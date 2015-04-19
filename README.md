@@ -1,4 +1,4 @@
-nDPI is an open source GPLv3 library for deep-packet inspection. Based on OpenDPI it includes ntop extensions. We have tried to push them into the OpenDPI source tree but nobody in answering emails so we have decided to create mour own source tree
+nDPI is an open source GPLv3 library for deep-packet inspection. Based on OpenDPI it includes ntop extensions. We have tried to push them into the OpenDPI source tree but nobody answered emails so we have decided to create mour own source tree
 
 ==========
 
