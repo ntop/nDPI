@@ -5584,7 +5584,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
 #ifndef __KERNEL__
 char* ndpi_revision() {
-  return(NDPI_SVN_RELEASE);
+  return(NDPI_GIT_RELEASE);
 }
 #endif
 

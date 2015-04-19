@@ -9,15 +9,16 @@ LT_INIT
 AC_PROG_CC
 AX_PTHREAD
 
-if test -d ".svn"; then :
-SVN_RELEASE=`svn info . | grep "^Revision"|cut -d " " -f 2`
-SVN_DATE=`svn info . | grep "^Last Changed Date"|cut -d " " -f 4-`
+if test -d ".git"; then :
+GIT_TAG=`git rev-parse HEAD | cut -c 1-10`
+GIT_DATE=`date +%Y%m%d`
+GIT_RELEASE="${PACKAGE_VERSION} (${GIT_TAG}:${GIT_DATE})"
 else
-SVN_RELEASE="${PACKAGE_VERSION}"
+GIT_RELEASE="${PACKAGE_VERSION}"
 SVN_DATE=`date`
 fi
 
-AC_DEFINE_UNQUOTED(NDPI_SVN_RELEASE, "r${SVN_RELEASE}", [SVN Release])
+AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "r${GIT_RELEASE}", [SVN Release])
 AC_DEFINE_UNQUOTED(NDPI_SVN_DATE, "${SVN_DATE}", [Last SVN change])
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h])
@@ -75,7 +76,7 @@ AC_CHECK_LIB(json-c, json_object_new_object, AC_DEFINE_UNQUOTED(HAVE_JSON_C, 1, 
 
 AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile libndpi.pc])
 AC_CONFIG_HEADERS(config.h)
-AC_SUBST(SVN_RELEASE)
+AC_SUBST(GIT_RELEASE)
 AC_SUBST(SVN_DATE)
 AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
