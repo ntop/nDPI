@@ -1,15 +1,12 @@
-This directory contains a modified version of OpenDPI which
-includes ntop extensions. I have tried to push them into the
-OpenDPI source tree but nobody in answering emails so I have
-decided to create my own source tree
+nDPI is an open source GPLv3 library for deep-packet inspection. Based on OpenDPI it includes ntop extensions. We have tried to push them into the OpenDPI source tree but nobody in answering emails so we have decided to create mour own source tree
 
 ==========
 
 In order to compile this library do
 
-# ./autogen.sh
-# ./configure
-# make
+- ./autogen.sh
+- ./configure
+- make
 
 Please note that the pre-requisites for compilation include:
 - GNU tools (autogen, automake, autoconf, libtool)
@@ -52,7 +49,7 @@ src/lib/Makefile.am
 
 If you want to distribute a source tar file of nDPI do:
 
-# make dist
+- make dist
 
 --------------------------
 April 2015 - ntop 
