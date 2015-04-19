@@ -1,0 +1,32 @@
+AC_INIT([Makefile.in], 1.0)
+
+NDPI_VERS=`cat ../../config.h | grep -w VERSION | cut -d \" -f 2`
+PFRING_VERS=`cat $HOME/PF_RING/kernel/linux/pf_ring.h | grep RING_VERSION | head -1 | cut -d '"' -f 2`
+SVN_RELEASE=`svn info ../.. | grep "^Revision"|cut -d " " -f 2`
+PFRING_SVN_RELEASE=`svn info $HOME/PF_RING | grep "^Revision"|cut -d " " -f 2`
+MACHINE=`uname -m`
+
+if test $MACHINE = "x86_64"; then
+   EXTN="amd64"
+else
+   EXTN="i386"
+fi
+
+DATE=`date -R`
+KERNEL=`uname -r`
+
+AC_SUBST(NDPI_VERS)
+AC_SUBST(PFRING_VERS)
+AC_SUBST(MACHINE)
+AC_SUBST(EXTN)
+AC_SUBST(DATE)
+AC_SUBST(KERNEL)
+AC_SUBST(SVN_RELEASE)
+AC_SUBST(PFRING_SVN_RELEASE)
+
+AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(debian/changelog)
+AC_CONFIG_FILES(debian/files)
+AC_CONFIG_FILES(debian/control)
+
+AC_OUTPUT

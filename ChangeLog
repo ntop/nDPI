@@ -1,0 +1,16 @@
+2014-03-21:
+- improved support for eDonkey/eMule/Kademlia
+- improved support for PPLive
+
+2014-03-20:
+- code optimizations
+- consistency improvements
+- added support for new applications: Pando Media Booster
+- improved support for Steam
+- added support for new web services: Wikipedia, MSN, Amazon, eBay, CNN
+
+2014-03-19:
+- added new protocols: FTP, code improvements
+
+2014-03-17:
+- added new protocols: SOCKSv4, SOCKSv5, RTMP

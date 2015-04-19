@@ -1,0 +1,4 @@
+This package is a GPL implementation of an iptables and netfilter module for
+nDPI integration into the Linux kernel.
+
+https://github.com/ewildgoose/ndpi-netfilter

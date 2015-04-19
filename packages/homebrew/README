@@ -1,0 +1,11 @@
+=== HOMEBREW PACKAGE ===
+
+NB: Work in progress
+
+- SUBMIT FORMULA
+cp ndpi.rb /usr/local/Library/Formula/
+
+- INSTALL FORMULA
+#check the formula
+brew audit ndpi
+brew install -vd ndpi
