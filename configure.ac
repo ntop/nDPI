@@ -10,7 +10,7 @@ AC_PROG_CC
 AX_PTHREAD
 
 if test -d ".git"; then :
-GIT_TAG=`git rev-parse HEAD | cut -c 1-10`
+GIT_TAG=`git rev-parse HEAD`
 GIT_DATE=`date +%Y%m%d`
 GIT_RELEASE="${PACKAGE_VERSION} (${GIT_TAG}:${GIT_DATE})"
 else
