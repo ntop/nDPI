@@ -1641,11 +1641,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Facebook",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_FACEBOOK_CHAT,
-			    no_master,
-			    no_master, "FacebookChat",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_PANDORA,
 			    no_master,
 			    no_master, "Pandora",
