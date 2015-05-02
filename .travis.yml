@@ -1,0 +1,18 @@
+language: c
+
+compiler:
+  - clang
+  - gcc
+
+install: 
+  - sudo apt-get update || true
+  - sudo apt-get install build-essential
+  - sudo apt-get install libpcap-dev libtool autoconf automake autogen
+
+before_script:
+  - ./autogen.sh
+
+script:
+  - ./configure
+  - make
+ 
