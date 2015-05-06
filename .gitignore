@@ -1,0 +1,6 @@
+*~
+.o
+*.obj
+.deps
+autom4te.cache
+configure
