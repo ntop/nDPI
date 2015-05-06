@@ -26,6 +26,7 @@
 #ifndef __KERNEL__
 #include <stdlib.h>
 #include <errno.h>
+#include <dirent.h>
 #endif
 
 #include "ahocorasick.h"
@@ -667,7 +668,77 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_struc
   return(0);
 }
 
-/* ****************************************************** */
+/* ******************************************************************** */
+
+void load_blacklist_rec (struct ndpi_detection_module_struct *ndpi_mod, const char *dir_name, int level)
+{
+    DIR *d;
+    FILE *f = NULL;
+    char tempNAME[PATH_MAX], path[PATH_MAX], line [PATH_MAX];
+    char *tstr;
+    struct dirent *entry;
+    static int count_files = 0;
+	 static int index_array = -1;
+
+	 if ( ( ior == 1 && iob != 1 ) || iob == -1 ) {
+        fprintf (stderr, "Error with args, with -r <0|..|n>, must use -b <dir>\n" );
+        return;
+     }
+	 else {
+		 d = opendir (dir_name);
+		 if (! d) {
+			  fprintf (stderr, "Cannot open directory '%s'\n", dir_name);
+			   return;
+		 }
+		 while (1) {
+			  struct dirent * entry;
+			  const char * d_name;
+			  entry = readdir (d);
+			  if (! entry ) break;
+			  d_name = entry->d_name;
+
+			  if (entry->d_type & DT_DIR) {
+					if ( level < lev_rec ) {
+						if (strcmp (d_name, "..") != 0 &&
+							 strcmp (d_name, ".") != 0) {
+							 int path_length;
+							 path_length = snprintf (path, PATH_MAX, "%s/%s", dir_name, d_name);
+							 tstr = entry->d_name;
+							 utarray_push_back(contents_array, &tstr);
+							 index_array ++;
+							 if (path_length >= PATH_MAX) {
+								  fprintf (stderr, "Path length has got too long.\n");
+								  return;
+							 }
+							 load_blacklist_rec(ndpi_mod, path, level + 1);
+						}
+					}
+				}
+				else {
+					snprintf (path, PATH_MAX, "%s/%s", dir_name, d_name);
+					if ( check_ext ( d_name, "domains", strlen ( "domains")) == 1 ){
+						count_files ++;
+						f = fopen (path,"r");
+						if ( f ) {
+									while( fgets(line,1024,f) ) {
+										line[strlen(line)-1] = '\0';
+										ndpi_string_to_automa(ndpi_mod, &ndpi_mod->blacklist_automa, line, index_array , NDPI_PROTOCOL_POTENTIALLY_DANGEROUS );
+									}
+									fclose ( f );
+								}
+							}
+						}
+		 }
+		 if (closedir (d)) {
+			  fprintf (stderr, "Could not close '%s'\n", dir_name);
+			   return;
+		 }
+	}
+	fprintf (stdout, "Blacklist load %d files \n", count_files);
+}
+
+/* ******************************************************************** */
+
 
 static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					 char *value, int protocol_id,
@@ -713,6 +784,10 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
       ndpi_mod->proto_defaults[host_match[i].protocol_id].protoId = host_match[i].protocol_id;
       ndpi_mod->proto_defaults[host_match[i].protocol_id].protoBreed = host_match[i].protocol_breed;
     }
+  }
+  if ( lev_rec > -1 ) {
+    utarray_new(contents_array, &ut_str_icd);
+    load_blacklist_rec(ndpi_mod, blacklist_dir, 0);
   }
 
   for(i=0; content_match[i].string_to_match != NULL; i++)
@@ -1686,6 +1761,56 @@ static int fill_prefix_v4(prefix_t *p, struct in_addr *a, int b, int mb) {
   return(0);
 }
 
+/* ****************************************************** */
+
+int ndpi_add_content_blacklist(struct ndpi_detection_module_struct *ndpi_struct,
+				 char *value, int protocol_id,
+				 ndpi_protocol_breed_t breed) {
+  return(ndpi_string_to_automa(ndpi_struct, &ndpi_struct->blacklist_automa, value, protocol_id, breed));
+}
+
+/* ******************************************************************** */
+int check_dir ( char * _blacklist_dir, int rec, int lev ) {
+	 DIR * d;
+    d = opendir (_blacklist_dir);
+    if (!d) {
+		 iob = -1;
+	 }
+    else {
+		  strcpy (blacklist_dir, _blacklist_dir);
+		  iob = 0;
+		  lev_rec = 1;
+	  }
+	  if ( rec == 1 ) iob = 1;
+	  closedir ( d );
+	  return 1;
+		
+}
+
+/* ******************************************************************** */
+
+int set_rec ( int rec, int lv ) {
+	ior = rec;
+	lev_rec = lv;
+}
+
+/* ******************************************************************** */
+
+int check_ext(const char* name, const char* extension, size_t length)
+{
+  const char* ldot = strrchr(name, '.');
+  if (ldot != NULL)
+  {
+    if (length == 0)
+      length = strlen(extension);
+    return strncmp(ldot + 1, extension, length) == 0;
+  }
+  return 0;
+}
+
+
+
+
 /* ******************************************* */
 
 u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin) {
@@ -1822,6 +1947,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_
   ndpi_str->host_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->content_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
+  ndpi_str->blacklist_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->impossible_bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
 
   ndpi_init_protocol_defaults(ndpi_str);
@@ -1855,6 +1981,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct
 
     if(ndpi_struct->content_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t*)ndpi_struct->content_automa.ac_automa);
+   
+    if(ndpi_struct->blacklist_automa.ac_automa != NULL)
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_struct->blacklist_automa.ac_automa);
 
     if(ndpi_struct->bigrams_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t*)ndpi_struct->bigrams_automa.ac_automa);
@@ -5473,6 +5602,43 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
 
 /* ****************************************************** */
 
+static int ndpi_automa_match_string_blacklist(struct ndpi_detection_module_struct *ndpi_struct,
+						ndpi_automa *automa,
+						struct ndpi_flow_struct *flow,
+						char *string_to_match, u_int string_to_match_len) {
+  int matching_blacklist_id;
+  struct ndpi_packet_struct *packet = &flow->packet;
+  AC_TEXT_t ac_input_text;
+
+  if((automa->ac_automa == NULL) || (string_to_match_len== 0)) return(-1);
+
+  if(!automa->ac_automa_finalized) {
+    ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
+    automa->ac_automa_finalized = 1;
+  }
+
+  matching_blacklist_id = -1;
+	 
+  ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
+  ac_automata_search (((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, (void*)&matching_blacklist_id);
+  ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
+   
+  return(matching_blacklist_id);
+
+}
+
+/* ****************************************************** */
+
+int ndpi_match_string_blacklist(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow,
+				  char *string_to_match, u_int string_to_match_len) {
+  return(ndpi_automa_match_string_blacklist(ndpi_struct, &ndpi_struct->blacklist_automa,
+					      flow, string_to_match, string_to_match_len));
+}
+
+
+/* ****************************************************** */
+
 static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 						ndpi_automa *automa,
 						struct ndpi_flow_struct *flow,
@@ -5523,6 +5689,7 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 
   return(NDPI_PROTOCOL_UNKNOWN);
 }
+
 
 /* ****************************************************** */
 

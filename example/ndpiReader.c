@@ -65,6 +65,7 @@ static void setupDetection(u_int16_t thread_id);
  * Client parameters
  */
 static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interafaces */
+static char *_blacklist_dir ; /**< Directory for blacklist */
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
 static char *_bpf_filter      = NULL; /**< bpf filter  */
 static char *_protoFilePath   = NULL; /**< Protocol file path  */
@@ -193,6 +194,9 @@ static void help(u_int long_help) {
 	 "          [-p <protos>][-l <loops>[-d][-h][-t][-v <level>]\n"
 	 "          [-n <threads>] [-j <file>]\n\n"
 	 "Usage:\n"
+ 	 "  -b <dir blacklist>        | Specify dir to load blacklist ( files in dirs must be *.domains ) \n"
+ 	 "  -r <0|...|n>					| Specify grade of recursion in dir blacklist \n"
+
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a device for live capture (comma-separated list)\n"
 	 "  -f <BPF filter>           | Specify a BPF filter for filtering selected traffic\n"
 	 "  -s <duration>             | Maximum capture duration in seconds (live traffic capture only)\n"
@@ -222,13 +226,21 @@ static void help(u_int long_help) {
 
 static void parseOptions(int argc, char **argv) {
   char *__pcap_file = NULL, *bind_mask = NULL;
-  int thread_id, opt;
+  int thread_id, opt, lvl;
 #ifdef linux
   u_int num_cores = sysconf( _SC_NPROCESSORS_ONLN );
 #endif
 
-  while ((opt = getopt(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:")) != EOF) {
+  while ((opt = getopt(argc, argv, "b:r:df:g:i:hp:l:s:tv:V:n:j:")) != EOF) {
     switch (opt) {
+     case 'b':
+	_blacklist_dir = optarg ;
+	check_dir ( _blacklist_dir, 1, 1 );
+	break;
+    case 'r':
+	lvl = atoi ( optarg );
+	set_rec( 1, lvl );
+	break;
     case 'd':
       enable_protocol_guess = 0;
       break;
@@ -448,7 +460,8 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
 #ifdef HAVE_JSON_C
   json_object *jObj;
 #endif
-
+  int bl = 0, i = 0;
+  char ** p;
   if(!json_flag) {
 #if 0
     printf("\t%s [VLAN: %u] %s:%u <-> %s:%u\n",
@@ -471,7 +484,18 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
 	   ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol),
 	   flow->packets, (long long unsigned int)flow->bytes);
 
-    if(flow->host_server_name[0] != '\0') printf("[Host: %s]", flow->host_server_name);
+     if(flow->host_server_name[0] != '\0') {
+	bl = ndpi_get_http_blacklist( ndpi_thread_info[thread_id].ndpi_struct, flow, flow->host_server_name, strlen(flow->host_server_name));
+	i = 0;
+	p = NULL;
+	if ( bl == -1 )  printf("[Host: %s]", flow->host_server_name);
+	else {
+	  while ( (p=(char**)utarray_next(contents_array,p))) {
+ 		if ( i == bl ) printf("[Host: %s - %s]", flow->host_server_name, *p);
+ 		i++;
+ 	  }
+ 	}
+    }
     if(flow->ssl.client_certificate[0] != '\0') printf("[SSL client: %s]", flow->ssl.client_certificate);
     if(flow->ssl.server_certificate[0] != '\0') printf("[SSL server: %s]", flow->ssl.server_certificate);
 

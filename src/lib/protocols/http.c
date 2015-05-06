@@ -969,6 +969,12 @@ char* ndpi_get_http_url(struct ndpi_detection_module_struct *ndpi_mod,
 }
 
 /* ********************************* */
+int ndpi_get_http_blacklist(struct ndpi_detection_module_struct *ndpi_mod,
+  struct ndpi_flow_struct *flow, char* h) {
+  return ndpi_match_string_blacklist(ndpi_mod, flow, h, strlen((char*)h));
+}
+
+/* ********************************* */
 
 char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod,
 			       struct ndpi_flow_struct *flow) {
