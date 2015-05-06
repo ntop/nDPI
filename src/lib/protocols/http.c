@@ -201,8 +201,13 @@ static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struc
       if(ndpi_struct->http_dissect_response) {
 	if(flow->http.url && flow->http_detected)
 	  ndpi_match_string_subprotocol(ndpi_struct, flow, (char *)&flow->http.url[7], strlen((const char *)&flow->http.url[7]));
+
+	  
       } else
+      
 	ndpi_match_string_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name, strlen((const char *)flow->host_server_name));
+
+	
     }
 }
 
@@ -913,6 +918,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     /* If we already detected the http request, we can add the connection and then check for the sub-protocol*/
     if (flow->http_detected)
       ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
+     
+    
 
     /* Parse packet line and we look for the subprotocols */
     ndpi_parse_packet_line_info(ndpi_struct, flow);
@@ -966,6 +973,13 @@ char* ndpi_get_http_url(struct ndpi_detection_module_struct *ndpi_mod,
     return("");
   else
     return(flow->http.url);
+}
+/* ********************************* */
+
+int ndpi_get_http_blacklist(struct ndpi_detection_module_struct *ndpi_mod,
+			struct ndpi_flow_struct *flow, char* h) {
+			
+  return ndpi_match_string_blacklist(ndpi_mod, flow, h, strlen((char*)h));
 }
 
 /* ********************************* */

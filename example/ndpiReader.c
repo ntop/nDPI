@@ -26,11 +26,13 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include "uthash.h"
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <process.h>
 #include <io.h>
 #include <getopt.h>
+#include <limits.h>
 #define getopt getopt____
 #else
 #include <unistd.h>
@@ -65,6 +67,7 @@ static void setupDetection(u_int16_t thread_id);
  * Client parameters
  */
 static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interafaces */
+static char *_blacklist_dir ; /**< Directory for blacklist */
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
 static char *_bpf_filter      = NULL; /**< bpf filter  */
 static char *_protoFilePath   = NULL; /**< Protocol file path  */
@@ -172,6 +175,7 @@ typedef struct ndpi_flow {
 
   u_int64_t bytes;
   u_int32_t packets;
+  u_int8_t content;
 
   // result only, not used for flow identification
   u_int32_t detected_protocol;
@@ -193,6 +197,8 @@ static void help(u_int long_help) {
 	 "          [-p <protos>][-l <loops>[-d][-h][-t][-v <level>]\n"
 	 "          [-n <threads>] [-j <file>]\n\n"
 	 "Usage:\n"
+	 "  -b <dir blacklist>        | Specify dir to load blacklist ( files in dirs must be *.domains ) \n"
+	 "  -r <0|...|n>					| Specify grade of recursion in dir blacklist \n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a device for live capture (comma-separated list)\n"
 	 "  -f <BPF filter>           | Specify a BPF filter for filtering selected traffic\n"
 	 "  -s <duration>             | Maximum capture duration in seconds (live traffic capture only)\n"
@@ -206,7 +212,8 @@ static void help(u_int long_help) {
 	 "  -d                        | Disable protocol guess and use only DPI\n"
 	 "  -t                        | Dissect GTP tunnels\n"
 	 "  -h                        | This help\n"
-	 "  -v <1|2>                  | Verbose 'unknown protocol' packet print. 1=verbose, 2=very verbose\n");
+	 "  -v <1|2>                  | Verbose 'unknown protocol' packet print. 1=verbose, 2=very verbose\n"
+	 "  -V <1|2>                  | Verbose nDPI trace log print. 1=trace, 2=debug\n");
 
   if(long_help) {
     printf("\n\nSupported protocols:\n");
@@ -222,13 +229,21 @@ static void help(u_int long_help) {
 
 static void parseOptions(int argc, char **argv) {
   char *__pcap_file = NULL, *bind_mask = NULL;
-  int thread_id, opt;
+  int thread_id, opt, lvl;
 #ifdef linux
   u_int num_cores = sysconf( _SC_NPROCESSORS_ONLN );
 #endif
 
-  while ((opt = getopt(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:")) != EOF) {
+  while ((opt = getopt(argc, argv, "b:r:df:g:i:hp:l:s:tv:V:n:j:")) != EOF) {
     switch (opt) {
+	 case 'b':
+		_blacklist_dir = optarg ;
+		check_dir ( _blacklist_dir, 1, 1 );
+		break;
+	 case 'r':
+		lvl = atoi ( optarg );
+		set_rec( 1, lvl );
+		break;
     case 'd':
       enable_protocol_guess = 0;
       break;
@@ -445,6 +460,8 @@ char* intoaV4(unsigned int addr, char* buf, u_short bufLen) {
 /* ***************************************************** */
 
 static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
+	int bl = 0, i = 0;
+	char ** p;
 #ifdef HAVE_JSON_C
   json_object *jObj;
 #endif
@@ -470,8 +487,20 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
 	   flow->detected_protocol,
 	   ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol),
 	   flow->packets, (long long unsigned int)flow->bytes);
-
-    if(flow->host_server_name[0] != '\0') printf("[Host: %s]", flow->host_server_name);
+	 
+    if(flow->host_server_name[0] != '\0') {
+		bl = ndpi_get_http_blacklist( ndpi_thread_info[thread_id].ndpi_struct, flow, flow->host_server_name, strlen(flow->host_server_name));
+		i = 0;
+		p = NULL;
+		if ( bl == -1 )  printf("[Host: %s]", flow->host_server_name);
+		else {
+			while ( (p=(char**)utarray_next(contents_array,p))) {
+				if ( i == bl ) printf("[Host: %s - %s]", flow->host_server_name, *p);
+				i++;
+			}
+		}
+	 }
+	 
     if(flow->ssl.client_certificate[0] != '\0') printf("[SSL client: %s]", flow->ssl.client_certificate);
     if(flow->ssl.server_certificate[0] != '\0') printf("[SSL server: %s]", flow->ssl.server_certificate);
 
@@ -954,7 +983,9 @@ static unsigned int packet_processing(u_int16_t thread_id,
     flow->detection_completed = 1;
 
     snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s", flow->ndpi_flow->host_server_name);
-
+	 
+	 
+	 
     if((proto == IPPROTO_TCP) && (flow->detected_protocol != NDPI_PROTOCOL_DNS)) {
       snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s", flow->ndpi_flow->protos.ssl.client_certificate);
       snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
@@ -966,10 +997,12 @@ static unsigned int packet_processing(u_int16_t thread_id,
 	)
        && full_http_dissection) {
       char *method;
-
+		
       printf("[URL] %s\n", ndpi_get_http_url(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
       printf("[Content-Type] %s\n", ndpi_get_http_content_type(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));     
 
+		//flow->content = flow->ndpi_flow->content;
+      
       switch(ndpi_get_http_method(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow)) {
       case HTTP_METHOD_OPTIONS: method = "HTTP_METHOD_OPTIONS"; break;
       case HTTP_METHOD_GET: method = "HTTP_METHOD_GET"; break;
@@ -1726,7 +1759,7 @@ int main(int argc, char **argv) {
 
   for(i=0; i<num_loops; i++)
     test_lib();
-
+  
   return 0;
 }
 

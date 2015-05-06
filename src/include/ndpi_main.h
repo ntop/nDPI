@@ -69,6 +69,11 @@
 #include "ndpi_protocol_ids.h"
 #include "ndpi_typedefs.h"
 #include "ndpi_protocols.h"
+#include "utarray.h"
+
+char blacklist_dir [1024] ; 
+int bl_rec, lev_rec, ior, iob;
+UT_array *contents_array;
 
 
 void *ndpi_tdelete(const void * __restrict, void ** __restrict,
