@@ -58,16 +58,6 @@ extern "C" {
   char* ndpi_strnstr(const char *s, const char *find, size_t slen);
 
   /**
-   * This function returns the nDPI protocol id for IP-based protocol detection
-   */
-  u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin);
-
-  /**
-   * Same as ndpi_network_ptree_match
-   */
-  u_int16_t ndpi_host_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t host);
-
-  /**
    * This function returns a new initialized detection module.
    * @param ticks_per_second the timestamp resolution per second (like 1000 for millisecond resolution)
    * @param ndpi_malloc function pointer to a memory allocator

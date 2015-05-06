@@ -259,6 +259,7 @@ typedef struct ndpi_id_struct {
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
+	
 #ifdef NDPI_PROTOCOL_MAIL_SMTP
   u_int16_t smtp_command_bitmask;
 #endif
@@ -306,6 +307,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t imesh_stage:4;
 #endif
 #ifdef NDPI_PROTOCOL_HTTP
+  
   u_int32_t http_setup_dir:2;
   u_int32_t http_stage:2;
   u_int32_t http_empty_line_seen:1;
@@ -619,10 +621,10 @@ typedef struct ndpi_detection_module_struct {
   u_int ndpi_num_custom_protocols;
 
   /* HTTP/DNS/HTTPS host matching */
-  ndpi_automa host_automa, content_automa, bigrams_automa, impossible_bigrams_automa;
+  ndpi_automa host_automa, content_automa, bigrams_automa, impossible_bigrams_automa, blacklist_automa;
 
-  /* IP-based protocol detection */
-  void *protocols_ptree;
+  /* Tor */
+  void *tor_ptree;
 
   /* irc parameters */
   u_int32_t irc_timeout;
@@ -670,6 +672,8 @@ typedef struct ndpi_detection_module_struct {
 } ndpi_detection_module_struct_t;
 
 typedef struct ndpi_flow_struct {
+	
+  
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
 #if NDPI_PROTOCOL_HISTORY_SIZE > 1
 #  if NDPI_PROTOCOL_HISTORY_SIZE > 5
@@ -687,12 +691,16 @@ typedef struct ndpi_flow_struct {
     protocol_stack_info;
 #endif
 
+
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id;
-
   u_int8_t protocol_id_already_guessed:1;
   u_int8_t no_cache_protocol:1;
   u_int8_t init_finished:1;
+  
+  
+  
+  
   u_int8_t setup_packet_direction:1;
   u_int8_t packet_direction:1; /* if ndpi_struct->direction_detect_disable == 1 */
   /* tcp sequence number connection tracking */
@@ -719,6 +727,7 @@ typedef struct ndpi_flow_struct {
   u_char detected_os[32];       /* Via HTTP User-Agent      */
   u_char nat_ip[24];            /* Via HTTP X-Forwarded-For */
 
+	
   /* 
      This structure below will not not stay inside the protos
      structure below as HTTP is used by many subprotocols

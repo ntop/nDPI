@@ -143,6 +143,8 @@ void ndpi_search_guildwars_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_dropbox(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+u_int8_t is_skype_host(u_int32_t host);
 void ndpi_search_citrix(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);

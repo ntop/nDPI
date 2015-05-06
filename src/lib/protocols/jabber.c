@@ -36,6 +36,10 @@ static struct jabber_string jabber_strings[] = {
   { "='im.truphone.com'",     NDPI_PROTOCOL_TRUPHONE },
   { "=\"im.truphone.com\"",   NDPI_PROTOCOL_TRUPHONE },
 #endif
+
+#ifdef NDPI_SERVICE_FACEBOOK_CHAT
+  { "to='chat.facebook.com'", NDPI_SERVICE_FACEBOOK_CHAT },
+#endif
   { NULL, 0 }
 };
 
