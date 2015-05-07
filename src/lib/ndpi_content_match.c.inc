@@ -28,6 +28,12 @@ typedef struct {
 } ndpi_protocol_match;
 
 typedef struct {
+  char *string_to_match, *proto_name;
+  int protocol_id;
+  ndpi_protocol_breed_t protocol_breed;
+} ndpi_content_match;
+
+typedef struct {
   u_int32_t network;
   u_int8_t cidr;
   u_int8_t value;

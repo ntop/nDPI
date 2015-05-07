@@ -619,7 +619,7 @@ typedef struct ndpi_detection_module_struct {
   u_int ndpi_num_custom_protocols;
 
   /* HTTP/DNS/HTTPS host matching */
-  ndpi_automa host_automa, content_automa, bigrams_automa, impossible_bigrams_automa;
+  ndpi_automa host_automa, content_automa, bigrams_automa, impossible_bigrams_automa, blacklist_automa;
 
   /* IP-based protocol detection */
   void *protocols_ptree;
