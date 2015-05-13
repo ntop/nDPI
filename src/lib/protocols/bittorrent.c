@@ -384,6 +384,8 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
       ndpi_int_search_bittorrent_tcp(ndpi_struct, flow);
     }
     else if(packet->udp != NULL) {
+      char *bt_search = "BT-SEARCH * HTTP/1.1\r\n";
+
       if((ntohs(packet->udp->source) < 1024)
 	 || (ntohs(packet->udp->dest) < 1024) /* High ports only */)
 	return;
@@ -395,44 +397,51 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
       */
 
       if(packet->payload_packet_len >= 23 /* min header size */) {
-	/* Check if this is protocol v0 */
-	u_int8_t v0_extension = packet->payload[17];
-	u_int8_t v0_flags     = packet->payload[18];
+	if(strncmp((const char*)packet->payload, bt_search, strlen(bt_search)) == 0) {
+	  ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
+					    NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
+					    NDPI_REAL_PROTOCOL);
+	  return;
+	} else {
+	  /* Check if this is protocol v0 */
+	  u_int8_t v0_extension = packet->payload[17];
+	  u_int8_t v0_flags     = packet->payload[18];
 
-	/* Check if this is protocol v1 */
-	u_int8_t v1_version     = packet->payload[0];
-	u_int8_t v1_extension   = packet->payload[1];
-	u_int32_t v1_window_size = *((u_int32_t*)&packet->payload[12]);
+	  /* Check if this is protocol v1 */
+	  u_int8_t v1_version     = packet->payload[0];
+	  u_int8_t v1_extension   = packet->payload[1];
+	  u_int32_t v1_window_size = *((u_int32_t*)&packet->payload[12]);
 
-	if((packet->payload[0]== 0x60)
-	   && (packet->payload[1]== 0x0)
-	   && (packet->payload[2]== 0x0)
-	   && (packet->payload[3]== 0x0)
-	   && (packet->payload[4]== 0x0)) {
-	  /* Heuristic */
-	  goto bittorrent_found;
-	} else if(((v1_version & 0x0f) == 1)
-		  && ((v1_version >> 4) < 5 /* ST_NUM_STATES */)
-		  && (v1_extension      < 3 /* EXT_NUM_EXT */)
-		  && (v1_window_size    < 32768 /* 32k */)
-		  ) {
-	  goto bittorrent_found;
-	} else if((v0_flags < 6 /* ST_NUM_STATES */)
-		  && (v0_extension < 3 /* EXT_NUM_EXT */)) {
-	  u_int32_t ts = ntohl(*((u_int32_t*)&(packet->payload[4])));
-	  u_int32_t now;
+	  if((packet->payload[0]== 0x60)
+	     && (packet->payload[1]== 0x0)
+	     && (packet->payload[2]== 0x0)
+	     && (packet->payload[3]== 0x0)
+	     && (packet->payload[4]== 0x0)) {
+	    /* Heuristic */
+	    goto bittorrent_found;
+	  } else if(((v1_version & 0x0f) == 1)
+		    && ((v1_version >> 4) < 5 /* ST_NUM_STATES */)
+		    && (v1_extension      < 3 /* EXT_NUM_EXT */)
+		    && (v1_window_size    < 32768 /* 32k */)
+		    ) {
+	    goto bittorrent_found;
+	  } else if((v0_flags < 6 /* ST_NUM_STATES */)
+		    && (v0_extension < 3 /* EXT_NUM_EXT */)) {
+	    u_int32_t ts = ntohl(*((u_int32_t*)&(packet->payload[4])));
+	    u_int32_t now;
 
 #ifndef __KERNEL__
-	  now = (u_int32_t)time(NULL);
+	    now = (u_int32_t)time(NULL);
 #else
-	  struct timespec t;
+	    struct timespec t;
 
-	  getnstimeofday(&t);
-	  now = t.tv_sec;
+	    getnstimeofday(&t);
+	    now = t.tv_sec;
 #endif
 
-	  if((ts < (now+86400)) && (ts > (now-86400))) {
-	    goto bittorrent_found;
+	    if((ts < (now+86400)) && (ts > (now-86400))) {
+	      goto bittorrent_found;
+	    }
 	  }
 	}
       }
