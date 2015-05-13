@@ -66,6 +66,8 @@ static void setupDetection(u_int16_t thread_id);
  */
 static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interafaces */
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
+static FILE *results_file = NULL;
+static char *results_path = NULL;
 static char *_bpf_filter      = NULL; /**< bpf filter  */
 static char *_protoFilePath   = NULL; /**< Protocol file path  */
 #ifdef HAVE_JSON_C
@@ -82,7 +84,7 @@ static u_int8_t undetected_flows_deleted = 0;
 static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
-static u_int8_t shutdown_app = 0;
+  static u_int8_t shutdown_app = 0, quiet_mode = 0;
 static u_int8_t num_threads = 1;
 static u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 #ifdef linux
@@ -190,8 +192,8 @@ static u_int32_t size_flow_struct = 0;
 
 static void help(u_int long_help) {
   printf("ndpiReader -i <file|device> [-f <filter>][-s <duration>]\n"
-	 "          [-p <protos>][-l <loops>[-d][-h][-t][-v <level>]\n"
-	 "          [-n <threads>] [-j <file>]\n\n"
+	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
+	 "          [-n <threads>] [-w <file>] [-j <file>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a device for live capture (comma-separated list)\n"
 	 "  -f <BPF filter>           | Specify a BPF filter for filtering selected traffic\n"
@@ -204,7 +206,10 @@ static void help(u_int long_help) {
          "  -g <id:id...>             | Thread affinity mask (one core id per thread)\n"
 #endif
 	 "  -d                        | Disable protocol guess and use only DPI\n"
+	 "  -q                        | Quiet mode\n"
 	 "  -t                        | Dissect GTP tunnels\n"
+	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
+	 "                            | testing purposes in order to compare results across runs\n"
 	 "  -h                        | This help\n"
 	 "  -v <1|2>                  | Verbose 'unknown protocol' packet print. 1=verbose, 2=very verbose\n");
 
@@ -224,10 +229,10 @@ static void parseOptions(int argc, char **argv) {
   char *__pcap_file = NULL, *bind_mask = NULL;
   int thread_id, opt;
 #ifdef linux
-  u_int num_cores = sysconf( _SC_NPROCESSORS_ONLN );
+  u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 
-  while ((opt = getopt(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:")) != EOF) {
+  while ((opt = getopt(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:w:q")) != EOF) {
     switch (opt) {
     case 'd':
       enable_protocol_guess = 0;
@@ -288,11 +293,23 @@ static void parseOptions(int argc, char **argv) {
 #endif
       break;
 
-    default:
-      help(0);
+    case 'w':
+      results_path = strdup(optarg);
+      if((results_file = fopen(results_path, "w")) == NULL) {
+	printf("Unable to write in file %s: quitting\n", results_path);
+	return;
+      }
       break;
-    }
-  }
+
+    case 'q':
+    quiet_mode = 1;
+    break;
+    
+  default:
+    help(0);
+      break;
+      }
+}
 
   // check parameters
   if(_pcap_file[0] == NULL || strcmp(_pcap_file[0], "") == 0) {
@@ -1151,6 +1168,7 @@ static void printResults(u_int64_t tot_usec) {
     cumulative_stats.max_packet_len += ndpi_thread_info[thread_id].stats.max_packet_len;
   }
 
+  if(!quiet_mode) {
   printf("\nnDPI Memory statistics:\n");
   printf("\tnDPI Memory (once):      %-13s\n", formatBytes(sizeof(struct ndpi_detection_module_struct), buf, sizeof(buf)));
   printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(size_flow_struct, buf, sizeof(buf)));
@@ -1203,6 +1221,7 @@ static void printResults(u_int64_t tot_usec) {
 
     if(enable_protocol_guess)
       printf("\tGuessed flow protos:   %-13u\n", cumulative_stats.guessed_flow_protocols);
+  }
   } else {
 #ifdef HAVE_JSON_C
     if((json_fp = fopen(_jsonFilePath,"w")) == NULL) {
@@ -1240,14 +1259,21 @@ static void printResults(u_int64_t tot_usec) {
 #endif
   }
 
-  if(!json_flag) printf("\n\nDetected protocols:\n");
+  if((!json_flag) && (!quiet_mode)) printf("\n\nDetected protocols:\n");
   for(i = 0; i <= ndpi_get_num_supported_protocols(ndpi_thread_info[0].ndpi_struct); i++) {
     ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].ndpi_struct, i);
 
     if(cumulative_stats.protocol_counter[i] > 0) {
       breed_stats[breed] += (long long unsigned int)cumulative_stats.protocol_counter_bytes[i];
 
-      if(!json_flag) {
+      if(results_file)
+	fprintf(results_file, "%s\t%llu\t%llu\t%u\n",
+		ndpi_get_proto_name(ndpi_thread_info[0].ndpi_struct, i),
+		(long long unsigned int)cumulative_stats.protocol_counter[i],
+		(long long unsigned int)cumulative_stats.protocol_counter_bytes[i],
+		cumulative_stats.protocol_flows[i]);	 
+
+      if((!json_flag) && (!quiet_mode)) {
 	printf("\t%-20s packets: %-13llu bytes: %-13llu "
 	       "flows: %-13u\n",
 	       ndpi_get_proto_name(ndpi_thread_info[0].ndpi_struct, i),
@@ -1272,7 +1298,7 @@ static void printResults(u_int64_t tot_usec) {
     }
   }
 
-  if(!json_flag) {
+  if((!json_flag) && (!quiet_mode)) {
     printf("\n\nProtocol statistics:\n");
 
     for(i=0; i < NUM_BREEDS; i++) {
@@ -1426,21 +1452,21 @@ static void openPcapFileOrDevice(u_int16_t thread_id) {
         printf("ERROR: could not open pcap file or playlist: %s\n", ndpi_thread_info[thread_id]._pcap_error_buffer);
         exit(-1);
       } else {
-        if(!json_flag) printf("Reading packets from playlist %s...\n", _pcap_file[thread_id]);
+        if((!json_flag) && (!quiet_mode)) printf("Reading packets from playlist %s...\n", _pcap_file[thread_id]);
       }
     } else {
-      if(!json_flag) printf("Reading packets from pcap file %s...\n", _pcap_file[thread_id]);
+      if((!json_flag) && (!quiet_mode)) printf("Reading packets from pcap file %s...\n", _pcap_file[thread_id]);
     }
   } else {
     live_capture = 1;
 
-    if(!json_flag) printf("Capturing live traffic from device %s...\n", _pcap_file[thread_id]);
+    if((!json_flag) && (!quiet_mode)) printf("Capturing live traffic from device %s...\n", _pcap_file[thread_id]);
   }
 
   configurePcapHandle(thread_id);
 
   if(capture_for > 0) {
-    if(!json_flag) printf("Capturing traffic up to %u seconds\n", (unsigned int)capture_for);
+    if((!json_flag) && (!quiet_mode)) printf("Capturing traffic up to %u seconds\n", (unsigned int)capture_for);
 
 #ifndef WIN32
     alarm(capture_for);
@@ -1539,7 +1565,7 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
       static u_int8_t cap_warning_used = 0;
 
       if(cap_warning_used == 0) {
-	if(!json_flag) printf("\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
+	if((!json_flag) && (!quiet_mode)) printf("\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
 	cap_warning_used = 1;
       }
     }
@@ -1554,7 +1580,7 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
 
       ndpi_thread_info[thread_id].stats.fragmented_count++;
       if(ipv4_frags_warning_used == 0) {
-	if(!json_flag) printf("\n\nWARNING: IPv4 fragments are not handled by this demo (nDPI supports them)\n");
+	if((!json_flag) && (!quiet_mode)) printf("\n\nWARNING: IPv4 fragments are not handled by this demo (nDPI supports them)\n");
 	ipv4_frags_warning_used = 1;
       }
 
@@ -1579,7 +1605,7 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
 
   v4_warning:
     if(ipv4_warning_used == 0) {
-      if(!json_flag) printf("\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
+      if((!json_flag) && (!quiet_mode)) printf("\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
       ipv4_warning_used = 1;
     }
 
@@ -1640,11 +1666,11 @@ void *processing_thread(void *_thread_id) {
     if(pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset) != 0)
       fprintf(stderr, "Error while binding thread %ld to core %d\n", thread_id, core_affinity[thread_id]);
     else {
-      if(!json_flag) printf("Running thread %ld on core %d...\n", thread_id, core_affinity[thread_id]);
+      if((!json_flag) && (!quiet_mode)) printf("Running thread %ld on core %d...\n", thread_id, core_affinity[thread_id]);
     }
   } else
 #endif
-    if(!json_flag) printf("Running thread %ld...\n", thread_id);
+    if((!json_flag) && (!quiet_mode)) printf("Running thread %ld...\n", thread_id);
 
  pcap_loop:
   runPcapLoop(thread_id);
@@ -1711,7 +1737,7 @@ int main(int argc, char **argv) {
 
   parseOptions(argc, argv);
 
-  if(!json_flag) {
+  if((!json_flag) && (!quiet_mode)) {
     printf("\n-----------------------------------------------------------\n"
 	   "* NOTE: This is demo app to show *some* nDPI features.\n"
 	   "* In this demo we have implemented only some basic features\n"
@@ -1726,6 +1752,9 @@ int main(int argc, char **argv) {
 
   for(i=0; i<num_loops; i++)
     test_lib();
+
+  if(results_path) free(results_path);
+  if(results_file) fclose(results_file);
 
   return 0;
 }
