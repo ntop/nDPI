@@ -177,5 +177,6 @@ void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 void ndpi_search_twitter(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_vhua(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 #endif /* __NDPI_PROTOCOLS_INCLUDE_FILE__ */
