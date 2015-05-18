@@ -32,8 +32,8 @@ typedef enum {
 } ndpi_log_level_t;
 
 typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol,
-              void *module_struct, ndpi_log_level_t log_level,
-              const char *format, ...);
+					 void *module_struct, ndpi_log_level_t log_level,
+					 const char *format, ...);
 #define BT_ANNOUNCE
 
 typedef enum {
@@ -102,43 +102,43 @@ typedef union {
 #ifdef NDPI_PROTOCOL_BITTORRENT
 #ifndef __KERNEL__
 typedef struct spinlock {
-        volatile int    val;
+  volatile int    val;
 } spinlock_t;
 typedef struct atomic {
-	volatile int counter;
+  volatile int counter;
 } atomic_t;
 
 #endif
 
 struct hash_ip4p_node {
-        struct hash_ip4p_node   *next,*prev;
-        time_t                  lchg;
-        u_int16_t               port,count:12,flag:4;
-        u_int32_t               ip;
-	// + 12 bytes for ipv6
+  struct hash_ip4p_node   *next,*prev;
+  time_t                  lchg;
+  u_int16_t               port,count:12,flag:4;
+  u_int32_t               ip;
+  // + 12 bytes for ipv6
 };
 
 struct hash_ip4p {
-        struct hash_ip4p_node   *top;
-        spinlock_t              lock;
-        size_t                  len;
+  struct hash_ip4p_node   *top;
+  spinlock_t              lock;
+  size_t                  len;
 };
 
 struct hash_ip4p_table {
-        size_t                  size;
-	int			ipv6;
-        spinlock_t              lock;
-        atomic_t                count;
-        struct hash_ip4p        tbl[0];
+  size_t                  size;
+  int			ipv6;
+  spinlock_t              lock;
+  atomic_t                count;
+  struct hash_ip4p        tbl;
 };
 
 struct bt_announce { // 192 bytes
-	u_int32_t		hash[5];
-	u_int32_t		ip[4];
-	u_int32_t		time;
-	u_int16_t		port;
-	u_int8_t		name_len,
-				name[192 - 4*10 - 2 - 1]; // 149 bytes
+  u_int32_t		hash[5];
+  u_int32_t		ip[4];
+  u_int32_t		time;
+  u_int16_t		port;
+  u_int8_t		name_len,
+    name[192 - 4*10 - 2 - 1]; // 149 bytes
 };
 #endif
 
@@ -174,7 +174,7 @@ typedef struct ndpi_id_struct {
   u_int32_t yahoo_video_lan_timer;
 #endif
 #endif
-/* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
+  /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
 #ifdef NDPI_PROTOCOL_IRC
 #define NDPI_PROTOCOL_IRC_MAXPORT 8
   u_int16_t irc_port[NDPI_PROTOCOL_IRC_MAXPORT];
@@ -518,8 +518,8 @@ typedef struct ndpi_packet_struct {
 
   u_int8_t ssl_certificate_detected:4, ssl_certificate_num_checks:4;
   u_int8_t packet_lines_parsed_complete:1,
-	   packet_direction:1,
-	   empty_line_position_set:1;
+    packet_direction:1,
+    empty_line_position_set:1;
 } ndpi_packet_struct_t;
 
 struct ndpi_detection_module_struct;
@@ -710,7 +710,7 @@ typedef struct ndpi_flow_struct {
 				       Pointer to src or dst
 				       that identifies the 
 				       server of this connection
-				     */
+				    */
 #ifndef __KERNEL__
   u_char host_server_name[256]; /* HTTP host or DNS query   */ 
 #else
