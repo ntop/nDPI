@@ -101,7 +101,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
             }
 
             // Skip CID length.
-            ver_offs = cid_len + 1 +1;
+            ver_offs = cid_len + 1;
             unsigned char vers[] = {packet->payload[ver_offs], packet->payload[ver_offs + 1],
                                     packet->payload[ver_offs + 2], packet->payload[ver_offs + 3]};
 
