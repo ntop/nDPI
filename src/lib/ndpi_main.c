@@ -1460,7 +1460,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master,
 			    no_master, "Quic",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 443, 0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_b, 443, 80, 0, 0, 0) /* UDP */);
 
     custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
     custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN;
