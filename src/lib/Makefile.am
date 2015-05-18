@@ -95,7 +95,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/quake.c \
 		     protocols/radius.c \
 		     protocols/rdp.c \
-		     protocols/redis.c \
+		     protocols/redis_net.c \
 		     protocols/rsync.c \
 		     protocols/rtcp.c \
 		     protocols/rtmp.c \
@@ -148,7 +148,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/xdmcp.c \
 		     protocols/yahoo.c \
 		     protocols/zattoo.c \
-		     protocols/zmq.c \
+		     protocols/zeromq.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
 		     third_party/include/node.h \

@@ -41,7 +41,11 @@
 #ifndef _PATRICIA_H
 #define _PATRICIA_H
 
-#define HAVE_IPV6
+#ifndef WIN32
+#define PATRICIA_IPV6  HAVE_IPV6
+#else
+#define PATRICIA_IPV6  0
+#endif
 
 /* typedef unsigned int u_int; */
 /* { from defs.h */
@@ -94,7 +98,7 @@ typedef struct the_prefix_t {
   int ref_count;		/* reference count */
   union {
     struct in_addr sin;
-#ifdef HAVE_IPV6
+#ifdef PATRICIA_IPV6
     struct in6_addr sin6;
 #endif /* IPV6 */
   } add;

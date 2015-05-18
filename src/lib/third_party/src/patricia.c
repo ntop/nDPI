@@ -60,6 +60,7 @@
 
 #include "patricia.h"
 
+
 #ifdef __KERNEL__
 
 long atol(const char *nptr) {
@@ -125,12 +126,12 @@ inet_pton (int af, const char *src, void *dst)
     }
   }
 #ifdef NT
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
   else if(af == AF_INET6) {
     struct in6_addr Address;
     return (inet6_addr(src, &Address));
   }
-#endif /* HAVE_IPV6 */
+#endif /* PATRICIA_IPV6 */
 #endif /* NT */
 #ifndef NT
   else {
@@ -174,10 +175,10 @@ ndpi_my_inet_pton (int af, const char *src, void *dst)
     }
     memcpy (dst, xp, sizeof(struct in_addr));
     return (1);
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
   } else if(af == AF_INET6) {
     return (inet_pton (af, src, dst));
-#endif /* HAVE_IPV6 */
+#endif /* PATRICIA_IPV6 */
   } else {
 #ifndef NT
 #ifndef __KERNEL__
@@ -235,7 +236,7 @@ ndpi_ndpi_prefix_toa2x (prefix_t *prefix, char *buff, int with_len)
     }
     return (buff);
   }
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
   else if(prefix->family == AF_INET6) {
     char *r;
     r = (char *) inet_ntop (AF_INET6, &prefix->add.sin6, buff, 48 /* a guess value */ );
@@ -245,7 +246,7 @@ ndpi_ndpi_prefix_toa2x (prefix_t *prefix, char *buff, int with_len)
     }
     return (buff);
   }
-#endif /* HAVE_IPV6 */
+#endif /* PATRICIA_IPV6 */
   else
     return (NULL);
 }
@@ -273,7 +274,7 @@ ndpi_New_Prefix2 (int family, void *dest, int bitlen, prefix_t *prefix)
   int dynamic_allocated = 0;
   int default_bitlen = sizeof(struct in_addr) * 8;
 
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
   if(family == AF_INET6) {
     default_bitlen = sizeof(struct in6_addr) * 8;
     if(prefix == NULL) {
@@ -283,7 +284,7 @@ ndpi_New_Prefix2 (int family, void *dest, int bitlen, prefix_t *prefix)
     memcpy (&prefix->add.sin6, dest, sizeof(struct in6_addr));
   }
   else
-#endif /* HAVE_IPV6 */
+#endif /* PATRICIA_IPV6 */
     if(family == AF_INET) {
       if(prefix == NULL) {
 #ifndef NT
@@ -327,9 +328,9 @@ ndpi_ascii2prefix (int family, char *string)
   long maxbitlen = 0;
   char *cp;
   struct in_addr sin;
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
   struct in6_addr sin6;
-#endif /* HAVE_IPV6 */ 
+#endif /* PATRICIA_IPV6 */ 
   char save[MAXLINE];
 
   if(string == NULL)
@@ -338,19 +339,19 @@ ndpi_ascii2prefix (int family, char *string)
   /* easy way to handle both families */
   if(family == 0) {
     family = AF_INET;
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
     if(strchr (string, ':')) family = AF_INET6;
-#endif /* HAVE_IPV6 */
+#endif /* PATRICIA_IPV6 */
   }
 
   if(family == AF_INET) {
     maxbitlen = sizeof(struct in_addr) * 8;
   }
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
   else if(family == AF_INET6) {
     maxbitlen = sizeof(struct in6_addr) * 8;
   }
-#endif /* HAVE_IPV6 */
+#endif /* PATRICIA_IPV6 */
 
   if((cp = strchr (string, '/')) != NULL) {
     bitlen = atol (cp + 1);
@@ -372,7 +373,7 @@ ndpi_ascii2prefix (int family, char *string)
     return (ndpi_New_Prefix (AF_INET, &sin, bitlen));
   }
 
-#if defined(HAVE_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
   else if(family == AF_INET6) {
     // Get rid of this with next IPv6 upgrade
 #if defined(NT) && !defined(HAVE_INET_NTOP)
@@ -384,7 +385,7 @@ ndpi_ascii2prefix (int family, char *string)
 #endif /* NT */
     return (ndpi_New_Prefix (AF_INET6, &sin6, bitlen));
   }
-#endif /* HAVE_IPV6 */
+#endif /* PATRICIA_IPV6 */
   else
     return (NULL);
 }
