@@ -246,7 +246,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	j++, i++;
       }
 
-      if(a_record != 0) {
+      if(a_record[0] != 0) {
 	char a_buf[32];
 	int i;
 

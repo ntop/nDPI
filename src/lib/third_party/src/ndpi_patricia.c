@@ -58,7 +58,7 @@
 #define assert(a) ;
 #endif /* __KERNEL__ */
 
-#include "patricia.h"
+#include "ndpi_patricia.h"
 
 
 #ifdef __KERNEL__
@@ -196,7 +196,7 @@ ndpi_my_inet_pton (int af, const char *src, void *dst)
  * thread safe and (almost) re-entrant implementation
  */
 char *
-ndpi_ndpi_prefix_toa2x (prefix_t *prefix, char *buff, int with_len)
+ndpi_prefix_toa2x (prefix_t *prefix, char *buff, int with_len)
 {
   if(prefix == NULL)
     return ((char*)"(Null)");
@@ -257,7 +257,7 @@ ndpi_ndpi_prefix_toa2x (prefix_t *prefix, char *buff, int with_len)
 char *
 ndpi_prefix_toa2 (prefix_t *prefix, char *buff)
 {
-  return (ndpi_ndpi_prefix_toa2x (prefix, buff, 0));
+  return (ndpi_prefix_toa2x (prefix, buff, 0));
 }
 
 /* ndpi_prefix_toa

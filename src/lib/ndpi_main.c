@@ -49,8 +49,8 @@
 #endif
 
 #include "ndpi_content_match.c.inc"
-#include "third_party/include/patricia.h"
-#include "third_party/src/patricia.c"
+#include "third_party/include/ndpi_patricia.h"
+#include "third_party/src/ndpi_patricia.c"
 
 #ifdef WIN32
 /* http://social.msdn.microsoft.com/Forums/uk/vcgeneral/thread/963aac07-da1a-4612-be4a-faac3f1d65ca */

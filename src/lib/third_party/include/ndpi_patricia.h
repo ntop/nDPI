@@ -1,5 +1,5 @@
 /*
- * $Id: patricia.h,v 1.6 2005/12/07 20:53:01 dplonka Exp $
+ * $Id: ndpi_patricia.h,v 1.6 2005/12/07 20:53:01 dplonka Exp $
  * Dave Plonka <plonka@doit.wisc.edu>
  *
  * This product includes software developed by the University of Michigan,
@@ -7,7 +7,7 @@
  *
  * This file had been called "radix.h" in the MRT sources.
  *
- * I renamed it to "patricia.h" since it's not an implementation of a general
+ * I renamed it to "ndpi_patricia.h" since it's not an implementation of a general
  * radix trie.  Also, pulled in various requirements from "mrt.h" and added
  * some other things it could be used as a standalone API.
 
@@ -38,8 +38,8 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _PATRICIA_H
-#define _PATRICIA_H
+#ifndef _NDPI_PATRICIA_H
+#define _NDPI_PATRICIA_H
 
 #ifndef WIN32
 #define PATRICIA_IPV6  HAVE_IPV6
@@ -189,7 +189,7 @@ void ndpi_patricia_process (patricia_tree_t *patricia, void_fn2_t func);
   }						\
     } while (0)
 
-#endif /* _PATRICIA_H */
+#endif /* _NDPI_PATRICIA_H */
 
 /*************************
 
