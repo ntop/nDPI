@@ -114,16 +114,13 @@ int sequence(const unsigned char *payload)
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
     struct ndpi_packet_struct *packet = &flow->packet;
-    u_int16_t dport = 0, sport = 0;
     u_int ver_offs;
 
     if(packet->udp != NULL) {
-        sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
         NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "calculating quic over udp.\n");
 
         // Settings without version. First check if PUBLIC FLAGS & SEQ bytes are 0x0. SEQ must be 1 at least.
-        if ((sport == 80 || dport == 80 || sport == 443 || dport == 443) && ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) ||
-                                                                             (packet->payload[0] & (QUIC_NO_V_RES_RSV) == 0)))
+        if ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) || (packet->payload[0] & (QUIC_NO_V_RES_RSV) == 0))
         {
             if (sequence(packet->payload) < 1)
             {
