@@ -1677,6 +1677,7 @@ static int fill_prefix_v4(prefix_t *p, struct in_addr *a, int b, int mb) {
     if(b < 0 || b > mb)
       return(-1);
 
+    memset(p, 0, sizeof(prefix_t));
     memcpy(&p->add.sin, a, (mb+7)/8);
     p->family = AF_INET;
     p->bitlen = b;
@@ -1692,6 +1693,7 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
   prefix_t prefix;
   patricia_node_t *node;
 
+  pin->s_addr = ntohl(pin->s_addr); /* Make sure all in network byte order otherwise compares wont work */
   fill_prefix_v4(&prefix, pin, 32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_struct->protocols_ptree, &prefix);
 
@@ -1755,7 +1757,7 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
     struct in_addr pin;
     patricia_node_t *node;
 
-    pin.s_addr = host_list[i].network;
+    pin.s_addr = ntohl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL)
       node->value.user_value = host_list[i].value;
   }

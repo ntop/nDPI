@@ -72,12 +72,14 @@ static ndpi_network host_protocol_list[] = {
   { 0x6CA0A000 /* 108.160.160.0 */, 20, NDPI_PROTOCOL_DROPBOX },
 
   /* 
-     Skype
+     Skype (Microsoft CDN)
      157.56.0.0/14, 157.60.0.0/16, 157.54.0.0/15
+     111.221.64.0 - 111.221.127.255
   */
   { 0x9D380000 /* 157.56.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x9D360000 /* 157.54.0.0/ */, 15, NDPI_PROTOCOL_SKYPE },
+  { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
+  { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
 
   /*
     Google
@@ -258,6 +260,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xD820F200, 24, NDPI_PROTOCOL_SKYPE },
   { 0xD821F000, 22, NDPI_PROTOCOL_SKYPE },
   { 0xD4A10800, 24, NDPI_PROTOCOL_SKYPE },
+
   { 0x012A1231, 32, NDPI_PROTOCOL_TOR },
   { 0x01E69FA1, 32, NDPI_PROTOCOL_TOR },
   { 0x020DE985, 32, NDPI_PROTOCOL_TOR },
