@@ -4212,7 +4212,7 @@ unsigned int ndpi_detection_process_packet(struct ndpi_detection_module_struct *
     flow->packet.tick_timestamp = d;
   }
 #else
-  flow->packet.tick_timestamp = current_tick_l/1000;
+  flow->packet.tick_timestamp = (u_int32_t)current_tick_l/1000;
 #endif
 
   /* parse packet */

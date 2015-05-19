@@ -44,7 +44,7 @@
 #ifndef WIN32
 #define PATRICIA_IPV6  HAVE_IPV6
 #else
-#define PATRICIA_IPV6  0
+#undef PATRICIA_IPV6
 #endif
 
 /* typedef unsigned int u_int; */
@@ -142,7 +142,11 @@ void ndpi_Clear_Patricia (patricia_tree_t *patricia, void_fn_t func);
 void ndpi_Destroy_Patricia (patricia_tree_t *patricia, void_fn_t func);
 void ndpi_patricia_process (patricia_tree_t *patricia, void_fn2_t func);
 
+#ifdef WIN32
+#define PATRICIA_MAXBITS	128
+#else
 #define PATRICIA_MAXBITS	(sizeof(struct in6_addr) * 8)
+#endif
 #define PATRICIA_NBIT(x)        (0x80 >> ((x) & 0x7f))
 #define PATRICIA_NBYTE(x)       ((x) >> 3)
 
