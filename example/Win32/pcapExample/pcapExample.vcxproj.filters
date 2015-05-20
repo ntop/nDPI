@@ -252,6 +252,9 @@
     <ClCompile Include="..\..\..\src\lib\protocols\quake.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\protocols\quic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\lib\protocols\radius.c">
       <Filter>Source Files</Filter>
     </ClCompile>

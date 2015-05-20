@@ -93,6 +93,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/pptp.c \
 		     protocols/qq.c \
 		     protocols/quake.c \
+		     protocols/quic.c \
 		     protocols/radius.c \
 		     protocols/rdp.c \
 		     protocols/redis_net.c \
