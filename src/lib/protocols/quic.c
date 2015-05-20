@@ -23,7 +23,7 @@
 
 #include "ndpi_api.h"
 
-#define QUIC_NO_V_RES_RSV 0xf3  // 1100 0011
+#define QUIC_NO_V_RES_RSV 0xC3  // 1100 0011
 
 #define QUIC_CID_MASK 0x0C      // 0000 1100
 #define QUIC_VER_MASK 0x01      // 0000 0001
@@ -39,10 +39,7 @@
 #define SEQ_LEN_2 0x10          // 0001 0000
 #define SEQ_LEN_1 0x00          // 0000 0000
 
-#define SEQ_CONV_6(ARR) (ARR[0] | ARR[1] | ARR[2] | ARR[3] | ARR[4] | ARR[5] << 8)
-#define SEQ_CONV_4(ARR) (ARR[0] | ARR[1] | ARR[2] | ARR[3] << 8)
-#define SEQ_CONV_2(ARR) (ARR[0] | ARR[1] << 8)
-#define SEQ_CONV_1(ARR) (ARR[0] << 8)
+#define SEQ_CONV(ARR) (ARR[0] | ARR[1] | ARR[2] | ARR[3] | ARR[4] | ARR[5] << 8)
 
 
 #ifdef NDPI_PROTOCOL_QUIC
@@ -55,7 +52,7 @@ static void ndpi_int_quic_add_connection(struct ndpi_detection_module_struct
 int connect_id(const unsigned char pflags)
 {
     u_int cid_len;
-
+    
         // Check CID length.
         switch (pflags & QUIC_CID_MASK)
         {
@@ -73,42 +70,34 @@ int connect_id(const unsigned char pflags)
 
 int sequence(const unsigned char *payload)
 {
-    unsigned char* conv;
-    u_int seq_len;
+    unsigned char conv[6] = {0};
+    u_int seq_value = -1;
+    u_int seq_lens;
     u_int cid_offs;
-    u_int seq_value;
     int i;
 
+        // Search SEQ bytes length.
         switch (payload[0] & QUIC_SEQ_MASK)
         {
-           case SEQ_LEN_6: seq_len = 6; break;
-           case SEQ_LEN_4: seq_len = 4; break;
-           case SEQ_LEN_2: seq_len = 2; break;
-           case SEQ_LEN_1: seq_len = 1; break;
+           case SEQ_LEN_6: seq_lens = 6; break;
+           case SEQ_LEN_4: seq_lens = 4; break;
+           case SEQ_LEN_2: seq_lens = 2; break;
+           case SEQ_LEN_1: seq_lens = 1; break;
            default:
                return -1;
         }
-
-        if (seq_len > 0) calloc(seq_len, sizeof(unsigned char));
+        // Retrieve SEQ offset.
         cid_offs = connect_id(payload[0]);
 
-        if (cid_offs >= 0)
+        if (cid_offs >= 0 && seq_lens > 0)
         {
-            for (i = cid_offs; i < seq_len; i++)
-                conv[i] = payload[i];
+            for (i = 0; i < seq_lens; i++)
+                conv[i] = payload[cid_offs + i];
 
-            switch (seq_len)
-            {
-               case 6: seq_value = SEQ_CONV_6(conv); break;
-               case 4: seq_value = SEQ_CONV_4(conv); break;
-               case 2: seq_value = SEQ_CONV_2(conv); break;
-               case 1: seq_value = SEQ_CONV_1(conv); break;
-               default:
-                   return -1;
-            }
-            // Return SEQ int value;
-            return seq_value;
+        seq_value = SEQ_CONV(conv);
         }
+        // Return SEQ dec value;
+        return seq_value;
 }
 
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -120,7 +109,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
         NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "calculating quic over udp.\n");
 
         // Settings without version. First check if PUBLIC FLAGS & SEQ bytes are 0x0. SEQ must be 1 at least.
-        if ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) || (packet->payload[0] & (QUIC_NO_V_RES_RSV) == 0))
+        if ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) || ((packet->payload[0] & QUIC_NO_V_RES_RSV) == 0))
         {
             if (sequence(packet->payload) < 1)
             {
