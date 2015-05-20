@@ -49,7 +49,7 @@ static void ndpi_int_quic_add_connection(struct ndpi_detection_module_struct
   ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_REAL_PROTOCOL);
 }
 
-int connect_id(const unsigned char pflags)
+static int connect_id(const unsigned char pflags)
 {
   u_int cid_len;
     
@@ -68,12 +68,12 @@ int connect_id(const unsigned char pflags)
   return cid_len + 1;
 }
 
-int sequence(const unsigned char *payload)
+static int sequence(const unsigned char *payload)
 {
   unsigned char conv[6] = {0};
   u_int seq_value = -1;
-  u_int seq_lens;
-  u_int cid_offs;
+  int seq_lens;
+  int cid_offs;
   int i;
 
   // Search SEQ bytes length.
@@ -103,7 +103,7 @@ int sequence(const unsigned char *payload)
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int ver_offs;
+  int ver_offs;
 
   if(packet->udp != NULL) {
     u_int16_t sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
