@@ -160,7 +160,7 @@ static u_int32_t size_id_struct = 0;		//< ID tracking structure size
 #endif
 
 // flow tracking
-typedef struct ndpi_flow {  
+typedef struct ndpi_flow {
   u_int32_t lower_ip;
   u_int32_t upper_ip;
   u_int16_t lower_port;
@@ -304,7 +304,7 @@ static void parseOptions(int argc, char **argv) {
     case 'q':
     quiet_mode = 1;
     break;
-    
+
   default:
     help(0);
       break;
@@ -637,7 +637,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 
       if (flow->detected_protocol == 0 /* UNKNOWN */ && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
- 
+
       free_ndpi_flow(flow);
       ndpi_thread_info[thread_id].stats.ndpi_flow_count--;
 
@@ -866,7 +866,7 @@ static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
 
   if(iph.protocol == 0x3C /* IPv6 destination option */) {
     u_int8_t *options = (u_int8_t*)iph6 + sizeof(const struct ndpi_ip6_hdr);
-    
+
     iph.protocol = options[0];
   }
 
@@ -884,7 +884,7 @@ static void setupDetection(u_int16_t thread_id) {
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
 
   // init global detection structure
-  ndpi_thread_info[thread_id].ndpi_struct = ndpi_init_detection_module(detection_tick_resolution, 
+  ndpi_thread_info[thread_id].ndpi_struct = ndpi_init_detection_module(detection_tick_resolution,
 								       malloc_wrapper, free_wrapper, debug_printf);
   if(ndpi_thread_info[thread_id].ndpi_struct == NULL) {
     printf("ERROR: global structure initialization failed\n");
@@ -978,14 +978,14 @@ static unsigned int packet_processing(u_int16_t thread_id,
     }
 
     if((
-	(flow->detected_protocol == NDPI_PROTOCOL_HTTP) 
+	(flow->detected_protocol == NDPI_PROTOCOL_HTTP)
 	|| (flow->detected_protocol == NDPI_SERVICE_FACEBOOK)
 	)
        && full_http_dissection) {
       char *method;
 
       printf("[URL] %s\n", ndpi_get_http_url(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
-      printf("[Content-Type] %s\n", ndpi_get_http_content_type(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));     
+      printf("[Content-Type] %s\n", ndpi_get_http_content_type(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
 
       switch(ndpi_get_http_method(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow)) {
       case HTTP_METHOD_OPTIONS: method = "HTTP_METHOD_OPTIONS"; break;
@@ -1271,7 +1271,7 @@ static void printResults(u_int64_t tot_usec) {
 		ndpi_get_proto_name(ndpi_thread_info[0].ndpi_struct, i),
 		(long long unsigned int)cumulative_stats.protocol_counter[i],
 		(long long unsigned int)cumulative_stats.protocol_counter_bytes[i],
-		cumulative_stats.protocol_flows[i]);	 
+		cumulative_stats.protocol_flows[i]);
 
       if((!json_flag) && (!quiet_mode)) {
 	printf("\t%-20s packets: %-13llu bytes: %-13llu "
@@ -1594,7 +1594,7 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
 
     if(proto == 0x3C /* IPv6 destination option */) {
       u_int8_t *options = (u_int8_t*)&packet[ip_offset+ip_len];
-      
+
       proto = options[0];
       ip_len += 8 * (options[1] + 1);
     }
