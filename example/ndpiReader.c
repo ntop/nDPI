@@ -208,6 +208,7 @@ static void help(u_int long_help) {
 	 "  -d                        | Disable protocol guess and use only DPI\n"
 	 "  -q                        | Quiet mode\n"
 	 "  -t                        | Dissect GTP tunnels\n"
+	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
 	 "                            | testing purposes in order to compare results across runs\n"
 	 "  -h                        | This help\n"
@@ -232,7 +233,7 @@ static void parseOptions(int argc, char **argv) {
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 
-  while ((opt = getopt(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:w:q")) != EOF) {
+  while ((opt = getopt(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q")) != EOF) {
     switch (opt) {
     case 'd':
       enable_protocol_guess = 0;
@@ -270,6 +271,10 @@ static void parseOptions(int argc, char **argv) {
     case 't':
       decode_tunnels = 1;
       break;
+
+    case 'r':
+      printf("ndpiReader, nDPI (%s)\n\n", ndpi_revision());
+      exit(0);
 
     case 'v':
       verbose = atoi(optarg);
