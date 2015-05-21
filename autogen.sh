@@ -1,7 +1,6 @@
 #!/bin/sh
 
-#
-# 1.5.1    r8171    06/09/2014
-#
+
+/bin/rm -f configure config.h config.h.in src/lib/Makefile.in
 autoreconf -ivf
 ./configure

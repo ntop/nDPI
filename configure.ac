@@ -10,32 +10,33 @@ AC_PROG_CC
 AX_PTHREAD
 
 if test -d ".git"; then :
-GIT_TAG=`git rev-parse HEAD`
-GIT_DATE=`date +%Y%m%d`
-GIT_RELEASE="${PACKAGE_VERSION} (${GIT_TAG}:${GIT_DATE})"
+     GIT_TAG=`git log -1 --format=%h`
+     GIT_DATE=`git log -1 --format=%cd`
+     GIT_NUM=`git rev-list HEAD --count`
+     GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     GIT_RELEASE="${PACKAGE_VERSION}-${GIT_BRANCH}-${GIT_NUM}-${GIT_TAG}"
 else
-GIT_RELEASE="${PACKAGE_VERSION}"
-SVN_DATE=`date`
+     GIT_RELEASE="${PACKAGE_VERSION}"
+     GIT_DATE=`date`
 fi
 
-AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "r${GIT_RELEASE}", [SVN Release])
-AC_DEFINE_UNQUOTED(NDPI_SVN_DATE, "${SVN_DATE}", [Last SVN change])
+AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
+AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h])
 
 PCAP_HOME=$HOME/PF_RING/userland
 
 if test -d $PCAP_HOME; then :
-   echo -n ""
+     echo -n ""
 else
-   PCAP_HOME=`pwd`/../../PF_RING/userland
+     PCAP_HOME=`pwd`/../../PF_RING/userland
 fi
-
 SHORT_MACHINE=`uname -m | cut -b1-3`
 if test $SHORT_MACHINE = "arm"; then
-LIBNUMA=""
+     LIBNUMA=""
 else
-LIBNUMA="-lnuma"
+     LIBNUMA="-lnuma"
 fi
 
 if test -f $PCAP_HOME/libpcap/libpcap.a; then :
@@ -57,11 +58,11 @@ else
 fi
 
 if test -d /usr/local/include/json-c/; then :
-   CFLAGS="$CFLAGS -I/usr/local/include/json-c/"
-   LDFLAGS="$LDFLAGS -L/usr/local/lib -ljson-c"
+     CFLAGS="$CFLAGS -I/usr/local/include/json-c/"
+     LDFLAGS="$LDFLAGS -L/usr/local/lib -ljson-c"
 else
-  CFLAGS="$CFLAGS $(pkg-config --cflags json-c)"
-  LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
+     CFLAGS="$CFLAGS $(pkg-config --cflags json-c)"
+     LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
 fi
 
 OLD_LIBS=$LIBS

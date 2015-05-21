@@ -43,7 +43,7 @@ void ndpi_search_warcraft3(struct ndpi_detection_module_struct
   //      struct ndpi_id_struct         *src=ndpi_struct->src;
   //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-  u_int32_t l; /* 
+  u_int16_t l; /* 
 		  Leave it as u_int32_t because otherwise 'u_int16_t temp' 
 		  might overflood it and thus generate an infinite loop
 	       */
