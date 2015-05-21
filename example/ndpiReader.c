@@ -273,7 +273,7 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'r':
-      printf("ndpiReader, nDPI (%s)\n\n", ndpi_revision());
+      printf("ndpiReader - nDPI (%s)\n", ndpi_revision());
       exit(0);
 
     case 'v':

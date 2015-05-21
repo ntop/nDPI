@@ -10,9 +10,11 @@ AC_PROG_CC
 AX_PTHREAD
 
 if test -d ".git"; then :
-     GIT_TAG=`git log -1 --format=%H`
+     GIT_TAG=`git log -1 --format=%h`
      GIT_DATE=`git log -1 --format=%cd`
-     GIT_RELEASE=`git describe --tags --long --dirty --always`
+     GIT_NUM=`git rev-list HEAD --count`
+     GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     GIT_RELEASE="${PACKAGE_VERSION}-${GIT_BRANCH}-${GIT_NUM}-${GIT_TAG}"
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
      GIT_DATE=`date`
