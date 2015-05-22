@@ -15,4 +15,8 @@ before_script:
 script:
   - ./configure
   - make
+
+after_script:
+  - cd tests
+  - ./do.sh
  

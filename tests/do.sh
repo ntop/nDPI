@@ -1,7 +1,7 @@
 
 READER=../example/ndpiReader
 
-
+RC=0
 PCAPS=`cd pcap; /bin/ls *.pcap`
 
 build_results() {
@@ -25,6 +25,7 @@ check_results() {
 		echo "$f\t ERROR"
 		echo "$CMD"
 		diff result/$f.out /tmp/reader.out
+		RC=1
 	    fi
 
 	    /bin/rm /tmp/reader.out
@@ -32,6 +33,7 @@ check_results() {
     done
 }
 
-
 build_results
 check_results
+
+exit $RC
