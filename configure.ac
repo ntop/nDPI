@@ -57,12 +57,16 @@ else
    fi
 fi
 
+PKG_CONFIG=$(which pkg-config)
+
 if test -d /usr/local/include/json-c/; then :
      CFLAGS="$CFLAGS -I/usr/local/include/json-c/"
      LDFLAGS="$LDFLAGS -L/usr/local/lib -ljson-c"
 else
-     CFLAGS="$CFLAGS $(pkg-config --cflags json-c)"
-     LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
+     if ! test -z "$PKG_CONFIG"; then :
+       CFLAGS="$CFLAGS $(pkg-config --cflags json-c)"
+       LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
+     fi
 fi
 
 OLD_LIBS=$LIBS
