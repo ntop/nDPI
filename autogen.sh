@@ -6,6 +6,7 @@
 AUTOCONF=$(which autoconf)
 AUTOMAKE=$(which automake)
 LIBTOOL=$(which libtool)
+AUTORECONF=$(which autoreconf)
 
 if test -z $AUTOCONF; then
     echo "autoconf is missing: please install it and try again"
