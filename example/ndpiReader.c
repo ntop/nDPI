@@ -1662,7 +1662,7 @@ static void runPcapLoop(u_int16_t thread_id) {
 void *processing_thread(void *_thread_id) {
   long thread_id = (long) _thread_id;
 
-#ifdef linux
+#if defined(linux) && defined(HAVE_PTHREAD_SETAFFINITY_NP)
   if(core_affinity[thread_id] >= 0) {
     cpu_set_t cpuset;
     CPU_ZERO(&cpuset);
