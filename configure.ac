@@ -79,6 +79,8 @@ LIBS=$OLD_LIBS
 
 AC_CHECK_LIB(json-c, json_object_new_object, AC_DEFINE_UNQUOTED(HAVE_JSON_C, 1, [The JSON-C library is present]))
 
+AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
+
 AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile libndpi.pc])
 AC_CONFIG_HEADERS(config.h)
 AC_SUBST(GIT_RELEASE)
@@ -86,5 +88,6 @@ AC_SUBST(SVN_DATE)
 AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
+AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 
 AC_OUTPUT
