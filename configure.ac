@@ -12,7 +12,11 @@ AX_PTHREAD
 if test -d ".git"; then :
      GIT_TAG=`git log -1 --format=%h`
      GIT_DATE=`git log -1 --format=%cd`
-     GIT_NUM=`git rev-list HEAD --count`
+     #
+     # On CentOS 6 `git rev-list HEAD --count` does not work
+     # 
+     #
+     GIT_NUM=`git log --pretty=oneline | wc -l`
      GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      GIT_RELEASE="${PACKAGE_VERSION}-${GIT_BRANCH}-${GIT_NUM}-${GIT_TAG}"
 else
