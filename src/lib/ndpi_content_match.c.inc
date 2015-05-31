@@ -75,11 +75,13 @@ static ndpi_network host_protocol_list[] = {
      Skype (Microsoft CDN)
      157.56.0.0/14, 157.60.0.0/16, 157.54.0.0/15
      111.221.64.0 - 111.221.127.255
+     91.190.216.0/21 (AS198015 Skype Communications Sarl)
   */
   { 0x9D380000 /* 157.56.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
   { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
+  { 0x5BBED800 /* 91.190.216.0 */, 21, NDPI_PROTOCOL_SKYPE },
 
   /*
     Google
