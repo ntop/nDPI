@@ -35,6 +35,3 @@ The entire procedure of adding new protocols in detail:
 If you want to distribute a source tar file of nDPI do:
 
 - make dist
-
---------------------------
-April 2015 - ntop 

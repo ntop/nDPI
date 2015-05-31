@@ -1,4 +1,4 @@
-AC_INIT([libndpi], [1.5.2])
+AC_INIT([libndpi], [1.6.0])
 
 AC_CONFIG_MACRO_DIR([m4])
 
