@@ -16,7 +16,7 @@ if test -d ".git"; then :
      # On CentOS 6 `git rev-list HEAD --count` does not work
      # 
      #
-     GIT_NUM=`git log --pretty=oneline | wc -l`
+     GIT_NUM=`git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
      GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      GIT_RELEASE="${PACKAGE_VERSION}-${GIT_BRANCH}-${GIT_NUM}-${GIT_TAG}"
 else

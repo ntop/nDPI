@@ -747,16 +747,7 @@ typedef struct ndpi_flow_struct {
   /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
 
-#if 0
-#ifdef NDPI_PROTOCOL_RTP
-  u_int32_t rtp_ssid[2];
-  u_int16_t rtp_seqnum[2];			/* current highest sequence number (only goes forwards, is not decreased by retransmissions) */
-  /* tcp and udp */
-  u_int8_t rtp_payload_type[2];
-  u_int32_t rtp_stage1:2;			//0-3
-  u_int32_t rtp_stage2:2;
-#endif
-#endif
+  u_int8_t num_stun_udp_pkts;
 
 #ifdef NDPI_PROTOCOL_REDIS
   u_int8_t redis_s2d_first_char, redis_d2s_first_char;
