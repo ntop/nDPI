@@ -373,23 +373,18 @@ struct ndpi_flow_tcp_struct {
 #ifdef NDPI_PROTOCOL_MAIL_IMAP
   u_int32_t mail_imap_stage:3;
 #endif
-
 #ifdef NDPI_PROTOCOL_SKYPE
   u_int8_t skype_packet_id;
 #endif
-
 #ifdef NDPI_PROTOCOL_CITRIX
   u_int8_t citrix_packet_id;
 #endif
-
 #ifdef NDPI_PROTOCOL_LOTUS_NOTES
   u_int8_t lotus_notes_packet_id;
 #endif
-
 #ifdef NDPI_PROTOCOL_TEAMVIEWER
   u_int8_t teamviewer_stage;
 #endif
-
 #ifdef NDPI_PROTOCOL_ZMQ
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
@@ -438,6 +433,10 @@ struct ndpi_flow_udp_struct {
 #endif
 #ifdef NDPI_PROTOCOL_TEAMVIEWER
   u_int8_t teamviewer_stage;
+#endif
+#ifdef NDPI_PROTOCOL_EAQ
+  u_int8_t eaq_pkt_id;
+  u_int32_t eaq_sequence;
 #endif
 }
 #if !defined(WIN32)
