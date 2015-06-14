@@ -60,6 +60,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/ipp.c \
 		     protocols/irc.c \
 		     protocols/jabber.c \
+		     protocols/kakaotalk_voice.c \
 		     protocols/kerberos.c \
 		     protocols/kontiki.c \
 		     protocols/ldap.c \

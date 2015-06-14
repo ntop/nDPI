@@ -7296,6 +7296,8 @@ ndpi_protocol_match host_match[] = {
   { ".pandora.com",			"Pandora",		NDPI_SERVICE_PANDORA,  NDPI_PROTOCOL_FUN },
   { ".torproject.org",                  "Tor",                  NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
   { "appmeutim.tim.com.br",             "Meu",                  NDPI_SERVICE_MEU, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".timtorcedor.com.br",              "Torcedor",             NDPI_SERVICE_TORCEDOR, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".kakao.com",                       "KakaoTalk",            NDPI_SERVICE_KAKAOTALK, NDPI_PROTOCOL_FUN },
   { NULL, 0 }
 };
 
