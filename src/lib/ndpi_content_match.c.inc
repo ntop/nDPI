@@ -7298,6 +7298,7 @@ ndpi_protocol_match host_match[] = {
   { "appmeutim.tim.com.br",             "Meu",                  NDPI_SERVICE_MEU, NDPI_PROTOCOL_ACCEPTABLE },
   { ".timtorcedor.com.br",              "Torcedor",             NDPI_SERVICE_TORCEDOR, NDPI_PROTOCOL_ACCEPTABLE },
   { ".kakao.com",                       "KakaoTalk",            NDPI_SERVICE_KAKAOTALK, NDPI_PROTOCOL_FUN },
+  { "ttvnw.net",                        "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { NULL, 0 }
 };
 
@@ -7342,6 +7343,7 @@ ndpi_protocol_match content_match[] = {
   { "audio/webm",			NULL,		        NDPI_CONTENT_WEBM, NDPI_PROTOCOL_FUN },
   { "video/webm",			NULL,		        NDPI_CONTENT_WEBM, NDPI_PROTOCOL_FUN },
   { "application/x-rtsp-tunnelled",	NULL,		        NDPI_PROTOCOL_RTSP, NDPI_PROTOCOL_FUN },
+  { "application/vnd.apple.mpegurl",	NULL,		        NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { NULL, 0 }
 };
 
