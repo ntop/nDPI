@@ -7295,6 +7295,7 @@ ndpi_protocol_match host_match[] = {
   { ".spotify.",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_FUN },
   { ".pandora.com",			"Pandora",		NDPI_SERVICE_PANDORA,  NDPI_PROTOCOL_FUN },
   { ".torproject.org",                  "Tor",                  NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
+  { "appmeutim.tim.com.br",             "Meu",                  NDPI_SERVICE_MEU, NDPI_PROTOCOL_ACCEPTABLE },
   { NULL, 0 }
 };
 

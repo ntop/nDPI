@@ -19,6 +19,11 @@
  */
 
 
+/*
+  EAQ: Entitade Aferidora da Qualidade de Banda Larga
+
+  http://www.brasilbandalarga.com.br
+ */
 #include "ndpi_api.h"
 
 #define EAQ_DEFAULT_PORT   6000
