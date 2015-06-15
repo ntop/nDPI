@@ -14,5 +14,11 @@ host:"googlesyndacation.com"@Google
 host:"venere.com"@Venere
 host:"kataweb.it",host:"repubblica.it"@Repubblica
 
+#  IP based Subprotocols
+#  Format:
+#  ip:"<value>",ip:"<value>",.....@<subproto>
+
+ip:213.75.170.11@CustomProtocol
+
 
 

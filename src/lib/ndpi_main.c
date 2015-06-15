@@ -1772,6 +1772,25 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
       node->value.user_value = host_list[i].value;
   }
 }
+
+/* ******************************************* */
+
+static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+                     char *value, int protocol_id) {
+
+    patricia_node_t *node;
+    struct in_addr pin;
+
+    inet_pton(AF_INET, value, &pin);
+    pin.s_addr = ntohl(pin.s_addr);
+
+    if((node = add_to_ptree(ndpi_struct->protocols_ptree, AF_INET, &pin, 32)) != NULL) {
+        node->value.user_value = protocol_id;
+    }
+
+    return(0);
+}
+
 #endif
 
 /* ******************************************************************** */
@@ -2068,12 +2087,14 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
   while((elem = strsep(&rule, ",")) != NULL) {
     char *attr = elem, *value = NULL;
     ndpi_port_range range;
-    int is_tcp = 0, is_udp = 0;
+    int is_tcp = 0, is_udp = 0, is_ip = 0;
 
     if(strncmp(attr, "tcp:", 4) == 0)
       is_tcp = 1, value = &attr[4];
     else if(strncmp(attr, "udp:", 4) == 0)
       is_udp = 1, value = &attr[4];
+    else if(strncmp(attr, "ip:", 3) == 0)
+      is_ip = 1, value = &attr[3];
     else if(strncmp(attr, "host:", 5) == 0) {
       /* host:"<value>",host:"<value>",.....@<subproto> */
       value = &attr[5];
@@ -2083,16 +2104,20 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
 
     if(is_tcp || is_udp) {
       if(sscanf(value, "%u-%u", (unsigned int *)&range.port_low, (unsigned int *)&range.port_high) != 2)
-	range.port_low = range.port_high = atoi(&elem[4]);
+        range.port_low = range.port_high = atoi(&elem[4]);
       if(do_add)
-	addDefaultPort(&range, def, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
+        addDefaultPort(&range, def, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
       else
-	removeDefaultPort(&range, def, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
+        removeDefaultPort(&range, def, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
+    } else if(is_ip) {
+#ifdef NDPI_PROTOCOL_TOR
+        ndpi_add_host_ip_subprotocol(ndpi_mod, value, subprotocol_id);
+#endif
     } else {
       if(do_add)
-	ndpi_add_host_url_subprotocol(ndpi_mod, value, subprotocol_id, NDPI_PROTOCOL_ACCEPTABLE);
+        ndpi_add_host_url_subprotocol(ndpi_mod, value, subprotocol_id, NDPI_PROTOCOL_ACCEPTABLE);
       else
-	ndpi_remove_host_url_subprotocol(ndpi_mod, value, subprotocol_id);
+        ndpi_remove_host_url_subprotocol(ndpi_mod, value, subprotocol_id);
     }
   }
 
