@@ -16,6 +16,14 @@
 #define _PRIVATE_RNDPI_H_
 
 
+/* Library headers */
+#include "rlibc.h"
+
+
+/* nDPI headers */
+#include "ndpi_api.h"
+
+
 /* Enumerate of supported protocols (automatically generated via shell script) */
 typedef enum
 {
@@ -215,29 +223,17 @@ typedef enum
 
 
 /* Functions to bless a packet */
-typedef void rndpi_bless_f (void * ndpi, void * flow);
+typedef void rndpi_bless_f (struct ndpi_detection_module_struct * ndpi_struct, struct ndpi_flow_struct * flow);
 
 
 /* Structure to represent a single protocol */
-struct rndpi_protocol
+typedef struct rndpi_protocol
 {
   rndpi_id id;             /* enumerate */
   char * name;             /* name      */
   char * description;      /* textual   */
   rndpi_bless_f * bless;   /* dissector */
-};
-
-
-/* Generic tail queue definition (experimental) */
-typedef TAILQ_HEAD (, rndpi_protocol_item_t) rndpi_protocol_list;
-
-/* Definition to keep all the protocol names in a sys/queue.h list */
-typedef struct rndpi_protocol_item_t
-{
-  char * name;                                /* protocol name */
-  TAILQ_ENTRY (rndpi_protocol_item_t) next;   /* next item     */
-
-} rndpi_protocol_item_t;
+} rndpi_protocol_t;
 
 
 /* Structure to represent a handle */
@@ -249,6 +245,11 @@ struct rndpi
 
 
 /* Public functions */
+unsigned ndpi_protocol_count (void);
+rndpi_protocol_t * ndpi_lookup_by_id (rndpi_id id);
+rndpi_protocol_t * ndpi_lookup_by_name (char * name);
+char ** ndpi_protocol_names (void);
+char ** ndpi_protocol_not_implemented (void);
 void * ndpi_init (void);                                                      /* Initialize nDPI library         */
 void ndpi_term (void * ndpi);                                                 /* Terminate nDPI library          */
 void * ndpi_flow_alloc (void);                                                /* Allocate memory to keep a flow  */

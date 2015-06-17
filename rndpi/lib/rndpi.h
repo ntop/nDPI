@@ -53,12 +53,8 @@
  */
 
 typedef enum rndpi_id rndpi_id_t;
-typedef struct rndpi_protocol rndpi_protocol_t;    /* supported protocols           */
-typedef struct rndpi rndpi_t;                      /* handle for inspecting packets */
-
-
-/* Tail queue definition (experimental) */
-typedef TAILQ_HEAD (, rndpi_protocol_item_t) rndpi_protocol_list_t;
+typedef struct rndpi_protocol rndpi_protocol_t;              /* supported protocols */
+typedef struct rndpi rndpi_t;                                /* handles             */
 
 
 /* Public functions */
@@ -76,12 +72,6 @@ char * rndpi_protocol_description (unsigned id);                       /* Return
 char ** rndpi_protocol_names (void);                                   /* Return all protocol names (array)    */
 bool rndpi_protocol_is_implemented (unsigned id);                      /* Return if protocol is implemented    */
 char ** rndpi_protocol_not_implemented (void);                         /* Return all protocols not implemented */
-
-
-/* Protocol names in a list (sys/queue.h experimental) */
-rndpi_protocol_list_t * rndpi_protocol_list_alloc (void);              /* Return all protocol names (list)     */
-rndpi_protocol_list_t * rndpi_protocol_list_print (rndpi_protocol_list_t * list);
-rndpi_protocol_list_t * rndpi_protocol_list_free (rndpi_protocol_list_t * list);
 
 
 /* Handles */

@@ -36,10 +36,6 @@ int main (int argc, char * argv [])
       rndpi_protocol_is_implemented (0);      /* Return if protocol is implemented      */
       rndpi_protocol_not_implemented ();      /* Return all protocols not implemented   */
 
-      rndpi_protocol_list_alloc ();           /* Return all protocol names (list)       */
-      rndpi_protocol_list_print (NULL);       /* Print all items in the protocol list   */
-      rndpi_protocol_list_free (NULL);        /* Free all items in the protocol list    */
-
       /* Handles */
       rndpi_alloc ();
       rndpi_free (NULL);
