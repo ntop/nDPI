@@ -7488,4 +7488,3 @@ static const char *ndpi_en_impossible_bigrams[] = {
     "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zr", "zs", "zx", "wh", "wk",
     "wb", "zk", "kp", "zk", "xy",
     NULL };
-
