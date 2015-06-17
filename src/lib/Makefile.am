@@ -39,6 +39,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/dns.c \
 		     protocols/dofus.c \
 		     protocols/dropbox.c \
+		     protocols/eaq.c \
 		     protocols/edonkey.c \
 		     protocols/fasttrack.c \
 		     protocols/fiesta.c \
@@ -59,6 +60,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/ipp.c \
 		     protocols/irc.c \
 		     protocols/jabber.c \
+		     protocols/kakaotalk_voice.c \
 		     protocols/kerberos.c \
 		     protocols/kontiki.c \
 		     protocols/ldap.c \

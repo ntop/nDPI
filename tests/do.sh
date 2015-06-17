@@ -20,9 +20,9 @@ check_results() {
 	    NUM_DIFF=`diff result/$f.out /tmp/reader.out | wc -l`
 	    
 	    if [ $NUM_DIFF -eq 0 ]; then
-		echo "$f\t OK"
+		printf "%-32s\tOK\n" "$f"
 	    else
-		echo "$f\t ERROR"
+		printf "%-32s\tERROR\n" "$f"
 		echo "$CMD"
 		diff result/$f.out /tmp/reader.out
 		RC=1
