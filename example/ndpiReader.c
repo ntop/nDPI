@@ -76,7 +76,7 @@ static char *_jsonFilePath    = NULL; /**< JSON file path  */
 #ifdef HAVE_JSON_C
 static json_object *jArray_known_flows, *jArray_unknown_flows;
 #endif
-static u_int8_t live_capture = 0, full_http_dissection = 0;
+static u_int8_t live_capture = 0, full_http_dissection = 1;
 static u_int8_t undetected_flows_deleted = 0;
 /**
  * User preferences
@@ -897,8 +897,8 @@ static void setupDetection(u_int16_t thread_id) {
     exit(-1);
   }
 
-  if(full_http_dissection)
-    ndpi_thread_info[thread_id].ndpi_struct->http_dissect_response = 1;
+  if(!full_http_dissection)
+    ndpi_thread_info[thread_id].ndpi_struct->http_dont_dissect_response = 1;
 
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);

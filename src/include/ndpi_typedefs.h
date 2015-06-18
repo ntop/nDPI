@@ -665,7 +665,7 @@ typedef struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t match_dns_host_names:1, http_dissect_response:1;
+  u_int8_t match_dns_host_names:1, http_dont_dissect_response:1;
   u_int8_t direction_detect_disable:1; /* disable internal detection of packet direction */
 } ndpi_detection_module_struct_t;
 
