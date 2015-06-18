@@ -986,6 +986,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
       snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
     }
 
+#if 0
     if((
 	(flow->detected_protocol == NDPI_PROTOCOL_HTTP)
 	|| (flow->detected_protocol == NDPI_SERVICE_FACEBOOK)
@@ -1010,6 +1011,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
 
       printf("[Method] %s\n", method);
     }
+#endif
 
     free_ndpi_flow(flow);
 
