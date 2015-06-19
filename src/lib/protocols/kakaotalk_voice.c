@@ -33,7 +33,10 @@ void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndpi_struc
   unsigned char *vers;
   int ver_offs;
   
-  if(packet->iph && (packet->udp != NULL)) {
+  if(packet->iph
+     && packet->udp
+     && (packet->payload_packet_len > 0)
+     ) {
     if((packet->payload[0] == 0x81)
        || (packet->payload[1] == 0xC8)
        || (packet->payload[2] == 0x00)
