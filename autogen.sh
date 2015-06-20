@@ -6,6 +6,7 @@
 AUTOCONF=$(which autoconf)
 AUTOMAKE=$(which automake)
 LIBTOOL=$(which libtool)
+LIBTOOLIZE=$(which libtoolize)
 AUTORECONF=$(which autoreconf)
 
 if test -z $AUTOCONF; then
@@ -18,8 +19,8 @@ if test -z $AUTOMAKE; then
     exit
 fi
 
-if test -z $LIBTOOL; then
-    echo "libtool is missing: please install it and try again"
+if test -z $LIBTOOL && test -z $LIBTOOLIZE ; then
+    echo "libtool and libtoolize is missing: please install it and try again"
     exit
 fi
 
