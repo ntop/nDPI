@@ -1233,7 +1233,9 @@ static void printResults(u_int64_t tot_usec) {
       if(enable_protocol_guess)
 	printf("\tGuessed flow protos:   %-13u\n", cumulative_stats.guessed_flow_protocols);
     }
-  } else if(json_flag) {
+  } 
+
+  if(json_flag) {
 #ifdef HAVE_JSON_C
     if((json_fp = fopen(_jsonFilePath,"w")) == NULL) {
       printf("Error createing .json file %s\n", _jsonFilePath);
