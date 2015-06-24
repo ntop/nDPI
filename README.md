@@ -36,3 +36,7 @@ If you want to distribute a source tar file of nDPI do:
 
 - make dist
 
+
+# Acknowledgements
+
+Many thanks to <A HREF=http://www.radcom.com>Radcom</A> Ltd for supporting the development of nDPI.
