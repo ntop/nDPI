@@ -7370,6 +7370,8 @@ ndpi_protocol_match host_match[] = {
   { "static-cdn.jtvnw.net",             "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "www-cdn.jtvnw.net",                "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "quickplay.com",                    "QuickPlay",            NDPI_SERVICE_QUICKPLAY, NDPI_PROTOCOL_FUN },
+  { "tim.com.br",                       "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
+  { "tim.it",                           "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
   { NULL, 0 }
 };
 
