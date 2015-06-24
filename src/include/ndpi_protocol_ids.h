@@ -242,9 +242,10 @@
 #define NDPI_SERVICE_KAKAOTALK        			193 /* KakaoTalk Chat (no voice call) */
 #define NDPI_SERVICE_KAKAOTALK_VOICE  			194 /* KakaoTalk Voice */
 #define NDPI_SERVICE_TWITCH                             195 /* Edoardo Dominici <edoaramis@gmail.com>  */
+#define NDPI_SERVICE_QUICKPLAY                          196 /* Streaming service used by various services such as hooq.tv  */
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			195
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_QUICKPLAY
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)
