@@ -39,6 +39,8 @@
 #define SEQ_LEN_2 0x10          // 0001 0000
 #define SEQ_LEN_1 0x00          // 0000 0000
 
+#define SEQ_CONV(ARR) (ARR[0] | ARR[1] | ARR[2] | ARR[3] | ARR[4] | ARR[5] << 8)
+
 
 #ifdef NDPI_PROTOCOL_QUIC
 static void ndpi_int_quic_add_connection(struct ndpi_detection_module_struct
@@ -69,8 +71,7 @@ static int connect_id(const unsigned char pflags)
 static int sequence(const unsigned char *payload)
 {
     unsigned char conv[6] = {0};
-    /* u_int seq_value = -1; */
-    int ret = 0;
+    u_int seq_value = -1;
     int seq_lens;
     int cid_offs;
     int i;
@@ -82,19 +83,21 @@ static int sequence(const unsigned char *payload)
            case SEQ_LEN_4: seq_lens = 4; break;
            case SEQ_LEN_2: seq_lens = 2; break;
            case SEQ_LEN_1: seq_lens = 1; break;
-	}
+           default:
+               return -1;
+        }
         // Retrieve SEQ offset.
         cid_offs = connect_id(payload[0]);
 
         if (cid_offs >= 0 && seq_lens > 0)
         {
-	  for (i = 0; i < seq_lens; i++)
-	    conv[i] = payload[cid_offs + i];
-	  ret = 1;
-	}
+            for (i = 0; i < seq_lens; i++)
+                conv[i] = payload[cid_offs + i];
 
-	// Return SEQ dec value;
-        return ret; /* seq_value; */
+        seq_value = SEQ_CONV(conv);
+        }
+        // Return SEQ dec value;
+        return seq_value;
 }
 
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -108,56 +111,54 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
       
       NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "calculating quic over udp.\n");
       
-      if((packet->payload[0] == 0xC2) && (!((sport == 80) || (dport == 80) || (sport == 443) || (dport == 443))))
+      if((((sport == 80) || (dport == 80) || (sport == 443) || (dport == 443))))
       {
 	NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
-      }
 
-#if 0
-      // Settings without version. First check if PUBLIC FLAGS & SEQ bytes are 0x0. SEQ must be 1 at least.
-      if (((packet->payload[0] == 0x00) && (packet->payload[1] != 0x00)) || ((packet->payload[0]) & (QUIC_NO_V_RES_RSV == 0)))
-      {
-	u_int ret = 0;
-	ret = sequence(packet->payload);
-	if (ret == 0)
+
+	// Settings without version. First check if PUBLIC FLAGS & SEQ bytes are 0x0. SEQ must be 1 at least.
+	if ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) || (packet->payload[0] & QUIC_NO_V_RES_RSV == 0))
 	{
+	  if (sequence(packet->payload) < 1)
+	  {
+	    
+	    NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
+	    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
+	  }
 
-	  NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
-	  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
+	  NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
+	  ndpi_int_quic_add_connection(ndpi_struct, flow);
 	}
 
-	NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
-	ndpi_int_quic_add_connection(ndpi_struct, flow);
-      }
-#endif
-
-      // Check if version, than the CID length.
-      else if (packet->payload[0] & QUIC_VER_MASK)
-      {
-	// Skip CID length.
-	ver_offs = connect_id(packet->payload[0]);
-	
-	if(ver_offs != -1)
+	// Check if version, than the CID length.
+	else if (packet->payload[0] & QUIC_VER_MASK)
 	{
-	  unsigned char vers[] = {packet->payload[ver_offs], packet->payload[ver_offs + 1],
-				  packet->payload[ver_offs + 2], packet->payload[ver_offs + 3]};
+	  // Skip CID length.
+	  ver_offs = connect_id(packet->payload[0]);
 	  
-	  // Version Match.
-	  if ((vers[0] == 'Q' && vers[1] == '0') &&
-	      ((vers[2] == '2' && (vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
-				   vers[3] == '1' || vers[3] == '0')) ||
-	       (vers[2] == '1' && (vers[3] == '9' || vers[3] == '8' || vers[3] == '7' || vers[3] == '6' ||
-				    vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
-				    vers[3] == '1' || vers[3] == '0')) ||
-		(vers[2] == '0' && vers[3] == '9')))
-	      
+	  if (ver_offs >= 0)
 	  {
-	    NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
-	    ndpi_int_quic_add_connection(ndpi_struct, flow);
+	    unsigned char vers[] = {packet->payload[ver_offs], packet->payload[ver_offs + 1],
+				    packet->payload[ver_offs + 2], packet->payload[ver_offs + 3]};
+	  
+	    // Version Match.
+	    if ((vers[0] == 'Q') && (vers[1] == '0') &&
+		((vers[2] == '2') && ((vers[3] == '5') || (vers[3] == '4') || (vers[3] == '3') || (vers[3] == '2') ||
+				      (vers[3] == '1') || (vers[3] == '0'))) ||
+		((vers[2] == '1') && ((vers[3] == '9') || (vers[3] == '8') || (vers[3] == '7') || (vers[3] == '6') ||
+				      (vers[3] == '5') || (vers[3] == '4') || (vers[3] == '3') || (vers[3] == '2') ||
+				      (vers[3] == '1') || (vers[3] == '0'))) ||
+		((vers[2]) == '0' && (vers[3] == '9')))
+	      
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
+	      ndpi_int_quic_add_connection(ndpi_struct, flow);
+	    }
 	  }
 	}
-      } else
+      } 
+      else
       {
 	NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
