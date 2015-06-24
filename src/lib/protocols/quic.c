@@ -103,7 +103,7 @@ static int sequence(const unsigned char *payload)
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
     struct ndpi_packet_struct *packet = &flow->packet;
-    u_int ver_offs;
+    int ver_offs;
     
     if(packet->udp != NULL) {
 
@@ -118,7 +118,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
 
 	// Settings without version. First check if PUBLIC FLAGS & SEQ bytes are 0x0. SEQ must be 1 at least.
-	if ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) || (packet->payload[0] & QUIC_NO_V_RES_RSV == 0))
+	if ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) || ((packet->payload[0] & QUIC_NO_V_RES_RSV) == 0))
 	{
 	  if (sequence(packet->payload) < 1)
 	  {
@@ -143,13 +143,13 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 				    packet->payload[ver_offs + 2], packet->payload[ver_offs + 3]};
 	  
 	    // Version Match.
-	    if ((vers[0] == 'Q') && (vers[1] == '0') &&
-		((vers[2] == '2') && ((vers[3] == '5') || (vers[3] == '4') || (vers[3] == '3') || (vers[3] == '2') ||
-				      (vers[3] == '1') || (vers[3] == '0'))) ||
-		((vers[2] == '1') && ((vers[3] == '9') || (vers[3] == '8') || (vers[3] == '7') || (vers[3] == '6') ||
-				      (vers[3] == '5') || (vers[3] == '4') || (vers[3] == '3') || (vers[3] == '2') ||
-				      (vers[3] == '1') || (vers[3] == '0'))) ||
-		((vers[2]) == '0' && (vers[3] == '9')))
+	    if ((vers[0] == 'Q' && vers[1] == '0') &&
+		((vers[2] == '2' && (vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
+				     vers[3] == '1' || vers[3] == '0')) ||
+		 (vers[2] == '1' && (vers[3] == '9' || vers[3] == '8' || vers[3] == '7' || vers[3] == '6' ||
+				     vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
+				     vers[3] == '1' || vers[3] == '0')) ||
+		 (vers[2] == '0' && vers[3] == '9')))
 	      
 	    {
 	      NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
