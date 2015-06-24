@@ -114,7 +114,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
       }
 
-
+#if 0
       // Settings without version. First check if PUBLIC FLAGS & SEQ bytes are 0x0. SEQ must be 1 at least.
       if (((packet->payload[0] == 0x00) && (packet->payload[1] != 0x00)) || ((packet->payload[0]) & (QUIC_NO_V_RES_RSV == 0)))
       {
@@ -130,6 +130,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
 	ndpi_int_quic_add_connection(ndpi_struct, flow);
       }
+#endif
 
       // Check if version, than the CID length.
       else if (packet->payload[0] & QUIC_VER_MASK)
