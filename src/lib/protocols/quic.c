@@ -2,7 +2,8 @@
  * quic.c
  *
  * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
- * Michele Campus - <michelecampus5@gmail.com>
+ * Michele Campus - <campus@ntop.org>
+ *
  * Copyright (C) 2012-15 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify

@@ -1476,6 +1476,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "KakaoTalk_Voice",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MPEGTS,
+			    no_master,
+			    no_master, "MPEG_TS",
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
     custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
     custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN;
@@ -3284,7 +3289,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 #endif
 
 #ifdef NDPI_PROTOCOL_SKYPE
-  ndpi_set_bitmask_protocol_detection("SKYPE", ndpi_struct, detection_bitmask, a++,
+  ndpi_set_bitmask_protocol_detection("Skype", ndpi_struct, detection_bitmask, a++,
 				      NDPI_PROTOCOL_SKYPE,
 				      ndpi_search_skype,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
@@ -3586,6 +3591,15 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 				      NDPI_SERVICE_KAKAOTALK_VOICE,
 				      ndpi_search_kakaotalk_voice,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+#endif
+
+#ifdef NDPI_PROTOCOL_MPEGTS
+  ndpi_set_bitmask_protocol_detection("MPEG_TS", ndpi_struct, detection_bitmask, a++,
+				      NDPI_PROTOCOL_MPEGTS,
+				      ndpi_search_mpegts,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 #endif

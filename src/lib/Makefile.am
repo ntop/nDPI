@@ -74,6 +74,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/megaco.c \
 		     protocols/mgcp.c \
 		     protocols/mms.c \
+		     protocols/mpegts.c \
 		     protocols/msn.c \
 		     protocols/mssql.c \
 		     protocols/mysql.c \

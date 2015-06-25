@@ -42,7 +42,7 @@ void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct, struct n
       len = packet->payload[2+offset] * 256 + packet->payload[2+offset+1];
       rtcp_section_len = (len + 1) * 4;
       
-      if((offset+rtcp_section_len) > packet->payload_packet_len)
+      if(((offset+rtcp_section_len) > packet->payload_packet_len) || (rtcp_section_len == 0))
 	goto exclude_rtcp;
       else
 	offset += rtcp_section_len;
