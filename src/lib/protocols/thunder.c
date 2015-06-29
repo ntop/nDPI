@@ -27,13 +27,13 @@
 #ifdef NDPI_PROTOCOL_THUNDER
 
 static void ndpi_int_thunder_add_connection(struct ndpi_detection_module_struct *ndpi_struct, 
-					    struct ndpi_flow_struct *flow, ndpi_protocol_type_t protocol_type)
+					    struct ndpi_flow_struct *flow/* , ndpi_protocol_type_t protocol_type */)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_THUNDER, protocol_type);
+  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_THUNDER/* , protocol_type */);
 
   if (src != NULL) {
     src->thunder_ts = packet->tick_timestamp;
@@ -62,7 +62,7 @@ void ndpi_int_search_thunder_udp(struct ndpi_detection_module_struct
       && packet->payload[0] < 0x40 && packet->payload[1] == 0 && packet->payload[2] == 0 && packet->payload[3] == 0) {
     if (flow->thunder_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_THUNDER, ndpi_struct, NDPI_LOG_DEBUG, "THUNDER udp detected\n");
-      ndpi_int_thunder_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_thunder_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
 
@@ -96,7 +96,7 @@ void ndpi_int_search_thunder_tcp(struct ndpi_detection_module_struct
       && packet->payload[0] < 0x40 && packet->payload[1] == 0 && packet->payload[2] == 0 && packet->payload[3] == 0) {
     if (flow->thunder_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_THUNDER, ndpi_struct, NDPI_LOG_DEBUG, "THUNDER tcp detected\n");
-      ndpi_int_thunder_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_thunder_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
 
@@ -126,7 +126,7 @@ void ndpi_int_search_thunder_tcp(struct ndpi_detection_module_struct
 	&& packet->payload[packet->empty_line_position + 5] == 0x00) {
       NDPI_LOG(NDPI_PROTOCOL_THUNDER, ndpi_struct, NDPI_LOG_DEBUG,
 	       "maybe thunder http POST packet application does match\n");
-      ndpi_int_thunder_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+      ndpi_int_thunder_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
       return;
     }
   }
@@ -188,7 +188,7 @@ void ndpi_int_search_thunder_http(struct ndpi_detection_module_struct
 		  "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)", 50) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_THUNDER, ndpi_struct, NDPI_LOG_DEBUG,
 	       "Thunder HTTP download detected, adding flow.\n");
-      ndpi_int_thunder_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+      ndpi_int_thunder_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
     }
   }
 }

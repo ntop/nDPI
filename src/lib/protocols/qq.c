@@ -28,10 +28,10 @@
 #ifdef NDPI_PROTOCOL_QQ
 
 static void ndpi_int_qq_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-				       struct ndpi_flow_struct *flow,
-				       ndpi_protocol_type_t protocol_type)
+				       struct ndpi_flow_struct *flow/* , */
+				       /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_QQ, protocol_type);
+  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_QQ/* , protocol_type */);
 }
 
 
@@ -275,7 +275,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
       if (flow->qq_stage == 3) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG,
 		 "found qq udp pattern 030001 or 000e35 four times.\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	return;
       }
       return;
@@ -294,7 +294,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
 	      return;
 	      } */
-	    ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	    ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	    return;
 	  }
 	  return;
@@ -314,7 +314,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	    return;
 	    } else */ if (flow->qq_stage == 3) {
 	    NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq udp pattern four times.\n");
-	    ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	    ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	    return;
 	  }
 	  return;
@@ -334,7 +334,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
       if (flow->qq_stage == 3) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG,
 		 "found qq udp pattern 04 1159 ... 03 four times.\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	return;
       }
       return;
@@ -347,7 +347,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
       if (flow->qq_stage == 3) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG,
 		 "found qq udp pattern 02/06 0100 ... 03/00 four times.\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	return;
       }
       return;
@@ -359,7 +359,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
       if (flow->qq_stage == 3) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG,
 		 "found qq udp pattern 02 1131 ... 03 four times.\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	return;
       }
       return;
@@ -372,7 +372,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
       if (flow->qq_stage == 3) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG,
 		 "found qq udp pattern 0203[packet_length_0b0b] three times.\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	return;
       }
       return;
@@ -386,7 +386,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	if (flow->qq_stage == 3) {
 	  NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG,
 		   "found qq udp pattern 02 02 <length> four times.\n");
-	  ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	  ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	  return;
 	}
 	return;
@@ -399,7 +399,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
     flow->qq_stage++;
     if (flow->qq_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over udp.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq packet stage %d\n", flow->qq_stage);
@@ -410,7 +410,7 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
     flow->qq_stage++;
     if (flow->qq_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq ft over udp.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     return;
@@ -450,7 +450,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
       get_u_int16_t(packet->payload, packet->payload_packet_len - 2) == htons(0x0000)) {
     if (flow->qq_stage == 4) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over tcp - maybe ft/audio/video.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     flow->qq_stage = 4;
@@ -497,7 +497,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
     flow->qq_stage++;
     if (flow->qq_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over tcp.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     return;
@@ -507,7 +507,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
     flow->qq_stage++;
     if (flow->qq_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over tcp.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     return;
@@ -517,7 +517,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
     flow->qq_stage++;
     if (flow->qq_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq ft over tcp.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     return;
@@ -538,7 +538,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
     flow->qq_stage++;
     if (flow->qq_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq udp pattern 02 ... 03 four times.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     return;
@@ -563,7 +563,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
     if (flow->qq_stage == 3) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG,
 	       "found qq udp pattern 04 1159 ... 03 four times.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       return;
     }
     return;
@@ -576,7 +576,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
     NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found GET or POST.\n");
     if (memcmp(packet->payload, "GET /qqfile/qq", 14) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over tcp GET /qqfile/qq.\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
       return;
     }
     ndpi_parse_packet_line_info(ndpi_struct, flow);
@@ -584,13 +584,13 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
     if (packet->user_agent_line.ptr != NULL
 	&& (packet->user_agent_line.len > 7 && memcmp(packet->user_agent_line.ptr, "QQClient", 8) == 0)) {
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over tcp GET...QQClient\n");
-      ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+      ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
       return;
     }
     for (i = 0; i < packet->parsed_lines; i++) {
       if (packet->line[i].len > 3 && memcmp(packet->line[i].ptr, "QQ: ", 4) == 0) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over tcp GET...QQ: \n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
 	return;
       }
     }
@@ -598,7 +598,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
       NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "host line ptr\n");
       if (packet->host_line.len > 11 && memcmp(&packet->host_line.ptr[0], "www.qq.co.za", 12) == 0) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq over tcp Host: www.qq.co.za\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
 	return;
       }
     }
@@ -611,7 +611,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
       }
       if (i == 81) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq Mail.\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	return;
       }
     }
@@ -620,7 +620,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
       && get_u_int32_t(packet->payload, 4) == htonl(0x01020000)
       && get_u_int32_t(packet->payload, 8) == htonl(0x04015151) && get_u_int32_t(packet->payload, 12) == htonl(0x4d61696c)) {
     NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq Mail.\n");
-    ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+    ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
     return;
   }
   if (packet->payload_packet_len == 204 && flow->qq_stage == 0 && get_u_int32_t(packet->payload, 200) == htonl(0xfbffffff)) {
@@ -631,7 +631,7 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
       }
       if (i == 199) {
 	NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "found qq chat or file transfer\n");
-	ndpi_int_qq_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_qq_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	return;
       }
     }

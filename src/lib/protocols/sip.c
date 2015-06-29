@@ -32,8 +32,8 @@ static void ndpi_int_sip_add_connection(struct ndpi_detection_module_struct *ndp
 {
 
   ndpi_int_add_connection(ndpi_struct, flow,
-			  NDPI_PROTOCOL_SIP,
-			  due_to_correlation ? NDPI_CORRELATED_PROTOCOL : NDPI_REAL_PROTOCOL);
+			  NDPI_PROTOCOL_SIP/* , */
+			  /* due_to_correlation ? NDPI_CORRELATED_PROTOCOL : NDPI_REAL_PROTOCOL */);
 }
 
 

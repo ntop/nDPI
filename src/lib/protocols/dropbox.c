@@ -30,8 +30,8 @@ static void ndpi_int_dropbox_add_connection(struct ndpi_detection_module_struct 
 					    u_int8_t due_to_correlation)
 {
   ndpi_int_add_connection(ndpi_struct, flow,
-			  NDPI_PROTOCOL_DROPBOX,
-			  due_to_correlation ? NDPI_CORRELATED_PROTOCOL : NDPI_REAL_PROTOCOL);
+			  NDPI_PROTOCOL_DROPBOX/* , */
+			  /* due_to_correlation ? NDPI_CORRELATED_PROTOCOL : NDPI_REAL_PROTOCOL */);
 }
 
 
