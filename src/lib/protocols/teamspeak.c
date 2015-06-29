@@ -25,7 +25,7 @@
 static void ndpi_int_teamspeak_add_connection(struct ndpi_detection_module_struct
                                              *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TEAMSPEAK, NDPI_REAL_PROTOCOL);
+    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TEAMSPEAK/* , NDPI_REAL_PROTOCOL */);
 }
   u_int16_t tdport = 0, tsport = 0;
   u_int16_t udport = 0, usport = 0;

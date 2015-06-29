@@ -33,7 +33,7 @@ static void ndpi_int_battlefield_add_connection(struct ndpi_detection_module_str
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_BATTLEFIELD, NDPI_REAL_PROTOCOL);
+  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_BATTLEFIELD/* , NDPI_REAL_PROTOCOL */);
 
   if (src != NULL) {
     src->battlefield_ts = packet->tick_timestamp;

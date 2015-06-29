@@ -39,10 +39,10 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
     if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
       if(protocol != NDPI_PROTOCOL_HTTP) {
 	ndpi_search_tcp_or_udp(ndpi_struct, flow);
-	ndpi_int_add_connection(ndpi_struct, flow, protocol, NDPI_CORRELATED_PROTOCOL);
+	ndpi_int_add_connection(ndpi_struct, flow, protocol/* , NDPI_CORRELATED_PROTOCOL */);
       } else {
 	ndpi_int_reset_protocol(flow);
-	ndpi_int_add_connection(ndpi_struct, flow, protocol, NDPI_REAL_PROTOCOL);
+	ndpi_int_add_connection(ndpi_struct, flow, protocol/* , NDPI_REAL_PROTOCOL */);
       }
     }
 

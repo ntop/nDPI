@@ -469,17 +469,17 @@ typedef struct ndpi_packet_struct {
 
   /* this is for simple read-only access to the real protocol
    * used for the main loop */
-  u_int16_t real_protocol_read_only;
+  /* u_int16_t real_protocol_read_only; */
 
 #if NDPI_PROTOCOL_HISTORY_SIZE > 1
 #  if NDPI_PROTOCOL_HISTORY_SIZE > 5
 #    error protocol stack size not supported
 #  endif
 
-  struct {
-    u_int8_t entry_is_real_protocol:5;
-    u_int8_t current_stack_size_minus_one:3;
-  }
+  /* struct { */
+  /*   u_int8_t entry_is_real_protocol:5; */
+  /*   u_int8_t current_stack_size_minus_one:3; */
+  /* } */
 #if !defined(WIN32)
     __attribute__ ((__packed__))
 #endif
@@ -677,10 +677,10 @@ typedef struct ndpi_flow_struct {
 #    error protocol stack size not supported
 #  endif
 
-  struct {
-    u_int8_t entry_is_real_protocol:5;
-    u_int8_t current_stack_size_minus_one:3;
-  }
+  /* struct { */
+  /*   u_int8_t entry_is_real_protocol:5; */
+  /*   u_int8_t current_stack_size_minus_one:3; */
+  /* } */
 
 #if !defined(WIN32)
     __attribute__ ((__packed__))
@@ -836,9 +836,9 @@ typedef struct ndpi_flow_struct {
   struct ndpi_id_struct *dst;
 } ndpi_flow_struct_t;
 
-typedef enum {
-  NDPI_REAL_PROTOCOL = 0,
-  NDPI_CORRELATED_PROTOCOL = 1
-} ndpi_protocol_type_t;
+/* typedef enum { */
+/*   NDPI_REAL_PROTOCOL = 0, */
+/*   NDPI_CORRELATED_PROTOCOL = 1 */
+/* } ndpi_protocol_type_t; */
 
 #endif/* __NDPI_TYPEDEFS_FILE__ */

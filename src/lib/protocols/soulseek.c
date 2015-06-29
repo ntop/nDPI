@@ -35,7 +35,7 @@ static void ndpi_int_soulseek_add_connection(struct ndpi_detection_module_struct
 	struct ndpi_id_struct *src = flow->src;
 	struct ndpi_id_struct *dst = flow->dst;
 
-	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_REAL_PROTOCOL);
+	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK/* , NDPI_REAL_PROTOCOL */);
 
 	if (src != NULL) {
 		src->soulseek_last_safe_access_time = packet->tick_timestamp;

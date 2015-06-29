@@ -27,9 +27,9 @@
 #ifdef NDPI_PROTOCOL_IPP
 
 static void ndpi_int_ipp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					struct ndpi_flow_struct *flow, ndpi_protocol_type_t protocol_type)
+					struct ndpi_flow_struct *flow/* , ndpi_protocol_type_t protocol_type */)
 {
-	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IPP, protocol_type);
+	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IPP/* , protocol_type */);
 }
 
 void ndpi_search_ipp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -90,7 +90,7 @@ void ndpi_search_ipp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 		}
 
 		NDPI_LOG(NDPI_PROTOCOL_IPP, ndpi_struct, NDPI_LOG_DEBUG, "found ipp\n");
-		ndpi_int_ipp_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+		ndpi_int_ipp_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 		return;
 	}
 
@@ -101,7 +101,7 @@ void ndpi_search_ipp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 		if (packet->content_line.ptr != NULL && packet->content_line.len > 14
 			&& memcmp(packet->content_line.ptr, "application/ipp", 15) == 0) {
 			NDPI_LOG(NDPI_PROTOCOL_IPP, ndpi_struct, NDPI_LOG_DEBUG, "found ipp via POST ... application/ipp.\n");
-			ndpi_int_ipp_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+			ndpi_int_ipp_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
 			return;
 		}
 	}

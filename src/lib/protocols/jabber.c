@@ -41,9 +41,9 @@ static struct jabber_string jabber_strings[] = {
 
 static void ndpi_int_jabber_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
-					   u_int32_t protocol, ndpi_protocol_type_t protocol_type)
+					   u_int32_t protocol/* , ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, protocol, protocol_type);
+  ndpi_int_add_connection(ndpi_struct, flow, protocol/* , protocol_type */);
 }
 
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
@@ -56,7 +56,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   for(i=0; jabber_strings[i].string != NULL; i++) {
     if(ndpi_strnstr((const char*)&packet->payload[x], jabber_strings[i].string, left) != NULL) {    
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, jabber_strings[i].ndpi_protocol, NDPI_CORRELATED_PROTOCOL);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, jabber_strings[i].ndpi_protocol/* , NDPI_CORRELATED_PROTOCOL */);
       return;
     }
   }  
@@ -95,7 +95,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 		 "found jabber file transfer.\n");
 
 	ndpi_int_jabber_add_connection(ndpi_struct, flow,
-				       NDPI_PROTOCOL_UNENCRYPED_JABBER, NDPI_CORRELATED_PROTOCOL);
+				       NDPI_PROTOCOL_UNENCRYPED_JABBER/* , NDPI_CORRELATED_PROTOCOL */);
       }
     }
     if (dst != NULL && dst->jabber_file_transfer_port[0] != 0) {
@@ -117,7 +117,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 		 "found jabber file transfer.\n");
 
 	ndpi_int_jabber_add_connection(ndpi_struct, flow,
-				       NDPI_PROTOCOL_UNENCRYPED_JABBER, NDPI_CORRELATED_PROTOCOL);
+				       NDPI_PROTOCOL_UNENCRYPED_JABBER/* , NDPI_CORRELATED_PROTOCOL */);
       }
     }
     return;
@@ -282,7 +282,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
        || ndpi_strnstr((const char *)&packet->payload[13], "xmlns:stream=\"http://etherx.jabber.org/streams\"", start)) {
   
       /* Protocol family */
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNENCRYPED_JABBER, NDPI_REAL_PROTOCOL);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNENCRYPED_JABBER/* , NDPI_REAL_PROTOCOL */);
 
       /* search for subprotocols */
       check_content_type_and_change_protocol(ndpi_struct, flow, 13);

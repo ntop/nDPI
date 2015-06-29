@@ -44,7 +44,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
      && (*ssid != 0)
      ) {
     NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found rtp.\n");
-    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTP, NDPI_REAL_PROTOCOL);	
+    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTP/* , NDPI_REAL_PROTOCOL */);	
   } else {
     NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "exclude rtp.\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
@@ -69,7 +69,7 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 static void ndpi_int_rtp_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTP, NDPI_REAL_PROTOCOL);
+  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTP/* , NDPI_REAL_PROTOCOL */);
 }
 
 /*
@@ -243,7 +243,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
  exclude_rtp:
 #ifdef NDPI_PROTOCOL_STUN
   if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN
-      || packet->real_protocol_read_only == NDPI_PROTOCOL_STUN) {
+      || /* packet->real_protocol_read_only == NDPI_PROTOCOL_STUN */) {
     NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "STUN: is detected, need next packet.\n");
     return;
   }
