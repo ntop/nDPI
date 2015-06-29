@@ -96,6 +96,7 @@ static int sequence(const unsigned char *payload)
 
         seq_value = SEQ_CONV(conv);
         }
+
         // Return SEQ dec value;
         return seq_value;
 }
