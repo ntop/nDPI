@@ -42,12 +42,12 @@ void ndpi_search_mpegts(struct ndpi_detection_module_struct *ndpi_struct, struct
     }
 
     /* This looks MPEG TS */
-    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MPEGTS, NDPI_REAL_PROTOCOL);
+    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MPEGTS/* , NDPI_REAL_PROTOCOL */);
     return;
   }    
 
  no_mpegts:
   NDPI_LOG(NDPI_PROTOCOL_MPEGTS, ndpi_struct, NDPI_LOG_DEBUG, "Excluded MPEGTS.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MPEGTS);
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask/* , NDPI_PROTOCOL_MPEGTS */);
 }
 #endif
