@@ -28,7 +28,7 @@
 
 #ifdef NDPI_PROTOCOL_EDONKEY
 static void ndpi_int_edonkey_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_EDONKEY/* , NDPI_REAL_PROTOCOL */);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_EDONKEY);
 }
 
 static int ndpi_edonkey_payload_check(const u_int8_t *data, u_int32_t len) {

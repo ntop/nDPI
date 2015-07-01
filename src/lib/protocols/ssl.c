@@ -40,7 +40,7 @@ static void ndpi_int_ssl_add_connection(struct ndpi_detection_module_struct *ndp
 {
   if((protocol != NDPI_PROTOCOL_SSL)
      && (protocol != NDPI_PROTOCOL_SSL_NO_CERT)) {
-    ndpi_int_add_connection(ndpi_struct, flow, protocol/* , NDPI_CORRELATED_PROTOCOL */);
+    ndpi_set_detected_protocol(ndpi_struct, flow, protocol);
   } else {
     struct ndpi_packet_struct *packet = &flow->packet;
 
@@ -76,7 +76,7 @@ static void ndpi_int_ssl_add_connection(struct ndpi_detection_module_struct *ndp
       }
     }
 
-    ndpi_int_add_connection(ndpi_struct, flow, protocol/* , NDPI_REAL_PROTOCOL */);
+    ndpi_set_detected_protocol(ndpi_struct, flow, protocol);
   }
 }
 
@@ -569,7 +569,7 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	   && (packet->payload[4] == 0)
 	   && (packet->payload[2] <= 9)
 	   && (packet->payload[3] <= 9))) {
-      ndpi_int_add_connection(ndpi_struct, flow, NDPI_SERVICE_WHATSAPP/* , NDPI_REAL_PROTOCOL */);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_SERVICE_WHATSAPP);
       return;
     } else {
       /* No whatsapp, let's try SSL */

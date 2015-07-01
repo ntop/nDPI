@@ -4881,14 +4881,14 @@ u_int8_t ndpi_detection_get_l4(const u_int8_t * l3, u_int16_t l3_len, const u_in
   return ndpi_detection_get_l4_internal(NULL, l3, l3_len, l4_return, l4_len_return, l4_protocol_return, flags);
 }
 
-void ndpi_int_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow,
 			     u_int16_t detected_protocol/* , ndpi_protocol_type_t protocol_type */)
 {
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_int_change_protocol(ndpi_struct, flow, detected_protocol/* , protocol_type */);
+  ndpi_int_change_protocol(ndpi_struct, flow, detected_protocol);
 
   if(src != NULL) {
     NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, detected_protocol);
@@ -5208,7 +5208,7 @@ u_int8_t ndpi_detection_flow_protocol_history_contains_protocol(struct ndpi_dete
  * 1.call ndpi_int_change_protocol
  * 2.set protocol in detected bitmask for src and dst
  */
-void ndpi_int_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow,
 			     u_int16_t detected_protocol/* , ndpi_protocol_type_t protocol_type */);
 
@@ -5241,8 +5241,8 @@ void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 			      u_int16_t detected_protocol/* , */
 			      /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_change_flow_protocol(ndpi_struct, flow, detected_protocol/* , protocol_type */);
-  ndpi_int_change_packet_protocol(ndpi_struct, flow, detected_protocol/* , protocol_type */);
+  ndpi_int_change_flow_protocol(ndpi_struct, flow, detected_protocol);
+  ndpi_int_change_packet_protocol(ndpi_struct, flow, detected_protocol);
 }
 
 

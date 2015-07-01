@@ -43,7 +43,7 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	    /* ISO 8073/X.224 */
 	    if((packet->payload[5] == 0xE0 /* CC Connect Request */)
 	       || (packet->payload[5] == 0xD0 /* CC Connect Confirm */)) {
-	      ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RDP/* , NDPI_REAL_PROTOCOL */);
+	      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RDP);
 	      return;
 	    }
 	  }
@@ -52,7 +52,7 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
 	  if(flow->l4.tcp.h323_valid_packets >= 2) {
 	    NDPI_LOG(NDPI_PROTOCOL_H323, ndpi_struct, NDPI_LOG_DEBUG, "found H323 broadcast.\n");
-	    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_H323/* , NDPI_REAL_PROTOCOL */);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323);
 	  }
 	} else {
 	  /* This is not H.323 */
@@ -67,7 +67,7 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
        packet->payload[4] == 0x00 && packet->payload[5] == 0x00)
       {
 	NDPI_LOG(NDPI_PROTOCOL_H323, ndpi_struct, NDPI_LOG_DEBUG, "found H323 broadcast.\n");
-	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_H323/* , NDPI_REAL_PROTOCOL */);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323);
 	return;
       }
     /* H323  */
@@ -76,13 +76,13 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
         if(packet->payload[0] == 0x16 && packet->payload[1] == 0x80 && packet->payload[4] == 0x06 && packet->payload[5] == 0x00)
 	  {
 	    NDPI_LOG(NDPI_PROTOCOL_H323, ndpi_struct, NDPI_LOG_DEBUG, "found H323 broadcast.\n");
-	    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_H323/* , NDPI_REAL_PROTOCOL */);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323);
 	    return;
 	  }
         else if(packet->payload_packet_len >= 20 || packet->payload_packet_len <= 117)
 	  {
 	    NDPI_LOG(NDPI_PROTOCOL_H323, ndpi_struct, NDPI_LOG_DEBUG, "found H323 broadcast.\n");
-	    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_H323/* , NDPI_REAL_PROTOCOL */);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323);
 	    return;
 	  }
         else

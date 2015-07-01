@@ -40,7 +40,7 @@ static void ndpi_int_rtsp_add_connection(struct ndpi_detection_module_struct *nd
 					 struct ndpi_flow_struct *flow/* , */
 					 /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTSP/* , protocol_type */);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTSP);
 }
 
 /* this function searches for a rtsp-"handshake" over tcp or udp. */
@@ -95,7 +95,7 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
       }
       NDPI_LOG(NDPI_PROTOCOL_RTSP, ndpi_struct, NDPI_LOG_TRACE, "RTSP detected.\n");
       flow->rtsp_control_flow = 1;
-      ndpi_int_rtsp_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+      ndpi_int_rtsp_add_connection(ndpi_struct, flow);
       return;
     }
   }

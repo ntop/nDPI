@@ -31,7 +31,7 @@
   {									\
     if (NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask,nprot) != 0) \
       {									\
-	ndpi_int_add_connection(ndpi_struct, flow,			\
+	ndpi_set_detected_protocol(ndpi_struct, flow,			\
 				nprot/* , */				\
 				/* NDPI_REAL_PROTOCOL */);		\
       }									\

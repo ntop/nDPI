@@ -31,7 +31,7 @@
 static void ndpi_int_veohtv_add_connection(struct ndpi_detection_module_struct *ndpi_struct, 
 					   struct ndpi_flow_struct *flow/* , ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV/* , protocol_type */);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV);
 }
 
 void ndpi_search_veohtv_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -59,7 +59,7 @@ void ndpi_search_veohtv_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 				packet->server_line.len > NDPI_STATICSTRING_LEN("Veoh-") &&
 				memcmp(packet->server_line.ptr, "Veoh-", NDPI_STATICSTRING_LEN("Veoh-")) == 0) {
 				NDPI_LOG(NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV, ndpi_struct, NDPI_LOG_DEBUG, "VeohTV detected.\n");
-				ndpi_int_veohtv_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+				ndpi_int_veohtv_add_connection(ndpi_struct, flow);
 				return;
 			}
 #endif
@@ -69,7 +69,7 @@ void ndpi_search_veohtv_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 				return;
 			}
 			NDPI_LOG(NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV, ndpi_struct, NDPI_LOG_DEBUG, "VeohTV detected.\n");
-			ndpi_int_veohtv_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+			ndpi_int_veohtv_add_connection(ndpi_struct, flow);
 			return;
 		} else if (flow->packet_direction_counter[(flow->setup_packet_direction == 1) ? 0 : 1] > 3) {
 			if (flow->l4.tcp.veoh_tv_stage == 2) {
@@ -78,7 +78,7 @@ void ndpi_search_veohtv_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 				return;
 			}
 			NDPI_LOG(NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV, ndpi_struct, NDPI_LOG_DEBUG, "VeohTV detected.\n");
-			ndpi_int_veohtv_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+			ndpi_int_veohtv_add_connection(ndpi_struct, flow);
 			return;
 		} else {
 			if (flow->packet_counter > 10) {
@@ -88,7 +88,7 @@ void ndpi_search_veohtv_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 					return;
 				}
 				NDPI_LOG(NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV, ndpi_struct, NDPI_LOG_DEBUG, "VeohTV detected.\n");
-				ndpi_int_veohtv_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+				ndpi_int_veohtv_add_connection(ndpi_struct, flow);
 				return;
 			}
 			return;
@@ -105,7 +105,7 @@ void ndpi_search_veohtv_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 			get_u_int32_t(packet->payload, 16) == htonl(0x00000021) &&
 			get_u_int32_t(packet->payload, 20) == htonl(0x00000000) && get_u_int32_t(packet->payload, 24) == htonl(0x01040000)) {
 			NDPI_LOG(NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV, ndpi_struct, NDPI_LOG_DEBUG, "UDP VeohTV found.\n");
-			ndpi_int_veohtv_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+			ndpi_int_veohtv_add_connection(ndpi_struct, flow);
 			return;
 		}
 	}

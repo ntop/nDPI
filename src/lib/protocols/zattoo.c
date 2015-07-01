@@ -36,7 +36,7 @@ static void ndpi_int_zattoo_add_connection(struct ndpi_detection_module_struct *
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_ZATTOO/* , protocol_type */);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZATTOO);
 
   if (src != NULL) {
     src->zattoo_ts = packet->tick_timestamp;
@@ -91,14 +91,14 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
     if (packet->payload_packet_len > 50 && memcmp(packet->payload, "GET /frontdoor/fd?brand=Zattoo&v=", 33) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct,
 	       NDPI_LOG_DEBUG, "add connection over tcp with pattern GET /frontdoor/fd?brand=Zattoo&v=\n");
-      ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+      ndpi_int_zattoo_add_connection(ndpi_struct, flow);
       return;
     }
     if (packet->payload_packet_len > 50
 	&& memcmp(packet->payload, "GET /ZattooAdRedirect/redirect.jsp?user=", 40) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct,
 	       NDPI_LOG_DEBUG, "add connection over tcp with pattern GET /ZattooAdRedirect/redirect.jsp?user=\n");
-      ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+      ndpi_int_zattoo_add_connection(ndpi_struct, flow);
       return;
     }
     if (packet->payload_packet_len > 50
@@ -110,7 +110,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
 	  NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct,
 		   NDPI_LOG_DEBUG,
 		   "add connection over tcp with pattern POST /channelserver/player/channel/update HTTP/1.1\n");
-	  ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+	  ndpi_int_zattoo_add_connection(ndpi_struct, flow);
 	  return;
 	}
       }
@@ -121,7 +121,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
        * that might be changed later */
       ndpi_parse_packet_line_info(ndpi_struct, flow);
       if (ndpi_int_zattoo_user_agent_set(ndpi_struct, flow)) {
-	ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+	ndpi_int_zattoo_add_connection(ndpi_struct, flow);
 	return;
       }
     } else if (packet->payload_packet_len > 50 && memcmp(packet->payload, "POST http://", 12) == 0) {
@@ -149,7 +149,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
 	    0x0a && packet->payload[packet->empty_line_position + 7] == 0x00) {
 	  NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct,
 		   NDPI_LOG_DEBUG, "add connection over tcp with pattern POST http://\n");
-	  ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+	  ndpi_int_zattoo_add_connection(ndpi_struct, flow);
 	  return;
 	}
       }
@@ -169,7 +169,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
     } else if (flow->zattoo_stage == 2 - packet->packet_direction
 	       && packet->payload_packet_len > 50 && packet->payload[0] == 0x03 && packet->payload[1] == 0x04) {
       NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG, "add connection over tcp with 0x0304.\n");
-      ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+      ndpi_int_zattoo_add_connection(ndpi_struct, flow);
       return;
     } else if (flow->zattoo_stage == 1 + packet->packet_direction) {
       if (packet->payload_packet_len > 500 && packet->payload[0] == 0x00 && packet->payload[1] == 0x00) {
@@ -190,15 +190,15 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
     } else if (flow->zattoo_stage == 4 - packet->packet_direction
 	       && packet->payload_packet_len > 50 && packet->payload[0] == 0x03 && packet->payload[1] == 0x04) {
       NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG, "add connection over tcp with 0x0304.\n");
-      ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+      ndpi_int_zattoo_add_connection(ndpi_struct, flow);
       return;
     } else if (flow->zattoo_stage == 5 + packet->packet_direction && (packet->payload_packet_len == 125)) {
       NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG, "detected zattoo.\n");
-      ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+      ndpi_int_zattoo_add_connection(ndpi_struct, flow);
       return;
     } else if (flow->zattoo_stage == 6 - packet->packet_direction && packet->payload_packet_len == 1412) {
       NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG, "found zattoo.\n");
-      ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+      ndpi_int_zattoo_add_connection(ndpi_struct, flow);
       return;
     }
     NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG,
@@ -216,7 +216,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
 	    || get_u_int32_t(packet->payload, 0) == htonl(0x03010005))) {
       if (++flow->zattoo_stage == 2) {
 	NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG, "add connection over udp.\n");
-	ndpi_int_zattoo_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+	ndpi_int_zattoo_add_connection(ndpi_struct, flow);
 	return;
       }
       NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG, "need next packet udp.\n");

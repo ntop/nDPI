@@ -31,7 +31,7 @@
 static void ndpi_int_aimini_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow/* ,  */
 					   /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_AIMINI/* , protocol_type */);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AIMINI);
 }
 
 
@@ -113,7 +113,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 				|| (packet->payload_packet_len > 100 && ntohs(get_u_int16_t(packet->payload, 0)) == 0x0115))) {
 			NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG, "found aimini (64, 0x010b), (>300, 0x0115), "
 					"(16, 0x010c || 64, 0x010b), (16, 0x010c || 64, 0x010b || >100, 0x0115).\n");
-			ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+			ndpi_int_aimini_add_connection(ndpi_struct, flow);
 			return;
 		}
 
@@ -139,7 +139,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 												   && ntohs(get_u_int16_t(packet->payload, 0)) == 0x01ca))) {
 			NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG,
 					"found aimini (136, 0x01c9), (136, 0x01c9)," "(136, 0x01c9),(136, 0x01c9 || 32, 0x01ca).\n");
-			ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+			ndpi_int_aimini_add_connection(ndpi_struct, flow);
 			return;
 		}
 
@@ -161,7 +161,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 			&& (packet->payload_packet_len == 88 && ntohs(get_u_int16_t(packet->payload, 0)) == 0x0101)) {
 			NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG,
 					"found aimini (88, 0x0101), (88, 0x0101)," "(88, 0x0101),(88, 0x0101).\n");
-			ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+			ndpi_int_aimini_add_connection(ndpi_struct, flow);
 			return;
 		}
 
@@ -184,7 +184,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 				|| (packet->payload_packet_len == 32 && ntohs(get_u_int16_t(packet->payload, 0)) == 0x01ca))) {
 			NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG,
 					"found aimini (104, 0x0102), (104, 0x0102), " "(104, 0x0102), (104, 0x0102).\n");
-			ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+			ndpi_int_aimini_add_connection(ndpi_struct, flow);
 			return;
 		}
 
@@ -208,7 +208,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 				|| (packet->payload_packet_len == 32 && ntohs(get_u_int16_t(packet->payload, 0)) == 0x01ca))) {
 			NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG,
 					"found aimini (32,0x01ca), (32,0x01ca), (32,0x01ca), ((136, 0x0166)||(32,0x01ca)).\n");
-			ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+			ndpi_int_aimini_add_connection(ndpi_struct, flow);
 			return;
 		}
 
@@ -230,7 +230,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 			&& (packet->payload_packet_len == 16 && ntohs(get_u_int16_t(packet->payload, 0)) == 0x010c)) {
 			NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG,
 					"found aimini (16, 0x010c), (16, 0x010c), (16, 0x010c), (16, 0x010c).\n");
-			ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
+			ndpi_int_aimini_add_connection(ndpi_struct, flow);
 			return;
 		}
 	} else if (packet->tcp != NULL) {
@@ -243,7 +243,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 			if (packet->host_line.ptr != NULL && packet->host_line.len > 11
 				&& (memcmp(&packet->host_line.ptr[packet->host_line.len - 11], ".aimini.net", 11) == 0)) {
 				NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG, "AIMINI HTTP traffic detected.\n");
-				ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+				ndpi_int_aimini_add_connection(ndpi_struct, flow);
 				return;
 			}
 		}
@@ -257,7 +257,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 					if (is_special_aimini_host(packet->host_line) == 1) {
 						NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG,
 								"AIMINI HTTP traffic detected.\n");
-						ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+						ndpi_int_aimini_add_connection(ndpi_struct, flow);
 						return;
 					}
 				}
@@ -268,7 +268,7 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 					if (is_special_aimini_host(packet->host_line) == 1) {
 						NDPI_LOG(NDPI_PROTOCOL_AIMINI, ndpi_struct, NDPI_LOG_DEBUG,
 								"AIMINI HTTP traffic detected.\n");
-						ndpi_int_aimini_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
+						ndpi_int_aimini_add_connection(ndpi_struct, flow);
 						return;
 					}
 				}

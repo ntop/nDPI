@@ -54,7 +54,7 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
 	
 	if(memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0) {
 	  NDPI_LOG(NDPI_PROTOCOL_CITRIX, ndpi_struct, NDPI_LOG_DEBUG, "Found citrix.\n");
-	  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX/* , NDPI_REAL_PROTOCOL */);
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX);
 	}
 
 	return;
@@ -64,7 +64,7 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
 	if((memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0)
 	   || (ndpi_strnstr((const char *)packet->payload, "Citrix.TcpProxyService", payload_len) != NULL)) {
 	  NDPI_LOG(NDPI_PROTOCOL_CITRIX, ndpi_struct, NDPI_LOG_DEBUG, "Found citrix.\n");
-	  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX/* , NDPI_REAL_PROTOCOL */);
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX);
 	}
 
 	return;	

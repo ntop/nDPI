@@ -30,7 +30,7 @@
 
 static void ndpi_dofus_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_DOFUS/* , NDPI_REAL_PROTOCOL */);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOFUS);
 }
 
 void ndpi_search_dofus(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
