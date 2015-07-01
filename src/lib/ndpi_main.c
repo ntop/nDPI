@@ -4264,13 +4264,13 @@ void check_ndpi_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
     check_ndpi_other_flow_func(ndpi_struct, flow, ndpi_selection_packet);
 }
 
-unsigned int ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
-					   struct ndpi_flow_struct *flow,
-					   const unsigned char *packet,
-					   const unsigned short packetlen,
-					   const u_int64_t current_tick_l,
-					   struct ndpi_id_struct *src,
-					   struct ndpi_id_struct *dst)
+u_int16_t ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
+					struct ndpi_flow_struct *flow,
+					const unsigned char *packet,
+					const unsigned short packetlen,
+					const u_int64_t current_tick_l,
+					struct ndpi_id_struct *src,
+					struct ndpi_id_struct *dst)
 {
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
   u_int32_t a;
@@ -4904,6 +4904,11 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct
   }
 }
 
+u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+				       struct ndpi_flow_struct *flow) {
+  return(flow->detected_protocol_stack[1]);
+}
+
 void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   u_int16_t upper_detected_protocol, 
@@ -5313,11 +5318,10 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
   if(matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
     /* Move the protocol on slot 0 down one position */
     packet->detected_protocol_stack[1] = packet->detected_protocol_stack[0];
-
     packet->detected_protocol_stack[0] = matching_protocol_id;
-
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
-      flow->detected_protocol_stack[0] = packet->detected_protocol_stack[0];
+    
+    flow->detected_protocol_stack[0] = packet->detected_protocol_stack[0],
+      flow->detected_protocol_stack[1] = packet->detected_protocol_stack[1];
 
     return(packet->detected_protocol_stack[0]);
   }

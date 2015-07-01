@@ -123,14 +123,16 @@ extern "C" {
    * @param dst void pointer to the destination subscriber state machine
    * @return returns the detected ID of the protocol
    */
-  unsigned int
-  ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
-				struct ndpi_flow_struct *flow,
-				const unsigned char *packet,
-				const unsigned short packetlen,
-				const u_int64_t current_tick,
-				struct ndpi_id_struct *src,
-				struct ndpi_id_struct *dst);
+  u_int16_t ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
+					  struct ndpi_flow_struct *flow,
+					  const unsigned char *packet,
+					  const unsigned short packetlen,
+					  const u_int64_t current_tick,
+					  struct ndpi_id_struct *src,
+					  struct ndpi_id_struct *dst);
+
+  u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+					 struct ndpi_flow_struct *flow);
 
 #define NDPI_DETECTION_ONLY_IPV4 ( 1 << 0 )
 #define NDPI_DETECTION_ONLY_IPV6 ( 1 << 1 )

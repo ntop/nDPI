@@ -176,7 +176,7 @@ typedef struct ndpi_flow {
   u_int32_t packets;
 
   // result only, not used for flow identification
-  u_int32_t detected_protocol;
+  u_int16_t detected_protocol, detected_masterprotocol;
 
   char host_server_name[256];
 
@@ -489,9 +489,17 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
 
-    fprintf(out, "[proto: %u/%s][%u pkts/%llu bytes]",
-	   flow->detected_protocol,
-	   ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol),
+    if(flow->detected_masterprotocol)
+      fprintf(out, "[proto: %u.%u/%s.%s]", 
+	      flow->detected_masterprotocol, flow->detected_protocol, 
+	      ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_masterprotocol),
+	      ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol));
+    else
+      fprintf(out, "[proto: %u/%s]", 
+	      flow->detected_protocol,
+	      ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol));
+
+    fprintf(out, "[%u pkts/%llu bytes]",
 	   flow->packets, (long long unsigned int)flow->bytes);
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
@@ -509,8 +517,23 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
     json_object_object_add(jObj,"host_a.port",json_object_new_int(ntohs(flow->lower_port)));
     json_object_object_add(jObj,"host_b.name",json_object_new_string(flow->upper_name));
     json_object_object_add(jObj,"host_n.port",json_object_new_int(ntohs(flow->upper_port)));
+
+    if(flow->detected_masterprotocol)
+      json_object_object_add(jObj,"detected.masterprotocol",json_object_new_int(flow->detected_masterprotocol));
+    
     json_object_object_add(jObj,"detected.protocol",json_object_new_int(flow->detected_protocol));
-    json_object_object_add(jObj,"detected.protocol.name",json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol)));
+
+    if(flow->detected_masterprotocol) {
+      char tmp[256];
+
+      snprintf(tmp, sizeof(tmp), "%s.%s", 
+	       ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_masterprotocol),
+	       ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol));
+
+      json_object_object_add(jObj,"detected.protocol.name",json_object_new_string(tmp));
+    } else
+      json_object_object_add(jObj,"detected.protocol.name",json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol)));
+
     json_object_object_add(jObj,"packets",json_object_new_int(flow->packets));
     json_object_object_add(jObj,"bytes",json_object_new_int(flow->bytes));
 
@@ -581,8 +604,7 @@ static void node_print_known_proto_walker(const void *node, ndpi_VISIT which, in
 
 /* ***************************************************** */
 
-static unsigned int node_guess_undetected_protocol(u_int16_t thread_id,
-						   struct ndpi_flow *flow) {
+static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi_flow *flow) {
   flow->detected_protocol = ndpi_guess_undetected_protocol(ndpi_thread_info[thread_id].ndpi_struct,
 							   flow->protocol,
 							   ntohl(flow->lower_ip),
@@ -968,9 +990,10 @@ static unsigned int packet_processing(u_int16_t thread_id,
   protocol = (const u_int32_t)ndpi_detection_process_packet(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time, src, dst);
-
-  flow->detected_protocol = protocol;
-
+  
+  if(protocol != NDPI_PROTOCOL_UNKNOWN)
+    flow->detected_protocol = protocol, flow->detected_masterprotocol = ndpi_get_flow_masterprotocol(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow);
+  
   if((flow->detected_protocol != NDPI_PROTOCOL_UNKNOWN)
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
