@@ -24,8 +24,7 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
          packet->payload[2] == 0x00 && packet->payload[3] == 0x00)) {
       NDPI_LOG(NDPI_PROTOCOL_OPENVPN, ndpi_struct, NDPI_LOG_DEBUG,
                "found openvpn udp 443.\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN/* , */
-                              /* NDPI_REAL_PROTOCOL */);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
 
@@ -39,8 +38,7 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
          packet->payload[0] == 0x38 || packet->payload[0] == 0x39)) {
       NDPI_LOG(NDPI_PROTOCOL_OPENVPN, ndpi_struct, NDPI_LOG_DEBUG,
                "found openvpn broadcast udp STD.\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN/* , */
-                              /* NDPI_REAL_PROTOCOL */);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
 
@@ -56,14 +54,12 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
          (packet->payload[2] == 0x38))) {
       NDPI_LOG(NDPI_PROTOCOL_OPENVPN, ndpi_struct, NDPI_LOG_DEBUG,
                "found openvpn broadcast udp STD.\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN/* , */
-                              /* NDPI_REAL_PROTOCOL */);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
 
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask,
-                               NDPI_PROTOCOL_OPENVPN);
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OPENVPN);
 }
 
 #endif

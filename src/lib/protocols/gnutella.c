@@ -33,12 +33,11 @@ static void ndpi_int_gnutella_add_connection(struct ndpi_detection_module_struct
 					     struct ndpi_flow_struct *flow/* , */
 					     /* ndpi_protocol_type_t protocol_type */)
 {
-
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA, NDPI_PROTOCOL_UNKNOWN);
 
   if (src != NULL) {
     src->gnutella_ts = packet->tick_timestamp;

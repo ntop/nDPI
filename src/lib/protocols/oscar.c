@@ -36,7 +36,7 @@ static void ndpi_int_oscar_add_connection(struct ndpi_detection_module_struct *n
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OSCAR);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OSCAR, NDPI_PROTOCOL_UNKNOWN);
 
   if (src != NULL) {
     src->oscar_last_safe_access_time = packet->tick_timestamp;

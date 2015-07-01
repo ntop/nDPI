@@ -24,7 +24,7 @@
 #ifdef NDPI_PROTOCOL_ZMQ
 
 static void ndpi_int_zmq_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ, NDPI_PROTOCOL_UNKNOWN);
   NDPI_LOG(NDPI_PROTOCOL_ZMQ, ndpi_struct, NDPI_LOG_TRACE, "ZMQ Found.\n");
 }
 

@@ -34,7 +34,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 					      const u_int8_t save_detection, const u_int8_t encrypted_connection/* , */
 					      /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT);
+  ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN);
 }
 
 static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module_struct

@@ -4881,31 +4881,42 @@ u_int8_t ndpi_detection_get_l4(const u_int8_t * l3, u_int16_t l3_len, const u_in
 
 void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow,
-				u_int16_t detected_protocol)
+				u_int16_t upper_detected_protocol,
+				u_int16_t lower_detected_protocol)
 {
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
   
-  ndpi_int_change_protocol(ndpi_struct, flow, detected_protocol);
+  ndpi_int_change_protocol(ndpi_struct, flow, upper_detected_protocol, lower_detected_protocol);
   
-  if(src != NULL)
-    NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, detected_protocol);
-  
-  if(dst != NULL)
-    NDPI_ADD_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, detected_protocol);  
+  if(src != NULL) {
+    NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, upper_detected_protocol);
+
+    if(lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN)
+      NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, lower_detected_protocol);
+  }
+
+ if(dst != NULL) {
+    NDPI_ADD_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, upper_detected_protocol);
+
+    if(lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN)
+      NDPI_ADD_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, lower_detected_protocol);
+  }
 }
 
 void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
-				   u_int16_t detected_protocol) {
+				   u_int16_t upper_detected_protocol, 
+				   u_int16_t lower_detected_protocol) {
   if(!flow) return;
   
-  flow->detected_protocol_stack[0] = detected_protocol;
+  flow->detected_protocol_stack[0] = upper_detected_protocol, flow->detected_protocol_stack[1] = lower_detected_protocol;
 }
 
 void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				     struct ndpi_flow_struct *flow,
-				     u_int16_t detected_protocol) {
+				     u_int16_t upper_detected_protocol, 
+				     u_int16_t lower_detected_protocol) {
   struct ndpi_packet_struct *packet = &flow->packet;
   /* NOTE: everything below is identically to change_flow_protocol
    *        except flow->packet If you want to change something here,
@@ -4915,7 +4926,7 @@ void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_s
   if(!packet)
     return;
 
-  packet->detected_protocol_stack[0] = detected_protocol;
+  packet->detected_protocol_stack[0] = upper_detected_protocol, packet->detected_protocol_stack[1] = lower_detected_protocol;
 }
 
 /*
@@ -4940,34 +4951,6 @@ u_int8_t ndpi_detection_flow_protocol_history_contains_protocol(struct ndpi_dete
   return 0;
 }
 
-/* generic function for setting a protocol for a flow
- *
- * what it does is:
- * 1.call ndpi_int_change_protocol
- * 2.set protocol in detected bitmask for src and dst
- */
-void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow,
-			     u_int16_t detected_protocol);
-
-/* generic function for changing the flow protocol
- *
- * what it does is:
- * 1.update the flow protocol stack with the new protocol
- */
-void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-				   struct ndpi_flow_struct *flow,
-				   u_int16_t detected_protocol);
-
-/* generic function for changing the packetprotocol
- *
- * what it does is:
- * 1.update the packet protocol stack with the new protocol
- */
-void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-				     struct ndpi_flow_struct *flow,
-				     u_int16_t detected_protocol);
-
 /* generic function for changing the protocol
  *
  * what it does is:
@@ -4976,10 +4959,10 @@ void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_s
  */
 void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow,
-			      u_int16_t detected_protocol)
-{
-  ndpi_int_change_flow_protocol(ndpi_struct, flow, detected_protocol);
-  ndpi_int_change_packet_protocol(ndpi_struct, flow, detected_protocol);
+			      u_int16_t upper_detected_protocol, 
+			      u_int16_t lower_detected_protocol) {
+  ndpi_int_change_flow_protocol(ndpi_struct, flow, upper_detected_protocol, lower_detected_protocol);
+  ndpi_int_change_packet_protocol(ndpi_struct, flow, upper_detected_protocol, lower_detected_protocol);
 }
 
 
@@ -5328,6 +5311,9 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 #endif
 
   if(matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+    /* Move the protocol on slot 0 down one position */
+    packet->detected_protocol_stack[1] = packet->detected_protocol_stack[0];
+
     packet->detected_protocol_stack[0] = matching_protocol_id;
 
     if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)

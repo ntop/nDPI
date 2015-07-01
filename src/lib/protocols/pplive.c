@@ -28,7 +28,7 @@
 
 #ifdef NDPI_PROTOCOL_PPLIVE
 static void ndpi_int_pplive_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PPLIVE);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PPLIVE, NDPI_PROTOCOL_UNKNOWN);
 }
 
 static void ndpi_check_pplive_udp1(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {

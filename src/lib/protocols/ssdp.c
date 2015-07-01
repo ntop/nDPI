@@ -28,43 +28,43 @@
 
 
 static void ndpi_int_ssdp_add_connection(struct ndpi_detection_module_struct
-										   *ndpi_struct, struct ndpi_flow_struct *flow)
+					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSDP);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSDP, NDPI_PROTOCOL_UNKNOWN);
 }
 
 /* this detection also works asymmetrically */
 void ndpi_search_ssdp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &flow->packet;
 	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
+  //      struct ndpi_id_struct         *src=ndpi_struct->src;
+  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-	NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "search ssdp.\n");
-	if (packet->udp != NULL) {
+  NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "search ssdp.\n");
+  if (packet->udp != NULL) {
 
-		if (packet->payload_packet_len > 100) {
-			if ((memcmp(packet->payload, "M-SEARCH * HTTP/1.1", 19) == 0)
-				|| memcmp(packet->payload, "NOTIFY * HTTP/1.1", 17) == 0) {
+    if (packet->payload_packet_len > 100) {
+      if ((memcmp(packet->payload, "M-SEARCH * HTTP/1.1", 19) == 0)
+	  || memcmp(packet->payload, "NOTIFY * HTTP/1.1", 17) == 0) {
 
 
-				NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "found ssdp.\n");
-				ndpi_int_ssdp_add_connection(ndpi_struct, flow);
-				return;
-			}
+	NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "found ssdp.\n");
+	ndpi_int_ssdp_add_connection(ndpi_struct, flow);
+	return;
+      }
 
 #define SSDP_HTTP "HTTP/1.1 200 OK\r\n"
-			if(memcmp(packet->payload, SSDP_HTTP, strlen(SSDP_HTTP)) == 0) {
-			  NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "found ssdp.\n");
-			  ndpi_int_ssdp_add_connection(ndpi_struct, flow);
-			  return;
-			}
-		}
-	}
+      if(memcmp(packet->payload, SSDP_HTTP, strlen(SSDP_HTTP)) == 0) {
+	NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "found ssdp.\n");
+	ndpi_int_ssdp_add_connection(ndpi_struct, flow);
+	return;
+      }
+    }
+  }
 
-	NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "ssdp excluded.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SSDP);
+  NDPI_LOG(NDPI_PROTOCOL_SSDP, ndpi_struct, NDPI_LOG_DEBUG, "ssdp excluded.\n");
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SSDP);
 }
 
 #endif

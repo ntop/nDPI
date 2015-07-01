@@ -27,7 +27,7 @@
 
 #ifdef NDPI_PROTOCOL_PANDO
 static void ndpi_int_pando_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PANDO);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PANDO, NDPI_PROTOCOL_UNKNOWN);
 }
 
 static void ndpi_check_pando_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {

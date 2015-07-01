@@ -27,11 +27,9 @@
 #ifdef NDPI_PROTOCOL_SPOTIFY
 static void ndpi_int_spotify_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
-					    u_int8_t due_to_correlation)
-{
+					    u_int8_t due_to_correlation) {
   ndpi_set_detected_protocol(ndpi_struct, flow,
-			  NDPI_PROTOCOL_SPOTIFY/* , */
-			  /* due_to_correlation ? NDPI_CORRELATED_PROTOCOL : NDPI_REAL_PROTOCOL */);
+			     NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN);
 }
 
 
@@ -61,7 +59,7 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
        packet->payload[6] == 0x52 && packet->payload[7] == 0x0e &&
        packet->payload[8] == 0x50 ) {
         NDPI_LOG(NDPI_PROTOCOL_SPOTIFY, ndpi_struct, NDPI_LOG_DEBUG, "Found spotify tcp dissector.\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN);
      }
 
 
@@ -100,7 +98,7 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
           || ((ntohl(packet->iph->daddr) & 0xFFFFFC00 /* 255.255.252.0 */) == 0xC284A200 /* 194.132.162.0 */)
 	   ) {
         NDPI_LOG(NDPI_PROTOCOL_SPOTIFY, ndpi_struct, NDPI_LOG_DEBUG, "Found spotify via ip range.\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN);
 	  return;
 	}
       }

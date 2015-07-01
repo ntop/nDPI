@@ -33,7 +33,7 @@ static void ndpi_int_thunder_add_connection(struct ndpi_detection_module_struct 
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_THUNDER);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_THUNDER, NDPI_PROTOCOL_UNKNOWN);
 
   if (src != NULL) {
     src->thunder_ts = packet->tick_timestamp;

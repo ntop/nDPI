@@ -38,7 +38,7 @@ static void ndpi_int_direct_download_link_add_connection(struct ndpi_detection_m
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, NDPI_PROTOCOL_UNKNOWN);
 
   flow->l4.tcp.ddlink_server_direction = packet->packet_direction;
 }

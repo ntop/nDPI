@@ -31,7 +31,7 @@ static void ndpi_int_tvuplayer_add_connection(struct ndpi_detection_module_struc
 					      struct ndpi_flow_struct *flow/* , */
 					      /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TVUPLAYER);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TVUPLAYER, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_tvuplayer(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

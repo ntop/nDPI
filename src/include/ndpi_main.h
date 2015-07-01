@@ -99,8 +99,9 @@ u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t * str, u_int16_t max_chars_to_r
 
 
 void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,                             
-                             struct ndpi_flow_struct *flow,
-                             u_int16_t detected_protocol/* , ndpi_protocol_type_t protocol_type */);
+				struct ndpi_flow_struct *flow,
+				u_int16_t upper_detected_protocol,
+                                u_int16_t lower_detected_protocol);
 
 
 /* function to parse a packet which has line based information into a line based structure
@@ -112,11 +113,12 @@ extern void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct 
 extern u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow, u_int16_t counter);
 extern void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
-					    u_int16_t detected_protocol/* , ndpi_protocol_type_t protocol_type */);
+					    u_int16_t upper_detected_protocol,
+					    u_int16_t lower_detected_protocol);
 extern void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				     struct ndpi_flow_struct *flow,
-				     u_int16_t detected_protocol/* , */
-				     /* ndpi_protocol_type_t protocol_type */);
+				     u_int16_t upper_detected_protocol,
+				     u_int16_t lower_detected_protocol);
 extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
 				    ndpi_protocol_breed_t protoBreed, u_int16_t protoId,
 				    u_int16_t tcp_alias_protoId[2], u_int16_t udp_alias_protoId[2],
@@ -147,8 +149,8 @@ extern u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
 			       u_int32_t net, u_int32_t num_bits);
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
-					     const char **file, const char **func, u_int32_t * line);
+void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
+					   const char **file, const char **func, u_int32_t * line);
 #endif
 
 #include "ndpi_api.h"

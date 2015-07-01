@@ -34,9 +34,9 @@ This module should detect MDNS
 */
 
 static void ndpi_int_mdns_add_connection(struct ndpi_detection_module_struct
-										   *ndpi_struct, struct ndpi_flow_struct *flow)
+					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MDNS);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MDNS, NDPI_PROTOCOL_UNKNOWN);
 }
 
 static int ndpi_int_check_mdns_payload(struct ndpi_detection_module_struct

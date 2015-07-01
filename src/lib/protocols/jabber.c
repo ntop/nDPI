@@ -41,9 +41,9 @@ static struct jabber_string jabber_strings[] = {
 
 static void ndpi_int_jabber_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
-					   u_int32_t protocol/* , ndpi_protocol_type_t protocol_type */)
+					   u_int32_t protocol)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, protocol);
+  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
 }
 
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,

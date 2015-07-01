@@ -57,11 +57,9 @@ static u_int8_t ndpi_check_for_YmsgCommand(u_int16_t len, const u_int8_t * ptr)
 static void ndpi_int_yahoo_add_connection(struct ndpi_detection_module_struct *ndpi_struct, 
 					  struct ndpi_flow_struct *flow/* , ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 }
-
-
-	
+       
 #if !defined(WIN32)
 static inline
 #else

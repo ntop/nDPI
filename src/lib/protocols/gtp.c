@@ -60,7 +60,7 @@ static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, str
 	
 	if(message_len <= (payload_len-sizeof(struct gtp_header_generic))) {
 	  NDPI_LOG(NDPI_PROTOCOL_GTP, ndpi_struct, NDPI_LOG_DEBUG, "Found gtp.\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP);
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP, NDPI_PROTOCOL_UNKNOWN);
 	  return;
 	}
       }

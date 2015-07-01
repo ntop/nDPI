@@ -49,7 +49,7 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
   struct ndpi_packet_struct *packet = &flow->packet;
 
   if(ndpi_is_tor_flow(ndpi_struct, flow)) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_UNKNOWN);
     return;
   }
 
@@ -70,7 +70,7 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
 				       sport, dport);
 
     if(proto != NDPI_PROTOCOL_UNKNOWN)
-      ndpi_set_detected_protocol(ndpi_struct, flow, proto);
+      ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_UNKNOWN);
   }
 }
 

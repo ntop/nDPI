@@ -26,7 +26,7 @@
 static void ndpi_int_rsync_add_connection(struct ndpi_detection_module_struct
 					  *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RSYNC);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RSYNC, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_rsync(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

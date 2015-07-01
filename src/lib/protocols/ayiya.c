@@ -56,7 +56,7 @@ void ndpi_search_ayiya(struct ndpi_detection_module_struct *ndpi_struct, struct 
       now = flow->packet.tick_timestamp;
 
       if((epoch >= (now - fireyears)) && (epoch <= (now+86400 /* 1 day */)))      
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AYIYA);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AYIYA, NDPI_PROTOCOL_UNKNOWN);
 
       return;
     }

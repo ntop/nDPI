@@ -35,7 +35,7 @@ static void ndpi_check_sflow(struct ndpi_detection_module_struct *ndpi_struct, s
      && (packet->payload[0] == 0) && (packet->payload[1] == 0) && (packet->payload[2] == 0)
      && ((packet->payload[3] == 2) || (packet->payload[3] == 5))) {
     NDPI_LOG(NDPI_PROTOCOL_SFLOW, ndpi_struct, NDPI_LOG_DEBUG, "Found sflow.\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SFLOW);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SFLOW, NDPI_PROTOCOL_UNKNOWN);
     return;
   }
 }

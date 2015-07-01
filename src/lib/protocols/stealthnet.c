@@ -29,30 +29,30 @@
 
 
 static void ndpi_int_stealthnet_add_connection(struct ndpi_detection_module_struct
-												 *ndpi_struct, struct ndpi_flow_struct *flow)
+					       *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STEALTHNET);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STEALTHNET, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_stealthnet(struct ndpi_detection_module_struct
-							  *ndpi_struct, struct ndpi_flow_struct *flow)
+			    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &flow->packet;
 	
 
-//  struct ndpi_id_struct *src = flow->src;
-//  struct ndpi_id_struct *dst = flow->dst;
+  //  struct ndpi_id_struct *src = flow->src;
+  //  struct ndpi_id_struct *dst = flow->dst;
 
 
-	if (packet->payload_packet_len > 40
-		&& memcmp(packet->payload, "LARS REGENSBURGER'S FILE SHARING PROTOCOL", 41) == 0) {
-		NDPI_LOG(NDPI_PROTOCOL_STEALTHNET, ndpi_struct, NDPI_LOG_DEBUG, "found stealthnet\n");
-		ndpi_int_stealthnet_add_connection(ndpi_struct, flow);
-		return;
-	}
+  if (packet->payload_packet_len > 40
+      && memcmp(packet->payload, "LARS REGENSBURGER'S FILE SHARING PROTOCOL", 41) == 0) {
+    NDPI_LOG(NDPI_PROTOCOL_STEALTHNET, ndpi_struct, NDPI_LOG_DEBUG, "found stealthnet\n");
+    ndpi_int_stealthnet_add_connection(ndpi_struct, flow);
+    return;
+  }
 
-	NDPI_LOG(NDPI_PROTOCOL_STEALTHNET, ndpi_struct, NDPI_LOG_DEBUG, "exclude stealthnet.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_STEALTHNET);
+  NDPI_LOG(NDPI_PROTOCOL_STEALTHNET, ndpi_struct, NDPI_LOG_DEBUG, "exclude stealthnet.\n");
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_STEALTHNET);
 
 }
 #endif
