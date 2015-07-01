@@ -471,16 +471,10 @@ typedef struct ndpi_packet_struct {
    * used for the main loop */
   /* u_int16_t real_protocol_read_only; */
 
-#if NDPI_PROTOCOL_HISTORY_SIZE > 1
-#  if NDPI_PROTOCOL_HISTORY_SIZE > 5
-#    error protocol stack size not supported
-#  endif
-
 #if !defined(WIN32)
     __attribute__ ((__packed__))
 #endif
     u_int16_t protocol_stack_info;  
-#endif
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
   struct ndpi_int_one_line_struct host_line;
@@ -668,16 +662,10 @@ typedef struct ndpi_detection_module_struct {
 
 typedef struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
-#if NDPI_PROTOCOL_HISTORY_SIZE > 1
-#  if NDPI_PROTOCOL_HISTORY_SIZE > 5
-#    error protocol stack size not supported
-#  endif
-
 #if !defined(WIN32)
     __attribute__ ((__packed__))
 #endif
     u_int16_t protocol_stack_info;  
-#endif
 
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id;
