@@ -1361,11 +1361,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "DropBox",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 17500, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYPE,
-			    no_master,
-			    no_master, "Skype",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DCERPC,
 			    no_master,
 			    no_master, "DCE_RPC",
@@ -1426,6 +1421,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Radius",
 			    ndpi_build_default_ports(ports_a, 1812, 1813, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 1812, 1813, 0, 0, 0) /* UDP */);
+
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WINDOWS_UPDATE,
 			    no_master,
 			    no_master, "WindowsUpdate",
@@ -2358,6 +2354,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 #endif
+
+  init_skype_dissector(ndpi_struct, &a, detection_bitmask);
+
   /*Update excluded protocol bitmask*/
   NDPI_BITMASK_SET(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
 		   ndpi_struct->callback_buffer[a].detection_bitmask);
@@ -3288,14 +3287,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 				      ADD_TO_DETECTION_BITMASK);
 #endif
 
-#ifdef NDPI_PROTOCOL_SKYPE
-  ndpi_set_bitmask_protocol_detection("Skype", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SKYPE,
-				      ndpi_search_skype,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
 
 #ifdef NDPI_PROTOCOL_RADIUS
   ndpi_set_bitmask_protocol_detection("RADIUS", ndpi_struct, detection_bitmask, a++,

@@ -29,6 +29,20 @@
 #include "ndpi_main.h"
 
 
+ndpi_port_range* ndpi_build_default_ports_range(ndpi_port_range *ports,
+						u_int16_t portA_low, u_int16_t portA_high,
+						u_int16_t portB_low, u_int16_t portB_high,
+						u_int16_t portC_low, u_int16_t portC_high,
+						u_int16_t portD_low, u_int16_t portD_high,
+						u_int16_t portE_low, u_int16_t portE_high);
+
+ndpi_port_range* ndpi_build_default_ports(ndpi_port_range *ports,
+					  u_int16_t portA,
+					  u_int16_t portB,
+					  u_int16_t portC,
+					  u_int16_t portD,
+					  u_int16_t portE);
+
 /* TCP/UDP protocols */
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int8_t protocol,
@@ -142,7 +156,6 @@ void ndpi_search_crossfire_tcp_udp(struct ndpi_detection_module_struct *ndpi_str
 void ndpi_search_guildwars_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_dropbox(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
-void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_citrix(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
@@ -182,4 +195,5 @@ void ndpi_search_eaq(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_mpegts(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
+void init_skype_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 #endif /* __NDPI_PROTOCOLS_INCLUDE_FILE__ */
