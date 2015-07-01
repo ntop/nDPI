@@ -33,7 +33,7 @@ void ndpi_search_vmware(struct ndpi_detection_module_struct *ndpi_struct, struct
      && (ntohs(packet->udp->dest) == 902)
      && ((packet->payload[0] & 0xFF) == 0xA4)) {
     NDPI_LOG(NDPI_PROTOCOL_VMWARE, ndpi_struct, NDPI_LOG_DEBUG, "Found vmware.\n");
-    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_VMWARE, NDPI_REAL_PROTOCOL);	
+    ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_VMWARE/* , NDPI_REAL_PROTOCOL */);	
   } else {
     NDPI_LOG(NDPI_PROTOCOL_VMWARE, ndpi_struct, NDPI_LOG_DEBUG, "exclude vmware.\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_VMWARE);

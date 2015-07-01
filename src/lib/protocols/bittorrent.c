@@ -31,10 +31,10 @@
 #define NDPI_PROTOCOL_PLAIN_DETECTION 	0
 #define NDPI_PROTOCOL_WEBSEED_DETECTION 	2
 static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
-					      const u_int8_t save_detection, const u_int8_t encrypted_connection,
-					      ndpi_protocol_type_t protocol_type)
+					      const u_int8_t save_detection, const u_int8_t encrypted_connection/* , */
+					      /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, protocol_type);
+  ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT/* , protocol_type */);
 }
 
 static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module_struct
@@ -58,8 +58,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT,
 	       ndpi_struct, NDPI_LOG_TRACE, "BT: plain BitTorrent protocol detected\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					NDPI_REAL_PROTOCOL);
+					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					/* NDPI_REAL_PROTOCOL */);
       return 1;
     }
   }
@@ -72,8 +72,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 	NDPI_LOG(NDPI_PROTOCOL_BITTORRENT,
 		 ndpi_struct, NDPI_LOG_TRACE, "BT: plain BitTorrent protocol detected\n");
 	ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					  NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					  NDPI_REAL_PROTOCOL);
+					  NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					  /* NDPI_REAL_PROTOCOL */);
 	return 1;
       }
     }
@@ -83,8 +83,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct,
 	     NDPI_LOG_TRACE, "BT: plain webseed BitTorrent protocol detected\n");
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION,
-				      NDPI_CORRELATED_PROTOCOL);
+				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION/* , */
+				      /* NDPI_CORRELATED_PROTOCOL */);
     return 1;
   }
   /* seen Azureus as server for webseed, possibly other servers existing, to implement */
@@ -95,8 +95,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct,
 	     NDPI_LOG_TRACE, "BT: plain Bitcomet persistent seed protocol detected\n");
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION,
-				      NDPI_CORRELATED_PROTOCOL);
+				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION/* , */
+				      /* NDPI_CORRELATED_PROTOCOL */);
     return 1;
   }
 
@@ -118,8 +118,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct,
 	       NDPI_LOG_TRACE, "Azureus /Bittorrent user agent line detected\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION,
-					NDPI_CORRELATED_PROTOCOL);
+					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION/* , */
+					/* NDPI_CORRELATED_PROTOCOL */);
       return 1;
     }
 
@@ -130,8 +130,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct,
 	       NDPI_LOG_TRACE, "Bittorrent Shareaza detected.\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION,
-					NDPI_CORRELATED_PROTOCOL);
+					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION/* , */
+					/* NDPI_CORRELATED_PROTOCOL */);
       return 1;
     }
 
@@ -165,8 +165,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct, NDPI_LOG_TRACE, "Bitcomet LTS detected\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					NDPI_CORRELATED_PROTOCOL);
+					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					/* NDPI_CORRELATED_PROTOCOL */);
       return 1;
 
     }
@@ -192,8 +192,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct, NDPI_LOG_TRACE, "FlashGet detected\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					NDPI_CORRELATED_PROTOCOL);
+					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					/* NDPI_CORRELATED_PROTOCOL */);
       return 1;
 
     }
@@ -214,8 +214,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct, NDPI_LOG_TRACE, "FlashGet detected\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					NDPI_CORRELATED_PROTOCOL);
+					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					/* NDPI_CORRELATED_PROTOCOL */);
       return 1;
 
     }
@@ -285,8 +285,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct,
 	     NDPI_LOG_TRACE, " BT stat: tracker info hash parsed\n");
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-				      NDPI_CORRELATED_PROTOCOL);
+				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+				      /* NDPI_CORRELATED_PROTOCOL */);
     return 1;
   }
 
@@ -315,8 +315,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct,
 	       NDPI_LOG_TRACE, "BT: Warez - Plain BitTorrent protocol detected\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					NDPI_REAL_PROTOCOL);
+					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					/* NDPI_REAL_PROTOCOL */);
       return 1;
     }
   }
@@ -332,8 +332,8 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 		 ndpi_struct, NDPI_LOG_TRACE,
 		 "BT: Warez - Plain BitTorrent protocol detected due to Host: ip2p.com: pattern\n");
 	ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					  NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION,
-					  NDPI_CORRELATED_PROTOCOL);
+					  NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION/* , */
+					  /* NDPI_CORRELATED_PROTOCOL */);
 	return 1;
       }
     }
@@ -399,8 +399,8 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
       if(packet->payload_packet_len >= 23 /* min header size */) {
 	if(strncmp((const char*)packet->payload, bt_search, strlen(bt_search)) == 0) {
 	  ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					    NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					    NDPI_REAL_PROTOCOL);
+					    NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					    /* NDPI_REAL_PROTOCOL */);
 	  return;
 	} else {
 	  /* Check if this is protocol v0 */
@@ -462,8 +462,8 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	    NDPI_LOG(NDPI_PROTOCOL_BITTORRENT,
 		     ndpi_struct, NDPI_LOG_TRACE, "BT: plain BitTorrent protocol detected\n");
 	    ndpi_add_connection_as_bittorrent(ndpi_struct, flow,
-					      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION,
-					      NDPI_REAL_PROTOCOL);
+					      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
+					      /* NDPI_REAL_PROTOCOL */);
 	    return;
 	  }
 	}

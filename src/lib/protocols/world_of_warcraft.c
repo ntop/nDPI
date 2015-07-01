@@ -29,10 +29,10 @@
 
 
 static void ndpi_int_worldofwarcraft_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-						    struct ndpi_flow_struct *flow,
-						    ndpi_protocol_type_t protocol_type)
+						    struct ndpi_flow_struct *flow/* , */
+						    /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_WORLDOFWARCRAFT, protocol_type);
+  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_WORLDOFWARCRAFT/* , protocol_type */);
 }
 
 	
@@ -70,7 +70,7 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
 	  packet->user_agent_line.len == NDPI_STATICSTRING_LEN("Blizzard Web Client") &&
 	  memcmp(packet->user_agent_line.ptr, "Blizzard Web Client",
 		 NDPI_STATICSTRING_LEN("Blizzard Web Client")) == 0) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
 	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG,
 		 "World of Warcraft: Web Client found\n");
 	return;
@@ -86,7 +86,7 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
 		    NDPI_STATICSTRING_LEN("Blizzard Downloader")) == 0
 	  && memcmp(&packet->host_line.ptr[packet->host_line.len - NDPI_STATICSTRING_LEN("worldofwarcraft.com")],
 		    "worldofwarcraft.com", NDPI_STATICSTRING_LEN("worldofwarcraft.com")) == 0) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_CORRELATED_PROTOCOL);
+	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_CORRELATED_PROTOCOL */);
 	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG,
 		 "World of Warcraft: Web Client found\n");
 	return;
@@ -94,14 +94,14 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
     }
     if (packet->payload_packet_len == 50 && memcmp(&packet->payload[2], "WORLD OF WARCRAFT CONNECTION",
 						   NDPI_STATICSTRING_LEN("WORLD OF WARCRAFT CONNECTION")) == 0) {
-      ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "World of Warcraft: Login found\n");
       return;
     }
     if (packet->tcp->dest == htons(3724) && packet->payload_packet_len < 70
 	&& packet->payload_packet_len > 40 && (memcmp(&packet->payload[4], "WoW", 3) == 0
 					       || memcmp(&packet->payload[5], "WoW", 3) == 0)) {
-      ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
       NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "World of Warcraft: Login found\n");
       return;
     }
@@ -109,7 +109,7 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
     if (NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_WORLDOFWARCRAFT) != 0) {
       if (packet->tcp->source == htons(3724)
 	  && packet->payload_packet_len == 8 && get_u_int32_t(packet->payload, 0) == htonl(0x0006ec01)) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct,
 		 NDPI_LOG_DEBUG, "World of Warcraft: connection detected\n");
 	return;
@@ -152,7 +152,7 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
 	    "\x94\xec\xff\xfd\x67\x62\xd4\x67\xfb\xf9\xdd\xbd\xfd\x01\xc0\x8f\xf9\x81", 18) == 0
 	   || memcmp(&packet->payload[packet->payload_packet_len - 30],
 		     "\x94\xec\xff\xfd\x67\x62\xd4\x67\xfb\xf9\xdd\xbd\xfd\x01\xc0\x8f\xf9\x81", 18) == 0)) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct,
 		 NDPI_LOG_DEBUG, "World of Warcraft: connection detected\n");
 	return;
@@ -176,12 +176,12 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
 
     if (flow->l4.tcp.wow_stage == 2) {
       if (packet->payload_packet_len == 4) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct,
 		 NDPI_LOG_DEBUG, "World of Warcraft: connection detected\n");
 	return;
       } else if (packet->payload_packet_len > 4 && packet->payload_packet_len <= 16 && packet->payload[4] == 0x0c) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct,
 		 NDPI_LOG_DEBUG, "World of Warcraft: connection detected\n");
 	return;
@@ -196,7 +196,7 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
       if (packet->payload_packet_len >= 77 &&
 	  get_u_int32_t(packet->payload, 0) == htonl(0x40000aed) && get_u_int32_t(packet->payload, 4) == htonl(0xea070aed)) {
 
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow/* , NDPI_REAL_PROTOCOL */);
 	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct,
 		 NDPI_LOG_DEBUG, "World of Warcraft: connection detected\n");
 	return;

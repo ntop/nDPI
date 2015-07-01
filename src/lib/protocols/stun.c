@@ -39,7 +39,7 @@ struct stun_packet_header {
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 u_int proto,
 					 struct ndpi_flow_struct *flow) {
-  ndpi_int_add_connection(ndpi_struct, flow, proto, NDPI_REAL_PROTOCOL);
+  ndpi_int_add_connection(ndpi_struct, flow, proto/* , NDPI_REAL_PROTOCOL */);
 }
 
 typedef enum {

@@ -168,7 +168,7 @@
 /**********************
  * detection features *
  **********************/
-#define NDPI_SELECT_DETECTION_WITH_REAL_PROTOCOL ( 1 << 0 )
+/* #define NDPI_SELECT_DETECTION_WITH_REAL_PROTOCOL ( 1 << 0 ) */
 
 #define NDPI_DIRECTCONNECT_CONNECTION_IP_TICK_TIMEOUT          600
 #define NDPI_IRC_CONNECTION_TIMEOUT                            120

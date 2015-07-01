@@ -33,7 +33,7 @@ static void ndpi_int_armagetron_add_connection(struct ndpi_detection_module_stru
 					       struct ndpi_flow_struct *flow)
 {
 
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_ARMAGETRON, NDPI_REAL_PROTOCOL);
+  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_ARMAGETRON/* , NDPI_REAL_PROTOCOL */);
 }
 
 void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

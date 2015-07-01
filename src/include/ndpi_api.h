@@ -155,7 +155,7 @@ extern "C" {
    * @param ndpi_struct the detection module
    * @return the protocol id of the last real protocol found in the protocol history of the flow
    */
-  u_int16_t ndpi_detection_get_real_protocol_of_flow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+  /* u_int16_t ndpi_detection_get_real_protocol_of_flow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow); */
 
   /**
    * returns true if the protocol history of the flow of the last packet given to the detection
