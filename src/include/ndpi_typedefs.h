@@ -476,14 +476,10 @@ typedef struct ndpi_packet_struct {
 #    error protocol stack size not supported
 #  endif
 
-  /* struct { */
-  /*   u_int8_t entry_is_real_protocol:5; */
-  /*   u_int8_t current_stack_size_minus_one:3; */
-  /* } */
 #if !defined(WIN32)
     __attribute__ ((__packed__))
 #endif
-    protocol_stack_info;
+    u_int16_t protocol_stack_info;  
 #endif
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
@@ -677,15 +673,10 @@ typedef struct ndpi_flow_struct {
 #    error protocol stack size not supported
 #  endif
 
-  /* struct { */
-  /*   u_int8_t entry_is_real_protocol:5; */
-  /*   u_int8_t current_stack_size_minus_one:3; */
-  /* } */
-
 #if !defined(WIN32)
     __attribute__ ((__packed__))
 #endif
-    protocol_stack_info;
+    u_int16_t protocol_stack_info;  
 #endif
 
   /* init parameter, internal used to set up timestamp,... */
