@@ -245,9 +245,10 @@
 #define NDPI_SERVICE_QUICKPLAY                          196 /* Streaming service used by various services such as hooq.tv  */
 #define NDPI_SERVICE_TIM                                197 /* Traffic for tim.com.br and tim.it */
 #define NDPI_PROTOCOL_MPEGTS        			198
+#define NDPI_SERVICE_SNAPCHAT                           199
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_MPEGTS
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_SNAPCHAT
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

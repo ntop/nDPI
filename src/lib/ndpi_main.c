@@ -530,14 +530,24 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
 			     u_int16_t tcp_master_protoId[2], u_int16_t udp_master_protoId[2],
 			     char *protoName,
 			     ndpi_port_range *tcpDefPorts, ndpi_port_range *udpDefPorts) {
-  char *name = ndpi_strdup(protoName);
+  char *name;
   int j;
 
   if(protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS) {
-    printf("[NDPI] %s(protoId=%d): INTERNAL ERROR\n", __FUNCTION__, protoId);
-    ndpi_free(name);
+#ifdef DEBUG
+    printf("[NDPI] %s(%s/protoId=%d): INTERNAL ERROR\n", __FUNCTION__, protoName, protoId);
+#endif
     return;
   }
+
+  if(ndpi_mod->proto_defaults[protoId].protoName != NULL) {
+#ifdef DEBUG
+    printf("[NDPI] %s(%s/protoId=%d): already initialized. Ignoring it\n", __FUNCTION__, protoName, protoId);
+#endif
+    return;
+  }
+
+  name = ndpi_strdup(protoName);
 
   ndpi_mod->proto_defaults[protoId].protoName = name,
     ndpi_mod->proto_defaults[protoId].protoId = protoId,
@@ -672,6 +682,10 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_struc
 static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					 char *value, int protocol_id,
 					 ndpi_protocol_breed_t breed) {
+#ifdef DEBUG
+  printf("[NDPI] Adding [%s][%d]\n", value, protocol_id);
+#endif
+
   return(ndpi_string_to_automa(ndpi_struct, &ndpi_struct->host_automa,
 			       value, protocol_id, breed));
 }
@@ -681,7 +695,8 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
 int ndpi_add_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				 char *value, int protocol_id,
 				 ndpi_protocol_breed_t breed) {
-  return(ndpi_string_to_automa(ndpi_struct, &ndpi_struct->content_automa, value, protocol_id, breed));
+  return(ndpi_string_to_automa(ndpi_struct, &ndpi_struct->content_automa, 
+			       value, protocol_id, breed));
 }
 
 /* ****************************************************** */
@@ -705,6 +720,9 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   int i;
 
   for(i=0; host_match[i].string_to_match != NULL; i++) {
+    u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO };
+    ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
+
     ndpi_add_host_url_subprotocol(ndpi_mod, host_match[i].string_to_match,
 				  host_match[i].protocol_id, host_match[i].protocol_breed);
 
@@ -713,7 +731,19 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
       ndpi_mod->proto_defaults[host_match[i].protocol_id].protoId = host_match[i].protocol_id;
       ndpi_mod->proto_defaults[host_match[i].protocol_id].protoBreed = host_match[i].protocol_breed;
     }
+
+    ndpi_set_proto_defaults(ndpi_mod, 
+			    ndpi_mod->proto_defaults[host_match[i].protocol_id].protoBreed,
+			    ndpi_mod->proto_defaults[host_match[i].protocol_id].protoId,
+			    no_master, no_master,
+			    ndpi_mod->proto_defaults[host_match[i].protocol_id].protoName,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   }
+
+#ifdef DEBUG
+  ac_automata_display(ndpi_mod->host_automa.ac_automa, 'n');
+#endif
 
   for(i=0; content_match[i].string_to_match != NULL; i++)
     ndpi_add_content_subprotocol(ndpi_mod, content_match[i].string_to_match,
@@ -5280,7 +5310,7 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
   struct ndpi_packet_struct *packet = &flow->packet;
   AC_TEXT_t ac_input_text;
 
-  if((automa->ac_automa == NULL) || (string_to_match_len== 0)) return(NDPI_PROTOCOL_UNKNOWN);
+  if((automa->ac_automa == NULL) || (string_to_match_len == 0)) return(NDPI_PROTOCOL_UNKNOWN);
 
   if(!automa->ac_automa_finalized) {
     ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
