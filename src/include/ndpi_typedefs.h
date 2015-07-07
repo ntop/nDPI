@@ -561,6 +561,12 @@ typedef struct _ndpi_automa {
   u_int8_t ac_automa_finalized;
 } ndpi_automa;
 
+typedef struct ndpi_proto {
+  u_int16_t master_protocol /* e.g. HTTP */, protocol /* e.g. FaceBook */;
+} ndpi_protocol;
+
+#define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
+
 typedef struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -671,7 +677,6 @@ typedef struct ndpi_flow_struct {
   u_int16_t guessed_protocol_id;
 
   u_int8_t protocol_id_already_guessed:1;
-  u_int8_t no_cache_protocol:1;
   u_int8_t init_finished:1;
   u_int8_t setup_packet_direction:1;
   u_int8_t packet_direction:1; /* if ndpi_struct->direction_detect_disable == 1 */
