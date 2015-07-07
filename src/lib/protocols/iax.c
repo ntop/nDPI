@@ -24,6 +24,7 @@
 
 
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_IAX
 
 #define NDPI_IAX_MAX_INFORMATION_ELEMENTS 15
@@ -91,4 +92,16 @@ void ndpi_search_iax(struct ndpi_detection_module_struct *ndpi_struct, struct nd
      && (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN))
     ndpi_search_setup_iax(ndpi_struct, flow);
 }
+
+
+void init_iax_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("IAX", ndpi_struct, detection_bitmask, *id++,
+				      NDPI_PROTOCOL_IAX,
+				      ndpi_search_iax,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+}
+
 #endif

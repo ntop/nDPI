@@ -145,4 +145,14 @@ void ndpi_search_dofus(struct ndpi_detection_module_struct *ndpi_struct, struct 
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DOFUS);
 }
 
+
+void init_dofus_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("DOFUS", ndpi_struct, detection_bitmask, *id++,
+				      NDPI_PROTOCOL_DOFUS,
+				      ndpi_search_dofus,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+}
 #endif

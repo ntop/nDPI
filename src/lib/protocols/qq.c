@@ -662,4 +662,15 @@ void ndpi_search_qq(struct ndpi_detection_module_struct *ndpi_struct, struct ndp
     ndpi_search_qq_tcp(ndpi_struct, flow);
 }
 
+
+void init_qq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, detection_bitmask, *id++,
+				      NDPI_PROTOCOL_QQ,
+				      ndpi_search_qq,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+}
+
 #endif

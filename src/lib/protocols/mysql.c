@@ -24,6 +24,7 @@
 
 
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_MYSQL
 
 static void ndpi_int_mysql_add_connection(struct ndpi_detection_module_struct
@@ -64,6 +65,17 @@ void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
   }
 
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MYSQL);
+}
+
+
+void init_mysql_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("MYSQL", ndpi_struct, detection_bitmask, *id++,
+				      NDPI_PROTOCOL_MYSQL,
+				      ndpi_search_mysql_tcp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
 }
 
 #endif

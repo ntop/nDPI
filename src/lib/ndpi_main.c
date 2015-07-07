@@ -769,6 +769,7 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
    Do NOT add web services (NDPI_SERVICE_xxx) here.
 */
 static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_mod) {
+  
   int i;
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
   u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO },
@@ -823,10 +824,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 993, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DNS,
-			    no_master,
-			    no_master, "DNS",
-			    ndpi_build_default_ports(ports_a, 53, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 53, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "DNS",
+    			    ndpi_build_default_ports(ports_a, 53, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 53, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IPP,
 			    no_master,
 			    no_master, "IPP",
@@ -863,10 +864,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BGP,
-			    no_master,
-			    no_master, "BGP",
-			    ndpi_build_default_ports(ports_a, 2605, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "BGP",
+    			    ndpi_build_default_ports(ports_a, 2605, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SNMP,
 			    no_master,
 			    no_master, "SNMP",
@@ -888,10 +889,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 514, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 514, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DHCP,
-			    no_master,
-			    no_master, "DHCP",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 67, 68, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "DHCP",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 67, 68, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_POSTGRES,
 			    no_master,
 			    no_master, "PostgreSQL",
@@ -913,10 +914,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_APPLEJUICE,
-			    no_master,
-			    no_master, "AppleJuice",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "AppleJuice",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DIRECTCONNECT,
 			    no_master,
 			    no_master, "DirectConnect",
@@ -938,10 +939,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 903, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 902, 903, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_FILETOPIA,
-			    no_master,
-			    no_master, "Filetopia",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Filetopia",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_IMESH,
 			    no_master,
 			    no_master, "iMESH",
@@ -973,10 +974,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BITTORRENT,
-			    no_master,
-			    no_master, "BitTorrent",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 6771, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "BitTorrent",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 6771, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_EPP,
 			    no_master,
 			    no_master, "EPP",
@@ -1018,20 +1019,20 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_MMS,
-			    no_master,
-			    no_master, "MMS",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "MMS",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX,
 			    no_master,
 			    no_master, "Xbox",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQ,
-			    no_master,
-			    no_master, "QQ",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "QQ",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MOVE,
 			    no_master,
 			    no_master, "Move",
@@ -1119,30 +1120,30 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 5072, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UNENCRYPED_JABBER,
-			    no_master,
-			    no_master, "Unencryped_Jabber",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSN,
-			    no_master,
-			    no_master, "MSN",
-			    ndpi_build_default_ports(ports_a, 1863, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Unencryped_Jabber",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSN, */
+    /* 			    no_master, */
+    /* 			    no_master, "MSN", */
+    /* 			    ndpi_build_default_ports(ports_a, 1863, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OSCAR,
-			    no_master,
-			    no_master, "Oscar",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_YAHOO,
-			    no_master,
-			    no_master, "Yahoo",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Oscar",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_YAHOO, */
+    /* 			    no_master, */
+    /* 			    no_master, "Yahoo", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_BATTLEFIELD,
-			    no_master,
-			    no_master, "BattleField",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "BattleField",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QUAKE,
 			    no_master,
 			    no_master, "Quake",
@@ -1176,9 +1177,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
     custom_master[0] = NDPI_PROTOCOL_SIP, custom_master[1] = NDPI_PROTOCOL_H323;
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_STUN,
-			    no_master, custom_master, "STUN",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 3478, 0, 0, 0, 0) /* UDP */);
+    			    no_master, custom_master, "STUN",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 3478, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_IP_IPSEC,
 			    no_master,
 			    no_master, "IPsec",
@@ -1220,10 +1221,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTP,
-			    no_master,
-			    no_master, "RTP",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "RTP",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RDP,
 			    no_master,
 			    no_master, "RDP",
@@ -1266,34 +1267,33 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IAX,
-			    no_master,
-			    no_master, "IAX",
-			    ndpi_build_default_ports(ports_a, 4569, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 4569, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "IAX",
+    			    ndpi_build_default_ports(ports_a, 4569, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 4569, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TFTP,
 			    no_master,
 			    no_master, "TFTP",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AFP,
-			    no_master,
-			    no_master, "AFP",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "AFP",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_STEALTHNET,
 			    no_master,
 			    no_master, "Stealthnet",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_AIMINI,
-			    no_master,
-			    no_master, "Aimini",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Aimini",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SIP,
 			    no_master,
-			    no_master,
-			    "SIP",
+			    no_master, "SIP",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 5060, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TRUPHONE,
@@ -1312,30 +1312,30 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ARMAGETRON,
-			    no_master,
-			    no_master, "Armagetron",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Armagetron",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_CROSSFIRE,
 			    no_master,
 			    no_master, "Crossfire",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DOFUS,
-			    no_master,
-			    no_master, "Dofus",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Dofus",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNRATED, NDPI_PROTOCOL_FIESTA,
 			    no_master,
 			    no_master, "Fiesta",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FLORENSIA,
-			    no_master,
-			    no_master, "Florensia",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Florensia",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_GUILDWARS,
 			    no_master,
 			    no_master, "Guildwars",
@@ -1386,16 +1386,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Meebo", /* Remove */
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DROPBOX,
-			    no_master,
-			    no_master, "DropBox",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 17500, 0, 0, 0, 0) /* UDP */);
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DROPBOX, */
+    /* 			    no_master, */
+    /* 			    no_master, "DropBox", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 17500, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DCERPC,
-			    no_master,
-			    no_master, "DCE_RPC",
-			    ndpi_build_default_ports(ports_a, 135, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "DCE_RPC",
+    			    ndpi_build_default_ports(ports_a, 135, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NETFLOW,
 			    no_master,
 			    no_master, "NetFlow",
@@ -1417,10 +1417,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 8080, 3128, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX,
-			    no_master,
-			    no_master, "Citrix",
-			    ndpi_build_default_ports(ports_a, 1494, 2598, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Citrix",
+    			    ndpi_build_default_ports(ports_a, 1494, 2598, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_PREPAID,
 			    no_master,
 			    no_master, "SkyFile_PrePaid",
@@ -1451,32 +1451,31 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Radius",
 			    ndpi_build_default_ports(ports_a, 1812, 1813, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 1812, 1813, 0, 0, 0) /* UDP */);
-
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WINDOWS_UPDATE,
 			    no_master,
 			    no_master, "WindowsUpdate",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMVIEWER,
-			    no_master,
-			    no_master, "TeamViewer",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "TeamViewer",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LOTUS_NOTES,
-			    no_master,
-			    no_master, "LotusNotes",
-			    ndpi_build_default_ports(ports_a, 1352, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "LotusNotes",
+    			    ndpi_build_default_ports(ports_a, 1352, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SAP,
 			    no_master,
 			    no_master, "SAP",
 			    ndpi_build_default_ports(ports_a, 3201, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GTP,
-			    no_master,
-			    no_master, "GTP",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 2152, 2123, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "GTP",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 2152, 2123, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UPNP,
 			    no_master,
 			    no_master, "UPnP",
@@ -1498,51 +1497,51 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 6000, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_KAKAOTALK_VOICE,
-			    no_master,
-			    no_master, "KakaoTalk_Voice",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "KakaoTalk_Voice",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MPEGTS,
 			    no_master,
 			    no_master, "MPEG_TS",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE,
-			    NDPI_SERVICE_GOOGLE,
-			    custom_master, custom_master1,
-			    "Google",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, */
+    /* 			    NDPI_SERVICE_GOOGLE, */
+    /* 			    custom_master, custom_master1, */
+    /* 			    "Google", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
 
-    custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE,
-			    NDPI_SERVICE_APPLE,
-			    custom_master, custom_master1,
-			    "Apple",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, */
+    /* 			    NDPI_SERVICE_APPLE, */
+    /* 			    custom_master, custom_master1, */
+    /* 			    "Apple", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
 
-    custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE,
-			    NDPI_SERVICE_APPLE_ICLOUD,
-			    custom_master, custom_master1,
-			    "AppleiCloud",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, */
+    /* 			    NDPI_SERVICE_APPLE_ICLOUD, */
+    /* 			    custom_master, custom_master1, */
+    /* 			    "AppleiCloud", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
 
-    custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN,
-			    NDPI_SERVICE_APPLE_ITUNES,
-			    custom_master, custom_master1,
-			    "AppleiTunes",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, */
+    /* 			    NDPI_SERVICE_APPLE_ITUNES, */
+    /* 			    custom_master, custom_master1, */
+    /* 			    "AppleiTunes", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
 
     /* http://en.wikipedia.org/wiki/Link-local_Multicast_Name_Resolution */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LLMNR,
@@ -1558,9 +1557,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
     custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SPOTIFY,
-			    custom_master, no_master, "Spotify",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 57621, 0, 0, 0, 0) /* UDP */);
+    			    custom_master, no_master, "Spotify",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 57621, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_WEBM,
 			    no_master,
 			    no_master, "WebM", /* Courtesy of Shreeram Ramamoorthy Swaminathan <shreeram <shreeram1985@yahoo.co.in> */
@@ -1583,20 +1582,20 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_CISCOVPN,
-			    no_master,
-			    no_master, "CiscoVPN",
-			    ndpi_build_default_ports(ports_a, 10000, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 10000, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "CiscoVPN",
+    			    ndpi_build_default_ports(ports_a, 10000, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 10000, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMSPEAK,
 			    no_master,
 			    no_master, "TeamSpeak",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_TOR,
-			    no_master,
-			    no_master, "TOR",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_TOR, */
+    /* 			    no_master, */
+    /* 			    no_master, "TOR", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKINNY,
 			    no_master,
 			    no_master, "CiscoSkinny",
@@ -1618,10 +1617,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 1521, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CORBA,
-			    no_master,
-			    no_master, "Corba",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Corba",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UBUNTUONE,
 			    no_master,
 			    no_master, "UbuntuONE",
@@ -1633,20 +1632,20 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 43, 4343, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_COLLECTD,
-			    no_master,
-			    no_master, "Collectd",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 25826, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "Collectd",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 25826, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOCKS5,
 			    no_master,
 			    no_master, "SOCKS5",
 			    ndpi_build_default_ports(ports_a, 1080, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 1080, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOCKS4,
-			    no_master,
-			    no_master, "SOCKS4",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "SOCKS4",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTMP,
 			    no_master,
 			    no_master, "RTMP",
@@ -1657,11 +1656,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Pando_Media_Booster",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER,
-			    no_master,
-			    no_master, "Viber",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER, */
+    /* 			    no_master, */
+    /* 			    no_master, "Viber", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEGACO,
 			    no_master,
 			    no_master, "Megaco",
@@ -1677,11 +1676,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "ZeroMQ",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_TWITTER,
-			    no_master,
-			    no_master, "Twitter",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /* UDP */);
+    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_TWITTER, */
+    /* 			    no_master, */
+    /* 			    no_master, "Twitter", */
+    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
+    /* 			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_VHUA,
 			    no_master,
 			    no_master, "VHUA",
@@ -2272,7 +2271,8 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* set this here to zero to be interrupt safe */
   ndpi_struct->callback_buffer_size = 0;
 
-
+  /* HTTP */
+  /* init_http_dissector(ndpi_struct, &a, detection_bitmask); */
 #ifdef NDPI_PROTOCOL_HTTP
   ndpi_set_bitmask_protocol_detection("HTTP",ndpi_struct, detection_bitmask, a++,
 				      NDPI_PROTOCOL_HTTP,
@@ -2385,18 +2385,20 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 				      ADD_TO_DETECTION_BITMASK);
 #endif
 
+
+  /* SKYPE */
   init_skype_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /*Update excluded protocol bitmask*/
+  /* Update excluded protocol bitmask */
   NDPI_BITMASK_SET(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-		   ndpi_struct->callback_buffer[a].detection_bitmask);
+  		   ndpi_struct->callback_buffer[a].detection_bitmask);
 
   /*Delete protocol from exluded protocol bitmask*/
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-				 NDPI_PROTOCOL_UNKNOWN);
+  				 NDPI_PROTOCOL_UNKNOWN);
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-				 NDPI_PROTOCOL_QQ);
+  				 NDPI_PROTOCOL_QQ);
 
 #ifdef NDPI_CONTENT_FLASH
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
@@ -2404,280 +2406,110 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 #endif
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-				 NDPI_CONTENT_MMS);
-  // #ifdef NDPI_PROTOCOL_RTSP
-  //   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-  // 				 NDPI_PROTOCOL_RTSP);
-  // #endif
+  				 NDPI_CONTENT_MMS);
+  /* #ifdef NDPI_PROTOCOL_RTSP */
+  /*   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, */
+  /* 				 NDPI_PROTOCOL_RTSP); */
+  /* #endif */
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-				 NDPI_PROTOCOL_XBOX);
+  				 NDPI_PROTOCOL_XBOX);
 
   NDPI_BITMASK_SET(ndpi_struct->generic_http_packet_bitmask,
-		   ndpi_struct->callback_buffer[a].detection_bitmask);
+  		   ndpi_struct->callback_buffer[a].detection_bitmask);
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->generic_http_packet_bitmask, NDPI_PROTOCOL_UNKNOWN);
 
   /* Update callback_buffer index */
   a++;
+
 #endif
 
+  /* SSL */
+  init_ssl_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_SSL
-  ndpi_set_bitmask_protocol_detection("SSL", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_SSL,
-				      ndpi_search_ssl_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* STUN */
+  init_stun_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* RTP */
+  init_rtp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_STUN
-  ndpi_set_bitmask_protocol_detection("STUN", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_STUN,
-				      ndpi_search_stun,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* RTSP */
+  init_rtsp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_RTP
-  ndpi_set_bitmask_protocol_detection("RTP", ndpi_struct, detection_bitmask,a,
-				      NDPI_PROTOCOL_RTP,
-				      ndpi_search_rtp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-  /* consider also real protocol for detection select in main loop */
-  /* ndpi_struct->callback_buffer[a].detection_feature = NDPI_SELECT_DETECTION_WITH_REAL_PROTOCOL; */
-  /* Update callback_buffer index */
-  a++;
-#endif
+  /* RDP */
+  init_rdp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_RTSP
-  ndpi_set_bitmask_protocol_detection("RTSP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_RTSP,
-				      ndpi_search_rtsp_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SIP */
+  init_sip_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_RDP
-  ndpi_set_bitmask_protocol_detection("RDP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_RDP,
-				      ndpi_search_rdp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* BITTORRENT */
+  init_bittorrent_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_SIP
-  ndpi_set_bitmask_protocol_detection("SIP", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_SIP,
-				      ndpi_search_sip,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,/* Fix courtesy of Miguel Quesada <mquesadab@gmail.com> */
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* EDONKEY */
+  init_edonkey_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_BITTORRENT
-  ndpi_set_bitmask_protocol_detection("BITTORRENT", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_BITTORRENT,
-				      ndpi_search_bittorrent,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* FASTTRACK */
+  init_fasttrack_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_EDONKEY
-  ndpi_set_bitmask_protocol_detection("EDONKEY", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_EDONKEY,
-				      ndpi_search_edonkey,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_FASTTRACK
-  ndpi_set_bitmask_protocol_detection("FASTTRACK", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_FASTTRACK,
-				      ndpi_search_fasttrack_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_GNUTELLA
-  ndpi_set_bitmask_protocol_detection("GNUTELLA", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_GNUTELLA,
-				      ndpi_search_gnutella,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* GNUTELLA */
+  init_gnutella_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_WINMX
-  ndpi_set_bitmask_protocol_detection("WINMX", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_WINMX,
-				      ndpi_search_winmx_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* WINMX */
+  init_winmx_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_DIRECTCONNECT
-  ndpi_set_bitmask_protocol_detection("DIRECTCONNECT", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_DIRECTCONNECT,
-				      ndpi_search_directconnect,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_MSN
+  /* DIRECTCONNECT */
+  init_directconnect_dissector(ndpi_struct, &a, detection_bitmask);
 
-  NDPI_BITMASK_RESET(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask);
+  /* MSN */
+  init_msn_dissector(ndpi_struct, &a, detection_bitmask);
 
-  ndpi_set_bitmask_protocol_detection("MSN", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_MSN,
-				      ndpi_search_msn,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* YAHOO */
+  init_yahoo_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_YAHOO
-  ndpi_set_bitmask_protocol_detection("YAHOO", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_YAHOO,
-				      ndpi_search_yahoo,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* OSCAR */
+  init_oscar_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_OSCAR
-  ndpi_set_bitmask_protocol_detection("OSCAR", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_OSCAR,
-				      ndpi_search_oscar,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* APPLEJUICE */
+  init_applejuice_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_APPLEJUICE
-  ndpi_set_bitmask_protocol_detection("APPLEJUICE", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_APPLEJUICE,
-				      ndpi_search_applejuice_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SOULSEEK */
+  init_soulseek_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_SOULSEEK
-  ndpi_set_bitmask_protocol_detection("SOULSEEK", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_SOULSEEK,
-				      ndpi_search_soulseek_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* IRC */
+  init_irc_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_IRC
-  ndpi_set_bitmask_protocol_detection("IRC", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_IRC,
-				      ndpi_search_irc_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* JABBER */
+  init_jabber_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_UNENCRYPED_JABBER
-  ndpi_set_bitmask_protocol_detection("UNENCRYPED_JABBER", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_UNENCRYPED_JABBER,
-				      ndpi_search_jabber_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MAIL_POP */
+  init_mail_pop_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_MAIL_POP
-  ndpi_set_bitmask_protocol_detection("MAIL_POP", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_MAIL_POP,
-				      ndpi_search_mail_pop_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MAIL_IMAP */
+  init_mail_imap_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_MAIL_IMAP
-  ndpi_set_bitmask_protocol_detection("MAIL_IMAP", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_MAIL_IMAP,
-				      ndpi_search_mail_imap_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MAIL_SMTP */
+  init_mail_smtp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_MAIL_SMTP
-  ndpi_set_bitmask_protocol_detection("MAIL_SMTP", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_MAIL_SMTP,
-				      ndpi_search_mail_smtp_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* USENET */
+  init_usenet_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_USENET
-  ndpi_set_bitmask_protocol_detection("USENET", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_USENET,
-				      ndpi_search_usenet_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* DNS */
+  init_dns_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_DNS
-  ndpi_set_bitmask_protocol_detection("DNS", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_DNS,
-				      ndpi_search_dns,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* FILETOPIA */
+  init_filetopia_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_FILETOPIA
-  ndpi_set_bitmask_protocol_detection("FILETOPIA", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_FILETOPIA,
-				      ndpi_search_filetopia_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* VMWARE */
+  init_vmware_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_VMWARE
-  ndpi_set_bitmask_protocol_detection("VMWARE", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_VMWARE,
-				      ndpi_search_vmware,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* IMESH */
+  init_imesh_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_IMESH
-  ndpi_set_bitmask_protocol_detection("IMESH", ndpi_struct, detection_bitmask,a++,
-				      NDPI_PROTOCOL_IMESH,
-				      ndpi_search_imesh_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_MMS
-  ndpi_set_bitmask_protocol_detection("NDPI_CONTENT_MMS", ndpi_struct, detection_bitmask,a++,
-				      NDPI_CONTENT_MMS,
-				      ndpi_search_mms_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MMS */
+  init_mms_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* NON_TCP_UDP */
+  /* init_non_tcp_udp_dissector(ndpi_struct, &a, detection_bitmask); */
 #if defined(NDPI_PROTOCOL_IP_IPSEC) || defined(NDPI_PROTOCOL_IP_GRE) || defined(NDPI_PROTOCOL_IP_ICMP) || defined(NDPI_PROTOCOL_IP_IGMP) || defined(NDPI_PROTOCOL_IP_EGP) || defined(NDPI_PROTOCOL_IP_SCTP) || defined(NDPI_PROTOCOL_IP_OSPF) || defined(NDPI_PROTOCOL_IP_IP_IN_IP) || defined(NDPI_PROTOCOL_IP_ICMPV6)
 
   /* always add non tcp/udp if one protocol is compiled in */
@@ -2745,885 +2577,311 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  // NDPI_BITMASK_RESET(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask);
 #endif
 
+  /* TVANTS */
+  init_tvants_dissector(ndpi_struct, &a, detection_bitmask);  
 
-#ifdef NDPI_PROTOCOL_TVANTS
-  ndpi_set_bitmask_protocol_detection("TVANTS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TVANTS,
-				      ndpi_search_tvants_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SOPCAST */
+  init_sopcast_dissector(ndpi_struct, &a, detection_bitmask);  
 
-#ifdef NDPI_PROTOCOL_SOPCAST
-  ndpi_set_bitmask_protocol_detection("SOPCAST", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SOPCAST,
-				      ndpi_search_sopcast,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_TVUPLAYER
-  ndpi_set_bitmask_protocol_detection("TVUPLAYER", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TVUPLAYER,
-				      ndpi_search_tvuplayer,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_PPSTREAM
-  ndpi_set_bitmask_protocol_detection("PPSTREAM", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_PPSTREAM,
-				      ndpi_search_ppstream,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_PPLIVE
-  ndpi_set_bitmask_protocol_detection("PPLIVE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_PPLIVE,
-				      ndpi_search_pplive,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_IAX
-  ndpi_set_bitmask_protocol_detection("IAX", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IAX,
-				      ndpi_search_iax,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_MGCP
-  ndpi_set_bitmask_protocol_detection("MGCP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MGCP,
-				      ndpi_search_mgcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_ZATTOO
-  ndpi_set_bitmask_protocol_detection("ZATTOO", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_ZATTOO,
-				      ndpi_search_zattoo,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_QQ
-  ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_QQ,
-				      ndpi_search_qq,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_SSH
-  ndpi_set_bitmask_protocol_detection("SSH", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SSH,
-				      ndpi_search_ssh_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_AYIYA
-  ndpi_set_bitmask_protocol_detection("AYIYA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_AYIYA,
-				      ndpi_search_ayiya,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_THUNDER
-  ndpi_set_bitmask_protocol_detection("THUNDER", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_THUNDER,
-				      ndpi_search_thunder,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_VNC
-  ndpi_set_bitmask_protocol_detection("VNC", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_VNC,
-				      ndpi_search_vnc_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* TVUPLAYER */
+  init_tvuplayer_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_TEAMVIEWER
-  ndpi_set_bitmask_protocol_detection("TEAMVIEWER", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TEAMVIEWER,
-				      ndpi_search_teamview,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* PPSTREAM */
+  init_ppstream_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_DHCP
-  ndpi_set_bitmask_protocol_detection("DHCP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_DHCP,
-				      ndpi_search_dhcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_SOCRATES
-  ndpi_set_bitmask_protocol_detection("SOCRATES", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SOCRATES,
-				      ndpi_search_socrates,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* PPLIVE */
+  init_pplive_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_STEAM
-  ndpi_set_bitmask_protocol_detection("STEAM", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_STEAM,
-				      ndpi_search_steam,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* IAX */
+  init_iax_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_HALFLIFE2
-  ndpi_set_bitmask_protocol_detection("HALFLIFE2", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_HALFLIFE2,
-				      ndpi_search_halflife2,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MGPC */
+  init_mgpc_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_XBOX
-  ndpi_set_bitmask_protocol_detection("XBOX", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_XBOX,
-				      ndpi_search_xbox,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC
-  ndpi_set_bitmask_protocol_detection("HTTP_APPLICATION_ACTIVESYNC", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC,
-				      ndpi_search_activesync,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_SMB
-  ndpi_set_bitmask_protocol_detection("SMB", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SMB,
-				      ndpi_search_smb_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* ZATTOO */
+  init_zattoo_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_TELNET
-  ndpi_set_bitmask_protocol_detection("TELNET", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TELNET,
-				      ndpi_search_telnet_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* QQ */
+  init_qq_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_NTP
-  ndpi_set_bitmask_protocol_detection("NTP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_NTP,
-				      ndpi_search_ntp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SSH */
+  init_ssh_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_NFS
-  ndpi_set_bitmask_protocol_detection("NFS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_NFS,
-				      ndpi_search_nfs,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* AYIYA */
+  init_ayiya_dissector(ndpi_struct, &a, detection_bitmask);  
 
-#ifdef NDPI_PROTOCOL_SSDP
-  ndpi_set_bitmask_protocol_detection("SSDP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SSDP,
-				      ndpi_search_ssdp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* THUNDER */
+  init_thunder_dissector(ndpi_struct, &a, detection_bitmask);  
 
-#ifdef NDPI_PROTOCOL_WORLDOFWARCRAFT
-  ndpi_set_bitmask_protocol_detection("WORLDOFWARCRAFT", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_WORLDOFWARCRAFT,
-				      ndpi_search_worldofwarcraft,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_POSTGRES
-  ndpi_set_bitmask_protocol_detection("POSTGRES", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_POSTGRES,
-				      ndpi_search_postgres_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* VNC */
+  init_vnc_dissector(ndpi_struct, &a, detection_bitmask);  
 
-#ifdef NDPI_PROTOCOL_MYSQL
-  ndpi_set_bitmask_protocol_detection("MYSQL", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MYSQL,
-				      ndpi_search_mysql_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* TEAMVIEWER */
+  init_teamviewer_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_BGP
-  ndpi_set_bitmask_protocol_detection("BGP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_BGP,
-				      ndpi_search_bgp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* DHCP */
+  init_dhcp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_QUAKE
-  ndpi_set_bitmask_protocol_detection("QUAKE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_QUAKE,
-				      ndpi_search_quake,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SOCRATES */
+  init_socrates_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_BATTLEFIELD
-  ndpi_set_bitmask_protocol_detection("BATTLEFIELD", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_BATTLEFIELD,
-				      ndpi_search_battlefield,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* STEAM */
+  init_steam_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_PCANYWHERE
-  ndpi_set_bitmask_protocol_detection("PCANYWHERE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_PCANYWHERE,
-				      ndpi_search_pcanywhere,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_SNMP
-  ndpi_set_bitmask_protocol_detection("SNMP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SNMP,
-				      ndpi_search_snmp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_KONTIKI
-  ndpi_set_bitmask_protocol_detection("KONTIKI", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_KONTIKI,
-				      ndpi_search_kontiki,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* HALFLIFE2 */
+  init_halflife2_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_ICECAST
-  ndpi_set_bitmask_protocol_detection("ICECAST", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_ICECAST,
-				      ndpi_search_icecast_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* XBOX */
+  init_xbox_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_SHOUTCAST
-  ndpi_set_bitmask_protocol_detection("SHOUTCAST", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SHOUTCAST,
-				      ndpi_search_shoutcast_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* HTTP_APPLICATION_ACTIVESYNC */
+  init_http_activesync_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV
-  ndpi_set_bitmask_protocol_detection("HTTP_APPLICATION_VEOHTV", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV,
-				      ndpi_search_veohtv_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SMB */
+  init_smb_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_KERBEROS
-  ndpi_set_bitmask_protocol_detection("KERBEROS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_KERBEROS,
-				      ndpi_search_kerberos,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_OPENFT
-  ndpi_set_bitmask_protocol_detection("OPENFT", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_OPENFT,
-				      ndpi_search_openft_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_SYSLOG
-  ndpi_set_bitmask_protocol_detection("SYSLOG", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SYSLOG,
-				      ndpi_search_syslog,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* TELNET */
+  init_telnet_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_TDS
-  ndpi_set_bitmask_protocol_detection("TDS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TDS,
-				      ndpi_search_tds_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* NTP */
+  init_ntp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK
-  ndpi_set_bitmask_protocol_detection("DIRECT_DOWNLOAD_LINK", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK,
-				      ndpi_search_direct_download_link_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* NFS */
+  init_nfs_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_NETBIOS
-  ndpi_set_bitmask_protocol_detection("NETBIOS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_NETBIOS,
-				      ndpi_search_netbios,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SSDP */
+  init_ssdp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_MDNS
-  ndpi_set_bitmask_protocol_detection("MDNS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MDNS,
-				      ndpi_search_mdns,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+/* WORLD_OF_WARCRAFT */
+  init_world_of_warcraft_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_IPP
-  ndpi_set_bitmask_protocol_detection("IPP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IPP,
-				      ndpi_search_ipp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* POSTGRES */
+  init_postgres_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_LDAP
-  ndpi_set_bitmask_protocol_detection("LDAP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_LDAP,
-				      ndpi_search_ldap,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MYSQL */
+  init_mysql_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_WARCRAFT3
-  ndpi_set_bitmask_protocol_detection("WARCRAFT3", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_WARCRAFT3,
-				      ndpi_search_warcraft3,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* BGP */
+  init_bgp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_XDMCP
-  ndpi_set_bitmask_protocol_detection("XDMCP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_XDMCP,
-				      ndpi_search_xdmcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* QUAKE */
+  init_quake_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_TFTP
-  ndpi_set_bitmask_protocol_detection("TFTP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TFTP,
-				      ndpi_search_tftp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_MSSQL
-  ndpi_set_bitmask_protocol_detection("MSSQL", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MSSQL,
-				      ndpi_search_mssql,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* BATTLEFIELD */
+  init_battlefield_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_PPTP
-  ndpi_set_bitmask_protocol_detection("PPTP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_PPTP,
-				      ndpi_search_pptp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_STEALTHNET
-  ndpi_set_bitmask_protocol_detection("STEALTHNET", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_STEALTHNET,
-				      ndpi_search_stealthnet,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_DHCPV6
-  ndpi_set_bitmask_protocol_detection("DHCPV6", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_DHCPV6,
-				      ndpi_search_dhcpv6_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_MEEBO
-  ndpi_set_bitmask_protocol_detection("Meebo", ndpi_struct, detection_bitmask, a,
-				      NDPI_PROTOCOL_MEEBO,
-				      ndpi_search_meebo,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-  /* Add protocol bitmask dependencies to detected bitmask*/
-#ifdef NDPI_CONTENT_FLASH
-  NDPI_ADD_PROTOCOL_TO_BITMASK(ndpi_struct->callback_buffer[a].detection_bitmask, NDPI_CONTENT_FLASH);
-#endif
-  a++;
-#endif
+  /* PCANYWHERE */
+  init_pcanywhere_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_AFP
-  ndpi_set_bitmask_protocol_detection("AFP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_AFP,
-				      ndpi_search_afp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_AIMINI
-  ndpi_set_bitmask_protocol_detection("AIMINI", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_AIMINI,
-				      ndpi_search_aimini,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_FLORENSIA
-  ndpi_set_bitmask_protocol_detection("FLORENSIA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_FLORENSIA,
-				      ndpi_search_florensia,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_MAPLESTORY
-  ndpi_set_bitmask_protocol_detection("MAPLESTORY", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MAPLESTORY,
-				      ndpi_search_maplestory,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_DOFUS
-  ndpi_set_bitmask_protocol_detection("DOFUS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_DOFUS,
-				      ndpi_search_dofus,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_WORLD_OF_KUNG_FU
-  ndpi_set_bitmask_protocol_detection("WORLD_OF_KUNG_FU", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_WORLD_OF_KUNG_FU,
-				      ndpi_search_world_of_kung_fu,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_FIESTA
-  ndpi_set_bitmask_protocol_detection("FIESTA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_FIESTA,
-				      ndpi_search_fiesta,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_CROSSFIRE
-  ndpi_set_bitmask_protocol_detection("CROSSFIRE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_CROSSFIRE,
-				      ndpi_search_crossfire_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_GUILDWARS
-  ndpi_set_bitmask_protocol_detection("GUILDWARS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_GUILDWARS,
-				      ndpi_search_guildwars_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_ARMAGETRON
-  ndpi_set_bitmask_protocol_detection("ARMAGETRON", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_ARMAGETRON,
-				      ndpi_search_armagetron_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SNMP */
+  init_snmp_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* KONTIKI */
+  init_kontiki_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_DROPBOX
-  ndpi_set_bitmask_protocol_detection("DROPBOX", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_DROPBOX,
-				      ndpi_search_dropbox,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* ICECAST */
+  init_icecast_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_SPOTIFY
-  ndpi_set_bitmask_protocol_detection("SPOTIFY", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SPOTIFY,
-				      ndpi_search_spotify,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SHOUTCAST */
+  init_shoutcast_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* VEOHTV */
+  init_veohtv_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_RADIUS
-  ndpi_set_bitmask_protocol_detection("RADIUS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_RADIUS,
-				      ndpi_search_radius,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* KERBEROS */
+  init_kerberos_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_CITRIX
-  ndpi_set_bitmask_protocol_detection("CITRIX", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_CITRIX,
-				      ndpi_search_citrix,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* OPENFT */
+  init_openft_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_LOTUS_NOTES
-  ndpi_set_bitmask_protocol_detection("LOTUS_NOTES", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_LOTUS_NOTES,
-				      ndpi_search_lotus_notes,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SYSLOG */
+  init_syslog_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_GTP
-  ndpi_set_bitmask_protocol_detection("GTP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_GTP,
-				      ndpi_search_gtp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* TDS */
+  init_tds_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_DCERPC
-  ndpi_set_bitmask_protocol_detection("DCERPC", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_DCERPC,
-				      ndpi_search_dcerpc,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* DIRECT_DOWNLOAD_LINK */
+  init_directdownloadlink_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_NETFLOW
-  ndpi_set_bitmask_protocol_detection("NETFLOW", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_NETFLOW,
-				      ndpi_search_netflow,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* NETBIOS */
+  init_netbios_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_SFLOW
-  ndpi_set_bitmask_protocol_detection("SFLOW", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SFLOW,
-				      ndpi_search_sflow,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MDNS */
+  init_mdns_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_H323
-  ndpi_set_bitmask_protocol_detection("H323", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_H323,
-				      ndpi_search_h323,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* IPP */
+  init_ipp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_OPENVPN
-  ndpi_set_bitmask_protocol_detection("OPENVPN", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_OPENVPN,
-				      ndpi_search_openvpn,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* LDAP */
+  init_ldap_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_NOE
-  ndpi_set_bitmask_protocol_detection("NOE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_NOE,
-				      ndpi_search_noe,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* WARCRAFT3 */
+  init_warcraft3_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_CISCOVPN
-  ndpi_set_bitmask_protocol_detection("CISCOVPN", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_CISCOVPN,
-				      ndpi_search_ciscovpn,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* XDMCP */
+  init_xdmcp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_TEAMSPEAK
-  ndpi_set_bitmask_protocol_detection("TEAMSPEAK", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TEAMSPEAK,
-				      ndpi_search_teamspeak,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* TFTP */
+  init_tftp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_VIBER
-  ndpi_set_bitmask_protocol_detection("VIBER", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_VIBER,
-				      ndpi_search_viber,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MSSQL */
+  init_mssql_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_TOR
-  ndpi_set_bitmask_protocol_detection("TOR", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TOR,
-				      ndpi_search_tor,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* PPTP */
+  init_pptp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_SKINNY
-  ndpi_set_bitmask_protocol_detection("SKINNY", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_SKINNY,
-				      ndpi_search_skinny,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* STEALTHNET */
+  init_stealthnet_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_RTCP
-  ndpi_set_bitmask_protocol_detection("RTCP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_RTCP,
-				      ndpi_search_rtcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* DHCPV6 */
+  init_dhcpv6_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_RSYNC
-  ndpi_set_bitmask_protocol_detection("RSYNC", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_RSYNC,
-				      ndpi_search_rsync,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* MEEBO */
+  init_meebo_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_WHOIS_DAS
-  ndpi_set_bitmask_protocol_detection("WHOIS_DAS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_WHOIS_DAS,
-				      ndpi_search_whois_das,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* AFP */
+  init_afp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_ORACLE
-  ndpi_set_bitmask_protocol_detection("ORACLE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_ORACLE,
-				      ndpi_search_oracle,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* AIMINI */
+  init_aimini_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* FLORENSIA */
+  init_florensia_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_CORBA
-  ndpi_set_bitmask_protocol_detection("CORBA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_CORBA,
-				      ndpi_search_corba,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+/* MAPLESTORY */
+  init_maplestory_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* DOFUS */
+  init_dofus_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_RTMP
-  ndpi_set_bitmask_protocol_detection("RTMP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_RTMP,
-				      ndpi_search_rtmp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* WORLD_OF_KUNG_FU */
+  init_world_of_kung_fu_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_FTP_CONTROL
-  ndpi_set_bitmask_protocol_detection("FTP_CONTROL", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_FTP_CONTROL,
-				      ndpi_search_ftp_control,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* FIESTA */
+  init_fiesta_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_FTP_DATA
-  ndpi_set_bitmask_protocol_detection("FTP_DATA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_FTP_DATA,
-				      ndpi_search_ftp_data,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* CROSSIFIRE */
+  init_crossfire_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* GUILDWARS */
+  init_guildwars_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* ARMAGETRON */
+  init_armagetron_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_PANDO
-  ndpi_set_bitmask_protocol_detection("PANDO", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_PANDO,
-				      ndpi_search_pando,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* DROPBOX */
+  init_dropbox_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_MEGACO
-  ndpi_set_bitmask_protocol_detection("MEGACO", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MEGACO,
-				      ndpi_search_megaco,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SPOTIFY */
+  init_spotify_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_REDIS
-  ndpi_set_bitmask_protocol_detection("REDIS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_REDIS,
-				      ndpi_search_redis,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* RADIUS */
+  init_radius_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_VHUA
-  ndpi_set_bitmask_protocol_detection("VHUA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_VHUA,
-				      ndpi_search_vhua,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* CITRIX */
+  init_citrix_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_ZMQ
-  ndpi_set_bitmask_protocol_detection("ZMQ", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_ZMQ,
-				      ndpi_search_zmq, /* TODO: add UDP support */
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* LOTUS_NOTES */
+  init_lotus_notes_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* GTP */
+  init_gtp_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_SERVICE_TWITTER
-  ndpi_set_bitmask_protocol_detection("TWITTER", ndpi_struct, detection_bitmask, a++,
-				      NDPI_SERVICE_TWITTER,
-				      ndpi_search_twitter,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* DCERPC */
+  init_dcerpc_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_TELEGRAM
-  ndpi_set_bitmask_protocol_detection("TELEGRAM", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_TELEGRAM,
-				      ndpi_search_telegram,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* NETFLOW */
+  init_netflow_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_QUIC
-  ndpi_set_bitmask_protocol_detection("QUIC", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_QUIC,
-				      ndpi_search_quic,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* SFLOW */
+  init_sflow_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_EAQ
-  ndpi_set_bitmask_protocol_detection("EAQ", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_EAQ,
-				      ndpi_search_eaq,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* H323 */
+  init_h323_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_SERVICE_KAKAOTALK_VOICE
-  ndpi_set_bitmask_protocol_detection("KakaoTalk_Voice", ndpi_struct, detection_bitmask, a++,
-				      NDPI_SERVICE_KAKAOTALK_VOICE,
-				      ndpi_search_kakaotalk_voice,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* OPENVPN */
+  init_openvpn_dissector(ndpi_struct, &a, detection_bitmask);
 
-#ifdef NDPI_PROTOCOL_MPEGTS
-  ndpi_set_bitmask_protocol_detection("MPEG_TS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MPEGTS,
-				      ndpi_search_mpegts,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  /* NOE */
+  init_noe_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* CISCOVPN */
+  init_ciscovpn_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* TEAMSPEAK */
+  init_teamspeak_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* VIBER */
+  init_viber_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* TOR */
+  init_tor_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* SKINNY */
+  init_skinny_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* RTCP */
+  init_rtcp_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* RSYNC */
+  init_rsync_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* WHOIS_DAS */
+  init_whois_das_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* ORACLE */
+  init_oracle_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* CORBA */
+  init_corba_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* RTMP */
+  init_rtmp_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* FTP_CONTROL */
+  init_ftp_control_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* FTP_DATA */
+  init_ftp_data_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* PANDO */
+  init_pando_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* MEGACO */
+  init_megaco_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* REDIS */
+  init_redis_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* VHUA */
+  init_vhua_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* ZMQ */
+  init_zmq_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* TWITTER */
+  init_twitter_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* TELEGRAM */
+  init_telegram_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* QUIC */
+  init_quic_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* EAQ */
+  init_eaq_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* KAKAOTALK_VOICE */
+  init_kakaotalk_voice_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* MPEGTS */
+  init_mpegts_dissector(ndpi_struct, &a, detection_bitmask);
+  
+
+  /* ----------------------------------------------------------------- */
+
 
   ndpi_struct->callback_buffer_size = a;
 

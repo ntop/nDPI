@@ -118,15 +118,15 @@ void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct 
     ndpi_check_skype(ndpi_struct, flow);
 }
 
-void init_skype_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
-  ndpi_set_bitmask_protocol_detection("Skype", ndpi_struct, detection_bitmask, *id,
+
+void init_skype_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
+{
+  ndpi_set_bitmask_protocol_detection("Skype", ndpi_struct, detection_bitmask, *id++,
 				      NDPI_PROTOCOL_SKYPE,
 				      ndpi_search_skype,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id = *id+1;
 }
 
 #endif

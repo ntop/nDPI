@@ -53,4 +53,16 @@ void ndpi_search_openft_tcp(struct ndpi_detection_module_struct
 
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OPENFT);
 }
+
+
+void init_openft_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("OPENFT", ndpi_struct, detection_bitmask, *id++,
+				      NDPI_PROTOCOL_OPENFT,
+				      ndpi_search_openft_tcp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+}
+
 #endif

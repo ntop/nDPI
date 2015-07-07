@@ -104,4 +104,13 @@ void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
   }
 }
 
+
+/* void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) */
+/* { */
+  
+/*   u_int32_t a = *id;   */
+
+
+/* } */
+
 #endif

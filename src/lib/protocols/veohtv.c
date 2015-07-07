@@ -113,4 +113,16 @@ void ndpi_search_veohtv_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV);
 }
+
+
+void init_veohtv_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("HTTP_APPLICATION_VEOHTV", ndpi_struct, detection_bitmask, *id++,
+				      NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV,
+				      ndpi_search_veohtv_tcp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+}
+
 #endif
