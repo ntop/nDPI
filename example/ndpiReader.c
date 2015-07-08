@@ -76,7 +76,7 @@ static char *_jsonFilePath    = NULL; /**< JSON file path  */
 #ifdef HAVE_JSON_C
 static json_object *jArray_known_flows, *jArray_unknown_flows;
 #endif
-static u_int8_t live_capture = 0, full_http_dissection = 1;
+static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /**
  * User preferences
@@ -176,7 +176,7 @@ typedef struct ndpi_flow {
   u_int32_t packets;
 
   // result only, not used for flow identification
-  u_int16_t detected_protocol, detected_masterprotocol;
+  ndpi_protocol detected_protocol;
 
   char host_server_name[256];
 
@@ -489,15 +489,17 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
 
-    if(flow->detected_masterprotocol)
-      fprintf(out, "[proto: %u.%u/%s.%s]", 
-	      flow->detected_masterprotocol, flow->detected_protocol, 
-	      ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_masterprotocol),
-	      ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol));
-    else
-      fprintf(out, "[proto: %u/%s]", 
-	      flow->detected_protocol,
-	      ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol));
+    if(flow->detected_protocol.master_protocol) {
+      char buf[64];
+
+      fprintf(out, "[proto: %u.%u/%s]",
+	      flow->detected_protocol.master_protocol, flow->detected_protocol.protocol,
+	      ndpi_protocol2name(ndpi_thread_info[thread_id].ndpi_struct,
+				 flow->detected_protocol, buf, sizeof(buf)));
+    } else
+      fprintf(out, "[proto: %u/%s]",
+	      flow->detected_protocol.protocol,
+	      ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol.protocol));
 
     fprintf(out, "[%u pkts/%llu bytes]",
 	   flow->packets, (long long unsigned int)flow->bytes);
@@ -518,21 +520,24 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
     json_object_object_add(jObj,"host_b.name",json_object_new_string(flow->upper_name));
     json_object_object_add(jObj,"host_n.port",json_object_new_int(ntohs(flow->upper_port)));
 
-    if(flow->detected_masterprotocol)
-      json_object_object_add(jObj,"detected.masterprotocol",json_object_new_int(flow->detected_masterprotocol));
-    
-    json_object_object_add(jObj,"detected.protocol",json_object_new_int(flow->detected_protocol));
+    if(flow->detected_protocol.master_protocol)
+      json_object_object_add(jObj,"detected.masterprotocol",json_object_new_int(flow->detected_protocol.master_protocol));
 
-    if(flow->detected_masterprotocol) {
+    json_object_object_add(jObj,"detected.protocol",json_object_new_int(flow->detected_protocol.protocol));
+
+    if(flow->detected_protocol.master_protocol) {
       char tmp[256];
 
-      snprintf(tmp, sizeof(tmp), "%s.%s", 
-	       ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_masterprotocol),
-	       ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol));
+      snprintf(tmp, sizeof(tmp), "%s.%s",
+	       ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol.master_protocol),
+	       ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol.protocol));
 
-      json_object_object_add(jObj,"detected.protocol.name",json_object_new_string(tmp));
+      json_object_object_add(jObj,"detected.protocol.name",
+			     json_object_new_string(tmp));
     } else
-      json_object_object_add(jObj,"detected.protocol.name",json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct, flow->detected_protocol)));
+      json_object_object_add(jObj,"detected.protocol.name",
+			     json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[thread_id].ndpi_struct,
+									flow->detected_protocol.protocol)));
 
     json_object_object_add(jObj,"packets",json_object_new_int(flow->packets));
     json_object_object_add(jObj,"bytes",json_object_new_int(flow->bytes));
@@ -584,7 +589,7 @@ static void node_print_unknown_proto_walker(const void *node, ndpi_VISIT which, 
   struct ndpi_flow *flow = *(struct ndpi_flow**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  if(flow->detected_protocol != 0 /* UNKNOWN */) return;
+  if(flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN) return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) /* Avoid walking the same node multiple times */
     printFlow(thread_id, flow);
@@ -596,7 +601,7 @@ static void node_print_known_proto_walker(const void *node, ndpi_VISIT which, in
   struct ndpi_flow *flow = *(struct ndpi_flow**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  if(flow->detected_protocol == 0 /* UNKNOWN */) return;
+  if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) /* Avoid walking the same node multiple times */
     printFlow(thread_id, flow);
@@ -612,10 +617,10 @@ static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi
 							   ntohl(flow->upper_ip),
 							   ntohs(flow->upper_port));
   // printf("Guess state: %u\n", flow->detected_protocol);
-  if(flow->detected_protocol != 0)
+  if(flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
     ndpi_thread_info[thread_id].stats.guessed_flow_protocols++;
 
-  return flow->detected_protocol;
+  return(flow->detected_protocol.protocol);
 }
 
 /* ***************************************************** */
@@ -636,15 +641,15 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if(enable_protocol_guess) {
-      if(flow->detected_protocol == 0 /* UNKNOWN */) {
+      if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
 	node_guess_undetected_protocol(thread_id, flow);
 	// printFlow(thread_id, flow);
       }
     }
 
-    ndpi_thread_info[thread_id].stats.protocol_counter[flow->detected_protocol]       += flow->packets;
-    ndpi_thread_info[thread_id].stats.protocol_counter_bytes[flow->detected_protocol] += flow->bytes;
-    ndpi_thread_info[thread_id].stats.protocol_flows[flow->detected_protocol]++;
+    ndpi_thread_info[thread_id].stats.protocol_counter[flow->detected_protocol.protocol]       += flow->packets;
+    ndpi_thread_info[thread_id].stats.protocol_counter_bytes[flow->detected_protocol.protocol] += flow->bytes;
+    ndpi_thread_info[thread_id].stats.protocol_flows[flow->detected_protocol.protocol]++;
   }
 }
 
@@ -663,7 +668,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       /* update stats */
       node_proto_guess_walker(node, which, depth, user_data);
 
-      if (flow->detected_protocol == 0 /* UNKNOWN */ && !undetected_flows_deleted)
+      if((flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
       free_ndpi_flow(flow);
@@ -919,8 +924,7 @@ static void setupDetection(u_int16_t thread_id) {
     exit(-1);
   }
 
-  if(!full_http_dissection)
-    ndpi_thread_info[thread_id].ndpi_struct->http_dont_dissect_response = 1;
+  /* ndpi_thread_info[thread_id].ndpi_struct->http_dont_dissect_response = 1; */
 
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);
@@ -965,7 +969,6 @@ static unsigned int packet_processing(u_int16_t thread_id,
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow *flow;
   struct ndpi_flow_struct *ndpi_flow = NULL;
-  u_int32_t protocol = 0;
   u_int8_t proto;
 
   if(iph)
@@ -987,52 +990,47 @@ static unsigned int packet_processing(u_int16_t thread_id,
 
   if(flow->detection_completed) return(0);
 
-  protocol = (const u_int32_t)ndpi_detection_process_packet(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow,
-							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
-							    ipsize, time, src, dst);
-  
-  if(protocol != NDPI_PROTOCOL_UNKNOWN)
-    flow->detected_protocol = protocol, flow->detected_masterprotocol = ndpi_get_flow_masterprotocol(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow);
-  
-  if((flow->detected_protocol != NDPI_PROTOCOL_UNKNOWN)
+  flow->detected_protocol = ndpi_detection_process_packet(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow,
+							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
+							  ipsize, time, src, dst);
+
+  if((flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
     flow->detection_completed = 1;
 
-    if((flow->detected_protocol == NDPI_PROTOCOL_UNKNOWN) && (ndpi_flow->num_stun_udp_pkts > 0))
+    if((flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) && (ndpi_flow->num_stun_udp_pkts > 0))
       ndpi_set_detected_protocol(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow, NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_UNKNOWN);
 
     snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s", flow->ndpi_flow->host_server_name);
 
-    if((proto == IPPROTO_TCP) && (flow->detected_protocol != NDPI_PROTOCOL_DNS)) {
+    if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
       snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s", flow->ndpi_flow->protos.ssl.client_certificate);
       snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
     }
 
 #if 0
-    if((
-	(flow->detected_protocol == NDPI_PROTOCOL_HTTP)
-	|| (flow->detected_protocol == NDPI_SERVICE_FACEBOOK)
-	)
-       && full_http_dissection) {
-      char *method;
+    if(verbose > 1) {
+      if(ndpi_is_proto(flow->detected_protocol, NDPI_PROTOCOL_HTTP)) {
+	char *method;
 
-      printf("[URL] %s\n", ndpi_get_http_url(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
-      printf("[Content-Type] %s\n", ndpi_get_http_content_type(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
+	printf("[URL] %s\n", ndpi_get_http_url(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
+	printf("[Content-Type] %s\n", ndpi_get_http_content_type(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
 
-      switch(ndpi_get_http_method(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow)) {
-      case HTTP_METHOD_OPTIONS: method = "HTTP_METHOD_OPTIONS"; break;
-      case HTTP_METHOD_GET: method = "HTTP_METHOD_GET"; break;
-      case HTTP_METHOD_HEAD: method = "HTTP_METHOD_HEAD"; break;
-      case HTTP_METHOD_POST: method = "HTTP_METHOD_POST"; break;
-      case HTTP_METHOD_PUT: method = "HTTP_METHOD_PUT"; break;
-      case HTTP_METHOD_DELETE: method = "HTTP_METHOD_DELETE"; break;
-      case HTTP_METHOD_TRACE: method = "HTTP_METHOD_TRACE"; break;
-      case HTTP_METHOD_CONNECT: method = "HTTP_METHOD_CONNECT"; break;
-      default: method = "HTTP_METHOD_UNKNOWN"; break;
+	switch(ndpi_get_http_method(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow)) {
+	case HTTP_METHOD_OPTIONS: method = "HTTP_METHOD_OPTIONS"; break;
+	case HTTP_METHOD_GET:     method = "HTTP_METHOD_GET"; break;
+	case HTTP_METHOD_HEAD:    method = "HTTP_METHOD_HEAD"; break;
+	case HTTP_METHOD_POST:    method = "HTTP_METHOD_POST"; break;
+	case HTTP_METHOD_PUT:     method = "HTTP_METHOD_PUT"; break;
+	case HTTP_METHOD_DELETE:  method = "HTTP_METHOD_DELETE"; break;
+	case HTTP_METHOD_TRACE:   method = "HTTP_METHOD_TRACE"; break;
+	case HTTP_METHOD_CONNECT: method = "HTTP_METHOD_CONNECT"; break;
+	default:                  method = "HTTP_METHOD_UNKNOWN"; break;
+	}
+
+	printf("[Method] %s\n", method);
       }
-
-      printf("[Method] %s\n", method);
     }
 #endif
 
@@ -1040,8 +1038,9 @@ static unsigned int packet_processing(u_int16_t thread_id,
 
     if(verbose > 1) {
       if(enable_protocol_guess) {
-	if(flow->detected_protocol == 0 /* UNKNOWN */) {
-	  protocol = node_guess_undetected_protocol(thread_id, flow);
+	if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
+	  flow->detected_protocol.protocol = node_guess_undetected_protocol(thread_id, flow),
+	    flow->detected_protocol.master_protocol = NDPI_PROTOCOL_UNKNOWN;
 	}
       }
 
@@ -1256,7 +1255,7 @@ static void printResults(u_int64_t tot_usec) {
       if(enable_protocol_guess)
 	printf("\tGuessed flow protos:   %-13u\n", cumulative_stats.guessed_flow_protocols);
     }
-  } 
+  }
 
   if(json_flag) {
 #ifdef HAVE_JSON_C
@@ -1320,13 +1319,13 @@ static void printResults(u_int64_t tot_usec) {
 #ifdef HAVE_JSON_C
 	if(json_fp) {
 	  jObj = json_object_new_object();
-	  
+
 	  json_object_object_add(jObj,"name",json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[0].ndpi_struct, i)));
 	  json_object_object_add(jObj,"breed",json_object_new_string(ndpi_get_proto_breed_name(ndpi_thread_info[0].ndpi_struct, breed)));
 	  json_object_object_add(jObj,"packets",json_object_new_int64(cumulative_stats.protocol_counter[i]));
 	  json_object_object_add(jObj,"bytes",json_object_new_int64(cumulative_stats.protocol_counter_bytes[i]));
 	  json_object_object_add(jObj,"flows",json_object_new_int(cumulative_stats.protocol_flows[i]));
-	  
+
 	  json_object_array_add(jArray_detProto,jObj);
 	}
 #endif
@@ -1352,7 +1351,7 @@ static void printResults(u_int64_t tot_usec) {
 
   if(verbose) {
     FILE *out = results_file ? results_file : stdout;
-    
+
     if(!json_flag) fprintf(out, "\n");
 
     num_flows = 0;
