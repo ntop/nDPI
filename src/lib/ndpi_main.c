@@ -999,20 +999,20 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_MPEG,
-			    no_master,
-			    no_master, "MPEG",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "MPEG",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_QUICKTIME,
 			    no_master,
 			    no_master, "QuickTime",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_REALMEDIA,
-			    no_master,
-			    no_master, "RealMedia",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "RealMedia",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_WINDOWSMEDIA,
 			    no_master,
 			    no_master, "WindowsMedia",
@@ -1124,21 +1124,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     			    no_master, "Unencryped_Jabber",
     			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
     			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSN, */
-    /* 			    no_master, */
-    /* 			    no_master, "MSN", */
-    /* 			    ndpi_build_default_ports(ports_a, 1863, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OSCAR,
     			    no_master,
     			    no_master, "Oscar",
     			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
     			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_YAHOO, */
-    /* 			    no_master, */
-    /* 			    no_master, "Yahoo", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_BATTLEFIELD,
     			    no_master,
     			    no_master, "BattleField",
@@ -1241,10 +1231,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_VOICE,
-			    no_master,
-			    no_master, "WhatsAppVoice",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    no_master,
+    			    no_master, "WhatsAppVoice",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
     custom_master[0] = NDPI_PROTOCOL_SSL_NO_CERT, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_SSL,
@@ -1382,15 +1372,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEEBO,
-			    no_master,
-			    no_master, "Meebo", /* Remove */
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DROPBOX, */
-    /* 			    no_master, */
-    /* 			    no_master, "DropBox", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 17500, 0, 0, 0, 0) /\* UDP *\/); */
+    			    no_master,
+    			    no_master, "Meebo",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DCERPC,
     			    no_master,
     			    no_master, "DCE_RPC",
@@ -1506,43 +1491,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "MPEG_TS",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-
-    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, */
-    /* 			    NDPI_SERVICE_GOOGLE, */
-    /* 			    custom_master, custom_master1, */
-    /* 			    "Google", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
-
-    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, */
-    /* 			    NDPI_SERVICE_APPLE, */
-    /* 			    custom_master, custom_master1, */
-    /* 			    "Apple", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
-
-    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, */
-    /* 			    NDPI_SERVICE_APPLE_ICLOUD, */
-    /* 			    custom_master, custom_master1, */
-    /* 			    "AppleiCloud", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
-
-    /* custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* custom_master1[0] = NDPI_PROTOCOL_DNS, custom_master1[1] = NDPI_PROTOCOL_UNKNOWN; */
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, */
-    /* 			    NDPI_SERVICE_APPLE_ITUNES, */
-    /* 			    custom_master, custom_master1, */
-    /* 			    "AppleiTunes", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
-
     /* http://en.wikipedia.org/wiki/Link-local_Multicast_Name_Resolution */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LLMNR,
 			    no_master,
@@ -1554,12 +1502,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "RemoteScan",
 			    ndpi_build_default_ports(ports_a, 6077, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 6078, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
-
-    custom_master[0] = NDPI_PROTOCOL_HTTP, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SPOTIFY,
-    			    custom_master, no_master, "Spotify",
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 57621, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_WEBM,
 			    no_master,
 			    no_master, "WebM", /* Courtesy of Shreeram Ramamoorthy Swaminathan <shreeram <shreeram1985@yahoo.co.in> */
@@ -1591,11 +1533,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "TeamSpeak",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_TOR, */
-    /* 			    no_master, */
-    /* 			    no_master, "TOR", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKINNY,
 			    no_master,
 			    no_master, "CiscoSkinny",
@@ -1656,11 +1593,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Pando_Media_Booster",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER, */
-    /* 			    no_master, */
-    /* 			    no_master, "Viber", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEGACO,
 			    no_master,
 			    no_master, "Megaco",
@@ -1676,27 +1608,13 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "ZeroMQ",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /* UDP */);
-    /* ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_TWITTER, */
-    /* 			    no_master, */
-    /* 			    no_master, "Twitter", */
-    /* 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /\* TCP *\/, */
-    /* 			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /\* UDP *\/); */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_VHUA,
 			    no_master,
 			    no_master, "VHUA",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 58267, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_FACEBOOK,
-			    no_master,
-			    no_master, "Facebook",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_PANDORA,
-			    no_master,
-			    no_master, "Pandora",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-
+    
+    /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
 
     for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
