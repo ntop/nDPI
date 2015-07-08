@@ -103,7 +103,7 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 
 void init_ppstream_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("PPSTREAM", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("PPStream", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_PPSTREAM,
 				      ndpi_search_ppstream,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,

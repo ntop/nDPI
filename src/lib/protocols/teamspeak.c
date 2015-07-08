@@ -65,7 +65,7 @@ else if (packet->tcp != NULL) {
 
 void init_teamspeak_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("TEAMSPEAK", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("TeamSpeak", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TEAMSPEAK,
 				      ndpi_search_teamspeak,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,

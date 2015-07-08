@@ -107,7 +107,7 @@ void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct
 
 void init_telnet_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("TELNET", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Telnet", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TELNET,
 				      ndpi_search_telnet_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

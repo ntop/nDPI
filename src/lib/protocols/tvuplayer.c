@@ -154,7 +154,7 @@ void ndpi_search_tvuplayer(struct ndpi_detection_module_struct *ndpi_struct, str
 
 void init_tvuplayer_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("TVUPLAYER", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("TVUplayer", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TVUPLAYER,
 				      ndpi_search_tvuplayer,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
