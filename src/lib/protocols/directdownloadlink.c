@@ -737,7 +737,7 @@ void ndpi_search_direct_download_link_tcp(struct ndpi_detection_module_struct *n
 
 void init_directdownloadlink_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("DIRECT_DOWNLOAD_LINK", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Direct_Download_Link", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK,
 				      ndpi_search_direct_download_link_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,

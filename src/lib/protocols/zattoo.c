@@ -236,7 +236,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
 
 void init_zattoo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("ZATTOO", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Zattoo", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_ZATTOO,
 				      ndpi_search_zattoo,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,

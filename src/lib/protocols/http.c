@@ -998,7 +998,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 
 #if 0
-  ndpi_set_bitmask_protocol_detection("HTTP_PROXY", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("HTTP_Proxy", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_HTTP_PROXY,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1017,7 +1017,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_CONTENT_FLASH
-  ndpi_set_bitmask_protocol_detection("FLASH", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Flash", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_FLASH,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1026,7 +1026,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_CONTENT_QUICKTIME
-  ndpi_set_bitmask_protocol_detection("QUICKTIME", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("QuickTime", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_QUICKTIME,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1035,7 +1035,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_CONTENT_REALMEDIA
-  ndpi_set_bitmask_protocol_detection("REALMEDIA", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("RealMedia", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_REALMEDIA,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1044,7 +1044,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_CONTENT_WINDOWSMEDIA
-  ndpi_set_bitmask_protocol_detection("WINDOWSMEDIA", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("WindowsMedia", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_WINDOWSMEDIA,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1062,7 +1062,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_PROTOCOL_XBOX
-  ndpi_set_bitmask_protocol_detection("XBOX", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Xbox", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_XBOX,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1071,7 +1071,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_PROTOCOL_WINDOWS_UPDATE
-  ndpi_set_bitmask_protocol_detection("WINDOWS_UPDATE", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("WindowsUpdate", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_WINDOWS_UPDATE,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1098,7 +1098,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_CONTENT_OGG
-  ndpi_set_bitmask_protocol_detection("OGG", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("OggVorbis", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_OGG,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
@@ -1107,7 +1107,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 #endif
 #ifdef NDPI_PROTOCOL_MOVE
-  ndpi_set_bitmask_protocol_detection("MOVE", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Move", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_MOVE,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,

@@ -77,7 +77,7 @@ void ndpi_search_socrates(struct ndpi_detection_module_struct
 
 void init_socrates_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("SOCRATES", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Socrates", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_SOCRATES,
 				      ndpi_search_socrates,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
