@@ -66,12 +66,14 @@ void ndpi_search_kontiki(struct ndpi_detection_module_struct *ndpi_struct, struc
 
 void init_kontiki_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("KONTIKI", ndpi_struct, detection_bitmask, *id++,
+  ndpi_set_bitmask_protocol_detection("KONTIKI", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_KONTIKI,
 				      ndpi_search_kontiki,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
 }
 
 #endif

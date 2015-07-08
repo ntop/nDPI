@@ -175,7 +175,7 @@ void init_meebo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
   NDPI_ADD_PROTOCOL_TO_BITMASK(ndpi_struct->callback_buffer[*id].detection_bitmask, NDPI_CONTENT_FLASH);
 #endif
 
-  *id++;
+  *id += 1;
 }
 
 #endif

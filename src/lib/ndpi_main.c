@@ -2147,17 +2147,25 @@ void ndpi_set_bitmask_protocol_detection( char * label,
     Compare specify protocol bitmask with main detection bitmask
   */
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(*detection_bitmask, ndpi_protocol_id) != 0) {
-    // #ifdef DEBUG
+#ifdef DEBUG
     NDPI_LOG(0, ndpi_struct, NDPI_LOG_DEBUG,"[NDPI] ndpi_set_bitmask_protocol_detection: %s : [callback_buffer] idx= %u, [proto_defaults] protocol_id=%u\n", label, idx, ndpi_protocol_id);
-    // #endif
+#endif
+    
+    if(ndpi_struct->proto_defaults[ndpi_protocol_id].protoIdx != 0)
+      printf("[NDPI] Internal error: protocol %s/%u has been already registered\n", label, ndpi_protocol_id);
+    else {
+#ifdef DEBUG
+      printf("[NDPI] Adding %s with protocol id %d\n", label, ndpi_protocol_id);
+#endif
+    }
+
     /*
       Set funcition and index protocol within proto_default strcuture for port protocol detection
       and callback_buffer function for DPI protocol detection
     */
     ndpi_struct->proto_defaults[ndpi_protocol_id].protoIdx = idx;
+    ndpi_struct->proto_defaults[ndpi_protocol_id].func = ndpi_struct->callback_buffer[idx].func = func;
 
-    ndpi_struct->proto_defaults[ndpi_protocol_id].func =
-      ndpi_struct->callback_buffer[idx].func = func;
     /*
       Set ndpi_selection_bitmask for protocol
     */
@@ -2190,157 +2198,10 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   ndpi_struct->callback_buffer_size = 0;
 
   /* HTTP */
-  /* init_http_dissector(ndpi_struct, &a, detection_bitmask); */
-#ifdef NDPI_PROTOCOL_HTTP
-  ndpi_set_bitmask_protocol_detection("HTTP",ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_HTTP,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("HTTP_PROXY", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_HTTP_PROXY,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-#ifdef NDPI_CONTENT_MPEG
-  ndpi_set_bitmask_protocol_detection("MPEG", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_MPEG,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_FLASH
-  ndpi_set_bitmask_protocol_detection("FLASH", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_FLASH,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_QUICKTIME
-  ndpi_set_bitmask_protocol_detection("QUICKTIME", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_QUICKTIME,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_REALMEDIA
-  ndpi_set_bitmask_protocol_detection("REALMEDIA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_REALMEDIA,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_WINDOWSMEDIA
-  ndpi_set_bitmask_protocol_detection("WINDOWSMEDIA", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_WINDOWSMEDIA,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_MMS
-  ndpi_set_bitmask_protocol_detection("MMS", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_MMS,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_XBOX
-  ndpi_set_bitmask_protocol_detection("XBOX", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_XBOX,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_WINDOWS_UPDATE
-  ndpi_set_bitmask_protocol_detection("WINDOWS_UPDATE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_WINDOWS_UPDATE,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_QQ
-  ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_QQ,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_AVI
-  ndpi_set_bitmask_protocol_detection("AVI", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_AVI,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_CONTENT_OGG
-  ndpi_set_bitmask_protocol_detection("OGG", ndpi_struct, detection_bitmask, a++,
-				      NDPI_CONTENT_OGG,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-#ifdef NDPI_PROTOCOL_MOVE
-  ndpi_set_bitmask_protocol_detection("MOVE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_MOVE,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
-
+  init_http_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* SKYPE */
   init_skype_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* Update excluded protocol bitmask */
-  NDPI_BITMASK_SET(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-  		   ndpi_struct->callback_buffer[a].detection_bitmask);
-
-  /*Delete protocol from exluded protocol bitmask*/
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-  				 NDPI_PROTOCOL_UNKNOWN);
-
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-  				 NDPI_PROTOCOL_QQ);
-
-#ifdef NDPI_CONTENT_FLASH
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-				 NDPI_CONTENT_FLASH);
-#endif
-
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-  				 NDPI_CONTENT_MMS);
-  /* #ifdef NDPI_PROTOCOL_RTSP */
-  /*   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, */
-  /* 				 NDPI_PROTOCOL_RTSP); */
-  /* #endif */
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
-  				 NDPI_PROTOCOL_XBOX);
-
-  NDPI_BITMASK_SET(ndpi_struct->generic_http_packet_bitmask,
-  		   ndpi_struct->callback_buffer[a].detection_bitmask);
-
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->generic_http_packet_bitmask, NDPI_PROTOCOL_UNKNOWN);
-
-  /* Update callback_buffer index */
-  a++;
-
-#endif
 
   /* SSL */
   init_ssl_dissector(ndpi_struct, &a, detection_bitmask);

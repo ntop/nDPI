@@ -205,12 +205,14 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
 
 void init_mail_pop_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("MAIL_POP", ndpi_struct, detection_bitmask, *id++,
+  ndpi_set_bitmask_protocol_detection("MAIL_POP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_MAIL_POP,
 				      ndpi_search_mail_pop_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
 }
 
 #endif
