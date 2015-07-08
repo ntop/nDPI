@@ -65,4 +65,16 @@ void ndpi_search_vhua(struct ndpi_detection_module_struct *ndpi_struct, struct n
   }
 }
 
+
+void init_vhua_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("VHUA", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_VHUA,
+				      ndpi_search_vhua,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+  *id += 1;
+}
+
 #endif

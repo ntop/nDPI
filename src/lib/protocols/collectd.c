@@ -50,4 +50,5 @@ void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struct, stru
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COLLECTD);
   }
 }
+
 #endif

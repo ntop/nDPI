@@ -55,9 +55,22 @@ void ndpi_search_twitter(struct ndpi_detection_module_struct *ndpi_struct, struc
       ndpi_int_twitter_add_connection(ndpi_struct, flow);
       return;
     }
-
   }
-
+  
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_SERVICE_TWITTER);
 }
+
+
+void init_twitter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("TWITTER", ndpi_struct, detection_bitmask, *id,
+				      NDPI_SERVICE_TWITTER,
+				      ndpi_search_twitter,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
+}
+
 #endif

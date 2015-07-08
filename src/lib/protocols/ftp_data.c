@@ -272,4 +272,17 @@ void ndpi_search_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, stru
   ndpi_check_ftp_data(ndpi_struct, flow);
 }
 
+
+void init_ftp_data_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("FTP_DATA", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_FTP_DATA,
+				      ndpi_search_ftp_data,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
+}
+
 #endif

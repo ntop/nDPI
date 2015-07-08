@@ -7314,6 +7314,7 @@ ndpi_protocol_match host_match[] = {
   { ".facebook.com",			"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
   { ".fbcdn.net",			"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
   { "fbcdn-",				"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },  /* fbcdn-video-a-akamaihd.net */
+  { ".google.",				"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gstatic.com",			"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".googlesyndication.com",		"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".googletagservices.com",		"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7359,7 +7360,6 @@ ndpi_protocol_match host_match[] = {
   { ".ytimg.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { "youtube-nocookie.",		"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { ".vevo.com",			"Vevo",			NDPI_SERVICE_VEVO,    NDPI_PROTOCOL_FUN },
-  { ".google.",				"Google",		NDPI_SERVICE_GOOGLE,  NDPI_PROTOCOL_ACCEPTABLE },
   { ".spotify.",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_FUN },
   { ".pandora.com",			"Pandora",		NDPI_SERVICE_PANDORA,  NDPI_PROTOCOL_FUN },
   { ".torproject.org",                  "Tor",                  NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },

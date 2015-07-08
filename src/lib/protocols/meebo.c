@@ -159,4 +159,23 @@ void ndpi_search_meebo(struct ndpi_detection_module_struct
   NDPI_LOG(NDPI_PROTOCOL_MEEBO, ndpi_struct, NDPI_LOG_DEBUG, "exclude meebo.\n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MEEBO);
 }
+
+
+void init_meebo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("Meebo", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_MEEBO,
+				      ndpi_search_meebo,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+  
+  /* Add protocol bitmask dependencies to detected bitmask*/
+#ifdef NDPI_CONTENT_FLASH
+  NDPI_ADD_PROTOCOL_TO_BITMASK(ndpi_struct->callback_buffer[*id].detection_bitmask, NDPI_CONTENT_FLASH);
+#endif
+
+  *id += 1;
+}
+
 #endif

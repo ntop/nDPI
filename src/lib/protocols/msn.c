@@ -92,8 +92,6 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
   }
 #endif
 
-
-
   /* we detect the initial connection only ! */
   /* match: "VER " ..... "CVR" x 0x0d 0x0a
    * len should be small, lets say less than 100 bytes
@@ -396,9 +394,6 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
     }
   }
 
-
-
-
   /* finished examining the secone packet only */
   /* direct user connection (file transfer,...) */
 
@@ -558,6 +553,22 @@ void ndpi_search_msn(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       ndpi_search_udp_msn_misc(ndpi_struct, flow);
     }
   }
+}
+
+
+void init_msn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
+{
+  
+  NDPI_BITMASK_RESET(ndpi_struct->callback_buffer[*id].excluded_protocol_bitmask);
+  
+  ndpi_set_bitmask_protocol_detection("MSN", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_MSN,
+				      ndpi_search_msn,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
 }
 
 #endif

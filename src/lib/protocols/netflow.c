@@ -90,4 +90,17 @@ void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struc
   ndpi_check_netflow(ndpi_struct, flow);
 }
 
+
+void init_netflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("NETFLOW", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_NETFLOW,
+				      ndpi_search_netflow,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
+}
+
 #endif

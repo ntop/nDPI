@@ -77,4 +77,18 @@ void ndpi_search_mms_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 #endif							/* NDPI_PROTOCOL_HTTP */
 
 }
+
+
+void init_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("MMS", ndpi_struct, detection_bitmask, *id,
+				      NDPI_CONTENT_MMS,
+				      ndpi_search_mms_tcp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
+}
+
 #endif
