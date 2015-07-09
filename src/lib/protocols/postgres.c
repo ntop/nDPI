@@ -120,7 +120,7 @@ void ndpi_search_postgres_tcp(struct ndpi_detection_module_struct
 
 void init_postgres_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("POSTGRES", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("PostgreSQL", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_POSTGRES,
 				      ndpi_search_postgres_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

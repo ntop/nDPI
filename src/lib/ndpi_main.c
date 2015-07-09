@@ -1509,8 +1509,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_H323,
 			    no_master,
-			    no_master,
-			    "H323",
+			    no_master,"H323",
 			    ndpi_build_default_ports(ports_a, 1719, 1720, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 1719, 1720, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_OPENVPN,
@@ -2288,75 +2287,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   init_mms_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* NON_TCP_UDP */
-  /* init_non_tcp_udp_dissector(ndpi_struct, &a, detection_bitmask); */
-#if defined(NDPI_PROTOCOL_IP_IPSEC) || defined(NDPI_PROTOCOL_IP_GRE) || defined(NDPI_PROTOCOL_IP_ICMP) || defined(NDPI_PROTOCOL_IP_IGMP) || defined(NDPI_PROTOCOL_IP_EGP) || defined(NDPI_PROTOCOL_IP_SCTP) || defined(NDPI_PROTOCOL_IP_OSPF) || defined(NDPI_PROTOCOL_IP_IP_IN_IP) || defined(NDPI_PROTOCOL_IP_ICMPV6)
-
-  /* always add non tcp/udp if one protocol is compiled in */
-  NDPI_SAVE_AS_BITMASK(ndpi_struct->callback_buffer[a].detection_bitmask, NDPI_PROTOCOL_UNKNOWN);
-
-  ndpi_set_bitmask_protocol_detection("IP_IPSEC", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_IPSEC,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_GRE", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_GRE,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_ICMP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_ICMP,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_IGMP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_IGMP,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_EGP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_EGP,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_SCTP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_SCTP,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_OSPF", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_OSPF,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_IP_IN_IP", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_IP_IN_IP,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  ndpi_set_bitmask_protocol_detection("IP_ICMPV6", ndpi_struct, detection_bitmask, a++,
-				      NDPI_PROTOCOL_IP_ICMPV6,
-				      ndpi_search_in_non_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-#endif
+  init_non_tcp_udp_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* TVANTS */
   init_tvants_dissector(ndpi_struct, &a, detection_bitmask);  
@@ -2529,7 +2460,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* FLORENSIA */
   init_florensia_dissector(ndpi_struct, &a, detection_bitmask);
 
-/* MAPLESTORY */
+  /* MAPLESTORY */
   init_maplestory_dissector(ndpi_struct, &a, detection_bitmask);
   
   /* DOFUS */

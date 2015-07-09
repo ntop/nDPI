@@ -60,7 +60,7 @@ void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_struct, str
 
 void init_whois_das_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("WHOIS_DAS", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Whois-DAS", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_WHOIS_DAS,
 				      ndpi_search_whois_das,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

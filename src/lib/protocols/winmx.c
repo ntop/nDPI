@@ -104,7 +104,7 @@ void ndpi_search_winmx_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
 
 void init_winmx_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("WINMX", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("WinMX", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_WINMX,
 				      ndpi_search_winmx_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

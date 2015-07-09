@@ -49,7 +49,7 @@ void ndpi_search_sflow(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
 void init_sflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("SFLOW", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("sFlow", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_SFLOW,
 				      ndpi_search_sflow,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,

@@ -73,7 +73,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct, stru
 
 void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("KERBEROS", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Kerberos", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_KERBEROS,
 				      ndpi_search_kerberos,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
