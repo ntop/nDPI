@@ -7392,6 +7392,7 @@ ndpi_protocol_match host_match[] = {
   { ".timbeta.com.br",                  "TIM_Beta",             NDPI_SERVICE_TIMBETA, NDPI_PROTOCOL_ACCEPTABLE },
   { "tim-geoportal.geoportal3d.com.br", "TIM_PortasAbertas",    NDPI_SERVICE_TIMPORTASABERTAS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".m4u.com.br",                      "TIM_Recarga",          NDPI_SERVICE_TIMRECARGA, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".deezer.com",                      "Deezer",               NDPI_SERVICE_DEEZER, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, 0 }
 };
