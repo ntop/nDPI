@@ -307,7 +307,9 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	printf("***** [SSL] %s\n", certificate);
 #endif
 
-	if(ndpi_match_string_subprotocol(ndpi_struct, flow, certificate, strlen(certificate)) != NDPI_PROTOCOL_UNKNOWN)
+	if(ndpi_match_host_subprotocol(ndpi_struct, flow, certificate, 
+					 strlen(certificate),
+					 NDPI_PROTOCOL_SSL) != NDPI_PROTOCOL_UNKNOWN)
 	  return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
 
 #ifdef NDPI_PROTOCOL_TOR

@@ -7282,6 +7282,9 @@ static ndpi_network host_protocol_list[] = {
 { 0xC709F98C, 32, NDPI_SERVICE_TWITCH },
 { 0xC709F9C5, 32, NDPI_SERVICE_TWITCH },
 
+/* Simet - 200.160.4.0/24 */ 
+{ 0xC8A00400, 24, NDPI_SERVICE_SIMET },
+
 { 0x0, 0, 0 }
 };
 
@@ -7330,7 +7333,6 @@ ndpi_protocol_match host_match[] = {
   { "maps.gstatic.com",			"GoogleMaps",		NDPI_SERVICE_GOOGLE_MAPS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gmail.",				"GMail",		NDPI_SERVICE_GMAIL, NDPI_PROTOCOL_SAFE },
   { "mail.google.",			"GMail",		NDPI_SERVICE_GMAIL, NDPI_PROTOCOL_SAFE },
-  { ".grooveshark.com",			"GrooveShark",		NDPI_SERVICE_GROOVESHARK, NDPI_PROTOCOL_FUN },
   { ".last.fm",				"LastFM",		NDPI_SERVICE_LASTFM, NDPI_PROTOCOL_FUN },
   { "msn.com",				"MSN",			NDPI_SERVICE_MSN, NDPI_PROTOCOL_FUN },
   { "netflix.com",			"NetFlix",		NDPI_SERVICE_NETFLIX, NDPI_PROTOCOL_FUN	},
@@ -7363,7 +7365,7 @@ ndpi_protocol_match host_match[] = {
   { ".spotify.",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_FUN },
   { ".pandora.com",			"Pandora",		NDPI_SERVICE_PANDORA,  NDPI_PROTOCOL_FUN },
   { ".torproject.org",                  "Tor",                  NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
-  { "appmeutim.tim.com.br",             "Meu",                  NDPI_SERVICE_MEU, NDPI_PROTOCOL_ACCEPTABLE },
+  { "appmeutim.tim.com.br",             "TIM_Meu",              NDPI_SERVICE_TIMMEU, NDPI_PROTOCOL_ACCEPTABLE },
   { ".timtorcedor.com.br",              "Torcedor",             NDPI_SERVICE_TORCEDOR, NDPI_PROTOCOL_ACCEPTABLE },
   { ".kakao.com",                       "KakaoTalk",            NDPI_SERVICE_KAKAOTALK, NDPI_PROTOCOL_FUN },
   { "ttvnw.net",                        "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
@@ -7377,6 +7379,19 @@ ndpi_protocol_match host_match[] = {
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice-hrd.appspot.com",     "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice.com",                 "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
+
+  { ".waze.com",                        "Waze",                 NDPI_SERVICE_WAZE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "simet-",                           "Simet",                NDPI_SERVICE_SIMET, NDPI_PROTOCOL_ACCEPTABLE },
+  { "opensignal.com",                   "OpenSignal",           NDPI_SERVICE_OPENSIGNAL, NDPI_PROTOCOL_ACCEPTABLE },
+  { "99taxis.com",                      "99Taxi",               NDPI_SERVICE_99TAXI, NDPI_PROTOCOL_ACCEPTABLE },
+  { "easytaxis.com",                    "EasyTaxi",             NDPI_SERVICE_EASYTAXI, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".globo.com",                       "GloboTV",              NDPI_SERVICE_GLOBOTV, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".glbimg.com",                      "GloboTV",              NDPI_SERVICE_GLOBOTV, NDPI_PROTOCOL_ACCEPTABLE },
+  { "timsomdechamada.com.br",           "SomDeChamada",         NDPI_SERVICE_TIMSOMDECHAMADA, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".tim.acotelbr.com.br",             "TIM_Menu",             NDPI_SERVICE_TIMMENU, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".timbeta.com.br",                  "TIM_Beta",             NDPI_SERVICE_TIMBETA, NDPI_PROTOCOL_ACCEPTABLE },
+  { "tim-geoportal.geoportal3d.com.br", "TIM_PortasAbertas",    NDPI_SERVICE_TIMPORTASABERTAS, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".m4u.com.br",                      "TIM_Recarga",          NDPI_SERVICE_TIMRECARGA, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, 0 }
 };

@@ -265,9 +265,10 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 #endif
 
 	if(ndpi_struct->match_dns_host_names)
-	  ndpi_match_string_subprotocol(ndpi_struct, flow, 
+	  ndpi_match_host_subprotocol(ndpi_struct, flow, 
 					(char *)flow->host_server_name,
-					strlen((const char*)flow->host_server_name));
+					strlen((const char*)flow->host_server_name),
+					NDPI_PROTOCOL_DNS);
       }
 
       i++;
@@ -284,7 +285,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
 	/* 
-	   Do not set the protocol with DNS if ndpi_match_string_subprotocol() has
+	   Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
 	   matched a subprotocol
 	*/
 	NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "found DNS.\n");      

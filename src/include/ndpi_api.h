@@ -173,11 +173,13 @@ extern "C" {
 					      u_int8_t proto, u_int32_t shost, u_int16_t sport, u_int32_t dhost, u_int16_t dport);
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 					       u_int8_t proto, u_int32_t shost, u_int16_t sport, u_int32_t dhost, u_int16_t dport);
-  int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow, char *string_to_match, u_int string_to_match_len);
+  int ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow, char *string_to_match, u_int string_to_match_len,
+				  u_int16_t master_protocol_id);
   int ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				     struct ndpi_flow_struct *flow,
-				     char *string_to_match, u_int string_to_match_len);
+				     char *string_to_match, u_int string_to_match_len,
+				     u_int16_t master_protocol_id);
   int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct, 
 			ndpi_automa *automa, char *bigram_to_match);
   char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto, char *buf, u_int buf_len);

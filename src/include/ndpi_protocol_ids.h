@@ -220,7 +220,7 @@
 #define NDPI_SERVICE_GOOGLE				126
 #define NDPI_SERVICE_NETFLIX				133
 #define NDPI_SERVICE_LASTFM				134
-#define NDPI_SERVICE_GROOVESHARK			135
+#define NDPI_SERVICE_WAZE        			135
 #define NDPI_SERVICE_APPLE				140
 #define NDPI_SERVICE_WHATSAPP				142
 #define NDPI_SERVICE_APPLE_ICLOUD			143
@@ -237,7 +237,7 @@
 #define NDPI_SERVICE_YAHOO				NDPI_PROTOCOL_YAHOO /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_SERVICE_PANDORA     			187
 #define NDPI_PROTOCOL_EAQ        			190
-#define NDPI_SERVICE_MEU        			191
+#define NDPI_SERVICE_TIMMEU        			191
 #define NDPI_SERVICE_TORCEDOR        			192
 #define NDPI_SERVICE_KAKAOTALK        			193 /* KakaoTalk Chat (no voice call) */
 #define NDPI_SERVICE_KAKAOTALK_VOICE  			194 /* KakaoTalk Voice */
@@ -246,9 +246,19 @@
 #define NDPI_SERVICE_TIM                                197 /* Traffic for tim.com.br and tim.it */
 #define NDPI_PROTOCOL_MPEGTS        			198
 #define NDPI_SERVICE_SNAPCHAT                           199
+#define NDPI_SERVICE_SIMET                              200
+#define NDPI_SERVICE_OPENSIGNAL                         201
+#define NDPI_SERVICE_99TAXI                             202
+#define NDPI_SERVICE_EASYTAXI                           203
+#define NDPI_SERVICE_GLOBOTV                            204
+#define NDPI_SERVICE_TIMSOMDECHAMADA                    205
+#define NDPI_SERVICE_TIMMENU                            206
+#define NDPI_SERVICE_TIMPORTASABERTAS                   207
+#define NDPI_SERVICE_TIMRECARGA                         208
+#define NDPI_SERVICE_TIMBETA                            209
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_SNAPCHAT
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_TIMBETA
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

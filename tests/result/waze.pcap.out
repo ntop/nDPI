@@ -1,0 +1,44 @@
+Unknown	10	786	1
+HTTP	37	63205	1
+NTP	2	180	1
+SSL_No_Cert	13	2142	1
+Waze	484	289335	19
+WhatsApp	15	1341	1
+Simet	36	2004	9
+
+	1	TCP 10.8.0.1:50828 <-> 108.168.176.228:443 [proto: 142/WhatsApp][15 pkts/1341 bytes]
+	2	TCP 10.8.0.1:36312 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][32 pkts/44619 bytes][SSL server: *.world.waze.com]
+	3	TCP 10.8.0.1:36314 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][20 pkts/5673 bytes][SSL server: *.world.waze.com]
+	4	TCP 10.8.0.1:36316 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][28 pkts/27886 bytes][SSL server: *.world.waze.com]
+	5	TCP 200.160.4.49:80 <-> 10.16.37.157:41823 [proto: 7.200/HTTP.Simet][4 pkts/228 bytes]
+	6	TCP 200.160.4.31:80 <-> 10.16.37.157:43991 [proto: 7.200/HTTP.Simet][4 pkts/228 bytes]
+	7	TCP 10.8.0.1:51050 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][18 pkts/5553 bytes][SSL server: *.waze.com]
+	8	TCP 10.8.0.1:45169 <-> 200.160.4.198:80 [proto: 7.200/HTTP.Simet][4 pkts/216 bytes]
+	9	TCP 200.160.4.49:80 <-> 10.16.37.157:46473 [proto: 7.200/HTTP.Simet][4 pkts/228 bytes]
+	10	TCP 200.160.4.49:80 <-> 10.16.37.157:52953 [proto: 7.200/HTTP.Simet][4 pkts/228 bytes]
+	11	TCP 10.8.0.1:36100 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][107 pkts/85712 bytes][SSL server: *.world.waze.com]
+	12	TCP 10.8.0.1:36102 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][37 pkts/11984 bytes][SSL server: *.world.waze.com]
+	13	TCP 10.8.0.1:36134 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][24 pkts/6585 bytes][SSL server: *.world.waze.com]
+	14	TCP 10.8.0.1:39010 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][16 pkts/9185 bytes][SSL server: *.world.waze.com]
+	15	TCP 10.8.0.1:45536 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][15 pkts/1365 bytes][Host: cres.waze.com]
+	16	TCP 10.8.0.1:45538 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1326 bytes][Host: cres.waze.com]
+	17	TCP 10.8.0.1:45540 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1286 bytes][Host: roadshields.waze.com]
+	18	TCP 10.8.0.1:45546 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1328 bytes][Host: cres.waze.com]
+	19	TCP 10.8.0.1:45552 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1323 bytes][Host: cres.waze.com]
+	20	TCP 10.8.0.1:45554 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1319 bytes][Host: cres.waze.com]
+	21	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7/HTTP][37 pkts/63205 bytes][Host: xtra1.gpsonextra.net]
+	22	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 64/SSL_No_Cert][13 pkts/2142 bytes]
+	23	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91.200/SSL.Simet][4 pkts/216 bytes]
+	24	TCP 10.8.0.1:51049 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][23 pkts/7823 bytes][SSL server: *.waze.com]
+	25	TCP 10.8.0.1:51051 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][21 pkts/7715 bytes][SSL server: *.waze.com]
+	26	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][2 pkts/180 bytes]
+	27	TCP 200.160.4.49:80 <-> 10.16.37.157:52746 [proto: 7.200/HTTP.Simet][4 pkts/228 bytes]
+	28	TCP 10.8.0.1:60574 <-> 200.160.4.49:80 [proto: 7.200/HTTP.Simet][4 pkts/216 bytes]
+	29	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91.200/SSL.Simet][4 pkts/216 bytes]
+	30	TCP 10.8.0.1:36137 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][23 pkts/5742 bytes][SSL server: *.world.waze.com]
+	31	TCP 10.8.0.1:39021 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][33 pkts/58896 bytes][SSL server: *.world.waze.com]
+	32	TCP 10.8.0.1:45529 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][17 pkts/4015 bytes][Host: roadshields.waze.com]
+
+
+Undetected flows:
+	1	TCP 174.37.231.81:5222 <-> 10.16.37.157:42256 [proto: 0/Unknown][10 pkts/786 bytes]

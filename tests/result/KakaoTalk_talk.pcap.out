@@ -10,9 +10,9 @@ Tor	40	10538	1
 KakaoTalk_Voice	44	6196	2
 
 	1	TCP 10.24.82.188:34533 <-> 120.28.26.242:80 [proto: 7/HTTP][5 pkts/280 bytes]
-	2	TCP 10.24.82.188:38380 <-> 173.194.117.229:443 [proto: 126/Google][1 pkts/56 bytes]
+	2	TCP 10.24.82.188:38380 <-> 173.194.117.229:443 [proto: 91.126/SSL.Google][1 pkts/56 bytes]
 	3	TCP 10.24.82.188:51021 <-> 103.246.57.251:8080 [proto: 131/HTTP_Proxy][11 pkts/1488 bytes]
-	4	UDP 10.188.1.1:53 <-> 10.24.82.188:25223 [proto: 119/Facebook][2 pkts/197 bytes][Host: mqtt.facebook.com]
+	4	UDP 10.188.1.1:53 <-> 10.24.82.188:25223 [proto: 5.119/DNS.Facebook][2 pkts/197 bytes][Host: mqtt.facebook.com]
 	5	TCP 173.252.88.128:443 <-> 10.24.82.188:59912 [proto: 91/SSL][2 pkts/124 bytes]
 	6	TCP 173.252.88.128:443 <-> 10.24.82.188:59954 [proto: 64/SSL_No_Cert][29 pkts/4024 bytes]
 	7	TCP 10.24.82.188:53974 <-> 203.205.151.233:8080 [proto: 131/HTTP_Proxy][5 pkts/350 bytes]

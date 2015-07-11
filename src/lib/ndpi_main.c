@@ -4156,7 +4156,8 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
     rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, proto, shost, dhost, sport, dport);
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
-      ret.protocol = rc;
+      ret.protocol = rc,
+	ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport, dport);
       return(ret);
     }
 
@@ -4306,7 +4307,8 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
 static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 						ndpi_automa *automa,
 						struct ndpi_flow_struct *flow,
-						char *string_to_match, u_int string_to_match_len) {
+						char *string_to_match, u_int string_to_match_len,
+						u_int16_t master_protocol_id) {
   int matching_protocol_id;
   struct ndpi_packet_struct *packet = &flow->packet;
   AC_TEXT_t ac_input_text;
@@ -4333,14 +4335,14 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
     strncpy(m, string_to_match, len);
     m[len] = '\0';
 
-    printf("[NDPI] ndpi_match_string_subprotocol(%s): %s\n", m, ndpi_struct->proto_defaults[matching_protocol_id].protoName);
+    printf("[NDPI] ndpi_match_host_subprotocol(%s): %s\n", m, ndpi_struct->proto_defaults[matching_protocol_id].protoName);
   }
 #endif
 
   if(matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
     /* Move the protocol on slot 0 down one position */
-    packet->detected_protocol_stack[1] = packet->detected_protocol_stack[0];
-    packet->detected_protocol_stack[0] = matching_protocol_id;
+    packet->detected_protocol_stack[1] = master_protocol_id,
+      packet->detected_protocol_stack[0] = matching_protocol_id;
 
     flow->detected_protocol_stack[0] = packet->detected_protocol_stack[0],
       flow->detected_protocol_stack[1] = packet->detected_protocol_stack[1];
@@ -4358,20 +4360,24 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 
 /* ****************************************************** */
 
-int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+int ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow,
-				  char *string_to_match, u_int string_to_match_len) {
+				  char *string_to_match, u_int string_to_match_len,
+				  u_int16_t master_protocol_id) {
   return(ndpi_automa_match_string_subprotocol(ndpi_struct, &ndpi_struct->host_automa,
-					      flow, string_to_match, string_to_match_len));
+					      flow, string_to_match, string_to_match_len,
+					      master_protocol_id));
 }
 
 /* ****************************************************** */
 
 int ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
-				   char *string_to_match, u_int string_to_match_len) {
+				   char *string_to_match, u_int string_to_match_len,
+				   u_int16_t master_protocol_id) {
   return(ndpi_automa_match_string_subprotocol(ndpi_struct, &ndpi_struct->content_automa,
-					      flow, string_to_match, string_to_match_len));
+					      flow, string_to_match, string_to_match_len,
+					      master_protocol_id));
 }
 
 /* ****************************************************** */
