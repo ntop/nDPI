@@ -25,11 +25,54 @@
 
 #include "ndpi_api.h"
 
+#define FLAPVERSION         0x00000001
+
+/* Flap channels */
+#define SIGNON              0x01
+#define DATA                0x02
+#define ERROR               0x03
+#define SIGNOFF             0x04
+#define KEEP_ALIVE          0x05
+
+/* Signon tags */
+#define SCREEN_NAME         0x0001
+#define PASSWD              0x0002
+#define CLIENT_NAME	    0x0003
+#define BOS                 0x0005	
+#define LOGIN_COOKIE	    0x0006	
+#define MAJOR_VERSION	    0x0017	
+#define MINOR_VERSION	    0x0018	
+#define POINT_VERSION	    0x0019	
+#define BUILD_NUM	    0x001a	
+#define MULTICONN_FLAGS	    0x004a
+#define CLIENT_LANG         0x00OF
+#define CLIENT_CNTRY        0x00OE	
+#define CLIENT_RECONNECT    0x0094
+
+/* Family */
+#define GE_SE_CTL           0x0001
+#define LOC_SRV             0x0002
+#define BUDDY_LIST          0x0003
+#define IM                  0x0004
+#define IS                  0x0006
+#define ACC_ADM             0x0007
+#define POPUP               0x0008
+#define PMS                 0x0009
+#define USS                 0x000b
+#define CHAT_ROOM_SETUP     0x000d
+#define CHAT_ROOM_ACT       0x000e
+#define USER_SRCH	    0x000f
+#define BUDDY_ICON_SERVER   0x0010
+#define SERVER_STORED_INFO  0x0013
+#define ICQ                 0x0015
+#define INIT_AUTH           0x0017
+#define EMAIL               0x0018
+#define IS_EXT              0x0085
 
 #ifdef NDPI_PROTOCOL_OSCAR
 
 static void ndpi_int_oscar_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					  struct ndpi_flow_struct *flow/* , ndpi_protocol_type_t protocol_type */)
+					  struct ndpi_flow_struct *flow)
 {
 
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -46,50 +89,520 @@ static void ndpi_int_oscar_add_connection(struct ndpi_detection_module_struct *n
   }
 }
 
+/**
+   Oscar connection work on FLAP protocol.
+   
+   FLAP is a low-level communications protocol that facilitates the development of higher-level, datagram-oriented, communications layers.
+   It is used on the TCP connection between all clients and servers.
+   Here is format of FLAP datagram
+**/
 static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 					  *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  
+  int excluded = 0;
+  u_int8_t channel;
+  u_int16_t family;
+  u_int16_t type;
+  u_int16_t flag;
+  u_int32_t req_ID;
+
+  struct ndpi_packet_struct * packet = &flow->packet;
 	
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
-  if (packet->payload_packet_len >= 10 && packet->payload[0] == 0x2a) {
+  struct ndpi_id_struct * src = flow->src;
+  struct ndpi_id_struct * dst = flow->dst;
+  
+  /* FLAP__Header
+   *
+   * [ 6 byte FLAP header ]
+   * +-----------+--------------+-------------+--------------+
+   * | 0x2a (1B) | Channel (1B) | SeqNum (2B) | PyldLen (2B) |
+   * +-----------+--------------+-------------+--------------+
+   *
+   * [ 4 byte of data ]
+   *
+   * */
+  if (packet->payload_packet_len >= 6 && packet->payload[0] == 0x2a) 
+    {
+    
+      /* FLAP__FRAME_TYPE (Channel)*/
+      u_int8_t channel = get_u_int8_t(packet->payload, 1);
+      
+      /* 
+	 Initialize the FLAP connection.
+	 
+	 SIGNON -> FLAP__SIGNON_FRAME
+	 +--------------------------------------------------+
+	 + FLAP__Header | 6 byte                            +
+	 + FlapVersion  | 4 byte  (Always 1 = 0x00000001)   +
+	 + TLVs         | [Class: FLAP__SIGNON_TAGS] TLVs   +
+	 +--------------------------------------------------+ 
+      */
+      if (channel == SIGNON &&
+	  get_u_int16_t(packet->payload, 4) == htons(packet->payload_packet_len - 6) &&
+	  get_u_int32_t(packet->payload, 6) == htonl(FLAPVERSION))
+	{
+	  
+	  /* No TLVs */
+	  if(packet->payload_packet_len == 10)
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Sign In \n");
+	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	      return;
+	    }
+	  /* /\* SCREEN_NAME *\/ */
+	  /* if (get_u_int16_t(packet->payload, 10) == htons(SCREEN_NAME)) /\* packet->payload[10] == 0x00 && packet->payload[11] == 0x01 *\/ */
+	  /*   { */
+	  /*     NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Screen Name \n"); */
+	  /*     ndpi_int_oscar_add_connection(ndpi_struct, flow); */
+	  /*     return; */
+	  /*   } */
+	  /* /\* PASSWD *\/ */
+	  /* if (get_u_int16_t(packet->payload, 10) == htons(PASSWD)) /\* packet->payload[10] == 0x00 && packet->payload[11] == 0x02 *\/ */
+	  /*   { */
+	  /*     NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Password (roasted) \n"); */
+	  /*     ndpi_int_oscar_add_connection(ndpi_struct, flow); */
+	  /*     return; */
+	  /*   } */
+	  /* CLIENT_NAME */
+	  if (get_u_int16_t(packet->payload, 10) == htons(CLIENT_NAME)) /* packet->payload[10] == 0x00 && packet->payload[11] == 0x03 */
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Client Name \n");
+	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	      return;
+	    }
+	  /* LOGIN_COOKIE */
+	  if (get_u_int16_t(packet->payload, 10) == htons(LOGIN_COOKIE) &&
+	      get_u_int16_t(packet->payload, 12) == htons(0x0100))
+	    {
+	      if(get_u_int16_t(packet->payload, packet->payload_packet_len - 5) == htons(MULTICONN_FLAGS)) /* MULTICONN_FLAGS */
+		{
+		  if(get_u_int16_t(packet->payload, packet->payload_packet_len - 3) == htons(0x0001))
+		    if(get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == htons(0x00) ||
+		       get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == htons(0x01) ||
+		       get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == htons(0x03))
+		      {
+			NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Login \n");
+			ndpi_int_oscar_add_connection(ndpi_struct, flow);
+			return;
+		      }
+		}
+	    }
+	  /* MAJOR_VERSION */
+	  if (get_u_int16_t(packet->payload, 10) == htons(MAJOR_VERSION))
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Major_Version \n");
+	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	      return;
+	    }
+	  /* MINOR_VERSION */
+	  if (get_u_int16_t(packet->payload, 10) == htons(MINOR_VERSION))
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Minor_Version \n");
+	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	      return;
+	    }
+	  /* POINT_VERSION */
+	  if (get_u_int16_t(packet->payload, 10) == htons(POINT_VERSION))
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Point_Version \n");
+	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	      return;
+	    }
+	  /* BUILD_NUM */
+	  if (get_u_int16_t(packet->payload, 10) == htons(BUILD_NUM))
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Build_Num \n");
+	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	      return;
+	    }
+	  /* CLIENT_RECONNECT */
+	  if (get_u_int16_t(packet->payload, 10) == htons(CLIENT_RECONNECT))
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Client_Reconnect \n");
+	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	      return;
+	    }	
+	}
+      
+      /* 
+	 Messages using the FLAP connection, usually a SNAC message.
 
-    /* if is a oscar connection, 10 bytes long */
+	 DATA -> FLAP__DATA_FRAME	 
+	 +-------------------------+
+	 + FLAP__Header | 6 byte   +
+	 + SNAC__Header | 10 byte  +
+	 + snac         |          +
+	 +-------------------------+
+	 
+	 SNAC__Header
+	 +----------------------------------------------+
+	 + ID           | 4 byte (2 foodgroup + 2 type) +
+	 + FLAGS        | 2 byte                        +
+	 + requestId    | 4 byte                        +
+	 +----------------------------------------------+ 
+      */
+      if (channel == DATA)
+	{
+	  family = get_u_int16_t(packet->payload, 6);
+	  type = get_u_int16_t(packet->payload, 8);
+	  flag = get_u_int16_t(packet->payload, 10);
+	  req_ID = get_u_int32_t(packet->payload, 12);
+	  
+	  /* Family 0x0001 */
+	  if (family == htons(GE_SE_CTL))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      case  (0x000a): break;
+	      case  (0x000b): break;
+	      case  (0x000c): break;
+	      case  (0x000d): break;
+	      case  (0x000e): break;
+	      case  (0x000f): break;
+	      case  (0x0010): break;
+	      case  (0x0011): break;
+	      case  (0x0012): break;
+	      case  (0x0013): break;
+	      case  (0x0014): break;
+	      case  (0x0015): break;
+	      case  (0x0016): break;
+	      case  (0x0017): break;
+	      case  (0x0018): break;
+	      case  (0x001e): break;
+	      case  (0x001f): break;
+	      case  (0x0020): break;
+	      case  (0x0021): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0002 */
+	  if (family == htons(LOC_SRV))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      case  (0x000a): break;
+	      case  (0x000b): break;
+	      case  (0x000c): break;
+	      case  (0x000f): break;
+	      case  (0x0010): break;
+	      case  (0x0015): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0003 */
+	  if (family == htons(BUDDY_LIST))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      case  (0x000a): break;
+	      case  (0x000b): break;
+	      case  (0x000c): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0004 */
+	  if (family == htons(IM))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      case  (0x000a): break;
+	      case  (0x000b): break;
+	      case  (0x000c): break;
+	      case  (0x0014): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0006 */
+	  if (family == htons(IS))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0007 */
+	  if (family == htons(ACC_ADM))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0008 */
+	  if (family == htons(POPUP))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0009 */
+	  if (family == htons(PMS))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      case  (0x000a): break;
+	      case  (0x000b): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x000b */
+	  if (family == htons(USS))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x000d */
+	  if (family == htons(CHAT_ROOM_SETUP))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x000e */
+	  if (family == htons(CHAT_ROOM_ACT))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x000f */
+	  if (family == htons(USER_SRCH))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0010 */
+	  if (family == htons(BUDDY_ICON_SERVER))
+	    {
+	      switch (type) {
+		
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0013 */
+	  if (family == htons(SERVER_STORED_INFO))
+	    {
+	      switch (type) {
+	       
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x0008): break;
+	      case  (0x0009): break;
+	      case  (0x000a): break;
+	      case  (0x000e): break;
+	      case  (0x000f): break;
+	      case  (0x0011): break;
+	      case  (0x0012): break;
+	      case  (0x0014): break;
+	      case  (0x0015): break;
+	      case  (0x0016): break;
+	      case  (0x0018): break;
+	      case  (0x001a): break;
+	      case  (0x001b): break;
+	      case  (0x001c): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0015 */
+	  if (family == htons(ICQ))
+	    {
+	      switch (type) {
+	       
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0017 */
+	  if (family == htons(SERVER_STORED_INFO))
+	    {
+	      switch (type) {
+	       
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      case  (0x0004): break;
+	      case  (0x0005): break;
+	      case  (0x0006): break;
+	      case  (0x0007): break;
+	      case  (0x000a): break;
+	      case  (0x000b): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  /* Family 0x0018 */
+	  if (family == htons(EMAIL))
+	    {
+	      /* TODO */
+	    }
+	  /* Family 0x0085 */
+	  if (family == htons(SERVER_STORED_INFO))
+	    {
+	      switch (type) {
+	       
+	      case  (0x0001): break;
+	      case  (0x0002): break;
+	      case  (0x0003): break;
+	      default: excluded = 1;
+	      }
+	    }
+	  
+	  if(excluded == 1)
+	    {
+	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "exclude oscar.\n");
+	      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OSCAR);
+	    }
 
-    /* OSCAR Connection :: Connection detected at initial packets only
-     * +----+----+------+------+---------------+
-     * |0x2a|Code|SeqNum|PktLen|ProtcolVersion |
-     * +----+----+------+------+---------------+
-     * Code 1 Byte : 0x01 Oscar Connection
-     * SeqNum and PktLen are 2 Bytes each and ProtcolVersion: 0x00000001
-     * */
-    if (get_u_int8_t(packet->payload, 1) == 0x01 && get_u_int16_t(packet->payload, 4) == htons(packet->payload_packet_len - 6)
-	&& get_u_int32_t(packet->payload, 6) == htonl(0x0000000001)) {
-      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Connection FOUND \n");
-      ndpi_int_oscar_add_connection(ndpi_struct, flow);
-      return;
+	  /* flag */
+	  if (flag == htons(0x0000)|| flag == htons(0x8000) || flag == htons(0x0001))
+	    {
+	      /* request ID */
+	      if((req_ID <= 4294967295))
+		{
+		  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected \n");
+		  ndpi_int_oscar_add_connection(ndpi_struct, flow);
+		  return;
+		}
+	    }
+	}
+      /* 
+	 ERROR -> FLAP__ERROR_CHANNEL_0x03
+	 A FLAP error - rare
+      */
+      if (channel == ERROR)
+	{
+	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Error frame \n");
+	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	  return;
+	}
+      /* 
+	 Close down the FLAP connection gracefully.
+	 SIGNOFF: FLAP__SIGNOFF_CHANNEL_0x04
+      */
+      if (channel == SIGNOFF)
+	{
+	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Signoff frame \n");
+	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	  return;
+	}
+      /* 
+	 Send a heartbeat to server to help keep connection open.
+	 KEEP_ALIVE: FLAP__KEEP_ALIVE_CHANNEL_0x05
+      */
+      if (channel == KEEP_ALIVE)
+	{
+	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Keep Alive frame \n");
+	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
+	  return;
+	}
     }
-
-    /* OSCAR IM
-     * +----+----+------+------+----------+-----------+
-     * |0x2a|Code|SeqNum|PktLen|FNACfamily|FNACsubtype|
-     * +----+----+------+------+----------+-----------+
-     * Code 1 Byte : 0x02 SNAC Header Code;
-     * SeqNum and PktLen are 2 Bytes each
-     * FNACfamily   2 Byte : 0x0004 IM Messaging
-     * FNACEsubtype 2 Byte : 0x0006 IM Outgoing Message, 0x000c IM Message Acknowledgment
-     * */
-    if (packet->payload[1] == 0x02
-	&& ntohs(get_u_int16_t(packet->payload, 4)) >=
-	packet->payload_packet_len - 6 && get_u_int16_t(packet->payload, 6) == htons(0x0004)
-	&& (get_u_int16_t(packet->payload, 8) == htons(0x0006)
-	    || get_u_int16_t(packet->payload, 8) == htons(0x000c))) {
-      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR IM Detected \n");
-      ndpi_int_oscar_add_connection(ndpi_struct, flow);
-      return;
-    }
-  }
 
 
   /* detect http connections */
