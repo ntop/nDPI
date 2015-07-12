@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -38,15 +38,15 @@
 #define SCREEN_NAME         0x0001
 #define PASSWD              0x0002
 #define CLIENT_NAME	    0x0003
-#define BOS                 0x0005	
-#define LOGIN_COOKIE	    0x0006	
-#define MAJOR_VERSION	    0x0017	
-#define MINOR_VERSION	    0x0018	
-#define POINT_VERSION	    0x0019	
-#define BUILD_NUM	    0x001a	
+#define BOS                 0x0005
+#define LOGIN_COOKIE	    0x0006
+#define MAJOR_VERSION	    0x0017
+#define MINOR_VERSION	    0x0018
+#define POINT_VERSION	    0x0019
+#define BUILD_NUM	    0x001a
 #define MULTICONN_FLAGS	    0x004a
 #define CLIENT_LANG         0x00OF
-#define CLIENT_CNTRY        0x00OE	
+#define CLIENT_CNTRY        0x00OE
 #define CLIENT_RECONNECT    0x0094
 
 /* Family */
@@ -91,7 +91,7 @@ static void ndpi_int_oscar_add_connection(struct ndpi_detection_module_struct *n
 
 /**
    Oscar connection work on FLAP protocol.
-   
+
    FLAP is a low-level communications protocol that facilitates the development of higher-level, datagram-oriented, communications layers.
    It is used on the TCP connection between all clients and servers.
    Here is format of FLAP datagram
@@ -99,7 +99,7 @@ static void ndpi_int_oscar_add_connection(struct ndpi_detection_module_struct *n
 static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 					  *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  
+
   int excluded = 0;
   u_int8_t channel;
   u_int16_t family;
@@ -108,10 +108,10 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
   u_int32_t req_ID;
 
   struct ndpi_packet_struct * packet = &flow->packet;
-	
+
   struct ndpi_id_struct * src = flow->src;
   struct ndpi_id_struct * dst = flow->dst;
-  
+
   /* FLAP__Header
    *
    * [ 6 byte FLAP header ]
@@ -122,27 +122,27 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
    * [ 4 byte of data ]
    *
    * */
-  if (packet->payload_packet_len >= 6 && packet->payload[0] == 0x2a) 
+  if (packet->payload_packet_len >= 6 && packet->payload[0] == 0x2a)
     {
-    
+
       /* FLAP__FRAME_TYPE (Channel)*/
       u_int8_t channel = get_u_int8_t(packet->payload, 1);
-      
-      /* 
+
+      /*
 	 Initialize the FLAP connection.
-	 
+
 	 SIGNON -> FLAP__SIGNON_FRAME
 	 +--------------------------------------------------+
 	 + FLAP__Header | 6 byte                            +
 	 + FlapVersion  | 4 byte  (Always 1 = 0x00000001)   +
 	 + TLVs         | [Class: FLAP__SIGNON_TAGS] TLVs   +
-	 +--------------------------------------------------+ 
+	 +--------------------------------------------------+
       */
       if (channel == SIGNON &&
 	  get_u_int16_t(packet->payload, 4) == htons(packet->payload_packet_len - 6) &&
 	  get_u_int32_t(packet->payload, 6) == htonl(FLAPVERSION))
 	{
-	  
+
 	  /* No TLVs */
 	  if(packet->payload_packet_len == 10)
 	    {
@@ -178,9 +178,9 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      if(get_u_int16_t(packet->payload, packet->payload_packet_len - 5) == htons(MULTICONN_FLAGS)) /* MULTICONN_FLAGS */
 		{
 		  if(get_u_int16_t(packet->payload, packet->payload_packet_len - 3) == htons(0x0001))
-		    if(get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == htons(0x00) ||
-		       get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == htons(0x01) ||
-		       get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == htons(0x03))
+		    if((get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == 0x00) ||
+		       (get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == 0x01) ||
+		       (get_u_int8_t(packet->payload, packet->payload_packet_len - 1) == 0x03))
 		      {
 			NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Login \n");
 			ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -222,25 +222,25 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR - Client_Reconnect \n");
 	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	      return;
-	    }	
+	    }
 	}
-      
-      /* 
+
+      /*
 	 Messages using the FLAP connection, usually a SNAC message.
 
-	 DATA -> FLAP__DATA_FRAME	 
+	 DATA -> FLAP__DATA_FRAME
 	 +-------------------------+
 	 + FLAP__Header | 6 byte   +
 	 + SNAC__Header | 10 byte  +
 	 + snac         |          +
 	 +-------------------------+
-	 
+
 	 SNAC__Header
 	 +----------------------------------------------+
 	 + ID           | 4 byte (2 foodgroup + 2 type) +
 	 + FLAGS        | 2 byte                        +
 	 + requestId    | 4 byte                        +
-	 +----------------------------------------------+ 
+	 +----------------------------------------------+
       */
       if (channel == DATA)
 	{
@@ -248,12 +248,12 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  type = get_u_int16_t(packet->payload, 8);
 	  flag = get_u_int16_t(packet->payload, 10);
 	  req_ID = get_u_int32_t(packet->payload, 12);
-	  
+
 	  /* Family 0x0001 */
 	  if (family == htons(GE_SE_CTL))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -289,7 +289,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(LOC_SRV))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -312,7 +312,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(BUDDY_LIST))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -332,7 +332,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(IM))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -353,7 +353,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(IS))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -364,7 +364,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(ACC_ADM))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -381,7 +381,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(POPUP))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      default: excluded = 1;
@@ -391,7 +391,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(PMS))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -410,7 +410,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(USS))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -422,7 +422,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(CHAT_ROOM_SETUP))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -439,7 +439,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(CHAT_ROOM_ACT))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -456,7 +456,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(USER_SRCH))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -469,7 +469,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(BUDDY_ICON_SERVER))
 	    {
 	      switch (type) {
-		
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -484,7 +484,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(SERVER_STORED_INFO))
 	    {
 	      switch (type) {
-	       
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -513,7 +513,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(ICQ))
 	    {
 	      switch (type) {
-	       
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -524,7 +524,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(SERVER_STORED_INFO))
 	    {
 	      switch (type) {
-	       
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
@@ -546,14 +546,14 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (family == htons(SERVER_STORED_INFO))
 	    {
 	      switch (type) {
-	       
+
 	      case  (0x0001): break;
 	      case  (0x0002): break;
 	      case  (0x0003): break;
 	      default: excluded = 1;
 	      }
 	    }
-	  
+
 	  if(excluded == 1)
 	    {
 	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "exclude oscar.\n");
@@ -572,7 +572,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 		}
 	    }
 	}
-      /* 
+      /*
 	 ERROR -> FLAP__ERROR_CHANNEL_0x03
 	 A FLAP error - rare
       */
@@ -582,7 +582,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	  return;
 	}
-      /* 
+      /*
 	 Close down the FLAP connection gracefully.
 	 SIGNOFF: FLAP__SIGNOFF_CHANNEL_0x04
       */
@@ -592,7 +592,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	  return;
 	}
-      /* 
+      /*
 	 Send a heartbeat to server to help keep connection open.
 	 KEEP_ALIVE: FLAP__KEEP_ALIVE_CHANNEL_0x05
       */
@@ -787,7 +787,6 @@ void ndpi_search_oscar(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
 void init_oscar_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-
   ndpi_set_bitmask_protocol_detection("Oscar", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_OSCAR,
 				      ndpi_search_oscar,

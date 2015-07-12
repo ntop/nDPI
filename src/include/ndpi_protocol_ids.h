@@ -257,11 +257,11 @@
 #define NDPI_SERVICE_TIMRECARGA                         208
 #define NDPI_SERVICE_TIMBETA                            209
 #define NDPI_SERVICE_DEEZER                             210
-#define NDPI_SERVICE_INSTAGRAM                          211 /* Andrea Buscarinu <andrea.buscarinu@gmail.com>
+#define NDPI_SERVICE_INSTAGRAM                          211 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_INSTAGRAM
 
-#define NDPI_MAX_SUPPORTED_PROTOCOLS (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
+#define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)
 #endif
