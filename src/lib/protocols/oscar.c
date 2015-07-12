@@ -553,8 +553,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      default: excluded = 1;
 	      }
 	    }
-
-	  /* mettere un flag per family e type che se non settat -> excluded oscar */
+	  
 	  if(excluded == 1)
 	    {
 	      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "exclude oscar.\n");
@@ -589,7 +588,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
       */
       if (channel == SIGNOFF)
 	{
-	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Error frame \n");
+	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Signoff frame \n");
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	  return;
 	}
@@ -599,7 +598,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
       */
       if (channel == KEEP_ALIVE)
 	{
-	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Error frame \n");
+	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Keep Alive frame \n");
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	  return;
 	}
