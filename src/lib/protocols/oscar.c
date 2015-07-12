@@ -521,7 +521,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0017 */
-	  if (family == htons(SERVER_STORED_INFO))
+	  if (family == htons(INIT_AUTH))
 	    {
 	      switch (type) {
 
