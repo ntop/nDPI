@@ -71,7 +71,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xC72FD800 /* 199.47.216.0 */, 22, NDPI_PROTOCOL_DROPBOX },
   { 0x6CA0A000 /* 108.160.160.0 */, 20, NDPI_PROTOCOL_DROPBOX },
 
-  /* 
+  /*
      Skype (Microsoft CDN)
      157.56.0.0/14, 157.60.0.0/16, 157.54.0.0/15
      111.221.64.0 - 111.221.127.255
@@ -108,7 +108,7 @@ static ndpi_network host_protocol_list[] = {
     origin:         AS62014
     mnt-by:         MNT-TELEGRAM
     source:         RIPE # Filtered
-    
+
     http://myip.ms/view/web_hosting/363906/Telegram_Messenger_Network.html
   */
   { 0x959AA400 /* 149.154.164.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM},
@@ -7215,7 +7215,7 @@ static ndpi_network host_protocol_list[] = {
 { 0xDF85F4CA, 32, NDPI_PROTOCOL_TOR },
 { 0xDFE57B41, 32, NDPI_PROTOCOL_TOR },
 
-/* 
+/*
   Twitch ingestion servers :
     https://api.twitch.tv/kraken/ingests
   Edoardo Dominici edoaramis@gmail.com
@@ -7282,7 +7282,7 @@ static ndpi_network host_protocol_list[] = {
 { 0xC709F98C, 32, NDPI_SERVICE_TWITCH },
 { 0xC709F9C5, 32, NDPI_SERVICE_TWITCH },
 
-/* Simet - 200.160.4.0/24 */ 
+/* Simet - 200.160.4.0/24 */
 { 0xC8A00400, 24, NDPI_SERVICE_SIMET },
 
 { 0x0, 0, 0 }
@@ -7379,6 +7379,11 @@ ndpi_protocol_match host_match[] = {
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice-hrd.appspot.com",     "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice.com",                 "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
+
+  /* Detected "instagram.c10r.facebook.com". Omitted "*amazonaws.com" and "*facebook.com" CDNs e.g. "ig-telegraph-shv-04-frc3.facebook.com" */
+  { ".cdninstagram.com",                "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
+  { "instagram.",                       "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
+  { ".instagram.",                      "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
 
   { ".waze.com",                        "Waze",                 NDPI_SERVICE_WAZE, NDPI_PROTOCOL_ACCEPTABLE },
   { "simet-",                           "Simet",                NDPI_SERVICE_SIMET, NDPI_PROTOCOL_ACCEPTABLE },
