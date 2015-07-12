@@ -565,8 +565,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	  if (flag == htons(0x0000)|| flag == htons(0x8000) || flag == htons(0x0001))
 	    {
 	      /* request ID */
-	      if((req_ID >= 0 && req_ID <= 2147483647) || 
-		 (req_ID >= 2147483648 && req_ID <= 4294967295))
+	      if((req_ID <= 4294967295))
 		{
 		  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected \n");
 		  ndpi_int_oscar_add_connection(ndpi_struct, flow);
