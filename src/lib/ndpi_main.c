@@ -3340,6 +3340,11 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     flow->guessed_protocol_id = (int16_t)ndpi_guess_protocol_id(ndpi_struct, protocol, sport, dport);
     flow->protocol_id_already_guessed = 1;
+
+    if((protocol != IPPROTO_TCP) && (protocol != IPPROTO_UDP)) {
+      flow->detected_protocol_stack[0] = flow->guessed_protocol_id;
+      goto ret_protocols;
+    }
   }
 
 #if 0
