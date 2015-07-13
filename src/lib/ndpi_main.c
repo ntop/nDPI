@@ -1436,11 +1436,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Radius",
 			    ndpi_build_default_ports(ports_a, 1812, 1813, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 1812, 1813, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WINDOWS_UPDATE,
-			    no_master,
-			    no_master, "WindowsUpdate",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMVIEWER,
     			    no_master,
     			    no_master, "TeamViewer",

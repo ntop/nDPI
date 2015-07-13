@@ -516,9 +516,6 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
 static void http_bitmask_exclude(struct ndpi_flow_struct *flow)
 {
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP);
-#ifdef NDPI_PROTOCOL_WINDOWS_UPDATE
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_WINDOWS_UPDATE);
-#endif
 #ifdef NDPI_CONTENT_MPEG
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_MPEG);
 #endif
@@ -1078,15 +1075,6 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 #ifdef NDPI_PROTOCOL_XBOX
   ndpi_set_bitmask_protocol_detection("Xbox", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_XBOX,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-  *id += 1;
-#endif
-#ifdef NDPI_PROTOCOL_WINDOWS_UPDATE
-  ndpi_set_bitmask_protocol_detection("WindowsUpdate", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_WINDOWS_UPDATE,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,

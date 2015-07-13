@@ -418,6 +418,9 @@ static char* ipProto2Name(u_short proto_id) {
   case IPPROTO_ICMP:
     return("ICMP");
     break;
+  case IPPROTO_ICMPV6:
+    return("ICMPV6");
+    break;
   case 112:
     return("VRRP");
     break;
