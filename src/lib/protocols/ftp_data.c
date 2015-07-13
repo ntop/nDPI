@@ -56,7 +56,6 @@ static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *nd
   }
 
   return 0;
-
 }
 
 static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
@@ -216,37 +215,17 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
 
 static void ndpi_check_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
 
-  /* Check if we so far detected the protocol in the request or not. */
-  if(flow->ftp_data_stage == 0) {
-    NDPI_LOG(NDPI_PROTOCOL_FTP_DATA, ndpi_struct, NDPI_LOG_DEBUG, "FTP_DATA stage 0: \n");
-
-    if((payload_len > 0) && (ndpi_match_file_header(ndpi_struct, flow) || ndpi_match_ftp_data_directory(ndpi_struct, flow) || ndpi_match_ftp_data_port(ndpi_struct, flow))) {
-      NDPI_LOG(NDPI_PROTOCOL_FTP_DATA, ndpi_struct, NDPI_LOG_DEBUG, "Possible FTP_DATA request detected, we will look further for the response...\n");
-
-      /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
-      flow->ftp_data_stage = packet->packet_direction + 1;
-    }
-
-  } else {
-    NDPI_LOG(NDPI_PROTOCOL_FTP_DATA, ndpi_struct, NDPI_LOG_DEBUG, "FTP_DATA stage %u: \n", flow->ftp_data_stage);
-
-    /* At first check, if this is for sure a response packet (in another direction. If not, do nothing now and return. */
-    if((flow->ftp_data_stage - packet->packet_direction) == 1) {
-      return;
-    }
-
-    /* This is a packet in another direction. Check if we find the proper response. */
-    if(payload_len == 0) {
-      NDPI_LOG(NDPI_PROTOCOL_FTP_DATA, ndpi_struct, NDPI_LOG_DEBUG, "Found FTP_DATA.\n");
-      ndpi_int_ftp_data_add_connection(ndpi_struct, flow);
-    } else {
-      NDPI_LOG(NDPI_PROTOCOL_FTP_DATA, ndpi_struct, NDPI_LOG_DEBUG, "The reply did not seem to belong to FTP_DATA, resetting the stage to 0...\n");
-      flow->ftp_data_stage = 0;
-    }
-
-  }
+  if((packet->payload_packet_len > 0)
+     && (ndpi_match_file_header(ndpi_struct, flow)
+	 || ndpi_match_ftp_data_directory(ndpi_struct, flow) 
+	 || ndpi_match_ftp_data_port(ndpi_struct, flow)
+	 )
+     ) {
+    NDPI_LOG(NDPI_PROTOCOL_FTP_DATA, ndpi_struct, NDPI_LOG_DEBUG, "Possible FTP_DATA request detected...\n");
+    ndpi_int_ftp_data_add_connection(ndpi_struct, flow);
+  } else
+    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_FTP_DATA);  
 }
 
 void ndpi_search_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
@@ -256,15 +235,6 @@ void ndpi_search_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, stru
   if(flow->packet_counter > 20) {
     NDPI_LOG(NDPI_PROTOCOL_FTP_DATA, ndpi_struct, NDPI_LOG_DEBUG, "Exclude FTP_DATA.\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_FTP_DATA);
-    return;
-  }
-
-  /* skip marked or retransmitted packets */
-  if(packet->tcp_retransmission != 0) {
-    return;
-  }
-
-  if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_FTP_DATA) {
     return;
   }
 
@@ -278,7 +248,7 @@ void init_ftp_data_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
   ndpi_set_bitmask_protocol_detection("FTP_DATA", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_FTP_DATA,
 				      ndpi_search_ftp_data,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

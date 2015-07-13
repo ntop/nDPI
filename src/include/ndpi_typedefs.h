@@ -792,9 +792,6 @@ typedef struct ndpi_flow_struct {
 #ifdef NDPI_PROTOCOL_FTP_CONTROL
   u_int32_t ftp_control_stage:2;
 #endif
-#ifdef NDPI_PROTOCOL_FTP_DATA
-  u_int32_t ftp_data_stage:2;
-#endif
 #ifdef NDPI_PROTOCOL_RTMP
   u_int32_t rtmp_stage:2;
 #endif
