@@ -2000,6 +2000,21 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
   } else
     at[0] = 0, proto = &at[1];
 
+  for(i=0; proto[i] != '\0'; i++) {
+    switch(proto[i]) {
+    case '/':
+    case '&':
+    case '^':
+    case ':':
+    case ';':
+    case '\'':
+    case '"':
+    case ' ':
+      proto[i] = '_';
+      break;
+    }
+  }
+
   for(i=0, def = NULL; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
     if(strcasecmp(ndpi_mod->proto_defaults[i].protoName, proto) == 0) {
       def = &ndpi_mod->proto_defaults[i];
