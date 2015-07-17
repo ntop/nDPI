@@ -199,7 +199,7 @@
 #define NDPI_PROTOCOL_TELEGRAM				        185 /* Gianluca Costa <g.costa@xplico.org> */
 #define NDPI_PROTOCOL_QUIC				        188 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
 #define NDPI_PROTOCOL_WHATSAPP_VOICE			        189
-#define NDPI_PROTOCOL_STARCRAFT2			        213   /* matteobracci1@gmail.com */
+#define NDPI_PROTOCOL_STARCRAFT2			        213 /* matteobracci1@gmail.com */
 
 
 #define NDPI_CONTENT_AVI				39
