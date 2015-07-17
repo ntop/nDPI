@@ -61,6 +61,7 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
   NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "Search World of Warcraft.\n");
 
   if (packet->tcp != NULL) {
+  	/*
     if ((packet->payload_packet_len > NDPI_STATICSTRING_LEN("POST /") &&
 	 memcmp(packet->payload, "POST /", NDPI_STATICSTRING_LEN("POST /")) == 0) ||
 	(packet->payload_packet_len > NDPI_STATICSTRING_LEN("GET /") &&
@@ -76,6 +77,7 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
 	return;
       }
     }
+    */
     if (packet->payload_packet_len > NDPI_STATICSTRING_LEN("GET /")
 	&& memcmp(packet->payload, "GET /", NDPI_STATICSTRING_LEN("GET /")) == 0) {
       ndpi_parse_packet_line_info(ndpi_struct, flow);
