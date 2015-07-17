@@ -1607,6 +1607,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "VHUA",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 58267, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_STARCRAFT2,
+			    no_master, 
+			    no_master, "Starcraft 2",
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	/* TCP */
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));	/* UDP */
     
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
