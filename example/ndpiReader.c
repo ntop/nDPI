@@ -575,6 +575,7 @@ static void free_ndpi_flow(struct ndpi_flow *flow) {
   if(flow->ndpi_flow) { ndpi_free_flow(flow->ndpi_flow); flow->ndpi_flow = NULL; }
   if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL;       }
   if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL;       }
+
 }
 
 /* ***************************************************** */
@@ -845,18 +846,21 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
 
       if((newflow->ndpi_flow = malloc_wrapper(size_flow_struct)) == NULL) {
 	printf("[NDPI] %s(2): not enough memory\n", __FUNCTION__);
+	free(newflow);
 	return(NULL);
       } else
 	memset(newflow->ndpi_flow, 0, size_flow_struct);
 
       if((newflow->src_id = malloc_wrapper(size_id_struct)) == NULL) {
 	printf("[NDPI] %s(3): not enough memory\n", __FUNCTION__);
+	free(newflow);
 	return(NULL);
       } else
 	memset(newflow->src_id, 0, size_id_struct);
 
       if((newflow->dst_id = malloc_wrapper(size_id_struct)) == NULL) {
 	printf("[NDPI] %s(4): not enough memory\n", __FUNCTION__);
+	free(newflow);
 	return(NULL);
       } else
 	memset(newflow->dst_id, 0, size_id_struct);
@@ -868,7 +872,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
 
       // printFlow(thread_id, newflow);
 
-      return(newflow);
+      return newflow ;
     }
   } else {
     struct ndpi_flow *flow = *(struct ndpi_flow**)ret;

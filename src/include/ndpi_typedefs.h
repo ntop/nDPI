@@ -44,7 +44,7 @@ typedef enum {
 } ndpi_VISIT;
 
 typedef struct node_t {
-  char	  *key;
+  char *key;
   struct node_t *left, *right;
 } ndpi_node;
 
@@ -88,7 +88,7 @@ struct ndpi_ipv6hdr {
   struct ndpi_ip6_addr saddr;
   struct ndpi_ip6_addr daddr;
 };
-#endif							/* NDPI_DETECTION_SUPPORT_IPV6 */
+#endif
 
 typedef union {
   u_int32_t ipv4;
@@ -126,19 +126,19 @@ struct hash_ip4p {
 
 struct hash_ip4p_table {
   size_t                  size;
-  int			ipv6;
+  int			  ipv6;
   spinlock_t              lock;
   atomic_t                count;
   struct hash_ip4p        tbl;
 };
 
-struct bt_announce { // 192 bytes
+struct bt_announce {              // 192 bytes
   u_int32_t		hash[5];
   u_int32_t		ip[4];
   u_int32_t		time;
   u_int16_t		port;
   u_int8_t		name_len,
-    name[192 - 4*10 - 2 - 1]; // 149 bytes
+    name[192 - 4*10 - 2 - 1];     // 149 bytes
 };
 #endif
 
@@ -288,7 +288,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t irc_0x1000_full:1;
 #endif
 #ifdef NDPI_PROTOCOL_WINMX
-  u_int32_t winmx_stage:1;			// 0-1
+  u_int32_t winmx_stage:1;		      // 0 - 1
 #endif
 #ifdef NDPI_PROTOCOL_SOULSEEK
   u_int32_t soulseek_stage:2;
@@ -310,9 +310,9 @@ struct ndpi_flow_tcp_struct {
   u_int32_t http_stage:2;
   u_int32_t http_empty_line_seen:1;
   u_int32_t http_wait_for_retransmission:1;
-#endif							// NDPI_PROTOCOL_HTTP
+#endif					       
 #ifdef NDPI_PROTOCOL_GNUTELLA
-  u_int32_t gnutella_stage:2;		//0-2
+  u_int32_t gnutella_stage:2;		       // 0 - 2
 #endif
 #ifdef NDPI_CONTENT_MMS
   u_int32_t mms_stage:2;
@@ -411,10 +411,10 @@ struct ndpi_flow_udp_struct {
   u_int32_t snmp_stage:2;
 #endif
 #ifdef NDPI_PROTOCOL_PPSTREAM
-  u_int32_t ppstream_stage:3;		// 0-7
+  u_int32_t ppstream_stage:3;		  // 0 - 7
 #endif
 #ifdef NDPI_PROTOCOL_HALFLIFE2
-  u_int32_t halflife2_stage:2;		// 0 - 2
+  u_int32_t halflife2_stage:2;		  // 0 - 2
 #endif
 #ifdef NDPI_PROTOCOL_TFTP
   u_int32_t tftp_stage:1;
@@ -467,9 +467,6 @@ typedef struct ndpi_packet_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
   u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
 
-  /* this is for simple read-only access to the real protocol
-   * used for the main loop */
-  /* u_int16_t real_protocol_read_only; */
 
 #if !defined(WIN32)
     __attribute__ ((__packed__))
@@ -532,12 +529,12 @@ typedef struct {
 } ndpi_port_range;
 
 typedef enum {
-  NDPI_PROTOCOL_SAFE = 0, /* Safe protocol with encryption */
-  NDPI_PROTOCOL_ACCEPTABLE, /* Ok but not encrypted */
-  NDPI_PROTOCOL_FUN, /* Pure fun protocol */
-  NDPI_PROTOCOL_UNSAFE, /* Protocol with a safe version existing  what should be used instead */
+  NDPI_PROTOCOL_SAFE = 0,              /* Safe protocol with encryption */
+  NDPI_PROTOCOL_ACCEPTABLE,            /* Ok but not encrypted */
+  NDPI_PROTOCOL_FUN,                   /* Pure fun protocol */
+  NDPI_PROTOCOL_UNSAFE,                /* Protocol with a safe version existing  what should be used instead */
   NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Be prepared to troubles */
-  NDPI_PROTOCOL_UNRATED /* No idea */
+  NDPI_PROTOCOL_UNRATED                /* No idea */
 } ndpi_protocol_breed_t;
 
 #define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)
@@ -577,6 +574,7 @@ typedef struct ndpi_detection_module_struct {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
 #endif
+  
   /* callback function buffer */
   struct ndpi_call_function_struct callback_buffer[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size;
@@ -602,6 +600,7 @@ typedef struct ndpi_detection_module_struct {
   const char *ndpi_debug_print_function;
   u_int32_t ndpi_debug_print_line;
 #endif
+
   /* misc parameters */
   u_int32_t tcp_max_retransmission_window_size;
 
@@ -614,9 +613,9 @@ typedef struct ndpi_detection_module_struct {
   u_int ndpi_num_custom_protocols;
 
   /* HTTP/DNS/HTTPS host matching */
-  ndpi_automa host_automa, /* Used for DNS/HTTPS */
-    content_automa,  /* Used for HTTP subprotocol_detection */
-    subprotocol_automa, /* Used for HTTP subprotocol_detection */
+  ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
+    content_automa,                            /* Used for HTTP subprotocol_detection */
+    subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa; /* TOR */
   /* IP-based protocol detection */
   void *protocols_ptree;
@@ -635,9 +634,9 @@ typedef struct ndpi_detection_module_struct {
   u_int32_t rtsp_connection_timeout;
   /* tvants parameters */
   u_int32_t tvants_connection_timeout;
+  /* rstp */
   u_int32_t orb_rstp_ts_timeout;
   /* yahoo */
-  //      u_int32_t yahoo_http_filetransfer_timeout;
   u_int8_t yahoo_detect_http_connections;
   u_int32_t yahoo_lan_video_timeout;
   u_int32_t zattoo_connection_timeout;
@@ -648,7 +647,6 @@ typedef struct ndpi_detection_module_struct {
   char ip_string[NDPI_IP_STRING_SIZE];
 #endif
   u_int8_t ip_version_limit;
-  /* ********************* */
 #ifdef NDPI_PROTOCOL_BITTORRENT
   struct hash_ip4p_table *bt_ht;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
@@ -737,16 +735,14 @@ typedef struct ndpi_flow_struct {
 #ifdef NDPI_PROTOCOL_REDIS
   u_int8_t redis_s2d_first_char, redis_d2s_first_char;
 #endif
-
-  u_int16_t packet_counter;			// can be 0-65000
+  u_int16_t packet_counter;		      // can be 0 - 65000
   u_int16_t packet_direction_counter[2];
   u_int16_t byte_counter[2];
-
 #ifdef NDPI_PROTOCOL_BITTORRENT
-  u_int8_t bittorrent_stage;		// can be 0-255
+  u_int8_t bittorrent_stage;		      // can be 0 - 255
 #endif
 #ifdef NDPI_PROTOCOL_DIRECTCONNECT
-  u_int32_t directconnect_stage:2;	// 0-1
+  u_int32_t directconnect_stage:2;	      // 0 - 1
 #endif
 #ifdef NDPI_PROTOCOL_SIP
 #ifdef NDPI_PROTOCOL_YAHOO
@@ -755,12 +751,11 @@ typedef struct ndpi_flow_struct {
 #endif
 #ifdef NDPI_PROTOCOL_HTTP
   u_int32_t http_detected:1;
-#endif							// NDPI_PROTOCOL_HTTP
+#endif				       
 #ifdef NDPI_PROTOCOL_RTSP
   u_int32_t rtsprdt_stage:2;
   u_int32_t rtsp_control_flow:1;
 #endif
-
 #ifdef NDPI_PROTOCOL_YAHOO
   u_int32_t yahoo_detection_finished:2;
 #endif
@@ -771,7 +766,7 @@ typedef struct ndpi_flow_struct {
   u_int32_t qq_stage:3;
 #endif
 #ifdef NDPI_PROTOCOL_THUNDER
-  u_int32_t thunder_stage:2;		// 0-3
+  u_int32_t thunder_stage:2;		        // 0 - 3
 #endif
 #ifdef NDPI_PROTOCOL_OSCAR
   u_int32_t oscar_ssl_voice_stage:3;
@@ -781,13 +776,13 @@ typedef struct ndpi_flow_struct {
   u_int32_t florensia_stage:1;
 #endif
 #ifdef NDPI_PROTOCOL_SOCKS5
-  u_int32_t socks5_stage:2;	// 0-3
+  u_int32_t socks5_stage:2;	                // 0 - 3
 #endif
 #ifdef NDPI_PROTOCOL_SOCKS4
-  u_int32_t socks4_stage:2;	// 0-3
+  u_int32_t socks4_stage:2;	                // 0 - 3
 #endif
 #ifdef NDPI_PROTOCOL_EDONKEY
-  u_int32_t edonkey_stage:2;	// 0-3
+  u_int32_t edonkey_stage:2;	                // 0 - 3
 #endif
 #ifdef NDPI_PROTOCOL_FTP_CONTROL
   u_int32_t ftp_control_stage:2;
@@ -805,9 +800,9 @@ typedef struct ndpi_flow_struct {
   u_int32_t steam_stage3:2;			// 0 - 2
 #endif
 #ifdef NDPI_PROTOCOL_PPLIVE
-  u_int32_t pplive_stage1:3;			// 0-6
-  u_int32_t pplive_stage2:2;			// 0-2
-  u_int32_t pplive_stage3:2;			// 0-2
+  u_int32_t pplive_stage1:3;			// 0 - 6
+  u_int32_t pplive_stage2:2;			// 0 - 2
+  u_int32_t pplive_stage3:2;			// 0 - 2
 #endif
 
   /* internal structures to save functions calls */
@@ -816,10 +811,5 @@ typedef struct ndpi_flow_struct {
   struct ndpi_id_struct *src;
   struct ndpi_id_struct *dst;
 } ndpi_flow_struct_t;
-
-/* typedef enum { */
-/*   NDPI_REAL_PROTOCOL = 0, */
-/*   NDPI_CORRELATED_PROTOCOL = 1 */
-/* } ndpi_protocol_type_t; */
 
 #endif/* __NDPI_TYPEDEFS_FILE__ */
