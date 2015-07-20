@@ -26,7 +26,6 @@
 #include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_STARCRAFT2
 
-int k = 0;
 /* Sender or receiver are one of the known login portals? */
 u_int8_t sc2_match_logon_ip(struct ndpi_packet_struct* packet)
 {
@@ -80,8 +79,6 @@ u_int8_t ndpi_check_starcraft2_udp(struct ndpi_detection_module_struct* ndpi_str
 	case 0:
 		if (packet->payload_packet_len == 20)
 			flow->starcraft2_udp_stage = 1;
-		else
-			flow->starcraft2_udp_stage = 0;
 		break;
 	case 1:
 		if (packet->payload_packet_len == 20)
@@ -112,8 +109,6 @@ u_int8_t ndpi_check_starcraft2_udp(struct ndpi_detection_module_struct* ndpi_str
 			return 1;
 		break;
 	}
-
-	return -1;
 }
 
 void ndpi_search_starcraft2(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow)
@@ -126,14 +121,14 @@ void ndpi_search_starcraft2(struct ndpi_detection_module_struct* ndpi_struct, st
 		if (packet->udp != NULL) {
 			result = ndpi_check_starcraft2_udp(ndpi_struct, flow);
 			if (result == 1) {
-				printf("%d Found Starcraft 2 [Game, UDP]\n", k++);
+				//printf("Found Starcraft 2 [Game, UDP]\n");
 				NDPI_LOG(NDPI_PROTOCOL_STARCRAFT2, ndpi_struct, NDPI_LOG_DEBUG, "Found Starcraft 2 [Game, UDP]\n");
 			}
 		}
 		else if (packet->tcp != NULL) {
 			result = ndpi_check_starcraft2_tcp(ndpi_struct, flow);
 			if (result == 1) {
-				printf("%d Found Starcraft 2 [Client, TCP]\n", k++);
+				//printf("Found Starcraft 2 [Client, TCP]\n");
 				NDPI_LOG(NDPI_PROTOCOL_STARCRAFT2, ndpi_struct, NDPI_LOG_DEBUG, "Found Starcraft 2 [Client, TCP]\n");
 			}
 		}
