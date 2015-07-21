@@ -121,6 +121,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/ssdp.c \
 		     protocols/ssh.c \
 		     protocols/ssl.c \
+		     protocols/starcraft.c \
 		     protocols/stealthnet.c \
 		     protocols/steam.c \
 		     protocols/stun.c \

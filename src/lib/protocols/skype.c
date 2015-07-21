@@ -68,13 +68,17 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
     flow->l4.udp.skype_packet_id++;
 
     if(flow->l4.udp.skype_packet_id < 5) {
+      u_int16_t dport = ntohs(packet->udp->dest);
+
       /* skype-to-skype */
-      if(((payload_len == 3) && ((packet->payload[2] & 0x0F)== 0x0d))
-	 || ((payload_len >= 16)
-	     && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
-	     && (packet->payload[2] == 0x02))) {
-	NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found skype.\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
+      if(dport != 1119) /* It can be confused with battle.net */ {
+	if(((payload_len == 3) && ((packet->payload[2] & 0x0F)== 0x0d))
+	   || ((payload_len >= 16)
+	       && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
+	       && (packet->payload[2] == 0x02))) {
+	  NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found skype.\n");
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
+	}
       }
 
       return;

@@ -1607,11 +1607,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "VHUA",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 58267, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_STARCRAFT2,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_STARCRAFT,
 			    no_master, 
-			    no_master, "Starcraft 2",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	/* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));	/* UDP */
+			    no_master, "Starcraft",
+			    ndpi_build_default_ports(ports_a, 1119, 0, 0, 0, 0),	/* TCP */
+			    ndpi_build_default_ports(ports_b, 1119, 0, 0, 0, 0));	/* UDP */
     
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
@@ -2216,6 +2216,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* SKYPE */
   init_skype_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* Stracraft */
+  init_starcraft_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* SSL */
   init_ssl_dissector(ndpi_struct, &a, detection_bitmask);
@@ -3392,9 +3395,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   }
 
  ret_protocols:
-  if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
+  if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
     ret.master_protocol = flow->detected_protocol_stack[1], ret.protocol = flow->detected_protocol_stack[0];
-  else
+    
+    if(ret.protocol == ret.master_protocol)
+      ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+  } else
     ret.protocol = flow->detected_protocol_stack[0];
 
   return(ret);
@@ -4178,6 +4184,10 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.protocol = rc,
 	ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport, dport);
+
+      if(ret.protocol == ret.master_protocol)
+	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+      
       return(ret);
     }
 
