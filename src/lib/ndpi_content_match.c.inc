@@ -7401,7 +7401,8 @@ ndpi_protocol_match host_match[] = {
   { ".microsoft.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
   { "update.microsoft.com",             "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".windowsupdate.com",               "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
-
+  { ".battle.net",                      "Battle.net",           NDPI_SERVICE_BATTLENET, NDPI_PROTOCOL_FUN },
+	{ "bnetcmsus-a.akamaihd.net",         "Battle.net",           NDPI_SERVICE_BATTLENET, NDPI_PROTOCOL_FUN },
   { NULL, 0 }
 };
 

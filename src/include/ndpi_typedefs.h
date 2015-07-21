@@ -804,6 +804,9 @@ typedef struct ndpi_flow_struct {
   u_int32_t pplive_stage2:2;			// 0 - 2
   u_int32_t pplive_stage3:2;			// 0 - 2
 #endif
+#ifdef NDPI_PROTOCOL_STARCRAFT2
+  u_int32_t starcraft2_udp_stage : 3;	// 0-7
+#endif
 
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
