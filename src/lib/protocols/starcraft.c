@@ -107,6 +107,8 @@ u_int8_t ndpi_check_starcraft_udp(struct ndpi_detection_module_struct* ndpi_stru
 	return 1;
       break;
     }
+
+  return(0);
 }
 
 void ndpi_search_starcraft(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow)

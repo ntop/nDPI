@@ -2,11 +2,12 @@ Unknown	2	121	1
 DNS	18	1956	5
 HTTP	180	134270	2
 SSDP	11	4984	1
+WorldOfWarcraft	9	880	1
 IGMP	2	120	1
 SSL	43	2903	13
 Google	12	1467	2
 Quic	6	475	1
-Battle.net	287	162382	20
+Battle.net	278	161502	19
 Starcraft	236	51494	6
 
 	1	TCP 80.239.186.21:80 <-> 192.168.1.100:3516 [proto: 7.213/HTTP.Battle.net][12 pkts/3680 bytes][Host: eu.launcher.battle.net]
@@ -58,7 +59,7 @@ Starcraft	236	51494	6
 	47	TCP 192.168.1.100:3490 <-> 2.228.46.104:443 [proto: 91/SSL][4 pkts/275 bytes]
 	48	TCP 192.168.1.100:3482 <-> 2.228.46.114:443 [proto: 91/SSL][4 pkts/275 bytes]
 	49	TCP 192.168.1.100:3480 <-> 2.228.46.114:443 [proto: 91/SSL][4 pkts/275 bytes]
-	50	TCP 12.129.222.54:80 <-> 192.168.1.100:3512 [proto: 7.213/HTTP.Battle.net][9 pkts/880 bytes][Host: us.scan.worldofwarcraft.com]
+	50	TCP 12.129.222.54:80 <-> 192.168.1.100:3512 [proto: 7.76/HTTP.WorldOfWarcraft][9 pkts/880 bytes][Host: us.scan.worldofwarcraft.com]
 	51	UDP 62.115.246.51:1119 <-> 192.168.1.100:53146 [proto: 214/Starcraft][2 pkts/104 bytes]
 
 

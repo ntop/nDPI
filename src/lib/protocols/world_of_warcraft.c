@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -35,7 +35,7 @@ static void ndpi_int_worldofwarcraft_add_connection(struct ndpi_detection_module
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WORLDOFWARCRAFT, NDPI_PROTOCOL_UNKNOWN);
 }
 
-	
+
 #if !defined(WIN32)
 static inline
 #else
@@ -54,29 +54,29 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
 				 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-	
+
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
   NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "Search World of Warcraft.\n");
 
   if (packet->tcp != NULL) {
-  	/*
-    if ((packet->payload_packet_len > NDPI_STATICSTRING_LEN("POST /") &&
-	 memcmp(packet->payload, "POST /", NDPI_STATICSTRING_LEN("POST /")) == 0) ||
-	(packet->payload_packet_len > NDPI_STATICSTRING_LEN("GET /") &&
-	 memcmp(packet->payload, "GET /", NDPI_STATICSTRING_LEN("GET /")) == 0)) {
+    /*
+      if ((packet->payload_packet_len > NDPI_STATICSTRING_LEN("POST /") &&
+      memcmp(packet->payload, "POST /", NDPI_STATICSTRING_LEN("POST /")) == 0) ||
+      (packet->payload_packet_len > NDPI_STATICSTRING_LEN("GET /") &&
+      memcmp(packet->payload, "GET /", NDPI_STATICSTRING_LEN("GET /")) == 0)) {
       ndpi_parse_packet_line_info(ndpi_struct, flow);
       if (packet->user_agent_line.ptr != NULL &&
-	  packet->user_agent_line.len == NDPI_STATICSTRING_LEN("Blizzard Web Client") &&
-	  memcmp(packet->user_agent_line.ptr, "Blizzard Web Client",
-		 NDPI_STATICSTRING_LEN("Blizzard Web Client")) == 0) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow);
-	NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG,
-		 "World of Warcraft: Web Client found\n");
-	return;
+      packet->user_agent_line.len == NDPI_STATICSTRING_LEN("Blizzard Web Client") &&
+      memcmp(packet->user_agent_line.ptr, "Blizzard Web Client",
+      NDPI_STATICSTRING_LEN("Blizzard Web Client")) == 0) {
+      ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow);
+      NDPI_LOG(NDPI_PROTOCOL_WORLDOFWARCRAFT, ndpi_struct, NDPI_LOG_DEBUG,
+      "World of Warcraft: Web Client found\n");
+      return;
       }
-    }
+      }
     */
     if (packet->payload_packet_len > NDPI_STATICSTRING_LEN("GET /")
 	&& memcmp(packet->payload, "GET /", NDPI_STATICSTRING_LEN("GET /")) == 0) {
