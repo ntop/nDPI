@@ -88,9 +88,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
    */
 
   if(payload_length >= 20 && ntohs(get_u_int16_t(payload, 2)) + 20 == payload_length &&
-      ((payload[0] == 0x00 && (payload[1] >= 0x01 && payload[1] <= 0x04)) ||
-       (payload[0] == 0x01 &&
-	((payload[1] >= 0x01 && payload[1] <= 0x04) || (payload[1] >= 0x11 && payload[1] <= 0x15))))) {
+     ((payload[0] == 0x00 && (payload[1] >= 0x01 && payload[1] <= 0x04)) ||
+      (payload[0] == 0x01 &&
+       ((payload[1] >= 0x01 && payload[1] <= 0x04) || (payload[1] >= 0x11 && payload[1] <= 0x15))))) {
     u_int8_t mod;
     u_int8_t old = 1;
     u_int8_t padding = 0;
@@ -106,17 +106,17 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     while (a < payload_length) {
 
       if(old && payload_length >= a + 4
-	  &&
-	  ((payload[a] == 0x00
-	    && ((payload[a + 1] >= 0x01 && payload[a + 1] <= 0x16) || payload[a + 1] == 0x19
-		|| payload[a + 1] == 0x20 || payload[a + 1] == 0x22 || payload[a + 1] == 0x24
-		|| payload[a + 1] == 0x25))
-	   || (payload[a] == 0x80
-	       && (payload[a + 1] == 0x01 || payload[a + 1] == 0x03 || payload[a + 1] == 0x04
-		   || payload[a + 1] == 0x06 || payload[a + 1] == 0x08 || payload[a + 1] == 0x15
-		   || payload[a + 1] == 0x20 || payload[a + 1] == 0x22 || payload[a + 1] == 0x28
-		   || payload[a + 1] == 0x2a || payload[a + 1] == 0x29 || payload[a + 1] == 0x50
-		   || payload[a + 1] == 0x54 || payload[a + 1] == 0x55)))) {
+	 &&
+	 ((payload[a] == 0x00
+	   && ((payload[a + 1] >= 0x01 && payload[a + 1] <= 0x16) || payload[a + 1] == 0x19
+	       || payload[a + 1] == 0x20 || payload[a + 1] == 0x22 || payload[a + 1] == 0x24
+	       || payload[a + 1] == 0x25))
+	  || (payload[a] == 0x80
+	      && (payload[a + 1] == 0x01 || payload[a + 1] == 0x03 || payload[a + 1] == 0x04
+		  || payload[a + 1] == 0x06 || payload[a + 1] == 0x08 || payload[a + 1] == 0x15
+		  || payload[a + 1] == 0x20 || payload[a + 1] == 0x22 || payload[a + 1] == 0x28
+		  || payload[a + 1] == 0x2a || payload[a + 1] == 0x29 || payload[a + 1] == 0x50
+		  || payload[a + 1] == 0x54 || payload[a + 1] == 0x55)))) {
 
 	NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "attribute match.\n");
 
@@ -132,21 +132,21 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
       } else if(payload_length >= a + padding + 4
 		&&
-		 ((payload[a + padding] == 0x00
-		   && ((payload[a + 1 + padding] >= 0x01 && payload[a + 1 + padding] <= 0x16)
-		       || payload[a + 1 + padding] == 0x19 || payload[a + 1 + padding] == 0x20
-		       || payload[a + 1 + padding] == 0x22 || payload[a + 1 + padding] == 0x24
-		       || payload[a + 1 + padding] == 0x25))
-		  || (payload[a + padding] == 0x80
-		      && (payload[a + 1 + padding] == 0x01 || payload[a + 1 + padding] == 0x03
-			  || payload[a + 1 + padding] == 0x04 || payload[a + 1 + padding] == 0x06
-			  || payload[a + 1 + padding] == 0x08 || payload[a + 1 + padding] == 0x15
-			  || payload[a + 1 + padding] == 0x20 || payload[a + 1 + padding] == 0x22
-			  || payload[a + 1 + padding] == 0x28 || payload[a + 1 + padding] == 0x2a
-			  || payload[a + 1 + padding] == 0x29 || payload[a + 1 + padding] == 0x50
-			  || payload[a + 1 + padding] == 0x54 || payload[a + 1 + padding] == 0x55))
-		  || ((payload[a + padding] == 0x40) && (payload[a + padding + 1] == 0x00))
-		  )) {
+		((payload[a + padding] == 0x00
+		  && ((payload[a + 1 + padding] >= 0x01 && payload[a + 1 + padding] <= 0x16)
+		      || payload[a + 1 + padding] == 0x19 || payload[a + 1 + padding] == 0x20
+		      || payload[a + 1 + padding] == 0x22 || payload[a + 1 + padding] == 0x24
+		      || payload[a + 1 + padding] == 0x25))
+		 || (payload[a + padding] == 0x80
+		     && (payload[a + 1 + padding] == 0x01 || payload[a + 1 + padding] == 0x03
+			 || payload[a + 1 + padding] == 0x04 || payload[a + 1 + padding] == 0x06
+			 || payload[a + 1 + padding] == 0x08 || payload[a + 1 + padding] == 0x15
+			 || payload[a + 1 + padding] == 0x20 || payload[a + 1 + padding] == 0x22
+			 || payload[a + 1 + padding] == 0x28 || payload[a + 1 + padding] == 0x2a
+			 || payload[a + 1 + padding] == 0x29 || payload[a + 1 + padding] == 0x50
+			 || payload[a + 1 + padding] == 0x54 || payload[a + 1 + padding] == 0x55))
+		 || ((payload[a + padding] == 0x40) && (payload[a + padding + 1] == 0x00))
+		 )) {
 	if((payload[a + padding] == 0x40) && (payload[a + padding + 1] == 0x00))
 	  goto udp_stun_found;
 
@@ -194,7 +194,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     /* STUN may be encapsulated in TCP packets */
 
     if(packet->payload_packet_len >= 2 + 20 &&
-	ntohs(get_u_int16_t(packet->payload, 0)) + 2 == packet->payload_packet_len) {
+       ntohs(get_u_int16_t(packet->payload, 0)) + 2 == packet->payload_packet_len) {
       
       /* TODO there could be several STUN packets in a single TCP packet so maybe the detection could be
        * improved by checking only the STUN packet of given length */
@@ -226,11 +226,11 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("STUN", ndpi_struct, detection_bitmask, *id,
-				       NDPI_PROTOCOL_STUN,
-				       ndpi_search_stun,
-				       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-				       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				       ADD_TO_DETECTION_BITMASK);
+				      NDPI_PROTOCOL_STUN,
+				      ndpi_search_stun,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
 
   *id += 1;
 }
