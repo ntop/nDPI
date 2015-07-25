@@ -50,8 +50,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   struct ndpi_flow_struct *flow,
 					   const u_int8_t * payload, 
 					   const u_int16_t payload_length,
-					   u_int8_t *is_whatsapp)
-{
+					   u_int8_t *is_whatsapp) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
 
@@ -65,6 +64,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   }
   
   msg_type = ntohs(h->msg_type) & 0x3EEF, msg_len = ntohs(h->msg_len);
+
+  if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
+    return(NDPI_IS_NOT_STUN);
 
   if((payload_length == (msg_len+20))
      && ((msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */))
@@ -171,11 +173,14 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
 
-  if((flow->num_stun_udp_pkts > 0) && ((payload[0] == 0x80) || (payload[0] == 0x81))) {
+  if(
+     ((flow->num_stun_udp_pkts > 0) && (msg_type = 0x0800)) 
+     || ((msg_type = 0x0800) && (msg_len == 106))
+     ) {     
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
   } else
-    return NDPI_IS_NOT_STUN;
+    return NDPI_IS_NOT_STUN;  
 
  udp_stun_found:
   flow->num_stun_udp_pkts++;
