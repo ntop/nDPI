@@ -7388,6 +7388,9 @@ ndpi_protocol_match host_match[] = {
   { ".cdninstagram.com",                "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
   { "instagram.",                       "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
   { ".instagram.",                      "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
+  { "igcdn-photos-",                    "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
+  { "instagramimages-",                 "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
+  { "instagramstatic-",                 "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
 
   { ".waze.com",                        "Waze",                 NDPI_SERVICE_WAZE, NDPI_PROTOCOL_ACCEPTABLE },
   { "simet-",                           "Simet",                NDPI_SERVICE_SIMET, NDPI_PROTOCOL_ACCEPTABLE },
