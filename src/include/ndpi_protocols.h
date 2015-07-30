@@ -194,7 +194,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 void ndpi_search_eaq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_mpegts(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
-void ndpi_search_starcraft2(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+void ndpi_search_starcraft(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 
 /* --- INIT FUNCTIONS --- */
@@ -330,6 +330,6 @@ void init_xdmcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
 void init_yahoo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_zattoo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_zmq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
-void init_stracraft2_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
+void init_stracraft_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 
 #endif /* __NDPI_PROTOCOLS_INCLUDE_FILE__ */

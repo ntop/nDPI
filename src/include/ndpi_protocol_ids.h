@@ -199,7 +199,7 @@
 #define NDPI_PROTOCOL_TELEGRAM				        185 /* Gianluca Costa <g.costa@xplico.org> */
 #define NDPI_PROTOCOL_QUIC				        188 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
 #define NDPI_PROTOCOL_WHATSAPP_VOICE			        189
-#define NDPI_PROTOCOL_STARCRAFT 			        214 /* Matteo Bracci <matteobracci1@gmail.com> */
+#define NDPI_PROTOCOL_STARCRAFT 			        213 /* Matteo Bracci <matteobracci1@gmail.com> */
 
 
 #define NDPI_CONTENT_AVI				39
@@ -260,7 +260,6 @@
 #define NDPI_SERVICE_DEEZER                             210
 #define NDPI_SERVICE_INSTAGRAM                          211 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */
 #define NDPI_SERVICE_MICROSOFT                          212
-#define NDPI_SERVICE_BATTLENET                          213 /* Matteo Bracci <matteobracci1@gmail.com> */
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_STARCRAFT
