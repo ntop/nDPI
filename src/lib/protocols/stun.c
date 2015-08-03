@@ -174,8 +174,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
 
   if(
-     ((flow->num_stun_udp_pkts > 0) && (msg_type = 0x0800)) 
-     || ((msg_type = 0x0800) && (msg_len == 106))
+     ((flow->num_stun_udp_pkts > 0) && (msg_type == 0x0800)) 
+     || ((msg_type == 0x0800) && (msg_len == 106))
      ) {     
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
