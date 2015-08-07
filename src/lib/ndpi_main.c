@@ -978,6 +978,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     			    no_master, "BitTorrent",
     			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
     			    ndpi_build_default_ports(ports_b, 6771, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEREDO,
+    			    no_master,
+    			    no_master, "Teredo",
+    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+    			    ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_EPP,
 			    no_master,
 			    no_master, "EPP",
@@ -2240,6 +2245,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* BITTORRENT */
   init_bittorrent_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* Teredo */
+  init_teredo_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* EDONKEY */
   init_edonkey_dissector(ndpi_struct, &a, detection_bitmask);

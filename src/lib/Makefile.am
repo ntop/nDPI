@@ -135,6 +135,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/tftp.c \
 		     protocols/thunder.c \
 		     protocols/tor.c \
+		     protocols/teredo.c \
 		     protocols/tvants.c \
 		     protocols/tvuplayer.c \
 		     protocols/twitter.c \

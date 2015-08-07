@@ -41,10 +41,6 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 						    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-
-  //  struct ndpi_id_struct *src = flow->src;
-  //  struct ndpi_id_struct *dst = flow->dst;
-
   u_int16_t a = 0;
 
   if (packet->payload_packet_len == 1 && packet->payload[0] == 0x13) {
@@ -370,12 +366,18 @@ static void ndpi_int_search_bittorrent_tcp(struct ndpi_detection_module_struct *
 void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
+  int no_bittorrent = 0;
 
   /* This is broadcast */
-  if(packet->iph
-     && ((packet->iph->saddr == 0xFFFFFFFF) || (packet->iph->daddr == 0xFFFFFFFF)))
+  if(packet->iph 
+     && (((packet->iph->saddr == 0xFFFFFFFF) || (packet->iph->daddr == 0xFFFFFFFF))
+	 || (packet->udp 
+	     && ((ntohs(packet->udp->source) == 3544) /* teredo.c */
+		 || (ntohs(packet->udp->dest) == 3544))))) {
+    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_BITTORRENT);
     return;
-
+  }
+  
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
 
@@ -482,7 +484,7 @@ void init_bittorrent_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("BitTorrent", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_BITTORRENT,
 				      ndpi_search_bittorrent,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
