@@ -7289,6 +7289,12 @@ static ndpi_network host_protocol_list[] = {
   /* Simet - 200.160.4.0/24 */
   { 0xC8A00400, 24, NDPI_SERVICE_SIMET },
 
+  /*
+    AnchorFree (Hotspot Shield)
+    AnchorFree Inc. AFNETWORK-1 (NET-74-115-0-0-1) 74.115.0.0 - 74.115.7.255
+  */
+  { 0x4A730000, 21, NDPI_SERVICE_HOTSPOT_SHIELD },
+
   { 0x0, 0, 0 }
 };
 
@@ -7409,6 +7415,8 @@ ndpi_protocol_match host_match[] = {
   { "update.microsoft.com",             "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".windowsupdate.com",               "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { "worldofwarcraft.com",              "WorldOfWarcraft",      NDPI_PROTOCOL_WORLDOFWARCRAFT, NDPI_PROTOCOL_FUN },
+  { ".anchorfree.",                     "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
+  { "hotspotshield.com",                "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
   { NULL, 0 }
 };
 

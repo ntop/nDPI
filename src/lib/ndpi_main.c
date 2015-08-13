@@ -1164,6 +1164,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "WorldOfWarcraft",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_HOTSPOT_SHIELD,
+			    no_master,
+			    no_master, "HotspotShield",
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_TELNET,
 			    no_master,
 			    no_master, "Telnet",
@@ -3410,6 +3415,22 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
   } else
     ret.protocol = flow->detected_protocol_stack[0];
+
+  
+  if((ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) && flow->packet.iph) {
+    struct ndpi_packet_struct *packet = &flow->packet;
+
+    if((ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->saddr)) == NDPI_PROTOCOL_UNKNOWN)
+      ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->daddr);
+
+    /* Swap proocols in case of success */
+    if(ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
+      u_int8_t t = ret.master_protocol;
+
+      ret.master_protocol = ret.protocol;
+      ret.protocol = t;
+    }
+  }
 
   return(ret);
 }
