@@ -149,11 +149,11 @@ static struct reader_thread ndpi_thread_info[MAX_NUM_READER_THREADS];
  * @brief ID tracking
  */
 typedef struct ndpi_id {
-  u_int8_t ip[4];				//< Ip address
-  struct ndpi_id_struct *ndpi_id;		//< nDpi worker structure
+  u_int8_t ip[4];				// Ip address
+  struct ndpi_id_struct *ndpi_id;		// nDpi worker structure
 } ndpi_id_t;
 
-static u_int32_t size_id_struct = 0;		//< ID tracking structure size
+static u_int32_t size_id_struct = 0;		// ID tracking structure size
 
 #ifndef ETH_P_IP
 #define ETH_P_IP 0x0800

@@ -70,7 +70,7 @@ extern "C" {
   /**
    * This function returns a new initialized detection module.
    * @param ticks_per_second the timestamp resolution per second (like 1000 for millisecond resolution)
-   * @param ndpi_malloc function pointer to a memory allocator
+   * @param __ndpi_malloc function pointer to a memory allocator
    * @param ndpi_debug_printf a function pointer to a debug output function, use NULL in productive envionments
    * @return the initialized detection module
    */
@@ -88,8 +88,8 @@ extern "C" {
 
   /**
    * This function enables cache support in nDPI used for some protocol such as Skype
-   * @param cache host name
-   * @param cache port
+   * @param host host name
+   * @param port port number
    */
   void ndpi_enable_cache(struct ndpi_detection_module_struct *ndpi_mod, char* host, u_int port);
 
