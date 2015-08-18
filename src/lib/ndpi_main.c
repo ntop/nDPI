@@ -773,7 +773,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   int i;
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
   u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO },
-    custom_master[2], custom_master1[2];
+    custom_master[2];
 
     /* Reset all settings */
     memset(ndpi_mod->proto_defaults, 0, sizeof(ndpi_mod->proto_defaults));
@@ -3425,7 +3425,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     /* Swap proocols in case of success */
     if(ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
-      u_int8_t t = ret.master_protocol;
+      u_int16_t t = ret.master_protocol;
 
       ret.master_protocol = ret.protocol;
       ret.protocol = t;
