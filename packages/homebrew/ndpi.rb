@@ -1,9 +1,15 @@
-require "formula"
-
 class Ndpi < Formula
+  desc "Superset of the popular OpenDPI library"
   homepage "http://www.ntop.org/products/ndpi/"
-  url "https://downloads.sourceforge.net/project/ntop/nDPI/libndpi-1.5.1.tar.gz"
-  sha1 "0a6ed585545ab6611f3f0ac9efd9eb36bb5481dd"
+  url "https://downloads.sourceforge.net/project/ntop/nDPI/nDPI-1.6.tar.gz"
+  sha256 "0e2201d0d003ac5df0de904f8e4df149ca55a59e708a32ce55500be92a031444"
+
+  bottle do
+    cellar :any
+    sha256 "e9464d314479ba3e7a91422e0bc606cfd5f6e72e94d6441cc4fa30e9c925da5c" => :yosemite
+    sha256 "1d6b1d860669b42766baa276ed948c342e2fa4fd28663ba64a90fd0e200ba9c4" => :mavericks
+    sha256 "b814918b4fb9588de7126061ce4ac3eb41a5c3eee27c7432b669f6dc6921bfde" => :mountain_lion
+  end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -12,12 +18,13 @@ class Ndpi < Formula
   depends_on "json-c"
 
   def install
-    system "./configure","--prefix=#{prefix}"
+    system "./autogen.sh"
+    system "./configure", "--prefix=#{prefix}"
     system "make"
     system "make", "install"
   end
 
   test do
-    system "#{bin}/ndpiReader","-h"
+    system "#{bin}/ndpiReader", "-i", test_fixtures("test.pcap")
   end
 end
