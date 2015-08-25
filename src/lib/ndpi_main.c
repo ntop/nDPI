@@ -1701,8 +1701,10 @@ u_int8_t ndpi_is_tor_flow(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->tcp != NULL) {
     if(flow->packet.iph) {
-      if(tor_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->saddr)
-         || tor_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->daddr)) {
+      struct in_addr saddr = { packet->iph->saddr };
+      struct in_addr daddr = { packet->iph->daddr };
+      if(tor_ptree_match(ndpi_struct, &saddr)
+         || tor_ptree_match(ndpi_struct, &daddr)) {
 	return(1);
       }
     }
@@ -3418,10 +3420,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   
   if((ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) && flow->packet.iph) {
-    struct ndpi_packet_struct *packet = &flow->packet;
+    struct in_addr pin = { flow->packet.iph->saddr };
 
-    if((ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->saddr)) == NDPI_PROTOCOL_UNKNOWN)
-      ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->daddr);
+    if((ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, &pin)) == NDPI_PROTOCOL_UNKNOWN) {
+      pin.s_addr = flow->packet.iph->daddr;
+      ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, &pin);
+    }
 
     /* Swap proocols in case of success */
     if(ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
