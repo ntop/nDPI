@@ -37,9 +37,9 @@ u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struc
     }
   }
 
-  if((rc = ndpi_host_ptree_match(ndpi_struct, saddr)) != NDPI_PROTOCOL_UNKNOWN) return(rc);
+  if((rc = ndpi_host_ptree_match(ndpi_struct, htonl(saddr))) != NDPI_PROTOCOL_UNKNOWN) return(rc);
   
-  return(ndpi_host_ptree_match(ndpi_struct, daddr));
+  return(ndpi_host_ptree_match(ndpi_struct, htonl(daddr)));
 }
 
 void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

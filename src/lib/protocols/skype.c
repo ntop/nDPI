@@ -40,8 +40,8 @@ u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
       Skype connections are identified by some SSL-like communications
       without SSL certificate being exchanged
     */	
-    if(is_skype_host(ndpi_struct, ntohl(packet->iph->saddr))
-       || is_skype_host(ndpi_struct, ntohl(packet->iph->daddr))) {
+    if(is_skype_host(ndpi_struct, packet->iph->saddr)
+       || is_skype_host(ndpi_struct, packet->iph->daddr)) {
       return(1);
     }
   }
