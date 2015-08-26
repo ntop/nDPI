@@ -1670,10 +1670,10 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
   prefix_t prefix;
   patricia_node_t *node;
 
-  pin->s_addr = ntohl(pin->s_addr); /* Make sure all in network byte order otherwise compares wont work */
+  /* Make sure all in network byte order otherwise compares wont work */
   fill_prefix_v4(&prefix, pin, 32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_struct->protocols_ptree, &prefix);
-
+  
   return(node ? node->value.user_value : NDPI_PROTOCOL_UNKNOWN);
 }
 
@@ -1736,7 +1736,7 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
     struct in_addr pin;
     patricia_node_t *node;
 
-    pin.s_addr = ntohl(host_list[i].network);
+    pin.s_addr = htonl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL)
       node->value.user_value = host_list[i].value;
   }
@@ -1745,19 +1745,19 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 /* ******************************************* */
 
 static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-                     char *value, int protocol_id) {
+					char *value, int protocol_id) {
 
-    patricia_node_t *node;
-    struct in_addr pin;
+  patricia_node_t *node;
+  struct in_addr pin;
+  
+  inet_pton(AF_INET, value, &pin);
+  pin.s_addr = ntohl(pin.s_addr);
+  
+  if((node = add_to_ptree(ndpi_struct->protocols_ptree, AF_INET, &pin, 32)) != NULL) {
+    node->value.user_value = protocol_id;
+  }
 
-    inet_pton(AF_INET, value, &pin);
-    pin.s_addr = ntohl(pin.s_addr);
-
-    if((node = add_to_ptree(ndpi_struct->protocols_ptree, AF_INET, &pin, 32)) != NULL) {
-        node->value.user_value = protocol_id;
-    }
-
-    return(0);
+  return(0);
 }
 
 #endif
@@ -1891,13 +1891,16 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struc
   ndpi_default_ports_tree_node_t node;
 
   if(sport && dport) {
-    node.default_port = sport;
+    int low  = ndpi_min(sport, dport);
+    int high = ndpi_max(sport, dport);
+
+    node.default_port = low; /* Check server port first */
     ret = ndpi_tfind(&node,
 		     (proto == IPPROTO_TCP) ? (void*)&ndpi_struct->tcpRoot : (void*)&ndpi_struct->udpRoot,
 		     ndpi_default_ports_tree_node_t_cmp);
 
     if(ret == NULL) {
-      node.default_port = dport;
+      node.default_port = high;
       ret = ndpi_tfind(&node,
 		       (proto == IPPROTO_TCP) ? (void*)&ndpi_struct->tcpRoot : (void*)&ndpi_struct->udpRoot,
 		       ndpi_default_ports_tree_node_t_cmp);
@@ -3418,23 +3421,33 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   } else
     ret.protocol = flow->detected_protocol_stack[0];
 
-  
-  if((ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) && flow->packet.iph) {
-    struct in_addr pin = { flow->packet.iph->saddr };
-
-    if((ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, &pin)) == NDPI_PROTOCOL_UNKNOWN) {
+  if((ret.protocol == NDPI_PROTOCOL_UNKNOWN)
+     && flow->packet.iph
+     && (!flow->host_already_guessed)) {
+    struct in_addr pin;
+    
+    pin.s_addr = flow->packet.iph->saddr;
+    if((flow->guessed_host_proto_id = ndpi_network_ptree_match(ndpi_struct, &pin)) == NDPI_PROTOCOL_UNKNOWN) {
       pin.s_addr = flow->packet.iph->daddr;
-      ret.master_protocol = ndpi_network_ptree_match(ndpi_struct, &pin);
+      flow->guessed_host_proto_id = ndpi_network_ptree_match(ndpi_struct, &pin);
     }
+    
+    flow->host_already_guessed = 1;
+  }
 
-    /* Swap proocols in case of success */
+#if 0
+
+    /* Swap protocols in case of success */
     if(ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
       u_int16_t t = ret.master_protocol;
 
       ret.master_protocol = ret.protocol;
       ret.protocol = t;
     }
-  }
+#endif
+
+    if((ret.protocol == NDPI_PROTOCOL_UNKNOWN) && (ret.master_protocol != NDPI_PROTOCOL_UNKNOWN))
+      ret.protocol = flow->guessed_host_proto_id;
 
   return(ret);
 }
