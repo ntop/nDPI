@@ -833,6 +833,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "IPP",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HEP,
+			    no_master,
+			    no_master, "HEP",
+			    ndpi_build_default_ports(ports_a, 9064, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 9063, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP,
 			    no_master,
 			    no_master, "HTTP",
@@ -2249,6 +2254,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* SIP */
   init_sip_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* HEP */
+  init_hep_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* BITTORRENT */
   init_bittorrent_dissector(ndpi_struct, &a, detection_bitmask);
