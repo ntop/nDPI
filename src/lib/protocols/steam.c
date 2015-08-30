@@ -34,6 +34,7 @@ static void ndpi_int_steam_add_connection(struct ndpi_detection_module_struct *n
 static void ndpi_check_steam_http(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
+  NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow, packet);
   if (packet->user_agent_line.ptr != NULL 
       && packet->user_agent_line.len >= 23 
       && memcmp(packet->user_agent_line.ptr, "Valve/Steam HTTP Client", 23) == 0) {
