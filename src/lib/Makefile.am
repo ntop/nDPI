@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libndpi.la
 
 CFLAGS += -fPIC -DPIC
 libndpi_la_CPPFLAGS = -I$(top_srcdir)/src/include/  -I$(top_srcdir)/src/lib/third_party/include/
-libndpi_la_LDFLAGS = -version-info 1:0:0 -export-symbols $(top_srcdir)/libndpi.sym
+libndpi_la_LDFLAGS = -static -version-info 1:0:0 -export-symbols $(top_srcdir)/libndpi.sym
 
 libndpi_la_includedir = $(includedir)/libndpi-@VERSION@/libndpi
 
