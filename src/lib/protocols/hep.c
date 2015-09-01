@@ -45,11 +45,7 @@ void ndpi_search_hep(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	      NDPI_LOG(NDPI_PROTOCOL_HEP, ndpi_struct, NDPI_LOG_DEBUG, "found HEP3.\n");
 	      ndpi_int_hep_add_connection(ndpi_struct, flow);
 	      return;
-	    } else if (memcmp(packet_payload, "HEP2", 4) == 0) {
-	      NDPI_LOG(NDPI_PROTOCOL_HEP, ndpi_struct, NDPI_LOG_DEBUG, "found HEP2.\n");
-	      ndpi_int_hep_add_connection(ndpi_struct, flow);
-	      return;
-	    }
+	    } 
     }
 
     NDPI_LOG(NDPI_PROTOCOL_HEP, ndpi_struct, NDPI_LOG_DEBUG, "exclude HEP.\n");
