@@ -143,13 +143,6 @@ extern int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct
 					     u_int16_t** tcp_master_proto,
 					     u_int16_t** udp_master_proto);
 
-extern u_int8_t ndpi_net_match(u_int32_t ip_to_check,
-			       u_int32_t net,
-			       u_int32_t num_bits);
-
-extern u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
-			       u_int32_t net, u_int32_t num_bits);
-
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
 void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
 					   const char **file, const char **func, u_int32_t * line);
