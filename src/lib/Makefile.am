@@ -157,8 +157,10 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/zeromq.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
+		     third_party/include/ndpi_patricia.h \
 		     third_party/include/node.h \
 		     third_party/include/sort.h \
 		     third_party/src/ahocorasick.c \
+		     third_party/src/ndpi_patricia.c \
 		     third_party/src/node.c \
 		     third_party/src/sort.c
