@@ -43,21 +43,90 @@
 #endif
 
 #pragma pack(push, 1)  /* push current alignment to stack */
-#pragma pack(1)     /* set alignment to 1 byte boundary */
+#pragma pack(1)        /* set alignment to 1 byte boundary */
 
-#pragma pack(pop)   /* restore original alignment from stack */
+#pragma pack(pop)      /* restore original alignment from stack */
 
-struct ndpi_ethhdr {
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+/* +++++++++++ Ethernet data structures +++++++++++++ */
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+struct ndpi_ethhdr 
+{
   u_char h_dest[6];       /* destination eth addr */
   u_char h_source[6];     /* source ether addr    */
   u_int16_t h_proto;      /* packet type ID field */
 };
 
-struct ndpi_80211q {
-  u_int16_t vlanId;
-  u_int16_t protoType;
-};
 
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+/* +++++++++++ ieee802.11 data structures +++++++++++ */
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+/******* RADIO TAP *******/
+/* radiotap header */
+struct ndpi_radiotap_header 
+{
+  u_int8_t  version;         /* set to 0 */
+  u_int8_t  pad;
+  u_int16_t len;
+  u_int32_t present;
+  u_int64_t MAC_timestamp;
+  u_int8_t flags;
+  
+} __attribute__((__packed__));
+
+/* Beacon frame */
+struct ndpi_beacon
+{
+  /* header -- 24 byte */
+  u_int16_t fc;
+  u_int16_t duration;
+  u_char rcv_addr[6];
+  u_char trsm_addr[6];
+  u_char bssid[6];
+  u_int16_t seq_ctrl;
+  /* body (variable) */
+  u_int64_t timestamp;		   /* 802.11 Timestamp value at frame send */
+  u_int16_t beacon_interval;       /* Interval at which beacons are send */
+  u_int16_t capability;
+  /** List of information elements **/
+  /* union ndpi_80211_info info_element[0]; */
+} __attribute__((packed));
+
+
+/* Wifi data frame - TODO: specify when addr1 addr2 addr3 is rcv, trams or bssid*/
+struct ndpi_wifi_data_frame 
+{
+  u_int16_t fc;
+  u_int16_t duration;
+  u_char addr1[6];
+  u_char addr2[6];
+  u_char addr3[6];
+  u_int16_t seq_ctrl;
+} __attribute__((packed));
+
+/* Logical-Link Control header */
+struct ndpi_llc_header_proto           
+{
+    u_int8_t    dsap; 
+    u_int8_t    ssap;
+    u_int8_t    ctl;
+    /* u_int8_t    pad1; */
+    u_int16_t   org;
+    u_int8_t    org2;
+    /* u_int8_t    pad2; */
+    u_int16_t   ether_IP_type;              
+} __attribute__((packed));
+
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+/* ++++++++++++++ IP data structures ++++++++++++++++ */
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+
+/* IP header */
 struct ndpi_iphdr {
 #if defined(__LITTLE_ENDIAN__) 
   u_int8_t ihl:4, version:4;
@@ -160,6 +229,11 @@ struct ndpi_ip6_hdr {
   struct ndpi_in6_addr ip6_src;
   struct ndpi_in6_addr ip6_dst;
 };
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+/* ++++++++ Transport Layer data structures +++++++++ */
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
 
 struct ndpi_tcphdr {
   u_int16_t source;
