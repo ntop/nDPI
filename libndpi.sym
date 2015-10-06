@@ -31,3 +31,6 @@ ndpi_guess_protocol_id
 ndpi_protocol2name
 ndpi_get_lower_proto
 ndpi_is_proto
+ndpi_malloc
+ndpi_calloc
+ndpi_set_detected_protocol

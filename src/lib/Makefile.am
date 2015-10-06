@@ -140,6 +140,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/tvants.c \
 		     protocols/tvuplayer.c \
 		     protocols/twitter.c \
+		     protocols/ubntac2.c \
 		     protocols/usenet.c \
 		     protocols/veohtv.c \
 		     protocols/viber.c \
