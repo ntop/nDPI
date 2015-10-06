@@ -1,11 +1,7 @@
 /*
  * ubntac2.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
- *
- * This file is part of nDPI, an open source deep packet inspection
- * library based on the OpenDPI and PACE technology by ipoque GmbH
+ * Copyright (C) 2015 Thomas Fjellstrom
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -35,24 +31,21 @@ static void ndpi_int_ubntac2_add_connection(struct ndpi_detection_module_struct 
 
 void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
-	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
+  struct ndpi_packet_struct *packet = &flow->packet;
 
-	NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_TRACE, "UBNTAC2 detection... plen:%i %i:%i\n", packet->payload_packet_len, ntohs(packet->udp->source), ntohs(packet->udp->dest));
-	
-	if (packet->payload_packet_len >= 135 &&
-		(packet->udp->source == htons(10001) || packet->udp->dest == htons(10001)) &&
-		memcmp(&(packet->payload[36]), "UBNT", 4) == 0) {
+  NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_TRACE, "UBNTAC2 detection... plen:%i %i:%i\n", packet->payload_packet_len, ntohs(packet->udp->source), ntohs(packet->udp->dest));
 
-		NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_DEBUG, "UBNT AirControl 2 request\n");
+  if (packet->payload_packet_len >= 135 &&
+      (packet->udp->source == htons(10001) || packet->udp->dest == htons(10001)) &&
+      memcmp(&(packet->payload[36]), "UBNT", 4) == 0) {
 
-		ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
-		return;
-	}
+    NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_DEBUG, "UBNT AirControl 2 request\n");
 
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_UBNTAC2);
+    ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
+    return;
+  }
+
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_UBNTAC2);
 }
 
 
