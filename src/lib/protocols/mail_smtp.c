@@ -117,10 +117,10 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 	    && (packet->line[a].ptr[1] == 'T' || packet->line[a].ptr[1] == 't')
 	    && (packet->line[a].ptr[2] == 'A' || packet->line[a].ptr[2] == 'a')
 	    && (packet->line[a].ptr[3] == 'R' || packet->line[a].ptr[3] == 'r')
-	    && (packet->line[a].ptr[4] == 'T' || packet->line[a].ptr[0] == 't')
-	    && (packet->line[a].ptr[5] == 'T' || packet->line[a].ptr[1] == 't')
-	    && (packet->line[a].ptr[6] == 'L' || packet->line[a].ptr[2] == 'l')
-	    && (packet->line[a].ptr[7] == 'S' || packet->line[a].ptr[3] == 's')) {
+	    && (packet->line[a].ptr[4] == 'T' || packet->line[a].ptr[4] == 't')
+	    && (packet->line[a].ptr[5] == 'T' || packet->line[a].ptr[5] == 't')
+	    && (packet->line[a].ptr[6] == 'L' || packet->line[a].ptr[6] == 'l')
+	    && (packet->line[a].ptr[7] == 'S' || packet->line[a].ptr[7] == 's')) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
 	}
       }
