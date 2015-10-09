@@ -250,7 +250,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	char a_buf[32];
 	int i;
 
-	for(i=0; i<num_a_records; i++) {
+	for(i=0; j < sizeof(flow->host_server_name)-1 && i < num_a_records; i++) {
 	  j += snprintf((char*)&flow->host_server_name[j], sizeof(flow->host_server_name)-1-j, "%s%s",
 			(i == 0) ? "@" : ";",
 			ndpi_intoa_v4(a_record[i], a_buf, sizeof(a_buf)));
