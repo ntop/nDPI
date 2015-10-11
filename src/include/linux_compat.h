@@ -91,7 +91,6 @@ typedef uint   u_int32_t;
 #define _WS2TCPIP_H_ /* Avoid compilation problems */
 #define HAVE_SIN6_LEN
 
-
 /* IPv6 address */
 /* Already defined in WS2tcpip.h */
 struct ndpi_win_in6_addr
@@ -129,6 +128,7 @@ struct ndpi_ip6_ext
   u_int8_t  ip6e_len;		/* length in units of 8 octets.  */
 };
 
+#define s6_addr		        __u6_addr.__u6_addr8
 #define s6_addr16		__u6_addr.__u6_addr16
 #define s6_addr32		__u6_addr.__u6_addr32
 #else
@@ -137,8 +137,6 @@ struct ndpi_ip6_ext
 #endif
 #endif
 
-
-
 struct ndpi_in6_addr {
   union {
     u_int8_t   __u6_addr8[16];
@@ -146,6 +144,13 @@ struct ndpi_in6_addr {
     u_int32_t  __u6_addr32[4];
   } __u6_addr;                    /* 128-bit IP6 address */
 };
+
+#undef s6_addr
+#undef s6_addr16
+#undef s6_addr32
+#define s6_addr		        __u6_addr.__u6_addr8
+#define s6_addr16		__u6_addr.__u6_addr16
+#define s6_addr32		__u6_addr.__u6_addr32
 
 struct ndpi_ip6_hdr {
   union {
