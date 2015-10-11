@@ -7352,7 +7352,7 @@ ndpi_protocol_match host_match[] = {
   { "nflxext.com",			"NetFlix",		NDPI_SERVICE_NETFLIX, NDPI_PROTOCOL_FUN	},
   { "nflximg.com",			"NetFlix",		NDPI_SERVICE_NETFLIX, NDPI_PROTOCOL_FUN },
   { "nflximg.net",			"NetFlix",		NDPI_SERVICE_NETFLIX, NDPI_PROTOCOL_FUN },
-
+  { "nflxvideo.net",			"NetFlix",		NDPI_SERVICE_NETFLIX, NDPI_PROTOCOL_FUN },
   { ".skype.",				"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypeassets.",			"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypedata.",			"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
