@@ -52,6 +52,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/guildwars.c \
 		     protocols/h323.c \
 		     protocols/halflife2_and_mods.c \
+		     protocols/hep.c \
 		     protocols/http_activesync.c \
 		     protocols/http.c \
 		     protocols/iax.c \
@@ -139,6 +140,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/tvants.c \
 		     protocols/tvuplayer.c \
 		     protocols/twitter.c \
+		     protocols/ubntac2.c \
 		     protocols/usenet.c \
 		     protocols/veohtv.c \
 		     protocols/viber.c \

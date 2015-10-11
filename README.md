@@ -1,8 +1,13 @@
-# What is nDPI ?
+![ntop][ntopng_logo] ![ntop][ntop_logo]
+# nDPI
+
+[![Build Status](https://travis-ci.org/ntop/nDPI.png?branch=master)](https://travis-ci.org/ntop/nDPI)
+
+## What is nDPI ?
 
 nDPI is an open source LGPLv3 library for deep-packet inspection. Based on OpenDPI it includes ntop extensions. We have tried to push them into the OpenDPI source tree but nobody answered emails so we have decided to create our own source tree
 
-# How To Compile nDPI
+### How To Compile nDPI
 
 In order to compile this library do
 
@@ -14,7 +19,7 @@ Please note that the pre-requisites for compilation include:
 - GNU tools (autogen, automake, autoconf, libtool)
 - GNU C compiler (gcc)
 
-# How To Add A New Protocol Dissector
+### How To Add A New Protocol Dissector
 
 The entire procedure of adding new protocols in detail:
 
@@ -30,13 +35,18 @@ The entire procedure of adding new protocols in detail:
 10. ./configure
 11. make
 
-# Creating A Source File Tar Ball
+### Creating A Source File Tar Ball
 
 If you want to distribute a source tar file of nDPI do:
 
 - make dist
 
 
-# Acknowledgements
+### Acknowledgements
 
 Many thanks to <A HREF=http://www.radcom.com>Radcom</A> Ltd for supporting the development of nDPI.
+
+
+[ntopng_logo]: https://camo.githubusercontent.com/0f789abcef232035c05e0d2e82afa3cc3be46485/687474703a2f2f7777772e6e746f702e6f72672f77702d636f6e74656e742f75706c6f6164732f323031312f30382f6e746f706e672d69636f6e2d313530783135302e706e67
+
+[ntop_logo]: https://camo.githubusercontent.com/58e2a1ecfff62d8ecc9d74633bd1013f26e06cba/687474703a2f2f7777772e6e746f702e6f72672f77702d636f6e74656e742f75706c6f6164732f323031352f30352f6e746f702e706e67
