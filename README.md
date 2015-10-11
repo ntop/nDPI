@@ -1,7 +1,7 @@
 ![ntop][ntopng_logo] ![ntop][ntop_logo]
 # nDPI
 
-[![Build Status](https://travis-ci.org/ntop/nDPI.png?branch=master)](https://travis-ci.org/zeromq/libzmq)
+[![Build Status](https://travis-ci.org/ntop/nDPI.png?branch=master)](https://travis-ci.org/ntop/nDPI)
 
 ## What is nDPI ?
 
