@@ -59,6 +59,7 @@
 #define IDLE_SCAN_BUDGET         1024
 #define NUM_ROOTS                 512
 #define GTP_U_V1_PORT            2152
+#define TZSP_PORT               37008
 #define MAX_NDPI_FLOWS      200000000
 
 #ifndef ETH_P_IP
@@ -223,7 +224,7 @@ static void help(u_int long_help) {
 #endif
 	 "  -d                        | Disable protocol guess and use only DPI\n"
 	 "  -q                        | Quiet mode\n"
-	 "  -t                        | Dissect GTP tunnels\n"
+	 "  -t                        | Dissect GTP/TZSP tunnels\n"
 	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
 	 "                            | testing purposes in order to compare results across runs\n"
@@ -1541,12 +1542,13 @@ static void openPcapFileOrDevice(u_int16_t thread_id) {
 
 /* ***************************************************** */
 
-static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
+static void pcap_packet_callback(u_char *args,
+				 const struct pcap_pkthdr *header,
+				 const u_char *packet) {
 
-  /* 
+  /*
    * Declare pointers to packet headers
    */
-  
   /** --- Ethernet header --- **/
   const struct ndpi_ethhdr *ethernet;
 
@@ -1564,13 +1566,14 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
   struct ndpi_ip6_hdr *iph6;
 
   /* lengths and offsets */
+  u_int16_t eth_offset = 0;
   u_int16_t radio_len;
   u_int16_t fc;
   int wifi_data_len;
   int llc_len;
   u_int16_t llc_ether_type;
   u_int32_t fcs;
-  
+
   u_int64_t time;
   u_int16_t type, ip_offset, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
@@ -1580,7 +1583,7 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
   u_int16_t thread_id = *((u_int16_t*)args);
 
   int malformed_pkts = 0;
-  
+
   /* Increment raw packet counter */
   ndpi_thread_info[thread_id].stats.raw_packet_count++;
 
@@ -1592,7 +1595,6 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
 
   /* Check if capture is live or not */
   if (!live_capture) {
-
     if (!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
     pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
   }
@@ -1600,84 +1602,81 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
   /* setting time */
   time = ((uint64_t) header->ts.tv_sec) * detection_tick_resolution +
     header->ts.tv_usec / (1000000 / detection_tick_resolution);
-  
+
   /* safety check */
-  if(ndpi_thread_info[thread_id].last_time > time) { 
+  if(ndpi_thread_info[thread_id].last_time > time) {
     /* printf("\nWARNING: timestamp bug in the pcap file (ts delta: %llu, repairing)\n", ndpi_thread_info[thread_id].last_time - time); */
     time = ndpi_thread_info[thread_id].last_time;
   }
   /* update last time value */
   ndpi_thread_info[thread_id].last_time = time;
-  
+
   /*** check Data Link type ***/
   int datalink_type = ndpi_thread_info[thread_id]._pcap_datalink_type;
 
-  switch(datalink_type)
-    {
+ datalink_check:
+  switch(datalink_type) {
     case DLT_NULL :
-      if(ntohl(*((u_int32_t*)packet)) == 2)
+      if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
 	type = ETH_P_IP;
       else
 	type = ETH_P_IPV6;
-    
-      ip_offset = 4;
+
+      ip_offset = 4 + eth_offset;
 
     case DLT_EN10MB :
-      ethernet = (struct ndpi_ethhdr *) packet;
-      ip_offset = sizeof(struct ndpi_ethhdr);
+      ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
+      ip_offset = sizeof(struct ndpi_ethhdr) + eth_offset;
       type = ntohs(ethernet->h_proto);
       break;
 
       /* Linux Cooked Capture - 113 */
     case DLT_LINUX_SLL :
-      type = (packet[14] << 8) + packet[15];
-      ip_offset = 16;
+      type = (packet[eth_offset+14] << 8) + packet[eth_offset+15];
+      ip_offset = 16 + eth_offset;
       break;
 
       /* Radiotap link-layer - 127 */
     case DLT_IEEE802_11_RADIO :
-      radiotap = (struct ndpi_radiotap_header *) packet;
+      radiotap = (struct ndpi_radiotap_header *) &packet[eth_offset];
       radio_len = radiotap->len;
-      
+
       /* Check Bad FCS presence */
       if((radiotap->flags & BAD_FCS) == BAD_FCS) {
 	malformed_pkts += 1;
 	ndpi_thread_info[thread_id].stats.total_discarded_bytes +=  header->len;
 	return;
       }
-    
+
       fcs = header->len - 4;
 
       /* Calculate 802.11 header length (variable) */
-      wifi_data = (struct ndpi_wifi_data_frame*)( packet + radio_len);
+      wifi_data = (struct ndpi_wifi_data_frame*)( packet + eth_offset + radio_len);
       fc = wifi_data->fc;
 
       /* check wifi data presence */
       if(FCF_TYPE(fc) == WIFI_DATA) {
-
 	if((FCF_TO_DS(fc) && FCF_FROM_DS(fc) == 0x0) ||
 	   (FCF_TO_DS(fc) == 0x0 && FCF_FROM_DS(fc)))
 	  wifi_data_len = 26; /* + 4 byte fcs */
-      
-	/* TODO: check QoS Control for aggregated MSDU */
-      
 
+	/* TODO: check QoS Control for aggregated MSDU */
       } else   /* no data frames */
 	break;
-      
+
       /* Check ether_type from LLC */
-      llc = (struct ndpi_llc_header_proto*)(packet + wifi_data_len + radio_len);
+      llc = (struct ndpi_llc_header_proto*)(packet + eth_offset + wifi_data_len + radio_len);
       llc_ether_type = ntohs(llc->ether_IP_type);
-    
+
       /* Set IP header offset */
-      ip_offset = wifi_data_len + radio_len + sizeof(struct ndpi_llc_header_proto);
+      ip_offset = wifi_data_len + radio_len + sizeof(struct ndpi_llc_header_proto) + eth_offset;
       break;
 
     default:
       return;
     }
-  
-  while(1) {    
+
+  while(1) {
     if(type == VLAN) {
       vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
       type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
@@ -1689,7 +1688,7 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
       label = ntohl(*((u_int32_t*)&packet[ip_offset]));
       ndpi_thread_info[thread_id].stats.mpls_count++;
       type = 0x800, ip_offset += 4;
-      
+
       while((label & 0x100) != 0x100) {
 	ip_offset += 4;
 	label = ntohl(*((u_int32_t*)&packet[ip_offset]));
@@ -1705,10 +1704,10 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
     else
       break;
   } /* while(1) */
-  
+
   ndpi_thread_info[thread_id].stats.vlan_count += vlan_packet;
 
-  /* Check and set IP header size and total packet length */  
+  /* Check and set IP header size and total packet length */
   iph = (struct ndpi_iphdr *) &packet[ip_offset];
 
   /* just work on Ethernet packets that contain IP */
@@ -1728,12 +1727,11 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
 
   /* Check IP version */
   if(iph->version == 4) {
-    
     ip_len = ((u_short)iph->ihl * 4);
     iph6 = NULL;
 
     if((frag_off & 0x3FFF) != 0) {
-      
+
       static u_int8_t ipv4_frags_warning_used = 0;
       ndpi_thread_info[thread_id].stats.fragmented_count++;
 
@@ -1751,39 +1749,38 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
     ip_len = sizeof(struct ndpi_ip6_hdr);
 
     if(proto == 0x3C /* IPv6 destination option */) {
-      
+
       u_int8_t *options = (u_int8_t*)&packet[ip_offset+ip_len];
       proto = options[0];
       ip_len += 8 * (options[1] + 1);
     }
     iph = NULL;
   } else {
-    
     static u_int8_t ipv4_warning_used = 0;
-    
+
   v4_warning:
     if(ipv4_warning_used == 0) {
-      if((!json_flag) && (!quiet_mode)) printf("\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
+      if((!json_flag) && (!quiet_mode))
+	printf("\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
       ipv4_warning_used = 1;
     }
     ndpi_thread_info[thread_id].stats.total_discarded_bytes +=  header->len;
     return;
   }
+
   if(decode_tunnels && (proto == IPPROTO_UDP)) {
-    
     struct ndpi_udphdr *udp = (struct ndpi_udphdr *)&packet[ip_offset+ip_len];
     u_int16_t sport = ntohs(udp->source), dport = ntohs(udp->dest);
 
     if((sport == GTP_U_V1_PORT) || (dport == GTP_U_V1_PORT)) {
-
       /* Check if it's GTPv1 */
       u_int offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
       u_int8_t flags = packet[offset];
       u_int8_t message_type = packet[offset+1];
-      
+
       if((((flags & 0xE0) >> 5) == 1 /* GTPv1 */) &&
 	 (message_type == 0xFF /* T-PDU */)) {
-	
+
 	ip_offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr)+8; /* GTPv1 header len */
 	if(flags & 0x04) ip_offset += 1; /* next_ext_header is present */
 	if(flags & 0x02) ip_offset += 4; /* sequence_number is present (it also includes next_ext_header and pdu_number) */
@@ -1796,9 +1793,47 @@ static void pcap_packet_callback(u_char *args, const struct pcap_pkthdr *header,
 	  goto v4_warning;
 	}
       }
+    } else if((sport == TZSP_PORT) || (dport == TZSP_PORT)) {
+      /* https://en.wikipedia.org/wiki/TZSP */
+      u_int offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
+      u_int8_t version = packet[offset];
+      u_int8_t type    = packet[offset+1];
+      u_int16_t encapsulates = ntohs(*((u_int16_t*)&packet[offset+2]));
+
+      if((version == 1) && (type == 0) && (encapsulates == 1)) {
+	u_int8_t stop = 0;
+	
+	offset += 4;
+
+	while((!stop) && (offset < header->caplen)) {
+	  u_int8_t tag_type = packet[offset];
+	  u_int8_t tag_len;
+	  
+	  switch(tag_type) {
+	  case 0: /* PADDING Tag */
+	    tag_len = 1;
+	    break;
+	  case 1: /* END Tag */
+	    tag_len = 1, stop = 1;
+	    break;
+	  default:
+	    tag_len = packet[offset+1];
+	    break;
+	  }
+
+	  offset += tag_len;
+
+	  if(offset >= header->caplen)
+	    return; /* Invalid packet */
+	  else {
+	    eth_offset = offset;
+	    goto datalink_check;
+	  }
+	}
+      }
     }
   }
-  
+
   /* process the packet */
   packet_processing(thread_id, time, vlan_id, iph, iph6,
 		    ip_offset, header->len - ip_offset, header->len);
