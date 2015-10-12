@@ -164,28 +164,11 @@ typedef uint   u_int32_t;
 /* Already defined in WS2tcpip.h */
 struct ndpi_win_in6_addr
 {
-  union
-  {
+  union {
     u_int8_t u6_addr8[16];
     u_int16_t u6_addr16[8];
     u_int32_t u6_addr32[4];
   } in6_u;
-#ifdef s6_addr
-#undef s6_addr
-#endif
-
-#ifdef s6_addr16
-#undef s6_addr16
-#endif
-
-#ifdef s6_addr32
-#undef s6_addr32
-#endif
-
-#define s6_addr                 in6_u.u6_addr8
-  // #define s6_addr16               in6_u.u6_addr16
-  // #define s6_addr32               in6_u.u6_addr32
-
 };
 
 #define in6_addr win_in6_addr
@@ -208,18 +191,12 @@ struct ndpi_ip6_ext
 
 struct ndpi_in6_addr {
   union {
-    u_int8_t   __u6_addr8[16];
-    u_int16_t  __u6_addr16[8];
-    u_int32_t  __u6_addr32[4];
-  } __u6_addr;                    /* 128-bit IP6 address */
+    u_int8_t   u6_addr8[16];
+    u_int16_t  u6_addr16[8];
+    u_int32_t  u6_addr32[4];
+  } u6_addr;  /* 128-bit IP6 address */
 };
 
-#undef s6_addr
-#undef s6_addr16
-#undef s6_addr32
-#define s6_addr		        __u6_addr.__u6_addr8
-#define s6_addr16		__u6_addr.__u6_addr16
-#define s6_addr32		__u6_addr.__u6_addr32
 
 struct ndpi_ip6_hdr {
   union {

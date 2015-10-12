@@ -917,8 +917,8 @@ static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
 
   memset(&iph, 0, sizeof(iph));
   iph.version = 4;
-  iph.saddr = iph6->ip6_src.__u6_addr.__u6_addr32[2] + iph6->ip6_src.__u6_addr.__u6_addr32[3];
-  iph.daddr = iph6->ip6_dst.__u6_addr.__u6_addr32[2] + iph6->ip6_dst.__u6_addr.__u6_addr32[3];
+  iph.saddr = iph6->ip6_src.u6_addr.u6_addr32[2] + iph6->ip6_src.u6_addr.u6_addr32[3];
+  iph.daddr = iph6->ip6_dst.u6_addr.u6_addr32[2] + iph6->ip6_dst.u6_addr.u6_addr32[3];
   iph.protocol = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
 
   if(iph.protocol == 0x3C /* IPv6 destination option */) {
