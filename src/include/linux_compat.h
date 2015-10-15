@@ -180,9 +180,11 @@ struct ndpi_ip6_ext
   u_int8_t  ip6e_len;		/* length in units of 8 octets.  */
 };
 
-#define s6_addr		        __u6_addr.__u6_addr8
-#define s6_addr16		__u6_addr.__u6_addr16
-#define s6_addr32		__u6_addr.__u6_addr32
+/*
+#define s6_addr		    u6_addr.u6_addr8
+#define s6_addr16		u6_addr.u6_addr16
+#define s6_addr32		u6_addr.u6_addr32
+*/
 #else
 #ifndef __KERNEL__
 #include <arpa/inet.h>
