@@ -1563,9 +1563,6 @@ static void pcap_packet_callback(u_char *args,
   /* Data frame */
   const struct ndpi_wifi_data_frame *wifi_data;
 
-  /* MPLS header */
-  const struct ndpi_mplshdr * mphls;
-
   /** --- IP header --- **/
   struct ndpi_iphdr *iph;
   /** --- IPv6 header --- **/
