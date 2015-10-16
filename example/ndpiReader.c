@@ -71,7 +71,8 @@
 #endif
 
 #define VLAN                   0x8100
-#define MPLS                   0x8847
+#define MPLS_UNI               0x8847
+#define MPLS_MULTI             0x8848
 #define PPPoE                  0x8864
 
 /* mask for FCF */
@@ -1551,6 +1552,8 @@ static void pcap_packet_callback(u_char *args,
    */
   /** --- Ethernet header --- **/
   const struct ndpi_ethhdr *ethernet;
+  /** --- Cisco HDLC header --- **/
+  const struct ndpi_chdlc *chdlc;
 
   /** --- ieee802.11 --- **/
   /* Radio Tap header */
@@ -1559,6 +1562,9 @@ static void pcap_packet_callback(u_char *args,
   const struct ndpi_llc_header_proto *llc;
   /* Data frame */
   const struct ndpi_wifi_data_frame *wifi_data;
+
+  /* MPLS header */
+  const struct ndpi_mplshdr * mphls;
 
   /** --- IP header --- **/
   struct ndpi_iphdr *iph;
@@ -1624,6 +1630,14 @@ static void pcap_packet_callback(u_char *args,
 
       ip_offset = 4 + eth_offset;
 
+      /* Cisco PPP with HDLC framing - 104 (http://tools.ietf.org/html/rfc1547#section-4.3.1) */
+    case DLT_C_HDLC:
+      chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
+      ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+      type = ntohs(chdlc->proto_code);
+      break;
+      
+      /* IEEE 802.3 Ethernet - 1 */
     case DLT_EN10MB :
       ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
       ip_offset = sizeof(struct ndpi_ethhdr) + eth_offset;
@@ -1684,7 +1698,7 @@ static void pcap_packet_callback(u_char *args,
       vlan_packet = 1;
       break;
     }
-    else if(type == MPLS) {
+    else if(type == MPLS_UNI || type == MPLS_MULTI) {
       label = ntohl(*((u_int32_t*)&packet[ip_offset]));
       ndpi_thread_info[thread_id].stats.mpls_count++;
       type = 0x800, ip_offset += 4;

@@ -48,6 +48,16 @@
 #pragma pack(pop)      /* restore original alignment from stack */
 
 
+/* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+/* ++++++++++ Cisco HDLC data structures +++++++++++++++++++++++ */
+/* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+struct ndpi_chdlc
+{
+  u_int8_t addr;          /* 0x0F (Unicast) - 0x8F (Broadcast) */
+  u_int8_t ctrl;          /* always 0x00                       */
+  u_int16_t proto_code;   /* protocol type (e.g. 0x0800 IP)    */
+};
+
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
 /* +++++++++++ Ethernet data structures +++++++++++++ */
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
@@ -58,7 +68,6 @@ struct ndpi_ethhdr
   u_char h_source[6];     /* source ether addr    */
   u_int16_t h_proto;      /* packet type ID field */
 };
-
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
 /* +++++++++++ ieee802.11 data structures +++++++++++ */
@@ -125,7 +134,6 @@ struct ndpi_llc_header_proto
 /* ++++++++++++++ IP data structures ++++++++++++++++ */
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-
 /* IP header */
 struct ndpi_iphdr {
 #if defined(__LITTLE_ENDIAN__) 
@@ -180,9 +188,11 @@ struct ndpi_ip6_ext
   u_int8_t  ip6e_len;		/* length in units of 8 octets.  */
 };
 
-#define s6_addr		        __u6_addr.__u6_addr8
-#define s6_addr16		__u6_addr.__u6_addr16
-#define s6_addr32		__u6_addr.__u6_addr32
+/*
+#define s6_addr		    u6_addr.u6_addr8
+#define s6_addr16		u6_addr.u6_addr16
+#define s6_addr32		u6_addr.u6_addr32
+*/
 #else
 #ifndef __KERNEL__
 #include <arpa/inet.h>
