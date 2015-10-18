@@ -70,6 +70,9 @@
 #define ETH_P_IPV6	       0x86dd	/* IPv6 */
 #endif
 
+#define SLARP                  0x8035   /* Cisco Slarp */
+#define CISCO_D_PROTO          0x2000	/* Cisco Discovery Protocol */
+
 #define VLAN                   0x8100
 #define MPLS_UNI               0x8847
 #define MPLS_MULTI             0x8848
@@ -1563,6 +1566,11 @@ static void pcap_packet_callback(u_char *args,
   /* Data frame */
   const struct ndpi_wifi_data_frame *wifi_data;
 
+  /* SLARP frame */
+  struct ndpi_slarp *slarp;
+  /* CDP */
+  struct ndpi_cdp *cdp;
+
   /** --- IP header --- **/
   struct ndpi_iphdr *iph;
   /** --- IPv6 header --- **/
@@ -1580,12 +1588,14 @@ static void pcap_packet_callback(u_char *args,
   u_int64_t time;
   u_int16_t type, ip_offset, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
-  u_int8_t proto = 0, vlan_packet = 0;
+  u_int8_t proto = 0;
   u_int32_t label;
 
   u_int16_t thread_id = *((u_int16_t*)args);
 
-  int malformed_pkts = 0;
+  /* counters */
+  u_int8_t malformed_pkts = 0, vlan_packet = 0;
+  u_int8_t slarp_pkts = 0, cdp_pkts = 0;
 
   /* Increment raw packet counter */
   ndpi_thread_info[thread_id].stats.raw_packet_count++;
@@ -1627,7 +1637,14 @@ static void pcap_packet_callback(u_char *args,
 
       ip_offset = 4 + eth_offset;
 
-      /* Cisco PPP with HDLC framing - 104 (http://tools.ietf.org/html/rfc1547#section-4.3.1) */
+      /* Cisco PPP in HDLC-like framing - 50*/
+    case DLT_PPP_SERIAL:
+      chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
+      ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+      type = ntohs(chdlc->proto_code);
+      break;
+
+      /* Cisco PPP with HDLC framing - 104 */
     case DLT_C_HDLC:
       chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
       ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
@@ -1706,6 +1723,19 @@ static void pcap_packet_callback(u_char *args,
       }
       break;
     }
+    else if(type == SLARP) {
+      slarp = (struct ndpi_slarp *) &packet[ip_offset];
+      if(slarp->slarp_type == 0x02 || slarp->slarp_type == 0x00 || slarp->slarp_type == 0x01) {
+	/* TODO if info are needed */
+      }
+      slarp_pkts++;
+      break;
+    }
+    else if(type == CISCO_D_PROTO) {
+      cdp = (struct ndpi_cdp *) &packet[ip_offset];
+      cdp_pkts++;
+      break;
+    }    
     else if(type == PPPoE) {
       ndpi_thread_info[thread_id].stats.pppoe_count++;
       type = 0x0800;

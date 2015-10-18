@@ -49,14 +49,39 @@
 
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-/* ++++++++++ Cisco HDLC data structures +++++++++++++++++++++++ */
+/* +++++++++++++++ Cisco data structures +++++++++++++++++++++++ */
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+/* Cisco HDLC */
 struct ndpi_chdlc
 {
   u_int8_t addr;          /* 0x0F (Unicast) - 0x8F (Broadcast) */
   u_int8_t ctrl;          /* always 0x00                       */
   u_int16_t proto_code;   /* protocol type (e.g. 0x0800 IP)    */
 };
+
+/* SLARP - Serial Line ARP http://tinyurl.com/qa54e95 */
+struct ndpi_slarp
+{
+  /* address requests (0x00)
+     address replies  (0x01)
+     keep-alive       (0x02)
+  */
+  u_int32_t slarp_type;
+  u_int32_t addr_1;
+  u_int32_t addr_2;
+};
+
+/* Cisco Discovery Protocol http://tinyurl.com/qa6yw9l */
+struct ndpi_cdp
+{
+  u_int8_t version;
+  u_int8_t ttl;
+  u_int16_t checksum;
+  u_int16_t type;
+  u_int16_t length;
+};
+
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++ */
 /* +++++++++++ Ethernet data structures +++++++++++++ */
