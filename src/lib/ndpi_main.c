@@ -1627,11 +1627,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Starcraft",
 			    ndpi_build_default_ports(ports_a, 1119, 0, 0, 0, 0),	/* TCP */
 			    ndpi_build_default_ports(ports_b, 1119, 0, 0, 0, 0));	/* UDP */
-	 ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_UBNTAC2,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_UBNTAC2,
 			    no_master, 
 			    no_master, "UBNTAC2",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	/* TCP */
 			    ndpi_build_default_ports(ports_b, 10001, 0, 0, 0, 0));	/* UDP */
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MS_LYNC,
+			    no_master, 
+			    no_master, "Lync",
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	/* TCP */
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));	/* UDP */
 	 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
