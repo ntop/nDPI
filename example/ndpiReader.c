@@ -1586,7 +1586,7 @@ static void pcap_packet_callback(u_char *args,
   u_int32_t fcs;
 
   u_int64_t time;
-  u_int16_t type, ip_offset, ip_len;
+  u_int16_t type, ip_offset, ip_len, ip6_offset;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0;
   u_int32_t label;
@@ -1766,10 +1766,24 @@ static void pcap_packet_callback(u_char *args,
     }
   }
 
+  /* Check for tunnel 6in4 */
+  if(iph->version == 4 && iph->protocol == 41) {
+    
+    ip_len = ((u_short)iph->ihl * 4);
+    ip6_offset = ip_len + ip_offset;
+    iph6 = (struct ndpi_ip6_hdr *)&packet[ip6_offset];
+    proto = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
+    ip_len = sizeof(struct ndpi_ip6_hdr);
+    ip_offset = ip_len + ip6_offset;
+    iph = NULL;
+  }
   /* Check IP version */
-  if(iph->version == 4) {
+  else if(iph->version == 4) {
     ip_len = ((u_short)iph->ihl * 4);
     iph6 = NULL;
+
+    /* if(iph->protocol == 41) */
+    /*   goto ipv6in4; */
 
     if((frag_off & 0x3FFF) != 0) {
 
@@ -1796,6 +1810,16 @@ static void pcap_packet_callback(u_char *args,
       ip_len += 8 * (options[1] + 1);
     }
     iph = NULL;
+
+    /* tunnel 6in4 */
+  /* ipv6in4: */
+  /*   ip6_offset = ip_len + ip_offset; */
+  /*   iph6 = (struct ndpi_ip6_hdr *)&packet[ip6_offset]; */
+  /*   proto = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt; */
+  /*   ip_len = sizeof(struct ndpi_ip6_hdr); */
+  /*   ip_offset = ip_len + ip6_offset; */
+  /*   iph = NULL; */
+
   } else {
     static u_int8_t ipv4_warning_used = 0;
 
