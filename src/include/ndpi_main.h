@@ -25,7 +25,6 @@
 #ifndef __NDPI_MAIN_INCLUDE_FILE__
 #define __NDPI_MAIN_INCLUDE_FILE__
 
-#ifndef __KERNEL__
 #include <stdint.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -35,32 +34,20 @@
 #endif
 #include <ctype.h>
 #include <time.h>
-#endif
 
 
 #ifndef WIN32
-#ifndef __KERNEL__
 #include <sys/time.h>
-#endif
 
 #if !defined __APPLE__ && !defined __FreeBSD__ && !defined __NetBSD__ && !defined __OpenBSD__
-
-#ifndef __KERNEL__
 #include <endian.h>
 #include <byteswap.h>
-#else
-#include <asm/byteorder.h>
-#include <linux/ctype.h>
-#endif
-
 #endif
 
 /* default includes */
 
-#ifndef __KERNEL__
 #include <sys/param.h>
 #include <limits.h>
-#endif
 #endif
 
 #include "ndpi_win32.h"

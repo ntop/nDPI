@@ -100,15 +100,12 @@ typedef union {
 
 
 #ifdef NDPI_PROTOCOL_BITTORRENT
-#ifndef __KERNEL__
 typedef struct spinlock {
   volatile int    val;
 } spinlock_t;
 typedef struct atomic {
   volatile int counter;
 } atomic_t;
-
-#endif
 
 struct hash_ip4p_node {
   struct hash_ip4p_node   *next,*prev;
@@ -692,11 +689,7 @@ typedef struct ndpi_flow_struct {
 				       that identifies the 
 				       server of this connection
 				    */
-#ifndef __KERNEL__
   u_char host_server_name[256]; /* HTTP host or DNS query   */ 
-#else
-  u_char host_server_name[160];
-#endif
   u_char detected_os[32];       /* Via HTTP User-Agent      */
   u_char nat_ip[24];            /* Via HTTP X-Forwarded-For */
 

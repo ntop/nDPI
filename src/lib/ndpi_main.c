@@ -23,29 +23,17 @@
  */
 
 
-#ifndef __KERNEL__
 #include <stdlib.h>
 #include <errno.h>
-#endif
-
 #include "ahocorasick.h"
 #include "ndpi_api.h"
-
-
-#ifndef __KERNEL__
 #include "../../config.h"
-#endif
 
 // #define DEBUG
 
-#ifdef __KERNEL__
-#include <linux/version.h>
-#define printf printk
-#else
 #include <time.h>
 #ifndef WIN32
 #include <unistd.h>
-#endif
 #endif
 
 #include "ndpi_content_match.c.inc"
@@ -57,115 +45,6 @@
 #ifndef strtok_r
 #define strtok_r(a,b,c) strtok(a,b)
 #endif
-#endif
-
-#ifdef __KERNEL__
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39)
-static inline char _tolower(const char c)
-{
-  return c | 0x20;
-}
-
-static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
-{
-  unsigned long long acc;
-  int ok;
-
-  if(base == 0) {
-    if(s[0] == '0') {
-      if(_tolower(s[1]) == 'x' && isxdigit(s[2]))
-	base = 16;
-      else
-	base = 8;
-    } else
-      base = 10;
-  }
-  if(base == 16 && s[0] == '0' && _tolower(s[1]) == 'x')
-    s += 2;
-
-  acc = 0;
-  ok = 0;
-  while (*s) {
-    unsigned int val;
-
-    if('0' <= *s && *s <= '9')
-      val = *s - '0';
-    else if('a' <= _tolower(*s) && _tolower(*s) <= 'f')
-      val = _tolower(*s) - 'a' + 10;
-    else if(*s == '\n') {
-      if(*(s + 1) == '\0')
-	break;
-      else
-	return -EINVAL;
-    } else
-      return -EINVAL;
-
-    if(val >= base)
-      return -EINVAL;
-    if(acc > div_u64(ULLONG_MAX - val, base))
-      return -ERANGE;
-    acc = acc * base + val;
-    ok = 1;
-
-    s++;
-  }
-  if(!ok)
-    return -EINVAL;
-  *res = acc;
-  return 0;
-}
-
-int kstrtoull(const char *s, unsigned int base, unsigned long long *res)
-{
-  if(s[0] == '+')
-    s++;
-  return _kstrtoull(s, base, res);
-}
-int kstrtoll(const char *s, unsigned int base, long long *res)
-{
-  unsigned long long tmp;
-  int rv;
-
-  if(s[0] == '-') {
-    rv = _kstrtoull(s + 1, base, &tmp);
-    if(rv < 0)
-      return rv;
-    if((long long)(-tmp) >= 0)
-      return -ERANGE;
-    *res = -tmp;
-  } else {
-    rv = kstrtoull(s, base, &tmp);
-    if(rv < 0)
-      return rv;
-    if((long long)tmp < 0)
-      return -ERANGE;
-    *res = tmp;
-  }
-  return 0;
-}
-int kstrtoint(const char *s, unsigned int base, int *res)
-{
-  long long tmp;
-  int rv;
-
-  rv = kstrtoll(s, base, &tmp);
-  if(rv < 0)
-    return rv;
-  if(tmp != (long long)(int)tmp)
-    return -ERANGE;
-  *res = tmp;
-  return 0;
-}
-#endif
-
-int atoi(const char *str) {
-  int rc;
-
-  if(kstrtoint(str, 0, &rc) == 0 /* Success */)
-    return(rc);
-  else
-    return(0);
-}
 #endif
 
 /* ftp://ftp.cc.uoc.gr/mirrors/OpenBSD/src/lib/libc/stdlib/tsearch.c */
@@ -1966,54 +1845,6 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ******************************************************************** */
 
-#if 0
-#ifndef __KERNEL__
-static int add_proto_default_port(u_int16_t **ports, u_int16_t new_port,
-				  ndpi_proto_defaults_t *def,
-				  ndpi_default_ports_tree_node_t *root) {
-  u_int num_ports, i;
-
-  if(*ports == NULL) {
-    ndpi_port_range range = { new_port, new_port };
-
-    addDefaultPort(&range, def, &root);
-    return(0);
-  }
-
-  for(num_ports=0; (*ports)[num_ports] != 0; num_ports++)
-    ;
-
-  if(num_ports >= MAX_DEFAULT_PORTS) {
-    printf("Too many ports defined: ignored port %d\n", new_port);
-    return(-1);
-  } else {
-    u_int16_t *new_ports = (u_int16_t*)ndpi_malloc(num_ports+1);
-    ndpi_port_range range;
-
-    if(new_ports == NULL) {
-      printf("Not enough memory\n");
-      return(-2);
-    }
-
-    for(i=0; i<num_ports; i++)
-      new_ports[i] = (*ports)[i];
-
-    new_ports[i++] = new_port;
-    new_ports[i++] = 0;
-
-    ndpi_free(*ports);
-    *ports = new_ports;
-
-    range.port_low = range.port_high = new_port;
-    addDefaultPort(&range, def, &root);
-    return(0);
-  }
-}
-#endif
-#endif
-
-/* ******************************************************************** */
-
 u_int ndpi_get_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   return(ndpi_mod->ndpi_num_supported_protocols);
 }
@@ -2135,9 +1966,6 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
 
 */
 int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char* path) {
-#ifdef __KERNEL__
-  return(0);
-#else
   FILE *fd = fopen(path, "r");
   int i;
 
@@ -2161,14 +1989,6 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char
   }
 
   fclose(fd);
-
-#if 0
-  printf("\nTCP:\n");
-  ndpi_twalk(ndpi_mod->tcpRoot, ndpi_default_ports_tree_node_t_walker, NULL);
-  printf("\nUDP:\n");
-  ndpi_twalk(ndpi_mod->udpRoot, ndpi_default_ports_tree_node_t_walker, NULL);
-#endif
-#endif
 
   return(0);
 }
@@ -3324,15 +3144,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   }
 
   flow->packet.tick_timestamp_l = current_tick_l;
-#ifdef __KERNEL__
-  {
-    u_int64_t d = current_tick_l;
-    do_div(d,1000);
-    flow->packet.tick_timestamp = d;
-  }
-#else
   flow->packet.tick_timestamp = (u_int32_t)current_tick_l/1000;
-#endif
 
   /* parse packet */
   flow->packet.iph = (struct ndpi_iphdr *)packet;
@@ -4190,16 +4002,6 @@ u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str, u_int16_t max_ch
 
 /* ****************************************************** */
 
-#if 0
-#ifndef __KERNEL__
-static u_int is_port(u_int16_t sport, u_int16_t dport, u_int16_t match_port) {
-  return(((match_port == sport) || (match_port == dport)) ? 1 : 0);
-}
-#endif
-#endif
-
-/* ****************************************************** */
-
 ndpi_protocol ndpi_find_port_based_protocol(struct ndpi_detection_module_struct *ndpi_struct /* NOTUSED */,
 					    u_int8_t proto,
 					    u_int32_t shost, u_int16_t sport,
@@ -4504,11 +4306,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
 /* ****************************************************** */
 
-#ifndef __KERNEL__
-char* ndpi_revision() {
-  return(NDPI_GIT_RELEASE);
-}
-#endif
+char* ndpi_revision() { return(NDPI_GIT_RELEASE); }
 
 /* ****************************************************** */
 

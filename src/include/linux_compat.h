@@ -219,9 +219,7 @@ struct ndpi_ip6_ext
 #define s6_addr32		u6_addr.u6_addr32
 */
 #else
-#ifndef __KERNEL__
 #include <arpa/inet.h>
-#endif
 #endif
 
 struct ndpi_in6_addr {
