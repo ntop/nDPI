@@ -1748,6 +1748,7 @@ static void pcap_packet_callback(u_char *args,
 
   ndpi_thread_info[thread_id].stats.vlan_count += vlan_packet;
 
+ iph_check:
   /* Check and set IP header size and total packet length */
   iph = (struct ndpi_iphdr *) &packet[ip_offset];
 
@@ -1766,24 +1767,14 @@ static void pcap_packet_callback(u_char *args,
     }
   }
 
-  /* Check for tunnel 6in4 */
-  if(iph->version == 4 && iph->protocol == 41) {
-    
-    ip_len = ((u_short)iph->ihl * 4);
-    ip6_offset = ip_len + ip_offset;
-    iph6 = (struct ndpi_ip6_hdr *)&packet[ip6_offset];
-    proto = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
-    ip_len = sizeof(struct ndpi_ip6_hdr);
-    ip_offset = ip_len + ip6_offset;
-    iph = NULL;
-  }
-  /* Check IP version */
-  else if(iph->version == 4) {
+  if(iph->version == 4) {
     ip_len = ((u_short)iph->ihl * 4);
     iph6 = NULL;
 
-    /* if(iph->protocol == 41) */
-    /*   goto ipv6in4; */
+    if(iph->protocol == 41) {
+      ip_offset += ip_len;
+      goto iph_check;
+    }
 
     if((frag_off & 0x3FFF) != 0) {
 
