@@ -204,16 +204,16 @@ static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struc
       NOTE
 
       If http_dont_dissect_response = 1 dissection of HTTP response
-      mime types won't happen     
+      mime types won't happen
      */
 
       if(!ndpi_struct->http_dont_dissect_response) {
 	if(flow->http.url && flow->http_detected)
-	  ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)&flow->http.url[7], 
+	  ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)&flow->http.url[7],
 					strlen((const char *)&flow->http.url[7]),
 					NDPI_PROTOCOL_HTTP);
       } else
-	ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name, 
+	ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
 				      strlen((const char *)flow->host_server_name),
 				      NDPI_PROTOCOL_HTTP);
     }
@@ -247,7 +247,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       if(flow->http.url) {
 	strncpy(flow->http.url, "http://", 7);
 	strncpy(&flow->http.url[7], (char*)packet->host_line.ptr, packet->host_line.len);
-	strncpy(&flow->http.url[7+packet->host_line.len], (char*)packet->http_url_name.ptr, 
+	strncpy(&flow->http.url[7+packet->host_line.len], (char*)packet->http_url_name.ptr,
 		packet->http_url_name.len);
 	flow->http.url[len-1] = '\0';
       }
@@ -282,8 +282,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       flow->http.content_type = ndpi_malloc(len);
       if(flow->http.content_type) {
-	strncpy(flow->http.content_type, (char*)packet->content_line.ptr, 
-		packet->content_line.len);      
+	strncpy(flow->http.content_type, (char*)packet->content_line.ptr,
+		packet->content_line.len);
 	flow->http.content_type[packet->content_line.len] = '\0';
       }
     }
@@ -352,8 +352,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
 #if 0
     if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
-      ndpi_match_content_subprotocol(ndpi_struct, flow, 
-				     (char*)packet->user_agent_line.ptr, 
+      ndpi_match_content_subprotocol(ndpi_struct, flow,
+				     (char*)packet->user_agent_line.ptr,
 				     packet->user_agent_line.len,
 				     NDPI_PROTOCOL_HTTP);
 #endif
@@ -367,11 +367,11 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	     packet->host_line.len, packet->host_line.ptr);
 
     if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
-      ndpi_match_host_subprotocol(ndpi_struct, flow, 
-				  (char*)packet->host_line.ptr, 
+      ndpi_match_host_subprotocol(ndpi_struct, flow,
+				  (char*)packet->host_line.ptr,
 				  packet->host_line.len,
 				  NDPI_PROTOCOL_HTTP);
-    
+
     /* Copy result for nDPI apps */
     len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
     strncpy((char*)flow->host_server_name, (char*)packet->host_line.ptr, len);
@@ -771,6 +771,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t filename_start;
 
+  packet->packet_lines_parsed_complete = 0;
+
   /* Check if we so far detected the protocol in the request or not. */
   if(flow->l4.tcp.http_stage == 0) {
     flow->http_detected = 0;
@@ -911,6 +913,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 		 "HTTP START Found in 2. packet, we will look further for the response....\n");
         flow->http_detected = 1;
       }
+
       return;
     }
 

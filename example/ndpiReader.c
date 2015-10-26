@@ -727,23 +727,27 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
 				       const u_int8_t version,
 				       u_int16_t vlan_id,
 				       const struct ndpi_iphdr *iph,
+				       const struct ndpi_ip6_hdr *iph6,
 				       u_int16_t ip_offset,
 				       u_int16_t ipsize,
 				       u_int16_t l4_packet_len,
+				       struct ndpi_tcphdr **tcph,
+				       struct ndpi_udphdr **udph,
+				       u_int16_t *sport, u_int16_t *dport,
 				       struct ndpi_id_struct **src,
 				       struct ndpi_id_struct **dst,
 				       u_int8_t *proto,
-				       const struct ndpi_ip6_hdr *iph6) {
+				       u_int8_t **payload,
+				       u_int16_t *payload_len,
+				       u_int8_t *src_to_dst_direction) {
   u_int32_t idx, l4_offset;
-  struct ndpi_tcphdr *tcph = NULL;
-  struct ndpi_udphdr *udph = NULL;
   u_int32_t lower_ip;
   u_int32_t upper_ip;
   u_int16_t lower_port;
   u_int16_t upper_port;
   struct ndpi_flow flow;
   void *ret;
-  u_int8_t *l3;
+  u_int8_t *l3, *l4;
 
   /*
     Note: to keep things simple (ndpiReader is just a demo app)
@@ -789,19 +793,25 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
   }
 
   *proto = iph->protocol;
+  l4 = ((u_int8_t *) l3 + l4_offset);
 
   if(iph->protocol == 6 && l4_packet_len >= 20) {
+    u_int tcp_len;
+
     ndpi_thread_info[thread_id].stats.tcp_count++;
 
     // tcp
-    tcph = (struct ndpi_tcphdr *) ((u_int8_t *) l3 + l4_offset);
+    *tcph = (struct ndpi_tcphdr *)l4;
+    *sport = ntohs((*tcph)->source), *dport = ntohs((*tcph)->dest);
+    
     if(iph->saddr < iph->daddr) {
-      lower_port = tcph->source;
-      upper_port = tcph->dest;
+      lower_port = (*tcph)->source, upper_port = (*tcph)->dest;
+      *src_to_dst_direction = 1;
     } else {
-      lower_port = tcph->dest;
-      upper_port = tcph->source;
+      lower_port = (*tcph)->dest;
+      upper_port = (*tcph)->source;
 
+      *src_to_dst_direction = 0;
       if(iph->saddr == iph->daddr) {
 	if(lower_port > upper_port) {
 	  u_int16_t p = lower_port;
@@ -811,18 +821,38 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
 	}
       }
     }
+    
+    tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
+    *payload = &l4[tcp_len];
+    *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
   } else if(iph->protocol == 17 && l4_packet_len >= 8) {
     // udp
     ndpi_thread_info[thread_id].stats.udp_count++;
 
-    udph = (struct ndpi_udphdr *) ((u_int8_t *) l3 + l4_offset);
+    *udph = (struct ndpi_udphdr *)l4;
+    *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);    
+    *payload = &l4[sizeof(struct ndpi_udphdr)];
+    *payload_len = ndpi_max(0, l4_packet_len-sizeof(struct ndpi_udphdr));
+
     if(iph->saddr < iph->daddr) {
-      lower_port = udph->source;
-      upper_port = udph->dest;
+      lower_port = (*udph)->source, upper_port = (*udph)->dest;
+      *src_to_dst_direction = 1;
     } else {
-      lower_port = udph->dest;
-      upper_port = udph->source;
+      lower_port = (*udph)->dest, upper_port = (*udph)->source;
+
+      *src_to_dst_direction = 0;
+
+      if(iph->saddr == iph->daddr) {
+	if(lower_port > upper_port) {
+	  u_int16_t p = lower_port;
+	  
+	  lower_port = upper_port;
+	  upper_port = p;
+	}
+      }
     }
+
+    *sport = ntohs(lower_port), *dport = ntohs(upper_port);
   } else {
     // non tcp/udp protocols
     lower_port = 0;
@@ -892,8 +922,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
       *src = newflow->src_id, *dst = newflow->dst_id;
 
       // printFlow(thread_id, newflow);
-
-      return newflow ;
+      return newflow;
     }
   } else {
     struct ndpi_flow *flow = *(struct ndpi_flow**)ret;
@@ -914,9 +943,15 @@ static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
 					u_int16_t vlan_id,
 					const struct ndpi_ip6_hdr *iph6,
 					u_int16_t ip_offset,
+					struct ndpi_tcphdr **tcph,
+					struct ndpi_udphdr **udph,
+					u_int16_t *sport, u_int16_t *dport,
 					struct ndpi_id_struct **src,
 					struct ndpi_id_struct **dst,
-					u_int8_t *proto) {
+					u_int8_t *proto,
+					u_int8_t **payload,
+					u_int16_t *payload_len,
+					u_int8_t *src_to_dst_direction) {
   struct ndpi_iphdr iph;
 
   memset(&iph, 0, sizeof(iph));
@@ -931,10 +966,11 @@ static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
     iph.protocol = options[0];
   }
 
-  return(get_ndpi_flow(thread_id, 6, vlan_id, &iph, ip_offset,
+  return(get_ndpi_flow(thread_id, 6, vlan_id, &iph, iph6, ip_offset,
 		       sizeof(struct ndpi_ip6_hdr),
 		       ntohs(iph6->ip6_ctlun.ip6_un1.ip6_un1_plen),
-		       src, dst, proto, iph6));
+		       tcph, udph, sport, dport,
+		       src, dst, proto, payload, payload_len, src_to_dst_direction));
 }
 
 /* ***************************************************** */
@@ -998,13 +1034,24 @@ static unsigned int packet_processing(u_int16_t thread_id,
   struct ndpi_flow *flow;
   struct ndpi_flow_struct *ndpi_flow = NULL;
   u_int8_t proto;
-
+  struct ndpi_tcphdr *tcph = NULL;
+  struct ndpi_udphdr *udph = NULL;
+  u_int16_t sport, dport, payload_len;
+  u_int8_t *payload;
+  u_int8_t src_to_dst_direction= 1;
+  
   if(iph)
-    flow = get_ndpi_flow(thread_id, 4, vlan_id, iph, ip_offset, ipsize,
+    flow = get_ndpi_flow(thread_id, 4, vlan_id, iph, NULL,
+			 ip_offset, ipsize,
 			 ntohs(iph->tot_len) - (iph->ihl * 4),
-			 &src, &dst, &proto, NULL);
+			 &tcph, &udph, &sport, &dport,			
+			 &src, &dst, &proto,
+			 &payload, &payload_len, &src_to_dst_direction);
   else
-    flow = get_ndpi_flow6(thread_id, vlan_id, iph6, ip_offset, &src, &dst, &proto);
+    flow = get_ndpi_flow6(thread_id, vlan_id, iph6, ip_offset,
+			  &tcph, &udph, &sport, &dport,			
+			  &src, &dst, &proto,
+			  &payload, &payload_len, &src_to_dst_direction);
 
   if(flow != NULL) {
     ndpi_thread_info[thread_id].stats.ip_packet_count++;
@@ -1021,7 +1068,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
   flow->detected_protocol = ndpi_detection_process_packet(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow,
 							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							  ipsize, time, src, dst);
-
+  
   if((flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
@@ -1777,7 +1824,6 @@ static void pcap_packet_callback(u_char *args,
     }
 
     if((frag_off & 0x3FFF) != 0) {
-
       static u_int8_t ipv4_frags_warning_used = 0;
       ndpi_thread_info[thread_id].stats.fragmented_count++;
 
