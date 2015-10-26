@@ -189,7 +189,7 @@ typedef struct ndpi_flow {
   u_int8_t detection_completed, protocol;
   u_int16_t vlan_id;
   struct ndpi_flow_struct *ndpi_flow;
-  char lower_name[32], upper_name[32];
+  char lower_name[48], upper_name[48];
 
   u_int64_t last_seen;
 
