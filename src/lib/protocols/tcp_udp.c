@@ -48,6 +48,9 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
   u_int proto;
   struct ndpi_packet_struct *packet = &flow->packet;
 
+  if(flow->host_server_name[0] != '\0')
+    return;
+
   if(ndpi_is_tor_flow(ndpi_struct, flow)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_UNKNOWN);
     return;
