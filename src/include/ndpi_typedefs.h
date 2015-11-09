@@ -106,15 +106,6 @@ struct ndpi_cdp
 } __attribute__((packed));
 
 
-
-/* ++++++++++++++++++ Ethernet II header ++++++++++++++++++++++ */
-struct ndpi_ethhdr_II
-{
-  u_char h_dest[6];       /* destination eth addr */
-  u_char h_source[6];     /* source ether addr    */
-  u_int16_t type;         /* packet type ID field */
-} __attribute__((packed));
-
 /* +++++++++++++++ Ethernet header (IEEE 802.3) +++++++++++++++ */
 struct ndpi_ethhdr 
 {
