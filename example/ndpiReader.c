@@ -42,16 +42,14 @@
 #include <pcap.h>
 #include <signal.h>
 #include <pthread.h>
+#include <sys/socket.h>
 
 #include "../config.h"
+#include "ndpi_api.h"
 
 #ifdef HAVE_JSON_C
 #include <json.h>
 #endif
-
-#include "ndpi_api.h"
-
-#include <sys/socket.h>
 
 #define MAX_NUM_READER_THREADS     16
 #define IDLE_SCAN_PERIOD           10 /* msec (use detection_tick_resolution = 1000) */
@@ -77,6 +75,7 @@
 #define MPLS_UNI               0x8847
 #define MPLS_MULTI             0x8848
 #define PPPoE                  0x8864
+#define SNAP                   0xaa
 
 /* mask for FCF */
 #define	WIFI_DATA                        0x2    /* 0000 0010 */
@@ -727,7 +726,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
 				       const u_int8_t version,
 				       u_int16_t vlan_id,
 				       const struct ndpi_iphdr *iph,
-				       const struct ndpi_ip6_hdr *iph6,
+				       const struct ndpi_ipv6hdr *iph6,
 				       u_int16_t ip_offset,
 				       u_int16_t ipsize,
 				       u_int16_t l4_packet_len,
@@ -764,7 +763,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
     l4_offset = iph->ihl * 4;
     l3 = (u_int8_t*)iph;
   } else {
-    l4_offset = sizeof(struct ndpi_ip6_hdr);
+    l4_offset = sizeof(struct ndpi_ipv6hdr);
     l3 = (u_int8_t*)iph6;
   }
 
@@ -941,7 +940,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
 
 static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
 					u_int16_t vlan_id,
-					const struct ndpi_ip6_hdr *iph6,
+					const struct ndpi_ipv6hdr *iph6,
 					u_int16_t ip_offset,
 					struct ndpi_tcphdr **tcph,
 					struct ndpi_udphdr **udph,
@@ -961,13 +960,13 @@ static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
   iph.protocol = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
 
   if(iph.protocol == 0x3C /* IPv6 destination option */) {
-    u_int8_t *options = (u_int8_t*)iph6 + sizeof(const struct ndpi_ip6_hdr);
+    u_int8_t *options = (u_int8_t*)iph6 + sizeof(const struct ndpi_ipv6hdr);
 
     iph.protocol = options[0];
   }
 
   return(get_ndpi_flow(thread_id, 6, vlan_id, &iph, iph6, ip_offset,
-		       sizeof(struct ndpi_ip6_hdr),
+		       sizeof(struct ndpi_ipv6hdr),
 		       ntohs(iph6->ip6_ctlun.ip6_un1.ip6_un1_plen),
 		       tcph, udph, sport, dport,
 		       src, dst, proto, payload, payload_len, src_to_dst_direction));
@@ -1027,7 +1026,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
 				      const u_int64_t time,
 				      u_int16_t vlan_id,
 				      const struct ndpi_iphdr *iph,
-				      struct ndpi_ip6_hdr *iph6,
+				      struct ndpi_ipv6hdr *iph6,
 				      u_int16_t ip_offset,
 				      u_int16_t ipsize, u_int16_t rawsize) {
   struct ndpi_id_struct *src, *dst;
@@ -1600,40 +1599,47 @@ static void pcap_packet_callback(u_char *args,
   /*
    * Declare pointers to packet headers
    */
-  /** --- Ethernet header --- **/
+  
+  /* --- Ethernet header --- */
   const struct ndpi_ethhdr *ethernet;
-  /** --- Cisco HDLC header --- **/
+  /* --- Ethernet II header --- */
+  const struct ndpi_ethhdr *ethernet_2;
+  /* --- LLC header --- */
+  const struct ndpi_llc_header *llc;
+
+  /* --- Cisco HDLC header --- */
   const struct ndpi_chdlc *chdlc;
-
-  /** --- ieee802.11 --- **/
-  /* Radio Tap header */
-  const struct ndpi_radiotap_header *radiotap;
-  /* LLC header */
-  const struct ndpi_llc_header_proto *llc;
-  /* Data frame */
-  const struct ndpi_wifi_data_frame *wifi_data;
-
-  /* SLARP frame */
+  /* --- SLARP frame --- */
   struct ndpi_slarp *slarp;
-  /* CDP */
+  /* --- CDP --- */
   struct ndpi_cdp *cdp;
+
+  /* --- Radio Tap header --- */
+  const struct ndpi_radiotap_header *radiotap;
+  /* --- Wifi header --- */
+  const struct ndpi_wifi_header *wifi;
+
+  /* --- MPLS header --- */
+  struct ndpi_mpls_header *mpls;
 
   /** --- IP header --- **/
   struct ndpi_iphdr *iph;
   /** --- IPv6 header --- **/
-  struct ndpi_ip6_hdr *iph6;
+  struct ndpi_ipv6hdr *iph6;
 
   /* lengths and offsets */
   u_int16_t eth_offset = 0;
   u_int16_t radio_len;
   u_int16_t fc;
-  int wifi_data_len;
-  int llc_len;
-  u_int16_t llc_ether_type;
+  u_int16_t type;
+  int wifi_len;
+  int llc_off;
+  int pyld_eth_len = 0;
+  int check;
   u_int32_t fcs;
 
   u_int64_t time;
-  u_int16_t type, ip_offset, ip_len, ip6_offset;
+  u_int16_t ip_offset, ip_len, ip6_offset;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0;
   u_int32_t label;
@@ -1676,6 +1682,7 @@ static void pcap_packet_callback(u_char *args,
 
  datalink_check:
   switch(datalink_type) {
+
     case DLT_NULL :
       if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
 	type = ETH_P_IP;
@@ -1684,7 +1691,7 @@ static void pcap_packet_callback(u_char *args,
 
       ip_offset = 4 + eth_offset;
 
-      /* Cisco PPP in HDLC-like framing - 50*/
+      /* Cisco PPP in HDLC-like framing - 50 */
     case DLT_PPP_SERIAL:
       chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
       ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
@@ -1702,7 +1709,21 @@ static void pcap_packet_callback(u_char *args,
     case DLT_EN10MB :
       ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
       ip_offset = sizeof(struct ndpi_ethhdr) + eth_offset;
-      type = ntohs(ethernet->h_proto);
+      check = ntohs(ethernet->h_lt);
+
+      if(check <= 1500)
+	pyld_eth_len = check;
+      else if (check >= 1536)
+	type = check;
+
+      if(pyld_eth_len != 0) {
+      /* check for LLC layer with SNAP extension */
+	if(packet[ip_offset] == SNAP) {
+	  llc = (struct ndpi_llc_header *)(&packet[ip_offset]);
+	  type = llc->snap.proto_ID;
+	  ip_offset += + 8;
+	}
+      }
       break;
 
       /* Linux Cooked Capture - 113 */
@@ -1726,73 +1747,67 @@ static void pcap_packet_callback(u_char *args,
       fcs = header->len - 4;
 
       /* Calculate 802.11 header length (variable) */
-      wifi_data = (struct ndpi_wifi_data_frame*)( packet + eth_offset + radio_len);
-      fc = wifi_data->fc;
+      wifi = (struct ndpi_wifi_header*)( packet + eth_offset + radio_len);
+      fc = wifi->fc;
 
       /* check wifi data presence */
       if(FCF_TYPE(fc) == WIFI_DATA) {
 	if((FCF_TO_DS(fc) && FCF_FROM_DS(fc) == 0x0) ||
 	   (FCF_TO_DS(fc) == 0x0 && FCF_FROM_DS(fc)))
-	  wifi_data_len = 26; /* + 4 byte fcs */
-
-	/* TODO: check QoS Control for aggregated MSDU */
+	  wifi_len = 26; /* + 4 byte fcs */
       } else   /* no data frames */
 	break;
 
       /* Check ether_type from LLC */
-      llc = (struct ndpi_llc_header_proto*)(packet + eth_offset + wifi_data_len + radio_len);
-      llc_ether_type = ntohs(llc->ether_IP_type);
+      llc = (struct ndpi_llc_header*)(packet + eth_offset + wifi_len + radio_len);
+      if(llc->dsap == SNAP)
+	type = ntohs(llc->snap.proto_ID);
 
       /* Set IP header offset */
-      ip_offset = wifi_data_len + radio_len + sizeof(struct ndpi_llc_header_proto) + eth_offset;
+      ip_offset = wifi_len + radio_len + sizeof(struct ndpi_llc_header) + eth_offset;
       break;
 
     default:
       return;
     }
 
-  while(1) {
-    if(type == VLAN) {
-      vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
-      type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
+  /* check ether type */
+  if(type == VLAN) {
+    vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
+    type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
+    ip_offset += 4;
+    vlan_packet = 1;
+  }
+  else if(type == MPLS_UNI || type == MPLS_MULTI) {
+    
+    mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
+    label = ntohl(mpls->label);
+    /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
+    ndpi_thread_info[thread_id].stats.mpls_count++;
+    type = ETH_P_IP, ip_offset += 4;
+    
+    while((label & 0x100) != 0x100) {
       ip_offset += 4;
-      vlan_packet = 1;
-      break;
+      label = ntohl(mpls->label);
     }
-    else if(type == MPLS_UNI || type == MPLS_MULTI) {
-      label = ntohl(*((u_int32_t*)&packet[ip_offset]));
-      ndpi_thread_info[thread_id].stats.mpls_count++;
-      type = 0x800, ip_offset += 4;
-
-      while((label & 0x100) != 0x100) {
-	ip_offset += 4;
-	label = ntohl(*((u_int32_t*)&packet[ip_offset]));
-      }
-      break;
+  }
+  else if(type == SLARP) {
+    slarp = (struct ndpi_slarp *) &packet[ip_offset];
+    if(slarp->slarp_type == 0x02 || slarp->slarp_type == 0x00 || slarp->slarp_type == 0x01) {
+      /* TODO if info are needed */
     }
-    else if(type == SLARP) {
-      slarp = (struct ndpi_slarp *) &packet[ip_offset];
-      if(slarp->slarp_type == 0x02 || slarp->slarp_type == 0x00 || slarp->slarp_type == 0x01) {
-	/* TODO if info are needed */
-      }
-      slarp_pkts++;
-      break;
-    }
-    else if(type == CISCO_D_PROTO) {
-      cdp = (struct ndpi_cdp *) &packet[ip_offset];
-      cdp_pkts++;
-      break;
-    }    
-    else if(type == PPPoE) {
-      ndpi_thread_info[thread_id].stats.pppoe_count++;
-      type = 0x0800;
-      ip_offset += 8;
-      break;
-    }
-    else
-      break;
-  } /* while(1) */
-
+    slarp_pkts++;
+  }
+  else if(type == CISCO_D_PROTO) {
+    cdp = (struct ndpi_cdp *) &packet[ip_offset];
+    cdp_pkts++;
+  }    
+  else if(type == PPPoE) {
+    ndpi_thread_info[thread_id].stats.pppoe_count++;
+    type = ETH_P_IP;
+    ip_offset += 8;
+  }
+  
   ndpi_thread_info[thread_id].stats.vlan_count += vlan_packet;
 
  iph_check:
@@ -1836,9 +1851,9 @@ static void pcap_packet_callback(u_char *args,
       return;
     }
   } else if(iph->version == 6) {
-    iph6 = (struct ndpi_ip6_hdr *)&packet[ip_offset];
+    iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
     proto = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
-    ip_len = sizeof(struct ndpi_ip6_hdr);
+    ip_len = sizeof(struct ndpi_ipv6hdr);
 
     if(proto == 0x3C /* IPv6 destination option */) {
 
@@ -1847,15 +1862,6 @@ static void pcap_packet_callback(u_char *args,
       ip_len += 8 * (options[1] + 1);
     }
     iph = NULL;
-
-    /* tunnel 6in4 */
-  /* ipv6in4: */
-  /*   ip6_offset = ip_len + ip_offset; */
-  /*   iph6 = (struct ndpi_ip6_hdr *)&packet[ip6_offset]; */
-  /*   proto = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt; */
-  /*   ip_len = sizeof(struct ndpi_ip6_hdr); */
-  /*   ip_offset = ip_len + ip6_offset; */
-  /*   iph = NULL; */
 
   } else {
     static u_int8_t ipv4_warning_used = 0;
