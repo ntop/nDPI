@@ -34,6 +34,7 @@
 #endif
 #include <ctype.h>
 #include <time.h>
+#include <arpa/inet.h>
 
 
 #ifndef WIN32
@@ -50,8 +51,6 @@
 #include <limits.h>
 #endif
 
-#include "ndpi_win32.h"
-#include "ndpi_unix.h"
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 #include "ndpi_typedefs.h"

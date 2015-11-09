@@ -22,82 +22,253 @@
  *
  */
 
-#ifndef __NDPI_TYPEDEFS_FILE__
-#define __NDPI_TYPEDEFS_FILE__
+#ifndef __NDPI_TYPEDEFS_H__
+#define __NDPI_TYPEDEFS_H__
 
-typedef enum {
+#include "ndpi_define.h"
+
+#define BT_ANNOUNCE
+#define _WS2TCPIP_H_ /* Avoid compilation problems */
+
+
+/* NDPI_LOG_LEVEL */
+typedef enum
+{
   NDPI_LOG_ERROR,
   NDPI_LOG_TRACE,
   NDPI_LOG_DEBUG
 } ndpi_log_level_t;
 
-typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol,
-					 void *module_struct, ndpi_log_level_t log_level,
-					 const char *format, ...);
-#define BT_ANNOUNCE
-
-typedef enum {
+/* NDPI_VISIT */
+typedef enum
+{
   ndpi_preorder,
   ndpi_postorder,
   ndpi_endorder,
   ndpi_leaf
 } ndpi_VISIT;
 
-typedef struct node_t {
+/* NDPI_NODE */
+typedef struct node_t
+{
   char *key;
   struct node_t *left, *right;
 } ndpi_node;
 
+/* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
 
-typedef struct ndpi_protocol_bitmask_struct {
-  ndpi_ndpi_mask  fds_bits[NDPI_NUM_FDS_BITS];
+/* NDPI_PROTO_BITMASK_STRUCT */
+typedef struct ndpi_protocol_bitmask_struct
+{
+  ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS];
 } ndpi_protocol_bitmask_struct_t;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-struct ndpi_ip6_addr {
-  union {
-    u_int8_t u6_addr8[16];
-    u_int16_t u6_addr16[8];
-    u_int32_t u6_addr32[4];
-    u_int64_t u6_addr64[2];
-  } ndpi_v6_u;
+/* NDPI_DEBUG_FUNCTION_PTR (cast) */
+typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol, void *module_struct,
+					 ndpi_log_level_t log_level, const char *format, ...);
 
-#define ndpi_v6_addr		ndpi_v6_u.u6_addr8
-#define ndpi_v6_addr16		ndpi_v6_u.u6_addr16
-#define ndpi_v6_addr32		ndpi_v6_u.u6_addr32
-#define ndpi_v6_addr64		ndpi_v6_u.u6_addr64
-};
 
-struct ndpi_ipv6hdr {
-  /* use userspace and kernelspace compatible compile parameters */
-#if defined(__LITTLE_ENDIAN__)
-  u_int8_t priority:4, version:4;
+/* ************************************************************ */
+/* ******************* NDPI NETWORKS HEADERS ****************** */
+/* ************************************************************ */
+
+/* ++++++++++++++++++++++++ Cisco headers +++++++++++++++++++++ */
+
+/* Cisco HDLC */
+struct ndpi_chdlc
+{
+  u_int8_t addr;          /* 0x0F (Unicast) - 0x8F (Broadcast) */
+  u_int8_t ctrl;          /* always 0x00                       */
+  u_int16_t proto_code;   /* protocol type (e.g. 0x0800 IP)    */
+} __attribute__((packed));
+
+/* SLARP - Serial Line ARP http://tinyurl.com/qa54e95 */
+struct ndpi_slarp
+{
+  /* address requests (0x00)
+     address replies  (0x01)
+     keep-alive       (0x02)
+  */
+  u_int32_t slarp_type;
+  u_int32_t addr_1;
+  u_int32_t addr_2;
+} __attribute__((packed));
+
+/* Cisco Discovery Protocol http://tinyurl.com/qa6yw9l */
+struct ndpi_cdp
+{
+  u_int8_t version;
+  u_int8_t ttl;
+  u_int16_t checksum;
+  u_int16_t type;
+  u_int16_t length;
+} __attribute__((packed));
+
+
+
+/* ++++++++++++++++++ Ethernet II header ++++++++++++++++++++++ */
+struct ndpi_ethhdr_II
+{
+  u_char h_dest[6];       /* destination eth addr */
+  u_char h_source[6];     /* source ether addr    */
+  u_int16_t type;         /* packet type ID field */
+} __attribute__((packed));
+
+/* +++++++++++++++ Ethernet header (IEEE 802.3) +++++++++++++++ */
+struct ndpi_ethhdr 
+{
+  u_char h_dest[6];       /* destination eth addr */
+  u_char h_source[6];     /* source ether addr    */
+  u_int16_t h_lt;          /* data length (<= 1500) or type ID proto (>=1536) */
+} __attribute__((packed));
+
+/* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
+struct ndpi_snap_extension
+{
+    u_int16_t   oui;
+    u_int8_t    oui2;
+    u_int16_t   proto_ID;              
+} __attribute__((packed));
+
+struct ndpi_llc_header
+{
+  u_int8_t    dsap; 
+  u_int8_t    ssap;
+  u_int8_t    ctrl;
+  struct ndpi_snap_extension snap;
+} __attribute__((packed));
+
+
+/* ++++++++++ RADIO TAP header (for IEEE 802.11) +++++++++++++ */
+struct ndpi_radiotap_header 
+{
+  u_int8_t  version;         /* set to 0 */
+  u_int8_t  pad;
+  u_int16_t len;
+  u_int32_t present;
+  u_int64_t MAC_timestamp;
+  u_int8_t flags;
+  
+} __attribute__((packed));
+
+/* ++++++++++++ Wireless header (IEEE 802.11) ++++++++++++++++ */
+struct ndpi_wifi_header
+{
+  u_int16_t fc;
+  u_int16_t duration;
+  u_char rcvr[6];
+  u_char trsm[6];
+  u_char dest[6];
+  u_int16_t seq_ctrl;
+  /* u_int64_t ccmp - for data encription only - check fc.flag */
+} __attribute__((packed));
+
+
+
+/* +++++++++++++++++++++++ MPLS header +++++++++++++++++++++++ */
+struct ndpi_mpls_header
+{
+  u_int32_t label:20, exp:3, s:1, ttl:8;
+} __attribute__((packed));
+
+
+  
+/* ++++++++++++++++++++++++ IP header ++++++++++++++++++++++++ */
+struct ndpi_iphdr {
+#if defined(__LITTLE_ENDIAN__) 
+  u_int8_t ihl:4, version:4;
 #elif defined(__BIG_ENDIAN__)
-  u_int8_t version:4, priority:4;
+  u_int8_t version:4, ihl:4;
 #else
 # error "Byte order must be defined"
 #endif
+  u_int8_t tos;
+  u_int16_t tot_len;
+  u_int16_t id;
+  u_int16_t frag_off;
+  u_int8_t ttl;
+  u_int8_t protocol;
+  u_int16_t check;
+  u_int32_t saddr;
+  u_int32_t daddr;
+} __attribute__((packed));
 
-  u_int8_t flow_lbl[3];
 
-  u_int16_t payload_len;
-  u_int8_t nexthdr;
-  u_int8_t hop_limit;
+/* +++++++++++++++++++++++ IPv6 header +++++++++++++++++++++++ */
+/* rfc3542 */
 
-  struct ndpi_ip6_addr saddr;
-  struct ndpi_ip6_addr daddr;
+struct ndpi_in6_addr
+{
+  union
+  {
+    u_int8_t   u6_addr8[16];
+    u_int16_t  u6_addr16[8];
+    u_int32_t  u6_addr32[4];
+  } u6_addr;  /* 128-bit IP6 address */
 };
-#endif
 
-typedef union {
+struct ndpi_ipv6hdr
+{
+  union
+  {
+    struct ndpi_ip6_hdrctl
+    {
+      u_int32_t ip6_un1_flow;
+      u_int16_t ip6_un1_plen;
+      u_int8_t ip6_un1_nxt;
+      u_int8_t ip6_un1_hlim;
+    } ip6_un1;
+    u_int8_t ip6_un2_vfc;
+  } ip6_ctlun;
+  struct ndpi_in6_addr ip6_src;
+  struct ndpi_in6_addr ip6_dst;
+} __attribute__((packed));
+
+
+
+/* +++++++++++++++++++++++ TCP header +++++++++++++++++++++++ */
+struct ndpi_tcphdr
+{
+  u_int16_t source;
+  u_int16_t dest;
+  u_int32_t seq;
+  u_int32_t ack_seq;
+#if defined(__LITTLE_ENDIAN__)
+  u_int16_t res1:4, doff:4, fin:1, syn:1, rst:1, psh:1, ack:1, urg:1, ece:1, cwr:1;
+#elif defined(__BIG_ENDIAN__)
+  u_int16_t doff:4, res1:4, cwr:1, ece:1, urg:1, ack:1, psh:1, rst:1, syn:1, fin:1;
+#else
+# error "Byte order must be defined"
+#endif  
+  u_int16_t window;
+  u_int16_t check;
+  u_int16_t urg_ptr;
+} __attribute__((packed));
+
+/* +++++++++++++++++++++++ UDP header +++++++++++++++++++++++ */
+struct ndpi_udphdr
+{
+  u_int16_t source;
+  u_int16_t dest;
+  u_int16_t len;
+  u_int16_t check;
+} __attribute__((packed));
+
+
+
+typedef union
+{
   u_int32_t ipv4;
   u_int8_t ipv4_u_int8_t[4];
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  struct ndpi_ip6_addr ipv6;
+  struct ndpi_in6_addr ipv6;
 #endif
 } ndpi_ip_addr_t;
 
+/* ************************************************************ */
+/* ******************* ********************* ****************** */
+/* ************************************************************ */
 
 #ifdef NDPI_PROTOCOL_BITTORRENT
 typedef struct spinlock {
@@ -811,4 +982,4 @@ typedef struct ndpi_flow_struct {
   struct ndpi_id_struct *dst;
 } ndpi_flow_struct_t;
 
-#endif/* __NDPI_TYPEDEFS_FILE__ */
+#endif/* __NDPI_TYPEDEFS_H__ */

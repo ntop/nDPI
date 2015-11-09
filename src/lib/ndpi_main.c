@@ -2652,10 +2652,10 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     l4protocol = iph->protocol;
   }
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  else if(iph_v6 != NULL && (l3_len - sizeof(struct ndpi_ipv6hdr)) >= ntohs(iph_v6->payload_len)) {
+  else if(iph_v6 != NULL && (l3_len - sizeof(struct ndpi_ipv6hdr)) >= ntohs(iph_v6->ip6_ctlun.ip6_un1.ip6_un1_plen)) {
     l4ptr = (((const u_int8_t *) iph_v6) + sizeof(struct ndpi_ipv6hdr));
-    l4len = ntohs(iph_v6->payload_len);
-    l4protocol = iph_v6->nexthdr;
+    l4len = ntohs(iph_v6->ip6_ctlun.ip6_un1.ip6_un1_plen);
+    l4protocol = iph_v6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
 
     // we need to handle IPv6 extension headers if present
     if(ndpi_handle_ipv6_extension_headers(ndpi_struct, &l4ptr, &l4len, &l4protocol) != 0) {
@@ -2845,7 +2845,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
       packet->packet_direction = 1;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-    if(iphv6 != NULL && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->saddr, &iphv6->daddr) != 0)
+    if(iphv6 != NULL && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->ip6_src, &iphv6->ip6_dst) != 0)
       packet->packet_direction = 1;
 #endif
   }
@@ -3196,7 +3196,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
     if(flow->packet.iphv6 != NULL) {
-      protocol = flow->packet.iphv6->nexthdr, saddr = 0, daddr = 0;
+      protocol = flow->packet.iphv6->ip6_ctlun.ip6_un1.ip6_un1_nxt, saddr = 0, daddr = 0;
     } else
 #endif
       {
@@ -3885,39 +3885,50 @@ int NDPI_PROTOCOL_IP_is_set(const ndpi_ip_addr_t * ip)
 /* NTOP */
 int ndpi_packet_src_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip)
 {
+  
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  if(packet->iphv6 != NULL) {
-    if(packet->iphv6->saddr.ndpi_v6_u.u6_addr64[0] == ip->ipv6.ndpi_v6_u.u6_addr64[0] &&
-       packet->iphv6->saddr.ndpi_v6_u.u6_addr64[1] == ip->ipv6.ndpi_v6_u.u6_addr64[1]) {
 
+  /* IPv6 */
+  if(packet->iphv6 != NULL) {
+    
+    if(packet->iphv6->ip6_src.u6_addr.u6_addr32[0] == ip->ipv6.u6_addr.u6_addr32[0] &&
+       packet->iphv6->ip6_src.u6_addr.u6_addr32[1] == ip->ipv6.u6_addr.u6_addr32[1] &&
+       packet->iphv6->ip6_src.u6_addr.u6_addr32[2] == ip->ipv6.u6_addr.u6_addr32[2] &&
+       packet->iphv6->ip6_src.u6_addr.u6_addr32[3] == ip->ipv6.u6_addr.u6_addr32[3])
       return 1;
-    } else {
-      return 0;
-    }
+    //else
+    return 0;
   }
 #endif
-  if(packet->iph->saddr == ip->ipv4) {
+
+  /* IPv4 */
+  if(packet->iph->saddr == ip->ipv4)
     return 1;
-  }
   return 0;
 }
 
 /* check if the destination ip address in packet and ip are equal */
 int ndpi_packet_dst_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip)
 {
+  
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
+
+  /* IPv6 */
   if(packet->iphv6 != NULL) {
-    if(packet->iphv6->daddr.ndpi_v6_u.u6_addr64[0] == ip->ipv6.ndpi_v6_u.u6_addr64[0] &&
-       packet->iphv6->daddr.ndpi_v6_u.u6_addr64[1] == ip->ipv6.ndpi_v6_u.u6_addr64[1]) {
+    
+    if(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0] == ip->ipv6.u6_addr.u6_addr32[0] &&
+       packet->iphv6->ip6_dst.u6_addr.u6_addr32[1] == ip->ipv6.u6_addr.u6_addr32[1] &&
+       packet->iphv6->ip6_dst.u6_addr.u6_addr32[2] == ip->ipv6.u6_addr.u6_addr32[2] &&
+       packet->iphv6->ip6_dst.u6_addr.u6_addr32[3] == ip->ipv6.u6_addr.u6_addr32[3])
       return 1;
-    } else {
-      return 0;
-    }
+    //else
+    return 0;    
   }
 #endif
-  if(packet->iph->daddr == ip->ipv4) {
+
+  /* IPv4 */
+  if(packet->iph->saddr == ip->ipv4)
     return 1;
-  }
   return 0;
 }
 
@@ -3926,12 +3937,21 @@ int ndpi_packet_dst_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_i
 void ndpi_packet_src_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t * ip)
 {
   NDPI_PROTOCOL_IP_clear(ip);
+  
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
+
+  /* IPv6 */
   if(packet->iphv6 != NULL) {
-    ip->ipv6.ndpi_v6_u.u6_addr64[0] = packet->iphv6->saddr.ndpi_v6_u.u6_addr64[0];
-    ip->ipv6.ndpi_v6_u.u6_addr64[1] = packet->iphv6->saddr.ndpi_v6_u.u6_addr64[1];
+
+    ip->ipv6.u6_addr.u6_addr32[0] = packet->iphv6->ip6_src.u6_addr.u6_addr32[0];
+    ip->ipv6.u6_addr.u6_addr32[1] = packet->iphv6->ip6_src.u6_addr.u6_addr32[1];
+    ip->ipv6.u6_addr.u6_addr32[2] = packet->iphv6->ip6_src.u6_addr.u6_addr32[2];
+    ip->ipv6.u6_addr.u6_addr32[3] = packet->iphv6->ip6_src.u6_addr.u6_addr32[3];
+
   } else
 #endif
+
+    /* IPv4 */
     ip->ipv4 = packet->iph->saddr;
 }
 
@@ -3940,12 +3960,20 @@ void ndpi_packet_src_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_add
 void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t * ip)
 {
   NDPI_PROTOCOL_IP_clear(ip);
+  
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
+  
   if(packet->iphv6 != NULL) {
-    ip->ipv6.ndpi_v6_u.u6_addr64[0] = packet->iphv6->daddr.ndpi_v6_u.u6_addr64[0];
-    ip->ipv6.ndpi_v6_u.u6_addr64[1] = packet->iphv6->daddr.ndpi_v6_u.u6_addr64[1];
+    
+    ip->ipv6.u6_addr.u6_addr32[0] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[0];
+    ip->ipv6.u6_addr.u6_addr32[1] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[1];
+    ip->ipv6.u6_addr.u6_addr32[2] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[2];
+    ip->ipv6.u6_addr.u6_addr32[3] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[3];
+    
   } else
+    
 #endif
+    
     ip->ipv4 = packet->iph->daddr;
 }
 
@@ -3959,15 +3987,22 @@ char *ndpi_get_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
   const u_int8_t *a = (const u_int8_t *) &ip->ipv4;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  if(ip->ipv6.ndpi_v6_u.u6_addr32[1] != 0 || ip->ipv6.ndpi_v6_u.u6_addr64[1] != 0) {
-    const u_int16_t *b = ip->ipv6.ndpi_v6_u.u6_addr16;
+  if(ip->ipv6.u6_addr.u6_addr32[0] != 0 ||
+     ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
+     ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
+     ip->ipv6.u6_addr.u6_addr32[1] != 0) {
+    
+    const u_int16_t *b = ip->ipv6.u6_addr.u6_addr16;
     snprintf(ndpi_struct->ip_string, 32, "%x:%x:%x:%x:%x:%x:%x:%x",
 	     ntohs(b[0]), ntohs(b[1]), ntohs(b[2]), ntohs(b[3]),
 	     ntohs(b[4]), ntohs(b[5]), ntohs(b[6]), ntohs(b[7]));
+    
     return ndpi_struct->ip_string;
   }
 #endif
+  
   snprintf(ndpi_struct->ip_string, 32, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
+
   return ndpi_struct->ip_string;
 
 }
