@@ -29,8 +29,6 @@
 #include "ndpi_api.h"
 #include "../../config.h"
 
-// #define DEBUG
-
 #include <time.h>
 #ifndef WIN32
 #include <unistd.h>
@@ -40,12 +38,9 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/src/ndpi_patricia.c"
 
-#ifdef WIN32
-/* http://social.msdn.microsoft.com/Forums/uk/vcgeneral/thread/963aac07-da1a-4612-be4a-faac3f1d65ca */
-#ifndef strtok_r
-#define strtok_r(a,b,c) strtok(a,b)
-#endif
-#endif
+/* #ifndef strtok_r */
+/* #define strtok_r(a,b,c) strtok(a,b) */
+/* #endif */
 
 /* ftp://ftp.cc.uoc.gr/mirrors/OpenBSD/src/lib/libc/stdlib/tsearch.c */
 /* find or insert datum into search tree */
@@ -344,19 +339,6 @@ char *ndpi_strdup(const char *s) {
   return(m);
 }
 
-/* ****************************************** */
-
-u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void)
-{
-  return sizeof(struct ndpi_flow_struct);
-}
-
-/* ****************************************** */
-
-u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void)
-{
-  return sizeof(struct ndpi_id_struct);
-}
 
 /* ******************************************************************** */
 
@@ -439,15 +421,6 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
     if(udpDefPorts[j].port_low != 0) addDefaultPort(&udpDefPorts[j], &ndpi_mod->proto_defaults[protoId], &ndpi_mod->udpRoot);
     if(tcpDefPorts[j].port_low != 0) addDefaultPort(&tcpDefPorts[j], &ndpi_mod->proto_defaults[protoId], &ndpi_mod->tcpRoot);
   }
-
-#if 0
-  printf("%s(%d, %s, %p) [%s]\n",
-	 __FUNCTION__,
-	 protoId,
-	 ndpi_mod->proto_defaults[protoId].protoName,
-	 ndpi_mod,
-	 ndpi_mod->proto_defaults[1].protoName);
-#endif
 }
 
 /* ******************************************************************** */
@@ -2547,8 +2520,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
  * 	nxt_hdr: protocol of the actual payload
  * returns 0 upon success and 1 upon failure
  */
-static int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_struct,
-					      const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr)
+static int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_struct, const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr)
 {
   while ((*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
     u_int16_t ehdr_len;
@@ -2683,11 +2655,6 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   return 0;
 }
 
-#if !defined(WIN32)
-#define ATTRIBUTE_ALWAYS_INLINE static inline
-#else
-__forceinline static
-#endif
 void ndpi_apply_flow_protocol_to_packet(struct ndpi_flow_struct *flow,
 					struct ndpi_packet_struct *packet)
 {
@@ -2813,12 +2780,6 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   return 0;
 }
 
-
-#if !defined(WIN32)
-static inline
-#else
-__forceinline static
-#endif
 void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow)
 {
@@ -2830,9 +2791,6 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   const struct ndpi_tcphdr *tcph = packet->tcp;
   const struct ndpi_udphdr *udph = flow->packet.udp;
-
-  //struct ndpi_unique_flow_struct      unique_flow;
-  //uint8_t                               new_connection;
 
   u_int8_t proxy_enabled = 0;
 
@@ -4418,44 +4376,44 @@ void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
 }
 
 
-#ifdef WIN32
-/* http://www.opensource.apple.com/source/xnu/xnu-1456.1.26/bsd/libkern/strsep.c */
+/* #ifdef WIN32 */
+/* /\* http://www.opensource.apple.com/source/xnu/xnu-1456.1.26/bsd/libkern/strsep.c *\/ */
 
-/*
- * Get next token from string *stringp, where tokens are possibly-empty
- * strings separated by characters from delim.
- *
- * Writes NULs into the string at *stringp to end tokens.
- * delim need not remain constant from call to call.
- * On return, *stringp points past the last NUL written (if there might
- * be further tokens), or is NULL (if there are definitely no more tokens).
- *
- * If *stringp is NULL, strsep returns NULL.
- */
-char* strsep(char **stringp, const char *delim) {
-  char *s;
-  const char *spanp;
-  int c, sc;
-  char *tok;
+/* /\* */
+/*  * Get next token from string *stringp, where tokens are possibly-empty */
+/*  * strings separated by characters from delim. */
+/*  * */
+/*  * Writes NULs into the string at *stringp to end tokens. */
+/*  * delim need not remain constant from call to call. */
+/*  * On return, *stringp points past the last NUL written (if there might */
+/*  * be further tokens), or is NULL (if there are definitely no more tokens). */
+/*  * */
+/*  * If *stringp is NULL, strsep returns NULL. */
+/*  *\/ */
+/* char* strsep(char **stringp, const char *delim) { */
+/*   char *s; */
+/*   const char *spanp; */
+/*   int c, sc; */
+/*   char *tok; */
 
-  if((s = *stringp) == NULL)
-    return (NULL);
-  for(tok = s;;) {
-    c = *s++;
-    spanp = delim;
-    do {
-      if((sc = *spanp++) == c) {
-	if(c == 0)
-	  s = NULL;
-	else
-	  s[-1] = 0;
-	*stringp = s;
-	return (tok);
-      }
-    } while (sc != 0);
-  }
-  /* NOTREACHED */
-}
-#endif
+/*   if((s = *stringp) == NULL) */
+/*     return (NULL); */
+/*   for(tok = s;;) { */
+/*     c = *s++; */
+/*     spanp = delim; */
+/*     do { */
+/*       if((sc = *spanp++) == c) { */
+/* 	if(c == 0) */
+/* 	  s = NULL; */
+/* 	else */
+/* 	  s[-1] = 0; */
+/* 	*stringp = s; */
+/* 	return (tok); */
+/*       } */
+/*     } while (sc != 0); */
+/*   } */
+/*   /\* NOTREACHED *\/ */
+/* } */
+/* #endif */
 
 

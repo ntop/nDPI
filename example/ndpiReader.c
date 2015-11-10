@@ -994,8 +994,8 @@ static void setupDetection(u_int16_t thread_id) {
   ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].ndpi_struct, &all);
 
   // allocate memory for id and flow tracking
-  size_id_struct = ndpi_detection_get_sizeof_ndpi_id_struct();
-  size_flow_struct = ndpi_detection_get_sizeof_ndpi_flow_struct();
+  size_id_struct = sizeof(struct ndpi_id_struct);
+  size_flow_struct = sizeof(struct ndpi_flow_struct);
 
   // clear memory for results
   memset(ndpi_thread_info[thread_id].stats.protocol_counter, 0, sizeof(ndpi_thread_info[thread_id].stats.protocol_counter));

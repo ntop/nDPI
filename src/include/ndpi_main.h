@@ -55,6 +55,7 @@
 #include "ndpi_protocol_ids.h"
 #include "ndpi_typedefs.h"
 #include "ndpi_protocols.h"
+#include "ndpi_api.h"
 
 
 void *ndpi_tdelete(const void * __restrict, void ** __restrict,
@@ -89,43 +90,40 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct
 				u_int16_t upper_detected_protocol,
                                 u_int16_t lower_detected_protocol);
 
-
-/* function to parse a packet which has line based information into a line based structure
- * this function will also set some well known line pointers like:
- *  - host, user agent, empty line,....
- */
 extern void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 extern void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+
 extern u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow, u_int16_t counter);
-extern void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-					    struct ndpi_flow_struct *flow,
+
+extern void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
 					    u_int16_t upper_detected_protocol,
 					    u_int16_t lower_detected_protocol);
-extern void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-				     struct ndpi_flow_struct *flow,
+extern void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
 				     u_int16_t upper_detected_protocol,
 				     u_int16_t lower_detected_protocol);
-extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
-				    ndpi_protocol_breed_t protoBreed, u_int16_t protoId,
-				    u_int16_t tcp_alias_protoId[2], u_int16_t udp_alias_protoId[2],
-				    char *protoName,
+extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol_breed_t protoBreed, u_int16_t protoId,
+				    u_int16_t tcp_alias_protoId[2], u_int16_t udp_alias_protoId[2], char *protoName,
 				    ndpi_port_range *tcpDefPorts, ndpi_port_range *udpDefPorts);
+
 extern void ndpi_int_reset_packet_protocol(struct ndpi_packet_struct *packet);
 extern void ndpi_int_reset_protocol(struct ndpi_flow_struct *flow);
+
 extern int ndpi_packet_src_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip);
 extern int ndpi_packet_dst_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip);
 extern void ndpi_packet_src_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t * ip);
 extern void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t * ip);
+
 extern char *ndpi_get_ip_string(struct ndpi_detection_module_struct *ndpi_struct, const ndpi_ip_addr_t * ip);
-extern char *ndpi_get_packet_src_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
-					   const struct ndpi_packet_struct *packet);
+extern char *ndpi_get_packet_src_ip_string(struct ndpi_detection_module_struct *ndpi_struct, const struct ndpi_packet_struct *packet);
 extern char* ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_mod, u_int id);
+
 extern u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					u_int8_t proto, u_int16_t sport, u_int16_t dport);
+
 extern u_int8_t ndpi_is_proto(ndpi_protocol p, u_int16_t proto);
+
 extern u_int16_t ndpi_get_lower_proto(ndpi_protocol p);
-extern int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct *ndpi_struct,
-					     u_int16_t protocol_id,
+extern int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t protocol_id,
 					     u_int16_t** tcp_master_proto,
 					     u_int16_t** udp_master_proto);
 
@@ -133,7 +131,5 @@ extern int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct
 void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
 					   const char **file, const char **func, u_int32_t * line);
 #endif
-
-#include "ndpi_api.h"
 
 #endif	/* __NDPI_MAIN_INCLUDE_FILE__ */

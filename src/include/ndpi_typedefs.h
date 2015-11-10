@@ -314,16 +314,13 @@ typedef enum {
 } ndpi_http_method;
 
 typedef struct ndpi_id_struct {
-  /* detected_protocol_bitmask:
-   * access this bitmask to find out whether an id has used skype or not
-   * if a flag is set here, it will not be resetted
-   * to compare this, use:
-   * if (NDPI_BITMASK_COMPARE(id->detected_protocol_bitmask,
-   *                            NDPI_PROTOCOL_BITMASK_XXX) != 0)
-   * {
-   *      // protocol XXX detected on this id
-   * }
-   */
+
+  /**
+      detected_protocol_bitmask:
+      access this bitmask to find out whether an id has used skype or not
+      if a flag is set here, it will not be resetted
+      to compare this, use:
+  **/
   NDPI_PROTOCOL_BITMASK detected_protocol_bitmask;
 #ifdef NDPI_PROTOCOL_RTSP
   ndpi_ip_addr_t rtsp_ip_address;
