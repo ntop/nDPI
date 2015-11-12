@@ -349,14 +349,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "User Agent Type Line found %.*s\n",
 	     packet->user_agent_line.len, packet->user_agent_line.ptr);
-
-#if 0
-    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
-      ndpi_match_content_subprotocol(ndpi_struct, flow,
-				     (char*)packet->user_agent_line.ptr,
-				     packet->user_agent_line.len,
-				     NDPI_PROTOCOL_HTTP);
-#endif
   }
 
   /* check for host line */

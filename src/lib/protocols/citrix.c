@@ -33,14 +33,6 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-#if 0
-  printf("[len=%u][%02X %02X %02X %02X]\n", payload_len,
-	 packet->payload[0] & 0xFF,
-	 packet->payload[1] & 0xFF,
-	 packet->payload[2] & 0xFF,
-	 packet->payload[3] & 0xFF);
-#endif
-
   if(packet->tcp != NULL) {
     flow->l4.tcp.citrix_packet_id++;
     
@@ -69,7 +61,6 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
 
 	return;	
       }
-      
       
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_CITRIX);
     } else if(flow->l4.tcp.citrix_packet_id > 3)

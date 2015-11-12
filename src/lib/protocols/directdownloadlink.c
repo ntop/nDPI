@@ -709,23 +709,10 @@ void ndpi_search_direct_download_link_tcp(struct ndpi_detection_module_struct *n
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-#if 0
-  if (ndpi_struct->direct_download_link_counter_callback != NULL) {
-    if (packet->detected_protocol == NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK) {
-      /* skip packets not requests from the client to the server */
-      if (packet->packet_direction == flow->l4.tcp.ddlink_server_direction) {
-	search_ddl_domains(ndpi_struct, flow);	// do the detection again in order to get the URL in keep alive streams
-      } else {
-	// just count the packet
-	ndpi_struct->direct_download_link_counter_callback(flow->hash_id_number, packet->l3_packet_len);
-      }
-    }
-    return;
-  }
-#endif
-  // do not detect again if it is already ddl
+  /* struct ndpi_id_struct         *src=ndpi_struct->src; */
+  /* struct ndpi_id_struct         *dst=ndpi_struct->dst; */
+
+  /* do not detect again if it is already ddl */
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK) {
     if (search_ddl_domains(ndpi_struct, flow) != 0) {
       return;
