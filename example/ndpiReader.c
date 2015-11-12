@@ -1667,7 +1667,7 @@ static void pcap_packet_callback(u_char *args,
     case DLT_EN10MB :
       ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
       ip_offset = sizeof(struct ndpi_ethhdr) + eth_offset;
-      check = ntohs(ethernet->h_lt);
+      check = ntohs(ethernet->h_proto);
 
       if(check <= 1500)
 	pyld_eth_len = check;
