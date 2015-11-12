@@ -25,8 +25,6 @@
 #ifndef __NDPI_UNIX_INCLUDE_FILE__
 #define __NDPI_UNIX_INCLUDE_FILE__
 
-#include "linux_compat.h"
-
 #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <netinet/in.h>
 #if defined(__NetBSD__) || defined(__OpenBSD__)

@@ -11,7 +11,7 @@ WhatsApp	182	25154	2
 AppleiTunes	85	28087	2
 Spotify	3	258	1
 
-	1	UDP fe80::da30:62ff:fe56:1c:5353 <-> ff02::fb:5353 [proto: 8/MDNS][2 pkts/258 bytes]
+	1	UDP [fe80::da30:62ff:fe56:1c]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][2 pkts/258 bytes]
 	2	UDP 192.168.2.1:17500 <-> 192.168.2.255:17500 [proto: 121/DropBox][4 pkts/2176 bytes]
 	3	ICMP 192.168.2.4:0 <-> 91.253.176.65:0 [proto: 81/ICMP][10 pkts/700 bytes]
 	4	UDP 173.252.114.1:3478 <-> 192.168.2.4:52794 [proto: 78/STUN][5 pkts/676 bytes]
@@ -65,7 +65,7 @@ Spotify	3	258	1
 	52	UDP 169.254.166.207:5353 <-> 224.0.0.251:5353 [proto: 8/MDNS][2 pkts/218 bytes]
 	53	UDP 192.168.2.1:5353 <-> 224.0.0.251:5353 [proto: 8/MDNS][2 pkts/218 bytes]
 	54	TCP 192.168.2.4:49192 <-> 93.186.135.8:80 [proto: 7/HTTP][5 pkts/330 bytes]
-	55	UDP fe80::c42c:3ff:fe60:6a64:5353 <-> ff02::fb:5353 [proto: 8/MDNS][2 pkts/258 bytes]
+	55	UDP [fe80::c42c:3ff:fe60:6a64]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][2 pkts/258 bytes]
 
 
 Undetected flows:

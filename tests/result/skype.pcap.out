@@ -289,7 +289,7 @@ Spotify	5	430	1
 	276	TCP 192.168.1.34:50100 <-> 111.221.74.46:443 [proto: 125/Skype][13 pkts/1109 bytes]
 	277	TCP 192.168.1.34:50035 <-> 213.199.179.175:40021 [proto: 125/Skype][17 pkts/1304 bytes]
 	278	TCP 192.168.1.34:50075 <-> 213.199.179.142:40003 [proto: 125/Skype][19 pkts/1495 bytes]
-	279	UDP fe80::c62c:3ff:fe06:49fe:5353 <-> ff02::fb:5353 [proto: 8/MDNS][4 pkts/908 bytes]
+	279	UDP [fe80::c62c:3ff:fe06:49fe]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][4 pkts/908 bytes]
 
 
 Undetected flows:

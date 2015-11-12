@@ -189,9 +189,8 @@ typedef struct ndpi_flow {
   u_int16_t vlan_id;
   struct ndpi_flow_struct *ndpi_flow;
   char lower_name[48], upper_name[48];
-
+  u_int8_t ip_version;
   u_int64_t last_seen;
-
   u_int64_t bytes;
   u_int32_t packets;
 
@@ -496,19 +495,18 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
   FILE *out = results_file ? results_file : stdout;
 
   if(!json_flag) {
-#if 0
-    fprintf(out, "\t%s [VLAN: %u] %s:%u <-> %s:%u\n",
-	    ipProto2Name(flow->protocol), flow->vlan_id,
-	    flow->lower_name, ntohs(flow->lower_port),
-	    flow->upper_name, ntohs(flow->upper_port));
-
-#else
     fprintf(out, "\t%u", ++num_flows);
 
-    fprintf(out, "\t%s %s:%u <-> %s:%u ",
+    fprintf(out, "\t%s %s%s%s:%u <-> %s%s%s:%u ",
 	    ipProto2Name(flow->protocol),
-	    flow->lower_name, ntohs(flow->lower_port),
-	    flow->upper_name, ntohs(flow->upper_port));
+	    (flow->ip_version == 6) ? "[" : "",
+	    flow->lower_name, 
+	    (flow->ip_version == 6) ? "]" : "",
+	    ntohs(flow->lower_port),
+	    (flow->ip_version == 6) ? "[" : "",
+	    flow->upper_name, 
+	    (flow->ip_version == 6) ? "]" : "",
+	    ntohs(flow->upper_port));
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
 
@@ -532,7 +530,6 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
     if(flow->ssl.server_certificate[0] != '\0') fprintf(out, "[SSL server: %s]", flow->ssl.server_certificate);
 
     fprintf(out, "\n");
-#endif
   } else {
 #ifdef HAVE_JSON_C
     jObj = json_object_new_object();
@@ -875,6 +872,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
       newflow->protocol = iph->protocol, newflow->vlan_id = vlan_id;
       newflow->lower_ip = lower_ip, newflow->upper_ip = upper_ip;
       newflow->lower_port = lower_port, newflow->upper_port = upper_port;
+      newflow->ip_version = version;
 
       if(version == 4) {
 	inet_ntop(AF_INET, &lower_ip, newflow->lower_name, sizeof(newflow->lower_name));

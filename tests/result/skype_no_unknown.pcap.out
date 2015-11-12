@@ -260,7 +260,7 @@ Apple	84	20699	2
 	248	UDP 192.168.1.34:13021 <-> 65.55.223.44:40020 [proto: 125/Skype][1 pkts/76 bytes]
 	249	UDP 192.168.1.34:13021 <-> 65.55.223.42:40024 [proto: 125/Skype][1 pkts/76 bytes]
 	250	UDP 192.168.1.34:13021 <-> 65.55.223.43:40006 [proto: 125/Skype][1 pkts/77 bytes]
-	251	UDP fe80::c62c:3ff:fe06:49fe:5353 <-> ff02::fb:5353 [proto: 8/MDNS][2 pkts/258 bytes]
+	251	UDP [fe80::c62c:3ff:fe06:49fe]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][2 pkts/258 bytes]
 	252	TCP 192.168.1.34:51240 <-> 111.221.74.45:443 [proto: 125/Skype][14 pkts/1373 bytes]
 	253	TCP 111.221.74.18:443 <-> 192.168.1.34:51268 [proto: 125/Skype][14 pkts/1203 bytes]
 	254	TCP 192.168.1.34:51250 <-> 111.221.77.175:443 [proto: 125/Skype][14 pkts/1363 bytes]

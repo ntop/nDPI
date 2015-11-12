@@ -6,7 +6,7 @@ WhatsApp	32	3243	2
 Spotify	1	86	1
 
 	1	UDP 192.168.2.1:17500 <-> 192.168.2.255:17500 [proto: 121/DropBox][2 pkts/1088 bytes]
-	2	UDP fe80::189c:c31b:1298:224:5353 <-> ff02::fb:5353 [proto: 8/MDNS][1 pkts/111 bytes]
+	2	UDP [fe80::189c:c31b:1298:224]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][1 pkts/111 bytes]
 	3	UDP 192.168.2.1:53 <-> 192.168.2.4:61697 [proto: 5.142/DNS.WhatsApp][2 pkts/280 bytes][Host: e12.whatsapp.net]
 	4	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.140/SSL.Apple][44 pkts/21371 bytes]
 	5	UDP 0.0.0.0:68 <-> 255.255.255.255:67 [proto: 18/DHCP][6 pkts/2052 bytes]
