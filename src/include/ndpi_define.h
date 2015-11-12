@@ -59,13 +59,6 @@
 #define __BIG_ENDIAN__
 #endif
 
-/* Kernel modules */
-#if defined(__LITTLE_ENDIAN)
-#define __LITTLE_ENDIAN__
-#endif
-#if defined(__BIG_ENDIAN)
-#define __BIG_ENDIAN__
-#endif
 /* Everything else */
 #if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__))
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -164,11 +157,6 @@
 
 #define MAX_PACKET_COUNTER                                   65000
 #define MAX_DEFAULT_PORTS                                        5
-
-/**********************
- * detection features *
- **********************/
-/* #define NDPI_SELECT_DETECTION_WITH_REAL_PROTOCOL ( 1 << 0 ) */
 
 #define NDPI_DIRECTCONNECT_CONNECTION_IP_TICK_TIMEOUT          600
 #define NDPI_IRC_CONNECTION_TIMEOUT                            120

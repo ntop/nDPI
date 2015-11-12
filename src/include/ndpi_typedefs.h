@@ -29,6 +29,7 @@
 
 #define BT_ANNOUNCE
 #define _WS2TCPIP_H_ /* Avoid compilation problems */
+#define SNAP_EXT
 
 
 /* NDPI_LOG_LEVEL */
@@ -127,7 +128,9 @@ struct ndpi_llc_header
   u_int8_t    dsap; 
   u_int8_t    ssap;
   u_int8_t    ctrl;
+#ifdef SNAP_EXT
   struct ndpi_snap_extension snap;
+#endif
 } __attribute__((packed));
 
 
@@ -831,26 +834,34 @@ typedef struct ndpi_flow_struct {
   u_int16_t guessed_protocol_id, guessed_host_proto_id;
 
   u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1; 
-  /* if ndpi_struct->direction_detect_disable == 1 */
-  /* tcp sequence number connection tracking */
+
+  /* 
+     if ndpi_struct->direction_detect_disable == 1
+     tcp sequence number connection tracking 
+  */
   u_int32_t next_tcp_seq_nr[2];
 
-  /* the tcp / udp / other l4 value union
-   * this is used to reduce the number of bytes for tcp or udp protocol states
-   * */
+  /* 
+     the tcp / udp / other l4 value union
+     used to reduce the number of bytes for tcp or udp protocol states 
+  */
   union {
     struct ndpi_flow_tcp_struct tcp;
     struct ndpi_flow_udp_struct udp;
   } l4;
 
-  struct ndpi_id_struct *server_id; /* 
-				       Pointer to src or dst
-				       that identifies the 
-				       server of this connection
-				    */
-  u_char host_server_name[256]; /* HTTP host or DNS query   */ 
-  u_char detected_os[32];       /* Via HTTP User-Agent      */
-  u_char nat_ip[24];            /* Via HTTP X-Forwarded-For */
+  /* 
+     Pointer to src or dst
+     that identifies the 
+     server of this connection
+  */
+  struct ndpi_id_struct *server_id;
+  /* HTTP host or DNS query */ 
+  u_char host_server_name[256];
+  /* Via HTTP User-Agent */
+  u_char detected_os[32];
+  /* Via HTTP X-Forwarded-For */
+  u_char nat_ip[24];    
 
   /* 
      This structure below will not not stay inside the protos
@@ -880,7 +891,8 @@ typedef struct ndpi_flow_struct {
       char client_certificate[48], server_certificate[48];
     } ssl;
   } protos;
-  /* ALL protocol specific 64 bit variables here */
+  
+  /*** ALL protocol specific 64 bit variables here ***/
 
   /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;

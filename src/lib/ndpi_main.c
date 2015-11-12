@@ -38,10 +38,6 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/src/ndpi_patricia.c"
 
-/* #ifndef strtok_r */
-/* #define strtok_r(a,b,c) strtok(a,b) */
-/* #endif */
-
 /* ftp://ftp.cc.uoc.gr/mirrors/OpenBSD/src/lib/libc/stdlib/tsearch.c */
 /* find or insert datum into search tree */
 void *
