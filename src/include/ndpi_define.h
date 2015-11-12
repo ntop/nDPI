@@ -42,6 +42,12 @@
 #endif/* BYTE_ORDER */
 #endif/* __OPENBSD__ */
 
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#define __LITTLE_ENDIAN__
+#else
+#define __BIG_ENDIAN__
+#endif
+
 #ifdef WIN32
 #define __LITTLE_ENDIAN__ 1
 #endif
@@ -215,7 +221,7 @@
 #define NDPI_NUM_FDS_BITS     howmanybits(NDPI_NUM_BITS, NDPI_BITS)
 
 #define NDPI_PROTOCOL_BITMASK ndpi_protocol_bitmask_struct_t
-  
+
 #define NDPI_BITMASK_ADD(a,b)     NDPI_SET(&a,b)
 #define NDPI_BITMASK_DEL(a,b)     NDPI_CLR(&a,b)
 #define NDPI_BITMASK_RESET(a)     NDPI_ZERO(&a)
