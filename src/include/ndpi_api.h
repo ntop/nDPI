@@ -32,6 +32,18 @@
 extern "C" {
 #endif
 
+  /**                                                                                                                                  
+   * This function returns the size of the flow struct                                                                                 
+   * @return the size of the flow struct                                                                                               
+   */
+  u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void);
+  
+  /**                                                                                                                                  
+   * This function returns the size of the id struct                                                                                   
+   * @return the size of the id struct                                                                                                 
+   */
+  u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void);
+
   /* Public malloc/free */
   void* ndpi_malloc(unsigned long size);
   void* ndpi_calloc(unsigned long count, unsigned long size);
