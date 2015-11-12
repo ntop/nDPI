@@ -653,16 +653,6 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   struct ndpi_flow *flow = *(struct ndpi_flow **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
-#if 0
-  printf("<%d>Walk on node %s (%p)\n",
-	 depth,
-	 which == preorder?"preorder":
-	 which == postorder?"postorder":
-	 which == endorder?"endorder":
-	 which == leaf?"leaf": "unknown",
-	 flow);
-#endif
-
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if(enable_protocol_guess) {
       if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
@@ -1083,31 +1073,6 @@ static unsigned int packet_processing(u_int16_t thread_id,
       snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
     }
 
-#if 0
-    if(verbose > 1) {
-      if(ndpi_is_proto(flow->detected_protocol, NDPI_PROTOCOL_HTTP)) {
-	char *method;
-
-	printf("[URL] %s\n", ndpi_get_http_url(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
-	printf("[Content-Type] %s\n", ndpi_get_http_content_type(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow));
-
-	switch(ndpi_get_http_method(ndpi_thread_info[thread_id].ndpi_struct, ndpi_flow)) {
-	case HTTP_METHOD_OPTIONS: method = "HTTP_METHOD_OPTIONS"; break;
-	case HTTP_METHOD_GET:     method = "HTTP_METHOD_GET"; break;
-	case HTTP_METHOD_HEAD:    method = "HTTP_METHOD_HEAD"; break;
-	case HTTP_METHOD_POST:    method = "HTTP_METHOD_POST"; break;
-	case HTTP_METHOD_PUT:     method = "HTTP_METHOD_PUT"; break;
-	case HTTP_METHOD_DELETE:  method = "HTTP_METHOD_DELETE"; break;
-	case HTTP_METHOD_TRACE:   method = "HTTP_METHOD_TRACE"; break;
-	case HTTP_METHOD_CONNECT: method = "HTTP_METHOD_CONNECT"; break;
-	default:                  method = "HTTP_METHOD_UNKNOWN"; break;
-	}
-
-	printf("[Method] %s\n", method);
-      }
-    }
-#endif
-
     free_ndpi_flow(flow);
 
     if(verbose > 1) {
@@ -1121,11 +1086,6 @@ static unsigned int packet_processing(u_int16_t thread_id,
       printFlow(thread_id, flow);
     }
   }
-
-#if 0
-  if(ndpi_flow->l4.tcp.host_server_name[0] != '\0')
-    printf("%s\n", ndpi_flow->l4.tcp.host_server_name);
-#endif
 
   if(live_capture) {
     if(ndpi_thread_info[thread_id].last_idle_scan_time + IDLE_SCAN_PERIOD < ndpi_thread_info[thread_id].last_time) {
@@ -2074,16 +2034,6 @@ struct timezone {
   int tz_minuteswest; /* minutes W of Greenwich */
   int tz_dsttime;     /* type of dst correction */
 };
-
-/* ***************************************************** */
-
-#if 0
-int gettimeofday(struct timeval *tv, void *notUsed) {
-  tv->tv_sec = time(NULL);
-  tv->tv_usec = 0;
-  return(0);
-}
-#endif
 
 /* ***************************************************** */
 

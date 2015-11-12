@@ -3171,16 +3171,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       goto ret_protocols;
     }
   }
-
-#if 0
-  a = flow->detected_protocol_stack[0];
-  if(a != NDPI_PROTOCOL_UNKNOWN) {
-    NDPI_LOG(NDPI_PROTOCOL_UNKNOWN, ndpi_struct, NDPI_LOG_TRACE, "PROCESS KNOWN PROTOCOL\n");
-    ndpi_struct->proto_defaults[a].func(ndpi_struct, flow);
-    return a;
-  }
-#endif
-
+  
   check_ndpi_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
 
   a = flow->packet.detected_protocol_stack[0];
@@ -3216,18 +3207,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     flow->host_already_guessed = 1;
   }
 
-#if 0
-    /* Swap protocols in case of success */
-    if(ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
-      u_int16_t t = ret.master_protocol;
-
-      ret.master_protocol = ret.protocol;
-      ret.protocol = t;
-    }
-#endif
-
-    if((ret.protocol == NDPI_PROTOCOL_UNKNOWN) && (ret.master_protocol != NDPI_PROTOCOL_UNKNOWN))
-      ret.protocol = flow->guessed_host_proto_id;
+  if((ret.protocol == NDPI_PROTOCOL_UNKNOWN) && (ret.master_protocol != NDPI_PROTOCOL_UNKNOWN))
+    ret.protocol = flow->guessed_host_proto_id;
 
   return(ret);
 }

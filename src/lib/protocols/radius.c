@@ -35,14 +35,6 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-#if 0
-  printf("[len=%u][%02X %02X %02X %02X]\n", payload_len,
-	 packet->payload[0] & 0xFF,
-	 packet->payload[1] & 0xFF,
-	 packet->payload[2] & 0xFF,
-	 packet->payload[3] & 0xFF);
-#endif
-
   if(packet->udp != NULL) {
     struct radius_header *h = (struct radius_header*)packet->payload;
     u_int len = ntohs(h->len);

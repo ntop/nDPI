@@ -42,12 +42,6 @@
 #endif/* BYTE_ORDER */
 #endif/* __OPENBSD__ */
 
-#if 0
-#ifndef NDPI_ENABLE_DEBUG_MESSAGES
-#define NDPI_ENABLE_DEBUG_MESSAGES
-#endif
-#endif
-
 #ifdef WIN32
 #define __LITTLE_ENDIAN__ 1
 #endif
