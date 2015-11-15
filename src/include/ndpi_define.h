@@ -42,10 +42,15 @@
 #endif/* BYTE_ORDER */
 #endif/* __OPENBSD__ */
 
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN
+#ifndef __LITTLE_ENDIAN__
 #define __LITTLE_ENDIAN__
+#endif
 #else
+#ifndef __BIG_ENDIAN__
 #define __BIG_ENDIAN__
+#endif
 #endif
 
 #ifdef WIN32
