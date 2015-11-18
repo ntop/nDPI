@@ -37,6 +37,7 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
   case 8: /* G.711 A-Law */
   case 9: /* G.722 */
   case 13: /* Comfort Noise */
+  case 96: /* Dynamic RTP */
   case 97: /* Redundant Audio Data Payload */
   case 101: /* DTMF */
   case 103: /* SILK Narrowband */
@@ -78,7 +79,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Check whether this is an RTP flow */
   if((payload_len >= 12)
-     && ((payload[0] & 0xFF) == 0x80) /* RTP magic byte[1] */
+     && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */
      && ((payload_type < 72) || (payload_type > 76))
      && ((payload_type <= 34)
 	 || ((payload_type >= 96) && (payload_type <= 127))
@@ -90,7 +91,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_UNKNOWN);
     return;
   } else if((payload_len >= 12)
-	    && ((payload[0] & 0xFF) == 0x80) /* RTP magic byte[1] */
+	    && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */	    
 	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF))) {
     if(payloadType == 1 /* RTP */) {
       NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
