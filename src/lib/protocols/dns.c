@@ -230,6 +230,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
     if(is_dns) {
       int j = 0;
+      int size_host_server_name = sizeof(flow->host_server_name);
 
       flow->protos.dns.num_queries = (u_int8_t)header.num_queries, 
 	flow->protos.dns.num_answers = (u_int8_t)(header.answer_rrs+header.authority_rrs+header.additional_rrs),
@@ -238,7 +239,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       i = query_offset+1;
 
       while((i < packet->payload_packet_len)
-	    && (j < (sizeof(flow->host_server_name)-1))	  
+	    && (j < (size_host_server_name-1))	  
 	    && (packet->payload[i] != '\0')) {
 	flow->host_server_name[j] = tolower(packet->payload[i]);
 	if(flow->host_server_name[j] < ' ')
@@ -250,8 +251,8 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	char a_buf[32];
 	int i;
 
-	for(i=0; i<num_a_records; i++) {
-	  j += snprintf((char*)&flow->host_server_name[j], sizeof(flow->host_server_name)-1-j, "%s%s",
+	for(i=0; i<num_a_records && j < size_host_server_name; i++) {
+	  j += snprintf((char*)&flow->host_server_name[j], size_host_server_name-1-j, "%s%s",
 			(i == 0) ? "@" : ";",
 			ndpi_intoa_v4(a_record[i], a_buf, sizeof(a_buf)));
 	}
