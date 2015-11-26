@@ -43,6 +43,9 @@
 #if !defined __APPLE__ && !defined __FreeBSD__ && !defined __NetBSD__ && !defined __OpenBSD__
 #include <endian.h>
 #include <byteswap.h>
+#if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
+#include <netinet/in.h>
+#endif
 #endif
 
 /* default includes */
