@@ -34,12 +34,15 @@
 #endif
 #include <ctype.h>
 #include <time.h>
+
+
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <arpa/inet.h>
-
-
-#ifndef WIN32
 #include <sys/time.h>
-
+#include <sys/socket.h>
 #if !defined __APPLE__ && !defined __FreeBSD__ && !defined __NetBSD__ && !defined __OpenBSD__
 #include <endian.h>
 #include <byteswap.h>

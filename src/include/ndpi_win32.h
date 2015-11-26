@@ -62,7 +62,7 @@ typedef unsigned __int64 u_int64_t;
 #define pthread_rwlock_unlock    pthread_mutex_unlock
 #define pthread_rwlock_destroy	 pthread_mutex_destroy
 
-#define gmtime_r(a, b)           gmtime(a) /* Already thread safe on windows */
+#define gmtime_r(a, b)           memcpy(b, gmtime(a), sizeof(struct tm))
 
 extern unsigned long waitForNextEvent(unsigned long ulDelay /* ms */);
 

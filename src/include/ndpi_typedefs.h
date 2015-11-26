@@ -56,6 +56,18 @@ typedef struct node_t
   struct node_t *left, *right;
 } ndpi_node;
 
+#ifdef WIN32
+typedef unsigned char  u_char;
+typedef unsigned short u_short;
+typedef unsigned int   uint;
+typedef unsigned long  u_long;
+typedef u_char  u_int8_t;
+typedef u_short u_int16_t;
+typedef uint   u_int32_t;
+typedef uint   u_int;
+typedef unsigned __int64 u_int64_t;
+#endif
+
 /* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
 
@@ -93,7 +105,7 @@ struct ndpi_chdlc
   u_int8_t addr;          /* 0x0F (Unicast) - 0x8F (Broadcast) */
   u_int8_t ctrl;          /* always 0x00                       */
   u_int16_t proto_code;   /* protocol type (e.g. 0x0800 IP)    */
-} PACK_OFF;
+}; PACK_OFF
 
 /* SLARP - Serial Line ARP http://tinyurl.com/qa54e95 */
 PACK_ON
@@ -267,6 +279,11 @@ struct ndpi_udphdr
   u_int16_t dest;
   u_int16_t len;
   u_int16_t check;
+} PACK_OFF;
+
+PACK_ON
+struct ndpi_dns_packet_header {
+	u_int16_t transaction_id, flags, num_queries, answer_rrs, authority_rrs, additional_rrs;
 } PACK_OFF;
 
 typedef union

@@ -54,7 +54,9 @@
 #endif
 
 #ifdef WIN32
+#ifndef __LITTLE_ENDIAN__
 #define __LITTLE_ENDIAN__ 1
+#endif
 #endif
 
 #if !(defined(__LITTLE_ENDIAN__) || defined(__BIG_ENDIAN__))
@@ -285,5 +287,9 @@
 
 /* define memory callback function */
 #define match_first_bytes(payload,st) (memcmp((payload),(st),(sizeof(st)-1))==0)
+
+#ifdef WIN32
+#define snprintf(buf,len, format,...) _snprintf_s(buf, len,len, format, __VA_ARGS__)
+#endif
 
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
