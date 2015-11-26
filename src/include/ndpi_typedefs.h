@@ -105,7 +105,7 @@ struct ndpi_chdlc
   u_int8_t addr;          /* 0x0F (Unicast) - 0x8F (Broadcast) */
   u_int8_t ctrl;          /* always 0x00                       */
   u_int16_t proto_code;   /* protocol type (e.g. 0x0800 IP)    */
-}; PACK_OFF
+} PACK_OFF;
 
 /* SLARP - Serial Line ARP http://tinyurl.com/qa54e95 */
 PACK_ON
