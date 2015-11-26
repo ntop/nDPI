@@ -77,14 +77,26 @@ typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol, void *module_struct
 /* ++++++++++++++++++++++++ Cisco headers +++++++++++++++++++++ */
 
 /* Cisco HDLC */
+#ifdef _MSC_VER
+/* Windows */
+#define PACK_ON   __pragma(pack(push, 1))
+#define PACK_OFF  __pragma(pack(pop))
+#elif defined(__GNUC__)
+/* GNU C */
+#define PACK_ON
+#define PACK_OFF  __attribute__((packed))
+#endif
+
+PACK_ON
 struct ndpi_chdlc
 {
   u_int8_t addr;          /* 0x0F (Unicast) - 0x8F (Broadcast) */
   u_int8_t ctrl;          /* always 0x00                       */
   u_int16_t proto_code;   /* protocol type (e.g. 0x0800 IP)    */
-} __attribute__((packed));
+} PACK_OFF;
 
 /* SLARP - Serial Line ARP http://tinyurl.com/qa54e95 */
+PACK_ON
 struct ndpi_slarp
 {
   /* address requests (0x00)
@@ -94,9 +106,10 @@ struct ndpi_slarp
   u_int32_t slarp_type;
   u_int32_t addr_1;
   u_int32_t addr_2;
-} __attribute__((packed));
+} PACK_OFF;
 
 /* Cisco Discovery Protocol http://tinyurl.com/qa6yw9l */
+PACK_ON
 struct ndpi_cdp
 {
   u_int8_t version;
@@ -104,26 +117,29 @@ struct ndpi_cdp
   u_int16_t checksum;
   u_int16_t type;
   u_int16_t length;
-} __attribute__((packed));
+} PACK_OFF;
 
 /* +++++++++++++++ Ethernet header (IEEE 802.3) +++++++++++++++ */
 
+PACK_ON
 struct ndpi_ethhdr
 {
   u_char h_dest[6];       /* destination eth addr */
   u_char h_source[6];     /* source ether addr    */
   u_int16_t h_proto;      /* data length (<= 1500) or type ID proto (>=1536) */
-} __attribute__((packed));
+} PACK_OFF;
 
 /* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
 
+PACK_ON
 struct ndpi_snap_extension
 {
   u_int16_t   oui;
   u_int8_t    oui2;
   u_int16_t   proto_ID;
-} __attribute__((packed));
+} PACK_OFF;
 
+PACK_ON
 struct ndpi_llc_header
 {
   u_int8_t    dsap;
@@ -132,9 +148,10 @@ struct ndpi_llc_header
 #ifdef SNAP_EXT
   struct ndpi_snap_extension snap;
 #endif
-} __attribute__((packed));
+} PACK_OFF;
 
 /* ++++++++++ RADIO TAP header (for IEEE 802.11) +++++++++++++ */
+PACK_ON
 struct ndpi_radiotap_header
 {
   u_int8_t  version;         /* set to 0 */
@@ -143,10 +160,10 @@ struct ndpi_radiotap_header
   u_int32_t present;
   u_int64_t MAC_timestamp;
   u_int8_t flags;
-
-} __attribute__((packed));
+} PACK_OFF;
 
 /* ++++++++++++ Wireless header (IEEE 802.11) ++++++++++++++++ */
+PACK_ON
 struct ndpi_wifi_header
 {
   u_int16_t fc;
@@ -156,16 +173,19 @@ struct ndpi_wifi_header
   u_char dest[6];
   u_int16_t seq_ctrl;
   /* u_int64_t ccmp - for data encription only - check fc.flag */
-} __attribute__((packed));
+} PACK_OFF;
 
 /* +++++++++++++++++++++++ MPLS header +++++++++++++++++++++++ */
+
+PACK_ON
 struct ndpi_mpls_header
 {
   u_int32_t label:20, exp:3, s:1, ttl:8;
-} __attribute__((packed));
+} PACK_OFF;
 
 /* ++++++++++++++++++++++++ IP header ++++++++++++++++++++++++ */
 
+PACK_ON
 struct ndpi_iphdr {
 #if defined(__LITTLE_ENDIAN__)
   u_int8_t ihl:4, version:4;
@@ -183,7 +203,7 @@ struct ndpi_iphdr {
   u_int16_t check;
   u_int32_t saddr;
   u_int32_t daddr;
-} __attribute__((packed));
+} PACK_OFF;
 
 /* +++++++++++++++++++++++ IPv6 header +++++++++++++++++++++++ */
 /* rfc3542 */
@@ -198,6 +218,7 @@ struct ndpi_in6_addr
   } u6_addr;  /* 128-bit IP6 address */
 };
 
+PACK_ON
 struct ndpi_ipv6hdr
 {
   union
@@ -214,10 +235,11 @@ struct ndpi_ipv6hdr
 
   struct ndpi_in6_addr ip6_src;
   struct ndpi_in6_addr ip6_dst;
-} __attribute__((packed));
+} PACK_OFF;
 
 /* +++++++++++++++++++++++ TCP header +++++++++++++++++++++++ */
 
+PACK_ON
 struct ndpi_tcphdr
 {
   u_int16_t source;
@@ -234,17 +256,18 @@ struct ndpi_tcphdr
   u_int16_t window;
   u_int16_t check;
   u_int16_t urg_ptr;
-} __attribute__((packed));
+} PACK_OFF;
 
 /* +++++++++++++++++++++++ UDP header +++++++++++++++++++++++ */
 
+PACK_ON
 struct ndpi_udphdr
 {
   u_int16_t source;
   u_int16_t dest;
   u_int16_t len;
   u_int16_t check;
-} __attribute__((packed));
+} PACK_OFF;
 
 typedef union
 {
