@@ -22,41 +22,10 @@
  *
  */
 
-#ifndef __NDPI_MAIN_INCLUDE_FILE__
-#define __NDPI_MAIN_INCLUDE_FILE__
+#ifndef __NDPI_MAIN_H__
+#define __NDPI_MAIN_H__
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#ifndef WIN32
-#include <pthread.h>
-#endif
-#include <ctype.h>
-#include <time.h>
-
-
-#ifdef WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <arpa/inet.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#if !defined __APPLE__ && !defined __FreeBSD__ && !defined __NetBSD__ && !defined __OpenBSD__
-#include <endian.h>
-#include <byteswap.h>
-#if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
-#include <netinet/in.h>
-#endif
-#endif
-
-/* default includes */
-
-#include <sys/param.h>
-#include <limits.h>
-#endif
-
+#include "ndpi_includes.h"
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 #include "ndpi_typedefs.h"
@@ -138,4 +107,4 @@ void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *
 					   const char **file, const char **func, u_int32_t * line);
 #endif
 
-#endif	/* __NDPI_MAIN_INCLUDE_FILE__ */
+#endif	/* __NDPI_MAIN_H__ */

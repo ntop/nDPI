@@ -28,7 +28,6 @@
 #include "ndpi_define.h"
 
 #define BT_ANNOUNCE
-#define _WS2TCPIP_H_ /* Avoid compilation problems */
 #define SNAP_EXT
 
 
@@ -55,18 +54,6 @@ typedef struct node_t
   char *key;
   struct node_t *left, *right;
 } ndpi_node;
-
-#ifdef WIN32
-typedef unsigned char  u_char;
-typedef unsigned short u_short;
-typedef unsigned int   uint;
-typedef unsigned long  u_long;
-typedef u_char  u_int8_t;
-typedef u_short u_int16_t;
-typedef uint   u_int32_t;
-typedef uint   u_int;
-typedef unsigned __int64 u_int64_t;
-#endif
 
 /* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
@@ -585,7 +572,7 @@ struct ndpi_flow_tcp_struct {
   u_char prev_zmq_pkt[10];
 #endif
 }
-#if !defined(WIN32)
+#ifndef WIN32
   __attribute__ ((__packed__))
 #endif
   ;
@@ -634,7 +621,7 @@ struct ndpi_flow_udp_struct {
   u_int32_t eaq_sequence;
 #endif
 }
-#if !defined(WIN32)
+#ifndef WIN32
   __attribute__ ((__packed__))
 #endif
   ;
@@ -663,7 +650,7 @@ typedef struct ndpi_packet_struct {
   u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
 
 
-#if !defined(WIN32)
+#ifndef WIN32
   __attribute__ ((__packed__))
 #endif
   u_int16_t protocol_stack_info;
@@ -861,7 +848,7 @@ typedef struct ndpi_detection_module_struct {
 
 typedef struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
-#if !defined(WIN32)
+#ifndef WIN32
   __attribute__ ((__packed__))
 #endif
   u_int16_t protocol_stack_info;

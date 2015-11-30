@@ -23,8 +23,8 @@
  */
 
 
-#ifndef __NDPI_PROTOCOLS_INCLUDE_FILE__
-#define __NDPI_PROTOCOLS_INCLUDE_FILE__
+#ifndef __NDPI_PROTOCOLS_H__
+#define __NDPI_PROTOCOLS_H__
 
 #include "ndpi_main.h"
 
@@ -337,4 +337,4 @@ void init_zmq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_stracraft_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_ubntac2_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 
-#endif /* __NDPI_PROTOCOLS_INCLUDE_FILE__ */
+#endif /* __NDPI_PROTOCOLS_H__ */

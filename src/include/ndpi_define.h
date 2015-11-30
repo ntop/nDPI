@@ -194,7 +194,7 @@
 
 #else							/* NDPI_ENABLE_DEBUG_MESSAGES */
 
-#if defined(WIN32)
+#ifdef WIN32
 #define NDPI_LOG(...) {}
 #else
 #define NDPI_LOG(proto, mod, log_level, args...) {}
@@ -236,7 +236,7 @@
 #define NDPI_BITMASK_SET(a, b)    { memcpy(&a, &b, sizeof(NDPI_PROTOCOL_BITMASK)); }
 
 /* this is a very very tricky macro *g*,
-  * the compiler will remove all shifts here if the protocol is static...
+ * the compiler will remove all shifts here if the protocol is static...
  */
 #define NDPI_ADD_PROTOCOL_TO_BITMASK(bmask,value)     NDPI_SET(&bmask,value)
 #define NDPI_DEL_PROTOCOL_FROM_BITMASK(bmask,value)   NDPI_CLR(&bmask,value)
