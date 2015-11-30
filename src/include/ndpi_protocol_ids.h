@@ -23,7 +23,7 @@
  */
 
 
-#ifndef __NDPI_API_INCLUDE_FILE__
+#ifndef __NDPI_API_H__
 
 #endif
 
@@ -201,6 +201,11 @@
 #define NDPI_PROTOCOL_WHATSAPP_VOICE			        189
 #define NDPI_PROTOCOL_STARCRAFT 			        213 /* Matteo Bracci <matteobracci1@gmail.com> */
 #define NDPI_PROTOCOL_TEREDO 			                214
+#define NDPI_PROTOCOL_HEP 			                216 /* Sipcapture.org QXIP BV */
+#define NDPI_PROTOCOL_UBNTAC2					217 /* Ubiquity UBNT AirControl 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
+#define NDPI_PROTOCOL_MS_LYNC 			                218
+
+
 
 #define NDPI_CONTENT_AVI				39
 #define NDPI_CONTENT_FLASH				40
@@ -263,7 +268,7 @@
 #define NDPI_SERVICE_HOTSPOT_SHIELD                     215
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_HOTSPOT_SHIELD
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_MS_LYNC
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

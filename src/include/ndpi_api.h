@@ -23,8 +23,8 @@
  */
 
 
-#ifndef __NDPI_PUBLIC_FUNCTIONS_H__
-#define __NDPI_PUBLIC_FUNCTIONS_H__
+#ifndef __NDPI_API_H__
+#define __NDPI_API_H__
 
 #include "ndpi_main.h"
 
@@ -32,18 +32,17 @@
 extern "C" {
 #endif
 
-  /**
-   * This function returns the size of the flow struct
-   * @return the size of the flow struct
+  /**                                                                                                                                  
+   * This function returns the size of the flow struct                                                                                 
+   * @return the size of the flow struct                                                                                               
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void);
-
-  /**
-   * This function returns the size of the id struct
-   * @return the size of the id struct
+  
+  /**                                                                                                                                  
+   * This function returns the size of the id struct                                                                                   
+   * @return the size of the id struct                                                                                                 
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void);
-
 
   /* Public malloc/free */
   void* ndpi_malloc(unsigned long size);
@@ -51,7 +50,8 @@ extern "C" {
   void  ndpi_free(void *ptr);
   void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
   char *ndpi_strdup(const char *s);
-  /*
+  
+  /**
    * Find the first occurrence of find in s, where the search is limited to the
    * first slen characters of s.
    */
@@ -70,7 +70,7 @@ extern "C" {
   /**
    * This function returns a new initialized detection module.
    * @param ticks_per_second the timestamp resolution per second (like 1000 for millisecond resolution)
-   * @param ndpi_malloc function pointer to a memory allocator
+   * @param __ndpi_malloc function pointer to a memory allocator
    * @param ndpi_debug_printf a function pointer to a debug output function, use NULL in productive envionments
    * @return the initialized detection module
    */
@@ -88,8 +88,8 @@ extern "C" {
 
   /**
    * This function enables cache support in nDPI used for some protocol such as Skype
-   * @param cache host name
-   * @param cache port
+   * @param host host name
+   * @param port port number
    */
   void ndpi_enable_cache(struct ndpi_detection_module_struct *ndpi_mod, char* host, u_int port);
 
@@ -150,14 +150,6 @@ extern "C" {
    */
   u_int8_t ndpi_detection_get_l4(const u_int8_t * l3, u_int16_t l3_len, const u_int8_t ** l4_return, u_int16_t * l4_len_return,
 				 u_int8_t * l4_protocol_return, u_int32_t flags);
-  /**
-   * returns the real protocol for the flow of the last packet given to the detection.
-   * if no real protocol could be found, the unknown protocol will be returned.
-   *
-   * @param ndpi_struct the detection module
-   * @return the protocol id of the last real protocol found in the protocol history of the flow
-   */
-  /* u_int16_t ndpi_detection_get_real_protocol_of_flow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow); */
 
   /**
    * returns true if the protocol history of the flow of the last packet given to the detection
@@ -244,4 +236,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif	/* __NDPI_API_H__ */

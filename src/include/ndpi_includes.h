@@ -1,8 +1,7 @@
 /*
- * ndpi_unix.h
+ * ndpi_includes.h
  *
  * Copyright (C) 2011-15 - ntop.org
- * Copyright (C) 2009-2011 by ipoque GmbH
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,23 +21,48 @@
  *
  */
 
-#ifndef __NDPI_UNIX_INCLUDE_FILE__
-#define __NDPI_UNIX_INCLUDE_FILE__
+#ifndef __NDPI_INCLUDES_H__
+#define __NDPI_INCLUDES_H__
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#include <netinet/in.h>
-#if defined(__NetBSD__) || defined(__OpenBSD__)
-#include <netinet/in_systm.h>
-#if defined(__OpenBSD__)
+#include <stdint.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
+#include <limits.h>
+
+#ifdef WIN32
+#include "ndpi_win32.h"
+#else
+#include <sys/param.h>
 #include <pthread.h>
-#endif
-#endif
-#endif
-
-#ifndef WIN32
+#include <arpa/inet.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+
+#if !defined __APPLE__ && !defined __FreeBSD__ && !defined __NetBSD__ && !defined __OpenBSD__
+#include <endian.h>
+#include <byteswap.h>
+
+#if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
+#include <netinet/in.h>
+
+#if defined __NetBSD__ || defined __OpenBSD__
+#include <netinet/in_systm.h>
+
+#ifdef __OpenBSD__
+#include <pthread.h>
+
+#endif
+#endif
+#endif
 #endif
 
-#endif /* __NDPI_UNIX_INCLUDE_FILE__ */
+#endif	/* Win32 */
+
+#endif /* __NDPI_INCLUDES_H__ */
