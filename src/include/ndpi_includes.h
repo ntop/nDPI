@@ -30,12 +30,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include <sys/param.h>
 #include <limits.h>
 
 #ifdef WIN32
 #include "ndpi_win32.h"
 #else
+#include <sys/param.h>
 #include <pthread.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
