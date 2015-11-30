@@ -289,7 +289,7 @@
 #define match_first_bytes(payload,st) (memcmp((payload),(st),(sizeof(st)-1))==0)
 
 #if defined(WIN32) && !defined(snprintf)
-#define snprintf(buf,len, format,...) _snprintf_s(buf, len,len, format, __VA_ARGS__)
+#define snprintf _snprintf 
 #endif
 
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
