@@ -84,47 +84,6 @@ int ndpi_comp_with_mask (void *addr, void *dest, u_int mask) {
   return (0);
 }
 
-#if 0 /* this implementation does not support IPv6, using system inet_pton */
-#ifndef WIN32
-/* inet_pton substitute implementation
- * Uses inet_addr to convert an IP address in dotted decimal notation into 
- * unsigned long and copies the result to dst.
- * Only supports AF_INET.  Follows standard error return conventions of 
- * inet_pton.
- */
-int
-inet_pton (int af, const char *src, void *dst)
-{
-  u_long result;  
-
-  if(af == AF_INET) {
-    result = inet_addr(src);
-    if(result == -1)
-      return 0;
-    else {
-      memcpy (dst, &result, sizeof(struct in_addr));
-      return 1;
-    }
-  }
-#ifdef NT
-#if defined(PATRICIA_IPV6)
-  else if(af == AF_INET6) {
-    struct in6_addr Address;
-    return (inet6_addr(src, &Address));
-  }
-#endif /* PATRICIA_IPV6 */
-#endif /* NT */
-#ifndef NT
-  else {
-    printf("NOT SUPP\n");
-    errno = EAFNOSUPPORT;
-    return -1;
-  }
-#endif /* NT */
-}
-#endif
-#endif
-
 /* this allows imcomplete prefix */
 int
 ndpi_my_inet_pton (int af, const char *src, void *dst)

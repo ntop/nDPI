@@ -23,7 +23,7 @@
  */
 
 
-#ifndef __NDPI_API_INCLUDE_FILE__
+#ifndef __NDPI_API_H__
 
 #endif
 
