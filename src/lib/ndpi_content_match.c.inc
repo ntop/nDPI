@@ -63,10 +63,11 @@ static ndpi_network host_protocol_list[] = {
     Dropbox
     108.160.160.0/20
     199.47.216.0/22
+    45.58.64.0/20
   */
   { 0x6CA0A000 /* 108.160.160.0 */, 20, NDPI_PROTOCOL_DROPBOX },
   { 0xC72FD800 /* 199.47.216.0 */, 22, NDPI_PROTOCOL_DROPBOX },
-  { 0x6CA0A000 /* 108.160.160.0 */, 20, NDPI_PROTOCOL_DROPBOX },
+  { 0x2D3A4000 /* 45.58.64.0 */, 20, NDPI_PROTOCOL_DROPBOX },
 
   /*
     Skype (Microsoft CDN)
@@ -7320,7 +7321,7 @@ ndpi_protocol_match host_match[] = {
   { ".cnn.c",				"CNN",			NDPI_SERVICE_CNN, NDPI_PROTOCOL_FUN },
   { ".cnn.net",				"CNN",			NDPI_SERVICE_CNN, NDPI_PROTOCOL_FUN },
   { ".dropbox.com",			"DropBox",		NDPI_SERVICE_DROPBOX, NDPI_PROTOCOL_SAFE },
-  { ".ebay.",	  		"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".ebay.",				"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
   { ".ebay.com",			"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
   { ".ebaystatic.com",			"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
   { ".ebaydesc.com",			"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },

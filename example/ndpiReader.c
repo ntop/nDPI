@@ -1640,7 +1640,6 @@ static void pcap_packet_callback(u_char *args,
 
  datalink_check:
   switch(datalink_type) {
-
     case DLT_NULL :
       if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
 	type = ETH_P_IP;
@@ -1725,7 +1724,12 @@ static void pcap_packet_callback(u_char *args,
       ip_offset = wifi_len + radio_len + sizeof(struct ndpi_llc_header) + eth_offset;
       break;
 
+  case DLT_RAW:
+    ip_offset = eth_offset = 0;
+    break;
+
     default:
+      printf("Unknown datalink %d\n", datalink_type);
       return;
     }
 
@@ -1735,9 +1739,7 @@ static void pcap_packet_callback(u_char *args,
     type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
     ip_offset += 4;
     vlan_packet = 1;
-  }
-  else if(type == MPLS_UNI || type == MPLS_MULTI) {
-    
+  } else if(type == MPLS_UNI || type == MPLS_MULTI) {    
     mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
     label = ntohl(mpls->label);
     /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
