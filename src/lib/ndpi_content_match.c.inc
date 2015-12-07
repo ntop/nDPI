@@ -7387,6 +7387,7 @@ ndpi_protocol_match host_match[] = {
   { "quickplay.com",                    "QuickPlay",            NDPI_SERVICE_QUICKPLAY, NDPI_PROTOCOL_FUN },
   { "tim.com.br",                       "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
   { "tim.it",                           "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".qq.com",                          "QQ",                   NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_FUN},
 
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
