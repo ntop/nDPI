@@ -1,7 +1,7 @@
 HTTP	2	1469	1
+QQ	12	4781	5
 Facebook	6	1740	3
 Google	2	378	1
-HTTP_Proxy	12	4781	5
 QuickPlay	133	96179	11
 
 	1	TCP 120.28.26.231:80 <-> 10.54.169.250:33277 [proto: 7.126/HTTP.Google][2 pkts/378 bytes][Host: clients3.google.com]
@@ -11,8 +11,8 @@ QuickPlay	133	96179	11
 	5	TCP 120.28.35.40:80 <-> 10.54.169.250:52017 [proto: 7.196/HTTP.QuickPlay][8 pkts/6032 bytes][Host: vod-singtelhawk.quickplay.com]
 	6	TCP 120.28.35.40:80 <-> 10.54.169.250:52019 [proto: 7.196/HTTP.QuickPlay][25 pkts/19606 bytes][Host: vod-singtelhawk.quickplay.com]
 	7	TCP 120.28.35.40:80 <-> 10.54.169.250:52021 [proto: 7.196/HTTP.QuickPlay][4 pkts/2754 bytes][Host: vod-singtelhawk.quickplay.com]
-	8	TCP 203.205.147.215:80 <-> 10.54.169.250:35670 [proto: 131/HTTP_Proxy][2 pkts/943 bytes][Host: hkminorshort.weixin.qq.com]
-	9	TCP 203.205.129.101:80 <-> 10.54.169.250:42762 [proto: 131/HTTP_Proxy][2 pkts/877 bytes][Host: hkextshort.weixin.qq.com]
+	8	TCP 203.205.147.215:80 <-> 10.54.169.250:35670 [proto: 7.48/HTTP.QQ][2 pkts/943 bytes][Host: hkminorshort.weixin.qq.com]
+	9	TCP 203.205.129.101:80 <-> 10.54.169.250:42762 [proto: 7.48/HTTP.QQ][2 pkts/877 bytes][Host: hkextshort.weixin.qq.com]
 	10	TCP 173.252.74.22:80 <-> 10.54.169.250:52285 [proto: 7.119/HTTP.Facebook][2 pkts/582 bytes][Host: www.facebook.com]
 	11	TCP 31.13.68.49:80 <-> 10.54.169.250:44793 [proto: 7.119/HTTP.Facebook][2 pkts/576 bytes][Host: www.facebook.com]
 	12	TCP 120.28.5.18:80 <-> 10.54.169.250:33064 [proto: 7.196/HTTP.QuickPlay][2 pkts/467 bytes][Host: api-singtelhawk.quickplay.com]
@@ -21,7 +21,7 @@ QuickPlay	133	96179	11
 	15	TCP 120.28.35.41:80 <-> 10.54.169.250:50668 [proto: 7.196/HTTP.QuickPlay][4 pkts/3360 bytes][Host: api-singtelhawk.quickplay.com]
 	16	TCP 120.28.35.40:80 <-> 10.54.169.250:52018 [proto: 7.196/HTTP.QuickPlay][7 pkts/5048 bytes][Host: vod-singtelhawk.quickplay.com]
 	17	TCP 120.28.35.40:80 <-> 10.54.169.250:52022 [proto: 7.196/HTTP.QuickPlay][7 pkts/4284 bytes][Host: vod-singtelhawk.quickplay.com]
-	18	TCP 203.205.129.101:80 <-> 10.54.169.250:42761 [proto: 131/HTTP_Proxy][2 pkts/641 bytes][Host: hkextshort.weixin.qq.com]
+	18	TCP 203.205.129.101:80 <-> 10.54.169.250:42761 [proto: 7.48/HTTP.QQ][2 pkts/641 bytes][Host: hkextshort.weixin.qq.com]
 	19	TCP 173.252.74.22:80 <-> 10.54.169.250:52288 [proto: 7.119/HTTP.Facebook][2 pkts/582 bytes][Host: www.facebook.com]
-	20	TCP 203.205.151.160:80 <-> 10.54.169.250:54883 [proto: 131/HTTP_Proxy][3 pkts/1337 bytes][Host: hkextshort.weixin.qq.com]
-	21	TCP 203.205.151.160:80 <-> 10.54.169.250:54885 [proto: 131/HTTP_Proxy][3 pkts/983 bytes][Host: hkextshort.weixin.qq.com]
+	20	TCP 203.205.151.160:80 <-> 10.54.169.250:54883 [proto: 7.48/HTTP.QQ][3 pkts/1337 bytes][Host: hkextshort.weixin.qq.com]
+	21	TCP 203.205.151.160:80 <-> 10.54.169.250:54885 [proto: 7.48/HTTP.QQ][3 pkts/983 bytes][Host: hkextshort.weixin.qq.com]
