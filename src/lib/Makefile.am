@@ -9,6 +9,7 @@ libndpi_la_includedir = $(includedir)/libndpi-@VERSION@/libndpi
 libndpi_la_include_HEADERS = ../include/ndpi_api.h \
 			     ../include/ndpi_define.h \
 			     ../include/ndpi_main.h \
+			     ../include/ndpi_includes.h \
 			     ../include/ndpi_protocol_ids.h \
 			     ../include/ndpi_protocols.h \
 			     ../include/ndpi_typedefs.h
