@@ -203,7 +203,7 @@
 #define NDPI_PROTOCOL_TEREDO 			                214
 #define NDPI_PROTOCOL_HEP 			                216 /* Sipcapture.org QXIP BV */
 #define NDPI_PROTOCOL_UBNTAC2					217 /* Ubiquity UBNT AirControl 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
-#define NDPI_PROTOCOL_MS_LYNC 			                218
+#define NDPI_PROTOCOL_MS_LYNC 			                219
 
 
 
@@ -266,6 +266,7 @@
 #define NDPI_SERVICE_INSTAGRAM                          211 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */
 #define NDPI_SERVICE_MICROSOFT                          212
 #define NDPI_SERVICE_HOTSPOT_SHIELD                     215
+#define NDPI_SERVICE_OCS                                218
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_MS_LYNC

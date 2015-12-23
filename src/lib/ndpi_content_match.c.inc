@@ -33,6 +33,13 @@ typedef struct {
 /* ****************************************************** */
 
 static ndpi_network host_protocol_list[] = {
+
+  /*    
+    OCS GO (Orange Cinéma Séries)
+    178.248.208.0/21
+  */
+  { 0xB2F8D000 /* 178.248.208.0 */, 21, NDPI_SERVICE_OCS },
+
   /*
     Citrix GotoMeeting (AS16815, AS21866)
     216.115.208.0/20
@@ -7369,7 +7376,7 @@ ndpi_protocol_match host_match[] = {
   { "wikimediafoundation.",		"Wikipedia",		NDPI_SERVICE_WIKIPEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { ".whatsapp.net",			"WhatsApp",		NDPI_SERVICE_WHATSAPP, NDPI_PROTOCOL_ACCEPTABLE },
   { ".yahoo.",				"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".yimg.com",				"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".yimg.com",			"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
   { "yahooapis.",			"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
   { "youtube.",				"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { ".googlevideo.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
@@ -7388,7 +7395,7 @@ ndpi_protocol_match host_match[] = {
   { "quickplay.com",                    "QuickPlay",            NDPI_SERVICE_QUICKPLAY, NDPI_PROTOCOL_FUN },
   { "tim.com.br",                       "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
   { "tim.it",                           "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".qq.com",                          "QQ",                   NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_FUN},
+  { ".qq.com",                          "QQ",                   NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_FUN },
 
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
@@ -7423,6 +7430,11 @@ ndpi_protocol_match host_match[] = {
   { ".anchorfree.",                     "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
   { "hotspotshield.com",                "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
   { ".webex.com",                       "Webex",                NDPI_PROTOCOL_WEBEX, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".ocsdomain.com",        		"OCS",          	NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },
+  { "ocs.fr",               		"OCS",   		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },   
+  { ".ocs.fr",              		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },
+  { ".labgency.ws",        		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },
+
   { NULL, 0 }
 };
 
