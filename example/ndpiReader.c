@@ -407,7 +407,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 
 /* ***************************************************** */
 
-static void *malloc_wrapper(unsigned long size) {
+static void *malloc_wrapper(size_t size) {
   current_ndpi_memory += size;
 
   if(current_ndpi_memory > max_ndpi_memory)
