@@ -1664,10 +1664,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_
   ndpi_str->user_data = NULL;
 #endif
 
-  ndpi_str->match_dns_host_names = 1; /*
-					Set it to 0 to increase library speed avoid
-					matching host names
-				      */
   ndpi_str->ticks_per_second = ticks_per_second;
   ndpi_str->tcp_max_retransmission_window_size = NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE;
   ndpi_str->directconnect_connection_ip_tick_timeout =

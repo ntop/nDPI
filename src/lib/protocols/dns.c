@@ -1,7 +1,9 @@
 /*
  * dns.c
  *
- * Copyright (C) 2012-15 - ntop.org
+ * Copyright (C) 2012-16 - ntop.org
+ *
+ * Michele Campus - <campus@ntop.org>
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -21,281 +23,102 @@
  *
  */
 
-
 #include "ndpi_protocols.h"
 
 #ifdef NDPI_PROTOCOL_DNS
 
-static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
-  if(payload[i] == 0x00)
-    return(1);
-  else if(payload[i] == 0xC0)
-    return(2);
-  else {
-    u_int8_t len = payload[i];
-    u_int8_t off = len + 1;
-
-    if(off == 0) /* Bad packet */
-      return(0);
-    else
-      return(off + getNameLength(i+off, payload, payloadLen));
-  }	
-}
-
-/* *********************************************** */
-
-static char* ndpi_intoa_v4(unsigned int addr, char* buf, u_short bufLen) {
-  char *cp, *retStr;
-  uint byte;
-  int n;
-
-  cp = &buf[bufLen];
-  *--cp = '\0';
-
-  n = 4;
-  do {
-    byte = addr & 0xff;
-    *--cp = byte % 10 + '0';
-    byte /= 10;
-    if(byte > 0) {
-      *--cp = byte % 10 + '0';
-      byte /= 10;
-      if(byte > 0)
-	*--cp = byte + '0';
-    }
-    *--cp = '.';
-    addr >>= 8;
-  } while (--n > 0);
-
-  /* Convert the string to lowercase */
-  retStr = (char*)(cp+1);
-
-  return(retStr);
-}
-
-/* *********************************************** */
-
-static u_int16_t get16(int *i, const u_int8_t *payload) {
-  u_int16_t v = *(u_int16_t*)&payload[*i];
-
-  (*i) += 2;
-
-  return(ntohs(v));
-}
-
-/* *********************************************** */
+#define FLAGS_MASK 0x8000
 
 void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-  u_int16_t dport = 0, sport = 0;
-  
-#define NDPI_MAX_DNS_REQUESTS			16
 
-  NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "search DNS.\n");
+  int x;
+  u_int8_t is_query, ret_code;
+  u_int16_t s_port = 0;
+  u_int16_t d_port = 0;
   
-  if (packet->udp != NULL) {
-    sport = ntohs(packet->udp->source),  dport = ntohs(packet->udp->dest);
-    NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "calculated dport over UDP.\n");
-  } else  if(packet->tcp != NULL) {
-    sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);
-    NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "calculated dport over tcp.\n");
+  NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "search DNS.\n");
+
+  if(flow->packet.udp != NULL)
+  {
+    s_port = ntohs(flow->packet.udp->source);
+    d_port = ntohs(flow->packet.udp->dest);
+    x = 0;
+  }
+  else if(flow->packet.tcp != NULL) /* pkt size > 512 bytes */
+  {
+    s_port = ntohs(flow->packet.tcp->source);
+    d_port = ntohs(flow->packet.tcp->dest);
+    x = 2;
+  }
+  else
+  {
+    NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
+    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);
   }
 
-  if(((dport == 53) || (sport == 53) || (dport == 5355))
-	  && (packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header))) {
-    int i = packet->tcp ? 2 : 0;
-	struct ndpi_dns_packet_header header, *dns = (struct ndpi_dns_packet_header*)&packet->payload[i];
-    u_int8_t is_query, ret_code, is_dns = 0;
-    u_int32_t a_record[NDPI_MAX_DNS_REQUESTS] = { 0 }, query_offset, num_a_records = 0;
+  if((s_port == 53 || d_port == 53 || d_port == 5355)
+     && (flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header)))
+  {
+    struct ndpi_dns_packet_header * dns_header = (struct ndpi_dns_packet_header*) &flow->packet.payload[x];
+    dns_header->tr_id = ntohs(dns_header->tr_id);
+    dns_header->flags = ntohs(dns_header->flags);
+    dns_header->num_queries = ntohs(dns_header->num_queries);
+    dns_header->num_answers = ntohs(dns_header->num_answers);
+    dns_header->authority_rrs = ntohs(dns_header->authority_rrs);
+    dns_header->additional_rrs = ntohs(dns_header->additional_rrs);
 
-    header.flags = ntohs(dns->flags);
-    header.transaction_id = ntohs(dns->transaction_id);
-    header.num_queries = ntohs(dns->num_queries);
-    header.answer_rrs = ntohs(dns->answer_rrs);
-    header.authority_rrs = ntohs(dns->authority_rrs);
-    header.additional_rrs = ntohs(dns->additional_rrs);
-    is_query = (header.flags & 0x8000) ? 0 : 1;
-    ret_code = is_query ? 0 : (header.flags & 0x0F);
-	i += sizeof(struct ndpi_dns_packet_header);
-    query_offset = i;
-
-    if(is_query) {
-      /* DNS Request */
-      if((header.num_queries > 0) && (header.num_queries <= NDPI_MAX_DNS_REQUESTS)
-	 && (((header.flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
-	     || ((header.answer_rrs == 0) && (header.authority_rrs == 0)))) {
-	/* This is a good query */
-	is_dns = 1;
-
-	if(header.num_queries > 0) {
-	  while(i < packet->payload_packet_len) {
-	      if(packet->payload[i] == '\0') {
-		i++;
-		flow->protos.dns.query_type = get16(&i, packet->payload);
-		break;
-	      } else
-		i++;
-	    }
-	}
-      }
-    } else {
-      /* DNS Reply */
-
-      flow->server_id = flow->dst;
-
-      if((header.num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
-	 && (((header.answer_rrs > 0) && (header.answer_rrs <= NDPI_MAX_DNS_REQUESTS))
-	     || ((header.authority_rrs > 0) && (header.authority_rrs <= NDPI_MAX_DNS_REQUESTS))
-	     || ((header.additional_rrs > 0) && (header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
-	 ) {
-	/* This is a good reply */
-	is_dns = 1;
-
-	i++;
-	
-	if(packet->payload[i] != '\0') {
-	  while((i < packet->payload_packet_len)
-		&& (packet->payload[i] != '\0')) {
-	    i++;
-	  }
-	  
-	  i++;
-	}
-
-	i += 4;
-
-	if(header.answer_rrs > 0) {
-	  u_int16_t rsp_type;
-	  u_int16_t num;
-
-	  for(num = 0; num < header.answer_rrs; num++) {
-	    u_int16_t data_len;
-	
-	    if((i+6) >= packet->payload_packet_len) {
-	      break;
-	    }
-
-	    if((data_len = getNameLength(i, packet->payload, packet->payload_packet_len)) == 0) {
-	      break;
-	    } else
-	      i += data_len;
-	
-	    rsp_type = get16(&i, packet->payload);
-
-	    // Skip past the CLASS (2 octets) and TTL (4 octets) fields.
-	    i += 6;
-	    data_len = get16(&i, packet->payload);
-
-	    if((data_len <= 1) || (data_len > (packet->payload_packet_len-i))) {
-	      break;
-	    }
-
-	    flow->protos.dns.rsp_type = rsp_type;
-
-	    if(rsp_type == 1 /* A */) {
-	      if(data_len == 4) {
-		u_int32_t v = ntohl(*((u_int32_t*)&packet->payload[i]));
-
-		if(num_a_records < (NDPI_MAX_DNS_REQUESTS-1))
-		  a_record[num_a_records++] = v;
-		else
-		  break; /* One record is enough */
-	      }
-	    }
-	
-	    if(data_len == 0) {
-	      break;
-	    }
-
-	    i += data_len;
-	  } /* for */
-	}
-      }
-
-      if((header.num_queries <= NDPI_MAX_DNS_REQUESTS)
-	 && ((header.answer_rrs == 0)
-	     || (header.authority_rrs == 0)
-	     || (header.additional_rrs == 0))
-	 && (ret_code != 0 /* 0 == OK */)
-	 ) {
-	/* This is a good reply */
-	is_dns = 1;
-      }
+    /* 0x0000 QUERY */
+    if(dns_header->flags & FLAGS_MASK == 0x0000)
+      is_query = 0;
+    /* 0x8000 RESPONSE */
+    else if(dns_header->flags & FLAGS_MASK != 0x8000)
+      is_query = 1;
+    else
+    {
+      NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
+      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);    
     }
+    
+    /* extract host name server */
+    ret_code = (is_query == 0) ? 0 : (dns_header->flags & 0x0F);
+    int j = 0;
+    int off = sizeof(struct ndpi_dns_packet_header) + 1;
+    while((flow->packet.payload[off] != '\0'))
+    {
+      flow->host_server_name[j] = flow->packet.payload[off];
+      if(flow->host_server_name[j] < ' ')
+	flow->host_server_name[j] = '.';
+      off++;
+      j++;
+    }
+    flow->host_server_name[j] = '\0';
 
-    if(is_dns) {
-      int j = 0;
-      int size_host_server_name = sizeof(flow->host_server_name);
+    flow->protos.dns.num_answers = (u_int8_t) (dns_header->num_answers + dns_header->authority_rrs + dns_header->additional_rrs);
+    flow->protos.dns.ret_code = ret_code;
 
-      flow->protos.dns.num_queries = (u_int8_t)header.num_queries, 
-	flow->protos.dns.num_answers = (u_int8_t)(header.answer_rrs+header.authority_rrs+header.additional_rrs),
-      flow->protos.dns.ret_code = ret_code;
-
-      i = query_offset+1;
-
-      while((i < packet->payload_packet_len)
-	    && (j < (size_host_server_name-1))	  
-	    && (packet->payload[i] != '\0')) {
-	flow->host_server_name[j] = tolower(packet->payload[i]);
-	if(flow->host_server_name[j] < ' ')
-	  flow->host_server_name[j] = '.';	
-	j++, i++;
-      }
-
-      if(a_record[0] != 0) {
-	char a_buf[32];
-	int i;
-
-	for(i=0; i<num_a_records && j < size_host_server_name; i++) {
-	  j += snprintf((char*)&flow->host_server_name[j], size_host_server_name-1-j, "%s%s",
-			(i == 0) ? "@" : ";",
-			ndpi_intoa_v4(a_record[i], a_buf, sizeof(a_buf)));
-	}
-      }
-		      
-      flow->host_server_name[j] = '\0';
-
-      if(j > 0) {
-#ifdef DEBUG
-	printf("==> %s\n", flow->host_server_name);
-#endif
-
-	if(ndpi_struct->match_dns_host_names)
-	  ndpi_match_host_subprotocol(ndpi_struct, flow, 
-					(char *)flow->host_server_name,
-					strlen((const char*)flow->host_server_name),
-					NDPI_PROTOCOL_DNS);
-      }
-
-      i++;
-
-      memcpy(&flow->protos.dns.query_type, &packet->payload[i], 2); 
-      flow->protos.dns.query_type  = ntohs(flow->protos.dns.query_type), i += 2;
-
-      memcpy(&flow->protos.dns.query_class, &packet->payload[i], 2); 
-      flow->protos.dns.query_class  = ntohs(flow->protos.dns.query_class), i += 2;
-
-#ifdef DEBUG
-      printf("%s [type=%04X][class=%04X]\n", flow->host_server_name, flow->protos.dns.query_type, flow->protos.dns.query_class);
-#endif
-
-      if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-	/* 
-	   Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
-	   matched a subprotocol
-	*/
-	NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "found DNS.\n");      
-	ndpi_set_detected_protocol(ndpi_struct, flow, (dport == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS, NDPI_PROTOCOL_UNKNOWN);
-      }
-    } else {
-      flow->protos.dns.bad_packet = 1;
+    if(j > 0)
+      ndpi_match_host_subprotocol(ndpi_struct, flow, 
+				  (char *)flow->host_server_name,
+				  strlen((const char*)flow->host_server_name),
+				  NDPI_PROTOCOL_DNS);
+    
+    if(flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
+    {
+      /**
+	 Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
+	 matched a subprotocol
+      **/
+      NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "found DNS.\n");      
+      ndpi_set_detected_protocol(ndpi_struct, flow, (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS, NDPI_PROTOCOL_UNKNOWN);
+    }
+    else
+    {
       NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);
     }
   }
 }
-
 
 void init_dns_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {

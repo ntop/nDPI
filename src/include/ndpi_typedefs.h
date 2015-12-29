@@ -270,7 +270,12 @@ struct ndpi_udphdr
 
 PACK_ON
 struct ndpi_dns_packet_header {
-	u_int16_t transaction_id, flags, num_queries, answer_rrs, authority_rrs, additional_rrs;
+  u_int16_t tr_id;
+  u_int16_t flags;
+  u_int16_t num_queries;
+  u_int16_t num_answers;
+  u_int16_t authority_rrs;
+  u_int16_t additional_rrs;
 } PACK_OFF;
 
 typedef union
@@ -340,7 +345,7 @@ typedef enum {
   HTTP_METHOD_CONNECT
 } ndpi_http_method;
 
-typedef struct ndpi_id_struct {
+struct ndpi_id_struct {
   /**
      detected_protocol_bitmask:
      access this bitmask to find out whether an id has used skype or not
@@ -436,7 +441,7 @@ typedef struct ndpi_id_struct {
 #ifdef NDPI_PROTOCOL_RTSP
   u_int32_t rtsp_ts_set:1;
 #endif
-} ndpi_id_struct;
+};
 
 /* ************************************************** */
 
@@ -628,12 +633,12 @@ struct ndpi_flow_udp_struct {
 
 /* ************************************************** */
 
-typedef struct ndpi_int_one_line_struct {
+struct ndpi_int_one_line_struct {
   const u_int8_t *ptr;
   u_int16_t len;
-} ndpi_int_one_line_struct_t;
+};
 
-typedef struct ndpi_packet_struct {
+struct ndpi_packet_struct {
   const struct ndpi_iphdr *iph;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   const struct ndpi_ipv6hdr *iphv6;
@@ -688,22 +693,22 @@ typedef struct ndpi_packet_struct {
   u_int8_t packet_lines_parsed_complete:1,
     packet_direction:1,
     empty_line_position_set:1;
-} ndpi_packet_struct_t;
+};
 
 struct ndpi_detection_module_struct;
 struct ndpi_flow_struct;
 
-typedef struct ndpi_call_function_struct {
+struct ndpi_call_function_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask;
   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
   u_int8_t detection_feature;
-} ndpi_call_function_struct_t;
+};
 
-typedef struct ndpi_subprotocol_conf_struct {
+struct ndpi_subprotocol_conf_struct {
   void (*func) (struct ndpi_detection_module_struct *, char *attr, char *value, int protocol_id);
-} ndpi_subprotocol_conf_struct_t;
+};
 
 
 typedef struct {
@@ -746,7 +751,8 @@ typedef struct ndpi_proto {
 
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
 
-typedef struct ndpi_detection_module_struct {
+struct ndpi_detection_module_struct {
+  
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
 
@@ -799,6 +805,7 @@ typedef struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa; /* TOR */
+  
   /* IP-based protocol detection */
   void *protocols_ptree;
 
@@ -842,11 +849,11 @@ typedef struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t match_dns_host_names:1, http_dont_dissect_response:1;
+  u_int8_t http_dont_dissect_response:1;
   u_int8_t direction_detect_disable:1; /* disable internal detection of packet direction */
-} ndpi_detection_module_struct_t;
+};
 
-typedef struct ndpi_flow_struct {
+struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
 #ifndef WIN32
   __attribute__ ((__packed__))
@@ -899,12 +906,13 @@ typedef struct ndpi_flow_struct {
   } http;
 
   union {
-    struct {
-      u_int8_t num_queries, num_answers, ret_code;
-      u_int8_t bad_packet /* the received packet looks bad */;
-      u_int16_t query_type, query_class, rsp_type;
-    } dns;
 
+    /* the only fields useful for nDPI and ntopng */
+    struct {
+      u_int8_t num_answers, ret_code;
+      u_int16_t query_type;
+    } dns;
+    
     struct {
       u_int8_t request_code;
       u_int8_t version;
@@ -1003,6 +1011,6 @@ typedef struct ndpi_flow_struct {
   struct ndpi_flow_struct *flow;
   struct ndpi_id_struct *src;
   struct ndpi_id_struct *dst;
-} ndpi_flow_struct_t;
+};
 
 #endif/* __NDPI_TYPEDEFS_H__ */
