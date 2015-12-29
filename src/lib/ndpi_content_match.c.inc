@@ -34,6 +34,32 @@ typedef struct {
 
 static ndpi_network host_protocol_list[] = {
 
+ /*    
+    OFFICE 365
+    13.107.1.0/24
+    13.107.3.0/24
+    13.107.4.0/24
+    13.107.5.0/24
+    13.107.6.0/24
+    13.107.7.0/24
+    13.107.9.0/24
+    13.107.12.0/24
+    13.107.13.0/24
+    13.107.15.0/24
+    13.107.16.0/24
+  */
+  { 0x0D6B0100 /* 13.107.1.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0300 /* 13.107.3.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0400 /* 13.107.4.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0500 /* 13.107.5.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0600 /* 13.107.6.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0700 /* 13.107.7.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0900 /* 13.107.9.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0C00 /* 13.107.12.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0D00 /* 13.107.13.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B0F00 /* 13.107.15.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+  { 0x0D6B1000 /* 13.107.16.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
+
   /*    
     OCS GO (Orange Cinéma Séries)
     178.248.208.0/21
@@ -7435,6 +7461,21 @@ ndpi_protocol_match host_match[] = {
   { "ocs.fr",               		"OCS",   		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },   
   { ".ocs.fr",              		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },
   { ".labgency.ws",        		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },
+  
+  { "crl.microsoft.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-ocsp.verisign.com",	"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-aia.verisign.com", 	"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-crl.verisign.com", 	"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "sa.symcb.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "sd.symcb.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".omniroot.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".verisign.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".symcb.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".symcd.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".verisign.net",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".geotrust.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".entrust.net",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".public-trust.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, 0 }
 };
