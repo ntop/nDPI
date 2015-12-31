@@ -1623,14 +1623,23 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 
   patricia_node_t *node;
   struct in_addr pin;
-
-  inet_pton(AF_INET, value, &pin);
-
-  if((node = add_to_ptree(ndpi_struct->protocols_ptree, AF_INET, &pin, 32)) != NULL) {
-    node->value.user_value = protocol_id;
+  int bits = 32;
+  char *ptr = strrchr(value, '/');
+  
+  if (ptr)
+  {
+    ptr[0] = '\0';
+    ptr++;
+    if (atoi(ptr)>=0 && atoi(ptr)<=32)
+      bits = atoi(ptr);
   }
-
-  return(0);
+  
+  inet_pton(AF_INET, value, &pin);
+  
+  if((node = add_to_ptree(ndpi_struct->protocols_ptree, AF_INET, &pin, bits)) != NULL)
+    node->value.user_value = protocol_id;
+  
+  return 0;
 }
 
 #endif
@@ -1846,6 +1855,7 @@ char * strsep(char **sp, char *sep)
 
 
 int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, u_int8_t do_add) {
+  
   char *at, *proto, *elem;
   ndpi_proto_defaults_t *def;
   int subprotocol_id, i;
@@ -1960,6 +1970,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
 
 */
 int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char* path) {
+  
   FILE *fd = fopen(path, "r");
   int i;
 
