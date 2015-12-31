@@ -196,7 +196,7 @@ u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
 
 /* ****************************************** */
 
-static void *(*_ndpi_malloc)(unsigned long size);
+static void *(*_ndpi_malloc)(size_t size);
 static void  (*_ndpi_free)(void *ptr);
 
 /* ****************************************** */
@@ -290,12 +290,12 @@ static int removeDefaultPort(ndpi_port_range *range,
 
 /* ****************************************** */
 
-void* ndpi_malloc(unsigned long size) { return(_ndpi_malloc(size)); }
+void* ndpi_malloc(size_t size) { return(_ndpi_malloc(size)); }
 
 /* ****************************************** */
 
-void* ndpi_calloc(unsigned long count, unsigned long size) {
-  unsigned long len = count*size;
+void* ndpi_calloc(unsigned long count, size_t size) {
+  size_t len = count*size;
   void *p = ndpi_malloc(len);
 
   if(p)
@@ -1638,7 +1638,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 /* ******************************************************************** */
 
 struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_per_second,
-								void* (*__ndpi_malloc)(unsigned long size),
+								void* (*__ndpi_malloc)(size_t size),
 								void  (*__ndpi_free)(void *ptr),
 								ndpi_debug_function_ptr ndpi_debug_printf)
 {

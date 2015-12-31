@@ -45,8 +45,8 @@ extern "C" {
   u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void);
 
   /* Public malloc/free */
-  void* ndpi_malloc(unsigned long size);
-  void* ndpi_calloc(unsigned long count, unsigned long size);
+  void* ndpi_malloc(size_t size);
+  void* ndpi_calloc(unsigned long count, size_t size);
   void  ndpi_free(void *ptr);
   void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
   char *ndpi_strdup(const char *s);
@@ -75,7 +75,7 @@ extern "C" {
    * @return the initialized detection module
    */
   struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_per_second,
-								  void* (*__ndpi_malloc)(unsigned long size),
+								  void* (*__ndpi_malloc)(size_t size),
 								  void  (*__ndpi_free)(void *ptr),
 								  ndpi_debug_function_ptr ndpi_debug_printf);
 
