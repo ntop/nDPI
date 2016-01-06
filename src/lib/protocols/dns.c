@@ -71,28 +71,28 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     dns_header->additional_rrs = ntohs(dns_header->additional_rrs);
 
     /* 0x0000 QUERY */
-    if(dns_header->flags & FLAGS_MASK == 0x0000)
+    if((dns_header->flags & FLAGS_MASK) == 0x0000)
       is_query = 0;
     /* 0x8000 RESPONSE */
-    else if(dns_header->flags & FLAGS_MASK != 0x8000)
+    else if((dns_header->flags & FLAGS_MASK) != 0x8000)
       is_query = 1;
     else
-      invalid = 1
+      invalid = 1;
 
     if(is_query) {
       /* DNS Request */
-      if((header.num_queries > 0) && (header.num_queries <= NDPI_MAX_DNS_REQUESTS)
-         && (((header.flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
-             || ((header.answer_rrs == 0) && (header.authority_rrs == 0)))) {
+      if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
+         && (((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
+             || ((dns_header->num_answers == 0) && (dns_header->authority_rrs == 0)))) {
         /* This is a good query */
       } else
 	invalid = 1;
     } else {
       /* DNS Reply */
-      if((header.num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
-         && (((header.answer_rrs > 0) && (header.answer_rrs <= NDPI_MAX_DNS_REQUESTS))
-             || ((header.authority_rrs > 0) && (header.authority_rrs <= NDPI_MAX_DNS_REQUESTS))
-             || ((header.additional_rrs > 0) && (header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
+      if((dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
+         && (((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
+             || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
+             || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
          ) {
 	/* This is a good reply */
       } else
