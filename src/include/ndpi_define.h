@@ -292,4 +292,6 @@
 #define snprintf _snprintf 
 #endif
 
+#define NDPI_MAX_DNS_REQUESTS                   16
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */

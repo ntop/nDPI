@@ -60,7 +60,9 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   if((s_port == 53 || d_port == 53 || d_port == 5355)
      && (flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header)))
   {
-    struct ndpi_dns_packet_header * dns_header = (struct ndpi_dns_packet_header*) &flow->packet.payload[x];
+    struct ndpi_dns_packet_header *dns_header = (struct ndpi_dns_packet_header*) &flow->packet.payload[x];
+    int invalid = 0;
+
     dns_header->tr_id = ntohs(dns_header->tr_id);
     dns_header->flags = ntohs(dns_header->flags);
     dns_header->num_queries = ntohs(dns_header->num_queries);
@@ -75,11 +77,34 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     else if(dns_header->flags & FLAGS_MASK != 0x8000)
       is_query = 1;
     else
-    {
+      invalid = 1
+
+    if(is_query) {
+      /* DNS Request */
+      if((header.num_queries > 0) && (header.num_queries <= NDPI_MAX_DNS_REQUESTS)
+         && (((header.flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
+             || ((header.answer_rrs == 0) && (header.authority_rrs == 0)))) {
+        /* This is a good query */
+      } else
+	invalid = 1;
+    } else {
+      /* DNS Reply */
+      if((header.num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
+         && (((header.answer_rrs > 0) && (header.answer_rrs <= NDPI_MAX_DNS_REQUESTS))
+             || ((header.authority_rrs > 0) && (header.authority_rrs <= NDPI_MAX_DNS_REQUESTS))
+             || ((header.additional_rrs > 0) && (header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
+         ) {
+	/* This is a good reply */
+      } else
+	invalid = 1;
+    }
+
+    if(invalid) {
       NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);    
+      return;
     }
-    
+
     /* extract host name server */
     ret_code = (is_query == 0) ? 0 : (dns_header->flags & 0x0F);
     int j = 0;
@@ -111,9 +136,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       **/
       NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "found DNS.\n");      
       ndpi_set_detected_protocol(ndpi_struct, flow, (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS, NDPI_PROTOCOL_UNKNOWN);
-    }
-    else
-    {
+    } else {
       NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);
     }
