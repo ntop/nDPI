@@ -79,32 +79,35 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     else
       invalid = 1;
 
-    if(is_query) {
+    if(is_query == 0)
+    {
       /* DNS Request */
       if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
          && (((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
-             || ((dns_header->num_answers == 0) && (dns_header->authority_rrs == 0)))) {
-        /* This is a good query */
-      } else
+             || ((dns_header->num_answers == 0) && (dns_header->authority_rrs == 0))))
+	invalid = 0; /* This is a good query */
+      else
 	invalid = 1;
-    } else {
-      /* DNS Reply */
-      if((dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
-         && (((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
-             || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
-             || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
-         ) {
-	/* This is a good reply */
-      } else
-	invalid = 1;
-    }
+      
+    } else
+      {
+	/* DNS Reply */
+	if((dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
+	   && (((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
+	       || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
+	       || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS))))
+	  invalid = 0; /* This is a good reply */
+	else
+	  invalid = 1;
+      }
 
-    if(invalid) {
+    if(invalid == 1)
+    {
       NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);    
       return;
     }
-
+    
     /* extract host name server */
     ret_code = (is_query == 0) ? 0 : (dns_header->flags & 0x0F);
     int j = 0;
