@@ -4195,7 +4195,8 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 
 char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod,
 			 ndpi_protocol proto, char *buf, u_int buf_len) {
-  if(proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
+  if((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN)
+     && (proto.master_protocol != proto.protocol)) {
     snprintf(buf, buf_len, "%s.%s",
 	     ndpi_get_proto_name(ndpi_mod, proto.master_protocol),
 	     ndpi_get_proto_name(ndpi_mod, proto.protocol));
