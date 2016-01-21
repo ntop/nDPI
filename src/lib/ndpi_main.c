@@ -4305,14 +4305,11 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
 
 /* ****************************************************** */
 
-static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-						ndpi_automa *automa,
-						struct ndpi_flow_struct *flow,
-						char *string_to_match, u_int string_to_match_len,
-						u_int16_t master_protocol_id) {
-  int matching_protocol_id;
-  struct ndpi_packet_struct *packet = &flow->packet;
+int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+				  char *string_to_match, u_int string_to_match_len) {
+  int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   AC_TEXT_t ac_input_text;
+  ndpi_automa *automa = &ndpi_struct->host_automa;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0)) return(NDPI_PROTOCOL_UNKNOWN);
 
@@ -4321,12 +4318,22 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
     automa->ac_automa_finalized = 1;
   }
 
-  matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
-
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
-  ac_automata_search (((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, (void*)&matching_protocol_id);
-
+  ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, (void*)&matching_protocol_id);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
+
+  return(matching_protocol_id);
+}
+
+/* ****************************************************** */
+
+static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+						struct ndpi_flow_struct *flow,
+						char *string_to_match, u_int string_to_match_len,
+						u_int16_t master_protocol_id) {
+  int matching_protocol_id = ndpi_match_string_subprotocol(ndpi_struct, string_to_match, string_to_match_len);
+  struct ndpi_packet_struct *packet = &flow->packet;
+  AC_TEXT_t ac_input_text;
 
 #ifdef DEBUG
   {
@@ -4336,7 +4343,8 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
     strncpy(m, string_to_match, len);
     m[len] = '\0';
 
-    printf("[NDPI] ndpi_match_host_subprotocol(%s): %s\n", m, ndpi_struct->proto_defaults[matching_protocol_id].protoName);
+    printf("[NDPI] ndpi_match_host_subprotocol(%s): %s\n", 
+	   m, ndpi_struct->proto_defaults[matching_protocol_id].protoName);
   }
 #endif
 
@@ -4362,10 +4370,10 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 /* ****************************************************** */
 
 int ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				  struct ndpi_flow_struct *flow,
-				  char *string_to_match, u_int string_to_match_len,
-				  u_int16_t master_protocol_id) {
-  return(ndpi_automa_match_string_subprotocol(ndpi_struct, &ndpi_struct->host_automa,
+				struct ndpi_flow_struct *flow,
+				char *string_to_match, u_int string_to_match_len,
+				u_int16_t master_protocol_id) {
+  return(ndpi_automa_match_string_subprotocol(ndpi_struct,
 					      flow, string_to_match, string_to_match_len,
 					      master_protocol_id));
 }
@@ -4376,8 +4384,8 @@ int ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_str
 				   struct ndpi_flow_struct *flow,
 				   char *string_to_match, u_int string_to_match_len,
 				   u_int16_t master_protocol_id) {
-  return(ndpi_automa_match_string_subprotocol(ndpi_struct, &ndpi_struct->content_automa,
-					      flow, string_to_match, string_to_match_len,
+  return(ndpi_automa_match_string_subprotocol(ndpi_struct, flow,
+					      string_to_match, string_to_match_len,
 					      master_protocol_id));
 }
 

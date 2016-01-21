@@ -72,10 +72,10 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
     /* 0x0000 QUERY */
     if((dns_header->flags & FLAGS_MASK) == 0x0000)
-      is_query = 0;
+      is_query = 1;
     /* 0x8000 RESPONSE */
     else if((dns_header->flags & FLAGS_MASK) != 0x8000)
-      is_query = 1;
+      is_query = 0;
     else
       invalid = 1;
 
@@ -89,7 +89,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	invalid = 1;
     } else {
       /* DNS Reply */
-      if((dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
+      if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
          && (((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
              || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
              || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
