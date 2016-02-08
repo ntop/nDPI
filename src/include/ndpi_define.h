@@ -156,6 +156,7 @@
 /* misc definitions */
 #define NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE 0x10000
 
+#define NDPI_ENABLE_DEBUG_MESSAGES 1
 
 /* TODO: rebuild all memory areas to have a more aligned memory block here */
 

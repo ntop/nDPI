@@ -1,0 +1,1579 @@
+
+-----------------------------------------------------------
+* NOTE: This is demo app to show *some* nDPI features.
+* In this demo we have implemented only some basic features
+* just to show you what you can do with the library. Feel 
+* free to extend it and send us the patches for inclusion
+------------------------------------------------------------
+
+Using nDPI (1.7.1-dev-282-278a067) [1 thread(s)]
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size is 135
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 0 as entry 0
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 1 as entry 1
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 2 as entry 2
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 5 as entry 3
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 6 as entry 4
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 7 as entry 5
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 8 as entry 6
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 10 as entry 7
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 10 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 11 as entry 8
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 12 as entry 9
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 13 as entry 10
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 14 as entry 11
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 15 as entry 12
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 16 as entry 13
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 16 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 17 as entry 14
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 18 as entry 15
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 19 as entry 16
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 20 as entry 17
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 21 as entry 18
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 21 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 22 as entry 19
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 23 as entry 20
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 24 as entry 21
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 25 as entry 22
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 26 as entry 23
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 27 as entry 24
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 29 as entry 25
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 30 as entry 26
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 31 as entry 27
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 32 as entry 28
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 33 as entry 29
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 34 as entry 30
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 38 as entry 31
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 40 as entry 32
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 42 as entry 33
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 43 as entry 34
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 44 as entry 35
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 44 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 46 as entry 36
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 47 as entry 37
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 47 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 49 as entry 38
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 50 as entry 39
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 51 as entry 40
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 52 as entry 41
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 54 as entry 42
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 56 as entry 43
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 57 as entry 44
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 58 as entry 45
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 59 as entry 46
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 62 as entry 47
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 65 as entry 48
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 66 as entry 49
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 67 as entry 50
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 68 as entry 51
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 69 as entry 52
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 70 as entry 53
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 71 as entry 54
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 72 as entry 55
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 73 as entry 56
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 75 as entry 57
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 76 as entry 58
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 77 as entry 59
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 78 as entry 60
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 80 as entry 61
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 81 as entry 62
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 82 as entry 63
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 84 as entry 64
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 85 as entry 65
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 86 as entry 66
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 87 as entry 67
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 88 as entry 68
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 89 as entry 69
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 90 as entry 70
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 91 as entry 71
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 92 as entry 72
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 93 as entry 73
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 96 as entry 74
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 98 as entry 75
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 99 as entry 76
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 101 as entry 77
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 104 as entry 78
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 105 as entry 79
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 106 as entry 80
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 107 as entry 81
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 108 as entry 82
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 110 as entry 83
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 111 as entry 84
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 112 as entry 85
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 113 as entry 86
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 114 as entry 87
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 115 as entry 88
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 116 as entry 89
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 117 as entry 90
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 118 as entry 91
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 118 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 119 as entry 92
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 120 as entry 93
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 120 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 122 as entry 94
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 124 as entry 95
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 125 as entry 96
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 125 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 126 as entry 97
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 126 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 133 as entry 98
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_tcp_payload, adding buffer 134 as entry 99
+08/Feb/2016 22:56:52 DEBUG: 	callback_buffer_tcp_no_payload, additional adding buffer 134 to no_payload process
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 1 as entry 0
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 3 as entry 1
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 4 as entry 2
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 5 as entry 3
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 7 as entry 4
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 8 as entry 5
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 9 as entry 6
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 10 as entry 7
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 12 as entry 8
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 14 as entry 9
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 15 as entry 10
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 16 as entry 11
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 17 as entry 12
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 21 as entry 13
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 26 as entry 14
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 28 as entry 15
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 29 as entry 16
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 31 as entry 17
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 32 as entry 18
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 33 as entry 19
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 34 as entry 20
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 35 as entry 21
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 36 as entry 22
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 37 as entry 23
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 38 as entry 24
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 39 as entry 25
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 41 as entry 26
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 42 as entry 27
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 44 as entry 28
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 45 as entry 29
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 46 as entry 30
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 47 as entry 31
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 48 as entry 32
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 53 as entry 33
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 54 as entry 34
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 55 as entry 35
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 60 as entry 36
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 61 as entry 37
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 62 as entry 38
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 63 as entry 39
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 64 as entry 40
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 67 as entry 41
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 70 as entry 42
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 73 as entry 43
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 74 as entry 44
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 75 as entry 45
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 76 as entry 46
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 77 as entry 47
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 78 as entry 48
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 79 as entry 49
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 83 as entry 50
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 86 as entry 51
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 87 as entry 52
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 92 as entry 53
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 94 as entry 54
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 95 as entry 55
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 96 as entry 56
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 97 as entry 57
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 100 as entry 58
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 102 as entry 59
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 103 as entry 60
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 104 as entry 61
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 105 as entry 62
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 106 as entry 63
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 107 as entry 64
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 108 as entry 65
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 109 as entry 66
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 112 as entry 67
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 120 as entry 68
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 121 as entry 69
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 123 as entry 70
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 126 as entry 71
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 127 as entry 72
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 128 as entry 73
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 129 as entry 74
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 130 as entry 75
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 131 as entry 76
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 132 as entry 77
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 133 as entry 78
+08/Feb/2016 22:56:52 DEBUG: callback_buffer_size_udp: adding buffer : 134 as entry 79
+Reading packets from pcap file ../../coap.pcap...
+Running thread 0...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: C〉 [len: 93]
+08/Feb/2016 22:56:52 DEBUG: Starcraft protocol detection...
+08/Feb/2016 22:56:52 DEBUG: Starcraft excluded
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: exclude rtp.
+08/Feb/2016 22:56:52 TRACE: RTSP detection...
+08/Feb/2016 22:56:52 DEBUG: maybe handshake 1; need next packet, return.
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: searching for HEP.
+08/Feb/2016 22:56:52 DEBUG: exclude HEP.
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: excluded at stage 0 
+08/Feb/2016 22:56:52 DEBUG: search yahoo
+08/Feb/2016 22:56:52 TRACE: JABBER detection....
+08/Feb/2016 22:56:52 DEBUG: packet_counter: 1
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: exclude vmware.
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 93
+08/Feb/2016 22:56:52 DEBUG: search tvants.  
+08/Feb/2016 22:56:52 DEBUG: exclude tvants.  
+08/Feb/2016 22:56:52 DEBUG: search sopcast.  
+08/Feb/2016 22:56:52 DEBUG: exclude sopcast.  
+08/Feb/2016 22:56:52 DEBUG: search tvuplayer.  
+08/Feb/2016 22:56:52 DEBUG: exclude tvuplayer.  
+08/Feb/2016 22:56:52 DEBUG: exclude ppstream.
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: exclude MGCP.
+08/Feb/2016 22:56:52 DEBUG: ZATTOO: discarded the flow (UDP): packet_size: 93; Flowstage: 0
+08/Feb/2016 22:56:52 DEBUG: exclude zattoo.
+08/Feb/2016 22:56:52 DEBUG: search qq udp.
+08/Feb/2016 22:56:52 DEBUG: QQ excluded
+08/Feb/2016 22:56:52 DEBUG: excluding thunder udp at stage 0
+08/Feb/2016 22:56:52 TRACE: TEAMWIEWER detection...
+08/Feb/2016 22:56:52 DEBUG: search socrates.
+08/Feb/2016 22:56:52 DEBUG: exclude socrates.
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: NTP excluded.
+08/Feb/2016 22:56:52 DEBUG: NFS user match stage 1
+08/Feb/2016 22:56:52 DEBUG: NFS user match stage 2
+08/Feb/2016 22:56:52 DEBUG: search ssdp.
+08/Feb/2016 22:56:52 DEBUG: ssdp excluded.
+08/Feb/2016 22:56:52 DEBUG: Quake excluded.
+08/Feb/2016 22:56:52 DEBUG: SNMP excluded.
+08/Feb/2016 22:56:52 DEBUG: search syslog
+08/Feb/2016 22:56:52 DEBUG: no syslog detected.
+08/Feb/2016 22:56:52 DEBUG: netbios udp start
+08/Feb/2016 22:56:52 DEBUG: exclude netbios
+08/Feb/2016 22:56:52 DEBUG: MDNS udp start 
+08/Feb/2016 22:56:52 DEBUG: search ipp
+08/Feb/2016 22:56:52 DEBUG: searching for a payload with a pattern like 'number(1to8)blanknumber(1to3)ipp://.
+08/Feb/2016 22:56:52 DEBUG: payload does not begin with a number.
+08/Feb/2016 22:56:52 DEBUG: no ipp detected.
+08/Feb/2016 22:56:52 DEBUG: search ldap
+08/Feb/2016 22:56:52 DEBUG: ldap excluded.
+08/Feb/2016 22:56:52 DEBUG: search WARCRAFT3
+08/Feb/2016 22:56:52 DEBUG: no warcraft3 detected.
+08/Feb/2016 22:56:52 DEBUG: search xdmcp.
+08/Feb/2016 22:56:52 DEBUG: exclude xdmcp.
+08/Feb/2016 22:56:52 DEBUG: search TFTP.
+08/Feb/2016 22:56:52 DEBUG: exclude TFTP.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: search aimini.
+08/Feb/2016 22:56:52 DEBUG: exclude aimini.
+08/Feb/2016 22:56:52 DEBUG: search florensia.
+08/Feb/2016 22:56:52 DEBUG: exclude florensia.
+08/Feb/2016 22:56:52 DEBUG: search crossfire.
+08/Feb/2016 22:56:52 DEBUG: exclude crossfire.
+08/Feb/2016 22:56:52 DEBUG: search armagetron.
+08/Feb/2016 22:56:52 DEBUG: exclude armagetron.
+08/Feb/2016 22:56:52 DEBUG: dropbox detection...
+08/Feb/2016 22:56:52 DEBUG: exclude dropbox.
+08/Feb/2016 22:56:52 DEBUG: spotify detection...
+08/Feb/2016 22:56:52 DEBUG: exclude spotify.
+08/Feb/2016 22:56:52 DEBUG: radius detection...
+08/Feb/2016 22:56:52 DEBUG: gtp detection...
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: search CISCOVPN.
+08/Feb/2016 22:56:52 DEBUG: calculated CISCOVPN over udp ports.
+08/Feb/2016 22:56:52 DEBUG: exclude CISCOVPN.
+08/Feb/2016 22:56:52 DEBUG: TEAMSPEAK excluded.
+08/Feb/2016 22:56:52 DEBUG: search for VIBER.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: exclude VIBER.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: exclude RTCP.
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: search for MEGACO.
+08/Feb/2016 22:56:52 DEBUG: exclude MEGACO.
+08/Feb/2016 22:56:52 TRACE: VHUA detection...
+08/Feb/2016 22:56:52 TRACE: TELEGRAM detection...
+08/Feb/2016 22:56:52 DEBUG: calculating quic over udp.
+08/Feb/2016 22:56:52 DEBUG: exclude quic.
+08/Feb/2016 22:56:52 DEBUG: Exclude eaq.
+08/Feb/2016 22:56:52 DEBUG: Exclude kakaotalk_voice.
+08/Feb/2016 22:56:52 DEBUG: search for MPEGTS.
+08/Feb/2016 22:56:52 DEBUG: Excluded MPEGTS.
+08/Feb/2016 22:56:52 TRACE: UBNTAC2 detection... plen:93 62202:5683
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: C〉 [len: 93]
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: HTTP detection...
+08/Feb/2016 22:56:52 DEBUG: HTTP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: ====>>>> HTTP: 2T08/Feb/2016 22:56:52 DEBUG: Filename HTTP not found, we look for possible truncate flow...
+08/Feb/2016 22:56:52 DEBUG: Exclude HTTP
+08/Feb/2016 22:56:52 DEBUG: Starcraft protocol detection...
+08/Feb/2016 22:56:52 DEBUG: Starcraft excluded
+08/Feb/2016 22:56:52 DEBUG: search ssl
+08/Feb/2016 22:56:52 DEBUG: first ssl packet
+08/Feb/2016 22:56:52 DEBUG: exclude ssl
+08/Feb/2016 22:56:52 TRACE: RTSP detection...
+08/Feb/2016 22:56:52 DEBUG: maybe handshake 1; need next packet, return.
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: exclude sip.
+08/Feb/2016 22:56:52 DEBUG: searching for HEP.
+08/Feb/2016 22:56:52 DEBUG: exclude HEP.
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 TRACE: fasttrack/kazaa excluded.
+08/Feb/2016 22:56:52 TRACE: MSN tcp detection...
+08/Feb/2016 22:56:52 DEBUG: msn 7.
+08/Feb/2016 22:56:52 TRACE: MSN tcp excluded.
+08/Feb/2016 22:56:52 DEBUG: search yahoo
+08/Feb/2016 22:56:52 DEBUG: OSCAR :: TCP
+08/Feb/2016 22:56:52 DEBUG: search applejuice.
+08/Feb/2016 22:56:52 DEBUG: exclude applejuice.
+08/Feb/2016 22:56:52 DEBUG: Soulseek: search soulseec tcp 
+08/Feb/2016 22:56:52 DEBUG: irc : search irc
+08/Feb/2016 22:56:52 DEBUG: called ndpi_search_irc_ssl_detect_ninty_percent_but_very_fast
+08/Feb/2016 22:56:52 DEBUG: detected_irc:08/Feb/2016 22:56:52 TRACE: JABBER detection....
+08/Feb/2016 22:56:52 DEBUG: packet_counter: 1
+08/Feb/2016 22:56:52 DEBUG: search mail_pop
+08/Feb/2016 22:56:52 DEBUG: exclude mail_pop
+08/Feb/2016 22:56:52 DEBUG: search IMAP.
+08/Feb/2016 22:56:52 DEBUG: exclude IMAP.
+08/Feb/2016 22:56:52 DEBUG: search mail_smtp.
+08/Feb/2016 22:56:52 DEBUG: exclude smtp
+08/Feb/2016 22:56:52 DEBUG: USENET: search usenet.
+08/Feb/2016 22:56:52 DEBUG: USENET: STAGE IS 0.
+08/Feb/2016 22:56:52 DEBUG: USENET: exclude usenet.
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: TCP FOUND :: Payload 86
+08/Feb/2016 22:56:52 DEBUG: search tvants.  
+08/Feb/2016 22:56:52 DEBUG: exclude tvants.  
+08/Feb/2016 22:56:52 DEBUG: exclude sopcast TCP.  
+08/Feb/2016 22:56:52 DEBUG: search tvuplayer.  
+08/Feb/2016 22:56:52 DEBUG: exclude tvuplayer.  
+08/Feb/2016 22:56:52 DEBUG: exclude ppstream.
+08/Feb/2016 22:56:52 DEBUG: ZATTOO: discarted the flow (TCP): packet_size: 86; Flowstage: 0
+08/Feb/2016 22:56:52 DEBUG: exclude zattoo.
+08/Feb/2016 22:56:52 DEBUG: excluding ssh at stage 0
+08/Feb/2016 22:56:52 DEBUG: excluding thunder tcp at stage 0
+08/Feb/2016 22:56:52 TRACE: TEAMWIEWER detection...
+08/Feb/2016 22:56:52 DEBUG: search socrates.
+08/Feb/2016 22:56:52 DEBUG: exclude socrates.
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: exclude activesync
+08/Feb/2016 22:56:52 DEBUG: search SMB.
+08/Feb/2016 22:56:52 DEBUG: exclude SMB.
+08/Feb/2016 22:56:52 DEBUG: search telnet.
+08/Feb/2016 22:56:52 DEBUG: NFS user match stage 1
+08/Feb/2016 22:56:52 DEBUG: Search World of Warcraft.
+08/Feb/2016 22:56:52 DEBUG: search icecast.
+08/Feb/2016 22:56:52 DEBUG: Icecast excluded.
+08/Feb/2016 22:56:52 DEBUG: search shoutcast.
+08/Feb/2016 22:56:52 DEBUG: Shoutcast excluded.
+08/Feb/2016 22:56:52 DEBUG: no KERBEROS detected.
+08/Feb/2016 22:56:52 DEBUG: search syslog
+08/Feb/2016 22:56:52 DEBUG: no syslog detected.
+08/Feb/2016 22:56:52 DEBUG: DDL: Packet too small.
+08/Feb/2016 22:56:52 DEBUG: Nothing Found
+08/Feb/2016 22:56:52 DEBUG: netbios tcp start
+08/Feb/2016 22:56:52 DEBUG: exclude netbios
+08/Feb/2016 22:56:52 DEBUG: search ipp
+08/Feb/2016 22:56:52 DEBUG: searching for a payload with a pattern like 'number(1to8)blanknumber(1to3)ipp://.
+08/Feb/2016 22:56:52 DEBUG: read symbols while the symbol is a number.
+08/Feb/2016 22:56:52 DEBUG: there is no blank following the number.
+08/Feb/2016 22:56:52 DEBUG: no ipp detected.
+08/Feb/2016 22:56:52 DEBUG: search ldap
+08/Feb/2016 22:56:52 DEBUG: ldap excluded.
+08/Feb/2016 22:56:52 DEBUG: search WARCRAFT3
+08/Feb/2016 22:56:52 DEBUG: no warcraft3 detected.
+08/Feb/2016 22:56:52 DEBUG: search xdmcp.
+08/Feb/2016 22:56:52 DEBUG: exclude xdmcp.
+08/Feb/2016 22:56:52 DEBUG: search mssql.
+08/Feb/2016 22:56:52 DEBUG: exclude mssql.
+08/Feb/2016 22:56:52 DEBUG: exclude pptp.
+08/Feb/2016 22:56:52 DEBUG: exclude stealthnet.
+08/Feb/2016 22:56:52 DEBUG: search meebo.
+08/Feb/2016 22:56:52 DEBUG: flash not yet excluded. need next packet.
+08/Feb/2016 22:56:52 DEBUG: AFP excluded.
+08/Feb/2016 22:56:52 DEBUG: search aimini.
+08/Feb/2016 22:56:52 DEBUG: exclude aimini.
+08/Feb/2016 22:56:52 DEBUG: search florensia.
+08/Feb/2016 22:56:52 DEBUG: exclude florensia.
+08/Feb/2016 22:56:52 DEBUG: exclude maplestory.
+08/Feb/2016 22:56:52 DEBUG: exclude dofus.
+08/Feb/2016 22:56:52 DEBUG: search world_of_kung_fu.
+08/Feb/2016 22:56:52 DEBUG: exclude world_of_kung_fu.
+08/Feb/2016 22:56:52 DEBUG: search fiesta.
+08/Feb/2016 22:56:52 DEBUG: exclude fiesta.
+08/Feb/2016 22:56:52 DEBUG: search crossfire.
+08/Feb/2016 22:56:52 DEBUG: exclude crossfire.
+08/Feb/2016 22:56:52 DEBUG: search guildwars.
+08/Feb/2016 22:56:52 DEBUG: exclude guildwars.
+08/Feb/2016 22:56:52 DEBUG: spotify detection...
+08/Feb/2016 22:56:52 DEBUG: exclude spotify.
+08/Feb/2016 22:56:52 DEBUG: citrix detection...
+08/Feb/2016 22:56:52 DEBUG: lotus_notes detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: exclude NOE.
+08/Feb/2016 22:56:52 DEBUG: search CISCOVPN.
+08/Feb/2016 22:56:52 DEBUG: calculated CISCOVPN over tcp ports.
+08/Feb/2016 22:56:52 DEBUG: exclude CISCOVPN.
+08/Feb/2016 22:56:52 DEBUG: TEAMSPEAK excluded.
+08/Feb/2016 22:56:52 DEBUG: search for TOR.
+08/Feb/2016 22:56:52 DEBUG: calculating TOR over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for SKINNY.
+08/Feb/2016 22:56:52 DEBUG: calculating SKINNY over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RSYNC.
+08/Feb/2016 22:56:52 DEBUG: calculating RSYNC over tcp.
+08/Feb/2016 22:56:52 TRACE: WHOIS Excluded.
+08/Feb/2016 22:56:52 DEBUG: search for ORACLE.
+08/Feb/2016 22:56:52 DEBUG: calculating ORACLE over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for CORBA.
+08/Feb/2016 22:56:52 DEBUG: calculating CORBA over tcp.
+08/Feb/2016 22:56:52 DEBUG: RTMP detection...
+08/Feb/2016 22:56:52 DEBUG: RTMP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_DATA detection...
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: Redis detection...
+08/Feb/2016 22:56:52 TRACE: ZMQ detection...
+08/Feb/2016 22:56:52 TRACE: TELEGRAM detection...
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: stage 0 has no direct detection, fall through
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: cD〉 [len: 19]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 TRACE: RTSP detection...
+08/Feb/2016 22:56:52 DEBUG: didn't find handshake, exclude.
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 TRACE: JABBER detection....
+08/Feb/2016 22:56:52 DEBUG: packet_counter: 2
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 TRACE: VHUA detection...
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: cD〉 [len: 19]
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 TRACE: RTSP detection...
+08/Feb/2016 22:56:52 DEBUG: didn't find handshake, exclude.
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: OSCAR :: TCP
+08/Feb/2016 22:56:52 DEBUG: irc : search irc
+08/Feb/2016 22:56:52 DEBUG: called ndpi_search_irc_ssl_detect_ninty_percent_but_very_fast
+08/Feb/2016 22:56:52 DEBUG: detected_irc:08/Feb/2016 22:56:52 TRACE: JABBER detection....
+08/Feb/2016 22:56:52 DEBUG: packet_counter: 2
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: TCP FOUND :: Payload 4
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: search telnet.
+08/Feb/2016 22:56:52 DEBUG: search meebo.
+08/Feb/2016 22:56:52 DEBUG: flash not yet excluded. need next packet.
+08/Feb/2016 22:56:52 DEBUG: citrix detection...
+08/Feb/2016 22:56:52 DEBUG: lotus_notes detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for TOR.
+08/Feb/2016 22:56:52 DEBUG: calculating TOR over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for SKINNY.
+08/Feb/2016 22:56:52 DEBUG: calculating SKINNY over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RSYNC.
+08/Feb/2016 22:56:52 DEBUG: calculating RSYNC over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for ORACLE.
+08/Feb/2016 22:56:52 DEBUG: calculating ORACLE over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for CORBA.
+08/Feb/2016 22:56:52 DEBUG: calculating CORBA over tcp.
+08/Feb/2016 22:56:52 DEBUG: RTMP detection...
+08/Feb/2016 22:56:52 DEBUG: RTMP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: Redis detection...
+08/Feb/2016 22:56:52 DEBUG: Exclude Redis.
+08/Feb/2016 22:56:52 TRACE: ZMQ detection...
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 TRACE: JABBER detection....
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: irc : search irc
+08/Feb/2016 22:56:52 DEBUG: called ndpi_search_irc_ssl_detect_ninty_percent_but_very_fast
+08/Feb/2016 22:56:52 DEBUG: detected_irc:08/Feb/2016 22:56:52 TRACE: JABBER detection....
+08/Feb/2016 22:56:52 TRACE: JABBER Excluded.
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: TCP FOUND :: Payload 60
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: search telnet.
+08/Feb/2016 22:56:52 DEBUG: search meebo.
+08/Feb/2016 22:56:52 DEBUG: flash not yet excluded. need next packet.
+08/Feb/2016 22:56:52 DEBUG: citrix detection...
+08/Feb/2016 22:56:52 DEBUG: lotus_notes detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for TOR.
+08/Feb/2016 22:56:52 DEBUG: calculating TOR over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for SKINNY.
+08/Feb/2016 22:56:52 DEBUG: calculating SKINNY over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RSYNC.
+08/Feb/2016 22:56:52 DEBUG: calculating RSYNC over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for ORACLE.
+08/Feb/2016 22:56:52 DEBUG: calculating ORACLE over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for CORBA.
+08/Feb/2016 22:56:52 DEBUG: calculating CORBA over tcp.
+08/Feb/2016 22:56:52 DEBUG: RTMP detection...
+08/Feb/2016 22:56:52 DEBUG: RTMP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 TRACE: ZMQ detection...
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: irc : search irc
+08/Feb/2016 22:56:52 DEBUG: called ndpi_search_irc_ssl_detect_ninty_percent_but_very_fast
+08/Feb/2016 22:56:52 DEBUG: detected_irc:08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: TCP FOUND :: Payload 4
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: search telnet.
+08/Feb/2016 22:56:52 DEBUG: search meebo.
+08/Feb/2016 22:56:52 DEBUG: flash not yet excluded. need next packet.
+08/Feb/2016 22:56:52 DEBUG: citrix detection...
+08/Feb/2016 22:56:52 DEBUG: lotus_notes detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for TOR.
+08/Feb/2016 22:56:52 DEBUG: calculating TOR over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for SKINNY.
+08/Feb/2016 22:56:52 DEBUG: calculating SKINNY over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RSYNC.
+08/Feb/2016 22:56:52 DEBUG: calculating RSYNC over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for ORACLE.
+08/Feb/2016 22:56:52 DEBUG: calculating ORACLE over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for CORBA.
+08/Feb/2016 22:56:52 DEBUG: calculating CORBA over tcp.
+08/Feb/2016 22:56:52 DEBUG: RTMP detection...
+08/Feb/2016 22:56:52 DEBUG: RTMP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 TRACE: ZMQ detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: B《 [len: 155]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  3
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 TRACE: JABBER detection....
+08/Feb/2016 22:56:52 TRACE: JABBER Excluded.
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 155
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 TRACE: VHUA detection...
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: B《 [len: 155]
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: irc : search irc
+08/Feb/2016 22:56:52 DEBUG: called ndpi_search_irc_ssl_detect_ninty_percent_but_very_fast
+08/Feb/2016 22:56:52 DEBUG: detected_irc:08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: TCP FOUND :: Payload 150
+08/Feb/2016 22:56:52 DEBUG: iMesh excluded at stage 0
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: search telnet.
+08/Feb/2016 22:56:52 DEBUG: search meebo.
+08/Feb/2016 22:56:52 DEBUG: exclude meebo.
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for TOR.
+08/Feb/2016 22:56:52 DEBUG: calculating TOR over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for SKINNY.
+08/Feb/2016 22:56:52 DEBUG: calculating SKINNY over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RSYNC.
+08/Feb/2016 22:56:52 DEBUG: calculating RSYNC over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for ORACLE.
+08/Feb/2016 22:56:52 DEBUG: calculating ORACLE over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for CORBA.
+08/Feb/2016 22:56:52 DEBUG: calculating CORBA over tcp.
+08/Feb/2016 22:56:52 DEBUG: RTMP detection...
+08/Feb/2016 22:56:52 DEBUG: RTMP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 TRACE: ZMQ detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: bD《 [len: 18]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  3
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  13
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 TRACE: VHUA detection...
+08/Feb/2016 22:56:52 TRACE: Exclude VHUA.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: bD《 [len: 18]
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: irc : search irc
+08/Feb/2016 22:56:52 DEBUG: called ndpi_search_irc_ssl_detect_ninty_percent_but_very_fast
+08/Feb/2016 22:56:52 DEBUG: detected_irc:08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: search telnet.
+08/Feb/2016 22:56:52 DEBUG: telnet excluded.
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for TOR.
+08/Feb/2016 22:56:52 DEBUG: calculating TOR over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for SKINNY.
+08/Feb/2016 22:56:52 DEBUG: calculating SKINNY over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RSYNC.
+08/Feb/2016 22:56:52 DEBUG: calculating RSYNC over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for ORACLE.
+08/Feb/2016 22:56:52 DEBUG: calculating ORACLE over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for CORBA.
+08/Feb/2016 22:56:52 DEBUG: calculating CORBA over tcp.
+08/Feb/2016 22:56:52 DEBUG: RTMP detection...
+08/Feb/2016 22:56:52 DEBUG: RTMP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 TRACE: ZMQ detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+
+
+WARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded
+
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: D》 [len: 94]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  3
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  13
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 94
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  70
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: D》 [len: 94]
+08/Feb/2016 22:56:52 DEBUG: skype detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: irc : search irc
+08/Feb/2016 22:56:52 DEBUG: called ndpi_search_irc_ssl_detect_ninty_percent_but_very_fast
+08/Feb/2016 22:56:52 DEBUG: detected_irc:08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for TOR.
+08/Feb/2016 22:56:52 DEBUG: calculating TOR over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for SKINNY.
+08/Feb/2016 22:56:52 DEBUG: calculating SKINNY over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RTCP.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for RSYNC.
+08/Feb/2016 22:56:52 DEBUG: calculating RSYNC over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for ORACLE.
+08/Feb/2016 22:56:52 DEBUG: calculating ORACLE over tcp.
+08/Feb/2016 22:56:52 DEBUG: search for CORBA.
+08/Feb/2016 22:56:52 DEBUG: calculating CORBA over tcp.
+08/Feb/2016 22:56:52 DEBUG: RTMP detection...
+08/Feb/2016 22:56:52 DEBUG: RTMP stage 0: 
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL detection...
+08/Feb/2016 22:56:52 DEBUG: FTP_CONTROL stage 0: 
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 TRACE: ZMQ detection...
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: dD》 [len: 20]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  3
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  13
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 20
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  70
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: dD》 [len: 20]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  78
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: G「 [len: 160]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  3
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  13
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 160
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  70
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: G「 [len: 160]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  78
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: gD「 [len: 23]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  3
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  13
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  70
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: gD「 [len: 23]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  78
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: B」 [len: 92]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  0
+08/Feb/2016 22:56:52 DEBUG: search stun.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  2
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  3
+08/Feb/2016 22:56:52 DEBUG: sip detection...
+08/Feb/2016 22:56:52 DEBUG: need next packet.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  5
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  6
+08/Feb/2016 22:56:52 DEBUG: EDONKEY detection...
+08/Feb/2016 22:56:52 DEBUG: EDONKEY stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  8
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  9
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  10
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  11
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  13
+08/Feb/2016 22:56:52 DEBUG: search DNS.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  15
+08/Feb/2016 22:56:52 DEBUG: UDP FOUND
+08/Feb/2016 22:56:52 DEBUG: iMesh UDP packetlen: 92
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  17
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  18
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  19
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  20
+08/Feb/2016 22:56:52 DEBUG: PPLIVE detection...
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: PPLIVE stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  22
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  23
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  24
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  25
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  26
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  27
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  28
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  29
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  30
+08/Feb/2016 22:56:52 DEBUG: STEAM detection...
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: STEAM stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  32
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  33
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  34
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  35
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  36
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  37
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  38
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  39
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  40
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  41
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  42
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  43
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  44
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  45
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  46
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  47
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  48
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  49
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  50
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  51
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  52
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  53
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  54
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  55
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  56
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  57
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  58
+08/Feb/2016 22:56:52 DEBUG: netflow detection...
+08/Feb/2016 22:56:52 DEBUG: sflow detection...
+08/Feb/2016 22:56:52 DEBUG: search H323.
+08/Feb/2016 22:56:52 DEBUG: calculated dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  62
+08/Feb/2016 22:56:52 DEBUG: search for NOE.
+08/Feb/2016 22:56:52 DEBUG: calculating dport over udp.
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  64
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  65
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  66
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  67
+08/Feb/2016 22:56:52 TRACE: PANDO detection...
+08/Feb/2016 22:56:52 DEBUG: PANDO stage 0: 
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  69
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  70
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  71
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  72
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  73
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  74
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  75
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  76
+08/Feb/2016 22:56:52 DEBUG: CoAP detection...
+08/Feb/2016 22:56:52 DEBUG: ====>>>> COAP: B」 [len: 92]
+08/Feb/2016 22:56:52 DEBUG: [UDP,SKIP] dissector of protocol as callback_buffer idx =  78
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: ipv4 header
+08/Feb/2016 22:56:52 DEBUG: netbios udp start
+08/Feb/2016 22:56:52 DEBUG: found netbios port 137 and payload_packet_len 50
+08/Feb/2016 22:56:52 DEBUG: found netbios with flag 0110 questions = 1 and answers = 0, authority, additional = 0  
+08/Feb/2016 22:56:52 DEBUG: Starcraft protocol detection...
+08/Feb/2016 22:56:52 DEBUG: Starcraft excluded
+
+nDPI Memory statistics:
+	nDPI Memory (once):      105.99 KB    
+	Flow Memory (per flow):  1.94 KB      
+	Actual Memory:           1.86 MB      
+	Peak Memory:             1.86 MB      
+
+Traffic statistics:
+	Ethernet bytes:        13857         (includes ethernet CRC/IFC/trailer)
+	Discarded bytes:       102          
+	IP packets:            122           of 124 packets total
+	IP bytes:              10929         (avg pkt size 88 bytes)
+	Unique flows:          3            
+	TCP Packets:           85           
+	UDP Packets:           37           
+	VLAN Packets:          0            
+	MPLS Packets:          0            
+	PPPoE Packets:         0            
+	Fragmented Packets:    0            
+	Max Packet size:       170          
+	Packet Len < 64:       82           
+	Packet Len 64-128:     30           
+	Packet Len 128-256:    10           
+	Packet Len 256-1024:   0            
+	Packet Len 1024-1500:  0            
+	Packet Len > 1500:     0            
+	nDPI throughput:       37.84 K pps / 32.79 Mb/sec
+	Traffic throughput:    3.54 pps / 3.15 Kb/sec
+	Traffic duration:      34.417 sec
+	Guessed flow protos:   1            
+
+
+Detected protocols:
+	Unknown              packets: 85            bytes: 6989          flows: 1            
+	NetBIOS              packets: 7             bytes: 644           flows: 1            
+	COAP                 packets: 30            bytes: 3296          flows: 1            
+
+
+Protocol statistics:
+	Acceptable                    3940 bytes
+	Unrated                       6989 bytes
