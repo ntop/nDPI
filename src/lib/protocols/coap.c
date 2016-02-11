@@ -24,63 +24,77 @@
 
 #include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_COAP
-static void
-ndpi_int_coap_add_connection (struct ndpi_detection_module_struct *ndpi_struct,
+
+/**
+ * Entry point when protocol is identified.
+ */
+static void ndpi_int_coap_add_connection (struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow)
 {
   // not sure if this is accurate but coap runs on top of udp and should be connectionless
-  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
-    {
-      /* This is COAP and it is not a sub protocol (e.g. lwm2m) */
-      ndpi_search_tcp_or_udp (ndpi_struct, flow);
-//
-//	    /* If no custom protocol has been detected */
-      if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
-	{
-//	      if(protocol != NDPI_PROTOCOL_HTTP) {
-//		ndpi_search_tcp_or_udp(ndpi_struct, flow);
-//		ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
-//	      } else {
-//		ndpi_int_reset_protocol(flow);
-//		ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
-//	      }
-//	    }
-//
-//	    flow->http_detected = 1;
-	}
-    }
+  ndpi_set_detected_protocol(ndpi_struct,flow,NDPI_PROTOCOL_COAP,NDPI_PROTOCOL_UNKNOWN);
+  NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "CoAP found.\n");
 }
-
-//static u_int16_t coap_request_url_offset(struct ndpi_detection_module_struct * ndpi_struct,
-//					 struct ndpi_flow_struct *flow)
-//{
-//  struct ndpi_packet_struct* packet = &flow->packet;
-//  if (packet->payload_packet_len >=4 )
-//}
-
+/**
+ * Dissector function that searches CoAP headers
+ */
 void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
-  {
-      return;
-  }
-  NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "CoAP detection...\n");
+	struct ndpi_packet_struct *packet = &flow->packet;
+	if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+		return;
+	}
+	NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "CoAP detection...\n");
+	// searching for request
+	NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> COAP header: %04x%04x%04x%04x [len: %u]\n",
+			packet->payload[0], packet->payload[1], packet->payload[2], packet->payload[3], packet->payload_packet_len);
+	// check if we have version bits
+	if (packet->payload_packet_len < 4) {
+		NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Coap .. mandatory header not found!\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COAP);
+		return;
+	}
+	// since this is always unsigned we could have spared the 0xF0 logical AND
+	// vt = version and type (version is mandatory 1; type is either 0,1,2,3 )
+	u_int8_t vt = (u_int8_t) ((packet->payload[0] & 0xF0) >> 4);
+	if ((vt == 4) || (vt == 5) || (vt == 6) || (vt == 7)) {
+		NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Continuing Coap detection \n");
+		// search for values 9 to 15 in the token length
+		u_int8_t tkl = (u_int8_t) ((packet->payload[0] & 0x0F));
+		if ((tkl >= 9) && (tkl <= 15)) {
+			NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Coap .. invalid token length found!\n");
+			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COAP);
+			return;
+		}
+		u_int8_t class = (u_int8_t) ((packet->payload[1] & 0xE0) >> 5);
+		u_int8_t detail = (u_int8_t) ((packet->payload[1] & 0x1F));
+		if ((class == 0) && (detail == 0) && (tkl == 0) && (packet->payload_packet_len == 4)) {
+			NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Coap found ... empty message\n");
+			ndpi_int_coap_add_connection(ndpi_struct,flow);
+			return;
+		}
+		if ((class == 0) && ((detail == 1) || (detail == 2 ) || (detail == 3 ) || (detail == 4 ))) {
+			// we should probably search for options as well and payload
+			NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Coap found ... req message\n");
+			ndpi_int_coap_add_connection(ndpi_struct,flow);
+			return;
+		}
+		if ((class == 2) || (class == 4) || (class == 5)) {
+			// we should probably search for options and payload
+			NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Coap found ... resp message\n");
+			ndpi_int_coap_add_connection(ndpi_struct,flow);
+			return;
+		}
+	}
+	NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Coap ...\n");
+	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COAP);
+	return;
 
-  if (flow->l4.udp.coap_stage == 0) {
-  // we must set something here
-      NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> COAP: %c%c%c%c [len: %u]\n",
-      	   packet->payload[0], packet->payload[1], packet->payload[2], packet->payload[3],
-      	   packet->payload_packet_len);
-
-  } else if (flow->l4.udp.coap_stage == 1 + packet->packet_direction )
-    {
-
-    }
-  //	packet->
 }
-
+/**
+ * Entry point for the ndpi library
+ */
 void init_coap_dissector (struct ndpi_detection_module_struct *ndpi_struct,
 		     u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
