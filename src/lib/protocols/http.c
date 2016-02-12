@@ -206,17 +206,10 @@ static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struc
       If http_dont_dissect_response = 1 dissection of HTTP response
       mime types won't happen
      */
-
-      if(!ndpi_struct->http_dont_dissect_response) {
-	if(flow->http.url && flow->http_detected)
-	  ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)&flow->http.url[7],
-					strlen((const char *)&flow->http.url[7]),
-					NDPI_PROTOCOL_HTTP);
-      } else
-	ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
-				      strlen((const char *)flow->host_server_name),
-				      NDPI_PROTOCOL_HTTP);
-    }
+    ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
+				strlen((const char *)flow->host_server_name),
+				NDPI_PROTOCOL_HTTP);
+  }
 }
 
 /*
