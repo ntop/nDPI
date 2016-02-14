@@ -34,6 +34,14 @@ typedef struct {
 
 static ndpi_network host_protocol_list[] = {
 
+  /*    
+    Cloudflare
+    104.16.0.0/12
+    173.245.48.0/20
+  */
+  { 0x68100000 /* 104.16.0.0/12 */, 12, NDPI_SERVICE_CLOUDFLARE },
+  { 0xADF53000 /* 173.245.48.0/20 */, 20, NDPI_SERVICE_CLOUDFLARE },
+
  /*    
     OFFICE 365
     13.107.1.0/24
@@ -7476,6 +7484,13 @@ ndpi_protocol_match host_match[] = {
   { ".geotrust.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".entrust.net",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".public-trust.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+
+  /* http://www.urlquery.net/report.php?id=1453233646161 */
+  { "lifedom.top",       		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "coby.ns.cloudflare.com",  		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "amanda.ns.cloudflare.com",		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
+
+
 
   { NULL, 0 }
 };
