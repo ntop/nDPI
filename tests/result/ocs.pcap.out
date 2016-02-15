@@ -1,7 +1,7 @@
-Unknown	2	120	1
+Unknown	8	480	2
 DNS	3	214	3
+HTTP	13	1019	2
 SSL	45	5771	3
-Skype	19	1379	3
 Google	14	2349	3
 OCS	863	57552	7
 
@@ -17,14 +17,14 @@ OCS	863	57552	7
 	10	UDP 192.168.180.2:3621 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/77 bytes][Host: xmpp.device06.eu01.capptain.com]
 	11	UDP 192.168.180.2:11793 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][1 pkts/65 bytes][Host: play.googleapis.com]
 	12	TCP 192.168.180.2:36680 <-> 178.248.208.54:443 [proto: 91.218/SSL.OCS][20 pkts/6089 bytes][SSL client: ocs.labgency.ws]
-	13	TCP 192.168.180.2:46166 <-> 137.135.131.52:5122 [proto: 125/Skype][6 pkts/360 bytes]
-	14	TCP 192.168.180.2:53356 <-> 137.135.129.206:80 [proto: 7.125/HTTP.Skype][6 pkts/479 bytes]
-	15	UDP 192.168.180.2:24245 <-> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/56 bytes][Host: www.ocs.fr]
-	16	TCP 192.168.180.2:49881 <-> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][751 pkts/44783 bytes][Host: ocu03.labgency.ws]
-	17	UDP 192.168.180.2:40097 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/70 bytes][Host: settings.crashlytics.com]
-	18	TCP 192.168.180.2:32946 <-> 64.233.184.188:443 [proto: 91.126/SSL.Google][12 pkts/2212 bytes][SSL client: mtalk.google.com]
-	19	TCP 192.168.180.2:44959 <-> 137.135.129.206:80 [proto: 7.125/HTTP.Skype][7 pkts/540 bytes]
+	13	TCP 192.168.180.2:53356 <-> 137.135.129.206:80 [proto: 7/HTTP][6 pkts/479 bytes]
+	14	UDP 192.168.180.2:24245 <-> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/56 bytes][Host: www.ocs.fr]
+	15	TCP 192.168.180.2:49881 <-> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][751 pkts/44783 bytes][Host: ocu03.labgency.ws]
+	16	UDP 192.168.180.2:40097 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/70 bytes][Host: settings.crashlytics.com]
+	17	TCP 192.168.180.2:32946 <-> 64.233.184.188:443 [proto: 91.126/SSL.Google][12 pkts/2212 bytes][SSL client: mtalk.google.com]
+	18	TCP 192.168.180.2:44959 <-> 137.135.129.206:80 [proto: 7/HTTP][7 pkts/540 bytes]
 
 
 Undetected flows:
-	1	TCP 192.168.180.2:47699 <-> 64.233.184.188:5228 [proto: 0/Unknown][2 pkts/120 bytes]
+	1	TCP 192.168.180.2:46166 <-> 137.135.131.52:5122 [proto: 0/Unknown][6 pkts/360 bytes]
+	2	TCP 192.168.180.2:47699 <-> 64.233.184.188:5228 [proto: 0/Unknown][2 pkts/120 bytes]

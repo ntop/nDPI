@@ -3006,7 +3006,7 @@ void check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   for(a = 0; a < ndpi_struct->callback_buffer_size_udp; a++) {
-    if((func != ndpi_struct->callback_buffer_tcp_payload[a].func)
+    if((func != ndpi_struct->callback_buffer_udp[a].func)
        && (ndpi_struct->callback_buffer_udp[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
        ndpi_struct->callback_buffer_udp[a].ndpi_selection_bitmask
        && NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,

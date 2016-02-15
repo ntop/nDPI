@@ -1742,7 +1742,7 @@ static void pcap_packet_callback(u_char *args,
     break;
 
     default:
-      printf("Unknown datalink %d\n", datalink_type);
+      /* printf("Unknown datalink %d\n", datalink_type); */
       return;
     }
 

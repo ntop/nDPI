@@ -27,7 +27,7 @@
 #ifdef NDPI_PROTOCOL_STUN
 
 
-#define MAX_NUM_STUN_PKTS     6
+#define MAX_NUM_STUN_PKTS     10
 
 
 struct stun_packet_header {
@@ -55,8 +55,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
 
-  if(payload_length < sizeof(struct stun_packet_header))
-    return(NDPI_IS_NOT_STUN);
+  if(payload_length < sizeof(struct stun_packet_header)) {
+    if(flow->num_stun_udp_pkts > 0) {
+      *is_whatsapp = 1;
+      return NDPI_IS_STUN; /* This is WhatsApp Voice */
+    } else
+      return(NDPI_IS_NOT_STUN);
+  }
 
   if((strncmp((const char*)payload, (const char*)"RSP/", 4) == 0)
      && (strncmp((const char*)&payload[7], (const char*)" STUN_", 6) == 0)) {
@@ -215,10 +220,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
 
-  if(
-     ((flow->num_stun_udp_pkts > 0) && (msg_type == 0x0800)) 
-     || ((msg_type == 0x0800) && (msg_len == 106))
-     ) {     
+  if((flow->num_stun_udp_pkts > 0) && (msg_type <= 0x00FF)) {
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
   } else
