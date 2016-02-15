@@ -197,7 +197,8 @@ typedef struct ndpi_flow {
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
 
-  char host_server_name[256];
+  char host_server_name[192];
+  char bittorent_hash[41];
 
   struct {
     char client_certificate[48], server_certificate[48];
@@ -528,6 +529,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
     if(flow->ssl.client_certificate[0] != '\0') fprintf(out, "[SSL client: %s]", flow->ssl.client_certificate);
     if(flow->ssl.server_certificate[0] != '\0') fprintf(out, "[SSL server: %s]", flow->ssl.server_certificate);
+    if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
 
     fprintf(out, "\n");
   } else {
@@ -1066,11 +1068,22 @@ static unsigned int packet_processing(u_int16_t thread_id,
 
     snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s", flow->ndpi_flow->host_server_name);
 
+    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_BITTORRENT) {
+      int i, j, n = 0;
+      
+      for(i=0, j = 0; i<20; i++) {
+	sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
+	j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
+      }
+      
+      if(n == 0) flow->bittorent_hash[0] = '\0';
+    }
+      
     if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
       snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s", flow->ndpi_flow->protos.ssl.client_certificate);
       snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
     }
-
+    
     free_ndpi_flow(flow);
 
     if(verbose > 1) {

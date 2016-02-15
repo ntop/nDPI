@@ -887,11 +887,13 @@ struct ndpi_flow_struct {
   */
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
-  u_char host_server_name[256];
+  u_char host_server_name[192];
   /* Via HTTP User-Agent */
   u_char detected_os[32];
   /* Via HTTP X-Forwarded-For */
   u_char nat_ip[24];
+  /* Bittorrent hash */
+  u_char bittorent_hash[20];
 
   /*
      This structure below will not not stay inside the protos
