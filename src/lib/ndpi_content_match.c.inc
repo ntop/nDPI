@@ -161,6 +161,11 @@ static ndpi_network host_protocol_list[] = {
   { 0x959AA400 /* 149.154.164.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM},
   { 0x959AA800 /* 149.154.168.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM},
 
+  /* 
+    The Skype list below looks outdated and it is temporarely
+    commented and probably harvested in future releases
+  */    
+#if 0
   /* Skype */
   { 0x17600000, 14, NDPI_PROTOCOL_SKYPE },
   { 0x17613000, 20, NDPI_PROTOCOL_SKYPE },
@@ -309,6 +314,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xD820F200, 24, NDPI_PROTOCOL_SKYPE },
   { 0xD821F000, 22, NDPI_PROTOCOL_SKYPE },
   { 0xD4A10800, 24, NDPI_PROTOCOL_SKYPE },
+#endif
 
   { 0x012A1231, 32, NDPI_PROTOCOL_TOR },
   { 0x01E69FA1, 32, NDPI_PROTOCOL_TOR },
