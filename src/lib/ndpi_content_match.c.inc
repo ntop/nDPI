@@ -7377,6 +7377,7 @@ ndpi_protocol_match host_match[] = {
   { ".ebaystratus.com",			"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
   { ".ebayimg.com",			"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
   { ".facebook.com",			"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
+  { "fbstatic-a.akamaihd.net",		"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
   { ".fbcdn.net",			"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
   { "fbcdn-",				"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },  /* fbcdn-video-a-akamaihd.net */
   { ".google.",				"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
