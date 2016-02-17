@@ -306,7 +306,7 @@ void* ndpi_calloc(unsigned long count, size_t size) {
 
 /* ****************************************** */
 
-void  ndpi_free(void *ptr)            { _ndpi_free(ptr); }
+void ndpi_free(void *ptr)  { _ndpi_free(ptr); }
 
 /* ****************************************** */
 

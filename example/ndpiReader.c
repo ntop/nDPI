@@ -592,8 +592,8 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
 
 static void free_ndpi_flow(struct ndpi_flow *flow) {
   if(flow->ndpi_flow) { ndpi_free_flow(flow->ndpi_flow); flow->ndpi_flow = NULL; }
-  if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL;       }
-  if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL;       }
+  if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL; }
+  if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL; }
 
 }
 
@@ -1111,6 +1111,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
 	
 	/* free the memory associated to idle flow in "idle_flows" - (see struct reader thread)*/
 	free_ndpi_flow(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
+	ndpi_free(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
       }
       
       if(++ndpi_thread_info[thread_id].idle_scan_idx == NUM_ROOTS) ndpi_thread_info[thread_id].idle_scan_idx = 0;
@@ -1452,6 +1453,7 @@ static void printResults(u_int64_t tot_usec) {
 static void closePcapFile(u_int16_t thread_id) {
   if(ndpi_thread_info[thread_id]._pcap_handle != NULL) {
     pcap_close(ndpi_thread_info[thread_id]._pcap_handle);
+    
   }
 }
 
