@@ -23,6 +23,29 @@
 
 #include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_MQTT
+
+/**
+ * The type of control messages in mqtt version 3.1.1
+ * see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1
+ */
+enum MQTT_PACKET_TYPES {
+	CONNECT = 1,
+	CONNACK = 2,
+	PUBLISH = 3,
+	PUBACK = 4,
+	PUBREC = 5,
+	PUBREL = 6,
+	PUBCOMP = 7,
+	SUBSCRIBE = 8,
+	SUBACK = 9,
+	UNSUBSCRIBE = 10,
+	UNSUBACK = 11,
+	PINGREQ = 12,
+	PINGRESP = 13,
+	DISCONNECT = 14
+};
+
+
 /**
  * Entry point when protocol is identified.
  */
@@ -53,12 +76,44 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 		return;
 	}
-	u_int8_t pt = (u_int8_t) (packet->payload[0]);
+	// we first extract the packet type
+	u_int8_t pt = (u_int8_t) ((packet->payload[0] & 0xF0) >> 4);
+	if ((pt == 0) || (pt == 15)) {
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt .. invalid packet type!\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
+	}
+	u_int8_t flags = (u_int8_t) (packet->payload[0] & 0x0F);
+	if ((((pt == CONNECT) || (pt == CONNACK) || (pt == PUBACK) || (pt == PUBREC) || (pt == PUBCOMP) ||
+		(pt = SUBACK) || (pt == UNSUBACK) || (pt == PINGREQ) || (pt == PINGRESP) || (pt == DISCONNECT))) && (flags != 0))
+	{
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Flag combination\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
+	}
+	if (((pt == PUBREL) || (pt == SUBSCRIBE) || (pt == UNSUBSCRIBE)) && (flags != 2)) {
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Flag combination\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
+	}
+	if ((pt == PUBLISH) && ((flags & 0x06) == 6)) // QoS combination
+	{
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Flag combination\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
+	}
+	// we have reached this point without any serious errors
+//	switch (pt) {
+//		case CONNECT:
+//
+//			break;
+//		default:
+//			break;
+//	}
 
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt ...\n");
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 	return;
-	//TODO
 }
 /**
  * Entry point for the ndpi library
