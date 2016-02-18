@@ -288,8 +288,6 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(!packet->iph /* IPv4 */) return(-1);
-
   if((packet->payload_packet_len > 9)
      && (packet->payload[0] == 0x16 /* consider only specific SSL packets (handshake) */)) {
     if((packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)

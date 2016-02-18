@@ -29,7 +29,7 @@
 
 /* The function below has been inherited by tcpdump */
 static int netbios_name_interpret(char *in, char *out, u_int out_len) {
-  int ret, len;
+  int ret = 0, len;
   char *b;
   
   len = (*in++)/2;
@@ -42,14 +42,14 @@ static int netbios_name_interpret(char *in, char *out, u_int out_len) {
   while (len--) {
     if(in[0] < 'A' || in[0] > 'P' || in[1] < 'A' || in[1] > 'P') {
       *out = 0;
-      return(-1);
+      break;
     }
 
     *out = ((in[0]-'A')<<4) + (in[1]-'A');
     in += 2;
-    out++;
+    out++, ret++;
   }
-  ret = *(--out);
+
   *out = 0;
 
   /* Courtesy of Roberto F. De Luca <deluca@tandar.cnea.gov.ar> */
@@ -318,12 +318,12 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct, struc
 		 NDPI_LOG_DEBUG, "found netbios with MSG-type 0x11,0x12,0x13,0x14,0x15 or 0x16\n");
 
 	if (ntohl(get_u_int32_t(packet->payload, 4)) == ntohl(packet->iph->saddr)) {
-	  char name[32];
+	  char name[64];
 
 	  NDPI_LOG(NDPI_PROTOCOL_NETBIOS, ndpi_struct,
 		   NDPI_LOG_DEBUG, "found netbios with checked ip-address.\n");
 
-	  if(netbios_name_interpret((char*)&packet->payload[14], name, sizeof(name)) > 0)
+	  if(netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
 	    snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name), "%s", name);
 
 	  ndpi_int_netbios_add_connection(ndpi_struct, flow);

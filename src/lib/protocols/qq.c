@@ -238,9 +238,9 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
-  static const u_int16_t p8000_patt_02[12] =	// maybe version numbers
-    { 0x1549, 0x1801, 0x180d, 0x0961, 0x01501, 0x0e35, 0x113f, 0x0b37, 0x1131, 0x163a, 0x1e0d };
-  u_int16_t no_of_patterns = 11, index = 0;
+  static const u_int16_t p8000_patt_02[13] =	// maybe version numbers
+    { 0x1549, 0x1801, 0x180d, 0x0961, 0x01501, 0x0e35, 0x113f, 0x0b37, 0x1131, 0x163a, 0x1e0d, 0x3619,};
+  u_int16_t no_of_patterns = 12, index = 0;
 
 
   NDPI_LOG(NDPI_PROTOCOL_QQ, ndpi_struct, NDPI_LOG_DEBUG, "search qq udp.\n");
@@ -668,8 +668,8 @@ void init_qq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32
   ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_QQ,
 				      ndpi_search_qq,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
   *id += 1;

@@ -24,7 +24,7 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 
   if((certificate == NULL)
      || (strlen(certificate) < 6)
-     || strncmp(certificate, "www.", 4))
+     || !(strncmp(certificate, "www.", 4)))
     return(0);
 
   // printf("***** [SSL] %s(): %s\n", __FUNCTION__, certificate);
@@ -66,13 +66,11 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_int_tor_add_connection(ndpi_struct, flow);
     return(1);
   } else {
-#ifndef __KERNEL__
 #ifdef PENDANTIC_TOR_CHECK
     if(gethostbyname(certificate) == NULL) {
       ndpi_int_tor_add_connection(ndpi_struct, flow);
       return(1);
     }
-#endif
 #endif
   }
 

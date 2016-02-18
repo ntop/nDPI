@@ -30,8 +30,6 @@
 #ifdef NDPI_SERVICE_KAKAOTALK_VOICE
 void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  unsigned char *vers;
-  int ver_offs;
   
   if(packet->iph
      && packet->udp
@@ -56,7 +54,7 @@ void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndpi_struc
     } 
   }
   
-  NDPI_LOG(NDPI_PROTOCOL_KAKAOTALK_VOICE, ndpi_struct, NDPI_LOG_DEBUG, "Exclude kakaotalk_voice.\n");
+  NDPI_LOG(NDPI_SERVICE_KAKAOTALK_VOICE, ndpi_struct, NDPI_LOG_DEBUG, "Exclude kakaotalk_voice.\n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_SERVICE_KAKAOTALK_VOICE);
 }
 

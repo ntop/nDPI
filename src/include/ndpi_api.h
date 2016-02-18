@@ -23,8 +23,8 @@
  */
 
 
-#ifndef __NDPI_PUBLIC_FUNCTIONS_H__
-#define __NDPI_PUBLIC_FUNCTIONS_H__
+#ifndef __NDPI_API_H__
+#define __NDPI_API_H__
 
 #include "ndpi_main.h"
 
@@ -32,26 +32,26 @@
 extern "C" {
 #endif
 
-  /**
-   * This function returns the size of the flow struct
-   * @return the size of the flow struct
+  /**                                                                                                                                  
+   * This function returns the size of the flow struct                                                                                 
+   * @return the size of the flow struct                                                                                               
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void);
-
-  /**
-   * This function returns the size of the id struct
-   * @return the size of the id struct
+  
+  /**                                                                                                                                  
+   * This function returns the size of the id struct                                                                                   
+   * @return the size of the id struct                                                                                                 
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void);
 
-
   /* Public malloc/free */
-  void* ndpi_malloc(unsigned long size);
-  void* ndpi_calloc(unsigned long count, unsigned long size);
+  void* ndpi_malloc(size_t size);
+  void* ndpi_calloc(unsigned long count, size_t size);
   void  ndpi_free(void *ptr);
   void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
   char *ndpi_strdup(const char *s);
-  /*
+  
+  /**
    * Find the first occurrence of find in s, where the search is limited to the
    * first slen characters of s.
    */
@@ -75,7 +75,7 @@ extern "C" {
    * @return the initialized detection module
    */
   struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_per_second,
-								  void* (*__ndpi_malloc)(unsigned long size),
+								  void* (*__ndpi_malloc)(size_t size),
 								  void  (*__ndpi_free)(void *ptr),
 								  ndpi_debug_function_ptr ndpi_debug_printf);
 
@@ -150,14 +150,6 @@ extern "C" {
    */
   u_int8_t ndpi_detection_get_l4(const u_int8_t * l3, u_int16_t l3_len, const u_int8_t ** l4_return, u_int16_t * l4_len_return,
 				 u_int8_t * l4_protocol_return, u_int32_t flags);
-  /**
-   * returns the real protocol for the flow of the last packet given to the detection.
-   * if no real protocol could be found, the unknown protocol will be returned.
-   *
-   * @param ndpi_struct the detection module
-   * @return the protocol id of the last real protocol found in the protocol history of the flow
-   */
-  /* u_int16_t ndpi_detection_get_real_protocol_of_flow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow); */
 
   /**
    * returns true if the protocol history of the flow of the last packet given to the detection
@@ -173,6 +165,8 @@ extern "C" {
 					      u_int8_t proto, u_int32_t shost, u_int16_t sport, u_int32_t dhost, u_int16_t dport);
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 					       u_int8_t proto, u_int32_t shost, u_int16_t sport, u_int32_t dhost, u_int16_t dport);
+  int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+				    char *string_to_match, u_int string_to_match_len);
   int ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow, char *string_to_match, u_int string_to_match_len,
 				  u_int16_t master_protocol_id);
@@ -244,4 +238,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif	/* __NDPI_API_H__ */

@@ -22,8 +22,9 @@
  *
  */
 
-/* include files */
+
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_ARMAGETRON
 
 

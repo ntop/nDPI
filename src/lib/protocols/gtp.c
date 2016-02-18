@@ -35,14 +35,6 @@ static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, str
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-#if 0
-  printf("[len=%u][%02X %02X %02X %02X]\n", payload_len,
-	 packet->payload[0] & 0xFF,
-	 packet->payload[1] & 0xFF,
-	 packet->payload[2] & 0xFF,
-	 packet->payload[3] & 0xFF);
-#endif
-
   if((packet->udp != NULL) && (payload_len > sizeof(struct gtp_header_generic))) {
     u_int32_t gtp_u  = ntohs(2152);
     u_int32_t gtp_c  = ntohs(2123);

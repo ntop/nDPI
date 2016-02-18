@@ -42,8 +42,6 @@ typedef signed long long int i_int64_t;
 
 #include "btlib.h"
 
-#ifndef __KERNEL__
-
 int bt_parse_debug = 0;
 
 static char *printXb(char *s,const u_int8_t *b,int l) {
@@ -183,11 +181,8 @@ static void _print_safe_str(char *msg,char *k,const u_int8_t *s,size_t l) {
 static void print_safe_str(char *msg,bt_parse_data_cb_t *cbd) {
   _print_safe_str(msg,cbd->buf,cbd->v.s.s,cbd->v.s.l);
 }
-#define DEBUG_TRACE(cmd) { if(bt_parse_debug) cmd; }
-#else
-#define DEBUG_TRACE(cmd,args...)
-#endif /* __KERNEL */
 
+#define DEBUG_TRACE(cmd) { if(bt_parse_debug) cmd; }
 #define STREQ(a,b) !strcmp(a,b)
 
 

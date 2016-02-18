@@ -10,6 +10,7 @@ ndpi_detection_get_sizeof_ndpi_flow_struct
 ndpi_load_protocols_file
 ndpi_tdestroy
 ndpi_exit_detection_module
+ndpi_l4_detection_process_packet
 ndpi_detection_process_packet
 ndpi_twalk
 ndpi_tdelete
@@ -29,3 +30,9 @@ ndpi_get_proto_by_id
 ndpi_get_protocol_id_master_proto
 ndpi_guess_protocol_id
 ndpi_protocol2name
+ndpi_get_lower_proto
+ndpi_is_proto
+ndpi_malloc
+ndpi_calloc
+ndpi_set_detected_protocol
+ndpi_match_string_subprotocol

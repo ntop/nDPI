@@ -22,93 +22,284 @@
  *
  */
 
-#ifndef __NDPI_TYPEDEFS_FILE__
-#define __NDPI_TYPEDEFS_FILE__
+#ifndef __NDPI_TYPEDEFS_H__
+#define __NDPI_TYPEDEFS_H__
 
-typedef enum {
-  NDPI_LOG_ERROR,
-  NDPI_LOG_TRACE,
-  NDPI_LOG_DEBUG
-} ndpi_log_level_t;
+#include "ndpi_define.h"
 
-typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol,
-					 void *module_struct, ndpi_log_level_t log_level,
-					 const char *format, ...);
 #define BT_ANNOUNCE
+#define SNAP_EXT
 
-typedef enum {
-  ndpi_preorder,
-  ndpi_postorder,
-  ndpi_endorder,
-  ndpi_leaf
-} ndpi_VISIT;
 
-typedef struct node_t {
+/* NDPI_LOG_LEVEL */
+typedef enum
+  {
+    NDPI_LOG_ERROR,
+    NDPI_LOG_TRACE,
+    NDPI_LOG_DEBUG
+  } ndpi_log_level_t;
+
+/* NDPI_VISIT */
+typedef enum
+  {
+    ndpi_preorder,
+    ndpi_postorder,
+    ndpi_endorder,
+    ndpi_leaf
+  } ndpi_VISIT;
+
+/* NDPI_NODE */
+typedef struct node_t
+{
   char *key;
   struct node_t *left, *right;
 } ndpi_node;
 
+/* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
 
-typedef struct ndpi_protocol_bitmask_struct {
-  ndpi_ndpi_mask  fds_bits[NDPI_NUM_FDS_BITS];
+/* NDPI_PROTO_BITMASK_STRUCT */
+typedef struct ndpi_protocol_bitmask_struct
+{
+  ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS];
 } ndpi_protocol_bitmask_struct_t;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-struct ndpi_ip6_addr {
-  union {
-    u_int8_t u6_addr8[16];
-    u_int16_t u6_addr16[8];
-    u_int32_t u6_addr32[4];
-    u_int64_t u6_addr64[2];
-  } ndpi_v6_u;
+/* NDPI_DEBUG_FUNCTION_PTR (cast) */
+typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol, void *module_struct,
+					 ndpi_log_level_t log_level, const char *format, ...);
 
-#define ndpi_v6_addr		ndpi_v6_u.u6_addr8
-#define ndpi_v6_addr16		ndpi_v6_u.u6_addr16
-#define ndpi_v6_addr32		ndpi_v6_u.u6_addr32
-#define ndpi_v6_addr64		ndpi_v6_u.u6_addr64
-};
 
-struct ndpi_ipv6hdr {
-  /* use userspace and kernelspace compatible compile parameters */
+/* ************************************************************ */
+/* ******************* NDPI NETWORKS HEADERS ****************** */
+/* ************************************************************ */
+
+/* ++++++++++++++++++++++++ Cisco headers +++++++++++++++++++++ */
+
+/* Cisco HDLC */
+#ifdef _MSC_VER
+/* Windows */
+#define PACK_ON   __pragma(pack(push, 1))
+#define PACK_OFF  __pragma(pack(pop))
+#elif defined(__GNUC__)
+/* GNU C */
+#define PACK_ON
+#define PACK_OFF  __attribute__((packed))
+#endif
+
+PACK_ON
+struct ndpi_chdlc
+{
+  u_int8_t addr;          /* 0x0F (Unicast) - 0x8F (Broadcast) */
+  u_int8_t ctrl;          /* always 0x00                       */
+  u_int16_t proto_code;   /* protocol type (e.g. 0x0800 IP)    */
+} PACK_OFF;
+
+/* SLARP - Serial Line ARP http://tinyurl.com/qa54e95 */
+PACK_ON
+struct ndpi_slarp
+{
+  /* address requests (0x00)
+     address replies  (0x01)
+     keep-alive       (0x02)
+  */
+  u_int32_t slarp_type;
+  u_int32_t addr_1;
+  u_int32_t addr_2;
+} PACK_OFF;
+
+/* Cisco Discovery Protocol http://tinyurl.com/qa6yw9l */
+PACK_ON
+struct ndpi_cdp
+{
+  u_int8_t version;
+  u_int8_t ttl;
+  u_int16_t checksum;
+  u_int16_t type;
+  u_int16_t length;
+} PACK_OFF;
+
+/* +++++++++++++++ Ethernet header (IEEE 802.3) +++++++++++++++ */
+
+PACK_ON
+struct ndpi_ethhdr
+{
+  u_char h_dest[6];       /* destination eth addr */
+  u_char h_source[6];     /* source ether addr    */
+  u_int16_t h_proto;      /* data length (<= 1500) or type ID proto (>=1536) */
+} PACK_OFF;
+
+/* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
+
+PACK_ON
+struct ndpi_snap_extension
+{
+  u_int16_t   oui;
+  u_int8_t    oui2;
+  u_int16_t   proto_ID;
+} PACK_OFF;
+
+PACK_ON
+struct ndpi_llc_header
+{
+  u_int8_t    dsap;
+  u_int8_t    ssap;
+  u_int8_t    ctrl;
+#ifdef SNAP_EXT
+  struct ndpi_snap_extension snap;
+#endif
+} PACK_OFF;
+
+/* ++++++++++ RADIO TAP header (for IEEE 802.11) +++++++++++++ */
+PACK_ON
+struct ndpi_radiotap_header
+{
+  u_int8_t  version;         /* set to 0 */
+  u_int8_t  pad;
+  u_int16_t len;
+  u_int32_t present;
+  u_int64_t MAC_timestamp;
+  u_int8_t flags;
+} PACK_OFF;
+
+/* ++++++++++++ Wireless header (IEEE 802.11) ++++++++++++++++ */
+PACK_ON
+struct ndpi_wifi_header
+{
+  u_int16_t fc;
+  u_int16_t duration;
+  u_char rcvr[6];
+  u_char trsm[6];
+  u_char dest[6];
+  u_int16_t seq_ctrl;
+  /* u_int64_t ccmp - for data encription only - check fc.flag */
+} PACK_OFF;
+
+/* +++++++++++++++++++++++ MPLS header +++++++++++++++++++++++ */
+
+PACK_ON
+struct ndpi_mpls_header
+{
+  u_int32_t label:20, exp:3, s:1, ttl:8;
+} PACK_OFF;
+
+/* ++++++++++++++++++++++++ IP header ++++++++++++++++++++++++ */
+
+PACK_ON
+struct ndpi_iphdr {
 #if defined(__LITTLE_ENDIAN__)
-  u_int8_t priority:4, version:4;
+  u_int8_t ihl:4, version:4;
 #elif defined(__BIG_ENDIAN__)
-  u_int8_t version:4, priority:4;
+  u_int8_t version:4, ihl:4;
 #else
 # error "Byte order must be defined"
 #endif
+  u_int8_t tos;
+  u_int16_t tot_len;
+  u_int16_t id;
+  u_int16_t frag_off;
+  u_int8_t ttl;
+  u_int8_t protocol;
+  u_int16_t check;
+  u_int32_t saddr;
+  u_int32_t daddr;
+} PACK_OFF;
 
-  u_int8_t flow_lbl[3];
+/* +++++++++++++++++++++++ IPv6 header +++++++++++++++++++++++ */
+/* rfc3542 */
 
-  u_int16_t payload_len;
-  u_int8_t nexthdr;
-  u_int8_t hop_limit;
-
-  struct ndpi_ip6_addr saddr;
-  struct ndpi_ip6_addr daddr;
+struct ndpi_in6_addr
+{
+  union
+  {
+    u_int8_t   u6_addr8[16];
+    u_int16_t  u6_addr16[8];
+    u_int32_t  u6_addr32[4];
+  } u6_addr;  /* 128-bit IP6 address */
 };
-#endif
 
-typedef union {
+PACK_ON
+struct ndpi_ipv6hdr
+{
+  union
+  {
+    struct ndpi_ip6_hdrctl
+    {
+      u_int32_t ip6_un1_flow;
+      u_int16_t ip6_un1_plen;
+      u_int8_t ip6_un1_nxt;
+      u_int8_t ip6_un1_hlim;
+    } ip6_un1;
+    u_int8_t ip6_un2_vfc;
+  } ip6_ctlun;
+
+  struct ndpi_in6_addr ip6_src;
+  struct ndpi_in6_addr ip6_dst;
+} PACK_OFF;
+
+/* +++++++++++++++++++++++ TCP header +++++++++++++++++++++++ */
+
+PACK_ON
+struct ndpi_tcphdr
+{
+  u_int16_t source;
+  u_int16_t dest;
+  u_int32_t seq;
+  u_int32_t ack_seq;
+#if defined(__LITTLE_ENDIAN__)
+  u_int16_t res1:4, doff:4, fin:1, syn:1, rst:1, psh:1, ack:1, urg:1, ece:1, cwr:1;
+#elif defined(__BIG_ENDIAN__)
+  u_int16_t doff:4, res1:4, cwr:1, ece:1, urg:1, ack:1, psh:1, rst:1, syn:1, fin:1;
+#else
+# error "Byte order must be defined"
+#endif
+  u_int16_t window;
+  u_int16_t check;
+  u_int16_t urg_ptr;
+} PACK_OFF;
+
+/* +++++++++++++++++++++++ UDP header +++++++++++++++++++++++ */
+
+PACK_ON
+struct ndpi_udphdr
+{
+  u_int16_t source;
+  u_int16_t dest;
+  u_int16_t len;
+  u_int16_t check;
+} PACK_OFF;
+
+PACK_ON
+struct ndpi_dns_packet_header {
+  u_int16_t tr_id;
+  u_int16_t flags;
+  u_int16_t num_queries;
+  u_int16_t num_answers;
+  u_int16_t authority_rrs;
+  u_int16_t additional_rrs;
+} PACK_OFF;
+
+typedef union
+{
   u_int32_t ipv4;
   u_int8_t ipv4_u_int8_t[4];
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  struct ndpi_ip6_addr ipv6;
+  struct ndpi_in6_addr ipv6;
 #endif
 } ndpi_ip_addr_t;
 
+/* ************************************************************ */
+/* ******************* ********************* ****************** */
+/* ************************************************************ */
 
 #ifdef NDPI_PROTOCOL_BITTORRENT
-#ifndef __KERNEL__
+
 typedef struct spinlock {
   volatile int    val;
 } spinlock_t;
+
 typedef struct atomic {
   volatile int counter;
 } atomic_t;
-
-#endif
 
 struct hash_ip4p_node {
   struct hash_ip4p_node   *next,*prev;
@@ -154,17 +345,13 @@ typedef enum {
   HTTP_METHOD_CONNECT
 } ndpi_http_method;
 
-typedef struct ndpi_id_struct {
-  /* detected_protocol_bitmask:
-   * access this bitmask to find out whether an id has used skype or not
-   * if a flag is set here, it will not be resetted
-   * to compare this, use:
-   * if (NDPI_BITMASK_COMPARE(id->detected_protocol_bitmask,
-   *                            NDPI_PROTOCOL_BITMASK_XXX) != 0)
-   * {
-   *      // protocol XXX detected on this id
-   * }
-   */
+struct ndpi_id_struct {
+  /**
+     detected_protocol_bitmask:
+     access this bitmask to find out whether an id has used skype or not
+     if a flag is set here, it will not be resetted
+     to compare this, use:
+  **/
   NDPI_PROTOCOL_BITMASK detected_protocol_bitmask;
 #ifdef NDPI_PROTOCOL_RTSP
   ndpi_ip_addr_t rtsp_ip_address;
@@ -254,7 +441,7 @@ typedef struct ndpi_id_struct {
 #ifdef NDPI_PROTOCOL_RTSP
   u_int32_t rtsp_ts_set:1;
 #endif
-} ndpi_id_struct;
+};
 
 /* ************************************************** */
 
@@ -310,7 +497,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t http_stage:2;
   u_int32_t http_empty_line_seen:1;
   u_int32_t http_wait_for_retransmission:1;
-#endif					       
+#endif
 #ifdef NDPI_PROTOCOL_GNUTELLA
   u_int32_t gnutella_stage:2;		       // 0 - 2
 #endif
@@ -390,7 +577,7 @@ struct ndpi_flow_tcp_struct {
   u_char prev_zmq_pkt[10];
 #endif
 }
-#if !defined(WIN32)
+#ifndef WIN32
   __attribute__ ((__packed__))
 #endif
   ;
@@ -439,19 +626,19 @@ struct ndpi_flow_udp_struct {
   u_int32_t eaq_sequence;
 #endif
 }
-#if !defined(WIN32)
+#ifndef WIN32
   __attribute__ ((__packed__))
 #endif
   ;
 
 /* ************************************************** */
 
-typedef struct ndpi_int_one_line_struct {
+struct ndpi_int_one_line_struct {
   const u_int8_t *ptr;
   u_int16_t len;
-} ndpi_int_one_line_struct_t;
+};
 
-typedef struct ndpi_packet_struct {
+struct ndpi_packet_struct {
   const struct ndpi_iphdr *iph;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   const struct ndpi_ipv6hdr *iphv6;
@@ -468,10 +655,10 @@ typedef struct ndpi_packet_struct {
   u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
 
 
-#if !defined(WIN32)
-    __attribute__ ((__packed__))
+#ifndef WIN32
+  __attribute__ ((__packed__))
 #endif
-    u_int16_t protocol_stack_info;  
+  u_int16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
   struct ndpi_int_one_line_struct host_line;
@@ -506,22 +693,22 @@ typedef struct ndpi_packet_struct {
   u_int8_t packet_lines_parsed_complete:1,
     packet_direction:1,
     empty_line_position_set:1;
-} ndpi_packet_struct_t;
+};
 
 struct ndpi_detection_module_struct;
 struct ndpi_flow_struct;
 
-typedef struct ndpi_call_function_struct {
+struct ndpi_call_function_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask;
   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
   u_int8_t detection_feature;
-} ndpi_call_function_struct_t;
+};
 
-typedef struct ndpi_subprotocol_conf_struct {
+struct ndpi_subprotocol_conf_struct {
   void (*func) (struct ndpi_detection_module_struct *, char *attr, char *value, int protocol_id);
-} ndpi_subprotocol_conf_struct_t;
+};
 
 
 typedef struct {
@@ -564,7 +751,8 @@ typedef struct ndpi_proto {
 
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
 
-typedef struct ndpi_detection_module_struct {
+struct ndpi_detection_module_struct {
+  
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
 
@@ -574,7 +762,7 @@ typedef struct ndpi_detection_module_struct {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
 #endif
-  
+
   /* callback function buffer */
   struct ndpi_call_function_struct callback_buffer[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size;
@@ -617,6 +805,7 @@ typedef struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa; /* TOR */
+  
   /* IP-based protocol detection */
   void *protocols_ptree;
 
@@ -660,47 +849,53 @@ typedef struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t match_dns_host_names:1, http_dont_dissect_response:1;
+  u_int8_t http_dont_dissect_response:1;
   u_int8_t direction_detect_disable:1; /* disable internal detection of packet direction */
-} ndpi_detection_module_struct_t;
+};
 
-typedef struct ndpi_flow_struct {
+struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
-#if !defined(WIN32)
-    __attribute__ ((__packed__))
+#ifndef WIN32
+  __attribute__ ((__packed__))
 #endif
-    u_int16_t protocol_stack_info;  
+  u_int16_t protocol_stack_info;
 
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_proto_id;
 
-  u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1; 
-  /* if ndpi_struct->direction_detect_disable == 1 */
-  /* tcp sequence number connection tracking */
+  u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1;
+
+  /*
+     if ndpi_struct->direction_detect_disable == 1
+     tcp sequence number connection tracking
+  */
   u_int32_t next_tcp_seq_nr[2];
 
-  /* the tcp / udp / other l4 value union
-   * this is used to reduce the number of bytes for tcp or udp protocol states
-   * */
+  /*
+     the tcp / udp / other l4 value union
+     used to reduce the number of bytes for tcp or udp protocol states
+  */
   union {
     struct ndpi_flow_tcp_struct tcp;
     struct ndpi_flow_udp_struct udp;
   } l4;
 
-  struct ndpi_id_struct *server_id; /* 
-				       Pointer to src or dst
-				       that identifies the 
-				       server of this connection
-				    */
-#ifndef __KERNEL__
-  u_char host_server_name[256]; /* HTTP host or DNS query   */ 
-#else
-  u_char host_server_name[160];
-#endif
-  u_char detected_os[32];       /* Via HTTP User-Agent      */
-  u_char nat_ip[24];            /* Via HTTP X-Forwarded-For */
+  /*
+     Pointer to src or dst
+     that identifies the
+     server of this connection
+  */
+  struct ndpi_id_struct *server_id;
+  /* HTTP host or DNS query */
+  u_char host_server_name[192];
+  /* Via HTTP User-Agent */
+  u_char detected_os[32];
+  /* Via HTTP X-Forwarded-For */
+  u_char nat_ip[24];
+  /* Bittorrent hash */
+  u_char bittorent_hash[20];
 
-  /* 
+  /*
      This structure below will not not stay inside the protos
      structure below as HTTP is used by many subprotocols
      such as FaceBook, Google... so it is hard to know
@@ -708,27 +903,29 @@ typedef struct ndpi_flow_struct {
      time being.
   */
   struct {
-    ndpi_http_method method;      
+    ndpi_http_method method;
     char *url, *content_type;
   } http;
 
   union {
+
+    /* the only fields useful for nDPI and ntopng */
     struct {
-      u_int8_t num_queries, num_answers, ret_code;
-      u_int8_t bad_packet /* the received packet looks bad */;
-      u_int16_t query_type, query_class, rsp_type;
+      u_int8_t num_answers, ret_code;
+      u_int16_t query_type;
     } dns;
-   
+    
     struct {
       u_int8_t request_code;
       u_int8_t version;
     } ntp;
- 
+
     struct {
       char client_certificate[48], server_certificate[48];
     } ssl;
   } protos;
-  /* ALL protocol specific 64 bit variables here */
+
+  /*** ALL protocol specific 64 bit variables here ***/
 
   /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
@@ -754,7 +951,7 @@ typedef struct ndpi_flow_struct {
 #endif
 #ifdef NDPI_PROTOCOL_HTTP
   u_int32_t http_detected:1;
-#endif				       
+#endif
 #ifdef NDPI_PROTOCOL_RTSP
   u_int32_t rtsprdt_stage:2;
   u_int32_t rtsp_control_flow:1;
@@ -816,6 +1013,6 @@ typedef struct ndpi_flow_struct {
   struct ndpi_flow_struct *flow;
   struct ndpi_id_struct *src;
   struct ndpi_id_struct *dst;
-} ndpi_flow_struct_t;
+};
 
-#endif/* __NDPI_TYPEDEFS_FILE__ */
+#endif/* __NDPI_TYPEDEFS_H__ */

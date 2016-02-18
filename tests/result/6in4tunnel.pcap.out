@@ -1,0 +1,16 @@
+HTTP	10	1792	1
+IMAPS	4	516	2
+SSL	28	15397	1
+ICMPV6	48	7862	3
+Facebook	37	14726	3
+
+	1	TCP [2001:470:1f17:13f:3e97:eff:fe73:4dec]:443 <-> [2a03:2880:1010:6f03:face:b00c::2]:53234 [proto: 91.119/SSL.Facebook][33 pkts/13926 bytes][SSL client: www.facebook.com]
+	2	UDP [2001:470:1f16:13f::2]:6404 <-> [2a03:2880:fffe:b:face:b00c::99]:53 [proto: 5.119/DNS.Facebook][2 pkts/394 bytes][Host: star.c10r.facebook.com]
+	3	TCP [2001:470:1f17:13f:3e97:eff:fe73:4dec]:443 <-> [2604:a880:1:20::224:b001]:60205 [proto: 91/SSL][28 pkts/15397 bytes][SSL client: mail.tomasu.net]
+	4	ICMPV6 [2001:470:1f16:13f::2]:0 <-> [2604:a880:1:20::224:b001]:0 [proto: 102/ICMPV6][1 pkts/200 bytes]
+	5	ICMPV6 [2a03:2880:1010:6f03:face:b00c::2]:0 <-> [2001:470:1f17:13f:3e97:eff:fe73:4dec]:0 [proto: 102/ICMPV6][1 pkts/1314 bytes]
+	6	TCP [2604:a880:1:20::224:b001]:993 <-> [2001:470:1f17:13f:6d69:c72:7313:616f]:35610 [proto: 51/IMAPS][2 pkts/258 bytes]
+	7	ICMPV6 [2001:470:1f17:13f:3e97:eff:fe73:4dec]:0 <-> [2604:a880:1:20::224:b001]:0 [proto: 102/ICMPV6][46 pkts/6348 bytes]
+	8	TCP [2604:a880:1:20::224:b001]:993 <-> [2001:470:1f17:13f:6d69:c72:7313:616f]:56381 [proto: 51/IMAPS][2 pkts/258 bytes]
+	9	UDP [2001:470:1f16:13f::2]:53959 <-> [2a03:2880:fffe:b:face:b00c::99]:53 [proto: 5.119/DNS.Facebook][2 pkts/406 bytes][Host: star.c10r.facebook.com]
+	10	TCP [2001:470:1f17:13f:3e97:eff:fe73:4dec]:80 <-> [2604:a880:1:20::224:b001]:41538 [proto: 7/HTTP][10 pkts/1792 bytes][Host: mail.tomasu.net]

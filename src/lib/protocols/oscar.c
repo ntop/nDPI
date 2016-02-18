@@ -30,7 +30,7 @@
 /* Flap channels */
 #define SIGNON              0x01
 #define DATA                0x02
-#define ERROR               0x03
+#define O_ERROR               0x03
 #define SIGNOFF             0x04
 #define KEEP_ALIVE          0x05
 
@@ -101,7 +101,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 {
 
   int excluded = 0;
-  u_int8_t channel;
+//  u_int8_t channel;
   u_int16_t family;
   u_int16_t type;
   u_int16_t flag;
@@ -576,7 +576,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	 ERROR -> FLAP__ERROR_CHANNEL_0x03
 	 A FLAP error - rare
       */
-      if (channel == ERROR)
+      if (channel == O_ERROR)
 	{
 	  NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected - Error frame \n");
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);

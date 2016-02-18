@@ -7,14 +7,12 @@ libndpi_la_LDFLAGS = -static -version-info 1:0:0 -export-symbols $(top_srcdir)/l
 libndpi_la_includedir = $(includedir)/libndpi-@VERSION@/libndpi
 
 libndpi_la_include_HEADERS = ../include/ndpi_api.h \
-			     ../include/linux_compat.h \
 			     ../include/ndpi_define.h \
 			     ../include/ndpi_main.h \
+			     ../include/ndpi_includes.h \
 			     ../include/ndpi_protocol_ids.h \
 			     ../include/ndpi_protocols.h \
-			     ../include/ndpi_typedefs.h \
-			     ../include/ndpi_unix.h \
-			     ../include/ndpi_win32.h
+			     ../include/ndpi_typedefs.h
 
 libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     ndpi_main.c \
@@ -52,6 +50,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/guildwars.c \
 		     protocols/h323.c \
 		     protocols/halflife2_and_mods.c \
+		     protocols/hep.c \
 		     protocols/http_activesync.c \
 		     protocols/http.c \
 		     protocols/iax.c \
@@ -139,6 +138,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/tvants.c \
 		     protocols/tvuplayer.c \
 		     protocols/twitter.c \
+		     protocols/ubntac2.c \
 		     protocols/usenet.c \
 		     protocols/veohtv.c \
 		     protocols/viber.c \

@@ -1,0 +1,30 @@
+Unknown	8	480	2
+DNS	3	214	3
+HTTP	13	1019	2
+SSL	45	5771	3
+Google	14	2349	3
+OCS	863	57552	7
+
+	1	TCP 192.168.180.2:42590 <-> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][83 pkts/5408 bytes][Host: www.ocs.fr]
+	2	TCP 192.168.180.2:48250 <-> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][6 pkts/1092 bytes][Host: ocu03.labgency.ws]
+	3	TCP 192.168.180.2:41223 <-> 216.58.208.46:443 [proto: 91/SSL][13 pkts/1448 bytes]
+	4	UDP 192.168.180.2:38472 <-> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/63 bytes][Host: ocu03.labgency.ws]
+	5	TCP 192.168.180.2:39263 <-> 23.21.230.199:443 [proto: 91/SSL][20 pkts/2715 bytes][SSL client: settings.crashlytics.com]
+	6	UDP 192.168.180.2:48770 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][1 pkts/72 bytes][Host: android.clients.google.com]
+	7	TCP 192.168.180.2:47803 <-> 64.233.166.95:443 [proto: 91/SSL][12 pkts/1608 bytes]
+	8	UDP 192.168.180.2:1291 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/67 bytes][Host: api.eu01.capptain.com]
+	9	UDP 192.168.180.2:2589 <-> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/61 bytes][Host: ocs.labgency.ws]
+	10	UDP 192.168.180.2:3621 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/77 bytes][Host: xmpp.device06.eu01.capptain.com]
+	11	UDP 192.168.180.2:11793 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][1 pkts/65 bytes][Host: play.googleapis.com]
+	12	TCP 192.168.180.2:36680 <-> 178.248.208.54:443 [proto: 91.218/SSL.OCS][20 pkts/6089 bytes][SSL client: ocs.labgency.ws]
+	13	TCP 192.168.180.2:53356 <-> 137.135.129.206:80 [proto: 7/HTTP][6 pkts/479 bytes]
+	14	UDP 192.168.180.2:24245 <-> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/56 bytes][Host: www.ocs.fr]
+	15	TCP 192.168.180.2:49881 <-> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][751 pkts/44783 bytes][Host: ocu03.labgency.ws]
+	16	UDP 192.168.180.2:40097 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/70 bytes][Host: settings.crashlytics.com]
+	17	TCP 192.168.180.2:32946 <-> 64.233.184.188:443 [proto: 91.126/SSL.Google][12 pkts/2212 bytes][SSL client: mtalk.google.com]
+	18	TCP 192.168.180.2:44959 <-> 137.135.129.206:80 [proto: 7/HTTP][7 pkts/540 bytes]
+
+
+Undetected flows:
+	1	TCP 192.168.180.2:46166 <-> 137.135.131.52:5122 [proto: 0/Unknown][6 pkts/360 bytes]
+	2	TCP 192.168.180.2:47699 <-> 64.233.184.188:5228 [proto: 0/Unknown][2 pkts/120 bytes]

@@ -585,7 +585,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     if (memcmp(packet->payload, "POST ", 5) == 0) {
       ndpi_parse_packet_line_info(ndpi_struct, flow);
       if (packet->parsed_lines) {
-	u_int16_t http_header_len = (packet->line[packet->parsed_lines - 1].ptr - packet->payload) + 2;
+		  u_int16_t http_header_len = (u_int16_t)((packet->line[packet->parsed_lines - 1].ptr - packet->payload) + 2);
 	if (packet->payload_packet_len > http_header_len) {
 	  http_content_ptr_len = packet->payload_packet_len - http_header_len;
 	}

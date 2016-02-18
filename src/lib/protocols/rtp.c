@@ -27,28 +27,84 @@
 
 #ifdef NDPI_PROTOCOL_RTP
 
+/* http://www.myskypelab.com/2014/05/microsoft-lync-wireshark-plugin.html */
+
+static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
+  switch(payloadType) {
+  case 0: /* G.711 u-Law */
+  case 3: /* GSM 6.10 */
+  case 4: /* G.723.1  */
+  case 8: /* G.711 A-Law */
+  case 9: /* G.722 */
+  case 13: /* Comfort Noise */
+  case 96: /* Dynamic RTP */
+  case 97: /* Redundant Audio Data Payload */
+  case 101: /* DTMF */
+  case 103: /* SILK Narrowband */
+  case 104: /* SILK Wideband */
+  case 111: /* Siren */
+  case 112: /* G.722.1 */
+  case 114: /* RT Audio Wideband */
+  case 115: /* RT Audio Narrowband */
+  case 116: /* G.726 */
+  case 117: /* G.722 */
+  case 118: /* Comfort Noise Wideband */
+  case 34: /* H.263 [MS-H26XPF] */
+  case 121: /* RT Video */
+  case 122: /* H.264 [MS-H264PF] */
+  case 123: /* H.264 FEC [MS-H264PF] */
+  case 127: /* x-data */
+    return(1 /* RTP */);
+    break;
+    
+  case 200: /* RTCP PACKET SENDER */
+  case 201: /* RTCP PACKET RECEIVER */
+  case 202: /* RTCP Source Description */
+  case 203: /* RTCP Bye */
+    return(2 /* RTCP */);
+    break;
+    
+  default:
+    return(0);
+  }
+}
 
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    const u_int8_t * payload, const u_int16_t payload_len)
 {
   //struct ndpi_packet_struct *packet = &flow->packet;
-  u_int8_t payload_type = payload[1] & 0x7F;
+  u_int8_t payloadType, payload_type = payload[1] & 0x7F;
   u_int32_t *ssid = (u_int32_t*)&payload[8];
 
   /* Check whether this is an RTP flow */
   if((payload_len >= 12)
-     && ((payload[0] & 0xFF) == 0x80) /* RTP magic byte[1] */
+     && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */
      && ((payload_type < 72) || (payload_type > 76))
-     && (payload_type < 128          /* http://anonsvn.wireshark.org/wireshark/trunk/epan/dissectors/packet-rtp.c */)
-     && (*ssid != 0)
+     && ((payload_type <= 34)
+	 || ((payload_type >= 96) && (payload_type <= 127))
+	 /* http://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
+	 )
+	 && (*ssid != 0)
      ) {
-    NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found rtp.\n");
+    NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found RTP.\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_UNKNOWN);
-  } else {
-    NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "exclude rtp.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
-  }
+    return;
+  } else if((payload_len >= 12)
+	    && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */	    
+	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF))) {
+    if(payloadType == 1 /* RTP */) {
+      NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_LYNC, NDPI_PROTOCOL_UNKNOWN);
+    } else /* RTCP */ {
+      NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found MS RTCP\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTCP, NDPI_PROTOCOL_UNKNOWN);
+    }
+  }  
+
+  /* No luck this time */
+  NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "exclude rtp.\n");
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
 }
 
 void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
