@@ -156,6 +156,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/zattoo.c \
 		     protocols/zeromq.c \
 		     protocols/coap.c \
+		     protocols/mqtt.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
 		     third_party/include/node.h \

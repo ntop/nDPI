@@ -584,6 +584,9 @@ struct ndpi_flow_tcp_struct {
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
 #endif
+#ifdef NDPI_PROTOCOL_MQTT
+  u_int8_t mqtt_stage:2;
+#endif
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
