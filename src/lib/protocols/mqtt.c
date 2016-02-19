@@ -135,25 +135,49 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 	}
 	if (pt == PUBLISH){
 		u_int8_t qos = (u_int8_t) (flags & 0x06);
-		if (((qos == 1) || (qos == 2)) && (packet->payload_packet_len < 4)){
+		if (((qos == 1) || (qos == 2)) && (packet->payload_packet_len < 4)){ // at least topic + pkt identifier
 			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt\n");
 			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 			return;
-		} else {
-			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found [%d]\n",pt);
-			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+		}
+		if ((qos == 0) && (packet->payload_packet_len < 3)){ // at least topic
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt\n");
+			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 			return;
 		}
-	}
-	if (pt == SUBSCRIBE){
-//		if ()
-	}
-
-	if (pt == SUBACK ){
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found [%d]\n",pt);
+		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+		return;
 
 	}
-	if (pt == UNSUBSCRIBE){
+	if ((pt == SUBSCRIBE) && (packet->payload_packet_len < 8)){ // at least one topic+filter is required in the payload
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
+	} else {
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found [%d]\n",pt);
+		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+		return;
+	}
 
+	if ((pt == SUBACK ) && (packet->payload_packet_len <5 )){ // must have at least a response code
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
+	} else {
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found [%d]\n",pt);
+		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+		return;
+	}
+
+	if ((pt == UNSUBSCRIBE) && (packet->payload_packet_len < 7)) { // at least a topic
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
+	} else {
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found [%d]\n",pt);
+		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+		return;
 	}
 
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt ...\n");
