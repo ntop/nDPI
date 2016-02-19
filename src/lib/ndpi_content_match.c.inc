@@ -34,6 +34,24 @@ typedef struct {
 
 static ndpi_network host_protocol_list[] = {
 
+ /*    
+    Amazon-EU-AWS Elastic Compute Cloud, EC2 (also used by Netflix)
+    46.137.128.0/18
+  */
+  { 0x2E898000 /* 46.137.128.0/18 */, 18, NDPI_SERVICE_AMAZON },
+  
+ /*    
+    Amazon-EU (also used by Netflix)
+    176.34.184.0/21
+  */
+  { 0xB022B800 /* 176.34.184.0/21 */, 21, NDPI_SERVICE_AMAZON },
+
+ /*    
+    Netflix
+    23.246.0.0/18
+  */
+  { 0x17F60000 /* 23.246.0.0/18 */, 18, NDPI_SERVICE_NETFLIX },
+
   /*    
     Cloudflare
     104.16.0.0/12
