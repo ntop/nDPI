@@ -540,7 +540,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
     json_object_object_add(jObj,"host_a.name",json_object_new_string(flow->lower_name));
     json_object_object_add(jObj,"host_a.port",json_object_new_int(ntohs(flow->lower_port)));
     json_object_object_add(jObj,"host_b.name",json_object_new_string(flow->upper_name));
-    json_object_object_add(jObj,"host_n.port",json_object_new_int(ntohs(flow->upper_port)));
+    json_object_object_add(jObj,"host_b.port",json_object_new_int(ntohs(flow->upper_port)));
 
     if(flow->detected_protocol.master_protocol)
       json_object_object_add(jObj,"detected.masterprotocol",json_object_new_int(flow->detected_protocol.master_protocol));
@@ -1966,7 +1966,7 @@ void *processing_thread(void *_thread_id) {
       goto pcap_loop;
     }
   }
-
+  
   return NULL;
 }
 
