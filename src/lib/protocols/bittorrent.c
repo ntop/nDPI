@@ -46,7 +46,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
       if(bt_magic)
 	bt_hash = &bt_magic[19], peer_id = &bt_magic[39];
     } else
-      bt_hash = &flow->packet.payload[28], peer_id = &flow->packet.payload[48];
+      bt_hash = (const char*)&flow->packet.payload[28], peer_id = (const char*)&flow->packet.payload[48];
  
     if(bt_hash) memcpy(flow->bittorent_hash, bt_hash, 20);
   }

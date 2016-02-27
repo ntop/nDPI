@@ -68,6 +68,12 @@ extern "C" {
   u_int16_t ndpi_host_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t host);
 
   /**
+   * Init single protocol match
+   */  
+  void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
+				ndpi_protocol_match *match);
+
+  /**
    * This function returns a new initialized detection module.
    * @param ticks_per_second the timestamp resolution per second (like 1000 for millisecond resolution)
    * @param __ndpi_malloc function pointer to a memory allocator

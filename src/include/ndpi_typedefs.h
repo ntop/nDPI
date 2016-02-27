@@ -1015,4 +1015,16 @@ struct ndpi_flow_struct {
   struct ndpi_id_struct *dst;
 };
 
+typedef struct {
+  char *string_to_match, *proto_name;
+  int protocol_id;
+  ndpi_protocol_breed_t protocol_breed;
+} ndpi_protocol_match;
+
+typedef struct {
+  u_int32_t network;
+  u_int8_t cidr;
+  u_int8_t value;
+} ndpi_network;
+
 #endif/* __NDPI_TYPEDEFS_H__ */

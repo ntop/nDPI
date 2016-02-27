@@ -577,30 +577,36 @@ static int ndpi_remove_host_url_subprotocol(struct ndpi_detection_module_struct 
 
 /* ******************************************************************** */
 
+void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
+			      ndpi_protocol_match *match) { 
+  u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO };
+  ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
+  
+  ndpi_add_host_url_subprotocol(ndpi_mod, match->string_to_match,
+				match->protocol_id, match->protocol_breed);
+  
+  if(ndpi_mod->proto_defaults[match->protocol_id].protoName == NULL) {
+    ndpi_mod->proto_defaults[match->protocol_id].protoName  = ndpi_strdup(match->proto_name);
+    ndpi_mod->proto_defaults[match->protocol_id].protoId    = match->protocol_id;
+    ndpi_mod->proto_defaults[match->protocol_id].protoBreed = match->protocol_breed;
+  }
+  
+  ndpi_set_proto_defaults(ndpi_mod,
+			  ndpi_mod->proto_defaults[match->protocol_id].protoBreed,
+			  ndpi_mod->proto_defaults[match->protocol_id].protoId,
+			  no_master, no_master,
+			  ndpi_mod->proto_defaults[match->protocol_id].protoName,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);  
+}
+
+/* ******************************************************************** */
+
 static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
-
-  for(i=0; host_match[i].string_to_match != NULL; i++) {
-    u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO };
-    ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
-
-    ndpi_add_host_url_subprotocol(ndpi_mod, host_match[i].string_to_match,
-				  host_match[i].protocol_id, host_match[i].protocol_breed);
-
-    if(ndpi_mod->proto_defaults[host_match[i].protocol_id].protoName == NULL) {
-      ndpi_mod->proto_defaults[host_match[i].protocol_id].protoName = ndpi_strdup(host_match[i].proto_name);
-      ndpi_mod->proto_defaults[host_match[i].protocol_id].protoId = host_match[i].protocol_id;
-      ndpi_mod->proto_defaults[host_match[i].protocol_id].protoBreed = host_match[i].protocol_breed;
-    }
-
-    ndpi_set_proto_defaults(ndpi_mod,
-			    ndpi_mod->proto_defaults[host_match[i].protocol_id].protoBreed,
-			    ndpi_mod->proto_defaults[host_match[i].protocol_id].protoId,
-			    no_master, no_master,
-			    ndpi_mod->proto_defaults[host_match[i].protocol_id].protoName,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  }
+  
+  for(i=0; host_match[i].string_to_match != NULL; i++)
+    ndpi_init_protocol_match(ndpi_mod, &host_match[i]);
 
 #ifdef DEBUG
   ac_automata_display(ndpi_mod->host_automa.ac_automa, 'n');
