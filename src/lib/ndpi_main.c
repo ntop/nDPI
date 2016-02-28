@@ -960,9 +960,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "TVUplayer",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HTTP_DOWNLOAD,
 			    no_master,
-			    no_master, "HTTP_APPLICATION_VEOHTV",
+			    no_master, "HTTPDownload",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQLIVE,
@@ -2272,9 +2272,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* SHOUTCAST */
   init_shoutcast_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* VEOHTV */
-  init_veohtv_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* KERBEROS */
   init_kerberos_dissector(ndpi_struct, &a, detection_bitmask);
@@ -4313,10 +4310,11 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
 /* ****************************************************** */
 
 int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				  char *string_to_match, u_int string_to_match_len) {
+				  char *string_to_match, u_int string_to_match_len,
+				  u_int8_t is_host_match) {
   int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   AC_TEXT_t ac_input_text;
-  ndpi_automa *automa = &ndpi_struct->host_automa;
+  ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa : &ndpi_struct->content_automa;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0)) return(NDPI_PROTOCOL_UNKNOWN);
 
@@ -4337,8 +4335,9 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
 static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 						struct ndpi_flow_struct *flow,
 						char *string_to_match, u_int string_to_match_len,
-						u_int16_t master_protocol_id) {
-  int matching_protocol_id = ndpi_match_string_subprotocol(ndpi_struct, string_to_match, string_to_match_len);
+						u_int16_t master_protocol_id,
+						u_int8_t is_host_match) {
+  int matching_protocol_id = ndpi_match_string_subprotocol(ndpi_struct, string_to_match, string_to_match_len, is_host_match);
   struct ndpi_packet_struct *packet = &flow->packet;
   AC_TEXT_t ac_input_text;
 
@@ -4382,7 +4381,7 @@ int ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct
 				u_int16_t master_protocol_id) {
   return(ndpi_automa_match_string_subprotocol(ndpi_struct,
 					      flow, string_to_match, string_to_match_len,
-					      master_protocol_id));
+					      master_protocol_id, 1));
 }
 
 /* ****************************************************** */
@@ -4393,7 +4392,7 @@ int ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_str
 				   u_int16_t master_protocol_id) {
   return(ndpi_automa_match_string_subprotocol(ndpi_struct, flow,
 					      string_to_match, string_to_match_len,
-					      master_protocol_id));
+					      master_protocol_id, 0));
 }
 
 /* ****************************************************** */

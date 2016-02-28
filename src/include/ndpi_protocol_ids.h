@@ -49,7 +49,7 @@
 #define NDPI_PROTOCOL_IP_ICMPV6					102
 
 #define NDPI_PROTOCOL_HTTP					7
-#define NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV 		        60
+#define NDPI_PROTOCOL_HTTP_DOWNLOAD    		                60
 #define NDPI_PROTOCOL_SSL_NO_CERT			        64 /* SSL without certificate (Skype, Ultrasurf?) - ntop.org */
 #define NDPI_PROTOCOL_SSL					91
 #define NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC		110

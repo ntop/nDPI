@@ -172,7 +172,7 @@ extern "C" {
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 					       u_int8_t proto, u_int32_t shost, u_int16_t sport, u_int32_t dhost, u_int16_t dport);
   int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				    char *string_to_match, u_int string_to_match_len);
+				    char *string_to_match, u_int string_to_match_len, u_int8_t is_host_match);
   int ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow, char *string_to_match, u_int string_to_match_len,
 				  u_int16_t master_protocol_id);
