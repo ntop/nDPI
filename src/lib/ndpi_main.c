@@ -1143,11 +1143,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     			    no_master, "IAX",
     			    ndpi_build_default_ports(ports_a, 4569, 0, 0, 0, 0) /* TCP */,
     			    ndpi_build_default_ports(ports_b, 4569, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TFTP,
-			    no_master,
-			    no_master, "TFTP",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AFP,
     			    no_master,
     			    no_master, "AFP",
@@ -1449,16 +1444,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     			    no_master, "Collectd",
     			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
     			    ndpi_build_default_ports(ports_b, 25826, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOCKS5,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOCKS,
 			    no_master,
-			    no_master, "SOCKS5",
+			    no_master, "SOCKS",
 			    ndpi_build_default_ports(ports_a, 1080, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 1080, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOCKS4,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TFTP,
     			    no_master,
-    			    no_master, "SOCKS4",
+    			    no_master, "TFTP",
     			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    			    ndpi_build_default_ports(ports_b, 69, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTMP,
 			    no_master,
 			    no_master, "RTMP",
@@ -2128,6 +2123,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* SOULSEEK */
   init_soulseek_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* SOCKS */
+  init_socks_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* IRC */
   init_irc_dissector(ndpi_struct, &a, detection_bitmask);

@@ -55,8 +55,8 @@
 #define NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC		110
 #define NDPI_PROTOCOL_HTTP_CONNECT				130
 #define NDPI_PROTOCOL_HTTP_PROXY				131
-#define NDPI_PROTOCOL_SOCKS5					172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_PROTOCOL_SOCKS4					173 /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_PROTOCOL_SOCKS					172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
+
 
 #define NDPI_PROTOCOL_FTP_CONTROL				1 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_MAIL_POP				        2
@@ -203,7 +203,7 @@
 #define NDPI_PROTOCOL_TEREDO 			                214
 #define NDPI_PROTOCOL_HEP 			                216 /* Sipcapture.org QXIP BV */
 #define NDPI_PROTOCOL_UBNTAC2					217 /* Ubiquity UBNT AirControl 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
-#define NDPI_PROTOCOL_MS_LYNC 			                221
+#define NDPI_PROTOCOL_MS_LYNC 			                173
 
 
 
@@ -271,7 +271,7 @@
 #define NDPI_SERVICE_CLOUDFLARE                         220
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_MS_LYNC
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_CLOUDFLARE
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

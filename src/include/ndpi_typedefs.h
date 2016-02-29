@@ -975,10 +975,8 @@ struct ndpi_flow_struct {
 #ifdef NDPI_PROTOCOL_FLORENSIA
   u_int32_t florensia_stage:1;
 #endif
-#ifdef NDPI_PROTOCOL_SOCKS5
+#ifdef NDPI_PROTOCOL_SOCKS
   u_int32_t socks5_stage:2;	                // 0 - 3
-#endif
-#ifdef NDPI_PROTOCOL_SOCKS4
   u_int32_t socks4_stage:2;	                // 0 - 3
 #endif
 #ifdef NDPI_PROTOCOL_EDONKEY

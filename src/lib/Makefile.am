@@ -111,8 +111,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/skype.c \
 		     protocols/smb.c \
 		     protocols/snmp.c \
-		     protocols/socks4.c \
-		     protocols/socks5.c \
+		     protocols/socks.c \
 		     protocols/socrates.c \
 		     protocols/sopcast.c \
 		     protocols/soulseek.c \
