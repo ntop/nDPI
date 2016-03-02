@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -31,7 +31,7 @@ static void ndpi_int_sip_add_connection(struct ndpi_detection_module_struct *ndp
 					u_int8_t due_to_correlation) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SIP, NDPI_PROTOCOL_UNKNOWN);
 }
-	
+
 #if !defined(WIN32)
 static inline
 #else
@@ -41,7 +41,7 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 			       *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  
+
   //      struct ndpi_id_struct         *src=ndpi_struct->src;
   //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
   const u_int8_t *packet_payload = packet->payload;
@@ -92,7 +92,7 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 	 * maybe it could be deleted, if somebody sees it in the first direction,
 	 * please delete this comment.
 	 */
-	
+
 	/*
 	if (memcmp(packet_payload, "SIP/2.0 200 OK", 14) == 0 || memcmp(packet_payload, "sip/2.0 200 OK", 14) == 0) {
 	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip SIP/2.0 0K.\n");
@@ -121,7 +121,7 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 	}
 
         if ((memcmp(packet_payload, "CANCEL ", 7) == 0 || memcmp(packet_payload, "cancel ", 7) == 0)
-	    && (memcmp(&packet_payload[4], "SIP:", 7) == 0 || memcmp(&packet_payload[4], "sip:", 7) == 0)) {
+	    && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
 	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip CANCEL.\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
