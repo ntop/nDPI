@@ -1161,8 +1161,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SIP,
 			    no_master,
 			    no_master, "SIP",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 5060, 0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_a, 5060, 5061, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 5060, 5061, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TRUPHONE,
 			    no_master,
 			    no_master, "TruPhone",
@@ -3196,10 +3196,16 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow) {
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
 
+  /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     if(flow->http_detected)
       ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_UNKNOWN);
-    else {
+    else if((flow->packet.l4_protocol == IPPROTO_TCP) && (flow->l4.tcp.ssl_stage > 1)) {
+      if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	ndpi_int_change_protocol(ndpi_struct, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_SSL);
+      else
+	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL, NDPI_PROTOCOL_UNKNOWN);
+    } else {
       flow->detected_protocol_stack[1] = flow->guessed_protocol_id, flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
 
       if(flow->detected_protocol_stack[1] == flow->detected_protocol_stack[0])
@@ -3911,6 +3917,9 @@ void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow,
 			      u_int16_t upper_detected_protocol,
 			      u_int16_t lower_detected_protocol) {
+  if(upper_detected_protocol == lower_detected_protocol)
+    lower_detected_protocol = NDPI_PROTOCOL_UNKNOWN;
+
   ndpi_int_change_flow_protocol(ndpi_struct, flow, upper_detected_protocol, lower_detected_protocol);
   ndpi_int_change_packet_protocol(ndpi_struct, flow, upper_detected_protocol, lower_detected_protocol);
 }

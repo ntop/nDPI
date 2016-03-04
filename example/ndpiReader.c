@@ -1086,7 +1086,10 @@ static unsigned int packet_processing(u_int16_t thread_id,
       snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s", flow->ndpi_flow->protos.ssl.client_certificate);
       snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
     }
-    
+
+    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN)
+      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[thread_id].ndpi_struct, flow->ndpi_flow);
+
     free_ndpi_flow(flow);
 
     if(verbose > 1) {
