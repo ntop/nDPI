@@ -116,7 +116,14 @@ extern "C" {
   void
   ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
 				       const NDPI_PROTOCOL_BITMASK * detection_bitmask);
+
   /**
+   * This function has to be called before we give up with detection for a given flow
+   */
+  ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
+				      struct ndpi_flow_struct *flow);
+
+    /**
    * This function will processes one packet and returns the ID of the detected protocol.
    * This is the main packet processing function.
    *

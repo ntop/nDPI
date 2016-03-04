@@ -653,6 +653,9 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
+    if((!flow->detection_completed) && flow->ndpi_flow)
+      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].ndpi_struct, flow->ndpi_flow);
+
     if(enable_protocol_guess) {
       if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
 	node_guess_undetected_protocol(thread_id, flow);
