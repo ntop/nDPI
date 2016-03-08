@@ -23,6 +23,27 @@
 static ndpi_network host_protocol_list[] = {
 
  /*    
+    Microsoft Corporation (MS One Drive)
+    204.79.195.0/24
+    204.79.196.0/23
+    134.170.0.0/16
+    131.253.12.0/22
+    131.253.16.0/23
+    131.253.18.0/24
+    65.54.191.0/24 
+  */
+  { 0xCC4FC300 /* 204.79.195.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0xCC4FC400 /* 204.79.196.0/23 */, 23, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x86AA0000 /* 134.170.0.0/16  */, 16, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x83FD0C00 /* 131.253.12.0/22 */, 22, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x83FD1000 /* 131.253.16.0/23 */, 23, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x83FD1200 /* 131.253.18.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
+
+
+  { 0x4136BF00 /* 65.54.191.0/24   */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
+
+
+ /*    
     Amazon-EU-AWS Elastic Compute Cloud, EC2 (also used by Netflix)
     46.137.128.0/18
   */
@@ -142,6 +163,7 @@ static ndpi_network host_protocol_list[] = {
   */
   { 0xADC20000 /* 173.194.0.0 */, 16, NDPI_SERVICE_GOOGLE },
   { 0x40E91600 /* 64.233.160.0 */, 19, NDPI_SERVICE_GOOGLE },
+
   /*
     Ubuntu One
     91.189.89.0/21 (255.255.248.0)
@@ -7471,9 +7493,14 @@ ndpi_protocol_match host_match[] = {
   { "tim-geoportal.geoportal3d.com.br", "TIM_PortasAbertas",    NDPI_SERVICE_TIMPORTASABERTAS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".m4u.com.br",                      "TIM_Recarga",          NDPI_SERVICE_TIMRECARGA, NDPI_PROTOCOL_ACCEPTABLE },
   { ".deezer.com",                      "Deezer",               NDPI_SERVICE_DEEZER, NDPI_PROTOCOL_ACCEPTABLE },
+
   { ".microsoft.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
+  { "bn1301.storage.live.com",          "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "skyapi.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "d.docs.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "update.microsoft.com",             "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".windowsupdate.com",               "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
+
   { "worldofwarcraft.com",              "WorldOfWarcraft",      NDPI_PROTOCOL_WORLDOFWARCRAFT, NDPI_PROTOCOL_FUN },
   { ".anchorfree.",                     "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
   { "hotspotshield.com",                "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
