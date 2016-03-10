@@ -33,6 +33,14 @@ extern "C" {
 #endif
 
   /**                                                                                                                                  
+   * This function check if a string is encoded with punycode
+
+   * ( https://tools.ietf.org/html/rfc3492 )                                                                                 
+   * @return 1 if the string is punycoded; else 0                                                                                           
+   */
+  int check_punycode_string(char * buff , int len);
+  
+  /**                                                                                                                                  
    * This function returns the size of the flow struct                                                                                 
    * @return the size of the flow struct                                                                                               
    */

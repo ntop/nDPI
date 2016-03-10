@@ -92,11 +92,12 @@ static void ndpi_int_ssl_add_connection(struct ndpi_detection_module_struct *ndp
                      ((ch) >= '{' && (ch) <= '~'))
 
 static void stripCertificateTrailer(char *buffer, int buffer_len) {
-  int i;
+
+  int i, is_puny;
 
   //  printf("->%s<-\n", buffer);
 
-  for(i=0; i<buffer_len; i++) {
+  for(i = 0; i < buffer_len; i++) {
     // printf("%c [%d]\n", buffer[i], buffer[i]);
 
     if((buffer[i] != '.')
@@ -110,21 +111,28 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
     }
   }
 
-  if(i > 0) i--;
-
-  while(i > 0) {
-    if(!ndpi_isalpha(buffer[i])) {
-      buffer[i] = '\0';
-      buffer_len = i;
-      i--;
-    } else
-      break;
-  }
-
-  for(i=buffer_len; i>0; i--) {
-    if(buffer[i] == '.') break;
-    else if(ndpi_isdigit(buffer[i]))
-      buffer[i] = '\0', buffer_len = i;
+  /* check for punycode encoding */
+  is_puny = check_punycode_string(buffer, buffer_len);
+  
+  // not a punycode string - need more checks
+  if(is_puny == 0) {
+    
+    if(i > 0) i--;
+    
+    while(i > 0) {
+      if(!ndpi_isalpha(buffer[i])) {
+	buffer[i] = '\0';
+	buffer_len = i;
+	i--;
+      } else
+	break;
+    }
+    
+    for(i = buffer_len; i > 0; i--) {    
+      if(buffer[i] == '.') break;
+      else if(ndpi_isdigit(buffer[i]))
+	buffer[i] = '\0', buffer_len = i;
+    }
   }
 }
 

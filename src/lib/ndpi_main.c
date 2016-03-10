@@ -38,6 +38,25 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/src/ndpi_patricia.c"
 
+
+/* implementation of the punycode check function */
+int check_punycode_string(char * buffer , int len)
+{
+  int i = 0;
+  
+  while(i++ < len)
+  {
+    if( buffer[i] == 'x' &&
+	buffer[i+1] == 'n' &&
+	buffer[i+2] == '-' &&
+	buffer[i+3] == '-' )
+      // is a punycode string
+      return 1;
+  }
+  // not a punycode string
+  return 0;
+}
+
 /* ftp://ftp.cc.uoc.gr/mirrors/OpenBSD/src/lib/libc/stdlib/tsearch.c */
 /* find or insert datum into search tree */
 void *
