@@ -159,11 +159,15 @@ static ndpi_network host_protocol_list[] = {
   /*
     Google
     173.194.0.0/16
+    74.125.0.0/16
     64.233.160.0/19
+    216.58.192.0/19
   */
   { 0xADC20000 /* 173.194.0.0 */, 16, NDPI_SERVICE_GOOGLE },
+  { 0x4A7D0000 /* 74.125.0.0  */, 16, NDPI_SERVICE_GOOGLE },
   { 0x40E91600 /* 64.233.160.0 */, 19, NDPI_SERVICE_GOOGLE },
-
+  { 0xD83AC000 /* 216.58.192.0 */, 19, NDPI_SERVICE_GOOGLE },
+  
   /*
     Ubuntu One
     91.189.89.0/21 (255.255.248.0)
