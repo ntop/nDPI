@@ -1575,13 +1575,13 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
 
 /* ******************************************* */
 
-u_int16_t ndpi_host_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t host /* network byte order */) {
-  struct in_addr pin;
+/* u_int16_t ndpi_host_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t host /\* network byte order *\/) { */
+/*   struct in_addr pin; */
 
-  pin.s_addr = host;
+/*   pin.s_addr = host; */
 
-  return(ndpi_network_ptree_match(ndpi_struct, &pin));
-}
+/*   return(ndpi_network_ptree_match(ndpi_struct, &pin)); */
+/* } */
 
 /* ******************************************* */
 
@@ -3906,27 +3906,27 @@ void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_s
   packet->detected_protocol_stack[0] = upper_detected_protocol, packet->detected_protocol_stack[1] = lower_detected_protocol;
 }
 
-/*
- * this function checks whether a protocol can be found in the
- * history. Actually it accesses the packet stack since this is what
- * leaves the library but it could also use the flow stack.
- */
-u_int8_t ndpi_detection_flow_protocol_history_contains_protocol(struct ndpi_detection_module_struct * ndpi_struct,
-								struct ndpi_flow_struct *flow,
-								u_int16_t protocol_id) {
-  u_int8_t a;
-  struct ndpi_packet_struct *packet = &flow->packet;
+/* /\* */
+/*  * this function checks whether a protocol can be found in the */
+/*  * history. Actually it accesses the packet stack since this is what */
+/*  * leaves the library but it could also use the flow stack. */
+/*  *\/ */
+/* u_int8_t ndpi_detection_flow_protocol_history_contains_protocol(struct ndpi_detection_module_struct * ndpi_struct, */
+/* 								struct ndpi_flow_struct *flow, */
+/* 								u_int16_t protocol_id) { */
+/*   u_int8_t a; */
+/*   struct ndpi_packet_struct *packet = &flow->packet; */
 
-  if(!packet)
-    return 0;
+/*   if(!packet) */
+/*     return 0; */
 
-  for(a = 0; a < NDPI_PROTOCOL_HISTORY_SIZE; a++) {
-    if(packet->detected_protocol_stack[a] == protocol_id)
-      return 1;
-  }
+/*   for(a = 0; a < NDPI_PROTOCOL_HISTORY_SIZE; a++) { */
+/*     if(packet->detected_protocol_stack[a] == protocol_id) */
+/*       return 1; */
+/*   } */
 
-  return 0;
-}
+/*   return 0; */
+/* } */
 
 /* generic function for changing the protocol
  *
@@ -4131,7 +4131,7 @@ u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str, u_int16_t max_ch
 /* ****************************************************** */
 
 ndpi_protocol ndpi_find_port_based_protocol(struct ndpi_detection_module_struct *ndpi_struct /* NOTUSED */,
-					    u_int8_t proto,
+					    /* u_int8_t proto, */
 					    u_int32_t shost, u_int16_t sport,
 					    u_int32_t dhost, u_int16_t dport) {
   ndpi_protocol p = NDPI_PROTOCOL_NULL;
@@ -4191,7 +4191,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 	return(ret);
     }
 
-    ret = ndpi_find_port_based_protocol(ndpi_struct, proto, shost, sport, dhost, dport);
+    ret = ndpi_find_port_based_protocol(ndpi_struct/* , proto */, shost, sport, dhost, dport);
     if(ret.protocol != NDPI_PROTOCOL_UNKNOWN)
       return(ret);
 
