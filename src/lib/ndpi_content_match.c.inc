@@ -116,10 +116,16 @@ static ndpi_network host_protocol_list[] = {
   { 0x4272A000 /* 66.114.160.0 */, 20, NDPI_PROTOCOL_WEBEX },
 
   /*
-    Viber
-    54.171.62.0/24
+    Viber Media AWS-VIBER-MEDIA (NET-54-169-63-160-1) 54.169.63.160 - 54.169.63.191
+    Viber Media S a r l AWS-VIBER-MEDIA-S-A-R-L (NET-54-93-255-64-1) 54.93.255.64 - 54.93.255.127
+    Crittercism AWS-VIBER-MEDIA (NET-52-0-252-0-1) 52.0.252.0 - 52.0.255.255
+    54.169.63.160/27
+    54.93.255.64/26
+    52.0.252.0/22
   */
-  { 0x36AB3E00 /* 54.171.62.0 */, 24, NDPI_PROTOCOL_VIBER },
+  { 0x36A93FA0 /* 54.169.63.160 */, 27, NDPI_PROTOCOL_VIBER },
+  { 0x365DFF40 /* 54.93.255.64 */, 26, NDPI_PROTOCOL_VIBER },
+  { 0x3400FC00 /* 52.0.252.0 */, 22, NDPI_PROTOCOL_VIBER },
 
   /*
     Apple (FaceTime, iMessage,...)
@@ -7444,6 +7450,7 @@ ndpi_protocol_match host_match[] = {
   { "twitter.",				"Twitter",		NDPI_SERVICE_TWITTER, NDPI_PROTOCOL_ACCEPTABLE },
   { "twimg.com",			"Twitter",		NDPI_SERVICE_TWITTER, NDPI_PROTOCOL_ACCEPTABLE },
   { ".viber.com",			"Viber",		NDPI_SERVICE_VIBER, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".cdn.viber.com",			"Viber",		NDPI_SERVICE_VIBER, NDPI_PROTOCOL_ACCEPTABLE },  
   { "wikipedia.",			"Wikipedia",		NDPI_SERVICE_WIKIPEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "wikimedia.",			"Wikipedia",		NDPI_SERVICE_WIKIPEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "mediawiki.",			"Wikipedia",		NDPI_SERVICE_WIKIPEDIA, NDPI_PROTOCOL_ACCEPTABLE },

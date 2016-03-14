@@ -232,15 +232,15 @@
 #define NDPI_SERVICE_APPLE_ICLOUD			143
 #define NDPI_SERVICE_APPLE_ITUNES			145
 #define NDPI_SERVICE_TUENTI				149
-#define NDPI_SERVICE_WIKIPEDIA				176 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_MSN				NDPI_PROTOCOL_MSN /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_AMAZON				178 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_EBAY				179 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_CNN				180 /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_WIKIPEDIA				176                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_MSN				NDPI_PROTOCOL_MSN     /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_AMAZON				178                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_EBAY				179                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_CNN				180                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_SERVICE_DROPBOX				NDPI_PROTOCOL_DROPBOX /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_SKYPE				NDPI_PROTOCOL_SKYPE /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_VIBER				NDPI_PROTOCOL_VIBER /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_YAHOO				NDPI_PROTOCOL_YAHOO /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_SKYPE				NDPI_PROTOCOL_SKYPE   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_VIBER				NDPI_PROTOCOL_VIBER
+#define NDPI_SERVICE_YAHOO				NDPI_PROTOCOL_YAHOO   /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_SERVICE_PANDORA     			187
 #define NDPI_PROTOCOL_EAQ        			190
 #define NDPI_SERVICE_TIMMEU        			191

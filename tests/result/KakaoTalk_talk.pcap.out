@@ -3,9 +3,9 @@ HTTP	5	280	1
 QQ	15	1727	1
 SSL_No_Cert	74	14132	2
 RTP	2991	398751	2
-SSL	10	1517	5
+SSL	8	1378	3
 Facebook	2	197	1
-Google	2	220	2
+Google	4	359	4
 HTTP_Proxy	16	1838	2
 Tor	40	10538	1
 KakaoTalk_Voice	44	6196	2
@@ -27,8 +27,8 @@ KakaoTalk_Voice	44	6196	2
 	15	UDP 1.201.1.174:23046 <-> 10.24.82.188:10268 [proto: 87/RTP][1488 pkts/198510 bytes]
 	16	UDP 1.201.1.174:23045 <-> 10.24.82.188:11321 [proto: 194/KakaoTalk_Voice][22 pkts/3084 bytes]
 	17	UDP 1.201.1.174:23044 <-> 10.24.82.188:11320 [proto: 87/RTP][1503 pkts/200241 bytes]
-	18	TCP 216.58.220.174:443 <-> 10.24.82.188:49217 [proto: 91/SSL][1 pkts/83 bytes]
-	19	TCP 216.58.220.161:443 <-> 10.24.82.188:56697 [proto: 91/SSL][1 pkts/56 bytes]
+	18	TCP 216.58.220.174:443 <-> 10.24.82.188:49217 [proto: 91.126/SSL.Google][1 pkts/83 bytes]
+	19	TCP 216.58.220.161:443 <-> 10.24.82.188:56697 [proto: 91.126/SSL.Google][1 pkts/56 bytes]
 
 
 Undetected flows:

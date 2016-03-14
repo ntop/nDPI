@@ -5,8 +5,8 @@ SSDP	11	4984	1
 HTTPDownload	179	134204	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
-SSL	43	2903	13
-Google	12	1467	2
+SSL	41	2782	12
+Google	14	1588	3
 Quic	6	475	1
 Starcraft	236	51494	6
 
@@ -23,7 +23,7 @@ Starcraft	236	51494	6
 	11	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91.126/SSL.Google][3 pkts/168 bytes]
 	12	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/SSL][4 pkts/228 bytes]
 	13	UDP 192.168.1.100:53146 <-> 5.42.180.154:1119 [proto: 213/Starcraft][2 pkts/104 bytes]
-	14	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91/SSL][2 pkts/121 bytes]
+	14	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91.126/SSL.Google][2 pkts/121 bytes]
 	15	TCP 192.168.1.100:3528 <-> 2.228.46.112:80 [proto: 7/HTTP][29 pkts/25105 bytes][Host: bnetcmsus-a.akamaihd.net]
 	16	TCP 192.168.1.100:3530 <-> 2.228.46.112:80 [proto: 7/HTTP][29 pkts/25102 bytes][Host: bnetcmsus-a.akamaihd.net]
 	17	TCP 192.168.1.100:3532 <-> 2.228.46.112:80 [proto: 7/HTTP][4 pkts/386 bytes]
