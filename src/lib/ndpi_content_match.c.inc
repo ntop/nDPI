@@ -148,12 +148,15 @@ static ndpi_network host_protocol_list[] = {
     157.56.0.0/14, 157.60.0.0/16, 157.54.0.0/15
     111.221.64.0 - 111.221.127.255
     91.190.216.0/21 (AS198015 Skype Communications Sarl)
+    40.126.129.109/32
   */
   { 0x9D380000 /* 157.56.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
   { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
   { 0x5BBED800 /* 91.190.216.0 */, 21, NDPI_PROTOCOL_SKYPE },
+  { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
+  
 
   /*
     route:          5.42.160.0/19
@@ -202,7 +205,7 @@ static ndpi_network host_protocol_list[] = {
   /* 
     The Skype list below looks outdated and it is temporarely
     commented and probably harvested in future releases
-  */    
+  */
 #if 0
   /* Skype */
   { 0x17600000, 14, NDPI_PROTOCOL_SKYPE },
@@ -7445,6 +7448,8 @@ ndpi_protocol_match host_match[] = {
   { ".skypeassets.",			"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypedata.",			"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypeecs-", /* no final . */	"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".skypeforbusiness.",       	"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".lync.com",   	                "Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".tuenti.com",			"Tuenti",		NDPI_SERVICE_TUENTI, NDPI_PROTOCOL_ACCEPTABLE },
   { ".twttr.com",			"Twitter",		NDPI_SERVICE_TWITTER, NDPI_PROTOCOL_ACCEPTABLE },
   { "twitter.",				"Twitter",		NDPI_SERVICE_TWITTER, NDPI_PROTOCOL_ACCEPTABLE },
