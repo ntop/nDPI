@@ -60,39 +60,40 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   if((s_port == 53 || d_port == 53 || d_port == 5355)
      && (flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header)))
   {
-    struct ndpi_dns_packet_header *dns_header = (struct ndpi_dns_packet_header*) &flow->packet.payload[x];
+    struct ndpi_dns_packet_header dns_header;
     int invalid = 0;
 
-    dns_header->tr_id = ntohs(dns_header->tr_id);
-    dns_header->flags = ntohs(dns_header->flags);
-    dns_header->num_queries = ntohs(dns_header->num_queries);
-    dns_header->num_answers = ntohs(dns_header->num_answers);
-    dns_header->authority_rrs = ntohs(dns_header->authority_rrs);
-    dns_header->additional_rrs = ntohs(dns_header->additional_rrs);
+    memcpy(&dns_header, (struct ndpi_dns_packet_header*) &flow->packet.payload[x], sizeof(struct ndpi_dns_packet_header));
+    dns_header.tr_id = ntohs(dns_header.tr_id);
+    dns_header.flags = ntohs(dns_header.flags);
+    dns_header.num_queries = ntohs(dns_header.num_queries);
+    dns_header.num_answers = ntohs(dns_header.num_answers);
+    dns_header.authority_rrs = ntohs(dns_header.authority_rrs);
+    dns_header.additional_rrs = ntohs(dns_header.additional_rrs);
 
     /* 0x0000 QUERY */
-    if((dns_header->flags & FLAGS_MASK) == 0x0000)
+    if((dns_header.flags & FLAGS_MASK) == 0x0000)
       is_query = 1;
     /* 0x8000 RESPONSE */
-    else if((dns_header->flags & FLAGS_MASK) != 0x8000)
+    else if((dns_header.flags & FLAGS_MASK) != 0x8000)
       is_query = 0;
     else
       invalid = 1;
 
     if(is_query) {
       /* DNS Request */
-      if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
-         && (((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
-             || ((dns_header->num_answers == 0) && (dns_header->authority_rrs == 0)))) {
+      if((dns_header.num_queries > 0) && (dns_header.num_queries <= NDPI_MAX_DNS_REQUESTS)
+         && (((dns_header.flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
+             || ((dns_header.num_answers == 0) && (dns_header.authority_rrs == 0)))) {
         /* This is a good query */
       } else
 	invalid = 1;
     } else {
       /* DNS Reply */
-      if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
-         && (((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
-             || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
-             || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
+      if((dns_header.num_queries > 0) && (dns_header.num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
+         && (((dns_header.num_answers > 0) && (dns_header.num_answers <= NDPI_MAX_DNS_REQUESTS))
+             || ((dns_header.authority_rrs > 0) && (dns_header.authority_rrs <= NDPI_MAX_DNS_REQUESTS))
+             || ((dns_header.additional_rrs > 0) && (dns_header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
          ) {
 	/* This is a good reply */
       } else
@@ -106,7 +107,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     }
 
     /* extract host name server */
-    ret_code = (is_query == 0) ? 0 : (dns_header->flags & 0x0F);
+    ret_code = (is_query == 0) ? 0 : (dns_header.flags & 0x0F);
     int j = 0;
     int off = sizeof(struct ndpi_dns_packet_header) + 1;
     while((flow->packet.payload[off] != '\0'))
@@ -119,7 +120,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     }
     flow->host_server_name[j] = '\0';
 
-    flow->protos.dns.num_answers = (u_int8_t) (dns_header->num_answers + dns_header->authority_rrs + dns_header->additional_rrs);
+    flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
     flow->protos.dns.ret_code = ret_code;
 
     if(j > 0)
