@@ -30,6 +30,27 @@
 
 #define NDPI_PROTOCOL_PLAIN_DETECTION 	0
 #define NDPI_PROTOCOL_WEBSEED_DETECTION 	2
+
+
+struct ndpi_utp_hdr {
+  u_int8_t h_version:4, h_type:4, next_extension;
+  u_int16_t connection_id;
+  u_int32_t ts_usec, tdiff_usec, window_size;
+  u_int16_t sequence_nr, ack_nr;
+};
+
+static u_int8_t is_utp_pkt(const u_int8_t *payload, u_int payload_len) {
+  struct ndpi_utp_hdr *h = (struct ndpi_utp_hdr*)payload;
+
+  if(payload_len < sizeof(struct ndpi_utp_hdr)) return(0);
+  if(h->h_version != 1)             return(0);
+  if(h->h_type > 4)                 return(0);
+  if(h->next_extension > 2)         return(0);
+  if(ntohl(h->window_size) > 65565) return(0);
+
+  return(1);
+}
+
 static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
 					      int bt_offset, int check_hash,
 					      const u_int8_t save_detection, const u_int8_t encrypted_connection/* , */
@@ -76,7 +97,6 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
       return 1;
     }
   }
-
 
   if(packet->payload_packet_len > 20) {
     /* test for match 0x13+"BitTorrent protocol" */
@@ -428,7 +448,9 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	  u_int8_t v1_extension   = packet->payload[1];
 	  u_int32_t v1_window_size = *((u_int32_t*)&packet->payload[12]);
 
-	  if((packet->payload[0]== 0x60)
+	  if(is_utp_pkt(packet->payload, packet->payload_packet_len))
+	    goto bittorrent_found;
+	  else if((packet->payload[0]== 0x60)
 	     && (packet->payload[1]== 0x0)
 	     && (packet->payload[2]== 0x0)
 	     && (packet->payload[3]== 0x0)
@@ -443,8 +465,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 		    ) {
 	    bt_proto = ndpi_strnstr((const char *)&packet->payload[20], "BitTorrent protocol", packet->payload_packet_len-20);
 	    goto bittorrent_found;
-	  } else if((v0_flags < 6 /* ST_NUM_STATES */)
-		    && (v0_extension < 3 /* EXT_NUM_EXT */)) {
+	  } else if((v0_flags < 6 /* ST_NUM_STATES */) && (v0_extension < 3 /* EXT_NUM_EXT */)) {
 	    u_int32_t ts = ntohl(*((u_int32_t*)&(packet->payload[4])));
 	    u_int32_t now;
 
