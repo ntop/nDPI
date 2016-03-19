@@ -80,24 +80,26 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     else
       invalid = 1;
 
-    if(is_query) {
-      /* DNS Request */
-      if((dns_header.num_queries > 0) && (dns_header.num_queries <= NDPI_MAX_DNS_REQUESTS)
-         && (((dns_header.flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
-             || ((dns_header.num_answers == 0) && (dns_header.authority_rrs == 0)))) {
-        /* This is a good query */
-      } else
-	invalid = 1;
-    } else {
-      /* DNS Reply */
-      if((dns_header.num_queries > 0) && (dns_header.num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
-         && (((dns_header.num_answers > 0) && (dns_header.num_answers <= NDPI_MAX_DNS_REQUESTS))
-             || ((dns_header.authority_rrs > 0) && (dns_header.authority_rrs <= NDPI_MAX_DNS_REQUESTS))
-             || ((dns_header.additional_rrs > 0) && (dns_header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
-         ) {
-	/* This is a good reply */
-      } else
-	invalid = 1;
+    if(!invalid) {
+      if(is_query) {
+	/* DNS Request */
+	if((dns_header.num_queries > 0) && (dns_header.num_queries <= NDPI_MAX_DNS_REQUESTS)
+	   && (((dns_header.flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
+	       || ((dns_header.num_answers == 0) && (dns_header.authority_rrs == 0)))) {
+	  /* This is a good query */
+	} else
+	  invalid = 1;
+      } else {
+	/* DNS Reply */
+	if((dns_header.num_queries > 0) && (dns_header.num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
+	   && (((dns_header.num_answers > 0) && (dns_header.num_answers <= NDPI_MAX_DNS_REQUESTS))
+	       || ((dns_header.authority_rrs > 0) && (dns_header.authority_rrs <= NDPI_MAX_DNS_REQUESTS))
+	       || ((dns_header.additional_rrs > 0) && (dns_header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
+	   ) {
+	  /* This is a good reply */
+	} else
+	  invalid = 1;
+      }
     }
 
     if(invalid) {
