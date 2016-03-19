@@ -75,13 +75,13 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
 			return;
 		}
 		if ((class == 0) && ((detail == 1) || (detail == 2 ) || (detail == 3 ) || (detail == 4 ))) {
-			// we should probably search for options as well and payload
+			// we should probably search for options as well and payload for deeper inspection
 			NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Coap found ... req message\n");
 			ndpi_int_coap_add_connection(ndpi_struct,flow);
 			return;
 		}
 		if ((class == 2) || (class == 4) || (class == 5)) {
-			// we should probably search for options and payload
+			// we should probably search for options as well and payload for deeper inspection
 			NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Coap found ... resp message\n");
 			ndpi_int_coap_add_connection(ndpi_struct,flow);
 			return;
