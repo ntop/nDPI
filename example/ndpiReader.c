@@ -113,7 +113,7 @@ static u_int8_t undetected_flows_deleted = 0;
 /**
  * User preferences
  */
-static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 2, json_flag = 0;
+static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
