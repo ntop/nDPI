@@ -345,6 +345,14 @@ typedef enum {
   HTTP_METHOD_CONNECT
 } ndpi_http_method;
 
+typedef enum {
+  COAP_METHOD_UNKNOWN = 0,
+  COAP_METHOD_GET,
+  COAP_METHOD_POST,
+  COAP_METHOD_PUT,
+  COAP_METHOD_DELETE
+} ndpi_coap_method;
+
 struct ndpi_id_struct {
   /**
      detected_protocol_bitmask:
@@ -576,6 +584,9 @@ struct ndpi_flow_tcp_struct {
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
 #endif
+#ifdef NDPI_PROTOCOL_MQTT
+  u_int8_t mqtt_stage:2;
+#endif
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
@@ -624,6 +635,9 @@ struct ndpi_flow_udp_struct {
 #ifdef NDPI_PROTOCOL_EAQ
   u_int8_t eaq_pkt_id;
   u_int32_t eaq_sequence;
+#endif
+#ifdef NDPI_PROTOCOL_COAP
+  u_int32_t coap_stage:2;
 #endif
 }
 #ifndef WIN32
@@ -906,6 +920,11 @@ struct ndpi_flow_struct {
     ndpi_http_method method;
     char *url, *content_type;
   } http;
+
+  struct {
+    ndpi_coap_method method;
+    char *url, *content_type;
+  } coap;
 
   union {
 
