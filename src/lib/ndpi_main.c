@@ -819,11 +819,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Socrates",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_WINMX,
-			    no_master,
-			    no_master, "WinMX",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VMWARE,
 			    no_master,
 			    no_master, "VMware",
@@ -2131,9 +2126,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* GNUTELLA */
   init_gnutella_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* WINMX */
-  init_winmx_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* DIRECTCONNECT */
   init_directconnect_dissector(ndpi_struct, &a, detection_bitmask);
