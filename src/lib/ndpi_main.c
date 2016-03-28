@@ -1516,12 +1516,12 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER,
 			    no_master,
 			    no_master, "Viber",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	     /* TCP */
-			    ndpi_build_default_ports(ports_b, 7985, 7987, 0, 0, 0));    /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod,NDPI_PROTOCOL_ACCEPTABLE,NDPI_PROTOCOL_COAP,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
+			    ndpi_build_default_ports(ports_b, 7985, 7987, 0, 0, 0));  /* UDP */
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_COAP,
 			    no_master,
 			    no_master, "COAP",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
 			    ndpi_build_default_ports(ports_b, 5683, 5684, 0, 0, 0));  /* UDP */
 
     /* calling function for host and content matched protocols */
@@ -3287,7 +3287,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   ndpi_connection_tracking(ndpi_struct, flow);
 
-  /* build ndpi_selction packet bitmask */
+  /* build ndpi_selection packet bitmask */
   ndpi_selection_packet = NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC;
   if(flow->packet.iph != NULL)
     ndpi_selection_packet |= NDPI_SELECTION_BITMASK_PROTOCOL_IP | NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6;
