@@ -114,11 +114,17 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     int off = sizeof(struct ndpi_dns_packet_header) + 1;
     while((flow->packet.payload[off] != '\0'))
     {
-      flow->host_server_name[j] = flow->packet.payload[off];
-      if(flow->host_server_name[j] < ' ')
-	flow->host_server_name[j] = '.';
-      off++;
-      j++;
+      if(off < flow->packet.payload_packet_len)
+      {
+	flow->host_server_name[j] = flow->packet.payload[off];
+	if(j < strlen(flow->host_server_name))
+	{
+	  if(flow->host_server_name[j] < ' ')
+	    flow->host_server_name[j] = '.';
+	  off++;
+	  j++;
+	}
+      }
     }
     flow->host_server_name[j] = '\0';
 

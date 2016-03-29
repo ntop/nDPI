@@ -3083,6 +3083,7 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 				   detection_bitmask) != 0) {
 	  ndpi_struct->callback_buffer_tcp_payload[a].func(ndpi_struct, flow);
 
+
 	  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	    break; /* Stop after detecting the first protocol */
 	}
