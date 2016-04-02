@@ -45,12 +45,11 @@ enum MQTT_PACKET_TYPES {
 	DISCONNECT = 14
 };
 
-
 /**
  * Entry point when protocol is identified.
  */
 static void ndpi_int_mqtt_add_connection (struct ndpi_detection_module_struct *ndpi_struct,
-			      struct ndpi_flow_struct *flow)
+		struct ndpi_flow_struct *flow)
 {
 	ndpi_set_detected_protocol(ndpi_struct,flow,NDPI_PROTOCOL_MQTT,NDPI_PROTOCOL_UNKNOWN);
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found.\n");
@@ -60,7 +59,7 @@ static void ndpi_int_mqtt_add_connection (struct ndpi_detection_module_struct *n
  * Dissector function that searches Mqtt headers
  */
 void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
-		       struct ndpi_flow_struct *flow)
+		struct ndpi_flow_struct *flow)
 {
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt search called...\n");
 	struct ndpi_packet_struct *packet = &flow->packet;
@@ -68,7 +67,7 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 		return;
 	}
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt detection...\n");
-	if  (flow->packet_counter > 10) {
+	if (flow->packet_counter > 10) {
 		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt .. mandatory header not found!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 		return;
@@ -93,14 +92,12 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 	u_int8_t flags = (u_int8_t) (packet->payload[0] & 0x0F);
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> Mqtt flags type: [%d]\n",flags);
 	// first stage verification
-	if ((pt == CONNECT) || (pt == CONNACK) || (pt == PUBACK) || (pt == PUBREC) ||
-		  (pt == PUBCOMP) || (pt == SUBACK) || (pt == UNSUBACK) || (pt == PINGREQ) ||
-		  (pt == PINGRESP) || (pt == DISCONNECT)) {
-		if (flags > 0) {
-			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Flag combination flag!=0\n");
-			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-			return;
-		}
+	if (((pt == CONNECT) || (pt == CONNACK) || (pt == PUBACK) || (pt == PUBREC) ||
+					(pt == PUBCOMP) || (pt == SUBACK) || (pt == UNSUBACK) || (pt == PINGREQ) ||
+					(pt == PINGRESP) || (pt == DISCONNECT)) && (flags > 0)) {
+		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Flag combination flag!=0\n");
+		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+		return;
 	}
 	if (((pt == PUBREL) || (pt == SUBSCRIBE) || (pt == UNSUBSCRIBE)) && (flags != 2)) {
 		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Flag combination flag!=2\n");
@@ -108,30 +105,33 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 		return;
 	}
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> Passed first stage of identification\n");
-	// second stage verification (no payload)
-	if (((pt == CONNACK) || (pt == PUBACK) || (pt == PUBREL) ||
-		(pt == PUBREC) || (pt == PUBCOMP) || (pt == UNSUBACK)) && (packet->payload_packet_len > 4)){
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Length < 4 \n");
-		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-		return;
-	} else {
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found \n");
-		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
-		return;
+	// second stage verification (no payload, just variable headers)
+	if ((pt == CONNACK) || (pt == PUBACK) || (pt == PUBREL) ||
+			(pt == PUBREC) || (pt == PUBCOMP) || (pt == UNSUBACK)) {
+		if (packet->payload_packet_len != 4) { // these packets are always 4 bytes long
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Length < 4 \n");
+			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+			return;
+		} else {
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found CONNACK/PUBACK/PUBREL/PUBREC/PUBCOMP/UNSUBACK\n");
+			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+			return;
+		}
 	}
-	if (((pt == PINGREQ) || (pt == PINGRESP) || (pt == DISCONNECT)) && (packet->payload_packet_len > 2))
-	{
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Length <2 \n");
-		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-		return;
-	} else {
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found PING/PINGRESP/DISCONNECT\n");
-		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
-		return;
+	if ((pt == PINGREQ) || (pt == PINGRESP) || (pt == DISCONNECT)) {
+		if (packet->payload_packet_len != 2) { // these packets are always 2 bytes long
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid Packet-Length <2 \n");
+			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+			return;
+		} else {
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found PING/PINGRESP/DISCONNECT\n");
+			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+			return;
+		}
 	}
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> Passed second stage of identification\n");
 	// third stage verification (payload)
-	if ((pt == CONNECT) && (memcmp(&(packet->payload[4]),"MQTT",4) == 0) ){
+	if ((pt == CONNECT) && (memcmp(&(packet->payload[4]),"MQTT",4) == 0) ) {
 		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found CONNECT\n");
 		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
 		return;
@@ -140,19 +140,19 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 		return;
 	}
-	if (pt == PUBLISH){
+	if (pt == PUBLISH) {
 		u_int8_t qos = (u_int8_t) (flags & 0x06);
-		if (((qos == 1) || (qos == 2)) && (packet->payload_packet_len < 4)){ // at least topic + pkt identifier
+		if (((qos == 1) || (qos == 2)) && (packet->payload_packet_len < 4)) { // at least topic + pkt identifier
 			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid PUBLISH qos1&2\n");
 			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 			return;
 		}
-		if ((qos == 0) && (packet->payload_packet_len < 3)){ // at least topic
+		if ((qos == 0) && (packet->payload_packet_len < 3)) { // at least topic
 			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid PUBLISH qos0\n");
 			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 			return;
 		}
-		if ((qos == 3)){ // this should never happen
+		if ((qos == 3)) { // this should never happen
 			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid PUBLISH qos3\n");
 			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 			return;
@@ -160,36 +160,39 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found PUBLISH\n");
 		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
 		return;
-
 	}
-	if ((pt == SUBSCRIBE) && (packet->payload_packet_len < 8)){ // at least one topic+filter is required in the payload
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid SUBSCRIBE\n");
-		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-		return;
-	} else {
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found SUBSCRIBE\n");
-		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
-		return;
+	if (pt == SUBSCRIBE) {
+		if (packet->payload_packet_len < 8) { // at least one topic+filter is required in the payload
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid SUBSCRIBE\n");
+			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+			return;
+		} else {
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found SUBSCRIBE\n");
+			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+			return;
+		}
 	}
-
-	if ((pt == SUBACK ) && (packet->payload_packet_len <5 )){ // must have at least a response code
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid SUBACK\n");
-		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-		return;
-	} else {
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found SUBACK\n");
-		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
-		return;
+	if (pt == SUBACK ) {
+		if (packet->payload_packet_len <5 ) { // must have at least a response code
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid SUBACK\n");
+			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+			return;
+		} else {
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found SUBACK\n");
+			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+			return;
+		}
 	}
-
-	if ((pt == UNSUBSCRIBE) && (packet->payload_packet_len < 7)) { // at least a topic
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid UNSUBSCRIBE\n");
-		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-		return;
-	} else {
-		NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found UNSUBSCRIBE\n",pt);
-		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
-		return;
+	if (pt == UNSUBSCRIBE) {
+		if (packet->payload_packet_len < 7) { // at least a topic
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Mqtt invalid UNSUBSCRIBE\n");
+			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
+			return;
+		} else {
+			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found UNSUBSCRIBE\n",pt);
+			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+			return;
+		}
 	}
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> Passed third stage of identification");
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Reached the end excluding Mqtt ...\n");
@@ -200,15 +203,15 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
  * Entry point for the ndpi library
  */
 void init_mqtt_dissector (struct ndpi_detection_module_struct *ndpi_struct,
-		     u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+		u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt dissector init...\n");
-  ndpi_set_bitmask_protocol_detection ("MQTT", ndpi_struct, detection_bitmask, *id,
-				       NDPI_PROTOCOL_MQTT,
-				       ndpi_search_mqtt,
-				       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				       SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
-  *id +=1;
+	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt dissector init...\n");
+	ndpi_set_bitmask_protocol_detection ("MQTT", ndpi_struct, detection_bitmask, *id,
+			NDPI_PROTOCOL_MQTT,
+			ndpi_search_mqtt,
+			NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+			SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
+	*id +=1;
 }
 
 #endif // NDPI_PROTOCOL_MQTT
