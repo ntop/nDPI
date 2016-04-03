@@ -58,17 +58,6 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
     }
-    if((packet->udp->dest == dropbox_port)) {
-      if(payload_len > 2) {
-	char * p = (char *) packet->payload;
-	while(*p++ != '{');
-	if(strncmp(p,"\"messageType\"", 13) == 0) {
-	  NDPI_LOG(NDPI_PROTOCOL_DROPBOX, ndpi_struct, NDPI_LOG_DEBUG, "Found dropbox.\n");
-	  ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-      }
-    }
   }
   
   NDPI_LOG(NDPI_PROTOCOL_DROPBOX, ndpi_struct, NDPI_LOG_DEBUG, "exclude dropbox.\n");
