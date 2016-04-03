@@ -819,11 +819,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Socrates",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_WINMX,
-			    no_master,
-			    no_master, "WinMX",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VMWARE,
 			    no_master,
 			    no_master, "VMware",
@@ -868,7 +863,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     			    no_master,
     			    no_master, "BitTorrent",
     			    ndpi_build_default_ports(ports_a, 51413, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 6771, 0, 0, 0, 0) /* UDP */);
+    			    ndpi_build_default_ports(ports_b, 6771, 51413, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEREDO,
     			    no_master,
     			    no_master, "Teredo",
@@ -1521,13 +1516,13 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER,
 			    no_master,
 			    no_master, "Viber",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	     /* TCP */
-			    ndpi_build_default_ports(ports_b, 7985, 7987, 0, 0, 0));    /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod,NDPI_PROTOCOL_ACCEPTABLE,NDPI_PROTOCOL_COAP,
-    		    no_master,
-				no_master, "COAP",
-				ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
-				ndpi_build_default_ports(ports_b, 5683, 5684, 0, 0, 0));  /* UDP */
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
+			    ndpi_build_default_ports(ports_b, 7985, 7987, 0, 0, 0));  /* UDP */
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_COAP,
+			    no_master,
+			    no_master, "COAP",
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			    ndpi_build_default_ports(ports_b, 5683, 5684, 0, 0, 0));  /* UDP */
     ndpi_set_proto_defaults(ndpi_mod,NDPI_PROTOCOL_ACCEPTABLE,NDPI_PROTOCOL_MQTT,
     		    no_master,
 				no_master, "MQTT",
@@ -2136,9 +2131,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* GNUTELLA */
   init_gnutella_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* WINMX */
-  init_winmx_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* DIRECTCONNECT */
   init_directconnect_dissector(ndpi_struct, &a, detection_bitmask);
@@ -3099,6 +3091,7 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 				   detection_bitmask) != 0) {
 	  ndpi_struct->callback_buffer_tcp_payload[a].func(ndpi_struct, flow);
 
+
 	  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	    break; /* Stop after detecting the first protocol */
 	}
@@ -3303,7 +3296,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   ndpi_connection_tracking(ndpi_struct, flow);
 
-  /* build ndpi_selction packet bitmask */
+  /* build ndpi_selection packet bitmask */
   ndpi_selection_packet = NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC;
   if(flow->packet.iph != NULL)
     ndpi_selection_packet |= NDPI_SELECTION_BITMASK_PROTOCOL_IP | NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6;

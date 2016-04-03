@@ -474,9 +474,6 @@ struct ndpi_flow_tcp_struct {
   u_int32_t irc_direction:2;
   u_int32_t irc_0x1000_full:1;
 #endif
-#ifdef NDPI_PROTOCOL_WINMX
-  u_int32_t winmx_stage:1;		      // 0 - 1
-#endif
 #ifdef NDPI_PROTOCOL_SOULSEEK
   u_int32_t soulseek_stage:2;
 #endif

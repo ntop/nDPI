@@ -83,7 +83,7 @@
 #define NDPI_PROTOCOL_APPLEJUICE				24
 #define NDPI_PROTOCOL_DIRECTCONNECT				25
 #define NDPI_PROTOCOL_SOCRATES				        26
-#define NDPI_PROTOCOL_WINMX					27
+#define NDPI_PROTOCOL_COAP                                      27
 #define NDPI_PROTOCOL_VMWARE					28
 #define NDPI_PROTOCOL_MAIL_SMTPS				29
 #define NDPI_PROTOCOL_FILETOPIA				        30
@@ -270,9 +270,7 @@
 #define NDPI_SERVICE_OFFICE_365                         219
 #define NDPI_SERVICE_CLOUDFLARE                         220
 #define NDPI_SERVICE_MS_ONE_DRIVE                       221
-#define NDPI_PROTOCOL_COAP                              222
-#define NDPI_PROTOCOL_MQTT								223
-
+#define NDPI_PROTOCOL_MQTT								222
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_MQTT
 

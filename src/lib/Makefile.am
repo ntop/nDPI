@@ -145,7 +145,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/vnc.c \
 		     protocols/warcraft3.c \
 		     protocols/whoisdas.c \
-		     protocols/winmx.c \
 		     protocols/world_of_kung_fu.c \
 		     protocols/world_of_warcraft.c \
 		     protocols/xbox.c \
