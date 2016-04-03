@@ -1,6 +1,7 @@
 MDNS	16	1648	1
 SSDP	140	61108	22
-DropBox	1104	246122	16
+COAP	800	80676	4
+DropBox	304	165446	12
 
 	1	UDP 192.168.1.105:33189 <-> 192.168.1.254:53 [proto: 5.121/DNS.DropBox][4 pkts/744 bytes][Host: notify.dropbox.com]
 	2	UDP 192.168.1.105:17500 <-> 192.168.1.255:17500 [proto: 121/DropBox][6 pkts/1422 bytes]
@@ -9,8 +10,8 @@ DropBox	1104	246122	16
 	5	TCP 192.168.1.105:46394 <-> 162.125.17.131:443 [proto: 91.121/SSL.DropBox][22 pkts/11392 bytes][SSL client: notify.dropbox.com]
 	6	UDP 192.168.1.105:50789 <-> 192.168.1.254:53 [proto: 5.121/DNS.DropBox][4 pkts/792 bytes][Host: d.dropbox.com]
 	7	UDP 192.168.1.105:55407 <-> 192.168.1.254:53 [proto: 5.121/DNS.DropBox][4 pkts/822 bytes][Host: client.dropbox.com]
-	8	UDP 192.168.56.1:50318 <-> 192.168.56.101:17500 [proto: 121/DropBox][200 pkts/20220 bytes]
-	9	UDP 192.168.56.1:50312 <-> 192.168.56.101:17500 [proto: 121/DropBox][200 pkts/20194 bytes]
+	8	UDP 192.168.56.1:50318 <-> 192.168.56.101:17500 [proto: 27/COAP][200 pkts/20220 bytes]
+	9	UDP 192.168.56.1:50312 <-> 192.168.56.101:17500 [proto: 27/COAP][200 pkts/20194 bytes]
 	10	UDP 192.168.1.101:1280 <-> 239.255.255.250:1900 [proto: 12/SSDP][2 pkts/1018 bytes]
 	11	UDP 192.168.1.101:1346 <-> 239.255.255.250:1900 [proto: 12/SSDP][2 pkts/1018 bytes]
 	12	UDP 192.168.1.101:1650 <-> 239.255.255.250:1900 [proto: 12/SSDP][6 pkts/2836 bytes]
@@ -22,8 +23,8 @@ DropBox	1104	246122	16
 	18	UDP 192.168.1.105:49112 <-> 192.168.1.254:53 [proto: 5.121/DNS.DropBox][4 pkts/774 bytes][Host: client-cf.dropbox.com]
 	19	UDP 192.168.1.105:17500 <-> 255.255.255.255:17500 [proto: 121/DropBox][6 pkts/1422 bytes]
 	20	UDP 239.255.255.250:1900 <-> 192.168.1.254:50828 [proto: 12/SSDP][44 pkts/19936 bytes]
-	21	UDP 192.168.56.1:50311 <-> 192.168.56.101:17500 [proto: 121/DropBox][200 pkts/20120 bytes]
-	22	UDP 192.168.56.1:50319 <-> 192.168.56.101:17500 [proto: 121/DropBox][200 pkts/20142 bytes]
+	21	UDP 192.168.56.1:50311 <-> 192.168.56.101:17500 [proto: 27/COAP][200 pkts/20120 bytes]
+	22	UDP 192.168.56.1:50319 <-> 192.168.56.101:17500 [proto: 27/COAP][200 pkts/20142 bytes]
 	23	UDP 192.168.1.106:57268 <-> 239.255.255.250:1900 [proto: 12/SSDP][16 pkts/2632 bytes]
 	24	TCP 54.240.174.31:443 <-> 192.168.1.105:44949 [proto: 91.121/SSL.DropBox][138 pkts/97302 bytes][SSL client: client-cf.dropbox.com]
 	25	TCP 192.168.1.105:36226 <-> 108.160.172.195:80 [proto: 7.121/HTTP.DropBox][20 pkts/3928 bytes][Host: log.getdropbox.com]
