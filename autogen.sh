@@ -30,4 +30,4 @@ if test -z $AUTORECONF; then
 fi
 
 autoreconf -ivf
-./configure
+./configure $*
