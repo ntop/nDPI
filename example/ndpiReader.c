@@ -1620,8 +1620,8 @@ static void pcap_packet_callback(u_char *args,
   int llc_off;
   int pyld_eth_len = 0;
   int check;
-  u_int32_t fcs;
-
+  char packet_copy[1600];
+  u_int32_t fcs, packet_copy_len = sizeof(packet_copy);;
   u_int64_t time;
   u_int16_t ip_offset, ip_len, ip6_offset;
   u_int16_t frag_off = 0, vlan_id = 0;
@@ -1642,6 +1642,9 @@ static void pcap_packet_callback(u_char *args,
       pcap_breakloop(ndpi_thread_info[thread_id]._pcap_handle);
     return;
   }
+
+  if(header->caplen < packet_copy_len) packet_copy_len = header->caplen;
+  memcpy(packet_copy, packet, packet_copy_len);
 
   /* Check if capture is live or not */
   if (!live_capture) {
@@ -1931,6 +1934,10 @@ static void pcap_packet_callback(u_char *args,
   /* process the packet */
   packet_processing(thread_id, time, vlan_id, iph, iph6,
 		    ip_offset, header->len - ip_offset, header->len);
+
+  if(memcmp(packet_copy, packet, packet_copy_len) != 0)
+    printf("INTERNAL ERROR: ingress packet was nodified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
+	   thread_id, (unsigned long)ndpi_thread_info[thread_id].stats.raw_packet_count);
 }
 
 /* ******************************************************************** */
