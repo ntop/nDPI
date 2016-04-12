@@ -39,7 +39,7 @@ static void ndpi_check_pplive_udp1(struct ndpi_detection_module_struct *ndpi_str
 	if (flow->pplive_stage1 == 0) {
 		NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "PPLIVE stage 0: \n");
 		
-		if ((payload_len > 0) && match_first_bytes(packet->payload, "\xe9\x03\x41\x01")) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "\xe9\x03\x41\x01")) {
 			NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "Possible PPLIVE request detected, we will look further for the response...\n");
 
 			/* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
@@ -47,7 +47,7 @@ static void ndpi_check_pplive_udp1(struct ndpi_detection_module_struct *ndpi_str
 			return;
 		}
 		
-		if ((payload_len > 0) && match_first_bytes(packet->payload, "\xe9\x03\x42\x01")) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "\xe9\x03\x42\x01")) {
 			NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "Possible PPLIVE request detected, we will look further for the response...\n");
 
 			/* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
@@ -55,7 +55,7 @@ static void ndpi_check_pplive_udp1(struct ndpi_detection_module_struct *ndpi_str
 			return;
 		}
 		
-		if ((payload_len > 0) && match_first_bytes(packet->payload, "\x1c\x1c\x32\x01")) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "\x1c\x1c\x32\x01")) {
 			NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "Possible PPLIVE request detected, we will look further for the response...\n");
 
 			/* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
@@ -72,7 +72,7 @@ static void ndpi_check_pplive_udp1(struct ndpi_detection_module_struct *ndpi_str
 		}
 
 		/* This is a packet in another direction. Check if we find the proper response. */
-		if ((payload_len > 0) && (match_first_bytes(packet->payload, "\xe9\x03\x42\x01") || match_first_bytes(packet->payload, "\xe9\x03\x41\x01"))) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "\xe9\x03\x42\x01") || ndpi_match_strprefix(packet->payload, payload_len, "\xe9\x03\x41\x01")) {
 			NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "Found PPLIVE.\n");
 			ndpi_int_pplive_add_connection(ndpi_struct, flow);
 		} else {
@@ -89,7 +89,7 @@ static void ndpi_check_pplive_udp1(struct ndpi_detection_module_struct *ndpi_str
 		}
 
 		/* This is a packet in another direction. Check if we find the proper response. */
-		if ((payload_len > 0) && match_first_bytes(packet->payload, "\xe9\x03\x41\x01")) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "\xe9\x03\x41\x01")) {
 			NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "Found PPLIVE.\n");
 			ndpi_int_pplive_add_connection(ndpi_struct, flow);
 		} else {
@@ -105,7 +105,7 @@ static void ndpi_check_pplive_udp1(struct ndpi_detection_module_struct *ndpi_str
 		}
 
 		/* This is a packet in another direction. Check if we find the proper response. */
-		if ((payload_len > 0) && match_first_bytes(packet->payload, "\x1c\x1c\x32\x01")) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "\x1c\x1c\x32\x01")) {
 			NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "Found PPLIVE.\n");
 			ndpi_int_pplive_add_connection(ndpi_struct, flow);
 		} else {
@@ -124,7 +124,7 @@ static void ndpi_check_pplive_udp2(struct ndpi_detection_module_struct *ndpi_str
 	if (flow->pplive_stage2 == 0) {
 		NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "PPLIVE stage 0: \n");
 		
-		if ((payload_len == 57) && match_first_bytes(packet->payload, "\xe9\x03\x41\x01")) {
+		if ((payload_len == 57) && ndpi_match_strprefix(packet->payload, payload_len, "\xe9\x03\x41\x01")) {
 			NDPI_LOG(NDPI_PROTOCOL_PPLIVE, ndpi_struct, NDPI_LOG_DEBUG, "Possible PPLIVE request detected, we will look further for the response...\n");
 
 			/* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */

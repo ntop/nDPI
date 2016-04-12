@@ -4339,6 +4339,16 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
 
 /* ****************************************************** */
 
+int ndpi_match_prefix(const u_int8_t *payload, size_t payload_len,
+    const char *str, size_t str_len)
+{
+  return str_len <= payload_len
+          ? memcmp(payload, str, str_len) == 0
+          : 0;
+}
+
+/* ****************************************************** */
+
 int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				  char *string_to_match, u_int string_to_match_len,
 				  u_int8_t is_host_match) {
