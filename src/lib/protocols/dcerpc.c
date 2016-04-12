@@ -36,13 +36,11 @@ void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct, struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-	u_int16_t len_packet = (packet->payload[9]<<8) | packet->payload[8];
-
   if((packet->tcp != NULL)
      && (packet->payload_packet_len >= 64)
      && (packet->payload[0] == 0x05) /* version 5 */
      && (packet->payload[2] < 16) /* Packet type */
-		 && (len_packet == packet->payload_packet_len) /* Packet Length */
+		 && (((packet->payload[9]<<8) | packet->payload[8]) == packet->payload_packet_len) /* Packet Length */
      ) {
     NDPI_LOG(NDPI_PROTOCOL_DCERPC, ndpi_struct, NDPI_LOG_DEBUG, "DCERPC match\n");
     ndpi_int_dcerpc_add_connection(ndpi_struct, flow);
