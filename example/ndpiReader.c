@@ -51,6 +51,17 @@
 #include <json.h>
 #endif
 
+/* Check for buffer allocation errors if address-sanitizer is enabled */
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define NDPI_STRICT_BUFFER_CHECK    1
+#endif
+#endif
+/* Check for GCC */
+#ifdef __SANITIZE_ADDRESS__
+#define NDPI_STRICT_BUFFER_CHECK    1
+#endif
+
 #define MAX_NUM_READER_THREADS     16
 #define IDLE_SCAN_PERIOD           10 /* msec (use detection_tick_resolution = 1000) */
 #define MAX_IDLE_TIME           30000
@@ -1940,11 +1951,28 @@ static void pcap_packet_callback(u_char *args,
 	   thread_id, (unsigned long)ndpi_thread_info[thread_id].stats.raw_packet_count);
 }
 
+#ifdef NDPI_STRICT_BUFFER_CHECK
+static void pcap_packet_callback_checked(u_char *args,
+				 const struct pcap_pkthdr *header,
+				 const u_char *packet) {
+  uint8_t *packet_checked = malloc(header->caplen);
+  memcpy(packet_checked, packet, header->caplen);
+  pcap_packet_callback(args, header, packet_checked);
+  free(packet_checked);
+}
+#else
+static void pcap_packet_callback_checked(u_char *args,
+				 const struct pcap_pkthdr *header,
+				 const u_char *packet) {
+  pcap_packet_callback(args, header, packet);
+}
+#endif
+
 /* ******************************************************************** */
 
 static void runPcapLoop(u_int16_t thread_id) {
   if((!shutdown_app) && (ndpi_thread_info[thread_id]._pcap_handle != NULL))
-    pcap_loop(ndpi_thread_info[thread_id]._pcap_handle, -1, &pcap_packet_callback, (u_char*)&thread_id);
+    pcap_loop(ndpi_thread_info[thread_id]._pcap_handle, -1, &pcap_packet_callback_checked, (u_char*)&thread_id);
 }
 
 /* ******************************************************************** */
