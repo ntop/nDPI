@@ -34,7 +34,7 @@ static void ndpi_check_pando_tcp(struct ndpi_detection_module_struct *ndpi_struc
 	struct ndpi_packet_struct *packet = &flow->packet;
 	u_int32_t payload_len = packet->payload_packet_len;
 
-	if ((payload_len > 0) && match_first_bytes(packet->payload, "\x0ePan")) {
+	if (ndpi_match_strprefix(packet->payload, payload_len, "\x0ePan")) {
 	    NDPI_LOG(NDPI_PROTOCOL_PANDO, ndpi_struct, NDPI_LOG_DEBUG, "Found PANDO.\n");
 	    ndpi_int_pando_add_connection(ndpi_struct, flow);
 	}
@@ -56,7 +56,7 @@ static void ndpi_check_pando_udp(struct ndpi_detection_module_struct *ndpi_struc
 			return;
 		}
 
-		if ((payload_len > 0) && match_first_bytes(packet->payload, "UDPA")) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "UDPA")) {
 			NDPI_LOG(NDPI_PROTOCOL_PANDO, ndpi_struct, NDPI_LOG_DEBUG, "Possible PANDO request detected, we will look further for the response...\n");
 
 			/* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
@@ -64,7 +64,7 @@ static void ndpi_check_pando_udp(struct ndpi_detection_module_struct *ndpi_struc
 			return;
 		}
 
-		if ((payload_len > 0) && (match_first_bytes(packet->payload, "UDPR") || match_first_bytes(packet->payload, "UDPE"))) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "UDPR") || ndpi_match_strprefix(packet->payload, payload_len, "UDPE")) {
 			NDPI_LOG(NDPI_PROTOCOL_PANDO, ndpi_struct, NDPI_LOG_DEBUG, "Possible PANDO request detected, we will look further for the response...\n");
 
 			/* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
@@ -98,7 +98,7 @@ static void ndpi_check_pando_udp(struct ndpi_detection_module_struct *ndpi_struc
 		}
 
 		/* This is a packet in another direction. Check if we find the proper response. */
-		if ((payload_len == 0) || match_first_bytes(packet->payload, "UDPR") || match_first_bytes(packet->payload, "UDPE")) {
+		if ((payload_len == 0) || (ndpi_match_strprefix(packet->payload, payload_len, "UDPR") || ndpi_match_strprefix(packet->payload, payload_len, "UDPE"))) {
 			NDPI_LOG(NDPI_PROTOCOL_PANDO, ndpi_struct, NDPI_LOG_DEBUG, "Found PANDO.\n");
 			ndpi_int_pando_add_connection(ndpi_struct, flow);
 		} else {
@@ -115,7 +115,7 @@ static void ndpi_check_pando_udp(struct ndpi_detection_module_struct *ndpi_struc
 		}
 
 		/* This is a packet in another direction. Check if we find the proper response. */
-		if ((payload_len > 0) && match_first_bytes(packet->payload, "UDPA")) {
+		if (ndpi_match_strprefix(packet->payload, payload_len, "UDPA")) {
 			NDPI_LOG(NDPI_PROTOCOL_PANDO, ndpi_struct, NDPI_LOG_DEBUG, "Found PANDO.\n");
 			ndpi_int_pando_add_connection(ndpi_struct, flow);
 		} else {

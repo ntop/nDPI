@@ -60,13 +60,14 @@ static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *nd
 
 static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
+  u_int32_t payload_len = packet->payload_packet_len;
 
   /* A FTP packet is pretty long so 256 is a bit consrvative but it should be OK */
   if(packet->payload_packet_len < 256)
     return 0;
 
   /* RIFF is a meta-format for storing AVI and WAV files */
-  if(match_first_bytes(packet->payload, "RIFF"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "RIFF"))
     return 1;
 
   /* MZ is a .exe file */
@@ -74,7 +75,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* Ogg files */
-  if(match_first_bytes(packet->payload, "OggS"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "OggS"))
     return 1;
 
   /* ZIP files */
@@ -86,7 +87,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* RAR files */
-  if(match_first_bytes(packet->payload, "Rar!"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "Rar!"))
     return 1;
 
   /* EBML */
@@ -98,7 +99,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* GIF */
-  if(match_first_bytes(packet->payload, "GIF8"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "GIF8"))
     return 1;
 
   /* PHP scripts */
@@ -110,7 +111,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* PDFs */
-  if(match_first_bytes(packet->payload, "%PDF"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "%PDF"))
     return 1;
 
   /* PNG */
@@ -118,7 +119,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* HTML */
-  if(match_first_bytes(packet->payload, "<htm"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "<htm"))
     return 1;
   if((packet->payload[0] == 0x0a) && (packet->payload[1] == '<') && (packet->payload[2] == '!') && (packet->payload[3] == 'D'))
     return 1;
@@ -132,17 +133,17 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* XML */
-  if(match_first_bytes(packet->payload, "<!DO"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "<!DO"))
     return 1;
 
   /* FLAC */
-  if(match_first_bytes(packet->payload, "fLaC"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "fLaC"))
     return 1;
 
   /* MP3 */
   if((packet->payload[0] == 'I') && (packet->payload[1] == 'D') && (packet->payload[2] == '3') && (packet->payload[3] == 0x03))
     return 1;
-  if(match_first_bytes(packet->payload, "\xff\xfb\x90\xc0"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "\xff\xfb\x90\xc0"))
     return 1;
 
   /* RPM */
@@ -150,7 +151,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* Wz Patch */
-  if(match_first_bytes(packet->payload, "WzPa"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "WzPa"))
     return 1;
 
   /* Flash Video */
@@ -158,7 +159,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* .BKF (Microsoft Tape Format) */
-  if(match_first_bytes(packet->payload, "TAPE"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "TAPE"))
     return 1;
 
   /* MS Office Doc file - this is unpleasantly geeky */
@@ -174,23 +175,23 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
 
   /* ar archive, typically .deb files */
-  if(match_first_bytes(packet->payload, "!<ar"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "!<ar"))
     return 1;
 
   /* Raw XML (skip jabber-like traffic as this is not FTP but unencrypted jabber) */
-  if((match_first_bytes(packet->payload, "<?xm"))
+  if((ndpi_match_strprefix(packet->payload, payload_len, "<?xm"))
      && (ndpi_strnstr((const char *)packet->payload, "jabber", packet->payload_packet_len) == NULL))
     return 1;
 
-  if(match_first_bytes(packet->payload, "<iq "))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "<iq "))
     return 1;
 
   /* SPF */
-  if(match_first_bytes(packet->payload, "SPFI"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "SPFI"))
     return 1;
 
   /* ABIF - Applied Biosystems */
-  if(match_first_bytes(packet->payload, "ABIF"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, "ABIF"))
     return 1;
 
   /* bzip2 - other digits are also possible instead of 9 */
@@ -203,11 +204,11 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
     return 1;
   if((packet->payload[0] == '<') && (packet->payload[1] == 'C') && (packet->payload[2] == 'F'))
     return 1;
-  if(match_first_bytes(packet->payload, ".tem"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, ".tem"))
     return 1;
-  if(match_first_bytes(packet->payload, ".ite"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, ".ite"))
     return 1;
-  if(match_first_bytes(packet->payload, ".lef"))
+  if(ndpi_match_strprefix(packet->payload, payload_len, ".lef"))
     return 1;
 
   return 0;

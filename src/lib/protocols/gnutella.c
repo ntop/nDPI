@@ -294,7 +294,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
       return;
     }
 
-    if (memcmp(packet->payload, "GND", 3) == 0) {
+    if (packet->payload_packet_len >= 3 && memcmp(packet->payload, "GND", 3) == 0) {
       if ((packet->payload_packet_len == 8 && (memcmp(&packet->payload[6], "\x01\x00", 2) == 0))
 	  || (packet->payload_packet_len == 11 && (memcmp(&packet->payload[6], "\x01\x01\x08\x50\x49", 5)
 						   == 0)) || (packet->payload_packet_len == 17
