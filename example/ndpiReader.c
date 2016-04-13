@@ -51,17 +51,6 @@
 #include <json.h>
 #endif
 
-/* Check for buffer allocation errors if address-sanitizer is enabled */
-#if defined(__has_feature)
-#if __has_feature(address_sanitizer)
-#define NDPI_STRICT_BUFFER_CHECK    1
-#endif
-#endif
-/* Check for GCC */
-#ifdef __SANITIZE_ADDRESS__
-#define NDPI_STRICT_BUFFER_CHECK    1
-#endif
-
 #define MAX_NUM_READER_THREADS     16
 #define IDLE_SCAN_PERIOD           10 /* msec (use detection_tick_resolution = 1000) */
 #define MAX_IDLE_TIME           30000
@@ -1631,8 +1620,7 @@ static void pcap_packet_callback(u_char *args,
   int llc_off;
   int pyld_eth_len = 0;
   int check;
-  char packet_copy[1600];
-  u_int32_t fcs, packet_copy_len = sizeof(packet_copy);;
+  u_int32_t fcs;
   u_int64_t time;
   u_int16_t ip_offset, ip_len, ip6_offset;
   u_int16_t frag_off = 0, vlan_id = 0;
@@ -1653,9 +1641,6 @@ static void pcap_packet_callback(u_char *args,
       pcap_breakloop(ndpi_thread_info[thread_id]._pcap_handle);
     return;
   }
-
-  if(header->caplen < packet_copy_len) packet_copy_len = header->caplen;
-  memcpy(packet_copy, packet, packet_copy_len);
 
   /* Check if capture is live or not */
   if (!live_capture) {
@@ -1945,28 +1930,22 @@ static void pcap_packet_callback(u_char *args,
   /* process the packet */
   packet_processing(thread_id, time, vlan_id, iph, iph6,
 		    ip_offset, header->len - ip_offset, header->len);
-
-  if(memcmp(packet_copy, packet, packet_copy_len) != 0)
-    printf("INTERNAL ERROR: ingress packet was nodified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
-	   thread_id, (unsigned long)ndpi_thread_info[thread_id].stats.raw_packet_count);
 }
 
-#ifdef NDPI_STRICT_BUFFER_CHECK
 static void pcap_packet_callback_checked(u_char *args,
 				 const struct pcap_pkthdr *header,
 				 const u_char *packet) {
+  u_int16_t thread_id = *((u_int16_t*)args);
+  /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
   memcpy(packet_checked, packet, header->caplen);
   pcap_packet_callback(args, header, packet_checked);
+  /* check for buffer changes */
+  if(memcmp(packet, packet_checked, header->caplen) != 0)
+    printf("INTERNAL ERROR: ingress packet was nodified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
+	   thread_id, (unsigned long)ndpi_thread_info[thread_id].stats.raw_packet_count);
   free(packet_checked);
 }
-#else
-static void pcap_packet_callback_checked(u_char *args,
-				 const struct pcap_pkthdr *header,
-				 const u_char *packet) {
-  pcap_packet_callback(args, header, packet);
-}
-#endif
 
 /* ******************************************************************** */
 
