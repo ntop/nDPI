@@ -622,6 +622,10 @@ struct ndpi_flow_udp_struct {
   u_int8_t eaq_pkt_id;
   u_int32_t eaq_sequence;
 #endif
+#ifdef NDPI_PROTOCOL_RX
+  u_int32_t rx_conn_epoch;
+  u_int32_t rx_conn_id;
+#endif
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
