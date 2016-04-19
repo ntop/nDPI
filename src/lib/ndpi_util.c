@@ -134,7 +134,7 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
   struct ndpi_detection_module_struct * module = ndpi_init_detection_module(
      prefs->detection_tick_resolution, malloc_wrapper, free_wrapper, debug_printf);
       
-  struct ndpi_workflow * workflow = ndpi_malloc(sizeof(struct ndpi_workflow));
+  struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
   
   removeme_free_wrapper = free_wrapper;
   
@@ -147,8 +147,8 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
     exit(-1);
   }
   
-  workflow->idle_flows = ndpi_malloc(sizeof(struct ndpi_flow_info *) * workflow->num_idle_flows);
-  workflow->ndpi_flows_root = ndpi_malloc(sizeof(void *) * workflow->prefs.num_roots);
+  workflow->idle_flows = ndpi_calloc(workflow->num_idle_flows, sizeof(struct ndpi_flow_info *));
+  workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
   return workflow;
 }
 
