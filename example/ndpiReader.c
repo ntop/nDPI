@@ -164,7 +164,7 @@ struct reader_thread {
   /* TODO Add barrier */
   struct thread_stats stats;
 
-  struct ndpi_flow *idle_flows[IDLE_SCAN_BUDGET];
+  struct ndpi_flow_info *idle_flows[IDLE_SCAN_BUDGET];
 };
 
 static struct reader_thread ndpi_thread_info[MAX_NUM_READER_THREADS];
@@ -180,7 +180,7 @@ typedef struct ndpi_id {
 static u_int32_t size_id_struct = 0;		// ID tracking structure size
 
 // flow tracking
-typedef struct ndpi_flow {
+typedef struct ndpi_flow_info {
   u_int32_t lower_ip;
   u_int32_t upper_ip;
   u_int16_t lower_port;
@@ -205,7 +205,7 @@ typedef struct ndpi_flow {
   } ssl;
 
   void *src_id, *dst_id;
-} ndpi_flow_t;
+} ndpi_flow_info_t;
 
 
 static u_int32_t size_flow_struct = 0;
@@ -489,7 +489,7 @@ char* intoaV4(unsigned int addr, char* buf, u_short bufLen) {
 
 /* ***************************************************** */
 
-static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
+static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 #ifdef HAVE_JSON_C
   json_object *jObj;
 #endif
@@ -590,7 +590,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow *flow) {
 
 /* ***************************************************** */
 
-static void free_ndpi_flow(struct ndpi_flow *flow) {
+static void free_ndpi_flow_info(struct ndpi_flow_info *flow) {
   if(flow->ndpi_flow) { ndpi_free_flow(flow->ndpi_flow); flow->ndpi_flow = NULL; }
   if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL; }
   if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL; }
@@ -599,17 +599,17 @@ static void free_ndpi_flow(struct ndpi_flow *flow) {
 
 /* ***************************************************** */
 
-static void ndpi_flow_freer(void *node) {
-  struct ndpi_flow *flow = (struct ndpi_flow*)node;
+static void ndpi_flow_info_freer(void *node) {
+  struct ndpi_flow_info *flow = (struct ndpi_flow_info*)node;
 
-  free_ndpi_flow(flow);
+  free_ndpi_flow_info(flow);
   ndpi_free(flow);
 }
 
 /* ***************************************************** */
 
 static void node_print_unknown_proto_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-  struct ndpi_flow *flow = *(struct ndpi_flow**)node;
+  struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
   if(flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN) return;
@@ -621,7 +621,7 @@ static void node_print_unknown_proto_walker(const void *node, ndpi_VISIT which, 
 /* ***************************************************** */
 
 static void node_print_known_proto_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-  struct ndpi_flow *flow = *(struct ndpi_flow**)node;
+  struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
   if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) return;
@@ -632,7 +632,7 @@ static void node_print_known_proto_walker(const void *node, ndpi_VISIT which, in
 
 /* ***************************************************** */
 
-static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi_flow *flow) {
+static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi_flow_info *flow) {
   flow->detected_protocol = ndpi_guess_undetected_protocol(ndpi_thread_info[thread_id].ndpi_struct,
 							   flow->protocol,
 							   ntohl(flow->lower_ip),
@@ -649,7 +649,7 @@ static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi
 /* ***************************************************** */
 
 static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-  struct ndpi_flow *flow = *(struct ndpi_flow **) node;
+  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
@@ -672,7 +672,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 /* ***************************************************** */
 
 static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-  struct ndpi_flow *flow = *(struct ndpi_flow **) node;
+  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
   if(ndpi_thread_info[thread_id].num_idle_flows == IDLE_SCAN_BUDGET) /* TODO optimise with a budget-based walk */
@@ -687,7 +687,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       if((flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
-      free_ndpi_flow(flow);
+      free_ndpi_flow_info(flow);
       ndpi_thread_info[thread_id].stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */
@@ -699,8 +699,8 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 /* ***************************************************** */
 
 static int node_cmp(const void *a, const void *b) {
-  struct ndpi_flow *fa = (struct ndpi_flow*)a;
-  struct ndpi_flow *fb = (struct ndpi_flow*)b;
+  struct ndpi_flow_info *fa = (struct ndpi_flow_info*)a;
+  struct ndpi_flow_info *fb = (struct ndpi_flow_info*)b;
 
   if(fa->vlan_id   < fb->vlan_id  )   return(-1); else { if(fa->vlan_id   > fb->vlan_id  )   return(1); }
   if(fa->lower_ip   < fb->lower_ip  ) return(-1); else { if(fa->lower_ip   > fb->lower_ip  ) return(1); }
@@ -714,7 +714,7 @@ static int node_cmp(const void *a, const void *b) {
 
 /* ***************************************************** */
 
-static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
+static struct ndpi_flow_info *get_ndpi_flow_info(u_int16_t thread_id,
 				       const u_int8_t version,
 				       u_int16_t vlan_id,
 				       const struct ndpi_iphdr *iph,
@@ -736,7 +736,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
   u_int32_t upper_ip;
   u_int16_t lower_port;
   u_int16_t upper_port;
-  struct ndpi_flow flow;
+  struct ndpi_flow_info flow;
   void *ret;
   u_int8_t *l3, *l4;
 
@@ -866,14 +866,14 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
       printf("ERROR: maximum flow count (%u) has been exceeded\n", MAX_NDPI_FLOWS);
       exit(-1);
     } else {
-      struct ndpi_flow *newflow = (struct ndpi_flow*)malloc(sizeof(struct ndpi_flow));
+      struct ndpi_flow_info *newflow = (struct ndpi_flow_info*)malloc(sizeof(struct ndpi_flow_info));
 
       if(newflow == NULL) {
 	printf("[NDPI] %s(1): not enough memory\n", __FUNCTION__);
 	return(NULL);
       }
 
-      memset(newflow, 0, sizeof(struct ndpi_flow));
+      memset(newflow, 0, sizeof(struct ndpi_flow_info));
       newflow->protocol = iph->protocol, newflow->vlan_id = vlan_id;
       newflow->lower_ip = lower_ip, newflow->upper_ip = upper_ip;
       newflow->lower_port = lower_port, newflow->upper_port = upper_port;
@@ -917,7 +917,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
       return newflow;
     }
   } else {
-    struct ndpi_flow *flow = *(struct ndpi_flow**)ret;
+    struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)ret;
 
     if(flow->lower_ip == lower_ip && flow->upper_ip == upper_ip
        && flow->lower_port == lower_port && flow->upper_port == upper_port)
@@ -931,7 +931,7 @@ static struct ndpi_flow *get_ndpi_flow(u_int16_t thread_id,
 
 /* ***************************************************** */
 
-static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
+static struct ndpi_flow_info *get_ndpi_flow_info6(u_int16_t thread_id,
 					u_int16_t vlan_id,
 					const struct ndpi_ipv6hdr *iph6,
 					u_int16_t ip_offset,
@@ -958,7 +958,7 @@ static struct ndpi_flow *get_ndpi_flow6(u_int16_t thread_id,
     iph.protocol = options[0];
   }
 
-  return(get_ndpi_flow(thread_id, 6, vlan_id, &iph, iph6, ip_offset,
+  return(get_ndpi_flow_info(thread_id, 6, vlan_id, &iph, iph6, ip_offset,
 		       sizeof(struct ndpi_ipv6hdr),
 		       ntohs(iph6->ip6_ctlun.ip6_un1.ip6_un1_plen),
 		       tcph, udph, sport, dport,
@@ -1005,7 +1005,7 @@ static void terminateDetection(u_int16_t thread_id) {
   int i;
 
   for(i=0; i<NUM_ROOTS; i++) {
-    ndpi_tdestroy(ndpi_thread_info[thread_id].ndpi_flows_root[i], ndpi_flow_freer);
+    ndpi_tdestroy(ndpi_thread_info[thread_id].ndpi_flows_root[i], ndpi_flow_info_freer);
     ndpi_thread_info[thread_id].ndpi_flows_root[i] = NULL;
   }
 
@@ -1023,7 +1023,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
 				      u_int16_t ip_offset,
 				      u_int16_t ipsize, u_int16_t rawsize) {
   struct ndpi_id_struct *src, *dst;
-  struct ndpi_flow *flow;
+  struct ndpi_flow_info *flow;
   struct ndpi_flow_struct *ndpi_flow = NULL;
   u_int8_t proto;
   struct ndpi_tcphdr *tcph = NULL;
@@ -1033,14 +1033,14 @@ static unsigned int packet_processing(u_int16_t thread_id,
   u_int8_t src_to_dst_direction= 1;
   
   if(iph)
-    flow = get_ndpi_flow(thread_id, 4, vlan_id, iph, NULL,
+    flow = get_ndpi_flow_info(thread_id, 4, vlan_id, iph, NULL,
 			 ip_offset, ipsize,
 			 ntohs(iph->tot_len) - (iph->ihl * 4),
 			 &tcph, &udph, &sport, &dport,			
 			 &src, &dst, &proto,
 			 &payload, &payload_len, &src_to_dst_direction);
   else
-    flow = get_ndpi_flow6(thread_id, vlan_id, iph6, ip_offset,
+    flow = get_ndpi_flow_info6(thread_id, vlan_id, iph6, ip_offset,
 			  &tcph, &udph, &sport, &dport,			
 			  &src, &dst, &proto,
 			  &payload, &payload_len, &src_to_dst_direction);
@@ -1090,7 +1090,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
     if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN)
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[thread_id].ndpi_struct, flow->ndpi_flow);
 
-    free_ndpi_flow(flow);
+    free_ndpi_flow_info(flow);
 
     if(verbose > 1) {
       if(enable_protocol_guess) {
@@ -1116,7 +1116,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
 	ndpi_tdelete(ndpi_thread_info[thread_id].idle_flows[--ndpi_thread_info[thread_id].num_idle_flows], &ndpi_thread_info[thread_id].ndpi_flows_root[ndpi_thread_info[thread_id].idle_scan_idx], node_cmp);
 	
 	/* free the memory associated to idle flow in "idle_flows" - (see struct reader thread)*/
-	free_ndpi_flow(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
+	free_ndpi_flow_info(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
 	ndpi_free(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
       }
       
