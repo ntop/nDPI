@@ -109,6 +109,10 @@ static u_int32_t num_flows;
 struct reader_thread {
   struct ndpi_workflow * workflow;
   pthread_t pthread;
+  u_int64_t last_idle_scan_time;
+  u_int32_t idle_scan_idx;
+  u_int32_t num_idle_flows;
+  struct ndpi_flow_info *idle_flows[IDLE_SCAN_BUDGET];
 };
 
 static struct reader_thread ndpi_thread_info[MAX_NUM_READER_THREADS];
@@ -553,7 +557,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
-  if(ndpi_thread_info[thread_id].workflow->num_idle_flows == IDLE_SCAN_BUDGET) /* TODO optimise with a budget-based walk */
+  if(ndpi_thread_info[thread_id].num_idle_flows == IDLE_SCAN_BUDGET) /* TODO optimise with a budget-based walk */
     return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
@@ -569,9 +573,65 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */
-      ndpi_thread_info[thread_id].workflow->idle_flows[ndpi_thread_info[thread_id].workflow->num_idle_flows++] = flow;
+      ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows++] = flow;
     }
   }
+}
+
+/* ***************************************************** */
+
+static void on_protocol_discovered(struct ndpi_workflow * workflow,
+        struct ndpi_flow_info * flow,
+        void * udata) {
+  const u_int16_t thread_id = *((u_int16_t *)udata);
+  
+  if(verbose > 1) {
+    if(enable_protocol_guess) {
+      if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
+        flow->detected_protocol.protocol = node_guess_undetected_protocol(thread_id, flow),
+        flow->detected_protocol.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+      }
+    }
+
+    printFlow(thread_id, flow);
+  }
+}
+
+/* ***************************************************** */
+
+static void debug_printf(u_int32_t protocol, void *id_struct,
+			 ndpi_log_level_t log_level,
+			 const char *format, ...) {
+  va_list va_ap;
+#ifndef WIN32
+  struct tm result;
+#endif
+
+  if(log_level <= nDPI_traceLevel) {
+    char buf[8192], out_buf[8192];
+    char theDate[32];
+    const char *extra_msg = "";
+    time_t theTime = time(NULL);
+
+    va_start (va_ap, format);
+
+    if(log_level == NDPI_LOG_ERROR)
+      extra_msg = "ERROR: ";
+    else if(log_level == NDPI_LOG_TRACE)
+      extra_msg = "TRACE: ";
+    else
+      extra_msg = "DEBUG: ";
+
+    memset(buf, 0, sizeof(buf));
+    strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime,&result) );
+    vsnprintf(buf, sizeof(buf)-1, format, va_ap);
+
+    snprintf(out_buf, sizeof(out_buf), "%s %s%s", theDate, extra_msg, buf);
+    printf("%s", out_buf);
+    fflush(stdout);
+  }
+
+  va_end(va_ap);
 }
 
 /* ***************************************************** */
@@ -588,8 +648,10 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   prefs.detection_tick_resolution = detection_tick_resolution;
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
-  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, malloc_wrapper, free_wrapper);
+  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, malloc_wrapper, free_wrapper, debug_printf);
   /* ndpi_thread_info[thread_id].workflow->ndpi_struct->http_dont_dissect_response = 1; */
+  
+  ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow, on_protocol_discovered, (void *)&thread_id);
 
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);
@@ -1076,6 +1138,30 @@ static void pcap_packet_callback_checked(u_char *args,
   if (!live_capture) {
     if (!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
     pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
+  }
+  
+  /* Idle flows cleanup */
+  if(live_capture) {
+    if(ndpi_thread_info[thread_id].last_idle_scan_time + IDLE_SCAN_PERIOD < ndpi_thread_info[thread_id].workflow->last_time) {
+      /* scan for idle flows */
+      ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[ndpi_thread_info[thread_id].idle_scan_idx], node_idle_scan_walker, &thread_id);
+
+      /* remove idle flows (unfortunately we cannot do this inline) */
+      while (ndpi_thread_info[thread_id].num_idle_flows > 0) {
+	
+	/* search and delete the idle flow from the "ndpi_flow_root" (see struct reader thread) - here flows are the node of a b-tree */
+	ndpi_tdelete(ndpi_thread_info[thread_id].idle_flows[--ndpi_thread_info[thread_id].num_idle_flows],
+        &ndpi_thread_info[thread_id].workflow->ndpi_flows_root[ndpi_thread_info[thread_id].idle_scan_idx],
+        ndpi_workflow_node_cmp);
+	
+	/* free the memory associated to idle flow in "idle_flows" - (see struct reader thread)*/
+	free_ndpi_flow_info(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
+	ndpi_free(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
+      }
+      
+      if(++ndpi_thread_info[thread_id].idle_scan_idx == ndpi_thread_info[thread_id].workflow->prefs.num_roots) ndpi_thread_info[thread_id].idle_scan_idx = 0;
+      ndpi_thread_info[thread_id].last_idle_scan_time = ndpi_thread_info[thread_id].workflow->last_time;
+    }
   }
   
   /* check for buffer changes */

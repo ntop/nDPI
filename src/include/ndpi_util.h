@@ -87,20 +87,25 @@ typedef struct ndpi_workflow_prefs {
   u_int32_t detection_tick_resolution;
 } ndpi_workflow_prefs_t;
 
+struct ndpi_workflow;
+/** workflow, flow, user data */
+typedef void (*ndpi_workflow_callback_ptr) (struct ndpi_workflow *, struct ndpi_flow_info *, void *);
+
 typedef struct ndpi_workflow {
   u_int64_t last_time;
-  u_int64_t last_idle_scan_time;
-  u_int32_t idle_scan_idx;
-  u_int32_t num_idle_flows;   /* TODO_EMA decide if idle flows will be handled */
   
   struct ndpi_workflow_prefs prefs;
   struct ndpi_stats stats;
+  
+  ndpi_workflow_callback_ptr __flow_detected_callback;
+  void * __flow_detected_udata;
+  ndpi_workflow_callback_ptr __flow_giveup_callback;
+  void * __flow_giveup_udata;
   
   /* outside referencies */
   pcap_t *pcap_handle;
 
   /* allocated by prefs */
-  struct ndpi_flow_info **idle_flows;
   void **ndpi_flows_root;
   struct ndpi_detection_module_struct *ndpi_struct;
 } ndpi_workflow_t;
@@ -109,7 +114,8 @@ typedef struct ndpi_workflow {
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
         pcap_t * pcap_handle,
         void * (*malloc_wrapper)(size_t),
-        void (*free_wrapper)(void*));
+        void (*free_wrapper)(void*),
+        ndpi_debug_function_ptr ndpi_debug_printf);
         
 void ndpi_workflow_free(struct ndpi_workflow * workflow);
 
@@ -117,5 +123,22 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow);
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				 const struct pcap_pkthdr *header,
 				 const u_char *packet);
+         
+/* flow callbacks: ndpi_flow_info will be freed right after */
+inline void ndpi_workflow_set_flow_detected_callback(struct ndpi_workflow * workflow,
+        ndpi_workflow_callback_ptr callback,
+        void * udata) {
+  workflow->__flow_detected_callback = callback;
+  workflow->__flow_detected_udata = udata;
+}
+
+inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow * workflow,
+        ndpi_workflow_callback_ptr callback,
+        void * udata) {
+  workflow->__flow_giveup_callback = callback;
+  workflow->__flow_giveup_udata = udata;
+}
+
+int ndpi_workflow_node_cmp(const void *a, const void *b);
 
 #endif
