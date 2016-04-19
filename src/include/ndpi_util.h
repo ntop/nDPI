@@ -31,6 +31,9 @@
  * WARNING: this API is unstable! Use it at your own risk!
  */
  
+#ifndef __NDPI_UTIL_H__
+#define __NDPI_UTIL_H__
+
 #include <pcap.h>
 
 // flow tracking
@@ -114,3 +117,5 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow);
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				 const struct pcap_pkthdr *header,
 				 const u_char *packet);
+
+#endif
