@@ -149,6 +149,7 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
   
   workflow->idle_flows = ndpi_malloc(sizeof(struct ndpi_flow_info *) * workflow->num_idle_flows);
   workflow->ndpi_flows_root = ndpi_malloc(sizeof(void *) * workflow->prefs.num_roots);
+  return workflow;
 }
 
 void ndpi_workflow_free(struct ndpi_workflow * workflow) {

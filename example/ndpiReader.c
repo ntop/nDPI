@@ -109,7 +109,6 @@ static u_int32_t num_flows;
 struct reader_thread {
   struct ndpi_workflow * workflow;
   pthread_t pthread;
-  pcap_t * pcap_handle;
 };
 
 static struct reader_thread ndpi_thread_info[MAX_NUM_READER_THREADS];
@@ -945,8 +944,8 @@ static void printResults(u_int64_t tot_usec) {
 /* ***************************************************** */
 
 static void breakPcapLoop(u_int16_t thread_id) {
-  if(ndpi_thread_info[thread_id].pcap_handle != NULL) {
-    pcap_breakloop(ndpi_thread_info[thread_id].pcap_handle);
+  if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL) {
+    pcap_breakloop(ndpi_thread_info[thread_id].workflow->pcap_handle);
   }
 }
 
@@ -1061,10 +1060,15 @@ static void pcap_packet_callback_checked(u_char *args,
 				 const struct pcap_pkthdr *header,
 				 const u_char *packet) {
   u_int16_t thread_id = *((u_int16_t*)args);
-          
+           
+  /* allocate an exact size buffer to check overflows */
+  uint8_t *packet_checked = malloc(header->caplen);
+  memcpy(packet_checked, packet, header->caplen);
+  ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
+  
   if((capture_until != 0) && (header->ts.tv_sec >= capture_until)) {
-    if(ndpi_thread_info[thread_id].pcap_handle != NULL)
-      pcap_breakloop(ndpi_thread_info[thread_id].pcap_handle);
+    if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)
+      pcap_breakloop(ndpi_thread_info[thread_id].workflow->pcap_handle);
     return;
   }
   
@@ -1073,11 +1077,7 @@ static void pcap_packet_callback_checked(u_char *args,
     if (!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
     pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
   }
-           
-  /* allocate an exact size buffer to check overflows */
-  uint8_t *packet_checked = malloc(header->caplen);
-  memcpy(packet_checked, packet, header->caplen);
-  ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
+  
   /* check for buffer changes */
   if(memcmp(packet, packet_checked, header->caplen) != 0)
     printf("INTERNAL ERROR: ingress packet was nodified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
@@ -1088,8 +1088,8 @@ static void pcap_packet_callback_checked(u_char *args,
 /* ******************************************************************** */
 
 static void runPcapLoop(u_int16_t thread_id) {
-  if((!shutdown_app) && (ndpi_thread_info[thread_id].pcap_handle != NULL))
-    pcap_loop(ndpi_thread_info[thread_id].pcap_handle, -1, &pcap_packet_callback_checked, (u_char*)&thread_id);
+  if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL))
+    pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &pcap_packet_callback_checked, (u_char*)&thread_id);
 }
 
 /* ******************************************************************** */
@@ -1120,8 +1120,8 @@ void *processing_thread(void *_thread_id) {
     char filename[256];
 
     if(getNextPcapFileFromPlaylist(thread_id, filename, sizeof(filename)) == 0 &&
-       (ndpi_thread_info[thread_id].pcap_handle = pcap_open_offline(filename, pcap_error_buffer)) != NULL) {
-      configurePcapHandle(ndpi_thread_info[thread_id].pcap_handle);
+       (ndpi_thread_info[thread_id].workflow->pcap_handle = pcap_open_offline(filename, pcap_error_buffer)) != NULL) {
+      configurePcapHandle(ndpi_thread_info[thread_id].workflow->pcap_handle);
       goto pcap_loop;
     }
   }
