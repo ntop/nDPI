@@ -1691,6 +1691,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_
 {
   struct ndpi_detection_module_struct *ndpi_str;
 
+  /* TODO global malloc wrappers should not be set here: ndpi_init_detection_module can be called many times */
   _ndpi_malloc = __ndpi_malloc;
   _ndpi_free = __ndpi_free;
 
