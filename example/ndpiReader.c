@@ -125,11 +125,6 @@ typedef struct ndpi_id {
   struct ndpi_id_struct *ndpi_id;		// nDpi worker structure
 } ndpi_id_t;
 
-static u_int32_t size_id_struct = 0;		// ID tracking structure size
-
-
-static u_int32_t size_flow_struct = 0;
-
 static void help(u_int long_help) {
   printf("ndpiReader -i <file|device> [-f <filter>][-s <duration>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
@@ -383,11 +378,11 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
     fprintf(out, "\t%s %s%s%s:%u <-> %s%s%s:%u ",
 	    ipProto2Name(flow->protocol),
 	    (flow->ip_version == 6) ? "[" : "",
-	    flow->lower_name, 
+	    flow->lower_name,
 	    (flow->ip_version == 6) ? "]" : "",
 	    ntohs(flow->lower_port),
 	    (flow->ip_version == 6) ? "[" : "",
-	    flow->upper_name, 
+	    flow->upper_name,
 	    (flow->ip_version == 6) ? "]" : "",
 	    ntohs(flow->upper_port));
 
@@ -472,24 +467,6 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 
 /* ***************************************************** */
 
-static void free_ndpi_flow_info(struct ndpi_flow_info *flow) {
-  if(flow->ndpi_flow) { ndpi_free_flow(flow->ndpi_flow); flow->ndpi_flow = NULL; }
-  if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL; }
-  if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL; }
-
-}
-
-/* ***************************************************** */
-
-static void ndpi_flow_info_freer(void *node) {
-  struct ndpi_flow_info *flow = (struct ndpi_flow_info*)node;
-
-  free_ndpi_flow_info(flow);
-  ndpi_free(flow);
-}
-
-/* ***************************************************** */
-
 static void node_print_unknown_proto_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
@@ -569,7 +546,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       if((flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
-      free_ndpi_flow_info(flow);
+      ndpi_free_flow_info_half(flow);
       ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */
@@ -584,7 +561,7 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
         struct ndpi_flow_info * flow,
         void * udata) {
   const u_int16_t thread_id = *((u_int16_t *)udata);
-  
+
   if(verbose > 1) {
     if(enable_protocol_guess) {
       if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
@@ -638,7 +615,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   NDPI_PROTOCOL_BITMASK all;
-  
+
   struct ndpi_workflow_prefs prefs;
   memset(&prefs, 0, sizeof(prefs));
   prefs.decode_tunnels = decode_tunnels;
@@ -650,7 +627,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, malloc_wrapper, free_wrapper, debug_printf);
   /* ndpi_thread_info[thread_id].workflow->ndpi_struct->http_dont_dissect_response = 1; */
-  
+
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow, on_protocol_discovered, (void *)&thread_id);
 
   // enable all protocols
@@ -669,13 +646,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 /* ***************************************************** */
 
 static void terminateDetection(u_int16_t thread_id) {
-  int i;
-
-  for(i=0; i<NUM_ROOTS; i++) {
-    ndpi_tdestroy(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
-    ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i] = NULL;
-  }
-
   ndpi_workflow_free(ndpi_thread_info[thread_id].workflow);
 }
 
@@ -810,7 +780,7 @@ static void printResults(u_int64_t tot_usec) {
   if(!quiet_mode) {
     printf("\nnDPI Memory statistics:\n");
     printf("\tnDPI Memory (once):      %-13s\n", formatBytes(sizeof(struct ndpi_detection_module_struct), buf, sizeof(buf)));
-    printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(size_flow_struct, buf, sizeof(buf)));
+    printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(sizeof(struct ndpi_flow_struct), buf, sizeof(buf)));
     printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
     printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
 
@@ -1112,7 +1082,7 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
     signal(SIGALRM, sigproc);
 #endif
   }
-  
+
   return pcap_handle;
 }
 
@@ -1122,24 +1092,24 @@ static void pcap_packet_callback_checked(u_char *args,
 				 const struct pcap_pkthdr *header,
 				 const u_char *packet) {
   u_int16_t thread_id = *((u_int16_t*)args);
-           
+
   /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
   memcpy(packet_checked, packet, header->caplen);
   ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
-  
+
   if((capture_until != 0) && (header->ts.tv_sec >= capture_until)) {
     if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)
       pcap_breakloop(ndpi_thread_info[thread_id].workflow->pcap_handle);
     return;
   }
-  
+
   /* Check if capture is live or not */
   if (!live_capture) {
     if (!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
     pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
   }
-  
+
   /* Idle flows cleanup */
   if(live_capture) {
     if(ndpi_thread_info[thread_id].last_idle_scan_time + IDLE_SCAN_PERIOD < ndpi_thread_info[thread_id].workflow->last_time) {
@@ -1148,22 +1118,22 @@ static void pcap_packet_callback_checked(u_char *args,
 
       /* remove idle flows (unfortunately we cannot do this inline) */
       while (ndpi_thread_info[thread_id].num_idle_flows > 0) {
-	
+
 	/* search and delete the idle flow from the "ndpi_flow_root" (see struct reader thread) - here flows are the node of a b-tree */
 	ndpi_tdelete(ndpi_thread_info[thread_id].idle_flows[--ndpi_thread_info[thread_id].num_idle_flows],
         &ndpi_thread_info[thread_id].workflow->ndpi_flows_root[ndpi_thread_info[thread_id].idle_scan_idx],
         ndpi_workflow_node_cmp);
-	
+
 	/* free the memory associated to idle flow in "idle_flows" - (see struct reader thread)*/
-	free_ndpi_flow_info(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
+	ndpi_free_flow_info_half(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
 	ndpi_free(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
       }
-      
+
       if(++ndpi_thread_info[thread_id].idle_scan_idx == ndpi_thread_info[thread_id].workflow->prefs.num_roots) ndpi_thread_info[thread_id].idle_scan_idx = 0;
       ndpi_thread_info[thread_id].last_idle_scan_time = ndpi_thread_info[thread_id].workflow->last_time;
     }
   }
-  
+
   /* check for buffer changes */
   if(memcmp(packet, packet_checked, header->caplen) != 0)
     printf("INTERNAL ERROR: ingress packet was nodified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
@@ -1211,7 +1181,7 @@ void *processing_thread(void *_thread_id) {
       goto pcap_loop;
     }
   }
-  
+
   return NULL;
 }
 

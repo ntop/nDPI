@@ -24,13 +24,13 @@
 
 /**
  * This module contains routines to help setup a simple nDPI program.
- * 
+ *
  * If you concern about performance or have to integrate nDPI in your
  * application, you could need to reimplement them yourself.
- * 
+ *
  * WARNING: this API is unstable! Use it at your own risk!
  */
- 
+
 #ifndef __NDPI_UTIL_H__
 #define __NDPI_UTIL_H__
 
@@ -93,15 +93,15 @@ typedef void (*ndpi_workflow_callback_ptr) (struct ndpi_workflow *, struct ndpi_
 
 typedef struct ndpi_workflow {
   u_int64_t last_time;
-  
+
   struct ndpi_workflow_prefs prefs;
   struct ndpi_stats stats;
-  
+
   ndpi_workflow_callback_ptr __flow_detected_callback;
   void * __flow_detected_udata;
   ndpi_workflow_callback_ptr __flow_giveup_callback;
   void * __flow_giveup_udata;
-  
+
   /* outside referencies */
   pcap_t *pcap_handle;
 
@@ -116,14 +116,20 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
         void * (*malloc_wrapper)(size_t),
         void (*free_wrapper)(void*),
         ndpi_debug_function_ptr ndpi_debug_printf);
-        
+
 void ndpi_workflow_free(struct ndpi_workflow * workflow);
+
+/** Free flow_info ndpi support structures but not the flow_info itself
+ *
+ *  TODO remove! Half freeing things is bad!
+ */
+void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 
 /** Process a @packet and update the @workflow.  */
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				 const struct pcap_pkthdr *header,
 				 const u_char *packet);
-         
+
 /* flow callbacks: ndpi_flow_info will be freed right after */
 static inline void ndpi_workflow_set_flow_detected_callback(struct ndpi_workflow * workflow,
         ndpi_workflow_callback_ptr callback,

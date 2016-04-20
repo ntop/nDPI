@@ -21,7 +21,7 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 #include <stdlib.h>
 
 #ifdef WIN32
@@ -71,7 +71,7 @@
 
 /* ***************************************************** */
 
-static void free_ndpi_flow_info(struct ndpi_flow_info *flow) {
+void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
   if(flow->ndpi_flow) { ndpi_free_flow(flow->ndpi_flow); flow->ndpi_flow = NULL; }
   if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL; }
   if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL; }
@@ -91,29 +91,45 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
         void * (*malloc_wrapper)(size_t),
         void (*free_wrapper)(void*),
         ndpi_debug_function_ptr ndpi_debug_printf) {
-            
+
   /* TODO: just needed here to init ndpi malloc wrapper */
   struct ndpi_detection_module_struct * module = ndpi_init_detection_module(
      prefs->detection_tick_resolution, malloc_wrapper, free_wrapper, ndpi_debug_printf);
-      
+
   struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
-  
+
   removeme_free_wrapper = free_wrapper;
-  
+
   workflow->pcap_handle = pcap_handle;
   workflow->prefs = *prefs;
   workflow->ndpi_struct = module;
-      
+
   if(workflow->ndpi_struct == NULL) {
     NDPI_LOG(0, NULL, NDPI_LOG_ERROR, "global structure initialization failed\n");
     exit(-1);
   }
-  
+
   workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
   return workflow;
 }
 
+/* ***************************************************** */
+
+static void ndpi_flow_info_freer(void *node) {
+  struct ndpi_flow_info *flow = (struct ndpi_flow_info*)node;
+
+  ndpi_free_flow_info_half(flow);
+  ndpi_free(flow);
+}
+
+/* ***************************************************** */
+
 void ndpi_workflow_free(struct ndpi_workflow * workflow) {
+  int i;
+
+  for(i=0; i<workflow->prefs.num_roots; i++)
+    ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
+
   ndpi_exit_detection_module(workflow->ndpi_struct, removeme_free_wrapper);
   free(workflow->ndpi_flows_root);
   free(workflow);
@@ -217,7 +233,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     // tcp
     *tcph = (struct ndpi_tcphdr *)l4;
     *sport = ntohs((*tcph)->source), *dport = ntohs((*tcph)->dest);
-    
+
     if(iph->saddr < iph->daddr) {
       lower_port = (*tcph)->source, upper_port = (*tcph)->dest;
       *src_to_dst_direction = 1;
@@ -235,7 +251,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	}
       }
     }
-    
+
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
     *payload = &l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
@@ -244,7 +260,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     workflow->stats.udp_count++;
 
     *udph = (struct ndpi_udphdr *)l4;
-    *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);    
+    *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);
     *payload = &l4[sizeof(struct ndpi_udphdr)];
     *payload_len = ndpi_max(0, l4_packet_len-sizeof(struct ndpi_udphdr));
 
@@ -259,7 +275,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       if(iph->saddr == iph->daddr) {
 	if(lower_port > upper_port) {
 	  u_int16_t p = lower_port;
-	  
+
 	  lower_port = upper_port;
 	  upper_port = p;
 	}
@@ -406,17 +422,17 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   u_int16_t sport, dport, payload_len;
   u_int8_t *payload;
   u_int8_t src_to_dst_direction= 1;
-  
+
   if(iph)
     flow = get_ndpi_flow_info(workflow, 4, vlan_id, iph, NULL,
 			 ip_offset, ipsize,
 			 ntohs(iph->tot_len) - (iph->ihl * 4),
-			 &tcph, &udph, &sport, &dport,			
+			 &tcph, &udph, &sport, &dport,
 			 &src, &dst, &proto,
 			 &payload, &payload_len, &src_to_dst_direction);
   else
     flow = get_ndpi_flow_info6(workflow, vlan_id, iph6, ip_offset,
-			  &tcph, &udph, &sport, &dport,			
+			  &tcph, &udph, &sport, &dport,
 			  &src, &dst, &proto,
 			  &payload, &payload_len, &src_to_dst_direction);
 
@@ -436,7 +452,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							  ipsize, time, src, dst);
-  
+
   if((flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
@@ -450,15 +466,15 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 
     if(flow->detected_protocol.protocol == NDPI_PROTOCOL_BITTORRENT) {
       int i, j, n = 0;
-      
+
       for(i=0, j = 0; i<20; i++) {
 	sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
 	j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
       }
-      
+
       if(n == 0) flow->bittorent_hash[0] = '\0';
     }
-      
+
     if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
       snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s", flow->ndpi_flow->protos.ssl.client_certificate);
       snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
@@ -466,17 +482,17 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 
     if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
       flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow);
-      
+
       if (workflow->__flow_giveup_callback != NULL)
         workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
     } else {
       if (workflow->__flow_detected_callback != NULL)
         workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
     }
-    
-    free_ndpi_flow_info(flow);
+
+    ndpi_free_flow_info_half(flow);
   }
-  
+
   return 0;
 }
 
@@ -487,7 +503,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   /*
    * Declare pointers to packet headers
    */
-  
+
   /* --- Ethernet header --- */
   const struct ndpi_ethhdr *ethernet;
   /* --- Ethernet II header --- */
@@ -576,7 +592,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
       type = ntohs(chdlc->proto_code);
       break;
-      
+
       /* IEEE 802.3 Ethernet - 1 */
     case DLT_EN10MB :
       ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
@@ -654,13 +670,13 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
     ip_offset += 4;
     vlan_packet = 1;
-  } else if(type == MPLS_UNI || type == MPLS_MULTI) {    
+  } else if(type == MPLS_UNI || type == MPLS_MULTI) {
     mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
     label = ntohl(mpls->label);
     /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
     workflow->stats.mpls_count++;
     type = ETH_P_IP, ip_offset += 4;
-    
+
     while((label & 0x100) != 0x100) {
       ip_offset += 4;
       label = ntohl(mpls->label);
@@ -676,13 +692,13 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   else if(type == CISCO_D_PROTO) {
     cdp = (struct ndpi_cdp *) &packet[ip_offset];
     cdp_pkts++;
-  }    
+  }
   else if(type == PPPoE) {
     workflow->stats.pppoe_count++;
     type = ETH_P_IP;
     ip_offset += 8;
   }
-  
+
   workflow->stats.vlan_count += vlan_packet;
 
  iph_check:
@@ -787,13 +803,13 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
       if((version == 1) && (type == 0) && (encapsulates == 1)) {
 	u_int8_t stop = 0;
-	
+
 	offset += 4;
 
 	while((!stop) && (offset < header->caplen)) {
 	  u_int8_t tag_type = packet[offset];
 	  u_int8_t tag_len;
-	  
+
 	  switch(tag_type) {
 	  case 0: /* PADDING Tag */
 	    tag_len = 1;
