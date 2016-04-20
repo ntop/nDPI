@@ -560,7 +560,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 static void on_protocol_discovered(struct ndpi_workflow * workflow,
         struct ndpi_flow_info * flow,
         void * udata) {
-  const u_int16_t thread_id = *((u_int16_t *)udata);
+  const u_int16_t thread_id = (uintptr_t)udata;
 
   if(verbose > 1) {
     if(enable_protocol_guess) {
@@ -628,7 +628,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, malloc_wrapper, free_wrapper, debug_printf);
   /* ndpi_thread_info[thread_id].workflow->ndpi_struct->http_dont_dissect_response = 1; */
 
-  ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow, on_protocol_discovered, (void *)&thread_id);
+  ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow, on_protocol_discovered, (void *)(uintptr_t)thread_id);
 
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);
