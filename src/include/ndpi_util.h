@@ -125,14 +125,14 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				 const u_char *packet);
          
 /* flow callbacks: ndpi_flow_info will be freed right after */
-inline void ndpi_workflow_set_flow_detected_callback(struct ndpi_workflow * workflow,
+static inline void ndpi_workflow_set_flow_detected_callback(struct ndpi_workflow * workflow,
         ndpi_workflow_callback_ptr callback,
         void * udata) {
   workflow->__flow_detected_callback = callback;
   workflow->__flow_detected_udata = udata;
 }
 
-inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow * workflow,
+static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow * workflow,
         ndpi_workflow_callback_ptr callback,
         void * udata) {
   workflow->__flow_giveup_callback = callback;
