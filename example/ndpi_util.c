@@ -1,8 +1,7 @@
 /*
  * ndpi_util.c
  *
- * Copyright (C) 2011-15 - ntop.org
- * Copyright (C) 2009-11 - ipoque GmbH
+ * Copyright (C) 2011-16 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -60,8 +59,8 @@
 /* mask for Bad FCF presence */
 #define BAD_FCS                         0x50    /* 0101 0000 */
 
-#define GTP_U_V1_PORT            2152
-#define TZSP_PORT               37008
+#define GTP_U_V1_PORT                   2152
+#define TZSP_PORT                      37008
 
 #define SIZEOF_ID_STRUCT (sizeof(struct ndpi_id_struct))
 #define SIZEOF_FLOW_STRUCT (sizeof(struct ndpi_flow_struct))
@@ -548,8 +547,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   u_int32_t label;
 
   /* counters */
-  u_int8_t malformed_pkts = 0, vlan_packet = 0;
-  u_int8_t slarp_pkts = 0, cdp_pkts = 0;
+  u_int8_t vlan_packet = 0;
 
   /* Increment raw packet counter */
   workflow->stats.raw_packet_count++;
@@ -627,7 +625,6 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
       /* Check Bad FCS presence */
       if((radiotap->flags & BAD_FCS) == BAD_FCS) {
-	malformed_pkts += 1;
 	workflow->stats.total_discarded_bytes +=  header->len;
 	return;
       }
@@ -682,17 +679,10 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       label = ntohl(mpls->label);
     }
   }
-  else if(type == SLARP) {
+  else if(type == SLARP)
     slarp = (struct ndpi_slarp *) &packet[ip_offset];
-    if(slarp->slarp_type == 0x02 || slarp->slarp_type == 0x00 || slarp->slarp_type == 0x01) {
-      /* TODO if info are needed */
-    }
-    slarp_pkts++;
-  }
-  else if(type == CISCO_D_PROTO) {
+  else if(type == CISCO_D_PROTO)
     cdp = (struct ndpi_cdp *) &packet[ip_offset];
-    cdp_pkts++;
-  }
   else if(type == PPPoE) {
     workflow->stats.pppoe_count++;
     type = ETH_P_IP;
