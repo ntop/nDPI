@@ -1,11 +1,7 @@
 /*
  * ndpi_util.h
  *
- * Copyright (C) 2011-15 - ntop.org
- * Copyright (C) 2009-11 - ipoque GmbH
- *
- * This file is part of nDPI, an open source deep packet inspection
- * library based on the OpenDPI and PACE technology by ipoque GmbH
+ * Copyright (C) 2011-16 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -112,10 +108,10 @@ typedef struct ndpi_workflow {
 
 /* TODO: remove wrappers parameters and use ndpi global, when their initialization will be fixed... */
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
-        pcap_t * pcap_handle,
-        void * (*malloc_wrapper)(size_t),
-        void (*free_wrapper)(void*),
-        ndpi_debug_function_ptr ndpi_debug_printf);
+					  pcap_t * pcap_handle,
+					  void * (*malloc_wrapper)(size_t),
+					  void (*free_wrapper)(void*),
+					  ndpi_debug_function_ptr ndpi_debug_printf);
 
 void ndpi_workflow_free(struct ndpi_workflow * workflow);
 
@@ -127,20 +123,20 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 
 /** Process a @packet and update the @workflow.  */
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
-				 const struct pcap_pkthdr *header,
-				 const u_char *packet);
+				   const struct pcap_pkthdr *header,
+				   const u_char *packet);
 
 /* flow callbacks: ndpi_flow_info will be freed right after */
 static inline void ndpi_workflow_set_flow_detected_callback(struct ndpi_workflow * workflow,
-        ndpi_workflow_callback_ptr callback,
-        void * udata) {
+							    ndpi_workflow_callback_ptr callback,
+							    void * udata) {
   workflow->__flow_detected_callback = callback;
   workflow->__flow_detected_udata = udata;
 }
 
 static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow * workflow,
-        ndpi_workflow_callback_ptr callback,
-        void * udata) {
+							  ndpi_workflow_callback_ptr callback,
+							  void * udata) {
   workflow->__flow_giveup_callback = callback;
   workflow->__flow_giveup_udata = udata;
 }

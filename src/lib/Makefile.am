@@ -16,7 +16,6 @@ libndpi_la_include_HEADERS = ../include/ndpi_api.h \
 
 libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     ndpi_main.c \
-		     ndpi_util.c \
 		     protocols/afp.c \
 		     protocols/aimini.c \
 		     protocols/applejuice.c \
