@@ -35,6 +35,7 @@
 #ifdef WIN32
 #include "ndpi_win32.h"
 #else
+#include <sys/types.h>
 #include <sys/param.h>
 #include <pthread.h>
 #include <arpa/inet.h>
