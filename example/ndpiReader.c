@@ -1044,14 +1044,14 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
   pcap_t * pcap_handle = NULL;
 
   /* trying to open a live interface */
-  if((pcap_handle = pcap_open_live(pcap_file, snaplen, promisc, 500, pcap_error_buffer)) == NULL) {
+  if((pcap_handle = pcap_open_live((char*)pcap_file, snaplen, promisc, 500, pcap_error_buffer)) == NULL) {
     capture_for = capture_until = 0;
 
     live_capture = 0;
     num_threads = 1; /* Open pcap files in single threads mode */
 
     /* trying to open a pcap file */
-    if((pcap_handle = pcap_open_offline(pcap_file, pcap_error_buffer)) == NULL) {
+    if((pcap_handle = pcap_open_offline((char*)pcap_file, pcap_error_buffer)) == NULL) {
       char filename[256];
 
       /* trying to open a pcap playlist */
@@ -1197,7 +1197,7 @@ void test_lib() {
 #endif
 
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    pcap_t * cap = openPcapFileOrDevice(thread_id, _pcap_file[thread_id]);
+    pcap_t * cap = openPcapFileOrDevice(thread_id, (const u_char*)_pcap_file[thread_id]);
     setupDetection(thread_id, cap);
   }
 
