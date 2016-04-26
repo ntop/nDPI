@@ -116,7 +116,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   /* FLAGS fields */
   if(header->flags != EMPTY && header->flags != LAST_PKT &&
      header->flags != PLUS_0 && header->flags != PLUS_1 &&
-     header->flags != PLUS_2 && header->flags != REQ_ACK &
+     header->flags != PLUS_2 && header->flags != REQ_ACK &&
      header->flags != MORE_1 && header->flags != CLIENT_INIT_1 &&
      header->flags != CLIENT_INIT_2) {
     exclude = 1;
@@ -126,7 +126,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   if(header->type == DATA) {
     if(header->flags != LAST_PKT && header->flags != EMPTY &&
        header->flags != PLUS_0 && header->flags != PLUS_1 &&
-       header->flags != PLUS_2 && header->flags != REQ_ACK &
+       header->flags != PLUS_2 && header->flags != REQ_ACK &&
        header->flags != MORE_1) {
       exclude = 1;
       goto end;
