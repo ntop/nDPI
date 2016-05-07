@@ -86,14 +86,14 @@ static const u_int8_t nDPI_traceLevel = 0;
 static void (*removeme_free_wrapper)(void*);
 
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
-        pcap_t * pcap_handle,
-        void * (*malloc_wrapper)(size_t),
-        void (*free_wrapper)(void*),
-        ndpi_debug_function_ptr ndpi_debug_printf) {
-
+					  pcap_t * pcap_handle,
+					  void * (*malloc_wrapper)(size_t),
+					  void (*free_wrapper)(void*),
+					  ndpi_debug_function_ptr ndpi_debug_printf) {
+  
   /* TODO: just needed here to init ndpi malloc wrapper */
-  struct ndpi_detection_module_struct * module = ndpi_init_detection_module(
-     prefs->detection_tick_resolution, malloc_wrapper, free_wrapper, ndpi_debug_printf);
+  struct ndpi_detection_module_struct * module = ndpi_init_detection_module(prefs->detection_tick_resolution, 
+									    malloc_wrapper, free_wrapper, ndpi_debug_printf);
 
   struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
 
@@ -153,22 +153,22 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
 /* ***************************************************** */
 
 static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow,
-        const u_int8_t version,
-        u_int16_t vlan_id,
-        const struct ndpi_iphdr *iph,
-        const struct ndpi_ipv6hdr *iph6,
-        u_int16_t ip_offset,
-        u_int16_t ipsize,
-        u_int16_t l4_packet_len,
-        struct ndpi_tcphdr **tcph,
-        struct ndpi_udphdr **udph,
-        u_int16_t *sport, u_int16_t *dport,
-        struct ndpi_id_struct **src,
-        struct ndpi_id_struct **dst,
-        u_int8_t *proto,
-        u_int8_t **payload,
-        u_int16_t *payload_len,
-        u_int8_t *src_to_dst_direction) {
+						 const u_int8_t version,
+						 u_int16_t vlan_id,
+						 const struct ndpi_iphdr *iph,
+						 const struct ndpi_ipv6hdr *iph6,
+						 u_int16_t ip_offset,
+						 u_int16_t ipsize,
+						 u_int16_t l4_packet_len,
+						 struct ndpi_tcphdr **tcph,
+						 struct ndpi_udphdr **udph,
+						 u_int16_t *sport, u_int16_t *dport,
+						 struct ndpi_id_struct **src,
+						 struct ndpi_id_struct **dst,
+						 u_int8_t *proto,
+						 u_int8_t **payload,
+						 u_int16_t *payload_len,
+						 u_int8_t *src_to_dst_direction) {
   u_int32_t idx, l4_offset;
   u_int32_t lower_ip;
   u_int32_t upper_ip;
@@ -294,7 +294,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
   if(0)
     NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "[NDPI] [%u][%u:%u <-> %u:%u]\n",
-	   iph->protocol, lower_ip, ntohs(lower_port), upper_ip, ntohs(upper_port));
+	     iph->protocol, lower_ip, ntohs(lower_port), upper_ip, ntohs(upper_port));
 
   idx = (vlan_id + lower_ip + upper_ip + iph->protocol + lower_port + upper_port) % workflow->prefs.num_roots;
   ret = ndpi_tfind(&flow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp);
@@ -369,18 +369,18 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 /* ****************************************************** */
 
 static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflow,
-        u_int16_t vlan_id,
-        const struct ndpi_ipv6hdr *iph6,
-				u_int16_t ip_offset,
-				struct ndpi_tcphdr **tcph,
-				struct ndpi_udphdr **udph,
-				u_int16_t *sport, u_int16_t *dport,
-				struct ndpi_id_struct **src,
-				struct ndpi_id_struct **dst,
-				u_int8_t *proto,
-				u_int8_t **payload,
-				u_int16_t *payload_len,
-				u_int8_t *src_to_dst_direction) {
+						  u_int16_t vlan_id,
+						  const struct ndpi_ipv6hdr *iph6,
+						  u_int16_t ip_offset,
+						  struct ndpi_tcphdr **tcph,
+						  struct ndpi_udphdr **udph,
+						  u_int16_t *sport, u_int16_t *dport,
+						  struct ndpi_id_struct **src,
+						  struct ndpi_id_struct **dst,
+						  u_int8_t *proto,
+						  u_int8_t **payload,
+						  u_int16_t *payload_len,
+						  u_int8_t *src_to_dst_direction) {
   struct ndpi_iphdr iph;
 
   memset(&iph, 0, sizeof(iph));
@@ -396,22 +396,22 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   }
 
   return(get_ndpi_flow_info(workflow, 6, vlan_id, &iph, iph6, ip_offset,
-		       sizeof(struct ndpi_ipv6hdr),
-		       ntohs(iph6->ip6_ctlun.ip6_un1.ip6_un1_plen),
-		       tcph, udph, sport, dport,
-		       src, dst, proto, payload, payload_len, src_to_dst_direction));
+			    sizeof(struct ndpi_ipv6hdr),
+			    ntohs(iph6->ip6_ctlun.ip6_un1.ip6_un1_plen),
+			    tcph, udph, sport, dport,
+			    src, dst, proto, payload, payload_len, src_to_dst_direction));
 }
 
 /* ****************************************************** */
 
 // ipsize = header->len - ip_offset ; rawsize = header->len
 static unsigned int packet_processing(struct ndpi_workflow * workflow,
-        const u_int64_t time,
-        u_int16_t vlan_id,
-        const struct ndpi_iphdr *iph,
-        struct ndpi_ipv6hdr *iph6,
-        u_int16_t ip_offset,
-        u_int16_t ipsize, u_int16_t rawsize) {
+				      const u_int64_t time,
+				      u_int16_t vlan_id,
+				      const struct ndpi_iphdr *iph,
+				      struct ndpi_ipv6hdr *iph6,
+				      u_int16_t ip_offset,
+				      u_int16_t ipsize, u_int16_t rawsize) {
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow_info *flow;
   struct ndpi_flow_struct *ndpi_flow = NULL;
@@ -424,16 +424,16 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 
   if(iph)
     flow = get_ndpi_flow_info(workflow, 4, vlan_id, iph, NULL,
-			 ip_offset, ipsize,
-			 ntohs(iph->tot_len) - (iph->ihl * 4),
-			 &tcph, &udph, &sport, &dport,
-			 &src, &dst, &proto,
-			 &payload, &payload_len, &src_to_dst_direction);
+			      ip_offset, ipsize,
+			      ntohs(iph->tot_len) - (iph->ihl * 4),
+			      &tcph, &udph, &sport, &dport,
+			      &src, &dst, &proto,
+			      &payload, &payload_len, &src_to_dst_direction);
   else
     flow = get_ndpi_flow_info6(workflow, vlan_id, iph6, ip_offset,
-			  &tcph, &udph, &sport, &dport,
-			  &src, &dst, &proto,
-			  &payload, &payload_len, &src_to_dst_direction);
+			       &tcph, &udph, &sport, &dport,
+			       &src, &dst, &proto,
+			       &payload, &payload_len, &src_to_dst_direction);
 
   if(flow != NULL) {
     workflow->stats.ip_packet_count++;
@@ -497,8 +497,8 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 
 /* ****************************************************** */
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
-				 const struct pcap_pkthdr *header,
-				 const u_char *packet) {
+				   const struct pcap_pkthdr *header,
+				   const u_char *packet) {
   /*
    * Declare pointers to packet headers
    */
@@ -569,97 +569,97 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
  datalink_check:
   switch(datalink_type) {
-    case DLT_NULL :
-      if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
-	type = ETH_P_IP;
-      else
-	type = ETH_P_IPV6;
+  case DLT_NULL :
+    if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
+      type = ETH_P_IP;
+    else
+      type = ETH_P_IPV6;
 
-      ip_offset = 4 + eth_offset;
+    ip_offset = 4 + eth_offset;
 
-      /* Cisco PPP in HDLC-like framing - 50 */
-    case DLT_PPP_SERIAL:
-      chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
-      ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
-      type = ntohs(chdlc->proto_code);
-      break;
+    /* Cisco PPP in HDLC-like framing - 50 */
+  case DLT_PPP_SERIAL:
+    chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
+    ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+    type = ntohs(chdlc->proto_code);
+    break;
 
-      /* Cisco PPP with HDLC framing - 104 */
-    case DLT_C_HDLC:
-      chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
-      ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
-      type = ntohs(chdlc->proto_code);
-      break;
+    /* Cisco PPP with HDLC framing - 104 */
+  case DLT_C_HDLC:
+    chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
+    ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+    type = ntohs(chdlc->proto_code);
+    break;
 
-      /* IEEE 802.3 Ethernet - 1 */
-    case DLT_EN10MB :
-      ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
-      ip_offset = sizeof(struct ndpi_ethhdr) + eth_offset;
-      check = ntohs(ethernet->h_proto);
+    /* IEEE 802.3 Ethernet - 1 */
+  case DLT_EN10MB :
+    ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
+    ip_offset = sizeof(struct ndpi_ethhdr) + eth_offset;
+    check = ntohs(ethernet->h_proto);
 
-      if(check <= 1500)
-	pyld_eth_len = check;
-      else if (check >= 1536)
-	type = check;
+    if(check <= 1500)
+      pyld_eth_len = check;
+    else if (check >= 1536)
+      type = check;
 
-      if(pyld_eth_len != 0) {
+    if(pyld_eth_len != 0) {
       /* check for LLC layer with SNAP extension */
-	if(packet[ip_offset] == SNAP) {
-	  llc = (struct ndpi_llc_header *)(&packet[ip_offset]);
-	  type = llc->snap.proto_ID;
-	  ip_offset += + 8;
-	}
+      if(packet[ip_offset] == SNAP) {
+	llc = (struct ndpi_llc_header *)(&packet[ip_offset]);
+	type = llc->snap.proto_ID;
+	ip_offset += + 8;
       }
+    }
+    break;
+
+    /* Linux Cooked Capture - 113 */
+  case DLT_LINUX_SLL :
+    type = (packet[eth_offset+14] << 8) + packet[eth_offset+15];
+    ip_offset = 16 + eth_offset;
+    break;
+
+    /* Radiotap link-layer - 127 */
+  case DLT_IEEE802_11_RADIO :
+    radiotap = (struct ndpi_radiotap_header *) &packet[eth_offset];
+    radio_len = radiotap->len;
+
+    /* Check Bad FCS presence */
+    if((radiotap->flags & BAD_FCS) == BAD_FCS) {
+      workflow->stats.total_discarded_bytes +=  header->len;
+      return;
+    }
+
+    fcs = header->len - 4;
+
+    /* Calculate 802.11 header length (variable) */
+    wifi = (struct ndpi_wifi_header*)( packet + eth_offset + radio_len);
+    fc = wifi->fc;
+
+    /* check wifi data presence */
+    if(FCF_TYPE(fc) == WIFI_DATA) {
+      if((FCF_TO_DS(fc) && FCF_FROM_DS(fc) == 0x0) ||
+	 (FCF_TO_DS(fc) == 0x0 && FCF_FROM_DS(fc)))
+	wifi_len = 26; /* + 4 byte fcs */
+    } else   /* no data frames */
       break;
 
-      /* Linux Cooked Capture - 113 */
-    case DLT_LINUX_SLL :
-      type = (packet[eth_offset+14] << 8) + packet[eth_offset+15];
-      ip_offset = 16 + eth_offset;
-      break;
+    /* Check ether_type from LLC */
+    llc = (struct ndpi_llc_header*)(packet + eth_offset + wifi_len + radio_len);
+    if(llc->dsap == SNAP)
+      type = ntohs(llc->snap.proto_ID);
 
-      /* Radiotap link-layer - 127 */
-    case DLT_IEEE802_11_RADIO :
-      radiotap = (struct ndpi_radiotap_header *) &packet[eth_offset];
-      radio_len = radiotap->len;
-
-      /* Check Bad FCS presence */
-      if((radiotap->flags & BAD_FCS) == BAD_FCS) {
-	workflow->stats.total_discarded_bytes +=  header->len;
-	return;
-      }
-
-      fcs = header->len - 4;
-
-      /* Calculate 802.11 header length (variable) */
-      wifi = (struct ndpi_wifi_header*)( packet + eth_offset + radio_len);
-      fc = wifi->fc;
-
-      /* check wifi data presence */
-      if(FCF_TYPE(fc) == WIFI_DATA) {
-	if((FCF_TO_DS(fc) && FCF_FROM_DS(fc) == 0x0) ||
-	   (FCF_TO_DS(fc) == 0x0 && FCF_FROM_DS(fc)))
-	  wifi_len = 26; /* + 4 byte fcs */
-      } else   /* no data frames */
-	break;
-
-      /* Check ether_type from LLC */
-      llc = (struct ndpi_llc_header*)(packet + eth_offset + wifi_len + radio_len);
-      if(llc->dsap == SNAP)
-	type = ntohs(llc->snap.proto_ID);
-
-      /* Set IP header offset */
-      ip_offset = wifi_len + radio_len + sizeof(struct ndpi_llc_header) + eth_offset;
-      break;
+    /* Set IP header offset */
+    ip_offset = wifi_len + radio_len + sizeof(struct ndpi_llc_header) + eth_offset;
+    break;
 
   case DLT_RAW:
     ip_offset = eth_offset = 0;
     break;
 
-    default:
-      /* printf("Unknown datalink %d\n", datalink_type); */
-      return;
-    }
+  default:
+    /* printf("Unknown datalink %d\n", datalink_type); */
+    return;
+  }
 
   /* check ether type */
   if(type == VLAN) {
@@ -705,7 +705,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
       if(cap_warning_used == 0) {
 	if(!workflow->prefs.quiet_mode)
-    NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
+	  NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
 	cap_warning_used = 1;
       }
     }
@@ -726,7 +726,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
       if(ipv4_frags_warning_used == 0) {
 	if(!workflow->prefs.quiet_mode)
-      NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: IPv4 fragments are not handled by this demo (nDPI supports them)\n");
+	  NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: IPv4 fragments are not handled by this demo (nDPI supports them)\n");
 	ipv4_frags_warning_used = 1;
       }
 

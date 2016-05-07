@@ -36,3 +36,10 @@ ndpi_malloc
 ndpi_calloc
 ndpi_set_detected_protocol
 ndpi_match_string_subprotocol
+ndpi_init_automa
+ndpi_free_automa
+ndpi_add_string_to_automa
+ndpi_finalize_automa
+ndpi_match_string
+set_ndpi_malloc
+set_ndpi_free

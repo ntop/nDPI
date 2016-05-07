@@ -544,6 +544,62 @@ extern "C" {
 		      struct ndpi_flow_struct *flow, char *certificate);
 #endif
 
+  /* Wrappers functions */
+  /**
+   * Init Aho-Corasick automata
+   *
+   * @return  The requested automata, or NULL if an error occurred
+   * 
+   */
+  void* ndpi_init_automa();
+
+
+  /**
+   * Free Aho-Corasick automata allocated with ndpi_init_automa();
+   *
+   * @par     The automata initialized with ndpi_init_automa();
+   * @return  The requested automata, or NULL if an error occurred
+   * 
+   */
+  void ndpi_free_automa(void *_automa);
+
+
+  /**
+   * Add a string to match to an automata
+   *
+   * @par     The automata initialized with ndpi_init_automa();
+   * @par     The (sub)string to search
+   * @return  0 in case of no error, or -1 if an error occurred.
+   * 
+   */
+  int ndpi_add_string_to_automa(void *_automa, char *str);
+
+
+  /**
+   * Finalize the automa (necessary before start searching)
+   *
+   * @par     The automata initialized with ndpi_init_automa();
+   * 
+   */
+  void ndpi_finalize_automa(void *_automa);
+
+
+  /**
+   * Add a string to match to an automata
+   *
+   * @par     The automata initialized with ndpi_init_automa();
+   * @par     The (sub)string to search
+   * @return  0 in case of match, or -1 if no match, or -2 if an error occurred.
+   * 
+   */
+  int ndpi_match_string(void *_automa, char *string_to_match);
+
+
+
+  /* Utility functions to set ndpi malloc/free wrappers */
+  void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
+  void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
+
 #ifdef __cplusplus
 }
 #endif

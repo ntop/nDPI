@@ -117,8 +117,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       if(off < flow->packet.payload_packet_len)
       {
 	flow->host_server_name[j] = flow->packet.payload[off];
-	if(j < strlen(flow->host_server_name))
-	{
+	if(j < strlen((char*)flow->host_server_name)) {
 	  if(flow->host_server_name[j] < ' ')
 	    flow->host_server_name[j] = '.';
 	  j++;
