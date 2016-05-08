@@ -1792,8 +1792,7 @@ static void free_ptree_data(void *data) { ; }
 
 /* ****************************************************** */
 
-void ndpi_exit_detection_module(struct ndpi_detection_module_struct
-				*ndpi_struct, void (*ndpi_free) (void *ptr)) {
+void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct) {
   if(ndpi_struct != NULL) {
     int i;
 

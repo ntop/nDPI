@@ -149,10 +149,9 @@ extern "C" {
    * Destroys the detection module
    *
    * @par ndpi_struct  = the struct to clearing for the detection module
-   * @par ndpi_free    = function pointer to a nDPI memory free function
    *
    */
-  void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct, void (*ndpi_free) (void *ptr));
+  void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct);
 
 
   /**

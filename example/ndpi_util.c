@@ -82,10 +82,6 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 static const u_int8_t nDPI_traceLevel = 0;
 
 /* ***************************************************** */
-/* TODO remove in future... */
-static void (*removeme_free_wrapper)(void*);
-
-/* ***************************************************** */
 
 extern u_int32_t current_ndpi_memory, max_ndpi_memory;
 
@@ -120,8 +116,6 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
   
   struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
 
-  removeme_free_wrapper = free_wrapper;
-
   workflow->pcap_handle = pcap_handle;
   workflow->prefs = *prefs;
   workflow->ndpi_struct = module;
@@ -152,7 +146,7 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow) {
   for(i=0; i<workflow->prefs.num_roots; i++)
     ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
 
-  ndpi_exit_detection_module(workflow->ndpi_struct, removeme_free_wrapper);
+  ndpi_exit_detection_module(workflow->ndpi_struct);
   free(workflow->ndpi_flows_root);
   free(workflow);
 }
@@ -163,7 +157,7 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
   struct ndpi_flow_info *fa = (struct ndpi_flow_info*)a;
   struct ndpi_flow_info *fb = (struct ndpi_flow_info*)b;
 
-  if(fa->vlan_id   < fb->vlan_id  )   return(-1); else { if(fa->vlan_id   > fb->vlan_id  )   return(1); }
+  if(fa->vlan_id   < fb->vlan_id  )   return(-1); else { if(fa->vlan_id   > fb->vlan_id    ) return(1); }
   if(fa->lower_ip   < fb->lower_ip  ) return(-1); else { if(fa->lower_ip   > fb->lower_ip  ) return(1); }
   if(fa->lower_port < fb->lower_port) return(-1); else { if(fa->lower_port > fb->lower_port) return(1); }
   if(fa->upper_ip   < fb->upper_ip  ) return(-1); else { if(fa->upper_ip   > fb->upper_ip  ) return(1); }
