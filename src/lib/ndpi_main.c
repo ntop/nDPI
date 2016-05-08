@@ -308,7 +308,7 @@ static int removeDefaultPort(ndpi_port_range *range,
 
 /* ****************************************** */
 
-void* ndpi_malloc(size_t size) { return(_ndpi_malloc(size)); }
+void* ndpi_malloc(size_t size) { return(_ndpi_malloc ? _ndpi_malloc(size) : malloc(size)); }
 
 /* ****************************************** */
 
@@ -324,7 +324,7 @@ void* ndpi_calloc(unsigned long count, size_t size) {
 
 /* ****************************************** */
 
-void ndpi_free(void *ptr)  { _ndpi_free(ptr); }
+void ndpi_free(void *ptr)  { if(_ndpi_free) _ndpi_free(ptr); else free(ptr); }
 
 /* ****************************************** */
 
@@ -1682,24 +1682,24 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 #endif
 
 void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size)) { _ndpi_malloc = __ndpi_malloc; }
+
 void set_ndpi_free(void  (*__ndpi_free)(void *ptr))       { _ndpi_free = __ndpi_free; }
+
+void set_ndpi_debug_function(ndpi_debug_function_ptr ndpi_debug_printf) {
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
+#endif
+}
 
 /* ******************************************************************** */
 
-struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_per_second,
-								void* (*__ndpi_malloc)(size_t size),
-								void  (*__ndpi_free)(void *ptr),
-								ndpi_debug_function_ptr ndpi_debug_printf)
-{
-  struct ndpi_detection_module_struct *ndpi_str;
-
-  /* TODO global malloc wrappers should not be set here: ndpi_init_detection_module can be called many times */
-  set_ndpi_malloc(__ndpi_malloc), set_ndpi_free(__ndpi_free);
-
-  ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
+struct ndpi_detection_module_struct *ndpi_init_detection_module() {
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
 
   if(ndpi_str == NULL) {
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
     ndpi_debug_printf(0, NULL, NDPI_LOG_DEBUG, "ndpi_init_detection_module initial malloc failed\n");
+#endif
     return NULL;
   }
   memset(ndpi_str, 0, sizeof(struct ndpi_detection_module_struct));
@@ -1709,30 +1709,29 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_
 
   NDPI_BITMASK_RESET(ndpi_str->detection_bitmask);
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
   ndpi_str->user_data = NULL;
 #endif
 
-  ndpi_str->ticks_per_second = ticks_per_second;
+  ndpi_str->ticks_per_second = 1000; /* ndpi_str->ticks_per_second */
   ndpi_str->tcp_max_retransmission_window_size = NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE;
   ndpi_str->directconnect_connection_ip_tick_timeout =
-    NDPI_DIRECTCONNECT_CONNECTION_IP_TICK_TIMEOUT * ticks_per_second;
+    NDPI_DIRECTCONNECT_CONNECTION_IP_TICK_TIMEOUT * ndpi_str->ticks_per_second;
 
-  ndpi_str->rtsp_connection_timeout = NDPI_RTSP_CONNECTION_TIMEOUT * ticks_per_second;
-  ndpi_str->tvants_connection_timeout = NDPI_TVANTS_CONNECTION_TIMEOUT * ticks_per_second;
-  ndpi_str->irc_timeout = NDPI_IRC_CONNECTION_TIMEOUT * ticks_per_second;
-  ndpi_str->gnutella_timeout = NDPI_GNUTELLA_CONNECTION_TIMEOUT * ticks_per_second;
+  ndpi_str->rtsp_connection_timeout = NDPI_RTSP_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
+  ndpi_str->tvants_connection_timeout = NDPI_TVANTS_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
+  ndpi_str->irc_timeout = NDPI_IRC_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
+  ndpi_str->gnutella_timeout = NDPI_GNUTELLA_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
 
-  ndpi_str->battlefield_timeout = NDPI_BATTLEFIELD_CONNECTION_TIMEOUT * ticks_per_second;
+  ndpi_str->battlefield_timeout = NDPI_BATTLEFIELD_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
 
-  ndpi_str->thunder_timeout = NDPI_THUNDER_CONNECTION_TIMEOUT * ticks_per_second;
+  ndpi_str->thunder_timeout = NDPI_THUNDER_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
   ndpi_str->yahoo_detect_http_connections = NDPI_YAHOO_DETECT_HTTP_CONNECTIONS;
 
-  ndpi_str->yahoo_lan_video_timeout = NDPI_YAHOO_LAN_VIDEO_TIMEOUT * ticks_per_second;
-  ndpi_str->zattoo_connection_timeout = NDPI_ZATTOO_CONNECTION_TIMEOUT * ticks_per_second;
-  ndpi_str->jabber_stun_timeout = NDPI_JABBER_STUN_TIMEOUT * ticks_per_second;
-  ndpi_str->jabber_file_transfer_timeout = NDPI_JABBER_FT_TIMEOUT * ticks_per_second;
-  ndpi_str->soulseek_connection_ip_tick_timeout = NDPI_SOULSEEK_CONNECTION_IP_TICK_TIMEOUT * ticks_per_second;
+  ndpi_str->yahoo_lan_video_timeout = NDPI_YAHOO_LAN_VIDEO_TIMEOUT * ndpi_str->ticks_per_second;
+  ndpi_str->zattoo_connection_timeout = NDPI_ZATTOO_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
+  ndpi_str->jabber_stun_timeout = NDPI_JABBER_STUN_TIMEOUT * ndpi_str->ticks_per_second;
+  ndpi_str->jabber_file_transfer_timeout = NDPI_JABBER_FT_TIMEOUT * ndpi_str->ticks_per_second;
+  ndpi_str->soulseek_connection_ip_tick_timeout = NDPI_SOULSEEK_CONNECTION_IP_TICK_TIMEOUT * ndpi_str->ticks_per_second;
 
   ndpi_str->ndpi_num_supported_protocols = NDPI_MAX_SUPPORTED_PROTOCOLS;
   ndpi_str->ndpi_num_custom_protocols = 0;

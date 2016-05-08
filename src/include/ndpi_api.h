@@ -115,22 +115,14 @@ extern "C" {
    *
    */  
   void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol_match *match);
-
   
   /**
    * Returns a new initialized detection module
    *
-   * @par     ticks_per_second    = the timestamp resolution per second (like 1000 for millisecond resolution)
-   * @par     __ndpi_malloc       = function pointer to a nDPI memory allocator
-   * @par     ndpi_debug_printf   = function pointer to a nDPI debug output function (use NULL in productive envionments)
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module(u_int32_t ticks_per_second,
-								  void* (*__ndpi_malloc)(size_t size),
-								  void  (*__ndpi_free)(void *ptr),
-								  ndpi_debug_function_ptr ndpi_debug_printf);
-
+  struct ndpi_detection_module_struct *ndpi_init_detection_module();
   
   /**
    * Frees the memory allocated in the specified flow
@@ -595,10 +587,10 @@ extern "C" {
   int ndpi_match_string(void *_automa, char *string_to_match);
 
 
-
-  /* Utility functions to set ndpi malloc/free wrappers */
+  /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
+  void set_ndpi_debug_function(ndpi_debug_function_ptr ndpi_debug_printf);
 
 #ifdef __cplusplus
 }

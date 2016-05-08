@@ -49,13 +49,6 @@
 #include <json.h>
 #endif
 
-#define MAX_NUM_READER_THREADS     16
-#define IDLE_SCAN_PERIOD           10 /* msec (use detection_tick_resolution = 1000) */
-#define MAX_IDLE_TIME           30000
-#define IDLE_SCAN_BUDGET         1024
-#define NUM_ROOTS                 512
-#define MAX_NDPI_FLOWS      200000000
-
 #include "ndpi_util.h"
 
 /** Client parameters **/
@@ -84,7 +77,6 @@ static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
 static struct timeval pcap_start, pcap_end;
 /** Detection parameters **/
-static u_int32_t detection_tick_resolution = 1000;
 static time_t capture_for = 0;
 static time_t capture_until = 0;
 static u_int32_t num_flows;
@@ -109,7 +101,7 @@ typedef struct ndpi_id {
 } ndpi_id_t;
 
 // used memory counters
-static u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
+u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 
 
 /********************** FUNCTIONS ********************* */
@@ -352,28 +344,6 @@ char* intoaV4(unsigned int addr, char* buf, u_short bufLen) {
 
   return(retStr);
 }
-
-
-/**
- * @brief malloc wrapper function
- */
-static void *malloc_wrapper(size_t size) {
-  current_ndpi_memory += size;
-
-  if(current_ndpi_memory > max_ndpi_memory)
-    max_ndpi_memory = current_ndpi_memory;
-
-  return malloc(size);
-}
-
-
-/**
- * @brief free wrapper function
- */
-static void free_wrapper(void *freeable) {
-  free(freeable);
-}
-
 
 /**
  * @brief Print the flow
@@ -656,10 +626,9 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   prefs.num_roots = NUM_ROOTS;
   prefs.max_ndpi_flows = MAX_NDPI_FLOWS;
   prefs.quiet_mode = quiet_mode;
-  prefs.detection_tick_resolution = detection_tick_resolution;
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
-  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, malloc_wrapper, free_wrapper, debug_printf);
+  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle);
   /* ndpi_thread_info[thread_id].workflow->ndpi_struct->http_dont_dissect_response = 1; */
 
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow, on_protocol_discovered, (void *)(uintptr_t)thread_id);
@@ -1306,7 +1275,6 @@ void test_lib() {
 void automataUnitTest() {
   void *automa;
 
-  set_ndpi_malloc(malloc_wrapper), set_ndpi_free(free_wrapper);
   assert(automa = ndpi_init_automa());
   assert(ndpi_add_string_to_automa(automa, "hello") == 0);
   assert(ndpi_add_string_to_automa(automa, "world") == 0);

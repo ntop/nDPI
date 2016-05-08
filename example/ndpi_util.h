@@ -32,6 +32,15 @@
 
 #include <pcap.h>
 
+#define MAX_NUM_READER_THREADS     16
+#define IDLE_SCAN_PERIOD           10 /* msec (use TICK_RESOLUTION = 1000) */
+#define MAX_IDLE_TIME           30000
+#define IDLE_SCAN_BUDGET         1024
+#define NUM_ROOTS                 512
+#define MAX_NDPI_FLOWS      200000000
+#define TICK_RESOLUTION          1000
+
+
 // flow tracking
 typedef struct ndpi_flow_info {
   u_int32_t lower_ip;
@@ -80,7 +89,6 @@ typedef struct ndpi_workflow_prefs {
   u_int8_t quiet_mode;
   u_int32_t num_roots;
   u_int32_t max_ndpi_flows;
-  u_int32_t detection_tick_resolution;
 } ndpi_workflow_prefs_t;
 
 struct ndpi_workflow;
@@ -107,11 +115,7 @@ typedef struct ndpi_workflow {
 } ndpi_workflow_t;
 
 /* TODO: remove wrappers parameters and use ndpi global, when their initialization will be fixed... */
-struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
-					  pcap_t * pcap_handle,
-					  void * (*malloc_wrapper)(size_t),
-					  void (*free_wrapper)(void*),
-					  ndpi_debug_function_ptr ndpi_debug_printf);
+struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle);
 
 void ndpi_workflow_free(struct ndpi_workflow * workflow);
 
@@ -142,5 +146,6 @@ static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow *
 }
 
 int ndpi_workflow_node_cmp(const void *a, const void *b);
+
 
 #endif

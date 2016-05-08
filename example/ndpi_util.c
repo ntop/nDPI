@@ -85,16 +85,39 @@ static const u_int8_t nDPI_traceLevel = 0;
 /* TODO remove in future... */
 static void (*removeme_free_wrapper)(void*);
 
-struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
-					  pcap_t * pcap_handle,
-					  void * (*malloc_wrapper)(size_t),
-					  void (*free_wrapper)(void*),
-					  ndpi_debug_function_ptr ndpi_debug_printf) {
-  
-  /* TODO: just needed here to init ndpi malloc wrapper */
-  struct ndpi_detection_module_struct * module = ndpi_init_detection_module(prefs->detection_tick_resolution, 
-									    malloc_wrapper, free_wrapper, ndpi_debug_printf);
+/* ***************************************************** */
 
+extern u_int32_t current_ndpi_memory, max_ndpi_memory;
+
+/**
+ * @brief malloc wrapper function
+ */
+static void *malloc_wrapper(size_t size) {
+  current_ndpi_memory += size;
+
+  if(current_ndpi_memory > max_ndpi_memory)
+    max_ndpi_memory = current_ndpi_memory;
+
+  return malloc(size);
+}
+
+/* ***************************************************** */
+
+/**
+ * @brief free wrapper function
+ */
+static void free_wrapper(void *freeable) {
+  free(freeable);
+}
+
+/* ***************************************************** */
+
+struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle) {
+  
+  set_ndpi_malloc(malloc_wrapper), set_ndpi_free(free_wrapper);
+  /* TODO: just needed here to init ndpi malloc wrapper */
+  struct ndpi_detection_module_struct * module = ndpi_init_detection_module();
+  
   struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
 
   removeme_free_wrapper = free_wrapper;
@@ -553,8 +576,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   workflow->stats.raw_packet_count++;
 
   /* setting time */
-  time = ((uint64_t) header->ts.tv_sec) * workflow->prefs.detection_tick_resolution +
-    header->ts.tv_usec / (1000000 / workflow->prefs.detection_tick_resolution);
+  time = ((uint64_t) header->ts.tv_sec) * TICK_RESOLUTION + header->ts.tv_usec / (1000000 / TICK_RESOLUTION);
 
   /* safety check */
   if(workflow->last_time > time) {
