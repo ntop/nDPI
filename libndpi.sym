@@ -1,4 +1,6 @@
 ndpi_dump_protocols
+ndpi_strnstr
+ndpi_detection_giveup
 ndpi_get_proto_name
 ndpi_free
 ndpi_guess_undetected_protocol
