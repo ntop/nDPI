@@ -106,13 +106,13 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 {
     struct ndpi_packet_struct *packet = &flow->packet;
     int ver_offs;
-    
+
     if(packet->udp != NULL) {
 
       u_int16_t sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
-      
+
       NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "calculating quic over udp.\n");
-      
+
       if((((sport == 80) || (dport == 80) || (sport == 443) || (dport == 443))))
       {
 	NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
@@ -124,7 +124,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	{
 	  if (sequence(packet->payload) < 1)
 	  {
-	    
+
 	    NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
 	    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
 	  }
@@ -138,12 +138,12 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	{
 	  // Skip CID length.
 	  ver_offs = connect_id(packet->payload[0]);
-	  
+
 	  if (ver_offs >= 0)
 	  {
 	    unsigned char vers[] = {packet->payload[ver_offs], packet->payload[ver_offs + 1],
 				    packet->payload[ver_offs + 2], packet->payload[ver_offs + 3]};
-	  
+
 	    // Version Match.
 	    if ((vers[0] == 'Q' && vers[1] == '0') &&
 		((vers[2] == '3' && (vers[3] == '3' || vers[3] == '2' || vers[3] == '1' || vers[3] == '0' )) ||
@@ -154,14 +154,14 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 				     vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
 				     vers[3] == '1' || vers[3] == '0')) ||
 		 (vers[2] == '0' && vers[3] == '9')))
-	      
+
 	    {
 	      NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
 	      ndpi_int_quic_add_connection(ndpi_struct, flow);
 	    }
 	  }
 	}
-      } 
+      }
       else
       {
 	NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
