@@ -61,17 +61,20 @@ else
    fi
 fi
 
-PKG_CONFIG=$(which pkg-config)
+AC_ARG_ENABLE([json-c],
+    AS_HELP_STRING([--disable-json-c], [Disable json-c support]))
 
-if test -d /usr/local/include/json-c/; then :
-     CFLAGS="$CFLAGS -I/usr/local/include/json-c/"
-     LDFLAGS="$LDFLAGS -L/usr/local/lib -ljson-c"
-else
-     if ! test -z "$PKG_CONFIG"; then :
-       CFLAGS="$CFLAGS $(pkg-config --cflags json-c)"
-       LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
-     fi
-fi
+AS_IF([test "x$enable_json_c" != "xno"], [
+       PKG_CONFIG_PATH=/usr/local/share/pkgconfig:$PKG_CONFIG_PATH
+       pkg-config --exists json-c
+       AS_IF([test "$?" == "0"],
+             [
+              CFLAGS="$CFLAGS $(pkg-config --cflags json-c)"
+              LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
+              AC_CHECK_LIB(json-c, json_object_new_object, AC_DEFINE_UNQUOTED(HAVE_JSON_C, 1, [The JSON-C library is present]))
+             ],
+             [])
+       ])
 
 OLD_LIBS=$LIBS
 LIBS="-L/opt/napatech3/lib $LIBS"
@@ -81,7 +84,6 @@ AC_CHECK_LIB([ntapi],
              [], [] )
 LIBS=$OLD_LIBS
 
-AC_CHECK_LIB(json-c, json_object_new_object, AC_DEFINE_UNQUOTED(HAVE_JSON_C, 1, [The JSON-C library is present]))
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 

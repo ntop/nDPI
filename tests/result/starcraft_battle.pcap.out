@@ -1,12 +1,13 @@
 Unknown	2	121	1
 DNS	26	2848	7
-HTTP	450	294880	19
+HTTP	271	160676	18
 SSDP	11	4984	1
+HTTPDownload	179	134204	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
-SSL	43	2903	13
-Google	12	1467	2
-Quic	6	475	1
+SSL	41	2782	12
+Google	14	1588	3
+QUIC	6	475	1
 Starcraft	236	51494	6
 
 	1	TCP 80.239.186.21:80 <-> 192.168.1.100:3516 [proto: 7/HTTP][12 pkts/3680 bytes][Host: eu.launcher.battle.net]
@@ -22,7 +23,7 @@ Starcraft	236	51494	6
 	11	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91.126/SSL.Google][3 pkts/168 bytes]
 	12	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/SSL][4 pkts/228 bytes]
 	13	UDP 192.168.1.100:53146 <-> 5.42.180.154:1119 [proto: 213/Starcraft][2 pkts/104 bytes]
-	14	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91/SSL][2 pkts/121 bytes]
+	14	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91.126/SSL.Google][2 pkts/121 bytes]
 	15	TCP 192.168.1.100:3528 <-> 2.228.46.112:80 [proto: 7/HTTP][29 pkts/25105 bytes][Host: bnetcmsus-a.akamaihd.net]
 	16	TCP 192.168.1.100:3530 <-> 2.228.46.112:80 [proto: 7/HTTP][29 pkts/25102 bytes][Host: bnetcmsus-a.akamaihd.net]
 	17	TCP 192.168.1.100:3532 <-> 2.228.46.112:80 [proto: 7/HTTP][4 pkts/386 bytes]
@@ -38,8 +39,8 @@ Starcraft	236	51494	6
 	27	TCP 80.239.186.40:80 <-> 192.168.1.100:3525 [proto: 7/HTTP][12 pkts/3933 bytes][Host: eu.battle.net]
 	28	TCP 80.239.186.26:443 <-> 192.168.1.100:3476 [proto: 91/SSL][1 pkts/60 bytes]
 	29	TCP 80.239.186.40:443 <-> 192.168.1.100:3478 [proto: 91/SSL][1 pkts/60 bytes]
-	30	TCP 192.168.1.100:3508 <-> 87.248.221.254:80 [proto: 7/HTTP][179 pkts/134204 bytes][Host: llnw.blizzard.com]
-	31	UDP 173.194.40.22:443 <-> 192.168.1.100:53568 [proto: 188/Quic][6 pkts/475 bytes]
+	30	TCP 192.168.1.100:3508 <-> 87.248.221.254:80 [proto: 7.60/HTTP.HTTPDownload][179 pkts/134204 bytes][Host: llnw.blizzard.com]
+	31	UDP 173.194.40.22:443 <-> 192.168.1.100:53568 [proto: 188/QUIC][6 pkts/475 bytes]
 	32	UDP 192.168.1.100:55468 <-> 192.168.1.254:53 [proto: 5/DNS][4 pkts/556 bytes][Host: bnetcmsus-a.akamaihd.net]
 	33	UDP 192.168.1.100:58818 <-> 192.168.1.254:53 [proto: 5/DNS][4 pkts/432 bytes][Host: 91.252.30.192.in-addr.arpa]
 	34	UDP 192.168.1.100:58844 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/210 bytes][Host: 40.186.239.80.in-addr.arpa]

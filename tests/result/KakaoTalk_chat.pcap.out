@@ -1,10 +1,10 @@
 Unknown	2	181	1
 DNS	2	217	1
-HTTP	15	840	2
+HTTP	1	56	1
 ICMP	1	147	1
-SSL	34	4913	5
+SSL	33	4830	4
 Facebook	211	51558	11
-Google	1	164	1
+Google	16	1031	3
 HTTP_Proxy	26	3926	1
 KakaoTalk	55	9990	15
 
@@ -35,10 +35,10 @@ KakaoTalk	55	9990	15
 	25	TCP 173.194.72.188:5228 <-> 10.24.82.188:34686 [proto: 126/Google][1 pkts/164 bytes]
 	26	UDP 10.188.1.1:53 <-> 10.24.82.188:14650 [proto: 5/DNS][2 pkts/217 bytes][Host: 2.97.252.173.in-addr.arpa]
 	27	UDP 10.188.1.1:53 <-> 10.24.82.188:19582 [proto: 5.119/DNS.Facebook][2 pkts/218 bytes][Host: graph.facebook.com]
-	28	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7/HTTP][14 pkts/784 bytes]
+	28	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7.126/HTTP.Google][14 pkts/784 bytes]
 	29	UDP 10.188.1.1:53 <-> 10.24.82.188:24596 [proto: 5.119/DNS.Facebook][2 pkts/196 bytes][Host: api.facebook.com]
 	30	TCP 210.103.240.15:443 <-> 10.24.82.188:42332 [proto: 91/SSL][5 pkts/280 bytes]
-	31	TCP 216.58.220.174:443 <-> 10.24.82.188:49217 [proto: 91/SSL][1 pkts/83 bytes]
+	31	TCP 216.58.220.174:443 <-> 10.24.82.188:49217 [proto: 91.126/SSL.Google][1 pkts/83 bytes]
 	32	UDP 10.188.1.1:53 <-> 10.24.82.188:38448 [proto: 5.193/DNS.KakaoTalk][2 pkts/190 bytes][Host: auth.kakao.com]
 	33	TCP 31.13.68.70:443 <-> 10.24.82.188:43581 [proto: 91.119/SSL.Facebook][34 pkts/9655 bytes][SSL client: graph.facebook.com]
 	34	TCP 31.13.68.84:443 <-> 10.24.82.188:45209 [proto: 91.119/SSL.Facebook][19 pkts/7707 bytes][SSL client: api.facebook.com]

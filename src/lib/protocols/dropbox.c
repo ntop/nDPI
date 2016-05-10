@@ -25,6 +25,10 @@
 #include "ndpi_api.h"
 
 #ifdef NDPI_PROTOCOL_DROPBOX
+
+#define DB_LSP_PORT 17500
+
+
 static void ndpi_int_dropbox_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
 					    u_int8_t due_to_correlation)
@@ -40,12 +44,14 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t payload_len = packet->payload_packet_len;
 
   if(packet->udp != NULL) {
-    u_int16_t dropbox_port = htons(17500);
+
+    u_int16_t dropbox_port = htons(DB_LSP_PORT);
 
     if((packet->udp->source == dropbox_port)
        && (packet->udp->dest == dropbox_port)) {
       if(payload_len > 2) {
-	if(strncmp((const char *)packet->payload, "{\"", 2) == 0) {
+	if(strncmp((const char *)packet->payload, "{\"host_int\"", 11) == 0) {
+	  
 	  NDPI_LOG(NDPI_PROTOCOL_DROPBOX, ndpi_struct, NDPI_LOG_DEBUG, "Found dropbox.\n");
 	  ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
 	  return;

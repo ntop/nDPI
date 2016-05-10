@@ -1,8 +1,7 @@
 /*
  * ndpi_main.h
  *
- * Copyright (C) 2011-15 - ntop.org
- * Copyright (C) 2009-2011 by ipoque GmbH
+ * Copyright (C) 2011-16 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -32,6 +31,9 @@
 #include "ndpi_protocols.h"
 #include "ndpi_api.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void *ndpi_tdelete(const void * __restrict, void ** __restrict,
 		   int (*)(const void *, const void *));
@@ -105,6 +107,21 @@ extern int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
 void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
 					   const char **file, const char **func, u_int32_t * line);
+#endif
+
+/** Checks when the @p payload starts with the string literal @p str.
+* When the string is larger than the payload, check fails.
+* @return non-zero if check succeeded
+*/
+int ndpi_match_prefix(const u_int8_t *payload, size_t payload_len,
+                           const char *str, size_t str_len);
+
+/* version of ndpi_match_prefix with string literal */
+#define ndpi_match_strprefix(payload, payload_len, str) \
+  ndpi_match_prefix((payload), (payload_len), (str), (sizeof(str)-1))
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif	/* __NDPI_MAIN_H__ */

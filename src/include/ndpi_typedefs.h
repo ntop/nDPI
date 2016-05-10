@@ -1,8 +1,7 @@
 /*
  * ndpi_typedefs.h
  *
- * Copyright (C) 2011-15 - ntop.org
- * Copyright (C) 2009-11 - ipoque GmbH
+ * Copyright (C) 2011-16 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -474,9 +473,6 @@ struct ndpi_flow_tcp_struct {
   u_int32_t irc_direction:2;
   u_int32_t irc_0x1000_full:1;
 #endif
-#ifdef NDPI_PROTOCOL_WINMX
-  u_int32_t winmx_stage:1;		      // 0 - 1
-#endif
 #ifdef NDPI_PROTOCOL_SOULSEEK
   u_int32_t soulseek_stage:2;
 #endif
@@ -624,6 +620,10 @@ struct ndpi_flow_udp_struct {
 #ifdef NDPI_PROTOCOL_EAQ
   u_int8_t eaq_pkt_id;
   u_int32_t eaq_sequence;
+#endif
+#ifdef NDPI_PROTOCOL_RX
+  u_int32_t rx_conn_epoch;
+  u_int32_t rx_conn_id;
 #endif
 }
 #ifndef WIN32
@@ -861,7 +861,7 @@ struct ndpi_flow_struct {
   u_int16_t protocol_stack_info;
 
   /* init parameter, internal used to set up timestamp,... */
-  u_int16_t guessed_protocol_id, guessed_host_proto_id;
+  u_int16_t guessed_protocol_id, guessed_host_protocol_id;
 
   u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1;
 
@@ -975,10 +975,8 @@ struct ndpi_flow_struct {
 #ifdef NDPI_PROTOCOL_FLORENSIA
   u_int32_t florensia_stage:1;
 #endif
-#ifdef NDPI_PROTOCOL_SOCKS5
+#ifdef NDPI_PROTOCOL_SOCKS
   u_int32_t socks5_stage:2;	                // 0 - 3
-#endif
-#ifdef NDPI_PROTOCOL_SOCKS4
   u_int32_t socks4_stage:2;	                // 0 - 3
 #endif
 #ifdef NDPI_PROTOCOL_EDONKEY
@@ -1014,5 +1012,17 @@ struct ndpi_flow_struct {
   struct ndpi_id_struct *src;
   struct ndpi_id_struct *dst;
 };
+
+typedef struct {
+  char *string_to_match, *proto_name;
+  int protocol_id;
+  ndpi_protocol_breed_t protocol_breed;
+} ndpi_protocol_match;
+
+typedef struct {
+  u_int32_t network;
+  u_int8_t cidr;
+  u_int8_t value;
+} ndpi_network;
 
 #endif/* __NDPI_TYPEDEFS_H__ */

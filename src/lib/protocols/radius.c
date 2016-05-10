@@ -37,12 +37,11 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
 
   if(packet->udp != NULL) {
     struct radius_header *h = (struct radius_header*)packet->payload;
-    u_int len = ntohs(h->len);
 
     if((payload_len > sizeof(struct radius_header))
        && (h->code > 0)
        && (h->code <= 5)
-       && (len == payload_len)) {
+       && (ntohs(h->len) == payload_len)) {
       NDPI_LOG(NDPI_PROTOCOL_RADIUS, ndpi_struct, NDPI_LOG_DEBUG, "Found radius.\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RADIUS, NDPI_PROTOCOL_UNKNOWN);
 

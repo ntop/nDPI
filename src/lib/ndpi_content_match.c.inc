@@ -1,7 +1,7 @@
 /*
  * ndpi_content_match.c
  *
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-16 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,29 +18,60 @@
  *
  */
 
-typedef struct {
-  char *string_to_match, *proto_name;
-  int protocol_id;
-  ndpi_protocol_breed_t protocol_breed;
-} ndpi_protocol_match;
-
-typedef struct {
-  u_int32_t network;
-  u_int8_t cidr;
-  u_int8_t value;
-} ndpi_network;
-
 /* ****************************************************** */
 
 static ndpi_network host_protocol_list[] = {
+
+ /*    
+    Microsoft Corporation (MS One Drive)
+    204.79.195.0/24
+    204.79.196.0/23
+    134.170.0.0/16
+    131.253.12.0/22
+    131.253.16.0/23
+    131.253.18.0/24
+    65.54.191.0/24 
+  */
+  { 0xCC4FC300 /* 204.79.195.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0xCC4FC400 /* 204.79.196.0/23 */, 23, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x86AA0000 /* 134.170.0.0/16  */, 16, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x83FD0C00 /* 131.253.12.0/22 */, 22, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x83FD1000 /* 131.253.16.0/23 */, 23, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x83FD1200 /* 131.253.18.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
+  { 0x4136BF00 /* 65.54.191.0/24   */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
+
+
+ /*    
+    Amazon-EU-AWS Elastic Compute Cloud, EC2 (also used by Netflix)
+    46.137.128.0/18
+  */
+  { 0x2E898000 /* 46.137.128.0/18 */, 18, NDPI_SERVICE_AMAZON },
+  
+ /*    
+    Amazon-EU (also used by Netflix)
+    176.34.184.0/21
+  */
+  { 0xB022B800 /* 176.34.184.0/21 */, 21, NDPI_SERVICE_AMAZON },
+
+ /*    
+    Netflix
+    23.246.0.0/18
+    23.21.190.124/32
+  */
+  { 0x17F60000 /* 23.246.0.0/18 */, 18, NDPI_SERVICE_NETFLIX },
+  { 0x1715BE7C /* 23.21.190.124/32 */, 32, NDPI_SERVICE_NETFLIX },
 
   /*    
     Cloudflare
     104.16.0.0/12
     173.245.48.0/20
+    162.158.0.0/15
+    141.101.125.0/24 CLOUDFLARE-EU CDN network
   */
   { 0x68100000 /* 104.16.0.0/12 */, 12, NDPI_SERVICE_CLOUDFLARE },
   { 0xADF53000 /* 173.245.48.0/20 */, 20, NDPI_SERVICE_CLOUDFLARE },
+  { 0xA29E0000 /* 162.158.0.0/15 */, 15, NDPI_SERVICE_CLOUDFLARE },
+  { 0x8D657D00 /* 141.101.125.0/24 */, 24, NDPI_SERVICE_CLOUDFLARE },
 
  /*    
     OFFICE 365
@@ -89,10 +120,16 @@ static ndpi_network host_protocol_list[] = {
   { 0x4272A000 /* 66.114.160.0 */, 20, NDPI_PROTOCOL_WEBEX },
 
   /*
-    Viber
-    54.171.62.0/24
+    Viber Media AWS-VIBER-MEDIA (NET-54-169-63-160-1) 54.169.63.160 - 54.169.63.191
+    Viber Media S a r l AWS-VIBER-MEDIA-S-A-R-L (NET-54-93-255-64-1) 54.93.255.64 - 54.93.255.127
+    Crittercism AWS-VIBER-MEDIA (NET-52-0-252-0-1) 52.0.252.0 - 52.0.255.255
+    54.169.63.160/27
+    54.93.255.64/26
+    52.0.252.0/22
   */
-  { 0x36AB3E00 /* 54.171.62.0 */, 24, NDPI_PROTOCOL_VIBER },
+  { 0x36A93FA0 /* 54.169.63.160 */, 27, NDPI_PROTOCOL_VIBER },
+  { 0x365DFF40 /* 54.93.255.64 */, 26, NDPI_PROTOCOL_VIBER },
+  { 0x3400FC00 /* 52.0.252.0 */, 22, NDPI_PROTOCOL_VIBER },
 
   /*
     Apple (FaceTime, iMessage,...)
@@ -115,12 +152,15 @@ static ndpi_network host_protocol_list[] = {
     157.56.0.0/14, 157.60.0.0/16, 157.54.0.0/15
     111.221.64.0 - 111.221.127.255
     91.190.216.0/21 (AS198015 Skype Communications Sarl)
+    40.126.129.109/32
   */
   { 0x9D380000 /* 157.56.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
   { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
   { 0x5BBED800 /* 91.190.216.0 */, 21, NDPI_PROTOCOL_SKYPE },
+  { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
+  
 
   /*
     route:          5.42.160.0/19
@@ -132,10 +172,15 @@ static ndpi_network host_protocol_list[] = {
   /*
     Google
     173.194.0.0/16
+    74.125.0.0/16
     64.233.160.0/19
+    216.58.192.0/19
   */
   { 0xADC20000 /* 173.194.0.0 */, 16, NDPI_SERVICE_GOOGLE },
+  { 0x4A7D0000 /* 74.125.0.0  */, 16, NDPI_SERVICE_GOOGLE },
   { 0x40E91600 /* 64.233.160.0 */, 19, NDPI_SERVICE_GOOGLE },
+  { 0xD83AC000 /* 216.58.192.0 */, 19, NDPI_SERVICE_GOOGLE },
+  
   /*
     Ubuntu One
     91.189.89.0/21 (255.255.248.0)
@@ -161,161 +206,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x959AA400 /* 149.154.164.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM},
   { 0x959AA800 /* 149.154.168.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM},
 
-  /* 
-    The Skype list below looks outdated and it is temporarely
-    commented and probably harvested in future releases
-  */    
-#if 0
-  /* Skype */
-  { 0x17600000, 14, NDPI_PROTOCOL_SKYPE },
-  { 0x17613000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x17614000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0x17616000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0x17622000, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x17622800, 22, NDPI_PROTOCOL_SKYPE },
-  { 0x17623800, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x17624000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0x17640000, 15, NDPI_PROTOCOL_SKYPE },
-  { 0x17660000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x17674000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0x17678000, 17, NDPI_PROTOCOL_SKYPE },
-  { 0x40040000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0x41340000, 14, NDPI_PROTOCOL_SKYPE },
-  { 0x4134A000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0x41362800, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x41364200, 23, NDPI_PROTOCOL_SKYPE },
-  { 0x41364400, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x41365200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x41365500, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x41365A00, 23, NDPI_PROTOCOL_SKYPE },
-  { 0x41372C00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x41377500, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x4137E600, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x4137E700, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x42779000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x46250000, 17, NDPI_PROTOCOL_SKYPE },
-  { 0x46258000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0x46259600, 23, NDPI_PROTOCOL_SKYPE },
-  { 0x5EF54000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0x5EF54C00, 23, NDPI_PROTOCOL_SKYPE },
-  { 0x5EF55200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x68280000, 13, NDPI_PROTOCOL_SKYPE },
-  { 0x68920000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0x68928000, 17, NDPI_PROTOCOL_SKYPE },
-  { 0x68D00000, 13, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD1000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD1000, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD1700, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD4000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD4000, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD4200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD4500, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD4600, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD4E00, 23, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD5000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD6000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD7000, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD7800, 22, NDPI_PROTOCOL_SKYPE },
-  { 0x6FDD7C00, 22, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD0100, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD0500, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD0600, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD0800, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD0C00, 22, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD1200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD1500, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD1800, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD2000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD2100, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD2200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD3D00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD3E00, 23, NDPI_PROTOCOL_SKYPE },
-  { 0x83FD8000, 17, NDPI_PROTOCOL_SKYPE },
-  { 0x84F50000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x84F59C00, 22, NDPI_PROTOCOL_SKYPE },
-  { 0x84F5A000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x86AA0000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x86AA8000, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x86AA8800, 21, NDPI_PROTOCOL_SKYPE },
-  { 0x86AAD900, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x89740000, 15, NDPI_PROTOCOL_SKYPE },
-  { 0x89748000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0x8974A000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x89870000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x8A5B0000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x8A5B0000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x8A5B1000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x8A5B2000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0x9D370000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x9D380000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0x9D3C1700, 24, NDPI_PROTOCOL_SKYPE },
-  { 0x9D3C1F00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xA7DCF000, 22, NDPI_PROTOCOL_SKYPE },
-  { 0xA83D0000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0xA83E0000, 15, NDPI_PROTOCOL_SKYPE },
-  { 0xA83F8000, 17, NDPI_PROTOCOL_SKYPE },
-  { 0xBFE80000, 13, NDPI_PROTOCOL_SKYPE },
-  { 0xC030E100, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC0549F00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC054A000, 23, NDPI_PROTOCOL_SKYPE },
-  { 0xC0C59D00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC1954000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0xC1DD7100, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC6310800, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC6C88200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC6CEA400, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC71E1000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0xC73C1C00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC74AD200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC7675A00, 23, NDPI_PROTOCOL_SKYPE },
-  { 0xC7677A00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xC7F23000, 21, NDPI_PROTOCOL_SKYPE },
-  { 0xCA59E000, 21, NDPI_PROTOCOL_SKYPE },
-  { 0xCC4F8700, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCC4FB300, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCC4FC300, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCC4FC500, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCC4FFC00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCC5F6000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0xCC988C00, 23, NDPI_PROTOCOL_SKYPE },
-  { 0xCE8AA800, 21, NDPI_PROTOCOL_SKYPE },
-  { 0xCEBFE000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E0000, 16, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E0000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E2000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E2900, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E3000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E3A00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E3E00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E4000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E4800, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E4D00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E6000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E6200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E8000, 17, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2E8000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0xCF2EE000, 20, NDPI_PROTOCOL_SKYPE },
-  { 0xCF448000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0xCF52FA00, 23, NDPI_PROTOCOL_SKYPE },
-  { 0xD0448800, 21, NDPI_PROTOCOL_SKYPE },
-  { 0xD04C2D00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xD04C2E00, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xD0540000, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xD0540100, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xD0540200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xD0540300, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xD1017000, 23, NDPI_PROTOCOL_SKYPE },
-  { 0xD1B98000, 22, NDPI_PROTOCOL_SKYPE },
-  { 0xD1B9F000, 22, NDPI_PROTOCOL_SKYPE },
-  { 0xD1F0C000, 19, NDPI_PROTOCOL_SKYPE },
-  { 0xD5C78000, 18, NDPI_PROTOCOL_SKYPE },
-  { 0xD820B400, 22, NDPI_PROTOCOL_SKYPE },
-  { 0xD820F000, 22, NDPI_PROTOCOL_SKYPE },
-  { 0xD820F200, 24, NDPI_PROTOCOL_SKYPE },
-  { 0xD821F000, 22, NDPI_PROTOCOL_SKYPE },
-  { 0xD4A10800, 24, NDPI_PROTOCOL_SKYPE },
-#endif
-
+  /* TOR  */
   { 0x012A1231, 32, NDPI_PROTOCOL_TOR },
   { 0x01E69FA1, 32, NDPI_PROTOCOL_TOR },
   { 0x020DE985, 32, NDPI_PROTOCOL_TOR },
@@ -7369,6 +7260,7 @@ ndpi_protocol_match host_match[] = {
   { ".cnn.c",				"CNN",			NDPI_SERVICE_CNN, NDPI_PROTOCOL_FUN },
   { ".cnn.net",				"CNN",			NDPI_SERVICE_CNN, NDPI_PROTOCOL_FUN },
   { ".dropbox.com",			"DropBox",		NDPI_SERVICE_DROPBOX, NDPI_PROTOCOL_SAFE },
+  { "log.getdropbox.com",		"DropBox",		NDPI_SERVICE_DROPBOX, NDPI_PROTOCOL_SAFE },
   { ".ebay.",				"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
   { ".ebay.com",			"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
   { ".ebaystatic.com",			"eBay",			NDPI_SERVICE_EBAY, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7407,11 +7299,14 @@ ndpi_protocol_match host_match[] = {
   { ".skypeassets.",			"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypedata.",			"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypeecs-", /* no final . */	"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".skypeforbusiness.",       	"Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".lync.com",   	                "Skype",		NDPI_SERVICE_SKYPE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".tuenti.com",			"Tuenti",		NDPI_SERVICE_TUENTI, NDPI_PROTOCOL_ACCEPTABLE },
   { ".twttr.com",			"Twitter",		NDPI_SERVICE_TWITTER, NDPI_PROTOCOL_ACCEPTABLE },
   { "twitter.",				"Twitter",		NDPI_SERVICE_TWITTER, NDPI_PROTOCOL_ACCEPTABLE },
   { "twimg.com",			"Twitter",		NDPI_SERVICE_TWITTER, NDPI_PROTOCOL_ACCEPTABLE },
   { ".viber.com",			"Viber",		NDPI_SERVICE_VIBER, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".cdn.viber.com",			"Viber",		NDPI_SERVICE_VIBER, NDPI_PROTOCOL_ACCEPTABLE },  
   { "wikipedia.",			"Wikipedia",		NDPI_SERVICE_WIKIPEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "wikimedia.",			"Wikipedia",		NDPI_SERVICE_WIKIPEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "mediawiki.",			"Wikipedia",		NDPI_SERVICE_WIKIPEDIA, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7465,9 +7360,19 @@ ndpi_protocol_match host_match[] = {
   { "tim-geoportal.geoportal3d.com.br", "TIM_PortasAbertas",    NDPI_SERVICE_TIMPORTASABERTAS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".m4u.com.br",                      "TIM_Recarga",          NDPI_SERVICE_TIMRECARGA, NDPI_PROTOCOL_ACCEPTABLE },
   { ".deezer.com",                      "Deezer",               NDPI_SERVICE_DEEZER, NDPI_PROTOCOL_ACCEPTABLE },
+
   { ".microsoft.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
+  { "i-msdn.sec.s-msft.com",            "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
+  { "i2-msdn.sec.s-msft.com",           "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".webtrends.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".msecnd.net",                      "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".visualstudio.com",                "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },  
+  { "bn1301.storage.live.com",          "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "skyapi.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "d.docs.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "update.microsoft.com",             "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".windowsupdate.com",               "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
+
   { "worldofwarcraft.com",              "WorldOfWarcraft",      NDPI_PROTOCOL_WORLDOFWARCRAFT, NDPI_PROTOCOL_FUN },
   { ".anchorfree.",                     "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
   { "hotspotshield.com",                "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
@@ -7477,20 +7382,18 @@ ndpi_protocol_match host_match[] = {
   { ".ocs.fr",              		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },
   { ".labgency.ws",        		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_FUN },
   
-  { "crl.microsoft.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { "evsecure-ocsp.verisign.com",	"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { "evsecure-aia.verisign.com", 	"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { "evsecure-crl.verisign.com", 	"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { "sa.symcb.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { "sd.symcb.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".omniroot.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".verisign.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".symcb.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".symcd.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".verisign.net",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".geotrust.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".entrust.net",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".public-trust.com",       		"OFFICE_365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "crl.microsoft.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-ocsp.verisign.com",	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-aia.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-crl.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+   { ".omniroot.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".verisign.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".symcb.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".symcd.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".verisign.net",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".geotrust.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".entrust.net",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".public-trust.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
 
   /* http://www.urlquery.net/report.php?id=1453233646161 */
   { "lifedom.top",       		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7544,6 +7447,18 @@ ndpi_protocol_match content_match[] = {
   { "video/webm",			NULL,		        NDPI_CONTENT_WEBM, NDPI_PROTOCOL_FUN },
   { "application/x-rtsp-tunnelled",	NULL,		        NDPI_PROTOCOL_RTSP, NDPI_PROTOCOL_FUN },
   { "application/vnd.apple.mpegurl",	NULL,		        NDPI_CONTENT_MPEG, NDPI_PROTOCOL_FUN },
+  { "application/x-tar",		NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "application/octet-stream",		NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "application/mac-binary",		NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "/x-bzip",				NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "/x-gzip",				NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "/x-zip",				NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "/zip",				NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "binhex",				NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "/base64",				NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "application/gnutar",		NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "application/x-compressed",		NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_ACCEPTABLE },
+  
   { NULL, 0 }
 };
 
@@ -7618,3 +7533,4 @@ static const char *ndpi_en_impossible_bigrams[] = {
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zr", "zs", "zx", "wh", "wk",
   "wb", "zk", "kp", "zk", "xy",
   NULL };
+

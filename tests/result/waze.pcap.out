@@ -1,6 +1,6 @@
 Unknown	10	786	1
-HTTP	37	63205	1
 NTP	2	180	1
+HTTPDownload	37	63205	1
 SSL_No_Cert	13	2142	1
 Waze	484	289335	19
 WhatsApp	15	1341	1
@@ -26,7 +26,7 @@ Simet	36	2004	9
 	18	TCP 10.8.0.1:45546 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1328 bytes][Host: cres.waze.com]
 	19	TCP 10.8.0.1:45552 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1323 bytes][Host: cres.waze.com]
 	20	TCP 10.8.0.1:45554 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][14 pkts/1319 bytes][Host: cres.waze.com]
-	21	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7/HTTP][37 pkts/63205 bytes][Host: xtra1.gpsonextra.net]
+	21	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7.60/HTTP.HTTPDownload][37 pkts/63205 bytes][Host: xtra1.gpsonextra.net]
 	22	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 64/SSL_No_Cert][13 pkts/2142 bytes]
 	23	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91.200/SSL.Simet][4 pkts/216 bytes]
 	24	TCP 10.8.0.1:51049 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][23 pkts/7823 bytes][SSL server: *.waze.com]

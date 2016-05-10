@@ -49,9 +49,8 @@ u_int8_t ndpi_check_starcraft_tcp(struct ndpi_detection_module_struct* ndpi_stru
 {
   if (sc2_match_logon_ip(&flow->packet)
       && flow->packet.tcp->dest == htons(1119)	//bnetgame port
-      && flow->packet.payload_packet_len >= 10
-      && (match_first_bytes(flow->packet.payload, "\x4a\x00\x00\x0a\x66\x02\x0a\xed\x2d\x66") 
-	  || match_first_bytes(flow->packet.payload, "\x49\x00\x00\x0a\x66\x02\x0a\xed\x2d\x66")))
+      && (ndpi_match_strprefix(flow->packet.payload, flow->packet.payload_packet_len, "\x4a\x00\x00\x0a\x66\x02\x0a\xed\x2d\x66") 
+	  || ndpi_match_strprefix(flow->packet.payload, flow->packet.payload_packet_len, "\x49\x00\x00\x0a\x66\x02\x0a\xed\x2d\x66")))
     return 1;
   else
     return -1;

@@ -1,7 +1,6 @@
 /*
  *
- * Copyright (C) 2011-15 - ntop.org
- * Copyright (C) 2009-2011 by ipoque GmbH
+ * Copyright (C) 2011-16 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -77,7 +76,7 @@
 
 #endif
 
-#define NDPI_USE_ASYMMETRIC_DETECTION             0
+#define NDPI_USE_ASYMMETRIC_DETECTION                           0
 #define NDPI_SELECTION_BITMASK_PROTOCOL_SIZE			u_int32_t
 
 #define NDPI_SELECTION_BITMASK_PROTOCOL_IP			(1<<0)
@@ -160,24 +159,24 @@
 /* TODO: rebuild all memory areas to have a more aligned memory block here */
 
 /* DEFINITION OF MAX LINE NUMBERS FOR line parse algorithm */
-#define NDPI_MAX_PARSE_LINES_PER_PACKET                        64
+#define NDPI_MAX_PARSE_LINES_PER_PACKET                         64
 
 #define MAX_PACKET_COUNTER                                   65000
 #define MAX_DEFAULT_PORTS                                        5
 
 #define NDPI_DIRECTCONNECT_CONNECTION_IP_TICK_TIMEOUT          600
 #define NDPI_IRC_CONNECTION_TIMEOUT                            120
-#define NDPI_GNUTELLA_CONNECTION_TIMEOUT                       60
-#define NDPI_BATTLEFIELD_CONNECTION_TIMEOUT                    60
-#define NDPI_THUNDER_CONNECTION_TIMEOUT                        30
-#define NDPI_RTSP_CONNECTION_TIMEOUT                           5
-#define NDPI_TVANTS_CONNECTION_TIMEOUT                         5
-#define NDPI_YAHOO_DETECT_HTTP_CONNECTIONS                     1
-#define NDPI_YAHOO_LAN_VIDEO_TIMEOUT                           30
+#define NDPI_GNUTELLA_CONNECTION_TIMEOUT                        60
+#define NDPI_BATTLEFIELD_CONNECTION_TIMEOUT                     60
+#define NDPI_THUNDER_CONNECTION_TIMEOUT                         30
+#define NDPI_RTSP_CONNECTION_TIMEOUT                             5
+#define NDPI_TVANTS_CONNECTION_TIMEOUT                           5
+#define NDPI_YAHOO_DETECT_HTTP_CONNECTIONS                       1
+#define NDPI_YAHOO_LAN_VIDEO_TIMEOUT                            30
 #define NDPI_ZATTOO_CONNECTION_TIMEOUT                         120
-#define NDPI_ZATTOO_FLASH_TIMEOUT                              5
-#define NDPI_JABBER_STUN_TIMEOUT                               30
-#define NDPI_JABBER_FT_TIMEOUT				       5
+#define NDPI_ZATTOO_FLASH_TIMEOUT                                5
+#define NDPI_JABBER_STUN_TIMEOUT                                30
+#define NDPI_JABBER_FT_TIMEOUT				         5
 #define NDPI_SOULSEEK_CONNECTION_IP_TICK_TIMEOUT               600
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES

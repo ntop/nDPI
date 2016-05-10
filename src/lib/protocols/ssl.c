@@ -92,11 +92,12 @@ static void ndpi_int_ssl_add_connection(struct ndpi_detection_module_struct *ndp
                      ((ch) >= '{' && (ch) <= '~'))
 
 static void stripCertificateTrailer(char *buffer, int buffer_len) {
-  int i;
+
+  int i, is_puny;
 
   //  printf("->%s<-\n", buffer);
 
-  for(i=0; i<buffer_len; i++) {
+  for(i = 0; i < buffer_len; i++) {
     // printf("%c [%d]\n", buffer[i], buffer[i]);
 
     if((buffer[i] != '.')
@@ -110,21 +111,28 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
     }
   }
 
-  if(i > 0) i--;
-
-  while(i > 0) {
-    if(!ndpi_isalpha(buffer[i])) {
-      buffer[i] = '\0';
-      buffer_len = i;
-      i--;
-    } else
-      break;
-  }
-
-  for(i=buffer_len; i>0; i--) {
-    if(buffer[i] == '.') break;
-    else if(ndpi_isdigit(buffer[i]))
-      buffer[i] = '\0', buffer_len = i;
+  /* check for punycode encoding */
+  is_puny = check_punycode_string(buffer, buffer_len);
+  
+  // not a punycode string - need more checks
+  if(is_puny == 0) {
+    
+    if(i > 0) i--;
+    
+    while(i > 0) {
+      if(!ndpi_isalpha(buffer[i])) {
+	buffer[i] = '\0';
+	buffer_len = i;
+	i--;
+      } else
+	break;
+    }
+    
+    for(i = buffer_len; i > 0; i--) {    
+      if(buffer[i] == '.') break;
+      else if(ndpi_isdigit(buffer[i]))
+	buffer[i] = '\0', buffer_len = i;
+    }
   }
 }
 
@@ -215,64 +223,67 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       } else if(handshake_protocol == 0x01 /* Client Hello */) {
 	u_int offset, base_offset = 43;
-	u_int16_t session_id_len = packet->payload[base_offset];
+	if (base_offset + 2 <= packet->payload_packet_len)
+	{
+	  u_int16_t session_id_len = packet->payload[base_offset];
 
-	if((session_id_len+base_offset+2) <= total_len) {
-	  u_int16_t cypher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
-	  offset = base_offset + session_id_len + cypher_len + 2;
+	  if((session_id_len+base_offset+2) <= total_len) {
+	    u_int16_t cypher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
+	    offset = base_offset + session_id_len + cypher_len + 2;
 
-	  flow->l4.tcp.ssl_seen_client_cert = 1;
-
-	  if(offset < total_len) {
-	    u_int16_t compression_len;
-	    u_int16_t extensions_len;
-
-	    compression_len = packet->payload[offset+1];
-	    offset += compression_len + 3;
+	    flow->l4.tcp.ssl_seen_client_cert = 1;
 
 	    if(offset < total_len) {
-	      extensions_len = packet->payload[offset];
+	      u_int16_t compression_len;
+	      u_int16_t extensions_len;
 
-	      if((extensions_len+offset) < total_len) {
-		u_int16_t extension_offset = 1; /* Move to the first extension */
+	      compression_len = packet->payload[offset+1];
+	      offset += compression_len + 3;
 
-		while(extension_offset < extensions_len) {
-		  u_int16_t extension_id, extension_len;
+	      if(offset < total_len) {
+		extensions_len = packet->payload[offset];
 
-		  memcpy(&extension_id, &packet->payload[offset+extension_offset], 2);
-		  extension_offset += 2;
+		if((extensions_len+offset) < total_len) {
+		  u_int16_t extension_offset = 1; /* Move to the first extension */
 
-		  memcpy(&extension_len, &packet->payload[offset+extension_offset], 2);
-		  extension_offset += 2;
+		  while(extension_offset < extensions_len) {
+		    u_int16_t extension_id, extension_len;
 
-		  extension_id = ntohs(extension_id), extension_len = ntohs(extension_len);
+		    memcpy(&extension_id, &packet->payload[offset+extension_offset], 2);
+		    extension_offset += 2;
 
-		  if(extension_id == 0) {
-		    u_int begin = 0,len;
-		    char *server_name = (char*)&packet->payload[offset+extension_offset];
+		    memcpy(&extension_len, &packet->payload[offset+extension_offset], 2);
+		    extension_offset += 2;
 
-		    while(begin < extension_len) {
-		      if((!ndpi_isprint(server_name[begin]))
-			 || ndpi_ispunct(server_name[begin])
-			 || ndpi_isspace(server_name[begin]))
-			begin++;
-		      else
-			break;
+		    extension_id = ntohs(extension_id), extension_len = ntohs(extension_len);
+
+		    if(extension_id == 0) {
+		      u_int begin = 0,len;
+		      char *server_name = (char*)&packet->payload[offset+extension_offset];
+
+		      while(begin < extension_len) {
+			if((!ndpi_isprint(server_name[begin]))
+			   || ndpi_ispunct(server_name[begin])
+			   || ndpi_isspace(server_name[begin]))
+			  begin++;
+			else
+			  break;
+		      }
+
+		      len = (u_int)ndpi_min(extension_len-begin, buffer_len-1);
+		      strncpy(buffer, &server_name[begin], len);
+		      buffer[len] = '\0';
+		      stripCertificateTrailer(buffer, buffer_len);
+
+		      snprintf(flow->protos.ssl.client_certificate,
+			       sizeof(flow->protos.ssl.client_certificate), "%s", buffer);
+
+		      /* We're happy now */
+		      return(2 /* Client Certificate */);
 		    }
 
-		    len = (u_int)ndpi_min(extension_len-begin, buffer_len-1);
-		    strncpy(buffer, &server_name[begin], len);
-		    buffer[len] = '\0';
-		    stripCertificateTrailer(buffer, buffer_len);
-
-		    snprintf(flow->protos.ssl.client_certificate,
-			     sizeof(flow->protos.ssl.client_certificate), "%s", buffer);
-
-		    /* We're happy now */
-		    return(2 /* Client Certificate */);
+		    extension_offset += extension_len;
 		  }
-
-		  extension_offset += extension_len;
 		}
 	      }
 	    }

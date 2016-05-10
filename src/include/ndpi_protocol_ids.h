@@ -1,8 +1,7 @@
 /*
  * ndpi_protocol_ids.h
  *
- * Copyright (C) 2011-15 - ntop.org
- * Copyright (C) 2009-11 - ipoque GmbH
+ * Copyright (C) 2011-16 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -49,14 +48,14 @@
 #define NDPI_PROTOCOL_IP_ICMPV6					102
 
 #define NDPI_PROTOCOL_HTTP					7
-#define NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV 		        60
+#define NDPI_PROTOCOL_HTTP_DOWNLOAD    		                60
 #define NDPI_PROTOCOL_SSL_NO_CERT			        64 /* SSL without certificate (Skype, Ultrasurf?) - ntop.org */
 #define NDPI_PROTOCOL_SSL					91
 #define NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC		110
 #define NDPI_PROTOCOL_HTTP_CONNECT				130
 #define NDPI_PROTOCOL_HTTP_PROXY				131
-#define NDPI_PROTOCOL_SOCKS5					172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_PROTOCOL_SOCKS4					173 /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_PROTOCOL_SOCKS					172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
+
 
 #define NDPI_PROTOCOL_FTP_CONTROL				1 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_MAIL_POP				        2
@@ -83,7 +82,7 @@
 #define NDPI_PROTOCOL_APPLEJUICE				24
 #define NDPI_PROTOCOL_DIRECTCONNECT				25
 #define NDPI_PROTOCOL_SOCRATES				        26
-#define NDPI_PROTOCOL_WINMX					27
+#define NDPI_PROTOCOL_COAP                                      27
 #define NDPI_PROTOCOL_VMWARE					28
 #define NDPI_PROTOCOL_MAIL_SMTPS				29
 #define NDPI_PROTOCOL_FILETOPIA				        30
@@ -203,7 +202,7 @@
 #define NDPI_PROTOCOL_TEREDO 			                214
 #define NDPI_PROTOCOL_HEP 			                216 /* Sipcapture.org QXIP BV */
 #define NDPI_PROTOCOL_UBNTAC2					217 /* Ubiquity UBNT AirControl 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
-#define NDPI_PROTOCOL_MS_LYNC 			                221
+#define NDPI_PROTOCOL_MS_LYNC 			                173
 
 
 
@@ -232,15 +231,15 @@
 #define NDPI_SERVICE_APPLE_ICLOUD			143
 #define NDPI_SERVICE_APPLE_ITUNES			145
 #define NDPI_SERVICE_TUENTI				149
-#define NDPI_SERVICE_WIKIPEDIA				176 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_MSN				NDPI_PROTOCOL_MSN /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_AMAZON				178 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_EBAY				179 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_CNN				180 /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_WIKIPEDIA				176                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_MSN				NDPI_PROTOCOL_MSN     /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_AMAZON				178                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_EBAY				179                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_CNN				180                   /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_SERVICE_DROPBOX				NDPI_PROTOCOL_DROPBOX /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_SKYPE				NDPI_PROTOCOL_SKYPE /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_VIBER				NDPI_PROTOCOL_VIBER /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_SERVICE_YAHOO				NDPI_PROTOCOL_YAHOO /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_SKYPE				NDPI_PROTOCOL_SKYPE   /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_SERVICE_VIBER				NDPI_PROTOCOL_VIBER
+#define NDPI_SERVICE_YAHOO				NDPI_PROTOCOL_YAHOO   /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_SERVICE_PANDORA     			187
 #define NDPI_PROTOCOL_EAQ        			190
 #define NDPI_SERVICE_TIMMEU        			191
@@ -269,9 +268,11 @@
 #define NDPI_SERVICE_OCS                                218
 #define NDPI_SERVICE_OFFICE_365                         219
 #define NDPI_SERVICE_CLOUDFLARE                         220
-
+#define NDPI_SERVICE_MS_ONE_DRIVE                       221
+#define NDPI_PROTOCOL_MQTT								222
+#define NDPI_PROTOCOL_RX 			                223  /* RX: RPC protocol used by AFS */
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_MS_LYNC
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_PROTOCOL_RX
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

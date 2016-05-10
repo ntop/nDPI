@@ -146,7 +146,9 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	  
 	    // Version Match.
 	    if ((vers[0] == 'Q' && vers[1] == '0') &&
-		((vers[2] == '2' && (vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
+		((vers[2] == '3' && (vers[3] == '3' || vers[3] == '2' || vers[3] == '1' || vers[3] == '0' )) ||
+		 (vers[2] == '2' && (vers[3] == '9' || vers[3] == '8' || vers[3] == '7' || vers[3] == '6' ||
+		                     vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
 				     vers[3] == '1' || vers[3] == '0')) ||
 		 (vers[2] == '1' && (vers[3] == '9' || vers[3] == '8' || vers[3] == '7' || vers[3] == '6' ||
 				     vers[3] == '5' || vers[3] == '4' || vers[3] == '3' || vers[3] == '2' ||
