@@ -69,39 +69,6 @@ static int connect_id(const unsigned char pflags)
         return cid_len + 1;
 }
 
-static int sequence(const unsigned char *payload)
-{
-    unsigned char conv[6] = {0};
-    u_int seq_value = -1;
-    int seq_lens;
-    int cid_offs;
-    int i;
-
-        // Search SEQ bytes length.
-        switch (payload[0] & QUIC_SEQ_MASK)
-        {
-           case SEQ_LEN_6: seq_lens = 6; break;
-           case SEQ_LEN_4: seq_lens = 4; break;
-           case SEQ_LEN_2: seq_lens = 2; break;
-           case SEQ_LEN_1: seq_lens = 1; break;
-           default:
-               return -1;
-        }
-        // Retrieve SEQ offset.
-        cid_offs = connect_id(payload[0]);
-
-        if (cid_offs >= 0 && seq_lens > 0)
-        {
-            for (i = 0; i < seq_lens; i++)
-                conv[i] = payload[cid_offs + i];
-
-        seq_value = SEQ_CONV(conv);
-        }
-
-        // Return SEQ dec value;
-        return seq_value;
-}
-
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
     struct ndpi_packet_struct *packet = &flow->packet;
@@ -118,23 +85,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
 
-
-	// Settings without version. First check if PUBLIC FLAGS & SEQ bytes are 0x0. SEQ must be 1 at least.
-	if ((packet->payload[0] == 0x00 && packet->payload[1] != 0x00) || ((packet->payload[0] & QUIC_NO_V_RES_RSV) == 0))
-	{
-	  if (sequence(packet->payload) < 1)
-	  {
-
-	    NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude quic.\n");
-	    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
-	  }
-
-	  NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found quic.\n");
-	  ndpi_int_quic_add_connection(ndpi_struct, flow);
-	}
-
-	// Check if version, than the CID length.
-	else if (packet->payload[0] & QUIC_VER_MASK)
+        if (packet->payload[0] & QUIC_VER_MASK)
 	{
 	  // Skip CID length.
 	  ver_offs = connect_id(packet->payload[0]);
