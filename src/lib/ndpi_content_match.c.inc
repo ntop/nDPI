@@ -7333,6 +7333,12 @@ ndpi_protocol_match host_match[] = {
   { "tim.com.br",                       "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
   { "tim.it",                           "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
   { ".qq.com",                          "QQ",                   NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_FUN },
+  { ".weibo.com",			"Weibo",        	NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sinaimg.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sinajs.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sina.cn",				"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sina.com.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  
 
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
@@ -7386,7 +7392,7 @@ ndpi_protocol_match host_match[] = {
   { "evsecure-ocsp.verisign.com",	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-aia.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-crl.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-   { ".omniroot.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".omniroot.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".verisign.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".symcb.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".symcd.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7400,7 +7406,7 @@ ndpi_protocol_match host_match[] = {
   { "coby.ns.cloudflare.com",  		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
   { "amanda.ns.cloudflare.com",		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
 
-
+  
 
   { NULL, 0 }
 };
