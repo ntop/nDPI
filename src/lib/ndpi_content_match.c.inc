@@ -22,7 +22,13 @@
 
 static ndpi_network host_protocol_list[] = {
 
- /*    
+ /*
+   OpenDNS
+   208.67.216.0/21
+ */
+   { 0xD043D800 /* 208.67.216.0/21 */, 21, NDPI_SERVICE_OPENDNS },
+
+ /*   
     Microsoft Corporation (MS One Drive)
     204.79.195.0/24
     204.79.196.0/23
@@ -39,7 +45,6 @@ static ndpi_network host_protocol_list[] = {
   { 0x83FD1000 /* 131.253.16.0/23 */, 23, NDPI_SERVICE_MS_ONE_DRIVE },
   { 0x83FD1200 /* 131.253.18.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
   { 0x4136BF00 /* 65.54.191.0/24   */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
-
 
  /*    
     Amazon-EU-AWS Elastic Compute Cloud, EC2 (also used by Netflix)
@@ -7253,6 +7258,7 @@ ndpi_protocol_match host_match[] = {
   { "images-amazon.com", 		"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazonaws.com",			"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazon-adsystem.com",		"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".cloudfront.net",    		"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { ".apple.com",			"Apple",		NDPI_SERVICE_APPLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".mzstatic.com",			"Apple",		NDPI_SERVICE_APPLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".icloud.com",			"AppleiCloud",		NDPI_SERVICE_APPLE_ICLOUD, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7405,6 +7411,9 @@ ndpi_protocol_match host_match[] = {
   { "lifedom.top",       		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
   { "coby.ns.cloudflare.com",  		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
   { "amanda.ns.cloudflare.com",		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { "d295hzzivaok4k.cloudfront.net",	"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".opendns.com",			"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_ACCEPTABLE },
 
   
 
