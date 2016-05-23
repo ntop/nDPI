@@ -65,7 +65,7 @@ static int quic_len(u_int8_t l) {
     return(8);
     break;
   }
-  
+
   return(0); /* NOTREACHED */
 }
 
@@ -90,7 +90,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     int i;
 
     if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
-      goto no_quic; 
+      goto no_quic;
 
     NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found QUIC.\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
@@ -106,10 +106,10 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	  u_int32_t prev_offset = *((u_int32_t*)&packet->payload[i-4]);
 	  int len = offset-prev_offset;
 	  int sni_offset = i+prev_offset+1;
-       
+
 	  while((packet->payload[sni_offset] == '-') && (sni_offset < udp_len))
 	    sni_offset++;
-	
+
 	  if((sni_offset+len) < udp_len) {
 	    int max_len = sizeof(flow->host_server_name)-1, j = 0;
 
