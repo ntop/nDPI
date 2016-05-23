@@ -592,6 +592,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       type = ETH_P_IPV6;
 
     ip_offset = 4 + eth_offset;
+    break;
 
     /* Cisco PPP in HDLC-like framing - 50 */
   case DLT_PPP_SERIAL:
