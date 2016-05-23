@@ -679,31 +679,33 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   }
 
   /* check ether type */
-  if(type == VLAN) {
-    vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
-    type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
-    ip_offset += 4;
-    vlan_packet = 1;
-  } else if(type == MPLS_UNI || type == MPLS_MULTI) {
-    mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
-    label = ntohl(mpls->label);
-    /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
-    workflow->stats.mpls_count++;
-    type = ETH_P_IP, ip_offset += 4;
-
-    while((label & 0x100) != 0x100) {
+  switch(type) {
+    case VLAN:
+      vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
+      type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
       ip_offset += 4;
+      vlan_packet = 1;
+      break;
+    case MPLS_UNI:
+    case MPLS_MULTI:
+      mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
       label = ntohl(mpls->label);
-    }
-  }
-  else if(type == SLARP)
-    slarp = (struct ndpi_slarp *) &packet[ip_offset];
-  else if(type == CISCO_D_PROTO)
-    cdp = (struct ndpi_cdp *) &packet[ip_offset];
-  else if(type == PPPoE) {
-    workflow->stats.pppoe_count++;
-    type = ETH_P_IP;
-    ip_offset += 8;
+      /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
+      workflow->stats.mpls_count++;
+      type = ETH_P_IP, ip_offset += 4;
+
+      while((label & 0x100) != 0x100) {
+        ip_offset += 4;
+        label = ntohl(mpls->label);
+      }
+      break;
+    case PPPoE:
+      workflow->stats.pppoe_count++;
+      type = ETH_P_IP;
+      ip_offset += 8;
+      break;
+    default:
+      break;
   }
 
   workflow->stats.vlan_count += vlan_packet;
