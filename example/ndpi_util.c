@@ -556,7 +556,6 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   int llc_off;
   int pyld_eth_len = 0;
   int check;
-  u_int32_t fcs;
   u_int64_t time;
   u_int16_t ip_offset, ip_len, ip6_offset;
   u_int16_t frag_off = 0, vlan_id = 0;
@@ -645,8 +644,6 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       workflow->stats.total_discarded_bytes +=  header->len;
       return;
     }
-
-    fcs = header->len - 4;
 
     /* Calculate 802.11 header length (variable) */
     wifi = (struct ndpi_wifi_header*)( packet + eth_offset + radio_len);
