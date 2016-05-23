@@ -96,7 +96,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
 
     if(!strncmp((char*)&packet->payload[quic_hlen+17], "CHLO" /* Client Hello */, 4)) {
-      /* Check if SNI (Server Name Indetification) is present */
+      /* Check if SNI (Server Name Identification) is present */
       for(i=quic_hlen+12; i<udp_len-3; i++) {
 	if((packet->payload[i] == 'S')
 	   && (packet->payload[i+1] == 'N')
