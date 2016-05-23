@@ -150,8 +150,8 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
       found = 1;
     else {
       NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
-    return;
+      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+      return;
     }
   }
   else {
