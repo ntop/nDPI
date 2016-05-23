@@ -3391,8 +3391,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 #endif
       {
 	protocol = flow->packet.iph->protocol;
-	saddr = ntohl(flow->packet.iph->saddr);
-	daddr = ntohl(flow->packet.iph->daddr);
       }
 
     if(flow->packet.udp) sport = ntohs(flow->packet.udp->source), dport = ntohs(flow->packet.udp->dest);
