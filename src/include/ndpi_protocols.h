@@ -52,10 +52,6 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
 
 /* Applications and other protocols. */
 void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
-void ndpi_bittorrent_init(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t size,u_int32_t timeout);
-void ndpi_bittorrent_done(struct ndpi_detection_module_struct *ndpi_struct);
-int ndpi_bittorrent_gc(struct hash_ip4p_table *ht,int key,time_t now);
-
 void ndpi_search_edonkey(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_fasttrack_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);

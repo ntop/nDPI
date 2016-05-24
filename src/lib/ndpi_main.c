@@ -1523,18 +1523,18 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
 			    ndpi_build_default_ports(ports_b, 5683, 5684, 0, 0, 0));  /* UDP */
     ndpi_set_proto_defaults(ndpi_mod,NDPI_PROTOCOL_ACCEPTABLE,NDPI_PROTOCOL_MQTT,
-    		    no_master,
-				no_master, "MQTT",
-				ndpi_build_default_ports(ports_a, 1883, 8883, 0, 0, 0),  /* TCP */
-				ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
+			    no_master,
+			    no_master, "MQTT",
+			    ndpi_build_default_ports(ports_a, 1883, 8883, 0, 0, 0),  /* TCP */
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
     ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0);
     ports_b[0].port_low = 7000;
     ports_b[0].port_high = 7032;   /* See https://www-01.ibm.com/support/docview.wss?uid=swg21044407 */
     ndpi_set_proto_defaults(ndpi_mod,NDPI_PROTOCOL_ACCEPTABLE,NDPI_PROTOCOL_RX,
-    		    no_master,
-				no_master, "RX",
-        ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),  /* TCP */
-				ports_b);  /* UDP */
+			    no_master,
+			    no_master, "RX",
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),  /* TCP */
+			    ports_b);  /* UDP */
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);

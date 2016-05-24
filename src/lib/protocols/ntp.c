@@ -22,9 +22,10 @@
  * 
  */
 
-
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_NTP
+
 
 static void ndpi_int_ntp_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
@@ -32,44 +33,33 @@ static void ndpi_int_ntp_add_connection(struct ndpi_detection_module_struct
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTP, NDPI_PROTOCOL_UNKNOWN);
 }
 
-/* detection also works asymmetrically */
-
 void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
-	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
-	if (!(packet->udp->dest == htons(123) || packet->udp->source == htons(123)))
-		goto exclude_ntp;
-
-	NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP port detected\n");
-
-        // It's not correct because packets could be bigger
-	//if (packet->payload_packet_len != 48)
-	//	goto exclude_ntp;
-
-	NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP length detected\n");
-
-
-	if ((((packet->payload[0] & 0x38) >> 3) <= 4)) {
-		NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "detected NTP.");
+  struct ndpi_packet_struct *packet = &flow->packet;
+  
+  if (!(packet->udp->dest == htons(123) || packet->udp->source == htons(123)))
+    goto exclude_ntp;
+  
+  NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP port detected\n");
+  
+  NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP length detected\n");
+  
+  
+  if ((((packet->payload[0] & 0x38) >> 3) <= 4)) {
+    NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "detected NTP.");
     
-                // 38 in binary representation is 00111000 
-                flow->protos.ntp.version = (packet->payload[0] & 0x38) >> 3;
-
-                if (flow->protos.ntp.version == 2) {
-                    flow->protos.ntp.request_code = packet->payload[3];
-                }
- 
-		ndpi_int_ntp_add_connection(ndpi_struct, flow);
-		return;
-	}
-
-
-
-  exclude_ntp:
+    // 38 in binary representation is 00111000 
+    flow->protos.ntp.version = (packet->payload[0] & 0x38) >> 3;
+    
+    if (flow->protos.ntp.version == 2) {
+      flow->protos.ntp.request_code = packet->payload[3];
+    }
+    
+    ndpi_int_ntp_add_connection(ndpi_struct, flow);
+    return;
+  }
+  
+ exclude_ntp:
 	NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP excluded.\n");
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_NTP);
 }
