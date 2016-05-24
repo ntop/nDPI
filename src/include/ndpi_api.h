@@ -224,6 +224,52 @@ extern "C" {
 					      struct ndpi_id_struct *src,
 					      struct ndpi_id_struct *dst);
 
+
+  /**
+   * Processes one packet of L4 and returns the ID of the detected protocol.
+   * L3 and L4 packet headers are passed in the arguments while payload
+   * points to the L4 body.
+   * This function mimics ndpi_detection_process_packet behaviour.
+   *
+   * @par    ndpi_struct           = the detection module
+   * @par    flow                  = pointer to the connection state machine
+   * @par    iph                   = IP packet header for IPv4 or NULL
+   * @par    iph6                  = IP packet header for IPv6 or NULL
+   * @par    tcp                   = TCP packet header for TCP or NULL
+   * @par    udp                   = UDP packet header for UDP or NULL
+   * @par    src_to_dst_direction  = order of src/dst state machines in a flow.
+   * @par    l4_proto              = L4 protocol of the packet.
+   * @par    src                   = pointer to the source subscriber state machine
+   * @par    dst                   = pointer to the destination subscriber state machine
+   * @par    sport                 = source port of L4 packet, used for protocol guessing.
+   * @par    dport                 = destination port of L4 packet, used for protocol guessing.
+   * @par    current_tick_l        = the current timestamp for the packet
+   * @par    payload               = unsigned char pointer to the Layer 4 (TCP/UDP body)
+   * @par    payload_len           = the length of the payload
+   * @return the detected ID of the protocol
+   *
+   * NOTE: in a current implementation flow->src and flow->dst are swapped with
+   * the src_to_dst_direction flag while ndpi_detection_process_packet does not swap
+   * these values.
+   *
+   */
+
+ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
+					       struct ndpi_flow_struct *flow,
+					       const struct ndpi_iphdr *iph,
+					       struct ndpi_ipv6hdr *iph6,
+					       struct ndpi_tcphdr *tcp,
+					       struct ndpi_udphdr *udp,
+					       u_int8_t src_to_dst_direction,
+					       u_int8_t l4_proto,
+					       struct ndpi_id_struct *src,
+					       u_int16_t sport,
+					       struct ndpi_id_struct *dst,
+					       u_int16_t dport,
+					       const u_int64_t current_tick_l,
+					       u_int8_t *payload, u_int16_t payload_len);
+
+
   
   /**
    * Get the main protocol of the passed flows for the detected module
