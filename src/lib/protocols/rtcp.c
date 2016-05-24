@@ -48,7 +48,6 @@ void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	offset += rtcp_section_len;
     }
     
-    sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
     NDPI_LOG(NDPI_PROTOCOL_RTCP, ndpi_struct, NDPI_LOG_DEBUG, "calculating dport over udp.\n");
     /* TODO changed a pair of length condition to the && from ||. Is it correct? */
     if(((packet->payload_packet_len >= 28 && packet->payload_packet_len <= 1200) &&

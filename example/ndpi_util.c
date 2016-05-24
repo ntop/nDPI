@@ -552,11 +552,10 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   u_int16_t radio_len;
   u_int16_t fc;
   u_int16_t type;
-  int wifi_len;
+  int wifi_len = 0;
   int llc_off;
   int pyld_eth_len = 0;
   int check;
-  u_int32_t fcs;
   u_int64_t time;
   u_int16_t ip_offset, ip_len, ip6_offset;
   u_int16_t frag_off = 0, vlan_id = 0;
@@ -646,8 +645,6 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       return;
     }
 
-    fcs = header->len - 4;
-
     /* Calculate 802.11 header length (variable) */
     wifi = (struct ndpi_wifi_header*)( packet + eth_offset + radio_len);
     fc = wifi->fc;
@@ -679,31 +676,33 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   }
 
   /* check ether type */
-  if(type == VLAN) {
-    vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
-    type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
-    ip_offset += 4;
-    vlan_packet = 1;
-  } else if(type == MPLS_UNI || type == MPLS_MULTI) {
-    mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
-    label = ntohl(mpls->label);
-    /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
-    workflow->stats.mpls_count++;
-    type = ETH_P_IP, ip_offset += 4;
-
-    while((label & 0x100) != 0x100) {
+  switch(type) {
+    case VLAN:
+      vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
+      type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
       ip_offset += 4;
+      vlan_packet = 1;
+      break;
+    case MPLS_UNI:
+    case MPLS_MULTI:
+      mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
       label = ntohl(mpls->label);
-    }
-  }
-  else if(type == SLARP)
-    slarp = (struct ndpi_slarp *) &packet[ip_offset];
-  else if(type == CISCO_D_PROTO)
-    cdp = (struct ndpi_cdp *) &packet[ip_offset];
-  else if(type == PPPoE) {
-    workflow->stats.pppoe_count++;
-    type = ETH_P_IP;
-    ip_offset += 8;
+      /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
+      workflow->stats.mpls_count++;
+      type = ETH_P_IP, ip_offset += 4;
+
+      while((label & 0x100) != 0x100) {
+        ip_offset += 4;
+        label = ntohl(mpls->label);
+      }
+      break;
+    case PPPoE:
+      workflow->stats.pppoe_count++;
+      type = ETH_P_IP;
+      ip_offset += 8;
+      break;
+    default:
+      break;
   }
 
   workflow->stats.vlan_count += vlan_packet;
