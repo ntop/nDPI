@@ -550,7 +550,11 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_struc
   if(automa->ac_automa == NULL) return(-2);
   ac_pattern.astring = value;
   ac_pattern.rep.number = protocol_id;
-  ac_pattern.length = strlen(ac_pattern.astring);
+  if(value == NULL)
+    ac_pattern.length = 0;
+  else
+    ac_pattern.length = strlen(ac_pattern.astring);
+
   ac_automata_add(((AC_AUTOMATA_t*)automa->ac_automa), &ac_pattern);
 
   return(0);
