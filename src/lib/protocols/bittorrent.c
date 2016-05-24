@@ -135,7 +135,6 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 					  || memcmp(packet->payload, "POST ", 5) == 0)) {
     const u_int8_t *ptr = &packet->payload[4];
     u_int16_t len = packet->payload_packet_len - 4;
-    a = 0;
 
 
     /* parse complete get packet here into line structure elements */
