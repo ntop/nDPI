@@ -549,7 +549,6 @@ extern "C" {
    * Free Aho-Corasick automata allocated with ndpi_init_automa();
    *
    * @par     The automata initialized with ndpi_init_automa();
-   * @return  The requested automata, or NULL if an error occurred
    * 
    */
   void ndpi_free_automa(void *_automa);
