@@ -552,7 +552,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   u_int16_t radio_len;
   u_int16_t fc;
   u_int16_t type;
-  int wifi_len;
+  int wifi_len = 0;
   int llc_off;
   int pyld_eth_len = 0;
   int check;
