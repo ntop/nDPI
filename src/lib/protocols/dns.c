@@ -112,10 +112,8 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     ret_code = (is_query == 0) ? 0 : (dns_header.flags & 0x0F);
     int j = 0;
     int off = sizeof(struct ndpi_dns_packet_header) + 1;
-    while((flow->packet.payload[off] != '\0'))
+    while(flow->packet.payload[off] != '\0' && off < flow->packet.payload_packet_len)
     {
-      if(off < flow->packet.payload_packet_len)
-      {
 	flow->host_server_name[j] = flow->packet.payload[off];
 	if(j < strlen((char*)flow->host_server_name)) {
 	  if(flow->host_server_name[j] < ' ')
@@ -123,7 +121,6 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	  j++;
 	}
 	off++;
-      }
     }
     flow->host_server_name[j] = '\0';
 
