@@ -3281,16 +3281,6 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
 
     flow->protocol_id_already_guessed = 1;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-    if(flow->packet.iphv6 != NULL) {
-      saddr = 0, daddr = 0;
-    } else
-#endif
-    {
-      saddr = ntohl(flow->packet.iph->saddr);
-      daddr = ntohl(flow->packet.iph->daddr);
-    }
-
     flow->guessed_protocol_id = (int16_t)ndpi_guess_protocol_id(ndpi_struct, l4_proto, sport, dport);
 
     if(flow->packet.iph) {
