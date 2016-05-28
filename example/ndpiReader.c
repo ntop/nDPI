@@ -117,6 +117,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
  * @brief Print help instructions
  */
 static void help(u_int long_help) {
+  printf("Welcome to nDPI %s\n\n", ndpi_revision());
 
   printf("ndpiReader -i <file|device> [-f <filter>][-s <duration>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
