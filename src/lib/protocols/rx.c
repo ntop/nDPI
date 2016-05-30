@@ -30,7 +30,8 @@
 /* See http://web.mit.edu/kolya/afs/rx/rx-spec for procotol description. */
 
 /* The should be no need for explicit packing, but just in case... */
-struct __attribute__((__packed__)) ndpi_rx_header {
+PACK_ON
+struct ndpi_rx_header {
   u_int32_t conn_epoch;
   u_int32_t conn_id;
   u_int32_t call_number;
@@ -42,7 +43,7 @@ struct __attribute__((__packed__)) ndpi_rx_header {
   u_int8_t security;
   u_int16_t checksum;
   u_int16_t service_id;
-};
+} PACK_OFF;
 
 /* Type values */
 #define DATA	           1
