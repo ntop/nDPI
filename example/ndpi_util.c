@@ -736,7 +736,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       goto iph_check;
     }
 
-    if((frag_off & 0x3FFF) != 0) {
+    if((frag_off & 0x1FFF) != 0) {
       static u_int8_t ipv4_frags_warning_used = 0;
       workflow->stats.fragmented_count++;
 

@@ -109,7 +109,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   **/
   
   /* TYPE field */
-  if((header->type < DATA) && (header->type > VERSION)) {
+  if((header->type < DATA) || (header->type > VERSION)) {
     NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
     return;
@@ -171,8 +171,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
 
  security:
   /* SECURITY field */
-  if(header->security != 0 && header->security != 1 &&
-     header->security != 2 && header->security != 3)
+  if(header->security > 3)
   {
     NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);

@@ -769,7 +769,9 @@ static void printResults(u_int64_t tot_usec) {
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
 
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    if(ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0) continue;
+    if((ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0) 
+       && (ndpi_thread_info[thread_id].workflow->stats.raw_packet_count == 0))
+      continue;
 
     for(i=0; i<NUM_ROOTS; i++)
       ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_proto_guess_walker, &thread_id);
