@@ -126,12 +126,12 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	} else
 	  invalid = 1;
 	
-	if(ndpi_struct->dns_dissect_response)
+	/* if(ndpi_struct->dns_dissect_response) */
 	  return; /* The response will set the verdict */
       } else {
 	/* DNS Reply */
 
-	flow->protos.dns.reply_code = dns_header.flags & 0x0F;
+	/* flow->protos.dns.reply_code = dns_header.flags & 0x0F; */
 
 	if((dns_header.num_queries > 0) && (dns_header.num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
 	   && (((dns_header.num_answers > 0) && (dns_header.num_answers <= NDPI_MAX_DNS_REQUESTS))
@@ -139,7 +139,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	       || ((dns_header.additional_rrs > 0) && (dns_header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
 	   ) {
 	  /* This is a good reply */
-	  if(ndpi_struct->dns_dissect_response) {
+	  /* if(ndpi_struct->dns_dissect_response) */ {
 	    x++;
 	  
 	    if(flow->packet.payload[x] != '\0') {
@@ -170,7 +170,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 		  x += data_len;
  
 		rsp_type = get16(&x, flow->packet.payload);
-		flow->protos.dns.rsp_type = rsp_type;
+		/* flow->protos.dns.rsp_type = rsp_type; */
 		break;
 	      }
 	    }
@@ -200,7 +200,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       }
       flow->host_server_name[j] = '\0';
 
-      flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
+      /* flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries, */
 	flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
 
 #ifdef DNS_DEBUG		
