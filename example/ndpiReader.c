@@ -633,7 +633,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   /* Preferences */
   ndpi_thread_info[thread_id].workflow->ndpi_struct->http_dont_dissect_response = 0;
-  ndpi_thread_info[thread_id].workflow->ndpi_struct->dns_dissect_response = 1;
+  ndpi_thread_info[thread_id].workflow->ndpi_struct->dns_dissect_response = 0;
 
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
 					   on_protocol_discovered, (void *)(uintptr_t)thread_id);

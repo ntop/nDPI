@@ -72,7 +72,7 @@ struct ndpi_coap_hdr
    [164] = "5.04 Gateway Timeout",
    [165] = "5.05 Proxying Not Supported"
 **/
-  
+
 
 /**
  * Entry point when protocol is identified.
@@ -84,6 +84,20 @@ static void ndpi_int_coap_add_connection (struct ndpi_detection_module_struct *n
 }
 
 /**
+ * Check if the default port is acceptable 
+ *
+ * UDP Port 5683 (mandatory)
+ * UDP Ports 61616-61631 compressed 6lowPAN
+ */
+static int isCoAPport(u_int16_t port) {
+  if((port == 5683)
+     || ((port >= 61616) && (port <= 61631)))
+    return(1);
+  else
+    return(0);
+}
+
+/**
  * Dissector function that searches CoAP headers
  */
 void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
@@ -91,22 +105,24 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ndpi_coap_hdr * h = (struct ndpi_coap_hdr*) packet->payload;
-	
+
   if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     return;
   }
 
   // search for udp packet
   if(packet->udp != NULL) {
-    
-    // header too short
-    if(packet->payload_packet_len < 4) {
-      
+    u_int16_t s_port = ntohs(flow->packet.udp->source);
+    u_int16_t d_port = ntohs(flow->packet.udp->dest);
+
+    if((!isCoAPport(s_port) && !isCoAPport(s_port))
+       || (packet->payload_packet_len < 4) // header too short
+       ) {
       NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "excluding Coap\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COAP);
       return;
     }
-    
+
     NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "calculating coap over udp.\n");
 
     // check values in header
@@ -116,21 +132,21 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
 	  if((h->code >= 0 && h->code <= 5) || (h->code >= 65 && h->code <= 69) ||
 	     (h->code >= 128  && h->code <= 134) || (h->code >= 140 && h->code <= 143) ||
 	     (h->code >= 160 && h->code <= 165)) {
-	       
+
 	    NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Coap found...\n");
 	    ndpi_int_coap_add_connection(ndpi_struct,flow);
 	    return;
 	  }
 	}
       }
-    } 
+    }
   }
-  
+
   NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Coap ...\n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COAP);
   return;
-
 }
+
 /**
  * Entry point for the ndpi library
  */

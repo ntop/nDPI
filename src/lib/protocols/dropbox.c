@@ -44,7 +44,6 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t payload_len = packet->payload_packet_len;
 
   if(packet->udp != NULL) {
-
     u_int16_t dropbox_port = htons(DB_LSP_PORT);
 
     if((packet->udp->source == dropbox_port)

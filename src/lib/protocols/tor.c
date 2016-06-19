@@ -24,7 +24,7 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 
   if((certificate == NULL)
      || (strlen(certificate) < 6)
-     || !(strncmp(certificate, "www.", 4)))
+     || (strncmp(certificate, "www.", 4)))
     return(0);
 
   // printf("***** [SSL] %s(): %s\n", __FUNCTION__, certificate);
@@ -39,10 +39,11 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 
   len = strlen(name);
   
-  if(len > 6) {
+  if(len >= 5) {
     for(i = 0; name[i+1] != '\0'; i++) {
+      // printf("***** [SSL] %s(): [%d][%c]", __FUNCTION__, i, name[i]);
+      
       if((name[i] >= '0') && (name[i] <= '9')) {
-
 	if(prev_num != 1) {
 	  numbers_found++;
 
