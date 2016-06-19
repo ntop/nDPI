@@ -24,7 +24,7 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 
   if((certificate == NULL)
      || (strlen(certificate) < 6)
-     || !(strncmp(certificate, "www.", 4)))
+     || (strncmp(certificate, "www.", 4)))
     return(0);
 
   // printf("***** [SSL] %s(): %s\n", __FUNCTION__, certificate);
