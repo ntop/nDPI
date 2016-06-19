@@ -1,10 +1,10 @@
 NetBIOS	1	252	1
 DHCPV6	6	906	1
-DropBox	10	1860	1
+Dropbox	10	1860	1
 Skype	1	60	1
 Tor	3676	3014362	7
 
-	1	UDP 192.168.1.1:17500 <-> 192.168.1.255:17500 [proto: 121/DropBox][10 pkts/1860 bytes]
+	1	UDP 192.168.1.1:17500 <-> 192.168.1.255:17500 [proto: 121/Dropbox][10 pkts/1860 bytes]
 	2	UDP [fe80::c583:1972:5728:7323]:547 <-> [ff02::1:2]:546 [proto: 103/DHCPV6][6 pkts/906 bytes]
 	3	TCP 212.83.155.250:443 <-> 192.168.1.252:51174 [proto: 163/Tor][32 pkts/10431 bytes][SSL client: www.t3i3ru.com]
 	4	TCP 46.59.52.31:443 <-> 192.168.1.252:51111 [proto: 163/Tor][34 pkts/11142 bytes][SSL client: www.e6r5p57kbafwrxj3plz.com]
