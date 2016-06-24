@@ -51,7 +51,7 @@ void ndpi_search_git(struct ndpi_detection_module_struct *ndpi_struct,
   
   u_int8_t * git_pkt_len_buff = NULL;
   u_int8_t * git_pkt_data = NULL;
-  u_int16_t git_len = 0, count = 0 , is_git = 0;
+  u_int16_t git_len = 0, count = 0;
 
   if(packet->tcp != NULL) {
 

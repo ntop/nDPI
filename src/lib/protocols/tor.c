@@ -1,7 +1,7 @@
 /*
  * tor.c
  *
- * Copyright (C) 2015 ntop.org
+ * Copyright (C) 2016 ntop.org
  * Copyright (C) 2013 Remy Mudingay <mudingay@ill.fr>
  *
  */
