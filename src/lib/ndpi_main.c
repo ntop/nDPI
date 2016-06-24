@@ -1531,22 +1531,26 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "COAP",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
 			    ndpi_build_default_ports(ports_b, 5683, 5684, 0, 0, 0));  /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod,NDPI_PROTOCOL_ACCEPTABLE,NDPI_PROTOCOL_MQTT,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MQTT,
 			    no_master,
 			    no_master, "MQTT",
 			    ndpi_build_default_ports(ports_a, 1883, 8883, 0, 0, 0),  /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
-    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0);
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));       /* UDP */
     /* Port guess is disabled as this is UDP and we can figure our immediately looking
        at the RX header, is this is RX or not
 
        See https://www-01.ibm.com/support/docview.wss?uid=swg21044407 
     */
-    ndpi_set_proto_defaults(ndpi_mod,NDPI_PROTOCOL_ACCEPTABLE,NDPI_PROTOCOL_RX,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RX,
 			    no_master,
 			    no_master, "RX",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),  /* TCP */
-			    ports_b);  /* UDP */
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GIT,
+			    no_master,
+			    no_master, "Git",
+			    ndpi_build_default_ports(ports_a, 9418, 0, 0, 0, 0),  /* TCP */
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));    /* UDP */
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
@@ -2325,7 +2329,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* SSDP */
   init_ssdp_dissector(ndpi_struct, &a, detection_bitmask);
 
-/* WORLD_OF_WARCRAFT */
+  /* WORLD_OF_WARCRAFT */
   init_world_of_warcraft_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* POSTGRES */
@@ -2558,6 +2562,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* RX */
   init_rx_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* GIT */
+  init_git_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* Put false-positive sensitive protocols at the end */
 
