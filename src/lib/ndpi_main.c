@@ -3292,8 +3292,6 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
 	 flow->packet.iphv6 ||
 #endif
 	 flow->packet.iph)) {
-    u_int32_t saddr, daddr;
-
     flow->protocol_id_already_guessed = 1;
 
     flow->guessed_protocol_id = (int16_t)ndpi_guess_protocol_id(ndpi_struct, l4_proto, sport, dport);
@@ -4485,7 +4483,6 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 						u_int8_t is_host_match) {
   int matching_protocol_id = ndpi_match_string_subprotocol(ndpi_struct, string_to_match, string_to_match_len, is_host_match);
   struct ndpi_packet_struct *packet = &flow->packet;
-  AC_TEXT_t ac_input_text;
 
 #ifdef DEBUG
   {
