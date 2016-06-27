@@ -849,8 +849,8 @@ struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t http_dont_dissect_response:1;
-  u_int8_t direction_detect_disable:1; /* disable internal detection of packet direction */
+  u_int8_t http_dont_dissect_response:1, dns_dissect_response:1, 
+    direction_detect_disable:1; /* disable internal detection of packet direction */
 };
 
 struct ndpi_flow_struct {
@@ -911,8 +911,8 @@ struct ndpi_flow_struct {
 
     /* the only fields useful for nDPI and ntopng */
     struct {
-      u_int8_t num_answers, ret_code;
-      u_int16_t query_type;
+      u_int8_t num_queries, num_answers, reply_code;
+      u_int16_t query_type, query_class, rsp_type;
     } dns;
     
     struct {
