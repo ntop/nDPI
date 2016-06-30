@@ -106,6 +106,12 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	      flow->host_server_name[j++] = packet->payload[sni_offset];
 	      sni_offset++, len--;
 	    }
+
+	    ndpi_match_host_subprotocol(ndpi_struct, flow, 
+					(char *)flow->host_server_name,
+					strlen((const char*)flow->host_server_name),
+					NDPI_PROTOCOL_QUIC);
+	    
 	  }
 
 	  break;
