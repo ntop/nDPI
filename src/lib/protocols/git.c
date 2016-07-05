@@ -24,76 +24,41 @@
 
 #define GIT_PORT 9418
 
-/* read all the length even if there is a null byte inside */
-u_int16_t read_all_len(char * s, u_int16_t git_len)
+void ndpi_search_git(struct ndpi_detection_module_struct *ndpi_struct,
+		     struct ndpi_flow_struct *flow)
 {
-  char * p = s;
-  int c = 0;
-  while(*p && c < git_len-4) {
-    c++;
-    p++;
-    if(!*p) {
-      if(c < git_len-4)	{
-	p++;
-	c++;
+  struct ndpi_packet_struct * packet = &flow->packet;
+
+  if((packet->tcp != NULL) && (packet->payload_packet_len > 4)) {
+    if((ntohs(packet->tcp->source) == GIT_PORT)
+       || (ntohs(packet->tcp->dest) == GIT_PORT)) {
+      const u_int8_t * pp = packet->payload;
+      u_int16_t payload_len = packet->payload_packet_len;  
+      u_int8_t found_git = 1;
+      u_int16_t git_len = 0, offset = 0;
+      
+      while((offset+4) < payload_len) {
+	char len[5];
+	u_int32_t git_pkt_len;
+
+	memcpy(&len, &pp[offset], 4), len[4] = 0;
+	git_pkt_len = atoi(len);
+
+	if(payload_len < git_pkt_len) {
+	  found_git = 0;
+	  break;
+	} else
+	  offset += git_pkt_len, payload_len -= git_pkt_len;      
+      }
+
+      if(found_git) {
+	NDPI_LOG(NDPI_PROTOCOL_GIT, ndpi_struct, NDPI_LOG_DEBUG, "found Git.\n");
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GIT, NDPI_PROTOCOL_UNKNOWN);
+	return;
       }
     }
   }
-  return c;
-}
-
-void ndpi_search_git(struct ndpi_detection_module_struct *ndpi_struct,
-		      struct ndpi_flow_struct *flow)
-{
-  struct ndpi_packet_struct * packet = &flow->packet;
-  const u_int8_t * pp = packet->payload;
-  u_int16_t payload_len = packet->payload_packet_len;
   
-  u_int8_t * git_pkt_len_buff = NULL;
-  u_int8_t * git_pkt_data = NULL;
-  u_int16_t git_len = 0, count = 0;
-
-  if(packet->tcp != NULL) {
-
-    if((ntohs(packet->tcp->source) == GIT_PORT ||
-	ntohs(packet->tcp->dest) == GIT_PORT)) {
-
-      git_pkt_len_buff = malloc(4 * sizeof(u_int8_t));
-
-      do {
-	 memcpy(git_pkt_len_buff, pp, 4);
-	 git_len = (int)strtol(git_pkt_len_buff, NULL, 16);
-	 
-	 if(git_pkt_len_buff[0] == 48 &&
-	    git_pkt_len_buff[1] == 48 &&
-	    git_pkt_len_buff[2] == 48 &&
-	    git_pkt_len_buff[3] == 48)
-	   /* Terminator packet */
-	   count += 4;
-	 else {
-	      git_pkt_data = malloc((git_len-4) * sizeof(u_int8_t));
-	      memcpy(git_pkt_data, pp+4, git_len-4);
-	      u_int16_t data_len = read_all_len(git_pkt_data, git_len);
-	      free(git_pkt_data);
-	      
-	      if(git_len != data_len+4)
-		    goto no_git;
-	      else {
-		    count += git_len;
-		    pp += git_len;
-	      }
-	 }
-      } while(count < payload_len);
-    }
-    else goto no_git;
-  }
-  else goto no_git;
-  
-  NDPI_LOG(NDPI_PROTOCOL_GIT, ndpi_struct, NDPI_LOG_DEBUG, "found Git.\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GIT, NDPI_PROTOCOL_UNKNOWN);
-  return;
-
- no_git:
   NDPI_LOG(NDPI_PROTOCOL_GIT, ndpi_struct, NDPI_LOG_DEBUG, "exclude Git.\n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_GIT);
 }
@@ -103,7 +68,7 @@ void ndpi_search_git(struct ndpi_detection_module_struct *ndpi_struct,
 
 
 void init_git_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-			 NDPI_PROTOCOL_BITMASK *detection_bitmask)
+			NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("Git", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_GIT,
