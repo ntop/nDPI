@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "ndpi_api.h"
 
 #ifdef NDPI_PROTOCOL_QUIC
@@ -34,18 +33,6 @@ static int quic_ports(u_int16_t sport, u_int16_t dport)
     return 1;
 
   return 0;
-}
-
-/* ***************************************************************** */
-
-static int quic_payload(const u_int8_t *payload) {
-  if((payload[0] == 'Q')
-     && isdigit(payload[1])
-     && isdigit(payload[2])
-     && isdigit(payload[3]))
-    return(1);
-
-  return(0);
 }
 
 /* ***************************************************************** */
@@ -119,6 +106,12 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	      flow->host_server_name[j++] = packet->payload[sni_offset];
 	      sni_offset++, len--;
 	    }
+
+	    ndpi_match_host_subprotocol(ndpi_struct, flow, 
+					(char *)flow->host_server_name,
+					strlen((const char*)flow->host_server_name),
+					NDPI_PROTOCOL_QUIC);
+	    
 	  }
 
 	  break;

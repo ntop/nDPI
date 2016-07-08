@@ -1,7 +1,7 @@
 /*
  * dropbox.c
  *
- * Copyright (C) 2011-13 by ntop.org
+ * Copyright (C) 2012-16 by ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -44,7 +44,6 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t payload_len = packet->payload_packet_len;
 
   if(packet->udp != NULL) {
-
     u_int16_t dropbox_port = htons(DB_LSP_PORT);
 
     if((packet->udp->source == dropbox_port)

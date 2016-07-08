@@ -620,8 +620,8 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   NDPI_PROTOCOL_BITMASK all;
-
   struct ndpi_workflow_prefs prefs;
+
   memset(&prefs, 0, sizeof(prefs));
   prefs.decode_tunnels = decode_tunnels;
   prefs.num_roots = NUM_ROOTS;
@@ -630,9 +630,13 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle);
-  /* ndpi_thread_info[thread_id].workflow->ndpi_struct->http_dont_dissect_response = 1; */
 
-  ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow, on_protocol_discovered, (void *)(uintptr_t)thread_id);
+  /* Preferences */
+  ndpi_thread_info[thread_id].workflow->ndpi_struct->http_dont_dissect_response = 0;
+  ndpi_thread_info[thread_id].workflow->ndpi_struct->dns_dissect_response = 0;
+
+  ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
+					   on_protocol_discovered, (void *)(uintptr_t)thread_id);
 
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);
@@ -769,7 +773,9 @@ static void printResults(u_int64_t tot_usec) {
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
 
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    if(ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0) continue;
+    if((ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0) 
+       && (ndpi_thread_info[thread_id].workflow->stats.raw_packet_count == 0))
+      continue;
 
     for(i=0; i<NUM_ROOTS; i++)
       ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_proto_guess_walker, &thread_id);

@@ -26,6 +26,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/bittorrent.c \
 		     protocols/ciscovpn.c \
 		     protocols/citrix.c \
+		     protocols/coap.c \
 		     protocols/collectd.c \
 		     protocols/corba.c \
 		     protocols/crossfire.c \
@@ -36,6 +37,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/directdownloadlink.c \
 		     protocols/dns.c \
 		     protocols/dofus.c \
+		     protocols/drda.c \
 		     protocols/dropbox.c \
 		     protocols/eaq.c \
 		     protocols/edonkey.c \
@@ -45,6 +47,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/florensia.c \
 		     protocols/ftp_control.c \
 		     protocols/ftp_data.c \
+		     protocols/git.c \
 		     protocols/gnutella.c \
 		     protocols/gtp.c \
 		     protocols/guildwars.c \
@@ -74,6 +77,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/mgcp.c \
 		     protocols/mms.c \
 		     protocols/mpegts.c \
+		     protocols/mqtt.c \
 		     protocols/msn.c \
 		     protocols/mssql.c \
 		     protocols/mysql.c \
@@ -104,6 +108,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/rtmp.c \
 		     protocols/rtp.c \
 		     protocols/rtsp.c \
+		     protocols/rx.c \
 		     protocols/sflow.c \
 		     protocols/shoutcast.c \
 		     protocols/sip.c \
@@ -152,9 +157,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/yahoo.c \
 		     protocols/zattoo.c \
 		     protocols/zeromq.c \
-		     protocols/coap.c \
-		     protocols/mqtt.c \
-		     protocols/rx.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
 		     third_party/include/node.h \
