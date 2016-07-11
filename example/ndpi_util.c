@@ -169,6 +169,23 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
 
 /* ***************************************************** */
 
+static void patchIPv6Address(char *str) {
+  int i = 0, j = 0;
+
+  while(str[i] != '\0') {
+    if((str[i] == ':')
+       && (str[i+1] == '0')
+       && (str[i+2] == ':')) {
+      str[j++] = ':';
+      str[j++] = ':';
+      i += 3;
+    } else
+      str[j++] = str[i++];
+  }
+}
+
+/* ***************************************************** */
+
 static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow,
 						 const u_int8_t version,
 						 u_int16_t vlan_id,
@@ -340,6 +357,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       } else {
 	inet_ntop(AF_INET6, &iph6->ip6_src, newflow->lower_name, sizeof(newflow->lower_name));
 	inet_ntop(AF_INET6, &iph6->ip6_dst, newflow->upper_name, sizeof(newflow->upper_name));
+	/* For consistency across platfoms replace :0: with :: */
+	patchIPv6Address(newflow->lower_name), patchIPv6Address(newflow->upper_name);
       }
 
       if((newflow->ndpi_flow = ndpi_malloc(SIZEOF_FLOW_STRUCT)) == NULL) {
