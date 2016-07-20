@@ -1,5 +1,5 @@
 /*
- * git.c
+ * hangout.c
  *
  * Copyright (C) 2012-16 - ntop.org
  *
@@ -17,7 +17,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include <stdlib.h>
 #include "ndpi_api.h"
 
 #ifdef NDPI_SERVICE_HANGOUT
