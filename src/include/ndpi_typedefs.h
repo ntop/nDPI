@@ -737,6 +737,7 @@ typedef struct ndpi_proto_defaults {
 
 typedef struct ndpi_default_ports_tree_node {
   ndpi_proto_defaults_t *proto;
+  u_int8_t customUserProto;
   u_int16_t default_port;
 } ndpi_default_ports_tree_node_t;
 
