@@ -80,7 +80,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   }
 
   if((s_port == 53 || d_port == 53 || d_port == 5355)
-     && (flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header))) {
+     && (flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header)+x)) {
     struct ndpi_dns_packet_header dns_header;
     int invalid = 0;
 
@@ -185,7 +185,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       /* extract host name server */
       int j = 0, max_len = sizeof(flow->host_server_name)-1, off = sizeof(struct ndpi_dns_packet_header) + 1;
 
-      while(flow->packet.payload[off] != '\0' && off < flow->packet.payload_packet_len) {
+      while(off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
 	flow->host_server_name[j] = flow->packet.payload[off];
 	if(j < max_len) {
 	  if(flow->host_server_name[j] < ' ')
