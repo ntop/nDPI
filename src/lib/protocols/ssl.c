@@ -244,7 +244,9 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		extensions_len = packet->payload[offset];
 
 		if((extensions_len+offset) < total_len) {
-		  u_int16_t extension_offset = 1; /* Move to the first extension */
+		  /* Move to the first extension
+		  Type is u_int to avoid possible overflow on extension_len addition */
+		  u_int extension_offset = 1;
 
 		  while(extension_offset < extensions_len) {
 		    u_int16_t extension_id, extension_len;
