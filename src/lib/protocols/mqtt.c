@@ -144,7 +144,7 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 	NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> Passed second stage of identification\n");
 	// third stage verification (payload)
 	if (pt == CONNECT) {
-		if (memcmp(&(packet->payload[4]),"MQTT",4) == 0) {
+		if (packet->payload_packet_len >= 8 && memcmp(&(packet->payload[4]),"MQTT",4) == 0) {
 			NDPI_LOG(NDPI_PROTOCOL_MQTT, ndpi_struct, NDPI_LOG_DEBUG, "Mqtt found CONNECT\n");
 			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
 			return;
