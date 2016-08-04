@@ -753,7 +753,7 @@ typedef struct ndpi_proto {
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
 
 struct ndpi_detection_module_struct {
-  
+
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
 
@@ -806,7 +806,7 @@ struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa; /* TOR */
-  
+
   /* IP-based protocol detection */
   void *protocols_ptree;
 
@@ -850,7 +850,7 @@ struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t http_dont_dissect_response:1, dns_dissect_response:1, 
+  u_int8_t http_dont_dissect_response:1, dns_dissect_response:1,
     direction_detect_disable:1; /* disable internal detection of packet direction */
 };
 
@@ -915,7 +915,7 @@ struct ndpi_flow_struct {
       u_int8_t num_queries, num_answers, reply_code;
       u_int16_t query_type, query_class, rsp_type;
     } dns;
-    
+
     struct {
       u_int8_t request_code;
       u_int8_t version;
@@ -1005,6 +1005,10 @@ struct ndpi_flow_struct {
 #endif
 #ifdef NDPI_PROTOCOL_STARCRAFT
   u_int32_t starcraft_udp_stage : 3;	// 0-7
+#endif
+#ifdef NDPI_PROTOCOL_OPENVPN
+  u_int8_t ovpn_session_id[8];
+  u_int8_t ovpn_counter;
 #endif
 
   /* internal structures to save functions calls */
