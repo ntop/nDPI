@@ -182,6 +182,7 @@ static void patchIPv6Address(char *str) {
     } else
       str[j++] = str[i++];
   }
+  if(str[j] != '\0') str[j] = '\0';
 }
 
 /* ***************************************************** */
