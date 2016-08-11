@@ -39,9 +39,9 @@ void ndpi_search_bgp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   u_int16_t bgp_port = htons(179);
 
   if(packet->tcp
+     && (packet->payload_packet_len > 18)
      && (packet->payload[18] < 5)
      && ((packet->tcp->dest == bgp_port) || (packet->tcp->source == bgp_port))
-     && (packet->payload_packet_len > 18)
      && (get_u_int64_t(packet->payload, 0) == 0xffffffffffffffffULL)
      && (get_u_int64_t(packet->payload, 8) == 0xffffffffffffffffULL)
      && (ntohs(get_u_int16_t(packet->payload, 16)) <= packet->payload_packet_len)

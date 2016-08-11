@@ -4,7 +4,7 @@ DHCP	10	3420	1
 STUN	97	11786	16
 ICMP	10	700	1
 SSL	8	589	2
-DropBox	4	2176	1
+Dropbox	4	2176	1
 Apple	127	28102	20
 WhatsApp	182	25154	2
 AppleiTunes	85	28087	2
@@ -12,7 +12,7 @@ Spotify	3	258	1
 WhatsAppVoice	706	91156	4
 
 	1	UDP [fe80::da30:62ff:fe56:1c]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][2 pkts/258 bytes]
-	2	UDP 192.168.2.1:17500 <-> 192.168.2.255:17500 [proto: 121/DropBox][4 pkts/2176 bytes]
+	2	UDP 192.168.2.1:17500 <-> 192.168.2.255:17500 [proto: 121/Dropbox][4 pkts/2176 bytes]
 	3	ICMP 192.168.2.4:0 <-> 91.253.176.65:0 [proto: 81/ICMP][10 pkts/700 bytes]
 	4	UDP 192.168.2.4:52794 <-> 91.253.176.65:9665 [proto: 189/WhatsAppVoice][198 pkts/30418 bytes]
 	5	UDP 173.252.114.1:3478 <-> 192.168.2.4:52794 [proto: 78/STUN][5 pkts/676 bytes]

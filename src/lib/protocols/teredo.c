@@ -29,6 +29,8 @@ void ndpi_search_teredo(struct ndpi_detection_module_struct *ndpi_struct, struct
   struct ndpi_packet_struct *packet = &flow->packet;
 
   if(packet->udp
+     && packet->iph
+     && ((ntohl(packet->iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */)
      && ((ntohs(packet->udp->source) == 3544) || (ntohs(packet->udp->dest) == 3544))
      && (packet->payload_packet_len >= 40 /* IPv6 header */))
     ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEREDO, NDPI_PROTOCOL_UNKNOWN);

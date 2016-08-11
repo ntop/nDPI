@@ -1,3 +1,19 @@
-QUIC	413	254874	1
+Unknown	6	7072	1
+GMail	413	254874	1
+YouTube	83	73409	4
+Google	13	12847	3
+QUIC	3	364	1
 
-	1	UDP 216.58.212.101:443 <-> 192.168.1.109:57833 [proto: 188/QUIC][413 pkts/254874 bytes]
+	1	UDP 192.168.1.105:48445 <-> 216.58.214.110:443 [proto: 188.124/QUIC.YouTube][3 pkts/2863 bytes][Host: i.ytimg.com]
+	2	UDP 192.168.1.105:53817 <-> 216.58.210.225:443 [proto: 188.126/QUIC.Google][2 pkts/2784 bytes][Host: yt3.ggpht.com]
+	3	UDP 216.58.212.101:443 <-> 192.168.1.109:57833 [proto: 188.122/QUIC.GMail][413 pkts/254874 bytes][Host: mail.google.com]
+	4	UDP 172.217.16.3:443 <-> 192.168.1.105:40461 [proto: 188/QUIC][3 pkts/364 bytes]
+	5	UDP 172.217.16.4:443 <-> 192.168.1.105:45669 [proto: 188.126/QUIC.Google][5 pkts/4334 bytes][Host: www.google.com]
+	6	UDP 192.168.1.105:34438 <-> 216.58.210.238:443 [proto: 188.124/QUIC.YouTube][7 pkts/6545 bytes][Host: www.youtube.com]
+	7	UDP 192.168.1.109:35236 <-> 216.58.210.206:443 [proto: 188.124/QUIC.YouTube][69 pkts/58433 bytes][Host: www.youtube.com]
+	8	UDP 192.168.1.105:40030 <-> 216.58.201.227:443 [proto: 188.126/QUIC.Google][6 pkts/5729 bytes][Host: fonts.gstatic.com]
+	9	UDP 192.168.1.105:55934 <-> 216.58.201.238:443 [proto: 188.124/QUIC.YouTube][4 pkts/5568 bytes][Host: s.ytimg.com]
+
+
+Undetected flows:
+	1	UDP 10.0.0.3:6121 <-> 10.0.0.4:40134 [proto: 0/Unknown][6 pkts/7072 bytes]

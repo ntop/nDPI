@@ -30,7 +30,8 @@
 /* See http://web.mit.edu/kolya/afs/rx/rx-spec for procotol description. */
 
 /* The should be no need for explicit packing, but just in case... */
-struct __attribute__((__packed__)) ndpi_rx_header {
+PACK_ON
+struct ndpi_rx_header {
   u_int32_t conn_epoch;
   u_int32_t conn_id;
   u_int32_t call_number;
@@ -42,7 +43,7 @@ struct __attribute__((__packed__)) ndpi_rx_header {
   u_int8_t security;
   u_int16_t checksum;
   u_int16_t service_id;
-};
+} PACK_OFF;
 
 /* Type values */
 #define DATA	           1
@@ -106,8 +107,9 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
    *  Check the TYPE and FLAGS fields of an RX packet header.
    *  This check is necessary because we could detect an RX session already begun 
   **/
+  
   /* TYPE field */
-  if((header->type < DATA) && (header->type > VERSION)) {
+  if((header->type < DATA) || (header->type > VERSION)) {
     NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
     return;
@@ -119,50 +121,58 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
      header->flags == PLUS_2 || header->flags == REQ_ACK ||
      header->flags == MORE_1 || header->flags == CLIENT_INIT_1 ||
      header->flags == CLIENT_INIT_2) {
- 
+
     /* TYPE and FLAGS combo */
-    if(header->type == DATA) {
-      if(header->flags == LAST_PKT || header->flags == EMPTY ||
-	 header->flags == PLUS_0 || header->flags == PLUS_1 ||
-	 header->flags == PLUS_2 || header->flags == REQ_ACK ||
-	 header->flags == MORE_1)
-	found = 1;
-    }
-    else if(header->type == ACK) {
-      if(header->flags == CLIENT_INIT_1 || header->flags == CLIENT_INIT_2 ||
-	 header->flags == EMPTY)
-	found = 1;
-      
-    }
-    else if(header->type == CHALLENGE || header->type == RESPONSE) {
-      if(header->flags == EMPTY || header->call_number == 0)
-	found = 1;
-      
-    }
-    else if(header->type == ACKALL) {
-      if(header->flags == EMPTY)
-	found = 1;
-    }
-    else if(header->type == BUSY || header->type == ABORT ||
-	    header->type == DEBUG || header->type == PARAM_1 ||
-	    header->type == PARAM_2 || header->type == PARAM_3 ||
-	    header->type == VERSION)
-      found = 1;
-    else {
-      NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
-    return;
-    }
-  }
-  else {
+    switch(header->type)
+    {
+      case DATA:
+	if(header->flags == LAST_PKT || header->flags == EMPTY ||
+	   header->flags == PLUS_0 || header->flags == PLUS_1 ||
+	   header->flags == PLUS_2 || header->flags == REQ_ACK ||
+	   header->flags == MORE_1)
+	  goto security;
+      case ACK:
+	if(header->flags == CLIENT_INIT_1 || header->flags == CLIENT_INIT_2 ||
+	   header->flags == EMPTY)
+	  goto security;
+      case CHALLENGE:
+	if(header->flags == EMPTY || header->call_number == 0)
+	  goto security;
+      case RESPONSE:
+	if(header->flags == EMPTY || header->call_number == 0)
+	  goto security;
+      case ACKALL:
+	if(header->flags == EMPTY)
+	  goto security;
+      case BUSY:
+	goto security;
+      case ABORT:
+	goto security;
+      case DEBUG:
+	goto security;
+      case PARAM_1:
+	goto security;
+      case PARAM_2:
+        goto security;
+      case PARAM_3:
+	goto security;
+      case VERSION:
+	goto security;
+      default:
+	NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
+	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+	return;
+    } // switch
+  } else { // FLAG
     NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
     return;
   }
 
+ security:
   /* SECURITY field */
-  if(header->security != 0 && header->security != 1 &&
-     header->security != 2 && header->security != 3) {
+  if(header->security > 3)
+  {
     NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
     return;
@@ -171,12 +181,17 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   /* If we have already seen one packet in the other direction, then
      the two must have matching connection numbers. Otherwise store
      them. */
-  if (flow->packet_direction_counter[!packet->packet_direction] != 0) {
+  if(flow->packet_direction_counter[!packet->packet_direction] != 0)
+  {
     if (flow->l4.udp.rx_conn_epoch == header->conn_epoch &&
-        flow->l4.udp.rx_conn_id == header->conn_id)
-      found = 1;
+	flow->l4.udp.rx_conn_id == header->conn_id)
+    {
+      NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "found RX\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN);
+    }
     /* https://www.central.org/frameless/numbers/rxservice.html. */
-    else {
+    else
+    {
       NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
       return;
@@ -184,16 +199,10 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     flow->l4.udp.rx_conn_epoch = header->conn_epoch;
     flow->l4.udp.rx_conn_id = header->conn_id;
-    found = 1;
-  }
-  
-  if(found) {
-    NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "found RX\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN);
-  }
-  else {
-    NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+    {
+      NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "found RX\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN);
+    }
   }
 }
 

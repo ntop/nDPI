@@ -324,7 +324,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct, struc
 		   NDPI_LOG_DEBUG, "found netbios with checked ip-address.\n");
 
 	  if(netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
-	    snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name), "%s", name);
+	    snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
 
 	  ndpi_int_netbios_add_connection(ndpi_struct, flow);
 	  return;

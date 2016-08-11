@@ -230,7 +230,6 @@ static void ndpi_check_ftp_data(struct ndpi_detection_module_struct *ndpi_struct
 }
 
 void ndpi_search_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
 	
   /* Break after 20 packets. */
   if(flow->packet_counter > 20) {

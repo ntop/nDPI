@@ -22,7 +22,13 @@
 
 static ndpi_network host_protocol_list[] = {
 
- /*    
+ /*
+   OpenDNS
+   208.67.216.0/21
+ */
+   { 0xD043D800 /* 208.67.216.0/21 */, 21, NDPI_SERVICE_OPENDNS },
+
+ /*   
     Microsoft Corporation (MS One Drive)
     204.79.195.0/24
     204.79.196.0/23
@@ -39,7 +45,6 @@ static ndpi_network host_protocol_list[] = {
   { 0x83FD1000 /* 131.253.16.0/23 */, 23, NDPI_SERVICE_MS_ONE_DRIVE },
   { 0x83FD1200 /* 131.253.18.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
   { 0x4136BF00 /* 65.54.191.0/24   */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
-
 
  /*    
     Amazon-EU-AWS Elastic Compute Cloud, EC2 (also used by Netflix)
@@ -7226,9 +7231,6 @@ static ndpi_network host_protocol_list[] = {
   { 0xC709F98C, 32, NDPI_SERVICE_TWITCH },
   { 0xC709F9C5, 32, NDPI_SERVICE_TWITCH },
 
-  /* Simet - 200.160.4.0/24 */
-  { 0xC8A00400, 24, NDPI_SERVICE_SIMET },
-
   /*
     AnchorFree (Hotspot Shield)
     AnchorFree Inc. AFNETWORK-1 (NET-74-115-0-0-1) 74.115.0.0 - 74.115.7.255
@@ -7253,6 +7255,7 @@ ndpi_protocol_match host_match[] = {
   { "images-amazon.com", 		"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazonaws.com",			"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazon-adsystem.com",		"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".cloudfront.net",    		"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { ".apple.com",			"Apple",		NDPI_SERVICE_APPLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".mzstatic.com",			"Apple",		NDPI_SERVICE_APPLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".icloud.com",			"AppleiCloud",		NDPI_SERVICE_APPLE_ICLOUD, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7271,7 +7274,8 @@ ndpi_protocol_match host_match[] = {
   { ".facebook.com",			"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
   { "fbstatic-a.akamaihd.net",		"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
   { ".fbcdn.net",			"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
-  { "fbcdn-",				"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },  /* fbcdn-video-a-akamaihd.net */
+  { "fbcdn-",				"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },      /* fbcdn-video-a-akamaihd.net */
+  { ".facebook.net",			"Facebook",		NDPI_SERVICE_FACEBOOK, NDPI_PROTOCOL_FUN },
   { ".google.",				"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gstatic.com",			"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".googlesyndication.com",		"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7284,6 +7288,7 @@ ndpi_protocol_match host_match[] = {
   { "googleadservices.",		"Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { "googleapis.com",	   	        "Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { "ggpht.com",	   	        "Google",		NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "1e100.net",                        "Google",               NDPI_SERVICE_GOOGLE, NDPI_PROTOCOL_ACCEPTABLE },
   { "maps.google.",			"GoogleMaps",		NDPI_SERVICE_GOOGLE_MAPS, NDPI_PROTOCOL_ACCEPTABLE },
   { "maps.gstatic.com",			"GoogleMaps",		NDPI_SERVICE_GOOGLE_MAPS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gmail.",				"GMail",		NDPI_SERVICE_GMAIL, NDPI_PROTOCOL_SAFE },
@@ -7316,6 +7321,7 @@ ndpi_protocol_match host_match[] = {
   { ".yimg.com",			"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
   { "yahooapis.",			"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
   { "youtube.",				"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
+  { "yt3.ggpht.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { ".googlevideo.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { ".ytimg.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { "youtube-nocookie.",		"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
@@ -7323,16 +7329,18 @@ ndpi_protocol_match host_match[] = {
   { ".spotify.",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_FUN },
   { ".pandora.com",			"Pandora",		NDPI_SERVICE_PANDORA,  NDPI_PROTOCOL_FUN },
   { ".torproject.org",                  "Tor",                  NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
-  { "appmeutim.tim.com.br",             "TIM_Meu",              NDPI_SERVICE_TIMMEU, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".timtorcedor.com.br",              "Torcedor",             NDPI_SERVICE_TORCEDOR, NDPI_PROTOCOL_ACCEPTABLE },
   { ".kakao.com",                       "KakaoTalk",            NDPI_SERVICE_KAKAOTALK, NDPI_PROTOCOL_FUN },
   { "ttvnw.net",                        "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "static-cdn.jtvnw.net",             "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "www-cdn.jtvnw.net",                "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "quickplay.com",                    "QuickPlay",            NDPI_SERVICE_QUICKPLAY, NDPI_PROTOCOL_FUN },
-  { "tim.com.br",                       "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
-  { "tim.it",                           "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
   { ".qq.com",                          "QQ",                   NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_FUN },
+  { ".weibo.com",			"Weibo",        	NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sinaimg.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sinajs.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sina.cn",				"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".sina.com.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  
 
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_FUN },
@@ -7348,17 +7356,6 @@ ndpi_protocol_match host_match[] = {
   { "instagramstatic-",                 "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
 
   { ".waze.com",                        "Waze",                 NDPI_SERVICE_WAZE, NDPI_PROTOCOL_ACCEPTABLE },
-  { "simet-",                           "Simet",                NDPI_SERVICE_SIMET, NDPI_PROTOCOL_ACCEPTABLE },
-  { "opensignal.com",                   "OpenSignal",           NDPI_SERVICE_OPENSIGNAL, NDPI_PROTOCOL_ACCEPTABLE },
-  { "99taxis.com",                      "99Taxi",               NDPI_SERVICE_99TAXI, NDPI_PROTOCOL_ACCEPTABLE },
-  { "easytaxis.com",                    "EasyTaxi",             NDPI_SERVICE_EASYTAXI, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".globo.com",                       "GloboTV",              NDPI_SERVICE_GLOBOTV, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".glbimg.com",                      "GloboTV",              NDPI_SERVICE_GLOBOTV, NDPI_PROTOCOL_ACCEPTABLE },
-  { "timsomdechamada.com.br",           "SomDeChamada",         NDPI_SERVICE_TIMSOMDECHAMADA, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".tim.acotelbr.com.br",             "TIM_Menu",             NDPI_SERVICE_TIMMENU, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".timbeta.com.br",                  "TIM_Beta",             NDPI_SERVICE_TIMBETA, NDPI_PROTOCOL_ACCEPTABLE },
-  { "tim-geoportal.geoportal3d.com.br", "TIM_PortasAbertas",    NDPI_SERVICE_TIMPORTASABERTAS, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".m4u.com.br",                      "TIM_Recarga",          NDPI_SERVICE_TIMRECARGA, NDPI_PROTOCOL_ACCEPTABLE },
   { ".deezer.com",                      "Deezer",               NDPI_SERVICE_DEEZER, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".microsoft.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7386,7 +7383,7 @@ ndpi_protocol_match host_match[] = {
   { "evsecure-ocsp.verisign.com",	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-aia.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-crl.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
-   { ".omniroot.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".omniroot.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".verisign.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".symcb.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
   { ".symcd.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7400,7 +7397,10 @@ ndpi_protocol_match host_match[] = {
   { "coby.ns.cloudflare.com",  		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
   { "amanda.ns.cloudflare.com",		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_ACCEPTABLE },
 
+  { "d295hzzivaok4k.cloudfront.net",	"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".opendns.com",			"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_ACCEPTABLE },
 
+  
 
   { NULL, 0 }
 };
@@ -7525,7 +7525,7 @@ static const char *ndpi_en_bigrams[] = {
 static const char *ndpi_en_impossible_bigrams[] = {
   "bk", "bq", "bx", "cb", "cf", "cg", "cj", "cp", "cv", "cw", "cx", "dx", "fk", "fq", "fv", "fx", "ee",
   "fz", "gq", "gv", "gx", "hh", "hk", "hv", "hx", "hz", "iy", "jb", "jc", "jd", "jf", "jg", "jh", "jk",
-  "jl", "jm", "jn", "jp", "jq", "jr", "js", "jt", "jv", "jw", "jx", "jy", "jz", "kg", "kq", "kv", "kx",
+  "jl", "jm", "jn", "jp", "jq", "jr", /* "js", */ "jt", "jv", "jw", "jx", "jy", "jz", "kg", "kq", "kv", "kx",
   "kz", "lq", "lx", "mg", "mj", "mq", "mx", "mz", "pq", "pv", "px", "qb", "qc", "qd", "qe", "qf", "ii",
   "qg", "qh", "qj", "qk", "ql", "qm", "qn", "qo", "qp", "qr", "qs", "qt", "qv", "qw", "qx", "qy", "uu",
   "qz", "sx", "sz", "tq", "tx", "vb", "vc", "vd", "vf", "vg", "vh", "vj", "vk", "vm", "vn", "vp", "bw",

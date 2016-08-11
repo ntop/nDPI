@@ -53,8 +53,7 @@ static u_int8_t is_utp_pkt(const u_int8_t *payload, u_int payload_len) {
 
 static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
 					      int bt_offset, int check_hash,
-					      const u_int8_t save_detection, const u_int8_t encrypted_connection/* , */
-					      /* ndpi_protocol_type_t protocol_type */)
+					      const u_int8_t save_detection, const u_int8_t encrypted_connection)
 {
   if(check_hash) {
     const char *bt_hash = NULL; /* 20 bytes long */
@@ -92,8 +91,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
       NDPI_LOG(NDPI_PROTOCOL_BITTORRENT,
 	       ndpi_struct, NDPI_LOG_TRACE, "BT: plain BitTorrent protocol detected\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow, 19, 1,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION/* , */
-					/* NDPI_REAL_PROTOCOL */);
+					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
       return 1;
     }
   }
@@ -125,8 +123,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     NDPI_LOG(NDPI_PROTOCOL_BITTORRENT, ndpi_struct,
 	     NDPI_LOG_TRACE, "BT: plain Bitcomet persistent seed protocol detected\n");
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION/* , */
-				      /* NDPI_CORRELATED_PROTOCOL */);
+				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION);
     return 1;
   }
 
@@ -135,7 +132,6 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 					  || memcmp(packet->payload, "POST ", 5) == 0)) {
     const u_int8_t *ptr = &packet->payload[4];
     u_int16_t len = packet->payload_packet_len - 4;
-    a = 0;
 
 
     /* parse complete get packet here into line structure elements */
