@@ -1,8 +1,7 @@
 /*
  * mail_imap.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -108,8 +107,8 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	    && (packet->payload[command_start + 1] == 'K' || packet->payload[command_start + 1] == 'k')
 	    && packet->payload[command_start + 2] == ' ') {
 	  flow->l4.tcp.mail_imap_stage += 1;
-    if (flow->l4.tcp.mail_imap_starttls == 1)
-      flow->l4.tcp.mail_imap_starttls = 2;
+	  if (flow->l4.tcp.mail_imap_starttls == 1)
+	    flow->l4.tcp.mail_imap_starttls = 2;
 	  saw_command = 1;
 	} else if ((packet->payload[command_start] == 'U' || packet->payload[command_start] == 'u')
 		   && (packet->payload[command_start + 1] == 'I' || packet->payload[command_start + 1] == 'i')
