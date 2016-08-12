@@ -7403,11 +7403,11 @@ ndpi_protocol_match host_match[] = {
   /* https://get.slack.help/hc/en-us/articles/205138367-Troubleshooting-Slack-connection-issues */
   { "slack.com",                        "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
   { ".slack-msgs.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".slack-files.com",                 "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".slack-imgs.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-files.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-imgs.com",                   "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
   { ".slack-edge.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
   { ".slack-core.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".slack-redir.net",                 "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-redir.net",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-",                "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
   
