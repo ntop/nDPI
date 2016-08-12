@@ -554,7 +554,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t mail_pop_stage:2;
 #endif
 #ifdef NDPI_PROTOCOL_MAIL_IMAP
-  u_int32_t mail_imap_stage:3;
+  u_int32_t mail_imap_stage:3, mail_imap_starttls:2;
 #endif
 #ifdef NDPI_PROTOCOL_SKYPE
   u_int8_t skype_packet_id;
