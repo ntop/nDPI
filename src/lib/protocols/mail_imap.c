@@ -144,6 +144,7 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	    && (packet->payload[command_start + 7] == 'S' || packet->payload[command_start + 7] == 's')) {
         flow->l4.tcp.mail_imap_stage += 1;
         flow->l4.tcp.mail_imap_starttls = 1;
+        flow->detected_protocol_stack[0] = NDPI_PROTOCOL_MAIL_IMAPS;
         saw_command = 1;
 	}
       }
