@@ -38,7 +38,7 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct * packet = &flow->packet;
   u_int16_t payload_len = packet->payload_packet_len;
-  u_int16_t count = 0;
+  u_int count = 0; // prevent integer overflow
   
   if(packet->tcp != NULL) {
 
