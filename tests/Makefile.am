@@ -1,0 +1,1 @@
+TESTS = do.sh
