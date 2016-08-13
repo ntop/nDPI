@@ -15,6 +15,10 @@ In order to compile this library do
 - ./configure
 - make
 
+To run tests do additionally:
+
+- make check
+
 Please note that the pre-requisites for compilation include:
 - GNU tools (autogen, automake, autoconf, libtool)
 - GNU C compiler (gcc)
@@ -34,12 +38,17 @@ The entire procedure of adding new protocols in detail:
 9.  ./autogen.sh
 10. ./configure
 11. make
+12. make check
 
 ### Creating A Source File Tar Ball
 
 If you want to distribute a source tar file of nDPI do:
 
 - make dist
+
+To ensure that a tar file includes all necessary files and to run tests on distribution do:
+
+- make distcheck
 
 [ntopng_logo]: https://camo.githubusercontent.com/0f789abcef232035c05e0d2e82afa3cc3be46485/687474703a2f2f7777772e6e746f702e6f72672f77702d636f6e74656e742f75706c6f6164732f323031312f30382f6e746f706e672d69636f6e2d313530783135302e706e67
 
