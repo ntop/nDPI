@@ -52,7 +52,7 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
       u_int16_t len = ntohs(drda->length);
 
       /* check first header */
-      if(len != ntohs(drda->length2) + 6 &&
+      if(len != ntohs(drda->length2) + 6 ||
 	 drda->magic != 0xd0)
 	goto no_drda;
 
@@ -67,7 +67,7 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
 	  drda = (struct ndpi_drda_hdr *)(packet->payload + count);
 	  len = ntohs(drda->length);
 
-	  if(len != ntohs(drda->length2) + 6 &&
+	  if(len != ntohs(drda->length2) + 6 ||
 	     drda->magic != 0xd0)
 	    goto no_drda;
 	  
