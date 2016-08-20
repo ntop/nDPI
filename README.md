@@ -27,7 +27,7 @@ Please note that the pre-requisites for compilation include:
 
 The entire procedure of adding new protocols in detail:
 
-1. Add new protocol together with its unique ID to: src/include/ndpi_protocols_osdpi.h
+1. Add new protocol together with its unique ID to: src/include/ndpi_protocol_ids.h
 2. Create a new protocol in: src/lib/protocols/
 3. Variables to be kept for the duration of the entire flow (as state variables) needs to be placed in: /include/ndpi_structs.h in ndpi_flow_tcp_struct (for TCP only), ndpi_flow_udp_struct (for UDP only), or ndpi_flow_struct (for both).
 4. Add a new entry for the search function for the new protocol in: src/include/ndpi_protocols.h
