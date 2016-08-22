@@ -34,6 +34,50 @@
 extern u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow);
 
+static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+					struct ndpi_flow_struct *flow, u_int32_t protocol)
+{
+  struct ndpi_packet_struct *packet = &flow->packet;
+
+  if((flow->protos.ssl.client_certificate[0] != '\0')
+     || (flow->protos.ssl.server_certificate[0] != '\0')
+     || (flow->host_server_name[0] != '\0'))
+    protocol = NDPI_PROTOCOL_SSL;
+  else
+    protocol =  NDPI_PROTOCOL_SSL_NO_CERT;
+
+  if(packet->tcp != NULL) {
+    switch(protocol) {
+    case NDPI_PROTOCOL_SSL:
+    case NDPI_PROTOCOL_SSL_NO_CERT:
+{
+  /*
+     In case of SSL there are probably sub-protocols
+     such as IMAPS that can be otherwise detected
+  */
+  u_int16_t sport = ntohs(packet->tcp->source);
+  u_int16_t dport = ntohs(packet->tcp->dest);
+
+  if((sport == 465) || (dport == 465))      protocol = NDPI_PROTOCOL_MAIL_SMTPS;
+  else if((sport == 993) || (dport == 993)
+#ifdef NDPI_PROTOCOL_MAIL_IMAP
+    || (flow->l4.tcp.mail_imap_starttls)
+#endif
+    ) protocol = NDPI_PROTOCOL_MAIL_IMAPS;
+  else if((sport == 995) || (dport == 995)) protocol = NDPI_PROTOCOL_MAIL_POPS;
+}
+break;
+    }
+
+    if((protocol == NDPI_PROTOCOL_SSL_NO_CERT)
+ && is_skype_flow(ndpi_struct, flow)) {
+protocol = NDPI_PROTOCOL_SKYPE;
+    }
+  }
+  
+  return protocol;
+}
+
 static void ndpi_int_ssl_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow, u_int32_t protocol)
 {
@@ -41,44 +85,7 @@ static void ndpi_int_ssl_add_connection(struct ndpi_detection_module_struct *ndp
      && (protocol != NDPI_PROTOCOL_SSL_NO_CERT)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
   } else {
-    struct ndpi_packet_struct *packet = &flow->packet;
-
-    if((flow->protos.ssl.client_certificate[0] != '\0')
-       || (flow->protos.ssl.server_certificate[0] != '\0')
-       || (flow->host_server_name[0] != '\0'))
-      protocol = NDPI_PROTOCOL_SSL;
-    else
-      protocol =  NDPI_PROTOCOL_SSL_NO_CERT;
-
-    if(packet->tcp != NULL) {
-      switch(protocol) {
-      case NDPI_PROTOCOL_SSL:
-      case NDPI_PROTOCOL_SSL_NO_CERT:
-	{
-	  /*
-	     In case of SSL there are probably sub-protocols
-	     such as IMAPS that can be otherwise detected
-	  */
-	  u_int16_t sport = ntohs(packet->tcp->source);
-	  u_int16_t dport = ntohs(packet->tcp->dest);
-
-	  if((sport == 465) || (dport == 465))      protocol = NDPI_PROTOCOL_MAIL_SMTPS;
-	  else if((sport == 993) || (dport == 993)
-#ifdef NDPI_PROTOCOL_MAIL_IMAP
-      || (flow->l4.tcp.mail_imap_starttls)
-#endif
-      ) protocol = NDPI_PROTOCOL_MAIL_IMAPS;
-	  else if((sport == 995) || (dport == 995)) protocol = NDPI_PROTOCOL_MAIL_POPS;
-	}
-	break;
-      }
-
-      if((protocol == NDPI_PROTOCOL_SSL_NO_CERT)
-	 && is_skype_flow(ndpi_struct, flow)) {
-	protocol = NDPI_PROTOCOL_SKYPE;
-      }
-    }
-
+    protocol = ndpi_ssl_refine_master_protocol(ndpi_struct, flow, protocol);
     ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
   }
 }
@@ -320,11 +327,14 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 #ifdef CERTIFICATE_DEBUG
 	printf("***** [SSL] %s\n", certificate);
 #endif
-
-	if(ndpi_match_host_subprotocol(ndpi_struct, flow, certificate, 
-					 strlen(certificate),
-					 NDPI_PROTOCOL_SSL) != NDPI_PROTOCOL_UNKNOWN)
+  u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate, 
+					 strlen(certificate), NDPI_PROTOCOL_SSL);
+  
+	if(subproto != NDPI_PROTOCOL_UNKNOWN) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
+              ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
 	  return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
+  }
 
 #ifdef NDPI_PROTOCOL_TOR
 	if(ndpi_is_ssl_tor(ndpi_struct, flow, certificate) != 0)
