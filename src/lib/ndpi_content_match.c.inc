@@ -154,14 +154,21 @@ static ndpi_network host_protocol_list[] = {
 
   /*
     Skype (Microsoft CDN)
-    157.56.0.0/14, 157.60.0.0/16, 157.54.0.0/15
+    157.56.135.64/26, 157.56.185.0/26, 157.56.52.0/26, 157.56.53.0/26
+    157.60.0.0/16, 157.54.0.0/15	
+    13.107.3.128/32
+    13.107.3.129/32
     111.221.64.0 - 111.221.127.255
     91.190.216.0/21 (AS198015 Skype Communications Sarl)
     40.126.129.109/32
   */
-  { 0x9D380000 /* 157.56.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
+  { 0x9D388740 /* 157.56.135.64 */, 26, NDPI_PROTOCOL_SKYPE },
+  { 0x9D38B900 /* 157.56.185.0 */, 26, NDPI_PROTOCOL_SKYPE },
+  { 0x9D383400 /* 157.56.52.0 */, 26, NDPI_PROTOCOL_SKYPE },	
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
   { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
+  { 0x0D6B0380 /* 13.107.3.128 */, 32, NDPI_PROTOCOL_SKYPE },
+  { 0x0D6B0381 /* 13.107.3.129 */, 32, NDPI_PROTOCOL_SKYPE },	
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
   { 0x5BBED800 /* 91.190.216.0 */, 21, NDPI_PROTOCOL_SKYPE },
   { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
@@ -7293,7 +7300,7 @@ ndpi_protocol_match host_match[] = {
   { "maps.gstatic.com",			"GoogleMaps",		NDPI_SERVICE_GOOGLE_MAPS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gmail.",				"GMail",		NDPI_SERVICE_GMAIL, NDPI_PROTOCOL_SAFE },
   { "mail.google.",			"GMail",		NDPI_SERVICE_GMAIL, NDPI_PROTOCOL_SAFE },
-  { "mail.outlook.com", "Hotmail",  NDPI_SERVICE_HOTMAIL, NDPI_PROTOCOL_SAFE },
+  { "mail.outlook.com",                 "Hotmail",              NDPI_SERVICE_HOTMAIL, NDPI_PROTOCOL_SAFE },
   { ".last.fm",				"LastFM",		NDPI_SERVICE_LASTFM, NDPI_PROTOCOL_FUN },
   { "msn.com",				"MSN",			NDPI_SERVICE_MSN, NDPI_PROTOCOL_FUN },
   { "netflix.com",			"NetFlix",		NDPI_SERVICE_NETFLIX, NDPI_PROTOCOL_FUN	},
@@ -7366,6 +7373,7 @@ ndpi_protocol_match host_match[] = {
   { ".msecnd.net",                      "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
   { ".visualstudio.com",                "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },  
   { "bn1301.storage.live.com",          "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "*.gateway.messenger.live.com",     "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "skyapi.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "d.docs.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "update.microsoft.com",             "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
