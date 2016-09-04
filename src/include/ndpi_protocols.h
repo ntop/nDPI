@@ -337,5 +337,6 @@ void init_coap_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 void init_mqtt_dissector (struct ndpi_detection_module_struct *ndpi_struct,u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_rx_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_git_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
+void init_hangout_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_drda_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 #endif /* __NDPI_PROTOCOLS_H__ */

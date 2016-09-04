@@ -154,17 +154,29 @@ static ndpi_network host_protocol_list[] = {
 
   /*
     Skype (Microsoft CDN)
-    157.56.0.0/14, 157.60.0.0/16, 157.54.0.0/15
+    157.56.135.64/26, 157.56.185.0/26, 157.56.52.0/26,
+    157.56.53.128/25, 157.56.198.0/26
+    157.60.0.0/16, 157.54.0.0/15	
+    13.107.3.128/32
+    13.107.3.129/32
     111.221.64.0 - 111.221.127.255
     91.190.216.0/21 (AS198015 Skype Communications Sarl)
     40.126.129.109/32
+    65.55.223.0/26
   */
-  { 0x9D380000 /* 157.56.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
+  { 0x9D388740 /* 157.56.135.64 */, 26, NDPI_PROTOCOL_SKYPE },
+  { 0x9D38B900 /* 157.56.185.0 */, 26, NDPI_PROTOCOL_SKYPE },
+  { 0x9D383400 /* 157.56.52.0 */, 26, NDPI_PROTOCOL_SKYPE },
+  { 0x9D383580 /* 157.56.53.128 */, 25, NDPI_PROTOCOL_SKYPE },
+  { 0x9D38C600 /* 157.56.198.0 */, 26, NDPI_PROTOCOL_SKYPE },
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
   { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
+  { 0x0D6B0380 /* 13.107.3.128 */, 32, NDPI_PROTOCOL_SKYPE },
+  { 0x0D6B0381 /* 13.107.3.129 */, 32, NDPI_PROTOCOL_SKYPE },	
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
   { 0x5BBED800 /* 91.190.216.0 */, 21, NDPI_PROTOCOL_SKYPE },
   { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
+  { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
   
 
   /*
@@ -7231,9 +7243,6 @@ static ndpi_network host_protocol_list[] = {
   { 0xC709F98C, 32, NDPI_SERVICE_TWITCH },
   { 0xC709F9C5, 32, NDPI_SERVICE_TWITCH },
 
-  /* Simet - 200.160.4.0/24 */
-  { 0xC8A00400, 24, NDPI_SERVICE_SIMET },
-
   /*
     AnchorFree (Hotspot Shield)
     AnchorFree Inc. AFNETWORK-1 (NET-74-115-0-0-1) 74.115.0.0 - 74.115.7.255
@@ -7296,6 +7305,7 @@ ndpi_protocol_match host_match[] = {
   { "maps.gstatic.com",			"GoogleMaps",		NDPI_SERVICE_GOOGLE_MAPS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gmail.",				"GMail",		NDPI_SERVICE_GMAIL, NDPI_PROTOCOL_SAFE },
   { "mail.google.",			"GMail",		NDPI_SERVICE_GMAIL, NDPI_PROTOCOL_SAFE },
+  { "mail.outlook.com",                 "Hotmail",              NDPI_SERVICE_HOTMAIL, NDPI_PROTOCOL_SAFE },
   { ".last.fm",				"LastFM",		NDPI_SERVICE_LASTFM, NDPI_PROTOCOL_FUN },
   { "msn.com",				"MSN",			NDPI_SERVICE_MSN, NDPI_PROTOCOL_FUN },
   { "netflix.com",			"NetFlix",		NDPI_SERVICE_NETFLIX, NDPI_PROTOCOL_FUN	},
@@ -7324,6 +7334,7 @@ ndpi_protocol_match host_match[] = {
   { ".yimg.com",			"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
   { "yahooapis.",			"Yahoo",		NDPI_SERVICE_YAHOO, NDPI_PROTOCOL_ACCEPTABLE },
   { "youtube.",				"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
+  { "yt3.ggpht.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { ".googlevideo.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { ".ytimg.com",			"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
   { "youtube-nocookie.",		"YouTube",		NDPI_SERVICE_YOUTUBE, NDPI_PROTOCOL_FUN },
@@ -7331,15 +7342,11 @@ ndpi_protocol_match host_match[] = {
   { ".spotify.",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_FUN },
   { ".pandora.com",			"Pandora",		NDPI_SERVICE_PANDORA,  NDPI_PROTOCOL_FUN },
   { ".torproject.org",                  "Tor",                  NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
-  { "appmeutim.tim.com.br",             "TIM_Meu",              NDPI_SERVICE_TIMMEU, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".timtorcedor.com.br",              "Torcedor",             NDPI_SERVICE_TORCEDOR, NDPI_PROTOCOL_ACCEPTABLE },
   { ".kakao.com",                       "KakaoTalk",            NDPI_SERVICE_KAKAOTALK, NDPI_PROTOCOL_FUN },
   { "ttvnw.net",                        "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "static-cdn.jtvnw.net",             "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "www-cdn.jtvnw.net",                "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "quickplay.com",                    "QuickPlay",            NDPI_SERVICE_QUICKPLAY, NDPI_PROTOCOL_FUN },
-  { "tim.com.br",                       "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
-  { "tim.it",                           "TIM",                  NDPI_SERVICE_TIM, NDPI_PROTOCOL_ACCEPTABLE },
   { ".qq.com",                          "QQ",                   NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_FUN },
   { ".weibo.com",			"Weibo",        	NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
   { ".sinaimg.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
@@ -7362,17 +7369,6 @@ ndpi_protocol_match host_match[] = {
   { "instagramstatic-",                 "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_FUN },
 
   { ".waze.com",                        "Waze",                 NDPI_SERVICE_WAZE, NDPI_PROTOCOL_ACCEPTABLE },
-  { "simet-",                           "Simet",                NDPI_SERVICE_SIMET, NDPI_PROTOCOL_ACCEPTABLE },
-  { "opensignal.com",                   "OpenSignal",           NDPI_SERVICE_OPENSIGNAL, NDPI_PROTOCOL_ACCEPTABLE },
-  { "99taxis.com",                      "99Taxi",               NDPI_SERVICE_99TAXI, NDPI_PROTOCOL_ACCEPTABLE },
-  { "easytaxis.com",                    "EasyTaxi",             NDPI_SERVICE_EASYTAXI, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".globo.com",                       "GloboTV",              NDPI_SERVICE_GLOBOTV, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".glbimg.com",                      "GloboTV",              NDPI_SERVICE_GLOBOTV, NDPI_PROTOCOL_ACCEPTABLE },
-  { "timsomdechamada.com.br",           "SomDeChamada",         NDPI_SERVICE_TIMSOMDECHAMADA, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".tim.acotelbr.com.br",             "TIM_Menu",             NDPI_SERVICE_TIMMENU, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".timbeta.com.br",                  "TIM_Beta",             NDPI_SERVICE_TIMBETA, NDPI_PROTOCOL_ACCEPTABLE },
-  { "tim-geoportal.geoportal3d.com.br", "TIM_PortasAbertas",    NDPI_SERVICE_TIMPORTASABERTAS, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".m4u.com.br",                      "TIM_Recarga",          NDPI_SERVICE_TIMRECARGA, NDPI_PROTOCOL_ACCEPTABLE },
   { ".deezer.com",                      "Deezer",               NDPI_SERVICE_DEEZER, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".microsoft.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7382,6 +7378,7 @@ ndpi_protocol_match host_match[] = {
   { ".msecnd.net",                      "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },
   { ".visualstudio.com",                "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_ACCEPTABLE },  
   { "bn1301.storage.live.com",          "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "*.gateway.messenger.live.com",     "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "skyapi.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "d.docs.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "update.microsoft.com",             "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7417,6 +7414,16 @@ ndpi_protocol_match host_match[] = {
   { "d295hzzivaok4k.cloudfront.net",	"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".opendns.com",			"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_ACCEPTABLE },
 
+  /* https://get.slack.help/hc/en-us/articles/205138367-Troubleshooting-Slack-connection-issues */
+  { "slack.com",                        "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".slack-msgs.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-files.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-imgs.com",                   "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".slack-edge.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".slack-core.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-redir.net",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
+  /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
+  { "slack-assets2.s3-",                "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
   
 
   { NULL, 0 }

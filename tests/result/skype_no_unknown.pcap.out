@@ -7,8 +7,9 @@ ICMP	4	328	1
 IGMP	4	226	4
 SSL	79	7742	6
 Dropbox	16	7342	5
-Skype	1585	362654	220
+Skype	1237	180967	219
 Apple	84	20699	2
+MS_OneDrive	348	181687	1
 
 	1	UDP 192.168.1.34:13021 <-> 189.138.161.88:19521 [proto: 125/Skype][1 pkts/60 bytes]
 	2	TCP 192.168.1.34:51290 <-> 5.248.186.221:31010 [proto: 125/Skype][18 pkts/1490 bytes]
@@ -150,7 +151,7 @@ Apple	84	20699	2
 	138	UDP 192.168.1.34:13021 <-> 157.55.130.146:33033 [proto: 125/Skype][1 pkts/69 bytes]
 	139	TCP 192.168.1.34:51291 <-> 81.83.77.141:17639 [proto: 125/Skype][15 pkts/1226 bytes]
 	140	TCP 76.167.161.6:20274 <-> 192.168.1.34:51288 [proto: 125/Skype][15 pkts/1258 bytes]
-	141	TCP 192.168.1.34:51230 <-> 157.56.126.211:443 [proto: 125/Skype][348 pkts/181687 bytes]
+	141	TCP 192.168.1.34:51230 <-> 157.56.126.211:443 [proto: 91.207/SSL.MS_OneDrive][348 pkts/181687 bytes][SSL server: *.gateway.messenger.live.com]
 	142	TCP 157.56.52.28:443 <-> 192.168.1.34:51232 [proto: 125/Skype][13 pkts/1157 bytes]
 	143	TCP 192.168.1.34:51241 <-> 157.55.130.176:443 [proto: 125/Skype][15 pkts/1584 bytes]
 	144	TCP 192.168.1.34:51261 <-> 157.55.235.170:443 [proto: 125/Skype][15 pkts/1569 bytes]

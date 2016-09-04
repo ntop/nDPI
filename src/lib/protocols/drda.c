@@ -38,20 +38,21 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct * packet = &flow->packet;
   u_int16_t payload_len = packet->payload_packet_len;
-  u_int16_t count = 0;
+  u_int count = 0; // prevent integer overflow
   
   if(packet->tcp != NULL) {
 
     /* check port */
     if((ntohs(packet->tcp->source) == DRDA_PORT ||
-	ntohs(packet->tcp->dest) == DRDA_PORT)) {
+	ntohs(packet->tcp->dest) == DRDA_PORT) &&
+	payload_len >= sizeof(struct ndpi_drda_hdr)) {
 
       struct ndpi_drda_hdr * drda = (struct ndpi_drda_hdr *) packet->payload;
 
       u_int16_t len = ntohs(drda->length);
 
       /* check first header */
-      if(len - 6 != ntohs(drda->length2) &&
+      if(len != ntohs(drda->length2) + 6 ||
 	 drda->magic != 0xd0)
 	goto no_drda;
 
@@ -59,15 +60,14 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
       if(payload_len > len) {
 
 	count = len;
-	const u_int8_t * pp = packet->payload + len;
 
-	while(count < payload_len)
+	while(count + sizeof(struct ndpi_drda_hdr) < payload_len)
 	{
 	  /* update info */
-	  drda = (struct ndpi_drda_hdr *) pp;
+	  drda = (struct ndpi_drda_hdr *)(packet->payload + count);
 	  len = ntohs(drda->length);
 
-	  if(len - 6 != ntohs(drda->length2) &&
+	  if(len != ntohs(drda->length2) + 6 ||
 	     drda->magic != 0xd0)
 	    goto no_drda;
 	  

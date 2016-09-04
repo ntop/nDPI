@@ -87,7 +87,7 @@ LIBS=$OLD_LIBS
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
-AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile libndpi.pc])
+AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile tests/Makefile libndpi.pc])
 AC_CONFIG_HEADERS(config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(SVN_DATE)
