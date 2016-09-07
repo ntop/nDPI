@@ -1,8 +1,7 @@
 /*
  * dhcp.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -43,16 +42,18 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
   /* this detection also works for asymmetric dhcp traffic */
 
   /*check standard DHCP 0.0.0.0:68 -> 255.255.255.255:67 */
-  if (packet->payload_packet_len >= 244 && (packet->udp->source == htons(67)
-					    || packet->udp->source == htons(68))
-      && (packet->udp->dest == htons(67) || packet->udp->dest == htons(68))
-      && get_u_int32_t(packet->payload, 236) == htonl(0x63825363)
-      && get_u_int16_t(packet->payload, 240) == htons(0x3501)) {
-
-    NDPI_LOG(NDPI_PROTOCOL_DHCP, ndpi_struct, NDPI_LOG_DEBUG, "DHCP request\n");
-
-    ndpi_int_dhcp_add_connection(ndpi_struct, flow);
-    return;
+  if(packet->udp) {
+    if(packet->payload_packet_len >= 244 &&
+       (packet->udp->source == htons(67) || packet->udp->source == htons(68)) &&
+       (packet->udp->dest == htons(67) || packet->udp->dest == htons(68)) &&
+       get_u_int32_t(packet->payload, 236) == htonl(0x63825363) &&
+       get_u_int16_t(packet->payload, 240) == htons(0x3501)) {
+      
+      NDPI_LOG(NDPI_PROTOCOL_DHCP, ndpi_struct, NDPI_LOG_DEBUG, "DHCP request\n");
+      
+      ndpi_int_dhcp_add_connection(ndpi_struct, flow);
+      return;
+    }
   }
 
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DHCP);
