@@ -40,7 +40,7 @@ void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
   //      struct ndpi_id_struct         *src=ndpi_struct->src;
   //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-  if (packet->payload_packet_len > 37	//min length
+  if (packet->payload_packet_len > 38	//min length
       && get_u_int16_t(packet->payload, 0) == packet->payload_packet_len - 4	//first 3 bytes are length
       && get_u_int8_t(packet->payload, 2) == 0x00	//3rd byte of packet length
       && get_u_int8_t(packet->payload, 3) == 0x00	//packet sequence number is 0 for startup packet
