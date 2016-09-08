@@ -51,15 +51,14 @@ __forceinline static
 
 	/* information about MGCP taken from http://en.wikipedia.org/wiki/MGCP */
 
-	u_int16_t pos = 4;
+	u_int16_t pos = 5;
 
 	if (packet->payload_packet_len < 8) {
 		goto mgcp_excluded;
 	}
 
 	/* packet must end with 0x0d0a or with 0x0a */
-	if (packet->payload[packet->payload_packet_len - 1] != 0x0a
-		&& get_u_int16_t(packet->payload, packet->payload_packet_len - 2) != htons(0x0d0a)) {
+	if (packet->payload[packet->payload_packet_len - 1] != 0x0a) {
 		goto mgcp_excluded;
 	}
 
@@ -78,7 +77,7 @@ __forceinline static
 		goto mgcp_excluded;
 	}
 	// now search for string "MGCP " in the rest of the message
-	while ((pos + 5) < packet->payload_packet_len) {
+	while ((pos + 4) < packet->payload_packet_len) {
 		if (memcmp(&packet->payload[pos], "MGCP ", 5) == 0) {
 			NDPI_LOG(NDPI_PROTOCOL_MGCP, ndpi_struct, NDPI_LOG_DEBUG, "MGCP match.\n");
 			ndpi_int_mgcp_add_connection(ndpi_struct, flow);
