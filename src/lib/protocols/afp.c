@@ -54,7 +54,7 @@ void ndpi_search_afp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   }
 
   /*
-   * detection of GetStatus command of DSI protocl
+   * detection of GetStatus command of DSI protocol
    */
   if (packet->payload_packet_len >= 18 && get_u_int16_t(packet->payload, 0) == htons(0x0003) &&
       get_u_int16_t(packet->payload, 2) == htons(0x0001) && get_u_int32_t(packet->payload, 4) == 0 &&
