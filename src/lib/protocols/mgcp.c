@@ -58,8 +58,7 @@ __forceinline static
 	}
 
 	/* packet must end with 0x0d0a or with 0x0a */
-	if (packet->payload[packet->payload_packet_len - 1] != 0x0a
-		&& get_u_int16_t(packet->payload, packet->payload_packet_len - 2) != htons(0x0d0a)) {
+	if (packet->payload[packet->payload_packet_len - 1] != 0x0a) {
 		goto mgcp_excluded;
 	}
 
