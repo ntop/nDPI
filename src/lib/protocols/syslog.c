@@ -46,15 +46,14 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 
   if (packet->payload_packet_len > 20 && packet->payload_packet_len <= 1024 && packet->payload[0] == '<') {
     NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "checked len>20 and <1024 and first symbol=<.\n");
-    i = 1;
 
-    for (;;) {
-      if (packet->payload[i] < '0' || packet->payload[i] > '9' || i++ > 3) {
-	NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG,
-		 "read symbols while the symbol is a number.\n");
-	break;
+    for (i = 1; i <= 3; i++) {
+      if (packet->payload[i] < '0' || packet->payload[i] > '9') {
+		break;
       }
     }
+    NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG,
+             "read symbols while the symbol is a number.\n");
 
     if (packet->payload[i++] != '>') {
       NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "there is no > following the number.\n");
