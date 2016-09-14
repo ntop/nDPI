@@ -52,8 +52,8 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 		break;
       }
     }
-	NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG,
-		 "read symbols while the symbol is a number.\n");
+    NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG,
+             "read symbols while the symbol is a number.\n");
 
     if (packet->payload[i++] != '>') {
       NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "there is no > following the number.\n");
