@@ -29,7 +29,7 @@ void ndpi_search_vmware(struct ndpi_detection_module_struct *ndpi_struct, struct
   struct ndpi_packet_struct *packet = &flow->packet;
 
   /* Check whether this is an VMWARE flow */
-  if((packet->payload_packet_len == 66)
+  if(packet->udp != NULL && (packet->payload_packet_len == 66)
      && (ntohs(packet->udp->dest) == 902)
      && ((packet->payload[0] & 0xFF) == 0xA4)) {
     NDPI_LOG(NDPI_PROTOCOL_VMWARE, ndpi_struct, NDPI_LOG_DEBUG, "Found vmware.\n");
