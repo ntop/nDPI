@@ -35,14 +35,16 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
 
   NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_TRACE, "UBNTAC2 detection... plen:%i %i:%i\n", packet->payload_packet_len, ntohs(packet->udp->source), ntohs(packet->udp->dest));
 
-  if (packet->udp != NULL && packet->payload_packet_len >= 135 &&
-      (packet->udp->source == htons(10001) || packet->udp->dest == htons(10001)) &&
-      memcmp(&(packet->payload[36]), "UBNT", 4) == 0) {
-
-    NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_DEBUG, "UBNT AirControl 2 request\n");
-
-    ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
-    return;
+  if(packet->udp) {
+    if(packet->payload_packet_len >= 135 &&
+       (packet->udp->source == htons(10001) || packet->udp->dest == htons(10001)) &&
+       memcmp(&(packet->payload[36]), "UBNT", 4) == 0) {
+      
+      NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_DEBUG, "UBNT AirControl 2 request\n");
+      
+      ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
+      return;
+    }
   }
 
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_UBNTAC2);

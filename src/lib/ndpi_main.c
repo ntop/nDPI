@@ -813,11 +813,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "MySQL",
 			    ndpi_build_default_ports(ports_a, 3306, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNRATED, NDPI_PROTOCOL_TDS,
-			    no_master,
-			    no_master, "TDS",
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK,
 			    no_master,
 			    no_master, "Direct_Download_Link",
@@ -1261,9 +1256,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "MapleStory",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSSQL,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSSQL_TDS,
 			    no_master,
-			    no_master, "MsSQL",
+			    no_master, "MsSQL-TDS",
 			    ndpi_build_default_ports(ports_a, 1433, 1434, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PPTP,
@@ -2410,9 +2405,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* SYSLOG */
   init_syslog_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* TDS */
-  init_tds_dissector(ndpi_struct, &a, detection_bitmask);
-
   /* DIRECT_DOWNLOAD_LINK */
   init_directdownloadlink_dissector(ndpi_struct, &a, detection_bitmask);
 
@@ -2437,8 +2429,8 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* TFTP */
   init_tftp_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* MSSQL */
-  init_mssql_dissector(ndpi_struct, &a, detection_bitmask);
+  /* MSSQL_TDS */
+  init_mssql_tds_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* PPTP */
   init_pptp_dissector(ndpi_struct, &a, detection_bitmask);
