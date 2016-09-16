@@ -21,7 +21,7 @@
 /* ****************************************************** */
 
 static ndpi_network host_protocol_list[] = {
-
+#ifdef _ND_INCLUDE_CONTENT_MATCH
  /*
    OpenDNS
    208.67.216.0/21
@@ -7236,7 +7236,7 @@ static ndpi_network host_protocol_list[] = {
     AnchorFree Inc. AFNETWORK-1 (NET-74-115-0-0-1) 74.115.0.0 - 74.115.7.255
   */
   { 0x4A730000, 21, NDPI_SERVICE_HOTSPOT_SHIELD },
-
+#endif //_ND_INCLUDE_CONTENT_MATCH
   { 0x0, 0, 0 }
 };
 
@@ -7250,6 +7250,7 @@ static ndpi_network host_protocol_list[] = {
 */
 
 ndpi_protocol_match host_match[] = {
+#ifdef _ND_INCLUDE_CONTENT_MATCH
   { "amazon.",  			"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazon.com",  			"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
   { "images-amazon.com", 		"Amazon",		NDPI_SERVICE_AMAZON, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7401,8 +7402,8 @@ ndpi_protocol_match host_match[] = {
   { ".opendns.com",			"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_ACCEPTABLE },
 
   
-
-  { NULL, 0 }
+#endif //_ND_INCLUDE_CONTENT_MATCH
+  { (char *)NULL, 0 }
 };
 
 
