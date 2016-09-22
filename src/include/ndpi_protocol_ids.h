@@ -1,7 +1,7 @@
 /*
  * ndpi_protocol_ids.h
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -76,7 +76,7 @@
 #define NDPI_PROTOCOL_DHCP					18
 #define NDPI_PROTOCOL_POSTGRES				        19
 #define NDPI_PROTOCOL_MYSQL					20
-#define NDPI_PROTOCOL_TDS					21
+#define NDPI_SERVICE_HOTMAIL					21
 #define NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK			22
 #define NDPI_PROTOCOL_MAIL_POPS				        23
 #define NDPI_PROTOCOL_APPLEJUICE				24
@@ -147,7 +147,7 @@
 #define NDPI_PROTOCOL_KERBEROS				        111
 #define NDPI_PROTOCOL_LDAP					112
 #define NDPI_PROTOCOL_MAPLESTORY				113
-#define NDPI_PROTOCOL_MSSQL					114
+#define NDPI_PROTOCOL_MSSQL_TDS					114
 #define NDPI_PROTOCOL_PPTP					115
 #define NDPI_PROTOCOL_WARCRAFT3				        116
 #define NDPI_PROTOCOL_WORLD_OF_KUNG_FU			        117
@@ -263,9 +263,10 @@
 #define NDPI_PROTOCOL_RX 			        209
 #define NDPI_SERVICE_WEIBO                              210
 #define NDPI_SERVICE_HANGOUT                            215
+#define NDPI_SERVICE_SLACK                              216
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_HANGOUT
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_SLACK
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

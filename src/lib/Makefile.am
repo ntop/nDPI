@@ -80,7 +80,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/mpegts.c \
 		     protocols/mqtt.c \
 		     protocols/msn.c \
-		     protocols/mssql.c \
+		     protocols/mssql_tds.c \
 		     protocols/mysql.c \
 		     protocols/netbios.c \
 		     protocols/netflow.c \
@@ -131,7 +131,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/stun.c \
 		     protocols/syslog.c \
 		     protocols/tcp_udp.c \
-		     protocols/tds.c \
 		     protocols/teamspeak.c \
 		     protocols/teamviewer.c \
 		     protocols/telegram.c \
@@ -167,3 +166,5 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     third_party/src/ndpi_patricia.c \
 		     third_party/src/node.c \
 		     third_party/src/sort.c
+
+EXTRA_DIST = third_party/src/ndpi_patricia.c
