@@ -1,8 +1,7 @@
 /*
  * ftp_data.c
  *
- * Copyright (C) 2014 Tomasz Bujlow <tomasz@skatnet.dk>
- * Copyright (C) 2014 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  * 
  * The signature is based on the Libprotoident library.
  *
@@ -34,12 +33,13 @@ static void ndpi_int_ftp_data_add_connection(struct ndpi_detection_module_struct
 static int ndpi_match_ftp_data_port(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(packet->tcp->dest == htons(20) || packet->tcp->source == htons(20)) {
-    return 1;
+  /* Check connection over TCP */
+  if(packet->tcp) {
+    if(packet->tcp->dest == htons(20) || packet->tcp->source == htons(20)) {
+      return 1;
+    }
   }
-
   return 0;
-
 }
 
 static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
