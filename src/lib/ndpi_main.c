@@ -2556,9 +2556,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* ZMQ */
   init_zmq_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* TWITTER */
-  init_twitter_dissector(ndpi_struct, &a, detection_bitmask);
-
   /* TELEGRAM */
   init_telegram_dissector(ndpi_struct, &a, detection_bitmask);
 

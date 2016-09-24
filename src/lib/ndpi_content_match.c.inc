@@ -23,6 +23,20 @@
 static ndpi_network host_protocol_list[] = {
 
  /*
+   Twitter
+   199.59.148.0/22
+   192.133.76.0/22
+   199.16.156.0/22
+   199.96.58.0/23
+   199.96.62.0/23
+ */
+ { 0xC73B9400 /* 199.59.148.0/22 */, 22, NDPI_SERVICE_TWITTER },
+ { 0xC0854C00 /* 199.133.76.0/22 */, 22, NDPI_SERVICE_TWITTER },
+ { 0xC7109C00 /* 199.16.156.0/22 */, 22, NDPI_SERVICE_TWITTER },
+ { 0xC7603A00 /* 199.96.58.0/23 */,  23, NDPI_SERVICE_TWITTER },
+ { 0xC7603E00 /* 199.96.62.0/23 */, 23, NDPI_SERVICE_TWITTER },
+
+ /*
    OpenDNS
    208.67.216.0/21
  */
@@ -62,9 +76,12 @@ static ndpi_network host_protocol_list[] = {
     Netflix
     23.246.0.0/18
     23.21.190.124/32
+    69.53.224.0/19
+    
   */
   { 0x17F60000 /* 23.246.0.0/18 */, 18, NDPI_SERVICE_NETFLIX },
   { 0x1715BE7C /* 23.21.190.124/32 */, 32, NDPI_SERVICE_NETFLIX },
+  { 0x4535E000 /* 69.53.224.0/19 */, 19, NDPI_SERVICE_NETFLIX },
 
   /*    
     Cloudflare
@@ -7444,6 +7461,7 @@ ndpi_protocol_match content_match[] = {
   { "audio/ogg",			NULL,		        NDPI_CONTENT_OGG, NDPI_PROTOCOL_FUN },
   { "video/ogg",			NULL,		        NDPI_CONTENT_OGG, NDPI_PROTOCOL_FUN },
   { "application/ogg",			NULL,		        NDPI_CONTENT_OGG, NDPI_PROTOCOL_FUN },
+  { ".adobe.",				NULL,			NDPI_CONTENT_FLASH, NDPI_PROTOCOL_FUN },
   { "video/flv",			NULL,		        NDPI_CONTENT_FLASH, NDPI_PROTOCOL_FUN },
   { "video/x-flv",			NULL,		        NDPI_CONTENT_FLASH, NDPI_PROTOCOL_FUN },
   { "application/x-fcs",		NULL,		        NDPI_CONTENT_FLASH, NDPI_PROTOCOL_FUN },
