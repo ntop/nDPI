@@ -7348,11 +7348,11 @@ ndpi_protocol_match host_match[] = {
   { "www-cdn.jtvnw.net",                "Twitch",               NDPI_SERVICE_TWITCH, NDPI_PROTOCOL_FUN },
   { "quickplay.com",                    "QuickPlay",            NDPI_SERVICE_QUICKPLAY, NDPI_PROTOCOL_FUN },
   { ".qq.com",                          "QQ",                   NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_FUN },
-  { ".weibo.com",			"Weibo",        	NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
-  { ".sinaimg.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
-  { ".sinajs.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
-  { ".sina.cn",				"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
-  { ".sina.com.cn",			"Weibo",       		NDPI_SERVICE_WEIBO, NDPI_PROTOCOL_FUN },
+  { ".weibo.com",			"Sina(Weibo)",		NDPI_SERVICE_SINA, NDPI_PROTOCOL_FUN },
+  { ".sinaimg.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_FUN },
+  { ".sinajs.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_FUN },
+  { ".sina.cn",				"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_FUN },
+  { ".sina.com.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_FUN },
   
 
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */

@@ -73,7 +73,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/mail_smtp.c \
 		     protocols/maplestory.c \
 		     protocols/mdns.c \
-		     protocols/meebo.c \
 		     protocols/megaco.c \
 		     protocols/mgcp.c \
 		     protocols/mms.c \
