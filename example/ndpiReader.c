@@ -1080,7 +1080,7 @@ static void configurePcapHandle(pcap_t * pcap_handle) {
  */ 
 static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_file) {
 
-  u_int snaplen = 1536;
+  u_int snaplen = 65535;
   int promisc = 1;
   char pcap_error_buffer[PCAP_ERRBUF_SIZE];
   pcap_t * pcap_handle = NULL;
