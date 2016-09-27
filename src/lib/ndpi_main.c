@@ -3711,7 +3711,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
 
-  for(a = 0; a < end; a++) {
+  for(a = 0; a < end-1 /* This because get_u_int16_t(packet->payload, a) reads 2 bytes */; a++) {
     if(get_u_int16_t(packet->payload, a) == ntohs(0x0d0a)) {
       packet->line[packet->parsed_lines].len = (u_int16_t)(((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
 
@@ -3764,10 +3764,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       }
 
       if(packet->line[packet->parsed_lines].len > 14
-	 &&
-	 (memcmp
-	  (packet->line[packet->parsed_lines].ptr, "Content-Type: ",
-	   14) == 0 || memcmp(packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
+	 && (memcmp(packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0
+	     || memcmp(packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
 	packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
 	packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
       }
@@ -3845,7 +3843,6 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       packet->line[packet->parsed_lines].len = 0;
 
       if((a + 2) >= packet->payload_packet_len) {
-
 	return;
       }
       a++;
