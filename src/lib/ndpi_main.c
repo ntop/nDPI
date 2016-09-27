@@ -3705,7 +3705,9 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
   packet->http_response.len = 0;
 
   if((packet->payload_packet_len == 0)
-     || (packet->payload == NULL))
+     || (packet->payload == NULL)
+     || (end == 0)
+     )
     return;
 
   packet->line[packet->parsed_lines].ptr = packet->payload;
