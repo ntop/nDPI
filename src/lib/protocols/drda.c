@@ -21,8 +21,6 @@
 
 #ifdef NDPI_PROTOCOL_DRDA
 
-//#define DRDA_PORT 50000
-
 struct ndpi_drda_hdr {
   u_int16_t length;
   u_int8_t magic;
