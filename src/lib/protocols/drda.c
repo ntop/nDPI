@@ -21,8 +21,6 @@
 
 #ifdef NDPI_PROTOCOL_DRDA
 
-#define DRDA_PORT 50000
-
 struct ndpi_drda_hdr {
   u_int16_t length;
   u_int8_t magic;
@@ -43,9 +41,7 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->tcp != NULL) {
 
     /* check port */
-    if((ntohs(packet->tcp->source) == DRDA_PORT ||
-	ntohs(packet->tcp->dest) == DRDA_PORT) &&
-	payload_len >= sizeof(struct ndpi_drda_hdr)) {
+    if(payload_len >= sizeof(struct ndpi_drda_hdr)) {
 
       struct ndpi_drda_hdr * drda = (struct ndpi_drda_hdr *) packet->payload;
 

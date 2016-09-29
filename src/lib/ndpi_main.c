@@ -1276,11 +1276,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "WorldOfKungFu",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEEBO,
-    			    no_master,
-    			    no_master, "Meebo",
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DCERPC,
     			    no_master,
     			    no_master, "DCE_RPC",
@@ -2207,7 +2202,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* HTTP */
   init_http_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* Stracraft */
+  /* STARCRAFT */
   init_starcraft_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* SSL */
@@ -2453,9 +2448,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* DHCPV6 */
   init_dhcpv6_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* MEEBO */
-  init_meebo_dissector(ndpi_struct, &a, detection_bitmask);
-
   /* AFP */
   init_afp_dissector(ndpi_struct, &a, detection_bitmask);
 
@@ -2575,9 +2567,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* ZMQ */
   init_zmq_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* TWITTER */
-  init_twitter_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* TELEGRAM */
   init_telegram_dissector(ndpi_struct, &a, detection_bitmask);
@@ -3728,13 +3717,15 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
   packet->http_response.len = 0;
 
   if((packet->payload_packet_len == 0)
-     || (packet->payload == NULL))
+     || (packet->payload == NULL)
+     || (end == 0)
+     )
     return;
 
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
 
-  for(a = 0; a < end; a++) {
+  for(a = 0; a < end-1 /* This because get_u_int16_t(packet->payload, a) reads 2 bytes */; a++) {
     if(get_u_int16_t(packet->payload, a) == ntohs(0x0d0a)) {
       packet->line[packet->parsed_lines].len = (u_int16_t)(((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
 
@@ -3787,10 +3778,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       }
 
       if(packet->line[packet->parsed_lines].len > 14
-	 &&
-	 (memcmp
-	  (packet->line[packet->parsed_lines].ptr, "Content-Type: ",
-	   14) == 0 || memcmp(packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
+	 && (memcmp(packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0
+	     || memcmp(packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
 	packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
 	packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
       }
@@ -3868,7 +3857,6 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       packet->line[packet->parsed_lines].len = 0;
 
       if((a + 2) >= packet->payload_packet_len) {
-
 	return;
       }
       a++;

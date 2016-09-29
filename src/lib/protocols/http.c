@@ -166,39 +166,10 @@ static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struc
   // int i = 0;
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(packet->iph /* IPv4 only */) {
-    /*
-      Twitter Inc. TWITTER-NETWORK (NET-199-59-148-0-1) 199.59.148.0 - 199.59.151.255
-      199.59.148.0/22
-    */
-    if(((ntohl(packet->iph->saddr) & 0xFFFFFC00 /* 255.255.252.0 */) == 0xC73B9400 /* 199.59.148.0 */)
-       || ((ntohl(packet->iph->daddr) & 0xFFFFFC00 /* 255.255.252.0 */) == 0xC73B9400 /* 199.59.148.0 */)) {
-      packet->detected_protocol_stack[0] = NDPI_SERVICE_TWITTER,
-	packet->detected_protocol_stack[1] = NDPI_PROTOCOL_HTTP;
-      return;
-    }
-
-    /*
-      CIDR:           69.53.224.0/19
-      OriginAS:       AS2906
-      NetName:        NETFLIX-INC
-    */
-    if(((ntohl(packet->iph->saddr) & 0xFFFFE000 /* 255.255.224.0 */) == 0x4535E000 /* 69.53.224.0 */)
-       || ((ntohl(packet->iph->daddr) & 0xFFFFE000 /* 255.255.224.0 */) == 0x4535E000 /* 69.53.224.0 */)) {
-      packet->detected_protocol_stack[0] = NDPI_SERVICE_NETFLIX,
-	packet->detected_protocol_stack[1] = NDPI_PROTOCOL_HTTP;
-      return;
-    }
-  }
-
   if((flow->l4.tcp.http_stage == 0)
      || (flow->http.url && flow->http_detected)) {
-      /* Try matching subprotocols */
-      // ndpi_match_host_subprotocol(ndpi_struct, flow, (char*)packet->host_line.ptr, packet->host_line.len);
-
     /*
-      NOTE
-      
+      NOTE      
       If http_dont_dissect_response = 1 dissection of HTTP response
       mime types won't happen
     */

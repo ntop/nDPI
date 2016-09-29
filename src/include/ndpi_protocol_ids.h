@@ -151,7 +151,7 @@
 #define NDPI_PROTOCOL_PPTP					115
 #define NDPI_PROTOCOL_WARCRAFT3				        116
 #define NDPI_PROTOCOL_WORLD_OF_KUNG_FU			        117
-#define NDPI_PROTOCOL_MEEBO					118
+#define NDPI_SERVICE_SLACK                                      118
 #define NDPI_PROTOCOL_DROPBOX					121
 #define NDPI_PROTOCOL_SKYPE					125
 #define NDPI_PROTOCOL_DCERPC					127
@@ -261,12 +261,11 @@
 #define NDPI_SERVICE_MS_ONE_DRIVE                       207
 #define NDPI_PROTOCOL_MQTT				208
 #define NDPI_PROTOCOL_RX 			        209
-#define NDPI_SERVICE_WEIBO                              210
+#define NDPI_SERVICE_SINA                               210
 #define NDPI_SERVICE_HANGOUT                            215
-#define NDPI_SERVICE_SLACK                              216
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_SLACK
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_HANGOUT
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)
