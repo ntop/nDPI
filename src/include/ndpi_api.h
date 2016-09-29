@@ -115,7 +115,6 @@ extern "C" {
    */
   u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin);
 
-
   /**
    * Init single protocol match
    *
@@ -124,7 +123,15 @@ extern "C" {
    *
    */  
   void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol_match *match);
-  
+
+  /**
+   * Init string-based protocols
+   *
+   * @par ndpi_mod  = the struct created for the protocol detection
+   *
+   */
+  void ndpi_init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod);
+
   /**
    * Returns a new initialized detection module
    *

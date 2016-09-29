@@ -640,7 +640,7 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ******************************************************************** */
 
-static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
+void ndpi_init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
 
   for(i=0; host_match[i].string_to_match != NULL; i++)
@@ -664,6 +664,12 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
     ndpi_string_to_automa(ndpi_mod, &ndpi_mod->impossible_bigrams_automa,
 			  (char*)ndpi_en_impossible_bigrams[i],
 			  1, NDPI_PROTOCOL_UNRATED);
+
+  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
+    if(ndpi_mod->proto_defaults[i].protoName == NULL) {
+	printf("[NDPI] %s(missing protoId=%d) INTERNAL ERROR: not all protocols have been initialized\n", __FUNCTION__, i);
+    }
+  }
 }
 
 /* ******************************************************************** */
@@ -1562,16 +1568,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "GoogleHangout",
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    
-
-    /* calling function for host and content matched protocols */
-    init_string_based_protocols(ndpi_mod);
-
-    for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
-      if(ndpi_mod->proto_defaults[i].protoName == NULL) {
-	printf("[NDPI] %s(missing protoId=%d) INTERNAL ERROR: not all protocols have been initialized\n", __FUNCTION__, i);
-      }
-    }
 }
 
 /* ****************************************************** */
