@@ -1688,6 +1688,18 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************* */
 
+void ndpi_add_to_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
+				 void *ptree, ndpi_network *host_entry) {
+  struct in_addr pin;
+  patricia_node_t *node;
+
+  pin.s_addr = htonl(host_entry->network);
+  if((node = add_to_ptree(ptree, AF_INET, &pin, host_entry->cidr /* bits */)) != NULL)
+    node->value.user_value = host_entry->value;
+}
+
+/* ******************************************* */
+
 static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					char *value, int protocol_id) {
 

@@ -94,7 +94,16 @@ extern "C" {
    */
   char* ndpi_strnstr(const char *s, const char *find, size_t slen);
 
-  
+  /**
+   * Inserts a new host entry in to the IPv4 ptree.
+   *
+   * @par    ndpi_struct  = the struct created for the protocol detection
+   * @par    ptree        = the Patricia tree to add to
+   * @par    host_entry   = the host structure to add to the tree
+   */
+  void ndpi_add_to_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
+                 void *ptree, ndpi_network *host_entry);
+
   /**
    * Returns the nDPI protocol id for IP-based protocol detection
    *
