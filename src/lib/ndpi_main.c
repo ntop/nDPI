@@ -2004,7 +2004,6 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
     case '/':
     case '&':
     case '^':
-    case ':':
     case ';':
     case '\'':
     case '"':
