@@ -1,8 +1,7 @@
 /*
  * ppstream.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -21,9 +20,8 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
-
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_PPSTREAM
 
 static void ndpi_int_ppstream_add_connection(struct ndpi_detection_module_struct
@@ -36,13 +34,7 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 							*ndpi_struct, struct ndpi_flow_struct *flow)
 {
 	struct ndpi_packet_struct *packet = &flow->packet;
-	
-
-	// struct ndpi_id_struct *src=ndpi_struct->src;
-	// struct ndpi_id_struct *dst=ndpi_struct->dst;
-
-
-
+     
 	/* check TCP Connections -> Videodata */
 	if (packet->tcp != NULL) {
 		if (packet->payload_packet_len >= 60 && get_u_int32_t(packet->payload, 52) == 0
