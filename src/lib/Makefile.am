@@ -59,7 +59,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/http.c \
 		     protocols/iax.c \
 		     protocols/icecast.c \
-		     protocols/imesh.c \
 		     protocols/ipp.c \
 		     protocols/irc.c \
 		     protocols/jabber.c \
