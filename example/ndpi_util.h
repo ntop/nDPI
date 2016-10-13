@@ -69,6 +69,8 @@ typedef struct ndpi_flow_info {
   void *src_id, *dst_id;
 } ndpi_flow_info_t;
 
+
+// flow statistics info
 typedef struct ndpi_stats {
   u_int32_t guessed_flow_protocols;
   u_int64_t raw_packet_count;
@@ -84,6 +86,8 @@ typedef struct ndpi_stats {
   u_int16_t max_packet_len;
 } ndpi_stats_t;
 
+
+// flow preferences
 typedef struct ndpi_workflow_prefs {
   u_int8_t decode_tunnels;
   u_int8_t quiet_mode;
@@ -92,9 +96,12 @@ typedef struct ndpi_workflow_prefs {
 } ndpi_workflow_prefs_t;
 
 struct ndpi_workflow;
+
 /** workflow, flow, user data */
 typedef void (*ndpi_workflow_callback_ptr) (struct ndpi_workflow *, struct ndpi_flow_info *, void *);
 
+
+// workflow main structure
 typedef struct ndpi_workflow {
   u_int64_t last_time;
 
@@ -114,10 +121,14 @@ typedef struct ndpi_workflow {
   struct ndpi_detection_module_struct *ndpi_struct;
 } ndpi_workflow_t;
 
+
 /* TODO: remove wrappers parameters and use ndpi global, when their initialization will be fixed... */
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle);
 
+
+// workflow main free function
 void ndpi_workflow_free(struct ndpi_workflow * workflow);
+
 
 /** Free flow_info ndpi support structures but not the flow_info itself
  *
@@ -125,27 +136,28 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow);
  */
 void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 
+
 /** Process a @packet and update the @workflow.  */
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				   const struct pcap_pkthdr *header,
 				   const u_char *packet);
 
-/* flow callbacks: ndpi_flow_info will be freed right after */
-static inline void ndpi_workflow_set_flow_detected_callback(struct ndpi_workflow * workflow,
-							    ndpi_workflow_callback_ptr callback,
-							    void * udata) {
+
+/* flow callbacks for complete detected flow
+   (ndpi_flow_info will be freed right after) */
+static inline void ndpi_workflow_set_flow_detected_callback(struct ndpi_workflow * workflow, ndpi_workflow_callback_ptr callback, void * udata) {
   workflow->__flow_detected_callback = callback;
   workflow->__flow_detected_udata = udata;
 }
 
-static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow * workflow,
-							  ndpi_workflow_callback_ptr callback,
-							  void * udata) {
+/* flow callbacks for sufficient detected flow
+   (ndpi_flow_info will be freed right after) */
+static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow * workflow, ndpi_workflow_callback_ptr callback, void * udata) {
   workflow->__flow_giveup_callback = callback;
   workflow->__flow_giveup_udata = udata;
 }
 
+// compare two nodes in workflow
 int ndpi_workflow_node_cmp(const void *a, const void *b);
-
 
 #endif

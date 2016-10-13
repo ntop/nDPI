@@ -88,8 +88,8 @@ void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   NDPI_LOG(NDPI_PROTOCOL_ZMQ, ndpi_struct, NDPI_LOG_TRACE, "ZMQ detection...\n");
 
   /* skip marked packets */
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_ZMQ) {
-    if (packet->tcp_retransmission == 0) {
+  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_ZMQ) {
+    if(packet->tcp && packet->tcp_retransmission == 0) {
       ndpi_check_zmq(ndpi_struct, flow);
     }
   }
