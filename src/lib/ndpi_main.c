@@ -1708,7 +1708,7 @@ void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size)) { _ndpi_malloc = __ndp
 
 void set_ndpi_free(void  (*__ndpi_free)(void *ptr))       { _ndpi_free = __ndpi_free; }
 
-void set_ndpi_debug_function(ndpi_debug_function_ptr ndpi_debug_printf) {
+void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
 #endif

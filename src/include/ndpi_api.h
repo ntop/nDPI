@@ -634,7 +634,7 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
-  void set_ndpi_debug_function(ndpi_debug_function_ptr ndpi_debug_printf);
+  void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf);
 
 #ifdef __cplusplus
 }
