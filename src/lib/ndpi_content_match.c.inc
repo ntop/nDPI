@@ -71,6 +71,12 @@ static ndpi_network host_protocol_list[] = {
     176.34.184.0/21
   */
   { 0xB022B800 /* 176.34.184.0/21 */, 21, NDPI_SERVICE_AMAZON },
+ 
+ /*    
+    OnSatMail
+    64.4.141.247/32
+  */
+  { 0x40048DF7 /* 64.4.141.247/32 */, 32, NDPI_SERVICE_ONSATMAIL },
 
  /*    
     Netflix
@@ -7441,7 +7447,8 @@ ndpi_protocol_match host_match[] = {
   { "slack-redir.net",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-",                "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_ACCEPTABLE },
-  
+  { ".onsatmail.com",                   "OnSatMail",            NDPI_SERVICE_ONSATMAIL, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".uuplus.com",                      "OnSatMail",            NDPI_SERVICE_ONSATMAIL, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, 0 }
 };
