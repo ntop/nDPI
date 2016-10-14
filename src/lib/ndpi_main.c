@@ -667,7 +667,8 @@ void ndpi_init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_
 
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
     if(ndpi_mod->proto_defaults[i].protoName == NULL) {
-	printf("[NDPI] %s(missing protoId=%d) INTERNAL ERROR: not all protocols have been initialized\n", __FUNCTION__, i);
+      printf("[NDPI] %s(missing protoId=%d) WARNING: protocol/service has not been initialized\n", __FUNCTION__, i);
+      ndpi_mod->proto_defaults[i].protoName = strdup("Uninitialized");
     }
   }
 }
