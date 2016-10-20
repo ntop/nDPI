@@ -1716,7 +1716,7 @@ void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi
 
 /* ******************************************************************** */
 
-struct ndpi_detection_module_struct *ndpi_init_detection_module() {
+struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
 
   if(ndpi_str == NULL) {
@@ -1771,7 +1771,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module() {
 /* *********************************************** */
 
 /* Wrappers */
-void* ndpi_init_automa() {
+void* ndpi_init_automa(void) {
   return(ac_automata_init(ac_match_handler));
 }
 
