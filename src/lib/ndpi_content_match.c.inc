@@ -178,6 +178,7 @@ static ndpi_network host_protocol_list[] = {
     13.107.3.129/32
     111.221.64.0 - 111.221.127.255
     91.190.216.0/21 (AS198015 Skype Communications Sarl)
+    91.190.218.0/24
     40.126.129.109/32
     65.55.223.0/26
   */
@@ -192,6 +193,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x0D6B0381 /* 13.107.3.129 */, 32, NDPI_PROTOCOL_SKYPE },	
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
   { 0x5BBED800 /* 91.190.216.0 */, 21, NDPI_PROTOCOL_SKYPE },
+  { 0x5BBEDA00 /* 91.190.218.0 */, 24, NDPI_PROTOCOL_SKYPE },
   { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
   
