@@ -122,7 +122,7 @@ extern "C" {
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module();
+  struct ndpi_detection_module_struct *ndpi_init_detection_module(void);
   
   /**
    * Frees the memory allocated in the specified flow
@@ -588,7 +588,7 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
    * @return  The requested automata, or NULL if an error occurred
    * 
    */
-  void* ndpi_init_automa();
+  void* ndpi_init_automa(void);
 
 
   /**
