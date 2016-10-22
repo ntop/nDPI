@@ -726,9 +726,34 @@ typedef enum {
 
 #define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)
 
+/* Abstract categories to group the protocols. */
+typedef enum {
+  NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
+  NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
+  NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
+  NDPI_PROTOCOL_CATEGORY_MAIL_SEND,         /* Protocols to send emails */
+  NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,         /* Protocols to receive or sync emails */
+  NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,     /* FTP and similar protocols */
+  NDPI_PROTOCOL_CATEGORY_WEB,               /* Web protocols and services */
+  NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
+  NDPI_PROTOCOL_CATEGORY_P2P,               /* File sharing and P2P */
+  NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
+  NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
+  NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
+  NDPI_PROTOCOL_CATEGORY_DATABASE,          /* Protocols for database communication */
+  NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
+  NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
+  NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
+  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development */
+  NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
+  NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
+  NDPI_PROTOCOL_CATEGORY_SYSTEM             /* System level applications */
+} ndpi_protocol_category_t;
+
 /* ntop extensions */
 typedef struct ndpi_proto_defaults {
   char *protoName;
+  ndpi_protocol_category_t protoCategory;
   u_int16_t protoId, protoIdx;
   u_int16_t master_tcp_protoId[2], master_udp_protoId[2]; /* The main protocols on which this sub-protocol sits on */
   ndpi_protocol_breed_t protoBreed;
@@ -1021,6 +1046,7 @@ struct ndpi_flow_struct {
 typedef struct {
   char *string_to_match, *proto_name;
   int protocol_id;
+  ndpi_protocol_category_t proto_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match;
 

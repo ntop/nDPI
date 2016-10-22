@@ -431,6 +431,23 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
    */
   char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto, char *buf, u_int buf_len);
 
+  /**
+   * Get protocol category as string
+   *
+   * @par     category      = the category associated to the protocol
+   * @return  the string name of the category
+   *
+   */
+  const char* ndpi_category_str(ndpi_protocol_category_t category);
+
+  /**
+   * Get protocol category
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     proto         = the struct ndpi_protocol contain the protocols name
+   * @return  the protocol category
+   */
+  ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto);
   
   /**
    * Get the protocol name associated to the ID
