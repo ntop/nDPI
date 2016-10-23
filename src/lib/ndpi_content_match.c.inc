@@ -7417,6 +7417,9 @@ ndpi_protocol_match host_match[] = {
   { "evsecure-aia.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-crl.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".omniroot.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+
+#if 0
+  /* The lines below are not just for Office 365 so they cannot be used for this purpose */
   { ".verisign.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".symcb.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".symcd.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7424,7 +7427,7 @@ ndpi_protocol_match host_match[] = {
   { ".geotrust.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".entrust.net",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".public-trust.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
-
+#endif
   /* http://www.urlquery.net/report.php?id=1453233646161 */
   { "lifedom.top",       		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "coby.ns.cloudflare.com",  		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
