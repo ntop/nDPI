@@ -128,6 +128,30 @@ static ndpi_network host_protocol_list[] = {
   { 0xB2F8D000 /* 178.248.208.0 */, 21, NDPI_SERVICE_OCS },
 
   /*
+   IFLIX services -by www.vizuamatix.com R&D team
+   
+    52.77.0.0/16 
+    52.220.0.0/16
+    52.74.0.0/16
+    54.230.159.0/24
+    54.192.156.80/32
+    54.251.182.168/32
+    54.192.150.0/24
+    52.74.192.247/32
+    2.21.231.24/32
+    */
+    
+    { 0x344D0000 /* 52.77.0.0 */, 16, NDPI_SERVICE_IFLIX },
+    { 0x34DC0000 /* 52.220.0.0 */, 16, NDPI_SERVICE_IFLIX },
+    { 0x344A0000 /* 52.74.0.0 */, 16, NDPI_SERVICE_IFLIX },
+    { 0x36E69F00 /* 54.230.159.0 */, 24, NDPI_SERVICE_IFLIX },
+    { 0x36C09C50 /* 54.192.156.80  */, 32, NDPI_SERVICE_IFLIX },
+    { 0x36FBB6A8 /* 54.251.182.168  */, 32, NDPI_SERVICE_IFLIX },
+    { 0x36C09600 /* 54.192.150.0  */, 24, NDPI_SERVICE_IFLIX },
+    { 0x344AC0F7 /* 52.74.192.247  */, 32, NDPI_SERVICE_IFLIX },
+    { 0x0215E718 /* 2.21.231.24 */, 32, NDPI_SERVICE_IFLIX },
+
+  /*
     Citrix GotoMeeting (AS16815, AS21866)
     216.115.208.0/20
     216.219.112.0/20
@@ -7373,7 +7397,6 @@ ndpi_protocol_match host_match[] = {
   { ".sina.cn",				"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".sina.com.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   
-
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice-hrd.appspot.com",     "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
@@ -7411,6 +7434,10 @@ ndpi_protocol_match host_match[] = {
   { "ocs.fr",               		"OCS",   		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },   
   { ".ocs.fr",              		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
   { ".labgency.ws",        		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
+
+  { ".iflix.com",        		"IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".app.iflixcorp.com",        	"IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".images.iflixassets.com",          "IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   
   { "crl.microsoft.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-ocsp.verisign.com",	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
