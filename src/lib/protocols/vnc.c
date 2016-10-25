@@ -34,23 +34,22 @@ void ndpi_search_vnc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     
     if(flow->l4.tcp.vnc_stage == 0) {
       
-      if(packet->payload_packet_len == 12 &&
-	 (memcmp(packet->payload, "RFB 003.003", 11) == 0 && packet->payload[11] == 0x0a) ||
-	 (memcmp(packet->payload, "RFB 003.007", 11) == 0 && packet->payload[11] == 0x0a) ||
-	 (memcmp(packet->payload, "RFB 003.008", 11) == 0 && packet->payload[11] == 0x0a) ||
-	 (memcmp(packet->payload, "RFB 004.001", 11) == 0 && packet->payload[11] == 0x0a)) {
-	
+      if((packet->payload_packet_len == 12) &&
+	 ((memcmp(packet->payload, "RFB 003.003", 11) == 0 && packet->payload[11] == 0x0a) ||
+	  (memcmp(packet->payload, "RFB 003.007", 11) == 0 && packet->payload[11] == 0x0a) ||
+	  (memcmp(packet->payload, "RFB 003.008", 11) == 0 && packet->payload[11] == 0x0a) ||
+	  (memcmp(packet->payload, "RFB 004.001", 11) == 0 && packet->payload[11] == 0x0a))) {	   
 	NDPI_LOG(NDPI_PROTOCOL_VNC, ndpi_struct, NDPI_LOG_DEBUG, "reached vnc stage one\n");
 	flow->l4.tcp.vnc_stage = 1 + packet->packet_direction;
 	return;
       }
     } else if(flow->l4.tcp.vnc_stage == 2 - packet->packet_direction) {
       
-      if(packet->payload_packet_len == 12 &&
-	 (memcmp(packet->payload, "RFB 003.003", 11) == 0 && packet->payload[11] == 0x0a) ||
-	 (memcmp(packet->payload, "RFB 003.007", 11) == 0 && packet->payload[11] == 0x0a) ||
-	 (memcmp(packet->payload, "RFB 003.008", 11) == 0 && packet->payload[11] == 0x0a) ||
-	 (memcmp(packet->payload, "RFB 004.001", 11) == 0 && packet->payload[11] == 0x0a)) {
+      if((packet->payload_packet_len == 12) &&
+	 ((memcmp(packet->payload, "RFB 003.003", 11) == 0 && packet->payload[11] == 0x0a) ||
+	  (memcmp(packet->payload, "RFB 003.007", 11) == 0 && packet->payload[11] == 0x0a) ||
+	  (memcmp(packet->payload, "RFB 003.008", 11) == 0 && packet->payload[11] == 0x0a) ||
+	  (memcmp(packet->payload, "RFB 004.001", 11) == 0 && packet->payload[11] == 0x0a))) {
 	
 	NDPI_LOG(NDPI_PROTOCOL_VNC, ndpi_struct, NDPI_LOG_DEBUG, "found vnc\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VNC, NDPI_PROTOCOL_UNKNOWN);
