@@ -2063,7 +2063,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
     }
 
     if(is_tcp || is_udp) {
-      if(sscanf(value, "%u-%u", (unsigned int *)&range.port_low, (unsigned int *)&range.port_high) != 2)
+      if(sscanf(value, "%u-%u", (u_int32_t *)&range.port_low, (u_int32_t *)&range.port_high) != 2)
         range.port_low = range.port_high = atoi(&elem[4]);
       if(do_add)
         addDefaultPort(&range, def, 1 /* Custom user proto */, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
@@ -4319,7 +4319,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 					     u_int8_t proto,
 					     u_int32_t shost /* host byte order */, u_int16_t sport,
 					     u_int32_t dhost /* host byte order */, u_int16_t dport) {
-  unsigned int rc;
+  u_int32_t rc;
   struct in_addr addr;
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
   u_int8_t user_defined_proto;

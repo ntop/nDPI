@@ -283,7 +283,7 @@ static void parseOptions(int argc, char **argv) {
 /**
  * @brief From IPPROTO to string NAME
  */
-static char* ipProto2Name(u_short proto_id) {
+static char* ipProto2Name(u_int16_t proto_id) {
 
   static char proto[8];
 
@@ -316,7 +316,7 @@ static char* ipProto2Name(u_short proto_id) {
 /**
  * @brief A faster replacement for inet_ntoa().
  */
-char* intoaV4(unsigned int addr, char* buf, u_short bufLen) {
+char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
 
   char *cp, *retStr;
   uint byte;
@@ -384,7 +384,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 	      ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.protocol));
 
     fprintf(out, "[%u pkts/%llu bytes]",
-	    flow->packets, (long long unsigned int)flow->bytes);
+	    flow->packets, (long long unsigned int) flow->bytes);
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
     if(flow->ssl.client_certificate[0] != '\0') fprintf(out, "[SSL client: %s]", flow->ssl.client_certificate);
@@ -760,7 +760,7 @@ static void printResults(u_int64_t tot_usec) {
 
   u_int32_t i;
   u_int64_t total_flow_bytes = 0;
-  u_int avg_pkt_size = 0;
+  u_int32_t avg_pkt_size = 0;
   struct ndpi_stats cumulative_stats;
   int thread_id;
   char buf[32];
