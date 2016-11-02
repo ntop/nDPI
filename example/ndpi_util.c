@@ -748,7 +748,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   }
 
   if(iph->version == 4) {
-    ip_len = ((u_short)iph->ihl * 4);
+    ip_len = ((u_int16_t)iph->ihl * 4);
     iph6 = NULL;
 
     if(iph->protocol == 41) {
