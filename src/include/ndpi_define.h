@@ -180,29 +180,22 @@
 #define NDPI_SOULSEEK_CONNECTION_IP_TICK_TIMEOUT               600
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-
-#define NDPI_LOG(proto, m, log_level, args...)		\
-  {								\
+#define NDPI_LOG(proto, m, log_level, args...)		                                     \
+  {								                                                         \
     struct ndpi_detection_module_struct *mod = (struct ndpi_detection_module_struct*) m; \
-    if(mod != NULL) {						\
-      mod->ndpi_debug_print_file=__FILE__;                      \
-      mod->ndpi_debug_print_function=__FUNCTION__;              \
-      mod->ndpi_debug_print_line=__LINE__;                      \
-      if (mod->ndpi_debug_printf != NULL)                       \
-		mod->ndpi_debug_printf(proto, mod, log_level, args);    \
-	  else                                                      \
-	    printf(args, proto, mod, log_level);                    \
-    }								\
+    if(mod != NULL) {						                                             \
+      mod->ndpi_debug_print_file=__FILE__;                                               \
+      mod->ndpi_debug_print_function=__FUNCTION__;                                       \
+      mod->ndpi_debug_print_line=__LINE__;                                               \
+      (*(mod->ndpi_debug_printf))(proto, mod, log_level, args);                          \
+    }								                                                     \
   }
-
 #else							/* NDPI_ENABLE_DEBUG_MESSAGES */
-
 #ifdef WIN32
 #define NDPI_LOG(...) {}
 #else
 #define NDPI_LOG(proto, mod, log_level, args...) {}
 #endif
-
 #endif							/* NDPI_ENABLE_DEBUG_MESSAGES */
 
 /**
