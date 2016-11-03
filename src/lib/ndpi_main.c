@@ -4386,47 +4386,66 @@ char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod,
 
 const char* ndpi_category_str(ndpi_protocol_category_t category) {
   switch(category) {
-  case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
-    return("Unspecified");
   case NDPI_PROTOCOL_CATEGORY_MEDIA:
     return("Media");
+	break;
   case NDPI_PROTOCOL_CATEGORY_VPN:
     return("VPN");
+	break;
   case NDPI_PROTOCOL_CATEGORY_MAIL_SEND:
     return("EmailSend");
+	break;
   case NDPI_PROTOCOL_CATEGORY_MAIL_SYNC:
     return("EmailSync");
+	break;
   case NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER:
     return("FileTransfer");
+	break;
   case NDPI_PROTOCOL_CATEGORY_WEB:
     return("Web");
+	break;
   case NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK:
     return("SocialNetwork");
+	break;
   case NDPI_PROTOCOL_CATEGORY_P2P:
     return("P2P");
+	break;
   case NDPI_PROTOCOL_CATEGORY_GAME:
     return("Game");
+	break;
   case NDPI_PROTOCOL_CATEGORY_CHAT:
     return("Chat");
+	break;
   case NDPI_PROTOCOL_CATEGORY_VOIP:
     return("VoIP");
+	break;
   case NDPI_PROTOCOL_CATEGORY_DATABASE:
     return("Database");
+	break;
   case NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS:
     return("RemoteAccess");
+	break;
   case NDPI_PROTOCOL_CATEGORY_CLOUD:
     return("Cloud");
+	break;
   case NDPI_PROTOCOL_CATEGORY_NETWORK:
     return("Network");
+	break;
   case NDPI_PROTOCOL_CATEGORY_COLLABORATIVE:
     return("Collaborative");
+	break;
   case NDPI_PROTOCOL_CATEGORY_RPC:
     return("RPC");
+	break;
   case NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL:
     return("NetworkTool");
+	break;
   case NDPI_PROTOCOL_CATEGORY_SYSTEM:
     return("System");
+	break;
   }
+
+  return("Unspecified");
 }
 
 /* ****************************************************** */

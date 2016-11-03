@@ -37,11 +37,19 @@
 #define P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size)  (P_HARD_RESET_PACKET_ID_OFFSET(hmac_size) + 8)
 #define P_HARD_RESET_CLIENT_MAX_COUNT  5
 
-static inline u_int32_t get_packet_id(const u_int8_t * payload, u_int8_t hms) {
+static 
+#ifndef WIN32
+inline 
+#endif
+u_int32_t get_packet_id(const u_int8_t * payload, u_int8_t hms) {
   return ntohl(*(u_int32_t*)(payload + P_HARD_RESET_PACKET_ID_OFFSET(hms)));
 }
 
-static inline int8_t check_pkid_and_detect_hmac_size(const u_int8_t * payload) {
+static 
+#ifndef WIN32
+inline
+#endif
+int8_t check_pkid_and_detect_hmac_size(const u_int8_t * payload) {
   // try to guess
   if (get_packet_id(payload, P_HMAC_160) == 1)
     return P_HMAC_160;
