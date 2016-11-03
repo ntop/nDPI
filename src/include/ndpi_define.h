@@ -181,13 +181,17 @@
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
 
-#define NDPI_LOG(proto, mod, log_level, args...)		\
+#define NDPI_LOG(proto, m, log_level, args...)		\
   {								\
+    struct ndpi_detection_module_struct *mod = (struct ndpi_detection_module_struct*) m; \
     if(mod != NULL) {						\
       mod->ndpi_debug_print_file=__FILE__;                      \
       mod->ndpi_debug_print_function=__FUNCTION__;              \
       mod->ndpi_debug_print_line=__LINE__;                      \
-      mod->ndpi_debug_printf(proto, mod, log_level, args);      \
+      if (mod->ndpi_debug_printf != NULL)                       \
+		mod->ndpi_debug_printf(proto, mod, log_level, args);    \
+	  else                                                      \
+	    printf(args, proto, mod, log_level);                    \
     }								\
   }
 

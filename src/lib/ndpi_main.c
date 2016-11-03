@@ -1716,7 +1716,10 @@ void set_ndpi_free(void  (*__ndpi_free)(void *ptr))       { _ndpi_free = __ndpi_
 
 void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
+  if (ndpi_debug_printf != NULL)
+	ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
+  else
+    ndpi_str->ndpi_debug_printf = (ndpi_debug_function_ptr) printf;
 #endif
 }
 
@@ -1727,7 +1730,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
   if(ndpi_str == NULL) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    ndpi_debug_printf(0, NULL, NDPI_LOG_DEBUG, "ndpi_init_detection_module initial malloc failed\n");
+    printf(0, NULL, NDPI_LOG_DEBUG, "ndpi_init_detection_module initial malloc failed\n");
 #endif
     return NULL;
   }
