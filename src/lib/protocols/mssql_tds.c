@@ -62,7 +62,7 @@ void ndpi_search_mssql_tds(struct ndpi_detection_module_struct *ndpi_struct, str
     }
   }
   
-  NDPI_LOG(NDPI_PROTOCOL_MSSQL, ndpi_struct, NDPI_LOG_DEBUG, "exclude mssql_tds\n");
+  NDPI_LOG(NDPI_PROTOCOL_MSSQL_TDS, ndpi_struct, NDPI_LOG_DEBUG, "exclude mssql_tds\n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MSSQL_TDS);
 }
 
