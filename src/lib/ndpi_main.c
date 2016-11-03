@@ -1714,12 +1714,29 @@ void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size)) { _ndpi_malloc = __ndp
 
 void set_ndpi_free(void  (*__ndpi_free)(void *ptr))       { _ndpi_free = __ndpi_free; }
 
+void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *ndpi_str, ndpi_log_level_t log_level, const char * format, ...)
+{
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  va_list args;
+  #define MAX_STR_LEN 120 
+  char str[MAX_STR_LEN];
+  va_start(args, format);
+  vsprintf(str, format, args);
+  va_end(args);
+  
+  if (ndpi_str != NULL) {
+    char proto_name[64];
+	snprintf(proto_name, sizeof(proto_name), "%s", ndpi_get_proto_name(ndpi_str, proto));
+	printf("%s:%s:%u - Proto: %s, %s\n", ndpi_str->ndpi_debug_print_file, ndpi_str->ndpi_debug_print_function, ndpi_str->ndpi_debug_print_line, proto_name, str);
+  } else {
+    printf("Proto: %u, %s\n", proto, str);
+  }
+#endif
+}
+
 void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  if (ndpi_debug_printf != NULL)
-	ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
-  else
-    ndpi_str->ndpi_debug_printf = (ndpi_debug_function_ptr) printf;
+    ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
 #endif
 }
 
@@ -1731,10 +1748,14 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   if(ndpi_str == NULL) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
     printf(0, NULL, NDPI_LOG_DEBUG, "ndpi_init_detection_module initial malloc failed\n");
-#endif
+#endif /* NDPI_ENABLE_DEBUG_MESSAGES */
     return NULL;
   }
   memset(ndpi_str, 0, sizeof(struct ndpi_detection_module_struct));
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr)ndpi_debug_printf);
+#endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
   if((ndpi_str->protocols_ptree = ndpi_New_Patricia(32 /* IPv4 */)) != NULL)
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
