@@ -7292,6 +7292,12 @@ static ndpi_network host_protocol_list[] = {
   */
   { 0x4A730000, 21, NDPI_SERVICE_HOTSPOT_SHIELD },
 
+  /*
+    Github: https://help.github.com/articles/what-ip-addresses-does-github-use-that-i-should-whitelist/
+    192.30.252.0/22
+  */
+  { 0xC01EFC00 /* 192.30.252.0/22 */, 22, NDPI_SERVICE_GITHUB },
+
   { 0x0, 0, 0 }
 };
 
@@ -7474,6 +7480,14 @@ ndpi_protocol_match host_match[] = {
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-",                "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   
+  { "github.com",                   "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".github.com",                  "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  /* https://github.com/blog/1452-new-github-pages-domain-github-io */
+  { "github.io",                    "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".github.io",                   "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  /* https://developer.github.com/changes/2014-04-25-user-content-security/ */
+  { "githubusercontent.com",        "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".githubusercontent.com",       "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, 0 }
 };

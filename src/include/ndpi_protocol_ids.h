@@ -263,9 +263,10 @@
 #define NDPI_SERVICE_SINA                               210
 #define NDPI_SERVICE_HANGOUT                            214
 #define NDPI_SERVICE_IFLIX                              215 /* www.vizuamatix.com R&D team & M.Mallawaarachchie <manoj_ws@yahoo.com> */
+#define NDPI_SERVICE_GITHUB                             216
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_IFLIX
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_GITHUB
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)
