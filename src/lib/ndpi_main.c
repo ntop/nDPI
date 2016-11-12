@@ -2888,11 +2888,11 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   }
 #endif							/* NDPI_DETECTION_SUPPORT_IPV6 */
 
-  if(decaps_iph->version == 4 && decaps_iph->ihl >= 5) {
+  if(decaps_iph && decaps_iph->version == 4 && decaps_iph->ihl >= 5) {
     NDPI_LOG(NDPI_PROTOCOL_UNKNOWN, ndpi_struct, NDPI_LOG_DEBUG, "ipv4 header\n");
   }
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  else if(decaps_iph->version == 6 && l3len >= sizeof(struct ndpi_ipv6hdr) &&
+  else if(decaps_iph && decaps_iph->version == 6 && l3len >= sizeof(struct ndpi_ipv6hdr) &&
 	  (ndpi_struct->ip_version_limit & NDPI_DETECTION_ONLY_IPV4) == 0) {
     NDPI_LOG(NDPI_PROTOCOL_UNKNOWN, ndpi_struct, NDPI_LOG_DEBUG, "ipv6 header\n");
     flow->packet.iphv6 = (struct ndpi_ipv6hdr *)flow->packet.iph;
