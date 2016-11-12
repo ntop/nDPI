@@ -164,7 +164,7 @@ static void setHttpUserAgent(struct ndpi_flow_struct *flow, char *ua) {
 
 static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   // int i = 0;
-  struct ndpi_packet_struct *packet = &flow->packet;
+  //struct ndpi_packet_struct *packet = &flow->packet;
 
   if((flow->l4.tcp.http_stage == 0)
      || (flow->http.url && flow->http_detected)) {
