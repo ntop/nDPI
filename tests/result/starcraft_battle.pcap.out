@@ -5,10 +5,11 @@ SSDP	11	4984	1
 HTTPDownload	179	134204	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
-SSL	41	2782	12
+SSL	38	2548	11
 Google	14	1588	3
 QUIC	6	475	1
 Starcraft	236	51494	6
+Github	3	234	1
 
 	1	TCP 80.239.186.21:80 <-> 192.168.1.100:3516 [proto: 7/HTTP][12 pkts/3680 bytes][Host: eu.launcher.battle.net]
 	2	TCP 80.239.186.26:80 <-> 192.168.1.100:3518 [proto: 7/HTTP][10 pkts/1226 bytes][Host: nydus.battle.net]
@@ -46,7 +47,7 @@ Starcraft	236	51494	6
 	34	UDP 192.168.1.100:58844 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/210 bytes][Host: 40.186.239.80.in-addr.arpa]
 	35	UDP 192.168.1.100:60026 <-> 192.168.1.254:53 [proto: 5/DNS][4 pkts/442 bytes][Host: llnw.blizzard.com]
 	36	TCP 192.168.1.100:3506 <-> 173.194.113.224:80 [proto: 7.126/HTTP.Google][9 pkts/1299 bytes][Host: www.google-analytics.com]
-	37	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91/SSL][3 pkts/234 bytes]
+	37	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91.216/SSL.Github][3 pkts/234 bytes]
 	38	IGMP 224.0.0.22:0 <-> 192.168.1.107:0 [proto: 82/IGMP][2 pkts/120 bytes]
 	39	TCP 192.168.1.100:3517 <-> 213.248.127.130:1119 [proto: 211/Starcraft][215 pkts/50178 bytes]
 	40	UDP 192.168.1.100:6113 <-> 213.248.127.212:1119 [proto: 211/Starcraft][2 pkts/103 bytes]
