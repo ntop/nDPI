@@ -1927,8 +1927,6 @@ static ndpi_default_ports_tree_node_t* ndpi_get_guessed_protocol_id(struct ndpi_
 u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int8_t proto, u_int16_t sport, u_int16_t dport,
 				 u_int8_t *user_defined_proto) {
-  const void *ret;
-  ndpi_default_ports_tree_node_t node;
 
   *user_defined_proto = 0; /* Default */
   if(sport && dport) {
