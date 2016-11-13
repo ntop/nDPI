@@ -57,16 +57,15 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 {
   if(check_hash) {
     const char *bt_hash = NULL; /* 20 bytes long */
-    const char *peer_id = NULL; /* 20 bytes long */
 
     if(bt_offset == -1) {
       const char *bt_magic = ndpi_strnstr((const char *)flow->packet.payload, 
 					  "BitTorrent protocol", flow->packet.payload_packet_len);
 
       if(bt_magic)
-	bt_hash = &bt_magic[19], peer_id = &bt_magic[39];
+	bt_hash = &bt_magic[19];
     } else
-      bt_hash = (const char*)&flow->packet.payload[28], peer_id = (const char*)&flow->packet.payload[48];
+      bt_hash = (const char*)&flow->packet.payload[28];
  
     if(bt_hash) memcpy(flow->bittorent_hash, bt_hash, 20);
   }
@@ -385,7 +384,6 @@ static void ndpi_int_search_bittorrent_tcp(struct ndpi_detection_module_struct *
 void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  int no_bittorrent = 0;
   char *bt_proto = NULL;
 
   /* This is broadcast */

@@ -573,7 +573,7 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
   }
 }
 
-
+#if 0
 /**
  * @brief Print debug
  */
@@ -612,7 +612,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
   
   va_end(va_ap);
 }
-
+#endif
 
 /**
  * @brief Setup for detection begin

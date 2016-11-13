@@ -1927,8 +1927,6 @@ static ndpi_default_ports_tree_node_t* ndpi_get_guessed_protocol_id(struct ndpi_
 u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int8_t proto, u_int16_t sport, u_int16_t dport,
 				 u_int8_t *user_defined_proto) {
-  const void *ret;
-  ndpi_default_ports_tree_node_t node;
 
   *user_defined_proto = 0; /* Default */
   if(sport && dport) {
@@ -3489,14 +3487,13 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	 flow->packet.iph)) {
     u_int16_t sport, dport;
     u_int8_t protocol;
-    u_int32_t saddr, daddr;
     u_int8_t user_defined_proto;
 
     flow->protocol_id_already_guessed = 1;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
     if(flow->packet.iphv6 != NULL) {
-      protocol = flow->packet.iphv6->ip6_ctlun.ip6_un1.ip6_un1_nxt, saddr = 0, daddr = 0;
+      protocol = flow->packet.iphv6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
     } else
 #endif
       {
@@ -4466,6 +4463,9 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
 	break;
   case NDPI_PROTOCOL_CATEGORY_SYSTEM:
     return("System");
+	break;
+  case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
+    return("Unspecified");
 	break;
   }
 
