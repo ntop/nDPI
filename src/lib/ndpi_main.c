@@ -3487,14 +3487,13 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	 flow->packet.iph)) {
     u_int16_t sport, dport;
     u_int8_t protocol;
-    u_int32_t saddr, daddr;
     u_int8_t user_defined_proto;
 
     flow->protocol_id_already_guessed = 1;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
     if(flow->packet.iphv6 != NULL) {
-      protocol = flow->packet.iphv6->ip6_ctlun.ip6_un1.ip6_un1_nxt, saddr = 0, daddr = 0;
+      protocol = flow->packet.iphv6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
     } else
 #endif
       {
