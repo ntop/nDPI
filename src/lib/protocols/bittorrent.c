@@ -385,7 +385,6 @@ static void ndpi_int_search_bittorrent_tcp(struct ndpi_detection_module_struct *
 void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  int no_bittorrent = 0;
   char *bt_proto = NULL;
 
   /* This is broadcast */
