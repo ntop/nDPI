@@ -561,12 +561,12 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   u_int16_t eth_offset = 0;
   u_int16_t radio_len;
   u_int16_t fc;
-  u_int16_t type;
+  u_int16_t type = 0;
   int wifi_len = 0;
   int pyld_eth_len = 0;
   int check;
   u_int64_t time;
-  u_int16_t ip_offset, ip_len;
+  u_int16_t ip_offset = 0, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0;
   u_int32_t label;
