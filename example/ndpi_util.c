@@ -79,10 +79,6 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 
 /* ***************************************************** */
 
-static const u_int8_t nDPI_traceLevel = 0;
-
-/* ***************************************************** */
-
 extern u_int32_t current_ndpi_memory, max_ndpi_memory;
 
 /**
