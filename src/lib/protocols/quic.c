@@ -73,7 +73,6 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
      && ((packet->payload[0] & 0xC2) == 0x00)
      && (quic_ports(ntohs(packet->udp->source), ntohs(packet->udp->dest)))
      ) {
-    char *begin;
     int i;
 
     if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
