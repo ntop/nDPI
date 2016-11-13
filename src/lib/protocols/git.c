@@ -35,7 +35,7 @@ void ndpi_search_git(struct ndpi_detection_module_struct *ndpi_struct,
       const u_int8_t * pp = packet->payload;
       u_int16_t payload_len = packet->payload_packet_len;  
       u_int8_t found_git = 1;
-      u_int16_t git_len = 0, offset = 0;
+      u_int16_t offset = 0;
       
       while((offset+4) < payload_len) {
 	char len[5];
