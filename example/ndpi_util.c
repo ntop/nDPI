@@ -542,17 +542,11 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
   /* --- Ethernet header --- */
   const struct ndpi_ethhdr *ethernet;
-  /* --- Ethernet II header --- */
-  const struct ndpi_ethhdr *ethernet_2;
   /* --- LLC header --- */
   const struct ndpi_llc_header *llc;
 
   /* --- Cisco HDLC header --- */
   const struct ndpi_chdlc *chdlc;
-  /* --- SLARP frame --- */
-  struct ndpi_slarp *slarp;
-  /* --- CDP --- */
-  struct ndpi_cdp *cdp;
 
   /* --- Radio Tap header --- */
   const struct ndpi_radiotap_header *radiotap;
@@ -573,11 +567,10 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   u_int16_t fc;
   u_int16_t type;
   int wifi_len = 0;
-  int llc_off;
   int pyld_eth_len = 0;
   int check;
   u_int64_t time;
-  u_int16_t ip_offset, ip_len, ip6_offset;
+  u_int16_t ip_offset, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0;
   u_int32_t label;
