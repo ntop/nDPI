@@ -4465,6 +4465,9 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
   case NDPI_PROTOCOL_CATEGORY_SYSTEM:
     return("System");
 	break;
+  case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
+    return("Unspecified");
+	break;
   }
 
   return("Unspecified");
