@@ -24,12 +24,6 @@
 
 #ifdef NDPI_PROTOCOL_BGP
 
-
-static void ndpi_int_bgp_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BGP, NDPI_PROTOCOL_UNKNOWN);
-}
-
 /* this detection also works asymmetrically */
 void ndpi_search_bgp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
