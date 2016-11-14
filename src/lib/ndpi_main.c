@@ -1747,7 +1747,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
   if(ndpi_str == NULL) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    printf(0, NULL, NDPI_LOG_DEBUG, "ndpi_init_detection_module initial malloc failed\n");
+    NDPI_LOG(0, ndpi_str, NDPI_LOG_DEBUG, "ndpi_init_detection_module initial malloc failed for ndpi_str\n");
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
     return NULL;
   }
