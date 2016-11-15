@@ -24,6 +24,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/battlefield.c \
 		     protocols/bgp.c \
 		     protocols/bittorrent.c \
+		     protocols/bjnp.c \
 		     protocols/ciscovpn.c \
 		     protocols/citrix.c \
 		     protocols/coap.c \
