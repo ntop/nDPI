@@ -42,7 +42,7 @@
 int check_punycode_string(char * buffer , int len)
 {
   int i = 0;
-  
+
   while(i++ < len)
   {
     if( buffer[i] == 'x' &&
@@ -385,7 +385,7 @@ u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, 
   for(i = 0; i < num; i++)
     if(strcasecmp(ndpi_get_proto_by_id(ndpi_mod, i), name) == 0)
       return(i);
-  
+
   return(NDPI_PROTOCOL_UNKNOWN);
 }
 
@@ -1563,7 +1563,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_CHAT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    
+
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
@@ -1718,12 +1718,12 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
 {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   va_list args;
-  #define MAX_STR_LEN 120 
+  #define MAX_STR_LEN 120
   char str[MAX_STR_LEN];
   va_start(args, format);
   vsprintf(str, format, args);
   va_end(args);
-  
+
   if (ndpi_str != NULL) {
     char proto_name[64];
 	snprintf(proto_name, sizeof(proto_name), "%s", ndpi_get_proto_name(ndpi_str, proto));
@@ -1805,7 +1805,7 @@ void* ndpi_init_automa(void) {
   return(ac_automata_init(ac_match_handler));
 }
 
-int ndpi_add_string_to_automa(void *_automa, char *str) { 
+int ndpi_add_string_to_automa(void *_automa, char *str) {
   AC_PATTERN_t ac_pattern;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
 
@@ -1826,8 +1826,8 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
   int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
-  
-  if((automa == NULL) 
+
+  if((automa == NULL)
      || (string_to_match == NULL)
      || (string_to_match[0] == '\0'))
     return(-2);
@@ -1899,7 +1899,7 @@ static ndpi_default_ports_tree_node_t* ndpi_get_guessed_protocol_id(struct ndpi_
 								    u_int8_t proto, u_int16_t sport, u_int16_t dport) {
   const void *ret;
   ndpi_default_ports_tree_node_t node;
-  
+
   if(sport && dport) {
     int low  = ndpi_min(sport, dport);
     int high = ndpi_max(sport, dport);
@@ -1934,7 +1934,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struc
 
     if(found != NULL) {
       *user_defined_proto = found->customUserProto;
-      return(found->proto->protoId);    
+      return(found->proto->protoId);
     }
   } else {
     /* No TCP/UDP */
@@ -2612,7 +2612,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* DRDA */
   init_drda_dissector(ndpi_struct, &a, detection_bitmask);
-  
+
   /*** Put false-positive sensitive protocols at the end ***/
 
   /* SKYPE */
@@ -3340,7 +3340,7 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
 #endif
 	 flow->packet.iph)) {
     u_int8_t user_defined_proto;
-    
+
     flow->protocol_id_already_guessed = 1,
       flow->guessed_protocol_id = (int16_t)ndpi_guess_protocol_id(ndpi_struct, l4_proto, sport, dport, &user_defined_proto);
 
@@ -3348,7 +3348,7 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.protocol = flow->guessed_protocol_id;
       return(ret);
     }
-      
+
     if(flow->packet.iph) {
       if((flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr)) == NDPI_PROTOCOL_UNKNOWN)
         flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
@@ -4768,4 +4768,3 @@ void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
 
   printf("\n");
 }
-
