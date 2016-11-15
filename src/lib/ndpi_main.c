@@ -2618,6 +2618,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* DRDA */
   init_drda_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* BJNP */
+  init_bjnp_dissector(ndpi_struct, &a, detection_bitmask);
+
   /*** Put false-positive sensitive protocols at the end ***/
 
   /* SKYPE */
@@ -2625,9 +2628,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* BITTORRENT */
   init_bittorrent_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* BJNP */
-  init_bjnp_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* ----------------------------------------------------------------- */
 
