@@ -780,6 +780,17 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       packet->http_method.ptr = packet->line[0].ptr;
       packet->http_method.len = filename_start - 1;
 
+      /* Check for additional field introduced by Facebook */
+      int x = 1;
+      while(packet->line[x].len != 0) {
+	if((memcmp(packet->line[x].ptr, "X-FB-SIM-HNI", 12)) == 0) {
+	  ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_FACEBOOK);
+	  check_content_type_and_change_protocol(ndpi_struct, flow);
+	  return;
+	}
+	x++;
+      }
+    
       if((packet->http_url_name.len > 7)
           && (!strncmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
         NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HTTP_PROXY Found.\n");
@@ -814,26 +825,26 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 		   "HTTP START Found, we will look further for the response...\n");
 	  flow->l4.tcp.http_stage = packet->packet_direction + 1; // packet_direction 0: stage 1, packet_direction 1: stage 2
 	}
-
+	
 	check_content_type_and_change_protocol(ndpi_struct, flow);
-
+	
 	return;
       }
     }
-
+    
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HTTP: REQUEST NOT HTTP CONFORM\n");
     http_bitmask_exclude(flow);
   } else if((flow->l4.tcp.http_stage == 1) || (flow->l4.tcp.http_stage == 2)) {
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HTTP stage %u: \n",
 	     flow->l4.tcp.http_stage);
-
+    
     /* At first check, if this is for sure a response packet (in another direction. If not, if http is detected do nothing now and return,
      * otherwise check the second packet for the http request . */
     if((flow->l4.tcp.http_stage - packet->packet_direction) == 1) {
-
+      
       if(flow->http_detected)
         return;
-
+      
       NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG,
 	       " SECOND PAYLOAD TRAFFIC FROM CLIENT, FIRST PACKET MIGHT HAVE BEEN HTTP...UNKNOWN TRAFFIC, HERE FOR HTTP again.. \n");
 
