@@ -66,6 +66,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/kakaotalk_voice.c \
 		     protocols/kerberos.c \
 		     protocols/kontiki.c \
+		     protocols/kxun.c \
 		     protocols/ldap.c \
 		     protocols/lotus_notes.c \
 		     protocols/mail_imap.c \

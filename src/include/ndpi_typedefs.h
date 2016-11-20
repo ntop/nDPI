@@ -572,6 +572,9 @@ struct ndpi_flow_tcp_struct {
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
 #endif
+#ifdef NDPI_PROTOCOL_PPSTREAM
+  u_int32_t ppstream_stage:3;
+#endif
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
