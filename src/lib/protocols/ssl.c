@@ -114,6 +114,7 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
     
     if((buffer[i] != '.')
        && (buffer[i] != '-')
+       && (buffer[i] != '_')
        && (buffer[i] != '*')
        && (!ndpi_isalpha(buffer[i]))
        && (!ndpi_isdigit(buffer[i]))) {
