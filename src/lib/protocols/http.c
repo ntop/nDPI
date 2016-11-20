@@ -840,7 +840,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
       
       /* Check for 1kxun packet */
-      for (int a = 0; a < packet->parsed_lines; a++) {
+      int a;
+      for (a = 0; a < packet->parsed_lines; a++) {
 	if((memcmp(packet->line[a].ptr, "Client-Source:", 14)) == 0) {
 	  if((memcmp(packet->line[a].ptr+15, "1kxun", 5)) == 0) {
 	    kxun_counter++;
