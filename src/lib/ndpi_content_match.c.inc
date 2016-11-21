@@ -28,11 +28,13 @@ static ndpi_network host_protocol_list[] = {
     69.63.176.0/20
     204.15.20.0/22
     31.13.86.0/24
+    31.13.74.0/24
  */
    { 0x42DC9000 /* 66.220.144.0/20 */, 20, NDPI_SERVICE_FACEBOOK },
    { 0x453FB000 /* 69.63.176.0/20 */, 20, NDPI_SERVICE_FACEBOOK },
    { 0xCC0F1400 /* 204.15.20.0/22 */, 22, NDPI_SERVICE_FACEBOOK },
    { 0x1F0D5600 /* 31.13.86.0/24 */, 24, NDPI_SERVICE_FACEBOOK },
+   { 0x1F0D4A00 /* 31.13.74.0/24 */, 24, NDPI_SERVICE_FACEBOOK },
 
  /*
     Twitter
