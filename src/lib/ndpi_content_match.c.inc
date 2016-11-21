@@ -21,7 +21,20 @@
 /* ****************************************************** */
 
 static ndpi_network host_protocol_list[] = {
-  /*
+
+ /*
+    Facebook
+    66.220.144.0/20
+    69.63.176.0/20
+    204.15.20.0/22
+    31.13.86.0/24
+ */
+   { 0x42DC9000 /* 66.220.144.0/20 */, 20, NDPI_SERVICE_FACEBOOK },
+   { 0x453FB000 /* 69.63.176.0/20 */, 20, NDPI_SERVICE_FACEBOOK },
+   { 0xCC0F1400 /* 204.15.20.0/22 */, 22, NDPI_SERVICE_FACEBOOK },
+   { 0x1F0D5600 /* 31.13.86.0/24 */, 24, NDPI_SERVICE_FACEBOOK },
+
+ /*
     Twitter
     103.252.112.0/23
     103.252.114.0/23
@@ -46,7 +59,7 @@ static ndpi_network host_protocol_list[] = {
     202.160.129.0/24
     202.160.130.0/24
     202.160.131.0/24
-  */
+ */
   { 0x67FC7000 /* 103.252.112.0/23 */, 23, NDPI_SERVICE_TWITTER },
   { 0x67FC7200 /* 103.252.114.0/23 */, 23, NDPI_SERVICE_TWITTER },
   { 0x68F42800 /* 104.244.40.0/24 */, 24, NDPI_SERVICE_TWITTER },
@@ -164,7 +177,6 @@ static ndpi_network host_protocol_list[] = {
 
   /*
    IFLIX services -by www.vizuamatix.com R&D team
-   
     52.77.0.0/16 
     52.220.0.0/16
     52.74.0.0/16
@@ -174,8 +186,7 @@ static ndpi_network host_protocol_list[] = {
     54.192.150.0/24
     52.74.192.247/32
     2.21.231.24/32
-    */
-    
+    */   
     { 0x344D0000 /* 52.77.0.0 */, 16, NDPI_SERVICE_IFLIX },
     { 0x34DC0000 /* 52.220.0.0 */, 16, NDPI_SERVICE_IFLIX },
     { 0x344A0000 /* 52.74.0.0 */, 16, NDPI_SERVICE_IFLIX },
@@ -256,7 +267,6 @@ static ndpi_network host_protocol_list[] = {
   { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
   
-
   /*
     route:          5.42.160.0/19
     descr:          Blizzard Entertainment, Inc
@@ -284,24 +294,16 @@ static ndpi_network host_protocol_list[] = {
 
   /*
     Telegram
-    route:          149.154.164.0/22
-    descr:          Telegram Messenger Amsterdam Network
-    origin:         AS62041
-    mnt-by:         MNT-TELEGRAM
-    source:         RIPE # Filtered
-
-    route:          149.154.168.0/22
-    descr:          Telegram Messenger DC5 Network
-    origin:         AS62014
-    mnt-by:         MNT-TELEGRAM
-    source:         RIPE # Filtered
-
+    149.154.164.0/22
+    149.154.168.0/22
     http://myip.ms/view/web_hosting/363906/Telegram_Messenger_Network.html
   */
   { 0x959AA400 /* 149.154.164.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM},
   { 0x959AA800 /* 149.154.168.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM},
 
-  /* TOR  */
+  /*
+    TOR
+  */
   { 0x012A1231, 32, NDPI_PROTOCOL_TOR },
   { 0x01E69FA1, 32, NDPI_PROTOCOL_TOR },
   { 0x020DE985, 32, NDPI_PROTOCOL_TOR },

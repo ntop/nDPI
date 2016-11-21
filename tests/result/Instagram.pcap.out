@@ -1,7 +1,8 @@
 Unknown	1	66	1
-HTTP	266	245342	7
+HTTP	116	91784	6
 ICMP	5	510	1
 SSL	103	62597	5
+Facebook	150	153558	1
 Dropbox	5	725	2
 Instagram	363	255094	16
 
@@ -15,7 +16,7 @@ Instagram	363	255094	16
 	8	TCP 77.67.29.17:80 <-> 192.168.0.103:33976 [proto: 7/HTTP][34 pkts/29039 bytes]
 	9	TCP 192.168.0.103:37350 <-> 82.85.26.153:80 [proto: 7.201/HTTP.Instagram][1 pkts/324 bytes][Host: photos-a.ak.instagram.com]
 	10	TCP 192.168.0.103:41181 <-> 82.85.26.154:443 [proto: 91.201/SSL.Instagram][14 pkts/5567 bytes][SSL client: igcdn-photos-a-a.akamaihd.net]
-	11	TCP 31.13.86.52:80 <-> 192.168.0.103:58216 [proto: 7/HTTP][150 pkts/153558 bytes]
+	11	TCP 31.13.86.52:80 <-> 192.168.0.103:58216 [proto: 7.119/HTTP.Facebook][150 pkts/153558 bytes]
 	12	TCP 192.168.0.103:57936 <-> 82.85.26.162:80 [proto: 7.201/HTTP.Instagram][58 pkts/50220 bytes][Host: photos-g.ak.instagram.com]
 	13	TCP 192.168.0.103:57966 <-> 82.85.26.185:80 [proto: 7/HTTP][3 pkts/198 bytes]
 	14	TCP 192.168.0.103:58052 <-> 82.85.26.162:80 [proto: 7.201/HTTP.Instagram][75 pkts/57239 bytes][Host: photos-g.ak.instagram.com]
