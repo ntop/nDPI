@@ -766,7 +766,7 @@ static void printResults(u_int64_t tot_usec) {
   char buf[32];
 #ifdef HAVE_JSON_C
   FILE *json_fp = NULL;
-  json_object *jObj_main, *jObj_trafficStats, *jArray_detProto, *jObj;
+  json_object *jObj_main = NULL, *jObj_trafficStats, *jArray_detProto = NULL, *jObj;
 #endif
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
 
