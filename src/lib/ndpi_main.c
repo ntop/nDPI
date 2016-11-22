@@ -2068,7 +2068,7 @@ void ndpi_set_bitmask_protocol_detection( char * label,
     ndpi_struct->callback_buffer[idx].ndpi_selection_bitmask = ndpi_selection_bitmask;
 
     /*
-      Reset protocol detection bitmask via NDPI_PROTOCOL_UNKNOWN and than add specify protocol bitmast to callback
+      Reset protocol detection bitmask via NDPI_PROTOCOL_UNKNOWN and then add specify protocol bitmast to callback
       buffer.
     */
     if(b_save_bitmask_unknow) NDPI_SAVE_AS_BITMASK(ndpi_struct->callback_buffer[idx].detection_bitmask, NDPI_PROTOCOL_UNKNOWN);

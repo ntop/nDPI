@@ -1023,7 +1023,7 @@ static unsigned int packet_processing(u_int16_t thread_id,
 				      u_int16_t ip_offset,
 				      u_int16_t ipsize, u_int16_t rawsize) {
   struct ndpi_id_struct *src, *dst;
-  struct ndpi_flow *flow;
+  struct ndpi_flow *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
   u_int8_t proto;
   struct ndpi_tcphdr *tcph = NULL;
