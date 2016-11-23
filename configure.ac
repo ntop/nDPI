@@ -50,6 +50,11 @@ if test -f $PCAP_HOME/libpcap/libpcap.a; then :
 
      AC_CHECK_LIB([rt], [clock_gettime],   [PCAP_LIB="$PCAP_LIB -lrt"])
      AC_CHECK_LIB([nl], [nl_handle_alloc], [PCAP_LIB="$PCAP_LIB -lnl"])
+     # The dlopen() function is in libdl on GLIBC-based systems
+     # and in the C library for *BSD systems
+     AC_CHECK_LIB([dl], [dlopen, dlsym],   [DL_LIB="-ldl"],
+                  [AC_CHECK_LIB([c], [dlopen, dlsym], [DL_LIB="-lc"],
+                                [AC_MSG_ERROR([unable to find the dlopen(), dlsym() functions]) ]) ])
 else
     AC_CHECK_LIB([pcap], [pcap_open_live], [PCAP_LIB="-lpcap"])
 
@@ -94,6 +99,7 @@ AC_SUBST(SVN_DATE)
 AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
+AC_SUBST(DL_LIB)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 
 AC_OUTPUT
