@@ -2,8 +2,8 @@ Unknown	2	181	1
 DNS	2	217	1
 HTTP	1	56	1
 ICMP	1	147	1
-SSL	33	4830	4
-Facebook	211	51558	11
+SSL	29	4579	3
+Facebook	215	51809	12
 Google	16	1031	3
 HTTP_Proxy	26	3926	1
 KakaoTalk	55	9990	15
@@ -44,7 +44,7 @@ KakaoTalk	55	9990	15
 	34	TCP 31.13.68.84:443 <-> 10.24.82.188:45209 [proto: 91.119/SSL.Facebook][19 pkts/7707 bytes][SSL client: api.facebook.com]
 	35	TCP 31.13.68.84:443 <-> 10.24.82.188:45211 [proto: 91.119/SSL.Facebook][29 pkts/9077 bytes][SSL client: developers.facebook.com]
 	36	TCP 31.13.68.84:443 <-> 10.24.82.188:45213 [proto: 91.119/SSL.Facebook][28 pkts/7561 bytes][SSL server: *.facebook.com]
-	37	TCP 31.13.68.73:443 <-> 10.24.82.188:47007 [proto: 91/SSL][4 pkts/251 bytes]
+	37	TCP 31.13.68.73:443 <-> 10.24.82.188:47007 [proto: 91.119/SSL.Facebook][4 pkts/251 bytes]
 
 
 Undetected flows:

@@ -4,8 +4,8 @@ HTTP	51	5299	8
 BitTorrent	57	13074	27
 SSL_No_Cert	36	5874	1
 ICMP	4	518	3
-SSL	90	22731	8
-Facebook	39	16382	2
+SSL	79	21658	7
+Facebook	50	17455	3
 Dropbox	2	163	1
 GMail	35	14773	2
 Google	75	17027	7
@@ -38,7 +38,7 @@ Viber	10081	1413446	4
 	24	TCP 54.169.63.186:443 <-> 192.168.200.222:39339 [proto: 91.144/SSL.Viber][6 pkts/412 bytes]
 	25	UDP 92.249.148.218:53810 <-> 192.168.200.222:39413 [proto: 37/BitTorrent][2 pkts/505 bytes]
 	26	TCP 93.184.221.200:80 <-> 192.168.200.222:33161 [proto: 7/HTTP][5 pkts/300 bytes]
-	27	TCP 192.168.200.222:52491 <-> 31.13.79.245:443 [proto: 91/SSL][11 pkts/1073 bytes]
+	27	TCP 192.168.200.222:52491 <-> 31.13.79.245:443 [proto: 91.119/SSL.Facebook][11 pkts/1073 bytes]
 	28	UDP 8.8.8.8:53 <-> 192.168.200.222:55854 [proto: 5/DNS][2 pkts/236 bytes][Host: s.jpush.cn]
 	29	UDP 8.8.8.8:53 <-> 192.168.200.222:58434 [proto: 5/DNS][2 pkts/349 bytes][Host: e.crashlytics.com]
 	30	UDP 2.85.108.0:21241 <-> 192.168.200.222:39413 [proto: 37/BitTorrent][2 pkts/505 bytes]
