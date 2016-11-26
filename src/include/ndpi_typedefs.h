@@ -781,7 +781,6 @@ typedef struct ndpi_proto {
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
 
 struct ndpi_detection_module_struct {
-
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
 

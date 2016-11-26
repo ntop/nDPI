@@ -445,97 +445,104 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 				      struct ndpi_ipv6hdr *iph6,
 				      u_int16_t ip_offset,
 				      u_int16_t ipsize, u_int16_t rawsize) {
-  struct ndpi_id_struct *src, *dst;
-  struct ndpi_flow_info *flow = NULL;
-  struct ndpi_flow_struct *ndpi_flow = NULL;
-  u_int8_t proto;
-  struct ndpi_tcphdr *tcph = NULL;
-  struct ndpi_udphdr *udph = NULL;
-  u_int16_t sport, dport, payload_len;
-  u_int8_t *payload;
-  u_int8_t src_to_dst_direction= 1;
+    struct ndpi_id_struct *src, *dst;
+    struct ndpi_flow_info *flow = NULL;
+    struct ndpi_flow_struct *ndpi_flow = NULL;
+    u_int8_t proto;
+    struct ndpi_tcphdr *tcph = NULL;
+    struct ndpi_udphdr *udph = NULL;
+    u_int16_t sport, dport, payload_len;
+    u_int8_t *payload;
+    u_int8_t src_to_dst_direction= 1;
 
-  if(iph)
-    flow = get_ndpi_flow_info(workflow, 4, vlan_id, iph, NULL,
-			      ip_offset, ipsize,
-			      ntohs(iph->tot_len) - (iph->ihl * 4),
-			      &tcph, &udph, &sport, &dport,
-			      &src, &dst, &proto,
-			      &payload, &payload_len, &src_to_dst_direction);
-  else
-    flow = get_ndpi_flow_info6(workflow, vlan_id, iph6, ip_offset,
-			       &tcph, &udph, &sport, &dport,
-			       &src, &dst, &proto,
-			       &payload, &payload_len, &src_to_dst_direction);
+    if(iph)
+	flow = get_ndpi_flow_info(workflow, 4, vlan_id, iph, NULL,
+				  ip_offset, ipsize,
+				  ntohs(iph->tot_len) - (iph->ihl * 4),
+				  &tcph, &udph, &sport, &dport,
+				  &src, &dst, &proto,
+				  &payload, &payload_len, &src_to_dst_direction);
+    else
+	flow = get_ndpi_flow_info6(workflow, vlan_id, iph6, ip_offset,
+				   &tcph, &udph, &sport, &dport,
+				   &src, &dst, &proto,
+				   &payload, &payload_len, &src_to_dst_direction);
 
-  if(flow != NULL) {
-    workflow->stats.ip_packet_count++;
-    workflow->stats.total_wire_bytes += rawsize + 24 /* CRC etc */, workflow->stats.total_ip_bytes += rawsize;
-    ndpi_flow = flow->ndpi_flow;
-    flow->packets++, flow->bytes += rawsize;
-    flow->last_seen = time;
-  } else {
-    return(0);
-  }
+    if(flow != NULL) {
+	workflow->stats.ip_packet_count++;
+	workflow->stats.total_wire_bytes += rawsize + 24 /* CRC etc */,
+	    workflow->stats.total_ip_bytes += rawsize;
+	ndpi_flow = flow->ndpi_flow;
+	flow->packets++, flow->bytes += rawsize;
+	flow->last_seen = time;
+    } else {
+	return(0);
+    }
 
-  /* Protocol already detected */
-  if(flow->detection_completed) return(0);
+    /* Protocol already detected */
+    if(flow->detection_completed) return(0);
 
-  flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
-							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
-							  ipsize, time, src, dst);
+    flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
+							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
+							    ipsize, time, src, dst);
 
-  if((flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
-     || ((proto == IPPROTO_UDP) && (flow->packets > 8))
-     || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
-    /* New protocol detected or give up */
-    flow->detection_completed = 1;
+    if((flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
+       || ((proto == IPPROTO_UDP) && (flow->packets > 8))
+       || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
+	/* New protocol detected or give up */
+	flow->detection_completed = 1;
+    }
 
-    if((flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) && (ndpi_flow->num_stun_udp_pkts > 0))
-      ndpi_set_detected_protocol(workflow->ndpi_struct, ndpi_flow, NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_UNKNOWN);
-
-    snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s", flow->ndpi_flow->host_server_name);
+    if(flow->detection_completed) {
+	if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN)
+	    flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
+							    flow->ndpi_flow);
+    }
+  
+    snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
+	     flow->ndpi_flow->host_server_name);
 
     if(flow->detected_protocol.protocol == NDPI_PROTOCOL_BITTORRENT) {
-      int i, j, n = 0;
+	int i, j, n = 0;
 
-      for(i=0, j = 0; i<20; i++) {
-	sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
-	j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
-      }
+	for(i=0, j = 0; i<20; i++) {
+	    sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
+	    j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
+	}
 
-      if(n == 0) flow->bittorent_hash[0] = '\0';
+	if(n == 0) flow->bittorent_hash[0] = '\0';
     }
 
     if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
-      snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s", flow->ndpi_flow->protos.ssl.client_certificate);
-      snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
+	snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s",
+		 flow->ndpi_flow->protos.ssl.client_certificate);
+	snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s",
+		 flow->ndpi_flow->protos.ssl.server_certificate);
     }
 
-    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
-      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow);
+    if(flow->detection_completed) {
+	if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
+	    if (workflow->__flow_giveup_callback != NULL)
+		workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
+	} else {
+	    if (workflow->__flow_detected_callback != NULL)
+		workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
+	}
 
-      if (workflow->__flow_giveup_callback != NULL)
-        workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
-    } else {
-      if (workflow->__flow_detected_callback != NULL)
-        workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
+	ndpi_free_flow_info_half(flow);
     }
 
-    ndpi_free_flow_info_half(flow);
-  }
-
-  return 0;
+    return 0;
 }
 
 /* ****************************************************** */
+
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				   const struct pcap_pkthdr *header,
 				   const u_char *packet) {
   /*
    * Declare pointers to packet headers
    */
-
   /* --- Ethernet header --- */
   const struct ndpi_ethhdr *ethernet;
   /* --- LLC header --- */

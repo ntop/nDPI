@@ -3215,7 +3215,8 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 	  func = ndpi_struct->proto_defaults[flow->guessed_protocol_id].func;
     }
 
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+    if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
+       && (flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)) {
       for(a = 0; a < ndpi_struct->callback_buffer_size_tcp_payload; a++) {
         if((func != ndpi_struct->callback_buffer_tcp_payload[a].func)
 	   && (ndpi_struct->callback_buffer_tcp_payload[a].ndpi_selection_bitmask & *ndpi_selection_packet) == ndpi_struct->callback_buffer_tcp_payload[a].ndpi_selection_bitmask
@@ -3408,22 +3409,27 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-    if(flow->http_detected)
-      ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_UNKNOWN);
-    else if((flow->packet.l4_protocol == IPPROTO_TCP) && (flow->l4.tcp.ssl_stage > 1)) {
-      if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-	ndpi_int_change_protocol(ndpi_struct, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_SSL);
-      else
-	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL, NDPI_PROTOCOL_UNKNOWN);
-    } else {
-      flow->detected_protocol_stack[1] = flow->guessed_protocol_id, flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
-
+      if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+	 && (flow->packet.l4_protocol == IPPROTO_TCP)
+	 && (flow->l4.tcp.ssl_stage > 1))
+	  flow->guessed_protocol_id = NDPI_PROTOCOL_SSL;
+      
+      ndpi_int_change_protocol(ndpi_struct, flow,
+			       flow->guessed_host_protocol_id,
+			       flow->guessed_protocol_id);
+  } else {
+      flow->detected_protocol_stack[1] = flow->guessed_protocol_id,
+	  flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
+      
       if(flow->detected_protocol_stack[1] == flow->detected_protocol_stack[0])
-	flow->detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
-    }
+	  flow->detected_protocol_stack[1] = flow->guessed_host_protocol_id;
   }
+  
+  if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) && (flow->num_stun_udp_pkts > 0))
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STUN, flow->guessed_host_protocol_id);
 
   ret.master_protocol = flow->detected_protocol_stack[1], ret.protocol = flow->detected_protocol_stack[0];
+
   return(ret);
 }
 
@@ -3525,6 +3531,15 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     if(user_defined_proto && (flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.protocol = flow->guessed_protocol_id;
       return(ret);
+    } else {
+	/*
+	  TODO
+	  The statement below at some point should be modified as we should not
+	  guess the protocol id unless users requested us to do that. Probably
+	  we need to modify the nDPI API as since we introduced ndpi_detection_giveup()
+	  we need to make some changes to have a consistent behaviour
+	 */
+	// flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
     }
 
     if(flow->packet.iph) {
