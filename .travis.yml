@@ -11,8 +11,7 @@ install:
 
 before_script:
   - ./autogen.sh
-  # init coverage to 0 (optional)
-  - lcov --directory . --zerocounters
+#  - lcov --directory . --zerocounters
 
 script:
   - ./configure
@@ -22,9 +21,9 @@ after_script:
   - cd tests
   - ./do.sh
 
-after_success:
-- cd ${TRAVIS_BUILD_DIR}
-- lcov --directory . --capture --output-file coverage.info # capture coverage info
-- lcov --remove coverage.info 'tests/*' 'packages/*' 'm4/*' 'doc/*' --output-file coverage.info # filter out system and test code
-- lcov --list coverage.info # debug before upload
-- coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info # uploads to coveralls
+#after_success:
+#- cd ${TRAVIS_BUILD_DIR}
+#- lcov --directory . --capture --output-file coverage.info # capture coverage info
+#- lcov --remove coverage.info 'tests/*' 'packages/*' 'm4/*' 'doc/*' --output-file coverage.info
+#- lcov --list coverage.info # debug before upload
+#- coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info # uploads to coveralls

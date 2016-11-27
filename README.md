@@ -2,7 +2,6 @@
 # nDPI
 
 [![Build Status](https://travis-ci.org/ntop/nDPI.png?branch=dev)](https://travis-ci.org/ntop/nDPI)
-[![Coverage Status](https://coveralls.io/repos/github/ntop/nDPI/badge.svg?branch=dev)](https://coveralls.io/github/ntop/nDPI?branch=dev)
 
 ## What is nDPI ?
 
