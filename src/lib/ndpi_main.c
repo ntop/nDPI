@@ -44,14 +44,14 @@ int check_punycode_string(char * buffer , int len)
   int i = 0;
 
   while(i++ < len)
-  {
-    if( buffer[i] == 'x' &&
-	buffer[i+1] == 'n' &&
-	buffer[i+2] == '-' &&
-	buffer[i+3] == '-' )
-      // is a punycode string
-      return 1;
-  }
+    {
+      if( buffer[i] == 'x' &&
+	  buffer[i+1] == 'n' &&
+	  buffer[i+2] == '-' &&
+	  buffer[i+3] == '-' )
+	// is a punycode string
+	return 1;
+    }
   // not a punycode string
   return 0;
 }
@@ -264,7 +264,7 @@ static const u_char charmap[] = {
 
 int
 strcasecmp(s1, s2)
-     const char *s1, *s2;
+  const char *s1, *s2;
 {
   register const u_char *cm = charmap,
     *us1 = (const u_char *)s1,
@@ -278,8 +278,8 @@ strcasecmp(s1, s2)
 
 int
 strncasecmp(s1, s2, n)
-     const char *s1, *s2;
-     register size_t n;
+  const char *s1, *s2;
+register size_t n;
 {
   if(n != 0) {
     register const u_char *cm = charmap,
@@ -683,906 +683,906 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO },
     custom_master[2];
 
-    /* Reset all settings */
-    memset(ndpi_mod->proto_defaults, 0, sizeof(ndpi_mod->proto_defaults));
+  /* Reset all settings */
+  memset(ndpi_mod->proto_defaults, 0, sizeof(ndpi_mod->proto_defaults));
 
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNRATED, NDPI_PROTOCOL_UNKNOWN,
-			    no_master,
-			    no_master, "Unknown", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_FTP_CONTROL,
-			    no_master,
-			    no_master, "FTP_CONTROL", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
-			    ndpi_build_default_ports(ports_a, 21, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_FTP_DATA,
-			    no_master,
-			    no_master, "FTP_DATA", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
-			    ndpi_build_default_ports(ports_a, 20, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_POP,
-			    no_master,
-			    no_master, "POP3", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
-			    ndpi_build_default_ports(ports_a, 110, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_POPS,
-			    no_master,
-			    no_master, "POPS", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
-			    ndpi_build_default_ports(ports_a, 995, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_SMTP,
-			    no_master,
-			    no_master, "SMTP", NDPI_PROTOCOL_CATEGORY_MAIL_SEND,
-			    ndpi_build_default_ports(ports_a, 25, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_SMTPS,
-			    no_master,
-			    no_master, "SMTPS", NDPI_PROTOCOL_CATEGORY_MAIL_SEND,
-			    ndpi_build_default_ports(ports_a, 465, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_IMAP,
-			    no_master,
-			    no_master, "IMAP", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
-			    ndpi_build_default_ports(ports_a, 143, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_IMAPS,
-			    no_master,
-			    no_master, "IMAPS", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
-			    ndpi_build_default_ports(ports_a, 993, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DNS,
-    			    no_master,
-    			    no_master, "DNS", NDPI_PROTOCOL_CATEGORY_NETWORK,
-    			    ndpi_build_default_ports(ports_a, 53, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 53, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IPP,
-			    no_master,
-			    no_master, "IPP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HEP,
-			    no_master,
-			    no_master, "HEP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 9064, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 9063, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP,
-			    no_master,
-			    no_master, "HTTP", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 80, 0 /* ntop */, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MDNS,
-			    no_master,
-			    no_master, "MDNS", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 5353, 5354, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NTP,
-			    no_master,
-			    no_master, "NTP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 123, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NETBIOS,
-			    no_master,
-			    no_master, "NetBIOS", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-			    ndpi_build_default_ports(ports_a, 139, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 137, 138, 139, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NFS,
-			    no_master,
-			    no_master, "NFS", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
-			    ndpi_build_default_ports(ports_a, 2049, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 2049, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSDP,
-			    no_master,
-			    no_master, "SSDP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BGP,
-    			    no_master,
-    			    no_master, "BGP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-    			    ndpi_build_default_ports(ports_a, 2605, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SNMP,
-			    no_master,
-			    no_master, "SNMP", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 161, 162, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_XDMCP,
-			    no_master,
-			    no_master, "XDMCP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 177, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 177, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SMB,
-			    no_master,
-			    no_master, "SMB", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-			    ndpi_build_default_ports(ports_a, 445, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SYSLOG,
-			    no_master,
-			    no_master, "Syslog", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-			    ndpi_build_default_ports(ports_a, 514, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 514, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DHCP,
-    			    no_master,
-    			    no_master, "DHCP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 67, 68, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_POSTGRES,
-			    no_master,
-			    no_master, "PostgreSQL", NDPI_PROTOCOL_CATEGORY_DATABASE,
-			    ndpi_build_default_ports(ports_a, 5432, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MYSQL,
-			    no_master,
-			    no_master, "MySQL", NDPI_PROTOCOL_CATEGORY_DATABASE,
-			    ndpi_build_default_ports(ports_a, 3306, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK,
-			    no_master,
-			    no_master, "Direct_Download_Link", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_APPLEJUICE,
-    			    no_master,
-    			    no_master, "AppleJuice", NDPI_PROTOCOL_CATEGORY_P2P,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DIRECTCONNECT,
-			    no_master,
-			    no_master, "DirectConnect", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_SOCRATES,
-			    no_master,
-			    no_master, "Socrates", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VMWARE,
-			    no_master,
-			    no_master, "VMware", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 903, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 902, 903, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_FILETOPIA,
-    			    no_master,
-    			    no_master, "Filetopia", NDPI_PROTOCOL_CATEGORY_P2P,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_KONTIKI,
-			    no_master,
-			    no_master, "Kontiki", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_OPENFT,
-			    no_master,
-			    no_master, "OpenFT", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_FASTTRACK,
-			    no_master,
-			    no_master, "FastTrack", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_GNUTELLA,
-			    no_master,
-			    no_master, "Gnutella", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_EDONKEY,
-			    no_master,
-			    no_master, "eDonkey", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BITTORRENT,
-    			    no_master,
-    			    no_master, "BitTorrent", NDPI_PROTOCOL_CATEGORY_P2P,
-    			    ndpi_build_default_ports(ports_a, 51413, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 6771, 51413, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEREDO,
-    			    no_master,
-    			    no_master, "Teredo", NDPI_PROTOCOL_CATEGORY_NETWORK,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_EPP,
-			    no_master,
-			    no_master, "EPP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_AVI,
-			    no_master,
-			    no_master, "AVI", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_FLASH,
-			    no_master,
-			    no_master, "Flash", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_OGG,
-			    no_master,
-			    no_master, "OggVorbis", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_MPEG,
-    			    no_master,
-    			    no_master, "MPEG", NDPI_PROTOCOL_CATEGORY_MEDIA,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_QUICKTIME,
-			    no_master,
-			    no_master, "QuickTime", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_REALMEDIA,
-    			    no_master,
-    			    no_master, "RealMedia", NDPI_PROTOCOL_CATEGORY_MEDIA,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_WINDOWSMEDIA,
-			    no_master,
-			    no_master, "WindowsMedia", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_MMS,
-    			    no_master,
-    			    no_master, "MMS", NDPI_PROTOCOL_CATEGORY_MEDIA,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX,
-			    no_master,
-			    no_master, "Xbox", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQ,
-    			    no_master,
-    			    no_master, "QQ", NDPI_PROTOCOL_CATEGORY_CHAT,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MOVE,
-			    no_master,
-			    no_master, "Move", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_RTSP,
-			    no_master,
-			    no_master, "RTSP", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 554, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 554, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ICECAST,
-			    no_master,
-			    no_master, "IceCast", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PPLIVE,
-			    no_master,
-			    no_master, "PPLive", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PPSTREAM,
-			    no_master,
-			    no_master, "PPStream", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ZATTOO,
-			    no_master,
-			    no_master, "Zattoo", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SHOUTCAST,
-			    no_master,
-			    no_master, "ShoutCast", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SOPCAST,
-			    no_master,
-			    no_master, "Sopcast", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TVANTS,
-			    no_master,
-			    no_master, "Tvants", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TVUPLAYER,
-			    no_master,
-			    no_master, "TVUplayer", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HTTP_DOWNLOAD,
-			    no_master,
-			    no_master, "HTTPDownload", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQLIVE,
-			    no_master,
-			    no_master, "QQLive", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_THUNDER,
-			    no_master,
-			    no_master, "Thunder", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SOULSEEK,
-			    no_master,
-			    no_master, "Soulseek", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNRATED, NDPI_PROTOCOL_UNKNOWN,
+			  no_master,
+			  no_master, "Unknown", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_FTP_CONTROL,
+			  no_master,
+			  no_master, "FTP_CONTROL", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			  ndpi_build_default_ports(ports_a, 21, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_FTP_DATA,
+			  no_master,
+			  no_master, "FTP_DATA", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			  ndpi_build_default_ports(ports_a, 20, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_POP,
+			  no_master,
+			  no_master, "POP3", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			  ndpi_build_default_ports(ports_a, 110, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_POPS,
+			  no_master,
+			  no_master, "POPS", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			  ndpi_build_default_ports(ports_a, 995, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_SMTP,
+			  no_master,
+			  no_master, "SMTP", NDPI_PROTOCOL_CATEGORY_MAIL_SEND,
+			  ndpi_build_default_ports(ports_a, 25, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_SMTPS,
+			  no_master,
+			  no_master, "SMTPS", NDPI_PROTOCOL_CATEGORY_MAIL_SEND,
+			  ndpi_build_default_ports(ports_a, 465, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_IMAP,
+			  no_master,
+			  no_master, "IMAP", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			  ndpi_build_default_ports(ports_a, 143, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_IMAPS,
+			  no_master,
+			  no_master, "IMAPS", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			  ndpi_build_default_ports(ports_a, 993, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DNS,
+			  no_master,
+			  no_master, "DNS", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 53, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 53, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IPP,
+			  no_master,
+			  no_master, "IPP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HEP,
+			  no_master,
+			  no_master, "HEP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 9064, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 9063, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP,
+			  no_master,
+			  no_master, "HTTP", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 80, 0 /* ntop */, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MDNS,
+			  no_master,
+			  no_master, "MDNS", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 5353, 5354, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NTP,
+			  no_master,
+			  no_master, "NTP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 123, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NETBIOS,
+			  no_master,
+			  no_master, "NetBIOS", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 139, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 137, 138, 139, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NFS,
+			  no_master,
+			  no_master, "NFS", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			  ndpi_build_default_ports(ports_a, 2049, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 2049, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSDP,
+			  no_master,
+			  no_master, "SSDP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BGP,
+			  no_master,
+			  no_master, "BGP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 2605, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SNMP,
+			  no_master,
+			  no_master, "SNMP", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 161, 162, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_XDMCP,
+			  no_master,
+			  no_master, "XDMCP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 177, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 177, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SMB,
+			  no_master,
+			  no_master, "SMB", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 445, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SYSLOG,
+			  no_master,
+			  no_master, "Syslog", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 514, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 514, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DHCP,
+			  no_master,
+			  no_master, "DHCP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 67, 68, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_POSTGRES,
+			  no_master,
+			  no_master, "PostgreSQL", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 5432, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MYSQL,
+			  no_master,
+			  no_master, "MySQL", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 3306, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK,
+			  no_master,
+			  no_master, "Direct_Download_Link", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_APPLEJUICE,
+			  no_master,
+			  no_master, "AppleJuice", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DIRECTCONNECT,
+			  no_master,
+			  no_master, "DirectConnect", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_SOCRATES,
+			  no_master,
+			  no_master, "Socrates", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VMWARE,
+			  no_master,
+			  no_master, "VMware", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 903, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 902, 903, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_FILETOPIA,
+			  no_master,
+			  no_master, "Filetopia", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_KONTIKI,
+			  no_master,
+			  no_master, "Kontiki", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_OPENFT,
+			  no_master,
+			  no_master, "OpenFT", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_FASTTRACK,
+			  no_master,
+			  no_master, "FastTrack", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_GNUTELLA,
+			  no_master,
+			  no_master, "Gnutella", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_EDONKEY,
+			  no_master,
+			  no_master, "eDonkey", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BITTORRENT,
+			  no_master,
+			  no_master, "BitTorrent", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 51413, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 6771, 51413, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEREDO,
+			  no_master,
+			  no_master, "Teredo", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_EPP,
+			  no_master,
+			  no_master, "EPP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_AVI,
+			  no_master,
+			  no_master, "AVI", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_FLASH,
+			  no_master,
+			  no_master, "Flash", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_OGG,
+			  no_master,
+			  no_master, "OggVorbis", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_MPEG,
+			  no_master,
+			  no_master, "MPEG", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_QUICKTIME,
+			  no_master,
+			  no_master, "QuickTime", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_REALMEDIA,
+			  no_master,
+			  no_master, "RealMedia", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_WINDOWSMEDIA,
+			  no_master,
+			  no_master, "WindowsMedia", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_MMS,
+			  no_master,
+			  no_master, "MMS", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX,
+			  no_master,
+			  no_master, "Xbox", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQ,
+			  no_master,
+			  no_master, "QQ", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MOVE,
+			  no_master,
+			  no_master, "Move", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_RTSP,
+			  no_master,
+			  no_master, "RTSP", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 554, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 554, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ICECAST,
+			  no_master,
+			  no_master, "IceCast", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PPLIVE,
+			  no_master,
+			  no_master, "PPLive", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PPSTREAM,
+			  no_master,
+			  no_master, "PPStream", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ZATTOO,
+			  no_master,
+			  no_master, "Zattoo", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SHOUTCAST,
+			  no_master,
+			  no_master, "ShoutCast", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SOPCAST,
+			  no_master,
+			  no_master, "Sopcast", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TVANTS,
+			  no_master,
+			  no_master, "Tvants", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TVUPLAYER,
+			  no_master,
+			  no_master, "TVUplayer", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HTTP_DOWNLOAD,
+			  no_master,
+			  no_master, "HTTPDownload", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQLIVE,
+			  no_master,
+			  no_master, "QQLive", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_THUNDER,
+			  no_master,
+			  no_master, "Thunder", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SOULSEEK,
+			  no_master,
+			  no_master, "Soulseek", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_SSL, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSL_NO_CERT,
-			    custom_master,
-			    no_master, "SSL_No_Cert", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IRC,
-			    no_master,
-			    no_master, "IRC", NDPI_PROTOCOL_CATEGORY_CHAT,
-			    ndpi_build_default_ports(ports_a, 194, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 194, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AYIYA,
-			    no_master,
-			    no_master, "Ayiya", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 5072, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UNENCRYPED_JABBER,
-    			    no_master,
-    			    no_master, "Unencryped_Jabber", NDPI_PROTOCOL_CATEGORY_WEB,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OSCAR,
-    			    no_master,
-    			    no_master, "Oscar", NDPI_PROTOCOL_CATEGORY_CHAT,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_BATTLEFIELD,
-    			    no_master,
-    			    no_master, "BattleField", NDPI_PROTOCOL_CATEGORY_GAME,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QUAKE,
-			    no_master,
-			    no_master, "Quake", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_VRRP,
-			    no_master,
-			    no_master, "VRRP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_STEAM,
-			    no_master,
-			    no_master, "Steam", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HALFLIFE2,
-			    no_master,
-			    no_master, "HalfLife2", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WORLDOFWARCRAFT,
-			    no_master,
-			    no_master, "WorldOfWarcraft", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_HOTSPOT_SHIELD,
-			    no_master,
-			    no_master, "HotspotShield", NDPI_PROTOCOL_CATEGORY_VPN,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_TELNET,
-			    no_master,
-			    no_master, "Telnet", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 23, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  custom_master[0] = NDPI_PROTOCOL_SSL, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSL_NO_CERT,
+			  custom_master,
+			  no_master, "SSL_No_Cert", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IRC,
+			  no_master,
+			  no_master, "IRC", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 194, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 194, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AYIYA,
+			  no_master,
+			  no_master, "Ayiya", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 5072, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UNENCRYPED_JABBER,
+			  no_master,
+			  no_master, "Unencryped_Jabber", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OSCAR,
+			  no_master,
+			  no_master, "Oscar", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_BATTLEFIELD,
+			  no_master,
+			  no_master, "BattleField", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QUAKE,
+			  no_master,
+			  no_master, "Quake", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_VRRP,
+			  no_master,
+			  no_master, "VRRP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_STEAM,
+			  no_master,
+			  no_master, "Steam", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HALFLIFE2,
+			  no_master,
+			  no_master, "HalfLife2", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WORLDOFWARCRAFT,
+			  no_master,
+			  no_master, "WorldOfWarcraft", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_HOTSPOT_SHIELD,
+			  no_master,
+			  no_master, "HotspotShield", NDPI_PROTOCOL_CATEGORY_VPN,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_TELNET,
+			  no_master,
+			  no_master, "Telnet", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 23, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_SIP, custom_master[1] = NDPI_PROTOCOL_H323;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_STUN,
-    			    no_master,
-    			    custom_master, "STUN", NDPI_PROTOCOL_CATEGORY_NETWORK,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 3478, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_IP_IPSEC,
-			    no_master,
-			    no_master, "IPsec", NDPI_PROTOCOL_CATEGORY_VPN,
-			    ndpi_build_default_ports(ports_a, 500, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 500, 4500, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_GRE,
-			    no_master,
-			    no_master, "GRE", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_ICMP,
-			    no_master,
-			    no_master, "ICMP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_IGMP,
-			    no_master,
-			    no_master, "IGMP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_EGP,
-			    no_master,
-			    no_master, "EGP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_SCTP,
-			    no_master,
-			    no_master, "SCTP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_OSPF,
-			    no_master,
-			    no_master, "OSPF", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 2604, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_IP_IN_IP,
-			    no_master,
-			    no_master, "IP_in_IP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTP,
-    			    no_master,
-    			    no_master, "RTP", NDPI_PROTOCOL_CATEGORY_VOIP,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RDP,
-			    no_master,
-			    no_master, "RDP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 3389, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VNC,
-			    no_master,
-			    no_master, "VNC", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 5900, 5901, 5800, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PCANYWHERE,
-			    no_master,
-			    no_master, "PcAnywhere", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_VOICE,
-    			    no_master,
-    			    no_master, "WhatsAppVoice", NDPI_PROTOCOL_CATEGORY_VOIP,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  custom_master[0] = NDPI_PROTOCOL_SIP, custom_master[1] = NDPI_PROTOCOL_H323;
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_STUN,
+			  no_master,
+			  custom_master, "STUN", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 3478, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_IP_IPSEC,
+			  no_master,
+			  no_master, "IPsec", NDPI_PROTOCOL_CATEGORY_VPN,
+			  ndpi_build_default_ports(ports_a, 500, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 500, 4500, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_GRE,
+			  no_master,
+			  no_master, "GRE", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_ICMP,
+			  no_master,
+			  no_master, "ICMP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_IGMP,
+			  no_master,
+			  no_master, "IGMP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_EGP,
+			  no_master,
+			  no_master, "EGP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_SCTP,
+			  no_master,
+			  no_master, "SCTP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_OSPF,
+			  no_master,
+			  no_master, "OSPF", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 2604, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_IP_IN_IP,
+			  no_master,
+			  no_master, "IP_in_IP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTP,
+			  no_master,
+			  no_master, "RTP", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RDP,
+			  no_master,
+			  no_master, "RDP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 3389, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VNC,
+			  no_master,
+			  no_master, "VNC", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 5900, 5901, 5800, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PCANYWHERE,
+			  no_master,
+			  no_master, "PcAnywhere", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_VOICE,
+			  no_master,
+			  no_master, "WhatsAppVoice", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_SSL_NO_CERT, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_SSL,
-			    no_master,
-			    custom_master, "SSL", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 443, 3001 /* ntop */, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSH,
-			    no_master,
-			    no_master, "SSH", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 22, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_USENET,
-			    no_master,
-			    no_master, "Usenet", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MGCP,
-			    no_master,
-			    no_master, "MGCP", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IAX,
-    			    no_master,
-    			    no_master, "IAX", NDPI_PROTOCOL_CATEGORY_VOIP,
-    			    ndpi_build_default_ports(ports_a, 4569, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 4569, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AFP,
-    			    no_master,
-    			    no_master, "AFP", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_STEALTHNET,
-			    no_master,
-			    no_master, "Stealthnet", NDPI_PROTOCOL_CATEGORY_P2P,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_AIMINI,
-    			    no_master,
-    			    no_master, "Aimini", NDPI_PROTOCOL_CATEGORY_P2P,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SIP,
-			    no_master,
-			    no_master, "SIP", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 5060, 5061, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 5060, 5061, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TRUPHONE,
-			    no_master,
-			    no_master, "TruPhone", NDPI_PROTOCOL_CATEGORY_CHAT,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_ICMPV6,
-			    no_master,
-			    no_master, "ICMPV6", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DHCPV6,
-			    no_master,
-			    no_master, "DHCPV6", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ARMAGETRON,
-    			    no_master,
-    			    no_master, "Armagetron", NDPI_PROTOCOL_CATEGORY_GAME,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_CROSSFIRE,
-			    no_master,
-			    no_master, "Crossfire", NDPI_PROTOCOL_CATEGORY_RPC,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DOFUS,
-    			    no_master,
-    			    no_master, "Dofus", NDPI_PROTOCOL_CATEGORY_GAME,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNRATED, NDPI_PROTOCOL_FIESTA,
-			    no_master,
-			    no_master, "Fiesta", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FLORENSIA,
-    			    no_master,
-    			    no_master, "Florensia", NDPI_PROTOCOL_CATEGORY_GAME,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_GUILDWARS,
-			    no_master,
-			    no_master, "Guildwars", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC,
-			    no_master,
-			    no_master, "HTTP_Application_ActiveSync", NDPI_PROTOCOL_CATEGORY_CLOUD,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_KERBEROS,
-			    no_master,
-			    no_master, "Kerberos", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 88, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 88, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LDAP,
-			    no_master,
-			    no_master, "LDAP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-			    ndpi_build_default_ports(ports_a, 389, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 389, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MAPLESTORY,
-			    no_master,
-			    no_master, "MapleStory", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSSQL_TDS,
-			    no_master,
-			    no_master, "MsSQL-TDS", NDPI_PROTOCOL_CATEGORY_DATABASE,
-			    ndpi_build_default_ports(ports_a, 1433, 1434, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PPTP,
-			    no_master,
-			    no_master, "PPTP", NDPI_PROTOCOL_CATEGORY_VPN,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WARCRAFT3,
-			    no_master,
-			    no_master, "Warcraft3", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WORLD_OF_KUNG_FU,
-			    no_master,
-			    no_master, "WorldOfKungFu", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DCERPC,
-    			    no_master,
-    			    no_master, "DCE_RPC", NDPI_PROTOCOL_CATEGORY_RPC,
-    			    ndpi_build_default_ports(ports_a, 135, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NETFLOW,
-			    no_master,
-			    no_master, "NetFlow", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 2055, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SFLOW,
-			    no_master,
-			    no_master, "sFlow", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 6343, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_CONNECT,
-			    no_master,
-			    no_master, "HTTP_Connect", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_PROXY,
-			    no_master,
-			    no_master, "HTTP_Proxy", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 8080, 3128, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX,
-    			    no_master,
-    			    no_master, "Citrix", NDPI_PROTOCOL_CATEGORY_NETWORK,
-    			    ndpi_build_default_ports(ports_a, 1494, 2598, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_PREPAID,
-			    no_master,
-			    no_master, "SkyFile_PrePaid", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_RUDICS,
-			    no_master,
-			    no_master, "SkyFile_Rudics", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_POSTPAID,
-			    no_master,
-			    no_master, "SkyFile_PostPaid", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX_ONLINE,
-			    no_master,
-			    no_master, "Citrix_Online", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WEBEX,
-			    no_master,
-			    no_master, "Webex", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RADIUS,
-			    no_master,
-			    no_master, "Radius", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 1812, 1813, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 1812, 1813, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMVIEWER,
-    			    no_master,
-    			    no_master, "TeamViewer", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LOTUS_NOTES,
-    			    no_master,
-    			    no_master, "LotusNotes", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
-    			    ndpi_build_default_ports(ports_a, 1352, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SAP,
-			    no_master,
-			    no_master, "SAP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 3201, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GTP,
-    			    no_master,
-    			    no_master, "GTP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 2152, 2123, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UPNP,
-			    no_master,
-			    no_master, "UPnP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 1780, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 1900, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TELEGRAM,
-			    no_master,
-			    no_master, "Telegram", NDPI_PROTOCOL_CATEGORY_CHAT,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_QUIC,
-			    no_master,
-			    no_master, "QUIC", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 443, 80, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DROPBOX,
-			    no_master,
-			    no_master, "Dropbox", NDPI_PROTOCOL_CATEGORY_CLOUD,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 17500, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_EAQ,
-			    no_master,
-			    no_master, "EAQ", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 6000, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_KAKAOTALK_VOICE,
-    			    no_master,
-    			    no_master, "KakaoTalk_Voice", NDPI_PROTOCOL_CATEGORY_VOIP,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MPEGTS,
-			    no_master,
-			    no_master, "MPEG_TS", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    /* http://en.wikipedia.org/wiki/Link-local_Multicast_Name_Resolution */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LLMNR,
-			    no_master,
-			    no_master, "LLMNR", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 5355, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 5355, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_REMOTE_SCAN,
-			    no_master,
-			    no_master, "RemoteScan", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 6077, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 6078, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_WEBM,
-			    no_master,
-			    no_master, "WebM", NDPI_PROTOCOL_CATEGORY_MEDIA, /* Courtesy of Shreeram Ramamoorthy Swaminathan <shreeram <shreeram1985@yahoo.co.in> */
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_H323,
-			    no_master,
-			    no_master,"H323", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 1719, 1720, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 1719, 1720, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_OPENVPN,
-			    no_master,
-			    no_master, "OpenVPN", NDPI_PROTOCOL_CATEGORY_VPN,
-			    ndpi_build_default_ports(ports_a, 1194, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 1194, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NOE,
-			    no_master,
-			    no_master, "NOE", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_CISCOVPN,
-    			    no_master,
-    			    no_master, "CiscoVPN", NDPI_PROTOCOL_CATEGORY_VPN,
-    			    ndpi_build_default_ports(ports_a, 10000, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 10000, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMSPEAK,
-			    no_master,
-			    no_master, "TeamSpeak", NDPI_PROTOCOL_CATEGORY_CHAT,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKINNY,
-			    no_master,
-			    no_master, "CiscoSkinny", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 2000, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTCP,
-			    no_master,
-			    no_master, "RTCP", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RSYNC,
-			    no_master,
-			    no_master, "RSYNC", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
-			    ndpi_build_default_ports(ports_a, 873, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ORACLE,
-			    no_master,
-			    no_master, "Oracle", NDPI_PROTOCOL_CATEGORY_DATABASE,
-			    ndpi_build_default_ports(ports_a, 1521, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CORBA,
-    			    no_master,
-    			    no_master, "Corba", NDPI_PROTOCOL_CATEGORY_RPC,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-    			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UBUNTUONE,
-			    no_master,
-			    no_master, "UbuntuONE", NDPI_PROTOCOL_CATEGORY_CLOUD,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHOIS_DAS,
-			    no_master,
-			    no_master, "Whois-DAS", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 43, 4343, 0, 0, 0),      /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));         /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_COLLECTD,
-    			    no_master,
-    			    no_master, "Collectd", NDPI_PROTOCOL_CATEGORY_SYSTEM,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
-    			    ndpi_build_default_ports(ports_b, 25826, 0, 0, 0, 0));    /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOCKS,
-			    no_master,
-			    no_master, "SOCKS", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 1080, 0, 0, 0, 0),      /* TCP */
-			    ndpi_build_default_ports(ports_b, 1080, 0, 0, 0, 0));     /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TFTP,
-    			    no_master,
-    			    no_master, "TFTP", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
-    			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
-    			    ndpi_build_default_ports(ports_b, 69, 0, 0, 0, 0));       /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTMP,
-			    no_master,
-			    no_master, "RTMP", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 1935, 0, 0, 0, 0),      /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));        /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PANDO,
-			    no_master,
-			    no_master, "Pando_Media_Booster", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));        /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEGACO,
-			    no_master,
-			    no_master, "Megaco", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
-			    ndpi_build_default_ports(ports_b, 2944 , 0, 0, 0, 0));    /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_REDIS,
-			    no_master,
-			    no_master, "Redis", NDPI_PROTOCOL_CATEGORY_DATABASE,
-			    ndpi_build_default_ports(ports_a, 6379, 0, 0, 0, 0),      /* TCP */
-			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0));       /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZMQ,
-			    no_master,
-			    no_master, "ZeroMQ", NDPI_PROTOCOL_CATEGORY_RPC,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
-			    ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) );      /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_VHUA,
-			    no_master,
-			    no_master, "VHUA", NDPI_PROTOCOL_CATEGORY_VOIP,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
-			    ndpi_build_default_ports(ports_b, 58267, 0, 0, 0, 0));    /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_STARCRAFT,
-			    no_master,
-			    no_master, "Starcraft", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 1119, 0, 0, 0, 0),      /* TCP */
-			    ndpi_build_default_ports(ports_b, 1119, 0, 0, 0, 0));     /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_UBNTAC2,
-			    no_master,
-			    no_master, "UBNTAC2", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
-			    ndpi_build_default_ports(ports_b, 10001, 0, 0, 0, 0));    /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MS_LYNC,
-			    no_master,
-			    no_master, "Lync", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));	      /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER,
-			    no_master,
-			    no_master, "Viber", NDPI_PROTOCOL_CATEGORY_CHAT,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
-			    ndpi_build_default_ports(ports_b, 7985, 7987, 0, 0, 0));  /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_COAP,
-			    no_master,
-			    no_master, "COAP", NDPI_PROTOCOL_CATEGORY_RPC,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
-			    ndpi_build_default_ports(ports_b, 5683, 5684, 0, 0, 0));  /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MQTT,
-			    no_master,
-			    no_master, "MQTT", NDPI_PROTOCOL_CATEGORY_RPC,
-			    ndpi_build_default_ports(ports_a, 1883, 8883, 0, 0, 0),  /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));       /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RX,
-			    no_master,
-			    no_master, "RX", NDPI_PROTOCOL_CATEGORY_RPC,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),        /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));       /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GIT,
-			    no_master,
-			    no_master, "Git", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
-			    ndpi_build_default_ports(ports_a, 9418, 0, 0, 0, 0),    /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DRDA,
-			    no_master,
-			    no_master, "DRDA", NDPI_PROTOCOL_CATEGORY_DATABASE,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),       /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_HANGOUT,
-			    no_master,
-			    no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_CHAT,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BJNP,
-			    no_master,
-			    no_master, "BJNP", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_1KXUN,
-			    no_master,
-			    no_master, "1kxun", NDPI_PROTOCOL_CATEGORY_MEDIA,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),      /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));     /* UDP */
+  custom_master[0] = NDPI_PROTOCOL_SSL_NO_CERT, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_SSL,
+			  no_master,
+			  custom_master, "SSL", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 443, 3001 /* ntop */, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSH,
+			  no_master,
+			  no_master, "SSH", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 22, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_USENET,
+			  no_master,
+			  no_master, "Usenet", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MGCP,
+			  no_master,
+			  no_master, "MGCP", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IAX,
+			  no_master,
+			  no_master, "IAX", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 4569, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 4569, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AFP,
+			  no_master,
+			  no_master, "AFP", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_STEALTHNET,
+			  no_master,
+			  no_master, "Stealthnet", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_AIMINI,
+			  no_master,
+			  no_master, "Aimini", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SIP,
+			  no_master,
+			  no_master, "SIP", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 5060, 5061, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 5060, 5061, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TRUPHONE,
+			  no_master,
+			  no_master, "TruPhone", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_ICMPV6,
+			  no_master,
+			  no_master, "ICMPV6", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DHCPV6,
+			  no_master,
+			  no_master, "DHCPV6", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ARMAGETRON,
+			  no_master,
+			  no_master, "Armagetron", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_CROSSFIRE,
+			  no_master,
+			  no_master, "Crossfire", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DOFUS,
+			  no_master,
+			  no_master, "Dofus", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNRATED, NDPI_PROTOCOL_FIESTA,
+			  no_master,
+			  no_master, "Fiesta", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FLORENSIA,
+			  no_master,
+			  no_master, "Florensia", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_GUILDWARS,
+			  no_master,
+			  no_master, "Guildwars", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC,
+			  no_master,
+			  no_master, "HTTP_Application_ActiveSync", NDPI_PROTOCOL_CATEGORY_CLOUD,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_KERBEROS,
+			  no_master,
+			  no_master, "Kerberos", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 88, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 88, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LDAP,
+			  no_master,
+			  no_master, "LDAP", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 389, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 389, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MAPLESTORY,
+			  no_master,
+			  no_master, "MapleStory", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSSQL_TDS,
+			  no_master,
+			  no_master, "MsSQL-TDS", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 1433, 1434, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PPTP,
+			  no_master,
+			  no_master, "PPTP", NDPI_PROTOCOL_CATEGORY_VPN,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WARCRAFT3,
+			  no_master,
+			  no_master, "Warcraft3", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WORLD_OF_KUNG_FU,
+			  no_master,
+			  no_master, "WorldOfKungFu", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DCERPC,
+			  no_master,
+			  no_master, "DCE_RPC", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 135, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NETFLOW,
+			  no_master,
+			  no_master, "NetFlow", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 2055, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SFLOW,
+			  no_master,
+			  no_master, "sFlow", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 6343, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_CONNECT,
+			  no_master,
+			  no_master, "HTTP_Connect", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_PROXY,
+			  no_master,
+			  no_master, "HTTP_Proxy", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 8080, 3128, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX,
+			  no_master,
+			  no_master, "Citrix", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 1494, 2598, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_PREPAID,
+			  no_master,
+			  no_master, "SkyFile_PrePaid", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_RUDICS,
+			  no_master,
+			  no_master, "SkyFile_Rudics", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_POSTPAID,
+			  no_master,
+			  no_master, "SkyFile_PostPaid", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX_ONLINE,
+			  no_master,
+			  no_master, "Citrix_Online", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WEBEX,
+			  no_master,
+			  no_master, "Webex", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RADIUS,
+			  no_master,
+			  no_master, "Radius", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 1812, 1813, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 1812, 1813, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMVIEWER,
+			  no_master,
+			  no_master, "TeamViewer", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LOTUS_NOTES,
+			  no_master,
+			  no_master, "LotusNotes", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
+			  ndpi_build_default_ports(ports_a, 1352, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SAP,
+			  no_master,
+			  no_master, "SAP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 3201, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GTP,
+			  no_master,
+			  no_master, "GTP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 2152, 2123, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UPNP,
+			  no_master,
+			  no_master, "UPnP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 1780, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 1900, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TELEGRAM,
+			  no_master,
+			  no_master, "Telegram", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_QUIC,
+			  no_master,
+			  no_master, "QUIC", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 443, 80, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DROPBOX,
+			  no_master,
+			  no_master, "Dropbox", NDPI_PROTOCOL_CATEGORY_CLOUD,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 17500, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_EAQ,
+			  no_master,
+			  no_master, "EAQ", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 6000, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_KAKAOTALK_VOICE,
+			  no_master,
+			  no_master, "KakaoTalk_Voice", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MPEGTS,
+			  no_master,
+			  no_master, "MPEG_TS", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  /* http://en.wikipedia.org/wiki/Link-local_Multicast_Name_Resolution */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LLMNR,
+			  no_master,
+			  no_master, "LLMNR", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 5355, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 5355, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_REMOTE_SCAN,
+			  no_master,
+			  no_master, "RemoteScan", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 6077, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 6078, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_WEBM,
+			  no_master,
+			  no_master, "WebM", NDPI_PROTOCOL_CATEGORY_MEDIA, /* Courtesy of Shreeram Ramamoorthy Swaminathan <shreeram <shreeram1985@yahoo.co.in> */
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_H323,
+			  no_master,
+			  no_master,"H323", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 1719, 1720, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 1719, 1720, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_OPENVPN,
+			  no_master,
+			  no_master, "OpenVPN", NDPI_PROTOCOL_CATEGORY_VPN,
+			  ndpi_build_default_ports(ports_a, 1194, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 1194, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NOE,
+			  no_master,
+			  no_master, "NOE", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_CISCOVPN,
+			  no_master,
+			  no_master, "CiscoVPN", NDPI_PROTOCOL_CATEGORY_VPN,
+			  ndpi_build_default_ports(ports_a, 10000, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 10000, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMSPEAK,
+			  no_master,
+			  no_master, "TeamSpeak", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKINNY,
+			  no_master,
+			  no_master, "CiscoSkinny", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 2000, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTCP,
+			  no_master,
+			  no_master, "RTCP", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RSYNC,
+			  no_master,
+			  no_master, "RSYNC", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			  ndpi_build_default_ports(ports_a, 873, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ORACLE,
+			  no_master,
+			  no_master, "Oracle", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 1521, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CORBA,
+			  no_master,
+			  no_master, "Corba", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UBUNTUONE,
+			  no_master,
+			  no_master, "UbuntuONE", NDPI_PROTOCOL_CATEGORY_CLOUD,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHOIS_DAS,
+			  no_master,
+			  no_master, "Whois-DAS", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 43, 4343, 0, 0, 0),      /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));         /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_COLLECTD,
+			  no_master,
+			  no_master, "Collectd", NDPI_PROTOCOL_CATEGORY_SYSTEM,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			  ndpi_build_default_ports(ports_b, 25826, 0, 0, 0, 0));    /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOCKS,
+			  no_master,
+			  no_master, "SOCKS", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 1080, 0, 0, 0, 0),      /* TCP */
+			  ndpi_build_default_ports(ports_b, 1080, 0, 0, 0, 0));     /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TFTP,
+			  no_master,
+			  no_master, "TFTP", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			  ndpi_build_default_ports(ports_b, 69, 0, 0, 0, 0));       /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RTMP,
+			  no_master,
+			  no_master, "RTMP", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 1935, 0, 0, 0, 0),      /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));        /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PANDO,
+			  no_master,
+			  no_master, "Pando_Media_Booster", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));        /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEGACO,
+			  no_master,
+			  no_master, "Megaco", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			  ndpi_build_default_ports(ports_b, 2944 , 0, 0, 0, 0));    /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_REDIS,
+			  no_master,
+			  no_master, "Redis", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 6379, 0, 0, 0, 0),      /* TCP */
+			  ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0));       /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZMQ,
+			  no_master,
+			  no_master, "ZeroMQ", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			  ndpi_build_default_ports(ports_b, 0 , 0, 0, 0, 0) );      /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_VHUA,
+			  no_master,
+			  no_master, "VHUA", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			  ndpi_build_default_ports(ports_b, 58267, 0, 0, 0, 0));    /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_STARCRAFT,
+			  no_master,
+			  no_master, "Starcraft", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 1119, 0, 0, 0, 0),      /* TCP */
+			  ndpi_build_default_ports(ports_b, 1119, 0, 0, 0, 0));     /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_UBNTAC2,
+			  no_master,
+			  no_master, "UBNTAC2", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
+			  ndpi_build_default_ports(ports_b, 10001, 0, 0, 0, 0));    /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MS_LYNC,
+			  no_master,
+			  no_master, "Lync", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));	      /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER,
+			  no_master,
+			  no_master, "Viber", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
+			  ndpi_build_default_ports(ports_b, 7985, 7987, 0, 0, 0));  /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_COAP,
+			  no_master,
+			  no_master, "COAP", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),         /* TCP */
+			  ndpi_build_default_ports(ports_b, 5683, 5684, 0, 0, 0));  /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MQTT,
+			  no_master,
+			  no_master, "MQTT", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 1883, 8883, 0, 0, 0),  /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));       /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RX,
+			  no_master,
+			  no_master, "RX", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),        /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));       /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GIT,
+			  no_master,
+			  no_master, "Git", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
+			  ndpi_build_default_ports(ports_a, 9418, 0, 0, 0, 0),    /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DRDA,
+			  no_master,
+			  no_master, "DRDA", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),       /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_HANGOUT,
+			  no_master,
+			  no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_CHAT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BJNP,
+			  no_master,
+			  no_master, "BJNP", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_1KXUN,
+			  no_master,
+			  no_master, "1kxun", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),      /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));     /* UDP */
 
 
-    /* calling function for host and content matched protocols */
-    init_string_based_protocols(ndpi_mod);
+  /* calling function for host and content matched protocols */
+  init_string_based_protocols(ndpi_mod);
 
-    for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
-      if(ndpi_mod->proto_defaults[i].protoName == NULL) {
-	printf("[NDPI] %s(missing protoId=%d) INTERNAL ERROR: not all protocols have been initialized\n", __FUNCTION__, i);
-      }
+  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
+    if(ndpi_mod->proto_defaults[i].protoName == NULL) {
+      printf("[NDPI] %s(missing protoId=%d) INTERNAL ERROR: not all protocols have been initialized\n", __FUNCTION__, i);
     }
+  }
 }
 
 /* ****************************************************** */
@@ -1703,12 +1703,12 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   char *ptr = strrchr(value, '/');
 
   if (ptr)
-  {
-    ptr[0] = '\0';
-    ptr++;
-    if (atoi(ptr)>=0 && atoi(ptr)<=32)
-      bits = atoi(ptr);
-  }
+    {
+      ptr[0] = '\0';
+      ptr++;
+      if (atoi(ptr)>=0 && atoi(ptr)<=32)
+	bits = atoi(ptr);
+    }
 
   inet_pton(AF_INET, value, &pin);
 
@@ -1728,7 +1728,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
 {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   va_list args;
-  #define MAX_STR_LEN 120
+#define MAX_STR_LEN 120
   char str[MAX_STR_LEN];
   va_start(args, format);
   vsprintf(str, format, args);
@@ -1736,8 +1736,8 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
 
   if (ndpi_str != NULL) {
     char proto_name[64];
-	snprintf(proto_name, sizeof(proto_name), "%s", ndpi_get_proto_name(ndpi_str, proto));
-	printf("%s:%s:%u - Proto: %s, %s\n", ndpi_str->ndpi_debug_print_file, ndpi_str->ndpi_debug_print_function, ndpi_str->ndpi_debug_print_line, proto_name, str);
+    snprintf(proto_name, sizeof(proto_name), "%s", ndpi_get_proto_name(ndpi_str, proto));
+    printf("%s:%s:%u - Proto: %s, %s\n", ndpi_str->ndpi_debug_print_file, ndpi_str->ndpi_debug_print_function, ndpi_str->ndpi_debug_print_line, proto_name, str);
   } else {
     printf("Proto: %u, %s\n", proto, str);
   }
@@ -1746,7 +1746,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
 
 void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
+  ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
 #endif
 }
 
@@ -2103,7 +2103,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
         removeDefaultPort(&range, def, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
     } else if(is_ip) {
 #ifdef NDPI_PROTOCOL_TOR
-        ndpi_add_host_ip_subprotocol(ndpi_mod, value, subprotocol_id);
+      ndpi_add_host_ip_subprotocol(ndpi_mod, value, subprotocol_id);
 #endif
     } else {
       if(do_add)
@@ -3289,7 +3289,7 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
 					       u_int8_t l4_proto,
 					       struct ndpi_id_struct *src,
 					       u_int16_t sport,
-				       struct ndpi_id_struct *dst,
+					       struct ndpi_id_struct *dst,
 					       u_int16_t dport,
 					       const u_int64_t current_tick_l,
 					       u_int8_t *payload, u_int16_t payload_len) {
@@ -3409,24 +3409,24 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-      if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-	 && (flow->packet.l4_protocol == IPPROTO_TCP)
-	 && (flow->l4.tcp.ssl_stage > 1))
-	  flow->guessed_protocol_id = NDPI_PROTOCOL_SSL;
+    if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+       && (flow->packet.l4_protocol == IPPROTO_TCP)
+       && (flow->l4.tcp.ssl_stage > 1))
+      flow->guessed_protocol_id = NDPI_PROTOCOL_SSL;
       
-      ndpi_int_change_protocol(ndpi_struct, flow,
-			       flow->guessed_host_protocol_id,
-			       flow->guessed_protocol_id);
+    ndpi_int_change_protocol(ndpi_struct, flow,
+			     flow->guessed_host_protocol_id,
+			     flow->guessed_protocol_id);
   } else {
-      flow->detected_protocol_stack[1] = flow->guessed_protocol_id,
-	  flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
+    flow->detected_protocol_stack[1] = flow->guessed_protocol_id,
+      flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
       
-      if(flow->detected_protocol_stack[1] == flow->detected_protocol_stack[0])
-	  flow->detected_protocol_stack[1] = flow->guessed_host_protocol_id;
+    if(flow->detected_protocol_stack[1] == flow->detected_protocol_stack[0])
+      flow->detected_protocol_stack[1] = flow->guessed_host_protocol_id;
   }
   
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) && (flow->num_stun_udp_pkts > 0))
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STUN, flow->guessed_host_protocol_id);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STUN, flow->guessed_host_protocol_id);
 
   ret.master_protocol = flow->detected_protocol_stack[1], ret.protocol = flow->detected_protocol_stack[0];
 
@@ -3532,14 +3532,14 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.protocol = flow->guessed_protocol_id;
       return(ret);
     } else {
-	/*
-	  TODO
-	  The statement below at some point should be modified as we should not
-	  guess the protocol id unless users requested us to do that. Probably
-	  we need to modify the nDPI API as since we introduced ndpi_detection_giveup()
-	  we need to make some changes to have a consistent behaviour
-	 */
-	// flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
+      /*
+	TODO
+	The statement below at some point should be modified as we should not
+	guess the protocol id unless users requested us to do that. Probably
+	we need to modify the nDPI API as since we introduced ndpi_detection_giveup()
+	we need to make some changes to have a consistent behaviour
+      */
+      // flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
     }
 
     if(flow->packet.iph) {
@@ -4074,7 +4074,7 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct
       NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, lower_detected_protocol);
   }
 
- if(dst != NULL) {
+  if(dst != NULL) {
     NDPI_ADD_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, upper_detected_protocol);
 
     if(lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN)
@@ -4170,8 +4170,8 @@ void ndpi_int_reset_protocol(struct ndpi_flow_struct *flow) {
   }
 }
 
- void NDPI_PROTOCOL_IP_clear(ndpi_ip_addr_t * ip) {
-   memset(ip, 0, sizeof(ndpi_ip_addr_t));
+void NDPI_PROTOCOL_IP_clear(ndpi_ip_addr_t * ip) {
+  memset(ip, 0, sizeof(ndpi_ip_addr_t));
 }
 
 /* NTOP */
@@ -4440,64 +4440,64 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
   switch(category) {
   case NDPI_PROTOCOL_CATEGORY_MEDIA:
     return("Media");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_VPN:
     return("VPN");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_MAIL_SEND:
     return("EmailSend");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_MAIL_SYNC:
     return("EmailSync");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER:
     return("FileTransfer");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_WEB:
     return("Web");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK:
     return("SocialNetwork");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_P2P:
     return("P2P");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_GAME:
     return("Game");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_CHAT:
     return("Chat");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_VOIP:
     return("VoIP");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_DATABASE:
     return("Database");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS:
     return("RemoteAccess");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_CLOUD:
     return("Cloud");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_NETWORK:
     return("Network");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_COLLABORATIVE:
     return("Collaborative");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_RPC:
     return("RPC");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL:
     return("NetworkTool");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_SYSTEM:
     return("System");
-	break;
+    break;
   case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
     return("Unspecified");
-	break;
+    break;
   }
 
   return("Unspecified");
@@ -4506,7 +4506,7 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
 /* ****************************************************** */
 
 ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_struct *ndpi_mod,
-			 ndpi_protocol proto) {
+						 ndpi_protocol proto) {
   /* simple rule: sub protocol first, master after */
   if ((proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) ||
       (ndpi_mod->proto_defaults[proto.protocol].protoCategory != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED))
@@ -4615,11 +4615,11 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
 /* ****************************************************** */
 
 int ndpi_match_prefix(const u_int8_t *payload, size_t payload_len,
-    const char *str, size_t str_len)
+		      const char *str, size_t str_len)
 {
   return str_len <= payload_len
-          ? memcmp(payload, str, str_len) == 0
-          : 0;
+    ? memcmp(payload, str, str_len) == 0
+    : 0;
 }
 
 /* ****************************************************** */

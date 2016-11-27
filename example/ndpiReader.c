@@ -452,7 +452,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
  * @brief Unknown Proto Walker
  */
 static void node_print_unknown_proto_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-  
+
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
@@ -556,19 +556,19 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
  * @brief On Protocol Discover - call node_guess_undetected_protocol() for protocol
  */
 static void on_protocol_discovered(struct ndpi_workflow * workflow,
-        struct ndpi_flow_info * flow,
-        void * udata) {
-  
+				   struct ndpi_flow_info * flow,
+				   void * udata) {
+
   const u_int16_t thread_id = (uintptr_t) udata;
 
   if(verbose > 1){
     if(enable_protocol_guess) {
       if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
         flow->detected_protocol.protocol = node_guess_undetected_protocol(thread_id, flow),
-        flow->detected_protocol.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+	  flow->detected_protocol.master_protocol = NDPI_PROTOCOL_UNKNOWN;
       }
     }
-    
+
     printFlow(thread_id, flow);
   }
 }
@@ -609,7 +609,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
     printf("%s", out_buf);
     fflush(stdout);
   }
-  
+
   va_end(va_ap);
 }
 #endif
@@ -656,7 +656,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
  * @brief End of detection and free flow
  */
 static void terminateDetection(u_int16_t thread_id) {
-  
+
   ndpi_workflow_free(ndpi_thread_info[thread_id].workflow);
 }
 
@@ -773,7 +773,7 @@ static void printResults(u_int64_t tot_usec) {
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
 
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    if((ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0) 
+    if((ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0)
        && (ndpi_thread_info[thread_id].workflow->stats.raw_packet_count == 0))
       continue;
 
@@ -898,7 +898,7 @@ static void printResults(u_int64_t tot_usec) {
     }
 #endif
   }
-  
+
   if((!json_flag) && (!quiet_mode)) printf("\n\nDetected protocols:\n");
   for(i = 0; i <= ndpi_get_num_supported_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {
     ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].workflow->ndpi_struct, i);
@@ -1017,9 +1017,9 @@ static void breakPcapLoop(u_int16_t thread_id) {
 
 /**
  * @brief Sigproc is executed for each packet in the pcap file
- */ 
+ */
 void sigproc(int sig) {
-  
+
   static int called = 0;
   int thread_id;
 
@@ -1033,7 +1033,7 @@ void sigproc(int sig) {
 
 /**
  * @brief Get the next pcap file from a passed playlist
- */ 
+ */
 static int getNextPcapFileFromPlaylist(u_int16_t thread_id, char filename[], u_int32_t filename_len) {
 
   if(playlist_fp[thread_id] == NULL) {
@@ -1057,7 +1057,7 @@ static int getNextPcapFileFromPlaylist(u_int16_t thread_id, char filename[], u_i
 
 /**
  * @brief Configure the pcap handle
- */ 
+ */
 static void configurePcapHandle(pcap_t * pcap_handle) {
 
   if(_bpf_filter != NULL) {
@@ -1077,7 +1077,7 @@ static void configurePcapHandle(pcap_t * pcap_handle) {
 
 /**
  * @brief Open a pcap file or a specified device - Always returns a valid pcap_t
- */ 
+ */
 static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_file) {
 
   u_int snaplen = 1536;
@@ -1131,10 +1131,10 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
 
 /**
  * @brief Check pcap packet
- */ 
+ */
 static void pcap_packet_callback_checked(u_char *args,
-				 const struct pcap_pkthdr *header,
-				 const u_char *packet) {
+					 const struct pcap_pkthdr *header,
+					 const u_char *packet) {
 
   u_int16_t thread_id = *((u_int16_t*)args);
 
@@ -1166,8 +1166,8 @@ static void pcap_packet_callback_checked(u_char *args,
 
 	/* search and delete the idle flow from the "ndpi_flow_root" (see struct reader thread) - here flows are the node of a b-tree */
 	ndpi_tdelete(ndpi_thread_info[thread_id].idle_flows[--ndpi_thread_info[thread_id].num_idle_flows],
-        &ndpi_thread_info[thread_id].workflow->ndpi_flows_root[ndpi_thread_info[thread_id].idle_scan_idx],
-        ndpi_workflow_node_cmp);
+		     &ndpi_thread_info[thread_id].workflow->ndpi_flows_root[ndpi_thread_info[thread_id].idle_scan_idx],
+		     ndpi_workflow_node_cmp);
 
 	/* free the memory associated to idle flow in "idle_flows" - (see struct reader thread)*/
 	ndpi_free_flow_info_half(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
@@ -1201,7 +1201,7 @@ static void runPcapLoop(u_int16_t thread_id) {
  * @brief Process a running thread
  */
 void * processing_thread(void *_thread_id) {
-  
+
   long thread_id = (long) _thread_id;
   char pcap_error_buffer[PCAP_ERRBUF_SIZE];
 
@@ -1287,13 +1287,13 @@ void automataUnitTest() {
   assert(ndpi_add_string_to_automa(automa, "world") == 0);
   ndpi_finalize_automa(automa);
   assert(ndpi_match_string(automa, "This is the wonderful world of nDPI") == 0);
-  
+
   ndpi_free_automa(automa);
 }
 
 /**
    @brief MAIN FUNCTION
- **/
+**/
 int main(int argc, char **argv) {
 
   int i;
@@ -1339,7 +1339,7 @@ int main(int argc, char **argv) {
 
 /**
    @brief Timezone
- **/
+**/
 struct timezone {
   int tz_minuteswest; /* minutes W of Greenwich */
   int tz_dsttime;     /* type of dst correction */
@@ -1348,7 +1348,7 @@ struct timezone {
 
 /**
    @brief Set time
- **/
+**/
 int gettimeofday(struct timeval *tv, struct timezone *tz) {
   FILETIME        ft;
   LARGE_INTEGER   li;
