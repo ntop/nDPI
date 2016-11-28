@@ -1,13 +1,26 @@
 language: c
 
+os:
+  - osx
+  - linux
+
 compiler:
   - clang
   - gcc
 
+matrix:
+  exclude:
+  # osx use always clang for build...
+  - os: osx
+    compiler: gcc
+
 install: 
-  - sudo apt-get update || true
-  - sudo apt-get install build-essential
-  - sudo apt-get install libpcap-dev libtool autoconf automake autogen
+#macos 
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+#linux
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update || true; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install build-essential; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install libpcap-dev libtool autoconf automake autogen; fi 
 
 before_script:
   - ./autogen.sh
