@@ -8,10 +8,15 @@ compiler:
   - clang
   - gcc
 
+matrix:
+  exclude:
+  # osx use always clang for build...
+  - os: osx
+    compiler: gcc
+
 install: 
 #macos 
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-#  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libtool; fi
 #linux
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update || true; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install build-essential; fi
