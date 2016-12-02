@@ -436,7 +436,13 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 
 /* ****************************************************** */
 
-// ipsize = header->len - ip_offset ; rawsize = header->len
+/**
+   Function to process the packet:
+   determine the flow of a packet and try to decode it
+   @return: 0 if success; else != 0
+   
+   @Note: ipsize = header->len - ip_offset ; rawsize = header->len
+*/
 static unsigned int packet_processing(struct ndpi_workflow * workflow,
 				      const u_int64_t time,
 				      u_int16_t vlan_id,

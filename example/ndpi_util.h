@@ -26,7 +26,6 @@
  *
  * WARNING: this API is unstable! Use it at your own risk!
  */
-
 #ifndef __NDPI_UTIL_H__
 #define __NDPI_UTIL_H__
 
@@ -126,7 +125,7 @@ typedef struct ndpi_workflow {
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle);
 
 
-// workflow main free function
+ /* workflow main free function */
 void ndpi_workflow_free(struct ndpi_workflow * workflow);
 
 
@@ -137,7 +136,7 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow);
 void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 
 
-/** Process a @packet and update the @workflow.  */
+/* Process a packet and update the workflow  */
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				   const struct pcap_pkthdr *header,
 				   const u_char *packet);
@@ -157,21 +156,7 @@ static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow *
   workflow->__flow_giveup_udata = udata;
 }
 
-// ompare two nodes in workflow
+ /* compare two nodes in workflow */
 int ndpi_workflow_node_cmp(const void *a, const void *b);
-
-
-/**
-   Function to process the packet:
-   determine the flow of a packet and try to decode it
-   @return: 0 if success; else != 0
-*/
-static unsigned int packet_processing(struct ndpi_workflow * workflow,
-				      const u_int64_t time,
-				      u_int16_t vlan_id,
-				      const struct ndpi_iphdr *iph,
-				      struct ndpi_ipv6hdr *iph6,
-				      u_int16_t ip_offset,
-				      u_int16_t ipsize, u_int16_t rawsize);
 
 #endif
