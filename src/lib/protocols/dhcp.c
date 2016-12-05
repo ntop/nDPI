@@ -80,6 +80,8 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 	u_int8_t id  = dhcp->options[i];
 	u_int8_t len = dhcp->options[i+1];
 
+	if(len == 0) break;
+	
 #ifdef DHCP_DEBUG
 	printf("[DHCP] Id=%d [len=%d]\n", id, len);
 #endif
