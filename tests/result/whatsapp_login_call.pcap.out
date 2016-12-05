@@ -44,7 +44,7 @@ WhatsAppVoice	706	91156	4
 	30	UDP 192.168.2.4:52794 <-> 31.13.79.192:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
 	31	TCP 192.168.2.4:49173 <-> 93.186.135.82:80 [proto: 7/HTTP][3 pkts/198 bytes]
 	32	TCP 192.168.2.4:49194 <-> 93.62.150.157:443 [proto: 91/SSL][3 pkts/198 bytes]
-	33	UDP 0.0.0.0:68 <-> 255.255.255.255:67 [proto: 18/DHCP][10 pkts/3420 bytes]
+	33	UDP 0.0.0.0:68 <-> 255.255.255.255:67 [proto: 18/DHCP][10 pkts/3420 bytes][Host: lucas-imac]
 	34	UDP 192.168.2.4:51518 <-> 91.253.176.65:9344 [proto: 189/WhatsAppVoice][464 pkts/52920 bytes]
 	35	TCP 192.168.2.4:49202 <-> 184.173.179.37:5222 [proto: 142/WhatsApp][180 pkts/24874 bytes]
 	36	UDP 192.168.2.1:57621 <-> 192.168.2.255:57621 [proto: 156/Spotify][3 pkts/258 bytes]
