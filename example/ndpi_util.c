@@ -212,7 +212,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     Note: to keep things simple (ndpiReader is just a demo app)
     we handle IPv6 a-la-IPv4.
   */
-  if(version == 4) {
+  if(version == IPVERSION) {
     if(ipsize < 20)
       return NULL;
 
@@ -254,7 +254,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   *proto = iph->protocol;
   l4 = ((u_int8_t *) l3 + l4_offset);
 
-  if(iph->protocol == 6 && l4_packet_len >= 20) {
+  if(iph->protocol == IPPROTO_TCP && l4_packet_len >= 20) {
     u_int tcp_len;
 
     workflow->stats.tcp_count++;
@@ -284,7 +284,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
     *payload = &l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
-  } else if(iph->protocol == 17 && l4_packet_len >= 8) {
+  } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
     // udp
     workflow->stats.udp_count++;
 
@@ -347,7 +347,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->lower_port = lower_port, newflow->upper_port = upper_port;
       newflow->ip_version = version;
 
-      if(version == 4) {
+      if(version == IPVERSION) {
 	inet_ntop(AF_INET, &lower_ip, newflow->lower_name, sizeof(newflow->lower_name));
 	inet_ntop(AF_INET, &upper_ip, newflow->upper_name, sizeof(newflow->upper_name));
       } else {
@@ -416,12 +416,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   struct ndpi_iphdr iph;
 
   memset(&iph, 0, sizeof(iph));
-  iph.version = 4;
+  iph.version = IPVERSION;
   iph.saddr = iph6->ip6_src.u6_addr.u6_addr32[2] + iph6->ip6_src.u6_addr.u6_addr32[3];
   iph.daddr = iph6->ip6_dst.u6_addr.u6_addr32[2] + iph6->ip6_dst.u6_addr.u6_addr32[3];
   iph.protocol = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
 
-  if(iph.protocol == 0x3C /* IPv6 destination option */) {
+  if(iph.protocol == IPPROTO_DSTOPTS /* IPv6 destination option */) {
     u_int8_t *options = (u_int8_t*)iph6 + sizeof(const struct ndpi_ipv6hdr);
 
     iph.protocol = options[0];
@@ -461,7 +461,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   u_int8_t src_to_dst_direction= 1;
 
   if(iph)
-    flow = get_ndpi_flow_info(workflow, 4, vlan_id, iph, NULL,
+    flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id, iph, NULL,
 			      ip_offset, ipsize,
 			      ntohs(iph->tot_len) - (iph->ihl * 4),
 			      &tcph, &udph, &sport, &dport,
@@ -510,7 +510,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   if(flow->detected_protocol.protocol == NDPI_PROTOCOL_BITTORRENT) {
     int i, j, n = 0;
 
-    for(i=0, j = 0; i<20; i++) {
+    for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
       sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
       j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
     }
@@ -748,11 +748,11 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     }
   }
 
-  if(iph->version == 4) {
+  if(iph->version == IPVERSION) {
     ip_len = ((u_int16_t)iph->ihl * 4);
     iph6 = NULL;
 
-    if(iph->protocol == 41) {
+    if(iph->protocol == IPPROTO_IPV6) {
       ip_offset += ip_len;
       goto iph_check;
     }
@@ -775,7 +775,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     proto = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
     ip_len = sizeof(struct ndpi_ipv6hdr);
 
-    if(proto == 0x3C /* IPv6 destination option */) {
+    if(proto == IPPROTO_DSTOPTS /* IPv6 destination option */) {
 
       u_int8_t *options = (u_int8_t*)&packet[ip_offset+ip_len];
       proto = options[0];
@@ -816,7 +816,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
 	iph = (struct ndpi_iphdr *) &packet[ip_offset];
 
-	if(iph->version != 4) {
+	if(iph->version != IPVERSION) {
 	  // printf("WARNING: not good (packet_id=%u)!\n", (unsigned int)workflow->stats.raw_packet_count);
 	  goto v4_warning;
 	}
