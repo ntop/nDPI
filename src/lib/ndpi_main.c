@@ -2786,7 +2786,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 
   iph = (const struct ndpi_iphdr *) l3;
 
-  if(iph->version == 4 && iph->ihl >= 5) {
+  if(iph->version == IPVERSION && iph->ihl >= 5) {
     NDPI_LOG(NDPI_PROTOCOL_UNKNOWN, ndpi_struct, NDPI_LOG_DEBUG, "ipv4 header\n");
   }
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
@@ -2902,7 +2902,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   }
 #endif							/* NDPI_DETECTION_SUPPORT_IPV6 */
 
-  if(decaps_iph && decaps_iph->version == 4 && decaps_iph->ihl >= 5) {
+  if(decaps_iph && decaps_iph->version == IPVERSION && decaps_iph->ihl >= 5) {
     NDPI_LOG(NDPI_PROTOCOL_UNKNOWN, ndpi_struct, NDPI_LOG_DEBUG, "ipv4 header\n");
   }
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
@@ -2941,7 +2941,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.l4_packet_len = l4len;
 
   /* tcp / udp detection */
-  if(l4protocol == 6 /* TCP */  &&flow->packet.l4_packet_len >= 20 /* min size of tcp */ ) {
+  if(l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */ ) {
     /* tcp */
     flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
 
@@ -2969,7 +2969,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
       /* tcp header not complete */
       flow->packet.tcp = NULL;
     }
-  } else if(l4protocol == 17 /* udp */  &&flow->packet.l4_packet_len >= 8 /* size of udp */ ) {
+  } else if(l4protocol == IPPROTO_UDP && flow->packet.l4_packet_len >= 8 /* size of udp */ ) {
     flow->packet.udp = (struct ndpi_udphdr *) l4ptr;
     flow->packet.payload_packet_len =flow->packet.l4_packet_len - 8;
     flow->packet.payload = ((u_int8_t *)flow->packet.udp) + 8;

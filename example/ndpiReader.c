@@ -675,10 +675,10 @@ char* formatTraffic(float numBits, int bits, char *buf) {
 
   if(numBits < 1024) {
     snprintf(buf, 32, "%lu %c", (unsigned long)numBits, unit);
-  } else if(numBits < 1048576) {
+  } else if(numBits < (1024*1024)) {
     snprintf(buf, 32, "%.2f K%c", (float)(numBits)/1024, unit);
   } else {
-    float tmpMBits = ((float)numBits)/1048576;
+    float tmpMBits = ((float)numBits)/(1024*1024);
 
     if(tmpMBits < 1024) {
       snprintf(buf, 32, "%.2f M%c", tmpMBits, unit);
@@ -704,10 +704,10 @@ char* formatPackets(float numPkts, char *buf) {
 
   if(numPkts < 1000) {
     snprintf(buf, 32, "%.2f", numPkts);
-  } else if(numPkts < 1000000) {
+  } else if(numPkts < (1000*1000)) {
     snprintf(buf, 32, "%.2f K", numPkts/1000);
   } else {
-    numPkts /= 1000000;
+    numPkts /= (1000*1000);
     snprintf(buf, 32, "%.2f M", numPkts);
   }
 
@@ -735,10 +735,10 @@ char* formatBytes(u_int32_t howMuch, char *buf, u_int buf_len) {
 
   if(howMuch < 1024) {
     snprintf(buf, buf_len, "%lu %c", (unsigned long)howMuch, unit);
-  } else if(howMuch < 1048576) {
+  } else if(howMuch < (1024*1024)) {
     snprintf(buf, buf_len, "%.2f K%c", (float)(howMuch)/1024, unit);
   } else {
-    float tmpGB = ((float)howMuch)/1048576;
+    float tmpGB = ((float)howMuch)/(1024*1024);
 
     if(tmpGB < 1024) {
       snprintf(buf, buf_len, "%.2f M%c", tmpGB, unit);
@@ -801,7 +801,7 @@ static void printResults(u_int64_t tot_usec) {
     cumulative_stats.pppoe_count += ndpi_thread_info[thread_id].workflow->stats.pppoe_count;
     cumulative_stats.vlan_count  += ndpi_thread_info[thread_id].workflow->stats.vlan_count;
     cumulative_stats.fragmented_count += ndpi_thread_info[thread_id].workflow->stats.fragmented_count;
-    for(i = 0; i < 6; i++)
+    for(i = 0; i < sizeof(cumulative_stats.packet_len)/sizeof(cumulative_stats.packet_len[0]); i++)
       cumulative_stats.packet_len[i] += ndpi_thread_info[thread_id].workflow->stats.packet_len[i];
     cumulative_stats.max_packet_len += ndpi_thread_info[thread_id].workflow->stats.max_packet_len;
   }
