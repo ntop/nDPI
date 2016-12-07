@@ -38,6 +38,8 @@
 
 #define _WS2TCPIP_H_ /* Avoid compilation problems */
 
+#define	IPVERSION	4 /* on *nix it is defined in netinet/ip.h */ 
+
 extern char* strsep(char **sp, const char *sep);
 
 typedef unsigned char  u_char;
