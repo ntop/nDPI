@@ -4144,11 +4144,17 @@ void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow,
 			      u_int16_t upper_detected_protocol,
 			      u_int16_t lower_detected_protocol) {
+  if((upper_detected_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && (lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN))
+    upper_detected_protocol = lower_detected_protocol;
+  
   if(upper_detected_protocol == lower_detected_protocol)
     lower_detected_protocol = NDPI_PROTOCOL_UNKNOWN;
-
-  ndpi_int_change_flow_protocol(ndpi_struct, flow, upper_detected_protocol, lower_detected_protocol);
-  ndpi_int_change_packet_protocol(ndpi_struct, flow, upper_detected_protocol, lower_detected_protocol);
+  
+  ndpi_int_change_flow_protocol(ndpi_struct, flow,
+				upper_detected_protocol, lower_detected_protocol);
+  ndpi_int_change_packet_protocol(ndpi_struct, flow,
+				  upper_detected_protocol, lower_detected_protocol);
 }
 
 
