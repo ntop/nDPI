@@ -7379,6 +7379,12 @@ static ndpi_network host_protocol_list[] = {
   */
   { 0xC01EFC00 /* 192.30.252.0/22 */, 22, NDPI_SERVICE_GITHUB },
 
+  /*
+    Steam
+    162.254.192.0/21
+  */	
+  { 0xA2FEC000 /* 162.254.192.0/21 */, 21, NDPI_PROTOCOL_STEAM },
+  
   { 0x0, 0, 0 }
 };
 
@@ -7578,6 +7584,8 @@ ndpi_protocol_match host_match[] = {
   { ".pps.tv",				"PPStream",     	NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".1kxun.",				"1kxun",		NDPI_SERVICE_1KXUN, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "tcad.wedolook.com",		"1kxun",		NDPI_SERVICE_1KXUN, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+
+  { ".steampowered.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
   { NULL, 0 }
 };
