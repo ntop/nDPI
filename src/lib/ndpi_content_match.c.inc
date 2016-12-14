@@ -49,8 +49,8 @@ static ndpi_network host_protocol_list[] = {
     66.220.144.0/20
     66.220.152.0/21
     204.15.20.0/22
-    
-    
+
+
  */
    { 0x1F0D1800 /* 31.13.24.0/21 */, 21, NDPI_SERVICE_FACEBOOK },
    { 0x1F0D4000 /* 31.13.64.0/18 */, 18, NDPI_SERVICE_FACEBOOK },
@@ -76,7 +76,7 @@ static ndpi_network host_protocol_list[] = {
    { 0x42DC9000 /* 66.220.144.0/20 */, 20, NDPI_SERVICE_FACEBOOK },
    { 0x45DC9800 /* 69.220.152.0/21 */, 21, NDPI_SERVICE_FACEBOOK },
    { 0xCC0F1400 /* 204.15.20.0/22 */, 22, NDPI_SERVICE_FACEBOOK },
-   
+
 
  /*
     Twitter
@@ -134,7 +134,7 @@ static ndpi_network host_protocol_list[] = {
  */
    { 0xD043D800 /* 208.67.216.0/21 */, 21, NDPI_SERVICE_OPENDNS },
 
- /*   
+ /*
     Microsoft Corporation (MS One Drive)
     204.79.195.0/24
     204.79.196.0/23
@@ -142,7 +142,7 @@ static ndpi_network host_protocol_list[] = {
     131.253.12.0/22
     131.253.16.0/23
     131.253.18.0/24
-    65.54.191.0/24 
+    65.54.191.0/24
   */
   { 0xCC4FC300 /* 204.79.195.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
   { 0xCC4FC400 /* 204.79.196.0/23 */, 23, NDPI_SERVICE_MS_ONE_DRIVE },
@@ -152,30 +152,30 @@ static ndpi_network host_protocol_list[] = {
   { 0x83FD1200 /* 131.253.18.0/24 */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
   { 0x4136BF00 /* 65.54.191.0/24   */, 24, NDPI_SERVICE_MS_ONE_DRIVE },
 
- /*    
+ /*
     Amazon-EU-AWS Elastic Compute Cloud, EC2 (also used by Netflix)
     46.137.128.0/18
   */
   { 0x2E898000 /* 46.137.128.0/18 */, 18, NDPI_SERVICE_AMAZON },
-  
- /*    
+
+ /*
     Amazon-EU (also used by Netflix)
     176.34.184.0/21
   */
   { 0xB022B800 /* 176.34.184.0/21 */, 21, NDPI_SERVICE_AMAZON },
 
- /*    
+ /*
     Netflix
     23.246.0.0/18
     23.21.190.124/32
     69.53.224.0/19
-    
+
   */
   { 0x17F60000 /* 23.246.0.0/18 */, 18, NDPI_SERVICE_NETFLIX },
   { 0x1715BE7C /* 23.21.190.124/32 */, 32, NDPI_SERVICE_NETFLIX },
   { 0x4535E000 /* 69.53.224.0/19 */, 19, NDPI_SERVICE_NETFLIX },
 
-  /*    
+  /*
     Cloudflare
     104.16.0.0/12
     173.245.48.0/20
@@ -187,7 +187,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xA29E0000 /* 162.158.0.0/15 */, 15, NDPI_SERVICE_CLOUDFLARE },
   { 0x8D657D00 /* 141.101.125.0/24 */, 24, NDPI_SERVICE_CLOUDFLARE },
 
- /*    
+ /*
     OFFICE 365
     13.107.1.0/24
     13.107.3.0/24
@@ -213,7 +213,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x0D6B0F00 /* 13.107.15.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
   { 0x0D6B1000 /* 13.107.16.0 */, 24 , NDPI_SERVICE_OFFICE_365 },
 
-  /*    
+  /*
     OCS GO (Orange Cinéma Séries)
     178.248.208.0/21
   */
@@ -221,7 +221,7 @@ static ndpi_network host_protocol_list[] = {
 
   /*
    IFLIX services -by www.vizuamatix.com R&D team
-    52.77.0.0/16 
+    52.77.0.0/16
     52.220.0.0/16
     52.74.0.0/16
     54.230.159.0/24
@@ -230,7 +230,7 @@ static ndpi_network host_protocol_list[] = {
     54.192.150.0/24
     52.74.192.247/32
     2.21.231.24/32
-    */   
+    */
     { 0x344D0000 /* 52.77.0.0 */, 16, NDPI_SERVICE_IFLIX },
     { 0x34DC0000 /* 52.220.0.0 */, 16, NDPI_SERVICE_IFLIX },
     { 0x344A0000 /* 52.74.0.0 */, 16, NDPI_SERVICE_IFLIX },
@@ -287,7 +287,7 @@ static ndpi_network host_protocol_list[] = {
     Skype (Microsoft CDN)
     157.56.135.64/26, 157.56.185.0/26, 157.56.52.0/26,
     157.56.53.128/25, 157.56.198.0/26
-    157.60.0.0/16, 157.54.0.0/15	
+    157.60.0.0/16, 157.54.0.0/15
     13.107.3.128/32
     13.107.3.129/32
     111.221.64.0 - 111.221.127.255
@@ -304,13 +304,13 @@ static ndpi_network host_protocol_list[] = {
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
   { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
   { 0x0D6B0380 /* 13.107.3.128 */, 32, NDPI_PROTOCOL_SKYPE },
-  { 0x0D6B0381 /* 13.107.3.129 */, 32, NDPI_PROTOCOL_SKYPE },	
+  { 0x0D6B0381 /* 13.107.3.129 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
   { 0x5BBED800 /* 91.190.216.0 */, 21, NDPI_PROTOCOL_SKYPE },
   { 0x5BBEDA00 /* 91.190.218.0 */, 24, NDPI_PROTOCOL_SKYPE },
   { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
-  
+
   /*
     route:          5.42.160.0/19
     descr:          Blizzard Entertainment, Inc
@@ -329,7 +329,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x4A7D0000 /* 74.125.0.0  */, 16, NDPI_SERVICE_GOOGLE },
   { 0x40E91600 /* 64.233.160.0 */, 19, NDPI_SERVICE_GOOGLE },
   { 0xD83AC000 /* 216.58.192.0 */, 19, NDPI_SERVICE_GOOGLE },
-  
+
   /*
     Ubuntu One
     91.189.89.0/21 (255.255.248.0)
@@ -7380,11 +7380,27 @@ static ndpi_network host_protocol_list[] = {
   { 0xC01EFC00 /* 192.30.252.0/22 */, 22, NDPI_SERVICE_GITHUB },
 
   /*
-    Steam
-    162.254.192.0/21
-  */	
+    Valve Corporation (Steam)
+    origin AS32590
+  */
+  { 0x2D79B800 /* 45.121.184.0/22 */, 22, NDPI_PROTOCOL_STEAM },
+  { 0x670A7C00 /* 103.10.124.0/23 */, 23, NDPI_PROTOCOL_STEAM },
+  { 0x671C3600 /* 103.28.54.0/23 */, 23, NDPI_PROTOCOL_STEAM },
+  { 0x8F899200 /* 143.137.146.0/24 */, 24, NDPI_PROTOCOL_STEAM },
+  { 0x92429800 /* 146.66.152.0/21 */, 21, NDPI_PROTOCOL_STEAM },
+  { 0x99FE5600 /* 153.254.86.0/24 */, 24, NDPI_PROTOCOL_STEAM },
+  { 0x9B85E000 /* 155.133.224.0/19 */, 19, NDPI_PROTOCOL_STEAM },
   { 0xA2FEC000 /* 162.254.192.0/21 */, 21, NDPI_PROTOCOL_STEAM },
-  
+  { 0xB919B400 /* 185.25.180.0/22 */, 22, NDPI_PROTOCOL_STEAM },
+  { 0xBED87900 /* 190.216.121.0/24 */, 24, NDPI_PROTOCOL_STEAM },
+  { 0xBED92100 /* 190.217.33.0/24 */, 24, NDPI_PROTOCOL_STEAM },
+  { 0xC0456000 /* 192.69.96.0/22 */, 22, NDPI_PROTOCOL_STEAM },
+  { 0xCDB9C200 /* 205.185.194.0/24 */, 24, NDPI_PROTOCOL_STEAM },
+  { 0xCDC40600 /* 205.196.6.0/24 */, 24, NDPI_PROTOCOL_STEAM },
+  { 0xD040C800 /* 208.64.200.0/24 */, 24, NDPI_PROTOCOL_STEAM },
+  { 0xD040C900 /* 208.64.201.0/22 */, 22, NDPI_PROTOCOL_STEAM },
+  { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
+
   { 0x0, 0, 0 }
 };
 
@@ -7491,7 +7507,7 @@ ndpi_protocol_match host_match[] = {
   { ".sinajs.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".sina.cn",				"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".sina.com.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  
+
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice-hrd.appspot.com",     "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
@@ -7526,14 +7542,14 @@ ndpi_protocol_match host_match[] = {
   { "hotspotshield.com",                "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
   { ".webex.com",                       "Webex",                NDPI_PROTOCOL_WEBEX, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".ocsdomain.com",        		"OCS",          	NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
-  { "ocs.fr",               		"OCS",   		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },   
+  { "ocs.fr",               		"OCS",   		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
   { ".ocs.fr",              		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
   { ".labgency.ws",        		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
 
   { ".iflix.com",        		"IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".app.iflixcorp.com",        	"IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".images.iflixassets.com",          "IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
-  
+
   { "crl.microsoft.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-ocsp.verisign.com",	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "evsecure-aia.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7568,7 +7584,7 @@ ndpi_protocol_match host_match[] = {
   { "slack-redir.net",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-",                "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
-  
+
   { "github.com",                       "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".github.com",                      "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "github.io",                        "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -7579,13 +7595,17 @@ ndpi_protocol_match host_match[] = {
   { ".iqiyi.com",			"iQIYI",     		NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".qiyi.com",			"iQIYI",     		NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".71.am",			     	"iQIYI",     		NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
-  { ".qiyipic.com",			"iQIYI",	     	NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },	
+  { ".qiyipic.com",			"iQIYI",	     	NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".ppstream.com",			"PPStream",     	NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".pps.tv",				"PPStream",     	NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".1kxun.",				"1kxun",		NDPI_SERVICE_1KXUN, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "tcad.wedolook.com",		"1kxun",		NDPI_SERVICE_1KXUN, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { ".steampowered.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { "steamcommunity.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { ".steamcontent.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { ".steamstatic.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { "steamcommunity-a.akamaihd.net",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
   { NULL, 0 }
 };
@@ -7644,7 +7664,7 @@ ndpi_protocol_match content_match[] = {
   { "/base64",				NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER, NDPI_PROTOCOL_ACCEPTABLE },
   { "application/gnutar",		NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER, NDPI_PROTOCOL_ACCEPTABLE },
   { "application/x-compressed",		NULL,		        NDPI_PROTOCOL_HTTP_DOWNLOAD, NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER, NDPI_PROTOCOL_ACCEPTABLE },
-  
+
   { NULL, 0 }
 };
 
@@ -7719,4 +7739,3 @@ static const char *ndpi_en_impossible_bigrams[] = {
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zr", "zs", "zx", "wh", "wk",
   "wb", "zk", "kp", "zk", "xy",
   NULL };
-
