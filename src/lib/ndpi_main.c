@@ -1573,6 +1573,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, "1kxun", NDPI_PROTOCOL_CATEGORY_MEDIA,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),      /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));     /* UDP */
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SMPP,
+			  no_master,
+			  no_master, "SMPP", NDPI_PROTOCOL_CATEGORY_P2P,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
 
 
   /* calling function for host and content matched protocols */
@@ -2628,6 +2633,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* 1KXUN */
   init_kxun_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* SMPP */
+  init_smpp_dissector(ndpi_struct, &a, detection_bitmask);
 
   /*** Put false-positive sensitive protocols at the end ***/
 
