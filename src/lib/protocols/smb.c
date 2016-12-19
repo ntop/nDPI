@@ -1,8 +1,7 @@
 /*
  * smb.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -21,32 +20,28 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_SMB
 
-static void ndpi_int_smb_add_connection(struct ndpi_detection_module_struct
-					*ndpi_struct, struct ndpi_flow_struct *flow)
-{
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMB, NDPI_PROTOCOL_UNKNOWN);
-}
 
 void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(packet && packet->tcp) {
+  /* Check connection over TCP */
+  if(packet->tcp) {
     NDPI_LOG(NDPI_PROTOCOL_SMB, ndpi_struct, NDPI_LOG_DEBUG, "search SMB.\n");
-
-    if (packet->tcp->dest == htons(445)
-	&& packet->payload_packet_len > (32 + 4 + 4)
-	&& (packet->payload_packet_len - 4) == ntohl(get_u_int32_t(packet->payload, 0))
-	&& get_u_int32_t(packet->payload, 4) == htonl(0xff534d42)) {
+    
+    if(packet->tcp->dest == htons(445)
+       && packet->payload_packet_len > (32 + 4 + 4)
+       && (packet->payload_packet_len - 4) == ntohl(get_u_int32_t(packet->payload, 0))
+       && get_u_int32_t(packet->payload, 4) == htonl(0xff534d42)) {
+      
       NDPI_LOG(NDPI_PROTOCOL_SMB, ndpi_struct, NDPI_LOG_DEBUG, "found SMB.\n");
-      ndpi_int_smb_add_connection(ndpi_struct, flow);
-      return;
 
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMB, NDPI_PROTOCOL_UNKNOWN);
+      return;
     }
   }
 

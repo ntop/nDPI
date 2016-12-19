@@ -935,6 +935,7 @@ static int ndpi_ftp_control_check_response(const u_int8_t *payload, size_t paylo
 }
 
 static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+
   struct ndpi_packet_struct *packet = &flow->packet;  
   u_int32_t payload_len = packet->payload_packet_len;
 

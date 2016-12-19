@@ -54,7 +54,6 @@
 #define NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC		110
 #define NDPI_PROTOCOL_HTTP_CONNECT				130
 #define NDPI_PROTOCOL_HTTP_PROXY				131
-#define NDPI_PROTOCOL_SOCKS					172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 
 
 #define NDPI_PROTOCOL_FTP_CONTROL				1 /* Tomasz Bujlow <tomasz@skatnet.dk> */
@@ -86,7 +85,7 @@
 #define NDPI_PROTOCOL_VMWARE					28
 #define NDPI_PROTOCOL_MAIL_SMTPS				29
 #define NDPI_PROTOCOL_FILETOPIA				        30
-#define NDPI_PROTOCOL_IMESH					31
+#define NDPI_PROTOCOL_UBNTAC2					31 /* Ubiquity UBNT AirControl 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
 #define NDPI_PROTOCOL_KONTIKI					32
 #define NDPI_PROTOCOL_OPENFT					33
 #define NDPI_PROTOCOL_FASTTRACK				        34
@@ -188,6 +187,8 @@
 #define NDPI_PROTOCOL_UBUNTUONE			  	        169 /* Remy Mudingay <mudingay@ill.fr> */
 #define NDPI_PROTOCOL_WHOIS_DAS				        170
 #define NDPI_PROTOCOL_COLLECTD				        171
+#define NDPI_PROTOCOL_SOCKS					172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
+#define NDPI_PROTOCOL_MS_LYNC 			                173
 #define NDPI_PROTOCOL_RTMP					174 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_FTP_DATA				        175 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_ZMQ                                       177
@@ -198,11 +199,6 @@
 #define NDPI_PROTOCOL_TELEGRAM				        185 /* Gianluca Costa <g.costa@xplico.org> */
 #define NDPI_PROTOCOL_QUIC				        188 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
 #define NDPI_PROTOCOL_WHATSAPP_VOICE			        189
-#define NDPI_PROTOCOL_STARCRAFT 			        211 /* Matteo Bracci <matteobracci1@gmail.com> */
-#define NDPI_PROTOCOL_TEREDO 			                212
-#define NDPI_PROTOCOL_HEP 			                213 /* Sipcapture.org QXIP BV */
-#define NDPI_PROTOCOL_UBNTAC2					214 /* Ubiquity UBNT AirControl 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
-#define NDPI_PROTOCOL_MS_LYNC 			                173
 
 
 
@@ -262,10 +258,19 @@
 #define NDPI_PROTOCOL_MQTT				208
 #define NDPI_PROTOCOL_RX 			        209
 #define NDPI_SERVICE_SINA                               210
-#define NDPI_SERVICE_HANGOUT                            215
+#define NDPI_PROTOCOL_STARCRAFT 			211 /* Matteo Bracci <matteobracci1@gmail.com> */
+#define NDPI_PROTOCOL_TEREDO 			        212
+#define NDPI_PROTOCOL_HEP 			        213 /* Sipcapture.org QXIP BV */
+#define NDPI_SERVICE_HANGOUT                            214
+#define NDPI_SERVICE_IFLIX                              215 /* www.vizuamatix.com R&D team & M.Mallawaarachchie <manoj_ws@yahoo.com> */
+#define NDPI_SERVICE_GITHUB                             216
+#define NDPI_PROTOCOL_BJNP 			        217
+#define NDPI_SERVICE_1KXUN				218
+#define NDPI_SERVICE_IQIYI                              219
+#define NDPI_PROTOCOL_SMPP                              220 /* Damir Franusic <df@release14.org> */
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL			NDPI_SERVICE_HANGOUT
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL		        NDPI_PROTOCOL_SMPP
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

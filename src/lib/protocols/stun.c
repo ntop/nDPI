@@ -21,9 +21,8 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_STUN
 
 
@@ -87,6 +86,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     */
 
     while(offset < payload_length) {
+
       u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
       u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
 
@@ -120,13 +120,12 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	break;
 
       default:
-         /* This means this STUN packet cannot be confused with whatsapp voice */
-         can_this_be_whatsapp_voice = 0;
-	 break;
+	/* This means this STUN packet cannot be confused with whatsapp voice */
+	can_this_be_whatsapp_voice = 0;
+	break;
       }
       offset += len + 4;
     }
-
     goto udp_stun_found;
   }
 
@@ -239,7 +238,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
  udp_stun_found:
   if(can_this_be_whatsapp_voice)
-	  flow->num_stun_udp_pkts++;
+    flow->num_stun_udp_pkts++;
 
   return((flow->num_stun_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
 }

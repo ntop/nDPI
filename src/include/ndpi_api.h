@@ -138,7 +138,7 @@ extern "C" {
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module();
+  struct ndpi_detection_module_struct *ndpi_init_detection_module(void);
   
   /**
    * Frees the memory allocated in the specified flow
@@ -447,6 +447,23 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
    */
   char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto, char *buf, u_int buf_len);
 
+  /**
+   * Get protocol category as string
+   *
+   * @par     category      = the category associated to the protocol
+   * @return  the string name of the category
+   *
+   */
+  const char* ndpi_category_str(ndpi_protocol_category_t category);
+
+  /**
+   * Get protocol category
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     proto         = the struct ndpi_protocol contain the protocols name
+   * @return  the protocol category
+   */
+  ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto);
   
   /**
    * Get the protocol name associated to the ID
@@ -604,7 +621,7 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
    * @return  The requested automata, or NULL if an error occurred
    * 
    */
-  void* ndpi_init_automa();
+  void* ndpi_init_automa(void);
 
 
   /**
@@ -650,7 +667,7 @@ ndpi_protocol ndpi_l4_detection_process_packet(struct ndpi_detection_module_stru
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
-  void set_ndpi_debug_function(ndpi_debug_function_ptr ndpi_debug_printf);
+  void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf);
 
 #ifdef __cplusplus
 }

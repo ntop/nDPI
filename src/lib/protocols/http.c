@@ -21,10 +21,14 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "ndpi_protocols.h"
 
 #ifdef NDPI_PROTOCOL_HTTP
+
+
+/* global variables used for 1kxun protocol and iqiyi service */
+static u_int16_t kxun_counter;
+static u_int16_t iqiyi_counter;
 
 static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
@@ -97,11 +101,14 @@ static void avi_check_http_payload(struct ndpi_detection_module_struct *ndpi_str
     return;
   }
 
+  /**
+     for reference see http://msdn.microsoft.com/archive/default.asp?url=/archive/en-us/directx9_c/directx/htm/avirifffilereference.asp
+  **/
   if(packet->empty_line_position_set != 0) {
-    // check for avi header
-    // for reference see http://msdn.microsoft.com/archive/default.asp?url=/archive/en-us/directx9_c/directx/htm/avirifffilereference.asp
+
     u_int32_t p = packet->empty_line_position + 2;
 
+    // check for avi header
     NDPI_LOG(NDPI_CONTENT_AVI, ndpi_struct, NDPI_LOG_DEBUG, "p = %u\n", p);
 
     if((p + 16) <= packet->payload_packet_len && memcmp(&packet->payload[p], "RIFF", 4) == 0
@@ -153,25 +160,24 @@ static void setHttpUserAgent(struct ndpi_flow_struct *flow, char *ua) {
   else if(!strcmp(ua, "Windows NT 5.1")) ua = "Windows XP";
   else if(!strcmp(ua, "Windows NT 5.2")) ua = "Windows Server 2003";
   else if(!strcmp(ua, "Windows NT 6.0")) ua = "Windows Vista";
-  // else if(!strcmp(ua, "Windows NT 7.0")) ua = "Windows 7";
   else if(!strcmp(ua, "Windows NT 6.1")) ua = "Windows 7";
   else if(!strcmp(ua, "Windows NT 6.2")) ua = "Windows 8";
   else if(!strcmp(ua, "Windows NT 6.3")) ua = "Windows 8.1";
 
-  //printf("==> %s\n", ua);
+  // printf("==> %s\n", ua);
   snprintf((char*)flow->detected_os, sizeof(flow->detected_os), "%s", ua);
 }
 
 static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  // int i = 0;
-  struct ndpi_packet_struct *packet = &flow->packet;
+  if((flow->l4.tcp.http_stage == 0) || (flow->http.url && flow->http_detected)) {
+      char *double_col = strchr((char*)flow->host_server_name, ':');
 
-  if((flow->l4.tcp.http_stage == 0)
-     || (flow->http.url && flow->http_detected)) {
-    /*
-      NOTE      
-      If http_dont_dissect_response = 1 dissection of HTTP response
-      mime types won't happen
+      if(double_col) double_col[0] = '\0';
+
+    /**
+       NOTE
+       If http_dont_dissect_response = 1 dissection of HTTP response
+       mime types won't happen
     */
     ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
 				strlen((const char *)flow->host_server_name),
@@ -179,23 +185,36 @@ static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struc
   }
 }
 
-/*
-  NOTE
-
-  ndpi_parse_packet_line_info @ ndpi_main.c
-  is the code that parses the packet
+/**
+   NOTE
+   ndpi_parse_packet_line_info is in ndpi_main.c
 */
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 						   struct ndpi_flow_struct *flow) {
-#ifdef NDPI_CONTENT_MPEG
-  struct ndpi_packet_struct *packet = &flow->packet;
-#endif
-#ifdef NDPI_CONTENT_AVI
-#endif
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
+  struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t a;
+
+
+#ifdef NDPI_PROTOCOL_PPSTREAM
+  /* PPStream */
+  if(flow->l4.tcp.ppstream_stage > 0 && iqiyi_counter == 0) {
+    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG, "PPStream found.\n");
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM);
+  }
+  else if(iqiyi_counter > 0) {
+    NDPI_LOG(NDPI_SERVICE_IQIYI, ndpi_struct, NDPI_LOG_DEBUG, "iQiyi found.\n");
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_IQIYI);
+  }
+#endif
+
+#ifdef NDPI_SERVICE_1KXUN
+  /* 1KXUN */
+  if(kxun_counter > 0) {
+    NDPI_LOG(NDPI_SERVICE_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "1kxun found.\n");
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_1KXUN);
+  }
+#endif
 
   if(!ndpi_struct->http_dont_dissect_response) {
     if((flow->http.url == NULL)
@@ -250,7 +269,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
-    /* Format:
+    /**
+       Format:
        Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ....
     */
     if(packet->user_agent_line.len > 7) {
@@ -362,6 +382,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(!ndpi_struct->http_dont_dissect_response && flow->http_detected)
     parseHttpSubprotocol(ndpi_struct, flow);
 
+  flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
+
   /* check for accept line */
   if(packet->accept_line.ptr != NULL) {
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "Accept Line found %.*s\n",
@@ -418,7 +440,7 @@ static void check_http_payload(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 /**
- * this functions checks whether the packet begins with a valid http request
+ * Functions to check whether the packet begins with a valid http request
  * @param ndpi_struct
  * @returnvalue 0 if no valid request has been found
  * @returnvalue >0 indicates start of filename but not necessarily in packet limit
@@ -431,7 +453,10 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
 	   packet->payload[0], packet->payload[1], packet->payload[2], packet->payload[3],
 	   packet->payload_packet_len);
 
-  /* FIRST PAYLOAD PACKET FROM CLIENT */
+  /**
+     FIRST PAYLOAD PACKET FROM CLIENT
+  **/
+
   /* check if the packet starts with POST or GET */
   if(packet->payload_packet_len >= 4 && memcmp(packet->payload, "GET ", 4) == 0) {
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HTTP: GET FOUND\n");
@@ -780,6 +805,62 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       packet->http_method.ptr = packet->line[0].ptr;
       packet->http_method.len = filename_start - 1;
 
+      /* Check for additional field introduced by Steam */
+      int x = 1;
+      if((memcmp(packet->line[x].ptr, "x-steam-sid", 11)) == 0) {
+	ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_STEAM);
+	check_content_type_and_change_protocol(ndpi_struct, flow);
+	return;
+      }
+      
+      /* Check for additional field introduced by Facebook */
+      x = 1;
+      while(packet->line[x].len != 0) {
+	if((memcmp(packet->line[x].ptr, "X-FB-SIM-HNI", 12)) == 0) {
+	  ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_FACEBOOK);
+	  check_content_type_and_change_protocol(ndpi_struct, flow);
+	  return;
+	}
+	x++;
+      }
+
+      /* check PPStream protocol or iQiyi service
+	 (iqiyi is deliverd by ppstream) */
+      // substring in url
+      if(strstr((const char*) &packet->payload[filename_start], "iqiyi.com") != NULL) {
+	if(kxun_counter == 0) {
+	  flow->l4.tcp.ppstream_stage++;
+	  iqiyi_counter++;
+	  check_content_type_and_change_protocol(ndpi_struct, flow); /* ***** CHECK ****** */
+	  return;
+	}
+      }
+      // additional field in http payload
+      x = 1;
+      while(packet->line[x].len != 0) {
+	if((memcmp(packet->line[x].ptr, "qyid", 4)) == 0 &&
+	   (memcmp(packet->line[x+1].ptr, "qypid", 5)) == 0 &&
+	   (memcmp(packet->line[x+2].ptr, "qyplatform", 10)) == 0) {
+	  flow->l4.tcp.ppstream_stage++;
+	  iqiyi_counter++;
+	  check_content_type_and_change_protocol(ndpi_struct, flow);
+	  return;
+	}
+	x++;
+      }
+
+      /* Check for 1kxun packet */
+      int a;
+      for (a = 0; a < packet->parsed_lines; a++) {
+	if((memcmp(packet->line[a].ptr, "Client-Source:", 14)) == 0) {
+	  if((memcmp(packet->line[a].ptr+15, "1kxun", 5)) == 0) {
+	    kxun_counter++;
+	    check_content_type_and_change_protocol(ndpi_struct, flow);
+	    return;
+	  }
+	}
+      }
+
       if((packet->http_url_name.len > 7)
           && (!strncmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
         NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HTTP_PROXY Found.\n");
@@ -798,11 +879,11 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
           "HTTP START Found, we will look for sub-protocols (content and host)...\n");
 
       if(packet->host_line.ptr != NULL) {
-	/*
-	  nDPI is pretty scrupoulous about HTTP so it waits until the
-	  HTTP response is received just to check that it conforms
-	  with the HTTP specs. However this might be a waste of time as
-	  in 99.99% of the cases is like that.
+	/**
+	   nDPI is pretty scrupoulous about HTTP so it waits until the
+	   HTTP response is received just to check that it conforms
+	   with the HTTP specs. However this might be a waste of time as
+	   in 99.99% of the cases is like that.
 	*/
 
 	if(ndpi_struct->http_dont_dissect_response) {
@@ -827,8 +908,9 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HTTP stage %u: \n",
 	     flow->l4.tcp.http_stage);
 
-    /* At first check, if this is for sure a response packet (in another direction. If not, if http is detected do nothing now and return,
-     * otherwise check the second packet for the http request . */
+    /**
+       At first check, if this is for sure a response packet (in another direction. If not, if http is detected do nothing now and return,
+       otherwise check the second packet for the http request . */
     if((flow->l4.tcp.http_stage - packet->packet_direction) == 1) {
 
       if(flow->http_detected)
@@ -869,21 +951,20 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       return;
     }
 
-    /* This is a packet in another direction. Check if we find the proper response. */
-    /* We have received a response for a previously identified partial HTTP request */
+    /**
+       This is a packet in another direction. Check if we find the proper response.
+       We have received a response for a previously identified partial HTTP request
+    */
 
     if((packet->parsed_lines == 1) && (packet->packet_direction == 1 /* server -> client */)) {
-      /*
-	In apache if you do "GET /\n\n" the response comes without any header so we can assume that
-	this can be the case
-      */
+      /* In apache if you do "GET /\n\n" the response comes without any header */
       NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "Found HTTP. (apache)\n");
       ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
       check_content_type_and_change_protocol(ndpi_struct, flow);
       return;
     }
 
-    /* If we already detected the http request, we can add the connection and then check for the sub-protocol*/
+    /* If we already detected the http request, we can add the connection and then check for the sub-protocol */
     if(flow->http_detected)
       ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
 
@@ -1087,10 +1168,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 #endif
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,  NDPI_CONTENT_MMS);
-  /* #ifdef NDPI_PROTOCOL_RTSP */
-  /*   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, */
-  /* 				 NDPI_PROTOCOL_RTSP); */
-  /* #endif */
+
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
 
   NDPI_BITMASK_SET(ndpi_struct->generic_http_packet_bitmask, ndpi_struct->callback_buffer[a].detection_bitmask);

@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libndpi.la
 
-CFLAGS += -fPIC -DPIC
+CFLAGS += -fPIC -DPIC # --coverage
 libndpi_la_CPPFLAGS = -I$(top_srcdir)/src/include/  -I$(top_srcdir)/src/lib/third_party/include/
 libndpi_la_LDFLAGS = -static -version-info 1:0:0 -export-symbols $(top_srcdir)/libndpi.sym
 
@@ -24,6 +24,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/battlefield.c \
 		     protocols/bgp.c \
 		     protocols/bittorrent.c \
+		     protocols/bjnp.c \
 		     protocols/ciscovpn.c \
 		     protocols/citrix.c \
 		     protocols/coap.c \
@@ -59,13 +60,13 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/http.c \
 		     protocols/iax.c \
 		     protocols/icecast.c \
-		     protocols/imesh.c \
 		     protocols/ipp.c \
 		     protocols/irc.c \
 		     protocols/jabber.c \
 		     protocols/kakaotalk_voice.c \
 		     protocols/kerberos.c \
 		     protocols/kontiki.c \
+		     protocols/kxun.c \
 		     protocols/ldap.c \
 		     protocols/lotus_notes.c \
 		     protocols/mail_imap.c \
@@ -155,6 +156,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/yahoo.c \
 		     protocols/zattoo.c \
 		     protocols/zeromq.c \
+		     protocols/smpp.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
 		     third_party/include/ndpi_patricia.h \

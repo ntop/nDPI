@@ -74,12 +74,7 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
   if(flow->ndpi_flow) { ndpi_free_flow(flow->ndpi_flow); flow->ndpi_flow = NULL; }
   if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL; }
   if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL; }
-
 }
-
-/* ***************************************************** */
-
-static const u_int8_t nDPI_traceLevel = 0;
 
 /* ***************************************************** */
 
@@ -109,11 +104,11 @@ static void free_wrapper(void *freeable) {
 /* ***************************************************** */
 
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle) {
-  
+
   set_ndpi_malloc(malloc_wrapper), set_ndpi_free(free_wrapper);
   /* TODO: just needed here to init ndpi malloc wrapper */
   struct ndpi_detection_module_struct * module = ndpi_init_detection_module();
-  
+
   struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
 
   workflow->pcap_handle = pcap_handle;
@@ -217,7 +212,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     Note: to keep things simple (ndpiReader is just a demo app)
     we handle IPv6 a-la-IPv4.
   */
-  if(version == 4) {
+  if(version == IPVERSION) {
     if(ipsize < 20)
       return NULL;
 
@@ -259,7 +254,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   *proto = iph->protocol;
   l4 = ((u_int8_t *) l3 + l4_offset);
 
-  if(iph->protocol == 6 && l4_packet_len >= 20) {
+  if(iph->protocol == IPPROTO_TCP && l4_packet_len >= 20) {
     u_int tcp_len;
 
     workflow->stats.tcp_count++;
@@ -289,7 +284,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
     *payload = &l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
-  } else if(iph->protocol == 17 && l4_packet_len >= 8) {
+  } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
     // udp
     workflow->stats.udp_count++;
 
@@ -328,7 +323,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   flow.lower_port = lower_port, flow.upper_port = upper_port;
 
   if(0)
-    NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "[NDPI] [%u][%u:%u <-> %u:%u]\n",
+    NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "[NDPI] [%u][%u:%u <-> %u:%u]\n",
 	     iph->protocol, lower_ip, ntohs(lower_port), upper_ip, ntohs(upper_port));
 
   idx = (vlan_id + lower_ip + upper_ip + iph->protocol + lower_port + upper_port) % workflow->prefs.num_roots;
@@ -336,13 +331,13 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
   if(ret == NULL) {
     if(workflow->stats.ndpi_flow_count == workflow->prefs.max_ndpi_flows) {
-      NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_ERROR, "maximum flow count (%u) has been exceeded\n", workflow->prefs.max_ndpi_flows);
+      NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "maximum flow count (%u) has been exceeded\n", workflow->prefs.max_ndpi_flows);
       exit(-1);
     } else {
       struct ndpi_flow_info *newflow = (struct ndpi_flow_info*)malloc(sizeof(struct ndpi_flow_info));
 
       if(newflow == NULL) {
-	NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(1): not enough memory\n", __FUNCTION__);
+	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(1): not enough memory\n", __FUNCTION__);
 	return(NULL);
       }
 
@@ -352,7 +347,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->lower_port = lower_port, newflow->upper_port = upper_port;
       newflow->ip_version = version;
 
-      if(version == 4) {
+      if(version == IPVERSION) {
 	inet_ntop(AF_INET, &lower_ip, newflow->lower_name, sizeof(newflow->lower_name));
 	inet_ntop(AF_INET, &upper_ip, newflow->upper_name, sizeof(newflow->upper_name));
       } else {
@@ -363,21 +358,21 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       }
 
       if((newflow->ndpi_flow = ndpi_malloc(SIZEOF_FLOW_STRUCT)) == NULL) {
-	NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(2): not enough memory\n", __FUNCTION__);
+	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(2): not enough memory\n", __FUNCTION__);
 	free(newflow);
 	return(NULL);
       } else
 	memset(newflow->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
 
       if((newflow->src_id = ndpi_malloc(SIZEOF_ID_STRUCT)) == NULL) {
-	NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(3): not enough memory\n", __FUNCTION__);
+	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(3): not enough memory\n", __FUNCTION__);
 	free(newflow);
 	return(NULL);
       } else
 	memset(newflow->src_id, 0, SIZEOF_ID_STRUCT);
 
       if((newflow->dst_id = ndpi_malloc(SIZEOF_ID_STRUCT)) == NULL) {
-	NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(4): not enough memory\n", __FUNCTION__);
+	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(4): not enough memory\n", __FUNCTION__);
 	free(newflow);
 	return(NULL);
       } else
@@ -421,12 +416,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   struct ndpi_iphdr iph;
 
   memset(&iph, 0, sizeof(iph));
-  iph.version = 4;
+  iph.version = IPVERSION;
   iph.saddr = iph6->ip6_src.u6_addr.u6_addr32[2] + iph6->ip6_src.u6_addr.u6_addr32[3];
   iph.daddr = iph6->ip6_dst.u6_addr.u6_addr32[2] + iph6->ip6_dst.u6_addr.u6_addr32[3];
   iph.protocol = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
 
-  if(iph.protocol == 0x3C /* IPv6 destination option */) {
+  if(iph.protocol == IPPROTO_DSTOPTS /* IPv6 destination option */) {
     u_int8_t *options = (u_int8_t*)iph6 + sizeof(const struct ndpi_ipv6hdr);
 
     iph.protocol = options[0];
@@ -441,7 +436,13 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 
 /* ****************************************************** */
 
-// ipsize = header->len - ip_offset ; rawsize = header->len
+/**
+   Function to process the packet:
+   determine the flow of a packet and try to decode it
+   @return: 0 if success; else != 0
+   
+   @Note: ipsize = header->len - ip_offset ; rawsize = header->len
+*/
 static unsigned int packet_processing(struct ndpi_workflow * workflow,
 				      const u_int64_t time,
 				      u_int16_t vlan_id,
@@ -450,7 +451,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 				      u_int16_t ip_offset,
 				      u_int16_t ipsize, u_int16_t rawsize) {
   struct ndpi_id_struct *src, *dst;
-  struct ndpi_flow_info *flow;
+  struct ndpi_flow_info *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
   u_int8_t proto;
   struct ndpi_tcphdr *tcph = NULL;
@@ -460,7 +461,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   u_int8_t src_to_dst_direction= 1;
 
   if(iph)
-    flow = get_ndpi_flow_info(workflow, 4, vlan_id, iph, NULL,
+    flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id, iph, NULL,
 			      ip_offset, ipsize,
 			      ntohs(iph->tot_len) - (iph->ihl * 4),
 			      &tcph, &udph, &sport, &dport,
@@ -474,7 +475,8 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 
   if(flow != NULL) {
     workflow->stats.ip_packet_count++;
-    workflow->stats.total_wire_bytes += rawsize + 24 /* CRC etc */, workflow->stats.total_ip_bytes += rawsize;
+    workflow->stats.total_wire_bytes += rawsize + 24 /* CRC etc */,
+      workflow->stats.total_ip_bytes += rawsize;
     ndpi_flow = flow->ndpi_flow;
     flow->packets++, flow->bytes += rawsize;
     flow->last_seen = time;
@@ -494,36 +496,42 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
     /* New protocol detected or give up */
     flow->detection_completed = 1;
+  }
 
-    if((flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) && (ndpi_flow->num_stun_udp_pkts > 0))
-      ndpi_set_detected_protocol(workflow->ndpi_struct, ndpi_flow, NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_UNKNOWN);
+  if(flow->detection_completed) {
+    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN)
+      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
+						      flow->ndpi_flow);
+  }
 
-    snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s", flow->ndpi_flow->host_server_name);
+  snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
+	   flow->ndpi_flow->host_server_name);
 
-    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_BITTORRENT) {
-      int i, j, n = 0;
+  if(flow->detected_protocol.protocol == NDPI_PROTOCOL_BITTORRENT) {
+    int i, j, n = 0;
 
-      for(i=0, j = 0; i<20; i++) {
-	sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
-	j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
-      }
-
-      if(n == 0) flow->bittorent_hash[0] = '\0';
+    for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
+      sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
+      j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
     }
 
-    if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
-      snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s", flow->ndpi_flow->protos.ssl.client_certificate);
-      snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s", flow->ndpi_flow->protos.ssl.server_certificate);
-    }
+    if(n == 0) flow->bittorent_hash[0] = '\0';
+  }
 
+  if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
+    snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s",
+	     flow->ndpi_flow->protos.ssl.client_certificate);
+    snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s",
+	     flow->ndpi_flow->protos.ssl.server_certificate);
+  }
+
+  if(flow->detection_completed) {
     if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
-      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow);
-
       if (workflow->__flow_giveup_callback != NULL)
-        workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
+	workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
     } else {
       if (workflow->__flow_detected_callback != NULL)
-        workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
+	workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
     }
 
     ndpi_free_flow_info_half(flow);
@@ -533,26 +541,20 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 }
 
 /* ****************************************************** */
+
 void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 				   const struct pcap_pkthdr *header,
 				   const u_char *packet) {
   /*
    * Declare pointers to packet headers
    */
-
   /* --- Ethernet header --- */
   const struct ndpi_ethhdr *ethernet;
-  /* --- Ethernet II header --- */
-  const struct ndpi_ethhdr *ethernet_2;
   /* --- LLC header --- */
   const struct ndpi_llc_header *llc;
 
   /* --- Cisco HDLC header --- */
   const struct ndpi_chdlc *chdlc;
-  /* --- SLARP frame --- */
-  struct ndpi_slarp *slarp;
-  /* --- CDP --- */
-  struct ndpi_cdp *cdp;
 
   /* --- Radio Tap header --- */
   const struct ndpi_radiotap_header *radiotap;
@@ -571,13 +573,12 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   u_int16_t eth_offset = 0;
   u_int16_t radio_len;
   u_int16_t fc;
-  u_int16_t type;
+  u_int16_t type = 0;
   int wifi_len = 0;
-  int llc_off;
   int pyld_eth_len = 0;
   int check;
   u_int64_t time;
-  u_int16_t ip_offset, ip_len, ip6_offset;
+  u_int16_t ip_offset = 0, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0;
   u_int32_t label;
@@ -697,32 +698,32 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
   /* check ether type */
   switch(type) {
-    case VLAN:
-      vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
-      type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
-      ip_offset += 4;
-      vlan_packet = 1;
-      break;
-    case MPLS_UNI:
-    case MPLS_MULTI:
-      mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
-      label = ntohl(mpls->label);
-      /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
-      workflow->stats.mpls_count++;
-      type = ETH_P_IP, ip_offset += 4;
+  case VLAN:
+    vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
+    type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
+    ip_offset += 4;
+    vlan_packet = 1;
+    break;
+  case MPLS_UNI:
+  case MPLS_MULTI:
+    mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
+    label = ntohl(mpls->label);
+    /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
+    workflow->stats.mpls_count++;
+    type = ETH_P_IP, ip_offset += 4;
 
-      while((label & 0x100) != 0x100) {
-        ip_offset += 4;
-        label = ntohl(mpls->label);
-      }
-      break;
-    case PPPoE:
-      workflow->stats.pppoe_count++;
-      type = ETH_P_IP;
-      ip_offset += 8;
-      break;
-    default:
-      break;
+    while((label & 0x100) != 0x100) {
+      ip_offset += 4;
+      label = ntohl(mpls->label);
+    }
+    break;
+  case PPPoE:
+    workflow->stats.pppoe_count++;
+    type = ETH_P_IP;
+    ip_offset += 8;
+    break;
+  default:
+    break;
   }
 
   workflow->stats.vlan_count += vlan_packet;
@@ -741,17 +742,17 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
       if(cap_warning_used == 0) {
 	if(!workflow->prefs.quiet_mode)
-	  NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
+	  NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
 	cap_warning_used = 1;
       }
     }
   }
 
-  if(iph->version == 4) {
-    ip_len = ((u_short)iph->ihl * 4);
+  if(iph->version == IPVERSION) {
+    ip_len = ((u_int16_t)iph->ihl * 4);
     iph6 = NULL;
 
-    if(iph->protocol == 41) {
+    if(iph->protocol == IPPROTO_IPV6) {
       ip_offset += ip_len;
       goto iph_check;
     }
@@ -762,7 +763,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
       if(ipv4_frags_warning_used == 0) {
 	if(!workflow->prefs.quiet_mode)
-	  NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: IPv4 fragments are not handled by this demo (nDPI supports them)\n");
+	  NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: IPv4 fragments are not handled by this demo (nDPI supports them)\n");
 	ipv4_frags_warning_used = 1;
       }
 
@@ -774,7 +775,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     proto = iph6->ip6_ctlun.ip6_un1.ip6_un1_nxt;
     ip_len = sizeof(struct ndpi_ipv6hdr);
 
-    if(proto == 0x3C /* IPv6 destination option */) {
+    if(proto == IPPROTO_DSTOPTS /* IPv6 destination option */) {
 
       u_int8_t *options = (u_int8_t*)&packet[ip_offset+ip_len];
       proto = options[0];
@@ -788,7 +789,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   v4_warning:
     if(ipv4_warning_used == 0) {
       if(!workflow->prefs.quiet_mode)
-        NDPI_LOG(0, workflow.ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
+        NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
       ipv4_warning_used = 1;
     }
     workflow->stats.total_discarded_bytes +=  header->len;
@@ -815,7 +816,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
 	iph = (struct ndpi_iphdr *) &packet[ip_offset];
 
-	if(iph->version != 4) {
+	if(iph->version != IPVERSION) {
 	  // printf("WARNING: not good (packet_id=%u)!\n", (unsigned int)workflow->stats.raw_packet_count);
 	  goto v4_warning;
 	}

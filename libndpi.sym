@@ -47,3 +47,5 @@ ndpi_match_string
 set_ndpi_malloc
 set_ndpi_free
 set_ndpi_debug_function
+ndpi_category_str
+ndpi_get_proto_category

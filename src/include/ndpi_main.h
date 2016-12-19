@@ -80,6 +80,7 @@ extern "C" {
 				       u_int16_t lower_detected_protocol);
   extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol_breed_t protoBreed, u_int16_t protoId,
 				      u_int16_t tcp_alias_protoId[2], u_int16_t udp_alias_protoId[2], char *protoName,
+				      ndpi_protocol_category_t protoCategory,
 				      ndpi_port_range *tcpDefPorts, ndpi_port_range *udpDefPorts);
 
   extern void ndpi_int_reset_packet_protocol(struct ndpi_packet_struct *packet);

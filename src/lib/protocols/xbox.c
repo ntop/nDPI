@@ -1,8 +1,7 @@
 /*
  * xbox.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,8 +21,8 @@
  * 
  */
 
-
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_XBOX
 
 static void ndpi_int_xbox_add_connection(struct ndpi_detection_module_struct
@@ -41,13 +40,11 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
   //  struct ndpi_id_struct *dst = flow->dst;
 
   /*
-   * THIS IS TH XBOX UDP DETCTION ONLY !!!
-   * the xbox tcp detection is done by http code
+   * XBOX UDP DETCTION ONLY
+   * the xbox TCP detection is done by http code
+   * this detection also works for asymmetric xbox udp traffic
    */
-
-
-  /* this detection also works for asymmetric xbox udp traffic */
-  if (packet->udp != NULL) {
+  if(packet->udp != NULL) {
 
     u_int16_t dport = ntohs(packet->udp->dest);
     u_int16_t sport = ntohs(packet->udp->source);
@@ -88,11 +85,9 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
     }
 
     /* exclude here all non matched udp traffic, exclude here tcp only if http has been excluded, because xbox could use http */
-    if (packet->tcp == NULL
 #ifdef NDPI_PROTOCOL_HTTP
-	|| NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0
+    if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0) {
 #endif
-	) {
       NDPI_LOG(NDPI_PROTOCOL_XBOX, ndpi_struct, NDPI_LOG_DEBUG, "xbox udp excluded.\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
     }
