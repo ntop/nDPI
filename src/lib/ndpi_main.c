@@ -4512,6 +4512,9 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
   case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
     return("Unspecified");
     break;
+  case NDPI_PROTOCOL_NUM_CATEGORIES:
+    return("Code should not use this internal constant");
+    break;
   }
 
   return("Unspecified");
