@@ -752,10 +752,11 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
   NDPI_PROTOCOL_CATEGORY_SYSTEM,            /* System level applications */
 
-  NdpiProtocolCategoryN /* Unused as value but useful to
-       getting the number of elements
-       in this datastructure
-    */
+  NDPI_PROTOCOL_NUM_CATEGORIES /*
+				  NOTE: Keep this as last member
+				  Unused as value but useful to getting the number of elements
+				  in this datastructure
+			       */
 } ndpi_protocol_category_t;
 
 /* ntop extensions */
