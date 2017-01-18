@@ -31,6 +31,11 @@ static void ndpi_int_smpp_add_connection(struct ndpi_detection_module_struct* nd
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMPP, NDPI_PROTOCOL_UNKNOWN);
 }
 
+static  u_int8_t ndpi_check_overflow(u_int32_t current_legth, u_int32_t total_lenth)
+{
+    return (current_legth > 0 && current_legth > INT_MAX - total_lenth);
+}
+
 void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct, 
                           struct ndpi_flow_struct* flow)
 {
@@ -68,8 +73,8 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
       while(total_pdu_l < packet->payload_packet_len) {
 	// get next PDU length
 	tmp_pdu_l = ntohl(get_u_int32_t(packet->payload, total_pdu_l));
-	// if zero, return, will try the next TCP segment
-	if(tmp_pdu_l == 0) return;
+	// if zero or overflowing , return, will try the next TCP segment
+	if(tmp_pdu_l == 0 ||  ndpi_check_overflow(tmp_pdu_l, total_pdu_l) ) return;
 	// inc total PDU length
 	total_pdu_l += ntohl(get_u_int32_t(packet->payload, total_pdu_l));
 	// inc total PDU count
