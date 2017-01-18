@@ -7509,6 +7509,105 @@ ndpi_protocol_match host_match[] = {
   { ".sinajs.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".sina.cn",				"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".sina.com.cn",			"Sina",       		NDPI_SERVICE_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+
+  /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
+  { "feelinsonice.appspot.com",         "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { "feelinsonice-hrd.appspot.com",     "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { "feelinsonice.com",                 "Snapchat",             NDPI_SERVICE_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+
+  /* Detected "instagram.c10r.facebook.com". Omitted "*amazonaws.com" and "*facebook.com" CDNs e.g. "ig-telegraph-shv-04-frc3.facebook.com" */
+  { ".cdninstagram.com",                "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+  { "instagram.",                       "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+  { ".instagram.",                      "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+  { "igcdn-photos-",                    "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+  { "instagramimages-",                 "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+  { "instagramstatic-",                 "Instagram",            NDPI_SERVICE_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+
+  { ".waze.com",                        "Waze",                 NDPI_SERVICE_WAZE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".deezer.com",                      "Deezer",               NDPI_SERVICE_DEEZER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { ".microsoft.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM, NDPI_PROTOCOL_ACCEPTABLE },
+  { "i-msdn.sec.s-msft.com",            "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM, NDPI_PROTOCOL_ACCEPTABLE },
+  { "i2-msdn.sec.s-msft.com",           "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".webtrends.com",                   "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".msecnd.net",                      "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".visualstudio.com",                "Microsoft",            NDPI_SERVICE_MICROSOFT, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "bn1301.storage.live.com",          "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE,NDPI_PROTOCOL_CATEGORY_CLOUD,  NDPI_PROTOCOL_ACCEPTABLE },
+  { "*.gateway.messenger.live.com",     "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "skyapi.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "d.docs.live.net",                  "MS_OneDrive",          NDPI_SERVICE_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "update.microsoft.com",             "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_CATEGORY_SYSTEM, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".windowsupdate.com",               "WindowsUpdate",        NDPI_SERVICE_WINDOWS_UPDATE, NDPI_PROTOCOL_CATEGORY_SYSTEM, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { "worldofwarcraft.com",              "WorldOfWarcraft",      NDPI_PROTOCOL_WORLDOFWARCRAFT, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { ".anchorfree.",                     "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
+  { "hotspotshield.com",                "HotspotShield",        NDPI_SERVICE_HOTSPOT_SHIELD, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
+  { ".webex.com",                       "Webex",                NDPI_PROTOCOL_WEBEX, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".ocsdomain.com",        		"OCS",          	NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
+  { "ocs.fr",               		"OCS",   		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
+  { ".ocs.fr",              		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
+  { ".labgency.ws",        		"OCS",       		NDPI_SERVICE_OCS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_FUN },
+
+  { ".iflix.com",        		"IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".app.iflixcorp.com",        	"IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".images.iflixassets.com",          "IFLIX",       		NDPI_SERVICE_IFLIX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+
+  { "crl.microsoft.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-ocsp.verisign.com",	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-aia.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "evsecure-crl.verisign.com", 	"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".omniroot.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+
+#if 0
+  /* The lines below are not just for Office 365 so they cannot be used for this purpose */
+  { ".verisign.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".symcb.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".symcd.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".verisign.net",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".geotrust.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".entrust.net",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".public-trust.com",       		"Office365",       	NDPI_SERVICE_OFFICE_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+#endif
+  /* http://www.urlquery.net/report.php?id=1453233646161 */
+  { "lifedom.top",       		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "coby.ns.cloudflare.com",  		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "amanda.ns.cloudflare.com",		"Cloudflare",       	NDPI_SERVICE_CLOUDFLARE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { "d295hzzivaok4k.cloudfront.net",	"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".opendns.com",			"OpenDNS",       	NDPI_SERVICE_OPENDNS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+
+  /* https://get.slack.help/hc/en-us/articles/205138367-Troubleshooting-Slack-connection-issues */
+  { "slack.com",                        "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".slack-msgs.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-files.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-imgs.com",                   "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".slack-edge.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".slack-core.com",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "slack-redir.net",                  "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
+  { "slack-assets2.s3-",                "Slack",                NDPI_SERVICE_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { "github.com",                       "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".github.com",                      "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "github.io",                        "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".github.io",                       "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "githubusercontent.com",            "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".githubusercontent.com",           "Github",       	NDPI_SERVICE_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { ".iqiyi.com",			"iQIYI",     		NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".qiyi.com",			"iQIYI",     		NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".71.am",			     	"iQIYI",     		NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".qiyipic.com",			"iQIYI",	     	NDPI_SERVICE_IQIYI, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".ppstream.com",			"PPStream",     	NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".pps.tv",				"PPStream",     	NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".1kxun.",				"1kxun",		NDPI_SERVICE_1KXUN, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { "tcad.wedolook.com",		"1kxun",		NDPI_SERVICE_1KXUN, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+
+  { ".steampowered.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { "steamcommunity.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { ".steamcontent.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { ".steamstatic.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { "steamcommunity-a.akamaihd.net",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 #endif //_ND_INCLUDE_CONTENT_MATCH
   { (char *)NULL, 0 }
 };
