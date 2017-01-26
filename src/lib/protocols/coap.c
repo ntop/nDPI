@@ -115,7 +115,7 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t s_port = ntohs(flow->packet.udp->source);
     u_int16_t d_port = ntohs(flow->packet.udp->dest);
 
-    if((!isCoAPport(s_port) && !isCoAPport(s_port))
+    if((!isCoAPport(s_port) && !isCoAPport(d_port))
        || (packet->payload_packet_len < 4) // header too short
        ) {
       NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "excluding Coap\n");

@@ -821,6 +821,8 @@ ndpi_patricia_lookup (patricia_tree_t *patricia, prefix_t *prefix)
   }
   else {
     glue = (patricia_node_t*)ndpi_calloc(1, sizeof *glue);
+
+    if(!glue) return(NULL);
     glue->bit = differ_bit;
     glue->prefix = NULL;
     glue->parent = node->parent;

@@ -1,9 +1,10 @@
 HTTP	11	726	3
 MDNS	8	952	4
 DHCP	10	3420	1
-STUN	97	11786	16
+STUN	37	3674	4
 ICMP	10	700	1
 SSL	8	589	2
+Facebook	60	8112	12
 Dropbox	4	2176	1
 Apple	127	28102	20
 WhatsApp	182	25154	2
@@ -27,23 +28,23 @@ WhatsAppVoice	706	91156	4
 	14	TCP 192.168.2.4:49197 <-> 17.167.142.39:443 [proto: 91.140/SSL.Apple][3 pkts/162 bytes]
 	15	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.145/SSL.AppleiTunes][32 pkts/9705 bytes][SSL client: p53-buy.itunes.apple.com]
 	16	TCP 192.168.2.4:49172 <-> 23.50.148.228:443 [proto: 91/SSL][5 pkts/391 bytes]
-	17	UDP 192.168.2.4:51518 <-> 31.13.100.14:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	18	UDP 192.168.2.4:51518 <-> 31.13.70.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	19	UDP 192.168.2.4:51518 <-> 31.13.64.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	20	UDP 192.168.2.4:51518 <-> 31.13.85.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	21	UDP 192.168.2.4:51518 <-> 31.13.73.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	22	UDP 192.168.2.4:51518 <-> 31.13.91.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	23	UDP 192.168.2.4:51518 <-> 31.13.79.192:3478 [proto: 78/STUN][5 pkts/676 bytes]
+	17	UDP 192.168.2.4:51518 <-> 31.13.100.14:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	18	UDP 192.168.2.4:51518 <-> 31.13.70.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	19	UDP 192.168.2.4:51518 <-> 31.13.64.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	20	UDP 192.168.2.4:51518 <-> 31.13.85.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	21	UDP 192.168.2.4:51518 <-> 31.13.73.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	22	UDP 192.168.2.4:51518 <-> 31.13.91.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	23	UDP 192.168.2.4:51518 <-> 31.13.79.192:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
 	24	UDP 192.168.2.4:51518 <-> 31.13.93.48:3478 [proto: 189/WhatsAppVoice][24 pkts/4825 bytes]
-	25	UDP 192.168.2.4:52794 <-> 31.13.73.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	26	UDP 192.168.2.4:52794 <-> 31.13.93.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	27	UDP 192.168.2.4:52794 <-> 31.13.90.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	28	UDP 192.168.2.4:52794 <-> 31.13.74.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
+	25	UDP 192.168.2.4:52794 <-> 31.13.73.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	26	UDP 192.168.2.4:52794 <-> 31.13.93.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	27	UDP 192.168.2.4:52794 <-> 31.13.90.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	28	UDP 192.168.2.4:52794 <-> 31.13.74.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
 	29	UDP 192.168.2.4:52794 <-> 31.13.84.48:3478 [proto: 189/WhatsAppVoice][20 pkts/2993 bytes]
-	30	UDP 192.168.2.4:52794 <-> 31.13.79.192:3478 [proto: 78/STUN][5 pkts/676 bytes]
+	30	UDP 192.168.2.4:52794 <-> 31.13.79.192:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
 	31	TCP 192.168.2.4:49173 <-> 93.186.135.82:80 [proto: 7/HTTP][3 pkts/198 bytes]
 	32	TCP 192.168.2.4:49194 <-> 93.62.150.157:443 [proto: 91/SSL][3 pkts/198 bytes]
-	33	UDP 0.0.0.0:68 <-> 255.255.255.255:67 [proto: 18/DHCP][10 pkts/3420 bytes]
+	33	UDP 0.0.0.0:68 <-> 255.255.255.255:67 [proto: 18/DHCP][10 pkts/3420 bytes][Host: lucas-imac]
 	34	UDP 192.168.2.4:51518 <-> 91.253.176.65:9344 [proto: 189/WhatsAppVoice][464 pkts/52920 bytes]
 	35	TCP 192.168.2.4:49202 <-> 184.173.179.37:5222 [proto: 142/WhatsApp][180 pkts/24874 bytes]
 	36	UDP 192.168.2.1:57621 <-> 192.168.2.255:57621 [proto: 156/Spotify][3 pkts/258 bytes]

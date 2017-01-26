@@ -21,14 +21,12 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-
 #include "ndpi_protocols.h"
+
 #ifdef NDPI_PROTOCOL_STUN
 
 
 #define MAX_NUM_STUN_PKTS     10
-
 
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
@@ -48,13 +46,14 @@ typedef enum {
 
 static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
-					   const u_int8_t * payload, 
+					   const u_int8_t * payload,
 					   const u_int16_t payload_length,
 					   u_int8_t *is_whatsapp,
 					   u_int8_t *is_lync) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
-
+  u_int8_t can_this_be_whatsapp_voice = 1;
+	  
   if(payload_length < sizeof(struct stun_packet_header)) {
     if(flow->num_stun_udp_pkts > 0) {
       *is_whatsapp = 1;
@@ -68,18 +67,18 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "Found stun.\n");
     goto udp_stun_found;
   }
-  
+
   msg_type = ntohs(h->msg_type) & 0x3EEF, msg_len = ntohs(h->msg_len);
 
   if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
     return(NDPI_IS_NOT_STUN);
 
   /* printf("msg_type=%04X, msg_len=%u\n", msg_type, msg_len); */
-  
+
   if((payload_length == (msg_len+20))
      && ((msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */)) {
     u_int offset = 20;
-    
+
     /*
       This can either be the standard RTCP or Ms Lync RTCP that
       later will becomg Ms Lync RTP. In this case we need to
@@ -87,10 +86,17 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     */
 
     while(offset < payload_length) {
+
       u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
       u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
 
       switch(attribute) {
+      case 0x0008: /* Message Integrity */
+      case 0x0020: /* XOR-MAPPED-ADDRESSES */
+      case 0x4002:
+	/* These are the only messages apparently whatsapp voice can use */
+	break;
+	      
       case 0x8054: /* Candidate Identifier */
 	if((len == 4)
 	   && (payload[offset+4] == 0x31)
@@ -101,7 +107,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  return(NDPI_IS_STUN);
 	}
 	break;
-	
+
       case 0x8070: /* Implementation Version */
 	if((len == 4)
 	   && (payload[offset+4] == 0x00)
@@ -110,15 +116,19 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	   && (payload[offset+7] == 0x02)) {
 	  *is_lync = 1;
 	  return(NDPI_IS_STUN);
-	}	
-	break;	
+	}
+	break;
+
+      default:
+	/* This means this STUN packet cannot be confused with whatsapp voice */
+	can_this_be_whatsapp_voice = 0;
+	break;
       }
       offset += len + 4;
     }
-
-    goto udp_stun_found;  
+    goto udp_stun_found;
   }
-  
+
 #ifdef ORIGINAL_CODE
   /*
    * token list of message types and attribute types from
@@ -224,11 +234,12 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
   } else
-    return NDPI_IS_NOT_STUN;  
+    return NDPI_IS_NOT_STUN;
 
  udp_stun_found:
-  flow->num_stun_udp_pkts++;
-    
+  if(can_this_be_whatsapp_voice)
+    flow->num_stun_udp_pkts++;
+
   return((flow->num_stun_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
 }
 
@@ -244,11 +255,11 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
     if(packet->payload_packet_len >= 2 + 20 &&
        ntohs(get_u_int16_t(packet->payload, 0)) + 2 == packet->payload_packet_len) {
-      
+
       /* TODO there could be several STUN packets in a single TCP packet so maybe the detection could be
        * improved by checking only the STUN packet of given length */
 
-      if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2, 
+      if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
 			     packet->payload_packet_len - 2, &is_whatsapp, &is_lync) == NDPI_IS_STUN) {
 	NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found TCP stun.\n");
 	ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_STUN, flow);
@@ -257,14 +268,14 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     }
   }
 
-  if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload, 
+  if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
 			 packet->payload_packet_len, &is_whatsapp, &is_lync) == NDPI_IS_STUN) {
     if(is_lync) {
       NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
       ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_MS_LYNC, flow);
     } else {
       NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found UDP stun.\n");
-      ndpi_int_stun_add_connection(ndpi_struct, 
+      ndpi_int_stun_add_connection(ndpi_struct,
 				   is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
     }
     return;

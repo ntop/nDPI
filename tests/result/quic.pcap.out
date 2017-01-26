@@ -1,11 +1,11 @@
 Unknown	6	7072	1
 GMail	413	254874	1
-YouTube	83	73409	4
-Google	13	12847	3
+YouTube	85	76193	5
+Google	11	10063	2
 QUIC	3	364	1
 
 	1	UDP 192.168.1.105:48445 <-> 216.58.214.110:443 [proto: 188.124/QUIC.YouTube][3 pkts/2863 bytes][Host: i.ytimg.com]
-	2	UDP 192.168.1.105:53817 <-> 216.58.210.225:443 [proto: 188.126/QUIC.Google][2 pkts/2784 bytes][Host: yt3.ggpht.com]
+	2	UDP 192.168.1.105:53817 <-> 216.58.210.225:443 [proto: 188.124/QUIC.YouTube][2 pkts/2784 bytes][Host: yt3.ggpht.com]
 	3	UDP 216.58.212.101:443 <-> 192.168.1.109:57833 [proto: 188.122/QUIC.GMail][413 pkts/254874 bytes][Host: mail.google.com]
 	4	UDP 172.217.16.3:443 <-> 192.168.1.105:40461 [proto: 188/QUIC][3 pkts/364 bytes]
 	5	UDP 172.217.16.4:443 <-> 192.168.1.105:45669 [proto: 188.126/QUIC.Google][5 pkts/4334 bytes][Host: www.google.com]

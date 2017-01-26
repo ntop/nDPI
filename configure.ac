@@ -50,6 +50,11 @@ if test -f $PCAP_HOME/libpcap/libpcap.a; then :
 
      AC_CHECK_LIB([rt], [clock_gettime],   [PCAP_LIB="$PCAP_LIB -lrt"])
      AC_CHECK_LIB([nl], [nl_handle_alloc], [PCAP_LIB="$PCAP_LIB -lnl"])
+     # The dlopen() function is in libdl on GLIBC-based systems
+     # and in the C library for *BSD systems
+     AC_CHECK_LIB([dl], [dlopen, dlsym],   [DL_LIB="-ldl"],
+                  [AC_CHECK_LIB([c], [dlopen, dlsym], [DL_LIB="-lc"],
+                                [AC_MSG_ERROR([unable to find the dlopen(), dlsym() functions]) ]) ])
 else
     AC_CHECK_LIB([pcap], [pcap_open_live], [PCAP_LIB="-lpcap"])
 
@@ -87,13 +92,14 @@ LIBS=$OLD_LIBS
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
-AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile libndpi.pc])
+AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile tests/Makefile libndpi.pc])
 AC_CONFIG_HEADERS(config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(SVN_DATE)
 AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
+AC_SUBST(DL_LIB)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 
 AC_OUTPUT

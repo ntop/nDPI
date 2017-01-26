@@ -554,7 +554,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t mail_pop_stage:2;
 #endif
 #ifdef NDPI_PROTOCOL_MAIL_IMAP
-  u_int32_t mail_imap_stage:3;
+  u_int32_t mail_imap_stage:3, mail_imap_starttls:2;
 #endif
 #ifdef NDPI_PROTOCOL_SKYPE
   u_int8_t skype_packet_id;
@@ -571,6 +571,9 @@ struct ndpi_flow_tcp_struct {
 #ifdef NDPI_PROTOCOL_ZMQ
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
+#endif
+#ifdef NDPI_PROTOCOL_PPSTREAM
+  u_int32_t ppstream_stage:3;
 #endif
 }
 #ifndef WIN32
@@ -726,9 +729,40 @@ typedef enum {
 
 #define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)
 
+/* Abstract categories to group the protocols. */
+typedef enum {
+  NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
+  NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
+  NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
+  NDPI_PROTOCOL_CATEGORY_MAIL_SEND,         /* Protocols to send emails */
+  NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,         /* Protocols to receive or sync emails */
+  NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,     /* FTP and similar protocols */
+  NDPI_PROTOCOL_CATEGORY_WEB,               /* Web protocols and services */
+  NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
+  NDPI_PROTOCOL_CATEGORY_P2P,               /* File sharing and P2P */
+  NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
+  NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
+  NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
+  NDPI_PROTOCOL_CATEGORY_DATABASE,          /* Protocols for database communication */
+  NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
+  NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
+  NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
+  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development */
+  NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
+  NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
+  NDPI_PROTOCOL_CATEGORY_SYSTEM,            /* System level applications */
+
+  NDPI_PROTOCOL_NUM_CATEGORIES /*
+				  NOTE: Keep this as last member
+				  Unused as value but useful to getting the number of elements
+				  in this datastructure
+			       */
+} ndpi_protocol_category_t;
+
 /* ntop extensions */
 typedef struct ndpi_proto_defaults {
   char *protoName;
+  ndpi_protocol_category_t protoCategory;
   u_int16_t protoId, protoIdx;
   u_int16_t master_tcp_protoId[2], master_udp_protoId[2]; /* The main protocols on which this sub-protocol sits on */
   ndpi_protocol_breed_t protoBreed;
@@ -737,6 +771,7 @@ typedef struct ndpi_proto_defaults {
 
 typedef struct ndpi_default_ports_tree_node {
   ndpi_proto_defaults_t *proto;
+  u_int8_t customUserProto;
   u_int16_t default_port;
 } ndpi_default_ports_tree_node_t;
 
@@ -752,7 +787,6 @@ typedef struct ndpi_proto {
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
 
 struct ndpi_detection_module_struct {
-  
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
 
@@ -805,7 +839,7 @@ struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa; /* TOR */
-  
+
   /* IP-based protocol detection */
   void *protocols_ptree;
 
@@ -849,7 +883,7 @@ struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t http_dont_dissect_response:1, dns_dissect_response:1, 
+  u_int8_t http_dont_dissect_response:1, dns_dissect_response:1,
     direction_detect_disable:1; /* disable internal detection of packet direction */
 };
 
@@ -914,7 +948,7 @@ struct ndpi_flow_struct {
       u_int8_t num_queries, num_answers, reply_code;
       u_int16_t query_type, query_class, rsp_type;
     } dns;
-    
+
     struct {
       u_int8_t request_code;
       u_int8_t version;
@@ -1005,6 +1039,10 @@ struct ndpi_flow_struct {
 #ifdef NDPI_PROTOCOL_STARCRAFT
   u_int32_t starcraft_udp_stage : 3;	// 0-7
 #endif
+#ifdef NDPI_PROTOCOL_OPENVPN
+  u_int8_t ovpn_session_id[8];
+  u_int8_t ovpn_counter;
+#endif
 
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
@@ -1016,6 +1054,7 @@ struct ndpi_flow_struct {
 typedef struct {
   char *string_to_match, *proto_name;
   int protocol_id;
+  ndpi_protocol_category_t proto_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match;
 

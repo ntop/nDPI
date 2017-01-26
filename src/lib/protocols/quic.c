@@ -73,7 +73,6 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
      && ((packet->payload[0] & 0xC2) == 0x00)
      && (quic_ports(ntohs(packet->udp->source), ntohs(packet->udp->dest)))
      ) {
-    char *begin;
     int i;
 
     if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
@@ -82,7 +81,8 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found QUIC.\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
 
-    if(!strncmp((char*)&packet->payload[quic_hlen+17], "CHLO" /* Client Hello */, 4)) {
+    if(udp_len > quic_hlen + 17 + 4 &&
+         !strncmp((char*)&packet->payload[quic_hlen+17], "CHLO" /* Client Hello */, 4)) {
       /* Check if SNI (Server Name Identification) is present */
       for(i=quic_hlen+12; i<udp_len-3; i++) {
 	if((packet->payload[i] == 'S')
@@ -94,7 +94,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	  int len = offset-prev_offset;
 	  int sni_offset = i+prev_offset+1;
 
-	  while((packet->payload[sni_offset] == '-') && (sni_offset < udp_len))
+	  while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
 	    sni_offset++;
 
 	  if((sni_offset+len) < udp_len) {

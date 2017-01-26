@@ -5,8 +5,6 @@
  * Copyright (C) 2013 Remy Mudingay <mudingay@ill.fr>
  *
  */
-
-
 #include "ndpi_api.h"
 
 #ifdef NDPI_PROTOCOL_TOR
@@ -19,6 +17,7 @@ static void ndpi_int_tor_add_connection(struct ndpi_detection_module_struct
 
 int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 		    struct ndpi_flow_struct *flow, char *certificate) {
+  
   int prev_num = 0, numbers_found = 0, num_found = 0, i, len;
   char dummy[48], *dot, *name;
 

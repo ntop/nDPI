@@ -78,8 +78,6 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t payload_len = packet->payload_packet_len;
-  int found = 0;
-
 
   NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "RX: pck: %d, dir[0]: %d, dir[1]: %d\n",
            flow->packet_counter, flow->packet_direction_counter[0], flow->packet_direction_counter[1]);
