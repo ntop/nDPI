@@ -128,6 +128,12 @@ static ndpi_network host_protocol_list[] = {
   { 0x68F28200 /* 202.160.130.0/24 */, 24, NDPI_PROTOCOL_TWITTER },
   { 0x68F28300 /* 202.160.131.0/24 */, 24, NDPI_PROTOCOL_TWITTER },
 
+  /*
+    WhatsApp Inc.
+    169.47.35.32 - 169.47.35.63
+  */
+   { 0xA92F2320 /* 169.47.35.32/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+   
  /*
    OpenDNS
    208.67.216.0/21
