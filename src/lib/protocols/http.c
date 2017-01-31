@@ -40,7 +40,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
     ndpi_search_tcp_or_udp(ndpi_struct, flow);
 
     /* If no custom protocol has been detected */
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+    /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */ {
       if(protocol == NDPI_PROTOCOL_HTTP) {
 	ndpi_int_reset_protocol(flow);
 	ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, protocol);
