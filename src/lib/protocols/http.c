@@ -41,10 +41,11 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 
     /* If no custom protocol has been detected */
     if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-      if(protocol == NDPI_PROTOCOL_HTTP)
+      if(protocol == NDPI_PROTOCOL_HTTP) {
 	ndpi_int_reset_protocol(flow);
-
-      ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, protocol);
+      } else
+	ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_HTTP);
     }
 
     flow->http_detected = 1;
@@ -382,7 +383,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(!ndpi_struct->http_dont_dissect_response && flow->http_detected)
     parseHttpSubprotocol(ndpi_struct, flow);
 
-  flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
+  if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+    flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
 
   /* check for accept line */
   if(packet->accept_line.ptr != NULL) {

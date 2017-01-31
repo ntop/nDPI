@@ -1680,10 +1680,8 @@ u_int8_t ndpi_is_tor_flow(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->tcp != NULL) {
     if(packet->iph) {
-      if(tor_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->saddr)
-         || tor_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->daddr)) {
+      if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_TOR)
 	return(1);
-      }
     }
   }
 
@@ -4413,7 +4411,8 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
   u_int8_t user_defined_proto;
 
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
-    rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, proto, shost, dhost, sport, dport);
+    rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, NULL, proto,
+				    shost, dhost, sport, dport);
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.protocol = rc,
