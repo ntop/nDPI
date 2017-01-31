@@ -204,15 +204,15 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
   else if(iqiyi_counter > 0) {
     NDPI_LOG(NDPI_SERVICE_IQIYI, ndpi_struct, NDPI_LOG_DEBUG, "iQiyi found.\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_IQIYI);
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI);
   }
 #endif
 
-#ifdef NDPI_SERVICE_1KXUN
+#ifdef NDPI_PROTOCOL_1KXUN
   /* 1KXUN */
   if(kxun_counter > 0) {
-    NDPI_LOG(NDPI_SERVICE_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "1kxun found.\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_1KXUN);
+    NDPI_LOG(NDPI_PROTOCOL_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "1kxun found.\n");
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN);
   }
 #endif
 
@@ -817,7 +817,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       x = 1;
       while(packet->line[x].len != 0) {
 	if((memcmp(packet->line[x].ptr, "X-FB-SIM-HNI", 12)) == 0) {
-	  ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_FACEBOOK);
+	  ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_FACEBOOK);
 	  check_content_type_and_change_protocol(ndpi_struct, flow);
 	  return;
 	}

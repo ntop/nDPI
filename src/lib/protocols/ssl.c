@@ -363,7 +363,7 @@ static void ssl_mark_and_payload_search_for_other_protocols(struct
 							    ndpi_detection_module_struct
 							    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-#if defined(NDPI_PROTOCOL_MEEBO)|| defined(NDPI_PROTOCOL_TOR) || defined(NDPI_PROTOCOL_VPN_X) || defined(NDPI_PROTOCOL_UNENCRYPED_JABBER) || defined (NDPI_PROTOCOL_OSCAR) || defined (NDPI_PROTOCOL_ITUNES) || defined (NDPI_SERVICE_GMAIL)
+#if defined(NDPI_PROTOCOL_MEEBO)|| defined(NDPI_PROTOCOL_TOR) || defined(NDPI_PROTOCOL_VPN_X) || defined(NDPI_PROTOCOL_UNENCRYPED_JABBER) || defined (NDPI_PROTOCOL_OSCAR) || defined (NDPI_PROTOCOL_ITUNES) || defined (NDPI_PROTOCOL_GMAIL)
   struct ndpi_packet_struct *packet = &flow->packet;
   //      struct ndpi_id_struct         *src=flow->src;
   //      struct ndpi_id_struct         *dst=flow->dst;
@@ -598,7 +598,7 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	   && (packet->payload[4] == 0)
 	   && (packet->payload[2] <= 9)
 	   && (packet->payload[3] <= 9))) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_SERVICE_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
       return;
     } else {
       /* No whatsapp, let's try SSL */

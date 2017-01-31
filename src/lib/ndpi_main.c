@@ -671,6 +671,20 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 /* ******************************************************************** */
 
+static void ndpi_init_placeholder_proto(struct ndpi_detection_module_struct *ndpi_mod,
+					ndpi_port_range *ports_a,
+					ndpi_port_range *ports_b,
+					u_int16_t *no_master,
+					u_int16_t proto_id) {
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, proto_id,
+			  no_master,
+			  no_master, "Placeholder", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
+}
+
+/* ******************************************************************** */
+
 /* This function is used to map protocol name and default ports and it MUST
    be updated whenever a new protocol is added to NDPI.
 
@@ -1063,7 +1077,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, "WorldOfWarcraft", NDPI_PROTOCOL_CATEGORY_GAME,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_HOTSPOT_SHIELD,
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HOTSPOT_SHIELD,
 			  no_master,
 			  no_master, "HotspotShield", NDPI_PROTOCOL_CATEGORY_VPN,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1382,7 +1396,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, "EAQ", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 6000, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_KAKAOTALK_VOICE,
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_KAKAOTALK_VOICE,
 			  no_master,
 			  no_master, "KakaoTalk_Voice", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1558,7 +1572,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, "DRDA", NDPI_PROTOCOL_CATEGORY_DATABASE,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),       /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
-  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_SERVICE_HANGOUT,
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HANGOUT,
 			  no_master,
 			  no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_CHAT,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1568,7 +1582,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, "BJNP", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 8612, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_SERVICE_1KXUN,
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_1KXUN,
 			  no_master,
 			  no_master, "1kxun", NDPI_PROTOCOL_CATEGORY_MEDIA,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),      /* TCP */
@@ -1579,6 +1593,14 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
 
+  /* To be removed as soon as we define new protocols */
+  ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_191);
+  ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_192);
+  ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_217);
+  ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_222);
+  ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_223);
+  ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_224);
+  ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_225);
 
   /* calling function for host and content matched protocols */
   init_string_based_protocols(ndpi_mod);

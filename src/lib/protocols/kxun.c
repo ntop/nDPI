@@ -19,13 +19,13 @@
  */
 #include "ndpi_protocols.h"
 
-#ifdef NDPI_SERVICE_1KXUN
+#ifdef NDPI_PROTOCOL_1KXUN
 
 
 static void ndpi_int_kxun_add_connection(struct ndpi_detection_module_struct
 					     *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_SERVICE_1KXUN, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN, NDPI_PROTOCOL_UNKNOWN);
 }
 
 
@@ -46,7 +46,7 @@ void ndpi_search_kxun(struct ndpi_detection_module_struct
 	   packet->payload[1] == 0x0f &&
 	   packet->payload[4] == 0xa0 &&
 	   packet->payload[5] == 0x00) {
-	  NDPI_LOG(NDPI_SERVICE_1KXUN, ndpi_struct, NDPI_LOG_DEBUG,
+	  NDPI_LOG(NDPI_PROTOCOL_1KXUN, ndpi_struct, NDPI_LOG_DEBUG,
 		   "found 1kxun over udp.\n");
 	  ndpi_int_kxun_add_connection(ndpi_struct, flow);
 	  return;
@@ -78,15 +78,15 @@ void ndpi_search_kxun(struct ndpi_detection_module_struct
     }
   }
   /* EXCLUDE 1KXUN */
-  NDPI_LOG(NDPI_SERVICE_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "exclude 1kxun.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_SERVICE_1KXUN);
+  NDPI_LOG(NDPI_PROTOCOL_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "exclude 1kxun.\n");
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_1KXUN);
 }
 
 
 void init_kxun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("1kxun", ndpi_struct, detection_bitmask, *id,
-				      NDPI_SERVICE_1KXUN,
+				      NDPI_PROTOCOL_1KXUN,
 				      ndpi_search_kxun,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
