@@ -236,7 +236,10 @@
 #define NDPI_PROTOCOL_KAKAOTALK_VOICE 	 194 /* KakaoTalk Voice */
 #define NDPI_PROTOCOL_TWITCH 	 195 /* Edoardo Dominici <edoaramis@gmail.com> */
 #define NDPI_PROTOCOL_QUICKPLAY 	 196 /* Streaming service used by various services such as hooq.tv */
-#define NDPI_PROTOCOL_OPENDNS 	 197
+
+/* 197 is free */
+#define NDPI_PROTOCOL_FREE_197   197
+
 #define NDPI_PROTOCOL_MPEGTS 	 198
 #define NDPI_PROTOCOL_SNAPCHAT 	 199
 #define NDPI_PROTOCOL_SINA 	 200
@@ -247,8 +250,11 @@
 #define NDPI_PROTOCOL_1KXUN 	 205
 #define NDPI_PROTOCOL_IQIYI 	 206
 #define NDPI_PROTOCOL_SMPP 	 207 /* Damir Franusic <df@release14.org> */
-#define NDPI_PROTOCOL_MQTT 	 208
-#define NDPI_PROTOCOL_RX 	 209
+
+/* 208 - 209 free */
+#define NDPI_PROTOCOL_FREE_208   208
+#define NDPI_PROTOCOL_FREE_209   209
+
 #define NDPI_PROTOCOL_DEEZER 	 210
 #define NDPI_PROTOCOL_INSTAGRAM 	 211 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */
 #define NDPI_PROTOCOL_MICROSOFT 	 212
@@ -264,13 +270,13 @@
 #define NDPI_PROTOCOL_OFFICE_365 	 219
 #define NDPI_PROTOCOL_CLOUDFLARE 	 220
 #define NDPI_PROTOCOL_MS_ONE_DRIVE 	 221
+#define NDPI_PROTOCOL_MQTT 	         222
+#define NDPI_PROTOCOL_RX 	         223
 
-/* 222 - 225 */
-#define NDPI_PROTOCOL_FREE_222   222
-#define NDPI_PROTOCOL_FREE_223   223
+/* 224 is free */
 #define NDPI_PROTOCOL_FREE_224   224
-#define NDPI_PROTOCOL_FREE_225   225
 
+#define NDPI_PROTOCOL_OPENDNS 	 225
 #define NDPI_PROTOCOL_GIT 	 226
 #define NDPI_PROTOCOL_DRDA 	 227
 
