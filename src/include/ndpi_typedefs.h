@@ -921,7 +921,7 @@ struct ndpi_flow_struct {
   */
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
-  u_char host_server_name[192];
+  u_char host_server_name[256];
   /* Via HTTP User-Agent */
   u_char detected_os[32];
   /* Via HTTP X-Forwarded-For */
