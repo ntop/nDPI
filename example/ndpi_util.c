@@ -440,7 +440,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
    Function to process the packet:
    determine the flow of a packet and try to decode it
    @return: 0 if success; else != 0
-   
+
    @Note: ipsize = header->len - ip_offset ; rawsize = header->len
 */
 static unsigned int packet_processing(struct ndpi_workflow * workflow,
@@ -519,10 +519,18 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   }
 
   if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
-    snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s",
-	     flow->ndpi_flow->protos.ssl.client_certificate);
-    snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s",
-	     flow->ndpi_flow->protos.ssl.server_certificate);
+    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_SSH) {
+      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
+	       flow->ndpi_flow->protos.ssh.client_signature);
+      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
+	       flow->ndpi_flow->protos.ssh.server_signature);
+    } else if((flow->detected_protocol.protocol == NDPI_PROTOCOL_SSL)
+	      || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
+      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
+	       flow->ndpi_flow->protos.ssl.client_certificate);
+      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
+	       flow->ndpi_flow->protos.ssl.server_certificate);
+    }
   }
 
   if(flow->detection_completed) {

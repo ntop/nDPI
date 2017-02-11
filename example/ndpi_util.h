@@ -62,8 +62,8 @@ typedef struct ndpi_flow_info {
   char bittorent_hash[41];
 
   struct {
-    char client_certificate[48], server_certificate[48];
-  } ssl;
+    char client_info[48], server_info[48];
+  } ssh_ssl;
 
   void *src_id, *dst_id;
 } ndpi_flow_info_t;
