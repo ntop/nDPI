@@ -387,7 +387,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 	    flow->packets, (long long unsigned int) flow->bytes);
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
-
+    if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
     
     if(flow->ssh_ssl.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_ssl.client_info);
     if(flow->ssh_ssl.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_ssl.server_info);

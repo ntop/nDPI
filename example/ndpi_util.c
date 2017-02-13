@@ -516,8 +516,12 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
     }
 
     if(n == 0) flow->bittorent_hash[0] = '\0';
+  } else if(flow->detected_protocol.protocol == NDPI_PROTOCOL_MDNS) {
+    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.mdns.answer);
+  } else if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UBNTAC2) {
+    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
   }
-
+    
   if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
     if(flow->detected_protocol.protocol == NDPI_PROTOCOL_SSH) {
       snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",

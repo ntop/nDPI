@@ -960,6 +960,14 @@ struct ndpi_flow_struct {
     struct {
       char client_signature[48], server_signature[48];
     } ssh;
+
+    struct {
+      char answer[96];
+    } mdns;
+
+    struct {
+      char version[96];
+    } ubntac2;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/
