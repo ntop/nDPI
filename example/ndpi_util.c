@@ -662,10 +662,12 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     break;
 
     /* Linux Cooked Capture - 113 */
+#ifdef __linux__
   case DLT_LINUX_SLL :
     type = (packet[eth_offset+14] << 8) + packet[eth_offset+15];
     ip_offset = 16 + eth_offset;
     break;
+#endif
 
     /* Radiotap link-layer - 127 */
   case DLT_IEEE802_11_RADIO :
