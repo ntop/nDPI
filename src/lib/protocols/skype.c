@@ -1,7 +1,7 @@
 /*
  * skype.c
  *
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2017 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,8 +17,6 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-
 #include "ndpi_api.h"
 
 #ifdef NDPI_PROTOCOL_SKYPE
@@ -55,18 +53,17 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
+  
   if(flow->host_server_name[0] != '\0')
     return;
 
-  /*
-    Skype AS8220
-    212.161.8.0/24
-  */
+  
   if(is_skype_flow(ndpi_struct, flow)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
     return;
   }
 
+  // UDP check
   if(packet->udp != NULL) {
     flow->l4.udp.skype_packet_id++;
 
@@ -75,20 +72,20 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 
       /* skype-to-skype */
       if(dport != 1119) /* It can be confused with battle.net */ {
-	if(((payload_len == 3) && ((packet->payload[2] & 0x0F)== 0x0d))
-	   || ((payload_len >= 16)
-	       && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
-	       && (packet->payload[2] == 0x02))) {
+	if(((payload_len == 3) && ((packet->payload[2] & 0x0F)== 0x0d)) ||
+	   ((payload_len >= 16)
+	    && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
+	    && (packet->payload[2] == 0x02))) {
 	  NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found skype.\n");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
 	}
       }
-
       return;
     }
-
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SKYPE);
     return;
+    
+    // TCP check
   } else if(packet->tcp != NULL) {
     flow->l4.tcp.skype_packet_id++;
 

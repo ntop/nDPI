@@ -317,11 +317,13 @@ static ndpi_network host_protocol_list[] = {
     157.60.0.0/16, 157.54.0.0/15
     13.107.3.128/32
     13.107.3.129/32
-    111.221.64.0 - 111.221.127.255
+    13.64.0.0/11
+    111.221.64.0/18
     91.190.216.0/21 (AS198015 Skype Communications Sarl)
     91.190.218.0/24
     40.126.129.109/32
     65.55.223.0/26
+    23.96.0.0/13
   */
   { 0x9D388740 /* 157.56.135.64 */, 26, NDPI_PROTOCOL_SKYPE },
   { 0x9D38B900 /* 157.56.185.0 */, 26, NDPI_PROTOCOL_SKYPE },
@@ -330,6 +332,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x9D38C600 /* 157.56.198.0 */, 26, NDPI_PROTOCOL_SKYPE },
   { 0x9D3C0000 /* 157.60.0.0 */, 16, NDPI_PROTOCOL_SKYPE },
   { 0x9D360000 /* 157.54.0.0 */, 15, NDPI_PROTOCOL_SKYPE },
+  { 0x0D400000 /* 13.64.0.0 */, 11, NDPI_PROTOCOL_SKYPE },
   { 0x0D6B0380 /* 13.107.3.128 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x0D6B0381 /* 13.107.3.129 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x6FDD4000 /* 111.221.64.0 */, 18, NDPI_PROTOCOL_SKYPE },
@@ -337,6 +340,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x5BBEDA00 /* 91.190.218.0 */, 24, NDPI_PROTOCOL_SKYPE },
   { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
+  { 0x17600000 /* 23.96.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
 
   /*
     route:          5.42.160.0/19
