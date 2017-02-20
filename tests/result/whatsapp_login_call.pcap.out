@@ -1,10 +1,10 @@
 HTTP	11	726	3
 MDNS	8	952	4
 DHCP	10	3420	1
-STUN	37	3674	4
+STUN	27	2322	2
 ICMP	10	700	1
 SSL	8	589	2
-Facebook	60	8112	12
+Facebook	70	9464	14
 Dropbox	4	2176	1
 Apple	127	28102	20
 WhatsApp	182	25154	2
@@ -16,9 +16,9 @@ WhatsAppVoice	706	91156	4
 	2	UDP 192.168.2.1:17500 <-> 192.168.2.255:17500 [proto: 121/Dropbox][4 pkts/2176 bytes]
 	3	ICMP 192.168.2.4:0 <-> 91.253.176.65:0 [proto: 81/ICMP][10 pkts/700 bytes]
 	4	UDP 192.168.2.4:52794 <-> 91.253.176.65:9665 [proto: 189/WhatsAppVoice][198 pkts/30418 bytes]
-	5	UDP 173.252.114.1:3478 <-> 192.168.2.4:52794 [proto: 78/STUN][5 pkts/676 bytes]
+	5	UDP 173.252.114.1:3478 <-> 192.168.2.4:52794 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
 	6	UDP 192.168.2.1:53 <-> 192.168.2.4:51897 [proto: 5.140/DNS.Apple][2 pkts/330 bytes][Host: query.ess.apple.com]
-	7	UDP 192.168.2.4:52794 <-> 179.60.192.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
+	7	UDP 192.168.2.4:52794 <-> 179.60.192.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
 	8	UDP 192.168.2.4:51518 <-> 1.194.90.191:60312 [proto: 78/STUN][15 pkts/1290 bytes]
 	9	TCP 192.168.2.4:49166 <-> 17.154.66.121:443 [proto: 91.140/SSL.Apple][3 pkts/162 bytes]
 	10	TCP 192.168.2.4:49169 <-> 17.173.66.102:443 [proto: 91.140/SSL.Apple][3 pkts/162 bytes]

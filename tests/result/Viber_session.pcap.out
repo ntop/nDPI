@@ -1,5 +1,5 @@
 Unknown	163	9995	7
-HTTP	14	862	8
+HTTP	13	796	7
 SSL_No_Cert	34	4141	1
 ICMP	2	196	1
 SSL	80	7703	8
@@ -8,6 +8,7 @@ Dropbox	1	97	1
 GMail	21	1891	1
 Google	50	4084	5
 Viber	4163	392492	4
+Amazon	1	66	1
 
 	1	TCP 74.125.130.188:5228 <-> 192.168.200.222:57999 [proto: 126/Google][10 pkts/757 bytes]
 	2	TCP 74.125.130.188:5228 <-> 192.168.200.222:59011 [proto: 126/Google][9 pkts/692 bytes]
@@ -16,7 +17,7 @@ Viber	4163	392492	4
 	5	TCP 222.165.163.117:443 <-> 192.168.200.222:47424 [proto: 91/SSL][5 pkts/385 bytes]
 	6	TCP 192.168.200.222:38039 <-> 31.13.79.246:443 [proto: 91.119/SSL.Facebook][23 pkts/3345 bytes]
 	7	TCP 216.58.199.206:443 <-> 192.168.200.222:58663 [proto: 91.126/SSL.Google][2 pkts/132 bytes]
-	8	TCP 54.251.141.219:80 <-> 192.168.200.222:38778 [proto: 7/HTTP][1 pkts/66 bytes]
+	8	TCP 54.251.141.219:80 <-> 192.168.200.222:38778 [proto: 7.178/HTTP.Amazon][1 pkts/66 bytes]
 	9	TCP 54.169.63.186:443 <-> 192.168.200.222:39339 [proto: 91.144/SSL.Viber][6 pkts/412 bytes]
 	10	TCP 93.184.221.200:80 <-> 192.168.200.222:33161 [proto: 7/HTTP][1 pkts/60 bytes]
 	11	TCP 192.168.200.222:52491 <-> 31.13.79.245:443 [proto: 91.119/SSL.Facebook][6 pkts/599 bytes]

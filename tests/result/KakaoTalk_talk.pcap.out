@@ -1,35 +1,32 @@
-Unknown	4	396	1
 HTTP	5	280	1
 QQ	15	1727	1
 SSL_No_Cert	29	4024	1
 RTP	2991	398751	2
-SSL	8	1378	3
-Facebook	2	197	1
+SSL	5	1198	1
+Facebook	5	377	3
 Google	4	359	4
 HTTP_Proxy	61	11946	3
 Tor	40	10538	1
+Amazon	4	396	1
 KakaoTalk_Voice	44	6196	2
 
 	1	TCP 10.24.82.188:34533 <-> 120.28.26.242:80 [proto: 7/HTTP][5 pkts/280 bytes]
-	2	TCP 10.24.82.188:38380 <-> 173.194.117.229:443 [proto: 91.126/SSL.Google][1 pkts/56 bytes]
-	3	TCP 10.24.82.188:51021 <-> 103.246.57.251:8080 [proto: 131/HTTP_Proxy][11 pkts/1488 bytes]
-	4	UDP 10.188.1.1:53 <-> 10.24.82.188:25223 [proto: 5.119/DNS.Facebook][2 pkts/197 bytes][Host: mqtt.facebook.com]
-	5	TCP 173.252.88.128:443 <-> 10.24.82.188:59912 [proto: 91/SSL][2 pkts/124 bytes]
-	6	TCP 173.252.88.128:443 <-> 10.24.82.188:59954 [proto: 64/SSL_No_Cert][29 pkts/4024 bytes]
-	7	TCP 10.24.82.188:53974 <-> 203.205.151.233:8080 [proto: 131/HTTP_Proxy][5 pkts/350 bytes]
-	8	TCP 110.76.143.50:8080 <-> 10.24.82.188:32968 [proto: 131/HTTP_Proxy][45 pkts/10108 bytes]
-	9	TCP 139.150.0.125:443 <-> 10.24.82.188:46947 [proto: 91/SSL][5 pkts/1198 bytes]
-	10	TCP 173.194.72.188:5228 <-> 10.24.82.188:34686 [proto: 126/Google][1 pkts/164 bytes]
-	11	TCP 110.76.143.50:9001 <-> 10.24.82.188:58857 [proto: 163/Tor][40 pkts/10538 bytes]
-	12	TCP 173.252.122.1:443 <-> 10.24.82.188:52123 [proto: 91/SSL][1 pkts/56 bytes]
-	13	TCP 10.24.82.188:48489 <-> 203.205.147.215:80 [proto: 7.48/HTTP.QQ][15 pkts/1727 bytes][Host: hkminorshort.weixin.qq.com]
-	14	UDP 1.201.1.174:23047 <-> 10.24.82.188:10269 [proto: 194/KakaoTalk_Voice][22 pkts/3112 bytes]
-	15	UDP 1.201.1.174:23046 <-> 10.24.82.188:10268 [proto: 87/RTP][1488 pkts/198510 bytes]
-	16	UDP 1.201.1.174:23045 <-> 10.24.82.188:11321 [proto: 194/KakaoTalk_Voice][22 pkts/3084 bytes]
-	17	UDP 1.201.1.174:23044 <-> 10.24.82.188:11320 [proto: 87/RTP][1503 pkts/200241 bytes]
-	18	TCP 216.58.220.174:443 <-> 10.24.82.188:49217 [proto: 91.126/SSL.Google][1 pkts/83 bytes]
-	19	TCP 216.58.220.161:443 <-> 10.24.82.188:56697 [proto: 91.126/SSL.Google][1 pkts/56 bytes]
-
-
-Undetected flows:
-	1	TCP 10.24.82.188:58916 <-> 54.255.185.236:5222 [proto: 0/Unknown][4 pkts/396 bytes]
+	2	TCP 10.24.82.188:58916 <-> 54.255.185.236:5222 [proto: 178/Amazon][4 pkts/396 bytes]
+	3	TCP 10.24.82.188:38380 <-> 173.194.117.229:443 [proto: 91.126/SSL.Google][1 pkts/56 bytes]
+	4	TCP 10.24.82.188:51021 <-> 103.246.57.251:8080 [proto: 131/HTTP_Proxy][11 pkts/1488 bytes]
+	5	UDP 10.188.1.1:53 <-> 10.24.82.188:25223 [proto: 5.119/DNS.Facebook][2 pkts/197 bytes][Host: mqtt.facebook.com]
+	6	TCP 173.252.88.128:443 <-> 10.24.82.188:59912 [proto: 91.119/SSL.Facebook][2 pkts/124 bytes]
+	7	TCP 173.252.88.128:443 <-> 10.24.82.188:59954 [proto: 64/SSL_No_Cert][29 pkts/4024 bytes]
+	8	TCP 10.24.82.188:53974 <-> 203.205.151.233:8080 [proto: 131/HTTP_Proxy][5 pkts/350 bytes]
+	9	TCP 110.76.143.50:8080 <-> 10.24.82.188:32968 [proto: 131/HTTP_Proxy][45 pkts/10108 bytes]
+	10	TCP 139.150.0.125:443 <-> 10.24.82.188:46947 [proto: 91/SSL][5 pkts/1198 bytes]
+	11	TCP 173.194.72.188:5228 <-> 10.24.82.188:34686 [proto: 126/Google][1 pkts/164 bytes]
+	12	TCP 110.76.143.50:9001 <-> 10.24.82.188:58857 [proto: 163/Tor][40 pkts/10538 bytes]
+	13	TCP 173.252.122.1:443 <-> 10.24.82.188:52123 [proto: 91.119/SSL.Facebook][1 pkts/56 bytes]
+	14	TCP 10.24.82.188:48489 <-> 203.205.147.215:80 [proto: 7.48/HTTP.QQ][15 pkts/1727 bytes][Host: hkminorshort.weixin.qq.com]
+	15	UDP 1.201.1.174:23047 <-> 10.24.82.188:10269 [proto: 194/KakaoTalk_Voice][22 pkts/3112 bytes]
+	16	UDP 1.201.1.174:23046 <-> 10.24.82.188:10268 [proto: 87/RTP][1488 pkts/198510 bytes]
+	17	UDP 1.201.1.174:23045 <-> 10.24.82.188:11321 [proto: 194/KakaoTalk_Voice][22 pkts/3084 bytes]
+	18	UDP 1.201.1.174:23044 <-> 10.24.82.188:11320 [proto: 87/RTP][1503 pkts/200241 bytes]
+	19	TCP 216.58.220.174:443 <-> 10.24.82.188:49217 [proto: 91.126/SSL.Google][1 pkts/83 bytes]
+	20	TCP 216.58.220.161:443 <-> 10.24.82.188:56697 [proto: 91.126/SSL.Google][1 pkts/56 bytes]
