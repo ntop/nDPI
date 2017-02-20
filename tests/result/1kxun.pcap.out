@@ -1,6 +1,6 @@
 Unknown	9	2428	7
 DNS	2	378	1
-HTTP	8	500	3
+HTTP	5	324	2
 MDNS	1	82	1
 NTP	1	90	1
 NetBIOS	31	3589	8
@@ -10,6 +10,7 @@ QQ	28	5216	2
 SSL	105	21914	7
 DHCPV6	10	980	3
 Facebook	19	6840	2
+Google	3	176	1
 HTTP_Proxy	33	11721	1
 LLMNR	89	6799	47
 Lync	2	132	1
@@ -120,7 +121,7 @@ Lync	2	132	1
 	103	UDP 192.168.5.50:64674 <-> 239.255.255.250:1900 [proto: 12/SSDP][9 pkts/1611 bytes]
 	104	UDP 192.168.5.57:65150 <-> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/136 bytes][Host: usher-pc]
 	105	UDP 192.168.3.236:65496 <-> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/138 bytes][Host: wangs-ltw]
-	106	TCP 192.168.115.8:49581 <-> 64.233.189.128:80 [proto: 7/HTTP][3 pkts/176 bytes]
+	106	TCP 192.168.115.8:49581 <-> 64.233.189.128:80 [proto: 7.126/HTTP.Google][3 pkts/176 bytes]
 	107	UDP 192.168.119.1:67 <-> 255.255.255.255:68 [proto: 18/DHCP][14 pkts/4788 bytes]
 	108	UDP 192.168.5.9:68 <-> 255.255.255.255:67 [proto: 18/DHCP][1 pkts/342 bytes][Host: joanna-pc]
 	109	UDP 192.168.5.41:68 <-> 255.255.255.255:67 [proto: 18/DHCP][1 pkts/342 bytes][Host: kevin-pc]
