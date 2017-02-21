@@ -1,7 +1,7 @@
 /*
  * ndpi_util.c
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -717,6 +717,12 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
     ip_offset += 4;
     vlan_packet = 1;
+    // double tagging for 802.1Q
+    if(type == 0x8100) {
+      vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
+      type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
+      ip_offset += 4;
+    }
     break;
   case MPLS_UNI:
   case MPLS_MULTI:
