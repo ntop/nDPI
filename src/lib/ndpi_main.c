@@ -1599,7 +1599,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, "SMPP", NDPI_PROTOCOL_CATEGORY_P2P,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
-#if 
+
   /* To be removed as soon as we define new protocols */
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_191);
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_192);
@@ -1608,16 +1608,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_209);
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_217);
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_224);
-
-  /* calling function for host and content matched protocols */
-  init_string_based_protocols(ndpi_mod);
-
-  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
-    if(ndpi_mod->proto_defaults[i].protoName == NULL) {
-      printf("[NDPI] %s(missing protoId=%d) INTERNAL ERROR: not all protocols have been initialized\n", __FUNCTION__, i);
-    }
-  }
->>>>>>> c2c92b2e9bd8ac9d82b2056ed7887827679c990a
 }
 
 /* ****************************************************** */
@@ -1648,17 +1638,6 @@ static int fill_prefix_v4(prefix_t *p, struct in_addr *a, int b, int mb) {
     p->ref_count = 0;
   } while (0);
 
-  return(0);
-}
-
-/* ******************************************* */
-
-u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin /* network byte order */) {
-  prefix_t prefix;
-  patricia_node_t *node;
-
-  /* Make sure all in network byte order otherwise compares wont work */
-  fill_prefix_v4(&prefix, pin, 32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
   return(0);
 }
 
@@ -2087,6 +2066,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
     case '/':
     case '&':
     case '^':
+    case ':':
     case ';':
     case '\'':
     case '"':
@@ -4812,6 +4792,17 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct,
   if(!automa->ac_automa_finalized) {
     ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
     automa->ac_automa_finalized = 1;
+  }
+
+  ac_input_text.astring = bigram_to_match, ac_input_text.length = 2;
+  ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, (void*)&ret);
+  ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
+
+  return(ret);
+}
+
+/* ****************************************************** */
+
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
     if(flow->http.url)          ndpi_free(flow->http.url);
