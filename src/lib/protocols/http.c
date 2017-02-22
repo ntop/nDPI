@@ -1,8 +1,7 @@
 /*
  * http.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -326,8 +325,12 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	  }
 	}
       }
+      else if(memcmp(ua, "netflix-ios-app", 15) == 0) {
+      	ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_NETFLIX);
+      	return;
+      }
     }
-
+    
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "User Agent Type Line found %.*s\n",
 	     packet->user_agent_line.len, packet->user_agent_line.ptr);
   }
@@ -419,8 +422,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 				     (char*)packet->content_line.ptr, packet->content_line.len,
 				     NDPI_PROTOCOL_HTTP);
   }
-
-  /* check user agent here too */
 }
 
 static void check_http_payload(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
