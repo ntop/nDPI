@@ -1,7 +1,7 @@
-HTTP	2	1469	1
 QQ	12	4781	5
 Facebook	6	1740	3
 Google	2	378	1
+Amazon	2	1469	1
 QuickPlay	133	96179	11
 
 	1	TCP 120.28.26.231:80 <-> 10.54.169.250:33277 [proto: 7.126/HTTP.Google][2 pkts/378 bytes][Host: clients3.google.com]
@@ -16,7 +16,7 @@ QuickPlay	133	96179	11
 	10	TCP 173.252.74.22:80 <-> 10.54.169.250:52285 [proto: 7.119/HTTP.Facebook][2 pkts/582 bytes][Host: www.facebook.com]
 	11	TCP 31.13.68.49:80 <-> 10.54.169.250:44793 [proto: 7.119/HTTP.Facebook][2 pkts/576 bytes][Host: www.facebook.com]
 	12	TCP 120.28.5.18:80 <-> 10.54.169.250:33064 [proto: 7.196/HTTP.QuickPlay][2 pkts/467 bytes][Host: api-singtelhawk.quickplay.com]
-	13	TCP 54.179.140.65:80 <-> 10.54.169.250:56381 [proto: 7/HTTP][2 pkts/1469 bytes][Host: api.account.xiaomi.com]
+	13	TCP 54.179.140.65:80 <-> 10.54.169.250:56381 [proto: 7.178/HTTP.Amazon][2 pkts/1469 bytes][Host: api.account.xiaomi.com]
 	14	TCP 120.28.5.41:80 <-> 10.54.169.250:44256 [proto: 7.196/HTTP.QuickPlay][3 pkts/2311 bytes][Host: play-singtelhawk.quickplay.com]
 	15	TCP 120.28.35.41:80 <-> 10.54.169.250:50668 [proto: 7.196/HTTP.QuickPlay][4 pkts/3360 bytes][Host: api-singtelhawk.quickplay.com]
 	16	TCP 120.28.35.40:80 <-> 10.54.169.250:52018 [proto: 7.196/HTTP.QuickPlay][7 pkts/5048 bytes][Host: vod-singtelhawk.quickplay.com]

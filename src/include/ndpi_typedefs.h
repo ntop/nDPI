@@ -750,7 +750,13 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development */
   NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
   NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
-  NDPI_PROTOCOL_CATEGORY_SYSTEM             /* System level applications */
+  NDPI_PROTOCOL_CATEGORY_SYSTEM,            /* System level applications */
+
+  NDPI_PROTOCOL_NUM_CATEGORIES /*
+				  NOTE: Keep this as last member
+				  Unused as value but useful to getting the number of elements
+				  in this datastructure
+			       */
 } ndpi_protocol_category_t;
 
 /* ntop extensions */
@@ -915,7 +921,7 @@ struct ndpi_flow_struct {
   */
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
-  u_char host_server_name[192];
+  u_char host_server_name[256];
   /* Via HTTP User-Agent */
   u_char detected_os[32];
   /* Via HTTP X-Forwarded-For */
@@ -936,7 +942,6 @@ struct ndpi_flow_struct {
   } http;
 
   union {
-
     /* the only fields useful for nDPI and ntopng */
     struct {
       u_int8_t num_queries, num_answers, reply_code;
@@ -951,6 +956,18 @@ struct ndpi_flow_struct {
     struct {
       char client_certificate[48], server_certificate[48];
     } ssl;
+
+    struct {
+      char client_signature[48], server_signature[48];
+    } ssh;
+
+    struct {
+      char answer[96];
+    } mdns;
+
+    struct {
+      char version[96];
+    } ubntac2;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/

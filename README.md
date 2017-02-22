@@ -40,6 +40,10 @@ The entire procedure of adding new protocols in detail:
 11. make
 12. make check
 
+### How to use nDPI to Block Selected Traffic
+
+You can use nDPI to selectively block selected Internet traffic by embedding it onto an application (remember that nDPI us just a library). Both [ntopng](https://github.com/ntop/ntopng) and [nProbe cento](http://www.ntop.org/products/netflow/nprobe-cento/) can do this.
+
 ### Creating A Source File Tar Ball
 
 If you want to distribute a source tar file of nDPI do:

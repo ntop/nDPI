@@ -1,5 +1,4 @@
-STUN	10	1352	2
-Facebook	34	4564	6
+Facebook	44	5916	8
 WhatsApp	217	22139	5
 
 	1	UDP 10.8.0.1:53620 <-> 31.13.84.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
@@ -13,5 +12,5 @@ WhatsApp	217	22139	5
 	9	TCP 10.8.0.1:44819 <-> 158.85.58.42:5222 [proto: 142/WhatsApp][30 pkts/4709 bytes]
 	10	TCP 10.8.0.1:51570 <-> 158.85.5.199:443 [proto: 142/WhatsApp][27 pkts/2220 bytes]
 	11	TCP 10.8.0.1:49721 <-> 158.85.58.109:5222 [proto: 142/WhatsApp][52 pkts/4611 bytes]
-	12	UDP 10.8.0.1:53620 <-> 173.252.121.1:3478 [proto: 78/STUN][5 pkts/676 bytes]
-	13	UDP 10.8.0.1:53620 <-> 179.60.192.48:3478 [proto: 78/STUN][5 pkts/676 bytes]
+	12	UDP 10.8.0.1:53620 <-> 173.252.121.1:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]
+	13	UDP 10.8.0.1:53620 <-> 179.60.192.48:3478 [proto: 78.119/STUN.Facebook][5 pkts/676 bytes]

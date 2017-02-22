@@ -1,7 +1,7 @@
 /*
  * ndpiReader.c
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -387,8 +387,10 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 	    flow->packets, (long long unsigned int) flow->bytes);
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
-    if(flow->ssl.client_certificate[0] != '\0') fprintf(out, "[SSL client: %s]", flow->ssl.client_certificate);
-    if(flow->ssl.server_certificate[0] != '\0') fprintf(out, "[SSL server: %s]", flow->ssl.server_certificate);
+    if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
+    
+    if(flow->ssh_ssl.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_ssl.client_info);
+    if(flow->ssh_ssl.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_ssl.server_info);
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
 
     fprintf(out, "\n");
@@ -427,16 +429,16 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
     if(flow->host_server_name[0] != '\0')
       json_object_object_add(jObj,"host.server.name",json_object_new_string(flow->host_server_name));
 
-    if((flow->ssl.client_certificate[0] != '\0') || (flow->ssl.server_certificate[0] != '\0')) {
+    if((flow->ssh_ssl.client_info[0] != '\0') || (flow->ssh_ssl.server_info[0] != '\0')) {
       json_object *sjObj = json_object_new_object();
 
-      if(flow->ssl.client_certificate[0] != '\0')
-	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssl.client_certificate));
+      if(flow->ssh_ssl.client_info[0] != '\0')
+	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssh_ssl.client_info));
 
-      if(flow->ssl.server_certificate[0] != '\0')
-	json_object_object_add(sjObj, "server", json_object_new_string(flow->ssl.server_certificate));
+      if(flow->ssh_ssl.server_info[0] != '\0')
+	json_object_object_add(sjObj, "server", json_object_new_string(flow->ssh_ssl.server_info));
 
-      json_object_object_add(jObj, "ssl", sjObj);
+      json_object_object_add(jObj, "ssh_ssl", sjObj);
     }
 
     if(json_flag == 1)

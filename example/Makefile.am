@@ -5,7 +5,7 @@ AM_CFLAGS = @PTHREAD_CFLAGS@ # --coverage
 
 EXTRA_DIST = ndpi_util.h
 
-LDADD = $(top_builddir)/src/lib/libndpi.la @JSON_C_LIB@ @PTHREAD_LIBS@ @PCAP_LIB@ -ldl
+LDADD = $(top_builddir)/src/lib/libndpi.la @JSON_C_LIB@ @PTHREAD_LIBS@ @PCAP_LIB@ @DL_LIB@
 AM_LDFLAGS = -static @DL_LIB@
 
 ndpiReader_SOURCES = ndpiReader.c ndpi_util.c ndpi_util.h

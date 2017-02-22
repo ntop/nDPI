@@ -1,7 +1,7 @@
 /*
  * ndpi_util.c
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -440,7 +440,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
    Function to process the packet:
    determine the flow of a packet and try to decode it
    @return: 0 if success; else != 0
-   
+
    @Note: ipsize = header->len - ip_offset ; rawsize = header->len
 */
 static unsigned int packet_processing(struct ndpi_workflow * workflow,
@@ -516,13 +516,25 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
     }
 
     if(n == 0) flow->bittorent_hash[0] = '\0';
+  } else if(flow->detected_protocol.protocol == NDPI_PROTOCOL_MDNS) {
+    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.mdns.answer);
+  } else if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UBNTAC2) {
+    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
   }
-
+    
   if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
-    snprintf(flow->ssl.client_certificate, sizeof(flow->ssl.client_certificate), "%s",
-	     flow->ndpi_flow->protos.ssl.client_certificate);
-    snprintf(flow->ssl.server_certificate, sizeof(flow->ssl.server_certificate), "%s",
-	     flow->ndpi_flow->protos.ssl.server_certificate);
+    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_SSH) {
+      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
+	       flow->ndpi_flow->protos.ssh.client_signature);
+      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
+	       flow->ndpi_flow->protos.ssh.server_signature);
+    } else if((flow->detected_protocol.protocol == NDPI_PROTOCOL_SSL)
+	      || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
+      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
+	       flow->ndpi_flow->protos.ssl.client_certificate);
+      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
+	       flow->ndpi_flow->protos.ssl.server_certificate);
+    }
   }
 
   if(flow->detection_completed) {
@@ -650,10 +662,12 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     break;
 
     /* Linux Cooked Capture - 113 */
+#ifdef __linux__
   case DLT_LINUX_SLL :
     type = (packet[eth_offset+14] << 8) + packet[eth_offset+15];
     ip_offset = 16 + eth_offset;
     break;
+#endif
 
     /* Radiotap link-layer - 127 */
   case DLT_IEEE802_11_RADIO :
@@ -703,6 +717,12 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
     ip_offset += 4;
     vlan_packet = 1;
+    // double tagging for 802.1Q
+    if(type == 0x8100) {
+      vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
+      type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
+      ip_offset += 4;
+    }
     break;
   case MPLS_UNI:
   case MPLS_MULTI:

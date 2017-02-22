@@ -58,12 +58,13 @@ typedef struct ndpi_flow_info {
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
 
+  char info[96];
   char host_server_name[192];
   char bittorent_hash[41];
 
   struct {
-    char client_certificate[48], server_certificate[48];
-  } ssl;
+    char client_info[48], server_info[48];
+  } ssh_ssl;
 
   void *src_id, *dst_id;
 } ndpi_flow_info_t;

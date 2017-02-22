@@ -1,8 +1,7 @@
 /*
  * http.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -40,11 +39,12 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
     ndpi_search_tcp_or_udp(ndpi_struct, flow);
 
     /* If no custom protocol has been detected */
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-      if(protocol == NDPI_PROTOCOL_HTTP)
+    /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */ {
+      if(protocol == NDPI_PROTOCOL_HTTP) {
 	ndpi_int_reset_protocol(flow);
-
-      ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, protocol);
+      } else
+	ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_HTTP);
     }
 
     flow->http_detected = 1;
@@ -204,15 +204,15 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
   else if(iqiyi_counter > 0) {
     NDPI_LOG(NDPI_SERVICE_IQIYI, ndpi_struct, NDPI_LOG_DEBUG, "iQiyi found.\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_IQIYI);
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI);
   }
 #endif
 
-#ifdef NDPI_SERVICE_1KXUN
+#ifdef NDPI_PROTOCOL_1KXUN
   /* 1KXUN */
   if(kxun_counter > 0) {
-    NDPI_LOG(NDPI_SERVICE_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "1kxun found.\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_1KXUN);
+    NDPI_LOG(NDPI_PROTOCOL_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "1kxun found.\n");
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN);
   }
 #endif
 
@@ -325,8 +325,12 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	  }
 	}
       }
+      else if(memcmp(ua, "netflix-ios-app", 15) == 0) {
+      	ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_NETFLIX);
+      	return;
+      }
     }
-
+    
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "User Agent Type Line found %.*s\n",
 	     packet->user_agent_line.len, packet->user_agent_line.ptr);
   }
@@ -382,7 +386,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(!ndpi_struct->http_dont_dissect_response && flow->http_detected)
     parseHttpSubprotocol(ndpi_struct, flow);
 
-  flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
+  if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+    flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
 
   /* check for accept line */
   if(packet->accept_line.ptr != NULL) {
@@ -417,8 +422,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 				     (char*)packet->content_line.ptr, packet->content_line.len,
 				     NDPI_PROTOCOL_HTTP);
   }
-
-  /* check user agent here too */
 }
 
 static void check_http_payload(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -817,7 +820,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       x = 1;
       while(packet->line[x].len != 0) {
 	if((memcmp(packet->line[x].ptr, "X-FB-SIM-HNI", 12)) == 0) {
-	  ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_SERVICE_FACEBOOK);
+	  ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_FACEBOOK);
 	  check_content_type_and_change_protocol(ndpi_struct, flow);
 	  return;
 	}

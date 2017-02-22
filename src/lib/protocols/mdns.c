@@ -63,13 +63,26 @@ static int ndpi_int_check_mdns_payload(struct ndpi_detection_module_struct
      ntohs(get_u_int16_t(packet->payload, 6)) <= NDPI_MAX_MDNS_REQUESTS) {
     
     NDPI_LOG(NDPI_PROTOCOL_MDNS, ndpi_struct, NDPI_LOG_DEBUG, "found MDNS with question query.\n");
-    return 1;
-    
+    return 1;    
   }
   else if((packet->payload[2] & 0x80) != 0 &&
 	  ntohs(get_u_int16_t(packet->payload, 4)) == 0 &&
 	  ntohs(get_u_int16_t(packet->payload, 6)) <= NDPI_MAX_MDNS_REQUESTS &&
 	  ntohs(get_u_int16_t(packet->payload, 6)) != 0) {
+    char answer[256];
+    int i, j, len;
+
+    for(i=13, j=0; (packet->payload[i] != 0) && (i < packet->payload_packet_len) && (i < (sizeof(answer)-1)); i++)
+      answer[j++] = (packet->payload[i] < 13) ? '.' : packet->payload[i];
+	
+    answer[j] = '\0';
+
+    /* printf("==> [%d] %s\n", j, answer); */
+
+    len = ndpi_min(sizeof(flow->protos.mdns.answer)-1, j);
+    strncpy(flow->protos.mdns.answer, (const char *)answer, len);
+    flow->protos.mdns.answer[len] = '\0';
+
     NDPI_LOG(NDPI_PROTOCOL_MDNS, ndpi_struct, NDPI_LOG_DEBUG, "found MDNS with answer query.\n");
     return 1;
   }
@@ -87,14 +100,12 @@ void ndpi_search_mdns(struct ndpi_detection_module_struct *ndpi_struct, struct n
   */
   
   /* check if UDP packet */
-  if(packet->udp != NULL) {
-    
+  if(packet->udp != NULL) {   
     /* read destination port */
     dport = ntohs(packet->udp->dest);
 
     /* check standard MDNS ON port 5353 */
     if(dport == 5353 && packet->payload_packet_len >= 12) {
-
       /* mdns protocol must have destination address 224.0.0.251 */
       if(packet->iph != NULL && ntohl(packet->iph->daddr) == 0xe00000fb) {
 

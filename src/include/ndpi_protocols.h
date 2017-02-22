@@ -44,6 +44,7 @@ ndpi_port_range* ndpi_build_default_ports(ndpi_port_range *ports,
 
 /* TCP/UDP protocols */
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow,
 				 u_int8_t protocol,
 				 u_int32_t saddr, u_int32_t daddr,
 				 u_int16_t sport, u_int16_t dport);
