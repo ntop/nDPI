@@ -841,9 +841,10 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       // additional field in http payload
       x = 1;
       while(packet->line[x].len != 0) {
-	if((memcmp(packet->line[x].ptr, "qyid", 4)) == 0 &&
-	   (memcmp(packet->line[x+1].ptr, "qypid", 5)) == 0 &&
-	   (memcmp(packet->line[x+2].ptr, "qyplatform", 10)) == 0) {
+	if(packet->line[x].ptr && ((memcmp(packet->line[x].ptr, "qyid", 4)) == 0)
+	   && packet->line[x+1].ptr && ((memcmp(packet->line[x+1].ptr, "qypid", 5)) == 0)
+	   && packet->line[x+2].ptr && ((memcmp(packet->line[x+2].ptr, "qyplatform", 10)) == 0)
+	   ) {
 	  flow->l4.tcp.ppstream_stage++;
 	  iqiyi_counter++;
 	  check_content_type_and_change_protocol(ndpi_struct, flow);
