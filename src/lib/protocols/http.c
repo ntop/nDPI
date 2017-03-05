@@ -341,7 +341,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HOST Line found %.*s\n",
 	     packet->host_line.len, packet->host_line.ptr);
-
+    
+    /* call ndpi_match_host_subprotocol to see if there is a match with known-host http subprotocol */
     if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
       ndpi_match_host_subprotocol(ndpi_struct, flow,
 				  (char*)packet->host_line.ptr,
@@ -356,25 +357,43 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     len = ndpi_min(packet->forwarded_line.len, sizeof(flow->nat_ip)-1);
     strncpy((char*)flow->nat_ip, (char*)packet->forwarded_line.ptr, len);
     flow->nat_ip[len] = '\0';
-
+    
     if(ndpi_struct->http_dont_dissect_response)
       parseHttpSubprotocol(ndpi_struct, flow);
 
-    if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
-       && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected))
-      ndpi_match_host_subprotocol(ndpi_struct, flow,
-				    (char *)flow->host_server_name,
-				    strlen((const char *)flow->host_server_name),
-				    NDPI_PROTOCOL_HTTP);
+    /**
+       check result of host subprotocol detection
+       
+       if "detected" in flow == 0 then "detected" = "guess"
+       else "guess" = "detected"
+    **/
+    if(flow->detected_protocol_stack[1] == 0) {
+      flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
+      if(flow->detected_protocol_stack[0] == 0)
+    	flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
+    }
+    else {
+      if(flow->detected_protocol_stack[1] != flow->guessed_protocol_id)
+	flow->guessed_protocol_id = flow->detected_protocol_stack[1];
+      if(flow->detected_protocol_stack[0] != flow->guessed_host_protocol_id)
+	flow->guessed_host_protocol_id = flow->detected_protocol_stack[0];
+    }
+    
+    /* if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */
+    /*    && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected)) */
+    /*   ndpi_match_host_subprotocol(ndpi_struct, flow, */
+    /* 				    (char *)flow->host_server_name, */
+    /* 				    strlen((const char *)flow->host_server_name), */
+    /* 				    NDPI_PROTOCOL_HTTP); */
 
     if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
        && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
        && (packet->http_origin.len > 0))
       ndpi_match_host_subprotocol(ndpi_struct, flow,
-				    (char *)packet->http_origin.ptr,
-				    packet->http_origin.len,
-				    NDPI_PROTOCOL_HTTP);
-
+				  (char *)packet->http_origin.ptr,
+				  packet->http_origin.len,
+				  NDPI_PROTOCOL_HTTP);
+    
     if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
       if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) {
 	ndpi_int_http_add_connection(ndpi_struct, flow, packet->detected_protocol_stack[0]);
