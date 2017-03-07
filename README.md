@@ -44,6 +44,9 @@ The entire procedure of adding new protocols in detail:
 
 You can use nDPI to selectively block selected Internet traffic by embedding it onto an application (remember that nDPI us just a library). Both [ntopng](https://github.com/ntop/ntopng) and [nProbe cento](http://www.ntop.org/products/netflow/nprobe-cento/) can do this.
 
+### DISCLAIMER
+While we do our best to detect network protocols, we cannot guarantee that our software is error free and 100% accurate in protocol detection. Please make sure that you respect the privacy of users and you have proper authorization to listen, capture and inspect network traffic.
+
 ### Creating A Source File Tar Ball
 
 If you want to distribute a source tar file of nDPI do:
