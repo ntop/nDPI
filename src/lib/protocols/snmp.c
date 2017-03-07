@@ -41,6 +41,8 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   if (packet->payload_packet_len > 32 && packet->payload[0] == 0x30) {
     int offset;
+    u_int16_t u16;
+    
     switch (packet->payload[1]) {
     case 0x81:
       offset = 3;
@@ -56,8 +58,10 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct, struct n
       offset = 2;
     }
 
-    if (get_u_int16_t(packet->payload, offset) != htons(0x0201)) {
-      NDPI_LOG(NDPI_PROTOCOL_SNMP, ndpi_struct, NDPI_LOG_DEBUG, "SNMP excluded, 0x0201 pattern not found\n");
+    u16 = ntohs(get_u_int16_t(packet->payload, offset));
+    
+    if((u16 != 0x0201) && (u16 != 0x0204)) {
+      NDPI_LOG(NDPI_PROTOCOL_SNMP, ndpi_struct, NDPI_LOG_DEBUG, "SNMP excluded, 0x0201/0x0204 pattern not found\n");
       goto excl;
     }
 
