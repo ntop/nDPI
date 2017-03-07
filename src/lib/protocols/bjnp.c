@@ -17,8 +17,12 @@ static void ndpi_check_bjnp(struct ndpi_detection_module_struct *ndpi_struct, st
   u_int32_t payload_len = packet->payload_packet_len;
 
   if(packet->udp != NULL) {
-    if(payload_len > 2) {
-	  if(strncmp((const char *)packet->payload, "BJNP", 4) == 0) {
+    if(payload_len > 4) {
+      if((memcmp((const char *)packet->payload, "BJNP", 4) == 0)
+	 || (memcmp((const char *)packet->payload, "BNJB", 4) == 0)
+	 || (memcmp((const char *)packet->payload, "BJNB", 4) == 0)
+	 || (memcmp((const char *)packet->payload, "MFNP", 4) == 0)
+	 ) {
 	    NDPI_LOG(NDPI_PROTOCOL_BJNP, ndpi_struct, NDPI_LOG_DEBUG, "Found bjnp.\n");
 	    ndpi_int_bjnp_add_connection(ndpi_struct, flow, 0);
 	    return;
