@@ -203,7 +203,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	if(memcmp(&packet->payload[5], "http://", 7) == 0) {
 	  /*
 	   * We are searching for a pattern "POST http://gateway.messenger.hotmail.com/gateway/gateway.dll" or
-	   * "POST http://<some ip addres here like 172.0.0.0>/gateway/gateway.dll"
+	   * "POST http://<some ip address here like 172.0.0.0>/gateway/gateway.dll"
 	   * POST http:// is 12 byte so we are searching for 13 to 70 byte for this paten.
 	   */
 	  for(c = 13; c < 50; c++) {
