@@ -62,7 +62,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  /* A FTP packet is pretty long so 256 is a bit consrvative but it should be OK */
+  /* A FTP packet is pretty long so 256 is a bit conservative but it should be OK */
   if(packet->payload_packet_len < 256)
     return 0;
 
