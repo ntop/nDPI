@@ -373,7 +373,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
     }
   }
-  /* finished examining the secone packet only */
+  /* finished examining the second packet only */
   /* direct user connection (file transfer,...) */
   
   if((src != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_MSN) != 0)
