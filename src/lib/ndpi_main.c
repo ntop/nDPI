@@ -3012,7 +3012,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow)
 {
-  /* const for gcc code optimisation and cleaner code */
+  /* const for gcc code optimization and cleaner code */
   struct ndpi_packet_struct *packet = &flow->packet;
   const struct ndpi_iphdr *iph = packet->iph;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
