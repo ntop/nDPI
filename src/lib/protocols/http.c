@@ -1181,7 +1181,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   NDPI_BITMASK_SET(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
   		   ndpi_struct->callback_buffer[a].detection_bitmask);
 
-  /*Delete protocol from exluded protocol bitmask*/
+  /*Delete protocol from excluded protocol bitmask*/
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_PROTOCOL_UNKNOWN);
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_PROTOCOL_QQ);
