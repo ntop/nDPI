@@ -230,7 +230,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
     }
     
     NDPI_LOG(NDPI_PROTOCOL_ZATTOO, ndpi_struct, NDPI_LOG_DEBUG,
-	     "ZATTOO: discarted the flow (TCP): packet_size: %u; Flowstage: %u\n",
+	     "ZATTOO: discarded the flow (TCP): packet_size: %u; Flowstage: %u\n",
 	     packet->payload_packet_len, flow->zattoo_stage);
 
   }
