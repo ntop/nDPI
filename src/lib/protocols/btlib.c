@@ -401,7 +401,7 @@ void cb_data(bt_parse_data_cb_t *cbd,int *ret) {
     p->e_len = cbd->v.s.l;
     return;
   }
-  // DEBUG_TRACE(print_safe_str("UKNOWN",cbd));
+  // DEBUG_TRACE(print_safe_str("UNKNOWN",cbd));
 }
 
 
