@@ -867,7 +867,7 @@ static void printResults(u_int64_t tot_usec) {
   if(json_flag) {
 #ifdef HAVE_JSON_C
     if((json_fp = fopen(_jsonFilePath,"w")) == NULL) {
-      printf("Error createing .json file %s\n", _jsonFilePath);
+      printf("Error creating .json file %s\n", _jsonFilePath);
       json_flag = 0;
     } else {
       jObj_main = json_object_new_object();
