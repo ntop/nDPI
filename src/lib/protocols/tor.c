@@ -69,7 +69,7 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_int_tor_add_connection(ndpi_struct, flow);
       return(1);
     } else {
-#ifdef PENDANTIC_TOR_CHECK
+#ifdef PEDANTIC_TOR_CHECK
       if(gethostbyname(certificate) == NULL) {
 	ndpi_int_tor_add_connection(ndpi_struct, flow);
 	return(1);
