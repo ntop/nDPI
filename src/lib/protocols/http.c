@@ -903,7 +903,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       if(packet->host_line.ptr != NULL) {
 	/**
-	   nDPI is pretty scrupoulous about HTTP so it waits until the
+	   nDPI is pretty scrupulous about HTTP so it waits until the
 	   HTTP response is received just to check that it conforms
 	   with the HTTP specs. However this might be a waste of time as
 	   in 99.99% of the cases is like that.
