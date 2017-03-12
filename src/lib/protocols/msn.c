@@ -509,7 +509,7 @@ void ndpi_search_msn(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     /* we deal with tcp now */
     if(packet->tcp != NULL) {
       /* msn can use http or ssl for connection. That's why every http, ssl and ukn packet must enter in the msn detection */
-      /* the detection can swich out the http or the ssl detection. In this case we need not check those protocols */
+      /* the detection can switch out the http or the ssl detection. In this case we need not check those protocols */
       // need to do the ceck when protocol == http too (POST /gateway ...)
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
 #ifdef NDPI_PROTOCOL_HTTP
