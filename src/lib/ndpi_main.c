@@ -528,7 +528,7 @@ static void addDefaultPort(ndpi_port_range *range,
   NOTE
 
   This function must be called with a semaphore set, this in order to avoid
-  changing the datastrutures while using them
+  changing the datastructures while using them
 */
 static int removeDefaultPort(ndpi_port_range *range,
 			     ndpi_proto_defaults_t *def,
@@ -605,7 +605,7 @@ int ndpi_add_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struc
   NOTE
 
   This function must be called with a semaphore set, this in order to avoid
-  changing the datastrutures while using them
+  changing the datastructures while using them
 */
 static int ndpi_remove_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					    char *value, int protocol_id) {
