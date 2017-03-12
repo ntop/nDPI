@@ -3067,7 +3067,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
     }
     if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0)
        || (proxy_enabled && (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0))) {
-      /* initalize tcp sequence counters */
+      /* initialize tcp sequence counters */
       /* the ack flag needs to be set to get valid sequence numbers from the other
        * direction. Usually it will catch the second packet syn+ack but it works
        * also for asymmetric traffic where it will use the first data packet
