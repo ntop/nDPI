@@ -2211,7 +2211,7 @@ void ndpi_set_bitmask_protocol_detection( char * label,
     }
 
     /*
-      Set function and index protocol within proto_default strcuture for port protocol detection
+      Set function and index protocol within proto_default structure for port protocol detection
       and callback_buffer function for DPI protocol detection
     */
     ndpi_struct->proto_defaults[ndpi_protocol_id].protoIdx = idx;
