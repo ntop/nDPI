@@ -170,7 +170,7 @@ struct ndpi_wifi_header
   u_char trsm[6];
   u_char dest[6];
   u_int16_t seq_ctrl;
-  /* u_int64_t ccmp - for data encription only - check fc.flag */
+  /* u_int64_t ccmp - for data encryption only - check fc.flag */
 } PACK_OFF;
 
 /* +++++++++++++++++++++++ MPLS header +++++++++++++++++++++++ */
