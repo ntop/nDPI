@@ -348,7 +348,7 @@ struct ndpi_id_struct {
   /**
      detected_protocol_bitmask:
      access this bitmask to find out whether an id has used skype or not
-     if a flag is set here, it will not be resetted
+     if a flag is set here, it will not be reset
      to compare this, use:
   **/
   NDPI_PROTOCOL_BITMASK detected_protocol_bitmask;
