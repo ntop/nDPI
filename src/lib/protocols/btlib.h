@@ -150,9 +150,9 @@ struct bt_parse_protocol {
 		struct bt_nodes6_data *nodes6;
 		u_int16_t	name_len;
 		u_int16_t	nn;		// nodes num
-		u_int16_t	nv;		// valuse num
+		u_int16_t	nv;		// values num
 		u_int16_t	nn6;		// nodes6 num
-		u_int16_t	nv6;		// valuse6 num
+		u_int16_t	nv6;		// values6 num
 		u_int16_t	port;
 		u_int16_t	t_len;
 	} r;
