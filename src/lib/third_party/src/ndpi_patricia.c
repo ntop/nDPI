@@ -84,7 +84,7 @@ int ndpi_comp_with_mask (void *addr, void *dest, u_int mask) {
   return (0);
 }
 
-/* this allows imcomplete prefix */
+/* this allows incomplete prefix */
 int
 ndpi_my_inet_pton (int af, const char *src, void *dst)
 {
