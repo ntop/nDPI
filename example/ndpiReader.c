@@ -52,7 +52,7 @@
 #include "ndpi_util.h"
 
 /** Client parameters **/
-static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interafaces */
+static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interfaces */
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
 static FILE *results_file = NULL;
 static char *results_path = NULL;

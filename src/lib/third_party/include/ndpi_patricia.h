@@ -236,7 +236,7 @@ MRT Credits
    originally written by him.
 
    Alexey Kuznetsov made enhancements to 1.4.3a and fixed the Linux
-   kernel intarface. Linux's netlink interface was written, referring to
+   kernel interface. Linux's netlink interface was written, referring to
    his code "iproute2".
 
    We would also like to thank our other colleagues in Japan, Portugal,
