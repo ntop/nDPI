@@ -847,7 +847,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
 
       /* check PPStream protocol or iQiyi service
-	 (iqiyi is deliverd by ppstream) */
+	 (iqiyi is delivered by ppstream) */
       // substring in url
       if(strstr((const char*) &packet->payload[filename_start], "iqiyi.com") != NULL) {
 	if(kxun_counter == 0) {
