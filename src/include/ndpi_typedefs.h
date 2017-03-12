@@ -385,7 +385,7 @@ struct ndpi_id_struct {
 #ifdef NDPI_PROTOCOL_ZATTOO
   u_int32_t zattoo_ts;
 #endif
-#ifdef NDPI_PROTOCOL_UNENCRYPED_JABBER
+#ifdef NDPI_PROTOCOL_UNENCRYPTED_JABBER
   u_int32_t jabber_stun_or_ft_ts;
 #endif
 #ifdef NDPI_PROTOCOL_DIRECTCONNECT
@@ -404,7 +404,7 @@ struct ndpi_id_struct {
   u_int16_t bt_port_t[NDPI_BT_PORTS];
   u_int16_t bt_port_u[NDPI_BT_PORTS];
 #endif
-#ifdef NDPI_PROTOCOL_UNENCRYPED_JABBER
+#ifdef NDPI_PROTOCOL_UNENCRYPTED_JABBER
 #define JABBER_MAX_STUN_PORTS 6
   u_int16_t jabber_voice_stun_port[JABBER_MAX_STUN_PORTS];
   u_int16_t jabber_file_transfer_port[2];
@@ -425,7 +425,7 @@ struct ndpi_id_struct {
 #ifdef NDPI_PROTOCOL_OSCAR
   u_int8_t oscar_ssl_session_id[33];
 #endif
-#ifdef NDPI_PROTOCOL_UNENCRYPED_JABBER
+#ifdef NDPI_PROTOCOL_UNENCRYPTED_JABBER
   u_int8_t jabber_voice_stun_used_ports;
 #endif
 #ifdef NDPI_PROTOCOL_SIP
