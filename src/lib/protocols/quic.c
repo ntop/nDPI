@@ -81,40 +81,44 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found QUIC.\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
 
-    if(udp_len > quic_hlen + 17 + 4 &&
-         !strncmp((char*)&packet->payload[quic_hlen+17], "CHLO" /* Client Hello */, 4)) {
-      /* Check if SNI (Server Name Identification) is present */
-      for(i=quic_hlen+12; i<udp_len-3; i++) {
-	if((packet->payload[i] == 'S')
-	   && (packet->payload[i+1] == 'N')
-	   && (packet->payload[i+2] == 'I')
-	   && (packet->payload[i+3] == 0)) {
-	  u_int32_t offset = *((u_int32_t*)&packet->payload[i+4]);
-	  u_int32_t prev_offset = *((u_int32_t*)&packet->payload[i-4]);
-	  int len = offset-prev_offset;
-	  int sni_offset = i+prev_offset+1;
+    if(packet->payload[quic_hlen+12] != 0xA0)
+      quic_hlen++;
+	     
+    if(udp_len > quic_hlen + 16 + 4) {
+      if(!strncmp((char*)&packet->payload[quic_hlen+16], "CHLO" /* Client Hello */, 4)) {
+	/* Check if SNI (Server Name Identification) is present */
+	for(i=quic_hlen+12; i<udp_len-3; i++) {
+	  if((packet->payload[i] == 'S')
+	     && (packet->payload[i+1] == 'N')
+	     && (packet->payload[i+2] == 'I')
+	     && (packet->payload[i+3] == 0)) {
+	    u_int32_t offset = *((u_int32_t*)&packet->payload[i+4]);
+	    u_int32_t prev_offset = *((u_int32_t*)&packet->payload[i-4]);
+	    int len = offset-prev_offset;
+	    int sni_offset = i+prev_offset+1;
 
-	  while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
-	    sni_offset++;
+	    while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
+	      sni_offset++;
 
-	  if((sni_offset+len) < udp_len) {
-	    int max_len = sizeof(flow->host_server_name)-1, j = 0;
+	    if((sni_offset+len) < udp_len) {
+	      int max_len = sizeof(flow->host_server_name)-1, j = 0;
 
-	    if(len > max_len) len = max_len;
+	      if(len > max_len) len = max_len;
 
-	    while((len > 0) && (sni_offset < udp_len)) {
-	      flow->host_server_name[j++] = packet->payload[sni_offset];
-	      sni_offset++, len--;
+	      while((len > 0) && (sni_offset < udp_len)) {
+		flow->host_server_name[j++] = packet->payload[sni_offset];
+		sni_offset++, len--;
+	      }
+
+	      ndpi_match_host_subprotocol(ndpi_struct, flow, 
+					  (char *)flow->host_server_name,
+					  strlen((const char*)flow->host_server_name),
+					  NDPI_PROTOCOL_QUIC);
+	    
 	    }
 
-	    ndpi_match_host_subprotocol(ndpi_struct, flow, 
-					(char *)flow->host_server_name,
-					strlen((const char*)flow->host_server_name),
-					NDPI_PROTOCOL_QUIC);
-	    
+	    break;
 	  }
-
-	  break;
 	}
       }
     }
