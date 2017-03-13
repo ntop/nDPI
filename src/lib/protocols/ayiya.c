@@ -51,11 +51,11 @@ void ndpi_search_ayiya(struct ndpi_detection_module_struct *ndpi_struct, struct 
       /* FINISH */
       struct ayiya *a = (struct ayiya*)packet->payload;
       u_int32_t epoch = ntohl(a->epoch), now;
-      u_int32_t fireyears = 86400 * 365 * 5;
+      u_int32_t fiveyears = 86400 * 365 * 5;
 
       now = flow->packet.tick_timestamp;
 
-      if((epoch >= (now - fireyears)) && (epoch <= (now+86400 /* 1 day */)))      
+      if((epoch >= (now - fiveyears)) && (epoch <= (now+86400 /* 1 day */)))      
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AYIYA, NDPI_PROTOCOL_UNKNOWN);
 
       return;

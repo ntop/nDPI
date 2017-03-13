@@ -353,7 +353,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       } else {
 	inet_ntop(AF_INET6, &iph6->ip6_src, newflow->lower_name, sizeof(newflow->lower_name));
 	inet_ntop(AF_INET6, &iph6->ip6_dst, newflow->upper_name, sizeof(newflow->upper_name));
-	/* For consistency across platfoms replace :0: with :: */
+	/* For consistency across platforms replace :0: with :: */
 	patchIPv6Address(newflow->lower_name), patchIPv6Address(newflow->upper_name);
       }
 

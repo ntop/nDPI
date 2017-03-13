@@ -203,7 +203,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	if(memcmp(&packet->payload[5], "http://", 7) == 0) {
 	  /*
 	   * We are searching for a pattern "POST http://gateway.messenger.hotmail.com/gateway/gateway.dll" or
-	   * "POST http://<some ip addres here like 172.0.0.0>/gateway/gateway.dll"
+	   * "POST http://<some ip address here like 172.0.0.0>/gateway/gateway.dll"
 	   * POST http:// is 12 byte so we are searching for 13 to 70 byte for this paten.
 	   */
 	  for(c = 13; c < 50; c++) {
@@ -373,7 +373,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
     }
   }
-  /* finished examining the secone packet only */
+  /* finished examining the second packet only */
   /* direct user connection (file transfer,...) */
   
   if((src != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_MSN) != 0)
@@ -509,7 +509,7 @@ void ndpi_search_msn(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     /* we deal with tcp now */
     if(packet->tcp != NULL) {
       /* msn can use http or ssl for connection. That's why every http, ssl and ukn packet must enter in the msn detection */
-      /* the detection can swich out the http or the ssl detection. In this case we need not check those protocols */
+      /* the detection can switch out the http or the ssl detection. In this case we need not check those protocols */
       // need to do the ceck when protocol == http too (POST /gateway ...)
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
 #ifdef NDPI_PROTOCOL_HTTP

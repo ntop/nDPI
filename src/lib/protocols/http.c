@@ -847,7 +847,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
 
       /* check PPStream protocol or iQiyi service
-	 (iqiyi is deliverd by ppstream) */
+	 (iqiyi is delivered by ppstream) */
       // substring in url
       if(strstr((const char*) &packet->payload[filename_start], "iqiyi.com") != NULL) {
 	if(kxun_counter == 0) {
@@ -903,7 +903,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       if(packet->host_line.ptr != NULL) {
 	/**
-	   nDPI is pretty scrupoulous about HTTP so it waits until the
+	   nDPI is pretty scrupulous about HTTP so it waits until the
 	   HTTP response is received just to check that it conforms
 	   with the HTTP specs. However this might be a waste of time as
 	   in 99.99% of the cases is like that.
@@ -1181,7 +1181,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   NDPI_BITMASK_SET(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,
   		   ndpi_struct->callback_buffer[a].detection_bitmask);
 
-  /*Delete protocol from exluded protocol bitmask*/
+  /*Delete protocol from excluded protocol bitmask*/
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_PROTOCOL_UNKNOWN);
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_PROTOCOL_QQ);

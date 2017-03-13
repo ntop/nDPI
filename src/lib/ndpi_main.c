@@ -528,7 +528,7 @@ static void addDefaultPort(ndpi_port_range *range,
   NOTE
 
   This function must be called with a semaphore set, this in order to avoid
-  changing the datastrutures while using them
+  changing the datastructures while using them
 */
 static int removeDefaultPort(ndpi_port_range *range,
 			     ndpi_proto_defaults_t *def,
@@ -605,7 +605,7 @@ int ndpi_add_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struc
   NOTE
 
   This function must be called with a semaphore set, this in order to avoid
-  changing the datastrutures while using them
+  changing the datastructures while using them
 */
 static int ndpi_remove_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					    char *value, int protocol_id) {
@@ -1037,9 +1037,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, "Ayiya", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 5072, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UNENCRYPED_JABBER,
+  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UNENCRYPTED_JABBER,
 			  no_master,
-			  no_master, "Unencryped_Jabber", NDPI_PROTOCOL_CATEGORY_WEB,
+			  no_master, "Unencrypted_Jabber", NDPI_PROTOCOL_CATEGORY_WEB,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OSCAR,
@@ -2211,7 +2211,7 @@ void ndpi_set_bitmask_protocol_detection( char * label,
     }
 
     /*
-      Set function and index protocol within proto_default strcuture for port protocol detection
+      Set function and index protocol within proto_default structure for port protocol detection
       and callback_buffer function for DPI protocol detection
     */
     ndpi_struct->proto_defaults[ndpi_protocol_id].protoIdx = idx;
@@ -3012,7 +3012,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow)
 {
-  /* const for gcc code optimisation and cleaner code */
+  /* const for gcc code optimization and cleaner code */
   struct ndpi_packet_struct *packet = &flow->packet;
   const struct ndpi_iphdr *iph = packet->iph;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
@@ -3067,7 +3067,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
     }
     if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0)
        || (proxy_enabled && (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0))) {
-      /* initalize tcp sequence counters */
+      /* initialize tcp sequence counters */
       /* the ack flag needs to be set to get valid sequence numbers from the other
        * direction. Usually it will catch the second packet syn+ack but it works
        * also for asymmetric traffic where it will use the first data packet

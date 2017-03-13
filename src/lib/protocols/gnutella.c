@@ -203,7 +203,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	&& packet->payload[packet->payload_packet_len - 2] == 0x0a) {
       if (packet->payload_packet_len > 3 && memcmp(packet->payload, "GIV", 3) == 0) {
 	NDPI_LOG(NDPI_PROTOCOL_GNUTELLA, ndpi_struct, NDPI_LOG_TRACE, "MORPHEUS GIV DETECTED\n");
-	/* Not Excludeing the flow now.. We shall Check the next Packet too for Gnutella Patterns */
+	/* Not Excluding the flow now.. We shall Check the next Packet too for Gnutella Patterns */
 	return;
       }
     }

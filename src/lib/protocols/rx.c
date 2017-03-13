@@ -27,7 +27,7 @@
 
 #ifdef NDPI_PROTOCOL_RX
 
-/* See http://web.mit.edu/kolya/afs/rx/rx-spec for procotol description. */
+/* See http://web.mit.edu/kolya/afs/rx/rx-spec for protocol description. */
 
 /* The should be no need for explicit packing, but just in case... */
 PACK_ON

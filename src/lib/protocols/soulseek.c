@@ -82,7 +82,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
        && ((u_int32_t)(packet->tick_timestamp - dst->soulseek_last_safe_access_time) < ndpi_struct->soulseek_connection_ip_tick_timeout)) {
       
       NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG,
-	       "Soulseek: Plain detection on Port : %u packet_tick_timestamp: %u soulseeek_last_safe_access_time: %u soulseek_connection_ip_ticktimeout: %u\n",
+	       "Soulseek: Plain detection on Port : %u packet_tick_timestamp: %u soulseek_last_safe_access_time: %u soulseek_connection_ip_ticktimeout: %u\n",
 	       dst->soulseek_listen_port, packet->tick_timestamp, dst->soulseek_last_safe_access_time, ndpi_struct->soulseek_connection_ip_tick_timeout);
       
       dst->soulseek_last_safe_access_time = packet->tick_timestamp;
@@ -100,7 +100,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(packet->payload_packet_len >= 12 && packet->payload_packet_len < 300 && get_l32(packet->payload, 4) == 1) {
 	while (!get_u_int16_t(packet->payload, index + 2)
 	       && (index + get_l32(packet->payload, index)) < packet->payload_packet_len - 4) {
-	  if(get_l32(packet->payload, index) < 8)	/*Minimum soulsek  login msg is 8B */
+	  if(get_l32(packet->payload, index) < 8)	/*Minimum soulseek login msg is 8B */
 	    break;
 
 	  if(index + get_l32(packet->payload, index) + 4 <= index) {

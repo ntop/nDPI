@@ -103,7 +103,7 @@
 #define NDPI_PROTOCOL_SSL_NO_CERT 	 64 /* SSL without certificate (Skype Ultrasurf?) - ntop.org */
 #define NDPI_PROTOCOL_IRC 	 65
 #define NDPI_PROTOCOL_AYIYA 	 66
-#define NDPI_PROTOCOL_UNENCRYPED_JABBER 	 67
+#define NDPI_PROTOCOL_UNENCRYPTED_JABBER 	 67
 #define NDPI_PROTOCOL_MSN 	 68
 #define NDPI_PROTOCOL_OSCAR 	 69
 #define NDPI_PROTOCOL_YAHOO 	 70

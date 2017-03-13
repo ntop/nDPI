@@ -84,7 +84,7 @@ int ndpi_comp_with_mask (void *addr, void *dest, u_int mask) {
   return (0);
 }
 
-/* this allows imcomplete prefix */
+/* this allows incomplete prefix */
 int
 ndpi_my_inet_pton (int af, const char *src, void *dst)
 {
@@ -874,7 +874,7 @@ ndpi_patricia_remove (patricia_tree_t *patricia, patricia_node_t *node)
 #endif /* PATRICIA_DEBUG */
 	
     /* this might be a placeholder node -- have to check and make sure
-     * there is a prefix aossciated with it ! */
+     * there is a prefix associated with it ! */
     if(node->prefix != NULL) 
       ndpi_Deref_Prefix (node->prefix);
     node->prefix = NULL;

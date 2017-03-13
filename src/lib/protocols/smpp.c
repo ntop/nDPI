@@ -31,9 +31,9 @@ static void ndpi_int_smpp_add_connection(struct ndpi_detection_module_struct* nd
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMPP, NDPI_PROTOCOL_UNKNOWN);
 }
 
-static  u_int8_t ndpi_check_overflow(u_int32_t current_legth, u_int32_t total_lenth)
+static  u_int8_t ndpi_check_overflow(u_int32_t current_length, u_int32_t total_lenth)
 {
-    return (current_legth > 0 && current_legth > INT_MAX - total_lenth);
+    return (current_length > 0 && current_length > INT_MAX - total_lenth);
 }
 
 void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct, 
@@ -122,7 +122,7 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
       switch(pdu_type){
 	// GENERIC_NACK
       case 0x80000000:
-	// body lengh must be zero
+	// body length must be zero
 	if(pdu_l > 16) extra_passed = 0;
 	break;
 
@@ -134,7 +134,7 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
       case 0x00000009:
 	// status field must be NULL
 	if(get_u_int32_t(packet->payload, 8) != 0) extra_passed = 0;
-	// min body lengh = 10 bytes (+16 in header)
+	// min body length = 10 bytes (+16 in header)
 	if(pdu_l < 26) extra_passed = 0; 
 	break;
 
@@ -160,13 +160,13 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
       case 0x00000006:
 	// status field must be NULL
 	if(get_u_int32_t(packet->payload, 8) != 0) extra_passed = 0;
-	// body lengh must be zero
+	// body length must be zero
 	if(pdu_l > 16) extra_passed = 0;
 	break;
 
 	// UNBIND_RESP
       case 0x80000006:
-	// body lengh must be zero
+	// body length must be zero
 	if(pdu_l > 16) extra_passed = 0;
 	break;
 
@@ -277,13 +277,13 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
       case 0x00000015:
 	// status field must be NULL
 	if(get_u_int32_t(packet->payload, 8) != 0) extra_passed = 0;
-	// body lengh must be zero
+	// body length must be zero
 	if(pdu_l > 16) extra_passed = 0;
 	break;
 
 	// ENQUIRE_LINK_RESP
       case 0x80000015:
-	// body lengh must be zero
+	// body length must be zero
 	if(pdu_l > 16) extra_passed = 0;
 	break;
 

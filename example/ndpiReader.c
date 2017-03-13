@@ -52,7 +52,7 @@
 #include "ndpi_util.h"
 
 /** Client parameters **/
-static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interafaces */
+static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interfaces */
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
 static FILE *results_file = NULL;
 static char *results_path = NULL;
@@ -867,7 +867,7 @@ static void printResults(u_int64_t tot_usec) {
   if(json_flag) {
 #ifdef HAVE_JSON_C
     if((json_fp = fopen(_jsonFilePath,"w")) == NULL) {
-      printf("Error createing .json file %s\n", _jsonFilePath);
+      printf("Error creating .json file %s\n", _jsonFilePath);
       json_flag = 0;
     } else {
       jObj_main = json_object_new_object();
@@ -1183,7 +1183,7 @@ static void pcap_packet_callback_checked(u_char *args,
 
   /* check for buffer changes */
   if(memcmp(packet, packet_checked, header->caplen) != 0)
-    printf("INTERNAL ERROR: ingress packet was nodified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
+    printf("INTERNAL ERROR: ingress packet was modified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
 	   thread_id, (unsigned long)ndpi_thread_info[thread_id].workflow->stats.raw_packet_count);
   free(packet_checked);
 }
