@@ -643,7 +643,7 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ******************************************************************** */
 
-static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
+void ndpi_init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
 
   for(i=0; host_match[i].string_to_match != NULL; i++)
@@ -667,6 +667,15 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
     ndpi_string_to_automa(ndpi_mod, &ndpi_mod->impossible_bigrams_automa,
 			  (char*)ndpi_en_impossible_bigrams[i],
 			  1, NDPI_PROTOCOL_UNRATED);
+
+  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
+    if(ndpi_mod->proto_defaults[i].protoName == NULL) {
+#if 0
+      printf("[NDPI] %s(missing protoId=%d) WARNING: protocol/service has not been initialized\n", __FUNCTION__, i);
+#endif
+      ndpi_mod->proto_defaults[i].protoName = strdup("Uninitialized");
+    }
+  }
 }
 
 /* ******************************************************************** */
@@ -1601,15 +1610,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_209);
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_217);
   ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_224);
-
-  /* calling function for host and content matched protocols */
-  init_string_based_protocols(ndpi_mod);
-
-  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
-    if(ndpi_mod->proto_defaults[i].protoName == NULL) {
-      printf("[NDPI] %s(missing protoId=%d) INTERNAL ERROR: not all protocols have been initialized\n", __FUNCTION__, i);
-    }
-  }
 }
 
 /* ****************************************************** */
@@ -1717,6 +1717,18 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL)
       node->value.user_value = host_list[i].value;
   }
+}
+
+/* ******************************************* */
+
+void ndpi_add_to_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
+				 void *ptree, ndpi_network *host_entry) {
+  struct in_addr pin;
+  patricia_node_t *node;
+
+  pin.s_addr = htonl(host_entry->network);
+  if((node = add_to_ptree(ptree, AF_INET, &pin, host_entry->cidr /* bits */)) != NULL)
+    node->value.user_value = host_entry->value;
 }
 
 /* ******************************************* */
@@ -4688,6 +4700,7 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
 				  u_int8_t is_host_match) {
   int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   AC_TEXT_t ac_input_text;
+  if (!is_host_match) return(matching_protocol_id);
   ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa : &ndpi_struct->content_automa;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0)) return(NDPI_PROTOCOL_UNKNOWN);

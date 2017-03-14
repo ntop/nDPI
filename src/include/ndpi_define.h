@@ -209,7 +209,7 @@
 #define NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(x,y)  \
   ((((u_int64_t *)(x))[0]) < (((u_int64_t *)(y))[0]) || ( (((u_int64_t *)(x))[0]) == (((u_int64_t *)(y))[0]) && (((u_int64_t *)(x))[1]) < (((u_int64_t *)(y))[1])) )
 
-#define NDPI_NUM_BITS              256
+#define NDPI_NUM_BITS              10000
 
 #define NDPI_BITS /* 32 */ (sizeof(ndpi_ndpi_mask) * 8 /* number of bits in a byte */)        /* bits per mask */
 #define howmanybits(x, y)   (((x)+((y)-1))/(y))

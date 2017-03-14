@@ -21,6 +21,7 @@
 /* ****************************************************** */
 
 static ndpi_network host_protocol_list[] = {
+#ifdef _ND_INCLUDE_CONTENT_MATCH
 
   /*
     Facebook, Inc.
@@ -7922,6 +7923,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xD040C900 /* 208.64.201.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
 
+#endif //_ND_INCLUDE_CONTENT_MATCH
   { 0x0, 0, 0 }
 };
 
@@ -7935,6 +7937,7 @@ static ndpi_network host_protocol_list[] = {
 */
 
 ndpi_protocol_match host_match[] = {
+#ifdef _ND_INCLUDE_CONTENT_MATCH
   { "amazon.",  			"Amazon",		NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazon.com",  			"Amazon",		NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "images-amazon.com", 		"Amazon",		NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8129,8 +8132,8 @@ ndpi_protocol_match host_match[] = {
   { ".steamcontent.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { ".steamstatic.com",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { "steamcommunity-a.akamaihd.net",		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
-
-  { NULL, 0 }
+#endif //_ND_INCLUDE_CONTENT_MATCH
+  { (char *)NULL, 0 }
 };
 
 

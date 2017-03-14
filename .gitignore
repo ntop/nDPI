@@ -11,6 +11,7 @@
 .libs
 .dirstamp
 stamp-h1
+compile
 /configure
 /config.guess
 /config.h

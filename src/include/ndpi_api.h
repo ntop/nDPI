@@ -94,7 +94,16 @@ extern "C" {
    */
   char* ndpi_strnstr(const char *s, const char *find, size_t slen);
 
-  
+  /**
+   * Inserts a new host entry in to the IPv4 ptree.
+   *
+   * @par    ndpi_struct  = the struct created for the protocol detection
+   * @par    ptree        = the Patricia tree to add to
+   * @par    host_entry   = the host structure to add to the tree
+   */
+  void ndpi_add_to_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
+                 void *ptree, ndpi_network *host_entry);
+
   /**
    * Returns the nDPI protocol id for IP-based protocol detection
    *
@@ -106,7 +115,6 @@ extern "C" {
    */
   u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin);
 
-
   /**
    * Init single protocol match
    *
@@ -115,7 +123,15 @@ extern "C" {
    *
    */  
   void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol_match *match);
-  
+
+  /**
+   * Init string-based protocols
+   *
+   * @par ndpi_mod  = the struct created for the protocol detection
+   *
+   */
+  void ndpi_init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod);
+
   /**
    * Returns a new initialized detection module
    *
