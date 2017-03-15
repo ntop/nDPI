@@ -70,11 +70,6 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
       }
       break;
     }
-    
-    if((protocol == NDPI_PROTOCOL_SSL_NO_CERT)
-       && is_skype_flow(ndpi_struct, flow)) {
-      protocol = NDPI_PROTOCOL_SKYPE;
-    }
   }
   
   return protocol;

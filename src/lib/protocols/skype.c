@@ -21,32 +21,6 @@
 
 #ifdef NDPI_PROTOCOL_SKYPE
 
-static u_int8_t is_skype_host(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t host) {
-  struct in_addr pin;
-  
-  pin.s_addr = host;
-  
-  return((ndpi_network_ptree_match(ndpi_struct, &pin) == NDPI_PROTOCOL_SKYPE) ? 1 : 0);
-}
-
-u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
-		       struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
-	
-  if(packet->iph) {
-    /*
-      Skype connections are identified by some SSL-like communications
-      without SSL certificate being exchanged
-    */	
-    if(is_skype_host(ndpi_struct, packet->iph->saddr)
-       || is_skype_host(ndpi_struct, packet->iph->daddr)) {
-      return(1);
-    }
-  }
-
-  return(0);
-}
-
 static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -56,12 +30,6 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
   
   if(flow->host_server_name[0] != '\0')
     return;
-
-  
-  if(is_skype_flow(ndpi_struct, flow)) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
-    return;
-  }
 
   // UDP check
   if(packet->udp != NULL) {

@@ -781,7 +781,7 @@ typedef struct _ndpi_automa {
 } ndpi_automa;
 
 typedef struct ndpi_proto {
-  u_int16_t master_protocol /* e.g. HTTP */, protocol /* e.g. FaceBook */;
+  u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
 } ndpi_protocol;
 
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }

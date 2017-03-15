@@ -370,18 +370,18 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 	    ntohs(flow->upper_port));
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
-
+    
     if(flow->detected_protocol.master_protocol) {
       char buf[64];
 
       fprintf(out, "[proto: %u.%u/%s]",
-	      flow->detected_protocol.master_protocol, flow->detected_protocol.protocol,
+	      flow->detected_protocol.master_protocol, flow->detected_protocol.app_protocol,
 	      ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				 flow->detected_protocol, buf, sizeof(buf)));
     } else
       fprintf(out, "[proto: %u/%s]",
-	      flow->detected_protocol.protocol,
-	      ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.protocol));
+	      flow->detected_protocol.app_protocol,
+	      ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.app_protocol));
 
     fprintf(out, "[%u pkts/%llu bytes]",
 	    flow->packets, (long long unsigned int) flow->bytes);
@@ -405,23 +405,23 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
     json_object_object_add(jObj,"host_b.port",json_object_new_int(ntohs(flow->upper_port)));
 
     if(flow->detected_protocol.master_protocol)
-      json_object_object_add(jObj,"detected.masterprotocol",json_object_new_int(flow->detected_protocol.master_protocol));
+      json_object_object_add(jObj,"detected.master_protocol",json_object_new_int(flow->detected_protocol.master_protocol));
 
-    json_object_object_add(jObj,"detected.protocol",json_object_new_int(flow->detected_protocol.protocol));
+    json_object_object_add(jObj,"detected.app_protocol",json_object_new_int(flow->detected_protocol.app_protocol));
 
     if(flow->detected_protocol.master_protocol) {
       char tmp[256];
 
       snprintf(tmp, sizeof(tmp), "%s.%s",
 	       ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.master_protocol),
-	       ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.protocol));
+	       ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.app_protocol));
 
       json_object_object_add(jObj,"detected.protocol.name",
 			     json_object_new_string(tmp));
     } else
       json_object_object_add(jObj,"detected.protocol.name",
 			     json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-									flow->detected_protocol.protocol)));
+									flow->detected_protocol.app_protocol)));
 
     json_object_object_add(jObj,"packets",json_object_new_int(flow->packets));
     json_object_object_add(jObj,"bytes",json_object_new_int(flow->bytes));
@@ -458,7 +458,7 @@ static void node_print_unknown_proto_walker(const void *node, ndpi_VISIT which, 
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  if(flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN) return;
+  if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN) return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) /* Avoid walking the same node multiple times */
     printFlow(thread_id, flow);
@@ -472,7 +472,7 @@ static void node_print_known_proto_walker(const void *node, ndpi_VISIT which, in
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) return;
+  if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) /* Avoid walking the same node multiple times */
     printFlow(thread_id, flow);
@@ -491,10 +491,10 @@ static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi
 							   ntohl(flow->upper_ip),
 							   ntohs(flow->upper_port));
   // printf("Guess state: %u\n", flow->detected_protocol);
-  if(flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
+  if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
     ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
 
-  return(flow->detected_protocol.protocol);
+  return(flow->detected_protocol.app_protocol);
 }
 
 
@@ -511,15 +511,15 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct, flow->ndpi_flow);
 
     if(enable_protocol_guess) {
-      if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
+      if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 	node_guess_undetected_protocol(thread_id, flow);
 	// printFlow(thread_id, flow);
       }
     }
 
-    ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.protocol]       += flow->packets;
-    ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[flow->detected_protocol.protocol] += flow->bytes;
-    ndpi_thread_info[thread_id].workflow->stats.protocol_flows[flow->detected_protocol.protocol]++;
+    ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.app_protocol]       += flow->packets;
+    ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[flow->detected_protocol.app_protocol] += flow->bytes;
+    ndpi_thread_info[thread_id].workflow->stats.protocol_flows[flow->detected_protocol.app_protocol]++;
   }
 }
 
@@ -541,7 +541,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       /* update stats */
       node_proto_guess_walker(node, which, depth, user_data);
 
-      if((flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
+      if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
       ndpi_free_flow_info_half(flow);
@@ -565,8 +565,8 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
 
   if(verbose > 1){
     if(enable_protocol_guess) {
-      if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
-        flow->detected_protocol.protocol = node_guess_undetected_protocol(thread_id, flow),
+      if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
+        flow->detected_protocol.app_protocol = node_guess_undetected_protocol(thread_id, flow),
 	  flow->detected_protocol.master_protocol = NDPI_PROTOCOL_UNKNOWN;
       }
     }

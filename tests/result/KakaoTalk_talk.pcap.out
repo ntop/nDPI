@@ -1,11 +1,11 @@
 HTTP	5	280	1
 QQ	15	1727	1
-SSL_No_Cert	29	4024	1
+SSL_No_Cert	74	14132	2
 RTP	2991	398751	2
 SSL	5	1198	1
 Facebook	5	377	3
 Google	4	359	4
-HTTP_Proxy	61	11946	3
+HTTP_Proxy	16	1838	2
 Tor	40	10538	1
 Amazon	4	396	1
 KakaoTalk_Voice	44	6196	2
@@ -18,7 +18,7 @@ KakaoTalk_Voice	44	6196	2
 	6	TCP 173.252.88.128:443 <-> 10.24.82.188:59912 [proto: 91.119/SSL.Facebook][2 pkts/124 bytes]
 	7	TCP 173.252.88.128:443 <-> 10.24.82.188:59954 [proto: 64/SSL_No_Cert][29 pkts/4024 bytes]
 	8	TCP 10.24.82.188:53974 <-> 203.205.151.233:8080 [proto: 131/HTTP_Proxy][5 pkts/350 bytes]
-	9	TCP 110.76.143.50:8080 <-> 10.24.82.188:32968 [proto: 131/HTTP_Proxy][45 pkts/10108 bytes]
+	9	TCP 110.76.143.50:8080 <-> 10.24.82.188:32968 [proto: 64/SSL_No_Cert][45 pkts/10108 bytes]
 	10	TCP 139.150.0.125:443 <-> 10.24.82.188:46947 [proto: 91/SSL][5 pkts/1198 bytes]
 	11	TCP 173.194.72.188:5228 <-> 10.24.82.188:34686 [proto: 126/Google][1 pkts/164 bytes]
 	12	TCP 110.76.143.50:9001 <-> 10.24.82.188:58857 [proto: 163/Tor][40 pkts/10538 bytes]

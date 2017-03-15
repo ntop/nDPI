@@ -1,5 +1,5 @@
 Unknown	236	70600	14
-DNS	6	627	3
+DNS	2	267	1
 MDNS	3	400	2
 NetBIOS	22	3106	7
 SSDP	40	14100	3
@@ -7,7 +7,7 @@ ICMP	4	328	1
 IGMP	4	226	4
 SSL	79	7742	6
 Dropbox	16	7342	5
-Skype	1237	180967	219
+Skype	1241	181327	221
 Apple	84	20699	2
 MS_OneDrive	348	181687	1
 
@@ -85,7 +85,7 @@ MS_OneDrive	348	181687	1
 	72	UDP 192.168.1.1:53 <-> 192.168.1.34:60413 [proto: 5.125/DNS.Skype][7 pkts/616 bytes][Host: 335.0.7.7.3.rst0.r.skype.net]
 	73	UDP 192.168.1.1:53 <-> 192.168.1.34:61095 [proto: 5.125/DNS.Skype][7 pkts/623 bytes][Host: pipe.prd.skypedata.akadns.net]
 	74	UDP 192.168.1.1:53 <-> 192.168.1.34:62875 [proto: 5.125/DNS.Skype][7 pkts/539 bytes][Host: dsn13.d.skype.net]
-	75	UDP 192.168.1.1:53 <-> 192.168.1.34:63661 [proto: 5/DNS][2 pkts/180 bytes][Host: e4593.g.akamaiedge.net]
+	75	UDP 192.168.1.1:53 <-> 192.168.1.34:63661 [proto: 5.125/DNS.Skype][2 pkts/180 bytes][Host: e4593.g.akamaiedge.net]
 	76	UDP 192.168.1.1:53 <-> 192.168.1.34:64971 [proto: 5.125/DNS.Skype][7 pkts/546 bytes][Host: a.config.skype.com]
 	77	TCP 192.168.1.34:51313 <-> 212.161.8.36:13392 [proto: 125/Skype][14 pkts/1142 bytes]
 	78	TCP 192.168.1.34:51256 <-> 111.221.77.142:40013 [proto: 125/Skype][16 pkts/1238 bytes]
@@ -152,7 +152,7 @@ MS_OneDrive	348	181687	1
 	139	TCP 192.168.1.34:51291 <-> 81.83.77.141:17639 [proto: 125/Skype][15 pkts/1226 bytes]
 	140	TCP 76.167.161.6:20274 <-> 192.168.1.34:51288 [proto: 125/Skype][15 pkts/1258 bytes]
 	141	TCP 192.168.1.34:51230 <-> 157.56.126.211:443 [proto: 91.221/SSL.MS_OneDrive][348 pkts/181687 bytes][server: *.gateway.messenger.live.com]
-	142	TCP 157.56.52.28:443 <-> 192.168.1.34:51232 [proto: 91.125/SSL.Skype][13 pkts/1157 bytes]
+	142	TCP 157.56.52.28:443 <-> 192.168.1.34:51232 [proto: 125/Skype][13 pkts/1157 bytes]
 	143	TCP 192.168.1.34:51241 <-> 157.55.130.176:443 [proto: 91.125/SSL.Skype][15 pkts/1584 bytes]
 	144	TCP 192.168.1.34:51261 <-> 157.55.235.170:443 [proto: 91.125/SSL.Skype][15 pkts/1569 bytes]
 	145	TCP 192.168.1.34:51281 <-> 157.55.235.156:443 [proto: 91.125/SSL.Skype][15 pkts/1380 bytes]
@@ -210,7 +210,7 @@ MS_OneDrive	348	181687	1
 	197	UDP 192.168.1.34:13021 <-> 213.199.179.172:40011 [proto: 125/Skype][1 pkts/76 bytes]
 	198	UDP 192.168.1.34:13021 <-> 213.199.179.174:40025 [proto: 125/Skype][1 pkts/71 bytes]
 	199	TCP 192.168.1.34:51298 <-> 82.224.110.241:38895 [proto: 125/Skype][14 pkts/1150 bytes]
-	200	UDP 192.168.1.1:53 <-> 192.168.1.34:59788 [proto: 5/DNS][2 pkts/180 bytes][Host: e4593.g.akamaiedge.net]
+	200	UDP 192.168.1.1:53 <-> 192.168.1.34:59788 [proto: 5.125/DNS.Skype][2 pkts/180 bytes][Host: e4593.g.akamaiedge.net]
 	201	UDP 192.168.1.1:53 <-> 192.168.1.34:60688 [proto: 5.125/DNS.Skype][8 pkts/648 bytes][Host: conn.skype.akadns.net]
 	202	UDP 192.168.1.1:53 <-> 192.168.1.34:61016 [proto: 5.125/DNS.Skype][1 pkts/80 bytes][Host: apps.skypeassets.com]
 	203	ICMP 192.168.1.1:0 <-> 192.168.1.34:0 [proto: 81/ICMP][4 pkts/328 bytes]

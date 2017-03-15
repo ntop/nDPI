@@ -322,9 +322,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   flow.lower_ip = lower_ip, flow.upper_ip = upper_ip;
   flow.lower_port = lower_port, flow.upper_port = upper_port;
 
-  if(0)
-    NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "[NDPI] [%u][%u:%u <-> %u:%u]\n",
-	     iph->protocol, lower_ip, ntohs(lower_port), upper_ip, ntohs(upper_port));
+  NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "[NDPI] [%u][%u:%u <-> %u:%u]\n",
+	   iph->protocol, lower_ip, ntohs(lower_port), upper_ip, ntohs(upper_port));
 
   idx = (vlan_id + lower_ip + upper_ip + iph->protocol + lower_port + upper_port) % workflow->prefs.num_roots;
   ret = ndpi_tfind(&flow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp);
@@ -491,7 +490,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							  ipsize, time, src, dst);
 
-  if((flow->detected_protocol.protocol != NDPI_PROTOCOL_UNKNOWN)
+  if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
     /* New protocol detected or give up */
@@ -499,7 +498,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   }
 
   if(flow->detection_completed) {
-    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN)
+    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
       flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
 						      flow->ndpi_flow);
   }
@@ -507,29 +506,36 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 
-  if(flow->detected_protocol.protocol == NDPI_PROTOCOL_BITTORRENT) {
+  /* BITTORRENT */
+  if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_BITTORRENT) {
     int i, j, n = 0;
-
+    
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
       sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
-      j += 2,	n += flow->ndpi_flow->bittorent_hash[i];
+      j += 2, n += flow->ndpi_flow->bittorent_hash[i];
     }
-
+    
     if(n == 0) flow->bittorent_hash[0] = '\0';
-  } else if(flow->detected_protocol.protocol == NDPI_PROTOCOL_MDNS) {
+  }
+  /* MDNS */
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MDNS) {
     snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.mdns.answer);
-  } else if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UBNTAC2) {
+  }
+  /* UBNTAC2 */
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UBNTAC2) {
     snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
   }
-    
-  if((proto == IPPROTO_TCP) && (flow->detected_protocol.protocol != NDPI_PROTOCOL_DNS)) {
-    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_SSH) {
+  if((proto == IPPROTO_TCP) && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_DNS)) {
+    /* SSH */
+    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH) {
       snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
 	       flow->ndpi_flow->protos.ssh.client_signature);
       snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
 	       flow->ndpi_flow->protos.ssh.server_signature);
-    } else if((flow->detected_protocol.protocol == NDPI_PROTOCOL_SSL)
-	      || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
+    }
+    /* SSL */
+    else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
+	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
       snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
 	       flow->ndpi_flow->protos.ssl.client_certificate);
       snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
@@ -538,7 +544,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   }
 
   if(flow->detection_completed) {
-    if(flow->detected_protocol.protocol == NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
       if (workflow->__flow_giveup_callback != NULL)
 	workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
     } else {
