@@ -1,7 +1,7 @@
 /*
  * ndpi_api.h
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -254,20 +254,6 @@ extern "C" {
   u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int8_t **l4_return, u_int16_t *l4_len_return,
 				 u_int8_t *l4_protocol_return, u_int32_t flags);
 
-
-#if 0
-  /**
-   * returns true if the protocol history of the flow of the last packet given to the detection
-   * contains the given protocol.
-   *
-   * @param ndpi_struct the detection module
-   * @return 1 if protocol has been found, 0 otherwise
-   *
-   */
-  u_int8_t ndpi_detection_flow_protocol_history_contains_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-  								  struct ndpi_flow_struct *flow,
-  								  u_int16_t protocol_id);
-#endif
 
   /**
    * Search and return the protocol based on matched ports

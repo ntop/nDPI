@@ -654,8 +654,8 @@ struct ndpi_packet_struct {
   u_int32_t tick_timestamp;
   u_int64_t tick_timestamp_l;
 
-  u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
-  u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
+  u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
+  u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_SIZE];
 
 
 #ifndef WIN32
@@ -888,7 +888,7 @@ struct ndpi_detection_module_struct {
 };
 
 struct ndpi_flow_struct {
-  u_int16_t detected_protocol_stack[NDPI_PROTOCOL_HISTORY_SIZE];
+  u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
 #ifndef WIN32
   __attribute__ ((__packed__))
 #endif

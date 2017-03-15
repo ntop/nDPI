@@ -4097,7 +4097,7 @@ void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 void ndpi_int_reset_packet_protocol(struct ndpi_packet_struct *packet) {
   int a;
 
-  for(a = 0; a < NDPI_PROTOCOL_HISTORY_SIZE; a++)
+  for(a = 0; a < NDPI_PROTOCOL_SIZE; a++)
     packet->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;
 }
 
@@ -4105,7 +4105,7 @@ void ndpi_int_reset_protocol(struct ndpi_flow_struct *flow) {
   if(flow) {
     int a;
 
-    for(a = 0; a < NDPI_PROTOCOL_HISTORY_SIZE; a++) {
+    for(a = 0; a < NDPI_PROTOCOL_SIZE; a++) {
       flow->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;
     }
   }
