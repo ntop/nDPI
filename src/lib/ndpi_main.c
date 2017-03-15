@@ -3254,7 +3254,7 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 	  func = ndpi_struct->proto_defaults[flow->guessed_protocol_id].func;
     }
 
-    if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)) {
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
       for(a = 0; a < ndpi_struct->callback_buffer_size_tcp_payload; a++) {
 	if((func != ndpi_struct->callback_buffer_tcp_payload[a].func)
 	   && (ndpi_struct->callback_buffer_tcp_payload[a].ndpi_selection_bitmask & *ndpi_selection_packet) == ndpi_struct->callback_buffer_tcp_payload[a].ndpi_selection_bitmask
