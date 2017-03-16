@@ -203,7 +203,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM);
   }
   else if(iqiyi_counter > 0) {
-    NDPI_LOG(NDPI_SERVICE_IQIYI, ndpi_struct, NDPI_LOG_DEBUG, "iQiyi found.\n");
+    NDPI_LOG(NDPI_PROTOCOL_IQIYI, ndpi_struct, NDPI_LOG_DEBUG, "iQiyi found.\n");
     ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI);
   }
 #endif
@@ -378,13 +378,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       if(flow->detected_protocol_stack[0] != flow->guessed_host_protocol_id)
 	flow->guessed_host_protocol_id = flow->detected_protocol_stack[0];
     }
-    
-    /* if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */
-    /*    && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected)) */
-    /*   ndpi_match_host_subprotocol(ndpi_struct, flow, */
-    /* 				    (char *)flow->host_server_name, */
-    /* 				    strlen((const char *)flow->host_server_name), */
-    /* 				    NDPI_PROTOCOL_HTTP); */
 
     if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
        && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
@@ -544,9 +537,6 @@ static void http_bitmask_exclude(struct ndpi_flow_struct *flow)
 void _org_ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
   u_int16_t filename_start;
 
@@ -902,13 +892,14 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
           "HTTP START Found, we will look for sub-protocols (content and host)...\n");
 
       if(packet->host_line.ptr != NULL) {
+
 	/**
 	   nDPI is pretty scrupulous about HTTP so it waits until the
 	   HTTP response is received just to check that it conforms
 	   with the HTTP specs. However this might be a waste of time as
 	   in 99.99% of the cases is like that.
 	*/
-
+	
 	if(ndpi_struct->http_dont_dissect_response) {
 	  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) /* No subprotocol found */
 	    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
@@ -933,7 +924,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
     /**
        At first check, if this is for sure a response packet (in another direction. If not, if http is detected do nothing now and return,
-       otherwise check the second packet for the http request . */
+       otherwise check the second packet for the http request
+    */
     if((flow->l4.tcp.http_stage - packet->packet_direction) == 1) {
 
       if(flow->http_detected)
