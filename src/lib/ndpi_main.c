@@ -213,6 +213,9 @@ u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
 
 /* ****************************************** */
 
+static void *(*_ndpi_flow_malloc)(size_t size);
+static void  (*_ndpi_flow_free)(void *ptr);
+
 static void *(*_ndpi_malloc)(size_t size);
 static void  (*_ndpi_free)(void *ptr);
 
@@ -310,6 +313,7 @@ static int removeDefaultPort(ndpi_port_range *range,
 /* ****************************************** */
 
 void * ndpi_malloc(size_t size) { return(_ndpi_malloc ? _ndpi_malloc(size) : malloc(size)); }
+void * ndpi_flow_malloc(size_t size) { return(_ndpi_flow_malloc ? _ndpi_flow_malloc(size) : ndpi_malloc(size)); }
 
 /* ****************************************** */
 
@@ -327,6 +331,7 @@ void * ndpi_calloc(unsigned long count, size_t size)
 /* ****************************************** */
 
 void ndpi_free(void *ptr) { if(_ndpi_free) _ndpi_free(ptr); else free(ptr); }
+void ndpi_flow_free(void *ptr) { if(_ndpi_flow_free) _ndpi_flow_free(ptr); else ndpi_free_flow((struct ndpi_flow_struct *) ptr); }
 
 /* ****************************************** */
 
@@ -1757,8 +1762,10 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 #endif
 
 void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size)) { _ndpi_malloc = __ndpi_malloc; }
+void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size)) { _ndpi_flow_malloc = __ndpi_flow_malloc; }
 
 void set_ndpi_free(void  (*__ndpi_free)(void *ptr))       { _ndpi_free = __ndpi_free; }
+void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr))       { _ndpi_flow_free = __ndpi_flow_free; }
 
 void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *ndpi_str, ndpi_log_level_t log_level, const char * format, ...)
 {
@@ -4680,8 +4687,10 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct,
 
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
-    if(flow->http.url)          ndpi_free(flow->http.url);
-    if(flow->http.content_type) ndpi_free(flow->http.content_type);
+    if(flow->http.url)
+      ndpi_free(flow->http.url);
+    if(flow->http.content_type)
+      ndpi_free(flow->http.content_type);
     ndpi_free(flow);
   }
 }
