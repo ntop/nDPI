@@ -106,7 +106,10 @@ extern "C" {
   extern int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t protocol_id,
 					       u_int16_t** tcp_master_proto,
 					       u_int16_t** udp_master_proto);
-
+#ifdef NDPI_PROTOCOL_NETBIOS
+  int ndpi_netbios_name_interpret(char *in, char *out, u_int out_len);
+#endif
+  
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
 					     const char **file, const char **func, u_int32_t * line);

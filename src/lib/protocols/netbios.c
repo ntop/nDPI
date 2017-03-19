@@ -32,7 +32,7 @@ struct netbios_header {
 };
 
 /* The function below has been inherited by tcpdump */
-static int netbios_name_interpret(char *in, char *out, u_int out_len) {
+int ndpi_netbios_name_interpret(char *in, char *out, u_int out_len) {
   int ret = 0, len;
   char *b;
   
@@ -114,7 +114,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct, struc
 	NDPI_LOG(NDPI_PROTOCOL_NETBIOS, ndpi_struct,
 		 NDPI_LOG_DEBUG, "found netbios with questions = 1 and answers = 0, authority = 0 and broadcast \n");
 	
-	if(netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
+	if(ndpi_netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
 	  snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
 
 	ndpi_int_netbios_add_connection(ndpi_struct, flow);
@@ -341,7 +341,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  NDPI_LOG(NDPI_PROTOCOL_NETBIOS, ndpi_struct,
 		   NDPI_LOG_DEBUG, "found netbios with checked ip-address.\n");
 
-	  if(netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
+	  if(ndpi_netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
 	    snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
 
 	  ndpi_int_netbios_add_connection(ndpi_struct, flow);
