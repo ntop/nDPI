@@ -50,8 +50,11 @@ int ndpi_netbios_name_interpret(char *in, char *out, u_int out_len) {
     }
 
     *out = ((in[0]-'A')<<4) + (in[1]-'A');
+        
     in += 2;
-    out++, ret++;
+
+    if(isprint(*out))
+      out++, ret++;
   }
 
   *out = 0;
