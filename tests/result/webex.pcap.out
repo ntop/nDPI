@@ -61,5 +61,5 @@ Amazon	3	174	1
 	53	TCP 10.8.0.1:41358 <-> 64.68.105.103:443 [proto: 91.141/SSL.Webex][38 pkts/42482 bytes][server: *.webex.com]
 	54	TCP 10.8.0.1:41386 <-> 64.68.105.103:443 [proto: 91.141/SSL.Webex][17 pkts/8401 bytes][server: *.webex.com]
 	55	TCP 10.8.0.1:41394 <-> 64.68.105.103:443 [proto: 91.141/SSL.Webex][11 pkts/697 bytes]
-	56	TCP 10.8.0.1:46211 <-> 54.241.32.14:443 [proto: 91/SSL][30 pkts/9568 bytes][client: api.crittercism.com]
+	56	TCP 10.8.0.1:46211 <-> 54.241.32.14:443 [proto: 91/SSL][30 pkts/9568 bytes][client: api.crittercism.com][server: *.crittercism.com]
 	57	TCP 10.8.0.1:44492 <-> 64.68.104.140:443 [proto: 91.141/SSL.Webex][17 pkts/7969 bytes][server: *.webex.com]

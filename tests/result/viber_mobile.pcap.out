@@ -70,7 +70,7 @@ Amazon	8	528	1
 	55	TCP 192.168.200.222:37376 <-> 74.125.68.239:443 [proto: 91.126/SSL.Google][7 pkts/532 bytes]
 	56	TCP 52.0.253.46:443 <-> 192.168.200.222:43287 [proto: 64/SSL_No_Cert][36 pkts/5874 bytes]
 	57	UDP 8.8.8.8:53 <-> 192.168.200.222:52263 [proto: 5.142/DNS.WhatsApp][2 pkts/278 bytes][Host: e9.whatsapp.net]
-	58	TCP 23.21.254.189:443 <-> 192.168.200.222:51146 [proto: 91/SSL][22 pkts/9241 bytes][client: e.crashlytics.com]
+	58	TCP 23.21.254.189:443 <-> 192.168.200.222:51146 [proto: 91/SSL][22 pkts/9241 bytes][client: e.crashlytics.com][server: *.crashlytics.com]
 	59	TCP 52.0.253.46:4244 <-> 192.168.200.222:43454 [proto: 144/Viber][16 pkts/2043 bytes]
 	60	TCP 74.125.200.18:443 <-> 192.168.200.222:42040 [proto: 91.122/SSL.GMail][33 pkts/14532 bytes][client: mail.google.com]
 	61	UDP 37.214.167.82:11905 <-> 192.168.200.222:39413 [proto: 37/BitTorrent][1 pkts/146 bytes]
@@ -84,7 +84,7 @@ Amazon	8	528	1
 	69	UDP 192.168.200.222:39413 <-> 81.192.42.247:15057 [proto: 37/BitTorrent][1 pkts/146 bytes]
 	70	UDP 92.245.59.202:12998 <-> 192.168.200.222:39413 [proto: 37/BitTorrent][2 pkts/505 bytes]
 	71	TCP 108.160.172.205:443 <-> 192.168.200.222:51765 [proto: 91.121/SSL.Dropbox][2 pkts/163 bytes]
-	72	TCP 107.22.192.179:443 <-> 192.168.200.222:52269 [proto: 91/SSL][26 pkts/10057 bytes][client: settings.crashlytics.com]
+	72	TCP 107.22.192.179:443 <-> 192.168.200.222:52269 [proto: 91/SSL][26 pkts/10057 bytes][client: settings.crashlytics.com][server: *.crashlytics.com]
 
 
 Undetected flows:

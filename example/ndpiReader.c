@@ -517,6 +517,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
       }
     }
 
+    process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.app_protocol]       += flow->packets;
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[flow->detected_protocol.app_protocol] += flow->bytes;
     ndpi_thread_info[thread_id].workflow->stats.protocol_flows[flow->detected_protocol.app_protocol]++;

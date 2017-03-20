@@ -3327,30 +3327,34 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     u_int16_t guessed_protocol_id, guessed_host_protocol_id;
 
-    if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-       && (flow->packet.l4_protocol == IPPROTO_TCP)
-       && (flow->l4.tcp.ssl_stage > 1))
-      flow->guessed_protocol_id = NDPI_PROTOCOL_SSL;
+    if(flow->protos.ssl.client_certificate[0] != '\0') {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL, NDPI_PROTOCOL_UNKNOWN);
+    } else {    
+      if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+	 && (flow->packet.l4_protocol == IPPROTO_TCP)
+	 && (flow->l4.tcp.ssl_stage > 1))
+	flow->guessed_protocol_id = NDPI_PROTOCOL_SSL;
 
-    guessed_protocol_id = flow->guessed_protocol_id,
-      guessed_host_protocol_id = flow->guessed_host_protocol_id;
+      guessed_protocol_id = flow->guessed_protocol_id,
+	guessed_host_protocol_id = flow->guessed_host_protocol_id;
 
-    if((guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-       && (NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_host_protocol_id)))
-      guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
+      if((guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	 && (NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_host_protocol_id)))
+	guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
 
-    /* Ignore guessed protocol if they have been discarded */
-    if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-       && (guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-       && (NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_protocol_id)))
-      guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
+      /* Ignore guessed protocol if they have been discarded */
+      if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	 && (guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+	 && (NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_protocol_id)))
+	guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
-    if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-       || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
-      ndpi_int_change_protocol(ndpi_struct, flow,
-			       guessed_host_protocol_id,
-			       guessed_protocol_id);
+      if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	 || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
+	ndpi_int_change_protocol(ndpi_struct, flow,
+				 guessed_host_protocol_id,
+				 guessed_protocol_id);
+      }
     }
   } else {
     flow->detected_protocol_stack[1] = flow->guessed_protocol_id,

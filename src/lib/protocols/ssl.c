@@ -24,10 +24,9 @@
 
 #include "ndpi_api.h"
 
-/* #define CERTIFICATE_DEBUG 1 */
-
 #ifdef NDPI_PROTOCOL_SSL
 
+/* #define CERTIFICATE_DEBUG 1 */
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
 /* Skype.c */
@@ -184,6 +183,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	/* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
 	for(i = 9; i < packet->payload_packet_len-3; i++) {
 	  if(((packet->payload[i] == 0x04) && (packet->payload[i+1] == 0x03) && (packet->payload[i+2] == 0x0c))
+	     || ((packet->payload[i] == 0x04) && (packet->payload[i+1] == 0x03) && (packet->payload[i+2] == 0x13))
 	     || ((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x03))) {
 	    u_int8_t server_len = packet->payload[i+3];
 
@@ -345,7 +345,7 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  && flow->l4.tcp.seen_syn_ack
 	  && flow->l4.tcp.seen_ack /* We have seen the 3-way handshake */)
 	 || (flow->protos.ssl.server_certificate[0] != '\0')
-	 || (flow->protos.ssl.client_certificate[0] != '\0')
+	 /* || (flow->protos.ssl.client_certificate[0] != '\0') */
 	 )
 	ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
     }

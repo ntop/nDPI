@@ -435,6 +435,64 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 
 /* ****************************************************** */
 
+void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
+  if(!flow->ndpi_flow) return;
+  
+    snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
+	   flow->ndpi_flow->host_server_name);
+
+  /* BITTORRENT */
+  if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_BITTORRENT) {
+    int i, j, n = 0;
+    
+    for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
+      sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
+      j += 2, n += flow->ndpi_flow->bittorent_hash[i];
+    }
+    
+    if(n == 0) flow->bittorent_hash[0] = '\0';
+  }
+  /* MDNS */
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MDNS) {
+    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.mdns.answer);
+  }
+  /* UBNTAC2 */
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UBNTAC2) {
+    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
+  }
+  if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_DNS) {
+    /* SSH */
+    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH) {
+      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
+	       flow->ndpi_flow->protos.ssh.client_signature);
+      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
+	       flow->ndpi_flow->protos.ssh.server_signature);
+    }
+    /* SSL */
+    else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
+	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
+      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
+	       flow->ndpi_flow->protos.ssl.client_certificate);
+      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
+	       flow->ndpi_flow->protos.ssl.server_certificate);
+    }
+  }
+
+  if(flow->detection_completed) {
+    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
+      if (workflow->__flow_giveup_callback != NULL)
+	workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
+    } else {
+      if (workflow->__flow_detected_callback != NULL)
+	workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
+    }
+
+    ndpi_free_flow_info_half(flow);
+  }
+}
+
+/* ****************************************************** */
+
 /**
    Function to process the packet:
    determine the flow of a packet and try to decode it
@@ -494,6 +552,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
     /* New protocol detected or give up */
+    
     flow->detection_completed = 1;
   }
 
@@ -503,58 +562,7 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
 						      flow->ndpi_flow);
   }
 
-  snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
-	   flow->ndpi_flow->host_server_name);
-
-  /* BITTORRENT */
-  if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_BITTORRENT) {
-    int i, j, n = 0;
-    
-    for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
-      sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
-      j += 2, n += flow->ndpi_flow->bittorent_hash[i];
-    }
-    
-    if(n == 0) flow->bittorent_hash[0] = '\0';
-  }
-  /* MDNS */
-  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MDNS) {
-    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.mdns.answer);
-  }
-  /* UBNTAC2 */
-  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UBNTAC2) {
-    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
-  }
-  if((proto == IPPROTO_TCP) && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_DNS)) {
-    /* SSH */
-    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH) {
-      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
-	       flow->ndpi_flow->protos.ssh.client_signature);
-      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
-	       flow->ndpi_flow->protos.ssh.server_signature);
-    }
-    /* SSL */
-    else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
-	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
-      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
-	       flow->ndpi_flow->protos.ssl.client_certificate);
-      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
-	       flow->ndpi_flow->protos.ssl.server_certificate);
-    }
-  }
-
-  if(flow->detection_completed) {
-    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
-      if (workflow->__flow_giveup_callback != NULL)
-	workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
-    } else {
-      if (workflow->__flow_detected_callback != NULL)
-	workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
-    }
-
-    ndpi_free_flow_info_half(flow);
-  }
-
+  process_ndpi_collected_info(workflow, flow);
   return 0;
 }
 
