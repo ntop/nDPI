@@ -31,6 +31,9 @@
 extern "C" {
 #endif
 
+#define SIZEOF_ID_STRUCT (sizeof(struct ndpi_id_struct))
+#define SIZEOF_FLOW_STRUCT (sizeof(struct ndpi_flow_struct))
+
 #define NDPI_DETECTION_ONLY_IPV4              ( 1 << 0 )
 #define NDPI_DETECTION_ONLY_IPV6              ( 1 << 1 )
 
@@ -79,8 +82,9 @@ extern "C" {
   void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
   char * ndpi_strdup(const char *s);
   void   ndpi_free(void *ptr);
+  void * ndpi_flow_malloc(size_t size);
+  void   ndpi_flow_free(void *ptr);
 
-  
   /**
    * Search the first occurrence of substring -find- in -s-
    * The search is limited to the first -slen- characters of the string
@@ -591,6 +595,8 @@ extern "C" {
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
+  void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size));
+  void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
   void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf);
 
 #ifdef __cplusplus
