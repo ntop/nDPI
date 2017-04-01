@@ -62,6 +62,10 @@
 #define GTP_U_V1_PORT                   2152
 #define TZSP_PORT                      37008
 
+#ifndef DLT_LINUX_SLL
+#define DLT_LINUX_SLL  113
+#endif
+
 #include "ndpi_main.h"
 #include "ndpi_util.h"
 
@@ -629,7 +633,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
  datalink_check:
   switch(datalink_type) {
-  case DLT_NULL :
+  case DLT_NULL:
     if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
       type = ETH_P_IP;
     else
@@ -653,7 +657,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     break;
 
     /* IEEE 802.3 Ethernet - 1 */
-  case DLT_EN10MB :
+  case DLT_EN10MB:
     ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
     ip_offset = sizeof(struct ndpi_ethhdr) + eth_offset;
     check = ntohs(ethernet->h_proto);
@@ -674,15 +678,13 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     break;
 
     /* Linux Cooked Capture - 113 */
-#ifdef __linux__
-  case DLT_LINUX_SLL :
+  case DLT_LINUX_SLL:
     type = (packet[eth_offset+14] << 8) + packet[eth_offset+15];
     ip_offset = 16 + eth_offset;
     break;
-#endif
 
     /* Radiotap link-layer - 127 */
-  case DLT_IEEE802_11_RADIO :
+  case DLT_IEEE802_11_RADIO:
     radiotap = (struct ndpi_radiotap_header *) &packet[eth_offset];
     radio_len = radiotap->len;
 

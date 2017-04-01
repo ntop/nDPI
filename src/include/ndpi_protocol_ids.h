@@ -227,9 +227,9 @@
 #define NDPI_PROTOCOL_QUIC 	 188 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
 #define NDPI_PROTOCOL_WHATSAPP_VOICE 	 189
 #define NDPI_PROTOCOL_EAQ 	 190
+#define NDPI_PROTOCOL_OOKLA      191
 
-/* 191, 192 are free */
-#define NDPI_PROTOCOL_FREE_191   191
+/* 192 is free */
 #define NDPI_PROTOCOL_FREE_192   192
 
 #define NDPI_PROTOCOL_KAKAOTALK 	 193 /* KakaoTalk Chat (no voice call) */
