@@ -617,7 +617,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       /* Check for Ookla */
       if((packet->referer_line.len > 0)
-	 && strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
+	 && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP);
 	return;
       }
