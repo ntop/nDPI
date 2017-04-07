@@ -187,7 +187,7 @@ static void ndpi_tdestroy_recurse(ndpi_node* root, void (*free_action)(void *))
 void ndpi_tdestroy(void *vrootp, void (*freefct)(void *))
 {
   ndpi_node *root = (ndpi_node *) vrootp;
-  
+
   if(root != NULL)
     ndpi_tdestroy_recurse(root, freefct);
 }
@@ -338,7 +338,7 @@ void ndpi_flow_free(void *ptr) { if(_ndpi_flow_free) _ndpi_flow_free(ptr); else 
 void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size)
 {
   void *ret = ndpi_malloc(new_size);
-  
+
   if(!ret)
     return(ret);
   else {
@@ -477,9 +477,9 @@ static int ndpi_default_ports_tree_node_t_cmp(const void *a, const void *b)
 {
   ndpi_default_ports_tree_node_t *fa = (ndpi_default_ports_tree_node_t*)a;
   ndpi_default_ports_tree_node_t *fb = (ndpi_default_ports_tree_node_t*)b;
-  
+
   //printf("[NDPI] %s(%d, %d)\n", __FUNCTION__, fa->default_port, fb->default_port);
-  
+
   return((fa->default_port == fb->default_port) ? 0 : ((fa->default_port < fb->default_port) ? -1 : 1));
 }
 
@@ -488,7 +488,7 @@ static int ndpi_default_ports_tree_node_t_cmp(const void *a, const void *b)
 void ndpi_default_ports_tree_node_t_walker(const void *node, const ndpi_VISIT which, const int depth)
 {
   ndpi_default_ports_tree_node_t *f = *(ndpi_default_ports_tree_node_t **)node;
-  
+
 
   printf("<%d>Walk on node %s (%u)\n",
 	 depth,
@@ -1016,7 +1016,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HTTP_DOWNLOAD,
 			    no_master,
-			    no_master, "HTTPDownload", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
+			    no_master, "HTTP_Download", NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQLIVE,
@@ -3281,8 +3281,8 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 	   && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_tcp_payload[a].detection_bitmask,
 				   detection_bitmask) != 0) {
 	  ndpi_struct->callback_buffer_tcp_payload[a].func(ndpi_struct, flow);
-	  
-	  
+
+
 	  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	    break; /* Stop after detecting the first protocol */
 	}
@@ -3347,7 +3347,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(flow->protos.ssl.client_certificate[0] != '\0') {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL, NDPI_PROTOCOL_UNKNOWN);
-    } else {    
+    } else {
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
 	 && (flow->l4.tcp.ssl_stage > 1))
@@ -3485,9 +3485,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     /* guess protocol */
     flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_struct, protocol, sport, dport, &user_defined_proto);
-    
+
     if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-      
+
       if(flow->packet.iph) {
 	/* guess host protocol */
 	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
@@ -3496,7 +3496,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	  /* ret.master_protocol = flow->guessed_protocol_id , ret.app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
 	  ret = ndpi_detection_giveup(ndpi_struct, flow);
-	
+
 	return(ret);
       }
     } else {
@@ -3508,7 +3508,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       }
     }
   }
-  
+
   check_ndpi_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
 
   a = flow->packet.detected_protocol_stack[0];
@@ -4111,7 +4111,7 @@ void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 /*     flow->packet.detected_protocol_stack[0] = flow->guessed_host_protocol_id; */
 /*     /\* master proto for packet *\/ */
 /*     flow->packet.detected_protocol_stack[1] = flow->guessed_protocol_id; */
-    
+
 /*   } */
 /* } */
 
@@ -4346,7 +4346,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.app_protocol = rc,
 	ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport, dport, &user_defined_proto);
-      
+
       if(ret.app_protocol == ret.master_protocol)
 	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
 
