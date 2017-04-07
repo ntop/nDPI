@@ -1611,9 +1611,13 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Ookla", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AMQP,
+			    no_master,
+			    no_master, "AMQP", NDPI_PROTOCOL_CATEGORY_RPC,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
 
     /* To be removed as soon as we define new protocols */
-    ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_192);
     ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_197);
     ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_208);
     ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_209);
@@ -2686,6 +2690,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* BITTORRENT */
   init_bittorrent_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* AMQP */
+  init_amqp_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* ----------------------------------------------------------------- */
 

@@ -1,7 +1,7 @@
 /*
  * ndpi_protocol_ids.h
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -228,10 +228,7 @@
 #define NDPI_PROTOCOL_WHATSAPP_VOICE 	 189
 #define NDPI_PROTOCOL_EAQ 	 190
 #define NDPI_PROTOCOL_OOKLA      191
-
-/* 192 is free */
-#define NDPI_PROTOCOL_FREE_192   192
-
+#define NDPI_PROTOCOL_AMQP       192
 #define NDPI_PROTOCOL_KAKAOTALK 	 193 /* KakaoTalk Chat (no voice call) */
 #define NDPI_PROTOCOL_KAKAOTALK_VOICE 	 194 /* KakaoTalk Voice */
 #define NDPI_PROTOCOL_TWITCH 	 195 /* Edoardo Dominici <edoaramis@gmail.com> */

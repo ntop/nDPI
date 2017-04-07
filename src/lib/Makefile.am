@@ -21,6 +21,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/applejuice.c \
 		     protocols/armagetron.c \
 		     protocols/ayiya.c \
+		     protocols/amqp.c \
 		     protocols/battlefield.c \
 		     protocols/bgp.c \
 		     protocols/bittorrent.c \
