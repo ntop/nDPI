@@ -246,6 +246,7 @@
 #define NDPI_PROTOCOL_BJNP 	 204
 #define NDPI_PROTOCOL_1KXUN 	 205
 #define NDPI_PROTOCOL_IQIYI 	 206
+#define NDPI_SERVICE_IQIYI       NDPI_PROTOCOL_IQIYI
 #define NDPI_PROTOCOL_SMPP 	 207 /* Damir Franusic <df@release14.org> */
 
 /* 208 - 209 free */
