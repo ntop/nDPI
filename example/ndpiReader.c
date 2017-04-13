@@ -24,11 +24,11 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <process.h>
 #include <io.h>
-#include <getopt.h>
 #define getopt getopt____
 #else
 #include <unistd.h>
@@ -81,6 +81,10 @@ static time_t capture_for = 0;
 static time_t capture_until = 0;
 static u_int32_t num_flows;
 
+static pcap_dumper_t *extcap_dumper = NULL;
+static char *extcap_capture_fifo    = NULL;
+static u_int16_t extcap_packet_filter = (u_int16_t)-1;
+
 // struct associated to a workflow for a thread
 struct reader_thread {
   struct ndpi_workflow * workflow;
@@ -104,8 +108,15 @@ typedef struct ndpi_id {
 u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 
 
-/********************** FUNCTIONS ********************* */
+void test_lib(); /* Forward */
 
+/* ********************************** */
+
+#ifdef DEBUG_TRACE
+FILE *trace = NULL;
+#endif
+
+/********************** FUNCTIONS ********************* */
 
 /**
  * @brief Set main components necessary to the detection
@@ -142,6 +153,20 @@ static void help(u_int long_help) {
 	 "  -h                        | This help\n"
 	 "  -v <1|2>                  | Verbose 'unknown protocol' packet print. 1=verbose, 2=very verbose\n");
 
+  #ifndef WIN32
+  printf("\nExcap (wireshark) options:\n"
+	 "  --extcap-interfaces\n"
+	 "  --extcap-version\n"
+	 "  --extcap-dlts\n"
+	 "  --extcap-interface <name>\n"
+	 "  --extcap-config\n"
+	 "  --capture\n"
+	 "  --extcap-capture-filter\n"
+	 "  --fifo <path to file or pipe>\n"
+	 "  --debug\n"
+	 );
+  #endif
+
   if(long_help) {
     printf("\n\nSupported protocols:\n");
     num_threads = 1;
@@ -152,28 +177,153 @@ static void help(u_int long_help) {
 }
 
 
+static struct option longopts[] = {
+  /* mandatory extcap options */
+  { "extcap-interfaces", no_argument, NULL, '0'},
+  { "extcap-version", optional_argument, NULL, '1'},
+  { "extcap-dlts", no_argument, NULL, '2'},
+  { "extcap-interface", required_argument, NULL, '3'},
+  { "extcap-config", no_argument, NULL, '4'},
+  { "capture", no_argument, NULL, '5'},
+  { "extcap-capture-filter", required_argument, NULL, '6'},
+  { "fifo", required_argument, NULL, '7'},
+  { "debug", optional_argument, NULL, '8'},
+  { "ndpi-proto-filter", required_argument, NULL, '9'},
+
+  /* ndpiReader options */
+  { "enable-protocol-guess", no_argument, NULL, 'd'},
+  { "interface", required_argument, NULL, 'i'},
+  { "filter", required_argument, NULL, 'f'},
+  { "cpu-bind", required_argument, NULL, 'g'},
+  { "loops", required_argument, NULL, 'l'},
+  { "num-threads", required_argument, NULL, 'n'},
+
+  { "protos", required_argument, NULL, 'p'},
+  { "capture-duration", required_argument, NULL, 's'},
+  { "decode-tunnels", no_argument, NULL, 't'},
+  { "revision", no_argument, NULL, 'r'},
+  { "verbose", no_argument, NULL, 'v'},
+  { "version", no_argument, NULL, 'V'},
+  { "help", no_argument, NULL, 'h'},
+  { "json", required_argument, NULL, 'j'},
+  { "result-path", required_argument, NULL, 'w'},
+  { "quiet", no_argument, NULL, 'q'},
+
+  {0, 0, 0, 0}
+};
+
+/* ********************************** */
+
+void extcap_interfaces() {
+  printf("extcap {version=%s}\n", ndpi_revision());
+  printf("interface {value=ndpi}{display=nDPI interface}\n");
+  exit(0);
+}
+
+/* ********************************** */
+
+void extcap_dlts() {
+  u_int dlts_number = DLT_EN10MB;
+  printf("dlt {number=%u}{name=%s}{display=%s}\n", dlts_number, "ndpi", "nDPI interface");
+  exit(0);
+}
+
+/* ********************************** */
+
+void extcap_config() {
+  int i, argidx = 0;
+  struct ndpi_detection_module_struct *ndpi_mod;
+
+#if 1
+  printf("arg {number=%u}{call=-i}{display=Capture Interface Name}{type=string}"
+	 "{tooltip=The interface name}\n", argidx++);
+#else
+
+  printf("arg {number=%u}{call=-i}{display=Pcap File to Analize}{type=fileselect}"
+	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
+#endif
+
+  printf("arg {number=%u}{call=-9}{display=nDPI Protocol}{type=selector}"
+	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
+
+  setupDetection(0, NULL);
+  ndpi_mod = ndpi_thread_info[0].workflow->ndpi_struct;
+
+  printf("value {arg=%d}{value=%d}{display=%s}\n", argidx, -1, "All Protocols (no nDPI filtering)");
+
+  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
+    printf("value {arg=%d}{value=%d}{display=%s (%u)}\n", argidx, i,
+	   ndpi_mod->proto_defaults[i].protoName, i);
+
+  exit(0);
+}
+
+/* ********************************** */
+
+void extcap_capture() {
+#ifdef DEBUG_TRACE
+  if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
+#endif
+
+  if((extcap_dumper = pcap_dump_open(pcap_open_dead(DLT_EN10MB, 16384 /* MTU */),
+				     extcap_capture_fifo)) == NULL) {
+    fprintf(stderr, "Unable to open the pcap dumper on %s", extcap_capture_fifo);
+
+#ifdef DEBUG_TRACE
+    if(trace) fprintf(trace, "Unable to open the pcap dumper on %s\n",
+		      extcap_capture_fifo);
+#endif
+    return;
+  }
+
+#ifdef DEBUG_TRACE
+  if(trace) fprintf(trace, "Starting packet capture [%p]\n", extcap_dumper);
+#endif
+
+  test_lib();
+  pcap_dump_close(extcap_dumper);
+
+#ifdef DEBUG_TRACE
+  if(trace) fprintf(trace, "End of packet capture [%p]\n", extcap_dumper);
+#endif
+}
+
+/* ********************************** */
+
 /**
  * @brief Option parser
  */
 static void parseOptions(int argc, char **argv) {
-
+  int option_idx = 0, do_capture = 0;
   char *__pcap_file = NULL, *bind_mask = NULL;
   int thread_id, opt;
 #ifdef linux
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 
-  while ((opt = getopt(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q")) != EOF) {
+#ifdef DEBUG_TRACE
+  trace = fopen("/tmp/ndpiReader.log", "a");
+
+  if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
+#endif
+
+  while ((opt = getopt_long(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:", longopts, &option_idx)) != EOF) {
+#ifdef DEBUG_TRACE
+    if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
+#endif
+
     switch (opt) {
     case 'd':
       enable_protocol_guess = 0;
       break;
 
     case 'i':
+    case '3':
       _pcap_file[0] = optarg;
       break;
 
     case 'f':
+    case '6':
       _bpf_filter = optarg;
       break;
 
@@ -240,11 +390,46 @@ static void parseOptions(int argc, char **argv) {
       quiet_mode = 1;
       break;
 
+      /* Extcap */
+    case '0':
+      extcap_interfaces();
+      break;
+
+    case '1':
+      printf("extcap {version=%s}\n", ndpi_revision());
+      break;
+
+    case '2':
+      extcap_dlts();
+      break;
+
+    case '4':
+      extcap_config();
+      break;
+
+    case '5':
+      do_capture = 1;
+      break;
+
+    case '7':
+      extcap_capture_fifo = strdup(optarg);
+      break;
+
+    case '8':
+      nDPI_traceLevel = 9;
+      break;
+
+    case '9':
+      extcap_packet_filter = atoi(optarg);
+      break;
+      
     default:
       help(0);
       break;
     }
   }
+
+  if(do_capture) extcap_capture();
 
   // check parameters
   if(_pcap_file[0] == NULL || strcmp(_pcap_file[0], "") == 0) {
@@ -276,6 +461,10 @@ static void parseOptions(int argc, char **argv) {
       core_id = strtok(NULL, ":");
     }
   }
+#endif
+
+#ifdef DEBUG_TRACE
+  if(trace) fclose(trace);
 #endif
 }
 
@@ -370,7 +559,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 	    ntohs(flow->upper_port));
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
-    
+
     if(flow->detected_protocol.master_protocol) {
       char buf[64];
 
@@ -388,7 +577,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
-    
+
     if(flow->ssh_ssl.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_ssl.client_info);
     if(flow->ssh_ssl.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_ssl.server_info);
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
@@ -1138,13 +1327,14 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
 static void pcap_packet_callback_checked(u_char *args,
 					 const struct pcap_pkthdr *header,
 					 const u_char *packet) {
-
+  struct ndpi_proto p;
   u_int16_t thread_id = *((u_int16_t*)args);
 
   /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
+
   memcpy(packet_checked, packet, header->caplen);
-  ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
+  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
 
   if((capture_until != 0) && (header->ts.tv_sec >= capture_until)) {
     if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)
@@ -1180,6 +1370,25 @@ static void pcap_packet_callback_checked(u_char *args,
       if(++ndpi_thread_info[thread_id].idle_scan_idx == ndpi_thread_info[thread_id].workflow->prefs.num_roots) ndpi_thread_info[thread_id].idle_scan_idx = 0;
       ndpi_thread_info[thread_id].last_idle_scan_time = ndpi_thread_info[thread_id].workflow->last_time;
     }
+  }
+
+#ifdef DEBUG_TRACE
+  if(trace) fprintf(trace, "Found %u bytes packet %u.%u\n", header->caplen, p.app_protocol, p.master_protocol);
+#endif
+
+  if(extcap_dumper
+     && ((extcap_packet_filter == (u_int16_t)-1)
+	 || (p.app_protocol == extcap_packet_filter)
+	 || (p.master_protocol == extcap_packet_filter)
+	 )
+     ) {
+    struct pcap_pkthdr *h = (struct pcap_pkthdr*)header;
+    
+#ifdef DEBUG_TRACE
+    if(trace) fprintf(trace, "Dumping %u bytes packet\n", header->caplen);
+#endif
+    // h->caplen += 8,  h->len += 8;
+    pcap_dump((u_char*)extcap_dumper, h, packet);
   }
 
   /* check for buffer changes */
@@ -1244,7 +1453,6 @@ void * processing_thread(void *_thread_id) {
  * @brief Begin, process, end detection process
  */
 void test_lib() {
-
   struct timeval begin, end;
   u_int64_t tot_usec;
   long thread_id;
@@ -1253,8 +1461,18 @@ void test_lib() {
   json_init();
 #endif
 
+#ifdef DEBUG_TRACE
+  if(trace) fprintf(trace, "Num threads: %d\n", num_threads);
+#endif
+
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    pcap_t * cap = openPcapFileOrDevice(thread_id, (const u_char*)_pcap_file[thread_id]);
+    pcap_t *cap;
+
+#ifdef DEBUG_TRACE
+    if(trace) fprintf(trace, "Opening %s\n", (const u_char*)_pcap_file[thread_id]);
+#endif
+
+    cap = openPcapFileOrDevice(thread_id, (const u_char*)_pcap_file[thread_id]);
     setupDetection(thread_id, cap);
   }
 
@@ -1275,9 +1493,9 @@ void test_lib() {
   printResults(tot_usec);
 
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL) {
+    if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)
       pcap_close(ndpi_thread_info[thread_id].workflow->pcap_handle);
-    }
+
     terminateDetection(thread_id);
   }
 }

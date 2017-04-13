@@ -138,9 +138,9 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 
 
 /* Process a packet and update the workflow  */
-void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
-				   const struct pcap_pkthdr *header,
-				   const u_char *packet);
+struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
+					       const struct pcap_pkthdr *header,
+					       const u_char *packet);
 
 
 /* flow callbacks for complete detected flow

@@ -502,13 +502,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
    @Note: ipsize = header->len - ip_offset ; rawsize = header->len
 */
-static unsigned int packet_processing(struct ndpi_workflow * workflow,
-				      const u_int64_t time,
-				      u_int16_t vlan_id,
-				      const struct ndpi_iphdr *iph,
-				      struct ndpi_ipv6hdr *iph6,
-				      u_int16_t ip_offset,
-				      u_int16_t ipsize, u_int16_t rawsize) {
+static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
+					   const u_int64_t time,
+					   u_int16_t vlan_id,
+					   const struct ndpi_iphdr *iph,
+					   struct ndpi_ipv6hdr *iph6,
+					   u_int16_t ip_offset,
+					   u_int16_t ipsize, u_int16_t rawsize) {
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow_info *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
@@ -540,11 +540,11 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
     flow->packets++, flow->bytes += rawsize;
     flow->last_seen = time;
   } else {
-    return(0);
+    return(flow->detected_protocol);
   }
 
   /* Protocol already detected */
-  if(flow->detection_completed) return(0);
+  if(flow->detection_completed) return(flow->detected_protocol);
 
   flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
@@ -565,14 +565,14 @@ static unsigned int packet_processing(struct ndpi_workflow * workflow,
   }
 
   process_ndpi_collected_info(workflow, flow);
-  return 0;
+  return(flow->detected_protocol);
 }
 
 /* ****************************************************** */
 
-void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
-				   const struct pcap_pkthdr *header,
-				   const u_char *packet) {
+struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
+						const struct pcap_pkthdr *header,
+						const u_char *packet) {
   /*
    * Declare pointers to packet headers
    */
@@ -597,6 +597,8 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   /** --- IPv6 header --- **/
   struct ndpi_ipv6hdr *iph6;
 
+  struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
+  
   /* lengths and offsets */
   u_int16_t eth_offset = 0;
   u_int16_t radio_len;
@@ -691,7 +693,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     /* Check Bad FCS presence */
     if((radiotap->flags & BAD_FCS) == BAD_FCS) {
       workflow->stats.total_discarded_bytes +=  header->len;
-      return;
+      return(nproto);
     }
 
     /* Calculate 802.11 header length (variable) */
@@ -721,7 +723,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
   default:
     /* printf("Unknown datalink %d\n", datalink_type); */
-    return;
+    return(nproto);
   }
 
   /* check ether type */
@@ -802,7 +804,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       }
 
       workflow->stats.total_discarded_bytes +=  header->len;
-      return;
+      return(nproto);
     }
   } else if(iph->version == 6) {
     iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
@@ -827,7 +829,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       ipv4_warning_used = 1;
     }
     workflow->stats.total_discarded_bytes +=  header->len;
-    return;
+    return(nproto);
   }
 
   if(workflow->prefs.decode_tunnels && (proto == IPPROTO_UDP)) {
@@ -886,7 +888,7 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 	  offset += tag_len;
 
 	  if(offset >= header->caplen)
-	    return; /* Invalid packet */
+	    return(nproto); /* Invalid packet */
 	  else {
 	    eth_offset = offset;
 	    goto datalink_check;
@@ -897,6 +899,6 @@ void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   }
 
   /* process the packet */
-  packet_processing(workflow, time, vlan_id, iph, iph6,
-		    ip_offset, header->len - ip_offset, header->len);
+  return(packet_processing(workflow, time, vlan_id, iph, iph6,
+			   ip_offset, header->len - ip_offset, header->len));
 }
