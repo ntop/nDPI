@@ -48,6 +48,7 @@
 #define MPLS_MULTI             0x8848
 #define PPPoE                  0x8864
 #define SNAP                   0xaa
+#define BSTP                   0x42     /* Bridge Spanning Tree Protocol */
 
 /* mask for FCF */
 #define	WIFI_DATA                        0x2    /* 0000 0010 */
@@ -286,8 +287,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
     *payload = &l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
-  } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
+
     // udp
+  } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
+    
     workflow->stats.udp_count++;
 
     *udph = (struct ndpi_udphdr *)l4;
@@ -670,11 +673,15 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       type = check;
 
     if(pyld_eth_len != 0) {
+      llc = (struct ndpi_llc_header *)(&packet[ip_offset]);
       /* check for LLC layer with SNAP extension */
-      if(packet[ip_offset] == SNAP) {
-	llc = (struct ndpi_llc_header *)(&packet[ip_offset]);
+      if(llc->dsap == SNAP || llc->ssap == SNAP) {
+#define SNAP_EXT
 	type = llc->snap.proto_ID;
 	ip_offset += + 8;
+      }
+      else if(llc->dsap == BSTP || llc->ssap == BSTP) {
+	goto v4_warning;
       }
     }
     break;

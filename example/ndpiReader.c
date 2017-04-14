@@ -1331,7 +1331,7 @@ static void pcap_packet_callback_checked(u_char *args,
   u_int16_t thread_id = *((u_int16_t*)args);
 
   /* allocate an exact size buffer to check overflows */
-  uint8_t *packet_checked = malloc(header->caplen);
+  uint8_t *packet_checked = malloc(header->caplen); /* HEAP OVERFLOW !!! */
 
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
@@ -1478,14 +1478,32 @@ void test_lib() {
 
   gettimeofday(&begin, NULL);
 
+  int status;
+  void * thd_res;
+
   /* Running processing threads */
-  for(thread_id = 0; thread_id < num_threads; thread_id++)
-    pthread_create(&ndpi_thread_info[thread_id].pthread, NULL, processing_thread, (void *) thread_id);
-
+  for(thread_id = 0; thread_id < num_threads; thread_id++) {
+    status = pthread_create(&ndpi_thread_info[thread_id].pthread, NULL, processing_thread, (void *) thread_id);
+    /* check pthreade_create return value */
+    if(status != 0) {
+      fprintf(stderr, "error on create %ld thread\n", thread_id);
+      exit(-1);
+    }
+  }
   /* Waiting for completion */
-  for(thread_id = 0; thread_id < num_threads; thread_id++)
-    pthread_join(ndpi_thread_info[thread_id].pthread, NULL);
-
+  for(thread_id = 0; thread_id < num_threads; thread_id++) {
+    status = pthread_join(ndpi_thread_info[thread_id].pthread, thd_res);
+    /* check pthreade_join return value */
+    if(status != 0) {
+      fprintf(stderr, "error on join %ld thread\n", thread_id);
+      exit(-1);
+    }
+    if(thd_res != NULL) {
+      fprintf(stderr, "error on returned value of %ld joined thread\n", thread_id);
+      exit(-1);
+    }
+  }
+  
   gettimeofday(&end, NULL);
   tot_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
 
