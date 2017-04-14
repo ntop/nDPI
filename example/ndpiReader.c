@@ -1331,7 +1331,7 @@ static void pcap_packet_callback_checked(u_char *args,
   u_int16_t thread_id = *((u_int16_t*)args);
 
   /* allocate an exact size buffer to check overflows */
-  uint8_t *packet_checked = malloc(header->caplen); /* HEAP OVERFLOW !!! */
+  uint8_t *packet_checked = malloc(header->caplen);
 
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);

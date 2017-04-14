@@ -582,7 +582,7 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   /* --- Ethernet header --- */
   const struct ndpi_ethhdr *ethernet;
   /* --- LLC header --- */
-  const struct ndpi_llc_header *llc;
+  const struct ndpi_llc_header_snap *llc;
 
   /* --- Cisco HDLC header --- */
   const struct ndpi_chdlc *chdlc;
@@ -673,13 +673,13 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       type = check;
 
     if(pyld_eth_len != 0) {
-      llc = (struct ndpi_llc_header *)(&packet[ip_offset]);
+      llc = (struct ndpi_llc_header_snap *)(&packet[ip_offset]);
       /* check for LLC layer with SNAP extension */
       if(llc->dsap == SNAP || llc->ssap == SNAP) {
-#define SNAP_EXT
 	type = llc->snap.proto_ID;
 	ip_offset += + 8;
       }
+      /* No SNAP extension - Spanning Tree pkt must be discarted */
       else if(llc->dsap == BSTP || llc->ssap == BSTP) {
 	goto v4_warning;
       }
@@ -716,12 +716,12 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
       break;
 
     /* Check ether_type from LLC */
-    llc = (struct ndpi_llc_header*)(packet + eth_offset + wifi_len + radio_len);
+    llc = (struct ndpi_llc_header_snap*)(packet + eth_offset + wifi_len + radio_len);
     if(llc->dsap == SNAP)
       type = ntohs(llc->snap.proto_ID);
 
     /* Set IP header offset */
-    ip_offset = wifi_len + radio_len + sizeof(struct ndpi_llc_header) + eth_offset;
+    ip_offset = wifi_len + radio_len + sizeof(struct ndpi_llc_header_snap) + eth_offset;
     break;
 
   case DLT_RAW:
