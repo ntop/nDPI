@@ -79,6 +79,17 @@ static ndpi_network host_protocol_list[] = {
 
    { 0xA92F2320 /* 169.47.35.32/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
 
+  /*
+    WeChat
+    203.205.147.171
+    203.205.147.173
+    203.205.151.162
+  */
+
+   { 0xCBCD93AB /* 203.205.147.171/32 */, 32, NDPI_PROTOCOL_WECHAT },
+   { 0xCBCD93AD /* 203.205.147.173/32 */, 32, NDPI_PROTOCOL_WECHAT },
+   { 0xCBCD97A2 /* 203.205.151.162/32 */, 32, NDPI_PROTOCOL_WECHAT },
+
    /*
     OpenDNS, LLC
     origin AS36692, AS30607
@@ -8126,8 +8137,14 @@ ndpi_protocol_match host_match[] = {
   { ".steamstatic.com", 		"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { "steamcommunity-a.akamaihd.net",	"Steam",		NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
-  { ".wechat.com",         		"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },  
-
+  { ".wechat.com",         		"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".wechat.org",         		"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".wechatapp.com",         		"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".we.chat",         		"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".wx.",				"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".weixin.",				"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".mmsns.qpic.cn",			"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+    
   { NULL, 0 }
 };
 

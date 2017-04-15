@@ -1,5 +1,4 @@
 HTTP	5	280	1
-QQ	15	1727	1
 SSL_No_Cert	74	14132	2
 RTP	2991	398751	2
 SSL	5	1198	1
@@ -9,6 +8,7 @@ HTTP_Proxy	16	1838	2
 Tor	40	10538	1
 Amazon	4	396	1
 KakaoTalk_Voice	44	6196	2
+WeChat	15	1727	1
 
 	1	TCP 10.24.82.188:34533 <-> 120.28.26.242:80 [proto: 7/HTTP][5 pkts/280 bytes]
 	2	TCP 10.24.82.188:58916 <-> 54.255.185.236:5222 [proto: 178/Amazon][4 pkts/396 bytes]
@@ -23,7 +23,7 @@ KakaoTalk_Voice	44	6196	2
 	11	TCP 173.194.72.188:5228 <-> 10.24.82.188:34686 [proto: 126/Google][1 pkts/164 bytes]
 	12	TCP 110.76.143.50:9001 <-> 10.24.82.188:58857 [proto: 163/Tor][40 pkts/10538 bytes]
 	13	TCP 173.252.122.1:443 <-> 10.24.82.188:52123 [proto: 91.119/SSL.Facebook][1 pkts/56 bytes]
-	14	TCP 10.24.82.188:48489 <-> 203.205.147.215:80 [proto: 7.48/HTTP.QQ][15 pkts/1727 bytes][Host: hkminorshort.weixin.qq.com]
+	14	TCP 10.24.82.188:48489 <-> 203.205.147.215:80 [proto: 7.197/HTTP.WeChat][15 pkts/1727 bytes][Host: hkminorshort.weixin.qq.com]
 	15	UDP 1.201.1.174:23047 <-> 10.24.82.188:10269 [proto: 194/KakaoTalk_Voice][22 pkts/3112 bytes]
 	16	UDP 1.201.1.174:23046 <-> 10.24.82.188:10268 [proto: 87/RTP][1488 pkts/198510 bytes]
 	17	UDP 1.201.1.174:23045 <-> 10.24.82.188:11321 [proto: 194/KakaoTalk_Voice][22 pkts/3084 bytes]
