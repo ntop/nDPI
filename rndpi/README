@@ -1,0 +1,12 @@
+librndpi -- a C library for deep packet inspection on top of nDPI
+=================================================================
+
+This library implements a brand-new interface for nDPI.
+
+
+Basic directory layout
+======================
+
+lib/       library include and sources
+tests/     programs to test
+tools/     project binaries
