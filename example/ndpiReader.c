@@ -81,7 +81,13 @@ static time_t capture_for = 0;
 static time_t capture_until = 0;
 static u_int32_t num_flows;
 
+struct ndpi_packet_trailer {
+	u_int32_t magic; /* 0x19682017 */
+	u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
+};
+
 static pcap_dumper_t *extcap_dumper = NULL;
+static char extcap_buf[2048];
 static char *extcap_capture_fifo    = NULL;
 static u_int16_t extcap_packet_filter = (u_int16_t)-1;
 
@@ -422,7 +428,7 @@ static void parseOptions(int argc, char **argv) {
     case '9':
       extcap_packet_filter = atoi(optarg);
       break;
-      
+
     default:
       help(0);
       break;
@@ -1383,12 +1389,22 @@ static void pcap_packet_callback_checked(u_char *args,
 	 )
      ) {
     struct pcap_pkthdr *h = (struct pcap_pkthdr*)header;
-    
+    uint32_t *crc, delta = sizeof(struct ndpi_packet_trailer) + 4 /* ethernet trailer */;
+    struct ndpi_packet_trailer *trailer = (struct ndpi_packet_trailer*)&extcap_buf[h->caplen];
+
+    memcpy(extcap_buf, packet, h->caplen);
+    trailer->magic = 0x19682017;
+    trailer->master_protocol = p.master_protocol, trailer->app_protocol = p.app_protocol;
+    crc = (uint32_t*)&extcap_buf[h->caplen+sizeof(struct ndpi_packet_trailer)];
+    *crc = 0;
+    ethernet_crc32((const void*)extcap_buf, h->caplen+sizeof(struct ndpi_packet_trailer), crc);
+    h->caplen += delta,  h->len += delta;
+
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, "Dumping %u bytes packet\n", header->caplen);
 #endif
-    // h->caplen += 8,  h->len += 8;
-    pcap_dump((u_char*)extcap_dumper, h, packet);
+
+    pcap_dump((u_char*)extcap_dumper, h, (const u_char *)extcap_buf);
   }
 
   /* check for buffer changes */
@@ -1503,7 +1519,7 @@ void test_lib() {
       exit(-1);
     }
   }
-  
+
   gettimeofday(&end, NULL);
   tot_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
 
