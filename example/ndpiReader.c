@@ -1508,7 +1508,7 @@ void test_lib() {
   }
   /* Waiting for completion */
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    status = pthread_join(ndpi_thread_info[thread_id].pthread, thd_res);
+    status = pthread_join(ndpi_thread_info[thread_id].pthread, &thd_res);
     /* check pthreade_join return value */
     if(status != 0) {
       fprintf(stderr, "error on join %ld thread\n", thread_id);
