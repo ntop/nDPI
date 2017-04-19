@@ -521,6 +521,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   u_int16_t sport, dport, payload_len;
   u_int8_t *payload;
   u_int8_t src_to_dst_direction= 1;
+  struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
 
   if(iph)
     flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id, iph, NULL,
@@ -543,7 +544,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     flow->packets++, flow->bytes += rawsize;
     flow->last_seen = time;
   } else {
-    return(flow->detected_protocol);
+    return(nproto);
   }
 
   /* Protocol already detected */
