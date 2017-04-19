@@ -44,6 +44,7 @@
 #include <assert.h>
 #include "../config.h"
 #include "ndpi_api.h"
+#include "uthash.h"
 
 #ifdef HAVE_JSON_C
 #include <json.h>
@@ -81,9 +82,17 @@ static time_t capture_for = 0;
 static time_t capture_until = 0;
 static u_int32_t num_flows;
 
+struct port_stats {
+  u_int32_t port; /* we'll use this field as the key */
+  u_int32_t num_pkts, num_bytes;
+  UT_hash_handle hh; /* makes this structure hashable */
+};
+
+struct port_stats *srcStats = NULL, *dstStats = NULL;
+
 struct ndpi_packet_trailer {
-	u_int32_t magic; /* 0x19682017 */
-	u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
+  u_int32_t magic; /* 0x19682017 */
+  u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
 };
 
 static pcap_dumper_t *extcap_dumper = NULL;
@@ -554,7 +563,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
     fprintf(out, "\t%u", ++num_flows);
 
     fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
-    
+
     if(flow->src_to_dst_direction == 1)
       fprintf(out, "%s%s%s:%u <-> %s%s%s:%u ",
 	      (flow->ip_version == 6) ? "[" : "",
@@ -569,7 +578,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 	      (flow->ip_version == 6) ? "[" : "",
 	      flow->lower_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->lower_port)
 	      );
-    
+
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
 
     if(flow->detected_protocol.master_protocol) {
@@ -703,7 +712,6 @@ static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi
  * @brief Proto Guess Walker
  */
 static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
@@ -725,6 +733,53 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   }
 }
 
+/* *********************************************** */
+
+static void updatePortStats(struct port_stats **stats, u_int32_t port, u_int32_t num_pkts, u_int32_t num_bytes) {
+  struct port_stats *s;
+
+  HASH_FIND_INT(*stats, &port, s);
+  if(s == NULL) {
+    s = (struct port_stats*)malloc(sizeof(struct port_stats));
+    if(!s) return;
+
+    s->port = port, s->num_pkts = 0, s->num_bytes = 0;
+    HASH_ADD_INT(*stats, port, s);
+  }
+
+  s->num_pkts += num_pkts, s->num_bytes += num_bytes;
+}
+
+/* *********************************************** */
+
+static void deletePortsStats(struct port_stats *stats) {
+  struct port_stats *current_port, *tmp;
+
+  HASH_ITER(hh, stats, current_port, tmp) {
+    HASH_DEL(stats, current_port);
+    free(current_port);
+  }
+}
+
+/* *********************************************** */
+
+/**
+ * @brief Ports stats
+ */
+static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
+  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
+  u_int16_t sport, dport;
+
+  if(flow->src_to_dst_direction == 1)
+    sport = ntohs(flow->lower_port), dport = ntohs(flow->upper_port);
+  else
+    sport = ntohs(flow->upper_port), dport = ntohs(flow->lower_port);
+
+  updatePortStats(&srcStats, sport, flow->packets, flow->bytes);
+  updatePortStats(&dstStats, dport, flow->packets, flow->bytes);
+}
+
+/* *********************************************** */
 
 /**
  * @brief Idle Scan Walker
@@ -929,12 +984,12 @@ static void json_init() {
 }
 #endif
 
+/* *********************************************** */
 
 /**
  * @brief Bytes stats format
  */
 char* formatBytes(u_int32_t howMuch, char *buf, u_int buf_len) {
-
   char unit = 'B';
 
   if(howMuch < 1024) {
@@ -956,6 +1011,29 @@ char* formatBytes(u_int32_t howMuch, char *buf, u_int buf_len) {
   return(buf);
 }
 
+/* *********************************************** */
+
+static int port_stats_sort(void *_a, void *_b) {
+  struct port_stats *a = (struct port_stats*)_a;
+  struct port_stats *b = (struct port_stats*)_b;
+
+  return(b->num_pkts - a->num_pkts);
+}
+
+/* *********************************************** */
+
+void printPortStats(struct port_stats *stats) {
+  struct port_stats *s, *tmp;
+  int i = 0;
+  
+  HASH_ITER(hh, stats, s, tmp) {
+    i++;
+    printf("\t%2d\tPort %5u\t[%u pkts/%u bytes]\n", i, s->port, s->num_pkts, s->num_bytes);
+    if(i >= 10) break;
+  }   
+}
+
+/* *********************************************** */
 
 /**
  * @brief Print result
@@ -973,17 +1051,24 @@ static void printResults(u_int64_t tot_usec) {
   json_object *jObj_main = NULL, *jObj_trafficStats, *jArray_detProto = NULL, *jObj;
 #endif
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
-
+  
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
 
-  for(thread_id = 0; thread_id < num_threads; thread_id++) {
+  for(thread_id = 0; thread_id < num_threads; thread_id++) {    
     if((ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0)
        && (ndpi_thread_info[thread_id].workflow->stats.raw_packet_count == 0))
       continue;
 
-    for(i=0; i<NUM_ROOTS; i++)
+    for(i=0; i<NUM_ROOTS; i++) {
       ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_proto_guess_walker, &thread_id);
+      if(verbose) ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], port_stats_walker, &thread_id);
+    }
 
+    if(verbose) {
+      HASH_SORT(srcStats, port_stats_sort);
+      HASH_SORT(dstStats, port_stats_sort);
+    }
+    
     /* Stats aggregation */
     cumulative_stats.guessed_flow_protocols += ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols;
     cumulative_stats.raw_packet_count += ndpi_thread_info[thread_id].workflow->stats.raw_packet_count;
@@ -1203,6 +1288,16 @@ static void printResults(u_int64_t tot_usec) {
     fprintf(json_fp,"%s\n",json_object_to_json_string(jObj_main));
     fclose(json_fp);
 #endif
+  }
+
+  if(verbose) {
+    printf("\n\nSource Ports Stats:\n");
+    printPortStats(srcStats);
+    
+    printf("\nDestination Ports Stats:\n");
+    printPortStats(dstStats);
+    
+    deletePortsStats(srcStats), deletePortsStats(dstStats);
   }
 }
 
