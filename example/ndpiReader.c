@@ -553,17 +553,23 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
   if(!json_flag) {
     fprintf(out, "\t%u", ++num_flows);
 
-    fprintf(out, "\t%s %s%s%s:%u <-> %s%s%s:%u ",
-	    ipProto2Name(flow->protocol),
-	    (flow->ip_version == 6) ? "[" : "",
-	    flow->lower_name,
-	    (flow->ip_version == 6) ? "]" : "",
-	    ntohs(flow->lower_port),
-	    (flow->ip_version == 6) ? "[" : "",
-	    flow->upper_name,
-	    (flow->ip_version == 6) ? "]" : "",
-	    ntohs(flow->upper_port));
-
+    fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
+    
+    if(flow->src_to_dst_direction == 1)
+      fprintf(out, "%s%s%s:%u <-> %s%s%s:%u ",
+	      (flow->ip_version == 6) ? "[" : "",
+	      flow->lower_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->lower_port),
+	      (flow->ip_version == 6) ? "[" : "",
+	      flow->upper_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->upper_port)
+	      );
+    else
+      fprintf(out, "%s%s%s:%u <-> %s%s%s:%u ",
+	      (flow->ip_version == 6) ? "[" : "",
+	      flow->upper_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->upper_port),
+	      (flow->ip_version == 6) ? "[" : "",
+	      flow->lower_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->lower_port)
+	      );
+    
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
 
     if(flow->detected_protocol.master_protocol) {

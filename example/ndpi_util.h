@@ -46,7 +46,7 @@ typedef struct ndpi_flow_info {
   u_int32_t upper_ip;
   u_int16_t lower_port;
   u_int16_t upper_port;
-  u_int8_t detection_completed, protocol;
+  u_int8_t detection_completed, protocol, src_to_dst_direction;
   u_int16_t vlan_id;
   struct ndpi_flow_struct *ndpi_flow;
   char lower_name[48], upper_name[48];

@@ -260,9 +260,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   if(iph->protocol == IPPROTO_TCP && l4_packet_len >= 20) {
     u_int tcp_len;
 
+    // tcp    
     workflow->stats.tcp_count++;
-
-    // tcp
     *tcph = (struct ndpi_tcphdr *)l4;
     *sport = ntohs((*tcph)->source), *dport = ntohs((*tcph)->dest);
 
@@ -287,12 +286,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
     *payload = &l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
-
-    // udp
   } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
+    // udp
     
     workflow->stats.udp_count++;
-
     *udph = (struct ndpi_udphdr *)l4;
     *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);
     *payload = &l4[sizeof(struct ndpi_udphdr)];
@@ -335,7 +332,9 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
   if(ret == NULL) {
     if(workflow->stats.ndpi_flow_count == workflow->prefs.max_ndpi_flows) {
-      NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "maximum flow count (%u) has been exceeded\n", workflow->prefs.max_ndpi_flows);
+      NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR,
+	       "maximum flow count (%u) has been exceeded\n",
+	       workflow->prefs.max_ndpi_flows);
       exit(-1);
     } else {
       struct ndpi_flow_info *newflow = (struct ndpi_flow_info*)malloc(sizeof(struct ndpi_flow_info));
@@ -350,7 +349,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->lower_ip = lower_ip, newflow->upper_ip = upper_ip;
       newflow->lower_port = lower_port, newflow->upper_port = upper_port;
       newflow->ip_version = version;
-
+      newflow->src_to_dst_direction = *src_to_dst_direction;
+      
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &lower_ip, newflow->lower_name, sizeof(newflow->lower_name));
 	inet_ntop(AF_INET, &upper_ip, newflow->upper_name, sizeof(newflow->upper_name));
@@ -520,7 +520,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   struct ndpi_udphdr *udph = NULL;
   u_int16_t sport, dport, payload_len;
   u_int8_t *payload;
-  u_int8_t src_to_dst_direction= 1;
+  u_int8_t src_to_dst_direction = 1;
 
   if(iph)
     flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id, iph, NULL,
@@ -542,9 +542,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     ndpi_flow = flow->ndpi_flow;
     flow->packets++, flow->bytes += rawsize;
     flow->last_seen = time;
-  } else {
+  } else
     return(flow->detected_protocol);
-  }
 
   /* Protocol already detected */
   if(flow->detection_completed) return(flow->detected_protocol);
@@ -556,8 +555,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
-    /* New protocol detected or give up */
-    
+    /* New protocol detected or give up */    
     flow->detection_completed = 1;
   }
 
