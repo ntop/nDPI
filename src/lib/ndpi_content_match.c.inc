@@ -8144,7 +8144,7 @@ ndpi_protocol_match host_match[] = {
   { ".wx.",				"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".weixin.",				"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".mmsns.qpic.cn",			"WeChat",          	NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
-    
+  { "dnscrypt.org",			"DNScrypt",          	NDPI_PROTOCOL_DNSCRYPT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },    
   { NULL, 0 }
 };
 
@@ -8217,6 +8217,8 @@ ndpi_protocol_match content_match[] = {
   - www.qbtxzhetq4s2f.com
   - www.fgd2iwya7vinfutj5wq5we.net
 
+  See also DGA (Domain Generation Algorithm)
+  
   In essence www.<name>.com|net
 
   To do things properly we should check if host name in the certificate

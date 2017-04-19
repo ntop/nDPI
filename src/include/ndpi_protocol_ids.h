@@ -233,8 +233,6 @@
 #define NDPI_PROTOCOL_KAKAOTALK_VOICE 	 194 /* KakaoTalk Voice */
 #define NDPI_PROTOCOL_TWITCH 	         195 /* Edoardo Dominici <edoaramis@gmail.com> */
 #define NDPI_PROTOCOL_QUICKPLAY 	 196 /* Streaming service used by various services such as hooq.tv */
-
-/* 197 is free */
 #define NDPI_PROTOCOL_WECHAT             197
 
 #define NDPI_PROTOCOL_MPEGTS 	         198
@@ -248,8 +246,9 @@
 #define NDPI_PROTOCOL_IQIYI 	         206
 #define NDPI_PROTOCOL_SMPP 	         207 /* Damir Franusic <df@release14.org> */
 
-/* 208 - 209 free */
-#define NDPI_PROTOCOL_FREE_208           208
+#define NDPI_PROTOCOL_DNSCRYPT           208
+
+/* 209 free */
 #define NDPI_PROTOCOL_FREE_209           209
 
 #define NDPI_PROTOCOL_DEEZER 	         210
