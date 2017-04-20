@@ -220,7 +220,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       return NULL;
 
     if((iph->ihl * 4) > ipsize || ipsize < ntohs(iph->tot_len)
-       || (iph->frag_off & htons(0x1FFF)) != 0)
+       /* || (iph->frag_off & htons(0x1FFF)) != 0 */)
       return NULL;
 
     l4_offset = iph->ihl * 4;
@@ -521,6 +521,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   u_int16_t sport, dport, payload_len;
   u_int8_t *payload;
   u_int8_t src_to_dst_direction = 1;
+  struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
 
   if(iph)
     flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id, iph, NULL,
@@ -542,8 +543,10 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     ndpi_flow = flow->ndpi_flow;
     flow->packets++, flow->bytes += rawsize;
     flow->last_seen = time;
-  } else
-    return(flow->detected_protocol);
+  } else { // flow is NULL
+    workflow->stats.total_discarded_bytes++;
+    return (nproto);
+  }
 
   /* Protocol already detected */
   if(flow->detection_completed) return(flow->detected_protocol);
