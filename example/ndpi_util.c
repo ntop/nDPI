@@ -260,7 +260,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   if(iph->protocol == IPPROTO_TCP && l4_packet_len >= 20) {
     u_int tcp_len;
 
-    // tcp    
+    // tcp
     workflow->stats.tcp_count++;
     *tcph = (struct ndpi_tcphdr *)l4;
     *sport = ntohs((*tcph)->source), *dport = ntohs((*tcph)->dest);
@@ -288,7 +288,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
   } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
     // udp
-    
+
     workflow->stats.udp_count++;
     *udph = (struct ndpi_udphdr *)l4;
     *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);
@@ -350,7 +350,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->lower_port = lower_port, newflow->upper_port = upper_port;
       newflow->ip_version = version;
       newflow->src_to_dst_direction = *src_to_dst_direction;
-      
+
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &lower_ip, newflow->lower_name, sizeof(newflow->lower_name));
 	inet_ntop(AF_INET, &upper_ip, newflow->upper_name, sizeof(newflow->upper_name));
@@ -442,19 +442,19 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
   if(!flow->ndpi_flow) return;
-  
-    snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
+
+  snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 
   /* BITTORRENT */
   if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_BITTORRENT) {
     int i, j, n = 0;
-    
+
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
       sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
       j += 2, n += flow->ndpi_flow->bittorent_hash[i];
     }
-    
+
     if(n == 0) flow->bittorent_hash[0] = '\0';
   }
   /* MDNS */
@@ -545,7 +545,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     flow->last_seen = time;
   } else { // flow is NULL
     workflow->stats.total_discarded_bytes++;
-    return (nproto);
+    return(nproto);
   }
 
   /* Protocol already detected */
@@ -558,17 +558,16 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
      || ((proto == IPPROTO_UDP) && (flow->packets > 8))
      || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
-    /* New protocol detected or give up */    
+    /* New protocol detected or give up */
     flow->detection_completed = 1;
-  }
 
-  if(flow->detection_completed) {
+    process_ndpi_collected_info(workflow, flow);
+
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
       flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
 						      flow->ndpi_flow);
-  }
+  }  
 
-  process_ndpi_collected_info(workflow, flow);
   return(flow->detected_protocol);
 }
 
@@ -602,7 +601,7 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   struct ndpi_ipv6hdr *iph6;
 
   struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
-  
+
   /* lengths and offsets */
   u_int16_t eth_offset = 0;
   u_int16_t radio_len;
@@ -916,11 +915,11 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 /* ********************************************************** */
 
 static uint32_t crc32_for_byte(uint32_t r) {
-	int j;
-	
-	for(j = 0; j < 8; ++j)
-		r = (r & 1? 0: (uint32_t)0xEDB88320L) ^ r >> 1;
-	return r ^ (uint32_t)0xFF000000L;
+  int j;
+
+  for(j = 0; j < 8; ++j)
+    r = (r & 1? 0: (uint32_t)0xEDB88320L) ^ r >> 1;
+  return r ^ (uint32_t)0xFF000000L;
 }
 
 /* Any unsigned integer type with at least 32 bits may be used as
@@ -929,31 +928,31 @@ static uint32_t crc32_for_byte(uint32_t r) {
 typedef unsigned long accum_t;
 
 static void init_tables(uint32_t* table, uint32_t* wtable) {
-	size_t i, k, w, j;
-	
-	for(i = 0; i < 0x100; ++i)
-		table[i] = crc32_for_byte(i);
-	for(k = 0; k < sizeof(accum_t); ++k)
-		for(i = 0; i < 0x100; ++i) {
-			for(j = w = 0; j < sizeof(accum_t); ++j)
-				w = table[(uint8_t)(j == k? w ^ i: w)] ^ w >> 8;
-			wtable[(k << 8) + i] = w ^ (k? wtable[0]: 0);
-		}
+  size_t i, k, w, j;
+
+  for(i = 0; i < 0x100; ++i)
+    table[i] = crc32_for_byte(i);
+  for(k = 0; k < sizeof(accum_t); ++k)
+    for(i = 0; i < 0x100; ++i) {
+      for(j = w = 0; j < sizeof(accum_t); ++j)
+	w = table[(uint8_t)(j == k? w ^ i: w)] ^ w >> 8;
+      wtable[(k << 8) + i] = w ^ (k? wtable[0]: 0);
+    }
 }
 
 void ethernet_crc32(const void* data, size_t n_bytes, uint32_t* crc) {
-	static uint32_t table[0x100], wtable[0x100*sizeof(accum_t)];
-	size_t n_accum = n_bytes/sizeof(accum_t);
-	size_t i, k, j;
-	
-	if(!*table)
-		init_tables(table, wtable);
-	for(i = 0; i < n_accum; ++i) {
-		accum_t a = *crc ^ ((accum_t*)data)[i];
-		for(j = *crc = 0; j < sizeof(accum_t); ++j)
-			*crc ^= wtable[(j << 8) + (uint8_t)(a >> 8*j)];
-	}
-	
-	for(i = n_accum*sizeof(accum_t); i < n_bytes; ++i)
-		*crc = table[(uint8_t)*crc ^ ((uint8_t*)data)[i]] ^ *crc >> 8;
+  static uint32_t table[0x100], wtable[0x100*sizeof(accum_t)];
+  size_t n_accum = n_bytes/sizeof(accum_t);
+  size_t i, k, j;
+
+  if(!*table)
+    init_tables(table, wtable);
+  for(i = 0; i < n_accum; ++i) {
+    accum_t a = *crc ^ ((accum_t*)data)[i];
+    for(j = *crc = 0; j < sizeof(accum_t); ++j)
+      *crc ^= wtable[(j << 8) + (uint8_t)(a >> 8*j)];
+  }
+
+  for(i = n_accum*sizeof(accum_t); i < n_bytes; ++i)
+    *crc = table[(uint8_t)*crc ^ ((uint8_t*)data)[i]] ^ *crc >> 8;
 }

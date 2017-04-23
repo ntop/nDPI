@@ -93,6 +93,7 @@ struct port_stats *srcStats = NULL, *dstStats = NULL;
 struct ndpi_packet_trailer {
   u_int32_t magic; /* 0x19682017 */
   u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
+  char name[16];
 };
 
 static pcap_dumper_t *extcap_dumper = NULL;
@@ -249,14 +250,12 @@ void extcap_config() {
   int i, argidx = 0;
   struct ndpi_detection_module_struct *ndpi_mod;
 
-#if 1
+  /* -i <interface> */
   printf("arg {number=%u}{call=-i}{display=Capture Interface Name}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
-#else
 
   printf("arg {number=%u}{call=-i}{display=Pcap File to Analize}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
-#endif
 
   printf("arg {number=%u}{call=-9}{display=nDPI Protocol}{type=selector}"
 	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
@@ -1494,8 +1493,9 @@ static void pcap_packet_callback_checked(u_char *args,
     struct ndpi_packet_trailer *trailer = (struct ndpi_packet_trailer*)&extcap_buf[h->caplen];
 
     memcpy(extcap_buf, packet, h->caplen);
-    trailer->magic = 0x19682017;
-    trailer->master_protocol = p.master_protocol, trailer->app_protocol = p.app_protocol;
+    trailer->magic = htonl(0x19680924);
+    trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
+    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
     crc = (uint32_t*)&extcap_buf[h->caplen+sizeof(struct ndpi_packet_trailer)];
     *crc = 0;
     ethernet_crc32((const void*)extcap_buf, h->caplen+sizeof(struct ndpi_packet_trailer), crc);
