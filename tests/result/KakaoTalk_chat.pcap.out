@@ -1,9 +1,9 @@
 DNS	2	217	1
-HTTP	1	56	1
+HTTP	15	840	2
 ICMP	1	147	1
 SSL	29	4579	3
 Facebook	215	51809	12
-Google	16	1031	3
+Google	2	247	2
 HTTP_Proxy	26	3926	1
 Amazon	2	181	1
 KakaoTalk	55	9990	15
@@ -36,7 +36,7 @@ KakaoTalk	55	9990	15
 	26	TCP 10.24.82.188:34686 <-> 173.194.72.188:5228 [proto: 126/Google][1 pkts/164 bytes]
 	27	UDP 10.24.82.188:14650 <-> 10.188.1.1:53 [proto: 5/DNS][2 pkts/217 bytes][Host: 2.97.252.173.in-addr.arpa]
 	28	UDP 10.24.82.188:19582 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][2 pkts/218 bytes][Host: graph.facebook.com]
-	29	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7.126/HTTP.Google][14 pkts/784 bytes]
+	29	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7/HTTP][14 pkts/784 bytes]
 	30	UDP 10.24.82.188:24596 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][2 pkts/196 bytes][Host: api.facebook.com]
 	31	TCP 10.24.82.188:42332 <-> 210.103.240.15:443 [proto: 91/SSL][5 pkts/280 bytes]
 	32	TCP 10.24.82.188:49217 <-> 216.58.220.174:443 [proto: 91.126/SSL.Google][1 pkts/83 bytes]

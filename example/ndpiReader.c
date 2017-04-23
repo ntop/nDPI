@@ -167,7 +167,7 @@ static void help(u_int long_help) {
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
 	 "                            | testing purposes in order to compare results across runs\n"
 	 "  -h                        | This help\n"
-	 "  -v <1|2>                  | Verbose 'unknown protocol' packet print. 1=verbose, 2=very verbose\n");
+	 "  -v <1|2|3>                | Verbose 'unknown protocol' packet print. 1=verbose, 2=very verbose, 3=port stats\n");
 
   #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -240,7 +240,7 @@ void extcap_interfaces() {
 
 void extcap_dlts() {
   u_int dlts_number = DLT_EN10MB;
-  printf("dlt {number=%u}{name=%s}{display=%s}\n", dlts_number, "ndpi", "nDPI interface");
+  printf("dlt {number=%u}{name=%s}{display=%s}\n", dlts_number, "ndpi", "nDPI Interface");
   exit(0);
 }
 
@@ -251,13 +251,16 @@ void extcap_config() {
   struct ndpi_detection_module_struct *ndpi_mod;
 
   /* -i <interface> */
-  printf("arg {number=%u}{call=-i}{display=Capture Interface Name}{type=string}"
+  printf("arg {number=%u}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
 
+#if 0
   printf("arg {number=%u}{call=-i}{display=Pcap File to Analize}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
+#endif
 
-  printf("arg {number=%u}{call=-9}{display=nDPI Protocol}{type=selector}"
+  
+  printf("arg {number=%u}{call=-9}{display=nDPI Protocol Filter}{type=selector}"
 	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
 
   setupDetection(0, NULL);
@@ -558,6 +561,9 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 #endif
   FILE *out = results_file ? results_file : stdout;
 
+  if((verbose != 1) && (verbose != 2))
+    return;
+    
   if(!json_flag) {
     fprintf(out, "\t%u", ++num_flows);
 
@@ -1060,10 +1066,10 @@ static void printResults(u_int64_t tot_usec) {
 
     for(i=0; i<NUM_ROOTS; i++) {
       ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_proto_guess_walker, &thread_id);
-      if(verbose) ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], port_stats_walker, &thread_id);
+      if(verbose == 3) ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], port_stats_walker, &thread_id);
     }
 
-    if(verbose) {
+    if(verbose == 3) {
       HASH_SORT(srcStats, port_stats_sort);
       HASH_SORT(dstStats, port_stats_sort);
     }
@@ -1242,7 +1248,7 @@ static void printResults(u_int64_t tot_usec) {
 
   // printf("\n\nTotal Flow Traffic: %llu (diff: %llu)\n", total_flow_bytes, cumulative_stats.total_ip_bytes-total_flow_bytes);
 
-  if(verbose) {
+  if((verbose == 1) || (verbose == 2)) {
     FILE *out = results_file ? results_file : stdout;
 
     if(!json_flag) fprintf(out, "\n");
@@ -1289,7 +1295,7 @@ static void printResults(u_int64_t tot_usec) {
 #endif
   }
 
-  if(verbose) {
+  if(verbose == 3) {
     printf("\n\nSource Ports Stats:\n");
     printPortStats(srcStats);
     
@@ -1493,6 +1499,7 @@ static void pcap_packet_callback_checked(u_char *args,
     struct ndpi_packet_trailer *trailer = (struct ndpi_packet_trailer*)&extcap_buf[h->caplen];
 
     memcpy(extcap_buf, packet, h->caplen);
+    memset(trailer, 0, sizeof(struct ndpi_packet_trailer));
     trailer->magic = htonl(0x19680924);
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
