@@ -246,10 +246,23 @@ void extcap_dlts() {
 
 /* ********************************** */
 
+struct ndpi_proto_sorter {
+  int id;
+  char name[16];
+};
+
+int cmpProto(const void *_a, const void *_b) {
+  struct ndpi_proto_sorter *a = (struct ndpi_proto_sorter*)_a;
+  struct ndpi_proto_sorter *b = (struct ndpi_proto_sorter*)_b;
+
+  return(strcmp(a->name, b->name));
+}
+
 void extcap_config() {
   int i, argidx = 0;
   struct ndpi_detection_module_struct *ndpi_mod;
-
+  struct ndpi_proto_sorter *protos;
+ 
   /* -i <interface> */
   printf("arg {number=%u}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
@@ -258,20 +271,31 @@ void extcap_config() {
   printf("arg {number=%u}{call=-i}{display=Pcap File to Analize}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 #endif
+  
+  setupDetection(0, NULL);
+  ndpi_mod = ndpi_thread_info[0].workflow->ndpi_struct;
+    
+  protos = (struct ndpi_proto_sorter*)malloc(sizeof(struct ndpi_proto_sorter)*ndpi_mod->ndpi_num_supported_protocols);
+  if(!protos) exit(0);  
 
+  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
+    protos[i].id = i;
+    snprintf(protos[i].name, sizeof(protos[i].name), "%s", ndpi_mod->proto_defaults[i].protoName);
+  }
+
+  qsort(protos, ndpi_mod->ndpi_num_supported_protocols, sizeof(struct ndpi_proto_sorter), cmpProto);
   
   printf("arg {number=%u}{call=-9}{display=nDPI Protocol Filter}{type=selector}"
 	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
 
-  setupDetection(0, NULL);
-  ndpi_mod = ndpi_thread_info[0].workflow->ndpi_struct;
-
   printf("value {arg=%d}{value=%d}{display=%s}\n", argidx, -1, "All Protocols (no nDPI filtering)");
-
+  
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
-    printf("value {arg=%d}{value=%d}{display=%s (%u)}\n", argidx, i,
-	   ndpi_mod->proto_defaults[i].protoName, i);
+    printf("value {arg=%d}{value=%d}{display=%s (%u)}\n", argidx, protos[i].id,
+	   protos[i].name, protos[i].id);
 
+  free(protos);
+  
   exit(0);
 }
 
@@ -1507,13 +1531,14 @@ static void pcap_packet_callback_checked(u_char *args,
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
     *crc = 0;
     ethernet_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer), crc);
-    h.caplen += delta,  h.len += delta;
+    h.caplen += delta, h.len += delta;
 
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, "Dumping %u bytes packet\n", h.caplen);
 #endif
 
     pcap_dump((u_char*)extcap_dumper, &h, (const u_char *)extcap_buf);
+    pcap_dump_flush(extcap_dumper);
   }
 
   /* check for buffer changes */

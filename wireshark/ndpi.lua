@@ -15,16 +15,15 @@ fds.name = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STR
 
 local f_eth_trailer = Field.new("eth.trailer")
 
-local ndpi_protos       = {}
-local ndpi_senders      = {}
-local ndpi_receivers    = {}
+local ndpi_protos     = {}
+local ndpi_flows      = {}
+local compute_flows_stats = true
 
 -- ###############################################
 
 function ndpi_proto.init()
    ndpi_protos       = {}
-   ndpi_senders      = {}
-   ndpi_receivers    = {}
+   ndpi_flows        = {}
 end
 
 function slen(str)
@@ -57,7 +56,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       local application_protocol = tvb(pktlen-22,2)
       local name = tvb(pktlen-20,16)
       local name_str = name:string(ENC_ASCII)
-      local key
+      local ndpikey, srckey, dstkey, flowkey
 
       ndpi_subtree:add(fds.network_protocol, network_protocol)
       ndpi_subtree:add(fds.application_protocol, application_protocol)
@@ -69,17 +68,22 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 pinfo.cols.protocol = name_str
       end
 
-      key = tostring(slen(name_str))
-      if(ndpi_protos[key] == nil) then ndpi_protos[key] = 0 end
-      ndpi_protos[key] = ndpi_protos[key] + pinfo.len
+      if(compute_flows_stats) then
+	 ndpikey = tostring(slen(name_str))
 	 
-      key = tostring(pinfo.src)
-      if(ndpi_senders[key] == nil) then ndpi_senders[key] = 0 end
-      ndpi_senders[key] = ndpi_senders[key] + pinfo.len
+	 if(ndpi_protos[ndpikey] == nil) then ndpi_protos[ndpikey] = 0 end
+	 ndpi_protos[ndpikey] = ndpi_protos[ndpikey] + pinfo.len
+	 
+	 srckey = tostring(pinfo.src)
+	 dstkey = tostring(pinfo.dst)
+	 
+	 flowkey = srckey.." / "..dstkey.." ["..ndpikey.."]"
+	 if(ndpi_flows[flowkey] == nil) then
+	    ndpi_flows[flowkey] = 0
+	 end
 
-      key = tostring(pinfo.dst)
-      if(ndpi_receivers[key] == nil) then ndpi_receivers[key] = 0 end
-      ndpi_receivers[key] = ndpi_receivers[key] + pinfo.len
+	 ndpi_flows[flowkey] = ndpi_flows[flowkey] + pinfo.len
+      end
    end
 end
 
@@ -147,27 +151,17 @@ local function ndpi_dialog_menu()
       i = 0
       for k,v in pairsByValues(ndpi_protos, rev) do
 	 -- label = label .. k .. "\t".. bytesToSize(v) .. "\n"
-	 label = label .. string.format("%-24s\t%s\n", k, bytesToSize(v))
+	 label = label .. string.format("%-32s\t%s\n", k, bytesToSize(v))
 	 if(i == max_i) then break else i = i + 1 end
       end
 
       -- #######
 
-      label = label .. "\nTop Senders\n"
+      label = label .. "\nTop nDPI Flows\n"
       label = label .. "-----------\n"
       i = 0
-      for k,v in pairsByValues(ndpi_senders, rev) do
-	 label = label .. string.format("%-24s\t%s\n", k, bytesToSize(v))
-	 if(i == max_i) then break else i = i + 1 end
-      end
-
-      -- #######
-
-      label = label .. "\nTop Receivers\n"
-      label = label .. "-------------\n"
-      i = 0
-      for k,v in pairsByValues(ndpi_receivers, rev) do
-	 label = label .. string.format("%-24s\t%s\n", k, bytesToSize(v))
+      for k,v in pairsByValues(ndpi_flows, rev) do
+	 label = label .. string.format("%-32s\t%s\n", k, bytesToSize(v))
 	 if(i == max_i) then break else i = i + 1 end
       end
 
@@ -175,4 +169,6 @@ local function ndpi_dialog_menu()
    end
 end
 
-register_menu("nDPI", ndpi_dialog_menu, MENU_STAT_UNSORTED)
+if(compute_flows_stats) then
+   register_menu("nDPI", ndpi_dialog_menu, MENU_STAT_UNSORTED)
+end
