@@ -97,7 +97,7 @@ struct ndpi_packet_trailer {
 };
 
 static pcap_dumper_t *extcap_dumper = NULL;
-static char extcap_buf[2048];
+static char extcap_buf[16384];
 static char *extcap_capture_fifo    = NULL;
 static u_int16_t extcap_packet_filter = (u_int16_t)-1;
 
@@ -295,13 +295,6 @@ void extcap_capture() {
 
 #ifdef DEBUG_TRACE
   if(trace) fprintf(trace, "Starting packet capture [%p]\n", extcap_dumper);
-#endif
-
-  test_lib();
-  pcap_dump_close(extcap_dumper);
-
-#ifdef DEBUG_TRACE
-  if(trace) fprintf(trace, "End of packet capture [%p]\n", extcap_dumper);
 #endif
 }
 
@@ -1494,31 +1487,39 @@ static void pcap_packet_callback_checked(u_char *args,
 	 || (p.master_protocol == extcap_packet_filter)
 	 )
      ) {
-    struct pcap_pkthdr *h = (struct pcap_pkthdr*)header;
+    struct pcap_pkthdr h;
     uint32_t *crc, delta = sizeof(struct ndpi_packet_trailer) + 4 /* ethernet trailer */;
-    struct ndpi_packet_trailer *trailer = (struct ndpi_packet_trailer*)&extcap_buf[h->caplen];
+    struct ndpi_packet_trailer *trailer;
 
-    memcpy(extcap_buf, packet, h->caplen);
+    memcpy(&h, header, sizeof(h));
+        
+    if(h.caplen > (sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4)) {
+      printf("INTERNAL ERROR: caplen=%u\n", h.caplen);
+      h.caplen = sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4;      
+    }
+
+    trailer = (struct ndpi_packet_trailer*)&extcap_buf[h.caplen];    
+    memcpy(extcap_buf, packet, h.caplen);
     memset(trailer, 0, sizeof(struct ndpi_packet_trailer));
     trailer->magic = htonl(0x19680924);
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
-    crc = (uint32_t*)&extcap_buf[h->caplen+sizeof(struct ndpi_packet_trailer)];
+    crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
     *crc = 0;
-    ethernet_crc32((const void*)extcap_buf, h->caplen+sizeof(struct ndpi_packet_trailer), crc);
-    h->caplen += delta,  h->len += delta;
+    ethernet_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer), crc);
+    h.caplen += delta,  h.len += delta;
 
 #ifdef DEBUG_TRACE
-    if(trace) fprintf(trace, "Dumping %u bytes packet\n", header->caplen);
+    if(trace) fprintf(trace, "Dumping %u bytes packet\n", h.caplen);
 #endif
 
-    pcap_dump((u_char*)extcap_dumper, h, (const u_char *)extcap_buf);
+    pcap_dump((u_char*)extcap_dumper, &h, (const u_char *)extcap_buf);
   }
 
   /* check for buffer changes */
   if(memcmp(packet, packet_checked, header->caplen) != 0)
-    printf("INTERNAL ERROR: ingress packet was modified by nDPI: this should not happen [thread_id=%u, packetId=%lu]\n",
-	   thread_id, (unsigned long)ndpi_thread_info[thread_id].workflow->stats.raw_packet_count);
+    printf("INTERNAL ERROR: ingress packet was modified by nDPI: this should not happen [thread_id=%u, packetId=%lu, caplen=%u]\n",
+	   thread_id, (unsigned long)ndpi_thread_info[thread_id].workflow->stats.raw_packet_count, header->caplen);
   free(packet_checked);
 }
 
@@ -1685,9 +1686,10 @@ int main(int argc, char **argv) {
   for(i=0; i<num_loops; i++)
     test_lib();
 
-  if(results_path) free(results_path);
-  if(results_file) fclose(results_file);
-
+  if(results_path)  free(results_path);
+  if(results_file)  fclose(results_file);
+  if(extcap_dumper) pcap_dump_close(extcap_dumper);
+  
   return 0;
 }
 
