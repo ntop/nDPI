@@ -561,11 +561,10 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     /* New protocol detected or give up */
     flow->detection_completed = 1;
 
-    process_ndpi_collected_info(workflow, flow);
-
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
-						      flow->ndpi_flow);
+	    flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
+							    flow->ndpi_flow);
+    process_ndpi_collected_info(workflow, flow);
   }  
 
   return(flow->detected_protocol);

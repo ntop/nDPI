@@ -1,15 +1,15 @@
 Unknown	6	360	1
 DNS	3	214	3
 HTTP	13	1019	2
+SSL	20	2715	1
 Google	41	5525	6
-Amazon	20	2715	1
 OCS	863	57552	7
 
 	1	TCP 192.168.180.2:42590 <-> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][83 pkts/5408 bytes][Host: www.ocs.fr]
 	2	TCP 192.168.180.2:48250 <-> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][6 pkts/1092 bytes][Host: ocu03.labgency.ws]
 	3	TCP 192.168.180.2:41223 <-> 216.58.208.46:443 [proto: 91.126/SSL.Google][13 pkts/1448 bytes]
 	4	UDP 192.168.180.2:38472 <-> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/63 bytes][Host: ocu03.labgency.ws]
-	5	TCP 192.168.180.2:39263 <-> 23.21.230.199:443 [proto: 91.178/SSL.Amazon][20 pkts/2715 bytes]
+	5	TCP 192.168.180.2:39263 <-> 23.21.230.199:443 [proto: 91/SSL][20 pkts/2715 bytes][client: settings.crashlytics.com]
 	6	UDP 192.168.180.2:48770 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][1 pkts/72 bytes][Host: android.clients.google.com]
 	7	TCP 192.168.180.2:47803 <-> 64.233.166.95:443 [proto: 91.126/SSL.Google][12 pkts/1608 bytes]
 	8	UDP 192.168.180.2:1291 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/67 bytes][Host: api.eu01.capptain.com]
