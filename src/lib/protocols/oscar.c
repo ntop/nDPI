@@ -579,7 +579,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 		{
 		  /* request ID */
 		  req_ID = get_u_int32_t(packet->payload, 12);
-		  if((req_ID <= 4294967295))
+		  if((req_ID <= ((u_int32_t)-1)))
 		    {
 		      NDPI_LOG(NDPI_PROTOCOL_OSCAR, ndpi_struct, NDPI_LOG_DEBUG, "OSCAR Detected \n");
 		      ndpi_int_oscar_add_connection(ndpi_struct, flow);
