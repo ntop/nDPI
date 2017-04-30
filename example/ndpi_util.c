@@ -129,7 +129,7 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
 
 /* ***************************************************** */
 
-static void ndpi_flow_info_freer(void *node) {
+void ndpi_flow_info_freer(void *node) {
   struct ndpi_flow_info *flow = (struct ndpi_flow_info*)node;
 
   ndpi_free_flow_info_half(flow);

@@ -69,10 +69,12 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
+static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
 static u_int8_t num_threads = 1;
+static struct timeval begin, end;
 #ifdef linux
 static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
@@ -146,13 +148,14 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
 static void help(u_int long_help) {
   printf("Welcome to nDPI %s\n\n", ndpi_revision());
 
-  printf("ndpiReader -i <file|device> [-f <filter>][-s <duration>]\n"
+  printf("ndpiReader -i <file|device> [-f <filter>][-s <duration>][-m <duration>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
 	 "          [-n <threads>] [-w <file>] [-j <file>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a device for live capture (comma-separated list)\n"
 	 "  -f <BPF filter>           | Specify a BPF filter for filtering selected traffic\n"
 	 "  -s <duration>             | Maximum capture duration in seconds (live traffic capture only)\n"
+	 "  -m <duration>             | Split analysis duration in <duration> max seconds\n"
 	 "  -p <file>.protos          | Specify a protocol file (eg. protos.txt)\n"
 	 "  -l <num loops>            | Number of detection loops (test only)\n"
 	 "  -n <num threads>          | Number of threads. Default: number of interfaces in -i. Ignored with pcap files.\n"
@@ -262,7 +265,7 @@ void extcap_config() {
   int i, argidx = 0;
   struct ndpi_detection_module_struct *ndpi_mod;
   struct ndpi_proto_sorter *protos;
- 
+
   /* -i <interface> */
   printf("arg {number=%u}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
@@ -271,12 +274,12 @@ void extcap_config() {
   printf("arg {number=%u}{call=-i}{display=Pcap File to Analize}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 #endif
-  
+
   setupDetection(0, NULL);
   ndpi_mod = ndpi_thread_info[0].workflow->ndpi_struct;
-    
+
   protos = (struct ndpi_proto_sorter*)malloc(sizeof(struct ndpi_proto_sorter)*ndpi_mod->ndpi_num_supported_protocols);
-  if(!protos) exit(0);  
+  if(!protos) exit(0);
 
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
     protos[i].id = i;
@@ -284,18 +287,18 @@ void extcap_config() {
   }
 
   qsort(protos, ndpi_mod->ndpi_num_supported_protocols, sizeof(struct ndpi_proto_sorter), cmpProto);
-  
+
   printf("arg {number=%u}{call=-9}{display=nDPI Protocol Filter}{type=selector}"
 	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
 
   printf("value {arg=%d}{value=%d}{display=%s}\n", argidx, -1, "All Protocols (no nDPI filtering)");
-  
+
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
     printf("value {arg=%d}{value=%d}{display=%s (%u)}\n", argidx, protos[i].id,
 	   protos[i].name, protos[i].id);
 
   free(protos);
-  
+
   exit(0);
 }
 
@@ -341,7 +344,7 @@ static void parseOptions(int argc, char **argv) {
   if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
 #endif
 
-  while ((opt = getopt_long(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:", longopts, &option_idx)) != EOF) {
+  while ((opt = getopt_long(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:", longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
@@ -354,6 +357,10 @@ static void parseOptions(int argc, char **argv) {
     case 'i':
     case '3':
       _pcap_file[0] = optarg;
+      break;
+
+    case 'm':
+      pcap_analysis_duration = atol(optarg);
       break;
 
     case 'f':
@@ -580,7 +587,7 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 
   if((verbose != 1) && (verbose != 2))
     return;
-    
+
   if(!json_flag) {
     fprintf(out, "\t%u", ++num_flows);
 
@@ -937,7 +944,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
  * @brief End of detection and free flow
  */
 static void terminateDetection(u_int16_t thread_id) {
-
   ndpi_workflow_free(ndpi_thread_info[thread_id].workflow);
 }
 
@@ -1047,12 +1053,12 @@ static int port_stats_sort(void *_a, void *_b) {
 void printPortStats(struct port_stats *stats) {
   struct port_stats *s, *tmp;
   int i = 0;
-  
+
   HASH_ITER(hh, stats, s, tmp) {
     i++;
     printf("\t%2d\tPort %5u\t[%u pkts/%u bytes]\n", i, s->port, s->num_pkts, s->num_bytes);
     if(i >= 10) break;
-  }   
+  }
 }
 
 /* *********************************************** */
@@ -1061,7 +1067,6 @@ void printPortStats(struct port_stats *stats) {
  * @brief Print result
  */
 static void printResults(u_int64_t tot_usec) {
-
   u_int32_t i;
   u_int64_t total_flow_bytes = 0;
   u_int32_t avg_pkt_size = 0;
@@ -1073,10 +1078,10 @@ static void printResults(u_int64_t tot_usec) {
   json_object *jObj_main = NULL, *jObj_trafficStats, *jArray_detProto = NULL, *jObj;
 #endif
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
-  
+
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
 
-  for(thread_id = 0; thread_id < num_threads; thread_id++) {    
+  for(thread_id = 0; thread_id < num_threads; thread_id++) {
     if((ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0)
        && (ndpi_thread_info[thread_id].workflow->stats.raw_packet_count == 0))
       continue;
@@ -1090,7 +1095,7 @@ static void printResults(u_int64_t tot_usec) {
       HASH_SORT(srcStats, port_stats_sort);
       HASH_SORT(dstStats, port_stats_sort);
     }
-    
+
     /* Stats aggregation */
     cumulative_stats.guessed_flow_protocols += ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols;
     cumulative_stats.raw_packet_count += ndpi_thread_info[thread_id].workflow->stats.raw_packet_count;
@@ -1116,6 +1121,8 @@ static void printResults(u_int64_t tot_usec) {
       cumulative_stats.packet_len[i] += ndpi_thread_info[thread_id].workflow->stats.packet_len[i];
     cumulative_stats.max_packet_len += ndpi_thread_info[thread_id].workflow->stats.max_packet_len;
   }
+
+  if(cumulative_stats.total_wire_bytes == 0) return;
 
   if(!quiet_mode) {
     printf("\nnDPI Memory statistics:\n");
@@ -1155,7 +1162,7 @@ static void printResults(u_int64_t tot_usec) {
       printf("\tPacket Len > 1500:     %-13lu\n", (unsigned long)cumulative_stats.packet_len[5]);
 
       if(tot_usec > 0) {
-	char buf[32], buf1[32];
+	char buf[32], buf1[32], when[64];
 	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)tot_usec;
 	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)tot_usec;
 	float traffic_duration;
@@ -1164,6 +1171,11 @@ static void printResults(u_int64_t tot_usec) {
 	printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
 	b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)traffic_duration;
+
+	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime(&pcap_start.tv_sec));
+	printf("\tAnalysis begin:        %s\n", when);
+	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime(&pcap_end.tv_sec));
+	printf("\tAnalysis end:          %s\n", when);
 	printf("\tTraffic throughput:    %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);
       }
@@ -1315,11 +1327,12 @@ static void printResults(u_int64_t tot_usec) {
   if(verbose == 3) {
     printf("\n\nSource Ports Stats:\n");
     printPortStats(srcStats);
-    
+
     printf("\nDestination Ports Stats:\n");
     printPortStats(dstStats);
-    
+
     deletePortsStats(srcStats), deletePortsStats(dstStats);
+    srcStats = NULL, dstStats = NULL;
   }
 }
 
@@ -1328,13 +1341,10 @@ static void printResults(u_int64_t tot_usec) {
  * @brief Force a pcap_dispatch() or pcap_loop() call to return
  */
 static void breakPcapLoop(u_int16_t thread_id) {
-
   if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL) {
     pcap_breakloop(ndpi_thread_info[thread_id].workflow->pcap_handle);
   }
 }
-
-
 
 /**
  * @brief Sigproc is executed for each packet in the pcap file
@@ -1453,9 +1463,9 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
 /**
  * @brief Check pcap packet
  */
-static void pcap_packet_callback_checked(u_char *args,
-					 const struct pcap_pkthdr *header,
-					 const u_char *packet) {
+static void pcap_process_packet(u_char *args,
+				const struct pcap_pkthdr *header,
+				const u_char *packet) {
   struct ndpi_proto p;
   u_int16_t thread_id = *((u_int16_t*)args);
 
@@ -1516,13 +1526,13 @@ static void pcap_packet_callback_checked(u_char *args,
     struct ndpi_packet_trailer *trailer;
 
     memcpy(&h, header, sizeof(h));
-        
+
     if(h.caplen > (sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4)) {
       printf("INTERNAL ERROR: caplen=%u\n", h.caplen);
-      h.caplen = sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4;      
+      h.caplen = sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4;
     }
 
-    trailer = (struct ndpi_packet_trailer*)&extcap_buf[h.caplen];    
+    trailer = (struct ndpi_packet_trailer*)&extcap_buf[h.caplen];
     memcpy(extcap_buf, packet, h.caplen);
     memset(trailer, 0, sizeof(struct ndpi_packet_trailer));
     trailer->magic = htonl(0x19680924);
@@ -1546,6 +1556,28 @@ static void pcap_packet_callback_checked(u_char *args,
     printf("INTERNAL ERROR: ingress packet was modified by nDPI: this should not happen [thread_id=%u, packetId=%lu, caplen=%u]\n",
 	   thread_id, (unsigned long)ndpi_thread_info[thread_id].workflow->stats.raw_packet_count, header->caplen);
   free(packet_checked);
+
+  if((pcap_end.tv_sec-pcap_start.tv_sec) > pcap_analysis_duration) {
+    int i;
+    u_int64_t tot_usec;
+
+    gettimeofday(&end, NULL);
+    tot_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
+
+    printResults(tot_usec);
+
+    for(i=0; i<ndpi_thread_info[thread_id].workflow->prefs.num_roots; i++) {
+      ndpi_tdestroy(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
+      ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i] = NULL;
+
+      memset(&ndpi_thread_info[thread_id].workflow->stats, 0, sizeof(struct ndpi_stats));
+    }
+
+    printf("\n-------------------------------------------\n\n");
+
+    memcpy(&begin, &end, sizeof(begin));
+    memcpy(&pcap_start, &pcap_end, sizeof(pcap_start));
+  }
 }
 
 
@@ -1553,11 +1585,9 @@ static void pcap_packet_callback_checked(u_char *args,
  * @brief Call pcap_loop() to process packets from a live capture or savefile
  */
 static void runPcapLoop(u_int16_t thread_id) {
-
   if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL))
-    pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &pcap_packet_callback_checked, (u_char*)&thread_id);
+    pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &pcap_process_packet, (u_char*)&thread_id);
 }
-
 
 /**
  * @brief Process a running thread
@@ -1583,7 +1613,7 @@ void * processing_thread(void *_thread_id) {
     if((!json_flag) && (!quiet_mode)) printf("Running thread %ld...\n", thread_id);
 
  pcap_loop:
-  runPcapLoop(thread_id);
+ runPcapLoop(thread_id);
 
   if(playlist_fp[thread_id] != NULL) { /* playlist: read next file */
     char filename[256];
@@ -1603,7 +1633,7 @@ void * processing_thread(void *_thread_id) {
  * @brief Begin, process, end detection process
  */
 void test_lib() {
-  struct timeval begin, end;
+  struct timeval end;
   u_int64_t tot_usec;
   long thread_id;
 
@@ -1690,8 +1720,6 @@ int main(int argc, char **argv) {
   automataUnitTest();
 
   memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
-  memset(&pcap_start, 0, sizeof(pcap_start));
-  memset(&pcap_end, 0, sizeof(pcap_end));
 
   parseOptions(argc, argv);
 
@@ -1714,7 +1742,7 @@ int main(int argc, char **argv) {
   if(results_path)  free(results_path);
   if(results_file)  fclose(results_file);
   if(extcap_dumper) pcap_dump_close(extcap_dumper);
-  
+
   return 0;
 }
 
