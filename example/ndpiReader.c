@@ -98,9 +98,9 @@ typedef struct node_a{
 struct port_stats {
   u_int32_t port; /* we'll use this field as the key */
   u_int32_t num_pkts, num_bytes;
-  u_int32_t num_addr; /*to hold number of distinct IP addresses*/
-  u_int32_t cumulative_addr; /*to hold cumulative some of IP addresses*/
-  addr_node *addr_tree; /* to hold distinct IP addresses*/
+  u_int32_t num_addr; /*to hold number of distinct IP addresses */
+  u_int32_t cumulative_addr; /*to hold cumulative some of IP addresses */
+  addr_node *addr_tree; /* to hold distinct IP addresses */
   struct info_pair top_ip_addrs[MAX_NUM_IP_ADDRESS];
   UT_hash_handle hh; /* makes this structure hashable */
 };
@@ -782,50 +782,52 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
 /* *********************************************** */
 
-int updateIpTree(const u_int32_t key, addr_node **vrootp){
-    addr_node *q;
-    addr_node **rootp = vrootp;
+int updateIpTree(const u_int32_t key, addr_node **vrootp) {
+  addr_node *q;
+  addr_node **rootp = vrootp;
 
-    if(rootp == (addr_node **)0)
-        return 0;
+  if(rootp == (addr_node **)0)
+    return 0;
 
-    while (*rootp != (addr_node *)0) {	/* Knuth's T1: */
-
-        if(key == ((*rootp)->addr)) {    /* T2: */
-            return ++((*rootp)->count);
-        }
-
-        rootp = (key < ((*rootp)->addr)) ?
-                &(*rootp)->left :		/* T3: follow left branch */
-                &(*rootp)->right;		/* T4: follow right branch */
-    }
-    q = (addr_node *) malloc(sizeof(addr_node));	/* T5: key not found */
-    if(q != (addr_node *)0) {	/* make new node */
-        *rootp = q;			/* link new node to old */
-        q->addr = key;		/* initialize new node */
-        q->count = 1;
-        q->left = q->right = (addr_node *)0;
-        return q->count;
+  while (*rootp != (addr_node *)0) {	/* Knuth's T1: */
+    if(key == ((*rootp)->addr)) {    /* T2: */
+      return ++((*rootp)->count);
     }
 
+    rootp = (key < ((*rootp)->addr)) ?
+      &(*rootp)->left :		/* T3: follow left branch */
+      &(*rootp)->right;		/* T4: follow right branch */
+  }
+
+  q = (addr_node *) malloc(sizeof(addr_node));	/* T5: key not found */
+  if(q != (addr_node *)0) {	/* make new node */
+    *rootp = q;			/* link new node to old */
+    q->addr = key;		/* initialize new node */
+    q->count = UPDATED_TREE;
+    q->left = q->right = (addr_node *)0;
+    return q->count;
+  }
+
+  return(0);
 }
 
 /* *********************************************** */
 
 void freeIpTree(addr_node *root) {
-    while (root != NULL) {
-        addr_node *left = root->left;
-        if (left == NULL) {
-            addr_node *right = root->right;
-            root->right = NULL;
-            root = right;
-        } else {
-            /* Rotate the left child up.*/
-            root->left = left->right;
-            left->right = root;
-            root = left;
-        }
+  while (root != NULL) {
+    addr_node *left = root->left;
+
+    if(left == NULL) {
+      addr_node *right = root->right;
+      root->right = NULL;
+      root = right;
+    } else {
+      /* Rotate the left child up.*/
+      root->left = left->right;
+      left->right = root;
+      root = left;
     }
+  }
 }
 
 /* *********************************************** */
@@ -844,7 +846,7 @@ void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int s
     /* if the same ip with a bigger
          count just update it      */
     for(i=0; i<size; i++) {
-        if (top[i].addr == addr) {
+        if(top[i].addr == addr) {
             top[i].count = count;
             return;
         }
@@ -853,7 +855,7 @@ void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int s
     /* if array is not full yet
      add it to the first empty place */
     for(i=0; i<size; i++) {
-        if (top[i].addr != addr && top[i].count == 0) {
+        if(top[i].addr != addr && top[i].count == 0) {
             top[i] = pair;
             return;
         }
@@ -876,7 +878,8 @@ void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int s
 static void updatePortStats(struct port_stats **stats, u_int32_t port, u_int32_t addr, u_int32_t num_pkts, u_int32_t num_bytes) {
   struct port_stats *s;
   char ipname[48];
-
+  int count;
+  
   HASH_FIND_INT(*stats, &port, s);
   if(s == NULL) {
     s = (struct port_stats*)malloc(sizeof(struct port_stats));
@@ -899,15 +902,15 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port, u_int32_t
     HASH_ADD_INT(*stats, port, s);
   }
 
-  int count = updateIpTree(addr, &(*s).addr_tree);
+  count = updateIpTree(addr, &(*s).addr_tree);
   if(count == UPDATED_TREE) s->num_addr++;
+  
   if(count) {
       s->cumulative_addr++;
       updateTopIpAddress(addr, count, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
   }
 
   s->num_pkts += num_pkts, s->num_bytes += num_bytes;
-
 }
 
 /* *********************************************** */
@@ -1199,21 +1202,19 @@ static int info_pair_cmp (const void *_a, const void *_b)
 void printPortStats(struct port_stats *stats) {
   struct port_stats *s, *tmp;
   char ip_name[48];
-  int i = 0;
-  int j = 0;
-  int first = 1;
-
+  int i = 0, j = 0, first = 1;
 
   HASH_ITER(hh, stats, s, tmp) {
     i++;
-    printf("\t%2d\tPort %5u\t[%u IP address/%u pkts/%u bytes]\n", i, s->port, s->num_addr, s->num_pkts, s->num_bytes);
+    printf("\t%2d\tPort %5u\t[%u IP address(es)/%u pkts/%u bytes]\n\t\tTop IP Stats:\n",
+	   i, s->port, s->num_addr, s->num_pkts, s->num_bytes);
 
     qsort(&s->top_ip_addrs[0], MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
 
     for(j=0; j<MAX_NUM_IP_ADDRESS; j++) {
-        if (s->top_ip_addrs[j].count != 0) {
+        if(s->top_ip_addrs[j].count != 0) {
             inet_ntop(AF_INET, &s->top_ip_addrs[j].addr, ip_name, sizeof(ip_name));
-            printf("\t\t\t\t%s\t%s ~ %.2f%%\n", (first) ? "Top IP Stats:" : "\t",
+            printf("\t\t%-16s ~ %.2f%%\n",
                    ip_name, ((s->top_ip_addrs[j].count) * 100.0) / s->cumulative_addr);
             first = 0;
         }
@@ -1331,7 +1332,7 @@ static void printResults(u_int64_t tot_usec) {
 	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)tot_usec;
 	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)tot_usec;
 	float traffic_duration;
-	if (live_capture) traffic_duration = tot_usec;
+	if(live_capture) traffic_duration = tot_usec;
 	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
 	printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
@@ -1647,8 +1648,8 @@ static void pcap_process_packet(u_char *args,
   }
 
   /* Check if capture is live or not */
-  if (!live_capture) {
-    if (!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
+  if(!live_capture) {
+    if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
     pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
   }
 
