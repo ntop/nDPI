@@ -138,14 +138,12 @@ struct ndpi_snap_extension
 } PACK_OFF;
 
 PACK_ON
-struct ndpi_llc_header
+struct ndpi_llc_header_snap
 {
   u_int8_t    dsap;
   u_int8_t    ssap;
   u_int8_t    ctrl;
-#ifdef SNAP_EXT
   struct ndpi_snap_extension snap;
-#endif
 } PACK_OFF;
 
 /* ++++++++++ RADIO TAP header (for IEEE 802.11) +++++++++++++ */

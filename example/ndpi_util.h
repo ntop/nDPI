@@ -38,7 +38,8 @@
 #define NUM_ROOTS                 512
 #define MAX_NDPI_FLOWS      200000000
 #define TICK_RESOLUTION          1000
-
+#define MAX_NUM_IP_ADDRESS          5  /* len of ip address array */
+#define UPDATED_TREE                1
 
 // flow tracking
 typedef struct ndpi_flow_info {
@@ -46,7 +47,7 @@ typedef struct ndpi_flow_info {
   u_int32_t upper_ip;
   u_int16_t lower_port;
   u_int16_t upper_port;
-  u_int8_t detection_completed, protocol;
+  u_int8_t detection_completed, protocol, src_to_dst_direction;
   u_int16_t vlan_id;
   struct ndpi_flow_struct *ndpi_flow;
   char lower_name[48], upper_name[48];
@@ -138,9 +139,9 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 
 
 /* Process a packet and update the workflow  */
-void ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
-				   const struct pcap_pkthdr *header,
-				   const u_char *packet);
+struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
+					       const struct pcap_pkthdr *header,
+					       const u_char *packet);
 
 
 /* flow callbacks for complete detected flow
@@ -160,5 +161,6 @@ static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow *
  /* compare two nodes in workflow */
 int ndpi_workflow_node_cmp(const void *a, const void *b);
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow);
-
+void ethernet_crc32(const void* data, size_t n_bytes, uint32_t* crc);
+void ndpi_flow_info_freer(void *node);
 #endif

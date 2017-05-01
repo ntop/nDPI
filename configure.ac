@@ -82,15 +82,6 @@ AS_IF([test "x$enable_json_c" != "xno"], [
              [])
        ])
 
-OLD_LIBS=$LIBS
-LIBS="-L/opt/napatech3/lib $LIBS"
-AC_CHECK_LIB([ntapi],
-             [NT_Init],
-             [PCAP_LIB="$PCAP_LIB -L/opt/napatech3/lib -lntapi"],
-             [], [] )
-LIBS=$OLD_LIBS
-
-
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
 AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile tests/Makefile libndpi.pc])

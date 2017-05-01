@@ -1,7 +1,7 @@
 /*
  * ndpi_protocol_ids.h
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -224,49 +224,45 @@
 #define NDPI_PROTOCOL_TELEGRAM 	 185 /* Gianluca Costa <g.costa@xplico.org> */
 #define NDPI_PROTOCOL_VEVO 	 186
 #define NDPI_PROTOCOL_PANDORA 	 187
-#define NDPI_PROTOCOL_QUIC 	 188 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
+#define NDPI_PROTOCOL_QUIC 	         188 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
 #define NDPI_PROTOCOL_WHATSAPP_VOICE 	 189
-#define NDPI_PROTOCOL_EAQ 	 190
-
-/* 191, 192 are free */
-#define NDPI_PROTOCOL_FREE_191   191
-#define NDPI_PROTOCOL_FREE_192   192
-
+#define NDPI_PROTOCOL_EAQ 	         190
+#define NDPI_PROTOCOL_OOKLA              191
+#define NDPI_PROTOCOL_AMQP               192
 #define NDPI_PROTOCOL_KAKAOTALK 	 193 /* KakaoTalk Chat (no voice call) */
 #define NDPI_PROTOCOL_KAKAOTALK_VOICE 	 194 /* KakaoTalk Voice */
-#define NDPI_PROTOCOL_TWITCH 	 195 /* Edoardo Dominici <edoaramis@gmail.com> */
+#define NDPI_PROTOCOL_TWITCH 	         195 /* Edoardo Dominici <edoaramis@gmail.com> */
 #define NDPI_PROTOCOL_QUICKPLAY 	 196 /* Streaming service used by various services such as hooq.tv */
+#define NDPI_PROTOCOL_WECHAT             197
 
-/* 197 is free */
-#define NDPI_PROTOCOL_FREE_197   197
+#define NDPI_PROTOCOL_MPEGTS 	         198
+#define NDPI_PROTOCOL_SNAPCHAT 	         199
+#define NDPI_PROTOCOL_SINA 	         200
+#define NDPI_PROTOCOL_HANGOUT 	         201
+#define NDPI_PROTOCOL_IFLIX 	         202 /* www.vizuamatix.com R&D team & M.Mallawaarachchie <manoj_ws@yahoo.com> */
+#define NDPI_PROTOCOL_GITHUB 	         203
+#define NDPI_PROTOCOL_BJNP 	         204
+#define NDPI_PROTOCOL_1KXUN 	         205
+#define NDPI_PROTOCOL_IQIYI 	         206
+#define NDPI_PROTOCOL_SMPP 	         207 /* Damir Franusic <df@release14.org> */
 
-#define NDPI_PROTOCOL_MPEGTS 	 198
-#define NDPI_PROTOCOL_SNAPCHAT 	 199
-#define NDPI_PROTOCOL_SINA 	 200
-#define NDPI_PROTOCOL_HANGOUT 	 201
-#define NDPI_PROTOCOL_IFLIX 	 202 /* www.vizuamatix.com R&D team & M.Mallawaarachchie <manoj_ws@yahoo.com> */
-#define NDPI_PROTOCOL_GITHUB 	 203
-#define NDPI_PROTOCOL_BJNP 	 204
-#define NDPI_PROTOCOL_1KXUN 	 205
-#define NDPI_PROTOCOL_IQIYI 	 206
-#define NDPI_PROTOCOL_SMPP 	 207 /* Damir Franusic <df@release14.org> */
+#define NDPI_PROTOCOL_DNSCRYPT           208
 
-/* 208 - 209 free */
-#define NDPI_PROTOCOL_FREE_208   208
-#define NDPI_PROTOCOL_FREE_209   209
+/* 209 free */
+#define NDPI_PROTOCOL_FREE_209           209
 
-#define NDPI_PROTOCOL_DEEZER 	 210
+#define NDPI_PROTOCOL_DEEZER 	         210
 #define NDPI_PROTOCOL_INSTAGRAM 	 211 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */
 #define NDPI_PROTOCOL_MICROSOFT 	 212
 #define NDPI_PROTOCOL_STARCRAFT 	 213 /* Matteo Bracci <matteobracci1@gmail.com> */
-#define NDPI_PROTOCOL_TEREDO 	 214
+#define NDPI_PROTOCOL_TEREDO 	         214
 #define NDPI_PROTOCOL_HOTSPOT_SHIELD 	 215
-#define NDPI_PROTOCOL_HEP 	 216 /* sipcapture.org QXIP BV */
+#define NDPI_PROTOCOL_HEP 	         216 /* sipcapture.org QXIP BV */
 
 /* 217 is free */
-#define NDPI_PROTOCOL_FREE_217   217
+#define NDPI_PROTOCOL_FREE_217           217
 
-#define NDPI_PROTOCOL_OCS 	 218
+#define NDPI_PROTOCOL_OCS 	         218
 #define NDPI_PROTOCOL_OFFICE_365 	 219
 #define NDPI_PROTOCOL_CLOUDFLARE 	 220
 #define NDPI_PROTOCOL_MS_ONE_DRIVE 	 221
@@ -274,11 +270,11 @@
 #define NDPI_PROTOCOL_RX 	         223
 
 /* 224 is free */
-#define NDPI_PROTOCOL_FREE_224   224
+#define NDPI_PROTOCOL_FREE_224           224
 
-#define NDPI_PROTOCOL_OPENDNS 	 225
-#define NDPI_PROTOCOL_GIT 	 226
-#define NDPI_PROTOCOL_DRDA 	 227
+#define NDPI_PROTOCOL_OPENDNS 	         225
+#define NDPI_PROTOCOL_GIT 	         226
+#define NDPI_PROTOCOL_DRDA 	         227
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL		        NDPI_PROTOCOL_DRDA
