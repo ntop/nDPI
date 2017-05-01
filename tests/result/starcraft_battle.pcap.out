@@ -4,11 +4,11 @@ SSDP	11	4984	1
 HTTP_Download	179	134204	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
-SSL	30	1998	9
+SSL	38	2548	11
 Google	16	1709	4
 QUIC	6	475	1
 Github	3	234	1
-Starcraft	244	52044	8
+Starcraft	236	51494	6
 
 	1	TCP 192.168.1.100:3516 <-> 80.239.186.21:80 [proto: 7/HTTP][12 pkts/3680 bytes][Host: eu.launcher.battle.net]
 	2	TCP 192.168.1.100:3518 <-> 80.239.186.26:80 [proto: 7/HTTP][10 pkts/1226 bytes][Host: nydus.battle.net]
@@ -28,8 +28,8 @@ Starcraft	244	52044	8
 	16	TCP 192.168.1.100:3530 <-> 2.228.46.112:80 [proto: 7/HTTP][29 pkts/25102 bytes][Host: bnetcmsus-a.akamaihd.net]
 	17	TCP 192.168.1.100:3532 <-> 2.228.46.112:80 [proto: 7/HTTP][4 pkts/386 bytes][Host: bnetcmsus-a.akamaihd.net]
 	18	TCP 192.168.1.100:3534 <-> 2.228.46.112:80 [proto: 7/HTTP][1 pkts/66 bytes]
-	19	TCP 192.168.1.100:3489 <-> 2.228.46.104:443 [proto: 91.213/SSL.Starcraft][4 pkts/275 bytes]
-	20	TCP 192.168.1.100:3481 <-> 2.228.46.114:443 [proto: 91.213/SSL.Starcraft][4 pkts/275 bytes]
+	19	TCP 192.168.1.100:3489 <-> 2.228.46.104:443 [proto: 91/SSL][4 pkts/275 bytes]
+	20	TCP 192.168.1.100:3481 <-> 2.228.46.114:443 [proto: 91/SSL][4 pkts/275 bytes]
 	21	TCP 192.168.1.100:3479 <-> 2.228.46.114:443 [proto: 91/SSL][4 pkts/275 bytes]
 	22	TCP 192.168.1.100:3491 <-> 2.228.46.104:443 [proto: 91/SSL][4 pkts/275 bytes]
 	23	TCP 192.168.1.100:3515 <-> 80.239.186.26:80 [proto: 7/HTTP][10 pkts/1224 bytes][Host: nydus.battle.net]
