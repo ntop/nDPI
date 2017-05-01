@@ -38,7 +38,8 @@
 #define NUM_ROOTS                 512
 #define MAX_NDPI_FLOWS      200000000
 #define TICK_RESOLUTION          1000
-
+#define MAX_NUM_IP_ADDRESS          5  /* len of ip address array */
+#define UPDATED_TREE                1
 
 // flow tracking
 typedef struct ndpi_flow_info {
