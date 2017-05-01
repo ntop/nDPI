@@ -1913,17 +1913,17 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
 
-  *id = 0;
+  *id = -1;
   if((automa == NULL)
      || (string_to_match == NULL)
      || (string_to_match[0] == '\0'))
     return(-2);
 
   ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
-  ac_automata_search(automa, &ac_input_text, (void*)&id);
+  ac_automata_search(automa, &ac_input_text, (void*)id);
   ac_automata_reset(automa);
 
-  return(*id > 0 ? *id : -1);
+  return(*id != -1 ? 0 : -1);
 }
 
 /* *********************************************** */
