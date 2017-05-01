@@ -41,9 +41,11 @@ ndpi_set_detected_protocol
 ndpi_match_string_subprotocol
 ndpi_init_automa
 ndpi_free_automa
+ndpi_add_string_value_to_automa
 ndpi_add_string_to_automa
 ndpi_finalize_automa
 ndpi_match_string
+ndpi_match_string_id
 set_ndpi_malloc
 set_ndpi_free
 set_ndpi_debug_function

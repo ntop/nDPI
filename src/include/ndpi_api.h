@@ -566,6 +566,18 @@ extern "C" {
    *
    * @par     The automata initialized with ndpi_init_automa();
    * @par     The (sub)string to search
+   * @par     The number associated with this string
+   * @return  0 in case of no error, or -1 if an error occurred.
+   * 
+   */
+  int ndpi_add_string_value_to_automa(void *_automa, char *str, unsigned long num);
+
+
+  /**
+   * Add a string to match to an automata. Same as ndpi_add_string_value_to_automa() with num set to 1
+   *
+   * @par     The automata initialized with ndpi_init_automa();
+   * @par     The (sub)string to search
    * @return  0 in case of no error, or -1 if an error occurred.
    * 
    */
@@ -590,6 +602,18 @@ extern "C" {
    * 
    */
   int ndpi_match_string(void *_automa, char *string_to_match);
+
+
+  /**
+   * Add a string to match to an automata
+   *
+   * @par     The automata initialized with ndpi_init_automa();
+   * @par     The (sub)string to search
+   * @par     The id associated with the matched string or 0 id not found.
+   * @return  0 in case of match, or -1 if no match, or -2 if an error occurred.
+   * 
+   */
+  int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id);
 
 
   /* Utility functions to set ndpi malloc/free/print wrappers */

@@ -1858,16 +1858,20 @@ void* ndpi_init_automa(void) {
   return(ac_automata_init(ac_match_handler));
 }
 
-int ndpi_add_string_to_automa(void *_automa, char *str) {
+int ndpi_add_string_value_to_automa(void *_automa, char *str, unsigned long num) {
   AC_PATTERN_t ac_pattern;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
 
   if(automa == NULL) return(-1);
 
   ac_pattern.astring = str;
-  ac_pattern.rep.number = 1; /* Dummy */
+  ac_pattern.rep.number = num;
   ac_pattern.length = strlen(ac_pattern.astring);
   return(ac_automata_add(automa, &ac_pattern) == ACERR_SUCCESS ? 0 : -1);
+}
+
+int ndpi_add_string_to_automa(void *_automa, char *str) {
+  return(ndpi_add_string_value_to_automa(_automa, str, 1));
 }
 
 void ndpi_free_automa(void *_automa)     { ac_automata_release((AC_AUTOMATA_t*)_automa);  }
@@ -1890,6 +1894,25 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
   ac_automata_reset(automa);
 
   return(matching_protocol_id > 0 ? 0 : -1);
+}
+
+/* ****************************************************** */
+
+int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id) {
+  AC_TEXT_t ac_input_text;
+  AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
+
+  *id = 0;
+  if((automa == NULL)
+     || (string_to_match == NULL)
+     || (string_to_match[0] == '\0'))
+    return(-2);
+
+  ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
+  ac_automata_search(automa, &ac_input_text, (void*)&id);
+  ac_automata_reset(automa);
+
+  return(*id > 0 ? *id : -1);
 }
 
 /* *********************************************** */
