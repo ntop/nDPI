@@ -832,6 +832,7 @@ void freeIpTree(addr_node *root) {
 
 void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int size){
     int update = 0;
+    int i;
     int min_i = 0;
     int min = count;
 
@@ -842,7 +843,7 @@ void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int s
 
     /* if the same ip with a bigger
          count just update it      */
-    for(int i=0; i<size; i++) {
+    for(i=0; i<size; i++) {
         if (top[i].addr == addr) {
             top[i].count = count;
             return;
@@ -851,7 +852,7 @@ void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int s
 
     /* if array is not full yet
      add it to the first empty place */
-    for(int i=0; i<size; i++) {
+    for(i=0; i<size; i++) {
         if (top[i].addr != addr && top[i].count == 0) {
             top[i] = pair;
             return;
@@ -859,7 +860,7 @@ void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int s
     }
 
     /* if bigger than the smallest one, replace it */
-    for(int i=0; i<size; i++) {
+    for(i=0; i<size; i++) {
         if(top[i].count < count && top[i].count < min){
            min = top[i].count;
            min_i = i;
@@ -1199,6 +1200,7 @@ void printPortStats(struct port_stats *stats) {
   struct port_stats *s, *tmp;
   char ip_name[48];
   int i = 0;
+  int j = 0;
   int first = 1;
 
 
@@ -1208,16 +1210,18 @@ void printPortStats(struct port_stats *stats) {
 
     qsort(&s->top_ip_addrs[0], MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
 
-    for(int i=0;i<MAX_NUM_IP_ADDRESS;i++) {
-        if (s->top_ip_addrs[i].count != 0) {
-            inet_ntop(AF_INET, &s->top_ip_addrs[i].addr, ip_name, sizeof(ip_name));
+    for(j=0; j<MAX_NUM_IP_ADDRESS; j++) {
+        if (s->top_ip_addrs[j].count != 0) {
+            inet_ntop(AF_INET, &s->top_ip_addrs[j].addr, ip_name, sizeof(ip_name));
             printf("\t\t\t\t%s\t%s ~ %.2f%%\n", (first) ? "Top IP Stats:" : "\t",
-                   ip_name, ((s->top_ip_addrs[i].count) * 100.0) / s->cumulative_addr);
+                   ip_name, ((s->top_ip_addrs[j].count) * 100.0) / s->cumulative_addr);
             first = 0;
         }
     }
+
     printf("\n");
     first = 1;
+
     if(i >= 10) break;
   }
 }
