@@ -769,6 +769,7 @@ ndpi_patricia_lookup (patricia_tree_t *patricia, prefix_t *prefix)
   }
 
   new_node = (patricia_node_t*)ndpi_calloc(1, sizeof *new_node);
+  if(!new_node) return NULL;
   new_node->bit = prefix->bitlen;
   new_node->prefix = ndpi_Ref_Prefix (prefix);
   new_node->parent = NULL;
