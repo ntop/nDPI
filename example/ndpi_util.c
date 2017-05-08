@@ -318,6 +318,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     // non tcp/udp protocols
     lower_port = 0;
     upper_port = 0;
+
+    *src_to_dst_direction = (iph->saddr < iph->daddr) ? 1 : 0;
   }
 
   flow.protocol = iph->protocol, flow.vlan_id = vlan_id;
