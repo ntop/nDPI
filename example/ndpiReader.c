@@ -85,12 +85,12 @@ static time_t capture_until = 0;
 static u_int32_t num_flows;
 
 struct info_pair{
-    u_int32_t addr;
+    char addr[48];
     int count;
 };
 
 typedef struct node_a{
-    u_int32_t addr;
+    char addr[48];
     int count;
     struct node_a *left, *right;
 }addr_node;
@@ -781,28 +781,28 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 }
 
 /* *********************************************** */
-
-int updateIpTree(const u_int32_t key, addr_node **vrootp) {
+int updateIpTree(const char *key, addr_node **vrootp) {
   addr_node *q;
   addr_node **rootp = vrootp;
+  int r;
 
   if(rootp == (addr_node **)0)
     return 0;
 
   while (*rootp != (addr_node *)0) {	/* Knuth's T1: */
-    if(key == ((*rootp)->addr)) {    /* T2: */
+    if((r = strcmp(key, ((*rootp)->addr))) == 0){    /* T2: */
       return ++((*rootp)->count);
     }
 
-    rootp = (key < ((*rootp)->addr)) ?
+    rootp = (r < 0) ?
       &(*rootp)->left :		/* T3: follow left branch */
       &(*rootp)->right;		/* T4: follow right branch */
   }
 
   q = (addr_node *) malloc(sizeof(addr_node));	/* T5: key not found */
-  if(q != (addr_node *)0) {	/* make new node */
-    *rootp = q;			/* link new node to old */
-    q->addr = key;		/* initialize new node */
+  if(q != (addr_node *)0) {	                /* make new node */
+    *rootp = q;			                /* link new node to old */
+    strncpy(q->addr, key, sizeof(q->addr));     /* initialize new node */
     q->count = UPDATED_TREE;
     q->left = q->right = (addr_node *)0;
     return q->count;
@@ -832,33 +832,33 @@ void freeIpTree(addr_node *root) {
 
 /* *********************************************** */
 
-void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int size){
+void updateTopIpAddress(const char *addr, int count, struct info_pair top[], int size){
     int update = 0;
+    int r;
     int i;
     int min_i = 0;
     int min = count;
+    struct info_pair pair;
 
     if(count == 0) return;
 
-    struct info_pair pair;
-    pair.addr = addr, pair.count = count;
+    strncpy(pair.addr, addr, sizeof(pair.addr)); 
+    pair.count = count;
 
-    /* if the same ip with a bigger
-         count just update it      */
+    
     for(i=0; i<size; i++) {
-        if(top[i].addr == addr) {
+        /* if the same ip with a bigger
+              count just update it     */
+        if((r = strcmp(top[i].addr, addr)) == 0) {
             top[i].count = count;
             return;
-        }
-    }
-
-    /* if array is not full yet
-     add it to the first empty place */
-    for(i=0; i<size; i++) {
-        if(top[i].addr != addr && top[i].count == 0) {
-            top[i] = pair;
-            return;
-        }
+        }   
+        /* if array is not full yet
+         add it to the first empty place */
+        if(top[i].count == 0) {
+           top[i] = pair;
+           return;
+        } 
     }
 
     /* if bigger than the smallest one, replace it */
@@ -870,47 +870,49 @@ void updateTopIpAddress(u_int32_t addr, int count, struct info_pair top[], int s
         }
     }
 
-    if(update)
+    if(update){
         top[min_i] = pair;
+    }
 }
 
 /* *********************************************** */
-static void updatePortStats(struct port_stats **stats, u_int32_t port, u_int32_t addr, u_int32_t num_pkts, u_int32_t num_bytes) {
+static void updatePortStats(struct port_stats **stats, u_int32_t port, const char *addr, u_int32_t num_pkts, u_int32_t num_bytes) {
   struct port_stats *s;
-  char ipname[48];
-  int count;
+  int count=0;
   
   HASH_FIND_INT(*stats, &port, s);
   if(s == NULL) {
     s = (struct port_stats*)malloc(sizeof(struct port_stats));
     if(!s) return;
 
-    s->port = port, s->num_pkts = 0, s->num_bytes = 0;
+    s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes;
     s->num_addr = 1, s->cumulative_addr = 1;
 
     memset(s->top_ip_addrs, 0, MAX_NUM_IP_ADDRESS*sizeof(struct info_pair));
     updateTopIpAddress(addr, 1, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
-
+    
     s->addr_tree = (addr_node *) malloc(sizeof(addr_node));
     if(!s->addr_tree) return;
 
-    s->addr_tree->addr = addr;
+    strncpy(s->addr_tree->addr, addr, sizeof(s->addr_tree->addr));
     s->addr_tree->count = 1;
     s->addr_tree->left = NULL;
     s->addr_tree->right = NULL;
 
     HASH_ADD_INT(*stats, port, s);
   }
+  else{
+    count = updateIpTree(addr, &(*s).addr_tree);
 
-  count = updateIpTree(addr, &(*s).addr_tree);
-  if(count == UPDATED_TREE) s->num_addr++;
-  
-  if(count) {
-      s->cumulative_addr++;
-      updateTopIpAddress(addr, count, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
+    if(count == UPDATED_TREE) s->num_addr++;
+    
+    if(count) {
+        s->cumulative_addr++;
+        updateTopIpAddress(addr, count, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
+    }
+
+    s->num_pkts += num_pkts, s->num_bytes += num_bytes;
   }
-
-  s->num_pkts += num_pkts, s->num_bytes += num_bytes;
 }
 
 /* *********************************************** */
@@ -934,15 +936,18 @@ static void deletePortsStats(struct port_stats *stats) {
 static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t sport, dport;
-  u_int32_t saddr, daddr;
+  char saddr[48];
+  char daddr[48];
 
   if(flow->src_to_dst_direction == 1) {
       sport = ntohs(flow->lower_port), dport = ntohs(flow->upper_port);
-      saddr = flow->lower_ip, daddr = flow->upper_ip;
+      strncpy(saddr, flow->lower_name, sizeof(saddr));
+      strncpy(daddr, flow->upper_name, sizeof(daddr));
   }
   else {
       sport = ntohs(flow->upper_port), dport = ntohs(flow->lower_port);
-      saddr = flow->upper_ip, daddr = flow->lower_ip;
+      strncpy(saddr, flow->upper_name, sizeof(saddr));
+      strncpy(daddr, flow->lower_name, sizeof(daddr));
   }
   updatePortStats(&srcStats, sport, saddr, flow->packets, flow->bytes);
   updatePortStats(&dstStats, dport, daddr, flow->packets, flow->bytes);
@@ -1201,8 +1206,7 @@ static int info_pair_cmp (const void *_a, const void *_b)
 
 void printPortStats(struct port_stats *stats) {
   struct port_stats *s, *tmp;
-  char ip_name[48];
-  int i = 0, j = 0, first = 1;
+  int i = 0, j = 0;
 
   HASH_ITER(hh, stats, s, tmp) {
     i++;
@@ -1213,16 +1217,12 @@ void printPortStats(struct port_stats *stats) {
 
     for(j=0; j<MAX_NUM_IP_ADDRESS; j++) {
         if(s->top_ip_addrs[j].count != 0) {
-            inet_ntop(AF_INET, &s->top_ip_addrs[j].addr, ip_name, sizeof(ip_name));
-            printf("\t\t%-16s ~ %.2f%%\n",
-                   ip_name, ((s->top_ip_addrs[j].count) * 100.0) / s->cumulative_addr);
-            first = 0;
+            printf("\t\t%-36s ~ %.2f%%\n", s->top_ip_addrs[j].addr,
+                   ((s->top_ip_addrs[j].count) * 100.0) / s->cumulative_addr);
         }
     }
 
     printf("\n");
-    first = 1;
-
     if(i >= 10) break;
   }
 }
