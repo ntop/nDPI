@@ -28,7 +28,7 @@ Amazon	1	66	1
 	16	TCP 222.165.163.93:443 <-> 192.168.200.222:52635 [proto: 91/SSL][5 pkts/385 bytes]
 	17	TCP 222.165.163.93:443 <-> 192.168.200.222:52641 [proto: 91/SSL][5 pkts/385 bytes]
 	18	TCP 222.165.163.91:443 <-> 192.168.200.222:56243 [proto: 91/SSL][5 pkts/385 bytes]
-	19	ICMP 192.168.1.1:0 <-> 192.168.200.222:0 [proto: 81/ICMP][2 pkts/196 bytes]
+	19	ICMP 192.168.200.222:0 <-> 192.168.1.1:0 [proto: 81/ICMP][2 pkts/196 bytes]
 	20	TCP 74.125.68.239:443 <-> 192.168.200.222:37376 [proto: 91.126/SSL.Google][5 pkts/424 bytes]
 	21	TCP 192.168.200.222:43287 <-> 52.0.253.46:443 [proto: 64/SSL_No_Cert][34 pkts/4141 bytes]
 	22	TCP 192.168.200.222:51146 <-> 23.21.254.189:443 [proto: 91/SSL][15 pkts/1484 bytes][client: e.crashlytics.com]

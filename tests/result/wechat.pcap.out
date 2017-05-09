@@ -56,7 +56,7 @@ WeChat	1277	615827	51
 	42	TCP 192.168.1.103:35000 <-> 95.101.34.33:80 [proto: 7/HTTP][9 pkts/594 bytes]
 	43	UDP [fe80::7a92:9cff:fe0f:a88e]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][44 pkts/4488 bytes]
 	44	TCP 192.168.1.103:54205 <-> 64.233.167.188:443 [proto: 91.126/SSL.Google][2 pkts/132 bytes]
-	45	ICMPV6 [fe80::842:a3f3:a286:6c5b]:0 <-> [ff02::2]:0 [proto: 102/ICMPV6][2 pkts/132 bytes]
+	45	ICMPV6 [ff02::2]:0 <-> [fe80::842:a3f3:a286:6c5b]:0 [proto: 102/ICMPV6][2 pkts/132 bytes]
 	46	UDP [ff02::1:3]:50440 <-> [fe80::91f9:3df3:7436:6cd6]:5355 [proto: 154/LLMNR][2 pkts/180 bytes][Host: lbjamwptxz]
 	47	TCP 192.168.1.103:52020 <-> 95.101.180.179:80 [proto: 7/HTTP][8 pkts/528 bytes]
 	48	UDP 192.168.1.103:35601 <-> 172.217.23.67:443 [proto: 188.126/QUIC.Google][10 pkts/3972 bytes][Host: ssl.gstatic.com]
@@ -99,10 +99,10 @@ WeChat	1277	615827	51
 	85	UDP 192.168.1.100:138 <-> 192.168.1.255:138 [proto: 10/NetBIOS][3 pkts/751 bytes]
 	86	UDP 192.168.1.100:137 <-> 192.168.1.255:137 [proto: 10/NetBIOS][9 pkts/828 bytes]
 	87	UDP 192.168.1.100:54124 <-> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/140 bytes][Host: lbjamwptxz]
-	88	IGMP 224.0.0.1:0 <-> 192.168.1.254:0 [proto: 82/IGMP][4 pkts/200 bytes]
-	89	IGMP 224.0.0.22:0 <-> 192.168.1.100:0 [proto: 82/IGMP][15 pkts/810 bytes]
-	90	IGMP 224.0.0.22:0 <-> 192.168.1.103:0 [proto: 82/IGMP][4 pkts/216 bytes]
-	91	IGMP 224.0.0.22:0 <-> 192.168.1.108:0 [proto: 82/IGMP][1 pkts/54 bytes]
+	88	IGMP 192.168.1.254:0 <-> 224.0.0.1:0 [proto: 82/IGMP][4 pkts/200 bytes]
+	89	IGMP 192.168.1.100:0 <-> 224.0.0.22:0 [proto: 82/IGMP][15 pkts/810 bytes]
+	90	IGMP 192.168.1.103:0 <-> 224.0.0.22:0 [proto: 82/IGMP][4 pkts/216 bytes]
+	91	IGMP 192.168.1.108:0 <-> 224.0.0.22:0 [proto: 82/IGMP][1 pkts/54 bytes]
 	92	TCP 192.168.1.103:36017 <-> 64.233.167.188:5228 [proto: 126/Google][20 pkts/1320 bytes]
 	93	TCP 192.168.1.103:34999 <-> 95.101.34.33:80 [proto: 7/HTTP][9 pkts/594 bytes]
 	94	TCP 192.168.1.103:34981 <-> 95.101.34.33:80 [proto: 7/HTTP][9 pkts/594 bytes]
@@ -117,4 +117,4 @@ WeChat	1277	615827	51
 
 
 Undetected flows:
-	1	0 [fe80::842:a3f3:a286:6c5b]:0 <-> [ff02::16]:0 [proto: 0/Unknown][1 pkts/110 bytes]
+	1	0 [ff02::16]:0 <-> [fe80::842:a3f3:a286:6c5b]:0 [proto: 0/Unknown][1 pkts/110 bytes]

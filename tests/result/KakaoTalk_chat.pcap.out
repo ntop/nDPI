@@ -12,7 +12,7 @@ KakaoTalk	55	9990	15
 	2	UDP 10.24.82.188:57816 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][2 pkts/244 bytes][Host: katalk.kakao.com]
 	3	UDP 10.24.82.188:58810 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][2 pkts/190 bytes][Host: item.kakao.com]
 	4	TCP 120.28.26.242:80 <-> 10.24.82.188:34503 [proto: 7/HTTP][1 pkts/56 bytes]
-	5	ICMP 10.188.191.1:0 <-> 10.24.82.188:0 [proto: 81/ICMP][1 pkts/147 bytes]
+	5	ICMP 10.24.82.188:0 <-> 10.188.191.1:0 [proto: 81/ICMP][1 pkts/147 bytes]
 	6	UDP 10.24.82.188:4017 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][2 pkts/229 bytes][Host: developers.facebook.com]
 	7	UDP 10.24.82.188:5929 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][2 pkts/205 bytes][Host: up-p.talk.kakao.com]
 	8	TCP 10.24.82.188:58927 <-> 54.255.253.199:5223 [proto: 178/Amazon][2 pkts/181 bytes]

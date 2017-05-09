@@ -48,7 +48,7 @@ Starcraft	236	51494	6
 	36	UDP 192.168.1.100:60026 <-> 192.168.1.254:53 [proto: 5/DNS][4 pkts/442 bytes][Host: llnw.blizzard.com]
 	37	TCP 192.168.1.100:3506 <-> 173.194.113.224:80 [proto: 7.126/HTTP.Google][9 pkts/1299 bytes][Host: www.google-analytics.com]
 	38	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91.203/SSL.Github][3 pkts/234 bytes]
-	39	IGMP 224.0.0.22:0 <-> 192.168.1.107:0 [proto: 82/IGMP][2 pkts/120 bytes]
+	39	IGMP 192.168.1.107:0 <-> 224.0.0.22:0 [proto: 82/IGMP][2 pkts/120 bytes]
 	40	TCP 192.168.1.100:3517 <-> 213.248.127.130:1119 [proto: 213/Starcraft][215 pkts/50178 bytes]
 	41	UDP 192.168.1.100:6113 <-> 213.248.127.212:1119 [proto: 213/Starcraft][2 pkts/103 bytes]
 	42	UDP 192.168.1.100:6113 <-> 213.248.127.166:1119 [proto: 213/Starcraft][2 pkts/103 bytes]
