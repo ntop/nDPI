@@ -158,8 +158,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	u_int32_t request_id = (u_int32_t) (packet->payload[8]+(packet->payload[9]<<8)+(packet->payload[10]<<16)+(packet->payload[11]<<24));
 	
  	if (message_id == MSG_MAGIC_COOKIE){
-		if (someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
-					(message_type == 0x01) && (return_code == 0x00){
+		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
+					(message_type == 0x01) && (return_code == 0x00)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct,flow);
 			return;
@@ -172,8 +172,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
  	}
 	
 	if (message_id == MSG_MAGIC_COOKIE_ACK){
-		if (someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
-					(message_type == 0x02) && (return_code == 0x00){
+		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
+					(message_type == 0x02) && (return_code == 0x00)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie ACK\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct,flow);
 			return;
