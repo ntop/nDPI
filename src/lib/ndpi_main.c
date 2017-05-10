@@ -1571,6 +1571,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "MQTT", NDPI_PROTOCOL_CATEGORY_RPC,
 			    ndpi_build_default_ports(ports_a, 1883, 8883, 0, 0, 0),  /* TCP */
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));       /* UDP */
+	 ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOMEIP,
+			    no_master,
+			    no_master, "SOME/IP", NDPI_PROTOCOL_CATEGORY_RPC,
+			    ndpi_build_default_ports(ports_a, 30491, 30501, 0, 0, 0),  /* TCP */
+			    ndpi_build_default_ports(ports_b, 30491, 30501, 30490, 0, 0));       /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RX,
 			    no_master,
 			    no_master, "RX", NDPI_PROTOCOL_CATEGORY_RPC,
@@ -2690,6 +2695,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* MQTT */
   init_mqtt_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* MQTT */
+  init_someip_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* RX */
   init_rx_dissector(ndpi_struct, &a, detection_bitmask);
