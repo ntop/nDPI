@@ -908,7 +908,7 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
   /* process the packet */
   return(packet_processing(workflow, time, vlan_id, iph, iph6,
-			   ip_offset, header->len - ip_offset, header->len));
+			   ip_offset, header->caplen - ip_offset, header->caplen));
 }
 
 /* ********************************************************** */
