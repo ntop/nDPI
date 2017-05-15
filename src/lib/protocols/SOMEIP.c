@@ -191,13 +191,13 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
 	//Filtering by port as per request. This is PURELY for demo purposes and the rest of the check must be filled in later on!
 	if (packet->l4_protocol == IPPROTO_UDP){
-		if ((packet->udp->dest == 30491) || (packet->udp->dest == 30501) || (packet->udp->dest == 30490)) {
+		if ((packet->udp->dest == ntohs(30491)) || (packet->udp->dest == ntohs(30501)) || (packet->udp->dest == ntohs(30490))) {
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct,flow);
 		}
 	}
 	if (packet->l4_protocol == IPPROTO_TCP){
-		if ((packet->tcp->dest == 30491) || (packet->tcp->dest == 30501)) {
+		if ((packet->tcp->dest == ntohs(30491)) || (packet->tcp->dest == ntohs(30501))) {
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct,flow);
 		}
@@ -217,7 +217,7 @@ void init_someip_dissector (struct ndpi_detection_module_struct *ndpi_struct,
 		u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP dissector init...\n");
-	ndpi_set_bitmask_protocol_detection ("MQTT", ndpi_struct, detection_bitmask, *id,
+	ndpi_set_bitmask_protocol_detection ("SOME/IP", ndpi_struct, detection_bitmask, *id,
 			NDPI_PROTOCOL_SOMEIP,
 			ndpi_search_someip,
 			NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
