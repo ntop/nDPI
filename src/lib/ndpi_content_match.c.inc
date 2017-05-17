@@ -7995,6 +7995,7 @@ ndpi_protocol_match host_match[] = {
 
   { ".speedtest.net",			"Ookla",		NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL, NDPI_PROTOCOL_ACCEPTABLE },
 
+  { "google.",				"Google",		NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".google.",				"Google",		NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gstatic.com",			"Google",		NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".googlesyndication.com",		"Google",		NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8095,6 +8096,8 @@ ndpi_protocol_match host_match[] = {
   { "feelinsonice.appspot.com",         "Snapchat",             NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice-hrd.appspot.com",     "Snapchat",             NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice.com",                 "Snapchat",             NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".snapchat.",			"Snapchat",             NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".snapads.",			"Snapchat",             NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
 
   /* Detected "instagram.c10r.facebook.com". Omitted "*amazonaws.com" and "*facebook.com" CDNs e.g. "ig-telegraph-shv-04-frc3.facebook.com" */
   { ".cdninstagram.com",                "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
@@ -8113,6 +8116,7 @@ ndpi_protocol_match host_match[] = {
   { "i2-msdn.sec.s-msft.com",           "Microsoft",            NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM, NDPI_PROTOCOL_ACCEPTABLE },
   { ".webtrends.com",                   "Microsoft",            NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".msecnd.net",                      "Microsoft",            NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "bing.com",				"Microsoft",            NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".visualstudio.com",                "Microsoft",            NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "bn1301.storage.live.com",          "MS_OneDrive",          NDPI_PROTOCOL_MS_ONE_DRIVE,NDPI_PROTOCOL_CATEGORY_CLOUD,  NDPI_PROTOCOL_ACCEPTABLE },
