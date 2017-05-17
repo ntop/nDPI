@@ -633,7 +633,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       /* Check for additional field introduced by Facebook */
       x = 1;
       while(packet->line[x].len != 0) {
-	if((memcmp(packet->line[x].ptr, "X-FB-SIM-HNI", 12)) == 0) {
+	if(packet->line[x].len >= 12 && (memcmp(packet->line[x].ptr, "X-FB-SIM-HNI", 12)) == 0) {
 	  ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_FACEBOOK);
 	  check_content_type_and_change_protocol(ndpi_struct, flow);
 	  return;
@@ -644,7 +644,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       /* check PPStream protocol or iQiyi service
 	 (iqiyi is delivered by ppstream) */
       // substring in url
-      if(strstr((const char*) &packet->payload[filename_start], "iqiyi.com") != NULL) {
+      if(ndpi_strnstr((const char*) &packet->payload[filename_start], "iqiyi.com", (packet->payload_packet_len - filename_start)) != NULL) {
 	if(kxun_counter == 0) {
 	  flow->l4.tcp.ppstream_stage++;
 	  iqiyi_counter++;
@@ -654,7 +654,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
       // additional field in http payload
       x = 1;
-      while(packet->line[x].len != 0) {
+      while((packet->line[x].len >= 4) && (packet->line[x+1].len >= 5) && (packet->line[x+2].len >= 10)) {
 	if(packet->line[x].ptr && ((memcmp(packet->line[x].ptr, "qyid", 4)) == 0)
 	   && packet->line[x+1].ptr && ((memcmp(packet->line[x+1].ptr, "qypid", 5)) == 0)
 	   && packet->line[x+2].ptr && ((memcmp(packet->line[x+2].ptr, "qyplatform", 10)) == 0)
@@ -670,7 +670,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       /* Check for 1kxun packet */
       int a;
       for (a = 0; a < packet->parsed_lines; a++) {
-	if((memcmp(packet->line[a].ptr, "Client-Source:", 14)) == 0) {
+	if(packet->line[a].len >= 14 && (memcmp(packet->line[a].ptr, "Client-Source:", 14)) == 0) {
 	  if((memcmp(packet->line[a].ptr+15, "1kxun", 5)) == 0) {
 	    kxun_counter++;
 	    check_content_type_and_change_protocol(ndpi_struct, flow);
