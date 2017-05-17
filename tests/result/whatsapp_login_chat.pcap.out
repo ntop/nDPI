@@ -5,12 +5,12 @@ Apple	50	23466	2
 WhatsApp	32	3243	2
 Spotify	1	86	1
 
-	1	UDP 192.168.2.1:17500 <-> 192.168.2.255:17500 [proto: 121/Dropbox][2 pkts/1088 bytes]
-	2	UDP [fe80::189c:c31b:1298:224]:5353 <-> [ff02::fb]:5353 [proto: 8/MDNS][1 pkts/111 bytes]
+	1	UDP 192.168.2.1:17500 -> 192.168.2.255:17500 [proto: 121/Dropbox][2 pkts/1088 bytes]
+	2	UDP [fe80::189c:c31b:1298:224]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][1 pkts/111 bytes]
 	3	UDP 192.168.2.4:61697 <-> 192.168.2.1:53 [proto: 5.142/DNS.WhatsApp][2 pkts/280 bytes][Host: e12.whatsapp.net]
 	4	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.140/SSL.Apple][44 pkts/21371 bytes]
-	5	UDP 0.0.0.0:68 <-> 255.255.255.255:67 [proto: 18/DHCP][6 pkts/2052 bytes][Host: lucas-imac]
+	5	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][6 pkts/2052 bytes][Host: lucas-imac]
 	6	TCP 192.168.2.4:49206 <-> 158.85.58.15:5222 [proto: 142/WhatsApp][30 pkts/2963 bytes]
-	7	UDP 192.168.2.1:57621 <-> 192.168.2.255:57621 [proto: 156/Spotify][1 pkts/86 bytes]
-	8	TCP 17.110.229.14:5223 <-> 192.168.2.4:49193 [proto: 140/Apple][6 pkts/2095 bytes]
-	9	UDP 192.168.2.4:5353 <-> 224.0.0.251:5353 [proto: 8/MDNS][1 pkts/91 bytes]
+	7	UDP 192.168.2.1:57621 -> 192.168.2.255:57621 [proto: 156/Spotify][1 pkts/86 bytes]
+	8	TCP 17.110.229.14:5223 -> 192.168.2.4:49193 [proto: 140/Apple][6 pkts/2095 bytes]
+	9	UDP 192.168.2.4:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][1 pkts/91 bytes]

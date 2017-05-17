@@ -16,4 +16,4 @@ QUIC	3	364	1
 
 
 Undetected flows:
-	1	UDP 10.0.0.4:40134 <-> 10.0.0.3:6121 [proto: 0/Unknown][6 pkts/7072 bytes]
+	1	UDP 10.0.0.4:40134 -> 10.0.0.3:6121 [proto: 0/Unknown][6 pkts/7072 bytes]

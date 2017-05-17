@@ -49,7 +49,7 @@ Amazon	3	174	1
 	41	TCP 10.8.0.1:43433 <-> 216.58.208.40:443 [proto: 91.126/SSL.Google][17 pkts/6375 bytes][client: ssl.google-analytics.com]
 	42	TCP 10.8.0.1:47498 <-> 209.197.222.159:443 [proto: 91.141/SSL.Webex][14 pkts/7796 bytes][server: *.webex.com]
 	43	TCP 10.133.206.47:54651 <-> 185.63.147.10:443 [proto: 91/SSL][3 pkts/174 bytes]
-	44	UDP 10.8.0.1:64538 <-> 172.16.1.75:5060 [proto: 100/SIP][22 pkts/15356 bytes]
+	44	UDP 10.8.0.1:64538 -> 172.16.1.75:5060 [proto: 100/SIP][22 pkts/15356 bytes]
 	45	TCP 10.133.206.47:33459 <-> 80.74.110.68:443 [proto: 91/SSL][5 pkts/317 bytes]
 	46	TCP 10.8.0.1:33512 <-> 80.74.110.68:443 [proto: 64/SSL_No_Cert][18 pkts/1972 bytes]
 	47	TCP 10.8.0.1:33554 <-> 80.74.110.68:443 [proto: 64/SSL_No_Cert][18 pkts/1972 bytes]
