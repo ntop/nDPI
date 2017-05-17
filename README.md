@@ -17,7 +17,7 @@ In order to compile this library do
 
 To run tests do additionally:
 
-- ce tests; ./do.sh
+- cd tests; ./do.sh
 
 Please note that the pre-requisites for compilation include:
 - GNU tools (autogen, automake, autoconf, libtool)
