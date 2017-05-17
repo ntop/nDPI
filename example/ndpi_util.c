@@ -155,14 +155,36 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
   struct ndpi_flow_info *fa = (struct ndpi_flow_info*)a;
   struct ndpi_flow_info *fb = (struct ndpi_flow_info*)b;
 
-  if(fa->vlan_id   < fb->vlan_id  )   return(-1); else { if(fa->vlan_id   > fb->vlan_id    ) return(1); }
+  if(fa->hashval < fb->hashval) return(-1); else if(fa->hashval > fb->hashval) return(1);
+
+  /* Flows have the same hash */
+  
+  if(fa->vlan_id   < fb->vlan_id   ) return(-1); else { if(fa->vlan_id    > fb->vlan_id   ) return(1); }
+  if(fa->protocol  < fb->protocol  ) return(-1); else { if(fa->protocol   > fb->protocol  ) return(1); }
+  
+  if(
+     (
+      (fa->lower_ip      == fb->lower_ip  )
+      && (fa->lower_port == fb->lower_port)
+      && (fa->upper_ip   == fb->upper_ip  )
+      && (fa->upper_port == fb->upper_port)
+      )
+     ||
+     (
+      (fa->lower_ip      == fb->upper_ip  )
+      && (fa->lower_port == fb->upper_port)
+      && (fa->upper_ip   == fb->lower_ip  )
+      && (fa->upper_port == fb->lower_port)
+      )
+     )
+    return(0);
+  
   if(fa->lower_ip   < fb->lower_ip  ) return(-1); else { if(fa->lower_ip   > fb->lower_ip  ) return(1); }
   if(fa->lower_port < fb->lower_port) return(-1); else { if(fa->lower_port > fb->lower_port) return(1); }
   if(fa->upper_ip   < fb->upper_ip  ) return(-1); else { if(fa->upper_ip   > fb->upper_ip  ) return(1); }
   if(fa->upper_port < fb->upper_port) return(-1); else { if(fa->upper_port > fb->upper_port) return(1); }
-  if(fa->protocol   < fb->protocol  ) return(-1); else { if(fa->protocol   > fb->protocol  ) return(1); }
-
-  return(0);
+    
+  return(0); /* notreached */
 }
 
 /* ***************************************************** */
@@ -202,11 +224,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 						 u_int8_t **payload,
 						 u_int16_t *payload_len,
 						 u_int8_t *src_to_dst_direction) {
-  u_int32_t idx, l4_offset;
-  u_int32_t lower_ip;
-  u_int32_t upper_ip;
-  u_int16_t lower_port;
-  u_int16_t upper_port;
+  u_int32_t idx, l4_offset, hashval;
   struct ndpi_flow_info flow;
   void *ret;
   u_int8_t *l3, *l4;
@@ -246,14 +264,6 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   if(l4_packet_len > workflow->stats.max_packet_len)
     workflow->stats.max_packet_len = l4_packet_len;
 
-  if(iph->saddr < iph->daddr) {
-    lower_ip = iph->saddr;
-    upper_ip = iph->daddr;
-  } else {
-    lower_ip = iph->daddr;
-    upper_ip = iph->saddr;
-  }
-
   *proto = iph->protocol;
   l4 = ((u_int8_t *) l3 + l4_offset);
 
@@ -264,25 +274,6 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     workflow->stats.tcp_count++;
     *tcph = (struct ndpi_tcphdr *)l4;
     *sport = ntohs((*tcph)->source), *dport = ntohs((*tcph)->dest);
-
-    if(iph->saddr < iph->daddr) {
-      lower_port = (*tcph)->source, upper_port = (*tcph)->dest;
-      *src_to_dst_direction = 1;
-    } else {
-      lower_port = (*tcph)->dest;
-      upper_port = (*tcph)->source;
-
-      *src_to_dst_direction = 0;
-      if(iph->saddr == iph->daddr) {
-	if(lower_port > upper_port) {
-	  u_int16_t p = lower_port;
-
-	  lower_port = upper_port;
-	  upper_port = p;
-	}
-      }
-    }
-
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
     *payload = &l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
@@ -294,42 +285,16 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);
     *payload = &l4[sizeof(struct ndpi_udphdr)];
     *payload_len = ndpi_max(0, l4_packet_len-sizeof(struct ndpi_udphdr));
-
-    if(iph->saddr < iph->daddr) {
-      lower_port = (*udph)->source, upper_port = (*udph)->dest;
-      *src_to_dst_direction = 1;
-    } else {
-      lower_port = (*udph)->dest, upper_port = (*udph)->source;
-
-      *src_to_dst_direction = 0;
-
-      if(iph->saddr == iph->daddr) {
-	if(lower_port > upper_port) {
-	  u_int16_t p = lower_port;
-
-	  lower_port = upper_port;
-	  upper_port = p;
-	}
-      }
-    }
-
-    *sport = ntohs(lower_port), *dport = ntohs(upper_port);
   } else {
     // non tcp/udp protocols
-    lower_port = 0;
-    upper_port = 0;
-
-    *src_to_dst_direction = (iph->saddr < iph->daddr) ? 1 : 0;
+    *sport = *dport = 0;
   }
 
   flow.protocol = iph->protocol, flow.vlan_id = vlan_id;
-  flow.lower_ip = lower_ip, flow.upper_ip = upper_ip;
-  flow.lower_port = lower_port, flow.upper_port = upper_port;
-
-  NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "[NDPI] [%u][%u:%u <-> %u:%u]\n",
-	   iph->protocol, lower_ip, ntohs(lower_port), upper_ip, ntohs(upper_port));
-
-  idx = (vlan_id + lower_ip + upper_ip + iph->protocol + lower_port + upper_port) % workflow->prefs.num_roots;
+  flow.lower_ip = iph->saddr, flow.upper_ip = iph->daddr;
+  flow.lower_port = htons(*sport), flow.upper_port = htons(*dport);
+  flow.hashval = hashval = flow.protocol + flow.vlan_id + flow.lower_ip + flow.upper_ip + flow.lower_port + flow.upper_port;
+  idx = hashval % workflow->prefs.num_roots;
   ret = ndpi_tfind(&flow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp);
 
   if(ret == NULL) {
@@ -347,15 +312,15 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       }
 
       memset(newflow, 0, sizeof(struct ndpi_flow_info));
+      newflow->hashval = hashval;
       newflow->protocol = iph->protocol, newflow->vlan_id = vlan_id;
-      newflow->lower_ip = lower_ip, newflow->upper_ip = upper_ip;
-      newflow->lower_port = lower_port, newflow->upper_port = upper_port;
+      newflow->lower_ip = iph->saddr, newflow->upper_ip = iph->daddr;
+      newflow->lower_port = htons(*sport), newflow->upper_port = htons(*dport);
       newflow->ip_version = version;
-      newflow->src_to_dst_direction = *src_to_dst_direction;
 
       if(version == IPVERSION) {
-	inet_ntop(AF_INET, &lower_ip, newflow->lower_name, sizeof(newflow->lower_name));
-	inet_ntop(AF_INET, &upper_ip, newflow->upper_name, sizeof(newflow->upper_name));
+	inet_ntop(AF_INET, &newflow->lower_ip, newflow->lower_name, sizeof(newflow->lower_name));
+	inet_ntop(AF_INET, &newflow->upper_ip, newflow->upper_name, sizeof(newflow->upper_name));
       } else {
 	inet_ntop(AF_INET6, &iph6->ip6_src, newflow->lower_name, sizeof(newflow->lower_name));
 	inet_ntop(AF_INET6, &iph6->ip6_dst, newflow->upper_name, sizeof(newflow->upper_name));
@@ -394,11 +359,14 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   } else {
     struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)ret;
 
-    if(flow->lower_ip == lower_ip && flow->upper_ip == upper_ip
-       && flow->lower_port == lower_port && flow->upper_port == upper_port)
-      *src = flow->src_id, *dst = flow->dst_id;
+    if(flow->lower_ip == iph->saddr
+       && flow->upper_ip == iph->daddr
+       && flow->lower_port == htons(*sport)
+       && flow->upper_port == htons(*dport)
+       )
+      *src = flow->src_id, *dst = flow->dst_id, *src_to_dst_direction = 1;
     else
-      *src = flow->dst_id, *dst = flow->src_id;
+      *src = flow->dst_id, *dst = flow->src_id, *src_to_dst_direction = 0, flow->bidirectional = 1;
 
     return flow;
   }

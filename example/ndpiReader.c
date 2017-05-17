@@ -611,20 +611,13 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 
     fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
 
-    if(flow->src_to_dst_direction == 1)
-      fprintf(out, "%s%s%s:%u <-> %s%s%s:%u ",
-	      (flow->ip_version == 6) ? "[" : "",
-	      flow->lower_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->lower_port),
-	      (flow->ip_version == 6) ? "[" : "",
-	      flow->upper_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->upper_port)
-	      );
-    else
-      fprintf(out, "%s%s%s:%u <-> %s%s%s:%u ",
-	      (flow->ip_version == 6) ? "[" : "",
-	      flow->upper_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->upper_port),
-	      (flow->ip_version == 6) ? "[" : "",
-	      flow->lower_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->lower_port)
-	      );
+    fprintf(out, "%s%s%s:%u %s %s%s%s:%u ",
+	    (flow->ip_version == 6) ? "[" : "",
+	    flow->lower_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->lower_port),
+	    flow->bidirectional ? "<->" : "->",
+	    (flow->ip_version == 6) ? "[" : "",
+	    flow->upper_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->upper_port)
+	    );
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
 
@@ -939,16 +932,10 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
   char saddr[48];
   char daddr[48];
 
-  if(flow->src_to_dst_direction == 1) {
-      sport = ntohs(flow->lower_port), dport = ntohs(flow->upper_port);
-      strncpy(saddr, flow->lower_name, sizeof(saddr));
-      strncpy(daddr, flow->upper_name, sizeof(daddr));
-  }
-  else {
-      sport = ntohs(flow->upper_port), dport = ntohs(flow->lower_port);
-      strncpy(saddr, flow->upper_name, sizeof(saddr));
-      strncpy(daddr, flow->lower_name, sizeof(daddr));
-  }
+  sport = ntohs(flow->lower_port), dport = ntohs(flow->upper_port);
+  strncpy(saddr, flow->lower_name, sizeof(saddr));
+  strncpy(daddr, flow->upper_name, sizeof(daddr));
+
   updatePortStats(&srcStats, sport, saddr, flow->packets, flow->bytes);
   updatePortStats(&dstStats, dport, daddr, flow->packets, flow->bytes);
 }
