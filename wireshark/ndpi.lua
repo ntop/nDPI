@@ -15,9 +15,65 @@ fds.name = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STR
 
 local f_eth_trailer = Field.new("eth.trailer")
 
-local ndpi_protos     = {}
-local ndpi_flows      = {}
-local compute_flows_stats = true
+local ndpi_protos            = {}
+local ndpi_flows             = {}
+local num_ndpi_flows         = 0
+
+local lower_ndpi_flow_id     = 0
+local lower_ndpi_flow_volume = 0
+
+local compute_flows_stats    = true
+local max_num_entries        = 10
+local max_num_flows          = 50
+
+-- ###############################################
+
+function round(num, idp)         return tonumber(string.format("%." .. (idp or 0) .. "f", num)) end
+
+-- Convert bytes to human readable format
+function bytesToSize(bytes)
+   if(bytes == nil) then
+      return("0")
+   else
+      precision = 2
+      kilobyte = 1024;
+      megabyte = kilobyte * 1024;
+      gigabyte = megabyte * 1024;
+      terabyte = gigabyte * 1024;
+
+      bytes = tonumber(bytes)
+      if((bytes >= 0) and (bytes < kilobyte)) then
+	 return round(bytes, precision) .. " Bytes";
+	 elseif((bytes >= kilobyte) and (bytes < megabyte)) then
+	 return round(bytes / kilobyte, precision) .. ' KB';
+	 elseif((bytes >= megabyte) and (bytes < gigabyte)) then
+	 return round(bytes / megabyte, precision) .. ' MB';
+	 elseif((bytes >= gigabyte) and (bytes < terabyte)) then
+	 return round(bytes / gigabyte, precision) .. ' GB';
+	 elseif(bytes >= terabyte) then
+	 return round(bytes / terabyte, precision) .. ' TB';
+      else
+	 return round(bytes, precision) .. ' Bytes';
+      end
+   end
+end
+
+function pairsByValues(t, f)
+   local a = {}
+   for n in pairs(t) do table.insert(a, n) end
+   table.sort(a, function(x, y) return f(t[x], t[y]) end)
+   local i = 0      -- iterator variable
+   local iter = function ()   -- iterator function
+      i = i + 1
+      if a[i] == nil then return nil
+      else return a[i], t[a[i]]
+      end
+   end
+   return iter
+end
+
+function asc(a,b) return (a < b) end
+function rev(a,b) return (a > b) end
 
 -- ###############################################
 
@@ -80,9 +136,27 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 flowkey = srckey.." / "..dstkey.." ["..ndpikey.."]"
 	 if(ndpi_flows[flowkey] == nil) then
 	    ndpi_flows[flowkey] = 0
+	    num_ndpi_flows = num_ndpi_flows + 1	    
+
+	    if(num_ndpi_flows > max_num_flows) then
+	       -- We need to harvest the flow with least packets beside this new one
+	       local tot_removed = 0
+	       
+	       for k,v in pairsByValues(ndpi_flows, asc) do
+		  if(k ~= flowkey) then
+		     table.remove(ndpi_flows, k)
+		     tot_removed = tot_removed + 1
+		     if(tot_removed == max_num_entries) then
+			break
+		     end
+		  end
+	       end
+
+	    end
 	 end
 
 	 ndpi_flows[flowkey] = ndpi_flows[flowkey] + pinfo.len
+
       end
    end
 end
@@ -91,58 +165,11 @@ register_postdissector(ndpi_proto)
 
 -- ###############################################
 
-function round(num, idp)         return tonumber(string.format("%." .. (idp or 0) .. "f", num)) end
-
--- Convert bytes to human readable format
-function bytesToSize(bytes)
-   if(bytes == nil) then
-      return("0")
-   else
-      precision = 2
-      kilobyte = 1024;
-      megabyte = kilobyte * 1024;
-      gigabyte = megabyte * 1024;
-      terabyte = gigabyte * 1024;
-
-      bytes = tonumber(bytes)
-      if((bytes >= 0) and (bytes < kilobyte)) then
-	 return round(bytes, precision) .. " Bytes";
-	 elseif((bytes >= kilobyte) and (bytes < megabyte)) then
-	 return round(bytes / kilobyte, precision) .. ' KB';
-	 elseif((bytes >= megabyte) and (bytes < gigabyte)) then
-	 return round(bytes / megabyte, precision) .. ' MB';
-	 elseif((bytes >= gigabyte) and (bytes < terabyte)) then
-	 return round(bytes / gigabyte, precision) .. ' GB';
-	 elseif(bytes >= terabyte) then
-	 return round(bytes / terabyte, precision) .. ' TB';
-      else
-	 return round(bytes, precision) .. ' Bytes';
-      end
-   end
-end
-
-function pairsByValues(t, f)
-   local a = {}
-   for n in pairs(t) do table.insert(a, n) end
-   table.sort(a, function(x, y) return f(t[x], t[y]) end)
-   local i = 0      -- iterator variable
-   local iter = function ()   -- iterator function
-      i = i + 1
-      if a[i] == nil then return nil
-      else return a[i], t[a[i]]
-      end
-   end
-   return iter
-end
-
-function asc(a,b) return (a < b) end
-function rev(a,b) return (a > b) end
 
 local function ndpi_dialog_menu()
    local win = TextWindow.new("nDPI Protocol Statistics");
    local label = ""
    local i
-   local max_i = 10
 
    if(ndpi_protos ~= {}) then
       label =          "nDPI Protocol Breakdown\n"
@@ -152,7 +179,7 @@ local function ndpi_dialog_menu()
       for k,v in pairsByValues(ndpi_protos, rev) do
 	 -- label = label .. k .. "\t".. bytesToSize(v) .. "\n"
 	 label = label .. string.format("%-32s\t%s\n", k, bytesToSize(v))
-	 if(i == max_i) then break else i = i + 1 end
+	 if(i == max_num_entries) then break else i = i + 1 end
       end
 
       -- #######
@@ -162,7 +189,7 @@ local function ndpi_dialog_menu()
       i = 0
       for k,v in pairsByValues(ndpi_flows, rev) do
 	 label = label .. string.format("%-32s\t%s\n", k, bytesToSize(v))
-	 if(i == max_i) then break else i = i + 1 end
+	 if(i == max_num_entries) then break else i = i + 1 end
       end
 
       win:set(label)

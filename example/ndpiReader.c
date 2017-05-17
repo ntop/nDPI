@@ -151,14 +151,10 @@ FILE *trace = NULL;
 
 /********************** FUNCTIONS ********************* */
 
-
-
-
 /**
  * @brief Set main components necessary to the detection
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
-
 
 /**
  * @brief Print help instructions
@@ -170,13 +166,15 @@ static void help(u_int long_help) {
 	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
 	 "          [-n <threads>] [-w <file>] [-j <file>]\n\n"
 	 "Usage:\n"
-	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a device for live capture (comma-separated list)\n"
+	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
+	 "                            | device for live capture (comma-separated list)\n"
 	 "  -f <BPF filter>           | Specify a BPF filter for filtering selected traffic\n"
 	 "  -s <duration>             | Maximum capture duration in seconds (live traffic capture only)\n"
 	 "  -m <duration>             | Split analysis duration in <duration> max seconds\n"
 	 "  -p <file>.protos          | Specify a protocol file (eg. protos.txt)\n"
 	 "  -l <num loops>            | Number of detection loops (test only)\n"
-	 "  -n <num threads>          | Number of threads. Default: number of interfaces in -i. Ignored with pcap files.\n"
+	 "  -n <num threads>          | Number of threads. Default: number of interfaces in -i.\n"
+	 "                            | Ignored with pcap files.\n"
 	 "  -j <file.json>            | Specify a file to write the content of packets in .json format\n"
 #ifdef linux
          "  -g <id:id...>             | Thread affinity mask (one core id per thread)\n"
@@ -188,9 +186,12 @@ static void help(u_int long_help) {
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
 	 "                            | testing purposes in order to compare results across runs\n"
 	 "  -h                        | This help\n"
-	 "  -v <1|2|3>                | Verbose 'unknown protocol' packet print. 1=verbose, 2=very verbose, 3=port stats\n");
+	 "  -v <1|2|3>                | Verbose 'unknown protocol' packet print.\n"
+	 "                            | 1 = verbose\n"
+	 "                            | 2 = very verbose\n"
+	 "                            | 3 = port stats\n");
 
-  #ifndef WIN32
+#ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
 	 "  --extcap-interfaces\n"
 	 "  --extcap-version\n"
@@ -202,7 +203,7 @@ static void help(u_int long_help) {
 	 "  --fifo <path to file or pipe>\n"
 	 "  --debug\n"
 	 );
-  #endif
+#endif
 
   if(long_help) {
     printf("\n\nSupported protocols:\n");
@@ -287,11 +288,8 @@ void extcap_config() {
   /* -i <interface> */
   printf("arg {number=%u}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
-
-#if 0
   printf("arg {number=%u}{call=-i}{display=Pcap File to Analize}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
-#endif
 
   setupDetection(0, NULL);
   ndpi_mod = ndpi_thread_info[0].workflow->ndpi_struct;
