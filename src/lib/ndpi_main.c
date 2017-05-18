@@ -2955,17 +2955,19 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   u_int8_t l4protocol;
   u_int8_t l4_result;
 
-  /* reset payload_packet_len, will be set if ipv4 tcp or udp */
-  flow->packet.payload_packet_len = 0;
-  flow->packet.l4_packet_len = 0;
-  flow->packet.l3_packet_len = packetlen;
+  if (flow) {
+    /* reset payload_packet_len, will be set if ipv4 tcp or udp */
+    flow->packet.payload_packet_len = 0;
+    flow->packet.l4_packet_len = 0;
+    flow->packet.l3_packet_len = packetlen;
 
-  flow->packet.tcp = NULL;
-  flow->packet.udp = NULL;
-  flow->packet.generic_l4_ptr = NULL;
+    flow->packet.tcp = NULL;
+    flow->packet.udp = NULL;
+    flow->packet.generic_l4_ptr = NULL;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  flow->packet.iphv6 = NULL;
+    flow->packet.iphv6 = NULL;
 #endif							/* NDPI_DETECTION_SUPPORT_IPV6 */
+  }
 
   if(flow) {
     ndpi_apply_flow_protocol_to_packet(flow, &flow->packet);
