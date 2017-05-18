@@ -158,7 +158,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/zeromq.c \
 		     protocols/smpp.c \
 		     protocols/tinc.c \
-		     protocols/someip.c \
+		     protocols/SOMEIP.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
 		     third_party/include/ndpi_patricia.h \
