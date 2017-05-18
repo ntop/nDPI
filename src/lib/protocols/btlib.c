@@ -396,7 +396,7 @@ void cb_data(bt_parse_data_cb_t *cbd,int *ret) {
     return;
   }
 
-  if(cbd->buf[0] == 'e' && !cbd->buf[0]) {
+  if(cbd->buf[0] == 'e') {
     p->e_msg = s;
     p->e_len = cbd->v.s.l;
     return;
