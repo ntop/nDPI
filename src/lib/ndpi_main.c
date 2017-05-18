@@ -4277,8 +4277,8 @@ char *ndpi_get_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   if(ip->ipv6.u6_addr.u6_addr32[0] != 0 ||
      ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
-     ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
-     ip->ipv6.u6_addr.u6_addr32[1] != 0) {
+     ip->ipv6.u6_addr.u6_addr32[2] != 0 ||
+     ip->ipv6.u6_addr.u6_addr32[3] != 0) {
 
     const u_int16_t *b = ip->ipv6.u6_addr.u6_addr16;
     snprintf(ndpi_struct->ip_string, 32, "%x:%x:%x:%x:%x:%x:%x:%x",
