@@ -24,6 +24,7 @@
 #include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_SOMEIP
 
+// CR: these MQTT references are no longer relevant, rigth?
 /**
  * The type of control messages in mqtt version 3.1.1
  * see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1
@@ -82,10 +83,13 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	//####Maybe check carrier protocols?####
 
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP search called...\n");
+	// CR: can packet be const?
 	struct ndpi_packet_struct *packet = &flow->packet;
 	if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
 		return;
 	}
+	// CR: let's reach a decision in this issue.
+
 	/*NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP detection...\n");
 	if (flow->packet_counter > 10) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. mandatory header not found!\n");
@@ -115,6 +119,7 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	*/
 
 	// we extract the remaining length
+	// CR: cast the payload to unsigned int, then use ntohl
 	u_int32_t someip_len = (u_int32_t) ((packet->payload[4]<<24) + (packet->payload[5]<<16) + (packet->payload[6]<<8) +packet->payload[7]);
 	if (packet->payload_packet_len != (someip_len + 8)) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. Length field invalid!\n");
@@ -124,6 +129,7 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
 	u_int8_t protocol_version = (u_int8_t) (packet->payload[12]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP protocol version: [%d]\n",protocol_version);
+	// CR: don't use magic numbers, convert this to a constant instead
 	if (protocol_version != 0x01){
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid protocol version!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
@@ -134,6 +140,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
 	u_int8_t message_type = (u_int8_t) (packet->payload[14]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP message type: [%d]\n",message_type);
+
+	// CR: don't use magic numbers, convert these to constants instead
 	if ((message_type != 0x00) && (message_type != 0x01) && (message_type != 0x02) && (message_type != 0x40) && (message_type != 0x41) && 
 					(message_type != 0x42) && (message_type != 0x80) && (message_type != 0x81) && (message_type != 0xc0) && (message_type != 0xc1)) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid message type!\n");
@@ -142,7 +150,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	}
 
 	u_int8_t return_code = (u_int8_t) (packet->payload[15]);
-	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP return code: [%d]\n",return_code);
+	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP return code: [%d]\n", return_code);
+	// CR: don't use magic numbers, convert this to a constant instead
 	if ((return_code > 0x3f)) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid return code!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
@@ -150,10 +159,11 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	}
 	
  	if (message_id == MSG_MAGIC_COOKIE){
+		// CR: don't use magic numbers, convert these to constants instead
 		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
 					(message_type == 0x01) && (return_code == 0x00)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie\n",message_type);
-			ndpi_int_someip_add_connection(ndpi_struct,flow);
+			ndpi_int_someip_add_connection(ndpi_struct, flow);
 			return;
 		}											
 		else{
@@ -164,10 +174,11 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
  	}
 	
 	if (message_id == MSG_MAGIC_COOKIE_ACK){
+		// CR: don't use magic numbers, convert these to constants instead
 		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
 					(message_type == 0x02) && (return_code == 0x00)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie ACK\n",message_type);
-			ndpi_int_someip_add_connection(ndpi_struct,flow);
+			ndpi_int_someip_add_connection(ndpi_struct, flow);
 			return;
 		}											
 		else{
@@ -178,21 +189,26 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
  	}
 
 	if (message_id == MSG_SD){
+		// CR: let's talk about this (i.e. what should be here right now? what documentation should we leave behind?)
 		//####Service Discovery message. Fill in later!####
 	}
+
+	// CR: while this is for demo purposes, the port numbers are as specified in the SOME/IP document, so we should change the
+	// comment to reflect this.
+	// Also, don't use magic numbers, use constants.
 
 	//Filtering by port as per request. This is PURELY for demo purposes and the rest of the check must be filled in later on!
 	if (packet->l4_protocol == IPPROTO_UDP){
 		if ((packet->udp->dest == ntohs(30491)) || (packet->udp->dest == ntohs(30501)) || (packet->udp->dest == ntohs(30490))) {
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
-			ndpi_int_someip_add_connection(ndpi_struct,flow);
+			ndpi_int_someip_add_connection(ndpi_struct, flow);
 			return;
 		}
 	}
 	if (packet->l4_protocol == IPPROTO_TCP){
 		if ((packet->tcp->dest == ntohs(30491)) || (packet->tcp->dest == ntohs(30501))) {
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
-			ndpi_int_someip_add_connection(ndpi_struct,flow);
+			ndpi_int_someip_add_connection(ndpi_struct, flow);
 			return;
 		}
 	}
