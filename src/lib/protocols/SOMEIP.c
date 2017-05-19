@@ -80,6 +80,9 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 {
 
 	//####Maybe check carrier protocols?####
+
+	printf("trying to SOMEIP 1...");
+
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP search called...\n");
 	struct ndpi_packet_struct *packet = &flow->packet;
 	if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
@@ -94,9 +97,15 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	####This block drops flows with over 10 packets. Why? Probably just an auto-drop in case nothing else catches it. Necessary for SOME/IP? Good question.####
 	*/
 
-	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> SOME/IP Service ID: %02x%02x%02x%02x [len: %u]\n",
-			packet->payload[3], packet->payload[2], packet->payload[1], packet->payload[0], packet->payload_packet_len);
-	//####I switched the endianity on these since the Message ID is 32 bit. Might be a wrong move?####
+	//we extract the Message ID and Request ID and check for special cases later
+	u_int32_t message_id = (u_int32_t) ((packet->payload[0]<<24)+(packet->payload[1]<<16)+(packet->payload[2]<<8)+packet->payload[3]);
+	u_int32_t request_id = (u_int32_t) ((packet->payload[8]<<24)+(packet->payload[9]<<16)+(packet->payload[10]<<8)+packet->payload[11]);
+
+
+	printf("trying to SOMEIP 2...");
+
+	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> SOME/IP Message ID: %08x [len: %u]\n",
+			message_id, packet->payload_packet_len);
 	if (packet->payload_packet_len < 16) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. mandatory header not found (not enough data for all fields)\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
@@ -111,18 +120,19 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	*/
 
 
-	
+	printf("trying to SOMEIP 3...");
+
 	// we extract the remaining length
-	u_int32_t someip_len = (u_int32_t) (packet->payload[4]+(packet->payload[5]<<8)+(packet->payload[6]<<16)+(packet->payload[7]<<24));
+	u_int32_t someip_len = (u_int32_t) ((packet->payload[4]<<24) + (packet->payload[5]<<16) + (packet->payload[6]<<8) +packet->payload[7]);
 	if (packet->payload_packet_len != (someip_len + 8)) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. Length field invalid!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
 		return;
 	}
 
+	printf("trying to SOMEIP 4...");
 
-	// check protocol version. ####CHECK IF ENDIANITY IS CORRECT####
-	u_int8_t protocol_version = (u_int8_t) (packet->payload[15]);
+	u_int8_t protocol_version = (u_int8_t) (packet->payload[12]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP protocol version: [%d]\n",protocol_version);
 	if (protocol_version != 0x01){
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid protocol version!\n");
@@ -130,12 +140,11 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		return;
 	}
 
-	//####Read Interface Version, for later use. CHECK IF ENDIANITY IS CORRECT####
-	u_int8_t interface_version = (packet->payload[14]);
-	
+	u_int8_t interface_version = (packet->payload[13]);
 
-	// we extract the message type. ####CHECK IF ENDIANITY IS CORRECT####
-	u_int8_t message_type = (u_int8_t) (packet->payload[13]);
+	printf("trying to SOMEIP 5...");
+
+	u_int8_t message_type = (u_int8_t) (packet->payload[14]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP message type: [%d]\n",message_type);
 	if ((message_type != 0x00) && (message_type != 0x01) && (message_type != 0x02) && (message_type != 0x40) && (message_type != 0x41) && 
 					(message_type != 0x42) && (message_type != 0x80) && (message_type != 0x81) && (message_type != 0xc0) && (message_type != 0xc1)) {
@@ -144,18 +153,17 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		return;
 	}
 
-	// we extract the return code. ####CHECK IF ENDIANITY IS CORRECT####
-	u_int8_t return_code = (u_int8_t) (packet->payload[12]);
+	printf("trying to SOMEIP 6...");
+
+	u_int8_t return_code = (u_int8_t) (packet->payload[15]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP return code: [%d]\n",return_code);
 	if ((return_code > 0x3f)) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid return code!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
 		return;
 	}
-	
-	//we extract the Message ID and Request ID and check for special cases
-	u_int32_t message_id = (u_int32_t) (packet->payload[0]+(packet->payload[1]<<8)+(packet->payload[2]<<16)+(packet->payload[3]<<24));
-	u_int32_t request_id = (u_int32_t) (packet->payload[8]+(packet->payload[9]<<8)+(packet->payload[10]<<16)+(packet->payload[11]<<24));
+
+	printf("trying to SOMEIP 7...");
 	
  	if (message_id == MSG_MAGIC_COOKIE){
 		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
@@ -170,6 +178,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 			return;
 		}
  	}
+
+	printf("trying to SOMEIP 8...");	
 	
 	if (message_id == MSG_MAGIC_COOKIE_ACK){
 		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
@@ -185,6 +195,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		}
  	}
 
+	printf("trying to SOMEIP 9...");
+
 	if (message_id == MSG_SD){
 		//####Service Discovery message. Fill in later!####
 	}
@@ -194,16 +206,18 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		if ((packet->udp->dest == ntohs(30491)) || (packet->udp->dest == ntohs(30501)) || (packet->udp->dest == ntohs(30490))) {
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct,flow);
+			return;
 		}
 	}
 	if (packet->l4_protocol == IPPROTO_TCP){
 		if ((packet->tcp->dest == ntohs(30491)) || (packet->tcp->dest == ntohs(30501))) {
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct,flow);
+			return;
 		}
 	}
-	
 
+	printf("trying to SOMEIP 10...");
 
 
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Reached the end without confirming SOME/IP ...\n");

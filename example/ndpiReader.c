@@ -1114,6 +1114,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);
+  printf("Setting up detection...");
   ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &all);
 
   // clear memory for results
