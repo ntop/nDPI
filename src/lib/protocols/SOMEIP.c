@@ -24,7 +24,6 @@
 #include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_SOMEIP
 
-// CR: these MQTT references are no longer relevant, rigth? ANS: true.
 enum SOMEIP_MESSAGE_TYPES {
 	REQUEST = 0x00,
 	REQUEST_NO_RETURN = 0x01,
@@ -95,25 +94,14 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	//####Maybe check carrier protocols?####
 
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP search called...\n");
-	// CR: can packet be const? ANS: Probably yeah, needs testing but I changed it.
 	struct const ndpi_packet_struct *packet = &flow->packet;
 	if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
 		return;
 	}
-	// CR: let's reach a decision in this issue. ANS: I think it's unnecessary and would get dropped on length checks or whatever, so we can remove this.
-
-	/*NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP detection...\n");
-	if (flow->packet_counter > 10) {
-		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. mandatory header not found!\n");
-		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
-		return;
-	}
-	####This block drops flows with over 10 packets. Why? Probably just an auto-drop in case nothing else catches it. Necessary for SOME/IP? Good question.####
-	*/
 
 	//we extract the Message ID and Request ID and check for special cases later
-	u_int32_t message_id = ntohl(*((u_int32_t *)packet->payload[0]));
-	u_int32_t request_id = ntohl(*((u_int32_t *)packet->payload[8]));
+	u_int32_t message_id = ntohl(*((u_int32_t *)&packet->payload[0]));
+	u_int32_t request_id = ntohl(*((u_int32_t *)&packet->payload[8]));
 
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> SOME/IP Message ID: %08x [len: %u]\n",
 			message_id, packet->payload_packet_len);
@@ -122,17 +110,11 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
 		return;
 	}
-	/*if (packet->payload_packet_len > 258) {
-		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. maximum packet size exceeded!\n");
-		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
-		return;
-	}
-	####Maximum packet size in SOMEIP depends on the carrier protocol, and I'm not certain how well enforced it is, so let's leave that for round 2####
-	*/
+	
+	//####Maximum packet size in SOMEIP depends on the carrier protocol, and I'm not certain how well enforced it is, so let's leave that for round 2####
 
 	// we extract the remaining length
-	// CR: cast the payload to unsigned int, then use ntohl ANS: done
-	u_int32_t someip_len = ntohl(*((u_int32_t *)packet->payload[4]));
+	u_int32_t someip_len = ntohl(*((u_int32_t *)&packet->payload[4]));
 	if (packet->payload_packet_len != (someip_len + 8)) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. Length field invalid!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
@@ -141,7 +123,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
 	u_int8_t protocol_version = (u_int8_t) (packet->payload[12]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP protocol version: [%d]\n",protocol_version);
-	// CR: don't use magic numbers, convert this to a constant instead ANS: done
 	if (protocol_version != LEGAL_PROTOCOL_VERSION){
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid protocol version!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
@@ -153,7 +134,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	u_int8_t message_type = (u_int8_t) (packet->payload[14]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP message type: [%d]\n",message_type);
 
-	// CR: don't use magic numbers, convert these to constants instead ANS: done
 	if ((message_type != REQUEST) && (message_type != REQUEST_NO_RETURN) && (message_type != NOTIFICATION) && (message_type != REQUEST_ACK) && 
 					(message_type != REQUEST_NO_RETURN_ACK) && (message_type != NOTIFICATION_ACK) && (message_type != RESPONSE) && 
 					(message_type != ERROR) && (message_type != RESPONSE_ACK) && (message_type != ERROR_ACK)) {
@@ -164,7 +144,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
 	u_int8_t return_code = (u_int8_t) (packet->payload[15]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP return code: [%d]\n", return_code);
-	// CR: don't use magic numbers, convert this to a constant instead ANS: done
 	if ((return_code >= E_RETURN_CODE_LEGAL_THRESHOLD)) {
 		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid return code!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
@@ -172,7 +151,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	}
 	
  	if (message_id == MSG_MAGIC_COOKIE){
-		// CR: don't use magic numbers, convert these to constants instead ANS:done
 		if ((someip_len == MC_LENGTH) && (request_id == MC_REQUEST_ID) && (interface_version == MC_INTERFACE_VERSION) &&
 					(message_type == REQUEST_NO_RETURN\) && (return_code == E_OK)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie\n",message_type);
@@ -187,7 +165,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
  	}
 	
 	if (message_id == MSG_MAGIC_COOKIE_ACK){
-		// CR: don't use magic numbers, convert these to constants instead ANS: done
 		if ((someip_len == MC_LENGTH) && (request_id == MC_REQUEST_ID) && (interface_version == MC_INTERFACE_VERSION\) &&
 					(message_type == REQUEST_NO_RETURN) && (return_code == E_OK)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie ACK\n",message_type);
@@ -202,13 +179,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
  	}
 
 	if (message_id == MSG_SD){
-		// CR: let's talk about this (i.e. what should be here right now? what documentation should we leave behind?) ANS: a TON of stuff. SD is basically another protocol built ontop SOMEIP. at the very least I expect it to be as long as everything else we've done already.
-		//####Service Discovery message. Fill in later!####
+		NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP-SD currently not supported\n", message_type);
 	}
-
-	// CR: while this is for demo purposes, the port numbers are as specified in the SOME/IP document, so we should change the
-	// comment to reflect this. ANS: done
-	// Also, don't use magic numbers, use constants. ANS: done
 
 	//Filtering by port. 
 	//This check is NOT a 100% thing - these ports are mentioned in the documentation but the documentation also states they haven't been approved by IANA yet, and that the user is free to use different ports.
