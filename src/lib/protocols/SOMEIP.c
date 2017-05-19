@@ -94,7 +94,7 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	//####Maybe check carrier protocols?####
 
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP search called...\n");
-	struct const ndpi_packet_struct *packet = &flow->packet;
+	const struct ndpi_packet_struct *packet = &flow->packet;
 	if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
 		return;
 	}
@@ -152,7 +152,7 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	
  	if (message_id == MSG_MAGIC_COOKIE){
 		if ((someip_len == MC_LENGTH) && (request_id == MC_REQUEST_ID) && (interface_version == MC_INTERFACE_VERSION) &&
-					(message_type == REQUEST_NO_RETURN\) && (return_code == E_OK)){
+					(message_type == REQUEST_NO_RETURN) && (return_code == E_OK)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct, flow);
 			return;
@@ -165,7 +165,7 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
  	}
 	
 	if (message_id == MSG_MAGIC_COOKIE_ACK){
-		if ((someip_len == MC_LENGTH) && (request_id == MC_REQUEST_ID) && (interface_version == MC_INTERFACE_VERSION\) &&
+		if ((someip_len == MC_LENGTH) && (request_id == MC_REQUEST_ID) && (interface_version == MC_INTERFACE_VERSION) &&
 					(message_type == REQUEST_NO_RETURN) && (return_code == E_OK)){
 			NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie ACK\n",message_type);
 			ndpi_int_someip_add_connection(ndpi_struct, flow);
