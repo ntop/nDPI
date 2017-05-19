@@ -2696,7 +2696,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* MQTT */
   init_mqtt_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* MQTT */
+  /* SOME/IP */
   init_someip_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* RX */

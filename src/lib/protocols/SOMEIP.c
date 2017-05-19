@@ -81,8 +81,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
 	//####Maybe check carrier protocols?####
 
-	printf("trying to SOMEIP 1...");
-
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP search called...\n");
 	struct ndpi_packet_struct *packet = &flow->packet;
 	if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
@@ -101,9 +99,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	u_int32_t message_id = (u_int32_t) ((packet->payload[0]<<24)+(packet->payload[1]<<16)+(packet->payload[2]<<8)+packet->payload[3]);
 	u_int32_t request_id = (u_int32_t) ((packet->payload[8]<<24)+(packet->payload[9]<<16)+(packet->payload[10]<<8)+packet->payload[11]);
 
-
-	printf("trying to SOMEIP 2...");
-
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> SOME/IP Message ID: %08x [len: %u]\n",
 			message_id, packet->payload_packet_len);
 	if (packet->payload_packet_len < 16) {
@@ -119,9 +114,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 	####Maximum packet size in SOMEIP depends on the carrier protocol, and I'm not certain how well enforced it is, so let's leave that for round 2####
 	*/
 
-
-	printf("trying to SOMEIP 3...");
-
 	// we extract the remaining length
 	u_int32_t someip_len = (u_int32_t) ((packet->payload[4]<<24) + (packet->payload[5]<<16) + (packet->payload[6]<<8) +packet->payload[7]);
 	if (packet->payload_packet_len != (someip_len + 8)) {
@@ -129,8 +121,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
 		return;
 	}
-
-	printf("trying to SOMEIP 4...");
 
 	u_int8_t protocol_version = (u_int8_t) (packet->payload[12]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP protocol version: [%d]\n",protocol_version);
@@ -142,8 +132,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
 	u_int8_t interface_version = (packet->payload[13]);
 
-	printf("trying to SOMEIP 5...");
-
 	u_int8_t message_type = (u_int8_t) (packet->payload[14]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP message type: [%d]\n",message_type);
 	if ((message_type != 0x00) && (message_type != 0x01) && (message_type != 0x02) && (message_type != 0x40) && (message_type != 0x41) && 
@@ -153,8 +141,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		return;
 	}
 
-	printf("trying to SOMEIP 6...");
-
 	u_int8_t return_code = (u_int8_t) (packet->payload[15]);
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP return code: [%d]\n",return_code);
 	if ((return_code > 0x3f)) {
@@ -162,8 +148,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
 		return;
 	}
-
-	printf("trying to SOMEIP 7...");
 	
  	if (message_id == MSG_MAGIC_COOKIE){
 		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
@@ -178,8 +162,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 			return;
 		}
  	}
-
-	printf("trying to SOMEIP 8...");	
 	
 	if (message_id == MSG_MAGIC_COOKIE_ACK){
 		if ((someip_len == 0x08) && (request_id == 0xDEADBEEF) && (interface_version == 0x01) &&
@@ -194,8 +176,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 			return;
 		}
  	}
-
-	printf("trying to SOMEIP 9...");
 
 	if (message_id == MSG_SD){
 		//####Service Discovery message. Fill in later!####
@@ -216,9 +196,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 			return;
 		}
 	}
-
-	printf("trying to SOMEIP 10...");
-
 
 	NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Reached the end without confirming SOME/IP ...\n");
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
