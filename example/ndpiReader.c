@@ -59,6 +59,7 @@ static FILE *results_file = NULL;
 static char *results_path = NULL;
 static char *_bpf_filter      = NULL; /**< bpf filter  */
 static char *_protoFilePath   = NULL; /**< Protocol file path  */
+static char *_statsFilePath   = NULL; /**< Top stats file path */
 #ifdef HAVE_JSON_C
 static char *_jsonFilePath    = NULL; /**< JSON file path  */
 #endif
@@ -69,6 +70,7 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
+static u_int8_t stats_flag = 0, file_first_time = 1; 
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
@@ -86,12 +88,14 @@ static u_int32_t num_flows;
 
 struct info_pair{
     char addr[48];
+    char protocol[64]; /*l4 protocol*/
     int count;
 };
 
 typedef struct node_a{
     char addr[48];
     int count;
+    char protocol[64]; /*l4 protocol*/
     struct node_a *left, *right;
 }addr_node;
 
@@ -106,6 +110,20 @@ struct port_stats {
 };
 
 struct port_stats *srcStats = NULL, *dstStats = NULL;
+
+// struct to hold port based top statistics
+struct top_stats {  
+  u_int32_t port; /* we'll use this field as the key */
+  char top_ip[48]; /*ip address that is contributed to > 95% of traffic*/
+  char protocol[64]; /*application level protocol of top_ip */
+  u_int32_t num_pkts;
+  float prcnt_pkt; /*percent of packets respect to total packets */
+  u_int32_t num_addr; /*to hold number of distinct IP addresses */
+  UT_hash_handle hh;  /* makes this structure hashable */
+};
+
+struct top_stats *topSrcStats = NULL, *topDstStats = NULL;
+
 
 struct ndpi_packet_trailer {
   u_int32_t magic; /* 0x19682017 */
@@ -189,7 +207,8 @@ static void help(u_int long_help) {
 	 "  -v <1|2|3>                | Verbose 'unknown protocol' packet print.\n"
 	 "                            | 1 = verbose\n"
 	 "                            | 2 = very verbose\n"
-	 "                            | 3 = port stats\n");
+	 "                            | 3 = port stats\n"
+         "  -b <file.json>            | Specify a file to write port based diagnose statistics\n");
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -360,7 +379,7 @@ static void parseOptions(int argc, char **argv) {
   if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
 #endif
 
-  while ((opt = getopt_long(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:", longopts, &option_idx)) != EOF) {
+  while ((opt = getopt_long(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:", longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
@@ -373,6 +392,16 @@ static void parseOptions(int argc, char **argv) {
     case 'i':
     case '3':
       _pcap_file[0] = optarg;
+      break;
+
+    case 'b':
+#ifndef HAVE_JSON_C
+      printf("WARNING: this copy of ndpiReader has been compiled without JSON-C: json export disabled\n");
+#else
+      _statsFilePath = optarg;
+      printf("FILE PATH %s\n",_statsFilePath);
+      stats_flag = 1;
+#endif
       break;
 
     case 'm':
@@ -1189,6 +1218,122 @@ static int info_pair_cmp (const void *_a, const void *_b)
 
 /* *********************************************** */
 
+static int top_stats_sort(void *_a, void *_b) {
+  struct top_stats *a = (struct top_stats*)_a;
+  struct top_stats *b = (struct top_stats*)_b;
+
+  return(b->num_addr - a->num_addr);
+}
+
+/* *********************************************** */
+
+static void deleteTopStats(struct top_stats *stats) {
+  struct top_stats *current_port, *tmp;
+
+  HASH_ITER(hh, stats, current_port, tmp) {
+    HASH_DEL(stats, current_port);
+    free(current_port);
+  }
+}
+
+/* *********************************************** */
+
+/**
+ * @brief Get port based top statistics 
+ */
+static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_int64_t total_packet_count){
+  struct top_stats *s;
+  struct port_stats *sp, *tmp;
+  struct info_pair inf;
+  float pkt_burst;
+  u_int64_t total_ip_addrs = 0;
+
+  /* stats are ordered by packet number */
+  HASH_ITER(hh, stats, sp, tmp){
+    s = (struct top_stats *)malloc(sizeof(struct top_stats));
+    memset(s, 0, sizeof(struct top_stats));
+
+    s->port = sp->port;
+    s->num_pkts = sp->num_pkts; 
+    s->prcnt_pkt = (sp->num_pkts*100.0)/total_packet_count; 
+    s->num_addr = sp->num_addr;
+
+    qsort(&sp->top_ip_addrs[0], MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
+    inf = sp->top_ip_addrs[0];
+
+    if(((inf.count * 100.0)/sp->cumulative_addr) > AGGRESSIVE_PERCENT){
+      strncpy(s->top_ip, inf.addr, sizeof(s->top_ip));
+      strncpy(s->protocol, inf.protocol, sizeof(s->protocol));
+    }
+
+    HASH_ADD_INT(*topStats, port, s);
+
+    total_ip_addrs += sp->num_addr;
+  }
+
+  return total_ip_addrs;
+
+}
+
+/* *********************************************** */
+
+/*
+ * @brief Save Top Stats in json format
+ */
+static void saveTopStats(FILE *fp, struct top_stats *stats, int direction, u_int64_t total_ip_addr){
+#ifdef HAVE_JSON_C
+  struct top_stats *s, *tmp;
+  json_object *jsMain = json_object_new_object();
+  json_object *jArray_filters  = json_object_new_array();
+  int i = 0;
+
+  /* stats for packet burst diagnose */
+  HASH_ITER(hh, stats, s, tmp) {
+
+    if(s->top_ip[0] != '\0'){
+      json_object *jObj_topStats = json_object_new_object();
+      json_object_object_add(jObj_topStats,"port",json_object_new_int(s->port));
+      json_object_object_add(jObj_topStats,"packets.number",json_object_new_int64(s->num_pkts));
+      json_object_object_add(jObj_topStats,"packets.percent",json_object_new_double(s->prcnt_pkt));
+      json_object_object_add(jObj_topStats,"aggressive.ip",json_object_new_string(s->top_ip));
+      
+      json_object_array_add(jArray_filters,jObj_topStats);
+      i++;
+
+      if(i >= 10) break;
+    }
+  }  
+
+  json_object_object_add(jsMain, (direction == DIR_SRC) ? "top.src.pckt.stats" : "top.dst.pckt.stats", jArray_filters);
+
+  /*sort top stats by ip addr count*/
+  HASH_SORT(stats, top_stats_sort);
+
+  jArray_filters  = json_object_new_array();
+  i=0;
+
+  /* stats for ip burst diagnose */
+  HASH_ITER(hh, stats, s, tmp) {
+
+    json_object *jObj_topStats = json_object_new_object();
+    json_object_object_add(jObj_topStats,"port",json_object_new_int(s->port));
+    json_object_object_add(jObj_topStats,"ip.total",json_object_new_int64(s->num_addr));
+    json_object_object_add(jObj_topStats,"ip.percent",json_object_new_double((s->num_addr*100.0)/total_ip_addr));
+
+    json_object_array_add(jArray_filters,jObj_topStats);
+    i++;
+
+    if(i >= 10) break;
+  }
+
+  json_object_object_add(jsMain, (direction == DIR_SRC) ? "top.src.ip.stats" : "top.dst.ip.stats", jArray_filters);
+
+  fprintf(fp,"%s\n",json_object_to_json_string(jsMain));
+#endif
+}
+
+/* *********************************************** */
+
 void printPortStats(struct port_stats *stats) {
   struct port_stats *s, *tmp;
   int i = 0, j = 0;
@@ -1226,6 +1371,7 @@ static void printResults(u_int64_t tot_usec) {
   char buf[32];
 #ifdef HAVE_JSON_C
   FILE *json_fp = NULL;
+  FILE *stats_fp = NULL;
   json_object *jObj_main = NULL, *jObj_trafficStats, *jArray_detProto = NULL, *jObj;
 #endif
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
@@ -1239,10 +1385,10 @@ static void printResults(u_int64_t tot_usec) {
 
     for(i=0; i<NUM_ROOTS; i++) {
       ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_proto_guess_walker, &thread_id);
-      if(verbose == 3) ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], port_stats_walker, &thread_id);
+      if(verbose == 3 || stats_flag) ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], port_stats_walker, &thread_id);
     }
 
-    if(verbose == 3) {
+    if(verbose == 3 || stats_flag) {
       HASH_SORT(srcStats, port_stats_sort);
       HASH_SORT(dstStats, port_stats_sort);
     }
@@ -1474,6 +1620,32 @@ static void printResults(u_int64_t tot_usec) {
     fclose(json_fp);
 #endif
   }
+
+
+  if(stats_flag) {
+#ifdef HAVE_JSON_C
+    u_int64_t total_src_addr = getTopStats(&topSrcStats, srcStats, cumulative_stats.ip_packet_count);
+    u_int64_t total_dst_addr = getTopStats(&topDstStats, dstStats, cumulative_stats.ip_packet_count);
+
+    if(file_first_time && (stats_fp = fopen(_statsFilePath,"w")) == NULL ||
+        !file_first_time && (stats_fp = fopen(_statsFilePath,"a")) == NULL) {
+      printf("Error creating file %s\n", _statsFilePath);
+      stats_flag = 0;
+    } 
+    else {
+      file_first_time = 0;
+
+      saveTopStats(stats_fp, topSrcStats, DIR_SRC, total_src_addr);
+      saveTopStats(stats_fp, topDstStats, DIR_DST, total_dst_addr);
+
+      fclose(stats_fp);
+
+      deleteTopStats(topSrcStats), deleteTopStats(topDstStats);
+      topSrcStats = NULL, topDstStats = NULL;
+    }
+#endif
+  }
+
 
   if(verbose == 3) {
     printf("\n\nSource Ports Stats:\n");
