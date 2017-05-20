@@ -40,6 +40,9 @@
 #define TICK_RESOLUTION          1000
 #define MAX_NUM_IP_ADDRESS          5  /* len of ip address array */
 #define UPDATED_TREE                1
+#define AGGRESSIVE_PERCENT      95.00
+#define DIR_SRC                    10
+#define DIR_DST                    20
 
 // flow tracking
 typedef struct ndpi_flow_info {
