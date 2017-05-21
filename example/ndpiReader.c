@@ -1627,8 +1627,9 @@ static void printResults(u_int64_t tot_usec) {
     u_int64_t total_src_addr = getTopStats(&topSrcStats, srcStats, cumulative_stats.ip_packet_count);
     u_int64_t total_dst_addr = getTopStats(&topDstStats, dstStats, cumulative_stats.ip_packet_count);
 
-    if(file_first_time && (stats_fp = fopen(_statsFilePath,"w")) == NULL ||
-        !file_first_time && (stats_fp = fopen(_statsFilePath,"a")) == NULL) {
+    if((file_first_time && ((stats_fp = fopen(_statsFilePath,"w")) == NULL))
+       ||
+       (!file_first_time && (stats_fp = fopen(_statsFilePath,"a")) == NULL)) {
       printf("Error creating file %s\n", _statsFilePath);
       stats_flag = 0;
     } 
