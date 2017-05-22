@@ -1,4 +1,4 @@
-AC_INIT([libndpi], [1.8.0])
+AC_INIT([libndpi], [2.1.0])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -18,8 +18,7 @@ if test -d ".git"; then :
      # 
      #
      GIT_NUM=`git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
-     GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     GIT_RELEASE="${PACKAGE_VERSION}-${GIT_BRANCH}-${GIT_NUM}-${GIT_TAG}"
+     GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
      GIT_DATE=`date`
