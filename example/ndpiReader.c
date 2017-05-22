@@ -514,7 +514,10 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
-  if(do_capture) extcap_capture();
+  if(do_capture) {
+    quiet_mode = 1;
+    extcap_capture();
+  }
 
   // check parameters
   if(_pcap_file[0] == NULL || strcmp(_pcap_file[0], "") == 0) {
