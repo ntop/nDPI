@@ -399,7 +399,6 @@ static void parseOptions(int argc, char **argv) {
       printf("WARNING: this copy of ndpiReader has been compiled without JSON-C: json export disabled\n");
 #else
       _statsFilePath = optarg;
-      printf("FILE PATH %s\n",_statsFilePath);
       stats_flag = 1;
 #endif
       break;
@@ -1636,9 +1635,12 @@ static void printResults(u_int64_t tot_usec) {
     else {
       file_first_time = 0;
 
+      fprintf(stats_fp,"[\n");
       saveTopStats(stats_fp, topSrcStats, DIR_SRC, total_src_addr);
+      fprintf(stats_fp,",\n");
       saveTopStats(stats_fp, topDstStats, DIR_DST, total_dst_addr);
-
+      fprintf(stats_fp,"]\n");
+      
       fclose(stats_fp);
 
       deleteTopStats(topSrcStats), deleteTopStats(topDstStats);

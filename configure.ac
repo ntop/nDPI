@@ -67,6 +67,7 @@ else
    fi
 fi
 
+dnl> https://github.com/json-c/json-c
 AC_ARG_ENABLE([json-c],
     AS_HELP_STRING([--disable-json-c], [Disable json-c support]))
 
