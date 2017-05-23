@@ -885,9 +885,8 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
 
 static uint32_t crc32_for_byte(uint32_t r) {
   int j;
-
   for(j = 0; j < 8; ++j)
-    r = ((r & 1) ? 0 : ((uint32_t)0xEDB88320L) ^ r >> 1);
+    r = (r & 1? 0: (uint32_t)0xEDB88320L) ^ r >> 1;
   return r ^ (uint32_t)0xFF000000L;
 }
 
@@ -897,8 +896,7 @@ static uint32_t crc32_for_byte(uint32_t r) {
 typedef unsigned long accum_t;
 
 static void init_tables(uint32_t* table, uint32_t* wtable) {
-  size_t i, k, w, j;
-
+  size_t i, j, k, w;
   for(i = 0; i < 0x100; ++i)
     table[i] = crc32_for_byte(i);
   for(k = 0; k < sizeof(accum_t); ++k)
@@ -909,11 +907,10 @@ static void init_tables(uint32_t* table, uint32_t* wtable) {
     }
 }
 
-void ethernet_crc32(const void* data, size_t n_bytes, uint32_t* crc) {
+static void __crc32(const void* data, size_t n_bytes, uint32_t* crc) {
   static uint32_t table[0x100], wtable[0x100*sizeof(accum_t)];
   size_t n_accum = n_bytes/sizeof(accum_t);
   size_t i, j;
-
   if(!*table)
     init_tables(table, wtable);
   for(i = 0; i < n_accum; ++i) {
@@ -921,7 +918,13 @@ void ethernet_crc32(const void* data, size_t n_bytes, uint32_t* crc) {
     for(j = *crc = 0; j < sizeof(accum_t); ++j)
       *crc ^= wtable[(j << 8) + (uint8_t)(a >> 8*j)];
   }
-
   for(i = n_accum*sizeof(accum_t); i < n_bytes; ++i)
     *crc = table[(uint8_t)*crc ^ ((uint8_t*)data)[i]] ^ *crc >> 8;
 }
+
+u_int32_t ethernet_crc32(const void* data, size_t n_bytes) {
+  u_int32_t crc = 0;
+  __crc32(data, n_bytes, &crc);
+  return crc;
+}
+
