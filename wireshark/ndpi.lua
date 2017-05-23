@@ -86,7 +86,7 @@ function slen(str)
    local i = 1
    local len = 0
    local zero = string.char(0)
-   
+
    for i = 1, 16 do
       local c = str:sub(i,i)
 
@@ -94,14 +94,23 @@ function slen(str)
 	 len = len + 1
       else
 	 break
-      end	 
+      end
    end
 
    return(str:sub(1, len))
 end
 
 -- the dissector function callback
+local num_pkts = 0
+
 function ndpi_proto.dissector(tvb, pinfo, tree)
+   num_pkts = num_pkts + 1
+
+   -- Wireshark dissects the packet twice. We ignore the first
+   -- run as on that step the packet is still undecoded
+   -- The trick below avoids to process the packet twice
+   if(num_pkts < pinfo.number) then return end
+
    local pktlen = tvb:len()
    local eth_trailer = f_eth_trailer()
    local magic = tostring(tvb(pktlen-28,4))
@@ -126,22 +135,22 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
       if(compute_flows_stats) then
 	 ndpikey = tostring(slen(name_str))
-	 
+
 	 if(ndpi_protos[ndpikey] == nil) then ndpi_protos[ndpikey] = 0 end
 	 ndpi_protos[ndpikey] = ndpi_protos[ndpikey] + pinfo.len
-	 
+
 	 srckey = tostring(pinfo.src)
 	 dstkey = tostring(pinfo.dst)
-	 
+
 	 flowkey = srckey.." / "..dstkey.." ["..ndpikey.."]"
 	 if(ndpi_flows[flowkey] == nil) then
 	    ndpi_flows[flowkey] = 0
-	    num_ndpi_flows = num_ndpi_flows + 1	    
+	    num_ndpi_flows = num_ndpi_flows + 1
 
 	    if(num_ndpi_flows > max_num_flows) then
 	       -- We need to harvest the flow with least packets beside this new one
 	       local tot_removed = 0
-	       
+
 	       for k,v in pairsByValues(ndpi_flows, asc) do
 		  if(k ~= flowkey) then
 		     table.remove(ndpi_flows, k)
