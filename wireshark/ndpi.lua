@@ -20,6 +20,7 @@ local ndpi_flows             = {}
 local num_ndpi_flows         = 0
 
 local arp_stats              = {}
+local mac_stats              = {}
 local vlan_stats             = {}
 local vlan_found             = false
 
@@ -174,6 +175,9 @@ function ndpi_proto.init()
    -- ARP
    arp_stats              = { }
 
+   -- MAC
+   mac_stats              = { }
+
    -- VLAN
    vlan_stats             = { }
    vlan_found             = false
@@ -324,6 +328,11 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 print("Processing packet "..pinfo.number .. "["..srckey.." / "..dstkey.."]")
       end
 
+      local src_mac = tostring(pinfo.dl_src)
+      local src_ip  = tostring(pinfo.src)
+      if(mac_stats[src_mac] == nil) then mac_stats[src_mac] = {} end
+      mac_stats[src_mac][src_ip] = 1
+      
       local pktlen = tvb:len()
       local eth_trailer = f_eth_trailer()
       local magic = tostring(tvb(pktlen-28,4))
@@ -470,15 +479,53 @@ local function arp_dialog_menu()
       end
    end
 
-   if(vlan_found) then
-      label = label .. "\n\nVLAN\tPackets\n"
-      for k,v in pairsByValues(vlan_stats, rev) do
-	 local pctg = formatPctg((v * 100) / last_processed_packet_number)
-	 label = label .. k .. "\t" .. v .. " pkts [".. pctg .." %]\n"
-      end
-   end
-
    win:set(label)
 end
 
-register_menu("ARP / VLAN",  arp_dialog_menu, MENU_STAT_UNSORTED)
+-- ###############################################
+
+local function mac_vlan_dialog_menu()
+   local win = TextWindow.new("MAC / VLAN Statistics");
+   local label
+   local _macs
+   local num_hosts = 0
+   
+   if(vlan_found) then
+      label = "VLAN\tPackets\n"
+      for k,v in pairsByValues(vlan_stats, rev) do
+	 local pctg = formatPctg((v * 100) / last_processed_packet_number)
+	 label = label .. k .. "\t" .. v .. " pkts [".. pctg .."]\n"
+      end
+   else
+      label = "No VLAN traffic found"
+   end
+
+   -- ##############################
+
+   _macs = {}
+   for mac,v in pairs(mac_stats) do
+      local num = 0
+      
+      for a,b in pairs(v) do
+	 num = num +1
+      end
+
+      _macs[mac] = num
+      num_hosts = num_hosts + num
+   end
+
+   if(num_hosts > 0) then
+      label = label .. "\n\nMAC\t\t# Hosts\tPercentage\n"
+      for k,v in pairsByValues(_macs, rev) do
+	 local pctg = formatPctg((v * 100) / num_hosts)	 
+	 label = label .. k .. "\t" .. v .. "\t".. pctg .."\n"
+      end
+   end
+   
+   win:set(label)
+end
+
+-- ###############################################
+
+register_menu("ARP",  arp_dialog_menu, MENU_STAT_UNSORTED)
+register_menu("MAC / VLAN", mac_vlan_dialog_menu, MENU_STAT_UNSORTED)
