@@ -1788,7 +1788,6 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
   return pcap_handle;
 }
 
-
 /**
  * @brief Check pcap packet
  */
@@ -1868,9 +1867,9 @@ static void pcap_process_packet(u_char *args,
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
-    *crc = 0;
-    ethernet_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer), crc);
-    h.caplen += delta, h.len += delta;
+    *crc = ethernet_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer));
+    h.caplen += delta;
+    h.len += delta;
 
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, "Dumping %u bytes packet\n", h.caplen);
