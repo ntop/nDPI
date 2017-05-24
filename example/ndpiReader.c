@@ -643,10 +643,10 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 
     fprintf(out, "%s%s%s:%u %s %s%s%s:%u ",
 	    (flow->ip_version == 6) ? "[" : "",
-	    flow->lower_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->lower_port),
+	    flow->src_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->src_port),
 	    flow->bidirectional ? "<->" : "->",
 	    (flow->ip_version == 6) ? "[" : "",
-	    flow->upper_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->upper_port)
+	    flow->dst_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->dst_port)
 	    );
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
@@ -681,10 +681,10 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
     jObj = json_object_new_object();
 
     json_object_object_add(jObj,"protocol",json_object_new_string(ipProto2Name(flow->protocol)));
-    json_object_object_add(jObj,"host_a.name",json_object_new_string(flow->lower_name));
-    json_object_object_add(jObj,"host_a.port",json_object_new_int(ntohs(flow->lower_port)));
-    json_object_object_add(jObj,"host_b.name",json_object_new_string(flow->upper_name));
-    json_object_object_add(jObj,"host_b.port",json_object_new_int(ntohs(flow->upper_port)));
+    json_object_object_add(jObj,"host_a.name",json_object_new_string(flow->src_name));
+    json_object_object_add(jObj,"host_a.port",json_object_new_int(ntohs(flow->src_port)));
+    json_object_object_add(jObj,"host_b.name",json_object_new_string(flow->dst_name));
+    json_object_object_add(jObj,"host_b.port",json_object_new_int(ntohs(flow->dst_port)));
 
     if(flow->detected_protocol.master_protocol)
       json_object_object_add(jObj,"detected.master_protocol",json_object_new_int(flow->detected_protocol.master_protocol));
@@ -768,10 +768,10 @@ static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi
 
   flow->detected_protocol = ndpi_guess_undetected_protocol(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 							   flow->protocol,
-							   ntohl(flow->lower_ip),
-							   ntohs(flow->lower_port),
-							   ntohl(flow->upper_ip),
-							   ntohs(flow->upper_port));
+							   ntohl(flow->src_ip),
+							   ntohs(flow->src_port),
+							   ntohl(flow->dst_ip),
+							   ntohs(flow->dst_port));
   // printf("Guess state: %u\n", flow->detected_protocol);
   if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
     ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
@@ -806,6 +806,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 }
 
 /* *********************************************** */
+
 int updateIpTree(const char *key, addr_node **vrootp) {
   addr_node *q;
   addr_node **rootp = vrootp;
@@ -962,16 +963,18 @@ static void deletePortsStats(struct port_stats *stats) {
  * @brief Ports stats
  */
 static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
-  u_int16_t sport, dport;
-  char saddr[48], daddr[48];
-
-  sport = ntohs(flow->lower_port), dport = ntohs(flow->upper_port);
-  strncpy(saddr, flow->lower_name, sizeof(saddr));
-  strncpy(daddr, flow->upper_name, sizeof(daddr));
-
-  updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes);
-  if(flow->dst2src_packets > 0) updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes);
+  if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */		
+	  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
+	  u_int16_t sport, dport;
+	  char saddr[48], daddr[48];
+	  
+	  sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
+	  strncpy(saddr, flow->src_name, sizeof(saddr));
+	  strncpy(daddr, flow->dst_name, sizeof(daddr));
+	  
+	  updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes);
+	  if(flow->dst2src_packets > 0) updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes);
+  }
 }
 
 /* *********************************************** */
