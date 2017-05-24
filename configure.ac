@@ -79,7 +79,15 @@ AS_IF([test "x$enable_json_c" != "xno"], [
               LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
               AC_CHECK_LIB(json-c, json_object_new_object, AC_DEFINE_UNQUOTED(HAVE_JSON_C, 1, [The JSON-C library is present]))
              ],
-             [])
+             [
+		JSONC_HOME="$HOME/json-c"
+	          if test -d "$JSONC_HOME"; then :
+		        CFLAGS="$CFLAGS -I $JSONC_HOME"
+			LDFLAGS="$LDFLAGS $JSONC_HOME/.libs/libjson-c.a"
+    		        AC_MSG_RESULT([Found json-c in $JSONC_HOME])
+		 	AC_DEFINE_UNQUOTED(HAVE_JSON_C, 1, [The JSON-C library is present])
+		  fi
+	     ])
        ])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))

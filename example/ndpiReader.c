@@ -1314,7 +1314,7 @@ static void saveTopStats(FILE *fp, struct top_stats *stats, int direction, u_int
     }
   }  
 
-  json_object_object_add(jsMain, (direction == DIR_SRC) ? "top.src.pckt.stats" : "top.dst.pckt.stats", jArray_filters);
+  json_object_object_add(jsMain, (direction == DIR_SRC) ? "top.src.pkts.stats" : "top.dst.pkts.stats", jArray_filters);
 
   /*sort top stats by ip addr count*/
   HASH_SORT(stats, top_stats_sort);
