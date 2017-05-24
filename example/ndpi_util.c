@@ -511,7 +511,12 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     workflow->stats.total_wire_bytes += rawsize + 24 /* CRC etc */,
       workflow->stats.total_ip_bytes += rawsize;
     ndpi_flow = flow->ndpi_flow;
-    flow->packets++, flow->bytes += rawsize;
+
+    if(src_to_dst_direction)
+      flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
+    else
+      flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
+    
     flow->last_seen = time;
   } else { // flow is NULL
     workflow->stats.total_discarded_bytes++;
@@ -526,8 +531,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 							  ipsize, time, src, dst);
 
   if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
-     || ((proto == IPPROTO_UDP) && (flow->packets > 8))
-     || ((proto == IPPROTO_TCP) && (flow->packets > 10))) {
+     || ((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > 8))
+     || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) {
     /* New protocol detected or give up */
     flow->detection_completed = 1;
 

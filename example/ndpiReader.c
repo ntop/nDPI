@@ -42,6 +42,7 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <assert.h>
+#include <math.h>
 #include "../config.h"
 #include "ndpi_api.h"
 #include "uthash.h"
@@ -662,8 +663,10 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 	      flow->detected_protocol.app_protocol,
 	      ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.app_protocol));
 
-    fprintf(out, "[%u pkts/%llu bytes]",
-	    flow->packets, (long long unsigned int) flow->bytes);
+    fprintf(out, "[%u pkts/%llu bytes ", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
+    fprintf(out, "%s %u pkts/%llu bytes]",
+	    (flow->dst2src_packets > 0) ? "<->" : "->",
+	    flow->dst2src_packets, (long long unsigned int) flow->dst2src_bytes);
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
@@ -702,8 +705,8 @@ static void printFlow(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 			     json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 									flow->detected_protocol.app_protocol)));
 
-    json_object_object_add(jObj,"packets",json_object_new_int(flow->packets));
-    json_object_object_add(jObj,"bytes",json_object_new_int(flow->bytes));
+    json_object_object_add(jObj,"packets",json_object_new_int(flow->src2dst_packets + flow->dst2src_packets));
+    json_object_object_add(jObj,"bytes",json_object_new_int(flow->src2dst_bytes + flow->dst2src_bytes));
 
     if(flow->host_server_name[0] != '\0')
       json_object_object_add(jObj,"host.server.name",json_object_new_string(flow->host_server_name));
@@ -796,8 +799,8 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     }
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
-    ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.app_protocol]       += flow->packets;
-    ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[flow->detected_protocol.app_protocol] += flow->bytes;
+    ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.app_protocol]       += flow->src2dst_packets + flow->dst2src_packets;
+    ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[flow->detected_protocol.app_protocol] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.protocol_flows[flow->detected_protocol.app_protocol]++;
   }
 }
@@ -898,17 +901,20 @@ void updateTopIpAddress(const char *addr, int count, struct info_pair top[], int
 }
 
 /* *********************************************** */
-static void updatePortStats(struct port_stats **stats, u_int32_t port, const char *addr, u_int32_t num_pkts, u_int32_t num_bytes) {
+
+static void updatePortStats(struct port_stats **stats, u_int32_t port,
+			    const char *addr, u_int32_t num_pkts,
+			    u_int32_t num_bytes) {
   struct port_stats *s;
-  int count=0;
+  int count = 0;
   
   HASH_FIND_INT(*stats, &port, s);
   if(s == NULL) {
     s = (struct port_stats*)malloc(sizeof(struct port_stats));
     if(!s) return;
 
-    s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes;
-    s->num_addr = 1, s->cumulative_addr = 1;
+    s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes,
+      s->num_addr = 1, s->cumulative_addr = 1;
 
     memset(s->top_ip_addrs, 0, MAX_NUM_IP_ADDRESS*sizeof(struct info_pair));
     updateTopIpAddress(addr, 1, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
@@ -958,15 +964,14 @@ static void deletePortsStats(struct port_stats *stats) {
 static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t sport, dport;
-  char saddr[48];
-  char daddr[48];
+  char saddr[48], daddr[48];
 
   sport = ntohs(flow->lower_port), dport = ntohs(flow->upper_port);
   strncpy(saddr, flow->lower_name, sizeof(saddr));
   strncpy(daddr, flow->upper_name, sizeof(daddr));
 
-  updatePortStats(&srcStats, sport, saddr, flow->packets, flow->bytes);
-  updatePortStats(&dstStats, dport, daddr, flow->packets, flow->bytes);
+  updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes);
+  if(flow->dst2src_packets > 0) updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes);
 }
 
 /* *********************************************** */
@@ -1257,7 +1262,7 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_
 
     s->port = sp->port;
     s->num_pkts = sp->num_pkts; 
-    s->prcnt_pkt = (sp->num_pkts*100.0)/total_packet_count; 
+    s->prcnt_pkt = (sp->num_pkts*100.0)/total_packet_count;
     s->num_addr = sp->num_addr;
 
     qsort(&sp->top_ip_addrs[0], MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
