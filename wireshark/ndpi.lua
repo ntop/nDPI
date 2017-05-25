@@ -24,6 +24,8 @@ local mac_stats              = {}
 local vlan_stats             = {}
 local vlan_found             = false
 
+local syn                    = {}
+local synack                 = {}
 local lower_ndpi_flow_id     = 0
 local lower_ndpi_flow_volume = 0
 
@@ -209,6 +211,10 @@ function ndpi_proto.init()
    -- VLAN
    vlan_stats             = { }
    vlan_found             = false
+
+   -- TCP
+   syn                    = {}
+   synack                 = {}   
 end
 
 function slen(str)
@@ -307,6 +313,22 @@ function dissectARP(isRequest, src_mac, dst_mac)
 end
 
 -- ###############################################
+
+function abstime_diff(a, b)
+   local secs1, frac1 = math.modf(a)
+   local secs2, frac2 = math.modf(b)
+   local diff   
+   local diff_sec = secs1 - secs2
+   local diff_res = frac1 - frac2
+
+   if(diff_res < 0) then diff_sec = diff_sec + 1 end
+   
+   return(diff_sec + diff_res)   
+end
+
+-- ###############################################
+
+local field_tcp_flags = Field.new('tcp.flags')
 
 -- the dissector function callback
 function ndpi_proto.dissector(tvb, pinfo, tree)
@@ -418,15 +440,53 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 end
       end -- nDPI
 
+
+      local _tcp_flags = field_tcp_flags()
+
+      if(_tcp_flags ~= nil) then
+	 local key
+	 local tcp_flags = field_tcp_flags().value
+	 local secs, frac = math.modf(pinfo.abs_ts)
+
+	 local age = os.difftime(os.clock(), pinfo.abs_ts)
+	 
+	 tcp_flags = tonumber(tcp_flags)
+	 
+	 if(tcp_flags == 2) then
+	    -- SYN
+	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
+	    syn[key] = pinfo.abs_ts
+	    -- print("SYN @ ".. pinfo.abs_ts.." "..key)
+    
+	 elseif(tcp_flags == 18) then
+	    -- SYN|ACK
+	    key = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
+	    -- print("SYN|ACK @ ".. pinfo.abs_ts.." "..key)
+	    synack[key] = pinfo.abs_ts
+	    print("Client RTT --> ".. abstime_diff(synack[key], syn[key]) .. " sec")
+	    table.remove(syn, key)
+	 elseif(tcp_flags == 16) then
+	    -- ACK
+	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
+	    -- print("ACK @ ".. pinfo.abs_ts.." "..key)
+	    	    
+	    if(synack[key] ~= nil) then
+	       print("Server RTT --> ".. abstime_diff(pinfo.abs_ts, synack[key]) .. " sec")
+	       table.remove(synack, key)
+	    end
+
+	 end
+      end
+      
       if(debug) then
 	 local fields  = { }
 	 local _fields = { all_field_infos() }
-
-	 fields['pinfo.number'] = pinfo.number
-
+	 
+	 -- fields['pinfo.number'] = pinfo.number
+	 
 	 for k,v in pairs(_fields) do
 	    local value = getstring(v)
-
+	    
 	    if(value ~= nil) then
 	       fields[v.name] = value
 	    end
