@@ -79,6 +79,34 @@ end
 
 -- ###############################################
 
+string.split = function(s, p)
+  local temp = {}
+  local index = 0
+  local last_index = string.len(s)
+
+  while true do
+    local i, e = string.find(s, p, index)
+
+    if i and e then
+      local next_index = e + 1
+      local word_bound = i - 1
+      table.insert(temp, string.sub(s, index, word_bound))
+      index = next_index
+    else
+      if index > 0 and index <= last_index then
+	table.insert(temp, string.sub(s, index, last_index))
+      elseif index == 0 then
+	temp = nil
+      end
+      break
+    end
+  end
+
+  return temp
+end
+
+-- ###############################################
+
 -- Convert bytes to human readable format
 function bytesToSize(bytes)
    if(bytes == nil) then
@@ -455,7 +483,7 @@ end
 
 local function arp_dialog_menu()
    local win = TextWindow.new("ARP Statistics");
-   local label
+   local label = ""
    local _stats
    local found = false
 
@@ -471,11 +499,13 @@ local function arp_dialog_menu()
       label = "No ARP Traffic detected"
    else
       label = "Top ARP Senders/Receivers\n\nMAC Address\tTot Pkts\tPctg\tARP Breakdown\n"
+      i = 0
       for k,v in pairsByValues(_stats, rev) do
 	 local s = arp_stats[k]
 	 local pctg = formatPctg((v * 100) / last_processed_packet_number)
 	 local str = k .. "\t" .. v .. "\t" .. pctg .. "\t" .. "[sent: ".. (s.request_sent + s.response_sent) .. "][rcvd: ".. (s.request_rcvd + s.response_rcvd) .. "]\n"
 	 label = label .. str
+	 if(i == max_num_entries) then break else i = i + 1 end	 
       end
    end
 
@@ -484,42 +514,70 @@ end
 
 -- ###############################################
 
-local function mac_vlan_dialog_menu()
-   local win = TextWindow.new("MAC / VLAN Statistics");
-   local label
+local function vlan_dialog_menu()
+   local win = TextWindow.new("VLAN Statistics");
+   local label = ""
    local _macs
    local num_hosts = 0
    
    if(vlan_found) then
+      i = 0
       label = "VLAN\tPackets\n"
       for k,v in pairsByValues(vlan_stats, rev) do
 	 local pctg = formatPctg((v * 100) / last_processed_packet_number)
 	 label = label .. k .. "\t" .. v .. " pkts [".. pctg .."]\n"
+	 if(i == max_num_entries) then break else i = i + 1 end	 
       end
    else
       label = "No VLAN traffic found"
    end
 
-   -- ##############################
+   win:set(label)
+end
+
+-- ###############################################
+
+local function ip_mac_dialog_menu()
+   local win = TextWindow.new("IP-MAC Statistics");
+   local label = ""
+   local _macs, _manufacturers
+   local num_hosts = 0
 
    _macs = {}
+   _manufacturers = {}
    for mac,v in pairs(mac_stats) do
       local num = 0
-      
+      local m =  string.split(mac, "_") 
+
       for a,b in pairs(v) do
 	 num = num +1
       end
 
       _macs[mac] = num
+      if(_manufacturers[m[1]] == nil) then _manufacturers[m[1]] = 0 end
+      _manufacturers[m[1]] = _manufacturers[m[1]] + 1
       num_hosts = num_hosts + num
    end
 
    if(num_hosts > 0) then
-      label = label .. "\n\nMAC\t\t# Hosts\tPercentage\n"
+      i = 0
+      label = label .. "MAC\t\t# Hosts\tPercentage\n"
       for k,v in pairsByValues(_macs, rev) do
 	 local pctg = formatPctg((v * 100) / num_hosts)	 
 	 label = label .. k .. "\t" .. v .. "\t".. pctg .."\n"
+	 if(i == max_num_entries) then break else i = i + 1 end	 
       end
+
+
+      i = 0
+      label = label .. "\n\nManufacturer\t# Hosts\tPercentage\n"
+      for k,v in pairsByValues(_manufacturers, rev) do
+	 local pctg = formatPctg((v * 100) / num_hosts)	 
+	 label = label .. k .. "\t\t" .. v .. "\t".. pctg .."\n"
+	 if(i == max_num_entries) then break else i = i + 1 end	 
+      end
+   else
+      label = label .. "\nIP-MAC traffic found"
    end
    
    win:set(label)
@@ -528,4 +586,5 @@ end
 -- ###############################################
 
 register_menu("ARP",  arp_dialog_menu, MENU_STAT_UNSORTED)
-register_menu("MAC / VLAN", mac_vlan_dialog_menu, MENU_STAT_UNSORTED)
+register_menu("VLAN", vlan_dialog_menu, MENU_STAT_UNSORTED)
+register_menu("IP-MAC", ip_mac_dialog_menu, MENU_STAT_UNSORTED)
