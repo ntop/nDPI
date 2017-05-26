@@ -1321,11 +1321,11 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 /*
  * @brief Save Top Stats in json format
  */
 static void saveTopStats(json_object **jObj_group, struct top_stats *stats, int direction, u_int64_t total_ip_addr){
-#ifdef HAVE_JSON_C
   struct top_stats *s, *tmp;
   json_object *jArray_stats  = json_object_new_array();
   int i = 0;
@@ -1374,8 +1374,8 @@ static void saveTopStats(json_object **jObj_group, struct top_stats *stats, int 
 
   json_object_object_add(*jObj_group, (direction == DIR_SRC) ? 
           "top.src.ip.stats" : "top.dst.ip.stats", jArray_stats);
-#endif
 }
+#endif
 
 /* *********************************************** */
 
