@@ -4,14 +4,21 @@
 -- This plugin is part of nDPI (https://github.com/ntop/nDPI)
 --
 --
+
+
 local ndpi_proto = Proto("ndpi", "nDPI", "nDPI Protocol Interpreter")
-
 ndpi_proto.fields = {}
-local fds = ndpi_proto.fields
+local ndpi_fds = ndpi_proto.fields
+ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
+ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
+ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
 
-fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
-fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
-fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
+
+local ntop_proto = Proto("ntop", "ntop", "ntop Extensions")
+ntop_proto.fields = {}
+local ntop_fds = ntop_proto.fields
+ntop_fds.client_nw_rtt = ProtoField.new("TCP client network RTT (msec)", "ntop.latency.client_rtt", ftypes.FLOAT, nil, base.NONE)
+ntop_fds.server_nw_rtt = ProtoField.new("TCP server network RTT (msec)", "ntop.latency.server_rtt", ftypes.FLOAT, nil, base.NONE)
 
 local f_eth_trailer = Field.new("eth.trailer")
 
@@ -395,9 +402,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 local name_str = name:string(ENC_ASCII)
 	 local ndpikey, srckey, dstkey, flowkey
 
-	 ndpi_subtree:add(fds.network_protocol, network_protocol)
-	 ndpi_subtree:add(fds.application_protocol, application_protocol)
-	 ndpi_subtree:add(fds.name, name)
+	 ndpi_subtree:add(ndpi_fds.network_protocol, network_protocol)
+	 ndpi_subtree:add(ndpi_fds.application_protocol, application_protocol)
+	 ndpi_subtree:add(ndpi_fds.name, name)
 
 	 local pname = ""..application_protocol
 	 if(pname ~= "0000") then
@@ -446,33 +453,41 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       if(_tcp_flags ~= nil) then
 	 local key
 	 local tcp_flags = field_tcp_flags().value
-	 local secs, frac = math.modf(pinfo.abs_ts)
-
-	 local age = os.difftime(os.clock(), pinfo.abs_ts)
 	 
 	 tcp_flags = tonumber(tcp_flags)
 	 
 	 if(tcp_flags == 2) then
 	    -- SYN
+	    if(debug) then print("SYN @ ".. pinfo.abs_ts.." "..key) end
+	    
 	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
 	    syn[key] = pinfo.abs_ts
-	    -- print("SYN @ ".. pinfo.abs_ts.." "..key)
-    
 	 elseif(tcp_flags == 18) then
 	    -- SYN|ACK
+	    if(debug) then print("SYN|ACK @ ".. pinfo.abs_ts.." "..key) end
+
 	    key = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
-	    -- print("SYN|ACK @ ".. pinfo.abs_ts.." "..key)
 	    synack[key] = pinfo.abs_ts
-	    print("Client RTT --> ".. abstime_diff(synack[key], syn[key]) .. " sec")
-	    table.remove(syn, key)
+	    if(syn[key] ~= nil) then
+	       local diff = abstime_diff(synack[key], syn[key]) * 1000 -- msec
+	       
+	       if(debug) then print("Client RTT --> ".. diff .. " sec") end
+	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+	       ntop_subtree:add(ntop_fds.client_nw_rtt, diff)
+	       -- syn[key] = nil
+	    end
 	 elseif(tcp_flags == 16) then
 	    -- ACK
+	    if(debug) then print("ACK @ ".. pinfo.abs_ts.." "..key) end
+	    
 	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
-	    -- print("ACK @ ".. pinfo.abs_ts.." "..key)
-	    	    
+    	    
 	    if(synack[key] ~= nil) then
-	       print("Server RTT --> ".. abstime_diff(pinfo.abs_ts, synack[key]) .. " sec")
-	       table.remove(synack, key)
+	       local diff = abstime_diff(pinfo.abs_ts, synack[key]) * 1000 -- msec
+	       if(debug) then print("Server RTT --> ".. diff .. " sec") end
+	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+	       ntop_subtree:add(ntop_fds.server_nw_rtt, diff)
+	       -- synack[key] = nil
 	    end
 
 	 end
@@ -608,14 +623,23 @@ local function ip_mac_dialog_menu()
    for mac,v in pairs(mac_stats) do
       local num = 0
       local m =  string.split(mac, "_") 
+      local manuf
 
+      if(m == nil) then
+	 m =  string.split(mac, ":")
+	 
+	 manuf = m[1]..":"..m[2]..":"..m[3]
+      else
+	 manuf = m[1]
+      end
+      
       for a,b in pairs(v) do
 	 num = num +1
       end
 
       _macs[mac] = num
-      if(_manufacturers[m[1]] == nil) then _manufacturers[m[1]] = 0 end
-      _manufacturers[m[1]] = _manufacturers[m[1]] + 1
+      if(_manufacturers[manuf] == nil) then _manufacturers[manuf] = 0 end
+      _manufacturers[manuf] = _manufacturers[manuf] + 1
       num_hosts = num_hosts + num
    end
 
