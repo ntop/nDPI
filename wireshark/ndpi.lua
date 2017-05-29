@@ -421,7 +421,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    srckey = tostring(pinfo.src)
 	    dstkey = tostring(pinfo.dst)
 
-	    flowkey = srckey.." / "..dstkey.." ["..ndpikey.."]"
+	    flowkey = srckey.." / "..dstkey.."\t["..ndpikey.."]"
 	    if(ndpi_flows[flowkey] == nil) then
 	       ndpi_flows[flowkey] = 0
 	       num_ndpi_flows = num_ndpi_flows + 1
@@ -524,13 +524,18 @@ local function ndpi_dialog_menu()
    local i
 
    if(ndpi_protos ~= {}) then
+      local tot = 0
       label =          "nDPI Protocol Breakdown\n"
       label = label .. "-----------------------\n"
 
+      for _,v in pairs(ndpi_protos) do
+	 tot = tot + v
+      end
+
       i = 0
       for k,v in pairsByValues(ndpi_protos, rev) do
-	 -- label = label .. k .. "\t".. bytesToSize(v) .. "\n"
-	 label = label .. string.format("%-32s\t%s\n", k, bytesToSize(v))
+	 local pctg = formatPctg((v * 100) / tot)
+	 label = label .. string.format("%-32s\t\t%s\t", k, bytesToSize(v)).. "\t["..pctg.."]\n"
 	 if(i == max_num_entries) then break else i = i + 1 end
       end
 
@@ -540,7 +545,8 @@ local function ndpi_dialog_menu()
       label = label .. "-----------\n"
       i = 0
       for k,v in pairsByValues(ndpi_flows, rev) do
-	 label = label .. string.format("%-32s\t%s\n", k, bytesToSize(v))
+	 local pctg = formatPctg((v * 100) / tot)
+	 label = label .. string.format("%-48s\t%s", k, bytesToSize(v)).. "\t["..pctg.."]\n"
 	 if(i == max_num_entries) then break else i = i + 1 end
       end
 
