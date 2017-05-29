@@ -25,6 +25,7 @@
 #define __NDPI_TYPEDEFS_H__
 
 #include "ndpi_define.h"
+#include "../lib/third_party/include/libcache.h"
 
 #define BT_ANNOUNCE
 #define SNAP_EXT
@@ -328,6 +329,18 @@ struct bt_announce {              // 192 bytes
   u_int8_t		name_len,
     name[192 - 4*10 - 2 - 1];     // 149 bytes
 };
+#endif
+
+#ifdef NDPI_PROTOCOL_TINC
+
+#define TINC_CACHE_MAX_SIZE 100
+
+typedef struct {
+  u_int32_t src_address;
+  u_int32_t dst_address;
+  u_int16_t dst_port;
+} tinc_cache_entry_t;
+
 #endif
 
 typedef enum {
@@ -878,6 +891,9 @@ struct ndpi_detection_module_struct {
   int    bt_ann_len;
 #endif
 #endif
+#ifdef NDPI_PROTOCOL_TINC
+  cache_t *tinc_cache;
+#endif
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
@@ -1052,6 +1068,11 @@ struct ndpi_flow_struct {
   u_int8_t ovpn_session_id[8];
   u_int8_t ovpn_counter;
 #endif
+#ifdef NDPI_PROTOCOL_TINC
+  u_int8_t tinc_state;
+  tinc_cache_entry_t tinc_cache_entry;
+#endif
+
 
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;

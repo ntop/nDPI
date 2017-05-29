@@ -247,10 +247,7 @@
 #define NDPI_PROTOCOL_SMPP 	         207 /* Damir Franusic <df@release14.org> */
 
 #define NDPI_PROTOCOL_DNSCRYPT           208
-
-/* 209 free */
-#define NDPI_PROTOCOL_FREE_209           209
-
+#define NDPI_PROTOCOL_TINC	         209 /* William Guglielmo <william@deselmo.com> */
 #define NDPI_PROTOCOL_DEEZER 	         210
 #define NDPI_PROTOCOL_INSTAGRAM 	 211 /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */
 #define NDPI_PROTOCOL_MICROSOFT 	 212
