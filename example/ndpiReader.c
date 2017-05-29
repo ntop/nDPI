@@ -312,7 +312,7 @@ void extcap_config() {
   /* -i <interface> */
   printf("arg {number=%u}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
-  printf("arg {number=%u}{call=-i}{display=Pcap File to Analize}{type=fileselect}"
+  printf("arg {number=%u}{call=-i}{display=Pcap File to Analyze}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 
   setupDetection(0, NULL);
