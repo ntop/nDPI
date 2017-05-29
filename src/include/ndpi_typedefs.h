@@ -333,7 +333,7 @@ struct bt_announce {              // 192 bytes
 
 #ifdef NDPI_PROTOCOL_TINC
 
-#define TINC_CACHE_MAX_SIZE 100
+#define TINC_CACHE_MAX_SIZE 10
 
 typedef struct {
   u_int32_t src_address;
