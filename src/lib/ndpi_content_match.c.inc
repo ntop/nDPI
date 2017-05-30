@@ -8100,12 +8100,12 @@ ndpi_protocol_match host_match[] = {
   { ".snapads.",			"Snapchat",             NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
 
   /* Detected "instagram.c10r.facebook.com". Omitted "*amazonaws.com" and "*facebook.com" CDNs e.g. "ig-telegraph-shv-04-frc3.facebook.com" */
-  { ".cdninstagram.com",                "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
-  { "instagram.",                       "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
-  { ".instagram.",                      "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
-  { "igcdn-photos-",                    "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
-  { "instagramimages-",                 "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
-  { "instagramstatic-",                 "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+  { ".cdninstagram.com",                "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "instagram.",                       "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { ".instagram.",                      "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "igcdn-photos-",                    "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "instagramimages-",                 "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "instagramstatic-",                 "Instagram",            NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
   { ".waze.com",                        "Waze",                 NDPI_PROTOCOL_WAZE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
