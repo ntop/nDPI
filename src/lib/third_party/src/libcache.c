@@ -1,3 +1,11 @@
+/**
+ * @file libcache.c
+ * @author William Guglielmo
+ * @brief File containing implementation of cache_t type.
+ *
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -7,6 +15,7 @@
 
 
 // https://en.wikipedia.org/wiki/Jenkins_hash_function
+#define HASH_FUNCTION jenkins_one_at_a_time_hash
 uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
   size_t i = 0;
   uint32_t hash = 0;
@@ -21,19 +30,62 @@ uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
   return hash;
 }
 
-cache_entry_map *cache_entry_map_new() {
-  return (cache_entry_map *) calloc(sizeof(cache_entry_map), 1);
-}
-cache_entry *cache_entry_new() {
-  return (cache_entry *) calloc(sizeof(cache_entry), 1);
+
+typedef struct cache_entry *cache_entry;
+
+typedef struct cache_entry_map *cache_entry_map;
+
+struct cache_t {
+  uint32_t size;
+  uint32_t max_size;
+  cache_entry head;
+  cache_entry tail;
+  cache_entry_map *map;
+};
+
+struct cache_entry_map {
+  cache_entry entry;
+  cache_entry_map next;
+};
+
+struct cache_entry {
+  void *item;
+  uint32_t item_size;
+  cache_entry prev;
+  cache_entry next;
+};
+
+
+void cache_touch_entry(cache_t cache, cache_entry entry) {
+  if(entry->prev) {
+    if(entry->next) {
+      entry->prev->next = entry->next;
+      entry->next->prev = entry->prev;
+    } else {
+      entry->prev->next = NULL;
+      cache->tail = entry->prev;
+    }
+    entry->prev = NULL;
+    entry->next = cache->head;
+    cache->head->prev = entry;
+    cache->head = entry;
+  }
 }
 
-cache_t *cache_new(uint32_t cache_max_size) {
+
+cache_entry cache_entry_new() {
+  return (cache_entry) calloc(sizeof(struct cache_entry), 1);
+}
+cache_entry_map cache_entry_map_new() {
+  return (cache_entry_map) calloc(sizeof(struct cache_entry_map), 1);
+}
+
+cache_t cache_new(uint32_t cache_max_size) {
   if(!cache_max_size) {
     return NULL;
   }
 
-  cache_t *cache = (cache_t *) calloc(sizeof(cache_t), 1);
+  cache_t cache = (cache_t) calloc(sizeof(struct cache_t), 1);
   if(!cache) {
     return NULL;
   }
@@ -41,7 +93,7 @@ cache_t *cache_new(uint32_t cache_max_size) {
   cache->size = 0;
   cache->max_size = cache_max_size;
 
-  cache->map = (cache_entry_map **) calloc(sizeof(cache_entry_map *), cache->max_size);
+  cache->map = (cache_entry_map *) calloc(sizeof(cache_entry_map ), cache->max_size);
 
   if(!cache->map) {
     free(cache);
@@ -51,15 +103,15 @@ cache_t *cache_new(uint32_t cache_max_size) {
   return cache;
 }
 
-cache_result cache_add(cache_t *cache, void *item, uint32_t item_size) {
+cache_result cache_add(cache_t cache, void *item, uint32_t item_size) {
   if(!cache || !item || !item_size) {
     return CACHE_INVALID_INPUT;
   }
 
-  uint32_t hash = jenkins_one_at_a_time_hash(item, item_size) % cache->max_size;
+  uint32_t hash = HASH_FUNCTION(item, item_size) % cache->max_size;
 
   if((cache->map)[hash]) {
-    cache_entry_map *hash_entry_map = cache->map[hash];
+    cache_entry_map hash_entry_map = cache->map[hash];
     while(hash_entry_map) {
       if(item_size == hash_entry_map->entry->item_size &&
           !memcmp(hash_entry_map->entry->item, item, item_size)) {
@@ -70,32 +122,19 @@ cache_result cache_add(cache_t *cache, void *item, uint32_t item_size) {
     }
 
     if(hash_entry_map) {
-      cache_entry *entry = hash_entry_map->entry;
-      if(entry->prev) {
-        if(entry->next) {
-          entry->prev->next = entry->next;
-          entry->next->prev = entry->prev;
-        } else {
-          entry->prev->next = NULL;
-          cache->tail = entry->prev;
-        }
-        entry->prev = NULL;
-        entry->next = cache->head;
-        cache->head->prev = entry;
-        cache->head = entry;
-      }
+      cache_touch_entry(cache, hash_entry_map->entry);
 
       return CACHE_NO_ERROR;
     }
   }
 
   
-  cache_entry *entry = cache_entry_new();
+  cache_entry entry = cache_entry_new();
   if(!entry) {
     return CACHE_MALLOC_ERROR;
   }
 
-  cache_entry_map *map_entry = cache_entry_map_new();
+  cache_entry_map map_entry = cache_entry_map_new();
   if(!map_entry) {
     free(entry);
     return CACHE_MALLOC_ERROR;
@@ -121,12 +160,12 @@ cache_result cache_add(cache_t *cache, void *item, uint32_t item_size) {
       cache->tail = entry;
     }
   } else {
-    cache_entry *tail = cache->tail;
+    cache_entry tail = cache->tail;
 
-    uint32_t hash = jenkins_one_at_a_time_hash(tail->item, tail->item_size) % cache->max_size;
+    uint32_t hash = HASH_FUNCTION(tail->item, tail->item_size) % cache->max_size;
     if(cache->map[hash]) {
-      cache_entry_map *hash_entry_map_prev = NULL;
-      cache_entry_map *hash_entry_map = cache->map[hash];
+      cache_entry_map hash_entry_map_prev = NULL;
+      cache_entry_map hash_entry_map = cache->map[hash];
       while(hash_entry_map) {
         if(tail->item_size == hash_entry_map->entry->item_size &&
             !memcmp(tail->item, hash_entry_map->entry->item, item_size)) {
@@ -155,18 +194,20 @@ cache_result cache_add(cache_t *cache, void *item, uint32_t item_size) {
   return CACHE_NO_ERROR;
 }
 
-cache_result cache_contains(cache_t *cache, void *item, uint32_t item_size) {
+cache_result cache_contains(cache_t cache, void *item, uint32_t item_size) {
   if(!cache || !item || !item_size) {
     return CACHE_INVALID_INPUT;
   }
 
-  uint32_t hash = jenkins_one_at_a_time_hash(item, item_size) % cache->max_size;
+  uint32_t hash = HASH_FUNCTION(item, item_size) % cache->max_size;
 
   if(cache->map[hash]) {
-    cache_entry_map *hash_entry_map = cache->map[hash];
+    cache_entry_map hash_entry_map = cache->map[hash];
     while(hash_entry_map) {
       if(item_size == hash_entry_map->entry->item_size &&
           !memcmp(hash_entry_map->entry->item, item, item_size)) {
+        cache_touch_entry(cache, hash_entry_map->entry);
+
         return CACHE_CONTAINS_TRUE;
       }
       
@@ -177,16 +218,16 @@ cache_result cache_contains(cache_t *cache, void *item, uint32_t item_size) {
   return CACHE_CONTAINS_FALSE;
 }
 
-cache_result cache_remove(cache_t *cache, void *item, uint32_t item_size) {
+cache_result cache_remove(cache_t cache, void *item, uint32_t item_size) {
   if(!cache || !item || !item_size) {
     return CACHE_INVALID_INPUT;
   }
 
-  uint32_t hash = jenkins_one_at_a_time_hash(item, item_size) % cache->max_size;
+  uint32_t hash = HASH_FUNCTION(item, item_size) % cache->max_size;
 
   if(cache->map[hash]) {
-    cache_entry_map *hash_entry_map_prev = NULL;
-    cache_entry_map *hash_entry_map = cache->map[hash];
+    cache_entry_map hash_entry_map_prev = NULL;
+    cache_entry_map hash_entry_map = cache->map[hash];
     while(hash_entry_map) {
       if(item_size == hash_entry_map->entry->item_size &&
           !memcmp(hash_entry_map->entry->item, item, item_size)) {
@@ -205,7 +246,7 @@ cache_result cache_remove(cache_t *cache, void *item, uint32_t item_size) {
         cache->map[hash] = hash_entry_map->next;
       }
 
-      cache_entry *entry = hash_entry_map->entry;
+      cache_entry entry = hash_entry_map->entry;
 
       if(entry->prev) {
         entry->prev->next = entry->next;
@@ -230,15 +271,15 @@ cache_result cache_remove(cache_t *cache, void *item, uint32_t item_size) {
   return CACHE_REMOVE_NOT_FOUND;
 }
 
-void cache_free(cache_t *cache) {
+void cache_free(cache_t cache) {
   if(!cache) {
     return;
   }
 
   int i;
   for(i = 0; i < cache->max_size; i++) {
-    cache_entry_map *prev = NULL;
-    cache_entry_map *curr = cache->map[i];
+    cache_entry_map prev = NULL;
+    cache_entry_map curr = cache->map[i];
     while(curr) {
       prev = curr;
       curr = curr->next;

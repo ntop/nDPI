@@ -892,7 +892,7 @@ struct ndpi_detection_module_struct {
 #endif
 #endif
 #ifdef NDPI_PROTOCOL_TINC
-  cache_t *tinc_cache;
+  cache_t tinc_cache;
 #endif
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
