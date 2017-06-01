@@ -35,7 +35,7 @@ typedef struct cache_entry *cache_entry;
 
 typedef struct cache_entry_map *cache_entry_map;
 
-struct cache_t {
+struct cache {
   uint32_t size;
   uint32_t max_size;
   cache_entry head;
@@ -85,7 +85,7 @@ cache_t cache_new(uint32_t cache_max_size) {
     return NULL;
   }
 
-  cache_t cache = (cache_t) calloc(sizeof(struct cache_t), 1);
+  cache_t cache = (cache_t) calloc(sizeof(struct cache), 1);
   if(!cache) {
     return NULL;
   }

@@ -25,7 +25,7 @@ typedef enum cache_result {
 } cache_result;
 
 
-typedef struct cache_t *cache_t;
+typedef struct cache *cache_t;
 
 
 /**
