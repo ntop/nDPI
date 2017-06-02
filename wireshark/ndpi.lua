@@ -13,14 +13,22 @@ ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.pr
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
 
-
 local ntop_proto = Proto("ntop", "ntop", "ntop Extensions")
 ntop_proto.fields = {}
-local ntop_fds = ntop_proto.fields
-ntop_fds.client_nw_rtt = ProtoField.new("TCP client network RTT (msec)", "ntop.latency.client_rtt", ftypes.FLOAT, nil, base.NONE)
-ntop_fds.server_nw_rtt = ProtoField.new("TCP server network RTT (msec)", "ntop.latency.server_rtt", ftypes.FLOAT, nil, base.NONE)
 
-local f_eth_trailer = Field.new("eth.trailer")
+local ntop_fds = ntop_proto.fields
+ntop_fds.client_nw_rtt    = ProtoField.new("TCP client network RTT (msec)",  "ntop.latency.client_rtt", ftypes.FLOAT, nil, base.NONE)
+ntop_fds.server_nw_rtt    = ProtoField.new("TCP server network RTT (msec)",  "ntop.latency.server_rtt", ftypes.FLOAT, nil, base.NONE)
+ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "ntop.latency.appl_rtt",   ftypes.FLOAT, nil, base.NONE)
+
+-- local f_eth_trailer    = Field.new("eth.trailer")
+local f_dns_query_name    = Field.new("dns.qry.name")
+local f_dns_ret_code      = Field.new("dns.flags.rcode")
+local f_dns_response      = Field.new("dns.flags.response")
+local f_udp_len           = Field.new("udp.length")
+local f_tcp_header_len    = Field.new("tcp.hdr_len")
+local f_ip_len            = Field.new("ip.len")
+local f_ip_hdr_len        = Field.new("ip.hdr_len")
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -31,6 +39,12 @@ local mac_stats              = {}
 local vlan_stats             = {}
 local vlan_found             = false
 
+local dns_responses_ok       = {}
+local dns_responses_error    = {}
+local dns_client_queries     = {}
+local dns_server_responses   = {}
+local dns_queries            = {}
+
 local syn                    = {}
 local synack                 = {}
 local lower_ndpi_flow_id     = 0
@@ -40,10 +54,23 @@ local compute_flows_stats    = true
 local max_num_entries        = 10
 local max_num_flows          = 50
 
+local num_top_dns_queries    = 0
+local max_num_dns_queries    = 50
+
+local min_nw_client_RRT      = {}
+local min_nw_server_RRT      = {}
+local max_nw_client_RRT      = {}
+local max_nw_server_RRT      = {}
+local min_appl_RRT           = {}
+local max_appl_RRT           = {}
+
+local first_payload_ts       = {}
+local first_payload_id       = {}
+
 local num_pkts               = 0
 local last_processed_packet_number = 0
-
-local debug = false
+local max_latency_discard    = 5000 -- 5 sec
+local debug                  = false
 
 -- ##############################################
 
@@ -112,6 +139,17 @@ string.split = function(s, p)
   end
 
   return temp
+end
+
+-- ##############################################
+
+function shortenString(name, max_len)
+   max_len = max_len or 24
+    if(string.len(name) < max_len) then
+      return(name)
+   else
+      return(string.sub(name, 1, max_len).."...")
+   end
 end
 
 -- ###############################################
@@ -221,7 +259,25 @@ function ndpi_proto.init()
 
    -- TCP
    syn                    = {}
-   synack                 = {}   
+   synack                 = {}
+
+   -- DNS
+   dns_responses_ok       = {}
+   dns_responses_error    = {}
+   dns_client_queries     = {}
+   dns_server_responses   = {}
+   top_dns_queries        = {}
+   num_top_dns_queries    = 0
+
+   -- Network RRT
+   min_nw_client_RRT  = {}
+   min_nw_server_RRT  = {}
+   max_nw_client_RRT  = {}
+   max_nw_server_RRT  = {}
+
+   -- Application Latency
+   first_payload_ts      = {}
+   first_payload_id      = {}   
 end
 
 function slen(str)
@@ -322,15 +378,7 @@ end
 -- ###############################################
 
 function abstime_diff(a, b)
-   local secs1, frac1 = math.modf(a)
-   local secs2, frac2 = math.modf(b)
-   local diff   
-   local diff_sec = secs1 - secs2
-   local diff_res = frac1 - frac2
-
-   if(diff_res < 0) then diff_sec = diff_sec + 1 end
-   
-   return(diff_sec + diff_res)   
+   return(tonumber(a)-tonumber(b))
 end
 
 -- ###############################################
@@ -389,9 +437,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       local src_ip  = tostring(pinfo.src)
       if(mac_stats[src_mac] == nil) then mac_stats[src_mac] = {} end
       mac_stats[src_mac][src_ip] = 1
-      
+
       local pktlen = tvb:len()
-      local eth_trailer = f_eth_trailer()
+      -- local eth_trailer = f_eth_trailer()
       local magic = tostring(tvb(pktlen-28,4))
 
       if(magic == "19680924") then
@@ -433,13 +481,12 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 		  for k,v in pairsByValues(ndpi_flows, asc) do
 		     if(k ~= flowkey) then
 			table.remove(ndpi_flows, k)
-			tot_removed = tot_removed + 1
-			if(tot_removed == max_num_entries) then
+			num_ndpi_flows = num_ndpi_flows + 1
+			if(num_ndpi_flows == (2*max_num_entries)) then
 			   break
 			end
 		     end
 		  end
-
 	       end
 	    end
 
@@ -447,61 +494,222 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 end
       end -- nDPI
 
+      -- ###########################################
+
+      local dns_response = f_dns_response()
+      if(dns_response ~= nil) then
+	 local dns_ret_code = f_dns_ret_code()
+	 local dns_response = tonumber(getval(dns_response))
+	 local srckey = tostring(pinfo.src)
+	 local dstkey = tostring(pinfo.dst)
+	 local dns_query_name = f_dns_query_name()
+	 dns_query_name = getval(dns_query_name)
+
+	 if(dns_response == 0) then
+	    -- DNS Query
+	    if(dns_client_queries[srckey] == nil) then dns_client_queries[srckey] = 0 end
+	    dns_client_queries[srckey] = dns_client_queries[srckey] + 1
+
+	    if(dns_query_name ~= nil) then
+	       if(top_dns_queries[dns_query_name] == nil) then
+		  top_dns_queries[dns_query_name] = 0
+		  num_top_dns_queries = num_top_dns_queries + 1
+
+		  if(num_top_dns_queries > max_num_dns_queries) then
+		     -- We need to harvest the flow with least packets beside this new one
+		     for k,v in pairsByValues(dns_client_queries, asc) do
+			if(k ~= dns_query_name) then
+			   table.remove(ndpi_flows, k)
+			   num_top_dns_queries = num_top_dns_queries - 1
+
+			   if(num_top_dns_queries == (2*max_num_entries)) then
+			      break
+			   end
+			end
+		     end
+		  end
+	       end
+
+	       top_dns_queries[dns_query_name] = top_dns_queries[dns_query_name] + 1
+	    end
+	 else
+	    -- DNS Response
+	    if(dns_server_responses[srckey] == nil) then dns_server_responses[srckey] = 0 end
+	    dns_server_responses[srckey] = dns_server_responses[srckey] + 1
+
+	    if(dns_ret_code ~= nil) then
+	       dns_ret_code = getval(dns_ret_code)
+
+	       if((dns_query_name ~= nil) and (dns_ret_code ~= nil)) then
+		  dns_ret_code = tonumber(dns_ret_code)
+
+		  if(debug) then print("[".. srckey .." -> ".. dstkey .."] "..dns_query_name.."\t"..dns_ret_code) end
+
+		  if(dns_ret_code == 0) then
+		     if(dns_responses_ok[srckey] == nil) then dns_responses_ok[srckey] = 0 end
+		     dns_responses_ok[srckey] = dns_responses_ok[srckey] + 1
+		  else
+		     if(dns_responses_error[srckey] == nil) then dns_responses_error[srckey] = 0 end
+		     dns_responses_error[srckey] = dns_responses_error[srckey] + 1
+		  end
+	       end
+	    end
+	 end
+      end
+
+      -- ###########################################
 
       local _tcp_flags = field_tcp_flags()
-
-      if(_tcp_flags ~= nil) then
+      local udp_len    = f_udp_len()
+      
+      if((_tcp_flags ~= nil) or (udp_len ~= nil)) then
 	 local key
-	 local tcp_flags = field_tcp_flags().value
+	 local rtt_debug = false
+	 local tcp_flags
+	 local tcp_header_len
+	 local ip_len
+	 local ip_hdr_len
+	 
+	 if(udp_len == nil) then
+	    tcp_flags = field_tcp_flags().value
+	    tcp_header_len = f_tcp_header_len()
+	    ip_len         = f_ip_len()
+	    ip_hdr_len     = f_ip_hdr_len()
+	 end
+	 
+	 if(((ip_len ~= nil) and (tcp_header_len ~= nil) and (ip_hdr_len ~= nil))
+	       or (udp_len ~= nil)
+	 ) then
+	    local payloadLen
+
+	    if(udp_len == nil) then
+	       ip_len         = tonumber(getval(ip_len))
+	       tcp_header_len = tonumber(getval(tcp_header_len))
+	       ip_hdr_len     = tonumber(getval(ip_hdr_len))
+	       
+	       payloadLen = ip_len - tcp_header_len - ip_hdr_len
+	    else
+	       payloadLen = tonumber(getval(udp_len))
+	    end
+	    
+	    if(payloadLen > 0) then
+	       local key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
+	       local revkey = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
+
+	       if(first_payload_ts[revkey] ~= nil) then
+		  local appl_latency = abstime_diff(pinfo.abs_ts, first_payload_ts[revkey]) * 1000
+
+		  if((appl_latency > 0)
+		     -- The trick below is used to set only the first latency packet
+			and ((first_payload_id[revkey] == nil) or (first_payload_id[revkey] == pinfo.number))
+		  ) then
+		     local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+		     local server = getstring(pinfo.src)
+		     if(rtt_debug) then print("==> Appl Latency @ "..pinfo.number..": "..appl_latency) end
+		     
+		     ntop_subtree:add(ntop_fds.appl_latency_rtt, appl_latency)
+		     first_payload_id[revkey] = pinfo.number
+
+		     if(min_appl_RRT[server] == nil) then
+			min_appl_RRT[server] = appl_latency
+		     else
+			min_appl_RRT[server] = math.min(min_appl_RRT[server], appl_latency)
+		     end
+		     
+		     if(max_appl_RRT[server] == nil) then
+			max_appl_RRT[server] = appl_latency
+		     else
+			max_appl_RRT[server] = math.max(max_appl_RRT[server], appl_latency)
+		     end
+
+		     -- first_payload_ts[revkey] = nil
+		  end
+	       else
+		  if(first_payload_ts[key] == nil) then first_payload_ts[key] = pinfo.abs_ts end
+	       end
+	    end
+	 end
+	 
 	 
 	 tcp_flags = tonumber(tcp_flags)
-	 
+
 	 if(tcp_flags == 2) then
 	    -- SYN
-	    if(debug) then print("SYN @ ".. pinfo.abs_ts.." "..key) end
-	    
 	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
+	    if(rtt_debug) then print("SYN @ ".. pinfo.abs_ts.." "..key) end
 	    syn[key] = pinfo.abs_ts
 	 elseif(tcp_flags == 18) then
 	    -- SYN|ACK
-	    if(debug) then print("SYN|ACK @ ".. pinfo.abs_ts.." "..key) end
-
 	    key = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
+	    if(rtt_debug) then print("SYN|ACK @ ".. pinfo.abs_ts.." "..key) end
 	    synack[key] = pinfo.abs_ts
 	    if(syn[key] ~= nil) then
 	       local diff = abstime_diff(synack[key], syn[key]) * 1000 -- msec
-	       
-	       if(debug) then print("Client RTT --> ".. diff .. " sec") end
-	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
-	       ntop_subtree:add(ntop_fds.client_nw_rtt, diff)
-	       -- syn[key] = nil
+
+	       if(rtt_debug) then print("Server RTT --> ".. diff .. " msec") end
+
+	       if(diff <= max_latency_discard) then
+		  local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+		  ntop_subtree:add(ntop_fds.server_nw_rtt, diff)
+		  -- Do not delete the key below as it's used when a user clicks on a packet
+		  -- syn[key] = nil
+		  
+		  local server = getstring(pinfo.src)
+		  if(min_nw_server_RRT[server] == nil) then
+		     min_nw_server_RRT[server] = diff
+		  else
+		     min_nw_server_RRT[server] = math.min(min_nw_server_RRT[server], diff)
+		  end
+
+		  if(max_nw_server_RRT[server] == nil) then
+		     max_nw_server_RRT[server] = diff
+		  else
+		     max_nw_server_RRT[server] = math.max(max_nw_server_RRT[server], diff)
+		  end		  
+	       end
 	    end
 	 elseif(tcp_flags == 16) then
 	    -- ACK
-	    if(debug) then print("ACK @ ".. pinfo.abs_ts.." "..key) end
-	    
 	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
-    	    
+	    if(rtt_debug) then print("ACK @ ".. pinfo.abs_ts.." "..key) end
+
 	    if(synack[key] ~= nil) then
 	       local diff = abstime_diff(pinfo.abs_ts, synack[key]) * 1000 -- msec
-	       if(debug) then print("Server RTT --> ".. diff .. " sec") end
-	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
-	       ntop_subtree:add(ntop_fds.server_nw_rtt, diff)
-	       -- synack[key] = nil
-	    end
+	       if(rtt_debug) then print("Client RTT --> ".. diff .. " msec") end
 
+	       if(diff <= max_latency_discard) then
+		  local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+		  ntop_subtree:add(ntop_fds.client_nw_rtt, diff)
+		  
+		  -- Do not delete the key below as it's used when a user clicks on a packet
+		   synack[key] = nil
+
+		  local client = getstring(pinfo.src)
+		  if(min_nw_client_RRT[client] == nil) then
+		     min_nw_client_RRT[client] = diff
+		  else
+		     min_nw_client_RRT[client] = math.min(min_nw_client_RRT[client], diff)
+		  end
+		  
+		  if(max_nw_client_RRT[client] == nil) then
+		     max_nw_client_RRT[client] = diff
+		  else
+		     max_nw_client_RRT[client] = math.max(max_nw_client_RRT[client], diff)
+		  end
+	       end
+	    end
 	 end
       end
-      
+
       if(debug) then
 	 local fields  = { }
 	 local _fields = { all_field_infos() }
-	 
+
 	 -- fields['pinfo.number'] = pinfo.number
-	 
+
 	 for k,v in pairs(_fields) do
 	    local value = getstring(v)
-	    
+
 	    if(value ~= nil) then
 	       fields[v.name] = value
 	    end
@@ -551,13 +759,8 @@ local function ndpi_dialog_menu()
       end
 
       win:set(label)
+      win:add_button("Clear", function() win:clear() end)
    end
-end
-
--- ###############################################
-
-if(compute_flows_stats) then
-   register_menu("nDPI", ndpi_dialog_menu, MENU_STAT_UNSORTED)
 end
 
 -- ###############################################
@@ -586,11 +789,12 @@ local function arp_dialog_menu()
 	 local pctg = formatPctg((v * 100) / last_processed_packet_number)
 	 local str = k .. "\t" .. v .. "\t" .. pctg .. "\t" .. "[sent: ".. (s.request_sent + s.response_sent) .. "][rcvd: ".. (s.request_rcvd + s.response_rcvd) .. "]\n"
 	 label = label .. str
-	 if(i == max_num_entries) then break else i = i + 1 end	 
+	 if(i == max_num_entries) then break else i = i + 1 end
       end
    end
 
    win:set(label)
+   win:add_button("Clear", function() win:clear() end)
 end
 
 -- ###############################################
@@ -600,20 +804,21 @@ local function vlan_dialog_menu()
    local label = ""
    local _macs
    local num_hosts = 0
-   
+
    if(vlan_found) then
       i = 0
       label = "VLAN\tPackets\n"
       for k,v in pairsByValues(vlan_stats, rev) do
 	 local pctg = formatPctg((v * 100) / last_processed_packet_number)
 	 label = label .. k .. "\t" .. v .. " pkts [".. pctg .."]\n"
-	 if(i == max_num_entries) then break else i = i + 1 end	 
+	 if(i == max_num_entries) then break else i = i + 1 end
       end
    else
       label = "No VLAN traffic found"
    end
 
    win:set(label)
+   win:add_button("Clear", function() win:clear() end)
 end
 
 -- ###############################################
@@ -628,17 +833,17 @@ local function ip_mac_dialog_menu()
    _manufacturers = {}
    for mac,v in pairs(mac_stats) do
       local num = 0
-      local m =  string.split(mac, "_") 
+      local m =  string.split(mac, "_")
       local manuf
 
       if(m == nil) then
 	 m =  string.split(mac, ":")
-	 
+
 	 manuf = m[1]..":"..m[2]..":"..m[3]
       else
 	 manuf = m[1]
       end
-      
+
       for a,b in pairs(v) do
 	 num = num +1
       end
@@ -653,28 +858,154 @@ local function ip_mac_dialog_menu()
       i = 0
       label = label .. "MAC\t\t# Hosts\tPercentage\n"
       for k,v in pairsByValues(_macs, rev) do
-	 local pctg = formatPctg((v * 100) / num_hosts)	 
+	 local pctg = formatPctg((v * 100) / num_hosts)
 	 label = label .. k .. "\t" .. v .. "\t".. pctg .."\n"
-	 if(i == max_num_entries) then break else i = i + 1 end	 
+	 if(i == max_num_entries) then break else i = i + 1 end
       end
-
 
       i = 0
       label = label .. "\n\nManufacturer\t# Hosts\tPercentage\n"
       for k,v in pairsByValues(_manufacturers, rev) do
-	 local pctg = formatPctg((v * 100) / num_hosts)	 
+	 local pctg = formatPctg((v * 100) / num_hosts)
 	 label = label .. k .. "\t\t" .. v .. "\t".. pctg .."\n"
-	 if(i == max_num_entries) then break else i = i + 1 end	 
+	 if(i == max_num_entries) then break else i = i + 1 end
       end
    else
       label = label .. "\nIP-MAC traffic found"
    end
-   
+
    win:set(label)
+   win:add_button("Clear", function() win:clear() end)
 end
 
 -- ###############################################
 
-register_menu("ARP",  arp_dialog_menu, MENU_STAT_UNSORTED)
-register_menu("VLAN", vlan_dialog_menu, MENU_STAT_UNSORTED)
-register_menu("IP-MAC", ip_mac_dialog_menu, MENU_STAT_UNSORTED)
+local function dns_dialog_menu()
+   local win = TextWindow.new("DNS Statistics");
+   local label = ""
+   local tot = 0
+   local _dns = {}
+
+   for k,v in pairs(dns_responses_ok) do
+      _dns[k] = v
+      tot = tot + v
+   end
+
+   for k,v in pairs(dns_responses_error) do
+      if(_dns[k] == nil) then _dns[k] = 0 end
+      _dns[k] = _dns[k] + v
+      tot = tot + v
+   end
+
+   if(tot > 0) then
+      i = 0
+      label = label .. "DNS Server\t\t# Responses\n"
+      for k,v in pairsByValues(_dns, rev) do
+	 local pctg = formatPctg((v * 100) / tot)
+	 local ok   = dns_responses_ok[k]
+	 local err  = dns_responses_error[k]
+
+	 if(ok == nil)  then ok = 0 end
+	 if(err == nil) then err = 0 end
+	 label = label .. string.format("%-20s\t%s\n", shortenString(k), v .. "\t[ok: "..ok.."][error: "..err.."][".. pctg .."]")
+
+	 if(i == max_num_entries) then break else i = i + 1 end
+      end
+
+      i = 0
+      label = label .. "\n\nTop DNS Clients\t# Queries\n"
+      for k,v in pairsByValues(dns_client_queries, rev) do
+	 local pctg = formatPctg((v * 100) / tot)
+	 label = label .. string.format("%-20s\t%s\n", shortenString(k), v .. "\t["..pctg.."]")
+	 if(i == max_num_entries) then break else i = i + 1 end
+      end
+
+      i = 0
+      label = label .. "\n\nTop DNS Resolvers\t# Responses\n"
+      for k,v in pairsByValues(dns_server_responses, rev) do
+	 local pctg = formatPctg((v * 100) / tot)
+	 label = label .. string.format("%-20s\t%s\n", shortenString(k), v .. "\t["..pctg.."]")
+	 if(i == max_num_entries) then break else i = i + 1 end
+      end
+
+      i = 0
+      label = label .. "\n\nTop DNS Queries\t\t\t# Queries\n"
+      for k,v in pairsByValues(top_dns_queries, rev) do
+	 local pctg = formatPctg((v * 100) / tot)
+	 label = label .. string.format("%-32s\t%s\n", shortenString(k,32), v .. "\t["..pctg.."]")
+	 if(i == max_num_entries) then break else i = i + 1 end
+      end
+   else
+      label = label .. "\nNo DNS traffic found"
+   end
+
+   win:set(label)
+
+
+   -- add buttons to clear text window and to enable editing
+   win:add_button("Clear", function() win:clear() end)
+   --win:add_button("Enable edit", function() win:set_editable(true) end)
+
+   -- print "closing" to stdout when the user closes the text windw
+   --win:set_atclose(function() print("closing") end)
+end
+
+-- ###############################################
+
+local function rtt_dialog_menu()
+   local win = TextWindow.new("Network Latency");
+   local label = ""
+   local tot = 0
+   local i
+
+   i = 0
+   label = label .. "Client\t\tMin/Max RTT\n"
+   for k,v in pairsByValues(min_nw_client_RRT, rev) do
+      label = label .. string.format("%-20s\t%.3f / %.3f msec\n", shortenString(k), v, max_nw_client_RRT[k])
+      if(i == max_num_entries) then break else i = i + 1 end
+   end
+
+   i = 0
+   label = label .. "\nServer\t\tMin RTT\n"
+   for k,v in pairsByValues(min_nw_server_RRT, rev) do
+      label = label .. string.format("%-20s\t%.3f / %.3f msec\n", shortenString(k), v, max_nw_server_RRT[k])
+      if(i == max_num_entries) then break else i = i + 1 end
+   end
+
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
+local function appl_rtt_dialog_menu()
+   local win = TextWindow.new("Application Latency");
+   local label = ""
+   local tot = 0
+   local i
+
+   i = 0
+   label = label .. "Server\t\tMin Application RTT\n"
+   for k,v in pairsByValues(min_appl_RRT, rev) do
+      label = label .. string.format("%-20s\t%.3f / %.3f msec\n", shortenString(k), v, max_appl_RRT[k])
+      if(i == max_num_entries) then break else i = i + 1 end
+   end
+
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
+register_menu("ntop/ARP",          arp_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/DNS",          dns_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/Latency/Network",      rtt_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/Latency/Application",  appl_rtt_dialog_menu, MENU_TOOLS_UNSORTED)
+
+-- ###############################################
+
+if(compute_flows_stats) then
+   register_menu("ntop/nDPI", ndpi_dialog_menu, MENU_TOOLS_UNSORTED)
+end
