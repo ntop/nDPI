@@ -8070,6 +8070,8 @@ ndpi_protocol_match host_match[] = {
   { ".vevo.com",			"Vevo",			NDPI_PROTOCOL_VEVO,    NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { ".spotify.",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { "audio-fa.scdn.co",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  
 
   { ".pandora.com",			"Pandora",		NDPI_PROTOCOL_PANDORA,  NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
