@@ -73,7 +73,7 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
-static u_int8_t stats_flag = 0, file_first_time = 1; 
+static u_int8_t stats_flag = 0, file_first_time = 1;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
@@ -105,7 +105,7 @@ typedef struct node_a{
 struct port_stats {
   u_int32_t port; /* we'll use this field as the key */
   u_int32_t num_pkts, num_bytes;
-  u_int32_t num_flows; 
+  u_int32_t num_flows;
   u_int32_t num_addr; /*to hold number of distinct IP addresses */
   u_int32_t cumulative_addr; /*to hold cumulative some of IP addresses */
   addr_node *addr_tree; /* to hold distinct IP addresses */
@@ -116,14 +116,14 @@ struct port_stats {
 struct port_stats *srcStats = NULL, *dstStats = NULL;
 
 // struct to hold port based top statistics
-struct top_stats {  
+struct top_stats {
   u_int32_t port; /* we'll use this field as the key */
   char top_ip[48]; /*ip address that is contributed to > 95% of traffic*/
   char proto[64]; /*application level protocol of top_ip */
   u_int32_t num_pkts;
   float prcnt_pkt; /*percent of packets respect to total packets */
   u_int32_t num_addr; /*to hold number of distinct IP addresses */
-  u_int32_t num_flows; 
+  u_int32_t num_flows;
   UT_hash_handle hh;  /* makes this structure hashable */
 };
 
@@ -833,7 +833,7 @@ int updateIpTree(const char *key, addr_node **vrootp, const char *proto) {
   if(q != (addr_node *)0) {	                /* make new node */
     *rootp = q;			                /* link new node to old */
     strncpy(q->addr, key, sizeof(q->addr));     /* initialize new node */
-    strncpy(q->proto, proto, sizeof(q->proto));    
+    strncpy(q->proto, proto, sizeof(q->proto));
     q->count = UPDATED_TREE;
     q->left = q->right = (addr_node *)0;
     return q->count;
@@ -873,24 +873,24 @@ void updateTopIpAddress(const char *addr, const char *proto, int count, struct i
 
     if(count == 0) return;
 
-    strncpy(pair.addr, addr, sizeof(pair.addr)); 
-    strncpy(pair.proto, proto, sizeof(pair.proto)); 
+    strncpy(pair.addr, addr, sizeof(pair.addr));
+    strncpy(pair.proto, proto, sizeof(pair.proto));
     pair.count = count;
 
-    
+
     for(i=0; i<size; i++) {
         /* if the same ip with a bigger
               count just update it     */
         if((r = strcmp(top[i].addr, addr)) == 0) {
             top[i].count = count;
             return;
-        }   
+        }
         /* if array is not full yet
          add it to the first empty place */
         if(top[i].count == 0) {
            top[i] = pair;
            return;
-        } 
+        }
     }
 
     /* if bigger than the smallest one, replace it */
@@ -914,18 +914,18 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 			    u_int32_t num_bytes, const char *proto) {
   struct port_stats *s;
   int count = 0;
-  
+
   HASH_FIND_INT(*stats, &port, s);
   if(s == NULL) {
     s = (struct port_stats*)malloc(sizeof(struct port_stats));
     if(!s) return;
 
     s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes,
-    s->num_addr = 1, s->cumulative_addr = 1; s->num_flows = 1; 
+    s->num_addr = 1, s->cumulative_addr = 1; s->num_flows = 1;
 
     memset(s->top_ip_addrs, 0, MAX_NUM_IP_ADDRESS*sizeof(struct info_pair));
     updateTopIpAddress(addr, proto, 1, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
-    
+
     s->addr_tree = (addr_node *) malloc(sizeof(addr_node));
     if(!s->addr_tree) return;
 
@@ -941,7 +941,7 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
     count = updateIpTree(addr, &(*s).addr_tree, proto);
 
     if(count == UPDATED_TREE) s->num_addr++;
-    
+
     if(count) {
         s->cumulative_addr++;
         updateTopIpAddress(addr, proto, count, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
@@ -970,13 +970,13 @@ static void deletePortsStats(struct port_stats *stats) {
  * @brief Ports stats
  */
 static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
-  if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */		
+  if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
 	  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
 	  u_int16_t sport, dport;
 	  char saddr[48], daddr[48];
           char proto[48];
           u_int16_t thread_id = *(int *)user_data;
-	  
+
 	  sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
 	  strncpy(saddr, flow->src_name, sizeof(saddr));
 	  strncpy(daddr, flow->dst_name, sizeof(daddr));
@@ -986,9 +986,9 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
             ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                                 flow->detected_protocol, proto, sizeof(proto));
           else
-            strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, 
+            strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                     flow->detected_protocol.app_protocol),sizeof(proto));
-	  
+
 	  updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes, proto);
 	  if(flow->dst2src_packets > 0) updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes, proto);
   }
@@ -1204,7 +1204,7 @@ static void json_open_stats_file() {
        (!file_first_time && (stats_fp = fopen(_statsFilePath,"a")) == NULL)) {
       printf("Error creating/opening file %s\n", _statsFilePath);
       stats_flag = 0;
-    } 
+    }
     else file_first_time = 0;
 }
 
@@ -1282,7 +1282,7 @@ static void deleteTopStats(struct top_stats *stats) {
 /* *********************************************** */
 
 /**
- * @brief Get port based top statistics 
+ * @brief Get port based top statistics
  */
 static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_int64_t total_packet_count){
   struct top_stats *s;
@@ -1297,7 +1297,7 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_
     memset(s, 0, sizeof(struct top_stats));
 
     s->port = sp->port;
-    s->num_pkts = sp->num_pkts; 
+    s->num_pkts = sp->num_pkts;
     s->prcnt_pkt = (sp->num_pkts*100.0)/total_packet_count;
     s->num_addr = sp->num_addr;
     s->num_flows = sp->num_flows;
@@ -1341,15 +1341,15 @@ static void saveTopStats(json_object **jObj_group, struct top_stats *stats, int 
       json_object_object_add(jObj_stat,"flows.number",json_object_new_double(s->num_flows));
       json_object_object_add(jObj_stat,"aggressive.ip",json_object_new_string(s->top_ip));
       json_object_object_add(jObj_stat,"protocol",json_object_new_string(s->proto));
-      
+
       json_object_array_add(jArray_stats, jObj_stat);
       i++;
 
       if(i >= 10) break;
     }
-  }  
+  }
 
-  json_object_object_add(*jObj_group, (direction == DIR_SRC) ? 
+  json_object_object_add(*jObj_group, (direction == DIR_SRC) ?
       "top.src.pkts.stats" : "top.dst.pkts.stats", jArray_stats);
 
   jArray_stats  = json_object_new_array();
@@ -1372,7 +1372,7 @@ static void saveTopStats(json_object **jObj_group, struct top_stats *stats, int 
     if(i >= 10) break;
   }
 
-  json_object_object_add(*jObj_group, (direction == DIR_SRC) ? 
+  json_object_object_add(*jObj_group, (direction == DIR_SRC) ?
           "top.src.ip.stats" : "top.dst.ip.stats", jArray_stats);
 }
 #endif
@@ -1928,7 +1928,7 @@ static void pcap_process_packet(u_char *args,
     tot_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
 
     printResults(tot_usec);
-    
+
 
     for(i=0; i<ndpi_thread_info[thread_id].workflow->prefs.num_roots; i++) {
       ndpi_tdestroy(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
