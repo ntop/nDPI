@@ -265,7 +265,7 @@ function ndpi_proto.init()
 
    -- ARP
    arp_stats              = { }
-
+   
    -- MAC
    mac_stats              = { }
 
@@ -410,7 +410,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    -- run as on that step the packet is still undecoded
    -- The trick below avoids to process the packet twice
 
-   if(pinfo.visited == false) then return end
+   if(pinfo.visited == true) then return end
 
    num_pkts = num_pkts + 1
    if((num_pkts > 1) and (pinfo.number == 1)) then return end
@@ -803,11 +803,13 @@ local function arp_dialog_menu()
    local label = ""
    local _stats
    local found = false
-
+   local tot_arp_pkts = 0
+   
    _stats = {}
    for k,v in pairs(arp_stats) do
       if(k ~= "Broadcast") then
 	 _stats[k] = v.request_sent + v.request_rcvd + v.response_sent + v.response_rcvd
+	 tot_arp_pkts = tot_arp_pkts + _stats[k]
 	 found = true
       end
    end
@@ -819,7 +821,7 @@ local function arp_dialog_menu()
       i = 0
       for k,v in pairsByValues(_stats, rev) do
 	 local s = arp_stats[k]
-	 local pctg = formatPctg((v * 100) / last_processed_packet_number)
+	 local pctg = formatPctg((v * 100) / tot_arp_pkts)
 	 local str = k .. "\t" .. v .. "\t" .. pctg .. "\t" .. "[sent: ".. (s.request_sent + s.response_sent) .. "][rcvd: ".. (s.request_rcvd + s.response_rcvd) .. "]\n"
 	 label = label .. str
 	 if(i == max_num_entries) then break else i = i + 1 end
