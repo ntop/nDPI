@@ -3,8 +3,20 @@
 --
 -- This plugin is part of nDPI (https://github.com/ntop/nDPI)
 --
+-- This program is free software; you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation; either version 3 of the License, or
+-- (at your option) any later version.
 --
-
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software Foundation,
+-- Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+-- 
 
 local ndpi_proto = Proto("ndpi", "nDPI", "nDPI Protocol Interpreter")
 ndpi_proto.fields = {}
@@ -29,6 +41,7 @@ local f_udp_len           = Field.new("udp.length")
 local f_tcp_header_len    = Field.new("tcp.hdr_len")
 local f_ip_len            = Field.new("ip.len")
 local f_ip_hdr_len        = Field.new("ip.hdr_len")
+local f_ssl_server_name   = Field.new("ssl.handshake.extensions_server_name")
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -56,6 +69,9 @@ local max_num_flows          = 50
 
 local num_top_dns_queries    = 0
 local max_num_dns_queries    = 50
+
+local ssl_server_names       = {}
+local tot_ssl_flows          = 0
 
 local min_nw_client_RRT      = {}
 local min_nw_server_RRT      = {}
@@ -261,6 +277,9 @@ function ndpi_proto.init()
    syn                    = {}
    synack                 = {}
 
+   -- SSL
+   ssl_server_names       = {}
+   
    -- DNS
    dns_responses_ok       = {}
    dns_responses_error    = {}
@@ -494,6 +513,20 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 end
       end -- nDPI
 
+      -- ###########################################
+
+      local ssl_server_name = f_ssl_server_name()
+      if(ssl_server_name ~= nil) then
+	 ssl_server_name = getval(ssl_server_name)
+
+	 if(ssl_server_names[ssl_server_name] == nil) then
+	    ssl_server_names[ssl_server_name] = 0
+	 end
+
+	 ssl_server_names[ssl_server_name] = ssl_server_names[ssl_server_name] + 1
+	 tot_ssl_flows = tot_ssl_flows + 1
+      end
+      
       -- ###########################################
 
       local dns_response = f_dns_response()
@@ -997,10 +1030,38 @@ end
 
 -- ###############################################
 
+local function ssl_dialog_menu()
+   local win = TextWindow.new("SSL Server Contacts");
+   local label = ""
+   local tot = 0
+   local i
+
+   if(tot_ssl_flows > 0) then
+      i = 0
+      label = label .. "SSL Server\t\t\t\t# Flows\n"
+      for k,v in pairsByValues(ssl_server_names, rev) do      
+	 local pctg
+	 
+	 v = tonumber(v)
+	 pctg = formatPctg((v * 100) / tot_ssl_flows)      
+	 label = label .. string.format("%-32s", shortenString(k,32)).."\t"..v.." [".. pctg.." %]\n"
+	 if(i == 50) then break else i = i + 1 end
+      end
+   else
+      label = "No SSL server certificates detected"
+   end
+   
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
 register_menu("ntop/ARP",          arp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/DNS",          dns_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/SSL",          ssl_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Network",      rtt_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Application",  appl_rtt_dialog_menu, MENU_TOOLS_UNSORTED)
 
