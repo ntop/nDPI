@@ -33,7 +33,10 @@ ntop_fds.client_nw_rtt    = ProtoField.new("TCP client network RTT (msec)",  "nt
 ntop_fds.server_nw_rtt    = ProtoField.new("TCP server network RTT (msec)",  "ntop.latency.server_rtt", ftypes.FLOAT, nil, base.NONE)
 ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "ntop.latency.appl_rtt",   ftypes.FLOAT, nil, base.NONE)
 
--- local f_eth_trailer    = Field.new("eth.trailer")
+local f_vlan_id           = Field.new("vlan.id")
+local f_arp_opcode        = Field.new("arp.opcode")
+local f_arp_sender_mac    = Field.new("arp.src.hw_mac")
+local f_arp_target_mac    = Field.new("arp.dst.hw_mac")
 local f_dns_query_name    = Field.new("dns.qry.name")
 local f_dns_ret_code      = Field.new("dns.flags.rcode")
 local f_dns_response      = Field.new("dns.flags.response")
@@ -374,9 +377,6 @@ function initARPEntry(mac)
 end
 
 function dissectARP(isRequest, src_mac, dst_mac)
-   local mac
-
-   -- print(num_pkts)
    if(isRequest == 1) then
       -- ARP Request
       initARPEntry(src_mac)
@@ -422,27 +422,23 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    -- print(num_pkts .. " / " .. pinfo.number .. " / " .. last_processed_packet_number)
 
    -- ############# ARP / VLAN #############
-   local offset = 12
-   local eth_proto = tostring(tvb(offset,2))
-
-   if(eth_proto == "8100") then
-      local vlan_id = BitAND(tonumber(tostring(tvb(offset+2,2))), 0xFFF)
+   local vlan_id = f_vlan_id()
+   if(vlan_id ~= nil) then
+      vlan_id = tonumber(getval(vlan_id))
 
       if(vlan_stats[vlan_id] == nil) then vlan_stats[vlan_id] = 0 end
       vlan_stats[vlan_id] = vlan_stats[vlan_id] + 1
       vlan_found = true
    end
 
-   while(eth_proto == "8100") do
-      offset = offset + 4
-      eth_proto = tostring(tvb(offset,2))
-   end
-
-   if(eth_proto == "0806") then
+   local arp_opcode = f_arp_opcode()
+   
+   if(arp_opcode ~= nil) then
       -- ARP
-      local isRequest = tonumber(tvb(21,1))
-      --print(eth_proto.." ["..tostring(pinfo.dl_src).." / ".. tostring(pinfo.dl_dst) .."] [" .. tostring(pinfo.src).." -> "..tostring(pinfo.dst).."]")
-      dissectARP(isRequest, tostring(pinfo.dl_src), tostring(pinfo.dl_dst))
+      local isRequest = getval(arp_opcode)
+      local src_mac = getval(f_arp_sender_mac())
+      local dst_mac = getval(f_arp_target_mac())
+      dissectARP(isRequest, src_mac, dst_mac)
    else
       -- ############# 2 nDPI Dissection #############
 
@@ -458,7 +454,6 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       mac_stats[src_mac][src_ip] = 1
 
       local pktlen = tvb:len()
-      -- local eth_trailer = f_eth_trailer()
       local magic = tostring(tvb(pktlen-28,4))
 
       if(magic == "19680924") then
