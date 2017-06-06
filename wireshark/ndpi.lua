@@ -16,11 +16,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program; if not, write to the Free Software Foundation,
 -- Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
--- 
+--
 
 local ndpi_proto = Proto("ndpi", "nDPI", "nDPI Protocol Interpreter")
 ndpi_proto.fields = {}
-local ndpi_fds = ndpi_proto.fields
+
+local ndpi_fds    = ndpi_proto.fields
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
@@ -33,6 +34,7 @@ ntop_fds.client_nw_rtt    = ProtoField.new("TCP client network RTT (msec)",  "nt
 ntop_fds.server_nw_rtt    = ProtoField.new("TCP server network RTT (msec)",  "ntop.latency.server_rtt", ftypes.FLOAT, nil, base.NONE)
 ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "ntop.latency.appl_rtt",   ftypes.FLOAT, nil, base.NONE)
 
+local f_eth_trailer       = Field.new("eth.trailer")
 local f_vlan_id           = Field.new("vlan.id")
 local f_arp_opcode        = Field.new("arp.opcode")
 local f_arp_sender_mac    = Field.new("arp.src.hw_mac")
@@ -45,6 +47,7 @@ local f_tcp_header_len    = Field.new("tcp.hdr_len")
 local f_ip_len            = Field.new("ip.len")
 local f_ip_hdr_len        = Field.new("ip.hdr_len")
 local f_ssl_server_name   = Field.new("ssl.handshake.extensions_server_name")
+local f_tcp_flags         = Field.new('tcp.flags')
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -135,36 +138,36 @@ end
 -- ###############################################
 
 string.split = function(s, p)
-  local temp = {}
-  local index = 0
-  local last_index = string.len(s)
+   local temp = {}
+   local index = 0
+   local last_index = string.len(s)
 
-  while true do
-    local i, e = string.find(s, p, index)
+   while true do
+      local i, e = string.find(s, p, index)
 
-    if i and e then
-      local next_index = e + 1
-      local word_bound = i - 1
-      table.insert(temp, string.sub(s, index, word_bound))
-      index = next_index
-    else
-      if index > 0 and index <= last_index then
-	table.insert(temp, string.sub(s, index, last_index))
-      elseif index == 0 then
-	temp = nil
+      if i and e then
+	 local next_index = e + 1
+	 local word_bound = i - 1
+	 table.insert(temp, string.sub(s, index, word_bound))
+	 index = next_index
+      else
+	 if index > 0 and index <= last_index then
+	    table.insert(temp, string.sub(s, index, last_index))
+	 elseif index == 0 then
+	    temp = nil
+	 end
+	 break
       end
-      break
-    end
-  end
+   end
 
-  return temp
+   return temp
 end
 
 -- ##############################################
 
 function shortenString(name, max_len)
    max_len = max_len or 24
-    if(string.len(name) < max_len) then
+   if(string.len(name) < max_len) then
       return(name)
    else
       return(string.sub(name, 1, max_len).."...")
@@ -268,7 +271,7 @@ function ndpi_proto.init()
 
    -- ARP
    arp_stats              = { }
-   
+
    -- MAC
    mac_stats              = { }
 
@@ -282,7 +285,7 @@ function ndpi_proto.init()
 
    -- SSL
    ssl_server_names       = {}
-   
+
    -- DNS
    dns_responses_ok       = {}
    dns_responses_error    = {}
@@ -299,7 +302,7 @@ function ndpi_proto.init()
 
    -- Application Latency
    first_payload_ts      = {}
-   first_payload_id      = {}   
+   first_payload_id      = {}
 end
 
 function slen(str)
@@ -402,7 +405,265 @@ end
 
 -- ###############################################
 
-local field_tcp_flags = Field.new('tcp.flags')
+function arp_dissector(tvb, pinfo, tree)
+   local arp_opcode = f_arp_opcode()
+
+   if(arp_opcode ~= nil) then
+      -- ARP
+      local isRequest = getval(arp_opcode)
+      local src_mac = getval(f_arp_sender_mac())
+      local dst_mac = getval(f_arp_target_mac())
+      dissectARP(isRequest, src_mac, dst_mac)
+   end
+end
+
+-- ###############################################
+
+function vlan_dissector(tvb, pinfo, tree)
+   local vlan_id = f_vlan_id()
+   if(vlan_id ~= nil) then
+      vlan_id = tonumber(getval(vlan_id))
+
+      if(vlan_stats[vlan_id] == nil) then vlan_stats[vlan_id] = 0 end
+      vlan_stats[vlan_id] = vlan_stats[vlan_id] + 1
+      vlan_found = true
+   end
+end
+
+-- ###############################################
+
+function mac_dissector(tvb, pinfo, tree)
+   local src_mac = tostring(pinfo.dl_src)
+   local src_ip  = tostring(pinfo.src)
+   if(mac_stats[src_mac] == nil) then mac_stats[src_mac] = {} end
+   mac_stats[src_mac][src_ip] = 1
+end
+
+-- ###############################################
+
+function ssl_dissector(tvb, pinfo, tree)
+   local ssl_server_name = f_ssl_server_name()
+   if(ssl_server_name ~= nil) then
+      ssl_server_name = getval(ssl_server_name)
+
+      if(ssl_server_names[ssl_server_name] == nil) then
+	 ssl_server_names[ssl_server_name] = 0
+      end
+
+      ssl_server_names[ssl_server_name] = ssl_server_names[ssl_server_name] + 1
+      tot_ssl_flows = tot_ssl_flows + 1
+   end
+end
+
+-- ###############################################
+
+function dns_dissector(tvb, pinfo, tree)
+   local dns_response = f_dns_response()
+   if(dns_response ~= nil) then
+      local dns_ret_code = f_dns_ret_code()
+      local dns_response = tonumber(getval(dns_response))
+      local srckey = tostring(pinfo.src)
+      local dstkey = tostring(pinfo.dst)
+      local dns_query_name = f_dns_query_name()
+      dns_query_name = getval(dns_query_name)
+
+      if(dns_response == 0) then
+	 -- DNS Query
+	 if(dns_client_queries[srckey] == nil) then dns_client_queries[srckey] = 0 end
+	 dns_client_queries[srckey] = dns_client_queries[srckey] + 1
+
+	 if(dns_query_name ~= nil) then
+	    if(top_dns_queries[dns_query_name] == nil) then
+	       top_dns_queries[dns_query_name] = 0
+	       num_top_dns_queries = num_top_dns_queries + 1
+
+	       if(num_top_dns_queries > max_num_dns_queries) then
+		  -- We need to harvest the flow with least packets beside this new one
+		  for k,v in pairsByValues(dns_client_queries, asc) do
+		     if(k ~= dns_query_name) then
+			table.remove(ndpi_flows, k)
+			num_top_dns_queries = num_top_dns_queries - 1
+
+			if(num_top_dns_queries == (2*max_num_entries)) then
+			   break
+			end
+		     end
+		  end
+	       end
+	    end
+
+	    top_dns_queries[dns_query_name] = top_dns_queries[dns_query_name] + 1
+	 end
+      else
+	 -- DNS Response
+	 if(dns_server_responses[srckey] == nil) then dns_server_responses[srckey] = 0 end
+	 dns_server_responses[srckey] = dns_server_responses[srckey] + 1
+
+	 if(dns_ret_code ~= nil) then
+	    dns_ret_code = getval(dns_ret_code)
+
+	    if((dns_query_name ~= nil) and (dns_ret_code ~= nil)) then
+	       dns_ret_code = tonumber(dns_ret_code)
+
+	       if(debug) then print("[".. srckey .." -> ".. dstkey .."] "..dns_query_name.."\t"..dns_ret_code) end
+
+	       if(dns_ret_code == 0) then
+		  if(dns_responses_ok[srckey] == nil) then dns_responses_ok[srckey] = 0 end
+		  dns_responses_ok[srckey] = dns_responses_ok[srckey] + 1
+	       else
+		  if(dns_responses_error[srckey] == nil) then dns_responses_error[srckey] = 0 end
+		  dns_responses_error[srckey] = dns_responses_error[srckey] + 1
+	       end
+	    end
+	 end
+      end
+   end
+end
+
+-- ###############################################
+
+function latency_dissector(tvb, pinfo, tree)
+   local _tcp_flags = f_tcp_flags()
+   local udp_len    = f_udp_len()
+
+   if((_tcp_flags ~= nil) or (udp_len ~= nil)) then
+      local key
+      local rtt_debug = false
+      local tcp_flags
+      local tcp_header_len
+      local ip_len
+      local ip_hdr_len
+
+      if(udp_len == nil) then
+	 tcp_flags      = f_tcp_flags().value
+	 tcp_header_len = f_tcp_header_len()
+	 ip_len         = f_ip_len()
+	 ip_hdr_len     = f_ip_hdr_len()
+      end
+
+      if(((ip_len ~= nil) and (tcp_header_len ~= nil) and (ip_hdr_len ~= nil))
+	    or (udp_len ~= nil)
+      ) then
+	 local payloadLen
+
+	 if(udp_len == nil) then
+	    ip_len         = tonumber(getval(ip_len))
+	    tcp_header_len = tonumber(getval(tcp_header_len))
+	    ip_hdr_len     = tonumber(getval(ip_hdr_len))
+
+	    payloadLen = ip_len - tcp_header_len - ip_hdr_len
+	 else
+	    payloadLen = tonumber(getval(udp_len))
+	 end
+
+	 if(payloadLen > 0) then
+	    local key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
+	    local revkey = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
+
+	    if(first_payload_ts[revkey] ~= nil) then
+	       local appl_latency = abstime_diff(pinfo.abs_ts, first_payload_ts[revkey]) * 1000
+
+	       if((appl_latency > 0)
+		  -- The trick below is used to set only the first latency packet
+		     and ((first_payload_id[revkey] == nil) or (first_payload_id[revkey] == pinfo.number))
+	       ) then
+		  local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+		  local server = getstring(pinfo.src)
+		  if(rtt_debug) then print("==> Appl Latency @ "..pinfo.number..": "..appl_latency) end
+
+		  ntop_subtree:add(ntop_fds.appl_latency_rtt, appl_latency)
+		  first_payload_id[revkey] = pinfo.number
+
+		  if(min_appl_RRT[server] == nil) then
+		     min_appl_RRT[server] = appl_latency
+		  else
+		     min_appl_RRT[server] = math.min(min_appl_RRT[server], appl_latency)
+		  end
+
+		  if(max_appl_RRT[server] == nil) then
+		     max_appl_RRT[server] = appl_latency
+		  else
+		     max_appl_RRT[server] = math.max(max_appl_RRT[server], appl_latency)
+		  end
+
+		  -- first_payload_ts[revkey] = nil
+	       end
+	    else
+	       if(first_payload_ts[key] == nil) then first_payload_ts[key] = pinfo.abs_ts end
+	    end
+	 end
+      end
+
+      tcp_flags = tonumber(tcp_flags)
+
+      if(tcp_flags == 2) then
+	 -- SYN
+	 key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
+	 if(rtt_debug) then print("SYN @ ".. pinfo.abs_ts.." "..key) end
+	 syn[key] = pinfo.abs_ts
+      elseif(tcp_flags == 18) then
+	 -- SYN|ACK
+	 key = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
+	 if(rtt_debug) then print("SYN|ACK @ ".. pinfo.abs_ts.." "..key) end
+	 synack[key] = pinfo.abs_ts
+	 if(syn[key] ~= nil) then
+	    local diff = abstime_diff(synack[key], syn[key]) * 1000 -- msec
+
+	    if(rtt_debug) then print("Server RTT --> ".. diff .. " msec") end
+
+	    if(diff <= max_latency_discard) then
+	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+	       ntop_subtree:add(ntop_fds.server_nw_rtt, diff)
+	       -- Do not delete the key below as it's used when a user clicks on a packet
+	       -- syn[key] = nil
+
+	       local server = getstring(pinfo.src)
+	       if(min_nw_server_RRT[server] == nil) then
+		  min_nw_server_RRT[server] = diff
+	       else
+		  min_nw_server_RRT[server] = math.min(min_nw_server_RRT[server], diff)
+	       end
+
+	       if(max_nw_server_RRT[server] == nil) then
+		  max_nw_server_RRT[server] = diff
+	       else
+		  max_nw_server_RRT[server] = math.max(max_nw_server_RRT[server], diff)
+	       end
+	    end
+	 end
+      elseif(tcp_flags == 16) then
+	 -- ACK
+	 key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
+	 if(rtt_debug) then print("ACK @ ".. pinfo.abs_ts.." "..key) end
+
+	 if(synack[key] ~= nil) then
+	    local diff = abstime_diff(pinfo.abs_ts, synack[key]) * 1000 -- msec
+	    if(rtt_debug) then print("Client RTT --> ".. diff .. " msec") end
+
+	    if(diff <= max_latency_discard) then
+	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+	       ntop_subtree:add(ntop_fds.client_nw_rtt, diff)
+
+	       -- Do not delete the key below as it's used when a user clicks on a packet
+	       synack[key] = nil
+
+	       local client = getstring(pinfo.src)
+	       if(min_nw_client_RRT[client] == nil) then
+		  min_nw_client_RRT[client] = diff
+	       else
+		  min_nw_client_RRT[client] = math.min(min_nw_client_RRT[client], diff)
+	       end
+
+	       if(max_nw_client_RRT[client] == nil) then
+		  max_nw_client_RRT[client] = diff
+	       else
+		  max_nw_client_RRT[client] = math.max(max_nw_client_RRT[client], diff)
+	       end
+	    end
+	 end
+      end
+   end
+end
 
 -- the dissector function callback
 function ndpi_proto.dissector(tvb, pinfo, tree)
@@ -410,6 +671,77 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    -- run as on that step the packet is still undecoded
    -- The trick below avoids to process the packet twice
 
+   if(pinfo.visited == true) then
+      local eth_trailer = f_eth_trailer()
+
+      if(eth_trailer ~= nil) then
+	 local eth_trailer = getval(eth_trailer)
+	 local magic = string.sub(eth_trailer, 1, 11)
+
+	 if(magic == "19:68:09:24") then
+	    local ndpikey, srckey, dstkey, flowkey
+	    local elems                = string.split(string.sub(eth_trailer, 12), ":")
+	    local ndpi_subtree         = tree:add(ndpi_proto, tvb(), "nDPI Protocol")
+	    local network_protocol     = tonumber(elems[2]..elems[3], 16) -- 16 = HEX
+	    local application_protocol = tonumber(elems[4]..elems[5], 16) -- 16 = HEX
+	    local name                 = ""
+
+	    for i=6,21 do
+	       name = name .. string.char(tonumber(elems[i], 16))
+	    end
+
+	    ndpi_subtree:add(ndpi_fds.network_protocol, network_protocol)
+	    ndpi_subtree:add(ndpi_fds.application_protocol, application_protocol)
+	    ndpi_subtree:add(ndpi_fds.name, name)
+
+	    if(application_protocol ~= 0) then
+	       -- Set protocol name in the wireshark protocol column (if not Unknown)
+	       --pinfo.cols.protocol = name
+	       print(network_protocol .. "/" .. application_protocol .. "/".. name)
+	    end
+
+	    if(compute_flows_stats) then
+	       ndpikey = tostring(slen(name))
+
+	       if(ndpi_protos[ndpikey] == nil) then ndpi_protos[ndpikey] = 0 end
+	       ndpi_protos[ndpikey] = ndpi_protos[ndpikey] + pinfo.len
+
+	       srckey = tostring(pinfo.src)
+	       dstkey = tostring(pinfo.dst)
+
+	       flowkey = srckey.." / "..dstkey.."\t["..ndpikey.."]"
+	       if(ndpi_flows[flowkey] == nil) then
+		  ndpi_flows[flowkey] = 0
+		  num_ndpi_flows = num_ndpi_flows + 1
+
+		  if(num_ndpi_flows > max_num_flows) then
+		     -- We need to harvest the flow with least packets beside this new one
+		     local tot_removed = 0
+
+		     for k,v in pairsByValues(ndpi_flows, asc) do
+			if(k ~= flowkey) then
+			   table.remove(ndpi_flows, k)
+			   num_ndpi_flows = num_ndpi_flows + 1
+			   if(num_ndpi_flows == (2*max_num_entries)) then
+			      break
+			   end
+			end
+		     end
+		  end
+	       end
+
+	       ndpi_flows[flowkey] = ndpi_flows[flowkey] + pinfo.len
+	    end
+	 end
+      end -- nDPI
+
+      latency_dissector(tvb, pinfo, tree)
+   end
+   
+   -- ###########################################
+
+   -- As we do not need to add fields to the dissection
+   -- there is no need to process the packet multiple times
    if(pinfo.visited == true) then return end
 
    num_pkts = num_pkts + 1
@@ -421,333 +753,17 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
    -- print(num_pkts .. " / " .. pinfo.number .. " / " .. last_processed_packet_number)
 
-   -- ############# ARP / VLAN #############
-   local vlan_id = f_vlan_id()
-   if(vlan_id ~= nil) then
-      vlan_id = tonumber(getval(vlan_id))
-
-      if(vlan_stats[vlan_id] == nil) then vlan_stats[vlan_id] = 0 end
-      vlan_stats[vlan_id] = vlan_stats[vlan_id] + 1
-      vlan_found = true
+   if(false) then
+      local srckey = tostring(pinfo.src)
+      local dstkey = tostring(pinfo.dst)
+      print("Processing packet "..pinfo.number .. "["..srckey.." / "..dstkey.."]")
    end
 
-   local arp_opcode = f_arp_opcode()
-   
-   if(arp_opcode ~= nil) then
-      -- ARP
-      local isRequest = getval(arp_opcode)
-      local src_mac = getval(f_arp_sender_mac())
-      local dst_mac = getval(f_arp_target_mac())
-      dissectARP(isRequest, src_mac, dst_mac)
-   else
-      -- ############# 2 nDPI Dissection #############
-
-      if(false) then
-	 local srckey = tostring(pinfo.src)
-	 local dstkey = tostring(pinfo.dst)
-	 print("Processing packet "..pinfo.number .. "["..srckey.." / "..dstkey.."]")
-      end
-
-      local src_mac = tostring(pinfo.dl_src)
-      local src_ip  = tostring(pinfo.src)
-      if(mac_stats[src_mac] == nil) then mac_stats[src_mac] = {} end
-      mac_stats[src_mac][src_ip] = 1
-
-      local pktlen = tvb:len()
-      local magic = tostring(tvb(pktlen-28,4))
-
-      if(magic == "19680924") then
-	 local ndpi_subtree = tree:add(ndpi_proto, tvb(), "nDPI Protocol")
-	 local network_protocol     = tvb(pktlen-24,2)
-	 local application_protocol = tvb(pktlen-22,2)
-	 local name = tvb(pktlen-20,16)
-	 local name_str = name:string(ENC_ASCII)
-	 local ndpikey, srckey, dstkey, flowkey
-
-	 ndpi_subtree:add(ndpi_fds.network_protocol, network_protocol)
-	 ndpi_subtree:add(ndpi_fds.application_protocol, application_protocol)
-	 ndpi_subtree:add(ndpi_fds.name, name)
-
-	 local pname = ""..application_protocol
-	 if(pname ~= "0000") then
-	    -- Set protocol name in the wireshark protocol column (if not Unknown)
-	    pinfo.cols.protocol = name_str
-	 end
-
-	 if(compute_flows_stats) then
-	    ndpikey = tostring(slen(name_str))
-
-	    if(ndpi_protos[ndpikey] == nil) then ndpi_protos[ndpikey] = 0 end
-	    ndpi_protos[ndpikey] = ndpi_protos[ndpikey] + pinfo.len
-
-	    srckey = tostring(pinfo.src)
-	    dstkey = tostring(pinfo.dst)
-
-	    flowkey = srckey.." / "..dstkey.."\t["..ndpikey.."]"
-	    if(ndpi_flows[flowkey] == nil) then
-	       ndpi_flows[flowkey] = 0
-	       num_ndpi_flows = num_ndpi_flows + 1
-
-	       if(num_ndpi_flows > max_num_flows) then
-		  -- We need to harvest the flow with least packets beside this new one
-		  local tot_removed = 0
-
-		  for k,v in pairsByValues(ndpi_flows, asc) do
-		     if(k ~= flowkey) then
-			table.remove(ndpi_flows, k)
-			num_ndpi_flows = num_ndpi_flows + 1
-			if(num_ndpi_flows == (2*max_num_entries)) then
-			   break
-			end
-		     end
-		  end
-	       end
-	    end
-
-	    ndpi_flows[flowkey] = ndpi_flows[flowkey] + pinfo.len
-	 end
-      end -- nDPI
-
-      -- ###########################################
-
-      local ssl_server_name = f_ssl_server_name()
-      if(ssl_server_name ~= nil) then
-	 ssl_server_name = getval(ssl_server_name)
-
-	 if(ssl_server_names[ssl_server_name] == nil) then
-	    ssl_server_names[ssl_server_name] = 0
-	 end
-
-	 ssl_server_names[ssl_server_name] = ssl_server_names[ssl_server_name] + 1
-	 tot_ssl_flows = tot_ssl_flows + 1
-      end
-      
-      -- ###########################################
-
-      local dns_response = f_dns_response()
-      if(dns_response ~= nil) then
-	 local dns_ret_code = f_dns_ret_code()
-	 local dns_response = tonumber(getval(dns_response))
-	 local srckey = tostring(pinfo.src)
-	 local dstkey = tostring(pinfo.dst)
-	 local dns_query_name = f_dns_query_name()
-	 dns_query_name = getval(dns_query_name)
-
-	 if(dns_response == 0) then
-	    -- DNS Query
-	    if(dns_client_queries[srckey] == nil) then dns_client_queries[srckey] = 0 end
-	    dns_client_queries[srckey] = dns_client_queries[srckey] + 1
-
-	    if(dns_query_name ~= nil) then
-	       if(top_dns_queries[dns_query_name] == nil) then
-		  top_dns_queries[dns_query_name] = 0
-		  num_top_dns_queries = num_top_dns_queries + 1
-
-		  if(num_top_dns_queries > max_num_dns_queries) then
-		     -- We need to harvest the flow with least packets beside this new one
-		     for k,v in pairsByValues(dns_client_queries, asc) do
-			if(k ~= dns_query_name) then
-			   table.remove(ndpi_flows, k)
-			   num_top_dns_queries = num_top_dns_queries - 1
-
-			   if(num_top_dns_queries == (2*max_num_entries)) then
-			      break
-			   end
-			end
-		     end
-		  end
-	       end
-
-	       top_dns_queries[dns_query_name] = top_dns_queries[dns_query_name] + 1
-	    end
-	 else
-	    -- DNS Response
-	    if(dns_server_responses[srckey] == nil) then dns_server_responses[srckey] = 0 end
-	    dns_server_responses[srckey] = dns_server_responses[srckey] + 1
-
-	    if(dns_ret_code ~= nil) then
-	       dns_ret_code = getval(dns_ret_code)
-
-	       if((dns_query_name ~= nil) and (dns_ret_code ~= nil)) then
-		  dns_ret_code = tonumber(dns_ret_code)
-
-		  if(debug) then print("[".. srckey .." -> ".. dstkey .."] "..dns_query_name.."\t"..dns_ret_code) end
-
-		  if(dns_ret_code == 0) then
-		     if(dns_responses_ok[srckey] == nil) then dns_responses_ok[srckey] = 0 end
-		     dns_responses_ok[srckey] = dns_responses_ok[srckey] + 1
-		  else
-		     if(dns_responses_error[srckey] == nil) then dns_responses_error[srckey] = 0 end
-		     dns_responses_error[srckey] = dns_responses_error[srckey] + 1
-		  end
-	       end
-	    end
-	 end
-      end
-
-      -- ###########################################
-
-      local _tcp_flags = field_tcp_flags()
-      local udp_len    = f_udp_len()
-      
-      if((_tcp_flags ~= nil) or (udp_len ~= nil)) then
-	 local key
-	 local rtt_debug = false
-	 local tcp_flags
-	 local tcp_header_len
-	 local ip_len
-	 local ip_hdr_len
-	 
-	 if(udp_len == nil) then
-	    tcp_flags = field_tcp_flags().value
-	    tcp_header_len = f_tcp_header_len()
-	    ip_len         = f_ip_len()
-	    ip_hdr_len     = f_ip_hdr_len()
-	 end
-	 
-	 if(((ip_len ~= nil) and (tcp_header_len ~= nil) and (ip_hdr_len ~= nil))
-	       or (udp_len ~= nil)
-	 ) then
-	    local payloadLen
-
-	    if(udp_len == nil) then
-	       ip_len         = tonumber(getval(ip_len))
-	       tcp_header_len = tonumber(getval(tcp_header_len))
-	       ip_hdr_len     = tonumber(getval(ip_hdr_len))
-	       
-	       payloadLen = ip_len - tcp_header_len - ip_hdr_len
-	    else
-	       payloadLen = tonumber(getval(udp_len))
-	    end
-	    
-	    if(payloadLen > 0) then
-	       local key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
-	       local revkey = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
-
-	       if(first_payload_ts[revkey] ~= nil) then
-		  local appl_latency = abstime_diff(pinfo.abs_ts, first_payload_ts[revkey]) * 1000
-
-		  if((appl_latency > 0)
-		     -- The trick below is used to set only the first latency packet
-			and ((first_payload_id[revkey] == nil) or (first_payload_id[revkey] == pinfo.number))
-		  ) then
-		     local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
-		     local server = getstring(pinfo.src)
-		     if(rtt_debug) then print("==> Appl Latency @ "..pinfo.number..": "..appl_latency) end
-		     
-		     ntop_subtree:add(ntop_fds.appl_latency_rtt, appl_latency)
-		     first_payload_id[revkey] = pinfo.number
-
-		     if(min_appl_RRT[server] == nil) then
-			min_appl_RRT[server] = appl_latency
-		     else
-			min_appl_RRT[server] = math.min(min_appl_RRT[server], appl_latency)
-		     end
-		     
-		     if(max_appl_RRT[server] == nil) then
-			max_appl_RRT[server] = appl_latency
-		     else
-			max_appl_RRT[server] = math.max(max_appl_RRT[server], appl_latency)
-		     end
-
-		     -- first_payload_ts[revkey] = nil
-		  end
-	       else
-		  if(first_payload_ts[key] == nil) then first_payload_ts[key] = pinfo.abs_ts end
-	       end
-	    end
-	 end
-	 
-	 
-	 tcp_flags = tonumber(tcp_flags)
-
-	 if(tcp_flags == 2) then
-	    -- SYN
-	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
-	    if(rtt_debug) then print("SYN @ ".. pinfo.abs_ts.." "..key) end
-	    syn[key] = pinfo.abs_ts
-	 elseif(tcp_flags == 18) then
-	    -- SYN|ACK
-	    key = getstring(pinfo.dst).."_"..getstring(pinfo.dst_port).."_"..getstring(pinfo.src).."_"..getstring(pinfo.src_port)
-	    if(rtt_debug) then print("SYN|ACK @ ".. pinfo.abs_ts.." "..key) end
-	    synack[key] = pinfo.abs_ts
-	    if(syn[key] ~= nil) then
-	       local diff = abstime_diff(synack[key], syn[key]) * 1000 -- msec
-
-	       if(rtt_debug) then print("Server RTT --> ".. diff .. " msec") end
-
-	       if(diff <= max_latency_discard) then
-		  local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
-		  ntop_subtree:add(ntop_fds.server_nw_rtt, diff)
-		  -- Do not delete the key below as it's used when a user clicks on a packet
-		  -- syn[key] = nil
-		  
-		  local server = getstring(pinfo.src)
-		  if(min_nw_server_RRT[server] == nil) then
-		     min_nw_server_RRT[server] = diff
-		  else
-		     min_nw_server_RRT[server] = math.min(min_nw_server_RRT[server], diff)
-		  end
-
-		  if(max_nw_server_RRT[server] == nil) then
-		     max_nw_server_RRT[server] = diff
-		  else
-		     max_nw_server_RRT[server] = math.max(max_nw_server_RRT[server], diff)
-		  end		  
-	       end
-	    end
-	 elseif(tcp_flags == 16) then
-	    -- ACK
-	    key = getstring(pinfo.src).."_"..getstring(pinfo.src_port).."_"..getstring(pinfo.dst).."_"..getstring(pinfo.dst_port)
-	    if(rtt_debug) then print("ACK @ ".. pinfo.abs_ts.." "..key) end
-
-	    if(synack[key] ~= nil) then
-	       local diff = abstime_diff(pinfo.abs_ts, synack[key]) * 1000 -- msec
-	       if(rtt_debug) then print("Client RTT --> ".. diff .. " msec") end
-
-	       if(diff <= max_latency_discard) then
-		  local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
-		  ntop_subtree:add(ntop_fds.client_nw_rtt, diff)
-		  
-		  -- Do not delete the key below as it's used when a user clicks on a packet
-		   synack[key] = nil
-
-		  local client = getstring(pinfo.src)
-		  if(min_nw_client_RRT[client] == nil) then
-		     min_nw_client_RRT[client] = diff
-		  else
-		     min_nw_client_RRT[client] = math.min(min_nw_client_RRT[client], diff)
-		  end
-		  
-		  if(max_nw_client_RRT[client] == nil) then
-		     max_nw_client_RRT[client] = diff
-		  else
-		     max_nw_client_RRT[client] = math.max(max_nw_client_RRT[client], diff)
-		  end
-	       end
-	    end
-	 end
-      end
-
-      if(debug) then
-	 local fields  = { }
-	 local _fields = { all_field_infos() }
-
-	 -- fields['pinfo.number'] = pinfo.number
-
-	 for k,v in pairs(_fields) do
-	    local value = getstring(v)
-
-	    if(value ~= nil) then
-	       fields[v.name] = value
-	    end
-	 end
-
-	 for k,v in pairs(fields) do
-	    print(k.." = "..v)
-	 end
-      end
-   end
+   mac_dissector(tvb, pinfo, tree)
+   arp_dissector(tvb, pinfo, tree)
+   vlan_dissector(tvb, pinfo, tree)
+   ssl_dissector(tvb, pinfo, tree)
+   dns_dissector(tvb, pinfo, tree)
 end
 
 register_postdissector(ndpi_proto)
@@ -799,7 +815,7 @@ local function arp_dialog_menu()
    local _stats
    local found = false
    local tot_arp_pkts = 0
-   
+
    _stats = {}
    for k,v in pairs(arp_stats) do
       if(k ~= "Broadcast") then
@@ -1036,18 +1052,18 @@ local function ssl_dialog_menu()
    if(tot_ssl_flows > 0) then
       i = 0
       label = label .. "SSL Server\t\t\t\t# Flows\n"
-      for k,v in pairsByValues(ssl_server_names, rev) do      
+      for k,v in pairsByValues(ssl_server_names, rev) do
 	 local pctg
-	 
+
 	 v = tonumber(v)
-	 pctg = formatPctg((v * 100) / tot_ssl_flows)      
+	 pctg = formatPctg((v * 100) / tot_ssl_flows)
 	 label = label .. string.format("%-32s", shortenString(k,32)).."\t"..v.." [".. pctg.." %]\n"
 	 if(i == 50) then break else i = i + 1 end
       end
    else
       label = "No SSL server certificates detected"
    end
-   
+
    win:set(label)
    win:add_button("Clear", function() win:clear() end)
 end
