@@ -91,7 +91,8 @@ local first_payload_id       = {}
 
 local num_pkts               = 0
 local last_processed_packet_number = 0
-local max_latency_discard    = 5000 -- 5 sec
+local max_latency_discard    = 5000  -- 5 sec
+local max_appl_lat_discard   = 15000 -- 15 sec
 local debug                  = false
 
 -- ##############################################
@@ -301,6 +302,12 @@ function ndpi_proto.init()
    max_nw_server_RRT  = {}
 
    -- Application Latency
+   min_nw_client_RRT     = {}
+   min_nw_server_RRT     = {}
+   max_nw_client_RRT     = {}
+   max_nw_server_RRT     = {}
+   min_appl_RRT          = {}
+   max_appl_RRT          = {}
    first_payload_ts      = {}
    first_payload_id      = {}
 end
@@ -563,7 +570,7 @@ function latency_dissector(tvb, pinfo, tree)
 	    if(first_payload_ts[revkey] ~= nil) then
 	       local appl_latency = abstime_diff(pinfo.abs_ts, first_payload_ts[revkey]) * 1000
 
-	       if((appl_latency > 0)
+	       if((appl_latency > 0) and (appl_latency < max_appl_lat_discard)
 		  -- The trick below is used to set only the first latency packet
 		     and ((first_payload_id[revkey] == nil) or (first_payload_id[revkey] == pinfo.number))
 	       ) then
