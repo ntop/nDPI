@@ -310,9 +310,9 @@ void extcap_config() {
   struct ndpi_proto_sorter *protos;
 
   /* -i <interface> */
-  printf("arg {number=%u}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
+  printf("arg {number=%d}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
-  printf("arg {number=%u}{call=-i}{display=Pcap File to Analyze}{type=fileselect}"
+  printf("arg {number=%d}{call=-i}{display=Pcap File to Analyze}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 
   setupDetection(0, NULL);
@@ -328,13 +328,13 @@ void extcap_config() {
 
   qsort(protos, ndpi_mod->ndpi_num_supported_protocols, sizeof(struct ndpi_proto_sorter), cmpProto);
 
-  printf("arg {number=%u}{call=-9}{display=nDPI Protocol Filter}{type=selector}"
+  printf("arg {number=%d}{call=-9}{display=nDPI Protocol Filter}{type=selector}"
 	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
 
   printf("value {arg=%d}{value=%d}{display=%s}\n", argidx, -1, "All Protocols (no nDPI filtering)");
 
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
-    printf("value {arg=%d}{value=%d}{display=%s (%u)}\n", argidx, protos[i].id,
+    printf("value {arg=%d}{value=%d}{display=%s (%d)}\n", argidx, protos[i].id,
 	   protos[i].name, protos[i].id);
 
   free(protos);
