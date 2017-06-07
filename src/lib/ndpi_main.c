@@ -1628,7 +1628,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 655, 0, 0, 0, 0) /* UDP */);
     
 /* To be removed as soon as we define new protocols */
-    ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_217);
     ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_224);
 
     /* calling function for host and content matched protocols */
