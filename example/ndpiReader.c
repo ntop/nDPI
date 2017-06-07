@@ -1288,7 +1288,6 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_
   struct top_stats *s;
   struct port_stats *sp, *tmp;
   struct info_pair inf;
-  float pkt_burst;
   u_int64_t total_ip_addrs = 0;
 
   /* stats are ordered by packet number */

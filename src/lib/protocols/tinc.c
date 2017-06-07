@@ -29,8 +29,6 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
   struct ndpi_packet_struct *packet = &flow->packet;
   const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
   
   if(packet->udp != NULL) {
     if(ndpi_struct->tinc_cache != NULL) {
