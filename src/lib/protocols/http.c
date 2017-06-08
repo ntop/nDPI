@@ -39,14 +39,13 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
     ndpi_search_tcp_or_udp(ndpi_struct, flow);
 
     /* If no custom protocol has been detected */
-    /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */ {
-      if(protocol == NDPI_PROTOCOL_HTTP) {
-	ndpi_int_reset_protocol(flow);
-	ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, protocol);
-      } else
-	ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_HTTP);
-    }
-
+    /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */
+    if(protocol == NDPI_PROTOCOL_HTTP) {
+      ndpi_int_reset_protocol(flow);
+      ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, protocol);
+    } else
+      ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_HTTP);
+    
     flow->http_detected = 1;
   }
 }
@@ -199,11 +198,13 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   /* PPStream */
   if(flow->l4.tcp.ppstream_stage > 0 && iqiyi_counter == 0) {
     NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG, "PPStream found.\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM);
+    /* ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM); */
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_HTTP);
   }
   else if(iqiyi_counter > 0) {
     NDPI_LOG(NDPI_PROTOCOL_IQIYI, ndpi_struct, NDPI_LOG_DEBUG, "iQiyi found.\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI);
+    /* ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI); */
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI, NDPI_PROTOCOL_HTTP);
   }
 #endif
 
@@ -211,7 +212,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   /* 1KXUN */
   if(kxun_counter > 0) {
     NDPI_LOG(NDPI_PROTOCOL_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "1kxun found.\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN);
+    /* ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN); */
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN, NDPI_PROTOCOL_HTTP);
   }
 #endif
 
