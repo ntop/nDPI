@@ -2,18 +2,19 @@ Unknown	163	9995	7
 HTTP	13	796	7
 SSL_No_Cert	34	4141	1
 ICMP	2	196	1
-SSL	80	7703	8
+SSL	75	7291	7
 Facebook	29	3944	2
 Dropbox	1	97	1
 GMail	21	1891	1
 Google	50	4084	5
+WhatsApp	5	412	1
 Viber	4163	392492	4
 Amazon	1	66	1
 
 	1	TCP 192.168.200.222:57999 <-> 74.125.130.188:5228 [proto: 126/Google][5 pkts/389 bytes <-> 5 pkts/368 bytes]
 	2	TCP 192.168.200.222:59011 <-> 74.125.130.188:5228 [proto: 126/Google][5 pkts/428 bytes <-> 4 pkts/264 bytes]
 	3	TCP 192.168.200.222:60828 -> 93.184.221.200:80 [proto: 7/HTTP][1 pkts/60 bytes -> 0 pkts/0 bytes]
-	4	TCP 192.168.200.222:44058 <-> 158.85.58.23:443 [proto: 91/SSL][2 pkts/157 bytes <-> 3 pkts/255 bytes]
+	4	TCP 192.168.200.222:44058 <-> 158.85.58.23:443 [proto: 91.142/SSL.WhatsApp][2 pkts/157 bytes <-> 3 pkts/255 bytes]
 	5	TCP 222.165.163.117:443 <-> 192.168.200.222:47424 [proto: 91/SSL][3 pkts/253 bytes <-> 2 pkts/132 bytes]
 	6	TCP 192.168.200.222:38039 <-> 31.13.79.246:443 [proto: 91.119/SSL.Facebook][14 pkts/1058 bytes <-> 9 pkts/2287 bytes]
 	7	TCP 216.58.199.206:443 <-> 192.168.200.222:58663 [proto: 91.126/SSL.Google][1 pkts/66 bytes <-> 1 pkts/66 bytes]

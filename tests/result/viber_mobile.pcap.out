@@ -4,12 +4,12 @@ HTTP	43	4771	7
 BitTorrent	57	13074	27
 SSL_No_Cert	36	5874	1
 ICMP	3	370	2
-SSL	79	21658	7
+SSL	72	21126	6
 Facebook	50	17455	3
 Dropbox	2	163	1
 GMail	35	14773	2
 Google	76	17175	8
-WhatsApp	31	6224	2
+WhatsApp	38	6756	3
 Viber	10081	1413446	4
 Amazon	8	528	1
 
@@ -18,7 +18,7 @@ Amazon	8	528	1
 	3	TCP 192.168.200.222:59011 <-> 74.125.130.188:5228 [proto: 126/Google][8 pkts/3893 bytes <-> 8 pkts/1945 bytes]
 	4	UDP 192.168.200.222:39413 <-> 134.249.176.227:7108 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/329 bytes]
 	5	TCP 192.168.200.222:60828 -> 93.184.221.200:80 [proto: 7/HTTP][5 pkts/300 bytes -> 0 pkts/0 bytes]
-	6	TCP 192.168.200.222:44058 <-> 158.85.58.23:443 [proto: 91/SSL][4 pkts/277 bytes <-> 3 pkts/255 bytes]
+	6	TCP 192.168.200.222:44058 <-> 158.85.58.23:443 [proto: 91.142/SSL.WhatsApp][4 pkts/277 bytes <-> 3 pkts/255 bytes]
 	7	UDP 192.168.200.222:15836 <-> 8.8.8.8:53 [proto: 5.122/DNS.GMail][1 pkts/75 bytes <-> 1 pkts/166 bytes][Host: mail.google.com]
 	8	UDP 192.168.200.222:39413 <-> 84.202.23.122:22737 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
 	9	UDP 192.168.200.222:39413 <-> 178.57.5.53:64731 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/352 bytes]
