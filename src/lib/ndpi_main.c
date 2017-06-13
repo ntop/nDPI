@@ -1637,11 +1637,14 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 static int ac_match_handler(AC_MATCH_t *m, void *param) {
   int *matching_protocol_id = (int*)param;
 
-  /* Stopping to the first match. We might consider searching
-   * for the more specific match, paying more cpu cycles. */
+  /*
+    Return 1 for stopping to the first match.
+    We might consider searching for the more
+    specific match, paying more cpu cycles. 
+  */
   *matching_protocol_id = m->patterns[0].rep.number;
 
-  return 1; /* 0 to continue searching, !0 to stop */
+  return 0; /* 0 to continue searching, !0 to stop */
 }
 
 /* ******************************************************************** */
@@ -4615,9 +4618,9 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
 int ndpi_match_prefix(const u_int8_t *payload, size_t payload_len,
 		      const char *str, size_t str_len)
 {
-  return str_len <= payload_len
-    ? memcmp(payload, str, str_len) == 0
-    : 0;
+  int rc = str_len <= payload_len ? memcmp(payload, str, str_len) == 0 : 0;
+  
+  return rc;
 }
 
 /* ****************************************************** */
@@ -4628,7 +4631,8 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   AC_TEXT_t ac_input_text;
   ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa : &ndpi_struct->content_automa;
-
+  int rc;
+  
   if((automa->ac_automa == NULL) || (string_to_match_len == 0)) return(NDPI_PROTOCOL_UNKNOWN);
 
   if(!automa->ac_automa_finalized) {
@@ -4638,6 +4642,7 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
   ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, (void*)&matching_protocol_id);
+  
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
   return(matching_protocol_id);

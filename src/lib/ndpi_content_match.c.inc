@@ -91,7 +91,7 @@ static ndpi_network host_protocol_list[] = {
    { 0xC60BFB20 /* 198.11.251.32/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
    { 0xD02B73C0 /* 208.43.115.192/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
    { 0xD02B7A80 /* 208.43.122.128/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   
+
 
   /*
     WeChat
@@ -859,7 +859,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xAC100010 /* 172.16.0.16/32 */, 32, NDPI_PROTOCOL_BITTORRENT },
   { 0xB2A4F550 /* 178.164.245.80/32 */, 32, NDPI_PROTOCOL_BITTORRENT },
   { 0xAE597B3E /* 174.89.123.62/32 */, 32, NDPI_PROTOCOL_BITTORRENT },
-  
+
 
   /*
     Tor
@@ -7987,6 +7987,10 @@ ndpi_protocol_match host_match[] = {
   { ".icloud.com",			"AppleiCloud",		NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "iosapps.itunes.apple.com",		"AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE }, /* iOS */
   { "osxapps.itunes.apple.com",		"AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE }, /* MacOS */
+  { "buy.itunes.apple.com",		"AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "su.itunes.apple.com",		"AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "se.itunes.apple.com",		"AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "myapp.itunes.apple.com",		"AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { "swscan.apple.com",	   	        "AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { "itunes-apple.com",		        "AppleStore",		NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { "itunes.apple.com",			"AppleiTunes",		NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
@@ -8020,7 +8024,7 @@ ndpi_protocol_match host_match[] = {
 
   { "android.clients.google.com",       "PlayStore",		NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
   { "ggpht.com",                        "PlayStore",		NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_ACCEPTABLE },
-  
+
   { "google.",				"Google",		NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".google.",				"Google",		NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".gstatic.com",			"Google",		NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8096,7 +8100,7 @@ ndpi_protocol_match host_match[] = {
 
   { ".spotify.",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "audio-fa.scdn.co",			"Spotify",		NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
-  
+
 
   { ".pandora.com",			"Pandora",		NDPI_PROTOCOL_PANDORA,  NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
@@ -8308,7 +8312,7 @@ ndpi_protocol_match content_match[] = {
   - www.fgd2iwya7vinfutj5wq5we.net
 
   See also DGA (Domain Generation Algorithm)
-  
+
   In essence www.<name>.com|net
 
   To do things properly we should check if host name in the certificate
