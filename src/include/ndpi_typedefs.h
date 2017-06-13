@@ -762,6 +762,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
   NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
   NDPI_PROTOCOL_CATEGORY_SYSTEM,            /* System level applications */
+  NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
 
   NDPI_PROTOCOL_NUM_CATEGORIES /*
 				  NOTE: Keep this as last member

@@ -1622,9 +1622,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 655, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 655, 0, 0, 0, 0) /* UDP */);
     
-/* To be removed as soon as we define new protocols */
-    ndpi_init_placeholder_proto(ndpi_mod, ports_a, ports_b, no_master, NDPI_PROTOCOL_FREE_224);
-
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
 
@@ -4492,6 +4489,9 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
     break;
   case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
     return("Unspecified");
+    break;
+  case NDPI_PROTOCOL_CATEGORY_SW_UPDATE:
+    return("SoftwareUpdate");
     break;
   case NDPI_PROTOCOL_NUM_CATEGORIES:
     return("Code should not use this internal constant");
