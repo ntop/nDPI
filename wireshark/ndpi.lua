@@ -48,6 +48,9 @@ local f_ip_len            = Field.new("ip.len")
 local f_ip_hdr_len        = Field.new("ip.hdr_len")
 local f_ssl_server_name   = Field.new("ssl.handshake.extensions_server_name")
 local f_tcp_flags         = Field.new('tcp.flags')
+local f_tcp_retrans       = Field.new('tcp.analysis.retransmission')
+local f_tcp_ooo           = Field.new('tcp.analysis.out_of_order')
+local f_tcp_lost_segment  = Field.new('tcp.analysis.lost_segment') -- packet drop ?
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -295,6 +298,14 @@ function ndpi_proto.init()
    top_dns_queries        = {}
    num_top_dns_queries    = 0
 
+   -- TCP analysis
+   num_tcp_retrans        = 0
+   num_tcp_ooo            = 0
+   num_tcp_lost_segment   = 0
+   tcp_retrans            = {}
+   tcp_ooo                = {}
+   tcp_lost_segment       = {}
+   
    -- Network RRT
    min_nw_client_RRT  = {}
    min_nw_server_RRT  = {}
@@ -529,6 +540,35 @@ end
 
 -- ###############################################
 
+function tcp_dissector(tvb, pinfo, tree)
+   local _tcp_retrans      = f_tcp_retrans()
+   local _tcp_ooo          = f_tcp_ooo()
+   local _tcp_lost_segment = f_tcp_lost_segment()
+
+   if(_tcp_retrans ~= nil) then
+      local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." -> "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
+      num_tcp_retrans = num_tcp_retrans + 1
+      if(tcp_retrans[key] == nil) then tcp_retrans[key] = 0 end
+      tcp_retrans[key] = tcp_retrans[key] + 1
+   end
+
+   if(_tcp_ooo ~= nil) then
+      local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." -> "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
+      num_tcp_ooo = num_tcp_ooo + 1
+      if(tcp_ooo[key] == nil) then tcp_ooo[key] = 0 end
+      tcp_ooo[key] = tcp_ooo[key] + 1
+   end
+
+   if(_tcp_lost_segment ~= nil) then
+      local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." -> "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
+      num_tcp_lost_segment = num_tcp_lost_segment + 1
+      if(tcp_lost_segment[key] == nil) then tcp_lost_segment[key] = 0 end
+      tcp_lost_segment[key] = tcp_lost_segment[key] + 1
+   end
+end
+
+-- ###############################################
+
 function latency_dissector(tvb, pinfo, tree)
    local _tcp_flags = f_tcp_flags()
    local udp_len    = f_udp_len()
@@ -743,6 +783,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       end -- nDPI
 
       latency_dissector(tvb, pinfo, tree)
+      tcp_dissector(tvb, pinfo, tree)
    end
    
    -- ###########################################
@@ -1077,11 +1118,52 @@ end
 
 -- ###############################################
 
+local function tcp_dialog_menu()
+   local win = TextWindow.new("TCP Packets Analysis");
+   local label = ""
+
+   label = label .. "Total Retransmissions : "..num_tcp_retrans.."\n"
+   if(num_tcp_retrans > 0) then
+      i = 0
+      label = label .. "-----------------------------\n"
+      for k,v in pairsByValues(tcp_retrans, rev) do
+	 label = label .. string.format("%-48s", shortenString(k,48)).."\t"..v.."\n"
+	 if(i == 10) then break else i = i + 1 end
+      end
+   end
+   
+   label = label .. "\nTotal Out-of-Order : "..num_tcp_ooo.."\n"
+   if(num_tcp_ooo > 0) then
+      i = 0
+      label = label .. "-----------------------------\n"
+      for k,v in pairsByValues(tcp_ooo, rev) do
+	 label = label .. string.format("%-48s", shortenString(k,48)).."\t"..v.."\n"
+	 if(i == 10) then break else i = i + 1 end
+      end
+   end
+
+   label = label .. "\nTotal Lost Segment : "..num_tcp_lost_segment.."\n"
+   if(num_tcp_lost_segment > 0) then
+      i = 0
+      label = label .. "-----------------------------\n"
+      for k,v in pairsByValues(tcp_lost_segment, rev) do
+	 label = label .. string.format("%-48s", shortenString(k,48)).."\t"..v.."\n"
+	 if(i == 10) then break else i = i + 1 end
+      end
+   end
+
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
 register_menu("ntop/ARP",          arp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/DNS",          dns_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/SSL",          ssl_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/TCP Analysis", tcp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Network",      rtt_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Application",  appl_rtt_dialog_menu, MENU_TOOLS_UNSORTED)
 
