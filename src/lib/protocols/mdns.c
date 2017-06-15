@@ -80,7 +80,7 @@ static int ndpi_int_check_mdns_payload(struct ndpi_detection_module_struct
 	
     answer[j] = '\0';
 
-    printf("==> [%d] %s\n", j, answer); 
+    /* printf("==> [%d] %s\n", j, answer);  */
 
     len = ndpi_min(sizeof(flow->protos.mdns.answer)-1, j);
     strncpy(flow->protos.mdns.answer, (const char *)answer, len);
