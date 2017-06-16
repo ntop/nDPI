@@ -990,7 +990,7 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
                     flow->detected_protocol.app_protocol),sizeof(proto));
 
 	  updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes, proto);
-	  if(flow->dst2src_packets > 0) updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes, proto);
+	  updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes, proto);
   }
 }
 
@@ -1336,7 +1336,6 @@ static void saveTopStats(json_object **jObj_group, struct top_stats *stats, int 
       json_object *jObj_stat = json_object_new_object();
       json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
       json_object_object_add(jObj_stat,"packets.number",json_object_new_int64(s->num_pkts));
-      json_object_object_add(jObj_stat,"packets.percent",json_object_new_double(s->prcnt_pkt));
       json_object_object_add(jObj_stat,"flows.number",json_object_new_double(s->num_flows));
       json_object_object_add(jObj_stat,"aggressive.ip",json_object_new_string(s->top_ip));
       json_object_object_add(jObj_stat,"protocol",json_object_new_string(s->proto));
@@ -1665,6 +1664,15 @@ static void printResults(u_int64_t tot_usec) {
   }
 
 
+  if(verbose == 3) {
+    printf("\n\nSource Ports Stats:\n");
+    printPortStats(srcStats);
+
+    printf("\nDestination Ports Stats:\n");
+    printPortStats(dstStats);
+  }
+
+
   if(stats_flag) {
 #ifdef HAVE_JSON_C
     u_int64_t total_src_addr = getTopStats(&topSrcStats, srcStats, cumulative_stats.ip_packet_count);
@@ -1686,17 +1694,12 @@ static void printResults(u_int64_t tot_usec) {
 #endif
   }
 
-
-  if(verbose == 3) {
-    printf("\n\nSource Ports Stats:\n");
-    printPortStats(srcStats);
-
-    printf("\nDestination Ports Stats:\n");
-    printPortStats(dstStats);
-
-    deletePortsStats(srcStats), deletePortsStats(dstStats);
-    srcStats = NULL, dstStats = NULL;
+  if(verbose == 3 || stats_flag){
+      deletePortsStats(srcStats), deletePortsStats(dstStats);
+      srcStats = NULL, dstStats = NULL;
   }
+
+
 }
 
 
