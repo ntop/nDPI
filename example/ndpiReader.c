@@ -1489,7 +1489,7 @@ static void saveTopStats(json_object **jObj_group,
       json_object_object_add(jObj_stat,"flows.percent",json_object_new_double((s->num_flows*100.0)/total_flow_count));
       if(s->num_pkts) json_object_object_add(jObj_stat,"flows/packets",
                               json_object_new_double(((double)s->num_flows)/s->num_pkts));
-      else json_object_object_add(jObj_stat,"flows/packets",json_object_new_double(0.0));
+      else json_object_object_add(jObj_stat,"flows.num_packets",json_object_new_double(0.0));
 
       json_object_object_add(jObj_stat,"aggressive.ip",json_object_new_string(s->top_ip));
       json_object_object_add(jObj_stat,"protocol",json_object_new_string(s->proto));
