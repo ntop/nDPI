@@ -91,14 +91,14 @@ static u_int32_t num_flows;
 
 struct info_pair{
     char addr[48];
-    char proto[48]; /*l4 protocol*/
+    char proto[48]; /*app level protocol*/
     int count;
 };
 
 typedef struct node_a{
     char addr[48];
     int count;
-    char proto[48]; /*l4 protocol*/
+    char proto[48]; /*app level protocol*/
     struct node_a *left, *right;
 }addr_node;
 
@@ -121,7 +121,6 @@ struct top_stats {
   char top_ip[48]; /*ip address that is contributed to > 95% of traffic*/
   char proto[64]; /*application level protocol of top_ip */
   u_int32_t num_pkts;
-  float prcnt_pkt; /*percent of packets respect to total packets */
   u_int32_t num_addr; /*to hold number of distinct IP addresses */
   u_int32_t num_flows;
   UT_hash_handle hh;  /* makes this structure hashable */
@@ -129,6 +128,23 @@ struct top_stats {
 
 struct top_stats *topSrcStats = NULL, *topDstStats = NULL;
 
+
+// struct to hold count of flows received by destination ports
+struct port_flow_info {
+  u_int32_t port; /* key */
+  u_int32_t num_flows;
+  UT_hash_handle hh;
+};
+
+// struct to hold single packet tcp flows send by source ip address
+struct single_flow_info {
+  char saddr[48]; /* key */
+  struct port_flow_info *ports;
+  u_int32_t tot_flows; 
+  UT_hash_handle hh;
+};
+
+struct single_flow_info *scannerHosts = NULL;
 
 struct ndpi_packet_trailer {
   u_int32_t magic; /* 0x19682017 */
@@ -811,6 +827,47 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
 /* *********************************************** */
 
+void updateScanners(struct single_flow_info **scanners, const char *saddr, u_int32_t dport){
+  struct single_flow_info *f;
+
+  HASH_FIND_STR(*scanners, saddr, f);
+
+  if(f == NULL) {
+    f = (struct single_flow_info*)malloc(sizeof(struct single_flow_info));
+    if(!f) return;
+    strncpy(f->saddr, saddr, sizeof(f->saddr));
+    f->tot_flows = 1;
+    f->ports = NULL;
+
+    HASH_ADD_STR(*scanners, saddr, f);
+
+    struct port_flow_info *p = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
+    if(!p) return;
+    p->port = dport;
+    p->num_flows = 1;
+
+    HASH_ADD_INT(f->ports, port, p);
+  }
+  else{
+    struct port_flow_info *pp;
+    f->tot_flows++;
+
+    HASH_FIND_INT(f->ports, &dport, pp);
+
+    if(pp == NULL){
+      pp = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
+      if(!pp) return;
+      pp->port = dport;
+      pp->num_flows = 1;
+
+      HASH_ADD_INT(f->ports, port, pp);
+    }
+    else pp->num_flows++; 
+  }
+}
+
+/* *********************************************** */
+
 int updateIpTree(const char *key, addr_node **vrootp, const char *proto) {
   addr_node *q;
   addr_node **rootp = vrootp;
@@ -920,7 +977,7 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
     s = (struct port_stats*)malloc(sizeof(struct port_stats));
     if(!s) return;
 
-    s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes,
+    s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes;
     s->num_addr = 1, s->cumulative_addr = 1; s->num_flows = 1;
 
     memset(s->top_ip_addrs, 0, MAX_NUM_IP_ADDRESS*sizeof(struct info_pair));
@@ -953,6 +1010,22 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
 /* *********************************************** */
 
+static void deleteScanners(struct single_flow_info *scanners){
+  struct single_flow_info *s, *tmp;
+  struct port_flow_info *p, *tmp2;
+
+  HASH_ITER(hh, scanners, s, tmp) {
+    HASH_ITER(hh, s->ports, p, tmp2) {
+      HASH_DEL(s->ports, p);
+      free(s->ports);
+    }
+    HASH_DEL(scanners, s);
+    free(s);
+  }
+}
+
+/* *********************************************** */
+
 static void deletePortsStats(struct port_stats *stats) {
   struct port_stats *current_port, *tmp;
 
@@ -976,6 +1049,7 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
 	  char saddr[48], daddr[48];
           char proto[48];
           u_int16_t thread_id = *(int *)user_data;
+          int r;
 
 	  sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
 	  strncpy(saddr, flow->src_name, sizeof(saddr));
@@ -988,6 +1062,12 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
           else
             strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                     flow->detected_protocol.app_protocol),sizeof(proto));
+
+          if(((r = strcmp(ipProto2Name(flow->protocol), "TCP")) == 0)
+              && (flow->src2dst_packets == 1) && (flow->dst2src_packets == 0)){
+
+              updateScanners(&scannerHosts, saddr, dport);
+          }
 
 	  updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes, proto);
 	  updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes, proto);
@@ -1252,6 +1332,24 @@ static int port_stats_sort(void *_a, void *_b) {
 
 /* *********************************************** */
 
+static int scanners_sort(void *_a, void *_b) {
+  struct single_flow_info *a = (struct single_flow_info *)_a;
+  struct single_flow_info *b = (struct single_flow_info *)_b;
+
+  return(b->tot_flows - a->tot_flows);
+}
+
+/* *********************************************** */
+
+static int scanners_port_sort(void *_a, void *_b) {
+  struct port_flow_info *a = (struct port_flow_info *)_a;
+  struct port_flow_info *b = (struct port_flow_info *)_b;
+
+  return(b->num_flows - a->num_flows);
+}
+
+/* *********************************************** */
+
 static int info_pair_cmp (const void *_a, const void *_b)
 {
     struct info_pair *a = (struct info_pair *)_a;
@@ -1284,7 +1382,7 @@ static void deleteTopStats(struct top_stats *stats) {
 /**
  * @brief Get port based top statistics
  */
-static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_int64_t total_packet_count){
+static int getTopStats(struct top_stats **topStats, struct port_stats *stats){
   struct top_stats *s;
   struct port_stats *sp, *tmp;
   struct info_pair inf;
@@ -1297,7 +1395,6 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_
 
     s->port = sp->port;
     s->num_pkts = sp->num_pkts;
-    s->prcnt_pkt = (sp->num_pkts*100.0)/total_packet_count;
     s->num_addr = sp->num_addr;
     s->num_flows = sp->num_flows;
 
@@ -1321,10 +1418,62 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats, u_
 /* *********************************************** */
 
 #ifdef HAVE_JSON_C
+static void saveScannerStats(json_object **jObj_group, struct single_flow_info *scanners){
+  struct single_flow_info *s, *tmp;
+  struct port_flow_info *p, *tmp2;
+  json_object *jArray_stats  = json_object_new_array();
+  int i = 0, j = 0;
+  
+  HASH_SORT(scanners, scanners_sort);
+
+
+  HASH_ITER(hh, scanners, s, tmp) {
+    json_object *jObj_stat = json_object_new_object();
+    json_object *jArray_ports = json_object_new_array();
+
+    json_object_object_add(jObj_stat,"ip.address",json_object_new_string(s->saddr));
+    json_object_object_add(jObj_stat,"total.flows.number",json_object_new_int(s->tot_flows));
+
+    HASH_SORT(s->ports, scanners_port_sort);
+
+    HASH_ITER(hh, s->ports, p, tmp2) {
+      json_object *jObj_port = json_object_new_object();
+
+      json_object_object_add(jObj_port,"port",json_object_new_int(p->port));
+      json_object_object_add(jObj_port,"flows.number",json_object_new_int(p->num_flows));
+
+      json_object_array_add(jArray_ports, jObj_port);
+
+      j++;
+      if(j >= 10) break;
+    }
+
+    json_object_object_add(jObj_stat,"top.ports",jArray_ports);
+    json_object_array_add(jArray_stats, jObj_stat);
+    
+    j = 0;
+    i++;
+    if(i >= 10) break;
+  }
+
+  json_object_object_add(*jObj_group, "scanner.stats", jArray_stats);
+
+
+}
+#endif
+
+
+
+#ifdef HAVE_JSON_C
 /*
  * @brief Save Top Stats in json format
  */
-static void saveTopStats(json_object **jObj_group, struct top_stats *stats, int direction, u_int64_t total_ip_addr){
+static void saveTopStats(json_object **jObj_group, 
+                         struct top_stats *stats, 
+                         int direction, 
+                         u_int64_t total_flow_count, 
+                         u_int64_t total_ip_addr){
+
   struct top_stats *s, *tmp;
   json_object *jArray_stats  = json_object_new_array();
   int i = 0;
@@ -1337,6 +1486,11 @@ static void saveTopStats(json_object **jObj_group, struct top_stats *stats, int 
       json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
       json_object_object_add(jObj_stat,"packets.number",json_object_new_int64(s->num_pkts));
       json_object_object_add(jObj_stat,"flows.number",json_object_new_double(s->num_flows));
+      json_object_object_add(jObj_stat,"flows.percent",json_object_new_double((s->num_flows*100.0)/total_flow_count));
+      if(s->num_pkts) json_object_object_add(jObj_stat,"flows/packets",
+                              json_object_new_double(((double)s->num_flows)/s->num_pkts));
+      else json_object_object_add(jObj_stat,"flows/packets",json_object_new_double(0.0));
+
       json_object_object_add(jObj_stat,"aggressive.ip",json_object_new_string(s->top_ip));
       json_object_object_add(jObj_stat,"protocol",json_object_new_string(s->proto));
 
@@ -1675,8 +1829,8 @@ static void printResults(u_int64_t tot_usec) {
 
   if(stats_flag) {
 #ifdef HAVE_JSON_C
-    u_int64_t total_src_addr = getTopStats(&topSrcStats, srcStats, cumulative_stats.ip_packet_count);
-    u_int64_t total_dst_addr = getTopStats(&topDstStats, dstStats, cumulative_stats.ip_packet_count);
+    u_int64_t total_src_addr = getTopStats(&topSrcStats, srcStats);
+    u_int64_t total_dst_addr = getTopStats(&topDstStats, dstStats);
 
     json_object *jObj_stats = json_object_new_object();
     char timestamp[64];
@@ -1684,13 +1838,19 @@ static void printResults(u_int64_t tot_usec) {
     strftime(timestamp, sizeof(timestamp), "%FT%TZ", localtime(&pcap_start.tv_sec));
     json_object_object_add(jObj_stats, "time", json_object_new_string(timestamp));
 
-    saveTopStats(&jObj_stats, topSrcStats, DIR_SRC, total_src_addr);
-    saveTopStats(&jObj_stats, topDstStats, DIR_DST, total_dst_addr);
+    saveScannerStats(&jObj_stats, scannerHosts);
+    
+    saveTopStats(&jObj_stats, topSrcStats, DIR_SRC, cumulative_stats.ndpi_flow_count, total_src_addr);
+    saveTopStats(&jObj_stats, topDstStats, DIR_DST, cumulative_stats.ndpi_flow_count, total_dst_addr);
 
     json_object_array_add(jArray_topStats, jObj_stats);
 
     deleteTopStats(topSrcStats), deleteTopStats(topDstStats);
     topSrcStats = NULL, topDstStats = NULL;
+
+    deleteScanners(scannerHosts);
+    scannerHosts = NULL;
+
 #endif
   }
 
