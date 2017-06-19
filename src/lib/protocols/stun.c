@@ -98,6 +98,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	      
       case 0x8054: /* Candidate Identifier */
 	if((len == 4)
+	   && ((payload[offset+4] == 0x31) || (payload[offset+4] == 0x34))
 	   && (payload[offset+5] == 0x00)
 	   && (payload[offset+6] == 0x00)
 	   && (payload[offset+7] == 0x00)) {
@@ -258,16 +259,15 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
       if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
 			     packet->payload_packet_len - 2, &is_whatsapp, &is_lync) == NDPI_IS_STUN) {
-				 if(is_lync) {
-				   NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
-				   ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_MS_LYNC, flow);
-				 } else {
-				   NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found UDP stun.\n");
-				   ndpi_int_stun_add_connection(ndpi_struct,
-								is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
-				 }
-
-				return;
+	if(is_lync) {
+	  NDPI_LOG(NDPI_PROTOCOL_MS_LYNC, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
+	  ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_MS_LYNC, flow);
+	} else {
+	  NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found UDP stun.\n");
+	  ndpi_int_stun_add_connection(ndpi_struct,
+				       is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
+	}	
+	return;
       }
     }
   }
