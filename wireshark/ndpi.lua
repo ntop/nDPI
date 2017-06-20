@@ -743,8 +743,8 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
 	    if(application_protocol ~= 0) then
 	       -- Set protocol name in the wireshark protocol column (if not Unknown)
-	       --pinfo.cols.protocol = name
-	       print(network_protocol .. "/" .. application_protocol .. "/".. name)
+	       pinfo.cols.protocol = name
+	       --print(network_protocol .. "/" .. application_protocol .. "/".. name)
 	    end
 
 	    if(compute_flows_stats) then
