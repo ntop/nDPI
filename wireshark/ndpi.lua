@@ -51,6 +51,8 @@ local f_tcp_flags         = Field.new('tcp.flags')
 local f_tcp_retrans       = Field.new('tcp.analysis.retransmission')
 local f_tcp_ooo           = Field.new('tcp.analysis.out_of_order')
 local f_tcp_lost_segment  = Field.new('tcp.analysis.lost_segment') -- packet drop ?
+local f_rpc_xid           = Field.new('rpc.xid')
+local f_rpc_msgtyp        = Field.new('rpc.msgtyp')
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -91,6 +93,8 @@ local max_appl_RRT           = {}
 
 local first_payload_ts       = {}
 local first_payload_id       = {}
+
+local rpc_ts                 = {}
 
 local num_pkts               = 0
 local last_processed_packet_number = 0
@@ -321,6 +325,9 @@ function ndpi_proto.init()
    max_appl_RRT          = {}
    first_payload_ts      = {}
    first_payload_id      = {}
+
+   -- RPC
+   rpc_ts                = {}   
 end
 
 function slen(str)
@@ -532,6 +539,31 @@ function dns_dissector(tvb, pinfo, tree)
 		  if(dns_responses_error[srckey] == nil) then dns_responses_error[srckey] = 0 end
 		  dns_responses_error[srckey] = dns_responses_error[srckey] + 1
 	       end
+	    end
+	 end
+      end
+   end
+end
+
+-- ###############################################
+
+function rpc_dissector(tvb, pinfo, tree)
+   local _rpc_xid      = f_rpc_xid()
+   local _rpc_msgtyp   = f_rpc_msgtyp()
+
+   if((_rpc_xid ~= nil) and (_rpc_msgtyp ~= nil)) then
+      local xid    = getval(_rpc_xid)
+      local msgtyp = getval(_rpc_msgtyp)
+
+      if(msgtyp == "0") then
+	 rpc_ts[xid] = pinfo.abs_ts
+      else
+	 if(rpc_ts[xid] ~= nil) then
+	    local appl_latency = abstime_diff(pinfo.abs_ts, rpc_ts[xid]) * 1000
+	    
+	    if((appl_latency > 0) and (appl_latency < max_appl_lat_discard)) then
+	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+	       ntop_subtree:add(ntop_fds.appl_latency_rtt, appl_latency)
 	    end
 	 end
       end
@@ -812,6 +844,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
    ssl_dissector(tvb, pinfo, tree)
    dns_dissector(tvb, pinfo, tree)
+   rpc_dissector(tvb, pinfo, tree)
 end
 
 register_postdissector(ndpi_proto)
