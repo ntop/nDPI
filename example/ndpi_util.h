@@ -43,6 +43,10 @@
 #define AGGRESSIVE_PERCENT      95.00
 #define DIR_SRC                    10
 #define DIR_DST                    20
+#define PORT_ARRAY_SIZE            20
+#define FLOWS_PACKETS_TRESHOLD    0.9
+#define FLOWS_PERCENT_TRESHOLD    1.0
+#define INIT_VAL                   -1
 
 // flow tracking
 typedef struct ndpi_flow_info {
