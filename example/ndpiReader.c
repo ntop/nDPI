@@ -46,6 +46,10 @@
 #include "../config.h"
 #include "ndpi_api.h"
 #include "uthash.h"
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <libgen.h>
 
 #ifdef HAVE_JSON_C
 #include <json.h>
@@ -62,6 +66,7 @@ static char *_bpf_filter      = NULL; /**< bpf filter  */
 static char *_protoFilePath   = NULL; /**< Protocol file path  */
 static char *_statsFilePath   = NULL; /**< Top stats file path */
 #ifdef HAVE_JSON_C
+static char *_diagnoseFilePath   = NULL; /**< Top stats file path */
 static char *_jsonFilePath    = NULL; /**< JSON file path  */
 static FILE *stats_fp = NULL;         /**< for Top Stats JSON file */
 #endif
@@ -73,7 +78,7 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
-static u_int8_t stats_flag = 0, file_first_time = 1;
+static u_int8_t stats_flag = 0, file_first_time = 1, bpf_filter_flag = 0;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
@@ -203,7 +208,7 @@ static void help(u_int long_help) {
 
   printf("ndpiReader -i <file|device> [-f <filter>][-s <duration>][-m <duration>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
-	 "          [-n <threads>] [-w <file>] [-j <file>]\n\n"
+	 "          [-n <threads>] [-w <file>] [-j <file>] [-x <file>] \n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
 	 "                            | device for live capture (comma-separated list)\n"
@@ -229,7 +234,10 @@ static void help(u_int long_help) {
 	 "                            | 1 = verbose\n"
 	 "                            | 2 = very verbose\n"
 	 "                            | 3 = port stats\n"
-         "  -b <file.json>            | Specify a file to write port based diagnose statistics\n");
+         "  -b <file.json>            | Specify a file to write port based diagnose statistics\n"
+         "  -x <file.json>            | Produce bpf filters for specified diagnose file. Use\n"
+         "                            | this option only for .json files generated with -b flag.\n");
+
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -400,7 +408,7 @@ static void parseOptions(int argc, char **argv) {
   if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
 #endif
 
-  while ((opt = getopt_long(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:", longopts, &option_idx)) != EOF) {
+  while ((opt = getopt_long(argc, argv, "df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:", longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
@@ -426,6 +434,15 @@ static void parseOptions(int argc, char **argv) {
 
     case 'm':
       pcap_analysis_duration = atol(optarg);
+      break;
+
+      case 'x':
+#ifndef HAVE_JSON_C
+      printf("WARNING: this copy of ndpiReader has been compiled without JSON-C: json export disabled\n");
+#else
+      _diagnoseFilePath = optarg;
+      bpf_filter_flag = 1;
+#endif
       break;
 
     case 'f':
@@ -535,42 +552,45 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
-  if(do_capture) {
-    quiet_mode = 1;
-    extcap_capture();
-  }
-
-  // check parameters
-  if(_pcap_file[0] == NULL || strcmp(_pcap_file[0], "") == 0) {
-    help(0);
-  }
-
-  if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
-    num_threads = 0;               /* setting number of threads = number of interfaces */
-    __pcap_file = strtok(_pcap_file[0], ",");
-    while (__pcap_file != NULL && num_threads < MAX_NUM_READER_THREADS) {
-      _pcap_file[num_threads++] = __pcap_file;
-      __pcap_file = strtok(NULL, ",");
+  if(!bpf_filter_flag){
+      
+    if(do_capture) {
+      quiet_mode = 1;
+      extcap_capture();
     }
-  } else {
-    if(num_threads > MAX_NUM_READER_THREADS) num_threads = MAX_NUM_READER_THREADS;
-    for(thread_id = 1; thread_id < num_threads; thread_id++)
-      _pcap_file[thread_id] = _pcap_file[0];
-  }
+
+    // check parameters
+    if(!bpf_filter_flag && (_pcap_file[0] == NULL || strcmp(_pcap_file[0], "") == 0)) {
+      help(0);
+    }
+
+    if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
+      num_threads = 0;               /* setting number of threads = number of interfaces */
+      __pcap_file = strtok(_pcap_file[0], ",");
+      while (__pcap_file != NULL && num_threads < MAX_NUM_READER_THREADS) {
+        _pcap_file[num_threads++] = __pcap_file;
+        __pcap_file = strtok(NULL, ",");
+      }
+    } else {
+      if(num_threads > MAX_NUM_READER_THREADS) num_threads = MAX_NUM_READER_THREADS;
+      for(thread_id = 1; thread_id < num_threads; thread_id++)
+        _pcap_file[thread_id] = _pcap_file[0];
+    }
 
 #ifdef linux
-  for(thread_id = 0; thread_id < num_threads; thread_id++)
-    core_affinity[thread_id] = -1;
+    for(thread_id = 0; thread_id < num_threads; thread_id++)
+      core_affinity[thread_id] = -1;
 
-  if(num_cores > 1 && bind_mask != NULL) {
-    char *core_id = strtok(bind_mask, ":");
-    thread_id = 0;
-    while (core_id != NULL && thread_id < num_threads) {
-      core_affinity[thread_id++] = atoi(core_id) % num_cores;
-      core_id = strtok(NULL, ":");
+    if(num_cores > 1 && bind_mask != NULL) {
+      char *core_id = strtok(bind_mask, ":");
+      thread_id = 0;
+      while (core_id != NULL && thread_id < num_threads) {
+        core_affinity[thread_id++] = atoi(core_id) % num_cores;
+        core_id = strtok(NULL, ":");
+      }
     }
-  }
 #endif
+  }
 
 #ifdef DEBUG_TRACE
   if(trace) fclose(trace);
@@ -1354,6 +1374,7 @@ static int info_pair_cmp (const void *_a, const void *_b)
 {
     struct info_pair *a = (struct info_pair *)_a;
     struct info_pair *b = (struct info_pair *)_b;
+
     return b->count - a->count;
 }
 
@@ -2243,6 +2264,193 @@ void automataUnitTest() {
   ndpi_free_automa(automa);
 }
 
+/* *********************************************** */
+
+/**
+ * @brief Produce port based pbf filter for port array
+ * and saves it in .json format
+ */
+
+void bpf_filter_produce_filter(int port_array[], int size, char *filePath){
+  char *prefix = "bpf_filter_";
+  char _filterFilePath[1024];
+  char *fileName;
+  FILE *fp = NULL;
+  char filter[1024];
+  char buf[10];
+  int produced = 0;
+  int i = 0;
+
+  printf("producing bpf filter...\n");
+
+  strcpy(filter, "not (dst port ");
+
+  while(i < size && port_array[i] != INIT_VAL){
+    if(i+1 == size || port_array[i+1] == INIT_VAL)
+      snprintf(buf, sizeof(buf), "%d", port_array[i]);
+    else
+      snprintf(buf, sizeof(buf), "%d or ", port_array[i]);
+    strncat(filter, buf, sizeof(buf));
+    i++;
+
+    produced = 1;
+  }
+
+  strncat(filter, ")", sizeof(")"));
+
+
+  fileName = basename(filePath);
+  snprintf(_filterFilePath, sizeof(_filterFilePath), "%s%s", prefix, fileName);
+
+  if((fp = fopen(_filterFilePath,"w")) == NULL) {
+    printf("Error creating .json file %s\n", _filterFilePath);
+    exit(-1);
+  } 
+
+  json_object *jObj_bpfFilter = json_object_new_object();
+  if(produced)
+    json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(filter));
+  else
+    json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(""));
+
+  fprintf(fp,"%s\n",json_object_to_json_string(jObj_bpfFilter));
+  fclose(fp);
+  
+  printf("created: %s\n", _filterFilePath);
+
+}
+
+/* *********************************************** */
+/**
+ * @brief Initialize port array
+ */
+
+void bpf_filter_port_array_init(int array[], int size){
+  int i;
+  for(i=0; i<size; i++)
+    array[i] = INIT_VAL;
+}
+
+/* *********************************************** */
+/**
+ * @brief Add port to port array
+ */
+
+void bpf_filter_port_array_add(int filter_array[], int size, int port){
+   int i;
+   for(i=0; i<size; i++){
+    if(filter_array[i] == port)
+      return;
+    if(filter_array[i] == INIT_VAL){
+      filter_array[i] = port;
+      return;
+    }
+  }
+  fprintf(stderr,"bpf_filter_port_array_add: max array size is reached!\n");
+  exit(-1);
+}
+
+
+/* *********************************************** */
+
+#ifdef HAVE_JSON_C
+static void produceBpfFilters(char *filePath){
+  int fsock;
+  struct stat statbuf;
+  void *fmap;
+  struct json_object *jObj; /* entire json object from file */
+  int filterPorts[PORT_ARRAY_SIZE]; /* ports to filter */
+  int array_len;
+  int typeCheck; /* jObj should be a json array */
+  int i;
+
+
+  if((fsock = open(filePath, O_RDONLY)) == -1){
+      fprintf(stderr,"error opening file %s\n", filePath);
+      exit(-1);
+  }
+
+  if(fstat(fsock, &statbuf) == -1){
+      fprintf(stderr,"error getting file stat\n");
+      exit(-1);
+  }
+
+  if((fmap = mmap(NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fsock, 0)) == MAP_FAILED){
+      fprintf(stderr,"error mmap is failed\n");
+      exit(-1);
+  }
+
+  if((jObj = json_tokener_parse(fmap)) == NULL){
+    printf("ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
+    exit(-1);
+  }
+
+  if((typeCheck = json_object_is_type(jObj, json_type_array)) == 0){
+    printf("ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
+    exit(-1);
+  }
+
+
+  bpf_filter_port_array_init(filterPorts, PORT_ARRAY_SIZE);
+  array_len = json_object_array_length(jObj);
+
+  for(i=0; i<array_len; i++){
+    json_object *stats = json_object_array_get_idx(jObj, i);
+    json_object *val;
+    json_bool res;
+    int stat_len;
+    int j;
+
+    if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0){
+      printf("ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
+    }
+
+    for(j=0; j<json_object_array_length(val); j++){
+      json_object *src_pkts_stat = json_object_array_get_idx(val, j);
+      json_object *jObj_flows_percent;
+      json_object *jObj_flows_packets;
+      json_object *jObj_port;
+      json_bool res;
+
+      if((res = json_object_object_get_ex(src_pkts_stat, "flows.percent", &jObj_flows_percent)) == 0){
+        printf("ERROR: invalid json file. Use -x flag only for .json files generated with -b flag.\n");
+        exit(-1);
+      }
+      double flows_percent = json_object_get_double(jObj_flows_percent);
+
+
+      if((res = json_object_object_get_ex(src_pkts_stat, "flows/packets", &jObj_flows_packets)) == 0){
+        printf("ERROR: invalid json file. Use -x flag only for .json files generated with -b flag.\n");
+        exit(-1);
+      }
+      double flows_packets = json_object_get_double(jObj_flows_packets);
+
+
+      if((flows_packets > FLOWS_PACKETS_TRESHOLD) && (flows_percent >= FLOWS_PERCENT_TRESHOLD)){
+
+        if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0){
+          printf("ERROR: invalid json file. Use -x flag only for .json files generated with -b flag.\n");
+          exit(-1);
+        }
+        int port = json_object_get_int(jObj_port);
+
+        bpf_filter_port_array_add(filterPorts, PORT_ARRAY_SIZE, port);
+      }
+    }
+  }
+
+  json_object_put(jObj); /* free memory */
+
+  bpf_filter_produce_filter(filterPorts, PORT_ARRAY_SIZE, filePath);
+
+}
+#endif
+
+
+/* *********************************************** */
+
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -2255,6 +2463,14 @@ int main(int argc, char **argv) {
   memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
   parseOptions(argc, argv);
+
+  if(bpf_filter_flag){
+#ifdef HAVE_JSON_C
+    produceBpfFilters(_diagnoseFilePath);
+    return 0;
+#endif
+  }
+
 
   if((!json_flag) && (!quiet_mode)) {
     printf("\n-----------------------------------------------------------\n"
