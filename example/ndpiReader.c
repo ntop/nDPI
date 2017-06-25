@@ -2270,7 +2270,7 @@ void automataUnitTest() {
  * @brief Produce port based pbf filter for port array
  * and saves it in .json format
  */
-
+#ifdef HAVE_JSON_C
 void bpf_filter_produce_filter(int port_array[], int size, char *filePath){
   char *prefix = "bpf_filter_";
   char _filterFilePath[1024];
@@ -2319,7 +2319,7 @@ void bpf_filter_produce_filter(int port_array[], int size, char *filePath){
   printf("created: %s\n", _filterFilePath);
 
 }
-
+#endif
 /* *********************************************** */
 /**
  * @brief Initialize port array
