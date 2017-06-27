@@ -1626,6 +1626,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "TINC", NDPI_PROTOCOL_CATEGORY_VPN,
 			    ndpi_build_default_ports(ports_a, 655, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 655, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_FIX,
+			    no_master,
+			    no_master, "FIX", NDPI_PROTOCOL_CATEGORY_RPC,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
@@ -2719,6 +2724,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* TINC */
   init_tinc_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* FIX */
+  init_fix_dissector(ndpi_struct, &a, detection_bitmask);
 
   /*** Put false-positive sensitive protocols at the end ***/
 

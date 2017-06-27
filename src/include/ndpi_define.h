@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-17 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -180,15 +180,15 @@
 #define NDPI_SOULSEEK_CONNECTION_IP_TICK_TIMEOUT               600
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-#define NDPI_LOG(proto, m, log_level, args...)		                                     \
-  {								                                                         \
+#define NDPI_LOG(proto, m, log_level, args...)		                                 \
+  {								                         \
     struct ndpi_detection_module_struct *mod = (struct ndpi_detection_module_struct*) m; \
-    if(mod != NULL) {						                                             \
+    if(mod != NULL) {						                         \
       mod->ndpi_debug_print_file=__FILE__;                                               \
       mod->ndpi_debug_print_function=__FUNCTION__;                                       \
       mod->ndpi_debug_print_line=__LINE__;                                               \
       (*(mod->ndpi_debug_printf))(proto, mod, log_level, args);                          \
-    }								                                                     \
+    }								                         \
   }
 #else							/* NDPI_ENABLE_DEBUG_MESSAGES */
 #ifdef WIN32
