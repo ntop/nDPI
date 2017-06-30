@@ -1309,7 +1309,10 @@ static void json_open_stats_file() {
 }
 
 static void json_close_stats_file() {
-  fprintf(stats_fp,"%s\n",json_object_to_json_string(jArray_topStats));
+  json_object *jObjFinal = json_object_new_object();
+  json_object_object_add(jObjFinal,"duration.in.seconds",json_object_new_int(pcap_analysis_duration));
+  json_object_object_add(jObjFinal,"statistics", jArray_topStats);
+  fprintf(stats_fp,"%s\n",json_object_to_json_string(jObjFinal));
   fclose(stats_fp);
 }
 #endif
@@ -1538,6 +1541,7 @@ static void saveTopStats(json_object **jObj_group,
     json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
     json_object_object_add(jObj_stat,"ip.total",json_object_new_int64(s->num_addr));
     json_object_object_add(jObj_stat,"ip.percent",json_object_new_double((s->num_addr*100.0)/total_ip_addr));
+    json_object_object_add(jObj_stat,"flows.number",json_object_new_double(s->num_flows));
 
     json_object_array_add(jArray_stats,jObj_stat);
     i++;
@@ -1850,9 +1854,6 @@ static void printResults(u_int64_t tot_usec) {
 
   if(stats_flag) {
 #ifdef HAVE_JSON_C
-    u_int64_t total_src_addr = getTopStats(&topSrcStats, srcStats);
-    u_int64_t total_dst_addr = getTopStats(&topDstStats, dstStats);
-
     json_object *jObj_stats = json_object_new_object();
     char timestamp[64];
 
@@ -1860,6 +1861,9 @@ static void printResults(u_int64_t tot_usec) {
     json_object_object_add(jObj_stats, "time", json_object_new_string(timestamp));
 
     saveScannerStats(&jObj_stats, scannerHosts);
+
+    u_int64_t total_src_addr = getTopStats(&topSrcStats, srcStats);
+    u_int64_t total_dst_addr = getTopStats(&topDstStats, dstStats);
     
     saveTopStats(&jObj_stats, topSrcStats, DIR_SRC, cumulative_stats.ndpi_flow_count, total_src_addr);
     saveTopStats(&jObj_stats, topDstStats, DIR_DST, cumulative_stats.ndpi_flow_count, total_dst_addr);
@@ -2267,36 +2271,63 @@ void automataUnitTest() {
 /* *********************************************** */
 
 /**
- * @brief Produce port based pbf filter for port array
- * and saves it in .json format
+ * @brief Produce bpf filter to filter ports and hosts,
+ * save it in .json format
  */
 #ifdef HAVE_JSON_C
-void bpf_filter_produce_filter(int port_array[], int size, char *filePath){
+void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_array[48], int h_size, char *filePath){
+  FILE *fp = NULL;
   char *prefix = "bpf_filter_";
   char _filterFilePath[1024];
   char *fileName;
-  FILE *fp = NULL;
-  char filter[1024];
-  char buf[10];
+  char filter[2048];
+  char portBuf[10];
+  char hostBuf[64];
   int produced = 0;
   int i = 0;
 
   printf("producing bpf filter...\n");
 
-  strcpy(filter, "not (dst port ");
 
-  while(i < size && port_array[i] != INIT_VAL){
-    if(i+1 == size || port_array[i+1] == INIT_VAL)
-      snprintf(buf, sizeof(buf), "%d", port_array[i]);
-    else
-      snprintf(buf, sizeof(buf), "%d or ", port_array[i]);
-    strncat(filter, buf, sizeof(buf));
-    i++;
+  if(port_array[0] != INIT_VAL){
 
+    strcpy(filter, "not (src port ");
+
+    while(i < p_size && port_array[i] != INIT_VAL){
+      if(i+1 == p_size || port_array[i+1] == INIT_VAL)
+        snprintf(portBuf, sizeof(portBuf), "%d", port_array[i]);
+      else
+        snprintf(portBuf, sizeof(portBuf), "%d or ", port_array[i]);
+      strncat(filter, portBuf, sizeof(portBuf));
+      i++;
+    }
+
+    strncat(filter, ")", sizeof(")"));
     produced = 1;
   }
 
-  strncat(filter, ")", sizeof(")"));
+
+  if(host_array[0] != NULL){
+
+    if(port_array[0] != INIT_VAL)
+      strncat(filter, " and not (host ", sizeof(" and not (host "));
+    else
+      strcpy(filter, "not (host ");
+    
+    i=0;
+
+    while(i < h_size && host_array[i] != NULL){
+      if(i+1 == h_size || host_array[i+1] == NULL)
+        snprintf(hostBuf, sizeof(hostBuf), "%s", host_array[i]);
+      else
+        snprintf(hostBuf, sizeof(hostBuf), "%s or ", host_array[i]);
+      strncat(filter, hostBuf, sizeof(hostBuf));
+      i++;
+    }
+
+    strncat(filter, ")", sizeof(")"));
+    produced = 1;
+  }
 
 
   fileName = basename(filePath);
@@ -2307,19 +2338,22 @@ void bpf_filter_produce_filter(int port_array[], int size, char *filePath){
     exit(-1);
   } 
 
+
   json_object *jObj_bpfFilter = json_object_new_object();
+
   if(produced)
-    json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(filter));
+   json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(filter));
   else
     json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(""));
 
   fprintf(fp,"%s\n",json_object_to_json_string(jObj_bpfFilter));
   fclose(fp);
   
-  printf("created: %s\n", _filterFilePath);
 
+  printf("created: %s\n", _filterFilePath);
 }
 #endif
+
 /* *********************************************** */
 /**
  * @brief Initialize port array
@@ -2333,7 +2367,41 @@ void bpf_filter_port_array_init(int array[], int size){
 
 /* *********************************************** */
 /**
- * @brief Add port to port array
+ * @brief Initialize host array
+ */
+
+void bpf_filter_host_array_init(const char *array[48], int size){
+  int i;
+  for(i=0; i<size; i++)
+    array[i] = NULL;
+}
+
+/* *********************************************** */
+
+/**
+ * @brief Add host to host filter array
+ */
+
+void bpf_filter_host_array_add(const char *filter_array[48], int size, const char *host){
+   int i;
+   int r;
+   for(i=0; i<size; i++){
+    if((filter_array[i] != NULL) && (r = strcmp(filter_array[i], host)) == 0)
+      return;
+    if(filter_array[i] == NULL){
+      filter_array[i] = host;
+      return;
+    }
+  }
+  fprintf(stderr,"bpf_filter_host_array_add: max array size is reached!\n");
+  exit(-1);
+}
+
+
+/* *********************************************** */
+
+/**
+ * @brief Add port to port filter array
  */
 
 void bpf_filter_port_array_add(int filter_array[], int size, int port){
@@ -2353,15 +2421,138 @@ void bpf_filter_port_array_add(int filter_array[], int size, int port){
 
 /* *********************************************** */
 
+/*
+ * @brief add ports which have (flows/packets > treshold) 
+ * and have (#flows > %1 of total flows) to the srcPortArray
+ * to filter
+ */
 #ifdef HAVE_JSON_C
-static void produceBpfFilters(char *filePath){
+void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPortArray[], int size){
+    int j;
+
+    for(j=0; j<json_object_array_length(jObj_stat); j++){
+      json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
+      json_object *jObj_flows_percent;
+      json_object *jObj_flows_packets;
+      json_object *jObj_port;
+      json_bool res;
+
+      if((res = json_object_object_get_ex(src_pkts_stat, "flows.percent", &jObj_flows_percent)) == 0){
+        fprintf(stderr, "ERROR: can't get \"flows.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+        exit(-1);
+      }
+      double flows_percent = json_object_get_double(jObj_flows_percent);
+
+
+      if((res = json_object_object_get_ex(src_pkts_stat, "flows/packets", &jObj_flows_packets)) == 0){
+        fprintf(stderr, "ERROR: can't get \"flows/packets\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+        exit(-1);
+      }
+      double flows_packets = json_object_get_double(jObj_flows_packets);
+
+
+      if((flows_packets > FLOWS_PACKETS_TRESHOLD) && (flows_percent >= FLOWS_PERCENT_TRESHOLD)){
+        if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0){
+          fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+          exit(-1);
+        }
+        int port = json_object_get_int(jObj_port);
+
+        bpf_filter_port_array_add(srcPortArray, size, port);
+      }
+    }
+}
+#endif
+
+/* *********************************************** */
+
+/*
+ * @brief add scanner hosts which have more than 1000 
+ * flows per second to the srcHostArray to filter
+ */
+#ifdef HAVE_JSON_C
+void getScannerHostsToFilter(struct json_object *jObj_stat, int duration, const char *srcHostArray[48], int size){
+    int j;
+
+    for(j=0; j<json_object_array_length(jObj_stat); j++){
+      json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
+      json_object *jObj_host_address;
+      json_object *jObj_tot_flows_number;
+      json_bool res;
+
+      if((res = json_object_object_get_ex(scanner_stat, "total.flows.number", &jObj_tot_flows_number)) == 0){
+        fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+        exit(-1);
+      }
+      int tot_flows_number = json_object_get_int(jObj_tot_flows_number);
+
+
+      if((tot_flows_number/duration) > 1000){
+        if((res = json_object_object_get_ex(scanner_stat, "ip.address", &jObj_host_address)) == 0){
+          fprintf(stderr, "ERROR: can't get \"ip.address\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+          exit(-1);
+        }
+        const char *host_address = json_object_get_string(jObj_host_address);
+
+        bpf_filter_host_array_add(srcHostArray, size, host_address);
+
+      }
+    }
+}
+#endif
+
+/* *********************************************** */
+
+/*
+ * @brief add ports which have more than 1000 flows per 
+ * second to the srcHostArray to filter
+ */
+#ifdef HAVE_JSON_C
+void getHostBasedSourcePortsToFilter(struct json_object *jObj_stat, int duration, int srcPortArray[], int size){
+    int j;
+
+    for(j=0; j<json_object_array_length(jObj_stat); j++){
+      json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
+      json_object *jObj_flows_number;
+      json_object *jObj_port;
+      json_bool res;
+
+      if((res = json_object_object_get_ex(src_pkts_stat, "flows.number", &jObj_flows_number)) == 0){
+        fprintf(stderr, "ERROR: can't get \"flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+        exit(-1);
+      }
+      int flows_number = json_object_get_double(jObj_flows_number);
+
+
+      if((flows_number/duration) > 1000){
+        if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0){
+          fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+          exit(-1);
+        }
+        int port = json_object_get_int(jObj_port);
+
+        bpf_filter_port_array_add(srcPortArray, size, port);
+      }
+    }
+}
+#endif
+
+/* *********************************************** */
+
+#ifdef HAVE_JSON_C
+static void produceBpfFilter(char *filePath){
   int fsock;
   struct stat statbuf;
   void *fmap;
-  struct json_object *jObj; /* entire json object from file */
-  int filterPorts[PORT_ARRAY_SIZE]; /* ports to filter */
+  int filterSrcPorts[PORT_ARRAY_SIZE]; /* ports to filter */
+  const char *filterSrcHosts[48]; /* hosts to filter */
+  json_object *jObj; /* entire json object from file */
+  json_object *jObj_duration;
+  json_object *jObj_statistics; /* json array */
+  json_bool res;
+  int duration;
+  int typeCheck;
   int array_len;
-  int typeCheck; /* jObj should be a json array */
   int i;
 
 
@@ -2381,69 +2572,63 @@ static void produceBpfFilters(char *filePath){
   }
 
   if((jObj = json_tokener_parse(fmap)) == NULL){
-    printf("ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
-    exit(-1);
-  }
-
-  if((typeCheck = json_object_is_type(jObj, json_type_array)) == 0){
-    printf("ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
+    fprintf(stderr,"ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
     exit(-1);
   }
 
 
-  bpf_filter_port_array_init(filterPorts, PORT_ARRAY_SIZE);
-  array_len = json_object_array_length(jObj);
+  if((res = json_object_object_get_ex(jObj, "duration.in.seconds", &jObj_duration)) == 0){
+    fprintf(stderr,"ERROR: can't get \"duration.in.seconds\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+    exit(-1);
+  }
+  duration = json_object_get_int(jObj_duration);
+
+
+  if((res = json_object_object_get_ex(jObj, "statistics", &jObj_statistics)) == 0){
+    fprintf(stderr,"ERROR: can't get \"statistics\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+    exit(-1);
+  }
+  
+  if((typeCheck = json_object_is_type(jObj_statistics, json_type_array)) == 0){
+    fprintf(stderr,"ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
+    exit(-1);
+  }
+  array_len = json_object_array_length(jObj_statistics);
+
+
+  bpf_filter_port_array_init(filterSrcPorts, PORT_ARRAY_SIZE);
+  bpf_filter_host_array_init(filterSrcHosts, HOST_ARRAY_SIZE);
+
 
   for(i=0; i<array_len; i++){
-    json_object *stats = json_object_array_get_idx(jObj, i);
+    json_object *stats = json_object_array_get_idx(jObj_statistics, i);
     json_object *val;
-    json_bool res;
-    int stat_len;
-    int j;
 
-    if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0){
-      printf("ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
+    if((res = json_object_object_get_ex(stats, "scanner.stats", &val)) == 0){
+      fprintf(stderr,"ERROR: can't get \"scanner.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
     }
-
-    for(j=0; j<json_object_array_length(val); j++){
-      json_object *src_pkts_stat = json_object_array_get_idx(val, j);
-      json_object *jObj_flows_percent;
-      json_object *jObj_flows_packets;
-      json_object *jObj_port;
-      json_bool res;
-
-      if((res = json_object_object_get_ex(src_pkts_stat, "flows.percent", &jObj_flows_percent)) == 0){
-        printf("ERROR: invalid json file. Use -x flag only for .json files generated with -b flag.\n");
-        exit(-1);
-      }
-      double flows_percent = json_object_get_double(jObj_flows_percent);
+    getScannerHostsToFilter(val, duration, filterSrcHosts, HOST_ARRAY_SIZE);    
 
 
-      if((res = json_object_object_get_ex(src_pkts_stat, "flows/packets", &jObj_flows_packets)) == 0){
-        printf("ERROR: invalid json file. Use -x flag only for .json files generated with -b flag.\n");
-        exit(-1);
-      }
-      double flows_packets = json_object_get_double(jObj_flows_packets);
-
-
-      if((flows_packets > FLOWS_PACKETS_TRESHOLD) && (flows_percent >= FLOWS_PERCENT_TRESHOLD)){
-
-        if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0){
-          printf("ERROR: invalid json file. Use -x flag only for .json files generated with -b flag.\n");
-          exit(-1);
-        }
-        int port = json_object_get_int(jObj_port);
-
-        bpf_filter_port_array_add(filterPorts, PORT_ARRAY_SIZE, port);
-      }
+    if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0){
+      fprintf(stderr,"ERROR: can't get \"top.src.pkts.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
     }
+    getPacketBasedSourcePortsToFilter(val, filterSrcPorts, PORT_ARRAY_SIZE);    
+
+
+    if((res = json_object_object_get_ex(stats, "top.src.ip.stats", &val)) == 0){
+      fprintf(stderr,"ERROR: can't get \"top.src.ip.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
+    }
+    getHostBasedSourcePortsToFilter(val, duration, filterSrcPorts, PORT_ARRAY_SIZE);    
+
   }
 
+  bpf_filter_produce_filter(filterSrcPorts, PORT_ARRAY_SIZE, filterSrcHosts, HOST_ARRAY_SIZE, filePath);
+  
   json_object_put(jObj); /* free memory */
-
-  bpf_filter_produce_filter(filterPorts, PORT_ARRAY_SIZE, filePath);
-
 }
 #endif
 
@@ -2466,7 +2651,7 @@ int main(int argc, char **argv) {
 
   if(bpf_filter_flag){
 #ifdef HAVE_JSON_C
-    produceBpfFilters(_diagnoseFilePath);
+    produceBpfFilter(_diagnoseFilePath);
     return 0;
 #endif
   }
