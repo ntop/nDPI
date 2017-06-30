@@ -40,7 +40,7 @@ SHORT_MACHINE=`uname -m | cut -b1-3`
 if test $SHORT_MACHINE = "arm"; then
      LIBNUMA=""
 else
-     LIBNUMA="-lnuma"
+     AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"])
 fi
 
 if test -f $PCAP_HOME/libpcap/libpcap.a; then :
