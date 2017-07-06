@@ -8,9 +8,9 @@ Facebook	70	9464	14
 Dropbox	4	2176	1
 Apple	127	28102	20
 WhatsApp	182	25154	2
-AppleiTunes	85	28087	2
 Spotify	3	258	1
 WhatsAppVoice	706	91156	4
+AppleStore	85	28087	2
 
 	1	UDP [fe80::da30:62ff:fe56:1c]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][2 pkts/258 bytes -> 0 pkts/0 bytes]
 	2	UDP 192.168.2.1:17500 -> 192.168.2.255:17500 [proto: 121/Dropbox][4 pkts/2176 bytes -> 0 pkts/0 bytes]
@@ -26,7 +26,7 @@ WhatsAppVoice	706	91156	4
 	12	TCP 192.168.2.4:49182 <-> 17.172.100.52:443 [proto: 91.140/SSL.Apple][2 pkts/108 bytes <-> 1 pkts/54 bytes]
 	13	TCP 192.168.2.4:49197 <-> 17.167.142.39:443 [proto: 91.140/SSL.Apple][2 pkts/108 bytes <-> 1 pkts/54 bytes]
 	14	TCP 192.168.2.4:49180 <-> 17.172.100.59:443 [proto: 91.140/SSL.Apple][2 pkts/108 bytes <-> 1 pkts/54 bytes]
-	15	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.145/SSL.AppleiTunes][17 pkts/6166 bytes <-> 15 pkts/3539 bytes][client: p53-buy.itunes.apple.com]
+	15	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.224/SSL.AppleStore][17 pkts/6166 bytes <-> 15 pkts/3539 bytes][client: p53-buy.itunes.apple.com]
 	16	TCP 192.168.2.4:49172 <-> 23.50.148.228:443 [proto: 91/SSL][3 pkts/174 bytes <-> 2 pkts/217 bytes]
 	17	UDP 192.168.2.4:51518 <-> 31.13.100.14:3478 [proto: 78.119/STUN.Facebook][3 pkts/504 bytes <-> 2 pkts/172 bytes]
 	18	UDP 192.168.2.4:51518 <-> 31.13.70.48:3478 [proto: 78.119/STUN.Facebook][3 pkts/504 bytes <-> 2 pkts/172 bytes]
@@ -62,7 +62,7 @@ WhatsAppVoice	706	91156	4
 	48	TCP 192.168.2.4:49181 <-> 17.172.100.37:443 [proto: 91.140/SSL.Apple][2 pkts/108 bytes <-> 1 pkts/54 bytes]
 	49	TCP 192.168.2.4:49164 <-> 17.167.142.31:443 [proto: 91.140/SSL.Apple][2 pkts/108 bytes <-> 1 pkts/54 bytes]
 	50	TCP 192.168.2.4:49165 <-> 17.172.100.55:443 [proto: 91.140/SSL.Apple][2 pkts/108 bytes <-> 1 pkts/54 bytes]
-	51	TCP 192.168.2.4:49204 <-> 17.173.66.102:443 [proto: 91.145/SSL.AppleiTunes][29 pkts/11770 bytes <-> 24 pkts/6612 bytes][client: p53-buy.itunes.apple.com]
+	51	TCP 192.168.2.4:49204 <-> 17.173.66.102:443 [proto: 91.224/SSL.AppleStore][29 pkts/11770 bytes <-> 24 pkts/6612 bytes][client: p53-buy.itunes.apple.com]
 	52	TCP 192.168.2.4:49199 <-> 17.172.100.70:993 [proto: 51.140/IMAPS.Apple][9 pkts/1130 bytes <-> 8 pkts/868 bytes]
 	53	TCP 192.168.2.4:49193 <-> 17.110.229.14:5223 [proto: 140/Apple][11 pkts/4732 bytes <-> 11 pkts/1194 bytes]
 	54	UDP 169.254.166.207:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][2 pkts/218 bytes -> 0 pkts/0 bytes]

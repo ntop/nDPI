@@ -95,16 +95,16 @@ static time_t capture_until = 0;
 static u_int32_t num_flows;
 
 struct info_pair{
-    char addr[48];
-    char proto[48]; /*app level protocol*/
-    int count;
+  char addr[48];
+  char proto[48]; /*app level protocol*/
+  int count;
 };
 
 typedef struct node_a{
-    char addr[48];
-    int count;
-    char proto[48]; /*app level protocol*/
-    struct node_a *left, *right;
+  char addr[48];
+  int count;
+  char proto[48]; /*app level protocol*/
+  struct node_a *left, *right;
 }addr_node;
 
 struct port_stats {
@@ -436,7 +436,7 @@ static void parseOptions(int argc, char **argv) {
       pcap_analysis_duration = atol(optarg);
       break;
 
-      case 'x':
+    case 'x':
 #ifndef HAVE_JSON_C
       printf("WARNING: this copy of ndpiReader has been compiled without JSON-C: json export disabled\n");
 #else
@@ -552,7 +552,7 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
-  if(!bpf_filter_flag){
+  if(!bpf_filter_flag) {
       
     if(do_capture) {
       quiet_mode = 1;
@@ -847,7 +847,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
 /* *********************************************** */
 
-void updateScanners(struct single_flow_info **scanners, const char *saddr, u_int32_t dport){
+void updateScanners(struct single_flow_info **scanners, const char *saddr, u_int32_t dport) {
   struct single_flow_info *f;
 
   HASH_FIND_STR(*scanners, saddr, f);
@@ -874,7 +874,7 @@ void updateScanners(struct single_flow_info **scanners, const char *saddr, u_int
 
     HASH_FIND_INT(f->ports, &dport, pp);
 
-    if(pp == NULL){
+    if(pp == NULL) {
       pp = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
       if(!pp) return;
       pp->port = dport;
@@ -897,7 +897,7 @@ int updateIpTree(const char *key, addr_node **vrootp, const char *proto) {
     return 0;
 
   while (*rootp != (addr_node *)0) {	/* Knuth's T1: */
-    if((r = strcmp(key, ((*rootp)->addr))) == 0){    /* T2: */
+    if((r = strcmp(key, ((*rootp)->addr))) == 0) {    /* T2: */
       return ++((*rootp)->count);
     }
 
@@ -940,48 +940,48 @@ void freeIpTree(addr_node *root) {
 
 /* *********************************************** */
 
-void updateTopIpAddress(const char *addr, const char *proto, int count, struct info_pair top[], int size){
-    int update = 0;
-    int r;
-    int i;
-    int min_i = 0;
-    int min = count;
-    struct info_pair pair;
+void updateTopIpAddress(const char *addr, const char *proto, int count, struct info_pair top[], int size) {
+  int update = 0;
+  int r;
+  int i;
+  int min_i = 0;
+  int min = count;
+  struct info_pair pair;
 
-    if(count == 0) return;
+  if(count == 0) return;
 
-    strncpy(pair.addr, addr, sizeof(pair.addr));
-    strncpy(pair.proto, proto, sizeof(pair.proto));
-    pair.count = count;
+  strncpy(pair.addr, addr, sizeof(pair.addr));
+  strncpy(pair.proto, proto, sizeof(pair.proto));
+  pair.count = count;
 
 
-    for(i=0; i<size; i++) {
-        /* if the same ip with a bigger
-              count just update it     */
-        if((r = strcmp(top[i].addr, addr)) == 0) {
-            top[i].count = count;
-            return;
-        }
-        /* if array is not full yet
-         add it to the first empty place */
-        if(top[i].count == 0) {
-           top[i] = pair;
-           return;
-        }
+  for(i=0; i<size; i++) {
+    /* if the same ip with a bigger
+       count just update it     */
+    if((r = strcmp(top[i].addr, addr)) == 0) {
+      top[i].count = count;
+      return;
     }
-
-    /* if bigger than the smallest one, replace it */
-    for(i=0; i<size; i++) {
-        if(top[i].count < count && top[i].count < min){
-           min = top[i].count;
-           min_i = i;
-           update = 1;
-        }
+    /* if array is not full yet
+       add it to the first empty place */
+    if(top[i].count == 0) {
+      top[i] = pair;
+      return;
     }
+  }
 
-    if(update){
-        top[min_i] = pair;
+  /* if bigger than the smallest one, replace it */
+  for(i=0; i<size; i++) {
+    if(top[i].count < count && top[i].count < min) {
+      min = top[i].count;
+      min_i = i;
+      update = 1;
     }
+  }
+
+  if(update) {
+    top[min_i] = pair;
+  }
 }
 
 /* *********************************************** */
@@ -1020,8 +1020,8 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
     if(count == UPDATED_TREE) s->num_addr++;
 
     if(count) {
-        s->cumulative_addr++;
-        updateTopIpAddress(addr, proto, count, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
+      s->cumulative_addr++;
+      updateTopIpAddress(addr, proto, count, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
     }
 
     s->num_pkts += num_pkts, s->num_bytes += num_bytes, s->num_flows++;
@@ -1030,7 +1030,7 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
 /* *********************************************** */
 
-static void deleteScanners(struct single_flow_info *scanners){
+static void deleteScanners(struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
 
@@ -1064,33 +1064,33 @@ static void deletePortsStats(struct port_stats *stats) {
  */
 static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
-	  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
-	  u_int16_t sport, dport;
-	  char saddr[48], daddr[48];
-          char proto[48];
-          u_int16_t thread_id = *(int *)user_data;
-          int r;
+    struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
+    u_int16_t sport, dport;
+    char saddr[48], daddr[48];
+    char proto[48];
+    u_int16_t thread_id = *(int *)user_data;
+    int r;
 
-	  sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
-	  strncpy(saddr, flow->src_name, sizeof(saddr));
-	  strncpy(daddr, flow->dst_name, sizeof(daddr));
+    sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
+    strncpy(saddr, flow->src_name, sizeof(saddr));
+    strncpy(daddr, flow->dst_name, sizeof(daddr));
 
-          /* get app level protocol */
-          if(flow->detected_protocol.master_protocol)
-            ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                flow->detected_protocol, proto, sizeof(proto));
-          else
-            strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                    flow->detected_protocol.app_protocol),sizeof(proto));
+    /* get app level protocol */
+    if(flow->detected_protocol.master_protocol)
+      ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			 flow->detected_protocol, proto, sizeof(proto));
+    else
+      strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+					 flow->detected_protocol.app_protocol),sizeof(proto));
 
-          if(((r = strcmp(ipProto2Name(flow->protocol), "TCP")) == 0)
-              && (flow->src2dst_packets == 1) && (flow->dst2src_packets == 0)){
+    if(((r = strcmp(ipProto2Name(flow->protocol), "TCP")) == 0)
+       && (flow->src2dst_packets == 1) && (flow->dst2src_packets == 0)) {
 
-              updateScanners(&scannerHosts, saddr, dport);
-          }
+      updateScanners(&scannerHosts, saddr, dport);
+    }
 
-	  updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes, proto);
-	  updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes, proto);
+    updatePortStats(&srcStats, sport, saddr, flow->src2dst_packets, flow->src2dst_bytes, proto);
+    updatePortStats(&dstStats, dport, daddr, flow->dst2src_packets, flow->dst2src_bytes, proto);
   }
 }
 
@@ -1135,7 +1135,7 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
 
   const u_int16_t thread_id = (uintptr_t) udata;
 
-  if(verbose > 1){
+  if(verbose > 1) {
     if(enable_protocol_guess) {
       if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
         flow->detected_protocol.app_protocol = node_guess_undetected_protocol(thread_id, flow),
@@ -1299,13 +1299,13 @@ static void json_init() {
 }
 
 static void json_open_stats_file() {
-     if((file_first_time && ((stats_fp = fopen(_statsFilePath,"w")) == NULL))
-       ||
-       (!file_first_time && (stats_fp = fopen(_statsFilePath,"a")) == NULL)) {
-      printf("Error creating/opening file %s\n", _statsFilePath);
-      stats_flag = 0;
-    }
-    else file_first_time = 0;
+  if((file_first_time && ((stats_fp = fopen(_statsFilePath,"w")) == NULL))
+     ||
+     (!file_first_time && (stats_fp = fopen(_statsFilePath,"a")) == NULL)) {
+    printf("Error creating/opening file %s\n", _statsFilePath);
+    stats_flag = 0;
+  }
+  else file_first_time = 0;
 }
 
 static void json_close_stats_file() {
@@ -1375,10 +1375,10 @@ static int scanners_port_sort(void *_a, void *_b) {
 
 static int info_pair_cmp (const void *_a, const void *_b)
 {
-    struct info_pair *a = (struct info_pair *)_a;
-    struct info_pair *b = (struct info_pair *)_b;
+  struct info_pair *a = (struct info_pair *)_a;
+  struct info_pair *b = (struct info_pair *)_b;
 
-    return b->count - a->count;
+  return b->count - a->count;
 }
 
 /* *********************************************** */
@@ -1406,14 +1406,14 @@ static void deleteTopStats(struct top_stats *stats) {
 /**
  * @brief Get port based top statistics
  */
-static int getTopStats(struct top_stats **topStats, struct port_stats *stats){
+static int getTopStats(struct top_stats **topStats, struct port_stats *stats) {
   struct top_stats *s;
   struct port_stats *sp, *tmp;
   struct info_pair inf;
   u_int64_t total_ip_addrs = 0;
 
   /* stats are ordered by packet number */
-  HASH_ITER(hh, stats, sp, tmp){
+  HASH_ITER(hh, stats, sp, tmp) {
     s = (struct top_stats *)malloc(sizeof(struct top_stats));
     memset(s, 0, sizeof(struct top_stats));
 
@@ -1425,7 +1425,7 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats){
     qsort(&sp->top_ip_addrs[0], MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
     inf = sp->top_ip_addrs[0];
 
-    if(((inf.count * 100.0)/sp->cumulative_addr) > AGGRESSIVE_PERCENT){
+    if(((inf.count * 100.0)/sp->cumulative_addr) > AGGRESSIVE_PERCENT) {
       strncpy(s->top_ip, inf.addr, sizeof(s->top_ip));
       strncpy(s->proto, inf.proto, sizeof(s->proto));
     }
@@ -1442,7 +1442,7 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats){
 /* *********************************************** */
 
 #ifdef HAVE_JSON_C
-static void saveScannerStats(json_object **jObj_group, struct single_flow_info *scanners){
+static void saveScannerStats(json_object **jObj_group, struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
   json_object *jArray_stats  = json_object_new_array();
@@ -1496,7 +1496,7 @@ static void saveTopStats(json_object **jObj_group,
                          struct top_stats *stats, 
                          int direction, 
                          u_int64_t total_flow_count, 
-                         u_int64_t total_ip_addr){
+                         u_int64_t total_ip_addr) {
 
   struct top_stats *s, *tmp;
   json_object *jArray_stats  = json_object_new_array();
@@ -1505,14 +1505,14 @@ static void saveTopStats(json_object **jObj_group,
   /* stats for packet burst diagnose */
   HASH_ITER(hh, stats, s, tmp) {
 
-    if(s->top_ip[0] != '\0'){
+    if(s->top_ip[0] != '\0') {
       json_object *jObj_stat = json_object_new_object();
       json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
       json_object_object_add(jObj_stat,"packets.number",json_object_new_int64(s->num_pkts));
       json_object_object_add(jObj_stat,"flows.number",json_object_new_double(s->num_flows));
       json_object_object_add(jObj_stat,"flows.percent",json_object_new_double((s->num_flows*100.0)/total_flow_count));
       if(s->num_pkts) json_object_object_add(jObj_stat,"flows/packets",
-                              json_object_new_double(((double)s->num_flows)/s->num_pkts));
+					     json_object_new_double(((double)s->num_flows)/s->num_pkts));
       else json_object_object_add(jObj_stat,"flows.num_packets",json_object_new_double(0.0));
 
       json_object_object_add(jObj_stat,"aggressive.ip",json_object_new_string(s->top_ip));
@@ -1526,7 +1526,7 @@ static void saveTopStats(json_object **jObj_group,
   }
 
   json_object_object_add(*jObj_group, (direction == DIR_SRC) ?
-      "top.src.pkts.stats" : "top.dst.pkts.stats", jArray_stats);
+			 "top.src.pkts.stats" : "top.dst.pkts.stats", jArray_stats);
 
   jArray_stats  = json_object_new_array();
   i=0;
@@ -1550,7 +1550,7 @@ static void saveTopStats(json_object **jObj_group,
   }
 
   json_object_object_add(*jObj_group, (direction == DIR_SRC) ?
-          "top.src.ip.stats" : "top.dst.ip.stats", jArray_stats);
+			 "top.src.ip.stats" : "top.dst.ip.stats", jArray_stats);
 }
 #endif
 
@@ -1568,10 +1568,10 @@ void printPortStats(struct port_stats *stats) {
     qsort(&s->top_ip_addrs[0], MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
 
     for(j=0; j<MAX_NUM_IP_ADDRESS; j++) {
-        if(s->top_ip_addrs[j].count != 0) {
-            printf("\t\t%-36s ~ %.2f%%\n", s->top_ip_addrs[j].addr,
-                   ((s->top_ip_addrs[j].count) * 100.0) / s->cumulative_addr);
-        }
+      if(s->top_ip_addrs[j].count != 0) {
+	printf("\t\t%-36s ~ %.2f%%\n", s->top_ip_addrs[j].addr,
+	       ((s->top_ip_addrs[j].count) * 100.0) / s->cumulative_addr);
+      }
     }
 
     printf("\n");
@@ -1879,9 +1879,9 @@ static void printResults(u_int64_t tot_usec) {
 #endif
   }
 
-  if(verbose == 3 || stats_flag){
-      deletePortsStats(srcStats), deletePortsStats(dstStats);
-      srcStats = NULL, dstStats = NULL;
+  if(verbose == 3 || stats_flag) {
+    deletePortsStats(srcStats), deletePortsStats(dstStats);
+    srcStats = NULL, dstStats = NULL;
   }
 
 
@@ -2164,7 +2164,7 @@ void * processing_thread(void *_thread_id) {
     if((!json_flag) && (!quiet_mode)) printf("Running thread %ld...\n", thread_id);
 
  pcap_loop:
- runPcapLoop(thread_id);
+  runPcapLoop(thread_id);
 
   if(playlist_fp[thread_id] != NULL) { /* playlist: read next file */
     char filename[256];
@@ -2242,11 +2242,11 @@ void test_lib() {
   /* Printing cumulative results */
   printResults(tot_usec);
 
-if(stats_flag){
+  if(stats_flag) {
 #ifdef HAVE_JSON_C
-  json_close_stats_file();
+    json_close_stats_file();
 #endif
-}
+  }
 
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
     if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)
@@ -2275,40 +2275,39 @@ void automataUnitTest() {
  * save it in .json format
  */
 #ifdef HAVE_JSON_C
-void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_array[48], int h_size, char *filePath){
+void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_array[48], int h_size, char *filePath) {
   FILE *fp = NULL;
   char *prefix = "bpf_filter_";
   char _filterFilePath[1024];
   char *fileName;
   char filter[2048];
-  char portBuf[10];
-  char hostBuf[64];
   int produced = 0;
   int i = 0;
 
-  printf("producing bpf filter...\n");
-
-
-  if(port_array[0] != INIT_VAL){
-
+  if(port_array[0] != INIT_VAL) {
+    int l;
+    
     strcpy(filter, "not (src port ");
 
-    while(i < p_size && port_array[i] != INIT_VAL){
+    while(i < p_size && port_array[i] != INIT_VAL) {
+      l = strlen(filter);
+      
       if(i+1 == p_size || port_array[i+1] == INIT_VAL)
-        snprintf(portBuf, sizeof(portBuf), "%d", port_array[i]);
+        snprintf(&filter[l], sizeof(filter)-l, "%d", port_array[i]);
       else
-        snprintf(portBuf, sizeof(portBuf), "%d or ", port_array[i]);
-      strncat(filter, portBuf, sizeof(portBuf));
+        snprintf(&filter[l], sizeof(filter)-l, "%d or ", port_array[i]);
       i++;
     }
 
-    strncat(filter, ")", sizeof(")"));
+    l = strlen(filter);
+    snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
 
 
-  if(host_array[0] != NULL){
-
+  if(host_array[0] != NULL) {
+    int l;
+    
     if(port_array[0] != INIT_VAL)
       strncat(filter, " and not (host ", sizeof(" and not (host "));
     else
@@ -2316,40 +2315,40 @@ void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_ar
     
     i=0;
 
-    while(i < h_size && host_array[i] != NULL){
+    while(i < h_size && host_array[i] != NULL) {
+      l = strlen(filter);
+	
       if(i+1 == h_size || host_array[i+1] == NULL)
-        snprintf(hostBuf, sizeof(hostBuf), "%s", host_array[i]);
+	snprintf(&filter[l], sizeof(filter)-l, "%s", host_array[i]);
       else
-        snprintf(hostBuf, sizeof(hostBuf), "%s or ", host_array[i]);
-      strncat(filter, hostBuf, sizeof(hostBuf));
+	snprintf(&filter[l], sizeof(filter)-l, "%s or ", host_array[i]);
+
       i++;
     }
-
-    strncat(filter, ")", sizeof(")"));
+    
+    l = strlen(filter);
+    snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
 
-
   fileName = basename(filePath);
-  snprintf(_filterFilePath, sizeof(_filterFilePath), "%s%s", prefix, fileName);
+  snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
 
   if((fp = fopen(_filterFilePath,"w")) == NULL) {
     printf("Error creating .json file %s\n", _filterFilePath);
     exit(-1);
   } 
 
-
   json_object *jObj_bpfFilter = json_object_new_object();
 
   if(produced)
-   json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(filter));
+    json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(filter));
   else
     json_object_object_add(jObj_bpfFilter, "filter", json_object_new_string(""));
 
   fprintf(fp,"%s\n",json_object_to_json_string(jObj_bpfFilter));
   fclose(fp);
   
-
   printf("created: %s\n", _filterFilePath);
 }
 #endif
@@ -2359,7 +2358,7 @@ void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_ar
  * @brief Initialize port array
  */
 
-void bpf_filter_port_array_init(int array[], int size){
+void bpf_filter_port_array_init(int array[], int size) {
   int i;
   for(i=0; i<size; i++)
     array[i] = INIT_VAL;
@@ -2370,7 +2369,7 @@ void bpf_filter_port_array_init(int array[], int size){
  * @brief Initialize host array
  */
 
-void bpf_filter_host_array_init(const char *array[48], int size){
+void bpf_filter_host_array_init(const char *array[48], int size) {
   int i;
   for(i=0; i<size; i++)
     array[i] = NULL;
@@ -2382,13 +2381,13 @@ void bpf_filter_host_array_init(const char *array[48], int size){
  * @brief Add host to host filter array
  */
 
-void bpf_filter_host_array_add(const char *filter_array[48], int size, const char *host){
-   int i;
-   int r;
-   for(i=0; i<size; i++){
+void bpf_filter_host_array_add(const char *filter_array[48], int size, const char *host) {
+  int i;
+  int r;
+  for(i=0; i<size; i++) {
     if((filter_array[i] != NULL) && (r = strcmp(filter_array[i], host)) == 0)
       return;
-    if(filter_array[i] == NULL){
+    if(filter_array[i] == NULL) {
       filter_array[i] = host;
       return;
     }
@@ -2404,12 +2403,12 @@ void bpf_filter_host_array_add(const char *filter_array[48], int size, const cha
  * @brief Add port to port filter array
  */
 
-void bpf_filter_port_array_add(int filter_array[], int size, int port){
-   int i;
-   for(i=0; i<size; i++){
+void bpf_filter_port_array_add(int filter_array[], int size, int port) {
+  int i;
+  for(i=0; i<size; i++) {
     if(filter_array[i] == port)
       return;
-    if(filter_array[i] == INIT_VAL){
+    if(filter_array[i] == INIT_VAL) {
       filter_array[i] = port;
       return;
     }
@@ -2427,40 +2426,40 @@ void bpf_filter_port_array_add(int filter_array[], int size, int port){
  * to filter
  */
 #ifdef HAVE_JSON_C
-void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPortArray[], int size){
-    int j;
+void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPortArray[], int size) {
+  int j;
 
-    for(j=0; j<json_object_array_length(jObj_stat); j++){
-      json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
-      json_object *jObj_flows_percent;
-      json_object *jObj_flows_packets;
-      json_object *jObj_port;
-      json_bool res;
+  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+    json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
+    json_object *jObj_flows_percent;
+    json_object *jObj_flows_packets;
+    json_object *jObj_port;
+    json_bool res;
 
-      if((res = json_object_object_get_ex(src_pkts_stat, "flows.percent", &jObj_flows_percent)) == 0){
-        fprintf(stderr, "ERROR: can't get \"flows.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-        exit(-1);
-      }
-      double flows_percent = json_object_get_double(jObj_flows_percent);
-
-
-      if((res = json_object_object_get_ex(src_pkts_stat, "flows/packets", &jObj_flows_packets)) == 0){
-        fprintf(stderr, "ERROR: can't get \"flows/packets\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-        exit(-1);
-      }
-      double flows_packets = json_object_get_double(jObj_flows_packets);
-
-
-      if((flows_packets > FLOWS_PACKETS_TRESHOLD) && (flows_percent >= FLOWS_PERCENT_TRESHOLD)){
-        if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0){
-          fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-          exit(-1);
-        }
-        int port = json_object_get_int(jObj_port);
-
-        bpf_filter_port_array_add(srcPortArray, size, port);
-      }
+    if((res = json_object_object_get_ex(src_pkts_stat, "flows.percent", &jObj_flows_percent)) == 0) {
+      fprintf(stderr, "ERROR: can't get \"flows.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
     }
+    double flows_percent = json_object_get_double(jObj_flows_percent);
+
+
+    if((res = json_object_object_get_ex(src_pkts_stat, "flows/packets", &jObj_flows_packets)) == 0) {
+      fprintf(stderr, "ERROR: can't get \"flows/packets\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
+    }
+    double flows_packets = json_object_get_double(jObj_flows_packets);
+
+
+    if((flows_packets > FLOWS_PACKETS_TRESHOLD) && (flows_percent >= FLOWS_PERCENT_TRESHOLD)) {
+      if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0) {
+	fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+	exit(-1);
+      }
+      int port = json_object_get_int(jObj_port);
+
+      bpf_filter_port_array_add(srcPortArray, size, port);
+    }
+  }
 }
 #endif
 
@@ -2471,33 +2470,33 @@ void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPor
  * flows per second to the srcHostArray to filter
  */
 #ifdef HAVE_JSON_C
-void getScannerHostsToFilter(struct json_object *jObj_stat, int duration, const char *srcHostArray[48], int size){
-    int j;
+void getScannerHostsToFilter(struct json_object *jObj_stat, int duration, const char *srcHostArray[48], int size) {
+  int j;
 
-    for(j=0; j<json_object_array_length(jObj_stat); j++){
-      json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
-      json_object *jObj_host_address;
-      json_object *jObj_tot_flows_number;
-      json_bool res;
+  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+    json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
+    json_object *jObj_host_address;
+    json_object *jObj_tot_flows_number;
+    json_bool res;
 
-      if((res = json_object_object_get_ex(scanner_stat, "total.flows.number", &jObj_tot_flows_number)) == 0){
-        fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-        exit(-1);
-      }
-      int tot_flows_number = json_object_get_int(jObj_tot_flows_number);
-
-
-      if((tot_flows_number/duration) > 1000){
-        if((res = json_object_object_get_ex(scanner_stat, "ip.address", &jObj_host_address)) == 0){
-          fprintf(stderr, "ERROR: can't get \"ip.address\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-          exit(-1);
-        }
-        const char *host_address = json_object_get_string(jObj_host_address);
-
-        bpf_filter_host_array_add(srcHostArray, size, host_address);
-
-      }
+    if((res = json_object_object_get_ex(scanner_stat, "total.flows.number", &jObj_tot_flows_number)) == 0) {
+      fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
     }
+    int tot_flows_number = json_object_get_int(jObj_tot_flows_number);
+
+
+    if((tot_flows_number/duration) > 1000) {
+      if((res = json_object_object_get_ex(scanner_stat, "ip.address", &jObj_host_address)) == 0) {
+	fprintf(stderr, "ERROR: can't get \"ip.address\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+	exit(-1);
+      }
+      const char *host_address = json_object_get_string(jObj_host_address);
+
+      bpf_filter_host_array_add(srcHostArray, size, host_address);
+
+    }
+  }
 }
 #endif
 
@@ -2508,39 +2507,39 @@ void getScannerHostsToFilter(struct json_object *jObj_stat, int duration, const 
  * second to the srcHostArray to filter
  */
 #ifdef HAVE_JSON_C
-void getHostBasedSourcePortsToFilter(struct json_object *jObj_stat, int duration, int srcPortArray[], int size){
-    int j;
+void getHostBasedSourcePortsToFilter(struct json_object *jObj_stat, int duration, int srcPortArray[], int size) {
+  int j;
 
-    for(j=0; j<json_object_array_length(jObj_stat); j++){
-      json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
-      json_object *jObj_flows_number;
-      json_object *jObj_port;
-      json_bool res;
+  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+    json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
+    json_object *jObj_flows_number;
+    json_object *jObj_port;
+    json_bool res;
 
-      if((res = json_object_object_get_ex(src_pkts_stat, "flows.number", &jObj_flows_number)) == 0){
-        fprintf(stderr, "ERROR: can't get \"flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-        exit(-1);
-      }
-      int flows_number = json_object_get_double(jObj_flows_number);
-
-
-      if((flows_number/duration) > 1000){
-        if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0){
-          fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-          exit(-1);
-        }
-        int port = json_object_get_int(jObj_port);
-
-        bpf_filter_port_array_add(srcPortArray, size, port);
-      }
+    if((res = json_object_object_get_ex(src_pkts_stat, "flows.number", &jObj_flows_number)) == 0) {
+      fprintf(stderr, "ERROR: can't get \"flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
     }
+    int flows_number = json_object_get_double(jObj_flows_number);
+
+
+    if((flows_number/duration) > 1000) {
+      if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0) {
+	fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+	exit(-1);
+      }
+      int port = json_object_get_int(jObj_port);
+
+      bpf_filter_port_array_add(srcPortArray, size, port);
+    }
+  }
 }
 #endif
 
 /* *********************************************** */
 
 #ifdef HAVE_JSON_C
-static void produceBpfFilter(char *filePath){
+static void produceBpfFilter(char *filePath) {
   int fsock;
   struct stat statbuf;
   void *fmap;
@@ -2556,40 +2555,40 @@ static void produceBpfFilter(char *filePath){
   int i;
 
 
-  if((fsock = open(filePath, O_RDONLY)) == -1){
-      fprintf(stderr,"error opening file %s\n", filePath);
-      exit(-1);
+  if((fsock = open(filePath, O_RDONLY)) == -1) {
+    fprintf(stderr,"error opening file %s\n", filePath);
+    exit(-1);
   }
 
-  if(fstat(fsock, &statbuf) == -1){
-      fprintf(stderr,"error getting file stat\n");
-      exit(-1);
+  if(fstat(fsock, &statbuf) == -1) {
+    fprintf(stderr,"error getting file stat\n");
+    exit(-1);
   }
 
-  if((fmap = mmap(NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fsock, 0)) == MAP_FAILED){
-      fprintf(stderr,"error mmap is failed\n");
-      exit(-1);
+  if((fmap = mmap(NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fsock, 0)) == MAP_FAILED) {
+    fprintf(stderr,"error mmap is failed\n");
+    exit(-1);
   }
 
-  if((jObj = json_tokener_parse(fmap)) == NULL){
+  if((jObj = json_tokener_parse(fmap)) == NULL) {
     fprintf(stderr,"ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
     exit(-1);
   }
 
 
-  if((res = json_object_object_get_ex(jObj, "duration.in.seconds", &jObj_duration)) == 0){
+  if((res = json_object_object_get_ex(jObj, "duration.in.seconds", &jObj_duration)) == 0) {
     fprintf(stderr,"ERROR: can't get \"duration.in.seconds\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
     exit(-1);
   }
   duration = json_object_get_int(jObj_duration);
 
 
-  if((res = json_object_object_get_ex(jObj, "statistics", &jObj_statistics)) == 0){
+  if((res = json_object_object_get_ex(jObj, "statistics", &jObj_statistics)) == 0) {
     fprintf(stderr,"ERROR: can't get \"statistics\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
     exit(-1);
   }
   
-  if((typeCheck = json_object_is_type(jObj_statistics, json_type_array)) == 0){
+  if((typeCheck = json_object_is_type(jObj_statistics, json_type_array)) == 0) {
     fprintf(stderr,"ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
     exit(-1);
   }
@@ -2600,25 +2599,25 @@ static void produceBpfFilter(char *filePath){
   bpf_filter_host_array_init(filterSrcHosts, HOST_ARRAY_SIZE);
 
 
-  for(i=0; i<array_len; i++){
+  for(i=0; i<array_len; i++) {
     json_object *stats = json_object_array_get_idx(jObj_statistics, i);
     json_object *val;
 
-    if((res = json_object_object_get_ex(stats, "scanner.stats", &val)) == 0){
+    if((res = json_object_object_get_ex(stats, "scanner.stats", &val)) == 0) {
       fprintf(stderr,"ERROR: can't get \"scanner.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
     }
     getScannerHostsToFilter(val, duration, filterSrcHosts, HOST_ARRAY_SIZE);    
 
 
-    if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0){
+    if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0) {
       fprintf(stderr,"ERROR: can't get \"top.src.pkts.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
     }
     getPacketBasedSourcePortsToFilter(val, filterSrcPorts, PORT_ARRAY_SIZE);    
 
 
-    if((res = json_object_object_get_ex(stats, "top.src.ip.stats", &val)) == 0){
+    if((res = json_object_object_get_ex(stats, "top.src.ip.stats", &val)) == 0) {
       fprintf(stderr,"ERROR: can't get \"top.src.ip.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
     }
@@ -2649,7 +2648,7 @@ int main(int argc, char **argv) {
 
   parseOptions(argc, argv);
 
-  if(bpf_filter_flag){
+  if(bpf_filter_flag) {
 #ifdef HAVE_JSON_C
     produceBpfFilter(_diagnoseFilePath);
     return 0;
