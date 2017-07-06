@@ -63,6 +63,8 @@ typedef unsigned       __int64 u_int64_t;
 
 #define gmtime_r(a, b)           memcpy(b, gmtime(a), sizeof(struct tm))
 
+#define in_addr_t				unsigned long
+
 extern unsigned long waitForNextEvent(unsigned long ulDelay /* ms */);
 
 #define sleep(a /* sec */) waitForNextEvent(1000*a /* ms */)
