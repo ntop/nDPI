@@ -62,7 +62,9 @@ static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interfac
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
 static FILE *results_file = NULL;
 static char *results_path = NULL;
+#ifndef __OpenBSD__
 static char *_bpf_filter      = NULL; /**< bpf filter  */
+#endif
 static char *_protoFilePath   = NULL; /**< Protocol file path  */
 static char *_statsFilePath   = NULL; /**< Top stats file path */
 #ifdef HAVE_JSON_C
