@@ -60,17 +60,17 @@
 /** Client parameters **/
 static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interfaces */
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
-static FILE *results_file = NULL;
-static char *results_path = NULL;
+static FILE *results_file           = NULL;
+static char *results_path           = NULL;
 #ifndef __OpenBSD__
-static char *_bpf_filter      = NULL; /**< bpf filter  */
+static const char *_bpf_filter      = NULL; /**< bpf filter  */
 #endif
-static char *_protoFilePath   = NULL; /**< Protocol file path  */
-static char *_statsFilePath   = NULL; /**< Top stats file path */
+static char *_protoFilePath         = NULL; /**< Protocol file path  */
+static char *_statsFilePath         = NULL; /**< Top stats file path */
 #ifdef HAVE_JSON_C
-static char *_diagnoseFilePath   = NULL; /**< Top stats file path */
-static char *_jsonFilePath    = NULL; /**< JSON file path  */
-static FILE *stats_fp = NULL;         /**< for Top Stats JSON file */
+static char *_diagnoseFilePath      = NULL; /**< Top stats file path */
+static char *_jsonFilePath          = NULL; /**< JSON file path  */
+static FILE *stats_fp               = NULL; /**< for Top Stats JSON file */
 #endif
 #ifdef HAVE_JSON_C
 static json_object *jArray_known_flows, *jArray_unknown_flows;
