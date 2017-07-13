@@ -62,9 +62,7 @@ static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interfac
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
 static FILE *results_file           = NULL;
 static char *results_path           = NULL;
-#ifndef __OpenBSD__
-static const char *_bpf_filter      = NULL; /**< bpf filter  */
-#endif
+static char * bpfFilter             = NULL; /**< bpf filter  */
 static char *_protoFilePath         = NULL; /**< Protocol file path  */
 static char *_statsFilePath         = NULL; /**< Top stats file path */
 #ifdef HAVE_JSON_C
@@ -449,7 +447,7 @@ static void parseOptions(int argc, char **argv) {
 
     case 'f':
     case '6':
-      _bpf_filter = optarg;
+      bpfFilter = optarg;
       break;
 
     case 'g':
@@ -1944,16 +1942,16 @@ static int getNextPcapFileFromPlaylist(u_int16_t thread_id, char filename[], u_i
  */
 static void configurePcapHandle(pcap_t * pcap_handle) {
 
-  if(_bpf_filter != NULL) {
+  if(bpfFilter != NULL) {
     struct bpf_program fcode;
 
-    if(pcap_compile(pcap_handle, &fcode, _bpf_filter, 1, 0xFFFFFF00) < 0) {
+    if(pcap_compile(pcap_handle, &fcode, bpfFilter, 1, 0xFFFFFF00) < 0) {
       printf("pcap_compile error: '%s'\n", pcap_geterr(pcap_handle));
     } else {
       if(pcap_setfilter(pcap_handle, &fcode) < 0) {
 	printf("pcap_setfilter error: '%s'\n", pcap_geterr(pcap_handle));
       } else
-	printf("Successfully set BPF filter to '%s'\n", _bpf_filter);
+	printf("Successfully set BPF filter to '%s'\n", bpfFilter);
     }
   }
 }
