@@ -536,7 +536,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 							  ipsize, time, src, dst);
         if (ndpi_flow->check_extra_packets == 0) {
           flow->check_extra_packets = 0;
-          ndpi_free_flow_info_half(flow);
+          process_ndpi_collected_info(workflow, flow);
         }
       }
     } else if (ndpi_flow != NULL) {
