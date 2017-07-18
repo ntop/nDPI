@@ -306,6 +306,46 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
   return(0); /* Not found */
 }
 
+int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &flow->packet;
+
+  /* consider only specific SSL packets (handshake) */
+  if((packet->payload_packet_len > 9) && (packet->payload[0] == 0x16)) {
+    char certificate[64];
+    int rc;
+    certificate[0] = '\0';
+    rc = getSSLcertificate(ndpi_struct, flow, certificate, sizeof(certificate));
+    packet->ssl_certificate_num_checks++;
+    if (rc > 0) {
+      packet->ssl_certificate_detected++;
+      if (flow->protos.ssl.server_certificate[0] != '\0')
+        /* 0 means we're done processing extra packets (since we found what we wanted) */
+        return 0;
+    }
+    /* Client hello, Server Hello, and certificate packets probably all checked in this case */
+    if ((packet->ssl_certificate_num_checks >= 3)
+    && (flow->l4.tcp.seen_syn)
+    && (flow->l4.tcp.seen_syn_ack)
+    && (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
+    {
+      /* We're done processing extra packets since we've probably checked all possible cert packets */
+      return 0;
+    }
+  }
+  /* 1 means keep looking for more packets */
+  return 1;
+}
+
+void sslInitExtraPacketProcessing(int caseNum, struct ndpi_flow_struct *flow) {
+  flow->check_extra_packets = 1;
+  /* 0 is the case for waiting for the server certificate */
+  if (caseNum == 0) {
+    /* At most 7 packets should almost always be enough to find the server certificate if it's there */
+    flow->max_extra_packets_to_check = 7;
+    flow->extra_packets_func = sslTryAndRetrieveServerCertificate;
+  }
+}
+
 int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
@@ -325,14 +365,15 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 #ifdef CERTIFICATE_DEBUG
 	printf("***** [SSL] %s\n", certificate);
 #endif
-  /* If we've detected the subprotocol from client certificate but haven't had a chance
-    * to see the server certificate yet, wait a few more packets  */
-  if((flow->protos.ssl.client_certificate[0] != '\0') && (flow->protos.ssl.server_certificate[0] == '\0')) {
-    return (rc);
-  }
 	u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate,
 							 strlen(certificate), NDPI_PROTOCOL_SSL);
 	if(subproto != NDPI_PROTOCOL_UNKNOWN) {
+    /* If we've detected the subprotocol from client certificate but haven't had a chance
+      * to see the server certificate yet, set up extra packet processing to wait
+      * a few more packets. */
+    if((flow->protos.ssl.client_certificate[0] != '\0') && (flow->protos.ssl.server_certificate[0] == '\0')) {
+      sslInitExtraPacketProcessing(0, flow);
+    }
     ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
             ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
     return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
@@ -350,18 +391,6 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	 || (flow->protos.ssl.server_certificate[0] != '\0')
 	 /* || (flow->protos.ssl.client_certificate[0] != '\0') */
 	 ) {
-  if (flow->protos.ssl.client_certificate[0] != '\0') {
-	  u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, flow->protos.ssl.client_certificate,
-							 strlen(flow->protos.ssl.client_certificate), NDPI_PROTOCOL_SSL);
-    if (subproto != NDPI_PROTOCOL_UNKNOWN) {
-      /* We would've only made it here if at some point we went into the if clause above where we wait a
-       * few packets if we have a subprotocol client cert match but hadn't seen a server cert at that point. */
-      ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
-              ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
-      return(2); /* Returning 2 is because we had a client certificate match
-                  * (since we use what would've been the return code from getSSLCertificate) */
-    }
-  }
 	ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
      }
   }
