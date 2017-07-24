@@ -8239,6 +8239,9 @@ ndpi_protocol_match host_match[] = {
   { "dnscrypt.org",			"DNScrypt",          	NDPI_PROTOCOL_DNSCRYPT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "torrent.",				"BitTorrent",          	NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_CATEGORY_P2P, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { ".nintendo.net",			"Nintendo",		NDPI_PROTOCOL_NINTENDO, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+  { ".nintendo.com",			"Nintendo",		NDPI_PROTOCOL_NINTENDO, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { NULL, 0 }
 };
 
