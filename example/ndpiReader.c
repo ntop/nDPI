@@ -1033,6 +1033,7 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 static void deleteScanners(struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
@@ -1046,6 +1047,7 @@ static void deleteScanners(struct single_flow_info *scanners) {
     free(s);
   }
 }
+#endif
 
 /* *********************************************** */
 
@@ -1358,6 +1360,7 @@ static int port_stats_sort(void *_a, void *_b) {
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 static int scanners_sort(void *_a, void *_b) {
   struct single_flow_info *a = (struct single_flow_info *)_a;
   struct single_flow_info *b = (struct single_flow_info *)_b;
@@ -1374,6 +1377,7 @@ static int scanners_port_sort(void *_a, void *_b) {
   return(b->num_flows - a->num_flows);
 }
 
+#endif
 /* *********************************************** */
 
 static int info_pair_cmp (const void *_a, const void *_b)
@@ -1386,6 +1390,7 @@ static int info_pair_cmp (const void *_a, const void *_b)
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 static int top_stats_sort(void *_a, void *_b) {
   struct top_stats *a = (struct top_stats*)_a;
   struct top_stats *b = (struct top_stats*)_b;
@@ -1444,7 +1449,6 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats) {
 
 /* *********************************************** */
 
-#ifdef HAVE_JSON_C
 static void saveScannerStats(json_object **jObj_group, struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
