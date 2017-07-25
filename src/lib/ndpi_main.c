@@ -684,21 +684,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 /* ******************************************************************** */
 
-static void ndpi_init_placeholder_proto(struct ndpi_detection_module_struct *ndpi_mod,
-					ndpi_port_range *ports_a,
-					ndpi_port_range *ports_b,
-					u_int16_t *no_master,
-					u_int16_t proto_id)
-{
-  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, proto_id,
-			  no_master,
-			  no_master, "Placeholder", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
-}
-
-/* ******************************************************************** */
-
 /* This function is used to map protocol name and default ports and it MUST
    be updated whenever a new protocol is added to NDPI.
 
