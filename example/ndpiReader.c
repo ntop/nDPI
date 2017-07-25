@@ -64,8 +64,8 @@ static FILE *results_file           = NULL;
 static char *results_path           = NULL;
 static char * bpfFilter             = NULL; /**< bpf filter  */
 static char *_protoFilePath         = NULL; /**< Protocol file path  */
-static char *_statsFilePath         = NULL; /**< Top stats file path */
 #ifdef HAVE_JSON_C
+static char *_statsFilePath         = NULL; /**< Top stats file path */
 static char *_diagnoseFilePath      = NULL; /**< Top stats file path */
 static char *_jsonFilePath          = NULL; /**< JSON file path  */
 static FILE *stats_fp               = NULL; /**< for Top Stats JSON file */
@@ -78,7 +78,10 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
-static u_int8_t stats_flag = 0, file_first_time = 1, bpf_filter_flag = 0;
+static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
+#ifdef HAVE_JSON_C
+static u_int8_t file_first_time = 1;
+#endif
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
