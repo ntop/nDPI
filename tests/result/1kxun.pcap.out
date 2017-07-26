@@ -10,9 +10,9 @@ QQ	28	5216	2
 SSL	105	21914	7
 DHCPV6	10	980	3
 Facebook	19	6840	2
+Skype	2	132	1
 Google	3	176	1
 LLMNR	89	6799	47
-Lync	2	132	1
 1kxun	952	531718	21
 
 	1	TCP 119.235.235.84:443 <-> 192.168.5.16:53406 [proto: 91/SSL][13 pkts/6269 bytes <-> 10 pkts/1165 bytes]
@@ -48,7 +48,7 @@ Lync	2	132	1
 	31	UDP 192.168.115.8:54420 <-> 8.8.8.8:53 [proto: 5.48/DNS.QQ][2 pkts/150 bytes <-> 1 pkts/116 bytes][Host: vv.video.qq.com]
 	32	UDP 192.168.5.48:59797 -> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/140 bytes -> 0 pkts/0 bytes][Host: kasper-mac]
 	33	UDP 192.168.5.47:60267 -> 239.255.255.250:1900 [proto: 12/SSDP][8 pkts/1432 bytes -> 0 pkts/0 bytes]
-	34	UDP 192.168.5.47:61603 -> 224.0.0.252:5355 [proto: 173/Lync][2 pkts/132 bytes -> 0 pkts/0 bytes]
+	34	UDP 192.168.5.47:61603 -> 224.0.0.252:5355 [proto: 125/Skype][2 pkts/132 bytes -> 0 pkts/0 bytes]
 	35	UDP 192.168.3.236:62069 -> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/138 bytes -> 0 pkts/0 bytes][Host: wangs-ltw]
 	36	UDP [fe80::e034:7be:d8f9:6197]:57143 -> [ff02::1:3]:5355 [proto: 154/LLMNR][1 pkts/91 bytes -> 0 pkts/0 bytes][Host: charming-pc]
 	37	UDP 192.168.115.8:60724 <-> 8.8.8.8:53 [proto: 5.205/DNS.1kxun][2 pkts/146 bytes <-> 1 pkts/137 bytes][Host: pic.1kxun.com]

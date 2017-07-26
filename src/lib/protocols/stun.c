@@ -18,7 +18,7 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with nDPI. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 #include "ndpi_protocols.h"
@@ -49,11 +49,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   const u_int8_t * payload,
 					   const u_int16_t payload_length,
 					   u_int8_t *is_whatsapp,
-					   u_int8_t *is_lync) {
+					   u_int8_t *is_skype) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
   u_int8_t can_this_be_whatsapp_voice = 1;
-
 
   if(payload_length < sizeof(struct stun_packet_header)) {
     if(flow->num_stun_udp_pkts > 0) {
@@ -80,15 +79,21 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
     /*
       This can either be the standard RTCP or Ms Lync RTCP that
-      later will becomg Ms Lync RTP. In this case we need to
+      later will become Ms Lync RTP. In this case we need to
       be careful before deciding about the protocol before dissecting the packet
+      
+      MS Lync = Skype
+      https://en.wikipedia.org/wiki/Skype_for_Business
     */
 
     while(offset < payload_length) {
-
       u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
       u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
+      u_int16_t x = (len + 4) % 4;
 
+      if(x != 0)
+	len += 4-x;
+      
       switch(attribute) {
       case 0x0008: /* Message Integrity */
       case 0x0020: /* XOR-MAPPED-ADDRESSES */
@@ -101,7 +106,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	   && (payload[offset+5] == 0x00)
 	   && (payload[offset+6] == 0x00)
 	   && (payload[offset+7] == 0x00)) {
-	  *is_lync = 1;
+	  /* Either skype for business or "normal" skype with multiparty call */
+	  *is_skype = 1;
 	  return(NDPI_IS_STUN);
 	}
 	break;
@@ -111,8 +117,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	   && (payload[offset+4] == 0x00)
 	   && (payload[offset+5] == 0x00)
 	   && (payload[offset+6] == 0x00)
-	   && (payload[offset+7] == 0x02)) {
-	  *is_lync = 1;
+	   && ((payload[offset+7] == 0x02) || (payload[offset+7] == 0x03))
+	   ) {
+	  *is_skype = 1;
 	  return(NDPI_IS_STUN);
 	}
 	break;
@@ -122,6 +129,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	can_this_be_whatsapp_voice = 0;
 	break;
       }
+     
       offset += len + 4;
     }
     goto udp_stun_found;
@@ -244,7 +252,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int8_t is_whatsapp = 0, is_lync = 0;
+  u_int8_t is_whatsapp = 0, is_skype = 0;
 
   NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "search stun.\n");
 
@@ -257,10 +265,10 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
        * improved by checking only the STUN packet of given length */
 
       if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
-			     packet->payload_packet_len - 2, &is_whatsapp, &is_lync) == NDPI_IS_STUN) {
-	if(is_lync) {
-	  NDPI_LOG(NDPI_PROTOCOL_MS_LYNC, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
-	  ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_MS_LYNC, flow);
+			     packet->payload_packet_len - 2, &is_whatsapp, &is_skype) == NDPI_IS_STUN) {
+	if(is_skype) {
+	  NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found Skype\n");
+	  ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_SKYPE, flow);
 	} else {
 	  NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found UDP stun.\n");
 	  ndpi_int_stun_add_connection(ndpi_struct,
@@ -272,10 +280,10 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   }
 
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
-			 packet->payload_packet_len, &is_whatsapp, &is_lync) == NDPI_IS_STUN) {
-    if(is_lync) {
-      NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
-      ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_MS_LYNC, flow);
+			 packet->payload_packet_len, &is_whatsapp, &is_skype) == NDPI_IS_STUN) {
+    if(is_skype) {
+      NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "Found Skype\n");
+      ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_SKYPE, flow);
     } else {
       NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found UDP stun.\n");
       ndpi_int_stun_add_connection(ndpi_struct,

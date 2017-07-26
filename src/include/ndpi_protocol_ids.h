@@ -209,7 +209,8 @@
 #define NDPI_PROTOCOL_WHOIS_DAS 	 170
 #define NDPI_PROTOCOL_COLLECTD 	         171
 #define NDPI_PROTOCOL_SOCKS 	         172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-#define NDPI_PROTOCOL_MS_LYNC 	         173
+/* The Lync protocol is now skype for business and this the old id 173 can now be recycled */
+#define NDPI_PROTOCOL_NINTENDO		 173
 #define NDPI_PROTOCOL_RTMP 	         174 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_FTP_DATA 	         175 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_WIKIPEDIA 	 176 /* Tomasz Bujlow <tomasz@skatnet.dk> */
@@ -245,7 +246,6 @@
 #define NDPI_PROTOCOL_1KXUN 	         205
 #define NDPI_PROTOCOL_IQIYI 	         206
 #define NDPI_PROTOCOL_SMPP 	         207 /* Damir Franusic <df@release14.org> */
-
 #define NDPI_PROTOCOL_DNSCRYPT           208
 #define NDPI_PROTOCOL_TINC	         209 /* William Guglielmo <william@deselmo.com> */
 #define NDPI_PROTOCOL_DEEZER 	         210
@@ -269,12 +269,12 @@
 #define NDPI_PROTOCOL_PLAYSTORE          228 /* Google Play Store */
 #define NDPI_PROTOCOL_SOMEIP		 229
 #define NDPI_PROTOCOL_FIX		 230
-#define NDPI_PROTOCOL_NINTENDO		 231
+
 
 
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL		        NDPI_PROTOCOL_NINTENDO
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL		        NDPI_PROTOCOL_FIX
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                    (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS                   (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

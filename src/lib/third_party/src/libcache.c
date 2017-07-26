@@ -130,9 +130,10 @@ cache_result cache_add(cache_t cache, void *item, uint32_t item_size) {
 
   if((cache->map)[hash]) {
     cache_entry_map hash_entry_map = cache->map[hash];
+
     while(hash_entry_map) {
       if(item_size == hash_entry_map->entry->item_size &&
-          !memcmp(hash_entry_map->entry->item, item, item_size)) {
+	 !memcmp(hash_entry_map->entry->item, item, item_size)) {
         break;
       }
       
@@ -141,7 +142,6 @@ cache_result cache_add(cache_t cache, void *item, uint32_t item_size) {
 
     if(hash_entry_map) {
       cache_touch_entry(cache, hash_entry_map->entry);
-
       return CACHE_NO_ERROR;
     }
   }
@@ -256,8 +256,7 @@ cache_result cache_remove(cache_t cache, void *item, uint32_t item_size) {
       hash_entry_map = hash_entry_map->next;
     }
 
-    if(hash_entry_map) {
-      
+    if(hash_entry_map) {      
       if(hash_entry_map_prev) {
         hash_entry_map_prev->next = hash_entry_map->next;
       } else {
