@@ -158,10 +158,10 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
   if(fa->hashval < fb->hashval) return(-1); else if(fa->hashval > fb->hashval) return(1);
 
   /* Flows have the same hash */
-  
+
   if(fa->vlan_id   < fb->vlan_id   ) return(-1); else { if(fa->vlan_id    > fb->vlan_id   ) return(1); }
   if(fa->protocol  < fb->protocol  ) return(-1); else { if(fa->protocol   > fb->protocol  ) return(1); }
-  
+
   if(
      (
       (fa->src_ip      == fb->src_ip  )
@@ -178,12 +178,12 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
       )
      )
     return(0);
-  
+
   if(fa->src_ip   < fb->src_ip  ) return(-1); else { if(fa->src_ip   > fb->src_ip  ) return(1); }
   if(fa->src_port < fb->src_port) return(-1); else { if(fa->src_port > fb->src_port) return(1); }
   if(fa->dst_ip   < fb->dst_ip  ) return(-1); else { if(fa->dst_ip   > fb->dst_ip  ) return(1); }
   if(fa->dst_port < fb->dst_port) return(-1); else { if(fa->dst_port > fb->dst_port) return(1); }
-    
+
   return(0); /* notreached */
 }
 
@@ -453,7 +453,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
   }
 
-  if(flow->detection_completed) {
+  if(flow->detection_completed && !flow->check_extra_packets) {
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
       if (workflow->__flow_giveup_callback != NULL)
 	workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
@@ -516,7 +516,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
     else
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
-    
+
     flow->last_seen = time;
   } else { // flow is NULL
     workflow->stats.total_discarded_bytes++;
@@ -524,7 +524,28 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   }
 
   /* Protocol already detected */
-  if(flow->detection_completed) return(flow->detected_protocol);
+  if(flow->detection_completed) {
+    if(flow->check_extra_packets && ndpi_flow != NULL && ndpi_flow->check_extra_packets) {
+      if(ndpi_flow->num_extra_packets_checked == 0 && ndpi_flow->max_extra_packets_to_check == 0) {
+        /* Protocols can set this, but we set it here in case they didn't */
+        ndpi_flow->max_extra_packets_to_check = MAX_EXTRA_PACKETS_TO_CHECK;
+      }
+      if(ndpi_flow->num_extra_packets_checked < ndpi_flow->max_extra_packets_to_check) {
+        ndpi_process_extra_packet(workflow->ndpi_struct, ndpi_flow,
+							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
+							  ipsize, time, src, dst);
+        if (ndpi_flow->check_extra_packets == 0) {
+          flow->check_extra_packets = 0;
+          process_ndpi_collected_info(workflow, flow);
+        }
+      }
+    } else if (ndpi_flow != NULL) {
+      /* If this wasn't NULL we should do the half free */
+      /* TODO: When half_free is deprecated, get rid of this */
+      ndpi_free_flow_info_half(flow);
+    }
+    return(flow->detected_protocol);
+  }
 
   flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							  iph ? (uint8_t *)iph : (uint8_t *)iph6,
@@ -535,12 +556,15 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
      || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) {
     /* New protocol detected or give up */
     flow->detection_completed = 1;
+    /* Check if we should keep checking extra packets */
+    if (ndpi_flow->check_extra_packets)
+      flow->check_extra_packets = 1;
 
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
 	    flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
 							    flow->ndpi_flow);
     process_ndpi_collected_info(workflow, flow);
-  }  
+  }
 
   return(flow->detected_protocol);
 }

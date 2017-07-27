@@ -1616,7 +1616,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Nintendo", NDPI_PROTOCOL_CATEGORY_GAME,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    
+   
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
 
@@ -1635,7 +1635,7 @@ static int ac_match_handler(AC_MATCH_t *m, void *param) {
   /*
     Return 1 for stopping to the first match.
     We might consider searching for the more
-    specific match, paying more cpu cycles. 
+    specific match, paying more cpu cycles.
   */
   *matching_protocol_id = m->patterns[0].rep.number;
 
@@ -3426,6 +3426,50 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
 /* ********************************************************************************* */
 
+void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_struct,
+					    struct ndpi_flow_struct *flow,
+					    const unsigned char *packet,
+					    const unsigned short packetlen,
+					    const u_int64_t current_tick_l,
+					    struct ndpi_id_struct *src,
+					    struct ndpi_id_struct *dst)
+{
+  if(flow == NULL)
+    return;
+
+  if(flow->server_id == NULL) flow->server_id = dst; /* Default */
+
+  /* need at least 20 bytes for ip header */
+  if(packetlen < 20) {
+    return;
+  }
+
+  flow->packet.tick_timestamp_l = current_tick_l;
+  flow->packet.tick_timestamp = (u_int32_t)current_tick_l/1000;
+
+  /* parse packet */
+  flow->packet.iph = (struct ndpi_iphdr *)packet;
+  /* we are interested in ipv4 packet */
+
+  /* set up the packet headers for the extra packet function to use if it wants */
+  if(ndpi_init_packet_header(ndpi_struct, flow, packetlen) != 0)
+    return;
+
+  /* detect traffic for tcp or udp only */
+  flow->src = src, flow->dst = dst;
+  ndpi_connection_tracking(ndpi_struct, flow);
+
+  /* call the extra packet function (which may add more data/info to flow) */
+  if (flow->extra_packets_func) {
+    if ((flow->extra_packets_func(ndpi_struct, flow)) == 0)
+      flow->check_extra_packets = 0;
+  }
+
+  flow->num_extra_packets_checked++;
+}
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
 					    const unsigned char *packet,
@@ -4622,7 +4666,7 @@ int ndpi_match_prefix(const u_int8_t *payload, size_t payload_len,
 		      const char *str, size_t str_len)
 {
   int rc = str_len <= payload_len ? memcmp(payload, str, str_len) == 0 : 0;
-  
+
   return rc;
 }
 
@@ -4635,7 +4679,7 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   AC_TEXT_t ac_input_text;
   ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa : &ndpi_struct->content_automa;
   int rc;
-  
+
   if((automa->ac_automa == NULL) || (string_to_match_len == 0)) return(NDPI_PROTOCOL_UNKNOWN);
 
   if(!automa->ac_automa_finalized) {
@@ -4645,7 +4689,7 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
   ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, (void*)&matching_protocol_id);
-  
+
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
   return(matching_protocol_id);

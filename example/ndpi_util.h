@@ -36,6 +36,7 @@
 #define MAX_IDLE_TIME           30000
 #define IDLE_SCAN_BUDGET         1024
 #define NUM_ROOTS                 512
+#define MAX_EXTRA_PACKETS_TO_CHECK  7
 #define MAX_NDPI_FLOWS      200000000
 #define TICK_RESOLUTION          1000
 #define MAX_NUM_IP_ADDRESS          5  /* len of ip address array */
@@ -56,7 +57,7 @@ typedef struct ndpi_flow_info {
   u_int32_t dst_ip;
   u_int16_t src_port;
   u_int16_t dst_port;
-  u_int8_t detection_completed, protocol, bidirectional;
+  u_int8_t detection_completed, protocol, bidirectional, check_extra_packets;
   u_int16_t vlan_id;
   struct ndpi_flow_struct *ndpi_flow;
   char src_name[48], dst_name[48];
@@ -64,7 +65,7 @@ typedef struct ndpi_flow_info {
   u_int64_t last_seen;
   u_int64_t src2dst_bytes, dst2src_bytes;
   u_int32_t src2dst_packets, dst2src_packets;
-  
+
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
 

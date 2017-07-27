@@ -47,7 +47,7 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
 
   if(packet->tcp != NULL) {
     switch(protocol) {
-      
+
     case NDPI_PROTOCOL_SSL:
     case NDPI_PROTOCOL_SSL_NO_CERT:
       {
@@ -57,7 +57,7 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
 	*/
 	u_int16_t sport = ntohs(packet->tcp->source);
 	u_int16_t dport = ntohs(packet->tcp->dest);
-	
+
 	if((sport == 465) || (dport == 465))
 	  protocol = NDPI_PROTOCOL_MAIL_SMTPS;
 	else if((sport == 993) || (dport == 993)
@@ -70,7 +70,7 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
       break;
     }
   }
-  
+
   return protocol;
 }
 
@@ -98,14 +98,14 @@ static void ndpi_int_ssl_add_connection(struct ndpi_detection_module_struct *ndp
 			  ((ch) >= '{' && (ch) <= '~'))
 
 static void stripCertificateTrailer(char *buffer, int buffer_len) {
-  
+
   int i, is_puny;
-  
+
   //  printf("->%s<-\n", buffer);
-  
+
   for(i = 0; i < buffer_len; i++) {
     // printf("%c [%d]\n", buffer[i], buffer[i]);
-    
+
     if((buffer[i] != '.')
        && (buffer[i] != '-')
        && (buffer[i] != '_')
@@ -120,12 +120,12 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
 
   /* check for punycode encoding */
   is_puny = check_punycode_string(buffer, buffer_len);
-  
+
   // not a punycode string - need more checks
   if(is_puny == 0) {
-    
+
     if(i > 0) i--;
-    
+
     while(i > 0) {
       if(!ndpi_isalpha(buffer[i])) {
 	buffer[i] = '\0';
@@ -134,8 +134,8 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
       } else
 	break;
     }
-    
-    for(i = buffer_len; i > 0; i--) {    
+
+    for(i = buffer_len; i > 0; i--) {
       if(buffer[i] == '.') break;
       else if(ndpi_isdigit(buffer[i]))
 	buffer[i] = '\0', buffer_len = i;
@@ -306,6 +306,46 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
   return(0); /* Not found */
 }
 
+int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &flow->packet;
+
+  /* consider only specific SSL packets (handshake) */
+  if((packet->payload_packet_len > 9) && (packet->payload[0] == 0x16)) {
+    char certificate[64];
+    int rc;
+    certificate[0] = '\0';
+    rc = getSSLcertificate(ndpi_struct, flow, certificate, sizeof(certificate));
+    packet->ssl_certificate_num_checks++;
+    if (rc > 0) {
+      packet->ssl_certificate_detected++;
+      if (flow->protos.ssl.server_certificate[0] != '\0')
+        /* 0 means we're done processing extra packets (since we found what we wanted) */
+        return 0;
+    }
+    /* Client hello, Server Hello, and certificate packets probably all checked in this case */
+    if ((packet->ssl_certificate_num_checks >= 3)
+    && (flow->l4.tcp.seen_syn)
+    && (flow->l4.tcp.seen_syn_ack)
+    && (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
+    {
+      /* We're done processing extra packets since we've probably checked all possible cert packets */
+      return 0;
+    }
+  }
+  /* 1 means keep looking for more packets */
+  return 1;
+}
+
+void sslInitExtraPacketProcessing(int caseNum, struct ndpi_flow_struct *flow) {
+  flow->check_extra_packets = 1;
+  /* 0 is the case for waiting for the server certificate */
+  if (caseNum == 0) {
+    /* At most 7 packets should almost always be enough to find the server certificate if it's there */
+    flow->max_extra_packets_to_check = 7;
+    flow->extra_packets_func = sslTryAndRetrieveServerCertificate;
+  }
+}
+
 int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
@@ -325,18 +365,22 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 #ifdef CERTIFICATE_DEBUG
 	printf("***** [SSL] %s\n", certificate);
 #endif
-	u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate, 
+	u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate,
 							 strlen(certificate), NDPI_PROTOCOL_SSL);
-  
 	if(subproto != NDPI_PROTOCOL_UNKNOWN) {
-	  ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
-				     ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
-	  return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
-	}
-
+    /* If we've detected the subprotocol from client certificate but haven't had a chance
+      * to see the server certificate yet, set up extra packet processing to wait
+      * a few more packets. */
+    if((flow->protos.ssl.client_certificate[0] != '\0') && (flow->protos.ssl.server_certificate[0] == '\0')) {
+      sslInitExtraPacketProcessing(0, flow);
+    }
+    ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
+            ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
+    return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
+  }
 #ifdef NDPI_PROTOCOL_TOR
-	if(ndpi_is_ssl_tor(ndpi_struct, flow, certificate) != 0)
-	  return(rc);
+  if(ndpi_is_ssl_tor(ndpi_struct, flow, certificate) != 0)
+    return(rc);
 #endif
       }
 
@@ -346,11 +390,11 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  && flow->l4.tcp.seen_ack /* We have seen the 3-way handshake */)
 	 || (flow->protos.ssl.server_certificate[0] != '\0')
 	 /* || (flow->protos.ssl.client_certificate[0] != '\0') */
-	 )
+	 ) {
 	ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
-    }
+     }
   }
-
+     }
   return(0);
 }
 
