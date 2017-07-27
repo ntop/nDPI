@@ -335,11 +335,11 @@ struct bt_announce {              // 192 bytes
 
 #define TINC_CACHE_MAX_SIZE 10
 
-typedef struct {
+PACK_ON struct tinc_cache_entry {
   u_int32_t src_address;
   u_int32_t dst_address;
   u_int16_t dst_port;
-} tinc_cache_entry_t;
+} PACK_OFF;
 
 #endif
 
@@ -1075,9 +1075,8 @@ struct ndpi_flow_struct {
 #endif
 #ifdef NDPI_PROTOCOL_TINC
   u_int8_t tinc_state;
-  tinc_cache_entry_t tinc_cache_entry;
+  struct tinc_cache_entry tinc_cache_entry;
 #endif
-
 
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;

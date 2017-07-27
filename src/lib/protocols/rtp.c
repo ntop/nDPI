@@ -96,8 +96,8 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	    && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */	    
 	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF))) {
     if(payloadType == 1 /* RTP */) {
-      NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found MS Lync\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_LYNC, NDPI_PROTOCOL_UNKNOWN);
+      NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found Skype for Business (former MS Lync)\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
     } else /* RTCP */ {
       NDPI_LOG(NDPI_PROTOCOL_RTP, ndpi_struct, NDPI_LOG_DEBUG, "Found MS RTCP\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTCP, NDPI_PROTOCOL_UNKNOWN);

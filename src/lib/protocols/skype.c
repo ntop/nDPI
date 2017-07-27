@@ -27,7 +27,7 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  
+
   if(flow->host_server_name[0] != '\0')
     return;
 
@@ -52,7 +52,7 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
     }
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SKYPE);
     return;
-    
+
     // TCP check
   } else if(packet->tcp != NULL) {
     flow->l4.tcp.skype_packet_id++;
@@ -64,11 +64,15 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	      && flow->l4.tcp.seen_syn
 	      && flow->l4.tcp.seen_syn_ack
 	      && flow->l4.tcp.seen_ack) {
-      if((payload_len == 8) || (payload_len == 3)) {
-	//printf("[SKYPE] %u/%u\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest));
+
+      if((payload_len == 8) || (payload_len == 3) || (payload_len == 17)) {
+	// printf("[SKYPE] payload_len=%u\n", payload_len);
+	/* printf("[SKYPE] %u/%u\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest)); */
 
 	NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found skype.\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
+      } else {
+	// printf("NO [SKYPE] payload_len=%u\n", payload_len);
       }
 
       /* printf("[SKYPE] [id: %u][len: %d]\n", flow->l4.tcp.skype_packet_id, payload_len);  */
@@ -91,7 +95,7 @@ void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct 
 }
 
 
-void init_skype_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
+void init_skype_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("Skype", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_SKYPE,

@@ -32,25 +32,25 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
   
   if(packet->udp != NULL) {
     if(ndpi_struct->tinc_cache != NULL) {
-      tinc_cache_entry_t tinc_cache_entry1 = {
+      struct tinc_cache_entry tinc_cache_entry1 = {
         .src_address = packet->iph->saddr,
         .dst_address = packet->iph->daddr,
         .dst_port = packet->udp->dest
       };
 
-      tinc_cache_entry_t tinc_cache_entry2 = {
+      struct tinc_cache_entry tinc_cache_entry2 = {
         .src_address = packet->iph->daddr,
         .dst_address = packet->iph->saddr,
         .dst_port = packet->udp->source
       };
 
-      if( cache_remove(ndpi_struct->tinc_cache, &tinc_cache_entry1, sizeof(tinc_cache_entry1)) == CACHE_NO_ERROR ||
-          cache_remove(ndpi_struct->tinc_cache, &tinc_cache_entry2, sizeof(tinc_cache_entry2)) == CACHE_NO_ERROR)
-      {
+      if(cache_remove(ndpi_struct->tinc_cache, &tinc_cache_entry1, sizeof(tinc_cache_entry1)) == CACHE_NO_ERROR ||
+	 cache_remove(ndpi_struct->tinc_cache, &tinc_cache_entry2, sizeof(tinc_cache_entry2)) == CACHE_NO_ERROR) {
+
         cache_remove(ndpi_struct->tinc_cache, &tinc_cache_entry1, sizeof(tinc_cache_entry1));
         cache_remove(ndpi_struct->tinc_cache, &tinc_cache_entry2, sizeof(tinc_cache_entry2));
 
-        // cache_free(ndpi_struct->tinc_cache);
+	/* cache_free(ndpi_struct->tinc_cache); */
 
         NDPI_LOG(NDPI_PROTOCOL_TINC, ndpi_struct, NDPI_LOG_DEBUG, "Found tinc udp connection\n");
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN);
@@ -59,9 +59,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 
     return;
 
-  } 
-  else if(packet->tcp != NULL) {
-
+  } else if(packet->tcp != NULL) {
     if(payload_len == 0) {
       if(packet->tcp->syn == 1 && packet->tcp->ack == 0) {
         flow->tinc_cache_entry.src_address = packet->iph->saddr;
@@ -72,58 +70,56 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
     }
 
     switch(flow->tinc_state) {
-      case 0:
-      case 1:
-        if(payload_len > 6 && memcmp(packet_payload, "0 ", 2) == 0 && packet_payload[2] != ' ') {
-          u_int16_t i = 3;
-          while(i < payload_len && packet_payload[i++] != ' ');
-          if(i+3 == payload_len && memcmp((packet_payload+i), "17\n", 3) == 0) {
-            flow->tinc_state++;
-            return;
-          }
-        }
-        break;
+    case 0:
+    case 1:
+      if(payload_len > 6 && memcmp(packet_payload, "0 ", 2) == 0 && packet_payload[2] != ' ') {
+	u_int16_t i = 3;
+	while(i < payload_len && packet_payload[i++] != ' ');
+	if(i+3 == payload_len && memcmp((packet_payload+i), "17\n", 3) == 0) {
+	  flow->tinc_state++;
+	  return;
+	}
+      }
+      break;
 
-      case 2:
-      case 3:
-        if(payload_len > 11 && memcmp(packet_payload, "1 ", 2) == 0 && packet_payload[2] != ' ') {
-          u_int16_t i = 3;
-          u_int8_t numbers_left = 4;
-          while(numbers_left) {
-            while(packet_payload[i] >= '0' && packet_payload[i] <= '9') {
-              i++;
-            }
+    case 2:
+    case 3:
+      if(payload_len > 11 && memcmp(packet_payload, "1 ", 2) == 0 && packet_payload[2] != ' ') {
+	u_int16_t i = 3;
+	u_int8_t numbers_left = 4;
+	while(numbers_left) {
+	  while(packet_payload[i] >= '0' && packet_payload[i] <= '9') {
+	    i++;
+	  }
 
-            if(packet_payload[i++] == ' ') {
-              numbers_left--;
-            }
-            else break;
-          }
+	  if(packet_payload[i++] == ' ') {
+	    numbers_left--;
+	  }
+	  else break;
+	}
           
-          if(numbers_left) break;
+	if(numbers_left) break;
           
-          while((packet_payload[i] >= '0' && packet_payload[i] <= '9') ||
-                (packet_payload[i] >= 'A' && packet_payload[i] <= 'Z')) {
-            i++;
-          }
+	while((packet_payload[i] >= '0' && packet_payload[i] <= '9') ||
+	      (packet_payload[i] >= 'A' && packet_payload[i] <= 'Z')) {
+	  i++;
+	}
           
-          if(packet_payload[i] == '\n') {
-            if(++flow->tinc_state > 3) {
-              if(ndpi_struct->tinc_cache == NULL) {
-                ndpi_struct->tinc_cache = cache_new(TINC_CACHE_MAX_SIZE);
-              }
+	if(packet_payload[i] == '\n') {
+	  if(++flow->tinc_state > 3) {
+	    if(ndpi_struct->tinc_cache == NULL)
+	      ndpi_struct->tinc_cache = cache_new(TINC_CACHE_MAX_SIZE);              
 
-              cache_add(ndpi_struct->tinc_cache, &(flow->tinc_cache_entry), sizeof(flow->tinc_cache_entry));
-
-              NDPI_LOG(NDPI_PROTOCOL_TINC, ndpi_struct, NDPI_LOG_DEBUG, "Found tinc tcp connection\n");
-              ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN);
-            }
-            return;
-          }
-        }
-        break;
+	    cache_add(ndpi_struct->tinc_cache, &(flow->tinc_cache_entry), sizeof(flow->tinc_cache_entry));
+	    NDPI_LOG(NDPI_PROTOCOL_TINC, ndpi_struct, NDPI_LOG_DEBUG, "Found tinc tcp connection\n");
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN);
+	  }
+	  return;
+	}
+      }
+      break;
       
-      default: break;
+    default: break;
     }
   }
 
@@ -136,8 +132,8 @@ void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, struct n
 
   NDPI_LOG(NDPI_PROTOCOL_TINC, ndpi_struct, NDPI_LOG_DEBUG, "tinc detection...\n");
 
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_TINC) {
-    if (packet->tcp_retransmission == 0) {
+  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_TINC) {
+    if(packet->tcp_retransmission == 0) {
       ndpi_check_tinc(ndpi_struct, flow);
     }
   }
@@ -146,11 +142,11 @@ void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, struct n
 void init_tinc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("TINC", ndpi_struct, detection_bitmask, *id,
-              NDPI_PROTOCOL_TINC,
-              ndpi_search_tinc,
-              NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
-              SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-              ADD_TO_DETECTION_BITMASK);
+				      NDPI_PROTOCOL_TINC,
+				      ndpi_search_tinc,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
 
   *id += 1;
 }

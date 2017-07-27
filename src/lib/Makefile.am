@@ -85,6 +85,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/mysql.c \
 		     protocols/netbios.c \
 		     protocols/netflow.c \
+		     protocols/nintendo.c \
 		     protocols/nfs.c \
 		     protocols/noe.c \
 		     protocols/non_tcp_udp.c \

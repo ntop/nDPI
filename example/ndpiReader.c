@@ -2277,7 +2277,6 @@ void automataUnitTest() {
 #ifdef HAVE_JSON_C
 void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_array[48], int h_size, char *filePath) {
   FILE *fp = NULL;
-  char *prefix = "bpf_filter_";
   char _filterFilePath[1024];
   char *fileName;
   char filter[2048];

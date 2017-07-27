@@ -684,21 +684,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 /* ******************************************************************** */
 
-static void ndpi_init_placeholder_proto(struct ndpi_detection_module_struct *ndpi_mod,
-					ndpi_port_range *ports_a,
-					ndpi_port_range *ports_b,
-					u_int16_t *no_master,
-					u_int16_t proto_id)
-{
-  ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, proto_id,
-			  no_master,
-			  no_master, "Placeholder", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),   /* TCP */
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));  /* UDP */
-}
-
-/* ******************************************************************** */
-
 /* This function is used to map protocol name and default ports and it MUST
    be updated whenever a new protocol is added to NDPI.
 
@@ -1551,11 +1536,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "UBNTAC2", NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
 			    ndpi_build_default_ports(ports_b, 10001, 0, 0, 0, 0));    /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MS_LYNC,
-			    no_master,
-			    no_master, "Lync", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),	      /* TCP */
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));	      /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER,
 			    no_master,
 			    no_master, "Viber", NDPI_PROTOCOL_CATEGORY_CHAT,
@@ -1571,11 +1551,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "MQTT", NDPI_PROTOCOL_CATEGORY_RPC,
 			    ndpi_build_default_ports(ports_a, 1883, 8883, 0, 0, 0),  /* TCP */
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));       /* UDP */
-	 ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOMEIP,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOMEIP,
 			    no_master,
 			    no_master, "SOMEIP", NDPI_PROTOCOL_CATEGORY_RPC,
 			    ndpi_build_default_ports(ports_a, 30491, 30501, 0, 0, 0),  /* TCP */
-			    ndpi_build_default_ports(ports_b, 30491, 30501, 30490, 0, 0));       /* UDP */
+			    ndpi_build_default_ports(ports_b, 30491, 30501, 30490, 0, 0)); /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RX,
 			    no_master,
 			    no_master, "RX", NDPI_PROTOCOL_CATEGORY_RPC,
@@ -1631,7 +1611,12 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "FIX", NDPI_PROTOCOL_CATEGORY_RPC,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NINTENDO,
+			    no_master,
+			    no_master, "Nintendo", NDPI_PROTOCOL_CATEGORY_GAME,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+   
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
 
@@ -2727,6 +2712,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* FIX */
   init_fix_dissector(ndpi_struct, &a, detection_bitmask);
+  
+  /* NINTENDO */
+  init_nintendo_dissector(ndpi_struct, &a, detection_bitmask);
 
   /*** Put false-positive sensitive protocols at the end ***/
 
@@ -2740,7 +2728,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   init_amqp_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* ----------------------------------------------------------------- */
-
 
   ndpi_struct->callback_buffer_size = a;
 
