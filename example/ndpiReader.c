@@ -2285,7 +2285,6 @@ void automataUnitTest() {
 void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_array[48], int h_size, char *filePath) {
   FILE *fp = NULL;
   char _filterFilePath[1024];
-  char *fileName;
   char filter[2048];
   int produced = 0;
   int i = 0;
@@ -2337,7 +2336,6 @@ void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_ar
     produced = 1;
   }
 
-  fileName = basename(filePath);
   snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
 
   if((fp = fopen(_filterFilePath,"w")) == NULL) {
