@@ -4678,7 +4678,6 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   AC_TEXT_t ac_input_text;
   ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa : &ndpi_struct->content_automa;
-  int rc;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0)) return(NDPI_PROTOCOL_UNKNOWN);
 

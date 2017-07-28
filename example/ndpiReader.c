@@ -64,8 +64,8 @@ static FILE *results_file           = NULL;
 static char *results_path           = NULL;
 static char * bpfFilter             = NULL; /**< bpf filter  */
 static char *_protoFilePath         = NULL; /**< Protocol file path  */
-static char *_statsFilePath         = NULL; /**< Top stats file path */
 #ifdef HAVE_JSON_C
+static char *_statsFilePath         = NULL; /**< Top stats file path */
 static char *_diagnoseFilePath      = NULL; /**< Top stats file path */
 static char *_jsonFilePath          = NULL; /**< JSON file path  */
 static FILE *stats_fp               = NULL; /**< for Top Stats JSON file */
@@ -78,7 +78,10 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
-static u_int8_t stats_flag = 0, file_first_time = 1, bpf_filter_flag = 0;
+static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
+#ifdef HAVE_JSON_C
+static u_int8_t file_first_time = 1;
+#endif
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
@@ -1030,6 +1033,7 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 static void deleteScanners(struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
@@ -1043,6 +1047,7 @@ static void deleteScanners(struct single_flow_info *scanners) {
     free(s);
   }
 }
+#endif
 
 /* *********************************************** */
 
@@ -1355,6 +1360,7 @@ static int port_stats_sort(void *_a, void *_b) {
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 static int scanners_sort(void *_a, void *_b) {
   struct single_flow_info *a = (struct single_flow_info *)_a;
   struct single_flow_info *b = (struct single_flow_info *)_b;
@@ -1371,6 +1377,7 @@ static int scanners_port_sort(void *_a, void *_b) {
   return(b->num_flows - a->num_flows);
 }
 
+#endif
 /* *********************************************** */
 
 static int info_pair_cmp (const void *_a, const void *_b)
@@ -1383,6 +1390,7 @@ static int info_pair_cmp (const void *_a, const void *_b)
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 static int top_stats_sort(void *_a, void *_b) {
   struct top_stats *a = (struct top_stats*)_a;
   struct top_stats *b = (struct top_stats*)_b;
@@ -1441,7 +1449,6 @@ static int getTopStats(struct top_stats **topStats, struct port_stats *stats) {
 
 /* *********************************************** */
 
-#ifdef HAVE_JSON_C
 static void saveScannerStats(json_object **jObj_group, struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
@@ -2278,7 +2285,6 @@ void automataUnitTest() {
 void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_array[48], int h_size, char *filePath) {
   FILE *fp = NULL;
   char _filterFilePath[1024];
-  char *fileName;
   char filter[2048];
   int produced = 0;
   int i = 0;
@@ -2330,7 +2336,6 @@ void bpf_filter_produce_filter(int port_array[], int p_size, const char *host_ar
     produced = 1;
   }
 
-  fileName = basename(filePath);
   snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
 
   if((fp = fopen(_filterFilePath,"w")) == NULL) {
