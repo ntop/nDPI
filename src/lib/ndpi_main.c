@@ -1353,8 +1353,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMVIEWER,
 			    no_master,
 			    no_master, "TeamViewer", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_a, 5938, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 5938, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LOTUS_NOTES,
 			    no_master,
 			    no_master, "LotusNotes", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,

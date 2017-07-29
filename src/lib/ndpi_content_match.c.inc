@@ -627,6 +627,10 @@ static ndpi_network host_protocol_list[] = {
 
   { 0xB2F8D000 /* 178.248.208.0 */, 21, NDPI_PROTOCOL_OCS },
 
+
+  /* Teamviewer 159.122.189.32-63 */
+  { 0x9F7ABD30 /* 159.122.189.32 */, 21, NDPI_PROTOCOL_TEAMVIEWER },
+   
   /*
    IFLIX services -by www.vizuamatix.com R&D team
   */
