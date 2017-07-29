@@ -652,8 +652,9 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     type = ntohs(chdlc->proto_code);
     break;
 
-    /* Cisco PPP with HDLC framing - 104 */
+    /* Cisco PPP - 9 or 104 */
   case DLT_C_HDLC:
+  case DLT_PPP:
     chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
     ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
     type = ntohs(chdlc->proto_code);
