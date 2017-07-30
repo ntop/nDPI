@@ -754,10 +754,6 @@ static ndpi_network host_protocol_list[] = {
     Google Inc. / Google Switzerland GmbH / Google Ireland Limited
     origin AS15169, AS36384, AS41264, AS43515, AS36039, AS36040, AS36492
   */
-
-  { 0x01000000 /* 1.0.0.0/24 */, 24, NDPI_PROTOCOL_GOOGLE },
-  { 0x01010100 /* 1.1.1.0/24 */, 24, NDPI_PROTOCOL_GOOGLE },
-  { 0x01020300 /* 1.2.3.0/24 */, 24, NDPI_PROTOCOL_GOOGLE },
   { 0x08063000 /* 8.6.48.0/21 */, 21, NDPI_PROTOCOL_GOOGLE },
   { 0x08080400 /* 8.8.4.0/24 */, 24, NDPI_PROTOCOL_GOOGLE },
   { 0x08080800 /* 8.8.8.0/24 */, 24, NDPI_PROTOCOL_GOOGLE },
@@ -829,7 +825,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xD8EF2000 /* 216.239.32.0/19 */, 19, NDPI_PROTOCOL_GOOGLE },
   { 0xD8FCDC00 /* 216.252.220.0/22 */, 22, NDPI_PROTOCOL_GOOGLE },
 
-  /*
+/*
     Canonical Ltd (Ubuntu)
     origin AS41231
   */
