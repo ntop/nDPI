@@ -130,6 +130,7 @@ typedef struct ndpi_workflow {
   /* allocated by prefs */
   void **ndpi_flows_root;
   struct ndpi_detection_module_struct *ndpi_struct;
+  u_int32_t num_allocated_flows;
 } ndpi_workflow_t;
 
 

@@ -106,7 +106,6 @@ static void free_wrapper(void *freeable) {
 /* ***************************************************** */
 
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle) {
-
   set_ndpi_malloc(malloc_wrapper), set_ndpi_free(free_wrapper);
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
   /* TODO: just needed here to init ndpi malloc wrapper */
@@ -309,7 +308,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       if(newflow == NULL) {
 	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(1): not enough memory\n", __FUNCTION__);
 	return(NULL);
-      }
+      } else
+        workflow->num_allocated_flows++;
 
       memset(newflow, 0, sizeof(struct ndpi_flow_info));
       newflow->hashval = hashval;
@@ -544,6 +544,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       /* TODO: When half_free is deprecated, get rid of this */
       ndpi_free_flow_info_half(flow);
     }
+    
     return(flow->detected_protocol);
   }
 
