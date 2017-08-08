@@ -730,12 +730,12 @@ typedef struct {
 } ndpi_port_range;
 
 typedef enum {
-  NDPI_PROTOCOL_SAFE = 0,              /* Safe protocol with encryption */
-  NDPI_PROTOCOL_ACCEPTABLE,            /* Ok but not encrypted */
-  NDPI_PROTOCOL_FUN,                   /* Pure fun protocol */
-  NDPI_PROTOCOL_UNSAFE,                /* Protocol with a safe version existing  what should be used instead */
-  NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Be prepared to troubles */
-  NDPI_PROTOCOL_UNRATED                /* No idea */
+  NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn’t provide risks for the network. (e.g., a news site) */
+  NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn’t provide risks, but could be malicious (e.g., Dropbox) */
+  NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
+  NDPI_PROTOCOL_UNSAFE,                /* Probably provides risks, but could be a normal traffic. Unencrypted protocols with clear pass should be here (e.g., telnet) */
+  NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Surely is dangerous (ex. Tor). Be prepared to troubles */
+  NDPI_PROTOCOL_UNRATED                /* No idea, not implemented or impossible to classify */
 } ndpi_protocol_breed_t;
 
 #define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)

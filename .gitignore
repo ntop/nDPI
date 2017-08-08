@@ -10,6 +10,10 @@
 *.la
 .libs
 .dirstamp
+.autotools
+.cproject
+.project
+.settings
 stamp-h1
 /configure
 /config.guess
