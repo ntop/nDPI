@@ -758,7 +758,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
   NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
   NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
-  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development */
+  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
   NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
   NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
   NDPI_PROTOCOL_CATEGORY_SYSTEM,            /* System level applications */
