@@ -23,6 +23,13 @@
 static ndpi_network host_protocol_list[] = {
 
   /*
+    SoundCloud
+  */
+  { 0x22FB2FEE /* 34.251.47.238 */, 32, NDPI_PROTOCOL_SOUNDCLOUD },
+  { 0x23A06456 /* 35.160.100.86 */, 32, NDPI_PROTOCOL_SOUNDCLOUD },
+  { 0x36C0CA58 /* 54.192.202.88 */, 32, NDPI_PROTOCOL_SOUNDCLOUD },
+
+  /*
     Facebook, Inc.
     origin AS32934, AS54115
   */
@@ -152,7 +159,6 @@ static ndpi_network host_protocol_list[] = {
   { 0x1B000000 /* 27.0.0.0/22 */, 22, NDPI_PROTOCOL_AMAZON },
   { 0x22C00000 /* 34.192.0.0/10 */, 10, NDPI_PROTOCOL_AMAZON },
   { 0x23980000 /* 35.152.0.0/13 */, 13, NDPI_PROTOCOL_AMAZON },
-  { 0x23A00000 /* 35.160.0.0/12 */, 12, NDPI_PROTOCOL_AMAZON },
   { 0x23B00000 /* 35.176.0.0/13 */, 13, NDPI_PROTOCOL_AMAZON },
   { 0x2BFAC000 /* 43.250.192.0/24 */, 24, NDPI_PROTOCOL_AMAZON },
   { 0x2BFAC100 /* 43.250.193.0/24 */, 24, NDPI_PROTOCOL_AMAZON },
@@ -845,7 +851,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x5B6C1000 /* 91.108.16.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x5B6C3800 /* 91.108.56.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x959AA000 /* 149.154.160.0/20 */, 20, NDPI_PROTOCOL_TELEGRAM },
-
+  
   /*
     BitTorrent
   */
@@ -859,7 +865,6 @@ static ndpi_network host_protocol_list[] = {
   { 0xAC100010 /* 172.16.0.16/32 */, 32, NDPI_PROTOCOL_BITTORRENT },
   { 0xB2A4F550 /* 178.164.245.80/32 */, 32, NDPI_PROTOCOL_BITTORRENT },
   { 0xAE597B3E /* 174.89.123.62/32 */, 32, NDPI_PROTOCOL_BITTORRENT },
-
 
   /*
     Tor
@@ -8293,6 +8298,11 @@ ndpi_protocol_match host_match[] = {
 
   { ".linkedin.com",            "LinkedIn",         NDPI_PROTOCOL_LINKEDIN, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".licdn.com",               "LinkedIn",         NDPI_PROTOCOL_LINKEDIN, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+
+  { ".sndcdn.com",              "SoundCloud",       NDPI_PROTOCOL_SOUNDCLOUD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".soundcloud.com",          "SoundCloud",       NDPI_PROTOCOL_SOUNDCLOUD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { "getrockerbox.com",         "SoundCloud",       NDPI_PROTOCOL_SOUNDCLOUD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+
 
   { NULL, 0 }
 };
