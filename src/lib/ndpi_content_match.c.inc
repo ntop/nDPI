@@ -7984,6 +7984,7 @@ static ndpi_network host_protocol_list[] = {
     - Web sites (and CDNs) which are not commonly used to host malicious activities.
     - OS update hosts.
     - App stores.
+    - Commonly used services with passwords in encrypted channels (SMTPS, POPS, etc)
 
   NDPI_PROTOCOL_ACCEPTABLE
     - Cloud services may be used to host malware (e.g., https://www.fireeye.com/blog/threat-research/2015/11/china-based-threat.html),
@@ -8008,6 +8009,7 @@ static ndpi_network host_protocol_list[] = {
         - https://www.scmagazine.com/600-plus-cloud-repositories-spotted-hosting-malware-and-malicious-files/article/572205/
         - https://howtoremove.guide/remove-s3-amazonaws-virus/
     - Torrents.
+    - Commonly used services with passwords in unencrypted channels (SMTP, POP, etc)
 
   NDPI_PROTOCOL_POTENTIALLY_DANGEROUS
     - Tor and other anonymization access.
