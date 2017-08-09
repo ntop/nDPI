@@ -27,6 +27,6 @@ KakaoTalk_Voice	44	6196	2
 	15	TCP 10.24.82.188:34686 -> 173.194.72.188:5228 [proto: 126/Google][1 pkts/164 bytes -> 0 pkts/0 bytes]
 	16	TCP 173.252.88.128:443 -> 10.24.82.188:59912 [proto: 91.119/SSL.Facebook][2 pkts/124 bytes -> 0 pkts/0 bytes]
 	17	TCP 10.24.82.188:49217 -> 216.58.220.174:443 [proto: 91.126/SSL.Google][1 pkts/83 bytes -> 0 pkts/0 bytes]
-	18	TCP 173.252.122.1:443 -> 10.24.82.188:52123 [proto: 91.119/SSL.Facebook][1 pkts/56 bytes -> 0 pkts/0 bytes]
-	19	TCP 173.194.117.229:443 -> 10.24.82.188:38380 [proto: 91.126/SSL.Google][1 pkts/56 bytes -> 0 pkts/0 bytes]
+	18	TCP 173.194.117.229:443 -> 10.24.82.188:38380 [proto: 91.126/SSL.Google][1 pkts/56 bytes -> 0 pkts/0 bytes]
+	19	TCP 173.252.122.1:443 -> 10.24.82.188:52123 [proto: 91.119/SSL.Facebook][1 pkts/56 bytes -> 0 pkts/0 bytes]
 	20	TCP 216.58.220.161:443 -> 10.24.82.188:56697 [proto: 91.126/SSL.Google][1 pkts/56 bytes -> 0 pkts/0 bytes]
