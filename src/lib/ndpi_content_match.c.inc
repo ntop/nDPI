@@ -7984,6 +7984,7 @@ static ndpi_network host_protocol_list[] = {
     - Web sites (and CDNs) which are not commonly used to host malicious activities.
     - OS update hosts.
     - App stores.
+    - Commonly used services in encrypted channels (SMTPS, POPS, etc)
 
   NDPI_PROTOCOL_ACCEPTABLE
     - Cloud services may be used to host malware (e.g., https://www.fireeye.com/blog/threat-research/2015/11/china-based-threat.html),
@@ -7993,6 +7994,7 @@ static ndpi_network host_protocol_list[] = {
     - Text, voice or video communication (e.g., Skype, Slack, Whatsapp).
     - Ads services are commonly used to spread malware
       (https://www.tripwire.com/state-of-security/security-data-protection/crypto-ransomware-spreads-via-poisoned-ads-on-major-websites/)
+    - Commonly used services in unencrypted channels (SMTP, POP, etc)
 
   NDPI_PROTOCOL_FUN
     - Social media sites and services.
