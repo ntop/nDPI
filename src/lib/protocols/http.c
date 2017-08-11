@@ -154,15 +154,19 @@ static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
 #endif
 
 static void setHttpUserAgent(struct ndpi_flow_struct *flow, char *ua) {
-  if(!strcmp(ua, "Windows NT 5.0")) ua = "Windows 2000";
-  else if(!strcmp(ua, "Windows NT 5.1")) ua = "Windows XP";
-  else if(!strcmp(ua, "Windows NT 5.2")) ua = "Windows Server 2003";
-  else if(!strcmp(ua, "Windows NT 6.0")) ua = "Windows Vista";
-  else if(!strcmp(ua, "Windows NT 6.1")) ua = "Windows 7";
-  else if(!strcmp(ua, "Windows NT 6.2")) ua = "Windows 8";
-  else if(!strcmp(ua, "Windows NT 6.3")) ua = "Windows 8.1";
+  if (    !strcmp(ua, "Windows NT 5.0"))  ua = "Windows 2000";
+  else if(!strcmp(ua, "Windows NT 5.1"))  ua = "Windows XP";
+  else if(!strcmp(ua, "Windows NT 5.2"))  ua = "Windows Server 2003";
+  else if(!strcmp(ua, "Windows NT 6.0"))  ua = "Windows Vista";
+  else if(!strcmp(ua, "Windows NT 6.1"))  ua = "Windows 7";
+  else if(!strcmp(ua, "Windows NT 6.2"))  ua = "Windows 8";
+  else if(!strcmp(ua, "Windows NT 6.3"))  ua = "Windows 8.1";
+  else if(!strcmp(ua, "Windows NT 10.0")) ua = "Windows 10";
 
-  // printf("==> %s\n", ua);
+  /* Good reference for future implementations:
+   * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
+
+  printf("==> %s\n", ua);
   snprintf((char*)flow->detected_os, sizeof(flow->detected_os), "%s", ua);
 }
 
@@ -271,8 +275,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
     /**
-       Format:
-       Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ....
+       Format examples:
+         Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ....
+         Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0
     */
     if(packet->user_agent_line.len > 7) {
       char ua[256];
@@ -302,22 +307,22 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	      if(token && (token[0] == ' ')) token++; /* Skip space */
 
 	      if(token
-		 && ((strcmp(token, "U") == 0)
-		     || (strncmp(token, "MSIE", 4) == 0))) {
-		token = strsep(&parent, ";");
-		if(token && (token[0] == ' ')) token++; /* Skip space */
-
-		if(token && (strncmp(token, "Update", 6)  == 0)) {
-		  token = strsep(&parent, ";");
-
-		  if(token && (token[0] == ' ')) token++; /* Skip space */
-
-		  if(token && (strncmp(token, "AOL", 3)  == 0)) {
+		     && ((strcmp(token, "U") == 0)
+		         || (strncmp(token, "MSIE", 4) == 0))) {
 		    token = strsep(&parent, ";");
-
 		    if(token && (token[0] == ' ')) token++; /* Skip space */
-		  }
-		}
+
+		    if(token && (strncmp(token, "Update", 6)  == 0)) {
+		      token = strsep(&parent, ";");
+
+		      if(token && (token[0] == ' ')) token++; /* Skip space */
+
+		      if(token && (strncmp(token, "AOL", 3)  == 0)) {
+
+		        token = strsep(&parent, ";");
+		        if(token && (token[0] == ' ')) token++; /* Skip space */
+		      }
+		    }
 	      }
 	    }
 
@@ -566,9 +571,9 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
 
       if((packet->payload_packet_len == 3) && memcmp(packet->payload, "HI\n", 3) == 0) {
-	/* This looks like Ookla: we don't give up with HTTP yet */
-	flow->l4.tcp.http_stage = 1;
-	return;
+	    /* This looks like Ookla: we don't give up with HTTP yet */
+	    flow->l4.tcp.http_stage = 1;
+	    return;
       }
 
       if((packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
@@ -787,14 +792,14 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     */
 
     if((packet->parsed_lines == 1) && (packet->packet_direction == 1 /* server -> client */)) {
-      /* In apache if you do "GET /\n\n" the response comes without any header */
+      /* In Apache if you do "GET /\n\n" the response comes without any header */
       NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "Found HTTP. (apache)\n");
       ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
       check_content_type_and_change_protocol(ndpi_struct, flow);
       return;
     }
 
-    /* If we already detected the http request, we can add the connection and then check for the sub-protocol */
+    /* If we already detected the HTTP request, we can add the connection and then check for the sub-protocol */
     if(flow->http_detected)
       ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
 
