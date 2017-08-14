@@ -675,6 +675,7 @@ struct ndpi_packet_struct {
   u_int16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
+  /* HTTP headers */
   struct ndpi_int_one_line_struct host_line;
   struct ndpi_int_one_line_struct forwarded_line;
   struct ndpi_int_one_line_struct referer_line;
@@ -690,7 +691,8 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct http_x_session_type;
   struct ndpi_int_one_line_struct server_line;
   struct ndpi_int_one_line_struct http_method;
-  struct ndpi_int_one_line_struct http_response;
+  struct ndpi_int_one_line_struct http_response; /* the first "word" in this pointer is the response code in the packet (200, etc) */
+  u_int8_t http_num_headers; /* number of found (valid) header lines in HTTP request or response */
 
   u_int16_t l3_packet_len;
   u_int16_t l4_packet_len;
@@ -958,6 +960,9 @@ struct ndpi_flow_struct {
   struct {
     ndpi_http_method method;
     char *url, *content_type;
+    u_int8_t  num_request_headers, num_response_headers;
+    u_int8_t  request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
+    u_char response_status_code[4]; /* 200, 404, etc. */
   } http;
 
   union {
