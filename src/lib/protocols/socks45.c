@@ -48,18 +48,15 @@ static void ndpi_check_socks4(struct ndpi_detection_module_struct *ndpi_struct, 
   /* Check if we so far detected the protocol in the request or not. */
   if(flow->socks4_stage == 0) {
     NDPI_LOG(NDPI_PROTOCOL_SOCKS, ndpi_struct, NDPI_LOG_DEBUG, "SOCKS4 stage 0: \n");
-
-    /*Octets 3 and 4 contain the port number, port 80 and 25 for now. */
-    if((payload_len == 9) &&
-	(((packet->payload[0] == 0x04) && (packet->payload[1] == 0x01) && (packet->payload[2] == 0x00) && (packet->payload[3] == 0x50))
-	 ||
-	 ((packet->payload[0] == 0x04) && (packet->payload[1] == 0x01) && (packet->payload[2] == 0x00) && (packet->payload[3] == 0x19)))) {
+    
+    if(payload_len >= 9 && packet->payload[0] == 0x04 && 
+      (packet->payload[1] == 0x01 || packet->payload[1] == 0x02) &&
+      packet->payload[payload_len - 1] == 0x00)  {
       NDPI_LOG(NDPI_PROTOCOL_SOCKS, ndpi_struct, NDPI_LOG_DEBUG, "Possible SOCKS4 request detected, we will look further for the response...\n");
-
+      /* TODO: check port and ip address is valid */
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
       flow->socks4_stage = packet->packet_direction + 1;
     }
-
   } else {
     NDPI_LOG(NDPI_PROTOCOL_SOCKS, ndpi_struct, NDPI_LOG_DEBUG, "SOCKS4 stage %u: \n", flow->socks4_stage);
 
@@ -67,16 +64,14 @@ static void ndpi_check_socks4(struct ndpi_detection_module_struct *ndpi_struct, 
     if((flow->socks4_stage - packet->packet_direction) == 1) {
       return;
     }
-
     /* This is a packet in another direction. Check if we find the proper response. */
-    if(payload_len == 0) {
+    if(payload_len == 8 && packet->payload[0] == 0x00 && packet->payload[1] >= 0x5a && packet->payload[1] <= 0x5d) {
       NDPI_LOG(NDPI_PROTOCOL_SOCKS, ndpi_struct, NDPI_LOG_DEBUG, "Found SOCKS4.\n");
       ndpi_int_socks_add_connection(ndpi_struct, flow);
     } else {
       NDPI_LOG(NDPI_PROTOCOL_SOCKS, ndpi_struct, NDPI_LOG_DEBUG, "The reply did not seem to belong to SOCKS4, resetting the stage to 0...\n");
       flow->socks4_stage = 0;
     }
-
   }
 }
 
