@@ -3817,6 +3817,11 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 	    packet->http_response.len = packet->line[0].len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
 	    packet->http_num_headers++;
 
+	    /* Set server HTTP response code */
+	    strncpy((char*)flow->http.response_status_code, (char*)packet->http_response.ptr, 3);
+	    flow->http.response_status_code[4]='\0';
+
+
 	    NDPI_LOG(NDPI_PROTOCOL_UNKNOWN, ndpi_struct, NDPI_LOG_DEBUG,
 		  "ndpi_parse_packet_line_info: HTTP response parsed: \"%.*s\"\n",
 		   packet->http_response.len, packet->http_response.ptr);

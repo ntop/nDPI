@@ -826,12 +826,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     ndpi_parse_packet_line_info(ndpi_struct, flow);
     check_content_type_and_change_protocol(ndpi_struct, flow);
 
-    /* Set server HTTP response code, if available */
-    if(packet->http_response.len>=3){
-      strncpy((char*)flow->http.response_status_code, (char*)packet->http_response.ptr, 3);
-      flow->http.response_status_code[4]='\0';
-    }
-
     if(packet->packet_direction == 1 /* server -> client */){
         flow->http.num_response_headers += packet->http_num_headers; /* flow structs are initialized with zeros */
     }
