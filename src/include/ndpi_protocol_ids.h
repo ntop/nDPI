@@ -172,9 +172,9 @@
 #define NDPI_PROTOCOL_NETFLIX               133
 #define NDPI_PROTOCOL_LASTFM                134
 #define NDPI_PROTOCOL_WAZE                  135
-#define NDPI_PROTOCOL_SKYFILE_PREPAID       136
-#define NDPI_PROTOCOL_SKYFILE_RUDICS        137
-#define NDPI_PROTOCOL_SKYFILE_POSTPAID      138
+#define NDPI_PROTOCOL_SKYFILE_PREPAID       136 /* free for future use */
+#define NDPI_PROTOCOL_SKYFILE_RUDICS        137 /* free for future use */
+#define NDPI_PROTOCOL_SKYFILE_POSTPAID      138 /* free for future use */
 #define NDPI_PROTOCOL_CITRIX_ONLINE         139
 #define NDPI_PROTOCOL_APPLE                 140
 #define NDPI_PROTOCOL_WEBEX                 141

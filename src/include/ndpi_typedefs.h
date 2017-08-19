@@ -747,8 +747,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
   NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
   NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
-  NDPI_PROTOCOL_CATEGORY_MAIL_SEND,         /* Protocols to send emails */
-  NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,         /* Protocols to receive or sync emails */
+  NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
   NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,     /* FTP and similar protocols */
   NDPI_PROTOCOL_CATEGORY_WEB,               /* Web protocols and services */
   NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */

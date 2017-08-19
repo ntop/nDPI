@@ -716,32 +716,32 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_POP,
 			    no_master,
-			    no_master, "POP3", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			    no_master, "POP3", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 110, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_POPS,
 			    no_master,
-			    no_master, "POPS", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			    no_master, "POPS", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 995, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MAIL_SMTP,
 			    no_master,
-			    no_master, "SMTP", NDPI_PROTOCOL_CATEGORY_MAIL_SEND,
+			    no_master, "SMTP", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 25, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_SMTPS,
 			    no_master,
-			    no_master, "SMTPS", NDPI_PROTOCOL_CATEGORY_MAIL_SEND,
+			    no_master, "SMTPS", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 465, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_IMAP,
 			    no_master,
-			    no_master, "IMAP", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			    no_master, "IMAP", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 143, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_IMAPS,
 			    no_master,
-			    no_master, "IMAPS", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			    no_master, "IMAPS", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 993, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DNS,
@@ -1322,17 +1322,17 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_PREPAID,
 			    no_master,
-			    no_master, "SkyFile_PrePaid", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			    no_master, "SkyFile_PrePaid", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_RUDICS,
 			    no_master,
-			    no_master, "SkyFile_Rudics", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			    no_master, "SkyFile_Rudics", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_POSTPAID,
 			    no_master,
-			    no_master, "SkyFile_PostPaid", NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,
+			    no_master, "SkyFile_PostPaid", NDPI_PROTOCOL_CATEGORY_MAIL,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX_ONLINE,
@@ -4534,11 +4534,8 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
   case NDPI_PROTOCOL_CATEGORY_VPN:
     return("VPN");
     break;
-  case NDPI_PROTOCOL_CATEGORY_MAIL_SEND:
-    return("EmailSend");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_MAIL_SYNC:
-    return("EmailSync");
+  case NDPI_PROTOCOL_CATEGORY_MAIL:
+    return("Email");
     break;
   case NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER:
     return("FileTransfer");
