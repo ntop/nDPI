@@ -1616,7 +1616,12 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Nintendo", NDPI_PROTOCOL_CATEGORY_GAME,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-   
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_CSGO,
+			    no_master,
+			    no_master, "CSGO", NDPI_PROTOCOL_CATEGORY_GAME,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
 
@@ -2712,7 +2717,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* FIX */
   init_fix_dissector(ndpi_struct, &a, detection_bitmask);
-  
+
   /* NINTENDO */
   init_nintendo_dissector(ndpi_struct, &a, detection_bitmask);
 
@@ -2726,6 +2731,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* AMQP */
   init_amqp_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* CSGO */
+  init_csgo_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* ----------------------------------------------------------------- */
 
