@@ -1,4 +1,4 @@
-AC_INIT([libndpi], [2.1.0])
+AC_INIT([libndpi], [@NDPI_VERSION_SHORT@])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -9,6 +9,14 @@ LT_INIT
 AC_PROG_CC
 AM_PROG_CC_C_O
 AX_PTHREAD
+
+NDPI_MAJOR="@NDPI_MAJOR@"
+NDPI_MINOR="@NDPI_MINOR@"
+NDPI_PATCH="@NDPI_PATCH@"
+
+AC_DEFINE_UNQUOTED(NDPI_MAJOR_RELEASE, "${NDPI_MAJOR}", [nDPI major release])
+AC_DEFINE_UNQUOTED(NDPI_MINOR_RELEASE, "${NDPI_MINOR}", [nDPI minor release])
+AC_DEFINE_UNQUOTED(NDPI_PATCH_LEVEL,   "${NDPI_PATCH}", [nDPI patch level])
 
 if test -d ".git"; then :
      GIT_TAG=`git log -1 --format=%h`
@@ -92,9 +100,12 @@ AS_IF([test "x$enable_json_c" != "xno"], [
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
-AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile tests/Makefile libndpi.pc])
+AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile tests/Makefile libndpi.pc src/include/ndpi_define.h])
 AC_CONFIG_HEADERS(config.h)
 AC_SUBST(GIT_RELEASE)
+AC_SUBST(NDPI_MAJOR)
+AC_SUBST(NDPI_MINOR)
+AC_SUBST(NDPI_PATCH)
 AC_SUBST(SVN_DATE)
 AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)

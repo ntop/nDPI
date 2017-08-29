@@ -290,4 +290,8 @@
 
 #define NDPI_MAX_DNS_REQUESTS                   16
 
+#define NDPI_MAJOR                              @NDPI_MAJOR@
+#define NDPI_MINOR                              @NDPI_MINOR@
+#define NDPI_PATCH                              @NDPI_PATCH@
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
