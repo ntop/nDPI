@@ -98,6 +98,18 @@ extern "C" {
    */
   char* ndpi_strnstr(const char *s, const char *find, size_t slen);
 
+  /**
+   * Same as ndpi_strnstr but case insensitive
+   *
+   * @par    s     = string to parse
+   * @par    find  = string to match with -s-
+   * @par    slen  = max length to match between -s- and -find-
+   * @return a pointer to the beginning of the located substring;
+   *         NULL if the substring is not found
+   *
+   */
+  char* ndpi_strncasestr(const char *s, const char *find, size_t slen);
+
 
   /**
    * Returns the nDPI protocol id for IP-based protocol detection

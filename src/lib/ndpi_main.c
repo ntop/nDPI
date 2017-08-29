@@ -3809,7 +3809,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 
       /* First line of a HTTP response parsing. Expected a "HTTP/1.? ???" */
       if(packet->parsed_lines == 0 && packet->line[0].len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
-	     memcmp(packet->line[0].ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
+	     strncasecmp((const char *)packet->line[0].ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
 	     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] > '0' && /* response code between 000 and 699 */
 	     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] < '6') {
 
@@ -3828,7 +3828,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       }
       /* "Server:" header line in HTTP response */
       if(packet->line[packet->parsed_lines].len > NDPI_STATICSTRING_LEN("Server:") + 1
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Server:", NDPI_STATICSTRING_LEN("Server:")) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Server:", NDPI_STATICSTRING_LEN("Server:")) == 0) {
 	    // some stupid clients omit a space and place the servername directly after the colon
         if(packet->line[packet->parsed_lines].ptr[NDPI_STATICSTRING_LEN("Server:")] == ' ') {
           packet->server_line.ptr =
@@ -3843,7 +3843,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       }
       /* "Host:" header line in HTTP request */
       if(packet->line[packet->parsed_lines].len > 6
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Host:", 5) == 0) {
+	 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr,
+			     "Host:", 5) == 0) {
         // some stupid clients omit a space and place the hostname directly after the colon
         if(packet->line[packet->parsed_lines].ptr[5] == ' ') {
           packet->host_line.ptr = &packet->line[packet->parsed_lines].ptr[6];
@@ -3856,7 +3857,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       }
       /* "X-Forwarded-For:" header line in HTTP request. Commonly used for HTTP proxies. */
       if(packet->line[packet->parsed_lines].len > 17
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "X-Forwarded-For:", 16) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "X-Forwarded-For:", 16) == 0) {
         // some stupid clients omit a space and place the hostname directly after the colon
         if(packet->line[packet->parsed_lines].ptr[16] == ' ') {
           packet->forwarded_line.ptr = &packet->line[packet->parsed_lines].ptr[17];
@@ -3869,80 +3870,80 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
       }
       /* "Content-Type:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 14
-	     && (memcmp(packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0
-	         || memcmp(packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
+	     && (strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0
+	         || strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
         packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
         packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
         packet->http_num_headers++;
       }
       /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
       if(packet->line[packet->parsed_lines].len > 13
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0) {
         packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
         packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
         packet->http_num_headers++;
       }
       /* "Accept:" header line in HTTP request. */
       if(packet->line[packet->parsed_lines].len > 8
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Accept: ", 8) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Accept: ", 8) == 0) {
         packet->accept_line.ptr = &packet->line[packet->parsed_lines].ptr[8];
         packet->accept_line.len = packet->line[packet->parsed_lines].len - 8;
         packet->http_num_headers++;
       }
       /* "Referer:" header line in HTTP request. */
       if(packet->line[packet->parsed_lines].len > 9
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Referer: ", 9) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Referer: ", 9) == 0) {
         packet->referer_line.ptr = &packet->line[packet->parsed_lines].ptr[9];
         packet->referer_line.len = packet->line[packet->parsed_lines].len - 9;
         packet->http_num_headers++;
       }
       /* "User-Agent:" header line in HTTP request. */
       if(packet->line[packet->parsed_lines].len > 12
-	     && (memcmp(packet->line[packet->parsed_lines].ptr, "User-Agent: ", 12) == 0
-	         || memcmp(packet->line[packet->parsed_lines].ptr, "User-agent: ", 12) == 0)) {
+	     && (strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "User-Agent: ", 12) == 0
+	         || strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "User-agent: ", 12) == 0)) {
         packet->user_agent_line.ptr = &packet->line[packet->parsed_lines].ptr[12];
         packet->user_agent_line.len = packet->line[packet->parsed_lines].len - 12;
         packet->http_num_headers++;
       }
       /* "Content-Encoding:" header line in HTTP response (and request?). */
       if(packet->line[packet->parsed_lines].len > 18
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Content-Encoding: ", 18) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-Encoding: ", 18) == 0) {
         packet->http_encoding.ptr = &packet->line[packet->parsed_lines].ptr[18];
         packet->http_encoding.len = packet->line[packet->parsed_lines].len - 18;
         packet->http_num_headers++;
       }
       /* "Transfer-Encoding:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 19
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Transfer-Encoding: ", 19) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Transfer-Encoding: ", 19) == 0) {
         packet->http_transfer_encoding.ptr = &packet->line[packet->parsed_lines].ptr[19];
         packet->http_transfer_encoding.len = packet->line[packet->parsed_lines].len - 19;
         packet->http_num_headers++;
       }
       /* "Content-Length:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 16
-	     && ((memcmp(packet->line[packet->parsed_lines].ptr, "Content-Length: ", 16) == 0)
-	     || (memcmp(packet->line[packet->parsed_lines].ptr, "content-length: ", 16) == 0))) {
+	     && ((strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-Length: ", 16) == 0)
+	     || (strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "content-length: ", 16) == 0))) {
         packet->http_contentlen.ptr = &packet->line[packet->parsed_lines].ptr[16];
         packet->http_contentlen.len = packet->line[packet->parsed_lines].len - 16;
         packet->http_num_headers++;
       }
       /* "Cookie:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 8
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Cookie: ", 8) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Cookie: ", 8) == 0) {
         packet->http_cookie.ptr = &packet->line[packet->parsed_lines].ptr[8];
         packet->http_cookie.len = packet->line[packet->parsed_lines].len - 8;
         packet->http_num_headers++;
       }
       /* "Origin:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 8
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "Origin: ", 8) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Origin: ", 8) == 0) {
         packet->http_origin.ptr = &packet->line[packet->parsed_lines].ptr[8];
         packet->http_origin.len = packet->line[packet->parsed_lines].len - 8;
         packet->http_num_headers++;
       }
       /* "X-Session-Type:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 16
-	     && memcmp(packet->line[packet->parsed_lines].ptr, "X-Session-Type: ", 16) == 0) {
+	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "X-Session-Type: ", 16) == 0) {
         packet->http_x_session_type.ptr = &packet->line[packet->parsed_lines].ptr[16];
         packet->http_x_session_type.len = packet->line[packet->parsed_lines].len - 16;
         packet->http_num_headers++;
@@ -3953,19 +3954,19 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
        * - https://tools.ietf.org/html/rfc7230
        * - https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
        */
-      if((packet->line[packet->parsed_lines].len >  6 && ( memcmp(packet->line[packet->parsed_lines].ptr, "Date: ", 6) == 0 ||
-                                                           memcmp(packet->line[packet->parsed_lines].ptr, "Vary: ", 6) == 0 ||
-                                                           memcmp(packet->line[packet->parsed_lines].ptr, "ETag: ", 6) == 0 )) ||
-         (packet->line[packet->parsed_lines].len >  8 && memcmp(packet->line[packet->parsed_lines].ptr, "Pragma: ", 8) == 0) ||
-         (packet->line[packet->parsed_lines].len >  9 && memcmp(packet->line[packet->parsed_lines].ptr, "Expires: ", 9) == 0) ||
-         (packet->line[packet->parsed_lines].len > 12 && ( memcmp(packet->line[packet->parsed_lines].ptr, "Set-Cookie: ", 12) == 0 ||
-                                                           memcmp(packet->line[packet->parsed_lines].ptr, "Keep-Alive: ", 12) == 0 ||
-                                                           memcmp(packet->line[packet->parsed_lines].ptr, "Connection: ", 12) == 0)) ||
-         (packet->line[packet->parsed_lines].len > 15 && ( memcmp(packet->line[packet->parsed_lines].ptr, "Last-Modified: ", 15) == 0 ||
-                                                           memcmp(packet->line[packet->parsed_lines].ptr, "Accept-Ranges: ", 15) == 0)) ||
-         (packet->line[packet->parsed_lines].len > 17 && ( memcmp(packet->line[packet->parsed_lines].ptr, "Accept-Language: ", 17) == 0 ||
-                                                           memcmp(packet->line[packet->parsed_lines].ptr, "Accept-Encoding: ", 17) == 0)) ||
-         (packet->line[packet->parsed_lines].len > 27 && memcmp(packet->line[packet->parsed_lines].ptr, "Upgrade-Insecure-Requests: ", 27) == 0)) {
+      if((packet->line[packet->parsed_lines].len >  6 && ( strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Date: ", 6) == 0 ||
+                                                           strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Vary: ", 6) == 0 ||
+                                                           strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "ETag: ", 6) == 0 )) ||
+         (packet->line[packet->parsed_lines].len >  8 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Pragma: ", 8) == 0) ||
+         (packet->line[packet->parsed_lines].len >  9 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Expires: ", 9) == 0) ||
+         (packet->line[packet->parsed_lines].len > 12 && ( strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Set-Cookie: ", 12) == 0 ||
+                                                           strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Keep-Alive: ", 12) == 0 ||
+                                                           strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Connection: ", 12) == 0)) ||
+         (packet->line[packet->parsed_lines].len > 15 && ( strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Last-Modified: ", 15) == 0 ||
+                                                           strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Accept-Ranges: ", 15) == 0)) ||
+         (packet->line[packet->parsed_lines].len > 17 && ( strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Accept-Language: ", 17) == 0 ||
+                                                           strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Accept-Encoding: ", 17) == 0)) ||
+         (packet->line[packet->parsed_lines].len > 27 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Upgrade-Insecure-Requests: ", 27) == 0)) {
         /* Just count. In the future, if needed, this if can be splited to parse these headers */
         packet->http_num_headers++;
       }
@@ -4700,6 +4701,30 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
       if(len > slen)
 	return (NULL);
     } while (strncmp(s, find, len) != 0);
+    s--;
+  }
+  return ((char *)s);
+}
+
+/* ****************************************************** */
+
+/*
+ * Same as ndpi_strnstr but case-insensitive
+ */
+char* ndpi_strncasestr(const char *s, const char *find, size_t slen) {
+  char c, sc;
+  size_t len;
+
+  if((c = *find++) != '\0') {
+    len = strlen(find);
+    do {
+      do {
+	if(slen-- < 1 || (sc = *s++) == '\0')
+	  return (NULL);
+      } while (sc != c);
+      if(len > slen)
+	return (NULL);
+    } while (strncasecmp(s, find, len) != 0);
     s--;
   }
   return ((char *)s);
