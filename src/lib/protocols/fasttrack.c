@@ -42,7 +42,9 @@ void ndpi_search_fasttrack_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 //      struct ndpi_id_struct         *src=ndpi_struct->src;
 //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-	if (packet->payload_packet_len > 6 && ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a) {
+	if ( (packet->payload != NULL)
+	     && (packet->payload_packet_len > 6)
+	     && (ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a)) {
 		NDPI_LOG(NDPI_PROTOCOL_FASTTRACK, ndpi_struct, NDPI_LOG_TRACE, "detected 0d0a at the end of the packet.\n");
 
 		if (memcmp(packet->payload, "GIVE ", 5) == 0 && packet->payload_packet_len >= 8) {
