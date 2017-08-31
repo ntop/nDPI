@@ -59,14 +59,14 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     const char *bt_hash = NULL; /* 20 bytes long */
 
     if(bt_offset == -1) {
-      const char *bt_magic = ndpi_strnstr((const char *)flow->packet.payload, 
+      const char *bt_magic = ndpi_strnstr((const char *)flow->packet.payload,
 					  "BitTorrent protocol", flow->packet.payload_packet_len);
 
       if(bt_magic)
 	bt_hash = &bt_magic[19];
     } else
       bt_hash = (const char*)&flow->packet.payload[28];
- 
+
     if(bt_hash) memcpy(flow->bittorent_hash, bt_hash, 20);
   }
 
@@ -387,15 +387,15 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
   char *bt_proto = NULL;
 
   /* This is broadcast */
-  if(packet->iph 
+  if(packet->iph
      && (((packet->iph->saddr == 0xFFFFFFFF) || (packet->iph->daddr == 0xFFFFFFFF))
-	 || (packet->udp 
+	 || (packet->udp
 	     && ((ntohs(packet->udp->source) == 3544) /* teredo.c */
 		 || (ntohs(packet->udp->dest) == 3544))))) {
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_BITTORRENT);
     return;
   }
-  
+
   if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
 
@@ -441,7 +441,8 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	    /* Heuristic */
 	    bt_proto = ndpi_strnstr((const char *)&packet->payload[20], "BitTorrent protocol", packet->payload_packet_len-20);
 	    goto bittorrent_found;
-	  } else if(((v1_version & 0x0f) == 1)
+      /* CSGO/DOTA conflict */
+	  } else if(flow->packet_counter > 8 && ((v1_version & 0x0f) == 1)
 		    && ((v1_version >> 4) < 5 /* ST_NUM_STATES */)
 		    && (v1_extension      < 3 /* EXT_NUM_EXT */)
 		    && (v1_window_size    < 32768 /* 32k */)
@@ -466,8 +467,8 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 
       if(flow->bittorrent_stage < 10) {
 	  /* We have detected bittorrent but we need to wait until we get a hash */
-	  
-	  if(packet->payload_packet_len > 19 /* min size */) {  
+
+	  if(packet->payload_packet_len > 19 /* min size */) {
 	    if(ndpi_strnstr((const char *)packet->payload, ":target20:", packet->payload_packet_len)
 	       || ndpi_strnstr((const char *)packet->payload, ":find_node1:", packet->payload_packet_len)
 	       || ndpi_strnstr((const char *)packet->payload, "d1:ad2:id20:", packet->payload_packet_len)
@@ -475,7 +476,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	       || ndpi_strnstr((const char *)packet->payload, ":filter64", packet->payload_packet_len)
 	       || ndpi_strnstr((const char *)packet->payload, "d1:rd2:id20:", packet->payload_packet_len)
 	       || (bt_proto = ndpi_strnstr((const char *)packet->payload, "BitTorrent protocol", packet->payload_packet_len))
-	       ) {	    
+	       ) {
 	    bittorrent_found:
 	      if(bt_proto && (packet->payload_packet_len > 47))
 		memcpy(flow->bittorent_hash, &bt_proto[27], 20);
@@ -486,7 +487,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 						NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
 	      return;
 	    }
-	  }	
+	  }
 
 	return;
       }
