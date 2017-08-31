@@ -32,6 +32,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/collectd.c \
 		     protocols/corba.c \
 		     protocols/crossfire.c \
+		     protocols/csgo.c \
 		     protocols/dcerpc.c \
 		     protocols/dhcp.c \
 		     protocols/dhcpv6.c \

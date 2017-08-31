@@ -272,9 +272,10 @@
 #define NDPI_PROTOCOL_PASTEBIN              232 /* Paulo Angelo <pa@pauloangelo.com> */
 #define NDPI_PROTOCOL_LINKEDIN              233 /* Paulo Angelo <pa@pauloangelo.com> */
 #define NDPI_PROTOCOL_SOUNDCLOUD            234
+#define NDPI_PROTOCOL_CSGO                  235 /* Counter-Strike Global Offensive, Dota 2 */
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_SOUNDCLOUD
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_CSGO
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS               (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)
