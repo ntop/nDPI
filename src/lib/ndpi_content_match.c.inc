@@ -849,6 +849,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x5B6C0800 /* 91.108.8.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x5B6C0C00 /* 91.108.12.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x5B6C1000 /* 91.108.16.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
+  { 0x5B6C1400 /* 91.108.20.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x5B6C3800 /* 91.108.56.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x959AA000 /* 149.154.160.0/20 */, 20, NDPI_PROTOCOL_TELEGRAM },
   
@@ -8305,6 +8306,7 @@ ndpi_protocol_match host_match[] = {
   { ".soundcloud.com",          "SoundCloud",       NDPI_PROTOCOL_SOUNDCLOUD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "getrockerbox.com",         "SoundCloud",       NDPI_PROTOCOL_SOUNDCLOUD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
+  { "web.telegram.org",         "Telegram",       NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, 0 }
 };
