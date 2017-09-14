@@ -54,7 +54,7 @@ void ndpi_search_lisp(struct ndpi_detection_module_struct *ndpi_struct, struct n
 }
 
 
-void init_my_lisp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
+void init_lisp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
 {
   ndpi_set_bitmask_protocol_detection("LISP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_LISP,

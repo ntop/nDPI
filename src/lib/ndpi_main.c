@@ -2741,7 +2741,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   init_csgo_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* LISP */
-  init_my_lisp_dissector(ndpi_struct, &a, detection_bitmask);
+  init_lisp_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* ----------------------------------------------------------------- */
 
