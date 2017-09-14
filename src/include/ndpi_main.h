@@ -28,8 +28,8 @@
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 #include "ndpi_typedefs.h"
-#include "ndpi_protocols.h"
 #include "ndpi_api.h"
+#include "ndpi_protocols.h"
 
 #ifdef __cplusplus
 extern "C" {
