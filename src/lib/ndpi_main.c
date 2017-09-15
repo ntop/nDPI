@@ -432,6 +432,26 @@ ndpi_port_range * ndpi_build_default_ports(ndpi_port_range *ports,
 
 /* ********************************************************************************** */
 
+void ndpi_set_proto_breed(struct ndpi_detection_module_struct *ndpi_mod,
+			  u_int16_t protoId, ndpi_protocol_breed_t breed) {
+  if(protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS)
+    return;
+  else
+    ndpi_mod->proto_defaults[protoId].protoBreed = breed;
+}
+
+/* ********************************************************************************** */
+
+void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_mod,
+			     u_int16_t protoId, ndpi_protocol_category_t protoCategory) {
+  if(protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS)
+    return;
+  else
+    ndpi_mod->proto_defaults[protoId].protoCategory = protoCategory;
+}
+
+/* ********************************************************************************** */
+
 void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
 			     ndpi_protocol_breed_t breed, u_int16_t protoId,
 			     u_int16_t tcp_master_protoId[2], u_int16_t udp_master_protoId[2],

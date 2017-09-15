@@ -387,16 +387,15 @@ extern "C" {
   /**
    * Check if the string -bigram_to_match- match with a bigram of -automa-
    *
-   * @par     ndpi_struct      = the detection module
+   * @par     ndpi_mod         = the detection module
    * @par     automa           = the struct ndpi_automa for the bigram
    * @par     bigram_to_match  = the bigram string to match
    * @return  0
    *
    */
-  int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_mod,
 			ndpi_automa *automa,
 			char *bigram_to_match);
-
 
   /**
    * Write the protocol name in the buffer -buf- as master_protocol.protocol
@@ -418,6 +417,28 @@ extern "C" {
    *
    */
   int ndpi_is_custom_category(ndpi_protocol_category_t category);
+
+  /**
+   * Overwrite a protocol category defined by nDPI with the custom category
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     protoId       = the protocol identifier to overwrite
+   * @par     breed         = the breed to be associated to the protocol
+   *
+   */
+  void ndpi_set_proto_breed(struct ndpi_detection_module_struct *ndpi_mod,
+			    u_int16_t protoId, ndpi_protocol_breed_t breed);
+
+  /**
+   * Overwrite a protocol category defined by nDPI with the custom category
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     protoId       = the protocol identifier to overwrite
+   * @par     category      = the category associated to the protocol
+   *
+   */
+  void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_mod,
+			       u_int16_t protoId, ndpi_protocol_category_t protoCategory);
 
   /**
    * Get protocol category as string
