@@ -411,6 +411,15 @@ extern "C" {
   char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto, char *buf, u_int buf_len);
 
   /**
+   * Find out if a given category is custom/user-defined
+   *
+   * @par     category      = the category associated to the protocol
+   * @return  1 if this is a custom user category, 0 otherwise
+   *
+   */
+  int ndpi_is_custom_category(ndpi_protocol_category_t category);
+
+  /**
    * Get protocol category as string
    *
    * @par     category      = the category associated to the protocol

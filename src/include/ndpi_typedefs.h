@@ -748,10 +748,10 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
   NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
   NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
-  NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,     /* FTP and similar protocols */
+  NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
   NDPI_PROTOCOL_CATEGORY_WEB,               /* Web protocols and services */
   NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
-  NDPI_PROTOCOL_CATEGORY_P2P,               /* File sharing and P2P */
+  NDPI_PROTOCOL_CATEGORY_P2P_DOWNLOAD_FT,   /* Download, FTP, file transfer/sharing and P2P */
   NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
   NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
   NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
@@ -762,8 +762,13 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
   NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
   NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
-  NDPI_PROTOCOL_CATEGORY_SYSTEM,            /* System level applications */
+  NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
   NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_3,          /* User custom category 3 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
 
   NDPI_PROTOCOL_NUM_CATEGORIES /*
 				  NOTE: Keep this as last member
