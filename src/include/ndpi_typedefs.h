@@ -751,7 +751,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
   NDPI_PROTOCOL_CATEGORY_WEB,               /* Web protocols and services */
   NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
-  NDPI_PROTOCOL_CATEGORY_P2P_DOWNLOAD_FT,   /* Download, FTP, file transfer/sharing and P2P */
+  NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,       /* Download, FTP, file transfer/sharing */
   NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
   NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
   NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
