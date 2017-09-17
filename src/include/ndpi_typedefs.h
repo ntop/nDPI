@@ -908,6 +908,8 @@ struct ndpi_detection_module_struct {
     direction_detect_disable:1; /* disable internal detection of packet direction */
 };
 
+#define dhcp_fingerprint host_server_name
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
 #ifndef WIN32
@@ -946,7 +948,7 @@ struct ndpi_flow_struct {
   */
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
-  u_char host_server_name[256];
+  u_char host_server_name[256]; /* Shared with dhcp_fingerprint */
   /* Via HTTP User-Agent */
   u_char detected_os[32];
   /* Via HTTP X-Forwarded-For */
