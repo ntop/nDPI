@@ -908,8 +908,6 @@ struct ndpi_detection_module_struct {
     direction_detect_disable:1; /* disable internal detection of packet direction */
 };
 
-#define dhcp_fingerprint host_server_name
-
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
 #ifndef WIN32
@@ -948,13 +946,7 @@ struct ndpi_flow_struct {
   */
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
-  u_char host_server_name[256]; /* Shared with dhcp_fingerprint */
-  /* Via HTTP User-Agent */
-  u_char detected_os[32];
-  /* Via HTTP X-Forwarded-For */
-  u_char nat_ip[24];
-  /* Bittorrent hash */
-  u_char bittorent_hash[20];
+  u_char host_server_name[256];
 
   /*
      This structure below will not not stay inside the protos
@@ -998,6 +990,22 @@ struct ndpi_flow_struct {
     struct {
       char version[96];
     } ubntac2;
+
+    struct {
+      /* Via HTTP User-Agent */
+      u_char detected_os[32];
+      /* Via HTTP X-Forwarded-For */
+      u_char nat_ip[24];
+    } http;
+
+    struct {
+      /* Bittorrent hash */
+      u_char hash[20];
+    } bittorrent;
+
+    struct {
+      char fingerprint[48];
+    } dhcp;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/

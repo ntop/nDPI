@@ -67,7 +67,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     } else
       bt_hash = (const char*)&flow->packet.payload[28];
 
-    if(bt_hash) memcpy(flow->bittorent_hash, bt_hash, 20);
+    if(bt_hash) memcpy(flow->protos.bittorrent.hash, bt_hash, 20);
   }
 
   ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN);
@@ -479,7 +479,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	       ) {
 	    bittorrent_found:
 	      if(bt_proto && (packet->payload_packet_len > 47))
-		memcpy(flow->bittorent_hash, &bt_proto[27], 20);
+		memcpy(flow->protos.bittorrent.hash, &bt_proto[27], 20);
 
 	      NDPI_LOG(NDPI_PROTOCOL_BITTORRENT,
 		       ndpi_struct, NDPI_LOG_TRACE, "BT: plain BitTorrent protocol detected\n");

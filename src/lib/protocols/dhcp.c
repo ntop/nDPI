@@ -96,11 +96,11 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 	    if(msg_type <= 8) foundValidMsgType = 1;
 	  } else if(id == 55 /* Parameter Request List / Fingerprint */) {
 	    u_int idx, offset = 0,
-	      hex_len = ndpi_min(len * 2, sizeof(flow->dhcp_fingerprint));
+	      hex_len = ndpi_min(len * 2, sizeof(flow->protos.dhcp.fingerprint));
 
 	    for(idx=0; idx<len; idx++) {
-	      snprintf((char*)&flow->dhcp_fingerprint[offset],
-		       sizeof(flow->dhcp_fingerprint)-offset-1,
+	      snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
+		       sizeof(flow->protos.dhcp.fingerprint)-offset-1,
 		       "%02X",  dhcp->options[i+2+idx] & 0xFF);
 	      offset += 2;
 	    }

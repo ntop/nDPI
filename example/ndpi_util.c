@@ -421,8 +421,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     int i, j, n = 0;
 
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
-      sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->bittorent_hash[i]);
-      j += 2, n += flow->ndpi_flow->bittorent_hash[i];
+      sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->protos.bittorrent.hash[i]);
+      j += 2, n += flow->ndpi_flow->protos.bittorrent.hash[i];
     }
 
     if(n == 0) flow->bittorent_hash[0] = '\0';
