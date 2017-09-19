@@ -764,6 +764,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
   NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
   NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
+  /* See #define NUM_CUSTOM_CATEGORIES */
   NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
   NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
   NDPI_PROTOCOL_CATEGORY_CUSTOM_3,          /* User custom category 3 */
@@ -804,6 +805,9 @@ typedef struct ndpi_proto {
 
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
 
+#define NUM_CUSTOM_CATEGORIES      5
+#define CUSTOM_CATEGORY_LABEL_LEN 32
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -814,7 +818,7 @@ struct ndpi_detection_module_struct {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
 #endif
-
+  char custom_category_labels[NUM_CUSTOM_CATEGORIES][CUSTOM_CATEGORY_LABEL_LEN];
   /* callback function buffer */
   struct ndpi_call_function_struct callback_buffer[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size;

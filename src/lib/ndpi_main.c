@@ -1839,7 +1839,8 @@ void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi
 
 struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
-
+  int i;
+  
   if(ndpi_str == NULL) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
     NDPI_LOG(0, ndpi_str, NDPI_LOG_DEBUG, "ndpi_init_detection_module initial malloc failed for ndpi_str\n");
@@ -1890,6 +1891,11 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   ndpi_str->impossible_bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
 
   ndpi_init_protocol_defaults(ndpi_str);
+
+  for(i=0; i<NUM_CUSTOM_CATEGORIES; i++)
+    snprintf(ndpi_str->custom_category_labels[i],
+	     CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u", i+1);
+
   return ndpi_str;
 }
 
@@ -2269,17 +2275,18 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char
   return(0);
 }
 
+/* ******************************************************************** */
+
 /* ntop */
-void ndpi_set_bitmask_protocol_detection( char * label,
-					  struct ndpi_detection_module_struct *ndpi_struct,
-					  const NDPI_PROTOCOL_BITMASK * detection_bitmask,
-					  const u_int32_t idx,
-					  u_int16_t ndpi_protocol_id,
-					  void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow),
-					  const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
-					  u_int8_t b_save_bitmask_unknow,
-					  u_int8_t b_add_detection_bitmask)
-{
+void ndpi_set_bitmask_protocol_detection(char * label,
+					 struct ndpi_detection_module_struct *ndpi_struct,
+					 const NDPI_PROTOCOL_BITMASK * detection_bitmask,
+					 const u_int32_t idx,
+					 u_int16_t ndpi_protocol_id,
+					 void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow),
+					 const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
+					 u_int8_t b_save_bitmask_unknow,
+					 u_int8_t b_add_detection_bitmask) {
   /*
     Compare specify protocol bitmask with main detection bitmask
   */
@@ -4589,7 +4596,44 @@ int ndpi_is_custom_category(ndpi_protocol_category_t category) {
 
 /* ****************************************************** */
 
-const char* ndpi_category_str(ndpi_protocol_category_t category) {
+void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_mod,
+			    ndpi_protocol_category_t category, char *name) {
+
+  if(!name) return;
+
+  switch(category) {
+  case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
+    snprintf(ndpi_mod->custom_category_labels[0], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    break;
+    
+  case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
+    snprintf(ndpi_mod->custom_category_labels[1], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    break;
+    
+  case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
+    snprintf(ndpi_mod->custom_category_labels[2], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    break;
+    
+  case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
+    snprintf(ndpi_mod->custom_category_labels[3], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    break;
+    
+  case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
+    snprintf(ndpi_mod->custom_category_labels[4], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    break;
+    
+  default:
+    break;
+  }
+}
+
+/* ****************************************************** */
+
+const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod,
+				   ndpi_protocol_category_t category) {
+
+  if(!ndpi_mod) return(NULL);
+  
   switch(category) {
   case NDPI_PROTOCOL_CATEGORY_MEDIA:
     return("Media");
@@ -4652,19 +4696,19 @@ const char* ndpi_category_str(ndpi_protocol_category_t category) {
     return("SoftwareUpdate");
     break;
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
-    return("User custom category 1");
+    return(ndpi_mod->custom_category_labels[0]);
     break;
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
-    return("User custom category 2");
+    return(ndpi_mod->custom_category_labels[1]);
     break;
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
-    return("User custom category 3");
+    return(ndpi_mod->custom_category_labels[2]);
     break;
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
-    return("User custom category 4");
+    return(ndpi_mod->custom_category_labels[3]);
     break;
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
-    return("User custom category 5");
+    return(ndpi_mod->custom_category_labels[4]);
     break;
   case NDPI_PROTOCOL_NUM_CATEGORIES:
     return("Code should not use this internal constant");

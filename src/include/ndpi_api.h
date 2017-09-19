@@ -443,11 +443,24 @@ extern "C" {
   /**
    * Get protocol category as string
    *
+   * @par     mod           = the detection module                                                                                                                                   
    * @par     category      = the category associated to the protocol
    * @return  the string name of the category
    *
    */
-  const char* ndpi_category_str(ndpi_protocol_category_t category);
+  const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod,
+				     ndpi_protocol_category_t category);
+
+  /**
+   * Set protocol category string
+   *
+   * @par     mod           = the detection module                                                                                                                                   
+   * @par     category      = the category associated to the protocol
+   * @paw     name          = the string name of the category
+   *
+   */
+  void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_mod,
+			      ndpi_protocol_category_t category, char *name);
 
   /**
    * Get protocol category

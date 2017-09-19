@@ -2783,7 +2783,6 @@ static void produceBpfFilter(char *filePath) {
    @brief MAIN FUNCTION
 **/
 int main(int argc, char **argv) {
-
   int i;
 
   automataUnitTest();
@@ -2798,7 +2797,6 @@ int main(int argc, char **argv) {
     return 0;
 #endif
   }
-
 
   if((!json_flag) && (!quiet_mode)) {
     printf("\n-----------------------------------------------------------\n"
@@ -2823,14 +2821,12 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-
 #ifdef WIN32
 #ifndef __GNUC__
 #define EPOCHFILETIME (116444736000000000i64)
 #else
 #define EPOCHFILETIME (116444736000000000LL)
 #endif
-
 
 /**
    @brief Timezone
