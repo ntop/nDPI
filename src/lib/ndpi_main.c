@@ -4648,7 +4648,7 @@ const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod
     return("Email");
     break;
   case NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT:
-    return("Download/FileTransfer/FileSharing");
+    return("Download-FileTransfer-FileSharing");
     break;
   case NDPI_PROTOCOL_CATEGORY_WEB:
     return("Web");
