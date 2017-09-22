@@ -46,8 +46,8 @@
 #define DIR_DST                    20
 #define PORT_ARRAY_SIZE            20
 #define HOST_ARRAY_SIZE            20
-#define FLOWS_PACKETS_TRESHOLD    0.9
-#define FLOWS_PERCENT_TRESHOLD    1.0
+#define FLOWS_PACKETS_THRESHOLD   0.9
+#define FLOWS_PERCENT_THRESHOLD   1.0
 #define INIT_VAL                   -1
 
 // flow tracking
