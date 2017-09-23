@@ -945,20 +945,12 @@ int updateIpTree(const char *key, addr_node **vrootp, const char *proto) {
 /* *********************************************** */
 
 void freeIpTree(addr_node *root) {
-  while (root != NULL) {
-    addr_node *left = root->left;
-
-    if(left == NULL) {
-      addr_node *right = root->right;
-      root->right = NULL;
-      root = right;
-    } else {
-      /* Rotate the left child up.*/
-      root->left = left->right;
-      left->right = root;
-      root = left;
-    }
-  }
+  if (root != NULL){
+    freeIpTree(root->left);
+    freeIpTree(root->right);
+    free(root);
+    root = NULL;
+  } 
 }
 
 /* *********************************************** */
@@ -1077,7 +1069,6 @@ static void deletePortsStats(struct port_stats *stats) {
   HASH_ITER(hh, stats, current_port, tmp) {
     HASH_DEL(stats, current_port);
     freeIpTree(current_port->addr_tree);
-    free(current_port->addr_tree);
     free(current_port);
   }
 }
