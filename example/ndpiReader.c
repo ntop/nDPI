@@ -945,12 +945,13 @@ int updateIpTree(const char *key, addr_node **vrootp, const char *proto) {
 /* *********************************************** */
 
 void freeIpTree(addr_node *root) {
-  if (root != NULL){
-    freeIpTree(root->left);
-    freeIpTree(root->right);
-    free(root);
-    root = NULL;
-  } 
+  if (root == NULL)
+    return;
+
+  freeIpTree(root->left);
+  freeIpTree(root->right);
+  free(root);
+  root = NULL;
 }
 
 /* *********************************************** */
