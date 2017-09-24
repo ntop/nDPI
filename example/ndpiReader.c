@@ -107,14 +107,14 @@ static struct flow_info *all_flows;
 
 struct info_pair {
   char addr[48];
-  char proto[48]; /*app level protocol*/
+  char proto[16]; /*app level protocol*/
   int count;
 };
 
 typedef struct node_a{
   char addr[48];
   int count;
-  char proto[48]; /*app level protocol*/
+  char proto[16]; /*app level protocol*/
   struct node_a *left, *right;
 }addr_node;
 
@@ -135,7 +135,7 @@ struct port_stats *srcStats = NULL, *dstStats = NULL;
 struct top_stats {
   u_int32_t port; /* we'll use this field as the key */
   char top_ip[48]; /*ip address that is contributed to > 95% of traffic*/
-  char proto[64]; /*application level protocol of top_ip */
+  char proto[16]; /*application level protocol of top_ip */
   u_int32_t num_pkts;
   u_int32_t num_addr; /*to hold number of distinct IP addresses */
   u_int32_t num_flows;
@@ -1054,7 +1054,7 @@ static void deleteScanners(struct single_flow_info *scanners) {
   HASH_ITER(hh, scanners, s, tmp) {
     HASH_ITER(hh, s->ports, p, tmp2) {
       HASH_DEL(s->ports, p);
-      free(s->ports);
+      free(p);
     }
     HASH_DEL(scanners, s);
     free(s);
@@ -1331,6 +1331,7 @@ static void json_close_stats_file() {
   json_object_object_add(jObjFinal,"statistics", jArray_topStats);
   fprintf(stats_fp,"%s\n",json_object_to_json_string(jObjFinal));
   fclose(stats_fp);
+  json_object_put(jObjFinal);
 }
 #endif
 
