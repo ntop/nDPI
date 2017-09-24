@@ -233,13 +233,12 @@ extern "C" {
    *
    */
   void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_struct,
-					      struct ndpi_flow_struct *flow,
-					      const unsigned char *packet,
-					      const unsigned short packetlen,
-					      const u_int64_t current_tick,
-					      struct ndpi_id_struct *src,
-					      struct ndpi_id_struct *dst);
-
+				 struct ndpi_flow_struct *flow,
+				 const unsigned char *packet,
+				 const unsigned short packetlen,
+				 const u_int64_t current_tick,
+				 struct ndpi_id_struct *src,
+				 struct ndpi_id_struct *dst);
 
   /**
    * Processes one packet and returns the ID of the detected protocol.

@@ -3478,13 +3478,12 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 /* ********************************************************************************* */
 
 void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_struct,
-					    struct ndpi_flow_struct *flow,
-					    const unsigned char *packet,
-					    const unsigned short packetlen,
-					    const u_int64_t current_tick_l,
-					    struct ndpi_id_struct *src,
-					    struct ndpi_id_struct *dst)
-{
+			       struct ndpi_flow_struct *flow,
+			       const unsigned char *packet,
+			       const unsigned short packetlen,
+			       const u_int64_t current_tick_l,
+			       struct ndpi_id_struct *src,
+			       struct ndpi_id_struct *dst) {
   if(flow == NULL)
     return;
 
@@ -3615,8 +3614,13 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     /* guess protocol */
     flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_struct, protocol, sport, dport, &user_defined_proto);
 
-    if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->guessed_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
+      /* This is a custom protocol and it has priority over everything else */
+      ret.master_protocol = flow->guessed_protocol_id, ret.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+      return(ret);
+    }
 
+    if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
       if(flow->packet.iph) {
 	/* guess host protocol */
 	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
@@ -3638,6 +3642,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     }
   }
 
+  if(flow->guessed_host_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
+    /* This is a custom protocol and it has priority over everything else */
+    ret.master_protocol = flow->guessed_host_protocol_id, ret.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+    return(ret);
+  }
+  
   check_ndpi_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
 
   a = flow->packet.detected_protocol_stack[0];
