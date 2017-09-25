@@ -6,7 +6,7 @@ AM_CFLAGS = @PTHREAD_CFLAGS@ # --coverage
 LDADD = $(top_builddir)/src/lib/libndpi.la @JSON_C_LIB@ @PTHREAD_LIBS@ @PCAP_LIB@ @DL_LIB@ -lm
 AM_LDFLAGS = -static @DL_LIB@
 
-ndpiReader_SOURCES = ndpiReader.c ndpi_util.c ndpi_util.h
+ndpiReader_SOURCES = ndpiReader.c ndpi_util.c ndpi_util.h uthash.h
 
 ndpiReader.o: ndpiReader.c
 
