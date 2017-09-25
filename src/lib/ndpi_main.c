@@ -3572,27 +3572,45 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     /* guess protocol */
     flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_struct, protocol, sport, dport, &user_defined_proto);
 
+ if(flow->packet.iph) {
+      if((flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr)) == NDPI_PROTOCOL_UNKNOWN)
+        flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
+   
+      if (flow->guessed_host_protocol_id == NDPI_PROTOCOL_TELEGRAM){   
+         ret.master_protocol = flow->guessed_host_protocol_id, ret.protocol = flow->guessed_host_protocol_id;
+         return(ret);
+       }
+   }
+
+
+    if(user_defined_proto && (flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
+      ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.protocol = flow->guessed_protocol_id;
+      return(ret);
+    }
+
+/*
     if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
 
       if(flow->packet.iph) {
-	/* guess host protocol */
+
 	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
 	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
 	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-	  /* ret.master_protocol = flow->guessed_protocol_id , ret.app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
+
 	  ret = ndpi_detection_giveup(ndpi_struct, flow);
 
 	return(ret);
       }
     } else {
-      /* guess host protocol */
+
       if(flow->packet.iph) {
 	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
 	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
       }
     }
+*/
   }
 
   check_ndpi_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
