@@ -48,6 +48,7 @@
 #define HOST_ARRAY_SIZE            20
 #define FLOWS_PACKETS_THRESHOLD   0.9
 #define FLOWS_PERCENT_THRESHOLD   1.0
+#define FLOWS_THRESHOLD          1000
 #define INIT_VAL                   -1
 
 // flow tracking
