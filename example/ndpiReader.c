@@ -2485,6 +2485,10 @@ void bpf_filter_port_array_add(int filter_array[], int size, int port) {
 
 
 /* *********************************************** */
+#ifdef HAVE_JSON_C
+/*
+ * @brief returns average value for a given field
+ */
 float getAverage(struct json_object *jObj_stat, char *field){
   json_object *field_stat;
   json_bool res;
@@ -2512,8 +2516,13 @@ float getAverage(struct json_object *jObj_stat, char *field){
 
   return sum/j;
 }
+#endif
 /* *********************************************** */
-
+#ifdef HAVE_JSON_C
+/*
+ * @brief returns standard deviation for a given
+ * field and it's average value.
+ */
 float getStdDeviation(struct json_object *jObj_stat, float average, char *field){
   json_object *field_stat;
   json_bool res;
@@ -2539,15 +2548,16 @@ float getStdDeviation(struct json_object *jObj_stat, float average, char *field)
   return sqrt(sum/(float)j);
 }
 
+#endif
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 /*
  * @brief add ports which have (flows/packets > threshold) 
  * and have (#flows > %1 of total flows) to the srcPortArray
  * to filter
  */
-#ifdef HAVE_JSON_C
 void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPortArray[], int size) {
   int j;
 
