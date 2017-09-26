@@ -115,8 +115,8 @@ struct info_pair {
 typedef struct node_a{
   u_int32_t addr; 
   u_int8_t version; /* IP version */
-  int count;
   char proto[16]; /*app level protocol*/
+  int count;
   struct node_a *left, *right;
 }addr_node;
 
@@ -124,33 +124,18 @@ struct port_stats {
   u_int32_t port; /* we'll use this field as the key */
   u_int32_t num_pkts, num_bytes;
   u_int32_t num_flows;
-  u_int32_t num_addr; /*to hold number of distinct IP addresses */
-  u_int32_t cumulative_addr; /*to hold cumulative some of IP addresses */
-  addr_node *addr_tree; /* to hold distinct IP addresses */
+  u_int32_t num_addr; /*number of distinct IP addresses */
+  u_int32_t cumulative_addr; /*cumulative some of IP addresses */
+  addr_node *addr_tree; /* tree of distinct IP addresses */
   struct info_pair top_ip_addrs[MAX_NUM_IP_ADDRESS];
   u_int8_t hasTopHost; /* as boolean flag*/
   u_int32_t top_host; /*host that is contributed to > 95% of traffic*/
-  u_int8_t version; /* top ip's versiob */
-  char proto[16]; /*application level protocol of top_ip */
-
+  u_int8_t version; /* top host's ip version */
+  char proto[16]; /*application level protocol of top host */
   UT_hash_handle hh; /* makes this structure hashable */
 };
 
 struct port_stats *srcStats = NULL, *dstStats = NULL;
-
-// struct to hold port based top statistics
-//struct top_stats {
-//u_int32_t port; /* we'll use this field as the key */
-//u_int32_t top_ip; /*ip address that is contributed to > 95% of traffic*/
-//u_int8_t version; /* top ip's versiob */
-//char proto[16]; /*application level protocol of top_ip */
-//u_int32_t num_pkts;
-//u_int32_t num_addr; /*to hold number of distinct IP addresses */
-//u_int32_t num_flows;
-//UT_hash_handle hh;  /* makes this structure hashable */
-//};
-
-//struct top_stats *topSrcStats = NULL, *topDstStats = NULL;
 
 
 // struct to hold count of flows received by destination ports
@@ -1011,9 +996,8 @@ void updateTopIpAddress(u_int32_t addr, u_int8_t version, const char *proto,
     }
   }
 
-  if(update) {
+  if(update)
     top[min_i] = pair;
-  }
 }
 
 /* *********************************************** */
