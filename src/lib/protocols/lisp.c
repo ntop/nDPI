@@ -35,7 +35,7 @@ static void ndpi_check_lisp(struct ndpi_detection_module_struct *ndpi_struct, st
       }
     }
 
-  NDPI_LOG(NDPI_PROTOCOL_lisp, ndpi_struct, NDPI_LOG_DEBUG, "exclude lisp.\n");
+  NDPI_LOG(NDPI_PROTOCOL_LISP, ndpi_struct, NDPI_LOG_DEBUG, "exclude lisp.\n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_LISP);
 }
 
