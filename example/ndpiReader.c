@@ -924,17 +924,18 @@ int updateIpTree(u_int32_t key, u_int8_t version,
                   addr_node **vrootp, const char *proto) {
   addr_node *q;
   addr_node **rootp = vrootp;
-  int r;
 
   if(rootp == (addr_node **)0)
     return 0;
 
-  while (*rootp != (addr_node *)0) {	/* Knuth's T1: */
-    if((version == (*rootp)->version) && (key == (*rootp)->addr)) {    /* T2: */
+  while (*rootp != (addr_node *)0) {
+    /* Knuth's T1: */
+    if((version == (*rootp)->version) && (key == (*rootp)->addr)) {
+      /* T2: */
       return ++((*rootp)->count);
     }
 
-    rootp = (r < 0) ?
+    rootp = (key < (*rootp)->addr) ?
       &(*rootp)->left :		/* T3: follow left branch */
       &(*rootp)->right;		/* T4: follow right branch */
   }
@@ -1019,7 +1020,7 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
                             u_int32_t num_pkts, u_int32_t num_bytes, 
                             const char *proto) {
 
-  struct port_stats *s;
+  struct port_stats *s = NULL;
   int count = 0;
 
   HASH_FIND_INT(*stats, &port, s);
@@ -1034,8 +1035,11 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
     updateTopIpAddress(addr, version, proto, 1, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
 
     s->addr_tree = (addr_node *) malloc(sizeof(addr_node));
-    if(!s->addr_tree) return;
-
+    if(!s->addr_tree) {
+      free(s);
+      return;
+    }
+    
     s->addr_tree->addr = addr;
     s->addr_tree->version = version;
     strncpy(s->addr_tree->proto, proto, sizeof(s->addr_tree->proto));
@@ -1903,8 +1907,7 @@ static void printResults(u_int64_t tot_usec) {
     fclose(json_fp);
 #endif
   }
-
-
+    
   if(verbose == 3) {
     printf("\n\nSource Ports Stats:\n");
     printPortStats(srcStats);
@@ -1912,9 +1915,8 @@ static void printResults(u_int64_t tot_usec) {
     printf("\nDestination Ports Stats:\n");
     printPortStats(dstStats);
   }
-
-
-  if(stats_flag) {
+    
+  if(00 && stats_flag) {
 #ifdef HAVE_JSON_C
     json_object *jObj_stats = json_object_new_object();
     char timestamp[64];
@@ -1937,17 +1939,19 @@ static void printResults(u_int64_t tot_usec) {
 
     deleteScanners(scannerHosts);
     scannerHosts = NULL;
-
 #endif
   }
 
-  if(verbose == 3 || stats_flag) {
-    deletePortsStats(srcStats), deletePortsStats(dstStats);
-    srcStats = NULL, dstStats = NULL;
+  if(srcStats) {
+    deletePortsStats(srcStats);
+    srcStats = NULL;
   }
-
+  
+  if(dstStats) {
+    deletePortsStats(dstStats);
+    dstStats = NULL;
+  }
 }
-
 
 /**
  * @brief Force a pcap_dispatch() or pcap_loop() call to return
@@ -2176,7 +2180,6 @@ static void pcap_process_packet(u_char *args,
     tot_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
 
     printResults(tot_usec);
-
 
     for(i=0; i<ndpi_thread_info[thread_id].workflow->prefs.num_roots; i++) {
       ndpi_tdestroy(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
