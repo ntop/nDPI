@@ -1916,7 +1916,7 @@ static void printResults(u_int64_t tot_usec) {
     printPortStats(dstStats);
   }
     
-  if(00 && stats_flag) {
+  if(stats_flag) {
 #ifdef HAVE_JSON_C
     json_object *jObj_stats = json_object_new_object();
     char timestamp[64];
