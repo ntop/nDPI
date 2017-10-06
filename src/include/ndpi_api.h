@@ -440,9 +440,21 @@ extern "C" {
 			       u_int16_t protoId, ndpi_protocol_category_t protoCategory);
 
   /**
+   * Check if subprotocols of the specified master protocol are just
+   * informative (and not real)
+   *
+   * @par     mod           = the detection module
+   * @par     protoId       = the (master) protocol identifier to query
+   * @return  1 = the subprotocol is informative, 0 otherwise.
+   *
+   */
+  u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *ndpi_mod,
+					   u_int16_t protoId);
+
+  /**
    * Get protocol category as string
    *
-   * @par     mod           = the detection module                                                                                                                                   
+   * @par     mod           = the detection module
    * @par     category      = the category associated to the protocol
    * @return  the string name of the category
    *
@@ -453,7 +465,7 @@ extern "C" {
   /**
    * Set protocol category string
    *
-   * @par     mod           = the detection module                                                                                                                                   
+   * @par     mod           = the detection module
    * @par     category      = the category associated to the protocol
    * @paw     name          = the string name of the category
    *

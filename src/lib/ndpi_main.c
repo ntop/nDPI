@@ -452,6 +452,34 @@ void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ********************************************************************************** */
 
+/*
+  There are some (master) protocols that are informative, meaning that it shows
+  what is the subprotocol about, but also that the subprotocol isn't a real protocol.
+
+  Example:
+  - DNS is informative as if we see a DNS request for www.facebook.com, the
+    returned protocol is DNS.Facebook, but Facebook isn't a real subprotocol but
+    rather it indicates a query for Facebook and not Facebook traffic.
+  - HTTP/SSL are NOT informative as SSL.Facebook (likely) means that this is
+    SSL (HTTPS) traffic containg Facebook traffic.
+ */
+u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *ndpi_mod,
+					 u_int16_t protoId) {
+  if(protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS)
+    return(0);
+
+  switch(protoId) {
+  case NDPI_PROTOCOL_DNS:
+    return(1);
+    break;
+
+  default:
+    return(0);
+  }
+}
+
+/* ********************************************************************************** */
+
 void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
 			     ndpi_protocol_breed_t breed, u_int16_t protoId,
 			     u_int16_t tcp_master_protoId[2], u_int16_t udp_master_protoId[2],

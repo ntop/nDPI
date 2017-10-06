@@ -58,3 +58,4 @@ ndpi_netbios_name_interpret
 ndpi_category_set_name
 ndpi_category_get_name
 ndpi_is_custom_category
+ndpi_is_subprotocol_informative
