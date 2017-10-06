@@ -26,8 +26,6 @@
 
 
 /* global variables used for 1kxun protocol and iqiyi service */
-static u_int16_t kxun_counter;
-static u_int16_t iqiyi_counter;
 
 static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
@@ -198,23 +196,23 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   u_int8_t a;
 
 
-#ifdef NDPI_PROTOCOL_PPSTREAM
+#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
   /* PPStream */
-  if(flow->l4.tcp.ppstream_stage > 0 && iqiyi_counter == 0) {
+  if(flow->l4.tcp.ppstream_stage > 0 && flow->iqiyi_counter == 0) {
     NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG, "PPStream found.\n");
     /* ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM); */
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_HTTP);
   }
-  else if(iqiyi_counter > 0) {
+  else if(flow->iqiyi_counter > 0) {
     NDPI_LOG(NDPI_PROTOCOL_IQIYI, ndpi_struct, NDPI_LOG_DEBUG, "iQiyi found.\n");
     /* ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI); */
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI, NDPI_PROTOCOL_HTTP);
   }
 #endif
 
-#ifdef NDPI_PROTOCOL_1KXUN
+#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
   /* 1KXUN */
-  if(kxun_counter > 0) {
+  if(flow->kxun_counter > 0) {
     NDPI_LOG(NDPI_PROTOCOL_1KXUN, ndpi_struct, NDPI_LOG_DEBUG, "1kxun found.\n");
     /* ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN); */
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN, NDPI_PROTOCOL_HTTP);
@@ -661,17 +659,19 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	    x++;
       }
 
+#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
       /* check PPStream protocol or iQiyi service
 	 (iqiyi is delivered by ppstream) */
       // substring in url
       if(ndpi_strnstr((const char*) &packet->payload[filename_start], "iqiyi.com", (packet->payload_packet_len - filename_start)) != NULL) {
-	if(kxun_counter == 0) {
+	if(flow->kxun_counter == 0) {
 	  flow->l4.tcp.ppstream_stage++;
-	  iqiyi_counter++;
+	  flow->iqiyi_counter++;
 	  check_content_type_and_change_protocol(ndpi_struct, flow); /* ***** CHECK ****** */
 	  return;
 	}
       }
+
       // additional field in http payload
       x = 1;
       while((packet->line[x].len >= 4) && (packet->line[x+1].len >= 5) && (packet->line[x+2].len >= 10)) {
@@ -680,25 +680,28 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	   && packet->line[x+2].ptr && ((memcmp(packet->line[x+2].ptr, "qyplatform", 10)) == 0)
 	   ) {
 	  flow->l4.tcp.ppstream_stage++;
-	  iqiyi_counter++;
+	  flow->iqiyi_counter++;
 	  check_content_type_and_change_protocol(ndpi_struct, flow);
 	  return;
 	}
 	x++;
       }
+#endif
 
+#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
       /* Check for 1kxun packet */
       int a;
       for (a = 0; a < packet->parsed_lines; a++) {
 	if(packet->line[a].len >= 14 && (memcmp(packet->line[a].ptr, "Client-Source:", 14)) == 0) {
 	  if((memcmp(packet->line[a].ptr+15, "1kxun", 5)) == 0) {
-	    kxun_counter++;
+	    flow->kxun_counter++;
 	    check_content_type_and_change_protocol(ndpi_struct, flow);
 	    return;
 	  }
 	}
       }
-
+#endif
+      
       if((packet->http_url_name.len > 7)
           && (!strncmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
         NDPI_LOG(NDPI_PROTOCOL_HTTP, ndpi_struct, NDPI_LOG_DEBUG, "HTTP_PROXY Found.\n");

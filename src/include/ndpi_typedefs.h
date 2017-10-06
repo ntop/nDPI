@@ -1105,6 +1105,10 @@ struct ndpi_flow_struct {
   u_int32_t csgo_id2;
 #endif
 
+#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
+  u_int16_t kxun_counter, iqiyi_counter;
+#endif
+  
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
   struct ndpi_flow_struct *flow;
