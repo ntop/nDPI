@@ -878,7 +878,8 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 void updateScanners(struct single_flow_info **scanners, u_int32_t saddr, 
                     u_int8_t version, u_int32_t dport) {
   struct single_flow_info *f;
-
+  struct port_flow_info *p;
+  
   HASH_FIND_INT(*scanners, (int *)&saddr, f);
 
   if(f == NULL) {
@@ -889,16 +890,17 @@ void updateScanners(struct single_flow_info **scanners, u_int32_t saddr,
     f->tot_flows = 1;
     f->ports = NULL;
 
-    HASH_ADD_INT(*scanners, saddr, f);
-
-    struct port_flow_info *p = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
-    if(!p) return;
-    p->port = dport;
-    p->num_flows = 1;
+    p = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
+    
+    if(!p) {
+      free(f);
+      return;
+    } else    
+      p->port = dport, p->num_flows = 1;
 
     HASH_ADD_INT(f->ports, port, p);
-  }
-  else{
+    HASH_ADD_INT(*scanners, saddr, f);
+  } else{
     struct port_flow_info *pp;
     f->tot_flows++;
 
@@ -907,16 +909,13 @@ void updateScanners(struct single_flow_info **scanners, u_int32_t saddr,
     if(pp == NULL) {
       pp = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
       if(!pp) return;
-      pp->port = dport;
-      pp->num_flows = 1;
+      pp->port = dport, pp->num_flows = 1;
 
       HASH_ADD_INT(f->ports, port, pp);
-    }
-    
-    else pp->num_flows++; 
+    } else
+      pp->num_flows++; 
   }
 }
-
 
 /* *********************************************** */
 
@@ -1025,13 +1024,12 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
   HASH_FIND_INT(*stats, &port, s);
   if(s == NULL) {
-    s = (struct port_stats*)malloc(sizeof(struct port_stats));
+    s = (struct port_stats*)calloc(1, sizeof(struct port_stats));
     if(!s) return;
 
     s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes;
     s->num_addr = 1, s->cumulative_addr = 1; s->num_flows = 1;
 
-    memset(s->top_ip_addrs, 0, MAX_NUM_IP_ADDRESS*sizeof(struct info_pair));
     updateTopIpAddress(addr, version, proto, 1, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
 
     s->addr_tree = (addr_node *) malloc(sizeof(addr_node));
@@ -1065,7 +1063,6 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
 /* *********************************************** */
 
-#ifdef HAVE_JSON_C
 static void deleteScanners(struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
@@ -1079,7 +1076,6 @@ static void deleteScanners(struct single_flow_info *scanners) {
     free(s);
   }
 }
-#endif
 
 /* *********************************************** */
 
@@ -1443,7 +1439,7 @@ static int getTopStats(struct port_stats *stats) {
   u_int64_t total_ip_addrs = 0;
 
   HASH_ITER(hh, stats, sp, tmp) {
-    qsort(&sp->top_ip_addrs[0], MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
+    qsort(sp->top_ip_addrs, MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
     inf = sp->top_ip_addrs[0];
 
     if(((inf.count * 100.0)/sp->cumulative_addr) > AGGRESSIVE_PERCENT) {
@@ -1451,20 +1447,18 @@ static int getTopStats(struct port_stats *stats) {
       sp->top_host = inf.addr;
       sp->version = inf.version;
       strncpy(sp->proto, inf.proto, sizeof(sp->proto));
-    }
-    else
+    } else
       sp->hasTopHost = 0;
     
     total_ip_addrs += sp->num_addr;
   }
 
   return total_ip_addrs;
-
 }
 
 /* *********************************************** */
 
-static void saveScannerStats(json_object **jObj_group, struct single_flow_info *scanners) {
+static void saveScannerStats(json_object **jObj_group, struct single_flow_info **scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
   char addr_name[48];
@@ -1472,18 +1466,17 @@ static void saveScannerStats(json_object **jObj_group, struct single_flow_info *
   
   json_object *jArray_stats  = json_object_new_array();
 
-  HASH_SORT(scanners, scanners_sort);
+  HASH_SORT(*scanners, scanners_sort); // FIX
 
-  HASH_ITER(hh, scanners, s, tmp) {
+  HASH_ITER(hh, *scanners, s, tmp) {
     json_object *jObj_stat = json_object_new_object();
     json_object *jArray_ports = json_object_new_array();
 
-    if(s->version == IPVERSION) {
+    if(s->version == IPVERSION)
       inet_ntop(AF_INET, &(s->saddr), addr_name, sizeof(addr_name));
-    } else {
+    else
       inet_ntop(AF_INET6, &(s->saddr),  addr_name, sizeof(addr_name));
-    }
-
+    
     json_object_object_add(jObj_stat,"ip.address",json_object_new_string(addr_name));
     json_object_object_add(jObj_stat,"total.flows.number",json_object_new_int(s->tot_flows));
 
@@ -1511,6 +1504,7 @@ static void saveScannerStats(json_object **jObj_group, struct single_flow_info *
 
   json_object_object_add(*jObj_group, "top.scanner.stats", jArray_stats);
 }
+
 #endif
 
 /* *********************************************** */
@@ -1520,12 +1514,10 @@ static void saveScannerStats(json_object **jObj_group, struct single_flow_info *
  * @brief Save Top Stats in json format
  */
 static void saveTopStats(json_object **jObj_group,
-                         struct port_stats *stats,
+                         struct port_stats **stats,
                          u_int8_t direction,
                          u_int64_t total_flow_count, 
                          u_int64_t total_ip_addr) {
-
-
   struct port_stats *s, *tmp;
   char addr_name[48];
   int i = 0;
@@ -1533,7 +1525,7 @@ static void saveTopStats(json_object **jObj_group,
   json_object *jArray_stats  = json_object_new_array();
 
 
-  HASH_ITER(hh, stats, s, tmp) {
+  HASH_ITER(hh, *stats, s, tmp) {
 
     if((s->hasTopHost)) {
       json_object *jObj_stat = json_object_new_object();
@@ -1569,10 +1561,10 @@ static void saveTopStats(json_object **jObj_group,
   i=0;
 
   /*sort top stats by ip addr count*/
-  HASH_SORT(stats, top_stats_sort);
+  HASH_SORT(*stats, top_stats_sort);
 
 
-  HASH_ITER(hh, stats, s, tmp) {
+  HASH_ITER(hh, *stats, s, tmp) {
     json_object *jObj_stat = json_object_new_object();
 
     json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
@@ -1654,11 +1646,6 @@ static void printResults(u_int64_t tot_usec) {
       if(verbose == 3 || stats_flag) ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], port_stats_walker, &thread_id);
     }
 
-    if(verbose == 3 || stats_flag) {
-      HASH_SORT(srcStats, port_stats_sort);
-      HASH_SORT(dstStats, port_stats_sort);
-    }
-
     /* Stats aggregation */
     cumulative_stats.guessed_flow_protocols += ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols;
     cumulative_stats.raw_packet_count += ndpi_thread_info[thread_id].workflow->stats.raw_packet_count;
@@ -1685,8 +1672,9 @@ static void printResults(u_int64_t tot_usec) {
     cumulative_stats.max_packet_len += ndpi_thread_info[thread_id].workflow->stats.max_packet_len;
   }
 
-  if(cumulative_stats.total_wire_bytes == 0) return;
-
+  if(cumulative_stats.total_wire_bytes == 0)
+    goto free_stats;
+  
   if(!quiet_mode) {
     printf("\nnDPI Memory statistics:\n");
     printf("\tnDPI Memory (once):      %-13s\n", formatBytes(sizeof(struct ndpi_detection_module_struct), buf, sizeof(buf)));
@@ -1909,6 +1897,9 @@ static void printResults(u_int64_t tot_usec) {
   }
     
   if(verbose == 3) {
+    HASH_SORT(srcStats, port_stats_sort);
+    HASH_SORT(dstStats, port_stats_sort);
+
     printf("\n\nSource Ports Stats:\n");
     printPortStats(srcStats);
 
@@ -1924,24 +1915,27 @@ static void printResults(u_int64_t tot_usec) {
     strftime(timestamp, sizeof(timestamp), "%FT%TZ", localtime(&pcap_start.tv_sec));
     json_object_object_add(jObj_stats, "time", json_object_new_string(timestamp));
 
-    saveScannerStats(&jObj_stats, scannerHosts);
-
+    saveScannerStats(&jObj_stats, &scannerHosts);
+    
     u_int64_t total_src_addr = getTopStats(srcStats);
     u_int64_t total_dst_addr = getTopStats(dstStats);
-    
-    saveTopStats(&jObj_stats, srcStats, DIR_SRC,
+
+    saveTopStats(&jObj_stats, &srcStats, DIR_SRC,
                  cumulative_stats.ndpi_flow_count, total_src_addr);
 
-    saveTopStats(&jObj_stats, dstStats, DIR_DST,
+    saveTopStats(&jObj_stats, &dstStats, DIR_DST,
                  cumulative_stats.ndpi_flow_count, total_dst_addr);
-
+    
     json_object_array_add(jArray_topStats, jObj_stats);
-
-    deleteScanners(scannerHosts);
-    scannerHosts = NULL;
 #endif
   }
 
+ free_stats:
+  if(scannerHosts) {
+    deleteScanners(scannerHosts);
+    scannerHosts = NULL;
+  }
+  
   if(srcStats) {
     deletePortsStats(srcStats);
     srcStats = NULL;
@@ -2745,8 +2739,11 @@ static void produceBpfFilter(char *filePath) {
   int typeCheck;
   int array_len;
   int i;
-
-
+  FILE *fp = NULL;
+  char *fileName;
+  char _filterFilePath[1024];
+  json_object *jObj_bpfFilter;
+  
   if((fsock = open(filePath, O_RDONLY)) == -1) {
     fprintf(stderr,"error opening file %s\n", filePath);
     exit(-1);
@@ -2791,7 +2788,6 @@ static void produceBpfFilter(char *filePath) {
   bpf_filter_host_array_init(filterSrcHosts, HOST_ARRAY_SIZE);
   bpf_filter_host_array_init(filterDstHosts, HOST_ARRAY_SIZE);
 
-
   for(i=0; i<array_len; i++) {
     json_object *stats = json_object_array_get_idx(jObj_statistics, i);
     json_object *val;
@@ -2805,7 +2801,6 @@ static void produceBpfFilter(char *filePath) {
       deviation = getStdDeviation(val, average, "top.scanner.stats");
       getScannerHostsToFilter(val, duration, filterSrcHosts, HOST_ARRAY_SIZE, average+deviation);    
     }
-
 
     if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0) {
       fprintf(stderr,"ERROR: can't get \"top.src.pkts.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
@@ -2825,14 +2820,7 @@ static void produceBpfFilter(char *filePath) {
       exit(-1);
     }
     getTopReceiverHostsToFilter(val, duration, filterDstHosts, HOST_ARRAY_SIZE);
-
   }
-
-
-  FILE *fp = NULL;
-  char *fileName;
-  char _filterFilePath[1024];
-
   fileName = basename(filePath);
   snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
 
@@ -2841,7 +2829,7 @@ static void produceBpfFilter(char *filePath) {
     exit(-1);
   } 
 
-  json_object *jObj_bpfFilter = json_object_new_object();
+  jObj_bpfFilter = json_object_new_object();
 
   bpf_filter_pkt_peak_filter(&jObj_bpfFilter, filterSrcPorts, PORT_ARRAY_SIZE, filterSrcHosts, HOST_ARRAY_SIZE);
   bpf_filter_host_peak_filter(&jObj_bpfFilter, filterDstHosts, HOST_ARRAY_SIZE);
@@ -2850,7 +2838,6 @@ static void produceBpfFilter(char *filePath) {
   fclose(fp);
   
   printf("created: %s\n", _filterFilePath);
-
   
   json_object_put(jObj); /* free memory */
 }

@@ -90,26 +90,28 @@ static void ndpi_int_someip_add_connection (struct ndpi_detection_module_struct 
 void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 			 struct ndpi_flow_struct *flow)
 {
-
+  const struct ndpi_packet_struct *packet = &flow->packet;
+  
+  if (packet->payload_packet_len < 16) {
+    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,
+	     "Excluding SOME/IP .. mandatory header not found (not enough data for all fields)\n");
+    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+    return;
+  }
+  
   //####Maybe check carrier protocols?####
 
   NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP search called...\n");
-  const struct ndpi_packet_struct *packet = &flow->packet;
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     return;
   }
-
+ 
   //we extract the Message ID and Request ID and check for special cases later
   u_int32_t message_id = ntohl(*((u_int32_t *)&packet->payload[0]));
   u_int32_t request_id = ntohl(*((u_int32_t *)&packet->payload[8]));
 
   NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> SOME/IP Message ID: %08x [len: %u]\n",
 	   message_id, packet->payload_packet_len);
-  if (packet->payload_packet_len < 16) {
-    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. mandatory header not found (not enough data for all fields)\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
-    return;
-  }
 	
   //####Maximum packet size in SOMEIP depends on the carrier protocol, and I'm not certain how well enforced it is, so let's leave that for round 2####
 
