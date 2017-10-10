@@ -145,7 +145,7 @@ struct port_flow_info {
   UT_hash_handle hh;
 };
 
-// struct to hold single packet tcp flows send by source ip address
+// struct to hold single packet tcp flows sent by source ip address
 struct single_flow_info {
   u_int32_t saddr; /* key */
   u_int8_t version; /* IP version */
@@ -155,6 +155,17 @@ struct single_flow_info {
 };
 
 struct single_flow_info *scannerHosts = NULL;
+
+// struct to hold top receiver hosts 
+struct receiver {
+  u_int32_t addr; /* key */
+  u_int8_t version; /* IP version */
+  u_int32_t num_pkts;
+  UT_hash_handle hh; 
+};
+
+struct receiver *receivers = NULL, *topReceivers = NULL;
+
 
 struct ndpi_packet_trailer {
   u_int32_t magic; /* 0x19682017 */
@@ -1063,6 +1074,188 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
 /* *********************************************** */
 
+/* @brief heuristic choice for receiver stats */ 
+static int acceptable(u_int32_t num_pkts){
+  return num_pkts > 5;
+}
+
+/* *********************************************** */
+
+static int receivers_sort(void *_a, void *_b) {
+  struct receiver *a = (struct receiver *)_a;
+  struct receiver *b = (struct receiver *)_b;
+
+  return(b->num_pkts - a->num_pkts);
+}
+
+/* *********************************************** */
+
+static int receivers_sort_asc(void *_a, void *_b) {
+  struct receiver *a = (struct receiver *)_a;
+  struct receiver *b = (struct receiver *)_b;
+
+  return(a->num_pkts - b->num_pkts);
+}
+
+/* ***************************************************** */
+/*@brief removes first (size - max) elements from hash table.
+ * hash table is ordered in ascending order.
+*/
+static struct receiver *cutBackTo(struct receiver *receivers, u_int32_t max) {
+  struct receiver *r, *tmp;
+  int i=0;
+  int size;
+  int count;
+
+  size = HASH_COUNT(receivers);
+
+  if(size < max){
+    printf("Error: invalid size value\n");
+    exit(-1);
+  }
+  
+  count = size - max;
+
+  HASH_ITER(hh, receivers, r, tmp) {
+    if(i++ == count)
+      return r;
+    HASH_DEL(receivers, r);
+    free(r);
+  }
+}
+
+/* *********************************************** */
+/*@brief merge first table to the second table.
+ * if element already in the second table
+ *  then updates its value
+ * else adds it to the second table
+*/
+static void mergeTables(struct receiver *primary, struct receiver **secondary) {
+  struct receiver *r, *s, *tmp;
+
+  HASH_ITER(hh, primary, r, tmp) {
+    HASH_FIND_INT(*secondary, (int *)&(r->addr), s);
+    if(s == NULL)
+      HASH_ADD_INT(*secondary, addr, r);
+    else
+      s->num_pkts += r->num_pkts;
+  }
+}
+/* *********************************************** */
+/*@brief resets a table without freeing its elements
+*/
+static void resetReceivers(struct receiver *receivers) {
+  struct receiver *current, *tmp;
+
+  HASH_ITER(hh, receivers, current, tmp) {
+    //HASH_DEL(receivers, current);
+    current = NULL;
+  }
+}
+
+/* *********************************************** */
+
+static void deleteReceivers(struct receiver *receivers) {
+  struct receiver *current, *tmp;
+
+  HASH_ITER(hh, receivers, current, tmp) {
+    HASH_DEL(receivers, current);
+    free(current);
+  }
+}
+
+/* *********************************************** */
+/* implementation of: https://jeroen.massar.ch/presentations/files/FloCon2010-TopK.pdf
+ *
+ * if (table1.size < max1 || acceptable){
+ *    create new element and add to the table1
+ *    if (table1.size > max2) {
+ *      cut table1 back to max1
+ *      merge table 1 to table2
+ *      if(table2.size > max1)
+ *        cut table2 back to max1
+ *    }
+ * } 
+ * else
+ *   update table1
+*/
+static void updateReceivers(struct receiver **receivers, u_int32_t dst_addr, 
+                            u_int8_t version, u_int32_t num_pkts, 
+                            struct receiver **topReceivers) {
+  struct receiver *r;
+  u_int32_t size;
+  int a;
+
+  HASH_FIND_INT(*receivers, (int *)&dst_addr, r);
+  if(r == NULL) {
+    if(((size = HASH_COUNT(*receivers)) < MAX_TABLE_SIZE_1) 
+    || ((a = acceptable(num_pkts)) != 0)){
+      r = (struct receiver *)malloc(sizeof(struct receiver));
+      if(!r) return;
+
+      r->addr = dst_addr;
+      r->version = version;
+      r->num_pkts = num_pkts;
+
+      HASH_ADD_INT(*receivers, addr, r);
+      
+      if((size = HASH_COUNT(*receivers)) > MAX_TABLE_SIZE_2){
+        HASH_SORT(*receivers, receivers_sort_asc);
+        *receivers = cutBackTo(*receivers, MAX_TABLE_SIZE_1);
+        mergeTables(*receivers, topReceivers);
+
+        if((size = HASH_COUNT(*topReceivers)) > MAX_TABLE_SIZE_1){
+          HASH_SORT(*topReceivers, receivers_sort_asc);
+          *topReceivers = cutBackTo(*topReceivers, MAX_TABLE_SIZE_1);
+        }
+
+        resetReceivers(*receivers);
+        *receivers = NULL;
+      }
+    }
+  }
+  else
+    r->num_pkts += num_pkts;
+}
+
+/* *********************************************** */
+
+#ifdef HAVE_JSON_C
+static void saveReceiverStats(json_object **jObj_group, 
+                              struct receiver *receivers, 
+                              u_int64_t total_pkt_count) {
+
+  json_object *jArray_stats  = json_object_new_array();
+  struct receiver *r, *tmp;
+  int i = 0;
+
+  HASH_ITER(hh, receivers, r, tmp) {
+    json_object *jObj_stat = json_object_new_object();
+    char addr_name[48];
+    
+    if(r->version == IPVERSION)
+      inet_ntop(AF_INET, &(r->addr), addr_name, sizeof(addr_name));
+    else
+      inet_ntop(AF_INET6, &(r->addr),  addr_name, sizeof(addr_name));
+    
+
+    json_object_object_add(jObj_stat,"ip.address",json_object_new_string(addr_name));
+    json_object_object_add(jObj_stat,"packets.number", json_object_new_int(r->num_pkts));
+    json_object_object_add(jObj_stat,"packets.percent",json_object_new_double(((double)r->num_pkts) / total_pkt_count));
+
+    json_object_array_add(jArray_stats, jObj_stat);
+
+    i++;
+    if(i >= 10) break;
+  }
+  
+  json_object_object_add(*jObj_group, "top.receiver.stats", jArray_stats);
+}
+#endif
+
+
+/* *********************************************** */
+
 static void deleteScanners(struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
@@ -1116,6 +1309,9 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
        && (flow->src2dst_packets == 1) && (flow->dst2src_packets == 0)) {
        updateScanners(&scannerHosts, flow->src_ip, flow->ip_version, dport);
     }
+
+    updateReceivers(&receivers, flow->dst_ip, flow->ip_version, 
+                    flow->src2dst_packets, &topReceivers);
 
     updatePortStats(&srcStats, sport, flow->src_ip, flow->ip_version, 
                     flow->src2dst_packets, flow->src2dst_bytes, proto);
@@ -1531,8 +1727,8 @@ static void saveTopStats(json_object **jObj_group,
       json_object *jObj_stat = json_object_new_object();
 
       json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
-      json_object_object_add(jObj_stat,"packets.number",json_object_new_int64(s->num_pkts));
-      json_object_object_add(jObj_stat,"flows.number",json_object_new_double(s->num_flows));
+      json_object_object_add(jObj_stat,"packets.number",json_object_new_int(s->num_pkts));
+      json_object_object_add(jObj_stat,"flows.number",json_object_new_int(s->num_flows));
       json_object_object_add(jObj_stat,"flows.percent",json_object_new_double((s->num_flows*100.0)/total_flow_count));
       if(s->num_pkts) json_object_object_add(jObj_stat,"flows/packets",
 					     json_object_new_double(((double)s->num_flows)/s->num_pkts));
@@ -1570,7 +1766,7 @@ static void saveTopStats(json_object **jObj_group,
     json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
     json_object_object_add(jObj_stat,"host.number",json_object_new_int64(s->num_addr));
     json_object_object_add(jObj_stat,"host.percent",json_object_new_double((s->num_addr*100.0)/total_ip_addr));
-    json_object_object_add(jObj_stat,"flows.number",json_object_new_double(s->num_flows));
+    json_object_object_add(jObj_stat,"flows.number",json_object_new_int(s->num_flows));
 
     json_object_array_add(jArray_stats,jObj_stat);
     i++;
@@ -1895,11 +2091,13 @@ static void printResults(u_int64_t tot_usec) {
     fclose(json_fp);
 #endif
   }
-    
-  if(verbose == 3) {
+
+  if(stats_flag || verbose == 3) {
     HASH_SORT(srcStats, port_stats_sort);
     HASH_SORT(dstStats, port_stats_sort);
-
+  }
+   
+  if(verbose == 3) {
     printf("\n\nSource Ports Stats:\n");
     printPortStats(srcStats);
 
@@ -1911,12 +2109,22 @@ static void printResults(u_int64_t tot_usec) {
 #ifdef HAVE_JSON_C
     json_object *jObj_stats = json_object_new_object();
     char timestamp[64];
+    int count;
 
     strftime(timestamp, sizeof(timestamp), "%FT%TZ", localtime(&pcap_start.tv_sec));
     json_object_object_add(jObj_stats, "time", json_object_new_string(timestamp));
 
     saveScannerStats(&jObj_stats, &scannerHosts);
     
+    if((count = HASH_COUNT(topReceivers)) == 0){
+        HASH_SORT(receivers, receivers_sort);
+        saveReceiverStats(&jObj_stats, receivers, cumulative_stats.ip_packet_count);
+    }
+    else{
+        HASH_SORT(topReceivers, receivers_sort);
+        saveReceiverStats(&jObj_stats, topReceivers, cumulative_stats.ip_packet_count);
+    }
+
     u_int64_t total_src_addr = getTopStats(srcStats);
     u_int64_t total_dst_addr = getTopStats(dstStats);
 
@@ -1934,6 +2142,16 @@ static void printResults(u_int64_t tot_usec) {
   if(scannerHosts) {
     deleteScanners(scannerHosts);
     scannerHosts = NULL;
+  }
+
+  if(receivers){
+    deleteReceivers(receivers);
+    receivers = NULL;
+  }
+
+  if(topReceivers){
+    deleteReceivers(topReceivers);
+    topReceivers = NULL;
   }
   
   if(srcStats) {
@@ -2333,7 +2551,12 @@ void automataUnitTest() {
  * sent by source hosts.
  */
 #ifdef HAVE_JSON_C
-void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter, int port_array[], int p_size, const char *host_array[16], int h_size) {
+void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
+                                int port_array[], int p_size, 
+                                const char *src_host_array[16], 
+                                int sh_size, 
+                                const char *dst_host_array[16], 
+                                int dh_size) {
   char filter[2048];
   int produced = 0;
   int i = 0;
@@ -2359,7 +2582,7 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter, int port_array[], 
   }
 
 
-  if(host_array[0] != NULL) {
+  if(src_host_array[0] != NULL) {
     int l;
     
     if(port_array[0] != INIT_VAL)
@@ -2367,15 +2590,15 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter, int port_array[], 
     else
       strcpy(filter, "not (src ");
     
-    i=0;
 
-    while(i < h_size && host_array[i] != NULL) {
+    i=0;
+    while(i < sh_size && src_host_array[i] != NULL) {
       l = strlen(filter);
 	
-      if(i+1 == h_size || host_array[i+1] == NULL)
-	snprintf(&filter[l], sizeof(filter)-l, "%s", host_array[i]);
+      if(i+1 == sh_size || src_host_array[i+1] == NULL)
+	snprintf(&filter[l], sizeof(filter)-l, "%s", src_host_array[i]);
       else
-	snprintf(&filter[l], sizeof(filter)-l, "%s or ", host_array[i]);
+	snprintf(&filter[l], sizeof(filter)-l, "%s or ", src_host_array[i]);
 
       i++;
     }
@@ -2384,6 +2607,35 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter, int port_array[], 
     snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
+
+
+  if(dst_host_array[0] != NULL) {
+    int l;
+    
+    if(port_array[0] != INIT_VAL || src_host_array[0] != NULL)
+      strncat(filter, " and not (dst ", sizeof(" and not (dst "));
+    else
+      strcpy(filter, "not (dst ");
+    
+    i=0;
+
+    while(i < dh_size && dst_host_array[i] != NULL) {
+      l = strlen(filter);
+	
+      if(i+1 == dh_size || dst_host_array[i+1] == NULL)
+	snprintf(&filter[l], sizeof(filter)-l, "%s", dst_host_array[i]);
+      else
+	snprintf(&filter[l], sizeof(filter)-l, "%s or ", dst_host_array[i]);
+
+      i++;
+    }
+    
+    l = strlen(filter);
+    snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    produced = 1;
+  }
+
+
 
   if(produced)
     json_object_object_add(*jObj_bpfFilter, "pkt.peak.filter", json_object_new_string(filter));
@@ -2399,7 +2651,9 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter, int port_array[], 
  * addresses.
  */
 #ifdef HAVE_JSON_C
-void bpf_filter_host_peak_filter(json_object **jObj_bpfFilter, const char *host_array[16], int h_size) {
+void bpf_filter_host_peak_filter(json_object **jObj_bpfFilter, 
+                                 const char *host_array[16], 
+                                 int h_size) {
   char filter[2048];
   int produced = 0;
   int i = 0;
@@ -2511,7 +2765,7 @@ float getAverage(struct json_object *jObj_stat, char *field){
   int r;
   int j;
 
-  if((r = strcmp(field, "top.scanner.stats")) == 0){
+  if((r = strcmp(field, "top.scanner.stats")) == 0) {
     for(j=0; j<json_object_array_length(jObj_stat); j++) {
       field_stat = json_object_array_get_idx(jObj_stat, j);
       json_object *jObj_tot_flows_number;
@@ -2520,12 +2774,25 @@ float getAverage(struct json_object *jObj_stat, char *field){
         fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
         exit(-1);
       }
-      int tot_flows_number = json_object_get_int(jObj_tot_flows_number);
+      u_int32_t tot_flows_number = json_object_get_int(jObj_tot_flows_number);
 
       sum += tot_flows_number;
     }
+  } else if((r = strcmp(field, "top.src.pkts.stats")) == 0) {
+    for(j=0; j<json_object_array_length(jObj_stat); j++) {
+      field_stat = json_object_array_get_idx(jObj_stat, j);
+      json_object *jObj_packets_number;
+
+      if((res = json_object_object_get_ex(field_stat, "packets.number", &jObj_packets_number)) == 0) {
+        fprintf(stderr, "ERROR: can't get \"packets.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+        exit(-1);
+      }
+      u_int32_t packets_number = json_object_get_int(jObj_packets_number);
+
+      sum += packets_number;
+    }
   }
-    
+
   if(j == 0) return 0.0;
 
   return sum/j;
@@ -2553,7 +2820,7 @@ float getStdDeviation(struct json_object *jObj_stat, float average, char *field)
         fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
         exit(-1);
       }
-      int tot_flows_number = json_object_get_int(jObj_tot_flows_number);
+      u_int32_t tot_flows_number = json_object_get_int(jObj_tot_flows_number);
 
       sum += pow((tot_flows_number - average), 2);
     }
@@ -2567,20 +2834,22 @@ float getStdDeviation(struct json_object *jObj_stat, float average, char *field)
 /* *********************************************** */
 
 #ifdef HAVE_JSON_C
-/*
- * @brief add ports which have (flows/packets > threshold) 
- * and have (#flows > %1 of total flows) to the srcPortArray
- * to filter
- */
-void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPortArray[], int size) {
+void getSourcePorts(struct json_object *jObj_stat, int srcPortArray[], int size, float threshold) {
   int j;
 
   for(j=0; j<json_object_array_length(jObj_stat); j++) {
     json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
+    json_object *jObj_packets_number;
     json_object *jObj_flows_percent;
     json_object *jObj_flows_packets;
     json_object *jObj_port;
     json_bool res;
+
+    if((res = json_object_object_get_ex(src_pkts_stat, "packets.number", &jObj_packets_number)) == 0) {
+      fprintf(stderr, "ERROR: can't get \"packets.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
+    }
+    u_int32_t packets_number = json_object_get_int(jObj_packets_number);
 
     if((res = json_object_object_get_ex(src_pkts_stat, "flows.percent", &jObj_flows_percent)) == 0) {
       fprintf(stderr, "ERROR: can't get \"flows.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
@@ -2596,7 +2865,9 @@ void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPor
     double flows_packets = json_object_get_double(jObj_flows_packets);
 
 
-    if((flows_packets > FLOWS_PACKETS_THRESHOLD) && (flows_percent >= FLOWS_PERCENT_THRESHOLD)) {
+    if((flows_packets > FLOWS_PACKETS_THRESHOLD) 
+        && (flows_percent >= FLOWS_PERCENT_THRESHOLD) 
+        && packets_number >= threshold) {
       if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0) {
 	fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
 	exit(-1);
@@ -2611,14 +2882,42 @@ void getPacketBasedSourcePortsToFilter(struct json_object *jObj_stat, int srcPor
 
 /* *********************************************** */
 
-/*
- * @brief add scanner hosts which have more than 1000 
- * flows per second to the srcHostArray to filter
- */
 #ifdef HAVE_JSON_C
-void getScannerHostsToFilter(struct json_object *jObj_stat, int duration, 
-                             const char *srcHostArray[48], int size, 
-                             float threshold) {
+void getReceiverHosts(struct json_object *jObj_stat, const char *dstHostArray[16], int size) {
+  int j;
+
+  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+    json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
+    json_object *jObj_host_address;
+    json_object *jObj_pkts_percent;
+    json_bool res;
+
+    if((res = json_object_object_get_ex(scanner_stat, "packets.percent", &jObj_pkts_percent)) == 0) {
+      fprintf(stderr, "ERROR: can't get \"packets.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
+    }
+    double pkts_percent = json_object_get_double(jObj_pkts_percent);
+
+
+    if(pkts_percent > PKTS_PERCENT_THRESHOLD) {
+      if((res = json_object_object_get_ex(scanner_stat, "ip.address", &jObj_host_address)) == 0) {
+	fprintf(stderr, "ERROR: can't get \"ip.address, use -x flag only with .json files generated by ndpiReader -b flag.\n");
+	exit(-1);
+      }
+      const char *host_address = json_object_get_string(jObj_host_address);
+
+      bpf_filter_host_array_add(dstHostArray, size, host_address);
+    }
+  }
+}
+#endif
+
+/* *********************************************** */
+
+#ifdef HAVE_JSON_C
+void getScannerHosts(struct json_object *jObj_stat, int duration, 
+                     const char *srcHostArray[48], int size, 
+                     float threshold) {
   int j;
 
   for(j=0; j<json_object_array_length(jObj_stat); j++) {
@@ -2627,14 +2926,15 @@ void getScannerHostsToFilter(struct json_object *jObj_stat, int duration,
     json_object *jObj_tot_flows_number;
     json_bool res;
 
+
     if((res = json_object_object_get_ex(scanner_stat, "total.flows.number", &jObj_tot_flows_number)) == 0) {
       fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
     }
-    int tot_flows_number = json_object_get_int(jObj_tot_flows_number);
+    u_int32_t tot_flows_number = json_object_get_int(jObj_tot_flows_number);
 
 
-    if(((tot_flows_number/duration) > FLOWS_THRESHOLD) && tot_flows_number > threshold) {
+    if(((tot_flows_number/(float)duration) > FLOWS_THRESHOLD) && tot_flows_number > threshold) {
       if((res = json_object_object_get_ex(scanner_stat, "ip.address", &jObj_host_address)) == 0) {
 	fprintf(stderr, "ERROR: can't get \"ip.address\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
 	exit(-1);
@@ -2649,12 +2949,10 @@ void getScannerHostsToFilter(struct json_object *jObj_stat, int duration,
 #endif
 
 /* *********************************************** */
-/*
- * @brief add to the dstHostArray to filter destination 
- * hosts which have more than 2 percent of flows per minute
- */
+
 #ifdef HAVE_JSON_C
-void getTopReceiverHostsToFilter(struct json_object *jObj_stat, int duration, const char *dstHostArray[16], int size) {
+void getDestinationHosts(struct json_object *jObj_stat, int duration, 
+                 const char *dstHostArray[16], int size) {
   int j;
 
   for(j=0; j<json_object_array_length(jObj_stat); j++) {
@@ -2663,6 +2961,7 @@ void getTopReceiverHostsToFilter(struct json_object *jObj_stat, int duration, co
     json_object *jObj_flows_percent;
     json_bool res;
 
+
     if((res = json_object_object_get_ex(scanner_stat, "flows.percent", &jObj_flows_percent)) == 0) {
       fprintf(stderr, "ERROR: can't get \"flows.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
@@ -2670,7 +2969,7 @@ void getTopReceiverHostsToFilter(struct json_object *jObj_stat, int duration, co
     double flows_percent = json_object_get_double(jObj_flows_percent);
 
 
-    if(flows_percent > 0.2) {
+    if(flows_percent > FLOWS_PERCENT_THRESHOLD_2) {
       if((res = json_object_object_get_ex(scanner_stat, "aggressive.host", &jObj_host_address)) == 0) {
 	fprintf(stderr, "ERROR: can't get \"aggressive.host\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
 	exit(-1);
@@ -2679,41 +2978,6 @@ void getTopReceiverHostsToFilter(struct json_object *jObj_stat, int duration, co
 
       bpf_filter_host_array_add(dstHostArray, size, host_address);
 
-    }
-  }
-}
-#endif
-
-/* *********************************************** */
-/*
- * @brief add ports which have more than 1000 flows per 
- * second to the srcHostArray to filter
- */
-#ifdef HAVE_JSON_C
-void getHostBasedSourcePortsToFilter(struct json_object *jObj_stat, int duration, int srcPortArray[], int size) {
-  int j;
-
-  for(j=0; j<json_object_array_length(jObj_stat); j++) {
-    json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
-    json_object *jObj_flows_number;
-    json_object *jObj_port;
-    json_bool res;
-
-    if((res = json_object_object_get_ex(src_pkts_stat, "flows.number", &jObj_flows_number)) == 0) {
-      fprintf(stderr, "ERROR: can't get \"flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    int flows_number = json_object_get_double(jObj_flows_number);
-
-
-    if((flows_number/duration) > 1000) {
-      if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      int port = json_object_get_int(jObj_port);
-
-      bpf_filter_port_array_add(srcPortArray, size, port);
     }
   }
 }
@@ -2730,7 +2994,12 @@ static void produceBpfFilter(char *filePath) {
   int filterSrcPorts[PORT_ARRAY_SIZE]; 
   const char *filterSrcHosts[48]; 
   const char *filterDstHosts[48]; 
+  const char *filterPktDstHosts[48]; 
   struct stat statbuf;
+  FILE *fp = NULL;
+  char *fileName;
+  char _filterFilePath[1024];
+  json_object *jObj_bpfFilter;
   void *fmap;
   int fsock;
   float average;
@@ -2739,11 +3008,7 @@ static void produceBpfFilter(char *filePath) {
   int typeCheck;
   int array_len;
   int i;
-  FILE *fp = NULL;
-  char *fileName;
-  char _filterFilePath[1024];
-  json_object *jObj_bpfFilter;
-  
+ 
   if((fsock = open(filePath, O_RDONLY)) == -1) {
     fprintf(stderr,"error opening file %s\n", filePath);
     exit(-1);
@@ -2787,6 +3052,7 @@ static void produceBpfFilter(char *filePath) {
   bpf_filter_port_array_init(filterSrcPorts, PORT_ARRAY_SIZE);
   bpf_filter_host_array_init(filterSrcHosts, HOST_ARRAY_SIZE);
   bpf_filter_host_array_init(filterDstHosts, HOST_ARRAY_SIZE);
+  bpf_filter_host_array_init(filterPktDstHosts, HOST_ARRAY_SIZE/2);
 
   for(i=0; i<array_len; i++) {
     json_object *stats = json_object_array_get_idx(jObj_statistics, i);
@@ -2799,28 +3065,34 @@ static void produceBpfFilter(char *filePath) {
 
     if((average = getAverage(val, "top.scanner.stats")) != 0){
       deviation = getStdDeviation(val, average, "top.scanner.stats");
-      getScannerHostsToFilter(val, duration, filterSrcHosts, HOST_ARRAY_SIZE, average+deviation);    
+      getScannerHosts(val, duration, filterSrcHosts, HOST_ARRAY_SIZE, average+deviation);    
     }
+
+
+    if((res = json_object_object_get_ex(stats, "top.receiver.stats", &val)) == 0) {
+      fprintf(stderr,"ERROR: can't get \"top.receiver.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
+      exit(-1);
+    }
+    getReceiverHosts(val, filterPktDstHosts, HOST_ARRAY_SIZE/2);
+
 
     if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0) {
       fprintf(stderr,"ERROR: can't get \"top.src.pkts.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
     }
-    getPacketBasedSourcePortsToFilter(val, filterSrcPorts, PORT_ARRAY_SIZE);    
 
+    if((average = getAverage(val, "top.src.pkts.stats")) != 0)
+      getSourcePorts(val, filterSrcPorts, PORT_ARRAY_SIZE, average);    
 
-    if((res = json_object_object_get_ex(stats, "top.src.host.stats", &val)) == 0) {
-      fprintf(stderr,"ERROR: can't get \"top.src.host.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    getHostBasedSourcePortsToFilter(val, duration, filterSrcPorts, PORT_ARRAY_SIZE);    
 
     if((res = json_object_object_get_ex(stats, "top.dst.pkts.stats", &val)) == 0) {
       fprintf(stderr,"ERROR: can't get \"top.dst.pkts.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
       exit(-1);
     }
-    getTopReceiverHostsToFilter(val, duration, filterDstHosts, HOST_ARRAY_SIZE);
+    getDestinationHosts(val, duration, filterDstHosts, HOST_ARRAY_SIZE);
   }
+  
+
   fileName = basename(filePath);
   snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
 
@@ -2831,7 +3103,9 @@ static void produceBpfFilter(char *filePath) {
 
   jObj_bpfFilter = json_object_new_object();
 
-  bpf_filter_pkt_peak_filter(&jObj_bpfFilter, filterSrcPorts, PORT_ARRAY_SIZE, filterSrcHosts, HOST_ARRAY_SIZE);
+  bpf_filter_pkt_peak_filter(&jObj_bpfFilter, filterSrcPorts, PORT_ARRAY_SIZE, 
+                  filterSrcHosts, HOST_ARRAY_SIZE, filterPktDstHosts, HOST_ARRAY_SIZE/2);
+
   bpf_filter_host_peak_filter(&jObj_bpfFilter, filterDstHosts, HOST_ARRAY_SIZE);
 
   fprintf(fp,"%s\n",json_object_to_json_string(jObj_bpfFilter));
