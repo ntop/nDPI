@@ -1101,25 +1101,20 @@ static int receivers_sort_asc(void *_a, void *_b) {
 /*@brief removes first (size - max) elements from hash table.
  * hash table is ordered in ascending order.
 */
-static struct receiver *cutBackTo(struct receiver *receivers, u_int32_t max) {
+static struct receiver *cutBackTo(struct receiver **receivers, u_int32_t size, u_int32_t max) {
   struct receiver *r, *tmp;
   int i=0;
-  int size;
   int count;
 
-  size = HASH_COUNT(receivers);
-
-  if(size < max){
-    printf("Error: invalid size value\n");
-    exit(-1);
-  }
+  if(size < max) //return the original table
+    return *receivers;  
   
   count = size - max;
 
-  HASH_ITER(hh, receivers, r, tmp) {
+  HASH_ITER(hh, *receivers, r, tmp) {
     if(i++ == count)
       return r;
-    HASH_DEL(receivers, r);
+    HASH_DEL(*receivers, r);
     free(r);
   }
 }
@@ -1130,29 +1125,28 @@ static struct receiver *cutBackTo(struct receiver *receivers, u_int32_t max) {
  *  then updates its value
  * else adds it to the second table
 */
-static void mergeTables(struct receiver *primary, struct receiver **secondary) {
+static void mergeTables(struct receiver **primary, struct receiver **secondary) {
   struct receiver *r, *s, *tmp;
 
-  HASH_ITER(hh, primary, r, tmp) {
+  HASH_ITER(hh, *primary, r, tmp) {
     HASH_FIND_INT(*secondary, (int *)&(r->addr), s);
-    if(s == NULL)
-      HASH_ADD_INT(*secondary, addr, r);
+    if(s == NULL){
+      s = (struct receiver *)malloc(sizeof(struct receiver));
+      if(!s) return;
+
+      s->addr = r->addr;
+      s->version = r->version;
+      s->num_pkts = r->num_pkts;
+
+      HASH_ADD_INT(*secondary, addr, s);
+    }
     else
       s->num_pkts += r->num_pkts;
+
+    HASH_DEL(*primary, r);
+    free(r);
   }
 }
-/* *********************************************** */
-/*@brief resets a table without freeing its elements
-*/
-static void resetReceivers(struct receiver *receivers) {
-  struct receiver *current, *tmp;
-
-  HASH_ITER(hh, receivers, current, tmp) {
-    //HASH_DEL(receivers, current);
-    current = NULL;
-  }
-}
-
 /* *********************************************** */
 
 static void deleteReceivers(struct receiver *receivers) {
@@ -1200,16 +1194,16 @@ static void updateReceivers(struct receiver **receivers, u_int32_t dst_addr,
       HASH_ADD_INT(*receivers, addr, r);
       
       if((size = HASH_COUNT(*receivers)) > MAX_TABLE_SIZE_2){
+
         HASH_SORT(*receivers, receivers_sort_asc);
-        *receivers = cutBackTo(*receivers, MAX_TABLE_SIZE_1);
-        mergeTables(*receivers, topReceivers);
+        *receivers = cutBackTo(receivers, size, MAX_TABLE_SIZE_1);
+        mergeTables(receivers, topReceivers);
 
         if((size = HASH_COUNT(*topReceivers)) > MAX_TABLE_SIZE_1){
           HASH_SORT(*topReceivers, receivers_sort_asc);
-          *topReceivers = cutBackTo(*topReceivers, MAX_TABLE_SIZE_1);
+          *topReceivers = cutBackTo(topReceivers, size, MAX_TABLE_SIZE_1);
         }
 
-        resetReceivers(*receivers);
         *receivers = NULL;
       }
     }
@@ -1222,14 +1216,14 @@ static void updateReceivers(struct receiver **receivers, u_int32_t dst_addr,
 
 #ifdef HAVE_JSON_C
 static void saveReceiverStats(json_object **jObj_group, 
-                              struct receiver *receivers, 
+                              struct receiver **receivers, 
                               u_int64_t total_pkt_count) {
 
   json_object *jArray_stats  = json_object_new_array();
   struct receiver *r, *tmp;
   int i = 0;
 
-  HASH_ITER(hh, receivers, r, tmp) {
+  HASH_ITER(hh, *receivers, r, tmp) {
     json_object *jObj_stat = json_object_new_object();
     char addr_name[48];
     
@@ -2118,11 +2112,11 @@ static void printResults(u_int64_t tot_usec) {
     
     if((count = HASH_COUNT(topReceivers)) == 0){
         HASH_SORT(receivers, receivers_sort);
-        saveReceiverStats(&jObj_stats, receivers, cumulative_stats.ip_packet_count);
+        saveReceiverStats(&jObj_stats, &receivers, cumulative_stats.ip_packet_count);
     }
     else{
         HASH_SORT(topReceivers, receivers_sort);
-        saveReceiverStats(&jObj_stats, topReceivers, cumulative_stats.ip_packet_count);
+        saveReceiverStats(&jObj_stats, &topReceivers, cumulative_stats.ip_packet_count);
     }
 
     u_int64_t total_src_addr = getTopStats(srcStats);
