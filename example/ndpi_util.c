@@ -105,6 +105,61 @@ static void free_wrapper(void *freeable) {
 
 /* ***************************************************** */
 
+static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod, const char *name) {
+  uint16_t proto_id;
+  char *e;
+  unsigned long p = strtol(name,&e,0);
+  if(e && !*e) {
+	if(p < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS &&
+			ndpi_mod->proto_defaults[p].protoName) return (uint16_t)p;
+	return NDPI_PROTOCOL_UNKNOWN;
+  }
+  for(proto_id=NDPI_PROTOCOL_UNKNOWN; proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS; proto_id++) {
+	if(ndpi_mod->proto_defaults[proto_id].protoName &&
+			!strcasecmp(ndpi_mod->proto_defaults[proto_id].protoName,name))
+		return proto_id;
+  }
+  return NDPI_PROTOCOL_UNKNOWN;
+}
+static NDPI_PROTOCOL_BITMASK debug_bitmask;
+static char _proto_delim[] = " \t,:;";
+static int parse_debug_proto(struct ndpi_detection_module_struct *ndpi_mod, char *str) {
+char *n;
+uint16_t proto;
+char op=1;
+for(n = strtok(str,_proto_delim); n && *n; n = strtok(NULL,_proto_delim)) {
+	if(*n == '-') {
+		op = 0;
+		n++;
+	} else if(*n == '+') {
+		op = 1;
+		n++;
+	}
+	if(!strcmp(n,"all")) {
+		if(op)
+			NDPI_BITMASK_SET_ALL(debug_bitmask);
+		   else
+			NDPI_BITMASK_RESET(debug_bitmask);
+		continue;
+	}
+	proto = ndpi_get_proto_id(ndpi_mod, n);
+	if(proto == NDPI_PROTOCOL_UNKNOWN && strcmp(n,"unknown") && strcmp(n,"0")) {
+		fprintf(stderr,"Invalid protocol %s\n",n);
+		return 1;
+	}
+	if(op)
+		NDPI_BITMASK_ADD(debug_bitmask,proto);
+	  else
+		NDPI_BITMASK_DEL(debug_bitmask,proto);
+}
+return 0;
+}
+
+/* ***************************************************** */
+
+extern char *_debug_protocols;
+static int _debug_protocols_ok = 0;
+
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle) {
   set_ndpi_malloc(malloc_wrapper), set_ndpi_free(free_wrapper);
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
@@ -121,7 +176,18 @@ struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * pre
     NDPI_LOG(0, NULL, NDPI_LOG_ERROR, "global structure initialization failed\n");
     exit(-1);
   }
+  module->ndpi_log_level = nDPI_LogLevel;
 
+  if(_debug_protocols != NULL && ! _debug_protocols_ok) {
+	if(parse_debug_proto(module,_debug_protocols))
+		exit(-1);
+	_debug_protocols_ok = 1;
+  }
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  NDPI_BITMASK_RESET(module->debug_bitmask);
+  if(_debug_protocols_ok)
+	  module->debug_bitmask = debug_bitmask;
+#endif
   workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
   return workflow;
 }

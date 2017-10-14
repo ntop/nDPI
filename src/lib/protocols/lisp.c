@@ -1,5 +1,10 @@
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
+
 #ifdef NDPI_PROTOCOL_LISP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_LISP
+
+#include "ndpi_api.h"
 
 #define LISP_PORT 4341
 #define LISP_PORT1 4342
@@ -16,9 +21,8 @@ static void ndpi_check_lisp(struct ndpi_detection_module_struct *ndpi_struct, st
 {
 
   struct ndpi_packet_struct *packet = &flow->packet;  
-  u_int32_t payload_len = packet->payload_packet_len;
 
-   if(packet->udp != NULL) {
+  if(packet->udp != NULL) {
 
     u_int16_t lisp_port = htons(LISP_PORT);
     u_int16_t lisp_port1 = htons(LISP_PORT1);
@@ -28,22 +32,21 @@ static void ndpi_check_lisp(struct ndpi_detection_module_struct *ndpi_struct, st
 	((packet->udp->source == lisp_port1)
        && (packet->udp->dest == lisp_port1)) ) {
      
-	  NDPI_LOG(NDPI_PROTOCOL_LISP, ndpi_struct, NDPI_LOG_DEBUG, "Found lisp.\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found lisp\n");
 	  ndpi_int_lisp_add_connection(ndpi_struct, flow, 0);
 	  return;
 
       }
     }
 
-  NDPI_LOG(NDPI_PROTOCOL_LISP, ndpi_struct, NDPI_LOG_DEBUG, "exclude lisp.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_LISP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void ndpi_search_lisp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_LISP, ndpi_struct, NDPI_LOG_DEBUG, "lisp detection...\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search lisp\n");
 
   /* skip marked packets */
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_LISP) {

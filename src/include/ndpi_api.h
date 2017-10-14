@@ -384,6 +384,20 @@ extern "C" {
 
 
   /**
+   * Exclude protocol from search
+   *
+   * @par    ndpi_struct         = the detection module
+   * @par    flow                = the flow where match the host
+   * @par    master_protocol_id  = value of the ID associated to the master protocol detected
+   *
+   */
+  void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow,
+				  u_int16_t master_protocol_id,
+				  const char *_file, const char *_func,int _line);
+
+
+  /**
    * Check if the string -bigram_to_match- match with a bigram of -automa-
    *
    * @par     ndpi_mod         = the detection module

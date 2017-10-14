@@ -18,10 +18,14 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_LOTUS_NOTES
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_LOTUS_NOTES
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_LOTUS_NOTES
 
 /* ************************************ */
 
@@ -32,38 +36,35 @@ static void ndpi_check_lotus_notes(struct ndpi_detection_module_struct *ndpi_str
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if(packet->tcp != NULL) {
-    flow->l4.tcp.lotus_notes_packet_id++;
-    
-    if((flow->l4.tcp.lotus_notes_packet_id == 1)
-       /* We have seen the 3-way handshake */
-       && flow->l4.tcp.seen_syn
-       && flow->l4.tcp.seen_syn_ack
-       && flow->l4.tcp.seen_ack) {
-      if(payload_len > 16) {
-	char lotus_notes_header[] = { 0x00, 0x00, 0x02, 0x00, 0x00, 0x40, 0x02, 0x0F };
-	
-	if(memcmp(&packet->payload[6], lotus_notes_header, sizeof(lotus_notes_header)) == 0) {
-	  NDPI_LOG(NDPI_PROTOCOL_LOTUS_NOTES, ndpi_struct, NDPI_LOG_DEBUG, "Found lotus_notes.\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LOTUS_NOTES, NDPI_PROTOCOL_UNKNOWN);
-	}
+  if(packet->tcp == NULL)  return;
 
-	return;
+  flow->l4.tcp.lotus_notes_packet_id++;
+  
+  if((flow->l4.tcp.lotus_notes_packet_id == 1)
+     /* We have seen the 3-way handshake */
+     && flow->l4.tcp.seen_syn
+     && flow->l4.tcp.seen_syn_ack
+     && flow->l4.tcp.seen_ack) {
+    if(payload_len > 16) {
+      char lotus_notes_header[] = { 0x00, 0x00, 0x02, 0x00, 0x00, 0x40, 0x02, 0x0F };
+      
+      if(memcmp(&packet->payload[6], lotus_notes_header, sizeof(lotus_notes_header)) == 0) {
+        NDPI_LOG__TRACE(ndpi_struct, "found lotus_notes\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LOTUS_NOTES, NDPI_PROTOCOL_UNKNOWN);
       }
+      return;
+    }
 
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_LOTUS_NOTES);
-    } else if(flow->l4.tcp.lotus_notes_packet_id > 3)
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_LOTUS_NOTES);
-    
-    return;
-  }
+  } else if(flow->l4.tcp.lotus_notes_packet_id <= 3) return;
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void ndpi_search_lotus_notes(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_LOTUS_NOTES, ndpi_struct, NDPI_LOG_DEBUG, "lotus_notes detection...\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search lotus_notes\n");
 
   /* skip marked packets */
   if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_LOTUS_NOTES)

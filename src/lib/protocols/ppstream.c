@@ -20,9 +20,14 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-#include "ndpi_protocols.h"
+
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_PPSTREAM
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_PPSTREAM
+
+#include "ndpi_api.h"
 
 #define PPS_PORT 17788
 
@@ -31,6 +36,7 @@ static void ndpi_int_ppstream_add_connection(struct ndpi_detection_module_struct
 					     *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_UNKNOWN);
+  NDPI_LOG__TRACE(ndpi_struct, "found PPStream over UDP\n");
 }
 
 
@@ -39,6 +45,7 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
+  NDPI_LOG__DEBUG(ndpi_struct, "search PPStream\n");
   /**
      PPS over TCP is detected inside HTTP dissector 
   */
@@ -66,8 +73,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    /* increase count pkt ppstream over udp */
 	    flow->l4.udp.ppstream_stage++;
 	    
-	    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-		     "found PPStream over UDP.\n");
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	  }       
@@ -91,8 +96,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		    /* increase count pkt ppstream over udp */
 		    flow->l4.udp.ppstream_stage++;
 
-		    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-			     "found PPStream over UDP.\n");
 		    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		    return;
 		  }
@@ -106,8 +109,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		    /* increase count pkt ppstream over udp */
 		    flow->l4.udp.ppstream_stage++;
 		  
-		    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-			     "found PPStream over UDP.\n");
 		    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		    return;
 		  }
@@ -131,8 +132,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		/* increase count pkt ppstream over udp */
 		flow->l4.udp.ppstream_stage++;
 
-		NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-			 "found PPStream over UDP.\n");
 		ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		return;
 	      }
@@ -152,8 +151,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		/* increase count pkt ppstream over udp */
 		flow->l4.udp.ppstream_stage++;
 	      
-		NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-			 "found PPStream over UDP.\n");
 		ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		return;
 	      }
@@ -172,8 +169,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    /* increase count pkt ppstream over udp */
 	    flow->l4.udp.ppstream_stage++;
 
-	    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-		     "found PPStream over UDP.\n");
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	  }
@@ -194,8 +189,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    /* increase count pkt ppstream over udp */
 	    flow->l4.udp.ppstream_stage++;
 	  
-	    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-		     "found PPStream over UDP.\n");
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	  }
@@ -210,8 +203,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    /* increase count pkt ppstream over udp */
 	    flow->l4.udp.ppstream_stage++;
 	  
-	    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-		     "found PPStream over UDP.\n");
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	  }
@@ -223,16 +214,13 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	  /* increase count pkt ppstream over udp */
 	  flow->l4.udp.ppstream_stage++;
 	
-	  NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG,
-		   "found PPStream over udp.\n");
 	  ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	  return;
 	}
       }
     }
-    /* EXCLUDE PPS */
-    NDPI_LOG(NDPI_PROTOCOL_PPSTREAM, ndpi_struct, NDPI_LOG_DEBUG, "exclude PPStream.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_PPSTREAM);
+
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 

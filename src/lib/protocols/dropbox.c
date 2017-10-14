@@ -21,10 +21,14 @@
  * 
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_DROPBOX
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DROPBOX
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_DROPBOX
 
 #define DB_LSP_PORT 17500
 
@@ -51,7 +55,7 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
       if(payload_len > 2) {
 	if(strncmp((const char *)packet->payload, "{\"host_int\"", 11) == 0) {
 	  
-	  NDPI_LOG(NDPI_PROTOCOL_DROPBOX, ndpi_struct, NDPI_LOG_DEBUG, "Found dropbox.\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found dropbox\n");
 	  ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
@@ -59,15 +63,14 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
   
-  NDPI_LOG(NDPI_PROTOCOL_DROPBOX, ndpi_struct, NDPI_LOG_DEBUG, "exclude dropbox.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DROPBOX);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void ndpi_search_dropbox(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_DROPBOX, ndpi_struct, NDPI_LOG_DEBUG, "dropbox detection...\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search dropbox\n");
 
   /* skip marked packets */
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_DROPBOX) {

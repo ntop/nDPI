@@ -22,9 +22,13 @@
  *
  */
 
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_QUIC
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_QUIC
+
+#include "ndpi_api.h"
 
 static int quic_ports(u_int16_t sport, u_int16_t dport)
 {
@@ -68,6 +72,8 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   u_int seq_len = quic_len((packet->payload[0] & 0x30) >> 4);
   u_int quic_hlen = 1 /* flags */ + version_len + seq_len + cid_len;
 
+  NDPI_LOG__DEBUG(ndpi_struct, "search QUIC\n");
+
   if(packet->udp != NULL
      && (udp_len > (quic_hlen+4 /* QXXX */))
      && ((packet->payload[0] & 0xC2) == 0x00)
@@ -78,7 +84,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
       goto no_quic;
 
-    NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found QUIC.\n");
+    NDPI_LOG__TRACE(ndpi_struct, "found QUIC\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
 
     if(packet->payload[quic_hlen+12] != 0xA0)
@@ -126,8 +132,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
  no_quic:
-  NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude QUIC.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 /* ***************************************************************** */

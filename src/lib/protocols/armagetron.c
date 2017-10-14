@@ -22,27 +22,26 @@
  *
  */
 
-
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_ARMAGETRON
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_ARMAGETRON
+
+#include "ndpi_api.h"
 
 
 static void ndpi_int_armagetron_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					       struct ndpi_flow_struct *flow)
 {
-
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ARMAGETRON, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-  NDPI_LOG(NDPI_PROTOCOL_ARMAGETRON, ndpi_struct, NDPI_LOG_DEBUG, "search armagetron.\n");
-
+  NDPI_LOG__DEBUG(ndpi_struct, "search armagetron\n");
 
   if (packet->payload_packet_len > 10) {
     /* login request */
@@ -52,7 +51,7 @@ void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct
 	goto exclude;
       if (get_u_int16_t(packet->payload, 6) == htons(0x0008)
 	  && get_u_int16_t(packet->payload, packet->payload_packet_len - 2) == 0) {
-	NDPI_LOG(NDPI_PROTOCOL_ARMAGETRON, ndpi_struct, NDPI_LOG_DEBUG, "detected armagetron.\n");
+	NDPI_LOG__TRACE(ndpi_struct, "found armagetron\n");
 	ndpi_int_armagetron_add_connection(ndpi_struct, flow);
 	return;
       }
@@ -65,7 +64,7 @@ void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct
 	goto exclude;
       if (get_u_int32_t(packet->payload, 6) == htonl(0x00000500) && get_u_int32_t(packet->payload, 6 + 4) == htonl(0x00010000)
 	  && get_u_int16_t(packet->payload, packet->payload_packet_len - 2) == 0) {
-	NDPI_LOG(NDPI_PROTOCOL_ARMAGETRON, ndpi_struct, NDPI_LOG_DEBUG, "detected armagetron.\n");
+	NDPI_LOG__TRACE(ndpi_struct, "found armagetron\n");
 	ndpi_int_armagetron_add_connection(ndpi_struct, flow);
 	return;
       }
@@ -85,7 +84,7 @@ void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct
 	    && (get_u_int32_t(packet->payload, 6 + 10 + val) == htonl(0x00010000)
 		|| get_u_int32_t(packet->payload, 6 + 10 + val) == htonl(0x00000001))
 	    && get_u_int16_t(packet->payload, packet->payload_packet_len - 2) == 0) {
-	  NDPI_LOG(NDPI_PROTOCOL_ARMAGETRON, ndpi_struct, NDPI_LOG_DEBUG, "detected armagetron.\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found armagetron\n");
 	  ndpi_int_armagetron_add_connection(ndpi_struct, flow);
 	  return;
 	}
@@ -94,8 +93,7 @@ void ndpi_search_armagetron_udp(struct ndpi_detection_module_struct *ndpi_struct
   }
 
  exclude:
-  NDPI_LOG(NDPI_PROTOCOL_ARMAGETRON, ndpi_struct, NDPI_LOG_DEBUG, "exclude armagetron.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_ARMAGETRON);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

@@ -22,10 +22,13 @@
  * 
  */
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_NTP
 
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_NTP
+
+#include "ndpi_api.h"
 
 static void ndpi_int_ntp_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
@@ -37,31 +40,28 @@ void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct, struc
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   
-  if (!(packet->udp->dest == htons(123) || packet->udp->source == htons(123)))
-    goto exclude_ntp;
+  NDPI_LOG__DEBUG(ndpi_struct, "search NTP\n");
+
+  if (packet->udp->dest == htons(123) || packet->udp->source == htons(123)) {
   
-  NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP port detected\n");
+    NDPI_LOG__DEBUG2(ndpi_struct, "NTP port and length detected\n");
   
-  NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP length detected\n");
-  
-  
-  if ((((packet->payload[0] & 0x38) >> 3) <= 4)) {
-    NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "detected NTP.");
+    if ((((packet->payload[0] & 0x38) >> 3) <= 4)) {
     
-    // 38 in binary representation is 00111000 
-    flow->protos.ntp.version = (packet->payload[0] & 0x38) >> 3;
+      // 38 in binary representation is 00111000 
+      flow->protos.ntp.version = (packet->payload[0] & 0x38) >> 3;
     
-    if (flow->protos.ntp.version == 2) {
-      flow->protos.ntp.request_code = packet->payload[3];
+      if (flow->protos.ntp.version == 2) {
+        flow->protos.ntp.request_code = packet->payload[3];
+      }
+    
+      NDPI_LOG__TRACE(ndpi_struct, "found NTP\n");
+      ndpi_int_ntp_add_connection(ndpi_struct, flow);
+      return;
     }
-    
-    ndpi_int_ntp_add_connection(ndpi_struct, flow);
-    return;
   }
-  
- exclude_ntp:
-	NDPI_LOG(NDPI_PROTOCOL_NTP, ndpi_struct, NDPI_LOG_DEBUG, "NTP excluded.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_NTP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+
 }
 
 

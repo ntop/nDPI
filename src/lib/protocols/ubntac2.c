@@ -19,9 +19,14 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_UBNTAC2
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UBNTAC2
+
+#include "ndpi_api.h"
+
 
 static void ndpi_int_ubntac2_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -33,7 +38,8 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_TRACE, "UBNTAC2 detection... plen:%i %i:%i\n", packet->payload_packet_len, ntohs(packet->udp->source), ntohs(packet->udp->dest));
+  NDPI_LOG__DEBUG(ndpi_struct, "search ubntac2\n");
+  NDPI_LOG__DEBUG2(ndpi_struct, "UBNTAC2 detection... plen:%i %i:%i\n", packet->payload_packet_len, ntohs(packet->udp->source), ntohs(packet->udp->dest));
 
   if(packet->udp) {
     if(packet->payload_packet_len >= 135 &&
@@ -64,7 +70,7 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  flow->protos.ubntac2.version[len] = '\0';
 	}
 	
-	NDPI_LOG(NDPI_PROTOCOL_UBNTAC2, ndpi_struct, NDPI_LOG_DEBUG, "UBNT AirControl 2 request\n");
+	NDPI_LOG__TRACE(ndpi_struct, "UBNT AirControl 2 request\n");
 	
 	ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
       }
@@ -72,7 +78,7 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
     }
   }
 
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_UBNTAC2);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

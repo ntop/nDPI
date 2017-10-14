@@ -19,10 +19,14 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_RSYNC
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RSYNC
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_RSYNC
 static void ndpi_int_rsync_add_connection(struct ndpi_detection_module_struct
 					  *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -33,10 +37,10 @@ void ndpi_search_rsync(struct ndpi_detection_module_struct *ndpi_struct, struct 
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_RSYNC, ndpi_struct, NDPI_LOG_DEBUG, "search for RSYNC.\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search RSYNC\n");
 
   if(packet->tcp) {
-    NDPI_LOG(NDPI_PROTOCOL_RSYNC, ndpi_struct, NDPI_LOG_DEBUG, "calculating RSYNC over tcp.\n");
+    NDPI_LOG__DEBUG2(ndpi_struct, "calculating RSYNC over tcp\n");
     /*
      * Should match: memcmp(packet->payload, "@RSYNCD: 28", 14) == 0)
      */
@@ -45,12 +49,11 @@ void ndpi_search_rsync(struct ndpi_detection_module_struct *ndpi_struct, struct 
 	packet->payload[3] == 0x59 && packet->payload[4] == 0x4e &&
 	packet->payload[5] == 0x43 && packet->payload[6] == 0x44 &&
 	packet->payload[7] == 0x3a ) {
-      NDPI_LOG(NDPI_PROTOCOL_RSYNC, ndpi_struct, NDPI_LOG_DEBUG, "found rsync.\n");
+      NDPI_LOG__TRACE(ndpi_struct, "found rsync\n");
       ndpi_int_rsync_add_connection(ndpi_struct, flow);
     }
   } else {
-    NDPI_LOG(NDPI_PROTOCOL_RSYNC, ndpi_struct, NDPI_LOG_DEBUG, "exclude RSYNC.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RSYNC);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 
