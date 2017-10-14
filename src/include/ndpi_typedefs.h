@@ -301,7 +301,7 @@ struct ndpi_icmphdr {
 
     u_int32_t gateway; /* gateway address */
     struct {
-      u_int16_t __unused;
+      u_int16_t _unused;
       u_int16_t mtu;
     } frag;/* path mtu discovery */
   } un;
