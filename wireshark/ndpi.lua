@@ -1252,12 +1252,17 @@ local function dhcp_dialog_menu()
       
    if(dhcp_fingerprints ~= {}) then
       i = 0
-      label = label .. "Client\t\tKnown Fingerprint\n"
+      
       for k,v in pairsByValues(dhcp_fingerprints, rev) do
 	 local os = fingeprints[v]
 
 	 if(os ~= nil) then
 	    local os = " ["..os.."]"
+
+	    if(i == 0) then
+	       label = label .. "Client\t\tKnown Fingerprint\n"
+	    end
+	    
 	    label = label .. k.."\t"..v..os.."\n"
 	    if(i == 50) then break else i = i + 1 end
 	 end
