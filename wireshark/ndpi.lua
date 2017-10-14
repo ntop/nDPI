@@ -1243,10 +1243,11 @@ local function dhcp_dialog_menu()
       ['01032C06070C0F16363A3B45122B7751999A'] = 'HP LaserJet',
       ['0103063633'] = 'Windows',
       ['0103060F1F212B2C2E2F79F9FC'] = 'Windows',
+      ['010F03062C2E2F1F2179F92B'] = 'Windows',
       ['0103060C0F1C2A'] = 'Linux',
       ['011C02030F06770C2C2F1A792A79F921FC2A'] = 'Linux',
       ['0102030F060C2C'] = 'Apple AirPort',
-      ['010F03062C2E2F1F2179F92B'] = 'Windows'
+      ['01792103060F1C333A3B77'] = 'Android',
    }
       
    if(dhcp_fingerprints ~= {}) then
