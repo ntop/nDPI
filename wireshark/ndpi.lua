@@ -53,6 +53,7 @@ local f_tcp_ooo           = Field.new('tcp.analysis.out_of_order')
 local f_tcp_lost_segment  = Field.new('tcp.analysis.lost_segment') -- packet drop ?
 local f_rpc_xid           = Field.new('rpc.xid')
 local f_rpc_msgtyp        = Field.new('rpc.msgtyp')
+local f_user_agent        = Field.new('http.user_agent')
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -83,6 +84,9 @@ local max_num_dns_queries    = 50
 
 local ssl_server_names       = {}
 local tot_ssl_flows          = 0
+
+local http_ua                = {}
+local tot_http_ua_flows      = 0
 
 local min_nw_client_RRT      = {}
 local min_nw_server_RRT      = {}
@@ -214,6 +218,24 @@ end
 
 -- ###############################################
 
+function pairsByKeys(t, f)
+  local a = {}
+
+  -- io.write(debug.traceback().."\n")
+  for n in pairs(t) do table.insert(a, n) end
+  table.sort(a, f)
+  local i = 0      -- iterator variable
+  local iter = function ()   -- iterator function
+    i = i + 1
+    if a[i] == nil then return nil
+    else return a[i], t[a[i]]
+    end
+  end
+  return iter
+end
+
+-- ###############################################
+
 function pairsByValues(t, f)
    local a = {}
    for n in pairs(t) do table.insert(a, n) end
@@ -293,7 +315,12 @@ function ndpi_proto.init()
 
    -- SSL
    ssl_server_names       = {}
-
+   tot_ssl_flows          = 0
+   
+   -- HTTP
+   http_ua                = {}
+   tot_http_ua_flows      = 0
+   
    -- DNS
    dns_responses_ok       = {}
    dns_responses_error    = {}
@@ -477,6 +504,27 @@ function ssl_dissector(tvb, pinfo, tree)
 
       ssl_server_names[ssl_server_name] = ssl_server_names[ssl_server_name] + 1
       tot_ssl_flows = tot_ssl_flows + 1
+   end
+end
+
+-- ###############################################
+
+function http_dissector(tvb, pinfo, tree)
+   local user_agent = f_user_agent()
+   if(user_agent ~= nil) then
+      local srckey = tostring(pinfo.src)
+      
+      user_agent = getval(user_agent)
+
+      if(http_ua[user_agent] == nil) then
+	 http_ua[user_agent] = { }
+	 tot_http_ua_flows = tot_http_ua_flows + 1
+      end
+
+      if(http_ua[user_agent][srckey] == nil) then
+	 http_ua[user_agent][srckey] = 1
+	 -- io.write("Adding ["..user_agent.."] @ "..srckey.."\n")
+      end
    end
 end
 
@@ -843,6 +891,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    arp_dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
    ssl_dissector(tvb, pinfo, tree)
+   http_dissector(tvb, pinfo, tree)
    dns_dissector(tvb, pinfo, tree)
    rpc_dissector(tvb, pinfo, tree)
 end
@@ -1124,6 +1173,36 @@ end
 
 -- ###############################################
 
+local function http_ua_dialog_menu()
+   local win = TextWindow.new("HTTP User Agent");
+   local label = ""
+   local tot = 0
+   local i
+
+   if(tot_http_ua_flows > 0) then
+      i = 0
+      label = label .. "Client\t\tUser Agent\n"
+      for k,v in pairsByKeys(http_ua, rev) do
+	 local ips = ""
+	 for k1,v1 in pairs(v) do
+	    if(ips ~= "") then ips = ips .. "," end
+	    ips = ips .. k1
+	 end
+
+	 --	 label = label .. string.format("%-32s", shortenString(k,32)).."\t"..ips.."\n"
+	 label = label .. ips.."\t"..k.."\n"
+	 if(i == 50) then break else i = i + 1 end
+      end
+   else
+      label = "No HTTP User agents detected"
+   end
+
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
 local function ssl_dialog_menu()
    local win = TextWindow.new("SSL Server Contacts");
    local label = ""
@@ -1195,6 +1274,7 @@ register_menu("ntop/ARP",          arp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/DNS",          dns_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/HTTP UA",      http_ua_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/SSL",          ssl_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/TCP Analysis", tcp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Network",      rtt_dialog_menu, MENU_TOOLS_UNSORTED)
