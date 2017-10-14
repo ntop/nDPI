@@ -34,6 +34,7 @@ ntop_fds.client_nw_rtt    = ProtoField.new("TCP client network RTT (msec)",  "nt
 ntop_fds.server_nw_rtt    = ProtoField.new("TCP server network RTT (msec)",  "ntop.latency.server_rtt", ftypes.FLOAT, nil, base.NONE)
 ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "ntop.latency.appl_rtt",   ftypes.FLOAT, nil, base.NONE)
 
+local f_eth_source        = Field.new("eth.src")
 local f_eth_trailer       = Field.new("eth.trailer")
 local f_vlan_id           = Field.new("vlan.id")
 local f_arp_opcode        = Field.new("arp.opcode")
@@ -54,6 +55,7 @@ local f_tcp_lost_segment  = Field.new('tcp.analysis.lost_segment') -- packet dro
 local f_rpc_xid           = Field.new('rpc.xid')
 local f_rpc_msgtyp        = Field.new('rpc.msgtyp')
 local f_user_agent        = Field.new('http.user_agent')
+local f_dhcp_request_item = Field.new('bootp.option.request_list_item')
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -87,6 +89,8 @@ local tot_ssl_flows          = 0
 
 local http_ua                = {}
 local tot_http_ua_flows      = 0
+
+local dhcp_fingerprints      = {}
 
 local min_nw_client_RRT      = {}
 local min_nw_server_RRT      = {}
@@ -320,6 +324,9 @@ function ndpi_proto.init()
    -- HTTP
    http_ua                = {}
    tot_http_ua_flows      = 0
+
+   -- DHCP
+   dhcp_fingerprints      = {}
    
    -- DNS
    dns_responses_ok       = {}
@@ -525,6 +532,24 @@ function http_dissector(tvb, pinfo, tree)
 	 http_ua[user_agent][srckey] = 1
 	 -- io.write("Adding ["..user_agent.."] @ "..srckey.."\n")
       end
+   end
+end
+
+-- ###############################################
+
+function dhcp_dissector(tvb, pinfo, tree)
+   local req_item = f_dhcp_request_item()
+   
+   if(req_item ~= nil) then
+      local srckey = tostring(f_eth_source())
+      local req_table = { f_dhcp_request_item() }
+      local fingerprint = ""
+
+      for k,v in pairs(req_table) do
+	 fingerprint = fingerprint .. string.format("%02X", v.value)
+      end
+
+      dhcp_fingerprints[srckey] = fingerprint
    end
 end
 
@@ -892,6 +917,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
    ssl_dissector(tvb, pinfo, tree)
    http_dissector(tvb, pinfo, tree)
+   dhcp_dissector(tvb, pinfo, tree)   
    dns_dissector(tvb, pinfo, tree)
    rpc_dissector(tvb, pinfo, tree)
 end
@@ -1203,6 +1229,65 @@ end
 
 -- ###############################################
 
+local function dhcp_dialog_menu()
+   local win = TextWindow.new("DHCP Fingerprinting");
+   local label = ""
+   local tot = 0
+   local i
+   local fingeprints = {
+      ['017903060F77FC'] = 'iOS',
+      ['017903060F77FC5F2C2E'] = 'MacOS',
+      ['0103060F775FFC2C2E2F'] = 'MacOS',
+      ['0103060F775FFC2C2E'] = 'MacOS',
+      ['0603010F0C2C51452B1242439607'] = 'HP LaserJet',
+      ['01032C06070C0F16363A3B45122B7751999A'] = 'HP LaserJet',
+      ['0103063633'] = 'Windows',
+      ['0103060F1F212B2C2E2F79F9FC'] = 'Windows',
+      ['0103060C0F1C2A'] = 'Linux',
+      ['011C02030F06770C2C2F1A792A79F921FC2A'] = 'Linux',
+      ['0102030F060C2C'] = 'Apple AirPort',
+      ['010F03062C2E2F1F2179F92B'] = 'Windows'
+   }
+      
+   if(dhcp_fingerprints ~= {}) then
+      i = 0
+      label = label .. "Client\t\tKnown Fingerprint\n"
+      for k,v in pairsByValues(dhcp_fingerprints, rev) do
+	 local os = fingeprints[v]
+
+	 if(os ~= nil) then
+	    local os = " ["..os.."]"
+	    label = label .. k.."\t"..v..os.."\n"
+	    if(i == 50) then break else i = i + 1 end
+	 end
+      end
+
+      i = 0
+      for k,v in pairsByValues(dhcp_fingerprints, rev) do
+	 local os = fingeprints[v]
+
+	 if(os == nil) then
+	    if(i == 0) then
+	       label = label .. "\n\nClient\t\tUnknown Fingerprint\n"
+	    end
+	 
+	    label = label .. k.."\t"..v.."\n"
+	    if(i == 50) then break else i = i + 1 end
+	 end
+      end
+
+
+      
+   else
+      label = "No DHCP fingerprints detected"
+   end
+
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
 local function ssl_dialog_menu()
    local win = TextWindow.new("SSL Server Contacts");
    local label = ""
@@ -1271,12 +1356,13 @@ end
 -- ###############################################
 
 register_menu("ntop/ARP",          arp_dialog_menu, MENU_TOOLS_UNSORTED)
-register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
-register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/DHCP",         dhcp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/DNS",          dns_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/HTTP UA",      http_ua_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/SSL",          ssl_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/TCP Analysis", tcp_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Network",      rtt_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Application",  appl_rtt_dialog_menu, MENU_TOOLS_UNSORTED)
 
