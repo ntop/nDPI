@@ -22,9 +22,13 @@
  * 
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_GUILDWARS
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_GUILDWARS
+
+#include "ndpi_api.h"
 
 
 static void ndpi_int_guildwars_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -35,35 +39,31 @@ static void ndpi_int_guildwars_add_connection(struct ndpi_detection_module_struc
 void ndpi_search_guildwars_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
 	struct ndpi_packet_struct *packet = &flow->packet;
-	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-	NDPI_LOG(NDPI_PROTOCOL_GUILDWARS, ndpi_struct, NDPI_LOG_DEBUG, "search guildwars.\n");
+	NDPI_LOG_DBG(ndpi_struct, "search guildwars\n");
 
 	if (packet->payload_packet_len == 64 && get_u_int16_t(packet->payload, 1) == ntohs(0x050c)
 		&& memcmp(&packet->payload[50], "@2&P", 4) == 0) {
-		NDPI_LOG(NDPI_PROTOCOL_GUILDWARS, ndpi_struct, NDPI_LOG_DEBUG, "GuildWars version 29.350: found.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found GuildWars version 29.350\n");
 		ndpi_int_guildwars_add_connection(ndpi_struct, flow);
 		return;
 	}
 	if (packet->payload_packet_len == 16 && get_u_int16_t(packet->payload, 1) == ntohs(0x040c)
 		&& get_u_int16_t(packet->payload, 4) == ntohs(0xa672)
 		&& packet->payload[8] == 0x01 && packet->payload[12] == 0x04) {
-		NDPI_LOG(NDPI_PROTOCOL_GUILDWARS, ndpi_struct, NDPI_LOG_DEBUG, "GuildWars version 29.350: found.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found GuildWars version 29.350\n");
 		ndpi_int_guildwars_add_connection(ndpi_struct, flow);
 		return;
 	}
 	if (packet->payload_packet_len == 21 && get_u_int16_t(packet->payload, 0) == ntohs(0x0100)
 		&& get_u_int32_t(packet->payload, 5) == ntohl(0xf1001000)
 		&& packet->payload[9] == 0x01) {
-		NDPI_LOG(NDPI_PROTOCOL_GUILDWARS, ndpi_struct, NDPI_LOG_DEBUG, "GuildWars version 216.107.245.50: found.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found GuildWars version 216.107.245.50\n");
 		ndpi_int_guildwars_add_connection(ndpi_struct, flow);
 		return;
 	}
 
-	NDPI_LOG(NDPI_PROTOCOL_GUILDWARS, ndpi_struct, NDPI_LOG_DEBUG, "exclude guildwars.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_GUILDWARS);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

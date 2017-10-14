@@ -18,10 +18,13 @@
  *
  */
 
-
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_DHCP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DHCP
+
+#include "ndpi_api.h"
 
 /* freeradius/src/lib/dhcp.c */
 #define DHCP_CHADDR_LEN	16
@@ -61,8 +64,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
+  NDPI_LOG_DBG(ndpi_struct, "search DHCP\n");
 
   /* this detection also works for asymmetric dhcp traffic */
 
@@ -87,7 +89,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  if(len == 0) break;
 
 #ifdef DHCP_DEBUG
-	  printf("[DHCP] Id=%d [len=%d]\n", id, len);
+	  NDPI_LOG_DBG2(ndpi_struct, "[DHCP] Id=%d [len=%d]\n", id, len);
 #endif
 
 	  if(id == 53 /* DHCP Message Type */) {
@@ -95,8 +97,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 
 	    if(msg_type <= 8) foundValidMsgType = 1;
 	  } else if(id == 55 /* Parameter Request List / Fingerprint */) {
-	    u_int idx, offset = 0,
-	      hex_len = ndpi_min(len * 2, sizeof(flow->protos.dhcp.fingerprint));
+	    u_int idx, offset = 0;
 
 	    for(idx=0; idx<len; idx++) {
 	      snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
@@ -109,9 +110,8 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 	    int j = 0;
 
 #ifdef DHCP_DEBUG
-	    printf("[DHCP] ");
-	    while(j < len) { printf("%c", name[j]); j++; }
-	    printf("\n");
+	    NDPI_LOG_DBG2(ndpi_struct, "[DHCP] '%.*s'\n",name,len);
+//	    while(j < len) { printf( "%c", name[j]); j++; }; printf("\n");
 #endif
 	    j = ndpi_min(len, sizeof(flow->host_server_name)-1);
 	    strncpy((char*)flow->host_server_name, name, j);
@@ -125,14 +125,14 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
       //get_u_int16_t(packet->payload, 240) == htons(0x3501)) {
 
       if(foundValidMsgType) {
-	NDPI_LOG(NDPI_PROTOCOL_DHCP, ndpi_struct, NDPI_LOG_DEBUG, "DHCP found\n");
+	NDPI_LOG_INFO(ndpi_struct, "found DHCP\n");
 	ndpi_int_dhcp_add_connection(ndpi_struct, flow);
       }
       return;
     }
   }
 
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DHCP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

@@ -22,10 +22,14 @@
  * 
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_QUAKE
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_QUAKE
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_QUAKE
 
 static void ndpi_int_quake_add_connection(struct ndpi_detection_module_struct
 											*ndpi_struct, struct ndpi_flow_struct *flow)
@@ -36,10 +40,9 @@ static void ndpi_int_quake_add_connection(struct ndpi_detection_module_struct
 void ndpi_search_quake(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
 	struct ndpi_packet_struct *packet = &flow->packet;
-	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
+	NDPI_LOG_DBG(ndpi_struct, "search Quake\n");
+	
 	if ((packet->payload_packet_len == 14
 		 && get_u_int16_t(packet->payload, 0) == 0xffff && memcmp(&packet->payload[2], "getInfo", 7) == 0)
 		|| (packet->payload_packet_len == 17
@@ -47,7 +50,7 @@ void ndpi_search_quake(struct ndpi_detection_module_struct *ndpi_struct, struct 
 		|| (packet->payload_packet_len > 20
 			&& packet->payload_packet_len < 30
 			&& get_u_int16_t(packet->payload, 0) == 0xffff && memcmp(&packet->payload[2], "getServers", 10) == 0)) {
-		NDPI_LOG(NDPI_PROTOCOL_QUAKE, ndpi_struct, NDPI_LOG_DEBUG, "Quake IV detected.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found Quake IV\n");
 		ndpi_int_quake_add_connection(ndpi_struct, flow);
 		return;
 	}
@@ -55,20 +58,20 @@ void ndpi_search_quake(struct ndpi_detection_module_struct *ndpi_struct, struct 
 	/* Quake III/Quake Live */
 	if (packet->payload_packet_len == 15 && get_u_int32_t(packet->payload, 0) == 0xffffffff
 		&& memcmp(&packet->payload[4], "getinfo", NDPI_STATICSTRING_LEN("getinfo")) == 0) {
-		NDPI_LOG(NDPI_PROTOCOL_QUAKE, ndpi_struct, NDPI_LOG_DEBUG, "Quake III Arena/Quake Live detected.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found Quake III Arena/Quake Live\n");
 		ndpi_int_quake_add_connection(ndpi_struct, flow);
 		return;
 	}
 	if (packet->payload_packet_len == 16 && get_u_int32_t(packet->payload, 0) == 0xffffffff
 		&& memcmp(&packet->payload[4], "getchallenge", NDPI_STATICSTRING_LEN("getchallenge")) == 0) {
-		NDPI_LOG(NDPI_PROTOCOL_QUAKE, ndpi_struct, NDPI_LOG_DEBUG, "Quake III Arena/Quake Live detected.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found Quake III Arena/Quake Live\n");
 		ndpi_int_quake_add_connection(ndpi_struct, flow);
 		return;
 	}
 	if (packet->payload_packet_len > 20 && packet->payload_packet_len < 30
 		&& get_u_int32_t(packet->payload, 0) == 0xffffffff
 		&& memcmp(&packet->payload[4], "getservers", NDPI_STATICSTRING_LEN("getservers")) == 0) {
-		NDPI_LOG(NDPI_PROTOCOL_QUAKE, ndpi_struct, NDPI_LOG_DEBUG, "Quake III Arena/Quake Live detected.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found Quake III Arena/Quake Live\n");
 		ndpi_int_quake_add_connection(ndpi_struct, flow);
 		return;
 	}
@@ -84,8 +87,7 @@ void ndpi_search_quake(struct ndpi_detection_module_struct *ndpi_struct, struct 
 	   Quake Wars     ?????
 	 */
 
-	NDPI_LOG(NDPI_PROTOCOL_QUAKE, ndpi_struct, NDPI_LOG_DEBUG, "Quake excluded.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUAKE);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

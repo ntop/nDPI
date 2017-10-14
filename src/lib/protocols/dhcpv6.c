@@ -22,12 +22,14 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
 
-
-/* include files */
-
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_DHCPV6
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DHCPV6
+
+#include "ndpi_api.h"
+
 
 static void ndpi_int_dhcpv6_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow)
@@ -40,21 +42,19 @@ void ndpi_search_dhcpv6_udp(struct ndpi_detection_module_struct *ndpi_struct, st
 {
 	struct ndpi_packet_struct *packet = &flow->packet;
 	
-//  struct ndpi_id_struct         *src=ndpi_struct->src;
-//  struct ndpi_id_struct         *dst=ndpi_struct->dst;
+	NDPI_LOG_DBG(ndpi_struct, "search DHCPv6\n");
 
 	if (packet->payload_packet_len >= 4 &&
 		(packet->udp->source == htons(546) || packet->udp->source == htons(547)) &&
 		(packet->udp->dest == htons(546) || packet->udp->dest == htons(547)) &&
 		packet->payload[0] >= 1 && packet->payload[0] <= 13) {
 
-		NDPI_LOG(NDPI_PROTOCOL_DHCPV6, ndpi_struct, NDPI_LOG_DEBUG, "DHCPv6 detected.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found DHCPv6\n");
 		ndpi_int_dhcpv6_add_connection(ndpi_struct, flow);
 		return;
 	}
 
-	NDPI_LOG(NDPI_PROTOCOL_DHCPV6, ndpi_struct, NDPI_LOG_DEBUG, "DHCPv6 excluded.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DHCPV6);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

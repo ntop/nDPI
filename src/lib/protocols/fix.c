@@ -20,14 +20,21 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "ndpi_protocols.h"
+
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_FIX
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_FIX
+
+#include "ndpi_api.h"
+
 
 void ndpi_search_fix(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search FIX\n");
   if(packet->tcp) {
     // 8=
     if(packet->payload[0] == 0x38 && packet->payload[1] == 0x3d) {
@@ -37,7 +44,7 @@ void ndpi_search_fix(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	 packet->payload[4] == 0x58 &&
 	 packet->payload[5] == 0x2e) {
 	
-	NDPI_LOG(NDPI_PROTOCOL_FIX, ndpi_struct, NDPI_LOG_DEBUG, "FIX detected.\n");
+	NDPI_LOG_INFO(ndpi_struct, "found FIX\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_FIX, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
@@ -47,14 +54,14 @@ void ndpi_search_fix(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	 packet->payload[4] == 0x39 &&
 	 packet->payload[5] == 0x3d) {
 
-	NDPI_LOG(NDPI_PROTOCOL_FIX, ndpi_struct, NDPI_LOG_DEBUG, "FIX detected.\n");
+	NDPI_LOG_INFO(ndpi_struct, "found FIX\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_FIX, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
     }
   }
-  /* exclude FIX */
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_FIX);
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

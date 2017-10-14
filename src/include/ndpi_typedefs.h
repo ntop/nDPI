@@ -36,7 +36,8 @@ typedef enum
   {
     NDPI_LOG_ERROR,
     NDPI_LOG_TRACE,
-    NDPI_LOG_DEBUG
+    NDPI_LOG_DEBUG,
+    NDPI_LOG_DEBUG_EXTRA
   } ndpi_log_level_t;
 
 /* NDPI_VISIT */
@@ -859,12 +860,14 @@ struct ndpi_detection_module_struct {
 
   ndpi_default_ports_tree_node_t *tcpRoot, *udpRoot;
 
+  ndpi_log_level_t ndpi_log_level; /* default error */
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   /* debug callback, only set when debug is used */
   ndpi_debug_function_ptr ndpi_debug_printf;
   const char *ndpi_debug_print_file;
   const char *ndpi_debug_print_function;
   u_int32_t ndpi_debug_print_line;
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
 #endif
 
   /* misc parameters */

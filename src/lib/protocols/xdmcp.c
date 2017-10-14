@@ -22,9 +22,13 @@
  * 
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_XDMCP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_XDMCP
+
+#include "ndpi_api.h"
 
 
 static void ndpi_int_xdmcp_add_connection(struct ndpi_detection_module_struct
@@ -38,17 +42,14 @@ void ndpi_search_xdmcp(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
-  NDPI_LOG(NDPI_PROTOCOL_XDMCP, ndpi_struct, NDPI_LOG_DEBUG, "search xdmcp.\n");
+  NDPI_LOG_DBG(ndpi_struct, "search xdmcp\n");
 
   if (packet->tcp != NULL && (ntohs(packet->tcp->dest) >= 6000 && ntohs(packet->tcp->dest) <= 6005)
       && packet->payload_packet_len == 48
       && packet->payload[0] == 0x6c && packet->payload[1] == 0x00
       && ntohs(get_u_int16_t(packet->payload, 6)) == 0x1200 && ntohs(get_u_int16_t(packet->payload, 8)) == 0x1000) {
 
-    NDPI_LOG(NDPI_PROTOCOL_XDMCP, ndpi_struct, NDPI_LOG_DEBUG, "found xdmcp over tcp.\n");
+    NDPI_LOG_INFO(ndpi_struct, "found xdmcp over tcp\n");
     ndpi_int_xdmcp_add_connection(ndpi_struct, flow);
     return;
   }
@@ -56,14 +57,12 @@ void ndpi_search_xdmcp(struct ndpi_detection_module_struct
       && packet->payload_packet_len >= 6 && packet->payload_packet_len == 6 + ntohs(get_u_int16_t(packet->payload, 4))
       && ntohs(get_u_int16_t(packet->payload, 0)) == 0x0001 && ntohs(get_u_int16_t(packet->payload, 2)) == 0x0002) {
 
-    NDPI_LOG(NDPI_PROTOCOL_XDMCP, ndpi_struct, NDPI_LOG_DEBUG, "found xdmcp over udp.\n");
+    NDPI_LOG_INFO(ndpi_struct, "found xdmcp over udp\n");
     ndpi_int_xdmcp_add_connection(ndpi_struct, flow);
     return;
   }
 
-
-  NDPI_LOG(NDPI_PROTOCOL_XDMCP, ndpi_struct, NDPI_LOG_DEBUG, "exclude xdmcp.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XDMCP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

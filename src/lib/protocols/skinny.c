@@ -17,12 +17,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "ndpi_protocol_ids.h"
 
+#ifdef NDPI_PROTOCOL_SKINNY
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SKINNY
 
 #include "ndpi_api.h"
 
 
-#ifdef NDPI_PROTOCOL_SKINNY
 static void ndpi_int_skinny_add_connection(struct ndpi_detection_module_struct
 					   *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -38,26 +41,25 @@ void ndpi_search_skinny(struct ndpi_detection_module_struct *ndpi_struct, struct
   const char keypadmsg_8_bytes[8] = { 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
   const char selectmsg_8_bytes[8] = { 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-  NDPI_LOG(NDPI_PROTOCOL_SKINNY, ndpi_struct, NDPI_LOG_DEBUG, "search for SKINNY.\n");
+  NDPI_LOG_DBG(ndpi_struct, "search for SKINNY\n");
 
   if(packet->tcp != NULL) {
     sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);
-    NDPI_LOG(NDPI_PROTOCOL_SKINNY, ndpi_struct, NDPI_LOG_DEBUG, "calculating SKINNY over tcp.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "calculating SKINNY over tcp\n");
     if (dport == 2000  && ((packet->payload_packet_len == 24 &&
 			    memcmp(&packet->payload[0], keypadmsg_8_bytes, 8) == 0) 
 			   || ((packet->payload_packet_len == 64) && memcmp(&packet->payload[0], pattern_8_bytes, 8) == 0))) {
-      NDPI_LOG(NDPI_PROTOCOL_SKINNY, ndpi_struct, NDPI_LOG_DEBUG, "found skinny.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found skinny\n");
       ndpi_int_skinny_add_connection(ndpi_struct, flow);
     } else if (sport == 2000 && ((packet->payload_packet_len == 28 &&
 				 memcmp(&packet->payload[0], selectmsg_8_bytes, 8) == 0 ) ||
 	       (packet->payload_packet_len == 44 &&
 		memcmp(&packet->payload[0], pattern_9_bytes, 9) == 0))) {
-      NDPI_LOG(NDPI_PROTOCOL_SKINNY, ndpi_struct, NDPI_LOG_DEBUG, "found skinny.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found skinny\n");
       ndpi_int_skinny_add_connection(ndpi_struct, flow);
     }
   } else {
-    NDPI_LOG(NDPI_PROTOCOL_SKINNY, ndpi_struct, NDPI_LOG_DEBUG, "exclude SKINNY.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SKINNY);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 
