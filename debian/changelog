@@ -1,0 +1,11 @@
+ndpi-netfilter (1.7.0-1.0.1.8) unstable; urgency=medium
+
+  * Initial our version
+
+ -- Hamid Reza Hasani <hasani@payampardaz.com>  Wed, 27 Jun 2017 14:43:36 +0430
+
+ndpi-netfilter (1.7.0-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Hamid Reza Hasani <hasani@payampardaz.com>  Wed, 27 Jul 2016 14:43:36 +0430

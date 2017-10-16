@@ -1,0 +1,149 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+#
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+#
+# Modified to make a template file for a multi-binary package with separated
+# build-arch and build-indep targets  by Bill Allombert 2001
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+.NOTPARALLEL:
+
+SHELL           =/bin/bash
+
+package         = ndpi-netfilter
+temp_dir	= $(CURDIR)/debian/tmp/
+#kernelVersion	= 3.19.8-ckt13+ #TODO build package base on this version of kernel!
+kernelVersion   = $(shell uname -r)
+
+commitCount = $(shell git log --pretty=oneline | wc -l)
+packageVersion  = $(shell head -n 1 debian/changelog | grep -m 1 -Po "\d+\.\d+\.\d+-\d+\.\d+")
+
+isChangLogCorrect=$(shell head -n 1 $(CURDIR)/debian/changelog | grep -cP "\d+\.\d+\.\d+-\d+.\d+\.\d+\.\d+")
+ifneq (${isChangLogCorrect}, 1)
+	$(error "The changelog is not corect!")
+endif
+
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+	confflags += --build $(DEB_HOST_GNU_TYPE)
+else
+	confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
+
+include /usr/share/quilt/quilt.make
+
+config.status:
+	dh_testdir
+
+#Architecture
+build: build-arch build-indep
+
+build-arch: build-arch-stamp
+build-arch-stamp: config.status
+	#$(shell cd nDPI;./autogen.sh;)
+	#$(shell make -C nDPI && exit 0)
+	$(info "===========It's going to make nDPI main directory(.ko)=============")
+	$(shell make)
+	touch $@
+
+build-indep: build-indep-stamp
+build-indep-stamp: config.status
+	touch $@
+
+clean: clean
+	dh_testdir
+	dh_testroot
+	rm -f build-arch-stamp build-indep-stamp
+	rm -f config.cache config.log
+
+	[ ! -d src/modules/lib ] || rm -fr src/modules/lib || true
+	[ ! -d src/binary ] || rm -fr src/binary || true
+
+	# Add here commands to clean up after the build process.
+ifeq (Make.inc,$(wildcard Make.inc))
+	$(MAKE) distclean
+endif
+ifeq (config.sub.dist,$(wildcard config.sub.dist))
+	rm -f config.sub
+	mv config.sub.dist config.sub
+endif
+ifeq (config.guess.dist,$(wildcard config.guess.dist))
+	rm -f config.guess
+	mv config.guess.dist config.guess
+endif
+	dh_clean
+
+install: install-indep install-arch
+install-indep: build-indep-stamp
+	dh_testdir
+	dh_testroot
+	dh_installdirs -i
+
+install-arch: build-arch-stamp
+	$(info ===============Installation phase==============)
+	dh_testdir
+	dh_testroot
+	dh_installdirs -s
+
+	test -d $(temp_dir)/lib/xtables || mkdir -p $(temp_dir)/lib/xtables
+
+	sed -i "s|lib/modules/.\+/extra/.\+\.ko|lib/modules/$(kernelVersion)/extra/xt_ndpi.ko|g" $(CURDIR)/debian/ndpi-netfilter-modules.install
+	sed -i "s|($(packageVersion)-kernel.\+)|($(packageVersion))|g" $(CURDIR)/debian/changelog
+	sed -ri "s|\($(packageVersion)\.[0-9]+\.[0-9]+\)|\($(packageVersion).1.${commitCount}\)|" $(CURDIR)/debian/changelog
+	sed -ri "s|linux-image-[0-d]+\.[0-d]+\.[0-d]+-[0-d]+(-[a-z]+)?|linux-image-$(kernelVersion)|g" debian/control
+	#sed -i "s|($(packageVersion).1.${commitCount})|($(packageVersion).1.${commitCount}-kernel-$(kernelVersion))|g" $(CURDIR)/debian/changelog
+
+	test -d $(temp_dir)/lib/modules/$(kernelVersion)/extra || mkdir -p $(temp_dir)/lib/modules/$(kernelVersion)/extra
+	install src/xt_ndpi.ko $(temp_dir)/lib/modules/$(kernelVersion)/extra/xt_ndpi.ko
+	install ipt/*.so  $(temp_dir)/lib/xtables
+
+	dh_install --sourcedir=$(temp_dir)/ -p ndpi-netfilter
+	dh_install --sourcedir=$(temp_dir)/ -p ndpi-netfilter-modules
+
+	dh_makeshlibs -a -n
+	dh_shlibdeps
+	rm $(temp_dir) -r
+
+binary-common:
+	dh_testdir
+	dh_testroot
+	dh_lintian
+	dh_link
+	dh_compress -Xexamples
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_builddeb
+	sed -i "s|($(packageVersion)-kernel-$(kernelVersion))|($(packageVersion))|g" $(CURDIR)/debian/changelog
+
+# Build architecture independant packages using the common target.
+binary-indep: build-indep install-indep
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+# Build architecture dependant packages using the common target.
+binary-arch: build-arch install-arch
+	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
+
+binary: binary-arch binary-indep
+.PHONY: build clean binary-arch binary-indep binary install install-indep install-arch

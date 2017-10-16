@@ -1,0 +1,20 @@
+Prerequisites for Compilation
+-----------------------------
+
+Prerequisites
+- GNU autotools/libtool
+- libpcap or PF_RING (optional but recommended)
+
+On Ubuntu/Debian
+- apt-get install build-essential
+- apt-get install git autoconf automake autogen libpcap-dev libtool
+
+On Fedora/CentOS
+- yum groupinstall "Development tools"
+- yum install git autoconf automake autogen libpcap-devel libtool
+
+On MacOSX (using http://brew.sh)
+brew install autoconf automake libtool git
+
+On FreeBSD
+- pkg install autoconf automake libtool gmake git

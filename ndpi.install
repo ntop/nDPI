@@ -1,0 +1,46 @@
+#
+# Steps to build ndpi-netfilter on Ubuntu/Debian
+#
+# - Now, WORKS with nf_conntrack_netlink too
+#
+
+1. Install kernel sources
+apt-get install linux-source
+
+
+# With Build dir /usr/src/ndpi-netfilter
+2. Install nDPI and ndpi-netfilter
+apt-get install libtool
+apt-get install autoconf
+apt-get install pkg-config
+apt-get install subversion
+apt-get install libpcap-dev 
+apt-get install iptables-dev 
+cd /usr/src/ndpi-netfilter
+tar xvfz tar xvfz nDPI.tar.gz
+cd nDPI
+./autogen.sh
+#./configure –with-pic
+make
+make install
+
+cd ..
+NDPI_PATH=/usr/src/ndpi-netfilter/nDPI make
+make modules_install
+cp /usr/src/ndpi-netfilter/ipt/libxt_ndpi.so /lib/xtables/
+
+
+3. Firewall rules example
+- You can use a full detection engine with "--dpi_check" option (any flows):
+# dpi_check without a firewall target
+iptables -t mangle -A PREROUTING -m ndpi --dpi_check
+iptables -t mangle -A POSTROUTING -m ndpi --dpi_check
+
+iptables -A INPUT -m ndpi --youtube -j DROP
+iptables -A OUTPUT -m ndpi --facebook -j DROP
+
+
+- Or make a manual flow detection
+iptables -A INPUT -m ndpi --ftp -j DROP
+iptables -A OUTPUT -m ndpi --ftp -j DROP
+

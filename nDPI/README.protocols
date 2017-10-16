@@ -1,0 +1,18 @@
+Tor
+---
+
+Tor protocol can use SSL to hide itself. These are examples:
+
+TCP 37.128.208.46:9001 <-> 172.16.253.130:2078 [VLAN: 0][proto: 91/SSL][132 pkts/93834 bytes][SSL client: www.jwrpsthzrih.com]
+TCP 172.16.253.130:2021 <-> 75.147.140.249:443 [VLAN: 0][proto: 91/SSL][28 pkts/8053 bytes][SSL client: www.5akw23dx.com]
+TCP 172.16.253.130:2077 <-> 77.247.181.163:443 [VLAN: 0][proto: 91/SSL][136 pkts/94329 bytes][SSL client: www.fk4pprq42hsvl2wey.com]
+
+It can be detected by analyzing the SSL client certificate and checking the name that does not match to a real host in
+addition of being a bit weird. As doing DNS resolution is not a task for nDPI we let applications do and then recognize
+SSL-tunnelled connections.
+
+See http://www.netresec.com/?page=Blog&month=2013-04&post=Detecting-TOR-Communication-in-Network-Traffic
+
+For this reason nDPI uses a heuristic, non-DNS based, approach to detect tor communications. If possible, apps
+should validate the certificate using the DNS. This is not something nDPI can afford to do for performance
+reasons

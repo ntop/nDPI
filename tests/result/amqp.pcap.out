@@ -1,5 +1,0 @@
-AMQP	160	23514	3
-
-	1	TCP 127.0.0.1:44205 <-> 127.0.1.1:5672 [proto: 192/AMQP][54 pkts/10859 bytes <-> 54 pkts/3564 bytes]
-	2	TCP 127.0.1.1:5672 <-> 127.0.0.1:44204 [proto: 192/AMQP][13 pkts/4327 bytes <-> 9 pkts/699 bytes]
-	3	TCP 127.0.0.1:44206 <-> 127.0.1.1:5672 [proto: 192/AMQP][15 pkts/3075 bytes <-> 15 pkts/990 bytes]

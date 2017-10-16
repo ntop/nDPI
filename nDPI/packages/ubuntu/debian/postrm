@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+set -e
+
+#\/bin/rm /etc/ld.so.conf.d/nprobe.conf
+/sbin/ldconfig
+
+# Not needed: upstart does it
+if [ "$1" = "purge" ] ; then
+  update-rc.d nprobe remove >/dev/null
+fi
+
+exit 0

@@ -1,3 +1,0 @@
-NTP	1	90	1
-
-	1	UDP 175.144.140.29:123 -> 78.46.76.2:80 [proto: 9/NTP][1 pkts/90 bytes -> 0 pkts/0 bytes]

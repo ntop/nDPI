@@ -1,6 +1,0 @@
-SSL_No_Cert	22	2879	1
-Snapchat	34	7320	2
-
-	1	TCP 10.8.0.1:56193 <-> 74.125.136.141:443 [proto: 91.199/SSL.Snapchat][9 pkts/2290 bytes <-> 8 pkts/1653 bytes][client: feelinsonice-hrd.appspot.com]
-	2	TCP 10.8.0.1:44536 <-> 74.125.136.141:443 [proto: 91.199/SSL.Snapchat][9 pkts/2345 bytes <-> 8 pkts/1032 bytes][client: feelinsonice-hrd.appspot.com]
-	3	TCP 10.8.0.1:33233 <-> 74.125.136.141:443 [proto: 64/SSL_No_Cert][11 pkts/1910 bytes <-> 11 pkts/969 bytes]

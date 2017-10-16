@@ -1,0 +1,25 @@
+ICMP	30	2100	2
+Nintendo	890	320242	12
+Amazon	76	10811	7
+
+	1	UDP 192.168.12.114:55915 <-> 185.118.169.65:27520 [proto: 173/Nintendo][169 pkts/61414 bytes <-> 278 pkts/126260 bytes]
+	2	UDP 192.168.12.114:55915 <-> 93.237.131.235:56066 [proto: 173/Nintendo][122 pkts/48332 bytes <-> 35 pkts/5026 bytes]
+	3	UDP 192.168.12.114:55915 <-> 81.61.158.138:51769 [proto: 173/Nintendo][122 pkts/46476 bytes <-> 38 pkts/5268 bytes]
+	4	TCP 54.187.10.185:443 <-> 192.168.12.114:48328 [proto: 91.178/SSL.Amazon][34 pkts/4466 bytes <-> 20 pkts/4021 bytes]
+	5	TCP 192.168.12.114:41517 <-> 54.192.27.217:443 [proto: 91.173/SSL.Nintendo][11 pkts/2898 bytes <-> 10 pkts/4865 bytes][client: 5][server: *.baas.nintendo.com]
+	6	TCP 192.168.12.114:31329 <-> 54.192.27.8:443 [proto: 91.173/SSL.Nintendo][10 pkts/2833 bytes <-> 10 pkts/4866 bytes][client: 5][server: *.baas.nintendo.com]
+	7	UDP 192.168.12.114:52119 <-> 91.8.243.35:49432 [proto: 173/Nintendo][23 pkts/2682 bytes <-> 16 pkts/3408 bytes]
+	8	UDP 192.168.12.114:52119 <-> 109.21.255.11:50251 [proto: 173/Nintendo][8 pkts/1024 bytes <-> 8 pkts/1024 bytes]
+	9	UDP 192.168.12.114:52119 <-> 134.3.248.25:56955 [proto: 173/Nintendo][8 pkts/1040 bytes <-> 7 pkts/922 bytes]
+	10	ICMP 151.6.184.100:0 -> 192.168.12.114:0 [proto: 81/ICMP][21 pkts/1470 bytes -> 0 pkts/0 bytes]
+	11	UDP 192.168.12.114:10184 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][4 pkts/368 bytes <-> 4 pkts/400 bytes][Host: g2df33d01-lp1.p.srv.nintendo.net]
+	12	UDP 192.168.12.114:52119 -> 52.10.205.177:34343 [proto: 178/Amazon][1 pkts/730 bytes -> 0 pkts/0 bytes]
+	13	ICMP 151.6.184.98:0 -> 192.168.12.114:0 [proto: 81/ICMP][9 pkts/630 bytes -> 0 pkts/0 bytes]
+	14	UDP 192.168.12.114:55915 <-> 35.158.74.61:10025 [proto: 178/Amazon][5 pkts/290 bytes <-> 5 pkts/290 bytes]
+	15	UDP 192.168.12.114:18874 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][1 pkts/110 bytes <-> 1 pkts/281 bytes][Host: e0d67c509fb203858ebcb2fe3f88c2aa.baas.nintendo.com]
+	16	UDP 192.168.12.114:51035 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][1 pkts/110 bytes <-> 1 pkts/281 bytes][Host: e0d67c509fb203858ebcb2fe3f88c2aa.baas.nintendo.com]
+	17	UDP 192.168.12.114:52119 -> 35.158.74.61:33335 [proto: 173/Nintendo][3 pkts/354 bytes -> 0 pkts/0 bytes]
+	18	UDP 192.168.12.114:55915 -> 35.158.74.61:33335 [proto: 178/Amazon][3 pkts/318 bytes -> 0 pkts/0 bytes]
+	19	UDP 192.168.12.114:55915 -> 52.10.205.177:34343 [proto: 178/Amazon][1 pkts/298 bytes -> 0 pkts/0 bytes]
+	20	UDP 192.168.12.114:55915 -> 35.158.74.61:33334 [proto: 178/Amazon][5 pkts/290 bytes -> 0 pkts/0 bytes]
+	21	TCP 192.168.12.114:11534 <-> 54.146.242.74:443 [proto: 91.178/SSL.Amazon][1 pkts/54 bytes <-> 1 pkts/54 bytes]

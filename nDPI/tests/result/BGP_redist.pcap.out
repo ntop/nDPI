@@ -1,0 +1,4 @@
+BGP	2	322	2
+
+	1	TCP 2.2.2.2:179 -> 4.4.4.4:63535 [proto: 13/BGP][1 pkts/163 bytes -> 0 pkts/0 bytes]
+	2	TCP 2.2.2.2:179 -> 5.5.5.5:49433 [proto: 13/BGP][1 pkts/159 bytes -> 0 pkts/0 bytes]

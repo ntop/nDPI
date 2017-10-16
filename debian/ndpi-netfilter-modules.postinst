@@ -1,0 +1,9 @@
+#! /bin/sh
+
+set -e
+
+depmod -a;
+
+#DEBHELPER#
+
+exit 0

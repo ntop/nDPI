@@ -1,0 +1,24 @@
+Source: ndpi-netfilter
+Build-Depends: debhelper (>= 6.0.7), iptables-dev (>= 1.4.21)
+Section: net
+Priority: optional
+Maintainer: Me  <me@gnu.org>
+Uploaders: Hamid Reza Hasani <hasani@payampardaz.com>
+Standards-Version: 3.8.3
+Homepage: http://www.payampardaz.com/
+
+Package: ndpi-netfilter
+Architecture: any
+Depends: ${shlibs:Depends}, linux-image-4.4.0-83-generic
+Provides: ndpi-netfilet
+Description: ndpi-netfilter
+
+Package: ndpi-netfilter-modules
+Architecture: any
+Depends: linux-image-4.4.0-83-generic
+Provides: ndpi-netfilter-modules
+Description: ndpi-netfilter modules for Linux (kernel 3.19.8-ckt13+).
+ If you have compiled your own kernel, you will most likely need to build
+ your own ndpi-netfilter-modules. The ndpi-netfilter-source package has been
+ provided for use with the Debian's module-assistant or kernel-package
+ utilities to produce a version of ndpi-netfilter-modules for your kernel.

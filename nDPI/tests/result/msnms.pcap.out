@@ -1,0 +1,8 @@
+MSN	364	56503	6
+
+	1	TCP 192.168.1.14:1208 <-> 207.46.108.83:1863 [proto: 68/MSN][43 pkts/7166 bytes <-> 48 pkts/9557 bytes]
+	2	TCP 192.168.1.14:1221 <-> 207.46.108.59:1863 [proto: 68/MSN][43 pkts/7062 bytes <-> 40 pkts/7349 bytes]
+	3	TCP 192.168.1.14:1217 <-> 207.46.108.41:1863 [proto: 68/MSN][46 pkts/7655 bytes <-> 19 pkts/3761 bytes]
+	4	TCP 192.168.1.14:1037 <-> 207.46.107.149:1863 [proto: 68/MSN][41 pkts/2425 bytes <-> 55 pkts/6426 bytes]
+	5	TCP 192.168.1.14:1220 <-> 207.46.108.150:1863 [proto: 68/MSN][2 pkts/163 bytes <-> 14 pkts/2737 bytes]
+	6	TCP 192.168.1.14:1176 -> 207.46.108.39:1863 [proto: 68/MSN][13 pkts/2202 bytes -> 0 pkts/0 bytes]

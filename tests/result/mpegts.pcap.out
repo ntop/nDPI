@@ -1,3 +1,0 @@
-MPEG_TS	1	1362	1
-
-	1	UDP 10.1.16.48:40737 -> 230.200.201.23:1234 [VLAN: 3359][proto: 198/MPEG_TS][1 pkts/1362 bytes -> 0 pkts/0 bytes]

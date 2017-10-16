@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F6A2C0AE-2110-438A-87E4-7C1CFCE064C6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>pcapExample</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\ntop\nprobe\nprobe-win-32;C:\ntop\winpcap\Include;C:\ntop\dependencies\nDPI\src\lib\third_party\include;C:\ntop\dependencies\nDPI\src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Wsock32.lib;Ws2_32.lib;C:\ntop\winpcap\Lib\Packet.lib;C:\ntop\winpcap\Lib\wpcap.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\nprobe\nprobe-win-32\getopt.c" />
+    <ClCompile Include="..\..\..\..\..\nprobe\nprobe-win-32\getopt1.c" />
+    <ClCompile Include="..\..\..\src\lib\ndpi_main.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\afp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\aimini.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\applejuice.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\armagetron.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\battlefield.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\bgp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\bittorrent.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ciscovpn.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\citrix.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\corba.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\crossfire.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\dcerpc.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\dhcp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\dhcpv6.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\directconnect.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\directdownloadlink.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\dns.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\dofus.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\dropbox.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\edonkey.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\fasttrack.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\feidian.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\fiesta.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\filetopia.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\flash.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\florensia.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ftp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\gadu_gadu.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\gnutella.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\gtp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\guildwars.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\h323.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\halflife2_and_mods.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\http.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\http_activesync.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\i23v5.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\iax.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\icecast.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\imesh.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ipp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\irc.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\jabber.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\kerberos.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\kontiki.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ldap.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\lotus_notes.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mail_imap.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mail_pop.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mail_smtp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\maplestory.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mdns.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\meebo.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mgcp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mms.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\msn.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mssql.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\mysql.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\netbios.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\netflow.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\nfs.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\noe.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\non_tcp_udp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ntp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\openft.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\openvpn.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\oracle.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\oscar.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\pando.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\pcanywhere.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\popo.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\postgres.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\pplive.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ppstream.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\pptp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\qq.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\quake.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\quic.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\radius.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\rdp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\rsync.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\rtcp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\rtp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\rtsp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\sflow.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\shoutcast.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\sip.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\skinny.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\skype.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\smb.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\snmp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\socrates.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\sopcast.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\soulseek.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\spotify.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ssdp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ssh.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\ssl.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\stealthnet.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\steam.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\stun.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\syslog.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\tcp_udp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\tds.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\teamspeak.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\teamviewer.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\telnet.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\tftp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\thunder.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\tor.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\tvants.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\tvuplayer.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\usenet.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\veohtv.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\viber.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\vmware.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\vnc.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\warcraft3.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\winmx.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\world_of_kung_fu.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\world_of_warcraft.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\xbox.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\xdmcp.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\yahoo.c" />
+    <ClCompile Include="..\..\..\src\lib\protocols\zattoo.c" />
+    <ClCompile Include="..\..\..\src\lib\third_party\src\ahocorasick.c" />
+    <ClCompile Include="..\..\..\src\lib\third_party\src\node.c" />
+    <ClCompile Include="..\..\..\src\lib\third_party\src\sort.c" />
+    <ClCompile Include="..\..\pcapReader.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\nprobe\nprobe-win-32\getopt.h" />
+    <ClInclude Include="..\..\..\src\include\linux_compat.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_api.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_debug_functions.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_define.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_macros.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_main.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_protocols.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_protocols_osdpi.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_protocol_history.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_public_functions.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_structs.h" />
+    <ClInclude Include="..\..\..\src\include\ndpi_utils.h" />
+    <ClInclude Include="..\..\..\src\lib\third_party\include\actypes.h" />
+    <ClInclude Include="..\..\..\src\lib\third_party\include\ahocorasick.h" />
+    <ClInclude Include="..\..\..\src\lib\third_party\include\node.h" />
+    <ClInclude Include="..\..\..\src\lib\third_party\include\sort.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

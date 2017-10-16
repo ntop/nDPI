@@ -1,5 +1,0 @@
-OpenVPN	298	57111	3
-
-	1	UDP 192.168.43.18:13680 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][62 pkts/11508 bytes <-> 58 pkts/16664 bytes]
-	2	TCP 192.168.1.77:60140 <-> 46.101.231.218:443 [proto: 159/OpenVPN][44 pkts/7514 bytes <-> 51 pkts/7866 bytes]
-	3	UDP 192.168.43.12:41507 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][49 pkts/7860 bytes <-> 34 pkts/5699 bytes]
