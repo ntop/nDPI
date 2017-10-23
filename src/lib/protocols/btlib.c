@@ -89,6 +89,7 @@ static char *print_id_ip6_p(char *s,const struct bt_nodes6_data *b) {
   return print_ip6_p(s,(struct bt_ipv6p *)&b->ip,0);
 }
 
+#ifndef __KERNEL__
 
 void dump_bt_proto_struct(struct bt_parse_protocol *p) {
   char b20h[128];
@@ -181,8 +182,14 @@ static void _print_safe_str(char *msg,char *k,const u_int8_t *s,size_t l) {
 static void print_safe_str(char *msg,bt_parse_data_cb_t *cbd) {
   _print_safe_str(msg,cbd->buf,cbd->v.s.s,cbd->v.s.l);
 }
-
 #define DEBUG_TRACE(cmd) { if(bt_parse_debug) cmd; }
+#else
+
+#define DEBUG_TRACE(cmd)
+
+#endif
+
+
 #define STREQ(a,b) !strcmp(a,b)
 
 

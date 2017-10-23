@@ -21,8 +21,13 @@
  *
  */
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
+
 #ifdef NDPI_PROTOCOL_SOMEIP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SOMEIP
+
+#include "ndpi_api.h"
 
 enum SOMEIP_MESSAGE_TYPES {
   SOMEIP_REQUEST = 0x00,
@@ -81,7 +86,7 @@ static void ndpi_int_someip_add_connection (struct ndpi_detection_module_struct 
 					    struct ndpi_flow_struct *flow)
 {
   ndpi_set_detected_protocol(ndpi_struct,flow,NDPI_PROTOCOL_SOMEIP,NDPI_PROTOCOL_UNKNOWN);
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found.\n");
+  NDPI_LOG__TRACE(ndpi_struct, "found SOME/IP\n");
 }
 
 /**
@@ -101,7 +106,8 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   
   //####Maybe check carrier protocols?####
 
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP search called...\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search SOME/IP\n");
+
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     return;
   }
@@ -110,23 +116,28 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t message_id = ntohl(*((u_int32_t *)&packet->payload[0]));
   u_int32_t request_id = ntohl(*((u_int32_t *)&packet->payload[8]));
 
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "====>>>> SOME/IP Message ID: %08x [len: %u]\n",
+  NDPI_LOG__DEBUG2(ndpi_struct, "====>>>> SOME/IP Message ID: %08x [len: %u]\n",
 	   message_id, packet->payload_packet_len);
-	
+  if (packet->payload_packet_len < 16) {
+    NDPI_LOG__DEBUG(ndpi_struct, "Excluding SOME/IP .. mandatory header not found\n");
+    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+    return;
+  }
+
   //####Maximum packet size in SOMEIP depends on the carrier protocol, and I'm not certain how well enforced it is, so let's leave that for round 2####
 
   // we extract the remaining length
   u_int32_t someip_len = ntohl(*((u_int32_t *)&packet->payload[4]));
   if (packet->payload_packet_len != (someip_len + 8)) {
-    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. Length field invalid!\n");
+    NDPI_LOG__DEBUG(ndpi_struct, "Excluding SOME/IP .. Length field invalid!\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
     return;
   }
 
   u_int8_t protocol_version = (u_int8_t) (packet->payload[12]);
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP protocol version: [%d]\n",protocol_version);
+  NDPI_LOG__DEBUG2(ndpi_struct,"====>>>> SOME/IP protocol version: [%d]\n",protocol_version);
   if (protocol_version != LEGAL_PROTOCOL_VERSION){
-    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid protocol version!\n");
+    NDPI_LOG__DEBUG(ndpi_struct, "Excluding SOME/IP .. invalid protocol version!\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
     return;
   }
@@ -134,20 +145,20 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t interface_version = (packet->payload[13]);
 
   u_int8_t message_type = (u_int8_t) (packet->payload[14]);
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP message type: [%d]\n",message_type);
+  NDPI_LOG__DEBUG2(ndpi_struct,"====>>>> SOME/IP message type: [%d]\n",message_type);
 
   if ((message_type != SOMEIP_REQUEST) && (message_type != SOMEIP_REQUEST_NO_RETURN) && (message_type != SOMEIP_NOTIFICATION) && (message_type != SOMEIP_REQUEST_ACK) && 
       (message_type != SOMEIP_REQUEST_NO_RETURN_ACK) && (message_type != SOMEIP_NOTIFICATION_ACK) && (message_type != SOMEIP_RESPONSE) && 
       (message_type != SOMEIP_ERROR) && (message_type != SOMEIP_RESPONSE_ACK) && (message_type != SOMEIP_ERROR_ACK)) {
-    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid message type!\n");
+    NDPI_LOG__DEBUG(ndpi_struct, "Excluding SOME/IP .. invalid message type!\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
     return;
   }
 
   u_int8_t return_code = (u_int8_t) (packet->payload[15]);
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,"====>>>> SOME/IP return code: [%d]\n", return_code);
+  NDPI_LOG__DEBUG2(ndpi_struct,"====>>>> SOME/IP return code: [%d]\n", return_code);
   if ((return_code >= E_RETURN_CODE_LEGAL_THRESHOLD)) {
-    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP .. invalid return code!\n");
+    NDPI_LOG__DEBUG(ndpi_struct, "Excluding SOME/IP .. invalid return code!\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
     return;
   }
@@ -155,12 +166,12 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   if (message_id == MSG_MAGIC_COOKIE){
     if ((someip_len == MC_LENGTH) && (request_id == MC_REQUEST_ID) && (interface_version == MC_INTERFACE_VERSION) &&
 	(message_type == SOMEIP_REQUEST_NO_RETURN) && (return_code == E_OK)){
-      NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie\n",message_type);
+      NDPI_LOG__DEBUG2(ndpi_struct, "found SOME/IP Magic Cookie 0x%x\n",message_type);
       ndpi_int_someip_add_connection(ndpi_struct, flow);
       return;
     }											
     else{
-      NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP, invalid header for Magic Cookie\n");
+      NDPI_LOG__DEBUG(ndpi_struct, "Excluding SOME/IP, invalid header for Magic Cookie\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
       return;
     }
@@ -169,19 +180,19 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   if (message_id == MSG_MAGIC_COOKIE_ACK){
     if ((someip_len == MC_LENGTH) && (request_id == MC_REQUEST_ID) && (interface_version == MC_INTERFACE_VERSION) &&
 	(message_type == SOMEIP_REQUEST_NO_RETURN) && (return_code == E_OK)){
-      NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found Magic Cookie ACK\n",message_type);
+      NDPI_LOG__DEBUG2(ndpi_struct, "found SOME/IP Magic Cookie ACK 0x%x\n",message_type);
       ndpi_int_someip_add_connection(ndpi_struct, flow);
       return;
     }											
     else{
-      NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding SOME/IP, invalid header for Magic Cookie ACK\n");
+      NDPI_LOG__DEBUG(ndpi_struct, "Excluding SOME/IP, invalid header for Magic Cookie ACK\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
       return;
     }
   }
 
   if (message_id == MSG_SD){
-    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP-SD currently not supported\n", message_type);
+    NDPI_LOG__DEBUG2(ndpi_struct, "SOME/IP-SD currently not supported\n", message_type);
   }
 
   //Filtering by port. 
@@ -189,22 +200,18 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   //This is is PURELY for demo purposes and the rest of the check must be filled in later on!
   if (packet->l4_protocol == IPPROTO_UDP){
     if ((packet->udp->dest == ntohs(PORT_DEFAULT_CLIENT)) || (packet->udp->dest == ntohs(PORT_DEFAULT_SERVER)) || (packet->udp->dest == ntohs(PORT_DEFAULT_SD))) {
-      NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
       ndpi_int_someip_add_connection(ndpi_struct, flow);
       return;
     }
   }
   if (packet->l4_protocol == IPPROTO_TCP){
     if ((packet->tcp->dest == ntohs(PORT_DEFAULT_CLIENT)) || (packet->tcp->dest == ntohs(PORT_DEFAULT_SERVER))) {
-      NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP found\n",message_type);
       ndpi_int_someip_add_connection(ndpi_struct, flow);
       return;
     }
   }
 
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "Reached the end without confirming SOME/IP ...\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
-  return;
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 /**
  * Entry point for the ndpi library
@@ -212,7 +219,6 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 void init_someip_dissector (struct ndpi_detection_module_struct *ndpi_struct,
 			    u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG, "SOME/IP dissector init...\n");
   ndpi_set_bitmask_protocol_detection ("SOME/IP", ndpi_struct, detection_bitmask, *id,
 				       NDPI_PROTOCOL_SOMEIP,
 				       ndpi_search_someip,

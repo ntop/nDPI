@@ -258,6 +258,7 @@ void ac_automata_display (AC_AUTOMATA_t * thiz, char repcast)
   struct edge * e;
   AC_PATTERN_t sid;
 
+#ifndef __KERNEL__
   printf("---------------------------------\n");
 
   for (i=0; i<thiz->all_nodes_num; i++)
@@ -295,6 +296,7 @@ void ac_automata_display (AC_AUTOMATA_t * thiz, char repcast)
       }
       printf("---------------------------------\n");
     }
+#endif
 }
 
 /******************************************************************************

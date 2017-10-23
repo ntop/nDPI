@@ -21,9 +21,11 @@
  * 
  */
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_XBOX
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_XBOX
+#include "ndpi_api.h"
 
 static void ndpi_int_xbox_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -36,9 +38,6 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
-  //  struct ndpi_id_struct *src = flow->src;
-  //  struct ndpi_id_struct *dst = flow->dst;
-
   /*
    * XBOX UDP DETCTION ONLY
    * the xbox TCP detection is done by http code
@@ -49,7 +48,7 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
     u_int16_t dport = ntohs(packet->udp->dest);
     u_int16_t sport = ntohs(packet->udp->source);
 
-    NDPI_LOG(NDPI_PROTOCOL_XBOX, ndpi_struct, NDPI_LOG_DEBUG, "search xbox\n");
+    NDPI_LOG__DEBUG(ndpi_struct, "search xbox\n");
 
     if (packet->payload_packet_len > 12 &&
 	get_u_int32_t(packet->payload, 0) == 0 && packet->payload[5] == 0x58 &&
@@ -62,7 +61,7 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	  (packet->payload[4] == 0x06 && packet->payload[6] == 0x4e)) {
 
 	ndpi_int_xbox_add_connection(ndpi_struct, flow);
-	NDPI_LOG(NDPI_PROTOCOL_XBOX, ndpi_struct, NDPI_LOG_DEBUG, "xbox udp connection detected\n");
+	NDPI_LOG__TRACE(ndpi_struct, "found xbox udp connection detected\n");
 	return;
       }
     }
@@ -76,10 +75,10 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	    || (packet->payload_packet_len == 28 && ntohl(get_u_int32_t(packet->payload, 0)) == 0x015f2c00))) {
       if (flow->l4.udp.xbox_stage == 1) {
 	ndpi_int_xbox_add_connection(ndpi_struct, flow);
-	NDPI_LOG(NDPI_PROTOCOL_XBOX, ndpi_struct, NDPI_LOG_DEBUG, "xbox udp connection detected\n");
+	NDPI_LOG__TRACE(ndpi_struct, "found xbox udp connection detected\n");
 	return;
       }
-      NDPI_LOG(NDPI_PROTOCOL_XBOX, ndpi_struct, NDPI_LOG_DEBUG, "maybe xbox.\n");
+      NDPI_LOG__DEBUG(ndpi_struct, "maybe xbox\n");
       flow->l4.udp.xbox_stage++;
       return;
     }
@@ -88,8 +87,7 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
 #ifdef NDPI_PROTOCOL_HTTP
     if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0) {
 #endif
-      NDPI_LOG(NDPI_PROTOCOL_XBOX, ndpi_struct, NDPI_LOG_DEBUG, "xbox udp excluded.\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   }
   /* to not exclude tcp traffic here, done by http code... */

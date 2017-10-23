@@ -21,9 +21,14 @@
  *
  */
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_DNS
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DNS
+
+#include "ndpi_api.h"
+
 
 #define FLAGS_MASK 0x8000
 
@@ -64,7 +69,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   u_int8_t is_query;
   u_int16_t s_port = 0, d_port = 0;
   
-  NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "search DNS.\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search DNS\n");
 
   if(flow->packet.udp != NULL) {
     s_port = ntohs(flow->packet.udp->source);
@@ -75,8 +80,8 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     d_port = ntohs(flow->packet.tcp->dest);
     x = 2;
   } else {
-    NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
   }
 
   if((s_port == 53 || d_port == 53 || d_port == 5355)
@@ -116,7 +121,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 		x++;
 		flow->protos.dns.query_type = get16(&x, flow->packet.payload);
 #ifdef DNS_DEBUG		
-		printf("[%s:%d] query_type=%2d\n", __FILE__, __LINE__, flow->protos.dns.query_type);
+    		NDPI_LOG__DEBUG2(ndpi_struct, "query_type=%2d\n", flow->protos.dns.query_type);
 #endif
 		break;
 	      } else
@@ -177,8 +182,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       }
 
       if(invalid) {
-	NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);    
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
       }
 
@@ -208,9 +212,8 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 				    strlen((const char*)flow->host_server_name),
 				    NDPI_PROTOCOL_DNS);
 
-#ifdef DNS_DEBUG		
-      printf("[%s:%d] [num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
-	     __FILE__, __LINE__,
+#ifdef DNS_DEBUG
+      NDPI_LOG__DEBUG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
 	     flow->protos.dns.num_queries, flow->protos.dns.num_answers,
 	     flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
 	     );
@@ -224,11 +227,10 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	   Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
 	   matched a subprotocol
 	**/
-	NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "found DNS.\n");      
+	NDPI_LOG__TRACE(ndpi_struct, "found DNS\n");      
 	ndpi_set_detected_protocol(ndpi_struct, flow, (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS, NDPI_PROTOCOL_UNKNOWN);
       } else {
-	NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       }
     }
   } 

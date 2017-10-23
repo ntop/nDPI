@@ -21,10 +21,14 @@
  * along with nDPI. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "ndpi_protocols.h"
+
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_STUN
 
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_STUN
+
+#include "ndpi_api.h"
 
 #define MAX_NUM_STUN_PKTS     10
 
@@ -64,7 +68,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if((strncmp((const char*)payload, (const char*)"RSP/", 4) == 0)
      && (strncmp((const char*)&payload[7], (const char*)" STUN_", 6) == 0)) {
-    NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "Found stun.\n");
+    NDPI_LOG__TRACE(ndpi_struct, "found stun\n");
     goto udp_stun_found;
   }
 
@@ -159,10 +163,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     u_int8_t mod;
     u_int8_t old = 1;
     u_int8_t padding = 0;
-    NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "len and type match.\n");
+    NDPI_LOG__DEBUG2(ndpi_struct, "len and type match\n");
 
     if(payload_length == 20) {
-      NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found stun.\n");
+      NDPI_LOG__TRACE(ndpi_struct, "found stun\n");
       goto udp_stun_found;
     }
 
@@ -183,7 +187,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 		  || payload[a + 1] == 0x2a || payload[a + 1] == 0x29 || payload[a + 1] == 0x50
 		  || payload[a + 1] == 0x54 || payload[a + 1] == 0x55)))) {
 
-	NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "attribute match.\n");
+	NDPI_LOG__DEBUG2(ndpi_struct, "attribute match\n");
 
 	a += ((payload[a + 2] << 8) + payload[a + 3] + 4);
 	mod = a % 4;
@@ -191,7 +195,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  padding = 4 - mod;
 	}
 	if(a == payload_length || (padding && (a + padding) == payload_length)) {
-	  NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found stun.\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found stun\n");
 	  goto udp_stun_found;
 	}
 
@@ -215,7 +219,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	if((payload[a + padding] == 0x40) && (payload[a + padding + 1] == 0x00))
 	  goto udp_stun_found;
 
-	NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "New STUN - attribute match.\n");
+	NDPI_LOG__DEBUG2(ndpi_struct, "New STUN - attribute match\n");
 
 	old = 0;
 	a += ((payload[a + 2 + padding] << 8) + payload[a + 3 + padding] + 4);
@@ -225,7 +229,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  a += 4 - mod;
 	}
 	if(a == payload_length) {
-	  NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found stun.\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found stun\n");
 	  goto udp_stun_found;
 	}
       } else {
@@ -254,7 +258,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t is_whatsapp = 0, is_skype = 0;
 
-  NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "search stun.\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search stun\n");
 
   if(packet->tcp) {
     /* STUN may be encapsulated in TCP packets */
@@ -267,10 +271,10 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
 			     packet->payload_packet_len - 2, &is_whatsapp, &is_skype) == NDPI_IS_STUN) {
 	if(is_skype) {
-	  NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found Skype\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found Skype\n");
 	  ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_SKYPE, flow);
 	} else {
-	  NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found UDP stun.\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found UDP stun\n");
 	  ndpi_int_stun_add_connection(ndpi_struct,
 				       is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
 	}
@@ -282,10 +286,10 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
 			 packet->payload_packet_len, &is_whatsapp, &is_skype) == NDPI_IS_STUN) {
     if(is_skype) {
-      NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "Found Skype\n");
+      NDPI_LOG__TRACE(ndpi_struct, "Found Skype\n");
       ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_SKYPE, flow);
     } else {
-      NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "found UDP stun.\n");
+      NDPI_LOG__TRACE(ndpi_struct, "found UDP stun\n");
       ndpi_int_stun_add_connection(ndpi_struct,
 				   is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
     }
@@ -293,8 +297,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   }
 
   if(flow->num_stun_udp_pkts >= MAX_NUM_STUN_PKTS) {
-    NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "exclude stun.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_STUN);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 

@@ -55,6 +55,10 @@
 #endif
 #include "ndpi_patricia.h"
 
+#ifdef __KERNEL__
+#undef PATRICIA_DEBUG
+#endif
+
 void ndpi_DeleteEntry(void *a) {
   ndpi_free(a);
 }

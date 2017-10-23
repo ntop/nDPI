@@ -24,8 +24,14 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
+
 #ifdef NDPI_PROTOCOL_HEP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HEP
+
+#include "ndpi_api.h"
+
 
 static void ndpi_int_hep_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
@@ -39,17 +45,16 @@ void ndpi_search_hep(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-    NDPI_LOG(NDPI_PROTOCOL_HEP, ndpi_struct, NDPI_LOG_DEBUG, "searching for HEP.\n");
+    NDPI_LOG__DEBUG(ndpi_struct, "searching HEP\n");
     if (payload_len > 10) {
 	    if (memcmp(packet_payload, "HEP3", 4) == 0) {
-	      NDPI_LOG(NDPI_PROTOCOL_HEP, ndpi_struct, NDPI_LOG_DEBUG, "found HEP3.\n");
+	      NDPI_LOG__TRACE(ndpi_struct, "found HEP3\n");
 	      ndpi_int_hep_add_connection(ndpi_struct, flow);
 	      return;
 	    } 
     }
 
-    NDPI_LOG(NDPI_PROTOCOL_HEP, ndpi_struct, NDPI_LOG_DEBUG, "exclude HEP.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HEP);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

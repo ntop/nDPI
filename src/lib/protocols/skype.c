@@ -17,9 +17,14 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_SKYPE
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SKYPE
+
+#include "ndpi_api.h"
+
 
 static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -44,13 +49,13 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	   ((payload_len >= 16)
 	    && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
 	    && (packet->payload[2] == 0x02))) {
-	  NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found skype.\n");
+	  NDPI_LOG__TRACE(ndpi_struct, "found skype\n");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
 	}
       }
       return;
     }
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SKYPE);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
 
     // TCP check
@@ -69,15 +74,16 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	// printf("[SKYPE] payload_len=%u\n", payload_len);
 	/* printf("[SKYPE] %u/%u\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest)); */
 
-	NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "Found skype.\n");
+	NDPI_LOG__TRACE(ndpi_struct, "found skype\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
       } else {
 	// printf("NO [SKYPE] payload_len=%u\n", payload_len);
       }
 
       /* printf("[SKYPE] [id: %u][len: %d]\n", flow->l4.tcp.skype_packet_id, payload_len);  */
-    } else
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SKYPE);
+    } else {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    }
 
     return;
   }
@@ -87,7 +93,7 @@ void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct 
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_SKYPE, ndpi_struct, NDPI_LOG_DEBUG, "skype detection...\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search skype\n");
 
   /* skip marked packets */
   if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_SKYPE)

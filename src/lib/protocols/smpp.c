@@ -20,9 +20,13 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_SMPP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SMPP
+
+#include "ndpi_api.h"
 
 
 static void ndpi_int_smpp_add_connection(struct ndpi_detection_module_struct* ndpi_struct, 
@@ -39,28 +43,24 @@ static  u_int8_t ndpi_check_overflow(u_int32_t current_length, u_int32_t total_l
 void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct, 
                           struct ndpi_flow_struct* flow)
 {
-  NDPI_LOG(NDPI_PROTOCOL_SMPP, ndpi_struct, NDPI_LOG_DEBUG, "SMPP protocol detection...\n");
+  NDPI_LOG__DEBUG(ndpi_struct, "search SMPP\n");
   if (flow->packet.detected_protocol_stack[0] != NDPI_PROTOCOL_SMPP){
     struct ndpi_packet_struct* packet = &flow->packet;
     // min SMPP packet length = 16 bytes
     if (packet->payload_packet_len < 16) {
-      NDPI_LOG(NDPI_PROTOCOL_SMPP, ndpi_struct, NDPI_LOG_DEBUG, "SMPP excluded\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SMPP);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
     // get PDU length
     u_int32_t pdu_l = ntohl(get_u_int32_t(packet->payload, 0));
 
-    NDPI_LOG(NDPI_PROTOCOL_SMPP, 
-	     ndpi_struct, 
-	     NDPI_LOG_DEBUG, 
+    NDPI_LOG__DEBUG2(ndpi_struct, 
 	     "calculated PDU Length: %d, received PDU Length: %d\n", 
 	     pdu_l, packet->payload_packet_len);
 
     // if PDU size was invalid, try the following TCP segments, 3 attempts max
     if(flow->packet_counter > 3) {
-      NDPI_LOG(NDPI_PROTOCOL_SMPP, ndpi_struct, NDPI_LOG_DEBUG, "SMPP excluded\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SMPP);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
     // verify PDU length
@@ -81,9 +81,7 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
 	++pdu_c;
       }
         
-      NDPI_LOG(NDPI_PROTOCOL_SMPP, 
-	       ndpi_struct, 
-	       NDPI_LOG_DEBUG, 
+      NDPI_LOG__DEBUG2(ndpi_struct, 
 	       "multiple PDUs included, calculated total PDU Length: %d, PDU count: %d, TCP payload length: %d\n", 
 	       total_pdu_l, pdu_c, packet->payload_packet_len);
 
@@ -98,8 +96,7 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
     u_int32_t pdu_type = ntohl(get_u_int32_t(packet->payload, 4));
     // first byte of PDU type is either 0x00 of 0x80
     if(!(packet->payload[4] == 0x00 || packet->payload[4] == 0x80)) {
-      NDPI_LOG(NDPI_PROTOCOL_SMPP, ndpi_struct, NDPI_LOG_DEBUG, "SMPP excluded\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SMPP);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
     // remove 0x80, get request type pdu
@@ -110,9 +107,7 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
         pdu_req == 0x00000021 || pdu_req == 0x00000102  ||
         pdu_req == 0x00000103)){
 
-      NDPI_LOG(NDPI_PROTOCOL_SMPP, 
-	       ndpi_struct, 
-	       NDPI_LOG_DEBUG, 
+      NDPI_LOG__DEBUG2(ndpi_struct, 
 	       "PDU type: %x, Request PDU type = %x\n", 
 	       pdu_type, pdu_req);
 
@@ -300,15 +295,13 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
 
       // if extra checks passed, set as identified
       if(extra_passed) {
-	NDPI_LOG(NDPI_PROTOCOL_SMPP, ndpi_struct, NDPI_LOG_DEBUG, "SMPP identified...\n");
+	NDPI_LOG__TRACE(ndpi_struct, "found SMPP\n");
 	ndpi_int_smpp_add_connection(ndpi_struct, flow);
 	return;
       }
     }
 
-    // exclude
-    NDPI_LOG(NDPI_PROTOCOL_SMPP, ndpi_struct, NDPI_LOG_DEBUG, "SMPP excluded\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SMPP);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 
