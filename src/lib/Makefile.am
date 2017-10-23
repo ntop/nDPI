@@ -12,8 +12,7 @@ libndpi_la_include_HEADERS = ../include/ndpi_api.h \
 			     ../include/ndpi_includes.h \
 			     ../include/ndpi_protocol_ids.h \
 			     ../include/ndpi_protocols.h \
-			     ../include/ndpi_typedefs.h \
-			     third_party/include/libcache.h
+			     ../include/ndpi_typedefs.h
 
 libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     ndpi_main.c \
