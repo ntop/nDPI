@@ -104,6 +104,13 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 		       "%02X",  dhcp->options[i+2+idx] & 0xFF);
 	      offset += 2;
 	    }
+	  } else if(id == 60 /* Class Identifier */) {
+	    char *name = (char*)&dhcp->options[i+2];
+	    int j = 0;
+
+	    j = ndpi_min(len, sizeof(flow->protos.dhcp.class_ident)-1);
+	    strncpy((char*)flow->protos.dhcp.class_ident, name, j);
+	    flow->protos.dhcp.class_ident[j] = '\0';
 	  } else if(id == 12 /* Host Name */) {
 	    char *name = (char*)&dhcp->options[i+2];
 	    int j = 0;
