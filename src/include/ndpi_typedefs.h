@@ -1031,6 +1031,7 @@ struct ndpi_flow_struct {
 
     struct {
       char fingerprint[48];
+      char class_ident[48];
     } dhcp;
   } protos;
 
