@@ -1117,6 +1117,8 @@ static struct receiver *cutBackTo(struct receiver **receivers, u_int32_t size, u
     HASH_DEL(*receivers, r);
     free(r);
   }
+
+  return(NULL);
 }
 
 /* *********************************************** */
