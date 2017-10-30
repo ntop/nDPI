@@ -96,6 +96,7 @@ static struct timeval pcap_start, pcap_end;
 static time_t capture_for = 0;
 static time_t capture_until = 0;
 static u_int32_t num_flows;
+static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 
 struct flow_info {
 	struct ndpi_flow_info *flow;
@@ -272,8 +273,7 @@ static void help(u_int long_help) {
   if(long_help) {
     printf("\n\nSupported protocols:\n");
     num_threads = 1;
-    setupDetection(0, NULL);
-    ndpi_dump_protocols(ndpi_thread_info[0].workflow->ndpi_struct);
+    ndpi_dump_protocols(ndpi_info_mod);
   }
   exit(!long_help);
 }
@@ -365,34 +365,30 @@ int cmpFlows(const void *_a, const void *_b) {
 
 void extcap_config() {
   int i, argidx = 0;
-  struct ndpi_detection_module_struct *ndpi_mod;
   struct ndpi_proto_sorter *protos;
 
   /* -i <interface> */
-  printf("arg {number=%d}{call=-i}{display=Capture Interface or Pcap File Path}{type=string}"
+  printf("arg {number=%d}{call=-i}{display=Capture Interface}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
   printf("arg {number=%d}{call=-i}{display=Pcap File to Analyze}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 
-  setupDetection(0, NULL);
-  ndpi_mod = ndpi_thread_info[0].workflow->ndpi_struct;
-
-  protos = (struct ndpi_proto_sorter*)malloc(sizeof(struct ndpi_proto_sorter)*ndpi_mod->ndpi_num_supported_protocols);
+  protos = (struct ndpi_proto_sorter*)malloc(sizeof(struct ndpi_proto_sorter) * ndpi_info_mod->ndpi_num_supported_protocols);
   if(!protos) exit(0);
 
-  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
+  for(i=0; i<(int) ndpi_info_mod->ndpi_num_supported_protocols; i++) {
     protos[i].id = i;
-    snprintf(protos[i].name, sizeof(protos[i].name), "%s", ndpi_mod->proto_defaults[i].protoName);
+    snprintf(protos[i].name, sizeof(protos[i].name), "%s", ndpi_info_mod->proto_defaults[i].protoName);
   }
 
-  qsort(protos, ndpi_mod->ndpi_num_supported_protocols, sizeof(struct ndpi_proto_sorter), cmpProto);
+  qsort(protos, ndpi_info_mod->ndpi_num_supported_protocols, sizeof(struct ndpi_proto_sorter), cmpProto);
 
   printf("arg {number=%d}{call=-9}{display=nDPI Protocol Filter}{type=selector}"
 	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
 
   printf("value {arg=%d}{value=%d}{display=%s}\n", argidx, -1, "All Protocols (no nDPI filtering)");
 
-  for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
+  for(i=0; i<(int)ndpi_info_mod->ndpi_num_supported_protocols; i++)
     printf("value {arg=%d}{value=%d}{display=%s (%d)}\n", argidx, protos[i].id,
 	   protos[i].name, protos[i].id);
 
@@ -578,7 +574,8 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case '9':
-      extcap_packet_filter = atoi(optarg);
+      extcap_packet_filter = ndpi_get_proto_by_name(ndpi_info_mod, optarg);
+      if (extcap_packet_filter == NDPI_PROTOCOL_UNKNOWN) extcap_packet_filter = atoi(optarg);
       break;
 
     default:
@@ -3123,6 +3120,9 @@ int main(int argc, char **argv) {
 
   automataUnitTest();
 
+  ndpi_info_mod = ndpi_init_detection_module();
+  if (ndpi_info_mod == NULL) return -1;
+
   memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
   parseOptions(argc, argv);
@@ -3153,6 +3153,7 @@ int main(int argc, char **argv) {
   if(results_path)  free(results_path);
   if(results_file)  fclose(results_file);
   if(extcap_dumper) pcap_dump_close(extcap_dumper);
+  if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
 
   return 0;
 }
