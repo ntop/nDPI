@@ -121,7 +121,7 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 	}
 
         if ((memcmp(packet_payload, "CANCEL ", 7) == 0 || memcmp(packet_payload, "cancel ", 7) == 0)
-	    && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
+	    && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found sip CANCEL\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
