@@ -2301,11 +2301,8 @@ static void pcap_process_packet(u_char *args,
     return;
   }
 
-  /* Check if capture is live or not */
-  if(!live_capture) {
-    if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
-    pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
-  }
+  if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
+  pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
 
   /* Idle flows cleanup */
   if(live_capture) {
