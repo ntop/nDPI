@@ -25,6 +25,7 @@
 #define __NDPI_TYPEDEFS_H__
 
 #include "ndpi_define.h"
+#include "../lib/third_party/include/libcache.h"
 
 #define BT_ANNOUNCE
 #define SNAP_EXT
@@ -284,6 +285,28 @@ typedef union
 #endif
 } ndpi_ip_addr_t;
 
+
+/* +++++++++++++++++++++++ ICMP header +++++++++++++++++++++++ */
+
+PACK_ON
+struct ndpi_icmphdr {
+  u_int8_t type;/* message type */
+  u_int8_t code;/* type sub-code */
+  u_int16_t checksum;
+  union {
+    struct {
+      u_int16_t id;
+      u_int16_t sequence;
+    } echo; /* echo datagram */
+
+    u_int32_t gateway; /* gateway address */
+    struct {
+      u_int16_t _unused;
+      u_int16_t mtu;
+    } frag;/* path mtu discovery */
+  } un;
+} PACK_OFF;
+
 /* ************************************************************ */
 /* ******************* ********************* ****************** */
 /* ************************************************************ */
@@ -328,6 +351,18 @@ struct bt_announce {              // 192 bytes
   u_int8_t		name_len,
     name[192 - 4*10 - 2 - 1];     // 149 bytes
 };
+#endif
+
+#ifdef NDPI_PROTOCOL_TINC
+
+#define TINC_CACHE_MAX_SIZE 10
+
+PACK_ON struct tinc_cache_entry {
+  u_int32_t src_address;
+  u_int32_t dst_address;
+  u_int16_t dst_port;
+} PACK_OFF;
+
 #endif
 
 typedef enum {
@@ -662,6 +697,7 @@ struct ndpi_packet_struct {
   u_int16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
+  /* HTTP headers */
   struct ndpi_int_one_line_struct host_line;
   struct ndpi_int_one_line_struct forwarded_line;
   struct ndpi_int_one_line_struct referer_line;
@@ -677,7 +713,8 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct http_x_session_type;
   struct ndpi_int_one_line_struct server_line;
   struct ndpi_int_one_line_struct http_method;
-  struct ndpi_int_one_line_struct http_response;
+  struct ndpi_int_one_line_struct http_response; /* the first "word" in this pointer is the response code in the packet (200, etc) */
+  u_int8_t http_num_headers; /* number of found (valid) header lines in HTTP request or response */
 
   u_int16_t l3_packet_len;
   u_int16_t l4_packet_len;
@@ -717,12 +754,12 @@ typedef struct {
 } ndpi_port_range;
 
 typedef enum {
-  NDPI_PROTOCOL_SAFE = 0,              /* Safe protocol with encryption */
-  NDPI_PROTOCOL_ACCEPTABLE,            /* Ok but not encrypted */
-  NDPI_PROTOCOL_FUN,                   /* Pure fun protocol */
-  NDPI_PROTOCOL_UNSAFE,                /* Protocol with a safe version existing  what should be used instead */
-  NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Be prepared to troubles */
-  NDPI_PROTOCOL_UNRATED                /* No idea */
+  NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn’t provide risks for the network. (e.g., a news site) */
+  NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn’t provide risks, but could be malicious (e.g., Dropbox) */
+  NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
+  NDPI_PROTOCOL_UNSAFE,                /* Probably provides risks, but could be a normal traffic. Unencrypted protocols with clear pass should be here (e.g., telnet) */
+  NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Surely is dangerous (ex. Tor). Be prepared to troubles */
+  NDPI_PROTOCOL_UNRATED                /* No idea, not implemented or impossible to classify */
 } ndpi_protocol_breed_t;
 
 #define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)
@@ -732,12 +769,11 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
   NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
   NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
-  NDPI_PROTOCOL_CATEGORY_MAIL_SEND,         /* Protocols to send emails */
-  NDPI_PROTOCOL_CATEGORY_MAIL_SYNC,         /* Protocols to receive or sync emails */
-  NDPI_PROTOCOL_CATEGORY_FILE_TRANSFER,     /* FTP and similar protocols */
+  NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
+  NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
   NDPI_PROTOCOL_CATEGORY_WEB,               /* Web protocols and services */
   NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
-  NDPI_PROTOCOL_CATEGORY_P2P,               /* File sharing and P2P */
+  NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,       /* Download, FTP, file transfer/sharing */
   NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
   NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
   NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
@@ -745,10 +781,17 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
   NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
   NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
-  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development */
+  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
   NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
   NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
-  NDPI_PROTOCOL_CATEGORY_SYSTEM,            /* System level applications */
+  NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
+  NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
+  /* See #define NUM_CUSTOM_CATEGORIES */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_3,          /* User custom category 3 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
 
   NDPI_PROTOCOL_NUM_CATEGORIES /*
 				  NOTE: Keep this as last member
@@ -784,6 +827,9 @@ typedef struct ndpi_proto {
 
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
 
+#define NUM_CUSTOM_CATEGORIES      5
+#define CUSTOM_CATEGORY_LABEL_LEN 32
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -794,7 +840,7 @@ struct ndpi_detection_module_struct {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
 #endif
-
+  char custom_category_labels[NUM_CUSTOM_CATEGORIES][CUSTOM_CATEGORY_LABEL_LEN];
   /* callback function buffer */
   struct ndpi_call_function_struct callback_buffer[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size;
@@ -878,6 +924,9 @@ struct ndpi_detection_module_struct {
   int    bt_ann_len;
 #endif
 #endif
+#ifdef NDPI_PROTOCOL_TINC
+  cache_t tinc_cache;
+#endif
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
@@ -895,13 +944,17 @@ struct ndpi_flow_struct {
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_protocol_id;
 
-  u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1;
+  u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
 
   /*
      if ndpi_struct->direction_detect_disable == 1
      tcp sequence number connection tracking
   */
   u_int32_t next_tcp_seq_nr[2];
+
+  u_int8_t max_extra_packets_to_check;
+  u_int8_t num_extra_packets_checked;
+  int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
   /*
      the tcp / udp / other l4 value union
@@ -920,12 +973,6 @@ struct ndpi_flow_struct {
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
   u_char host_server_name[256];
-  /* Via HTTP User-Agent */
-  u_char detected_os[32];
-  /* Via HTTP X-Forwarded-For */
-  u_char nat_ip[24];
-  /* Bittorrent hash */
-  u_char bittorent_hash[20];
 
   /*
      This structure below will not not stay inside the protos
@@ -937,6 +984,9 @@ struct ndpi_flow_struct {
   struct {
     ndpi_http_method method;
     char *url, *content_type;
+    u_int8_t  num_request_headers, num_response_headers;
+    u_int8_t  request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
+    u_char response_status_code[5]; /* 200, 404, etc. */
   } http;
 
   union {
@@ -966,6 +1016,23 @@ struct ndpi_flow_struct {
     struct {
       char version[96];
     } ubntac2;
+
+    struct {
+      /* Via HTTP User-Agent */
+      u_char detected_os[32];
+      /* Via HTTP X-Forwarded-For */
+      u_char nat_ip[24];
+    } http;
+
+    struct {
+      /* Bittorrent hash */
+      u_char hash[20];
+    } bittorrent;
+
+    struct {
+      char fingerprint[48];
+      char class_ident[48];
+    } dhcp;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/
@@ -1052,7 +1119,19 @@ struct ndpi_flow_struct {
   u_int8_t ovpn_session_id[8];
   u_int8_t ovpn_counter;
 #endif
+#ifdef NDPI_PROTOCOL_TINC
+  u_int8_t tinc_state;
+  struct tinc_cache_entry tinc_cache_entry;
+#endif
+#ifdef NDPI_PROTOCOL_CSGO
+  u_int8_t csgo_strid[18],csgo_state,csgo_s2;
+  u_int32_t csgo_id2;
+#endif
 
+#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
+  u_int16_t kxun_counter, iqiyi_counter;
+#endif
+  
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
   struct ndpi_flow_struct *flow;

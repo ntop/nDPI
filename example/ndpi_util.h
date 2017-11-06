@@ -36,25 +36,40 @@
 #define MAX_IDLE_TIME           30000
 #define IDLE_SCAN_BUDGET         1024
 #define NUM_ROOTS                 512
+#define MAX_EXTRA_PACKETS_TO_CHECK  7
 #define MAX_NDPI_FLOWS      200000000
 #define TICK_RESOLUTION          1000
 #define MAX_NUM_IP_ADDRESS          5  /* len of ip address array */
 #define UPDATED_TREE                1
+#define AGGRESSIVE_PERCENT      95.00
+#define DIR_SRC                    10
+#define DIR_DST                    20
+#define PORT_ARRAY_SIZE            20
+#define HOST_ARRAY_SIZE            20
+#define FLOWS_PACKETS_THRESHOLD   0.9
+#define FLOWS_PERCENT_THRESHOLD   1.0
+#define FLOWS_PERCENT_THRESHOLD_2 0.2
+#define FLOWS_THRESHOLD          1000
+#define PKTS_PERCENT_THRESHOLD    0.1
+#define MAX_TABLE_SIZE_1         4096
+#define MAX_TABLE_SIZE_2         8192
+#define INIT_VAL                   -1
 
 // flow tracking
 typedef struct ndpi_flow_info {
-  u_int32_t lower_ip;
-  u_int32_t upper_ip;
-  u_int16_t lower_port;
-  u_int16_t upper_port;
-  u_int8_t detection_completed, protocol, src_to_dst_direction;
+  u_int32_t hashval;
+  u_int32_t src_ip;
+  u_int32_t dst_ip;
+  u_int16_t src_port;
+  u_int16_t dst_port;
+  u_int8_t detection_completed, protocol, bidirectional, check_extra_packets;
   u_int16_t vlan_id;
   struct ndpi_flow_struct *ndpi_flow;
-  char lower_name[48], upper_name[48];
+  char src_name[48], dst_name[48];
   u_int8_t ip_version;
   u_int64_t last_seen;
-  u_int64_t bytes;
-  u_int32_t packets;
+  u_int64_t src2dst_bytes, dst2src_bytes;
+  u_int32_t src2dst_packets, dst2src_packets;
 
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
@@ -120,6 +135,7 @@ typedef struct ndpi_workflow {
   /* allocated by prefs */
   void **ndpi_flows_root;
   struct ndpi_detection_module_struct *ndpi_struct;
+  u_int32_t num_allocated_flows;
 } ndpi_workflow_t;
 
 
@@ -161,6 +177,6 @@ static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow *
  /* compare two nodes in workflow */
 int ndpi_workflow_node_cmp(const void *a, const void *b);
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow);
-void ethernet_crc32(const void* data, size_t n_bytes, uint32_t* crc);
+u_int32_t ethernet_crc32(const void* data, size_t n_bytes);
 void ndpi_flow_info_freer(void *node);
 #endif

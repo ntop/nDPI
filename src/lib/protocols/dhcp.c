@@ -78,24 +78,43 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 
       while(i < DHCP_VEND_LEN) {
 	u_int8_t id  = dhcp->options[i];
-	if(id == 0xFF) break;
+
+	if(id == 0xFF)
+	  break;
 	else {
 	  u_int8_t len = dhcp->options[i+1];
-	  
+
 	  if(len == 0) break;
-	  
+
 #ifdef DHCP_DEBUG
 	  printf("[DHCP] Id=%d [len=%d]\n", id, len);
 #endif
-	  
+
 	  if(id == 53 /* DHCP Message Type */) {
 	    u_int8_t msg_type = dhcp->options[i+2];
-	    
+
 	    if(msg_type <= 8) foundValidMsgType = 1;
+	  } else if(id == 55 /* Parameter Request List / Fingerprint */) {
+	    u_int idx, offset = 0,
+	      hex_len = ndpi_min(len * 2, sizeof(flow->protos.dhcp.fingerprint));
+
+	    for(idx=0; idx<len; idx++) {
+	      snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
+		       sizeof(flow->protos.dhcp.fingerprint)-offset-1,
+		       "%02X",  dhcp->options[i+2+idx] & 0xFF);
+	      offset += 2;
+	    }
+	  } else if(id == 60 /* Class Identifier */) {
+	    char *name = (char*)&dhcp->options[i+2];
+	    int j = 0;
+
+	    j = ndpi_min(len, sizeof(flow->protos.dhcp.class_ident)-1);
+	    strncpy((char*)flow->protos.dhcp.class_ident, name, j);
+	    flow->protos.dhcp.class_ident[j] = '\0';
 	  } else if(id == 12 /* Host Name */) {
 	    char *name = (char*)&dhcp->options[i+2];
 	    int j = 0;
-	    
+
 #ifdef DHCP_DEBUG
 	    printf("[DHCP] ");
 	    while(j < len) { printf("%c", name[j]); j++; }
@@ -105,6 +124,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 	    strncpy((char*)flow->host_server_name, name, j);
 	    flow->host_server_name[j] = '\0';
 	  }
+
 	  i += len + 2;
 	}
       }

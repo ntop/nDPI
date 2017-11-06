@@ -74,14 +74,14 @@ ndpi_prefix_tochar (prefix_t * prefix)
 }
 
 int ndpi_comp_with_mask (void *addr, void *dest, u_int mask) {
-  if( /* mask/8 == 0 || */ memcmp (addr, dest, mask / 8) == 0) {
-    int n = mask / 8;
-    int m = ((-1) << (8 - (mask % 8)));
-
-    if(mask % 8 == 0 || (((u_char *)addr)[n] & m) == (((u_char *)dest)[n] & m))
-      return (1);
-  }
-  return (0);
+  uint32_t *pa = addr;
+  uint32_t *pd = dest;
+  uint32_t m;
+  for(;mask >= 32; mask -= 32, pa++,pd++)
+        if(*pa != *pd) return 0;
+  if(!mask) return 1;
+  m = htonl((~0u) << (32-mask));
+  return (*pa & m) == (*pd &m);
 }
 
 /* this allows incomplete prefix */

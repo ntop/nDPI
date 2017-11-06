@@ -17,7 +17,7 @@ In order to compile this library do
 
 To run tests do additionally:
 
-- make check
+- cd tests; ./do.sh
 
 Please note that the pre-requisites for compilation include:
 - GNU tools (autogen, automake, autoconf, libtool)
@@ -29,7 +29,7 @@ The entire procedure of adding new protocols in detail:
 
 1. Add new protocol together with its unique ID to: src/include/ndpi_protocol_ids.h
 2. Create a new protocol in: src/lib/protocols/
-3. Variables to be kept for the duration of the entire flow (as state variables) needs to be placed in: /include/ndpi_structs.h in ndpi_flow_tcp_struct (for TCP only), ndpi_flow_udp_struct (for UDP only), or ndpi_flow_struct (for both).
+3. Variables to be kept for the duration of the entire flow (as state variables) need to be placed in: src/include/ndpi_typedefs.h in ndpi_flow_tcp_struct (for TCP only), ndpi_flow_udp_struct (for UDP only), or ndpi_flow_struct (for both).
 4. Add a new entry for the search function for the new protocol in: src/include/ndpi_protocols.h
 5. Choose (do not change anything) a selection bitmask from: src/include/ndpi_define.h
 6. Add a new entry in ndpi_set_protocol_detection_bitmask2 in: src/lib/ndpi_main.c

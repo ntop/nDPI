@@ -32,6 +32,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/collectd.c \
 		     protocols/corba.c \
 		     protocols/crossfire.c \
+		     protocols/csgo.c \
 		     protocols/dcerpc.c \
 		     protocols/dhcp.c \
 		     protocols/dhcpv6.c \
@@ -45,6 +46,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/edonkey.c \
 		     protocols/fasttrack.c \
 		     protocols/fiesta.c \
+		     protocols/fix.c \
 		     protocols/filetopia.c \
 		     protocols/florensia.c \
 		     protocols/ftp_control.c \
@@ -67,9 +69,9 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/kakaotalk_voice.c \
 		     protocols/kerberos.c \
 		     protocols/kontiki.c \
-		     protocols/kxun.c \
 		     protocols/ldap.c \
 		     protocols/lotus_notes.c \
+		     protocols/lisp.c \
 		     protocols/mail_imap.c \
 		     protocols/mail_pop.c \
 		     protocols/mail_smtp.c \
@@ -85,6 +87,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/mysql.c \
 		     protocols/netbios.c \
 		     protocols/netflow.c \
+		     protocols/nintendo.c \
 		     protocols/nfs.c \
 		     protocols/noe.c \
 		     protocols/non_tcp_udp.c \
@@ -158,13 +161,17 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/zattoo.c \
 		     protocols/zeromq.c \
 		     protocols/smpp.c \
+		     protocols/tinc.c \
+		     protocols/someip.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
 		     third_party/include/ndpi_patricia.h \
 		     third_party/include/node.h \
 		     third_party/include/sort.h \
+		     third_party/include/libcache.h \
 		     third_party/src/ahocorasick.c \
 		     third_party/src/node.c \
-		     third_party/src/sort.c
+		     third_party/src/sort.c \
+		     third_party/src/libcache.c
 
 EXTRA_DIST = third_party/src/ndpi_patricia.c

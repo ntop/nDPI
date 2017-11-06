@@ -1,5 +1,9 @@
 #!/bin/sh
 
+NDPI_MAJOR="2"
+NDPI_MINOR="1"
+NDPI_PATCH="0"
+NDPI_VERSION_SHORT="$NDPI_MAJOR.$NDPI_MINOR.$NDPI_PATCH"
 
 /bin/rm -f configure config.h config.h.in src/lib/Makefile.in
 
@@ -29,5 +33,6 @@ if test -z $AUTORECONF; then
     exit
 fi
 
+cat configure.seed | sed "s/@NDPI_MAJOR@/$NDPI_MAJOR/g" | sed "s/@NDPI_MINOR@/$NDPI_MINOR/g" | sed "s/@NDPI_PATCH@/$NDPI_PATCH/g" | sed "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" > configure.ac
 autoreconf -ivf
 ./configure $*
