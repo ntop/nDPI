@@ -641,7 +641,7 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       return;
     } else if((packet->payload_packet_len == 4)
 	      && (packet->payload[0] == 'W')
-	      && (packet->payload[1] == 'A')){
+	      && (packet->payload[1] == 'A')) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
       return;
     } else {
