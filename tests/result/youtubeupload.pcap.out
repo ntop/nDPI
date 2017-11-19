@@ -1,0 +1,5 @@
+YouTubeUpload	137	127038	3
+
+	1	UDP 192.168.2.27:51925 <-> 172.217.23.111:443 [proto: 188.136/QUIC.YouTubeUpload][80 pkts/100473 bytes <-> 20 pkts/6003 bytes][Host: upload.youtube.com]
+	2	UDP 192.168.2.27:62232 <-> 172.217.23.111:443 [proto: 188.136/QUIC.YouTubeUpload][13 pkts/8651 bytes <-> 11 pkts/6463 bytes][Host: upload.youtube.com]
+	3	TCP 192.168.2.27:57452 <-> 172.217.23.111:443 [proto: 91.136/SSL.YouTubeUpload][6 pkts/649 bytes <-> 7 pkts/4799 bytes][client: upload.youtube.com][server: upload.video.google.com]
