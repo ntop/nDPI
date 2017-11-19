@@ -172,7 +172,7 @@
 #define NDPI_PROTOCOL_NETFLIX               133
 #define NDPI_PROTOCOL_LASTFM                134
 #define NDPI_PROTOCOL_WAZE                  135
-#define NDPI_PROTOCOL_SKYFILE_PREPAID       136 /* free for future use */
+#define NDPI_PROTOCOL_YOUTUBE_UPLOAD        136 /* Upload files to youtube */
 #define NDPI_PROTOCOL_SKYFILE_RUDICS        137 /* free for future use */
 #define NDPI_PROTOCOL_SKYFILE_POSTPAID      138 /* free for future use */
 #define NDPI_PROTOCOL_CITRIX_ONLINE         139

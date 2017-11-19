@@ -1372,11 +1372,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Citrix", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 1494, 2598, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_PREPAID,
-			    no_master,
-			    no_master, "SkyFile_PrePaid", NDPI_PROTOCOL_CATEGORY_MAIL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_RUDICS,
 			    no_master,
 			    no_master, "SkyFile_Rudics", NDPI_PROTOCOL_CATEGORY_MAIL,
@@ -4524,8 +4519,7 @@ ndpi_protocol ndpi_find_port_based_protocol(struct ndpi_detection_module_struct 
   /* Skyfile (host 193.252.234.246 or host 10.10.102.80) */
   if((shost == 0xC1FCEAF6) || (dhost == 0xC1FCEAF6)
      || (shost == 0x0A0A6650) || (dhost == 0x0A0A6650)) {
-    if((sport == 4708) || (dport == 4708)) proto.app_protocol = NDPI_PROTOCOL_SKYFILE_PREPAID;
-    else if((sport == 4709) || (dport == 4709)) proto.app_protocol = NDPI_PROTOCOL_SKYFILE_RUDICS;
+    if((sport == 4709) || (dport == 4709)) proto.app_protocol = NDPI_PROTOCOL_SKYFILE_RUDICS;
     else if((sport == 4710) || (dport == 4710)) proto.app_protocol = NDPI_PROTOCOL_SKYFILE_POSTPAID;
   }
 

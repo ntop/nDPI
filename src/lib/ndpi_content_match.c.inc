@@ -8138,6 +8138,8 @@ ndpi_protocol_match host_match[] = {
   { ".yimg.com",                "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "yahooapis.",               "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
+  { "upload.youtube.com",       "YouTubeUpload",    NDPI_PROTOCOL_YOUTUBE_UPLOAD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { "upload.video.google.com",  "YouTubeUpload",    NDPI_PROTOCOL_YOUTUBE_UPLOAD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "youtube.",                 "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "youtu.be.",                "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "yt3.ggpht.com",            "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
