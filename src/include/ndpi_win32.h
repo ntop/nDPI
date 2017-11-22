@@ -24,7 +24,18 @@
 #ifndef __NDPI_WIN32_H__
 #define __NDPI_WIN32_H__
 
+// fix a MinGW build issue "error: multiple storage classes in declaration specifiers" due to MinGW
+// defining extern for __forceinline types
+#if (defined(__MINGW32__) || defined(__MINGW64__)) && defined(__GNUC__)
+// MinGW winnt.h uses FORCEINLINE which is originally defined as __forceinline, but requires extern
+#undef FORCEINLINE
+#define FORCEINLINE extern __inline__ __attribute__((__always_inline__,__gnu_inline__))
+#undef __forceinline
+#define __forceinline __inline__ __attribute__((__always_inline__,__gnu_inline__))
+#endif
+
 #include <winsock2.h>
+#include <windows.h>
 #include <ws2tcpip.h>
 #include <process.h>
 #include <io.h>
@@ -40,7 +51,7 @@
 
 #define	IPVERSION	4 /* on *nix it is defined in netinet/ip.h */ 
 
-extern char* strsep(char **sp, const char *sep);
+extern char* strsep(char **sp, char *sep);
 
 typedef unsigned char  u_char;
 typedef unsigned short u_short;
