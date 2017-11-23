@@ -254,7 +254,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       guessed protocol to STUN      
     */
     flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
-  }
+    return(NDPI_IS_NOT_STUN);
+  }  
 }
 
 void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -313,8 +314,8 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 }
 
 
-void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
-{
+void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
+			 NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("STUN", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_STUN,
 				      ndpi_search_stun,
