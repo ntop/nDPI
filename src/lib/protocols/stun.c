@@ -243,10 +243,18 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     return NDPI_IS_NOT_STUN;
 
  udp_stun_found:
-  if(can_this_be_whatsapp_voice)
+  if(can_this_be_whatsapp_voice) {
     flow->num_stun_udp_pkts++;
 
-  return((flow->num_stun_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
+    return((flow->num_stun_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
+  } else {
+    /*
+      We cannot immediately say that this is STUN as there are other protocols
+      like GoogleHangout that might be candidates, thus we set the
+      guessed protocol to STUN      
+    */
+    flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+  }
 }
 
 void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
