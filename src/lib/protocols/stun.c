@@ -297,12 +297,18 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       ndpi_int_stun_add_connection(ndpi_struct,
 				   is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
     }
+    
     return;
   }
 
   if(flow->num_stun_udp_pkts >= MAX_NUM_STUN_PKTS) {
     NDPI_LOG(NDPI_PROTOCOL_STUN, ndpi_struct, NDPI_LOG_DEBUG, "exclude stun.\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_STUN);
+  }
+
+  if(flow->packet_counter > 0) {
+    /* This might be a RTP stream: let's make sure we check it */
+    NDPI_CLR(&flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
   }
 }
 
