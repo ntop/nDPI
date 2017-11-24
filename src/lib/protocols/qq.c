@@ -81,6 +81,8 @@ static const u_int16_t ndpi_valid_qq_versions[] = {
 	
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
@@ -172,6 +174,8 @@ u_int8_t ndpi_is_valid_qq_packet(const struct ndpi_packet_struct *packet)
 	
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
@@ -428,6 +432,8 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif

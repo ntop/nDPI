@@ -47,6 +47,8 @@ static void ndpi_int_thunder_add_connection(struct ndpi_detection_module_struct 
 	
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
@@ -81,6 +83,8 @@ void ndpi_int_search_thunder_udp(struct ndpi_detection_module_struct
 	
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
@@ -139,6 +143,8 @@ void ndpi_int_search_thunder_tcp(struct ndpi_detection_module_struct
 	
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif

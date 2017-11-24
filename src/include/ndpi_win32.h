@@ -27,11 +27,8 @@
 // fix a MinGW build issue "error: multiple storage classes in declaration specifiers" due to MinGW
 // defining extern for __forceinline types
 #if (defined(__MINGW32__) || defined(__MINGW64__)) && defined(__GNUC__)
-// MinGW winnt.h uses FORCEINLINE which is originally defined as __forceinline, but requires extern
-#undef FORCEINLINE
-#define FORCEINLINE extern __inline__ __attribute__((__always_inline__,__gnu_inline__))
-#undef __forceinline
-#define __forceinline __inline__ __attribute__((__always_inline__,__gnu_inline__))
+#define MINGW_GCC
+#define __mingw_forceinline __inline__ __attribute__((__always_inline__,__gnu_inline__))
 #endif
 
 #include <winsock2.h>

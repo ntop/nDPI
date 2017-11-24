@@ -24,8 +24,10 @@
 
 #ifdef NDPI_PROTOCOL_ZATTOO
 	
-#ifndef WIN32
+#if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
