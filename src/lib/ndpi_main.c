@@ -4655,92 +4655,63 @@ void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ****************************************************** */
 
+static const char* categories[] = {
+   "Unspecified",
+   "Media",
+   "VPN",
+   "DataTransfer",
+   "Email",
+   "Download-FileTransfer-FileSharing",
+   "Web",
+   "SocialNetwork",
+   "Game",
+   "Chat",
+   "VoIP",
+   "Database",
+   "RemoteAccess",
+   "Cloud",
+   "Network",
+   "Collaborative",
+   "RPC",
+   "NetworkTool",
+   "System",
+   "SoftwareUpdate",
+   "",
+   "",
+   "",
+   "",
+   ""
+};
+
 const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod,
 				   ndpi_protocol_category_t category) {
-
   if(!ndpi_mod) return(NULL);
-  
-  switch(category) {
-  case NDPI_PROTOCOL_CATEGORY_MEDIA:
-    return("Media");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_VPN:
-    return("VPN");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER:
-    return("DataTransfer");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_MAIL:
-    return("Email");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT:
-    return("Download-FileTransfer-FileSharing");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_WEB:
-    return("Web");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK:
-    return("SocialNetwork");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_GAME:
-    return("Game");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CHAT:
-    return("Chat");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_VOIP:
-    return("VoIP");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_DATABASE:
-    return("Database");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS:
-    return("RemoteAccess");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CLOUD:
-    return("Cloud");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_NETWORK:
-    return("Network");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_COLLABORATIVE:
-    return("Collaborative");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_RPC:
-    return("RPC");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL:
-    return("NetworkTool");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_SYSTEM_OS:
-    return("System");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
-    return("Unspecified");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_SW_UPDATE:
-    return("SoftwareUpdate");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
-    return(ndpi_mod->custom_category_labels[0]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
-    return(ndpi_mod->custom_category_labels[1]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
-    return(ndpi_mod->custom_category_labels[2]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
-    return(ndpi_mod->custom_category_labels[3]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
-    return(ndpi_mod->custom_category_labels[4]);
-    break;
-  case NDPI_PROTOCOL_NUM_CATEGORIES:
-    return("Code should not use this internal constant");
-    break;
-  }
 
+  if(category < NDPI_PROTOCOL_CATEGORY_CUSTOM_1)
+    return(categories[category]);
+  else {
+    switch(category) {
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
+      return(ndpi_mod->custom_category_labels[0]);
+      break;
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
+      return(ndpi_mod->custom_category_labels[1]);
+      break;
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
+      return(ndpi_mod->custom_category_labels[2]);
+      break;
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
+      return(ndpi_mod->custom_category_labels[3]);
+      break;
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
+      return(ndpi_mod->custom_category_labels[4]);
+      break;
+    case NDPI_PROTOCOL_NUM_CATEGORIES:
+      return("Code should not use this internal constant");
+      break;
+    }
+  }
+  
   return("Unspecified");
 }
 
