@@ -150,6 +150,8 @@ static void ndpi_int_rtp_add_connection(struct ndpi_detection_module_struct
 
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
@@ -164,6 +166,8 @@ void init_seq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow
 
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
