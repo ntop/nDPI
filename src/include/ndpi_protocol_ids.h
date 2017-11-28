@@ -275,6 +275,10 @@
 #define NDPI_PROTOCOL_CSGO                  235 /* Counter-Strike Global Offensive, Dota 2 */
 #define NDPI_PROTOCOL_LISP	            236
 
+/* check_mk */
+#define NDPI_PROTOCOL_CHECKMK               237
+
+
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_LISP
 
