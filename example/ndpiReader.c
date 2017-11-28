@@ -2238,7 +2238,8 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
   pcap_t * pcap_handle = NULL;
 
   /* trying to open a live interface */
-  if((pcap_handle = pcap_open_live((char*)pcap_file, snaplen, promisc, 500, pcap_error_buffer)) == NULL) {
+  if((pcap_handle = pcap_open_live((char*)pcap_file, snaplen, promisc,
+				   500, pcap_error_buffer)) == NULL) {
     capture_for = capture_until = 0;
 
     live_capture = 0;
@@ -2248,28 +2249,32 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
     if((pcap_handle = pcap_open_offline((char*)pcap_file, pcap_error_buffer)) == NULL) {
       char filename[256] = { 0 };
 
-      if(strstr(pcap_file, ".pcap"))
+      if(strstr((char*)pcap_file, (char*)".pcap"))
 	printf("ERROR: could not open pcap file %s: %s\n", pcap_file, pcap_error_buffer);
       else if((getNextPcapFileFromPlaylist(thread_id, filename, sizeof(filename)) != 0)
 	 || ((pcap_handle = pcap_open_offline(filename, pcap_error_buffer)) == NULL)) {
         printf("ERROR: could not open playlist %s: %s\n", filename, pcap_error_buffer);
         exit(-1);
       } else {
-        if((!json_flag) && (!quiet_mode)) printf("Reading packets from playlist %s...\n", pcap_file);
+        if((!json_flag) && (!quiet_mode))
+	  printf("Reading packets from playlist %s...\n", pcap_file);
       }
     } else {
-      if((!json_flag) && (!quiet_mode)) printf("Reading packets from pcap file %s...\n", pcap_file);
+      if((!json_flag) && (!quiet_mode))
+	printf("Reading packets from pcap file %s...\n", pcap_file);
     }
   } else {
     live_capture = 1;
 
-    if((!json_flag) && (!quiet_mode)) printf("Capturing live traffic from device %s...\n", pcap_file);
+    if((!json_flag) && (!quiet_mode))
+      printf("Capturing live traffic from device %s...\n", pcap_file);
   }
 
   configurePcapHandle(pcap_handle);
 
   if(capture_for > 0) {
-    if((!json_flag) && (!quiet_mode)) printf("Capturing traffic up to %u seconds\n", (unsigned int)capture_for);
+    if((!json_flag) && (!quiet_mode))
+      printf("Capturing traffic up to %u seconds\n", (unsigned int)capture_for);
 
 #ifndef WIN32
     alarm(capture_for);

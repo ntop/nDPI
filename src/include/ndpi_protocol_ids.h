@@ -1,3 +1,4 @@
+
 /*
  * ndpi_protocol_ids.h
  *
@@ -174,7 +175,7 @@
 #define NDPI_PROTOCOL_WAZE                  135
 #define NDPI_PROTOCOL_YOUTUBE_UPLOAD        136 /* Upload files to youtube */
 #define NDPI_PROTOCOL_ICQ                   137
-#define NDPI_PROTOCOL_SKYFILE_POSTPAID      138 /* free for future use */
+#define NDPI_PROTOCOL_CHECKMK               138
 #define NDPI_PROTOCOL_CITRIX_ONLINE         139
 #define NDPI_PROTOCOL_APPLE                 140
 #define NDPI_PROTOCOL_WEBEX                 141
@@ -274,10 +275,6 @@
 #define NDPI_PROTOCOL_SOUNDCLOUD            234
 #define NDPI_PROTOCOL_CSGO                  235 /* Counter-Strike Global Offensive, Dota 2 */
 #define NDPI_PROTOCOL_LISP	            236
-
-/* check_mk */
-#define NDPI_PROTOCOL_CHECKMK               237
-
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_LISP
