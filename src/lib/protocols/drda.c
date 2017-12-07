@@ -17,9 +17,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_DRDA
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DRDA
+
+#include "ndpi_api.h"
 
 struct ndpi_drda_hdr {
   u_int16_t length;
@@ -37,6 +41,8 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct * packet = &flow->packet;
   u_int16_t payload_len = packet->payload_packet_len;
   u_int count = 0; // prevent integer overflow
+
+  NDPI_LOG_DBG(ndpi_struct, "search DRDA\n");
   
   if(packet->tcp != NULL) {
 
@@ -71,15 +77,14 @@ void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
 	}
 	if(count != payload_len) goto no_drda;
       }
-      NDPI_LOG(NDPI_PROTOCOL_DRDA, ndpi_struct, NDPI_LOG_DEBUG, "found DRDA.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found DRDA\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DRDA, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
 
  no_drda:
-  NDPI_LOG(NDPI_PROTOCOL_DRDA, ndpi_struct, NDPI_LOG_DEBUG, "exclude DRDA.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DRDA);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

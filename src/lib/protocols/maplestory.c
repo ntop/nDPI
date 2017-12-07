@@ -22,9 +22,13 @@
  * 
  */
 
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_MAPLESTORY
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MAPLESTORY
+
+#include "ndpi_api.h"
 
 static void ndpi_int_maplestory_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -36,16 +40,13 @@ void ndpi_search_maplestory(struct ndpi_detection_module_struct *ndpi_struct, st
 {
 	struct ndpi_packet_struct *packet = &flow->packet;
 	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
-
+	NDPI_LOG_DBG(ndpi_struct, "search maplestory\n");
 
 	if (packet->payload_packet_len == 16
 		&& (ntohl(get_u_int32_t(packet->payload, 0)) == 0x0e003a00 || ntohl(get_u_int32_t(packet->payload, 0)) == 0x0e003b00
 			|| ntohl(get_u_int32_t(packet->payload, 0)) == 0x0e004200)
 		&& ntohs(get_u_int16_t(packet->payload, 4)) == 0x0100 && (packet->payload[6] == 0x32 || packet->payload[6] == 0x33)) {
-		NDPI_LOG(NDPI_PROTOCOL_MAPLESTORY, ndpi_struct, NDPI_LOG_DEBUG, "found maplestory.\n");
+		NDPI_LOG_INFO(ndpi_struct, "found maplestory\n");
 		ndpi_int_maplestory_add_connection(ndpi_struct, flow);
 		return;
 	}
@@ -63,7 +64,7 @@ void ndpi_search_maplestory(struct ndpi_detection_module_struct *ndpi_struct, st
 						  NDPI_STATICSTRING_LEN("patch")) == 0
 				&& memcmp(packet->user_agent_line.ptr, "Patcher", NDPI_STATICSTRING_LEN("Patcher")) == 0
 				&& memcmp(packet->host_line.ptr, "patch.", NDPI_STATICSTRING_LEN("patch.")) == 0) {
-				NDPI_LOG(NDPI_PROTOCOL_MAPLESTORY, ndpi_struct, NDPI_LOG_DEBUG, "found maplestory update.\n");
+				NDPI_LOG_INFO(ndpi_struct, "found maplestory update\n");
 				ndpi_int_maplestory_add_connection(ndpi_struct, flow);
 				return;
 			}
@@ -71,14 +72,13 @@ void ndpi_search_maplestory(struct ndpi_detection_module_struct *ndpi_struct, st
 				   && memcmp(&packet->payload[NDPI_STATICSTRING_LEN("GET /maple")], "story/",
 							 NDPI_STATICSTRING_LEN("story/")) == 0
 				   && memcmp(packet->user_agent_line.ptr, "AspINet", NDPI_STATICSTRING_LEN("AspINet")) == 0) {
-			NDPI_LOG(NDPI_PROTOCOL_MAPLESTORY, ndpi_struct, NDPI_LOG_DEBUG, "found maplestory update.\n");
+			NDPI_LOG_INFO(ndpi_struct, "found maplestory update\n");
 			ndpi_int_maplestory_add_connection(ndpi_struct, flow);
 			return;
 		}
 	}
 
-	NDPI_LOG(NDPI_PROTOCOL_MAPLESTORY, ndpi_struct, NDPI_LOG_DEBUG, "exclude maplestory.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MAPLESTORY);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
 }
 

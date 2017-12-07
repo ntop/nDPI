@@ -77,7 +77,9 @@ static json_object *jArray_topStats;
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
-static u_int8_t enable_protocol_guess = 1, verbose = 0, nDPI_traceLevel = 0, json_flag = 0;
+static u_int8_t enable_protocol_guess = 1, verbose = 0, json_flag = 0;
+int nDPI_LogLevel = 0;
+char *_debug_protocols = NULL;
 static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
 #ifdef HAVE_JSON_C
 static u_int8_t file_first_time = 1;
@@ -251,9 +253,12 @@ static void help(u_int long_help) {
 	 "                            | 1 = verbose\n"
 	 "                            | 2 = very verbose\n"
 	 "                            | 3 = port stats\n"
-         "  -b <file.json>            | Specify a file to write port based diagnose statistics\n"
-         "  -x <file.json>            | Produce bpf filters for specified diagnose file. Use\n"
-         "                            | this option only for .json files generated with -b flag.\n");
+	 "  -V <1-4>                  | nDPI logging level\n"
+	 "                            | 1 - trace, 2 - debug, 3 - full debug\n"
+	 "                            | >3 - full debug + dbg_proto = all\n"
+	 "  -b <file.json>            | Specify a file to write port based diagnose statistics\n"
+	 "  -x <file.json>            | Produce bpf filters for specified diagnose file. Use\n"
+	 "                            | this option only for .json files generated with -b flag.\n");
 
 
 #ifndef WIN32
@@ -267,6 +272,7 @@ static void help(u_int long_help) {
 	 "  --extcap-capture-filter\n"
 	 "  --fifo <path to file or pipe>\n"
 	 "  --debug\n"
+	 "  --dbg-proto proto|num[,...]\n"
 	 );
 #endif
 
@@ -289,7 +295,8 @@ static struct option longopts[] = {
   { "capture", no_argument, NULL, '5'},
   { "extcap-capture-filter", required_argument, NULL, '6'},
   { "fifo", required_argument, NULL, '7'},
-  { "debug", optional_argument, NULL, '8'},
+  { "debug", no_argument, NULL, '8'},
+  { "dbg-proto", required_argument, NULL, 257},
   { "ndpi-proto-filter", required_argument, NULL, '9'},
 
   /* ndpiReader options */
@@ -515,8 +522,12 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'V':
-      printf("%d\n",atoi(optarg) );
-      nDPI_traceLevel  = atoi(optarg);
+      nDPI_LogLevel  = atoi(optarg);
+      if(nDPI_LogLevel < 0) nDPI_LogLevel = 0;
+      if(nDPI_LogLevel > 3) {
+	 nDPI_LogLevel = 3;
+      	 _debug_protocols = strdup("all");
+      }
       break;
 
     case 'h':
@@ -542,6 +553,7 @@ static void parseOptions(int argc, char **argv) {
 
     case 'q':
       quiet_mode = 1;
+      nDPI_LogLevel = 0;
       break;
 
       /* Extcap */
@@ -570,12 +582,17 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case '8':
-      nDPI_traceLevel = 9;
+      nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
+      _debug_protocols = strdup("all");
       break;
 
     case '9':
       extcap_packet_filter = ndpi_get_proto_by_name(ndpi_info_mod, optarg);
       if (extcap_packet_filter == NDPI_PROTOCOL_UNKNOWN) extcap_packet_filter = atoi(optarg);
+      break;
+    
+    case 257:
+      _debug_protocols = strdup(optarg);
       break;
 
     default:
@@ -982,7 +999,6 @@ void updateTopIpAddress(u_int32_t addr, u_int8_t version, const char *proto,
   int min = count;
   int update = 0;
   int min_i = 0;
-  int r;
   int i;
 
   if(count == 0) return;
@@ -1116,6 +1132,7 @@ static struct receiver *cutBackTo(struct receiver **receivers, u_int32_t size, u
   }
 
   return(NULL);
+
 }
 
 /* *********************************************** */
@@ -1380,7 +1397,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
   struct tm result;
 #endif
 
-  if(log_level <= nDPI_traceLevel) {
+  if(log_level <= nDPI_LogLevel) {
     char buf[8192], out_buf[8192];
     char theDate[32];
     const char *extra_msg = "";

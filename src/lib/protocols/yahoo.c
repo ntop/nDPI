@@ -20,9 +20,12 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_YAHOO
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_YAHOO
+#include "ndpi_api.h"
+
 
 
 struct ndpi_yahoo_header {
@@ -89,8 +92,6 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
   struct ndpi_id_struct *dst = flow->dst;
 
   const struct ndpi_yahoo_header *yahoo = (struct ndpi_yahoo_header *) packet->payload;
-  
-  if(packet->tcp) {
 
     if(packet->payload_packet_len > 0) {
       /* packet must be at least 20 bytes long */
@@ -98,11 +99,11 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	 && memcmp(yahoo->YMSG_str, "YMSG", 4) == 0 && ((packet->payload_packet_len - 20) == ntohs(yahoo->len)
 							|| check_ymsg(packet->payload, packet->payload_packet_len))) {
      
-	NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO FOUND\n");
+	NDPI_LOG_DBG(ndpi_struct, "YAHOO FOUND\n");
 	flow->yahoo_detection_finished = 2;
 
 	if(ntohs(yahoo->service) == 24 || ntohs(yahoo->service) == 152 || ntohs(yahoo->service) == 74) {
-	  NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO conference or chat invite  found");
+	  NDPI_LOG_DBG(ndpi_struct, "YAHOO conference or chat invite  found");
 
 	  if(src != NULL)
 	    src->yahoo_conf_logged_in = 1;
@@ -110,13 +111,13 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	    dst->yahoo_conf_logged_in = 1;
 	}
 	if(ntohs(yahoo->service) == 27 || ntohs(yahoo->service) == 155 || ntohs(yahoo->service) == 160) {
-	  NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO conference or chat logoff found");
+	  NDPI_LOG_DBG(ndpi_struct, "YAHOO conference or chat logoff found");
 	  if(src != NULL) {
 	    src->yahoo_conf_logged_in = 0;
 	    src->yahoo_voice_conf_logged_in = 0;
 	  }
 	}
-	NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	NDPI_LOG_INFO(ndpi_struct, "found YAHOO");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	return;
 	
@@ -142,7 +143,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 			&& NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_YAHOO)
 			!= 0)) {
 	    /* this is mostly a file transfer */
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
@@ -153,7 +154,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 
 	  if ((packet->user_agent_line.len >= 21)
 	      && (memcmp(packet->user_agent_line.ptr, "YahooMobileMessenger/", 21) == 0)) {
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO(Mobile)");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO(Mobile)");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
@@ -171,27 +172,23 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	      && memcmp(packet->line[4].ptr, "User-Agent: Mozilla/5.0",
 			23) == 0 && packet->line[5].len >= 23
 	      && memcmp(packet->line[5].ptr, "Cache-Control: no-cache", 23) == 0) {
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE,
-		     "YAHOO HTTP POST P2P FILETRANSFER FOUND\n");
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO HTTP POST P2P FILETRANSFER\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
 
 	  if (packet->host_line.ptr != NULL && packet->host_line.len >= 26 &&
 	      memcmp(packet->host_line.ptr, "filetransfer.msg.yahoo.com", 26) == 0) {
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO HTTP POST FILETRANSFER FOUND\n");
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO HTTP POST FILETRANSFER\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
 	  /* now check every line */
 	  for (a = 0; a < packet->parsed_lines; a++) {
 	    if (packet->line[a].len >= 4 && memcmp(packet->line[a].ptr, "YMSG", 4) == 0) {
-	      NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct,
-		       NDPI_LOG_TRACE,
+	      NDPI_LOG_DBG(ndpi_struct,
 		       "YAHOO HTTP POST FOUND, line is: %.*s\n", packet->line[a].len, packet->line[a].ptr);
-	      NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	      NDPI_LOG_INFO(ndpi_struct, "found YAHOO");
 	      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	      return;
 	    }
@@ -199,8 +196,8 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	  if (packet->parsed_lines > 8 && packet->line[8].len > 250 && packet->line[8].ptr != NULL) {
 	    if (memcmp(packet->line[8].ptr, "<Session ", 9) == 0) {
 	      if (ndpi_check_for_YmsgCommand(packet->line[8].len, packet->line[8].ptr)) {
-		NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG,
-			 "found HTTP Proxy Yahoo Chat <Ymsg Command= pattern  \n");
+		NDPI_LOG_INFO(ndpi_struct,
+			 "found YAHOO HTTP Proxy Yahoo Chat <Ymsg Command= pattern  \n");
 		ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 		return;
 	      }
@@ -211,8 +208,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	  if((src != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_YAHOO) != 0)
 	     || (dst != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_YAHOO) != 0)) {
 	    
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO HTTP GET /Messenger. match\n");
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO HTTP GET /Messenger. match\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
@@ -224,13 +220,13 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	      && memcmp(packet->user_agent_line.ptr, "YahooMobileMessenger/", NDPI_STATICSTRING_LEN("YahooMobileMessenger/")) == 0)
 	     || (packet->user_agent_line.len >= 15 && (memcmp(packet->user_agent_line.ptr, "Y!%20Messenger/", 15) == 0))) {
 	    
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO(Mobile)");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO(Mobile)");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
 	  if(packet->host_line.ptr != NULL && packet->host_line.len >= NDPI_STATICSTRING_LEN("msg.yahoo.com") &&
 	     memcmp(&packet->host_line.ptr[packet->host_line.len - NDPI_STATICSTRING_LEN("msg.yahoo.com")], "msg.yahoo.com", NDPI_STATICSTRING_LEN("msg.yahoo.com")) == 0) {
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
@@ -244,10 +240,10 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	
 	if (packet->parsed_lines > 2 && packet->line[1].len == 0) {
 	  
-	  NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "first line is empty.\n");
+	  NDPI_LOG_DBG(ndpi_struct, "first line is empty\n");
 	  if (packet->line[2].len > 13 && memcmp(packet->line[2].ptr, "<Ymsg Command=", 14) == 0) {
 
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO web chat found\n");
+	    NDPI_LOG_INFO(ndpi_struct, "YAHOO web chat found\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
@@ -256,8 +252,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 
       if (packet->payload_packet_len > 38 && memcmp(packet->payload, "CONNECT scs.msg.yahoo.com:5050 HTTP/1.", 38) == 0) {
 	
-	NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO-HTTP FOUND\n");
-	NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	NDPI_LOG_INFO(ndpi_struct, "found YAHOO-HTTP\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
@@ -266,7 +261,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	  || (dst != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_YAHOO) != 0)) {
 	if (packet->payload_packet_len == 6 && memcmp(packet->payload, "YAHOO!", 6) == 0) {
 	  
-	  NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	  NDPI_LOG_INFO(ndpi_struct, "found YAHOO");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	  return;
 	}
@@ -276,8 +271,6 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	if (packet->payload_packet_len == 8 && (memcmp(packet->payload, "<SNDIMG>", 8) == 0 || memcmp(packet->payload, "<REQIMG>", 8) == 0
 						|| memcmp(packet->payload, "<RVWCFG>", 8) == 0 || memcmp(packet->payload, "<RUPCFG>", 8) == 0)) {
 	  
-	  NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_TRACE, "YAHOO SNDIMG or REQIMG or RVWCFG or RUPCFG FOUND\n");
-
 	  if(src != NULL) {
 	    if (memcmp(packet->payload, "<SNDIMG>", 8) == 0) {
 	      src->yahoo_video_lan_dir = 0;
@@ -295,7 +288,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	    dst->yahoo_video_lan_timer = packet->tick_timestamp;
 
 	  }
-	  NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO subtype VIDEO");
+	  NDPI_LOG_INFO(ndpi_struct, "found YAHOO subtype VIDEO");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 	  return;
 	}
@@ -304,9 +297,8 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	  
 	  if (src->yahoo_video_lan_dir == 1) {
 
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO IMG MARKED");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "IMG MARKED");
 	    return;
 	  }
 	}
@@ -314,9 +306,8 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	    && ((u_int32_t) (packet->tick_timestamp - dst->yahoo_video_lan_timer) < ndpi_struct->yahoo_lan_video_timeout)) {
 	  if (dst->yahoo_video_lan_dir == 0) {
 	    
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO");
+	    NDPI_LOG_INFO(ndpi_struct, "found YAHOO IMG MARKED");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "IMG MARKED");
 	    return;
 	  }
 	}
@@ -328,8 +319,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	{
 	  if (flow->l4.tcp.yahoo_http_proxy_stage == 0) {
 	    
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG,
-		     "YAHOO maybe HTTP proxy packet 1 => need next packet\n");
+	    NDPI_LOG_DBG2(ndpi_struct, "YAHOO maybe HTTP proxy packet 1 => need next packet\n");
 	    flow->l4.tcp.yahoo_http_proxy_stage = 1 + packet->packet_direction;
 	    return;
 	  }
@@ -337,12 +327,12 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	    if ((packet->payload_packet_len > 250) && (memcmp(packet->payload, "<Session ", 9) == 0)) {
 	      if (ndpi_check_for_YmsgCommand(packet->payload_packet_len, packet->payload)) {
 		
-		NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found HTTP Proxy Yahoo Chat <Ymsg Command= pattern  \n");
+		NDPI_LOG_INFO(ndpi_struct, "found HTTP Proxy Yahoo Chat <Ymsg Command= pattern  \n");
 		ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 		return;
 	      }
 	    }
-	    NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "YAHOO maybe HTTP proxy still initial direction => need next packet\n");
+	    NDPI_LOG_DBG2(ndpi_struct, "YAHOO maybe HTTP proxy still initial direction => need next packet\n");
 	    return;
 	  }
 	  if (flow->l4.tcp.yahoo_http_proxy_stage == 2 - packet->packet_direction) {
@@ -356,7 +346,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 		  memcmp(packet->line[4].ptr, "<Session ", 9) == 0 &&
 		  memcmp(packet->line[8].ptr, "<Ymsg ", 6) == 0) {
 
-		NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "found YAHOO over HTTP proxy");
+		NDPI_LOG_INFO(ndpi_struct, "found YAHOO over HTTP proxy");
 		ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_UNKNOWN);
 		return;
 	      }
@@ -364,16 +354,15 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	  }
 	}
     }
-    /* exclude YAHOO */
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_YAHOO);
-  }
+
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void ndpi_search_yahoo(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_YAHOO, ndpi_struct, NDPI_LOG_DEBUG, "search yahoo\n");
+  NDPI_LOG_DBG(ndpi_struct, "search yahoo\n");
   
   if(packet->payload_packet_len > 0 && flow->yahoo_detection_finished == 0) {
 
@@ -387,13 +376,16 @@ void ndpi_search_yahoo(struct ndpi_detection_module_struct *ndpi_struct, struct 
 #ifdef NDPI_PROTOCOL_SSL
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) {
 #endif
+        /* search over TCP */
 	ndpi_search_yahoo_tcp(ndpi_struct, flow);
       }
     }
     /* search over UDP */
     else if(packet->udp != NULL) {
-      if(flow->src == NULL || NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->src->detected_protocol_bitmask, NDPI_PROTOCOL_YAHOO) == 0)
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_YAHOO);
+      if ( flow->src == NULL || 
+	   NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->src->detected_protocol_bitmask, NDPI_PROTOCOL_YAHOO) == 0) {
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      }
       return;
     }
   }

@@ -17,13 +17,16 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_ZMQ
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_ZMQ
+
+#include "ndpi_api.h"
 
 static void ndpi_int_zmq_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ, NDPI_PROTOCOL_UNKNOWN);
-  NDPI_LOG(NDPI_PROTOCOL_ZMQ, ndpi_struct, NDPI_LOG_TRACE, "ZMQ Found.\n");
+  NDPI_LOG_INFO(ndpi_struct, "found ZMQ\n");
 }
 
 
@@ -39,8 +42,7 @@ static void ndpi_check_zmq(struct ndpi_detection_module_struct *ndpi_struct, str
 
   /* Break after 17 packets. */
   if(flow->packet_counter > 17) {
-    NDPI_LOG(NDPI_PROTOCOL_ZMQ, ndpi_struct, NDPI_LOG_TRACE, "Exclude ZMQ.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_ZMQ);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
@@ -85,7 +87,7 @@ static void ndpi_check_zmq(struct ndpi_detection_module_struct *ndpi_struct, str
 void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_ZMQ, ndpi_struct, NDPI_LOG_TRACE, "ZMQ detection...\n");
+  NDPI_LOG_DBG(ndpi_struct, "search ZMQ\n");
 
   /* skip marked packets */
   if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_ZMQ) {

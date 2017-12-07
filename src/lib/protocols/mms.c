@@ -23,9 +23,13 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_CONTENT_MMS
+
+#define NDPI_CURRENT_PROTO NDPI_CONTENT_MMS
+
+#include "ndpi_api.h"
 
 
 static void ndpi_int_mms_add_connection(struct ndpi_detection_module_struct
@@ -39,9 +43,7 @@ void ndpi_search_mms_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
+  NDPI_LOG_DBG(ndpi_struct, "search MMS\n");
 
   /* search MSMMS packets */
   if (packet->payload_packet_len >= 20) {
@@ -49,7 +51,7 @@ void ndpi_search_mms_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	&& packet->payload[5] == 0xfa && packet->payload[6] == 0x0b
 	&& packet->payload[7] == 0xb0 && packet->payload[12] == 0x4d
 	&& packet->payload[13] == 0x4d && packet->payload[14] == 0x53 && packet->payload[15] == 0x20) {
-      NDPI_LOG(NDPI_CONTENT_MMS, ndpi_struct, NDPI_LOG_DEBUG, "MMS: MSMMS Request found \n");
+      NDPI_LOG_INFO(ndpi_struct, "found MMS: MSMMS Request \n");
       flow->l4.tcp.mms_stage = 1 + packet->packet_direction;
       return;
     }
@@ -59,7 +61,7 @@ void ndpi_search_mms_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	&& packet->payload[6] == 0x0b && packet->payload[7] == 0xb0
 	&& packet->payload[12] == 0x4d && packet->payload[13] == 0x4d
 	&& packet->payload[14] == 0x53 && packet->payload[15] == 0x20) {
-      NDPI_LOG(NDPI_CONTENT_MMS, ndpi_struct, NDPI_LOG_DEBUG, "MMS: MSMMS Response found \n");
+      NDPI_LOG_INFO(ndpi_struct, "found MMS: MSMMS Response \n");
       ndpi_int_mms_add_connection(ndpi_struct, flow);
       return;
     }
@@ -67,12 +69,11 @@ void ndpi_search_mms_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 #ifdef NDPI_PROTOCOL_HTTP
   if (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0) {
 #endif							/* NDPI_PROTOCOL_HTTP */
-    NDPI_LOG(NDPI_CONTENT_MMS, ndpi_struct, NDPI_LOG_DEBUG, "MMS: exclude\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_MMS);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
 #ifdef NDPI_PROTOCOL_HTTP
   } else {
-    NDPI_LOG(NDPI_CONTENT_MMS, ndpi_struct, NDPI_LOG_DEBUG, "MMS avoid early exclude from http\n");
+    NDPI_LOG_DBG(ndpi_struct, "MMS avoid early exclude from http\n");
   }
 #endif							/* NDPI_PROTOCOL_HTTP */
 

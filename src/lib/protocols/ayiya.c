@@ -26,9 +26,13 @@
   http://tools.ietf.org/html/rfc4891
 */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_AYIYA
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_AYIYA
+
+#include "ndpi_api.h"
 
 struct ayiya {
   u_int8_t flags[3];
@@ -41,6 +45,8 @@ struct ayiya {
 void ndpi_search_ayiya(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
+
+  NDPI_LOG_DBG(ndpi_struct, "search AYIYA\n");
 
   if(packet->udp && (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)) {
     /* Ayiya is udp based, port 5072 */
@@ -55,13 +61,15 @@ void ndpi_search_ayiya(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
       now = flow->packet.tick_timestamp;
 
-      if((epoch >= (now - fiveyears)) && (epoch <= (now+86400 /* 1 day */)))      
+      if((epoch >= (now - fiveyears)) && (epoch <= (now+86400 /* 1 day */))) {
+	NDPI_LOG_INFO(ndpi_struct, "found AYIYA\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AYIYA, NDPI_PROTOCOL_UNKNOWN);
+      }
 
       return;
     }
 
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_AYIYA);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 

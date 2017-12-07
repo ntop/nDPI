@@ -22,10 +22,14 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_SIP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SIP
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_SIP
 static void ndpi_int_sip_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow,
 					u_int8_t due_to_correlation) {
@@ -43,18 +47,14 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 			       *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
   const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
-
 
   if (payload_len > 4) {
     /* search for STUN Turn ChannelData Prefix */
     u_int16_t message_len = ntohs(get_u_int16_t(packet->payload, 2));
     if (payload_len - 4 == message_len) {
-      NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found STUN TURN ChannelData prefix.\n");
+      NDPI_LOG_DBG2(ndpi_struct, "found STUN TURN ChannelData prefix\n");
       payload_len -= 4;
       packet_payload += 4;
     }
@@ -70,7 +70,7 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 	if ((memcmp(packet_payload, "NOTIFY ", 7) == 0 || memcmp(packet_payload, "notify ", 7) == 0)
 	    && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
 
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip NOTIFY.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip NOTIFY\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
@@ -78,14 +78,14 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 	if ((memcmp(packet_payload, "REGISTER ", 9) == 0 || memcmp(packet_payload, "register ", 9) == 0)
 	    && (memcmp(&packet_payload[9], "SIP:", 4) == 0 || memcmp(&packet_payload[9], "sip:", 4) == 0)) {
 
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip REGISTER.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip REGISTER\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
 
 	if ((memcmp(packet_payload, "INVITE ", 7) == 0 || memcmp(packet_payload, "invite ", 7) == 0)
 	    && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip INVITE.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip INVITE\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
@@ -97,34 +97,34 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 
 	/*
 	if (memcmp(packet_payload, "SIP/2.0 200 OK", 14) == 0 || memcmp(packet_payload, "sip/2.0 200 OK", 14) == 0) {
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip SIP/2.0 0K.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip SIP/2.0 0K\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
         */
         if (memcmp(packet_payload, "SIP/2.0 ", 8) == 0 || memcmp(packet_payload, "sip/2.0 ", 8) == 0) {
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip SIP/2.0 *.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip SIP/2.0 *\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
 
         if ((memcmp(packet_payload, "BYE ", 4) == 0 || memcmp(packet_payload, "bye ", 4) == 0)
 	    && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip BYE.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip BYE\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
 
         if ((memcmp(packet_payload, "ACK ", 4) == 0 || memcmp(packet_payload, "ack ", 4) == 0)
 	    && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip ACK.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip ACK\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
 
         if ((memcmp(packet_payload, "CANCEL ", 7) == 0 || memcmp(packet_payload, "cancel ", 7) == 0)
 	    && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip CANCEL.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip CANCEL\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
@@ -134,7 +134,7 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 	     || memcmp(packet_payload, "options ", 8) == 0)
 	    && (memcmp(&packet_payload[8], "SIP:", 4) == 0
 		|| memcmp(&packet_payload[8], "sip:", 4) == 0)) {
-	  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "found sip OPTIONS.\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found sip OPTIONS\n");
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
@@ -143,19 +143,19 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
   /* add bitmask for tcp only, some stupid udp programs
    * send a very few (< 10 ) packets before invite (mostly a 0x0a0x0d, but just search the first 3 payload_packets here */
   if (packet->udp != NULL && flow->packet_counter < 20) {
-    NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "need next packet.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "need next packet\n");
     return;
   }
 #ifdef NDPI_PROTOCOL_STUN
   /* for STUN flows we need some more packets */
   if (packet->udp != NULL && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN && flow->packet_counter < 40) {
-    NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "need next STUN packet.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "need next STUN packet\n");
     return;
   }
 #endif
 
   if (payload_len == 4 && get_u_int32_t(packet_payload, 0) == 0) {
-    NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "maybe sip. need next packet.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "maybe sip. need next packet\n");
     return;
   }
 #ifdef NDPI_PROTOCOL_YAHOO
@@ -163,27 +163,21 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
       && packet_payload[3] == payload_len - 20 && get_u_int32_t(packet_payload, 4) == 0
       && get_u_int32_t(packet_payload, 8) == 0) {
     flow->sip_yahoo_voice = 1;
-    NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "maybe sip yahoo. need next packet.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "maybe sip yahoo. need next packet\n");
   }
   if (flow->sip_yahoo_voice && flow->packet_counter < 10) {
     return;
   }
 #endif
-  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "exclude sip.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SIP);
-  return;
-
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
 }
 
 void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  //  struct ndpi_flow_struct   *flow = ndpi_struct->flow;
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-  NDPI_LOG(NDPI_PROTOCOL_SIP, ndpi_struct, NDPI_LOG_DEBUG, "sip detection...\n");
+  NDPI_LOG_DBG(ndpi_struct, "search sip\n");
 
   /* skip marked packets */
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {

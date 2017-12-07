@@ -23,8 +23,14 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
+
 #ifdef NDPI_PROTOCOL_PCANYWHERE
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_PCANYWHERE
+
+#include "ndpi_api.h"
+
 
 static void ndpi_int_pcanywhere_add_connection(struct ndpi_detection_module_struct
 					       *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -37,19 +43,15 @@ void ndpi_search_pcanywhere(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
   if (packet->udp != NULL && packet->udp->dest == htons(5632)
       && packet->payload_packet_len == 2
       && (memcmp(packet->payload, "NQ", 2) == 0 || memcmp(packet->payload, "ST", 2) == 0)) {
-    NDPI_LOG(NDPI_PROTOCOL_PCANYWHERE, ndpi_struct, NDPI_LOG_DEBUG,
-	     "PC Anywhere name or status query detected.\n");
+    NDPI_LOG_INFO(ndpi_struct, "PC Anywhere name or status query detected\n");
     ndpi_int_pcanywhere_add_connection(ndpi_struct, flow);
     return;
   }
 
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_PCANYWHERE);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

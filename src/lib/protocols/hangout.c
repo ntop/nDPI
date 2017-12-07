@@ -17,9 +17,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "ndpi_api.h"
+
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_HANGOUT
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HANGOUT
+
+#include "ndpi_api.h"
+
 
 /* https://support.google.com/a/answer/1279090?hl=en */
 #define HANGOUT_UDP_LOW_PORT  19302
@@ -73,19 +79,20 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
 			 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct * packet = &flow->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search Hangout\n");
+
   if((packet->payload_packet_len > 24) && is_google_flow(ndpi_struct, flow)) {
     if(
        ((packet->udp != NULL) && (isHangoutUDPPort(ntohs(packet->udp->source)) || isHangoutUDPPort(ntohs(packet->udp->dest))))
        ||
        ((packet->tcp != NULL) && (isHangoutTCPPort(ntohs(packet->tcp->source)) || isHangoutTCPPort(ntohs(packet->tcp->dest))))) {
-      NDPI_LOG(NDPI_PROTOCOL_HANGOUT, ndpi_struct, NDPI_LOG_DEBUG, "Found Hangout.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found Hangout\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
   
-  NDPI_LOG(NDPI_PROTOCOL_HANGOUT, ndpi_struct, NDPI_LOG_DEBUG, "No Hangout.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HANGOUT);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 /* ***************************************************************** */

@@ -22,9 +22,13 @@
  * 
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_SYSLOG
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SYSLOG
+
+#include "ndpi_api.h"
 
 static void ndpi_int_syslog_add_connection(struct ndpi_detection_module_struct
 					   *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -36,45 +40,41 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 			*ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-	
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
   u_int8_t i;
 
-  NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "search syslog\n");
+  NDPI_LOG_DBG(ndpi_struct, "search syslog\n");
 
   if (packet->payload_packet_len > 20 && packet->payload_packet_len <= 1024 && packet->payload[0] == '<') {
-    NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "checked len>20 and <1024 and first symbol=<.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "checked len>20 and <1024 and first symbol=<\n");
 
     for (i = 1; i <= 3; i++) {
       if (packet->payload[i] < '0' || packet->payload[i] > '9') {
 		break;
       }
     }
-    NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG,
+    NDPI_LOG_DBG2(ndpi_struct,
              "read symbols while the symbol is a number.\n");
 
     if (packet->payload[i++] != '>') {
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "there is no > following the number.\n");
+      NDPI_LOG_DBG(ndpi_struct, "excluded, there is no > following the number\n");
       NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SYSLOG);
       return;
     } else {
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "a > following the number.\n");
+      NDPI_LOG_DBG2(ndpi_struct, "a > following the number\n");
     }
 
     if (packet->payload[i] == 0x20) {
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "a blank following the >: increment i.\n");
+      NDPI_LOG_DBG2(ndpi_struct, "a blank following the >: increment i\n");
       i++;
     } else {
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "no blank following the >: do nothing.\n");
+      NDPI_LOG_DBG2(ndpi_struct, "no blank following the >: do nothing\n");
     }
 
     /* check for "last message repeated" */
     if (i + sizeof("last message") - 1 <= packet->payload_packet_len &&
 	memcmp(packet->payload + i, "last message", sizeof("last message") - 1) == 0) {
 
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "found syslog by 'last message' string.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found syslog by 'last message' string\n");
 
       ndpi_int_syslog_add_connection(ndpi_struct, flow);
 
@@ -84,7 +84,7 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 
       /* snort events */
 
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "found syslog by 'snort: ' string.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found syslog by 'snort: ' string\n");
 
       ndpi_int_syslog_add_connection(ndpi_struct, flow);
 
@@ -103,27 +103,20 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 	&& memcmp(&packet->payload[i], "Oct", 3) != 0
 	&& memcmp(&packet->payload[i], "Nov", 3) != 0 && memcmp(&packet->payload[i], "Dec", 3) != 0) {
 
-
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG,
-	       "no month-shortname following: syslog excluded.\n");
-
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SYSLOG);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
       return;
 
     } else {
 
-      NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG,
-	       "a month-shortname following: syslog detected.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found syslog\n");
 
       ndpi_int_syslog_add_connection(ndpi_struct, flow);
 
       return;
     }
   }
-  NDPI_LOG(NDPI_PROTOCOL_SYSLOG, ndpi_struct, NDPI_LOG_DEBUG, "no syslog detected.\n");
-
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SYSLOG);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
