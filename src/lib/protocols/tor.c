@@ -21,14 +21,23 @@ static void ndpi_int_tor_add_connection(struct ndpi_detection_module_struct
 
 
 int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
-		    struct ndpi_flow_struct *flow, char *certificate) {
-  
+		    struct ndpi_flow_struct *flow, char *certificate) {  
   int prev_num = 0, numbers_found = 0, num_found = 0, i, len;
   char dummy[48], *dot, *name;
 
-  if((certificate == NULL)
-     || (strlen(certificate) < 6)
-     || (strncmp(certificate, "www.", 4)))
+  if(certificate == NULL)
+    return(0);
+  else
+    len = strlen(certificate);
+
+  /* Check if it ends in .com or .net */
+  if(strcmp(&certificate[len-4], ".com") && strcmp(&certificate[len-4], ".net"))
+    return(0);
+  
+  if((len < 6)
+     || (!strncmp(certificate, "*.", 2))  /* Wildcard certificate */
+     || (strncmp(certificate, "www.", 4)) /* Not starting with www.... */
+     )
     return(0);
 
   // printf("***** [SSL] %s(): %s\n", __FUNCTION__, certificate);
@@ -60,13 +69,12 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
       } else
 	prev_num = 0;
 
-      if(ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, &name[i])) {
-	ndpi_int_tor_add_connection(ndpi_struct, flow);
-	return(1);
-      }
-
+      
       if(ndpi_match_bigram(ndpi_struct, &ndpi_struct->bigrams_automa, &name[i])) {
 	num_found++;
+      } else if(ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, &name[i])) {
+	ndpi_int_tor_add_connection(ndpi_struct, flow);
+	return(1);
       }
     }
 

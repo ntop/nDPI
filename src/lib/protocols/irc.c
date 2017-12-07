@@ -44,8 +44,11 @@ static void ndpi_int_irc_add_connection(struct ndpi_detection_module_struct *ndp
 }
 
 	
+
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif

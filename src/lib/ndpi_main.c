@@ -1169,7 +1169,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
     custom_master[0] = NDPI_PROTOCOL_SIP, custom_master[1] = NDPI_PROTOCOL_H323;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_STUN,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_STUN,
 			    no_master,
 			    custom_master, "STUN", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1271,6 +1271,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "AFP", NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,
 			    ndpi_build_default_ports(ports_a, 548, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 548, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CHECKMK,
+                            no_master,
+                            no_master, "CHECKMK", NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,
+                            ndpi_build_default_ports(ports_a, 6556, 0, 0, 0, 0) /* TCP */,
+                            ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_STEALTHNET,
 			    no_master,
 			    no_master, "Stealthnet", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
@@ -1400,21 +1405,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master,
 			    no_master, "Citrix", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 1494, 2598, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_PREPAID,
-			    no_master,
-			    no_master, "SkyFile_PrePaid", NDPI_PROTOCOL_CATEGORY_MAIL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_RUDICS,
-			    no_master,
-			    no_master, "SkyFile_Rudics", NDPI_PROTOCOL_CATEGORY_MAIL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYFILE_POSTPAID,
-			    no_master,
-			    no_master, "SkyFile_PostPaid", NDPI_PROTOCOL_CATEGORY_MAIL,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX_ONLINE,
 			    no_master,
@@ -2654,6 +2644,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* AFP */
   init_afp_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* check_mk */
+  init_checkmk_dissector(ndpi_struct, &a, detection_bitmask);
+
   /* AIMINI */
   init_aimini_dissector(ndpi_struct, &a, detection_bitmask);
 
@@ -3207,7 +3200,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
       packet->packet_direction = 1;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-    if(iphv6 != NULL && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->ip6_src, &iphv6->ip6_dst) != 0)
+    if(iphv6 != NULL && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->ip6_src,
+							  &iphv6->ip6_dst) != 0)
       packet->packet_direction = 1;
 #endif
   }
@@ -4553,25 +4547,6 @@ u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str, u_int16_t max_ch
 
 /* ****************************************************** */
 
-ndpi_protocol ndpi_find_port_based_protocol(struct ndpi_detection_module_struct *ndpi_struct /* NOTUSED */,
-					    /* u_int8_t proto, */
-					    u_int32_t shost, u_int16_t sport,
-					    u_int32_t dhost, u_int16_t dport) {
-  ndpi_protocol proto = NDPI_PROTOCOL_NULL;
-
-  /* Skyfile (host 193.252.234.246 or host 10.10.102.80) */
-  if((shost == 0xC1FCEAF6) || (dhost == 0xC1FCEAF6)
-     || (shost == 0x0A0A6650) || (dhost == 0x0A0A6650)) {
-    if((sport == 4708) || (dport == 4708)) proto.app_protocol = NDPI_PROTOCOL_SKYFILE_PREPAID;
-    else if((sport == 4709) || (dport == 4709)) proto.app_protocol = NDPI_PROTOCOL_SKYFILE_RUDICS;
-    else if((sport == 4710) || (dport == 4710)) proto.app_protocol = NDPI_PROTOCOL_SKYFILE_POSTPAID;
-  }
-
-  return(proto);
-}
-
-/* ****************************************************** */
-
 u_int8_t ndpi_is_proto(ndpi_protocol proto, u_int16_t p) {
   return(((proto.app_protocol == p) || (proto.master_protocol == p)) ? 1 : 0);
 }
@@ -4616,10 +4591,6 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
       else
 	return(ret);
     }
-
-    ret = ndpi_find_port_based_protocol(ndpi_struct/* , proto */, shost, sport, dhost, dport);
-    if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN)
-      return(ret);
 
   check_guessed_skype:
     addr.s_addr = htonl(shost);
@@ -4705,93 +4676,58 @@ void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ****************************************************** */
 
+static const char* categories[] = {
+   "Unspecified",
+   "Media",
+   "VPN",
+   "Email",
+   "DataTransfer",
+   "Web",
+   "SocialNetwork",
+   "Download-FileTransfer-FileSharing",
+   "Game",
+   "Chat",
+   "VoIP",
+   "Database",
+   "RemoteAccess",
+   "Cloud",
+   "Network",
+   "Collaborative",
+   "RPC",
+   "NetworkTool",
+   "System",
+   "SoftwareUpdate",
+   "",
+   "",
+   "",
+   "",
+   ""
+};
+
 const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod,
 				   ndpi_protocol_category_t category) {
-
   if(!ndpi_mod) return(NULL);
-  
-  switch(category) {
-  case NDPI_PROTOCOL_CATEGORY_MEDIA:
-    return("Media");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_VPN:
-    return("VPN");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER:
-    return("DataTransfer");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_MAIL:
-    return("Email");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT:
-    return("Download-FileTransfer-FileSharing");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_WEB:
-    return("Web");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK:
-    return("SocialNetwork");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_GAME:
-    return("Game");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CHAT:
-    return("Chat");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_VOIP:
-    return("VoIP");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_DATABASE:
-    return("Database");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS:
-    return("RemoteAccess");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CLOUD:
-    return("Cloud");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_NETWORK:
-    return("Network");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_COLLABORATIVE:
-    return("Collaborative");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_RPC:
-    return("RPC");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL:
-    return("NetworkTool");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_SYSTEM_OS:
-    return("System");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_UNSPECIFIED:
-    return("Unspecified");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_SW_UPDATE:
-    return("SoftwareUpdate");
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
-    return(ndpi_mod->custom_category_labels[0]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
-    return(ndpi_mod->custom_category_labels[1]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
-    return(ndpi_mod->custom_category_labels[2]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
-    return(ndpi_mod->custom_category_labels[3]);
-    break;
-  case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
-    return(ndpi_mod->custom_category_labels[4]);
-    break;
-  case NDPI_PROTOCOL_NUM_CATEGORIES:
-    return("Code should not use this internal constant");
-    break;
-  }
 
-  return("Unspecified");
+  if(category < NDPI_PROTOCOL_CATEGORY_CUSTOM_1)
+    return(categories[category]);
+  else {
+    switch(category) {
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
+      return(ndpi_mod->custom_category_labels[0]);
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
+      return(ndpi_mod->custom_category_labels[1]);
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
+      return(ndpi_mod->custom_category_labels[2]);
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
+      return(ndpi_mod->custom_category_labels[3]);
+    case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
+      return(ndpi_mod->custom_category_labels[4]);
+    case NDPI_PROTOCOL_NUM_CATEGORIES:
+      return("Code should not use this internal constant");
+    default:
+      return("Unspecified");
+    }
+  }
 }
 
 /* ****************************************************** */

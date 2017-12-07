@@ -1,11 +1,12 @@
 Unknown	24	6428	14
 DNS	2	378	1
-HTTP	5	324	2
+HTTP	91	34135	7
 MDNS	1	82	1
 NTP	1	90	1
 NetBIOS	31	3589	8
 SSDP	143	36951	13
 DHCP	24	8208	5
+MPEG	433	185988	2
 QQ	28	5216	2
 SSL	105	21914	7
 DHCPV6	10	980	3
@@ -13,9 +14,9 @@ Facebook	19	6840	2
 Skype	2	132	1
 Google	3	176	1
 LLMNR	89	6799	47
-1kxun	952	531718	21
+1kxun	433	311919	14
 
-	1	TCP 192.168.115.8:49613 <-> 183.131.48.144:80 [proto: 7.205/HTTP.1kxun][260 pkts/15070 bytes <-> 159 pkts/168623 bytes][Host: 183.131.48.144]
+	1	TCP 192.168.115.8:49613 <-> 183.131.48.144:80 [proto: 7.42/HTTP.MPEG][260 pkts/15070 bytes <-> 159 pkts/168623 bytes][Host: 183.131.48.144]
 	2	TCP 192.168.115.8:49600 <-> 106.187.35.246:80 [proto: 7.205/HTTP.1kxun][18 pkts/1722 bytes <-> 51 pkts/61707 bytes][Host: pic.1kxun.com]
 	3	TCP 192.168.115.8:49601 <-> 106.187.35.246:80 [proto: 7.205/HTTP.1kxun][18 pkts/2440 bytes <-> 43 pkts/49237 bytes][Host: pic.1kxun.com]
 	4	TCP 192.168.115.8:49602 <-> 106.187.35.246:80 [proto: 7.205/HTTP.1kxun][24 pkts/2786 bytes <-> 41 pkts/46203 bytes][Host: pic.1kxun.com]
@@ -23,9 +24,9 @@ LLMNR	89	6799	47
 	6	TCP 192.168.115.8:49606 <-> 106.185.35.110:80 [proto: 7.205/HTTP.1kxun][22 pkts/1926 bytes <-> 28 pkts/33821 bytes][Host: jp.kankan.1kxun.mobi]
 	7	TCP 192.168.115.8:49599 <-> 106.187.35.246:80 [proto: 7.205/HTTP.1kxun][16 pkts/1612 bytes <-> 27 pkts/29579 bytes][Host: pic.1kxun.com]
 	8	TCP 192.168.115.8:49603 <-> 106.187.35.246:80 [proto: 7.205/HTTP.1kxun][12 pkts/1396 bytes <-> 22 pkts/24184 bytes][Host: pic.1kxun.com]
-	9	TCP 192.168.115.8:49609 <-> 42.120.51.152:8080 [proto: 7.205/HTTP.1kxun][20 pkts/4716 bytes <-> 13 pkts/7005 bytes][Host: 42.120.51.152:8080]
-	10	TCP 192.168.5.16:53627 <-> 203.69.81.73:80 [proto: 7.205/HTTP.1kxun][6 pkts/676 bytes <-> 8 pkts/8822 bytes][Host: dl-obs.official.line.naver.jp]
-	11	TCP 192.168.5.16:53628 <-> 203.69.81.73:80 [proto: 7.205/HTTP.1kxun][6 pkts/676 bytes <-> 8 pkts/8482 bytes][Host: dl-obs.official.line.naver.jp]
+	9	TCP 192.168.115.8:49609 <-> 42.120.51.152:8080 [proto: 7/HTTP][20 pkts/4716 bytes <-> 13 pkts/7005 bytes][Host: 42.120.51.152]
+	10	TCP 192.168.5.16:53627 <-> 203.69.81.73:80 [proto: 7/HTTP][6 pkts/676 bytes <-> 8 pkts/8822 bytes][Host: dl-obs.official.line.naver.jp]
+	11	TCP 192.168.5.16:53628 <-> 203.69.81.73:80 [proto: 7/HTTP][6 pkts/676 bytes <-> 8 pkts/8482 bytes][Host: dl-obs.official.line.naver.jp]
 	12	UDP [fe80::9bd:81dd:2fdc:5750]:1900 -> [ff02::c]:1900 [proto: 12/SSDP][16 pkts/8921 bytes -> 0 pkts/0 bytes]
 	13	UDP 192.168.5.49:1900 -> 239.255.255.250:1900 [proto: 12/SSDP][16 pkts/8473 bytes -> 0 pkts/0 bytes]
 	14	TCP 119.235.235.84:443 <-> 192.168.5.16:53406 [proto: 91/SSL][13 pkts/6269 bytes <-> 10 pkts/1165 bytes]
@@ -41,16 +42,16 @@ LLMNR	89	6799	47
 	24	TCP 31.13.87.1:443 <-> 192.168.5.16:53578 [proto: 91.119/SSL.Facebook][5 pkts/1006 bytes <-> 5 pkts/1487 bytes]
 	25	UDP 192.168.5.57:55809 -> 239.255.255.250:1900 [proto: 12/SSDP][14 pkts/2450 bytes -> 0 pkts/0 bytes]
 	26	TCP 192.168.115.8:49598 <-> 222.73.254.167:80 [proto: 7.205/HTTP.1kxun][10 pkts/1406 bytes <-> 4 pkts/980 bytes][Host: kankan.1kxun.com]
-	27	TCP 192.168.115.8:49612 <-> 183.131.48.145:80 [proto: 7.205/HTTP.1kxun][10 pkts/1428 bytes <-> 4 pkts/867 bytes][Host: 183.131.48.145]
+	27	TCP 192.168.115.8:49612 <-> 183.131.48.145:80 [proto: 7.42/HTTP.MPEG][10 pkts/1428 bytes <-> 4 pkts/867 bytes][Host: 183.131.48.145]
 	28	UDP 192.168.5.44:51389 -> 239.255.255.250:1900 [proto: 12/SSDP][13 pkts/2275 bytes -> 0 pkts/0 bytes]
 	29	UDP 192.168.3.95:59468 -> 239.255.255.250:1900 [proto: 12/SSDP][12 pkts/2100 bytes -> 0 pkts/0 bytes]
 	30	UDP 192.168.5.9:55484 -> 239.255.255.250:1900 [proto: 12/SSDP][12 pkts/2100 bytes -> 0 pkts/0 bytes]
-	31	TCP 192.168.5.16:53624 <-> 68.233.253.133:80 [proto: 7.205/HTTP.1kxun][7 pkts/996 bytes <-> 5 pkts/986 bytes][Host: api.magicansoft.com]
+	31	TCP 192.168.5.16:53624 <-> 68.233.253.133:80 [proto: 7/HTTP][7 pkts/996 bytes <-> 5 pkts/986 bytes][Host: api.magicansoft.com]
 	32	UDP 192.168.101.33:55485 -> 239.255.255.250:1900 [proto: 12/SSDP][10 pkts/1750 bytes -> 0 pkts/0 bytes]
 	33	UDP 192.168.5.49:51704 -> 239.255.255.250:1900 [proto: 12/SSDP][9 pkts/1611 bytes -> 0 pkts/0 bytes]
 	34	UDP 192.168.5.50:64674 -> 239.255.255.250:1900 [proto: 12/SSDP][9 pkts/1611 bytes -> 0 pkts/0 bytes]
 	35	UDP 192.168.5.37:57325 -> 239.255.255.250:1900 [proto: 12/SSDP][9 pkts/1575 bytes -> 0 pkts/0 bytes]
-	36	TCP 192.168.115.8:49607 <-> 218.244.135.170:9099 [proto: 7.205/HTTP.1kxun][10 pkts/880 bytes <-> 3 pkts/572 bytes][Host: 218.244.135.170:9099]
+	36	TCP 192.168.115.8:49607 <-> 218.244.135.170:9099 [proto: 7/HTTP][10 pkts/880 bytes <-> 3 pkts/572 bytes][Host: 218.244.135.170]
 	37	UDP 192.168.5.47:60267 -> 239.255.255.250:1900 [proto: 12/SSDP][8 pkts/1432 bytes -> 0 pkts/0 bytes]
 	38	UDP 192.168.5.41:55312 -> 239.255.255.250:1900 [proto: 12/SSDP][8 pkts/1400 bytes -> 0 pkts/0 bytes]
 	39	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][4 pkts/1368 bytes -> 0 pkts/0 bytes][Host: shen]

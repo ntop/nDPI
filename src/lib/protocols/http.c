@@ -552,15 +552,15 @@ static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 /*************************************************************************************************/
 
 static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-				struct ndpi_flow_struct *flow) {
-
+				struct ndpi_flow_struct *flow) {       
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t filename_start; /* the filename in the request method line, e.g., "GET filename_start..."*/
 
   packet->packet_lines_parsed_complete = 0;
 
   /* Check if we so far detected the protocol in the request or not. */
-  if(flow->l4.tcp.http_stage == 0) { /* Expected a request */
+  if(flow->l4.tcp.http_stage == 0) {
+    /* Expected a request */
     flow->http_detected = 0;
 
     NDPI_LOG_DBG2(ndpi_struct, "HTTP stage %d: \n", flow->l4.tcp.http_stage);
@@ -578,11 +578,29 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
 
       if((packet->payload_packet_len == 3) && memcmp(packet->payload, "HI\n", 3) == 0) {
-	    /* This looks like Ookla: we don't give up with HTTP yet */
-	    flow->l4.tcp.http_stage = 1;
-	    return;
+	/* This looks like Ookla: we don't give up with HTTP yet */
+        flow->l4.tcp.http_stage = 1;
+	return;
       }
+      
+      if((packet->payload_packet_len == 40) && (flow->l4.tcp.http_stage == 0)) {
+        /*
+	  -> QR O06L0072-6L91-4O43-857J-K8OO172L6L51
+	  <- QNUUX 2.5 2017-08-15.1314.4jn12m5
+	  -> MXFWUXJM 31625365
+	*/
 
+        if((packet->payload[2] == ' ')
+	   && (packet->payload[11] == '-')
+	   && (packet->payload[16] == '-')
+	   && (packet->payload[21] == '-')
+	   && (packet->payload[26] == '-')
+	   && (packet->payload[39] == 0x0A)
+		)
+		flow->l4.tcp.http_stage = 1;
+	return;	      
+      }
+      
       if((packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
         /*
           <policy-file-request/>
@@ -757,17 +775,21 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
   } else if((flow->l4.tcp.http_stage == 1) || (flow->l4.tcp.http_stage == 2)) {
 
     NDPI_LOG_DBG2(ndpi_struct, "HTTP stage %u: \n", flow->l4.tcp.http_stage);
-
-
-    if(flow->l4.tcp.http_stage == 1) {
-      if((packet->payload_packet_len > 6) && memcmp(packet->payload, "HELLO ", 6) == 0) {
-        /* This looks like Ookla */
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
-        return;
-      } else
-        NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OOKLA);
+    
+    if((packet->payload_packet_len == 34) && (flow->l4.tcp.http_stage == 1)) {
+      if((packet->payload[5] == ' ') && (packet->payload[9] == ' ')) {
+	      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA);
+	      return;
+      }
     }
-
+    
+    if((packet->payload_packet_len > 6) && memcmp(packet->payload, "HELLO ", 6) == 0) {
+       /* This looks like Ookla */
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
+      return;
+    } else
+	    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OOKLA);    
+    
     /**
        At first check, if this is for sure a response packet (in another direction. If not, if HTTP is detected do nothing now and return,
        otherwise check the second packet for the HTTP request
@@ -852,7 +874,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     flow->l4.tcp.http_stage = 0;
     return;
   }
-
 }
 
 void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,

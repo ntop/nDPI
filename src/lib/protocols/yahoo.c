@@ -55,8 +55,10 @@ static u_int8_t ndpi_check_for_YmsgCommand(u_int16_t len, const u_int8_t * ptr)
 }
 
        
-#ifndef WIN32
+#if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif

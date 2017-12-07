@@ -119,6 +119,8 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
+  /* printf("*** %s(pkt=%d)\n", __FUNCTION__, flow->packet_counter); */
+  
   if((packet->udp != NULL)
      && (ntohs(packet->udp->source) > 1023)
      && (ntohs(packet->udp->dest) > 1023))
@@ -154,6 +156,8 @@ static void ndpi_int_rtp_add_connection(struct ndpi_detection_module_struct
 
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
@@ -168,6 +172,8 @@ void init_seq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow
 
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif

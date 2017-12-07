@@ -247,10 +247,19 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     return NDPI_IS_NOT_STUN;
 
  udp_stun_found:
-  if(can_this_be_whatsapp_voice)
+  if(can_this_be_whatsapp_voice) {
     flow->num_stun_udp_pkts++;
 
-  return((flow->num_stun_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
+    return((flow->num_stun_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
+  } else {
+    /*
+      We cannot immediately say that this is STUN as there are other protocols
+      like GoogleHangout that might be candidates, thus we set the
+      guessed protocol to STUN      
+    */
+    flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+    return(NDPI_IS_NOT_STUN);
+  }  
 }
 
 void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -293,17 +302,23 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       ndpi_int_stun_add_connection(ndpi_struct,
 				   is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
     }
+    
     return;
   }
 
   if(flow->num_stun_udp_pkts >= MAX_NUM_STUN_PKTS) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
+
+  if(flow->packet_counter > 0) {
+    /* This might be a RTP stream: let's make sure we check it */
+    NDPI_CLR(&flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
+  }
 }
 
 
-void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
-{
+void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
+			 NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("STUN", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_STUN,
 				      ndpi_search_stun,

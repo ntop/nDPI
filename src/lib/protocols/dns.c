@@ -201,6 +201,9 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	off++;
       }
 
+	if(is_query && ndpi_struct->dns_dissect_response)
+	  return; /* The response will set the verdict */
+
       flow->host_server_name[j] = '\0';
 
       flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
@@ -220,9 +223,6 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 #endif
     
       if(flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-	if(is_query && ndpi_struct->dns_dissect_response)
-	  return; /* The response will set the verdict */
-	
 	/**
 	   Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
 	   matched a subprotocol

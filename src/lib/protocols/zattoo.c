@@ -28,8 +28,10 @@
 
 #include "ndpi_api.h"
 	
-#ifndef WIN32
+#if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
