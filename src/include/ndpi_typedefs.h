@@ -206,34 +206,27 @@ struct ndpi_iphdr {
 /* +++++++++++++++++++++++ IPv6 header +++++++++++++++++++++++ */
 /* rfc3542 */
 
-struct ndpi_in6_addr
-{
-  union
-  {
+struct ndpi_in6_addr {
+  union {
     u_int8_t   u6_addr8[16];
     u_int16_t  u6_addr16[8];
     u_int32_t  u6_addr32[4];
   } u6_addr;  /* 128-bit IP6 address */
 };
 
-PACK_ON
-struct ndpi_ipv6hdr
-{
-  union
-  {
-    struct ndpi_ip6_hdrctl
-    {
-      u_int32_t ip6_un1_flow;
-      u_int16_t ip6_un1_plen;
-      u_int8_t ip6_un1_nxt;
-      u_int8_t ip6_un1_hlim;
-    } ip6_un1;
-    u_int8_t ip6_un2_vfc;
-  } ip6_ctlun;
+struct ndpi_ip6_hdrctl {
+  u_int32_t ip6_un1_flow;
+  u_int16_t ip6_un1_plen;
+  u_int8_t ip6_un1_nxt;
+  u_int8_t ip6_un1_hlim;
+};
 
+/* PACK_ON */
+struct ndpi_ipv6hdr {
+  struct ndpi_ip6_hdrctl ip6_hdr;
   struct ndpi_in6_addr ip6_src;
   struct ndpi_in6_addr ip6_dst;
-} PACK_OFF;
+} /* PACK_OFF */;
 
 /* +++++++++++++++++++++++ TCP header +++++++++++++++++++++++ */
 
