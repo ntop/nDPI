@@ -22,6 +22,7 @@ ndpi_init_detection_module
 ndpi_get_num_supported_protocols
 ndpi_set_proto_defaults
 ndpi_get_protocol_id
+ndpi_get_category_id
 ndpi_find_port_based_protocol
 ndpi_get_http_method
 ndpi_get_http_url

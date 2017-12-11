@@ -533,11 +533,22 @@ extern "C" {
    * Return the ID of the protocol
    *
    * @par     ndpi_mod   = the detection module
-   * @par     proto      = the ID of the protocol
-   * @return  the string name of the breed ID
+   * @par     proto      = the protocol name
+   * @return  the ID of the protocol
    *
    */
   int ndpi_get_protocol_id(struct ndpi_detection_module_struct *ndpi_mod, char *proto);
+
+
+  /**
+   * Return the ID of the category
+   *
+   * @par     ndpi_mod   = the detection module
+   * @par     proto      = the category name
+   * @return  the ID of the category
+   *
+   */
+  int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_mod, char *cat);
 
 
   /**

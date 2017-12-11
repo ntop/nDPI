@@ -4676,6 +4676,7 @@ void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ****************************************************** */
 
+/* Keep it in order and in sync with ndpi_protocol_category_t in ndpi_typedefs.h */
 static const char* categories[] = {
    "Unspecified",
    "Media",
@@ -4801,6 +4802,21 @@ int ndpi_get_protocol_id(struct ndpi_detection_module_struct *ndpi_mod, char *pr
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
     if(strcasecmp(proto, ndpi_mod->proto_defaults[i].protoName) == 0)
       return(i);
+
+  return(-1);
+}
+
+/* ****************************************************** */
+
+int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_mod, char *cat) {
+  int i;
+  const char *name;
+
+  for(i = 0; i < NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
+    name = ndpi_category_get_name(ndpi_mod, i);
+    if(strcasecmp(cat, name) == 0)
+      return(i);
+  }
 
   return(-1);
 }
