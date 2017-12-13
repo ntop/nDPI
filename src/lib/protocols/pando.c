@@ -121,7 +121,7 @@ static void ndpi_check_pando_udp(struct ndpi_detection_module_struct *ndpi_struc
 			NDPI_LOG_INFO(ndpi_struct, "found PANDO\n");
 			ndpi_int_pando_add_connection(ndpi_struct, flow);
 		} else {
-			NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to PANDO, resetting the stage to 0\n")
+			NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to PANDO, resetting the stage to 0\n");
 			flow->pando_stage = 0;
 		}
 	}

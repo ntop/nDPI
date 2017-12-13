@@ -492,7 +492,7 @@ static struct l_string {
 	STATIC_STRING_L("REPORT ") };
 static const char *http_fs = "CDGHOPR";
 
-static inline uint8_t non_ctrl(uint8_t c) {
+static uint8_t non_ctrl(uint8_t c) {
 	return c < 32 ? '.':c;
 }
 
