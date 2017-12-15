@@ -109,7 +109,7 @@
 #define NDPI_PROTOCOL_OSCAR                 69
 #define NDPI_PROTOCOL_YAHOO                 70
 #define NDPI_PROTOCOL_BATTLEFIELD           71
-#define NDPI_PROTOCOL_QUAKE                 72
+#define NDPI_PROTOCOL_GOOGLE_PLUS           72
 #define NDPI_PROTOCOL_IP_VRRP               73
 #define NDPI_PROTOCOL_STEAM                 74 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_HALFLIFE2             75

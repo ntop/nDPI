@@ -1132,11 +1132,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "BattleField", NDPI_PROTOCOL_CATEGORY_GAME,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QUAKE,
-			    no_master,
-			    no_master, "Quake", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_VRRP,
 			    no_master,
 			    no_master, "VRRP", NDPI_PROTOCOL_CATEGORY_NETWORK,
@@ -2574,9 +2569,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* BGP */
   init_bgp_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* QUAKE */
-  init_quake_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* BATTLEFIELD */
   init_battlefield_dissector(ndpi_struct, &a, detection_bitmask);
