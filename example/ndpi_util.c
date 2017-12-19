@@ -362,6 +362,26 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   idx = hashval % workflow->prefs.num_roots;
   ret = ndpi_tfind(&flow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp);
 
+
+	/* to avoid two nodes in one binary tree for a flow */
+	int is_changed = 0;
+	if(ret == NULL)
+	{
+		u_int32_t orig_src_ip = flow.src_ip;
+		u_int16_t orig_src_port = flow.src_port;
+		u_int32_t orig_dst_ip = flow.dst_ip;
+		u_int16_t orig_dst_port = flow.dst_port;
+
+		flow.src_ip = orig_dst_ip;
+		flow.src_port = orig_dst_port;
+		flow.dst_ip = orig_src_ip;
+		flow.dst_port = orig_src_port;
+
+		is_changed = 1;
+
+		ret = ndpi_tfind(&flow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp);
+	}
+
   if(ret == NULL) {
     if(workflow->stats.ndpi_flow_count == workflow->prefs.max_ndpi_flows) {
       NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR,
@@ -425,15 +445,26 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   } else {
     struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)ret;
 
-    if(flow->src_ip == iph->saddr
-       && flow->dst_ip == iph->daddr
-       && flow->src_port == htons(*sport)
-       && flow->dst_port == htons(*dport)
-       )
-      *src = flow->src_id, *dst = flow->dst_id, *src_to_dst_direction = 1;
-    else
-      *src = flow->dst_id, *dst = flow->src_id, *src_to_dst_direction = 0, flow->bidirectional = 1;
-
+	if (is_changed) {
+		if(flow->src_ip == iph->saddr
+		 && flow->dst_ip == iph->daddr
+		 && flow->src_port == htons(*sport)
+		 && flow->dst_port == htons(*dport)
+		 )
+			*src = flow->dst_id, *dst = flow->src_id, *src_to_dst_direction = 0, flow->bidirectional = 1;
+		  else
+			*src = flow->src_id, *dst = flow->dst_id, *src_to_dst_direction = 1;
+	}
+	else {
+		if(flow->src_ip == iph->saddr
+		   && flow->dst_ip == iph->daddr
+		   && flow->src_port == htons(*sport)
+		   && flow->dst_port == htons(*dport)
+		   )
+		  *src = flow->src_id, *dst = flow->dst_id, *src_to_dst_direction = 1;
+		else
+		  *src = flow->dst_id, *dst = flow->src_id, *src_to_dst_direction = 0, flow->bidirectional = 1;
+	}
     return flow;
   }
 }
