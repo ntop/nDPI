@@ -22,10 +22,14 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_api.h"
 
 #ifdef NDPI_PROTOCOL_RX
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RX
+
+#include "ndpi_api.h"
 
 /* See http://web.mit.edu/kolya/afs/rx/rx-spec for protocol description. */
 
@@ -79,13 +83,12 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "RX: pck: %d, dir[0]: %d, dir[1]: %d\n",
+  NDPI_LOG_DBG2(ndpi_struct, "RX: pck: %d, dir[0]: %d, dir[1]: %d\n",
            flow->packet_counter, flow->packet_direction_counter[0], flow->packet_direction_counter[1]);
 
   /* Check that packet is long enough */
   if (payload_len < sizeof(struct ndpi_rx_header)) {
-    NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
   
@@ -108,8 +111,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   
   /* TYPE field */
   if((header->type < DATA) || (header->type > VERSION)) {
-    NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
@@ -157,13 +159,11 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
       case VERSION:
 	goto security;
       default:
-	NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
     } // switch
   } else { // FLAG
-    NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
@@ -171,8 +171,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   /* SECURITY field */
   if(header->security > 3)
   {
-    NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
   
@@ -184,21 +183,20 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
     if (flow->l4.udp.rx_conn_epoch == header->conn_epoch &&
 	flow->l4.udp.rx_conn_id == header->conn_id)
     {
-      NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "found RX\n");
+      NDPI_LOG_INFO(ndpi_struct, "found RX\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN);
     }
     /* https://www.central.org/frameless/numbers/rxservice.html. */
     else
     {
-      NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "excluding RX\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RX);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
   } else {
     flow->l4.udp.rx_conn_epoch = header->conn_epoch;
     flow->l4.udp.rx_conn_id = header->conn_id;
     {
-      NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "found RX\n");
+      NDPI_LOG_INFO(ndpi_struct, "found RX\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN);
     }
   }
@@ -209,7 +207,7 @@ void ndpi_search_rx(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_RX, ndpi_struct, NDPI_LOG_DEBUG, "entering RX search\n");
+  NDPI_LOG_DBG(ndpi_struct, "search RX\n");
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_RX) {
     ndpi_check_rx(ndpi_struct, flow);
   }

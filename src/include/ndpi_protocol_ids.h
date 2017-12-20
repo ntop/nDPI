@@ -1,3 +1,4 @@
+
 /*
  * ndpi_protocol_ids.h
  *
@@ -108,7 +109,7 @@
 #define NDPI_PROTOCOL_OSCAR                 69
 #define NDPI_PROTOCOL_YAHOO                 70
 #define NDPI_PROTOCOL_BATTLEFIELD           71
-#define NDPI_PROTOCOL_QUAKE                 72
+#define NDPI_PROTOCOL_GOOGLE_PLUS           72
 #define NDPI_PROTOCOL_IP_VRRP               73
 #define NDPI_PROTOCOL_STEAM                 74 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_HALFLIFE2             75
@@ -172,9 +173,9 @@
 #define NDPI_PROTOCOL_NETFLIX               133
 #define NDPI_PROTOCOL_LASTFM                134
 #define NDPI_PROTOCOL_WAZE                  135
-#define NDPI_PROTOCOL_SKYFILE_PREPAID       136 /* free for future use */
-#define NDPI_PROTOCOL_SKYFILE_RUDICS        137 /* free for future use */
-#define NDPI_PROTOCOL_SKYFILE_POSTPAID      138 /* free for future use */
+#define NDPI_PROTOCOL_YOUTUBE_UPLOAD        136 /* Upload files to youtube */
+#define NDPI_PROTOCOL_ICQ                   137
+#define NDPI_PROTOCOL_CHECKMK               138
 #define NDPI_PROTOCOL_CITRIX_ONLINE         139
 #define NDPI_PROTOCOL_APPLE                 140
 #define NDPI_PROTOCOL_WEBEX                 141

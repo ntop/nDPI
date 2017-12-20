@@ -1,5 +1,35 @@
 # CHANGELOG
 
+
+#### nDPI 2.2 (December 2017)
+
+## Main New Features
+
+* Custom protocol categories to allow personalization of protocols-categories mappings
+* DHCP fingerprinting
+* HTTP User Agent discovery
+
+
+## New Supported Protocols and Services
+
+* ICQ (instant messaging client)
+* YouTube Upload
+* LISP
+* SoundCloud
+* Sony PlayStation
+* Nintendo (switch) gaming protocol
+
+
+## Improvements
+
+*  Windows 10 detection from UA and indentation
+*  Determine STUN flows that turn into RTP
+*  Fixes for iQIYI and 1kxun
+*  Android fingerprint
+*  Added DHCP class identifier support
+
+------------------------------------------------------------------------
+
 #### nDPI 2.0 (May 2017)
 
 ## Main New Features

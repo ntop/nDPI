@@ -36,7 +36,8 @@ typedef enum
   {
     NDPI_LOG_ERROR,
     NDPI_LOG_TRACE,
-    NDPI_LOG_DEBUG
+    NDPI_LOG_DEBUG,
+    NDPI_LOG_DEBUG_EXTRA
   } ndpi_log_level_t;
 
 /* NDPI_VISIT */
@@ -205,34 +206,27 @@ struct ndpi_iphdr {
 /* +++++++++++++++++++++++ IPv6 header +++++++++++++++++++++++ */
 /* rfc3542 */
 
-struct ndpi_in6_addr
-{
-  union
-  {
+struct ndpi_in6_addr {
+  union {
     u_int8_t   u6_addr8[16];
     u_int16_t  u6_addr16[8];
     u_int32_t  u6_addr32[4];
   } u6_addr;  /* 128-bit IP6 address */
 };
 
-PACK_ON
-struct ndpi_ipv6hdr
-{
-  union
-  {
-    struct ndpi_ip6_hdrctl
-    {
-      u_int32_t ip6_un1_flow;
-      u_int16_t ip6_un1_plen;
-      u_int8_t ip6_un1_nxt;
-      u_int8_t ip6_un1_hlim;
-    } ip6_un1;
-    u_int8_t ip6_un2_vfc;
-  } ip6_ctlun;
+struct ndpi_ip6_hdrctl {
+  u_int32_t ip6_un1_flow;
+  u_int16_t ip6_un1_plen;
+  u_int8_t ip6_un1_nxt;
+  u_int8_t ip6_un1_hlim;
+};
 
+/* PACK_ON */
+struct ndpi_ipv6hdr {
+  struct ndpi_ip6_hdrctl ip6_hdr;
   struct ndpi_in6_addr ip6_src;
   struct ndpi_in6_addr ip6_dst;
-} PACK_OFF;
+} /* PACK_OFF */;
 
 /* +++++++++++++++++++++++ TCP header +++++++++++++++++++++++ */
 
@@ -859,12 +853,14 @@ struct ndpi_detection_module_struct {
 
   ndpi_default_ports_tree_node_t *tcpRoot, *udpRoot;
 
+  ndpi_log_level_t ndpi_log_level; /* default error */
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   /* debug callback, only set when debug is used */
   ndpi_debug_function_ptr ndpi_debug_printf;
   const char *ndpi_debug_print_file;
   const char *ndpi_debug_print_function;
   u_int32_t ndpi_debug_print_line;
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
 #endif
 
   /* misc parameters */

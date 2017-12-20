@@ -18,11 +18,15 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_ORACLE
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_ORACLE
 
 #include "ndpi_api.h"
 
 
-#ifdef NDPI_PROTOCOL_ORACLE
 static void ndpi_int_oracle_add_connection(struct ndpi_detection_module_struct
 					   *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -34,11 +38,11 @@ void ndpi_search_oracle(struct ndpi_detection_module_struct *ndpi_struct, struct
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t dport = 0, sport = 0;
 
-  NDPI_LOG(NDPI_PROTOCOL_ORACLE, ndpi_struct, NDPI_LOG_DEBUG, "search for ORACLE.\n");
+  NDPI_LOG_DBG(ndpi_struct, "search ORACLE\n");
 
   if(packet->tcp != NULL) {
     sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);
-    NDPI_LOG(NDPI_PROTOCOL_ORACLE, ndpi_struct, NDPI_LOG_DEBUG, "calculating ORACLE over tcp.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "calculating ORACLE over tcp\n");
     /* Oracle Database 9g,10g,11g */
     if ((dport == 1521 || sport == 1521)
 	&&  (((packet->payload[0] == 0x07) && (packet->payload[1] == 0xff) && (packet->payload[2] == 0x00))
@@ -46,17 +50,16 @@ void ndpi_search_oracle(struct ndpi_detection_module_struct *ndpi_struct, struct
 	     && (packet->payload[1] != 0x00)
 	     && (packet->payload[2] == 0x00)
 		 && (packet->payload[3] == 0x00)))) {
-      NDPI_LOG(NDPI_PROTOCOL_ORACLE, ndpi_struct, NDPI_LOG_DEBUG, "found oracle.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found oracle\n");
       ndpi_int_oracle_add_connection(ndpi_struct, flow);
     } else if (packet->payload_packet_len == 213 && packet->payload[0] == 0x00 &&
                packet->payload[1] == 0xd5 && packet->payload[2] == 0x00 &&
                packet->payload[3] == 0x00 ) {
-      NDPI_LOG(NDPI_PROTOCOL_ORACLE, ndpi_struct, NDPI_LOG_DEBUG, "found oracle.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found oracle\n");
       ndpi_int_oracle_add_connection(ndpi_struct, flow);
     }
   } else {
-    NDPI_LOG(NDPI_PROTOCOL_ORACLE, ndpi_struct, NDPI_LOG_DEBUG, "exclude ORACLE.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_ORACLE);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 

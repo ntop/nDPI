@@ -23,10 +23,15 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_EDONKEY
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_EDONKEY
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_EDONKEY
+
 static void ndpi_int_edonkey_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_EDONKEY, NDPI_PROTOCOL_UNKNOWN);
 }
@@ -159,24 +164,23 @@ static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Break after 20 packets. */
   if (flow->packet_counter > 20) {
-    NDPI_LOG(NDPI_PROTOCOL_EDONKEY, ndpi_struct, NDPI_LOG_DEBUG, "Exclude EDONKEY.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_EDONKEY);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
   /* Check if we so far detected the protocol in the request or not. */
   if (flow->edonkey_stage == 0) {
-    NDPI_LOG(NDPI_PROTOCOL_EDONKEY, ndpi_struct, NDPI_LOG_DEBUG, "EDONKEY stage 0: \n");
+    NDPI_LOG_DBG2(ndpi_struct, "EDONKEY stage 0: \n");
 
     if (ndpi_edonkey_payload_check(packet->payload, payload_len)) {
-      NDPI_LOG(NDPI_PROTOCOL_EDONKEY, ndpi_struct, NDPI_LOG_DEBUG, "Possible EDONKEY request detected, we will look further for the response...\n");
+      NDPI_LOG_DBG2(ndpi_struct, "Possible EDONKEY request detected, we will look further for the response\n");
 
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
       flow->edonkey_stage = packet->packet_direction + 1;
     }
 
   } else {
-    NDPI_LOG(NDPI_PROTOCOL_EDONKEY, ndpi_struct, NDPI_LOG_DEBUG, "EDONKEY stage %u: \n", flow->edonkey_stage);
+    NDPI_LOG_DBG2(ndpi_struct, "EDONKEY stage %u: \n", flow->edonkey_stage);
 
     /* At first check, if this is for sure a response packet (in another direction. If not, do nothing now and return. */
     if ((flow->edonkey_stage - packet->packet_direction) == 1) {
@@ -185,10 +189,10 @@ static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct,
 
     /* This is a packet in another direction. Check if we find the proper response. */
     if ((payload_len == 0) || (ndpi_edonkey_payload_check(packet->payload, payload_len))) {
-      NDPI_LOG(NDPI_PROTOCOL_EDONKEY, ndpi_struct, NDPI_LOG_DEBUG, "Found EDONKEY.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found EDONKEY\n");
       ndpi_int_edonkey_add_connection(ndpi_struct, flow);
     } else {
-      NDPI_LOG(NDPI_PROTOCOL_EDONKEY, ndpi_struct, NDPI_LOG_DEBUG, "The reply did not seem to belong to EDONKEY, resetting the stage to 0...\n");
+      NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to EDONKEY, resetting the stage to 0\n");
       flow->edonkey_stage = 0;
     }
 
@@ -198,7 +202,7 @@ static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct,
 void ndpi_search_edonkey(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_EDONKEY, ndpi_struct, NDPI_LOG_DEBUG, "EDONKEY detection...\n");
+  NDPI_LOG_DBG(ndpi_struct, "search EDONKEY\n");
 
   /* skip marked packets */
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_EDONKEY) {

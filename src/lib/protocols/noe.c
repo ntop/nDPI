@@ -5,28 +5,32 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_NOE
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_NOE
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_NOE
 
 static void ndpi_int_noe_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
 {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NOE, NDPI_PROTOCOL_UNKNOWN);
+  NDPI_LOG_INFO(ndpi_struct, "found noe\n");
 }
 
 void ndpi_search_noe(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   
-  NDPI_LOG(NDPI_PROTOCOL_NOE, ndpi_struct, NDPI_LOG_DEBUG, "search for NOE.\n");
+  NDPI_LOG_DBG(ndpi_struct, "search NOE\n");
   
   if(packet->udp != NULL) {
-    NDPI_LOG(NDPI_PROTOCOL_NOE, ndpi_struct, NDPI_LOG_DEBUG, "calculating dport over udp.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "calculating dport over udp\n");
 
     if (packet->payload_packet_len == 1 && ( packet->payload[0] == 0x05 || packet->payload[0] == 0x04 )) {
-      NDPI_LOG(NDPI_PROTOCOL_NOE, ndpi_struct, NDPI_LOG_DEBUG, "found noe.\n");
       ndpi_int_noe_add_connection(ndpi_struct, flow);
       return;
     } else if((packet->payload_packet_len == 5 || packet->payload_packet_len == 12) &&
@@ -34,19 +38,18 @@ void ndpi_search_noe(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	      (packet->payload[1] == 0x00 ) &&
 	      (packet->payload[2] != 0x00 ) &&
 	      (packet->payload[3] == 0x00 )) {
-      NDPI_LOG(NDPI_PROTOCOL_NOE, ndpi_struct, NDPI_LOG_DEBUG, "found noe.\n");
       ndpi_int_noe_add_connection(ndpi_struct, flow);
+      return;
     } else if((packet->payload_packet_len >= 25) &&
 	      (packet->payload[0] == 0x00 &&
 	       packet->payload[1] == 0x06 &&
 	       packet->payload[2] == 0x62 &&
 	       packet->payload[3] == 0x6c)) {
-      NDPI_LOG(NDPI_PROTOCOL_NOE, ndpi_struct, NDPI_LOG_DEBUG, "found noe.\n");
       ndpi_int_noe_add_connection(ndpi_struct, flow);
+      return;
     }
   } else {
-      NDPI_LOG(NDPI_PROTOCOL_NOE, ndpi_struct, NDPI_LOG_DEBUG, "exclude NOE.\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_NOE);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
 }
 

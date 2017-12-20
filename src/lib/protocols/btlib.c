@@ -181,8 +181,8 @@ static void _print_safe_str(char *msg,char *k,const u_int8_t *s,size_t l) {
 static void print_safe_str(char *msg,bt_parse_data_cb_t *cbd) {
   _print_safe_str(msg,cbd->buf,cbd->v.s.s,cbd->v.s.l);
 }
-
 #define DEBUG_TRACE(cmd) { if(bt_parse_debug) cmd; }
+
 #define STREQ(a,b) !strcmp(a,b)
 
 

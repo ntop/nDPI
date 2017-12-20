@@ -23,8 +23,13 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
+
 #ifdef NDPI_PROTOCOL_RDP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RDP
+
+#include "ndpi_api.h"
 
 static void ndpi_int_rdp_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
@@ -36,8 +41,7 @@ void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
+  NDPI_LOG_DBG(ndpi_struct, "search RDP\n");
 
   if (packet->payload_packet_len > 10
       && get_u_int8_t(packet->payload, 0) > 0
@@ -45,12 +49,12 @@ void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       && get_u_int8_t(packet->payload, 4) == packet->payload_packet_len - 5
       && get_u_int8_t(packet->payload, 5) == 0xe0
       && get_u_int16_t(packet->payload, 6) == 0 && get_u_int16_t(packet->payload, 8) == 0 && get_u_int8_t(packet->payload, 10) == 0) {
-    NDPI_LOG(NDPI_PROTOCOL_RDP, ndpi_struct, NDPI_LOG_DEBUG, "RDP detected.\n");
+    NDPI_LOG_INFO(ndpi_struct, "found RDP\n");
     ndpi_int_rdp_add_connection(ndpi_struct, flow);
     return;
   }
 
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RDP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
