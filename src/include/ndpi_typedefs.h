@@ -777,7 +777,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
   NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
   NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
-  NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
+  NDPI_PROTOCOL_CATEGORY_STREAMING,         /* Streaming protocols */
   NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
   NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
   /* See #define NUM_CUSTOM_CATEGORIES */
