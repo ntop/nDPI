@@ -171,7 +171,7 @@ typedef struct bt_parse_data_cb {
 	int	level;
 	int	t;
 	union {
-		i_int64_t i;
+		int64_t i;
 		b_elem_s_t s;
 	} v;
 } bt_parse_data_cb_t;
