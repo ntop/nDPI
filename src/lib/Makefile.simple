@@ -8,7 +8,7 @@
 CFLAGS += -fPIC -DPIC -I../include -Ithird_party/include
 RANLIB=ranlib
 
-OBJECTS = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) ndpi_main.o third_party/src/ndpi_patricia.o
+OBJECTS = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) ndpi_main.o
 HEADERS = $(wildcard ../include/*.h)
 
 libndpi.a: $(OBJECTS)
