@@ -1,7 +1,7 @@
 /*
  * quic.c
  *
- * Copyright (C) 2012-16 - ntop.org
+ * Copyright (C) 2012-18 - ntop.org
  *
  * Based on code of:
  * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
