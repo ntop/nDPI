@@ -2041,8 +2041,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
     if(ndpi_struct->protocols_ptree)
       ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->protocols_ptree, free_ptree_data);
 
-    ndpi_tdestroy(ndpi_struct->udpRoot, ndpi_free);
-    ndpi_tdestroy(ndpi_struct->tcpRoot, ndpi_free);
+    if (ndpi_struct->udpRoot != NULL)
+      ndpi_tdestroy(ndpi_struct->udpRoot, ndpi_free);
+    if (ndpi_struct->tcpRoot != NULL)
+      ndpi_tdestroy(ndpi_struct->tcpRoot, ndpi_free);
 
     if(ndpi_struct->host_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t*)ndpi_struct->host_automa.ac_automa);
