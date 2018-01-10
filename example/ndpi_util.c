@@ -689,7 +689,10 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   const struct ndpi_wifi_header *wifi;
 
   /* --- MPLS header --- */
-  struct ndpi_mpls_header *mpls;
+  union mpls {
+    uint32_t u32;
+    struct ndpi_mpls_header mpls;
+  } mpls;
 
   /** --- IP header --- **/
   struct ndpi_iphdr *iph;
@@ -846,15 +849,15 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     break;
   case MPLS_UNI:
   case MPLS_MULTI:
-    mpls = (struct ndpi_mpls_header *) &packet[ip_offset];
-    label = ntohl(mpls->label);
-    /* label = ntohl(*((u_int32_t*)&packet[ip_offset])); */
+    mpls.u32 = *((uint32_t *) &packet[ip_offset]);
+    mpls.u32 = ntohl(mpls.u32);
     workflow->stats.mpls_count++;
     type = ETH_P_IP, ip_offset += 4;
 
-    while((label & 0x100) != 0x100) {
+    while(!mpls.mpls.s) {
       ip_offset += 4;
-      label = ntohl(mpls->label);
+      mpls.u32 = *((uint32_t *) &packet[ip_offset]);
+      mpls.u32 = ntohl(mpls.u32);
     }
     break;
   case PPPoE:

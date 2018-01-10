@@ -38,6 +38,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/dcerpc.c \
 		     protocols/dhcp.c \
 		     protocols/dhcpv6.c \
+		     protocols/diameter.c \
 		     protocols/directconnect.c \
 		     protocols/directdownloadlink.c \
 		     protocols/dns.c \

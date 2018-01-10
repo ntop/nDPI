@@ -736,7 +736,9 @@ extern "C" {
   void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size));
   void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
   void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf);
-
+  void * ndpi_malloc(size_t size);
+  void * ndpi_calloc(unsigned long count, size_t size);
+  void ndpi_free(void *ptr);
 #ifdef __cplusplus
 }
 #endif

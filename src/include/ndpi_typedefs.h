@@ -178,7 +178,15 @@ struct ndpi_wifi_header
 PACK_ON
 struct ndpi_mpls_header
 {
+  /* Before using this strcut to parse an MPLS header, you will need to convert
+   * the 4-byte data to the correct endianess with ntohl(). */
+#if defined(__LITTLE_ENDIAN__)
+  u_int32_t ttl:8, s:1, exp:3, label:20;
+#elif defined(__BIG_ENDIAN__)
   u_int32_t label:20, exp:3, s:1, ttl:8;
+#else
+# error "Byte order must be defined"
+#endif
 } PACK_OFF;
 
 /* ++++++++++++++++++++++++ IP header ++++++++++++++++++++++++ */
@@ -777,7 +785,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
   NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
   NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
-  NDPI_PROTOCOL_CATEGORY_NETWORK_TOOL,      /* Network administration and monitor protocols */
+  NDPI_PROTOCOL_CATEGORY_STREAMING,         /* Streaming protocols */
   NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
   NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
   /* See #define NUM_CUSTOM_CATEGORIES */

@@ -54,6 +54,7 @@
 #include <arpa/inet.h> /* BSD, Linux, Solaris: for inet_addr */
 #endif
 #include "ndpi_patricia.h"
+#include "ndpi_api.h"
 
 void ndpi_DeleteEntry(void *a) {
   ndpi_free(a);

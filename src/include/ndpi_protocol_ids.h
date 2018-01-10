@@ -2,7 +2,7 @@
 /*
  * ndpi_protocol_ids.h
  *
- * Copyright (C) 2011-17 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -275,9 +275,10 @@
 #define NDPI_PROTOCOL_SOUNDCLOUD            234
 #define NDPI_PROTOCOL_CSGO                  235 /* Counter-Strike Global Offensive, Dota 2 */
 #define NDPI_PROTOCOL_LISP	            236
+#define NDPI_PROTOCOL_DIAMETER	            237
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_LISP
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_DIAMETER
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS               (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)
