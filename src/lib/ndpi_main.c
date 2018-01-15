@@ -1451,10 +1451,15 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "QUIC", NDPI_PROTOCOL_CATEGORY_WEB,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 443, 80, 0, 0, 0) /* UDP */);
-        ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DIAMETER,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DIAMETER,
 			    no_master,
 			    no_master, "Diameter", NDPI_PROTOCOL_CATEGORY_WEB,
 			    ndpi_build_default_ports(ports_a, 3868, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_APPLE_PUSH,
+			    no_master,
+			    no_master, "ApplePush", NDPI_PROTOCOL_CATEGORY_CLOUD,
+			    ndpi_build_default_ports(ports_a, 1, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DROPBOX,
 			    no_master,
@@ -2776,6 +2781,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* DIAMETER */
   init_diameter_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* APPLE_PUSH */
+  init_apple_push_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* EAQ */
   init_eaq_dissector(ndpi_struct, &a, detection_bitmask);

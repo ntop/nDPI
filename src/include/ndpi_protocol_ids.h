@@ -210,7 +210,6 @@
 #define NDPI_PROTOCOL_WHOIS_DAS             170
 #define NDPI_PROTOCOL_COLLECTD              171
 #define NDPI_PROTOCOL_SOCKS                 172 /* Tomasz Bujlow <tomasz@skatnet.dk> */
-/* The Lync protocol is now skype for business and this the old id 173 can now be recycled */
 #define NDPI_PROTOCOL_NINTENDO              173
 #define NDPI_PROTOCOL_RTMP                  174 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_FTP_DATA              175 /* Tomasz Bujlow <tomasz@skatnet.dk> */
@@ -276,9 +275,10 @@
 #define NDPI_PROTOCOL_CSGO                  235 /* Counter-Strike Global Offensive, Dota 2 */
 #define NDPI_PROTOCOL_LISP	            236
 #define NDPI_PROTOCOL_DIAMETER	            237
+#define NDPI_PROTOCOL_APPLE_PUSH            238
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_DIAMETER
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_APPLE_PUSH
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS               (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)

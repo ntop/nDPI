@@ -8030,11 +8030,11 @@ ndpi_protocol_match host_match[] = {
   { "amazon-adsystem.com",      "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".cloudfront.net",          "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { ".apple.com",               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+
+  { ".push.apple.com",          "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
   { ".apple-dns.net",           "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".mzstatic.com",            "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".aaplimg.com",             "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { ".icloud.com",              "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "iosapps.itunes.apple.com", "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* iOS */
   { "osxapps.itunes.apple.com", "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* MacOS */
   { "buy.itunes.apple.com",     "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
@@ -8045,6 +8045,8 @@ ndpi_protocol_match host_match[] = {
   { "itunes-apple.com",         "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { "itunes.apple.com",         "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "aaplimg.com",              "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { ".apple.com",               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { ".icloud.com",              "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".cnn.c",                   "CNN",              NDPI_PROTOCOL_CNN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".cnn.net",                 "CNN",              NDPI_PROTOCOL_CNN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },

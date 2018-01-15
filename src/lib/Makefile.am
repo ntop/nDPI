@@ -19,6 +19,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/afp.c \
 		     protocols/aimini.c \
 		     protocols/applejuice.c \
+		     protocols/apple_push.c \
 		     protocols/armagetron.c \
 		     protocols/ayiya.c \
 		     protocols/amqp.c \
