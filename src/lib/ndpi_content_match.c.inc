@@ -636,7 +636,7 @@ static ndpi_network host_protocol_list[] = {
 
   /* Teamviewer 159.122.189.32-63 */
   { 0x9F7ABD30 /* 159.122.189.32 */, 21, NDPI_PROTOCOL_TEAMVIEWER },
-   
+
   /*
    IFLIX services -by www.vizuamatix.com R&D team
   */
@@ -852,7 +852,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x5B6C1400 /* 91.108.20.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x5B6C3800 /* 91.108.56.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x959AA000 /* 149.154.160.0/20 */, 20, NDPI_PROTOCOL_TELEGRAM },
-  
+
   /*
     BitTorrent
   */
@@ -8080,20 +8080,47 @@ ndpi_protocol_match host_match[] = {
   { "android.clients.google.com",   "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { "ggpht.com",                    "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
 
+  /*
+     See https://better.fyi/trackers/
+
+     DoubleClick by Google (2mdn.net)
+     DoubleClick by Google (doubleclick.net)
+     DoubleClick by Google, Inc. (dmtry.com)
+     Google AdSense by Google (google.com)
+     Google AdSense by Google (google.se)
+     Google AdSense by Google (googleadservices.com)
+     Google Analytics by Google (google-analytics.com)
+     Google APIs by Google (ajax.googleapis.com)
+     Google Fonts by Google (fonts.googleapis.com)
+     Google Interactive Media Ads (imasdk.googleapis.com)
+     Google Syndication (googlesyndication.com)
+     Google Tag Manager by Google (googletagmanager.com)
+     Google Tag Manager by Google (googletagservices.com)
+     Gstatic by Google (gstatic.com)
+  */
+
+  /* Google Advertisements */
+  { ".googlesyndication.com",   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+  { "googleads.",               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".doubleclick.net",         "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+  { "googleadservices.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".2mdn.net",                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".dmtry.com",               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+  { "google-analytics.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+
+  /* Google Services */
+  { "googleapis.com",           "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".googletagservices.com",   "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "mtalk.google.com",         "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+
   { "plus.google.com",          "GooglePlus",       NDPI_PROTOCOL_GOOGLE_PLUS, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "plus.url.google.com",      "GooglePlus",       NDPI_PROTOCOL_GOOGLE_PLUS, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "google.",                  "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".google.",                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".gstatic.com",             "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { ".googlesyndication.com",   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { ".googletagservices.com",   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".2mdn.net",                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".doubleclick.net",         "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE }, /* Ads */
-  { "googleads.",               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { "google-analytics.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+
   { "googleusercontent.",       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { "googleadservices.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { "googleapis.com",           "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+
   { "1e100.net",                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "maps.google.",             "GoogleMaps",       NDPI_PROTOCOL_GOOGLE_MAPS, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
@@ -8106,7 +8133,7 @@ ndpi_protocol_match host_match[] = {
 
   { ".last.fm",                 "LastFM",           NDPI_PROTOCOL_LASTFM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
-  { "msn.com",                  "MSN",              NDPI_PROTOCOL_MSN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE }, /*News site*/
+  { "msn.com",                  "MSN",              NDPI_PROTOCOL_MSN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE }, /* News site */
 
   { "netflix.com",              "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "nflxext.com",              "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },

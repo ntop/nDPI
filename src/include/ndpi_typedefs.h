@@ -756,11 +756,12 @@ typedef struct {
 } ndpi_port_range;
 
 typedef enum {
-  NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn’t provide risks for the network. (e.g., a news site) */
-  NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn’t provide risks, but could be malicious (e.g., Dropbox) */
+  NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
+  NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn't provide risks, but could be malicious (e.g., Dropbox) */
   NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
   NDPI_PROTOCOL_UNSAFE,                /* Probably provides risks, but could be a normal traffic. Unencrypted protocols with clear pass should be here (e.g., telnet) */
   NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Surely is dangerous (ex. Tor). Be prepared to troubles */
+  NDPI_PROTOCOL_TRACKER_ADS,           /* Trackers, Advertisements... */
   NDPI_PROTOCOL_UNRATED                /* No idea, not implemented or impossible to classify */
 } ndpi_protocol_breed_t;
 
@@ -773,7 +774,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
   NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
   NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
-  NDPI_PROTOCOL_CATEGORY_WEB,               /* Web protocols and services */
+  NDPI_PROTOCOL_CATEGORY_WEB,               /* Web/mobile protocols and services */
   NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
   NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,       /* Download, FTP, file transfer/sharing */
   NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
