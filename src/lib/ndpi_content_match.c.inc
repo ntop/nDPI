@@ -8100,13 +8100,13 @@ ndpi_protocol_match host_match[] = {
   */
 
   /* Google Advertisements */
-  { ".googlesyndication.com",   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
-  { "googleads.",               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".doubleclick.net",         "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
-  { "googleadservices.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".2mdn.net",                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".dmtry.com",               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
-  { "google-analytics.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".googlesyndication.com",   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
+  { "googleads.",               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
+  { ".doubleclick.net",         "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
+  { "googleadservices.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
+  { ".2mdn.net",                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
+  { ".dmtry.com",               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
+  { "google-analytics.",        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
 
   /* Google Services */
   { "googleapis.com",           "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8118,6 +8118,9 @@ ndpi_protocol_match host_match[] = {
   { "google.",                  "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".google.",                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".gstatic.com",             "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+
+  /* http://check.googlezip.net/connect [check browser connectivity] */
+  { ".googlezip.net",           "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
   { "googleusercontent.",       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
