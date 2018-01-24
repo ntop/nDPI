@@ -937,6 +937,11 @@ struct ndpi_detection_module_struct {
 
   u_int8_t http_dont_dissect_response:1, dns_dissect_response:1,
     direction_detect_disable:1; /* disable internal detection of packet direction */
+
+#ifdef HAVE_HYPERSCAN
+  hs_database_t *hs_database;
+  hs_scratch_t *hs_scratch;
+#endif
 };
 
 struct ndpi_flow_struct {

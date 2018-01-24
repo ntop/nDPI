@@ -731,9 +731,62 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ******************************************************************** */
 
+#ifdef HAVE_HYPERSCAN
+
+static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
+  // TODO populate from ndpi_content_match.c.inc
+  // The regexes
+  static const char* expressions[] = {
+    "\\.facebook\\.com$",
+    "\\.youtube\\.com$",
+    "\\.youtube\\.it$",
+    "^video\\..*\\.google\\.com$",
+    "wikipedia\\.org$",
+  };
+  // The protocol ID to associate to each regex
+  static unsigned int ids[] = {
+    NDPI_PROTOCOL_FACEBOOK,
+    NDPI_PROTOCOL_YOUTUBE,
+    NDPI_PROTOCOL_YOUTUBE,
+    NDPI_PROTOCOL_GOOGLE,
+    NDPI_PROTOCOL_WIKIPEDIA,
+  };
+  #define NUM_EXPRESSIONS 5 // must match the above structures length
+
+  hs_compile_error_t *compile_err;
+
+  if(hs_compile_multi(expressions, NULL, ids,
+              NUM_EXPRESSIONS, HS_MODE_BLOCK, NULL,
+              &ndpi_mod->hs_database, &compile_err) != HS_SUCCESS) {
+    NDPI_LOG_ERR(ndpi_mod, "Unable to initialize hyperscan database\n");
+    hs_free_compile_error(compile_err);
+    return -1;
+  }
+
+  if(hs_alloc_scratch(ndpi_mod->hs_database, &ndpi_mod->hs_scratch) != HS_SUCCESS) {
+    NDPI_LOG_ERR(ndpi_mod, "Unable to allocate hyperscan scratch space\n");
+    hs_free_database(ndpi_mod->hs_database);
+    return -1;
+  }
+
+  return 0;
+}
+
+static void destroy_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
+  hs_free_scratch(ndpi_mod->hs_scratch);
+  hs_free_database(ndpi_mod->hs_database);
+}
+
+#endif
+
 static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod)
 {
   int i;
+
+#ifdef HAVE_HYPERSCAN
+  // TODO check return value
+  init_hyperscan(ndpi_mod);
+#endif
 
   for(i=0; host_match[i].string_to_match != NULL; i++)
     ndpi_init_protocol_match(ndpi_mod, &host_match[i]);
@@ -2062,6 +2115,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
 
     if(ndpi_struct->impossible_bigrams_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t*)ndpi_struct->impossible_bigrams_automa.ac_automa);
+
+#ifdef HAVE_HYPERSCAN
+    destroy_hyperscan(ndpi_struct);
+#endif
 
     ndpi_free(ndpi_struct);
   }
@@ -4929,6 +4986,8 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
 
 /* ****************************************************** */
 
+#ifndef HAVE_HYPERSCAN
+
 static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 						struct ndpi_flow_struct *flow,
 						char *string_to_match, u_int string_to_match_len,
@@ -4968,6 +5027,30 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 
   return(NDPI_PROTOCOL_UNKNOWN);
 }
+
+#else
+
+static int hyperscanEventHandler(unsigned int id, unsigned long long from,
+                        unsigned long long to, unsigned int flags, void *ctx) {
+  *((int *)ctx) = (int)id;
+  return HS_SCAN_TERMINATED;
+}
+
+static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+						struct ndpi_flow_struct *flow,
+						char *string_to_match, u_int string_to_match_len,
+						u_int16_t master_protocol_id,
+						u_int8_t is_host_match) {
+  int rv = NDPI_PROTOCOL_UNKNOWN;
+
+  if(hs_scan(ndpi_struct->hs_database, string_to_match, string_to_match_len, 0, ndpi_struct->hs_scratch,
+                hyperscanEventHandler, &rv) != HS_SUCCESS)
+    NDPI_LOG_ERR(ndpi_struct, "[NDPI] Hyperscan match returned error\n");
+
+  return rv;
+}
+
+#endif
 
 /* ****************************************************** */
 
