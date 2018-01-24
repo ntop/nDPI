@@ -25,7 +25,7 @@
 #define __NDPI_TYPEDEFS_H__
 
 #include "ndpi_define.h"
-#include "../lib/third_party/include/libcache.h"
+#include "libcache.h"
 
 #define BT_ANNOUNCE
 #define SNAP_EXT
