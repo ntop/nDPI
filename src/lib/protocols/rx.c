@@ -62,7 +62,7 @@ struct ndpi_rx_header {
 #define	PARAM_2           10	
 #define	PARAM_3           11	
 #define	PARAMS_4          12	
-#define	VERSION	          13
+#define	VERS	          13
 
 /* Flags values */
 #define EMPTY              0
@@ -110,7 +110,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   **/
   
   /* TYPE field */
-  if((header->type < DATA) || (header->type > VERSION)) {
+  if((header->type < DATA) || (header->type > VERS)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
@@ -156,7 +156,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
         goto security;
       case PARAM_3:
 	goto security;
-      case VERSION:
+      case VERS:
 	goto security;
       default:
 	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

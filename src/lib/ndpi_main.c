@@ -24,11 +24,12 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "ahocorasick.h"
+#include "libcache.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
 #include "ndpi_api.h"
-#include "../../config.h"
+#include "ndpi_config.h"
 
 #include <time.h>
 #ifndef WIN32
@@ -38,6 +39,17 @@
 #include "ndpi_content_match.c.inc"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/src/ndpi_patricia.c"
+
+#ifdef HAVE_HYPERSCAN
+#include <hs.h>
+#endif
+
+#ifdef HAVE_HYPERSCAN
+struct hs {
+  hs_database_t *database;
+  hs_scratch_t  *scratch;
+};
+#endif
 
 static int _ndpi_debug_callbacks = 0;
 
@@ -734,47 +746,61 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
 #ifdef HAVE_HYPERSCAN
 
 static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
-  // TODO populate from ndpi_content_match.c.inc
-  // The regexes
-  static const char* expressions[] = {
-    "\\.facebook\\.com$",
-    "\\.youtube\\.com$",
-    "\\.youtube\\.it$",
-    "^video\\..*\\.google\\.com$",
-    "wikipedia\\.org$",
-  };
-  // The protocol ID to associate to each regex
-  static unsigned int ids[] = {
-    NDPI_PROTOCOL_FACEBOOK,
-    NDPI_PROTOCOL_YOUTUBE,
-    NDPI_PROTOCOL_YOUTUBE,
-    NDPI_PROTOCOL_GOOGLE,
-    NDPI_PROTOCOL_WIKIPEDIA,
-  };
-  #define NUM_EXPRESSIONS 5 // must match the above structures length
-
+  u_int num_patterns = 0, i;
+  const char **expressions;
+  unsigned int *ids;
   hs_compile_error_t *compile_err;
+  struct hs *hs = (struct hs*)ndpi_mod->hyperscan;
+  
+  ndpi_mod->hyperscan = (void*)malloc(sizeof(struct hs));
+  if(!ndpi_mod->hyperscan) return(-1);
+  
+  for(i=0; host_match[i].string_to_match != NULL; i++) {
+    if(host_match[i].pattern_to_match)
+      num_patterns++;
+  }
 
+  expressions = (const char**)malloc(sizeof(char*)*num_patterns);
+  if(!expressions) return(-1);
+
+  ids = (unsigned int*)malloc(sizeof(unsigned int)*num_patterns);
+  if(!ids) {
+    free(expressions);
+    return(-1);
+  }
+
+  for(i=0, num_patterns=0; host_match[i].string_to_match != NULL; i++) {
+    if(host_match[i].pattern_to_match) {
+      expressions[num_patterns] = host_match[i].pattern_to_match;
+      ids[num_patterns]         = host_match[i].protocol_id;
+      num_patterns++;
+    }
+  }
+  
   if(hs_compile_multi(expressions, NULL, ids,
-              NUM_EXPRESSIONS, HS_MODE_BLOCK, NULL,
-              &ndpi_mod->hs_database, &compile_err) != HS_SUCCESS) {
+		      num_patterns, HS_MODE_BLOCK, NULL,
+		      &hs->database, &compile_err) != HS_SUCCESS) {
     NDPI_LOG_ERR(ndpi_mod, "Unable to initialize hyperscan database\n");
     hs_free_compile_error(compile_err);
     return -1;
   }
-
-  if(hs_alloc_scratch(ndpi_mod->hs_database, &ndpi_mod->hs_scratch) != HS_SUCCESS) {
+  
+  if(hs_alloc_scratch(hs->database, &hs->scratch) != HS_SUCCESS) {
     NDPI_LOG_ERR(ndpi_mod, "Unable to allocate hyperscan scratch space\n");
-    hs_free_database(ndpi_mod->hs_database);
+    hs_free_database(hs->database);
     return -1;
   }
-
+  
   return 0;
 }
 
 static void destroy_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
-  hs_free_scratch(ndpi_mod->hs_scratch);
-  hs_free_database(ndpi_mod->hs_database);
+  if(ndpi_mod->hyperscan) {
+    struct hs *hs = (struct hs*)ndpi_mod->hyperscan;
+    
+    hs_free_scratch(hs->scratch);
+    hs_free_database(hs->database);
+  }
 }
 
 #endif
@@ -2093,7 +2119,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
 
 #ifdef NDPI_PROTOCOL_TINC
     if(ndpi_struct->tinc_cache)
-      cache_free(ndpi_struct->tinc_cache);
+      cache_free((cache_t)(ndpi_struct->tinc_cache));
 #endif
 
     if(ndpi_struct->protocols_ptree)
@@ -5042,9 +5068,11 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 						u_int16_t master_protocol_id,
 						u_int8_t is_host_match) {
   int rv = NDPI_PROTOCOL_UNKNOWN;
-
-  if(hs_scan(ndpi_struct->hs_database, string_to_match, string_to_match_len, 0, ndpi_struct->hs_scratch,
-                hyperscanEventHandler, &rv) != HS_SUCCESS)
+  struct hs *hs = (struct hs*)ndpi_struct->hyperscan;
+  
+  if(hs_scan(hs->database, string_to_match,
+	     string_to_match_len, 0, hs->scratch,
+	     hyperscanEventHandler, &rv) != HS_SUCCESS)
     NDPI_LOG_ERR(ndpi_struct, "[NDPI] Hyperscan match returned error\n");
 
   return rv;

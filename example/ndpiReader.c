@@ -43,7 +43,6 @@
 #include <sys/socket.h>
 #include <assert.h>
 #include <math.h>
-#include "../config.h"
 #include "ndpi_api.h"
 #include "uthash.h"
 #include <sys/stat.h>

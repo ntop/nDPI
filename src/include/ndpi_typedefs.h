@@ -25,33 +25,28 @@
 #define __NDPI_TYPEDEFS_H__
 
 #include "ndpi_define.h"
-#include "libcache.h"
 
 #define BT_ANNOUNCE
 #define SNAP_EXT
 
-
 /* NDPI_LOG_LEVEL */
-typedef enum
-  {
-    NDPI_LOG_ERROR,
-    NDPI_LOG_TRACE,
-    NDPI_LOG_DEBUG,
-    NDPI_LOG_DEBUG_EXTRA
-  } ndpi_log_level_t;
+typedef enum {
+  NDPI_LOG_ERROR,
+  NDPI_LOG_TRACE,
+  NDPI_LOG_DEBUG,
+  NDPI_LOG_DEBUG_EXTRA
+} ndpi_log_level_t;
 
 /* NDPI_VISIT */
-typedef enum
-  {
-    ndpi_preorder,
-    ndpi_postorder,
-    ndpi_endorder,
-    ndpi_leaf
-  } ndpi_VISIT;
+typedef enum {
+  ndpi_preorder,
+  ndpi_postorder,
+  ndpi_endorder,
+  ndpi_leaf
+} ndpi_VISIT;
 
 /* NDPI_NODE */
-typedef struct node_t
-{
+typedef struct node_t {
   char *key;
   struct node_t *left, *right;
 } ndpi_node;
@@ -60,8 +55,7 @@ typedef struct node_t
 typedef u_int32_t ndpi_ndpi_mask;
 
 /* NDPI_PROTO_BITMASK_STRUCT */
-typedef struct ndpi_protocol_bitmask_struct
-{
+typedef struct ndpi_protocol_bitmask_struct {
   ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS];
 } ndpi_protocol_bitmask_struct_t;
 
@@ -797,9 +791,9 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
 
   NDPI_PROTOCOL_NUM_CATEGORIES /*
-				  NOTE: Keep this as last member
-				  Unused as value but useful to getting the number of elements
-				  in this datastructure
+				 NOTE: Keep this as last member
+				 Unused as value but useful to getting the number of elements
+				 in this datastructure
 			       */
 } ndpi_protocol_category_t;
 
@@ -863,6 +857,7 @@ struct ndpi_detection_module_struct {
   ndpi_default_ports_tree_node_t *tcpRoot, *udpRoot;
 
   ndpi_log_level_t ndpi_log_level; /* default error */
+
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   /* debug callback, only set when debug is used */
   ndpi_debug_function_ptr ndpi_debug_printf;
@@ -930,7 +925,7 @@ struct ndpi_detection_module_struct {
 #endif
 #endif
 #ifdef NDPI_PROTOCOL_TINC
-  cache_t tinc_cache;
+  struct cache *tinc_cache;
 #endif
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
@@ -938,10 +933,7 @@ struct ndpi_detection_module_struct {
   u_int8_t http_dont_dissect_response:1, dns_dissect_response:1,
     direction_detect_disable:1; /* disable internal detection of packet direction */
 
-#ifdef HAVE_HYPERSCAN
-  hs_database_t *hs_database;
-  hs_scratch_t *hs_scratch;
-#endif
+  void *hyperscan; /* Intel Hyperscan */
 };
 
 struct ndpi_flow_struct {
@@ -957,8 +949,8 @@ struct ndpi_flow_struct {
   u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
 
   /*
-     if ndpi_struct->direction_detect_disable == 1
-     tcp sequence number connection tracking
+    if ndpi_struct->direction_detect_disable == 1
+    tcp sequence number connection tracking
   */
   u_int32_t next_tcp_seq_nr[2];
 
@@ -967,8 +959,8 @@ struct ndpi_flow_struct {
   int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
   /*
-     the tcp / udp / other l4 value union
-     used to reduce the number of bytes for tcp or udp protocol states
+    the tcp / udp / other l4 value union
+    used to reduce the number of bytes for tcp or udp protocol states
   */
   union {
     struct ndpi_flow_tcp_struct tcp;
@@ -976,20 +968,20 @@ struct ndpi_flow_struct {
   } l4;
 
   /*
-     Pointer to src or dst
-     that identifies the
-     server of this connection
+    Pointer to src or dst
+    that identifies the
+    server of this connection
   */
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
   u_char host_server_name[256];
 
   /*
-     This structure below will not not stay inside the protos
-     structure below as HTTP is used by many subprotocols
-     such as FaceBook, Google... so it is hard to know
-     when to use it or not. Thus we leave it outside for the
-     time being.
+    This structure below will not not stay inside the protos
+    structure below as HTTP is used by many subprotocols
+    such as FaceBook, Google... so it is hard to know
+    when to use it or not. Thus we leave it outside for the
+    time being.
   */
   struct {
     ndpi_http_method method;
@@ -1150,7 +1142,7 @@ struct ndpi_flow_struct {
 };
 
 typedef struct {
-  char *string_to_match, *proto_name;
+  char *string_to_match, *string2_to_match, *pattern_to_match, *proto_name;
   int protocol_id;
   ndpi_protocol_category_t proto_category;
   ndpi_protocol_breed_t protocol_breed;

@@ -51,6 +51,17 @@ else
      AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"])
 fi
 
+
+HS_LIB=
+HS_INC=
+AC_ARG_WITH(hyperscan,     [  --with-hyperscan     Enable Intel Hyperscan (if available)])
+
+if test "${with_hyperscan}" == "yes"; then :
+   AC_CHECK_LIB([hs], [hs_compile_multi], AC_DEFINE_UNQUOTED(HAVE_HYPERSCAN, 1, [Intel Hyperscan is present]))
+   HS_INC=`pkg-config --cflags libhs`
+   HS_LIB=`pkg-config --libs libhs`
+fi
+
 if test -f $PCAP_HOME/libpcap/libpcap.a; then :
      echo "Using libpcap from $PCAP_HOME"
      PCAP_INC="-I $PCAP_HOME/libpcap"
@@ -101,7 +112,7 @@ AS_IF([test "x$enable_json_c" != "xno"], [
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
 AC_CONFIG_FILES([Makefile src/lib/Makefile example/Makefile tests/Makefile libndpi.pc src/include/ndpi_define.h])
-AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
 AC_SUBST(NDPI_MINOR)
@@ -111,6 +122,8 @@ AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
 AC_SUBST(DL_LIB)
+AC_SUBST(HS_LIB)
+AC_SUBST(HS_INC)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 
 AC_OUTPUT
