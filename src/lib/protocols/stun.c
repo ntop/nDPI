@@ -90,7 +90,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       https://en.wikipedia.org/wiki/Skype_for_Business
     */
 
-    while(offset < payload_length) {
+    while((offset+2) < payload_length) {
       u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
       u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
       u_int16_t x = (len + 4) % 4;
@@ -107,6 +107,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	      
       case 0x8054: /* Candidate Identifier */
 	if((len == 4)
+	   && ((offset+7) < payload_length)
 	   && (payload[offset+5] == 0x00)
 	   && (payload[offset+6] == 0x00)
 	   && (payload[offset+7] == 0x00)) {
@@ -118,6 +119,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
       case 0x8070: /* Implementation Version */
 	if((len == 4)
+	   && ((offset+7) < payload_length)
 	   && (payload[offset+4] == 0x00)
 	   && (payload[offset+5] == 0x00)
 	   && (payload[offset+6] == 0x00)
@@ -239,7 +241,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   }
 #endif
 
-
   if((flow->num_stun_udp_pkts > 0) && (msg_type <= 0x00FF)) {
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
@@ -269,11 +270,12 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 
+  if(packet->payload == NULL) return;
+    
   if(packet->tcp) {
     /* STUN may be encapsulated in TCP packets */
-    if(packet->payload_packet_len >= 2 + 20 &&
-       ntohs(get_u_int16_t(packet->payload, 0)) + 2 == packet->payload_packet_len) {
-
+    if((packet->payload_packet_len >= 22)
+       && ((ntohs(get_u_int16_t(packet->payload, 0)) + 2) == packet->payload_packet_len)) {      
       /* TODO there could be several STUN packets in a single TCP packet so maybe the detection could be
        * improved by checking only the STUN packet of given length */
 
@@ -283,10 +285,11 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
 	  ndpi_int_stun_add_connection(ndpi_struct, NDPI_PROTOCOL_SKYPE, flow);
 	} else {
-	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
+	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
 	  ndpi_int_stun_add_connection(ndpi_struct,
 				       is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
 	}
+	
 	return;
       }
     }
@@ -306,9 +309,8 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     return;
   }
 
-  if(flow->num_stun_udp_pkts >= MAX_NUM_STUN_PKTS) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  }
+  if(flow->num_stun_udp_pkts >= MAX_NUM_STUN_PKTS)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);  
 
   if(flow->packet_counter > 0) {
     /* This might be a RTP stream: let's make sure we check it */
