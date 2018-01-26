@@ -1950,13 +1950,13 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
 {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   va_list args;
-#define MAX_STR_LEN 120
+#define MAX_STR_LEN 250
   char str[MAX_STR_LEN];
   if(ndpi_str != NULL && log_level > NDPI_LOG_ERROR  &&
 	proto > 0 && proto < NDPI_MAX_SUPPORTED_PROTOCOLS &&
 	!NDPI_ISSET(&ndpi_str->debug_bitmask,proto)) return;
   va_start(args, format);
-  vsprintf(str, format, args);
+  vsnprintf(str,sizeof(str)-1, format, args);
   va_end(args);
 
   if (ndpi_str != NULL) {
