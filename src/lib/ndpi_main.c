@@ -750,20 +750,23 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
   const char **expressions;
   unsigned int *ids;
   hs_compile_error_t *compile_err;
-  struct hs *hs = (struct hs*)ndpi_mod->hyperscan;
+  struct hs *hs;
   
   ndpi_mod->hyperscan = (void*)malloc(sizeof(struct hs));
   if(!ndpi_mod->hyperscan) return(-1);
+  hs = (struct hs*)ndpi_mod->hyperscan;
   
   for(i=0; host_match[i].string_to_match != NULL; i++) {
-    if(host_match[i].pattern_to_match)
+    if(host_match[i].pattern_to_match) {
+      /*  printf("[DEBUG] %s\n", host_match[i].pattern_to_match); */
       num_patterns++;
+    }
   }
 
-  expressions = (const char**)malloc(sizeof(char*)*num_patterns);
+  expressions = (const char**)calloc(sizeof(char*), num_patterns+1);
   if(!expressions) return(-1);
 
-  ids = (unsigned int*)malloc(sizeof(unsigned int)*num_patterns);
+  ids = (unsigned int*)calloc(sizeof(unsigned int), num_patterns+1);
   if(!ids) {
     free(expressions);
     return(-1);
@@ -794,6 +797,8 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
   return 0;
 }
 
+/* ******************************************************************** */
+
 static void destroy_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
   if(ndpi_mod->hyperscan) {
     struct hs *hs = (struct hs*)ndpi_mod->hyperscan;
@@ -804,6 +809,8 @@ static void destroy_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
 }
 
 #endif
+
+/* ******************************************************************** */
 
 static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod)
 {
@@ -5055,6 +5062,8 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 }
 
 #else
+
+/* ******************************************************************** */
 
 static int hyperscanEventHandler(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int flags, void *ctx) {

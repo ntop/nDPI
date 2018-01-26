@@ -8162,11 +8162,11 @@ ndpi_protocol_match host_match[] = {
   { ".sina.com.cn", NULL, NULL,             "Sina",             NDPI_PROTOCOL_SINA, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
   /* https://support.cipafilter.com/index.php?/Knowledgebase/Article/View/117/0/snapchat---how-to-block */
-  { "feelinsonice.appspot.com", NULL, NULL,     "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { "feelinsonice.appspot.com", NULL, "\\.appspot\\.com$",     "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { "feelinsonice-hrd.appspot.com", NULL, NULL, "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
-  { "feelinsonice.com", NULL, NULL,             "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
-  { ".snapchat.", NULL, NULL,                   "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
-  { ".snapads.", NULL, NULL,                    "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { "feelinsonice.com", NULL, "\\.feelsonice\\.com$",             "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".snapchat.", NULL, "\\.snapchat\\.com$",                   "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".snapads.", NULL, "\\.snapads\\.com$",                    "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
 
   /* Detected "instagram.c10r.facebook.com". Omitted "*amazonaws.com" and "*facebook.com" CDNs e.g. "ig-telegraph-shv-04-frc3.facebook.com" */
   { ".cdninstagram.com", NULL, NULL,        "Instagram",        NDPI_PROTOCOL_INSTAGRAM, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
