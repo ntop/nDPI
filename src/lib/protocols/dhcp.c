@@ -72,19 +72,24 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
   if(packet->udp) {
     dhcp_packet_t *dhcp = (dhcp_packet_t*)packet->payload;
 
-    if((packet->payload_packet_len >= 244)
+    if((packet->payload_packet_len >= 244 /* 244 is the offset of options[0] in dhcp_packet_t */)
        && (packet->udp->source == htons(67) || packet->udp->source == htons(68))
        && (packet->udp->dest == htons(67) || packet->udp->dest == htons(68))
        && (dhcp->magic == htonl(DHCP_OPTION_MAGIC_NUMBER))) {
-      int i = 0, foundValidMsgType = 0;
+      u_int i = 0, foundValidMsgType = 0;
 
-      while(i < DHCP_VEND_LEN) {
+      u_int dhcp_options_size = ndpi_min(DHCP_VEND_LEN /* maximum size of options in dhcp_packet_t */,
+					 packet->payload_packet_len - 244);
+
+      while(i + 1 /* for the len */ < dhcp_options_size) {
 	u_int8_t id  = dhcp->options[i];
 
 	if(id == 0xFF)
 	  break;
 	else {
-	  u_int8_t len = dhcp->options[i+1];
+	  /* Prevent malformed packets to cause out-of-bounds accesses */
+	  u_int8_t len = ndpi_min(dhcp->options[i+1] /* len as found in the packet */,
+				  dhcp_options_size - (i+2) /* 1 for the type and 1 for the value */);
 
 	  if(len == 0) break;
 
@@ -99,12 +104,14 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  } else if(id == 55 /* Parameter Request List / Fingerprint */) {
 	    u_int idx, offset = 0;
 
-	    for(idx=0; idx<len; idx++) {
+	    for(idx = 0; idx < len && offset < sizeof(flow->protos.dhcp.fingerprint) - 2; idx++) {
 	      snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
-		       sizeof(flow->protos.dhcp.fingerprint)-offset-1,
-		       "%02X",  dhcp->options[i+2+idx] & 0xFF);
+		       sizeof(flow->protos.dhcp.fingerprint) - offset,
+		       "%02X", dhcp->options[i+2+idx] & 0xFF);
 	      offset += 2;
 	    }
+	    flow->protos.dhcp.fingerprint[sizeof(flow->protos.dhcp.fingerprint) - 1] = '\0';
+
 	  } else if(id == 60 /* Class Identifier */) {
 	    char *name = (char*)&dhcp->options[i+2];
 	    int j = 0;
