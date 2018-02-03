@@ -1,13 +1,14 @@
 MDNS	2	202	2
 DHCP	6	2052	1
 Dropbox	2	1088	1
-Apple	50	23466	2
+Apple	44	21371	1
 WhatsApp	32	3243	2
 Spotify	1	86	1
+ApplePush	6	2095	1
 
 	1	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.140/SSL.Apple][24 pkts/15117 bytes <-> 20 pkts/6254 bytes]
 	2	TCP 192.168.2.4:49206 <-> 158.85.58.15:5222 [proto: 142/WhatsApp][17 pkts/1794 bytes <-> 13 pkts/1169 bytes]
-	3	TCP 17.110.229.14:5223 -> 192.168.2.4:49193 [proto: 140/Apple][6 pkts/2095 bytes -> 0 pkts/0 bytes]
+	3	TCP 17.110.229.14:5223 -> 192.168.2.4:49193 [proto: 238/ApplePush][6 pkts/2095 bytes -> 0 pkts/0 bytes]
 	4	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][6 pkts/2052 bytes -> 0 pkts/0 bytes][Host: lucas-imac]
 	5	UDP 192.168.2.1:17500 -> 192.168.2.255:17500 [proto: 121/Dropbox][2 pkts/1088 bytes -> 0 pkts/0 bytes]
 	6	UDP 192.168.2.4:61697 <-> 192.168.2.1:53 [proto: 5.142/DNS.WhatsApp][1 pkts/76 bytes <-> 1 pkts/204 bytes][Host: e12.whatsapp.net]
