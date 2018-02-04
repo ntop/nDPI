@@ -3135,7 +3135,11 @@ static void produceBpfFilter(char *filePath) {
 /**
    @brief MAIN FUNCTION
 **/
+#ifdef APP_HAS_OWN_MAIN
+int orginal_main(int argc, char **argv) {
+#else
 int main(int argc, char **argv) {
+#endif
   int i;
 
   automataUnitTest();
