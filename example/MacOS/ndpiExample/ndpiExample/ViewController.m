@@ -46,6 +46,9 @@ extern int orginal_main(int argc, char **argv);
 {
     char* args[10];
     
+    extern int optind;
+    optind = 1; // reset the parse of getopt_long
+    
     // Check the "nDPI_QuickStartGuide.pdf" for comand option explanation.
     
     /* Following code it to execute below command (remember to change args[2] to
@@ -74,7 +77,9 @@ extern int orginal_main(int argc, char **argv);
     args[3] = (char*)"-s";
     args[4] = (char*)"10";
     args[5] = (char*)"-p";
-    args[6] = (char*)"/Users/zengyingpei/Documents/code/nDPI/example/protos.txt";
+    NSString* proto_file = [[NSBundle mainBundle]pathForResource:@"protos" ofType:@"txt"];
+    args[6] = (char*)[proto_file cStringUsingEncoding:NSUTF8StringEncoding];
+    //args[6] = (char*)"/Users/zengyingpei/Documents/code/nDPI/example/protos.txt";
     orginal_main(7, args);
      */
 }
