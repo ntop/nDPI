@@ -36,6 +36,7 @@
 #include <unistd.h>
 #endif
 
+#include "ndpi_network_list.c.inc"
 #include "ndpi_content_match.c.inc"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/src/ndpi_patricia.c"

@@ -1,3 +1,6 @@
+bin_PROGRAMS = ndpi_network_list_compile
+AM_CPPFLAGS = -I$(top_srcdir)/src/include/  -I$(top_srcdir)/src/lib/third_party/include/
+
 lib_LTLIBRARIES = libndpi.la
 
 CFLAGS += -fPIC -DPIC # --coverage
@@ -5,6 +8,8 @@ libndpi_la_CPPFLAGS = -I$(top_srcdir)/src/include/  -I$(top_srcdir)/src/lib/thir
 libndpi_la_LDFLAGS = -version-info 1:0:0 -export-symbols $(top_srcdir)/libndpi.sym
 
 libndpi_la_includedir = $(includedir)/libndpi-@VERSION@/libndpi
+
+BUILT_SOURCES = ndpi_network_list.c.inc
 
 libndpi_la_include_HEADERS = ../include/ndpi_api.h \
 			     ../include/ndpi_define.h \
@@ -16,6 +21,7 @@ libndpi_la_include_HEADERS = ../include/ndpi_api.h \
 			     third_party/include/libcache.h
 
 libndpi_la_SOURCES = ndpi_content_match.c.inc \
+		     ndpi_network_list.c.inc \
 		     ndpi_main.c \
 		     protocols/afp.c \
 		     protocols/aimini.c \
@@ -178,3 +184,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     third_party/src/libcache.c
 
 EXTRA_DIST = third_party/src/ndpi_patricia.c
+
+ndpi_network_list.c.inc: ndpi_network_list_std.yaml ndpi_network_list_tor.yaml ndpi_network_list_compile
+		./ndpi_network_list_compile -o $@ ndpi_network_list_std.yaml ndpi_network_list_tor.yaml
+

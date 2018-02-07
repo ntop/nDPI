@@ -49,3 +49,5 @@ stamp-h1
 /src/include/ndpi_define.h
 /test-driver
 /tests/Makefile
+/src/lib/ndpi_network_list_compile
+/src/lib/ndpi_network_list.c.inc
