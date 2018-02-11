@@ -802,6 +802,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x5B6C1400 /* 91.108.20.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x5B6C3800 /* 91.108.56.0/22 */, 22, NDPI_PROTOCOL_TELEGRAM },
   { 0x959AA000 /* 149.154.160.0/20 */, 20, NDPI_PROTOCOL_TELEGRAM },
+  { 0xA93F4940 /* 169.63.73.64/26 */, 26, NDPI_PROTOCOL_TELEGRAM },
 
   /*
     BitTorrent
@@ -7973,6 +7974,9 @@ static ndpi_network host_protocol_list[] = {
 */
 
 ndpi_protocol_match host_match[] = {
+  { "s3.ll.dash.row.aiv-cdn.net", NULL, "s3\\.ll\\.dash\\.row\\.aiv-cdn\\.net",  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "d25xi40x97liuc.cloudfront.net", NULL, "d25xi40x97liuc\\.cloudfront\\.net",  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".aiv-delivery.net", NULL, "\\.aiv-delivery\\.net",                          "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "amazon.", NULL, NULL,                                 "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "amazon.com", NULL, "amazon\\.com$",                   "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "images-amazon.com", NULL, "images-amazon\\.com$",     "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8021,10 +8025,10 @@ ndpi_protocol_match host_match[] = {
 
   { ".speedtest.net", NULL, NULL,           "Ookla",            NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
 
-  { "drive-thirdparty.", NULL, NULL,        "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
-  { "docs.", NULL, NULL,                    "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".docs.", NULL, NULL,                   "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
-  { "drive.", NULL, NULL,                   "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "docs.googleusercontent.com", NULL, NULL, "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
+  
+  { "drive-thirdparty.googleusercontent.com", NULL, NULL,        "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+  { "drive.google.com",                       NULL, NULL,        "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "android.clients.google.com", NULL, NULL,   "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { "ggpht.com", NULL, NULL,                    "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
@@ -8071,8 +8075,11 @@ ndpi_protocol_match host_match[] = {
   /* http://check.googlezip.net/connect [check browser connectivity] */
   { ".googlezip.net", NULL, NULL,           "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
-  { "googleusercontent.", NULL, NULL,       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-
+  { "docs.googleusercontent.com", NULL, NULL, "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
+  { "docs.google.com",            NULL, NULL, "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
+  
+  
+  { "googleusercontent.com", NULL, NULL,    "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE }, 
   { "1e100.net", NULL, NULL,                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "maps.google.", NULL, NULL,             "GoogleMaps",       NDPI_PROTOCOL_GOOGLE_MAPS, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
@@ -8132,7 +8139,6 @@ ndpi_protocol_match host_match[] = {
   { ".ytimg.com", NULL, NULL,               "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "youtube-nocookie.", NULL, NULL,        "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "ggpht.com", NULL, NULL,                "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
-  { "googleusercontent.com", NULL, NULL,    "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { ".vevo.com", NULL, NULL,                "Vevo",             NDPI_PROTOCOL_VEVO,    NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
