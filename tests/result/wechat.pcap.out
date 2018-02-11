@@ -9,10 +9,10 @@ QQ	26	9402	2
 IGMP	24	1280	4
 SSL	21	1209	3
 ICMPV6	3	218	2
-YouTube	36	9047	2
-Google	92	20878	15
+Google	113	24811	15
 LLMNR	12	944	6
 WeChat	1251	606425	49
+GoogleDocs	15	5114	2
 
 	1	TCP 203.205.151.162:443 <-> 192.168.1.103:54058 [proto: 91.197/SSL.WeChat][88 pkts/15114 bytes <-> 91 pkts/61842 bytes]
 	2	TCP 192.168.1.103:54101 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][46 pkts/12575 bytes <-> 40 pkts/53424 bytes][client: web.wechat.com][server: web.wechat.com]
@@ -35,9 +35,9 @@ WeChat	1251	606425	49
 	19	TCP 192.168.1.103:54111 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][14 pkts/4626 bytes <-> 12 pkts/5135 bytes][client: web.wechat.com][server: web.wechat.com]
 	20	TCP 192.168.1.103:58042 <-> 203.205.147.171:443 [proto: 91.197/SSL.WeChat][12 pkts/4516 bytes <-> 10 pkts/5004 bytes][client: web.wechat.com][server: web.wechat.com]
 	21	TCP 192.168.1.103:43850 <-> 203.205.158.34:443 [proto: 91.48/SSL.QQ][12 pkts/2005 bytes <-> 12 pkts/6787 bytes][client: res.wx.qq.com][server: wx.qq.com]
-	22	TCP 192.168.1.103:38657 <-> 172.217.22.14:443 [proto: 91.124/SSL.YouTube][17 pkts/2413 bytes <-> 17 pkts/6268 bytes][client: safebrowsing.googleusercontent.com][server: *.googleusercontent.com]
+	22	TCP 192.168.1.103:38657 <-> 172.217.22.14:443 [proto: 91.126/SSL.Google][17 pkts/2413 bytes <-> 17 pkts/6268 bytes][client: safebrowsing.googleusercontent.com][server: *.googleusercontent.com]
 	23	UDP 192.168.1.103:51507 <-> 172.217.23.67:443 [proto: 188.126/QUIC.Google][7 pkts/3507 bytes <-> 6 pkts/3329 bytes][Host: ssl.gstatic.com]
-	24	UDP 192.168.1.103:57591 <-> 216.58.198.46:443 [proto: 188.126/QUIC.Google][6 pkts/2687 bytes <-> 7 pkts/2125 bytes][Host: docs.google.com]
+	24	UDP 192.168.1.103:57591 <-> 216.58.198.46:443 [proto: 188.241/QUIC.GoogleDocs][6 pkts/2687 bytes <-> 7 pkts/2125 bytes][Host: docs.google.com]
 	25	TCP 192.168.1.103:54120 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][10 pkts/1032 bytes <-> 8 pkts/3711 bytes][client: web.wechat.com][server: web.wechat.com]
 	26	TCP 192.168.1.103:58041 <-> 203.205.147.171:443 [proto: 91.197/SSL.WeChat][10 pkts/1032 bytes <-> 8 pkts/3711 bytes][client: web.wechat.com][server: web.wechat.com]
 	27	TCP 192.168.1.103:54118 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][10 pkts/1032 bytes <-> 8 pkts/3703 bytes][client: web.wechat.com][server: web.wechat.com]
@@ -78,12 +78,12 @@ WeChat	1251	606425	49
 	62	UDP 192.168.1.103:60356 <-> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][1 pkts/74 bytes <-> 1 pkts/391 bytes][Host: web.wechat.com]
 	63	TCP 192.168.1.103:49787 <-> 216.58.205.142:443 [proto: 91.126/SSL.Google][3 pkts/198 bytes <-> 3 pkts/198 bytes]
 	64	TCP 192.168.1.103:58226 -> 203.205.147.171:443 [proto: 91.197/SSL.WeChat][6 pkts/396 bytes -> 0 pkts/0 bytes]
-	65	UDP 192.168.1.103:53734 <-> 192.168.1.254:53 [proto: 5.124/DNS.YouTube][1 pkts/94 bytes <-> 1 pkts/272 bytes][Host: safebrowsing.googleusercontent.com]
+	65	UDP 192.168.1.103:53734 <-> 192.168.1.254:53 [proto: 5.126/DNS.Google][1 pkts/94 bytes <-> 1 pkts/272 bytes][Host: safebrowsing.googleusercontent.com]
 	66	TCP 192.168.1.103:58043 <-> 203.205.147.171:443 [proto: 91.197/SSL.WeChat][3 pkts/206 bytes <-> 2 pkts/148 bytes]
 	67	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][1 pkts/342 bytes -> 0 pkts/0 bytes][Host: iphonedimonica]
 	68	UDP 192.168.1.103:46078 <-> 192.168.1.254:53 [proto: 5.126/DNS.Google][1 pkts/75 bytes <-> 1 pkts/234 bytes][Host: ssl.gstatic.com]
 	69	UDP 192.168.1.103:60562 <-> 192.168.1.254:53 [proto: 5.126/DNS.Google][1 pkts/75 bytes <-> 1 pkts/234 bytes][Host: ssl.gstatic.com]
-	70	UDP 192.168.1.103:55862 <-> 192.168.1.254:53 [proto: 5.126/DNS.Google][1 pkts/75 bytes <-> 1 pkts/227 bytes][Host: docs.google.com]
+	70	UDP 192.168.1.103:55862 <-> 192.168.1.254:53 [proto: 5.241/DNS.GoogleDocs][1 pkts/75 bytes <-> 1 pkts/227 bytes][Host: docs.google.com]
 	71	IGMP 192.168.1.103:0 -> 224.0.0.22:0 [proto: 82/IGMP][4 pkts/216 bytes -> 0 pkts/0 bytes]
 	72	TCP 192.168.1.103:40741 <-> 203.205.151.211:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/108 bytes]
 	73	IGMP 192.168.1.254:0 -> 224.0.0.1:0 [proto: 82/IGMP][4 pkts/200 bytes -> 0 pkts/0 bytes]
