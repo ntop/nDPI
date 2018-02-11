@@ -20,7 +20,6 @@
 		E395431A20255354000BBA0D /* Makefile.simple in Resources */ = {isa = PBXBuildFile; fileRef = E39540BF20255353000BBA0D /* Makefile.simple */; };
 		E395431B20255354000BBA0D /* ndpi_content_match.c.inc in Sources */ = {isa = PBXBuildFile; fileRef = E39540C020255353000BBA0D /* ndpi_content_match.c.inc */; };
 		E395431C20255354000BBA0D /* ndpi_main.c in Sources */ = {isa = PBXBuildFile; fileRef = E39540C120255353000BBA0D /* ndpi_main.c */; };
-		E395431E20255354000BBA0D /* .dirstamp in Resources */ = {isa = PBXBuildFile; fileRef = E39540C520255353000BBA0D /* .dirstamp */; };
 		E39543A320255354000BBA0D /* afp.c in Sources */ = {isa = PBXBuildFile; fileRef = E395414B20255353000BBA0D /* afp.c */; };
 		E39543A420255354000BBA0D /* aimini.c in Sources */ = {isa = PBXBuildFile; fileRef = E395414C20255353000BBA0D /* aimini.c */; };
 		E39543A520255354000BBA0D /* amqp.c in Sources */ = {isa = PBXBuildFile; fileRef = E395414D20255353000BBA0D /* amqp.c */; };
@@ -176,7 +175,6 @@
 		E395454320255355000BBA0D /* yahoo.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542ED20255354000BBA0D /* yahoo.c */; };
 		E395454420255355000BBA0D /* zattoo.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542EE20255354000BBA0D /* zattoo.c */; };
 		E395454520255355000BBA0D /* zeromq.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542EF20255354000BBA0D /* zeromq.c */; };
-		E395454720255355000BBA0D /* .dirstamp in Resources */ = {isa = PBXBuildFile; fileRef = E39542FB20255354000BBA0D /* .dirstamp */; };
 		E395454C20255355000BBA0D /* libcache.c in Sources */ = {isa = PBXBuildFile; fileRef = E395430120255354000BBA0D /* libcache.c */; };
 		E395455420255355000BBA0D /* node.c in Sources */ = {isa = PBXBuildFile; fileRef = E395430920255354000BBA0D /* node.c */; };
 		E395455520255355000BBA0D /* sort.c in Sources */ = {isa = PBXBuildFile; fileRef = E395430A20255354000BBA0D /* sort.c */; };
@@ -215,7 +213,6 @@
 		E39540BF20255353000BBA0D /* Makefile.simple */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.simple; sourceTree = "<group>"; };
 		E39540C020255353000BBA0D /* ndpi_content_match.c.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = ndpi_content_match.c.inc; sourceTree = "<group>"; };
 		E39540C120255353000BBA0D /* ndpi_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ndpi_main.c; sourceTree = "<group>"; };
-		E39540C520255353000BBA0D /* .dirstamp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .dirstamp; sourceTree = "<group>"; };
 		E395414B20255353000BBA0D /* afp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = afp.c; sourceTree = "<group>"; };
 		E395414C20255353000BBA0D /* aimini.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aimini.c; sourceTree = "<group>"; };
 		E395414D20255353000BBA0D /* amqp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = amqp.c; sourceTree = "<group>"; };
@@ -378,7 +375,6 @@
 		E39542F520255354000BBA0D /* ndpi_patricia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ndpi_patricia.h; sourceTree = "<group>"; };
 		E39542F620255354000BBA0D /* node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = node.h; sourceTree = "<group>"; };
 		E39542F720255354000BBA0D /* sort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sort.h; sourceTree = "<group>"; };
-		E39542FB20255354000BBA0D /* .dirstamp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .dirstamp; sourceTree = "<group>"; };
 		E395430020255354000BBA0D /* ahocorasick.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahocorasick.c; sourceTree = "<group>"; };
 		E395430120255354000BBA0D /* libcache.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libcache.c; sourceTree = "<group>"; };
 		E395430820255354000BBA0D /* ndpi_patricia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ndpi_patricia.c; sourceTree = "<group>"; };
@@ -496,7 +492,6 @@
 		E39540C220255353000BBA0D /* protocols */ = {
 			isa = PBXGroup;
 			children = (
-				E39540C520255353000BBA0D /* .dirstamp */,
 				E395414B20255353000BBA0D /* afp.c */,
 				E395414C20255353000BBA0D /* aimini.c */,
 				E395414D20255353000BBA0D /* amqp.c */,
@@ -690,7 +685,6 @@
 		E39542F820255354000BBA0D /* src */ = {
 			isa = PBXGroup;
 			children = (
-				E39542FB20255354000BBA0D /* .dirstamp */,
 				E395430020255354000BBA0D /* ahocorasick.c */,
 				E395430120255354000BBA0D /* libcache.c */,
 				E395430820255354000BBA0D /* ndpi_patricia.c */,
@@ -772,9 +766,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E395430C20255354000BBA0D /* ndpi_define.h.in in Resources */,
-				E395431E20255354000BBA0D /* .dirstamp in Resources */,
 				E395431A20255354000BBA0D /* Makefile.simple in Resources */,
-				E395454720255355000BBA0D /* .dirstamp in Resources */,
 				E395430B20255354000BBA0D /* Makefile.am in Resources */,
 				E395431920255354000BBA0D /* Makefile.in in Resources */,
 				E3953F5920254989000BBA0D /* Assets.xcassets in Resources */,
@@ -1106,7 +1098,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 5NEA8474R4;
-				GCC_PREPROCESSOR_DEFINITIONS = BUILD_NDPI_IN_XCODE;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"APP_HAS_OWN_MAIN=1",
+					"NDPI_LOG_DEBUG2=NDPI_LOG_DEBUG2_XCODE_PROJ",
+				);
 				INFOPLIST_FILE = ndpiExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zyingp.ndpiExample;
