@@ -7980,7 +7980,7 @@ ndpi_protocol_match host_match[] = {
   { "amazon.", NULL, NULL,                                 "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "amazon.com", NULL, "amazon\\.com$",                   "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "images-amazon.com", NULL, "images-amazon\\.com$",     "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { "amazonaws.com", NULL, "amazonaws\\.com$",             "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_UNSAFE },
+  { "amazonaws.com", NULL, "amazonaws\\.com$",             "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazon-adsystem.com", NULL, "amazon-adsystem\\.com$", "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".cloudfront.net", NULL, "\\.cloudfront\\.net$",       "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
