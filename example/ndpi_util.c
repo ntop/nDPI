@@ -855,9 +855,9 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
     type = ETH_P_IP, ip_offset += 4;
 
     while(!mpls.mpls.s) {
-      ip_offset += 4;
       mpls.u32 = *((uint32_t *) &packet[ip_offset]);
       mpls.u32 = ntohl(mpls.u32);
+      ip_offset += 4;
     }
     break;
   case PPPoE:
