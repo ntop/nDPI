@@ -23,9 +23,11 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #if defined(NDPI_PROTOCOL_IP_IPSEC) || defined(NDPI_PROTOCOL_IP_GRE) || defined(NDPI_PROTOCOL_IP_ICMP)  || defined(NDPI_PROTOCOL_IP_IGMP) || defined(NDPI_PROTOCOL_IP_EGP) || defined(NDPI_PROTOCOL_IP_SCTP) || defined(NDPI_PROTOCOL_IP_OSPF) || defined(NDPI_PROTOCOL_IP_IP_IN_IP)
+
+#include "ndpi_api.h"
 
 #define set_protocol_and_bmask(nprot)					\
   {									\
