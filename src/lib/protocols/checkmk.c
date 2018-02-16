@@ -21,10 +21,14 @@
  *
  *
  */
-
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_CHECKMK
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CHECKMK
+
+#include "ndpi_api.h"
+
 
 static void ndpi_int_checkmk_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow)
