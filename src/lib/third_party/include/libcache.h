@@ -29,6 +29,10 @@ SOFTWARE.
 
 #include <stdint.h>
 
+typedef struct cache_entry *cache_entry;
+
+typedef struct cache_entry_map *cache_entry_map;
+
 /**
  * @brief Codes representing the result of some functions
  *
@@ -99,5 +103,7 @@ cache_result cache_remove(cache_t cache, void *item, uint32_t item_size);
  */
 void cache_free(cache_t cache);
 
+cache_entry cache_entry_new(void);
+cache_entry_map cache_entry_map_new(void);
 
 #endif
