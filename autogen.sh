@@ -7,11 +7,11 @@ NDPI_VERSION_SHORT="$NDPI_MAJOR.$NDPI_MINOR.$NDPI_PATCH"
 
 rm -f configure config.h config.h.in src/lib/Makefile.in
 
-AUTOCONF=$(which autoconf)
-AUTOMAKE=$(which automake)
-LIBTOOL=$(which libtool)
-LIBTOOLIZE=$(which libtoolize)
-AUTORECONF=$(which autoreconf)
+AUTOCONF=$(command -v autoconf)
+AUTOMAKE=$(command -v automake)
+LIBTOOL=$(command -v libtool)
+LIBTOOLIZE=$(command -v libtoolize)
+AUTORECONF=$(command -v autoreconf)
 
 if test -z $AUTOCONF; then
     echo "autoconf is missing: please install it and try again"
