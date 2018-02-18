@@ -33,6 +33,12 @@ if test -z $AUTORECONF; then
     exit
 fi
 
-cat configure.seed | sed "s/@NDPI_MAJOR@/$NDPI_MAJOR/g" | sed "s/@NDPI_MINOR@/$NDPI_MINOR/g" | sed "s/@NDPI_PATCH@/$NDPI_PATCH/g" | sed "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" > configure.ac
+cat configure.seed | sed \
+    -e "s/@NDPI_MAJOR@/$NDPI_MAJOR/g" \
+    -e "s/@NDPI_MINOR@/$NDPI_MINOR/g" \
+    -e "s/@NDPI_PATCH@/$NDPI_PATCH/g" \
+    -e "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" \
+    > configure.ac
+
 autoreconf -ivf
 ./configure $*
