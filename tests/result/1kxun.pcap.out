@@ -8,10 +8,10 @@ SSDP	143	36951	13
 DHCP	24	8208	5
 MPEG	433	185988	2
 QQ	28	5216	2
+RTP	2	132	1
 SSL	105	21914	7
 DHCPV6	10	980	3
 Facebook	19	6840	2
-Skype	2	132	1
 Google	3	176	1
 LLMNR	89	6799	47
 1kxun	433	311919	14
@@ -116,7 +116,7 @@ LLMNR	89	6799	47
 	98	UDP 192.168.3.236:51714 -> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/132 bytes -> 0 pkts/0 bytes][Host: isatap]
 	99	UDP 192.168.3.236:56043 -> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/132 bytes -> 0 pkts/0 bytes][Host: isatap]
 	100	UDP 192.168.5.47:53962 -> 224.0.0.252:5355 [proto: 154/LLMNR][2 pkts/132 bytes -> 0 pkts/0 bytes][Host: ro_x1c]
-	101	UDP 192.168.5.47:61603 -> 224.0.0.252:5355 [proto: 125/Skype][2 pkts/132 bytes -> 0 pkts/0 bytes]
+	101	UDP 192.168.5.47:61603 -> 224.0.0.252:5355 [proto: 87/RTP][2 pkts/132 bytes -> 0 pkts/0 bytes]
 	102	TCP 192.168.5.16:53605 -> 68.233.253.133:80 [proto: 7/HTTP][2 pkts/126 bytes -> 0 pkts/0 bytes]
 	103	TCP 192.168.5.16:53622 <-> 192.168.115.75:443 [proto: 91/SSL][1 pkts/60 bytes <-> 1 pkts/60 bytes]
 	104	UDP [fe80::f65c:89ff:fe89:e607]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][1 pkts/98 bytes -> 0 pkts/0 bytes]
