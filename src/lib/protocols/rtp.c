@@ -122,7 +122,7 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   /* printf("*** %s(pkt=%d)\n", __FUNCTION__, flow->packet_counter); */
   
   if((packet->udp != NULL)
-     && (ntohs(packet->udp->source) > 1023)
+     /* && (ntohs(packet->udp->source) > 1023) */
      && (ntohs(packet->udp->dest) > 1023))
     ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
 }
