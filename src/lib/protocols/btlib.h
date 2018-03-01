@@ -150,9 +150,9 @@ struct bt_parse_protocol {
 		struct bt_nodes6_data *nodes6;
 		u_int16_t	name_len;
 		u_int16_t	nn;		// nodes num
-		u_int16_t	nv;		// valuse num
+		u_int16_t	nv;		// values num
 		u_int16_t	nn6;		// nodes6 num
-		u_int16_t	nv6;		// valuse6 num
+		u_int16_t	nv6;		// values6 num
 		u_int16_t	port;
 		u_int16_t	t_len;
 	} r;
@@ -171,7 +171,7 @@ typedef struct bt_parse_data_cb {
 	int	level;
 	int	t;
 	union {
-		i_int64_t i;
+		int64_t i;
 		b_elem_s_t s;
 	} v;
 } bt_parse_data_cb_t;

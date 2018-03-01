@@ -1,0 +1,8 @@
+RTP	9	1926	1
+SIP	102	47087	2
+RTCP	1	146	1
+
+	1	UDP 192.168.1.2:5060 <-> 212.242.33.35:5060 [proto: 100/SIP][53 pkts/21940 bytes <-> 31 pkts/15635 bytes]
+	2	UDP 192.168.1.2:5060 <-> 200.68.120.81:5060 [proto: 100/SIP][15 pkts/7568 bytes <-> 3 pkts/1944 bytes]
+	3	UDP 192.168.1.2:30000 -> 212.242.33.36:40392 [proto: 87/RTP][9 pkts/1926 bytes -> 0 pkts/0 bytes]
+	4	UDP 192.168.1.2:30001 -> 212.242.33.36:40393 [proto: 165/RTCP][1 pkts/146 bytes -> 0 pkts/0 bytes]

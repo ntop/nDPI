@@ -22,10 +22,13 @@
  * 
  */
 
-
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_SOPCAST
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SOPCAST
+
+#include "ndpi_api.h"
 
 
 static void ndpi_int_sopcast_add_connection(struct ndpi_detection_module_struct
@@ -43,6 +46,8 @@ static void ndpi_int_sopcast_add_connection(struct ndpi_detection_module_struct
 	
 #if !defined(WIN32)
 static inline
+#elif defined(MINGW_GCC)
+__mingw_forceinline static
 #else
 __forceinline static
 #endif
@@ -102,15 +107,13 @@ static void ndpi_search_sopcast_tcp(struct ndpi_detection_module_struct
 	
   if (flow->packet_counter == 1 && packet->payload_packet_len == 54 && get_u_int16_t(packet->payload, 0) == ntohs(0x0036)) {
     if (ndpi_int_is_sopcast_tcp(packet->payload, packet->payload_packet_len)) {
-      NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast TCP \n");
+      NDPI_LOG_INFO(ndpi_struct, "found sopcast TCP \n");
       ndpi_int_sopcast_add_connection(ndpi_struct, flow);
       return;
     }
   }
 
-  NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "exclude sopcast TCP.  \n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOPCAST);
-
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
 }
 
@@ -119,19 +122,14 @@ static void ndpi_search_sopcast_udp(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
-
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
-  NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "search sopcast.  \n");
-
+  NDPI_LOG_DBG(ndpi_struct, "search sopcast.  \n");
 
   if (packet->payload_packet_len == 52 && packet->payload[0] == 0xff
       && packet->payload[1] == 0xff && packet->payload[2] == 0x01
       && packet->payload[8] == 0x02 && packet->payload[9] == 0xff
       && packet->payload[10] == 0x00 && packet->payload[11] == 0x2c
       && packet->payload[12] == 0x00 && packet->payload[13] == 0x00 && packet->payload[14] == 0x00) {
-    NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast with if I.  \n");
+    NDPI_LOG_INFO(ndpi_struct, "found sopcast with if I.  \n");
     ndpi_int_sopcast_add_connection(ndpi_struct, flow);
     return;
   }
@@ -140,17 +138,17 @@ static void ndpi_search_sopcast_udp(struct ndpi_detection_module_struct
       && packet->payload[8] == 0x01 && packet->payload[9] == 0xff
       && packet->payload[10] == 0x00 && packet->payload[11] == 0x14
       && packet->payload[12] == 0x00 && packet->payload[13] == 0x00) {
-    NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast with if II.  \n");
+    NDPI_LOG_INFO(ndpi_struct, "found sopcast with if II.  \n");
     ndpi_int_sopcast_add_connection(ndpi_struct, flow);
     return;
   }
-  /* this case has been seen once. Please revome this comment, if you see it another time */
+  /* this case has been seen once. Please remove this comment, if you see it another time */
   if (packet->payload_packet_len == 60 && packet->payload[0] == 0x00
       && packet->payload[2] == 0x01
       && packet->payload[8] == 0x03 && packet->payload[9] == 0xff
       && packet->payload[10] == 0x00 && packet->payload[11] == 0x34
       && packet->payload[12] == 0x00 && packet->payload[13] == 0x00 && packet->payload[14] == 0x00) {
-    NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast with if III.  \n");
+    NDPI_LOG_INFO(ndpi_struct, "found sopcast with if III.  \n");
     ndpi_int_sopcast_add_connection(ndpi_struct, flow);
     return;
   }
@@ -160,7 +158,7 @@ static void ndpi_search_sopcast_udp(struct ndpi_detection_module_struct
       && packet->payload[8] == 0x06
       && packet->payload[9] == 0x01 && packet->payload[10] == 0x00
       && packet->payload[11] == 0x22 && packet->payload[12] == 0x00 && packet->payload[13] == 0x00) {
-    NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast with if IV.  \n");
+    NDPI_LOG_INFO(ndpi_struct, "found sopcast with if IV.  \n");
     ndpi_int_sopcast_add_connection(ndpi_struct, flow);
     return;
   }
@@ -170,18 +168,18 @@ static void ndpi_search_sopcast_udp(struct ndpi_detection_module_struct
       && packet->payload[8] == 0x01
       && packet->payload[9] == 0x01 && packet->payload[10] == 0x00
       && packet->payload[11] == 0x14 && packet->payload[12] == 0x00 && packet->payload[13] == 0x00) {
-    NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast with if V.  \n");
+    NDPI_LOG_INFO(ndpi_struct, "found sopcast with if V.  \n");
     ndpi_int_sopcast_add_connection(ndpi_struct, flow);
     return;
   }
-  /* this case has been seen once. Please revome this comment, if you see it another time */
+  /* this case has been seen once. Please remove this comment, if you see it another time */
   if (packet->payload_packet_len == 286 && packet->payload[0] == 0x00
       && packet->payload[1] == 0x02 && packet->payload[2] == 0x01
       && packet->payload[3] == 0x07 && packet->payload[4] == 0x03
       && packet->payload[8] == 0x06
       && packet->payload[9] == 0x01 && packet->payload[10] == 0x01
       && packet->payload[11] == 0x16 && packet->payload[12] == 0x00 && packet->payload[13] == 0x00) {
-    NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast with if VI.  \n");
+    NDPI_LOG_INFO(ndpi_struct, "found sopcast with if VI.  \n");
     ndpi_int_sopcast_add_connection(ndpi_struct, flow);
     return;
   }
@@ -191,14 +189,14 @@ static void ndpi_search_sopcast_udp(struct ndpi_detection_module_struct
       && packet->payload[10] == 0x00 && packet->payload[11] == 0x44
       && packet->payload[16] == 0x01 && packet->payload[15] == 0x01
       && packet->payload[12] == 0x00 && packet->payload[13] == 0x00 && packet->payload[14] == 0x00) {
-    NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "found sopcast with if VII.  \n");
+    NDPI_LOG_INFO(ndpi_struct, "found sopcast with if VII.  \n");
     ndpi_int_sopcast_add_connection(ndpi_struct, flow);
     return;
   }
 
   /* Attention please: no asymmetric detection necessary. This detection works asymmetrically as well. */
 
-  NDPI_LOG(NDPI_PROTOCOL_SOPCAST, ndpi_struct, NDPI_LOG_DEBUG, "exclude sopcast.  \n");
+  NDPI_LOG_DBG(ndpi_struct, "exclude sopcast.  \n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOPCAST);
 
 }

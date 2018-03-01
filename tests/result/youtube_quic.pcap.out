@@ -1,0 +1,6 @@
+YouTube	258	178495	1
+Google	31	13144	2
+
+	1	UDP 192.168.1.7:56074 <-> 216.58.198.33:443 [proto: 188.124/QUIC.YouTube][113 pkts/16111 bytes <-> 145 pkts/162384 bytes][Host: yt3.ggpht.com]
+	2	UDP 192.168.1.7:53859 <-> 216.58.205.66:443 [proto: 188.126/QUIC.Google][9 pkts/3929 bytes <-> 9 pkts/4736 bytes][Host: googleads.g.doubleclick.net]
+	3	UDP 192.168.1.7:54997 <-> 216.58.205.66:443 [proto: 188.126/QUIC.Google][7 pkts/2312 bytes <-> 6 pkts/2167 bytes][Host: pagead2.googlesyndication.com]

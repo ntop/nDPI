@@ -18,10 +18,14 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_NETFLOW
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_NETFLOW
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_NETFLOW
 
 #ifdef WIN32
 extern int gettimeofday(struct timeval * tp, struct timezone * tzp);
@@ -95,13 +99,15 @@ struct flow_ver7_rec {
   u_int32_t router_sc;  /* Router which is shortcut by switch */
 };
 
-static void ndpi_check_netflow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
   time_t now;
   struct timeval now_tv;
+
+  NDPI_LOG_DBG(ndpi_struct, "search netflow\n");
 
   if((packet->udp != NULL) && (payload_len >= 24)) {
     u_int16_t version = (packet->payload[0] << 8) + packet->payload[1], uptime_offset;
@@ -132,7 +138,7 @@ static void ndpi_check_netflow(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       if((expected_len > 0) && (expected_len != payload_len)) {
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_NETFLOW);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
       }
 
@@ -159,19 +165,12 @@ static void ndpi_check_netflow(struct ndpi_detection_module_struct *ndpi_struct,
 
     if(((version == 1) && (when == 0))
        || ((when >= 946684800 /* 1/1/2000 */) && (when <= now))) {
-      NDPI_LOG(NDPI_PROTOCOL_NETFLOW, ndpi_struct, NDPI_LOG_DEBUG, "Found netflow.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found netflow\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETFLOW, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
 }
-
-void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-  NDPI_LOG(NDPI_PROTOCOL_NETFLOW, ndpi_struct, NDPI_LOG_DEBUG, "netflow detection...\n");
-  ndpi_check_netflow(ndpi_struct, flow);
-}
-
 
 void init_netflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {

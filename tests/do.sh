@@ -1,4 +1,3 @@
-
 READER="../example/ndpiReader -p ../example/protos.txt"
 
 RC=0

@@ -1,7 +1,7 @@
 /*
  * quic.c
  *
- * Copyright (C) 2012-16 - ntop.org
+ * Copyright (C) 2012-18 - ntop.org
  *
  * Based on code of:
  * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
@@ -22,9 +22,13 @@
  *
  */
 
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_QUIC
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_QUIC
+
+#include "ndpi_api.h"
 
 static int quic_ports(u_int16_t sport, u_int16_t dport)
 {
@@ -68,6 +72,8 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   u_int seq_len = quic_len((packet->payload[0] & 0x30) >> 4);
   u_int quic_hlen = 1 /* flags */ + version_len + seq_len + cid_len;
 
+  NDPI_LOG_DBG(ndpi_struct, "search QUIC\n");
+
   if(packet->udp != NULL
      && (udp_len > (quic_hlen+4 /* QXXX */))
      && ((packet->payload[0] & 0xC2) == 0x00)
@@ -78,43 +84,47 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
       goto no_quic;
 
-    NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "found QUIC.\n");
+    NDPI_LOG_INFO(ndpi_struct, "found QUIC\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
 
-    if(udp_len > quic_hlen + 17 + 4 &&
-         !strncmp((char*)&packet->payload[quic_hlen+17], "CHLO" /* Client Hello */, 4)) {
-      /* Check if SNI (Server Name Identification) is present */
-      for(i=quic_hlen+12; i<udp_len-3; i++) {
-	if((packet->payload[i] == 'S')
-	   && (packet->payload[i+1] == 'N')
-	   && (packet->payload[i+2] == 'I')
-	   && (packet->payload[i+3] == 0)) {
-	  u_int32_t offset = *((u_int32_t*)&packet->payload[i+4]);
-	  u_int32_t prev_offset = *((u_int32_t*)&packet->payload[i-4]);
-	  int len = offset-prev_offset;
-	  int sni_offset = i+prev_offset+1;
+    if(packet->payload[quic_hlen+12] != 0xA0)
+      quic_hlen++;
+	     
+    if(udp_len > quic_hlen + 16 + 4) {
+      if(!strncmp((char*)&packet->payload[quic_hlen+16], "CHLO" /* Client Hello */, 4)) {
+	/* Check if SNI (Server Name Identification) is present */
+	for(i=quic_hlen+12; i<udp_len-3; i++) {
+	  if((packet->payload[i] == 'S')
+	     && (packet->payload[i+1] == 'N')
+	     && (packet->payload[i+2] == 'I')
+	     && (packet->payload[i+3] == 0)) {
+	    u_int32_t offset = *((u_int32_t*)&packet->payload[i+4]);
+	    u_int32_t prev_offset = *((u_int32_t*)&packet->payload[i-4]);
+	    int len = offset-prev_offset;
+	    int sni_offset = i+prev_offset+1;
 
-	  while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
-	    sni_offset++;
+	    while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
+	      sni_offset++;
 
-	  if((sni_offset+len) < udp_len) {
-	    int max_len = sizeof(flow->host_server_name)-1, j = 0;
+	    if((sni_offset+len) < udp_len) {
+	      int max_len = sizeof(flow->host_server_name)-1, j = 0;
 
-	    if(len > max_len) len = max_len;
+	      if(len > max_len) len = max_len;
 
-	    while((len > 0) && (sni_offset < udp_len)) {
-	      flow->host_server_name[j++] = packet->payload[sni_offset];
-	      sni_offset++, len--;
+	      while((len > 0) && (sni_offset < udp_len)) {
+		flow->host_server_name[j++] = packet->payload[sni_offset];
+		sni_offset++, len--;
+	      }
+
+	      ndpi_match_host_subprotocol(ndpi_struct, flow, 
+					  (char *)flow->host_server_name,
+					  strlen((const char*)flow->host_server_name),
+					  NDPI_PROTOCOL_QUIC);
+	    
 	    }
 
-	    ndpi_match_host_subprotocol(ndpi_struct, flow, 
-					(char *)flow->host_server_name,
-					strlen((const char*)flow->host_server_name),
-					NDPI_PROTOCOL_QUIC);
-	    
+	    break;
 	  }
-
-	  break;
 	}
       }
     }
@@ -122,8 +132,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
  no_quic:
-  NDPI_LOG(NDPI_PROTOCOL_QUIC, ndpi_struct, NDPI_LOG_DEBUG, "exclude QUIC.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QUIC);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 /* ***************************************************************** */

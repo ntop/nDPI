@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = libndpi.la
 
 CFLAGS += -fPIC -DPIC # --coverage
-libndpi_la_CPPFLAGS = -I$(top_srcdir)/src/include/  -I$(top_srcdir)/src/lib/third_party/include/
+libndpi_la_CPPFLAGS = -I$(top_srcdir)/src/include/  -I$(top_srcdir)/src/lib/third_party/include/ @HS_INC@
 libndpi_la_LDFLAGS = -version-info 1:0:0 -export-symbols $(top_srcdir)/libndpi.sym
 
 libndpi_la_includedir = $(includedir)/libndpi-@VERSION@/libndpi
@@ -12,28 +12,34 @@ libndpi_la_include_HEADERS = ../include/ndpi_api.h \
 			     ../include/ndpi_includes.h \
 			     ../include/ndpi_protocol_ids.h \
 			     ../include/ndpi_protocols.h \
-			     ../include/ndpi_typedefs.h
+			     ../include/ndpi_typedefs.h \
+			     third_party/include/libcache.h
 
 libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     ndpi_main.c \
 		     protocols/afp.c \
 		     protocols/aimini.c \
 		     protocols/applejuice.c \
+		     protocols/apple_push.c \
 		     protocols/armagetron.c \
 		     protocols/ayiya.c \
+		     protocols/amqp.c \
 		     protocols/battlefield.c \
 		     protocols/bgp.c \
 		     protocols/bittorrent.c \
 		     protocols/bjnp.c \
+		     protocols/checkmk.c \
 		     protocols/ciscovpn.c \
 		     protocols/citrix.c \
 		     protocols/coap.c \
 		     protocols/collectd.c \
 		     protocols/corba.c \
 		     protocols/crossfire.c \
+		     protocols/csgo.c \
 		     protocols/dcerpc.c \
 		     protocols/dhcp.c \
 		     protocols/dhcpv6.c \
+		     protocols/diameter.c \
 		     protocols/directconnect.c \
 		     protocols/directdownloadlink.c \
 		     protocols/dns.c \
@@ -44,6 +50,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/edonkey.c \
 		     protocols/fasttrack.c \
 		     protocols/fiesta.c \
+		     protocols/fix.c \
 		     protocols/filetopia.c \
 		     protocols/florensia.c \
 		     protocols/ftp_control.c \
@@ -66,9 +73,9 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/kakaotalk_voice.c \
 		     protocols/kerberos.c \
 		     protocols/kontiki.c \
-		     protocols/kxun.c \
 		     protocols/ldap.c \
 		     protocols/lotus_notes.c \
+		     protocols/lisp.c \
 		     protocols/mail_imap.c \
 		     protocols/mail_pop.c \
 		     protocols/mail_smtp.c \
@@ -84,6 +91,7 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/mysql.c \
 		     protocols/netbios.c \
 		     protocols/netflow.c \
+		     protocols/nintendo.c \
 		     protocols/nfs.c \
 		     protocols/noe.c \
 		     protocols/non_tcp_udp.c \
@@ -99,7 +107,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/ppstream.c \
 		     protocols/pptp.c \
 		     protocols/qq.c \
-		     protocols/quake.c \
 		     protocols/quic.c \
 		     protocols/radius.c \
 		     protocols/rdp.c \
@@ -157,13 +164,17 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/zattoo.c \
 		     protocols/zeromq.c \
 		     protocols/smpp.c \
+		     protocols/tinc.c \
+		     protocols/someip.c \
 		     third_party/include/actypes.h \
 		     third_party/include/ahocorasick.h \
 		     third_party/include/ndpi_patricia.h \
 		     third_party/include/node.h \
 		     third_party/include/sort.h \
+		     third_party/include/libcache.h \
 		     third_party/src/ahocorasick.c \
 		     third_party/src/node.c \
-		     third_party/src/sort.c
+		     third_party/src/sort.c \
+		     third_party/src/libcache.c
 
 EXTRA_DIST = third_party/src/ndpi_patricia.c

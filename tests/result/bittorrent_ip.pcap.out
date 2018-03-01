@@ -1,0 +1,4 @@
+BitTorrent	479	508018	2
+
+	1	TCP 77.222.174.20:2866 <-> 10.0.0.14:46610 [proto: 37/BitTorrent][305 pkts/461770 bytes <-> 126 pkts/8316 bytes]
+	2	TCP 185.56.20.36:53646 <-> 10.0.0.14:35030 [proto: 37/BitTorrent][25 pkts/36414 bytes <-> 23 pkts/1518 bytes]

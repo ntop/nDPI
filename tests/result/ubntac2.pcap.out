@@ -1,0 +1,10 @@
+UBNTAC2	8	1736	8
+
+	1	UDP 192.168.1.1:34085 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]
+	2	UDP 192.168.1.1:42838 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]
+	3	UDP 192.168.1.1:44641 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]
+	4	UDP 192.168.1.1:47746 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]
+	5	UDP 192.168.1.1:47871 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]
+	6	UDP 192.168.1.1:52220 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]
+	7	UDP 192.168.1.1:55321 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]
+	8	UDP 192.168.1.1:59772 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][1 pkts/217 bytes -> 0 pkts/0 bytes][UniFiSecurityGateway.ER-e120.v4.3.33.4936086.161203.2031]

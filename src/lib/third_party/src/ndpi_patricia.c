@@ -54,6 +54,7 @@
 #include <arpa/inet.h> /* BSD, Linux, Solaris: for inet_addr */
 #endif
 #include "ndpi_patricia.h"
+#include "ndpi_api.h"
 
 void ndpi_DeleteEntry(void *a) {
   ndpi_free(a);
@@ -74,17 +75,17 @@ ndpi_prefix_tochar (prefix_t * prefix)
 }
 
 int ndpi_comp_with_mask (void *addr, void *dest, u_int mask) {
-  if( /* mask/8 == 0 || */ memcmp (addr, dest, mask / 8) == 0) {
-    int n = mask / 8;
-    int m = ((-1) << (8 - (mask % 8)));
-
-    if(mask % 8 == 0 || (((u_char *)addr)[n] & m) == (((u_char *)dest)[n] & m))
-      return (1);
-  }
-  return (0);
+  uint32_t *pa = addr;
+  uint32_t *pd = dest;
+  uint32_t m;
+  for(;mask >= 32; mask -= 32, pa++,pd++)
+        if(*pa != *pd) return 0;
+  if(!mask) return 1;
+  m = htonl((~0u) << (32-mask));
+  return (*pa & m) == (*pd &m);
 }
 
-/* this allows imcomplete prefix */
+/* this allows incomplete prefix */
 int
 ndpi_my_inet_pton (int af, const char *src, void *dst)
 {
@@ -769,6 +770,7 @@ ndpi_patricia_lookup (patricia_tree_t *patricia, prefix_t *prefix)
   }
 
   new_node = (patricia_node_t*)ndpi_calloc(1, sizeof *new_node);
+  if(!new_node) return NULL;
   new_node->bit = prefix->bitlen;
   new_node->prefix = ndpi_Ref_Prefix (prefix);
   new_node->parent = NULL;
@@ -874,7 +876,7 @@ ndpi_patricia_remove (patricia_tree_t *patricia, patricia_node_t *node)
 #endif /* PATRICIA_DEBUG */
 	
     /* this might be a placeholder node -- have to check and make sure
-     * there is a prefix aossciated with it ! */
+     * there is a prefix associated with it ! */
     if(node->prefix != NULL) 
       ndpi_Deref_Prefix (node->prefix);
     node->prefix = NULL;

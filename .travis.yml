@@ -40,3 +40,10 @@ after_script:
 #- lcov --remove coverage.info 'tests/*' 'packages/*' 'm4/*' 'doc/*' --output-file coverage.info
 #- lcov --list coverage.info # debug before upload
 #- coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info # uploads to coveralls
+
+notifications:
+  email:
+    recipients:
+      - packager@ntop.org
+    on_success: never
+    on_failure: always

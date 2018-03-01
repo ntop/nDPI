@@ -21,9 +21,14 @@
  *
  */
 
-#include "ndpi_api.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_OPENVPN
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_OPENVPN
+
+#include "ndpi_api.h"
+
 
 #define P_CONTROL_HARD_RESET_CLIENT_V1  (0x01 << 3)
 #define P_CONTROL_HARD_RESET_CLIENT_V2  (0x07 << 3)
@@ -81,7 +86,7 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
       if (check_pkid_and_detect_hmac_size(ovpn_payload) > 0) {
         memcpy(flow->ovpn_session_id, ovpn_payload+1, 8);
 
-        NDPI_LOG(NDPI_PROTOCOL_OPENVPN, ndpi_struct, NDPI_LOG_DEBUG,
+        NDPI_LOG_DBG2(ndpi_struct,
 		 "session key: %02x%02x%02x%02x%02x%02x%02x%02x\n",
 		 flow->ovpn_session_id[0], flow->ovpn_session_id[1], flow->ovpn_session_id[2], flow->ovpn_session_id[3],
 		 flow->ovpn_session_id[4], flow->ovpn_session_id[5], flow->ovpn_session_id[6], flow->ovpn_session_id[7]);
@@ -95,10 +100,12 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
         alen = ovpn_payload[P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size)];
         session_remote = ovpn_payload + P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size) + 1 + alen * 4;
 
-        if (memcmp(flow->ovpn_session_id, session_remote, 8) == 0)
-          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
+        if (memcmp(flow->ovpn_session_id, session_remote, 8) == 0) {
+		NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
+          	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
+	  }
         else {
-          NDPI_LOG(NDPI_PROTOCOL_OPENVPN, ndpi_struct, NDPI_LOG_DEBUG,
+          NDPI_LOG_DBG2(ndpi_struct,
 		   "key mismatch: %02x%02x%02x%02x%02x%02x%02x%02x\n",
 		   session_remote[0], session_remote[1], session_remote[2], session_remote[3],
 		   session_remote[4], session_remote[5], session_remote[6], session_remote[7]);
@@ -111,8 +118,9 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
 
     flow->ovpn_counter++;
     
-    if (failed)
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OPENVPN);
+    if (failed) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    }
   }
 }
 

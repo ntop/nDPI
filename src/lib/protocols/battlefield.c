@@ -22,10 +22,13 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_BATTLEFIELD
 
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_BATTLEFIELD
+
+#include "ndpi_api.h"
 
 static void ndpi_int_battlefield_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -53,12 +56,12 @@ void ndpi_search_battlefield(struct ndpi_detection_module_struct *ndpi_struct, s
   if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_BATTLEFIELD) {
     if (src != NULL && ((u_int32_t)
 			(packet->tick_timestamp - src->battlefield_ts) < ndpi_struct->battlefield_timeout)) {
-      NDPI_LOG(NDPI_PROTOCOL_BATTLEFIELD, ndpi_struct, NDPI_LOG_DEBUG,
+      NDPI_LOG_DBG2(ndpi_struct,
 	       "battlefield : save src connection packet detected\n");
       src->battlefield_ts = packet->tick_timestamp;
     } else if (dst != NULL && ((u_int32_t)
 			       (packet->tick_timestamp - dst->battlefield_ts) < ndpi_struct->battlefield_timeout)) {
-      NDPI_LOG(NDPI_PROTOCOL_BATTLEFIELD, ndpi_struct, NDPI_LOG_DEBUG,
+      NDPI_LOG_DBG2(ndpi_struct,
 	       "battlefield : save dst connection packet detected\n");
       dst->battlefield_ts = packet->tick_timestamp;
     }
@@ -74,8 +77,7 @@ void ndpi_search_battlefield(struct ndpi_detection_module_struct *ndpi_struct, s
       }
     } else if (flow->l4.udp.battlefield_stage == 2 - packet->packet_direction) {
       if (packet->payload_packet_len > 8 && get_u_int32_t(packet->payload, 0) == flow->l4.udp.battlefield_msg_id) {
-	NDPI_LOG(NDPI_PROTOCOL_BATTLEFIELD, ndpi_struct,
-		 NDPI_LOG_DEBUG, "Battlefield message and reply detected.\n");
+	NDPI_LOG_INFO(ndpi_struct, "found Battlefield message and reply detected\n");
 	ndpi_int_battlefield_add_connection(ndpi_struct, flow);
 	return;
       }
@@ -91,28 +93,26 @@ void ndpi_search_battlefield(struct ndpi_detection_module_struct *ndpi_struct, s
   } else if (flow->l4.udp.battlefield_stage == 4 - packet->packet_direction) {
     if (packet->payload_packet_len == 7
 	&& (packet->payload[0] == 0x02 || packet->payload[packet->payload_packet_len - 1] == 0xe0)) {
-      NDPI_LOG(NDPI_PROTOCOL_BATTLEFIELD, ndpi_struct, NDPI_LOG_DEBUG,
-	       "Battlefield message and reply detected.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found Battlefield message and reply detected\n");
       ndpi_int_battlefield_add_connection(ndpi_struct, flow);
       return;
     }
   }
 
   if (packet->payload_packet_len == 18 && memcmp(&packet->payload[5], "battlefield2\x00", 13) == 0) {
-    NDPI_LOG(NDPI_PROTOCOL_BATTLEFIELD, ndpi_struct, NDPI_LOG_DEBUG, "Battlefield 2 hello packet detected.\n");
+    NDPI_LOG_INFO(ndpi_struct, "found Battlefield 2 hello packet detected\n");
     ndpi_int_battlefield_add_connection(ndpi_struct, flow);
     return;
   } else if (packet->payload_packet_len > 10 &&
 	     (memcmp(packet->payload, "\x11\x20\x00\x01\x00\x00\x50\xb9\x10\x11", 10) == 0
 	      || memcmp(packet->payload, "\x11\x20\x00\x01\x00\x00\x30\xb9\x10\x11", 10) == 0
 	      || memcmp(packet->payload, "\x11\x20\x00\x01\x00\x00\xa0\x98\x00\x11", 10) == 0)) {
-    NDPI_LOG(NDPI_PROTOCOL_BATTLEFIELD, ndpi_struct, NDPI_LOG_DEBUG, "Battlefield safe pattern detected.\n");
+    NDPI_LOG_INFO(ndpi_struct, "found Battlefield safe pattern detected\n");
     ndpi_int_battlefield_add_connection(ndpi_struct, flow);
     return;
   }
 
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_BATTLEFIELD);
-  return;
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

@@ -21,9 +21,14 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_COAP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_COAP
+
+#include "ndpi_api.h"
+
 
 #define CON     0
 #define NO_CON  1
@@ -116,14 +121,12 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t d_port = ntohs(flow->packet.udp->dest);
 
     if((!isCoAPport(s_port) && !isCoAPport(d_port))
-       || (packet->payload_packet_len < 4) // header too short
-       ) {
-      NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "excluding Coap\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COAP);
+       || (packet->payload_packet_len < 4) ) {   // header too short
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
 
-    NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "calculating coap over udp.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "calculating coap over udp\n");
 
     // check values in header
     if(h->version == 1) {
@@ -133,7 +136,7 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
 	     (h->code >= 128  && h->code <= 134) || (h->code >= 140 && h->code <= 143) ||
 	     (h->code >= 160 && h->code <= 165)) {
 
-	    NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Coap found...\n");
+	    NDPI_LOG_INFO(ndpi_struct, "found Coap\n");
 	    ndpi_int_coap_add_connection(ndpi_struct,flow);
 	    return;
 	  }
@@ -142,8 +145,7 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  NDPI_LOG(NDPI_PROTOCOL_COAP, ndpi_struct, NDPI_LOG_DEBUG, "Excluding Coap ...\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_COAP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   return;
 }
 

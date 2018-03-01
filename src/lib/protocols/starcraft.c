@@ -19,10 +19,14 @@
 *
 */
 
-
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_STARCRAFT
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_STARCRAFT
+
+#include "ndpi_api.h"
+
 
 /* Sender or receiver are one of the known login portals? */
 u_int8_t sc2_match_logon_ip(struct ndpi_packet_struct* packet)
@@ -112,7 +116,7 @@ u_int8_t ndpi_check_starcraft_udp(struct ndpi_detection_module_struct* ndpi_stru
 
 void ndpi_search_starcraft(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow)
 {
-  NDPI_LOG(NDPI_PROTOCOL_STARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "Starcraft protocol detection...\n");
+  NDPI_LOG_DBG(ndpi_struct, "search Starcraft\n");
   if (flow->packet.detected_protocol_stack[0] != NDPI_PROTOCOL_STARCRAFT) {
     struct ndpi_packet_struct* packet = &flow->packet;
     int8_t result = 0;
@@ -120,24 +124,22 @@ void ndpi_search_starcraft(struct ndpi_detection_module_struct* ndpi_struct, str
     if (packet->udp != NULL) {
       result = ndpi_check_starcraft_udp(ndpi_struct, flow);
       if (result == 1) {
-	//printf("Found Starcraft 2 [Game, UDP]\n");
-	NDPI_LOG(NDPI_PROTOCOL_STARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "Found Starcraft 2 [Game, UDP]\n");
+	NDPI_LOG_INFO(ndpi_struct, "Found Starcraft 2 [Game, UDP]\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STARCRAFT, NDPI_PROTOCOL_UNKNOWN);
+	return;
       }
     }
     else if (packet->tcp != NULL) {
       result = ndpi_check_starcraft_tcp(ndpi_struct, flow);
       if (result == 1) {
-	//printf("Found Starcraft 2 [Client, TCP]\n");
-	NDPI_LOG(NDPI_PROTOCOL_STARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "Found Starcraft 2 [Client, TCP]\n");
+	NDPI_LOG_INFO(ndpi_struct, "Found Starcraft 2 [Client, TCP]\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STARCRAFT, NDPI_PROTOCOL_UNKNOWN);
+	return;
       }
     }
 
-    if (result == 1) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STARCRAFT, NDPI_PROTOCOL_UNKNOWN);
-    }
-    else if (result == -1) {
-      NDPI_LOG(NDPI_PROTOCOL_STARCRAFT, ndpi_struct, NDPI_LOG_DEBUG, "Starcraft excluded\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_STARCRAFT);
+    if (result == -1) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   }
 }

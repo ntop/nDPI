@@ -18,10 +18,14 @@
  * 
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_REDIS
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_REDIS
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_REDIS
 
 static void ndpi_int_redis_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_REDIS, NDPI_PROTOCOL_UNKNOWN);
@@ -36,8 +40,7 @@ static void ndpi_check_redis(struct ndpi_detection_module_struct *ndpi_struct, s
 
   /* Break after 20 packets. */
   if(flow->packet_counter > 20) {
-    NDPI_LOG(NDPI_PROTOCOL_REDIS, ndpi_struct, NDPI_LOG_DEBUG, "Exclude Redis.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_REDIS);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
@@ -66,11 +69,10 @@ static void ndpi_check_redis(struct ndpi_detection_module_struct *ndpi_struct, s
 	&& ((flow->redis_d2s_first_char == '+') || (flow->redis_d2s_first_char == ':')))
        || ((flow->redis_d2s_first_char == '*') 
 	   && ((flow->redis_s2d_first_char == '+') || (flow->redis_s2d_first_char == ':')))) {
-      NDPI_LOG(NDPI_PROTOCOL_REDIS, ndpi_struct, NDPI_LOG_DEBUG, "Found Redis.\n");
+      NDPI_LOG_INFO(ndpi_struct, "Found Redis\n");
       ndpi_int_redis_add_connection(ndpi_struct, flow);
     } else {
-      NDPI_LOG(NDPI_PROTOCOL_REDIS, ndpi_struct, NDPI_LOG_DEBUG, "Exclude Redis.\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_REDIS);      
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   } else
     return; /* Too early */
@@ -79,7 +81,7 @@ static void ndpi_check_redis(struct ndpi_detection_module_struct *ndpi_struct, s
 void ndpi_search_redis(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_REDIS, ndpi_struct, NDPI_LOG_DEBUG, "Redis detection...\n");
+  NDPI_LOG_DBG(ndpi_struct, "search Redis\n");
 
   /* skip marked packets */
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_REDIS) {

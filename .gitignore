@@ -10,8 +10,13 @@
 *.la
 .libs
 .dirstamp
+.autotools
+.cproject
+.project
+.settings
 stamp-h1
 /configure
+/configure.ac
 /config.guess
 /config.h
 /config.h.in
@@ -41,5 +46,6 @@ stamp-h1
 /src/lib/.deps/
 /src/lib/protocols/.deps/
 /src/lib/third_party/src/.deps/
+/src/include/ndpi_define.h
 /test-driver
 /tests/Makefile

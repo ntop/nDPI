@@ -22,9 +22,13 @@
  *
  */
 
-/* include files */
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
+
 #ifdef NDPI_PROTOCOL_FIESTA
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_FIESTA
+
+#include "ndpi_api.h"
 
 
 static void ndpi_int_fiesta_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -35,18 +39,15 @@ static void ndpi_int_fiesta_add_connection(struct ndpi_detection_module_struct *
 void ndpi_search_fiesta(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
 	struct ndpi_packet_struct *packet = &flow->packet;
-	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
 
-	NDPI_LOG(NDPI_PROTOCOL_FIESTA, ndpi_struct, NDPI_LOG_DEBUG, "search fiesta.\n");
+	NDPI_LOG_DBG(ndpi_struct, "search fiesta\n");
 
 	if (flow->l4.tcp.fiesta_stage == 0 && packet->payload_packet_len == 5
 		&& get_u_int16_t(packet->payload, 0) == ntohs(0x0407)
 		&& (packet->payload[2] == 0x08)
 		&& (packet->payload[4] == 0x00 || packet->payload[4] == 0x01)) {
 
-		NDPI_LOG(NDPI_PROTOCOL_FIESTA, ndpi_struct, NDPI_LOG_DEBUG, "maybe fiesta symmetric, first packet.\n");
+		NDPI_LOG_DBG2(ndpi_struct, "maybe fiesta symmetric, first packet\n");
 		flow->l4.tcp.fiesta_stage = 1 + packet->packet_direction;
 		goto maybe_fiesta;
 	}
@@ -54,7 +55,7 @@ void ndpi_search_fiesta(struct ndpi_detection_module_struct *ndpi_struct, struct
 		&& ((packet->payload_packet_len > 1 && packet->payload_packet_len - 1 == packet->payload[0])
 			|| (packet->payload_packet_len > 3 && packet->payload[0] == 0
 				&& get_l16(packet->payload, 1) == packet->payload_packet_len - 3))) {
-		NDPI_LOG(NDPI_PROTOCOL_FIESTA, ndpi_struct, NDPI_LOG_DEBUG, "Maybe fiesta.\n");
+		NDPI_LOG_DBG2(ndpi_struct, "Maybe fiesta\n");
 		goto maybe_fiesta;
 	}
 	if (flow->l4.tcp.fiesta_stage == (1 + packet->packet_direction)) {
@@ -79,16 +80,15 @@ void ndpi_search_fiesta(struct ndpi_detection_module_struct *ndpi_struct, struct
 		}
 	}
 
-	NDPI_LOG(NDPI_PROTOCOL_FIESTA, ndpi_struct, NDPI_LOG_DEBUG, "exclude fiesta.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_FIESTA);
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
 
   maybe_fiesta:
-	NDPI_LOG(NDPI_PROTOCOL_FIESTA, ndpi_struct, NDPI_LOG_DEBUG, "Stage is set to %d.\n", flow->l4.tcp.fiesta_stage);
+	NDPI_LOG_DBG2(ndpi_struct, "Stage is set to %d\n", flow->l4.tcp.fiesta_stage);
 	return;
 
   add_fiesta:
-	NDPI_LOG(NDPI_PROTOCOL_FIESTA, ndpi_struct, NDPI_LOG_DEBUG, "detected fiesta.\n");
+	NDPI_LOG_INFO(ndpi_struct, "found fiesta\n");
 	ndpi_int_fiesta_add_connection(ndpi_struct, flow);
 	return;
 }

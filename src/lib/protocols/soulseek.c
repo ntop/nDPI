@@ -20,10 +20,21 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "ndpi_protocols.h"
+
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_SOULSEEK
 
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SOULSEEK
+
+#include "ndpi_api.h"
+
+#define SOULSEEK_DETECT \
+    if(src != NULL) \
+	      src->soulseek_last_safe_access_time = packet->tick_timestamp; \
+    if(dst != NULL) \
+	      dst->soulseek_last_safe_access_time = packet->tick_timestamp; \
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN)
 
 void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow)
@@ -36,14 +47,14 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->tcp) {
 
     if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SOULSEEK) {
-      NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "packet marked as Soulseek\n");
+      NDPI_LOG_DBG2(ndpi_struct, "packet marked as Soulseek\n");
       if(src != NULL)
-	NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG,
+	NDPI_LOG_DBG2(ndpi_struct,
 		 "  SRC bitmask: %u, packet tick %llu , last safe access timestamp: %llu\n",
 		 NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
 		 != 0 ? 1 : 0, (u_int64_t) packet->tick_timestamp, (u_int64_t) src->soulseek_last_safe_access_time);
       if(dst != NULL)
-	NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG,
+	NDPI_LOG_DBG2(ndpi_struct,
 		 "  DST bitmask: %u, packet tick %llu , last safe ts: %llu\n",
 		 NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
 		 != 0 ? 1 : 0, (u_int64_t) packet->tick_timestamp, (u_int64_t) dst->soulseek_last_safe_access_time);
@@ -65,13 +76,13 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       if(src != NULL && ((u_int32_t)(packet->tick_timestamp - src->soulseek_last_safe_access_time) < ndpi_struct->soulseek_connection_ip_tick_timeout)) {
-	NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG,
+	NDPI_LOG_DBG2(ndpi_struct,
 		 "Soulseek: SRC update last safe access time and SKIP_FOR_TIME \n");
 	src->soulseek_last_safe_access_time = packet->tick_timestamp;
       }
 
       if(dst != NULL && ((u_int32_t)(packet->tick_timestamp - dst->soulseek_last_safe_access_time) < ndpi_struct->soulseek_connection_ip_tick_timeout)) {
-	NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG,
+	NDPI_LOG_DBG2(ndpi_struct,
 		 "Soulseek: DST update last safe access time and SKIP_FOR_TIME \n");
 	dst->soulseek_last_safe_access_time = packet->tick_timestamp;
       }
@@ -81,14 +92,15 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     if(dst != NULL && dst->soulseek_listen_port != 0 && dst->soulseek_listen_port == ntohs(packet->tcp->dest)
        && ((u_int32_t)(packet->tick_timestamp - dst->soulseek_last_safe_access_time) < ndpi_struct->soulseek_connection_ip_tick_timeout)) {
       
-      NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG,
-	       "Soulseek: Plain detection on Port : %u packet_tick_timestamp: %u soulseeek_last_safe_access_time: %u soulseek_connection_ip_ticktimeout: %u\n",
+      NDPI_LOG_DBG2(ndpi_struct,
+	       "Soulseek: Plain detection on Port : %u packet_tick_timestamp: %u soulseek_last_safe_access_time: %u soulseek_connection_ip_ticktimeout: %u\n",
 	       dst->soulseek_listen_port, packet->tick_timestamp, dst->soulseek_last_safe_access_time, ndpi_struct->soulseek_connection_ip_tick_timeout);
       
       dst->soulseek_last_safe_access_time = packet->tick_timestamp;
       if(src != NULL)
 	src->soulseek_last_safe_access_time = packet->tick_timestamp;
 
+      NDPI_LOG_INFO(ndpi_struct, "found Soulseek\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
@@ -100,7 +112,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(packet->payload_packet_len >= 12 && packet->payload_packet_len < 300 && get_l32(packet->payload, 4) == 1) {
 	while (!get_u_int16_t(packet->payload, index + 2)
 	       && (index + get_l32(packet->payload, index)) < packet->payload_packet_len - 4) {
-	  if(get_l32(packet->payload, index) < 8)	/*Minimum soulsek  login msg is 8B */
+	  if(get_l32(packet->payload, index) < 8)	/*Minimum soulseek login msg is 8B */
 	    break;
 
 	  if(index + get_l32(packet->payload, index) + 4 <= index) {
@@ -121,14 +133,8 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  index += get_l32(packet->payload, index + 4) + 8;	// enf of "hash value"
 		  if(index == get_l32(packet->payload, 0)) {
 		    
-		    NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "Soulseek Login Detected\n");
-		    
-		    if(src != NULL)
-		      src->soulseek_last_safe_access_time = packet->tick_timestamp;
-		    if(dst != NULL)
-		      dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-		    
-		    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+		    NDPI_LOG_INFO(ndpi_struct, "found soulseek Login Detected\n");
+		    SOULSEEK_DETECT;		    
 		    return;
 		  }
 		}
@@ -142,7 +148,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	if(msgcode == 0x7d) {
 	  flow->l4.tcp.soulseek_stage = 1 + packet->packet_direction;
-	  NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "Soulseek Messages Search\n");
+	  NDPI_LOG_DBG2(ndpi_struct, "Soulseek Messages Search\n");
 	  return;
 	} else if(msgcode == 0x02 && packet->payload_packet_len == 12) {
 	  const u_int32_t soulseek_listen_port = get_l32(packet->payload, 8);
@@ -152,7 +158,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    if(packet->tcp != NULL && src->soulseek_listen_port == 0) {
 	      src->soulseek_listen_port = soulseek_listen_port;
-	      NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "\n Listen Port Saved : %u", src->soulseek_listen_port);
+	      NDPI_LOG_DBG2(ndpi_struct, "\n Listen Port Saved : %u", src->soulseek_listen_port);
 
 	      if(dst != NULL)
 		dst->soulseek_last_safe_access_time = packet->tick_timestamp;
@@ -171,25 +177,17 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	      && namelen <= packet->payload_packet_len
 	      && (4 + 1 + 4 + namelen + 4 + 1 + 4) ==
 	      packet->payload_packet_len && (type == 'F' || type == 'P' || type == 'D')) {
-	    NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "soulseek detected\n");
-
-	    if(src != NULL)
-	      src->soulseek_last_safe_access_time = packet->tick_timestamp;
-	    
-	    if(dst != NULL)
-	      dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-	    
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+	    NDPI_LOG_INFO(ndpi_struct, "found soulseek\n");
+	    SOULSEEK_DETECT;
 	    return;
 	  }
-	  NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "1\n");
 	}
-	NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "3\n");
+	NDPI_LOG_DBG2(ndpi_struct, "3\n");
 	//Peer Message : Pierce Firewall
 	if(packet->payload_packet_len == 9 && get_l32(packet->payload, 0) == 5
 	    && packet->payload[4] <= 0x10 && get_u_int32_t(packet->payload, 5) != 0x00000000) {
 	  flow->l4.tcp.soulseek_stage = 1 + packet->packet_direction;
-	  NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_TRACE, "Soulseek Size 9 Pierce Firewall\n");
+	  NDPI_LOG_DBG2(ndpi_struct, "Soulseek Size 9 Pierce Firewall\n");
 	  return;
 	}
       }
@@ -202,14 +200,8 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  const u_int32_t typelen = get_l32(packet->payload, 4 + 1 + 4 + usrlen);
 	  const u_int8_t type = packet->payload[4 + 1 + 4 + usrlen + 4];
 	  if(typelen == 1 && (type == 'F' || type == 'P' || type == 'D')) {
-	    NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "soulseek detected Pattern command(D|P|F).\n");
-	    
-	    if(src != NULL)
-	      src->soulseek_last_safe_access_time = packet->tick_timestamp;
-	    if(dst != NULL)
-	      dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-	    
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+	    NDPI_LOG_INFO(ndpi_struct, "found soulseek Pattern command(D|P|F)\n");
+	    SOULSEEK_DETECT;	    
 	    return;
 	  }
 	}
@@ -219,14 +211,8 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(packet->payload_packet_len > 8) {
 	if((packet->payload[0] || packet->payload[1]) && get_l32(packet->payload, 4) == 9) {
 	  /* 9 is search result */
-	  NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "soulseek detected Second Pkt\n");
-	  
-	  if(src != NULL)
-	    src->soulseek_last_safe_access_time = packet->tick_timestamp;
-	  if(dst != NULL)
-	    dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-	  
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+	  NDPI_LOG_INFO(ndpi_struct, "found soulseek Second Pkt\n");
+	  SOULSEEK_DETECT;
 	  return;
 	}
 	if(get_l32(packet->payload, 0) == packet->payload_packet_len - 4) {
@@ -235,14 +221,8 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	    {
 	      const u_int32_t usrlen = get_l32(packet->payload, 8);
 	      if(usrlen <= packet->payload_packet_len && 4 + 4 + 4 + usrlen == packet->payload_packet_len) {
-		NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "Soulseek Request Get Peer Address Detected\n");
-		
-		if(src != NULL)
-		  src->soulseek_last_safe_access_time = packet->tick_timestamp;
-		if(dst != NULL)
-		  dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-		
-		ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+		NDPI_LOG_INFO(ndpi_struct, "found soulseek Request Get Peer Address Detected\n");
+		SOULSEEK_DETECT;		
 		return;
 	      }
 	    }
@@ -250,27 +230,15 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       if(packet->payload_packet_len == 8 && get_l32(packet->payload, 4) == 0x00000004) {
-	NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "soulseek detected\n");
-
-	if(src != NULL)
-	  src->soulseek_last_safe_access_time = packet->tick_timestamp;
-	if(dst != NULL)
-	  dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-	
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+	NDPI_LOG_INFO(ndpi_struct, "found soulseek\n");
+	SOULSEEK_DETECT;
 	return;
       }
 
       if(packet->payload_packet_len == 4
 	 && get_u_int16_t(packet->payload, 2) == 0x00 && get_u_int16_t(packet->payload, 0) != 0x00) {
-	NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "soulseek detected\n");
-	
-	if(src != NULL)
-	  src->soulseek_last_safe_access_time = packet->tick_timestamp;
-	if(dst != NULL)
-	  dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-	
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+	NDPI_LOG_INFO(ndpi_struct, "found soulseek\n");
+	SOULSEEK_DETECT;	
 	return;
       } else if(packet->payload_packet_len == 4) {
 	flow->l4.tcp.soulseek_stage = 3;
@@ -279,33 +247,21 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     } else if(flow->l4.tcp.soulseek_stage == 1 + packet->packet_direction) {
       if(packet->payload_packet_len > 8) {
 	if(packet->payload[4] == 0x03 && get_l32(packet->payload, 5) == 0x00000031) {
-	  NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "soulseek detected Second Pkt with SIGNATURE :: 0x0331000000 \n");
-	  
-	  if(src != NULL)
-	    src->soulseek_last_safe_access_time = packet->tick_timestamp;
-	  if(dst != NULL)
-	    dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-	  
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+	  NDPI_LOG_INFO(ndpi_struct, "found soulseek Second Pkt with SIGNATURE :: 0x0331000000 \n");
+	  SOULSEEK_DETECT;	  
 	  return;
 	}
       }
     }
     if(flow->l4.tcp.soulseek_stage == 3 && packet->payload_packet_len == 8 && !get_u_int32_t(packet->payload, 4)) {
 
-      NDPI_LOG(NDPI_PROTOCOL_SOULSEEK, ndpi_struct, NDPI_LOG_DEBUG, "soulseek detected bcz of 8B  pkt\n");
-
-      if(src != NULL)
-	src->soulseek_last_safe_access_time = packet->tick_timestamp;
-      if(dst != NULL)
-	dst->soulseek_last_safe_access_time = packet->tick_timestamp;
-      
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SOULSEEK, NDPI_PROTOCOL_UNKNOWN);
+      NDPI_LOG_INFO(ndpi_struct, "found soulseek bcz of 8B  pkt\n");
+      SOULSEEK_DETECT;
       return;
     }
     if(flow->l4.tcp.soulseek_stage && flow->packet_counter < 11) {
     } else {
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   }
 }
