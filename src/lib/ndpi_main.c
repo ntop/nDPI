@@ -1320,6 +1320,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "WhatsAppVoice", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_FILES,
+			    no_master,
+			    no_master, "WhatsAppFiles", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP,
+			    no_master,
+			    no_master, "WhatsApp", NDPI_PROTOCOL_CATEGORY_CHAT,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
     custom_master[0] = NDPI_PROTOCOL_SSL_NO_CERT, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_SSL,
@@ -2931,6 +2941,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* BITTORRENT */
   init_bittorrent_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* WHATSAPP */
+  init_whatsapp_dissector(ndpi_struct, &a, detection_bitmask);
+
   /* AMQP */
   init_amqp_dissector(ndpi_struct, &a, detection_bitmask);
 
@@ -3582,6 +3595,23 @@ void check_ndpi_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************************************************************* */
 
+static u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
+					     struct ndpi_flow_struct *flow) {
+  u_int16_t ret = NDPI_PROTOCOL_UNKNOWN;
+  
+  if(flow->packet.iph) {
+    /* guess host protocol */
+    ret = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
+
+    if(ret == NDPI_PROTOCOL_UNKNOWN)
+      ret = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
+  }
+    
+  return(ret);
+}
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow) {
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
@@ -3598,15 +3628,14 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
 	 && (flow->l4.tcp.ssl_stage > 1))
-	flow->guessed_protocol_id = NDPI_PROTOCOL_SSL;
-
+	flow->guessed_protocol_id = NDPI_PROTOCOL_SSL_NO_CERT;
+       
       guessed_protocol_id = flow->guessed_protocol_id,
 	guessed_host_protocol_id = flow->guessed_host_protocol_id;
 
       if((guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	 && (NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_host_protocol_id)))
 	guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
-
 
       /* Ignore guessed protocol if they have been discarded */
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
@@ -3778,23 +3807,21 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     /* guess protocol */
     flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_struct, protocol, sport, dport, &user_defined_proto);
-
+    flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_struct, flow);
+    
     if(flow->guessed_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
       /* This is a custom protocol and it has priority over everything else */
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.app_protocol = flow->guessed_host_protocol_id;
       return(ret);
     }
 
-    if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+    if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {      
       if(flow->packet.iph) {
-	/* guess host protocol */
-	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
-	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
-	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
 	  /* ret.master_protocol = flow->guessed_protocol_id , ret.app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
 	  ret = ndpi_detection_giveup(ndpi_struct, flow);
-
+	}
+	
 	return(ret);
       }
     } else {
