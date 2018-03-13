@@ -43,6 +43,7 @@ cat configure.seed | sed \
 autoreconf -ivf
 cat configure | sed "s/#define PACKAGE/#define NDPI_PACKAGE/g" | sed "s/#define VERSION/#define NDPI_VERSION/g"  > configure.tmp
 cat configure.tmp > configure
+chmod +x configure
 
 chmod +x configure
 ./configure $*
