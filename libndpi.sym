@@ -61,3 +61,4 @@ ndpi_category_get_name
 ndpi_is_custom_category
 ndpi_is_subprotocol_informative
 ndpi_set_proto_category
+ndpi_get_api_version

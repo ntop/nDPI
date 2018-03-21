@@ -3142,6 +3142,11 @@ int main(int argc, char **argv) {
 #endif
   int i;
 
+  if(ndpi_get_api_version() != NDPI_API_VERSION) {
+    printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
+    return(-1);
+  }
+  
   automataUnitTest();
 
   ndpi_info_mod = ndpi_init_detection_module();

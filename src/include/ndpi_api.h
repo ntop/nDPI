@@ -31,6 +31,11 @@
 extern "C" {
 #endif
 
+  /* The #define below is used for apps that dynamically link with nDPI to make
+     sure that datastructures and in sync across versions
+  */
+#define NDPI_API_VERSION                      1
+  
 #define SIZEOF_ID_STRUCT (sizeof(struct ndpi_id_struct))
 #define SIZEOF_FLOW_STRUCT (sizeof(struct ndpi_flow_struct))
 
@@ -739,6 +744,7 @@ extern "C" {
   void * ndpi_malloc(size_t size);
   void * ndpi_calloc(unsigned long count, size_t size);
   void ndpi_free(void *ptr);
+  u_int8_t ndpi_get_api_version();
 #ifdef __cplusplus
 }
 #endif
