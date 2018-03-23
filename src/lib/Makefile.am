@@ -6,13 +6,14 @@ libndpi_la_LDFLAGS = -version-info 1:0:0 -export-symbols $(top_srcdir)/libndpi.s
 
 libndpi_la_includedir = $(includedir)/libndpi-@VERSION@/libndpi
 
-libndpi_la_include_HEADERS = ../include/ndpi_api.h \
-			     ../include/ndpi_define.h \
-			     ../include/ndpi_main.h \
-			     ../include/ndpi_includes.h \
+libndpi_la_include_HEADERS = ../include/ndpi_api.h          \
+			     ../include/ndpi_define.h       \
+			     ../include/ndpi_main.h         \
+			     ../include/ndpi_includes.h     \
+			     ../include/ndpi_config.h       \
 			     ../include/ndpi_protocol_ids.h \
-			     ../include/ndpi_protocols.h \
-			     ../include/ndpi_typedefs.h \
+			     ../include/ndpi_protocols.h    \
+			     ../include/ndpi_typedefs.h     \
 			     third_party/include/libcache.h
 
 libndpi_la_SOURCES = ndpi_content_match.c.inc \

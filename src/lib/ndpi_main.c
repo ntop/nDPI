@@ -3582,7 +3582,10 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-void check_ndpi_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
+
+/* ********************************************************************************* */
+
+void ndpi_check_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow,
 			  NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
   if(flow->packet.tcp != NULL)
@@ -3837,11 +3840,11 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->guessed_host_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
     /* This is a custom protocol and it has priority over everything else */
     ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.app_protocol = flow->guessed_host_protocol_id;
-    check_ndpi_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
+    ndpi_check_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
     return(ret);
   }
   
-  check_ndpi_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
+  ndpi_check_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
 
   a = flow->packet.detected_protocol_stack[0];
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, a) == 0)
