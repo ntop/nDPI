@@ -3275,6 +3275,10 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	 && flow->packet.tcp->ack == 0
 	 && flow->init_finished != 0
 	 && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+  if(flow->http.url)
+    ndpi_free(flow->http.url);
+  if(flow->http.content_type)
+    ndpi_free(flow->http.content_type);
 	memset(flow, 0, sizeof(*(flow)));
 
 	NDPI_LOG_DBG(ndpi_struct,
