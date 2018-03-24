@@ -51,18 +51,13 @@
 /* { from defs.h */
 #define prefix_touchar(prefix) ((u_char *)&(prefix)->add.sin)
 
-#ifdef __KERNEL__
-#define MAXLINE 512
-#else
 #define MAXLINE 1024
-#endif
 
 #define BIT_TEST(f, b)  ((f) & (b))
 /* } */
 
 #define addroute make_and_lookup
 
-#ifndef __KERNEL__
 #include <sys/types.h> /* for u_* definitions (on FreeBSD 5) */
 #include <errno.h> /* for EAFNOSUPPORT */
 
@@ -80,8 +75,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h> /* IPv6 */
 #endif
-
-#endif /* __KERNEL__ */
 
 /* { from mrt.h */
 
@@ -243,7 +236,7 @@ MRT Credits
    originally written by him.
 
    Alexey Kuznetsov made enhancements to 1.4.3a and fixed the Linux
-   kernel intarface. Linux's netlink interface was written, referring to
+   kernel interface. Linux's netlink interface was written, referring to
    his code "iproute2".
 
    We would also like to thank our other colleagues in Japan, Portugal,

@@ -22,49 +22,61 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_TFTP
 
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TFTP
+
+#include "ndpi_api.h"
+
 static void ndpi_int_tftp_add_connection(struct ndpi_detection_module_struct
-										   *ndpi_struct, struct ndpi_flow_struct *flow)
+					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TFTP, NDPI_REAL_PROTOCOL);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TFTP, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_tftp(struct ndpi_detection_module_struct
-						*ndpi_struct, struct ndpi_flow_struct *flow)
+		      *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
-	
+  struct ndpi_packet_struct *packet = &flow->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search TFTP\n");
 
+  if (packet->payload_packet_len > 3 && flow->l4.udp.tftp_stage == 0
+      && ntohl(get_u_int32_t(packet->payload, 0)) == 0x00030001) {
+    NDPI_LOG_DBG2(ndpi_struct, "maybe tftp. need next packet\n");
+    flow->l4.udp.tftp_stage = 1;
+    return;
+  }
+  if (packet->payload_packet_len > 3 && (flow->l4.udp.tftp_stage == 1)
+      && ntohl(get_u_int32_t(packet->payload, 0)) == 0x00040001) {
 
-	NDPI_LOG(NDPI_PROTOCOL_TFTP, ndpi_struct, NDPI_LOG_DEBUG, "search TFTP.\n");
+    NDPI_LOG_INFO(ndpi_struct, "found tftp\n");
+    ndpi_int_tftp_add_connection(ndpi_struct, flow);
+    return;
+  }
+  if (packet->payload_packet_len > 1
+      && ((packet->payload[0] == 0 && packet->payload[packet->payload_packet_len - 1] == 0)
+	  || (packet->payload_packet_len == 4 && ntohl(get_u_int32_t(packet->payload, 0)) == 0x00040000))) {
+    NDPI_LOG_DBG2(ndpi_struct, "skip initial packet\n");
+    return;
+  }
 
-
-
-	if (packet->payload_packet_len > 3 && flow->l4.udp.tftp_stage == 0
-		&& ntohl(get_u_int32_t(packet->payload, 0)) == 0x00030001) {
-		NDPI_LOG(NDPI_PROTOCOL_TFTP, ndpi_struct, NDPI_LOG_DEBUG, "maybe tftp. need next packet.\n");
-		flow->l4.udp.tftp_stage = 1;
-		return;
-	}
-	if (packet->payload_packet_len > 3 && (flow->l4.udp.tftp_stage == 1)
-		&& ntohl(get_u_int32_t(packet->payload, 0)) == 0x00040001) {
-
-		NDPI_LOG(NDPI_PROTOCOL_TFTP, ndpi_struct, NDPI_LOG_DEBUG, "found tftp.\n");
-		ndpi_int_tftp_add_connection(ndpi_struct, flow);
-		return;
-	}
-	if (packet->payload_packet_len > 1
-		&& ((packet->payload[0] == 0 && packet->payload[packet->payload_packet_len - 1] == 0)
-			|| (packet->payload_packet_len == 4 && ntohl(get_u_int32_t(packet->payload, 0)) == 0x00040000))) {
-		NDPI_LOG(NDPI_PROTOCOL_TFTP, ndpi_struct, NDPI_LOG_DEBUG, "skip initial packet.\n");
-		return;
-	}
-
-	NDPI_LOG(NDPI_PROTOCOL_TFTP, ndpi_struct, NDPI_LOG_DEBUG, "exclude TFTP.\n");
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_TFTP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
+
+
+void init_tftp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("TFTP", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_TFTP,
+				      ndpi_search_tftp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
+}
+
 #endif

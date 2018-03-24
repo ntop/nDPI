@@ -1,0 +1,32 @@
+Unknown	6	360	1
+DNS	3	214	3
+HTTP	13	1019	2
+SSL	20	2715	1
+Google	27	3176	3
+OCS	863	57552	7
+PlayStore	1	72	1
+GoogleServices	13	2277	2
+
+	1	TCP 192.168.180.2:49881 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][751 pkts/44783 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws]
+	2	TCP 192.168.180.2:36680 -> 178.248.208.54:443 [proto: 91.218/SSL.OCS][20 pkts/6089 bytes -> 0 pkts/0 bytes][client: ocs.labgency.ws]
+	3	TCP 192.168.180.2:42590 -> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][83 pkts/5408 bytes -> 0 pkts/0 bytes][Host: www.ocs.fr]
+	4	TCP 192.168.180.2:39263 -> 23.21.230.199:443 [proto: 91/SSL][20 pkts/2715 bytes -> 0 pkts/0 bytes][client: settings.crashlytics.com]
+	5	TCP 192.168.180.2:32946 -> 64.233.184.188:443 [proto: 91.239/SSL.GoogleServices][12 pkts/2212 bytes -> 0 pkts/0 bytes][client: mtalk.google.com]
+	6	TCP 192.168.180.2:47803 -> 64.233.166.95:443 [proto: 91.126/SSL.Google][12 pkts/1608 bytes -> 0 pkts/0 bytes]
+	7	TCP 192.168.180.2:41223 -> 216.58.208.46:443 [proto: 91.126/SSL.Google][13 pkts/1448 bytes -> 0 pkts/0 bytes]
+	8	TCP 192.168.180.2:48250 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][6 pkts/1092 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws]
+	9	TCP 192.168.180.2:44959 -> 137.135.129.206:80 [proto: 7/HTTP][7 pkts/540 bytes -> 0 pkts/0 bytes][Host: api.eu01.capptain.com]
+	10	TCP 192.168.180.2:53356 -> 137.135.129.206:80 [proto: 7/HTTP][6 pkts/479 bytes -> 0 pkts/0 bytes][Host: api.eu01.capptain.com]
+	11	TCP 192.168.180.2:47699 -> 64.233.184.188:5228 [proto: 126/Google][2 pkts/120 bytes -> 0 pkts/0 bytes]
+	12	UDP 192.168.180.2:3621 -> 8.8.8.8:53 [proto: 5/DNS][1 pkts/77 bytes -> 0 pkts/0 bytes][Host: xmpp.device06.eu01.capptain.com]
+	13	UDP 192.168.180.2:48770 -> 8.8.8.8:53 [proto: 5.228/DNS.PlayStore][1 pkts/72 bytes -> 0 pkts/0 bytes][Host: android.clients.google.com]
+	14	UDP 192.168.180.2:40097 -> 8.8.8.8:53 [proto: 5/DNS][1 pkts/70 bytes -> 0 pkts/0 bytes][Host: settings.crashlytics.com]
+	15	UDP 192.168.180.2:1291 -> 8.8.8.8:53 [proto: 5/DNS][1 pkts/67 bytes -> 0 pkts/0 bytes][Host: api.eu01.capptain.com]
+	16	UDP 192.168.180.2:11793 -> 8.8.8.8:53 [proto: 5.239/DNS.GoogleServices][1 pkts/65 bytes -> 0 pkts/0 bytes][Host: play.googleapis.com]
+	17	UDP 192.168.180.2:38472 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/63 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws]
+	18	UDP 192.168.180.2:2589 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/61 bytes -> 0 pkts/0 bytes][Host: ocs.labgency.ws]
+	19	UDP 192.168.180.2:24245 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][1 pkts/56 bytes -> 0 pkts/0 bytes][Host: www.ocs.fr]
+
+
+Undetected flows:
+	1	TCP 192.168.180.2:46166 -> 137.135.131.52:5122 [proto: 0/Unknown][6 pkts/360 bytes -> 0 pkts/0 bytes]

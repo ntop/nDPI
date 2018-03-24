@@ -1,8 +1,7 @@
 /*
  * bgp.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2016 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,36 +21,51 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_BGP
 
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_BGP
 
-static void ndpi_int_bgp_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-	ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_BGP, NDPI_REAL_PROTOCOL);
-}
+#include "ndpi_api.h"
+
 
 /* this detection also works asymmetrically */
 void ndpi_search_bgp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
-	
-//      struct ndpi_id_struct         *src=ndpi_struct->src;
-//      struct ndpi_id_struct         *dst=ndpi_struct->dst;
+  struct ndpi_packet_struct *packet = &flow->packet;
+  u_int16_t bgp_port = htons(179);
 
-	if (packet->payload_packet_len > 18 &&
-		get_u_int64_t(packet->payload, 0) == 0xffffffffffffffffULL &&
-		get_u_int64_t(packet->payload, 8) == 0xffffffffffffffffULL &&
-		ntohs(get_u_int16_t(packet->payload, 16)) <= packet->payload_packet_len &&
-		(packet->tcp->dest == htons(179) || packet->tcp->source == htons(179))
-		&& packet->payload[18] < 5) {
-		NDPI_LOG(NDPI_PROTOCOL_BGP, ndpi_struct, NDPI_LOG_DEBUG, "BGP detected.\n");
-		ndpi_int_bgp_add_connection(ndpi_struct, flow);
-		return;
-	}
+  NDPI_LOG_DBG(ndpi_struct, "search BGP\n");
 
-	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_BGP);
+  if(packet->tcp) {
+    if(packet->payload_packet_len > 18
+       && packet->payload[18] < 5
+       && ((packet->tcp->dest == bgp_port) || (packet->tcp->source == bgp_port))
+       && (get_u_int64_t(packet->payload, 0) == 0xffffffffffffffffULL)
+       && (get_u_int64_t(packet->payload, 8) == 0xffffffffffffffffULL)
+       && (ntohs(get_u_int16_t(packet->payload, 16)) <= packet->payload_packet_len)) {
+      
+      NDPI_LOG_INFO(ndpi_struct, "found BGP\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BGP, NDPI_PROTOCOL_UNKNOWN);
+      return;
+    } 
+  }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
+
+
+void init_bgp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("BGP", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_BGP,
+				      ndpi_search_bgp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+  *id += 1;
+}
+
 
 #endif

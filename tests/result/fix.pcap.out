@@ -1,0 +1,14 @@
+FIX	1261	115514	12
+
+	1	TCP 208.245.107.3:4000 <-> 192.168.0.20:45578 [proto: 230/FIX][228 pkts/26333 bytes <-> 228 pkts/13920 bytes]
+	2	TCP 8.17.22.31:4000 <-> 192.168.0.20:47968 [proto: 230/FIX][201 pkts/21246 bytes <-> 200 pkts/13460 bytes]
+	3	TCP 8.17.22.31:4000 <-> 192.168.0.20:43594 [proto: 230/FIX][111 pkts/16881 bytes <-> 111 pkts/7680 bytes]
+	4	TCP 208.245.107.3:4000 <-> 192.168.0.20:45584 [proto: 230/FIX][35 pkts/3022 bytes <-> 35 pkts/2342 bytes]
+	5	TCP 8.17.22.31:4000 <-> 192.168.0.20:40918 [proto: 230/FIX][18 pkts/1938 bytes <-> 18 pkts/1358 bytes]
+	6	TCP 208.245.107.3:4000 <-> 192.168.0.20:38652 [proto: 230/FIX][9 pkts/961 bytes <-> 9 pkts/700 bytes]
+	7	TCP 8.17.22.31:4000 <-> 192.168.0.20:47952 [proto: 230/FIX][5 pkts/577 bytes <-> 5 pkts/484 bytes]
+	8	TCP 8.17.22.31:4000 <-> 192.168.0.20:47962 [proto: 230/FIX][6 pkts/513 bytes <-> 4 pkts/522 bytes]
+	9	TCP 208.245.107.3:4000 <-> 192.168.0.20:39094 [proto: 230/FIX][6 pkts/456 bytes <-> 5 pkts/551 bytes]
+	10	TCP 217.192.86.32:4000 <-> 192.168.0.20:53330 [proto: 230/FIX][6 pkts/456 bytes <-> 5 pkts/551 bytes]
+	11	TCP 208.245.107.3:4000 <-> 192.168.0.20:38646 [proto: 230/FIX][6 pkts/441 bytes <-> 4 pkts/477 bytes]
+	12	TCP 8.17.22.31:4000 <-> 192.168.0.20:40928 [proto: 230/FIX][4 pkts/342 bytes <-> 2 pkts/303 bytes]

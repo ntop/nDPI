@@ -23,8 +23,13 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
+
 #ifdef NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK
+
+#include "ndpi_api.h"
 
 
 #ifdef NDPI_DEBUG_DIRECT_DOWNLOAD_LINK
@@ -38,7 +43,7 @@ static void ndpi_int_direct_download_link_add_connection(struct ndpi_detection_m
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, NDPI_CORRELATED_PROTOCOL);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, NDPI_PROTOCOL_UNKNOWN);
 
   flow->l4.tcp.ddlink_server_direction = packet->packet_direction;
 }
@@ -52,15 +57,12 @@ static void ndpi_int_direct_download_link_add_connection(struct ndpi_detection_m
 u_int8_t search_ddl_domains(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
   u_int16_t filename_start = 0;
   u_int8_t i = 1;
   u_int16_t host_line_len_without_port;
 
   if (packet->payload_packet_len < 100) {
-    NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: Packet too small.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "DDL: Packet too small\n");
     goto end_ddl_nothing_found;
   }
 
@@ -68,10 +70,10 @@ u_int8_t search_ddl_domains(struct ndpi_detection_module_struct *ndpi_struct, st
 
   if (memcmp(packet->payload, "POST ", 5) == 0) {
     filename_start = 5;		// POST
-    NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: POST FOUND\n");
+    NDPI_LOG_DBG2(ndpi_struct, "DDL: POST FOUND\n");
   } else if (memcmp(packet->payload, "GET ", 4) == 0) {
     filename_start = 4;		// GET
-    NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: GET FOUND\n");
+    NDPI_LOG_DBG2(ndpi_struct, "DDL: GET FOUND\n");
   } else {
     goto end_ddl_nothing_found;
   }
@@ -79,16 +81,15 @@ u_int8_t search_ddl_domains(struct ndpi_detection_module_struct *ndpi_struct, st
   ndpi_parse_packet_line_info(ndpi_struct, flow);
 
   if (packet->host_line.ptr == NULL) {
-    NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: NO HOST FOUND\n");
+    NDPI_LOG_DBG2(ndpi_struct, "DDL: NO HOST FOUND\n");
     goto end_ddl_nothing_found;
   }
 
-  NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: Host: found\n");
+  NDPI_LOG_DBG2(ndpi_struct, "DDL: Host: found\n");
 
   if (packet->line[0].len < 9 + filename_start
       || memcmp(&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) != 0) {
-    NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct,
-	     NDPI_LOG_DEBUG, "DDL: PACKET NOT HTTP CONFORM.\nXXX%.*sXXX\n",
+    NDPI_LOG_DBG2(ndpi_struct, "DDL: PACKET NOT HTTP CONFORM.\nXXX%.*sXXX\n",
 	     8, &packet->line[0].ptr[packet->line[0].len - 9]);
     goto end_ddl_nothing_found;
   }
@@ -100,11 +101,11 @@ u_int8_t search_ddl_domains(struct ndpi_detection_module_struct *ndpi_struct, st
     i = 2;
     while (host_line_len_without_port >= i && packet->host_line.ptr[host_line_len_without_port - i] >= '0'
 	   && packet->host_line.ptr[host_line_len_without_port - i] <= '9') {
-      NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: number found\n");
+      NDPI_LOG_DBG2(ndpi_struct, "DDL: number found\n");
       i++;
     }
     if (host_line_len_without_port >= i && packet->host_line.ptr[host_line_len_without_port - i] == ':') {
-      NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: ':' found\n");
+      NDPI_LOG_DBG2(ndpi_struct, "DDL: ':' found\n");
       host_line_len_without_port = host_line_len_without_port - i;
     }
   }
@@ -694,12 +695,12 @@ u_int8_t search_ddl_domains(struct ndpi_detection_module_struct *ndpi_struct, st
   */
 
  end_ddl_nothing_found:
-  NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG,
+  NDPI_LOG_DBG2(ndpi_struct,
 	   "Nothing Found\n");
   return 0;
 
  end_ddl_found:
-  NDPI_LOG(NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK, ndpi_struct, NDPI_LOG_DEBUG, "DDL: DIRECT DOWNLOAD LINK FOUND\n");
+  NDPI_LOG_INFO(ndpi_struct, "found DIRECT DOWNLOAD LINK\n");
   ndpi_int_direct_download_link_add_connection(ndpi_struct, flow);
   return 1;
 }
@@ -709,29 +710,25 @@ void ndpi_search_direct_download_link_tcp(struct ndpi_detection_module_struct *n
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  //      struct ndpi_id_struct         *src=ndpi_struct->src;
-  //      struct ndpi_id_struct         *dst=ndpi_struct->dst;
-#if 0
-  if (ndpi_struct->direct_download_link_counter_callback != NULL) {
-    if (packet->detected_protocol == NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK) {
-      /* skip packets not requests from the client to the server */
-      if (packet->packet_direction == flow->l4.tcp.ddlink_server_direction) {
-	search_ddl_domains(ndpi_struct, flow);	// do the detection again in order to get the URL in keep alive streams
-      } else {
-	// just count the packet
-	ndpi_struct->direct_download_link_counter_callback(flow->hash_id_number, packet->l3_packet_len);
-      }
-    }
-    return;
-  }
-#endif
-  // do not detect again if it is already ddl
+  /* do not detect again if it is already ddl */
   if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK) {
     if (search_ddl_domains(ndpi_struct, flow) != 0) {
       return;
     }
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 
+}
+
+void init_directdownloadlink_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("Direct_Download_Link", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK,
+				      ndpi_search_direct_download_link_tcp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);  
+
+  *id += 1;
 }
 #endif

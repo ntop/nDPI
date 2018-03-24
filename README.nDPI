@@ -1,9 +1,10 @@
-rerequisites for Compilation
+Prerequisites for Compilation
 -----------------------------
 
 Prerequisites
 - GNU autotools/libtool
 - libpcap or PF_RING (optional but recommended)
+- apt-get install libjson-c-dev (for JSON support)
 
 On Ubuntu/Debian
 - apt-get install build-essential

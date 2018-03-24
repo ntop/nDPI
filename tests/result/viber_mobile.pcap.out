@@ -1,0 +1,98 @@
+Unknown	163	9995	7
+DNS	16	1943	7
+HTTP	43	4771	7
+BitTorrent	57	13074	27
+SSL_No_Cert	36	5874	1
+ICMP	3	370	2
+SSL	72	21126	6
+Facebook	50	17455	3
+Dropbox	2	163	1
+GMail	35	14773	2
+Google	59	14520	6
+WhatsApp	38	6756	3
+Viber	10081	1413446	4
+Amazon	8	528	1
+GoogleServices	17	2655	2
+
+	1	UDP 192.168.200.222:48564 <-> 54.169.63.186:7985 [proto: 144/Viber][4192 pkts/515224 bytes <-> 5865 pkts/895629 bytes]
+	2	TCP 192.168.200.222:38039 <-> 31.13.79.246:443 [proto: 91.119/SSL.Facebook][19 pkts/3115 bytes <-> 18 pkts/13053 bytes][client: graph.facebook.com][server: *.facebook.com]
+	3	TCP 192.168.200.222:42040 <-> 74.125.200.18:443 [proto: 91.122/SSL.GMail][17 pkts/3286 bytes <-> 16 pkts/11246 bytes][client: mail.google.com][server: mail.google.com]
+	4	TCP 192.168.200.222:52269 <-> 107.22.192.179:443 [proto: 91/SSL][15 pkts/2237 bytes <-> 11 pkts/7820 bytes][client: settings.crashlytics.com][server: *.crashlytics.com]
+	5	TCP 192.168.200.222:51146 <-> 23.21.254.189:443 [proto: 91/SSL][12 pkts/2322 bytes <-> 10 pkts/6919 bytes][client: e.crashlytics.com][server: *.crashlytics.com]
+	6	TCP 192.168.200.222:51055 <-> 74.125.68.156:443 [proto: 91.126/SSL.Google][17 pkts/2087 bytes <-> 14 pkts/5520 bytes][client: googleads.g.doubleclick.net][server: *.g.doubleclick.net]
+	7	TCP 192.168.200.222:40005 <-> 108.168.176.234:443 [proto: 142/WhatsApp][13 pkts/1401 bytes <-> 16 pkts/4545 bytes]
+	8	TCP 192.168.200.222:43287 <-> 52.0.253.46:443 [proto: 64/SSL_No_Cert][22 pkts/3437 bytes <-> 14 pkts/2437 bytes]
+	9	TCP 192.168.200.222:59011 <-> 74.125.130.188:5228 [proto: 126/Google][8 pkts/3893 bytes <-> 8 pkts/1945 bytes]
+	10	TCP 192.168.200.222:57999 <-> 74.125.130.188:5228 [proto: 91.239/SSL.GoogleServices][7 pkts/1505 bytes <-> 8 pkts/953 bytes][client: mtalk.google.com]
+	11	TCP 192.168.200.222:36675 -> 112.124.219.82:80 [proto: 7/HTTP][9 pkts/2188 bytes -> 0 pkts/0 bytes][Host: androiddailyyogacn.oss-cn-hangzhou.aliyuncs.com]
+	12	TCP 52.0.253.46:4244 <-> 192.168.200.222:43454 [proto: 144/Viber][8 pkts/1187 bytes <-> 8 pkts/856 bytes]
+	13	UDP 192.168.200.222:39413 <-> 24.43.1.206:17193 [proto: 37/BitTorrent][4 pkts/996 bytes <-> 4 pkts/996 bytes]
+	14	TCP 192.168.200.222:46761 <-> 112.124.219.93:80 [proto: 7/HTTP][5 pkts/520 bytes <-> 4 pkts/563 bytes][Host: androiddailyyogacn.oss-cn-hangzhou.aliyuncs.com]
+	15	TCP 192.168.200.222:52491 <-> 31.13.79.245:443 [proto: 91.119/SSL.Facebook][4 pkts/328 bytes <-> 7 pkts/745 bytes]
+	16	UDP 192.168.200.222:39413 <-> 24.43.1.206:40959 [proto: 37/BitTorrent][2 pkts/498 bytes <-> 2 pkts/498 bytes]
+	17	TCP 74.125.68.239:443 <-> 192.168.200.222:37376 [proto: 91.126/SSL.Google][4 pkts/303 bytes <-> 3 pkts/229 bytes]
+	18	TCP 192.168.200.222:44058 <-> 158.85.58.23:443 [proto: 91.142/SSL.WhatsApp][4 pkts/277 bytes <-> 3 pkts/255 bytes]
+	19	TCP 222.165.163.91:443 <-> 192.168.200.222:56243 [proto: 91/SSL][4 pkts/319 bytes <-> 3 pkts/210 bytes]
+	20	TCP 222.165.163.93:443 <-> 192.168.200.222:52635 [proto: 91/SSL][4 pkts/319 bytes <-> 3 pkts/210 bytes]
+	21	TCP 192.168.200.222:38778 -> 54.251.141.219:80 [proto: 7.178/HTTP.Amazon][8 pkts/528 bytes -> 0 pkts/0 bytes]
+	22	UDP 192.168.200.222:39413 <-> 2.85.108.0:21241 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	23	UDP 192.168.200.222:39413 <-> 46.181.170.37:36237 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	24	UDP 192.168.200.222:39413 <-> 60.71.113.134:37764 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	25	UDP 192.168.200.222:39413 <-> 80.47.129.1:44420 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	26	UDP 192.168.200.222:39413 <-> 80.234.25.211:12624 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	27	UDP 192.168.200.222:39413 <-> 84.202.23.122:22737 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	28	UDP 192.168.200.222:39413 <-> 92.245.59.202:12998 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	29	UDP 192.168.200.222:39413 <-> 92.249.148.218:53810 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	30	UDP 192.168.200.222:39413 <-> 94.6.33.9:46735 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	31	UDP 192.168.200.222:39413 <-> 120.57.18.255:10201 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	32	UDP 192.168.200.222:39413 <-> 186.220.157.231:45235 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/359 bytes]
+	33	UDP 192.168.200.222:39413 <-> 23.113.222.89:49548 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/357 bytes]
+	34	UDP 192.168.200.222:39413 <-> 93.100.186.199:6881 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/352 bytes]
+	35	UDP 192.168.200.222:39413 <-> 178.57.5.53:64731 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/352 bytes]
+	36	UDP 192.168.200.222:39413 <-> 188.165.225.138:6881 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/334 bytes]
+	37	UDP 192.168.200.222:39413 <-> 134.249.176.227:7108 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/329 bytes]
+	38	UDP 192.168.200.222:39413 <-> 1.163.234.205:58738 [proto: 37/BitTorrent][1 pkts/146 bytes <-> 1 pkts/325 bytes]
+	39	UDP 192.168.200.222:39413 -> 70.112.231.62:51413 [proto: 37/BitTorrent][3 pkts/438 bytes -> 0 pkts/0 bytes]
+	40	TCP 192.168.200.222:39339 <-> 54.169.63.186:443 [proto: 91.144/SSL.Viber][4 pkts/272 bytes <-> 2 pkts/140 bytes]
+	41	TCP 222.165.163.93:443 <-> 192.168.200.222:52641 [proto: 91/SSL][3 pkts/253 bytes <-> 2 pkts/132 bytes]
+	42	TCP 222.165.163.117:443 <-> 192.168.200.222:47424 [proto: 91/SSL][3 pkts/253 bytes <-> 2 pkts/132 bytes]
+	43	UDP 192.168.200.222:16965 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/84 bytes <-> 1 pkts/282 bytes][Host: settings.crashlytics.com]
+	44	UDP 192.168.200.222:58434 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/77 bytes <-> 1 pkts/272 bytes][Host: e.crashlytics.com]
+	45	UDP 192.168.200.222:58921 <-> 8.8.8.8:53 [proto: 5/DNS][2 pkts/144 bytes <-> 2 pkts/192 bytes][Host: sis.jpush.io]
+	46	TCP 192.168.200.222:33161 -> 93.184.221.200:80 [proto: 7/HTTP][5 pkts/300 bytes -> 0 pkts/0 bytes]
+	47	TCP 192.168.200.222:43646 -> 93.184.221.200:80 [proto: 7/HTTP][5 pkts/300 bytes -> 0 pkts/0 bytes]
+	48	TCP 192.168.200.222:50854 -> 93.184.221.200:80 [proto: 7/HTTP][5 pkts/300 bytes -> 0 pkts/0 bytes]
+	49	TCP 192.168.200.222:52977 -> 93.184.221.200:80 [proto: 7/HTTP][5 pkts/300 bytes -> 0 pkts/0 bytes]
+	50	TCP 192.168.200.222:60828 -> 93.184.221.200:80 [proto: 7/HTTP][5 pkts/300 bytes -> 0 pkts/0 bytes]
+	51	UDP 192.168.200.222:39413 -> 182.57.65.243:27736 [proto: 37/BitTorrent][2 pkts/292 bytes -> 0 pkts/0 bytes]
+	52	UDP 192.168.200.222:52263 <-> 8.8.8.8:53 [proto: 5.142/DNS.WhatsApp][1 pkts/75 bytes <-> 1 pkts/203 bytes][Host: e9.whatsapp.net]
+	53	UDP 192.168.200.222:43901 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][1 pkts/87 bytes <-> 1 pkts/176 bytes][Host: googleads.g.doubleclick.net]
+	54	UDP 192.168.200.222:22761 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/107 bytes <-> 1 pkts/139 bytes][Host: androiddailyyogacn.oss-cn-hangzhou.aliyuncs.com]
+	55	UDP 192.168.200.222:15836 <-> 8.8.8.8:53 [proto: 5.122/DNS.GMail][1 pkts/75 bytes <-> 1 pkts/166 bytes][Host: mail.google.com]
+	56	UDP 192.168.200.222:55854 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/70 bytes <-> 1 pkts/166 bytes][Host: s.jpush.cn]
+	57	UDP 192.168.200.222:60474 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/77 bytes <-> 1 pkts/141 bytes][Host: easytomessage.com]
+	58	UDP 192.168.200.222:39695 <-> 8.8.8.8:53 [proto: 5.119/DNS.Facebook][1 pkts/78 bytes <-> 1 pkts/136 bytes][Host: graph.facebook.com]
+	59	UDP 192.168.200.222:47874 <-> 8.8.8.8:53 [proto: 5.239/DNS.GoogleServices][1 pkts/76 bytes <-> 1 pkts/121 bytes][Host: mtalk.google.com]
+	60	ICMP 192.168.200.222:0 -> 192.168.1.1:0 [proto: 81/ICMP][2 pkts/196 bytes -> 0 pkts/0 bytes]
+	61	UDP 192.168.200.222:39149 <-> 8.8.8.8:53 [proto: 5/DNS][1 pkts/72 bytes <-> 1 pkts/120 bytes][Host: sis.jpush.io]
+	62	ICMP 37.214.167.82:0 -> 192.168.200.222:0 [proto: 81/ICMP][1 pkts/174 bytes -> 0 pkts/0 bytes]
+	63	TCP 192.168.200.222:51765 -> 108.160.172.205:443 [proto: 91.121/SSL.Dropbox][2 pkts/163 bytes -> 0 pkts/0 bytes]
+	64	ICMP 192.168.200.222:0 -> 8.8.8.8:0 [proto: 81.126/ICMP.Google][1 pkts/148 bytes -> 0 pkts/0 bytes]
+	65	UDP 192.168.200.222:39413 -> 37.214.167.82:11905 [proto: 37/BitTorrent][1 pkts/146 bytes -> 0 pkts/0 bytes]
+	66	UDP 192.168.200.222:39413 -> 81.192.42.247:15057 [proto: 37/BitTorrent][1 pkts/146 bytes -> 0 pkts/0 bytes]
+	67	UDP 192.168.200.222:39413 -> 88.176.55.218:51413 [proto: 37/BitTorrent][1 pkts/146 bytes -> 0 pkts/0 bytes]
+	68	UDP 192.168.200.222:39413 -> 90.19.187.56:40500 [proto: 37/BitTorrent][1 pkts/146 bytes -> 0 pkts/0 bytes]
+	69	UDP 192.168.200.222:39413 -> 122.146.250.88:9415 [proto: 37/BitTorrent][1 pkts/146 bytes -> 0 pkts/0 bytes]
+	70	UDP 192.168.200.222:39413 -> 178.157.199.144:22133 [proto: 37/BitTorrent][1 pkts/146 bytes -> 0 pkts/0 bytes]
+	71	UDP 192.168.200.222:48564 <-> 54.169.63.186:7987 [proto: 144/Viber][1 pkts/76 bytes <-> 1 pkts/62 bytes]
+	72	TCP 216.58.199.206:443 <-> 192.168.200.222:58663 [proto: 91.126/SSL.Google][1 pkts/66 bytes <-> 1 pkts/66 bytes]
+
+
+Undetected flows:
+	1	UDP 192.168.200.222:48564 -> 10.216.246.82:59027 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	2	UDP 192.168.200.222:48564 -> 175.157.52.135:37299 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	3	UDP 192.168.200.222:48564 -> 175.157.52.135:37300 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	4	UDP 192.168.200.222:48564 -> 175.157.52.135:37301 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	5	UDP 192.168.200.222:48564 -> 175.157.52.135:37302 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	6	TCP 192.168.200.222:55565 <-> 113.31.80.142:7003 [proto: 0/Unknown][4 pkts/341 bytes <-> 3 pkts/208 bytes]
+	7	TCP 192.168.200.222:55554 <-> 113.31.80.142:7003 [proto: 0/Unknown][4 pkts/276 bytes <-> 2 pkts/170 bytes]

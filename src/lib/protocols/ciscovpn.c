@@ -4,13 +4,18 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
 
-#include "ndpi_protocols.h"
 #ifdef NDPI_PROTOCOL_CISCOVPN
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CISCOVPN
+
+#include "ndpi_api.h"
+
 
 static void ndpi_int_ciscovpn_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_CISCOVPN, NDPI_REAL_PROTOCOL);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CISCOVPN, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -20,15 +25,15 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
   u_int16_t tdport = 0, tsport = 0;
 
 
-  NDPI_LOG(NDPI_PROTOCOL_CISCOVPN, ndpi_struct, NDPI_LOG_DEBUG, "search CISCOVPN.\n");
+  NDPI_LOG_DBG(ndpi_struct, "search CISCOVPN\n");
 
   if(packet->tcp != NULL) {
     tsport = ntohs(packet->tcp->source), tdport = ntohs(packet->tcp->dest);
-    NDPI_LOG(NDPI_PROTOCOL_CISCOVPN, ndpi_struct, NDPI_LOG_DEBUG, "calculated CISCOVPN over tcp ports.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "calculated CISCOVPN over tcp ports\n");
   }
   if(packet->udp != NULL) {
     usport = ntohs(packet->udp->source), udport = ntohs(packet->udp->dest);
-    NDPI_LOG(NDPI_PROTOCOL_CISCOVPN, ndpi_struct, NDPI_LOG_DEBUG, "calculated CISCOVPN over udp ports.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "calculated CISCOVPN over udp ports\n");
   }
 
   if((tdport == 10000 && tsport == 10000) ||
@@ -42,8 +47,9 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
 
     {
       /* This is a good query  17010000*/
-      NDPI_LOG(NDPI_PROTOCOL_CISCOVPN, ndpi_struct, NDPI_LOG_DEBUG, "found CISCOVPN.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
       ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
+      return;
     } 
   else if(
 	  (
@@ -59,12 +65,24 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
 
 
       /* This is a good query  fe577e2b */
-      NDPI_LOG(NDPI_PROTOCOL_CISCOVPN, ndpi_struct, NDPI_LOG_DEBUG, "found CISCOVPN.\n");
+      NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
       ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
     } else {
-    NDPI_LOG(NDPI_PROTOCOL_CISCOVPN, ndpi_struct, NDPI_LOG_DEBUG, "exclude CISCOVPN.\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_CISCOVPN);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 
 }
+
+
+void init_ciscovpn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("CiscoVPN", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_CISCOVPN,
+				      ndpi_search_ciscovpn,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+  *id += 1;
+}
+
 #endif

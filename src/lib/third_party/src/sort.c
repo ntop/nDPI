@@ -4,9 +4,6 @@
  * Jan 23 2005  Matt Mackall <mpm@selenic.com>
  */
 
-#ifdef __KERNEL__
-#include <linux/types.h>
-#else
 #ifdef WIN32
 #include <stdint.h>
 typedef uint32_t u_int32_t;
@@ -15,7 +12,6 @@ typedef uint32_t u_int32_t;
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
-#endif
 
 /* This is a function ported from the Linux kernel lib/sort.c */
 
@@ -94,37 +90,3 @@ void sort(void *_base, size_t num, size_t size,
     }
   }
 }
-
-
-#if 0
-/* a simple boot-time regression test */
-
-int cmpint(const void *a, const void *b)
-{
-  return *(int *)a - *(int *)b;
-}
-
-int main(int argc, char *argv[]) {
-  int *a, i, r = 1;
-
-  a = ndpi_malloc(1000 * sizeof(int));
-
-  printf("testing sort()\n");
-
-  for (i = 0; i < 1000; i++) {
-    r = (r * 725861) % 6599;
-    a[i] = r;
-  }
-
-  sort(a, 1000, sizeof(int), cmpint, NULL);
-
-  for (i = 0; i < 999; i++)
-    if (a[i] > a[i+1]) {
-      printf("sort() failed!\n");
-      break;
-    }
-
-  return 0;
-}
-
-#endif

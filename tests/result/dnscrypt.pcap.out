@@ -1,0 +1,6 @@
+DNScrypt	111	44676	4
+
+	1	TCP 192.168.43.167:50233 <-> 134.119.26.24:443 [proto: 91.208/SSL.DNScrypt][18 pkts/1788 bytes <-> 21 pkts/14580 bytes][client: simplednscrypt.org]
+	2	TCP 192.168.43.167:50259 <-> 134.119.26.24:443 [proto: 91.208/SSL.DNScrypt][18 pkts/1988 bytes <-> 18 pkts/9290 bytes][client: simplednscrypt.org]
+	3	TCP 192.168.43.167:50253 <-> 134.119.26.24:443 [proto: 91.208/SSL.DNScrypt][8 pkts/780 bytes <-> 10 pkts/7735 bytes][client: simplednscrypt.org]
+	4	TCP 192.168.43.167:50258 <-> 134.119.26.24:443 [proto: 91.208/SSL.DNScrypt][8 pkts/780 bytes <-> 10 pkts/7735 bytes][client: simplednscrypt.org]

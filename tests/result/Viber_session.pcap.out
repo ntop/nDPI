@@ -1,0 +1,54 @@
+Unknown	163	9995	7
+HTTP	13	796	7
+SSL_No_Cert	34	4141	1
+ICMP	2	196	1
+SSL	75	7291	7
+Facebook	29	3944	2
+Dropbox	1	97	1
+GMail	21	1891	1
+Google	50	4084	5
+WhatsApp	5	412	1
+Viber	4163	392492	4
+Amazon	1	66	1
+
+	1	UDP 192.168.200.222:48564 <-> 54.169.63.186:7985 [proto: 144/Viber][2835 pkts/280455 bytes <-> 1308 pkts/110326 bytes]
+	2	TCP 192.168.200.222:43287 <-> 52.0.253.46:443 [proto: 64/SSL_No_Cert][21 pkts/2257 bytes <-> 13 pkts/1884 bytes]
+	3	TCP 192.168.200.222:38039 <-> 31.13.79.246:443 [proto: 91.119/SSL.Facebook][14 pkts/1058 bytes <-> 9 pkts/2287 bytes]
+	4	TCP 192.168.200.222:40005 <-> 108.168.176.234:443 [proto: 91/SSL][12 pkts/1116 bytes <-> 12 pkts/1732 bytes]
+	5	TCP 192.168.200.222:51055 <-> 74.125.68.156:443 [proto: 91.126/SSL.Google][15 pkts/1329 bytes <-> 9 pkts/750 bytes]
+	6	TCP 192.168.200.222:42040 <-> 74.125.200.18:443 [proto: 91.122/SSL.GMail][15 pkts/1318 bytes <-> 6 pkts/573 bytes][client: mail.google.com]
+	7	TCP 192.168.200.222:51146 <-> 23.21.254.189:443 [proto: 91/SSL][11 pkts/1043 bytes <-> 4 pkts/441 bytes][client: e.crashlytics.com]
+	8	TCP 192.168.200.222:52269 <-> 107.22.192.179:443 [proto: 91/SSL][12 pkts/1116 bytes <-> 4 pkts/303 bytes][client: settings.crashlytics.com]
+	9	TCP 192.168.200.222:43454 <-> 52.0.253.46:4244 [proto: 144/Viber][7 pkts/689 bytes <-> 5 pkts/472 bytes]
+	10	TCP 192.168.200.222:57999 <-> 74.125.130.188:5228 [proto: 126/Google][5 pkts/389 bytes <-> 5 pkts/368 bytes]
+	11	TCP 192.168.200.222:59011 <-> 74.125.130.188:5228 [proto: 126/Google][5 pkts/428 bytes <-> 4 pkts/264 bytes]
+	12	TCP 192.168.200.222:52491 <-> 31.13.79.245:443 [proto: 91.119/SSL.Facebook][3 pkts/250 bytes <-> 3 pkts/349 bytes]
+	13	TCP 192.168.200.222:46761 <-> 112.124.219.93:80 [proto: 7/HTTP][4 pkts/254 bytes <-> 3 pkts/182 bytes]
+	14	TCP 74.125.68.239:443 <-> 192.168.200.222:37376 [proto: 91.126/SSL.Google][2 pkts/195 bytes <-> 3 pkts/229 bytes]
+	15	TCP 192.168.200.222:39339 <-> 54.169.63.186:443 [proto: 91.144/SSL.Viber][4 pkts/272 bytes <-> 2 pkts/140 bytes]
+	16	TCP 192.168.200.222:44058 <-> 158.85.58.23:443 [proto: 91.142/SSL.WhatsApp][2 pkts/157 bytes <-> 3 pkts/255 bytes]
+	17	TCP 222.165.163.91:443 <-> 192.168.200.222:56243 [proto: 91/SSL][3 pkts/253 bytes <-> 2 pkts/132 bytes]
+	18	TCP 222.165.163.93:443 <-> 192.168.200.222:52635 [proto: 91/SSL][3 pkts/253 bytes <-> 2 pkts/132 bytes]
+	19	TCP 222.165.163.93:443 <-> 192.168.200.222:52641 [proto: 91/SSL][3 pkts/253 bytes <-> 2 pkts/132 bytes]
+	20	TCP 222.165.163.117:443 <-> 192.168.200.222:47424 [proto: 91/SSL][3 pkts/253 bytes <-> 2 pkts/132 bytes]
+	21	ICMP 192.168.200.222:0 -> 192.168.1.1:0 [proto: 81/ICMP][2 pkts/196 bytes -> 0 pkts/0 bytes]
+	22	UDP 192.168.200.222:48564 <-> 54.169.63.186:7987 [proto: 144/Viber][1 pkts/76 bytes <-> 1 pkts/62 bytes]
+	23	TCP 216.58.199.206:443 <-> 192.168.200.222:58663 [proto: 91.126/SSL.Google][1 pkts/66 bytes <-> 1 pkts/66 bytes]
+	24	TCP 192.168.200.222:51765 -> 108.160.172.205:443 [proto: 91.121/SSL.Dropbox][1 pkts/97 bytes -> 0 pkts/0 bytes]
+	25	TCP 192.168.200.222:38778 -> 54.251.141.219:80 [proto: 7.178/HTTP.Amazon][1 pkts/66 bytes -> 0 pkts/0 bytes]
+	26	TCP 192.168.200.222:33161 -> 93.184.221.200:80 [proto: 7/HTTP][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	27	TCP 192.168.200.222:36675 -> 112.124.219.82:80 [proto: 7/HTTP][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	28	TCP 192.168.200.222:43646 -> 93.184.221.200:80 [proto: 7/HTTP][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	29	TCP 192.168.200.222:50854 -> 93.184.221.200:80 [proto: 7/HTTP][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	30	TCP 192.168.200.222:52977 -> 93.184.221.200:80 [proto: 7/HTTP][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	31	TCP 192.168.200.222:60828 -> 93.184.221.200:80 [proto: 7/HTTP][1 pkts/60 bytes -> 0 pkts/0 bytes]
+
+
+Undetected flows:
+	1	UDP 192.168.200.222:48564 -> 10.216.246.82:59027 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	2	UDP 192.168.200.222:48564 -> 175.157.52.135:37299 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	3	UDP 192.168.200.222:48564 -> 175.157.52.135:37300 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	4	UDP 192.168.200.222:48564 -> 175.157.52.135:37301 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	5	UDP 192.168.200.222:48564 -> 175.157.52.135:37302 [proto: 0/Unknown][30 pkts/1800 bytes -> 0 pkts/0 bytes]
+	6	TCP 192.168.200.222:55565 <-> 113.31.80.142:7003 [proto: 0/Unknown][4 pkts/341 bytes <-> 3 pkts/208 bytes]
+	7	TCP 192.168.200.222:55554 <-> 113.31.80.142:7003 [proto: 0/Unknown][4 pkts/276 bytes <-> 2 pkts/170 bytes]

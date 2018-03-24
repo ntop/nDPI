@@ -27,10 +27,10 @@
 #ifdef NDPI_PROTOCOL_SECONDLIFE
 
 static void ndpi_int_secondlife_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					       struct ndpi_flow_struct *flow,
-					       ndpi_protocol_type_t protocol_type)
+					       struct ndpi_flow_struct *flow/* , */
+					       /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SECONDLIFE, protocol_type);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SECONDLIFE, protocol_type);
 }
 
 void ndpi_search_secondlife(struct ndpi_detection_module_struct
@@ -92,25 +92,25 @@ void ndpi_search_secondlife(struct ndpi_detection_module_struct
     if (packet->payload_packet_len == 46
 	&& memcmp(packet->payload, "\x40\x00\x00\x00\x01\x00\xff\xff\x00\x03", 10) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_SECONDLIFE, ndpi_struct, NDPI_LOG_DEBUG, "Second Life 0xffff0003 detected.\n");
-      ndpi_int_secondlife_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_secondlife_add_connection(ndpi_struct, flow);
       return;
     }
     if (packet->payload_packet_len == 54
 	&& memcmp(packet->payload, "\x40\x00\x00\x00\x01\x00\xff\xff\x00\x52", 10) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_SECONDLIFE, ndpi_struct, NDPI_LOG_DEBUG, "Second Life 0xffff0052 detected.\n");
-      ndpi_int_secondlife_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_secondlife_add_connection(ndpi_struct, flow);
       return;
     }
     if (packet->payload_packet_len == 58
 	&& memcmp(packet->payload, "\x40\x00\x00\x00\x01\x00\xff\xff\x00\xa9", 10) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_SECONDLIFE, ndpi_struct, NDPI_LOG_DEBUG, "Second Life 0xffff00a9 detected.\n");
-      ndpi_int_secondlife_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_secondlife_add_connection(ndpi_struct, flow);
       return;
     }
     if (packet->payload_packet_len > 54 && memcmp(packet->payload, "\x40\x00\x00\x00\x01\x00\x08", 7) == 0 &&
 	get_u_int32_t(packet->payload, packet->payload_packet_len - 4) == 0) {
       NDPI_LOG(NDPI_PROTOCOL_SECONDLIFE, ndpi_struct, NDPI_LOG_DEBUG, "Second Life 0x08 detected.\n");
-      ndpi_int_secondlife_add_connection(ndpi_struct, flow, NDPI_REAL_PROTOCOL);
+      ndpi_int_secondlife_add_connection(ndpi_struct, flow);
       return;
     }
   }

@@ -1,16 +1,30 @@
 language: c
 
+os:
+  - osx
+  - linux
+
 compiler:
   - clang
   - gcc
 
+matrix:
+  exclude:
+  # osx use always clang for build...
+  - os: osx
+    compiler: gcc
+
 install: 
-  - sudo apt-get update || true
-  - sudo apt-get install build-essential
-  - sudo apt-get install libpcap-dev libtool autoconf automake autogen
+#macos 
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+#linux
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update || true; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install build-essential; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install libpcap-dev libtool autoconf automake autogen; fi 
 
 before_script:
   - ./autogen.sh
+#  - lcov --directory . --zerocounters
 
 script:
   - ./configure
@@ -19,4 +33,17 @@ script:
 after_script:
   - cd tests
   - ./do.sh
- 
+
+#after_success:
+#- cd ${TRAVIS_BUILD_DIR}
+#- lcov --directory . --capture --output-file coverage.info # capture coverage info
+#- lcov --remove coverage.info 'tests/*' 'packages/*' 'm4/*' 'doc/*' --output-file coverage.info
+#- lcov --list coverage.info # debug before upload
+#- coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info # uploads to coveralls
+
+notifications:
+  email:
+    recipients:
+      - packager@ntop.org
+    on_success: never
+    on_failure: always

@@ -1,0 +1,7 @@
+Teredo	24	2574	5
+
+	1	UDP 10.112.16.67:51812 <-> 194.136.28.76:3544 [proto: 214/Teredo][10 pkts/930 bytes <-> 4 pkts/374 bytes]
+	2	UDP 10.112.16.106:52513 <-> 194.136.28.76:3544 [proto: 214/Teredo][2 pkts/206 bytes <-> 2 pkts/302 bytes]
+	3	UDP 10.112.16.64:56154 <-> 194.136.28.76:3544 [proto: 214/Teredo][1 pkts/103 bytes <-> 1 pkts/151 bytes]
+	4	UDP 10.112.16.89:60381 <-> 194.136.28.76:3544 [proto: 214/Teredo][1 pkts/103 bytes <-> 1 pkts/151 bytes]
+	5	UDP 10.112.16.92:63448 <-> 194.136.28.76:3544 [proto: 214/Teredo][1 pkts/103 bytes <-> 1 pkts/151 bytes]

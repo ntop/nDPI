@@ -1,0 +1,4 @@
+WhatsAppFiles	620	452233	2
+
+	1	TCP 192.168.2.29:49698 <-> 185.60.216.53:443 [proto: 242/WhatsAppFiles][132 pkts/9906 bytes <-> 178 pkts/237405 bytes]
+	2	TCP 192.168.2.29:49674 <-> 185.60.216.53:443 [proto: 242/WhatsAppFiles][161 pkts/189194 bytes <-> 149 pkts/15728 bytes]

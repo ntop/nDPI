@@ -23,9 +23,14 @@
  */
 
 
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_MAIL_SMTP
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MAIL_SMTP
+
+#include "ndpi_api.h"
+
 
 #define SMTP_BIT_220		0x01
 #define SMTP_BIT_250		0x02
@@ -45,7 +50,7 @@
 static void ndpi_int_mail_smtp_add_connection(struct ndpi_detection_module_struct
 					      *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP, NDPI_REAL_PROTOCOL);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
@@ -53,12 +58,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
-  //  struct ndpi_id_struct         *src=ndpi_struct->src;
-  //  struct ndpi_id_struct         *dst=ndpi_struct->dst;
-
-
-  NDPI_LOG(NDPI_PROTOCOL_MAIL_SMTP, ndpi_struct, NDPI_LOG_DEBUG, "search mail_smtp.\n");
-
+  NDPI_LOG_DBG(ndpi_struct, "search mail_smtp\n");
 
   if (packet->payload_packet_len > 2 && ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a) {
     u_int8_t a;
@@ -117,10 +117,10 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 	    && (packet->line[a].ptr[1] == 'T' || packet->line[a].ptr[1] == 't')
 	    && (packet->line[a].ptr[2] == 'A' || packet->line[a].ptr[2] == 'a')
 	    && (packet->line[a].ptr[3] == 'R' || packet->line[a].ptr[3] == 'r')
-	    && (packet->line[a].ptr[4] == 'T' || packet->line[a].ptr[0] == 't')
-	    && (packet->line[a].ptr[5] == 'T' || packet->line[a].ptr[1] == 't')
-	    && (packet->line[a].ptr[6] == 'L' || packet->line[a].ptr[2] == 'l')
-	    && (packet->line[a].ptr[7] == 'S' || packet->line[a].ptr[3] == 's')) {
+	    && (packet->line[a].ptr[4] == 'T' || packet->line[a].ptr[4] == 't')
+	    && (packet->line[a].ptr[5] == 'T' || packet->line[a].ptr[5] == 't')
+	    && (packet->line[a].ptr[6] == 'L' || packet->line[a].ptr[6] == 'l')
+	    && (packet->line[a].ptr[7] == 'S' || packet->line[a].ptr[7] == 's')) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
 	}
       }
@@ -152,11 +152,11 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 	bit_count += (flow->l4.tcp.smtp_command_bitmask >> a) & 0x01;
       }
     }
-    NDPI_LOG(NDPI_PROTOCOL_MAIL_SMTP, ndpi_struct, NDPI_LOG_DEBUG, "seen smtp commands and responses: %u.\n",
+    NDPI_LOG_DBG2(ndpi_struct, "seen smtp commands and responses: %u\n",
 	     bit_count);
 
     if (bit_count >= 3) {
-      NDPI_LOG(NDPI_PROTOCOL_MAIL_SMTP, ndpi_struct, NDPI_LOG_DEBUG, "mail smtp identified\n");
+      NDPI_LOG_INFO(ndpi_struct, "mail smtp identified\n");
       ndpi_int_mail_smtp_add_connection(ndpi_struct, flow);
       return;
     }
@@ -169,12 +169,24 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
       packet->payload_packet_len >= 4 &&
       (ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a
        || memcmp(packet->payload, "220", 3) == 0 || memcmp(packet->payload, "EHLO", 4) == 0)) {
-    NDPI_LOG(NDPI_PROTOCOL_MAIL_SMTP, ndpi_struct, NDPI_LOG_DEBUG, "maybe SMTP, need next packet.\n");
+    NDPI_LOG_DBG2(ndpi_struct, "maybe SMTP, need next packet\n");
     return;
   }
 
-  NDPI_LOG(NDPI_PROTOCOL_MAIL_SMTP, ndpi_struct, NDPI_LOG_DEBUG, "exclude smtp\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MAIL_SMTP);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
 }
+
+void init_mail_smtp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("MAIL_SMTP", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_MAIL_SMTP,
+				      ndpi_search_mail_smtp_tcp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);  
+
+  *id += 1;
+}
+
 #endif

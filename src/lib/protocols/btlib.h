@@ -24,43 +24,80 @@
 
 #define BDEC_MAXDEPT 8
 
+#ifdef WIN32
+#include "ndpi_win32.h"
+#endif
 
 typedef struct b_elem_s {
 	const u_int8_t *s;
 	size_t   l;
 } b_elem_s_t;
 
-struct __attribute__ ((__packed__)) bt_nodes_data {
-	u_int8_t  id[20] ;
+#ifdef WIN32
+// enable 1 byte packing on Windows
+#include <pshpack1.h>
+#endif
+
+struct
+#ifndef WIN32
+	__attribute__((__packed__))
+#endif
+	bt_nodes_data {
+	u_int8_t  id[20];
 	u_int32_t ip;
 	u_int16_t port;
 };
 
-struct __attribute__ ((__packed__)) bt_ipv4p {
+struct
+#ifndef WIN32
+	__attribute__((__packed__))
+#endif
+	bt_ipv4p {
 	u_int32_t ip;
 	u_int16_t port;
 };
 
-struct __attribute__ ((__packed__)) bt_ipv4p2 {
+struct
+#ifndef WIN32
+	__attribute__((__packed__))
+#endif
+	bt_ipv4p2 {
 	struct bt_ipv4p d;
 	u_int8_t	pad[2];
 };
 
-struct __attribute__ ((__packed__)) bt_nodes6_data {
-	u_int8_t  id[20] ;
+struct
+#ifndef WIN32
+	__attribute__((__packed__))
+#endif
+	bt_nodes6_data {
+	u_int8_t  id[20];
 	u_int32_t ip[4];
 	u_int16_t port;
 };
 
-struct __attribute__ ((__packed__)) bt_ipv6p {
+struct
+#ifndef WIN32
+	__attribute__((__packed__))
+#endif
+	bt_ipv6p {
 	u_int32_t ip[4];
 	u_int16_t port;
 };
 
-struct __attribute__ ((__packed__)) bt_ipv6p2 {
+struct
+#ifndef WIN32
+	__attribute__((__packed__))
+#endif
+	bt_ipv6p2 {
 	struct bt_ipv6p d;
 	u_int8_t	pad[3];
 };
+
+#ifdef WIN32
+// disable 1 byte packing
+#include <poppack.h>
+#endif
 
 /*
  
@@ -113,9 +150,9 @@ struct bt_parse_protocol {
 		struct bt_nodes6_data *nodes6;
 		u_int16_t	name_len;
 		u_int16_t	nn;		// nodes num
-		u_int16_t	nv;		// valuse num
+		u_int16_t	nv;		// values num
 		u_int16_t	nn6;		// nodes6 num
-		u_int16_t	nv6;		// valuse6 num
+		u_int16_t	nv6;		// values6 num
 		u_int16_t	port;
 		u_int16_t	t_len;
 	} r;
@@ -134,14 +171,11 @@ typedef struct bt_parse_data_cb {
 	int	level;
 	int	t;
 	union {
-		i_int64_t i;
+		int64_t i;
 		b_elem_s_t s;
 	} v;
 } bt_parse_data_cb_t;
 
-#ifndef __KERNEL__
 extern int bt_parse_debug;
 void dump_bt_proto_struct(struct bt_parse_protocol *p);
-#endif
 const u_int8_t *bt_decode(const u_int8_t *b, size_t *l, int *ret, bt_parse_data_cb_t *cbd);
-

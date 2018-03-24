@@ -1,0 +1,64 @@
+DNS	26	2848	7
+HTTP	271	160676	18
+SSDP	11	4984	1
+HTTP_Download	179	134204	1
+WorldOfWarcraft	9	880	1
+IGMP	2	120	1
+SSL	38	2548	11
+Google	16	1709	4
+QUIC	6	475	1
+Github	3	234	1
+Starcraft	236	51494	6
+
+	1	TCP 192.168.1.100:3508 <-> 87.248.221.254:80 [proto: 7.60/HTTP.HTTP_Download][90 pkts/5059 bytes <-> 89 pkts/129145 bytes][Host: llnw.blizzard.com]
+	2	TCP 192.168.1.100:3517 <-> 213.248.127.130:1119 [proto: 213/Starcraft][126 pkts/9157 bytes <-> 89 pkts/41021 bytes]
+	3	TCP 192.168.1.100:3527 <-> 2.228.46.112:80 [proto: 7/HTTP][15 pkts/971 bytes <-> 26 pkts/36462 bytes][Host: bnetcmsus-a.akamaihd.net]
+	4	TCP 192.168.1.100:3528 <-> 2.228.46.112:80 [proto: 7/HTTP][11 pkts/755 bytes <-> 18 pkts/24350 bytes][Host: bnetcmsus-a.akamaihd.net]
+	5	TCP 192.168.1.100:3529 <-> 2.228.46.112:80 [proto: 7/HTTP][11 pkts/752 bytes <-> 18 pkts/24350 bytes][Host: bnetcmsus-a.akamaihd.net]
+	6	TCP 192.168.1.100:3530 <-> 2.228.46.112:80 [proto: 7/HTTP][11 pkts/752 bytes <-> 18 pkts/24350 bytes][Host: bnetcmsus-a.akamaihd.net]
+	7	TCP 192.168.1.100:3531 <-> 2.228.46.112:80 [proto: 7/HTTP][11 pkts/752 bytes <-> 18 pkts/24350 bytes][Host: bnetcmsus-a.akamaihd.net]
+	8	UDP 192.168.1.254:38605 -> 239.255.255.250:1900 [proto: 12/SSDP][11 pkts/4984 bytes -> 0 pkts/0 bytes]
+	9	TCP 192.168.1.100:3525 <-> 80.239.186.40:80 [proto: 7/HTTP][6 pkts/545 bytes <-> 6 pkts/3388 bytes][Host: eu.battle.net]
+	10	TCP 192.168.1.100:3526 <-> 80.239.186.40:80 [proto: 7/HTTP][6 pkts/547 bytes <-> 5 pkts/3139 bytes][Host: eu.battle.net]
+	11	TCP 192.168.1.100:3516 <-> 80.239.186.21:80 [proto: 7/HTTP][6 pkts/549 bytes <-> 6 pkts/3131 bytes][Host: eu.launcher.battle.net]
+	12	TCP 192.168.1.100:3522 <-> 80.239.186.21:80 [proto: 7/HTTP][6 pkts/549 bytes <-> 5 pkts/3071 bytes][Host: eu.launcher.battle.net]
+	13	TCP 192.168.1.100:3506 <-> 173.194.113.224:80 [proto: 7.126/HTTP.Google][5 pkts/632 bytes <-> 4 pkts/667 bytes][Host: www.google-analytics.com]
+	14	TCP 192.168.1.100:3518 <-> 80.239.186.26:80 [proto: 7/HTTP][6 pkts/473 bytes <-> 4 pkts/753 bytes][Host: nydus.battle.net]
+	15	TCP 192.168.1.100:3515 <-> 80.239.186.26:80 [proto: 7/HTTP][6 pkts/475 bytes <-> 4 pkts/749 bytes][Host: nydus.battle.net]
+	16	TCP 192.168.1.100:3521 <-> 80.239.186.26:80 [proto: 7/HTTP][6 pkts/475 bytes <-> 4 pkts/749 bytes][Host: nydus.battle.net]
+	17	TCP 192.168.1.100:3524 <-> 80.239.186.26:80 [proto: 7/HTTP][6 pkts/481 bytes <-> 4 pkts/733 bytes][Host: nydus.battle.net]
+	18	TCP 192.168.1.100:3523 <-> 80.239.186.26:80 [proto: 7/HTTP][6 pkts/483 bytes <-> 4 pkts/725 bytes][Host: nydus.battle.net]
+	19	TCP 192.168.1.100:3519 <-> 80.239.186.21:80 [proto: 7/HTTP][5 pkts/482 bytes <-> 4 pkts/497 bytes][Host: eu.launcher.battle.net]
+	20	TCP 192.168.1.100:3427 <-> 80.239.208.193:1119 [proto: 213/Starcraft][6 pkts/376 bytes <-> 7 pkts/526 bytes]
+	21	TCP 192.168.1.100:3512 <-> 12.129.222.54:80 [proto: 7.76/HTTP.WorldOfWarcraft][5 pkts/367 bytes <-> 4 pkts/513 bytes][Host: us.scan.worldofwarcraft.com]
+	22	UDP 192.168.1.100:55468 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/168 bytes <-> 2 pkts/388 bytes][Host: bnetcmsus-a.akamaihd.net]
+	23	UDP 173.194.40.22:443 <-> 192.168.1.100:53568 [proto: 188/QUIC][3 pkts/243 bytes <-> 3 pkts/232 bytes]
+	24	UDP 192.168.1.100:58851 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/173 bytes <-> 2 pkts/282 bytes][Host: 22.40.194.173.in-addr.arpa]
+	25	UDP 192.168.1.100:60026 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/154 bytes <-> 2 pkts/288 bytes][Host: llnw.blizzard.com]
+	26	UDP 192.168.1.100:58818 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/172 bytes <-> 2 pkts/260 bytes][Host: 91.252.30.192.in-addr.arpa]
+	27	UDP 192.168.1.100:58831 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/172 bytes <-> 2 pkts/245 bytes][Host: 254.1.168.192.in-addr.arpa]
+	28	TCP 192.168.1.100:3532 <-> 2.228.46.112:80 [proto: 7/HTTP][3 pkts/320 bytes <-> 1 pkts/66 bytes][Host: bnetcmsus-a.akamaihd.net]
+	29	TCP 192.168.1.100:3533 <-> 2.228.46.112:80 [proto: 7/HTTP][3 pkts/320 bytes <-> 1 pkts/66 bytes][Host: bnetcmsus-a.akamaihd.net]
+	30	UDP 192.168.1.100:53145 <-> 192.168.1.254:53 [proto: 5/DNS][2 pkts/152 bytes <-> 2 pkts/184 bytes][Host: nydus.battle.net]
+	31	TCP 192.168.1.100:3479 <-> 2.228.46.114:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	32	TCP 192.168.1.100:3480 <-> 2.228.46.114:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	33	TCP 192.168.1.100:3481 <-> 2.228.46.114:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	34	TCP 192.168.1.100:3482 <-> 2.228.46.114:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	35	TCP 192.168.1.100:3489 <-> 2.228.46.104:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	36	TCP 192.168.1.100:3490 <-> 2.228.46.104:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	37	TCP 192.168.1.100:3491 <-> 2.228.46.104:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	38	TCP 192.168.1.100:3492 <-> 2.228.46.104:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	39	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91.203/SSL.Github][2 pkts/145 bytes <-> 1 pkts/89 bytes]
+	40	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/120 bytes]
+	41	UDP 192.168.1.100:58844 <-> 192.168.1.254:53 [proto: 5/DNS][1 pkts/86 bytes <-> 1 pkts/124 bytes][Host: 40.186.239.80.in-addr.arpa]
+	42	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91.126/SSL.Google][2 pkts/108 bytes <-> 1 pkts/60 bytes]
+	43	TCP 192.168.1.100:2759 <-> 64.233.184.188:5228 [proto: 126/Google][1 pkts/55 bytes <-> 1 pkts/66 bytes]
+	44	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91.126/SSL.Google][1 pkts/55 bytes <-> 1 pkts/66 bytes]
+	45	IGMP 192.168.1.107:0 -> 224.0.0.22:0 [proto: 82/IGMP][2 pkts/120 bytes -> 0 pkts/0 bytes]
+	46	UDP 192.168.1.100:53146 <-> 5.42.180.154:1119 [proto: 213/Starcraft][1 pkts/44 bytes <-> 1 pkts/60 bytes]
+	47	UDP 192.168.1.100:53146 <-> 62.115.246.51:1119 [proto: 213/Starcraft][1 pkts/44 bytes <-> 1 pkts/60 bytes]
+	48	UDP 192.168.1.100:6113 <-> 213.248.127.166:1119 [proto: 213/Starcraft][1 pkts/43 bytes <-> 1 pkts/60 bytes]
+	49	UDP 192.168.1.100:6113 <-> 213.248.127.212:1119 [proto: 213/Starcraft][1 pkts/43 bytes <-> 1 pkts/60 bytes]
+	50	TCP 192.168.1.100:3534 -> 2.228.46.112:80 [proto: 7/HTTP][1 pkts/66 bytes -> 0 pkts/0 bytes]
+	51	TCP 80.239.186.26:443 -> 192.168.1.100:3476 [proto: 91/SSL][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	52	TCP 80.239.186.40:443 -> 192.168.1.100:3478 [proto: 91/SSL][1 pkts/60 bytes -> 0 pkts/0 bytes]

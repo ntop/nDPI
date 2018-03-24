@@ -18,10 +18,14 @@
  *
  */
 
+#include "ndpi_protocol_ids.h"
+
+#ifdef NDPI_PROTOCOL_RADIUS
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RADIUS
 
 #include "ndpi_api.h"
 
-#ifdef NDPI_PROTOCOL_RADIUS
 
 struct radius_header {
   u_int8_t code;
@@ -31,33 +35,23 @@ struct radius_header {
 
 static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;  
+  struct ndpi_packet_struct *packet = &flow->packet;
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-#if 0
-  printf("[len=%u][%02X %02X %02X %02X]\n", payload_len,
-	 packet->payload[0] & 0xFF,
-	 packet->payload[1] & 0xFF,
-	 packet->payload[2] & 0xFF,
-	 packet->payload[3] & 0xFF);
-#endif
-
   if(packet->udp != NULL) {
     struct radius_header *h = (struct radius_header*)packet->payload;
-    u_int len = ntohs(h->len);
 
     if((payload_len > sizeof(struct radius_header))
        && (h->code > 0)
        && (h->code <= 5)
-       && (len == payload_len)) {
-      NDPI_LOG(NDPI_PROTOCOL_RADIUS, ndpi_struct, NDPI_LOG_DEBUG, "Found radius.\n");
-      ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RADIUS, NDPI_REAL_PROTOCOL);	
-      
+       && (ntohs(h->len) == payload_len)) {
+      NDPI_LOG_INFO(ndpi_struct, "Found radius\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RADIUS, NDPI_PROTOCOL_UNKNOWN);
+
       return;
     }
-    
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RADIUS);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 }
@@ -66,11 +60,24 @@ void ndpi_search_radius(struct ndpi_detection_module_struct *ndpi_struct, struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG(NDPI_PROTOCOL_RADIUS, ndpi_struct, NDPI_LOG_DEBUG, "radius detection...\n");
+  NDPI_LOG_DBG(ndpi_struct, "search radius\n");
 
   /* skip marked packets */
   if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_RADIUS)
     ndpi_check_radius(ndpi_struct, flow);
+}
+
+
+void init_radius_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("Radius", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_RADIUS,
+				      ndpi_search_radius,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
 }
 
 #endif

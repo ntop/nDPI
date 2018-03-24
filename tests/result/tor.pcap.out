@@ -1,0 +1,17 @@
+NetBIOS	1	252	1
+SSL	1	60	1
+DHCPV6	6	906	1
+Dropbox	10	1860	1
+Tor	3676	3014362	7
+
+	1	TCP 192.168.1.252:51176 <-> 38.229.70.53:443 [proto: 163/Tor][693 pkts/181364 bytes <-> 1133 pkts/1331914 bytes]
+	2	TCP 192.168.1.252:51112 <-> 38.229.70.53:443 [proto: 163/Tor][580 pkts/145960 bytes <-> 996 pkts/1242832 bytes]
+	3	TCP 192.168.1.252:51110 <-> 91.143.93.242:443 [proto: 163/Tor][62 pkts/22715 bytes <-> 79 pkts/45823 bytes]
+	4	TCP 192.168.1.252:51175 <-> 91.143.93.242:443 [proto: 163/Tor][17 pkts/5489 bytes <-> 21 pkts/7031 bytes]
+	5	TCP 192.168.1.252:51111 <-> 46.59.52.31:443 [proto: 163/Tor][16 pkts/4858 bytes <-> 18 pkts/6284 bytes]
+	6	TCP 192.168.1.252:51174 <-> 212.83.155.250:443 [proto: 163/Tor][16 pkts/3691 bytes <-> 16 pkts/6740 bytes]
+	7	TCP 192.168.1.252:51185 <-> 62.210.137.230:443 [proto: 163/Tor][15 pkts/3634 bytes <-> 14 pkts/6027 bytes]
+	8	UDP 192.168.1.1:17500 -> 192.168.1.255:17500 [proto: 121/Dropbox][10 pkts/1860 bytes -> 0 pkts/0 bytes]
+	9	UDP [fe80::c583:1972:5728:7323]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][6 pkts/906 bytes -> 0 pkts/0 bytes]
+	10	UDP 192.168.1.252:138 -> 192.168.1.255:138 [proto: 10/NetBIOS][1 pkts/252 bytes -> 0 pkts/0 bytes]
+	11	TCP 192.168.1.252:51104 -> 157.56.30.46:443 [proto: 91/SSL][1 pkts/60 bytes -> 0 pkts/0 bytes]

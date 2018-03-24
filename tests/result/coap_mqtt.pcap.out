@@ -1,0 +1,20 @@
+COAP	19	1614	8
+Dropbox	800	80676	4
+MQTT	7695	668291	4
+
+	1	TCP 192.168.56.1:53528 <-> 192.168.56.101:17501 [proto: 222/MQTT][924 pkts/77180 bytes <-> 1004 pkts/90329 bytes]
+	2	TCP 192.168.56.1:53523 <-> 192.168.56.101:17501 [proto: 222/MQTT][918 pkts/76692 bytes <-> 1008 pkts/90434 bytes]
+	3	TCP 192.168.56.1:53522 <-> 192.168.56.101:17501 [proto: 222/MQTT][921 pkts/76872 bytes <-> 1001 pkts/90056 bytes]
+	4	TCP 192.168.56.101:17501 <-> 192.168.56.1:53524 [proto: 222/MQTT][1005 pkts/90274 bytes <-> 914 pkts/76454 bytes]
+	5	UDP 192.168.56.1:50318 <-> 192.168.56.101:17500 [proto: 121/Dropbox][100 pkts/13960 bytes <-> 100 pkts/6260 bytes]
+	6	UDP 192.168.56.1:50312 <-> 192.168.56.101:17500 [proto: 121/Dropbox][100 pkts/13947 bytes <-> 100 pkts/6247 bytes]
+	7	UDP 192.168.56.1:50319 <-> 192.168.56.101:17500 [proto: 121/Dropbox][100 pkts/13921 bytes <-> 100 pkts/6221 bytes]
+	8	UDP 192.168.56.1:50311 <-> 192.168.56.101:17500 [proto: 121/Dropbox][100 pkts/13910 bytes <-> 100 pkts/6210 bytes]
+	9	UDP [bbbb::1]:46819 <-> [bbbb::3]:5683 [proto: 27/COAP][3 pkts/262 bytes <-> 3 pkts/205 bytes]
+	10	UDP [bbbb::1]:33499 <-> [bbbb::3]:5683 [proto: 27/COAP][2 pkts/147 bytes <-> 2 pkts/257 bytes]
+	11	UDP [bbbb::1]:50250 <-> [bbbb::3]:5683 [proto: 27/COAP][2 pkts/158 bytes <-> 2 pkts/151 bytes]
+	12	UDP [2001:da8:215:1171:a10b:cb48:8f83:57f6]:61047 -> [2001:620:8:35d9::10]:5683 [proto: 27/COAP][1 pkts/90 bytes -> 0 pkts/0 bytes]
+	13	UDP [2001:da8:215:1171:a10b:cb48:8f83:57f6]:61043 -> [2001:620:8:35d9::10]:5683 [proto: 27/COAP][1 pkts/86 bytes -> 0 pkts/0 bytes]
+	14	UDP [2001:da8:215:1171:a10b:cb48:8f83:57f6]:61044 -> [2001:620:8:35d9::10]:5683 [proto: 27/COAP][1 pkts/86 bytes -> 0 pkts/0 bytes]
+	15	UDP [2001:da8:215:1171:a10b:cb48:8f83:57f6]:61045 -> [2001:620:8:35d9::10]:5683 [proto: 27/COAP][1 pkts/86 bytes -> 0 pkts/0 bytes]
+	16	UDP [2001:da8:215:1171:a10b:cb48:8f83:57f6]:61046 -> [2001:620:8:35d9::10]:5683 [proto: 27/COAP][1 pkts/86 bytes -> 0 pkts/0 bytes]

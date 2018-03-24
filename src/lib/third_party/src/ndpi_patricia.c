@@ -39,7 +39,6 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 */
 
-#ifndef __KERNEL__
 #include <assert.h> /* assert */
 #include <ctype.h> /* isdigit */
 #include <errno.h> /* errno */
@@ -54,25 +53,8 @@
 #include <netinet/in.h> /* BSD, Linux: for inet_addr */
 #include <arpa/inet.h> /* BSD, Linux, Solaris: for inet_addr */
 #endif
-#else
-#define assert(a) ;
-#endif /* __KERNEL__ */
-
 #include "ndpi_patricia.h"
-
-
-#ifdef __KERNEL__
-
-long atol(const char *nptr) {
-  long l;
-  char *endp;
-  
-  l = simple_strtol(nptr, &endp, 10);
-  return(l);
-}
-#endif
-
-// #define PATRICIA_DEBUG
+#include "ndpi_api.h"
 
 void ndpi_DeleteEntry(void *a) {
   ndpi_free(a);
@@ -93,58 +75,17 @@ ndpi_prefix_tochar (prefix_t * prefix)
 }
 
 int ndpi_comp_with_mask (void *addr, void *dest, u_int mask) {
-  if( /* mask/8 == 0 || */ memcmp (addr, dest, mask / 8) == 0) {
-    int n = mask / 8;
-    int m = ((-1) << (8 - (mask % 8)));
-
-    if(mask % 8 == 0 || (((u_char *)addr)[n] & m) == (((u_char *)dest)[n] & m))
-      return (1);
-  }
-  return (0);
+  uint32_t *pa = addr;
+  uint32_t *pd = dest;
+  uint32_t m;
+  for(;mask >= 32; mask -= 32, pa++,pd++)
+        if(*pa != *pd) return 0;
+  if(!mask) return 1;
+  m = htonl((~0u) << (32-mask));
+  return (*pa & m) == (*pd &m);
 }
 
-#if 0 /* this implementation does not support IPv6, using system inet_pton */
-#ifndef WIN32
-/* inet_pton substitute implementation
- * Uses inet_addr to convert an IP address in dotted decimal notation into 
- * unsigned long and copies the result to dst.
- * Only supports AF_INET.  Follows standard error return conventions of 
- * inet_pton.
- */
-int
-inet_pton (int af, const char *src, void *dst)
-{
-  u_long result;  
-
-  if(af == AF_INET) {
-    result = inet_addr(src);
-    if(result == -1)
-      return 0;
-    else {
-      memcpy (dst, &result, sizeof(struct in_addr));
-      return 1;
-    }
-  }
-#ifdef NT
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
-  else if(af == AF_INET6) {
-    struct in6_addr Address;
-    return (inet6_addr(src, &Address));
-  }
-#endif /* PATRICIA_IPV6 */
-#endif /* NT */
-#ifndef NT
-  else {
-    printf("NOT SUPP\n");
-    errno = EAFNOSUPPORT;
-    return -1;
-  }
-#endif /* NT */
-}
-#endif
-#endif
-
-/* this allows imcomplete prefix */
+/* this allows incomplete prefix */
 int
 ndpi_my_inet_pton (int af, const char *src, void *dst)
 {
@@ -175,15 +116,13 @@ ndpi_my_inet_pton (int af, const char *src, void *dst)
     }
     memcpy (dst, xp, sizeof(struct in_addr));
     return (1);
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6)
   } else if(af == AF_INET6) {
-    return (inet_pton (af, src, dst));
+  return (inet_pton (af, src, dst));
 #endif /* PATRICIA_IPV6 */
-  } else {
+ } else {
 #ifndef NT
-#ifndef __KERNEL__
-    errno = EAFNOSUPPORT;
-#endif
+  errno = EAFNOSUPPORT;
 #endif /* NT */
     return -1;
   }
@@ -236,7 +175,7 @@ ndpi_prefix_toa2x (prefix_t *prefix, char *buff, int with_len)
     }
     return (buff);
   }
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6)
   else if(prefix->family == AF_INET6) {
     char *r;
     r = (char *) inet_ntop (AF_INET6, &prefix->add.sin6, buff, 48 /* a guess value */ );
@@ -274,7 +213,7 @@ ndpi_New_Prefix2 (int family, void *dest, int bitlen, prefix_t *prefix)
   int dynamic_allocated = 0;
   int default_bitlen = sizeof(struct in_addr) * 8;
 
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6)
   if(family == AF_INET6) {
     default_bitlen = sizeof(struct in6_addr) * 8;
     if(prefix == NULL) {
@@ -319,8 +258,7 @@ ndpi_New_Prefix (int family, void *dest, int bitlen)
   return (ndpi_New_Prefix2 (family, dest, bitlen, NULL));
 }
 
-/* ndpi_ascii2prefix
- */
+/* ndpi_ascii2prefix */
 prefix_t *
 ndpi_ascii2prefix (int family, char *string)
 {
@@ -328,7 +266,7 @@ ndpi_ascii2prefix (int family, char *string)
   long maxbitlen = 0;
   char *cp;
   struct in_addr sin;
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6)
   struct in6_addr sin6;
 #endif /* PATRICIA_IPV6 */ 
   char save[MAXLINE];
@@ -339,7 +277,7 @@ ndpi_ascii2prefix (int family, char *string)
   /* easy way to handle both families */
   if(family == 0) {
     family = AF_INET;
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6)
     if(strchr (string, ':')) family = AF_INET6;
 #endif /* PATRICIA_IPV6 */
   }
@@ -347,7 +285,7 @@ ndpi_ascii2prefix (int family, char *string)
   if(family == AF_INET) {
     maxbitlen = sizeof(struct in_addr) * 8;
   }
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6)
   else if(family == AF_INET6) {
     maxbitlen = sizeof(struct in6_addr) * 8;
   }
@@ -373,7 +311,7 @@ ndpi_ascii2prefix (int family, char *string)
     return (ndpi_New_Prefix (AF_INET, &sin, bitlen));
   }
 
-#if defined(PATRICIA_IPV6) && (!defined(__KERNEL__))
+#if defined(PATRICIA_IPV6)
   else if(family == AF_INET6) {
     // Get rid of this with next IPv6 upgrade
 #if defined(NT) && !defined(HAVE_INET_NTOP)
@@ -420,8 +358,6 @@ ndpi_Deref_Prefix (prefix_t * prefix)
   }
 }
 
-/* } */
-
 /* #define PATRICIA_DEBUG 1 */
 
 static int num_active_patricia = 0;
@@ -446,7 +382,6 @@ ndpi_New_Patricia (int maxbits)
  * if func is supplied, it will be called as func(node->data)
  * before deleting the node
  */
-
 void
 ndpi_Clear_Patricia (patricia_tree_t *patricia, void_fn_t func)
 {
@@ -503,7 +438,6 @@ ndpi_Destroy_Patricia (patricia_tree_t *patricia, void_fn_t func)
 /*
  * if func is supplied, it will be called as func(node->prefix, node->data)
  */
-
 void
 ndpi_patricia_process (patricia_tree_t *patricia, void_fn2_t func)
 {
@@ -836,6 +770,7 @@ ndpi_patricia_lookup (patricia_tree_t *patricia, prefix_t *prefix)
   }
 
   new_node = (patricia_node_t*)ndpi_calloc(1, sizeof *new_node);
+  if(!new_node) return NULL;
   new_node->bit = prefix->bitlen;
   new_node->prefix = ndpi_Ref_Prefix (prefix);
   new_node->parent = NULL;
@@ -888,6 +823,8 @@ ndpi_patricia_lookup (patricia_tree_t *patricia, prefix_t *prefix)
   }
   else {
     glue = (patricia_node_t*)ndpi_calloc(1, sizeof *glue);
+
+    if(!glue) return(NULL);
     glue->bit = differ_bit;
     glue->prefix = NULL;
     glue->parent = node->parent;
@@ -939,7 +876,7 @@ ndpi_patricia_remove (patricia_tree_t *patricia, patricia_node_t *node)
 #endif /* PATRICIA_DEBUG */
 	
     /* this might be a placeholder node -- have to check and make sure
-     * there is a prefix aossciated with it ! */
+     * there is a prefix associated with it ! */
     if(node->prefix != NULL) 
       ndpi_Deref_Prefix (node->prefix);
     node->prefix = NULL;
@@ -1073,5 +1010,3 @@ ndpi_lookup_then_remove (patricia_tree_t *tree, char *string)
     patricia_remove (tree, node);
 }
 #endif
-
-/* } */

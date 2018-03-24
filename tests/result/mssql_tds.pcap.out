@@ -1,0 +1,14 @@
+MsSQL-TDS	38	16260	12
+
+	1	TCP 10.111.111.111:6666 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][7 pkts/8717 bytes -> 0 pkts/0 bytes]
+	2	TCP 10.111.111.111:5555 <-> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][10 pkts/1552 bytes <-> 7 pkts/1521 bytes]
+	3	TCP 10.111.111.111:1111 <-> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][2 pkts/614 bytes <-> 2 pkts/524 bytes]
+	4	TCP 10.111.111.111:4444 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/1136 bytes -> 0 pkts/0 bytes]
+	5	TCP 10.111.111.111:7777 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/425 bytes -> 0 pkts/0 bytes]
+	6	TCP 10.111.111.111:33333 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/374 bytes -> 0 pkts/0 bytes]
+	7	TCP 10.111.111.111:22222 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/322 bytes -> 0 pkts/0 bytes]
+	8	TCP 10.111.111.111:9999 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/272 bytes -> 0 pkts/0 bytes]
+	9	TCP 10.111.111.111:11111 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/253 bytes -> 0 pkts/0 bytes]
+	10	TCP 10.111.111.111:3333 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/239 bytes -> 0 pkts/0 bytes]
+	11	TCP 10.111.111.111:2222 <-> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/98 bytes <-> 1 pkts/71 bytes]
+	12	TCP 10.111.111.111:8888 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][1 pkts/142 bytes -> 0 pkts/0 bytes]

@@ -1,0 +1,45 @@
+Unknown	10	786	1
+HTTP	28	1572	7
+NTP	2	180	1
+HTTP_Download	37	63205	1
+SSL_No_Cert	13	2142	1
+SSL	8	432	2
+Waze	484	289335	19
+WhatsApp	15	1341	1
+
+	1	TCP 10.8.0.1:36100 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][52 pkts/10860 bytes <-> 55 pkts/74852 bytes][server: *.world.waze.com]
+	2	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7.60/HTTP.HTTP_Download][19 pkts/1309 bytes <-> 18 pkts/61896 bytes][Host: xtra1.gpsonextra.net]
+	3	TCP 10.8.0.1:39021 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][17 pkts/1962 bytes <-> 16 pkts/56934 bytes][server: *.world.waze.com]
+	4	TCP 10.8.0.1:36312 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][17 pkts/2176 bytes <-> 15 pkts/42443 bytes][server: *.world.waze.com]
+	5	TCP 10.8.0.1:36316 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][15 pkts/1540 bytes <-> 13 pkts/26346 bytes][server: *.world.waze.com]
+	6	TCP 10.8.0.1:36102 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][19 pkts/2646 bytes <-> 18 pkts/9338 bytes][server: *.world.waze.com]
+	7	TCP 10.8.0.1:39010 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][8 pkts/1034 bytes <-> 8 pkts/8151 bytes][server: *.world.waze.com]
+	8	TCP 10.8.0.1:51049 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][12 pkts/1282 bytes <-> 11 pkts/6541 bytes][server: *.waze.com]
+	9	TCP 10.8.0.1:51051 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][11 pkts/1228 bytes <-> 10 pkts/6487 bytes][server: *.waze.com]
+	10	TCP 10.8.0.1:36134 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][12 pkts/1650 bytes <-> 12 pkts/4935 bytes][server: *.world.waze.com]
+	11	TCP 10.8.0.1:36137 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][12 pkts/1522 bytes <-> 11 pkts/4220 bytes][server: *.world.waze.com]
+	12	TCP 10.8.0.1:36314 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][11 pkts/1260 bytes <-> 9 pkts/4413 bytes][server: *.world.waze.com]
+	13	TCP 10.8.0.1:51050 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][9 pkts/1184 bytes <-> 9 pkts/4369 bytes][server: *.waze.com]
+	14	TCP 10.8.0.1:45529 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][9 pkts/591 bytes <-> 8 pkts/3424 bytes][Host: roadshields.waze.com]
+	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 64/SSL_No_Cert][7 pkts/1137 bytes <-> 6 pkts/1005 bytes]
+	16	TCP 10.8.0.1:45536 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][8 pkts/594 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
+	17	TCP 10.8.0.1:50828 <-> 108.168.176.228:443 [proto: 142/WhatsApp][8 pkts/673 bytes <-> 7 pkts/668 bytes]
+	18	TCP 10.8.0.1:45546 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][7 pkts/557 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
+	19	TCP 10.8.0.1:45538 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][7 pkts/555 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
+	20	TCP 10.8.0.1:45552 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][7 pkts/552 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
+	21	TCP 10.8.0.1:45554 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][7 pkts/550 bytes <-> 7 pkts/769 bytes][Host: cres.waze.com]
+	22	TCP 10.8.0.1:45540 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][7 pkts/553 bytes <-> 7 pkts/733 bytes][Host: roadshields.waze.com]
+	23	TCP 10.16.37.157:41823 <-> 200.160.4.49:80 [proto: 7/HTTP][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	24	TCP 10.16.37.157:43991 <-> 200.160.4.31:80 [proto: 7/HTTP][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	25	TCP 10.16.37.157:46473 <-> 200.160.4.49:80 [proto: 7/HTTP][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	26	TCP 10.16.37.157:52746 <-> 200.160.4.49:80 [proto: 7/HTTP][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	27	TCP 10.16.37.157:52953 <-> 200.160.4.49:80 [proto: 7/HTTP][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	28	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	29	TCP 10.8.0.1:45169 <-> 200.160.4.198:80 [proto: 7/HTTP][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	30	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91/SSL][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	31	TCP 10.8.0.1:60574 <-> 200.160.4.49:80 [proto: 7/HTTP][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	32	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][1 pkts/90 bytes <-> 1 pkts/90 bytes]
+
+
+Undetected flows:
+	1	TCP 10.16.37.157:42256 <-> 174.37.231.81:5222 [proto: 0/Unknown][8 pkts/678 bytes <-> 2 pkts/108 bytes]

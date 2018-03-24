@@ -22,23 +22,28 @@
  *
  */
 
-
-#include "ndpi_protocols.h"
+#include "ndpi_protocol_ids.h"
 
 #ifdef NDPI_PROTOCOL_TEAMVIEWER
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TEAMVIEWER
+
+#include "ndpi_api.h"
+
 
 static void ndpi_int_teamview_add_connection(struct ndpi_detection_module_struct
                                              *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_int_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TEAMVIEWER, NDPI_REAL_PROTOCOL);
-  NDPI_LOG(NDPI_PROTOCOL_TEAMVIEWER, ndpi_struct, NDPI_LOG_TRACE, "TEAMWIEWER Found.\n");
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEAMVIEWER, NDPI_PROTOCOL_UNKNOWN);
+  NDPI_LOG_INFO(ndpi_struct, "found teamwiewer\n");
 }
 
 
 void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  NDPI_LOG(NDPI_PROTOCOL_TEAMVIEWER, ndpi_struct, NDPI_LOG_TRACE, "TEAMWIEWER detection...\n");
+
+  NDPI_LOG_DBG(ndpi_struct, "search teamwiewer\n");
   /*
     TeamViewer
     178.77.120.0/25
@@ -95,6 +100,20 @@ void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struct, stru
     }
   }
 
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_TEAMVIEWER);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
+
+
+void init_teamviewer_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+{
+  ndpi_set_bitmask_protocol_detection("TeamViewer", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_TEAMVIEWER,
+				      ndpi_search_teamview,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+
+  *id += 1;
+}
+
 #endif

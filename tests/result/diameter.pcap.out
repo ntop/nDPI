@@ -1,0 +1,3 @@
+Diameter	6	1980	1
+
+	1	TCP 10.201.9.245:50957 <-> 10.201.9.11:3868 [proto: 237/Diameter][3 pkts/1174 bytes <-> 3 pkts/806 bytes]

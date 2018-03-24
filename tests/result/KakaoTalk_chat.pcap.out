@@ -1,0 +1,48 @@
+DNS	2	217	1
+HTTP	1	56	1
+ICMP	1	147	1
+SSL	29	4579	3
+Facebook	215	51809	12
+Google	16	1031	3
+HTTP_Proxy	26	3926	1
+Amazon	2	181	1
+KakaoTalk	55	9990	15
+
+	1	TCP 10.24.82.188:43581 <-> 31.13.68.70:443 [proto: 91.119/SSL.Facebook][17 pkts/3461 bytes <-> 17 pkts/6194 bytes][client: graph.facebook.com][server: *.facebook.com]
+	2	TCP 10.24.82.188:45211 <-> 31.13.68.84:443 [proto: 91.119/SSL.Facebook][14 pkts/2575 bytes <-> 15 pkts/6502 bytes][client: developers.facebook.com][server: *.facebook.com]
+	3	TCP 10.24.82.188:45209 <-> 31.13.68.84:443 [proto: 91.119/SSL.Facebook][10 pkts/2584 bytes <-> 9 pkts/5123 bytes][client: api.facebook.com][server: *.facebook.com]
+	4	TCP 10.24.82.188:35503 <-> 173.252.97.2:443 [proto: 91.119/SSL.Facebook][20 pkts/2849 bytes <-> 18 pkts/4742 bytes][server: *.facebook.com]
+	5	TCP 10.24.82.188:45213 <-> 31.13.68.84:443 [proto: 91.119/SSL.Facebook][15 pkts/2508 bytes <-> 13 pkts/5053 bytes][server: *.facebook.com]
+	6	TCP 10.24.82.188:35511 <-> 173.252.97.2:443 [proto: 91.119/SSL.Facebook][18 pkts/2390 bytes <-> 18 pkts/4762 bytes][server: *.facebook.com]
+	7	TCP 10.24.82.188:37821 <-> 210.103.240.15:443 [proto: 91.193/SSL.KakaoTalk][13 pkts/2036 bytes <-> 14 pkts/5090 bytes][server: *.kakao.com]
+	8	TCP 10.24.82.188:51021 <-> 103.246.57.251:8080 [proto: 131/HTTP_Proxy][17 pkts/2231 bytes <-> 9 pkts/1695 bytes]
+	9	TCP 139.150.0.125:443 <-> 10.24.82.188:46947 [proto: 91/SSL][9 pkts/1737 bytes <-> 9 pkts/672 bytes]
+	10	TCP 10.24.82.188:58964 <-> 54.255.253.199:5223 [proto: 91/SSL][3 pkts/290 bytes <-> 3 pkts/1600 bytes][server: *.push.samsungosp.com]
+	11	TCP 10.24.82.188:37557 <-> 31.13.68.84:80 [proto: 7.119/HTTP.Facebook][5 pkts/487 bytes <-> 6 pkts/627 bytes][Host: www.facebook.com]
+	12	TCP 10.24.82.188:37553 <-> 31.13.68.84:80 [proto: 7.119/HTTP.Facebook][5 pkts/487 bytes <-> 5 pkts/571 bytes][Host: www.facebook.com]
+	13	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7.126/HTTP.Google][7 pkts/392 bytes <-> 7 pkts/392 bytes]
+	14	TCP 10.24.82.188:42332 <-> 210.103.240.15:443 [proto: 91/SSL][2 pkts/112 bytes <-> 3 pkts/168 bytes]
+	15	TCP 31.13.68.73:443 <-> 10.24.82.188:47007 [proto: 91.119/SSL.Facebook][2 pkts/139 bytes <-> 2 pkts/112 bytes]
+	16	UDP 10.24.82.188:57816 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/78 bytes <-> 1 pkts/166 bytes][Host: katalk.kakao.com]
+	17	UDP 10.24.82.188:4017 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][1 pkts/85 bytes <-> 1 pkts/144 bytes][Host: developers.facebook.com]
+	18	UDP 10.24.82.188:19582 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][1 pkts/80 bytes <-> 1 pkts/138 bytes][Host: graph.facebook.com]
+	19	UDP 10.24.82.188:14650 <-> 10.188.1.1:53 [proto: 5/DNS][1 pkts/87 bytes <-> 1 pkts/130 bytes][Host: 2.97.252.173.in-addr.arpa]
+	20	UDP 10.24.82.188:35603 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/79 bytes <-> 1 pkts/136 bytes][Host: ac-talk.kakao.com]
+	21	UDP 10.24.82.188:41909 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/84 bytes <-> 1 pkts/130 bytes][Host: booking.loco.kakao.com]
+	22	UDP 10.24.82.188:25117 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/82 bytes <-> 1 pkts/126 bytes][Host: up-gp.talk.kakao.com]
+	23	UDP 10.24.82.188:5929 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/124 bytes][Host: up-p.talk.kakao.com]
+	24	UDP 10.24.82.188:9094 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/124 bytes][Host: up-v.talk.kakao.com]
+	25	UDP 10.24.82.188:12908 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/124 bytes][Host: up-m.talk.kakao.com]
+	26	UDP 10.24.82.188:29029 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/124 bytes][Host: up-a.talk.kakao.com]
+	27	UDP 10.24.82.188:56820 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/124 bytes][Host: up-c.talk.kakao.com]
+	28	UDP 10.24.82.188:61011 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/119 bytes][Host: plus-talk.kakao.com]
+	29	UDP 10.24.82.188:61011 <-> 10.188.191.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/119 bytes][Host: plus-talk.kakao.com]
+	30	UDP 10.24.82.188:24596 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][1 pkts/78 bytes <-> 1 pkts/118 bytes][Host: api.facebook.com]
+	31	UDP 10.24.82.188:38448 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/76 bytes <-> 1 pkts/114 bytes][Host: auth.kakao.com]
+	32	UDP 10.24.82.188:58810 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/76 bytes <-> 1 pkts/114 bytes][Host: item.kakao.com]
+	33	TCP 10.24.82.188:58927 -> 54.255.253.199:5223 [proto: 178/Amazon][2 pkts/181 bytes -> 0 pkts/0 bytes]
+	34	UDP 10.24.82.188:43077 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][1 pkts/81 bytes <-> 1 pkts/97 bytes][Host: dn-l.talk.kakao.com]
+	35	TCP 10.24.82.188:34686 -> 173.194.72.188:5228 [proto: 126/Google][1 pkts/164 bytes -> 0 pkts/0 bytes]
+	36	ICMP 10.24.82.188:0 -> 10.188.191.1:0 [proto: 81/ICMP][1 pkts/147 bytes -> 0 pkts/0 bytes]
+	37	TCP 10.24.82.188:49217 -> 216.58.220.174:443 [proto: 91.126/SSL.Google][1 pkts/83 bytes -> 0 pkts/0 bytes]
+	38	TCP 120.28.26.242:80 -> 10.24.82.188:34503 [proto: 7/HTTP][1 pkts/56 bytes -> 0 pkts/0 bytes]
