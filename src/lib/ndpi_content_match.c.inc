@@ -82,40 +82,46 @@ static ndpi_network host_protocol_list[] = {
   /*
     WhatsApp Inc.
   */
-   { 0x3216C6CC /* 50.22.198.204/30 */,  30, NDPI_PROTOCOL_WHATSAPP },
-   { 0x4B7E2720 /* 75.126.39.32/27 */,   27, NDPI_PROTOCOL_WHATSAPP },
-   { 0x6CA8B460 /* 108.168.180.96/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   { 0x9E553A00 /* 158.85.58.0/25 */,    25, NDPI_PROTOCOL_WHATSAPP },
-   { 0x9E55FE40 /* 158.85.254.64/27 */,  27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xA92F2320 /* 169.47.35.32/27 */,   27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xA93C4F00 /* 169.60.79.0/24 */,    24, NDPI_PROTOCOL_WHATSAPP },
-   { 0xA93F4C11 /* 169.63.76.0/25 */,    25, NDPI_PROTOCOL_WHATSAPP },
-   { 0xA93F4940 /* 169.63.73.64/25 */,    25, NDPI_PROTOCOL_WHATSAPP },
-   { 0xA93764A0 /* 169.55.100.160/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xA937EBA0 /* 169.55.235.160/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xADC0A220 /* 173.192.162.32/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xB8AD8840 /* 184.173.136.64/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xB93CDA35 /* 185.60.218.53/32 */,  27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xC60BFB20 /* 198.11.251.32/27 */,  27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xD02B73C0 /* 208.43.115.192/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   { 0xD02B7A80 /* 208.43.122.128/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
-   /* Files */
-   { 0xB93CD835 /* 185.60.216.53/32 */,  32, NDPI_PROTOCOL_WHATSAPP_FILES },
+  { 0x3216C6CC /* 50.22.198.204/30 */,  30, NDPI_PROTOCOL_WHATSAPP },
+  { 0x4B7E2720 /* 75.126.39.32/27 */,   27, NDPI_PROTOCOL_WHATSAPP },
+  { 0x6CA8B460 /* 108.168.180.96/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0x9E553A00 /* 158.85.58.0/25 */,    25, NDPI_PROTOCOL_WHATSAPP },
+  { 0x9E55FE40 /* 158.85.254.64/27 */,  27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA92C5360 /* 169.44.82.96/27   */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA92DD6E0 /* 169.45.214.224/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA92DDBE0 /* 169.45.219.224/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA92DF860 /* 169.45.248.96/27  */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA92F05C0 /* 169.47.5.192/26 */,   26, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA92F2320 /* 169.47.35.32/27 */,   27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA9373CAA /* 169.55.60.170/32  */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA93C4F00 /* 169.60.79.0/24 */,    24, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA93F4C11 /* 169.63.76.0/25 */,    25, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA93F4940 /* 169.63.73.64/25 */,   25, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA93764A0 /* 169.55.100.160/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xA937EBA0 /* 169.55.235.160/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xADC0A220 /* 173.192.162.32/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xB8AD8840 /* 184.173.136.64/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xB93CDA35 /* 185.60.218.53/32 */,  27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xC60BFB20 /* 198.11.251.32/27 */,  27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xD02B73C0 /* 208.43.115.192/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  { 0xD02B7A80 /* 208.43.122.128/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
+  /* Files */
+  { 0xB93CD835 /* 185.60.216.53/32 */,  32, NDPI_PROTOCOL_WHATSAPP_FILES },
 
   /*
     WeChat
     origin AS132203, AS132591, AS45090
   */
 
-   { 0xCBCD93AB /* 203.205.147.171/32 */, 32, NDPI_PROTOCOL_WECHAT },
-   { 0xCBCD93AD /* 203.205.147.173/32 */, 32, NDPI_PROTOCOL_WECHAT },
-   { 0xCBCD97A2 /* 203.205.151.162/32 */, 32, NDPI_PROTOCOL_WECHAT },
-   { 0x67071E25 /* 103.7.30.37/32 */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0xCBCD93AB /* 203.205.147.171/32 */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0xCBCD93AD /* 203.205.147.173/32 */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0xCBCD97A2 /* 203.205.151.162/32 */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0x67071E25 /* 103.7.30.37/32 */, 32, NDPI_PROTOCOL_WECHAT },
 
-   /*
+  /*
     OpenDNS, LLC
     origin AS36692, AS30607
-   */
+  */
 
   { 0x26631400 /* 38.99.20.0/23 */, 23, NDPI_PROTOCOL_OPENDNS },
   { 0x3F504FC0 /* 63.80.79.192/26 */, 26, NDPI_PROTOCOL_OPENDNS },
@@ -590,7 +596,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x9F7ABD30 /* 159.122.189.32 */, 21, NDPI_PROTOCOL_TEAMVIEWER },
 
   /*
-   IFLIX services -by www.vizuamatix.com R&D team
+    IFLIX services -by www.vizuamatix.com R&D team
   */
 
   { 0x344D0000 /* 52.77.0.0 */, 16, NDPI_PROTOCOL_IFLIX },
@@ -783,7 +789,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xD8EF2000 /* 216.239.32.0/19 */, 19, NDPI_PROTOCOL_GOOGLE },
   { 0xD8FCDC00 /* 216.252.220.0/22 */, 22, NDPI_PROTOCOL_GOOGLE },
 
-/*
+  /*
     Canonical Ltd (Ubuntu)
     origin AS41231
   */
@@ -7934,43 +7940,43 @@ static ndpi_network host_protocol_list[] = {
   ----------------------------
 
   NDPI_PROTOCOL_SAFE
-    - Web sites (and CDNs) which are not commonly used to host malicious activities.
-    - OS update hosts.
-    - App stores.
-    - Commonly used services with passwords in encrypted channels (SMTPS, POPS, etc)
+  - Web sites (and CDNs) which are not commonly used to host malicious activities.
+  - OS update hosts.
+  - App stores.
+  - Commonly used services with passwords in encrypted channels (SMTPS, POPS, etc)
 
   NDPI_PROTOCOL_ACCEPTABLE
-    - Cloud services may be used to host malware (e.g., https://www.fireeye.com/blog/threat-research/2015/11/china-based-threat.html),
-      but it is mostly used for normal purposes.
-    - Webmail sites, which can be used to phising.
-    - Encrypted administrative protocols, such as SSH.
-    - Text, voice or video communication (e.g., Skype, Slack, Whatsapp).
-    - Ads services are commonly used to spread malware
-      (https://www.tripwire.com/state-of-security/security-data-protection/crypto-ransomware-spreads-via-poisoned-ads-on-major-websites/)
+  - Cloud services may be used to host malware (e.g., https://www.fireeye.com/blog/threat-research/2015/11/china-based-threat.html),
+  but it is mostly used for normal purposes.
+  - Webmail sites, which can be used to phising.
+  - Encrypted administrative protocols, such as SSH.
+  - Text, voice or video communication (e.g., Skype, Slack, Whatsapp).
+  - Ads services are commonly used to spread malware
+  (https://www.tripwire.com/state-of-security/security-data-protection/crypto-ransomware-spreads-via-poisoned-ads-on-major-websites/)
 
   NDPI_PROTOCOL_FUN
-    - Social media sites and services.
-    - Communication used for fun purposes, like Snapchat, Tinder, etc.
-    - Audio and videostreamming services (e.g., Netflix).
-    - Game services.
+  - Social media sites and services.
+  - Communication used for fun purposes, like Snapchat, Tinder, etc.
+  - Audio and videostreamming services (e.g., Netflix).
+  - Game services.
 
   NDPI_PROTOCOL_UNSAFE
-    - Unencrypted administrative protocols, such as Telnet.
-    - Cloud hosted servers when accessed by default domains, such as *.amazonaws.com.
-        - "AWS Supports 41% of Malware Hosting Sites, More than Any Other Web Host or ISP"
-          http://www.thewhir.com/web-hosting-news/aws-supports-41-malware-hosting-sites-web-host-isp
-        - https://www.scmagazine.com/600-plus-cloud-repositories-spotted-hosting-malware-and-malicious-files/article/572205/
-        - https://howtoremove.guide/remove-s3-amazonaws-virus/
-    - Torrents.
-    - Commonly used services with passwords in unencrypted channels (SMTP, POP, etc)
+  - Unencrypted administrative protocols, such as Telnet.
+  - Cloud hosted servers when accessed by default domains, such as *.amazonaws.com.
+  - "AWS Supports 41% of Malware Hosting Sites, More than Any Other Web Host or ISP"
+  http://www.thewhir.com/web-hosting-news/aws-supports-41-malware-hosting-sites-web-host-isp
+  - https://www.scmagazine.com/600-plus-cloud-repositories-spotted-hosting-malware-and-malicious-files/article/572205/
+  - https://howtoremove.guide/remove-s3-amazonaws-virus/
+  - Torrents.
+  - Commonly used services with passwords in unencrypted channels (SMTP, POP, etc)
 
   NDPI_PROTOCOL_POTENTIALLY_DANGEROUS
-    - Tor and other anonymization access.
-    - Sites commonly used to host malware and not as commonly used by "normal" users. (e.g., pastebin.com)
-      https://isc.sans.edu/forums/diary/Many+Malware+Samples+Found+on+Pastebin/22036/
+  - Tor and other anonymization access.
+  - Sites commonly used to host malware and not as commonly used by "normal" users. (e.g., pastebin.com)
+  https://isc.sans.edu/forums/diary/Many+Malware+Samples+Found+on+Pastebin/22036/
 
   NDPI_PROTOCOL_UNRATED
-    - Avoid this class.
+  - Avoid this class.
 
 */
 
@@ -8035,22 +8041,22 @@ ndpi_protocol_match host_match[] = {
   { "ggpht.com", NULL, NULL,                    "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
 
   /*
-     See https://better.fyi/trackers/
+    See https://better.fyi/trackers/
 
-     DoubleClick by Google (2mdn.net)
-     DoubleClick by Google (doubleclick.net)
-     DoubleClick by Google, Inc. (dmtry.com)
-     Google AdSense by Google (google.com)
-     Google AdSense by Google (google.se)
-     Google AdSense by Google (googleadservices.com)
-     Google Analytics by Google (google-analytics.com)
-     Google APIs by Google (ajax.googleapis.com)
-     Google Fonts by Google (fonts.googleapis.com)
-     Google Interactive Media Ads (imasdk.googleapis.com)
-     Google Syndication (googlesyndication.com)
-     Google Tag Manager by Google (googletagmanager.com)
-     Google Tag Manager by Google (googletagservices.com)
-     Gstatic by Google (gstatic.com)
+    DoubleClick by Google (2mdn.net)
+    DoubleClick by Google (doubleclick.net)
+    DoubleClick by Google, Inc. (dmtry.com)
+    Google AdSense by Google (google.com)
+    Google AdSense by Google (google.se)
+    Google AdSense by Google (googleadservices.com)
+    Google Analytics by Google (google-analytics.com)
+    Google APIs by Google (ajax.googleapis.com)
+    Google Fonts by Google (fonts.googleapis.com)
+    Google Interactive Media Ads (imasdk.googleapis.com)
+    Google Syndication (googlesyndication.com)
+    Google Tag Manager by Google (googletagmanager.com)
+    Google Tag Manager by Google (googletagservices.com)
+    Gstatic by Google (gstatic.com)
   */
 
   /* Google Advertisements */
