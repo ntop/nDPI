@@ -10,6 +10,8 @@ tcp:3000@ntop
 #  Format:
 #  host:"<value>",host:"<value>",.....@<subproto>
 
+# by Minkoo HWANG, Test 01 to classify DASH (Dynamic Adaptive Streaming over HTTP)
+host:"dash.edgesuite.net"@DASH
 host:"googlesyndication.com"@Google
 host:"venere.com"@Venere
 host:"kataweb.it",host:"repubblica.it"@Repubblica
