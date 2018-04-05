@@ -613,8 +613,8 @@ static ndpi_network host_protocol_list[] = {
     Citrix GotoMeeting (AS16815, AS21866)
   */
 
-  { 0xD873D000 /* 216.115.208.0 */, 20, NDPI_PROTOCOL_CITRIX_ONLINE },
-  { 0xD8DB7000 /* 216.219.112.0 */, 20, NDPI_PROTOCOL_CITRIX_ONLINE },
+  { 0xD873D000 /* 216.115.208.0 */, 20, NDPI_PROTOCOL_CITRIX },
+  { 0xD8DB7000 /* 216.219.112.0 */, 20, NDPI_PROTOCOL_CITRIX },
 
   /*
     Cisco Webex LLC

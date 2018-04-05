@@ -541,9 +541,6 @@ static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 #ifdef NDPI_CONTENT_OGG
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_OGG);
 #endif
-#ifdef NDPI_PROTOCOL_MOVE
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MOVE);
-#endif
 #ifdef NDPI_PROTOCOL_XBOX
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
 #endif
@@ -1031,15 +1028,6 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 #ifdef NDPI_CONTENT_OGG
   ndpi_set_bitmask_protocol_detection("OggVorbis", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_OGG,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-  *id += 1;
-#endif
-#ifdef NDPI_PROTOCOL_MOVE
-  ndpi_set_bitmask_protocol_detection("Move", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_MOVE,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,

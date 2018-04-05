@@ -86,7 +86,7 @@
 #define NDPI_CONTENT_MMS                    46
 #define NDPI_PROTOCOL_XBOX                  47
 #define NDPI_PROTOCOL_QQ                    48
-#define NDPI_PROTOCOL_MOVE                  49
+/* Free to use */
 #define NDPI_PROTOCOL_RTSP                  50
 #define NDPI_PROTOCOL_MAIL_IMAPS            51
 #define NDPI_PROTOCOL_ICECAST               52
@@ -169,14 +169,14 @@
 #define NDPI_PROTOCOL_SFLOW                 129
 #define NDPI_PROTOCOL_HTTP_CONNECT          130
 #define NDPI_PROTOCOL_HTTP_PROXY            131
-#define NDPI_PROTOCOL_CITRIX                132
+#define NDPI_PROTOCOL_CITRIX                132 /* It includes also the old NDPI_PROTOCOL_CITRIX_ONLINE */
 #define NDPI_PROTOCOL_NETFLIX               133
 #define NDPI_PROTOCOL_LASTFM                134
 #define NDPI_PROTOCOL_WAZE                  135
 #define NDPI_PROTOCOL_YOUTUBE_UPLOAD        136 /* Upload files to youtube */
 #define NDPI_PROTOCOL_ICQ                   137
 #define NDPI_PROTOCOL_CHECKMK               138
-#define NDPI_PROTOCOL_CITRIX_ONLINE         139
+/* Free */
 #define NDPI_PROTOCOL_APPLE                 140
 #define NDPI_PROTOCOL_WEBEX                 141
 #define NDPI_PROTOCOL_WHATSAPP              142
