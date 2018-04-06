@@ -1,5 +1,40 @@
 # CHANGELOG
 
+#### nDPI 2.2.2 (April 2018)
+
+## Main New Features
+
+* Hyperscan support
+* `ndpi_get_api_version` API call to be used in applications that are dynamically linking with nDPI
+* `--enable-debug-messages` to enable debug information output
+* Increased number of protocols to 512
+
+## New Supported Protocols and Services
+
+* GoogleDocs
+* GoogleServices
+* AmazonVideo
+* ApplePush
+* Diameter
+* GooglePlus
+* WhatsApp file exchage
+
+## Improvements
+
+* WhatsApp detection
+* Amazon detection
+* Improved Google Drive
+* Improved Spotify support
+* Improved SNI matching when using office365
+* Improved HostShield VPN
+
+## Fixes
+
+* Fixed invalid RTP/Skype detection
+* Fixed possible out-of-bounds due to malformed DHCP packets
+* Fixed buffer overflow in function `ndpi_debug_printf`
+
+------------------------------------------------------------------------
 
 #### nDPI 2.2 (December 2017)
 
