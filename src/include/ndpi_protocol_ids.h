@@ -86,7 +86,10 @@
 #define NDPI_CONTENT_MMS                    46
 #define NDPI_PROTOCOL_XBOX                  47
 #define NDPI_PROTOCOL_QQ                    48
+
 /* Free to use */
+#define NDPI_PROTOCOL_FREE_A                49
+
 #define NDPI_PROTOCOL_RTSP                  50
 #define NDPI_PROTOCOL_MAIL_IMAPS            51
 #define NDPI_PROTOCOL_ICECAST               52
@@ -176,7 +179,10 @@
 #define NDPI_PROTOCOL_YOUTUBE_UPLOAD        136 /* Upload files to youtube */
 #define NDPI_PROTOCOL_ICQ                   137
 #define NDPI_PROTOCOL_CHECKMK               138
-/* Free */
+
+/* Free to use */
+#define NDPI_PROTOCOL_FREE_B                139
+
 #define NDPI_PROTOCOL_APPLE                 140
 #define NDPI_PROTOCOL_WEBEX                 141
 #define NDPI_PROTOCOL_WHATSAPP              142
