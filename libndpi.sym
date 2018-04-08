@@ -15,6 +15,7 @@ ndpi_tdestroy
 ndpi_exit_detection_module
 ndpi_l4_detection_process_packet
 ndpi_detection_process_packet
+ndpi_process_extra_packet
 ndpi_twalk
 ndpi_tdelete
 ndpi_revision
