@@ -3691,7 +3691,7 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   flow->packet.tick_timestamp_l = current_tick_l;
-  flow->packet.tick_timestamp = (u_int32_t)current_tick_l/1000;
+  flow->packet.tick_timestamp = (u_int32_t)(current_tick_l/ndpi_struct->ticks_per_second);
 
   /* parse packet */
   flow->packet.iph = (struct ndpi_iphdr *)packet;
@@ -3746,7 +3746,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   }
 
   flow->packet.tick_timestamp_l = current_tick_l;
-  flow->packet.tick_timestamp = (u_int32_t)current_tick_l/1000;
+  flow->packet.tick_timestamp = (u_int32_t)(current_tick_l/ndpi_struct->ticks_per_second);
 
   /* parse packet */
   flow->packet.iph = (struct ndpi_iphdr *)packet;
