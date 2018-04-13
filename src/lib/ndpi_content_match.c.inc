@@ -541,8 +541,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xB909BC00 /* 185.9.188.0/22 */, 22, NDPI_PROTOCOL_NETFLIX },
   { 0xC0AD4000 /* 192.173.64.0/18 */, 18, NDPI_PROTOCOL_NETFLIX },
   { 0xC6266000 /* 198.38.96.0/19 */, 19, NDPI_PROTOCOL_NETFLIX },
-  { 0xC62D3000 /* 198.45.48.0/20 */, 20, NDPI_PROTOCOL_NETFLIX },
-  { 0xD04B4C00 /* 208.75.76.0/22 */, 22, NDPI_PROTOCOL_NETFLIX },
+  { 0xC62D3000 /* 198.45.48.0/20 */, 20, NDPI_PROTOCOL_NETFLIX }, 
 
   /*
     Cloudflare, Inc.
@@ -8106,6 +8105,7 @@ ndpi_protocol_match host_match[] = {
   { "nflximg.com", NULL, NULL,              "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "nflximg.net", NULL, NULL,              "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "nflxvideo.net", NULL, NULL,            "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "nflxso.net", NULL, NULL,               "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
   { ".skype.", NULL, NULL,                  "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypeassets.", NULL, NULL,            "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
