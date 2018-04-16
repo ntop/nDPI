@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E32F1ECB20844620005739B7 /* whatsapp.c in Sources */ = {isa = PBXBuildFile; fileRef = E32F1ECA20844620005739B7 /* whatsapp.c */; };
 		E3953F5420254989000BBA0D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E3953F5320254989000BBA0D /* AppDelegate.m */; };
 		E3953F5720254989000BBA0D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E3953F5620254989000BBA0D /* ViewController.m */; };
 		E3953F5920254989000BBA0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3953F5820254989000BBA0D /* Assets.xcassets */; };
@@ -187,6 +188,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E32F1ECA20844620005739B7 /* whatsapp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = whatsapp.c; sourceTree = "<group>"; };
 		E3953F4F20254989000BBA0D /* ndpiExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ndpiExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3953F5220254989000BBA0D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E3953F5320254989000BBA0D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -644,6 +646,7 @@
 				E39542ED20255354000BBA0D /* yahoo.c */,
 				E39542EE20255354000BBA0D /* zattoo.c */,
 				E39542EF20255354000BBA0D /* zeromq.c */,
+				E32F1ECA20844620005739B7 /* whatsapp.c */,
 			);
 			path = protocols;
 			sourceTree = "<group>";
@@ -947,6 +950,7 @@
 				E395454420255355000BBA0D /* zattoo.c in Sources */,
 				E39544FD20255354000BBA0D /* noe.c in Sources */,
 				E395451620255354000BBA0D /* shoutcast.c in Sources */,
+				E32F1ECB20844620005739B7 /* whatsapp.c in Sources */,
 				E395455E202558E6000BBA0D /* ndpi_util.c in Sources */,
 				E3953F5420254989000BBA0D /* AppDelegate.m in Sources */,
 				E39543C520255354000BBA0D /* dropbox.c in Sources */,
