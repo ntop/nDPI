@@ -663,7 +663,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       /* Check for additional field introduced by Steam */
       int x = 1;
-      if((memcmp(packet->line[x].ptr, "x-steam-sid", 11)) == 0) {
+      if(packet->line[x].len >= 11 && (memcmp(packet->line[x].ptr, "x-steam-sid", 11)) == 0) {
 	    NDPI_LOG_INFO(ndpi_struct, "found STEAM\n");
 	    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_STEAM);
 	    check_content_type_and_change_protocol(ndpi_struct, flow);
