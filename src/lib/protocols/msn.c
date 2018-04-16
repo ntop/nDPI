@@ -442,15 +442,16 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
   }
   NDPI_LOG_DBG(ndpi_struct, "msn 7\n");
   
-  if (flow->packet_counter <= MAX_PACKETS_FOR_MSN) {	
-    if (memcmp(&packet->payload[0], "MSG ", 4) == 0
+  if (flow->packet_counter <= MAX_PACKETS_FOR_MSN) {
+    if (packet->payload_packet_len >=4 &&  (memcmp(&packet->payload[0], "MSG ", 4) == 0
 	|| memcmp(&packet->payload[0], "PNG", 3) == 0
 	|| memcmp(&packet->payload[0], "QNG ", 4) == 0
 	|| memcmp(&packet->payload[0], "OUT", 3) == 0
 	|| memcmp(&packet->payload[0], "RNG ", 4) == 0
 	|| memcmp(&packet->payload[0], "NLN ", 4) == 0
 	|| memcmp(&packet->payload[0], "UBX ", 4) == 0
-	|| memcmp(&packet->payload[0], "XFR ", 4) == 0) {
+	|| memcmp(&packet->payload[0], "XFR ", 4) == 0)
+       ){
       ndpi_int_msn_add_connection(ndpi_struct, flow);
       
       NDPI_LOG_INFO(ndpi_struct, "found MSN\n");
