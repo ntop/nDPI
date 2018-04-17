@@ -184,6 +184,24 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	flow->l4.tcp.ssl_seen_server_cert = 1;
 
+    if (handshake_protocol == 0x02) {
+
+        flow->protos.ssl.ssl_version = packet->payload[9];
+        flow->protos.ssl.tls_version = packet->payload[10];
+
+        NDPI_LOG_DBG2(ndpi_struct, "SSL/TLS version: 0x%02hhx/0x%02hhx\n",
+            flow->protos.ssl.ssl_version, flow->protos.ssl.tls_version);
+
+        u_int offset, base_offset = 43;
+        if (base_offset <= packet->payload_packet_len) {
+            u_int16_t session_id_len = packet->payload[base_offset];
+            flow->protos.ssl.cipher_suite = packet->payload[base_offset + session_id_len + 2] + (packet->payload[base_offset + session_id_len + 1] << 8);
+
+            NDPI_LOG_DBG2(ndpi_struct, "SSL session ID len: %hu, %04hx\n",
+                session_id_len, flow->protos.ssl.cipher_suite);
+        }
+    }
+
 	/* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
 	for(i = 9; i < packet->payload_packet_len-3; i++) {
 	  if(((packet->payload[i] == 0x04) && (packet->payload[i+1] == 0x03) && (packet->payload[i+2] == 0x0c))
@@ -292,8 +310,10 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			snprintf(flow->protos.ssl.client_certificate,
 				 sizeof(flow->protos.ssl.client_certificate), "%s", buffer);
 
+			/* Always try to process ServerHello */
+			return(0 /* Keep processing */);
 			/* We're happy now */
-			return(2 /* Client Certificate */);
+			//return(2 /* Client Certificate */);
 		      }
 
 		      extension_offset += extension_len;
