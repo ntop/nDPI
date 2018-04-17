@@ -186,19 +186,22 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
     if (handshake_protocol == 0x02) {
 
-        flow->protos.ssl.ssl_version = packet->payload[9];
-        flow->protos.ssl.tls_version = packet->payload[10];
+        flow->protos.ssl.version = 
+            packet->payload[10] + (packet->payload[9] << 8);
 
-        NDPI_LOG_DBG2(ndpi_struct, "SSL/TLS version: 0x%02hhx/0x%02hhx\n",
-            flow->protos.ssl.ssl_version, flow->protos.ssl.tls_version);
+        NDPI_LOG_DBG2(ndpi_struct, "SSL/TLS version: 0x%04hx\n",
+            flow->protos.ssl.version);
 
         u_int offset, base_offset = 43;
         if (base_offset <= packet->payload_packet_len) {
             u_int16_t session_id_len = packet->payload[base_offset];
-            flow->protos.ssl.cipher_suite = packet->payload[base_offset + session_id_len + 2] + (packet->payload[base_offset + session_id_len + 1] << 8);
 
-            NDPI_LOG_DBG2(ndpi_struct, "SSL session ID len: %hu, %04hx\n",
-                session_id_len, flow->protos.ssl.cipher_suite);
+            flow->protos.ssl.cipher_suite = 
+                packet->payload[base_offset + session_id_len + 2] +
+                (packet->payload[base_offset + session_id_len + 1] << 8);
+
+            NDPI_LOG_DBG2(ndpi_struct, "SSL cipher suite: 0x%04hx\n",
+                flow->protos.ssl.cipher_suite);
         }
     }
 
