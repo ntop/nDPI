@@ -179,10 +179,7 @@
 #define NDPI_PROTOCOL_YOUTUBE_UPLOAD        136 /* Upload files to youtube */
 #define NDPI_PROTOCOL_ICQ                   137
 #define NDPI_PROTOCOL_CHECKMK               138
-
-/* Free to use */
-#define NDPI_PROTOCOL_FREE_B                139
-
+#define NDPI_PROTOCOL_AJP                   139 /* Leonn Paiva <leonn.paiva@gmail.com>*/
 #define NDPI_PROTOCOL_APPLE                 140
 #define NDPI_PROTOCOL_WEBEX                 141
 #define NDPI_PROTOCOL_WHATSAPP              142
