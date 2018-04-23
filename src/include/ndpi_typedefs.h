@@ -350,7 +350,6 @@ struct bt_announce {              // 192 bytes
 #endif
 
 #ifdef NDPI_PROTOCOL_TINC
-
 #define TINC_CACHE_MAX_SIZE 10
 
 PACK_ON struct tinc_cache_entry {
@@ -1133,7 +1132,7 @@ struct ndpi_flow_struct {
 #if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
   u_int16_t kxun_counter, iqiyi_counter;
 #endif
-  
+
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
   struct ndpi_flow_struct *flow;
