@@ -1,0 +1,10 @@
+Unknown	6	2200	2
+AJP	26	4446	2
+
+	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][7 pkts/1554 bytes <-> 6 pkts/669 bytes]
+	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][7 pkts/1554 bytes <-> 6 pkts/669 bytes]
+
+
+Undetected flows:
+	1	80 93.88.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][4 pkts/2012 bytes -> 0 pkts/0 bytes]
+	2	80 142.243.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][2 pkts/188 bytes -> 0 pkts/0 bytes]
