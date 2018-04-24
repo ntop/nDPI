@@ -1006,9 +1006,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "DirectConnect", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_SOCRATES,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_NTOP,
 			    no_master,
-			    no_master, "Socrates", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    no_master, "ntop", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VMWARE,
@@ -2646,9 +2646,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* DHCP */
   init_dhcp_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* SOCRATES */
-  init_socrates_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* STEAM */
   init_steam_dissector(ndpi_struct, &a, detection_bitmask);

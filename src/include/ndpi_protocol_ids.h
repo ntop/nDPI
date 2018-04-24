@@ -63,7 +63,7 @@
 #define NDPI_PROTOCOL_MAIL_POPS             23
 #define NDPI_PROTOCOL_APPLEJUICE            24
 #define NDPI_PROTOCOL_DIRECTCONNECT         25
-#define NDPI_PROTOCOL_SOCRATES              26
+#define NDPI_PROTOCOL_NTOP                  26
 #define NDPI_PROTOCOL_COAP                  27
 #define NDPI_PROTOCOL_VMWARE                28
 #define NDPI_PROTOCOL_MAIL_SMTPS            29

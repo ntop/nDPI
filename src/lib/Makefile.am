@@ -127,7 +127,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/smb.c \
 		     protocols/snmp.c \
 		     protocols/socks45.c \
-		     protocols/socrates.c \
 		     protocols/sopcast.c \
 		     protocols/soulseek.c \
 		     protocols/spotify.c \

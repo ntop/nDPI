@@ -8040,6 +8040,8 @@ ndpi_protocol_match host_match[] = {
   { "android.clients.google.com", NULL, NULL,   "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { "ggpht.com", NULL, NULL,                    "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
 
+  { "ntop.org", NULL, NULL,                     "ntop",         NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
+
   /*
     See https://better.fyi/trackers/
 
