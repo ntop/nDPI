@@ -1,5 +1,5 @@
 --
--- (C) 2017 - ntop.org
+-- (C) 2017-18 - ntop.org
 --
 -- This plugin is part of nDPI (https://github.com/ntop/nDPI)
 --
@@ -17,6 +17,10 @@
 -- along with this program; if not, write to the Free Software Foundation,
 -- Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 --
+
+-- wireshark ~/Dropbox/discovery/Daniele/alexa_sonos_only.pcap
+-- cat /tmp/wireshark.sql | influx -database wireshark
+
 
 local ndpi_proto = Proto("ndpi", "nDPI", "nDPI Protocol Interpreter")
 ndpi_proto.fields = {}
@@ -89,6 +93,9 @@ local tot_ssl_flows          = 0
 
 local http_ua                = {}
 local tot_http_ua_flows      = 0
+
+local flows                  = {}
+local tot_flows              = 0
 
 local dhcp_fingerprints      = {}
 
@@ -325,6 +332,10 @@ function ndpi_proto.init()
    http_ua                = {}
    tot_http_ua_flows      = 0
 
+   -- Flows
+   flows                  = {}
+   tot_flows              = 0
+   
    -- DHCP
    dhcp_fingerprints      = {}
    
@@ -533,6 +544,42 @@ function http_dissector(tvb, pinfo, tree)
 	 -- io.write("Adding ["..user_agent.."] @ "..srckey.."\n")
       end
    end
+end
+
+-- ###############################################
+
+function flow_dissector(tvb, pinfo, tree)
+   local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).."-"..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
+   local k
+
+   -- 1522511601.2942
+   -- 15225115972358
+   -- 15246849200000 00000
+   
+   if(flows[rev_key] ~= nil) then
+      flows[rev_key][2] = flows[rev_key][2] + pinfo.len
+      k = rev_key
+   else
+      local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).."-"..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
+
+      k = key
+      if(flows[key] == nil) then
+	 flows[key] = { pinfo.len, 0 } -- src -> dst  / dst -> src
+	 tot_flows = tot_flows + 1
+      else
+	 flows[key][1] = flows[key][1] + pinfo.len
+      end
+   end
+
+   local bytes = flows[k][1]+flows[k][2]
+   local row = "wireshark,"..k.." bytes=".. bytes .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000\n"
+   
+   print(row)
+   file = io.open("/tmp/wireshark.sql", "a")
+   file:write(row)
+   file:close()
+   -- en0,metric=iface packets.rcvd=213 1524684920000000000
+   
 end
 
 -- ###############################################
@@ -906,12 +953,13 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
    -- print(num_pkts .. " / " .. pinfo.number .. " / " .. last_processed_packet_number)
 
-   if(false) then
+   if(true) then
       local srckey = tostring(pinfo.src)
       local dstkey = tostring(pinfo.dst)
-      print("Processing packet "..pinfo.number .. "["..srckey.." / "..dstkey.."]")
+      --print("Processing packet "..pinfo.number .. "["..srckey.." / "..dstkey.."]")
    end
 
+   flow_dissector(tvb, pinfo, tree)
    mac_dissector(tvb, pinfo, tree)
    arp_dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
@@ -1229,6 +1277,30 @@ end
 
 -- ###############################################
 
+local function flows_ua_dialog_menu()
+   local win = TextWindow.new("Flows");
+   local label = ""
+   local tot = 0
+   local i
+
+   if(tot_flows > 0) then
+      i = 0
+      label = label .. "Flow\t\t\t\t\tA->B\tB->A\n"
+      for k,v in pairsByKeys(flows, rev) do
+	 label = label .. k.."\t"..v[1].."\t"..v[2].."\n"
+	 --label = label .. k.."\n"
+	 if(i == 50) then break else i = i + 1 end
+      end
+   else
+      label = "No flows detected"
+   end
+
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
 local function dhcp_dialog_menu()
    local win = TextWindow.new("DHCP Fingerprinting");
    local label = ""
@@ -1365,6 +1437,7 @@ register_menu("ntop/ARP",          arp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/DHCP",         dhcp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/DNS",          dns_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/HTTP UA",      http_ua_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/Flows",        flows_ua_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/SSL",          ssl_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/TCP Analysis", tcp_dialog_menu, MENU_TOOLS_UNSORTED)
