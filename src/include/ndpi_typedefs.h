@@ -820,6 +820,7 @@ typedef struct _ndpi_automa {
 
 typedef struct ndpi_proto {
   u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
+  ndpi_protocol_category_t category;
 } ndpi_protocol;
 
 #define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }
@@ -884,6 +885,11 @@ struct ndpi_detection_module_struct {
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa; /* TOR */
 
+  struct {
+    ndpi_automa hostnames, hostnames_shadow;
+    void *ipAddresses, *ipAddresses_shadow; /* Patricia */
+  } custom_categories;
+  
   /* IP-based protocol detection */
   void *protocols_ptree;
 

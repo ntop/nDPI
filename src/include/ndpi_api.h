@@ -36,8 +36,8 @@ extern "C" {
   */
 #define NDPI_API_VERSION                      1
   
-#define SIZEOF_ID_STRUCT (sizeof(struct ndpi_id_struct))
-#define SIZEOF_FLOW_STRUCT (sizeof(struct ndpi_flow_struct))
+#define SIZEOF_ID_STRUCT                      ( sizeof(struct ndpi_id_struct)   )
+#define SIZEOF_FLOW_STRUCT                    ( sizeof(struct ndpi_flow_struct) )
 
 #define NDPI_DETECTION_ONLY_IPV4              ( 1 << 0 )
 #define NDPI_DETECTION_ONLY_IPV6              ( 1 << 1 )
@@ -125,7 +125,8 @@ extern "C" {
    * @return the nDPI protocol ID
    *
    */
-  u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin);
+  u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct,
+				     struct in_addr *pin);
 
 
   /**
@@ -135,7 +136,8 @@ extern "C" {
    * @par match     = the struct passed to match the protocol
    *
    */
-  void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol_match *match);
+  void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
+				ndpi_protocol_match *match);
 
   /**
    * Returns a new initialized detection module
@@ -163,7 +165,8 @@ extern "C" {
    * @par port      = unsigned int for the port number
    *
    */
-  void ndpi_enable_cache(struct ndpi_detection_module_struct *ndpi_mod, char* host, u_int port);
+  void ndpi_enable_cache(struct ndpi_detection_module_struct *ndpi_mod,
+			 char* host, u_int port);
 
 
   /**
@@ -193,7 +196,8 @@ extern "C" {
 					   const NDPI_PROTOCOL_BITMASK *detection_bitmask,
 					   const u_int32_t idx,
 					   u_int16_t ndpi_protocol_id,
-					   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow),
+					   void (*func) (struct ndpi_detection_module_struct *,
+							 struct ndpi_flow_struct *flow),
 					   const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
 					   u_int8_t b_save_bitmask_unknow,
 					   u_int8_t b_add_detection_bitmask);
@@ -514,7 +518,8 @@ extern "C" {
    * @par     proto         = the struct ndpi_protocol contain the protocols name
    * @return  the protocol category
    */
-  ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto);
+  ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_struct *ndpi_mod,
+						   ndpi_protocol proto);
 
   /**
    * Get the protocol name associated to the ID
@@ -535,7 +540,8 @@ extern "C" {
    * @return  the breed ID associated to the protocol
    *
    */
-  ndpi_protocol_breed_t ndpi_get_proto_breed(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t proto);
+  ndpi_protocol_breed_t ndpi_get_proto_breed(struct ndpi_detection_module_struct *ndpi_struct,
+					     u_int16_t proto);
 
 
   /**
@@ -546,7 +552,8 @@ extern "C" {
    * @return  the string name of the breed ID
    *
    */
-  char* ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_struct, ndpi_protocol_breed_t breed_id);
+  char* ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_struct,
+				  ndpi_protocol_breed_t breed_id);
 
 
   /**
@@ -594,7 +601,8 @@ extern "C" {
    *          -1 else
    *
    */
-  int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char* path);
+  int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod,
+			       char* path);
 
 
   /**
@@ -623,7 +631,8 @@ extern "C" {
    * @par automa      = the automa to match
    *
    */
-  void ndpi_set_automa(struct ndpi_detection_module_struct *ndpi_struct, void* automa);
+  void ndpi_set_automa(struct ndpi_detection_module_struct *ndpi_struct,
+		       void* automa);
 
 
 #ifdef NDPI_PROTOCOL_HTTP
@@ -635,7 +644,8 @@ extern "C" {
    * @return  the HTTP method information about the flow
    *
   */
-  ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_mod, struct ndpi_flow_struct *flow);
+  ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_mod,
+					struct ndpi_flow_struct *flow);
 
 
   /**
@@ -646,7 +656,8 @@ extern "C" {
    * @return  the HTTP method information about the flow
    *
   */
-  char* ndpi_get_http_url(struct ndpi_detection_module_struct *ndpi_mod, struct ndpi_flow_struct *flow);
+  char* ndpi_get_http_url(struct ndpi_detection_module_struct *ndpi_mod,
+			  struct ndpi_flow_struct *flow);
 
 
   /**
@@ -657,7 +668,8 @@ extern "C" {
    * @return  the HTTP method information about the flow
    *
   */
-  char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod, struct ndpi_flow_struct *flow);
+  char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod,
+				   struct ndpi_flow_struct *flow);
 #endif
 
 
@@ -736,8 +748,13 @@ extern "C" {
    *
    */
   int ndpi_match_string(void *_automa, char *string_to_match);
-
-
+  
+  void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
+			     char *ip_address_and_mask, ndpi_protocol_category_t category);
+  void ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
+				   char *name, ndpi_protocol_category_t category);
+  void ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
+  
   /**
    * Add a string to match to an automata
    *
@@ -749,13 +766,13 @@ extern "C" {
    */
   int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id);
 
-
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
   void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size));
   void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
-  void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf);
+  void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str,
+			       ndpi_debug_function_ptr ndpi_debug_printf);
   void * ndpi_malloc(size_t size);
   void * ndpi_calloc(unsigned long count, size_t size);
   void ndpi_free(void *ptr);
