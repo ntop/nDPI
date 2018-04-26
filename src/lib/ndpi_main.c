@@ -21,6 +21,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "ndpi_config.h"
+#endif
+
 #include <stdlib.h>
 #include <errno.h>
 #include "ahocorasick.h"
