@@ -18,6 +18,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "ndpi_config.h"
+#endif
+
 #ifdef linux
 #define _GNU_SOURCE
 #include <sched.h>
