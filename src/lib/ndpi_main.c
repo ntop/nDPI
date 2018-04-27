@@ -3777,7 +3777,6 @@ void ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struc
   ac_pattern.rep.number = (int)category;
   
   ac_automata_add(ndpi_struct->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
-  ac_automata_finalize(ndpi_struct->custom_categories.hostnames_shadow.ac_automa);
 }
 
 /* ********************************************************************************* */
