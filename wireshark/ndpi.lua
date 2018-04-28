@@ -22,7 +22,7 @@
 -- cat /tmp/wireshark.sql | influx -database wireshark
 
 
-local ndpi_proto = Proto("ndpi", "nDPI", "nDPI Protocol Interpreter")
+local ndpi_proto = Proto("ndpi", "nDPI Protocol Interpreter")
 ndpi_proto.fields = {}
 
 local ndpi_fds    = ndpi_proto.fields
@@ -30,7 +30,7 @@ ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.pr
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
 
-local ntop_proto = Proto("ntop", "ntop", "ntop Extensions")
+local ntop_proto = Proto("ntop", "ntop Extensions")
 ntop_proto.fields = {}
 
 local ntop_fds = ntop_proto.fields
@@ -116,6 +116,9 @@ local last_processed_packet_number = 0
 local max_latency_discard    = 5000  -- 5 sec
 local max_appl_lat_discard   = 15000 -- 15 sec
 local debug                  = false
+
+local dump_file = "/tmp/wireshark-influx.txt"
+local file
 
 -- ##############################################
 
@@ -373,6 +376,9 @@ function ndpi_proto.init()
 
    -- RPC
    rpc_ts                = {}   
+
+   file = assert(io.open(dump_file, "a"))
+   print("Writing to "..dump_file.."\n")
 end
 
 function slen(str)
@@ -572,14 +578,14 @@ function flow_dissector(tvb, pinfo, tree)
    end
 
    local bytes = flows[k][1]+flows[k][2]
-   local row = "wireshark,"..k.." bytes=".. bytes .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000\n"
-   
+   local row = "wireshark,flow="..k.." bytes=".. bytes .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
+
    print(row)
-   file = io.open("/tmp/wireshark.sql", "a")
-   file:write(row)
-   file:close()
-   -- en0,metric=iface packets.rcvd=213 1524684920000000000
+     
+   file:write(row.."\n")
+   file:flush()
    
+   -- en0,metric=iface packets.rcvd=213 1524684920000000000
 end
 
 -- ###############################################
