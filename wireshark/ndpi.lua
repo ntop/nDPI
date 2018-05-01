@@ -117,6 +117,8 @@ local max_latency_discard    = 5000  -- 5 sec
 local max_appl_lat_discard   = 15000 -- 15 sec
 local debug                  = false
 
+local dump_timeseries = false
+
 local dump_file = "/tmp/wireshark-influx.txt"
 local file
 
@@ -377,8 +379,11 @@ function ndpi_proto.init()
    -- RPC
    rpc_ts                = {}   
 
-   file = assert(io.open(dump_file, "a"))
-   print("Writing to "..dump_file.."\n")
+   if(dump_timeseries) then
+      file = assert(io.open(dump_file, "a"))
+      print("Writing to "..dump_file.."\n")
+      print('Load data with:\ncurl -i -XPOST "http://localhost:8086/write?db=wireshark" --data-binary @/tmp/wireshark-influx.txt\n')
+   end
 end
 
 function slen(str)
@@ -554,38 +559,51 @@ end
 
 -- ###############################################
 
-function flow_dissector(tvb, pinfo, tree)
-   local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).."-"..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
-   local k
-
-   -- 1522511601.2942
-   -- 15225115972358
-   -- 15246849200000 00000
-   
-   if(flows[rev_key] ~= nil) then
-      flows[rev_key][2] = flows[rev_key][2] + pinfo.len
-      k = rev_key
-   else
-      local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).."-"..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
-
-      k = key
-      if(flows[key] == nil) then
-	 flows[key] = { pinfo.len, 0 } -- src -> dst  / dst -> src
-	 tot_flows = tot_flows + 1
+function timeseries_dissector(tvb, pinfo, tree)
+   if(pinfo.dst_port ~= 0) then
+      local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).."-"..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
+      local k
+            
+      if(flows[rev_key] ~= nil) then
+	 flows[rev_key][2] = flows[rev_key][2] + pinfo.len
+	 k = rev_key
       else
-	 flows[key][1] = flows[key][1] + pinfo.len
+	 local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).."-"..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
+	 
+	 k = key
+	 if(flows[key] == nil) then
+	    flows[key] = { pinfo.len, 0 } -- src -> dst  / dst -> src
+	    tot_flows = tot_flows + 1
+	 else
+	    flows[key][1] = flows[key][1] + pinfo.len
+	 end
       end
-   end
+      
+      --k = pinfo.curr_proto..","..k
+      
+      local bytes = flows[k][1]+flows[k][2]
+      local row
 
-   local bytes = flows[k][1]+flows[k][2]
-   local row = "wireshark,flow="..k.." bytes=".. bytes .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
+      -- Prometheus
+      -- row = "wireshark {metric=\"bytes\", flow=\""..k.."\"} ".. bytes .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"
 
-   print(row)
-     
-   file:write(row.."\n")
-   file:flush()
+      -- Influx      
+      row = "wireshark,flow="..k.." bytes=".. pinfo.len .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
+      file:write(row.."\n")
+
+      row = "wireshark,ndpi="..ndpi.protocol_name.." bytes=".. pinfo.len .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
+      file:write(row.."\n")
+
+      row = "wireshark,host="..getstring(pinfo.src).." sent=".. pinfo.len .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
+      file:write(row.."\n")
+
+      row = "wireshark,host="..getstring(pinfo.dst).." rcvd=".. pinfo.len .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
+      file:write(row.."\n")
    
-   -- en0,metric=iface packets.rcvd=213 1524684920000000000
+      -- print(row)
+
+      file:flush()
+   end
 end
 
 -- ###############################################
@@ -965,7 +983,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       --print("Processing packet "..pinfo.number .. "["..srckey.." / "..dstkey.."]")
    end
 
-   flow_dissector(tvb, pinfo, tree)
+   if(dump_timeseries) then
+      timeseries_dissector(tvb, pinfo, tree)
+   end
    mac_dissector(tvb, pinfo, tree)
    arp_dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
