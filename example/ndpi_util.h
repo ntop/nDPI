@@ -75,7 +75,7 @@ typedef struct ndpi_flow_info {
   ndpi_protocol detected_protocol;
 
   char info[96];
-  char host_server_name[192];
+  char host_server_name[256];
   char bittorent_hash[41];
 
   struct {
