@@ -170,9 +170,9 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
   /* TODO: just needed here to init ndpi malloc wrapper */
   struct ndpi_detection_module_struct * module = ndpi_init_detection_module();
-  
+
   struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
-  
+
   workflow->pcap_handle = pcap_handle;
   workflow->prefs       = *prefs;
   workflow->ndpi_struct = module;
@@ -188,15 +188,15 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
       exit(-1);
     _debug_protocols_ok = 1;
   }
-  
+
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   NDPI_BITMASK_RESET(module->debug_bitmask);
   if(_debug_protocols_ok)
     module->debug_bitmask = debug_bitmask;
 #endif
-  
+
   workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
-  
+
   return workflow;
 }
 
@@ -453,7 +453,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   } else {
     struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)ret;
 
-    if (is_changed) {
+    if(is_changed) {
       if(flow->src_ip == iph->saddr
 	 && flow->dst_ip == iph->daddr
 	 && flow->src_port == htons(*sport)
@@ -510,16 +510,15 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 			    sizeof(struct ndpi_ipv6hdr),
 			    ntohs(iph6->ip6_hdr.ip6_un1_plen),
 			    tcph, udph, sport, dport,
-			    src, dst, proto, payload, payload_len, src_to_dst_direction));
+			    src, dst, proto, payload,
+			    payload_len, src_to_dst_direction));
 }
 
 /* ****************************************************** */
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
   if(!flow->ndpi_flow) return;
-
-  /* printf("CATEGORY %u\n", flow->detected_protocol.category); */
-  
+     
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 
@@ -528,7 +527,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     int i, j, n = 0;
 
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
-      sprintf(&flow->bittorent_hash[j], "%02x", flow->ndpi_flow->protos.bittorrent.hash[i]);
+      sprintf(&flow->bittorent_hash[j], "%02x",
+	      flow->ndpi_flow->protos.bittorrent.hash[i]);
+      
       j += 2, n += flow->ndpi_flow->protos.bittorrent.hash[i];
     }
 
@@ -562,10 +563,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   if(flow->detection_completed && !flow->check_extra_packets) {
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
-      if (workflow->__flow_giveup_callback != NULL)
+      if(workflow->__flow_giveup_callback != NULL)
 	workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
     } else {
-      if (workflow->__flow_detected_callback != NULL)
+      if(workflow->__flow_detected_callback != NULL)
 	workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
     }
 
@@ -641,17 +642,17 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
         ndpi_process_extra_packet(workflow->ndpi_struct, ndpi_flow,
 				  iph ? (uint8_t *)iph : (uint8_t *)iph6,
 				  ipsize, time, src, dst);
-        if (ndpi_flow->check_extra_packets == 0) {
+        if(ndpi_flow->check_extra_packets == 0) {
           flow->check_extra_packets = 0;
           process_ndpi_collected_info(workflow, flow);
         }
       }
-    } else if (ndpi_flow != NULL) {
+    } else if(ndpi_flow != NULL) {
       /* If this wasn't NULL we should do the half free */
       /* TODO: When half_free is deprecated, get rid of this */
       ndpi_free_flow_info_half(flow);
     }
-    
+
     return(flow->detected_protocol);
   }
 
@@ -666,7 +667,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     /* New protocol detected or give up */
     flow->detection_completed = 1;
     /* Check if we should keep checking extra packets */
-    if (ndpi_flow->check_extra_packets)
+    if(ndpi_flow->check_extra_packets)
       flow->check_extra_packets = 1;
 
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
@@ -780,7 +781,7 @@ datalink_check:
 
     if(check <= 1500)
       pyld_eth_len = check;
-    else if (check >= 1536)
+    else if(check >= 1536)
       type = check;
 
     if(pyld_eth_len != 0) {
@@ -1069,4 +1070,3 @@ u_int32_t ethernet_crc32(const void* data, size_t n_bytes) {
   __crc32(data, n_bytes, &crc);
   return crc;
 }
-

@@ -828,6 +828,14 @@ typedef struct ndpi_proto {
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
 
+#ifdef HAVE_HYPERSCAN
+struct hs_list {
+  char *expression;
+  unsigned int id;
+  struct hs_list *next;
+};
+#endif
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -886,7 +894,13 @@ struct ndpi_detection_module_struct {
     bigrams_automa, impossible_bigrams_automa; /* TOR */
 
   struct {
+#ifdef HAVE_HYPERSCAN
+    struct hs *hostnames;
+    unsigned int num_to_load;
+    struct hs_list *to_load;
+#else
     ndpi_automa hostnames, hostnames_shadow;
+#endif
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
   } custom_categories;
   

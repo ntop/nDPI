@@ -751,9 +751,9 @@ extern "C" {
   
   void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
 			     char *ip_address_and_mask, ndpi_protocol_category_t category);
-  void ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
-				   char *name, ndpi_protocol_category_t category);
-  void ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
+  int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
+				  char *name, ndpi_protocol_category_t category);
+  int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
   
   /**
    * Add a string to match to an automata

@@ -54,13 +54,18 @@ fi
 
 HS_LIB=
 HS_INC=
-AC_ARG_WITH(hyperscan,     [  --with-hyperscan     Enable Intel Hyperscan (if available)])
+BKP=$LIBS
+LIBS="$LIBS -lstdc++ -lm"
+AC_CHECK_LIB([hs], [hs_compile_multi], AC_DEFINE_UNQUOTED(HAVE_HYPERSCAN, 1, [Intel Hyperscan is present]))
+LIBS=$BKP
 
-if test "${with_hyperscan}" == "yes"; then :
-   AC_CHECK_LIB([hs], [hs_compile_multi], AC_DEFINE_UNQUOTED(HAVE_HYPERSCAN, 1, [Intel Hyperscan is present]))
-   HS_INC=`pkg-config --cflags libhs`
-   HS_LIB=`pkg-config --libs libhs`
+if test "x$ac_cv_lib_hs_hs_compile_multi" = xyes; then :
+AC_CHECK_LIB([m], [pow])
+AC_CHECK_LIB([stdc++], [main])
 fi
+
+HS_INC=`pkg-config --cflags libhs`
+HS_LIB=`pkg-config --libs libhs`
 
 if test -f $PCAP_HOME/libpcap/libpcap.a; then :
      echo "Using libpcap from $PCAP_HOME"
