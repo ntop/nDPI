@@ -754,7 +754,9 @@ extern "C" {
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
 				  char *name, ndpi_protocol_category_t category);
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
-  
+  void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow,
+				   ndpi_protocol *ret);  
   /**
    * Add a string to match to an automata
    *

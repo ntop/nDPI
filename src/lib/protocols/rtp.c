@@ -103,9 +103,12 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
       return;
     } else /* RTCP */ {
+#if 0
+      /* If it's RTCP the RTCP decoder will catch it */
       NDPI_LOG_INFO(ndpi_struct, "Found MS RTCP\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTCP, NDPI_PROTOCOL_UNKNOWN);
       return;
+#endif
     }
   }  
 

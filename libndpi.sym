@@ -65,3 +65,4 @@ ndpi_set_proto_category
 ndpi_get_api_version
 ndpi_network_ptree_match
 ndpi_check_flow_func
+ndpi_fill_protocol_category

@@ -902,6 +902,7 @@ struct ndpi_detection_module_struct {
     ndpi_automa hostnames, hostnames_shadow;
 #endif
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
+    u_int8_t categories_loaded;
   } custom_categories;
   
   /* IP-based protocol detection */
@@ -1006,8 +1007,8 @@ struct ndpi_flow_struct {
   struct {
     ndpi_http_method method;
     char *url, *content_type;
-    u_int8_t  num_request_headers, num_response_headers;
-    u_int8_t  request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
+    u_int8_t num_request_headers, num_response_headers;
+    u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     u_char response_status_code[5]; /* 200, 404, etc. */
   } http;
 
@@ -1055,14 +1056,17 @@ struct ndpi_flow_struct {
       char fingerprint[48];
       char class_ident[48];
     } dhcp;
+
+    struct {
+      u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests, is_skype;
+    } stun;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/
 
   /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
-
-  u_int8_t num_stun_udp_pkts;
+ 
 
 #ifdef NDPI_PROTOCOL_REDIS
   u_int8_t redis_s2d_first_char, redis_d2s_first_char;

@@ -75,7 +75,7 @@
 #define NDPI_PROTOCOL_GNUTELLA              35
 #define NDPI_PROTOCOL_EDONKEY               36 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_BITTORRENT            37
-#define NDPI_PROTOCOL_EPP                   38
+#define NDPI_PROTOCOL_SKYPE_CALL_OUT        38
 #define NDPI_CONTENT_AVI                    39
 #define NDPI_CONTENT_FLASH                  40
 #define NDPI_CONTENT_OGG                    41
@@ -86,10 +86,7 @@
 #define NDPI_CONTENT_MMS                    46
 #define NDPI_PROTOCOL_XBOX                  47
 #define NDPI_PROTOCOL_QQ                    48
-
-/* Free to use */
-#define NDPI_PROTOCOL_FREE_A                49
-
+#define NDPI_PROTOCOL_SKYPE_CALL_IN         49
 #define NDPI_PROTOCOL_RTSP                  50
 #define NDPI_PROTOCOL_MAIL_IMAPS            51
 #define NDPI_PROTOCOL_ICECAST               52
