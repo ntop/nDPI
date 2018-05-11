@@ -62,10 +62,9 @@ LIBS=$BKP
 if test "x$ac_cv_lib_hs_hs_compile_multi" = xyes; then :
 AC_CHECK_LIB([m], [pow])
 AC_CHECK_LIB([stdc++], [main])
-fi
-
 HS_INC=`pkg-config --cflags libhs`
 HS_LIB=`pkg-config --libs libhs`
+fi
 
 if test -f $PCAP_HOME/libpcap/libpcap.a; then :
      echo "Using libpcap from $PCAP_HOME"
