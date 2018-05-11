@@ -66,3 +66,5 @@ ndpi_get_api_version
 ndpi_network_ptree_match
 ndpi_check_flow_func
 ndpi_fill_protocol_category
+ndpi_load_hostname_category
+ndpi_enable_loaded_categories
