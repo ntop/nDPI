@@ -5655,3 +5655,23 @@ void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
 u_int8_t ndpi_get_api_version() {
   return(NDPI_API_VERSION);
 }
+
+ndpi_proto_defaults_t* ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod) {
+  return(ndpi_mod->proto_defaults);
+}
+
+u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
+  return(ndpi_mod->ndpi_num_supported_protocols);
+}
+
+u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
+  return(ndpi_mod->ndpi_num_custom_protocols);
+}
+
+u_int ndpi_get_ndpi_detection_module_size() {
+  return(sizeof(struct ndpi_detection_module_struct));
+}
+
+void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l) {
+  ndpi_mod->ndpi_log_level = l;
+}

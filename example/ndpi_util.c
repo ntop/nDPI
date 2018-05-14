@@ -113,14 +113,17 @@ static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod,
   uint16_t proto_id;
   char *e;
   unsigned long p = strtol(name,&e,0);
+  ndpi_proto_defaults_t *proto_defaults = ndpi_get_proto_defaults(ndpi_mod);
+  
   if(e && !*e) {
     if(p < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS &&
-       ndpi_mod->proto_defaults[p].protoName) return (uint16_t)p;
+       proto_defaults[p].protoName) return (uint16_t)p;
     return NDPI_PROTOCOL_UNKNOWN;
   }
+  
   for(proto_id=NDPI_PROTOCOL_UNKNOWN; proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS; proto_id++) {
-    if(ndpi_mod->proto_defaults[proto_id].protoName &&
-       !strcasecmp(ndpi_mod->proto_defaults[proto_id].protoName,name))
+    if(proto_defaults[proto_id].protoName &&
+       !strcasecmp(proto_defaults[proto_id].protoName,name))
       return proto_id;
   }
   return NDPI_PROTOCOL_UNKNOWN;
@@ -181,7 +184,8 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
     NDPI_LOG(0, NULL, NDPI_LOG_ERROR, "global structure initialization failed\n");
     exit(-1);
   }
-  module->ndpi_log_level = nDPI_LogLevel;
+  
+  ndpi_set_log_level(module, nDPI_LogLevel);
 
   if(_debug_protocols != NULL && ! _debug_protocols_ok) {
     if(parse_debug_proto(module,_debug_protocols))

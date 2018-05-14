@@ -61,9 +61,9 @@ typedef struct ndpi_protocol_bitmask_struct {
 
 /* NDPI_DEBUG_FUNCTION_PTR (cast) */
 typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol, void *module_struct,
-					 ndpi_log_level_t log_level, const char *file, const char *func, unsigned line,
+					 ndpi_log_level_t log_level, const char *file,
+					 const char *func, unsigned line,
 					 const char *format, ...);
-
 
 /* ************************************************************ */
 /* ******************* NDPI NETWORKS HEADERS ****************** */
@@ -709,7 +709,8 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct http_x_session_type;
   struct ndpi_int_one_line_struct server_line;
   struct ndpi_int_one_line_struct http_method;
-  struct ndpi_int_one_line_struct http_response; /* the first "word" in this pointer is the response code in the packet (200, etc) */
+  struct ndpi_int_one_line_struct http_response; /* the first "word" in this pointer is the
+						    response code in the packet (200, etc) */
   u_int8_t http_num_headers; /* number of found (valid) header lines in HTTP request or response */
 
   u_int16_t l3_packet_len;
@@ -743,7 +744,6 @@ struct ndpi_call_function_struct {
 struct ndpi_subprotocol_conf_struct {
   void (*func) (struct ndpi_detection_module_struct *, char *attr, char *value, int protocol_id);
 };
-
 
 typedef struct {
   u_int16_t port_low, port_high;
@@ -843,6 +843,7 @@ struct hs_list {
 };
 #endif
 
+#ifdef NDPI_LIB_COMPILATION
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -965,6 +966,7 @@ struct ndpi_detection_module_struct {
   
   void *hyperscan; /* Intel Hyperscan */
 };
+#endif
 
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
