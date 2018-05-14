@@ -156,7 +156,8 @@ static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
 }
 #endif
 
-static void setHttpUserAgent(struct ndpi_flow_struct *flow, char *ua) {
+static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow, char *ua) {
   if (    !strcmp(ua, "Windows NT 5.0"))  ua = "Windows 2000";
   else if(!strcmp(ua, "Windows NT 5.1"))  ua = "Windows XP";
   else if(!strcmp(ua, "Windows NT 5.2"))  ua = "Windows Server 2003";
@@ -170,7 +171,9 @@ static void setHttpUserAgent(struct ndpi_flow_struct *flow, char *ua) {
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
   //printf("==> %s\n", ua);
-  snprintf((char*)flow->protos.http.detected_os, sizeof(flow->protos.http.detected_os), "%s", ua);
+  if(!ndpi_struct->disable_metadata_export) {
+    snprintf((char*)flow->protos.http.detected_os, sizeof(flow->protos.http.detected_os), "%s", ua);
+  }
 }
 
 static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
@@ -330,7 +333,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	    }
 
 	    if(token)
-	      setHttpUserAgent(flow, token);
+	      setHttpUserAgent(ndpi_struct, flow, token);
 	  }
 	}
       }
@@ -360,14 +363,20 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 				  NDPI_PROTOCOL_HTTP);
 
     /* Copy result for nDPI apps */
-    len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
-    strncpy((char*)flow->host_server_name, (char*)packet->host_line.ptr, len);
-    flow->host_server_name[len] = '\0', flow->server_id = flow->dst;
+    if(!ndpi_struct->disable_metadata_export) {
+      len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
+      strncpy((char*)flow->host_server_name, (char*)packet->host_line.ptr, len);
+      flow->host_server_name[len] = '\0';
+    }
+    
+    flow->server_id = flow->dst;
 
     if(packet->forwarded_line.ptr) {
         len = ndpi_min(packet->forwarded_line.len, sizeof(flow->protos.http.nat_ip)-1);
-        strncpy((char*)flow->protos.http.nat_ip, (char*)packet->forwarded_line.ptr, len);
-        flow->protos.http.nat_ip[len] = '\0';
+	if(!ndpi_struct->disable_metadata_export) {
+	  strncpy((char*)flow->protos.http.nat_ip, (char*)packet->forwarded_line.ptr, len);
+	  flow->protos.http.nat_ip[len] = '\0';
+	}
     }
 
     if(ndpi_struct->http_dont_dissect_response)

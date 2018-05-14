@@ -107,20 +107,21 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	      sni_offset++;
 
 	    if((sni_offset+len) < udp_len) {
-	      int max_len = sizeof(flow->host_server_name)-1, j = 0;
-
-	      if(len > max_len) len = max_len;
-
-	      while((len > 0) && (sni_offset < udp_len)) {
-		flow->host_server_name[j++] = packet->payload[sni_offset];
-		sni_offset++, len--;
+	      if(!ndpi_struct->disable_metadata_export) {
+		int max_len = sizeof(flow->host_server_name)-1, j = 0;
+		
+		if(len > max_len) len = max_len;
+		
+		while((len > 0) && (sni_offset < udp_len)) {
+		  flow->host_server_name[j++] = packet->payload[sni_offset];
+		  sni_offset++, len--;
+		}
+		
+		ndpi_match_host_subprotocol(ndpi_struct, flow, 
+					    (char *)flow->host_server_name,
+					    strlen((const char*)flow->host_server_name),
+					    NDPI_PROTOCOL_QUIC);
 	      }
-
-	      ndpi_match_host_subprotocol(ndpi_struct, flow, 
-					  (char *)flow->host_server_name,
-					  strlen((const char*)flow->host_server_name),
-					  NDPI_PROTOCOL_QUIC);
-	    
 	    }
 
 	    break;

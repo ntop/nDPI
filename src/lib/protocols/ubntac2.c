@@ -64,10 +64,12 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
 	    version[j++] = packet->payload[i];
 	  
 	  version[j] = '\0';
-	  
-	  len = ndpi_min(sizeof(flow->protos.ubntac2.version)-1, j);
-	  strncpy(flow->protos.ubntac2.version, (const char *)version, len);
-	  flow->protos.ubntac2.version[len] = '\0';
+
+	  if(!ndpi_struct->disable_metadata_export) {
+	    len = ndpi_min(sizeof(flow->protos.ubntac2.version)-1, j);
+	    strncpy(flow->protos.ubntac2.version, (const char *)version, len);
+	    flow->protos.ubntac2.version[len] = '\0';
+	  }
 	}
 	
 	NDPI_LOG_INFO(ndpi_struct, "UBNT AirControl 2 request\n");

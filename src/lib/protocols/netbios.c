@@ -119,9 +119,12 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct, struc
 
 	NDPI_LOG_INFO(ndpi_struct, "found netbios with questions = 1 and answers = 0, authority = 0 and broadcast \n");
 	
-	if(ndpi_netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
-	  snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
-
+	if(ndpi_netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0) {
+	  if(!ndpi_struct->disable_metadata_export) {
+	    snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
+	  }
+	}
+	
 	ndpi_int_netbios_add_connection(ndpi_struct, flow);
 	return;
       }
@@ -336,9 +339,12 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct, struc
 	if(ntohl(get_u_int32_t(packet->payload, 4)) == ntohl(packet->iph->saddr)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found netbios with checked ip-address\n");
 
-	  if(ndpi_netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0)
-	    snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
-
+	  if(ndpi_netbios_name_interpret((char*)&packet->payload[12], name, sizeof(name)) > 0) {
+	    if(!ndpi_struct->disable_metadata_export) {
+	      snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
+	    }
+	  }
+	  
 	  ndpi_int_netbios_add_connection(ndpi_struct, flow);
 	  return;
 	}

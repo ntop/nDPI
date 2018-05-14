@@ -57,7 +57,8 @@ static u_int8_t is_utp_pkt(const u_int8_t *payload, u_int payload_len) {
   return(1);
 }
 
-static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
+static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struct *ndpi_struct,
+					      struct ndpi_flow_struct *flow,
 					      int bt_offset, int check_hash,
 					      const u_int8_t save_detection, const u_int8_t encrypted_connection)
 {
@@ -73,7 +74,9 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     } else
       bt_hash = (const char*)&flow->packet.payload[28];
 
-    if(bt_hash) memcpy(flow->protos.bittorrent.hash, bt_hash, 20);
+    if(!ndpi_struct->disable_metadata_export) {
+      if(bt_hash) memcpy(flow->protos.bittorrent.hash, bt_hash, 20);
+    }
   }
 
   ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN);

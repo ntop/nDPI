@@ -68,3 +68,4 @@ ndpi_check_flow_func
 ndpi_fill_protocol_category
 ndpi_load_hostname_category
 ndpi_enable_loaded_categories
+ndpi_set_detection_preferences

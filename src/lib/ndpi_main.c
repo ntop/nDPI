@@ -864,6 +864,35 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 /* ******************************************************************** */
 
+int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
+				   ndpi_detection_preference pref,
+				   int value) {
+  switch(pref) {
+  case ndpi_pref_http_dont_dissect_response:
+    ndpi_mod->http_dont_dissect_response = (u_int8_t)value;
+    break;
+
+  case ndpi_pref_dns_dissect_response:
+    ndpi_mod->dns_dissect_response = (u_int8_t)value;
+    break;
+
+  case ndpi_pref_direction_detect_disable:
+    ndpi_mod->direction_detect_disable = (u_int8_t)value;
+    break;
+
+  case ndpi_pref_disable_metadata_export:
+    ndpi_mod->disable_metadata_export = (u_int8_t)value;
+    break;
+
+  default:
+    return(-1);
+  }
+
+  return(0);
+}
+
+/* ******************************************************************** */
+
 /* This function is used to map protocol name and default ports and it MUST
    be updated whenever a new protocol is added to NDPI.
 
@@ -3782,7 +3811,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STUN, flow->guessed_host_protocol_id);
     }
   }
-  
+
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
 
   return(ret);

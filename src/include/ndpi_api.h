@@ -35,7 +35,7 @@ extern "C" {
      sure that datastructures and in sync across versions
   */
 #define NDPI_API_VERSION                      1
-  
+
 #define SIZEOF_ID_STRUCT                      ( sizeof(struct ndpi_id_struct)   )
 #define SIZEOF_FLOW_STRUCT                    ( sizeof(struct ndpi_flow_struct) )
 
@@ -748,7 +748,7 @@ extern "C" {
    *
    */
   int ndpi_match_string(void *_automa, char *string_to_match);
-  
+
   void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
 			     char *ip_address_and_mask, ndpi_protocol_category_t category);
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
@@ -756,7 +756,11 @@ extern "C" {
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
-				   ndpi_protocol *ret);  
+				   ndpi_protocol *ret);
+  int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
+				   ndpi_detection_preference pref,
+				     int value);
+
   /**
    * Add a string to match to an automata
    *
