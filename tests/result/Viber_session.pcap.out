@@ -12,13 +12,13 @@ Viber	4163	392492	4
 Amazon	1	66	1
 
 	1	UDP 192.168.200.222:48564 <-> 54.169.63.186:7985 [proto: 144/Viber][2835 pkts/280455 bytes <-> 1308 pkts/110326 bytes]
-	2	TCP 192.168.200.222:43287 <-> 52.0.253.46:443 [proto: 64/SSL_No_Cert][21 pkts/2257 bytes <-> 13 pkts/1884 bytes]
+	2	TCP 192.168.200.222:43287 <-> 52.0.253.46:443 [proto: 64/SSL_No_Cert][cat: 5][21 pkts/2257 bytes <-> 13 pkts/1884 bytes]
 	3	TCP 192.168.200.222:38039 <-> 31.13.79.246:443 [proto: 91.119/SSL.Facebook][14 pkts/1058 bytes <-> 9 pkts/2287 bytes]
 	4	TCP 192.168.200.222:40005 <-> 108.168.176.234:443 [proto: 91/SSL][12 pkts/1116 bytes <-> 12 pkts/1732 bytes]
 	5	TCP 192.168.200.222:51055 <-> 74.125.68.156:443 [proto: 91.126/SSL.Google][15 pkts/1329 bytes <-> 9 pkts/750 bytes]
-	6	TCP 192.168.200.222:42040 <-> 74.125.200.18:443 [proto: 91.122/SSL.GMail][15 pkts/1318 bytes <-> 6 pkts/573 bytes][client: mail.google.com]
-	7	TCP 192.168.200.222:51146 <-> 23.21.254.189:443 [proto: 91/SSL][11 pkts/1043 bytes <-> 4 pkts/441 bytes][client: e.crashlytics.com]
-	8	TCP 192.168.200.222:52269 <-> 107.22.192.179:443 [proto: 91/SSL][12 pkts/1116 bytes <-> 4 pkts/303 bytes][client: settings.crashlytics.com]
+	6	TCP 192.168.200.222:42040 <-> 74.125.200.18:443 [proto: 91.122/SSL.GMail][cat: 3][cat: 3][15 pkts/1318 bytes <-> 6 pkts/573 bytes][client: mail.google.com]
+	7	TCP 192.168.200.222:51146 <-> 23.21.254.189:443 [proto: 91/SSL][cat: 5][11 pkts/1043 bytes <-> 4 pkts/441 bytes][client: e/crashlytics.com]
+	8	TCP 192.168.200.222:52269 <-> 107.22.192.179:443 [proto: 91/SSL][cat: 5][12 pkts/1116 bytes <-> 4 pkts/303 bytes][client: sfttings.crashlytics.com]
 	9	TCP 192.168.200.222:43454 <-> 52.0.253.46:4244 [proto: 144/Viber][7 pkts/689 bytes <-> 5 pkts/472 bytes]
 	10	TCP 192.168.200.222:57999 <-> 74.125.130.188:5228 [proto: 126/Google][5 pkts/389 bytes <-> 5 pkts/368 bytes]
 	11	TCP 192.168.200.222:59011 <-> 74.125.130.188:5228 [proto: 126/Google][5 pkts/428 bytes <-> 4 pkts/264 bytes]
