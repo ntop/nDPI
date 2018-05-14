@@ -161,6 +161,10 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
   }
 #endif
 
+	if (! flow->l4.tcp.ssl_seen_client_cert)
+        flow->protos.ssl.client_certificate[0] = '\0';
+	if (! flow->l4.tcp.ssl_seen_server_cert)
+        flow->protos.ssl.server_certificate[0] = '\0';
   /*
     Nothing matched so far: let's decode the certificate with some heuristics
     Patches courtesy of Denys Fedoryshchenko <nuclearcat@nuclearcat.com>
@@ -228,11 +232,40 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		stripCertificateTrailer(buffer, buffer_len);
 		snprintf(flow->protos.ssl.server_certificate,
 			 sizeof(flow->protos.ssl.server_certificate), "%s", buffer);
-		return(1 /* Server Certificate */);
+		break; /* Found Server Certificate; but now try to extract SSL/TLS version/cipher */
 	      }
 	    }
 	  }
 	}
+
+    if (handshake_protocol == 0x02) {
+
+        flow->protos.ssl.version =
+            packet->payload[10] + (packet->payload[9] << 8);
+
+        NDPI_LOG_DBG2(ndpi_struct, "SSL/TLS version: 0x%04hx\n",
+            flow->protos.ssl.version);
+
+        u_int offset, base_offset = 43;
+        if (base_offset <= packet->payload_packet_len) {
+            u_int16_t session_id_len = packet->payload[base_offset];
+
+            flow->protos.ssl.cipher_suite =
+                packet->payload[base_offset + session_id_len + 2] +
+                (packet->payload[base_offset + session_id_len + 1] << 8);
+
+            NDPI_LOG_DBG2(ndpi_struct, "SSL cipher suite: 0x%04hx\n",
+                flow->protos.ssl.cipher_suite);
+        }
+    }
+
+    if (flow->protos.ssl.server_certificate[0] != '\0')
+        return 1; /* Found Server Certificate. */
+    if (flow->protos.ssl.client_certificate[0] != '\0') {
+        snprintf(buffer, buffer_len, "%s", flow->protos.ssl.client_certificate);
+        return 2; /* Previously found Client Certificate. */
+    }
+
       } else if(handshake_protocol == 0x01 /* Client Hello */) {
 	u_int offset, base_offset = 43;
 	if (base_offset + 2 <= packet->payload_packet_len)
@@ -292,8 +325,10 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			snprintf(flow->protos.ssl.client_certificate,
 				 sizeof(flow->protos.ssl.client_certificate), "%s", buffer);
 
+			/* Always try to process ServerHello */
+			return(0 /* Keep processing */);
 			/* We're happy now */
-			return(2 /* Client Certificate */);
+			//return(2 /* Client Certificate */);
 		      }
 
 		      extension_offset += extension_len;

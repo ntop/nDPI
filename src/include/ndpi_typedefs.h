@@ -1025,6 +1025,7 @@ struct ndpi_flow_struct {
     } ntp;
 
     struct {
+      u_int16_t version, cipher_suite;
       char client_certificate[48], server_certificate[48];
     } ssl;
 
