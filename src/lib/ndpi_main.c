@@ -3774,14 +3774,12 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
      && (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
   check_stun_export:
     if(flow->protos.stun.num_processed_pkts > 0) {
-      u_int proto;
-      
-      if(flow->protos.stun.num_processed_pkts >= 8)
-	proto = (flow->protos.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT;
-      else
-      proto = NDPI_PROTOCOL_STUN;
-      
-      ndpi_set_detected_protocol(ndpi_struct, flow, proto, flow->guessed_host_protocol_id);
+      if(flow->protos.stun.num_processed_pkts >= 8) {
+	u_int16_t proto = (flow->protos.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT;
+
+	ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_SKYPE);
+      } else
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STUN, flow->guessed_host_protocol_id);
     }
   }
   

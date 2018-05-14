@@ -191,7 +191,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
 
 	  if((flow->protos.stun.num_processed_pkts >= 8) || (flow->protos.stun.num_binding_requests >= 4))
-	    ndpi_int_stun_add_connection(ndpi_struct, (flow->protos.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT, flow);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, (flow->protos.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT, NDPI_PROTOCOL_SKYPE);
 	} else {
 	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
 	  ndpi_int_stun_add_connection(ndpi_struct,
@@ -211,9 +211,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
       
       if((flow->protos.stun.num_processed_pkts >= 8) || (flow->protos.stun.num_binding_requests >= 4))
-	ndpi_int_stun_add_connection(ndpi_struct,
-				     (flow->protos.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT,
-				     flow);
+	ndpi_set_detected_protocol(ndpi_struct, flow, (flow->protos.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT, NDPI_PROTOCOL_SKYPE);
     } else {
       NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
       ndpi_int_stun_add_connection(ndpi_struct,
