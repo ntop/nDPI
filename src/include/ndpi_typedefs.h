@@ -1,7 +1,7 @@
 /*
  * ndpi_typedefs.h
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -801,7 +801,8 @@ typedef enum {
   ndpi_pref_http_dont_dissect_response = 0,
   ndpi_pref_dns_dissect_response,
   ndpi_pref_direction_detect_disable,
-  ndpi_pref_disable_metadata_export
+  ndpi_pref_disable_metadata_export,
+  ndpi_pref_enable_category_substring_match,
 } ndpi_detection_preference;
   
 /* ntop extensions */
@@ -844,6 +845,7 @@ struct hs_list {
 #endif
 
 #ifdef NDPI_LIB_COMPILATION
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -909,6 +911,7 @@ struct ndpi_detection_module_struct {
 #else
     ndpi_automa hostnames, hostnames_shadow;
 #endif
+    void *hostnames_hash;
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
     u_int8_t categories_loaded;
   } custom_categories;
@@ -961,7 +964,8 @@ struct ndpi_detection_module_struct {
 
   u_int8_t http_dont_dissect_response:1, dns_dissect_response:1,
     direction_detect_disable:1, /* disable internal detection of packet direction */
-    disable_metadata_export:1 /* No metadata is exported */
+    disable_metadata_export:1, /* No metadata is exported */
+    enable_category_substring_match:1 /* Default is perfect match */
     ;
   
   void *hyperscan; /* Intel Hyperscan */

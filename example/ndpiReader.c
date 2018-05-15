@@ -1464,6 +1464,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 				 ndpi_pref_http_dont_dissect_response, 0);
   ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				 ndpi_pref_dns_dissect_response, 0);
+  ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+				 ndpi_pref_enable_category_substring_match, 0);
 
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
 					   on_protocol_discovered, (void *)(uintptr_t)thread_id);

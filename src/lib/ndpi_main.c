@@ -43,6 +43,8 @@
 #include "ndpi_content_match.c.inc"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/src/ndpi_patricia.c"
+#include "third_party/include/hash.h"
+#include "third_party/src/hash.c"
 
 #ifdef HAVE_HYPERSCAN
 #include <hs.h>
@@ -352,8 +354,21 @@ void * ndpi_calloc(unsigned long count, size_t size)
 
 /* ****************************************** */
 
-void ndpi_free(void *ptr) { if(_ndpi_free) _ndpi_free(ptr); else free(ptr); }
-void ndpi_flow_free(void *ptr) { if(_ndpi_flow_free) _ndpi_flow_free(ptr); else ndpi_free_flow((struct ndpi_flow_struct *) ptr); }
+void ndpi_free(void *ptr) {
+  if(_ndpi_free)
+    _ndpi_free(ptr);
+  else
+    free(ptr);
+}
+
+/* ****************************************** */
+
+void ndpi_flow_free(void *ptr) {
+  if(_ndpi_flow_free)
+    _ndpi_flow_free(ptr);
+  else
+    ndpi_free_flow((struct ndpi_flow_struct *) ptr);
+}
 
 /* ****************************************** */
 
@@ -884,6 +899,10 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod
     ndpi_mod->disable_metadata_export = (u_int8_t)value;
     break;
 
+  case ndpi_pref_enable_category_substring_match:
+    ndpi_mod->enable_category_substring_match = (u_int8_t)value;
+    break;
+    
   default:
     return(-1);
   }
@@ -2101,6 +2120,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
 #endif
 
+  ndpi_str->custom_categories.hostnames_hash            = (void*)ht_create(65536);
+  
   ndpi_str->custom_categories.ipAddresses                = ndpi_New_Patricia(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow         = ndpi_New_Patricia(32 /* IPv4 */);
 
@@ -2203,30 +2224,39 @@ static int hyperscanCustomEventHandler(unsigned int id,
 
 static int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *name, unsigned long *id) {
-#ifdef HAVE_HYPERSCAN
-  if(ndpi_struct->custom_categories.hostnames == NULL)
-    return(-1);
-  else {
-    hs_error_t rc;
-
-    *id = (unsigned long)-1;
-
-    rc = hs_scan(ndpi_struct->custom_categories.hostnames->database,
-		 name, strlen(name), 0,
-		 ndpi_struct->custom_categories.hostnames->scratch,
-		 hyperscanCustomEventHandler, id);
-
-    if(rc == HS_SCAN_TERMINATED) {
-#ifdef DEBUG
-      printf("[HS] Found category %lu for %s\n", *id, name);
-#endif
-      return(0);
-    } else
+  if(!ndpi_struct->enable_category_substring_match) {
+    if(ndpi_struct->custom_categories.hostnames_hash == NULL)
       return(-1);
-  }
-#else
-  return(ndpi_match_string_id(ndpi_struct->custom_categories.hostnames.ac_automa, name, id));
+    else {
+      *id = (unsigned long)ht_get((hashtable_t*)ndpi_struct->custom_categories.hostnames_hash, name);
+      return(0);
+    }
+  } else {
+#ifdef HAVE_HYPERSCAN
+    if(ndpi_struct->custom_categories.hostnames == NULL)
+      return(-1);
+    else {
+      hs_error_t rc;
+
+      *id = (unsigned long)-1;
+
+      rc = hs_scan(ndpi_struct->custom_categories.hostnames->database,
+		   name, strlen(name), 0,
+		   ndpi_struct->custom_categories.hostnames->scratch,
+		   hyperscanCustomEventHandler, id);
+
+      if(rc == HS_SCAN_TERMINATED) {
+#ifdef DEBUG
+	printf("[HS] Found category %lu for %s\n", *id, name);
 #endif
+	return(0);
+      } else
+	return(-1);
+    }
+#else
+    return(ndpi_match_string_id(ndpi_struct->custom_categories.hostnames.ac_automa, name, id));
+#endif
+  }
 }
 
 /* *********************************************** */
@@ -2295,6 +2325,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
     if(ndpi_struct->custom_categories.ipAddresses_shadow != NULL)
       ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->custom_categories.ipAddresses_shadow, free_ptree_data);
 
+    if(ndpi_struct->custom_categories.hostnames_hash)
+      ht_free((hashtable_t*)ndpi_struct->custom_categories.hostnames_hash);
+        
     ndpi_free(ndpi_struct);
   }
 }
@@ -3887,133 +3920,142 @@ void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
 
 int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 char *name, ndpi_protocol_category_t category) {
-  AC_PATTERN_t ac_pattern;
-
   if(name == NULL)
     return(-1);
 
-  /* printf("===> Loading %s as %u\n", name, category); */
+  if(!ndpi_struct->enable_category_substring_match) {
+    ht_set((hashtable_t*)ndpi_struct->custom_categories.hostnames_hash, name, (u_int16_t)category);
+    return(0);    
+  } else {
+    AC_PATTERN_t ac_pattern;
+    
+    /* printf("===> Loading %s as %u\n", name, category); */
 
 #ifdef HAVE_HYPERSCAN
-  {
-    struct hs_list *h = (struct hs_list*)malloc(sizeof(struct hs_list));
+    {
+      struct hs_list *h = (struct hs_list*)malloc(sizeof(struct hs_list));
 
-    if(h) {
-      char tmp[256];
-      int i, j;
+      if(h) {
+	char tmp[256];
+	int i, j;
 
-      for(i=0, j=0; (j<sizeof(tmp)) && (name[i] != '\0'); i++) {
-	if(name[i] == '.')
-	  tmp[j++] = '\\';
+	for(i=0, j=0; (j<sizeof(tmp)) && (name[i] != '\0'); i++) {
+	  if(name[i] == '.')
+	    tmp[j++] = '\\';
 
-	tmp[j++] = name[i];
-      }
+	  tmp[j++] = name[i];
+	}
 
-      tmp[j] = '\0';
+	tmp[j] = '\0';
 
-      h->expression = strdup(name), h->id = (unsigned int)category;
-      if(h->expression == NULL) {
-	free(h);
-	return(-2);
-      }
+	h->expression = strdup(name), h->id = (unsigned int)category;
+	if(h->expression == NULL) {
+	  free(h);
+	  return(-2);
+	}
 
-      h->next = ndpi_struct->custom_categories.to_load;
-      ndpi_struct->custom_categories.to_load = h;
-      ndpi_struct->custom_categories.num_to_load++;
-    } else
-      return(-1);
-  }
+	h->next = ndpi_struct->custom_categories.to_load;
+	ndpi_struct->custom_categories.to_load = h;
+	ndpi_struct->custom_categories.num_to_load++;
+      } else
+	return(-1);
+    }
 #else
-  if(ndpi_struct->custom_categories.hostnames_shadow.ac_automa == NULL)
-    return(-1);
+    if(ndpi_struct->custom_categories.hostnames_shadow.ac_automa == NULL)
+      return(-1);
 
-  ac_pattern.astring = name, ac_pattern.length = strlen(ac_pattern.astring);
-  ac_pattern.rep.number = (int)category;
+    ac_pattern.astring = name, ac_pattern.length = strlen(ac_pattern.astring);
+    ac_pattern.rep.number = (int)category;
 
-  ac_automata_add(ndpi_struct->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
+    ac_automata_add(ndpi_struct->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
 #endif
-
+  }
+  
   return(0);
 }
 
 /* ********************************************************************************* */
 
 int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str) {
+  if(!ndpi_str->enable_category_substring_match) {
+    ; /* Nothing to do */
+  } else {
 #ifdef HAVE_HYPERSCAN
-  if(ndpi_str->custom_categories.num_to_load > 0) {
-    const char **expressions;
-    unsigned int *ids, i;
-    int rc;
-    struct hs_list *head = ndpi_str->custom_categories.to_load;
+    if(ndpi_str->custom_categories.num_to_load > 0) {
+      const char **expressions;
+      unsigned int *ids, i;
+      int rc;
+      struct hs_list *head = ndpi_str->custom_categories.to_load;
 
-    expressions = (const char**)calloc(sizeof(char*),
-				       ndpi_str->custom_categories.num_to_load+1);
-    if(!expressions) return(-1);
+      expressions = (const char**)calloc(sizeof(char*),
+					 ndpi_str->custom_categories.num_to_load+1);
+      if(!expressions) return(-1);
 
-    ids = (unsigned int*)calloc(sizeof(unsigned int),
-				ndpi_str->custom_categories.num_to_load+1);
-    if(!ids) {
-      free(expressions);
-      return(-1);
-    }
+      ids = (unsigned int*)calloc(sizeof(unsigned int),
+				  ndpi_str->custom_categories.num_to_load+1);
+      if(!ids) {
+	free(expressions);
+	return(-1);
+      }
 
-    for(i=0; head != NULL; i++) {
+      for(i=0; head != NULL; i++) {
 #ifdef DEBUG
-      printf("[HS] Loading category %u for %s\n", head->id, head->expression);
+	printf("[HS] Loading category %u for %s\n", head->id, head->expression);
 #endif
-      expressions[i] = head->expression, ids[i] = head->id;
-      head = head->next;
-    }
+	expressions[i] = head->expression, ids[i] = head->id;
+	head = head->next;
+      }
 
-    free_hyperscan_memory(ndpi_str->custom_categories.hostnames);
-    ndpi_str->custom_categories.hostnames = (struct hs*)malloc(sizeof(struct hs));
+      free_hyperscan_memory(ndpi_str->custom_categories.hostnames);
+      ndpi_str->custom_categories.hostnames = (struct hs*)malloc(sizeof(struct hs));
 
-    if(ndpi_str->custom_categories.hostnames == NULL) {
+      if(ndpi_str->custom_categories.hostnames == NULL) {
+	free(expressions), free(ids);
+	return(-1); /* Failed */
+      }
+
+      rc = hyperscan_load_patterns(ndpi_str->custom_categories.hostnames,
+				   ndpi_str->custom_categories.num_to_load,
+				   expressions, ids);
       free(expressions), free(ids);
-      return(-1); /* Failed */
+
+      head = ndpi_str->custom_categories.to_load;
+      while(head != NULL) {
+	struct hs_list *next = head->next;
+
+	free(head->expression);
+	free(head);
+
+	head = next;
+      }
+
+      ndpi_str->custom_categories.to_load = NULL;
+
+      if(rc < 0) {
+	free(ndpi_str->custom_categories.hostnames);
+	ndpi_str->custom_categories.hostnames = NULL;
+      }
     }
-
-    rc = hyperscan_load_patterns(ndpi_str->custom_categories.hostnames,
-				 ndpi_str->custom_categories.num_to_load,
-				 expressions, ids);
-    free(expressions), free(ids);
-
-    head = ndpi_str->custom_categories.to_load;
-    while(head != NULL) {
-      struct hs_list *next = head->next;
-
-      free(head->expression);
-      free(head);
-
-      head = next;
-    }
-
-    ndpi_str->custom_categories.to_load = NULL;
-
-    if(rc < 0) {
-      free(ndpi_str->custom_categories.hostnames);
-      ndpi_str->custom_categories.hostnames = NULL;
-      ndpi_str->custom_categories.hostnames = NULL;
-    }
-  }
 #else
-  /* Free */
-  ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa);
-  ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_str->custom_categories.ipAddresses, free_ptree_data);
+    /* Free */
+    ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa);
+    ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
-  /* Finalize */
-  ac_automata_finalize((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa);
+    /* Finalize */
+    ac_automata_finalize((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa);
 
-  /* Swap */
-  ndpi_str->custom_categories.hostnames.ac_automa = ndpi_str->custom_categories.hostnames_shadow.ac_automa;
-  ndpi_str->custom_categories.ipAddresses = ndpi_str->custom_categories.ipAddresses_shadow;
+    /* Swap */
+    ndpi_str->custom_categories.hostnames.ac_automa = ndpi_str->custom_categories.hostnames_shadow.ac_automa;
+    ndpi_str->custom_categories.ipAddresses = ndpi_str->custom_categories.ipAddresses_shadow;
 
-  /* Realloc */
-  ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
-  ndpi_str->custom_categories.ipAddresses_shadow = ndpi_New_Patricia(32 /* IPv4 */);
+    /* Realloc */
+    ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
+    ndpi_str->custom_categories.ipAddresses_shadow = ndpi_New_Patricia(32 /* IPv4 */);
 #endif
-
+  }
+  
   ndpi_str->custom_categories.categories_loaded = 1;
+  
   return(0);
 }
 
