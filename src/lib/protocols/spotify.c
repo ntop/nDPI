@@ -1,7 +1,7 @@
 /*
  * spotify.c
  *
- * Copyright (C) 2011-13 by ntop.org
+ * Copyright (C) 2011-18 by ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,18 +23,18 @@
 
 #include "ndpi_protocol_ids.h"
 
-
 #ifdef NDPI_PROTOCOL_SPOTIFY
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SPOTIFY
 
 #include "ndpi_api.h"
 
+
 static void ndpi_int_spotify_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
-					    u_int8_t due_to_correlation) {
-  ndpi_set_detected_protocol(ndpi_struct, flow,
-			     NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN);
+					    u_int8_t due_to_correlation)
+{
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN);
 }
 
 
@@ -59,13 +59,13 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
     }
   } else if(packet->tcp != NULL) {
 
-     if(payload_len >= 8 && packet->payload[0] == 0x00 && packet->payload[1] == 0x04 &&
+    if(payload_len >= 9 && packet->payload[0] == 0x00 && packet->payload[1] == 0x04 &&
        packet->payload[2] == 0x00 && packet->payload[3] == 0x00&&
-       packet->payload[6] == 0x52 && packet->payload[7] == 0x0e &&
+       packet->payload[6] == 0x52 && (packet->payload[7] == 0x0e || packet->payload[7] == 0x0f) &&
        packet->payload[8] == 0x50 ) {
-        NDPI_LOG_INFO(ndpi_struct, "found spotify tcp dissector\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN);
-     }
+      NDPI_LOG_INFO(ndpi_struct, "found spotify tcp dissector\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN);
+    }
 
 
     if(packet->iph /* IPv4 Only: we need to support packet->iphv6 at some point */) {
