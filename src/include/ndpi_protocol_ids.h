@@ -67,7 +67,7 @@
 #define NDPI_PROTOCOL_COAP                  27
 #define NDPI_PROTOCOL_VMWARE                28
 #define NDPI_PROTOCOL_MAIL_SMTPS            29
-#define NDPI_PROTOCOL_FILETOPIA             30
+#define NDPI_PROTOCOL_FBZERO                30
 #define NDPI_PROTOCOL_UBNTAC2               31 /* Ubiquity UBNT AirControl 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
 #define NDPI_PROTOCOL_KONTIKI               32
 #define NDPI_PROTOCOL_OPENFT                33

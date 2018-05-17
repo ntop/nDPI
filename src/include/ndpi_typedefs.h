@@ -490,6 +490,7 @@ struct ndpi_flow_tcp_struct {
   u_int8_t irc_stage;
   u_int8_t irc_port;
 #endif
+  
 #ifdef NDPI_PROTOCOL_H323
   u_int8_t h323_valid_packets;
 #endif
@@ -504,9 +505,6 @@ struct ndpi_flow_tcp_struct {
 #endif
 #ifdef NDPI_PROTOCOL_SOULSEEK
   u_int32_t soulseek_stage:2;
-#endif
-#ifdef NDPI_PROTOCOL_FILETOPIA
-  u_int32_t filetopia_stage:2;
 #endif
 #ifdef NDPI_PROTOCOL_TDS
   u_int32_t tds_stage:3;

@@ -1082,10 +1082,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "VMware", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 903, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 902, 903, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_FILETOPIA,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_FBZERO,
 			    no_master,
-			    no_master, "Filetopia", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    no_master, "FacebookZero", NDPI_PROTOCOL_CATEGORY_WEB,
+			    ndpi_build_default_ports(ports_a, 443, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_KONTIKI,
 			    no_master,
@@ -2754,7 +2754,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   init_dns_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* FILETOPIA */
-  init_filetopia_dissector(ndpi_struct, &a, detection_bitmask);
+  init_fbzero_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* VMWARE */
   init_vmware_dissector(ndpi_struct, &a, detection_bitmask);
