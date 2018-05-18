@@ -2120,7 +2120,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
 #endif
 
-  ndpi_str->custom_categories.hostnames_hash            = (void*)ht_create(65536);
+  ndpi_str->custom_categories.hostnames_hash            = NULL;
   
   ndpi_str->custom_categories.ipAddresses                = ndpi_New_Patricia(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow         = ndpi_New_Patricia(32 /* IPv4 */);
@@ -3924,7 +3924,12 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct
     return(-1);
 
   if(!ndpi_struct->enable_category_substring_match) {
-    ht_set((hashtable_t*)ndpi_struct->custom_categories.hostnames_hash, name, (u_int16_t)category);
+    if(ndpi_struct->custom_categories.hostnames_hash == NULL)
+      ndpi_struct->custom_categories.hostnames_hash = (void*)ht_create(65536);
+
+    if(ndpi_struct->custom_categories.hostnames_hash)
+      ht_set((hashtable_t*)ndpi_struct->custom_categories.hostnames_hash, name, (u_int16_t)category);
+    
     return(0);    
   } else {
     AC_PATTERN_t ac_pattern;
