@@ -114,13 +114,13 @@ static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod,
   char *e;
   unsigned long p = strtol(name,&e,0);
   ndpi_proto_defaults_t *proto_defaults = ndpi_get_proto_defaults(ndpi_mod);
-  
+
   if(e && !*e) {
     if(p < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS &&
        proto_defaults[p].protoName) return (uint16_t)p;
     return NDPI_PROTOCOL_UNKNOWN;
   }
-  
+
   for(proto_id=NDPI_PROTOCOL_UNKNOWN; proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS; proto_id++) {
     if(proto_defaults[proto_id].protoName &&
        !strcasecmp(proto_defaults[proto_id].protoName,name))
@@ -128,6 +128,9 @@ static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod,
   }
   return NDPI_PROTOCOL_UNKNOWN;
 }
+
+/* ***************************************************** */
+
 static NDPI_PROTOCOL_BITMASK debug_bitmask;
 static char _proto_delim[] = " \t,:;";
 static int parse_debug_proto(struct ndpi_detection_module_struct *ndpi_mod, char *str) {
@@ -184,7 +187,7 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
     NDPI_LOG(0, NULL, NDPI_LOG_ERROR, "global structure initialization failed\n");
     exit(-1);
   }
-  
+
   ndpi_set_log_level(module, nDPI_LogLevel);
 
   if(_debug_protocols != NULL && ! _debug_protocols_ok) {
@@ -377,8 +380,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
   /* to avoid two nodes in one binary tree for a flow */
   int is_changed = 0;
-  if(ret == NULL)
-  {
+  if(ret == NULL) {
     u_int32_t orig_src_ip = flow.src_ip;
     u_int16_t orig_src_port = flow.src_port;
     u_int32_t orig_dst_ip = flow.dst_ip;
@@ -522,7 +524,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
   if(!flow->ndpi_flow) return;
-     
+
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 
@@ -533,7 +535,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
       sprintf(&flow->bittorent_hash[j], "%02x",
 	      flow->ndpi_flow->protos.bittorrent.hash[i]);
-      
+
       j += 2, n += flow->ndpi_flow->protos.bittorrent.hash[i];
     }
 

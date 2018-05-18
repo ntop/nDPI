@@ -781,6 +781,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_STREAMING,         /* Streaming protocols */
   NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
   NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
+
   /* See #define NUM_CUSTOM_CATEGORIES */
   NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
   NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
@@ -788,6 +789,16 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
   NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
 
+  /* Payload Content */
+  NDPI_CONTENT_CATEGORY_AVI,
+  NDPI_CONTENT_CATEGORY_FLASH,
+  NDPI_CONTENT_CATEGORY_OGG,
+  NDPI_CONTENT_CATEGORY_MPEG,
+  NDPI_CONTENT_CATEGORY_QUICKTIME,
+  NDPI_CONTENT_CATEGORY_REALMEDIA,
+  NDPI_CONTENT_CATEGORY_WINDOWSMEDIA,
+  NDPI_CONTENT_CATEGORY_WEBM,
+  
   NDPI_PROTOCOL_NUM_CATEGORIES /*
 				 NOTE: Keep this as last member
 				 Unused as value but useful to getting the number of elements
@@ -978,7 +989,7 @@ struct ndpi_flow_struct {
   u_int16_t protocol_stack_info;
 
   /* init parameter, internal used to set up timestamp,... */
-  u_int16_t guessed_protocol_id, guessed_host_protocol_id;
+  u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category;
 
   u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
 

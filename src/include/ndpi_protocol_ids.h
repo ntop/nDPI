@@ -76,14 +76,17 @@
 #define NDPI_PROTOCOL_EDONKEY               36 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_BITTORRENT            37
 #define NDPI_PROTOCOL_SKYPE_CALL_OUT        38
-#define NDPI_CONTENT_AVI                    39
-#define NDPI_CONTENT_FLASH                  40
-#define NDPI_CONTENT_OGG                    41
-#define NDPI_CONTENT_MPEG                   42
-#define NDPI_CONTENT_QUICKTIME              43
-#define NDPI_CONTENT_REALMEDIA              44
-#define NDPI_CONTENT_WINDOWSMEDIA           45
-#define NDPI_CONTENT_MMS                    46
+
+/* 39..46 are free */
+#define NDPI_PROTOCOL_FREE_39               39
+#define NDPI_PROTOCOL_FREE_40               40
+#define NDPI_PROTOCOL_FREE_41               41
+#define NDPI_PROTOCOL_FREE_42               42
+#define NDPI_PROTOCOL_FREE_43               43
+#define NDPI_PROTOCOL_FREE_44               44
+#define NDPI_PROTOCOL_FREE_45               45
+#define NDPI_PROTOCOL_FREE_46               46
+
 #define NDPI_PROTOCOL_XBOX                  47
 #define NDPI_PROTOCOL_QQ                    48
 #define NDPI_PROTOCOL_SKYPE_CALL_IN         49
@@ -194,7 +197,7 @@
 #define NDPI_PROTOCOL_LLMNR                 154
 #define NDPI_PROTOCOL_REMOTE_SCAN           155
 #define NDPI_PROTOCOL_SPOTIFY               156
-#define NDPI_CONTENT_WEBM                   157
+#define NDPI_PROTOCOL_MESSENGER             157
 #define NDPI_PROTOCOL_H323                  158 /* Remy Mudingay <mudingay@ill.fr> */
 #define NDPI_PROTOCOL_OPENVPN               159 /* Remy Mudingay <mudingay@ill.fr> */
 #define NDPI_PROTOCOL_NOE                   160 /* Remy Mudingay <mudingay@ill.fr> */

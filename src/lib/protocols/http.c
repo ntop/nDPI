@@ -34,7 +34,7 @@
 
 static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
-					 u_int32_t protocol) {
+					 u_int16_t category) {
 
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     /* This is HTTP and it is not a sub protocol (e.g. skype or dropbox) */
@@ -42,18 +42,18 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
     ndpi_search_tcp_or_udp(ndpi_struct, flow);
 
     /* If no custom protocol has been detected */
-    /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */
-    if(protocol == NDPI_PROTOCOL_HTTP) {
+
+    if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
       ndpi_int_reset_protocol(flow);
-      ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, protocol);
+      ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_HTTP);
     } else
-      ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_HTTP);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_UNKNOWN);
     
-    flow->http_detected = 1;
+    flow->http_detected = 1, flow->guessed_category = category;
   }
 }
 
-#ifdef NDPI_CONTENT_FLASH
+#ifdef NDPI_CONTENT_CATEGORY_FLASH
 static void flash_check_http_payload(struct ndpi_detection_module_struct
 				     *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -69,12 +69,12 @@ static void flash_check_http_payload(struct ndpi_detection_module_struct
      && pos[5] == 0x00 && pos[6] == 0x00 && pos[7] == 0x00 && pos[8] == 0x09) {
 
     NDPI_LOG_INFO(ndpi_struct, "found Flash content in HTTP\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_FLASH);
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_FLASH);
   }
 }
 #endif
 
-#ifdef NDPI_CONTENT_AVI
+#ifdef NDPI_CONTENT_CATEGORY_AVI
 static void avi_check_http_payload(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -96,7 +96,7 @@ static void avi_check_http_payload(struct ndpi_detection_module_struct *ndpi_str
     if(packet->payload_packet_len > 20 && memcmp(packet->payload, "RIFF", 4) == 0
        && memcmp(packet->payload + 8, "AVI LIST", 8) == 0) {
       NDPI_LOG_INFO(ndpi_struct, "found Avi content in HTTP\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_AVI);
+      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_AVI);
     }
     flow->l4.tcp.http_empty_line_seen = 0;
     return;
@@ -115,7 +115,7 @@ static void avi_check_http_payload(struct ndpi_detection_module_struct *ndpi_str
     if((p + 16) <= packet->payload_packet_len && memcmp(&packet->payload[p], "RIFF", 4) == 0
        && memcmp(&packet->payload[p + 8], "AVI LIST", 8) == 0) {
       NDPI_LOG_INFO(ndpi_struct, "found Avi content in HTTP\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_AVI);
+      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_AVI);
     }
   }
 }
@@ -436,15 +436,15 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   /* search for line startin with "Icy-MetaData" */
-#ifdef NDPI_CONTENT_MPEG
+#ifdef NDPI_CONTENT_CATEGORY_MPEG
   for (a = 0; a < packet->parsed_lines; a++) {
     if(packet->line[a].len > 11 && memcmp(packet->line[a].ptr, "Icy-MetaData", 12) == 0) {
       NDPI_LOG_INFO(ndpi_struct, "found MPEG: Icy-MetaData\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_MPEG);
+      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_MPEG);
       return;
     }
   }
-#ifdef NDPI_CONTENT_AVI
+#ifdef NDPI_CONTENT_CATEGORY_AVI
 #endif
 #endif
 
@@ -463,12 +463,12 @@ static void check_http_payload(struct ndpi_detection_module_struct *ndpi_struct,
 {
   NDPI_LOG_DBG2(ndpi_struct, "called check_http_payload\n");
 
-#ifdef NDPI_CONTENT_FLASH
-  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_CONTENT_FLASH) != 0)
+#ifdef NDPI_CONTENT_CATEGORY_FLASH
+  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_CONTENT_CATEGORY_FLASH) != 0)
     flash_check_http_payload(ndpi_struct, flow);
 #endif
-#ifdef NDPI_CONTENT_AVI
-  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_CONTENT_AVI) != 0)
+#ifdef NDPI_CONTENT_CATEGORY_AVI
+  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_CONTENT_CATEGORY_AVI) != 0)
     avi_check_http_payload(ndpi_struct, flow);
 #endif
 #ifdef NDPI_PROTOCOL_TEAMVIEWER
@@ -532,23 +532,23 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
 
 static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 {
-#ifdef NDPI_CONTENT_MPEG
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_MPEG);
+#ifdef NDPI_CONTENT_CATEGORY_MPEG
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_MPEG);
 #endif
-#ifdef NDPI_CONTENT_QUICKTIME
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_QUICKTIME);
+#ifdef NDPI_CONTENT_CATEGORY_QUICKTIME
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_QUICKTIME);
 #endif
-#ifdef NDPI_CONTENT_WINDOWSMEDIA
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_WINDOWSMEDIA);
+#ifdef NDPI_CONTENT_CATEGORY_WINDOWSMEDIA
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_WINDOWSMEDIA);
 #endif
-#ifdef NDPI_CONTENT_REALMEDIA
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_REALMEDIA);
+#ifdef NDPI_CONTENT_CATEGORY_REALMEDIA
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_REALMEDIA);
 #endif
-#ifdef NDPI_CONTENT_AVI
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_AVI);
+#ifdef NDPI_CONTENT_CATEGORY_AVI
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_AVI);
 #endif
-#ifdef NDPI_CONTENT_OGG
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_OGG);
+#ifdef NDPI_CONTENT_CATEGORY_OGG
+  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_OGG);
 #endif
 #ifdef NDPI_PROTOCOL_XBOX
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
@@ -952,9 +952,9 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-#ifdef NDPI_CONTENT_MPEG
+#ifdef NDPI_CONTENT_CATEGORY_MPEG
   ndpi_set_bitmask_protocol_detection("MPEG", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_MPEG,
+				      NDPI_CONTENT_CATEGORY_MPEG,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
@@ -962,45 +962,45 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 
   *id += 1;
 #endif
-#ifdef NDPI_CONTENT_FLASH
+#ifdef NDPI_CONTENT_CATEGORY_FLASH
   ndpi_set_bitmask_protocol_detection("Flash", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_FLASH,
+				      NDPI_CONTENT_CATEGORY_FLASH,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_CONTENT_QUICKTIME
+#ifdef NDPI_CONTENT_CATEGORY_QUICKTIME
   ndpi_set_bitmask_protocol_detection("QuickTime", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_QUICKTIME,
+				      NDPI_CONTENT_CATEGORY_QUICKTIME,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_CONTENT_REALMEDIA
+#ifdef NDPI_CONTENT_CATEGORY_REALMEDIA
   ndpi_set_bitmask_protocol_detection("RealMedia", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_REALMEDIA,
+				      NDPI_CONTENT_CATEGORY_REALMEDIA,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_CONTENT_WINDOWSMEDIA
+#ifdef NDPI_CONTENT_CATEGORY_WINDOWSMEDIA
   ndpi_set_bitmask_protocol_detection("WindowsMedia", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_WINDOWSMEDIA,
+				      NDPI_CONTENT_CATEGORY_WINDOWSMEDIA,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_CONTENT_MMS
+#ifdef NDPI_CONTENT_CATEGORY_MMS
   ndpi_set_bitmask_protocol_detection("MMS", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_MMS,
+				      NDPI_CONTENT_CATEGORY_MMS,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
@@ -1025,18 +1025,18 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_CONTENT_AVI
+#ifdef NDPI_CONTENT_CATEGORY_AVI
   ndpi_set_bitmask_protocol_detection("AVI", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_AVI,
+				      NDPI_CONTENT_CATEGORY_AVI,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_CONTENT_OGG
+#ifdef NDPI_CONTENT_CATEGORY_OGG
   ndpi_set_bitmask_protocol_detection("OggVorbis", ndpi_struct, detection_bitmask, *id,
-				      NDPI_CONTENT_OGG,
+				      NDPI_CONTENT_CATEGORY_OGG,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
@@ -1053,11 +1053,11 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_PROTOCOL_QQ);
 
-#ifdef NDPI_CONTENT_FLASH
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_CONTENT_FLASH);
+#ifdef NDPI_CONTENT_CATEGORY_FLASH
+  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_FLASH);
 #endif
 
-  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,  NDPI_CONTENT_MMS);
+  NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask,  NDPI_CONTENT_CATEGORY_MMS);
 
   NDPI_DEL_PROTOCOL_FROM_BITMASK(ndpi_struct->callback_buffer[a].excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
 

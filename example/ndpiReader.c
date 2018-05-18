@@ -757,16 +757,14 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	      flow->detected_protocol.master_protocol, flow->detected_protocol.app_protocol,
 	      ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				 flow->detected_protocol, buf, sizeof(buf)));
-
-      if(flow->detected_protocol.category != 0)
-	fprintf(out, "[cat: %u]", flow->detected_protocol.category);
     } else
       fprintf(out, "[proto: %u/%s]",
 	      flow->detected_protocol.app_protocol,
 	      ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.app_protocol));
-
-      if(flow->detected_protocol.category != 0)
-	fprintf(out, "[cat: %u]", flow->detected_protocol.category);
+    
+    if(flow->detected_protocol.category != 0)
+      fprintf(out, "[cat: %s]", ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+						       flow->detected_protocol.category));      
 
     fprintf(out, "[%u pkts/%llu bytes ", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
     fprintf(out, "%s %u pkts/%llu bytes]",

@@ -1137,46 +1137,50 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Teredo", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_AVI,
+
+
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_39,
 			    no_master,
-			    no_master, "AVI", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_FLASH,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_40,
 			    no_master,
-			    no_master, "Flash", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_OGG,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_41,
 			    no_master,
-			    no_master, "OggVorbis", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_MPEG,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_42,
 			    no_master,
-			    no_master, "MPEG", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_QUICKTIME,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_43,
 			    no_master,
-			    no_master, "QuickTime", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_REALMEDIA,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_44,
 			    no_master,
-			    no_master, "RealMedia", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_CONTENT_WINDOWSMEDIA,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_45,
 			    no_master,
-			    no_master, "WindowsMedia", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_MMS,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_46,
 			    no_master,
-			    no_master, "MMS", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+
+
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX,
 			    no_master,
 			    no_master, "Xbox", NDPI_PROTOCOL_CATEGORY_GAME,
@@ -1659,11 +1663,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "RemoteScan", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 6077, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 6078, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_CONTENT_WEBM,
-			    no_master,
-			    no_master, "WebM", NDPI_PROTOCOL_CATEGORY_MEDIA, /* Courtesy of Shreeram Ramamoorthy Swaminathan <shreeram <shreeram1985@yahoo.co.in> */
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_H323,
 			    no_master,
 			    no_master,"H323", NDPI_PROTOCOL_CATEGORY_VOIP,
@@ -2758,9 +2758,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* VMWARE */
   init_vmware_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* MMS */
-  init_mms_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* NON_TCP_UDP */
   init_non_tcp_udp_dissector(ndpi_struct, &a, detection_bitmask);
@@ -5301,7 +5298,15 @@ static const char* categories[] = {
    "",
    "",
    "",
-   ""
+   "",
+   "AVI",
+   "Flash",
+   "OGG",
+   "MPEG",
+   "QuickTime",
+   "RealMedia",
+   "WindowsMedia",
+   "Webm",
 };
 
 const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod,

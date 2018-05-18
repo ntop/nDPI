@@ -85,7 +85,6 @@ libndpi_la_SOURCES = ndpi_content_match.c.inc \
 		     protocols/mdns.c \
 		     protocols/megaco.c \
 		     protocols/mgcp.c \
-		     protocols/mms.c \
 		     protocols/mpegts.c \
 		     protocols/mqtt.c \
 		     protocols/msn.c \
