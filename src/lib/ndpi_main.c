@@ -960,7 +960,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_SMTPS,
 			    no_master,
 			    no_master, "SMTPS", NDPI_PROTOCOL_CATEGORY_MAIL,
-			    ndpi_build_default_ports(ports_a, 465, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_a, 465, 587, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_IMAP,
 			    no_master,
