@@ -178,7 +178,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
  * @brief Print help instructions
  */
 static void help(u_int long_help) {
-  printf("Welcome to nDPI %s HWANG MINKOOOOOOO\n\n", ndpi_revision());
+  printf("Welcome to nDPI %s HELLO HWANG MINKOOOOOOO\n\n", ndpi_revision());
 
   printf("ndpiReader -i <file|device> [-f <filter>][-s <duration>][-m <duration>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
@@ -788,7 +788,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     if(enable_protocol_guess) {
       if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 	node_guess_undetected_protocol(thread_id, flow);
-	// printFlow(thread_id, flow);
+	printFlow(thread_id, flow);
       }
     }
 
@@ -1571,7 +1571,7 @@ static void printResults(u_int64_t tot_usec) {
     }
   }
 
-  // printf("\n\nTotal Flow Traffic: %llu (diff: %llu)\n", total_flow_bytes, cumulative_stats.total_ip_bytes-total_flow_bytes);
+  printf("\n\nTotal Flow Traffic: %llu (diff: %llu)\n", total_flow_bytes, cumulative_stats.total_ip_bytes-total_flow_bytes);
 
   if((verbose == 1) || (verbose == 2)) {
     FILE *out = results_file ? results_file : stdout;
