@@ -8088,6 +8088,9 @@ ndpi_protocol_match host_match[] = {
   { "google-analytics.", NULL, NULL,        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
   { "gtv1.com", NULL, NULL,                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
+  /* Google Hangout */ 
+  { "images2-hangout-opensocial.googleusercontent.com", NULL, NULL, "GoogleHangout", NDPI_PROTOCOL_HANGOUT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+
   /* Google Services */
   { "googleapis.com", NULL, NULL,           "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".googletagservices.com", NULL, NULL,   "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
