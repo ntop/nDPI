@@ -8289,6 +8289,11 @@ ndpi_protocol_match host_match[] = {
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-", NULL, NULL,        "Slack",            NDPI_PROTOCOL_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
+  { "zhiliaoapp.com", NULL, NULL,           "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "muscdn.com", NULL, NULL,               "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "livelycdn.com", NULL, NULL,            "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "direct.ly", NULL, NULL,                "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  
   { "github.com", NULL, NULL,               "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".github.com", NULL, NULL,              "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "github.io", NULL, NULL,                "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
