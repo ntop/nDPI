@@ -766,7 +766,7 @@ static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi
 							   ntohs(flow->lower_port),
 							   ntohl(flow->upper_ip),
 							   ntohs(flow->upper_port));
-  // printf("Guess state: %u\n", flow->detected_protocol);
+  printf("Guess state: %u\n", flow->detected_protocol);
   if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
     ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
 
