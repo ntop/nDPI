@@ -62,7 +62,7 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
 	u_int16_t sport = ntohs(packet->tcp->source);
 	u_int16_t dport = ntohs(packet->tcp->dest);
 
-	if((sport == 465) || (dport == 465))
+	if((sport == 465) || (dport == 465) || (sport == 587) || (dport == 587))
 	  protocol = NDPI_PROTOCOL_MAIL_SMTPS;
 	else if((sport == 993) || (dport == 993)
 #ifdef NDPI_PROTOCOL_MAIL_IMAP
