@@ -76,9 +76,9 @@
 #define NDPI_PROTOCOL_EDONKEY               36 /* Tomasz Bujlow <tomasz@skatnet.dk> */
 #define NDPI_PROTOCOL_BITTORRENT            37
 #define NDPI_PROTOCOL_SKYPE_CALL_OUT        38
+#define NDPI_PROTOCOL_MUSICALLY             39
 
-/* 39..46 are free */
-#define NDPI_PROTOCOL_FREE_39               39
+/* 40..46 are free */
 #define NDPI_PROTOCOL_FREE_40               40
 #define NDPI_PROTOCOL_FREE_41               41
 #define NDPI_PROTOCOL_FREE_42               42

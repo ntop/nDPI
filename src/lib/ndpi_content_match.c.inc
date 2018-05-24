@@ -8088,6 +8088,9 @@ ndpi_protocol_match host_match[] = {
   { "google-analytics.", NULL, NULL,        "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
   { "gtv1.com", NULL, NULL,                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
+  /* Google Hangout */ 
+  { "images2-hangout-opensocial.googleusercontent.com", NULL, NULL, "GoogleHangout", NDPI_PROTOCOL_HANGOUT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+
   /* Google Services */
   { "googleapis.com", NULL, NULL,           "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".googletagservices.com", NULL, NULL,   "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8286,6 +8289,11 @@ ndpi_protocol_match host_match[] = {
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-", NULL, NULL,        "Slack",            NDPI_PROTOCOL_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
+  { "zhiliaoapp.com", NULL, NULL,           "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "muscdn.com", NULL, NULL,               "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "livelycdn.com", NULL, NULL,            "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "direct.ly", NULL, NULL,                "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  
   { "github.com", NULL, NULL,               "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".github.com", NULL, NULL,              "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "github.io", NULL, NULL,                "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
