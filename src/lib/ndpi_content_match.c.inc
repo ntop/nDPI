@@ -652,12 +652,16 @@ static ndpi_network host_protocol_list[] = {
     https://whois.arin.net/rest/nets;q=AWS-VIBER-MEDIA?showDetails=true&showARIN=false&showNonArinTopLevelNet=false&ext=netref2
   */
 
+  { 0x0DE61550 /* 13.230.21.80/28 */, 28, NDPI_PROTOCOL_VIBER },
+  { 0x0D39B480 /* 13.57.180.128/28 */, 28, NDPI_PROTOCOL_VIBER },
+  { 0x012C30400 /* 18.195.4.0/23 */, 23, NDPI_PROTOCOL_VIBER },
+  { 0x012C45500 /* 18.196.85.0/25 */, 25, NDPI_PROTOCOL_VIBER },
+  { 0x022E8A340 /* 34.232.163.64/28 */, 28, NDPI_PROTOCOL_VIBER },
+  { 0x022F67200 /* 34.246.114.0/23 */, 23, NDPI_PROTOCOL_VIBER },
   { 0x3400FC00 /* 52.0.252.0/22 */, 22, NDPI_PROTOCOL_VIBER },
   { 0x3640BFF0 /* 54.64.191.240/28 */, 28, NDPI_PROTOCOL_VIBER },
   { 0x36A5FFD0 /* 54.165.255.208/28 */, 28, NDPI_PROTOCOL_VIBER },
   { 0x36A5FFE0 /* 54.165.255.224/27 */, 27, NDPI_PROTOCOL_VIBER },
-  { 0x36A93FA0 /* 54.169.63.160/27 */, 27, NDPI_PROTOCOL_VIBER },
-  { 0x36A93FC0 /* 54.169.63.192/26 */, 26, NDPI_PROTOCOL_VIBER },
   { 0x36DBBFA0 /* 54.219.191.160/28 */, 28, NDPI_PROTOCOL_VIBER },
   { 0x36E8FB90 /* 54.232.251.144/28 */, 28, NDPI_PROTOCOL_VIBER },
 
@@ -8149,6 +8153,7 @@ ndpi_protocol_match host_match[] = {
 
   { ".viber.com", NULL, NULL,               "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { ".cdn.viber.com", NULL, NULL,           "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".viber.it", NULL, NULL,                "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "wikipedia.", NULL, NULL,               "Wikipedia",        NDPI_PROTOCOL_WIKIPEDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "wikimedia.", NULL, NULL,               "Wikipedia",        NDPI_PROTOCOL_WIKIPEDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
