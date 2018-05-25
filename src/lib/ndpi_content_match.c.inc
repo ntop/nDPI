@@ -8367,8 +8367,12 @@ ndpi_protocol_match host_match[] = {
 
   { ".icq.", NULL, NULL,                    "ICQ",              NDPI_PROTOCOL_ICQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "icq.", NULL, NULL,                     "ICQ",              NDPI_PROTOCOL_ICQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+
   { ".vidto.me", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_VIDTO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".vidto.se", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_VIDTO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  
+  { ".rapidvideo.com", NULL, NULL,          "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".playercdn.net", NULL, NULL,           "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
   { NULL, NULL, NULL, 0 }
 };
