@@ -7925,6 +7925,7 @@ static ndpi_network host_protocol_list[] = {
     Valve Corporation (Steam)
     origin AS32590
   */
+  
   { 0x2D79B800 /* 45.121.184.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0x670A7C00 /* 103.10.124.0/23 */, 23, NDPI_PROTOCOL_STEAM },
   { 0x671C3600 /* 103.28.54.0/23 */, 23, NDPI_PROTOCOL_STEAM },
@@ -7942,7 +7943,15 @@ static ndpi_network host_protocol_list[] = {
   { 0xD040C800 /* 208.64.200.0/24 */, 24, NDPI_PROTOCOL_STEAM },
   { 0xD040C900 /* 208.64.201.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
-
+  
+  /*
+    VidTO
+  */
+  
+  { 0x51111030 /* 81.17.16.48/32 */, 32, NDPI_PROTOCOL_VIDTO },
+  { 0x5fb7329d /* 95.183.50.157/32 */, 32, NDPI_PROTOCOL_VIDTO },
+  { 0x577824f2 /* 87.120.36.242/32 */, 32, NDPI_PROTOCOL_VIDTO },
+  
   { 0x0, 0, 0 }
 };
 
@@ -8358,6 +8367,9 @@ ndpi_protocol_match host_match[] = {
 
   { ".icq.", NULL, NULL,                    "ICQ",              NDPI_PROTOCOL_ICQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "icq.", NULL, NULL,                     "ICQ",              NDPI_PROTOCOL_ICQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { ".vidto.me", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_VIDTO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".vidto.se", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_VIDTO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   
   { ".rapidvideo.com", NULL, NULL,          "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".playercdn.net", NULL, NULL,           "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
