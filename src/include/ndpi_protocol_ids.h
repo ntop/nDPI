@@ -283,6 +283,8 @@
 #define NDPI_PROTOCOL_AMAZON_VIDEO          240
 #define NDPI_PROTOCOL_GOOGLE_DOCS           241
 #define NDPI_PROTOCOL_WHATSAPP_FILES        242 /* Videos, pictures, voice messages... */
+#define NDPI_PROTOCOL_VIDTO                 243 /* VidTO streaming service */
+#define NDPI_PROTOCOL_RAPIDVIDEO            244 /* RapidVideo streaming */
 
 /* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
 #define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_WHATSAPP_FILES
