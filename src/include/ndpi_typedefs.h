@@ -1054,8 +1054,16 @@ struct ndpi_flow_struct {
     } ntp;
 
     struct {
-      char client_certificate[48], server_certificate[48];
-    } ssl;
+      struct {
+	char client_certificate[48], server_certificate[48];
+      } ssl;
+      
+      struct {
+	u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests, is_skype;
+      } stun;
+
+      /* We can have STUN over SSL thus they need to live together */
+    } stun_ssl;  
 
     struct {
       char client_signature[48], server_signature[48];
@@ -1085,11 +1093,7 @@ struct ndpi_flow_struct {
       char fingerprint[48];
       char class_ident[48];
     } dhcp;
-
-    struct {
-      u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests, is_skype;
-    } stun;
-  } protos;
+   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/
 
