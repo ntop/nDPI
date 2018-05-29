@@ -10,7 +10,7 @@ GoogleServices	13	2277	2
 	1	TCP 192.168.180.2:49881 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media][751 pkts/44783 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws]
 	2	TCP 192.168.180.2:36680 -> 178.248.208.54:443 [proto: 91.218/SSL.OCS][cat: Media][20 pkts/6089 bytes -> 0 pkts/0 bytes][client: ocs.labgency.ws]
 	3	TCP 192.168.180.2:42590 -> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][cat: Media][83 pkts/5408 bytes -> 0 pkts/0 bytes][Host: www.ocs.fr]
-	4	TCP 192.168.180.2:39263 -> 23.21.230.199:443 [proto: 91/SSL][20 pkts/2715 bytes -> 0 pkts/0 bytes][client: sfttings.crashlytics.com]
+	4	TCP 192.168.180.2:39263 -> 23.21.230.199:443 [proto: 91/SSL][20 pkts/2715 bytes -> 0 pkts/0 bytes][client: settings.crashlytics.com]
 	5	TCP 192.168.180.2:32946 -> 64.233.184.188:443 [proto: 91.239/SSL.GoogleServices][cat: Web][12 pkts/2212 bytes -> 0 pkts/0 bytes][client: mtalk.google.com]
 	6	TCP 192.168.180.2:47803 -> 64.233.166.95:443 [proto: 91.126/SSL.Google][12 pkts/1608 bytes -> 0 pkts/0 bytes]
 	7	TCP 192.168.180.2:41223 -> 216.58.208.46:443 [proto: 91.126/SSL.Google][13 pkts/1448 bytes -> 0 pkts/0 bytes]

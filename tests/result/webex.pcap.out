@@ -15,7 +15,7 @@ Amazon	3	174	1
 	7	TCP 10.8.0.1:51154 <-> 62.109.224.120:443 [proto: 91.141/SSL.Webex][cat: Collaborative][55 pkts/12583 bytes <-> 50 pkts/6703 bytes][server: *.webex.com]
 	8	UDP 10.8.0.1:64538 -> 172.16.1.75:5060 [proto: 100/SIP][cat: VoIP][22 pkts/15356 bytes -> 0 pkts/0 bytes]
 	9	TCP 10.8.0.1:51857 <-> 62.109.229.158:443 [proto: 91.141/SSL.Webex][cat: Collaborative][29 pkts/4559 bytes <-> 21 pkts/5801 bytes][server: *.webex.com]
-	10	TCP 10.8.0.1:46211 <-> 54.241.32.14:443 [proto: 91/SSL][cat: Web][16 pkts/1984 bytes <-> 14 pkts/7584 bytes][client: aqi.crittercism.com][server: *.crittercism.com]
+	10	TCP 10.8.0.1:46211 <-> 54.241.32.14:443 [proto: 91/SSL][cat: Web][16 pkts/1984 bytes <-> 14 pkts/7584 bytes][client: api.crittercism.com][server: *.crittercism.com]
 	11	TCP 10.8.0.1:41386 <-> 64.68.105.103:443 [proto: 91.141/SSL.Webex][cat: Collaborative][9 pkts/1417 bytes <-> 8 pkts/6984 bytes][server: *.webex.com]
 	12	TCP 10.8.0.1:41419 <-> 64.68.105.103:443 [proto: 91.141/SSL.Webex][cat: Collaborative][7 pkts/1309 bytes <-> 7 pkts/6930 bytes][server: *.webex.com]
 	13	TCP 10.8.0.1:52730 <-> 173.243.4.76:443 [proto: 91.141/SSL.Webex][cat: Collaborative][9 pkts/1369 bytes <-> 8 pkts/6621 bytes][server: *.webex.com]
