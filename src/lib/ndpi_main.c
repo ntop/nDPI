@@ -1883,9 +1883,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
 /* ****************************************************** */
 
-static int ac_match_handler(AC_MATCH_t *m, void *param) {
+static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, void *param) {
   int *matching_protocol_id = (int*)param;
-
+  int min_len = (txt->length < m->patterns->length) ? txt->length : m->patterns->length;
   /*
     Return 1 for stopping to the first match.
     We might consider searching for the more
@@ -1893,7 +1893,10 @@ static int ac_match_handler(AC_MATCH_t *m, void *param) {
   */
   *matching_protocol_id = m->patterns[0].rep.number;
 
-  return 0; /* 0 to continue searching, !0 to stop */
+  if(strncmp(txt->astring, m->patterns->astring, min_len) == 0)
+    return(1); /* If the pattern found matches the string at the beginning we stop here */
+  else
+    return 0; /* 0 to continue searching, !0 to stop */
 }
 
 /* ******************************************************************** */
