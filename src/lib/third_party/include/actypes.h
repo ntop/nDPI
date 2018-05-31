@@ -125,7 +125,7 @@ typedef enum
  * continue searching, otherwise it will return from ac_automata_search()
  * to your calling function.
  **/
-typedef int (*MATCH_CALBACK_f)(AC_MATCH_t *, void *);
+typedef int (*MATCH_CALBACK_f)(AC_MATCH_t *, AC_TEXT_t *, void *);
 
 /* AC_PATTRN_MAX_LENGTH:
  * Maximum acceptable pattern length in AC_PATTERN_t.length

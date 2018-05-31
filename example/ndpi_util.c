@@ -561,9 +561,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
 	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
       snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
-	       flow->ndpi_flow->protos.ssl.client_certificate);
+	       flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
       snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
-	       flow->ndpi_flow->protos.ssl.server_certificate);
+	       flow->ndpi_flow->protos.stun_ssl.ssl.server_certificate);
     }
   }
 

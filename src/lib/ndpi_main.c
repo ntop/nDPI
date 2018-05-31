@@ -1883,9 +1883,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
 /* ****************************************************** */
 
-static int ac_match_handler(AC_MATCH_t *m, void *param) {
+static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, void *param) {
   int *matching_protocol_id = (int*)param;
-
+  int min_len = (txt->length < m->patterns->length) ? txt->length : m->patterns->length;
   /*
     Return 1 for stopping to the first match.
     We might consider searching for the more
@@ -1893,7 +1893,10 @@ static int ac_match_handler(AC_MATCH_t *m, void *param) {
   */
   *matching_protocol_id = m->patterns[0].rep.number;
 
-  return 0; /* 0 to continue searching, !0 to stop */
+  if(strncmp(txt->astring, m->patterns->astring, min_len) == 0)
+    return(1); /* If the pattern found matches the string at the beginning we stop here */
+  else
+    return 0; /* 0 to continue searching, !0 to stop */
 }
 
 /* ******************************************************************** */
@@ -3791,7 +3794,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)
       goto check_stun_export;
-    else if(flow->protos.ssl.client_certificate[0] != '\0') {
+    else if(flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL, NDPI_PROTOCOL_UNKNOWN);
     } else {
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
@@ -3830,9 +3833,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
      && (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
   check_stun_export:
-    if(flow->protos.stun.num_processed_pkts > 0) {
-      if(flow->protos.stun.num_processed_pkts >= 8) {
-	u_int16_t proto = (flow->protos.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT;
+    if(flow->protos.stun_ssl.stun.num_processed_pkts > 0) {
+      if(flow->protos.stun_ssl.stun.num_processed_pkts >= 8) {
+	u_int16_t proto = (flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT;
 
 	ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_SKYPE);
       } else
@@ -4096,9 +4099,9 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
       }
     }
 
-    if(flow->protos.ssl.server_certificate[0] != '\0') {
+    if(flow->protos.stun_ssl.ssl.server_certificate[0] != '\0') {
       unsigned long id;
-      int rc = ndpi_match_custom_category(ndpi_struct, (char *)flow->protos.ssl.server_certificate, &id);
+      int rc = ndpi_match_custom_category(ndpi_struct, (char *)flow->protos.stun_ssl.ssl.server_certificate, &id);
 
       if(rc == 0) {
 	ret->category = (ndpi_protocol_category_t)id;

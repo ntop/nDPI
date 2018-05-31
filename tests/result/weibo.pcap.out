@@ -18,7 +18,7 @@ Sina(Weibo)	418	258007	15
 	10	TCP 192.168.1.105:59119 <-> 114.134.80.162:80 [proto: 7/HTTP][cat: Web][5 pkts/736 bytes <-> 4 pkts/863 bytes][Host: weibo.com]
 	11	TCP 192.168.1.105:35811 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork][3 pkts/604 bytes <-> 2 pkts/140 bytes][Host: js.t.sinajs.cn]
 	12	TCP 192.168.1.105:42275 <-> 222.73.28.96:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork][3 pkts/610 bytes <-> 1 pkts/66 bytes][Host: u1.img.mobile.sina.cn]
-	13	TCP 192.168.1.105:50827 <-> 47.89.65.229:443 [proto: 91/SSL][3 pkts/382 bytes <-> 1 pkts/66 bytes][client: g/alicdn.com]
+	13	TCP 192.168.1.105:50827 <-> 47.89.65.229:443 [proto: 91/SSL][3 pkts/382 bytes <-> 1 pkts/66 bytes][client: g.alicdn.com]
 	14	UDP 192.168.1.105:53543 <-> 192.168.1.1:53 [proto: 5.200/DNS.Sina(Weibo)][cat: SocialNetwork][1 pkts/75 bytes <-> 1 pkts/191 bytes][Host: img.t.sinajs.cn]
 	15	UDP 192.168.1.105:41352 <-> 192.168.1.1:53 [proto: 5.200/DNS.Sina(Weibo)][cat: SocialNetwork][1 pkts/74 bytes <-> 1 pkts/190 bytes][Host: js.t.sinajs.cn]
 	16	UDP 192.168.1.105:51440 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network][1 pkts/72 bytes <-> 1 pkts/171 bytes][Host: g.alicdn.com]

@@ -189,16 +189,15 @@ int ac_automata_search (AC_AUTOMATA_t * thiz, AC_TEXT_t * txt, void * param)
 	  position++;
 	}
 
-      if(curr->final && next)
+      if(curr->final && next) {
 	/* We check 'next' to find out if we came here after a alphabet
 	 * transition or due to a fail. in second case we should not report
 	 * matching because it was reported in previous node */
-	{
 	  thiz->match.position = position + thiz->base_position;
 	  thiz->match.match_num = curr->matched_patterns_num;
 	  thiz->match.patterns = curr->matched_patterns;
 	  /* we found a match! do call-back */
-	  if (thiz->match_callback(&thiz->match, param))
+	  if (thiz->match_callback(&thiz->match, txt, param))
 	    return 1;
 	}
     }
