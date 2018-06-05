@@ -3,6 +3,8 @@
 #ifndef _HASH_H_
 #define _HASH_H_
 
+#include "ndpi_api.h"
+
 struct entry_s {
   char *key;
   u_int16_t value;

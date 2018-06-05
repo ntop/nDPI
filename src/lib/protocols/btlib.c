@@ -22,6 +22,8 @@
  *
  */
 
+#include "ndpi_api.h"
+
 #ifndef NDPI_NO_STD_INC
 #include <stdlib.h>
 #include <stdio.h>
