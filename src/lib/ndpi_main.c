@@ -2457,9 +2457,8 @@ char * strsep(char **sp, char *sep)
 
 /* ******************************************************************** */
 
-
-int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, u_int8_t do_add) {
-
+int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, 
+		     char* rule, u_int8_t do_add) {
   char *at, *proto, *elem;
   ndpi_proto_defaults_t *def;
   int subprotocol_id, i;
@@ -2575,7 +2574,6 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod, char* rule, 
 
 */
 int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char* path) {
-
   FILE *fd = fopen(path, "r");
   int i;
 
@@ -4057,6 +4055,13 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 #endif
   }
   
+  if(ndpi_str->custom_categories.ipAddresses != NULL)
+    ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_str->custom_categories.ipAddresses, 
+			  free_ptree_data);
+
+  ndpi_str->custom_categories.ipAddresses = ndpi_str->custom_categories.ipAddresses_shadow;
+  ndpi_str->custom_categories.ipAddresses_shadow = ndpi_New_Patricia(32 /* IPv4 */);
+
   ndpi_str->custom_categories.categories_loaded = 1;
   
   return(0);

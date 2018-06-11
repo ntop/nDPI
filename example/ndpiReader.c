@@ -380,7 +380,7 @@ void extcap_config() {
   struct ndpi_proto_sorter *protos;
   u_int ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
   ndpi_proto_defaults_t *proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
-  
+
   /* -i <interface> */
   printf("arg {number=%d}{call=-i}{display=Capture Interface}{type=string}"
 	 "{tooltip=The interface name}\n", argidx++);
@@ -601,7 +601,7 @@ static void parseOptions(int argc, char **argv) {
       extcap_packet_filter = ndpi_get_proto_by_name(ndpi_info_mod, optarg);
       if (extcap_packet_filter == NDPI_PROTOCOL_UNKNOWN) extcap_packet_filter = atoi(optarg);
       break;
-    
+
     case 257:
       _debug_protocols = strdup(optarg);
       break;
@@ -761,10 +761,12 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[proto: %u/%s]",
 	      flow->detected_protocol.app_protocol,
 	      ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.app_protocol));
-    
+
     if(flow->detected_protocol.category != 0)
-      fprintf(out, "[cat: %s]", ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-						       flow->detected_protocol.category));      
+      fprintf(out, "[cat: %s/%u]", 
+	      ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+				     flow->detected_protocol.category),
+	      (unsigned int)flow->detected_protocol.category);
 
     fprintf(out, "[%u pkts/%llu bytes ", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
     fprintf(out, "%s %u pkts/%llu bytes]",
@@ -1487,10 +1489,10 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       while(fd) {
 	char buffer[512], *line, *name, *category;
 	int i;
-	
+
 	if(!(line = fgets(buffer, sizeof(buffer), fd)))
 	  break;
-	
+
 	if(((i = strlen(line)) <= 1) || (line[0] == '#'))
 	  continue;
 	else
@@ -1501,9 +1503,16 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	  category = strtok(NULL, "\t");
 
 	  if(category) {
+	    int fields[4];
+
 	    // printf("Loading %s\t%s\n", name, category);
-	    ndpi_load_hostname_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-					name, (ndpi_protocol_category_t)atoi(category));
+
+	    if(sscanf(name, "%d.%d.%d.%d", &fields[0], &fields[1], &fields[2], &fields[3]) == 4)
+	      ndpi_load_ip_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+				    name, (ndpi_protocol_category_t)atoi(category));
+	    else
+	      ndpi_load_hostname_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+					  name, (ndpi_protocol_category_t)atoi(category));
 	  }
 	}
       }
@@ -3199,7 +3208,7 @@ int orginal_main(int argc, char **argv) {
       printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
       return(-1);
     }
-  
+
     automataUnitTest();
 
     ndpi_info_mod = ndpi_init_detection_module();
