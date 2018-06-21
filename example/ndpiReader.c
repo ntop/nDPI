@@ -547,7 +547,7 @@ static void parseOptions(int argc, char **argv) {
 
     case 'j':
 #ifndef HAVE_JSON_C
-      printf("WARNING: this copy of ndpiReader has been compiled without JSON-C: json export disabled\n");
+      printf("WARNING: this copy of ndpiReader has been compiled without json-c: JSON export disabled\n");
 #else
       _jsonFilePath = optarg;
       json_flag = 1;
@@ -1897,6 +1897,7 @@ static void printResults(u_int64_t tot_usec) {
   char buf[32];
 #ifdef HAVE_JSON_C
   FILE *json_fp = NULL;
+  u_int8_t dont_close_json_fp = 0;
   json_object *jObj_main = NULL, *jObj_trafficStats, *jArray_detProto = NULL, *jObj;
 #endif
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
@@ -2005,10 +2006,14 @@ static void printResults(u_int64_t tot_usec) {
 
   if(json_flag) {
 #ifdef HAVE_JSON_C
-    if((json_fp = fopen(_jsonFilePath,"w")) == NULL) {
+    if(!strcmp(_jsonFilePath, "-"))
+      json_fp = stderr, dont_close_json_fp = 1;
+    else if((json_fp = fopen(_jsonFilePath,"w")) == NULL) {
       printf("Error creating .json file %s\n", _jsonFilePath);
       json_flag = 0;
-    } else {
+    }
+
+    if(json_flag) {
       jObj_main = json_object_new_object();
       jObj_trafficStats = json_object_new_object();
       jArray_detProto = json_object_new_array();
@@ -2159,7 +2164,7 @@ static void printResults(u_int64_t tot_usec) {
       json_object_object_add(jObj_main,"unknown.flows",jArray_unknown_flows);
 
     fprintf(json_fp,"%s\n",json_object_to_json_string(jObj_main));
-    fclose(json_fp);
+    if(!dont_close_json_fp) fclose(json_fp);
 #endif
   }
 
@@ -2473,7 +2478,8 @@ static void pcap_process_packet(u_char *args,
       memset(&ndpi_thread_info[thread_id].workflow->stats, 0, sizeof(struct ndpi_stats));
     }
 
-    printf("\n-------------------------------------------\n\n");
+    if(!quiet_mode)
+      printf("\n-------------------------------------------\n\n");
 
     memcpy(&begin, &end, sizeof(begin));
     memcpy(&pcap_start, &pcap_end, sizeof(pcap_start));
