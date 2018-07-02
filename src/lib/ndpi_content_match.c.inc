@@ -8374,6 +8374,9 @@ ndpi_protocol_match host_match[] = {
   { ".rapidvideo.com", NULL, NULL,          "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".playercdn.net", NULL, NULL,           "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
+  { "showmax.com", NULL, NULL,                "Showmax",          NDPI_PROTOCOL_SHOWMAX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { "showmax.akamaized.net", NULL, NULL,       "Showmax",          NDPI_PROTOCOL_SHOWMAX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+
   { NULL, NULL, NULL, 0 }
 };
 
