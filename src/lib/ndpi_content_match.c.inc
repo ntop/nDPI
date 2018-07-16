@@ -71,7 +71,6 @@ static ndpi_network host_protocol_list[] = {
   { 0xB92D0600 /* 185.45.6.0/23 */, 23, NDPI_PROTOCOL_TWITTER },
   { 0xBC40E000 /* 188.64.224.0/21 */, 21, NDPI_PROTOCOL_TWITTER },
   { 0xC02C4400 /* 192.44.68.0/23 */, 23, NDPI_PROTOCOL_TWITTER },
-  { 0xC030EC00 /* 192.48.236.0/23 */, 23, NDPI_PROTOCOL_TWITTER },
   { 0xC0854C00 /* 192.133.76.0/22 */, 22, NDPI_PROTOCOL_TWITTER },
   { 0xC7109C00 /* 199.16.156.0/22 */, 22, NDPI_PROTOCOL_TWITTER },
   { 0xC73B9400 /* 199.59.148.0/22 */, 22, NDPI_PROTOCOL_TWITTER },
@@ -609,10 +608,10 @@ static ndpi_network host_protocol_list[] = {
   /* Teamviewer 159.122.189.32-63 */
   { 0x9F7ABD30 /* 159.122.189.32 */, 21, NDPI_PROTOCOL_TEAMVIEWER },
 
+#if 0
   /*
     IFLIX services -by www.vizuamatix.com R&D team
   */
-
   { 0x344D0000 /* 52.77.0.0 */, 16, NDPI_PROTOCOL_IFLIX },
   { 0x34DC0000 /* 52.220.0.0 */, 16, NDPI_PROTOCOL_IFLIX },
   { 0x344A0000 /* 52.74.0.0 */, 16, NDPI_PROTOCOL_IFLIX },
@@ -622,6 +621,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x36C09600 /* 54.192.150.0  */, 24, NDPI_PROTOCOL_IFLIX },
   { 0x344AC0F7 /* 52.74.192.247  */, 32, NDPI_PROTOCOL_IFLIX },
   { 0x0215E718 /* 2.21.231.24 */, 32, NDPI_PROTOCOL_IFLIX },
+#endif
 
   /*
     Citrix GotoMeeting (AS16815, AS21866)
@@ -8033,6 +8033,7 @@ ndpi_protocol_match host_match[] = {
   { "swscan.apple.com", NULL, NULL,         "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { "itunes-apple.com", NULL, NULL,         "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { "itunes.apple.com", NULL, NULL,         "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "tlnk.io", NULL, NULL,         	    "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "aaplimg.com", NULL, NULL,              "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { ".apple.com", NULL, NULL,               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".icloud.com", NULL, NULL,              "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
