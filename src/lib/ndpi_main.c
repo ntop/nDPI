@@ -1886,16 +1886,36 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, void *param) {
   int *matching_protocol_id = (int*)param;
   int min_len = (txt->length < m->patterns->length) ? txt->length : m->patterns->length;
+  char *match, buf[64];
+  int min_buf_len = (txt->length > 63 /* sizeof(buf)-1 */) ? 63 : txt->length;
+
   /*
     Return 1 for stopping to the first match.
     We might consider searching for the more
     specific match, paying more cpu cycles.
   */
+  if(m->match_num == 0) {
+#ifdef MATCH_DEBUG
+    printf("Skipping match [to search: %s][pattern: %s] [len: %u]\n", buf, m->patterns->astring, min_len); 
+#endif
+    return(0); /* No match */
+  }
+
   *matching_protocol_id = m->patterns[0].rep.number;
 
-  if(strncmp(txt->astring, m->patterns->astring, min_len) == 0)
+  strncpy(buf, txt->astring, min_buf_len);
+  buf[min_buf_len] = '\0';
+
+#ifdef MATCH_DEBUG
+  printf("Searching [to search: %s][pattern: %s] [len: %u]\n", buf, m->patterns->astring, min_len);
+#endif
+
+  if(strncmp(buf, m->patterns->astring, min_len) == 0) {
+#ifdef MATCH_DEBUG
+    printf("Found match [%s][%s] [len: %u]\n", buf, m->patterns->astring, min_len);
+#endif
     return(1); /* If the pattern found matches the string at the beginning we stop here */
-  else
+  } else
     return 0; /* 0 to continue searching, !0 to stop */
 }
 
