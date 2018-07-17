@@ -1889,26 +1889,22 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, void *param) {
   char *match, buf[64];
   int min_buf_len = (txt->length > 63 /* sizeof(buf)-1 */) ? 63 : txt->length;
 
+  strncpy(buf, txt->astring, min_buf_len);
+  buf[min_buf_len] = '\0';
+
+#ifdef MATCH_DEBUG
+  printf("Searching [to search: %s/%u][pattern: %s/%u] [len: %u][match_num: %u]\n",
+	 buf, txt->length, m->patterns->astring, m->patterns->length, min_len,
+	 m->match_num);
+#endif
+
   /*
     Return 1 for stopping to the first match.
     We might consider searching for the more
     specific match, paying more cpu cycles.
   */
-  if(m->match_num == 0) {
-#ifdef MATCH_DEBUG
-    printf("Skipping match [to search: %s][pattern: %s] [len: %u]\n", buf, m->patterns->astring, min_len); 
-#endif
-    return(0); /* No match */
-  }
 
   *matching_protocol_id = m->patterns[0].rep.number;
-
-  strncpy(buf, txt->astring, min_buf_len);
-  buf[min_buf_len] = '\0';
-
-#ifdef MATCH_DEBUG
-  printf("Searching [to search: %s][pattern: %s] [len: %u]\n", buf, m->patterns->astring, min_len);
-#endif
 
   if(strncmp(buf, m->patterns->astring, min_len) == 0) {
 #ifdef MATCH_DEBUG
@@ -2245,6 +2241,8 @@ static int hyperscanCustomEventHandler(unsigned int id,
 
 static int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *name, unsigned long *id) {
+  /* printf("[NDPI] %s(%s)\n", __FUNCTION__, name); */
+
   if(!ndpi_struct->enable_category_substring_match) {
     if(ndpi_struct->custom_categories.hostnames_hash == NULL)
       return(-1);
@@ -3934,6 +3932,14 @@ void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************************************************************* */
 
+/*
+ *
+ * IMPORTANT
+ *
+ * The *name pointer MUST be kept allocated until the automa is finalized and it
+ * cannot be recycled across multiple ndpi_load_hostname_category() calls
+ *
+ */
 int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 char *name, ndpi_protocol_category_t category) {
   if(name == NULL)
@@ -3969,7 +3975,7 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct
 
 	tmp[j] = '\0';
 
-	h->expression = strdup(name), h->id = (unsigned int)category;
+	h->expression = ndpi_strdup(name), h->id = (unsigned int)category;
 	if(h->expression == NULL) {
 	  free(h);
 	  return(-2);
