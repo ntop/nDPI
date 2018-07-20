@@ -286,9 +286,13 @@
 #define NDPI_PROTOCOL_VIDTO                 243 /* VidTO streaming service */
 #define NDPI_PROTOCOL_RAPIDVIDEO            244 /* RapidVideo streaming */
 #define NDPI_PROTOCOL_SHOWMAX               245 /* showmax.com video streaming */
-
-/* UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE */
-#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_RAPIDVIDEO
+/* IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT */
+/*                                                                                           */
+/* If you add new NDPI protocol defines after the last, DON'T forget                         */
+/*  to update constant NDPI_LAST_IMPLEMENTED_PROTOCOL below !!!                              */
+/*                                                                                           */
+/* IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT */
+#define NDPI_LAST_IMPLEMENTED_PROTOCOL              NDPI_PROTOCOL_SHOWMAX
 
 #define NDPI_MAX_SUPPORTED_PROTOCOLS                (NDPI_LAST_IMPLEMENTED_PROTOCOL + 1)
 #define NDPI_MAX_NUM_CUSTOM_PROTOCOLS               (NDPI_NUM_BITS-NDPI_LAST_IMPLEMENTED_PROTOCOL)
