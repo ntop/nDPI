@@ -4456,7 +4456,6 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 {
   u_int32_t a;
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int16_t end = packet->payload_packet_len - 1;
   if(packet->packet_lines_parsed_complete != 0)
     return;
 
@@ -4497,15 +4496,14 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
   packet->http_response.len = 0;
   packet->http_num_headers=0;
 
-  if((packet->payload_packet_len == 0)
-     || (packet->payload == NULL)
-     || (end == 0))
+  if((packet->payload_packet_len < 3)
+     || (packet->payload == NULL))
     return;
 
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
 
-  for(a = 0; a < end-1 /* This because get_u_int16_t(packet->payload, a) reads 2 bytes */; a++) {
+  for(a = 0; a < packet->payload_packet_len; a++) {
     if(get_u_int16_t(packet->payload, a) == ntohs(0x0d0a)) { /* If end of line char sequence CR+NL "\r\n", process line */
       packet->line[packet->parsed_lines].len = (u_int16_t)(((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
 
