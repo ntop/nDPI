@@ -45,7 +45,7 @@ void ndpi_search_ssdp(struct ndpi_detection_module_struct *ndpi_struct, struct n
   NDPI_LOG_DBG(ndpi_struct, "search ssdp\n");
   if (packet->udp != NULL) {
 
-    if (packet->payload_packet_len > 100) {
+    if (packet->payload_packet_len >= 19) {
       if ((memcmp(packet->payload, "M-SEARCH * HTTP/1.1", 19) == 0)
 	  || memcmp(packet->payload, "NOTIFY * HTTP/1.1", 17) == 0) {
 
