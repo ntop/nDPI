@@ -533,7 +533,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t telnet_stage:2;			// 0 - 2
 
 /* NDPI_PROTOCOL_SSL */
-  u_int8_t ssl_stage:2, ssl_seen_client_cert:1, ssl_seen_server_cert:1; // 0 - 5
+  u_int8_t ssl_seen_client_cert:1, ssl_seen_server_cert:1, ssl_stage:2; // 0 - 5
 
 /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
