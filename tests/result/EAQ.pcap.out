@@ -1,8 +1,8 @@
 Google	23	11743	2
 EAQ	174	10092	29
 
-	1	TCP 10.8.0.1:40467 <-> 173.194.119.24:80 [proto: 7.126/HTTP.Google][cat: Web][8 pkts/591 bytes <-> 6 pkts/9998 bytes][Host: www.google.com.br]
-	2	TCP 10.8.0.1:53497 <-> 173.194.119.48:80 [proto: 7.126/HTTP.Google][cat: Web][5 pkts/390 bytes <-> 4 pkts/764 bytes][Host: www.google.com]
+	1	TCP 10.8.0.1:40467 <-> 173.194.119.24:80 [proto: 7.126/HTTP.Google][cat: Web/5][8 pkts/591 bytes <-> 6 pkts/9998 bytes][Host: www.google.com.br]
+	2	TCP 10.8.0.1:53497 <-> 173.194.119.48:80 [proto: 7.126/HTTP.Google][cat: Web/5][5 pkts/390 bytes <-> 4 pkts/764 bytes][Host: www.google.com]
 	3	UDP 10.8.0.1:39185 <-> 200.194.132.67:6000 [proto: 190/EAQ][5 pkts/290 bytes <-> 5 pkts/290 bytes]
 	4	UDP 10.8.0.1:42620 <-> 200.194.148.66:6000 [proto: 190/EAQ][5 pkts/290 bytes <-> 5 pkts/290 bytes]
 	5	UDP 10.8.0.1:43641 <-> 200.194.148.68:6000 [proto: 190/EAQ][5 pkts/290 bytes <-> 5 pkts/290 bytes]
