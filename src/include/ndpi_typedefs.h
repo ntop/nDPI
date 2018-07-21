@@ -828,6 +828,11 @@ typedef struct _ndpi_automa {
 } ndpi_automa;
 
 typedef struct ndpi_proto {
+  /*
+    Note
+    below we do not use ndpi_protocol_id_t as users can define their own
+    custom protocols and thus the typedef could be too short in size.
+  */
   u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
   ndpi_protocol_category_t category;
 } ndpi_protocol;
