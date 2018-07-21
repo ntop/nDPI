@@ -23,8 +23,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_COAP
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_COAP
 
 #include "ndpi_api.h"
@@ -163,5 +161,3 @@ void init_coap_dissector (struct ndpi_detection_module_struct *ndpi_struct,
   *id +=1;
 }
 
-
-#endif // NDPI_PROTOCOL_COAP

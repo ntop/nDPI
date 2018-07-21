@@ -20,8 +20,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_CORBA
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CORBA
 
 #include "ndpi_api.h"
@@ -60,4 +58,3 @@ void init_corba_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 }
-#endif

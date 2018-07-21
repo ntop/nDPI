@@ -23,8 +23,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_APPLE_PUSH
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_APPLE_PUSH
 
 #include "ndpi_api.h"
@@ -76,6 +74,3 @@ void init_apple_push_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   *id += 1;
 }
 
-
-
-#endif

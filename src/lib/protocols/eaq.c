@@ -1,7 +1,7 @@
 /*
  * eaq.c
  *
- * Copyright (C) 2015 - ntop.org
+ * Copyright (C) 2015-18 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -26,8 +26,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_EAQ
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_EAQ
 
@@ -88,5 +86,3 @@ void init_eaq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 
   *id += 1;
 }
-
-#endif

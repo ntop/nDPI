@@ -1495,9 +1495,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Guildwars", NDPI_PROTOCOL_CATEGORY_GAME,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_APPLICATION_ACTIVESYNC,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_ACTIVESYNC,
 			    no_master,
-			    no_master, "HTTP_Application_ActiveSync", NDPI_PROTOCOL_CATEGORY_CLOUD,
+			    no_master, "HTTP_ActiveSync", NDPI_PROTOCOL_CATEGORY_CLOUD,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_KERBEROS,
@@ -1917,8 +1917,6 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, void *param) {
 
 /* ******************************************************************** */
 
-#ifdef NDPI_PROTOCOL_TOR
-
 static int fill_prefix_v4(prefix_t *p, struct in_addr *a, int b, int mb) {
   do {
     if(b < 0 || b > mb)
@@ -1995,6 +1993,7 @@ static patricia_node_t* add_to_ptree(patricia_tree_t *tree, int family,
 
   return(node);
 }
+
 /* ******************************************* */
 
 static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
@@ -2006,7 +2005,8 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
     patricia_node_t *node;
 
     pin.s_addr = htonl(host_list[i].network);
-    if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL)
+    if((node = add_to_ptree(ptree, AF_INET,
+			    &pin, host_list[i].cidr /* bits */)) != NULL)
       node->value.user_value = host_list[i].value;
   }
 }
@@ -2035,8 +2035,6 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 
   return 0;
 }
-
-#endif
 
 void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size)) { _ndpi_malloc = __ndpi_malloc; }
 void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size)) { _ndpi_flow_malloc = __ndpi_flow_malloc; }
@@ -2293,13 +2291,13 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
 	ndpi_free(ndpi_struct->proto_defaults[i].protoName);
     }
 
-#ifdef NDPI_PROTOCOL_TINC
+/* NDPI_PROTOCOL_TINC */
     if(ndpi_struct->tinc_cache)
       cache_free((cache_t)(ndpi_struct->tinc_cache));
-#endif
 
     if(ndpi_struct->protocols_ptree)
-      ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->protocols_ptree, free_ptree_data);
+      ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->protocols_ptree,
+      free_ptree_data);
 
     if (ndpi_struct->udpRoot != NULL)
       ndpi_tdestroy(ndpi_struct->udpRoot, ndpi_free);
@@ -2358,7 +2356,8 @@ int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct *ndpi_
 				      u_int16_t** tcp_master_proto,
 				      u_int16_t** udp_master_proto) {
   if(protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS)) {
-    *tcp_master_proto = *udp_master_proto = NDPI_PROTOCOL_UNKNOWN;
+    *tcp_master_proto = ndpi_struct->proto_defaults[NDPI_PROTOCOL_UNKNOWN].master_tcp_protoId,
+      *udp_master_proto = ndpi_struct->proto_defaults[NDPI_PROTOCOL_UNKNOWN].master_udp_protoId;    
     return(-1);
   }
 
@@ -2566,12 +2565,12 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
       else
 	removeDefaultPort(&range, def, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
     } else if(is_ip) {
-#ifdef NDPI_PROTOCOL_TOR
+/* NDPI_PROTOCOL_TOR */
       ndpi_add_host_ip_subprotocol(ndpi_mod, value, subprotocol_id);
-#endif
     } else {
       if(do_add)
-	ndpi_add_host_url_subprotocol(ndpi_mod, value, subprotocol_id, NDPI_PROTOCOL_ACCEPTABLE);
+	ndpi_add_host_url_subprotocol(ndpi_mod, value, subprotocol_id,
+NDPI_PROTOCOL_ACCEPTABLE);
       else
 	ndpi_remove_host_url_subprotocol(ndpi_mod, value, subprotocol_id);
     }

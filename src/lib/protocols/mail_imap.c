@@ -1,7 +1,7 @@
 /*
  * mail_imap.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,8 +23,6 @@
 
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_MAIL_IMAP
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MAIL_IMAP
 
@@ -48,12 +46,10 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search IMAP_IMAP\n");
   
   if (flow->l4.tcp.mail_imap_starttls == 2) {
-#ifdef NDPI_PROTOCOL_SSL
     NDPI_LOG_DBG2(ndpi_struct, "starttls detected\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MAIL_IMAP);
     NDPI_DEL_PROTOCOL_FROM_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SSL);
     return;
-#endif
   }
 
   if (packet->payload_packet_len >= 4 && ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a) {
@@ -320,5 +316,3 @@ void init_mail_imap_dissector(struct ndpi_detection_module_struct *ndpi_struct, 
 
   *id += 1;
 }
-
-#endif

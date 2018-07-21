@@ -1,7 +1,7 @@
 /*
  * teredo.c
  *
- * Copyright (C) 2015 - ntop.org
+ * Copyright (C) 2015-18 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,8 +19,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_TEREDO
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TEREDO
 
@@ -57,4 +55,3 @@ void init_teredo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   *id += 1;
 }
 
-#endif

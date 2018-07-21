@@ -1,7 +1,7 @@
 /*
  * ssl.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,9 +22,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-
-#ifdef NDPI_PROTOCOL_SSL
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SSL
 
@@ -65,9 +62,7 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
 	if((sport == 465) || (dport == 465) || (sport == 587) || (dport == 587))
 	  protocol = NDPI_PROTOCOL_MAIL_SMTPS;
 	else if((sport == 993) || (dport == 993)
-#ifdef NDPI_PROTOCOL_MAIL_IMAP
 		|| (flow->l4.tcp.mail_imap_starttls)
-#endif
 		) protocol = NDPI_PROTOCOL_MAIL_IMAPS;
 	else if((sport == 995) || (dport == 995)) protocol = NDPI_PROTOCOL_MAIL_POPS;
       }
@@ -386,10 +381,9 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
             ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
     return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
   }
-#ifdef NDPI_PROTOCOL_TOR
+
   if(ndpi_is_ssl_tor(ndpi_struct, flow, certificate) != 0)
     return(rc);
-#endif
       }
 
       if(((packet->ssl_certificate_num_checks >= 2)
@@ -410,24 +404,22 @@ static void ssl_mark_and_payload_search_for_other_protocols(struct
 							    ndpi_detection_module_struct
 							    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-#if defined(NDPI_PROTOCOL_TOR) || defined(NDPI_PROTOCOL_VPN_X) || defined(NDPI_PROTOCOL_UNENCRYPTED_JABBER) || defined (NDPI_PROTOCOL_OSCAR) || defined (NDPI_PROTOCOL_ITUNES) || defined (NDPI_PROTOCOL_GMAIL)
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t a;
   u_int32_t end;
-#if defined(NDPI_PROTOCOL_UNENCRYPTED_JABBER)
+
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_PROTOCOL_UNENCRYPTED_JABBER) != 0)
     goto check_for_ssl_payload;
-#endif
-#if defined(NDPI_PROTOCOL_OSCAR)
+
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_PROTOCOL_OSCAR) != 0)
     goto check_for_ssl_payload;
-#endif
-  goto no_check_for_ssl_payload;
+  else
+    goto no_check_for_ssl_payload;
 
  check_for_ssl_payload:
   end = packet->payload_packet_len - 20;
   for (a = 5; a < end; a++) {
-#ifdef NDPI_PROTOCOL_UNENCRYPTED_JABBER
+
     if(packet->payload[a] == 't') {
       if(memcmp(&packet->payload[a], "talk.google.com", 15) == 0) {
 	if(NDPI_COMPARE_PROTOCOL_TO_BITMASK
@@ -438,8 +430,7 @@ static void ssl_mark_and_payload_search_for_other_protocols(struct
 	}
       }
     }
-#endif
-#ifdef NDPI_PROTOCOL_OSCAR
+
     if(packet->payload[a] == 'A' || packet->payload[a] == 'k' || packet->payload[a] == 'c'
        || packet->payload[a] == 'h') {
       if(((a + 19) < packet->payload_packet_len && memcmp(&packet->payload[a], "America Online Inc.", 19) == 0)
@@ -475,11 +466,9 @@ static void ssl_mark_and_payload_search_for_other_protocols(struct
 	return;
       }
     }
-#endif
   }
 
  no_check_for_ssl_payload:
-#endif
   if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     NDPI_LOG_DBG(ndpi_struct, "found ssl connection\n");
     sslDetectProtocolFromCertificate(ndpi_struct, flow);
@@ -726,5 +715,3 @@ void init_ssl_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 
   *id += 1;
 }
-
-#endif

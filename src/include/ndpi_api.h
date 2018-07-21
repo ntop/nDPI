@@ -606,7 +606,7 @@ extern "C" {
   void ndpi_set_automa(struct ndpi_detection_module_struct *ndpi_struct,
 		       void* automa);
 
-#ifdef NDPI_PROTOCOL_HTTP
+/* NDPI_PROTOCOL_HTTP */
   /**
    * Retrieve information for HTTP flows
    *
@@ -639,9 +639,8 @@ extern "C" {
   */
   char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod,
 				   struct ndpi_flow_struct *flow);
-#endif
 
-#ifdef NDPI_PROTOCOL_TOR
+/* NDPI_PROTOCOL_TOR */
   /**
    * Check if the flow could be detected as TOR protocol
    *
@@ -654,7 +653,6 @@ extern "C" {
    */
   int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow, char *certificate);
-#endif
 
   /* Wrappers functions */
   /**

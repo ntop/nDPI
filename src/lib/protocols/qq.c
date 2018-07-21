@@ -2,7 +2,7 @@
  * qq.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,8 +23,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_QQ
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_QQ
 
@@ -636,17 +634,13 @@ void ndpi_search_qq_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct
       }
     }
   }
-#ifdef NDPI_PROTOCOL_HTTP
+
   if (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0) {
-#endif							/* NDPI_PROTOCOL_HTTP */
 
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_QQ);
     NDPI_LOG_DBG(ndpi_struct, "QQ tcp excluded; len %u\n",
 	     packet->payload_packet_len);
-
-#ifdef NDPI_PROTOCOL_HTTP
   }
-#endif							/* NDPI_PROTOCOL_HTTP */
 
 }
 
@@ -674,5 +668,3 @@ void init_qq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32
 
   *id += 1;
 }
-
-#endif

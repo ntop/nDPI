@@ -1,7 +1,7 @@
 /*
  * http.c
  *
- * Copyright (C) 2011-17 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,8 +22,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_HTTP
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
 
@@ -121,7 +119,6 @@ static void avi_check_http_payload(struct ndpi_detection_module_struct *ndpi_str
 }
 #endif
 
-#ifdef NDPI_PROTOCOL_TEAMVIEWER
 static void teamviewer_check_http_payload(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -140,10 +137,7 @@ static void teamviewer_check_http_payload(struct ndpi_detection_module_struct *n
     ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TEAMVIEWER);
   }
 }
-#endif
 
-
-#ifdef NDPI_PROTOCOL_RTSP
 static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -154,7 +148,6 @@ static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
     ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTSP);
   }
 }
-#endif
 
 static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow, char *ua) {
@@ -428,25 +421,20 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(packet->accept_line.ptr != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "Accept line found %.*s\n",
 	     packet->accept_line.len, packet->accept_line.ptr);
-#ifdef NDPI_PROTOCOL_RTSP
-    if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_PROTOCOL_RTSP) != 0) {
+    if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask,
+					NDPI_PROTOCOL_RTSP) != 0) {
       rtsp_parse_packet_acceptline(ndpi_struct, flow);
     }
-#endif
   }
 
   /* search for line startin with "Icy-MetaData" */
-#ifdef NDPI_CONTENT_CATEGORY_MPEG
-  for (a = 0; a < packet->parsed_lines; a++) {
+    for (a = 0; a < packet->parsed_lines; a++) {
     if(packet->line[a].len > 11 && memcmp(packet->line[a].ptr, "Icy-MetaData", 12) == 0) {
-      NDPI_LOG_INFO(ndpi_struct, "found MPEG: Icy-MetaData\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_MPEG);
-      return;
-    }
+    NDPI_LOG_INFO(ndpi_struct, "found MPEG: Icy-MetaData\n");
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_MPEG);
+    return;
   }
-#ifdef NDPI_CONTENT_CATEGORY_AVI
-#endif
-#endif
+  }
 
   if(packet->content_line.ptr != NULL && packet->content_line.len != 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
@@ -471,10 +459,8 @@ static void check_http_payload(struct ndpi_detection_module_struct *ndpi_struct,
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_CONTENT_CATEGORY_AVI) != 0)
     avi_check_http_payload(ndpi_struct, flow);
 #endif
-#ifdef NDPI_PROTOCOL_TEAMVIEWER
-  teamviewer_check_http_payload(ndpi_struct, flow);
-#endif
 
+  teamviewer_check_http_payload(ndpi_struct, flow);
 }
 
 /**
@@ -550,9 +536,8 @@ static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 #ifdef NDPI_CONTENT_CATEGORY_OGG
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_OGG);
 #endif
-#ifdef NDPI_PROTOCOL_XBOX
+
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
-#endif
 }
 
 /*************************************************************************************************/
@@ -1007,7 +992,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_PROTOCOL_XBOX
+
   ndpi_set_bitmask_protocol_detection("Xbox", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_XBOX,
 				      ndpi_search_http_tcp,
@@ -1015,8 +1000,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
-#endif
-#ifdef NDPI_PROTOCOL_QQ
+
   ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_QQ,
 				      ndpi_search_http_tcp,
@@ -1024,7 +1008,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
-#endif
+
 #ifdef NDPI_CONTENT_CATEGORY_AVI
   ndpi_set_bitmask_protocol_detection("AVI", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_CATEGORY_AVI,
@@ -1069,7 +1053,4 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   a++;
 
 #endif
-
 }
-
-#endif

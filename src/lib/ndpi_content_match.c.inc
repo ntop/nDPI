@@ -7946,9 +7946,8 @@ static ndpi_network host_protocol_list[] = {
   
   /*
     VidTO
-  */
-  
-  { 0x51111030 /* 81.17.16.48/32 */, 32, NDPI_PROTOCOL_VIDTO },
+  */  
+  { 0x51111030 /* 81.17.16.48/32 */, 32,  NDPI_PROTOCOL_VIDTO  },
   { 0x5fb7329d /* 95.183.50.157/32 */, 32, NDPI_PROTOCOL_VIDTO },
   { 0x577824f2 /* 87.120.36.242/32 */, 32, NDPI_PROTOCOL_VIDTO },
   
@@ -8212,8 +8211,6 @@ ndpi_protocol_match host_match[] = {
   { "static-cdn.jtvnw.net", NULL, NULL,     "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "www-cdn.jtvnw.net", NULL, NULL,        "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
-  { "quickplay.com", NULL, NULL,            "QuickPlay",        NDPI_PROTOCOL_QUICKPLAY, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
   { ".qq.com", NULL, NULL,                  "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".gtimg.com", NULL, NULL,               "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
 
@@ -8316,17 +8313,6 @@ ndpi_protocol_match host_match[] = {
   { "githubusercontent.com", NULL, NULL,    "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".githubusercontent.com", NULL, NULL,   "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { ".iqiyi.com", NULL, NULL,               "iQIYI",            NDPI_PROTOCOL_IQIYI, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".qiyi.com", NULL, NULL,                "iQIYI",            NDPI_PROTOCOL_IQIYI, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".71.am", NULL, NULL,                   "iQIYI",            NDPI_PROTOCOL_IQIYI, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".qiyipic.com", NULL, NULL,             "iQIYI",            NDPI_PROTOCOL_IQIYI, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
-  { ".ppstream.com", NULL, NULL,            "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".pps.tv", NULL, NULL,                  "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
-  { ".1kxun.", NULL, NULL,                  "1kxun",            NDPI_PROTOCOL_1KXUN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { "tcad.wedolook.com", NULL, NULL,        "1kxun",            NDPI_PROTOCOL_1KXUN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
   { ".steampowered.com", NULL, NULL,            "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { "steamcommunity.com", NULL, NULL,           "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { ".steamcontent.com", NULL, NULL,            "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
@@ -8353,8 +8339,6 @@ ndpi_protocol_match host_match[] = {
   { ".playstation.com", NULL, NULL,             "Playstation",  NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { ".sonyentertainmentnetwork.com", NULL, NULL,"Playstation",  NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
-  { ".pastebin.com", NULL, NULL,            "Pastebin",         NDPI_PROTOCOL_PASTEBIN, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
-
   { ".linkedin.com", NULL, NULL,            "LinkedIn",         NDPI_PROTOCOL_LINKEDIN, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".licdn.com", NULL, NULL,               "LinkedIn",         NDPI_PROTOCOL_LINKEDIN, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
@@ -8366,17 +8350,42 @@ ndpi_protocol_match host_match[] = {
   { "tdesktop.com", NULL, NULL,             "Telegram",         NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "tupdate.com", NULL, NULL,              "Telegram",         NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { ".icq.", NULL, NULL,                    "ICQ",              NDPI_PROTOCOL_ICQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
-  { "icq.", NULL, NULL,                     "ICQ",              NDPI_PROTOCOL_ICQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".pastebin.com", NULL, NULL,            "Pastebin",         NDPI_PROTOCOL_PASTEBIN, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
 
-  { ".vidto.me", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_VIDTO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".vidto.se", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_VIDTO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".ppstream.com", NULL, NULL,            "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".pps.tv", NULL, NULL,                  "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+
+  /*
+    VidTO streaming service
+    NOTE: this is a possible candidate for NDPI_PROTOCOL_GENERIC
+  */
+  { ".vidto.me", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".vidto.se", NULL, NULL,                "VidTO",            NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+
+  /*
+    Not so popular services without a protocl dissector (and thus not worth a protocolId) that are handled/detected by categpory rather
+    than by protocol id. They are bound to a generic protocol (NDPI_PROTOCOL_GENERIC) and placed onto the right category
+  */
+  { "quickplay.com", NULL, NULL,            "QuickPlay",        NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   
-  { ".rapidvideo.com", NULL, NULL,          "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".playercdn.net", NULL, NULL,           "RapidVideo",       NDPI_PROTOCOL_RAPIDVIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".iqiyi.com", NULL, NULL,               "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".qiyi.com", NULL, NULL,                "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".71.am", NULL, NULL,                   "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".qiyipic.com", NULL, NULL,             "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
-  { "showmax.com", NULL, NULL,                "Showmax",          NDPI_PROTOCOL_SHOWMAX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
-  { "showmax.akamaized.net", NULL, NULL,       "Showmax",          NDPI_PROTOCOL_SHOWMAX, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { ".1kxun.", NULL, NULL,                  "1kxun",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "tcad.wedolook.com", NULL, NULL,        "1kxun",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+
+  { ".icq.", NULL, NULL,                    "ICQ",              NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+  { "icq.", NULL, NULL,                     "ICQ",              NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+
+  /* RapidVideo streaming */
+  { ".rapidvideo.com", NULL, NULL,          "RapidVideo",       NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".playercdn.net", NULL, NULL,           "RapidVideo",       NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+
+  /* showmax.com video streaming */
+  { "showmax.com", NULL, NULL,              "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { "showmax.akamaized.net", NULL, NULL,    "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { NULL, NULL, NULL, 0 }
 };

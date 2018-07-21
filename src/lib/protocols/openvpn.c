@@ -1,7 +1,7 @@
 /*
  * openvpn.c
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * OpenVPN TCP / UDP Detection - 128/160 hmac
  *
@@ -22,8 +22,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_OPENVPN
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_OPENVPN
 
@@ -135,5 +133,3 @@ void init_openvpn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
 
   *id += 1;
 }
-
-#endif

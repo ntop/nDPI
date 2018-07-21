@@ -1,13 +1,11 @@
 /*
  * tor.c
  *
- * Copyright (C) 2016 ntop.org
+ * Copyright (C) 2016-18 ntop.org
  * Copyright (C) 2013 Remy Mudingay <mudingay@ill.fr>
  *
  */
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_TOR
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TOR
 
@@ -132,4 +130,3 @@ void init_tor_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
   *id += 1;
 }
 
-#endif

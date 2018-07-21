@@ -1,7 +1,7 @@
 /*
  * ndpi_util.h
  *
- * Copyright (C) 2011-16 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -24,7 +24,7 @@
  * If you concern about performance or have to integrate nDPI in your
  * application, you could need to reimplement them yourself.
  *
- * WARNING: this API is unstable! Use it at your own risk!
+ * WARNING: this API is just a demo od nDPI usage: Use it at your own risk!
  */
 #ifndef __NDPI_UTIL_H__
 #define __NDPI_UTIL_H__

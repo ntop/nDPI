@@ -2,7 +2,7 @@
  * megaco.c 
  *
  * Copyright (C) 2014 by Gianluca Costa http://www.capanalysis.net
- * Copyright (C) 2012-15 - ntop.org
+ * Copyright (C) 2012-18 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,14 +20,13 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_MEGACO
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MEGACO
 
 #include "ndpi_api.h"
 
 
-void ndpi_search_megaco(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+void ndpi_search_megaco(struct ndpi_detection_module_struct *ndpi_struct,
+			struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   
@@ -61,4 +60,3 @@ void init_megaco_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 
   *id += 1;
 }
-#endif

@@ -1,7 +1,7 @@
 /*
  * socks4.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  * Copyright (C) 2014 Tomasz Bujlow <tomasz@skatnet.dk>
  *
  * The signature is based on the Libprotoident library.
@@ -24,8 +24,6 @@
  *
  */
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_SOCKS
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SOCKS
 
@@ -148,4 +146,3 @@ void init_socks_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
   *id += 1;
 }
 
-#endif

@@ -3,10 +3,6 @@
  *
  * Copyright (C) 2012-18 - ntop.org
  *
- * Based on code of:
- * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
- * Michele Campus - <campus@ntop.org>
- *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,11 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License.
  * If not, see <http://www.gnu.org/licenses/>.
  *
+ * Based on code of:
+ * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
+ * Michele Campus - <campus@ntop.org>
+ *
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_QUIC
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_QUIC
 
@@ -148,5 +146,3 @@ void init_quic_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 
   *id += 1;
 }
-
-#endif /* NDPI_PROTOCOL_QUIC */

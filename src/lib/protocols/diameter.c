@@ -2,7 +2,6 @@
  * diameter.c
  *
  * Copyright (C) 2018 - ntop.org
- * Written by Michele Campus - <campus@ntop.org>
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -19,11 +18,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
+ * Based on code of:
+ * Michele Campus - <campus@ntop.org>
  */
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_DIAMETER
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DIAMETER
 
@@ -127,6 +126,4 @@ void init_diameter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 
   *id += 1;
 }
-
-#endif /* NDPI_PROTOCOL_DIAMETER */
 

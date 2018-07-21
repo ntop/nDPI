@@ -11,10 +11,12 @@ RANLIB=ranlib
 OBJECTS = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) ndpi_main.o
 HEADERS = $(wildcard ../include/*.h)
 
+all: libndpi.a
+
 libndpi.a: $(OBJECTS)
 	   ar rc $@ $(OBJECTS)
 	   $(RANLIB) $@	       
-	   
+
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 

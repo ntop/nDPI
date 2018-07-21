@@ -1,7 +1,7 @@
 /*
  * drda.c
  *
- * Copyright (C) 2012-16 - ntop.org
+ * Copyright (C) 2012-18 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,8 +18,6 @@
  *
  */
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_DRDA
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DRDA
 
@@ -103,5 +101,3 @@ void init_drda_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 
   *id += 1;
 }
-
-#endif /* NDPI_PROTOCOL_DRDA */

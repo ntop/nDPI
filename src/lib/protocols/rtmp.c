@@ -25,8 +25,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_RTMP
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RTMP
 
 #include "ndpi_api.h"
@@ -105,4 +103,3 @@ void init_rtmp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 }
 
-#endif

@@ -2,7 +2,7 @@
 
 NDPI_MAJOR="2"
 NDPI_MINOR="3"
-NDPI_PATCH="0"
+NDPI_PATCH="1"
 NDPI_VERSION_SHORT="$NDPI_MAJOR.$NDPI_MINOR.$NDPI_PATCH"
 
 rm -f configure config.h config.h.in src/lib/Makefile.in

@@ -1,7 +1,7 @@
 /*
  * yahoo.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,11 +22,9 @@
  */
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_YAHOO
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_YAHOO
+
 #include "ndpi_api.h"
-
-
 
 struct ndpi_yahoo_header {
   u_int8_t YMSG_str[4];
@@ -313,9 +311,7 @@ static void ndpi_search_yahoo_tcp(struct ndpi_detection_module_struct *ndpi_stru
 	}
       }
       /* detect YAHOO over HTTP proxy */
-#ifdef NDPI_PROTOCOL_HTTP
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP)
-#endif
 	{
 	  if (flow->l4.tcp.yahoo_http_proxy_stage == 0) {
 	    
@@ -370,12 +366,8 @@ void ndpi_search_yahoo(struct ndpi_detection_module_struct *ndpi_struct, struct 
     if(packet->tcp != NULL && packet->tcp_retransmission == 0) {
 
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
-#ifdef NDPI_PROTOCOL_HTTP
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP
-#endif
-#ifdef NDPI_PROTOCOL_SSL
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) {
-#endif
         /* search over TCP */
 	ndpi_search_yahoo_tcp(ndpi_struct, flow);
       }
@@ -412,4 +404,3 @@ void init_yahoo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
   *id += 1;
 }
 
-#endif

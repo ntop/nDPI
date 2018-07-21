@@ -2,7 +2,7 @@
  * rtsp.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,14 +23,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_RTSP
- #ifndef NDPI_PROTOCOL_RTP
- #error RTSP requires RTP detection to work correctly
- #endif
- #ifndef NDPI_PROTOCOL_RDP
- #error RTSP requires RDP detection to work correctly
- #endif
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RTSP
 
@@ -56,9 +48,7 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
   NDPI_LOG_DBG(ndpi_struct, "search RTSP\n");
 
   if (flow->rtsprdt_stage == 0
-#ifdef NDPI_PROTOCOL_RTCP
       && !(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_RTCP)
-#endif
       ) {
     flow->rtsprdt_stage = 1 + packet->packet_direction;
     NDPI_LOG_DBG2(ndpi_struct, "maybe handshake 1; need next packet, return\n");
@@ -102,9 +92,7 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
   }
   if (packet->udp != NULL && packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
       && ((NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP) == 0)
-#ifdef NDPI_PROTOCOL_RTCP
 	  || (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTCP) == 0)
-#endif
 	  )) {
     NDPI_LOG_DBG2(ndpi_struct,
 	     "maybe RTSP RTP, RTSP RTCP, RDT; need next packet.\n");
@@ -127,5 +115,3 @@ void init_rtsp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 }
-
-#endif

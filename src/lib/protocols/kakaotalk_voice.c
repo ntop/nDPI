@@ -1,7 +1,7 @@
 /*
  * kakaotalk_voice.c
  *
- * Copyright (C) 2015 - ntop.org
+ * Copyright (C) 2015-18 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,8 +25,6 @@
   http://www.kakao.com/services/talk/voices
 */
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_KAKAOTALK_VOICE
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_KAKAOTALK_VOICE
 
@@ -66,7 +64,8 @@ void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndpi_struc
 }
 
 
-void init_kakaotalk_voice_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_kakaotalk_voice_dissector(struct ndpi_detection_module_struct *ndpi_struct,
+				    u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("KakaoTalk_Voice", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_KAKAOTALK_VOICE,
@@ -77,4 +76,3 @@ void init_kakaotalk_voice_dissector(struct ndpi_detection_module_struct *ndpi_st
   *id += 1;
 }
 
-#endif

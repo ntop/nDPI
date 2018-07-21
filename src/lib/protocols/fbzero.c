@@ -22,8 +22,6 @@
 
 /* https://code.facebook.com/posts/608854979307125/building-zero-protocol-for-fast-secure-mobile-connections/ */
 
-#ifdef NDPI_PROTOCOL_FBZERO
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_FBZERO
 
 #include "ndpi_api.h"
@@ -129,4 +127,3 @@ void init_fbzero_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   *id += 1;
 }
 
-#endif
