@@ -2503,7 +2503,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
   }
 
   for(i=0, def = NULL; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++) {
-    if(strcasecmp(ndpi_mod->proto_defaults[i].protoName, proto) == 0) {
+    if(ndpi_mod->proto_defaults[i].protoName && strcasecmp(ndpi_mod->proto_defaults[i].protoName, proto) == 0) {
       def = &ndpi_mod->proto_defaults[i];
       subprotocol_id = i;
       break;
