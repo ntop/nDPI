@@ -49,13 +49,15 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(src != NULL)
 	NDPI_LOG_DBG2(ndpi_struct,
 		 "  SRC bitmask: %u, packet tick %llu , last safe access timestamp: %llu\n",
-		 NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
-		 != 0 ? 1 : 0, (u_int64_t) packet->tick_timestamp, (u_int64_t) src->soulseek_last_safe_access_time);
+		      NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
+		 != 0 ? 1 : 0, (long long unsigned int) packet->tick_timestamp,
+		      (long long unsigned int) src->soulseek_last_safe_access_time);
       if(dst != NULL)
 	NDPI_LOG_DBG2(ndpi_struct,
 		 "  DST bitmask: %u, packet tick %llu , last safe ts: %llu\n",
 		 NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
-		 != 0 ? 1 : 0, (u_int64_t) packet->tick_timestamp, (u_int64_t) dst->soulseek_last_safe_access_time);
+		 != 0 ? 1 : 0, (long long unsigned int) packet->tick_timestamp,
+		      (long long unsigned int) dst->soulseek_last_safe_access_time);
 
       if(packet->payload_packet_len == 431) {
 	if(dst != NULL) {

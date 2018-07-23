@@ -190,7 +190,7 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if (message_id == MSG_SD){
-    NDPI_LOG_DBG2(ndpi_struct, "SOME/IP-SD currently not supported\n", message_type);
+    NDPI_LOG_DBG2(ndpi_struct, "SOME/IP-SD currently not supported [%d]\n", message_type);
   }
 
   //Filtering by port. 
