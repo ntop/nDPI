@@ -8186,6 +8186,7 @@ ndpi_protocol_match host_match[] = {
 
   { "upload.youtube.com", NULL, NULL,       "YouTubeUpload",    NDPI_PROTOCOL_YOUTUBE_UPLOAD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "upload.video.google.com", NULL, NULL,  "YouTubeUpload",    NDPI_PROTOCOL_YOUTUBE_UPLOAD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+  { "youtubei.googleapis.com", NULL, NULL,  "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "youtube.", NULL, NULL,                 "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "youtu.be.", NULL, NULL,                "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "yt3.ggpht.com", NULL, NULL,            "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
