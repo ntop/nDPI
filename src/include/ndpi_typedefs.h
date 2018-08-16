@@ -1099,8 +1099,9 @@ struct ndpi_flow_struct {
 
   /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
- 
 
+  ndpi_protocol_category_t category;
+  
 /* NDPI_PROTOCOL_REDIS */
   u_int8_t redis_s2d_first_char, redis_d2s_first_char;
   
@@ -1206,5 +1207,11 @@ typedef struct {
   u_int8_t cidr;
   u_int8_t value;
 } ndpi_network;
+
+typedef struct {
+  int protocol_id;
+  ndpi_protocol_category_t protocol_category;
+  ndpi_protocol_breed_t protocol_breed;
+} ndpi_protocol_match_result;
 
 #endif /* __NDPI_TYPEDEFS_H__ */

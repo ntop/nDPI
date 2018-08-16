@@ -207,12 +207,16 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
 	flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
 
-      if(j > 0)
+      if(j > 0) {
+	ndpi_protocol_match_result ret_match;
+	
 	ndpi_match_host_subprotocol(ndpi_struct, flow, 
 				    (char *)flow->host_server_name,
 				    strlen((const char*)flow->host_server_name),
+				    &ret_match,
 				    NDPI_PROTOCOL_DNS);
-
+      }
+      
 #ifdef DNS_DEBUG
       NDPI_LOG_DBG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
 	     flow->protos.dns.num_queries, flow->protos.dns.num_answers,

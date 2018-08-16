@@ -84,7 +84,8 @@ void ndpi_search_fbzero(struct ndpi_detection_module_struct *ndpi_struct,
 	 && (t->tag[2] == 'I') && (t->tag[3] == '\0')) {
 	char *value = (char*)&packet->payload[data_offset + data_prev_offset];
 	u_int tag_len = t->tag_offset_len-data_prev_offset, max_len;
-
+	ndpi_protocol_match_result ret_match;
+	
 	max_len = ndpi_min(tag_len, sizeof(flow->host_server_name)-1);
 
 	strncpy((char*)flow->host_server_name, value, max_len);
@@ -99,6 +100,7 @@ void ndpi_search_fbzero(struct ndpi_detection_module_struct *ndpi_struct,
 	  
 	ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
 				    strlen((const char *)flow->host_server_name),
+				    &ret_match,
 				    NDPI_PROTOCOL_FBZERO);
 	return;
       }

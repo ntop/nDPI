@@ -172,7 +172,8 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   if((flow->l4.tcp.http_stage == 0) || (flow->http.url && flow->http_detected)) {
       char *double_col = strchr((char*)flow->host_server_name, ':');
-
+      ndpi_protocol_match_result ret_match;
+      
       if(double_col) double_col[0] = '\0';
 
     /**
@@ -182,6 +183,7 @@ static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struc
     */
     ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
 				strlen((const char *)flow->host_server_name),
+				&ret_match,
 				NDPI_PROTOCOL_HTTP);
   }
 }
@@ -349,12 +351,16 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	     packet->host_line.len, packet->host_line.ptr);
 
     /* call ndpi_match_host_subprotocol to see if there is a match with known-host HTTP subprotocol */
-    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
+    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected) {
+      ndpi_protocol_match_result ret_match;
+      
       ndpi_match_host_subprotocol(ndpi_struct, flow,
 				  (char*)packet->host_line.ptr,
 				  packet->host_line.len,
+				  &ret_match,
 				  NDPI_PROTOCOL_HTTP);
-
+    }
+    
     /* Copy result for nDPI apps */
     if(!ndpi_struct->disable_metadata_export) {
       len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
@@ -395,12 +401,16 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
        && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
-       && (packet->http_origin.len > 0))
+       && (packet->http_origin.len > 0)) {
+      ndpi_protocol_match_result ret_match;
+      
       ndpi_match_host_subprotocol(ndpi_struct, flow,
 				  (char *)packet->http_origin.ptr,
 				  packet->http_origin.len,
+				  &ret_match,
 				  NDPI_PROTOCOL_HTTP);
-
+    }
+    
     if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
       if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) {
 	NDPI_LOG_INFO(ndpi_struct, "found HTTP/%s\n", 
@@ -440,10 +450,13 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
 	     packet->content_line.len, packet->content_line.ptr);
 
-    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
+    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected) {
+      ndpi_protocol_match_result ret_match;
+      
       ndpi_match_content_subprotocol(ndpi_struct, flow,
 				     (char*)packet->content_line.ptr, packet->content_line.len,
-				     NDPI_PROTOCOL_HTTP);
+				     &ret_match, NDPI_PROTOCOL_HTTP);
+    }
   }
 }
 

@@ -6,7 +6,7 @@
 # make -f Makefile.simple
 #
 CFLAGS += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -g
-RANLIB=ranlib
+RANLIB  = ranlib
 
 OBJECTS = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) ndpi_main.o
 HEADERS = $(wildcard ../include/*.h)

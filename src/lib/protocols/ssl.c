@@ -327,13 +327,13 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
     }
     /* Client hello, Server Hello, and certificate packets probably all checked in this case */
     if ((packet->ssl_certificate_num_checks >= 3)
-    && (flow->l4.tcp.seen_syn)
-    && (flow->l4.tcp.seen_syn_ack)
-    && (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
-    {
-      /* We're done processing extra packets since we've probably checked all possible cert packets */
-      return 0;
-    }
+	&& (flow->l4.tcp.seen_syn)
+	&& (flow->l4.tcp.seen_syn_ack)
+	&& (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
+      {
+	/* We're done processing extra packets since we've probably checked all possible cert packets */
+	return 0;
+      }
   }
   /* 1 means keep looking for more packets */
   return 1;
@@ -368,22 +368,27 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 #ifdef CERTIFICATE_DEBUG
 	NDPI_LOG_DBG2(ndpi_struct, "***** [SSL] %s\n", certificate);
 #endif
+	ndpi_protocol_match_result ret_match;
 	u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate,
-							 strlen(certificate), NDPI_PROTOCOL_SSL);
+							 strlen(certificate),
+							 &ret_match,
+							 NDPI_PROTOCOL_SSL);
+	
 	if(subproto != NDPI_PROTOCOL_UNKNOWN) {
-    /* If we've detected the subprotocol from client certificate but haven't had a chance
-      * to see the server certificate yet, set up extra packet processing to wait
-      * a few more packets. */
-    if((flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0')) {
-      sslInitExtraPacketProcessing(0, flow);
-    }
-    ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
-            ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
-    return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
-  }
+	  /* If we've detected the subprotocol from client certificate but haven't had a chance
+	   * to see the server certificate yet, set up extra packet processing to wait
+	   * a few more packets. */
+	  if((flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0')) {
+	    sslInitExtraPacketProcessing(0, flow);
+	  }
+	  
+	  ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
+				     ndpi_ssl_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL));
+	  return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
+	}
 
-  if(ndpi_is_ssl_tor(ndpi_struct, flow, certificate) != 0)
-    return(rc);
+	if(ndpi_is_ssl_tor(ndpi_struct, flow, certificate) != 0)
+	  return(rc);
       }
 
       if(((packet->ssl_certificate_num_checks >= 2)
@@ -394,9 +399,9 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	 /* || (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') */
 	 ) {
 	ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
-     }
+      }
+    }
   }
-     }
   return(0);
 }
 
@@ -480,7 +485,7 @@ static void ssl_mark_and_payload_search_for_other_protocols(struct
       ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL_NO_CERT);
     } else
       NDPI_LOG_INFO(ndpi_struct, "found ssl\n");
-      ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
+    ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
   }
 }
 
@@ -516,16 +521,16 @@ static u_int8_t ndpi_search_sslv3_direction1(struct ndpi_detection_module_struct
       u_int32_t cert_start;
 
       NDPI_LOG_DBG2(ndpi_struct,
-	       "maybe SSLv3 server hello split into smaller packets\n");
+		    "maybe SSLv3 server hello split into smaller packets\n");
 
       /* lets hope at least the server hello and the start of the certificate block are in the first packet */
       cert_start = ntohs(get_u_int16_t(packet->payload, 7)) + 5 + 4;
       NDPI_LOG_DBG2(ndpi_struct, "suspected start of certificate: %u\n",
-	       cert_start);
+		    cert_start);
 
       if(cert_start < packet->payload_packet_len && packet->payload[cert_start] == 0x0b) {
 	NDPI_LOG_DBG2(ndpi_struct,
-		 "found 0x0b at suspected start of certificate block\n");
+		      "found 0x0b at suspected start of certificate block\n");
 	return 2;
       }
     }
@@ -536,16 +541,16 @@ static u_int8_t ndpi_search_sslv3_direction1(struct ndpi_detection_module_struct
       u_int32_t cert_start;
 
       NDPI_LOG_DBG2(ndpi_struct,
-	       "maybe SSLv3 server hello split into smaller packets but with seperate record for the certificate\n");
+		    "maybe SSLv3 server hello split into smaller packets but with seperate record for the certificate\n");
 
       /* lets hope at least the server hello record and the start of the certificate record are in the first packet */
       cert_start = ntohs(get_u_int16_t(packet->payload, 7)) + 5 + 5 + 4;
       NDPI_LOG_DBG2(ndpi_struct, "suspected start of certificate: %u\n",
-	       cert_start);
+		    cert_start);
 
       if(cert_start < packet->payload_packet_len && packet->payload[cert_start] == 0x0b) {
 	NDPI_LOG_DBG2(ndpi_struct,
-		 "found 0x0b at suspected start of certificate block\n");
+		      "found 0x0b at suspected start of certificate block\n");
 	return 2;
       }
     }
@@ -603,7 +608,7 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
        * so go on checking for certificate patterns for a couple more packets
        */
       NDPI_LOG_DBG2(ndpi_struct,
-	       "ssl flow but check another packet for patterns\n");
+		    "ssl flow but check another packet for patterns\n");
       ssl_mark_and_payload_search_for_other_protocols(ndpi_struct, flow);
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) {
 	/* still ssl so check another packet */
@@ -685,7 +690,7 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       return;
     } else if(ret == 2) {
       NDPI_LOG_DBG2(ndpi_struct,
-	       "sslv3 server len match with split packet -> check some more packets for SSL patterns\n");
+		    "sslv3 server len match with split packet -> check some more packets for SSL patterns\n");
       ssl_mark_and_payload_search_for_other_protocols(ndpi_struct, flow);
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) {
 	flow->l4.tcp.ssl_stage = 3;

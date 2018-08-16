@@ -346,6 +346,7 @@ extern "C" {
    * @par    ndpi_struct         = the detection module
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
+   * @par    ret_match           = completed returned match information
    * @par    is_host_match       = value of the second field of struct ndpi_automa
    * @return the ID of the matched subprotocol
    *
@@ -353,6 +354,7 @@ extern "C" {
   int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				    char *string_to_match,
 				    u_int string_to_match_len,
+				    ndpi_protocol_match_result *ret_match,
 				    u_int8_t is_host_match);
   /**
    * Check if the host passed match with a protocol
@@ -361,6 +363,7 @@ extern "C" {
    * @par    flow                = the flow where match the host
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
+   * @par    ret_match           = completed returned match information
    * @par    master_protocol_id  = value of the ID associated to the master protocol detected
    * @return the ID of the matched subprotocol
    *
@@ -369,6 +372,7 @@ extern "C" {
 				  struct ndpi_flow_struct *flow,
 				  char *string_to_match,
 				  u_int string_to_match_len,
+				  ndpi_protocol_match_result *ret_match,
 				  u_int16_t master_protocol_id);
 
 
@@ -379,6 +383,7 @@ extern "C" {
    * @par    flow                = the flow where match the host
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
+   * @par    ret_match           = completed returned match information
    * @par    master_protocol_id  = value of the ID associated to the master protocol detected
    * @return the ID of the matched subprotocol
    *
@@ -387,6 +392,7 @@ extern "C" {
 				     struct ndpi_flow_struct *flow,
 				     char *string_to_match,
 				     u_int string_to_match_len,
+				     ndpi_protocol_match_result *ret_match,
 				     u_int16_t master_protocol_id);
   /**
    * Exclude protocol from search

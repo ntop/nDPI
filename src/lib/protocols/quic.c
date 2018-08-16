@@ -107,6 +107,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	    if((sni_offset+len) < udp_len) {
 	      if(!ndpi_struct->disable_metadata_export) {
 		int max_len = sizeof(flow->host_server_name)-1, j = 0;
+		ndpi_protocol_match_result ret_match;
 		
 		if(len > max_len) len = max_len;
 		
@@ -118,6 +119,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 		ndpi_match_host_subprotocol(ndpi_struct, flow, 
 					    (char *)flow->host_server_name,
 					    strlen((const char*)flow->host_server_name),
+					    &ret_match,
 					    NDPI_PROTOCOL_QUIC);
 	      }
 	    }
