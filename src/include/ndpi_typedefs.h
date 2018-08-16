@@ -1194,7 +1194,7 @@ struct ndpi_flow_struct {
 typedef struct {
   char *string_to_match, *string2_to_match, *pattern_to_match, *proto_name;
   int protocol_id;
-  ndpi_protocol_category_t proto_category;
+  ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match;
 

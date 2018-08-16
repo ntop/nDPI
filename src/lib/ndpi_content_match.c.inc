@@ -8377,6 +8377,8 @@ ndpi_protocol_match host_match[] = {
   { ".1kxun.", NULL, NULL,                  "1kxun",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "tcad.wedolook.com", NULL, NULL,        "1kxun",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
+  { "baidu.com", NULL, NULL,                "baidu",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
+
   { ".icq.", NULL, NULL,                    "ICQ",              NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "icq.", NULL, NULL,                     "ICQ",              NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
