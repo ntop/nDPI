@@ -5714,7 +5714,7 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 						struct ndpi_flow_struct *flow,
 						char *string_to_match, u_int string_to_match_len,
 						u_int16_t master_protocol_id,
-						ndpi_automa_match_string_subprotocol *ret_match,
+						ndpi_protocol_match_result *ret_match,
 						u_int8_t is_host_match) {
   int rv = NDPI_PROTOCOL_UNKNOWN;
   struct hs *hs = (struct hs*)ndpi_struct->hyperscan;
