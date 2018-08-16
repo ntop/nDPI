@@ -54,16 +54,24 @@ fi
 
 HS_LIB=
 HS_INC=
-BKP=$LIBS
-LIBS="$LIBS -lstdc++ -lm"
-AC_CHECK_LIB([hs], [hs_compile_multi], AC_DEFINE_UNQUOTED(HAVE_HYPERSCAN, 1, [Intel Hyperscan is present]))
-LIBS=$BKP
 
-if test "x$ac_cv_lib_hs_hs_compile_multi" = xyes; then :
-AC_CHECK_LIB([m], [pow])
-AC_CHECK_LIB([stdc++], [main])
-HS_INC=`pkg-config --cflags libhs`
-HS_LIB=`pkg-config --libs libhs`
+AC_ARG_WITH(hyperscan,          [  --with-hyperscan          Enable nDPI build with Intel Hyperscan])
+
+if test "${with_hyperscan+set}" = set; then
+     BKP=$LIBS
+     LIBS="$LIBS -lstdc++ -lm"
+     AC_CHECK_LIB([hs], [hs_compile_multi], AC_DEFINE_UNQUOTED(HAVE_HYPERSCAN, 1, [Intel Hyperscan is present]))
+     LIBS=$BKP
+
+     if test "x$ac_cv_lib_hs_hs_compile_multi" = xyes; then :
+          AC_CHECK_LIB([m], [pow])
+          AC_CHECK_LIB([stdc++], [main])
+          HS_INC=`pkg-config --cflags libhs`
+          HS_LIB=`pkg-config --libs libhs`
+     else
+          AC_MSG_RESULT([Intel Hyperscan not found, exiting. See https://github.com/intel/hyperscan/blob/master/doc/dev-reference/getting_started.rst for install/build instructions])
+          exit 1
+     fi
 fi
 
 if test -f $PCAP_HOME/libpcap/libpcap.a; then :
