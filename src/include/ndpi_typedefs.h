@@ -26,6 +26,9 @@
 
 #include "ndpi_define.h"
 
+/* Needed to have access to HAVE_* defines */
+#include "ndpi_config.h"
+
 /* NDPI_LOG_LEVEL */
 typedef enum {
   NDPI_LOG_ERROR,

@@ -47,7 +47,7 @@
 #include "third_party/src/hash.c"
 
 #ifdef HAVE_HYPERSCAN
-#include <hs.h>
+#include <hs/hs.h>
 #endif
 
 #ifdef HAVE_HYPERSCAN
