@@ -7954,6 +7954,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x0, 0, 0 }
 };
 
+
 /* ****************************************************** */
 
 /*
@@ -8006,44 +8007,62 @@ static ndpi_network host_protocol_list[] = {
 
 */
 
+/* ****************************************************** */
+
+/* 
+
+Each part of a domain name can be no longer than 63 characters. There are no single-digit top-level domains and none contain digits. It doesn't look like ICANN will approve such domains either.
+
+https://www.regular-expressions.info/email.html
+
+We also add an optional .co to match domains such as .co.uk
+
+(?i) is to make searches case insensitive
+*/
+
+#define TLD "(?i)(\\.co){0,1}\\.[a-z]{2,63}$"
+
+/* ****************************************************** */
+
 ndpi_protocol_match host_match[] = {
-  { "s3.ll.dash.row.aiv-cdn.net", NULL, "s3\\.ll\\.dash\\.row\\.aiv-cdn\\.net",  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "s3.ll.dash.row.aiv-cdn.net", NULL, "s3\\.ll\\.dash\\.row\\.aiv-cdn\\.net",          "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "s3-dub.cf.dash.row.aiv-cdn.net", NULL, "s3-dub\\.cf\\.dash\\.row\\.aiv-cdn\\.net",  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { "dmqdd6hw24ucf.cloudfront.net", NULL, "dmqdd6hw24ucf\\.cloudfront\\.net",  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { "d25xi40x97liuc.cloudfront.net", NULL, "d25xi40x97liuc\\.cloudfront\\.net",  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".aiv-delivery.net", NULL, "\\.aiv-delivery\\.net",                          "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { "amazon.", NULL, NULL,                                 "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { "amazon.com", NULL, "amazon\\.com$",                   "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { "images-amazon.com", NULL, "images-amazon\\.com$",     "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { "amazonaws.com", NULL, "amazonaws\\.com$",             "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { "amazon-adsystem.com", NULL, "amazon-adsystem\\.com$", "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".cloudfront.net", NULL, "\\.cloudfront\\.net$",       "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dmqdd6hw24ucf.cloudfront.net", NULL, "dmqdd6hw24ucf\\.cloudfront\\.net",            "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "d25xi40x97liuc.cloudfront.net", NULL, "d25xi40x97liuc\\.cloudfront\\.net",          "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { ".aiv-delivery.net", NULL, "\\.aiv-delivery\\.net",                                  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "amazon.", NULL, NULL,                              "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { "amazon.com", NULL, "amazon" TLD,                   "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { "images-amazon.com", NULL, "images-amazon" TLD,     "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "amazonaws.com", NULL, "amazonaws" TLD,             "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "amazon-adsystem.com", NULL, "amazon-adsystem" TLD, "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".cloudfront.net", NULL, "\\.cloudfront" TLD,       "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { ".push.apple.com", NULL, NULL,          "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
-  { ".apple-dns.net", NULL, NULL,           "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { ".mzstatic.com", NULL, NULL,            "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { ".aaplimg.com", NULL, NULL,             "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { "iosapps.itunes.apple.com", NULL, NULL, "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* iOS */
-  { "osxapps.itunes.apple.com", NULL, NULL, "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* MacOS */
-  { "buy.itunes.apple.com", NULL, NULL,     "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "su.itunes.apple.com", NULL, NULL,      "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "se.itunes.apple.com", NULL, NULL,      "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "myapp.itunes.apple.com", NULL, NULL,   "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "swscan.apple.com", NULL, NULL,         "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "itunes-apple.com", NULL, NULL,         "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "itunes.apple.com", NULL, NULL,         "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { "tlnk.io", NULL, NULL,         	    "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { "aaplimg.com", NULL, NULL,              "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { ".apple.com", NULL, NULL,               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { ".icloud.com", NULL, NULL,              "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".push.apple.com", NULL, "\\.push\\.apple" TLD,                   "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
+  { ".apple-dns.net", NULL, "\\.apple-dns" TLD,                       "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { ".mzstatic.com", NULL, "\\.mzstatic" TLD,                         "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { ".aaplimg.com", NULL, "\\.aaplimg" TLD,                           "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { "aaplimg.com", NULL, "aaplimg" TLD,                               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { ".apple.com", NULL, "\\.apple" TLD,                               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { ".icloud.com", NULL, "\\.icloud" TLD,                             "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { "iosapps.itunes.apple.com", NULL, "iosapps\\.itunes\\.apple" TLD, "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* iOS */
+  { "osxapps.itunes.apple.com", NULL, "osxapps\\.itunes\\.apple" TLD, "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* MacOS */
+  { "buy.itunes.apple.com", NULL, "buy\\.itunes\\.apple" TLD,         "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { "su.itunes.apple.com", NULL, "su\\.itunes\\.apple" TLD,           "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { "se.itunes.apple.com", NULL, "se\\.itunes\\.apple" TLD,           "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { "myapp.itunes.apple.com", NULL, "myapp\\.itunes\\.apple" TLD,     "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { "swscan.apple.com", NULL, "swscan\\.apple" TLD,                   "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { "itunes-apple.com", NULL, "itunes-apple" TLD,                     "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+  { "itunes.apple.com", NULL, "itunes\\.apple" TLD,                   "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  { "tlnk.io", NULL, "tlnk" TLD,         	                      "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
-  { ".cnn.c", NULL, NULL,                   "CNN",              NDPI_PROTOCOL_CNN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+
+  { ".cnn.c", NULL, "\\.cnn" TLD,           "CNN",              NDPI_PROTOCOL_CNN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".cnn.net", NULL, NULL,                 "CNN",              NDPI_PROTOCOL_CNN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
-  { ".dropbox.com", NULL, NULL,             "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".dropboxstatic.com", NULL, NULL,       "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".dropbox-dns.com", NULL, NULL,         "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
-  { "log.getdropbox.com", NULL, NULL,       "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".dropbox.com", NULL, ".\\dropbox" TLD,             "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".dropboxstatic.com", NULL, "\\.dropboxstatic" TLD, "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".dropbox-dns.com", NULL, "\\.dropbox-dns" TLD,     "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "log.getdropbox.com", NULL, "log\\.getdropbox" TLD, "DropBox",          NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".ebay.", NULL, NULL,                   "eBay",             NDPI_PROTOCOL_EBAY, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE }, /* or FUN */
   { ".ebay.com", NULL, NULL,                "eBay",             NDPI_PROTOCOL_EBAY, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },

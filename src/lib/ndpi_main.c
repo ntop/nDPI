@@ -5648,9 +5648,23 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   return(match.number);
 }
 
-/* ****************************************************** */
+#ifdef HAVE_HYPERSCAN
 
-#ifndef HAVE_HYPERSCAN
+/* ******************************************************************** */
+
+static int hyperscanEventHandler(unsigned int id, unsigned long long from,
+				 unsigned long long to, unsigned int flags, void *ctx) {
+  *((int *)ctx) = (int)id;
+
+  NDPI_LOG_DBG2(ndpi_struct, "[NDPI] Match with: %d [from: %llu][to: %llu]\n", id, from, to);
+
+  /* return HS_SCAN_TERMINATED; */
+  return 0; /* keep searching */
+}
+
+#endif
+
+/* ****************************************************** */
 
 static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 						struct ndpi_flow_struct *flow,
@@ -5658,13 +5672,40 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 						u_int16_t master_protocol_id,
 						ndpi_protocol_match_result *ret_match,
 						u_int8_t is_host_match) {
-  int matching_protocol_id;
+  int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   struct ndpi_packet_struct *packet = &flow->packet;
 
+#ifndef HAVE_HYPERSCAN
   matching_protocol_id = ndpi_match_string_subprotocol(ndpi_struct, string_to_match,
 						       string_to_match_len, ret_match,
 						       is_host_match);
-	 
+
+#else
+  struct hs *hs = (struct hs*)ndpi_struct->hyperscan;
+  hs_error_t status;
+  /*
+    TODO HYPERSCAN
+    In case of match fill up ret_match and set flow protocol + category
+   */
+  status = hs_scan(hs->database, string_to_match,
+		   string_to_match_len, 0, hs->scratch,
+		   hyperscanEventHandler, &matching_protocol_id);
+
+  if(status == HS_SUCCESS) {
+    NDPI_LOG_DBG2(ndpi_struct, "[NDPI] Hyperscan engine completed normally. Result: %s [%d][%s]\n",
+		 ndpi_get_proto_name(ndpi_struct, matching_protocol_id), matching_protocol_id, string_to_match);
+  } else if(status == HS_SCAN_TERMINATED) {
+    NDPI_LOG_DBG2(ndpi_struct, "[NDPI] Hyperscan engine was terminated by callback. Result: %s [%d][%s]\n",
+		  ndpi_get_proto_name(ndpi_struct, matching_protocol_id), matching_protocol_id, string_to_match);
+  } else {
+    NDPI_LOG_DBG2(ndpi_struct, "[NDPI] Hyperscan returned with error.\n");
+  }
+
+  ret_match->protocol_id = matching_protocol_id,
+    ret_match->protocol_category = ndpi_struct->proto_defaults[matching_protocol_id].protoCategory,
+    ret_match->protocol_breed = ndpi_struct->proto_defaults[matching_protocol_id].protoBreed;
+#endif
+
 #ifdef DEBUG
   {
     char m[256];
@@ -5686,7 +5727,7 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
     flow->detected_protocol_stack[0] = packet->detected_protocol_stack[0],
       flow->detected_protocol_stack[1] = packet->detected_protocol_stack[1],
       flow->category = ret_match->protocol_category;
-    
+
     return(packet->detected_protocol_stack[0]);
   }
 
@@ -5697,41 +5738,6 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 
   return(NDPI_PROTOCOL_UNKNOWN);
 }
-
-#else
-
-/* ******************************************************************** */
-
-static int hyperscanEventHandler(unsigned int id, unsigned long long from,
-				 unsigned long long to, unsigned int flags, void *ctx) {
-  *((int *)ctx) = (int)id;
-  return HS_SCAN_TERMINATED;
-}
-
-/* *********************************************** */
-
-static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-						struct ndpi_flow_struct *flow,
-						char *string_to_match, u_int string_to_match_len,
-						u_int16_t master_protocol_id,
-						ndpi_protocol_match_result *ret_match,
-						u_int8_t is_host_match) {
-  int rv = NDPI_PROTOCOL_UNKNOWN;
-  struct hs *hs = (struct hs*)ndpi_struct->hyperscan;
-
-  /*
-    TODO HYPERSCAN
-    In case of match fill up ret_match and set flow protocol + category
-   */
-  if(hs_scan(hs->database, string_to_match,
-	     string_to_match_len, 0, hs->scratch,
-	     hyperscanEventHandler, &rv) != HS_SUCCESS)
-    NDPI_LOG_ERR(ndpi_struct, "[NDPI] Hyperscan match returned error\n");
-
-  return rv;
-}
-
-#endif
 
 /* ****************************************************** */
 
