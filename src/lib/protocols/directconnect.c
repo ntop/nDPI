@@ -78,8 +78,7 @@ static void ndpi_int_directconnect_add_connection(struct ndpi_detection_module_s
 						  const u_int8_t connection_type)
 {
 
-  struct ndpi_packet_struct *packet = &flow->packet;
-	
+  struct ndpi_packet_struct *packet = &flow->packet;	
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 

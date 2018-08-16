@@ -475,6 +475,9 @@ struct ndpi_flow_tcp_struct {
 /* NDPI_PROTOCOL_QQ */
   u_int16_t qq_nxt_len;
 
+  /* NDPI_PROTOCOL_WHATSAPP */
+  u_int8_t wa_matched_so_far;
+  
 /* NDPI_PROTOCOL_TDS */
   u_int8_t tds_login_version;
 
