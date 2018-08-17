@@ -8043,7 +8043,7 @@ ndpi_protocol_match host_match[] = {
   { ".aaplimg.com", NULL, "\\.aaplimg" TLD,                           "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "aaplimg.com", NULL, "aaplimg" TLD,                               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
   { ".apple.com", NULL, "\\.apple" TLD,                               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-  { ".icloud.com", NULL, "\\.icloud" TLD,                             "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".icloud.com", NULL, "\\.icloud\\.com",                           "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "iosapps.itunes.apple.com", NULL, "iosapps\\.itunes\\.apple" TLD, "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* iOS */
   { "osxapps.itunes.apple.com", NULL, "osxapps\\.itunes\\.apple" TLD, "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE }, /* MacOS */
   { "buy.itunes.apple.com", NULL, "buy\\.itunes\\.apple" TLD,         "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
@@ -8173,11 +8173,11 @@ ndpi_protocol_match host_match[] = {
   { "nflxvideo.net", NULL, "nflxvideo" TLD,                       "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { "nflxso.net", NULL, "nflxso" TLD,                             "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
-  { ".skype.", NULL, "\\.skype" TLD,                                   "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".skypeassets.", NULL, "\\.skypeassets" TLD,                       "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".skypedata.", NULL, "\\.skypedata" TLD,                           "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".skype.", NULL, "\\.skype\\.",                                    "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".skypeassets.", NULL, "\\.skypeassets\\.",                        "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".skypedata.", NULL, "\\.skypedata\\.",                            "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { ".skypeecs-", NULL, "\\.skypeecs-",                                "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".skypeforbusiness.", NULL, "\\.skypeforbusiness" TLD,             "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".skypeforbusiness.", NULL, "\\.skypeforbusiness\\.",              "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { ".lync.com", NULL, "\\.lync" TLD,                                  "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "e7768.b.akamaiedge.net", NULL, "e7768\\.b\\.akamaiedge" TLD,      "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "e4593.dspg.akamaiedge.net", NULL, "e4593\\.dspg\\.akamaiedge" TLD,"Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
