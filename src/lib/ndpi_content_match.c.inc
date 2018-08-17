@@ -8342,8 +8342,8 @@ ndpi_protocol_match host_match[] = {
   { ".steamstatic.com", NULL, "\\.steamstatic" TLD,                          "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { "steamcommunity-a.akamaihd.net", NULL, "steamcommunity-a\\.akamaihd" TLD,"Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
-  { ".wechat.com", NULL, "\\.wechat" TLD,                              "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
-  { ".wechat.org", NULL, NULL,                                         "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".wechat.com", NULL, "\\.wechat\\.com",                            "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { ".wechat.org", NULL, "\\.wechat\\.org",                            "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".wechatapp.com", NULL, "\\.wechatapp" TLD,                        "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".we.chat", NULL, "\\.we\\.chat",                                  "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".wx.", NULL, "\\.wx\\.",                                          "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
