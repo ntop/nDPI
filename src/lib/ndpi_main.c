@@ -27,6 +27,7 @@
 
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/types.h>
 #include "ahocorasick.h"
 #include "libcache.h"
 
