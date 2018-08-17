@@ -1,10 +1,10 @@
-DNS	11	1129	6
+DNS	10	1059	5
 HTTP	19	2275	5
 SSL	15	1234	10
 Google	10	660	5
 Amazon	2	132	1
 QUIC	23	4118	2
-Sina(Weibo)	418	258007	15
+Sina(Weibo)	419	258077	16
 
 	1	TCP 192.168.1.105:35803 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][52 pkts/5367 bytes <-> 54 pkts/71536 bytes][Host: img.t.sinajs.cn]
 	2	TCP 192.168.1.105:35804 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][32 pkts/3624 bytes <-> 40 pkts/50657 bytes][Host: img.t.sinajs.cn]
@@ -49,4 +49,4 @@ Sina(Weibo)	418	258007	15
 	41	TCP 192.168.1.105:52272 -> 42.156.184.19:443 [proto: 91/SSL][1 pkts/74 bytes -> 0 pkts/0 bytes]
 	42	TCP 192.168.1.105:52274 -> 42.156.184.19:443 [proto: 91/SSL][1 pkts/74 bytes -> 0 pkts/0 bytes]
 	43	UDP 192.168.1.105:50533 -> 192.168.1.1:53 [proto: 5.200/DNS.Sina(Weibo)][cat: SocialNetwork/6][1 pkts/74 bytes -> 0 pkts/0 bytes][Host: data.weibo.com]
-	44	UDP 192.168.1.105:16804 -> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/70 bytes -> 0 pkts/0 bytes][Host: c.weibo.cn]
+	44	UDP 192.168.1.105:16804 -> 192.168.1.1:53 [proto: 5.200/DNS.Sina(Weibo)][cat: SocialNetwork/6][1 pkts/70 bytes -> 0 pkts/0 bytes][Host: c.weibo.cn]
