@@ -48,9 +48,13 @@
 
 #ifdef HAVE_HYPERSCAN
 #include <hs/hs.h>
-#endif
 
-#ifdef HAVE_HYPERSCAN
+struct hs_list {
+    char *expression;
+    unsigned int id;
+    struct hs_list *next;
+};
+
 struct hs {
   hs_database_t *database;
   hs_scratch_t  *scratch;
