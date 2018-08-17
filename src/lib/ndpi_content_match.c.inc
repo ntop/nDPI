@@ -8015,12 +8015,15 @@ Each part of a domain name can be no longer than 63 characters. There are no sin
 
 https://www.regular-expressions.info/email.html
 
-We also add an optional .co to match domains such as .co.uk
-
 (?i) is to make searches case insensitive
+
+(?:) is a non-capturing group used to allow patterns such as .co.uk or .com.cn
+     The non-capturing group is used in a nested fashion to capture the
+     .co, and then, optionally, another m.
+
 */
 
-#define TLD "(?i)(\\.co){0,1}\\.[a-z]{2,63}$"
+#define TLD "(?i)(?:\\.co(?:m)?)?\\.[a-z]{2,63}$"
 
 /* ****************************************************** */
 
