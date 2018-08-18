@@ -811,10 +811,26 @@ static int hyperscan_load_patterns(struct hs *hs, u_int num_patterns,
 
 /* ******************************************************************** */
 
+char* string2hex(const char *pat) {
+  u_int patlen, i;
+  char *hexbuf, *buf;
+
+  patlen = strlen(pat);
+  hexbuf = (char*)calloc(sizeof(char), patlen * 4 + 1);
+
+  for (i = 0, buf = hexbuf; i < patlen; i++, buf += 4) {
+    snprintf(buf, 5, "\\x%02x", (unsigned char)pat[i]);
+  }
+  *buf = '\0';
+
+  return hexbuf;
+}
+
 static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
   u_int num_patterns = 0, i;
-  const char **expressions;
+  char **expressions;
   unsigned int *ids;
+  unsigned char *need_to_be_free;
   struct hs *hs;
   int rc;
 
@@ -823,13 +839,10 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
   hs = (struct hs*)ndpi_mod->hyperscan;
 
   for(i=0; host_match[i].string_to_match != NULL; i++) {
-    if(host_match[i].pattern_to_match) {
-      /*  printf("[DEBUG] %s\n", host_match[i].pattern_to_match); */
-      num_patterns++;
-    }
+    num_patterns++;
   }
 
-  expressions = (const char**)calloc(sizeof(char*), num_patterns+1);
+  expressions = (char**)calloc(sizeof(char*), num_patterns+1);
   if(!expressions) return(-1);
 
   ids = (unsigned int*)calloc(sizeof(unsigned int), num_patterns+1);
@@ -838,15 +851,31 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
     return(-1);
   }
 
+  need_to_be_free = (unsigned char*)calloc(sizeof(unsigned char), num_patterns+1);
+  if (!need_to_be_free) {
+      free(expressions);
+      free(ids);
+      return(-1);
+  }
+
   for(i=0, num_patterns=0; host_match[i].string_to_match != NULL; i++) {
     if(host_match[i].pattern_to_match) {
       expressions[num_patterns] = host_match[i].pattern_to_match;
-      ids[num_patterns]         = host_match[i].protocol_id;
-      num_patterns++;
+      need_to_be_free[num_patterns] = 0;
+    } else {
+      expressions[num_patterns] = string2hex(host_match[i].string_to_match);
+      need_to_be_free[num_patterns] = 1;
+      /*printf("[DEBUG] %s\n", expressions[num_patterns]);*/
     }
+    ids[num_patterns] = host_match[i].protocol_id;
+    num_patterns++;
   }
 
-  rc = hyperscan_load_patterns(hs, num_patterns, expressions, ids);
+  rc = hyperscan_load_patterns(hs, num_patterns, (const char**)expressions, ids);
+
+  for (i = 0; i < num_patterns; ++i)
+    if (need_to_be_free[i])
+      free(expressions[i]);
   free(expressions), free(ids);
 
   return(rc);
