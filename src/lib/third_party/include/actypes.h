@@ -44,7 +44,7 @@ typedef char AC_ALPHABET_t;
  **/
 typedef struct {
   int number;
-  u_int16_t category, breed;
+  unsigned int category, breed;
 } AC_REP_t;
 
 /* AC_PATTERN_t:
