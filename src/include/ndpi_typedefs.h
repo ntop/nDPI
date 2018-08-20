@@ -656,8 +656,8 @@ struct ndpi_flow_udp_struct {
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
-  ;
 #endif
+  ;
 
 /* ************************************************** */
 
