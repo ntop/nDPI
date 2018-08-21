@@ -1,6 +1,6 @@
 # CHANGELOG
 
-#### nDPI 2.4 (July 2018)
+#### nDPI 2.4 (August 2018)
 
 ## New Supported Protocols and Services
 
