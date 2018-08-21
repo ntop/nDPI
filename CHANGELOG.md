@@ -1,5 +1,63 @@
 # CHANGELOG
 
+#### nDPI 2.4 (July 2018)
+
+## New Supported Protocols and Services
+
+* Showmax.com
+* Musical.ly
+* RapidVideo
+* VidTO streaming service
+* Apache JServ Protocol
+* Facebook Messenger
+* FacebookZero protocol
+
+## Improvements
+
+* Improved YouTube support
+* Improved Netflix support
+* Updated Google Hangout detection
+* Updated Twitter address range
+* Updated Viber ports, subnet and domain
+* Updated AmazonVideo detection
+* Updated list of FaceBook sites
+* Initial Skype in/out support
+* Improved Tor detection
+* Improved hyperscan support and category definition
+* Custom categories loading, extended ndpiReader (`-c <file>`) for loading name-based categories
+
+## Fixes
+
+* Fixes for Instagram flows classified as Facebook
+* Fixed Spotify detection
+* Fixed minimum packet payload length for SSDP
+* Fixed length check in MSN, x-steam-sid, Tor certificate name
+* Increase client's maximum payload length for SSH
+* Fixed end-of-line bounds handling
+* Fixed substring matching
+* Fix for handling IP address based custom categories
+* Repaired wrong timestamp calculation
+* Fixed memory leak
+* Optimized memory usage
+
+## Other/Changes
+
+* New API calls:
+  * `ndpi_set_detection_preferences()`
+  * `ndpi_load_hostname_category()`
+  * `ndpi_enable_loaded_categories()`
+  * `ndpi_fill_protocol_category()`
+  * `ndpi_process_extra_packet()`
+* Skype CallIn/CallOut are now set as Skype.SkypeCallOut Skype.SkypeCallIn
+* Added support for SMTPS on port 587
+* Changed RTP from VoIP to Media category
+* Added site unavailable category
+* Added custom categories CUSTOM_CATEGORY_MINING, CUSTOM_CATEGORY_MALWARE, CUSTOM_CATEGORY_ADVERTISEMENT, CUSTOM_CATEGORY_BANNED_SITE
+* Implemented hash-based categories
+* Converted some not popular protocols to NDPI_PROTOCOL_GENERIC with category detection
+
+------------------------------------------------------------------------
+
 #### nDPI 2.2.2 (April 2018)
 
 ## Main New Features
@@ -95,7 +153,7 @@
 * Ubiquity AirControl 2
 * HEP (Extensible Encapsulation Protocol)
 * WhatsApp Voice vs WhatsApp (chat, no voice)
-* Viber	
+* Viber
 * Wechat
 * Github
 * Hotmail
@@ -124,7 +182,7 @@
 * Improved HTTP subprotocol matching
 * Implemented DHCP host name extraction
 * Updated Facebook detection by ip server ranges
-* Updated Twitter networks	  
+* Updated Twitter networks
 * Improved Microsoft detection
 * Enhanced Google detection
 * Improved BT-uTP protocol dissection
