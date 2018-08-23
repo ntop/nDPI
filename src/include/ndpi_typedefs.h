@@ -25,6 +25,7 @@
 #define __NDPI_TYPEDEFS_H__
 
 #include "ndpi_define.h"
+#include "ndpi_protocol_ids.h"
 
 /* Needed to have access to HAVE_* defines */
 #include "ndpi_config.h"
