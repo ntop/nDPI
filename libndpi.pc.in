@@ -7,4 +7,4 @@ Name: libndpi
 Description: deep packet inspection library
 Version: @VERSION@
 Libs: -L${libdir} -lndpi
-Cflags: -I${includedir}/libndpi-@VERSION@
+Cflags: -I${includedir}/ndpi
