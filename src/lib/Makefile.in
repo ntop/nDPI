@@ -32,7 +32,7 @@ $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(RANLIB) $@	       
 
 $(NDPI_LIB_SHARED): $(OBJECTS)
-	gcc -shared -fPIC -o $@ $(OBJECTS)
+	$(CC) -shared -fPIC -Wl,-soname,$(NDPI_LIB_SHARED) -o $@ $(OBJECTS)
 	ln -Fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
 
 %.o: %.c $(HEADERS) Makefile
