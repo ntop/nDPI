@@ -5,7 +5,7 @@ NDPI_MINOR="5"
 NDPI_PATCH="0"
 NDPI_VERSION_SHORT="$NDPI_MAJOR.$NDPI_MINOR.$NDPI_PATCH"
 
-rm -f configure config.h config.h.in src/lib/Makefile.in
+rm -f configure config.h config.h.in
 
 AUTOCONF=$(command -v autoconf)
 AUTOMAKE=$(command -v automake)

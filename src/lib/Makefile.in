@@ -1,0 +1,49 @@
+#
+# Simple non-autotools dependent makefile
+#
+# ./autogen.sh
+# cd src/lib
+# make Makefile
+#
+
+#
+# Installation directories
+#
+prefix     = /usr/local
+libdir     = ${prefix}/lib
+includedir = ${prefix}/include/ndpi
+
+CFLAGS += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -g
+RANLIB  = ranlib
+
+OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) ndpi_main.o
+HEADERS   = $(wildcard ../include/*.h)
+NDPI_LIB_STATIC      = libndpi.a
+NDPI_LIB_SHARED_BASE = libndpi.so
+NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE).@NDPI_VERSION_SHORT@
+NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
+
+all: $(NDPI_LIBS)
+
+ndpi_main.c: ndpi_content_match.c.inc
+
+$(NDPI_LIB_STATIC): $(OBJECTS)
+	   ar rc $@ $(OBJECTS)
+	   $(RANLIB) $@	       
+
+$(NDPI_LIB_SHARED): $(OBJECTS)
+	gcc -shared -fPIC -o $@ $(OBJECTS)
+	ln -Fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
+
+%.o: %.c $(HEADERS) Makefile
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo
+
+install: $(NDPI_LIBS)
+	mkdir -p $(DESTDIR)$(libdir)
+	cp $(NDPI_LIBS) $(DESTDIR)$(libdir)/
+	ln -Fs $(DESTDIR)$(libdir)/$(NDPI_LIB_SHARED) $(DESTDIR)$(libdir)/$(NDPI_LIB_SHARED_BASE)
+	mkdir -p $(DESTDIR)$(includedir)
+	cp ../include/*.h $(DESTDIR)$(includedir)
