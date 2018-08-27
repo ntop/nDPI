@@ -26,9 +26,6 @@
 
 #include "ndpi_define.h"
 
-/* Needed to have access to HAVE_* defines */
-#include "ndpi_config.h"
-
 /* NDPI_LOG_LEVEL */
 typedef enum {
   NDPI_LOG_ERROR,
@@ -854,15 +851,23 @@ typedef struct ndpi_proto {
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
 
+#ifdef NDPI_LIB_COMPILATION
+
+/* Needed to have access to HAVE_* defines */
+#include "ndpi_define.h"
+
 #ifdef HAVE_HYPERSCAN
+struct hs {
+  hs_database_t *database;
+  hs_scratch_t  *scratch;
+};
+
 struct hs_list {
   char *expression;
   unsigned int id;
   struct hs_list *next;
 };
 #endif
-
-#ifdef NDPI_LIB_COMPILATION
 
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
