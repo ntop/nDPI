@@ -49,17 +49,6 @@
 
 #ifdef HAVE_HYPERSCAN
 #include <hs/hs.h>
-
-struct hs_list {
-    char *expression;
-    unsigned int id;
-    struct hs_list *next;
-};
-
-struct hs {
-  hs_database_t *database;
-  hs_scratch_t  *scratch;
-};
 #endif
 
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"

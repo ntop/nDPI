@@ -854,6 +854,22 @@ typedef struct ndpi_proto {
 
 #ifdef NDPI_LIB_COMPILATION
 
+/* Needed to have access to HAVE_* defines */
+#include "ndpi_config.h"
+
+#ifdef HAVE_HYPERSCAN
+struct hs_list {
+    char *expression;
+    unsigned int id;
+    struct hs_list *next;
+};
+
+struct hs {
+  hs_database_t *database;
+  hs_scratch_t  *scratch;
+};
+#endif
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
