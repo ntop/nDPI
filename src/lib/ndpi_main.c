@@ -811,12 +811,13 @@ static int hyperscan_load_patterns(struct hs *hs, u_int num_patterns,
 
 /* ******************************************************************** */
 
-char* string2hex(const char *pat) {
+static char* string2hex(const char *pat) {
   u_int patlen, i;
   char *hexbuf, *buf;
 
   patlen = strlen(pat);
   hexbuf = (char*)calloc(sizeof(char), patlen * 4 + 1);
+  if(!hexbuf) return(-1);
 
   for (i = 0, buf = hexbuf; i < patlen; i++, buf += 4) {
     snprintf(buf, 5, "\\x%02x", (unsigned char)pat[i]);
