@@ -63,5 +63,5 @@ Amazon	2	126	1
 	57	UDP 192.168.1.7:57719 <-> 192.168.1.1:53 [proto: 5.133/DNS.NetFlix][cat: Streaming/17][1 pkts/85 bytes <-> 1 pkts/137 bytes][Host: sha2.san.akam.nflximg.net]
 	58	UDP 192.168.1.7:57093 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/113 bytes][Host: a1907.dscg.akamai.net]
 	59	UDP 192.168.1.7:51728 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/80 bytes <-> 1 pkts/112 bytes][Host: a803.dscg.akamai.net]
-	60	TCP 192.168.1.7:52929 -> 52.24.87.6:443 [proto: 91.178/SSL.Amazon][2 pkts/126 bytes -> 0 pkts/0 bytes]
+	60	TCP 192.168.1.7:52929 -> 52.24.87.6:443 [proto: 91.178/SSL.Amazon][cat: Web/5][2 pkts/126 bytes -> 0 pkts/0 bytes]
 	61	IGMP 192.168.1.7:0 -> 239.255.255.250:0 [proto: 82/IGMP][cat: Network/14][1 pkts/60 bytes -> 0 pkts/0 bytes]

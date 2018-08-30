@@ -3516,7 +3516,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
     if(flow->packet.l4_packet_len >=flow->packet.tcp->doff * 4) {
       flow->packet.payload_packet_len =
 	flow->packet.l4_packet_len -flow->packet.tcp->doff * 4;
-      flow->packet.actual_payload_len =flow->packet.payload_packet_len;
+      flow->packet.actual_payload_len = flow->packet.payload_packet_len;
       flow->packet.payload = ((u_int8_t *)flow->packet.tcp) + (flow->packet.tcp->doff * 4);
 
       /* check for new tcp syn packets, here
@@ -3526,15 +3526,17 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	 && flow->packet.tcp->ack == 0
 	 && flow->init_finished != 0
 	 && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-	if(flow->http.url)
-		ndpi_free(flow->http.url);
-	if(flow->http.content_type)
-		ndpi_free(flow->http.content_type);
-	memset(flow, 0, sizeof(*(flow)));
+	u_int8_t backup;
+	
+	if(flow->http.url)          ndpi_free(flow->http.url);
+	if(flow->http.content_type) ndpi_free(flow->http.content_type);
 
+	backup = flow->num_processed_pkts;
+	memset(flow, 0, sizeof(*(flow)));
+	flow->num_processed_pkts = backup;
+	
 	NDPI_LOG_DBG(ndpi_struct,
 		 "tcp syn packet for unknown protocol, reset detection state\n");
-
       }
     } else {
       /* tcp header not complete */
@@ -3547,6 +3549,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   } else {
     flow->packet.generic_l4_ptr = l4ptr;
   }
+
   return 0;
 }
 
@@ -3837,7 +3840,6 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-
 /* ********************************************************************************* */
 
 void ndpi_check_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
@@ -3932,6 +3934,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   }
 
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+  ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
 
   return(ret);
 }
@@ -4236,6 +4239,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   u_int32_t a;
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
 
+  flow->num_processed_pkts++;
+  
   if(ndpi_struct->ndpi_log_level >= NDPI_LOG_TRACE)
   	NDPI_LOG(flow ? flow->detected_protocol_stack[0]:NDPI_PROTOCOL_UNKNOWN,
 		  ndpi_struct, NDPI_LOG_TRACE, "START packet processing\n");
@@ -4264,7 +4269,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     return(ret);
 
   /* detect traffic for tcp or udp only */
-
   flow->src = src, flow->dst = dst;
 
   ndpi_connection_tracking(ndpi_struct, flow);
@@ -4367,6 +4371,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     
     ndpi_check_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
     ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
+
     return(ret);
   }
 
@@ -4395,6 +4400,24 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret.app_protocol = flow->detected_protocol_stack[0];
 
   ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
+
+  if((flow->num_processed_pkts == 1)
+     && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && flow->packet.tcp
+     && (flow->packet.tcp->syn == 0)
+    ) {
+    /*
+      This is a TCP flow
+      - whose first packet is NOT a SYN
+      - no protocol has been detected
+
+      We don't see how future packets can match anything
+      hence we giveup here
+    */
+    ret = ndpi_detection_giveup(ndpi_struct, flow);
+  }
+
   return(ret);
 }
 
@@ -4612,7 +4635,6 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 	    /* Set server HTTP response code */
 	    strncpy((char*)flow->http.response_status_code, (char*)packet->http_response.ptr, 3);
 	    flow->http.response_status_code[4]='\0';
-
 
 	    NDPI_LOG_DBG2(ndpi_struct,
 		  "ndpi_parse_packet_line_info: HTTP response parsed: \"%.*s\"\n",
@@ -5045,27 +5067,6 @@ void ndpi_int_change_category(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************************************************************* */
 
-/* change protocol only if guessing is active */
-/* void ndpi_guess_change_protocol(struct ndpi_detection_module_struct *ndpi_struct, */
-/* 				struct ndpi_flow_struct *flow) */
-/* { */
-/*   if(flow->guessed_host_protocol_id != 0 && */
-/*      flow->guessed_protocol_id != 0) { */
-/*     /\* app proto for flow *\/ */
-/*     flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id; */
-/*     /\* master proto for flow *\/ */
-/*     flow->detected_protocol_stack[1] = flow->guessed_protocol_id; */
-
-/*     /\* app proto for packet *\/ */
-/*     flow->packet.detected_protocol_stack[0] = flow->guessed_host_protocol_id; */
-/*     /\* master proto for packet *\/ */
-/*     flow->packet.detected_protocol_stack[1] = flow->guessed_protocol_id; */
-
-/*   } */
-/* } */
-
-/* ********************************************************************************* */
-
 /* turns a packet back to unknown */
 void ndpi_int_reset_packet_protocol(struct ndpi_packet_struct *packet) {
   int a;
@@ -5297,11 +5298,13 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.app_protocol = rc,
-	ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport, dport, &user_defined_proto);
+	ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport,
+						     dport, &user_defined_proto);
 
       if(ret.app_protocol == ret.master_protocol)
 	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
 
+      ret.category = ndpi_get_proto_category(ndpi_struct, ret);
       return(ret);
     }
 
@@ -5311,8 +5314,10 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 
       if(rc == NDPI_PROTOCOL_SSL)
 	goto check_guessed_skype;
-      else
+      else {
+	ret.category = ndpi_get_proto_category(ndpi_struct, ret);
 	return(ret);
+      }
     }
 
   check_guessed_skype:
@@ -5325,8 +5330,10 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 	ret.app_protocol = NDPI_PROTOCOL_SKYPE;
     }
   } else
-    ret.app_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport, dport, &user_defined_proto);
+    ret.app_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport,
+					      dport, &user_defined_proto);
 
+  ret.category = ndpi_get_proto_category(ndpi_struct, ret);
   return(ret);
 }
 
