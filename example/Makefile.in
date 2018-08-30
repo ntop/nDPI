@@ -1,7 +1,7 @@
 CC=@CC@
 CFLAGS=-g -I../src/include @CFLAGS@
 LIBNDPI=../src/lib/libndpi.a
-LDFLAGS=$(LIBNDPI) -lpcap @LDFLAGS@
+LDFLAGS=$(LIBNDPI) -lpcap -lpthread @LDFLAGS@
 OBJS=ndpiReader.o ndpi_util.o
 
 all: ndpiReader
