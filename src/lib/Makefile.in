@@ -6,15 +6,17 @@
 # make Makefile
 #
 
+OS := $(shell uname -s)
+
 #
 # Installation directories
 #
 prefix     = /usr/local
 libdir     = ${prefix}/lib
 includedir = ${prefix}/include/ndpi
-
-CFLAGS += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -g
-RANLIB  = ranlib
+CC         = gcc
+CFLAGS     += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -g
+RANLIB     = ranlib
 
 OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) ndpi_main.o
 HEADERS   = $(wildcard ../include/*.h)
@@ -22,6 +24,10 @@ NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so
 NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE).@NDPI_VERSION_SHORT@
 NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
+
+ifeq ($(OS),Darwin)
+CC=clang
+endif
 
 all: $(NDPI_LIBS)
 
@@ -32,7 +38,7 @@ $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(RANLIB) $@	       
 
 $(NDPI_LIB_SHARED): $(OBJECTS)
-	gcc -shared -fPIC -o $@ $(OBJECTS)
+	$(CC) -shared -fPIC -o $@ $(OBJECTS)
 	ln -Fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
 
 %.o: %.c $(HEADERS) Makefile
