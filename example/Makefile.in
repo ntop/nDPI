@@ -1,0 +1,20 @@
+CC=@CC@
+CFLAGS=-g -I../src/include @CFLAGS@
+LIBNDPI=../src/lib/libndpi.a
+LDFLAGS=$(LIBNDPI) -lpcap @LDFLAGS@
+OBJS=ndpiReader.o ndpi_util.o
+
+all: ndpiReader
+
+ndpiReader: $(OBJS) $(LIBNDPI)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+
+%.o: %.c $(HEADERS) Makefile
+	$(CC) $(CFLAGS) -c $< -o $@
+
+install:
+	cp ndpiReader /usr/local/bin
+
+clean:
+	/bin/rm *.o ndpiReader
+
