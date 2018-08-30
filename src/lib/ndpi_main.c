@@ -51,13 +51,6 @@
 #include <hs/hs.h>
 #endif
 
-#ifdef HAVE_HYPERSCAN
-struct hs {
-  hs_database_t *database;
-  hs_scratch_t  *scratch;
-};
-#endif
-
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
 static int _ndpi_debug_callbacks = 0;
