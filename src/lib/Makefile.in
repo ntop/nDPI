@@ -6,7 +6,6 @@
 # make Makefile
 #
 
-OS := $(shell uname -s)
 
 #
 # Installation directories
@@ -14,7 +13,7 @@ OS := $(shell uname -s)
 prefix     = /usr/local
 libdir     = ${prefix}/lib
 includedir = ${prefix}/include/ndpi
-CC         = gcc
+CC         = @CC@
 CFLAGS     += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -g
 RANLIB     = ranlib
 
