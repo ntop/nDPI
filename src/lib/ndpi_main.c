@@ -1935,7 +1935,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
 static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
   int min_len = (txt->length < m->patterns->length) ? txt->length : m->patterns->length;
-  char buf[64];
+  char buf[64] = { '\0' };
   int min_buf_len = (txt->length > 63 /* sizeof(buf)-1 */) ? 63 : txt->length;
   u_int buf_len = strlen(buf);
   
@@ -4607,7 +4607,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
 
-  for(a = 0; a < packet->payload_packet_len; a++) {
+  for(a = 0; a < packet->payload_packet_len-2; a++) {
     if(get_u_int16_t(packet->payload, a) == ntohs(0x0d0a)) { /* If end of line char sequence CR+NL "\r\n", process line */
       packet->line[packet->parsed_lines].len = (u_int16_t)(((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
 
