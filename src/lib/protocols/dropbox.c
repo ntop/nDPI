@@ -51,7 +51,7 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
     if((packet->udp->source == dropbox_port)
        && (packet->udp->dest == dropbox_port)) {
       if(payload_len > 2) {
-	if(strncmp((const char *)packet->payload, "{\"host_int\"", 11) == 0) {
+	if(strstr((const char *)packet->payload, "\"host_int\"") != NULL) {
 	  
 	  NDPI_LOG_INFO(ndpi_struct, "found dropbox\n");
 	  ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
