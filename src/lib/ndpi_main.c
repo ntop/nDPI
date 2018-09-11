@@ -4228,14 +4228,14 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   u_int32_t a;
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
 
-  flow->num_processed_pkts++;
-  
   if(ndpi_struct->ndpi_log_level >= NDPI_LOG_TRACE)
   	NDPI_LOG(flow ? flow->detected_protocol_stack[0]:NDPI_PROTOCOL_UNKNOWN,
 		  ndpi_struct, NDPI_LOG_TRACE, "START packet processing\n");
   if(flow == NULL)
     return(ret);
 
+  flow->num_processed_pkts++;
+  
   if(flow->server_id == NULL) flow->server_id = dst; /* Default */
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
     goto ret_protocols;
