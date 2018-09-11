@@ -25,5 +25,6 @@ extern int ht_hash( hashtable_t *hashtable, char *key );
 extern entry_t *ht_newpair( char *key, u_int16_t value );
 extern void ht_set( hashtable_t *hashtable, char *key, u_int16_t value );
 extern u_int16_t ht_get( hashtable_t *hashtable, char *key );
+extern void ht_free( hashtable_t *hashtable );
 
 #endif /* _HASH_H_ */

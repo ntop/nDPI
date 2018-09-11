@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-/* #define CERTIFICATE_DEBUG 1 */
+// #define CERTIFICATE_DEBUG 1
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
 /* Skype.c */
@@ -246,28 +246,43 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t compression_len;
 		u_int16_t extensions_len;
 
-		compression_len = packet->payload[offset+1];
-		offset += compression_len + 3;
+		offset++;
+		compression_len = packet->payload[offset];
+		offset++;
+		
+#ifdef CERTIFICATE_DEBUG
+		printf("SSL [compression_len: %u]\n", compression_len);
+#endif
+
+		// offset += compression_len + 3;
+		offset += compression_len;
 
 		if(offset < total_len) {
-		  extensions_len = packet->payload[offset];
+		  extensions_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
+		  offset += 2;
+		  
+#ifdef CERTIFICATE_DEBUG
+		  printf("SSL [extensions_len: %u]\n", extensions_len);
+#endif
 
-		  if((extensions_len+offset) < total_len) {
+		  if((extensions_len+offset) <= total_len) {
 		    /* Move to the first extension
 		       Type is u_int to avoid possible overflow on extension_len addition */
-		    u_int extension_offset = 1;
+		    u_int extension_offset = 0;
 
 		    while(extension_offset < extensions_len) {
 		      u_int16_t extension_id, extension_len;
 
-		      memcpy(&extension_id, &packet->payload[offset+extension_offset], 2);
+		      extension_id = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
 		      extension_offset += 2;
 
-		      memcpy(&extension_len, &packet->payload[offset+extension_offset], 2);
+		      extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
 		      extension_offset += 2;
 
-		      extension_id = ntohs(extension_id), extension_len = ntohs(extension_len);
-
+#ifdef CERTIFICATE_DEBUG
+		      printf("SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
+#endif
+		      
 		      if(extension_id == 0) {
 			u_int begin = 0,len;
 			char *server_name = (char*)&packet->payload[offset+extension_offset];
@@ -316,6 +331,7 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
   if((packet->payload_packet_len > 9) && (packet->payload[0] == 0x16)) {
     char certificate[64];
     int rc;
+    
     certificate[0] = '\0';
     rc = getSSLcertificate(ndpi_struct, flow, certificate, sizeof(certificate));
     packet->ssl_certificate_num_checks++;
