@@ -8417,6 +8417,12 @@ ndpi_protocol_match host_match[] = {
   { "showmax.com", NULL, "showmax" TLD,                                "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "showmax.akamaized.net", NULL, "showmax\\.akamaized" TLD,          "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
+  { "snapdeal.", NULL, NULL,                              "Snapdeal",           NDPI_PROTOCOL_SNAPDEAL, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+
+  { "flipkart.", NULL, NULL,                              "Flipkart",           NDPI_PROTOCOL_FLIPKART, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+
+  { "hotstar.", NULL, NULL,                              "Hotstar",           NDPI_PROTOCOL_HOTSTAR, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+
   { NULL, NULL, NULL, 0 }
 };
 
