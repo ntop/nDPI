@@ -858,6 +858,8 @@ typedef struct ndpi_proto {
 #include "ndpi_config.h"
 
 #ifdef HAVE_HYPERSCAN
+#include <hs/hs.h>
+
 struct hs_list {
     char *expression;
     unsigned int id;

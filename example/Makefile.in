@@ -7,7 +7,7 @@ OBJS=ndpiReader.o ndpi_util.o
 all: ndpiReader
 
 ndpiReader: $(OBJS) $(LIBNDPI)
-	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+	$(CXX) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@

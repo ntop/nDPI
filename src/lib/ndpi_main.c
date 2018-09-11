@@ -47,10 +47,6 @@
 #include "third_party/include/hash.h"
 /* #include "third_party/src/hash.c" */
 
-#ifdef HAVE_HYPERSCAN
-#include <hs/hs.h>
-#endif
-
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
 static int _ndpi_debug_callbacks = 0;
