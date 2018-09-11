@@ -800,10 +800,27 @@ static int hyperscan_load_patterns(struct hs *hs, u_int num_patterns,
 
 /* ******************************************************************** */
 
+static char* string2hex(const char *pat) {
+  u_int patlen, i;
+  char *hexbuf, *buf;
+
+  patlen = strlen(pat);
+  hexbuf = (char*)calloc(sizeof(char), patlen * 4 + 1);
+  if(!hexbuf) return(NULL);
+
+  for (i = 0, buf = hexbuf; i < patlen; i++, buf += 4) {
+    snprintf(buf, 5, "\\x%02x", (unsigned char)pat[i]);
+  }
+  *buf = '\0';
+
+  return hexbuf;
+}
+
 static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
-  u_int num_patterns = 0, i;
-  const char **expressions;
+  u_int num_patterns = 0, i, j;
+  char **expressions;
   unsigned int *ids;
+  unsigned char *need_to_be_free;
   struct hs *hs;
   int rc;
 
@@ -811,31 +828,52 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
   if(!ndpi_mod->hyperscan) return(-1);
   hs = (struct hs*)ndpi_mod->hyperscan;
 
-  for(i=0; host_match[i].string_to_match != NULL; i++) {
-    if(host_match[i].pattern_to_match) {
-      /*  printf("[DEBUG] %s\n", host_match[i].pattern_to_match); */
-      num_patterns++;
-    }
+  for(i = 0; host_match[i].string_to_match != NULL || host_match[i].pattern_to_match != NULL; i++) {
+    num_patterns++;
   }
 
-  expressions = (const char**)calloc(sizeof(char*), num_patterns+1);
+  expressions = (char**)calloc(sizeof(char*), num_patterns + 1);
   if(!expressions) return(-1);
 
-  ids = (unsigned int*)calloc(sizeof(unsigned int), num_patterns+1);
+  ids = (unsigned int*)calloc(sizeof(unsigned int), num_patterns + 1);
   if(!ids) {
     free(expressions);
     return(-1);
   }
 
-  for(i=0, num_patterns=0; host_match[i].string_to_match != NULL; i++) {
-    if(host_match[i].pattern_to_match) {
-      expressions[num_patterns] = host_match[i].pattern_to_match;
-      ids[num_patterns]         = host_match[i].protocol_id;
-      num_patterns++;
-    }
+  need_to_be_free = (unsigned char*)calloc(sizeof(unsigned char), num_patterns + 1);
+  if (!need_to_be_free) {
+    free(expressions);
+    free(ids);
+    return(-1);
   }
 
-  rc = hyperscan_load_patterns(hs, num_patterns, expressions, ids);
+  for (i = 0, j = 0; host_match[i].string_to_match != NULL || host_match[i].pattern_to_match != NULL; i++) {
+    if (host_match[i].pattern_to_match) {
+      expressions[j] = host_match[i].pattern_to_match;
+      ids[j] = host_match[i].protocol_id;
+      need_to_be_free[j] = 0;
+      ++j;
+    } else {
+      expressions[j] = string2hex(host_match[i].string_to_match);
+      if (expressions[j] != NULL) {
+        ids[j] = host_match[i].protocol_id;
+        need_to_be_free[j] = 1;
+        ++j;
+      } else {
+#ifdef DEBUG
+        printf("Fail to calloc memory for %s\n", host_match[i].string_to_match);
+#endif
+      }
+    }
+    /*printf("[DEBUG] %s\n", j ? expressions[j - 1] : "No Expression");*/
+  }
+
+  rc = hyperscan_load_patterns(hs, j, (const char**)expressions, ids);
+
+  for (i = 0; i < j; ++i)
+    if (need_to_be_free[i])
+      free(expressions[i]);
   free(expressions), free(ids);
 
   return(rc);
