@@ -61,7 +61,7 @@ fi
 HS_LIB=
 HS_INC=
 
-AC_ARG_WITH(hyperscan,          [  --with-hyperscan          Enable nDPI build with Intel Hyperscan])
+AC_ARG_WITH(hyperscan,          [  --with-hyperscan        Enable nDPI build with Intel Hyperscan])
 
 if test "${with_hyperscan+set}" = set; then
      BKP=$LIBS
