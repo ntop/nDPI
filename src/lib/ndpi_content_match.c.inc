@@ -8225,6 +8225,7 @@ ndpi_protocol_match host_match[] = {
   { "audio-fa.scdn.co", NULL, "audio-fa\\.scdn" TLD,                   "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { "edge-mqtt.facebook.com", NULL, "edge-mqtt\\.facebook" TLD,        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { "messenger.com", NULL, "messenger\\.com" TLD,                     "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
 
   { ".pandora.com", NULL, "\\.pandora" TLD,                            "Pandora",          NDPI_PROTOCOL_PANDORA,  NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
