@@ -433,6 +433,20 @@ extern "C" {
 			   ndpi_protocol proto, char *buf, u_int buf_len);
 
   /**
+   * Same as ndpi_protocol2name() with the difference that the numeric protocol
+   * name is returned
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     proto         = the struct ndpi_protocol contain the protocols name
+   * @par     buf           = the buffer to write the name of the protocols
+   * @par     buf_len       = the length of the buffer
+   * @return  the buffer contains the master_protocol and protocol name
+   *
+   */
+  char* ndpi_protocol2id(struct ndpi_detection_module_struct *ndpi_mod,
+			 ndpi_protocol proto, char *buf, u_int buf_len);
+
+  /**
    * Find out if a given category is custom/user-defined
    *
    * @par     category      = the category associated to the protocol
