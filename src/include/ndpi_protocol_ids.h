@@ -50,7 +50,7 @@ typedef enum {
   NDPI_PROTOCOL_BGP                   = 13,
   NDPI_PROTOCOL_SNMP                  = 14,
   NDPI_PROTOCOL_XDMCP                 = 15,
-  NDPI_PROTOCOL_SMB                   = 16,
+  NDPI_PROTOCOL_SMBV1                 = 16, /* SMB version 1 */
   NDPI_PROTOCOL_SYSLOG                = 17,
   NDPI_PROTOCOL_DHCP                  = 18,
   NDPI_PROTOCOL_POSTGRES              = 19,
@@ -75,8 +75,8 @@ typedef enum {
   NDPI_PROTOCOL_SKYPE_CALL_OUT        = 38,
   NDPI_PROTOCOL_MUSICALLY             = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached - Darryl Sokoloski <darryl@egloo.ca> */
-
-  NDPI_PROTOCOL_FREE_41               = 41, /* Free */
+  NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */
+  
   NDPI_PROTOCOL_FREE_42               = 42, /* Free */
   NDPI_PROTOCOL_FREE_43               = 43, /* Free */
   NDPI_PROTOCOL_FREE_44               = 44, /* Free */
