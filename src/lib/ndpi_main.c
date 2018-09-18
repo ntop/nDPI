@@ -1222,9 +1222,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "SMBv23", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
 			    ndpi_build_default_ports(ports_a, 445, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MINING,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MINING,
 			    no_master,
-			    no_master, "Mining", CUSTOM_CATEGORY_MINING /* dummy */,
+			    no_master, "Mining", CUSTOM_CATEGORY_MINING,
 			    ndpi_build_default_ports(ports_a, 8333, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_43,
@@ -5486,14 +5486,93 @@ static const char* categories[] = {
    "QuickTime",
    "RealMedia",
    "WindowsMedia",
-   "Webm",
+   "Webm", /* 32 */
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+     
+   "Mining", /* 99 */
+   "Malware",
+   "Advertisement",
+   "Banned_Site",
+   "Site_Unavailable"
 };
 
 const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod,
 				   ndpi_protocol_category_t category) {
-  if(!ndpi_mod) return(NULL);
+  if((!ndpi_mod) || (category >= NDPI_PROTOCOL_NUM_CATEGORIES))
+    return(NULL);
 
-  if(category < NDPI_PROTOCOL_CATEGORY_CUSTOM_1)
+  if((category < NDPI_PROTOCOL_CATEGORY_CUSTOM_1) || (category >= CUSTOM_CATEGORY_MINING))
     return(categories[category]);
   else {
     switch(category) {

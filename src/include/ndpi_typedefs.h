@@ -800,7 +800,17 @@ typedef enum {
   CUSTOM_CATEGORY_ADVERTISEMENT    = 101,
   CUSTOM_CATEGORY_BANNED_SITE      = 102,
   CUSTOM_CATEGORY_SITE_UNAVAILABLE = 103,
-  
+
+  /*
+    IMPORTANT
+
+    Please keep in sync with
+
+    static const char* categories[] = { ..}
+
+    in ndpi_main.c
+  */
+    
   NDPI_PROTOCOL_NUM_CATEGORIES /*
 				 NOTE: Keep this as last member
 				 Unused as value but useful to getting the number of elements
