@@ -75,9 +75,9 @@ typedef enum {
   NDPI_PROTOCOL_SKYPE_CALL_OUT        = 38,
   NDPI_PROTOCOL_MUSICALLY             = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached - Darryl Sokoloski <darryl@egloo.ca> */
-  NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */
+  NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */  
+  NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
   
-  NDPI_PROTOCOL_FREE_42               = 42, /* Free */
   NDPI_PROTOCOL_FREE_43               = 43, /* Free */
   NDPI_PROTOCOL_FREE_44               = 44, /* Free */
   NDPI_PROTOCOL_FREE_45               = 45, /* Free */
