@@ -38,8 +38,6 @@ void ndpi_search_nest_log_sink(
         struct ndpi_flow_struct *flow)
 {
     struct ndpi_packet_struct *packet = &flow->packet;
-    const u_int8_t *offset = packet->payload;
-    u_int8_t *matches;
 
     NDPI_LOG_DBG(ndpi_struct, "search nest_log_sink\n");
 
