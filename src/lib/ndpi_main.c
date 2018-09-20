@@ -1227,10 +1227,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Mining", CUSTOM_CATEGORY_MINING,
 			    ndpi_build_default_ports(ports_a, 8333, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_43,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NEST_LOG_SINK,
 			    no_master,
-			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    no_master, "NestLogSink", NDPI_PROTOCOL_CATEGORY_CLOUD,
+			    ndpi_build_default_ports(ports_a, 11095, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_44,
 			    no_master,
@@ -3227,6 +3227,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* Memcached */
   init_memcached_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* Nest Log Sink */
+  init_nest_log_sink_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* ----------------------------------------------------------------- */
 
