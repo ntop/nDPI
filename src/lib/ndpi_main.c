@@ -5703,7 +5703,7 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
   size_t len;
 
   if((c = *find++) != '\0') {
-    len = strlen(find);
+    len = strnlen(find, slen);
     do {
       do {
 	if(slen-- < 1 || (sc = *s++) == '\0')
@@ -5711,10 +5711,11 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
       } while (sc != c);
       if(len > slen)
 	return (NULL);
-    } while (strncmp(s, find, len) != 0);
+    } while(strncmp(s, find, len) != 0);
     s--;
   }
-  return ((char *)s);
+  
+  return((char *)s);
 }
 
 /* ****************************************************** */
