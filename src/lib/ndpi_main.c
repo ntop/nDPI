@@ -741,7 +741,6 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
   u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO };
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
   static u_int16_t generic_id = NDPI_LAST_IMPLEMENTED_PROTOCOL;
-  u_int16_t p_id;
   
   if(ndpi_mod->proto_defaults[match->protocol_id].protoName == NULL) {
     if(match->protocol_id == NDPI_PROTOCOL_GENERIC)
@@ -989,7 +988,6 @@ static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_s
    Do NOT add web services (NDPI_SERVICE_xxx) here.
 */
 static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_mod) {
-  int i;
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
   u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO },
     custom_master[2];
