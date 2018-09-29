@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <string.h>
 
-#include "hash.h"
+#include "ht_hash.h"
 
 /* #define HASH_DEBUG 1 */
 
