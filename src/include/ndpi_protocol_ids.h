@@ -273,12 +273,13 @@ typedef enum {
   NDPI_PROTOCOL_SOUNDCLOUD            = 234,
   NDPI_PROTOCOL_CSGO                  = 235, /* Counter-Strike Global Offensive, Dota = 2 */
   NDPI_PROTOCOL_LISP	              = 236,
-  NDPI_PROTOCOL_DIAMETER	      = 237,
+  NDPI_PROTOCOL_DIAMETER			  = 237,
   NDPI_PROTOCOL_APPLE_PUSH            = 238,
   NDPI_PROTOCOL_GOOGLE_SERVICES       = 239,
   NDPI_PROTOCOL_AMAZON_VIDEO          = 240,
   NDPI_PROTOCOL_GOOGLE_DOCS           = 241,
   NDPI_PROTOCOL_WHATSAPP_FILES        = 242, /* Videos, pictures, voice messages... */
+  NDPI_PROTOCOL_YOUKU				  = 243,
   /*
     IMPORTANT
     before allocating a new identifier please fill up

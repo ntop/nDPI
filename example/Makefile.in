@@ -13,8 +13,8 @@ ndpiReader: $(OBJS) $(LIBNDPI)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 install:
-	cp ndpiReader /usr/local/bin
+	\cp -f ndpiReader /usr/local/bin
 
 clean:
-	/bin/rm *.o ndpiReader
+	/bin/rm -f *.o ndpiReader
 
