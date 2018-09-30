@@ -51,12 +51,6 @@ if test $SHORT_MACHINE = "arm"; then
 else
      AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"])
 fi
-
-if test -z `which clang`; then
-CC=gcc
-else
-CC=clang
-fi
  
 HS_LIB=
 HS_INC=
