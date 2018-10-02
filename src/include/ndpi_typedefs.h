@@ -596,6 +596,9 @@ struct ndpi_flow_tcp_struct {
 
 /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
+
+/* NDPI_PROTOCOL_NEST_LOG_SINK */
+  u_int8_t nest_log_sink_matches;
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
