@@ -274,7 +274,7 @@ extern "C" {
    */
   u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow);
-  
+
   /**
    * API call that is called internally by ndpi_detection_process_packet or by apps
    * that want to avoid calling ndpi_detection_process_packet as they have already
@@ -432,6 +432,19 @@ extern "C" {
   char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod,
 			   ndpi_protocol proto, char *buf, u_int buf_len);
 
+  /**
+   * Same as ndpi_protocol2name() with the difference that the numeric protocol
+   * name is returned
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     proto         = the struct ndpi_protocol contain the protocols name
+   * @par     buf           = the buffer to write the name of the protocols
+   * @par     buf_len       = the length of the buffer
+   * @return  the buffer contains the master_protocol and protocol name
+   *
+   */
+  char* ndpi_protocol2id(struct ndpi_detection_module_struct *ndpi_mod,
+                         ndpi_protocol proto, char *buf, u_int buf_len);
   /**
    * Write the protocol name in the buffer -buf- as master_protocol.protocol (number)
    *
@@ -746,7 +759,7 @@ extern "C" {
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size();
   void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
-  
+
   /**
    * Add a string to match to an automata
    *
