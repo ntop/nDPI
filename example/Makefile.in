@@ -16,5 +16,5 @@ install:
 	cp ndpiReader /usr/local/bin
 
 clean:
-	/bin/rm *.o ndpiReader
+	/bin/rm -f *.o ndpiReader
 
