@@ -2366,6 +2366,42 @@ static int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_
 
 /* *********************************************** */
 
+int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
+				      char *name_or_ip, unsigned long *id) {
+  char ipbuf[64];
+  struct in_addr pin;
+
+  if(!ndpi_struct->custom_categories.categories_loaded)
+    return -1;
+
+  strncpy(ipbuf, name_or_ip, sizeof(ipbuf));
+  char *ptr = strrchr(ipbuf, '/');
+
+  if(ptr)
+    ptr[0] = '\0';
+
+  if(inet_pton(AF_INET, ipbuf, &pin) == 1) {
+    /* Search IP */
+    prefix_t prefix;
+    patricia_node_t *node;
+
+    /* Make sure all in network byte order otherwise compares wont work */
+    fill_prefix_v4(&prefix, &pin, 32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
+    node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
+
+    if(node) {
+      *id = node->value.user_value;
+      return 0;
+    }
+
+    return(-1);
+  } else
+    /* Search Host */
+    return ndpi_match_custom_category(ndpi_struct, name_or_ip, id);
+}
+
+/* *********************************************** */
+
 static void free_ptree_data(void *data) { ; }
 
 /* ****************************************************** */

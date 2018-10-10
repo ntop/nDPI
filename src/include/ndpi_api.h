@@ -738,6 +738,8 @@ extern "C" {
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   ndpi_protocol *ret);
+  int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
+				      char *name_or_ip, unsigned long *id);
   int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
 				     ndpi_detection_preference pref,
 				     int value);
