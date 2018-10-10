@@ -5599,8 +5599,10 @@ const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod
 
 ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_struct *ndpi_mod,
 						 ndpi_protocol proto) {
+  if(proto.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    return proto.category;
   /* simple rule: sub protocol first, master after */
-  if((proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) ||
+  else if((proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) ||
       (ndpi_mod->proto_defaults[proto.app_protocol].protoCategory != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED))
     return ndpi_mod->proto_defaults[proto.app_protocol].protoCategory;
   else
