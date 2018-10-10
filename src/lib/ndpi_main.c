@@ -4233,11 +4233,6 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 ndpi_protocol *ret) {
-  if(flow->category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) {
-    ret->category = flow->category;
-    return;
-  }
-
   if(ndpi_struct->custom_categories.categories_loaded) {
     if(flow->packet.iph) {
       prefix_t prefix;
@@ -5895,7 +5890,9 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
       packet->detected_protocol_stack[0] = matching_protocol_id;
 
     flow->detected_protocol_stack[0] = packet->detected_protocol_stack[0],
-      flow->detected_protocol_stack[1] = packet->detected_protocol_stack[1],
+      flow->detected_protocol_stack[1] = packet->detected_protocol_stack[1];
+
+    if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
       flow->category = ret_match->protocol_category;
 
     return(packet->detected_protocol_stack[0]);
