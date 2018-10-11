@@ -4265,9 +4265,9 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
       }
     }
 
-    if(flow->protos.stun_ssl.ssl.server_certificate[0] != '\0') {
+    if(flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') {
       unsigned long id;
-      int rc = ndpi_match_custom_category(ndpi_struct, (char *)flow->protos.stun_ssl.ssl.server_certificate, &id);
+      int rc = ndpi_match_custom_category(ndpi_struct, (char *)flow->protos.stun_ssl.ssl.client_certificate, &id);
 
       if(rc == 0) {
 	flow->category = ret->category = (ndpi_protocol_category_t)id;
