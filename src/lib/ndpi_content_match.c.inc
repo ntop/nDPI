@@ -812,8 +812,8 @@ static ndpi_network host_protocol_list[] = {
     origin AS41231
   */
 
-  { 0x5BBD5800 /* 91.189.88.0/21 */, 21, NDPI_PROTOCOL_UBUNTUONE },
-  { 0xA2D52000 /* 162.213.32.0/22 */, 22, NDPI_PROTOCOL_UBUNTUONE },
+  { 0x5BBD5800 /* 91.189.88.0/21 */,   21, NDPI_PROTOCOL_UBUNTUONE },
+  { 0xA2D52000 /* 162.213.32.0/22 */,  22, NDPI_PROTOCOL_UBUNTUONE },
   { 0xB97DBC00 /* 185.125.188.0/22 */, 22, NDPI_PROTOCOL_UBUNTUONE },
 
   /*
@@ -8417,6 +8417,9 @@ ndpi_protocol_match host_match[] = {
   /* showmax.com video streaming */
   { "showmax.com", NULL, "showmax" TLD,                                "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "showmax.akamaized.net", NULL, "showmax\\.akamaized" TLD,          "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
+
+  { "snapcraft.io", NULL, "snapcraft\\.io" TLD,                        "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "ubuntu.com", NULL, "ubuntu\\.com" TLD,                            "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, NULL, NULL, 0 }
 };
