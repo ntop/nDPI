@@ -541,7 +541,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xC0AD4000 /* 192.173.64.0/18 */, 18, NDPI_PROTOCOL_NETFLIX },
   { 0xC6266000 /* 198.38.96.0/19 */, 19, NDPI_PROTOCOL_NETFLIX },
   { 0xC62D3000 /* 198.45.48.0/20 */, 20, NDPI_PROTOCOL_NETFLIX },
-  { 0xD194D687 /* 209.148.214.135/21 */, 21, NDPI_PROTOCOL_NETFLIX }, 
+  { 0xD194D687 /* 209.148.214.135/21 */, 21, NDPI_PROTOCOL_NETFLIX },
 
   /*
     Cloudflare, Inc.
@@ -7925,7 +7925,7 @@ static ndpi_network host_protocol_list[] = {
     Valve Corporation (Steam)
     origin AS32590
   */
-  
+
   { 0x2D79B800 /* 45.121.184.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0x670A7C00 /* 103.10.124.0/23 */, 23, NDPI_PROTOCOL_STEAM },
   { 0x671C3600 /* 103.28.54.0/23 */, 23, NDPI_PROTOCOL_STEAM },
@@ -7943,14 +7943,14 @@ static ndpi_network host_protocol_list[] = {
   { 0xD040C800 /* 208.64.200.0/24 */, 24, NDPI_PROTOCOL_STEAM },
   { 0xD040C900 /* 208.64.201.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
-  
+
   /*
     VidTO
-  */  
+  */
   { 0x51111030 /* 81.17.16.48/32 */, 32,  NDPI_PROTOCOL_VIDTO  },
   { 0x5fb7329d /* 95.183.50.157/32 */, 32, NDPI_PROTOCOL_VIDTO },
   { 0x577824f2 /* 87.120.36.242/32 */, 32, NDPI_PROTOCOL_VIDTO },
-  
+
   { 0x0, 0, 0 }
 };
 
@@ -8009,7 +8009,7 @@ static ndpi_network host_protocol_list[] = {
 
 /* ****************************************************** */
 
-/* 
+/*
 
 Each part of a domain name can be no longer than 63 characters. There are no single-digit top-level domains and none contain digits. It doesn't look like ICANN will approve such domains either.
 
@@ -8095,7 +8095,6 @@ ndpi_protocol_match host_match[] = {
 
   { "ntop.org", NULL, "ntop\\.org$",                     "ntop",         NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
 
-  { "docs.googleusercontent.com", NULL, "docs\\.googleusercontent" TLD, "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "docs.googleusercontent.com", NULL, "docs.googleusercontent" TLD,   "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "docs.google.com",            NULL, "docs.google" TLD,              "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
 
@@ -8103,7 +8102,6 @@ ndpi_protocol_match host_match[] = {
   { "drive.google.com",                       NULL, "drive.google" TLD,                          "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "android.clients.google.com", NULL, "android\\.clients\\.google" TLD,   "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "ggpht.com", NULL, "ggpht" TLD,                                         "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
 
   /*
     See https://better.fyi/trackers/
@@ -8136,7 +8134,7 @@ ndpi_protocol_match host_match[] = {
   { "google-analytics.", NULL, "google-analytics\\.",             "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
   { "gtv1.com", NULL, "gtv1" TLD,                                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
-  /* Google Hangout */ 
+  /* Google Hangout */
   { "images2-hangout-opensocial.googleusercontent.com", NULL, "images2-hangout-opensocial\\.googleusercontent" TLD, "GoogleHangout", NDPI_PROTOCOL_HANGOUT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
   /* Google Services */
@@ -8162,6 +8160,7 @@ ndpi_protocol_match host_match[] = {
   { "google.", NULL, "google" TLD,                                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".google.", NULL, NULL,                                       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".gstatic.com", NULL, "\\.gstatic" TLD,                       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { "ggpht.com", NULL, "ggpht" TLD,                               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
   { "mail.outlook.com", NULL, "mail\\.outlook" TLD,               "Hotmail",          NDPI_PROTOCOL_HOTMAIL, NDPI_PROTOCOL_CATEGORY_MAIL, NDPI_PROTOCOL_ACCEPTABLE },
 
@@ -8217,7 +8216,6 @@ ndpi_protocol_match host_match[] = {
   { ".googlevideo.com", NULL, "\\.googlevideo" TLD,                    "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".ytimg.com", NULL, "\\.ytimg" TLD,                                "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "youtube-nocookie.", NULL, "youtube-nocookie" TLD,                 "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
-  { "ggpht.com", NULL, "ggpht" TLD,                                    "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { ".vevo.com", NULL, "\\.vevo" TLD,                                  "Vevo",             NDPI_PROTOCOL_VEVO,    NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
@@ -8225,7 +8223,7 @@ ndpi_protocol_match host_match[] = {
   { "audio-fa.scdn.co", NULL, "audio-fa\\.scdn" TLD,                   "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { "edge-mqtt.facebook.com", NULL, "edge-mqtt\\.facebook" TLD,        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
-  { "messenger.com", NULL, "messenger\\.com" TLD,                     "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { "messenger.com", NULL, "messenger\\.com" TLD,                      "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
 
   { ".pandora.com", NULL, "\\.pandora" TLD,                            "Pandora",          NDPI_PROTOCOL_PANDORA,  NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
@@ -8332,7 +8330,7 @@ ndpi_protocol_match host_match[] = {
   { "muscdn.com", NULL, "muscdn" TLD,                                  "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "livelycdn.com", NULL, "livelycdn" TLD,                            "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "direct.ly", NULL, "direct\\.ly$",                                 "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  
+
   { "github.com", NULL, "github" TLD,                                  "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".github.com", NULL, "\\.github" TLD,                              "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "github.io", NULL, NULL,                                           "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8395,7 +8393,7 @@ ndpi_protocol_match host_match[] = {
     than by protocol id. They are bound to a generic protocol (NDPI_PROTOCOL_GENERIC) and placed onto the right category
   */
   { "quickplay.com", NULL, "quickplay" TLD,                            "QuickPlay",        NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  
+
   { ".iqiyi.com", NULL, "\\.iqiyi" TLD,                                "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".qiyi.com", NULL, "\\.qiyi" TLD,                                  "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".71.am", NULL, "\\.71" TLD,                                       "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
