@@ -25,6 +25,10 @@ NDPI_LIB_SHARED_BASE = libndpi.so
 NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE).@NDPI_VERSION_SHORT@
 NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
 
+ifneq ($(OS),Windows_NT)
+OS := $(shell uname)
+endif
+
 ifeq ($(OS),Darwin)
 CC=clang
 SONAME_FLAG=
