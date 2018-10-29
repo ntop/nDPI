@@ -19,6 +19,7 @@ RANLIB     = ranlib
 
 OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) ndpi_main.o
 HEADERS   = $(wildcard ../include/*.h)
+NDPI_VERSION_MAJOR   = @NDPI_MAJOR@
 NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so
 NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE).@NDPI_VERSION_SHORT@
@@ -37,7 +38,7 @@ $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(RANLIB) $@	       
 
 $(NDPI_LIB_SHARED): $(OBJECTS)
-	$(CC) -shared -fPIC -o $@ $(OBJECTS)
+	$(CC) -shared -fPIC -Wl,-soname,$(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) -o $@ $(OBJECTS)
 	ln -Ffs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
 
 %.o: %.c $(HEADERS) Makefile
