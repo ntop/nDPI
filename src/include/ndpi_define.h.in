@@ -332,6 +332,7 @@
 #endif
 
 #define NDPI_MAX_DNS_REQUESTS                   16
+#define NDPI_MIN_NUM_STUN_DETECTION             8
 
 #define NDPI_MAJOR                              @NDPI_MAJOR@
 #define NDPI_MINOR                              @NDPI_MINOR@
