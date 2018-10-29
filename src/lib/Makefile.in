@@ -27,6 +27,9 @@ NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
 
 ifeq ($(OS),Darwin)
 CC=clang
+SONAME_FLAG=
+else
+SONAME_FLAG=-Wl,-soname,$(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 endif
 
 all: $(NDPI_LIBS)
@@ -38,7 +41,7 @@ $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(RANLIB) $@	       
 
 $(NDPI_LIB_SHARED): $(OBJECTS)
-	$(CC) -shared -fPIC -Wl,-soname,$(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) -o $@ $(OBJECTS)
+	$(CC) -shared -fPIC $(SONAME_FLAG) -o $@ $(OBJECTS)
 	ln -Ffs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
 
 %.o: %.c $(HEADERS) Makefile
