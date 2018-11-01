@@ -3,6 +3,7 @@ CFLAGS=-g -I../src/include @CFLAGS@
 LIBNDPI=../src/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) -lpcap -lpthread @LDFLAGS@
 OBJS=ndpiReader.o ndpi_util.o
+PREFIX?=/usr/local
 
 all: ndpiReader
 
@@ -13,7 +14,7 @@ ndpiReader: $(OBJS) $(LIBNDPI)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 install:
-	cp ndpiReader /usr/local/bin
+	cp ndpiReader $(DESTDIR)$(PREFIX)/bin
 
 clean:
 	/bin/rm -f *.o ndpiReader
