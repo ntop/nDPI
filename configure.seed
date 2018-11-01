@@ -52,10 +52,14 @@ else
      AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"])
 fi
 
-if test -z `which clang`; then
-CC=gcc
-else
-CC=clang
+MACHINE=`uname -m`
+SYSTEM=`uname -s`
+if test $SYSTEM = "Darwin"; then
+ CC=clang
+fi
+ 
+if test $ax_cv_PTHREAD_CLANG = "yes"; then
+ CC=clang
 fi
  
 HS_LIB=
