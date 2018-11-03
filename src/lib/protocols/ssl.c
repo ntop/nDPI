@@ -284,9 +284,18 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		      
 		      if(extension_id == 0) {
-			u_int begin = 0,len;
-			char *server_name = (char*)&packet->payload[offset+extension_offset];
+#if 1
+			u_int16_t len;
 
+			len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];			
+			len = (u_int)ndpi_min(len, buffer_len-1);
+			strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
+			buffer[len] = '\0';			
+#else
+			/* old code */
+			u_int begin = 0;
+			char *server_name = (char*)&packet->payload[offset+extension_offset];
+			
 			while(begin < extension_len) {
 			  if((!ndpi_isprint(server_name[begin]))
 			     || ndpi_ispunct(server_name[begin])
@@ -299,6 +308,8 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			len = (u_int)ndpi_min(extension_len-begin, buffer_len-1);
 			strncpy(buffer, &server_name[begin], len);
 			buffer[len] = '\0';
+#endif
+			
 			stripCertificateTrailer(buffer, buffer_len);
 
 			if(!ndpi_struct->disable_metadata_export) {
