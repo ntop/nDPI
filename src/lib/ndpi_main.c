@@ -3170,6 +3170,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* REDIS */
   init_redis_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* UPnP */
+  init_upnp_dissector(ndpi_struct, &a, detection_bitmask);
+
   /* VHUA */
   init_vhua_dissector(ndpi_struct, &a, detection_bitmask);
 
