@@ -4001,11 +4001,19 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_SKYPE);
       } else
 #endif
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STUN, flow->guessed_host_protocol_id);
+	ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN);
     }
   }
 
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+
+  if(ret.master_protocol == NDPI_PROTOCOL_STUN) {
+    if(ret.app_protocol == NDPI_PROTOCOL_FACEBOOK)
+      ret.app_protocol = NDPI_PROTOCOL_MESSENGER;
+    else if(ret.app_protocol == NDPI_PROTOCOL_GOOGLE)
+      ret.app_protocol = NDPI_PROTOCOL_HANGOUT;
+  }
+  
   ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
 
   return(ret);
