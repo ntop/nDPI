@@ -39,8 +39,8 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if((flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')
-     || (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0')
+  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0'))
+     || ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
      || (flow->host_server_name[0] != '\0'))
     protocol = NDPI_PROTOCOL_SSL;
   else
@@ -348,7 +348,7 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
     packet->ssl_certificate_num_checks++;
     if (rc > 0) {
       packet->ssl_certificate_detected++;
-      if (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0')
+      if ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
         /* 0 means we're done processing extra packets (since we found what we wanted) */
         return 0;
     }
@@ -405,7 +405,7 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  /* If we've detected the subprotocol from client certificate but haven't had a chance
 	   * to see the server certificate yet, set up extra packet processing to wait
 	   * a few more packets. */
-	  if((flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0')) {
+	  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) && ((flow->l4.tcp.ssl_seen_server_cert != 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0'))) {
 	    sslInitExtraPacketProcessing(0, flow);
 	  }
 	  
@@ -422,8 +422,8 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  && flow->l4.tcp.seen_syn
 	  && flow->l4.tcp.seen_syn_ack
 	  && flow->l4.tcp.seen_ack /* We have seen the 3-way handshake */)
-	 || (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0')
-	 /* || (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') */
+	 || ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
+	 /* || ((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) */
 	 ) {
 	ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
       }
