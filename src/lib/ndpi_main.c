@@ -3971,6 +3971,12 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	 || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
+
+	if((guessed_protocol_id == 0)
+	   && (flow->protos.stun_ssl.stun.num_binding_requests > 0)
+	   && (flow->protos.stun_ssl.stun.num_processed_pkts > 0))
+	  guessed_protocol_id = NDPI_PROTOCOL_STUN;
+
 	ndpi_int_change_protocol(ndpi_struct, flow,
 				 guessed_host_protocol_id,
 				 guessed_protocol_id);
@@ -3988,11 +3994,13 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
      && (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
   check_stun_export:
     if(flow->protos.stun_ssl.stun.num_processed_pkts > 0) {
+#if 0
       if(flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) {
 	u_int16_t proto = (flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT;
 
 	ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_SKYPE);
       } else
+#endif
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STUN, flow->guessed_host_protocol_id);
     }
   }
