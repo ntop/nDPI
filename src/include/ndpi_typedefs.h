@@ -1080,7 +1080,7 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
-	char client_certificate[48], server_certificate[48];
+	char client_certificate[64], server_certificate[64];
       } ssl;
       
       struct {

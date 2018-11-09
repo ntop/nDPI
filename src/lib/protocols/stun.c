@@ -106,7 +106,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       case 0x4002:
 	/* These are the only messages apparently whatsapp voice can use */
 	break;
-	      
+	
       case 0x8054: /* Candidate Identifier */
 	if((len == 4)
 	   && ((offset+7) < payload_length)
@@ -119,6 +119,20 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	}
 	break;
 
+      case 0x8055: /* MS Service Quality (skype?) */
+	break;
+
+	/* Proprietary fields found on skype calls */
+      case 0x24DF:
+      case 0x3802:
+      case 0x8036:
+      case 0x8095:
+      case 0x0800:
+	/* printf("====>>>> %04X\n", attribute); */
+	flow->protos.stun_ssl.stun.is_skype = 1;
+	return(NDPI_IS_STUN);
+	break;
+	
       case 0x8070: /* Implementation Version */
 	if((len == 4)
 	   && ((offset+7) < payload_length)
