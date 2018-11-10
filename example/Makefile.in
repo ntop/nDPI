@@ -5,7 +5,7 @@ LDFLAGS=$(LIBNDPI) -lpcap -lpthread @LDFLAGS@
 OBJS=ndpiReader.o ndpi_util.o
 PREFIX?=/usr/local
 
-all: ndpiReader
+all: ndpiReader @DPDK_TARGET@
 
 ndpiReader: $(OBJS) $(LIBNDPI)
 	$(CXX) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
@@ -15,6 +15,9 @@ ndpiReader: $(OBJS) $(LIBNDPI)
 
 install:
 	cp ndpiReader $(DESTDIR)$(PREFIX)/bin
+
+dpdk:
+	make -f Makefile.dpdk
 
 clean:
 	/bin/rm -f *.o ndpiReader

@@ -219,7 +219,7 @@ void ndpi_flow_info_freer(void *node) {
 /* ***************************************************** */
 
 void ndpi_workflow_free(struct ndpi_workflow * workflow) {
-  int i;
+  u_int i;
 
   for(i=0; i<workflow->prefs.num_roots; i++)
     ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
@@ -232,8 +232,8 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow) {
 /* ***************************************************** */
 
 int ndpi_workflow_node_cmp(const void *a, const void *b) {
-  struct ndpi_flow_info *fa = (struct ndpi_flow_info*)a;
-  struct ndpi_flow_info *fb = (struct ndpi_flow_info*)b;
+  const struct ndpi_flow_info *fa = (const struct ndpi_flow_info*)a;
+  const struct ndpi_flow_info *fb = (const struct ndpi_flow_info*)b;
 
   if(fa->hashval < fb->hashval) return(-1); else if(fa->hashval > fb->hashval) return(1);
 
@@ -307,7 +307,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   u_int32_t idx, l4_offset, hashval;
   struct ndpi_flow_info flow;
   void *ret;
-  u_int8_t *l3, *l4;
+  const u_int8_t *l3, *l4;
 
   /*
     Note: to keep things simple (ndpiReader is just a demo app)
@@ -322,10 +322,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       return NULL;
 
     l4_offset = iph->ihl * 4;
-    l3 = (u_int8_t*)iph;
+    l3 = (const u_int8_t*)iph;
   } else {
     l4_offset = sizeof(struct ndpi_ipv6hdr);
-    l3 = (u_int8_t*)iph6;
+    l3 = (const u_int8_t*)iph6;
   }
 
   if(l4_packet_len < 64)
@@ -345,7 +345,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     workflow->stats.max_packet_len = l4_packet_len;
 
   *proto = iph->protocol;
-  l4 = ((u_int8_t *) l3 + l4_offset);
+  l4 = ((const u_int8_t *) l3 + l4_offset);
 
   if(iph->protocol == IPPROTO_TCP && l4_packet_len >= 20) {
     u_int tcp_len;
@@ -355,7 +355,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *tcph = (struct ndpi_tcphdr *)l4;
     *sport = ntohs((*tcph)->source), *dport = ntohs((*tcph)->dest);
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
-    *payload = &l4[tcp_len];
+    *payload = (u_int8_t*)&l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
   } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
     // udp
@@ -363,8 +363,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     workflow->stats.udp_count++;
     *udph = (struct ndpi_udphdr *)l4;
     *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);
-    *payload = &l4[sizeof(struct ndpi_udphdr)];
-    *payload_len = ndpi_max(0, l4_packet_len-sizeof(struct ndpi_udphdr));
+    *payload = (u_int8_t*)&l4[sizeof(struct ndpi_udphdr)];
+    *payload_len = (l4_packet_len > sizeof(struct ndpi_udphdr)) ? l4_packet_len-sizeof(struct ndpi_udphdr) : 0;
   } else {
     // non tcp/udp protocols
     *sport = *dport = 0;
@@ -507,7 +507,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   iph.protocol = iph6->ip6_hdr.ip6_un1_nxt;
 
   if(iph.protocol == IPPROTO_DSTOPTS /* IPv6 destination option */) {
-    u_int8_t *options = (u_int8_t*)iph6 + sizeof(const struct ndpi_ipv6hdr);
+    const u_int8_t *options = (const u_int8_t*)iph6 + sizeof(const struct ndpi_ipv6hdr);
 
     iph.protocol = options[0];
   }
@@ -530,7 +530,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   /* BITTORRENT */
   if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_BITTORRENT) {
-    int i, j, n = 0;
+    u_int i, j, n = 0;
 
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
       sprintf(&flow->bittorent_hash[j], "%02x",
@@ -751,8 +751,14 @@ struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
   workflow->last_time = time;
 
   /*** check Data Link type ***/
-  const int datalink_type = pcap_datalink(workflow->pcap_handle);
+  int datalink_type;
 
+#ifdef USE_DPDK
+  datalink_type = DLT_EN10MB;
+#else
+  datalink_type = (int)pcap_datalink(workflow->pcap_handle);
+#endif
+  
 datalink_check:
   switch(datalink_type) {
   case DLT_NULL:
@@ -1076,3 +1082,49 @@ u_int32_t ethernet_crc32(const void* data, size_t n_bytes) {
   __crc32(data, n_bytes, &crc);
   return crc;
 }
+
+/* *********************************************** */
+
+#ifdef USE_DPDK
+
+static const struct rte_eth_conf port_conf_default = {
+  .rxmode = { .max_rx_pkt_len = ETHER_MAX_LEN }
+};
+
+/* ************************************ */
+
+int dpdk_port_init(int port, struct rte_mempool *mbuf_pool) {
+  struct rte_eth_conf port_conf = port_conf_default;
+  const u_int16_t rx_rings = 1, tx_rings = 1;
+  int retval;
+  u_int16_t q;
+
+  /* 1 RX queue */
+  retval = rte_eth_dev_configure(port, rx_rings, tx_rings, &port_conf);
+
+  if(retval != 0)
+    return retval;
+
+  for (q = 0; q < rx_rings; q++) {
+    retval = rte_eth_rx_queue_setup(port, q, RX_RING_SIZE, rte_eth_dev_socket_id(port), NULL, mbuf_pool);
+    if(retval < 0)
+      return retval;
+  }
+
+  for (q = 0; q < tx_rings; q++) {
+    retval = rte_eth_tx_queue_setup(port, q, TX_RING_SIZE, rte_eth_dev_socket_id(port), NULL);
+    if(retval < 0)
+      return retval;
+  }
+
+  retval = rte_eth_dev_start(port);
+
+  if(retval < 0)
+    return retval;
+
+  rte_eth_promiscuous_enable(port);
+
+  return 0;
+}
+
+#endif
