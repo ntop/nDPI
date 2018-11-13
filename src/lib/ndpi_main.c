@@ -3948,7 +3948,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)
       goto check_stun_export;
-    else if(flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') {
+    else if((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL, NDPI_PROTOCOL_UNKNOWN);
     } else {
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
@@ -4283,7 +4283,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
       }
     }
 
-    if(flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') {
+    if((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
       unsigned long id;
       int rc = ndpi_match_custom_category(ndpi_struct, (char *)flow->protos.stun_ssl.ssl.client_certificate, &id);
 
