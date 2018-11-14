@@ -6063,3 +6063,27 @@ u_int ndpi_get_ndpi_detection_module_size() {
 void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l) {
   ndpi_mod->ndpi_log_level = l;
 }
+
+/* ******************************************************************** */
+
+/*
+  NOTE:
+  - Leave fields empty/zero when information is missing (e.g. with ICMP ports are zero)
+  - The hash_buf most be 30+1 bits or longer
+  - Return code: 0 = OK, -1 otherwise
+ */
+
+int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip,
+			  u_int32_t dst_ip, u_int16_t src_port, u_int16_t dst_port,
+			  u_int8_t icmp_type, u_int8_t icmp_code,
+			  u_char *hash_buf, u_int8_t hash_buf_len) {
+
+  return(0); /* OK */
+}
+
+int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struct ndpi_in6_addr *dst_ip,
+			  u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
+			  u_char *hash_buf, u_int8_t hash_buf_len) {
+
+  return(0); /* OK */
+}

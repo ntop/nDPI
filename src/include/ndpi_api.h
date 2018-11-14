@@ -772,6 +772,14 @@ extern "C" {
   void * ndpi_calloc(unsigned long count, size_t size);
   void ndpi_free(void *ptr);
   u_int8_t ndpi_get_api_version();
+
+  /* https://github.com/corelight/community-id-spec */
+  int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip, u_int16_t src_port, u_int16_t dst_port,
+			    u_int8_t icmp_type, u_int8_t icmp_code, u_char *hash_buf, u_int8_t hash_buf_len);
+  int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struct ndpi_in6_addr *dst_ip,
+			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
+			    u_char *hash_buf, u_int8_t hash_buf_len);
+  
 #ifdef __cplusplus
 }
 #endif
