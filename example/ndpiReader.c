@@ -2703,7 +2703,7 @@ void test_lib() {
 void automataUnitTest() {
   void *automa;
 
-  assert(automa = ndpi_init_automa());
+  assert((automa = ndpi_init_automa()));
   assert(ndpi_add_string_to_automa(automa, "hello") == 0);
   assert(ndpi_add_string_to_automa(automa, "world") == 0);
   ndpi_finalize_automa(automa);
