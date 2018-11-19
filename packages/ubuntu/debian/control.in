@@ -8,7 +8,7 @@ Build-Conflicts:
 
 Package: ndpi
 Architecture: @EXTN@
-Depends: libnuma
+Depends: libnuma1
 Recommends:
 Suggests:
 Pre-Depends:
