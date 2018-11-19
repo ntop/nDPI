@@ -26,7 +26,7 @@ fi
 
 NDPI_VERS=`cat ../../configure.ac|grep C_INIT|cut -c 21-|rev|cut -c 3-|rev`
 GIT_RELEASE=`git rev-parse HEAD`
-GIT_COMMITS=`git rev-list --all |wc -l | tr -d '[[:space:]]'`
+GIT_REVISION=`git rev-list --all |wc -l | tr -d '[[:space:]]'`
 
 AC_CONFIG_FILES([Makefile debian/changelog debian/files debian/control])
 
@@ -36,6 +36,6 @@ AC_SUBST(EXTN)
 AC_SUBST(DATE)
 AC_SUBST(KERNEL)
 AC_SUBST(GIT_RELEASE)
-AC_SUBST(GIT_COMMITS)
+AC_SUBST(GIT_REVISION)
 
 AC_OUTPUT

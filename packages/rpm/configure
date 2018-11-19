@@ -589,7 +589,7 @@ KERNEL
 DATE
 EXTN
 MACHINE
-NDPI_VERS
+PLATFORM
 target_alias
 host_alias
 build_alias
@@ -1671,6 +1671,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 DATE=`date -R`
 KERNEL=`uname -r`
+PLATFORM=`uname -p`
 MACHINE=`uname -m`
 SHORT_MACHINE=`uname -m | cut -b1-3`
 
@@ -1693,11 +1694,12 @@ else
   fi
 fi
 
-NDPI_VERS=`cat ../../configure.ac|grep C_INIT|cut -c 21-|rev|cut -c 3-|rev`
+PACKAGE_VERSION=`cat ../../configure.ac|grep C_INIT|cut -c 21-|rev|cut -c 3-|rev`
 GIT_RELEASE=`git rev-parse HEAD`
 GIT_REVISION=`git rev-list --all |wc -l | tr -d '[:space:]'`
 
-ac_config_files="$ac_config_files Makefile debian/changelog debian/files debian/control"
+ac_config_files="$ac_config_files Makefile ndpi.spec"
+
 
 
 
@@ -2414,9 +2416,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "debian/changelog") CONFIG_FILES="$CONFIG_FILES debian/changelog" ;;
-    "debian/files") CONFIG_FILES="$CONFIG_FILES debian/files" ;;
-    "debian/control") CONFIG_FILES="$CONFIG_FILES debian/control" ;;
+    "ndpi.spec") CONFIG_FILES="$CONFIG_FILES ndpi.spec" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -2865,4 +2865,5 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
+
 
