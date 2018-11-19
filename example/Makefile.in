@@ -13,7 +13,7 @@ ndpiReader: $(OBJS) $(LIBNDPI)
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
-install:
+install: ndpiReader
 	cp ndpiReader $(DESTDIR)$(PREFIX)/bin/
 
 dpdk:

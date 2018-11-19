@@ -1,0 +1,44 @@
+AC_INIT([Makefile.in], 1.0)
+
+DATE=`date -R`
+KERNEL=`uname -r`
+PLATFORM=`uname -p`
+MACHINE=`uname -m`
+SHORT_MACHINE=`uname -m | cut -b1-3`
+
+EXTN=""
+if test $MACHINE = "x86_64"; then
+  EXTN="amd64"
+else
+  if test $SHORT_MACHINE = "aar"; then
+    EXTN="arm64"
+  else
+    if test $SHORT_MACHINE = "arm"; then
+      EXTN="armhf"
+    else
+      if test $SHORT_MACHINE = "mip"; then
+        EXTN="mips"
+      else	
+        EXTN="i386"
+      fi
+    fi
+  fi
+fi
+
+PACKAGE_VERSION=`cat ../../configure.ac|grep C_INIT|cut -c 21-|rev|cut -c 3-|rev`
+GIT_RELEASE=`git rev-parse HEAD`
+GIT_REVISION=`git rev-list --all |wc -l | tr -d '[[:space:]]'`
+
+AC_CONFIG_FILES([Makefile ndpi.spec])
+
+AC_SUBST(PACKAGE_VERSION)
+AC_SUBST(PLATFORM)
+AC_SUBST(MACHINE)
+AC_SUBST(EXTN)
+AC_SUBST(DATE)
+AC_SUBST(KERNEL)
+AC_SUBST(GIT_RELEASE)
+AC_SUBST(GIT_REVISION)
+
+AC_OUTPUT
+
