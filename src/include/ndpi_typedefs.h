@@ -826,7 +826,7 @@ typedef enum {
   ndpi_pref_dns_dissect_response,
   ndpi_pref_direction_detect_disable,
   ndpi_pref_disable_metadata_export,
-  ndpi_pref_enable_category_substring_match,
+  ndpi_pref_enable_category_substring_match
 } ndpi_detection_preference;
   
 /* ntop extensions */

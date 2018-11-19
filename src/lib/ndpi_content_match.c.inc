@@ -21,7 +21,6 @@
 /* ****************************************************** */
 
 static ndpi_network host_protocol_list[] = {
-
   /*
     SoundCloud
   */
@@ -111,11 +110,14 @@ static ndpi_network host_protocol_list[] = {
     WeChat
     origin AS132203, AS132591, AS45090
   */
-
   { 0xCBCD93AB /* 203.205.147.171/32 */, 32, NDPI_PROTOCOL_WECHAT },
   { 0xCBCD93AD /* 203.205.147.173/32 */, 32, NDPI_PROTOCOL_WECHAT },
   { 0xCBCD97A2 /* 203.205.151.162/32 */, 32, NDPI_PROTOCOL_WECHAT },
-  { 0x67071E25 /* 103.7.30.37/32 */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0x67071E25 /* 103.7.30.37/32     */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0XCBCDB000 /* 203.205.176.0/20   */, 20, NDPI_PROTOCOL_WECHAT },
+  { 0XCBCDC000 /* 203.205.192.0/18   */, 18, NDPI_PROTOCOL_WECHAT },
+  
+
 
   /*
     OpenDNS, LLC
@@ -8327,10 +8329,7 @@ ndpi_protocol_match host_match[] = {
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-", NULL, "slack-assets2\\.s3-",                  "Slack",            NDPI_PROTOCOL_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { "zhiliaoapp.com", NULL, "zhiliaoapp" TLD,                          "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  { "muscdn.com", NULL, "muscdn" TLD,                                  "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  { "livelycdn.com", NULL, "livelycdn" TLD,                            "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  { "direct.ly", NULL, "direct\\.ly$",                                 "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "wechat.com", NULL, "wechat\\.com" TLD,                            "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
   { "github.com", NULL, "github" TLD,                                  "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".github.com", NULL, "\\.github" TLD,                              "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },

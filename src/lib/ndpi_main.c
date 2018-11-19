@@ -517,7 +517,6 @@ void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 
 		(*(ndpi_struct->ndpi_debug_printf))(protocol_id, ndpi_struct, NDPI_LOG_DEBUG,
 		 _file, _func, _line, "exclude %s\n",ndpi_get_proto_name(ndpi_struct, protocol_id));
-
 	}
 #endif
 	NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, protocol_id);
@@ -1205,9 +1204,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Teredo", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_MUSICALLY,
-			    no_master,
-			    no_master, "Musical.ly", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WECHAT,
+			    no_master, /* wechat.com */
+			    no_master, "WeChat", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEMCACHED,
@@ -1245,7 +1244,12 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_196,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_39,
+			    no_master,
+			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_39,
 			    no_master,
 			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -2523,6 +2527,7 @@ static ndpi_default_ports_tree_node_t* ndpi_get_guessed_protocol_id(struct ndpi_
 /* ****************************************************** */
 
 u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow,
 				 u_int8_t proto, u_int16_t sport, u_int16_t dport,
 				 u_int8_t *user_defined_proto) {
 
@@ -2531,8 +2536,17 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struc
     ndpi_default_ports_tree_node_t *found = ndpi_get_guessed_protocol_id(ndpi_struct, proto, sport, dport);
 
     if(found != NULL) {
-      *user_defined_proto = found->customUserProto;
-      return(found->proto->protoId);
+      u_int16_t guessed_proto = found->proto->protoId;
+
+      /* We need to check if the guessed protocol isn't excluded by nDPI */
+      if(flow
+	 && (proto == IPPROTO_UDP)
+	 && (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, guessed_proto)))
+	return(NDPI_PROTOCOL_UNKNOWN);
+      else {
+	*user_defined_proto = found->customUserProto;
+	return(guessed_proto);
+      }
     }
   } else {
     /* No TCP/UDP */
@@ -3956,18 +3970,17 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	 && (flow->l4.tcp.ssl_stage > 1))
 	flow->guessed_protocol_id = NDPI_PROTOCOL_SSL_NO_CERT;
 
-      guessed_protocol_id = flow->guessed_protocol_id,
-	guessed_host_protocol_id = flow->guessed_host_protocol_id;
+      guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
 
       if((guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-	 && (NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_host_protocol_id)))
-	guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
-
+	 && ((flow->packet.l4_protocol == IPPROTO_UDP) && NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_host_protocol_id)))
+	flow->guessed_host_protocol_id = guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
+      
       /* Ignore guessed protocol if they have been discarded */
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-	 && (guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-	 && (NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_protocol_id)))
-	guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
+	 // && (guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+	 && (flow->packet.l4_protocol == IPPROTO_UDP) && NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_protocol_id))
+	flow->guessed_protocol_id = guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	 || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
@@ -4394,7 +4407,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     else sport = dport = 0;
 
     /* guess protocol */
-    flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_struct, protocol, sport, dport, &user_defined_proto);
+    flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_struct, flow, protocol, sport, dport, &user_defined_proto);
     flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_struct, flow);
 
     if(flow->guessed_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
@@ -5356,6 +5369,7 @@ u_int16_t ndpi_get_lower_proto(ndpi_protocol proto) {
 /* ****************************************************** */
 
 ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+					     struct ndpi_flow_struct *flow,
 					     u_int8_t proto,
 					     u_int32_t shost /* host byte order */, u_int16_t sport,
 					     u_int32_t dhost /* host byte order */, u_int16_t dport) {
@@ -5365,30 +5379,37 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
   u_int8_t user_defined_proto;
 
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
-    rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, NULL, proto,
-				    shost, dhost, sport, dport);
+    rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, NULL, proto, shost, dhost, sport, dport);
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
-      ret.app_protocol = rc,
-	ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport,
-						     dport, &user_defined_proto);
-
-      if(ret.app_protocol == ret.master_protocol)
-	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
-
-      ret.category = ndpi_get_proto_category(ndpi_struct, ret);
-      return(ret);
-    }
-
-    rc = ndpi_guess_protocol_id(ndpi_struct, proto, sport, dport, &user_defined_proto);
-    if(rc != NDPI_PROTOCOL_UNKNOWN) {
-      ret.app_protocol = rc;
-
-      if(rc == NDPI_PROTOCOL_SSL)
-	goto check_guessed_skype;
+      if(flow && (proto == IPPROTO_UDP) && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc))
+	;
       else {
+	ret.app_protocol = rc,
+	  ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, NULL, proto, sport,
+						       dport, &user_defined_proto);
+	
+	if(ret.app_protocol == ret.master_protocol)
+	  ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+	
 	ret.category = ndpi_get_proto_category(ndpi_struct, ret);
 	return(ret);
+      }
+    }
+
+    rc = ndpi_guess_protocol_id(ndpi_struct, NULL, proto, sport, dport, &user_defined_proto);
+    if(rc != NDPI_PROTOCOL_UNKNOWN) {
+      if(flow && (proto == IPPROTO_UDP) && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc))
+	;
+      else {
+	ret.app_protocol = rc;
+	
+	if(rc == NDPI_PROTOCOL_SSL)
+	  goto check_guessed_skype;
+	else {
+	  ret.category = ndpi_get_proto_category(ndpi_struct, ret);
+	  return(ret);
+	}
       }
     }
 
@@ -5402,10 +5423,10 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 	ret.app_protocol = NDPI_PROTOCOL_SKYPE;
     }
   } else
-    ret.app_protocol = ndpi_guess_protocol_id(ndpi_struct, proto, sport,
+    ret.app_protocol = ndpi_guess_protocol_id(ndpi_struct, NULL, proto, sport,
 					      dport, &user_defined_proto);
 
-  ret.category = ndpi_get_proto_category(ndpi_struct, ret);
+  ret.category = ndpi_get_proto_category(ndpi_struct, ret);  
   return(ret);
 }
 

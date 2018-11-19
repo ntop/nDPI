@@ -326,6 +326,7 @@ extern "C" {
    * Search and return the protocol guessed that is undetected
    *
    * @par    ndpi_struct  = the detection module
+   * @par    flow         = the flow we're trying to guess, NULL if not available
    * @par    proto        = the l4 protocol number
    * @par    shost        = source address in host byte order
    * @par    sport        = source port number
@@ -335,6 +336,7 @@ extern "C" {
    *
    */
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+					       struct ndpi_flow_struct *flow,
 					       u_int8_t proto,
 					       u_int32_t shost,
 					       u_int16_t sport,

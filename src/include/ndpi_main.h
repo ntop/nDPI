@@ -119,6 +119,7 @@ extern "C" {
   u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, const char *name);
 
   extern u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
+					  struct ndpi_flow_struct *flow,
 					  u_int8_t proto, u_int16_t sport, u_int16_t dport,
 					  u_int8_t *user_defined_proto);
 

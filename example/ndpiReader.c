@@ -911,6 +911,7 @@ static void node_print_known_proto_walker(const void *node,
 static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi_flow_info *flow) {
 
   flow->detected_protocol = ndpi_guess_undetected_protocol(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+							   NULL,
 							   flow->protocol,
 							   ntohl(flow->src_ip),
 							   ntohs(flow->src_port),
