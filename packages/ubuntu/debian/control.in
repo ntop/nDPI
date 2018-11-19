@@ -19,7 +19,7 @@ Description: A L7 DPI library.
 
 Package: ndpi-dev
 Section: libdevel
-Architecture: all
+Architecture: @EXTN@
 Depends: ndpi (= ${binary:Version}), ${misc:Depends}
 Conflicts: 
 Description: Development library and header files for ndpi

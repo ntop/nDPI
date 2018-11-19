@@ -28,10 +28,10 @@ ndpi:
 	@echo "Package built."
 	@/bin/ls ndpi*deb
 	@echo "-------------------------------"
-	-dpkg --contents ndpi*@EXTN@.deb
+	-dpkg --contents ndpi_*.deb
 	@echo "-------------------------------"
 	@echo "-------------------------------"
-	-dpkg --contents ndpi*all.deb
+	-dpkg --contents ndpi-dev_*.deb
 	@echo "-------------------------------"
 
 distclean:
