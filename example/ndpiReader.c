@@ -81,7 +81,8 @@ static json_object *jArray_topStats;
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
-static u_int8_t enable_protocol_guess = 1, verbose = 0, json_flag = 0;
+u_int8_t enable_protocol_guess = 1;
+static u_int8_t verbose = 0, json_flag = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
@@ -97,7 +98,7 @@ static struct timeval begin, end;
 #ifdef linux
 static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
-static struct timeval pcap_start, pcap_end;
+static struct timeval pcap_start = { 0, 0}, pcap_end = { 0, 0 };
 /** Detection parameters **/
 static time_t capture_for = 0;
 static time_t capture_until = 0;
@@ -906,27 +907,6 @@ static void node_print_known_proto_walker(const void *node,
 /* ********************************** */
 
 /**
- * @brief Guess Undetected Protocol
- */
-static u_int16_t node_guess_undetected_protocol(u_int16_t thread_id, struct ndpi_flow_info *flow) {
-
-  flow->detected_protocol = ndpi_guess_undetected_protocol(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-							   NULL,
-							   flow->protocol,
-							   ntohl(flow->src_ip),
-							   ntohs(flow->src_port),
-							   ntohl(flow->dst_ip),
-							   ntohs(flow->dst_port));
-  // printf("Guess state: %u\n", flow->detected_protocol);
-  if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
-    ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
-
-  return(flow->detected_protocol.app_protocol);
-}
-
-/* ********************************** */
-
-/**
  * @brief Proto Guess Walker
  */
 static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
@@ -935,13 +915,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow)
-      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct, flow->ndpi_flow);
-
-    if(enable_protocol_guess) {
-      if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
-	node_guess_undetected_protocol(thread_id, flow);
-      }
-    }
+      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct, flow->ndpi_flow, enable_protocol_guess);
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
 
@@ -1416,23 +1390,12 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 
 
 /**
- * @brief On Protocol Discover - call node_guess_undetected_protocol() for protocol
+ * @brief On Protocol Discover - demo callback
  */
 static void on_protocol_discovered(struct ndpi_workflow * workflow,
 				   struct ndpi_flow_info * flow,
 				   void * udata) {
-  const u_int16_t thread_id = (uintptr_t) udata;
-
-  if(verbose > 1) {
-    if(enable_protocol_guess) {
-      if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
-        flow->detected_protocol.app_protocol = node_guess_undetected_protocol(thread_id, flow),
-	  flow->detected_protocol.master_protocol = NDPI_PROTOCOL_UNKNOWN;
-      }
-    }
-
-    // printFlow(thread_id, flow);
-  }
+  ;
 }
 
 #if 0
@@ -2026,8 +1989,10 @@ static void printResults(u_int64_t tot_usec) {
 	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)tot_usec;
 	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)tot_usec;
 	float traffic_duration;
+	
 	if(live_capture) traffic_duration = tot_usec;
 	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
+	
 	printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
 	b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)traffic_duration;

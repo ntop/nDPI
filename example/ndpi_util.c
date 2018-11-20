@@ -74,6 +74,8 @@
 #include "ndpi_main.h"
 #include "ndpi_util.h"
 
+extern u_int8_t enable_protocol_guess;
+
 /* ***************************************************** */
 
 void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
@@ -677,8 +679,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       flow->check_extra_packets = 1;
 
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
-						      flow->ndpi_flow);
+      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
+						      enable_protocol_guess);
+    
     process_ndpi_collected_info(workflow, flow);
   }
 

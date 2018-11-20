@@ -66,7 +66,7 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	}
       }
       
-      return;
+      // return;
     }
     
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

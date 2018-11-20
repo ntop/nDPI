@@ -213,11 +213,13 @@ extern "C" {
    *
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
+   * @par    enable_guess = guess protocol if unknown
    * @return the detected protocol even if the flow is not completed;
    *
    */
   ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
-				      struct ndpi_flow_struct *flow);
+				      struct ndpi_flow_struct *flow,
+				      u_int8_t enable_guess);
 
   /**
    * Processes an extra packet in order to get more information for a given protocol

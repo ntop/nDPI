@@ -2526,6 +2526,25 @@ static ndpi_default_ports_tree_node_t* ndpi_get_guessed_protocol_id(struct ndpi_
 
 /* ****************************************************** */
 
+/*
+  These are UDP protocols that must fit a single packet
+  and thus that if have NOT been detected they cannot be guessed
+  as they have been excluded
+ */
+u_int8_t is_udp_guessable_protocol(u_int16_t l7_guessed_proto) {
+  switch(l7_guessed_proto) {
+  case NDPI_PROTOCOL_QUIC:
+  case NDPI_PROTOCOL_SNMP:
+  case NDPI_PROTOCOL_NETFLOW:
+    /* TODO: add more protocols (if any missing) */
+    return(1);
+  }
+
+  return(0);
+}
+
+/* ****************************************************** */
+
 u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 u_int8_t proto, u_int16_t sport, u_int16_t dport,
@@ -2541,7 +2560,9 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struc
       /* We need to check if the guessed protocol isn't excluded by nDPI */
       if(flow
 	 && (proto == IPPROTO_UDP)
-	 && (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, guessed_proto)))
+	 && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, guessed_proto)
+	 && is_udp_guessable_protocol(guessed_proto)
+	 )
 	return(NDPI_PROTOCOL_UNKNOWN);
       else {
 	*user_defined_proto = found->customUserProto;
@@ -3397,7 +3418,7 @@ static int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struc
   }
   return 0;
 }
-#endif							/* NDPI_DETECTION_SUPPORT_IPV6 */
+#endif /* NDPI_DETECTION_SUPPORT_IPV6 */
 
 
 static u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize)
@@ -3605,13 +3626,18 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	 && flow->init_finished != 0
 	 && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
 	u_int8_t backup;
+	u_int16_t backup1, backup2;
 	
 	if(flow->http.url)          ndpi_free(flow->http.url);
 	if(flow->http.content_type) ndpi_free(flow->http.content_type);
 
-	backup = flow->num_processed_pkts;
+	backup  = flow->num_processed_pkts;
+	backup1 = flow->guessed_protocol_id;
+	backup2 = flow->guessed_host_protocol_id;	
 	memset(flow, 0, sizeof(*(flow)));
 	flow->num_processed_pkts = backup;
+	flow->guessed_protocol_id      = backup1;
+	flow->guessed_host_protocol_id = backup2;
 	
 	NDPI_LOG_DBG(ndpi_struct,
 		 "tcp syn packet for unknown protocol, reset detection state\n");
@@ -3785,9 +3811,8 @@ void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_struct
        ndpi_struct->callback_buffer_non_tcp_udp[a].ndpi_selection_bitmask
        && (flow == NULL
 	   ||
-	   NDPI_BITMASK_COMPARE
-	   (flow->excluded_protocol_bitmask,
-	    ndpi_struct->callback_buffer_non_tcp_udp[a].excluded_protocol_bitmask) == 0)
+	   NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
+				ndpi_struct->callback_buffer_non_tcp_udp[a].excluded_protocol_bitmask) == 0)
        && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_non_tcp_udp[a].detection_bitmask,
 			       detection_bitmask) != 0) {
 
@@ -3905,8 +3930,7 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 	 && (ndpi_struct->callback_buffer_tcp_no_payload[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
 	 ndpi_struct->callback_buffer_tcp_no_payload[a].ndpi_selection_bitmask
 	 && NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
-				 ndpi_struct->
-				 callback_buffer_tcp_no_payload[a].excluded_protocol_bitmask) == 0
+				 ndpi_struct->callback_buffer_tcp_no_payload[a].excluded_protocol_bitmask) == 0
 	 && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_tcp_no_payload[a].detection_bitmask,
 				 detection_bitmask) != 0) {
 	ndpi_struct->callback_buffer_tcp_no_payload[a].func(ndpi_struct, flow);
@@ -3951,7 +3975,7 @@ static u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct
 /* ********************************************************************************* */
 
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow) {
+				    struct ndpi_flow_struct *flow, u_int8_t enable_guess) {
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
 
   if(flow == NULL) return(ret);
@@ -3973,13 +3997,18 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
 
       if((guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
-	 && ((flow->packet.l4_protocol == IPPROTO_UDP) && NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_host_protocol_id)))
+	 && ((flow->packet.l4_protocol == IPPROTO_UDP)
+	     && NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_host_protocol_id)
+	     && is_udp_guessable_protocol(guessed_host_protocol_id)
+	     ))
 	flow->guessed_host_protocol_id = guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
       
       /* Ignore guessed protocol if they have been discarded */
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	 // && (guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-	 && (flow->packet.l4_protocol == IPPROTO_UDP) && NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_protocol_id))
+	 && (flow->packet.l4_protocol == IPPROTO_UDP)
+	 && NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_protocol_id)
+	 && is_udp_guessable_protocol(guessed_protocol_id))
 	flow->guessed_protocol_id = guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
@@ -4025,6 +4054,20 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     else if(ret.app_protocol == NDPI_PROTOCOL_GOOGLE)
       ret.app_protocol = NDPI_PROTOCOL_HANGOUT;
   }
+  
+  if(enable_guess
+     && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && flow->packet.iph /* Guess only IPv4 */
+     && (flow->packet.tcp || flow->packet.udp)
+     )
+    ret = ndpi_guess_undetected_protocol(ndpi_struct,
+					 flow,
+					 flow->packet.l4_protocol,
+					 ntohl(flow->packet.iph->saddr),
+					 ntohs(flow->packet.udp ? flow->packet.udp->source : flow->packet.tcp->source),
+					 ntohl(flow->packet.iph->daddr),
+					 ntohs(flow->packet.udp ? flow->packet.udp->dest : flow->packet.tcp->dest)
+					 );
   
   ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
 
@@ -4421,7 +4464,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       if(flow->packet.iph) {
 	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
 	  /* ret.master_protocol = flow->guessed_protocol_id , ret.app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
-	  ret = ndpi_detection_giveup(ndpi_struct, flow);
+	  ret = ndpi_detection_giveup(ndpi_struct, flow, 0);
 	}
 
 	ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
@@ -4499,7 +4542,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       We don't see how future packets can match anything
       hence we giveup here
     */
-    ret = ndpi_detection_giveup(ndpi_struct, flow);
+    ret = ndpi_detection_giveup(ndpi_struct, flow, 0);
   }
 
   return(ret);
@@ -5382,7 +5425,9 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
     rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, NULL, proto, shost, dhost, sport, dport);
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
-      if(flow && (proto == IPPROTO_UDP) && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc))
+      if(flow && (proto == IPPROTO_UDP)
+	 && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc)
+	 && is_udp_guessable_protocol(rc))
 	;
       else {
 	ret.app_protocol = rc,
@@ -5399,7 +5444,9 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 
     rc = ndpi_guess_protocol_id(ndpi_struct, NULL, proto, sport, dport, &user_defined_proto);
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
-      if(flow && (proto == IPPROTO_UDP) && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc))
+      if(flow && (proto == IPPROTO_UDP)
+	 && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc)
+	 && is_udp_guessable_protocol(rc))
 	;
       else {
 	ret.app_protocol = rc;
