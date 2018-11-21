@@ -2400,7 +2400,7 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
 /**
  * @brief Check pcap packet
  */
-static void pcap_process_packet(u_char *args,
+static void ndpi_process_packet(u_char *args,
 				const struct pcap_pkthdr *header,
 				const u_char *packet) {
   struct ndpi_proto p;
@@ -2522,7 +2522,7 @@ static void pcap_process_packet(u_char *args,
  */
 static void runPcapLoop(u_int16_t thread_id) {
   if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL))
-    pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &pcap_process_packet, (u_char*)&thread_id);
+    pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id);
 }
 
 /**
@@ -2570,7 +2570,7 @@ void * processing_thread(void *_thread_id) {
       h.len = h.caplen = len;
       gettimeofday(&h.ts, NULL);
 
-      pcap_process_packet((u_char*)&thread_id, &h, (const u_char *)data);
+      ndpi_process_packet((u_char*)&thread_id, &h, (const u_char *)data);
       rte_pktmbuf_free(bufs[i]);
     }
   }
