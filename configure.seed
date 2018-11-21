@@ -87,6 +87,7 @@ if test "${with_hyperscan+set}" = set; then
           HS_INC=`pkg-config --cflags libhs`
           HS_LIB=`pkg-config --libs libhs`
           LDFLAGS="$LDFLAGS $HS_LIB"
+	  AC_MSG_RESULT([compiling with Intel Hyperscan])
      else
           AC_MSG_RESULT([Intel Hyperscan not found, exiting. See https://github.com/intel/hyperscan/blob/master/doc/dev-reference/getting_started.rst for install/build instructions])
           exit 1

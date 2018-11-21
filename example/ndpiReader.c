@@ -94,7 +94,7 @@ static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
 static u_int8_t num_threads = 1;
-static struct timeval begin, end;
+static struct timeval startup_time, begin, end;
 #ifdef linux
 static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
@@ -1890,7 +1890,7 @@ void printPortStats(struct port_stats *stats) {
 /**
  * @brief Print result
  */
-static void printResults(u_int64_t tot_usec) {
+static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_usec) {
   u_int32_t i;
   u_int64_t total_flow_bytes = 0;
   u_int32_t avg_pkt_size = 0;
@@ -1953,7 +1953,9 @@ static void printResults(u_int64_t tot_usec) {
     printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(sizeof(struct ndpi_flow_struct), buf, sizeof(buf)));
     printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
     printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
-
+    printf("\tSetup Time:              %lu msec\n", setup_time_usec/1000);
+    printf("\tPacket Processing Time:  %lu msec\n", processing_time_usec/1000);
+    
     if(!json_flag) {
       printf("\nTraffic statistics:\n");
       printf("\tEthernet bytes:        %-13llu (includes ethernet CRC/IFC/trailer)\n",
@@ -1984,13 +1986,13 @@ static void printResults(u_int64_t tot_usec) {
       printf("\tPacket Len 1024-1500:  %-13lu\n", (unsigned long)cumulative_stats.packet_len[4]);
       printf("\tPacket Len > 1500:     %-13lu\n", (unsigned long)cumulative_stats.packet_len[5]);
 
-      if(tot_usec > 0) {
+      if(processing_time_usec > 0) {
 	char buf[32], buf1[32], when[64];
-	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)tot_usec;
-	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)tot_usec;
+	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)processing_time_usec;
+	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)processing_time_usec;
 	float traffic_duration;
 	
-	if(live_capture) traffic_duration = tot_usec;
+	if(live_capture) traffic_duration = processing_time_usec;
 	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
 	
 	printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
@@ -2002,7 +2004,7 @@ static void printResults(u_int64_t tot_usec) {
 	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime(&pcap_end.tv_sec));
 	printf("\tAnalysis end:          %s\n", when);
 	printf("\tTraffic throughput:    %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
-	printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);
+	printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);	
       }
 
       if(enable_protocol_guess)
@@ -2491,12 +2493,13 @@ static void pcap_process_packet(u_char *args,
 
   if((pcap_end.tv_sec-pcap_start.tv_sec) > pcap_analysis_duration) {
     int i;
-    u_int64_t tot_usec;
+    u_int64_t processing_time_usec, setup_time_usec;
 
     gettimeofday(&end, NULL);
-    tot_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
-
-    printResults(tot_usec);
+    processing_time_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
+    setup_time_usec = begin.tv_sec*1000000 + begin.tv_usec - (startup_time.tv_sec*1000000 + startup_time.tv_usec);
+    
+    printResults(processing_time_usec, setup_time_usec);
 
     for(i=0; i<ndpi_thread_info[thread_id].workflow->prefs.num_roots; i++) {
       ndpi_tdestroy(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
@@ -2595,7 +2598,7 @@ pcap_loop:
  */
 void test_lib() {
   struct timeval end;
-  u_int64_t tot_usec;
+  u_int64_t processing_time_usec, setup_time_usec;
   long thread_id;
 
 #ifdef HAVE_JSON_C
@@ -2647,10 +2650,11 @@ void test_lib() {
   }
 
   gettimeofday(&end, NULL);
-  tot_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
+  processing_time_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
+  setup_time_usec = begin.tv_sec*1000000 + begin.tv_usec - (startup_time.tv_sec*1000000 + startup_time.tv_usec);
 
   /* Printing cumulative results */
-  printResults(tot_usec);
+  printResults(processing_time_usec, setup_time_usec);
 
   if(stats_flag) {
 #ifdef HAVE_JSON_C
@@ -3263,8 +3267,8 @@ int orginal_main(int argc, char **argv) {
 #else
   int main(int argc, char **argv) {
 #endif
-    int i;
-
+    int i;    
+    
     if(ndpi_get_api_version() != NDPI_API_VERSION) {
       printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
       return(-1);
@@ -3272,7 +3276,9 @@ int orginal_main(int argc, char **argv) {
 
     automataUnitTest();
 
+    gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module();
+	   
     if(ndpi_info_mod == NULL) return -1;
 
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
