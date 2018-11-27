@@ -80,6 +80,8 @@ static ndpi_network host_protocol_list[] = {
   /*
     WhatsApp Inc.
   */
+  { 0x1F0D4B00 /* 31.13.75.0/24 */,     24, NDPI_PROTOCOL_WHATSAPP },
+  { 0x1F0D5600 /* 31.13.86.0/24 */,     24, NDPI_PROTOCOL_WHATSAPP },
   { 0x3216C6CC /* 50.22.198.204/30 */,  30, NDPI_PROTOCOL_WHATSAPP },
   { 0x4B7E2720 /* 75.126.39.32/27 */,   27, NDPI_PROTOCOL_WHATSAPP },
   { 0x6CA8B460 /* 108.168.180.96/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
