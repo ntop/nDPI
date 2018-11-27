@@ -8419,6 +8419,8 @@ ndpi_protocol_match host_match[] = {
   { "snapcraft.io", NULL, "snapcraft\\.io" TLD,                        "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
   { "ubuntu.com", NULL, "ubuntu\\.com" TLD,                            "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
+  { "signal.org", NULL, "signal\\.org" TLD,                            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+  { "whispersystems.org", NULL, "whispersystems\\.org" TLD,            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { NULL, NULL, NULL, 0 }
 };
 

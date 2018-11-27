@@ -73,7 +73,7 @@ typedef enum {
   NDPI_PROTOCOL_EDONKEY               = 36, /* Tomasz Bujlow <tomasz@skatnet.dk> */
   NDPI_PROTOCOL_BITTORRENT            = 37,
   NDPI_PROTOCOL_SKYPE_CALL_OUT        = 38,
-  NDPI_PROTOCOL_FREE_39               = 39, /* Free */
+  NDPI_PROTOCOL_SIGNAL                = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached - Darryl Sokoloski <darryl@egloo.ca> */
   NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */  
   NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
