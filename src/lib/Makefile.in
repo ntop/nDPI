@@ -54,6 +54,9 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 clean:
 	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo
 
+distclean: clean
+	/bin/rm -f Makefile
+
 install: $(NDPI_LIBS)
 	mkdir -p $(DESTDIR)$(libdir)
 	cp $(NDPI_LIBS) $(DESTDIR)$(libdir)/
