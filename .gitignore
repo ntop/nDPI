@@ -19,6 +19,8 @@ compile
 /example/.deps/
 /example/Makefile
 /example/ndpiReader
+/example/Makefile.dpdk
+/example/build
 *.in
 /install-sh
 *.ko
@@ -35,7 +37,7 @@ compile
 /m4/ltversion.m4
 /Makefile
 /missing
-*.[oa]
+*.[o]
 *.obj
 *o.cmd
 *o.cmd

@@ -1,7 +1,7 @@
 CC=@CC@
 CFLAGS=-g -I../src/include @CFLAGS@
 LIBNDPI=../src/lib/libndpi.a
-LDFLAGS=$(LIBNDPI) -lpcap -lpthread @LDFLAGS@
+LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread @LDFLAGS@
 OBJS=ndpiReader.o ndpi_util.o
 PREFIX?=/usr/local
 
@@ -14,11 +14,18 @@ ndpiReader: $(OBJS) $(LIBNDPI)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 install: ndpiReader
+	mkdir -p $(DESTDIR)$(PREFIX)/bin/
 	cp ndpiReader $(DESTDIR)$(PREFIX)/bin/
+	[ -f build/app/ndpiReader.dpdk ] && cp build/app/ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
+	[ -f ndpiReader.dpdk ] && cp ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
 
 dpdk:
 	make -f Makefile.dpdk
 
 clean:
 	/bin/rm -f *.o ndpiReader
+	/bin/rm -rf build
 
+distclean: clean
+	/bin/rm -f Makefile.dpdk
+	/bin/rm -f Makefile

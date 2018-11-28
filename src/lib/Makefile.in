@@ -52,7 +52,10 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo
+	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo $(NDPI_LIB_SHARED)
+
+distclean: clean
+	/bin/rm -f Makefile
 
 install: $(NDPI_LIBS)
 	mkdir -p $(DESTDIR)$(libdir)
