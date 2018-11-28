@@ -14,7 +14,9 @@ ndpiReader: $(OBJS) $(LIBNDPI)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 install: ndpiReader
+	mkdir -p $(DESTDIR)$(PREFIX)/bin/
 	cp ndpiReader $(DESTDIR)$(PREFIX)/bin/
+	[ -f build/app/ndpiReader.dpdk ] && cp build/app/ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/
 
 dpdk:
 	make -f Makefile.dpdk
