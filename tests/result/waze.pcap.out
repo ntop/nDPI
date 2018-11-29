@@ -1,8 +1,8 @@
 HTTP	28	1572	7
 NTP	2	180	1
 HTTP_Download	37	63205	1
-SSL_No_Cert	13	2142	1
 SSL	8	432	2
+Google	13	2142	1
 Waze	484	289335	19
 WhatsApp	15	1341	1
 Amazon	10	786	1
@@ -21,7 +21,7 @@ Amazon	10	786	1
 	12	TCP 10.8.0.1:36314 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][cat: Web/5][11 pkts/1260 bytes <-> 9 pkts/4413 bytes][server: *.world.waze.com]
 	13	TCP 10.8.0.1:51050 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][cat: Web/5][9 pkts/1184 bytes <-> 9 pkts/4369 bytes][server: *.waze.com]
 	14	TCP 10.8.0.1:45529 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][9 pkts/591 bytes <-> 8 pkts/3424 bytes][Host: roadshields.waze.com]
-	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 64/SSL_No_Cert][cat: Web/5][7 pkts/1137 bytes <-> 6 pkts/1005 bytes]
+	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 64.126/SSL_No_Cert.Google][cat: Web/5][7 pkts/1137 bytes <-> 6 pkts/1005 bytes]
 	16	TCP 10.8.0.1:45536 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][8 pkts/594 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
 	17	TCP 10.8.0.1:50828 <-> 108.168.176.228:443 [proto: 142/WhatsApp][cat: Chat/9][8 pkts/673 bytes <-> 7 pkts/668 bytes]
 	18	TCP 10.8.0.1:45546 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/557 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]

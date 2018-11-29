@@ -118,8 +118,6 @@ static ndpi_network host_protocol_list[] = {
   { 0x67071E25 /* 103.7.30.37/32     */, 32, NDPI_PROTOCOL_WECHAT },
   { 0XCBCDB000 /* 203.205.176.0/20   */, 20, NDPI_PROTOCOL_WECHAT },
   { 0XCBCDC000 /* 203.205.192.0/18   */, 18, NDPI_PROTOCOL_WECHAT },
-  
-
 
   /*
     OpenDNS, LLC
@@ -814,7 +812,7 @@ static ndpi_network host_protocol_list[] = {
 
   /*
     Canonical Ltd (Ubuntu)
-    origin AS41231
+    origin AS41231z
   */
 
   { 0x5BBD5800 /* 91.189.88.0/21 */,   21, NDPI_PROTOCOL_UBUNTUONE },

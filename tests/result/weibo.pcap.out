@@ -1,9 +1,8 @@
 DNS	10	1059	5
 HTTP	19	2275	5
 SSL	15	1234	10
-Google	10	660	5
+Google	33	4778	7
 Amazon	2	132	1
-QUIC	23	4118	2
 Sina(Weibo)	419	258077	16
 
 	1	TCP 192.168.1.105:35803 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][52 pkts/5367 bytes <-> 54 pkts/71536 bytes][Host: img.t.sinajs.cn]
@@ -13,8 +12,8 @@ Sina(Weibo)	419	258077	16
 	5	TCP 192.168.1.105:35805 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][21 pkts/2323 bytes <-> 20 pkts/20922 bytes][Host: img.t.sinajs.cn]
 	6	TCP 192.168.1.105:35809 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][18 pkts/1681 bytes <-> 17 pkts/20680 bytes][Host: img.t.sinajs.cn]
 	7	TCP 192.168.1.105:35806 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][7 pkts/946 bytes <-> 6 pkts/3755 bytes][Host: img.t.sinajs.cn]
-	8	UDP 192.168.1.105:53656 <-> 216.58.210.227:443 [proto: 188/QUIC][cat: Web/5][8 pkts/1301 bytes <-> 6 pkts/873 bytes]
-	9	UDP 216.58.210.14:443 <-> 192.168.1.105:49361 [proto: 188/QUIC][cat: Web/5][5 pkts/963 bytes <-> 4 pkts/981 bytes]
+	8	UDP 192.168.1.105:53656 <-> 216.58.210.227:443 [proto: 188.126/QUIC.Google][cat: Web/5][8 pkts/1301 bytes <-> 6 pkts/873 bytes]
+	9	UDP 216.58.210.14:443 <-> 192.168.1.105:49361 [proto: 188.126/QUIC.Google][cat: Web/5][5 pkts/963 bytes <-> 4 pkts/981 bytes]
 	10	TCP 192.168.1.105:59119 <-> 114.134.80.162:80 [proto: 7/HTTP][cat: Web/5][5 pkts/736 bytes <-> 4 pkts/863 bytes][Host: weibo.com]
 	11	TCP 192.168.1.105:35811 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][3 pkts/604 bytes <-> 2 pkts/140 bytes][Host: js.t.sinajs.cn]
 	12	TCP 192.168.1.105:42275 <-> 222.73.28.96:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][3 pkts/610 bytes <-> 1 pkts/66 bytes][Host: u1.img.mobile.sina.cn]

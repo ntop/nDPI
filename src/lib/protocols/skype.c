@@ -72,7 +72,10 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
     // TCP check
-  } else if(packet->tcp != NULL) {
+  } else if((packet->tcp != NULL)
+	    /* As the TCP skype heuristic is weak, we need to make sure no other protocols overlap */
+	    && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+	    && (flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)) {
     flow->l4.tcp.skype_packet_id++;
 
     if(flow->l4.tcp.skype_packet_id < 3) {

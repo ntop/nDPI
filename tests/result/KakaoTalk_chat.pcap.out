@@ -1,11 +1,11 @@
 DNS	2	217	1
 HTTP	1	56	1
 ICMP	1	147	1
-SSL	29	4579	3
+SSL	23	2689	2
 Facebook	215	51809	12
 Google	16	1031	3
 HTTP_Proxy	26	3926	1
-Amazon	2	181	1
+Amazon	8	2071	2
 KakaoTalk	55	9990	15
 
 	1	TCP 10.24.82.188:43581 <-> 31.13.68.70:443 [proto: 91.119/SSL.Facebook][cat: SocialNetwork/6][17 pkts/3461 bytes <-> 17 pkts/6194 bytes][client: graph.facebook.com][server: *.facebook.com]
@@ -17,7 +17,7 @@ KakaoTalk	55	9990	15
 	7	TCP 10.24.82.188:37821 <-> 210.103.240.15:443 [proto: 91.193/SSL.KakaoTalk][cat: VoIP/10][13 pkts/2036 bytes <-> 14 pkts/5090 bytes][server: *.kakao.com]
 	8	TCP 10.24.82.188:51021 <-> 103.246.57.251:8080 [proto: 131/HTTP_Proxy][cat: Web/5][17 pkts/2231 bytes <-> 9 pkts/1695 bytes]
 	9	TCP 139.150.0.125:443 <-> 10.24.82.188:46947 [proto: 91/SSL][cat: Web/5][9 pkts/1737 bytes <-> 9 pkts/672 bytes]
-	10	TCP 10.24.82.188:58964 <-> 54.255.253.199:5223 [proto: 91/SSL][cat: Web/5][3 pkts/290 bytes <-> 3 pkts/1600 bytes][server: *.push.samsungosp.com]
+	10	TCP 10.24.82.188:58964 <-> 54.255.253.199:5223 [proto: 91.178/SSL.Amazon][cat: Web/5][3 pkts/290 bytes <-> 3 pkts/1600 bytes][server: *.push.samsungosp.com]
 	11	TCP 10.24.82.188:37557 <-> 31.13.68.84:80 [proto: 7.119/HTTP.Facebook][cat: SocialNetwork/6][5 pkts/487 bytes <-> 6 pkts/627 bytes][Host: www.facebook.com]
 	12	TCP 10.24.82.188:37553 <-> 31.13.68.84:80 [proto: 7.119/HTTP.Facebook][cat: SocialNetwork/6][5 pkts/487 bytes <-> 5 pkts/571 bytes][Host: www.facebook.com]
 	13	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7.126/HTTP.Google][cat: Web/5][7 pkts/392 bytes <-> 7 pkts/392 bytes]
