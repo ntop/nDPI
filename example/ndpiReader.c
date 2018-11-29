@@ -1953,8 +1953,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(sizeof(struct ndpi_flow_struct), buf, sizeof(buf)));
     printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
     printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
-    printf("\tSetup Time:              %lu msec\n", setup_time_usec/1000);
-    printf("\tPacket Processing Time:  %lu msec\n", processing_time_usec/1000);
+    printf("\tSetup Time:              %lu msec\n", (unsigned long)(setup_time_usec/1000));
+    printf("\tPacket Processing Time:  %lu msec\n", (unsigned long)(processing_time_usec/1000));
     
     if(!json_flag) {
       printf("\nTraffic statistics:\n");
