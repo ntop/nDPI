@@ -24,12 +24,10 @@
 #include "ndpi_api.h"
 
 static void ndpi_skype_report_protocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  u_int16_t proto = (flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT;
-
   //printf("-> payload_len=%u\n", flow->packet.payload_packet_len);
   
   NDPI_LOG_INFO(ndpi_struct, "found skype\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_SKYPE);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
 }
 
 static int is_port(u_int16_t a, u_int16_t b, u_int16_t c) {

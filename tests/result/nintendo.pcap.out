@@ -1,6 +1,6 @@
 ICMP	30	2100	2
-Nintendo	887	319888	11
-Amazon	79	11165	8
+Nintendo	890	320242	12
+Amazon	76	10811	7
 
 	1	UDP 192.168.12.114:55915 <-> 185.118.169.65:27520 [proto: 173/Nintendo][cat: Game/8][169 pkts/61414 bytes <-> 278 pkts/126260 bytes]
 	2	UDP 192.168.12.114:55915 <-> 93.237.131.235:56066 [proto: 173/Nintendo][cat: Game/8][122 pkts/48332 bytes <-> 35 pkts/5026 bytes]
@@ -18,7 +18,7 @@ Amazon	79	11165	8
 	14	UDP 192.168.12.114:55915 <-> 35.158.74.61:10025 [proto: 178/Amazon][cat: Web/5][5 pkts/290 bytes <-> 5 pkts/290 bytes]
 	15	UDP 192.168.12.114:18874 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][cat: Game/8][1 pkts/110 bytes <-> 1 pkts/281 bytes][Host: e0d67c509fb203858ebcb2fe3f88c2aa.baas.nintendo.com]
 	16	UDP 192.168.12.114:51035 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][cat: Game/8][1 pkts/110 bytes <-> 1 pkts/281 bytes][Host: e0d67c509fb203858ebcb2fe3f88c2aa.baas.nintendo.com]
-	17	UDP 192.168.12.114:52119 -> 35.158.74.61:33335 [proto: 173.178/Nintendo.Amazon][cat: Web/5][3 pkts/354 bytes -> 0 pkts/0 bytes]
+	17	UDP 192.168.12.114:52119 -> 35.158.74.61:33335 [proto: 173/Nintendo][cat: Game/8][3 pkts/354 bytes -> 0 pkts/0 bytes]
 	18	UDP 192.168.12.114:55915 -> 35.158.74.61:33335 [proto: 178/Amazon][cat: Web/5][3 pkts/318 bytes -> 0 pkts/0 bytes]
 	19	UDP 192.168.12.114:55915 -> 52.10.205.177:34343 [proto: 178/Amazon][cat: Web/5][1 pkts/298 bytes -> 0 pkts/0 bytes]
 	20	UDP 192.168.12.114:55915 -> 35.158.74.61:33334 [proto: 178/Amazon][cat: Web/5][5 pkts/290 bytes -> 0 pkts/0 bytes]
