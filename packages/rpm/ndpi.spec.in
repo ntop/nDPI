@@ -56,7 +56,7 @@ mkdir -p $RPM_BUILD_ROOT%{libdir}
 mkdir -p $RPM_BUILD_ROOT%{bindir}
 cd $HOME/nDPI; make DESTDIR=$RPM_BUILD_ROOT install;
 rm $RPM_BUILD_ROOT%{libdir}/libndpi.so
-ln -sr $RPM_BUILD_ROOT%{libdir}/libndpi.so.@PACKAGE_VERSION@ $RPM_BUILD_ROOT%{libdir}/libndpi.so
+cd $RPM_BUILD_ROOT%{libdir}/; ln -s libndpi.so.2.5.0 libndpi.so; cd -
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 cp $HOME/nDPI/packages/etc/ld.so.conf.d/ndpi.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d
 strip $RPM_BUILD_ROOT%{bindir}/*
