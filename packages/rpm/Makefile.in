@@ -11,13 +11,13 @@ PACKAGE_PATH=$(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
 
 package: build-rpm
 
-cleanup-src:
-	cd ../..; ./autogen.sh; ./configure; make clean
+build-src:
+	cd ../..; ./autogen.sh; ./configure; make clean; make
 
 cleanup-rpm:
 	rm -rf $(HOME)/rpmbuild/BUILD/ndpi* $(HOME)/rpmbuild/SOURCES/ndpi*
 
-build-rpm: cleanup-src cleanup-rpm
+build-rpm: build-src cleanup-rpm
 	-rm -rf ndpi-@PACKAGE_VERSION@
 	mkdir -p ndpi-@PACKAGE_VERSION@/packages
 	cp ndpi.spec.in ndpi-@PACKAGE_VERSION@/packages
