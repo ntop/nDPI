@@ -12,7 +12,9 @@ ndpi:
 	mkdir -p  ./debian/ndpi-tmp/usr/local/lib ./debian/ndpi-tmp/usr/local/bin 
 	mkdir -p ./debian/ndpi-dev-tmp/usr/local/lib ./debian/ndpi-dev-tmp/usr/local/include/ndpi
 	cd ${NDPI_HOME}; ./autogen.sh; ./configure; make
-	cp $(NDPI_HOME)/src/lib/libndpi.so* ./debian/ndpi-tmp/usr/local/lib/
+	cp $(NDPI_HOME)/src/lib/libndpi.so.@NDPI_VERS@ ./debian/ndpi-tmp/usr/local/lib/
+	cd ./debian/ndpi-tmp/usr/local/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so; cd -
+	cd ./debian/ndpi-tmp/usr/local/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so.@MAJOR_RELEASE@; cd -
 	cp $(NDPI_HOME)/src/lib/libndpi.a ./debian/ndpi-dev-tmp/usr/local/lib/
 	cp $(NDPI_HOME)/example/ndpiReader ./debian/ndpi-tmp/usr/local/bin/
 	cp $(NDPI_HOME)/src/include/*.h ./debian/ndpi-dev-tmp/usr/local/include/ndpi/

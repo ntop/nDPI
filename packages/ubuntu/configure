@@ -583,6 +583,7 @@ PACKAGE_URL=''
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+MAJOR_RELEASE
 GIT_REVISION
 KERNEL
 DATE
@@ -1705,9 +1706,11 @@ else
 fi
 
 NDPI_VERS=`../version.sh --release`
+MAJOR_RELEASE=`../version.sh --major-release`
 GIT_REVISION=`../version.sh --revision`
 
 ac_config_files="$ac_config_files Makefile debian/changelog debian/files debian/control"
+
 
 
 
