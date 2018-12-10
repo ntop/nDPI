@@ -26,6 +26,7 @@ else
 fi
 
 PACKAGE_VERSION=`../version.sh --release`
+MAJOR_RELEASE=`../version.sh --major-release`
 GIT_REVISION=`../version.sh --revision`
 
 AC_CONFIG_FILES([Makefile ndpi.spec])
@@ -37,6 +38,7 @@ AC_SUBST(EXTN)
 AC_SUBST(DATE)
 AC_SUBST(KERNEL)
 AC_SUBST(GIT_REVISION)
+AC_SUBST(MAJOR_RELEASE)
 
 AC_OUTPUT
 
