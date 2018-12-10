@@ -8094,7 +8094,8 @@ ndpi_protocol_match host_match[] = {
   { ".facebook.net", NULL, "\\.facebook" TLD,                     "Facebook",         NDPI_PROTOCOL_FACEBOOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".fbsbx.com", NULL, "\\.fbsbx" TLD,                           "Facebook",         NDPI_PROTOCOL_FACEBOOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
-  { ".speedtest.net", NULL, "\\.speedtest" TLD,         "Ookla",            NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
+  { "speedtest.", NULL, "speedtest\\." TLD,                       "Ookla",            NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
+  { ".ooklaserver.net", NULL, "\\.ooklaserver\\.net" TLD,         "Ookla",            NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
 
   { "ntop.org", NULL, "ntop\\.org$",                     "ntop",         NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
 
