@@ -4313,28 +4313,42 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ********************************************************************************* */
 
-void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
-				 struct ndpi_flow_struct *flow,
+int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
+				 const struct ndpi_iphdr *iph,
 				 ndpi_protocol *ret) {
   if(ndpi_struct->custom_categories.categories_loaded) {
-    if(flow->packet.iph) {
       prefix_t prefix;
       patricia_node_t *node;
 
       /* Make sure all in network byte order otherwise compares wont work */
-      fill_prefix_v4(&prefix, (struct in_addr *)&flow->packet.iph->saddr,
+      fill_prefix_v4(&prefix, (struct in_addr *)&iph->saddr,
 		     32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
       node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
 
       if(!node) {
-	fill_prefix_v4(&prefix, (struct in_addr *)&flow->packet.iph->daddr,
+	fill_prefix_v4(&prefix, (struct in_addr *)&iph->daddr,
 		       32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
 	node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
       }
 
       if(node) {
-	flow->category = ret->category = (ndpi_protocol_category_t)node->value.user_value;
-	return;
+	ret->category = (ndpi_protocol_category_t)node->value.user_value;
+	return 1;
+      }
+  }
+
+  ret->category = ndpi_get_proto_category(ndpi_struct, *ret);
+  return 0;
+}
+
+void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow,
+				 ndpi_protocol *ret) {
+  if(ndpi_struct->custom_categories.categories_loaded) {
+    if(flow->packet.iph) {
+      if(ndpi_fill_ip_protocol_category(ndpi_struct, flow->packet.iph, ret)) {
+        flow->category = ret->category;
+        return;
       }
     }
 
