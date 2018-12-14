@@ -1,0 +1,4 @@
+UPnP	14	9912	2
+
+	1	UDP [fe80::3441:3d24:6d30:a807]:58932 -> [ff02::c]:3702 [proto: 153/UPnP][cat: Network/14][7 pkts/5026 bytes -> 0 pkts/0 bytes]
+	2	UDP 192.168.61.66:58931 -> 239.255.255.250:3702 [proto: 153/UPnP][cat: Network/14][7 pkts/4886 bytes -> 0 pkts/0 bytes]

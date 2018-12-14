@@ -2,11 +2,12 @@ Unknown	1	66	1
 HTTP	116	91784	6
 ICMP	5	510	1
 SSL	2	169	1
-Facebook	251	215986	5
+Facebook	101	62428	4
 Dropbox	5	725	2
+WhatsApp	150	153558	1
 Instagram	363	255094	16
 
-	1	TCP 31.13.86.52:80 <-> 192.168.0.103:58216 [proto: 7.119/HTTP.Facebook][cat: SocialNetwork/6][103 pkts/150456 bytes <-> 47 pkts/3102 bytes]
+	1	TCP 31.13.86.52:80 <-> 192.168.0.103:58216 [proto: 7.142/HTTP.WhatsApp][cat: Chat/9][103 pkts/150456 bytes <-> 47 pkts/3102 bytes]
 	2	TCP 192.168.0.103:38816 <-> 46.33.70.160:80 [proto: 7.211/HTTP.Instagram][cat: SocialNetwork/6][13 pkts/1118 bytes <-> 39 pkts/57876 bytes][Host: photos-h.ak.instagram.com]
 	3	TCP 192.168.0.103:58052 <-> 82.85.26.162:80 [proto: 7.211/HTTP.Instagram][cat: SocialNetwork/6][37 pkts/2702 bytes <-> 38 pkts/54537 bytes][Host: photos-g.ak.instagram.com]
 	4	TCP 192.168.0.103:44379 <-> 82.85.26.186:80 [proto: 7.211/HTTP.Instagram][cat: SocialNetwork/6][41 pkts/3392 bytes <-> 40 pkts/50024 bytes][Host: photos-e.ak.instagram.com]

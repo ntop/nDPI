@@ -2,27 +2,25 @@ Source: ndpi
 Section: free
 Priority: optional
 Maintainer: Luca Deri <deri@ntop.org>
-Standards-Version: @NDPI_VERSION@
+Standards-Version: @NDPI_VERS@
 Build-Depends:
 Build-Conflicts:
 
 Package: ndpi
 Architecture: @EXTN@
-Depends: pfring (=@PFRING_VERS@-@PFRING_SVN_RELEASE@), libnuma
+Depends: libnuma1
 Recommends:
 Suggests:
 Pre-Depends:
 Conflicts:
 Provides:
 Replaces:
-Description: A network probe.
+Description: A L7 DPI library.
 
 Package: ndpi-dev
 Section: libdevel
-Architecture: all
+Architecture: @EXTN@
 Depends: ndpi (= ${binary:Version}), ${misc:Depends}
 Conflicts: 
-Description: development library and header files for ndpi
- Headers, static libraries, and documentation for the ndpi library
-
+Description: Development library and header files for ndpi
 

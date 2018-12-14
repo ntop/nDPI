@@ -31,6 +31,24 @@
 
 #include <pcap.h>
 
+#ifdef USE_DPDK
+#include <rte_eal.h>
+#include <rte_ether.h>
+#include <rte_ethdev.h>
+#include <rte_cycles.h>
+#include <rte_lcore.h>
+#include <rte_mbuf.h>
+
+#define RX_RING_SIZE     128
+#define TX_RING_SIZE     512
+#define NUM_MBUFS       8191
+#define MBUF_CACHE_SIZE  250
+#define BURST_SIZE        32
+#define PREFETCH_OFFSET    3
+
+extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
+#endif
+
 #define MAX_NUM_READER_THREADS     16
 #define IDLE_SCAN_PERIOD           10 /* msec (use TICK_RESOLUTION = 1000) */
 #define MAX_IDLE_TIME           30000
@@ -79,7 +97,7 @@ typedef struct ndpi_flow_info {
   char bittorent_hash[41];
   
   struct {
-    char client_info[48], server_info[48];
+    char client_info[64], server_info[64];
   } ssh_ssl;
 
   void *src_id, *dst_id;

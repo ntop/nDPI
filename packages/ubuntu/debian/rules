@@ -1,16 +1,7 @@
 #!/usr/bin/make -f
 
 # Uncomment this to turn on verbose mode.
-# export DH_VERBOSE=1
-
-#
-# debian/compat
-# We should use at least compatibility version 5
-# but this requires the whole building process
-# to be remade and this is something we leave
-# to when we will have more time
-# http://www.tin.org/bin/man.cgi?section=7&topic=debhelper
-#
+export DH_VERBOSE=1
 
 package=ndpi
 
@@ -37,20 +28,20 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
+	#dh_clean -k
 	dh_installdirs
 	dh_installinit
 	dh_installman
-# install the files into debian/tmp.
-	cp -r ./usr/ ./debian/tmp	
-	cp -r ./ndpi-dev/* ./debian/ndpi-dev/
-	-find ./debian/tmp -name .svn -exec /bin/rm -rf {} ';'
-	-find ./debian/tmp -executable -type f |xargs strip
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb
+	mkdir -p ./debian/ndpi ./debian/ndpi-dev
+	cp -r ./debian/ndpi-tmp/*     ./debian/ndpi/
+	cp -r ./debian/ndpi-dev-tmp/* ./debian/ndpi-dev/
+	-find ./debian/ndpi -executable -type f | xargs strip
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

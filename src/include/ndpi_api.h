@@ -213,11 +213,13 @@ extern "C" {
    *
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
+   * @par    enable_guess = guess protocol if unknown
    * @return the detected protocol even if the flow is not completed;
    *
    */
   ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
-				      struct ndpi_flow_struct *flow);
+				      struct ndpi_flow_struct *flow,
+				      u_int8_t enable_guess);
 
   /**
    * Processes an extra packet in order to get more information for a given protocol
@@ -326,6 +328,7 @@ extern "C" {
    * Search and return the protocol guessed that is undetected
    *
    * @par    ndpi_struct  = the detection module
+   * @par    flow         = the flow we're trying to guess, NULL if not available
    * @par    proto        = the l4 protocol number
    * @par    shost        = source address in host byte order
    * @par    sport        = source port number
@@ -335,6 +338,7 @@ extern "C" {
    *
    */
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+					       struct ndpi_flow_struct *flow,
 					       u_int8_t proto,
 					       u_int32_t shost,
 					       u_int16_t sport,
@@ -735,9 +739,14 @@ extern "C" {
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
 				  char *name, ndpi_protocol_category_t category);
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
+  int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
+				 const struct ndpi_iphdr *iph,
+				 ndpi_protocol *ret);
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   ndpi_protocol *ret);
+  int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
+				      char *name_or_ip, unsigned long *id);
   int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
 				     ndpi_detection_preference pref,
 				     int value);
@@ -770,6 +779,14 @@ extern "C" {
   void * ndpi_calloc(unsigned long count, size_t size);
   void ndpi_free(void *ptr);
   u_int8_t ndpi_get_api_version();
+
+  /* https://github.com/corelight/community-id-spec */
+  int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip, u_int16_t src_port, u_int16_t dst_port,
+			    u_int8_t icmp_type, u_int8_t icmp_code, u_char *hash_buf, u_int8_t hash_buf_len);
+  int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struct ndpi_in6_addr *dst_ip,
+			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
+			    u_char *hash_buf, u_int8_t hash_buf_len);
+  
 #ifdef __cplusplus
 }
 #endif

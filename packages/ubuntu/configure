@@ -583,13 +583,12 @@ PACKAGE_URL=''
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
-PFRING_SVN_RELEASE
-SVN_RELEASE
+MAJOR_RELEASE
+GIT_REVISION
 KERNEL
 DATE
 EXTN
 MACHINE
-PFRING_VERS
 NDPI_VERS
 target_alias
 host_alias
@@ -610,6 +609,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -674,6 +674,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -926,6 +927,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1063,7 +1073,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1216,6 +1226,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1670,20 +1681,35 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-NDPI_VERS=`cat ../../config.h | grep -w VERSION | cut -d \" -f 2`
-PFRING_VERS=`cat $HOME/PF_RING/kernel/linux/pf_ring.h | grep RING_VERSION | head -1 | cut -d '"' -f 2`
-SVN_RELEASE=`svn info ../.. | grep "^Revision"|cut -d " " -f 2`
-PFRING_SVN_RELEASE=`svn info $HOME/PF_RING | grep "^Revision"|cut -d " " -f 2`
-MACHINE=`uname -m`
-
-if test $MACHINE = "x86_64"; then
-   EXTN="amd64"
-else
-   EXTN="i386"
-fi
-
 DATE=`date -R`
 KERNEL=`uname -r`
+MACHINE=`uname -m`
+SHORT_MACHINE=`uname -m | cut -b1-3`
+
+EXTN=""
+if test $MACHINE = "x86_64"; then
+  EXTN="amd64"
+else
+  if test $SHORT_MACHINE = "aar"; then
+    EXTN="arm64"
+  else
+    if test $SHORT_MACHINE = "arm"; then
+      EXTN="armhf"
+    else
+      if test $SHORT_MACHINE = "mip"; then
+        EXTN="mips"
+      else
+        EXTN="i386"
+      fi
+    fi
+  fi
+fi
+
+NDPI_VERS=`../version.sh --release`
+MAJOR_RELEASE=`../version.sh --major-release`
+GIT_REVISION=`../version.sh --revision`
+
+ac_config_files="$ac_config_files Makefile debian/changelog debian/files debian/control"
 
 
 
@@ -1692,15 +1718,6 @@ KERNEL=`uname -r`
 
 
 
-
-
-ac_config_files="$ac_config_files Makefile"
-
-ac_config_files="$ac_config_files debian/changelog"
-
-ac_config_files="$ac_config_files debian/files"
-
-ac_config_files="$ac_config_files debian/control"
 
 
 cat >confcache <<\_ACEOF

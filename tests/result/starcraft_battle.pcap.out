@@ -5,8 +5,7 @@ HTTP_Download	179	134204	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
 SSL	38	2548	11
-Google	16	1709	4
-QUIC	6	475	1
+Google	22	2184	5
 Github	3	234	1
 Starcraft	236	51494	6
 
@@ -32,7 +31,7 @@ Starcraft	236	51494	6
 	20	TCP 192.168.1.100:3427 <-> 80.239.208.193:1119 [proto: 213/Starcraft][cat: Game/8][6 pkts/376 bytes <-> 7 pkts/526 bytes]
 	21	TCP 192.168.1.100:3512 <-> 12.129.222.54:80 [proto: 7.76/HTTP.WorldOfWarcraft][cat: Game/8][5 pkts/367 bytes <-> 4 pkts/513 bytes][Host: us.scan.worldofwarcraft.com]
 	22	UDP 192.168.1.100:55468 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/168 bytes <-> 2 pkts/388 bytes][Host: bnetcmsus-a.akamaihd.net]
-	23	UDP 173.194.40.22:443 <-> 192.168.1.100:53568 [proto: 188/QUIC][cat: Web/5][3 pkts/243 bytes <-> 3 pkts/232 bytes]
+	23	UDP 173.194.40.22:443 <-> 192.168.1.100:53568 [proto: 188.126/QUIC.Google][cat: Web/5][3 pkts/243 bytes <-> 3 pkts/232 bytes]
 	24	UDP 192.168.1.100:58851 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/173 bytes <-> 2 pkts/282 bytes][Host: 22.40.194.173.in-addr.arpa]
 	25	UDP 192.168.1.100:60026 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/154 bytes <-> 2 pkts/288 bytes][Host: llnw.blizzard.com]
 	26	UDP 192.168.1.100:58818 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/172 bytes <-> 2 pkts/260 bytes][Host: 91.252.30.192.in-addr.arpa]

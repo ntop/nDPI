@@ -40,6 +40,14 @@ AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h])
 
 PCAP_HOME=$HOME/PF_RING/userland
 
+DPDK_TARGET=
+if test -d $HOME/DPDK; then :
+     echo "Enabling DPDK support in ndpiReader"
+     DPDK_TARGET=dpdk
+else
+    echo  "DPDK support disabled (missing $HOME/DPDK)"
+fi
+
 if test -d $PCAP_HOME; then :
      echo -n ""
 else
@@ -52,10 +60,14 @@ else
      AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"])
 fi
 
-if test -z `which clang`; then
-CC=gcc
-else
-CC=clang
+MACHINE=`uname -m`
+SYSTEM=`uname -s`
+if test $SYSTEM = "Darwin"; then
+ CC=clang
+fi
+ 
+if test $ax_cv_PTHREAD_CLANG = "yes"; then
+ CC=clang
 fi
  
 HS_LIB=
@@ -75,6 +87,7 @@ if test "${with_hyperscan+set}" = set; then
           HS_INC=`pkg-config --cflags libhs`
           HS_LIB=`pkg-config --libs libhs`
           LDFLAGS="$LDFLAGS $HS_LIB"
+	  AC_MSG_RESULT([compiling with Intel Hyperscan])
      else
           AC_MSG_RESULT([Intel Hyperscan not found, exiting. See https://github.com/intel/hyperscan/blob/master/doc/dev-reference/getting_started.rst for install/build instructions])
           exit 1
@@ -134,7 +147,7 @@ AC_ARG_ENABLE([debug-messages],
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
-AC_CONFIG_FILES([Makefile example/Makefile tests/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile])
+AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
@@ -148,6 +161,7 @@ AC_SUBST(PCAP_LIB)
 AC_SUBST(DL_LIB)
 AC_SUBST(HS_LIB)
 AC_SUBST(HS_INC)
+AC_SUBST(DPDK_TARGET)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 
 AC_OUTPUT

@@ -1,32 +1,41 @@
 AC_INIT([Makefile.in], 1.0)
 
-NDPI_VERS=`cat ../../config.h | grep -w VERSION | cut -d \" -f 2`
-PFRING_VERS=`cat $HOME/PF_RING/kernel/linux/pf_ring.h | grep RING_VERSION | head -1 | cut -d '"' -f 2`
-SVN_RELEASE=`svn info ../.. | grep "^Revision"|cut -d " " -f 2`
-PFRING_SVN_RELEASE=`svn info $HOME/PF_RING | grep "^Revision"|cut -d " " -f 2`
-MACHINE=`uname -m`
-
-if test $MACHINE = "x86_64"; then
-   EXTN="amd64"
-else
-   EXTN="i386"
-fi
-
 DATE=`date -R`
 KERNEL=`uname -r`
+MACHINE=`uname -m`
+SHORT_MACHINE=`uname -m | cut -b1-3`
+
+EXTN=""
+if test $MACHINE = "x86_64"; then
+  EXTN="amd64"
+else
+  if test $SHORT_MACHINE = "aar"; then
+    EXTN="arm64"
+  else
+    if test $SHORT_MACHINE = "arm"; then
+      EXTN="armhf"
+    else
+      if test $SHORT_MACHINE = "mip"; then
+        EXTN="mips"
+      else	
+        EXTN="i386"
+      fi
+    fi
+  fi
+fi
+
+NDPI_VERS=`../version.sh --release`
+MAJOR_RELEASE=`../version.sh --major-release`
+GIT_REVISION=`../version.sh --revision`
+
+AC_CONFIG_FILES([Makefile debian/changelog debian/files debian/control])
 
 AC_SUBST(NDPI_VERS)
-AC_SUBST(PFRING_VERS)
 AC_SUBST(MACHINE)
 AC_SUBST(EXTN)
 AC_SUBST(DATE)
 AC_SUBST(KERNEL)
-AC_SUBST(SVN_RELEASE)
-AC_SUBST(PFRING_SVN_RELEASE)
-
-AC_CONFIG_FILES(Makefile)
-AC_CONFIG_FILES(debian/changelog)
-AC_CONFIG_FILES(debian/files)
-AC_CONFIG_FILES(debian/control)
+AC_SUBST(GIT_REVISION)
+AC_SUBST(MAJOR_RELEASE)
 
 AC_OUTPUT

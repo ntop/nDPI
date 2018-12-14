@@ -97,6 +97,7 @@ extern "C" {
 
   extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
 				      ndpi_protocol_breed_t protoBreed, u_int16_t protoId,
+				      u_int8_t can_have_a_subprotocol,
 				      u_int16_t tcp_alias_protoId[2],
 				      u_int16_t udp_alias_protoId[2], char *protoName,
 				      ndpi_protocol_category_t protoCategory,
@@ -119,6 +120,7 @@ extern "C" {
   u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, const char *name);
 
   extern u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
+					  struct ndpi_flow_struct *flow,
 					  u_int8_t proto, u_int16_t sport, u_int16_t dport,
 					  u_int8_t *user_defined_proto);
 

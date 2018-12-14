@@ -1,11 +1,11 @@
-Unknown	10	786	1
 HTTP	28	1572	7
 NTP	2	180	1
 HTTP_Download	37	63205	1
-SSL_No_Cert	13	2142	1
 SSL	8	432	2
+Google	13	2142	1
 Waze	484	289335	19
 WhatsApp	15	1341	1
+Amazon	10	786	1
 
 	1	TCP 10.8.0.1:36100 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][cat: Web/5][52 pkts/10860 bytes <-> 55 pkts/74852 bytes][server: *.world.waze.com]
 	2	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7.60/HTTP.HTTP_Download][cat: Download-FileTransfer-FileSharing/7][19 pkts/1309 bytes <-> 18 pkts/61896 bytes][Host: xtra1.gpsonextra.net]
@@ -21,7 +21,7 @@ WhatsApp	15	1341	1
 	12	TCP 10.8.0.1:36314 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][cat: Web/5][11 pkts/1260 bytes <-> 9 pkts/4413 bytes][server: *.world.waze.com]
 	13	TCP 10.8.0.1:51050 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][cat: Web/5][9 pkts/1184 bytes <-> 9 pkts/4369 bytes][server: *.waze.com]
 	14	TCP 10.8.0.1:45529 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][9 pkts/591 bytes <-> 8 pkts/3424 bytes][Host: roadshields.waze.com]
-	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 64/SSL_No_Cert][cat: Web/5][7 pkts/1137 bytes <-> 6 pkts/1005 bytes]
+	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 64.126/SSL_No_Cert.Google][cat: Web/5][7 pkts/1137 bytes <-> 6 pkts/1005 bytes]
 	16	TCP 10.8.0.1:45536 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][8 pkts/594 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
 	17	TCP 10.8.0.1:50828 <-> 108.168.176.228:443 [proto: 142/WhatsApp][cat: Chat/9][8 pkts/673 bytes <-> 7 pkts/668 bytes]
 	18	TCP 10.8.0.1:45546 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/557 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
@@ -29,17 +29,14 @@ WhatsApp	15	1341	1
 	20	TCP 10.8.0.1:45552 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/552 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com]
 	21	TCP 10.8.0.1:45554 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/550 bytes <-> 7 pkts/769 bytes][Host: cres.waze.com]
 	22	TCP 10.8.0.1:45540 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/553 bytes <-> 7 pkts/733 bytes][Host: roadshields.waze.com]
-	23	TCP 10.16.37.157:41823 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
-	24	TCP 10.16.37.157:43991 <-> 200.160.4.31:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
-	25	TCP 10.16.37.157:46473 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
-	26	TCP 10.16.37.157:52746 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
-	27	TCP 10.16.37.157:52953 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
-	28	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
-	29	TCP 10.8.0.1:45169 <-> 200.160.4.198:80 [proto: 7/HTTP][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
-	30	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
-	31	TCP 10.8.0.1:60574 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
-	32	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes]
-
-
-Undetected flows:
-	1	TCP 10.16.37.157:42256 <-> 174.37.231.81:5222 [proto: 0/Unknown][8 pkts/678 bytes <-> 2 pkts/108 bytes]
+	23	TCP 10.16.37.157:42256 <-> 174.37.231.81:5222 [proto: 91.178/SSL.Amazon][cat: Web/5][8 pkts/678 bytes <-> 2 pkts/108 bytes]
+	24	TCP 10.16.37.157:41823 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	25	TCP 10.16.37.157:43991 <-> 200.160.4.31:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	26	TCP 10.16.37.157:46473 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	27	TCP 10.16.37.157:52746 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	28	TCP 10.16.37.157:52953 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
+	29	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	30	TCP 10.8.0.1:45169 <-> 200.160.4.198:80 [proto: 7/HTTP][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	31	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	32	TCP 10.8.0.1:60574 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	33	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes]

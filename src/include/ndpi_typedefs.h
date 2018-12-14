@@ -596,6 +596,9 @@ struct ndpi_flow_tcp_struct {
 
 /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
+
+/* NDPI_PROTOCOL_NEST_LOG_SINK */
+  u_int8_t nest_log_sink_matches;
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
@@ -823,13 +826,14 @@ typedef enum {
   ndpi_pref_dns_dissect_response,
   ndpi_pref_direction_detect_disable,
   ndpi_pref_disable_metadata_export,
-  ndpi_pref_enable_category_substring_match,
+  ndpi_pref_enable_category_substring_match
 } ndpi_detection_preference;
   
 /* ntop extensions */
 typedef struct ndpi_proto_defaults {
   char *protoName;
   ndpi_protocol_category_t protoCategory;
+  u_int8_t can_have_a_subprotocol;
   u_int16_t protoId, protoIdx;
   u_int16_t master_tcp_protoId[2], master_udp_protoId[2]; /* The main protocols on which this sub-protocol sits on */
   ndpi_protocol_breed_t protoBreed;
@@ -1077,7 +1081,7 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
-	char client_certificate[48], server_certificate[48];
+	char client_certificate[64], server_certificate[64];
       } ssl;
       
       struct {

@@ -32,7 +32,7 @@ void ndpi_search_teredo(struct ndpi_detection_module_struct *ndpi_struct, struct
   NDPI_LOG_DBG(ndpi_struct,"search teredo\n");
   if(packet->udp
      && packet->iph
-     && ((ntohl(packet->iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */)
+     && ((ntohl(packet->iph->daddr) & 0xF0000000) != 0xE0000000 /* Not a multicast address */)
      && ((ntohs(packet->udp->source) == 3544) || (ntohs(packet->udp->dest) == 3544))
      && (packet->payload_packet_len >= 40 /* IPv6 header */)) {
     NDPI_LOG_INFO(ndpi_struct,"found teredo\n");

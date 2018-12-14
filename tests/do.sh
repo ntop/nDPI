@@ -7,7 +7,10 @@ build_results() {
     for f in $PCAPS; do 
 	#echo $f
 	# create result files if not present
-	[ ! -f result/$f.out ] && $READER -q -i pcap/$f -w result/$f.out -v 1
+	if [ ! -f result/$f.out ]; then
+	    CMD="$READER -q -i pcap/$f -w result/$f.out -v 1"
+	    $CMD 
+	fi
     done
 }
 

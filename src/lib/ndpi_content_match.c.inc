@@ -21,7 +21,6 @@
 /* ****************************************************** */
 
 static ndpi_network host_protocol_list[] = {
-
   /*
     SoundCloud
   */
@@ -81,6 +80,8 @@ static ndpi_network host_protocol_list[] = {
   /*
     WhatsApp Inc.
   */
+  { 0x1F0D4B00 /* 31.13.75.0/24 */,     24, NDPI_PROTOCOL_WHATSAPP },
+  { 0x1F0D5600 /* 31.13.86.0/24 */,     24, NDPI_PROTOCOL_WHATSAPP },
   { 0x3216C6CC /* 50.22.198.204/30 */,  30, NDPI_PROTOCOL_WHATSAPP },
   { 0x4B7E2720 /* 75.126.39.32/27 */,   27, NDPI_PROTOCOL_WHATSAPP },
   { 0x6CA8B460 /* 108.168.180.96/27 */, 27, NDPI_PROTOCOL_WHATSAPP },
@@ -111,11 +112,12 @@ static ndpi_network host_protocol_list[] = {
     WeChat
     origin AS132203, AS132591, AS45090
   */
-
   { 0xCBCD93AB /* 203.205.147.171/32 */, 32, NDPI_PROTOCOL_WECHAT },
   { 0xCBCD93AD /* 203.205.147.173/32 */, 32, NDPI_PROTOCOL_WECHAT },
   { 0xCBCD97A2 /* 203.205.151.162/32 */, 32, NDPI_PROTOCOL_WECHAT },
-  { 0x67071E25 /* 103.7.30.37/32 */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0x67071E25 /* 103.7.30.37/32     */, 32, NDPI_PROTOCOL_WECHAT },
+  { 0XCBCDB000 /* 203.205.176.0/20   */, 20, NDPI_PROTOCOL_WECHAT },
+  { 0XCBCDC000 /* 203.205.192.0/18   */, 18, NDPI_PROTOCOL_WECHAT },
 
   /*
     OpenDNS, LLC
@@ -541,7 +543,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xC0AD4000 /* 192.173.64.0/18 */, 18, NDPI_PROTOCOL_NETFLIX },
   { 0xC6266000 /* 198.38.96.0/19 */, 19, NDPI_PROTOCOL_NETFLIX },
   { 0xC62D3000 /* 198.45.48.0/20 */, 20, NDPI_PROTOCOL_NETFLIX },
-  { 0xD194D687 /* 209.148.214.135/21 */, 21, NDPI_PROTOCOL_NETFLIX }, 
+  { 0xD194D687 /* 209.148.214.135/21 */, 21, NDPI_PROTOCOL_NETFLIX },
 
   /*
     Cloudflare, Inc.
@@ -706,6 +708,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x287F816D /* 40.126.129.109 */, 32, NDPI_PROTOCOL_SKYPE },
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
   { 0x17600000 /* 23.96.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
+  { 0x34724A05 /* 52.114.74.5 */, 32, NDPI_PROTOCOL_SKYPE },
 
   /*
     Blizzard Entertainment, Inc
@@ -809,11 +812,11 @@ static ndpi_network host_protocol_list[] = {
 
   /*
     Canonical Ltd (Ubuntu)
-    origin AS41231
+    origin AS41231z
   */
 
-  { 0x5BBD5800 /* 91.189.88.0/21 */, 21, NDPI_PROTOCOL_UBUNTUONE },
-  { 0xA2D52000 /* 162.213.32.0/22 */, 22, NDPI_PROTOCOL_UBUNTUONE },
+  { 0x5BBD5800 /* 91.189.88.0/21 */,   21, NDPI_PROTOCOL_UBUNTUONE },
+  { 0xA2D52000 /* 162.213.32.0/22 */,  22, NDPI_PROTOCOL_UBUNTUONE },
   { 0xB97DBC00 /* 185.125.188.0/22 */, 22, NDPI_PROTOCOL_UBUNTUONE },
 
   /*
@@ -7925,7 +7928,7 @@ static ndpi_network host_protocol_list[] = {
     Valve Corporation (Steam)
     origin AS32590
   */
-  
+
   { 0x2D79B800 /* 45.121.184.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0x670A7C00 /* 103.10.124.0/23 */, 23, NDPI_PROTOCOL_STEAM },
   { 0x671C3600 /* 103.28.54.0/23 */, 23, NDPI_PROTOCOL_STEAM },
@@ -7943,14 +7946,14 @@ static ndpi_network host_protocol_list[] = {
   { 0xD040C800 /* 208.64.200.0/24 */, 24, NDPI_PROTOCOL_STEAM },
   { 0xD040C900 /* 208.64.201.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
-  
+
   /*
     VidTO
-  */  
+  */
   { 0x51111030 /* 81.17.16.48/32 */, 32,  NDPI_PROTOCOL_VIDTO  },
   { 0x5fb7329d /* 95.183.50.157/32 */, 32, NDPI_PROTOCOL_VIDTO },
   { 0x577824f2 /* 87.120.36.242/32 */, 32, NDPI_PROTOCOL_VIDTO },
-  
+
   { 0x0, 0, 0 }
 };
 
@@ -8009,7 +8012,7 @@ static ndpi_network host_protocol_list[] = {
 
 /* ****************************************************** */
 
-/* 
+/*
 
 Each part of a domain name can be no longer than 63 characters. There are no single-digit top-level domains and none contain digits. It doesn't look like ICANN will approve such domains either.
 
@@ -8091,11 +8094,11 @@ ndpi_protocol_match host_match[] = {
   { ".facebook.net", NULL, "\\.facebook" TLD,                     "Facebook",         NDPI_PROTOCOL_FACEBOOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".fbsbx.com", NULL, "\\.fbsbx" TLD,                           "Facebook",         NDPI_PROTOCOL_FACEBOOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
-  { ".speedtest.net", NULL, "\\.speedtest" TLD,         "Ookla",            NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
+  { "speedtest.", NULL, "speedtest\\." TLD,                       "Ookla",            NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
+  { ".ooklaserver.net", NULL, "\\.ooklaserver\\.net" TLD,         "Ookla",            NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
 
   { "ntop.org", NULL, "ntop\\.org$",                     "ntop",         NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
 
-  { "docs.googleusercontent.com", NULL, "docs\\.googleusercontent" TLD, "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "docs.googleusercontent.com", NULL, "docs.googleusercontent" TLD,   "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
   { "docs.google.com",            NULL, "docs.google" TLD,              "GoogleDocs",     NDPI_PROTOCOL_GOOGLE_DOCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_ACCEPTABLE },
 
@@ -8103,7 +8106,6 @@ ndpi_protocol_match host_match[] = {
   { "drive.google.com",                       NULL, "drive.google" TLD,                          "GoogleDrive",      NDPI_PROTOCOL_GOOGLE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
   { "android.clients.google.com", NULL, "android\\.clients\\.google" TLD,   "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-  { "ggpht.com", NULL, "ggpht" TLD,                                         "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
 
   /*
     See https://better.fyi/trackers/
@@ -8136,7 +8138,7 @@ ndpi_protocol_match host_match[] = {
   { "google-analytics.", NULL, "google-analytics\\.",             "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_TRACKER_ADS },
   { "gtv1.com", NULL, "gtv1" TLD,                                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
-  /* Google Hangout */ 
+  /* Google Hangout */
   { "images2-hangout-opensocial.googleusercontent.com", NULL, "images2-hangout-opensocial\\.googleusercontent" TLD, "GoogleHangout", NDPI_PROTOCOL_HANGOUT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
   /* Google Services */
@@ -8162,6 +8164,7 @@ ndpi_protocol_match host_match[] = {
   { "google.", NULL, "google" TLD,                                "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".google.", NULL, NULL,                                       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".gstatic.com", NULL, "\\.gstatic" TLD,                       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+  { "ggpht.com", NULL, "ggpht" TLD,                               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
   { "mail.outlook.com", NULL, "mail\\.outlook" TLD,               "Hotmail",          NDPI_PROTOCOL_HOTMAIL, NDPI_PROTOCOL_CATEGORY_MAIL, NDPI_PROTOCOL_ACCEPTABLE },
 
@@ -8217,7 +8220,6 @@ ndpi_protocol_match host_match[] = {
   { ".googlevideo.com", NULL, "\\.googlevideo" TLD,                    "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { ".ytimg.com", NULL, "\\.ytimg" TLD,                                "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "youtube-nocookie.", NULL, "youtube-nocookie" TLD,                 "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
-  { "ggpht.com", NULL, "ggpht" TLD,                                    "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { ".vevo.com", NULL, "\\.vevo" TLD,                                  "Vevo",             NDPI_PROTOCOL_VEVO,    NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
@@ -8225,7 +8227,7 @@ ndpi_protocol_match host_match[] = {
   { "audio-fa.scdn.co", NULL, "audio-fa\\.scdn" TLD,                   "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
   { "edge-mqtt.facebook.com", NULL, "edge-mqtt\\.facebook" TLD,        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
-  { "messenger.com", NULL, "messenger\\.com" TLD,                     "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
+  { "messenger.com", NULL, "messenger\\.com" TLD,                      "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
 
   { ".pandora.com", NULL, "\\.pandora" TLD,                            "Pandora",          NDPI_PROTOCOL_PANDORA,  NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
@@ -8328,11 +8330,8 @@ ndpi_protocol_match host_match[] = {
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-", NULL, "slack-assets2\\.s3-",                  "Slack",            NDPI_PROTOCOL_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { "zhiliaoapp.com", NULL, "zhiliaoapp" TLD,                          "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  { "muscdn.com", NULL, "muscdn" TLD,                                  "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  { "livelycdn.com", NULL, "livelycdn" TLD,                            "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  { "direct.ly", NULL, "direct\\.ly$",                                 "Musical.ly",       NDPI_PROTOCOL_MUSICALLY, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-  
+  { "wechat.com", NULL, "wechat\\.com" TLD,                            "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+
   { "github.com", NULL, "github" TLD,                                  "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".github.com", NULL, "\\.github" TLD,                              "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "github.io", NULL, NULL,                                           "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8395,7 +8394,7 @@ ndpi_protocol_match host_match[] = {
     than by protocol id. They are bound to a generic protocol (NDPI_PROTOCOL_GENERIC) and placed onto the right category
   */
   { "quickplay.com", NULL, "quickplay" TLD,                            "QuickPlay",        NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  
+
   { ".iqiyi.com", NULL, "\\.iqiyi" TLD,                                "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".qiyi.com", NULL, "\\.qiyi" TLD,                                  "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".71.am", NULL, "\\.71" TLD,                                       "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
@@ -8418,6 +8417,11 @@ ndpi_protocol_match host_match[] = {
   { "showmax.com", NULL, "showmax" TLD,                                "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "showmax.akamaized.net", NULL, "showmax\\.akamaized" TLD,          "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
 
+  { "snapcraft.io", NULL, "snapcraft\\.io" TLD,                        "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+  { "ubuntu.com", NULL, "ubuntu\\.com" TLD,                            "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
+
+  { "signal.org", NULL, "signal\\.org" TLD,                            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+  { "whispersystems.org", NULL, "whispersystems\\.org" TLD,            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { NULL, NULL, NULL, 0 }
 };
 

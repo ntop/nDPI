@@ -72,20 +72,20 @@ typedef enum {
   NDPI_PROTOCOL_GNUTELLA              = 35,
   NDPI_PROTOCOL_EDONKEY               = 36, /* Tomasz Bujlow <tomasz@skatnet.dk> */
   NDPI_PROTOCOL_BITTORRENT            = 37,
-  NDPI_PROTOCOL_SKYPE_CALL_OUT        = 38,
-  NDPI_PROTOCOL_MUSICALLY             = 39,
+  NDPI_PROTOCOL_SKYPE_CALL            = 38, /* Skype call and videocalls */
+  NDPI_PROTOCOL_SIGNAL                = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached - Darryl Sokoloski <darryl@egloo.ca> */
   NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */  
   NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
+  NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) - Darryl Sokoloski <darryl@egloo.ca> */
   
-  NDPI_PROTOCOL_FREE_43               = 43, /* Free */
   NDPI_PROTOCOL_FREE_44               = 44, /* Free */
   NDPI_PROTOCOL_FREE_45               = 45, /* Free */
   NDPI_PROTOCOL_FREE_46               = 46, /* Free */
   
   NDPI_PROTOCOL_XBOX                  = 47,
   NDPI_PROTOCOL_QQ                    = 48,
-  NDPI_PROTOCOL_SKYPE_CALL_IN         = 49,
+  NDPI_PROTOCOL_FREE_49               = 49, /* Free */
   NDPI_PROTOCOL_RTSP                  = 50,
   NDPI_PROTOCOL_MAIL_IMAPS            = 51,
   NDPI_PROTOCOL_ICECAST               = 52,
