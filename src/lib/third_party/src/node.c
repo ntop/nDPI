@@ -176,6 +176,7 @@ AC_NODE_t * node_create_next (AC_NODE_t * thiz, AC_ALPHABET_t alpha)
  ******************************************************************************/
 void node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str)
 {
+  void *tmp = NULL;
   /* Check if the new pattern already exists in the node list */
   if (node_has_matchstr(thiz, str))
     return;
@@ -183,11 +184,16 @@ void node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str)
   /* Manage memory */
   if (thiz->matched_patterns_num >= thiz->matched_patterns_max)
     {
-      thiz->matched_patterns = (AC_PATTERN_t *) ndpi_realloc 
+	  tmp = (AC_PATTERN_t *) ndpi_realloc
+      //thiz->matched_patterns = (AC_PATTERN_t *) ndpi_realloc 
 	(thiz->matched_patterns, thiz->matched_patterns_max*sizeof(AC_PATTERN_t),
 	 (REALLOC_CHUNK_MATCHSTR+thiz->matched_patterns_max)*sizeof(AC_PATTERN_t));
-
-      thiz->matched_patterns_max += REALLOC_CHUNK_MATCHSTR;
+	  if(tmp){
+		  thiz->matched_patterns = tmp;
+		  thiz->matched_patterns_max += REALLOC_CHUNK_MATCHSTR;
+	  }else{
+		return;
+	  }
     }
 
   thiz->matched_patterns[thiz->matched_patterns_num].astring = str->astring;

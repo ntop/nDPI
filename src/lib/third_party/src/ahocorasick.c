@@ -302,15 +302,22 @@ void ac_automata_display (AC_AUTOMATA_t * thiz, char repcast)
  ******************************************************************************/
 static void ac_automata_register_nodeptr (AC_AUTOMATA_t * thiz, AC_NODE_t * node)
 {
+  void *tmp = NULL;
   if(thiz->all_nodes_num >= thiz->all_nodes_max)
     {
-      thiz->all_nodes = ndpi_realloc(thiz->all_nodes,
+	  tmp = ndpi_realloc(thiz->all_nodes,
+      //thiz->all_nodes = ndpi_realloc(thiz->all_nodes,
 				     thiz->all_nodes_max*sizeof(AC_NODE_t *),
 				     (REALLOC_CHUNK_ALLNODES+thiz->all_nodes_max)*sizeof(AC_NODE_t *)
 				     );
-      thiz->all_nodes_max += REALLOC_CHUNK_ALLNODES;
+	  if(tmp){
+		thiz->all_nodes = tmp;
+		thiz->all_nodes_max += REALLOC_CHUNK_ALLNODES;
+	  }else{
+	    return;
+	  }
     }
-  thiz->all_nodes[thiz->all_nodes_num++] = node;
+	thiz->all_nodes[thiz->all_nodes_num++] = node;
 }
 
 /******************************************************************************
