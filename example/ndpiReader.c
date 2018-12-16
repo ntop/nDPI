@@ -2407,9 +2407,10 @@ static void ndpi_process_packet(u_char *args,
   u_int16_t thread_id = *((u_int16_t*)args);
 
   /* allocate an exact size buffer to check overflows */
-  uint8_t *packet_checked = malloc(header->caplen);
+  uint8_t *packet_checked = malloc(header->caplen + 1);
 
   memcpy(packet_checked, packet, header->caplen);
+  packet_checked[header->caplen] = '\0';
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
 
   if((capture_until != 0) && (header->ts.tv_sec >= capture_until)) {
