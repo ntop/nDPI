@@ -1979,7 +1979,7 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
   int min_len = (txt->length < m->patterns->length) ? txt->length : m->patterns->length;
   char buf[64] = { '\0' };
   int min_buf_len = (txt->length > 63 /* sizeof(buf)-1 */) ? 63 : txt->length;
-  u_int buf_len = strlen(buf);
+  u_int buf_len = 0;
   
   strncpy(buf, txt->astring, min_buf_len);
   buf[min_buf_len] = '\0';
@@ -1998,9 +1998,7 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 
   memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t));
 
-  if(((buf_len >= min_len) && (strncmp(&buf[buf_len-min_len], m->patterns->astring, min_len) == 0))
-     || (strncmp(buf, m->patterns->astring, min_len) == 0) /* begins with */
-     )
+  if(strncmp(buf, m->patterns->astring, min_len) == 0) /* begins with */
     {
 #ifdef MATCH_DEBUG
       printf("Found match [%s][%s] [len: %u][proto_id: %u]\n",
