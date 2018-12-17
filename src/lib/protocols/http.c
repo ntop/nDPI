@@ -26,7 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
 
 #include "ndpi_api.h"
-
+#include "lruc.h"
 
 /* global variables used for 1kxun protocol and iqiyi service */
 
@@ -613,7 +613,23 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
           <allow-access-from domain="*.speedtest.net" to-ports="8080"/>
           </cross-domain-policy>
         */
+      ookla_found:
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
+
+	if(ndpi_struct->ookla_cache == NULL)
+	  ndpi_struct->ookla_cache = lruc_new(4*1024, 1024);	 	
+	
+	if(ndpi_struct->ookla_cache != NULL) {
+	  u_int8_t *dummy = (u_int8_t*)ndpi_malloc(sizeof(u_int8_t));
+
+	  if(dummy) {
+	    if(packet->tcp->source == htons(8080))
+	      lruc_set((lruc*)ndpi_struct->ookla_cache, (void*)&packet->iph->saddr, 4, dummy, 1);
+	    else
+	      lruc_set((lruc*)ndpi_struct->ookla_cache, (void*)&packet->iph->daddr, 4, dummy, 1);
+	  }
+	}
+	
         return;
       }
       
@@ -663,9 +679,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       /* Check for Ookla */
       if((packet->referer_line.len > 0)
-	      && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP);
-	    return;
+	 && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
+	goto ookla_found;
       }
 
       /* Check for additional field introduced by Steam */
@@ -782,17 +797,15 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     
     if((packet->payload_packet_len == 34) && (flow->l4.tcp.http_stage == 1)) {
       if((packet->payload[5] == ' ') && (packet->payload[9] == ' ')) {
-	      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA);
-	      return;
+	goto ookla_found;
       }
     }
     
     if((packet->payload_packet_len > 6) && memcmp(packet->payload, "HELLO ", 6) == 0) {
        /* This looks like Ookla */
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
-      return;
+      goto ookla_found;
     } else
-	    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OOKLA);    
+      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OOKLA);    
     
     /**
        At first check, if this is for sure a response packet (in another direction. If not, if HTTP is detected do nothing now and return,

@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include "ahocorasick.h"
 #include "libcache.h"
+#include "lruc.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
@@ -2427,14 +2428,16 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
 	ndpi_free(ndpi_struct->proto_defaults[i].protoName);
     }
 
-/* NDPI_PROTOCOL_TINC */
+    /* NDPI_PROTOCOL_TINC */
     if(ndpi_struct->tinc_cache)
       cache_free((cache_t)(ndpi_struct->tinc_cache));
 
-    if(ndpi_struct->protocols_ptree)
-      ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->protocols_ptree,
-      free_ptree_data);
+    if(ndpi_struct->ookla_cache)
+      lruc_free((lruc*)ndpi_struct->ookla_cache);
 
+    if(ndpi_struct->protocols_ptree)
+      ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->protocols_ptree, free_ptree_data);
+    
     if(ndpi_struct->udpRoot != NULL)
       ndpi_tdestroy(ndpi_struct->udpRoot, ndpi_free);
     if(ndpi_struct->tcpRoot != NULL)
@@ -3292,6 +3295,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* WHATSAPP */
   init_whatsapp_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* OOKLA */
+  init_ookla_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* AMQP */
   init_amqp_dissector(ndpi_struct, &a, detection_bitmask);

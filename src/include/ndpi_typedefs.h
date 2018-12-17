@@ -996,7 +996,10 @@ struct ndpi_detection_module_struct {
   struct bt_announce *bt_ann;
   int    bt_ann_len;
 
-/* NDPI_PROTOCOL_TINC */
+  /* NDPI_PROTOCOL_OOKLA */
+  void *ookla_cache;
+
+  /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];

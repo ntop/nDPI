@@ -123,7 +123,6 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct, struct n
   }
  excl:
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-
 }
 
 
