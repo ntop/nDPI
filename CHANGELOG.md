@@ -1,5 +1,61 @@
 # CHANGELOG
 
+#### nDPI 2.6 (December 2018)
+
+## New Supported Protocols and Services
+
+* New Bitcoin, Ethereum, ZCash, Monero dissectors all identified as Mining
+* New Signal.org dissector
+* New Nest Log Sink dissector
+* New UPnP dissector
+* Added support for SMBv1 traffic, split from SMBv23
+
+## Improvements
+
+* Improved Skype detection, merged Skype call in/out into Skype Call
+* Improved heuristics for Skype, Teredo, Netbios
+* Improved SpeedTest (Ookla) detection
+* Improved WhatsApp detection
+* Improved WeChat detection
+* Improved Facebook Messenger detection
+* Improved Messenger/Hangout detection
+* Improved SSL detection, prevent false positives
+* Improved guess for UDP protocols
+* Improved STUN detection
+* Added more Ubuntu servers
+* Added missing categorization with giveup/guess
+* Optimizations for TCP flows that do not start with a SYN packet (early giveup)
+
+## Fixes
+
+* Fixed eDonkey false positives
+* Fixed Dropbox dissector
+* Fixed Spotify dissector
+* Fixed custom protocol loading
+* Fixed missing Application Data packet for TLS
+* Fixed buffer overflows
+* Fixed custom categories match by IP
+* Fixed category field not accounted in ndpi_get_proto_category
+* Fixed null pointer dereference in ndpi_detection_process_packet
+* Fixed compilation on Mac
+
+## Other
+
+* Deb and RPM packages: ndpi with shared libraries and binaries, ndpi-dev with headers and static libraries
+* Protocols now have an optional subprotocol: Spotify cannot have subprotocols, DNS can (DNS.Spotify) 
+* New API functions:
+  - ndpi_fill_ip_protocol_category to handle ICMP flows category
+  - ndpi_flowv4_flow_hash and ndpi_flowv6_flow_hash to support the Community ID Flow Hashing (https://github.com/corelight/community-id-spec)
+  - ndpi_protocol2id to print the protocol as ID
+  - ndpi_get_custom_category_match to search host in custom categories
+* Changed ndpi_detection_giveup API: guess is now part of the call
+* Added DPDK support to ndpiReader
+* Removed Musical.ly protocol (service no longer used)
+* Custom categories have now priority over protocol related categories
+* Improved clang support
+
+------------------------------------------------------------------------
+
 #### nDPI 2.4 (August 2018)
 
 ## New Supported Protocols and Services
