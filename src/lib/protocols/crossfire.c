@@ -1,7 +1,7 @@
 /*
  * crossfire.c
  *
- * Copyright (C) 2012-15 - ntop.org
+ * Copyright (C) 2012-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,8 +22,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_CROSSFIRE
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CROSSFIRE
 
@@ -88,5 +86,3 @@ void init_crossfire_dissector(struct ndpi_detection_module_struct *ndpi_struct, 
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 }
-
-#endif

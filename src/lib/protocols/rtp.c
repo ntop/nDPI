@@ -2,7 +2,7 @@
  * rtp.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,8 +23,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_RTP
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RTP
 
@@ -308,13 +306,12 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   return;
 
  exclude_rtp:
-#ifdef NDPI_PROTOCOL_STUN
   if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN
       || /* packet->real_protocol_read_only == NDPI_PROTOCOL_STUN */) {
     NDPI_LOG_DBG(ndpi_struct, "STUN: is detected, need next packet\n");
     return;
   }
-#endif							/*  NDPI_PROTOCOL_STUN */
+
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
@@ -337,7 +334,7 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	       "skipping STUN-like, special yahoo packets with payload[0] == 0x90.\n");
       return;
     }
-#ifdef NDPI_PROTOCOL_STUN
+
     /* TODO the rtp detection sometimes doesn't exclude rtp
      * so for TCP flows only run the detection if STUN has been
      * detected (or RTP is already detected)
@@ -360,6 +357,7 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	return;
       }
     }
+
     if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN && flow->l4.tcp.rtp_special_packets_seen == 1) {
 
       if (packet->payload_packet_len >= 4 && ntohl(get_u_int32_t(packet->payload, 0)) + 4 == packet->payload_packet_len) {
@@ -378,15 +376,13 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     } else {
       NDPI_LOG_DBG(ndpi_struct, "STUN not yet excluded, need next packet\n");
     }
-#else
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-#endif
   }
 }
 #endif
 
 
-void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct,
+			u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("RTP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_RTP,
@@ -397,7 +393,4 @@ void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 
   *id += 1;
 }
-
-#endif	   
-/* NDPI_PROTOCOL_RTP */
 

@@ -213,11 +213,13 @@ extern "C" {
    *
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
+   * @par    enable_guess = guess protocol if unknown
    * @return the detected protocol even if the flow is not completed;
    *
    */
   ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
-				      struct ndpi_flow_struct *flow);
+				      struct ndpi_flow_struct *flow,
+				      u_int8_t enable_guess);
 
   /**
    * Processes an extra packet in order to get more information for a given protocol
@@ -326,6 +328,7 @@ extern "C" {
    * Search and return the protocol guessed that is undetected
    *
    * @par    ndpi_struct  = the detection module
+   * @par    flow         = the flow we're trying to guess, NULL if not available
    * @par    proto        = the l4 protocol number
    * @par    shost        = source address in host byte order
    * @par    sport        = source port number
@@ -335,6 +338,7 @@ extern "C" {
    *
    */
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+					       struct ndpi_flow_struct *flow,
 					       u_int8_t proto,
 					       u_int32_t shost,
 					       u_int16_t sport,
@@ -346,6 +350,7 @@ extern "C" {
    * @par    ndpi_struct         = the detection module
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
+   * @par    ret_match           = completed returned match information
    * @par    is_host_match       = value of the second field of struct ndpi_automa
    * @return the ID of the matched subprotocol
    *
@@ -353,6 +358,7 @@ extern "C" {
   int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				    char *string_to_match,
 				    u_int string_to_match_len,
+				    ndpi_protocol_match_result *ret_match,
 				    u_int8_t is_host_match);
   /**
    * Check if the host passed match with a protocol
@@ -361,6 +367,7 @@ extern "C" {
    * @par    flow                = the flow where match the host
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
+   * @par    ret_match           = completed returned match information
    * @par    master_protocol_id  = value of the ID associated to the master protocol detected
    * @return the ID of the matched subprotocol
    *
@@ -369,6 +376,7 @@ extern "C" {
 				  struct ndpi_flow_struct *flow,
 				  char *string_to_match,
 				  u_int string_to_match_len,
+				  ndpi_protocol_match_result *ret_match,
 				  u_int16_t master_protocol_id);
 
 
@@ -379,6 +387,7 @@ extern "C" {
    * @par    flow                = the flow where match the host
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
+   * @par    ret_match           = completed returned match information
    * @par    master_protocol_id  = value of the ID associated to the master protocol detected
    * @return the ID of the matched subprotocol
    *
@@ -387,6 +396,7 @@ extern "C" {
 				     struct ndpi_flow_struct *flow,
 				     char *string_to_match,
 				     u_int string_to_match_len,
+				     ndpi_protocol_match_result *ret_match,
 				     u_int16_t master_protocol_id);
   /**
    * Exclude protocol from search
@@ -425,6 +435,20 @@ extern "C" {
    */
   char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod,
 			   ndpi_protocol proto, char *buf, u_int buf_len);
+
+  /**
+   * Same as ndpi_protocol2name() with the difference that the numeric protocol
+   * name is returned
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     proto         = the struct ndpi_protocol contain the protocols name
+   * @par     buf           = the buffer to write the name of the protocols
+   * @par     buf_len       = the length of the buffer
+   * @return  the buffer contains the master_protocol and protocol name
+   *
+   */
+  char* ndpi_protocol2id(struct ndpi_detection_module_struct *ndpi_mod,
+			 ndpi_protocol proto, char *buf, u_int buf_len);
 
   /**
    * Find out if a given category is custom/user-defined
@@ -606,7 +630,7 @@ extern "C" {
   void ndpi_set_automa(struct ndpi_detection_module_struct *ndpi_struct,
 		       void* automa);
 
-#ifdef NDPI_PROTOCOL_HTTP
+/* NDPI_PROTOCOL_HTTP */
   /**
    * Retrieve information for HTTP flows
    *
@@ -639,9 +663,8 @@ extern "C" {
   */
   char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod,
 				   struct ndpi_flow_struct *flow);
-#endif
 
-#ifdef NDPI_PROTOCOL_TOR
+/* NDPI_PROTOCOL_TOR */
   /**
    * Check if the flow could be detected as TOR protocol
    *
@@ -654,7 +677,6 @@ extern "C" {
    */
   int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow, char *certificate);
-#endif
 
   /* Wrappers functions */
   /**
@@ -717,9 +739,14 @@ extern "C" {
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
 				  char *name, ndpi_protocol_category_t category);
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
+  int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
+				 const struct ndpi_iphdr *iph,
+				 ndpi_protocol *ret);
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   ndpi_protocol *ret);
+  int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
+				      char *name_or_ip, unsigned long *id);
   int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
 				     ndpi_detection_preference pref,
 				     int value);
@@ -752,6 +779,14 @@ extern "C" {
   void * ndpi_calloc(unsigned long count, size_t size);
   void ndpi_free(void *ptr);
   u_int8_t ndpi_get_api_version();
+
+  /* https://github.com/corelight/community-id-spec */
+  int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip, u_int16_t src_port, u_int16_t dst_port,
+			    u_int8_t icmp_type, u_int8_t icmp_code, u_char *hash_buf, u_int8_t hash_buf_len);
+  int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struct ndpi_in6_addr *dst_ip,
+			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
+			    u_char *hash_buf, u_int8_t hash_buf_len);
+  
 #ifdef __cplusplus
 }
 #endif

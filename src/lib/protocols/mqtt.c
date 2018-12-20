@@ -23,8 +23,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_MQTT
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MQTT
 
 #include "ndpi_api.h"
@@ -232,7 +230,7 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 			return;
 		} else {
-			NDPI_LOG_INFO(ndpi_struct, "found Mqtt UNSUBSCRIBE\n",pt);
+			NDPI_LOG_INFO(ndpi_struct, "found Mqtt UNSUBSCRIBE\n");
 			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
 			return;
 		}
@@ -255,5 +253,4 @@ void init_mqtt_dissector (struct ndpi_detection_module_struct *ndpi_struct,
 	*id +=1;
 }
 
-#endif // NDPI_PROTOCOL_MQTT
 

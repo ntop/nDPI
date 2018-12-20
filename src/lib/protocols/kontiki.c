@@ -2,7 +2,7 @@
  * kontiki.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -24,8 +24,6 @@
 
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_KONTIKI
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_KONTIKI
 
@@ -66,7 +64,8 @@ void ndpi_search_kontiki(struct ndpi_detection_module_struct *ndpi_struct, struc
 }
 
 
-void init_kontiki_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_kontiki_dissector(struct ndpi_detection_module_struct *ndpi_struct,
+			    u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("Kontiki", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_KONTIKI,
@@ -78,4 +77,3 @@ void init_kontiki_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   *id += 1;
 }
 
-#endif

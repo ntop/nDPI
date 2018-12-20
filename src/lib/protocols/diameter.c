@@ -1,8 +1,7 @@
 /*
- * aimini.c
+ * diameter.c
  *
  * Copyright (C) 2018 - ntop.org
- * Written by Michele Campus - <campus@ntop.org>
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -19,11 +18,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
+ * Based on code of:
+ * Michele Campus - <campus@ntop.org>
  */
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_DIAMETER
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DIAMETER
 
@@ -31,10 +30,10 @@
 
 
 // Header Flags possibile values
-#define REQUEST   0X80
-#define PROXYABLE 0X40
-#define ERROR     0X20
-#define RETRASM   0X10
+#define DIAMETER_REQUEST   0X80
+#define DIAMETER_PROXYABLE 0X40
+#define DIAMETER_ERROR     0X20
+#define DIAMETER_RETRASM   0X10
 
 typedef enum {
     AC = 271,
@@ -73,10 +72,10 @@ int is_diameter(struct ndpi_packet_struct *packet, int size_payload)
 
   // check if the packet is diameter
   if(diameter->version == 0x01 &&
-     (diameter->flags == REQUEST ||
-      diameter->flags == PROXYABLE ||
-      diameter->flags == ERROR ||
-      diameter->flags == RETRASM)) {
+     (diameter->flags == DIAMETER_REQUEST ||
+      diameter->flags == DIAMETER_PROXYABLE ||
+      diameter->flags == DIAMETER_ERROR ||
+      diameter->flags == DIAMETER_RETRASM)) {
 
     u_int16_t com_code = diameter->com_code[2] + (diameter->com_code[1] << 8) + (diameter->com_code[0] << 8);
     
@@ -127,6 +126,4 @@ void init_diameter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 
   *id += 1;
 }
-
-#endif /* NDPI_PROTOCOL_DIAMETER */
 

@@ -192,7 +192,7 @@ void node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str)
 
   thiz->matched_patterns[thiz->matched_patterns_num].astring = str->astring;
   thiz->matched_patterns[thiz->matched_patterns_num].length = str->length;
-  thiz->matched_patterns[thiz->matched_patterns_num].rep = str->rep;
+  memcpy(&thiz->matched_patterns[thiz->matched_patterns_num].rep, &str->rep, sizeof(AC_REP_t));
   thiz->matched_patterns_num++;
 }
 

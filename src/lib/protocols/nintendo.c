@@ -1,7 +1,7 @@
 /*
  * nintendo.c
  *
- * Copyright (C) 2017 by ntop.org
+ * Copyright (C) 2017-18 by ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,8 +22,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_NINTENDO
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_NINTENDO
 
@@ -67,4 +65,3 @@ void init_nintendo_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   *id += 1;
 }
 
-#endif

@@ -1,4 +1,4 @@
-ndpi (@NDPI_VERS@-@SVN_RELEASE@) stable; urgency=high
+ndpi (@NDPI_VERS@-@GIT_REVISION@) stable; urgency=high
    * Last packaged version
 
  -- Luca Deri <deri@ntop.org>  @DATE@

@@ -1,5 +1,119 @@
 # CHANGELOG
 
+#### nDPI 2.6 (December 2018)
+
+## New Supported Protocols and Services
+
+* New Bitcoin, Ethereum, ZCash, Monero dissectors all identified as Mining
+* New Signal.org dissector
+* New Nest Log Sink dissector
+* New UPnP dissector
+* Added support for SMBv1 traffic, split from SMBv23
+
+## Improvements
+
+* Improved Skype detection, merged Skype call in/out into Skype Call
+* Improved heuristics for Skype, Teredo, Netbios
+* Improved SpeedTest (Ookla) detection
+* Improved WhatsApp detection
+* Improved WeChat detection
+* Improved Facebook Messenger detection
+* Improved Messenger/Hangout detection
+* Improved SSL detection, prevent false positives
+* Improved guess for UDP protocols
+* Improved STUN detection
+* Added more Ubuntu servers
+* Added missing categorization with giveup/guess
+* Optimizations for TCP flows that do not start with a SYN packet (early giveup)
+
+## Fixes
+
+* Fixed eDonkey false positives
+* Fixed Dropbox dissector
+* Fixed Spotify dissector
+* Fixed custom protocol loading
+* Fixed missing Application Data packet for TLS
+* Fixed buffer overflows
+* Fixed custom categories match by IP
+* Fixed category field not accounted in ndpi_get_proto_category
+* Fixed null pointer dereference in ndpi_detection_process_packet
+* Fixed compilation on Mac
+
+## Other
+
+* Deb and RPM packages: ndpi with shared libraries and binaries, ndpi-dev with headers and static libraries
+* Protocols now have an optional subprotocol: Spotify cannot have subprotocols, DNS can (DNS.Spotify) 
+* New API functions:
+  - ndpi_fill_ip_protocol_category to handle ICMP flows category
+  - ndpi_flowv4_flow_hash and ndpi_flowv6_flow_hash to support the Community ID Flow Hashing (https://github.com/corelight/community-id-spec)
+  - ndpi_protocol2id to print the protocol as ID
+  - ndpi_get_custom_category_match to search host in custom categories
+* Changed ndpi_detection_giveup API: guess is now part of the call
+* Added DPDK support to ndpiReader
+* Removed Musical.ly protocol (service no longer used)
+* Custom categories have now priority over protocol related categories
+* Improved clang support
+
+------------------------------------------------------------------------
+
+#### nDPI 2.4 (August 2018)
+
+## New Supported Protocols and Services
+
+* Showmax.com
+* Musical.ly
+* RapidVideo
+* VidTO streaming service
+* Apache JServ Protocol
+* Facebook Messenger
+* FacebookZero protocol
+
+## Improvements
+
+* Improved YouTube support
+* Improved Netflix support
+* Updated Google Hangout detection
+* Updated Twitter address range
+* Updated Viber ports, subnet and domain
+* Updated AmazonVideo detection
+* Updated list of FaceBook sites
+* Initial Skype in/out support
+* Improved Tor detection
+* Improved hyperscan support and category definition
+* Custom categories loading, extended ndpiReader (`-c <file>`) for loading name-based categories
+
+## Fixes
+
+* Fixes for Instagram flows classified as Facebook
+* Fixed Spotify detection
+* Fixed minimum packet payload length for SSDP
+* Fixed length check in MSN, x-steam-sid, Tor certificate name
+* Increase client's maximum payload length for SSH
+* Fixed end-of-line bounds handling
+* Fixed substring matching
+* Fix for handling IP address based custom categories
+* Repaired wrong timestamp calculation
+* Fixed memory leak
+* Optimized memory usage
+
+## Other/Changes
+
+* New API calls:
+  * `ndpi_set_detection_preferences()`
+  * `ndpi_load_hostname_category()`
+  * `ndpi_enable_loaded_categories()`
+  * `ndpi_fill_protocol_category()`
+  * `ndpi_process_extra_packet()`
+* Skype CallIn/CallOut are now set as Skype.SkypeCallOut Skype.SkypeCallIn
+* Added support for SMTPS on port 587
+* Changed RTP from VoIP to Media category
+* Added site unavailable category
+* Added custom categories CUSTOM_CATEGORY_MINING, CUSTOM_CATEGORY_MALWARE, CUSTOM_CATEGORY_ADVERTISEMENT, CUSTOM_CATEGORY_BANNED_SITE
+* Implemented hash-based categories
+* Converted some not popular protocols to NDPI_PROTOCOL_GENERIC with category detection
+
+------------------------------------------------------------------------
+
 #### nDPI 2.2.2 (April 2018)
 
 ## Main New Features
@@ -95,7 +209,7 @@
 * Ubiquity AirControl 2
 * HEP (Extensible Encapsulation Protocol)
 * WhatsApp Voice vs WhatsApp (chat, no voice)
-* Viber	
+* Viber
 * Wechat
 * Github
 * Hotmail
@@ -124,7 +238,7 @@
 * Improved HTTP subprotocol matching
 * Implemented DHCP host name extraction
 * Updated Facebook detection by ip server ranges
-* Updated Twitter networks	  
+* Updated Twitter networks
 * Improved Microsoft detection
 * Enhanced Google detection
 * Improved BT-uTP protocol dissection

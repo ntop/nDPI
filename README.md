@@ -2,6 +2,8 @@
 # nDPI
 
 [![Build Status](https://travis-ci.org/ntop/nDPI.png?branch=dev)](https://travis-ci.org/ntop/nDPI)
+[![Code Quality: Cpp](https://img.shields.io/lgtm/grade/cpp/g/ntop/nDPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ntop/nDPI/context:cpp)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/ntop/nDPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ntop/nDPI/alerts)
 
 ## What is nDPI ?
 
@@ -34,15 +36,13 @@ The entire procedure of adding new protocols in detail:
 5. Choose (do not change anything) a selection bitmask from: src/include/ndpi_define.h
 6. Add a new entry in ndpi_set_protocol_detection_bitmask2 in: src/lib/ndpi_main.c
 7. Set protocol default ports in ndpi_init_protocol_defaults in: src/lib/ndpi_main.c
-8. Add the new protocol file to: src/lib/Makefile.am
-9.  ./autogen.sh
-10. ./configure
-11. make
-12. make check
+8.  ./autogen.sh
+9. make
+10. make check
 
 ### How to use nDPI to Block Selected Traffic
 
-You can use nDPI to selectively block selected Internet traffic by embedding it onto an application (remember that nDPI us just a library). Both [ntopng](https://github.com/ntop/ntopng) and [nProbe cento](http://www.ntop.org/products/netflow/nprobe-cento/) can do this.
+You can use nDPI to selectively block selected Internet traffic by embedding it onto an application (remember that nDPI is just a library). Both [ntopng](https://github.com/ntop/ntopng) and [nProbe cento](http://www.ntop.org/products/netflow/nprobe-cento/) can do this.
 
 ### DISCLAIMER
 While we do our best to detect network protocols, we cannot guarantee that our software is error free and 100% accurate in protocol detection. Please make sure that you respect the privacy of users and you have proper authorization to listen, capture and inspect network traffic.

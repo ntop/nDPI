@@ -2,7 +2,7 @@
  * icecast.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -24,8 +24,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_ICECAST
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_ICECAST
 
 #include "ndpi_api.h"
@@ -42,13 +40,13 @@ void ndpi_search_icecast_tcp(struct ndpi_detection_module_struct *ndpi_struct, s
 
   NDPI_LOG_DBG(ndpi_struct, "search icecast\n");
 
-  if ((packet->payload_packet_len < 500 &&
+  if((packet->payload_packet_len < 500 &&
        packet->payload_packet_len >= 7 && memcmp(packet->payload, "SOURCE ", 7) == 0)
       || flow->l4.tcp.icecast_stage) {
     ndpi_parse_packet_line_info_any(ndpi_struct, flow);
     NDPI_LOG_DBG2(ndpi_struct, "Icecast lines=%d\n", packet->parsed_lines);
     for (i = 0; i < packet->parsed_lines; i++) {
-      if (packet->line[i].ptr != NULL && packet->line[i].len > 4
+      if(packet->line[i].ptr != NULL && packet->line[i].len > 4
 	  && memcmp(packet->line[i].ptr, "ice-", 4) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found Icecast\n");
 	ndpi_int_icecast_add_connection(ndpi_struct, flow);
@@ -56,28 +54,30 @@ void ndpi_search_icecast_tcp(struct ndpi_detection_module_struct *ndpi_struct, s
       }
     }
 
-    if (packet->parsed_lines < 1 && !flow->l4.tcp.icecast_stage) {
+    if(packet->parsed_lines < 1 && !flow->l4.tcp.icecast_stage) {
       flow->l4.tcp.icecast_stage = 1;
       return;
     }
   }
-#ifdef NDPI_PROTOCOL_HTTP
-  if (NDPI_FLOW_PROTOCOL_EXCLUDED(ndpi_struct, flow, NDPI_PROTOCOL_HTTP)) {
+
+  if(NDPI_FLOW_PROTOCOL_EXCLUDED(ndpi_struct, flow, NDPI_PROTOCOL_HTTP)) {
     goto icecast_exclude;
   }
-#endif
 
-  if (packet->packet_direction == flow->setup_packet_direction && flow->packet_counter < 10) {
+  if((packet->packet_direction == flow->setup_packet_direction)
+      && (flow->packet_counter < 10)) {
     return;
   }
 
-  if (packet->packet_direction != flow->setup_packet_direction) {
+  if(packet->packet_direction != flow->setup_packet_direction) {
     /* server answer, now test Server for Icecast */
 
     ndpi_parse_packet_line_info(ndpi_struct, flow);
 
-    if (packet->server_line.ptr != NULL && packet->server_line.len > NDPI_STATICSTRING_LEN("Icecast") &&
-	memcmp(packet->server_line.ptr, "Icecast", NDPI_STATICSTRING_LEN("Icecast")) == 0) {
+    if((packet->server_line.ptr != NULL)
+       && (packet->server_line.len > NDPI_STATICSTRING_LEN("Icecast"))
+       &&  memcmp(packet->server_line.ptr, "Icecast",
+		  NDPI_STATICSTRING_LEN("Icecast")) == 0) {
       /* TODO maybe store the previous protocol type as subtype?
        *      e.g. ogg or mpeg
        */
@@ -103,5 +103,3 @@ void init_icecast_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
 
   *id += 1;
 }
-
-#endif

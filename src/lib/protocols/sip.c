@@ -2,7 +2,7 @@
  * sip.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,8 +23,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_SIP
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SIP
 
@@ -59,12 +57,8 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
       packet_payload += 4;
     }
   }
-#ifndef NDPI_PROTOCOL_YAHOO
-  if (payload_len >= 14 && packet_payload[payload_len - 2] == 0x0d && packet_payload[payload_len - 1] == 0x0a)
-#endif
-#ifdef NDPI_PROTOCOL_YAHOO
-    if (payload_len >= 14)
-#endif
+
+  if (payload_len >= 14)
       {
 
 	if ((memcmp(packet_payload, "NOTIFY ", 7) == 0 || memcmp(packet_payload, "notify ", 7) == 0)
@@ -146,19 +140,18 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
     NDPI_LOG_DBG2(ndpi_struct, "need next packet\n");
     return;
   }
-#ifdef NDPI_PROTOCOL_STUN
+
   /* for STUN flows we need some more packets */
   if (packet->udp != NULL && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN && flow->packet_counter < 40) {
     NDPI_LOG_DBG2(ndpi_struct, "need next STUN packet\n");
     return;
   }
-#endif
 
   if (payload_len == 4 && get_u_int32_t(packet_payload, 0) == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "maybe sip. need next packet\n");
     return;
   }
-#ifdef NDPI_PROTOCOL_YAHOO
+
   if (payload_len > 30 && packet_payload[0] == 0x90
       && packet_payload[3] == payload_len - 20 && get_u_int32_t(packet_payload, 4) == 0
       && get_u_int32_t(packet_payload, 8) == 0) {
@@ -168,9 +161,8 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
   if (flow->sip_yahoo_voice && flow->packet_counter < 10) {
     return;
   }
-#endif
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -200,4 +192,3 @@ void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
   *id += 1;
 }
 
-#endif

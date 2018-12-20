@@ -2,7 +2,7 @@
  * world_of_kung_fu.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -24,7 +24,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_WORLD_OF_KUNG_FU
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_WORLD_OF_KUNG_FU
 #include "ndpi_api.h"
 
@@ -64,5 +63,3 @@ void init_world_of_kung_fu_dissector(struct ndpi_detection_module_struct *ndpi_s
 
   *id += 1;
 }
-
-#endif

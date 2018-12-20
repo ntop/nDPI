@@ -1,0 +1,8 @@
+Mining	637	581074	6
+
+	1	TCP 192.168.1.142:55328 <-> 69.118.54.122:8333 [proto: 42/Mining][cat: Mining/99][2 pkts/281 bytes <-> 137 pkts/191029 bytes]
+	2	TCP 192.168.1.142:55348 <-> 74.89.181.229:8333 [proto: 42/Mining][cat: Mining/99][55 pkts/28663 bytes <-> 117 pkts/134830 bytes]
+	3	TCP 192.168.1.142:55383 <-> 66.68.83.22:8333 [proto: 42/Mining][cat: Mining/99][65 pkts/45271 bytes <-> 96 pkts/70339 bytes]
+	4	TCP 192.168.1.142:55400 <-> 195.218.16.178:8333 [proto: 42/Mining][cat: Mining/99][47 pkts/26824 bytes <-> 72 pkts/55927 bytes]
+	5	TCP 192.168.1.142:55317 <-> 188.165.213.169:8333 [proto: 42/Mining][cat: Mining/99][16 pkts/21673 bytes <-> 3 pkts/1771 bytes]
+	6	TCP 192.168.1.142:55487 <-> 184.58.165.119:8333 [proto: 42/Mining][cat: Mining/99][24 pkts/3082 bytes <-> 3 pkts/1384 bytes]

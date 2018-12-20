@@ -1,7 +1,7 @@
 /*
  * eaq.c
  *
- * Copyright (C) 2015 - ntop.org
+ * Copyright (C) 2015-18 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -26,8 +26,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_EAQ
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_EAQ
 
@@ -55,12 +53,15 @@ void ndpi_search_eaq(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       
     if(packet->udp != NULL) {
       u_int32_t seq = (packet->payload[0] * 1000) + (packet->payload[1] * 100) + (packet->payload[2] * 10) + packet->payload[3];
-      
+
       if(flow->l4.udp.eaq_pkt_id == 0)
         flow->l4.udp.eaq_sequence = seq;
       else {
         if( (flow->l4.udp.eaq_sequence != seq) &&
-	    ((flow->l4.udp.eaq_sequence+1) != seq)) break;
+	    ((flow->l4.udp.eaq_sequence+1) != seq))
+	  break;
+	else
+	  flow->l4.udp.eaq_sequence = seq;
       }
 
       if(++flow->l4.udp.eaq_pkt_id == 4) {
@@ -68,7 +69,8 @@ void ndpi_search_eaq(struct ndpi_detection_module_struct *ndpi_struct, struct nd
         NDPI_LOG_INFO(ndpi_struct, "found eaq\n");
         ndpi_int_eaq_add_connection(ndpi_struct, flow);
         return;
-      }
+      } else
+	return;
     }
   } while(0);
 
@@ -88,5 +90,3 @@ void init_eaq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 
   *id += 1;
 }
-
-#endif

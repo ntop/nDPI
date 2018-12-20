@@ -1,0 +1,38 @@
+# 
+# RPM Build Process
+#
+APPL=ndpi
+PLATFORM=@PLATFORM@
+GIT_REVISION=@GIT_REVISION@
+PACKAGE_VERSION=@PACKAGE_VERSION@
+PACKAGE=$(APPL)-$(PACKAGE_VERSION)-$(GIT_REVISION).$(PLATFORM).rpm
+DEV_PACKAGE=$(APPL)-dev-$(PACKAGE_VERSION)-$(GIT_REVISION).$(PLATFORM).rpm
+PACKAGE_PATH=$(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
+
+package: build-rpm
+
+build-src:
+	cd ../..; ./autogen.sh; ./configure; make clean; make
+
+cleanup-rpm:
+	rm -rf $(HOME)/rpmbuild/BUILD/ndpi* $(HOME)/rpmbuild/SOURCES/ndpi*
+
+build-rpm: build-src cleanup-rpm
+	-rm -rf ndpi-@PACKAGE_VERSION@
+	mkdir -p ndpi-@PACKAGE_VERSION@/packages
+	cp ndpi.spec.in ndpi-@PACKAGE_VERSION@/packages
+	cp ../../Makefile.* ../../libtool ../../configure* ../../config.* ../../install-sh ../../autogen.sh ndpi-@PACKAGE_VERSION@
+	cp -rf ../../src ndpi-@PACKAGE_VERSION@ 
+	cp ../../CHANGELOG.md ../../COPYING ndpi-@PACKAGE_VERSION@ 
+	\rm -f ndpi-@PACKAGE_VERSION@/config.status
+	mkdir -p $(HOME)/rpmbuild/SOURCES
+	tar cvfz $(HOME)/rpmbuild/SOURCES/ndpi-@PACKAGE_VERSION@.tgz ndpi-@PACKAGE_VERSION@
+	@rm -f $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
+	@rpmbuild -bb ./$(APPL).spec --define "buildnumber $(GIT_REVISION)"
+	@if [[ $EUID -ne 0 ]]; then ./rpm-sign.exp $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE); fi
+	@if [[ $EUID -ne 0 ]]; then ./rpm-sign.exp $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(DEV_PACKAGE); fi
+	@echo ""
+	@echo "Package contents:"
+	@rpm -qpl $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
+	@echo "The package is now available in $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)"
+

@@ -25,8 +25,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_BITTORRENT
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_BITTORRENT
 
 #include "ndpi_api.h"
@@ -503,5 +501,3 @@ void init_bittorrent_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 }
-
-#endif

@@ -1,7 +1,7 @@
 /*
  * rx.c
  *
- * Copyright (C) 2012-16 - ntop.org
+ * Copyright (C) 2012-18 - ntop.org
  *
  * Giovanni Mascellani <gio@debian.org>
  *
@@ -24,8 +24,6 @@
  */
 #include "ndpi_protocol_ids.h"
 
-
-#ifdef NDPI_PROTOCOL_RX
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RX
 
@@ -227,4 +225,3 @@ void init_rx_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   *id += 1;
 }
 
-#endif

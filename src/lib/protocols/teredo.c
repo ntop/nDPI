@@ -1,7 +1,7 @@
 /*
  * teredo.c
  *
- * Copyright (C) 2015 - ntop.org
+ * Copyright (C) 2015-18 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,8 +20,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_TEREDO
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TEREDO
 
 #include "ndpi_api.h"
@@ -34,7 +32,7 @@ void ndpi_search_teredo(struct ndpi_detection_module_struct *ndpi_struct, struct
   NDPI_LOG_DBG(ndpi_struct,"search teredo\n");
   if(packet->udp
      && packet->iph
-     && ((ntohl(packet->iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */)
+     && ((ntohl(packet->iph->daddr) & 0xF0000000) != 0xE0000000 /* Not a multicast address */)
      && ((ntohs(packet->udp->source) == 3544) || (ntohs(packet->udp->dest) == 3544))
      && (packet->payload_packet_len >= 40 /* IPv6 header */)) {
     NDPI_LOG_INFO(ndpi_struct,"found teredo\n");
@@ -57,4 +55,3 @@ void init_teredo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   *id += 1;
 }
 
-#endif

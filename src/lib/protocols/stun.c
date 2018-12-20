@@ -2,7 +2,7 @@
  * stun.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,8 +23,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_STUN
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_STUN
 
@@ -108,7 +106,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       case 0x4002:
 	/* These are the only messages apparently whatsapp voice can use */
 	break;
-	      
+	
       case 0x8054: /* Candidate Identifier */
 	if((len == 4)
 	   && ((offset+7) < payload_length)
@@ -121,6 +119,20 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	}
 	break;
 
+      case 0x8055: /* MS Service Quality (skype?) */
+	break;
+
+	/* Proprietary fields found on skype calls */
+      case 0x24DF:
+      case 0x3802:
+      case 0x8036:
+      case 0x8095:
+      case 0x0800:
+	/* printf("====>>>> %04X\n", attribute); */
+	flow->protos.stun_ssl.stun.is_skype = 1;
+	return(NDPI_IS_STUN);
+	break;
+	
       case 0x8070: /* Implementation Version */
 	if((len == 4)
 	   && ((offset+7) < payload_length)
@@ -191,7 +203,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
 
 	  if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
-	    ndpi_set_detected_protocol(ndpi_struct, flow, (flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT, NDPI_PROTOCOL_SKYPE);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
 	} else {
 	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
 	  ndpi_int_stun_add_connection(ndpi_struct,
@@ -209,9 +221,10 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     
     if(flow->protos.stun_ssl.stun.is_skype) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
-      
+
+      /* flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT */ 
       if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
-	ndpi_set_detected_protocol(ndpi_struct, flow, (flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT, NDPI_PROTOCOL_SKYPE);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
     } else {
       NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
       ndpi_int_stun_add_connection(ndpi_struct,
@@ -242,5 +255,3 @@ void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 
   *id += 1;
 }
-
-#endif

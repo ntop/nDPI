@@ -1,7 +1,7 @@
 /*
  * smb.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,10 +22,6 @@
  */
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_SMB
-
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SMB
-
 #include "ndpi_api.h"
 
 
@@ -45,19 +41,23 @@ void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       
       NDPI_LOG_INFO(ndpi_struct, "found SMB\n");
 
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMB, NDPI_PROTOCOL_UNKNOWN);
+      if(packet->payload[8] == 0x72)
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, NDPI_PROTOCOL_UNKNOWN);
+      else
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, __FILE__, __FUNCTION__, __LINE__);
+  ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23, __FILE__, __FUNCTION__, __LINE__);
 }
 
 
 void init_smb_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("SMB", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_SMB,
+				      NDPI_PROTOCOL_SMBV23,
 				      ndpi_search_smb_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
@@ -66,4 +66,3 @@ void init_smb_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
   *id += 1;
 }
 
-#endif

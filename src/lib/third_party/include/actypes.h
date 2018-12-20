@@ -42,9 +42,9 @@ typedef char AC_ALPHABET_t;
  * automata for further reference. we provisioned two possible types as a
  * union for this purpose. you can add your desired type in it.
  **/
-typedef union {
-  char * stringy; /* null-terminated string */
-  unsigned long number;
+typedef struct {
+  int number;
+  unsigned int category, breed;
 } AC_REP_t;
 
 /* AC_PATTERN_t:
@@ -112,20 +112,20 @@ typedef enum
 			      ac_automata_finalize() you can not add new patterns to the automata. */
   } AC_ERROR_t;
 
-/* MATCH_CALBACK_t:
+/* MATCH_CALLBACK_t:
  * This is the call-back function type that must be given to automata at
  * initialization to report match occurrence to the caller.
  * at a match event, the automata will reach you using this function and sends
  * you a pointer to AC_MATCH_t. using that pointer you can handle
  * matches. you can send parameters to the call-back function when you call
  * ac_automata_search(). at call-back, the automata will sent you those
- * parameters as the second parameter (void *) of MATCH_CALBACK_t. inside
+ * parameters as the second parameter (void *) of MATCH_CALLBACK_t. inside
  * the call-back function you can cast it to whatever you want.
- * If you return 0 from MATCH_CALBACK_t function to the automata, it will
+ * If you return 0 from MATCH_CALLBACK_t function to the automata, it will
  * continue searching, otherwise it will return from ac_automata_search()
  * to your calling function.
  **/
-typedef int (*MATCH_CALBACK_f)(AC_MATCH_t *, AC_TEXT_t *, void *);
+typedef int (*MATCH_CALLBACK_f)(AC_MATCH_t *, AC_TEXT_t *, AC_REP_t *);
 
 /* AC_PATTRN_MAX_LENGTH:
  * Maximum acceptable pattern length in AC_PATTERN_t.length

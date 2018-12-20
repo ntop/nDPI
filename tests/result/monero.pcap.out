@@ -1,0 +1,4 @@
+Mining	319	166676	2
+
+	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes]
+	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes]

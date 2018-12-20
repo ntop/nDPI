@@ -1,15 +1,12 @@
 /*
  * h323.c
  *
- * Copyright (C) 2015 ntop.org
+ * Copyright (C) 2015-18 ntop.org
  * Copyright (C) 2013 Remy Mudingay <mudingay@ill.fr>
  *
  */
 
-
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_H323
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_H323
 
@@ -115,5 +112,3 @@ void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 
   *id += 1;
 }
-
-#endif

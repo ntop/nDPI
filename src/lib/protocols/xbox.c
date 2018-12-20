@@ -1,7 +1,7 @@
 /*
  * xbox.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,7 +23,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_XBOX
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_XBOX
 #include "ndpi_api.h"
 
@@ -84,9 +83,7 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
     }
 
     /* exclude here all non matched udp traffic, exclude here tcp only if http has been excluded, because xbox could use http */
-#ifdef NDPI_PROTOCOL_HTTP
     if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0) {
-#endif
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   }
@@ -106,4 +103,3 @@ void init_xbox_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 }
 
-#endif

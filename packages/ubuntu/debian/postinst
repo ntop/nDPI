@@ -17,18 +17,7 @@ esac
 
 umask 022
 
-# Update shared libs
-echo "/usr/local/lib\n" > /etc/ld.so.conf.d/nprobe.conf
 echo "Rebuilding ld cache..."
 /sbin/ldconfig
-
-echo "Adding the nprobe startup script"
-update-rc.d nprobe defaults 93 >/dev/null
-
-echo "Making the /etc/nprobe directory..."
-mkdir -p /etc/nprobe/
-
-echo "Making the /var/log/nprobe directory..."
-mkdir -p /var/log/nprobe
 
 exit 0

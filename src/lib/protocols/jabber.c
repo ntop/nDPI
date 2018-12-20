@@ -2,7 +2,7 @@
  * jabber.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -24,8 +24,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_UNENCRYPTED_JABBER
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNENCRYPTED_JABBER
 
 #include "ndpi_api.h"
@@ -36,10 +34,8 @@ struct jabber_string {
 };
 
 static struct jabber_string jabber_strings[] = {
-#ifdef NDPI_PROTOCOL_TRUPHONE
   { "='im.truphone.com'",     NDPI_PROTOCOL_TRUPHONE },
   { "=\"im.truphone.com\"",   NDPI_PROTOCOL_TRUPHONE },
-#endif
   { NULL, 0 }
 };
 
@@ -289,9 +285,8 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
-#ifdef NDPI_PROTOCOL_TRUPHONE
-  ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TRUPHONE,__FILE__,__FUNCTION__,__LINE__);
-#endif
+  ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TRUPHONE,
+			__FILE__,__FUNCTION__,__LINE__);
 }
 
 
@@ -306,4 +301,4 @@ void init_jabber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 
   *id += 1;
 }
-#endif
+

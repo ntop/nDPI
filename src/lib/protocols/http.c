@@ -1,7 +1,7 @@
 /*
  * http.c
  *
- * Copyright (C) 2011-17 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,12 +23,10 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_HTTP
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
 
 #include "ndpi_api.h"
-
+#include "lruc.h"
 
 /* global variables used for 1kxun protocol and iqiyi service */
 
@@ -121,7 +119,6 @@ static void avi_check_http_payload(struct ndpi_detection_module_struct *ndpi_str
 }
 #endif
 
-#ifdef NDPI_PROTOCOL_TEAMVIEWER
 static void teamviewer_check_http_payload(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -140,10 +137,7 @@ static void teamviewer_check_http_payload(struct ndpi_detection_module_struct *n
     ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TEAMVIEWER);
   }
 }
-#endif
 
-
-#ifdef NDPI_PROTOCOL_RTSP
 static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -154,7 +148,6 @@ static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
     ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTSP);
   }
 }
-#endif
 
 static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow, char *ua) {
@@ -179,7 +172,8 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   if((flow->l4.tcp.http_stage == 0) || (flow->http.url && flow->http_detected)) {
       char *double_col = strchr((char*)flow->host_server_name, ':');
-
+      ndpi_protocol_match_result ret_match;
+      
       if(double_col) double_col[0] = '\0';
 
     /**
@@ -189,6 +183,7 @@ static void parseHttpSubprotocol(struct ndpi_detection_module_struct *ndpi_struc
     */
     ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
 				strlen((const char *)flow->host_server_name),
+				&ret_match,
 				NDPI_PROTOCOL_HTTP);
   }
 }
@@ -356,12 +351,16 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	     packet->host_line.len, packet->host_line.ptr);
 
     /* call ndpi_match_host_subprotocol to see if there is a match with known-host HTTP subprotocol */
-    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
+    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected) {
+      ndpi_protocol_match_result ret_match;
+      
       ndpi_match_host_subprotocol(ndpi_struct, flow,
 				  (char*)packet->host_line.ptr,
 				  packet->host_line.len,
+				  &ret_match,
 				  NDPI_PROTOCOL_HTTP);
-
+    }
+    
     /* Copy result for nDPI apps */
     if(!ndpi_struct->disable_metadata_export) {
       len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
@@ -402,12 +401,16 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
        && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
-       && (packet->http_origin.len > 0))
+       && (packet->http_origin.len > 0)) {
+      ndpi_protocol_match_result ret_match;
+      
       ndpi_match_host_subprotocol(ndpi_struct, flow,
 				  (char *)packet->http_origin.ptr,
 				  packet->http_origin.len,
+				  &ret_match,
 				  NDPI_PROTOCOL_HTTP);
-
+    }
+    
     if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
       if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) {
 	NDPI_LOG_INFO(ndpi_struct, "found HTTP/%s\n", 
@@ -428,34 +431,32 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(packet->accept_line.ptr != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "Accept line found %.*s\n",
 	     packet->accept_line.len, packet->accept_line.ptr);
-#ifdef NDPI_PROTOCOL_RTSP
-    if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_PROTOCOL_RTSP) != 0) {
+    if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask,
+					NDPI_PROTOCOL_RTSP) != 0) {
       rtsp_parse_packet_acceptline(ndpi_struct, flow);
     }
-#endif
   }
 
   /* search for line startin with "Icy-MetaData" */
-#ifdef NDPI_CONTENT_CATEGORY_MPEG
-  for (a = 0; a < packet->parsed_lines; a++) {
+    for (a = 0; a < packet->parsed_lines; a++) {
     if(packet->line[a].len > 11 && memcmp(packet->line[a].ptr, "Icy-MetaData", 12) == 0) {
-      NDPI_LOG_INFO(ndpi_struct, "found MPEG: Icy-MetaData\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_MPEG);
-      return;
-    }
+    NDPI_LOG_INFO(ndpi_struct, "found MPEG: Icy-MetaData\n");
+    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_CONTENT_CATEGORY_MPEG);
+    return;
   }
-#ifdef NDPI_CONTENT_CATEGORY_AVI
-#endif
-#endif
+  }
 
   if(packet->content_line.ptr != NULL && packet->content_line.len != 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
 	     packet->content_line.len, packet->content_line.ptr);
 
-    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
+    if((ndpi_struct->http_dont_dissect_response) || flow->http_detected) {
+      ndpi_protocol_match_result ret_match;
+      
       ndpi_match_content_subprotocol(ndpi_struct, flow,
 				     (char*)packet->content_line.ptr, packet->content_line.len,
-				     NDPI_PROTOCOL_HTTP);
+				     &ret_match, NDPI_PROTOCOL_HTTP);
+    }
   }
 }
 
@@ -471,10 +472,8 @@ static void check_http_payload(struct ndpi_detection_module_struct *ndpi_struct,
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask, NDPI_CONTENT_CATEGORY_AVI) != 0)
     avi_check_http_payload(ndpi_struct, flow);
 #endif
-#ifdef NDPI_PROTOCOL_TEAMVIEWER
-  teamviewer_check_http_payload(ndpi_struct, flow);
-#endif
 
+  teamviewer_check_http_payload(ndpi_struct, flow);
 }
 
 /**
@@ -550,9 +549,8 @@ static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 #ifdef NDPI_CONTENT_CATEGORY_OGG
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_CONTENT_CATEGORY_OGG);
 #endif
-#ifdef NDPI_PROTOCOL_XBOX
+
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
-#endif
 }
 
 /*************************************************************************************************/
@@ -615,7 +613,23 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
           <allow-access-from domain="*.speedtest.net" to-ports="8080"/>
           </cross-domain-policy>
         */
+      ookla_found:
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
+
+	if(ndpi_struct->ookla_cache == NULL)
+	  ndpi_struct->ookla_cache = lruc_new(4*1024, 1024);	 	
+	
+	if(ndpi_struct->ookla_cache != NULL) {
+	  u_int8_t *dummy = (u_int8_t*)ndpi_malloc(sizeof(u_int8_t));
+
+	  if(dummy) {
+	    if(packet->tcp->source == htons(8080))
+	      lruc_set((lruc*)ndpi_struct->ookla_cache, (void*)&packet->iph->saddr, 4, dummy, 1);
+	    else
+	      lruc_set((lruc*)ndpi_struct->ookla_cache, (void*)&packet->iph->daddr, 4, dummy, 1);
+	  }
+	}
+	
         return;
       }
       
@@ -665,9 +679,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       /* Check for Ookla */
       if((packet->referer_line.len > 0)
-	      && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP);
-	    return;
+	 && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
+	goto ookla_found;
       }
 
       /* Check for additional field introduced by Steam */
@@ -784,17 +797,15 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     
     if((packet->payload_packet_len == 34) && (flow->l4.tcp.http_stage == 1)) {
       if((packet->payload[5] == ' ') && (packet->payload[9] == ' ')) {
-	      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA);
-	      return;
+	goto ookla_found;
       }
     }
     
     if((packet->payload_packet_len > 6) && memcmp(packet->payload, "HELLO ", 6) == 0) {
        /* This looks like Ookla */
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
-      return;
+      goto ookla_found;
     } else
-	    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OOKLA);    
+      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OOKLA);    
     
     /**
        At first check, if this is for sure a response packet (in another direction. If not, if HTTP is detected do nothing now and return,
@@ -1007,7 +1018,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 #endif
-#ifdef NDPI_PROTOCOL_XBOX
+
   ndpi_set_bitmask_protocol_detection("Xbox", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_XBOX,
 				      ndpi_search_http_tcp,
@@ -1015,8 +1026,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
-#endif
-#ifdef NDPI_PROTOCOL_QQ
+
   ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_QQ,
 				      ndpi_search_http_tcp,
@@ -1024,7 +1034,7 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
-#endif
+
 #ifdef NDPI_CONTENT_CATEGORY_AVI
   ndpi_set_bitmask_protocol_detection("AVI", ndpi_struct, detection_bitmask, *id,
 				      NDPI_CONTENT_CATEGORY_AVI,
@@ -1069,7 +1079,4 @@ void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   a++;
 
 #endif
-
 }
-
-#endif

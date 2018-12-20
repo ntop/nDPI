@@ -2,7 +2,7 @@
  * hep.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  * Copyright (C) 2011-15 - QXIP BV
  *
  * This file is part of nDPI, an open source deep packet inspection
@@ -26,8 +26,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_HEP
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HEP
 
 #include "ndpi_api.h"
@@ -45,16 +43,17 @@ void ndpi_search_hep(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-    NDPI_LOG_DBG(ndpi_struct, "searching HEP\n");
-    if (payload_len > 10) {
-	    if (memcmp(packet_payload, "HEP3", 4) == 0) {
-	      NDPI_LOG_INFO(ndpi_struct, "found HEP3\n");
-	      ndpi_int_hep_add_connection(ndpi_struct, flow);
-	      return;
-	    } 
-    }
+  NDPI_LOG_DBG(ndpi_struct, "searching HEP\n");
 
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  if(payload_len > 10) {
+    if(memcmp(packet_payload, "HEP3", 4) == 0) {
+      NDPI_LOG_INFO(ndpi_struct, "found HEP3\n");
+      ndpi_int_hep_add_connection(ndpi_struct, flow);
+      return;
+    } 
+  }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
@@ -69,5 +68,3 @@ void init_hep_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 
   *id += 1;
 }
-
-#endif

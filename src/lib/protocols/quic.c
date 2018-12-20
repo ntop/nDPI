@@ -3,10 +3,6 @@
  *
  * Copyright (C) 2012-18 - ntop.org
  *
- * Based on code of:
- * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
- * Michele Campus - <campus@ntop.org>
- *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,11 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License.
  * If not, see <http://www.gnu.org/licenses/>.
  *
+ * Based on code of:
+ * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
+ * Michele Campus - <campus@ntop.org>
+ *
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_QUIC
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_QUIC
 
@@ -109,6 +107,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	    if((sni_offset+len) < udp_len) {
 	      if(!ndpi_struct->disable_metadata_export) {
 		int max_len = sizeof(flow->host_server_name)-1, j = 0;
+		ndpi_protocol_match_result ret_match;
 		
 		if(len > max_len) len = max_len;
 		
@@ -120,6 +119,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 		ndpi_match_host_subprotocol(ndpi_struct, flow, 
 					    (char *)flow->host_server_name,
 					    strlen((const char*)flow->host_server_name),
+					    &ret_match,
 					    NDPI_PROTOCOL_QUIC);
 	      }
 	    }
@@ -148,5 +148,3 @@ void init_quic_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 
   *id += 1;
 }
-
-#endif /* NDPI_PROTOCOL_QUIC */

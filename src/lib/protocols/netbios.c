@@ -2,7 +2,7 @@
  * netbios.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-17 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -24,8 +24,6 @@
 
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_NETBIOS
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_NETBIOS
 
@@ -332,9 +330,8 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct, struc
 
       NDPI_LOG_DBG2(ndpi_struct, "found netbios port 138 and payload length >= 112 \n");
 
-      if(packet->payload[0] >= 0x11 && packet->payload[0] <= 0x16) {
-
-	NDPI_LOG_DBG2(ndpi_struct, "found netbios with MSG-type 0x11,0x12,0x13,0x14,0x15 or 0x16\n");
+      if(packet->payload[0] >= 0x10 && packet->payload[0] <= 0x16) {
+	NDPI_LOG_DBG2(ndpi_struct, "found netbios with MSG-type 0x10,0x11,0x12,0x13,0x14,0x15 or 0x16\n");
 
 	if(ntohl(get_u_int32_t(packet->payload, 4)) == ntohl(packet->iph->saddr)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found netbios with checked ip-address\n");
@@ -390,5 +387,3 @@ void init_netbios_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
 
   *id += 1;
 }
-
-#endif

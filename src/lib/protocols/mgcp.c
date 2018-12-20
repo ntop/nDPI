@@ -1,7 +1,7 @@
 /*
  * mgcp.c
  *
- * Copyright (C) 2017 - ntop.org
+ * Copyright (C) 2017-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,13 +23,9 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_MGCP
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MGCP
 
 #include "ndpi_api.h"
-
-
 
 static void ndpi_int_mgcp_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -93,4 +89,3 @@ void init_mgpc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 }
 
-#endif

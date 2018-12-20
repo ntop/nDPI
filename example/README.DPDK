@@ -1,0 +1,31 @@
+Prerequisites
+-------------
+
+You need to install and compile DPDK in your HOME directory as explained in
+See http://core.dpdk.org/doc/quick-start/ for DPDK installation and setup
+
+Once DPDK is built make sure to create a symbolic link
+
+$ cd
+$ ln -s dpdk-18.08 DPDK
+
+so the build process will use the DPDK directory letting you have multiple
+DPDK versions available on your system
+
+
+Build
+-----
+Everything will happen automagically but if you want to do it by hand
+do: make -f Makefile.dpdk
+
+
+Run Application
+---------------
+Supposing to capture packets from device eno1 you can start the
+application as follows:
+
+sudo ./build/ndpiReader -c 1 --vdev=net_pcap0,iface=eno1 -- -v 1
+
+NOTE:
+- ndpiReader without DPDK support sits in this directory
+- ndpiReader with DPDK support can be found inside the ./build directory

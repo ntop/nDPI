@@ -1,7 +1,7 @@
 /*
  * ftp_data.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  * 
  * The signature is based on the Libprotoident library.
  *
@@ -24,8 +24,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_FTP_DATA
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_FTP_DATA
 
@@ -258,5 +256,3 @@ void init_ftp_data_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 
   *id += 1;
 }
-
-#endif

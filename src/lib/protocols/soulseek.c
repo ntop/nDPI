@@ -1,7 +1,7 @@
 /*
  * soulseek.c
  *
- * Copyright (C) 2016 - ntop.org
+ * Copyright (C) 2016-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,8 +22,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-#ifdef NDPI_PROTOCOL_SOULSEEK
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SOULSEEK
 
@@ -51,13 +49,15 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(src != NULL)
 	NDPI_LOG_DBG2(ndpi_struct,
 		 "  SRC bitmask: %u, packet tick %llu , last safe access timestamp: %llu\n",
-		 NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
-		 != 0 ? 1 : 0, (u_int64_t) packet->tick_timestamp, (u_int64_t) src->soulseek_last_safe_access_time);
+		      NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
+		 != 0 ? 1 : 0, (long long unsigned int) packet->tick_timestamp,
+		      (long long unsigned int) src->soulseek_last_safe_access_time);
       if(dst != NULL)
 	NDPI_LOG_DBG2(ndpi_struct,
 		 "  DST bitmask: %u, packet tick %llu , last safe ts: %llu\n",
 		 NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_SOULSEEK)
-		 != 0 ? 1 : 0, (u_int64_t) packet->tick_timestamp, (u_int64_t) dst->soulseek_last_safe_access_time);
+		 != 0 ? 1 : 0, (long long unsigned int) packet->tick_timestamp,
+		      (long long unsigned int) dst->soulseek_last_safe_access_time);
 
       if(packet->payload_packet_len == 431) {
 	if(dst != NULL) {
@@ -278,5 +278,3 @@ void init_soulseek_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 
   *id += 1;
 }
-
-#endif

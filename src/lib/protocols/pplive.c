@@ -26,8 +26,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_PPLIVE
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_PPLIVE
 
 #include "ndpi_api.h"
@@ -232,4 +230,3 @@ void init_pplive_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   *id += 1;
 }
 
-#endif

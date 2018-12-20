@@ -2,7 +2,7 @@
  * msn.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -23,9 +23,6 @@
  */
 
 #include "ndpi_protocol_ids.h"
-
-
-#ifdef NDPI_PROTOCOL_MSN
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MSN
 
@@ -65,7 +62,6 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
   u_int16_t plen;
   u_int16_t status = 0;
   
-#ifdef NDPI_PROTOCOL_SSL
   if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) {
     
     NDPI_LOG_DBG2(ndpi_struct, "msn ssl ft test\n");
@@ -73,28 +69,32 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
     if(flow->packet_counter < 10) {
       if(flow->packet_counter == 7 && packet->payload_packet_len > 300) {
 	if(memcmp(packet->payload + 24, "MSNSLP", 6) == 0
-	   || (get_u_int32_t(packet->payload, 0) == htonl(0x30000000) && get_u_int32_t(packet->payload, 4) == 0x00000000)) {
+	   || (get_u_int32_t(packet->payload, 0) == htonl(0x30000000)
+	       && get_u_int32_t(packet->payload, 4) == 0x00000000)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found MSN File Transfer, ifdef ssl\n");
 	  ndpi_int_msn_add_connection(ndpi_struct, flow);
 	  return;
 	}
       }
-      if(flow->packet_counter >= 5 && flow->packet_counter <= 10 && (get_u_int32_t(packet->payload, 0) == htonl(0x18000000)
-								     && get_u_int32_t(packet->payload, 4) == 0x00000000)) {
+      
+      if(flow->packet_counter >= 5 && flow->packet_counter <= 10
+	 && (get_u_int32_t(packet->payload, 0) == htonl(0x18000000)
+	     && get_u_int32_t(packet->payload, 4) == 0x00000000)) {
 	flow->l4.tcp.msn_ssl_ft++;
 	NDPI_LOG_DBG2(ndpi_struct,
-		 "increased msn ft ssl stage to: %u at packet nr: %u\n", flow->l4.tcp.msn_ssl_ft,
+		      "increased msn ft ssl stage to: %u at packet nr: %u\n",
+		      flow->l4.tcp.msn_ssl_ft,
 		 flow->packet_counter);
 	if (flow->l4.tcp.msn_ssl_ft == 2) {
 	  NDPI_LOG_INFO(ndpi_struct,
 		   "found MSN File Transfer, ifdef ssl 2.\n");
 	  ndpi_int_msn_add_connection(ndpi_struct, flow);
 	}
+
 	return;
       }
     }
   }
-#endif
 
   /* we detect the initial connection only ! */
   /* match: "VER " ..... "CVR" x 0x0d 0x0a
@@ -103,15 +103,17 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
    */
   /* now we have a look at the first packet only. */
   if(flow->packet_counter == 1
-#ifdef NDPI_PROTOCOL_SSL
-      || ((packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) && flow->packet_counter <= 3)
-#endif
+      || ((packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL)
+	  && flow->packet_counter <= 3)
       ) {
     
     /* this part is working asymmetrically */
-    if(packet->payload_packet_len > 32 && (packet->payload[0] == 0x02 || packet->payload[0] == 0x00)
-       && (ntohl(get_u_int32_t(packet->payload, 8)) == 0x2112a442 || ntohl(get_u_int32_t(packet->payload, 4)) == 0x2112a442)
-       && ((ntohl(get_u_int32_t(packet->payload, 24)) == 0x000f0004 && ntohl(get_u_int32_t(packet->payload, 28)) == 0x72c64bc6)
+    if(packet->payload_packet_len > 32
+       && (packet->payload[0] == 0x02 || packet->payload[0] == 0x00)
+       && (ntohl(get_u_int32_t(packet->payload, 8)) == 0x2112a442
+	   || ntohl(get_u_int32_t(packet->payload, 4)) == 0x2112a442)
+       && ((ntohl(get_u_int32_t(packet->payload, 24)) == 0x000f0004
+	    && ntohl(get_u_int32_t(packet->payload, 28)) == 0x72c64bc6)
 	   || (ntohl(get_u_int32_t(packet->payload, 20)) == 0x000f0004
 	       && ntohl(get_u_int32_t(packet->payload, 24)) == 0x72c64bc6))) {
       NDPI_LOG_INFO(ndpi_struct,
@@ -145,10 +147,9 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	}
       }
     }
+
     if(
-#ifdef NDPI_PROTOCOL_HTTP
        packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
-#endif
        ndpi_match_strprefix(packet->payload, packet->payload_packet_len, "GET ") ||
        ndpi_match_strprefix(packet->payload, packet->payload_packet_len, "POST ")) {
       ndpi_parse_packet_line_info(ndpi_struct, flow);
@@ -160,18 +161,12 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	return;
       }
     }
-/* #ifdef NDPI_PROTOCOL_HTTP */
-/*     /\* we have to examine two http packets *\/ */
-/*     if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP) { */
-/*     } */
-/* #endif */
+
     /* not seen this pattern in any trace */
     /* now test for http login, at least 100 a bytes packet */
     if(packet->payload_packet_len > 100) {
       if(
-#ifdef NDPI_PROTOCOL_HTTP
 	  packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
-#endif
 	  memcmp(packet->payload, "POST http://", 12) == 0) {
 	/* scan packet if not already done... */
 	ndpi_parse_packet_line_info(ndpi_struct, flow);
@@ -193,9 +188,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
     /* for this case the asymmetric detection is asym (1) */
     if(packet->payload_packet_len > 400) {
       if((
-#ifdef NDPI_PROTOCOL_HTTP
 	  packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
-#endif
 	  (memcmp(packet->payload, "POST ", 5) == 0))) {
 	u_int16_t c;
 	if(memcmp(&packet->payload[5], "http://", 7) == 0) {
@@ -259,9 +252,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
        && packet->payload_packet_len > 100) {
       /* not necessary to check the length, because this has been done : >400. */
       if(
-#ifdef NDPI_PROTOCOL_HTTP
 	 packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
-#endif
 	 ndpi_match_strprefix(packet->payload, packet->payload_packet_len, "HTTP/1.0 200 OK") ||
 	 ndpi_match_strprefix(packet->payload, packet->payload_packet_len, "HTTP/1.1 200 OK")
 	 ) {
@@ -342,9 +333,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
       packet->payload_packet_len > 100) {
     /* not necessary to check the length, because this has been done : >400. */
     if(
-#ifdef NDPI_PROTOCOL_HTTP
        packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
-#endif
        (memcmp(packet->payload, "HTTP/1.0 200 OK", 15) == 0) ||
        (memcmp(packet->payload, "HTTP/1.1 200 OK", 15) == 0)) {
       
@@ -507,15 +496,9 @@ void ndpi_search_msn(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       /* the detection can switch out the http or the ssl detection. In this case we need not check those protocols */
       // need to do the ceck when protocol == http too (POST /gateway ...)
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
-#ifdef NDPI_PROTOCOL_HTTP
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP
-#endif
-#ifdef NDPI_PROTOCOL_SSL
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL
-#endif
-#ifdef NDPI_PROTOCOL_STUN
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN
-#endif
 	 )
 	ndpi_search_msn_tcp(ndpi_struct, flow);
     } else if (packet->udp != NULL) {
@@ -525,7 +508,8 @@ void ndpi_search_msn(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 }
 
 
-void init_msn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
+void init_msn_dissector(struct ndpi_detection_module_struct *ndpi_struct,
+			u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
 {
   
   NDPI_BITMASK_RESET(ndpi_struct->callback_buffer[*id].excluded_protocol_bitmask);
@@ -540,4 +524,3 @@ void init_msn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
   *id += 1;
 }
 
-#endif

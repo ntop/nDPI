@@ -20,8 +20,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_ORACLE
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_ORACLE
 
 #include "ndpi_api.h"
@@ -75,5 +73,3 @@ void init_oracle_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 
   *id += 1;
 }
-
-#endif

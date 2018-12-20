@@ -2,7 +2,7 @@
  * ssdp.c
  *
  * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-15 - ntop.org
+ * Copyright (C) 2011-18 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -24,8 +24,6 @@
 
 #include "ndpi_protocol_ids.h"
 
-#ifdef NDPI_PROTOCOL_SSDP
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SSDP
 
 #include "ndpi_api.h"
@@ -45,7 +43,7 @@ void ndpi_search_ssdp(struct ndpi_detection_module_struct *ndpi_struct, struct n
   NDPI_LOG_DBG(ndpi_struct, "search ssdp\n");
   if (packet->udp != NULL) {
 
-    if (packet->payload_packet_len > 100) {
+    if (packet->payload_packet_len >= 19) {
       if ((memcmp(packet->payload, "M-SEARCH * HTTP/1.1", 19) == 0)
 	  || memcmp(packet->payload, "NOTIFY * HTTP/1.1", 17) == 0) {
 
@@ -80,4 +78,3 @@ void init_ssdp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   *id += 1;
 }
 
-#endif
