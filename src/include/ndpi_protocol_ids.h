@@ -78,8 +78,8 @@ typedef enum {
   NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */  
   NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
   NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) - Darryl Sokoloski <darryl@egloo.ca> */
-  
-  NDPI_PROTOCOL_FREE_44               = 44, /* Free */
+  NDPI_PROTOCOL_MODBUS                = 44, /* Modbus */
+
   NDPI_PROTOCOL_FREE_45               = 45, /* Free */
   NDPI_PROTOCOL_FREE_46               = 46, /* Free */
   

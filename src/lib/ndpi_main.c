@@ -1238,11 +1238,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "NestLogSink", NDPI_PROTOCOL_CATEGORY_CLOUD,
 			    ndpi_build_default_ports(ports_a, 11095, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_44,
-			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MODBUS,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "Modbus", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
+			    ndpi_build_default_ports(ports_a, 502, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_45,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
@@ -1699,7 +1699,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "UPnP", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 1780, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 1900, 0, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
+			    ndpi_build_default_ports(ports_b, 1900, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TELEGRAM,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "Telegram", NDPI_PROTOCOL_CATEGORY_CHAT,
@@ -3285,6 +3285,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* NINTENDO */
   init_nintendo_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* MODBUS */
+  init_modbus_dissector(ndpi_struct, &a, detection_bitmask);
+
   /*** Put false-positive sensitive protocols at the end ***/
 
   /* SKYPE */
@@ -4325,7 +4328,7 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
   if(ndpi_struct->custom_categories.categories_loaded) {
       prefix_t prefix;
       patricia_node_t *node;
-
+      
       /* Make sure all in network byte order otherwise compares wont work */
       fill_prefix_v4(&prefix, (struct in_addr *)&iph->saddr,
 		     32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
