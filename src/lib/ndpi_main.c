@@ -3901,8 +3901,7 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
     if((proto_id != NDPI_PROTOCOL_UNKNOWN)
        && NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
 			       ndpi_struct->callback_buffer[proto_index].excluded_protocol_bitmask) == 0
-       && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer[proto_index].detection_bitmask,
-			       detection_bitmask) != 0
+       && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer[proto_index].detection_bitmask, detection_bitmask) != 0
        && (ndpi_struct->callback_buffer[proto_index].ndpi_selection_bitmask & *ndpi_selection_packet) == ndpi_struct->callback_buffer[proto_index].ndpi_selection_bitmask) {
       if((flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	 && (ndpi_struct->proto_defaults[flow->guessed_protocol_id].func != NULL))
@@ -3919,7 +3918,6 @@ void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 	   && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_tcp_payload[a].detection_bitmask,
 				   detection_bitmask) != 0) {
 	  ndpi_struct->callback_buffer_tcp_payload[a].func(ndpi_struct, flow);
-
 
 	  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	    break; /* Stop after detecting the first protocol */
@@ -4731,14 +4729,13 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 {
   u_int32_t a;
   struct ndpi_packet_struct *packet = &flow->packet;
+
   if(packet->packet_lines_parsed_complete != 0)
     return;
 
   packet->packet_lines_parsed_complete = 1;
   packet->parsed_lines = 0;
-
   packet->empty_line_position_set = 0;
-
   packet->host_line.ptr = NULL;
   packet->host_line.len = 0;
   packet->referer_line.ptr = NULL;
@@ -4779,7 +4776,6 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
   packet->line[packet->parsed_lines].len = 0;
 
   for(a = 0; a < packet->payload_packet_len; a++) {
-
     if((a + 1) == packet->payload_packet_len)
 	  return; /* Return if only one byte remains (prevent invalid reads past end-of-buffer) */
 
@@ -4788,22 +4784,22 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 
       /* First line of a HTTP response parsing. Expected a "HTTP/1.? ???" */
       if(packet->parsed_lines == 0 && packet->line[0].len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
-	     strncasecmp((const char *)packet->line[0].ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
-	     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] > '0' && /* response code between 000 and 699 */
-	     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] < '6') {
-
-	    packet->http_response.ptr = &packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.1 ")];
-	    packet->http_response.len = packet->line[0].len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
-	    packet->http_num_headers++;
-
-	    /* Set server HTTP response code */
-	    strncpy((char*)flow->http.response_status_code, (char*)packet->http_response.ptr, 3);
-	    flow->http.response_status_code[4]='\0';
-
-	    NDPI_LOG_DBG2(ndpi_struct,
-		  "ndpi_parse_packet_line_info: HTTP response parsed: \"%.*s\"\n",
-		   packet->http_response.len, packet->http_response.ptr);
+	 strncasecmp((const char *)packet->line[0].ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
+	 packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] > '0' && /* response code between 000 and 699 */
+	 packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] < '6') {
+	packet->http_response.ptr = &packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.1 ")];
+	packet->http_response.len = packet->line[0].len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
+	packet->http_num_headers++;
+	
+	/* Set server HTTP response code */
+	strncpy((char*)flow->http.response_status_code, (char*)packet->http_response.ptr, 3);
+	flow->http.response_status_code[4] = '\0';
+	
+	NDPI_LOG_DBG2(ndpi_struct,
+		      "ndpi_parse_packet_line_info: HTTP response parsed: \"%.*s\"\n",
+		      packet->http_response.len, packet->http_response.ptr);
       }
+      
       /* "Server:" header line in HTTP response */
       if(packet->line[packet->parsed_lines].len > NDPI_STATICSTRING_LEN("Server:") + 1
 	     && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Server:", NDPI_STATICSTRING_LEN("Server:")) == 0) {
@@ -5253,9 +5249,8 @@ void ndpi_int_reset_protocol(struct ndpi_flow_struct *flow) {
   if(flow) {
     int a;
 
-    for(a = 0; a < NDPI_PROTOCOL_SIZE; a++) {
-      flow->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;
-    }
+    for(a = 0; a < NDPI_PROTOCOL_SIZE; a++)
+      flow->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;    
   }
 }
 
