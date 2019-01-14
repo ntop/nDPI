@@ -630,7 +630,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	return;
       }
 
-      if((packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
+      if((packet->iph != NULL) && (packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
         /*
           <policy-file-request/>
           <cross-domain-policy>
