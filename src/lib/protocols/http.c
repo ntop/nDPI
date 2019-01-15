@@ -630,7 +630,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	return;
       }
 
-      if((packet->iph != NULL) && (packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
+      if((packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
         /*
           <policy-file-request/>
           <cross-domain-policy>
@@ -644,7 +644,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	if(ndpi_struct->ookla_cache == NULL)
 	  ndpi_struct->ookla_cache = lruc_new(4*1024, 1024);
 
-	if(ndpi_struct->ookla_cache != NULL) {
+	if(packet->iph != NULL && ndpi_struct->ookla_cache != NULL) {
 	  u_int8_t *dummy = (u_int8_t*)ndpi_malloc(sizeof(u_int8_t));
 
 	  if(dummy) {
