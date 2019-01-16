@@ -559,7 +559,7 @@ static u_int8_t ndpi_search_sslv3_direction1(struct ndpi_detection_module_struct
       }
     }
 
-    if((packet->payload_packet_len > temp && packet->payload_packet_len > 100) && packet->payload_packet_len > 9) {
+    if((packet->payload_packet_len > temp) && (packet->payload_packet_len > 100)) {
       /* the server hello may be split into small packets and the certificate has its own SSL Record
        * so temp contains only the length for the first ServerHello block */
       u_int32_t cert_start;

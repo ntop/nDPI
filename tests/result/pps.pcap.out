@@ -1,7 +1,6 @@
 Unknown	990	378832	34
-HTTP	47	42014	11
+HTTP	73	69236	13
 SSDP	63	17143	10
-HTTP_Download	26	27222	2
 Google	2	1093	1
 GenericProtocol	1429	1780307	49
 
@@ -9,7 +8,7 @@ GenericProtocol	1429	1780307	49
 	2	TCP 192.168.115.8:50778 <-> 223.26.106.20:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/303 bytes <-> 528 pkts/692658 bytes][Host: preimage1.qiyipic.com]
 	3	TCP 192.168.115.8:50505 <-> 223.26.106.19:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][2 pkts/400 bytes <-> 244 pkts/319633 bytes][Host: static.qiyi.com]
 	4	TCP 192.168.115.8:50491 <-> 223.26.106.66:80 [proto: 7/HTTP][cat: Web/5][1 pkts/426 bytes <-> 26 pkts/33872 bytes][Host: 223.26.106.66]
-	5	TCP 192.168.115.8:50486 <-> 77.234.40.96:80 [proto: 7.60/HTTP.HTTP_Download][cat: Download-FileTransfer-FileSharing/7][11 pkts/11023 bytes <-> 12 pkts/14869 bytes][Host: bcu.ff.avast.com]
+	5	TCP 192.168.115.8:50486 <-> 77.234.40.96:80 [proto: 7/HTTP][cat: Web/5][11 pkts/11023 bytes <-> 12 pkts/14869 bytes][Host: bcu.ff.avast.com]
 	6	UDP 192.168.5.38:1900 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][18 pkts/9327 bytes -> 0 pkts/0 bytes]
 	7	TCP 192.168.115.8:50476 <-> 101.227.32.39:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/656 bytes <-> 4 pkts/3897 bytes][Host: cache.video.iqiyi.com]
 	8	TCP 192.168.115.8:50495 <-> 202.108.14.236:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][3 pkts/2844 bytes <-> 3 pkts/597 bytes][Host: msg.71.am]
@@ -26,7 +25,7 @@ GenericProtocol	1429	1780307	49
 	19	TCP 192.168.115.8:50464 <-> 123.125.112.49:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/707 bytes <-> 1 pkts/744 bytes][Host: click.hm.baidu.com]
 	20	TCP 192.168.115.8:50492 <-> 111.206.13.3:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/389 bytes <-> 2 pkts/1034 bytes][Host: pdata.video.qiyi.com]
 	21	TCP 192.168.115.8:50777 <-> 111.206.22.77:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/1186 bytes <-> 1 pkts/194 bytes][Host: msg.iqiyi.com]
-	22	TCP 192.168.115.8:50494 <-> 223.26.106.66:80 [proto: 7.60/HTTP.HTTP_Download][cat: Download-FileTransfer-FileSharing/7][2 pkts/887 bytes <-> 1 pkts/443 bytes][Host: 223.26.106.66]
+	22	TCP 192.168.115.8:50494 <-> 223.26.106.66:80 [proto: 7/HTTP][cat: Web/5][2 pkts/887 bytes <-> 1 pkts/443 bytes][Host: 223.26.106.66]
 	23	TCP 192.168.115.8:50497 <-> 123.125.112.49:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/1004 bytes <-> 2 pkts/301 bytes][Host: click.hm.baidu.com]
 	24	TCP 192.168.115.8:50499 <-> 111.206.22.76:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/1097 bytes <-> 1 pkts/199 bytes][Host: msg.iqiyi.com]
 	25	TCP 192.168.115.8:50474 <-> 202.108.14.221:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][1 pkts/1100 bytes <-> 1 pkts/194 bytes][Host: msg.iqiyi.com]

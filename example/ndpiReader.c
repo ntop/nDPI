@@ -1015,7 +1015,6 @@ void freeIpTree(addr_node *root) {
   freeIpTree(root->left);
   freeIpTree(root->right);
   free(root);
-  root = NULL;
 }
 
 /* *********************************************** */
@@ -2901,7 +2900,7 @@ float getAverage(struct json_object *jObj_stat, char *field){
   float average;
   float sum = 0;
   int r;
-  int j;
+  int j = 0;
 
   if((r = strcmp(field, "top.scanner.stats")) == 0) {
     for(j=0; j<json_object_array_length(jObj_stat); j++) {

@@ -77,7 +77,7 @@ static int ndpi_int_check_mdns_payload(struct ndpi_detection_module_struct
     char answer[256];
     int i, j, len;
 
-    for(i=13, j=0; (packet->payload[i] != 0) && (i < packet->payload_packet_len) && (i < (sizeof(answer)-1)); i++)
+    for(i=13, j=0; (i < packet->payload_packet_len) && (i < (sizeof(answer)-1)) && (packet->payload[i] != 0); i++)
       answer[j++] = (packet->payload[i] < 13) ? '.' : packet->payload[i];
 	
     answer[j] = '\0';

@@ -1,14 +1,13 @@
 Unknown	10	786	1
-HTTP	28	1572	7
+HTTP	65	64777	8
 NTP	2	180	1
-HTTP_Download	37	63205	1
 SSL	8	432	2
 Google	13	2142	1
 Waze	484	289335	19
 WhatsApp	15	1341	1
 
 	1	TCP 10.8.0.1:36100 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][cat: Web/5][52 pkts/10860 bytes <-> 55 pkts/74852 bytes][server: *.world.waze.com]
-	2	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7.60/HTTP.HTTP_Download][cat: Download-FileTransfer-FileSharing/7][19 pkts/1309 bytes <-> 18 pkts/61896 bytes][Host: xtra1.gpsonextra.net]
+	2	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7/HTTP][cat: Web/5][19 pkts/1309 bytes <-> 18 pkts/61896 bytes][Host: xtra1.gpsonextra.net]
 	3	TCP 10.8.0.1:39021 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][cat: Web/5][17 pkts/1962 bytes <-> 16 pkts/56934 bytes][server: *.world.waze.com]
 	4	TCP 10.8.0.1:36312 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][cat: Web/5][17 pkts/2176 bytes <-> 15 pkts/42443 bytes][server: *.world.waze.com]
 	5	TCP 10.8.0.1:36316 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][cat: Web/5][15 pkts/1540 bytes <-> 13 pkts/26346 bytes][server: *.world.waze.com]

@@ -842,21 +842,21 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
   }
 
   need_to_be_free = (unsigned char*)calloc(sizeof(unsigned char), num_patterns + 1);
-  if (!need_to_be_free) {
+  if(!need_to_be_free) {
     free(expressions);
     free(ids);
     return(-1);
   }
 
-  for (i = 0, j = 0; host_match[i].string_to_match != NULL || host_match[i].pattern_to_match != NULL; i++) {
-    if (host_match[i].pattern_to_match) {
+  for(i = 0, j = 0; host_match[i].string_to_match != NULL || host_match[i].pattern_to_match != NULL; i++) {
+    if(host_match[i].pattern_to_match) {
       expressions[j] = host_match[i].pattern_to_match;
       ids[j] = host_match[i].protocol_id;
       need_to_be_free[j] = 0;
       ++j;
     } else {
       expressions[j] = string2hex(host_match[i].string_to_match);
-      if (expressions[j] != NULL) {
+      if(expressions[j] != NULL) {
         ids[j] = host_match[i].protocol_id;
         need_to_be_free[j] = 1;
         ++j;
@@ -871,11 +871,12 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
 
   rc = hyperscan_load_patterns(hs, j, (const char**)expressions, ids);
 
-  for (i = 0; i < j; ++i)
-    if (need_to_be_free[i])
+  for(i = 0; i < j; ++i)
+    if(need_to_be_free[i])
       free(expressions[i]);
   free(expressions), free(ids);
 
+  free(need_to_be_free);
   return(rc);
 }
 
