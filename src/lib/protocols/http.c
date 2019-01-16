@@ -26,7 +26,6 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
 
 #include "ndpi_api.h"
-#include "lruc.h"
 
 static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
@@ -642,19 +641,15 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
 
 	if(ndpi_struct->ookla_cache == NULL)
-	  ndpi_struct->ookla_cache = lruc_new(4*1024, 1024);
-
+	  ndpi_struct->ookla_cache = ndpi_lru_cache_init(1024);
+	
 	if(packet->iph != NULL && ndpi_struct->ookla_cache != NULL) {
-	  u_int8_t *dummy = (u_int8_t*)ndpi_malloc(sizeof(u_int8_t));
-
-	  if(dummy) {
-	    if(packet->tcp->source == htons(8080))
-	      lruc_set((lruc*)ndpi_struct->ookla_cache, (void*)&packet->iph->saddr, 4, dummy, 1);
-	    else
-	      lruc_set((lruc*)ndpi_struct->ookla_cache, (void*)&packet->iph->daddr, 4, dummy, 1);
-	  }
+	  if(packet->tcp->source == htons(8080))
+	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->saddr);
+	  else
+	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->daddr);	  
 	}
-
+	
         return;
       }
 

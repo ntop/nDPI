@@ -761,6 +761,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if((verbose != 1) && (verbose != 2))
     return;
 
+  if(5222 == ntohs(flow->dst_port))
+    printf("************\n");
+  
   if(!json_flag) {
     fprintf(out, "\t%u", id);
 
@@ -913,7 +916,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
-  if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
+  if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */	
     if((!flow->detection_completed) && flow->ndpi_flow)
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct, flow->ndpi_flow, enable_protocol_guess);
 

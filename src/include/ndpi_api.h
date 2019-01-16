@@ -756,6 +756,12 @@ extern "C" {
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size();
   void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
+
+  /* LRU cache */
+  struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries);
+  void ndpi_lru_free_cache(struct ndpi_lru_cache *c);
+  u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int8_t clean_key_when_found);
+  void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key);
   
   /**
    * Add a string to match to an automata

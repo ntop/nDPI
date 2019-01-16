@@ -30,7 +30,6 @@
 #include <sys/types.h>
 #include "ahocorasick.h"
 #include "libcache.h"
-#include "lruc.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
@@ -2433,7 +2432,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
       cache_free((cache_t)(ndpi_struct->tinc_cache));
 
     if(ndpi_struct->ookla_cache)
-      lruc_free((lruc*)ndpi_struct->ookla_cache);
+      ndpi_lru_free_cache(ndpi_struct->ookla_cache);
 
     if(ndpi_struct->protocols_ptree)
       ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->protocols_ptree, free_ptree_data);
@@ -3995,6 +3994,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   if(flow == NULL) return(ret);
 
+  if(flow->packet.tcp && (5222 == ntohs(flow->packet.tcp->dest)))
+    printf("%u - %u\n", ntohs(flow->packet.tcp->source), ntohs(flow->packet.tcp->dest));
+  
   /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     u_int16_t guessed_protocol_id, guessed_host_protocol_id;
@@ -6167,6 +6169,48 @@ u_int ndpi_get_ndpi_detection_module_size() {
 
 void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l) {
   ndpi_mod->ndpi_log_level = l;
+}
+
+/* ******************************************************************** */
+
+/* LRU cache */
+
+struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries) {
+  struct ndpi_lru_cache *c = (struct ndpi_lru_cache*)malloc(sizeof(struct ndpi_lru_cache));
+
+  if(!c) return(NULL);
+
+  c->entries = (u_int32_t*)calloc(num_entries, sizeof(u_int32_t));
+
+  if(!c->entries) {
+    free(c);
+    return(NULL);
+  } else  
+    c->num_entries = num_entries;
+  
+  return(c);
+}
+
+void ndpi_lru_free_cache(struct ndpi_lru_cache *c) {
+  free(c->entries);
+  free(c);
+}
+
+
+u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int8_t clean_key_when_found) {
+  u_int32_t slot = key % c->num_entries;
+
+  if(c->entries[slot] == key) {
+    if(clean_key_when_found) c->entries[slot] = 0;
+    return(1);
+  } else
+    return(0);
+}
+
+void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key) {
+  u_int32_t slot = key % c->num_entries;
+
+  c->entries[slot] = key;
 }
 
 /* ******************************************************************** */

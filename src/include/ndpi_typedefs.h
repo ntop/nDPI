@@ -367,6 +367,10 @@ typedef enum {
 	      HTTP_METHOD_CONNECT
 } ndpi_http_method;
 
+struct ndpi_lru_cache {
+  u_int32_t num_entries, *entries;  
+};
+
 struct ndpi_id_struct {
   /**
      detected_protocol_bitmask:
@@ -997,7 +1001,7 @@ struct ndpi_detection_module_struct {
   int    bt_ann_len;
 
   /* NDPI_PROTOCOL_OOKLA */
-  void *ookla_cache;
+  struct ndpi_lru_cache *ookla_cache;
 
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
