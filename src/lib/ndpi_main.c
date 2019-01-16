@@ -3995,9 +3995,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   if(flow == NULL) return(ret);
 
-  if(flow->packet.tcp && (5222 == ntohs(flow->packet.tcp->dest)))
-    printf("%u - %u\n", ntohs(flow->packet.tcp->source), ntohs(flow->packet.tcp->dest));
-  
   /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     u_int16_t guessed_protocol_id, guessed_host_protocol_id;

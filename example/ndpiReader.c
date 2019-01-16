@@ -761,9 +761,6 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if((verbose != 1) && (verbose != 2))
     return;
 
-  if(5222 == ntohs(flow->dst_port))
-    printf("************\n");
-  
   if(!json_flag) {
     fprintf(out, "\t%u", id);
 
