@@ -626,10 +626,6 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t ret;
 
-  if(flow->packet.tcp && (5222 == ntohs(flow->packet.tcp->dest)))
-    printf("%u - %u\n", ntohs(flow->packet.tcp->source), ntohs(flow->packet.tcp->dest));
-  
-
   if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) {
     if(flow->l4.tcp.ssl_stage == 3 && packet->payload_packet_len > 20 && flow->packet_counter < 5) {
       /* this should only happen, when we detected SSL with a packet that had parts of the certificate in subsequent packets
