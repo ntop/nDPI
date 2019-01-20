@@ -3693,7 +3693,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
   if(ndpi_struct->direction_detect_disable) {
     packet->packet_direction = flow->packet_direction;
   } else {
-    if(iph != NULL && iph->saddr < iph->daddr)
+    if(iph != NULL && le32toh(iph->saddr) < le32toh(iph->daddr))
       packet->packet_direction = 1;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
@@ -3717,7 +3717,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
     packet->num_retried_bytes = 0;
 
     if(!ndpi_struct->direction_detect_disable)
-      packet->packet_direction = (tcph->source < tcph->dest) ? 1 : 0;
+      packet->packet_direction = (le16toh(tcph->source) < le16toh(tcph->dest)) ? 1 : 0;
 
     if(tcph->syn != 0 && tcph->ack == 0 && flow->l4.tcp.seen_syn == 0 && flow->l4.tcp.seen_syn_ack == 0
        && flow->l4.tcp.seen_ack == 0) {
@@ -3781,7 +3781,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
     }
   } else if(udph != NULL) {
     if(!ndpi_struct->direction_detect_disable)
-      packet->packet_direction = (udph->source < udph->dest) ? 1 : 0;
+      packet->packet_direction = (le16toh(udph->source) < le16toh(udph->dest)) ? 1 : 0;
   }
 
   if(flow->packet_counter < MAX_PACKET_COUNTER && packet->payload_packet_len) {

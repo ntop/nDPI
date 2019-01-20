@@ -96,8 +96,8 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	     && (packet->payload[i+1] == 'N')
 	     && (packet->payload[i+2] == 'I')
 	     && (packet->payload[i+3] == 0)) {
-	    u_int32_t offset = *((u_int32_t*)&packet->payload[i+4]);
-	    u_int32_t prev_offset = *((u_int32_t*)&packet->payload[i-4]);
+	    u_int32_t offset = le32toh(*((u_int32_t*)&packet->payload[i+4]));
+	    u_int32_t prev_offset = le32toh(*((u_int32_t*)&packet->payload[i-4]));
 	    int len = offset-prev_offset;
 	    int sni_offset = i+prev_offset+1;
 
