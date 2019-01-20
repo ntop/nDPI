@@ -10,7 +10,7 @@
 #
 # Installation directories
 #
-prefix     = /usr/local
+prefix     = @prefix@
 libdir     = ${prefix}/lib
 includedir = ${prefix}/include/ndpi
 CC         = @CC@
