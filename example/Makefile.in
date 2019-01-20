@@ -3,7 +3,7 @@ CFLAGS=-g -I../src/include @CFLAGS@
 LIBNDPI=../src/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread @LDFLAGS@
 OBJS=ndpiReader.o ndpi_util.o
-PREFIX?=/usr/local
+PREFIX?=@prefix@
 
 all: ndpiReader @DPDK_TARGET@
 
