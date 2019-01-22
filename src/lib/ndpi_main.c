@@ -4792,12 +4792,18 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 	packet->http_num_headers++;
 	
 	/* Set server HTTP response code */
-	strncpy((char*)flow->http.response_status_code, (char*)packet->http_response.ptr, 3);
-	flow->http.response_status_code[4] = '\0';
-	
-	NDPI_LOG_DBG2(ndpi_struct,
-		      "ndpi_parse_packet_line_info: HTTP response parsed: \"%.*s\"\n",
-		      packet->http_response.len, packet->http_response.ptr);
+	if(packet->payload_packet_len >= 12) {
+	  char buf[4];
+	  
+	  /* Set server HTTP response code */
+	  strncpy(buf, (char*)&packet->payload[9], 3);
+	  buf[3] = '\0';
+	  
+	  flow->http.response_status_code = atoi(buf);
+	  /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
+	  if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
+	    flow->http.response_status_code = 0; /* Out of range */
+	}
       }
       
       /* "Server:" header line in HTTP response */

@@ -1071,7 +1071,7 @@ struct ndpi_flow_struct {
     char *url, *content_type;
     u_int8_t num_request_headers, num_response_headers;
     u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
-    u_char response_status_code[5]; /* 200, 404, etc. */
+    u_int16_t response_status_code; /* 200, 404, etc. */
   } http;
 
   union {

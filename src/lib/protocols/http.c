@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
 
 #include "ndpi_api.h"
+#include <stdlib.h>
 
 static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
@@ -54,7 +55,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
       flow->packet.detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN, flow->packet.detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
     }
   } else {
-    if((!ndpi_struct->http_dont_dissect_response) && (flow->http.response_status_code[0] == '\0')) {
+    if((!ndpi_struct->http_dont_dissect_response) && (flow->http.response_status_code == 0)) {
       flow->http_upper_protocol = flow->detected_protocol_stack[0], flow->http_lower_protocol = flow->detected_protocol_stack[1];
       flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN, flow->detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
       flow->packet.detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN, flow->packet.detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
@@ -211,10 +212,11 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t a;
 
-  if((!ndpi_struct->http_dont_dissect_response) && flow->http_detected && (flow->http.response_status_code[0] != 0)) {
+  if((!ndpi_struct->http_dont_dissect_response) && flow->http_detected && (flow->http.response_status_code != 0)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, flow->http_upper_protocol, flow->http_lower_protocol);
 #ifdef DEBUG
-    printf("[%s] [http_dont_dissect_response: %u]->> %s\n", __FUNCTION__, ndpi_struct->http_dont_dissect_response, flow->http.response_status_code);
+    printf("[%s] [http_dont_dissect_response: %u]->> %s\n",
+	   __FUNCTION__, ndpi_struct->http_dont_dissect_response, flow->http.response_status_code);
 #endif
     return;
   }
@@ -600,6 +602,20 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       if(packet->payload_packet_len >= 7 && memcmp(packet->payload, "HTTP/1.", 7) == 0) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP response\n");
+
+	if(packet->payload_packet_len >= 12) {
+	  char buf[4];
+	  
+	  /* Set server HTTP response code */
+	  strncpy(buf, (char*)&packet->payload[9], 3);
+	  buf[3] = '\0';
+	  
+	  flow->http.response_status_code = atoi(buf);
+	  /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
+	  if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
+	    flow->http.response_status_code = 0; /* Out of range */
+	}
+	
         ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
         check_content_type_and_change_protocol(ndpi_struct, flow);
         return;
