@@ -2762,31 +2762,66 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
 
 */
 int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char* path) {
-  FILE *fd = fopen(path, "r");
-  int i;
+  FILE *fd;
+  char *buffer;
+  int chunk_len = 512, buffer_len = chunk_len, old_buffer_len;
+  int i, rc = -1;
+
+  fd = fopen(path, "r");
 
   if(fd == NULL) {
     NDPI_LOG_ERR(ndpi_mod, "Unable to open file %s [%s]", path, strerror(errno));
-    return(-1);
+    goto error;
+  }
+
+  buffer = ndpi_malloc(buffer_len);
+
+  if(buffer == NULL) {
+    NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure");
+    goto close_fd;    
   }
 
   while(fd) {
-    char buffer[512], *line;
+    char *line = buffer;
+    int line_len = buffer_len;
 
-    if(!(line = fgets(buffer, sizeof(buffer), fd)))
+    while((line = fgets(line, line_len, fd)) != NULL && line[strlen(line)-1] != '\n') {
+      i = strlen(line);
+      old_buffer_len = buffer_len;
+      buffer_len += chunk_len;
+
+      buffer = ndpi_realloc(buffer, old_buffer_len, buffer_len);
+
+      if(buffer == NULL) {
+        NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure"); 
+        goto close_fd;
+      }
+
+      line = &buffer[i];
+      line_len = chunk_len;
+    }
+
+    if(!line) /* safety check */
       break;
 
-    if(((i = strlen(line)) <= 1) || (line[0] == '#'))
+    i = strlen(buffer);
+    if((i <= 1) || (buffer[0] == '#'))
       continue;
     else
-      line[i-1] = '\0';
+      buffer[i-1] = '\0';
 
-    ndpi_handle_rule(ndpi_mod, line, 1);
+    ndpi_handle_rule(ndpi_mod, buffer, 1);
   }
 
+  rc = 0;
+
+  free(buffer);
+
+ close_fd:
   fclose(fd);
 
-  return(0);
+ error:
+  return(rc);
 }
 
 /* ******************************************************************** */
