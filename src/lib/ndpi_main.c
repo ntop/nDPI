@@ -2763,7 +2763,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
 */
 int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char* path) {
   FILE *fd;
-  char *buffer;
+  char *buffer, *old_buffer;
   int chunk_len = 512, buffer_len = chunk_len, old_buffer_len;
   int i, rc = -1;
 
@@ -2787,13 +2787,15 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char
 
     while((line = fgets(line, line_len, fd)) != NULL && line[strlen(line)-1] != '\n') {
       i = strlen(line);
+      old_buffer = buffer;
       old_buffer_len = buffer_len;
       buffer_len += chunk_len;
 
-      buffer = ndpi_realloc(buffer, old_buffer_len, buffer_len);
+      buffer = ndpi_realloc(old_buffer, old_buffer_len, buffer_len);
 
       if(buffer == NULL) {
-        NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure"); 
+        NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure");
+        free(old_buffer);
         goto close_fd;
       }
 
