@@ -827,7 +827,7 @@ typedef enum {
 
 typedef enum {
 	      ndpi_pref_http_dont_dissect_response = 0,
-	      ndpi_pref_dns_dissect_response,
+	      ndpi_pref_dns_dont_dissect_response,
 	      ndpi_pref_direction_detect_disable,
 	      ndpi_pref_disable_metadata_export,
 	      ndpi_pref_enable_category_substring_match
@@ -1008,7 +1008,7 @@ struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t http_dont_dissect_response:1, dns_dissect_response:1,
+  u_int8_t http_dont_dissect_response:1, dns_dont_dissect_response:1,
     direction_detect_disable:1, /* disable internal detection of packet direction */
     disable_metadata_export:1, /* No metadata is exported */
     enable_category_substring_match:1 /* Default is perfect match */

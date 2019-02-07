@@ -942,8 +942,8 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod
     ndpi_mod->http_dont_dissect_response = (u_int8_t)value;
     break;
 
-  case ndpi_pref_dns_dissect_response:
-    ndpi_mod->dns_dissect_response = (u_int8_t)value;
+  case ndpi_pref_dns_dont_dissect_response:
+    ndpi_mod->dns_dont_dissect_response = (u_int8_t)value;
     break;
 
   case ndpi_pref_direction_detect_disable:
