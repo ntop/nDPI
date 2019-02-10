@@ -1991,21 +1991,38 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 	 m->match_num, m->patterns->astring);
 #endif
 
+  {
+    char *whatfound = strstr(buf, m->patterns->astring);
+
+#ifdef MATCH_DEBUG
+    printf("[NDPI] %s() [searching=%s][pattern=%s][%s][%c]\n", 
+	   __FUNCTION__, buf,  m->patterns->astring, 
+	   whatfound ? whatfound : "<NULL>",
+	   whatfound[-1]);
+#endif
+
+    /*
+      The patch below allows in case of pattern ws.amazon.com
+      to avoid matching aws.amazon.com whereas a.ws.amazon.com
+      has to match
+     */
+    if(whatfound && (whatfound != buf) && (whatfound[-1] != '.'))
+      return(0);
+  }
+
   /*
     Return 1 for stopping to the first match.
     We might consider searching for the more
     specific match, paying more cpu cycles.
   */
-
   memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t));
 
   if(((buf_len >= min_len) && (strncmp(&buf[buf_len-min_len], m->patterns->astring, min_len) == 0))
      || (strncmp(buf, m->patterns->astring, min_len) == 0) /* begins with */
-     )
-    {
+     ) {
 #ifdef MATCH_DEBUG
       printf("Found match [%s][%s] [len: %u][proto_id: %u]\n",
-	     buf, m->patterns->astring, min_len, *matching_protocol_id);
+	     buf, m->patterns->astring, min_len , *matching_protocol_id);
 #endif
     return(1); /* If the pattern found matches the string at the beginning we stop here */
   } else
@@ -2301,8 +2318,8 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
 int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id) {
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
-  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
-  
+  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED }; 
+
   *id = -1;
   if((automa == NULL)
      || (string_to_match == NULL)
@@ -2340,9 +2357,12 @@ static int hyperscanCustomEventHandler(unsigned int id,
 
 static int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *name, unsigned long *id) {
-  /* printf("[NDPI] %s(%s)\n", __FUNCTION__, name); */
+#ifdef DEBUG
+  printf("[NDPI] %s(%s) [enable_category_substring_match: %u]\n", 
+	 __FUNCTION__, name, ndpi_struct->enable_category_substring_match);
+#endif
 
-  if(!ndpi_struct->enable_category_substring_match) {
+  if(ndpi_struct->enable_category_substring_match == 0) {
     if(ndpi_struct->custom_categories.hostnames_hash == NULL)
       return(-1);
     else {
@@ -2731,7 +2751,8 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
       if(sscanf(value, "%u-%u", (u_int32_t *)&range.port_low, (u_int32_t *)&range.port_high) != 2)
 	range.port_low = range.port_high = atoi(&elem[4]);
       if(do_add)
-	addDefaultPort(ndpi_mod, &range, def, 1 /* Custom user proto */, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot, __FUNCTION__,__LINE__);
+	addDefaultPort(ndpi_mod, &range, def, 1 /* Custom user proto */,
+		       is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot, __FUNCTION__,__LINE__);
       else
 	removeDefaultPort(&range, def, is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot);
     } else if(is_ip) {
@@ -4385,6 +4406,8 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
   return 0;
 }
 
+/* ********************************************************************************* */
+
 void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 ndpi_protocol *ret) {
@@ -4435,7 +4458,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   if(ndpi_struct->ndpi_log_level >= NDPI_LOG_TRACE)
   	NDPI_LOG(flow ? flow->detected_protocol_stack[0]:NDPI_PROTOCOL_UNKNOWN,
-		  ndpi_struct, NDPI_LOG_TRACE, "START packet processing\n");
+		 ndpi_struct, NDPI_LOG_TRACE, "START packet processing\n");
   if(flow == NULL)
     return(ret);
 
