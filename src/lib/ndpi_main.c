@@ -2355,7 +2355,7 @@ static int hyperscanCustomEventHandler(unsigned int id,
 
 /* *********************************************** */
 
-static int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
+int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *name, unsigned long *id) {
 #ifdef DEBUG
   printf("[NDPI] %s(%s) [enable_category_substring_match: %u]\n", 
@@ -4379,19 +4379,20 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 /* ********************************************************************************* */
 
 int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
-				 const struct ndpi_iphdr *iph,
+				 u_int32_t saddr,
+				 u_int32_t daddr,
 				 ndpi_protocol *ret) {
   if(ndpi_struct->custom_categories.categories_loaded) {
       prefix_t prefix;
       patricia_node_t *node;
-      
+
       /* Make sure all in network byte order otherwise compares wont work */
-      fill_prefix_v4(&prefix, (struct in_addr *)&iph->saddr,
+      fill_prefix_v4(&prefix, (struct in_addr *)&saddr,
 		     32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
       node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
 
       if(!node) {
-	fill_prefix_v4(&prefix, (struct in_addr *)&iph->daddr,
+	fill_prefix_v4(&prefix, (struct in_addr *)&daddr,
 		       32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
 	node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
       }
@@ -4413,7 +4414,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
 				 ndpi_protocol *ret) {
   if(ndpi_struct->custom_categories.categories_loaded) {
     if(flow->packet.iph) {
-      if(ndpi_fill_ip_protocol_category(ndpi_struct, flow->packet.iph, ret)) {
+      if(ndpi_fill_ip_protocol_category(ndpi_struct, flow->packet.iph->saddr, flow->packet.iph->daddr, ret)) {
         flow->category = ret->category;
         return;
       }
