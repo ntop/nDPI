@@ -2006,7 +2006,9 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
       to avoid matching aws.amazon.com whereas a.ws.amazon.com
       has to match
      */
-    if(whatfound && (whatfound != buf) && (whatfound[-1] != '.'))
+    if(whatfound && (whatfound != buf)
+       && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */
+       && (whatfound[-1] != '.'))
       return(0);
   }
 
