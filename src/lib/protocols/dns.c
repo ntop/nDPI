@@ -63,7 +63,7 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
 /* *********************************************** */
 
 void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  int x;
+  int x, payload_offset;
   u_int8_t is_query;
   u_int16_t s_port = 0, d_port = 0;
 
@@ -72,15 +72,17 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   if(flow->packet.udp != NULL) {
     s_port = ntohs(flow->packet.udp->source);
     d_port = ntohs(flow->packet.udp->dest);
-    x = 0;
+    payload_offset = 0;
   } else if(flow->packet.tcp != NULL) /* pkt size > 512 bytes */ {
     s_port = ntohs(flow->packet.tcp->source);
     d_port = ntohs(flow->packet.tcp->dest);
-    x = 2;
+    payload_offset = 2;
   } else {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
+
+  x = payload_offset;
 
   if((s_port == 53 || d_port == 53 || d_port == 5355)
      && (flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header)+x)) {
@@ -184,8 +186,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       }
 
       /* extract host name server */
-      int j = 0, max_len = sizeof(flow->host_server_name)-1, off = sizeof(struct ndpi_dns_packet_header) + 1;
-
+      int j = 0, max_len = sizeof(flow->host_server_name)-1, off = sizeof(struct ndpi_dns_packet_header) + 1 + payload_offset;
       while(off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
 	flow->host_server_name[j] = flow->packet.payload[off];
 	if(j < max_len) {
