@@ -2007,8 +2007,10 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
       has to match
      */
     if(whatfound && (whatfound != buf)
+       && (m->patterns->astring[0] != '.')  /* The searched patter does not start with . */
        && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */
-       && (whatfound[-1] != '.'))
+       && (whatfound[-1] != '.') 
+       )
       return(0);
   }
 
