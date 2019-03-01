@@ -1,5 +1,36 @@
 # CHANGELOG
 
+#### nDPI 2.8 (March 2019)
+
+## New Supported Protocols and Services
+
+* Added Modbus over TCP dissector
+
+## Improvements
+
+* Wireshark Lua plugin compatibility with Wireshark 3
+* Improved MDNS dissection
+* Improved HTTP response code handling
+* Full dissection of HTTP responses
+
+## Fixes
+
+* Fixed false positive mining detection
+* Fixed invalid TCP DNS dissection
+* Releasing buffers upon `realloc` failures
+* ndpiReader: Prevents references after free
+* Endianness fixes
+* Fixed IPv6 HTTP traffic dissection
+* Fixed H.323 detection
+
+## Other
+
+* Disabled ookla statistics which need to be improved
+* Support for custom protocol files of arbitrary length
+* Update radius.c to RFC2865
+
+------------------------------------------------------------------------
+
 #### nDPI 2.6 (December 2018)
 
 ## New Supported Protocols and Services
