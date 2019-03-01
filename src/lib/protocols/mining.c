@@ -44,9 +44,12 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if((*to_match == magic) || (*to_match == magic1)) {
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
       }
-    } if(ndpi_strnstr((const char *)packet->payload, "\"eth1.0\"", packet->payload_packet_len)
-	 || ndpi_strnstr((const char *)packet->payload, "\"worker\"", packet->payload_packet_len)
-	 || ndpi_strnstr((const char *)packet->payload, "\"id\"", packet->payload_packet_len)) {
+    } if(ndpi_strnstr((const char *)packet->payload, "{", packet->payload_packet_len)
+	 && (
+	   ndpi_strnstr((const char *)packet->payload, "\"eth1.0\"", packet->payload_packet_len)
+	   || ndpi_strnstr((const char *)packet->payload, "\"worker\":", packet->payload_packet_len)
+	   /* || ndpi_strnstr((const char *)packet->payload, "\"id\":", packet->payload_packet_len) - Removed as too generic */
+	   )) {
       /*
 	Ethereum
 	
@@ -55,9 +58,12 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	{"worker": "", "jsonrpc": "2.0", "params": [], "id": 3, "method": "eth_getWork"}
       */
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
-    } else if(ndpi_strnstr((const char *)packet->payload, "\"method\"", packet->payload_packet_len)
-	      || ndpi_strnstr((const char *)packet->payload, "\"blob\"", packet->payload_packet_len)
-	      || ndpi_strnstr((const char *)packet->payload, "\"id\"", packet->payload_packet_len)) {
+    } else if(ndpi_strnstr((const char *)packet->payload, "{", packet->payload_packet_len)
+	      && (ndpi_strnstr((const char *)packet->payload, "\"method\":", packet->payload_packet_len)
+		  || ndpi_strnstr((const char *)packet->payload, "\"blob\":", packet->payload_packet_len)
+		  /* || ndpi_strnstr((const char *)packet->payload, "\"id\":", packet->payload_packet_len) - Removed as too generic */
+		)
+      ) {
       /*
 	ZCash
 
