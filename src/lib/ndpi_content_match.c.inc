@@ -8422,6 +8422,8 @@ ndpi_protocol_match host_match[] = {
 
   { "signal.org", NULL, "signal\\.org" TLD,                            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "whispersystems.org", NULL, "whispersystems\\.org" TLD,            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+  { "musical.ly", NULL, "musical\\.ly" TLD,                            "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "muscdn.com", NULL, "muscndl\\.com" TLD,                           "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   { NULL, NULL, NULL, 0 }
 };
 
