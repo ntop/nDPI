@@ -177,7 +177,8 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	      }
 	    }
 	  }
-	}
+	} else
+	  invalid = 1;
       }
 
       if(invalid) {
