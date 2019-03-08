@@ -242,7 +242,7 @@ typedef enum {
   NDPI_PROTOCOL_GITHUB                = 203,
   NDPI_PROTOCOL_BJNP                  = 204,
   NDPI_PROTOCOL_FREE_205              = 205, /* Free */
-  NDPI_PROTOCOL_VIDTO                 = 206,
+  NDPI_PROTOCOL_FREE_206              = 206, /* Free */
   NDPI_PROTOCOL_SMPP                  = 207, /* Damir Franusic <df@release14.org> */
   NDPI_PROTOCOL_DNSCRYPT              = 208,
   NDPI_PROTOCOL_TINC                  = 209, /* William Guglielmo <william@deselmo.com> */

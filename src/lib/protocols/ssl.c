@@ -27,7 +27,8 @@
 
 #include "ndpi_api.h"
 
-// #define CERTIFICATE_DEBUG 1
+//#define CERTIFICATE_DEBUG 1
+
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
 /* Skype.c */
@@ -150,9 +151,9 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 #ifdef CERTIFICATE_DEBUG
   {
-    static u_int8_t id = 0;
+    u_int16_t ssl_version = (packet->payload[1] << 8) + packet->payload[2];
 
-    NDPI_LOG_DBG2(ndpi_struct,"-> [%u] %02X\n", ++id, packet->payload[0] & 0xFF);
+    printf("SSL [version: %u]\n", ssl_version);
   }
 #endif
 
@@ -232,8 +233,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       } else if(handshake_protocol == 0x01 /* Client Hello */) {
 	u_int offset, base_offset = 43;
-	if (base_offset + 2 <= packet->payload_packet_len)
-	  {
+	if (base_offset + 2 <= packet->payload_packet_len) {
 	    u_int16_t session_id_len = packet->payload[base_offset];
 
 	    if((session_id_len+base_offset+2) <= total_len) {
