@@ -51,7 +51,7 @@ local f_udp_len           = Field.new("udp.length")
 local f_tcp_header_len    = Field.new("tcp.hdr_len")
 local f_ip_len            = Field.new("ip.len")
 local f_ip_hdr_len        = Field.new("ip.hdr_len")
-local f_ssl_server_name   = Field.new("ssl.handshake.extensions_server_name")
+local f_tls_server_name   = Field.new("tls.handshake.extensions_server_name")
 local f_tcp_flags         = Field.new('tcp.flags')
 local f_tcp_retrans       = Field.new('tcp.analysis.retransmission')
 local f_tcp_ooo           = Field.new('tcp.analysis.out_of_order')
@@ -59,7 +59,7 @@ local f_tcp_lost_segment  = Field.new('tcp.analysis.lost_segment') -- packet dro
 local f_rpc_xid           = Field.new('rpc.xid')
 local f_rpc_msgtyp        = Field.new('rpc.msgtyp')
 local f_user_agent        = Field.new('http.user_agent')
-local f_dhcp_request_item = Field.new('bootp.option.request_list_item')
+local f_dhcp_request_item = Field.new('dhcp.option.request_list_item')
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -88,8 +88,8 @@ local max_num_flows          = 50
 local num_top_dns_queries    = 0
 local max_num_dns_queries    = 50
 
-local ssl_server_names       = {}
-local tot_ssl_flows          = 0
+local tls_server_names       = {}
+local tot_tls_flows          = 0
 
 local http_ua                = {}
 local tot_http_ua_flows      = 0
@@ -329,9 +329,9 @@ function ndpi_proto.init()
    syn                    = {}
    synack                 = {}
 
-   -- SSL
-   ssl_server_names       = {}
-   tot_ssl_flows          = 0
+   -- TLS
+   tls_server_names       = {}
+   tot_tls_flows          = 0
    
    -- HTTP
    http_ua                = {}
@@ -522,17 +522,17 @@ end
 
 -- ###############################################
 
-function ssl_dissector(tvb, pinfo, tree)
-   local ssl_server_name = f_ssl_server_name()
-   if(ssl_server_name ~= nil) then
-      ssl_server_name = getval(ssl_server_name)
+function tls_dissector(tvb, pinfo, tree)
+   local tls_server_name = f_tls_server_name()
+   if(tls_server_name ~= nil) then
+      tls_server_name = getval(tls_server_name)
 
-      if(ssl_server_names[ssl_server_name] == nil) then
-	 ssl_server_names[ssl_server_name] = 0
+      if(tls_server_names[tls_server_name] == nil) then
+	 tls_server_names[tls_server_name] = 0
       end
 
-      ssl_server_names[ssl_server_name] = ssl_server_names[ssl_server_name] + 1
-      tot_ssl_flows = tot_ssl_flows + 1
+      tls_server_names[tls_server_name] = tls_server_names[tls_server_name] + 1
+      tot_tls_flows = tot_tls_flows + 1
    end
 end
 
@@ -989,7 +989,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    mac_dissector(tvb, pinfo, tree)
    arp_dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
-   ssl_dissector(tvb, pinfo, tree)
+   tls_dissector(tvb, pinfo, tree)
    http_dissector(tvb, pinfo, tree)
    dhcp_dissector(tvb, pinfo, tree)   
    dns_dissector(tvb, pinfo, tree)
@@ -1392,25 +1392,25 @@ end
 
 -- ###############################################
 
-local function ssl_dialog_menu()
-   local win = TextWindow.new("SSL Server Contacts");
+local function tls_dialog_menu()
+   local win = TextWindow.new("TLS Server Contacts");
    local label = ""
    local tot = 0
    local i
 
-   if(tot_ssl_flows > 0) then
+   if(tot_tls_flows > 0) then
       i = 0
-      label = label .. "SSL Server\t\t\t\t# Flows\n"
-      for k,v in pairsByValues(ssl_server_names, rev) do
+      label = label .. "TLS Server\t\t\t\t# Flows\n"
+      for k,v in pairsByValues(tls_server_names, rev) do
 	 local pctg
 
 	 v = tonumber(v)
-	 pctg = formatPctg((v * 100) / tot_ssl_flows)
+	 pctg = formatPctg((v * 100) / tot_tls_flows)
 	 label = label .. string.format("%-32s", shortenString(k,32)).."\t"..v.." [".. pctg.." %]\n"
 	 if(i == 50) then break else i = i + 1 end
       end
    else
-      label = "No SSL server certificates detected"
+      label = "No TLS server certificates detected"
    end
 
    win:set(label)
@@ -1465,7 +1465,7 @@ register_menu("ntop/DNS",          dns_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/HTTP UA",      http_ua_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Flows",        flows_ua_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/IP-MAC",       ip_mac_dialog_menu, MENU_TOOLS_UNSORTED)
-register_menu("ntop/SSL",          ssl_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/TLS",          tls_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/TCP Analysis", tcp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Network",      rtt_dialog_menu, MENU_TOOLS_UNSORTED)

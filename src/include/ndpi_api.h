@@ -740,8 +740,11 @@ extern "C" {
 				  char *name, ndpi_protocol_category_t category);
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
   int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
-				 const struct ndpi_iphdr *iph,
+				 u_int32_t saddr,
+				 u_int32_t daddr,
 				 ndpi_protocol *ret);
+  int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
+				      char *name, unsigned long *id);
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   ndpi_protocol *ret);

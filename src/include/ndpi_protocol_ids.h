@@ -85,7 +85,7 @@ typedef enum {
   
   NDPI_PROTOCOL_XBOX                  = 47,
   NDPI_PROTOCOL_QQ                    = 48,
-  NDPI_PROTOCOL_FREE_49               = 49, /* Free */
+  NDPI_PROTOCOL_TIKTOK                = 49,
   NDPI_PROTOCOL_RTSP                  = 50,
   NDPI_PROTOCOL_MAIL_IMAPS            = 51,
   NDPI_PROTOCOL_ICECAST               = 52,
