@@ -136,6 +136,35 @@ struct ndpi_arphdr {
   u_int32_t arp_tpa;/* target protocol address */
 } PACK_OFF;
 
+/* +++++++++++++++ DHCP header +++++++++++++++ */
+PACK_ON
+struct ndpi_dhcphdr {
+  u_int8_t      msgType;
+  u_int8_t      htype;
+  u_int8_t      hlen;
+  u_int8_t      hops;
+  u_int32_t     xid;/* 4 */
+  u_int16_t     secs;/* 8 */
+  u_int16_t     flags;
+  u_int32_t     ciaddr;/* 12 */
+  u_int32_t     yiaddr;/* 16 */
+  u_int32_t     siaddr;/* 20 */
+  u_int32_t     giaddr;/* 24 */
+  u_int8_t      chaddr[16]; /* 28 */
+  u_int8_t      sname[64]; /* 44 */
+  u_int8_t      file[128]; /* 108 */
+  u_int32_t     magic; /* 236 */
+  u_int8_t      options[308];
+} PACK_OFF;
+
+/* +++++++++++++++ MDNS rsp header +++++++++++++++ */
+PACK_ON
+struct ndpi_mdns_rsp_entry {
+  u_int16_t rsp_type, rsp_class;
+  u_int32_t ttl;
+  u_int16_t data_len;
+} PACK_OFF;
+
 /* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
 
 PACK_ON
