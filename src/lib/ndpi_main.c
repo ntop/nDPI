@@ -1155,7 +1155,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 902, 903, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_FBZERO,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "FacebookZero", NDPI_PROTOCOL_CATEGORY_WEB,
+			    no_master, "FacebookZero", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
 			    ndpi_build_default_ports(ports_a, 443, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_KONTIKI,
@@ -1268,9 +1268,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_VIDTO,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PPSTREAM,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "PPStream", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "PPStream", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
@@ -1306,27 +1306,27 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ZATTOO,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Zattoo", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Zattoo", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SHOUTCAST,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "ShoutCast", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "ShoutCast", NDPI_PROTOCOL_CATEGORY_MUSIC,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SOPCAST,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Sopcast", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Sopcast", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TVANTS,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Tvants", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "Tvants", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TVUPLAYER,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "TVUplayer", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "TVUplayer", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_DOWNLOAD,
@@ -1336,7 +1336,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQLIVE,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "QQLive", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			    no_master, "QQLive", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_THUNDER,
@@ -1784,7 +1784,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 10000, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMSPEAK,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "TeamSpeak", NDPI_PROTOCOL_CATEGORY_CHAT,
+			    no_master, "TeamSpeak", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKINNY,
@@ -1879,7 +1879,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 10001, 0, 0, 0, 0));    /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Viber", NDPI_PROTOCOL_CATEGORY_CHAT,
+			    no_master, "Viber", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 7985, 5242, 5243, 4244, 0),      /* TCP */
 			    ndpi_build_default_ports(ports_b, 7985, 7987, 5242, 5243, 4244));  /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_COAP,
@@ -1914,7 +1914,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HANGOUT,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_CHAT,
+			    no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BJNP,
@@ -5684,11 +5684,11 @@ static const char* categories[] = {
    "RealMedia",
    "WindowsMedia",
    "Webm", /* 32 */
-   "",
-   "",
-   "",
-   "",
-   "",
+   "Music",
+   "Video",
+   "Shopping",
+   "Productivity",
+   "FileSharing",
    "",
    "",
    "",
