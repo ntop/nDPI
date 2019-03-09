@@ -1019,8 +1019,13 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "Xbox", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_a, 3074, 3076, 0, 0, 0)         /* TCP */,
+			    ndpi_build_default_ports(ports_b, 3074, 3076, 500, 3544, 4500) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PLAYSTATION,
+                            0 /* can_have_a_subprotocol */, no_master,
+                            no_master, "Playstation", NDPI_PROTOCOL_CATEGORY_GAME,
+                            ndpi_build_default_ports(ports_a, 1935, 3478, 3479, 3480, 0) /* TCP */,
+                            ndpi_build_default_ports(ports_b, 3478, 3479, 0, 0, 0)       /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQ,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "QQ", NDPI_PROTOCOL_CATEGORY_CHAT,
