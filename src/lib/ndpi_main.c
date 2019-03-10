@@ -5698,14 +5698,6 @@ static const char* categories[] = {
    "",
    "",
    "",
-   "AVI",
-   "Flash",
-   "OGG",
-   "MPEG",
-   "QuickTime",
-   "RealMedia",
-   "WindowsMedia",
-   "Webm", /* 32 */
    "Music",
    "Video",
    "Shopping",
@@ -5791,9 +5783,7 @@ const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod
   if((!ndpi_mod) || (category >= NDPI_PROTOCOL_NUM_CATEGORIES))
     return(NULL);
 
-  if((category < NDPI_PROTOCOL_CATEGORY_CUSTOM_1) || (category >= CUSTOM_CATEGORY_MINING))
-    return(categories[category]);
-  else {
+  if((category >= NDPI_PROTOCOL_CATEGORY_CUSTOM_1) && (category <= NDPI_PROTOCOL_CATEGORY_CUSTOM_5)) {
     switch(category) {
     case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
       return(ndpi_mod->custom_category_labels[0]);
@@ -5810,7 +5800,8 @@ const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod
     default:
       return("Unspecified");
     }
-  }
+  } else
+    return(categories[category]);
 }
 
 /* ****************************************************** */
