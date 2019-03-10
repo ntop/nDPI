@@ -915,12 +915,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   // ac_automata_display(ndpi_mod->host_automa.ac_automa, 'n');
 #endif
 
-  for(i=0; content_match[i].string_to_match != NULL; i++)
-    ndpi_add_content_subprotocol(ndpi_mod, content_match[i].string_to_match,
-				 content_match[i].protocol_id,
-				 content_match[i].protocol_category,
-				 content_match[i].protocol_breed);
-
   for(i=0; ndpi_en_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_mod, &ndpi_mod->bigrams_automa,
 			  (char*)ndpi_en_bigrams[i],

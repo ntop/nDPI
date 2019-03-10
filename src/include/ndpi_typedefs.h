@@ -791,16 +791,6 @@ typedef enum {
 	      NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
 	      NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
 
-	      /* Payload Content */
-	      NDPI_CONTENT_CATEGORY_AVI,
-	      NDPI_CONTENT_CATEGORY_FLASH,
-	      NDPI_CONTENT_CATEGORY_OGG,
-	      NDPI_CONTENT_CATEGORY_MPEG,
-	      NDPI_CONTENT_CATEGORY_QUICKTIME,
-	      NDPI_CONTENT_CATEGORY_REALMEDIA,
-	      NDPI_CONTENT_CATEGORY_WINDOWSMEDIA,
-	      NDPI_CONTENT_CATEGORY_WEBM,
-
 	      /* Further categories... */
 	      NDPI_PROTOCOL_CATEGORY_MUSIC,
 	      NDPI_PROTOCOL_CATEGORY_VIDEO,
