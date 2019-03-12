@@ -356,15 +356,15 @@ PACK_ON struct tinc_cache_entry {
 } PACK_OFF;
 
 typedef enum {
-	      HTTP_METHOD_UNKNOWN = 0,
-	      HTTP_METHOD_OPTIONS,
-	      HTTP_METHOD_GET,
-	      HTTP_METHOD_HEAD,
-	      HTTP_METHOD_POST,
-	      HTTP_METHOD_PUT,
-	      HTTP_METHOD_DELETE,
-	      HTTP_METHOD_TRACE,
-	      HTTP_METHOD_CONNECT
+	      NDPI_HTTP_METHOD_UNKNOWN = 0,
+	      NDPI_HTTP_METHOD_OPTIONS,
+	      NDPI_HTTP_METHOD_GET,
+	      NDPI_HTTP_METHOD_HEAD,
+	      NDPI_HTTP_METHOD_POST,
+	      NDPI_HTTP_METHOD_PUT,
+	      NDPI_HTTP_METHOD_DELETE,
+	      NDPI_HTTP_METHOD_TRACE,
+	      NDPI_HTTP_METHOD_CONNECT
 } ndpi_http_method;
 
 struct ndpi_lru_cache {

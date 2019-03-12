@@ -260,25 +260,25 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       }
 
       if(flow->packet.http_method.len < 3)
-        flow->http.method = HTTP_METHOD_UNKNOWN;
+        flow->http.method = NDPI_HTTP_METHOD_UNKNOWN;
       else {
         switch(flow->packet.http_method.ptr[0]) {
-        case 'O':  flow->http.method = HTTP_METHOD_OPTIONS; break;
-        case 'G':  flow->http.method = HTTP_METHOD_GET; break;
-        case 'H':  flow->http.method = HTTP_METHOD_HEAD; break;
+        case 'O':  flow->http.method = NDPI_HTTP_METHOD_OPTIONS; break;
+        case 'G':  flow->http.method = NDPI_HTTP_METHOD_GET; break;
+        case 'H':  flow->http.method = NDPI_HTTP_METHOD_HEAD; break;
 
         case 'P':
           switch(flow->packet.http_method.ptr[1]) {
-          case 'O': flow->http.method = HTTP_METHOD_POST; break;
-          case 'U': flow->http.method = HTTP_METHOD_PUT; break;
+          case 'O': flow->http.method = NDPI_HTTP_METHOD_POST; break;
+          case 'U': flow->http.method = NDPI_HTTP_METHOD_PUT; break;
           }
           break;
 
-        case 'D':   flow->http.method = HTTP_METHOD_DELETE; break;
-        case 'T':   flow->http.method = HTTP_METHOD_TRACE; break;
-        case 'C':   flow->http.method = HTTP_METHOD_CONNECT; break;
+        case 'D':   flow->http.method = NDPI_HTTP_METHOD_DELETE; break;
+        case 'T':   flow->http.method = NDPI_HTTP_METHOD_TRACE; break;
+        case 'C':   flow->http.method = NDPI_HTTP_METHOD_CONNECT; break;
         default:
-          flow->http.method = HTTP_METHOD_UNKNOWN;
+          flow->http.method = NDPI_HTTP_METHOD_UNKNOWN;
           break;
         }
       }
@@ -949,7 +949,7 @@ void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_mod,
 				      struct ndpi_flow_struct *flow) {
   if(!flow)
-    return(HTTP_METHOD_UNKNOWN);
+    return(NDPI_HTTP_METHOD_UNKNOWN);
   else
     return(flow->http.method);
 }
