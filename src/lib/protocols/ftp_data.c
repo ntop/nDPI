@@ -49,16 +49,22 @@ static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *nd
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if((payload_len >= 4)
-      && ((packet->payload[0] == '-') || (packet->payload[0] == 'd'))
-      && ((packet->payload[1] == '-') || (packet->payload[1] == 'r'))
-      && ((packet->payload[2] == '-') || (packet->payload[2] == 'w'))
-      && ((packet->payload[3] == '-') || (packet->payload[3] == 'x'))) {
+  if(payload_len > 10) {
+    int i;
 
-    return 1;
+    if(!((packet->payload[0] == '-') || (packet->payload[0] == 'd')))
+      return(0);
+  
+    for(i=0; i<9; i += 3)
+      if(((packet->payload[1+i] == '-') || (packet->payload[1+i] == 'r'))
+	 && ((packet->payload[2+i] == '-') || (packet->payload[2+i] == 'w'))
+	 && ((packet->payload[3+i] == '-') || (packet->payload[3+i] == 'x'))) {
+	;
+      } else
+	return 0;
   }
 
-  return 0;
+  return 1;
 }
 
 static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
