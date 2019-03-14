@@ -220,16 +220,24 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
 static void ndpi_check_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if((packet->payload_packet_len > 0)
-     && (ndpi_match_file_header(ndpi_struct, flow)
-	 || ndpi_match_ftp_data_directory(ndpi_struct, flow) 
-	 || ndpi_match_ftp_data_port(ndpi_struct, flow)
-	 )
-     ) {
-    NDPI_LOG_INFO(ndpi_struct, "found FTP_DATA request\n");
-    ndpi_int_ftp_data_add_connection(ndpi_struct, flow);
-  } else
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  /*
+    Make sure we see the beginning of the connection as otherwise we might have
+    false positive results
+  */
+  if(flow->l4.tcp.seen_syn) {
+    if((packet->payload_packet_len > 0)
+       && (ndpi_match_file_header(ndpi_struct, flow)
+	   || ndpi_match_ftp_data_directory(ndpi_struct, flow) 
+	   || ndpi_match_ftp_data_port(ndpi_struct, flow)
+	   )
+       ) {
+      NDPI_LOG_INFO(ndpi_struct, "found FTP_DATA request\n");
+      ndpi_int_ftp_data_add_connection(ndpi_struct, flow);
+      return;
+    }
+  }
+  
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void ndpi_search_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
