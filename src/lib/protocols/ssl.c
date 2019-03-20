@@ -216,11 +216,11 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  break;
 		} else if(buffer[j] == '.') {
 		  num_dots++;
-		  if(num_dots >=2) break;
+		  if(num_dots >=1) break;
 		}
 	      }
 
-	      if(num_dots >= 2) {
+	      if(num_dots >= 1) {
 		if(!ndpi_struct->disable_metadata_export) {
 		  stripCertificateTrailer(buffer, buffer_len);
 		  snprintf(flow->protos.stun_ssl.ssl.server_certificate,
