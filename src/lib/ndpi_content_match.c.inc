@@ -8246,6 +8246,10 @@ ndpi_protocol_match host_match[] = {
   { "feelinsonice.com", NULL, "\\.feelsonice" TLD,                          "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".snapchat.", NULL, "\\.snapchat" TLD,                                  "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { ".snapads.", NULL, "\\.snapads" TLD,                                    "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { ".sc-cdn.net", NULL, "\\.sc-cdn\\.net" TLD,                             "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { ".sc-prod.net", NULL, "\\.sc-prod\\.net" TLD,                           "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { ".sc-jpl.com", NULL, "\\.sc-jpl\\.com" TLD,                             "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "sc-analytics.appspot.com", NULL, "sc-analytics\\.appspot\\.com",       "Snapchat",     NDPI_PROTOCOL_SNAPCHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
   { ".waze.com", NULL, "\\.waze" TLD,                                  "Waze",             NDPI_PROTOCOL_WAZE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 

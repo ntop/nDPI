@@ -2351,7 +2351,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
   if((sizeof(categories)/sizeof(char*)) != NDPI_PROTOCOL_NUM_CATEGORIES) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] invalid categories length: expected %u, got %u\n",
-      NDPI_PROTOCOL_NUM_CATEGORIES, (sizeof(categories)/sizeof(char*)));
+		 NDPI_PROTOCOL_NUM_CATEGORIES, (unsigned int)(sizeof(categories)/sizeof(char*)));
     return(NULL);
   }
 
