@@ -216,11 +216,11 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  break;
 		} else if(buffer[j] == '.') {
 		  num_dots++;
-		  if(num_dots >=2) break;
+		  if(num_dots >=1) break;
 		}
 	      }
 
-	      if(num_dots >= 2) {
+	      if(num_dots >= 1) {
 		if(!ndpi_struct->disable_metadata_export) {
 		  stripCertificateTrailer(buffer, buffer_len);
 		  snprintf(flow->protos.stun_ssl.ssl.server_certificate,
@@ -335,18 +335,87 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
   return(0); /* Not found */
 }
 
+void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
+	struct ndpi_flow_struct *flow,
+	char *buffer, int buffer_len) {
+    struct ndpi_packet_struct *packet = &flow->packet;
+
+    if(packet->payload[0] != 0x16 /* Handshake */)
+	return;
+
+    u_int16_t total_len  = (packet->payload[3] << 8) + packet->payload[4] + 5 /* SSL Header */;
+    u_int8_t handshake_protocol = packet->payload[5]; /* handshake protocol a bit misleading, it is message type according TLS specs */
+
+    if(handshake_protocol != 0x02 && handshake_protocol != 0xb /* Server Hello and Certificate message types are interesting for us */)
+	return;
+
+    /* Truncate total len, search at least in incomplete packet */
+    if(total_len > packet->payload_packet_len)
+	total_len = packet->payload_packet_len;
+
+    memset(buffer, 0, buffer_len);
+
+    /* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
+    u_int num_found = 0;
+    u_int i, j;
+    for(i = 9; i < packet->payload_packet_len-4; i++) {
+	/* Organization OID: 2.5.4.10 */
+	if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x0a)) {
+	    u_int8_t type_tag = packet->payload[i+3]; // 0x0c: utf8string / 0x13: printable_string
+	    u_int8_t server_len = packet->payload[i+4];
+
+	    num_found++;
+	    /* what we want is subject certificate, so we bypass the issuer certificate */
+	    if (num_found != 2) continue;
+
+	    // packet is truncated... further inspection is not needed
+	    if(i+4+server_len >= packet->payload_packet_len) {
+		break;
+	    }
+
+	    char *server_org = (char*)&packet->payload[i+5];
+
+	    u_int len = (u_int)ndpi_min(server_len, buffer_len-1);
+	    strncpy(buffer, server_org, len);
+	    buffer[len] = '\0';
+
+	    // check if organization string are all printable
+	    u_int8_t is_printable = 1;
+	    for (j = 0; j < len; j++) {
+		if(!ndpi_isprint(buffer[j])) {
+		    is_printable = 0;
+		    break;
+		}
+	    }
+
+	    if (is_printable == 1) {
+		snprintf(flow->protos.stun_ssl.ssl.server_organization,
+			sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
+#ifdef CERTIFICATE_DEBUG
+		printf("Certificate origanization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
+#endif
+	    }
+	}
+    }
+}
+
 int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
   /* consider only specific SSL packets (handshake) */
   if((packet->payload_packet_len > 9) && (packet->payload[0] == 0x16)) {
     char certificate[64];
+    char organization[64];
     int rc;
 
     certificate[0] = '\0';
     rc = getSSLcertificate(ndpi_struct, flow, certificate, sizeof(certificate));
     packet->ssl_certificate_num_checks++;
     if (rc > 0) {
+      // try fetch server organization once server certificate is found
+      organization[0] = '\0';
+      getSSLorganization(ndpi_struct, flow, organization, sizeof(organization));
+
       packet->ssl_certificate_detected++;
       if ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
         /* 0 means we're done processing extra packets (since we found what we wanted) */
