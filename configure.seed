@@ -30,7 +30,7 @@ if test -d ".git"; then :
      GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
-     GIT_DATE=`date`
+     GIT_DATE=`date -u -r CHANGELOG.md`
 fi
 
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
