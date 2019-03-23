@@ -566,6 +566,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
       snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.server_certificate);
+      snprintf(flow->ssh_ssl.server_organization, sizeof(flow->ssh_ssl.server_organization), "%s",
+	       flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);
     }
   }
 
