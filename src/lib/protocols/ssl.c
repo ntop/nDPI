@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-//#define CERTIFICATE_DEBUG 1
+// #define CERTIFICATE_DEBUG 1
 
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
@@ -152,8 +152,9 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
   {
     u_int16_t ssl_version = (packet->payload[1] << 8) + packet->payload[2];
-
-    printf("SSL [version: %u]\n", ssl_version);
+    u_int16_t ssl_len     = (packet->payload[3] << 8) + packet->payload[4];    
+      
+    printf("SSL Record [version: 0x%02X][len: %u]\n", ssl_version, ssl_len);
   }
 #endif
 
@@ -175,10 +176,18 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
     if(total_len > 4) {
       int i;
 
-      if(handshake_protocol == 0x02 || handshake_protocol == 0xb /* Server Hello and Certificate message types are interesting for us */) {
+#ifdef CERTIFICATE_DEBUG
+      printf("SSL [len: %u][handshake_protocol: %02X]\n", packet->payload_packet_len, handshake_protocol);
+#endif
+
+      if((handshake_protocol == 0x02)
+	 || (handshake_protocol == 0xb) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
 
-	flow->l4.tcp.ssl_seen_server_cert = 1;
+	if(handshake_protocol == 0x02)
+	  flow->l4.tcp.ssl_seen_server_cert = 1;
+	else
+	  flow->l4.tcp.ssl_seen_certificate = 1;
 
 	/* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
 	for(i = 9; i < packet->payload_packet_len-3; i++) {
@@ -233,7 +242,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       } else if(handshake_protocol == 0x01 /* Client Hello */) {
 	u_int offset, base_offset = 43;
-	if (base_offset + 2 <= packet->payload_packet_len) {
+	if(base_offset + 2 <= packet->payload_packet_len) {
 	    u_int16_t session_id_len = packet->payload[base_offset];
 
 	    if((session_id_len+base_offset+2) <= total_len) {
@@ -366,7 +375,7 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    num_found++;
 	    /* what we want is subject certificate, so we bypass the issuer certificate */
-	    if (num_found != 2) continue;
+	    if(num_found != 2) continue;
 
 	    // packet is truncated... further inspection is not needed
 	    if(i+4+server_len >= packet->payload_packet_len) {
@@ -388,7 +397,7 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 	    }
 
-	    if (is_printable == 1) {
+	    if(is_printable == 1) {
 		snprintf(flow->protos.stun_ssl.ssl.server_organization,
 			sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
 #ifdef CERTIFICATE_DEBUG
@@ -411,18 +420,18 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
     certificate[0] = '\0';
     rc = getSSLcertificate(ndpi_struct, flow, certificate, sizeof(certificate));
     packet->ssl_certificate_num_checks++;
-    if (rc > 0) {
+    if(rc > 0) {
       // try fetch server organization once server certificate is found
       organization[0] = '\0';
       getSSLorganization(ndpi_struct, flow, organization, sizeof(organization));
 
       packet->ssl_certificate_detected++;
-      if ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
+      if((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
         /* 0 means we're done processing extra packets (since we found what we wanted) */
         return 0;
     }
     /* Client hello, Server Hello, and certificate packets probably all checked in this case */
-    if ((packet->ssl_certificate_num_checks >= 3)
+    if((packet->ssl_certificate_num_checks >= 3)
 	&& (flow->l4.tcp.seen_syn)
 	&& (flow->l4.tcp.seen_syn_ack)
 	&& (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
@@ -438,7 +447,7 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
 void sslInitExtraPacketProcessing(int caseNum, struct ndpi_flow_struct *flow) {
   flow->check_extra_packets = 1;
   /* 0 is the case for waiting for the server certificate */
-  if (caseNum == 0) {
+  if(caseNum == 0) {
     /* At most 7 packets should almost always be enough to find the server certificate if it's there */
     flow->max_extra_packets_to_check = 7;
     flow->extra_packets_func = sslTryAndRetrieveServerCertificate;
@@ -474,7 +483,8 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  /* If we've detected the subprotocol from client certificate but haven't had a chance
 	   * to see the server certificate yet, set up extra packet processing to wait
 	   * a few more packets. */
-	  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) && ((flow->l4.tcp.ssl_seen_server_cert != 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0'))) {
+	  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0'))
+	     && ((flow->l4.tcp.ssl_seen_server_cert != 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0'))) {
 	    sslInitExtraPacketProcessing(0, flow);
 	  }
 
@@ -487,11 +497,13 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  return(rc);
       }
 
-      if(((packet->ssl_certificate_num_checks >= 2)
+      if(((packet->ssl_certificate_num_checks >= 3)
 	  && flow->l4.tcp.seen_syn
 	  && flow->l4.tcp.seen_syn_ack
 	  && flow->l4.tcp.seen_ack /* We have seen the 3-way handshake */)
-	 || ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
+	 || ((flow->l4.tcp.ssl_seen_certificate == 1)
+	     && (flow->l4.tcp.ssl_seen_server_cert == 1)
+	     && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
 	 /* || ((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) */
 	 ) {
 	ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
@@ -501,8 +513,7 @@ int sslDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
   return(0);
 }
 
-static void ssl_mark_and_payload_search_for_other_protocols(struct
-							    ndpi_detection_module_struct
+static void ssl_mark_and_payload_search_for_other_protocols(struct ndpi_detection_module_struct
 							    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -579,16 +590,16 @@ static void ssl_mark_and_payload_search_for_other_protocols(struct
       /* SSL without certificate (Skype, Ultrasurf?) */
       NDPI_LOG_INFO(ndpi_struct, "found ssl NO_CERT\n");
       ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL_NO_CERT);
-    } else
+    } else if(packet->ssl_certificate_num_checks >= 3) {
       NDPI_LOG_INFO(ndpi_struct, "found ssl\n");
-    ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
+      ndpi_int_ssl_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SSL);
+    }
   }
 }
 
 
 static u_int8_t ndpi_search_sslv3_direction1(struct ndpi_detection_module_struct *ndpi_struct,
 					     struct ndpi_flow_struct *flow) {
-
   struct ndpi_packet_struct *packet = &flow->packet;
 
   if((packet->payload_packet_len >= 5)
@@ -716,27 +727,25 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
   NDPI_LOG_DBG(ndpi_struct, "search ssl\n");
 
-  {
-    /* Check if this is whatsapp first (this proto runs over port 443) */
-    if((packet->payload_packet_len > 5)
-       && ((packet->payload[0] == 'W')
-	   && (packet->payload[1] == 'A')
-	   && (packet->payload[4] == 0)
-	   && (packet->payload[2] <= 9)
-	   && (packet->payload[3] <= 9))) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
+  /* Check if this is whatsapp first (this proto runs over port 443) */
+  if((packet->payload_packet_len > 5)
+     && ((packet->payload[0] == 'W')
+	 && (packet->payload[1] == 'A')
+	 && (packet->payload[4] == 0)
+	 && (packet->payload[2] <= 9)
+	 && (packet->payload[3] <= 9))) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
+    return;
+  } else if((packet->payload_packet_len == 4)
+	    && (packet->payload[0] == 'W')
+	    && (packet->payload[1] == 'A')) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
+    return;
+  } else {
+    /* No whatsapp, let's try SSL */
+    if(sslDetectProtocolFromCertificate(ndpi_struct, flow) > 0)
       return;
-    } else if((packet->payload_packet_len == 4)
-	      && (packet->payload[0] == 'W')
-	      && (packet->payload[1] == 'A')) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
-      return;
-    } else {
-      /* No whatsapp, let's try SSL */
-      if(sslDetectProtocolFromCertificate(ndpi_struct, flow) > 0)
-	return;
-    }
-  }
+  }  
 
   if(packet->payload_packet_len > 40 && flow->l4.tcp.ssl_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "first ssl packet\n");
