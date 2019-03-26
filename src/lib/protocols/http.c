@@ -182,6 +182,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
         case 'P':
           switch(flow->packet.http_method.ptr[1]) {
+          case 'A': flow->http.method = NDPI_HTTP_METHOD_PATCH; break;
           case 'O': flow->http.method = NDPI_HTTP_METHOD_POST; break;
           case 'U': flow->http.method = NDPI_HTTP_METHOD_PUT; break;
           }
@@ -412,6 +413,7 @@ static struct l_string {
 		    STATIC_STRING_L("OPTIONS "),
 		    STATIC_STRING_L("HEAD "),
 		    STATIC_STRING_L("PUT "),
+		    STATIC_STRING_L("PATCH "),
 		    STATIC_STRING_L("DELETE "),
 		    STATIC_STRING_L("CONNECT "),
 		    STATIC_STRING_L("PROPFIND "),
