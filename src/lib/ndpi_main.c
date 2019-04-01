@@ -2474,7 +2474,7 @@ static int hyperscanCustomEventHandler(unsigned int id,
 /* *********************************************** */
 
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
-				      char *name, unsigned long *id) {
+			       char *name, unsigned long *id) {
 #ifdef DEBUG
   printf("[NDPI] %s(%s) [enable_category_substring_match: %u]\n",
 	 __FUNCTION__, name, ndpi_struct->enable_category_substring_match);
@@ -2518,7 +2518,7 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 /* *********************************************** */
 
 int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
-				      char *name_or_ip, unsigned long *id) {
+				   char *name_or_ip, unsigned long *id) {
   char ipbuf[64];
   struct in_addr pin;
 
@@ -4180,7 +4180,8 @@ static ndpi_protocol ndpi_process_partial_detection(struct ndpi_detection_module
 
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
     ret.app_protocol = ret.master_protocol;
-  
+
+  ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
   ndpi_int_change_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
   return(ret);
 }
@@ -6090,7 +6091,6 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
   matching_protocol_id = ndpi_match_string_subprotocol(ndpi_struct, string_to_match,
 						       string_to_match_len, ret_match,
 						       is_host_match);
-
 #else
   struct hs *hs = (struct hs*)ndpi_struct->hyperscan;
   hs_error_t status;
