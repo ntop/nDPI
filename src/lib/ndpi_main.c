@@ -4176,13 +4176,18 @@ static ndpi_protocol ndpi_process_partial_detection(struct ndpi_detection_module
 						    strlen((const char*)flow->host_server_name),
 						    &ret_match,
 						    flow->guessed_protocol_id);
-  ret.category = ret_match.protocol_category;
 
+  if(flow->category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    ret.category = flow->category;
+  else
+    ret.category = ret_match.protocol_category;
+  
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
     ret.app_protocol = ret.master_protocol;
 
   ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
   ndpi_int_change_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
+
   return(ret);
 }
 
@@ -4205,7 +4210,12 @@ ndpi_protocol ndpi_get_partial_detection(struct ndpi_detection_module_struct *nd
 	  && (!NDPI_ISSET(&flow->excluded_protocol_bitmask, flow->guessed_host_protocol_id)))
     return(ndpi_process_partial_detection(ndpi_struct, flow));
   else {
-    ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
+    ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN,
+			  NDPI_PROTOCOL_UNKNOWN,
+			  NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
+
+    if(flow) ret.category = flow->category;
+    
     return(ret);
   }
 }
@@ -4216,8 +4226,11 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow, u_int8_t enable_guess) {
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
 
-  if(flow == NULL) return(ret);
-
+  if(flow == NULL)
+    return(ret);
+  else
+    ret.category = flow->category;
+  
   /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     u_int16_t guessed_protocol_id, guessed_host_protocol_id;
@@ -4631,9 +4644,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(ndpi_struct->ndpi_log_level >= NDPI_LOG_TRACE)
   	NDPI_LOG(flow ? flow->detected_protocol_stack[0]:NDPI_PROTOCOL_UNKNOWN,
 		 ndpi_struct, NDPI_LOG_TRACE, "START packet processing\n");
+
   if(flow == NULL)
     return(ret);
-
+  else
+    ret.category = flow->category;
+      
   flow->num_processed_pkts++;
 
   if(flow->server_id == NULL) flow->server_id = dst; /* Default */
