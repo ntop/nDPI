@@ -153,8 +153,10 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	       || ((dns_header.authority_rrs > 0) && (dns_header.authority_rrs <= NDPI_MAX_DNS_REQUESTS))
 	       || ((dns_header.additional_rrs > 0) && (dns_header.additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
 	   ) {
-	  /* This is a good reply */
-	  if(ndpi_struct->dns_dont_dissect_response == 0) {
+	  /* This is a good reply: we dissect it both for request and response */
+
+	  /* Leave the statement below commented necessary in case of call to ndpi_get_partial_detection() */
+	  /* if(ndpi_struct->dns_dont_dissect_response == 0) */ {
 	    x++;
 
 	    if(flow->packet.payload[x] != '\0') {

@@ -157,7 +157,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 #endif
 
-  if(!ndpi_struct->http_dont_dissect_response) {
+  /* Leave the statement below commented necessary in case of call to ndpi_get_partial_detection() */
+  
+  /* if(!ndpi_struct->http_dont_dissect_response) */ {
     if((flow->http.url == NULL)
        && (packet->http_url_name.len > 0)
        && (packet->host_line.len > 0)) {
