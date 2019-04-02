@@ -29,18 +29,18 @@
 
 /* NDPI_LOG_LEVEL */
 typedef enum {
-  NDPI_LOG_ERROR,
-  NDPI_LOG_TRACE,
-  NDPI_LOG_DEBUG,
-  NDPI_LOG_DEBUG_EXTRA
+	      NDPI_LOG_ERROR,
+	      NDPI_LOG_TRACE,
+	      NDPI_LOG_DEBUG,
+	      NDPI_LOG_DEBUG_EXTRA
 } ndpi_log_level_t;
 
 /* NDPI_VISIT */
 typedef enum {
-  ndpi_preorder,
-  ndpi_postorder,
-  ndpi_endorder,
-  ndpi_leaf
+	      ndpi_preorder,
+	      ndpi_postorder,
+	      ndpi_endorder,
+	      ndpi_leaf
 } ndpi_VISIT;
 
 /* NDPI_NODE */
@@ -356,16 +356,20 @@ PACK_ON struct tinc_cache_entry {
 } PACK_OFF;
 
 typedef enum {
-  HTTP_METHOD_UNKNOWN = 0,
-  HTTP_METHOD_OPTIONS,
-  HTTP_METHOD_GET,
-  HTTP_METHOD_HEAD,
-  HTTP_METHOD_POST,
-  HTTP_METHOD_PUT,
-  HTTP_METHOD_DELETE,
-  HTTP_METHOD_TRACE,
-  HTTP_METHOD_CONNECT
+	      NDPI_HTTP_METHOD_UNKNOWN = 0,
+	      NDPI_HTTP_METHOD_OPTIONS,
+	      NDPI_HTTP_METHOD_GET,
+	      NDPI_HTTP_METHOD_HEAD,
+	      NDPI_HTTP_METHOD_POST,
+	      NDPI_HTTP_METHOD_PUT,
+	      NDPI_HTTP_METHOD_DELETE,
+	      NDPI_HTTP_METHOD_TRACE,
+	      NDPI_HTTP_METHOD_CONNECT
 } ndpi_http_method;
+
+struct ndpi_lru_cache {
+  u_int32_t num_entries, *entries;  
+};
 
 struct ndpi_id_struct {
   /**
@@ -375,229 +379,232 @@ struct ndpi_id_struct {
      to compare this, use:
   **/
   NDPI_PROTOCOL_BITMASK detected_protocol_bitmask;
-/* NDPI_PROTOCOL_RTSP */
+  /* NDPI_PROTOCOL_RTSP */
   ndpi_ip_addr_t rtsp_ip_address;
 
-/* NDPI_PROTOCOL_YAHOO */
+  /* NDPI_PROTOCOL_YAHOO */
   u_int32_t yahoo_video_lan_timer;
 
   /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
-/* NDPI_PROTOCOL_IRC */
+  /* NDPI_PROTOCOL_IRC */
 #define NDPI_PROTOCOL_IRC_MAXPORT 8
   u_int16_t irc_port[NDPI_PROTOCOL_IRC_MAXPORT];
   u_int32_t last_time_port_used[NDPI_PROTOCOL_IRC_MAXPORT];
   u_int32_t irc_ts;
 
-/* NDPI_PROTOCOL_GNUTELLA */
+  /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_ts;
 
-/* NDPI_PROTOCOL_BATTLEFIELD */
+  /* NDPI_PROTOCOL_BATTLEFIELD */
   u_int32_t battlefield_ts;
 
-/* NDPI_PROTOCOL_THUNDER */
+  /* NDPI_PROTOCOL_THUNDER */
   u_int32_t thunder_ts;
 
-/* NDPI_PROTOCOL_RTSP */
+  /* NDPI_PROTOCOL_RTSP */
   u_int32_t rtsp_timer;
 
-/* NDPI_PROTOCOL_OSCAR */
+  /* NDPI_PROTOCOL_OSCAR */
   u_int32_t oscar_last_safe_access_time;
 
-/* NDPI_PROTOCOL_ZATTOO */
+  /* NDPI_PROTOCOL_ZATTOO */
   u_int32_t zattoo_ts;
 
-/* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
+  /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   u_int32_t jabber_stun_or_ft_ts;
 
-/* NDPI_PROTOCOL_DIRECTCONNECT */
+  /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int32_t directconnect_last_safe_access_time;
 
-/* NDPI_PROTOCOL_SOULSEEK */
+  /* NDPI_PROTOCOL_SOULSEEK */
   u_int32_t soulseek_last_safe_access_time;
 
-/* NDPI_PROTOCOL_DIRECTCONNECT */
+  /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int16_t detected_directconnect_port;
   u_int16_t detected_directconnect_udp_port;
   u_int16_t detected_directconnect_ssl_port;
 
-/* NDPI_PROTOCOL_BITTORRENT */
+  /* NDPI_PROTOCOL_BITTORRENT */
 #define NDPI_BT_PORTS 8
   u_int16_t bt_port_t[NDPI_BT_PORTS];
   u_int16_t bt_port_u[NDPI_BT_PORTS];
 
-/* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
+  /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
 #define JABBER_MAX_STUN_PORTS 6
   u_int16_t jabber_voice_stun_port[JABBER_MAX_STUN_PORTS];
   u_int16_t jabber_file_transfer_port[2];
 
-/* NDPI_PROTOCOL_GNUTELLA */
+  /* NDPI_PROTOCOL_GNUTELLA */
   u_int16_t detected_gnutella_port;
 
-/* NDPI_PROTOCOL_GNUTELLA */
+  /* NDPI_PROTOCOL_GNUTELLA */
   u_int16_t detected_gnutella_udp_port1;
   u_int16_t detected_gnutella_udp_port2;
 
-/* NDPI_PROTOCOL_SOULSEEK */
+  /* NDPI_PROTOCOL_SOULSEEK */
   u_int16_t soulseek_listen_port;
 
-/* NDPI_PROTOCOL_IRC */
+  /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_number_of_port;
 
-/* NDPI_PROTOCOL_OSCAR */
+  /* NDPI_PROTOCOL_OSCAR */
   u_int8_t oscar_ssl_session_id[33];
 
-/* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
+  /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   u_int8_t jabber_voice_stun_used_ports;
 
-/* NDPI_PROTOCOL_SIP */
-/* NDPI_PROTOCOL_YAHOO */
+  /* NDPI_PROTOCOL_SIP */
+  /* NDPI_PROTOCOL_YAHOO */
   u_int32_t yahoo_video_lan_dir:1;
 
-/* NDPI_PROTOCOL_YAHOO */
+  /* NDPI_PROTOCOL_YAHOO */
   u_int32_t yahoo_conf_logged_in:1;
   u_int32_t yahoo_voice_conf_logged_in:1;
 
-/* NDPI_PROTOCOL_RTSP */
+  /* NDPI_PROTOCOL_RTSP */
   u_int32_t rtsp_ts_set:1;
 };
 
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
-/* NDPI_PROTOCOL_MAIL_SMTP */
+  /* NDPI_PROTOCOL_MAIL_SMTP */
   u_int16_t smtp_command_bitmask;
 
-/* NDPI_PROTOCOL_MAIL_POP */
+  /* NDPI_PROTOCOL_MAIL_POP */
   u_int16_t pop_command_bitmask;
 
-/* NDPI_PROTOCOL_QQ */
+  /* NDPI_PROTOCOL_QQ */
   u_int16_t qq_nxt_len;
 
   /* NDPI_PROTOCOL_WHATSAPP */
   u_int8_t wa_matched_so_far;
   
-/* NDPI_PROTOCOL_TDS */
+  /* NDPI_PROTOCOL_TDS */
   u_int8_t tds_login_version;
 
-/* NDPI_PROTOCOL_IRC */
+  /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_stage;
   u_int8_t irc_port;
   
-/* NDPI_PROTOCOL_H323 */
+  /* NDPI_PROTOCOL_H323 */
   u_int8_t h323_valid_packets;
 
-/* NDPI_PROTOCOL_GNUTELLA */
+  /* NDPI_PROTOCOL_GNUTELLA */
   u_int8_t gnutella_msg_id[3];
 
-/* NDPI_PROTOCOL_IRC */
+  /* NDPI_PROTOCOL_IRC */
   u_int32_t irc_3a_counter:3;
   u_int32_t irc_stage2:5;
   u_int32_t irc_direction:2;
   u_int32_t irc_0x1000_full:1;
 
-/* NDPI_PROTOCOL_SOULSEEK */
+  /* NDPI_PROTOCOL_SOULSEEK */
   u_int32_t soulseek_stage:2;
 
-/* NDPI_PROTOCOL_TDS */
+  /* NDPI_PROTOCOL_TDS */
   u_int32_t tds_stage:3;
 
-/* NDPI_PROTOCOL_USENET */
+  /* NDPI_PROTOCOL_USENET */
   u_int32_t usenet_stage:2;
 
-/* NDPI_PROTOCOL_IMESH */
+  /* NDPI_PROTOCOL_IMESH */
   u_int32_t imesh_stage:4;
 
-/* NDPI_PROTOCOL_HTTP */
+  /* NDPI_PROTOCOL_HTTP */
   u_int32_t http_setup_dir:2;
   u_int32_t http_stage:2;
   u_int32_t http_empty_line_seen:1;
   u_int32_t http_wait_for_retransmission:1;
 
-/* NDPI_PROTOCOL_GNUTELLA */
+  /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_stage:2;		       // 0 - 2
 
-/* NDPI_CONTENT_MMS */
+  /* NDPI_CONTENT_MMS */
   u_int32_t mms_stage:2;
 
-/* NDPI_PROTOCOL_YAHOO */
+  /* NDPI_PROTOCOL_YAHOO */
   u_int32_t yahoo_sip_comm:1;
   u_int32_t yahoo_http_proxy_stage:2;
 
-/* NDPI_PROTOCOL_MSN */
+  /* NDPI_PROTOCOL_MSN */
   u_int32_t msn_stage:3;
   u_int32_t msn_ssl_ft:2;
 
-/* NDPI_PROTOCOL_SSH */
+  /* NDPI_PROTOCOL_SSH */
   u_int32_t ssh_stage:3;
 
-/* NDPI_PROTOCOL_VNC */
+  /* NDPI_PROTOCOL_VNC */
   u_int32_t vnc_stage:2;			// 0 - 3
 
-/* NDPI_PROTOCOL_TELNET */
+  /* NDPI_PROTOCOL_TELNET */
   u_int32_t telnet_stage:2;			// 0 - 2
 
-/* NDPI_PROTOCOL_SSL */
-  u_int8_t ssl_seen_client_cert:1, ssl_seen_server_cert:1, ssl_stage:2; // 0 - 5
+  /* NDPI_PROTOCOL_SSL */
+  u_int8_t ssl_seen_client_cert:1,
+    ssl_seen_server_cert:1,
+    ssl_seen_certificate:1,
+    ssl_stage:2; // 0 - 5
 
-/* NDPI_PROTOCOL_POSTGRES */
+  /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
 
-/* NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK */
+  /* NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK */
   u_int32_t ddlink_server_direction:1;
   u_int32_t seen_syn:1;
   u_int32_t seen_syn_ack:1;
   u_int32_t seen_ack:1;
   
-/* NDPI_PROTOCOL_ICECAST */
+  /* NDPI_PROTOCOL_ICECAST */
   u_int32_t icecast_stage:1;
 
-/* NDPI_PROTOCOL_DOFUS */
+  /* NDPI_PROTOCOL_DOFUS */
   u_int32_t dofus_stage:1;
 
-/* NDPI_PROTOCOL_FIESTA */
+  /* NDPI_PROTOCOL_FIESTA */
   u_int32_t fiesta_stage:2;
 
-/* NDPI_PROTOCOL_WORLDOFWARCRAFT */
+  /* NDPI_PROTOCOL_WORLDOFWARCRAFT */
   u_int32_t wow_stage:2;
 
-/* NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV */
+  /* NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV */
   u_int32_t veoh_tv_stage:2;
 
-/* NDPI_PROTOCOL_SHOUTCAST */
+  /* NDPI_PROTOCOL_SHOUTCAST */
   u_int32_t shoutcast_stage:2;
 
-/* NDPI_PROTOCOL_RTP */
+  /* NDPI_PROTOCOL_RTP */
   u_int32_t rtp_special_packets_seen:1;
 
-/* NDPI_PROTOCOL_MAIL_POP */
+  /* NDPI_PROTOCOL_MAIL_POP */
   u_int32_t mail_pop_stage:2;
 
-/* NDPI_PROTOCOL_MAIL_IMAP */
+  /* NDPI_PROTOCOL_MAIL_IMAP */
   u_int32_t mail_imap_stage:3, mail_imap_starttls:2;
 
-/* NDPI_PROTOCOL_SKYPE */
+  /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
 
-/* NDPI_PROTOCOL_CITRIX */
+  /* NDPI_PROTOCOL_CITRIX */
   u_int8_t citrix_packet_id;
 
-/* NDPI_PROTOCOL_LOTUS_NOTES */
+  /* NDPI_PROTOCOL_LOTUS_NOTES */
   u_int8_t lotus_notes_packet_id;
 
-/* NDPI_PROTOCOL_TEAMVIEWER */
+  /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage;
 
-/* NDPI_PROTOCOL_ZMQ */
+  /* NDPI_PROTOCOL_ZMQ */
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
 
-/* NDPI_PROTOCOL_PPSTREAM */
+  /* NDPI_PROTOCOL_PPSTREAM */
   u_int32_t ppstream_stage:3;
 
-/* NDPI_PROTOCOL_MEMCACHED */
+  /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
 
-/* NDPI_PROTOCOL_NEST_LOG_SINK */
+  /* NDPI_PROTOCOL_NEST_LOG_SINK */
   u_int8_t nest_log_sink_matches;
 }
 #ifndef WIN32
@@ -608,51 +615,51 @@ struct ndpi_flow_tcp_struct {
 /* ************************************************** */
 
 struct ndpi_flow_udp_struct {
-/* NDPI_PROTOCOL_BATTLEFIELD */
+  /* NDPI_PROTOCOL_BATTLEFIELD */
   u_int32_t battlefield_msg_id;
 
-/* NDPI_PROTOCOL_SNMP */
+  /* NDPI_PROTOCOL_SNMP */
   u_int32_t snmp_msg_id;
 
-/* NDPI_PROTOCOL_BATTLEFIELD */
+  /* NDPI_PROTOCOL_BATTLEFIELD */
   u_int32_t battlefield_stage:3;
 
-/* NDPI_PROTOCOL_SNMP */
+  /* NDPI_PROTOCOL_SNMP */
   u_int32_t snmp_stage:2;
 
-/* NDPI_PROTOCOL_PPSTREAM */
+  /* NDPI_PROTOCOL_PPSTREAM */
   u_int32_t ppstream_stage:3;		  // 0 - 7
 
-/* NDPI_PROTOCOL_HALFLIFE2 */
+  /* NDPI_PROTOCOL_HALFLIFE2 */
   u_int32_t halflife2_stage:2;		  // 0 - 2
 
-/* NDPI_PROTOCOL_TFTP */
+  /* NDPI_PROTOCOL_TFTP */
   u_int32_t tftp_stage:1;
 
-/* NDPI_PROTOCOL_AIMINI */
+  /* NDPI_PROTOCOL_AIMINI */
   u_int32_t aimini_stage:5;
 
-/* NDPI_PROTOCOL_XBOX */
+  /* NDPI_PROTOCOL_XBOX */
   u_int32_t xbox_stage:1;
 
-/* NDPI_PROTOCOL_WINDOWS_UPDATE */
+  /* NDPI_PROTOCOL_WINDOWS_UPDATE */
   u_int32_t wsus_stage:1;
 
-/* NDPI_PROTOCOL_SKYPE */
+  /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
 
-/* NDPI_PROTOCOL_TEAMVIEWER */
+  /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage;
 
-/* NDPI_PROTOCOL_EAQ */
+  /* NDPI_PROTOCOL_EAQ */
   u_int8_t eaq_pkt_id;
   u_int32_t eaq_sequence;
 
-/* NDPI_PROTOCOL_RX */
+  /* NDPI_PROTOCOL_RX */
   u_int32_t rx_conn_epoch;
   u_int32_t rx_conn_id;
 
-/* NDPI_PROTOCOL_MEMCACHED */
+  /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
 }
 #ifndef WIN32
@@ -746,87 +753,84 @@ typedef struct {
 } ndpi_port_range;
 
 typedef enum {
-  NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
-  NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn't provide risks, but could be malicious (e.g., Dropbox) */
-  NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
-  NDPI_PROTOCOL_UNSAFE,                /* Probably provides risks, but could be a normal traffic. Unencrypted protocols with clear pass should be here (e.g., telnet) */
-  NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Surely is dangerous (ex. Tor). Be prepared to troubles */
-  NDPI_PROTOCOL_TRACKER_ADS,           /* Trackers, Advertisements... */
-  NDPI_PROTOCOL_UNRATED                /* No idea, not implemented or impossible to classify */
+	      NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
+	      NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn't provide risks, but could be malicious (e.g., Dropbox) */
+	      NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
+	      NDPI_PROTOCOL_UNSAFE,                /* Probably provides risks, but could be a normal traffic. Unencrypted protocols with clear pass should be here (e.g., telnet) */
+	      NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Surely is dangerous (ex. Tor). Be prepared to troubles */
+	      NDPI_PROTOCOL_TRACKER_ADS,           /* Trackers, Advertisements... */
+	      NDPI_PROTOCOL_UNRATED                /* No idea, not implemented or impossible to classify */
 } ndpi_protocol_breed_t;
 
 #define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)
 
 /* Abstract categories to group the protocols. */
 typedef enum {
-  NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
-  NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
-  NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
-  NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
-  NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
-  NDPI_PROTOCOL_CATEGORY_WEB,               /* Web/mobile protocols and services */
-  NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
-  NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,       /* Download, FTP, file transfer/sharing */
-  NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
-  NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
-  NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
-  NDPI_PROTOCOL_CATEGORY_DATABASE,          /* Protocols for database communication */
-  NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
-  NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
-  NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
-  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
-  NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
-  NDPI_PROTOCOL_CATEGORY_STREAMING,         /* Streaming protocols */
-  NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
-  NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
+	      NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
+	      NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
+	      NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
+	      NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
+	      NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
+	      NDPI_PROTOCOL_CATEGORY_WEB,               /* Web/mobile protocols and services */
+	      NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
+	      NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,       /* Download, FTP, file transfer/sharing */
+	      NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
+	      NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
+	      NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
+	      NDPI_PROTOCOL_CATEGORY_DATABASE,          /* Protocols for database communication */
+	      NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
+	      NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
+	      NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
+	      NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
+	      NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
+	      NDPI_PROTOCOL_CATEGORY_STREAMING,         /* Streaming protocols */
+	      NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
+	      NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
 
-  /* See #define NUM_CUSTOM_CATEGORIES */
-  NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
-  NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
-  NDPI_PROTOCOL_CATEGORY_CUSTOM_3,          /* User custom category 3 */
-  NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
-  NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
+	      /* See #define NUM_CUSTOM_CATEGORIES */
+	      NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
+	      NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
+	      NDPI_PROTOCOL_CATEGORY_CUSTOM_3,          /* User custom category 3 */
+	      NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
+	      NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
 
-  /* Payload Content */
-  NDPI_CONTENT_CATEGORY_AVI,
-  NDPI_CONTENT_CATEGORY_FLASH,
-  NDPI_CONTENT_CATEGORY_OGG,
-  NDPI_CONTENT_CATEGORY_MPEG,
-  NDPI_CONTENT_CATEGORY_QUICKTIME,
-  NDPI_CONTENT_CATEGORY_REALMEDIA,
-  NDPI_CONTENT_CATEGORY_WINDOWSMEDIA,
-  NDPI_CONTENT_CATEGORY_WEBM,
+	      /* Further categories... */
+	      NDPI_PROTOCOL_CATEGORY_MUSIC,
+	      NDPI_PROTOCOL_CATEGORY_VIDEO,
+	      NDPI_PROTOCOL_CATEGORY_SHOPPING,
+	      NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,
+	      NDPI_PROTOCOL_CATEGORY_FILE_SHARING,
+	      
+	      /* Some custom categories */
+	      CUSTOM_CATEGORY_MINING           = 99,
+	      CUSTOM_CATEGORY_MALWARE          = 100,
+	      CUSTOM_CATEGORY_ADVERTISEMENT    = 101,
+	      CUSTOM_CATEGORY_BANNED_SITE      = 102,
+	      CUSTOM_CATEGORY_SITE_UNAVAILABLE = 103,
 
-  /* Some custom categories */
-  CUSTOM_CATEGORY_MINING           = 99,
-  CUSTOM_CATEGORY_MALWARE          = 100,
-  CUSTOM_CATEGORY_ADVERTISEMENT    = 101,
-  CUSTOM_CATEGORY_BANNED_SITE      = 102,
-  CUSTOM_CATEGORY_SITE_UNAVAILABLE = 103,
+	      /*
+		IMPORTANT
 
-  /*
-    IMPORTANT
+		Please keep in sync with
 
-    Please keep in sync with
+		static const char* categories[] = { ..}
 
-    static const char* categories[] = { ..}
-
-    in ndpi_main.c
-  */
+		in ndpi_main.c
+	      */
     
-  NDPI_PROTOCOL_NUM_CATEGORIES /*
-				 NOTE: Keep this as last member
-				 Unused as value but useful to getting the number of elements
-				 in this datastructure
-			       */
+	      NDPI_PROTOCOL_NUM_CATEGORIES /*
+					     NOTE: Keep this as last member
+					     Unused as value but useful to getting the number of elements
+					     in this datastructure
+					   */
 } ndpi_protocol_category_t;
 
 typedef enum {
-  ndpi_pref_http_dont_dissect_response = 0,
-  ndpi_pref_dns_dissect_response,
-  ndpi_pref_direction_detect_disable,
-  ndpi_pref_disable_metadata_export,
-  ndpi_pref_enable_category_substring_match
+	      ndpi_pref_http_dont_dissect_response = 0,
+	      ndpi_pref_dns_dont_dissect_response,
+	      ndpi_pref_direction_detect_disable,
+	      ndpi_pref_disable_metadata_export,
+	      ndpi_pref_enable_category_substring_match
 } ndpi_detection_preference;
   
 /* ntop extensions */
@@ -875,9 +879,9 @@ typedef struct ndpi_proto {
 #include <hs/hs.h>
 
 struct hs_list {
-    char *expression;
-    unsigned int id;
-    struct hs_list *next;
+  char *expression;
+  unsigned int id;
+  struct hs_list *next;
 };
 
 struct hs {
@@ -986,25 +990,25 @@ struct ndpi_detection_module_struct {
   char ip_string[NDPI_IP_STRING_SIZE];
 #endif
   u_int8_t ip_version_limit;
-/* NDPI_PROTOCOL_BITTORRENT */
+  /* NDPI_PROTOCOL_BITTORRENT */
   struct hash_ip4p_table *bt_ht;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   struct hash_ip4p_table *bt6_ht;
 #endif
 
-/* BT_ANNOUNCE */
+  /* BT_ANNOUNCE */
   struct bt_announce *bt_ann;
   int    bt_ann_len;
 
   /* NDPI_PROTOCOL_OOKLA */
-  void *ookla_cache;
+  struct ndpi_lru_cache *ookla_cache;
 
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t http_dont_dissect_response:1, dns_dissect_response:1,
+  u_int8_t http_dont_dissect_response:1, dns_dont_dissect_response:1,
     direction_detect_disable:1, /* disable internal detection of packet direction */
     disable_metadata_export:1, /* No metadata is exported */
     enable_category_substring_match:1 /* Default is perfect match */
@@ -1067,7 +1071,7 @@ struct ndpi_flow_struct {
     char *url, *content_type;
     u_int8_t num_request_headers, num_response_headers;
     u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
-    u_char response_status_code[5]; /* 200, 404, etc. */
+    u_int16_t response_status_code; /* 200, 404, etc. */
   } http;
 
   union {
@@ -1075,6 +1079,7 @@ struct ndpi_flow_struct {
     struct {
       u_int8_t num_queries, num_answers, reply_code;
       u_int16_t query_type, query_class, rsp_type;
+      ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet */
     } dns;
 
     struct {
@@ -1084,7 +1089,7 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
-	char client_certificate[64], server_certificate[64];
+	char client_certificate[64], server_certificate[64], server_organization[64];
       } ssl;
       
       struct {
@@ -1122,7 +1127,7 @@ struct ndpi_flow_struct {
       char fingerprint[48];
       char class_ident[48];
     } dhcp;
-   } protos;
+  } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/
 
@@ -1131,90 +1136,83 @@ struct ndpi_flow_struct {
 
   ndpi_protocol_category_t category;
   
-/* NDPI_PROTOCOL_REDIS */
+  /* NDPI_PROTOCOL_REDIS */
   u_int8_t redis_s2d_first_char, redis_d2s_first_char;
   
   u_int16_t packet_counter;		      // can be 0 - 65000
   u_int16_t packet_direction_counter[2];
   u_int16_t byte_counter[2];
-/* NDPI_PROTOCOL_BITTORRENT */
+  /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255
 
-/* NDPI_PROTOCOL_DIRECTCONNECT */
-  u_int32_t directconnect_stage:2;	      // 0 - 1
+  /* NDPI_PROTOCOL_DIRECTCONNECT */
+  u_int8_t directconnect_stage:2;	      // 0 - 1
 
-/* NDPI_PROTOCOL_YAHOO */
-  u_int32_t sip_yahoo_voice:1;
+  /* NDPI_PROTOCOL_YAHOO */
+  u_int8_t sip_yahoo_voice:1;
 
-/* NDPI_PROTOCOL_HTTP */
-  u_int32_t http_detected:1;
-
-/* NDPI_PROTOCOL_RTSP */
-  u_int32_t rtsprdt_stage:2;
-  u_int32_t rtsp_control_flow:1;
-
-/* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_detection_finished:2;
-
-/* NDPI_PROTOCOL_ZATTOO */
-  u_int32_t zattoo_stage:3;
-
-/* NDPI_PROTOCOL_QQ */
-  u_int32_t qq_stage:3;
-
-/* NDPI_PROTOCOL_THUNDER */
-  u_int32_t thunder_stage:2;		        // 0 - 3
+  /* NDPI_PROTOCOL_HTTP */
+  u_int8_t http_detected:1;
+  u_int16_t http_upper_protocol, http_lower_protocol;
   
-/* NDPI_PROTOCOL_OSCAR */
-  u_int32_t oscar_ssl_voice_stage:3;
-  u_int32_t oscar_video_voice:1;
+  /* NDPI_PROTOCOL_RTSP */
+  u_int8_t rtsprdt_stage:2, rtsp_control_flow:1;
 
-/* NDPI_PROTOCOL_FLORENSIA */
-  u_int32_t florensia_stage:1;
+  /* NDPI_PROTOCOL_YAHOO */
+  u_int8_t yahoo_detection_finished:2;
 
-/* NDPI_PROTOCOL_SOCKS */
-  u_int32_t socks5_stage:2;	                // 0 - 3
-  u_int32_t socks4_stage:2;	                // 0 - 3
+  /* NDPI_PROTOCOL_ZATTOO */
+  u_int8_t zattoo_stage:3;
 
-/* NDPI_PROTOCOL_EDONKEY */
-  u_int32_t edonkey_stage:2;	                // 0 - 3
+  /* NDPI_PROTOCOL_QQ */
+  u_int8_t qq_stage:3;
 
-/* NDPI_PROTOCOL_FTP_CONTROL */
-  u_int32_t ftp_control_stage:2;
+  /* NDPI_PROTOCOL_THUNDER */
+  u_int8_t thunder_stage:2;		        // 0 - 3
+  
+  /* NDPI_PROTOCOL_OSCAR */
+  u_int8_t oscar_ssl_voice_stage:3, oscar_video_voice:1;
 
-/* NDPI_PROTOCOL_RTMP */
-  u_int32_t rtmp_stage:2;
+  /* NDPI_PROTOCOL_FLORENSIA */
+  u_int8_t florensia_stage:1;
 
-/* NDPI_PROTOCOL_PANDO */
-  u_int32_t pando_stage:3;
+  /* NDPI_PROTOCOL_SOCKS */
+  u_int8_t socks5_stage:2, socks4_stage:2;      // 0 - 3
 
-/* NDPI_PROTOCOL_STEAM */
-  u_int32_t steam_stage:3;
-  u_int32_t steam_stage1:3;			// 0 - 4
-  u_int32_t steam_stage2:2;			// 0 - 2
-  u_int32_t steam_stage3:2;			// 0 - 2
+  /* NDPI_PROTOCOL_EDONKEY */
+  u_int8_t edonkey_stage:2;	                // 0 - 3
 
-/* NDPI_PROTOCOL_PPLIVE */
-  u_int32_t pplive_stage1:3;			// 0 - 6
-  u_int32_t pplive_stage2:2;			// 0 - 2
-  u_int32_t pplive_stage3:2;			// 0 - 2
+  /* NDPI_PROTOCOL_FTP_CONTROL */
+  u_int8_t ftp_control_stage:2;
 
-/* NDPI_PROTOCOL_STARCRAFT */
-  u_int32_t starcraft_udp_stage : 3;	// 0-7
+  /* NDPI_PROTOCOL_RTMP */
+  u_int8_t rtmp_stage:2;
 
-/* NDPI_PROTOCOL_OPENVPN */
+  /* NDPI_PROTOCOL_PANDO */
+  u_int8_t pando_stage:3;
+
+  /* NDPI_PROTOCOL_STEAM */
+  u_int16_t steam_stage:3, steam_stage1:3, steam_stage2:2, steam_stage3:2;
+
+  /* NDPI_PROTOCOL_PPLIVE */
+  u_int8_t pplive_stage1:3, pplive_stage2:2, pplive_stage3:2;
+
+  /* NDPI_PROTOCOL_STARCRAFT */
+  u_int8_t starcraft_udp_stage : 3;	// 0-7
+
+  /* NDPI_PROTOCOL_OPENVPN */
   u_int8_t ovpn_session_id[8];
   u_int8_t ovpn_counter;
 
-/* NDPI_PROTOCOL_TINC */
+  /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;
   struct tinc_cache_entry tinc_cache_entry;
 
-/* NDPI_PROTOCOL_CSGO */
+  /* NDPI_PROTOCOL_CSGO */
   u_int8_t csgo_strid[18],csgo_state,csgo_s2;
   u_int32_t csgo_id2;
 
-/* NDPI_PROTOCOL_1KXUN || NDPI_PROTOCOL_IQIYI */
+  /* NDPI_PROTOCOL_1KXUN || NDPI_PROTOCOL_IQIYI */
   u_int16_t kxun_counter, iqiyi_counter;
 
   /* internal structures to save functions calls */

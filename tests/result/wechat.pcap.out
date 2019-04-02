@@ -13,7 +13,7 @@ LLMNR	12	944	6
 WeChat	1251	606425	49
 GoogleDocs	15	5114	2
 
-	1	TCP 203.205.151.162:443 <-> 192.168.1.103:54058 [proto: 91.197/SSL.WeChat][cat: SocialNetwork/6][88 pkts/15114 bytes <-> 91 pkts/61842 bytes]
+	1	TCP 203.205.151.162:443 <-> 192.168.1.103:54058 [proto: 64.197/SSL_No_Cert.WeChat][cat: SocialNetwork/6][88 pkts/15114 bytes <-> 91 pkts/61842 bytes]
 	2	TCP 192.168.1.103:54101 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][cat: SocialNetwork/6][46 pkts/12575 bytes <-> 40 pkts/53424 bytes][client: web.wechat.com][server: web.wechat.com]
 	3	TCP 192.168.1.103:54103 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][cat: SocialNetwork/6][50 pkts/23958 bytes <-> 46 pkts/39684 bytes][client: web.wechat.com][server: web.wechat.com]
 	4	TCP 192.168.1.103:54113 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][cat: SocialNetwork/6][38 pkts/8933 bytes <-> 35 pkts/35112 bytes][client: web.wechat.com][server: web.wechat.com]

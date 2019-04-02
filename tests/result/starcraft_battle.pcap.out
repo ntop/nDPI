@@ -1,7 +1,6 @@
 DNS	26	2848	7
-HTTP	271	160676	18
+HTTP	450	294880	19
 SSDP	11	4984	1
-HTTP_Download	179	134204	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
 SSL	38	2548	11
@@ -9,7 +8,7 @@ Google	22	2184	5
 Github	3	234	1
 Starcraft	236	51494	6
 
-	1	TCP 192.168.1.100:3508 <-> 87.248.221.254:80 [proto: 7.60/HTTP.HTTP_Download][cat: Download-FileTransfer-FileSharing/7][90 pkts/5059 bytes <-> 89 pkts/129145 bytes][Host: llnw.blizzard.com]
+	1	TCP 192.168.1.100:3508 <-> 87.248.221.254:80 [proto: 7/HTTP][cat: Web/5][90 pkts/5059 bytes <-> 89 pkts/129145 bytes][Host: llnw.blizzard.com]
 	2	TCP 192.168.1.100:3517 <-> 213.248.127.130:1119 [proto: 213/Starcraft][cat: Game/8][126 pkts/9157 bytes <-> 89 pkts/41021 bytes]
 	3	TCP 192.168.1.100:3527 <-> 2.228.46.112:80 [proto: 7/HTTP][cat: Web/5][15 pkts/971 bytes <-> 26 pkts/36462 bytes][Host: bnetcmsus-a.akamaihd.net]
 	4	TCP 192.168.1.100:3528 <-> 2.228.46.112:80 [proto: 7/HTTP][cat: Web/5][11 pkts/755 bytes <-> 18 pkts/24350 bytes][Host: bnetcmsus-a.akamaihd.net]

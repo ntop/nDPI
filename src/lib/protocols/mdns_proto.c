@@ -63,21 +63,19 @@ static int ndpi_int_check_mdns_payload(struct ndpi_detection_module_struct
   struct ndpi_packet_struct *packet = &flow->packet;
   struct mdns_header *h = (struct mdns_header*)packet->payload;
   u_int16_t questions = ntohs(h->questions), answers = ntohs(h->answers);
+
+  if((questions > NDPI_MAX_MDNS_REQUESTS)
+     || (answers > NDPI_MAX_MDNS_REQUESTS))
+    return(0);
   
-  if(((packet->payload[2] & 0x80) == 0)
-     && (questions <= NDPI_MAX_MDNS_REQUESTS)
-     && (answers <= NDPI_MAX_MDNS_REQUESTS)) {	
+  if((packet->payload[2] & 0x80) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found MDNS with question query\n");
     return 1;    
-  }
-  else if(((packet->payload[2] & 0x80) != 0)
-	  && (questions == 0)
-	  && (answers <= NDPI_MAX_MDNS_REQUESTS)
-	  && (answers != 0)) {
+  } else if((packet->payload[2] & 0x80) != 0) {
     char answer[256];
     int i, j, len;
 
-    for(i=13, j=0; (packet->payload[i] != 0) && (i < packet->payload_packet_len) && (i < (sizeof(answer)-1)); i++)
+    for(i=13, j=0; (i < packet->payload_packet_len) && (i < (sizeof(answer)-1)) && (packet->payload[i] != 0); i++)
       answer[j++] = (packet->payload[i] < 13) ? '.' : packet->payload[i];
 	
     answer[j] = '\0';
@@ -100,8 +98,6 @@ static int ndpi_int_check_mdns_payload(struct ndpi_detection_module_struct
 void ndpi_search_mdns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int16_t dport;
-  
   NDPI_LOG_DBG(ndpi_struct, "search MDNS\n");
 
   /**
@@ -111,15 +107,13 @@ void ndpi_search_mdns(struct ndpi_detection_module_struct *ndpi_struct, struct n
   /* check if UDP packet */
   if(packet->udp != NULL) {   
     /* read destination port */
-    dport = ntohs(packet->udp->dest);
+    u_int16_t sport = ntohs(packet->udp->source);
+    u_int16_t dport = ntohs(packet->udp->dest);
 
     /* check standard MDNS ON port 5353 */
-    if(dport == 5353 && packet->payload_packet_len >= 12) {
-      /* mdns protocol must have destination address 224.0.0.251 */
-	    if(packet->iph != NULL /* && ntohl(packet->iph->daddr) == 0xe00000fb */) {
-
-	NDPI_LOG_INFO(ndpi_struct, "found MDNS with destination address 224.0.0.251 (=0xe00000fb)\n");
-	
+    if(((dport == 5353) || (sport == 5353))
+       && (packet->payload_packet_len >= 12)) {
+      if(packet->iph != NULL) {
 	if(ndpi_int_check_mdns_payload(ndpi_struct, flow) == 1) {
 	  ndpi_int_mdns_add_connection(ndpi_struct, flow);
 	  return;
@@ -141,6 +135,7 @@ void ndpi_search_mdns(struct ndpi_detection_module_struct *ndpi_struct, struct n
 #endif
     }
   }
+  
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 

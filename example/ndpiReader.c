@@ -804,6 +804,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_ssl.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_ssl.client_info);
     if(flow->ssh_ssl.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_ssl.server_info);
+    if(flow->ssh_ssl.server_organization[0] != '\0') fprintf(out, "[organization: %s]", flow->ssh_ssl.server_organization);
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
 
     fprintf(out, "\n");
@@ -1015,7 +1016,6 @@ void freeIpTree(addr_node *root) {
   freeIpTree(root->left);
   freeIpTree(root->right);
   free(root);
-  root = NULL;
 }
 
 /* *********************************************** */
@@ -1459,7 +1459,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				 ndpi_pref_http_dont_dissect_response, 0);
   ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				 ndpi_pref_dns_dissect_response, 0);
+				 ndpi_pref_dns_dont_dissect_response, 0);
   ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				 ndpi_pref_enable_category_substring_match, 1);
 
@@ -1505,7 +1505,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	  if(category) {
 	    int fields[4];
 
-	    // printf("Loading %s\t%s\n", name, category);
+
+	    if(verbose) printf("[Category] Loading %s\t%s\n", name, category);
 
 	    if(sscanf(name, "%d.%d.%d.%d", &fields[0], &fields[1], &fields[2], &fields[3]) == 4)
 	      ndpi_load_ip_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
@@ -1955,7 +1956,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
     printf("\tSetup Time:              %lu msec\n", (unsigned long)(setup_time_usec/1000));
     printf("\tPacket Processing Time:  %lu msec\n", (unsigned long)(processing_time_usec/1000));
-    
+
     if(!json_flag) {
       printf("\nTraffic statistics:\n");
       printf("\tEthernet bytes:        %-13llu (includes ethernet CRC/IFC/trailer)\n",
@@ -1991,10 +1992,10 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)processing_time_usec;
 	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)processing_time_usec;
 	float traffic_duration;
-	
+
 	if(live_capture) traffic_duration = processing_time_usec;
 	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
-	
+
 	printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
 	b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)traffic_duration;
@@ -2004,7 +2005,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime(&pcap_end.tv_sec));
 	printf("\tAnalysis end:          %s\n", when);
 	printf("\tTraffic throughput:    %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
-	printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);	
+	printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);
       }
 
       if(enable_protocol_guess)
@@ -2489,7 +2490,6 @@ static void ndpi_process_packet(u_char *args,
   if(memcmp(packet, packet_checked, header->caplen) != 0)
     printf("INTERNAL ERROR: ingress packet was modified by nDPI: this should not happen [thread_id=%u, packetId=%lu, caplen=%u]\n",
 	   thread_id, (unsigned long)ndpi_thread_info[thread_id].workflow->stats.raw_packet_count, header->caplen);
-  free(packet_checked);
 
   if((pcap_end.tv_sec-pcap_start.tv_sec) > pcap_analysis_duration) {
     int i;
@@ -2498,7 +2498,7 @@ static void ndpi_process_packet(u_char *args,
     gettimeofday(&end, NULL);
     processing_time_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
     setup_time_usec = begin.tv_sec*1000000 + begin.tv_usec - (startup_time.tv_sec*1000000 + startup_time.tv_usec);
-    
+
     printResults(processing_time_usec, setup_time_usec);
 
     for(i=0; i<ndpi_thread_info[thread_id].workflow->prefs.num_roots; i++) {
@@ -2514,6 +2514,12 @@ static void ndpi_process_packet(u_char *args,
     memcpy(&begin, &end, sizeof(begin));
     memcpy(&pcap_start, &pcap_end, sizeof(pcap_start));
   }
+
+  /*
+     Leave the free as last statement to avoid crashes when ndpi_detection_giveup()
+     is called above by printResults()
+  */
+  free(packet_checked);
 }
 
 
@@ -2535,7 +2541,7 @@ void * processing_thread(void *_thread_id) {
 #if defined(linux) && defined(HAVE_PTHREAD_SETAFFINITY_NP)
   if(core_affinity[thread_id] >= 0) {
     cpu_set_t cpuset;
-    
+
     CPU_ZERO(&cpuset);
     CPU_SET(core_affinity[thread_id], &cpuset);
 
@@ -2553,7 +2559,7 @@ void * processing_thread(void *_thread_id) {
     struct rte_mbuf *bufs[BURST_SIZE];
     u_int16_t num = rte_eth_rx_burst(dpdk_port_id, 0, bufs, BURST_SIZE);
     u_int i;
-    
+
     if(num == 0) {
       usleep(1);
       continue;
@@ -2901,7 +2907,7 @@ float getAverage(struct json_object *jObj_stat, char *field){
   float average;
   float sum = 0;
   int r;
-  int j;
+  int j = 0;
 
   if((r = strcmp(field, "top.scanner.stats")) == 0) {
     for(j=0; j<json_object_array_length(jObj_stat); j++) {
@@ -3267,8 +3273,8 @@ int orginal_main(int argc, char **argv) {
 #else
   int main(int argc, char **argv) {
 #endif
-    int i;    
-    
+    int i;
+
     if(ndpi_get_api_version() != NDPI_API_VERSION) {
       printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
       return(-1);
@@ -3278,7 +3284,7 @@ int orginal_main(int argc, char **argv) {
 
     gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module();
-	   
+
     if(ndpi_info_mod == NULL) return -1;
 
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));

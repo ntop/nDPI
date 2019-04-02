@@ -566,6 +566,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
       snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.server_certificate);
+      snprintf(flow->ssh_ssl.server_organization, sizeof(flow->ssh_ssl.server_organization), "%s",
+	       flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);
     }
   }
 
@@ -1044,7 +1046,7 @@ iph_check:
 static uint32_t crc32_for_byte(uint32_t r) {
   int j;
   for(j = 0; j < 8; ++j)
-    r = (r & 1? 0: (uint32_t)0xEDB88320L) ^ r >> 1;
+    r = ((r & 1) ? 0 : (uint32_t)0xEDB88320L) ^ r >> 1;
   return r ^ (uint32_t)0xFF000000L;
 }
 

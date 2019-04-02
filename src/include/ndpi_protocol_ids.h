@@ -78,14 +78,14 @@ typedef enum {
   NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */  
   NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
   NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) - Darryl Sokoloski <darryl@egloo.ca> */
-  
-  NDPI_PROTOCOL_FREE_44               = 44, /* Free */
+  NDPI_PROTOCOL_MODBUS                = 44, /* Modbus */
+
   NDPI_PROTOCOL_FREE_45               = 45, /* Free */
   NDPI_PROTOCOL_FREE_46               = 46, /* Free */
   
   NDPI_PROTOCOL_XBOX                  = 47,
   NDPI_PROTOCOL_QQ                    = 48,
-  NDPI_PROTOCOL_FREE_49               = 49, /* Free */
+  NDPI_PROTOCOL_TIKTOK                = 49,
   NDPI_PROTOCOL_RTSP                  = 50,
   NDPI_PROTOCOL_MAIL_IMAPS            = 51,
   NDPI_PROTOCOL_ICECAST               = 52,
@@ -242,7 +242,7 @@ typedef enum {
   NDPI_PROTOCOL_GITHUB                = 203,
   NDPI_PROTOCOL_BJNP                  = 204,
   NDPI_PROTOCOL_FREE_205              = 205, /* Free */
-  NDPI_PROTOCOL_VIDTO                 = 206,
+  NDPI_PROTOCOL_FREE_206              = 206, /* Free */
   NDPI_PROTOCOL_SMPP                  = 207, /* Damir Franusic <df@release14.org> */
   NDPI_PROTOCOL_DNSCRYPT              = 208,
   NDPI_PROTOCOL_TINC                  = 209, /* William Guglielmo <william@deselmo.com> */
