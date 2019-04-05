@@ -4731,7 +4731,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_struct, flow);
 
     if(ndpi_struct->custom_categories.categories_loaded && flow->packet.iph) {
-      ndpi_protocol ret;
+      ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
       
       ndpi_fill_ip_protocol_category(ndpi_struct, flow->packet.iph->saddr, flow->packet.iph->daddr, &ret);
       flow->guessed_header_category = ret.category;
