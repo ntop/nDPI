@@ -1,4 +1,5 @@
 CC=@CC@
+CXX=@CXX@
 CFLAGS=-g -I../src/include @CFLAGS@
 LIBNDPI=../src/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread @LDFLAGS@

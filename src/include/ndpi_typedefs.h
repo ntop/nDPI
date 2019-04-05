@@ -356,15 +356,15 @@ PACK_ON struct tinc_cache_entry {
 } PACK_OFF;
 
 typedef enum {
-	      HTTP_METHOD_UNKNOWN = 0,
-	      HTTP_METHOD_OPTIONS,
-	      HTTP_METHOD_GET,
-	      HTTP_METHOD_HEAD,
-	      HTTP_METHOD_POST,
-	      HTTP_METHOD_PUT,
-	      HTTP_METHOD_DELETE,
-	      HTTP_METHOD_TRACE,
-	      HTTP_METHOD_CONNECT
+	      NDPI_HTTP_METHOD_UNKNOWN = 0,
+	      NDPI_HTTP_METHOD_OPTIONS,
+	      NDPI_HTTP_METHOD_GET,
+	      NDPI_HTTP_METHOD_HEAD,
+	      NDPI_HTTP_METHOD_POST,
+	      NDPI_HTTP_METHOD_PUT,
+	      NDPI_HTTP_METHOD_DELETE,
+	      NDPI_HTTP_METHOD_TRACE,
+	      NDPI_HTTP_METHOD_CONNECT
 } ndpi_http_method;
 
 struct ndpi_lru_cache {
@@ -541,7 +541,10 @@ struct ndpi_flow_tcp_struct {
   u_int32_t telnet_stage:2;			// 0 - 2
 
   /* NDPI_PROTOCOL_SSL */
-  u_int8_t ssl_seen_client_cert:1, ssl_seen_server_cert:1, ssl_stage:2; // 0 - 5
+  u_int8_t ssl_seen_client_cert:1,
+    ssl_seen_server_cert:1,
+    ssl_seen_certificate:1,
+    ssl_stage:2; // 0 - 5
 
   /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
@@ -1024,7 +1027,7 @@ struct ndpi_flow_struct {
   u_int16_t protocol_stack_info;
 
   /* init parameter, internal used to set up timestamp,... */
-  u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category;
+  u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
   u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
 
   /*
@@ -1076,6 +1079,7 @@ struct ndpi_flow_struct {
     struct {
       u_int8_t num_queries, num_answers, reply_code;
       u_int16_t query_type, query_class, rsp_type;
+      ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet */
     } dns;
 
     struct {
@@ -1085,7 +1089,7 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
-	char client_certificate[64], server_certificate[64];
+	char client_certificate[64], server_certificate[64], server_organization[64];
       } ssl;
       
       struct {

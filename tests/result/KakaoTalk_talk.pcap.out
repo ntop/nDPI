@@ -1,8 +1,7 @@
 HTTP	5	280	1
 QQ	15	1727	1
-SSL_No_Cert	45	10108	1
 RTP	2991	398751	2
-SSL	5	1198	1
+SSL	50	11306	2
 Facebook	34	4401	4
 Google	4	359	4
 HTTP_Proxy	16	1838	2
@@ -13,7 +12,7 @@ KakaoTalk_Voice	44	6196	2
 	1	UDP 10.24.82.188:11320 <-> 1.201.1.174:23044 [proto: 87/RTP][cat: Media/1][757 pkts/106335 bytes <-> 746 pkts/93906 bytes]
 	2	UDP 10.24.82.188:10268 <-> 1.201.1.174:23046 [proto: 87/RTP][cat: Media/1][746 pkts/93906 bytes <-> 742 pkts/104604 bytes]
 	3	TCP 10.24.82.188:58857 <-> 110.76.143.50:9001 [proto: 163/Tor][cat: VPN/2][22 pkts/5326 bytes <-> 18 pkts/5212 bytes]
-	4	TCP 10.24.82.188:32968 <-> 110.76.143.50:8080 [proto: 64/SSL_No_Cert][cat: Web/5][23 pkts/4380 bytes <-> 22 pkts/5728 bytes]
+	4	TCP 10.24.82.188:32968 <-> 110.76.143.50:8080 [proto: 91/SSL][cat: Web/5][23 pkts/4380 bytes <-> 22 pkts/5728 bytes][server: Kakao.com]
 	5	TCP 10.24.82.188:59954 <-> 173.252.88.128:443 [proto: 64.119/SSL_No_Cert.Facebook][cat: SocialNetwork/6][15 pkts/2932 bytes <-> 14 pkts/1092 bytes]
 	6	UDP 10.24.82.188:10269 <-> 1.201.1.174:23047 [proto: 194/KakaoTalk_Voice][cat: VoIP/10][12 pkts/1692 bytes <-> 10 pkts/1420 bytes]
 	7	UDP 10.24.82.188:11321 <-> 1.201.1.174:23045 [proto: 194/KakaoTalk_Voice][cat: VoIP/10][11 pkts/1542 bytes <-> 11 pkts/1542 bytes]

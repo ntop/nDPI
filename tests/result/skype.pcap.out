@@ -135,7 +135,7 @@ ApplePush	12	1877	1
 	118	UDP 192.168.1.34:54396 -> 192.168.1.1:53 [proto: 5.125/DNS.Skype][cat: VoIP/10][7 pkts/511 bytes -> 0 pkts/0 bytes][Host: api.skype.com]
 	119	UDP 192.168.1.34:65426 -> 192.168.1.1:53 [proto: 5.125/DNS.Skype][cat: VoIP/10][7 pkts/511 bytes -> 0 pkts/0 bytes][Host: api.skype.com]
 	120	TCP 192.168.1.34:50109 <-> 91.190.216.125:12350 [proto: 125/Skype][cat: VoIP/10][3 pkts/297 bytes <-> 3 pkts/186 bytes]
-	121	UDP 192.168.1.92:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][cat: Streaming/17][5 pkts/430 bytes -> 0 pkts/0 bytes]
+	121	UDP 192.168.1.92:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][cat: Music/25][5 pkts/430 bytes -> 0 pkts/0 bytes]
 	122	TCP 192.168.1.34:50110 <-> 91.190.216.125:12350 [proto: 125/Skype][cat: VoIP/10][3 pkts/191 bytes <-> 3 pkts/186 bytes]
 	123	UDP 192.168.1.34:55893 -> 192.168.1.1:53 [proto: 5.125/DNS.Skype][cat: VoIP/10][5 pkts/360 bytes -> 0 pkts/0 bytes][Host: ui.skype.com]
 	124	UDP 192.168.1.34:49485 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][2 pkts/349 bytes -> 0 pkts/0 bytes]

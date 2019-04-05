@@ -1,8 +1,8 @@
+HTTP	2	1469	1
 QQ	12	4781	5
 Facebook	6	1740	3
 Google	2	378	1
 GenericProtocol	133	96179	11
-Amazon	2	1469	1
 
 	1	TCP 10.54.169.250:52009 <-> 120.28.35.40:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][35 pkts/17902 bytes <-> 30 pkts/28000 bytes][Host: vod-singtelhawk.quickplay.com]
 	2	TCP 10.54.169.250:52019 <-> 120.28.35.40:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][14 pkts/7028 bytes <-> 11 pkts/12578 bytes][Host: vod-singtelhawk.quickplay.com]
@@ -14,7 +14,7 @@ Amazon	2	1469	1
 	8	TCP 10.54.169.250:52021 <-> 120.28.35.40:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][3 pkts/1506 bytes <-> 1 pkts/1248 bytes][Host: vod-singtelhawk.quickplay.com]
 	9	TCP 10.54.169.250:52007 <-> 120.28.35.40:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][3 pkts/1583 bytes <-> 1 pkts/1152 bytes][Host: vod-singtelhawk.quickplay.com]
 	10	TCP 10.54.169.250:44256 <-> 120.28.5.41:80 [proto: 7.137/HTTP.GenericProtocol][cat: Streaming/17][2 pkts/1086 bytes <-> 1 pkts/1225 bytes][Host: play-singtelhawk.quickplay.com]
-	11	TCP 10.54.169.250:56381 <-> 54.179.140.65:80 [proto: 7.178/HTTP.Amazon][cat: Web/5][1 pkts/638 bytes <-> 1 pkts/831 bytes][Host: api.account.xiaomi.com]
+	11	TCP 10.54.169.250:56381 <-> 54.179.140.65:80 [proto: 7.7/HTTP][cat: Web/5][1 pkts/638 bytes <-> 1 pkts/831 bytes][Host: api.account.xiaomi.com]
 	12	TCP 10.54.169.250:54883 <-> 203.205.151.160:80 [proto: 7.48/HTTP.QQ][cat: Chat/9][2 pkts/1192 bytes <-> 1 pkts/145 bytes][Host: hkextshort.weixin.qq.com]
 	13	TCP 10.54.169.250:54885 <-> 203.205.151.160:80 [proto: 7.48/HTTP.QQ][cat: Chat/9][1 pkts/461 bytes <-> 2 pkts/522 bytes][Host: hkextshort.weixin.qq.com]
 	14	TCP 10.54.169.250:35670 <-> 203.205.147.215:80 [proto: 7.48/HTTP.QQ][cat: Chat/9][1 pkts/681 bytes <-> 1 pkts/262 bytes][Host: hkminorshort.weixin.qq.com]

@@ -22,6 +22,10 @@
  *
  */
 
+#if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
+#include <sys/endian.h>
+#endif
+
 #include "ndpi_protocol_ids.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_QUIC
