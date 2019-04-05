@@ -62,9 +62,11 @@ static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *nd
 	;
       } else
 	return 0;
+
+    return 1;
   }
 
-  return 1;
+  return 0;
 }
 
 static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {

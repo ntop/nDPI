@@ -204,8 +204,7 @@ void cb_data(bt_parse_data_cb_t *cbd,int *ret) {
   if(cbd->t == 0)  return;
 
   if(cbd->t == 1) {
-
-    DEBUG_TRACE(printf("%s %lld\n",cbd->buf,cbd->v.i));
+    DEBUG_TRACE(printf("%s %lld\n",cbd->buf, (long long)cbd->v.i));
 
     if(STREQ(cbd->buf,"a.port")) {
       p->a.port = (u_int16_t)(cbd->v.i & 0xffff);
@@ -234,7 +233,7 @@ void cb_data(bt_parse_data_cb_t *cbd,int *ret) {
       p->h_mint = 1;
       return;
     }
-    DEBUG_TRACE(printf("UNKNOWN %s %lld\n",cbd->buf,cbd->v.i));
+    DEBUG_TRACE(printf("UNKNOWN %s %lld\n",cbd->buf, (long long)cbd->v.i));
     return;
   }
   if(cbd->t != 2) {

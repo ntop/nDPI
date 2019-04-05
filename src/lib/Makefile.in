@@ -58,6 +58,9 @@ clean:
 distclean: clean
 	/bin/rm -f Makefile
 
+cppcheck:
+	cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I ../include *.c protocols/*.c
+
 install: $(NDPI_LIBS)
 	mkdir -p $(DESTDIR)$(libdir)
 	cp $(NDPI_LIBS) $(DESTDIR)$(libdir)/

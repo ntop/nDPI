@@ -318,7 +318,6 @@ static void ndpi_search_directconnect_udp(struct ndpi_detection_module_struct
   struct ndpi_id_struct *dst = flow->dst;
   int pos, count = 0;
 
-
   if (dst != NULL && dst->detected_directconnect_udp_port == packet->udp->dest) {
     if ((u_int32_t)
 	(packet->tick_timestamp -

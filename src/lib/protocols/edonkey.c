@@ -177,7 +177,6 @@ static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct,
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
       flow->edonkey_stage = packet->packet_direction + 1;
     }
-
   } else {
     NDPI_LOG_DBG2(ndpi_struct, "EDONKEY stage %u: \n", flow->edonkey_stage);
 
@@ -187,7 +186,7 @@ static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     /* This is a packet in another direction. Check if we find the proper response. */
-    if((payload_len == 0) || (ndpi_edonkey_payload_check(packet->payload, payload_len))) {
+    if(ndpi_edonkey_payload_check(packet->payload, payload_len)) {
       NDPI_LOG_INFO(ndpi_struct, "found EDONKEY\n");
       ndpi_int_edonkey_add_connection(ndpi_struct, flow);
     } else {

@@ -64,6 +64,8 @@ void ndpi_search_icecast_tcp(struct ndpi_detection_module_struct *ndpi_struct, s
     goto icecast_exclude;
   }
 
+  if(flow == NULL) return;
+    
   if((packet->packet_direction == flow->setup_packet_direction)
       && (flow->packet_counter < 10)) {
     return;

@@ -68,7 +68,6 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
-
   u_int16_t c;
 
   NDPI_LOG_DBG(ndpi_struct, "search GNUTELLA\n");

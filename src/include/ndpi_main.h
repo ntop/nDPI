@@ -124,7 +124,7 @@ extern "C" {
 					  u_int8_t proto, u_int16_t sport, u_int16_t dport,
 					  u_int8_t *user_defined_proto);
 
-  extern u_int8_t ndpi_is_proto(ndpi_protocol p, u_int16_t proto);
+  extern u_int8_t ndpi_is_proto(ndpi_protocol proto, u_int16_t p);
 
   extern u_int16_t ndpi_get_lower_proto(ndpi_protocol p);
   extern int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct *ndpi_struct,

@@ -541,7 +541,7 @@ ndpi_port_range * ndpi_build_default_ports_range(ndpi_port_range *ports,
   ports[i].port_low = portB_low, ports[i].port_high = portB_high; i++;
   ports[i].port_low = portC_low, ports[i].port_high = portC_high; i++;
   ports[i].port_low = portD_low, ports[i].port_high = portD_high; i++;
-  ports[i].port_low = portE_low, ports[i].port_high = portE_high; i++;
+  ports[i].port_low = portE_low, ports[i].port_high = portE_high;
 
   return(ports);
 }
@@ -560,7 +560,7 @@ ndpi_port_range * ndpi_build_default_ports(ndpi_port_range *ports,
   ports[i].port_low = portB, ports[i].port_high = portB; i++;
   ports[i].port_low = portC, ports[i].port_high = portC; i++;
   ports[i].port_low = portD, ports[i].port_high = portD; i++;
-  ports[i].port_low = portE, ports[i].port_high = portE; i++;
+  ports[i].port_low = portE, ports[i].port_high = portE;
 
   return(ports);
 }
@@ -714,8 +714,7 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_mod,
 			   ndpi_proto_defaults_t *def,
 			   u_int8_t customUserProto,
 			   ndpi_default_ports_tree_node_t **root,
-			   const char *_func, int _line)
-{
+			   const char *_func, int _line) {
   ndpi_default_ports_tree_node_t *ret;
   u_int16_t port;
 
@@ -851,7 +850,6 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
 			      ndpi_protocol_match *match) {
   u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO };
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
-  static u_int16_t generic_id = NDPI_LAST_IMPLEMENTED_PROTOCOL;
   
   if(ndpi_mod->proto_defaults[match->protocol_id].protoName == NULL) {
     if(match->protocol_id == NDPI_PROTOCOL_GENERIC)
@@ -2170,16 +2168,6 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
 
 /* ******************************************* */
 
-/* u_int16_t ndpi_host_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t host /\* network byte order *\/) { */
-/*   struct in_addr pin; */
-
-/*   pin.s_addr = host; */
-
-/*   return(ndpi_network_ptree_match(ndpi_struct, &pin)); */
-/* } */
-
-/* ******************************************* */
-
 #if 0
 static u_int8_t tor_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin) {
   return((ndpi_network_ptree_match(ndpi_struct, pin) == NDPI_PROTOCOL_TOR) ? 1 : 0);
@@ -2376,7 +2364,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
   for(i=0; i<NUM_CUSTOM_CATEGORIES; i++)
     snprintf(ndpi_str->custom_category_labels[i],
-	     CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u", i+1);
+	     CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u", (unsigned int)(i+1));
 
   return ndpi_str;
 }
@@ -2694,8 +2682,8 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struc
 				 struct ndpi_flow_struct *flow,
 				 u_int8_t proto, u_int16_t sport, u_int16_t dport,
 				 u_int8_t *user_defined_proto) {
-
   *user_defined_proto = 0; /* Default */
+  
   if(sport && dport) {
     ndpi_default_ports_tree_node_t *found = ndpi_get_guessed_protocol_id(ndpi_struct, proto, sport, dport);
 
@@ -3019,8 +3007,7 @@ void ndpi_set_bitmask_protocol_detection(char * label,
 /* ******************************************************************** */
 
 void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
-					  const NDPI_PROTOCOL_BITMASK * dbm)
-{
+					  const NDPI_PROTOCOL_BITMASK * dbm) {
   NDPI_PROTOCOL_BITMASK detection_bitmask_local;
   NDPI_PROTOCOL_BITMASK *detection_bitmask = &detection_bitmask_local;
   u_int32_t a = 0;
@@ -3858,8 +3845,6 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
   const struct ndpi_tcphdr *tcph = packet->tcp;
   const struct ndpi_udphdr *udph = flow->packet.udp;
 
-  u_int8_t proxy_enabled = 0;
-
   packet->tcp_retransmission = 0, packet->packet_direction = 0;
 
   if(ndpi_struct->direction_detect_disable) {
@@ -3904,7 +3889,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
       flow->l4.tcp.seen_ack = 1;
     }
     if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0)
-       || (proxy_enabled && (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0))) {
+       || (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0)) {
       /* initialize tcp sequence counters */
       /* the ack flag needs to be set to get valid sequence numbers from the other
        * direction. Usually it will catch the second packet syn+ack but it works
@@ -3916,9 +3901,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
       if(tcph->ack != 0) {
 	flow->next_tcp_seq_nr[flow->packet.packet_direction] =
 	  ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
-	if(!proxy_enabled) {
-	  flow->next_tcp_seq_nr[1 -flow->packet.packet_direction] = ntohl(tcph->ack_seq);
-	}
+	
+	flow->next_tcp_seq_nr[1 -flow->packet.packet_direction] = ntohl(tcph->ack_seq);
       }
     } else if(packet->payload_packet_len > 0) {
       /* check tcp sequence counters */
@@ -4209,6 +4193,20 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	   && (flow->protos.stun_ssl.stun.num_processed_pkts > 0))
 	  guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
+
+	if(flow->host_server_name[0] != '\0') {
+	  ndpi_protocol_match_result ret_match;
+	  
+	  ndpi_match_host_subprotocol(ndpi_struct, flow,
+				      (char *)flow->host_server_name,
+				      strlen((const char*)flow->host_server_name),
+				      &ret_match,
+				      NDPI_PROTOCOL_DNS);
+	  
+	  if(ret_match.protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	    guessed_host_protocol_id = ret_match.protocol_id;
+	}
+	
 	ndpi_int_change_protocol(ndpi_struct, flow,
 				 guessed_host_protocol_id,
 				 guessed_protocol_id);
@@ -4363,17 +4361,7 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct
       struct hs_list *h = (struct hs_list*)malloc(sizeof(struct hs_list));
 
       if(h) {
-	char tmp[256];
 	int i, j;
-
-	for(i=0, j=0; (j<sizeof(tmp)) && (name[i] != '\0'); i++) {
-	  if(name[i] == '.')
-	    tmp[j++] = '\\';
-
-	  tmp[j++] = name[i];
-	}
-
-	tmp[j] = '\0';
 
 	h->expression = ndpi_strdup(name), h->id = (unsigned int)category;
 	if(h->expression == NULL) {
@@ -4437,7 +4425,8 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
       ndpi_str->custom_categories.hostnames = (struct hs*)malloc(sizeof(struct hs));
 
       if(ndpi_str->custom_categories.hostnames == NULL) {
-	free(expressions), free(ids);
+	free(expressions);
+	free(ids);
 	return(-1); /* Failed */
       }
 
@@ -4493,30 +4482,30 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 /* ********************************************************************************* */
 
 int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
-				 u_int32_t saddr,
-				 u_int32_t daddr,
-				 ndpi_protocol *ret) {
+				   u_int32_t saddr,
+				   u_int32_t daddr,
+				   ndpi_protocol *ret) {
   if(ndpi_struct->custom_categories.categories_loaded) {
-      prefix_t prefix;
-      patricia_node_t *node;
-
-      /* Make sure all in network byte order otherwise compares wont work */
-      fill_prefix_v4(&prefix, (struct in_addr *)&saddr,
+    prefix_t prefix;
+    patricia_node_t *node;
+    
+    /* Make sure all in network byte order otherwise compares wont work */
+    fill_prefix_v4(&prefix, (struct in_addr *)&saddr,
+		   32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
+    node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
+    
+    if(!node) {
+      fill_prefix_v4(&prefix, (struct in_addr *)&daddr,
 		     32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
       node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
-
-      if(!node) {
-	fill_prefix_v4(&prefix, (struct in_addr *)&daddr,
-		       32, ((patricia_tree_t*)ndpi_struct->protocols_ptree)->maxbits);
-	node = ndpi_patricia_search_best(ndpi_struct->custom_categories.ipAddresses, &prefix);
-      }
-
-      if(node) {
-	ret->category = (ndpi_protocol_category_t)node->value.user_value;
-	return 1;
-      }
+    }
+    
+    if(node) {
+      ret->category = (ndpi_protocol_category_t)node->value.user_value;
+      return 1;
+    }
   }
-
+  
   ret->category = ndpi_get_proto_category(ndpi_struct, *ret);
   return 0;
 }
@@ -4717,10 +4706,14 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(a != NDPI_PROTOCOL_UNKNOWN) {
     int i;
 
-    for(i=0; (i<sizeof(flow->host_server_name)) && (flow->host_server_name[i] != '\0'); i++)
-      flow->host_server_name[i] = tolower(flow->host_server_name[i]);
-
-    flow->host_server_name[i] ='\0';
+    for(i=0; i<sizeof(flow->host_server_name); i++) {
+      if(flow->host_server_name[i] != '\0')
+	flow->host_server_name[i] = tolower(flow->host_server_name[i]);
+      else {      
+	flow->host_server_name[i] ='\0';
+	break;
+      }
+    }
   }
 
  ret_protocols:
@@ -5611,8 +5604,8 @@ char *ndpi_get_packet_dst_ip_string(struct ndpi_detection_module_struct *ndpi_st
 /* ****************************************************** */
 
 u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str,
-					  u_int16_t max_chars_to_read, u_int16_t * bytes_read)
-{
+					  u_int16_t max_chars_to_read,
+					  u_int16_t * bytes_read) {
   u_int16_t val = ndpi_bytestream_to_number(str, max_chars_to_read, bytes_read);
   return ntohs(val);
 }
@@ -6027,7 +6020,7 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 						u_int16_t master_protocol_id,
 						ndpi_protocol_match_result *ret_match,
 						u_int8_t is_host_match) {
-  int matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
+  int matching_protocol_id;
   struct ndpi_packet_struct *packet = &flow->packet;
 
 #ifndef HAVE_HYPERSCAN
@@ -6038,6 +6031,8 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
 #else
   struct hs *hs = (struct hs*)ndpi_struct->hyperscan;
   hs_error_t status;
+
+  matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   /*
     TODO HYPERSCAN
     In case of match fill up ret_match and set flow protocol + category
