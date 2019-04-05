@@ -2837,7 +2837,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
 			      ndpi_mod->ndpi_num_supported_protocols,
 			      0 /* can_have_a_subprotocol */, no_master,
 			      no_master,
-			      ndpi_strdup(proto),
+			      proto,
 			      NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, /* TODO add protocol category support in rules */
 			      ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			      ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
