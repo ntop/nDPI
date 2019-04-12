@@ -2889,7 +2889,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
   udp:139@NETBIOS
 
 */
-int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char* path) {
+int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, const char* path) {
   FILE *fd;
   char *buffer, *old_buffer;
   int chunk_len = 512, buffer_len = chunk_len, old_buffer_len;
