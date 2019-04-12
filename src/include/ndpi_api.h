@@ -612,7 +612,7 @@ extern "C" {
    *
    */
   int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod,
-			       char* path);
+			       const char* path);
 
   /**
    * Get the total number of the supported protocols
