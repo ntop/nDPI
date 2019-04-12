@@ -1,0 +1,10 @@
+Unknown	1115	1122198	1
+FTP_CONTROL	68	5571	1
+FTP_DATA	9	1819	1
+
+	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes]
+	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][cat: Download-FileTransfer-FileSharing/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes]
+
+
+Undetected flows:
+	1	TCP 192.168.1.212:50696 <-> 90.130.70.73:24523 [proto: 0/Unknown][380 pkts/25104 bytes <-> 735 pkts/1097094 bytes]
