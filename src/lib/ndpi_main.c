@@ -4589,7 +4589,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
 				 ndpi_protocol *ret) {
   if(ndpi_struct->custom_categories.categories_loaded) {
     if(flow->guessed_header_category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) {
-      flow->category = flow->guessed_header_category;
+      flow->category = ret->category = flow->guessed_header_category;
       return;
     }  
 
