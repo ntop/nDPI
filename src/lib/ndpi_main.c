@@ -4649,7 +4649,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(packetlen < 20) {
     /* reset protocol which is normally done in init_packet_header */
     ndpi_int_reset_packet_protocol(&flow->packet);
-    return(ret);
+    goto invalidate_ptr;
   }
 
   flow->packet.tick_timestamp_l = current_tick_l;
@@ -4660,7 +4660,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   /* we are interested in ipv4 packet */
 
   if(ndpi_init_packet_header(ndpi_struct, flow, packetlen) != 0)
-    return(ret);
+    goto invalidate_ptr;  
 
   /* detect traffic for tcp or udp only */
   flow->src = src, flow->dst = dst;
@@ -4733,7 +4733,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN,
 	ret.app_protocol = flow->guessed_protocol_id ? flow->guessed_protocol_id : flow->guessed_host_protocol_id;
       ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
-      return(ret);
+      goto invalidate_ptr;
     }
 
     if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
@@ -4744,7 +4744,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	}
 
 	ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
-	return(ret);
+	goto invalidate_ptr;
       }
     } else {
       /* guess host protocol */
@@ -4774,8 +4774,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     ndpi_check_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
     ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
-
-    return(ret);
+    goto invalidate_ptr;    
   }
 
   ndpi_check_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
@@ -4825,6 +4824,13 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret = ndpi_detection_giveup(ndpi_struct, flow, 0);
   }
 
+ invalidate_ptr:
+  /*     
+     Invalidate packet memory to avoid accessing the pointers below
+     when the packet is no longer accessible
+  */
+  flow->packet.iph = NULL, flow->packet.tcp = NULL, flow->packet.udp = NULL;
+  
   return(ret);
 }
 
