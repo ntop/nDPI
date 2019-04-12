@@ -1521,6 +1521,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       ndpi_enable_loaded_categories(ndpi_thread_info[thread_id].workflow->ndpi_struct);
     } else
       printf("ERROR: Unable to read file %s\n", _customCategoryFilePath);
+
+    fclose(fd);
   }
 }
 
