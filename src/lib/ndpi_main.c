@@ -2898,14 +2898,14 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char
   fd = fopen(path, "r");
 
   if(fd == NULL) {
-    NDPI_LOG_ERR(ndpi_mod, "Unable to open file %s [%s]", path, strerror(errno));
+    NDPI_LOG_ERR(ndpi_mod, "Unable to open file %s [%s]\n", path, strerror(errno));
     goto error;
   }
 
   buffer = ndpi_malloc(buffer_len);
 
   if(buffer == NULL) {
-    NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure");
+    NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure\n");
     goto close_fd;
   }
 
@@ -2922,7 +2922,7 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, char
       buffer = ndpi_realloc(old_buffer, old_buffer_len, buffer_len);
 
       if(buffer == NULL) {
-        NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure");
+        NDPI_LOG_ERR(ndpi_mod, "Memory allocation failure\n");
         free(old_buffer);
         goto close_fd;
       }
