@@ -190,11 +190,11 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 		flow->protos.dns.rsp_type = rsp_type;
 
 		/* here x points to the response "class" field */
-		if((x+12) < flow->packet.payload_packet_len) {
+		if((x+12) <= flow->packet.payload_packet_len) {
 		  x += 6;
 		  data_len = get16(&x, flow->packet.payload);
 
-		  if(((x + data_len) < flow->packet.payload_packet_len)
+		  if(((x + data_len) <= flow->packet.payload_packet_len)
 		    && (((rsp_type == 0x1) && (data_len == 4)) /* A */
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
 		       || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
