@@ -998,6 +998,7 @@ static void free_hyperscan_memory(struct hs *h) {
   if(h) {
     hs_free_scratch(h->scratch);
     hs_free_database(h->database);
+    free(h);
   }
 }
 
