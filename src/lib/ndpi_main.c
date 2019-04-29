@@ -2884,6 +2884,12 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
   Format:
   <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto>
 
+  Subprotocols Format:
+  host:"<value>",host:"<value>",.....@<subproto>
+
+  IP based Subprotocols Format (<value> is IP or CIDR):
+  ip:<value>,ip:<value>,.....@<subproto>
+
   Example:
   tcp:80,tcp:3128@HTTP
   udp:139@NETBIOS
