@@ -58,13 +58,16 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 	
   NDPI_LOG_DBG(ndpi_struct, "search mail_smtp\n");
 
-  if (packet->payload_packet_len > 2 && ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a) {
+  if((packet->payload_packet_len > 2)
+      && (packet->parsed_lines <  NDPI_MAX_PARSE_LINES_PER_PACKET)
+      && (ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a)
+      ) {
     u_int8_t a;
     u_int8_t bit_count = 0;
 
     NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow,packet);
-    for (a = 0; a < packet->parsed_lines; a++) {
 
+    for (a = 0; a < packet->parsed_lines; a++) {
       // expected server responses
       if (packet->line[a].len >= 3) {
 	if (memcmp(packet->line[a].ptr, "220", 3) == 0) {

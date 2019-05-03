@@ -5036,7 +5036,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
 
-  for(a = 0; a < packet->payload_packet_len; a++) {
+  for(a = 0; (a < packet->payload_packet_len)
+	&& (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
     if((a + 1) == packet->payload_packet_len)
       return; /* Return if only one byte remains (prevent invalid reads past end-of-buffer) */
 
