@@ -423,7 +423,8 @@ static const char* categories[] = {
   "Malware",
   "Advertisement",
   "Banned_Site",
-  "Site_Unavailable"
+  "Site_Unavailable",
+  "Allowed_Site",
 };
 
 /* ****************************************** */
