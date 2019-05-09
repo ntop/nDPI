@@ -279,6 +279,7 @@ typedef enum {
   NDPI_PROTOCOL_AMAZON_VIDEO          = 240,
   NDPI_PROTOCOL_GOOGLE_DOCS           = 241,
   NDPI_PROTOCOL_WHATSAPP_FILES        = 242, /* Videos, pictures, voice messages... */
+  NDPI_PROTOCOL_MOMO_CHAT             = 243, /* www.vizuamatix.com R&D team & M.Mallawaarachchie <manoj_ws@yahoo.com> */
   /*
     IMPORTANT
     before allocating a new identifier please fill up
