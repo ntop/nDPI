@@ -800,10 +800,14 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    flow->dst2src_packets, (long long unsigned int) flow->dst2src_bytes);
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
+    
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
 
-    if(flow->ssh_ssl.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_ssl.client_info);
+    
+    if(flow->ssh_ssl.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s]", flow->ssh_ssl.ja3_client);    
     if(flow->ssh_ssl.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_ssl.server_info);
+    
+    if(flow->ssh_ssl.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s]", flow->ssh_ssl.ja3_server);
     if(flow->ssh_ssl.server_organization[0] != '\0') fprintf(out, "[organization: %s]", flow->ssh_ssl.server_organization);
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
 
@@ -850,6 +854,15 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if((flow->ssh_ssl.client_info[0] != '\0') || (flow->ssh_ssl.server_info[0] != '\0')) {
       json_object *sjObj = json_object_new_object();
 
+      if(flow->ssh_ssl.ja3_server[0] != '\0')
+	json_object_object_add(jObj,"ja3s",json_object_new_string(flow->ssh_ssl.ja3_server));
+      
+      if(flow->ssh_ssl.ja3_client[0] != '\0')
+	json_object_object_add(jObj,"ja3c",json_object_new_string(flow->ssh_ssl.ja3_client));
+      
+      if(flow->ja3_server[0] != '\0')
+	json_object_object_add(jObj,"host.server.ja3",json_object_new_string(flow->ja3_server));
+      
       if(flow->ssh_ssl.client_info[0] != '\0')
 	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssh_ssl.client_info));
 

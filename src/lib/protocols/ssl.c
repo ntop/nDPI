@@ -27,13 +27,209 @@
 
 #include "ndpi_api.h"
 
-// #define CERTIFICATE_DEBUG 1
+/* #define CERTIFICATE_DEBUG 1 */
 
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
 /* Skype.c */
 extern u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow);
+
+/* **************************************** */
+
+typedef struct MD5Context {
+  uint32_t buf[4];
+  uint32_t bits[2];
+  unsigned char in[64];
+} MD5_CTX;
+
+static int is_big_endian(void) {
+  static const int n = 1;
+  return ((char *) &n)[0] == 0;
+}
+
+static void byteReverse(unsigned char *buf, unsigned longs) {
+  uint32_t t;
+
+  // Forrest: MD5 expect LITTLE_ENDIAN, swap if BIG_ENDIAN
+  if (is_big_endian()) {
+    do {
+      t = (uint32_t) ((unsigned) buf[3] << 8 | buf[2]) << 16 |
+	((unsigned) buf[1] << 8 | buf[0]);
+      * (uint32_t *) buf = t;
+      buf += 4;
+    } while (--longs);
+  }
+}
+
+#define F1(x, y, z) (z ^ (x & (y ^ z)))
+#define F2(x, y, z) F1(z, x, y)
+#define F3(x, y, z) (x ^ y ^ z)
+#define F4(x, y, z) (y ^ (x | ~z))
+
+#define MD5STEP(f, w, x, y, z, data, s)	\
+  ( w += f(x, y, z) + data,  w = w<<s | w>>(32-s),  w += x )
+
+// Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
+// initialization constants.
+static void MD5Init(MD5_CTX *ctx) {
+  ctx->buf[0] = 0x67452301;
+  ctx->buf[1] = 0xefcdab89;
+  ctx->buf[2] = 0x98badcfe;
+  ctx->buf[3] = 0x10325476;
+
+  ctx->bits[0] = 0;
+  ctx->bits[1] = 0;
+}
+
+static void MD5Transform(uint32_t buf[4], uint32_t const in[16]) {
+  uint32_t a, b, c, d;
+
+  a = buf[0];
+  b = buf[1];
+  c = buf[2];
+  d = buf[3];
+
+  MD5STEP(F1, a, b, c, d, in[0] + 0xd76aa478, 7);
+  MD5STEP(F1, d, a, b, c, in[1] + 0xe8c7b756, 12);
+  MD5STEP(F1, c, d, a, b, in[2] + 0x242070db, 17);
+  MD5STEP(F1, b, c, d, a, in[3] + 0xc1bdceee, 22);
+  MD5STEP(F1, a, b, c, d, in[4] + 0xf57c0faf, 7);
+  MD5STEP(F1, d, a, b, c, in[5] + 0x4787c62a, 12);
+  MD5STEP(F1, c, d, a, b, in[6] + 0xa8304613, 17);
+  MD5STEP(F1, b, c, d, a, in[7] + 0xfd469501, 22);
+  MD5STEP(F1, a, b, c, d, in[8] + 0x698098d8, 7);
+  MD5STEP(F1, d, a, b, c, in[9] + 0x8b44f7af, 12);
+  MD5STEP(F1, c, d, a, b, in[10] + 0xffff5bb1, 17);
+  MD5STEP(F1, b, c, d, a, in[11] + 0x895cd7be, 22);
+  MD5STEP(F1, a, b, c, d, in[12] + 0x6b901122, 7);
+  MD5STEP(F1, d, a, b, c, in[13] + 0xfd987193, 12);
+  MD5STEP(F1, c, d, a, b, in[14] + 0xa679438e, 17);
+  MD5STEP(F1, b, c, d, a, in[15] + 0x49b40821, 22);
+
+  MD5STEP(F2, a, b, c, d, in[1] + 0xf61e2562, 5);
+  MD5STEP(F2, d, a, b, c, in[6] + 0xc040b340, 9);
+  MD5STEP(F2, c, d, a, b, in[11] + 0x265e5a51, 14);
+  MD5STEP(F2, b, c, d, a, in[0] + 0xe9b6c7aa, 20);
+  MD5STEP(F2, a, b, c, d, in[5] + 0xd62f105d, 5);
+  MD5STEP(F2, d, a, b, c, in[10] + 0x02441453, 9);
+  MD5STEP(F2, c, d, a, b, in[15] + 0xd8a1e681, 14);
+  MD5STEP(F2, b, c, d, a, in[4] + 0xe7d3fbc8, 20);
+  MD5STEP(F2, a, b, c, d, in[9] + 0x21e1cde6, 5);
+  MD5STEP(F2, d, a, b, c, in[14] + 0xc33707d6, 9);
+  MD5STEP(F2, c, d, a, b, in[3] + 0xf4d50d87, 14);
+  MD5STEP(F2, b, c, d, a, in[8] + 0x455a14ed, 20);
+  MD5STEP(F2, a, b, c, d, in[13] + 0xa9e3e905, 5);
+  MD5STEP(F2, d, a, b, c, in[2] + 0xfcefa3f8, 9);
+  MD5STEP(F2, c, d, a, b, in[7] + 0x676f02d9, 14);
+  MD5STEP(F2, b, c, d, a, in[12] + 0x8d2a4c8a, 20);
+
+  MD5STEP(F3, a, b, c, d, in[5] + 0xfffa3942, 4);
+  MD5STEP(F3, d, a, b, c, in[8] + 0x8771f681, 11);
+  MD5STEP(F3, c, d, a, b, in[11] + 0x6d9d6122, 16);
+  MD5STEP(F3, b, c, d, a, in[14] + 0xfde5380c, 23);
+  MD5STEP(F3, a, b, c, d, in[1] + 0xa4beea44, 4);
+  MD5STEP(F3, d, a, b, c, in[4] + 0x4bdecfa9, 11);
+  MD5STEP(F3, c, d, a, b, in[7] + 0xf6bb4b60, 16);
+  MD5STEP(F3, b, c, d, a, in[10] + 0xbebfbc70, 23);
+  MD5STEP(F3, a, b, c, d, in[13] + 0x289b7ec6, 4);
+  MD5STEP(F3, d, a, b, c, in[0] + 0xeaa127fa, 11);
+  MD5STEP(F3, c, d, a, b, in[3] + 0xd4ef3085, 16);
+  MD5STEP(F3, b, c, d, a, in[6] + 0x04881d05, 23);
+  MD5STEP(F3, a, b, c, d, in[9] + 0xd9d4d039, 4);
+  MD5STEP(F3, d, a, b, c, in[12] + 0xe6db99e5, 11);
+  MD5STEP(F3, c, d, a, b, in[15] + 0x1fa27cf8, 16);
+  MD5STEP(F3, b, c, d, a, in[2] + 0xc4ac5665, 23);
+
+  MD5STEP(F4, a, b, c, d, in[0] + 0xf4292244, 6);
+  MD5STEP(F4, d, a, b, c, in[7] + 0x432aff97, 10);
+  MD5STEP(F4, c, d, a, b, in[14] + 0xab9423a7, 15);
+  MD5STEP(F4, b, c, d, a, in[5] + 0xfc93a039, 21);
+  MD5STEP(F4, a, b, c, d, in[12] + 0x655b59c3, 6);
+  MD5STEP(F4, d, a, b, c, in[3] + 0x8f0ccc92, 10);
+  MD5STEP(F4, c, d, a, b, in[10] + 0xffeff47d, 15);
+  MD5STEP(F4, b, c, d, a, in[1] + 0x85845dd1, 21);
+  MD5STEP(F4, a, b, c, d, in[8] + 0x6fa87e4f, 6);
+  MD5STEP(F4, d, a, b, c, in[15] + 0xfe2ce6e0, 10);
+  MD5STEP(F4, c, d, a, b, in[6] + 0xa3014314, 15);
+  MD5STEP(F4, b, c, d, a, in[13] + 0x4e0811a1, 21);
+  MD5STEP(F4, a, b, c, d, in[4] + 0xf7537e82, 6);
+  MD5STEP(F4, d, a, b, c, in[11] + 0xbd3af235, 10);
+  MD5STEP(F4, c, d, a, b, in[2] + 0x2ad7d2bb, 15);
+  MD5STEP(F4, b, c, d, a, in[9] + 0xeb86d391, 21);
+
+  buf[0] += a;
+  buf[1] += b;
+  buf[2] += c;
+  buf[3] += d;
+}
+
+static void MD5Update(MD5_CTX *ctx, unsigned char const *buf, unsigned len) {
+  uint32_t t;
+
+  t = ctx->bits[0];
+  if ((ctx->bits[0] = t + ((uint32_t) len << 3)) < t)
+    ctx->bits[1]++;
+  ctx->bits[1] += len >> 29;
+
+  t = (t >> 3) & 0x3f;
+
+  if (t) {
+    unsigned char *p = (unsigned char *) ctx->in + t;
+
+    t = 64 - t;
+    if (len < t) {
+      memcpy(p, buf, len);
+      return;
+    }
+    memcpy(p, buf, t);
+    byteReverse(ctx->in, 16);
+    MD5Transform(ctx->buf, (uint32_t *) ctx->in);
+    buf += t;
+    len -= t;
+  }
+
+  while (len >= 64) {
+    memcpy(ctx->in, buf, 64);
+    byteReverse(ctx->in, 16);
+    MD5Transform(ctx->buf, (uint32_t *) ctx->in);
+    buf += 64;
+    len -= 64;
+  }
+
+  memcpy(ctx->in, buf, len);
+}
+
+static void MD5Final(unsigned char digest[16], MD5_CTX *ctx) {
+  unsigned count;
+  unsigned char *p;
+  uint32_t *c = (uint32_t*)ctx->in;
+
+  count = (ctx->bits[0] >> 3) & 0x3F;
+
+  p = ctx->in + count;
+  *p++ = 0x80;
+  count = 64 - 1 - count;
+  if (count < 8) {
+    memset(p, 0, count);
+    byteReverse(ctx->in, 16);
+    MD5Transform(ctx->buf, (uint32_t *) ctx->in);
+    memset(ctx->in, 0, 56);
+  } else {
+    memset(p, 0, count - 8);
+  }
+  byteReverse(ctx->in, 14);
+
+  c[14] = ctx->bits[0];
+  c[15] = ctx->bits[1];
+
+  MD5Transform(ctx->buf, (uint32_t *) ctx->in);
+  byteReverse((unsigned char *) ctx->buf, 4);
+  memcpy(digest, ctx->buf, 16);
+  memset((char *) ctx, 0, sizeof(*ctx));
+}
+
+/* **************************************** */
 
 static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 						 struct ndpi_flow_struct *flow, u_int32_t protocol)
@@ -143,20 +339,41 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
   }
 }
 
-/* Code fixes courtesy of Alexsandro Brahm <alex@digistar.com.br> */
+/* https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967 */
+
+#define JA3_STR_LEN  256
+#define MAX_NUM_JA3   24
+
+struct ja3_info {
+  u_int16_t ssl_version;
+  u_int16_t num_cipher, cipher[MAX_NUM_JA3];
+  u_int16_t num_ssl_extension, ssl_extension[MAX_NUM_JA3];
+  u_int16_t num_elliptic_curve, elliptic_curve[MAX_NUM_JA3];
+  u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format;
+};
+
+/* code fixes courtesy of Alexsandro Brahm <alex@digistar.com.br> */
 int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow,
 		      char *buffer, int buffer_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
+  struct ja3_info ja3;
+  u_int16_t ssl_version = (packet->payload[1] << 8) + packet->payload[2], ja3_str_len;
+  char ja3_str[JA3_STR_LEN];
+  MD5_CTX ctx;
+  u_char md5_hash[16];
+
+  memset(&ja3, 0, sizeof(ja3));
 
 #ifdef CERTIFICATE_DEBUG
   {
-    u_int16_t ssl_version = (packet->payload[1] << 8) + packet->payload[2];
-    u_int16_t ssl_len     = (packet->payload[3] << 8) + packet->payload[4];    
-      
-    printf("SSL Record [version: 0x%02X][len: %u]\n", ssl_version, ssl_len);
+    u_int16_t ssl_len     = (packet->payload[3] << 8) + packet->payload[4];
+
+    printf("SSL Record [version: %u][len: %u]\n", ssl_version, ssl_len);
   }
 #endif
+
+  ja3.ssl_version = ssl_version;
 
   /*
     Nothing matched so far: let's decode the certificate with some heuristics
@@ -184,9 +401,62 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	 || (handshake_protocol == 0xb) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
 
-	if(handshake_protocol == 0x02)
+	if(handshake_protocol == 0x02) {
+	  u_int16_t offset = 43, extension_len;
+	  u_int8_t  session_id_len = packet->payload[43];
+
+	  offset += session_id_len+1;
+
+	  ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
+
+#ifdef CERTIFICATE_DEBUG
+	  printf("SSL [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
+#endif
+
+	  offset += 2 + 1;
+	  extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
+
+#ifdef CERTIFICATE_DEBUG
+	  printf("SSL [server][extension_len: %u]\n", extension_len);
+#endif
+	  offset += 2;
+	  
+	  for(i=0; i<extension_len; ) {
+	    u_int16_t id, len;
+	    
+	    if(offset >= (packet->payload_packet_len+4)) break;
+	    
+	    id  = ntohs(*((u_int16_t*)&packet->payload[offset]));
+	    len = ntohs(*((u_int16_t*)&packet->payload[offset+2]));
+
+	    if(ja3.num_ssl_extension < MAX_NUM_JA3)
+	      ja3.ssl_extension[ja3.num_ssl_extension++] = id;	    
+
+#ifdef CERTIFICATE_DEBUG
+	    printf("SSL [server][extension_id: %u]\n", id);
+#endif
+
+	    i += 4 + len, offset += 4 + len;
+	  }
+	  
+	  ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.ssl_version);
+	  
+	  for(i=0; i<ja3.num_cipher; i++)
+	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.cipher[i]);
+	  
+	  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+	  
+	  /* ********** */
+	  
+	  for(i=0; i<ja3.num_ssl_extension; i++)
+	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.ssl_extension[i]);
+
+#ifdef CERTIFICATE_DEBUG
+	  printf("SSL [server] %s\n", ja3_str);
+#endif
+     	  
 	  flow->l4.tcp.ssl_seen_server_cert = 1;
-	else
+	} else
 	  flow->l4.tcp.ssl_seen_certificate = 1;
 
 	/* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
@@ -235,6 +505,17 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  snprintf(flow->protos.stun_ssl.ssl.server_certificate,
 			   sizeof(flow->protos.stun_ssl.ssl.server_certificate), "%s", buffer);
 		}
+
+		MD5Init(&ctx);
+		MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
+		MD5Final(md5_hash, &ctx);
+
+		for(i=0, j=0; i<16; i++)
+		  j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
+				sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
+
+		printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
+
 		return(1 /* Server Certificate */);
 	      }
 	    }
@@ -242,101 +523,164 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       } else if(handshake_protocol == 0x01 /* Client Hello */) {
 	u_int offset, base_offset = 43;
+
 	if(base_offset + 2 <= packet->payload_packet_len) {
-	    u_int16_t session_id_len = packet->payload[base_offset];
+	  u_int16_t session_id_len = packet->payload[base_offset];
 
-	    if((session_id_len+base_offset+2) <= total_len) {
-	      u_int16_t cypher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
-	      offset = base_offset + session_id_len + cypher_len + 2;
+	  if((session_id_len+base_offset+2) <= total_len) {
+	    u_int16_t cypher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
+	    u_int16_t i, cypher_offset = base_offset + session_id_len + 3;
 
-	      flow->l4.tcp.ssl_seen_client_cert = 1;
+#ifdef CERTIFICATE_DEBUG
+	    printf("SSL [client cypher_len: %u]\n", cypher_len);
+#endif
+
+	    for(i=0; i<cypher_len; i++) {
+	      u_int16_t *id = (u_int16_t*)&packet->payload[cypher_offset+i];
+
+#ifdef CERTIFICATE_DEBUG
+	      printf("SSL [cypher suite: %u]\n", ntohs(*id));
+#endif
+
+	      if(ja3.num_cipher < MAX_NUM_JA3)
+		ja3.cipher[ja3.num_cipher++] = ntohs(*id);
+
+	      i++;
+	    }
+
+	    offset = base_offset + session_id_len + cypher_len + 2;
+
+	    flow->l4.tcp.ssl_seen_client_cert = 1;
+
+	    if(offset < total_len) {
+	      u_int16_t compression_len;
+	      u_int16_t extensions_len;
+
+	      offset++;
+	      compression_len = packet->payload[offset];
+	      offset++;
+
+#ifdef CERTIFICATE_DEBUG
+	      printf("SSL [compression_len: %u]\n", compression_len);
+#endif
+
+	      // offset += compression_len + 3;
+	      offset += compression_len;
 
 	      if(offset < total_len) {
-		u_int16_t compression_len;
-		u_int16_t extensions_len;
-
-		offset++;
-		compression_len = packet->payload[offset];
-		offset++;
+		extensions_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
+		offset += 2;
 
 #ifdef CERTIFICATE_DEBUG
-		printf("SSL [compression_len: %u]\n", compression_len);
+		printf("SSL [extensions_len: %u]\n", extensions_len);
 #endif
 
-		// offset += compression_len + 3;
-		offset += compression_len;
+		if((extensions_len+offset) <= total_len) {
+		  /* Move to the first extension
+		     Type is u_int to avoid possible overflow on extension_len addition */
+		  u_int extension_offset = 0;
+		  u_int32_t md5h[4], j;
 
-		if(offset < total_len) {
-		  extensions_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
-		  offset += 2;
+		  while(extension_offset < extensions_len) {
+		    u_int16_t extension_id, extension_len;
+
+		    extension_id = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
+		    extension_offset += 2;
+
+		    extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
+		    extension_offset += 2;
 
 #ifdef CERTIFICATE_DEBUG
-		  printf("SSL [extensions_len: %u]\n", extensions_len);
+		    printf("SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
 #endif
 
-		  if((extensions_len+offset) <= total_len) {
-		    /* Move to the first extension
-		       Type is u_int to avoid possible overflow on extension_len addition */
-		    u_int extension_offset = 0;
+		    if(ja3.num_ssl_extension < MAX_NUM_JA3)
+		      ja3.ssl_extension[ja3.num_ssl_extension++] = extension_id;
 
-		    while(extension_offset < extensions_len) {
-		      u_int16_t extension_id, extension_len;
+		    if(extension_id == 0 /* server name */) {
+		      u_int16_t len;
 
-		      extension_id = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
-		      extension_offset += 2;
+		      len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
+		      len = (u_int)ndpi_min(len, buffer_len-1);
+		      strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
+		      buffer[len] = '\0';
 
-		      extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
-		      extension_offset += 2;
+		      stripCertificateTrailer(buffer, buffer_len);
 
-#ifdef CERTIFICATE_DEBUG
-		      printf("SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
-#endif
-
-		      if(extension_id == 0) {
-#if 1
-			u_int16_t len;
-
-			len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];			
-			len = (u_int)ndpi_min(len, buffer_len-1);
-			strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
-			buffer[len] = '\0';			
-#else
-			/* old code */
-			u_int begin = 0;
-			char *server_name = (char*)&packet->payload[offset+extension_offset];
-			
-			while(begin < extension_len) {
-			  if((!ndpi_isprint(server_name[begin]))
-			     || ndpi_ispunct(server_name[begin])
-			     || ndpi_isspace(server_name[begin]))
-			    begin++;
-			  else
-			    break;
-			}
-
-			len = (u_int)ndpi_min(extension_len-begin, buffer_len-1);
-			strncpy(buffer, &server_name[begin], len);
-			buffer[len] = '\0';
-#endif
-			
-			stripCertificateTrailer(buffer, buffer_len);
-
-			if(!ndpi_struct->disable_metadata_export) {
-			  snprintf(flow->protos.stun_ssl.ssl.client_certificate,
-				   sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
-			}
-
-			/* We're happy now */
-			return(2 /* Client Certificate */);
+		      if(!ndpi_struct->disable_metadata_export) {
+			snprintf(flow->protos.stun_ssl.ssl.client_certificate,
+				 sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
 		      }
+		    } else if(extension_id == 10 /* supported groups */) {
+		      u_int16_t i, s_offset = offset+extension_offset + 2;
 
-		      extension_offset += extension_len;
+		      for(i=0; i<extension_len; i++) {
+			u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
+
+#ifdef CERTIFICATE_DEBUG
+			printf("SSL [EllipticCurve: %u]\n", s_group);
+#endif
+
+			if(ja3.num_elliptic_curve < MAX_NUM_JA3)
+			  ja3.elliptic_curve[ja3.num_elliptic_curve++] = s_group;
+
+			i++;
+		      }
+		    } else if(extension_id == 11 /* ec_point_formats groups */) {
+#ifdef CERTIFICATE_DEBUG
+		      printf("SSL [EllipticCurveFormat: %u]\n", packet->payload[offset+extension_offset+1]);
+#endif
+		      ja3.elliptic_curve_point_format = packet->payload[offset+extension_offset+1],
+			ja3.num_elliptic_curve_point_format = 1;
 		    }
+
+		    extension_offset += extension_len;
+
+#ifdef CERTIFICATE_DEBUG
+		    // printf("SSL [extension_offset/len: %u/%u]\n", extension_offset, extension_len);
+#endif
 		  }
+
+		  ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.ssl_version);
+
+		  for(i=0; i<ja3.num_cipher; i++)
+		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.cipher[i]);
+
+		  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+
+		  /* ********** */
+
+		  for(i=0; i<ja3.num_ssl_extension; i++)
+		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.ssl_extension[i]);
+
+		  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+
+		  /* ********** */
+
+		  for(i=0; i<ja3.num_elliptic_curve; i++)
+		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.elliptic_curve[i]);
+
+		  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+
+		  if(ja3.num_elliptic_curve_point_format)
+		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%u", ja3.elliptic_curve_point_format);
+
+		  MD5Init(&ctx);
+		  MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
+		  MD5Final(md5_hash, &ctx);
+
+		  for(i=0, j=0; i<16; i++)
+		    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
+				  sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x", md5_hash[i]);
+
+		  printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
+
+		  return(2 /* Client Certificate */);
 		}
 	      }
 	    }
 	  }
+	}
       }
     }
   }
@@ -345,68 +689,69 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
-	struct ndpi_flow_struct *flow,
-	char *buffer, int buffer_len) {
-    struct ndpi_packet_struct *packet = &flow->packet;
+			struct ndpi_flow_struct *flow,
+			char *buffer, int buffer_len) {
+  struct ndpi_packet_struct *packet = &flow->packet;
 
-    if(packet->payload[0] != 0x16 /* Handshake */)
-	return;
+  if(packet->payload[0] != 0x16 /* Handshake */)
+    return;
 
-    u_int16_t total_len  = (packet->payload[3] << 8) + packet->payload[4] + 5 /* SSL Header */;
-    u_int8_t handshake_protocol = packet->payload[5]; /* handshake protocol a bit misleading, it is message type according TLS specs */
+  u_int16_t total_len  = (packet->payload[3] << 8) + packet->payload[4] + 5 /* SSL Header */;
+  u_int8_t handshake_protocol = packet->payload[5]; /* handshake protocol a bit misleading, it is message type according TLS specs */
 
-    if(handshake_protocol != 0x02 && handshake_protocol != 0xb /* Server Hello and Certificate message types are interesting for us */)
-	return;
+  if(handshake_protocol != 0x02 && handshake_protocol != 0xb /* Server Hello and Certificate message types are interesting for us */)
+    return;
 
-    /* Truncate total len, search at least in incomplete packet */
-    if(total_len > packet->payload_packet_len)
-	total_len = packet->payload_packet_len;
+  /* Truncate total len, search at least in incomplete packet */
+  if(total_len > packet->payload_packet_len)
+    total_len = packet->payload_packet_len;
 
-    memset(buffer, 0, buffer_len);
+  memset(buffer, 0, buffer_len);
 
-    /* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
-    u_int num_found = 0;
-    u_int i, j;
-    for(i = 9; i < packet->payload_packet_len-4; i++) {
-	/* Organization OID: 2.5.4.10 */
-	if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x0a)) {
-	    u_int8_t type_tag = packet->payload[i+3]; // 0x0c: utf8string / 0x13: printable_string
-	    u_int8_t server_len = packet->payload[i+4];
+  /* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
+  u_int num_found = 0;
+  u_int i, j;
+  for(i = 9; i < packet->payload_packet_len-4; i++) {
+    /* Organization OID: 2.5.4.10 */
+    if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x0a)) {
+      u_int8_t type_tag = packet->payload[i+3]; // 0x0c: utf8string / 0x13: printable_string
+      u_int8_t server_len = packet->payload[i+4];
 
-	    num_found++;
-	    /* what we want is subject certificate, so we bypass the issuer certificate */
-	    if(num_found != 2) continue;
+      num_found++;
+      /* what we want is subject certificate, so we bypass the issuer certificate */
+      if(num_found != 2) continue;
 
-	    // packet is truncated... further inspection is not needed
-	    if(i+4+server_len >= packet->payload_packet_len) {
-		break;
-	    }
+      // packet is truncated... further inspection is not needed
+      if(i+4+server_len >= packet->payload_packet_len) {
+	break;
+      }
 
-	    char *server_org = (char*)&packet->payload[i+5];
+      char *server_org = (char*)&packet->payload[i+5];
 
-	    u_int len = (u_int)ndpi_min(server_len, buffer_len-1);
-	    strncpy(buffer, server_org, len);
-	    buffer[len] = '\0';
+      u_int len = (u_int)ndpi_min(server_len, buffer_len-1);
+      strncpy(buffer, server_org, len);
+      buffer[len] = '\0';
 
-	    // check if organization string are all printable
-	    u_int8_t is_printable = 1;
-	    for (j = 0; j < len; j++) {
-		if(!ndpi_isprint(buffer[j])) {
-		    is_printable = 0;
-		    break;
-		}
-	    }
-
-	    if(is_printable == 1) {
-		snprintf(flow->protos.stun_ssl.ssl.server_organization,
-			sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
-#ifdef CERTIFICATE_DEBUG
-		printf("Certificate origanization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
-#endif
-	    }
+      // check if organization string are all printable
+      u_int8_t is_printable = 1;
+      for (j = 0; j < len; j++) {
+	if(!ndpi_isprint(buffer[j])) {
+	  is_printable = 0;
+	  break;
 	}
+      }
+
+      if(is_printable == 1) {
+	snprintf(flow->protos.stun_ssl.ssl.server_organization,
+		 sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
+#ifdef CERTIFICATE_DEBUG
+	printf("Certificate origanization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
+#endif
+      }
     }
+  }
 }
+
 
 int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -745,7 +1090,7 @@ void ndpi_search_ssl_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     /* No whatsapp, let's try SSL */
     if(sslDetectProtocolFromCertificate(ndpi_struct, flow) > 0)
       return;
-  }  
+  }
 
   if(packet->payload_packet_len > 40 && flow->l4.tcp.ssl_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "first ssl packet\n");

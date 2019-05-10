@@ -97,7 +97,8 @@ typedef struct ndpi_flow_info {
   char bittorent_hash[41];
   
   struct {
-    char client_info[64], server_info[64], server_organization[64];
+    char client_info[64], server_info[64], server_organization[64],
+      ja3_client[33], ja3_server[33];
   } ssh_ssl;
 
   void *src_id, *dst_id;
