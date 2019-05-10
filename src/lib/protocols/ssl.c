@@ -420,17 +420,17 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  printf("SSL [server][extension_len: %u]\n", extension_len);
 #endif
 	  offset += 2;
-	  
+
 	  for(i=0; i<extension_len; ) {
 	    u_int16_t id, len;
-	    
+
 	    if(offset >= (packet->payload_packet_len+4)) break;
-	    
+
 	    id  = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	    len = ntohs(*((u_int16_t*)&packet->payload[offset+2]));
 
 	    if(ja3.num_ssl_extension < MAX_NUM_JA3)
-	      ja3.ssl_extension[ja3.num_ssl_extension++] = id;	    
+	      ja3.ssl_extension[ja3.num_ssl_extension++] = id;
 
 #ifdef CERTIFICATE_DEBUG
 	    printf("SSL [server][extension_id: %u]\n", id);
@@ -438,23 +438,23 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    i += 4 + len, offset += 4 + len;
 	  }
-	  
+
 	  ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.ssl_version);
-	  
+
 	  for(i=0; i<ja3.num_cipher; i++)
 	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.cipher[i]);
-	  
+
 	  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-	  
+
 	  /* ********** */
-	  
+
 	  for(i=0; i<ja3.num_ssl_extension; i++)
 	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.ssl_extension[i]);
 
 #ifdef CERTIFICATE_DEBUG
 	  printf("SSL [server] %s\n", ja3_str);
 #endif
-     	  
+
 	  flow->l4.tcp.ssl_seen_server_cert = 1;
 	} else
 	  flow->l4.tcp.ssl_seen_certificate = 1;
@@ -514,8 +514,10 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
 				sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
 
+#ifdef CERTIFICATE_DEBUG
 		printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
-
+#endif
+		
 		return(1 /* Server Certificate */);
 	      }
 	    }
@@ -673,8 +675,10 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
 				  sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x", md5_hash[i]);
 
+#ifdef CERTIFICATE_DEBUG
 		  printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
-
+#endif
+		  
 		  return(2 /* Client Certificate */);
 		}
 	      }
