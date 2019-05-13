@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-/* #define CERTIFICATE_DEBUG 1 */
+// #define CERTIFICATE_DEBUG 1
 
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
@@ -551,9 +551,15 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 	      printf("SSL [cypher suite: %u] [%u/%u]\n", ntohs(*id), i, cypher_len);
 #endif
-
-	      if(ja3.num_cipher < MAX_NUM_JA3)
-		ja3.cipher[ja3.num_cipher++] = ntohs(*id);
+	      if((*id == 0) || (packet->payload[cypher_offset+i] != packet->payload[cypher_offset+i+1])) {
+		/* 
+		   Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
+		   https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
+		 */
+		
+		if(ja3.num_cipher < MAX_NUM_JA3)
+		  ja3.cipher[ja3.num_cipher++] = ntohs(*id);
+	      }
 	      
 	      i += 2;
 	    }
@@ -592,7 +598,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  u_int32_t md5h[4], j;
 
 		  while(extension_offset < extensions_len) {
-		    u_int16_t extension_id, extension_len;
+		    u_int16_t extension_id, extension_len, extn_off = offset+extension_offset;
 
 		    extension_id = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
 		    extension_offset += 2;
@@ -603,10 +609,14 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 		    printf("SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
 #endif
-
-		    if(ja3.num_ssl_extension < MAX_NUM_JA3)
-		      ja3.ssl_extension[ja3.num_ssl_extension++] = extension_id;
-
+		    
+		    if((extension_id == 0) || (packet->payload[extn_off] != packet->payload[extn_off+1])) {
+		      /* Skip GREASE */
+		      
+		      if(ja3.num_ssl_extension < MAX_NUM_JA3)
+			ja3.ssl_extension[ja3.num_ssl_extension++] = extension_id;
+		    }
+		    
 		    if(extension_id == 0 /* server name */) {
 		      u_int16_t len;
 
@@ -634,10 +644,12 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 			printf("SSL [EllipticCurve: %u]\n", s_group);
 #endif
-
-			if(ja3.num_elliptic_curve < MAX_NUM_JA3)
-			  ja3.elliptic_curve[ja3.num_elliptic_curve++] = s_group;
-
+			if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])) {
+			  /* Skip GREASE */
+			  if(ja3.num_elliptic_curve < MAX_NUM_JA3)
+			    ja3.elliptic_curve[ja3.num_elliptic_curve++] = s_group;			
+			}
+			
 			i += 2;
 		      }
 		    } else if(extension_id == 11 /* ec_point_formats groups */) {
