@@ -341,7 +341,7 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
 
 /* https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967 */
 
-#define JA3_STR_LEN  512
+#define JA3_STR_LEN 1024
 #define MAX_NUM_JA3  128
 
 struct ja3_info {
@@ -358,6 +358,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      char *buffer, int buffer_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ja3_info ja3;
+  u_int8_t invalid_ja3 = 0;
   u_int16_t ssl_version = (packet->payload[1] << 8) + packet->payload[2], ja3_str_len;
   char ja3_str[JA3_STR_LEN];
   MD5_CTX ctx;
@@ -399,7 +400,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	 || (handshake_protocol == 0xb) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
 	u_int16_t  ssl_version = ntohs(*((u_int16_t*)&packet->payload[9]));
-	
+
 	ja3.ssl_version = ssl_version;
 
 	if(handshake_protocol == 0x02) {
@@ -510,7 +511,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 		printf("[JA3] Server: %s \n", ja3_str);
 #endif
-		
+
 		MD5Init(&ctx);
 		MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
 		MD5Final(md5_hash, &ctx);
@@ -522,7 +523,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 		printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
 #endif
-		
+
 		return(1 /* Server Certificate */);
 	      }
 	    }
@@ -534,9 +535,9 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	if(base_offset + 2 <= packet->payload_packet_len) {
 	  u_int16_t session_id_len = packet->payload[base_offset];
 	  u_int16_t  ssl_version   = ntohs(*((u_int16_t*)&packet->payload[9]));
-	  
+
 	  ja3.ssl_version = ssl_version;
-	  
+
 	  if((session_id_len+base_offset+2) <= total_len) {
 	    u_int16_t cypher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
 	    u_int16_t i, cypher_offset = base_offset + session_id_len + 3;
@@ -545,25 +546,38 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    printf("SSL [client cypher_len: %u]\n", cypher_len);
 #endif
 
-	    for(i=0; i<cypher_len;) {
-	      u_int16_t *id = (u_int16_t*)&packet->payload[cypher_offset+i];
-
-#ifdef CERTIFICATE_DEBUG
-	      printf("SSL [cypher suite: %u] [%u/%u]\n", ntohs(*id), i, cypher_len);
-#endif
-	      if((*id == 0) || (packet->payload[cypher_offset+i] != packet->payload[cypher_offset+i+1])) {
-		/* 
-		   Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
-		   https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
-		 */
+	    if((cypher_offset+cypher_len) <= total_len) {
+	      for(i=0; i<cypher_len;) {
+		u_int16_t *id = (u_int16_t*)&packet->payload[cypher_offset+i];
 		
-		if(ja3.num_cipher < MAX_NUM_JA3)
-		  ja3.cipher[ja3.num_cipher++] = ntohs(*id);
+#ifdef CERTIFICATE_DEBUG
+		printf("SSL [cypher suite: %u] [%u/%u]\n", ntohs(*id), i, cypher_len);
+#endif
+		if((*id == 0) || (packet->payload[cypher_offset+i] != packet->payload[cypher_offset+i+1])) {
+		  /*
+		    Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
+		    https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
+		  */
+		  
+		  if(ja3.num_cipher < MAX_NUM_JA3)
+		    ja3.cipher[ja3.num_cipher++] = ntohs(*id);
+		  else {
+		    invalid_ja3 = 1;
+#ifdef CERTIFICATE_DEBUG
+		    printf("SSL Invalid cypher %u\n", ja3.num_cipher);
+#endif
+		  }
+		}
+		
+		i += 2;
 	      }
-	      
-	      i += 2;
+	    } else {
+	      invalid_ja3 = 1;
+#ifdef CERTIFICATE_DEBUG
+	      printf("SSL Invalid len %u vs %u\n", (cypher_offset+cypher_len), total_len);
+#endif		    
 	    }
-
+	    
 	    offset = base_offset + session_id_len + cypher_len + 2;
 
 	    flow->l4.tcp.ssl_seen_client_cert = 1;
@@ -609,14 +623,20 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 		    printf("SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
 #endif
-		    
+
 		    if((extension_id == 0) || (packet->payload[extn_off] != packet->payload[extn_off+1])) {
 		      /* Skip GREASE */
-		      
+
 		      if(ja3.num_ssl_extension < MAX_NUM_JA3)
 			ja3.ssl_extension[ja3.num_ssl_extension++] = extension_id;
+		      else {
+			invalid_ja3 = 1;
+#ifdef CERTIFICATE_DEBUG
+			printf("SSL Invalid extensions %u\n", ja3.num_ssl_extension);
+#endif
+		      }
 		    }
-		    
+
 		    if(extension_id == 0 /* server name */) {
 		      u_int16_t len;
 
@@ -638,39 +658,64 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      printf("SSL [EllipticCurve: len=%u]\n", extension_len);
 #endif
 
-		      for(i=0; i<extension_len-2;) {
-			u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
-
-#ifdef CERTIFICATE_DEBUG
-			printf("SSL [EllipticCurve: %u]\n", s_group);
-#endif
-			if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])) {
-			  /* Skip GREASE */
-			  if(ja3.num_elliptic_curve < MAX_NUM_JA3)
-			    ja3.elliptic_curve[ja3.num_elliptic_curve++] = s_group;			
-			}
+		      if((s_offset+extension_len-1) < total_len) {
+			for(i=0; i<extension_len-2;) {
+			  u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 			
-			i += 2;
-		      }
+#ifdef CERTIFICATE_DEBUG
+			  printf("SSL [EllipticCurve: %u]\n", s_group);
+#endif
+			  if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])) {
+			    /* Skip GREASE */
+			    if(ja3.num_elliptic_curve < MAX_NUM_JA3)
+			      ja3.elliptic_curve[ja3.num_elliptic_curve++] = s_group;
+			    else {			      
+			      invalid_ja3 = 1;
+#ifdef CERTIFICATE_DEBUG
+			      printf("SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve);
+#endif
+			    }
+			  }
+
+			  i += 2;
+			}
+		      } else {
+			invalid_ja3 = 1;
+#ifdef CERTIFICATE_DEBUG
+			printf("SSL Invalid len %u vs %u\n", (s_offset+extension_len-1), total_len);
+#endif
+		      }		     
 		    } else if(extension_id == 11 /* ec_point_formats groups */) {
 		      u_int16_t i, s_offset = offset+extension_offset + 1;
 
 #ifdef CERTIFICATE_DEBUG
 		      printf("SSL [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
-
-		      for(i=0; i<extension_len-1;i++) {
-			u_int8_t s_group = packet->payload[s_offset+i];
-
+		      if((s_offset+extension_len) < total_len) {
+			for(i=0; i<extension_len-1;i++) {
+			  u_int8_t s_group = packet->payload[s_offset+i];
+			  
 #ifdef CERTIFICATE_DEBUG
-			printf("SSL [EllipticCurveFormat: %u]\n", s_group);
+			  printf("SSL [EllipticCurveFormat: %u]\n", s_group);
 #endif
-
-			if(ja3.num_elliptic_curve_point_format < MAX_NUM_JA3)
-			  ja3.elliptic_curve_point_format[ja3.num_elliptic_curve_point_format++] = s_group;
+			  
+			  if(ja3.num_elliptic_curve_point_format < MAX_NUM_JA3)
+			    ja3.elliptic_curve_point_format[ja3.num_elliptic_curve_point_format++] = s_group;
+			  else {
+			    invalid_ja3 = 1;
+#ifdef CERTIFICATE_DEBUG
+			    printf("SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve_point_format);
+#endif
+			  }
+			}
+		      } else {
+			invalid_ja3 = 1;
+#ifdef CERTIFICATE_DEBUG
+			printf("SSL Invalid len %u vs %u\n", s_offset+extension_len, total_len);
+#endif
 		      }
 		    }
-
+		    
 		    extension_offset += extension_len;
 
 #ifdef CERTIFICATE_DEBUG
@@ -678,45 +723,51 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		  } /* while */
 
-		  ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.ssl_version);
-
-		  for(i=0; i<ja3.num_cipher; i++)
-		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.cipher[i]);
-
-		  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-
-		  /* ********** */
-
-		  for(i=0; i<ja3.num_ssl_extension; i++)
-		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.ssl_extension[i]);
-
-		  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-
-		  /* ********** */
-
-		  for(i=0; i<ja3.num_elliptic_curve; i++)
-		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.elliptic_curve[i]);
-
-		  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-		  
-		  for(i=0; i<ja3.num_elliptic_curve_point_format; i++)
-		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.elliptic_curve_point_format[i]);
-
-#ifdef CERTIFICATE_DEBUG
-		  printf("[JA3] Client: %s \n", ja3_str);
-#endif
-
-		  MD5Init(&ctx);
-		  MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
-		  MD5Final(md5_hash, &ctx);
-
-		  for(i=0, j=0; i<16; i++)
-		    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
-				  sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x", md5_hash[i]);
+		  if(!invalid_ja3) {
+		    ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.ssl_version);
+		    
+		    for(i=0; i<ja3.num_cipher; i++)
+		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+					      (i > 0) ? "-" : "", ja3.cipher[i]);
+		    
+		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+		    
+		    /* ********** */
+		    
+		    for(i=0; i<ja3.num_ssl_extension; i++)
+		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+					      (i > 0) ? "-" : "", ja3.ssl_extension[i]);
+		    
+		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+		    
+		    /* ********** */
+		    
+		    for(i=0; i<ja3.num_elliptic_curve; i++)
+		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+					      (i > 0) ? "-" : "", ja3.elliptic_curve[i]);
+		    
+		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+		    
+		    for(i=0; i<ja3.num_elliptic_curve_point_format; i++)
+		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+					      (i > 0) ? "-" : "", ja3.elliptic_curve_point_format[i]);
 
 #ifdef CERTIFICATE_DEBUG
-		  printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
+		    printf("[JA3] Client: %s \n", ja3_str);
 #endif
+
+		    MD5Init(&ctx);
+		    MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
+		    MD5Final(md5_hash, &ctx);
+
+		    for(i=0, j=0; i<16; i++)
+		      j += snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
+				    sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x", md5_hash[i]);
+
+#ifdef CERTIFICATE_DEBUG
+		    printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
+#endif
+		  }
 		  
 		  return(2 /* Client Certificate */);
 		}
