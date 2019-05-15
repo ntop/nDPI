@@ -8,17 +8,26 @@
 
 /* Begin PBXBuildFile section */
 		E32F1ECB20844620005739B7 /* whatsapp.c in Sources */ = {isa = PBXBuildFile; fileRef = E32F1ECA20844620005739B7 /* whatsapp.c */; };
+		E35D5510228BA70600A80DED /* ajp.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D5506228BA70400A80DED /* ajp.c */; };
+		E35D5511228BA70600A80DED /* snmp_proto.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D5507228BA70400A80DED /* snmp_proto.c */; };
+		E35D5512228BA70600A80DED /* modbus.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D5508228BA70400A80DED /* modbus.c */; };
+		E35D5513228BA70600A80DED /* ookla.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D5509228BA70400A80DED /* ookla.c */; };
+		E35D5514228BA70600A80DED /* upnp.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D550A228BA70400A80DED /* upnp.c */; };
+		E35D5515228BA70600A80DED /* memcached.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D550B228BA70500A80DED /* memcached.c */; };
+		E35D5516228BA70600A80DED /* mdns_proto.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D550C228BA70500A80DED /* mdns_proto.c */; };
+		E35D5517228BA70600A80DED /* fbzero.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D550D228BA70500A80DED /* fbzero.c */; };
+		E35D5518228BA70600A80DED /* nest_log_sink.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D550E228BA70500A80DED /* nest_log_sink.c */; };
+		E35D5519228BA70600A80DED /* mining.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D550F228BA70600A80DED /* mining.c */; };
+		E35D551D228BA80000A80DED /* sha1-fast.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D551B228BA80000A80DED /* sha1-fast.c */; };
+		E35D551E228BA80000A80DED /* ht_hash.c in Sources */ = {isa = PBXBuildFile; fileRef = E35D551C228BA80000A80DED /* ht_hash.c */; };
+		E35D551F228BA88700A80DED /* ndpi_patricia.c in Sources */ = {isa = PBXBuildFile; fileRef = E395430820255354000BBA0D /* ndpi_patricia.c */; };
 		E3953F5420254989000BBA0D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E3953F5320254989000BBA0D /* AppDelegate.m */; };
 		E3953F5720254989000BBA0D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E3953F5620254989000BBA0D /* ViewController.m */; };
 		E3953F5920254989000BBA0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3953F5820254989000BBA0D /* Assets.xcassets */; };
 		E3953F5C2025498A000BBA0D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E3953F5A2025498A000BBA0D /* Main.storyboard */; };
 		E3953F5F2025498A000BBA0D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E3953F5E2025498A000BBA0D /* main.m */; };
-		E395430B20255354000BBA0D /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = E39540A520255353000BBA0D /* Makefile.am */; };
 		E395430C20255354000BBA0D /* ndpi_define.h.in in Resources */ = {isa = PBXBuildFile; fileRef = E39540A720255353000BBA0D /* ndpi_define.h.in */; };
 		E395431720255354000BBA0D /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = E39540BC20255353000BBA0D /* Makefile */; };
-		E395431820255354000BBA0D /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = E39540BD20255353000BBA0D /* Makefile.am */; };
-		E395431920255354000BBA0D /* Makefile.in in Resources */ = {isa = PBXBuildFile; fileRef = E39540BE20255353000BBA0D /* Makefile.in */; };
-		E395431A20255354000BBA0D /* Makefile.simple in Resources */ = {isa = PBXBuildFile; fileRef = E39540BF20255353000BBA0D /* Makefile.simple */; };
 		E395431B20255354000BBA0D /* ndpi_content_match.c.inc in Sources */ = {isa = PBXBuildFile; fileRef = E39540C020255353000BBA0D /* ndpi_content_match.c.inc */; };
 		E395431C20255354000BBA0D /* ndpi_main.c in Sources */ = {isa = PBXBuildFile; fileRef = E39540C120255353000BBA0D /* ndpi_main.c */; };
 		E39543A320255354000BBA0D /* afp.c in Sources */ = {isa = PBXBuildFile; fileRef = E395414B20255353000BBA0D /* afp.c */; };
@@ -60,7 +69,6 @@
 		E39543C720255354000BBA0D /* edonkey.c in Sources */ = {isa = PBXBuildFile; fileRef = E395417120255353000BBA0D /* edonkey.c */; };
 		E39543C820255354000BBA0D /* fasttrack.c in Sources */ = {isa = PBXBuildFile; fileRef = E395417220255353000BBA0D /* fasttrack.c */; };
 		E39543C920255354000BBA0D /* fiesta.c in Sources */ = {isa = PBXBuildFile; fileRef = E395417320255353000BBA0D /* fiesta.c */; };
-		E39543CA20255354000BBA0D /* filetopia.c in Sources */ = {isa = PBXBuildFile; fileRef = E395417420255353000BBA0D /* filetopia.c */; };
 		E39543CB20255354000BBA0D /* fix.c in Sources */ = {isa = PBXBuildFile; fileRef = E395417520255353000BBA0D /* fix.c */; };
 		E39543CC20255354000BBA0D /* florensia.c in Sources */ = {isa = PBXBuildFile; fileRef = E395417620255353000BBA0D /* florensia.c */; };
 		E39543CD20255354000BBA0D /* ftp_control.c in Sources */ = {isa = PBXBuildFile; fileRef = E395417720255353000BBA0D /* ftp_control.c */; };
@@ -90,10 +98,8 @@
 		E39544ED20255354000BBA0D /* mail_pop.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429720255354000BBA0D /* mail_pop.c */; };
 		E39544EE20255354000BBA0D /* mail_smtp.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429820255354000BBA0D /* mail_smtp.c */; };
 		E39544EF20255354000BBA0D /* maplestory.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429920255354000BBA0D /* maplestory.c */; };
-		E39544F020255354000BBA0D /* mdns.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429A20255354000BBA0D /* mdns.c */; };
 		E39544F120255354000BBA0D /* megaco.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429B20255354000BBA0D /* megaco.c */; };
 		E39544F220255354000BBA0D /* mgcp.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429C20255354000BBA0D /* mgcp.c */; };
-		E39544F320255354000BBA0D /* mms.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429D20255354000BBA0D /* mms.c */; };
 		E39544F420255354000BBA0D /* mpegts.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429E20255354000BBA0D /* mpegts.c */; };
 		E39544F520255354000BBA0D /* mqtt.c in Sources */ = {isa = PBXBuildFile; fileRef = E395429F20255354000BBA0D /* mqtt.c */; };
 		E39544F620255354000BBA0D /* msn.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542A020255354000BBA0D /* msn.c */; };
@@ -134,9 +140,7 @@
 		E395451920255354000BBA0D /* skype.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542C320255354000BBA0D /* skype.c */; };
 		E395451A20255354000BBA0D /* smb.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542C420255354000BBA0D /* smb.c */; };
 		E395451B20255354000BBA0D /* smpp.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542C520255354000BBA0D /* smpp.c */; };
-		E395451C20255354000BBA0D /* snmp.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542C620255354000BBA0D /* snmp.c */; };
 		E395451D20255354000BBA0D /* socks45.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542C720255354000BBA0D /* socks45.c */; };
-		E395451E20255354000BBA0D /* socrates.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542C820255354000BBA0D /* socrates.c */; };
 		E395451F20255354000BBA0D /* someip.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542C920255354000BBA0D /* someip.c */; };
 		E395452020255354000BBA0D /* sopcast.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542CA20255354000BBA0D /* sopcast.c */; };
 		E395452120255354000BBA0D /* soulseek.c in Sources */ = {isa = PBXBuildFile; fileRef = E39542CB20255354000BBA0D /* soulseek.c */; };
@@ -189,6 +193,19 @@
 
 /* Begin PBXFileReference section */
 		E32F1ECA20844620005739B7 /* whatsapp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = whatsapp.c; sourceTree = "<group>"; };
+		E35D5506228BA70400A80DED /* ajp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ajp.c; sourceTree = "<group>"; };
+		E35D5507228BA70400A80DED /* snmp_proto.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = snmp_proto.c; sourceTree = "<group>"; };
+		E35D5508228BA70400A80DED /* modbus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = modbus.c; sourceTree = "<group>"; };
+		E35D5509228BA70400A80DED /* ookla.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ookla.c; sourceTree = "<group>"; };
+		E35D550A228BA70400A80DED /* upnp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = upnp.c; sourceTree = "<group>"; };
+		E35D550B228BA70500A80DED /* memcached.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = memcached.c; sourceTree = "<group>"; };
+		E35D550C228BA70500A80DED /* mdns_proto.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mdns_proto.c; sourceTree = "<group>"; };
+		E35D550D228BA70500A80DED /* fbzero.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fbzero.c; sourceTree = "<group>"; };
+		E35D550E228BA70500A80DED /* nest_log_sink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nest_log_sink.c; sourceTree = "<group>"; };
+		E35D550F228BA70600A80DED /* mining.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mining.c; sourceTree = "<group>"; };
+		E35D551A228BA7DF00A80DED /* ht_hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ht_hash.h; sourceTree = "<group>"; };
+		E35D551B228BA80000A80DED /* sha1-fast.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sha1-fast.c"; sourceTree = "<group>"; };
+		E35D551C228BA80000A80DED /* ht_hash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ht_hash.c; sourceTree = "<group>"; };
 		E3953F4F20254989000BBA0D /* ndpiExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ndpiExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3953F5220254989000BBA0D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E3953F5320254989000BBA0D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -212,7 +229,6 @@
 		E39540BC20255353000BBA0D /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		E39540BD20255353000BBA0D /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
 		E39540BE20255353000BBA0D /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
-		E39540BF20255353000BBA0D /* Makefile.simple */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.simple; sourceTree = "<group>"; };
 		E39540C020255353000BBA0D /* ndpi_content_match.c.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = ndpi_content_match.c.inc; sourceTree = "<group>"; };
 		E39540C120255353000BBA0D /* ndpi_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ndpi_main.c; sourceTree = "<group>"; };
 		E395414B20255353000BBA0D /* afp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = afp.c; sourceTree = "<group>"; };
@@ -255,7 +271,6 @@
 		E395417120255353000BBA0D /* edonkey.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edonkey.c; sourceTree = "<group>"; };
 		E395417220255353000BBA0D /* fasttrack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fasttrack.c; sourceTree = "<group>"; };
 		E395417320255353000BBA0D /* fiesta.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fiesta.c; sourceTree = "<group>"; };
-		E395417420255353000BBA0D /* filetopia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = filetopia.c; sourceTree = "<group>"; };
 		E395417520255353000BBA0D /* fix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fix.c; sourceTree = "<group>"; };
 		E395417620255353000BBA0D /* florensia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = florensia.c; sourceTree = "<group>"; };
 		E395417720255353000BBA0D /* ftp_control.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ftp_control.c; sourceTree = "<group>"; };
@@ -285,10 +300,8 @@
 		E395429720255354000BBA0D /* mail_pop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mail_pop.c; sourceTree = "<group>"; };
 		E395429820255354000BBA0D /* mail_smtp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mail_smtp.c; sourceTree = "<group>"; };
 		E395429920255354000BBA0D /* maplestory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maplestory.c; sourceTree = "<group>"; };
-		E395429A20255354000BBA0D /* mdns.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mdns.c; sourceTree = "<group>"; };
 		E395429B20255354000BBA0D /* megaco.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = megaco.c; sourceTree = "<group>"; };
 		E395429C20255354000BBA0D /* mgcp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mgcp.c; sourceTree = "<group>"; };
-		E395429D20255354000BBA0D /* mms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mms.c; sourceTree = "<group>"; };
 		E395429E20255354000BBA0D /* mpegts.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mpegts.c; sourceTree = "<group>"; };
 		E395429F20255354000BBA0D /* mqtt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mqtt.c; sourceTree = "<group>"; };
 		E39542A020255354000BBA0D /* msn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = msn.c; sourceTree = "<group>"; };
@@ -329,9 +342,7 @@
 		E39542C320255354000BBA0D /* skype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = skype.c; sourceTree = "<group>"; };
 		E39542C420255354000BBA0D /* smb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = smb.c; sourceTree = "<group>"; };
 		E39542C520255354000BBA0D /* smpp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = smpp.c; sourceTree = "<group>"; };
-		E39542C620255354000BBA0D /* snmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = snmp.c; sourceTree = "<group>"; };
 		E39542C720255354000BBA0D /* socks45.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = socks45.c; sourceTree = "<group>"; };
-		E39542C820255354000BBA0D /* socrates.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = socrates.c; sourceTree = "<group>"; };
 		E39542C920255354000BBA0D /* someip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = someip.c; sourceTree = "<group>"; };
 		E39542CA20255354000BBA0D /* sopcast.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sopcast.c; sourceTree = "<group>"; };
 		E39542CB20255354000BBA0D /* soulseek.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = soulseek.c; sourceTree = "<group>"; };
@@ -482,7 +493,6 @@
 				E39540BC20255353000BBA0D /* Makefile */,
 				E39540BD20255353000BBA0D /* Makefile.am */,
 				E39540BE20255353000BBA0D /* Makefile.in */,
-				E39540BF20255353000BBA0D /* Makefile.simple */,
 				E39540C020255353000BBA0D /* ndpi_content_match.c.inc */,
 				E39540C120255353000BBA0D /* ndpi_main.c */,
 				E39540C220255353000BBA0D /* protocols */,
@@ -530,7 +540,6 @@
 				E395417120255353000BBA0D /* edonkey.c */,
 				E395417220255353000BBA0D /* fasttrack.c */,
 				E395417320255353000BBA0D /* fiesta.c */,
-				E395417420255353000BBA0D /* filetopia.c */,
 				E395417520255353000BBA0D /* fix.c */,
 				E395417620255353000BBA0D /* florensia.c */,
 				E395417720255353000BBA0D /* ftp_control.c */,
@@ -560,10 +569,8 @@
 				E395429720255354000BBA0D /* mail_pop.c */,
 				E395429820255354000BBA0D /* mail_smtp.c */,
 				E395429920255354000BBA0D /* maplestory.c */,
-				E395429A20255354000BBA0D /* mdns.c */,
 				E395429B20255354000BBA0D /* megaco.c */,
 				E395429C20255354000BBA0D /* mgcp.c */,
-				E395429D20255354000BBA0D /* mms.c */,
 				E395429E20255354000BBA0D /* mpegts.c */,
 				E395429F20255354000BBA0D /* mqtt.c */,
 				E39542A020255354000BBA0D /* msn.c */,
@@ -604,9 +611,7 @@
 				E39542C320255354000BBA0D /* skype.c */,
 				E39542C420255354000BBA0D /* smb.c */,
 				E39542C520255354000BBA0D /* smpp.c */,
-				E39542C620255354000BBA0D /* snmp.c */,
 				E39542C720255354000BBA0D /* socks45.c */,
-				E39542C820255354000BBA0D /* socrates.c */,
 				E39542C920255354000BBA0D /* someip.c */,
 				E39542CA20255354000BBA0D /* sopcast.c */,
 				E39542CB20255354000BBA0D /* soulseek.c */,
@@ -647,6 +652,16 @@
 				E39542EE20255354000BBA0D /* zattoo.c */,
 				E39542EF20255354000BBA0D /* zeromq.c */,
 				E32F1ECA20844620005739B7 /* whatsapp.c */,
+				E35D5506228BA70400A80DED /* ajp.c */,
+				E35D550D228BA70500A80DED /* fbzero.c */,
+				E35D550C228BA70500A80DED /* mdns_proto.c */,
+				E35D550B228BA70500A80DED /* memcached.c */,
+				E35D550F228BA70600A80DED /* mining.c */,
+				E35D5508228BA70400A80DED /* modbus.c */,
+				E35D550E228BA70500A80DED /* nest_log_sink.c */,
+				E35D5509228BA70400A80DED /* ookla.c */,
+				E35D5507228BA70400A80DED /* snmp_proto.c */,
+				E35D550A228BA70400A80DED /* upnp.c */,
 			);
 			path = protocols;
 			sourceTree = "<group>";
@@ -675,6 +690,7 @@
 		E39542F120255354000BBA0D /* include */ = {
 			isa = PBXGroup;
 			children = (
+				E35D551A228BA7DF00A80DED /* ht_hash.h */,
 				E39542F220255354000BBA0D /* actypes.h */,
 				E39542F320255354000BBA0D /* ahocorasick.h */,
 				E39542F420255354000BBA0D /* libcache.h */,
@@ -688,6 +704,8 @@
 		E39542F820255354000BBA0D /* src */ = {
 			isa = PBXGroup;
 			children = (
+				E35D551C228BA80000A80DED /* ht_hash.c */,
+				E35D551B228BA80000A80DED /* sha1-fast.c */,
 				E395430020255354000BBA0D /* ahocorasick.c */,
 				E395430120255354000BBA0D /* libcache.c */,
 				E395430820255354000BBA0D /* ndpi_patricia.c */,
@@ -769,14 +787,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E395430C20255354000BBA0D /* ndpi_define.h.in in Resources */,
-				E395431A20255354000BBA0D /* Makefile.simple in Resources */,
-				E395430B20255354000BBA0D /* Makefile.am in Resources */,
-				E395431920255354000BBA0D /* Makefile.in in Resources */,
 				E3953F5920254989000BBA0D /* Assets.xcassets in Resources */,
 				E39547942026B2AA000BBA0D /* capture.pcap in Resources */,
 				E395455D202558E6000BBA0D /* protos.txt in Resources */,
 				E3953F5C2025498A000BBA0D /* Main.storyboard in Resources */,
-				E395431820255354000BBA0D /* Makefile.am in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -787,20 +801,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E39544F320255354000BBA0D /* mms.c in Sources */,
 				E39544F220255354000BBA0D /* mgcp.c in Sources */,
 				E39543B420255354000BBA0D /* checkmk.c in Sources */,
 				E39543D720255354000BBA0D /* http.c in Sources */,
 				E39543A420255354000BBA0D /* aimini.c in Sources */,
 				E39543DD20255354000BBA0D /* jabber.c in Sources */,
+				E35D5510228BA70600A80DED /* ajp.c in Sources */,
 				E395452820255354000BBA0D /* steam.c in Sources */,
 				E39543C720255354000BBA0D /* edonkey.c in Sources */,
 				E39543B520255354000BBA0D /* ciscovpn.c in Sources */,
+				E35D5511228BA70600A80DED /* snmp_proto.c in Sources */,
 				E39543B120255354000BBA0D /* bittorrent.c in Sources */,
 				E395452E20255354000BBA0D /* telegram.c in Sources */,
 				E39543DA20255354000BBA0D /* icecast.c in Sources */,
 				E395450620255354000BBA0D /* postgres.c in Sources */,
-				E395451E20255354000BBA0D /* socrates.c in Sources */,
 				E395450B20255354000BBA0D /* quic.c in Sources */,
 				E39543A820255354000BBA0D /* armagetron.c in Sources */,
 				E39543D120255354000BBA0D /* gtp.c in Sources */,
@@ -811,7 +825,6 @@
 				E395452620255354000BBA0D /* starcraft.c in Sources */,
 				E39543B620255354000BBA0D /* citrix.c in Sources */,
 				E395451320255354000BBA0D /* rtsp.c in Sources */,
-				E39543CA20255354000BBA0D /* filetopia.c in Sources */,
 				E39544F120255354000BBA0D /* megaco.c in Sources */,
 				E39543A920255354000BBA0D /* flash.c in Sources */,
 				E39544F820255354000BBA0D /* mysql.c in Sources */,
@@ -832,10 +845,12 @@
 				E395451420255354000BBA0D /* rx.c in Sources */,
 				E39543DC20255354000BBA0D /* irc.c in Sources */,
 				E395450320255354000BBA0D /* oscar.c in Sources */,
+				E35D551D228BA80000A80DED /* sha1-fast.c in Sources */,
 				E39543BC20255354000BBA0D /* dcerpc.c in Sources */,
 				E395454020255355000BBA0D /* world_of_warcraft.c in Sources */,
 				E39543A620255354000BBA0D /* apple_push.c in Sources */,
 				E395451920255354000BBA0D /* skype.c in Sources */,
+				E35D551E228BA80000A80DED /* ht_hash.c in Sources */,
 				E39543AC20255354000BBA0D /* popo.c in Sources */,
 				E39543BF20255354000BBA0D /* diameter.c in Sources */,
 				E39544FF20255354000BBA0D /* ntp.c in Sources */,
@@ -847,7 +862,6 @@
 				E39544EC20255354000BBA0D /* mail_imap.c in Sources */,
 				E395450C20255354000BBA0D /* radius.c in Sources */,
 				E395455F202558E6000BBA0D /* ndpiReader.c in Sources */,
-				E395451C20255354000BBA0D /* snmp.c in Sources */,
 				E395452520255354000BBA0D /* ssl.c in Sources */,
 				E39543D420255354000BBA0D /* halflife2_and_mods.c in Sources */,
 				E39544F920255354000BBA0D /* netbios.c in Sources */,
@@ -870,11 +884,13 @@
 				E395450D20255354000BBA0D /* rdp.c in Sources */,
 				E39544EA20255354000BBA0D /* lisp.c in Sources */,
 				E39544EF20255354000BBA0D /* maplestory.c in Sources */,
+				E35D5519228BA70600A80DED /* mining.c in Sources */,
 				E39544EB20255354000BBA0D /* lotus_notes.c in Sources */,
 				E395451F20255354000BBA0D /* someip.c in Sources */,
 				E39543DF20255354000BBA0D /* kerberos.c in Sources */,
 				E39543A720255354000BBA0D /* applejuice.c in Sources */,
 				E395452020255354000BBA0D /* sopcast.c in Sources */,
+				E35D5517228BA70600A80DED /* fbzero.c in Sources */,
 				E39543AD20255354000BBA0D /* secondlife.c in Sources */,
 				E395450720255354000BBA0D /* pplive.c in Sources */,
 				E395453120255354000BBA0D /* tftp.c in Sources */,
@@ -883,6 +899,7 @@
 				E39543D620255354000BBA0D /* hep.c in Sources */,
 				E39543E020255354000BBA0D /* kontiki.c in Sources */,
 				E39544FA20255354000BBA0D /* netflow.c in Sources */,
+				E35D5513228BA70600A80DED /* ookla.c in Sources */,
 				E395454220255355000BBA0D /* xdmcp.c in Sources */,
 				E39544F720255354000BBA0D /* mssql_tds.c in Sources */,
 				E395451A20255354000BBA0D /* smb.c in Sources */,
@@ -890,11 +907,12 @@
 				E395450520255354000BBA0D /* pcanywhere.c in Sources */,
 				E39547902026A51A000BBA0D /* ahocorasick.c in Sources */,
 				E395452320255354000BBA0D /* ssdp.c in Sources */,
+				E35D5518228BA70600A80DED /* nest_log_sink.c in Sources */,
 				E395431B20255354000BBA0D /* ndpi_content_match.c.inc in Sources */,
 				E395450120255354000BBA0D /* openvpn.c in Sources */,
 				E395453920255354000BBA0D /* vhua.c in Sources */,
-				E39544F020255354000BBA0D /* mdns.c in Sources */,
 				E39543C920255354000BBA0D /* fiesta.c in Sources */,
+				E35D5514228BA70600A80DED /* upnp.c in Sources */,
 				E395454120255355000BBA0D /* xbox.c in Sources */,
 				E395453D20255355000BBA0D /* warcraft3.c in Sources */,
 				E39543D220255354000BBA0D /* guildwars.c in Sources */,
@@ -902,12 +920,14 @@
 				E395450E20255354000BBA0D /* redis_net.c in Sources */,
 				E395455420255355000BBA0D /* node.c in Sources */,
 				E39543CE20255354000BBA0D /* ftp_data.c in Sources */,
+				E35D551F228BA88700A80DED /* ndpi_patricia.c in Sources */,
 				E395451D20255354000BBA0D /* socks45.c in Sources */,
 				E395451820255354000BBA0D /* skinny.c in Sources */,
 				E395453620255354000BBA0D /* tvuplayer.c in Sources */,
 				E39543CC20255354000BBA0D /* florensia.c in Sources */,
 				E3953F5720254989000BBA0D /* ViewController.m in Sources */,
 				E39544F520255354000BBA0D /* mqtt.c in Sources */,
+				E35D5516228BA70600A80DED /* mdns_proto.c in Sources */,
 				E39543C220255354000BBA0D /* dns.c in Sources */,
 				E39543B920255354000BBA0D /* corba.c in Sources */,
 				E39543B320255354000BBA0D /* btlib.c in Sources */,
@@ -927,6 +947,7 @@
 				E395453E20255355000BBA0D /* whoisdas.c in Sources */,
 				E39543BB20255354000BBA0D /* csgo.c in Sources */,
 				E395450A20255354000BBA0D /* qq.c in Sources */,
+				E35D5512228BA70600A80DED /* modbus.c in Sources */,
 				E395431C20255354000BBA0D /* ndpi_main.c in Sources */,
 				E39543BD20255354000BBA0D /* dhcp.c in Sources */,
 				E395454520255355000BBA0D /* zeromq.c in Sources */,
@@ -935,6 +956,7 @@
 				E395451120255354000BBA0D /* rtmp.c in Sources */,
 				E39544FE20255354000BBA0D /* non_tcp_udp.c in Sources */,
 				E39543C020255354000BBA0D /* directconnect.c in Sources */,
+				E35D5515228BA70600A80DED /* memcached.c in Sources */,
 				E39543D020255354000BBA0D /* gnutella.c in Sources */,
 				E39543D320255354000BBA0D /* h323.c in Sources */,
 				E395453720255354000BBA0D /* ubntac2.c in Sources */,
@@ -1087,6 +1109,7 @@
 					"$(inherited)",
 					"APP_HAS_OWN_MAIN=1",
 					"NDPI_LOG_DEBUG2=NDPI_LOG_DEBUG2_XCODE_PROJ",
+					NDPI_LIB_COMPILATION,
 				);
 				INFOPLIST_FILE = ndpiExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1105,6 +1128,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"APP_HAS_OWN_MAIN=1",
 					"NDPI_LOG_DEBUG2=NDPI_LOG_DEBUG2_XCODE_PROJ",
+					NDPI_LIB_COMPILATION,
 				);
 				INFOPLIST_FILE = ndpiExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
