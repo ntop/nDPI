@@ -645,6 +645,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     return(nproto);
   }
 
+  /* The lines below are no longer necessary as this hsould be called automatically by ndpi_detection_process_packet */
+#if 0
   /* Protocol already detected */
   if(flow->detection_completed) {
     if(flow->check_extra_packets && ndpi_flow != NULL && ndpi_flow->check_extra_packets) {
@@ -669,7 +671,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
     return(flow->detected_protocol);
   }
-
+#endif
+  
   flow->detected_protocol =
     ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 				  iph ? (uint8_t *)iph : (uint8_t *)iph6,

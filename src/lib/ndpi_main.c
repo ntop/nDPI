@@ -4650,9 +4650,24 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   flow->num_processed_pkts++;
 
   if(flow->server_id == NULL) flow->server_id = dst; /* Default */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
-    goto ret_protocols;
-
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+    /*
+      With SSL we might want to dissect further packets to decode
+      the certificate type for instance 
+    */
+    if(flow->check_extra_packets
+       /*
+	 && ((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL)
+	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_SSL))
+       */
+       ) {
+      ndpi_process_extra_packet(ndpi_struct, flow, packet, packetlen, current_tick_l, src, dst);
+      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+      return(ret);
+    } else
+      goto ret_protocols;
+  }
+  
   /* need at least 20 bytes for ip header */
   if(packetlen < 20) {
     /* reset protocol which is normally done in init_packet_header */

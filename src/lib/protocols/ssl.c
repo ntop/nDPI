@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-// #define CERTIFICATE_DEBUG 1
+ #define CERTIFICATE_DEBUG 1
 
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
@@ -543,7 +543,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    u_int16_t i, cypher_offset = base_offset + session_id_len + 3;
 
 #ifdef CERTIFICATE_DEBUG
-	    printf("SSL [client cypher_len: %u]\n", cypher_len);
+	    printf("Client SSL [client cypher_len: %u]\n", cypher_len);
 #endif
 
 	    if((cypher_offset+cypher_len) <= total_len) {
@@ -551,7 +551,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t *id = (u_int16_t*)&packet->payload[cypher_offset+i];
 		
 #ifdef CERTIFICATE_DEBUG
-		printf("SSL [cypher suite: %u] [%u/%u]\n", ntohs(*id), i, cypher_len);
+		printf("Client SSL [cypher suite: %u] [%u/%u]\n", ntohs(*id), i, cypher_len);
 #endif
 		if((*id == 0) || (packet->payload[cypher_offset+i] != packet->payload[cypher_offset+i+1])) {
 		  /*
@@ -564,7 +564,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  else {
 		    invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-		    printf("SSL Invalid cypher %u\n", ja3.num_cipher);
+		    printf("Client SSL Invalid cypher %u\n", ja3.num_cipher);
 #endif
 		  }
 		}
@@ -574,7 +574,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    } else {
 	      invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-	      printf("SSL Invalid len %u vs %u\n", (cypher_offset+cypher_len), total_len);
+	      printf("Client SSL Invalid len %u vs %u\n", (cypher_offset+cypher_len), total_len);
 #endif		    
 	    }
 	    
@@ -591,7 +591,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      offset++;
 
 #ifdef CERTIFICATE_DEBUG
-	      printf("SSL [compression_len: %u]\n", compression_len);
+	      printf("Client SSL [compression_len: %u]\n", compression_len);
 #endif
 
 	      // offset += compression_len + 3;
@@ -602,7 +602,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		offset += 2;
 
 #ifdef CERTIFICATE_DEBUG
-		printf("SSL [extensions_len: %u]\n", extensions_len);
+		printf("Client SSL [extensions_len: %u]\n", extensions_len);
 #endif
 
 		if((extensions_len+offset) <= total_len) {
@@ -621,7 +621,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    extension_offset += 2;
 
 #ifdef CERTIFICATE_DEBUG
-		    printf("SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
+		    printf("Client SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
 #endif
 
 		    if((extension_id == 0) || (packet->payload[extn_off] != packet->payload[extn_off+1])) {
@@ -632,7 +632,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      else {
 			invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-			printf("SSL Invalid extensions %u\n", ja3.num_ssl_extension);
+			printf("Client SSL Invalid extensions %u\n", ja3.num_ssl_extension);
 #endif
 		      }
 		    }
@@ -655,15 +655,15 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      u_int16_t i, s_offset = offset+extension_offset + 2;
 
 #ifdef CERTIFICATE_DEBUG
-		      printf("SSL [EllipticCurve: len=%u]\n", extension_len);
+		      printf("Client SSL [EllipticCurveGroups: len=%u]\n", extension_len);
 #endif
 
-		      if((s_offset+extension_len-1) < total_len) {
+		      if((s_offset+extension_len-2) <= total_len) {
 			for(i=0; i<extension_len-2;) {
 			  u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 			
 #ifdef CERTIFICATE_DEBUG
-			  printf("SSL [EllipticCurve: %u]\n", s_group);
+			  printf("Client SSL [EllipticCurve: %u]\n", s_group);
 #endif
 			  if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])) {
 			    /* Skip GREASE */
@@ -672,7 +672,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			    else {			      
 			      invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-			      printf("SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve);
+			      printf("Client SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve);
 #endif
 			    }
 			  }
@@ -682,21 +682,21 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      } else {
 			invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-			printf("SSL Invalid len %u vs %u\n", (s_offset+extension_len-1), total_len);
+			printf("Client SSL Invalid len %u vs %u\n", (s_offset+extension_len-1), total_len);
 #endif
 		      }		     
 		    } else if(extension_id == 11 /* ec_point_formats groups */) {
 		      u_int16_t i, s_offset = offset+extension_offset + 1;
 
 #ifdef CERTIFICATE_DEBUG
-		      printf("SSL [EllipticCurveFormat: len=%u]\n", extension_len);
+		      printf("Client SSL [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
 		      if((s_offset+extension_len) < total_len) {
 			for(i=0; i<extension_len-1;i++) {
 			  u_int8_t s_group = packet->payload[s_offset+i];
 			  
 #ifdef CERTIFICATE_DEBUG
-			  printf("SSL [EllipticCurveFormat: %u]\n", s_group);
+			  printf("Client SSL [EllipticCurveFormat: %u]\n", s_group);
 #endif
 			  
 			  if(ja3.num_elliptic_curve_point_format < MAX_NUM_JA3)
@@ -704,14 +704,14 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			  else {
 			    invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-			    printf("SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve_point_format);
+			    printf("Client SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve_point_format);
 #endif
 			  }
 			}
 		      } else {
 			invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-			printf("SSL Invalid len %u vs %u\n", s_offset+extension_len, total_len);
+			printf("Client SSL Invalid len %u vs %u\n", s_offset+extension_len, total_len);
 #endif
 		      }
 		    }
@@ -719,7 +719,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    extension_offset += extension_len;
 
 #ifdef CERTIFICATE_DEBUG
-		    printf("SSL [extension_offset/len: %u/%u]\n", extension_offset, extension_len);
+		    printf("Client SSL [extension_offset/len: %u/%u]\n", extension_offset, extension_len);
 #endif
 		  } /* while */
 
@@ -839,7 +839,7 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 	snprintf(flow->protos.stun_ssl.ssl.server_organization,
 		 sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
 #ifdef CERTIFICATE_DEBUG
-	printf("Certificate origanization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
+	printf("Certificate organization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
 #endif
       }
     }
