@@ -749,13 +749,13 @@ char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
 
 /* ********************************** */
 
-static char* print_cipher(u_int8_t c) {
+static char* print_cipher(ndpi_cipher_weakness c) {
   switch(c) {
-  case NDPI_CIPHER_INSECURE:
+  case ndpi_cipher_insecure:
     return(" (INSECURE)");
     break;
 
-  case NDPI_CIPHER_WEAK:
+  case ndpi_cipher_weak:
     return(" (WEAK)");
     break;
 

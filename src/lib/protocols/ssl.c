@@ -358,7 +358,7 @@ struct ja3_info {
 
 struct cipher_weakness {
   u_int16_t cipher_id;
-  u_int8_t weakness_type;
+  ndpi_cipher_weakness weakness_type;
 };
 
 static struct cipher_weakness safe_ssl_ciphers[] =

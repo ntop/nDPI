@@ -369,7 +369,7 @@ typedef enum {
 } ndpi_http_method;
 
 struct ndpi_lru_cache {
-  u_int32_t num_entries, *entries;  
+  u_int32_t num_entries, *entries;
 };
 
 struct ndpi_id_struct {
@@ -480,14 +480,14 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_WHATSAPP */
   u_int8_t wa_matched_so_far;
-  
+
   /* NDPI_PROTOCOL_TDS */
   u_int8_t tds_login_version;
 
   /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_stage;
   u_int8_t irc_port;
-  
+
   /* NDPI_PROTOCOL_H323 */
   u_int8_t h323_valid_packets;
 
@@ -555,7 +555,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t seen_syn:1;
   u_int32_t seen_syn_ack:1;
   u_int32_t seen_ack:1;
-  
+
   /* NDPI_PROTOCOL_ICECAST */
   u_int32_t icecast_stage:1;
 
@@ -801,7 +801,7 @@ typedef enum {
 	      NDPI_PROTOCOL_CATEGORY_SHOPPING,
 	      NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,
 	      NDPI_PROTOCOL_CATEGORY_FILE_SHARING,
-	      
+
 	      /* Some custom categories */
 	      CUSTOM_CATEGORY_MINING           = 99,
 	      CUSTOM_CATEGORY_MALWARE          = 100,
@@ -819,7 +819,7 @@ typedef enum {
 
 		in ndpi_main.c
 	      */
-    
+
 	      NDPI_PROTOCOL_NUM_CATEGORIES /*
 					     NOTE: Keep this as last member
 					     Unused as value but useful to getting the number of elements
@@ -834,7 +834,7 @@ typedef enum {
 	      ndpi_pref_disable_metadata_export,
 	      ndpi_pref_enable_category_substring_match
 } ndpi_detection_preference;
-  
+
 /* ntop extensions */
 typedef struct ndpi_proto_defaults {
   char *protoName;
@@ -961,7 +961,7 @@ struct ndpi_detection_module_struct {
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
     u_int8_t categories_loaded;
   } custom_categories;
-  
+
   /* IP-based protocol detection */
   void *protocols_ptree;
 
@@ -1015,11 +1015,17 @@ struct ndpi_detection_module_struct {
     disable_metadata_export:1, /* No metadata is exported */
     enable_category_substring_match:1 /* Default is perfect match */
     ;
-  
+
   void *hyperscan; /* Intel Hyperscan */
 };
-  
+
 #endif /* NDPI_LIB_COMPILATION */
+
+typedef enum {
+   ndpi_cipher_safe = NDPI_CIPHER_SAFE,
+   ndpi_cipher_weak = NDPI_CIPHER_WEAK,
+   ndpi_cipher_insecure = NDPI_CIPHER_INSECURE
+} ndpi_cipher_weakness;
 
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
@@ -1041,7 +1047,7 @@ struct ndpi_flow_struct {
   u_int8_t max_extra_packets_to_check;
   u_int8_t num_extra_packets_checked;
   u_int8_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
-  
+
   int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
   /*
@@ -1093,15 +1099,15 @@ struct ndpi_flow_struct {
       struct {
 	char client_certificate[64], server_certificate[64], server_organization[64];
 	char ja3_client[33], ja3_server[33];
-	u_int8_t client_unsafe_cipher:2, server_unsafe_cipher:2, _pad:4;
+	ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
       } ssl;
-      
+
       struct {
 	u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests, is_skype;
       } stun;
 
       /* We can have STUN over SSL thus they need to live together */
-    } stun_ssl;  
+    } stun_ssl;
 
     struct {
       char client_signature[48], server_signature[48];
@@ -1139,10 +1145,10 @@ struct ndpi_flow_struct {
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
 
   ndpi_protocol_category_t category;
-  
+
   /* NDPI_PROTOCOL_REDIS */
   u_int8_t redis_s2d_first_char, redis_d2s_first_char;
-  
+
   u_int16_t packet_counter;		      // can be 0 - 65000
   u_int16_t packet_direction_counter[2];
   u_int16_t byte_counter[2];
@@ -1158,7 +1164,7 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_HTTP */
   u_int8_t http_detected:1;
   u_int16_t http_upper_protocol, http_lower_protocol;
-  
+
   /* NDPI_PROTOCOL_RTSP */
   u_int8_t rtsprdt_stage:2, rtsp_control_flow:1;
 
@@ -1173,7 +1179,7 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_THUNDER */
   u_int8_t thunder_stage:2;		        // 0 - 3
-  
+
   /* NDPI_PROTOCOL_OSCAR */
   u_int8_t oscar_ssl_voice_stage:3, oscar_video_voice:1;
 
