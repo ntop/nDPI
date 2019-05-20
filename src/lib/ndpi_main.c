@@ -6404,3 +6404,5 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 
   return(0); /* OK */
 }
+
+/* **************************************** */

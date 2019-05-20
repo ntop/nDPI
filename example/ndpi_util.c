@@ -572,6 +572,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client);
       snprintf(flow->ssh_ssl.ja3_server, sizeof(flow->ssh_ssl.ja3_server), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server);
+      flow->ssh_ssl.client_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.client_unsafe_cipher;
+      flow->ssh_ssl.server_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_unsafe_cipher;
     }
   }
 
@@ -684,7 +686,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     /* New protocol detected or give up */
     flow->detection_completed = 1;
     /* Check if we should keep checking extra packets */
-    if(ndpi_flow->check_extra_packets)
+    if(ndpi_flow && ndpi_flow->check_extra_packets)
       flow->check_extra_packets = 1;
 
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)

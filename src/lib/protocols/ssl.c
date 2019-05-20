@@ -43,6 +43,8 @@ typedef struct MD5Context {
   unsigned char in[64];
 } MD5_CTX;
 
+/* **************************************** */
+
 static int is_big_endian(void) {
   static const int n = 1;
   return ((char *) &n)[0] == 0;
@@ -352,6 +354,58 @@ struct ja3_info {
   u_int8_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA3];
 };
 
+/* **************************************** */
+
+struct cipher_weakness {
+  u_int16_t cipher_id;
+  u_int8_t weakness_type;
+};
+
+static struct cipher_weakness safe_ssl_ciphers[] =
+  {
+   /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
+   /* INSECURE */
+   { 0xc011, NDPI_CIPHER_INSECURE }, /* TLS_ECDHE_RSA_WITH_RC4_128_SHA */
+   { 0x0005, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_SHA */
+   { 0x0004, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_MD5 */
+   /* WEAK */
+   { 0x009d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_GCM_SHA384 */
+   { 0x003d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
+   { 0x0035, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA */
+   { 0x0084, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_256_CBC_SHA */
+   { 0x009c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_GCM_SHA256 */
+   { 0x003c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
+   { 0x002f, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA */
+   { 0x0041, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_128_CBC_SHA */
+   { 0xc012, NDPI_CIPHER_WEAK }, /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
+   { 0x0016, NDPI_CIPHER_WEAK }, /* TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA */
+   { 0x000a, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_3DES_EDE_CBC_SHA */
+   { 0x0096, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_SEED_CBC_SHA */
+   { 0x0007, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_IDEA_CBC_SHA */
+   
+   { 0x0, NDPI_CIPHER_SAFE    } /* END */
+};
+  
+static u_int8_t is_safe_ssl_cipher(u_int16_t cipher) {
+  u_int i;
+
+  for(i=0; safe_ssl_ciphers[i].cipher_id  != 0; i++) {    
+    if(safe_ssl_ciphers[i].cipher_id == cipher) {
+#ifdef CERTIFICATE_DEBUG
+      printf("%s %s(%04X / %u)\n",
+	     (safe_ssl_ciphers[i].weakness_type == NDPI_CIPHER_WEAK) ? "WEAK" : "INSECURE",
+	     __FUNCTION__, cipher, cipher);
+#endif
+  
+      return(safe_ssl_ciphers[i].weakness_type);
+    }
+  }
+  
+  return(NDPI_CIPHER_SAFE); /* We're safe */
+}
+/* **************************************** */
+
+
 /* code fixes courtesy of Alexsandro Brahm <alex@digistar.com.br> */
 int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow,
@@ -410,6 +464,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  offset += session_id_len+1;
 
 	  ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
+	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = is_safe_ssl_cipher(ja3.cipher[0]);
 
 #ifdef CERTIFICATE_DEBUG
 	  printf("SSL [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
@@ -539,21 +594,21 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  ja3.ssl_version = ssl_version;
 
 	  if((session_id_len+base_offset+2) <= total_len) {
-	    u_int16_t cypher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
-	    u_int16_t i, cypher_offset = base_offset + session_id_len + 3;
+	    u_int16_t cipher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
+	    u_int16_t i, cipher_offset = base_offset + session_id_len + 3;
 
 #ifdef CERTIFICATE_DEBUG
-	    printf("Client SSL [client cypher_len: %u]\n", cypher_len);
+	    printf("Client SSL [client cipher_len: %u]\n", cipher_len);
 #endif
 
-	    if((cypher_offset+cypher_len) <= total_len) {
-	      for(i=0; i<cypher_len;) {
-		u_int16_t *id = (u_int16_t*)&packet->payload[cypher_offset+i];
+	    if((cipher_offset+cipher_len) <= total_len) {
+	      for(i=0; i<cipher_len;) {
+		u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
 		
 #ifdef CERTIFICATE_DEBUG
-		printf("Client SSL [cypher suite: %u] [%u/%u]\n", ntohs(*id), i, cypher_len);
+		printf("Client SSL [cipher suite: %u] [%u/%u]\n", ntohs(*id), i, cipher_len);
 #endif
-		if((*id == 0) || (packet->payload[cypher_offset+i] != packet->payload[cypher_offset+i+1])) {
+		if((*id == 0) || (packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1])) {
 		  /*
 		    Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
 		    https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
@@ -564,7 +619,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  else {
 		    invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-		    printf("Client SSL Invalid cypher %u\n", ja3.num_cipher);
+		    printf("Client SSL Invalid cipher %u\n", ja3.num_cipher);
 #endif
 		  }
 		}
@@ -574,11 +629,11 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    } else {
 	      invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
-	      printf("Client SSL Invalid len %u vs %u\n", (cypher_offset+cypher_len), total_len);
+	      printf("Client SSL Invalid len %u vs %u\n", (cipher_offset+cipher_len), total_len);
 #endif		    
 	    }
 	    
-	    offset = base_offset + session_id_len + cypher_len + 2;
+	    offset = base_offset + session_id_len + cipher_len + 2;
 
 	    flow->l4.tcp.ssl_seen_client_cert = 1;
 
@@ -726,9 +781,13 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  if(!invalid_ja3) {
 		    ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.ssl_version);
 		    
-		    for(i=0; i<ja3.num_cipher; i++)
+		    for(i=0; i<ja3.num_cipher; i++) {
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 					      (i > 0) ? "-" : "", ja3.cipher[i]);
+		      
+		      if(flow->protos.stun_ssl.ssl.client_unsafe_cipher < NDPI_CIPHER_INSECURE)
+			flow->protos.stun_ssl.ssl.client_unsafe_cipher = is_safe_ssl_cipher(ja3.cipher[i]);
+		    }
 		    
 		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
 		    
