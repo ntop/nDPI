@@ -338,6 +338,10 @@
 #define NDPI_MINOR                              @NDPI_MINOR@
 #define NDPI_PATCH                              @NDPI_PATCH@
 
+/* IMPORTANT: order according to its severity */
+#define NDPI_CIPHER_SAFE                        0
+#define NDPI_CIPHER_WEAK                        1
+#define NDPI_CIPHER_INSECURE                    2
 
 #ifdef __APPLE__
 
