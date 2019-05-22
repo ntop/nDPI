@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-#define CERTIFICATE_DEBUG 1 
+/* #define CERTIFICATE_DEBUG 1  */
 
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
