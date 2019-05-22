@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-/* #define CERTIFICATE_DEBUG 1 */
+#define CERTIFICATE_DEBUG 1 
 
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
@@ -458,14 +458,15 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	ja3.ssl_version = ssl_version;
 
 	if(handshake_protocol == 0x02) {
-	  u_int16_t offset = 43, extension_len;
+	  u_int16_t offset = 43, extension_len, j;
 	  u_int8_t  session_id_len = packet->payload[43];
 
 	  offset += session_id_len+1;
 
 	  ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = is_safe_ssl_cipher(ja3.cipher[0]);
-
+	  flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
+	  
 #ifdef CERTIFICATE_DEBUG
 	  printf("SSL [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
 #endif
@@ -511,7 +512,23 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 	  printf("SSL [server] %s\n", ja3_str);
 #endif
-
+	  
+#ifdef CERTIFICATE_DEBUG
+	  printf("[JA3] Server: %s \n", ja3_str);
+#endif
+	  
+	  MD5Init(&ctx);
+	  MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
+	  MD5Final(md5_hash, &ctx);
+	  
+	  for(i=0, j=0; i<16; i++)
+	    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
+			  sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
+	  
+#ifdef CERTIFICATE_DEBUG
+	  printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
+#endif
+	  
 	  flow->l4.tcp.ssl_seen_server_cert = 1;
 	} else
 	  flow->l4.tcp.ssl_seen_certificate = 1;
@@ -562,22 +579,6 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  snprintf(flow->protos.stun_ssl.ssl.server_certificate,
 			   sizeof(flow->protos.stun_ssl.ssl.server_certificate), "%s", buffer);
 		}
-
-#ifdef CERTIFICATE_DEBUG
-		printf("[JA3] Server: %s \n", ja3_str);
-#endif
-
-		MD5Init(&ctx);
-		MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
-		MD5Final(md5_hash, &ctx);
-
-		for(i=0, j=0; i<16; i++)
-		  j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
-				sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
-
-#ifdef CERTIFICATE_DEBUG
-		printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
-#endif
 
 		return(1 /* Server Certificate */);
 	      }
