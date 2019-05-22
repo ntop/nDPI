@@ -356,55 +356,6 @@ struct ja3_info {
 
 /* **************************************** */
 
-struct cipher_weakness {
-  u_int16_t cipher_id;
-  ndpi_cipher_weakness weakness_type;
-};
-
-static struct cipher_weakness safe_ssl_ciphers[] =
-  {
-   /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
-   /* INSECURE */
-   { 0xc011, NDPI_CIPHER_INSECURE }, /* TLS_ECDHE_RSA_WITH_RC4_128_SHA */
-   { 0x0005, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_SHA */
-   { 0x0004, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_MD5 */
-   /* WEAK */
-   { 0x009d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_GCM_SHA384 */
-   { 0x003d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
-   { 0x0035, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA */
-   { 0x0084, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_256_CBC_SHA */
-   { 0x009c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_GCM_SHA256 */
-   { 0x003c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
-   { 0x002f, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA */
-   { 0x0041, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_128_CBC_SHA */
-   { 0xc012, NDPI_CIPHER_WEAK }, /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x0016, NDPI_CIPHER_WEAK }, /* TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x000a, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x0096, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_SEED_CBC_SHA */
-   { 0x0007, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_IDEA_CBC_SHA */
-   
-   { 0x0, NDPI_CIPHER_SAFE    } /* END */
-};
-  
-static u_int8_t is_safe_ssl_cipher(u_int16_t cipher) {
-  u_int i;
-
-  for(i=0; safe_ssl_ciphers[i].cipher_id  != 0; i++) {    
-    if(safe_ssl_ciphers[i].cipher_id == cipher) {
-#ifdef CERTIFICATE_DEBUG
-      printf("%s %s(%04X / %u)\n",
-	     (safe_ssl_ciphers[i].weakness_type == NDPI_CIPHER_WEAK) ? "WEAK" : "INSECURE",
-	     __FUNCTION__, cipher, cipher);
-#endif
-  
-      return(safe_ssl_ciphers[i].weakness_type);
-    }
-  }
-  
-  return(NDPI_CIPHER_SAFE); /* We're safe */
-}
-/* **************************************** */
-
 
 /* code fixes courtesy of Alexsandro Brahm <alex@digistar.com.br> */
 int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
@@ -464,7 +415,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  offset += session_id_len+1;
 
 	  ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
-	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = is_safe_ssl_cipher(ja3.cipher[0]);
+	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0]);
 	  flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
 	  
 #ifdef CERTIFICATE_DEBUG
@@ -785,9 +736,6 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    for(i=0; i<ja3.num_cipher; i++) {
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 					      (i > 0) ? "-" : "", ja3.cipher[i]);
-		      
-		      if(flow->protos.stun_ssl.ssl.client_unsafe_cipher < NDPI_CIPHER_INSECURE)
-			flow->protos.stun_ssl.ssl.client_unsafe_cipher = is_safe_ssl_cipher(ja3.cipher[i]);
 		    }
 		    
 		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");

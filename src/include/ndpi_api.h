@@ -807,6 +807,7 @@ extern "C" {
 			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
 			    u_char *hash_buf, u_int8_t hash_buf_len);
   
+  u_int8_t ndpi_is_safe_ssl_cipher(u_int16_t cipher);
 #ifdef __cplusplus
 }
 #endif

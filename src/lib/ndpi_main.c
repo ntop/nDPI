@@ -2690,7 +2690,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struc
 				 u_int8_t proto, u_int16_t sport, u_int16_t dport,
 				 u_int8_t *user_defined_proto) {
   *user_defined_proto = 0; /* Default */
-  
+
   if(sport && dport) {
     ndpi_default_ports_tree_node_t *found = ndpi_get_guessed_protocol_id(ndpi_struct, proto, sport, dport);
 
@@ -3913,7 +3913,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
       if(tcph->ack != 0) {
 	flow->next_tcp_seq_nr[flow->packet.packet_direction] =
 	  ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
-	
+
 	flow->next_tcp_seq_nr[1 -flow->packet.packet_direction] = ntohl(tcph->ack_seq);
       }
     } else if(packet->payload_packet_len > 0) {
@@ -4178,7 +4178,7 @@ static ndpi_protocol ndpi_process_partial_detection(struct ndpi_detection_module
     ret.app_protocol = ret.master_protocol;
 
   ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
-  
+
   ndpi_int_change_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
 
   return(ret);
@@ -4275,17 +4275,17 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
 	if(flow->host_server_name[0] != '\0') {
 	  ndpi_protocol_match_result ret_match;
-	  
+
 	  ndpi_match_host_subprotocol(ndpi_struct, flow,
 				      (char *)flow->host_server_name,
 				      strlen((const char*)flow->host_server_name),
 				      &ret_match,
 				      NDPI_PROTOCOL_DNS);
-	  
+
 	  if(ret_match.protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	    guessed_host_protocol_id = ret_match.protocol_id;
 	}
-	
+
 	ndpi_int_change_protocol(ndpi_struct, flow,
 				 guessed_host_protocol_id,
 				 guessed_protocol_id);
@@ -4584,7 +4584,7 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
       return 1;
     }
   }
-  
+
   ret->category = ndpi_get_proto_category(ndpi_struct, *ret);
 
   return 0;
@@ -4599,7 +4599,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
     if(flow->guessed_header_category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) {
       flow->category = ret->category = flow->guessed_header_category;
       return;
-    }  
+    }
 
     if(flow->host_server_name[0] != '\0') {
       unsigned long id;
@@ -4653,7 +4653,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     /*
       With SSL we might want to dissect further packets to decode
-      the certificate type for instance 
+      the certificate type for instance
     */
     if(flow->check_extra_packets
        /*
@@ -4667,7 +4667,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     } else
       goto ret_protocols;
   }
-  
+
   /* need at least 20 bytes for ip header */
   if(packetlen < 20) {
     /* reset protocol which is normally done in init_packet_header */
@@ -4683,7 +4683,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   /* we are interested in ipv4 packet */
 
   if(ndpi_init_packet_header(ndpi_struct, flow, packetlen) != 0)
-    goto invalidate_ptr;  
+    goto invalidate_ptr;
 
   /* detect traffic for tcp or udp only */
   flow->src = src, flow->dst = dst;
@@ -4745,12 +4745,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     if(ndpi_struct->custom_categories.categories_loaded && flow->packet.iph) {
       ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
-      
+
       ndpi_fill_ip_protocol_category(ndpi_struct, flow->packet.iph->saddr, flow->packet.iph->daddr, &ret);
       flow->guessed_header_category = ret.category;
     } else
       flow->guessed_header_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-    
+
     if(flow->guessed_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
       /* This is a custom protocol and it has priority over everything else */
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN,
@@ -4797,7 +4797,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     ndpi_check_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
     ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
-    goto invalidate_ptr;    
+    goto invalidate_ptr;
   }
 
   ndpi_check_flow_func(ndpi_struct, flow, &ndpi_selection_packet);
@@ -4812,7 +4812,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     for(i=0; i<sizeof(flow->host_server_name); i++) {
       if(flow->host_server_name[i] != '\0')
 	flow->host_server_name[i] = tolower(flow->host_server_name[i]);
-      else {      
+      else {
 	flow->host_server_name[i] ='\0';
 	break;
       }
@@ -4848,12 +4848,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   }
 
  invalidate_ptr:
-  /*     
+  /*
      Invalidate packet memory to avoid accessing the pointers below
      when the packet is no longer accessible
   */
   flow->packet.iph = NULL, flow->packet.tcp = NULL, flow->packet.udp = NULL;
-  
+
   return(ret);
 }
 
@@ -6406,3 +6406,52 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 }
 
 /* **************************************** */
+
+/* **************************************** */
+
+struct cipher_weakness {
+  u_int16_t cipher_id;
+  ndpi_cipher_weakness weakness_type;
+};
+
+static struct cipher_weakness safe_ssl_ciphers[] = {
+   /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
+   /* INSECURE */
+   { 0xc011, NDPI_CIPHER_INSECURE }, /* TLS_ECDHE_RSA_WITH_RC4_128_SHA */
+   { 0x0005, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_SHA */
+   { 0x0004, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_MD5 */
+   /* WEAK */
+   { 0x009d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_GCM_SHA384 */
+   { 0x003d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
+   { 0x0035, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA */
+   { 0x0084, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_256_CBC_SHA */
+   { 0x009c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_GCM_SHA256 */
+   { 0x003c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
+   { 0x002f, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA */
+   { 0x0041, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_128_CBC_SHA */
+   { 0xc012, NDPI_CIPHER_WEAK }, /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
+   { 0x0016, NDPI_CIPHER_WEAK }, /* TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA */
+   { 0x000a, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_3DES_EDE_CBC_SHA */
+   { 0x0096, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_SEED_CBC_SHA */
+   { 0x0007, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_IDEA_CBC_SHA */
+
+   { 0x0, NDPI_CIPHER_SAFE    } /* END */
+};
+
+u_int8_t ndpi_is_safe_ssl_cipher(u_int16_t cipher) {
+  u_int i;
+
+  for(i=0; safe_ssl_ciphers[i].cipher_id  != 0; i++) {
+    if(safe_ssl_ciphers[i].cipher_id == cipher) {
+#ifdef CERTIFICATE_DEBUG
+      printf("%s %s(%04X / %u)\n",
+	     (safe_ssl_ciphers[i].weakness_type == NDPI_CIPHER_WEAK) ? "WEAK" : "INSECURE",
+	     __FUNCTION__, cipher, cipher);
+#endif
+
+      return(safe_ssl_ciphers[i].weakness_type);
+    }
+  }
+
+  return(NDPI_CIPHER_SAFE); /* We're safe */
+}

@@ -572,7 +572,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client);
       snprintf(flow->ssh_ssl.ja3_server, sizeof(flow->ssh_ssl.ja3_server), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server);
-      flow->ssh_ssl.client_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.client_unsafe_cipher;
       flow->ssh_ssl.server_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_unsafe_cipher;
     }
   }
