@@ -562,6 +562,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     /* SSL */
     else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
 	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
+      flow->ssh_ssl.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
       snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
       snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
@@ -576,7 +577,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
   }
 
-  if(flow->detection_completed && !flow->check_extra_packets) {
+  if(flow->detection_completed && (!flow->check_extra_packets)) {
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
       if(workflow->__flow_giveup_callback != NULL)
 	workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
@@ -646,63 +647,37 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     return(nproto);
   }
 
-  /* The lines below are no longer necessary as this hsould be called automatically by ndpi_detection_process_packet */
-#if 0
-  /* Protocol already detected */
-  if(flow->detection_completed) {
-    if(flow->check_extra_packets && ndpi_flow != NULL && ndpi_flow->check_extra_packets) {
-      if(ndpi_flow->num_extra_packets_checked == 0 && ndpi_flow->max_extra_packets_to_check == 0) {
-        /* Protocols can set this, but we set it here in case they didn't */
-        ndpi_flow->max_extra_packets_to_check = MAX_EXTRA_PACKETS_TO_CHECK;
-      }
-      if(ndpi_flow->num_extra_packets_checked < ndpi_flow->max_extra_packets_to_check) {
-        ndpi_process_extra_packet(workflow->ndpi_struct, ndpi_flow,
-				  iph ? (uint8_t *)iph : (uint8_t *)iph6,
-				  ipsize, time, src, dst);
-        if(ndpi_flow->check_extra_packets == 0) {
-          flow->check_extra_packets = 0;
-          process_ndpi_collected_info(workflow, flow);
-        }
-      }
-    } else if(ndpi_flow != NULL) {
-      /* If this wasn't NULL we should do the half free */
-      /* TODO: When half_free is deprecated, get rid of this */
-      ndpi_free_flow_info_half(flow);
-    }
-
-    return(flow->detected_protocol);
-  }
-#endif
+  if(!flow->detection_completed) {
+    flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
+							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
+							    ipsize, time, src, dst);
   
-  flow->detected_protocol =
-    ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
-				  iph ? (uint8_t *)iph : (uint8_t *)iph6,
-				  ipsize, time, src, dst);
-
-  if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
-     || ((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > 8))
-     || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) {
-    /* New protocol detected or give up */
-    flow->detection_completed = 1;
-    /* Check if we should keep checking extra packets */
-    if(ndpi_flow && ndpi_flow->check_extra_packets)
-      flow->check_extra_packets = 1;
-
-    if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
-						      enable_protocol_guess);
+    if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+       || ((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > 8))
+       || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) {
+      /* New protocol detected or give up */
+      flow->detection_completed = 1;
     
-    process_ndpi_collected_info(workflow, flow);
-  }
+      /* Check if we should keep checking extra packets */
+      if(ndpi_flow && ndpi_flow->check_extra_packets)
+	flow->check_extra_packets = 1;
 
+      if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+	flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
+							enable_protocol_guess);
+    
+      process_ndpi_collected_info(workflow, flow);
+    }
+  }
+  
   return(flow->detected_protocol);
 }
 
 /* ****************************************************** */
 
-struct ndpi_proto ndpi_workflow_process_packet (struct ndpi_workflow * workflow,
-						const struct pcap_pkthdr *header,
-						const u_char *packet) {
+struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
+					       const struct pcap_pkthdr *header,
+					       const u_char *packet) {
   /*
    * Declare pointers to packet headers
    */

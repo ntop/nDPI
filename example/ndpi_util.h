@@ -97,6 +97,7 @@ typedef struct ndpi_flow_info {
   char bittorent_hash[41];
   
   struct {
+    u_int16_t ssl_version;
     char client_info[64], server_info[64], server_organization[64],
       ja3_client[33], ja3_server[33];
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;

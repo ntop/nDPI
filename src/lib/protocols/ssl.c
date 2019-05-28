@@ -356,7 +356,6 @@ struct ja3_info {
 
 /* **************************************** */
 
-
 /* code fixes courtesy of Alexsandro Brahm <alex@digistar.com.br> */
 int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow,
@@ -369,11 +368,13 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
   MD5_CTX ctx;
   u_char md5_hash[16];
 
+  flow->protos.stun_ssl.ssl.ssl_version = ssl_version;
+  
   memset(&ja3, 0, sizeof(ja3));
 
 #ifdef CERTIFICATE_DEBUG
   {
-    u_int16_t ssl_len     = (packet->payload[3] << 8) + packet->payload[4];
+    u_int16_t ssl_len = (packet->payload[3] << 8) + packet->payload[4];
 
     printf("SSL Record [version: %u][len: %u]\n", ssl_version, ssl_len);
   }

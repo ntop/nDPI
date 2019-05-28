@@ -1097,6 +1097,7 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
+	u_int16_t ssl_version;
 	char client_certificate[64], server_certificate[64], server_organization[64];
 	char ja3_client[33], ja3_server[33];
 	u_int16_t server_cipher;

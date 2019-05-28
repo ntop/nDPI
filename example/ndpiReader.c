@@ -763,6 +763,24 @@ static char* print_cipher(ndpi_cipher_weakness c) {
     return("");
   }
 }
+
+/* ********************************** */
+
+static char* ssl_version2str(u_int16_t version) {
+  static char v[8];
+    
+  switch(version) {
+  case 0x300: return("SSLv3");
+  case 0x301: return("TLSv1");
+  case 0x302: return("TLSv1.1");
+  case 0x303: return("TLSv1.2");
+  case 0x304: return("TLSv1.3");
+  }
+
+  snprintf(v, sizeof(v), "%04X", version);
+  return(v);
+}
+
 /* ********************************** */
 
 /**
@@ -819,7 +837,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
 
-
+    if(flow->ssh_ssl.ssl_version != 0) fprintf(out, "[%s]", ssl_version2str(flow->ssh_ssl.ssl_version));
     if(flow->ssh_ssl.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_ssl.ja3_client,
 						    print_cipher(flow->ssh_ssl.client_unsafe_cipher));
     if(flow->ssh_ssl.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_ssl.server_info);
