@@ -8,14 +8,14 @@ Google	32	9133	3
 Viber	268	99524	9
 Amazon	71	24849	3
 
-	1	TCP 192.168.0.17:53934 <-> 54.230.93.53:443 [proto: 91.144/SSL.Viber][cat: VoIP/10][43 pkts/4571 bytes <-> 46 pkts/60087 bytes][client: dl-media.viber.com][server: *.viber.com][organization: Viber Media Sarl]
-	2	TCP 192.168.0.17:57520 <-> 54.230.93.96:443 [proto: 91.144/SSL.Viber][cat: VoIP/10][12 pkts/1848 bytes <-> 12 pkts/9317 bytes][client: media.cdn.viber.com][server: *.cdn.viber.com][organization: Viber Media Sarl]
-	3	TCP 192.168.0.17:49048 <-> 54.187.91.182:443 [proto: 91.178/SSL.Amazon][cat: Web/5][13 pkts/2823 bytes <-> 14 pkts/6552 bytes][client: brahe.apptimize.com][server: *.apptimize.com]
+	1	TCP 192.168.0.17:53934 <-> 54.230.93.53:443 [proto: 91.144/SSL.Viber][cat: VoIP/10][43 pkts/4571 bytes <-> 46 pkts/60087 bytes][TLSv1][JA3C: d8c87b9bfde38897979e41242626c2f3]
+	2	TCP 192.168.0.17:57520 <-> 54.230.93.96:443 [proto: 91.144/SSL.Viber][cat: VoIP/10][12 pkts/1848 bytes <-> 12 pkts/9317 bytes][TLSv1][JA3C: d8c87b9bfde38897979e41242626c2f3]
+	3	TCP 192.168.0.17:49048 <-> 54.187.91.182:443 [proto: 91.178/SSL.Amazon][cat: Web/5][13 pkts/2823 bytes <-> 14 pkts/6552 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039]
 	4	TCP 192.168.0.17:33208 <-> 52.0.253.101:4244 [proto: 144/Viber][cat: VoIP/10][32 pkts/6563 bytes <-> 26 pkts/2782 bytes]
-	5	TCP 192.168.0.17:43702 <-> 172.217.23.78:443 [proto: 91.126/SSL.Google][cat: Web/5][15 pkts/5339 bytes <-> 12 pkts/3436 bytes][client: app-measurement.com]
-	6	TCP 192.168.0.17:36986 <-> 54.69.166.226:443 [proto: 91.178/SSL.Amazon][cat: Web/5][11 pkts/1437 bytes <-> 11 pkts/6412 bytes][client: mapi.apptimize.com][server: *.apptimize.com]
-	7	TCP 192.168.0.17:55746 <-> 151.101.1.130:443 [proto: 91/SSL][cat: Web/5][10 pkts/1534 bytes <-> 9 pkts/6239 bytes][client: venetia.iad.appboy.com][server: y.ssl.fastly.net]
-	8	TCP 192.168.0.17:36988 <-> 54.69.166.226:443 [proto: 91.178/SSL.Amazon][cat: Web/5][11 pkts/1462 bytes <-> 11 pkts/6163 bytes][client: mapi.apptimize.com][server: *.apptimize.com]
+	5	TCP 192.168.0.17:43702 <-> 172.217.23.78:443 [proto: 91.126/SSL.Google][cat: Web/5][15 pkts/5339 bytes <-> 12 pkts/3436 bytes][TLSv1.2][JA3C: 3967ff2d2c9c4d144e7e30f24f4e9761][JA3S: 67619a80665d7ab92d1041b1d11f9164]
+	6	TCP 192.168.0.17:36986 <-> 54.69.166.226:443 [proto: 91.178/SSL.Amazon][cat: Web/5][11 pkts/1437 bytes <-> 11 pkts/6412 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039]
+	7	TCP 192.168.0.17:55746 <-> 151.101.1.130:443 [proto: 91/SSL][cat: Web/5][10 pkts/1534 bytes <-> 9 pkts/6239 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: y.ssl.fastly.net][JA3S: 860fcf58fd757e26aa8911e5eaff6b53]
+	8	TCP 192.168.0.17:36988 <-> 54.69.166.226:443 [proto: 91.178/SSL.Amazon][cat: Web/5][11 pkts/1462 bytes <-> 11 pkts/6163 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039]
 	9	UDP 192.168.0.17:47171 <-> 18.201.4.32:7985 [proto: 144/Viber][cat: VoIP/10][24 pkts/5035 bytes <-> 22 pkts/2302 bytes]
 	10	UDP 192.168.0.17:38190 <-> 18.201.4.3:7985 [proto: 144/Viber][cat: VoIP/10][25 pkts/4344 bytes <-> 18 pkts/1872 bytes]
 	11	ICMP 192.168.0.17:0 <-> 192.168.0.15:0 [proto: 81/ICMP][cat: Network/14][1 pkts/1514 bytes <-> 1 pkts/1514 bytes]
