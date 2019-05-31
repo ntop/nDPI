@@ -1,0 +1,3 @@
+RDP	2010	622743	1
+
+	1	TCP 172.16.2.185:52494 <-> 192.168.2.142:3389 [proto: 88/RDP][cat: RemoteAccess/12][936 pkts/58890 bytes <-> 1074 pkts/563853 bytes]
