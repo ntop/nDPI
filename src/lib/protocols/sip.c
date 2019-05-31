@@ -136,6 +136,14 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
 	  return;
 	}
+        
+        /* SIP message extension RFC 3248 */
+        if ((memcmp(packet_payload, "MESSAGE ", 8) == 0 || memcmp(packet_payload, "message ", 8) == 0)
+	    && (memcmp(&packet_payload[8], "SIP:", 4) == 0 || memcmp(&packet_payload[8], "sip:", 4) == 0)) {
+	  NDPI_LOG_INFO(ndpi_struct, "found sip MESSAGE\n");
+	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+	  return;
+	}
 
 	/* Courtesy of Miguel Quesada <mquesadab@gmail.com> */
 	if ((memcmp(packet_payload, "OPTIONS ", 8) == 0
