@@ -425,6 +425,7 @@ static const char* categories[] = {
   "Banned_Site",
   "Site_Unavailable",
   "Allowed_Site",
+  "Antimalware",
 };
 
 /* ****************************************** */
