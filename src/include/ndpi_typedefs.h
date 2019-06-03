@@ -809,6 +809,12 @@ typedef enum {
 	      CUSTOM_CATEGORY_BANNED_SITE      = 102,
 	      CUSTOM_CATEGORY_SITE_UNAVAILABLE = 103,
 	      CUSTOM_CATEGORY_ALLOWED_SITE     = 104,
+	      /*
+		The category below is used to track communications made by
+		security applications (e.g. sophosxl.net, spamhaus.org)
+		to track malware, spam etc.
+	      */
+	      CUSTOM_CATEGORY_ANTIMALWARE      = 105,
 
 	      /*
 		IMPORTANT
