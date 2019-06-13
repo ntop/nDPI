@@ -441,16 +441,19 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	memset(newflow->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
 
       if((newflow->src_id = ndpi_malloc(SIZEOF_ID_STRUCT)) == NULL) {
-	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(3): not enough memory\n", __FUNCTION__);
-	free(newflow);
-	return(NULL);
+           NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(3): not enough memory\n", __FUNCTION__);
+           ndp_flow_free(newflow->ndpi_flow);
+           free(newflow);
+           return(NULL);
       } else
 	memset(newflow->src_id, 0, SIZEOF_ID_STRUCT);
 
       if((newflow->dst_id = ndpi_malloc(SIZEOF_ID_STRUCT)) == NULL) {
-	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(4): not enough memory\n", __FUNCTION__);
-	free(newflow);
-	return(NULL);
+           NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(4): not enough memory\n", __FUNCTION__);
+           ndpi_flow_free(newflow->ndpi_flow);
+           ndpi_free(newflow->src_id);
+           free(newflow);
+           return(NULL);
       } else
 	memset(newflow->dst_id, 0, SIZEOF_ID_STRUCT);
 
