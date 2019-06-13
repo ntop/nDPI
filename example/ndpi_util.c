@@ -178,17 +178,20 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
   /* TODO: just needed here to init ndpi malloc wrapper */
   struct ndpi_detection_module_struct * module = ndpi_init_detection_module();
+  if (module == NULL) {
+      NDPI_LOG(0, NULL, NDPI_LOG_ERROR, "global structure initialization failed\n");
+      exit(-1);
+  }
 
   struct ndpi_workflow * workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
-
+  if (workflow == NULL) {
+      NDPI_LOG(0, NULL, NDPI_LOG_ERROR, "global structure initialization failed\n");
+      ndpi_free(module);
+      exit(-1);
+  }
   workflow->pcap_handle = pcap_handle;
   workflow->prefs       = *prefs;
   workflow->ndpi_struct = module;
-
-  if(workflow->ndpi_struct == NULL) {
-    NDPI_LOG(0, NULL, NDPI_LOG_ERROR, "global structure initialization failed\n");
-    exit(-1);
-  }
 
   ndpi_set_log_level(module, nDPI_LogLevel);
 
