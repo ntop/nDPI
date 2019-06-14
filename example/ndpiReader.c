@@ -896,8 +896,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       if(flow->ssh_ssl.ja3_client[0] != '\0')
 	json_object_object_add(jObj,"ja3c",json_object_new_string(flow->ssh_ssl.ja3_client));
 
-      if(flow->ja3_server[0] != '\0')
-	json_object_object_add(jObj,"host.server.ja3",json_object_new_string(flow->ja3_server));
+      if(flow->ssh_ssl.ja3_server[0] != '\0')
+	json_object_object_add(jObj,"host.server.ja3",json_object_new_string(flow->ssh_ssl.ja3_server));
 
       if(flow->ssh_ssl.client_info[0] != '\0')
 	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssh_ssl.client_info));
