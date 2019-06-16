@@ -58,7 +58,7 @@ extern "C" {
    *         else 0
    *
    */
-  int check_punycode_string(char *buff, int len);
+  int ndpi_check_punycode_string(char *buff, int len);
 
 
   /**
@@ -807,7 +807,8 @@ extern "C" {
 			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
 			    u_char *hash_buf, u_int8_t hash_buf_len);
   
-  u_int8_t ndpi_is_safe_ssl_cipher(u_int16_t cipher);
+  u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
+  const char* ndpi_cipher2str(u_int32_t cipher);
 #ifdef __cplusplus
 }
 #endif

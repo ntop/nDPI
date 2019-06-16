@@ -55,180 +55,6 @@ static int _ndpi_debug_callbacks = 0;
 
 // #define MATCH_DEBUG 1
 
-/* implementation of the punycode check function */
-int check_punycode_string(char * buffer , int len)
-{
-  int i = 0;
-
-  while(i++ < len)
-    {
-      if( buffer[i] == 'x' &&
-	  buffer[i+1] == 'n' &&
-	  buffer[i+2] == '-' &&
-	  buffer[i+3] == '-' )
-	// is a punycode string
-	return 1;
-    }
-  // not a punycode string
-  return 0;
-}
-
-/* ftp://ftp.cc.uoc.gr/mirrors/OpenBSD/src/lib/libc/stdlib/tsearch.c */
-/* find or insert datum into search tree */
-void * ndpi_tsearch(const void *vkey, void **vrootp,
-		    int (*compar)(const void *, const void *))
-{
-  ndpi_node *q;
-  char *key = (char *)vkey;
-  ndpi_node **rootp = (ndpi_node **)vrootp;
-
-  if(rootp == (ndpi_node **)0)
-    return ((void *)0);
-  while (*rootp != (ndpi_node *)0) {	/* Knuth's T1: */
-    int r;
-
-    if((r = (*compar)(key, (*rootp)->key)) == 0)	/* T2: */
-      return ((void *)*rootp);	/* we found it! */
-    rootp = (r < 0) ?
-      &(*rootp)->left :		/* T3: follow left branch */
-      &(*rootp)->right;		/* T4: follow right branch */
-  }
-  q = (ndpi_node *) ndpi_malloc(sizeof(ndpi_node));	/* T5: key not found */
-  if(q != (ndpi_node *)0) {	/* make new node */
-    *rootp = q;			/* link new node to old */
-    q->key = key;		/* initialize new node */
-    q->left = q->right = (ndpi_node *)0;
-  }
-  return ((void *)q);
-}
-
-/* delete node with given key */
-void * ndpi_tdelete(const void *vkey, void **vrootp,
-		    int (*compar)(const void *, const void *))
-{
-  ndpi_node **rootp = (ndpi_node **)vrootp;
-  char *key = (char *)vkey;
-  ndpi_node *p = (ndpi_node *)1;
-  ndpi_node *q;
-  ndpi_node *r;
-  int cmp;
-
-  if(rootp == (ndpi_node **)0 || *rootp == (ndpi_node *)0)
-    return ((ndpi_node *)0);
-  while ((cmp = (*compar)(key, (*rootp)->key)) != 0) {
-    p = *rootp;
-    rootp = (cmp < 0) ?
-      &(*rootp)->left :		/* follow left branch */
-      &(*rootp)->right;		/* follow right branch */
-    if(*rootp == (ndpi_node *)0)
-      return ((void *)0);		/* key not found */
-  }
-  r = (*rootp)->right;			/* D1: */
-  if((q = (*rootp)->left) == (ndpi_node *)0)	/* Left (ndpi_node *)0? */
-    q = r;
-  else if(r != (ndpi_node *)0) {		/* Right link is null? */
-    if(r->left == (ndpi_node *)0) {	/* D2: Find successor */
-      r->left = q;
-      q = r;
-    } else {			/* D3: Find (ndpi_node *)0 link */
-      for(q = r->left; q->left != (ndpi_node *)0; q = r->left)
-	r = q;
-      r->left = q->right;
-      q->left = (*rootp)->left;
-      q->right = (*rootp)->right;
-    }
-  }
-  ndpi_free((ndpi_node *) *rootp);	/* D4: Free node */
-  *rootp = q;				/* link parent to new node */
-  return(p);
-}
-
-/* Walk the nodes of a tree */
-static void ndpi_trecurse(ndpi_node *root, void (*action)(const void *, ndpi_VISIT, int, void*), int level, void *user_data)
-{
-  if(root->left == (ndpi_node *)0 && root->right == (ndpi_node *)0)
-    (*action)(root, ndpi_leaf, level, user_data);
-  else {
-    (*action)(root, ndpi_preorder, level, user_data);
-    if(root->left != (ndpi_node *)0)
-      ndpi_trecurse(root->left, action, level + 1, user_data);
-    (*action)(root, ndpi_postorder, level, user_data);
-    if(root->right != (ndpi_node *)0)
-      ndpi_trecurse(root->right, action, level + 1, user_data);
-    (*action)(root, ndpi_endorder, level, user_data);
-  }
-}
-
-/* Walk the nodes of a tree */
-void ndpi_twalk(const void *vroot, void (*action)(const void *, ndpi_VISIT, int, void *), void *user_data)
-{
-  ndpi_node *root = (ndpi_node *)vroot;
-
-  if(root != (ndpi_node *)0 && action != (void (*)(const void *, ndpi_VISIT, int, void*))0)
-    ndpi_trecurse(root, action, 0, user_data);
-}
-
-/* find a node, or return 0 */
-void * ndpi_tfind(const void *vkey, void *vrootp,
-		  int (*compar)(const void *, const void *))
-{
-  char *key = (char *)vkey;
-  ndpi_node **rootp = (ndpi_node **)vrootp;
-
-  if(rootp == (ndpi_node **)0)
-    return ((ndpi_node *)0);
-  while (*rootp != (ndpi_node *)0) {	/* T1: */
-    int r;
-    if((r = (*compar)(key, (*rootp)->key)) == 0)	/* T2: */
-      return (*rootp);		/* key found */
-    rootp = (r < 0) ?
-      &(*rootp)->left :		/* T3: follow left branch */
-      &(*rootp)->right;		/* T4: follow right branch */
-  }
-  return (ndpi_node *)0;
-}
-
-/* ****************************************** */
-
-/* Walk the nodes of a tree */
-static void ndpi_tdestroy_recurse(ndpi_node* root, void (*free_action)(void *))
-{
-  if(root->left != NULL)
-    ndpi_tdestroy_recurse(root->left, free_action);
-  if(root->right != NULL)
-    ndpi_tdestroy_recurse(root->right, free_action);
-
-  (*free_action) ((void *) root->key);
-  ndpi_free(root);
-}
-
-void ndpi_tdestroy(void *vrootp, void (*freefct)(void *))
-{
-  ndpi_node *root = (ndpi_node *) vrootp;
-
-  if(root != NULL)
-    ndpi_tdestroy_recurse(root, freefct);
-}
-
-/* ****************************************** */
-
-u_int8_t ndpi_net_match(u_int32_t ip_to_check,
-			u_int32_t net,
-			u_int32_t num_bits)
-{
-  u_int32_t mask = 0;
-
-  mask = ~(~mask >> num_bits);
-
-  return(((ip_to_check & mask) == (net & mask)) ? 1 : 0);
-}
-
-u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
-			u_int32_t net, u_int32_t num_bits)
-{
-  return(ndpi_net_match(src, net, num_bits) || ndpi_net_match(dst, net, num_bits));
-}
-
 /* ****************************************** */
 
 static void *(*_ndpi_flow_malloc)(size_t size);
@@ -236,197 +62,6 @@ static void  (*_ndpi_flow_free)(void *ptr);
 
 static void *(*_ndpi_malloc)(size_t size);
 static void  (*_ndpi_free)(void *ptr);
-
-/* ****************************************** */
-
-#ifdef WIN32
-/* http://opensource.apple.com/source/Libc/Libc-186/string.subproj/strcasecmp.c */
-
-/*
- * This array is designed for mapping upper and lower case letter
- * together for a case independent comparison.  The mappings are
- * based upon ascii character sequences.
- */
-static const u_char charmap[] = {
-  '\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
-  '\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
-  '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
-  '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037',
-  '\040', '\041', '\042', '\043', '\044', '\045', '\046', '\047',
-  '\050', '\051', '\052', '\053', '\054', '\055', '\056', '\057',
-  '\060', '\061', '\062', '\063', '\064', '\065', '\066', '\067',
-  '\070', '\071', '\072', '\073', '\074', '\075', '\076', '\077',
-  '\100', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
-  '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
-  '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
-  '\170', '\171', '\172', '\133', '\134', '\135', '\136', '\137',
-  '\140', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
-  '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
-  '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
-  '\170', '\171', '\172', '\173', '\174', '\175', '\176', '\177',
-  '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
-  '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
-  '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
-  '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237',
-  '\240', '\241', '\242', '\243', '\244', '\245', '\246', '\247',
-  '\250', '\251', '\252', '\253', '\254', '\255', '\256', '\257',
-  '\260', '\261', '\262', '\263', '\264', '\265', '\266', '\267',
-  '\270', '\271', '\272', '\273', '\274', '\275', '\276', '\277',
-  '\300', '\301', '\302', '\303', '\304', '\305', '\306', '\307',
-  '\310', '\311', '\312', '\313', '\314', '\315', '\316', '\317',
-  '\320', '\321', '\322', '\323', '\324', '\325', '\326', '\327',
-  '\330', '\331', '\332', '\333', '\334', '\335', '\336', '\337',
-  '\340', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
-  '\350', '\351', '\352', '\353', '\354', '\355', '\356', '\357',
-  '\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
-  '\370', '\371', '\372', '\373', '\374', '\375', '\376', '\377',
-};
-
-int strcasecmp(s1, s2)
-     const char *s1, *s2;
-{
-  register const u_char *cm = charmap,
-    *us1 = (const u_char *)s1,
-    *us2 = (const u_char *)s2;
-
-  while (cm[*us1] == cm[*us2++])
-    if(*us1++ == '\0')
-      return (0);
-  return (cm[*us1] - cm[*--us2]);
-}
-
-int strncasecmp(s1, s2, n)
-     const char *s1, *s2;
-     register size_t n;
-{
-  if(n != 0) {
-    register const u_char *cm = charmap,
-      *us1 = (const u_char *)s1,
-      *us2 = (const u_char *)s2;
-
-    do {
-      if(cm[*us1] != cm[*us2++])
-	return (cm[*us1] - cm[*--us2]);
-      if(*us1++ == '\0')
-	break;
-    } while (--n != 0);
-  }
-  return (0);
-}
-
-#endif
-
-/* ****************************************** */
-
-/* Keep it in order and in sync with ndpi_protocol_category_t in ndpi_typedefs.h */
-static const char* categories[] = {
-  "Unspecified",
-  "Media",
-  "VPN",
-  "Email",
-  "DataTransfer",
-  "Web",
-  "SocialNetwork",
-  "Download-FileTransfer-FileSharing",
-  "Game",
-  "Chat",
-  "VoIP",
-  "Database",
-  "RemoteAccess",
-  "Cloud",
-  "Network",
-  "Collaborative",
-  "RPC",
-  "Streaming",
-  "System",
-  "SoftwareUpdate",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "Music",
-  "Video",
-  "Shopping",
-  "Productivity",
-  "FileSharing",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "Mining", /* 99 */
-  "Malware",
-  "Advertisement",
-  "Banned_Site",
-  "Site_Unavailable",
-  "Allowed_Site",
-  "Antimalware",
-};
 
 /* ****************************************** */
 
@@ -2289,6 +1924,118 @@ void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi
   ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
 #endif
 }
+
+/* ****************************************** */
+
+/* Keep it in order and in sync with ndpi_protocol_category_t in ndpi_typedefs.h */
+static const char* categories[] = {
+  "Unspecified",
+  "Media",
+  "VPN",
+  "Email",
+  "DataTransfer",
+  "Web",
+  "SocialNetwork",
+  "Download-FileTransfer-FileSharing",
+  "Game",
+  "Chat",
+  "VoIP",
+  "Database",
+  "RemoteAccess",
+  "Cloud",
+  "Network",
+  "Collaborative",
+  "RPC",
+  "Streaming",
+  "System",
+  "SoftwareUpdate",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "Music",
+  "Video",
+  "Shopping",
+  "Productivity",
+  "FileSharing",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "Mining", /* 99 */
+  "Malware",
+  "Advertisement",
+  "Banned_Site",
+  "Site_Unavailable",
+  "Allowed_Site",
+  "Antimalware",
+};
 
 /* ******************************************************************** */
 
@@ -6408,51 +6155,3 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 
 /* **************************************** */
 
-/* **************************************** */
-
-struct cipher_weakness {
-  u_int16_t cipher_id;
-  ndpi_cipher_weakness weakness_type;
-};
-
-static struct cipher_weakness safe_ssl_ciphers[] = {
-   /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
-   /* INSECURE */
-   { 0xc011, NDPI_CIPHER_INSECURE }, /* TLS_ECDHE_RSA_WITH_RC4_128_SHA */
-   { 0x0005, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_SHA */
-   { 0x0004, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_MD5 */
-   /* WEAK */
-   { 0x009d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_GCM_SHA384 */
-   { 0x003d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
-   { 0x0035, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA */
-   { 0x0084, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_256_CBC_SHA */
-   { 0x009c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_GCM_SHA256 */
-   { 0x003c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
-   { 0x002f, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA */
-   { 0x0041, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_128_CBC_SHA */
-   { 0xc012, NDPI_CIPHER_WEAK }, /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x0016, NDPI_CIPHER_WEAK }, /* TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x000a, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x0096, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_SEED_CBC_SHA */
-   { 0x0007, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_IDEA_CBC_SHA */
-
-   { 0x0, NDPI_CIPHER_SAFE    } /* END */
-};
-
-u_int8_t ndpi_is_safe_ssl_cipher(u_int16_t cipher) {
-  u_int i;
-
-  for(i=0; safe_ssl_ciphers[i].cipher_id  != 0; i++) {
-    if(safe_ssl_ciphers[i].cipher_id == cipher) {
-#ifdef CERTIFICATE_DEBUG
-      printf("%s %s(%04X / %u)\n",
-	     (safe_ssl_ciphers[i].weakness_type == NDPI_CIPHER_WEAK) ? "WEAK" : "INSECURE",
-	     __FUNCTION__, cipher, cipher);
-#endif
-
-      return(safe_ssl_ciphers[i].weakness_type);
-    }
-  }
-
-  return(NDPI_CIPHER_SAFE); /* We're safe */
-}

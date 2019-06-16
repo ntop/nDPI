@@ -845,7 +845,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_ssl.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s%s]", flow->ssh_ssl.ja3_server,
 						    print_cipher(flow->ssh_ssl.server_unsafe_cipher));
     if(flow->ssh_ssl.server_organization[0] != '\0') fprintf(out, "[organization: %s]", flow->ssh_ssl.server_organization);
-    if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[%s]", print_cipher_id(flow->ssh_ssl.server_cipher));;
+    if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[%s]", ndpi_cipher2str(flow->ssh_ssl.server_cipher));;
 
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
 

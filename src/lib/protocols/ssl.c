@@ -317,7 +317,7 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
   }
 
   /* check for punycode encoding */
-  is_puny = check_punycode_string(buffer, buffer_len);
+  is_puny = ndpi_check_punycode_string(buffer, buffer_len);
 
   // not a punycode string - need more checks
   if(is_puny == 0) {

@@ -4,7 +4,7 @@ SSL	28	15397	1
 ICMPV6	48	7862	3
 Facebook	37	14726	3
 
-	1	TCP [2001:470:1f17:13f:3e97:eff:fe73:4dec]:60205 <-> [2604:a880:1:20::224:b001]:443 [proto: 91/SSL][cat: Web/5][14 pkts/2312 bytes <-> 14 pkts/13085 bytes][TLSv1.2][JA3C: 812d8bce0f85487ba7834d36568ed586][server: mail.tomasu.net][JA3S: 389ed42c02ebecc32e73aa31def07e14]
+	1	TCP [2001:470:1f17:13f:3e97:eff:fe73:4dec]:60205 <-> [2604:a880:1:20::224:b001]:443 [proto: 91/SSL][cat: Web/5][14 pkts/2312 bytes <-> 14 pkts/13085 bytes][TLSv1.2][JA3C: 812d8bce0f85487ba7834d36568ed586][server: mail.tomasu.net][JA3S: 389ed42c02ebecc32e73aa31def07e14][TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	2	TCP [2001:470:1f17:13f:3e97:eff:fe73:4dec]:53234 <-> [2a03:2880:1010:6f03:face:b00c::2]:443 [proto: 91.119/SSL.Facebook][cat: SocialNetwork/6][18 pkts/6894 bytes <-> 15 pkts/7032 bytes][TLSv1][JA3C: eb7cdd4e7dea7a11b3016c3c9acbd2a3]
 	3	ICMPV6 [2001:470:1f17:13f:3e97:eff:fe73:4dec]:0 <-> [2604:a880:1:20::224:b001]:0 [proto: 102/ICMPV6][cat: Network/14][23 pkts/3174 bytes <-> 23 pkts/3174 bytes]
 	4	TCP [2001:470:1f17:13f:3e97:eff:fe73:4dec]:41538 <-> [2604:a880:1:20::224:b001]:80 [proto: 7/HTTP][cat: Web/5][6 pkts/786 bytes <-> 4 pkts/1006 bytes][Host: mail.tomasu.net]
