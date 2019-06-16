@@ -305,53 +305,29 @@ int strncasecmp(const char *s1, const char *s2, size_t n) {
 
 /* **************************************** */
 
-struct cipher_weakness {
-  u_int16_t cipher_id;
-  ndpi_cipher_weakness weakness_type;
-};
-
-static struct cipher_weakness safe_ssl_ciphers[] = {
+u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher) {
    /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
    /* INSECURE */
-   { 0xc011, NDPI_CIPHER_INSECURE }, /* TLS_ECDHE_RSA_WITH_RC4_128_SHA */
-   { 0x0005, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_SHA */
-   { 0x0004, NDPI_CIPHER_INSECURE }, /* TLS_RSA_WITH_RC4_128_MD5 */
-   /* WEAK */
-   { 0x009d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_GCM_SHA384 */
-   { 0x003d, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
-   { 0x0035, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_256_CBC_SHA */
-   { 0x0084, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_256_CBC_SHA */
-   { 0x009c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_GCM_SHA256 */
-   { 0x003c, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
-   { 0x002f, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_AES_128_CBC_SHA */
-   { 0x0041, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_CAMELLIA_128_CBC_SHA */
-   { 0xc012, NDPI_CIPHER_WEAK }, /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x0016, NDPI_CIPHER_WEAK }, /* TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x000a, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_3DES_EDE_CBC_SHA */
-   { 0x0096, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_SEED_CBC_SHA */
-   { 0x0007, NDPI_CIPHER_WEAK }, /* TLS_RSA_WITH_IDEA_CBC_SHA */
-
-   { 0x0, NDPI_CIPHER_SAFE    } /* END */
-};
-
-/* ***************************************************** */
-
-u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher) {
-  u_int i;
-
-  for(i=0; safe_ssl_ciphers[i].cipher_id  != 0; i++) {
-    if(safe_ssl_ciphers[i].cipher_id == cipher) {
-#ifdef CERTIFICATE_DEBUG
-      printf("%s %s(%04X / %u)\n",
-	     (safe_ssl_ciphers[i].weakness_type == NDPI_CIPHER_WEAK) ? "WEAK" : "INSECURE",
-	     __FUNCTION__, cipher, cipher);
-#endif
-
-      return(safe_ssl_ciphers[i].weakness_type);
-    }
+  switch(cipher) {
+  case 0xc011: return(NDPI_CIPHER_INSECURE); /* TLS_ECDHE_RSA_WITH_RC4_128_SHA */
+  case 0x0005: return(NDPI_CIPHER_INSECURE); /* TLS_RSA_WITH_RC4_128_SHA */
+  case 0x0004: return(NDPI_CIPHER_INSECURE); /* TLS_RSA_WITH_RC4_128_MD5 */
+    /* WEAK */
+  case 0x009d: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_AES_256_GCM_SHA384 */
+  case 0x003d: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
+  case 0x0035: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_AES_256_CBC_SHA */
+  case 0x0084: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_CAMELLIA_256_CBC_SHA */
+  case 0x009c: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_AES_128_GCM_SHA256 */
+  case 0x003c: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
+  case 0x002f: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_AES_128_CBC_SHA */
+  case 0x0041: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_CAMELLIA_128_CBC_SHA */
+  case 0xc012: return(NDPI_CIPHER_WEAK); /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
+  case 0x0016: return(NDPI_CIPHER_WEAK); /* TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA */
+  case 0x000a: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_3DES_EDE_CBC_SHA */
+  case 0x0096: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_SEED_CBC_SHA */
+  case 0x0007: return(NDPI_CIPHER_WEAK); /* TLS_RSA_WITH_IDEA_CBC_SHA */
+  default:     return(NDPI_CIPHER_SAFE);
   }
-
-  return(NDPI_CIPHER_SAFE); /* We're safe */
 }
 
 /* ***************************************************** */
