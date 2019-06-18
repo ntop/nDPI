@@ -95,6 +95,7 @@ typedef struct ndpi_flow_info {
   char info[96];
   char host_server_name[256];
   char bittorent_hash[41];
+  char dhcp_fingerprint[48];
   
   struct {
     u_int16_t ssl_version;

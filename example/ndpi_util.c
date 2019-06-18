@@ -530,8 +530,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 
-  /* BITTORRENT */
-  if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_BITTORRENT) {
+  if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_DHCP) {
+    snprintf(flow->dhcp_fingerprint, sizeof(flow->dhcp_fingerprint), "%s", flow->ndpi_flow->protos.dhcp.fingerprint);
+  } else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_BITTORRENT) {
     u_int i, j, n = 0;
 
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {

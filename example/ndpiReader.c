@@ -848,6 +848,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[%s]", ndpi_cipher2str(flow->ssh_ssl.server_cipher));;
 
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
+    if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
 
     fprintf(out, "\n");
   } else {
