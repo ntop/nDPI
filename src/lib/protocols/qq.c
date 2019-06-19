@@ -244,9 +244,9 @@ static void ndpi_search_qq_udp(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  static const u_int16_t p8000_patt_02[14] =	// maybe version numbers
-    { 0x1549, 0x1801, 0x180d, 0x0961, 0x01501, 0x0e35, 0x113f, 0x0b37, 0x1131, 0x163a, 0x1e0d, 0x3619, 0x371b,};
-  u_int16_t no_of_patterns = 13, index = 0;
+  static const u_int16_t p8000_patt_02[15] =	// maybe version numbers
+    { 0x1549, 0x1801, 0x180d, 0x0961, 0x01501, 0x0e35, 0x113f, 0x0b37, 0x1131, 0x163a, 0x1e0d, 0x3619, 0x371b, 0x3823,};
+  u_int16_t no_of_patterns = 14, index = 0;
 
 
   NDPI_LOG_DBG(ndpi_struct, "search qq udp\n");
