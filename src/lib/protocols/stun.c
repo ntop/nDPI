@@ -28,7 +28,7 @@
 
 #include "ndpi_api.h"
 
-#define MAX_NUM_STUN_PKTS     10
+#define MAX_NUM_STUN_PKTS     8
 
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
@@ -53,7 +53,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   u_int8_t *is_whatsapp) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
-  u_int8_t can_this_be_whatsapp_voice = 1;
+  u_int8_t can_this_be_whatsapp_voice = 1, wa = 0;
 
   flow->protos.stun_ssl.stun.num_processed_pkts++;
   
@@ -75,14 +75,26 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if(ntohs(h->msg_type) == 0x01 /* Binding Request */)
     flow->protos.stun_ssl.stun.num_binding_requests++;
+
+  // printf("[%02X][%02X][payload_length: %u]\n", payload[0], payload[1], payload_length);
   
+  if(((payload[0] == 0x80) && ((msg_len+20) <= payload_length)) /* WhatsApp Voice */) {
+    *is_whatsapp = 1;
+    return NDPI_IS_STUN; /* This is WhatsApp Voice */
+  } else if((payload[0] == 0x90) && ((msg_len+11) == payload_length) /* WhatsApp Video */) {
+    *is_whatsapp = 2;
+    return NDPI_IS_STUN; /* This is WhatsApp Video */
+  }
+
   if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
     return(NDPI_IS_NOT_STUN);
-
-  if((payload_length == (msg_len+20))
-     && ((msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */)) {
+  
+  if(((payload_length == (msg_len+20))
+      && ((msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */))) {
     u_int offset = 20;
 
+    // printf("[%02X][%02X][%02X][%02X][payload_length: %u]\n", payload[offset], payload[offset+1], payload[offset+2], payload[offset+3],payload_length);
+    
     /*
       This can either be the standard RTCP or Ms Lync RTCP that
       later will become Ms Lync RTP. In this case we need to
@@ -103,6 +115,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       switch(attribute) {
       case 0x0008: /* Message Integrity */
       case 0x0020: /* XOR-MAPPED-ADDRESSES */
+      case 0x4000:
       case 0x4002:
 	/* These are the only messages apparently whatsapp voice can use */
 	break;
@@ -148,6 +161,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
       default:
 	/* This means this STUN packet cannot be confused with whatsapp voice */
+	printf("==> %04X\n", attribute);
 	can_this_be_whatsapp_voice = 0;
 	break;
       }
