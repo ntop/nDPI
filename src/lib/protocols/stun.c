@@ -56,7 +56,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   u_int8_t can_this_be_whatsapp_voice = 1, wa = 0;
 
   flow->protos.stun_ssl.stun.num_processed_pkts++;
-  
+
   if(payload_length < sizeof(struct stun_packet_header)) {
     if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
       *is_whatsapp = 1;
@@ -77,7 +77,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     flow->protos.stun_ssl.stun.num_binding_requests++;
 
   // printf("[%02X][%02X][payload_length: %u]\n", payload[0], payload[1], payload_length);
-  
+
   if(((payload[0] == 0x80) && ((msg_len+20) <= payload_length)) /* WhatsApp Voice */) {
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
@@ -88,18 +88,18 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
     return(NDPI_IS_NOT_STUN);
-  
+
   if(((payload_length == (msg_len+20))
       && ((msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */))) {
     u_int offset = 20;
 
     // printf("[%02X][%02X][%02X][%02X][payload_length: %u]\n", payload[offset], payload[offset+1], payload[offset+2], payload[offset+3],payload_length);
-    
+
     /*
       This can either be the standard RTCP or Ms Lync RTCP that
       later will become Ms Lync RTP. In this case we need to
       be careful before deciding about the protocol before dissecting the packet
-      
+
       MS Lync = Skype
       https://en.wikipedia.org/wiki/Skype_for_Business
     */
@@ -111,7 +111,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
       if(x != 0)
 	len += 4-x;
-      
+
       switch(attribute) {
       case 0x0008: /* Message Integrity */
       case 0x0020: /* XOR-MAPPED-ADDRESSES */
@@ -119,7 +119,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       case 0x4002:
 	/* These are the only messages apparently whatsapp voice can use */
 	break;
-	
+
       case 0x8054: /* Candidate Identifier */
 	if((len == 4)
 	   && ((offset+7) < payload_length)
@@ -145,7 +145,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	flow->protos.stun_ssl.stun.is_skype = 1;
 	return(NDPI_IS_STUN);
 	break;
-	
+
       case 0x8070: /* Implementation Version */
 	if((len == 4)
 	   && ((offset+7) < payload_length)
@@ -165,7 +165,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	can_this_be_whatsapp_voice = 0;
 	break;
       }
-     
+
       offset += len + 4;
     }
     goto udp_stun_found;
@@ -177,7 +177,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   } else
     return NDPI_IS_NOT_STUN;
 
- udp_stun_found:      
+ udp_stun_found:
   if(can_this_be_whatsapp_voice) {
     flow->protos.stun_ssl.stun.num_udp_pkts++;
 
@@ -186,11 +186,11 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     /*
       We cannot immediately say that this is STUN as there are other protocols
       like GoogleHangout that might be candidates, thus we set the
-      guessed protocol to STUN      
+      guessed protocol to STUN
     */
     flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
     return(NDPI_IS_NOT_STUN);
-  }  
+  }
 }
 
 void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -201,11 +201,11 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 
   if(packet->payload == NULL) return;
-    
+
   if(packet->tcp) {
     /* STUN may be encapsulated in TCP packets */
     if((packet->payload_packet_len >= 22)
-       && ((ntohs(get_u_int16_t(packet->payload, 0)) + 2) == packet->payload_packet_len)) {      
+       && ((ntohs(get_u_int16_t(packet->payload, 0)) + 2) == packet->payload_packet_len)) {
       /* TODO there could be several STUN packets in a single TCP packet so maybe the detection could be
        * improved by checking only the STUN packet of given length */
 
@@ -221,9 +221,9 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	} else {
 	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
 	  ndpi_int_stun_add_connection(ndpi_struct,
-				       is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
+				       is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO) : NDPI_PROTOCOL_STUN, flow);
 	}
-	
+
 	return;
       }
     }
@@ -232,24 +232,25 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
 			 packet->payload_packet_len, &is_whatsapp) == NDPI_IS_STUN) {
     if(flow->guessed_protocol_id == 0) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
-    
+
     if(flow->protos.stun_ssl.stun.is_skype) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
 
-      /* flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT */ 
+      /* flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT */
       if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
     } else {
       NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
       ndpi_int_stun_add_connection(ndpi_struct,
-				   is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_STUN, flow);
+				   is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO) : NDPI_PROTOCOL_STUN,
+				   flow);
     }
-    
+
     return;
   }
 
   if(flow->protos.stun_ssl.stun.num_udp_pkts >= MAX_NUM_STUN_PKTS)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);  
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
   if(flow->packet_counter > 0) {
     /* This might be a RTP stream: let's make sure we check it */
