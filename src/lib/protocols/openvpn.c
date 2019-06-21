@@ -89,18 +89,24 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
 
     if(packet->udp) {
 #ifdef DEBUG
-      printf("[opcode: %u][Packet ID: %d][%u <-> %u][len: %u]\n", opcode, check_pkid_and_detect_hmac_size(ovpn_payload),
+      printf("[packet_id: %u][opcode: %u][Packet ID: %d][%u <-> %u][len: %u]\n",
+	     flow->num_processed_pkts,
+	     opcode, check_pkid_and_detect_hmac_size(ovpn_payload),
 	     htons(packet->udp->source), htons(packet->udp->dest), packet->payload_packet_len);	   
 #endif
       
       if(
-	 ((packet->payload_packet_len == 112) && (opcode == 168))
-	 || ((packet->payload_packet_len == 80)
-	     && ((opcode == 184) || (opcode == 88) || (opcode == 160) || (opcode == 168)))
-	 ) {
+	 (flow->num_processed_pkts == 1)
+	 && (
+	     ((packet->payload_packet_len == 112)
+	      && ((opcode == 168) || (opcode == 192))
+	      )
+	     || ((packet->payload_packet_len == 80)
+		 && ((opcode == 184) || (opcode == 88) || (opcode == 160) || (opcode == 168) || (opcode == 200)))
+	     )) {
 	NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
-	  return;
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
+	return;
       }
     }
     
