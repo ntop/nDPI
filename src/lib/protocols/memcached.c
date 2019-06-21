@@ -92,99 +92,99 @@
 #define MEMCACHED_MATCH(cr)     (cr ## _LEN > length || memcmp(offset, cr, cr ## _LEN))
 
 static void ndpi_int_memcached_add_connection(struct ndpi_detection_module_struct
-        *ndpi_struct, struct ndpi_flow_struct *flow)
+					      *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-    NDPI_LOG_INFO(ndpi_struct, "found memcached\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow,
-        NDPI_PROTOCOL_MEMCACHED, NDPI_PROTOCOL_UNKNOWN);
+  NDPI_LOG_INFO(ndpi_struct, "found memcached\n");
+  ndpi_set_detected_protocol(ndpi_struct, flow,
+			     NDPI_PROTOCOL_MEMCACHED, NDPI_PROTOCOL_UNKNOWN);
 }
 
 void ndpi_search_memcached(
-        struct ndpi_detection_module_struct *ndpi_struct,
-        struct ndpi_flow_struct *flow)
+			   struct ndpi_detection_module_struct *ndpi_struct,
+			   struct ndpi_flow_struct *flow)
 {
-    struct ndpi_packet_struct *packet = &flow->packet;
-    const u_int8_t *offset = packet->payload;
-    const u_int16_t length = packet->payload_packet_len;
-    u_int8_t *matches;
+  struct ndpi_packet_struct *packet = &flow->packet;
+  const u_int8_t *offset = packet->payload;
+  const u_int16_t length = packet->payload_packet_len;
+  u_int8_t *matches;
 
-    NDPI_LOG_DBG(ndpi_struct, "search memcached\n");
+  NDPI_LOG_DBG(ndpi_struct, "search memcached\n");
 
-    if (packet->tcp != NULL) {
-        if (packet->payload_packet_len < MEMCACHED_MIN_LEN) {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-            return;
-        }
-
-        matches = &flow->l4.tcp.memcached_matches;
-    }
-    else if (packet->udp != NULL) {
-        if (packet->payload_packet_len < MEMCACHED_MIN_UDP_LEN) {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-            return;
-        }
-
-        if ((offset[4] == 0x00 && offset[5] == 0x00) ||
-                offset[6] != 0x00 || offset[7] != 0x00) {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-            return;
-        }
-
-        offset += MEMCACHED_UDP_HDR_LEN;
-        matches = &flow->l4.udp.memcached_matches;
-    }
-    else {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        return;
+  if (packet->tcp != NULL) {
+    if (packet->payload_packet_len < MEMCACHED_MIN_LEN) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
     }
 
-    /* grep MCD memcached.c |\
-     *  egrep -v '(LEN|MATCH)' |\
-     *  sed -e 's/^#define //g' |\
-     *  awk '{ printf "else if (! MEMCACHED_MATCH(%s)) *matches += 1;\n",$1 }' */
+    matches = &flow->l4.tcp.memcached_matches;
+  }
+  else if (packet->udp != NULL) {
+    if (packet->payload_packet_len < MEMCACHED_MIN_UDP_LEN) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
+    }
 
-    if (! MEMCACHED_MATCH(MCDC_SET)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_ADD)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_REPLACE)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_APPEND)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_PREPEND)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_CAS)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_GET)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_GETS)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_DELETE)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_INCR)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_DECR)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_TOUCH)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_GAT)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_GATS)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDC_STATS)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_ERROR)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_CLIENT_ERROR)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_SERVER_ERROR)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_STORED)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_NOT_STORED)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_EXISTS)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_NOT_FOUND)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_END)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_DELETED)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_TOUCHED)) *matches += 1;
-    else if (! MEMCACHED_MATCH(MCDR_STAT)) *matches += 1;
+    if ((offset[4] == 0x00 && offset[5] == 0x00) ||
+	offset[6] != 0x00 || offset[7] != 0x00) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
+    }
 
-    if (*matches >= MEMCACHED_MIN_MATCH)
-        ndpi_int_memcached_add_connection(ndpi_struct, flow);
+    offset += MEMCACHED_UDP_HDR_LEN;
+    matches = &flow->l4.udp.memcached_matches;
+  }
+  else {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+
+  /* grep MCD memcached.c |\
+   *  egrep -v '(LEN|MATCH)' |\
+   *  sed -e 's/^#define //g' |\
+   *  awk '{ printf "else if (! MEMCACHED_MATCH(%s)) *matches += 1;\n",$1 }' */
+
+  if (! MEMCACHED_MATCH(MCDC_SET)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_ADD)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_REPLACE)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_APPEND)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_PREPEND)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_CAS)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_GET)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_GETS)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_DELETE)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_INCR)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_DECR)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_TOUCH)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_GAT)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_GATS)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDC_STATS)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_ERROR)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_CLIENT_ERROR)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_SERVER_ERROR)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_STORED)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_NOT_STORED)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_EXISTS)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_NOT_FOUND)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_END)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_DELETED)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_TOUCHED)) *matches += 1;
+  else if (! MEMCACHED_MATCH(MCDR_STAT)) *matches += 1;
+
+  if (*matches >= MEMCACHED_MIN_MATCH)
+    ndpi_int_memcached_add_connection(ndpi_struct, flow);
 }
 
 void init_memcached_dissector(
-        struct ndpi_detection_module_struct *ndpi_struct,
-        u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+			      struct ndpi_detection_module_struct *ndpi_struct,
+			      u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-    ndpi_set_bitmask_protocol_detection("MEMCACHED",
-            ndpi_struct, detection_bitmask, *id,
-            NDPI_PROTOCOL_MEMCACHED,
-            ndpi_search_memcached,
-            NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
-            SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-            ADD_TO_DETECTION_BITMASK);
+  ndpi_set_bitmask_protocol_detection("MEMCACHED",
+				      ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_MEMCACHED,
+				      ndpi_search_memcached,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
 
-    *id += 1;
+  *id += 1;
 }
