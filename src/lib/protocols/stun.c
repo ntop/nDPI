@@ -76,7 +76,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   if(ntohs(h->msg_type) == 0x01 /* Binding Request */)
     flow->protos.stun_ssl.stun.num_binding_requests++;
 
-  // printf("[%02X][%02X][payload_length: %u]\n", payload[0], payload[1], payload_length);
+  /* printf("[%02X][%02X][msg_len: %u][payload_length: %u]\n", payload[0], payload[1], msg_len, payload_length); */
 
   if(((payload[0] == 0x80) && ((msg_len+20) <= payload_length)) /* WhatsApp Voice */) {
     *is_whatsapp = 1;
@@ -89,86 +89,90 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
     return(NDPI_IS_NOT_STUN);
 
-  if(((payload_length == (msg_len+20))
-      && ((msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */))) {
-    u_int offset = 20;
+  if(payload_length == (msg_len+20)) {
+    if(msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */ {
+      u_int offset = 20;
 
-    // printf("[%02X][%02X][%02X][%02X][payload_length: %u]\n", payload[offset], payload[offset+1], payload[offset+2], payload[offset+3],payload_length);
+      // printf("[%02X][%02X][%02X][%02X][payload_length: %u]\n", payload[offset], payload[offset+1], payload[offset+2], payload[offset+3],payload_length);
 
-    /*
-      This can either be the standard RTCP or Ms Lync RTCP that
-      later will become Ms Lync RTP. In this case we need to
-      be careful before deciding about the protocol before dissecting the packet
+      /*
+	This can either be the standard RTCP or Ms Lync RTCP that
+	later will become Ms Lync RTP. In this case we need to
+	be careful before deciding about the protocol before dissecting the packet
 
-      MS Lync = Skype
-      https://en.wikipedia.org/wiki/Skype_for_Business
-    */
+	MS Lync = Skype
+	https://en.wikipedia.org/wiki/Skype_for_Business
+      */
 
-    while((offset+2) < payload_length) {
-      u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
-      u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
-      u_int16_t x = (len + 4) % 4;
+      while((offset+2) < payload_length) {
+	u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
+	u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
+	u_int16_t x = (len + 4) % 4;
 
-      if(x != 0)
-	len += 4-x;
+	if(x != 0)
+	  len += 4-x;
 
-      switch(attribute) {
-      case 0x0008: /* Message Integrity */
-      case 0x0020: /* XOR-MAPPED-ADDRESSES */
-      case 0x4000:
-      case 0x4002:
-	/* These are the only messages apparently whatsapp voice can use */
-	break;
+	switch(attribute) {
+	case 0x0008: /* Message Integrity */
+	case 0x0020: /* XOR-MAPPED-ADDRESSES */
+	case 0x4000:
+	case 0x4002:
+	  /* These are the only messages apparently whatsapp voice can use */
+	  break;
 
-      case 0x8054: /* Candidate Identifier */
-	if((len == 4)
-	   && ((offset+7) < payload_length)
-	   && (payload[offset+5] == 0x00)
-	   && (payload[offset+6] == 0x00)
-	   && (payload[offset+7] == 0x00)) {
-	  /* Either skype for business or "normal" skype with multiparty call */
+	case 0x8054: /* Candidate Identifier */
+	  if((len == 4)
+	     && ((offset+7) < payload_length)
+	     && (payload[offset+5] == 0x00)
+	     && (payload[offset+6] == 0x00)
+	     && (payload[offset+7] == 0x00)) {
+	    /* Either skype for business or "normal" skype with multiparty call */
+	    flow->protos.stun_ssl.stun.is_skype = 1;
+	    return(NDPI_IS_STUN);
+	  }
+	  break;
+
+	case 0x8055: /* MS Service Quality (skype?) */
+	  break;
+
+	  /* Proprietary fields found on skype calls */
+	case 0x24DF:
+	case 0x3802:
+	case 0x8036:
+	case 0x8095:
+	case 0x0800:
+	  /* printf("====>>>> %04X\n", attribute); */
 	  flow->protos.stun_ssl.stun.is_skype = 1;
 	  return(NDPI_IS_STUN);
+	  break;
+
+	case 0x8070: /* Implementation Version */
+	  if((len == 4)
+	     && ((offset+7) < payload_length)
+	     && (payload[offset+4] == 0x00)
+	     && (payload[offset+5] == 0x00)
+	     && (payload[offset+6] == 0x00)
+	     && ((payload[offset+7] == 0x02) || (payload[offset+7] == 0x03))
+	     ) {
+	    flow->protos.stun_ssl.stun.is_skype = 1;
+	    return(NDPI_IS_STUN);
+	  }
+	  break;
+
+	default:
+	  /* This means this STUN packet cannot be confused with whatsapp voice */
+	  /* printf("==> %04X\n", attribute); */
+	  can_this_be_whatsapp_voice = 0;
+	  break;
 	}
-	break;
 
-      case 0x8055: /* MS Service Quality (skype?) */
-	break;
-
-	/* Proprietary fields found on skype calls */
-      case 0x24DF:
-      case 0x3802:
-      case 0x8036:
-      case 0x8095:
-      case 0x0800:
-	/* printf("====>>>> %04X\n", attribute); */
-	flow->protos.stun_ssl.stun.is_skype = 1;
-	return(NDPI_IS_STUN);
-	break;
-
-      case 0x8070: /* Implementation Version */
-	if((len == 4)
-	   && ((offset+7) < payload_length)
-	   && (payload[offset+4] == 0x00)
-	   && (payload[offset+5] == 0x00)
-	   && (payload[offset+6] == 0x00)
-	   && ((payload[offset+7] == 0x02) || (payload[offset+7] == 0x03))
-	   ) {
-	  flow->protos.stun_ssl.stun.is_skype = 1;
-	  return(NDPI_IS_STUN);
-	}
-	break;
-
-      default:
-	/* This means this STUN packet cannot be confused with whatsapp voice */
-	printf("==> %04X\n", attribute);
-	can_this_be_whatsapp_voice = 0;
-	break;
+	offset += len + 4;
       }
-
-      offset += len + 4;
+      goto udp_stun_found;
+    } else if(msg_type == 0x0800) {
+      *is_whatsapp = 1;
+      return NDPI_IS_STUN; /* This is WhatsApp */
     }
-    goto udp_stun_found;
   }
 
   if((flow->protos.stun_ssl.stun.num_udp_pkts > 0) && (msg_type <= 0x00FF)) {

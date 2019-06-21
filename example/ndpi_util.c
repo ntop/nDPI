@@ -246,21 +246,21 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
 
   if(
     (
-      (fa->src_ip      == fb->src_ip  )
-      && (fa->src_port == fb->src_port)
-      && (fa->dst_ip   == fb->dst_ip  )
-      && (fa->dst_port == fb->dst_port)
-      )
+     (fa->src_ip      == fb->src_ip  )
+     && (fa->src_port == fb->src_port)
+     && (fa->dst_ip   == fb->dst_ip  )
+     && (fa->dst_port == fb->dst_port)
+     )
     ||
     (
-      (fa->src_ip      == fb->dst_ip  )
-      && (fa->src_port == fb->dst_port)
-      && (fa->dst_ip   == fb->src_ip  )
-      && (fa->dst_port == fb->src_port)
-      )
-    )
+     (fa->src_ip      == fb->dst_ip  )
+     && (fa->src_port == fb->dst_port)
+     && (fa->dst_ip   == fb->src_ip  )
+     && (fa->dst_port == fb->src_port)
+     )
+     )
     return(0);
-
+  
   if(fa->src_ip   < fb->src_ip  ) return(-1); else { if(fa->src_ip   > fb->src_ip  ) return(1); }
   if(fa->src_port < fb->src_port) return(-1); else { if(fa->src_port > fb->src_port) return(1); }
   if(fa->dst_ip   < fb->dst_ip  ) return(-1); else { if(fa->dst_ip   > fb->dst_ip  ) return(1); }
@@ -376,9 +376,9 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   flow.src_ip = iph->saddr, flow.dst_ip = iph->daddr;
   flow.src_port = htons(*sport), flow.dst_port = htons(*dport);
   flow.hashval = hashval = flow.protocol + flow.vlan_id + flow.src_ip + flow.dst_ip + flow.src_port + flow.dst_port;
+  /* printf("hashval=%u [%u][%u][%u:%u][%u:%u]\n", hashval, flow.protocol, flow.vlan_id, flow.src_ip, flow.src_port, flow.dst_ip, flow.dst_port); */
   idx = hashval % workflow->prefs.num_roots;
   ret = ndpi_tfind(&flow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp);
-
 
   /* to avoid two nodes in one binary tree for a flow */
   int is_changed = 0;
