@@ -18,7 +18,9 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
 #include "ndpi_config.h"
+#endif
 
 #ifdef linux
 #define _GNU_SOURCE
@@ -292,6 +294,8 @@ static void help(u_int long_help) {
   exit(!long_help);
 }
 
+//AGGIUNTO variabile globale che conterrà il file su cui scrivere la lista di DHCP-fingerprint
+FILE *file_finger= NULL;
 
 static struct option longopts[] = {
   /* mandatory extcap options */
@@ -325,6 +329,9 @@ static struct option longopts[] = {
   { "json", required_argument, NULL, 'j'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
+
+  //AGGIUNTO campo k, con argomento (il nome del file su cui scrivere) obbligatorio (posso metterlo anche opzionale)
+  {"kfingerprint", required_argument, NULL, 'k'},
 
   {0, 0, 0, 0}
 };
@@ -472,12 +479,11 @@ static void parseOptions(int argc, char **argv) {
     argc -= ret, argv += ret;
   }
 #endif
-
-  while((opt = getopt_long(argc, argv, "c:df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:", longopts, &option_idx)) != EOF) {
+  //AGGIUNTO k alla stringa delle opzioni
+  while((opt = getopt_long(argc, argv, "c:df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:k:", longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
-
     switch (opt) {
     case 'd':
       enable_protocol_guess = 0;
@@ -624,6 +630,19 @@ static void parseOptions(int argc, char **argv) {
 
     case 257:
       _debug_protocols = strdup(optarg);
+      break;
+
+    //AGGIUNTO case k 'fingerprint', nel caso ci sia apro il file che conterra lista dei fingerprint
+    case 'k':
+      fprintf(stdout, "Richiesta stampa dei fingerprint sul file %s\n", optarg);
+      //il file su cui scrivere deve trovarsi nella cartella ndpi-dev
+      //non faccio controlli se il file esiste ecc
+      file_finger= fopen(optarg, "a");
+      fprintf(file_finger, "Lista dei DHCP - fingerprint: \n");
+
+      //comando successivo può servire per "forzare" il fatto che stampi la lista dei fingerprint
+      //sennò nel caso in cui non sia presente l'opzione v - verbose non stamperebbe nulla nel file
+      //verbose= 1;
       break;
 
     default:
@@ -846,7 +865,11 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[%s]", ndpi_cipher2str(flow->ssh_ssl.server_cipher));;
 
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
-    if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
+    if(flow->dhcp_fingerprint[0] != '\0') {
+      fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
+      //AGGIUNTO controllo se file fingerpint è aperto allora scrivo anche su file
+      if (file_finger != NULL) fprintf(file_finger, "%s\n", flow->dhcp_fingerprint);
+    }
 
     fprintf(out, "\n");
   } else {
@@ -897,8 +920,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       if(flow->ssh_ssl.ja3_client[0] != '\0')
 	json_object_object_add(jObj,"ja3c",json_object_new_string(flow->ssh_ssl.ja3_client));
 
-      if(flow->ssh_ssl.ja3_server[0] != '\0')
-	json_object_object_add(jObj,"host.server.ja3",json_object_new_string(flow->ssh_ssl.ja3_server));
+      if(flow->ja3_server[0] != '\0')
+	json_object_object_add(jObj,"host.server.ja3",json_object_new_string(flow->ja3_server));
 
       if(flow->ssh_ssl.client_info[0] != '\0')
 	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssh_ssl.client_info));
@@ -1438,7 +1461,6 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
   }
 }
 
-/* *********************************************** */  
 
 /**
  * @brief On Protocol Discover - demo callback
@@ -1449,8 +1471,6 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
   ;
 }
 
-/* *********************************************** */
-
 #if 0
 /**
  * @brief Print debug
@@ -1458,6 +1478,7 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
 static void debug_printf(u_int32_t protocol, void *id_struct,
 			 ndpi_log_level_t log_level,
 			 const char *format, ...) {
+
   va_list va_ap;
 #ifndef WIN32
   struct tm result;
@@ -1490,8 +1511,6 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
   va_end(va_ap);
 }
 #endif
-
-/* *********************************************** */
 
 /**
  * @brief Setup for detection begin
@@ -1580,7 +1599,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   }
 }
 
-/* *********************************************** */
 
 /**
  * @brief End of detection and free flow
@@ -1589,7 +1607,6 @@ static void terminateDetection(u_int16_t thread_id) {
   ndpi_workflow_free(ndpi_thread_info[thread_id].workflow);
 }
 
-/* *********************************************** */
 
 /**
  * @brief Traffic stats format
@@ -1626,7 +1643,6 @@ char* formatTraffic(float numBits, int bits, char *buf) {
   return(buf);
 }
 
-/* *********************************************** */  
 
 /**
  * @brief Packets stats format
@@ -1645,7 +1661,6 @@ char* formatPackets(float numPkts, char *buf) {
   return(buf);
 }
 
-/* *********************************************** */
 
 /**
  * @brief JSON function init
@@ -1657,8 +1672,6 @@ static void json_init() {
   jArray_topStats = json_object_new_array();
 }
 
-/* *********************************************** */
-
 static void json_open_stats_file() {
   if((file_first_time && ((stats_fp = fopen(_statsFilePath,"w")) == NULL))
      ||
@@ -1668,8 +1681,6 @@ static void json_open_stats_file() {
   }
   else file_first_time = 0;
 }
-
-/* *********************************************** */
 
 static void json_close_stats_file() {
   json_object *jObjFinal = json_object_new_object();
@@ -2216,7 +2227,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
       if(ndpi_thread_info[thread_id].workflow->stats.protocol_counter[0] > 0) {
         for(i=0; i<NUM_ROOTS; i++)
-	  ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_print_unknown_proto_walker, &thread_id);
+          ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_print_unknown_proto_walker, &thread_id);
       }
     }
 
@@ -3382,6 +3393,9 @@ int orginal_main(int argc, char **argv) {
     if(results_file)  fclose(results_file);
     if(extcap_dumper) pcap_dump_close(extcap_dumper);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
+
+    //AGGIUNTO chiudo il file se era stato aperto
+    if(file_finger != NULL) fclose(file_finger);
 
     return 0;
   }
