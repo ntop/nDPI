@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #endif
+
 #include <string.h>
 #include <stdarg.h>
 #include <search.h>
@@ -766,7 +767,7 @@ static char* print_cipher(ndpi_cipher_weakness c) {
 
 static char* ssl_version2str(u_int16_t version) {
   static char v[8];
-    
+
   switch(version) {
   case 0x300: return("SSLv3");
   case 0x301: return("TLSv1");
@@ -1438,7 +1439,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
   }
 }
 
-/* *********************************************** */  
+/* *********************************************** */
 
 /**
  * @brief On Protocol Discover - demo callback
@@ -1626,7 +1627,7 @@ char* formatTraffic(float numBits, int bits, char *buf) {
   return(buf);
 }
 
-/* *********************************************** */  
+/* *********************************************** */
 
 /**
  * @brief Packets stats format
@@ -2192,6 +2193,126 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       for(i=0; i<NUM_ROOTS; i++)
         ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], node_print_known_proto_walker, &thread_id);
     }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ progetto gestione di reti ~~~~~~~~~~~~~~~~~~~
+   ndpi_host_ja3_fingerprints *hTable = NULL; //hash table principale
+   for(int i = 0; i < num_flows; i++){
+      ndpi_host_ja3_fingerprints *found = NULL;
+      //controllo se e' un flusso ssh-ssl
+      if(all_flows[i].flow->ssh_ssl.ja3_client[0] != '\0'){
+         //cerco se l'host e' gia' nella hash
+         HASH_FIND_INT(hTable, &(all_flows[i].flow->src_ip), found);
+
+         if(found == NULL){
+            //inserisco il nuovo host
+            ndpi_host_ja3_fingerprints *newHost = malloc(sizeof(ndpi_host_ja3_fingerprints));
+            newHost -> host_client_info_hasht = NULL;
+            newHost -> host_server_info_hasht = NULL;
+            newHost->ip_string = all_flows[i].flow->src_name;
+            newHost->ip = all_flows[i].flow->src_ip;
+
+            ndpi_ja3_info *newInfo = malloc(sizeof(ndpi_ja3_info));
+            newInfo->ja3 = all_flows[i].flow->ssh_ssl.ja3_client; //[0] controlli se e' eol
+            newInfo->unsafe_cipher = all_flows[i].flow->ssh_ssl.client_unsafe_cipher;
+            //aggiunto il nuovo ja3
+            HASH_ADD_KEYPTR(hh, newHost->host_client_info_hasht, newInfo->ja3, strlen(newInfo->ja3), newInfo);
+            //aggiungo nuovo host
+            HASH_ADD_INT(hTable, ip, newHost);
+         }else{
+            //host gia' presente
+            ndpi_ja3_info *infoFound = NULL;
+            HASH_FIND_STR(found->host_client_info_hasht, all_flows[i].flow->ssh_ssl.ja3_client, infoFound);
+            if(infoFound == NULL){
+               ndpi_ja3_info *newInfo = malloc(sizeof(ndpi_ja3_info));
+               newInfo->ja3 = all_flows[i].flow->ssh_ssl.ja3_client; //[0] controlli se e' eol
+               newInfo->unsafe_cipher = all_flows[i].flow->ssh_ssl.client_unsafe_cipher;
+               HASH_ADD_KEYPTR(hh, found->host_client_info_hasht, newInfo->ja3, strlen(newInfo->ja3), newInfo);
+            }
+         }
+      }
+      if(all_flows[i].flow->ssh_ssl.ja3_server[0] != '\0'){
+         //cerco se l'host e' gia' nella hash
+         HASH_FIND_INT(hTable, &(all_flows[i].flow->dst_ip), found);
+         if(found == NULL){
+            //inserisco il nuovo host
+            ndpi_host_ja3_fingerprints *newHost = malloc(sizeof(ndpi_host_ja3_fingerprints));
+            newHost->host_client_info_hasht = NULL;
+            newHost->host_server_info_hasht = NULL;
+
+            newHost->ip_string = all_flows[i].flow->dst_name;
+            newHost->ip = all_flows[i].flow->dst_ip;
+
+            ndpi_ja3_info *newInfo = malloc(sizeof(ndpi_ja3_info));
+            newInfo->ja3 = all_flows[i].flow->ssh_ssl.ja3_server; //[0] controlli se e' eol
+            newInfo->unsafe_cipher = all_flows[i].flow->ssh_ssl.server_unsafe_cipher;
+            //aggiunto il nuovo ja3
+            HASH_ADD_KEYPTR(hh, newHost->host_server_info_hasht, newInfo->ja3, strlen(newInfo->ja3), newInfo);
+            //aggiungo nuovo host
+            HASH_ADD_INT(hTable, ip, newHost);
+         }else{
+            //host gia' presente
+            ndpi_ja3_info *infoFound = NULL;
+            HASH_FIND_STR(found->host_server_info_hasht, all_flows[i].flow->ssh_ssl.ja3_server, infoFound);
+            if(infoFound == NULL){
+               ndpi_ja3_info *newInfo = malloc(sizeof(ndpi_ja3_info));
+               newInfo->ja3 = all_flows[i].flow->ssh_ssl.ja3_server; //[0] controlli se e' eol
+               newInfo->unsafe_cipher = all_flows[i].flow->ssh_ssl.server_unsafe_cipher;
+               HASH_ADD_KEYPTR(hh, found->host_server_info_hasht, newInfo->ja3, strlen(newInfo->ja3), newInfo);
+            }
+         }
+      }
+   }
+
+   //puntatori necessari per l'iterazione delle tabelle hash
+   ndpi_host_ja3_fingerprints *element_of_hTable = NULL;
+   ndpi_ja3_info *info_of_element = NULL;
+   ndpi_host_ja3_fingerprints *tmp = NULL;
+   ndpi_ja3_info *tmp2 = NULL;
+
+   if(verbose == 1){
+      //stampo solo numero di flussi con ja3 per ogni host
+      ndpi_host_ja3_fingerprints *element_of_hTable;
+
+      for(element_of_hTable = hTable; element_of_hTable != NULL; element_of_hTable = element_of_hTable->hh.next){
+         unsigned int num_ja3_client;
+         unsigned int num_ja3_server;
+         num_ja3_client = HASH_COUNT(element_of_hTable->host_client_info_hasht);
+         num_ja3_server = HASH_COUNT(element_of_hTable->host_server_info_hasht);
+         printf("\n L'host con IP: %s ha %d Fingerprint JA3C e %d Fingerprint JA3S \n", element_of_hTable->ip_string, num_ja3_client, num_ja3_server);
+
+      }
+   }else if(verbose == 2){
+      HASH_ITER(hh, hTable, element_of_hTable, tmp){
+         printf("\nL'host con IP: %s ha i seguenti fingerprint\n", element_of_hTable->ip_string);
+         printf(" JA3 Client: \n");
+         HASH_ITER(hh, element_of_hTable->host_client_info_hasht, info_of_element, tmp2){
+            printf("   %s %s\n", info_of_element->ja3, print_cipher(info_of_element->unsafe_cipher));
+         }
+         printf(" JA3 server: \n");
+         HASH_ITER(hh, element_of_hTable->host_server_info_hasht, info_of_element, tmp2){
+            printf("   %s %s\n", info_of_element->ja3, print_cipher(info_of_element->unsafe_cipher));
+         }
+      }
+   }
+   printf("\n\n");
+
+   //libero la tabella hash
+   //non e' necessario liberare i dati in quanto sono pointer ad aree di memoria
+   //che verranno liberate successivamente da ndpiExample stesso
+   HASH_ITER(hh, hTable, element_of_hTable, tmp){
+      HASH_ITER(hh, element_of_hTable->host_client_info_hasht, info_of_element, tmp2){
+         HASH_DEL(element_of_hTable->host_client_info_hasht, info_of_element);
+         free(info_of_element);
+      }
+      HASH_ITER(hh, element_of_hTable->host_server_info_hasht, info_of_element, tmp2){
+         HASH_DEL(element_of_hTable->host_server_info_hasht, info_of_element);
+         free(info_of_element);
+      }
+      HASH_DEL(hTable, element_of_hTable);
+      free(element_of_hTable);
+   }
+   // ~~~~~~~~~~~~~~~~ Fine progetto ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     qsort(all_flows, num_flows, sizeof(struct flow_info), cmpFlows);
 

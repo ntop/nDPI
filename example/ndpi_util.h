@@ -30,6 +30,7 @@
 #define __NDPI_UTIL_H__
 
 #include <pcap.h>
+#include "uthash.h"
 
 #ifdef USE_DPDK
 #include <rte_eal.h>
@@ -38,6 +39,7 @@
 #include <rte_cycles.h>
 #include <rte_lcore.h>
 #include <rte_mbuf.h>
+
 
 #define RX_RING_SIZE     128
 #define TX_RING_SIZE     512
@@ -73,6 +75,27 @@ extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
 #define MAX_TABLE_SIZE_2         8192
 #define INIT_VAL                   -1
 
+
+// ~~~~~~~~~~~~~~~~~~~~~ progetto gestione di reti ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// hash table interna (ja3 -> stato sicurezza)
+typedef struct ndpi_ja3_info {
+   char * ja3;
+   ndpi_cipher_weakness unsafe_cipher;
+
+   UT_hash_handle hh;
+} ndpi_ja3_info;
+
+// hash table esterna (host ip -> <stringa ip, hash table ja3c, hash table ja3s>)
+typedef struct ndpi_host_ja3_fingerprints{
+   u_int32_t ip;
+   char *ip_string;
+   ndpi_ja3_info *host_client_info_hasht;
+   ndpi_ja3_info *host_server_info_hasht;
+
+   UT_hash_handle hh;
+} ndpi_host_ja3_fingerprints;
+// ~~~~~~~~~~~~~~~ fine progetto ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // flow tracking
 typedef struct ndpi_flow_info {
   u_int32_t hashval;
@@ -96,7 +119,7 @@ typedef struct ndpi_flow_info {
   char host_server_name[256];
   char bittorent_hash[41];
   char dhcp_fingerprint[48];
-  
+
   struct {
     u_int16_t ssl_version;
     char client_info[64], server_info[64], server_organization[64],

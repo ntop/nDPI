@@ -1,0 +1,184 @@
+
+-----------------------------------------------------------
+* NOTE: This is demo app to show *some* nDPI features.
+* In this demo we have implemented only some basic features
+* just to show you what you can do with the library. Feel 
+* free to extend it and send us the patches for inclusion
+------------------------------------------------------------
+
+Using nDPI (2.9.0-1572-6ed8ccf) [1 thread(s)]
+Reading packets from pcap file test.pcap...
+Running thread 0...
+
+nDPI Memory statistics:
+	nDPI Memory (once):      203.63 KB    
+	Flow Memory (per flow):  2.15 KB      
+	Actual Memory:           2.96 MB      
+	Peak Memory:             2.96 MB      
+	Setup Time:              8 msec
+	Packet Processing Time:  3 msec
+
+Traffic statistics:
+	Ethernet bytes:        1932688       (includes ethernet CRC/IFC/trailer)
+	Discarded bytes:       402          
+	IP packets:            2153          of 2160 packets total
+	IP bytes:              1881016       (avg pkt size 870 bytes)
+	Unique flows:          69           
+	TCP Packets:           1453         
+	UDP Packets:           700          
+	VLAN Packets:          0            
+	MPLS Packets:          0            
+	PPPoE Packets:         0            
+	Fragmented Packets:    0            
+	Max Packet size:       11376        
+	Packet Len < 64:       957          
+	Packet Len 64-128:     179          
+	Packet Len 128-256:    120          
+	Packet Len 256-1024:   219          
+	Packet Len 1024-1500:  456          
+	Packet Len > 1500:     222          
+	nDPI throughput:       621.00 K pps / 4.15 Gb/sec
+	Analysis begin:        23/Jun/2019 18:59:01
+	Analysis end:          23/Jun/2019 18:59:38
+	Traffic throughput:    58.66 pps / 411.40 Kb/sec
+	Traffic duration:      36.702 sec
+	Guessed flow protos:   0            
+
+
+Detected protocols:
+	DNS                  packets: 14            bytes: 2063          flows: 7            
+	MDNS                 packets: 1             bytes: 119           flows: 1            
+	SSDP                 packets: 5             bytes: 1031          flows: 2            
+	SSL                  packets: 143           bytes: 38605         flows: 9            
+	GMail                packets: 1174          bytes: 1482566       flows: 1            
+	Google               packets: 684           bytes: 311216        flows: 38           
+	Spotify              packets: 2             bytes: 172           flows: 2            
+	Amazon               packets: 19            bytes: 5042          flows: 1            
+	Telegram             packets: 98            bytes: 39160         flows: 4            
+	Github               packets: 11            bytes: 830           flows: 3            
+	GoogleServices       packets: 2             bytes: 212           flows: 1            
+
+
+Protocol statistics:
+	Safe                         38605 bytes
+	Acceptable                 1531195 bytes
+	Unrated                     311216 bytes
+
+
+L'host con IP: 192.168.1.7 ha i seguenti fingerprint
+ JA3 Client: 
+   8f41a697eff27e008f969cf7b5ba4117 
+   66918128f1b9b03303d77c6f2eefd128 
+   554719594ba90b02ae410c297c6e50ad 
+ JA3 server: 
+
+L'host con IP: 2.20.80.21 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   410b9bedaf65dd26c6fe547154d60db4 
+
+L'host con IP: 80.252.91.52 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   0a917d753018dad73d9899ace370f8d8  (WEAK)
+
+L'host con IP: 85.222.128.7 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   0debd3853f330c574b05e0b6d882dc27 
+
+L'host con IP: 52.213.106.142 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   303951d4c50efb2e991652225a6f02b1 
+
+L'host con IP: 84.53.177.33 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   4560a2cba28d0d5a9c9208d56ff6b439 
+
+L'host con IP: 104.91.3.136 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   410b9bedaf65dd26c6fe547154d60db4 
+
+L'host con IP: 66.117.29.226 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   410b9bedaf65dd26c6fe547154d60db4 
+
+L'host con IP: 104.83.121.78 ha i seguenti fingerprint
+ JA3 Client: 
+ JA3 server: 
+   42ec7b1db61428bf1cc6e01b9ef02b04 
+
+
+	1	TCP 192.168.1.7:42646 <-> 216.58.205.197:443 [proto: 91.122/SSL.GMail][cat: Email/3][451 pkts/77976 bytes <-> 723 pkts/1404590 bytes][TLSv1][JA3C: 554719594ba90b02ae410c297c6e50ad]
+	2	UDP 192.168.1.7:45040 <-> 216.58.205.206:443 [proto: 126/Google][cat: Web/5][29 pkts/4749 bytes <-> 52 pkts/62478 bytes]
+	3	UDP 192.168.1.7:50627 <-> 66.102.1.189:443 [proto: 126/Google][cat: Web/5][27 pkts/6888 bytes <-> 45 pkts/53502 bytes]
+	4	UDP 192.168.1.7:45837 <-> 216.58.205.78:443 [proto: 126/Google][cat: Web/5][35 pkts/9476 bytes <-> 49 pkts/25249 bytes]
+	5	UDP 192.168.1.7:36963 <-> 216.58.198.42:443 [proto: 126/Google][cat: Web/5][18 pkts/6562 bytes <-> 24 pkts/17845 bytes]
+	6	UDP 192.168.1.7:58915 <-> 216.58.205.202:443 [proto: 126/Google][cat: Web/5][15 pkts/7470 bytes <-> 19 pkts/11805 bytes]
+	7	TCP 192.168.1.7:60390 <-> 149.154.167.99:443 [proto: 91.185/SSL.Telegram][cat: Chat/9][21 pkts/7223 bytes <-> 21 pkts/10721 bytes][TLSv1][JA3C: 8f41a697eff27e008f969cf7b5ba4117]
+	8	UDP 192.168.1.7:38407 <-> 216.58.205.174:443 [proto: 126/Google][cat: Web/5][23 pkts/10948 bytes <-> 25 pkts/6218 bytes]
+	9	UDP 192.168.1.7:59251 <-> 216.58.205.170:443 [proto: 126/Google][cat: Web/5][22 pkts/8334 bytes <-> 22 pkts/5498 bytes]
+	10	TCP 149.154.167.99:443 <-> 192.168.1.7:60300 [proto: 64.185/SSL_No_Cert.Telegram][cat: Chat/9][19 pkts/6175 bytes <-> 18 pkts/6444 bytes]
+	11	TCP 192.168.1.7:40450 <-> 104.83.121.78:443 [proto: 91/SSL][cat: Web/5][13 pkts/2784 bytes <-> 13 pkts/8912 bytes][TLSv1.2][JA3C: 8f41a697eff27e008f969cf7b5ba4117][server: www.trenitalia.com][JA3S: 42ec7b1db61428bf1cc6e01b9ef02b04][TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384]
+	12	TCP 192.168.1.7:43758 <-> 80.252.91.52:443 [proto: 91/SSL][cat: Web/5][12 pkts/3168 bytes <-> 9 pkts/6902 bytes][TLSv1.2][JA3C: 66918128f1b9b03303d77c6f2eefd128][server: bs.serving-sys.com][JA3S: 0a917d753018dad73d9899ace370f8d8 (WEAK)][TLS_RSA_WITH_AES_256_CBC_SHA]
+	13	TCP 192.168.1.7:60394 <-> 149.154.167.99:443 [proto: 91.185/SSL.Telegram][cat: Chat/9][9 pkts/1854 bytes <-> 8 pkts/6541 bytes][TLSv1][JA3C: 8f41a697eff27e008f969cf7b5ba4117]
+	14	UDP 192.168.1.7:52420 <-> 216.58.205.131:443 [proto: 126/Google][cat: Web/5][14 pkts/2920 bytes <-> 18 pkts/4892 bytes]
+	15	UDP 192.168.1.7:34683 <-> 216.58.205.174:443 [proto: 126/Google][cat: Web/5][8 pkts/4784 bytes <-> 7 pkts/2757 bytes]
+	16	UDP 192.168.1.7:46506 <-> 216.58.198.42:443 [proto: 126/Google][cat: Web/5][14 pkts/4372 bytes <-> 18 pkts/2942 bytes]
+	17	UDP 192.168.1.7:34995 <-> 216.58.205.202:443 [proto: 126/Google][cat: Web/5][15 pkts/4479 bytes <-> 14 pkts/2834 bytes]
+	18	UDP 192.168.1.7:59428 <-> 216.58.205.166:443 [proto: 126/Google][cat: Web/5][11 pkts/4161 bytes <-> 12 pkts/2979 bytes]
+	19	UDP 192.168.1.7:60812 <-> 216.58.205.130:443 [proto: 126/Google][cat: Web/5][7 pkts/4163 bytes <-> 8 pkts/2639 bytes]
+	20	UDP 192.168.1.7:41124 <-> 216.58.205.77:443 [proto: 126/Google][cat: Web/5][7 pkts/3823 bytes <-> 7 pkts/2616 bytes]
+	21	UDP 192.168.1.7:56571 <-> 216.58.205.132:443 [proto: 126/Google][cat: Web/5][9 pkts/3355 bytes <-> 9 pkts/3032 bytes]
+	22	UDP 192.168.1.7:49990 <-> 216.58.205.142:443 [proto: 126/Google][cat: Web/5][7 pkts/3482 bytes <-> 9 pkts/2031 bytes]
+	23	UDP 192.168.1.7:55280 <-> 216.58.205.106:443 [proto: 126/Google][cat: Web/5][12 pkts/3298 bytes <-> 11 pkts/2056 bytes]
+	24	TCP 192.168.1.7:33336 <-> 52.213.106.142:443 [proto: 91.178/SSL.Amazon][cat: Web/5][11 pkts/1353 bytes <-> 8 pkts/3689 bytes][TLSv1.2][JA3C: 66918128f1b9b03303d77c6f2eefd128][server: *.demdex.net][JA3S: 303951d4c50efb2e991652225a6f02b1][TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	25	TCP 192.168.1.7:46980 <-> 66.117.29.226:443 [proto: 91/SSL][cat: Web/5][8 pkts/2511 bytes <-> 9 pkts/1428 bytes][TLSv1.2][JA3C: 8f41a697eff27e008f969cf7b5ba4117][JA3S: 410b9bedaf65dd26c6fe547154d60db4][TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384]
+	26	TCP 192.168.1.7:32996 <-> 104.91.3.136:443 [proto: 91/SSL][cat: Web/5][10 pkts/2368 bytes <-> 10 pkts/1081 bytes][TLSv1.2][JA3C: 8f41a697eff27e008f969cf7b5ba4117][JA3S: 410b9bedaf65dd26c6fe547154d60db4][TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384]
+	27	TCP 192.168.1.7:60134 <-> 85.222.128.7:443 [proto: 91/SSL][cat: Web/5][9 pkts/1984 bytes <-> 10 pkts/1250 bytes][TLSv1.2][JA3C: 66918128f1b9b03303d77c6f2eefd128][JA3S: 0debd3853f330c574b05e0b6d882dc27][TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384]
+	28	TCP 192.168.1.7:46110 <-> 2.20.80.21:443 [proto: 91/SSL][cat: Web/5][10 pkts/1767 bytes <-> 10 pkts/1132 bytes][TLSv1.2][JA3C: 8f41a697eff27e008f969cf7b5ba4117][JA3S: 410b9bedaf65dd26c6fe547154d60db4][TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384]
+	29	TCP 192.168.1.7:35782 <-> 84.53.177.33:443 [proto: 91/SSL][cat: Web/5][7 pkts/1936 bytes <-> 6 pkts/854 bytes][TLSv1.2][JA3C: 66918128f1b9b03303d77c6f2eefd128][JA3S: 4560a2cba28d0d5a9c9208d56ff6b439][TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384]
+	30	UDP 173.194.76.189:443 <-> 192.168.1.7:34214 [proto: 126/Google][cat: Web/5][5 pkts/742 bytes <-> 5 pkts/356 bytes]
+	31	UDP 74.125.133.189:443 <-> 192.168.1.7:36820 [proto: 126/Google][cat: Web/5][4 pkts/691 bytes <-> 4 pkts/278 bytes]
+	32	UDP 192.168.1.4:54609 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][4 pkts/864 bytes -> 0 pkts/0 bytes]
+	33	UDP 192.168.1.7:49288 <-> 74.125.140.189:443 [proto: 126/Google][cat: Web/5][3 pkts/207 bytes <-> 3 pkts/608 bytes]
+	34	TCP 192.168.1.7:44090 <-> 192.30.253.125:443 [proto: 91.203/SSL.Github][cat: Collaborative/15][3 pkts/226 bytes <-> 3 pkts/222 bytes]
+	35	UDP 192.168.1.7:36108 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/85 bytes <-> 1 pkts/323 bytes][Host: dpm.demdex.net]
+	36	TCP 192.168.1.7:53442 <-> 159.69.129.2:443 [proto: 91/SSL][cat: Web/5][2 pkts/167 bytes <-> 3 pkts/229 bytes]
+	37	UDP 192.168.1.7:52368 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/90 bytes <-> 1 pkts/255 bytes][Host: assets.adobedtm.com]
+	38	UDP 192.168.1.7:50172 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/93 bytes <-> 1 pkts/204 bytes][Host: ds-aksb-a.akamaihd.net]
+	39	UDP 192.168.1.7:45959 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/96 bytes <-> 1 pkts/195 bytes][Host: secure-ds.serving-sys.com]
+	40	UDP 192.168.1.7:43246 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/89 bytes <-> 1 pkts/179 bytes][Host: www.trenitalia.com]
+	41	TCP 192.168.1.7:46078 <-> 35.186.224.47:443 [proto: 91.126/SSL.Google][cat: Web/5][2 pkts/167 bytes <-> 1 pkts/97 bytes]
+	42	TCP 192.30.253.124:443 <-> 192.168.1.7:47786 [proto: 91.203/SSL.Github][cat: Collaborative/15][2 pkts/156 bytes <-> 1 pkts/94 bytes]
+	43	UDP 192.168.1.7:59253 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/91 bytes <-> 1 pkts/147 bytes][Host: adservice.google.com]
+	44	UDP 192.168.1.7:49676 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/98 bytes <-> 1 pkts/139 bytes][Host: googleads.g.doubleclick.net]
+	45	UDP 192.168.1.7:48128 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/106 bytes <-> 1 pkts/122 bytes][Host: ferroviedellostato.d3.sc.omtrdc.net]
+	46	UDP 192.168.1.7:50881 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/95 bytes <-> 1 pkts/131 bytes][Host: bs.eyeblaster.akadns.net]
+	47	TCP 192.168.1.7:41772 <-> 104.199.65.45:4070 [proto: 126/Google][cat: Web/5][2 pkts/143 bytes <-> 1 pkts/77 bytes]
+	48	UDP 192.168.1.7:42425 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/90 bytes <-> 1 pkts/130 bytes][Host: clients4.google.com]
+	49	UDP 192.168.1.7:47169 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/90 bytes <-> 1 pkts/130 bytes][Host: clients6.google.com]
+	50	UDP 192.168.1.7:58335 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/90 bytes <-> 1 pkts/130 bytes][Host: clients2.google.com]
+	51	UDP 192.168.1.7:34060 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/100 bytes <-> 1 pkts/116 bytes][Host: people-pa.clients6.google.com]
+	52	UDP 192.168.1.7:49495 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/99 bytes <-> 1 pkts/115 bytes][Host: 13.client-channel.google.com]
+	53	UDP 192.168.1.7:34998 <-> 192.168.1.1:53 [proto: 5.239/DNS.GoogleServices][cat: Web/5][1 pkts/98 bytes <-> 1 pkts/114 bytes][Host: safebrowsing.googleapis.com]
+	54	UDP 192.168.1.7:35350 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/98 bytes <-> 1 pkts/114 bytes][Host: chat-pa.clients6.google.com]
+	55	UDP 192.168.1.7:45359 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/94 bytes <-> 1 pkts/110 bytes][Host: googlemail.l.google.com]
+	56	UDP 192.168.1.7:47232 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/93 bytes <-> 1 pkts/109 bytes][Host: dart.l.doubleclick.net]
+	57	UDP 192.168.1.7:54262 <-> 192.168.1.1:53 [proto: 5.185/DNS.Telegram][cat: Chat/9][1 pkts/93 bytes <-> 1 pkts/109 bytes][Host: vesta.web.telegram.org]
+	58	UDP 192.168.1.7:57062 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/90 bytes <-> 1 pkts/106 bytes][Host: accounts.google.com]
+	59	UDP 192.168.1.7:40851 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/88 bytes <-> 1 pkts/104 bytes][Host: www3.l.google.com]
+	60	UDP 192.168.1.7:43897 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/88 bytes <-> 1 pkts/104 bytes][Host: plus.l.google.com]
+	61	UDP 192.168.1.7:44268 <-> 192.168.1.1:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/85 bytes <-> 1 pkts/101 bytes][Host: www.google.com]
+	62	UDP 192.168.1.7:43387 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][1 pkts/167 bytes -> 0 pkts/0 bytes]
+	63	TCP 192.168.1.7:43142 <-> 159.69.129.3:443 [proto: 91/SSL][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes]
+	64	TCP 192.168.1.7:47886 <-> 192.30.253.124:443 [proto: 91.203/SSL.Github][cat: Collaborative/15][1 pkts/66 bytes <-> 1 pkts/66 bytes]
+	65	TCP 192.168.1.7:47898 <-> 108.177.15.188:5228 [proto: 126/Google][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes]
+	66	TCP 192.168.1.7:52602 <-> 35.186.224.53:443 [proto: 91.126/SSL.Google][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes]
+	67	UDP 192.168.1.1:49001 -> 224.0.0.251:5353 [proto: 8/MDNS][cat: Network/14][1 pkts/119 bytes -> 0 pkts/0 bytes]
+	68	UDP 192.168.1.4:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][cat: Music/25][1 pkts/86 bytes -> 0 pkts/0 bytes]
+	69	UDP 192.168.1.7:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][cat: Music/25][1 pkts/86 bytes -> 0 pkts/0 bytes]
