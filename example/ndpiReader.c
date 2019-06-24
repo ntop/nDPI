@@ -2194,7 +2194,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     }
 
    ndpi_host_ja3_fingerprints *hTable = NULL; //outer hash table
-   for(int i = 0; i < num_flows; i++){
+   int i = 0;
+   for(i = 0; i < num_flows; i++){
       ndpi_host_ja3_fingerprints *found = NULL;
       //check if this is a ssh-ssl flow
       if(all_flows[i].flow->ssh_ssl.ja3_client[0] != '\0'){
