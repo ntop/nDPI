@@ -29,6 +29,7 @@
 #ifndef __NDPI_UTIL_H__
 #define __NDPI_UTIL_H__
 
+#include "uthash.h"
 #include <pcap.h>
 
 #ifdef USE_DPDK
@@ -72,6 +73,25 @@ extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
 #define MAX_TABLE_SIZE_1         4096
 #define MAX_TABLE_SIZE_2         8192
 #define INIT_VAL                   -1
+
+// inner hash table (ja3 -> security state)
+typedef struct ndpi_ja3_info {
+   char * ja3;
+   ndpi_cipher_weakness unsafe_cipher;
+   char *server_name;
+   UT_hash_handle hh;
+} ndpi_ja3_info;
+
+// external hash table (host ip -> <ip string, hash table ja3c, hash table ja3s>)
+typedef struct ndpi_host_ja3_fingerprints{
+   u_int32_t ip;
+   char *ip_string;
+   ndpi_ja3_info *host_client_info_hasht;
+   ndpi_ja3_info *host_server_info_hasht;
+
+   UT_hash_handle hh;
+} ndpi_host_ja3_fingerprints;
+
 
 // flow tracking
 typedef struct ndpi_flow_info {
