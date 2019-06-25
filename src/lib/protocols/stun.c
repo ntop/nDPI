@@ -92,7 +92,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   }
 
   if((payload[0] != 0x80) && ((msg_len+20) > payload_length)) {
-    printf("=>> NOT STUN [[%02X]\n", payload[0]);
     return(NDPI_IS_NOT_STUN);
   }
   
