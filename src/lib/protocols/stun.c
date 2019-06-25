@@ -71,30 +71,37 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     goto udp_stun_found;
   }
 
-  msg_type = ntohs(h->msg_type) & 0x3EEF, msg_len = ntohs(h->msg_len);
-
-  if(ntohs(h->msg_type) == 0x01 /* Binding Request */)
+  msg_type = ntohs(h->msg_type) /* & 0x3EEF */, msg_len = ntohs(h->msg_len);
+ 
+  if(msg_type == 0x01 /* Binding Request */)
     flow->protos.stun_ssl.stun.num_binding_requests++;
 
-  /* printf("[%02X][%02X][msg_len: %u][payload_length: %u]\n", payload[0], payload[1], msg_len, payload_length); */
+  /*
+    printf("[msg_type: %04X][payload_length: %u][num_binding_request: %u]\n",
+           msg_type, payload_length, flow->protos.stun_ssl.stun.num_binding_requests);
+  */
 
   if(((payload[0] == 0x80) && ((msg_len+20) <= payload_length)) /* WhatsApp Voice */) {
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
-  } else if((payload[0] == 0x90) && ((msg_len+11) == payload_length) /* WhatsApp Video */) {
+  } else if((payload[0] == 0x90)
+	    && (((msg_len+11) == payload_length) /* WhatsApp Video */
+		|| (flow->protos.stun_ssl.stun.num_binding_requests >= 4))) {
     *is_whatsapp = 2;
     return NDPI_IS_STUN; /* This is WhatsApp Video */
   }
 
-  if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
+  if((payload[0] != 0x80) && ((msg_len+20) > payload_length)) {
+    printf("=>> NOT STUN [[%02X]\n", payload[0]);
     return(NDPI_IS_NOT_STUN);
-
+  }
+  
   if(payload_length == (msg_len+20)) {
     if(msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */ {
       u_int offset = 20;
 
       // printf("[%02X][%02X][%02X][%02X][payload_length: %u]\n", payload[offset], payload[offset+1], payload[offset+2], payload[offset+3],payload_length);
-
+      
       /*
 	This can either be the standard RTCP or Ms Lync RTCP that
 	later will become Ms Lync RTP. In this case we need to
