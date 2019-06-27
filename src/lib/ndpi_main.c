@@ -3888,8 +3888,8 @@ void ndpi_check_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************************************************************* */
 
-static u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
-					     struct ndpi_flow_struct *flow) {
+u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
+				      struct ndpi_flow_struct *flow) {
   u_int16_t ret = NDPI_PROTOCOL_UNKNOWN;
 
   if(flow->packet.iph) {

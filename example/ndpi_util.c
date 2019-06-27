@@ -653,25 +653,33 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   }
 
   if(!flow->detection_completed) {
+    u_int enough_packets =
+      (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > 8))
+       || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) ? 1 : 0;
+    
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time, src, dst);
   
-    if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
-       || ((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > 8))
-       || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) {
-      /* New protocol detected or give up */
-      flow->detection_completed = 1;
-    
-      /* Check if we should keep checking extra packets */
-      if(ndpi_flow && ndpi_flow->check_extra_packets)
-	flow->check_extra_packets = 1;
-
-      if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-	flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
-							enable_protocol_guess);
-    
-      process_ndpi_collected_info(workflow, flow);
+    if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
+      if((!enough_packets)
+	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
+	 && (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server[0] == '\0'))
+	; /* Wait for JA3S certificate */
+      else {
+	/* New protocol detected or give up */
+	flow->detection_completed = 1;
+	
+	/* Check if we should keep checking extra packets */
+	if(ndpi_flow && ndpi_flow->check_extra_packets)
+	  flow->check_extra_packets = 1;
+	
+	if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+	  flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
+							  enable_protocol_guess);
+	
+	process_ndpi_collected_info(workflow, flow);
+      }
     }
   }
   
