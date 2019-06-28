@@ -3474,24 +3474,23 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   u_int8_t l4protocol;
   u_int8_t l4_result;
 
-  if(flow) {
-    /* reset payload_packet_len, will be set if ipv4 tcp or udp */
-    flow->packet.payload_packet_len = 0;
-    flow->packet.l4_packet_len = 0;
-    flow->packet.l3_packet_len = packetlen;
-
-    flow->packet.tcp = NULL;
-    flow->packet.udp = NULL;
-    flow->packet.generic_l4_ptr = NULL;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-    flow->packet.iphv6 = NULL;
-#endif							/* NDPI_DETECTION_SUPPORT_IPV6 */
+  if (!flow) {
+    return 1;
   }
 
-  if(flow)
-    ndpi_apply_flow_protocol_to_packet(flow, &flow->packet);
-  else
-    ndpi_int_reset_packet_protocol(&flow->packet);
+  /* reset payload_packet_len, will be set if ipv4 tcp or udp */
+  flow->packet.payload_packet_len = 0;
+  flow->packet.l4_packet_len = 0;
+  flow->packet.l3_packet_len = packetlen;
+
+  flow->packet.tcp = NULL;
+  flow->packet.udp = NULL;
+  flow->packet.generic_l4_ptr = NULL;
+#ifdef NDPI_DETECTION_SUPPORT_IPV6
+  flow->packet.iphv6 = NULL;
+#endif							/* NDPI_DETECTION_SUPPORT_IPV6 */
+
+  ndpi_apply_flow_protocol_to_packet(flow, &flow->packet);
 
   l3len = flow->packet.l3_packet_len;
 
@@ -3557,7 +3556,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
       /* check for new tcp syn packets, here
        * idea: reset detection state if a connection is unknown
        */
-      if(flow && flow->packet.tcp->syn != 0
+      if(flow->packet.tcp->syn != 0
 	 && flow->packet.tcp->ack == 0
 	 && flow->init_finished != 0
 	 && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
@@ -3605,6 +3604,10 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
   const struct ndpi_tcphdr *tcph = packet->tcp;
   const struct ndpi_udphdr *udph = flow->packet.udp;
 
+  if (!flow) {
+    return;
+  }
+
   packet->tcp_retransmission = 0, packet->packet_direction = 0;
 
   if(ndpi_struct->direction_detect_disable) {
@@ -3621,8 +3624,6 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   packet->packet_lines_parsed_complete = 0;
-  if(flow == NULL)
-    return;
 
   if(flow->init_finished == 0) {
     flow->init_finished = 1;
@@ -3717,6 +3718,11 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
 void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow,
 				NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
+
+  if (!flow) {
+    return;
+  }
+
   void *func = NULL;
   u_int32_t a;
   u_int16_t proto_index = ndpi_struct->proto_defaults[flow->guessed_protocol_id].protoIdx;
@@ -3742,10 +3748,9 @@ void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_struct
     if((func != ndpi_struct->callback_buffer_non_tcp_udp[a].func)
        && (ndpi_struct->callback_buffer_non_tcp_udp[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
        ndpi_struct->callback_buffer_non_tcp_udp[a].ndpi_selection_bitmask
-       && (flow == NULL
-	   ||
+       && 
 	   NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
-				ndpi_struct->callback_buffer_non_tcp_udp[a].excluded_protocol_bitmask) == 0)
+				ndpi_struct->callback_buffer_non_tcp_udp[a].excluded_protocol_bitmask) == 0
        && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_non_tcp_udp[a].detection_bitmask,
 			       detection_bitmask) != 0) {
 
