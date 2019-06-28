@@ -5683,8 +5683,8 @@ ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_st
 
 char* ndpi_get_proto_name(struct ndpi_detection_module_struct *ndpi_mod, u_int16_t proto_id) {
   if((proto_id >= ndpi_mod->ndpi_num_supported_protocols)
-     || ((proto_id < (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS))
-	 && (ndpi_mod->proto_defaults[proto_id].protoName == NULL)))
+     || (proto_id < (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS))
+     || (ndpi_mod->proto_defaults[proto_id].protoName == NULL))
     proto_id = NDPI_PROTOCOL_UNKNOWN;
 
   return(ndpi_mod->proto_defaults[proto_id].protoName);
@@ -5695,8 +5695,8 @@ char* ndpi_get_proto_name(struct ndpi_detection_module_struct *ndpi_mod, u_int16
 ndpi_protocol_breed_t ndpi_get_proto_breed(struct ndpi_detection_module_struct *ndpi_mod,
 					   u_int16_t proto_id) {
   if((proto_id >= ndpi_mod->ndpi_num_supported_protocols)
-     || ((proto_id < (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS))
-	 && (ndpi_mod->proto_defaults[proto_id].protoName == NULL)))
+     || (proto_id < (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS))
+     || (ndpi_mod->proto_defaults[proto_id].protoName == NULL))
     proto_id = NDPI_PROTOCOL_UNKNOWN;
 
   return(ndpi_mod->proto_defaults[proto_id].protoBreed);
