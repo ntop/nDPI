@@ -24,6 +24,7 @@ hashtable_t *ht_create(int size) {
 
   /* Allocate pointers to the head nodes. */
   if((hashtable->table = ndpi_malloc(sizeof(entry_t *) * size)) == NULL)
+    free(hashtable);
     return NULL;
   else {    
     for(i = 0; i < size; i++)
@@ -62,6 +63,7 @@ entry_t *ht_newpair(char *key, u_int16_t value) {
     return NULL;  
   
   if((newpair->key = ndpi_strdup(key)) == NULL)
+    free(newpair);
     return NULL;  
 
   newpair->value = value, newpair->next = NULL;
