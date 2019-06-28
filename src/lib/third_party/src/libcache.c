@@ -196,7 +196,11 @@ cache_result cache_add(cache_t cache, void *item, uint32_t item_size) {
       }
 
       if(hash_entry_map_prev) {
-        hash_entry_map_prev->next = hash_entry_map->next;
+        if (hash_entry_map) {
+          hash_entry_map_prev->next = hash_entry_map->next;
+        } else {
+          hash_entry_map_prev->next = NULL;
+        }
       } else {
         cache->map[hash] = hash_entry_map->next;
       }
