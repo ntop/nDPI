@@ -8367,6 +8367,16 @@ ndpi_protocol_match host_match[] = {
 
   { "android.clients.google.com", NULL, "android\\.clients\\.google" TLD,   "PlayStore",    NDPI_PROTOCOL_PLAYSTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
 
+    /*
+    https://www.fastvue.co/sophos/blog/google-data-saver-affect-security-confidentiality-reporting/
+    Used by Google Chrome Lite Mode for Android
+
+    This traffic will bypass checks and blocks as it will include all the communications from/to
+    the browser instead of using the standard communication mechanisms SSL/HTTP(S)/DNS
+  */
+  { ".googlezip.net", NULL, ".googlezip\\.net" TLD,                       "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },	 
+  { "datasaver.googleapis.com", NULL, "datasaver\\.googleapis\\.com" TLD, "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  
   /*
     See https://better.fyi/trackers/
 
@@ -8687,7 +8697,7 @@ ndpi_protocol_match host_match[] = {
   { "whispersystems.org", NULL, "whispersystems\\.org" TLD,            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "musical.ly", NULL, "musical\\.ly" TLD,                            "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   { "muscdn.com", NULL, "muscndl\\.com" TLD,                           "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
-  
+
   { NULL, NULL, NULL, 0 }
 };
 

@@ -80,9 +80,7 @@ typedef enum {
   NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) - Darryl Sokoloski <darryl@egloo.ca> */
   NDPI_PROTOCOL_MODBUS                = 44, /* Modbus */
   NDPI_PROTOCOL_WHATSAPP_VIDEO        = 45,
-
-  NDPI_PROTOCOL_FREE_46               = 46, /* Free */
-  
+  NDPI_PROTOCOL_DATASAVER             = 46, /* Protocols used to save data on Internet communications */  
   NDPI_PROTOCOL_XBOX                  = 47,
   NDPI_PROTOCOL_QQ                    = 48,
   NDPI_PROTOCOL_TIKTOK                = 49,
