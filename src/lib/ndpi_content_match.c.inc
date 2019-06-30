@@ -8700,8 +8700,7 @@ ndpi_protocol_match host_match[] = {
 
   { NULL, NULL, NULL, 0 }
 };
-
-/* ****************************************************** */
+/* ******************************************************************** */
 
 /*
   Tor
@@ -8763,6 +8762,8 @@ static const char *ndpi_en_bigrams[] = {
   "py", "ry", "sy", "ty", "uy", "vy", "wy", "xy", "yy", "zy", "az", "bz", "cz", "dz", "ez", "gz", "iz",
   "lz", "nz", "oz", "pz", "rz", "tz", "uz", "zz", NULL };
 
+/* ******************************************************************** */
+
 static const char *ndpi_en_impossible_bigrams[] = {
   "bk", "bq", "bx", "cb", "cf", "cg", "cj", "cp", "cv", "cw", "cx", "dx", "fk", "fq", "fv", "fx", /* "ee", removed it can be found in 'meeting' */
   "fz", "gq", "gv", "gx", "hh", "hk", "hv", "hx", "hz", "iy", "jb", /* "jc", jcrew.com */ "jd", "jf", "jg", "jh", "jk",
@@ -8775,3 +8776,5 @@ static const char *ndpi_en_impossible_bigrams[] = {
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zs", "zx", "wh", "wk",
   "wb", "zk", "kp", "zk", "xy",
   NULL };
+
+

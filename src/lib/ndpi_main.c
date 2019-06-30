@@ -650,8 +650,7 @@ static void destroy_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
 
 /* ******************************************************************** */
 
-static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod)
-{
+static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
 
 #ifdef HAVE_HYPERSCAN

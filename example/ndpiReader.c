@@ -2474,6 +2474,8 @@ static void ndpi_process_packet(u_char *args,
   /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
 
+  /* ndpi_has_human_readeable_string(ndpi_info_mod, (char*)packet, header->caplen, 3); */
+  
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
 
