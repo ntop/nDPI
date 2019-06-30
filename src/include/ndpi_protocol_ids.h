@@ -230,7 +230,7 @@ typedef enum {
   NDPI_PROTOCOL_KAKAOTALK             = 193, /* KakaoTalk Chat (no voice call) */
   NDPI_PROTOCOL_KAKAOTALK_VOICE       = 194, /* KakaoTalk Voice */
   NDPI_PROTOCOL_TWITCH                = 195, /* Edoardo Dominici <edoaramis@gmail.com> */
-  NDPI_PROTOCOL_FREE_196              = 196, /* Free */
+  NDPI_PROTOCOL_DNS_OVER_HTTPS        = 196,
   NDPI_PROTOCOL_WECHAT                = 197,
   NDPI_PROTOCOL_MPEGTS                = 198,
   NDPI_PROTOCOL_SNAPCHAT              = 199,

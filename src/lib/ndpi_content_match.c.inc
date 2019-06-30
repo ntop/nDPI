@@ -8376,7 +8376,12 @@ ndpi_protocol_match host_match[] = {
   */
   { ".googlezip.net", NULL, ".googlezip\\.net" TLD,                       "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },	 
   { "datasaver.googleapis.com", NULL, "datasaver\\.googleapis\\.com" TLD, "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  
+
+  { "dns.google", NULL, "dns\\.google" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  // { "mozilla.cloudflare-dns.com", NULL, "mozilla\\.cloudflare-dns\\.com" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE }, /* Firefox */
+  { "cloudflare-dns.com", NULL, "cloudflare-dns\\.com" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+
+
   /*
     See https://better.fyi/trackers/
 
