@@ -4583,6 +4583,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
      && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
      && flow->packet.tcp
      && (flow->packet.tcp->syn == 0)
+     && (flow->guessed_protocol_id == 0)
      ) {
     /*
       This is a TCP flow

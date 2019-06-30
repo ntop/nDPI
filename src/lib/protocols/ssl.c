@@ -339,6 +339,10 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
 	buffer[i] = '\0', buffer_len = i;
     }
   }
+
+  /* Now all lowecase */
+  for(i=0; i<buffer_len; i++)
+    buffer[i] = tolower(buffer[i]);
 }
 
 /* https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967 */
@@ -498,7 +502,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      if(num_found != 2) continue;
 	    }
 
-	    if(server_len+i+3 < packet->payload_packet_len) {
+	    if((server_len+i+3) < packet->payload_packet_len) {
 	      char *server_name = (char*)&packet->payload[i+4];
 	      u_int8_t begin = 0, len, j, num_dots;
 

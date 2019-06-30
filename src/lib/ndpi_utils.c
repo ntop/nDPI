@@ -590,7 +590,14 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x060040: return("SSL2_DES_64_CBC_WITH_MD5");
   case 0x0700c0: return("SSL2_DES_192_EDE3_CBC_WITH_MD5");
   case 0x080080: return("SSL2_RC4_64_WITH_MD5");
-  default: return("???");
+  case 0x001301: return("TLS_AES_128_GMC_SHA256");
+  default:
+    {
+      static char buf[8];
+
+      snprintf(buf, sizeof(buf), "0X%04X", cipher);
+      return(buf);
+    }
   }
 }
 
