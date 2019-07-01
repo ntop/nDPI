@@ -2336,46 +2336,55 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
    if(verbose == 1){
       //for each host the number of flow with a ja3 fingerprint is printed
-      printf("Number of flow with JA3 fingerprint for each host: \n");
-      int i = 0;
-      ndpi_host_ja3_fingerprints *ja3ByHost_element;
-      for(ja3ByHost_element = ja3ByHostsHashT; ja3ByHost_element != NULL; ja3ByHost_element = ja3ByHost_element->hh.next){
-
-         num_ja3_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
-         num_ja3_server = HASH_COUNT(ja3ByHost_element->host_server_info_hasht);
-
-         if(num_ja3_client > 0)
-            printf("\t%d\t IP %s   \t %d JA3C \n",i, ja3ByHost_element->ip_string, num_ja3_client);
-
-         if(num_ja3_server > 0)
-            printf("\t%d\t IP %s   \t %d JA3S \n",i, ja3ByHost_element->ip_string, num_ja3_server);
-
-         i++;
-      }
-   }else if(verbose == 2){
       int i = 1;
-      //for each host it is printted the JA3C and JA3S, along the server name (if any)
-      //and the security status
-      printf("JA3C and JA3S for each host, with server name and the cipher security status: \n");
-      printf("-------------------------------------------------------------------------------------------------------------\n");
-      HASH_ITER(hh, ja3ByHostsHashT, ja3ByHost_element, tmp){
-         //printf(" host IP %s %s has the following fingerprints\n", ja3ByHost_element->ip_string, ja3ByHost_element->dns_name);
+      ndpi_host_ja3_fingerprints *ja3ByHost_element;
+      printf("Number of flow with JA3 fingerprint for each host: \n");
+      for(ja3ByHost_element = ja3ByHostsHashT; ja3ByHost_element != NULL; ja3ByHost_element = ja3ByHost_element->hh.next){
          num_ja3_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
          num_ja3_server = HASH_COUNT(ja3ByHost_element->host_server_info_hasht);
 
          if(num_ja3_client > 0){
+            printf("\t%d\t IP %s   \t %d JA3C \n",i, ja3ByHost_element->ip_string, num_ja3_client);
+         }
+
+         if(num_ja3_server > 0){
+            printf("\t%d\t IP %s   \t %d JA3S %s \n",i, ja3ByHost_element->ip_string, num_ja3_server, ja3ByHost_element->dns_name);
+         }
+         i++;
+      }
+   }else if(verbose == 2){
+      int i = 1;
+      int againstRepeat;
+      //for each host it is printted the JA3C and JA3S, along the server name (if any)
+      //and the security status
+      printf("JA3C & JA3S for each host, with dns and security: \n");
+      HASH_ITER(hh, ja3ByHostsHashT, ja3ByHost_element, tmp){
+         num_ja3_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
+         num_ja3_server = HASH_COUNT(ja3ByHost_element->host_server_info_hasht);
+         againstRepeat = 0;
+         if(num_ja3_client > 0){
             HASH_ITER(hh, ja3ByHost_element->host_client_info_hasht, info_of_element, tmp2){
-               printf("\t%d\t %s     \t JA3C %s %s\n",i,  ja3ByHost_element->ip_string, info_of_element->ja3, print_cipher(info_of_element->unsafe_cipher));
+               if(againstRepeat == 0){
+                  printf("\t%d\t %s    \t JA3C %s %s\n",i,  ja3ByHost_element->ip_string, info_of_element->ja3, print_cipher(info_of_element->unsafe_cipher));
+                  againstRepeat = 1;
+               }
+               else
+                  printf("\t%d\t\t\t\t JA3C %s %s\n", i,  info_of_element->ja3, print_cipher(info_of_element->unsafe_cipher));
+
                i++;
             }
-            printf("-------------------------------------------------------------------------------------------------------------\n");
          }
+         againstRepeat = 0;
          if(num_ja3_server > 0){
             HASH_ITER(hh, ja3ByHost_element->host_server_info_hasht, info_of_element, tmp2){
-               printf("\t%d\t %s     \t JA3S %s %s %s\n",i, ja3ByHost_element->ip_string, info_of_element->ja3, print_cipher(info_of_element->unsafe_cipher), ja3ByHost_element->dns_name);
+               if(againstRepeat == 0){
+                  printf("\t%d\t %s     \t JA3S %s %s %s\n",i, ja3ByHost_element->ip_string, info_of_element->ja3, print_cipher(info_of_element->unsafe_cipher), ja3ByHost_element->dns_name);
+                  againstRepeat = 1;
+               }else
+                  printf("\t%d\t \tJA3S %s %s %s\n", i, info_of_element->ja3, ja3ByHost_element->dns_name, print_cipher(info_of_element->unsafe_cipher));
+
                i++;
             }
-            printf("-------------------------------------------------------------------------------------------------------------\n");
          }
       }
 
@@ -2386,22 +2395,33 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
       i = 1;
       printf("\nFor each JA3 fingerprint the associated host:\n");
-      printf("-------------------------------------------------------------------------------------------------------------\n");
       HASH_ITER(hh, hostByJA3C_ht, hostByJA3Element, tmp3){
+         againstRepeat = 0;
          HASH_ITER(hh, hostByJA3Element->ipToDNS_ht, innerHashEl, tmp4){
-            printf("\t%d\t JA3C %s",i, hostByJA3Element->ja3);
-            printf("\t IP %s %s\n", innerHashEl->ip_string, print_cipher(hostByJA3Element->unsafe_cipher));
+            if(againstRepeat == 0){
+               printf("\t%d\t JA3C %s",i, hostByJA3Element->ja3);
+               printf("\t IP %s %s\n", innerHashEl->ip_string, print_cipher(hostByJA3Element->unsafe_cipher));
+               againstRepeat = 1;
+            }else{
+               printf("\t%d \t\t\t\t\t",i);
+               printf("\t IP %s %s\n", innerHashEl->ip_string, print_cipher(hostByJA3Element->unsafe_cipher));
+            }
             i++;
          }
-         printf("-------------------------------------------------------------------------------------------------------------\n");
       }
       HASH_ITER(hh, hostByJA3S_ht, hostByJA3Element, tmp3){
+         againstRepeat = 0;
          HASH_ITER(hh, hostByJA3Element->ipToDNS_ht, innerHashEl, tmp4){
-            printf("\t%d\t JA3S %s",i, hostByJA3Element->ja3);
-            printf("\t IP %s \t%s %s\n", innerHashEl->ip_string, innerHashEl->dns_name, print_cipher(hostByJA3Element->unsafe_cipher));
+            if(againstRepeat == 0){
+               printf("\t%d\t JA3S %s",i, hostByJA3Element->ja3);
+               printf("\t IP %s     \t%s %s\n", innerHashEl->ip_string, innerHashEl->dns_name, print_cipher(hostByJA3Element->unsafe_cipher));
+               againstRepeat = 1;
+            }else{
+               printf("\t%d\t \t\t\t\t", i);
+               printf("\t IP %s     \t%s %s\n", innerHashEl->ip_string, innerHashEl->dns_name, print_cipher(hostByJA3Element->unsafe_cipher));
+            }
             i++;
          }
-         printf("-------------------------------------------------------------------------------------------------------------\n");
       }
 
    }
@@ -2443,8 +2463,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       HASH_DEL(hostByJA3S_ht, hostByJA3Element);
       free(hostByJA3Element);
    }
-
-
+   
     qsort(all_flows, num_flows, sizeof(struct flow_info), cmpFlows);
 
     for(i=0; i<num_flows; i++)
