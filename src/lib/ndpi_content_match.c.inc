@@ -8377,6 +8377,9 @@ ndpi_protocol_match host_match[] = {
   { ".googlezip.net", NULL, ".googlezip\\.net" TLD,                       "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },	 
   { "datasaver.googleapis.com", NULL, "datasaver\\.googleapis\\.com" TLD, "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
+  /* http://check.googlezip.net/connect [check browser connectivity] */
+  // { ".googlezip.net", NULL, "\\.googlezip" TLD,                   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
+
   { "dns.google", NULL, "dns\\.google" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   // { "mozilla.cloudflare-dns.com", NULL, "mozilla\\.cloudflare-dns\\.com" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE }, /* Firefox */
   { "cloudflare-dns.com", NULL, "cloudflare-dns\\.com" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8421,9 +8424,6 @@ ndpi_protocol_match host_match[] = {
 
   { "plus.google.com", NULL, "plus\\.google" TLD,                 "GooglePlus",       NDPI_PROTOCOL_GOOGLE_PLUS, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "plus.url.google.com", NULL, "plus\\.url\\.google" TLD,       "GooglePlus",       NDPI_PROTOCOL_GOOGLE_PLUS, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-
-  /* http://check.googlezip.net/connect [check browser connectivity] */
-  { ".googlezip.net", NULL, "\\.googlezip" TLD,                   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
   { "googleusercontent.com", NULL, "googleusercontent" TLD,       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "1e100.net", NULL, "1e100" TLD,                               "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
