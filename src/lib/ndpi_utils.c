@@ -591,6 +591,11 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x0700c0: return("SSL2_DES_192_EDE3_CBC_WITH_MD5");
   case 0x080080: return("SSL2_RC4_64_WITH_MD5");
   case 0x001301: return("TLS_AES_128_GMC_SHA256");
+  case 0x001302: return("TLS_AES_256_GCM_SHA384");
+  case 0x001303: return("TLS_CHACHA20_POLY1305_SHA256");
+  case 0x001304: return("TLS_AES_128_CCM_SHA256");
+  case 0x001305: return("TLS_AES_128_CCM_8_SHA256");
+      
   default:
     {
       static char buf[8];
