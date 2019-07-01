@@ -768,7 +768,7 @@ extern "C" {
   ndpi_proto_defaults_t* ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
-  u_int ndpi_get_ndpi_detection_module_size();
+  u_int ndpi_get_ndpi_detection_module_size(void);
   void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
 
   /* LRU cache */
@@ -795,9 +795,9 @@ extern "C" {
   void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
   void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str,
 			       ndpi_debug_function_ptr ndpi_debug_printf);
-  void * ndpi_malloc(size_t size);
-  void * ndpi_calloc(unsigned long count, size_t size);
-  void ndpi_free(void *ptr);
+  //void * ndpi_malloc(size_t size);
+  //void * ndpi_calloc(unsigned long count, size_t size);
+  //void ndpi_free(void *ptr);
   u_int8_t ndpi_get_api_version();
 
   /* https://github.com/corelight/community-id-spec */

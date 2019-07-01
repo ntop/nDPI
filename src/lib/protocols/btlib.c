@@ -423,7 +423,7 @@ const u_int8_t *bt_decode(const u_int8_t *b, size_t *l, int *ret, bt_parse_data_
   int64_t d = 0;
   u_int8_t c;
 
-  if(*l == 0) return NULL;
+  if(!l || *l == 0) return NULL;
   if(cbd->level > BDEC_MAXDEPT) goto bad_data;
   c = *b++; (*l)--;
   if(c == 'i') { // integer
