@@ -650,8 +650,7 @@ static void destroy_hyperscan(struct ndpi_detection_module_struct *ndpi_mod) {
 
 /* ******************************************************************** */
 
-static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod)
-{
+static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
 
 #ifdef HAVE_HYPERSCAN
@@ -988,9 +987,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "WhatsAppVideo", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_46,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DATASAVER,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
+			    no_master, "DataSaver", NDPI_PROTOCOL_CATEGORY_WEB /* dummy */,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_SIGNAL,
@@ -998,9 +997,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Signal", NDPI_PROTOCOL_CATEGORY_CHAT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_196,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DNS_OVER_HTTPS,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Free", NDPI_PROTOCOL_CATEGORY_CUSTOM_1 /* dummy */,
+			    no_master, "DNSoverHTTPS", NDPI_PROTOCOL_CATEGORY_NETWORK /* dummy */,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_205,
@@ -3613,7 +3612,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
   if(ndpi_struct->direction_detect_disable) {
     packet->packet_direction = flow->packet_direction;
   } else {
-    if(iph != NULL && le32toh(iph->saddr) < le32toh(iph->daddr))
+    if(iph != NULL && ntohl(iph->saddr) < ntohl(iph->daddr))
       packet->packet_direction = 1;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
@@ -3635,7 +3634,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
     packet->num_retried_bytes = 0;
 
     if(!ndpi_struct->direction_detect_disable)
-      packet->packet_direction = (le16toh(tcph->source) < le16toh(tcph->dest)) ? 1 : 0;
+      packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
     if(tcph->syn != 0 && tcph->ack == 0 && flow->l4.tcp.seen_syn == 0 && flow->l4.tcp.seen_syn_ack == 0
        && flow->l4.tcp.seen_ack == 0) {
@@ -3698,7 +3697,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_struct,
     }
   } else if(udph != NULL) {
     if(!ndpi_struct->direction_detect_disable)
-      packet->packet_direction = (le16toh(udph->source) < le16toh(udph->dest)) ? 1 : 0;
+      packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
   }
 
   if(flow->packet_counter < MAX_PACKET_COUNTER && packet->payload_packet_len) {
@@ -4588,6 +4587,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
      && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
      && flow->packet.tcp
      && (flow->packet.tcp->syn == 0)
+     && (flow->guessed_protocol_id == 0)
      ) {
     /*
       This is a TCP flow

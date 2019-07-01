@@ -66,7 +66,7 @@ int ndpi_check_punycode_string(char * buffer , int len) {
       // is a punycode string
       return(1);
   }
-  
+
   // not a punycode string
   return 0;
 }
@@ -276,7 +276,7 @@ int strcasecmp(const char *s1, const char *s2) {
   register const u_char *cm = charmap,
     *us1 = (const u_char *)s1,
     *us2 = (const u_char *)s2;
-  
+
   while (cm[*us1] == cm[*us2++])
     if(*us1++ == '\0')
       return (0);
@@ -590,7 +590,95 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x060040: return("SSL2_DES_64_CBC_WITH_MD5");
   case 0x0700c0: return("SSL2_DES_192_EDE3_CBC_WITH_MD5");
   case 0x080080: return("SSL2_RC4_64_WITH_MD5");
-  default: return("???");
+  case 0x001301: return("TLS_AES_128_GMC_SHA256");
+  default:
+    {
+      static char buf[8];
+
+      snprintf(buf, sizeof(buf), "0X%04X", cipher);
+      return(buf);
+    }
   }
 }
 
+/* ******************************************************************** */
+
+static int ndpi_is_other_char(char c) {
+  return((c == '.')
+	 || (c == '@')
+	 );
+}
+
+/* ******************************************************************** */
+
+static int ndpi_is_valid_char(char c) {
+  return(isdigit(c)
+	 || isalpha(c)
+	 || ndpi_is_other_char(c));
+}
+
+/* ******************************************************************** */
+
+
+static int ndpi_find_non_eng_bigrams(struct ndpi_detection_module_struct *ndpi_struct,
+				     char *str) {
+  char s[3];
+
+  if((isdigit(str[0]) && isdigit(str[1]))
+     || (ndpi_is_other_char(str[0]) || ndpi_is_other_char(str[1]))
+     || (ndpi_is_other_char(str[0]) || ndpi_is_other_char(str[1]))
+     )
+    return(1);
+
+  s[0] = tolower(str[0]), s[1] = tolower(str[1]), s[2] = '\0';
+
+  return(ndpi_match_bigram(ndpi_struct, &ndpi_struct->bigrams_automa, s));
+}
+
+/* ******************************************************************** */
+
+/* #define PRINT_STRINGS 1 */
+
+int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,
+				    char *buffer, u_int buffer_size) {
+  u_int ret = 0, i = 0, do_cr = 0, len = 0;
+  const u_int8_t NDPI_MIN_VALID_STRING_LEN = 4; /* Will return 0 if no string > NDPI_MIN_VALID_STRING_LEN have been found */
+
+  if(buffer_size <= 0)
+    return(0);
+
+  for(i=0; i<buffer_size-2; i++) {
+    if(ndpi_is_valid_char(buffer[i])
+       && ndpi_is_valid_char(buffer[i+1])
+       && ndpi_find_non_eng_bigrams(ndpi_struct, &buffer[i])) {
+#ifdef PRINT_STRINGS
+      printf("%c%c", buffer[i], buffer[i+1]);
+#endif
+      do_cr = 1, i += 1, len += 2;
+    } else {
+      if(ndpi_is_valid_char(buffer[i]) && do_cr) {
+#ifdef PRINT_STRINGS
+	printf("%c", buffer[i]);
+#endif
+	len += 1;
+      }
+
+      // printf("->> %c%c\n", isprint(buffer[i]) ? buffer[i] : '.', isprint(buffer[i+1]) ? buffer[i+1] : '.');
+      if(do_cr) {
+#ifdef PRINT_STRINGS
+	printf(" [len: %u]\n", len);
+#endif
+	if(len > NDPI_MIN_VALID_STRING_LEN)
+	  ret = 1;
+
+	do_cr = 0, len = 0;
+      }
+    }
+  }
+
+#ifdef PRINT_STRINGS
+  printf("=======>> Found string: %u\n", ret);
+#endif
+
+  return(ret);
+}

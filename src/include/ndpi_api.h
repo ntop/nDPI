@@ -811,7 +811,8 @@ extern "C" {
   const char* ndpi_cipher2str(u_int32_t cipher);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
-
+  int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,
+				      char *buffer, u_int buffer_size);
 #ifdef __cplusplus
 }
 #endif

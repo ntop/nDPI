@@ -843,7 +843,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_ssl.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s%s]", flow->ssh_ssl.ja3_server,
 						    print_cipher(flow->ssh_ssl.server_unsafe_cipher));
     if(flow->ssh_ssl.server_organization[0] != '\0') fprintf(out, "[organization: %s]", flow->ssh_ssl.server_organization);
-    if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[%s]", ndpi_cipher2str(flow->ssh_ssl.server_cipher));;
+    if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_ssl.server_cipher));
 
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
@@ -2474,6 +2474,8 @@ static void ndpi_process_packet(u_char *args,
   /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
 
+  /* ndpi_has_human_readeable_string(ndpi_info_mod, (char*)packet, header->caplen, 3); */
+  
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
 
