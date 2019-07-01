@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-/* #define CERTIFICATE_DEBUG 1 */
+#define CERTIFICATE_DEBUG 1
 
 #define NDPI_MAX_SSL_REQUEST_SIZE 10000
 
@@ -238,9 +238,10 @@ static u_int32_t ndpi_ssl_refine_master_protocol(struct ndpi_detection_module_st
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0'))
-     || ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
-     || (flow->host_server_name[0] != '\0'))
+  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.ja3_client[0] != '\0'))
+     || ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.ja3_server[0] != '\0'))
+     // || (flow->host_server_name[0] != '\0')
+     )
     protocol = NDPI_PROTOCOL_SSL;
   else
     protocol =  NDPI_PROTOCOL_SSL_NO_CERT;
@@ -373,7 +374,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
   u_char md5_hash[16];
 
   flow->protos.stun_ssl.ssl.ssl_version = ssl_version;
-  
+
   memset(&ja3, 0, sizeof(ja3));
 
 #ifdef CERTIFICATE_DEBUG
@@ -409,7 +410,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
       if((handshake_protocol == 0x02)
 	 || (handshake_protocol == 0xb) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
-	u_int16_t  ssl_version = ntohs(*((u_int16_t*)&packet->payload[9]));
+	u_int16_t ssl_version = ntohs(*((u_int16_t*)&packet->payload[9]));
 
 	ja3.ssl_version = ssl_version;
 
@@ -417,12 +418,23 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  u_int16_t offset = 43, extension_len, j;
 	  u_int8_t  session_id_len = packet->payload[43];
 
-	  offset += session_id_len+1;
+#ifdef CERTIFICATE_DEBUG
+	  printf("SSL Server Hello [version: 0x%04X]\n", ssl_version);
+#endif
+
+	  /* 
+	     The server hello decides about the SSL version of this flow 
+	     https://networkengineering.stackexchange.com/questions/55752/why-does-wireshark-show-version-tls-1-2-here-instead-of-tls-1-3
+	  */
+	  flow->protos.stun_ssl.ssl.ssl_version = ssl_version;
+	  
+	  if(ssl_version < 0x7F15 /* TLS 1.3 lacks of session id */)
+	    offset += session_id_len+1;
 
 	  ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0]);
 	  flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
-	  
+
 #ifdef CERTIFICATE_DEBUG
 	  printf("SSL [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
 #endif
@@ -468,23 +480,23 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 	  printf("SSL [server] %s\n", ja3_str);
 #endif
-	  
+
 #ifdef CERTIFICATE_DEBUG
 	  printf("[JA3] Server: %s \n", ja3_str);
 #endif
-	  
+
 	  MD5Init(&ctx);
 	  MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
 	  MD5Final(md5_hash, &ctx);
-	  
+
 	  for(i=0, j=0; i<16; i++)
 	    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
 			  sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
-	  
+
 #ifdef CERTIFICATE_DEBUG
 	  printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
 #endif
-	  
+
 	  flow->l4.tcp.ssl_seen_server_cert = 1;
 	} else
 	  flow->l4.tcp.ssl_seen_certificate = 1;
@@ -561,7 +573,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    if((cipher_offset+cipher_len) <= total_len) {
 	      for(i=0; i<cipher_len;) {
 		u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
-		
+
 #ifdef CERTIFICATE_DEBUG
 		printf("Client SSL [cipher suite: %u] [%u/%u]\n", ntohs(*id), i, cipher_len);
 #endif
@@ -570,7 +582,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
 		    https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
 		  */
-		  
+
 		  if(ja3.num_cipher < MAX_NUM_JA3)
 		    ja3.cipher[ja3.num_cipher++] = ntohs(*id);
 		  else {
@@ -580,16 +592,16 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		  }
 		}
-		
+
 		i += 2;
 	      }
 	    } else {
 	      invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
 	      printf("Client SSL Invalid len %u vs %u\n", (cipher_offset+cipher_len), total_len);
-#endif		    
+#endif
 	    }
-	    
+
 	    offset = base_offset + session_id_len + cipher_len + 2;
 
 	    flow->l4.tcp.ssl_seen_client_cert = 1;
@@ -673,7 +685,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      if((s_offset+extension_len-2) <= total_len) {
 			for(i=0; i<extension_len-2;) {
 			  u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
-			
+
 #ifdef CERTIFICATE_DEBUG
 			  printf("Client SSL [EllipticCurve: %u]\n", s_group);
 #endif
@@ -681,7 +693,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			    /* Skip GREASE */
 			    if(ja3.num_elliptic_curve < MAX_NUM_JA3)
 			      ja3.elliptic_curve[ja3.num_elliptic_curve++] = s_group;
-			    else {			      
+			    else {
 			      invalid_ja3 = 1;
 #ifdef CERTIFICATE_DEBUG
 			      printf("Client SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve);
@@ -696,7 +708,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef CERTIFICATE_DEBUG
 			printf("Client SSL Invalid len %u vs %u\n", (s_offset+extension_len-1), total_len);
 #endif
-		      }		     
+		      }
 		    } else if(extension_id == 11 /* ec_point_formats groups */) {
 		      u_int16_t i, s_offset = offset+extension_offset + 1;
 
@@ -706,11 +718,11 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      if((s_offset+extension_len) < total_len) {
 			for(i=0; i<extension_len-1;i++) {
 			  u_int8_t s_group = packet->payload[s_offset+i];
-			  
+
 #ifdef CERTIFICATE_DEBUG
 			  printf("Client SSL [EllipticCurveFormat: %u]\n", s_group);
 #endif
-			  
+
 			  if(ja3.num_elliptic_curve_point_format < MAX_NUM_JA3)
 			    ja3.elliptic_curve_point_format[ja3.num_elliptic_curve_point_format++] = s_group;
 			  else {
@@ -727,7 +739,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		      }
 		    }
-		    
+
 		    extension_offset += extension_len;
 
 #ifdef CERTIFICATE_DEBUG
@@ -737,30 +749,30 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  if(!invalid_ja3) {
 		    ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.ssl_version);
-		    
+
 		    for(i=0; i<ja3.num_cipher; i++) {
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 					      (i > 0) ? "-" : "", ja3.cipher[i]);
 		    }
-		    
+
 		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-		    
+
 		    /* ********** */
-		    
+
 		    for(i=0; i<ja3.num_ssl_extension; i++)
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 					      (i > 0) ? "-" : "", ja3.ssl_extension[i]);
-		    
+
 		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-		    
+
 		    /* ********** */
-		    
+
 		    for(i=0; i<ja3.num_elliptic_curve; i++)
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 					      (i > 0) ? "-" : "", ja3.elliptic_curve[i]);
-		    
+
 		    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-		    
+
 		    for(i=0; i<ja3.num_elliptic_curve_point_format; i++)
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 					      (i > 0) ? "-" : "", ja3.elliptic_curve_point_format[i]);
@@ -781,7 +793,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
 #endif
 		  }
-		  
+
 		  return(2 /* Client Certificate */);
 		}
 	      }

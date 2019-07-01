@@ -687,3 +687,24 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
   return(ret);
 }
+
+/* ********************************** */
+
+char* ndpi_ssl_version2str(u_int16_t version) {
+  static char v[8];
+    
+  switch(version) {
+  case 0x300: return("SSLv3");
+  case 0x301: return("TLSv1");
+  case 0x302: return("TLSv1.1");
+  case 0x303: return("TLSv1.2");
+  case 0x304: return("TLSv1.3");
+  }
+
+  if((version >= 0x7f00) && (version <= 0x7fff))
+    return("TLSv1.3 (draft)");
+  
+  snprintf(v, sizeof(v), "%04X", version);
+  return(v);
+}
+

@@ -813,6 +813,7 @@ extern "C" {
 					struct ndpi_flow_struct *flow);
   int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *buffer, u_int buffer_size);
+  char* ndpi_ssl_version2str(u_int16_t version);
 #ifdef __cplusplus
 }
 #endif
