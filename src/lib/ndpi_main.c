@@ -5499,7 +5499,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
   u_int8_t user_defined_proto;
 
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
-    rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, NULL, proto, shost, dhost, sport, dport);
+    rc = ndpi_search_tcp_or_udp_raw(ndpi_struct, flow, proto, shost, dhost, sport, dport);
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       if(flow && (proto == IPPROTO_UDP)
@@ -5508,7 +5508,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 	;
       else {
 	ret.app_protocol = rc,
-	  ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, NULL, proto, sport,
+	  ret.master_protocol = ndpi_guess_protocol_id(ndpi_struct, flow, proto, sport,
 						       dport, &user_defined_proto);
 
 	if(ret.app_protocol == ret.master_protocol)
@@ -5519,7 +5519,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
       }
     }
 
-    rc = ndpi_guess_protocol_id(ndpi_struct, NULL, proto, sport, dport, &user_defined_proto);
+    rc = ndpi_guess_protocol_id(ndpi_struct, flow, proto, sport, dport, &user_defined_proto);
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       if(flow && (proto == IPPROTO_UDP)
 	 && NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc)
@@ -5547,7 +5547,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 	ret.app_protocol = NDPI_PROTOCOL_SKYPE;
     }
   } else
-    ret.app_protocol = ndpi_guess_protocol_id(ndpi_struct, NULL, proto, sport,
+    ret.app_protocol = ndpi_guess_protocol_id(ndpi_struct, flow, proto, sport,
 					      dport, &user_defined_proto);
 
   ret.category = ndpi_get_proto_category(ndpi_struct, ret);
