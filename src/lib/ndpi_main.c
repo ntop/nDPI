@@ -53,7 +53,7 @@
 
 static int _ndpi_debug_callbacks = 0;
 
-// #define MATCH_DEBUG 1
+/* #define MATCH_DEBUG 1 */
 
 /* ****************************************** */
 
@@ -1751,7 +1751,7 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
       has to match
     */
     if(whatfound && (whatfound != buf)
-       && (m->patterns->astring[0] != '.')  /* The searched patter does not start with . */
+       && (m->patterns->astring[0] != '.')  /* The searched pattern does not start with . */
        && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */
        && (whatfound[-1] != '.')
        )
@@ -1769,12 +1769,18 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
      || (strncmp(buf, m->patterns->astring, min_len) == 0) /* begins with */
      ) {
 #ifdef MATCH_DEBUG
-    printf("Found match [%s][%s] [len: %u][proto_id: %u]\n",
-	   buf, m->patterns->astring, min_len , *matching_protocol_id);
+    printf("Found match [%s][%s] [len: %u]"
+	   // "[proto_id: %u]"
+	   "\n",
+	   buf, m->patterns->astring, min_len /* , *matching_protocol_id */);
 #endif
     return(1); /* If the pattern found matches the string at the beginning we stop here */
-  } else
+  } else {
+#ifdef MATCH_DEBUG
+    printf("NO match found: continue\n");
+#endif
     return 0; /* 0 to continue searching, !0 to stop */
+  }
 }
 
 /* ******************************************************************** */
@@ -2156,6 +2162,7 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
+  int rc;
 
   if((automa == NULL)
      || (string_to_match == NULL)
@@ -2163,10 +2170,10 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
     return(-2);
 
   ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
-  ac_automata_search(automa, &ac_input_text, &match);
+  rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
-  return(match.number > 0 ? 0 : -1);
+  return((rc && (match.number > 0)) ? 0 : -1);
 }
 
 /* ****************************************************** */
@@ -2175,6 +2182,7 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
+  int rc;
 
   *id = -1;
   if((automa == NULL)
@@ -2183,10 +2191,10 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id
     return(-2);
 
   ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
-  ac_automata_search(automa, &ac_input_text, &match);
+  rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
-  *id = match.number;
+  *id = rc ? match.number : NDPI_PROTOCOL_UNKNOWN;
 
   return(*id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
 }
@@ -5646,8 +5654,15 @@ void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_mod,
 
 const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod,
 				   ndpi_protocol_category_t category) {
-  if((!ndpi_mod) || (category >= NDPI_PROTOCOL_NUM_CATEGORIES))
-    return(NULL);
+  if((!ndpi_mod) || (category >= NDPI_PROTOCOL_NUM_CATEGORIES)) {
+    static char b[24];
+
+    if(!ndpi_mod)
+      snprintf(b, sizeof(b), "NULL nDPI");
+    else
+      snprintf(b, sizeof(b), "Invalid category %d", (int)category);
+    return(b);
+  }
 
   if((category >= NDPI_PROTOCOL_CATEGORY_CUSTOM_1) && (category <= NDPI_PROTOCOL_CATEGORY_CUSTOM_5)) {
     switch(category) {
@@ -5823,8 +5838,7 @@ char* ndpi_strncasestr(const char *s, const char *find, size_t slen) {
 /* ****************************************************** */
 
 int ndpi_match_prefix(const u_int8_t *payload, size_t payload_len,
-		      const char *str, size_t str_len)
-{
+		      const char *str, size_t str_len) {
   int rc = str_len <= payload_len ? memcmp(payload, str, str_len) == 0 : 0;
 
   return rc;
@@ -5837,9 +5851,9 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
 				  ndpi_protocol_match_result *ret_match,
 				  u_int8_t is_host_match) {
   AC_TEXT_t ac_input_text;
-  ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa :
-    &ndpi_struct->content_automa;
+  ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa : &ndpi_struct->content_automa;
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
+  int rc;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0))
     return(NDPI_PROTOCOL_UNKNOWN);
@@ -5850,13 +5864,14 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   }
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
-  ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
+  rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
-  ret_match->protocol_id = match.number,
-    ret_match->protocol_category = match.category,
-    ret_match->protocol_breed = match.breed;
-
+  if(rc)
+    ret_match->protocol_id = match.number,
+      ret_match->protocol_category = match.category,
+      ret_match->protocol_breed = match.breed;
+  
   return(match.number);
 }
 
@@ -5984,6 +5999,7 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct,
 		      ndpi_automa *automa, char *bigram_to_match) {
   AC_TEXT_t ac_input_text;
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
+  int rc;
 
   if((automa->ac_automa == NULL) || (bigram_to_match == NULL))
     return(-1);
@@ -5994,10 +6010,10 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   ac_input_text.astring = bigram_to_match, ac_input_text.length = 2;
-  ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
+  rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
-  return(match.number);
+  return(rc ? match.number : 0);
 }
 
 /* ****************************************************** */
