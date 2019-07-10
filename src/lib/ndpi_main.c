@@ -4383,6 +4383,9 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
   }
 
   flow->category = ret->category = ndpi_get_proto_category(ndpi_struct, *ret);
+
+  if(flow->category == 190842)
+    printf("BUG!!!!\n");
 }
 
 /* ********************************************************************************* */
@@ -5867,12 +5870,14 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
-  if(rc)
+  if(rc) {
     ret_match->protocol_id = match.number,
       ret_match->protocol_category = match.category,
       ret_match->protocol_breed = match.breed;
-  
-  return(match.number);
+    
+    return(match.number);
+  } else
+    return(NDPI_PROTOCOL_UNKNOWN);
 }
 
 #ifdef HAVE_HYPERSCAN
@@ -5965,6 +5970,10 @@ static int ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_str
   string_to_match[string_to_match_len] = '\0';
   NDPI_LOG_DBG2(ndpi_struct, "[NTOP] Unable to find a match for '%s'\n", string_to_match);
 #endif
+
+  ret_match->protocol_id = NDPI_PROTOCOL_UNKNOWN,
+    ret_match->protocol_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+    ret_match->protocol_breed = NDPI_PROTOCOL_UNRATED;
 
   return(NDPI_PROTOCOL_UNKNOWN);
 }
