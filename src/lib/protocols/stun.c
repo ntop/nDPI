@@ -81,7 +81,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
            msg_type, payload_length, flow->protos.stun_ssl.stun.num_binding_requests);
   */
 
-  if(((payload[0] == 0x80) && ((msg_len+20) <= payload_length)) /* WhatsApp Voice */) {
+  if(((payload[0] == 0x80)
+      && (payload_length < 512)
+      && ((msg_len+20) <= payload_length)) /* WhatsApp Voice */) {
     *is_whatsapp = 1;
     return NDPI_IS_STUN; /* This is WhatsApp Voice */
   } else if((payload[0] == 0x90)
