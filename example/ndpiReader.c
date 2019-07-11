@@ -2725,6 +2725,8 @@ void test_lib() {
   }
 }
 
+/* *********************************************** */
+
 void automataUnitTest() {
   void *automa;
 

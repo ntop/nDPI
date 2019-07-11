@@ -2173,7 +2173,7 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
   rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
-  return((rc && (match.number > 0)) ? 0 : -1);
+  return(rc ? match.number : 0);
 }
 
 /* ****************************************************** */
@@ -4383,9 +4383,6 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
   }
 
   flow->category = ret->category = ndpi_get_proto_category(ndpi_struct, *ret);
-
-  if(flow->category == 190842)
-    printf("BUG!!!!\n");
 }
 
 /* ********************************************************************************* */
@@ -4503,7 +4500,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     else sport = dport = 0;
 
     /* guess protocol */
-    flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_struct, flow, protocol, sport, dport, &user_defined_proto);
+    flow->guessed_protocol_id = (int16_t)ndpi_guess_protocol_id(ndpi_struct, flow, protocol, sport, dport, &user_defined_proto);
     flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_struct, flow);
 
     if(ndpi_struct->custom_categories.categories_loaded && flow->packet.iph) {
@@ -4546,15 +4543,23 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     /* This is a custom protocol and it has priority over everything else */
     ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.app_protocol = flow->guessed_host_protocol_id;
 
-    if(flow->packet.tcp) {
+    if(flow->packet.tcp && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN)) {
       /* Minimal guess for HTTP/SSL-based protocols */
-      switch(ntohs(flow->packet.tcp->dest)) {
-      case 80:
-	ret.master_protocol = NDPI_PROTOCOL_HTTP;
-	break;
-      case 443:
-	ret.master_protocol = NDPI_PROTOCOL_SSL; /* QUIC could also match */
-	break;
+
+      for(int i=0; i<2; i++) {
+	u_int16_t port = (i == 0) ? ntohs(flow->packet.tcp->dest) : ntohs(flow->packet.tcp->source);
+	
+	switch(port) {
+	case 80:
+	  ret.master_protocol = NDPI_PROTOCOL_HTTP;
+	  break;
+	case 443:
+	  ret.master_protocol = NDPI_PROTOCOL_SSL; /* QUIC could also match */
+	  break;
+	}
+	
+	if(ret.master_protocol != NDPI_PROTOCOL_UNKNOWN)
+	  break;
       }
     }
 
@@ -5870,14 +5875,19 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
+  /* We need to take into account also rc==0 that is used for partial matches */
+#if 0
   if(rc) {
+#endif
     ret_match->protocol_id = match.number,
       ret_match->protocol_category = match.category,
       ret_match->protocol_breed = match.breed;
     
     return(match.number);
+#if 0
   } else
     return(NDPI_PROTOCOL_UNKNOWN);
+#endif
 }
 
 #ifdef HAVE_HYPERSCAN
