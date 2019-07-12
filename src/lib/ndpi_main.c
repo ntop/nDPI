@@ -4545,8 +4545,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     if(flow->packet.tcp && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN)) {
       /* Minimal guess for HTTP/SSL-based protocols */
+      int i;
 
-      for(int i=0; i<2; i++) {
+      for(i=0; i<2; i++) {
 	u_int16_t port = (i == 0) ? ntohs(flow->packet.tcp->dest) : ntohs(flow->packet.tcp->source);
 	
 	switch(port) {
