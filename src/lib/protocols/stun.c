@@ -53,7 +53,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   u_int8_t *is_whatsapp) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
-  u_int8_t can_this_be_whatsapp_voice = 1, wa = 0;
+  u_int8_t can_this_be_whatsapp_voice = 1;
 
   flow->protos.stun_ssl.stun.num_processed_pkts++;
 

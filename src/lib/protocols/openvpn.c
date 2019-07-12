@@ -40,13 +40,6 @@
 #define P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size)  (P_HARD_RESET_PACKET_ID_OFFSET(hmac_size) + 8)
 #define P_HARD_RESET_CLIENT_MAX_COUNT  5
 
-static void ndpi_int_openvpn_add_connection(struct ndpi_detection_module_struct
-					      *ndpi_struct, struct ndpi_flow_struct *flow) {
-  NDPI_LOG_INFO(ndpi_struct, "found memcached\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
-			     NDPI_PROTOCOL_MEMCACHED, NDPI_PROTOCOL_UNKNOWN);
-}
-
 static 
 #ifndef WIN32
 inline 

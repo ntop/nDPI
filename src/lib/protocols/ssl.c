@@ -633,7 +633,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  /* Move to the first extension
 		     Type is u_int to avoid possible overflow on extension_len addition */
 		  u_int extension_offset = 0;
-		  u_int32_t md5h[4], j;
+		  u_int32_t j;
 
 		  while(extension_offset < extensions_len) {
 		    u_int16_t extension_id, extension_len, extn_off = offset+extension_offset;
@@ -833,7 +833,6 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
   for(i = 9; i < packet->payload_packet_len-4; i++) {
     /* Organization OID: 2.5.4.10 */
     if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x0a)) {
-      u_int8_t type_tag = packet->payload[i+3]; // 0x0c: utf8string / 0x13: printable_string
       u_int8_t server_len = packet->payload[i+4];
 
       num_found++;
