@@ -2781,7 +2781,7 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
     int l;
 
     if(port_array[0] != INIT_VAL)
-      strncat(filter, " and not (src ", sizeof(" and not (src "));
+      strncat(filter, " and not (src ", sizeof(filter)/sizeof(char));
     else
       strcpy(filter, "not (src ");
 
@@ -2808,7 +2808,7 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
     int l;
 
     if(port_array[0] != INIT_VAL || src_host_array[0] != NULL)
-      strncat(filter, " and not (dst ", sizeof(" and not (dst "));
+      strncat(filter, " and not (dst ", sizeof(filter)/sizeof(char));
     else
       strcpy(filter, "not (dst ");
 
@@ -2955,7 +2955,6 @@ void bpf_filter_port_array_add(int filter_array[], int size, int port) {
 float getAverage(struct json_object *jObj_stat, char *field){
   json_object *field_stat;
   json_bool res;
-  float average;
   float sum = 0;
   int r;
   int j = 0;
@@ -3003,11 +3002,11 @@ float getStdDeviation(struct json_object *jObj_stat, float average, char *field)
   json_object *field_stat;
   json_bool res;
   float sum = 0;
-  int j;
+  int j = 0;
   int r;
 
   if((r = strcmp(field, "top.scanner.stats")) == 0){
-    for(j=0; j<json_object_array_length(jObj_stat); j++) {
+    for(; j<json_object_array_length(jObj_stat); j++) {
       field_stat = json_object_array_get_idx(jObj_stat, j);
       json_object *jObj_tot_flows_number;
 
@@ -3192,7 +3191,6 @@ static void produceBpfFilter(char *filePath) {
   const char *filterPktDstHosts[48];
   struct stat statbuf;
   FILE *fp = NULL;
-  char *fileName;
   char _filterFilePath[1024];
   json_object *jObj_bpfFilter;
   void *fmap;
@@ -3288,7 +3286,6 @@ static void produceBpfFilter(char *filePath) {
   }
 
 
-  fileName = basename(filePath);
   snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
 
   if((fp = fopen(_filterFilePath,"w")) == NULL) {
