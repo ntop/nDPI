@@ -2740,6 +2740,77 @@ void automataUnitTest() {
 }
 
 /* *********************************************** */
+
+void serializerUnitTest() {
+  ndpi_serializer serializer, deserializer;
+  int i;
+  u_int8_t trace = 0;
+  
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_tlv) != -1);
+
+  for(i=0; i<16; i++) {
+    char kbuf[32], vbuf[32];
+    assert(ndpi_serialize_uint32_uint32(&serializer, i, i*i) != -1);
+
+    snprintf(kbuf, sizeof(kbuf), "Hello %u", i);
+    snprintf(vbuf, sizeof(vbuf), "World %u", i);
+    assert(ndpi_serialize_uint32_string(&serializer, i, "Hello") != -1);
+    assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
+  }
+  
+  if(trace)
+    printf("Serialization size: %u/%u\n", serializer.size_used, serializer.buffer_size);
+
+  assert(ndpi_init_deserializer(&deserializer, &serializer) != -1);
+
+  while(1) {
+    ndpi_serialization_element_type et = ndpi_deserialize_get_nextitem_type(&deserializer);
+
+    if(et == ndpi_serialization_unknown)
+      break;
+    else {
+      u_int32_t k32, v32;
+      ndpi_string ks, vs;
+      
+      switch(et) {
+      case ndpi_serialization_uint32_uint32:
+	assert(ndpi_deserialize_uint32_uint32(&deserializer, &k32, &v32) != -1);
+	if(trace) printf("%u=%u\n", k32, v32);
+	break;
+	
+      case ndpi_serialization_uint32_string:
+	assert(ndpi_deserialize_uint32_string(&deserializer, &k32, &vs) != -1);
+	if(trace) {
+	  u_int8_t bkp = vs.str[vs.str_len];
+
+	  vs.str[vs.str_len] = '\0';
+	  printf("%u=%s\n", k32, vs.str);
+	  vs.str[vs.str_len] = bkp;
+	}
+	break;
+	
+      case ndpi_serialization_string_string:
+	assert(ndpi_deserialize_string_string(&deserializer, &ks, &vs) != -1);
+	if(trace) {
+	  u_int8_t bkpk = ks.str[ks.str_len], bkp = vs.str[vs.str_len];
+
+	  ks.str[ks.str_len] = vs.str[vs.str_len] = '\0';
+	  printf("%s=%s\n", ks.str, vs.str);
+	  ks.str[ks.str_len] = bkpk, vs.str[vs.str_len] = bkp;
+	}
+	break;
+
+      default:
+	break;
+      }
+    }
+  }
+  
+  ndpi_term_serializer(&serializer);
+}
+
+/* *********************************************** */
+
 /**
  * @brief Produce bpf filter to filter ports and hosts
  * in order to remove a peak in terms of number of packets
@@ -3331,8 +3402,10 @@ int orginal_main(int argc, char **argv) {
       return(-1);
     }
 
+    /* Internal checks */
     automataUnitTest();
-
+    serializerUnitTest();
+    
     gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module();
 

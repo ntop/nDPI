@@ -814,6 +814,36 @@ extern "C" {
   int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *buffer, u_int buffer_size);
   char* ndpi_ssl_version2str(u_int16_t version);
+
+  /* Serializer */
+  int ndpi_init_serializer(ndpi_serializer *serializer, ndpi_serialization_format fmt);
+  void ndpi_term_serializer(ndpi_serializer *serializer);
+  void ndpi_reset_serializer(ndpi_serializer *serializer);
+  int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer,
+				   u_int32_t key, u_int32_t value);
+  int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
+				   u_int32_t key, char *value);
+  int ndpi_serialize_string_string(ndpi_serializer *serializer,
+				   char *key, char *value);
+  int ndpi_serialize_string_string(ndpi_serializer *serializer,
+				   char *key, char *value);
+  /* **** */
+  
+  int ndpi_init_deserializer(ndpi_deserializer *deserializer,
+			     ndpi_serializer *serializer);  
+  int ndpi_init_deserializer_buf(ndpi_deserializer *deserializer,
+				 u_int8_t *serialized_buffer,
+				 u_int32_t serialized_buffer_len);
+  
+  ndpi_serialization_element_type ndpi_deserialize_get_nextitem_type(ndpi_deserializer *deserializer);
+
+  int ndpi_deserialize_uint32_uint32(ndpi_deserializer *deserializer,
+				     u_int32_t *key, u_int32_t *value);
+  int ndpi_deserialize_uint32_string(ndpi_deserializer *deserializer,
+				     u_int32_t *key, ndpi_string *value);
+  int ndpi_deserialize_string_string(ndpi_deserializer *deserializer,
+				     ndpi_string *key, ndpi_string *value);
+
 #ifdef __cplusplus
 }
 #endif

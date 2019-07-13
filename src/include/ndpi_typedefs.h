@@ -1259,4 +1259,30 @@ typedef struct {
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match_result;
 
+typedef enum {
+  ndpi_serialization_format_unknown = 0,
+  ndpi_serialization_format_tlv,
+  ndpi_serialization_format_json,
+} ndpi_serialization_format;
+
+typedef enum {
+  ndpi_serialization_unknown = 0,
+  ndpi_serialization_uint32_uint32,
+  ndpi_serialization_uint32_string,
+  ndpi_serialization_string_string,
+} ndpi_serialization_element_type;
+
+typedef struct {
+  u_int32_t buffer_size, size_used;
+  ndpi_serialization_format fmt;
+  u_int8_t *buffer;
+} ndpi_serializer;
+
+#define ndpi_deserializer ndpi_serializer
+
+typedef struct {
+  char *str;
+  u_int16_t str_len;
+} ndpi_string;
+
 #endif /* __NDPI_TYPEDEFS_H__ */
