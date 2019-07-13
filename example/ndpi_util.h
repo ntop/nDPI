@@ -29,6 +29,7 @@
 #ifndef __NDPI_UTIL_H__
 #define __NDPI_UTIL_H__
 
+#include "uthash.h"
 #include <pcap.h>
 
 #ifdef USE_DPDK
@@ -73,6 +74,45 @@ extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
 #define MAX_TABLE_SIZE_2         8192
 #define INIT_VAL                   -1
 
+
+// inner hash table (ja3 -> security state)
+typedef struct ndpi_ja3_info {
+   char * ja3;
+   ndpi_cipher_weakness unsafe_cipher;
+   UT_hash_handle hh;
+} ndpi_ja3_info;
+
+// external hash table (host ip -> <ip string, hash table ja3c, hash table ja3s>)
+// used to aggregate ja3 fingerprints by hosts
+typedef struct ndpi_host_ja3_fingerprints{
+   u_int32_t ip;
+   char *ip_string;
+   char *dns_name;
+   ndpi_ja3_info *host_client_info_hasht;
+   ndpi_ja3_info *host_server_info_hasht;
+
+   UT_hash_handle hh;
+} ndpi_host_ja3_fingerprints;
+
+
+//inner hash table
+typedef struct ndpi_ip_dns{
+   u_int32_t ip;
+   char *ip_string;
+   char *dns_name; //server name if any;
+   UT_hash_handle hh;
+} ndpi_ip_dns;
+
+//hash table ja3 -> <host, ip, security>, used to aggregate host by ja3 fingerprints
+typedef struct ndpi_ja3_fingerprints_host{
+   char *ja3; //key
+   ndpi_cipher_weakness unsafe_cipher;
+   ndpi_ip_dns *ipToDNS_ht;
+   UT_hash_handle hh;
+} ndpi_ja3_fingerprints_host;
+
+
+
 // flow tracking
 typedef struct ndpi_flow_info {
   u_int32_t hashval;
@@ -96,7 +136,7 @@ typedef struct ndpi_flow_info {
   char host_server_name[256];
   char bittorent_hash[41];
   char dhcp_fingerprint[48];
-  
+
   struct {
     u_int16_t ssl_version;
     char client_info[64], server_info[64], server_organization[64],
