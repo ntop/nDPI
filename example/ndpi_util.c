@@ -732,7 +732,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   u_int16_t ip_offset = 0, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0;
-  u_int32_t label;
+  /*u_int32_t label;*/
 
   /* counters */
   u_int8_t vlan_packet = 0;

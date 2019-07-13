@@ -123,7 +123,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 						   struct ndpi_flow_struct *flow) {
 
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int8_t a;
 
   if((!ndpi_struct->http_dont_dissect_response) && flow->http_detected && (flow->http.response_status_code != 0)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, flow->http_upper_protocol, flow->http_lower_protocol);
@@ -424,10 +423,6 @@ static struct l_string {
 		    STATIC_STRING_L("PROPFIND "),
 		    STATIC_STRING_L("REPORT ") };
 static const char *http_fs = "CDGHOPR";
-
-static uint8_t non_ctrl(uint8_t c) {
-  return c < 32 ? '.':c;
-}
 
 static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {

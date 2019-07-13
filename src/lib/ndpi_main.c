@@ -491,7 +491,6 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
 			      ndpi_protocol_match *match) {
   u_int16_t no_master[2] = { NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO };
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
-  static u_int16_t generic_id = NDPI_LAST_IMPLEMENTED_PROTOCOL;
 
   if(ndpi_mod->proto_defaults[match->protocol_id].protoName == NULL) {
     if(match->protocol_id == NDPI_PROTOCOL_GENERIC)
@@ -5862,7 +5861,6 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   AC_TEXT_t ac_input_text;
   ndpi_automa *automa = is_host_match ? &ndpi_struct->host_automa : &ndpi_struct->content_automa;
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
-  int rc;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0))
     return(NDPI_PROTOCOL_UNKNOWN);
@@ -5873,22 +5871,15 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
   }
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
-  rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
+  ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
   /* We need to take into account also rc==0 that is used for partial matches */
-#if 0
-  if(rc) {
-#endif
     ret_match->protocol_id = match.number,
       ret_match->protocol_category = match.category,
       ret_match->protocol_breed = match.breed;
     
     return(match.number);
-#if 0
-  } else
-    return(NDPI_PROTOCOL_UNKNOWN);
-#endif
 }
 
 #ifdef HAVE_HYPERSCAN

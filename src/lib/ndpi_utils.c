@@ -50,8 +50,6 @@
 
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
-static int _ndpi_debug_callbacks = 0;
-
 // #define MATCH_DEBUG 1
 
 /* implementation of the punycode check function */
