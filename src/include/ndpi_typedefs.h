@@ -122,6 +122,20 @@ struct ndpi_ethhdr
   u_int16_t h_proto;      /* data length (<= 1500) or type ID proto (>=1536) */
 } PACK_OFF;
 
+/* +++++++++++++++ ARP header +++++++++++++++ */
+PACK_ON
+struct ndpi_arphdr {
+  u_int16_t ar_hrd;/* Format of hardware address.  */
+  u_int16_t ar_pro;/* Format of protocol address.  */
+  u_int8_t  ar_hln;/* Length of hardware address.  */
+  u_int8_t  ar_pln;/* Length of protocol address.  */
+  u_int16_t ar_op;/* ARP opcode (command).  */
+  u_char arp_sha[6];/* sender hardware address */
+  u_int32_t arp_spa;/* sender protocol address */
+  u_char arp_tha[6];/* target hardware address */
+  u_int32_t arp_tpa;/* target protocol address */
+} PACK_OFF;
+
 /* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
 
 PACK_ON
