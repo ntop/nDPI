@@ -71,13 +71,16 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
   }
 }
 
+/* *************************************************************** */
+
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
-			    const u_int8_t * payload, const u_int16_t payload_len)
-{
+			    const u_int8_t * payload, const u_int16_t payload_len) {
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
+
   if (payload_len < 2)
     return;
+
   //struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t payloadType, payload_type = payload[1] & 0x7F;
 
@@ -90,6 +93,19 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	 /* http://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
 	 )
      ) {
+    struct ndpi_packet_struct *packet = &flow->packet;
+    
+    if(packet->iph) {
+      /* 125.209.252.xxx */
+      if(((ntohl(packet->iph->saddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)
+	 || ((ntohl(packet->iph->daddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)) {
+	if((flow->packet.payload[0] == 0x80) && (flow->packet.payload[1] == 0x78)) {
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LINE, NDPI_PROTOCOL_LINE);
+	  return;
+	}
+      }
+    }
+
     NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_UNKNOWN);
     return;
@@ -114,6 +130,8 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
+/* *************************************************************** */
+
 void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -125,6 +143,8 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
      && (ntohs(packet->udp->dest) > 1023))
     ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
 }
+
+/* *************************************************************** */
 
 #if 0
 /* Original (messy) OpenDPI code */
@@ -315,6 +335,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
+/* *************************************************************** */
 
 void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -380,10 +401,10 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 }
 #endif
 
+/* *************************************************************** */
 
 void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-			u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
-{
+			u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("RTP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_RTP,
 				      ndpi_search_rtp,
