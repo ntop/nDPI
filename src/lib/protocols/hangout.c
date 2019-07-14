@@ -62,8 +62,11 @@ static u_int8_t is_google_flow(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
   
   if(packet->iph) {
-    if(google_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->saddr)
-       || google_ptree_match(ndpi_struct, (struct in_addr *)&packet->iph->daddr)) {
+    struct in_addr saddr, daddr;
+    memcpy(&saddr, &packet->iph->saddr, sizeof(struct in_addr));
+    memcpy(&daddr, &packet->iph->daddr, sizeof(struct in_addr));
+    if(google_ptree_match(ndpi_struct, &saddr)
+       || google_ptree_match(ndpi_struct, &daddr)) {
       return(1);
     }
   }
