@@ -166,7 +166,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       flow->http.url = ndpi_malloc(len);
       if(flow->http.url) {
-	strncpy(flow->http.url, "http://", 7);
+	strcpy(flow->http.url, "http://");
 	strncpy(&flow->http.url[7], (char*)packet->host_line.ptr, packet->host_line.len);
 	strncpy(&flow->http.url[7+packet->host_line.len], (char*)packet->http_url_name.ptr,
 		packet->http_url_name.len);
