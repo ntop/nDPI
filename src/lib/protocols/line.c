@@ -40,13 +40,9 @@ void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct, struct n
     /* 125.209.252.xxx */
     if(((ntohl(packet->iph->saddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)
        || ((ntohl(packet->iph->daddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)) {
-      if(
-	 ((packet->payload_packet_len == 110)
-	  && (flow->packet.payload[0] == 0xB6) && (flow->packet.payload[1] == 0x18)
-	  && (flow->packet.payload[2] == 0x00) && (flow->packet.payload[3] == 0x6A))
-	 ||
-	 ((flow->packet.payload[0] == 0xB0) && (flow->packet.payload[1] == 0x78))
-	 ) {
+      if((packet->payload_packet_len == 110)
+	 && (flow->packet.payload[0] == 0xB6) && (flow->packet.payload[1] == 0x18)
+	 && (flow->packet.payload[2] == 0x00) && (flow->packet.payload[3] == 0x6A)) {
 	ndpi_line_report_protocol(ndpi_struct, flow);
 	return;
       }
