@@ -3402,7 +3402,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   else if(iph->version == 6 && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
     NDPI_LOG_DBG2(ndpi_struct, "ipv6 header\n");
-    iph_v6 = (const struct ndpi_ipv6hdr *) iph;
+    iph_v6 = (const struct ndpi_ipv6hdr *) l3;
     iph = NULL;
   }
 #endif
@@ -3906,11 +3906,17 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
   u_int16_t ret = NDPI_PROTOCOL_UNKNOWN;
 
   if(flow->packet.iph) {
-    /* guess host protocol */
-    ret = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
+    struct in_addr addr;
 
-    if(ret == NDPI_PROTOCOL_UNKNOWN)
-      ret = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
+    addr.s_addr = flow->packet.iph->saddr;
+    
+    /* guess host protocol */
+    ret = ndpi_network_ptree_match(ndpi_struct, &addr);
+
+    if(ret == NDPI_PROTOCOL_UNKNOWN) {
+      addr.s_addr = flow->packet.iph->daddr;
+      ret = ndpi_network_ptree_match(ndpi_struct, &addr);
+    }
   }
 
   return(ret);
@@ -4533,9 +4539,15 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     } else {
       /* guess host protocol */
       if(flow->packet.iph) {
-	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
-	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
+	struct in_addr addr;
+
+	addr.s_addr = flow->packet.iph->saddr;
+	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, &addr);
+	
+	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) {
+	  addr.s_addr = flow->packet.iph->daddr;
+	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, &addr);
+	}
       }
     }
   }
