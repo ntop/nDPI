@@ -1,0 +1,17 @@
+DNS	15	1612	1
+NestLogSink	759	116848	13
+
+	1	TCP 192.168.242.15:63342 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][cat: Cloud/13][37 pkts/14650 bytes <-> 35 pkts/4115 bytes]
+	2	TCP 192.168.242.15:63345 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][cat: Cloud/13][36 pkts/14613 bytes <-> 35 pkts/4114 bytes]
+	3	TCP 192.168.242.15:63351 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][cat: Cloud/13][25 pkts/9229 bytes <-> 24 pkts/2916 bytes]
+	4	TCP 192.168.242.15:63348 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][cat: Cloud/13][25 pkts/9114 bytes <-> 24 pkts/2915 bytes]
+	5	TCP 192.168.242.15:63343 <-> 35.174.82.237:11095 [proto: 43/NestLogSink][cat: Cloud/13][60 pkts/5549 bytes <-> 56 pkts/5094 bytes]
+	6	TCP 192.168.242.15:63352 <-> 35.174.82.237:11095 [proto: 43/NestLogSink][cat: Cloud/13][50 pkts/4894 bytes <-> 46 pkts/4392 bytes]
+	7	TCP 192.168.242.15:63346 <-> 35.174.82.237:11095 [proto: 43/NestLogSink][cat: Cloud/13][41 pkts/4409 bytes <-> 37 pkts/3907 bytes]
+	8	TCP 192.168.242.15:63349 <-> 35.174.82.237:11095 [proto: 43/NestLogSink][cat: Cloud/13][28 pkts/3254 bytes <-> 24 pkts/3040 bytes]
+	9	TCP 192.168.242.15:63350 <-> 35.174.82.237:11095 [proto: 43/NestLogSink][cat: Cloud/13][18 pkts/2655 bytes <-> 14 pkts/2499 bytes]
+	10	TCP 192.168.242.15:63340 <-> 35.174.82.237:11095 [proto: 43/NestLogSink][cat: Cloud/13][42 pkts/2576 bytes <-> 41 pkts/2214 bytes]
+	11	TCP 192.168.242.15:63344 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][cat: Cloud/13][11 pkts/2565 bytes <-> 10 pkts/1389 bytes]
+	12	TCP 192.168.242.15:63347 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][cat: Cloud/13][10 pkts/1983 bytes <-> 10 pkts/1390 bytes]
+	13	TCP 192.168.242.15:63353 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][cat: Cloud/13][10 pkts/1983 bytes <-> 10 pkts/1389 bytes]
+	14	UDP 192.168.242.15:52849 <-> 192.168.242.1:53 [proto: 5/DNS][cat: Network/14][8 pkts/713 bytes <-> 7 pkts/899 bytes][Host: weave-logsink.nest.com]

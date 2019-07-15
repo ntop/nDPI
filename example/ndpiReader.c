@@ -209,6 +209,9 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 
 void test_lib(); /* Forward */
 
+//global variable that contains the file where to print the dhcp - fingerprint list
+FILE *file_finger= NULL;
+
 /* ********************************** */
 
 #ifdef DEBUG_TRACE
@@ -234,7 +237,7 @@ static void help(u_int long_help) {
 #endif
 	 "[-f <filter>][-s <duration>][-m <duration>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
-	 "          [-n <threads>][-w <file>][-c <file>][-j <file>][-x <file>]\n\n"
+	 "          [-n <threads>][-w <file>][-c <file>][-j <file>][-x <file>] [-k <file>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
 	 "                            | device for live capture (comma-separated list)\n"
@@ -266,8 +269,8 @@ static void help(u_int long_help) {
 	 "                            | >3 - full debug + dbg_proto = all\n"
 	 "  -b <file.json>            | Specify a file to write port based diagnose statistics\n"
 	 "  -x <file.json>            | Produce bpf filters for specified diagnose file. Use\n"
-	 "                            | this option only for .json files generated with -b flag.\n");
-
+	 "                            | this option only for .json files generated with -b flag.\n"
+	 "  -k <file.txt>             | Print the list of dhcp fingerprint to the specified file.\n");
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -325,6 +328,9 @@ static struct option longopts[] = {
   { "json", required_argument, NULL, 'j'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
+
+  //argument (name of file) is required (it can puts it optional)
+  { "kfingerprint", required_argument, NULL, 'k'},
 
   {0, 0, 0, 0}
 };
@@ -473,7 +479,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "c:df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:", longopts, &option_idx)) != EOF) {
+  while((opt = getopt_long(argc, argv, "c:df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:k:", longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
@@ -625,6 +631,20 @@ static void parseOptions(int argc, char **argv) {
     case 257:
       _debug_protocols = strdup(optarg);
       break;
+
+    case 'k':
+    	//fprintf(stdout, "Request to print the dhcp - fingerprint to the file %s\n", optarg);
+    	//the file is created if it does not exist
+    	//return error if the path already exists
+    	file_finger= fopen(optarg, "a+x");
+    	if (file_finger == NULL)
+    		perror("ERROR: open file to print dhcp - fingerprint list ");
+    	else
+      		fprintf(file_finger, "List of DHCP - Fingerprint: \n");
+
+      	//if there is not option verbose
+      	//if (verbose == 0) verbose=2;
+      	break;
 
     default:
       help(0);
@@ -829,7 +849,21 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_ssl.server_cipher));
 
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
-    if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
+    if(flow->dhcp_fingerprint[0] != '\0') {
+    	fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
+		//it checks if file_finger is open then it writes the fingerprint to the file
+      	if (file_finger != NULL) {
+      		//it checks if the DHCP - fingerprint is already in the file
+      		int found = 0;
+      		char line[100];
+      		fseek(file_finger, 0, SEEK_SET);
+      		while (!found && fgets(line, 100, file_finger) ) {
+      			line[strlen(line)-1]= '\0';
+      			if (strcmp(line, flow->dhcp_fingerprint) == 0) found= 1; 
+      		}
+      		if (!found) fprintf(file_finger, "%s\n", flow->dhcp_fingerprint);
+      	}
+    }
 
     fprintf(out, "\n");
   } else {
@@ -3775,6 +3809,9 @@ int orginal_main(int argc, char **argv) {
     if(results_file)  fclose(results_file);
     if(extcap_dumper) pcap_dump_close(extcap_dumper);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
+
+    //it closes the file if it is open
+    if(file_finger != NULL) fclose(file_finger);
 
     return 0;
   }
