@@ -3906,11 +3906,16 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
   u_int16_t ret = NDPI_PROTOCOL_UNKNOWN;
 
   if(flow->packet.iph) {
+    struct in_addr saddr;
+    memcpy(&saddr, &flow->packet.iph->saddr, sizeof(struct in_addr));
     /* guess host protocol */
-    ret = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
+    ret = ndpi_network_ptree_match(ndpi_struct, &saddr);
 
-    if(ret == NDPI_PROTOCOL_UNKNOWN)
-      ret = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
+    if(ret == NDPI_PROTOCOL_UNKNOWN) {
+      struct in_addr daddr;
+      memcpy(&daddr, &flow->packet.iph->daddr, sizeof(struct in_addr));
+      ret = ndpi_network_ptree_match(ndpi_struct, &daddr);
+    }
   }
 
   return(ret);
@@ -4533,9 +4538,14 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     } else {
       /* guess host protocol */
       if(flow->packet.iph) {
-	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->saddr);
-	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, (struct in_addr *)&flow->packet.iph->daddr);
+        struct in_addr saddr;
+        memcpy(&saddr, &flow->packet.iph->saddr, sizeof(struct in_addr));
+        flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, &saddr);
+        if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) {
+          struct in_addr daddr;
+          memcpy(&daddr, &flow->packet.iph->daddr, sizeof(struct in_addr));
+          flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, &daddr);
+        }
       }
     }
   }
