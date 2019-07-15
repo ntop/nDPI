@@ -458,12 +458,16 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       workflow->stats.ndpi_flow_count++;
 
       *src = newflow->src_id, *dst = newflow->dst_id;
+      
+      if(workflow->hrs == 1)newflow->n_pckt_human_readable_string++;
 
       return newflow;
     }
   } else {
     struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)ret;
-
+    
+    if(workflow->hrs == 1)flow->n_pckt_human_readable_string++;
+    
     if(is_changed) {
       if(flow->src_ip == iph->saddr
 	 && flow->dst_ip == iph->daddr
