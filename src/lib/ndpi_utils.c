@@ -757,7 +757,7 @@ static void ndpi_serialize_single_string(ndpi_serializer *serializer,
   else {
     u_int16_t l = ntohs(slen);
 
-    memcpy(&serializer->buffer[serializer->size_used], &l, sizeof(u_int32_t));
+    memcpy(&serializer->buffer[serializer->size_used], &l, sizeof(u_int16_t));
     serializer->size_used += 2;
   }
 
