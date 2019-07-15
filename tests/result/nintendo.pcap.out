@@ -2,6 +2,11 @@ ICMP	30	2100	2
 Nintendo	890	320242	12
 Amazon	76	10811	7
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.12.114           	 1      
+
+
 	1	UDP 192.168.12.114:55915 <-> 185.118.169.65:27520 [proto: 173/Nintendo][cat: Game/8][169 pkts/61414 bytes <-> 278 pkts/126260 bytes]
 	2	UDP 192.168.12.114:55915 <-> 93.237.131.235:56066 [proto: 173/Nintendo][cat: Game/8][122 pkts/48332 bytes <-> 35 pkts/5026 bytes]
 	3	UDP 192.168.12.114:55915 <-> 81.61.158.138:51769 [proto: 173/Nintendo][cat: Game/8][122 pkts/46476 bytes <-> 38 pkts/5268 bytes]

@@ -5,6 +5,11 @@ Google	17	6375	1
 Webex	1380	818407	43
 Amazon	33	9742	2
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.8.0.1                 	 6      
+
+
 	1	TCP 10.8.0.1:51155 <-> 62.109.224.120:443 [proto: 91.141/SSL.Webex][cat: VoIP/10][256 pkts/14707 bytes <-> 257 pkts/329379 bytes][TLSv1][JA3C: 7cb93b2404a98399e9f84c74fef1fb8f][server: *.webex.com][JA3S: 91589ea825a2ee41810c85fab06d2ef6 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
 	2	TCP 10.8.0.1:41348 <-> 64.68.105.103:443 [proto: 91.141/SSL.Webex][cat: VoIP/10][28 pkts/4815 bytes <-> 28 pkts/104881 bytes][TLSv1.2][JA3C: f9010d8c34749bdf7659b52227e6f91b][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_MD5]
 	3	TCP 10.8.0.1:41346 <-> 64.68.105.103:443 [proto: 91.141/SSL.Webex][cat: VoIP/10][48 pkts/11540 bytes <-> 47 pkts/80696 bytes][TLSv1.2][JA3C: f9010d8c34749bdf7659b52227e6f91b][server: *.webex.com][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][organization: Cisco Systems, Inc.][Cipher: TLS_RSA_WITH_RC4_128_MD5]

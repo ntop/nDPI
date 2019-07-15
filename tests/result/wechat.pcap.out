@@ -13,6 +13,11 @@ LLMNR	12	944	6
 WeChat	1251	606425	49
 GoogleDocs	15	5114	2
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.103            	 3      
+
+
 	1	TCP 203.205.151.162:443 <-> 192.168.1.103:54058 [proto: 64.197/SSL_No_Cert.WeChat][cat: SocialNetwork/6][88 pkts/15114 bytes <-> 91 pkts/61842 bytes]
 	2	TCP 192.168.1.103:54101 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][cat: SocialNetwork/6][46 pkts/12575 bytes <-> 40 pkts/53424 bytes][TLSv1.2][JA3C: e330bca99c8a5256ae126a55c4c725c5][server: web.wechat.com][JA3S: 699a80bdb17efe157c861f92c5bf5d1d][organization: Tencent Mobility Limited][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	3	TCP 192.168.1.103:54103 <-> 203.205.151.162:443 [proto: 91.197/SSL.WeChat][cat: SocialNetwork/6][50 pkts/23958 bytes <-> 46 pkts/39684 bytes][TLSv1.2][JA3C: e330bca99c8a5256ae126a55c4c725c5][server: web.wechat.com][JA3S: 699a80bdb17efe157c861f92c5bf5d1d][organization: Tencent Mobility Limited][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]

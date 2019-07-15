@@ -6,6 +6,11 @@ Facebook	251	215986	5
 Dropbox	5	725	2
 Instagram	363	255094	16
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.0.103            	 1      
+
+
 	1	TCP 31.13.86.52:80 <-> 192.168.0.103:58216 [proto: 7.119/HTTP.Facebook][cat: SocialNetwork/6][103 pkts/150456 bytes <-> 47 pkts/3102 bytes]
 	2	TCP 192.168.0.103:38816 <-> 46.33.70.160:80 [proto: 7.211/HTTP.Instagram][cat: SocialNetwork/6][13 pkts/1118 bytes <-> 39 pkts/57876 bytes][Host: photos-h.ak.instagram.com]
 	3	TCP 192.168.0.103:58052 <-> 82.85.26.162:80 [proto: 7.211/HTTP.Instagram][cat: SocialNetwork/6][37 pkts/2702 bytes <-> 38 pkts/54537 bytes][Host: photos-g.ak.instagram.com]

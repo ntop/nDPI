@@ -8,6 +8,11 @@ Google	32	9133	3
 Viber	268	99524	9
 Amazon	71	24849	3
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.0.17             	 2      
+
+
 	1	TCP 192.168.0.17:53934 <-> 54.230.93.53:443 [proto: 91.144/SSL.Viber][cat: VoIP/10][43 pkts/4571 bytes <-> 46 pkts/60087 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.viber.com][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][organization: Viber Media Sarl][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	2	TCP 192.168.0.17:57520 <-> 54.230.93.96:443 [proto: 91.144/SSL.Viber][cat: VoIP/10][12 pkts/1848 bytes <-> 12 pkts/9317 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.cdn.viber.com][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][organization: Viber Media Sarl][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	3	TCP 192.168.0.17:49048 <-> 54.187.91.182:443 [proto: 91.178/SSL.Amazon][cat: Web/5][13 pkts/2823 bytes <-> 14 pkts/6552 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]

@@ -8,6 +8,11 @@ HTTP_Proxy	26	3926	1
 Amazon	8	2071	2
 KakaoTalk	55	9990	15
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.24.82.188             	 2      
+
+
 	1	TCP 10.24.82.188:43581 <-> 31.13.68.70:443 [proto: 91.119/SSL.Facebook][cat: SocialNetwork/6][17 pkts/3461 bytes <-> 17 pkts/6194 bytes][TLSv1.2][JA3C: 051d20e8adbe8dac78945de300764d5e][server: *.facebook.com][JA3S: 6806b8fe92d7d465715d771eb102ff04][organization: Facebook, Inc.][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256]
 	2	TCP 10.24.82.188:45211 <-> 31.13.68.84:443 [proto: 91.119/SSL.Facebook][cat: SocialNetwork/6][14 pkts/2575 bytes <-> 15 pkts/6502 bytes][TLSv1.2][JA3C: 051d20e8adbe8dac78945de300764d5e][server: *.facebook.com][JA3S: 6806b8fe92d7d465715d771eb102ff04][organization: Facebook, Inc.][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256]
 	3	TCP 10.24.82.188:45209 <-> 31.13.68.84:443 [proto: 91.119/SSL.Facebook][cat: SocialNetwork/6][10 pkts/2584 bytes <-> 9 pkts/5123 bytes][TLSv1.2][JA3C: 051d20e8adbe8dac78945de300764d5e][server: *.facebook.com][JA3S: 6806b8fe92d7d465715d771eb102ff04][organization: Facebook, Inc.][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256]

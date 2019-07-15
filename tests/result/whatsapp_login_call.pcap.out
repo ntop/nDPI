@@ -12,6 +12,11 @@ Spotify	3	258	1
 WhatsAppVoice	70	9464	14
 ApplePush	22	5926	1
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.2.4              	 1      
+
+
 	1	UDP 192.168.2.4:51518 <-> 91.253.176.65:9344 [proto: 87/RTP][cat: Media/1][186 pkts/27025 bytes <-> 278 pkts/25895 bytes]
 	2	UDP 192.168.2.4:52794 <-> 91.253.176.65:9665 [proto: 87/RTP][cat: Media/1][141 pkts/17530 bytes <-> 57 pkts/12888 bytes]
 	3	TCP 192.168.2.4:49202 <-> 184.173.179.37:5222 [proto: 142/WhatsApp][cat: Chat/9][100 pkts/14711 bytes <-> 80 pkts/10163 bytes]

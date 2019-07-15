@@ -4,6 +4,11 @@ IGMP	1	60	1
 NetFlix	6976	6151821	56
 Amazon	2	126	1
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.7              	 4      
+
+
 	1	TCP 192.168.1.7:53217 <-> 23.246.11.141:80 [proto: 7.133/HTTP.NetFlix][cat: Video/26][667 pkts/50462 bytes <-> 1205 pkts/1807875 bytes][Host: 23.246.11.141]
 	2	TCP 192.168.1.7:53183 <-> 23.246.3.140:80 [proto: 7.133/HTTP.NetFlix][cat: Video/26][502 pkts/40335 bytes <-> 805 pkts/1202445 bytes][Host: 23.246.3.140]
 	3	TCP 192.168.1.7:53210 <-> 23.246.11.133:80 [proto: 7.133/HTTP.NetFlix][cat: Video/26][293 pkts/23170 bytes <-> 495 pkts/736113 bytes][Host: 23.246.11.133]

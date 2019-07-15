@@ -9,6 +9,11 @@ Tor	40	10538	1
 Amazon	4	396	1
 KakaoTalk_Voice	44	6196	2
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.24.82.188             	 2      
+
+
 	1	UDP 10.24.82.188:11320 <-> 1.201.1.174:23044 [proto: 87/RTP][cat: Media/1][757 pkts/106335 bytes <-> 746 pkts/93906 bytes]
 	2	UDP 10.24.82.188:10268 <-> 1.201.1.174:23046 [proto: 87/RTP][cat: Media/1][746 pkts/93906 bytes <-> 742 pkts/104604 bytes]
 	3	TCP 10.24.82.188:58857 <-> 110.76.143.50:9001 [proto: 163/Tor][cat: VPN/2][22 pkts/5326 bytes <-> 18 pkts/5212 bytes]

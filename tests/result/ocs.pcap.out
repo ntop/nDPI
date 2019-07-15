@@ -7,6 +7,11 @@ OCS	863	57552	7
 PlayStore	1	72	1
 GoogleServices	13	2277	2
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.180.2            	 4      
+
+
 	1	TCP 192.168.180.2:49881 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media/1][751 pkts/44783 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws]
 	2	TCP 192.168.180.2:36680 -> 178.248.208.54:443 [proto: 91.218/SSL.OCS][cat: Media/1][20 pkts/6089 bytes -> 0 pkts/0 bytes][TLSv1][JA3C: 0534a22b266a64a5cc9a90f7b5c483cc]
 	3	TCP 192.168.180.2:42590 -> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][cat: Media/1][83 pkts/5408 bytes -> 0 pkts/0 bytes][Host: www.ocs.fr]

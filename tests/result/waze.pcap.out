@@ -6,6 +6,11 @@ Google	13	2142	1
 Waze	484	289335	19
 WhatsApp	15	1341	1
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.8.0.1                 	 2      
+
+
 	1	TCP 10.8.0.1:36100 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][cat: Web/5][52 pkts/10860 bytes <-> 55 pkts/74852 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
 	2	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7/HTTP][cat: Web/5][19 pkts/1309 bytes <-> 18 pkts/61896 bytes][Host: xtra1.gpsonextra.net]
 	3	TCP 10.8.0.1:39021 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][cat: Web/5][17 pkts/1962 bytes <-> 16 pkts/56934 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]

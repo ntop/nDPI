@@ -5,6 +5,11 @@ Google	33	4778	7
 Amazon	2	132	1
 Sina(Weibo)	419	258077	16
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.105            	 1      
+
+
 	1	TCP 192.168.1.105:35803 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][52 pkts/5367 bytes <-> 54 pkts/71536 bytes][Host: img.t.sinajs.cn]
 	2	TCP 192.168.1.105:35804 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][32 pkts/3624 bytes <-> 40 pkts/50657 bytes][Host: img.t.sinajs.cn]
 	3	TCP 192.168.1.105:51698 <-> 93.188.134.137:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][40 pkts/3462 bytes <-> 39 pkts/34030 bytes][Host: www.weibo.com]

@@ -1,6 +1,11 @@
 Google	22	2879	1
 Snapchat	34	7320	2
 
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.8.0.1                 	 2      
+
+
 	1	TCP 10.8.0.1:56193 <-> 74.125.136.141:443 [proto: 91.199/SSL.Snapchat][cat: SocialNetwork/6][9 pkts/2290 bytes <-> 8 pkts/1653 bytes][TLSv1.2][JA3C: fded31ac9b978e56ce306f8056092f2a][JA3S: 7bee5c1d424b7e5f943b06983bb11422][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	2	TCP 10.8.0.1:44536 <-> 74.125.136.141:443 [proto: 91.199/SSL.Snapchat][cat: SocialNetwork/6][9 pkts/2345 bytes <-> 8 pkts/1032 bytes][TLSv1.2][JA3C: fded31ac9b978e56ce306f8056092f2a][JA3S: 7bee5c1d424b7e5f943b06983bb11422][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	3	TCP 10.8.0.1:33233 <-> 74.125.136.141:443 [proto: 91.126/SSL.Google][cat: Web/5][11 pkts/1910 bytes <-> 11 pkts/969 bytes][TLSv1.2][JA3C: 36e9ceaa96dd810482573844f78a063f][JA3S: fbe78c619e7ea20046131294ad087f05][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
