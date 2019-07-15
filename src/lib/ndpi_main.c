@@ -3402,7 +3402,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   else if(iph->version == 6 && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
     NDPI_LOG_DBG2(ndpi_struct, "ipv6 header\n");
-    iph_v6 = (const struct ndpi_ipv6hdr *) iph;
+    iph_v6 = (const struct ndpi_ipv6hdr *) l3;
     iph = NULL;
   }
 #endif
