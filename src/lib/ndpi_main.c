@@ -2263,13 +2263,14 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 
 int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
 				   char *name_or_ip, unsigned long *id) {
-  char ipbuf[64];
+  char ipbuf[65];
   struct in_addr pin;
 
   if(!ndpi_struct->custom_categories.categories_loaded)
     return -1;
 
-  strncpy(ipbuf, name_or_ip, sizeof(ipbuf));
+  // Retain null terminator
+  strncpy(ipbuf, name_or_ip, sizeof(ipbuf)-1);
   char *ptr = strrchr(ipbuf, '/');
 
   if(ptr)
