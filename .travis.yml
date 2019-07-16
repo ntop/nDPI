@@ -1,7 +1,7 @@
 language: c
 
 os:
-  - osx
+  #  - osx # tmp disable osx
   - linux
 
 compiler:
@@ -18,22 +18,12 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
             - g++-8
       env:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
 
     - os: linux
-      compiler: gcc
+      compiler: gcc-9
       addons:
         apt:
           sources:
@@ -42,6 +32,17 @@ matrix:
             - g++-9
       env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+
+    - os: linux
+      compiler: clang-8
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-8
+          packages:
+            - clang-8
+      env:
+        - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
 
 
 
@@ -57,9 +58,7 @@ install:
 #macos 
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
 #linux
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update || true; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install build-essential; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install libpcap-dev libtool autoconf automake autogen; fi 
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install libpcap-dev autogen; fi 
 
 before_script:
   - ./autogen.sh
