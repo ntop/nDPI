@@ -3092,6 +3092,7 @@ void serializerUnitTest() {
     snprintf(vbuf, sizeof(vbuf), "World %u", i);
     assert(ndpi_serialize_uint32_string(&serializer, i, "Hello") != -1);
     assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
+    assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);
   }
 
   if(trace)
@@ -3134,6 +3135,17 @@ void serializerUnitTest() {
 	  printf("%s=%s\n", ks.str, vs.str);
 	  ks.str[ks.str_len] = bkpk, vs.str[vs.str_len] = bkp;
 	}
+	break;
+
+      case ndpi_serialization_string_uint32:
+	assert(ndpi_deserialize_string_uint32(&deserializer, &ks, &v32) != -1);
+	if(trace) {
+	  u_int8_t bkpk = ks.str[ks.str_len];
+
+	  ks.str[ks.str_len] = '\0';
+	  printf("%s=%u\n", ks.str, v32);
+	  ks.str[ks.str_len] = bkpk;
+        }
 	break;
 
       default:

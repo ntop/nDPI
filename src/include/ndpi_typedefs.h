@@ -1270,6 +1270,7 @@ typedef enum {
   ndpi_serialization_uint32_uint32,
   ndpi_serialization_uint32_string,
   ndpi_serialization_string_string,
+  ndpi_serialization_string_uint32,
 } ndpi_serialization_element_type;
 
 typedef struct {

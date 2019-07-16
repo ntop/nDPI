@@ -881,6 +881,33 @@ int ndpi_serialize_string_string(ndpi_serializer *serializer,
 }
 
 /* ********************************** */
+
+int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
+				 char *key, u_int32_t value) {
+  u_int32_t klen = strlen(key);
+  u_int32_t needed = 1 /* type */ + 2 /* key len */ + klen /* key */ + 4 /* value */;
+  u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
+
+  if(buff_diff < needed) {
+    ndpi_extend_serializer_buffer(serializer);
+    if(serializer->size_used < 10) return(-1);
+  }
+
+  serializer->buffer[serializer->size_used++] = ndpi_serialization_string_uint32;
+
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    serializer->size_used += snprintf((char*)serializer->buffer, buff_diff, "%s\"%s\":%u",
+				      (serializer->size_used > 2) ? "," : "",
+				      key, value);
+  } else {
+    ndpi_serialize_single_string(serializer, key, klen);
+    ndpi_serialize_single_uint32(serializer, value);
+  }
+
+  return(0);
+}
+
+/* ********************************** */
 /* ********************************** */
 
 int ndpi_init_deserializer_buf(ndpi_deserializer *deserializer,
@@ -972,3 +999,24 @@ int ndpi_deserialize_string_string(ndpi_deserializer *deserializer,
   } else
     return(-1);
 }
+
+/* ********************************** */
+
+int ndpi_deserialize_string_uint32(ndpi_deserializer *deserializer,
+				   ndpi_string *key, u_int32_t *value) {
+  if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_string_uint32) {
+    u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+
+    if(buff_diff < 8) return(-2);
+
+    deserializer->size_used++; /* Skip element type */
+    ndpi_deserialize_single_string(deserializer, key);    
+    ndpi_deserialize_single_uint32(deserializer, value);
+
+    return(0);
+  } else
+    return(-1);
+}
+
+/* ********************************** */
+
