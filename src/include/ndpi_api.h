@@ -821,12 +821,16 @@ extern "C" {
   void ndpi_reset_serializer(ndpi_serializer *serializer);
   int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer,
 				   u_int32_t key, u_int32_t value);
+  int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
+				   u_int32_t key, u_int64_t value);
   int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
 				   u_int32_t key, char *value);
-  int ndpi_serialize_string_string(ndpi_serializer *serializer,
-				   char *key, char *value);
   int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
 				   char *key, u_int32_t value);
+  int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
+				   char *key, u_int64_t value);
+  int ndpi_serialize_string_string(ndpi_serializer *serializer,
+				   char *key, char *value);
   /* **** */
   
   int ndpi_init_deserializer(ndpi_deserializer *deserializer,
@@ -839,12 +843,17 @@ extern "C" {
 
   int ndpi_deserialize_uint32_uint32(ndpi_deserializer *deserializer,
 				     u_int32_t *key, u_int32_t *value);
+  int ndpi_deserialize_uint32_uint64(ndpi_deserializer *deserializer,
+				     u_int32_t *key, u_int64_t *value);
   int ndpi_deserialize_uint32_string(ndpi_deserializer *deserializer,
 				     u_int32_t *key, ndpi_string *value);
-  int ndpi_deserialize_string_string(ndpi_deserializer *deserializer,
-				     ndpi_string *key, ndpi_string *value);
   int ndpi_deserialize_string_uint32(ndpi_deserializer *deserializer,
 				     ndpi_string *key, u_int32_t *value);
+  int ndpi_deserialize_string_uint64(ndpi_deserializer *deserializer,
+				     ndpi_string *key, u_int64_t *value);
+  int ndpi_deserialize_string_string(ndpi_deserializer *deserializer,
+				     ndpi_string *key, ndpi_string *value);
+
 
 #ifdef __cplusplus
 }
