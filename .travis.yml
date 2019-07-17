@@ -52,7 +52,8 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-xenial-8
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-8
           packages:
             - clang-8
             - libpcap-dev
@@ -65,7 +66,8 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-xenial-7
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-7
           packages:
             - clang-7
             - libpcap-dev
