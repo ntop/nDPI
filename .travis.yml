@@ -1,24 +1,36 @@
 language: c
 
-os:
-  #  - osx # tmp disable osx
-  - linux
-
-compiler:
-  - clang
-  - gcc
-
-
 matrix:
   include:
+    - os: osx
+      compiler: clang
+
     - os: linux
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: gcc-8
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
+            - libpcap-dev
+            - autogen
       env:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
 
@@ -30,6 +42,8 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-9
+            - libpcap-dev
+            - autogen
       env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
 
@@ -41,6 +55,8 @@ matrix:
             - llvm-toolchain-xenial-8
           packages:
             - clang-8
+            - libpcap-dev
+            - autogen
       env:
         - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
 
@@ -57,8 +73,6 @@ before_install:
 install: 
 #macos 
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-#linux
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install libpcap-dev autogen; fi 
 
 before_script:
   - ./autogen.sh
