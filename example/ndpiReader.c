@@ -833,13 +833,15 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
 
-    fprintf(out, " Num_Packt_Human_Readable_String: %d ", flow->n_pckt_human_readable_string);
+    fprintf(out, "[Num_Packt_Human_Readable_String: %d]", flow->n_pckt_human_readable_string);
 
 
     if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_HTTP ) && (flow->n_pckt_human_readable_string == 0) ) printf("!WARNING!");
     if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_FTP_CONTROL) && (flow->n_pckt_human_readable_string == 0) ) printf("!WARNING!");
     if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_NTP ) && (flow->n_pckt_human_readable_string != 0) ) printf("!WARNING!");
     if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_IP_ICMP ) && (flow->n_pckt_human_readable_string != 0) ) printf("!WARNING!");
+    if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_VNC ) && (flow->n_pckt_human_readable_string != 0 ) ) printf("!WARNING!");
+    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_RTP ) && (flow->n_pckt_human_readable_string != 0 ) ) printf("!WARNING!");
     //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_DNS ) && (flow->n_pckt_human_readable_string > ? ) ) printf("!WARNING!");
 
 
