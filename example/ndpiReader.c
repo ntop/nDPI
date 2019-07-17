@@ -3139,6 +3139,17 @@ void serializerUnitTest() {
 	  vs.str[vs.str_len] = bkp;
 	}
 	break;
+		  
+      case ndpi_serialization_string_string:
+	assert(ndpi_deserialize_string_string(&deserializer, &ks, &vs) != -1);
+	if(trace) {
+	  u_int8_t bkpk = ks.str[ks.str_len], bkp = vs.str[vs.str_len];
+
+	  ks.str[ks.str_len] = vs.str[vs.str_len] = '\0';
+	  printf("%s=%s\n", ks.str, vs.str);
+	  ks.str[ks.str_len] = bkpk, vs.str[vs.str_len] = bkp;
+	}
+	break;
 
       case ndpi_serialization_string_uint32:
 	assert(ndpi_deserialize_string_uint32(&deserializer, &ks, &v32) != -1);
