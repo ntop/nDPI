@@ -1267,6 +1267,7 @@ typedef enum {
 
 typedef enum {
   ndpi_serialization_unknown = 0,
+  ndpi_serialization_end_of_record,
   ndpi_serialization_uint32_uint32,
   ndpi_serialization_uint32_uint64,
   ndpi_serialization_uint32_string,

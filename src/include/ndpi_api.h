@@ -831,8 +831,9 @@ extern "C" {
 				   char *key, u_int64_t value);
   int ndpi_serialize_string_string(ndpi_serializer *serializer,
 				   char *key, char *value);
-  /* **** */
-  
+  int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
+
+  /* Deserializer */
   int ndpi_init_deserializer(ndpi_deserializer *deserializer,
 			     ndpi_serializer *serializer);  
   int ndpi_init_deserializer_buf(ndpi_deserializer *deserializer,
@@ -853,7 +854,7 @@ extern "C" {
 				     ndpi_string *key, u_int64_t *value);
   int ndpi_deserialize_string_string(ndpi_deserializer *deserializer,
 				     ndpi_string *key, ndpi_string *value);
-
+  int ndpi_deserialize_end_of_record(ndpi_deserializer *deserializer);
 
 #ifdef __cplusplus
 }

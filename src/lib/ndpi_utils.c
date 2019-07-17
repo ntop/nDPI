@@ -839,6 +839,25 @@ static void ndpi_deserialize_single_string(ndpi_serializer *serializer,
 
 /* ********************************** */
 
+int ndpi_serialize_end_of_record(ndpi_serializer *serializer) {
+  u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
+
+  if(buff_diff < 1) {
+    ndpi_extend_serializer_buffer(serializer);
+    if(serializer->size_used < 10) return(-1);
+  }
+
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    // TODO do we need to handle arrays?
+  } else {
+    serializer->buffer[serializer->size_used++] = ndpi_serialization_end_of_record;
+  }
+
+  return(0);
+}
+
+/* ********************************** */
+
 int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer,
 				 u_int32_t key, u_int32_t value) {
   u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
@@ -1022,16 +1041,35 @@ int ndpi_init_deserializer(ndpi_deserializer *deserializer,
 			   ndpi_serializer *serializer) {
   return(ndpi_init_deserializer_buf(deserializer,
 				    serializer->buffer,
-				    serializer->buffer_size));
+				    serializer->size_used));
 }
 
 /* ********************************** */
 
 ndpi_serialization_element_type ndpi_deserialize_get_nextitem_type(ndpi_deserializer *deserializer) {
+  ndpi_serialization_element_type et;
+
   if(deserializer->size_used >= deserializer->buffer_size)
     return(ndpi_serialization_unknown);
-  else
-    return((ndpi_serialization_element_type)deserializer->buffer[deserializer->size_used]);
+
+  et = (ndpi_serialization_element_type) deserializer->buffer[deserializer->size_used];
+
+  return et;
+}
+
+/* ********************************** */
+
+int ndpi_deserialize_end_of_record(ndpi_deserializer *deserializer) {
+  if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_end_of_record) {
+    u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+
+    if(buff_diff < 1) return(-2);
+
+    deserializer->size_used++; /* Skip element type */
+
+    return(0);
+  } else
+    return(-1);
 }
 
 /* ********************************** */
