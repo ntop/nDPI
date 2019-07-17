@@ -60,14 +60,22 @@ matrix:
       env:
         - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
 
+    - os: linux
+      compiler: clang-7
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-7
+          packages:
+            - clang-7
+            - libpcap-dev
+            - autogen
+      env:
+        - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
 
 
-  exclude:
-  # osx use always clang for build...
-  - os: osx
-    compiler: gcc
 
-before_install:
+  before_install:
   - eval "${MATRIX_EVAL}"
 
 before_script:
