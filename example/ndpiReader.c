@@ -3163,6 +3163,8 @@ void serializerUnitTest() {
 	break;
 
       default:
+        printf("serializerUnitTest: unsupported type %u detected!\n", et);
+        return;
 	break;
       }
     }
