@@ -82,7 +82,7 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 u_int8_t enable_protocol_guess = 1;
-static u_int8_t verbose = 0, json_flag = 0;
+u_int8_t verbose = 0, json_flag = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
@@ -833,15 +833,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
 
-    //fprintf(out, "[Num_Packt_Human_Readable_String: %d]", flow->n_pckt_human_readable_string);
-
-
-    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_HTTP ) && (flow->n_pckt_human_readable_string == 0) ) printf("!WARNING!");
-    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_FTP_CONTROL) && (flow->n_pckt_human_readable_string == 0) ) printf("!WARNING!");
-    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_NTP ) && (flow->n_pckt_human_readable_string != 0) ) printf("!WARNING!");
-    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_IP_ICMP ) && (flow->n_pckt_human_readable_string != 0) ) printf("!WARNING!");
-    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_VNC ) && (flow->n_pckt_human_readable_string != 0 ) ) printf("!WARNING!");
-
+    if(flow->has_human_readeable_strings) fprintf(out, "[PLAIN TEXT (%s)]", flow->human_readeable_string_buffer);
+    
     fprintf(out, "\n");
   } else {
 #ifdef HAVE_JSON_C
@@ -2804,19 +2797,8 @@ static void ndpi_process_packet(u_char *args,
   /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
 
-  ndpi_thread_info[thread_id].workflow->hrs = 0;
-  if (ndpi_has_human_readeable_string(ndpi_info_mod, (char*)packet, header->caplen) == 1) {
-    ndpi_thread_info[thread_id].workflow->hrs = 1;
-  }
-
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
-
-  if((capture_until != 0) && (header->ts.tv_sec >= capture_until)) {
-    if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)
-      pcap_breakloop(ndpi_thread_info[thread_id].workflow->pcap_handle);
-    return;
-  }
 
   if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
   pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
@@ -2840,7 +2822,9 @@ static void ndpi_process_packet(u_char *args,
 	ndpi_free(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
       }
 
-      if(++ndpi_thread_info[thread_id].idle_scan_idx == ndpi_thread_info[thread_id].workflow->prefs.num_roots) ndpi_thread_info[thread_id].idle_scan_idx = 0;
+      if(++ndpi_thread_info[thread_id].idle_scan_idx == ndpi_thread_info[thread_id].workflow->prefs.num_roots)
+	ndpi_thread_info[thread_id].idle_scan_idx = 0;
+      
       ndpi_thread_info[thread_id].last_idle_scan_time = ndpi_thread_info[thread_id].workflow->last_time;
     }
   }
@@ -2874,8 +2858,7 @@ static void ndpi_process_packet(u_char *args,
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
     *crc = ethernet_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer));
-    h.caplen += delta;
-    h.len += delta;
+    h.caplen += delta, h.len += delta;
 
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, "Dumping %u bytes packet\n", h.caplen);
@@ -2920,7 +2903,6 @@ static void ndpi_process_packet(u_char *args,
   */
   free(packet_checked);
 }
-
 
 /**
  * @brief Call pcap_loop() to process packets from a live capture or savefile

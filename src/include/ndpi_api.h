@@ -812,7 +812,9 @@ extern "C" {
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
   int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,
-				      char *buffer, u_int buffer_size);
+				      char *buffer, u_int buffer_size,
+				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
+				      char *outbuf, u_int outbuf_len);
   char* ndpi_ssl_version2str(u_int16_t version);
 
   /* Serializer */

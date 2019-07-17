@@ -75,6 +75,7 @@
 #include "ndpi_util.h"
 
 extern u_int8_t enable_protocol_guess;
+extern u_int8_t verbose;
 
 /* ***************************************************** */
 
@@ -459,31 +460,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
       *src = newflow->src_id, *dst = newflow->dst_id;
 
-      if(workflow->hrs == 1){
-       /* count if no SSL protocol */
-        if((newflow->detected_protocol.app_protocol != NDPI_PROTOCOL_SSL)
-            && (newflow->detected_protocol.master_protocol != NDPI_PROTOCOL_SSL)){
-                newflow->n_pckt_human_readable_string++;
-        }
-      }
-
       return newflow;
     }
   } else {
     struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)ret;
-
-    if(workflow->hrs == 1){
-    /* count if no SSL protocol */
-        if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_SSL)
-            && (flow->detected_protocol.master_protocol != NDPI_PROTOCOL_SSL)){
-                flow->n_pckt_human_readable_string++;
-        }
-
-    }
-    if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
-            || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)){
-                flow->n_pckt_human_readable_string = 0;
-    }
 
     if(is_changed) {
       if(flow->src_ip == iph->saddr
@@ -631,7 +611,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 					   const struct ndpi_iphdr *iph,
 					   struct ndpi_ipv6hdr *iph6,
 					   u_int16_t ip_offset,
-					   u_int16_t ipsize, u_int16_t rawsize) {
+					   u_int16_t ipsize, u_int16_t rawsize,
+					   const struct pcap_pkthdr *header,
+					   const u_char *packet) {
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow_info *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
@@ -668,6 +650,42 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
 
     flow->last_seen = time;
+
+    if(verbose) {
+    }
+      
+    if(!flow->has_human_readeable_strings) {
+      u_int8_t skip = 0;
+      
+      if((iph->protocol == IPPROTO_TCP)
+	 && (
+	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
+	     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))	     
+	 ) {
+	if((flow->src2dst_packets+flow->dst2src_packets) < 10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
+	  skip = 1;
+      }
+
+      if(!skip) {
+	char outbuf[64] = { '\0' };
+	
+	if(ndpi_has_human_readeable_string(workflow->ndpi_struct, (char*)packet, header->caplen, 8,
+					   flow->human_readeable_string_buffer,
+					   sizeof(flow->human_readeable_string_buffer)) == 1)
+	  flow->has_human_readeable_strings = 1;
+      }
+    } else {
+      if((iph->protocol == IPPROTO_TCP)
+	 && (
+	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
+	     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))	     
+	 )
+	flow->has_human_readeable_strings = 0;
+    }
   } else { // flow is NULL
     workflow->stats.total_discarded_bytes++;
     return(nproto);
@@ -965,20 +983,20 @@ iph_check:
     ip_len = sizeof(struct ndpi_ipv6hdr);
 
     if(proto == IPPROTO_DSTOPTS /* IPv6 destination option */) {
-
       u_int8_t *options = (u_int8_t*)&packet[ip_offset+ip_len];
       proto = options[0];
       ip_len += 8 * (options[1] + 1);
     }
+    
     iph = NULL;
-
   } else {
     static u_int8_t ipv4_warning_used = 0;
 
   v4_warning:
     if(ipv4_warning_used == 0) {
       if(!workflow->prefs.quiet_mode)
-        NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
+        NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG,
+		 "\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
       ipv4_warning_used = 1;
     }
     workflow->stats.total_discarded_bytes +=  header->len;
@@ -1053,7 +1071,8 @@ iph_check:
 
   /* process the packet */
   return(packet_processing(workflow, time, vlan_id, iph, iph6,
-			   ip_offset, header->caplen - ip_offset, header->caplen));
+			   ip_offset, header->caplen - ip_offset,
+			   header->caplen, header, packet));
 }
 
 /* ********************************************************** */
