@@ -69,9 +69,6 @@ if test $SYSTEM = "Darwin"; then
  CC=clang
 fi
  
-if test $ax_cv_PTHREAD_CLANG = "yes"; then
- CC=clang
-fi
  
 HS_LIB=
 HS_INC=

@@ -1,26 +1,84 @@
 language: c
 
-os:
-  - osx
-  - linux
-
-compiler:
-  - clang
-  - gcc
-
 matrix:
-  exclude:
-  # osx use always clang for build...
-  - os: osx
-    compiler: gcc
+  include:
+    - os: osx
+      compiler: clang
 
-install: 
-#macos 
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-#linux
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update || true; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install build-essential; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install libpcap-dev libtool autoconf automake autogen; fi 
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: gcc-8
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+            - libpcap-dev
+            - autogen
+      env:
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+
+    - os: linux
+      compiler: gcc-9
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+            - libpcap-dev
+            - autogen
+      env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+
+    - os: linux
+      compiler: clang-8
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-8
+          packages:
+            - clang-8
+            - libpcap-dev
+            - autogen
+      env:
+        - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
+
+    - os: linux
+      compiler: clang-7
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-7
+          packages:
+            - clang-7
+            - libpcap-dev
+            - autogen
+      env:
+        - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
+
+
+
+  before_install:
+  - eval "${MATRIX_EVAL}"
 
 before_script:
   - ./autogen.sh
@@ -29,7 +87,7 @@ before_script:
 script:
   - ./configure
   - make
-#
+
 #after_script:
   - cd tests
   - ./do.sh
