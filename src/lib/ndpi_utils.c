@@ -747,6 +747,12 @@ static u_int64_t ndpi_ntohll(u_int64_t v) {
 
 /* ********************************** */
 
+void ndpi_reset_serializer(ndpi_serializer *serializer) {
+  serializer->size_used = 2 * sizeof(u_int8_t);
+}
+
+/* ********************************** */
+
 int ndpi_init_serializer(ndpi_serializer *serializer,
 			 ndpi_serialization_format fmt) {
   serializer->buffer_size = 8192;
@@ -755,7 +761,7 @@ int ndpi_init_serializer(ndpi_serializer *serializer,
 
   serializer->buffer[0]   = 1; /* version */
   serializer->buffer[1]   = (u_int8_t) fmt;
-  serializer->size_used   = 2;
+  ndpi_reset_serializer(serializer);
 
   return(serializer->buffer ? 1 : -1);
 }
@@ -767,12 +773,6 @@ void ndpi_term_serializer(ndpi_serializer *serializer) {
     free(serializer->buffer);
     serializer->buffer = NULL;
   }
-}
-
-/* ********************************** */
-
-void ndpi_reset_serializer(ndpi_serializer *serializer) {
-  serializer->size_used = 2;
 }
 
 /* ********************************** */
@@ -799,33 +799,12 @@ static int ndpi_extend_serializer_buffer(ndpi_serializer *serializer, u_int32_t 
 
 /* ********************************** */
 
-static void ndpi_serialize_single_string(ndpi_serializer *serializer,
-					 char *s, u_int32_t slen) {
-  u_int16_t l = htonl(slen);
-
-  memcpy(&serializer->buffer[serializer->size_used], &l, sizeof(u_int16_t));
-  serializer->size_used += 2;
-
-  memcpy(&serializer->buffer[serializer->size_used], s, slen);
-  serializer->size_used += slen;
-}
-
-/* ********************************** */
-
 static void ndpi_serialize_single_uint32(ndpi_serializer *serializer,
 					 u_int32_t s) {
 
   u_int32_t v = htonl(s);
 
   memcpy(&serializer->buffer[serializer->size_used], &v, sizeof(u_int32_t));
-  serializer->size_used += sizeof(u_int32_t);
-}
-
-/* ********************************** */
-
-static void ndpi_deserialize_single_uint32(ndpi_serializer *serializer,
-					   u_int32_t *s) {
-  *s = ntohl(*(u_int32_t*)&serializer->buffer[serializer->size_used]);
   serializer->size_used += sizeof(u_int32_t);
 }
 
@@ -842,21 +821,42 @@ static void ndpi_serialize_single_uint64(ndpi_serializer *serializer,
 
 /* ********************************** */
 
-static void ndpi_deserialize_single_uint64(ndpi_serializer *serializer,
-					   u_int64_t *s) {
-  *s = ndpi_ntohll(*(u_int64_t*)&serializer->buffer[serializer->size_used]);
-  serializer->size_used += sizeof(u_int64_t);
+static void ndpi_serialize_single_string(ndpi_serializer *serializer,
+					 char *s, u_int32_t slen) {
+  u_int16_t l = htonl(slen);
+
+  memcpy(&serializer->buffer[serializer->size_used], &l, sizeof(u_int16_t));
+  serializer->size_used += sizeof(u_int16_t);
+
+  memcpy(&serializer->buffer[serializer->size_used], s, slen);
+  serializer->size_used += slen;
 }
 
 /* ********************************** */
 
-static void ndpi_deserialize_single_string(ndpi_serializer *serializer,
-					   ndpi_string *v) {
-  v->str_len = ntohs(*((u_int16_t *) &serializer->buffer[serializer->size_used]));
-  serializer->size_used += 2;
+static void ndpi_deserialize_single_uint32(ndpi_serializer *deserializer,
+					   u_int32_t *s) {
+  *s = ntohl(*(u_int32_t*)&deserializer->buffer[deserializer->size_used]);
+  deserializer->size_used += sizeof(u_int32_t);
+}
 
-  v->str = (char*)&serializer->buffer[serializer->size_used];
-  serializer->size_used += v->str_len;
+/* ********************************** */
+
+static void ndpi_deserialize_single_uint64(ndpi_serializer *deserializer,
+					   u_int64_t *s) {
+  *s = ndpi_ntohll(*(u_int64_t*)&deserializer->buffer[deserializer->size_used]);
+  deserializer->size_used += sizeof(u_int64_t);
+}
+
+/* ********************************** */
+
+static void ndpi_deserialize_single_string(ndpi_serializer *deserializer,
+					   ndpi_string *v) {
+  v->str_len = ntohs(*((u_int16_t *) &deserializer->buffer[deserializer->size_used]));
+  deserializer->size_used += sizeof(u_int16_t);
+
+  v->str = (char*)&deserializer->buffer[deserializer->size_used];
+  deserializer->size_used += v->str_len;
 }
 
 /* ********************************** */
@@ -1069,17 +1069,17 @@ int ndpi_serialize_string_string(ndpi_serializer *serializer,
 int ndpi_init_deserializer_buf(ndpi_deserializer *deserializer,
 			       u_int8_t *serialized_buffer,
 			       u_int32_t serialized_buffer_len) {
-  if(serialized_buffer_len < 3)
+  if(serialized_buffer_len < (2 * sizeof(u_int8_t)))
     return(-1);
 
-  deserializer->buffer_size = serialized_buffer_len;
   deserializer->buffer      = serialized_buffer;
 
   if(deserializer->buffer[0] != 1)
     return(-2); /* Invalid version */
 
+  deserializer->buffer_size = serialized_buffer_len;
   deserializer->fmt         = deserializer->buffer[1];
-  deserializer->size_used   = 2;
+  ndpi_reset_serializer(deserializer);
   
   return(0);
 }
@@ -1111,8 +1111,10 @@ ndpi_serialization_element_type ndpi_deserialize_get_nextitem_type(ndpi_deserial
 int ndpi_deserialize_end_of_record(ndpi_deserializer *deserializer) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_end_of_record) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int16_t expected = 
+      sizeof(u_int8_t) /* type */;
 
-    if(buff_diff < 1) return(-2);
+    if(buff_diff < expected) return(-2);
 
     deserializer->size_used++; /* Skip element type */
 
@@ -1127,8 +1129,12 @@ int ndpi_deserialize_uint32_uint32(ndpi_deserializer *deserializer,
 				   u_int32_t *key, u_int32_t *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_uint32_uint32) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int16_t expected = 
+      sizeof(u_int8_t) /* type */ + 
+      sizeof(u_int32_t) /* key */ +  
+      sizeof(u_int32_t);
 
-    if(buff_diff < 10) return(-2);
+    if(buff_diff < expected) return(-2);
 
     deserializer->size_used++; /* Skip element type */
     ndpi_deserialize_single_uint32(deserializer, key);
@@ -1145,8 +1151,12 @@ int ndpi_deserialize_uint32_uint64(ndpi_deserializer *deserializer,
 				   u_int32_t *key, u_int64_t *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_uint32_uint64) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int16_t expected = 
+      sizeof(u_int8_t) /* type */ +
+      sizeof(u_int32_t) /* key */ +
+      sizeof(u_int64_t);
 
-    if(buff_diff < 10) return(-2);
+    if(buff_diff < expected) return(-2);
 
     deserializer->size_used++; /* Skip element type */
     ndpi_deserialize_single_uint32(deserializer, key);
@@ -1163,8 +1173,12 @@ int ndpi_deserialize_uint32_string(ndpi_deserializer *deserializer,
 				   u_int32_t *key, ndpi_string *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_uint32_string) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int32_t expected = 
+      sizeof(u_int8_t) /* type */ + 
+      sizeof(u_int32_t) /* key */ +
+      sizeof(u_int16_t) /* len */;
 
-    if(buff_diff < 7) return(-2);
+    if(buff_diff < expected) return(-2);
 
     deserializer->size_used++; /* Skip element type */
     ndpi_deserialize_single_uint32(deserializer, key);    
@@ -1181,8 +1195,12 @@ int ndpi_deserialize_string_uint32(ndpi_deserializer *deserializer,
 				   ndpi_string *key, u_int32_t *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_string_uint32) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int32_t expected = 
+      sizeof(u_int8_t) /* type */ + 
+      sizeof(u_int16_t) /* key len */ + 
+      sizeof(u_int32_t);
 
-    if(buff_diff < 7) return(-2);
+    if(buff_diff < expected) return(-2);
 
     deserializer->size_used++; /* Skip element type */
     ndpi_deserialize_single_string(deserializer, key);    
@@ -1199,8 +1217,12 @@ int ndpi_deserialize_string_uint64(ndpi_deserializer *deserializer,
 				   ndpi_string *key, u_int64_t *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_string_uint64) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int32_t expected = 
+      sizeof(u_int8_t) /* type */ +
+      sizeof(u_int16_t) /* key len */ +
+      sizeof(u_int64_t);
 
-    if(buff_diff < 11) return(-2);
+    if(buff_diff < expected) return(-2);
 
     deserializer->size_used++; /* Skip element type */
     ndpi_deserialize_single_string(deserializer, key);    
@@ -1217,8 +1239,12 @@ int ndpi_deserialize_string_string(ndpi_deserializer *deserializer,
 				   ndpi_string *key, ndpi_string *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_string_string) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int32_t expected = 
+      sizeof(u_int8_t) /* type */ + 
+      sizeof(u_int16_t) /* key len */ + 
+      sizeof(u_int16_t) /* len */;
 
-    if(buff_diff < 5) return(-2);
+    if(buff_diff < expected) return(-2);
 
     deserializer->size_used++; /* Skip element type */
     ndpi_deserialize_single_string(deserializer, key);    
