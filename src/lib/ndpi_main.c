@@ -45,7 +45,7 @@
 #include <sys/endian.h>
 #endif
 
-#include "ndpi_content_match.c.inc"
+#include "ndpi_content_match.h"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ht_hash.h"
 
