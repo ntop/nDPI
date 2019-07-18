@@ -31,8 +31,9 @@
 
 #include "uthash.h"
 #include <pcap.h>
+#include "ndpi_config.h"
 
-#ifdef USE_DPDK
+#ifdef HAVE_DPDK
 #include <rte_eal.h>
 #include <rte_ether.h>
 #include <rte_ethdev.h>

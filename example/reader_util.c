@@ -790,7 +790,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   /*** check Data Link type ***/
   int datalink_type;
 
-#ifdef USE_DPDK
+#ifdef HAVE_DPDK
   datalink_type = DLT_EN10MB;
 #else
   datalink_type = (int)pcap_datalink(workflow->pcap_handle);
@@ -1123,7 +1123,7 @@ u_int32_t ethernet_crc32(const void* data, size_t n_bytes) {
 
 /* *********************************************** */
 
-#ifdef USE_DPDK
+#ifdef HAVE_DPDK
 
 static const struct rte_eth_conf port_conf_default = {
   .rxmode = { .max_rx_pkt_len = ETHER_MAX_LEN }

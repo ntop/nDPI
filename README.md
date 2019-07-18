@@ -14,12 +14,12 @@ nDPI is an open source LGPLv3 library for deep-packet inspection. Based on OpenD
 In order to compile this library do
 
 - ./autogen.sh
-- ./configure
 - make
 
 To run tests do additionally:
 
-- cd tests; ./do.sh
+- make check
+Test output will be in tests/do.sh.log
 
 Please note that the pre-requisites for compilation include:
 - GNU tools (autogen, automake, autoconf, libtool)
@@ -36,9 +36,10 @@ The entire procedure of adding new protocols in detail:
 5. Choose (do not change anything) a selection bitmask from: src/include/ndpi_define.h
 6. Add a new entry in ndpi_set_protocol_detection_bitmask2 in: src/lib/ndpi_main.c
 7. Set protocol default ports in ndpi_init_protocol_defaults in: src/lib/ndpi_main.c
-8.  ./autogen.sh
-9. make
-10. make check
+8. Add the new source files to src/lib/Makefile.am
+9.  ./autogen.sh
+10. make
+11. make check
 
 ### How to use nDPI to Block Selected Traffic
 
