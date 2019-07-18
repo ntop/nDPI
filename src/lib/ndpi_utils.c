@@ -822,13 +822,15 @@ static void ndpi_serialize_single_uint64(ndpi_serializer *serializer,
 /* ********************************** */
 
 static void ndpi_serialize_single_string(ndpi_serializer *serializer,
-					 char *s, u_int32_t slen) {
-  u_int16_t l = htonl(slen);
+					 char *s, u_int16_t slen) {
+  u_int16_t l = htons(slen);
 
   memcpy(&serializer->buffer[serializer->size_used], &l, sizeof(u_int16_t));
   serializer->size_used += sizeof(u_int16_t);
 
-  memcpy(&serializer->buffer[serializer->size_used], s, slen);
+  if (slen > 0)
+    memcpy(&serializer->buffer[serializer->size_used], s, slen);
+
   serializer->size_used += slen;
 }
 
@@ -836,7 +838,7 @@ static void ndpi_serialize_single_string(ndpi_serializer *serializer,
 
 static void ndpi_deserialize_single_uint32(ndpi_serializer *deserializer,
 					   u_int32_t *s) {
-  *s = ntohl(*(u_int32_t*)&deserializer->buffer[deserializer->size_used]);
+  *s = ntohl(*((u_int32_t *) &deserializer->buffer[deserializer->size_used]));
   deserializer->size_used += sizeof(u_int32_t);
 }
 
@@ -855,7 +857,7 @@ static void ndpi_deserialize_single_string(ndpi_serializer *deserializer,
   v->str_len = ntohs(*((u_int16_t *) &deserializer->buffer[deserializer->size_used]));
   deserializer->size_used += sizeof(u_int16_t);
 
-  v->str = (char*)&deserializer->buffer[deserializer->size_used];
+  v->str = (char*) &deserializer->buffer[deserializer->size_used];
   deserializer->size_used += v->str_len;
 }
 
@@ -942,7 +944,7 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
 
 int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
 				 u_int32_t key, char *value) {
-  u_int32_t slen = strlen(value);
+  u_int16_t slen = strlen(value);
   u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
   u_int32_t needed = 
     sizeof(u_int8_t) /* type */ + 
@@ -973,7 +975,7 @@ int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
 
 int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
 				 char *key, u_int32_t value) {
-  u_int32_t klen = strlen(key);
+  u_int16_t klen = strlen(key);
   u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
   u_int32_t needed = 
     sizeof(u_int8_t) /* type */ + 
@@ -1004,7 +1006,7 @@ int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
 
 int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
 				 char *key, u_int64_t value) {
-  u_int32_t klen = strlen(key);
+  u_int16_t klen = strlen(key);
   u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
   u_int32_t needed = 
     sizeof(u_int8_t) /* type */ +
@@ -1035,7 +1037,7 @@ int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
 
 int ndpi_serialize_string_string(ndpi_serializer *serializer,
 				 char *key, char *value) {
-  u_int32_t klen = strlen(key), vlen = strlen(value);
+  u_int16_t klen = strlen(key), vlen = strlen(value);
   u_int32_t needed = 
     sizeof(u_int8_t) /* type */ + 
     sizeof(u_int16_t) /* key len */ + 
