@@ -58,7 +58,9 @@
 
 #include "ndpi_util.h"
 
+
 /** Client parameters **/
+
 static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interfaces */
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
 static FILE *results_file           = NULL;
@@ -830,6 +832,15 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
+
+    //fprintf(out, "[Num_Packt_Human_Readable_String: %d]", flow->n_pckt_human_readable_string);
+
+
+    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_HTTP ) && (flow->n_pckt_human_readable_string == 0) ) printf("!WARNING!");
+    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_FTP_CONTROL) && (flow->n_pckt_human_readable_string == 0) ) printf("!WARNING!");
+    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_NTP ) && (flow->n_pckt_human_readable_string != 0) ) printf("!WARNING!");
+    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_IP_ICMP ) && (flow->n_pckt_human_readable_string != 0) ) printf("!WARNING!");
+    //if( (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_VNC ) && (flow->n_pckt_human_readable_string != 0 ) ) printf("!WARNING!");
 
     fprintf(out, "\n");
   } else {
@@ -1934,7 +1945,7 @@ void printPortStats(struct port_stats *stats) {
 
 /* *********************************************** */
 
-static void printFlowsStats() {   
+static void printFlowsStats() {
   if(verbose) {
     int thread_id;
     FILE *out = results_file ? results_file : stdout;
@@ -1998,10 +2009,10 @@ static void printFlowsStats() {
 	  } else {
 	    //host already in the hash table
 	    ndpi_ja3_info *infoFound = NULL;
-	    
+
 	    HASH_FIND_STR(ja3ByHostFound->host_client_info_hasht,
 			  all_flows[i].flow->ssh_ssl.ja3_client, infoFound);
-	    
+
 	    if(infoFound == NULL){
 	      ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
 	      newJA3->ja3 = all_flows[i].flow->ssh_ssl.ja3_client;
@@ -2040,7 +2051,7 @@ static void printFlowsStats() {
 	    }
 	  }
 	}
-	
+
 	if(all_flows[i].flow->ssh_ssl.ja3_server[0] != '\0'){
 	  //looking if the host is already in the hash table
 	  HASH_FIND_INT(ja3ByHostsHashT, &(all_flows[i].flow->dst_ip), ja3ByHostFound);
@@ -2112,7 +2123,7 @@ static void printFlowsStats() {
 	ndpi_ja3_fingerprints_host *tmp3 = NULL;
 	ndpi_ip_dns *innerHashEl = NULL;
 	ndpi_ip_dns *tmp4 = NULL;
-      
+
 	if(verbose == 2) {
 	  /* for each host the number of flow with a ja3 fingerprint is printed */
 	  i = 1;
@@ -2268,7 +2279,7 @@ static void printFlowsStats() {
 	  HASH_DEL(hostByJA3C_ht, hostByJA3Element);
 	  free(hostByJA3Element);
 	}
-	
+
 	hostByJA3Element = NULL;
 	HASH_ITER(hh, hostByJA3S_ht, hostByJA3Element, tmp3) {
 	  HASH_ITER(hh, hostByJA3S_ht->ipToDNS_ht, innerHashEl, tmp4) {
@@ -2282,14 +2293,14 @@ static void printFlowsStats() {
     }
 
     /* Print all flows stats */
-    
+
     qsort(all_flows, num_flows, sizeof(struct flow_info), cmpFlows);
 
     if(verbose > 1) {
-      for(i=0; i<num_flows; i++)
-	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
+    for(i=0; i<num_flows; i++)
+        printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
     }
-    
+
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
       if(ndpi_thread_info[thread_id].workflow->stats.protocol_counter[0 /* 0 = Unknown */] > 0) {
 	if(!json_flag) {
@@ -2319,7 +2330,7 @@ static void printFlowsStats() {
       printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
 
     free(all_flows);
-  }  
+  }
 }
 
 /* *********************************************** */
@@ -2793,7 +2804,10 @@ static void ndpi_process_packet(u_char *args,
   /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
 
-  /* ndpi_has_human_readeable_string(ndpi_info_mod, (char*)packet, header->caplen, 3); */
+  ndpi_thread_info[thread_id].workflow->hrs = 0;
+  if (ndpi_has_human_readeable_string(ndpi_info_mod, (char*)packet, header->caplen) == 1) {
+    ndpi_thread_info[thread_id].workflow->hrs = 1;
+  }
 
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
@@ -3125,7 +3139,7 @@ void serializerUnitTest() {
 	  vs.str[vs.str_len] = bkp;
 	}
 	break;
-
+		  
       case ndpi_serialization_string_string:
 	assert(ndpi_deserialize_string_string(&deserializer, &ks, &vs) != -1);
 	if(trace) {
@@ -3783,10 +3797,13 @@ int orginal_main(int argc, char **argv) {
     for(i=0; i<num_loops; i++)
       test_lib();
 
+
+
     if(results_path)  free(results_path);
     if(results_file)  fclose(results_file);
     if(extcap_dumper) pcap_dump_close(extcap_dumper);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
+
 
     return 0;
   }

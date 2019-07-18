@@ -128,6 +128,7 @@ typedef struct ndpi_flow_info {
   u_int64_t last_seen;
   u_int64_t src2dst_bytes, dst2src_bytes;
   u_int32_t src2dst_packets, dst2src_packets;
+  u_int32_t n_pckt_human_readable_string;
 
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
@@ -199,6 +200,9 @@ typedef struct ndpi_workflow {
   void **ndpi_flows_root;
   struct ndpi_detection_module_struct *ndpi_struct;
   u_int32_t num_allocated_flows;
+  
+  int hrs;
+  
 } ndpi_workflow_t;
 
 

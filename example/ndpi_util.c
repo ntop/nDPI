@@ -263,7 +263,7 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
      )
      )
     return(0);
-  
+
   if(fa->src_ip   < fb->src_ip  ) return(-1); else { if(fa->src_ip   > fb->src_ip  ) return(1); }
   if(fa->src_port < fb->src_port) return(-1); else { if(fa->src_port > fb->src_port) return(1); }
   if(fa->dst_ip   < fb->dst_ip  ) return(-1); else { if(fa->dst_ip   > fb->dst_ip  ) return(1); }
@@ -459,10 +459,31 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
       *src = newflow->src_id, *dst = newflow->dst_id;
 
+      if(workflow->hrs == 1){
+       /* count if no SSL protocol */
+        if((newflow->detected_protocol.app_protocol != NDPI_PROTOCOL_SSL)
+            && (newflow->detected_protocol.master_protocol != NDPI_PROTOCOL_SSL)){
+                newflow->n_pckt_human_readable_string++;
+        }
+      }
+
       return newflow;
     }
   } else {
     struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)ret;
+
+    if(workflow->hrs == 1){
+    /* count if no SSL protocol */
+        if((flow->detected_protocol.app_protocol != NDPI_PROTOCOL_SSL)
+            && (flow->detected_protocol.master_protocol != NDPI_PROTOCOL_SSL)){
+                flow->n_pckt_human_readable_string++;
+        }
+
+    }
+    if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
+            || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)){
+                flow->n_pckt_human_readable_string = 0;
+    }
 
     if(is_changed) {
       if(flow->src_ip == iph->saddr
@@ -572,7 +593,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.server_certificate);
       snprintf(flow->ssh_ssl.server_organization, sizeof(flow->ssh_ssl.server_organization), "%s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);      
+	       flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);
       snprintf(flow->ssh_ssl.ja3_client, sizeof(flow->ssh_ssl.ja3_client), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client);
       snprintf(flow->ssh_ssl.ja3_server, sizeof(flow->ssh_ssl.ja3_server), "%s",
@@ -656,11 +677,11 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     u_int enough_packets =
       (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > 8))
        || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) ? 1 : 0;
-    
+
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time, src, dst);
-  
+
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
 	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
@@ -669,20 +690,20 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       else {
 	/* New protocol detected or give up */
 	flow->detection_completed = 1;
-	
+
 	/* Check if we should keep checking extra packets */
 	if(ndpi_flow && ndpi_flow->check_extra_packets)
 	  flow->check_extra_packets = 1;
-	
+
 	if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
 	  flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
 							  enable_protocol_guess);
-	
+
 	process_ndpi_collected_info(workflow, flow);
       }
     }
   }
-  
+
   return(flow->detected_protocol);
 }
 
@@ -759,7 +780,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 #else
   datalink_type = (int)pcap_datalink(workflow->pcap_handle);
 #endif
-  
+
 datalink_check:
   switch(datalink_type) {
   case DLT_NULL:
