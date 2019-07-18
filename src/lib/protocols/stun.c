@@ -51,13 +51,17 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   const u_int8_t * payload,
 					   const u_int16_t payload_length,
 					   u_int8_t *is_whatsapp,
-					   u_int8_t *is_messenger) {
+					   u_int8_t *is_messenger,
+					   u_int8_t *is_duo
+					   ) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
   u_int8_t can_this_be_whatsapp_voice = 1;
 
   /* STUN over TCP does not look good */
   if(flow->packet.tcp) return(NDPI_IS_NOT_STUN);
+
+  *is_whatsapp = 0, *is_messenger = 0, *is_duo = 0;
   
   flow->protos.stun_ssl.stun.num_processed_pkts++;
 
@@ -133,8 +137,15 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  break;
 
 	case 0xC057: /* Messeger */
-	  if(msg_type == 0x0001) *is_messenger = 1;
-	  return(NDPI_IS_STUN);
+	  if(msg_type == 0x0001) {
+	    if((msg_len == 100) || (msg_len == 104)) {
+	      *is_messenger = 1;
+	      return(NDPI_IS_STUN);
+	    } else if(msg_len == 76) {
+	      *is_duo = 1;
+	      return(NDPI_IS_STUN);
+	    }
+	  }
 	  break;
 	  
 	case 0x8054: /* Candidate Identifier */
@@ -217,7 +228,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int8_t is_whatsapp = 0, is_messenger = 0;
+  u_int8_t is_whatsapp = 0, is_messenger = 0, is_duo = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 
@@ -232,11 +243,14 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
       if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
 			     packet->payload_packet_len - 2,
-			     &is_whatsapp, &is_messenger) == NDPI_IS_STUN) {
+			     &is_whatsapp, &is_messenger, &is_duo) == NDPI_IS_STUN) {
 	if(flow->guessed_protocol_id == 0) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
 	if(is_messenger) {
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
+	  return;
+	} else if(is_duo) {
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GOOGLE_DUO, NDPI_PROTOCOL_STUN);
 	  return;
 	} else if(flow->protos.stun_ssl.stun.is_skype) {
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
@@ -255,11 +269,15 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   }
 
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
-			 packet->payload_packet_len, &is_whatsapp, &is_messenger) == NDPI_IS_STUN) {
+			 packet->payload_packet_len,
+			 &is_whatsapp, &is_messenger, &is_duo) == NDPI_IS_STUN) {
     if(flow->guessed_protocol_id == 0) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
     if(is_messenger) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
+      return;
+    } else if(is_duo) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GOOGLE_DUO, NDPI_PROTOCOL_STUN);
       return;
     } else if(flow->protos.stun_ssl.stun.is_skype) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
