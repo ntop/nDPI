@@ -3,7 +3,7 @@ CXX=@CXX@
 CFLAGS=-g -I../src/include @CFLAGS@
 LIBNDPI=../src/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread @LDFLAGS@
-OBJS=ndpiReader.o ndpi_util.o
+OBJS=ndpiReader.o reader_util.o
 PREFIX?=@prefix@
 
 all: ndpiReader @DPDK_TARGET@

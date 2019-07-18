@@ -655,7 +655,7 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
   if(buffer_size <= 0)
     return(0);
-
+  
   outbuf_len--;
   outbuf[outbuf_len] = '\0';
   

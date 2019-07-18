@@ -56,7 +56,7 @@
 #include <json.h>
 #endif
 
-#include "ndpi_util.h"
+#include "reader_util.h"
 
 
 /** Client parameters **/
@@ -1582,7 +1582,6 @@ static void terminateDetection(u_int16_t thread_id) {
  * @brief Traffic stats format
  */
 char* formatTraffic(float numBits, int bits, char *buf) {
-
   char unit;
 
   if(bits)
@@ -3745,7 +3744,7 @@ int orginal_main(int argc, char **argv) {
 
     /* Internal checks */
     automataUnitTest();
-    serializerUnitTest();
+    // serializerUnitTest();
 
     gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module();

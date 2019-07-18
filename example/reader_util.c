@@ -72,7 +72,7 @@
 #endif
 
 #include "ndpi_main.h"
-#include "ndpi_util.h"
+#include "reader_util.h"
 
 extern u_int8_t enable_protocol_guess;
 extern u_int8_t verbose;
@@ -651,13 +651,10 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
     flow->last_seen = time;
 
-    if(verbose) {
-    }
-      
     if(!flow->has_human_readeable_strings) {
       u_int8_t skip = 0;
       
-      if((iph->protocol == IPPROTO_TCP)
+      if((proto == IPPROTO_TCP)
 	 && (
 	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
@@ -677,7 +674,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	  flow->has_human_readeable_strings = 1;
       }
     } else {
-      if((iph->protocol == IPPROTO_TCP)
+      if((proto == IPPROTO_TCP)
 	 && (
 	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
