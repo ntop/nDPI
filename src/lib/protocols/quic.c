@@ -78,20 +78,28 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->udp != NULL
      && (udp_len > (quic_hlen+4 /* QXXX */))
-     && ((packet->payload[0] & 0xC2) == 0x00)
+     // && ((packet->payload[0] & 0xC2) == 0x00)
      && (quic_ports(ntohs(packet->udp->source), ntohs(packet->udp->dest)))
      ) {
     int i;
 
-    if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
-      goto no_quic;
 
-    NDPI_LOG_INFO(ndpi_struct, "found QUIC\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
-
-    if(packet->payload[quic_hlen+12] != 0xA0)
-      quic_hlen++;
-	     
+    if((packet->payload[1] == 'Q')
+       && (packet->payload[2] == '0')
+       && (packet->payload[3] == '4')
+       && (packet->payload[4] == '6'))
+      quic_hlen = 18; /* TODO: Better handle Q046 */
+    else {
+      if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
+	goto no_quic;
+      
+      NDPI_LOG_INFO(ndpi_struct, "found QUIC\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
+      
+      if(packet->payload[quic_hlen+12] != 0xA0)
+	quic_hlen++;
+    }
+    
     if(udp_len > quic_hlen + 16 + 4) {
       if(!strncmp((char*)&packet->payload[quic_hlen+16], "CHLO" /* Client Hello */, 4)) {
 	/* Check if SNI (Server Name Identification) is present */
