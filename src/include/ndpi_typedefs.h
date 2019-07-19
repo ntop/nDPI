@@ -1280,6 +1280,7 @@ typedef struct {
   u_int32_t buffer_size, size_used;
   ndpi_serialization_format fmt;
   u_int8_t *buffer;
+  char *json_buffer;
 } ndpi_serializer;
 
 #define ndpi_deserializer ndpi_serializer
