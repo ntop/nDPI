@@ -822,7 +822,7 @@ static void ndpi_serialize_single_uint64(ndpi_serializer *serializer,
 /* ********************************** */
 
 static void ndpi_serialize_single_string(ndpi_serializer *serializer,
-					 char *s, u_int16_t slen) {
+					 const char *s, u_int16_t slen) {
   u_int16_t l = htons(slen);
 
   memcpy(&serializer->buffer[serializer->size_used], &l, sizeof(u_int16_t));
@@ -857,7 +857,7 @@ static void ndpi_deserialize_single_string(ndpi_serializer *deserializer,
   v->str_len = ntohs(*((u_int16_t *) &deserializer->buffer[deserializer->size_used]));
   deserializer->size_used += sizeof(u_int16_t);
 
-  v->str = (char*) &deserializer->buffer[deserializer->size_used];
+  v->str = (char *) &deserializer->buffer[deserializer->size_used];
   deserializer->size_used += v->str_len;
 }
 
@@ -898,7 +898,7 @@ int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer,
   }
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    serializer->size_used += snprintf((char*)serializer->buffer, buff_diff, "%s\"%u\":%u",
+    serializer->size_used += snprintf((char *) serializer->buffer, buff_diff, "%s\"%u\":%u",
 				      (serializer->size_used > 2) ? "," : "",
 				      key, value);
   } else {
@@ -927,7 +927,7 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
   }
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    serializer->size_used += snprintf((char*)serializer->buffer, buff_diff, "%s\"%u\":%llu",
+    serializer->size_used += snprintf((char *) serializer->buffer, buff_diff, "%s\"%u\":%llu",
 				      (serializer->size_used > 2) ? "," : "",
 				      key, (unsigned long long)value);
   } else {
@@ -943,7 +943,7 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
 /* ********************************** */
 
 int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
-				 u_int32_t key, char *value) {
+				 u_int32_t key, const char *value) {
   u_int16_t slen = strlen(value);
   u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
   u_int32_t needed = 
@@ -960,7 +960,7 @@ int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
   serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_string;
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    serializer->size_used += snprintf((char*)serializer->buffer, buff_diff, "%s\"%u\":\"%s\"",
+    serializer->size_used += snprintf((char *) serializer->buffer, buff_diff, "%s\"%u\":\"%s\"",
 				      (serializer->size_used > 2) ? "," : "",
 				      key, value);
   } else {
@@ -974,7 +974,7 @@ int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
 /* ********************************** */
 
 int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
-				 char *key, u_int32_t value) {
+				 const char *key, u_int32_t value) {
   u_int16_t klen = strlen(key);
   u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
   u_int32_t needed = 
@@ -991,7 +991,7 @@ int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
   serializer->buffer[serializer->size_used++] = ndpi_serialization_string_uint32;
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    serializer->size_used += snprintf((char*)serializer->buffer, buff_diff, "%s\"%s\":%u",
+    serializer->size_used += snprintf((char *) serializer->buffer, buff_diff, "%s\"%s\":%u",
 				      (serializer->size_used > 2) ? "," : "",
 				      key, value);
   } else {
@@ -1005,7 +1005,7 @@ int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
 /* ********************************** */
 
 int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
-				 char *key, u_int64_t value) {
+				 const char *key, u_int64_t value) {
   u_int16_t klen = strlen(key);
   u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
   u_int32_t needed = 
@@ -1022,7 +1022,7 @@ int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
   serializer->buffer[serializer->size_used++] = ndpi_serialization_string_uint64;
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    serializer->size_used += snprintf((char*)serializer->buffer, buff_diff, "%s\"%s\":%llu",
+    serializer->size_used += snprintf((char *) serializer->buffer, buff_diff, "%s\"%s\":%llu",
 				      (serializer->size_used > 2) ? "," : "",
 				      key, (unsigned long long)value);
   } else {
@@ -1036,7 +1036,7 @@ int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
 /* ********************************** */
 
 int ndpi_serialize_string_string(ndpi_serializer *serializer,
-				 char *key, char *value) {
+				 const char *key, const char *value) {
   u_int16_t klen = strlen(key), vlen = strlen(value);
   u_int32_t needed = 
     sizeof(u_int8_t) /* type */ + 
@@ -1054,7 +1054,7 @@ int ndpi_serialize_string_string(ndpi_serializer *serializer,
   serializer->buffer[serializer->size_used++] = ndpi_serialization_string_string;
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    serializer->size_used += snprintf((char*)serializer->buffer, buff_diff, "%s\"%s\":\"%s\"",
+    serializer->size_used += snprintf((char *) serializer->buffer, buff_diff, "%s\"%s\":\"%s\"",
 				      (serializer->size_used > 2) ? "," : "",
 				      key, value);
   } else {
