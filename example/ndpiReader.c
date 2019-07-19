@@ -3746,7 +3746,7 @@ int orginal_main(int argc, char **argv) {
 
     /* Internal checks */
     automataUnitTest();
-    // serializerUnitTest();
+    serializerUnitTest();
 
     gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module();
