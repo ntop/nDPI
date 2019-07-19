@@ -7,6 +7,29 @@ matrix:
 
     - os: linux
       compiler: gcc
+      script:
+        - ./configure --disable-json-c
+        - make
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    # - os: linux
+      # compiler: gcc
+      # script:
+        # - ./configure --with-hyperscan
+      # addons:
+        # apt:
+          # packages:
+            # - libpcap-dev
+            # - autogen
+            # - libjson-c-dev
+            # - libhyperscan-dev
+
+    - os: linux
+      compiler: gcc
       addons:
         apt:
           packages:
@@ -87,7 +110,7 @@ matrix:
   - eval "${MATRIX_EVAL}"
 
 before_script:
-  - ./autogen.sh
+  - autoreconf -vfi
 #  - lcov --directory . --zerocounters
 
 script:
