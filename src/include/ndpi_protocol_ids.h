@@ -240,7 +240,7 @@ typedef enum {
   NDPI_PROTOCOL_GITHUB                = 203,
   NDPI_PROTOCOL_BJNP                  = 204,
   NDPI_PROTOCOL_LINE                  = 205, /* https://en.wikipedia.org/wiki/Line_(software) */
-  NDPI_PROTOCOL_FREE206               = 206, /* Free */
+  NDPI_PROTOCOL_WIREGUARD             = 206,
   NDPI_PROTOCOL_SMPP                  = 207, /* Damir Franusic <df@release14.org> */
   NDPI_PROTOCOL_DNSCRYPT              = 208,
   NDPI_PROTOCOL_TINC                  = 209, /* William Guglielmo <william@deselmo.com> */
