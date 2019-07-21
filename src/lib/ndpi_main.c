@@ -4088,8 +4088,14 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(ret.master_protocol == NDPI_PROTOCOL_STUN) {
     if(ret.app_protocol == NDPI_PROTOCOL_FACEBOOK)
       ret.app_protocol = NDPI_PROTOCOL_MESSENGER;
-    else if(ret.app_protocol == NDPI_PROTOCOL_GOOGLE)
+    else if(ret.app_protocol == NDPI_PROTOCOL_GOOGLE) {
+      /*
+	As Google has recently introduced Duo,
+	we need to distinguish between it and hangout
+	thing that should be handled by the STUN dissector
+      */
       ret.app_protocol = NDPI_PROTOCOL_HANGOUT;
+    }
   }
 
   if(enable_guess

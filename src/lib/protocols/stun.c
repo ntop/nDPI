@@ -62,13 +62,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   if(flow->packet.tcp) return(NDPI_IS_NOT_STUN);
 
   *is_whatsapp = 0, *is_messenger = 0, *is_duo = 0;
-  
-  flow->protos.stun_ssl.stun.num_processed_pkts++;
 
   if(payload_length < sizeof(struct stun_packet_header)) {
+    /* This looks like an invlid packet */
+
     if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
       *is_whatsapp = 1;
-      return NDPI_IS_STUN; /* This is WhatsApp Voice */
+      return(NDPI_IS_STUN); /* This is WhatsApp Voice */
     } else
       return(NDPI_IS_NOT_STUN);
   }
@@ -80,9 +80,19 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   }
 
   msg_type = ntohs(h->msg_type) /* & 0x3EEF */, msg_len = ntohs(h->msg_len);
- 
-  if(msg_type == 0x01 /* Binding Request */)
+
+  /* https://www.iana.org/assignments/stun-parameters/stun-parameters.xhtml */
+  if(msg_type > 0x000C)
+    return(NDPI_IS_NOT_STUN);
+
+  if(msg_type == 0x01 /* Binding Request */) {
     flow->protos.stun_ssl.stun.num_binding_requests++;
+    if((msg_len == 0)  && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_GOOGLE)) {
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_GOOGLE_DUO;
+    }
+  }
+  
+  flow->protos.stun_ssl.stun.num_udp_pkts++;
 
   /*
     printf("[msg_type: %04X][payload_length: %u][num_binding_request: %u]\n",
@@ -93,24 +103,25 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       && (payload_length < 512)
       && ((msg_len+20) <= payload_length)) /* WhatsApp Voice */) {
     *is_whatsapp = 1;
-    return NDPI_IS_STUN; /* This is WhatsApp Voice */
+    return(NDPI_IS_STUN); /* This is WhatsApp Voice */
   } else if((payload[0] == 0x90)
 	    && (((msg_len+11) == payload_length) /* WhatsApp Video */
 		|| (flow->protos.stun_ssl.stun.num_binding_requests >= 4))) {
     *is_whatsapp = 2;
-    return NDPI_IS_STUN; /* This is WhatsApp Video */
+    return(NDPI_IS_STUN); /* This is WhatsApp Video */
   }
 
-  if((payload[0] != 0x80) && ((msg_len+20) > payload_length)) {
+  if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
     return(NDPI_IS_NOT_STUN);
-  }
+  else
+    flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
   
   if(payload_length == (msg_len+20)) {
     if(msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */ {
       u_int offset = 20;
 
       // printf("[%02X][%02X][%02X][%02X][payload_length: %u]\n", payload[offset], payload[offset+1], payload[offset+2], payload[offset+3],payload_length);
-      
+
       /*
 	This can either be the standard RTCP or Ms Lync RTCP that
 	later will become Ms Lync RTP. In this case we need to
@@ -147,7 +158,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	    }
 	  }
 	  break;
-	  
+
 	case 0x8054: /* Candidate Identifier */
 	  if((len == 4)
 	     && ((offset+7) < payload_length)
@@ -199,19 +210,19 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       goto udp_stun_found;
     } else if(msg_type == 0x0800) {
       *is_whatsapp = 1;
-      return NDPI_IS_STUN; /* This is WhatsApp */
+      return(NDPI_IS_STUN); /* This is WhatsApp */
     }
   }
 
   if((flow->protos.stun_ssl.stun.num_udp_pkts > 0) && (msg_type <= 0x00FF)) {
     *is_whatsapp = 1;
-    return NDPI_IS_STUN; /* This is WhatsApp Voice */
+    return(NDPI_IS_STUN); /* This is WhatsApp Voice */
   } else
-    return NDPI_IS_NOT_STUN;
+    return(NDPI_IS_NOT_STUN);
 
  udp_stun_found:
   if(can_this_be_whatsapp_voice) {
-    flow->protos.stun_ssl.stun.num_udp_pkts++;
+    flow->protos.stun_ssl.stun.num_processed_pkts++;
 
     return((flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
   } else {
@@ -220,7 +231,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       like GoogleHangout that might be candidates, thus we set the
       guessed protocol to STUN
     */
-    flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
     return(NDPI_IS_NOT_STUN);
   }
 }
@@ -268,6 +278,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     }
   }
 
+  /* UDP */
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
 			 packet->payload_packet_len,
 			 &is_whatsapp, &is_messenger, &is_duo) == NDPI_IS_STUN) {
@@ -288,7 +299,8 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     } else {
       NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
       ndpi_int_stun_add_connection(ndpi_struct,
-				   is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO) : NDPI_PROTOCOL_STUN,
+				   is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO)
+				   : NDPI_PROTOCOL_STUN,
 				   flow);
     }
 
