@@ -1006,9 +1006,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Line", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GOOGLE_DUO,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE206,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "GoogleDuo", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "Free206", NDPI_PROTOCOL_CATEGORY_MEDIA,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PPSTREAM,
@@ -1659,7 +1659,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "DRDA", NDPI_PROTOCOL_CATEGORY_DATABASE,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),       /* TCP */
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HANGOUT,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HANGOUT_DUO,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -4096,7 +4096,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	we need to distinguish between it and hangout
 	thing that should be handled by the STUN dissector
       */
-      ret.app_protocol = NDPI_PROTOCOL_HANGOUT;
+      ret.app_protocol = NDPI_PROTOCOL_HANGOUT_DUO;
     }
   }
 

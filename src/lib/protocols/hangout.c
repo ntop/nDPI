@@ -20,7 +20,7 @@
 
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HANGOUT
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HANGOUT_DUO
 
 #include "ndpi_api.h"
 
@@ -89,7 +89,7 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
        ||
        ((packet->tcp != NULL) && (isHangoutTCPPort(ntohs(packet->tcp->source)) || isHangoutTCPPort(ntohs(packet->tcp->dest))))) {
       NDPI_LOG_INFO(ndpi_struct, "found Hangout\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
@@ -102,7 +102,7 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
 void init_hangout_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
 			    NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("GoogleHangout", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_HANGOUT,
+				      NDPI_PROTOCOL_HANGOUT_DUO,
 				      ndpi_search_hangout,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,

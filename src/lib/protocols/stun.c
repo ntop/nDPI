@@ -88,7 +88,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   if(msg_type == 0x01 /* Binding Request */) {
     flow->protos.stun_ssl.stun.num_binding_requests++;
     if((msg_len == 0)  && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_GOOGLE)) {
-      flow->guessed_host_protocol_id = NDPI_PROTOCOL_GOOGLE_DUO;
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
     }
   }
   
@@ -261,7 +261,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
 	  return;
 	} else if(is_duo) {
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GOOGLE_DUO, NDPI_PROTOCOL_STUN);
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
 	  return;
 	} else if(flow->protos.stun_ssl.stun.is_skype) {
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
@@ -289,7 +289,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
       return;
     } else if(is_duo) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GOOGLE_DUO, NDPI_PROTOCOL_STUN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
       return;
     } else if(flow->protos.stun_ssl.stun.is_skype) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
