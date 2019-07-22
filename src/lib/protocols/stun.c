@@ -143,6 +143,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	case 0x0008: /* Message Integrity */
 	case 0x0020: /* XOR-MAPPED-ADDRESSES */
 	case 0x4000:
+	case 0x4001:
 	case 0x4002:
 	  /* These are the only messages apparently whatsapp voice can use */
 	  break;
@@ -223,7 +224,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
  udp_stun_found:
   if(can_this_be_whatsapp_voice) {
     flow->protos.stun_ssl.stun.num_processed_pkts++;
-
+    flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_VOICE;
     return((flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
   } else {
     /*

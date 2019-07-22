@@ -4074,12 +4074,14 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
      && (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
   check_stun_export:
-    if(flow->protos.stun_ssl.stun.num_processed_pkts > 0) {
-      if(/* (flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
-	 flow->protos.stun_ssl.stun.is_skype) {
+    if(flow->protos.stun_ssl.stun.num_processed_pkts || flow->protos.stun_ssl.stun.num_udp_pkts) {
+      // if(/* (flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
+      if(flow->protos.stun_ssl.stun.num_processed_pkts && flow->protos.stun_ssl.stun.is_skype) {
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
       } else
-	ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN);
+	ndpi_set_detected_protocol(ndpi_struct, flow,
+				   flow->guessed_host_protocol_id,
+				   NDPI_PROTOCOL_STUN);
     }
   }
 
