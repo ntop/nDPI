@@ -3184,6 +3184,7 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
         snprintf(&filter[l], sizeof(filter)-l, "%d", port_array[i]);
       else
         snprintf(&filter[l], sizeof(filter)-l, "%d or ", port_array[i]);
+      
       i++;
     }
 
@@ -3197,10 +3198,9 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
     int l;
 
     if(port_array[0] != INIT_VAL)
-      strncat(filter, " and not (src ", sizeof(filter)/sizeof(char));
+      strncat(filter, " and not (src ", sizeof(filter)-strlen(filter));
     else
       strcpy(filter, "not (src ");
-
 
     i=0;
     while(i < sh_size && src_host_array[i] != NULL) {
@@ -3224,7 +3224,7 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
     int l;
 
     if(port_array[0] != INIT_VAL || src_host_array[0] != NULL)
-      strncat(filter, " and not (dst ", sizeof(filter)/sizeof(char));
+      strncat(filter, " and not (dst ", sizeof(filter)-strlen(filter));
     else
       strcpy(filter, "not (dst ");
 
