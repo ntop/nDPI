@@ -3168,18 +3168,16 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
                                 int sh_size,
                                 const char *dst_host_array[16],
                                 int dh_size) {
-  char filter[2048];
+  char filter[2048] = { '\0' };
   int produced = 0;
-  int i = 0;
+  int i = 0, l = 0;
 
   if(port_array[0] != INIT_VAL) {
-    int l;
-
     strcpy(filter, "not (src port ");
 
+    l = strlen(filter);
+    
     while(i < p_size && port_array[i] != INIT_VAL) {
-      l = strlen(filter);
-
       if(i+1 == p_size || port_array[i+1] == INIT_VAL)
         snprintf(&filter[l], sizeof(filter)-l, "%d", port_array[i]);
       else
@@ -3188,65 +3186,52 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
       i++;
     }
 
-    l = strlen(filter);
-    snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    l += snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
 
 
   if(src_host_array[0] != NULL) {
-    int l;
-
     if(port_array[0] != INIT_VAL)
-      strncat(filter, " and not (src ", sizeof(filter)-strlen(filter));
+      l += snprintf(&filter[l], sizeof(filter)-l, " and not (src ");
     else
-      strcpy(filter, "not (src ");
+      l += snprintf(&filter[l], sizeof(filter)-l, "not (src ");
+    
+    i = 0;
 
-    i=0;
     while(i < sh_size && src_host_array[i] != NULL) {
-      l = strlen(filter);
-
       if(i+1 == sh_size || src_host_array[i+1] == NULL)
-	snprintf(&filter[l], sizeof(filter)-l, "%s", src_host_array[i]);
+	l += snprintf(&filter[l], sizeof(filter)-l, "%s", src_host_array[i]);
       else
-	snprintf(&filter[l], sizeof(filter)-l, "%s or ", src_host_array[i]);
+	l += snprintf(&filter[l], sizeof(filter)-l, "%s or ", src_host_array[i]);
 
       i++;
     }
-
-    l = strlen(filter);
-    snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    
+    l += snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
-
 
   if(dst_host_array[0] != NULL) {
-    int l;
-
     if(port_array[0] != INIT_VAL || src_host_array[0] != NULL)
-      strncat(filter, " and not (dst ", sizeof(filter)-strlen(filter));
+      l += snprintf(&filter[l], sizeof(filter)-l, " and not (dst ");
     else
-      strcpy(filter, "not (dst ");
+      l += snprintf(&filter[l], sizeof(filter)-l, "not (dst ");
 
     i=0;
 
-    while(i < dh_size && dst_host_array[i] != NULL) {
-      l = strlen(filter);
-
+    while(i < dh_size && dst_host_array[i] != NULL) {     
       if(i+1 == dh_size || dst_host_array[i+1] == NULL)
-	snprintf(&filter[l], sizeof(filter)-l, "%s", dst_host_array[i]);
+	l += snprintf(&filter[l], sizeof(filter)-l, "%s", dst_host_array[i]);
       else
-	snprintf(&filter[l], sizeof(filter)-l, "%s or ", dst_host_array[i]);
+	l += snprintf(&filter[l], sizeof(filter)-l, "%s or ", dst_host_array[i]);
 
       i++;
     }
 
-    l = strlen(filter);
-    snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    l +=  snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
-
-
 
   if(produced)
     json_object_object_add(*jObj_bpfFilter, "pkt.peak.filter", json_object_new_string(filter));
