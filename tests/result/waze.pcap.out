@@ -27,7 +27,7 @@ JA3 Host Stats:
 	14	TCP 10.8.0.1:45529 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][9 pkts/591 bytes <-> 8 pkts/3424 bytes][Host: roadshields.waze.com][PLAIN TEXT (GET /images/HD/CH)]
 	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 91.126/SSL.Google][cat: Web/5][7 pkts/1137 bytes <-> 6 pkts/1005 bytes][TLSv1][JA3C: f8f5b71e02603b283e55b50d17ede861][JA3S: 23f1f6e2f0015c166df49fdab4280370 (INSECURE)][Cipher: TLS_ECDHE_RSA_WITH_RC4_128_SHA]
 	16	TCP 10.8.0.1:45536 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][8 pkts/594 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com][PLAIN TEXT (GET /lang)]
-	17	TCP 10.8.0.1:50828 <-> 108.168.176.228:443 [proto: 142/WhatsApp][cat: Chat/9][8 pkts/673 bytes <-> 7 pkts/668 bytes]
+	17	TCP 10.8.0.1:50828 <-> 108.168.176.228:443 [proto: 142/WhatsApp][cat: Chat/9][8 pkts/673 bytes <-> 7 pkts/668 bytes][PLAIN TEXT (Android)]
 	18	TCP 10.8.0.1:45546 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/557 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com][PLAIN TEXT (GET /newV)]
 	19	TCP 10.8.0.1:45538 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/555 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com][PLAIN TEXT (GET /lang)]
 	20	TCP 10.8.0.1:45552 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/552 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com][PLAIN TEXT (GET /langs/1.0/lang.portuguese)]

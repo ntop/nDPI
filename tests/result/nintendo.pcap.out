@@ -7,9 +7,9 @@ JA3 Host Stats:
 	1	 192.168.12.114           	 1      
 
 
-	1	UDP 192.168.12.114:55915 <-> 185.118.169.65:27520 [proto: 173/Nintendo][cat: Game/8][169 pkts/61414 bytes <-> 278 pkts/126260 bytes]
+	1	UDP 192.168.12.114:55915 <-> 185.118.169.65:27520 [proto: 173/Nintendo][cat: Game/8][169 pkts/61414 bytes <-> 278 pkts/126260 bytes][PLAIN TEXT (pluHnq)]
 	2	UDP 192.168.12.114:55915 <-> 93.237.131.235:56066 [proto: 173/Nintendo][cat: Game/8][122 pkts/48332 bytes <-> 35 pkts/5026 bytes]
-	3	UDP 192.168.12.114:55915 <-> 81.61.158.138:51769 [proto: 173/Nintendo][cat: Game/8][122 pkts/46476 bytes <-> 38 pkts/5268 bytes]
+	3	UDP 192.168.12.114:55915 <-> 81.61.158.138:51769 [proto: 173/Nintendo][cat: Game/8][122 pkts/46476 bytes <-> 38 pkts/5268 bytes][PLAIN TEXT (FutwCa)]
 	4	TCP 54.187.10.185:443 <-> 192.168.12.114:48328 [proto: 64.178/SSL_No_Cert.Amazon][cat: Web/5][34 pkts/4466 bytes <-> 20 pkts/4021 bytes]
 	5	TCP 192.168.12.114:41517 <-> 54.192.27.217:443 [proto: 91.173/SSL.Nintendo][cat: Game/8][11 pkts/2898 bytes <-> 10 pkts/4865 bytes][TLSv1.2][JA3C: 200a99534ce50d35cf40cc3cce4c69b5][server: *.baas.nintendo.com][JA3S: 699a80bdb17efe157c861f92c5bf5d1d][organization: Nintendo Co., Ltd.][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	6	TCP 192.168.12.114:31329 <-> 54.192.27.8:443 [proto: 91.173/SSL.Nintendo][cat: Game/8][10 pkts/2833 bytes <-> 10 pkts/4866 bytes][TLSv1.2][JA3C: 200a99534ce50d35cf40cc3cce4c69b5][server: *.baas.nintendo.com][JA3S: 699a80bdb17efe157c861f92c5bf5d1d][organization: Nintendo Co., Ltd.][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
@@ -17,7 +17,7 @@ JA3 Host Stats:
 	8	UDP 192.168.12.114:52119 <-> 109.21.255.11:50251 [proto: 173/Nintendo][cat: Game/8][8 pkts/1024 bytes <-> 8 pkts/1024 bytes]
 	9	UDP 192.168.12.114:52119 <-> 134.3.248.25:56955 [proto: 173/Nintendo][cat: Game/8][8 pkts/1040 bytes <-> 7 pkts/922 bytes]
 	10	ICMP 151.6.184.100:0 -> 192.168.12.114:0 [proto: 81/ICMP][cat: Network/14][21 pkts/1470 bytes -> 0 pkts/0 bytes]
-	11	UDP 192.168.12.114:10184 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][cat: Game/8][4 pkts/368 bytes <-> 4 pkts/400 bytes][Host: g2df33d01-lp1.p.srv.nintendo.net]
+	11	UDP 192.168.12.114:10184 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][cat: Game/8][4 pkts/368 bytes <-> 4 pkts/400 bytes][Host: g2df33d01-lp1.p.srv.nintendo.net][PLAIN TEXT (nintendo)]
 	12	UDP 192.168.12.114:52119 -> 52.10.205.177:34343 [proto: 178/Amazon][cat: Web/5][1 pkts/730 bytes -> 0 pkts/0 bytes]
 	13	ICMP 151.6.184.98:0 -> 192.168.12.114:0 [proto: 81/ICMP][cat: Network/14][9 pkts/630 bytes -> 0 pkts/0 bytes]
 	14	UDP 192.168.12.114:55915 <-> 35.158.74.61:10025 [proto: 178/Amazon][cat: Web/5][5 pkts/290 bytes <-> 5 pkts/290 bytes]

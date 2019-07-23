@@ -255,7 +255,11 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     printf("==>> NDPI_PROTOCOL_WHATSAPP_VOICE\n");
 #endif
 
-    flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr))) ? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_VOICE;
+    if((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478))
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_VOICE;
+    else
+      flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
+					? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_VOICE;
     return((flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
   } else {
     /*
@@ -274,7 +278,12 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 
-  if(packet->payload == NULL) return;
+  if(packet->payload == NULL)
+    return;
+  else if(packet->iphv6 != NULL) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
 
   if(packet->tcp) {
     /* STUN may be encapsulated in TCP packets */

@@ -14,8 +14,8 @@ JA3 Host Stats:
 	1	 10.24.82.188             	 2      
 
 
-	1	UDP 10.24.82.188:11320 <-> 1.201.1.174:23044 [proto: 87/RTP][cat: Media/1][757 pkts/106335 bytes <-> 746 pkts/93906 bytes]
-	2	UDP 10.24.82.188:10268 <-> 1.201.1.174:23046 [proto: 87/RTP][cat: Media/1][746 pkts/93906 bytes <-> 742 pkts/104604 bytes]
+	1	UDP 10.24.82.188:11320 <-> 1.201.1.174:23044 [proto: 87/RTP][cat: Media/1][757 pkts/106335 bytes <-> 746 pkts/93906 bytes][PLAIN TEXT (46yOXQ)]
+	2	UDP 10.24.82.188:10268 <-> 1.201.1.174:23046 [proto: 87/RTP][cat: Media/1][746 pkts/93906 bytes <-> 742 pkts/104604 bytes][PLAIN TEXT (46yOXQ)]
 	3	TCP 10.24.82.188:58857 <-> 110.76.143.50:9001 [proto: 163/Tor][cat: VPN/2][22 pkts/5326 bytes <-> 18 pkts/5212 bytes][PLAIN TEXT (Kakao.com)]
 	4	TCP 10.24.82.188:32968 <-> 110.76.143.50:8080 [proto: 91/SSL][cat: Web/5][23 pkts/4380 bytes <-> 22 pkts/5728 bytes][TLSv1][JA3C: 4b79ae67eb3b2cf1c75e68ea0100ca1b][server: kakao.com][JA3S: 4ea82b75038dd27e8a1cb69d8b839b26 (WEAK)][Cipher: TLS_RSA_WITH_AES_128_CBC_SHA]
 	5	TCP 10.24.82.188:59954 <-> 173.252.88.128:443 [proto: 91.119/SSL.Facebook][cat: SocialNetwork/6][15 pkts/2932 bytes <-> 14 pkts/1092 bytes][TLSv1][JA3C: dff8a0aa1c904aaea76c5bf624e88333][JA3S: 07dddc59e60135c7b479d39c3ae686af][Cipher: TLS_ECDHE_ECDSA_WITH_RC4_128_SHA]
@@ -27,7 +27,7 @@ JA3 Host Stats:
 	11	TCP 10.24.82.188:58916 <-> 54.255.185.236:5222 [proto: 178/Amazon][cat: Web/5][2 pkts/225 bytes <-> 2 pkts/171 bytes][PLAIN TEXT (xiaomi.com)]
 	12	TCP 10.24.82.188:53974 -> 203.205.151.233:8080 [proto: 131/HTTP_Proxy][cat: Web/5][5 pkts/350 bytes -> 0 pkts/0 bytes]
 	13	TCP 120.28.26.242:80 <-> 10.24.82.188:34533 [proto: 7/HTTP][cat: Web/5][3 pkts/168 bytes <-> 2 pkts/112 bytes]
-	14	UDP 10.24.82.188:25223 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][cat: SocialNetwork/6][1 pkts/79 bytes <-> 1 pkts/118 bytes][Host: mqtt.facebook.com]
+	14	UDP 10.24.82.188:25223 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][cat: SocialNetwork/6][1 pkts/79 bytes <-> 1 pkts/118 bytes][Host: mqtt.facebook.com][PLAIN TEXT (facebook)]
 	15	TCP 10.24.82.188:34686 -> 173.194.72.188:5228 [proto: 126/Google][cat: Web/5][1 pkts/164 bytes -> 0 pkts/0 bytes]
 	16	TCP 173.252.88.128:443 -> 10.24.82.188:59912 [proto: 91.119/SSL.Facebook][cat: SocialNetwork/6][2 pkts/124 bytes -> 0 pkts/0 bytes]
 	17	TCP 10.24.82.188:49217 -> 216.58.220.174:443 [proto: 91.126/SSL.Google][cat: Web/5][1 pkts/83 bytes -> 0 pkts/0 bytes]

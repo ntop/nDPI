@@ -75,7 +75,7 @@
 #include "reader_util.h"
 
 extern u_int8_t enable_protocol_guess;
-extern u_int8_t verbose;
+extern u_int8_t verbose, human_readeable_string_len;
 
 /* ***************************************************** */
 
@@ -668,7 +668,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       if(!skip) {
 	char outbuf[64] = { '\0' };
 	
-	if(ndpi_has_human_readeable_string(workflow->ndpi_struct, (char*)packet, header->caplen, 8,
+	if(ndpi_has_human_readeable_string(workflow->ndpi_struct, (char*)packet, header->caplen,
+					   human_readeable_string_len,
 					   flow->human_readeable_string_buffer,
 					   sizeof(flow->human_readeable_string_buffer)) == 1)
 	  flow->has_human_readeable_strings = 1;
