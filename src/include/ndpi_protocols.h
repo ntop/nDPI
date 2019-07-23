@@ -205,6 +205,9 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct *ndpi_struct, struct n
 void ndpi_search_ajp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 void ndpi_search_nest_log_sink(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+void ndpi_search_targus_getdata(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+void ndpi_search_apple_push(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 /* --- INIT FUNCTIONS --- */
 void init_diameter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_afp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
@@ -357,6 +360,7 @@ void init_nintendo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 void init_csgo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_checkmk_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_apple_push_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
+void init_amazon_video_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_whatsapp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_ajp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_fbzero_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
@@ -365,5 +369,6 @@ void init_nest_log_sink_dissector(struct ndpi_detection_module_struct *ndpi_stru
 void init_ookla_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_modbus_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_line_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
+void init_targus_getdata_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 
 #endif /* __NDPI_PROTOCOLS_H__ */
