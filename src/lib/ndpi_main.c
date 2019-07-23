@@ -4241,7 +4241,6 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct
       struct hs_list *h = (struct hs_list*)malloc(sizeof(struct hs_list));
 
       if(h) {
-	int i, j;
 
 	h->expression = ndpi_strdup(name), h->id = (unsigned int)category;
 	if(h->expression == NULL) {
