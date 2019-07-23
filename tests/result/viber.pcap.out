@@ -1,10 +1,11 @@
 DNS	8	1267	4
 MDNS	4	412	1
 ICMP	2	3028	1
-SSL	31	8597	3
+SSL	12	824	2
 ICMPV6	2	140	1
 Facebook	2	281	1
 Google	32	9133	3
+GenericProtocol	19	7773	1
 Viber	268	99524	9
 Amazon	71	24849	3
 
@@ -19,7 +20,7 @@ JA3 Host Stats:
 	4	TCP 192.168.0.17:33208 <-> 52.0.253.101:4244 [proto: 144/Viber][cat: VoIP/10][32 pkts/6563 bytes <-> 26 pkts/2782 bytes]
 	5	TCP 192.168.0.17:43702 <-> 172.217.23.78:443 [proto: 91.126/SSL.Google][cat: Web/5][15 pkts/5339 bytes <-> 12 pkts/3436 bytes][TLSv1.2][JA3C: 3967ff2d2c9c4d144e7e30f24f4e9761][JA3S: 67619a80665d7ab92d1041b1d11f9164][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	6	TCP 192.168.0.17:36986 <-> 54.69.166.226:443 [proto: 91.178/SSL.Amazon][cat: Web/5][11 pkts/1437 bytes <-> 11 pkts/6412 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
-	7	TCP 192.168.0.17:55746 <-> 151.101.1.130:443 [proto: 91/SSL][cat: Web/5][10 pkts/1534 bytes <-> 9 pkts/6239 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: y.ssl.fastly.net][JA3S: 860fcf58fd757e26aa8911e5eaff6b53][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	7	TCP 192.168.0.17:55746 <-> 151.101.1.130:443 [proto: 91.137/SSL.GenericProtocol][cat: Media/1][10 pkts/1534 bytes <-> 9 pkts/6239 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: y.ssl.fastly.net][JA3S: 860fcf58fd757e26aa8911e5eaff6b53][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	8	TCP 192.168.0.17:36988 <-> 54.69.166.226:443 [proto: 91.178/SSL.Amazon][cat: Web/5][11 pkts/1462 bytes <-> 11 pkts/6163 bytes][TLSv1.2][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	9	UDP 192.168.0.17:47171 <-> 18.201.4.32:7985 [proto: 144/Viber][cat: VoIP/10][24 pkts/5035 bytes <-> 22 pkts/2302 bytes]
 	10	UDP 192.168.0.17:38190 <-> 18.201.4.3:7985 [proto: 144/Viber][cat: VoIP/10][25 pkts/4344 bytes <-> 18 pkts/1872 bytes]

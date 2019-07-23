@@ -8505,7 +8505,6 @@ ndpi_protocol_match host_match[] = {
   { "g.whatsapp.net", NULL, "g\\.whatsapp" TLD,                        "WhatsApp",         NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "v.whatsapp.net", NULL, "v\\.whatsapp" TLD,                        "WhatsApp",         NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "mmg.whatsapp.net", NULL, "mmg\\.whatsapp" TLD,                    "WhatsApp",         NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
-  { "graph.facebook.com", NULL, "graph\\.facebook" TLD,                "WhatsApp",         NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".yahoo.", NULL, "\\.yahoo" TLD,                                   "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".yimg.com", NULL, "\\.yimg" TLD,                                  "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },

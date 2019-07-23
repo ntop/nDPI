@@ -30,6 +30,8 @@
 
 #define MAX_NUM_STUN_PKTS     8
 
+// #define DEBUG_STUN 1
+
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
   u_int32_t cookie;
@@ -45,6 +47,17 @@ typedef enum {
   NDPI_IS_STUN,
   NDPI_IS_NOT_STUN
 } ndpi_int_stun_t;
+
+
+static int is_google_ip_address(u_int32_t host) {
+  if(
+     ((host & 0xFFFF0000 /* 255.255.0.0 */) == 0x4A7D0000 /* 74.125.0.0/16 */)
+     || ((host & 0xFFFF0000 /* 255.255.0.0 */) == 0x42660000 /* 66.102.0.0/16 */)
+     )
+    return(1);
+  else
+    return(0);
+}
 
 static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
@@ -87,9 +100,14 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if(msg_type == 0x01 /* Binding Request */) {
     flow->protos.stun_ssl.stun.num_binding_requests++;
-    if((msg_len == 0)  && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_GOOGLE)) {
+    if((msg_len == 0) && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_GOOGLE)) {
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
     }
+  }
+
+  if((msg_len == 0) && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return(NDPI_IS_NOT_STUN);
   }
   
   flow->protos.stun_ssl.stun.num_udp_pkts++;
@@ -199,9 +217,16 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  }
 	  break;
 
+	case 0xFF03:
+	  can_this_be_whatsapp_voice = 0;
+	  flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+	  break;
+	  
 	default:
 	  /* This means this STUN packet cannot be confused with whatsapp voice */
-	  /* printf("==> %04X\n", attribute); */
+#ifdef DEBUG_STUN
+	  printf("==> %04X\n", attribute);
+#endif
 	  can_this_be_whatsapp_voice = 0;
 	  break;
 	}
@@ -223,8 +248,14 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
  udp_stun_found:
   if(can_this_be_whatsapp_voice) {
+    struct ndpi_packet_struct *packet = &flow->packet;
+    
     flow->protos.stun_ssl.stun.num_processed_pkts++;
-    flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_VOICE;
+#ifdef DEBUG_STUN
+    printf("==>> NDPI_PROTOCOL_WHATSAPP_VOICE\n");
+#endif
+
+    flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr))) ? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_VOICE;
     return((flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
   } else {
     /*

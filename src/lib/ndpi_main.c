@@ -1666,7 +1666,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HANGOUT_DUO,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "GoogleHangoutDuo", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BJNP,
@@ -1727,8 +1727,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AMAZON_VIDEO,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "AmazonVideo", NDPI_PROTOCOL_CATEGORY_CLOUD,
-			    ndpi_build_default_ports(ports_a, 443, 80, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 443, 80, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
