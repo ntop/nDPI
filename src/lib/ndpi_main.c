@@ -1714,6 +1714,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "AJP", NDPI_PROTOCOL_CATEGORY_WEB,
 			    ndpi_build_default_ports(ports_a, 8009, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TARGUS_GETDATA,
+			    0 /* can_have_a_subprotocol */, no_master,
+			    no_master, "Targus Dataspeed", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 5001, 5201, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 5001, 5201, 0, 0, 0) /* UDP */);
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
@@ -3169,6 +3174,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* APPLE_PUSH */
   init_apple_push_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* Targus Getdata */
+  init_targus_getdata_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* EAQ */
   init_eaq_dissector(ndpi_struct, &a, detection_bitmask);
