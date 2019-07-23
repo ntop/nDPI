@@ -669,5 +669,5 @@ ndpi_log_timestamp(char *log_ts)
     nowtime = tv.tv_sec;
     localtime_r(&nowtime, &nowtm_r);
     strftime(tmbuf, NDPI_TIMESTAMP_LEN, "%H:%M:%S", &nowtm_r);
-    snprintf(log_ts, NDPI_TIMESTAMP_LEN, "%s.%06ld", tmbuf, tv.tv_usec);
+    snprintf(log_ts, NDPI_TIMESTAMP_LEN, "%s.%06ld", tmbuf, (long)tv.tv_usec);
 }
