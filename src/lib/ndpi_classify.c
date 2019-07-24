@@ -658,7 +658,7 @@ ndpi_timeval_to_milliseconds(struct timeval ts)
 }
 
 void
-ndpi_log_timestamp(char *log_ts)
+ndpi_log_timestamp(char *log_ts, u_int log_ts_len)
 {
     struct timeval tv;
     time_t nowtime;
@@ -669,5 +669,5 @@ ndpi_log_timestamp(char *log_ts)
     nowtime = tv.tv_sec;
     localtime_r(&nowtime, &nowtm_r);
     strftime(tmbuf, NDPI_TIMESTAMP_LEN, "%H:%M:%S", &nowtm_r);
-    snprintf(log_ts, NDPI_TIMESTAMP_LEN, "%s.%06ld", tmbuf, (long)tv.tv_usec);
+    snprintf(log_ts, log_ts_len, "%s.%06ld", tmbuf, (long)tv.tv_usec);
 }
