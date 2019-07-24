@@ -14,11 +14,15 @@ host:"googlesyndication.com"@Google
 host:"venere.com"@Venere
 host:"kataweb.it",host:"repubblica.it"@Repubblica
 host:"ntop"@ntop
+host:"atv-ext.amazon.com",host:"*.api.amazon.com",host:"*.api.amazonvideo.com"@AmazonVideo
+host:"*.amazonaws.com"@AmazonVideo
+host:"*.netflix.com"@Netflix
+host:"*.lvlt.dash.us.aiv-cdn.net.c.footprint.net"@AmazonVideo
+host:"api-global.netflix.com"@Netflix
 #  IP based Subprotocols
 #  Format:
 #  ip:<value>,ip:<value>,.....@<subproto>
 
 ip:213.75.170.11@CustomProtocol
-
-
-
+ip:8.248.73.247@AmazonPrime
+ip:54.80.47.130@AmazonPrime

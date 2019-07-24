@@ -89,6 +89,7 @@ static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
 #ifdef HAVE_JSON_C
 static u_int8_t file_first_time = 1;
 #endif
+u_int8_t human_readeable_string_len = 5;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
@@ -235,7 +236,7 @@ static void help(u_int long_help) {
 	 "-i <file|device> "
 #endif
 	 "[-f <filter>][-s <duration>][-m <duration>]\n"
-	 "          [-p <protos>][-l <loops> [-q][-d][-h][-t][-v <level>]\n"
+	 "          [-p <protos>][-l <loops> [-q][-d][-h][-e <len>][-t][-v <level>]\n"
 	 "          [-n <threads>][-w <file>][-c <file>][-j <file>][-x <file>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
@@ -252,6 +253,7 @@ static void help(u_int long_help) {
          "  -g <id:id...>             | Thread affinity mask (one core id per thread)\n"
 #endif
 	 "  -d                        | Disable protocol guess and use only DPI\n"
+	 "  -e <len>                  | Min human readeable string match len. Default %u\n"
 	 "  -q                        | Quiet mode\n"
 	 "  -t                        | Dissect GTP/TZSP tunnels\n"
 	 "  -r                        | Print nDPI version and git revision\n"
@@ -268,8 +270,8 @@ static void help(u_int long_help) {
 	 "                            | >3 - full debug + dbg_proto = all\n"
 	 "  -b <file.json>            | Specify a file to write port based diagnose statistics\n"
 	 "  -x <file.json>            | Produce bpf filters for specified diagnose file. Use\n"
-	 "                            | this option only for .json files generated with -b flag.\n");
-
+	 "                            | this option only for .json files generated with -b flag.\n",
+	 human_readeable_string_len);
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -475,7 +477,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "c:df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:", longopts, &option_idx)) != EOF) {
+  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:", longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
@@ -483,6 +485,10 @@ static void parseOptions(int argc, char **argv) {
     switch (opt) {
     case 'd':
       enable_protocol_guess = 0;
+      break;
+
+    case 'e':
+      human_readeable_string_len = atoi(optarg);
       break;
 
     case 'i':

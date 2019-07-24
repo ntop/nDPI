@@ -122,6 +122,49 @@ struct ndpi_ethhdr
   u_int16_t h_proto;      /* data length (<= 1500) or type ID proto (>=1536) */
 } PACK_OFF;
 
+/* +++++++++++++++ ARP header +++++++++++++++ */
+PACK_ON
+struct ndpi_arphdr {
+  u_int16_t ar_hrd;/* Format of hardware address.  */
+  u_int16_t ar_pro;/* Format of protocol address.  */
+  u_int8_t  ar_hln;/* Length of hardware address.  */
+  u_int8_t  ar_pln;/* Length of protocol address.  */
+  u_int16_t ar_op;/* ARP opcode (command).  */
+  u_char arp_sha[6];/* sender hardware address */
+  u_int32_t arp_spa;/* sender protocol address */
+  u_char arp_tha[6];/* target hardware address */
+  u_int32_t arp_tpa;/* target protocol address */
+} PACK_OFF;
+
+/* +++++++++++++++ DHCP header +++++++++++++++ */
+PACK_ON
+struct ndpi_dhcphdr {
+  u_int8_t      msgType;
+  u_int8_t      htype;
+  u_int8_t      hlen;
+  u_int8_t      hops;
+  u_int32_t     xid;/* 4 */
+  u_int16_t     secs;/* 8 */
+  u_int16_t     flags;
+  u_int32_t     ciaddr;/* 12 */
+  u_int32_t     yiaddr;/* 16 */
+  u_int32_t     siaddr;/* 20 */
+  u_int32_t     giaddr;/* 24 */
+  u_int8_t      chaddr[16]; /* 28 */
+  u_int8_t      sname[64]; /* 44 */
+  u_int8_t      file[128]; /* 108 */
+  u_int32_t     magic; /* 236 */
+  u_int8_t      options[308];
+} PACK_OFF;
+
+/* +++++++++++++++ MDNS rsp header +++++++++++++++ */
+PACK_ON
+struct ndpi_mdns_rsp_entry {
+  u_int16_t rsp_type, rsp_class;
+  u_int32_t ttl;
+  u_int16_t data_len;
+} PACK_OFF;
+
 /* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
 
 PACK_ON
@@ -1275,6 +1318,8 @@ typedef enum {
   ndpi_serialization_uint32_uint32,
   ndpi_serialization_uint32_uint64,
   ndpi_serialization_uint32_string,
+  ndpi_serialization_string_int32,
+  ndpi_serialization_string_int64,
   ndpi_serialization_string_uint32,
   ndpi_serialization_string_uint64,
   ndpi_serialization_string_string,

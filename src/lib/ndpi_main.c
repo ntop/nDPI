@@ -1019,8 +1019,13 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "Xbox", NDPI_PROTOCOL_CATEGORY_GAME,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_a, 3074, 3076, 0, 0, 0)         /* TCP */,
+			    ndpi_build_default_ports(ports_b, 3074, 3076, 500, 3544, 4500) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PLAYSTATION,
+                            0 /* can_have_a_subprotocol */, no_master,
+                            no_master, "Playstation", NDPI_PROTOCOL_CATEGORY_GAME,
+                            ndpi_build_default_ports(ports_a, 1935, 3478, 3479, 3480, 0) /* TCP */,
+                            ndpi_build_default_ports(ports_b, 3478, 3479, 0, 0, 0)       /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQ,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "QQ", NDPI_PROTOCOL_CATEGORY_CHAT,
@@ -1661,7 +1666,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));      /* UDP */
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HANGOUT_DUO,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "GoogleHangout", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "GoogleHangoutDuo", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BJNP,
@@ -1713,6 +1718,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "AJP", NDPI_PROTOCOL_CATEGORY_WEB,
 			    ndpi_build_default_ports(ports_a, 8009, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TARGUS_GETDATA,
+			    0 /* can_have_a_subprotocol */, no_master,
+			    no_master, "Targus Dataspeed", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 5001, 5201, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 5001, 5201, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AMAZON_VIDEO,
+			    0 /* can_have_a_subprotocol */, no_master,
+			    no_master, "AmazonVideo", NDPI_PROTOCOL_CATEGORY_CLOUD,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
     /* calling function for host and content matched protocols */
@@ -3256,6 +3271,12 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* WireGuard VPN */
   init_wireguard_dissector(ndpi_struct, &a, detection_bitmask);
 
+  /* AMAZON_VIDEO */
+  init_amazon_video_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* Targus Getdata */
+  init_targus_getdata_dissector(ndpi_struct, &a, detection_bitmask);
+
   /* ----------------------------------------------------------------- */
 
   ndpi_struct->callback_buffer_size = a;
@@ -4223,7 +4244,6 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct
       struct hs_list *h = (struct hs_list*)malloc(sizeof(struct hs_list));
 
       if(h) {
-	int i, j;
 
 	h->expression = ndpi_strdup(name), h->id = (unsigned int)category;
 	if(h->expression == NULL) {
