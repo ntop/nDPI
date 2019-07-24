@@ -662,6 +662,10 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
+
+  /* NDPI_PROTOCOL_WIREGUARD */
+  u_int8_t wireguard_stage;
+  u_int32_t wireguard_peer_index[2];
 }
 #ifndef WIN32
   __attribute__ ((__packed__))
