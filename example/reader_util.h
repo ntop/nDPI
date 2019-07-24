@@ -31,6 +31,7 @@
 
 #include "uthash.h"
 #include <pcap.h>
+#include "ndpi_classify.h"
 
 #ifdef USE_DPDK
 #include <rte_eal.h>
@@ -49,6 +50,14 @@
 
 extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
 #endif
+
+/* ETTA Spec defiintions for feature readiness */
+#define ETTA_MIN_PACKETS 10
+#define ETTA_MIN_OCTETS 4000
+/** maximum line length */
+#define LINEMAX 512
+#define MAX_BYTE_COUNT_ARRAY_LENGTH 256
+#define MAX_NUM_PKTS               100
 
 #define MAX_NUM_READER_THREADS     16
 #define IDLE_SCAN_PERIOD           10 /* msec (use TICK_RESOLUTION = 1000) */
@@ -128,6 +137,7 @@ typedef struct ndpi_flow_info {
   u_int64_t last_seen;
   u_int64_t src2dst_bytes, dst2src_bytes;
   u_int32_t src2dst_packets, dst2src_packets;
+  u_int32_t src2dst_opackets, dst2src_opackets;
   u_int32_t has_human_readeable_strings;
   char human_readeable_string_buffer[32];
   
@@ -148,6 +158,27 @@ typedef struct ndpi_flow_info {
   } ssh_ssl;
 
   void *src_id, *dst_id;
+
+  // Entropy fields
+  u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];       /*!< array of packet appdata lengths */
+  struct timeval src2dst_pkt_time[MAX_NUM_PKTS]; /*!< array of arrival times          */
+  u_int16_t dst2src_pkt_len[MAX_NUM_PKTS];       /*!< array of packet appdata lengths */
+  struct timeval dst2src_pkt_time[MAX_NUM_PKTS]; /*!< array of arrival times          */
+  struct timeval src2dst_start;                  /*!< first packet arrival time       */
+  struct timeval dst2src_start;                  /*!< first packet arrival time       */
+  u_int16_t src2dst_pkt_count;                   /*!< packet counts                   */
+  u_int16_t dst2src_pkt_count;                   /*!< packet counts                   */
+  u_int32_t src2dst_l4_bytes;                    /*!< packet counts                   */
+  u_int32_t dst2src_l4_bytes;                    /*!< packet counts                   */
+  u_int32_t src2dst_byte_count[256];             /*!< number of occurences of each byte   */
+  u_int32_t dst2src_byte_count[256];             /*!< number of occurences of each byte   */
+  u_int32_t src2dst_num_bytes;
+  u_int32_t dst2src_num_bytes;
+  double src2dst_bd_mean;
+  double src2dst_bd_variance;
+  double dst2src_bd_mean;
+  double dst2src_bd_variance;
+  float score;
 } ndpi_flow_info_t;
 
 
@@ -245,6 +276,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 u_int32_t ethernet_crc32(const void* data, size_t n_bytes);
 void ndpi_flow_info_freer(void *node);
 const char* print_cipher_id(u_int32_t cipher);
+float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256], unsigned int num_bytes);
 
 extern int nDPI_LogLevel;
 

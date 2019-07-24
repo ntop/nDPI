@@ -82,7 +82,7 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
 u_int8_t enable_protocol_guess = 1;
-u_int8_t verbose = 0, json_flag = 0;
+u_int8_t verbose = 0, json_flag = 0, enable_joy_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
@@ -225,6 +225,110 @@ FILE *trace = NULL;
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
 
+static void reduceBDbits(uint32_t *bd, unsigned int len) {
+  int mask = 0;
+  int shift = 0;
+  unsigned int i = 0;
+  
+  for(i = 0; i < len; i++)
+    mask = mask | bd[i];
+  
+  mask = mask >> 8;
+  for(i = 0; i < 24 && mask; i++) {
+    mask = mask >> 1;
+    if (mask == 0) {
+      shift = i+1;
+      break;
+    }
+  }
+  
+  for(i = 0; i < len; i++)
+    bd[i] = bd[i] >> shift;  
+}
+
+/**
+ * @brief Get flow byte distribution mean and variance
+ */
+static void
+flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
+  FILE *out = results_file ? results_file : stdout;
+
+  const uint32_t *array = NULL;
+  uint32_t tmp[256], i;
+  unsigned int num_bytes;
+  double mean = 0.0, variance = 0.0;
+
+  fflush(out);
+
+  /*
+   * Sum up the byte_count array for outbound and inbound flows,
+   * if this flow is bidirectional
+   */
+  if (!flow->bidirectional) {
+    array = flow->src2dst_byte_count;
+    num_bytes = flow->src2dst_l4_bytes;
+    for (i=0; i<256; i++) {
+      tmp[i] = flow->src2dst_byte_count[i];
+    }
+
+    if (flow->src2dst_num_bytes != 0) {
+      mean = flow->src2dst_bd_mean;
+      variance = flow->src2dst_bd_variance/(flow->src2dst_num_bytes - 1);
+      variance = sqrt(variance);
+
+      if (flow->src2dst_num_bytes == 1) {
+        variance = 0.0;
+      }
+    }
+  } else {
+    for (i=0; i<256; i++) {
+      tmp[i] = flow->src2dst_byte_count[i] + flow->dst2src_byte_count[i];
+    }
+    array = tmp;
+    num_bytes = flow->src2dst_l4_bytes + flow->dst2src_l4_bytes;
+
+    if (flow->src2dst_num_bytes + flow->dst2src_num_bytes != 0) {
+      mean = ((double)flow->src2dst_num_bytes)/((double)(flow->src2dst_num_bytes+flow->dst2src_num_bytes))*flow->src2dst_bd_mean +
+             ((double)flow->dst2src_num_bytes)/((double)(flow->dst2src_num_bytes+flow->src2dst_num_bytes))*flow->dst2src_bd_mean;
+
+      variance = ((double)flow->src2dst_num_bytes)/((double)(flow->src2dst_num_bytes+flow->dst2src_num_bytes))*flow->src2dst_bd_variance +
+                 ((double)flow->dst2src_num_bytes)/((double)(flow->dst2src_num_bytes+flow->src2dst_num_bytes))*flow->dst2src_bd_variance;
+
+      variance = variance/((double)(flow->src2dst_num_bytes + flow->dst2src_num_bytes - 1));
+      variance = sqrt(variance);
+      if (flow->src2dst_num_bytes + flow->dst2src_num_bytes == 1) {
+        variance = 0.0;
+      }
+    }
+  }
+
+  if(enable_joy_stats) {
+    if(verbose > 1) {
+      reduceBDbits(tmp, 256);
+      array = tmp;
+      
+      fprintf(out, " [byte_dist: ");
+      for(i = 0; i < 255; i++)
+	fprintf(out, "%u,", (unsigned char)array[i]);
+      
+      fprintf(out, "%u]", (unsigned char)array[i]);
+    }
+    
+    /* Output the mean */
+    if(num_bytes != 0) {
+      fprintf(out, "][byte_dist_mean: %f", mean);
+      fprintf(out, "][byte_dist_std: %f]", variance);
+    }
+    
+    if(num_bytes != 0) {
+      double entropy = ndpi_flow_get_byte_count_entropy(array, num_bytes);
+      
+      fprintf(out, "[entropy: %f]", entropy);
+      fprintf(out, "[total_entropy: %f]", entropy * num_bytes);
+    }
+  }
+}
+
 /**
  * @brief Print help instructions
  */
@@ -236,7 +340,7 @@ static void help(u_int long_help) {
 	 "-i <file|device> "
 #endif
 	 "[-f <filter>][-s <duration>][-m <duration>]\n"
-	 "          [-p <protos>][-l <loops> [-q][-d][-h][-e <len>][-t][-v <level>]\n"
+	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-e <len>][-t][-v <level>]\n"
 	 "          [-n <threads>][-w <file>][-c <file>][-j <file>][-x <file>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
@@ -255,6 +359,8 @@ static void help(u_int long_help) {
 	 "  -d                        | Disable protocol guess and use only DPI\n"
 	 "  -e <len>                  | Min human readeable string match len. Default %u\n"
 	 "  -q                        | Quiet mode\n"
+	 "  -J                        | Display flow SPLT (sequence of packet length and time)\n"
+	 "                            | and BD (byte distribution). See https://github.com/cisco/joy\n"
 	 "  -t                        | Dissect GTP/TZSP tunnels\n"
 	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -c <path>                 | Load custom categories from the specified file\n"
@@ -327,6 +433,7 @@ static struct option longopts[] = {
   { "version", no_argument, NULL, 'V'},
   { "help", no_argument, NULL, 'h'},
   { "json", required_argument, NULL, 'j'},
+  { "joy", required_argument, NULL, 'J'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
 
@@ -477,7 +584,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:l:s:tv:V:n:j:rp:w:q0123:456:7:89:m:b:x:", longopts, &option_idx)) != EOF) {
+  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:l:s:tv:V:n:j:Jrp:w:q0123:456:7:89:m:b:x:", longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
@@ -573,6 +680,10 @@ static void parseOptions(int argc, char **argv) {
       help(1);
       break;
 
+    case 'J':
+      enable_joy_stats = 1;
+      break;
+      
     case 'j':
 #ifndef HAVE_JSON_C
       printf("WARNING: this copy of ndpiReader has been compiled without json-c: JSON export disabled\n");
@@ -799,6 +910,13 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
 
+    if(enable_joy_stats) {
+      /* Print entropy values for monitored flows. */
+      flowGetBDMeanandVariance(flow);
+      fflush(out);
+      fprintf(out, "[score: %.4f]", flow->score);
+    }
+    
     if(flow->detected_protocol.master_protocol) {
       char buf[64];
 

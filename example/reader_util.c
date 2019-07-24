@@ -34,6 +34,8 @@
 #else
 #include <unistd.h>
 #include <netinet/in.h>
+#include <math.h>
+#include <float.h>
 #endif
 
 #ifndef ETH_P_IP
@@ -73,8 +75,9 @@
 
 #include "ndpi_main.h"
 #include "reader_util.h"
+#include "ndpi_classify.h"
 
-extern u_int8_t enable_protocol_guess;
+extern u_int8_t enable_protocol_guess, enable_joy_stats;
 extern u_int8_t verbose, human_readeable_string_len;
 
 /* ***************************************************** */
@@ -273,6 +276,94 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
   return(0); /* notreached */
 }
 
+/**
+ * \brief Update the byte count for the flow record.
+ * \param f Flow data
+ * \param x Data to use for update
+ * \param len Length of the data (in bytes)
+ * \return none
+ */
+static void
+ndpi_flow_update_byte_count(struct ndpi_flow_info *flow, const void *x,
+                            unsigned int len, u_int8_t src_to_dst_direction) {
+  const unsigned char *data = x;
+  u_int32_t i;
+  u_int32_t current_count = 0;
+
+  /*
+   * implementation note: The spec says that 4000 octets is enough of a
+   * sample size to accurately reflect the byte distribution. Also, to avoid
+   * wrapping of the byte count at the 16-bit boundry, we stop counting once
+   * the 4000th octet has been seen for a flow.
+   */
+
+  /* octet count was already incremented before processing this payload */
+  if (src_to_dst_direction) {
+    current_count = flow->src2dst_l4_bytes - len;
+  } else {
+    current_count = flow->dst2src_l4_bytes - len;
+  }
+
+  if (current_count < ETTA_MIN_OCTETS) {
+    for (i=0; i<len; i++) {
+      if (src_to_dst_direction) {
+        flow->src2dst_byte_count[data[i]]++;
+      } else {
+        flow->dst2src_byte_count[data[i]]++;
+      }
+      current_count++;
+      if (current_count >= ETTA_MIN_OCTETS) {
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * \brief Update the byte distribution mean for the flow record.
+ * \param f Flow record
+ * \param x Data to use for update
+ * \param len Length of the data (in bytes)
+ * \return none
+ */
+static void
+ndpi_flow_update_byte_dist_mean_var(ndpi_flow_info_t *flow, const void *x,
+                                    unsigned int len, u_int8_t src_to_dst_direction) {
+  const unsigned char *data = x;
+  double delta;
+  unsigned int i;
+
+  for (i=0; i<len; i++) {
+    if (src_to_dst_direction) {
+      flow->src2dst_num_bytes += 1;
+      delta = ((double)data[i] - flow->src2dst_bd_mean);
+      flow->src2dst_bd_mean += delta/((double)flow->src2dst_num_bytes);
+      flow->src2dst_bd_variance += delta*((double)data[i] - flow->src2dst_bd_mean);
+    } else {
+      flow->dst2src_num_bytes += 1;
+      delta = ((double)data[i] - flow->dst2src_bd_mean);
+      flow->dst2src_bd_mean += delta/((double)flow->dst2src_num_bytes);
+      flow->dst2src_bd_variance += delta*((double)data[i] - flow->dst2src_bd_mean);
+    }
+  }
+}
+
+float
+ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
+                                 unsigned int num_bytes)
+{
+  int i;
+  float tmp, sum = 0.0;
+
+  for (i=0; i<256; i++) {
+    tmp = (float) byte_count[i] / (float) num_bytes;
+    if (tmp > FLT_EPSILON) {
+      sum -= tmp * logf(tmp);
+    }
+  }
+  return sum / logf(2.0);
+}
+
 /* ***************************************************** */
 
 static void patchIPv6Address(char *str) {
@@ -309,11 +400,13 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 						 u_int8_t *proto,
 						 u_int8_t **payload,
 						 u_int16_t *payload_len,
-						 u_int8_t *src_to_dst_direction) {
+						 u_int8_t *src_to_dst_direction,
+                                                 struct timeval when) {
   u_int32_t idx, l4_offset, hashval;
   struct ndpi_flow_info flow;
   void *ret;
   const u_int8_t *l3, *l4;
+  u_int32_t l4_data_len = 0XFEEDFACE;
 
   /*
     Note: to keep things simple (ndpiReader is just a demo app)
@@ -363,6 +456,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     tcp_len = ndpi_min(4*(*tcph)->doff, l4_packet_len);
     *payload = (u_int8_t*)&l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
+    l4_data_len = l4_packet_len - sizeof(struct ndpi_tcphdr);
   } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
     // udp
 
@@ -371,9 +465,11 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);
     *payload = (u_int8_t*)&l4[sizeof(struct ndpi_udphdr)];
     *payload_len = (l4_packet_len > sizeof(struct ndpi_udphdr)) ? l4_packet_len-sizeof(struct ndpi_udphdr) : 0;
+    l4_data_len = l4_packet_len - sizeof(struct ndpi_udphdr);
   } else {
     // non tcp/udp protocols
     *sport = *dport = 0;
+    l4_data_len = 0;
   }
 
   flow.protocol = iph->protocol, flow.vlan_id = vlan_id;
@@ -459,7 +555,15 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       workflow->stats.ndpi_flow_count++;
 
       *src = newflow->src_id, *dst = newflow->dst_id;
-
+      newflow->src2dst_pkt_len[newflow->src2dst_pkt_count] = l4_packet_len;
+      newflow->src2dst_pkt_time[newflow->src2dst_pkt_count] = when;
+      if (newflow->src2dst_pkt_count == 0) {
+        newflow->src2dst_start = when;
+      }
+      newflow->src2dst_pkt_count++;
+      if (l4_data_len != 0XFEEDFACE) {
+        newflow->src2dst_opackets++;
+      }
       return newflow;
     }
   } else {
@@ -485,6 +589,28 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       else
 	*src = flow->dst_id, *dst = flow->src_id, *src_to_dst_direction = 0, flow->bidirectional = 1;
     }
+    if (src_to_dst_direction) {
+      if (flow->src2dst_pkt_count < MAX_NUM_PKTS) {
+        flow->src2dst_pkt_len[flow->src2dst_pkt_count] = l4_packet_len;
+        flow->src2dst_pkt_time[flow->src2dst_pkt_count] = when;
+        flow->src2dst_pkt_count++;
+      }
+      if (l4_data_len != 0XFEEDFACE) {
+        flow->src2dst_opackets++;
+      }
+    } else {
+      if (flow->dst2src_pkt_count < MAX_NUM_PKTS) {
+        flow->dst2src_pkt_len[flow->dst2src_pkt_count] = l4_packet_len;
+        flow->dst2src_pkt_time[flow->dst2src_pkt_count] = when;
+        if (flow->dst2src_pkt_count == 0) {
+          flow->dst2src_start = when;
+        }
+        flow->dst2src_pkt_count++;
+      }
+      if (l4_data_len != 0XFEEDFACE) {
+        flow->dst2src_opackets++;
+      }
+    }
     return flow;
   }
 }
@@ -503,7 +629,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 						  u_int8_t *proto,
 						  u_int8_t **payload,
 						  u_int16_t *payload_len,
-						  u_int8_t *src_to_dst_direction) {
+						  u_int8_t *src_to_dst_direction,
+                                                  struct timeval when) {
   struct ndpi_iphdr iph;
 
   memset(&iph, 0, sizeof(iph));
@@ -523,12 +650,33 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 			    ntohs(iph6->ip6_hdr.ip6_un1_plen),
 			    tcph, udph, sport, dport,
 			    src, dst, proto, payload,
-			    payload_len, src_to_dst_direction));
+			    payload_len, src_to_dst_direction, when));
 }
 
 /* ****************************************************** */
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
+
+  /* Update SPLT scores. */
+  if (flow->bidirectional) {
+    flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
+                                flow->dst2src_pkt_len, flow->dst2src_pkt_time,
+                                flow->src2dst_start, flow->dst2src_start,
+                                MAX_NUM_PKTS, flow->src_port, flow->dst_port,
+                                flow->src2dst_packets, flow->dst2src_packets,
+                                flow->src2dst_opackets, flow->dst2src_opackets,
+                                flow->src2dst_l4_bytes, flow->dst2src_l4_bytes, 1,
+                                flow->src2dst_byte_count, flow->dst2src_byte_count);
+  } else {
+    flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
+                           NULL, NULL, flow->src2dst_start, flow->src2dst_start,
+                           MAX_NUM_PKTS, flow->src_port, flow->dst_port,
+                           flow->src2dst_packets, 0,
+                           flow->src2dst_opackets, 0,
+                           flow->src2dst_l4_bytes, 0, 1,
+                           flow->src2dst_byte_count, NULL);
+  }
+
   if(!flow->ndpi_flow) return;
 
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
@@ -613,7 +761,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 					   u_int16_t ip_offset,
 					   u_int16_t ipsize, u_int16_t rawsize,
 					   const struct pcap_pkthdr *header,
-					   const u_char *packet) {
+					   const u_char *packet,
+                                           struct timeval when) {
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow_info *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
@@ -631,12 +780,12 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 			      ntohs(iph->tot_len) - (iph->ihl * 4),
 			      &tcph, &udph, &sport, &dport,
 			      &src, &dst, &proto,
-			      &payload, &payload_len, &src_to_dst_direction);
+			      &payload, &payload_len, &src_to_dst_direction, when);
   else
     flow = get_ndpi_flow_info6(workflow, vlan_id, iph6, ip_offset,
 			       &tcph, &udph, &sport, &dport,
 			       &src, &dst, &proto,
-			       &payload, &payload_len, &src_to_dst_direction);
+			       &payload, &payload_len, &src_to_dst_direction, when);
 
   if(flow != NULL) {
     workflow->stats.ip_packet_count++;
@@ -644,11 +793,20 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       workflow->stats.total_ip_bytes += rawsize;
     ndpi_flow = flow->ndpi_flow;
 
-    if(src_to_dst_direction)
+    if(src_to_dst_direction) {
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
-    else
+      flow->src2dst_l4_bytes += payload_len;
+    } else {
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
+      flow->dst2src_l4_bytes += payload_len;
+    }
 
+    if(enable_joy_stats) {
+      /* Update BD, distribution and mean. */
+      ndpi_flow_update_byte_count(flow, payload, payload_len, src_to_dst_direction);
+      ndpi_flow_update_byte_dist_mean_var(flow, payload, payload_len, src_to_dst_direction);
+    }
+    
     flow->last_seen = time;
 
     if(!flow->has_human_readeable_strings) {
@@ -1070,7 +1228,7 @@ iph_check:
   /* process the packet */
   return(packet_processing(workflow, time, vlan_id, iph, iph6,
 			   ip_offset, header->caplen - ip_offset,
-			   header->caplen, header, packet));
+			   header->caplen, header, packet, header->ts));
 }
 
 /* ********************************************************** */
