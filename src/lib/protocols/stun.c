@@ -38,6 +38,8 @@ struct stun_packet_header {
   u_int8_t  transaction_id[8];
 };
 
+/* ************************************************************ */
+
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 u_int proto, struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_UNKNOWN);
@@ -48,6 +50,7 @@ typedef enum {
   NDPI_IS_NOT_STUN
 } ndpi_int_stun_t;
 
+/* ************************************************************ */
 
 static int is_google_ip_address(u_int32_t host) {
   if(
@@ -58,6 +61,29 @@ static int is_google_ip_address(u_int32_t host) {
   else
     return(0);
 }
+
+/* ************************************************************ */
+
+/*
+ WhatsApp
+ 31.13.86.48
+ 31.13.92.50
+ 157.240.20.51
+ 157.240.21.51
+ 185.60.216.51
+
+ Messenger
+ 31.13.86.5
+*/
+
+static int is_messenger_ip_address(u_int32_t host) {
+  if(host == 0x1F0D5605 /* 31.13.86.5 */)
+    return(1);
+  else
+    return(0);
+}
+
+/* ************************************************************ */
 
 static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
@@ -255,9 +281,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     printf("==>> NDPI_PROTOCOL_WHATSAPP_VOICE\n");
 #endif
 
-    if((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478))
-      flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_VOICE;
-    else
+    if((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478)) {           
+      flow->guessed_host_protocol_id = (is_messenger_ip_address(ntohl(packet->iph->saddr)) || is_messenger_ip_address(ntohl(packet->iph->daddr))) ?
+	NDPI_PROTOCOL_MESSENGER : NDPI_PROTOCOL_WHATSAPP_VOICE;
+    } else
       flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
 					? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_VOICE;
     return((flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
