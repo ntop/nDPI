@@ -4,7 +4,7 @@ Version: @PACKAGE_VERSION@
 Release: %{buildnumber}
 License: LGPL
 Group: Networking/Utilities
-Conflicts: nprobe-dev 
+Conflicts:
 URL: http://www.ntop.org/products/deep-packet-inspection/ndpi/
 Source: ndpi-%{version}.tgz
 Packager: Luca Deri <deri@ntop.org>
@@ -64,6 +64,7 @@ cp $HOME/nDPI/packages/etc/ld.so.conf.d/ndpi.conf $RPM_BUILD_ROOT/etc/ld.so.conf
 rm -rf $RPM_BUILD_ROOT/usr/local/sbin/ndpi
 strip $RPM_BUILD_ROOT%{bindir}/*
 rm -fr %{buildroot}%{includedir}/ndpi_win32.h
+#sed -i -e "s/#include \"ndpi_win32.h\"//g" %{buildroot}%{includedir}/ndpi_main.h
 
 %clean
 rm -fr $RPM_BUILD_ROOT
