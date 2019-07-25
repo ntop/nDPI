@@ -4,7 +4,6 @@ Version: @PACKAGE_VERSION@
 Release: %{buildnumber}
 License: LGPL
 Group: Networking/Utilities
-Conflicts:
 URL: http://www.ntop.org/products/deep-packet-inspection/ndpi/
 Source: ndpi-%{version}.tgz
 Packager: Luca Deri <deri@ntop.org>
