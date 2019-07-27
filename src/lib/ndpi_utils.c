@@ -893,6 +893,15 @@ static void ndpi_serialize_single_uint64(ndpi_serializer *serializer,
 
 /* ********************************** */
 
+/* TODO: fix portability across platforms */
+static void ndpi_serialize_single_float(ndpi_serializer *serializer, float s) {
+
+  memcpy(&serializer->buffer[serializer->size_used], &s, sizeof(s));
+  serializer->size_used += sizeof(float);
+}
+
+/* ********************************** */
+
 static void ndpi_serialize_single_string(ndpi_serializer *serializer,
 					 const char *s, u_int16_t slen) {
   u_int16_t l = htons(slen);
@@ -936,6 +945,15 @@ static void ndpi_deserialize_single_int64(ndpi_serializer *deserializer,
 					  int64_t *s) {
   *s = ndpi_ntohll(*(int64_t*)&deserializer->buffer[deserializer->size_used]);
   deserializer->size_used += sizeof(int64_t);
+}
+
+/* ********************************** */
+
+/* TODO: fix portability across platforms */
+static void ndpi_deserialize_single_float(ndpi_serializer *deserializer,
+					  float *s) {
+  *s = *(float*)&deserializer->buffer[deserializer->size_used];
+  deserializer->size_used += sizeof(float);
 }
 
 /* ********************************** */
@@ -1272,6 +1290,50 @@ int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
 
 /* ********************************** */
 
+int ndpi_serialize_string_float(ndpi_serializer *serializer,
+				const char *key, float value,
+				const char *format /* e.f. "%.2f" */) {
+  u_int16_t klen = strlen(key);
+  u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
+  u_int32_t needed = 
+    sizeof(u_int8_t) /* type */ +
+    sizeof(u_int16_t) /* key len */ +
+    klen /* key */ + 
+    sizeof(float);
+  
+  if(serializer->fmt == ndpi_serialization_format_json)
+    needed += 32 + klen;
+
+  if(buff_diff < needed) {
+    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+      return(-1);
+    buff_diff = serializer->buffer_size - serializer->size_used;
+  }
+
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    ndpi_serialize_json_pre(serializer); 
+    serializer->size_used += ndpi_json_string_escape(key, klen, 
+      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+    buff_diff = serializer->buffer_size - serializer->size_used;
+
+    serializer->buffer[serializer->size_used] = ':';
+    serializer->size_used++;
+
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, format, value);
+    
+    ndpi_serialize_json_post(serializer); 
+  } else {
+    serializer->buffer[serializer->size_used++] = ndpi_serialization_string_float;
+
+    ndpi_serialize_single_string(serializer, key, klen);
+    ndpi_serialize_single_float(serializer, value);
+  }
+
+  return(0);
+}
+
+/* ********************************** */
+
 int ndpi_serialize_string_string(ndpi_serializer *serializer,
 				 const char *key, const char *value) {
   u_int16_t klen = strlen(key), vlen = strlen(value);
@@ -1521,6 +1583,28 @@ int ndpi_deserialize_string_uint64(ndpi_deserializer *deserializer,
     deserializer->size_used++; /* Skip element type */
     ndpi_deserialize_single_string(deserializer, key);    
     ndpi_deserialize_single_uint64(deserializer, value);
+
+    return(0);
+  } else
+    return(-1);
+}
+
+/* ********************************** */
+
+int ndpi_deserialize_string_float(ndpi_deserializer *deserializer,
+				   ndpi_string *key, float *value) {
+  if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_string_float) {
+    u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
+    u_int32_t expected = 
+      sizeof(u_int8_t) /* type */ + 
+      sizeof(u_int16_t) /* key len */ + 
+      sizeof(float);
+
+    if(buff_diff < expected) return(-2);
+
+    deserializer->size_used++; /* Skip element type */
+    ndpi_deserialize_single_string(deserializer, key);    
+    ndpi_deserialize_single_float(deserializer, value);
 
     return(0);
   } else

@@ -1318,6 +1318,7 @@ typedef enum {
   ndpi_serialization_string_int64,
   ndpi_serialization_string_uint32,
   ndpi_serialization_string_uint64,
+  ndpi_serialization_string_float,
   ndpi_serialization_string_string,
 } ndpi_serialization_element_type;
 
