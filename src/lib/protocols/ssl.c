@@ -51,11 +51,11 @@ static int is_big_endian(void) {
 }
 
 static void byteReverse(unsigned char *buf, unsigned longs) {
-  uint32_t t;
-
   // Forrest: MD5 expect LITTLE_ENDIAN, swap if BIG_ENDIAN
-  if (is_big_endian()) {
+  if (is_big_endian()) {    
     do {
+      uint32_t t;
+      
       t = (uint32_t) ((unsigned) buf[3] << 8 | buf[2]) << 16 |
 	((unsigned) buf[1] << 8 | buf[0]);
       * (uint32_t *) buf = t;
@@ -367,13 +367,14 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      char *buffer, int buffer_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ja3_info ja3;
+  int i;
   u_int8_t invalid_ja3 = 0;
-  u_int16_t ssl_version = (packet->payload[1] << 8) + packet->payload[2], ja3_str_len;
+  u_int16_t pkt_ssl_version = (packet->payload[1] << 8) + packet->payload[2], ja3_str_len;
   char ja3_str[JA3_STR_LEN];
   MD5_CTX ctx;
   u_char md5_hash[16];
 
-  flow->protos.stun_ssl.ssl.ssl_version = ssl_version;
+  flow->protos.stun_ssl.ssl.ssl_version = pkt_ssl_version;
 
   memset(&ja3, 0, sizeof(ja3));
 
@@ -381,7 +382,7 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
   {
     u_int16_t ssl_len = (packet->payload[3] << 8) + packet->payload[4];
 
-    printf("SSL Record [version: %u][len: %u]\n", ssl_version, ssl_len);
+    printf("SSL Record [version: %u][len: %u]\n", pkt_ssl_version, ssl_len);
   }
 #endif
 
@@ -401,17 +402,16 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
     /* At least "magic" 3 bytes, null for string end, otherwise no need to waste cpu cycles */
     if(total_len > 4) {
-      int i;
-
 #ifdef CERTIFICATE_DEBUG
       printf("SSL [len: %u][handshake_protocol: %02X]\n", packet->payload_packet_len, handshake_protocol);
 #endif
-
+      
       if((handshake_protocol == 0x02)
 	 || (handshake_protocol == 0xb) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
 	u_int16_t ssl_version = ntohs(*((u_int16_t*)&packet->payload[9]));
-
+	int i;
+	
 	ja3.ssl_version = ssl_version;
 
 	if(handshake_protocol == 0x02) {
@@ -564,8 +564,8 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  if((session_id_len+base_offset+2) <= total_len) {
 	    u_int16_t cipher_len =  packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
-	    u_int16_t i, cipher_offset = base_offset + session_id_len + 3;
-
+	    u_int16_t cipher_offset = base_offset + session_id_len + 3;
+	    
 #ifdef CERTIFICATE_DEBUG
 	    printf("Client SSL [client cipher_len: %u]\n", cipher_len);
 #endif
@@ -676,8 +676,8 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 				 sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
 		      }
 		    } else if(extension_id == 10 /* supported groups */) {
-		      u_int16_t i, s_offset = offset+extension_offset + 2;
-
+		      u_int16_t s_offset = offset+extension_offset + 2;
+		      
 #ifdef CERTIFICATE_DEBUG
 		      printf("Client SSL [EllipticCurveGroups: len=%u]\n", extension_len);
 #endif
@@ -710,8 +710,8 @@ int getSSLcertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		      }
 		    } else if(extension_id == 11 /* ec_point_formats groups */) {
-		      u_int16_t i, s_offset = offset+extension_offset + 1;
-
+		      u_int16_t s_offset = offset+extension_offset + 1;
+		      
 #ifdef CERTIFICATE_DEBUG
 		      printf("Client SSL [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
@@ -877,13 +877,15 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
   /* consider only specific SSL packets (handshake) */
   if((packet->payload_packet_len > 9) && (packet->payload[0] == 0x16)) {
     char certificate[64];
-    char organization[64];
     int rc;
 
     certificate[0] = '\0';
     rc = getSSLcertificate(ndpi_struct, flow, certificate, sizeof(certificate));
     packet->ssl_certificate_num_checks++;
+
     if(rc > 0) {
+      char organization[64];
+      
       // try fetch server organization once server certificate is found
       organization[0] = '\0';
       getSSLorganization(ndpi_struct, flow, organization, sizeof(organization));
@@ -893,6 +895,7 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
         /* 0 means we're done processing extra packets (since we found what we wanted) */
         return 0;
     }
+
     /* Client hello, Server Hello, and certificate packets probably all checked in this case */
     if((packet->ssl_certificate_num_checks >= 3)
 	&& (flow->l4.tcp.seen_syn)

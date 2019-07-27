@@ -128,19 +128,17 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	       || ((dns_header.num_answers == 0) && (dns_header.authority_rrs == 0)))) {
 	  /* This is a good query */
 
-	  if(dns_header.num_queries > 0) {
-	    while(x < flow->packet.payload_packet_len) {
-	      if(flow->packet.payload[x] == '\0') {
-		x++;
-		flow->protos.dns.query_type = get16(&x, flow->packet.payload);
+	  while(x < flow->packet.payload_packet_len) {
+	    if(flow->packet.payload[x] == '\0') {
+	      x++;
+	      flow->protos.dns.query_type = get16(&x, flow->packet.payload);
 #ifdef DNS_DEBUG
-    		NDPI_LOG_DBG2(ndpi_struct, "query_type=%2d\n", flow->protos.dns.query_type);
+	      NDPI_LOG_DBG2(ndpi_struct, "query_type=%2d\n", flow->protos.dns.query_type);
 #endif
-		break;
-	      } else
-		x++;
-	    }
-	  }
+	      break;
+	    } else
+	      x++;
+	  }	  
 	} else
 	  invalid = 1;
       } else {
@@ -222,15 +220,19 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
       while(j < max_len && off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
-	uint8_t c,cl = flow->packet.payload[off++];
+	uint8_t c, cl = flow->packet.payload[off++];
+	
 	if( (cl & 0xc0) != 0 || // we not support compressed names in query
-	     off + cl  >= flow->packet.payload_packet_len) {
-		j = 0; break;
+	    off + cl  >= flow->packet.payload_packet_len) {
+	  j = 0;
+	  break;
 	}
+	
 	if(j && j < max_len) flow->host_server_name[j++] = '.';
+	
 	while(j < max_len && cl != 0) {
 	  c = flow->packet.payload[off++];
-	  flow->host_server_name[j++] = dns_validchar[c >> 5] & (1 << (c & 0x1f)) ? c:'_';
+	  flow->host_server_name[j++] = (dns_validchar[c >> 5] & (1 << (c & 0x1f))) ? c : '_';
 	  cl--;
 	}
       }

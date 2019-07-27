@@ -96,11 +96,12 @@ int ndpi_is_ssl_tor(struct ndpi_detection_module_struct *ndpi_struct,
 void ndpi_search_tor(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int16_t dport = 0, sport = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search for TOR\n");
 
   if(packet->tcp != NULL) {
+    u_int16_t dport, sport;
+    
     sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);
     NDPI_LOG_DBG2(ndpi_struct, "calculating TOR over tcp\n");
 
