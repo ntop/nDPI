@@ -833,6 +833,9 @@ extern "C" {
 				   u_int32_t key, const char *value);
   int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
 				   const char *key, u_int32_t value);
+  int ndpi_serialize_string_uint32_format(ndpi_serializer *serializer,
+					  const char *key, u_int32_t value,
+					  const char *format);
   int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
 				   const char *key, u_int64_t value);
   int ndpi_serialize_string_string(ndpi_serializer *serializer,
