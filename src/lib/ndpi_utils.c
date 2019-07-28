@@ -790,7 +790,7 @@ static int ndpi_json_string_escape(const char *src, int src_len, char *dst, int 
         dst[j++] = 'r';
       break;
       default:
-        if (c < ' ')
+        if(c < ' ')
           ; /* non printable */
         else
           dst[j++] = c;
@@ -806,12 +806,14 @@ static int ndpi_json_string_escape(const char *src, int src_len, char *dst, int 
 /* ********************************** */
 
 void ndpi_reset_serializer(ndpi_serializer *serializer) {
-  serializer->size_used = 2 * sizeof(u_int8_t);
-  if (serializer->fmt == ndpi_serialization_format_json) {
+  if(serializer->fmt == ndpi_serialization_format_json) {
     u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
     /* Note: please keep a space at the beginning as it is used for arrays when an end-of-record is used */
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, " {}");
-  }
+  } else if(serializer->fmt == ndpi_serialization_format_csv)
+    serializer->size_used = 0;
+  else
+    serializer->size_used = 2 * sizeof(u_int8_t);      
 }
 
 /* ********************************** */
@@ -821,7 +823,7 @@ int ndpi_init_serializer(ndpi_serializer *serializer,
   serializer->buffer_size = 8192;
   serializer->buffer      = (u_int8_t *) malloc(serializer->buffer_size * sizeof(u_int8_t));
 
-  if (serializer->buffer == NULL)
+  if(serializer->buffer == NULL)
     return(-1);
 
   serializer->fmt         = fmt;
@@ -834,7 +836,7 @@ int ndpi_init_serializer(ndpi_serializer *serializer,
 
   ndpi_reset_serializer(serializer);
 
-  if (fmt == ndpi_serialization_format_json)
+  if(fmt == ndpi_serialization_format_json)
     serializer->json_buffer = (char *) &serializer->buffer[2];
 
   return(1);
@@ -862,7 +864,7 @@ static int ndpi_extend_serializer_buffer(ndpi_serializer *serializer, u_int32_t 
   u_int32_t new_size;
   void *r;
 
-  if (min_len < 1024)
+  if(min_len < 1024)
     min_len = 1024;
 
   new_size = serializer->buffer_size + min_len;
@@ -918,7 +920,7 @@ static void ndpi_serialize_single_string(ndpi_serializer *serializer,
   memcpy(&serializer->buffer[serializer->size_used], &l, sizeof(u_int16_t));
   serializer->size_used += sizeof(u_int16_t);
 
-  if (slen > 0)
+  if(slen > 0)
     memcpy(&serializer->buffer[serializer->size_used], s, slen);
 
   serializer->size_used += slen;
@@ -987,13 +989,13 @@ int ndpi_serialize_end_of_record(ndpi_serializer *serializer) {
     needed += 1;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    if (!(serializer->status & NDPI_SERIALIZER_STATUS_ARRAY)) {
+    if(!(serializer->status & NDPI_SERIALIZER_STATUS_ARRAY)) {
       serializer->json_buffer[0] = '[';
       serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, "]");
     }
@@ -1009,17 +1011,17 @@ int ndpi_serialize_end_of_record(ndpi_serializer *serializer) {
 /* ********************************** */
 
 static void ndpi_serialize_json_pre(ndpi_serializer *serializer) {
-  if (serializer->status & NDPI_SERIALIZER_STATUS_EOR) {
+  if(serializer->status & NDPI_SERIALIZER_STATUS_EOR) {
     serializer->size_used--; /* Remove ']' */
     serializer->status &= ~NDPI_SERIALIZER_STATUS_EOR;
     serializer->buffer[serializer->size_used++] = ',';
     serializer->buffer[serializer->size_used++] = '{';
   } else {
-    if (serializer->status & NDPI_SERIALIZER_STATUS_ARRAY)
+    if(serializer->status & NDPI_SERIALIZER_STATUS_ARRAY)
       serializer->size_used--; /* Remove ']'*/
     serializer->size_used--; /* Remove '}'*/
   }
-  if (serializer->status & NDPI_SERIALIZER_STATUS_COMMA)
+  if(serializer->status & NDPI_SERIALIZER_STATUS_COMMA)
     serializer->buffer[serializer->size_used++] = ',';
 }
 
@@ -1027,7 +1029,7 @@ static void ndpi_serialize_json_pre(ndpi_serializer *serializer) {
 
 static void ndpi_serialize_json_post(ndpi_serializer *serializer) {
   serializer->buffer[serializer->size_used++] = '}';
-  if (serializer->status & NDPI_SERIALIZER_STATUS_ARRAY)
+  if(serializer->status & NDPI_SERIALIZER_STATUS_ARRAY)
     serializer->buffer[serializer->size_used++] = ']';
 
   serializer->status |= NDPI_SERIALIZER_STATUS_COMMA;
@@ -1047,7 +1049,7 @@ int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer,
     needed += 24;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1084,7 +1086,7 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
     needed += 32;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1126,7 +1128,7 @@ int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
     needed += 24 + slen;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1169,7 +1171,7 @@ int ndpi_serialize_string_int32(ndpi_serializer *serializer,
     needed += 16 + klen;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1211,7 +1213,7 @@ int ndpi_serialize_string_int64(ndpi_serializer *serializer,
     needed += 16 + klen;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1253,7 +1255,7 @@ int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
     needed += 16 + klen;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1311,7 +1313,7 @@ int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
     needed += 32 + klen;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1355,7 +1357,7 @@ int ndpi_serialize_string_float(ndpi_serializer *serializer,
     needed += 32 + klen;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
@@ -1404,7 +1406,7 @@ int ndpi_serialize_string_string(ndpi_serializer *serializer,
     needed += 16 + klen + vlen;
 
   if(buff_diff < needed) {
-    if (ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
+    if(ndpi_extend_serializer_buffer(serializer, needed - buff_diff) < 0)
       return(-1);
     buff_diff = serializer->buffer_size - serializer->size_used;
   }
