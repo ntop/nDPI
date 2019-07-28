@@ -236,38 +236,38 @@ u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
  * based upon ascii character sequences.
  */
 static const u_char charmap[] = {
-  '\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
-  '\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
-  '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
-  '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037',
-  '\040', '\041', '\042', '\043', '\044', '\045', '\046', '\047',
-  '\050', '\051', '\052', '\053', '\054', '\055', '\056', '\057',
-  '\060', '\061', '\062', '\063', '\064', '\065', '\066', '\067',
-  '\070', '\071', '\072', '\073', '\074', '\075', '\076', '\077',
-  '\100', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
-  '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
-  '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
-  '\170', '\171', '\172', '\133', '\134', '\135', '\136', '\137',
-  '\140', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
-  '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
-  '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
-  '\170', '\171', '\172', '\173', '\174', '\175', '\176', '\177',
-  '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
-  '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
-  '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
-  '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237',
-  '\240', '\241', '\242', '\243', '\244', '\245', '\246', '\247',
-  '\250', '\251', '\252', '\253', '\254', '\255', '\256', '\257',
-  '\260', '\261', '\262', '\263', '\264', '\265', '\266', '\267',
-  '\270', '\271', '\272', '\273', '\274', '\275', '\276', '\277',
-  '\300', '\301', '\302', '\303', '\304', '\305', '\306', '\307',
-  '\310', '\311', '\312', '\313', '\314', '\315', '\316', '\317',
-  '\320', '\321', '\322', '\323', '\324', '\325', '\326', '\327',
-  '\330', '\331', '\332', '\333', '\334', '\335', '\336', '\337',
-  '\340', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
-  '\350', '\351', '\352', '\353', '\354', '\355', '\356', '\357',
-  '\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
-  '\370', '\371', '\372', '\373', '\374', '\375', '\376', '\377',
+				 '\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
+				 '\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
+				 '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
+				 '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037',
+				 '\040', '\041', '\042', '\043', '\044', '\045', '\046', '\047',
+				 '\050', '\051', '\052', '\053', '\054', '\055', '\056', '\057',
+				 '\060', '\061', '\062', '\063', '\064', '\065', '\066', '\067',
+				 '\070', '\071', '\072', '\073', '\074', '\075', '\076', '\077',
+				 '\100', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
+				 '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
+				 '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
+				 '\170', '\171', '\172', '\133', '\134', '\135', '\136', '\137',
+				 '\140', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
+				 '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
+				 '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
+				 '\170', '\171', '\172', '\173', '\174', '\175', '\176', '\177',
+				 '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
+				 '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
+				 '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
+				 '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237',
+				 '\240', '\241', '\242', '\243', '\244', '\245', '\246', '\247',
+				 '\250', '\251', '\252', '\253', '\254', '\255', '\256', '\257',
+				 '\260', '\261', '\262', '\263', '\264', '\265', '\266', '\267',
+				 '\270', '\271', '\272', '\273', '\274', '\275', '\276', '\277',
+				 '\300', '\301', '\302', '\303', '\304', '\305', '\306', '\307',
+				 '\310', '\311', '\312', '\313', '\314', '\315', '\316', '\317',
+				 '\320', '\321', '\322', '\323', '\324', '\325', '\326', '\327',
+				 '\330', '\331', '\332', '\333', '\334', '\335', '\336', '\337',
+				 '\340', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
+				 '\350', '\351', '\352', '\353', '\354', '\355', '\356', '\357',
+				 '\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
+				 '\370', '\371', '\372', '\373', '\374', '\375', '\376', '\377',
 };
 
 int strcasecmp(const char *s1, const char *s2) {
@@ -304,8 +304,8 @@ int strncasecmp(const char *s1, const char *s2, size_t n) {
 /* **************************************** */
 
 u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher) {
-   /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
-   /* INSECURE */
+  /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
+  /* INSECURE */
   switch(cipher) {
   case 0xc011: return(NDPI_CIPHER_INSECURE); /* TLS_ECDHE_RSA_WITH_RC4_128_SHA */
   case 0x0005: return(NDPI_CIPHER_INSECURE); /* TLS_RSA_WITH_RC4_128_SHA */
@@ -829,12 +829,21 @@ int ndpi_init_serializer(ndpi_serializer *serializer,
   serializer->buffer[0]   = 1; /* version */
   serializer->buffer[1]   = (u_int8_t) fmt;
 
+  serializer->csv_separator[0] = ',';
+  serializer->csv_separator[1] = '\0';
+
   ndpi_reset_serializer(serializer);
 
   if (fmt == ndpi_serialization_format_json)
     serializer->json_buffer = (char *) &serializer->buffer[2];
 
   return(1);
+}
+
+/* ********************************** */
+
+void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator) {
+  serializer->csv_separator[0] = separator;
 }
 
 /* ********************************** */
@@ -1048,6 +1057,9 @@ int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer,
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      "\"%u\":%u", key, value);
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%u", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_uint32;
 
@@ -1082,6 +1094,12 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      "\"%u\":%llu", key, (unsigned long long)value);
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%llu",
+				      (serializer->size_used > 0) ? serializer->csv_separator : "",
+				      (unsigned long long)value);
+
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_uint64;
 
@@ -1119,9 +1137,12 @@ int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
 				      "\"%u\":", key);
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += ndpi_json_string_escape(value, slen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%s", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_string;
 
@@ -1156,11 +1177,14 @@ int ndpi_serialize_string_int32(ndpi_serializer *serializer,
   if(serializer->fmt == ndpi_serialization_format_json) {
     ndpi_serialize_json_pre(serializer);
     serializer->size_used += ndpi_json_string_escape(key, klen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      ":%d", value);
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%d", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int32;
 
@@ -1195,11 +1219,14 @@ int ndpi_serialize_string_int64(ndpi_serializer *serializer,
   if(serializer->fmt == ndpi_serialization_format_json) {
     ndpi_serialize_json_pre(serializer);
     serializer->size_used += ndpi_json_string_escape(key, klen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      ":%lld", value);
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%lld", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int64;
 
@@ -1234,11 +1261,14 @@ int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
   if(serializer->fmt == ndpi_serialization_format_json) {
     ndpi_serialize_json_pre(serializer);
     serializer->size_used += ndpi_json_string_escape(key, klen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      ":%u", value);
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%u", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_string_uint32;
 
@@ -1256,8 +1286,8 @@ int ndpi_serialize_string_uint32_format(ndpi_serializer *serializer,
 					const char *format) {
   if(serializer->fmt == ndpi_serialization_format_json) {
     /*
-       JSON supports base 10 numbers only
-       http://cjihrig.com/blog/json-overview/
+      JSON supports base 10 numbers only
+      http://cjihrig.com/blog/json-overview/
     */
 
     return(ndpi_serialize_string_uint32(serializer, key, value));
@@ -1265,7 +1295,7 @@ int ndpi_serialize_string_uint32_format(ndpi_serializer *serializer,
     return(ndpi_serialize_string_uint32_format(serializer, key, value, format));
 }
 
-  /* ********************************** */
+/* ********************************** */
 
 int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
 				 const char *key, u_int64_t value) {
@@ -1289,11 +1319,15 @@ int ndpi_serialize_string_uint64(ndpi_serializer *serializer,
   if(serializer->fmt == ndpi_serialization_format_json) {
     ndpi_serialize_json_pre(serializer);
     serializer->size_used += ndpi_json_string_escape(key, klen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      ":%llu", (unsigned long long)value);
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%llu", (serializer->size_used > 0) ? serializer->csv_separator : "",
+				      (unsigned long long)value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_string_uint64;
 
@@ -1329,7 +1363,7 @@ int ndpi_serialize_string_float(ndpi_serializer *serializer,
   if(serializer->fmt == ndpi_serialization_format_json) {
     ndpi_serialize_json_pre(serializer);
     serializer->size_used += ndpi_json_string_escape(key, klen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
 
     serializer->buffer[serializer->size_used] = ':';
@@ -1338,6 +1372,11 @@ int ndpi_serialize_string_float(ndpi_serializer *serializer,
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, format, value);
 
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    if(serializer->size_used > 0)
+      serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, "%s", serializer->csv_separator);
+
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, format, value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_string_float;
 
@@ -1373,14 +1412,18 @@ int ndpi_serialize_string_string(ndpi_serializer *serializer,
   if(serializer->fmt == ndpi_serialization_format_json) {
     ndpi_serialize_json_pre(serializer);
     serializer->size_used += ndpi_json_string_escape(key, klen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, ":");
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += ndpi_json_string_escape(value, vlen,
-      (char *) &serializer->buffer[serializer->size_used], buff_diff);
+						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     ndpi_serialize_json_post(serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
+				      "%s%s", (serializer->size_used > 0) ? serializer->csv_separator : "",
+				      value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_string_string;
 
@@ -1520,7 +1563,7 @@ int ndpi_deserialize_uint32_string(ndpi_deserializer *deserializer,
 /* ********************************** */
 
 int ndpi_deserialize_string_int32(ndpi_deserializer *deserializer,
-				ndpi_string *key, int32_t *value) {
+				  ndpi_string *key, int32_t *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_string_int32) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
     u_int32_t expected =
@@ -1608,7 +1651,7 @@ int ndpi_deserialize_string_uint64(ndpi_deserializer *deserializer,
 /* ********************************** */
 
 int ndpi_deserialize_string_float(ndpi_deserializer *deserializer,
-				   ndpi_string *key, float *value) {
+				  ndpi_string *key, float *value) {
   if(ndpi_deserialize_get_nextitem_type(deserializer) == ndpi_serialization_string_float) {
     u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
     u_int32_t expected =

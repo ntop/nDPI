@@ -847,7 +847,8 @@ extern "C" {
 
   /* Deserializer */
   int ndpi_init_deserializer(ndpi_deserializer *deserializer,
-			     ndpi_serializer *serializer);  
+			     ndpi_serializer *serializer);
+  void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator);
   int ndpi_init_deserializer_buf(ndpi_deserializer *deserializer,
 				 u_int8_t *serialized_buffer,
 				 u_int32_t serialized_buffer_len);
