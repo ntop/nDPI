@@ -3,13 +3,13 @@ MDNS	8	952	4
 DHCP	10	3420	1
 STUN	27	2322	2
 ICMP	10	700	1
-RTP	706	91156	4
+RTP	44	7818	2
 SSL	8	589	2
 Dropbox	4	2176	1
 Apple	190	50263	21
 WhatsApp	182	25154	2
 Spotify	3	258	1
-WhatsAppVoice	70	9464	14
+WhatsAppVoice	732	92802	16
 ApplePush	22	5926	1
 
 JA3 Host Stats: 
@@ -17,8 +17,8 @@ JA3 Host Stats:
 	1	 192.168.2.4              	 1      
 
 
-	1	UDP 192.168.2.4:51518 <-> 91.253.176.65:9344 [proto: 87/RTP][cat: Media/1][186 pkts/27025 bytes <-> 278 pkts/25895 bytes][PLAIN TEXT (zTdFPOk)]
-	2	UDP 192.168.2.4:52794 <-> 91.253.176.65:9665 [proto: 87/RTP][cat: Media/1][141 pkts/17530 bytes <-> 57 pkts/12888 bytes]
+	1	UDP 192.168.2.4:51518 <-> 91.253.176.65:9344 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][186 pkts/27025 bytes <-> 278 pkts/25895 bytes][PLAIN TEXT (zTdFPOk)]
+	2	UDP 192.168.2.4:52794 <-> 91.253.176.65:9665 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][141 pkts/17530 bytes <-> 57 pkts/12888 bytes]
 	3	TCP 192.168.2.4:49202 <-> 184.173.179.37:5222 [proto: 142/WhatsApp][cat: Chat/9][100 pkts/14711 bytes <-> 80 pkts/10163 bytes][PLAIN TEXT (iPhone)]
 	4	TCP 192.168.2.4:49204 <-> 17.173.66.102:443 [proto: 91.140/SSL.Apple][cat: Web/5][29 pkts/11770 bytes <-> 24 pkts/6612 bytes][TLSv1.2][JA3C: 799135475da362592a4be9199d258726][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_MD5]
 	5	TCP 192.168.2.4:49201 <-> 17.178.104.12:443 [proto: 91.140/SSL.Apple][cat: Web/5][21 pkts/7644 bytes <-> 17 pkts/9576 bytes][TLSv1.2][JA3C: 799135475da362592a4be9199d258726][server: *.ess.apple.com][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][organization: Apple Inc.][Cipher: TLS_RSA_WITH_RC4_128_MD5]
