@@ -1327,13 +1327,7 @@ typedef enum {
 #define NDPI_SERIALIZER_STATUS_ARRAY (1 << 1)
 #define NDPI_SERIALIZER_STATUS_EOR   (1 << 2)
 
-typedef struct {
-  u_int32_t buffer_size, size_used;
-  ndpi_serialization_format fmt;
-  u_int32_t status;
-  u_int8_t *buffer;
-  char *json_buffer, csv_separator[2];
-} ndpi_serializer;
+typedef void* ndpi_serializer;
 
 #define ndpi_deserializer ndpi_serializer
 

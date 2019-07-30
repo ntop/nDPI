@@ -844,7 +844,9 @@ extern "C" {
 				  const char *key, float value,
 				  const char *format /* e.f. "%.2f" */);
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
-
+  char* ndpi_serializer_get_buffer(ndpi_serializer *_serializer, u_int32_t *buffer_len);
+  u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *_serializer);
+    
   /* Deserializer */
   int ndpi_init_deserializer(ndpi_deserializer *deserializer,
 			     ndpi_serializer *serializer);
