@@ -850,6 +850,17 @@ int ndpi_init_serializer(ndpi_serializer *serializer,
 
 /* ********************************** */
 
+char* ndpi_serializer_get_buffer(ndpi_serializer *serializer, u_int32_t *buffer_len) {
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    
+  } else {
+    *buffer_len = serializer->size_used;
+    return(serializer->buffer);
+  }
+}
+
+/* ********************************** */
+
 void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator) {
   serializer->csv_separator[0] = separator;
 }

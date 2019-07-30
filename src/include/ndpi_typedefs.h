@@ -1306,7 +1306,7 @@ typedef enum {
   ndpi_serialization_format_unknown = 0,
   ndpi_serialization_format_tlv,
   ndpi_serialization_format_json,
-  ndpi_serialization_format_csv, // TODO
+  ndpi_serialization_format_csv
 } ndpi_serialization_format;
 
 typedef enum {
