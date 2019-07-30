@@ -611,11 +611,12 @@ int ndpi_serialize_string_int64(ndpi_serializer *_serializer,
 						     (char *) &serializer->buffer[serializer->size_used], buff_diff);
     buff_diff = serializer->buffer_size - serializer->size_used;
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
-				      ":%lld", value);
+				      ":%lld", (long long int)value);
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
-				      "%s%lld", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
+				      "%s%lld", (serializer->size_used > 0) ? serializer->csv_separator : "",
+				      (long long int)value);
   } else {
     serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int64;
 

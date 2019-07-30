@@ -3216,7 +3216,7 @@ void serializerUnitTest() {
   }
 
   if(trace)
-    printf("Serialization size: %u/%u\n", serializer.size_used, serializer.buffer_size);
+    printf("Serialization size: %u\n", ndpi_serializer_get_buffer_len(&serializer));
 
   assert(ndpi_init_deserializer(&deserializer, &serializer) != -1);
 
