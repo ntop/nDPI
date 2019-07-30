@@ -124,11 +124,11 @@ void ndpi_reset_serializer(ndpi_serializer *_serializer) {
   if(serializer->fmt == ndpi_serialization_format_json) {
     u_int32_t buff_diff;
 
-    serializer->size_used = 2 * sizeof(u_int8_t);
+    serializer->size_used = 0;
     buff_diff = serializer->buffer_size - serializer->size_used;
+    
     /* Note: please keep a space at the beginning as it is used for arrays when an end-of-record is used */
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, " {}");
-
   } else if(serializer->fmt == ndpi_serialization_format_csv)
     serializer->size_used = 0;
   else /* TLV */
