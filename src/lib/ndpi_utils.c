@@ -807,19 +807,25 @@ static int ndpi_json_string_escape(const char *src, int src_len, char *dst, int 
 
 void ndpi_reset_serializer(ndpi_serializer *serializer) {
   if(serializer->fmt == ndpi_serialization_format_json) {
-    u_int32_t buff_diff = serializer->buffer_size - serializer->size_used;
+    u_int32_t buff_diff;
+
+    serializer->size_used = 2 * sizeof(u_int8_t);
+    buff_diff = serializer->buffer_size - serializer->size_used;
     /* Note: please keep a space at the beginning as it is used for arrays when an end-of-record is used */
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, " {}");
+
   } else if(serializer->fmt == ndpi_serialization_format_csv)
     serializer->size_used = 0;
   else
-    serializer->size_used = 2 * sizeof(u_int8_t);      
+    serializer->size_used = 2 * sizeof(u_int8_t);
 }
 
 /* ********************************** */
 
 int ndpi_init_serializer(ndpi_serializer *serializer,
 			 ndpi_serialization_format fmt) {
+  memset(serializer, 0, sizeof(ndpi_serializer));
+  
   serializer->buffer_size = 8192;
   serializer->buffer      = (u_int8_t *) malloc(serializer->buffer_size * sizeof(u_int8_t));
 
