@@ -41,16 +41,6 @@
 #include <sys/endian.h>
 #endif
 
-typedef struct {
-  u_int32_t buffer_size, size_used;
-  ndpi_serialization_format fmt;
-  u_int32_t status;
-  u_int8_t *buffer;
-  char csv_separator[2];
-} ndpi_private_serializer;
-
-#define ndpi_private_deserializer ndpi_private_serializer
-
 /* ********************************** */
 
 static u_int64_t ndpi_htonll(u_int64_t v) {
