@@ -83,15 +83,27 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
      ) {
     int i;
 
-
     if((packet->payload[1] == 'Q')
        && (packet->payload[2] == '0')
        && (packet->payload[3] == '4')
-       && (packet->payload[4] == '6'))
+       && (packet->payload[4] == '6')
+       && (version_len == 1)
+       )
       quic_hlen = 18; /* TODO: Better handle Q046 */
     else {
+      u_int16_t potential_stun_len = ntohs((*((u_int16_t*)&packet->payload[2])));
+      
       if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
 	goto no_quic;
+
+      if((version_len == 0) && ((packet->payload[0] & 0xC3 /* ignore CID len/packet number */) != 0))
+	goto no_quic;      
+
+
+      /* Heuristic to see if this packet could be a STUN packet */
+      if((potential_stun_len /* STUN message len */ < udp_len)
+	 && ((potential_stun_len+25 /* Attribute header overhead we assume is max */) /* STUN message len */ > udp_len))	
+	return; /* This could be STUN, let's skip this packet */      
       
       NDPI_LOG_INFO(ndpi_struct, "found QUIC\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
