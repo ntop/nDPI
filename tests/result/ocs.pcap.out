@@ -13,10 +13,10 @@ JA3 Host Stats:
 
 
 	1	TCP 192.168.180.2:49881 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media/1][751 pkts/44783 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws][PLAIN TEXT (POST /catalog/vod)]
-	2	TCP 192.168.180.2:36680 -> 178.248.208.54:443 [proto: 91.218/SSL.OCS][cat: Media/1][20 pkts/6089 bytes -> 0 pkts/0 bytes][TLSv1][JA3C: 0534a22b266a64a5cc9a90f7b5c483cc]
+	2	TCP 192.168.180.2:36680 -> 178.248.208.54:443 [proto: 91.218/SSL.OCS][cat: Media/1][20 pkts/6089 bytes -> 0 pkts/0 bytes][TLSv1][client: ocs.labgency.ws][JA3C: 0534a22b266a64a5cc9a90f7b5c483cc]
 	3	TCP 192.168.180.2:42590 -> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][cat: Media/1][83 pkts/5408 bytes -> 0 pkts/0 bytes][Host: www.ocs.fr][PLAIN TEXT (GET /data)]
-	4	TCP 192.168.180.2:39263 -> 23.21.230.199:443 [proto: 91.178/SSL.Amazon][cat: Web/5][20 pkts/2715 bytes -> 0 pkts/0 bytes][TLSv1][JA3C: b030dba3ca09e2e484b9fa75adc4039c]
-	5	TCP 192.168.180.2:32946 -> 64.233.184.188:443 [proto: 91.239/SSL.GoogleServices][cat: Web/5][12 pkts/2212 bytes -> 0 pkts/0 bytes][TLSv1.2][JA3C: 75edb912bc6f0a222ae3e3e47f5c89b1]
+	4	TCP 192.168.180.2:39263 -> 23.21.230.199:443 [proto: 91.178/SSL.Amazon][cat: Web/5][20 pkts/2715 bytes -> 0 pkts/0 bytes][TLSv1][client: settings.crashlytics.com][JA3C: b030dba3ca09e2e484b9fa75adc4039c]
+	5	TCP 192.168.180.2:32946 -> 64.233.184.188:443 [proto: 91.239/SSL.GoogleServices][cat: Web/5][12 pkts/2212 bytes -> 0 pkts/0 bytes][TLSv1.2][client: mtalk.google.com][JA3C: 75edb912bc6f0a222ae3e3e47f5c89b1]
 	6	TCP 192.168.180.2:47803 -> 64.233.166.95:443 [proto: 91.126/SSL.Google][cat: Web/5][12 pkts/1608 bytes -> 0 pkts/0 bytes][TLSv1][JA3C: 5a236bfc3d18ddef1b1f2f4c9e765d66]
 	7	TCP 192.168.180.2:41223 -> 216.58.208.46:443 [proto: 91.126/SSL.Google][cat: Web/5][13 pkts/1448 bytes -> 0 pkts/0 bytes][TLSv1][JA3C: 5a236bfc3d18ddef1b1f2f4c9e765d66]
 	8	TCP 192.168.180.2:48250 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media/1][6 pkts/1092 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws][PLAIN TEXT (POST /catalog/vod)]

@@ -24,7 +24,7 @@ JA3 Host Stats:
 	4	UDP 192.168.0.254:1025 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][36 pkts/13402 bytes -> 0 pkts/0 bytes][PLAIN TEXT (NOTIFY )]
 	5	TCP 192.168.1.34:51292 <-> 71.238.7.203:18767 [proto: 125.38/Skype.SkypeCall][cat: VoIP/10][17 pkts/2686 bytes <-> 13 pkts/2218 bytes]
 	6	TCP 192.168.1.34:51293 <-> 5.248.186.221:31010 [proto: 125.38/Skype.SkypeCall][cat: VoIP/10][12 pkts/2194 bytes <-> 8 pkts/1711 bytes]
-	7	TCP 192.168.1.34:51231 <-> 23.206.33.166:443 [proto: 91.125/SSL.Skype][cat: VoIP/10][16 pkts/3461 bytes <-> 1 pkts/74 bytes][TLSv1][JA3C: 799135475da362592a4be9199d258726]
+	7	TCP 192.168.1.34:51231 <-> 23.206.33.166:443 [proto: 91.125/SSL.Skype][cat: VoIP/10][16 pkts/3461 bytes <-> 1 pkts/74 bytes][TLSv1][client: apps.skype.com][JA3C: 799135475da362592a4be9199d258726]
 	8	TCP 192.168.1.34:51297 <-> 91.190.216.24:12350 [proto: 125/Skype][cat: VoIP/10][12 pkts/3242 bytes <-> 3 pkts/290 bytes]
 	9	TCP 108.160.163.108:443 <-> 192.168.1.34:51222 [proto: 64.121/SSL_No_Cert.Dropbox][cat: Cloud/13][4 pkts/818 bytes <-> 4 pkts/2172 bytes][PLAIN TEXT (ZeNjsq)]
 	10	TCP 192.168.1.34:51295 <-> 23.206.33.166:443 [proto: 64.125/SSL_No_Cert.Skype][cat: VoIP/10][11 pkts/2074 bytes <-> 1 pkts/74 bytes][PLAIN TEXT (apps.skype.com)]

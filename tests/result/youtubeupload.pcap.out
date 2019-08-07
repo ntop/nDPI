@@ -7,4 +7,4 @@ JA3 Host Stats:
 
 	1	UDP 192.168.2.27:51925 <-> 172.217.23.111:443 [proto: 188.136/QUIC.YouTubeUpload][cat: Media/1][80 pkts/100473 bytes <-> 20 pkts/6003 bytes][Host: upload.youtube.com][PLAIN TEXT (upload.youtube.comQ)]
 	2	UDP 192.168.2.27:62232 <-> 172.217.23.111:443 [proto: 188.136/QUIC.YouTubeUpload][cat: Media/1][13 pkts/8651 bytes <-> 11 pkts/6463 bytes][Host: upload.youtube.com][PLAIN TEXT (upload.youtube.comQ)]
-	3	TCP 192.168.2.27:57452 <-> 172.217.23.111:443 [proto: 91.136/SSL.YouTubeUpload][cat: Media/1][6 pkts/649 bytes <-> 7 pkts/4799 bytes][TLSv1.2][JA3C: bc6c386f480ee97b9d9e52d472b772d8][server: upload.video.google.com][JA3S: b26c652e0a402a24b5ca2a660e84f9d5][organization: Google Inc][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	3	TCP 192.168.2.27:57452 <-> 172.217.23.111:443 [proto: 91.136/SSL.YouTubeUpload][cat: Media/1][6 pkts/649 bytes <-> 7 pkts/4799 bytes][TLSv1.2][client: upload.youtube.com][JA3C: bc6c386f480ee97b9d9e52d472b772d8][server: upload.video.google.com][JA3S: b26c652e0a402a24b5ca2a660e84f9d5][organization: Google Inc][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
