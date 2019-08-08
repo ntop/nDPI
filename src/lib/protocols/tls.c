@@ -27,7 +27,7 @@
 
 #include "ndpi_api.h"
 
-/* #define CERTIFICATE_DEBUG 1 */
+// #define DEBUG_TLS 1
 
 #define NDPI_MAX_TLS_REQUEST_SIZE 10000
 
@@ -391,7 +391,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
   memset(&ja3, 0, sizeof(ja3));
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
   {
     u_int16_t tls_len = (packet->payload[3] << 8) + packet->payload[4];
 
@@ -429,7 +429,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
     if(total_len > 4) {
       u_int16_t base_offset = packet->tcp ? 43 : 59;
       
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
       printf("SSL [len: %u][handshake_protocol: %02X]\n", packet->payload_packet_len, handshake_protocol);
 #endif
       
@@ -450,7 +450,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  u_int16_t offset = base_offset, extension_len, j;
 	  u_int8_t  session_id_len = packet->payload[offset];
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	  printf("SSL Server Hello [version: 0x%04X]\n", tls_version);
 #endif
 
@@ -471,14 +471,14 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0]);
 	  flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	  printf("SSL [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
 #endif
 
 	  offset += 2 + 1;
 	  extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	  printf("SSL [server][extension_len: %u]\n", extension_len);
 #endif
 	  offset += 2;
@@ -494,7 +494,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    if(ja3.num_tls_extension < MAX_NUM_JA3)
 	      ja3.tls_extension[ja3.num_tls_extension++] = id;
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	    printf("SSL [server][extension_id: %u/0x%04X]\n", id, id);
 #endif
 
@@ -513,11 +513,11 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  for(i=0; i<ja3.num_tls_extension; i++)
 	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.tls_extension[i]);
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	  printf("SSL [server] %s\n", ja3_str);
 #endif
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	  printf("[JA3] Server: %s \n", ja3_str);
 #endif
 
@@ -529,7 +529,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
 			  sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	  printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
 #endif
 
@@ -592,7 +592,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
       } else if(handshake_protocol == 0x01 /* Client Hello */) {
 	u_int offset;
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	printf("[base_offset: %u][payload_packet_len: %u]\n", base_offset, packet->payload_packet_len);
 #endif
 
@@ -620,7 +620,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      cipher_offset = base_offset+4;
 	    }
 	    
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	    printf("Client SSL [client cipher_len: %u][tls_version: 0x%04X]\n", cipher_len, tls_version);
 #endif
 
@@ -628,7 +628,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      for(i=0; i<cipher_len;) {
 		u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		printf("Client SSL [cipher suite: %u/0x%04X] [%u/%u]\n", ntohs(*id), ntohs(*id), i, cipher_len);
 #endif
 		if((*id == 0) || (packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1])) {
@@ -641,7 +641,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    ja3.cipher[ja3.num_cipher++] = ntohs(*id);
 		  else {
 		    invalid_ja3 = 1;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		    printf("Client SSL Invalid cipher %u\n", ja3.num_cipher);
 #endif
 		  }
@@ -651,7 +651,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      }
 	    } else {
 	      invalid_ja3 = 1;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	      printf("Client SSL Invalid len %u vs %u\n", (cipher_offset+cipher_len), total_len);
 #endif
 	    }
@@ -668,7 +668,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      compression_len = packet->payload[offset];
 	      offset++;
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	      printf("Client SSL [compression_len: %u]\n", compression_len);
 #endif
 
@@ -679,7 +679,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		extensions_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
 		offset += 2;
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		printf("Client SSL [extensions_len: %u]\n", extensions_len);
 #endif
 
@@ -698,7 +698,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
 		    extension_offset += 2;
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		    printf("Client SSL [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
 #endif
 
@@ -709,7 +709,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			ja3.tls_extension[ja3.num_tls_extension++] = extension_id;
 		      else {
 			invalid_ja3 = 1;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 			printf("Client SSL Invalid extensions %u\n", ja3.num_tls_extension);
 #endif
 		      }
@@ -732,7 +732,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    } else if(extension_id == 10 /* supported groups */) {
 		      u_int16_t s_offset = offset+extension_offset + 2;
 		      
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		      printf("Client SSL [EllipticCurveGroups: len=%u]\n", extension_len);
 #endif
 
@@ -740,7 +740,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			for(i=0; i<extension_len-2;) {
 			  u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 			  printf("Client SSL [EllipticCurve: %u/0x%04X]\n", s_group, s_group);
 #endif
 			  if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])) {
@@ -749,7 +749,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			      ja3.elliptic_curve[ja3.num_elliptic_curve++] = s_group;
 			    else {
 			      invalid_ja3 = 1;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 			      printf("Client SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve);
 #endif
 			    }
@@ -759,21 +759,21 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			}
 		      } else {
 			invalid_ja3 = 1;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 			printf("Client SSL Invalid len %u vs %u\n", (s_offset+extension_len-1), total_len);
 #endif
 		      }
 		    } else if(extension_id == 11 /* ec_point_formats groups */) {
 		      u_int16_t s_offset = offset+extension_offset + 1;
 		      
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		      printf("Client SSL [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
 		      if((s_offset+extension_len) < total_len) {
 			for(i=0; i<extension_len-1;i++) {
 			  u_int8_t s_group = packet->payload[s_offset+i];
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 			  printf("Client SSL [EllipticCurveFormat: %u]\n", s_group);
 #endif
 
@@ -781,14 +781,14 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			    ja3.elliptic_curve_point_format[ja3.num_elliptic_curve_point_format++] = s_group;
 			  else {
 			    invalid_ja3 = 1;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 			    printf("Client SSL Invalid num elliptic %u\n", ja3.num_elliptic_curve_point_format);
 #endif
 			  }
 			}
 		      } else {
 			invalid_ja3 = 1;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 			printf("Client SSL Invalid len %u vs %u\n", s_offset+extension_len, total_len);
 #endif
 		      }
@@ -796,7 +796,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 		    extension_offset += extension_len;
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		    printf("Client SSL [extension_offset/len: %u/%u]\n", extension_offset, extension_len);
 #endif
 		  } /* while */
@@ -831,7 +831,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 					      (i > 0) ? "-" : "", ja3.elliptic_curve_point_format[i]);
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		    printf("[JA3] Client: %s \n", ja3_str);
 #endif
 
@@ -843,7 +843,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      j += snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
 				    sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x", md5_hash[i]);
 
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 		    printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
 #endif
 		  }
@@ -918,7 +918,7 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
       if(is_printable == 1) {
 	snprintf(flow->protos.stun_ssl.ssl.server_organization,
 		 sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	printf("Certificate organization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
 #endif
       }
@@ -943,7 +943,7 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
 
     if(rc > 0) {
       char organization[64];
-      
+
       // try fetch server organization once server certificate is found
       organization[0] = '\0';
       getSSLorganization(ndpi_struct, flow, organization, sizeof(organization));
@@ -955,12 +955,13 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
     }
 
     /* Client hello, Server Hello, and certificate packets probably all checked in this case */
-    if((packet->ssl_certificate_num_checks >= 3)
+    if(((packet->ssl_certificate_num_checks >= 3)
 	&& (flow->l4.tcp.seen_syn)
 	&& (flow->l4.tcp.seen_syn_ack)
 	&& (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
-      {
-	/* We're done processing extra packets since we've probably checked all possible cert packets */
+       || (flow->protos.stun_ssl.ssl.ja3_server[0] != '\0')
+      ) {
+      /* We're done processing extra packets since we've probably checked all possible cert packets */
 	return 0;
       }
   }
@@ -1000,7 +1001,7 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 
       if(rc > 0) {
 	packet->ssl_certificate_detected++;
-#ifdef CERTIFICATE_DEBUG
+#ifdef DEBUG_TLS
 	NDPI_LOG_DBG2(ndpi_struct, "***** [SSL] %s\n", certificate);
 #endif
 	ndpi_protocol_match_result ret_match;
@@ -1242,12 +1243,28 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->udp != NULL) {
     /* DTLS dissector */
-    int rc = sslTryAndRetrieveServerCertificate(ndpi_struct, flow);
+    int rc;
+    
+    rc = sslTryAndRetrieveServerCertificate(ndpi_struct, flow);
 
-    if(rc) flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
-
-    if(flow->l4.tcp.ssl_seen_server_cert)
-      ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
+#ifdef DEBUG_TLS
+    printf("==>> %u [rc: %u][len: %u][%s][version: %u]\n",
+	   flow->guessed_host_protocol_id, rc, packet->payload_packet_len, flow->protos.stun_ssl.ssl.ja3_server,
+	   flow->protos.stun_ssl.ssl.ssl_version);
+#endif
+    
+    if(flow->protos.stun_ssl.ssl.ssl_version != 0) {
+      flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
+      
+      if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
+	/* In Signal protocol STUN turns into DTLS... */
+	ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SIGNAL);
+      } else if(flow->protos.stun_ssl.ssl.ja3_server[0] != '\0') {
+	/* Wait the server certificate the bless this flow as TLS */
+	ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
+      }
+    }
+    
     return;
   }
   

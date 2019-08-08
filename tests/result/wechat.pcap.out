@@ -1,3 +1,4 @@
+DNS	6	494	3
 HTTP	70	4620	8
 MDNS	116	10672	4
 NTP	1	90	1
@@ -5,9 +6,10 @@ NetBIOS	12	1579	2
 DHCP	1	342	1
 QQ	26	9402	2
 IGMP	24	1280	4
-TLS	39	2647	12
+TLS	21	1209	3
 ICMPV6	4	328	3
 Google	113	24811	15
+LLMNR	12	944	6
 WeChat	1251	606425	49
 GoogleDocs	15	5114	2
 
@@ -90,19 +92,19 @@ JA3 Host Stats:
 	72	TCP 192.168.1.103:40741 <-> 203.205.151.211:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
 	73	IGMP 192.168.1.254:0 -> 224.0.0.1:0 [proto: 82/IGMP][cat: Network/14][4 pkts/200 bytes -> 0 pkts/0 bytes]
 	74	TCP 192.168.1.103:54085 <-> 203.205.151.162:443 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][2 pkts/132 bytes <-> 1 pkts/66 bytes]
-	75	UDP [fe80::91f9:3df3:7436:6cd6]:50440 -> [ff02::1:3]:5355 [proto: 91/TLS][cat: Web/5][2 pkts/180 bytes -> 0 pkts/0 bytes][Host: lbjamwptxz][PLAIN TEXT (lbjamwptx)]
-	76	UDP [fe80::91f9:3df3:7436:6cd6]:49195 -> [ff02::1:3]:5355 [proto: 91/TLS][cat: Web/5][2 pkts/176 bytes -> 0 pkts/0 bytes][Host: cansaqcq][PLAIN TEXT (cansaqcq)]
-	77	UDP [fe80::91f9:3df3:7436:6cd6]:50577 -> [ff02::1:3]:5355 [proto: 91/TLS][cat: Web/5][2 pkts/176 bytes -> 0 pkts/0 bytes][Host: mcztmpkc][PLAIN TEXT (mcztmpkc)]
-	78	UDP 192.168.1.103:43705 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][2 pkts/172 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com.lan][PLAIN TEXT (webpush)]
-	79	UDP 192.168.1.103:42856 -> 192.168.1.254:53 [proto: 91/TLS][cat: Web/5][2 pkts/170 bytes -> 0 pkts/0 bytes][Host: 1.debian.pool.ntp.org.lan][PLAIN TEXT (debian)]
-	80	UDP 192.168.1.103:45366 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][2 pkts/164 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
-	81	UDP 192.168.1.103:56367 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][2 pkts/164 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
-	82	UDP 192.168.1.103:41759 -> 192.168.1.254:53 [proto: 91/TLS][cat: Web/5][2 pkts/162 bytes -> 0 pkts/0 bytes][Host: 2.debian.pool.ntp.org][PLAIN TEXT (debian)]
-	83	UDP 192.168.1.103:44063 -> 192.168.1.254:53 [proto: 91/TLS][cat: Web/5][2 pkts/162 bytes -> 0 pkts/0 bytes][Host: 1.debian.pool.ntp.org][PLAIN TEXT (debian)]
-	84	UDP 192.168.1.103:42074 -> 192.168.1.254:53 [proto: 91.126/TLS.Google][cat: Web/5][2 pkts/158 bytes -> 0 pkts/0 bytes][Host: ssl.gstatic.com.lan][PLAIN TEXT (gstatic)]
-	85	UDP 192.168.1.100:54124 -> 224.0.0.252:5355 [proto: 91/TLS][cat: Web/5][2 pkts/140 bytes -> 0 pkts/0 bytes][Host: lbjamwptxz][PLAIN TEXT (lbjamwptx)]
-	86	UDP 192.168.1.100:49832 -> 224.0.0.252:5355 [proto: 91/TLS][cat: Web/5][2 pkts/136 bytes -> 0 pkts/0 bytes][Host: cansaqcq][PLAIN TEXT (cansaqcq)]
-	87	UDP 192.168.1.100:57401 -> 224.0.0.252:5355 [proto: 91/TLS][cat: Web/5][2 pkts/136 bytes -> 0 pkts/0 bytes][Host: mcztmpkc][PLAIN TEXT (mcztmpkc)]
+	75	UDP [fe80::91f9:3df3:7436:6cd6]:50440 -> [ff02::1:3]:5355 [proto: 154/LLMNR][cat: Network/14][2 pkts/180 bytes -> 0 pkts/0 bytes][Host: lbjamwptxz][PLAIN TEXT (lbjamwptx)]
+	76	UDP [fe80::91f9:3df3:7436:6cd6]:49195 -> [ff02::1:3]:5355 [proto: 154/LLMNR][cat: Network/14][2 pkts/176 bytes -> 0 pkts/0 bytes][Host: cansaqcq][PLAIN TEXT (cansaqcq)]
+	77	UDP [fe80::91f9:3df3:7436:6cd6]:50577 -> [ff02::1:3]:5355 [proto: 154/LLMNR][cat: Network/14][2 pkts/176 bytes -> 0 pkts/0 bytes][Host: mcztmpkc][PLAIN TEXT (mcztmpkc)]
+	78	UDP 192.168.1.103:43705 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][2 pkts/172 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com.lan][PLAIN TEXT (webpush)]
+	79	UDP 192.168.1.103:42856 -> 192.168.1.254:53 [proto: 5.5/DNS][cat: Network/14][2 pkts/170 bytes -> 0 pkts/0 bytes][Host: 1.debian.pool.ntp.org.lan][PLAIN TEXT (debian)]
+	80	UDP 192.168.1.103:45366 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][2 pkts/164 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
+	81	UDP 192.168.1.103:56367 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][2 pkts/164 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
+	82	UDP 192.168.1.103:41759 -> 192.168.1.254:53 [proto: 5.5/DNS][cat: Network/14][2 pkts/162 bytes -> 0 pkts/0 bytes][Host: 2.debian.pool.ntp.org][PLAIN TEXT (debian)]
+	83	UDP 192.168.1.103:44063 -> 192.168.1.254:53 [proto: 5.5/DNS][cat: Network/14][2 pkts/162 bytes -> 0 pkts/0 bytes][Host: 1.debian.pool.ntp.org][PLAIN TEXT (debian)]
+	84	UDP 192.168.1.103:42074 -> 192.168.1.254:53 [proto: 5.126/DNS.Google][cat: Web/5][2 pkts/158 bytes -> 0 pkts/0 bytes][Host: ssl.gstatic.com.lan][PLAIN TEXT (gstatic)]
+	85	UDP 192.168.1.100:54124 -> 224.0.0.252:5355 [proto: 154/LLMNR][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Host: lbjamwptxz][PLAIN TEXT (lbjamwptx)]
+	86	UDP 192.168.1.100:49832 -> 224.0.0.252:5355 [proto: 154/LLMNR][cat: Network/14][2 pkts/136 bytes -> 0 pkts/0 bytes][Host: cansaqcq][PLAIN TEXT (cansaqcq)]
+	87	UDP 192.168.1.100:57401 -> 224.0.0.252:5355 [proto: 154/LLMNR][cat: Network/14][2 pkts/136 bytes -> 0 pkts/0 bytes][Host: mcztmpkc][PLAIN TEXT (mcztmpkc)]
 	88	TCP 192.168.1.103:54106 -> 203.205.151.162:443 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][2 pkts/132 bytes -> 0 pkts/0 bytes]
 	89	TCP 192.168.1.103:54109 <-> 203.205.151.162:443 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][1 pkts/66 bytes <-> 1 pkts/66 bytes]
 	90	TCP 192.168.1.103:54110 <-> 203.205.151.162:443 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][1 pkts/66 bytes <-> 1 pkts/66 bytes]
@@ -110,12 +112,12 @@ JA3 Host Stats:
 	92	ICMPV6 [fe80::842:a3f3:a286:6c5b]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/132 bytes -> 0 pkts/0 bytes]
 	93	0 [fe80::842:a3f3:a286:6c5b]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][cat: Network/14][1 pkts/110 bytes -> 0 pkts/0 bytes]
 	94	UDP 192.168.1.103:37578 -> 193.204.114.233:123 [proto: 9/NTP][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes]
-	95	UDP 192.168.1.103:44346 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][1 pkts/86 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com.lan][PLAIN TEXT (webpush)]
-	96	UDP 192.168.1.103:53515 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][1 pkts/86 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com.lan][PLAIN TEXT (webpush)]
+	95	UDP 192.168.1.103:44346 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][1 pkts/86 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com.lan][PLAIN TEXT (webpush)]
+	96	UDP 192.168.1.103:53515 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][1 pkts/86 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com.lan][PLAIN TEXT (webpush)]
 	97	ICMPV6 [::]:0 -> [ff02::1:ff86:6c5b]:0 [proto: 102/ICMPV6][cat: Network/14][1 pkts/86 bytes -> 0 pkts/0 bytes]
-	98	UDP 192.168.1.103:33915 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][1 pkts/82 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
-	99	UDP 192.168.1.103:43317 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][1 pkts/82 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
-	100	UDP 192.168.1.103:58165 -> 192.168.1.254:53 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][1 pkts/82 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
-	101	UDP 192.168.1.103:59567 -> 192.168.1.254:53 [proto: 91.126/TLS.Google][cat: Web/5][1 pkts/79 bytes -> 0 pkts/0 bytes][Host: ssl.gstatic.com.lan][PLAIN TEXT (gstatic)]
-	102	UDP 192.168.1.103:42589 -> 192.168.1.254:53 [proto: 91.126/TLS.Google][cat: Web/5][1 pkts/75 bytes -> 0 pkts/0 bytes][Host: ssl.gstatic.com][PLAIN TEXT (gstatic)]
+	98	UDP 192.168.1.103:33915 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][1 pkts/82 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
+	99	UDP 192.168.1.103:43317 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][1 pkts/82 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
+	100	UDP 192.168.1.103:58165 -> 192.168.1.254:53 [proto: 5.197/DNS.WeChat][cat: Chat/9][1 pkts/82 bytes -> 0 pkts/0 bytes][Host: webpush.web.wechat.com][PLAIN TEXT (webpush)]
+	101	UDP 192.168.1.103:59567 -> 192.168.1.254:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/79 bytes -> 0 pkts/0 bytes][Host: ssl.gstatic.com.lan][PLAIN TEXT (gstatic)]
+	102	UDP 192.168.1.103:42589 -> 192.168.1.254:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/75 bytes -> 0 pkts/0 bytes][Host: ssl.gstatic.com][PLAIN TEXT (gstatic)]
 	103	IGMP 192.168.1.108:0 -> 224.0.0.22:0 [proto: 82/IGMP][cat: Network/14][1 pkts/54 bytes -> 0 pkts/0 bytes]

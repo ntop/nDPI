@@ -22,8 +22,8 @@ int ndpi_is_tls_tor(struct ndpi_detection_module_struct *ndpi_struct,
 		    struct ndpi_flow_struct *flow, char *certificate) {  
   int prev_num = 0, numbers_found = 0, num_found = 0, i, len, num_impossible = 0;
   char dummy[48], *dot, *name;
-
-  if(certificate == NULL)
+  
+  if((certificate == NULL) || (certificate[0] == '\0'))
     return(0);
   else
     len = strlen(certificate);
@@ -99,7 +99,8 @@ void ndpi_search_tor(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
   NDPI_LOG_DBG(ndpi_struct, "search for TOR\n");
 
-  if(packet->tcp != NULL) {
+  if((packet->tcp != NULL)
+     && (!packet->ssl_certificate_detected)) {
     u_int16_t dport, sport;
     
     sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);

@@ -79,6 +79,7 @@
 
 extern u_int8_t enable_protocol_guess, enable_joy_stats;
 extern u_int8_t verbose, human_readeable_string_len;
+extern u_int8_t max_num_udp_dissected_pkts /* 8 */, max_num_tcp_dissected_pkts /* 10 */;
 
 /* ***************************************************** */
 
@@ -657,26 +658,28 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
 
-  /* Update SPLT scores. */
-  if (flow->bidirectional) {
-    flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
-                                flow->dst2src_pkt_len, flow->dst2src_pkt_time,
-                                flow->src2dst_start, flow->dst2src_start,
-                                MAX_NUM_PKTS, flow->src_port, flow->dst_port,
-                                flow->src2dst_packets, flow->dst2src_packets,
-                                flow->src2dst_opackets, flow->dst2src_opackets,
-                                flow->src2dst_l4_bytes, flow->dst2src_l4_bytes, 1,
-                                flow->src2dst_byte_count, flow->dst2src_byte_count);
-  } else {
-    flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
-                           NULL, NULL, flow->src2dst_start, flow->src2dst_start,
-                           MAX_NUM_PKTS, flow->src_port, flow->dst_port,
-                           flow->src2dst_packets, 0,
-                           flow->src2dst_opackets, 0,
-                           flow->src2dst_l4_bytes, 0, 1,
-                           flow->src2dst_byte_count, NULL);
-  }
+  if(enable_joy_stats) {
+    /* Update SPLT scores. */
 
+    if(flow->bidirectional)
+      flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
+				  flow->dst2src_pkt_len, flow->dst2src_pkt_time,
+				  flow->src2dst_start, flow->dst2src_start,
+				  MAX_NUM_PKTS, flow->src_port, flow->dst_port,
+				  flow->src2dst_packets, flow->dst2src_packets,
+				  flow->src2dst_opackets, flow->dst2src_opackets,
+				  flow->src2dst_l4_bytes, flow->dst2src_l4_bytes, 1,
+				  flow->src2dst_byte_count, flow->dst2src_byte_count);
+    else
+      flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
+				  NULL, NULL, flow->src2dst_start, flow->src2dst_start,
+				  MAX_NUM_PKTS, flow->src_port, flow->dst_port,
+				  flow->src2dst_packets, 0,
+				  flow->src2dst_opackets, 0,
+				  flow->src2dst_l4_bytes, 0, 1,
+				  flow->src2dst_byte_count, NULL);
+  }
+  
   if(!flow->ndpi_flow) return;
 
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
@@ -714,7 +717,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
     /* TLS */
     else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
-	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)) {
+	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
+	    || (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client[0] != '\0')
+      ) {
       flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
       snprintf(flow->ssh_tls.client_info, sizeof(flow->ssh_tls.client_info), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
@@ -849,8 +854,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
   if(!flow->detection_completed) {
     u_int enough_packets =
-      (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > 8))
-       || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > 10))) ? 1 : 0;
+      (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_udp_dissected_pkts))
+       || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_tcp_dissected_pkts))) ? 1 : 0;
 
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,

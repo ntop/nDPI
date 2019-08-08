@@ -2289,7 +2289,7 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
 
   if(!ndpi_struct->custom_categories.categories_loaded)
     return -1;
-  
+
   snprintf(ipbuf, sizeof(ipbuf)-1, "%s", name_or_ip);
   ptr = strrchr(ipbuf, '/');
 
@@ -3782,7 +3782,7 @@ void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_struct
     if((func != ndpi_struct->callback_buffer_non_tcp_udp[a].func)
        && (ndpi_struct->callback_buffer_non_tcp_udp[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
        ndpi_struct->callback_buffer_non_tcp_udp[a].ndpi_selection_bitmask
-       && 
+       &&
 	   NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
 				ndpi_struct->callback_buffer_non_tcp_udp[a].excluded_protocol_bitmask) == 0
        && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_non_tcp_udp[a].detection_bitmask,
@@ -3935,7 +3935,7 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
     struct in_addr addr;
 
     addr.s_addr = flow->packet.iph->saddr;
-    
+
     /* guess host protocol */
     ret = ndpi_network_ptree_match(ndpi_struct, &addr);
 
@@ -4023,6 +4023,10 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)
       goto check_stun_export;
+    else if((flow->guessed_protocol_id == NDPI_PROTOCOL_HANGOUT_DUO)
+	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_MESSENGER)
+	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_VOICE))
+      ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
     else if((flow->l4.tcp.ssl_seen_client_cert == 1)
 	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
@@ -4576,7 +4580,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
 	addr.s_addr = flow->packet.iph->saddr;
 	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, &addr);
-	
+
 	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) {
 	  addr.s_addr = flow->packet.iph->daddr;
 	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_struct, &addr);
@@ -4595,7 +4599,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
       for(i=0; i<2; i++) {
 	u_int16_t port = (i == 0) ? ntohs(flow->packet.tcp->dest) : ntohs(flow->packet.tcp->source);
-	
+
 	switch(port) {
 	case 80:
 	  ret.master_protocol = NDPI_PROTOCOL_HTTP;
@@ -4604,7 +4608,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	  ret.master_protocol = NDPI_PROTOCOL_TLS; /* QUIC could also match */
 	  break;
 	}
-	
+
 	if(ret.master_protocol != NDPI_PROTOCOL_UNKNOWN)
 	  break;
       }
@@ -5925,7 +5929,7 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_stru
     ret_match->protocol_id = match.number,
       ret_match->protocol_category = match.category,
       ret_match->protocol_breed = match.breed;
-    
+
     return(match.number);
 }
 
@@ -6235,4 +6239,3 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 }
 
 /* **************************************** */
-

@@ -30,7 +30,7 @@
 
 #define MAX_NUM_STUN_PKTS     8
 
-// #define DEBUG_STUN 1
+/* #define DEBUG_STUN 1  */
 
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
@@ -126,9 +126,16 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if(msg_type == 0x01 /* Binding Request */) {
     flow->protos.stun_ssl.stun.num_binding_requests++;
-    if((msg_len == 0) && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_GOOGLE)) {
+
+    if((msg_len == 0) && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_GOOGLE))
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
-    }
+    else
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_STUN;
+    
+    flow->protos.stun_ssl.stun.num_udp_pkts++;
+
+    if(msg_len == 0)
+      return(NDPI_IS_NOT_STUN); /* This to keep analyzing STUN instead of giving up */
   }
 
   if((msg_len == 0) && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)) {
@@ -157,9 +164,20 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if((payload[0] != 0x80) && ((msg_len+20) > payload_length))
     return(NDPI_IS_NOT_STUN);
-  else
-    flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
-  
+  else {
+    switch(flow->guessed_protocol_id) {
+    case NDPI_PROTOCOL_HANGOUT_DUO:
+    case NDPI_PROTOCOL_MESSENGER:
+    case NDPI_PROTOCOL_WHATSAPP_VOICE:
+      /* Don't overwrite the protocol with sub-STUN protocols */
+      break;
+
+    default:
+      flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+      break;
+    }
+  }
+
   if(payload_length == (msg_len+20)) {
     if(msg_type <= 0x000b) /* http://www.3cx.com/blog/voip-howto/stun-details/ */ {
       u_int offset = 20;
@@ -183,6 +201,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	if(x != 0)
 	  len += 4-x;
 
+#ifdef DEBUG_STUN
+	printf("==> Attribute: %04X\n", attribute);
+#endif
+
 	switch(attribute) {
 	case 0x0008: /* Message Integrity */
 	case 0x0020: /* XOR-MAPPED-ADDRESSES */
@@ -197,9 +219,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	    if((msg_len == 100) || (msg_len == 104)) {
 	      *is_messenger = 1;
 	      return(NDPI_IS_STUN);
-	    } else if(msg_len == 76) {
+	    } else if(msg_len == 76) {	      
 	      *is_duo = 1;
-	      return(NDPI_IS_STUN);
+	      if(1) {
+		flow->guessed_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+		return(NDPI_IS_NOT_STUN); /* This case is found also with signal traffic */
+	      } else
+		return(NDPI_IS_STUN);
 	    }
 	  }
 	  break;
@@ -211,6 +237,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	     && (payload[offset+6] == 0x00)
 	     && (payload[offset+7] == 0x00)) {
 	    /* Either skype for business or "normal" skype with multiparty call */
+#ifdef DEBUG_STUN
+	    printf("==> Skype found\n");
+#endif	  
 	    flow->protos.stun_ssl.stun.is_skype = 1;
 	    return(NDPI_IS_STUN);
 	  }
@@ -227,6 +256,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	case 0x0800:
 	  /* printf("====>>>> %04X\n", attribute); */
 	  flow->protos.stun_ssl.stun.is_skype = 1;
+#ifdef DEBUG_STUN
+	  printf("==> Skype (2) found\n");
+#endif	  
+
 	  return(NDPI_IS_STUN);
 	  break;
 
@@ -239,6 +272,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	     && ((payload[offset+7] == 0x02) || (payload[offset+7] == 0x03))
 	     ) {
 	    flow->protos.stun_ssl.stun.is_skype = 1;
+#ifdef DEBUG_STUN
+	    printf("==> Skype (3) found\n");
+#endif	  
+	    
 	    return(NDPI_IS_STUN);
 	  }
 	  break;
@@ -322,7 +359,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
 			     packet->payload_packet_len - 2,
 			     &is_whatsapp, &is_messenger, &is_duo) == NDPI_IS_STUN) {
-	if(flow->guessed_protocol_id == 0) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+	if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
 	if(is_messenger) {
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
@@ -350,7 +387,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
 			 packet->payload_packet_len,
 			 &is_whatsapp, &is_messenger, &is_duo) == NDPI_IS_STUN) {
-    if(flow->guessed_protocol_id == 0) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+    if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
     if(is_messenger) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);

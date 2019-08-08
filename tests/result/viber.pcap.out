@@ -1,12 +1,12 @@
 DNS	8	1267	4
 MDNS	4	412	1
 ICMP	2	3028	1
-TLS	105	14653	6
+TLS	12	824	2
 ICMPV6	2	140	1
 Facebook	2	281	1
 Google	32	9133	3
 GenericProtocol	19	7773	1
-Viber	175	85695	5
+Viber	268	99524	9
 Amazon	71	24849	3
 
 JA3 Host Stats: 
@@ -22,8 +22,8 @@ JA3 Host Stats:
 	6	TCP 192.168.0.17:36986 <-> 54.69.166.226:443 [proto: 91.178/TLS.Amazon][cat: Web/5][11 pkts/1437 bytes <-> 11 pkts/6412 bytes][TLSv1.2][client: mapi.apptimize.com][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	7	TCP 192.168.0.17:55746 <-> 151.101.1.130:443 [proto: 91.137/TLS.GenericProtocol][cat: Media/1][10 pkts/1534 bytes <-> 9 pkts/6239 bytes][TLSv1.2][client: venetia.iad.appboy.com][JA3C: d8c87b9bfde38897979e41242626c2f3][server: y.ssl.fastly.net][JA3S: 860fcf58fd757e26aa8911e5eaff6b53][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	8	TCP 192.168.0.17:36988 <-> 54.69.166.226:443 [proto: 91.178/TLS.Amazon][cat: Web/5][11 pkts/1462 bytes <-> 11 pkts/6163 bytes][TLSv1.2][client: mapi.apptimize.com][JA3C: d8c87b9bfde38897979e41242626c2f3][server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
-	9	UDP 192.168.0.17:47171 <-> 18.201.4.32:7985 [proto: 91/TLS][cat: Web/5][24 pkts/5035 bytes <-> 22 pkts/2302 bytes][PLAIN TEXT (Android)]
-	10	UDP 192.168.0.17:38190 <-> 18.201.4.3:7985 [proto: 91/TLS][cat: Web/5][25 pkts/4344 bytes <-> 18 pkts/1872 bytes][PLAIN TEXT (Android)]
+	9	UDP 192.168.0.17:47171 <-> 18.201.4.32:7985 [proto: 144/Viber][cat: VoIP/10][24 pkts/5035 bytes <-> 22 pkts/2302 bytes][PLAIN TEXT (Android)]
+	10	UDP 192.168.0.17:38190 <-> 18.201.4.3:7985 [proto: 144/Viber][cat: VoIP/10][25 pkts/4344 bytes <-> 18 pkts/1872 bytes][PLAIN TEXT (Android)]
 	11	ICMP 192.168.0.17:0 <-> 192.168.0.15:0 [proto: 81/ICMP][cat: Network/14][1 pkts/1514 bytes <-> 1 pkts/1514 bytes][PLAIN TEXT (1234567890ABCDEFGHIJKLMNOPQ)]
 	12	UDP 192.168.0.17:62872 <-> 192.168.0.15:53 [proto: 5/DNS][cat: Network/14][1 pkts/78 bytes <-> 1 pkts/373 bytes][Host: mapi.apptimize.com][PLAIN TEXT (apptimize)]
 	13	TCP 192.168.0.17:33744 <-> 18.201.4.3:443 [proto: 91/TLS][cat: Web/5][4 pkts/272 bytes <-> 2 pkts/140 bytes]
@@ -38,5 +38,5 @@ JA3 Host Stats:
 	22	UDP 192.168.0.17:35331 <-> 192.168.0.15:53 [proto: 5/DNS][cat: Network/14][1 pkts/79 bytes <-> 1 pkts/95 bytes][Host: app-measurement.com][PLAIN TEXT (measurement)]
 	23	UDP 192.168.0.17:50097 <-> 192.168.0.15:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/90 bytes][Host: www.google.com][PLAIN TEXT (google)]
 	24	ICMPV6 [fe80::3207:4dff:fea3:5fa7]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes]
-	25	UDP 192.168.0.17:38190 <-> 18.201.4.3:7987 [proto: 91/TLS][cat: Web/5][1 pkts/76 bytes <-> 1 pkts/62 bytes]
-	26	UDP 192.168.0.17:47171 <-> 18.201.4.32:7987 [proto: 91/TLS][cat: Web/5][1 pkts/76 bytes <-> 1 pkts/62 bytes]
+	25	UDP 192.168.0.17:38190 <-> 18.201.4.3:7987 [proto: 144/Viber][cat: VoIP/10][1 pkts/76 bytes <-> 1 pkts/62 bytes]
+	26	UDP 192.168.0.17:47171 <-> 18.201.4.32:7987 [proto: 144/Viber][cat: VoIP/10][1 pkts/76 bytes <-> 1 pkts/62 bytes]

@@ -713,11 +713,13 @@ char* ndpi_ssl_version2str(u_int16_t version) {
   static char v[8];
 
   switch(version) {
-  case 0x300: return("SSLv3");
-  case 0x301: return("TLSv1");
-  case 0x302: return("TLSv1.1");
-  case 0x303: return("TLSv1.2");
-  case 0x304: return("TLSv1.3");
+  case 0x0300: return("SSLv3");
+  case 0x0301: return("TLSv1");
+  case 0x0302: return("TLSv1.1");
+  case 0x0303: return("TLSv1.2");
+  case 0x0304: return("TLSv1.3");
+  case 0xfeff: return("DTLSv1.0");
+  case 0xfefd: return("DTLSv1.2");
   }
 
   if((version >= 0x7f00) && (version <= 0x7fff))

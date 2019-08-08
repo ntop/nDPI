@@ -1,6 +1,7 @@
+Unknown	1	66	1
 HTTP	116	91784	6
 ICMP	5	510	1
-TLS	3	235	2
+TLS	2	169	1
 Facebook	251	215986	5
 Dropbox	5	725	2
 Instagram	363	255094	16
@@ -40,5 +41,8 @@ JA3 Host Stats:
 	28	TCP 192.168.0.103:58690 -> 46.33.70.159:443 [proto: 91/TLS][cat: Web/5][2 pkts/169 bytes -> 0 pkts/0 bytes]
 	29	UDP 192.168.0.106:17500 -> 192.168.0.255:17500 [proto: 121/Dropbox][cat: Cloud/13][1 pkts/145 bytes -> 0 pkts/0 bytes][PLAIN TEXT ( 413767116)]
 	30	TCP 46.33.70.150:80 <-> 192.168.0.103:40855 [proto: 7/HTTP][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/66 bytes]
-	31	UDP 192.168.0.103:27124 -> 8.8.8.8:53 [proto: 91.211/TLS.Instagram][cat: SocialNetwork/6][1 pkts/85 bytes -> 0 pkts/0 bytes][Host: photos-b.ak.instagram.com][PLAIN TEXT (photos)]
-	32	UDP 192.168.0.1:520 -> 192.168.0.255:520 [proto: 91/TLS][cat: Web/5][1 pkts/66 bytes -> 0 pkts/0 bytes]
+	31	UDP 192.168.0.103:27124 -> 8.8.8.8:53 [proto: 5.211/DNS.Instagram][cat: SocialNetwork/6][1 pkts/85 bytes -> 0 pkts/0 bytes][Host: photos-b.ak.instagram.com][PLAIN TEXT (photos)]
+
+
+Undetected flows:
+	1	UDP 192.168.0.1:520 -> 192.168.0.255:520 [proto: 0/Unknown][1 pkts/66 bytes -> 0 pkts/0 bytes]
