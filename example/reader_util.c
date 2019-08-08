@@ -715,19 +715,19 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     /* TLS */
     else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
 	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)) {
-      flow->ssh_tls.tls_version = flow->ndpi_flow->protos.stun_tls.tls.tls_version;
+      flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
       snprintf(flow->ssh_tls.client_info, sizeof(flow->ssh_tls.client_info), "%s",
-	       flow->ndpi_flow->protos.stun_tls.tls.client_certificate);
+	       flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
       snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
-	       flow->ndpi_flow->protos.stun_tls.tls.server_certificate);
+	       flow->ndpi_flow->protos.stun_ssl.ssl.server_certificate);
       snprintf(flow->ssh_tls.server_organization, sizeof(flow->ssh_tls.server_organization), "%s",
-	       flow->ndpi_flow->protos.stun_tls.tls.server_organization);
+	       flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);
       snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
-	       flow->ndpi_flow->protos.stun_tls.tls.ja3_client);
+	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client);
       snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
-	       flow->ndpi_flow->protos.stun_tls.tls.ja3_server);
-      flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.stun_tls.tls.server_unsafe_cipher;
-      flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.stun_tls.tls.server_cipher;
+	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server);
+      flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_unsafe_cipher;
+      flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_cipher;
     }
   }
 
@@ -859,7 +859,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
 	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	 && (flow->ndpi_flow->protos.stun_tls.tls.ja3_server[0] == '\0'))
+	 && (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server[0] == '\0'))
 	; /* Wait for JA3S certificate */
       else {
 	/* New protocol detected or give up */

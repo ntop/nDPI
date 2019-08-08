@@ -466,7 +466,7 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int16_t detected_directconnect_port;
   u_int16_t detected_directconnect_udp_port;
-  u_int16_t detected_directconnect_tls_port;
+  u_int16_t detected_directconnect_ssl_port;
 
   /* NDPI_PROTOCOL_BITTORRENT */
 #define NDPI_BT_PORTS 8
@@ -492,7 +492,7 @@ struct ndpi_id_struct {
   u_int8_t irc_number_of_port;
 
   /* NDPI_PROTOCOL_OSCAR */
-  u_int8_t oscar_tls_session_id[33];
+  u_int8_t oscar_ssl_session_id[33];
 
   /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   u_int8_t jabber_voice_stun_used_ports;
@@ -573,7 +573,7 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_MSN */
   u_int32_t msn_stage:3;
-  u_int32_t msn_tls_ft:2;
+  u_int32_t msn_ssl_ft:2;
 
   /* NDPI_PROTOCOL_SSH */
   u_int32_t ssh_stage:3;
@@ -585,10 +585,10 @@ struct ndpi_flow_tcp_struct {
   u_int32_t telnet_stage:2;			// 0 - 2
 
   /* NDPI_PROTOCOL_TLS */
-  u_int8_t tls_seen_client_cert:1,
-    tls_seen_server_cert:1,
-    tls_seen_certificate:1,
-    tls_stage:2; // 0 - 5
+  u_int8_t ssl_seen_client_cert:1,
+    ssl_seen_server_cert:1,
+    ssl_seen_certificate:1,
+    ssl_stage:2; // 0 - 5
 
   /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
@@ -771,7 +771,7 @@ struct ndpi_packet_struct {
   u_int8_t tcp_retransmission;
   u_int8_t l4_protocol;
 
-  u_int8_t tls_certificate_detected:4, tls_certificate_num_checks:4;
+  u_int8_t ssl_certificate_detected:4, ssl_certificate_num_checks:4;
   u_int8_t packet_lines_parsed_complete:1,
     packet_direction:1,
     empty_line_position_set:1;
@@ -1146,19 +1146,19 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
-	u_int16_t tls_version;
+	u_int16_t ssl_version;
 	char client_certificate[64], server_certificate[64], server_organization[64];
 	char ja3_client[33], ja3_server[33];
 	u_int16_t server_cipher;
 	ndpi_cipher_weakness server_unsafe_cipher;
-      } tls;
+      } ssl;
 
       struct {
 	u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests, is_skype;
       } stun;
 
-      /* We can have STUN over TLS thus they need to live together */
-    } stun_tls;
+      /* We can have STUN over SSL/TLS thus they need to live together */
+    } stun_ssl;
 
     struct {
       char client_signature[48], server_signature[48];
@@ -1232,7 +1232,7 @@ struct ndpi_flow_struct {
   u_int8_t thunder_stage:2;		        // 0 - 3
 
   /* NDPI_PROTOCOL_OSCAR */
-  u_int8_t oscar_tls_voice_stage:3, oscar_video_voice:1;
+  u_int8_t oscar_ssl_voice_stage:3, oscar_video_voice:1;
 
   /* NDPI_PROTOCOL_FLORENSIA */
   u_int8_t florensia_stage:1;

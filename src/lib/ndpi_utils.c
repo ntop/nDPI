@@ -303,7 +303,7 @@ int strncasecmp(const char *s1, const char *s2, size_t n) {
 
 /* **************************************** */
 
-u_int8_t ndpi_is_safe_tls_cipher(u_int32_t cipher) {
+u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher) {
   /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
   /* INSECURE */
   switch(cipher) {
@@ -709,7 +709,7 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 /* ********************************** */
 
-char* ndpi_tls_version2str(u_int16_t version) {
+char* ndpi_ssl_version2str(u_int16_t version) {
   static char v[8];
 
   switch(version) {

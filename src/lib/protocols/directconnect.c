@@ -58,9 +58,9 @@ static u_int16_t parse_binf_message(struct ndpi_detection_module_struct
   u_int16_t ssl_port = 0;
   while (i < payload_len) {
     i = skip_unknown_headers(payload, payload_len, i);
-    if ((i + 30) < payload_len) {
-      if (memcmp(&payload[i], "DCTM", 4) == 0) {
-	if (memcmp(&payload[i + 15], "ADCS", 4) == 0) {
+    if((i + 30) < payload_len) {
+      if(memcmp(&payload[i], "DCTM", 4) == 0) {
+	if(memcmp(&payload[i + 15], "ADCS", 4) == 0) {
 	  ssl_port = ntohs_ndpi_bytestream_to_number(&payload[i + 25], 5, &bytes_read);
 	  NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ssl_port);
 	}
@@ -84,15 +84,15 @@ static void ndpi_int_directconnect_add_connection(struct ndpi_detection_module_s
 
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 
-  if (src != NULL) {
+  if(src != NULL) {
     src->directconnect_last_safe_access_time = packet->tick_timestamp;
-    if (connection_type == DIRECT_CONNECT_TYPE_PEER) {
-      if (packet->tcp != NULL
+    if(connection_type == DIRECT_CONNECT_TYPE_PEER) {
+      if(packet->tcp != NULL
 	  && flow->setup_packet_direction != packet->packet_direction && src->detected_directconnect_port == 0) {
 	src->detected_directconnect_port = packet->tcp->source;
 	NDPI_LOG_DBG2(ndpi_struct, "DC tcp PORT %u for src\n", ntohs(src->detected_directconnect_port));
       }
-      if (packet->udp != NULL && src->detected_directconnect_udp_port == 0) {
+      if(packet->udp != NULL && src->detected_directconnect_udp_port == 0) {
 	src->detected_directconnect_udp_port = packet->udp->source;
 	NDPI_LOG_DBG2(ndpi_struct, "DC udp PORT %u for src\n", ntohs(src->detected_directconnect_port));
 
@@ -100,10 +100,10 @@ static void ndpi_int_directconnect_add_connection(struct ndpi_detection_module_s
     }
 
   }
-  if (dst != NULL) {
+  if(dst != NULL) {
     dst->directconnect_last_safe_access_time = packet->tick_timestamp;
-    if (connection_type == DIRECT_CONNECT_TYPE_PEER) {
-      if (packet->tcp != NULL
+    if(connection_type == DIRECT_CONNECT_TYPE_PEER) {
+      if(packet->tcp != NULL
 	  && flow->setup_packet_direction == packet->packet_direction && dst->detected_directconnect_port == 0) {
 	/* DST PORT MARKING CAN LEAD TO PORT MISSDETECTIONS
 	 * seen at large customer http servers, where someone has send faked DC tcp packets
@@ -121,38 +121,37 @@ static void ndpi_int_directconnect_add_connection(struct ndpi_detection_module_s
   }
 }
 
-static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+					  struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
-    if (packet->payload_packet_len >= 40 && memcmp(&packet->payload[0], "BINF", 4) == 0) {
-      u_int16_t tls_port = 0;
-      tls_port = parse_binf_message(ndpi_struct, &packet->payload[4], packet->payload_packet_len - 4);
-      if (dst != NULL && tls_port) {
-	dst->detected_directconnect_tls_port = tls_port;
-      }
-      if (src != NULL && tls_port) {
-	src->detected_directconnect_tls_port = tls_port;
-      }
-
-
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
+    if(packet->payload_packet_len >= 40 && memcmp(&packet->payload[0], "BINF", 4) == 0) {
+      u_int16_t ssl_port = parse_binf_message(ndpi_struct,
+					      &packet->payload[4],
+					      packet->payload_packet_len - 4);
+      if(dst != NULL && ssl_port)
+	dst->detected_directconnect_ssl_port = ssl_port;
+      
+      if(src != NULL && ssl_port)
+	src->detected_directconnect_ssl_port = ssl_port;
     }
-    if ((packet->payload_packet_len >= 38 && packet->payload_packet_len <= 42)
+    
+    if((packet->payload_packet_len >= 38 && packet->payload_packet_len <= 42)
 	&& memcmp(&packet->payload[0], "DCTM", 4) == 0 && memcmp(&packet->payload[15], "ADCS", 4) == 0) {
       u_int16_t bytes_read = 0;
-      if (dst != NULL) {
-	dst->detected_directconnect_tls_port =
+      if(dst != NULL) {
+	dst->detected_directconnect_ssl_port =
 	  ntohs_ndpi_bytestream_to_number(&packet->payload[25], 5, &bytes_read);
-	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(dst->detected_directconnect_tls_port));
+	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(dst->detected_directconnect_ssl_port));
       }
-      if (src != NULL) {
-	src->detected_directconnect_tls_port =
+      if(src != NULL) {
+	src->detected_directconnect_ssl_port =
 	  ntohs_ndpi_bytestream_to_number(&packet->payload[25], 5, &bytes_read);
-	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(src->detected_directconnect_tls_port));
+	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(src->detected_directconnect_ssl_port));
       }
 
 
@@ -160,9 +159,9 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
     return;
 
   }
-  if (src != NULL) {
-    if (src->detected_directconnect_port == packet->tcp->source) {
-      if ((u_int32_t)
+  if(src != NULL) {
+    if(src->detected_directconnect_port == packet->tcp->source) {
+      if((u_int32_t)
 	  (packet->tick_timestamp -
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	src->directconnect_last_safe_access_time = packet->tick_timestamp;
@@ -175,16 +174,16 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	return;
       }
     }
-    if (src->detected_directconnect_tls_port == packet->tcp->dest) {
-      if ((u_int32_t)
+    if(src->detected_directconnect_ssl_port == packet->tcp->dest) {
+      if((u_int32_t)
 	  (packet->tick_timestamp -
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	src->directconnect_last_safe_access_time = packet->tick_timestamp;
-	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_tls_port));
+	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_ssl_port));
 	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
       } else {
-	src->detected_directconnect_tls_port = 0;
+	src->detected_directconnect_ssl_port = 0;
 	NDPI_LOG_DBG2(ndpi_struct, "resetting src port due to timeout\n");
 	return;
       }
@@ -192,9 +191,9 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 
   }
 
-  if (dst != NULL) {
-    if (dst->detected_directconnect_port == packet->tcp->dest) {
-      if ((u_int32_t)
+  if(dst != NULL) {
+    if(dst->detected_directconnect_port == packet->tcp->dest) {
+      if((u_int32_t)
 	  (packet->tick_timestamp -
 	   dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	dst->directconnect_last_safe_access_time = packet->tick_timestamp;
@@ -207,16 +206,16 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	return;
       }
     }
-    if (dst->detected_directconnect_tls_port == packet->tcp->dest) {
-      if ((u_int32_t)
+    if(dst->detected_directconnect_ssl_port == packet->tcp->dest) {
+      if((u_int32_t)
 	  (packet->tick_timestamp -
 	   dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	dst->directconnect_last_safe_access_time = packet->tick_timestamp;
-	NDPI_LOG_DBG(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_tls_port));
+	NDPI_LOG_DBG(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_ssl_port));
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
       } else {
-	dst->detected_directconnect_tls_port = 0;
+	dst->detected_directconnect_ssl_port = 0;
 	NDPI_LOG_DBG2(ndpi_struct, "resetting dst port due to timeout\n");
 	return;
       }
@@ -224,17 +223,17 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 
   }
 
-  if (flow->directconnect_stage == 0) {
+  if(flow->directconnect_stage == 0) {
 
-    if (packet->payload_packet_len > 6) {
-      if (packet->payload[0] == '$'
+    if(packet->payload_packet_len > 6) {
+      if(packet->payload[0] == '$'
 	  && packet->payload[packet->payload_packet_len - 1] == '|'
 	  && (memcmp(&packet->payload[1], "Lock ", 5) == 0)) {
 	NDPI_LOG_DBG2(ndpi_struct, "maybe first dc connect to hub  detected\n");
 	flow->directconnect_stage = 1;
 	return;
       }
-      if (packet->payload_packet_len > 7
+      if(packet->payload_packet_len > 7
 	  && packet->payload[0] == '$'
 	  && packet->payload[packet->payload_packet_len - 1] == '|'
 	  && (memcmp(&packet->payload[1], "MyNick ", 7) == 0)) {
@@ -244,15 +243,15 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
       }
 
     }
-    if (packet->payload_packet_len >= 11) {
+    if(packet->payload_packet_len >= 11) {
       /* did not see this pattern in any trace */
-      if (memcmp(&packet->payload[0], "HSUP ADBAS0", 11) == 0
+      if(memcmp(&packet->payload[0], "HSUP ADBAS0", 11) == 0
 	  || memcmp(&packet->payload[0], "HSUP ADBASE", 11) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found DC HSUP ADBAS0 E\n");
 	ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_TYPE_HUB);
 	return;
 	/* did not see this pattern in any trace */
-      } else if (memcmp(&packet->payload[0], "CSUP ADBAS0", 11) == 0 ||
+      } else if(memcmp(&packet->payload[0], "CSUP ADBAS0", 11) == 0 ||
 		 memcmp(&packet->payload[0], "CSUP ADBASE", 11) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found DC CSUP ADBAS0 E\n");
 	ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_ADC_PEER);
@@ -262,16 +261,16 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 
     }
 
-  } else if (flow->directconnect_stage == 1) {
-    if (packet->payload_packet_len >= 11) {
+  } else if(flow->directconnect_stage == 1) {
+    if(packet->payload_packet_len >= 11) {
       /* did not see this pattern in any trace */
-      if (memcmp(&packet->payload[0], "HSUP ADBAS0", 11) == 0
+      if(memcmp(&packet->payload[0], "HSUP ADBAS0", 11) == 0
 	  || memcmp(&packet->payload[0], "HSUP ADBASE", 11) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found DC HSUP ADBAS E in second packet\n");
 	ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_TYPE_HUB);
 	return;
 	/* did not see this pattern in any trace */
-      } else if (memcmp(&packet->payload[0], "CSUP ADBAS0", 11) == 0 ||
+      } else if(memcmp(&packet->payload[0], "CSUP ADBAS0", 11) == 0 ||
 		 memcmp(&packet->payload[0], "CSUP ADBASE", 11) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found DC HSUP ADBAS0 E in second packet\n");
 	ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_ADC_PEER);
@@ -280,8 +279,8 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
       }
     }
     /* get client hello answer or server message */
-    if (packet->payload_packet_len > 6) {
-      if ((packet->payload[0] == '$' || packet->payload[0] == '<')
+    if(packet->payload_packet_len > 6) {
+      if((packet->payload[0] == '$' || packet->payload[0] == '<')
 	  && packet->payload[packet->payload_packet_len - 1] == '|') {
 	NDPI_LOG_INFO(ndpi_struct, "found DC second\n");
 	ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_TYPE_HUB);
@@ -291,10 +290,10 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
       }
 
     }
-  } else if (flow->directconnect_stage == 2) {
+  } else if(flow->directconnect_stage == 2) {
     /* get client hello answer or server message */
-    if (packet->payload_packet_len > 6) {
-      if (packet->payload[0] == '$' && packet->payload[packet->payload_packet_len - 1] == '|') {
+    if(packet->payload_packet_len > 6) {
+      if(packet->payload[0] == '$' && packet->payload[packet->payload_packet_len - 1] == '|') {
 	NDPI_LOG_INFO(ndpi_struct, "found DC between peers\n");
 	ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_TYPE_PEER);
 	return;
@@ -318,8 +317,8 @@ static void ndpi_search_directconnect_udp(struct ndpi_detection_module_struct
   struct ndpi_id_struct *dst = flow->dst;
   int pos, count = 0;
 
-  if (dst != NULL && dst->detected_directconnect_udp_port == packet->udp->dest) {
-    if ((u_int32_t)
+  if(dst != NULL && dst->detected_directconnect_udp_port == packet->udp->dest) {
+    if((u_int32_t)
 	(packet->tick_timestamp -
 	 dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 
@@ -334,21 +333,21 @@ static void ndpi_search_directconnect_udp(struct ndpi_detection_module_struct
     }
   }
 
-  if (packet->payload_packet_len > 58) {
-    if (src != NULL
+  if(packet->payload_packet_len > 58) {
+    if(src != NULL
 	&& NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, NDPI_PROTOCOL_DIRECTCONNECT)) {
-      if (packet->payload[0] == '$'
+      if(packet->payload[0] == '$'
 	  && packet->payload[packet->payload_packet_len - 1] == '|'
 	  && memcmp(&packet->payload[1], "SR ", 3) == 0) {
 	pos = packet->payload_packet_len - 2;
-	if (packet->payload[pos] == ')') {
+	if(packet->payload[pos] == ')') {
 	  while (pos > 0 && packet->payload[pos] != '(' && count < 21) {
 	    pos--;
 	    count++;
 	  }
-	  if (packet->payload[pos] == '(') {
+	  if(packet->payload[pos] == '(') {
 	    pos = pos - 44;
-	    if (pos > 2 && memcmp(&packet->payload[pos], "TTH:", 4) == 0) {
+	    if(pos > 2 && memcmp(&packet->payload[pos], "TTH:", 4) == 0) {
 	      NDPI_LOG_INFO(ndpi_struct, "found DC udp\n");
 	      ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_TYPE_PEER);
 	      return;
@@ -356,25 +355,25 @@ static void ndpi_search_directconnect_udp(struct ndpi_detection_module_struct
 	  }
 	}
 	flow->directconnect_stage++;
-	if (flow->directconnect_stage < 3) 
+	if(flow->directconnect_stage < 3) 
 	  return;
       }
 
     }
-    if (dst != NULL
+    if(dst != NULL
 	&& NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_DIRECTCONNECT)) {
-      if (packet->payload[0] == '$'
+      if(packet->payload[0] == '$'
 	  && packet->payload[packet->payload_packet_len - 1] == '|'
 	  && memcmp(&packet->payload[1], "SR ", 3) == 0) {
 	pos = packet->payload_packet_len - 2;
-	if (packet->payload[pos] == ')') {
+	if(packet->payload[pos] == ')') {
 	  while (pos > 0 && packet->payload[pos] != '(' && count < 21) {
 	    pos--;
 	    count++;
 	  }
-	  if (packet->payload[pos] == '(') {
+	  if(packet->payload[pos] == '(') {
 	    pos = pos - 44;
-	    if (pos > 2 && memcmp(&packet->payload[pos], "TTH:", 4) == 0) {
+	    if(pos > 2 && memcmp(&packet->payload[pos], "TTH:", 4) == 0) {
 	      NDPI_LOG_INFO(ndpi_struct, "found DC udp\n");
 	      ndpi_int_directconnect_add_connection(ndpi_struct, flow, DIRECT_CONNECT_TYPE_PEER);
 	      return;
@@ -382,7 +381,7 @@ static void ndpi_search_directconnect_udp(struct ndpi_detection_module_struct
 	  }
 	}
 	flow->directconnect_stage++;
-	if (flow->directconnect_stage < 3)
+	if(flow->directconnect_stage < 3)
 	  return;
       }
     }
@@ -404,14 +403,14 @@ void ndpi_search_directconnect(struct ndpi_detection_module_struct
 
   NDPI_LOG_DBG(ndpi_struct, "search DC\n");
 
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
-    if (src != NULL && ((u_int32_t)
+  if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
+    if(src != NULL && ((u_int32_t)
 			(packet->tick_timestamp -
 			 src->directconnect_last_safe_access_time) <
 			ndpi_struct->directconnect_connection_ip_tick_timeout)) {
       src->directconnect_last_safe_access_time = packet->tick_timestamp;
 
-    } else if (dst != NULL && ((u_int32_t)
+    } else if(dst != NULL && ((u_int32_t)
 			       (packet->tick_timestamp -
 				dst->directconnect_last_safe_access_time) <
 			       ndpi_struct->directconnect_connection_ip_tick_timeout)) {
@@ -423,9 +422,9 @@ void ndpi_search_directconnect(struct ndpi_detection_module_struct
     return;
   }
 
-  if (packet->tcp != NULL) {
+  if(packet->tcp != NULL) {
     ndpi_search_directconnect_tcp(ndpi_struct, flow);
-  } else if (packet->udp != NULL) {
+  } else if(packet->udp != NULL) {
     ndpi_search_directconnect_udp(ndpi_struct, flow);
   }
 }

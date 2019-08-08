@@ -237,8 +237,8 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
 						 struct ndpi_flow_struct *flow, u_int32_t protocol) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_tls.tls.ja3_client[0] != '\0'))
-     || ((flow->l4.tcp.tls_seen_server_cert == 1) && (flow->protos.stun_tls.tls.ja3_server[0] != '\0'))
+  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.ja3_client[0] != '\0'))
+     || ((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.ja3_server[0] != '\0'))
      // || (flow->host_server_name[0] != '\0')
      )
     protocol = NDPI_PROTOCOL_TLS;
@@ -387,7 +387,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
   
-  flow->protos.stun_tls.tls.tls_version = pkt_tls_version;
+  flow->protos.stun_ssl.ssl.ssl_version = pkt_tls_version;
 
   memset(&ja3, 0, sizeof(ja3));
 
@@ -458,7 +458,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	     The server hello decides about the SSL version of this flow 
 	     https://networkengineering.stackexchange.com/questions/55752/why-does-wireshark-show-version-tls-1-2-here-instead-of-tls-1-3
 	  */
-	  flow->protos.stun_tls.tls.tls_version = tls_version;
+	  flow->protos.stun_ssl.ssl.ssl_version = tls_version;
 
 	  if(packet->udp)
 	    offset += 1;
@@ -468,8 +468,8 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  }
 	  
 	  ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
-	  flow->protos.stun_tls.tls.server_unsafe_cipher = ndpi_is_safe_tls_cipher(ja3.cipher[0]);
-	  flow->protos.stun_tls.tls.server_cipher = ja3.cipher[0];
+	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0]);
+	  flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
 
 #ifdef CERTIFICATE_DEBUG
 	  printf("SSL [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
@@ -526,16 +526,16 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  MD5Final(md5_hash, &ctx);
 
 	  for(i=0, j=0; i<16; i++)
-	    j += snprintf(&flow->protos.stun_tls.tls.ja3_server[j],
-			  sizeof(flow->protos.stun_tls.tls.ja3_server)-j, "%02x", md5_hash[i]);
+	    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
+			  sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
 
 #ifdef CERTIFICATE_DEBUG
-	  printf("[JA3] Server: %s \n", flow->protos.stun_tls.tls.ja3_server);
+	  printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
 #endif
 
-	  flow->l4.tcp.tls_seen_server_cert = 1;
+	  flow->l4.tcp.ssl_seen_server_cert = 1;
 	} else
-	  flow->l4.tcp.tls_seen_certificate = 1;
+	  flow->l4.tcp.ssl_seen_certificate = 1;
 
 	/* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
 	for(i = 9; i < packet->payload_packet_len-3; i++) {
@@ -580,8 +580,8 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      if(num_dots >= 1) {
 		if(!ndpi_struct->disable_metadata_export) {
 		  stripCertificateTrailer(buffer, buffer_len);
-		  snprintf(flow->protos.stun_tls.tls.server_certificate,
-			   sizeof(flow->protos.stun_tls.tls.server_certificate), "%s", buffer);
+		  snprintf(flow->protos.stun_ssl.ssl.server_certificate,
+			   sizeof(flow->protos.stun_ssl.ssl.server_certificate), "%s", buffer);
 		}
 
 		return(1 /* Server Certificate */);
@@ -658,7 +658,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    offset = base_offset + session_id_len + cipher_len + 2;
 
-	    flow->l4.tcp.tls_seen_client_cert = 1;
+	    flow->l4.tcp.ssl_seen_client_cert = 1;
 
 	    if(offset < total_len) {
 	      u_int16_t compression_len;
@@ -726,8 +726,8 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      stripCertificateTrailer(buffer, buffer_len);
 
 		      if(!ndpi_struct->disable_metadata_export) {
-			snprintf(flow->protos.stun_tls.tls.client_certificate,
-				 sizeof(flow->protos.stun_tls.tls.client_certificate), "%s", buffer);
+			snprintf(flow->protos.stun_ssl.ssl.client_certificate,
+				 sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
 		      }
 		    } else if(extension_id == 10 /* supported groups */) {
 		      u_int16_t s_offset = offset+extension_offset + 2;
@@ -840,11 +840,11 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		    MD5Final(md5_hash, &ctx);
 
 		    for(i=0, j=0; i<16; i++)
-		      j += snprintf(&flow->protos.stun_tls.tls.ja3_client[j],
-				    sizeof(flow->protos.stun_tls.tls.ja3_client)-j, "%02x", md5_hash[i]);
+		      j += snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
+				    sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x", md5_hash[i]);
 
 #ifdef CERTIFICATE_DEBUG
-		    printf("[JA3] Client: %s \n", flow->protos.stun_tls.tls.ja3_client);
+		    printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
 #endif
 		  }
 
@@ -916,10 +916,10 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       if(is_printable == 1) {
-	snprintf(flow->protos.stun_tls.tls.server_organization,
-		 sizeof(flow->protos.stun_tls.tls.server_organization), "%s", buffer);
+	snprintf(flow->protos.stun_ssl.ssl.server_organization,
+		 sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
 #ifdef CERTIFICATE_DEBUG
-	printf("Certificate organization: %s\n", flow->protos.stun_tls.tls.server_organization);
+	printf("Certificate organization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
 #endif
       }
     }
@@ -939,7 +939,7 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
 
     certificate[0] = '\0';
     rc = getTLScertificate(ndpi_struct, flow, certificate, sizeof(certificate));
-    packet->tls_certificate_num_checks++;
+    packet->ssl_certificate_num_checks++;
 
     if(rc > 0) {
       char organization[64];
@@ -948,14 +948,14 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
       organization[0] = '\0';
       getSSLorganization(ndpi_struct, flow, organization, sizeof(organization));
 
-      packet->tls_certificate_detected++;
-      if((flow->l4.tcp.tls_seen_server_cert == 1) && (flow->protos.stun_tls.tls.server_certificate[0] != '\0'))
+      packet->ssl_certificate_detected++;
+      if((flow->l4.tcp.ssl_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
         /* 0 means we're done processing extra packets (since we found what we wanted) */
         return 0;
     }
 
     /* Client hello, Server Hello, and certificate packets probably all checked in this case */
-    if((packet->tls_certificate_num_checks >= 3)
+    if((packet->ssl_certificate_num_checks >= 3)
 	&& (flow->l4.tcp.seen_syn)
 	&& (flow->l4.tcp.seen_syn_ack)
 	&& (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
@@ -996,10 +996,10 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 
       certificate[0] = '\0';
       rc = getTLScertificate(ndpi_struct, flow, certificate, sizeof(certificate));
-      packet->tls_certificate_num_checks++;
+      packet->ssl_certificate_num_checks++;
 
       if(rc > 0) {
-	packet->tls_certificate_detected++;
+	packet->ssl_certificate_detected++;
 #ifdef CERTIFICATE_DEBUG
 	NDPI_LOG_DBG2(ndpi_struct, "***** [SSL] %s\n", certificate);
 #endif
@@ -1013,8 +1013,8 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  /* If we've detected the subprotocol from client certificate but haven't had a chance
 	   * to see the server certificate yet, set up extra packet processing to wait
 	   * a few more packets. */
-	  if(((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_tls.tls.client_certificate[0] != '\0'))
-	     && ((flow->l4.tcp.tls_seen_server_cert != 1) && (flow->protos.stun_tls.tls.server_certificate[0] == '\0'))) {
+	  if(((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0'))
+	     && ((flow->l4.tcp.ssl_seen_server_cert != 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0'))) {
 	    sslInitExtraPacketProcessing(0, flow);
 	  }
 
@@ -1027,14 +1027,14 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	  return(rc);
       }
 
-      if(((packet->tls_certificate_num_checks >= 3)
+      if(((packet->ssl_certificate_num_checks >= 3)
 	  && flow->l4.tcp.seen_syn
 	  && flow->l4.tcp.seen_syn_ack
 	  && flow->l4.tcp.seen_ack /* We have seen the 3-way handshake */)
-	 || ((flow->l4.tcp.tls_seen_certificate == 1)
-	     && (flow->l4.tcp.tls_seen_server_cert == 1)
-	     && (flow->protos.stun_tls.tls.server_certificate[0] != '\0'))
-	 /* || ((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_tls.tls.client_certificate[0] != '\0')) */
+	 || ((flow->l4.tcp.ssl_seen_certificate == 1)
+	     && (flow->l4.tcp.ssl_seen_server_cert == 1)
+	     && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
+	 /* || ((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) */
 	 ) {
 	ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
       }
@@ -1090,8 +1090,8 @@ static void tls_mark_and_payload_search_for_other_protocols(struct ndpi_detectio
 	NDPI_LOG_INFO(ndpi_struct, "found OSCAR SERVER SSL DETECTED\n");
 
 	if(flow->dst != NULL && packet->payload_packet_len > 75) {
-	  memcpy(flow->dst->oscar_tls_session_id, &packet->payload[44], 32);
-	  flow->dst->oscar_tls_session_id[32] = '\0';
+	  memcpy(flow->dst->oscar_ssl_session_id, &packet->payload[44], 32);
+	  flow->dst->oscar_ssl_session_id[32] = '\0';
 	  flow->dst->oscar_last_safe_access_time = packet->tick_timestamp;
 	}
 
@@ -1116,12 +1116,12 @@ static void tls_mark_and_payload_search_for_other_protocols(struct ndpi_detectio
     NDPI_LOG_DBG(ndpi_struct, "found ssl connection\n");
     tlsDetectProtocolFromCertificate(ndpi_struct, flow);
 
-    if(!packet->tls_certificate_detected
-       && (!(flow->l4.tcp.tls_seen_client_cert && flow->l4.tcp.tls_seen_server_cert))) {
+    if(!packet->ssl_certificate_detected
+       && (!(flow->l4.tcp.ssl_seen_client_cert && flow->l4.tcp.ssl_seen_server_cert))) {
       /* SSL without certificate (Skype, Ultrasurf?) */
       NDPI_LOG_INFO(ndpi_struct, "found ssl NO_CERT\n");
       ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS_NO_CERT);
-    } else if(packet->tls_certificate_num_checks >= 3) {
+    } else if(packet->ssl_certificate_num_checks >= 3) {
       NDPI_LOG_INFO(ndpi_struct, "found ssl\n");
       ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
     }
@@ -1246,13 +1246,13 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
     if(rc) flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 
-    if(flow->l4.tcp.tls_seen_server_cert)
+    if(flow->l4.tcp.ssl_seen_server_cert)
       ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
     return;
   }
   
   if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS) {
-    if(flow->l4.tcp.tls_stage == 3 && packet->payload_packet_len > 20 && flow->packet_counter < 5) {
+    if(flow->l4.tcp.ssl_stage == 3 && packet->payload_packet_len > 20 && flow->packet_counter < 5) {
       /* this should only happen, when we detected SSL with a packet that had parts of the certificate in subsequent packets
        * so go on checking for certificate patterns for a couple more packets
        */
@@ -1294,14 +1294,14 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
       return;
   }  
   
-  if(packet->payload_packet_len > 40 && flow->l4.tcp.tls_stage == 0) {
+  if(packet->payload_packet_len > 40 && flow->l4.tcp.ssl_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "first ssl packet\n");
     // SSLv2 Record
     if(packet->payload[2] == 0x01 && packet->payload[3] == 0x03
        && (packet->payload[4] == 0x00 || packet->payload[4] == 0x01 || packet->payload[4] == 0x02)
        && (packet->payload_packet_len - packet->payload[1] == 2)) {
       NDPI_LOG_DBG2(ndpi_struct, "sslv2 len match\n");
-      flow->l4.tcp.tls_stage = 1 + packet->packet_direction;
+      flow->l4.tcp.ssl_stage = 1 + packet->packet_direction;
       return;
     }
 
@@ -1310,7 +1310,7 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
        && (packet->payload_packet_len - ntohs(get_u_int16_t(packet->payload, 3)) == 5)) {
       // SSLv3 Record
       NDPI_LOG_DBG2(ndpi_struct, "sslv3 len match\n");
-      flow->l4.tcp.tls_stage = 1 + packet->packet_direction;
+      flow->l4.tcp.ssl_stage = 1 + packet->packet_direction;
       return;
     }
 
@@ -1320,19 +1320,19 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
            packet->payload[2] == 0x02 || packet->payload[2] == 0x03)) {
       if(packet->payload_packet_len - ntohs(get_u_int16_t(packet->payload, 3)) == 5) {
 	NDPI_LOG_DBG2(ndpi_struct, "TLS len match\n");
-	flow->l4.tcp.tls_stage = 1 + packet->packet_direction;
+	flow->l4.tcp.ssl_stage = 1 + packet->packet_direction;
 	return;
       }
     }
   }
   
   if(packet->payload_packet_len > 40 &&
-     flow->l4.tcp.tls_stage == 1 + packet->packet_direction
+     flow->l4.tcp.ssl_stage == 1 + packet->packet_direction
      && flow->packet_direction_counter[packet->packet_direction] < 5) {
     return;
   }
 
-  if(packet->payload_packet_len > 40 && flow->l4.tcp.tls_stage == 2 - packet->packet_direction) {
+  if(packet->payload_packet_len > 40 && flow->l4.tcp.ssl_stage == 2 - packet->packet_direction) {
     NDPI_LOG_DBG2(ndpi_struct, "second ssl packet\n");
     // SSLv2 Record
     if(packet->payload[2] == 0x01 && packet->payload[3] == 0x03
@@ -1353,7 +1353,7 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 		    "sslv3 server len match with split packet -> check some more packets for SSL patterns\n");
       tls_mark_and_payload_search_for_other_protocols(ndpi_struct, flow);
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS) {
-	flow->l4.tcp.tls_stage = 3;
+	flow->l4.tcp.ssl_stage = 3;
       }
       return;
     }

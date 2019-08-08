@@ -944,7 +944,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
 
-    if(flow->ssh_tls.tls_version != 0) fprintf(out, "[%s]", ndpi_tls_version2str(flow->ssh_tls.tls_version));
+    if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version));
     if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_tls.client_info);
     if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
 						    print_cipher(flow->ssh_tls.client_unsafe_cipher));

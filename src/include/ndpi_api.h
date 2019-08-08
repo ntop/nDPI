@@ -681,7 +681,7 @@ extern "C" {
    *
    * @par     ndpi_struct = the detection module
    * @par     flow = the detected flow
-   * @par     certificate = the tls certificate
+   * @par     certificate = the SSL/TLS certificate
    * @return  1 if the flow is TOR;
    *          0 else
    *
@@ -807,7 +807,7 @@ extern "C" {
 			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
 			    u_char *hash_buf, u_int8_t hash_buf_len);
   
-  u_int8_t ndpi_is_safe_tls_cipher(u_int32_t cipher);
+  u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
   const char* ndpi_cipher2str(u_int32_t cipher);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
@@ -815,7 +815,7 @@ extern "C" {
 				      char *buffer, u_int buffer_size,
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
-  char* ndpi_tls_version2str(u_int16_t version);
+  char* ndpi_ssl_version2str(u_int16_t version);
 
   /* Serializer */
   int ndpi_init_serializer(ndpi_serializer *serializer, ndpi_serialization_format fmt);
