@@ -1,0 +1,3 @@
+SMBv1	7	1197	1
+
+	1	TCP 172.16.156.130:50927 <-> 10.128.0.243:445 [proto: 16/SMBv1][cat: System/18][4 pkts/669 bytes <-> 3 pkts/528 bytes][PLAIN TEXT (PC NETWORK PROGRAM 1.0)]
