@@ -1,5 +1,5 @@
 NetBIOS	1	252	1
-SSL	1	60	1
+TLS	1	60	1
 DHCPV6	6	906	1
 Dropbox	10	1860	1
 Tor	3676	3014362	7
@@ -14,4 +14,4 @@ Tor	3676	3014362	7
 	8	UDP 192.168.1.1:17500 -> 192.168.1.255:17500 [proto: 121/Dropbox][cat: Cloud/13][10 pkts/1860 bytes -> 0 pkts/0 bytes][PLAIN TEXT ( 676879976)]
 	9	UDP [fe80::c583:1972:5728:7323]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][cat: Network/14][6 pkts/906 bytes -> 0 pkts/0 bytes][PLAIN TEXT (Endian)]
 	10	UDP 192.168.1.252:138 -> 192.168.1.255:138 [proto: 10/NetBIOS][cat: System/18][1 pkts/252 bytes -> 0 pkts/0 bytes][PLAIN TEXT ( EFEOEEEJEBEOCNFAEDCACACACACACA)]
-	11	TCP 192.168.1.252:51104 -> 157.56.30.46:443 [proto: 91/SSL][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	11	TCP 192.168.1.252:51104 -> 157.56.30.46:443 [proto: 91/TLS][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes]

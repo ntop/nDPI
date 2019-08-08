@@ -1,7 +1,7 @@
 Unknown	10	786	1
 HTTP	65	64777	8
 NTP	2	180	1
-SSL	8	432	2
+TLS	8	432	2
 Google	13	2142	1
 Waze	484	289335	19
 WhatsApp	15	1341	1
@@ -11,21 +11,21 @@ JA3 Host Stats:
 	1	 10.8.0.1                 	 2      
 
 
-	1	TCP 10.8.0.1:36100 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][cat: Web/5][52 pkts/10860 bytes <-> 55 pkts/74852 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
+	1	TCP 10.8.0.1:36100 <-> 46.51.173.182:443 [proto: 91.135/TLS.Waze][cat: Web/5][52 pkts/10860 bytes <-> 55 pkts/74852 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
 	2	TCP 10.8.0.1:54915 <-> 65.39.128.135:80 [proto: 7/HTTP][cat: Web/5][19 pkts/1309 bytes <-> 18 pkts/61896 bytes][Host: xtra1.gpsonextra.net][PLAIN TEXT (GET /xtra)]
-	3	TCP 10.8.0.1:39021 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][cat: Web/5][17 pkts/1962 bytes <-> 16 pkts/56934 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
-	4	TCP 10.8.0.1:36312 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][cat: Web/5][17 pkts/2176 bytes <-> 15 pkts/42443 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
-	5	TCP 10.8.0.1:36316 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][cat: Web/5][15 pkts/1540 bytes <-> 13 pkts/26346 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
-	6	TCP 10.8.0.1:36102 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][cat: Web/5][19 pkts/2646 bytes <-> 18 pkts/9338 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
-	7	TCP 10.8.0.1:39010 <-> 52.17.114.219:443 [proto: 91.135/SSL.Waze][cat: Web/5][8 pkts/1034 bytes <-> 8 pkts/8151 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
-	8	TCP 10.8.0.1:51049 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][cat: Web/5][12 pkts/1282 bytes <-> 11 pkts/6541 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
-	9	TCP 10.8.0.1:51051 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][cat: Web/5][11 pkts/1228 bytes <-> 10 pkts/6487 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
-	10	TCP 10.8.0.1:36134 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][cat: Web/5][12 pkts/1650 bytes <-> 12 pkts/4935 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
-	11	TCP 10.8.0.1:36137 <-> 46.51.173.182:443 [proto: 91.135/SSL.Waze][cat: Web/5][12 pkts/1522 bytes <-> 11 pkts/4220 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
-	12	TCP 10.8.0.1:36314 <-> 176.34.186.180:443 [proto: 91.135/SSL.Waze][cat: Web/5][11 pkts/1260 bytes <-> 9 pkts/4413 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
-	13	TCP 10.8.0.1:51050 <-> 176.34.103.105:443 [proto: 91.135/SSL.Waze][cat: Web/5][9 pkts/1184 bytes <-> 9 pkts/4369 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	3	TCP 10.8.0.1:39021 <-> 52.17.114.219:443 [proto: 91.135/TLS.Waze][cat: Web/5][17 pkts/1962 bytes <-> 16 pkts/56934 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	4	TCP 10.8.0.1:36312 <-> 176.34.186.180:443 [proto: 91.135/TLS.Waze][cat: Web/5][17 pkts/2176 bytes <-> 15 pkts/42443 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	5	TCP 10.8.0.1:36316 <-> 176.34.186.180:443 [proto: 91.135/TLS.Waze][cat: Web/5][15 pkts/1540 bytes <-> 13 pkts/26346 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	6	TCP 10.8.0.1:36102 <-> 46.51.173.182:443 [proto: 91.135/TLS.Waze][cat: Web/5][19 pkts/2646 bytes <-> 18 pkts/9338 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
+	7	TCP 10.8.0.1:39010 <-> 52.17.114.219:443 [proto: 91.135/TLS.Waze][cat: Web/5][8 pkts/1034 bytes <-> 8 pkts/8151 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	8	TCP 10.8.0.1:51049 <-> 176.34.103.105:443 [proto: 91.135/TLS.Waze][cat: Web/5][12 pkts/1282 bytes <-> 11 pkts/6541 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	9	TCP 10.8.0.1:51051 <-> 176.34.103.105:443 [proto: 91.135/TLS.Waze][cat: Web/5][11 pkts/1228 bytes <-> 10 pkts/6487 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	10	TCP 10.8.0.1:36134 <-> 46.51.173.182:443 [proto: 91.135/TLS.Waze][cat: Web/5][12 pkts/1650 bytes <-> 12 pkts/4935 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
+	11	TCP 10.8.0.1:36137 <-> 46.51.173.182:443 [proto: 91.135/TLS.Waze][cat: Web/5][12 pkts/1522 bytes <-> 11 pkts/4220 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 714ac86d50db68420429ca897688f5f3 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA]
+	12	TCP 10.8.0.1:36314 <-> 176.34.186.180:443 [proto: 91.135/TLS.Waze][cat: Web/5][11 pkts/1260 bytes <-> 9 pkts/4413 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.world.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
+	13	TCP 10.8.0.1:51050 <-> 176.34.103.105:443 [proto: 91.135/TLS.Waze][cat: Web/5][9 pkts/1184 bytes <-> 9 pkts/4369 bytes][TLSv1][JA3C: f392f120f1087cd2f8814539cf58cfa4][server: *.waze.com][JA3S: 39f74f5618836d3c5f7dcccc9f67ba75][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
 	14	TCP 10.8.0.1:45529 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][9 pkts/591 bytes <-> 8 pkts/3424 bytes][Host: roadshields.waze.com][PLAIN TEXT (GET /images/HD/CH)]
-	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 91.126/SSL.Google][cat: Web/5][7 pkts/1137 bytes <-> 6 pkts/1005 bytes][TLSv1][JA3C: f8f5b71e02603b283e55b50d17ede861][JA3S: 23f1f6e2f0015c166df49fdab4280370 (INSECURE)][Cipher: TLS_ECDHE_RSA_WITH_RC4_128_SHA]
+	15	TCP 10.8.0.1:36585 <-> 173.194.118.48:443 [proto: 91.126/TLS.Google][cat: Web/5][7 pkts/1137 bytes <-> 6 pkts/1005 bytes][TLSv1][JA3C: f8f5b71e02603b283e55b50d17ede861][JA3S: 23f1f6e2f0015c166df49fdab4280370 (INSECURE)][Cipher: TLS_ECDHE_RSA_WITH_RC4_128_SHA]
 	16	TCP 10.8.0.1:45536 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][8 pkts/594 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com][PLAIN TEXT (GET /lang)]
 	17	TCP 10.8.0.1:50828 <-> 108.168.176.228:443 [proto: 142/WhatsApp][cat: Chat/9][8 pkts/673 bytes <-> 7 pkts/668 bytes][PLAIN TEXT (Android)]
 	18	TCP 10.8.0.1:45546 <-> 54.230.227.172:80 [proto: 7.135/HTTP.Waze][cat: Web/5][7 pkts/557 bytes <-> 7 pkts/771 bytes][Host: cres.waze.com][PLAIN TEXT (GET /newV)]
@@ -38,9 +38,9 @@ JA3 Host Stats:
 	25	TCP 10.16.37.157:46473 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
 	26	TCP 10.16.37.157:52746 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
 	27	TCP 10.16.37.157:52953 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes]
-	28	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	28	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
 	29	TCP 10.8.0.1:45169 <-> 200.160.4.198:80 [proto: 7/HTTP][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
-	30	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
+	30	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
 	31	TCP 10.8.0.1:60574 <-> 200.160.4.49:80 [proto: 7/HTTP][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes]
 	32	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes]
 

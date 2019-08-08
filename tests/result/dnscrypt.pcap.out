@@ -1,11 +1,11 @@
-SSL	111	44676	4
+TLS	111	44676	4
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.43.167           	 2      
 
 
-	1	TCP 192.168.43.167:50233 <-> 134.119.26.24:443 [proto: 91/SSL][cat: Web/5][18 pkts/1788 bytes <-> 21 pkts/14580 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: b8f81673c0e1d29908346f3bab892b9b][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
-	2	TCP 192.168.43.167:50259 <-> 134.119.26.24:443 [proto: 91/SSL][cat: Web/5][18 pkts/1988 bytes <-> 18 pkts/9290 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: 83e04bc58d402f9633983cbf22724b02][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
-	3	TCP 192.168.43.167:50253 <-> 134.119.26.24:443 [proto: 91/SSL][cat: Web/5][8 pkts/780 bytes <-> 10 pkts/7735 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: 83e04bc58d402f9633983cbf22724b02][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
-	4	TCP 192.168.43.167:50258 <-> 134.119.26.24:443 [proto: 91/SSL][cat: Web/5][8 pkts/780 bytes <-> 10 pkts/7735 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: 83e04bc58d402f9633983cbf22724b02][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	1	TCP 192.168.43.167:50233 <-> 134.119.26.24:443 [proto: 91/TLS][cat: Web/5][18 pkts/1788 bytes <-> 21 pkts/14580 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: b8f81673c0e1d29908346f3bab892b9b][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	2	TCP 192.168.43.167:50259 <-> 134.119.26.24:443 [proto: 91/TLS][cat: Web/5][18 pkts/1988 bytes <-> 18 pkts/9290 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: 83e04bc58d402f9633983cbf22724b02][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	3	TCP 192.168.43.167:50253 <-> 134.119.26.24:443 [proto: 91/TLS][cat: Web/5][8 pkts/780 bytes <-> 10 pkts/7735 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: 83e04bc58d402f9633983cbf22724b02][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	4	TCP 192.168.43.167:50258 <-> 134.119.26.24:443 [proto: 91/TLS][cat: Web/5][8 pkts/780 bytes <-> 10 pkts/7735 bytes][TLSv1.2][client: simplednscrypt.org][JA3C: 83e04bc58d402f9633983cbf22724b02][server: simplednscrypt.org][JA3S: 76cc3e2d3028143b23ec18e27dbd7ca9][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]

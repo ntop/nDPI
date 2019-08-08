@@ -707,27 +707,27 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_DNS) {
     /* SSH */
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH) {
-      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
+      snprintf(flow->ssh_tls.client_info, sizeof(flow->ssh_tls.client_info), "%s",
 	       flow->ndpi_flow->protos.ssh.client_signature);
-      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
+      snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
 	       flow->ndpi_flow->protos.ssh.server_signature);
     }
-    /* SSL */
-    else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
-	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)) {
-      flow->ssh_ssl.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
-      snprintf(flow->ssh_ssl.client_info, sizeof(flow->ssh_ssl.client_info), "%s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
-      snprintf(flow->ssh_ssl.server_info, sizeof(flow->ssh_ssl.server_info), "%s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.server_certificate);
-      snprintf(flow->ssh_ssl.server_organization, sizeof(flow->ssh_ssl.server_organization), "%s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);
-      snprintf(flow->ssh_ssl.ja3_client, sizeof(flow->ssh_ssl.ja3_client), "%s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client);
-      snprintf(flow->ssh_ssl.ja3_server, sizeof(flow->ssh_ssl.ja3_server), "%s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server);
-      flow->ssh_ssl.server_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_unsafe_cipher;
-      flow->ssh_ssl.server_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_cipher;
+    /* TLS */
+    else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
+	    || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)) {
+      flow->ssh_tls.tls_version = flow->ndpi_flow->protos.stun_tls.tls.tls_version;
+      snprintf(flow->ssh_tls.client_info, sizeof(flow->ssh_tls.client_info), "%s",
+	       flow->ndpi_flow->protos.stun_tls.tls.client_certificate);
+      snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
+	       flow->ndpi_flow->protos.stun_tls.tls.server_certificate);
+      snprintf(flow->ssh_tls.server_organization, sizeof(flow->ssh_tls.server_organization), "%s",
+	       flow->ndpi_flow->protos.stun_tls.tls.server_organization);
+      snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
+	       flow->ndpi_flow->protos.stun_tls.tls.ja3_client);
+      snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
+	       flow->ndpi_flow->protos.stun_tls.tls.ja3_server);
+      flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.stun_tls.tls.server_unsafe_cipher;
+      flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.stun_tls.tls.server_cipher;
     }
   }
 
@@ -814,8 +814,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       
       if((proto == IPPROTO_TCP)
 	 && (
-	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
-	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
+	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))	     
 	 ) {
@@ -835,8 +835,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     } else {
       if((proto == IPPROTO_TCP)
 	 && (
-	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSL)
-	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
+	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))	     
 	 )
@@ -858,8 +858,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
-	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSL)
-	 && (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server[0] == '\0'))
+	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
+	 && (flow->ndpi_flow->protos.stun_tls.tls.ja3_server[0] == '\0'))
 	; /* Wait for JA3S certificate */
       else {
 	/* New protocol detected or give up */

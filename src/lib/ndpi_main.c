@@ -1097,10 +1097,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_SSL, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSL_NO_CERT,
+    custom_master[0] = NDPI_PROTOCOL_TLS, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TLS_NO_CERT,
 			    1 /* can_have_a_subprotocol */, custom_master,
-			    no_master, "SSL_No_Cert", NDPI_PROTOCOL_CATEGORY_WEB,
+			    no_master, "TLS_No_Cert", NDPI_PROTOCOL_CATEGORY_WEB,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_IRC,
@@ -1241,10 +1241,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_SSL_NO_CERT, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_SSL,
+    custom_master[0] = NDPI_PROTOCOL_TLS_NO_CERT, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_TLS,
 			    1 /* can_have_a_subprotocol */, no_master,
-			    custom_master, "SSL", NDPI_PROTOCOL_CATEGORY_WEB,
+			    custom_master, "TLS", NDPI_PROTOCOL_CATEGORY_WEB,
 			    ndpi_build_default_ports(ports_a, 443, 3001 /* ntop */, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSH,
@@ -2811,8 +2811,8 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* STARCRAFT */
   init_starcraft_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* SSL */
-  init_ssl_dissector(ndpi_struct, &a, detection_bitmask);
+  /* TLS */
+  init_tls_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* STUN */
   init_stun_dissector(ndpi_struct, &a, detection_bitmask);
@@ -4023,9 +4023,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)
       goto check_stun_export;
-    else if((flow->l4.tcp.ssl_seen_client_cert == 1)
-	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSL, NDPI_PROTOCOL_UNKNOWN);
+    else if((flow->l4.tcp.tls_seen_client_cert == 1)
+	    && (flow->protos.stun_tls.tls.client_certificate[0] != '\0')) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
     } else {
       ndpi_protocol ret_g = ndpi_get_partial_detection(ndpi_struct, flow);
 
@@ -4038,8 +4038,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
-	 && (flow->l4.tcp.ssl_stage > 1))
-	flow->guessed_protocol_id = NDPI_PROTOCOL_SSL_NO_CERT;
+	 && (flow->l4.tcp.tls_stage > 1))
+	flow->guessed_protocol_id = NDPI_PROTOCOL_TLS_NO_CERT;
 
       guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
 
@@ -4061,8 +4061,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
 	 || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
 	if((guessed_protocol_id == 0)
-	   && (flow->protos.stun_ssl.stun.num_binding_requests > 0)
-	   && (flow->protos.stun_ssl.stun.num_processed_pkts > 0))
+	   && (flow->protos.stun_tls.stun.num_binding_requests > 0)
+	   && (flow->protos.stun_tls.stun.num_processed_pkts > 0))
 	  guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
 
@@ -4095,9 +4095,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
      && (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
   check_stun_export:
-    if(flow->protos.stun_ssl.stun.num_processed_pkts || flow->protos.stun_ssl.stun.num_udp_pkts) {
-      // if(/* (flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
-      if(flow->protos.stun_ssl.stun.num_processed_pkts && flow->protos.stun_ssl.stun.is_skype) {
+    if(flow->protos.stun_tls.stun.num_processed_pkts || flow->protos.stun_tls.stun.num_udp_pkts) {
+      // if(/* (flow->protos.stun_tls.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
+      if(flow->protos.stun_tls.stun.num_processed_pkts && flow->protos.stun_tls.stun.is_skype) {
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
       } else
 	ndpi_set_detected_protocol(ndpi_struct, flow,
@@ -4411,9 +4411,9 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
       }
     }
 
-    if((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
+    if((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_tls.tls.client_certificate[0] != '\0')) {
       unsigned long id;
-      int rc = ndpi_match_custom_category(ndpi_struct, (char *)flow->protos.stun_ssl.ssl.client_certificate, &id);
+      int rc = ndpi_match_custom_category(ndpi_struct, (char *)flow->protos.stun_tls.tls.client_certificate, &id);
 
       if(rc == 0) {
 	flow->category = ret->category = (ndpi_protocol_category_t)id;
@@ -4457,8 +4457,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     */
     if(flow->check_extra_packets
        /*
-	 && ((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL)
-	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_SSL))
+	 && ((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS)
+	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_TLS))
        */
        ) {
       ndpi_process_extra_packet(ndpi_struct, flow, packet, packetlen, current_tick_l, src, dst);
@@ -4599,7 +4599,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	  ret.master_protocol = NDPI_PROTOCOL_HTTP;
 	  break;
 	case 443:
-	  ret.master_protocol = NDPI_PROTOCOL_SSL; /* QUIC could also match */
+	  ret.master_protocol = NDPI_PROTOCOL_TLS; /* QUIC could also match */
 	  break;
 	}
 	
@@ -5589,7 +5589,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
       else {
 	ret.app_protocol = rc;
 
-	if(rc == NDPI_PROTOCOL_SSL)
+	if(rc == NDPI_PROTOCOL_TLS)
 	  goto check_guessed_skype;
 	else {
 	  ret.category = ndpi_get_proto_category(ndpi_struct, ret);

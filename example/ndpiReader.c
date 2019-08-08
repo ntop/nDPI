@@ -944,16 +944,16 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
 
-    if(flow->ssh_ssl.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_ssl.ssl_version));
-    if(flow->ssh_ssl.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_ssl.client_info);
-    if(flow->ssh_ssl.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_ssl.ja3_client,
-						    print_cipher(flow->ssh_ssl.client_unsafe_cipher));
-    if(flow->ssh_ssl.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_ssl.server_info);
+    if(flow->ssh_tls.tls_version != 0) fprintf(out, "[%s]", ndpi_tls_version2str(flow->ssh_tls.tls_version));
+    if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_tls.client_info);
+    if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
+						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
+    if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_tls.server_info);
 
-    if(flow->ssh_ssl.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s%s]", flow->ssh_ssl.ja3_server,
-						    print_cipher(flow->ssh_ssl.server_unsafe_cipher));
-    if(flow->ssh_ssl.server_organization[0] != '\0') fprintf(out, "[organization: %s]", flow->ssh_ssl.server_organization);
-    if(flow->ssh_ssl.server_cipher != '\0') fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_ssl.server_cipher));
+    if(flow->ssh_tls.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s%s]", flow->ssh_tls.ja3_server,
+						    print_cipher(flow->ssh_tls.server_unsafe_cipher));
+    if(flow->ssh_tls.server_organization[0] != '\0') fprintf(out, "[organization: %s]", flow->ssh_tls.server_organization);
+    if(flow->ssh_tls.server_cipher != '\0') fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher));
 
     if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
@@ -1000,25 +1000,25 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->host_server_name[0] != '\0')
       json_object_object_add(jObj,"host.server.name",json_object_new_string(flow->host_server_name));
 
-    if((flow->ssh_ssl.client_info[0] != '\0') || (flow->ssh_ssl.server_info[0] != '\0')) {
+    if((flow->ssh_tls.client_info[0] != '\0') || (flow->ssh_tls.server_info[0] != '\0')) {
       json_object *sjObj = json_object_new_object();
 
-      if(flow->ssh_ssl.ja3_server[0] != '\0')
-	json_object_object_add(jObj,"ja3s",json_object_new_string(flow->ssh_ssl.ja3_server));
+      if(flow->ssh_tls.ja3_server[0] != '\0')
+	json_object_object_add(jObj,"ja3s",json_object_new_string(flow->ssh_tls.ja3_server));
 
-      if(flow->ssh_ssl.ja3_client[0] != '\0')
-	json_object_object_add(jObj,"ja3c",json_object_new_string(flow->ssh_ssl.ja3_client));
+      if(flow->ssh_tls.ja3_client[0] != '\0')
+	json_object_object_add(jObj,"ja3c",json_object_new_string(flow->ssh_tls.ja3_client));
 
-      if(flow->ssh_ssl.ja3_server[0] != '\0')
-	json_object_object_add(jObj,"host.server.ja3",json_object_new_string(flow->ssh_ssl.ja3_server));
+      if(flow->ssh_tls.ja3_server[0] != '\0')
+	json_object_object_add(jObj,"host.server.ja3",json_object_new_string(flow->ssh_tls.ja3_server));
 
-      if(flow->ssh_ssl.client_info[0] != '\0')
-	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssh_ssl.client_info));
+      if(flow->ssh_tls.client_info[0] != '\0')
+	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssh_tls.client_info));
 
-      if(flow->ssh_ssl.server_info[0] != '\0')
-	json_object_object_add(sjObj, "server", json_object_new_string(flow->ssh_ssl.server_info));
+      if(flow->ssh_tls.server_info[0] != '\0')
+	json_object_object_add(sjObj, "server", json_object_new_string(flow->ssh_tls.server_info));
 
-      json_object_object_add(jObj, "ssh_ssl", sjObj);
+      json_object_object_add(jObj, "ssh_tls", sjObj);
     }
 
     if(json_flag == 1)
@@ -2101,7 +2101,7 @@ static void printFlowsStats() {
 	ndpi_ja3_fingerprints_host *hostByJA3Found = NULL;
 
 	//check if this is a ssh-ssl flow
-	if(all_flows[i].flow->ssh_ssl.ja3_client[0] != '\0'){
+	if(all_flows[i].flow->ssh_tls.ja3_client[0] != '\0'){
 	  //looking if the host is already in the hash table
 	  HASH_FIND_INT(ja3ByHostsHashT, &(all_flows[i].flow->src_ip), ja3ByHostFound);
 
@@ -2113,11 +2113,11 @@ static void printFlowsStats() {
 	    newHost->host_server_info_hasht = NULL;
 	    newHost->ip_string = all_flows[i].flow->src_name;
 	    newHost->ip = all_flows[i].flow->src_ip;
-	    newHost->dns_name = all_flows[i].flow->ssh_ssl.client_info;
+	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_info;
 
 	    ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
-	    newJA3->ja3 = all_flows[i].flow->ssh_ssl.ja3_client;
-	    newJA3->unsafe_cipher = all_flows[i].flow->ssh_ssl.client_unsafe_cipher;
+	    newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
+	    newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.client_unsafe_cipher;
 	    //adding the new ja3 fingerprint
 	    HASH_ADD_KEYPTR(hh, newHost->host_client_info_hasht,
 			    newJA3->ja3, strlen(newJA3->ja3), newJA3);
@@ -2128,29 +2128,29 @@ static void printFlowsStats() {
 	    ndpi_ja3_info *infoFound = NULL;
 
 	    HASH_FIND_STR(ja3ByHostFound->host_client_info_hasht,
-			  all_flows[i].flow->ssh_ssl.ja3_client, infoFound);
+			  all_flows[i].flow->ssh_tls.ja3_client, infoFound);
 
 	    if(infoFound == NULL){
 	      ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
-	      newJA3->ja3 = all_flows[i].flow->ssh_ssl.ja3_client;
-	      newJA3->unsafe_cipher = all_flows[i].flow->ssh_ssl.client_unsafe_cipher;
+	      newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
+	      newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.client_unsafe_cipher;
 	      HASH_ADD_KEYPTR(hh, ja3ByHostFound->host_client_info_hasht,
 			      newJA3->ja3, strlen(newJA3->ja3), newJA3);
 	    }
 	  }
 
 	  //ja3 -> host ip
-	  HASH_FIND_STR(hostByJA3C_ht, all_flows[i].flow->ssh_ssl.ja3_client, hostByJA3Found);
+	  HASH_FIND_STR(hostByJA3C_ht, all_flows[i].flow->ssh_tls.ja3_client, hostByJA3Found);
 	  if(hostByJA3Found == NULL){
 	    ndpi_ip_dns *newHost = malloc(sizeof(ndpi_ip_dns));
 
 	    newHost->ip = all_flows[i].flow->src_ip;
 	    newHost->ip_string = all_flows[i].flow->src_name;
-	    newHost->dns_name = all_flows[i].flow->ssh_ssl.client_info;;
+	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_info;;
 
 	    ndpi_ja3_fingerprints_host *newElement = malloc(sizeof(ndpi_ja3_fingerprints_host));
-	    newElement->ja3 = all_flows[i].flow->ssh_ssl.ja3_client;
-	    newElement->unsafe_cipher = all_flows[i].flow->ssh_ssl.client_unsafe_cipher;
+	    newElement->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
+	    newElement->unsafe_cipher = all_flows[i].flow->ssh_tls.client_unsafe_cipher;
 	    newElement->ipToDNS_ht = NULL;
 
 	    HASH_ADD_INT(newElement->ipToDNS_ht, ip, newHost);
@@ -2163,13 +2163,13 @@ static void printFlowsStats() {
 	      ndpi_ip_dns *newInnerElement = malloc(sizeof(ndpi_ip_dns));
 	      newInnerElement->ip = all_flows[i].flow->src_ip;
 	      newInnerElement->ip_string = all_flows[i].flow->src_name;
-	      newInnerElement->dns_name = all_flows[i].flow->ssh_ssl.client_info;
+	      newInnerElement->dns_name = all_flows[i].flow->ssh_tls.client_info;
 	      HASH_ADD_INT(hostByJA3Found->ipToDNS_ht, ip, newInnerElement);
 	    }
 	  }
 	}
 
-	if(all_flows[i].flow->ssh_ssl.ja3_server[0] != '\0'){
+	if(all_flows[i].flow->ssh_tls.ja3_server[0] != '\0'){
 	  //looking if the host is already in the hash table
 	  HASH_FIND_INT(ja3ByHostsHashT, &(all_flows[i].flow->dst_ip), ja3ByHostFound);
 	  if(ja3ByHostFound == NULL){
@@ -2179,11 +2179,11 @@ static void printFlowsStats() {
 	    newHost->host_server_info_hasht = NULL;
 	    newHost->ip_string = all_flows[i].flow->dst_name;
 	    newHost->ip = all_flows[i].flow->dst_ip;
-	    newHost->dns_name = all_flows[i].flow->ssh_ssl.server_info;
+	    newHost->dns_name = all_flows[i].flow->ssh_tls.server_info;
 
 	    ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
-	    newJA3->ja3 = all_flows[i].flow->ssh_ssl.ja3_server;
-	    newJA3->unsafe_cipher = all_flows[i].flow->ssh_ssl.server_unsafe_cipher;
+	    newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_server;
+	    newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.server_unsafe_cipher;
 	    //adding the new ja3 fingerprint
 	    HASH_ADD_KEYPTR(hh, newHost->host_server_info_hasht, newJA3->ja3,
 			    strlen(newJA3->ja3), newJA3);
@@ -2193,27 +2193,27 @@ static void printFlowsStats() {
 	    //host already in the hashtable
 	    ndpi_ja3_info *infoFound = NULL;
 	    HASH_FIND_STR(ja3ByHostFound->host_server_info_hasht,
-			  all_flows[i].flow->ssh_ssl.ja3_server, infoFound);
+			  all_flows[i].flow->ssh_tls.ja3_server, infoFound);
 	    if(infoFound == NULL){
 	      ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
-	      newJA3->ja3 = all_flows[i].flow->ssh_ssl.ja3_server;
-	      newJA3->unsafe_cipher = all_flows[i].flow->ssh_ssl.server_unsafe_cipher;
+	      newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_server;
+	      newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.server_unsafe_cipher;
 	      HASH_ADD_KEYPTR(hh, ja3ByHostFound->host_server_info_hasht,
 			      newJA3->ja3, strlen(newJA3->ja3), newJA3);
 	    }
 	  }
 
-	  HASH_FIND_STR(hostByJA3S_ht, all_flows[i].flow->ssh_ssl.ja3_server, hostByJA3Found);
+	  HASH_FIND_STR(hostByJA3S_ht, all_flows[i].flow->ssh_tls.ja3_server, hostByJA3Found);
 	  if(hostByJA3Found == NULL){
 	    ndpi_ip_dns *newHost = malloc(sizeof(ndpi_ip_dns));
 
 	    newHost->ip = all_flows[i].flow->dst_ip;
 	    newHost->ip_string = all_flows[i].flow->dst_name;
-	    newHost->dns_name = all_flows[i].flow->ssh_ssl.server_info;;
+	    newHost->dns_name = all_flows[i].flow->ssh_tls.server_info;;
 
 	    ndpi_ja3_fingerprints_host *newElement = malloc(sizeof(ndpi_ja3_fingerprints_host));
-	    newElement->ja3 = all_flows[i].flow->ssh_ssl.ja3_server;
-	    newElement->unsafe_cipher = all_flows[i].flow->ssh_ssl.server_unsafe_cipher;
+	    newElement->ja3 = all_flows[i].flow->ssh_tls.ja3_server;
+	    newElement->unsafe_cipher = all_flows[i].flow->ssh_tls.server_unsafe_cipher;
 	    newElement->ipToDNS_ht = NULL;
 
 	    HASH_ADD_INT(newElement->ipToDNS_ht, ip, newHost);
@@ -2227,7 +2227,7 @@ static void printFlowsStats() {
 	      ndpi_ip_dns *newInnerElement = malloc(sizeof(ndpi_ip_dns));
 	      newInnerElement->ip = all_flows[i].flow->dst_ip;
 	      newInnerElement->ip_string = all_flows[i].flow->dst_name;
-	      newInnerElement->dns_name = all_flows[i].flow->ssh_ssl.server_info;
+	      newInnerElement->dns_name = all_flows[i].flow->ssh_tls.server_info;
 	      HASH_ADD_INT(hostByJA3Found->ipToDNS_ht, ip, newInnerElement);
 	    }
 	  }

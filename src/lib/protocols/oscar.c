@@ -774,7 +774,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
       NDPI_LOG_INFO(ndpi_struct, "found OSCAR PICTURE TRANSFER\n");
       ndpi_int_oscar_add_connection(ndpi_struct, flow);
       if (ntohs(packet->tcp->dest) == 443 || ntohs(packet->tcp->source) == 443) {
-	flow->oscar_ssl_voice_stage = 1;
+	flow->oscar_tls_voice_stage = 1;
       }
       return;
 

@@ -6,7 +6,7 @@ WhatsApp	32	3243	2
 Spotify	1	86	1
 ApplePush	6	2095	1
 
-	1	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.140/SSL.Apple][cat: Web/5][24 pkts/15117 bytes <-> 20 pkts/6254 bytes]
+	1	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.140/TLS.Apple][cat: Web/5][24 pkts/15117 bytes <-> 20 pkts/6254 bytes]
 	2	TCP 192.168.2.4:49206 <-> 158.85.58.15:5222 [proto: 142/WhatsApp][cat: Chat/9][17 pkts/1794 bytes <-> 13 pkts/1169 bytes][PLAIN TEXT (iPhone)]
 	3	TCP 17.110.229.14:5223 -> 192.168.2.4:49193 [proto: 238/ApplePush][cat: Cloud/13][6 pkts/2095 bytes -> 0 pkts/0 bytes]
 	4	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][cat: Network/14][6 pkts/2052 bytes -> 0 pkts/0 bytes][Host: lucas-imac][DHCP Fingerprint: 1,3,6,15,119,95,252,44,46]

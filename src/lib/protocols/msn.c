@@ -62,7 +62,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
   u_int16_t plen;
   u_int16_t status = 0;
   
-  if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL) {
+  if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS) {
     
     NDPI_LOG_DBG2(ndpi_struct, "msn ssl ft test\n");
 
@@ -80,12 +80,12 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
       if(flow->packet_counter >= 5 && flow->packet_counter <= 10
 	 && (get_u_int32_t(packet->payload, 0) == htonl(0x18000000)
 	     && get_u_int32_t(packet->payload, 4) == 0x00000000)) {
-	flow->l4.tcp.msn_ssl_ft++;
+	flow->l4.tcp.msn_tls_ft++;
 	NDPI_LOG_DBG2(ndpi_struct,
 		      "increased msn ft ssl stage to: %u at packet nr: %u\n",
-		      flow->l4.tcp.msn_ssl_ft,
+		      flow->l4.tcp.msn_tls_ft,
 		 flow->packet_counter);
-	if (flow->l4.tcp.msn_ssl_ft == 2) {
+	if (flow->l4.tcp.msn_tls_ft == 2) {
 	  NDPI_LOG_INFO(ndpi_struct,
 		   "found MSN File Transfer, ifdef ssl 2.\n");
 	  ndpi_int_msn_add_connection(ndpi_struct, flow);
@@ -103,7 +103,7 @@ static void ndpi_search_msn_tcp(struct ndpi_detection_module_struct *ndpi_struct
    */
   /* now we have a look at the first packet only. */
   if(flow->packet_counter == 1
-      || ((packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL)
+      || ((packet->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS)
 	  && flow->packet_counter <= 3)
       ) {
     
@@ -497,7 +497,7 @@ void ndpi_search_msn(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       // need to do the ceck when protocol == http too (POST /gateway ...)
       if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP
-	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SSL
+	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS
 	 || packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN
 	 )
 	ndpi_search_msn_tcp(ndpi_struct, flow);

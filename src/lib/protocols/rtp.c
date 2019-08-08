@@ -78,7 +78,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    const u_int8_t * payload, const u_int16_t payload_len) {
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
-  if((payload_len < 2) || flow->protos.stun_ssl.stun.num_binding_requests) {
+  if((payload_len < 2) || flow->protos.stun_tls.stun.num_binding_requests) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }

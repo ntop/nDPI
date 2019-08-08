@@ -150,12 +150,12 @@ typedef struct ndpi_flow_info {
   char dhcp_fingerprint[48];
 
   struct {
-    u_int16_t ssl_version;
+    u_int16_t tls_version;
     char client_info[64], server_info[64], server_organization[64],
       ja3_client[33], ja3_server[33];
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
-  } ssh_ssl;
+  } ssh_tls;
 
   void *src_id, *dst_id;
 

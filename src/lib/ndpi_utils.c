@@ -303,7 +303,7 @@ int strncasecmp(const char *s1, const char *s2, size_t n) {
 
 /* **************************************** */
 
-u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher) {
+u_int8_t ndpi_is_safe_tls_cipher(u_int32_t cipher) {
   /* https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites */
   /* INSECURE */
   switch(cipher) {
@@ -360,9 +360,9 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x000019: return("TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA");
   case 0x00001a: return("TLS_DH_anon_WITH_DES_CBC_SHA");
   case 0x00001b: return("TLS_DH_anon_WITH_3DES_EDE_CBC_SHA");
-  case 0x00001c: return("SSL_FORTEZZA_KEA_WITH_NULL_SHA");
-  case 0x00001d: return("SSL_FORTEZZA_KEA_WITH_FORTEZZA_CBC_SHA");
-    /* case 0x00001e: return("SSL_FORTEZZA_KEA_WITH_RC4_128_SHA"); */
+  case 0x00001c: return("TLS_FORTEZZA_KEA_WITH_NULL_SHA");
+  case 0x00001d: return("TLS_FORTEZZA_KEA_WITH_FORTEZZA_CBC_SHA");
+    /* case 0x00001e: return("TLS_FORTEZZA_KEA_WITH_RC4_128_SHA"); */
   case 0x00001E: return("TLS_KRB5_WITH_DES_CBC_SHA");
   case 0x00001F: return("TLS_KRB5_WITH_3DES_EDE_CBC_SHA");
   case 0x000020: return("TLS_KRB5_WITH_RC4_128_SHA");
@@ -576,10 +576,10 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x00E41D: return("TLS_DHE_PSK_WITH_SALSA20_SHA1");
   case 0x00E41E: return("TLS_DHE_RSA_WITH_ESTREAM_SALSA20_SHA1");
   case 0x00E41F: return("TLS_DHE_RSA_WITH_SALSA20_SHA1");
-  case 0x00fefe: return("SSL_RSA_FIPS_WITH_DES_CBC_SHA");
-  case 0x00feff: return("SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA");
-  case 0x00ffe0: return("SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA");
-  case 0x00ffe1: return("SSL_RSA_FIPS_WITH_DES_CBC_SHA");
+  case 0x00fefe: return("TLS_RSA_FIPS_WITH_DES_CBC_SHA");
+  case 0x00feff: return("TLS_RSA_FIPS_WITH_3DES_EDE_CBC_SHA");
+  case 0x00ffe0: return("TLS_RSA_FIPS_WITH_3DES_EDE_CBC_SHA");
+  case 0x00ffe1: return("TLS_RSA_FIPS_WITH_DES_CBC_SHA");
   case 0x010080: return("SSL2_RC4_128_WITH_MD5");
   case 0x020080: return("SSL2_RC4_128_EXPORT40_WITH_MD5");
   case 0x030080: return("SSL2_RC2_128_CBC_WITH_MD5");
@@ -709,7 +709,7 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 /* ********************************** */
 
-char* ndpi_ssl_version2str(u_int16_t version) {
+char* ndpi_tls_version2str(u_int16_t version) {
   static char v[8];
 
   switch(version) {

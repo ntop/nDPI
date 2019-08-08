@@ -130,13 +130,13 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 
   if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
     if (packet->payload_packet_len >= 40 && memcmp(&packet->payload[0], "BINF", 4) == 0) {
-      u_int16_t ssl_port = 0;
-      ssl_port = parse_binf_message(ndpi_struct, &packet->payload[4], packet->payload_packet_len - 4);
-      if (dst != NULL && ssl_port) {
-	dst->detected_directconnect_ssl_port = ssl_port;
+      u_int16_t tls_port = 0;
+      tls_port = parse_binf_message(ndpi_struct, &packet->payload[4], packet->payload_packet_len - 4);
+      if (dst != NULL && tls_port) {
+	dst->detected_directconnect_tls_port = tls_port;
       }
-      if (src != NULL && ssl_port) {
-	src->detected_directconnect_ssl_port = ssl_port;
+      if (src != NULL && tls_port) {
+	src->detected_directconnect_tls_port = tls_port;
       }
 
 
@@ -145,14 +145,14 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	&& memcmp(&packet->payload[0], "DCTM", 4) == 0 && memcmp(&packet->payload[15], "ADCS", 4) == 0) {
       u_int16_t bytes_read = 0;
       if (dst != NULL) {
-	dst->detected_directconnect_ssl_port =
+	dst->detected_directconnect_tls_port =
 	  ntohs_ndpi_bytestream_to_number(&packet->payload[25], 5, &bytes_read);
-	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(dst->detected_directconnect_ssl_port));
+	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(dst->detected_directconnect_tls_port));
       }
       if (src != NULL) {
-	src->detected_directconnect_ssl_port =
+	src->detected_directconnect_tls_port =
 	  ntohs_ndpi_bytestream_to_number(&packet->payload[25], 5, &bytes_read);
-	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(src->detected_directconnect_ssl_port));
+	NDPI_LOG_DBG2(ndpi_struct, "DC ssl port parsed %d\n", ntohs(src->detected_directconnect_tls_port));
       }
 
 
@@ -175,16 +175,16 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	return;
       }
     }
-    if (src->detected_directconnect_ssl_port == packet->tcp->dest) {
+    if (src->detected_directconnect_tls_port == packet->tcp->dest) {
       if ((u_int32_t)
 	  (packet->tick_timestamp -
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	src->directconnect_last_safe_access_time = packet->tick_timestamp;
-	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_ssl_port));
+	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_tls_port));
 	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
       } else {
-	src->detected_directconnect_ssl_port = 0;
+	src->detected_directconnect_tls_port = 0;
 	NDPI_LOG_DBG2(ndpi_struct, "resetting src port due to timeout\n");
 	return;
       }
@@ -207,16 +207,16 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	return;
       }
     }
-    if (dst->detected_directconnect_ssl_port == packet->tcp->dest) {
+    if (dst->detected_directconnect_tls_port == packet->tcp->dest) {
       if ((u_int32_t)
 	  (packet->tick_timestamp -
 	   dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	dst->directconnect_last_safe_access_time = packet->tick_timestamp;
-	NDPI_LOG_DBG(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_ssl_port));
+	NDPI_LOG_DBG(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_tls_port));
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
       } else {
-	dst->detected_directconnect_ssl_port = 0;
+	dst->detected_directconnect_tls_port = 0;
 	NDPI_LOG_DBG2(ndpi_struct, "resetting dst port due to timeout\n");
 	return;
       }

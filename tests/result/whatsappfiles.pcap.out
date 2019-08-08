@@ -5,5 +5,5 @@ JA3 Host Stats:
 	1	 192.168.2.29             	 2      
 
 
-	1	TCP 192.168.2.29:49698 <-> 185.60.216.53:443 [proto: 91.242/SSL.WhatsAppFiles][cat: Download-FileTransfer-FileSharing/7][132 pkts/9906 bytes <-> 178 pkts/237405 bytes][TLSv1.2][client: mmg-fna.whatsapp.net][JA3C: 4e1a414c4f4c99097edd2a9a98e336c8][JA3S: 96681175a9547081bf3d417f1a572091][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256]
-	2	TCP 192.168.2.29:49674 <-> 185.60.216.53:443 [proto: 91.242/SSL.WhatsAppFiles][cat: Download-FileTransfer-FileSharing/7][161 pkts/189194 bytes <-> 149 pkts/15728 bytes][TLSv1.2][client: mmg-fna.whatsapp.net][JA3C: 107144b88827da5da9ed42d8776ccdc5][server: *.whatsapp.net][JA3S: 2d1eb5817ece335c24904f516ad5da12][organization: Facebook, Inc.][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256]
+	1	TCP 192.168.2.29:49698 <-> 185.60.216.53:443 [proto: 91.242/TLS.WhatsAppFiles][cat: Download-FileTransfer-FileSharing/7][132 pkts/9906 bytes <-> 178 pkts/237405 bytes][TLSv1.2][client: mmg-fna.whatsapp.net][JA3C: 4e1a414c4f4c99097edd2a9a98e336c8][JA3S: 96681175a9547081bf3d417f1a572091][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256]
+	2	TCP 192.168.2.29:49674 <-> 185.60.216.53:443 [proto: 91.242/TLS.WhatsAppFiles][cat: Download-FileTransfer-FileSharing/7][161 pkts/189194 bytes <-> 149 pkts/15728 bytes][TLSv1.2][client: mmg-fna.whatsapp.net][JA3C: 107144b88827da5da9ed42d8776ccdc5][server: *.whatsapp.net][JA3S: 2d1eb5817ece335c24904f516ad5da12][organization: Facebook, Inc.][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256]

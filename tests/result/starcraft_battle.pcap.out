@@ -1,12 +1,12 @@
-DNS	26	2848	7
+DNS	22	2431	6
 HTTP	450	294880	19
 SSDP	11	4984	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
-SSL	38	2548	11
+TLS	46	3171	14
 Google	22	2184	5
 Github	3	234	1
-Starcraft	236	51494	6
+Starcraft	232	51288	4
 
 	1	TCP 192.168.1.100:3508 <-> 87.248.221.254:80 [proto: 7/HTTP][cat: Web/5][90 pkts/5059 bytes <-> 89 pkts/129145 bytes][Host: llnw.blizzard.com][PLAIN TEXT (GET /sc)]
 	2	TCP 192.168.1.100:3517 <-> 213.248.127.130:1119 [proto: 213/Starcraft][cat: Game/8][126 pkts/9157 bytes <-> 89 pkts/41021 bytes][PLAIN TEXT (matteobracci1@gmail.com)]
@@ -34,29 +34,29 @@ Starcraft	236	51494	6
 	24	UDP 192.168.1.100:58851 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/173 bytes <-> 2 pkts/282 bytes][Host: 110.212.58.216.in-addr.arpa]
 	25	UDP 192.168.1.100:60026 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/154 bytes <-> 2 pkts/288 bytes][Host: llnw.blizzard.com][PLAIN TEXT (blizzard)]
 	26	UDP 192.168.1.100:58818 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/172 bytes <-> 2 pkts/260 bytes][Host: 100.1.168.192.in-addr.arpa][PLAIN TEXT (dynect)]
-	27	UDP 192.168.1.100:58831 <-> 192.168.1.254:53 [proto: 5.5/DNS][cat: Network/14][2 pkts/172 bytes <-> 2 pkts/245 bytes][Host: 26.186.239.80.in-addr.arpa][PLAIN TEXT (signup)]
+	27	UDP 192.168.1.100:58831 <-> 192.168.1.254:53 [proto: 91/TLS][cat: Web/5][2 pkts/172 bytes <-> 2 pkts/245 bytes][Host: 26.186.239.80.in-addr.arpa][client: ][PLAIN TEXT (signup)]
 	28	TCP 192.168.1.100:3532 <-> 2.228.46.112:80 [proto: 7.7/HTTP][cat: Web/5][3 pkts/320 bytes <-> 1 pkts/66 bytes][Host: bnetcmsus-a.akamaihd.net][PLAIN TEXT (GET /cms/bnet)]
 	29	TCP 192.168.1.100:3533 <-> 2.228.46.112:80 [proto: 7.7/HTTP][cat: Web/5][3 pkts/320 bytes <-> 1 pkts/66 bytes][Host: bnetcmsus-a.akamaihd.net][PLAIN TEXT (GET /cms/bnet)]
 	30	UDP 192.168.1.100:53145 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][2 pkts/152 bytes <-> 2 pkts/184 bytes][Host: nydus.battle.net][PLAIN TEXT (battle)]
-	31	TCP 192.168.1.100:3479 <-> 2.228.46.114:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	32	TCP 192.168.1.100:3480 <-> 2.228.46.114:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	33	TCP 192.168.1.100:3481 <-> 2.228.46.114:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	34	TCP 192.168.1.100:3482 <-> 2.228.46.114:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	35	TCP 192.168.1.100:3489 <-> 2.228.46.104:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	36	TCP 192.168.1.100:3490 <-> 2.228.46.104:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	37	TCP 192.168.1.100:3491 <-> 2.228.46.104:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	38	TCP 192.168.1.100:3492 <-> 2.228.46.104:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
-	39	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91.203/SSL.Github][cat: Collaborative/15][2 pkts/145 bytes <-> 1 pkts/89 bytes]
-	40	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/SSL][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/120 bytes]
+	31	TCP 192.168.1.100:3479 <-> 2.228.46.114:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	32	TCP 192.168.1.100:3480 <-> 2.228.46.114:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	33	TCP 192.168.1.100:3481 <-> 2.228.46.114:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	34	TCP 192.168.1.100:3482 <-> 2.228.46.114:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	35	TCP 192.168.1.100:3489 <-> 2.228.46.104:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	36	TCP 192.168.1.100:3490 <-> 2.228.46.104:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	37	TCP 192.168.1.100:3491 <-> 2.228.46.104:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	38	TCP 192.168.1.100:3492 <-> 2.228.46.104:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes]
+	39	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91.203/TLS.Github][cat: Collaborative/15][2 pkts/145 bytes <-> 1 pkts/89 bytes]
+	40	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/TLS][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/120 bytes]
 	41	UDP 192.168.1.100:58844 <-> 192.168.1.254:53 [proto: 5/DNS][cat: Network/14][1 pkts/86 bytes <-> 1 pkts/124 bytes][Host: 40.186.239.80.in-addr.arpa][PLAIN TEXT (attens)]
-	42	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91.126/SSL.Google][cat: Web/5][2 pkts/108 bytes <-> 1 pkts/60 bytes]
+	42	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91.126/TLS.Google][cat: Web/5][2 pkts/108 bytes <-> 1 pkts/60 bytes]
 	43	TCP 192.168.1.100:2759 <-> 64.233.184.188:5228 [proto: 126/Google][cat: Web/5][1 pkts/55 bytes <-> 1 pkts/66 bytes]
-	44	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91.126/SSL.Google][cat: Web/5][1 pkts/55 bytes <-> 1 pkts/66 bytes]
+	44	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91.126/TLS.Google][cat: Web/5][1 pkts/55 bytes <-> 1 pkts/66 bytes]
 	45	IGMP 192.168.1.107:0 -> 224.0.0.22:0 [proto: 82/IGMP][cat: Network/14][2 pkts/120 bytes -> 0 pkts/0 bytes]
-	46	UDP 192.168.1.100:53146 <-> 5.42.180.154:1119 [proto: 213/Starcraft][cat: Game/8][1 pkts/44 bytes <-> 1 pkts/60 bytes]
-	47	UDP 192.168.1.100:53146 <-> 62.115.246.51:1119 [proto: 213/Starcraft][cat: Game/8][1 pkts/44 bytes <-> 1 pkts/60 bytes]
-	48	UDP 192.168.1.100:6113 <-> 213.248.127.166:1119 [proto: 213/Starcraft][cat: Game/8][1 pkts/43 bytes <-> 1 pkts/60 bytes]
-	49	UDP 192.168.1.100:6113 <-> 213.248.127.212:1119 [proto: 213/Starcraft][cat: Game/8][1 pkts/43 bytes <-> 1 pkts/60 bytes]
+	46	UDP 192.168.1.100:53146 <-> 5.42.180.154:1119 [proto: 91.213/TLS.Starcraft][cat: Game/8][1 pkts/44 bytes <-> 1 pkts/60 bytes]
+	47	UDP 192.168.1.100:53146 <-> 62.115.246.51:1119 [proto: 91.213/TLS.Starcraft][cat: Game/8][1 pkts/44 bytes <-> 1 pkts/60 bytes]
+	48	UDP 192.168.1.100:6113 <-> 213.248.127.166:1119 [proto: 91/TLS][cat: Web/5][1 pkts/43 bytes <-> 1 pkts/60 bytes]
+	49	UDP 192.168.1.100:6113 <-> 213.248.127.212:1119 [proto: 91/TLS][cat: Web/5][1 pkts/43 bytes <-> 1 pkts/60 bytes]
 	50	TCP 192.168.1.100:3534 -> 2.228.46.112:80 [proto: 7/HTTP][cat: Web/5][1 pkts/66 bytes -> 0 pkts/0 bytes]
-	51	TCP 80.239.186.26:443 -> 192.168.1.100:3476 [proto: 91/SSL][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes]
-	52	TCP 80.239.186.40:443 -> 192.168.1.100:3478 [proto: 91/SSL][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	51	TCP 80.239.186.26:443 -> 192.168.1.100:3476 [proto: 91/TLS][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes]
+	52	TCP 80.239.186.40:443 -> 192.168.1.100:3478 [proto: 91/TLS][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes]
