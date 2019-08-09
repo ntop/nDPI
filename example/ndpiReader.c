@@ -854,8 +854,7 @@ static char* ipProto2Name(u_int16_t proto_id) {
  * @brief A faster replacement for inet_ntoa().
  */
 char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
-  char *cp, *retStr;
-  uint byte;
+  char *cp;
   int n;
 
   cp = &buf[bufLen];
@@ -863,7 +862,8 @@ char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
 
   n = 4;
   do {
-    byte = addr & 0xff;
+    u_int byte = addr & 0xff;
+
     *--cp = byte % 10 + '0';
     byte /= 10;
     if(byte > 0) {
@@ -872,14 +872,12 @@ char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
       if(byte > 0)
 	*--cp = byte + '0';
     }
-    *--cp = '.';
+    if(n > 1)
+      *--cp = '.';
     addr >>= 8;
-  } while(--n > 0);
+  } while (--n > 0);
 
-  /* Convert the string to lowercase */
-  retStr = (char*)(cp+1);
-
-  return(retStr);
+  return(cp);
 }
 
 /* ********************************** */
