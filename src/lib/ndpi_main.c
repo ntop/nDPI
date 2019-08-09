@@ -846,7 +846,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "XDMCP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 177, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 177, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_SMBV1,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_DANGEROUS, NDPI_PROTOCOL_SMBV1,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "SMBv1", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,

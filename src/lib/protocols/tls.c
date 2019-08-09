@@ -1243,9 +1243,10 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->udp != NULL) {
     /* DTLS dissector */
-    int rc;
-    
-    rc = sslTryAndRetrieveServerCertificate(ndpi_struct, flow);
+#ifdef DEBUG_TLS
+    int rc = /* sslTryAndRetrieveServerCertificate(...) */
+#endif
+    sslTryAndRetrieveServerCertificate(ndpi_struct, flow);
 
 #ifdef DEBUG_TLS
     printf("==>> %u [rc: %u][len: %u][%s][version: %u]\n",
