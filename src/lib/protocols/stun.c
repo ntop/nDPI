@@ -30,7 +30,7 @@
 
 #define MAX_NUM_STUN_PKTS     8
 
-/* #define DEBUG_STUN 1  */
+/* #define DEBUG_STUN 1 */
 
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
@@ -131,7 +131,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
     else
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_STUN;
-    
+
     flow->protos.stun_ssl.stun.num_udp_pkts++;
 
     if(msg_len == 0)
@@ -142,7 +142,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return(NDPI_IS_NOT_STUN);
   }
-  
+
   flow->protos.stun_ssl.stun.num_udp_pkts++;
 
   /*
@@ -214,15 +214,39 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  /* These are the only messages apparently whatsapp voice can use */
 	  break;
 
+	case 0x0014: /* Realm */
+	{
+	  u_int16_t realm_len = ntohs(*((u_int16_t*)&payload[offset+2]));
+
+	  if(flow->host_server_name[0] == '\0') {
+	    u_int j, i = (realm_len > sizeof(flow->host_server_name)) ? sizeof(flow->host_server_name) : realm_len;
+	    u_int k = offset+4;
+
+	    memset(flow->host_server_name, 0, sizeof(flow->host_server_name));
+
+	    for(j=0; j<i; j++)
+	      flow->host_server_name[j] = payload[k++];
+
+	    if(strstr((char*)flow->host_server_name, "google.com") != NULL) {
+	      *is_duo = 1;
+	      flow->guessed_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+	      return(NDPI_IS_STUN);
+	    }
+	  }
+	}
+	break;
+
 	case 0xC057: /* Messeger */
 	  if(msg_type == 0x0001) {
 	    if((msg_len == 100) || (msg_len == 104)) {
 	      *is_messenger = 1;
 	      return(NDPI_IS_STUN);
-	    } else if(msg_len == 76) {	      
+	    } else if(msg_len == 76) {
 	      *is_duo = 1;
+	      
 	      if(1) {
-		flow->guessed_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+		flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+		flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 		return(NDPI_IS_NOT_STUN); /* This case is found also with signal traffic */
 	      } else
 		return(NDPI_IS_STUN);
@@ -239,7 +263,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	    /* Either skype for business or "normal" skype with multiparty call */
 #ifdef DEBUG_STUN
 	    printf("==> Skype found\n");
-#endif	  
+#endif
 	    flow->protos.stun_ssl.stun.is_skype = 1;
 	    return(NDPI_IS_STUN);
 	  }
@@ -258,7 +282,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  flow->protos.stun_ssl.stun.is_skype = 1;
 #ifdef DEBUG_STUN
 	  printf("==> Skype (2) found\n");
-#endif	  
+#endif
 
 	  return(NDPI_IS_STUN);
 	  break;
@@ -274,8 +298,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	    flow->protos.stun_ssl.stun.is_skype = 1;
 #ifdef DEBUG_STUN
 	    printf("==> Skype (3) found\n");
-#endif	  
-	    
+#endif
+
 	    return(NDPI_IS_STUN);
 	  }
 	  break;
@@ -284,7 +308,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  can_this_be_whatsapp_voice = 0;
 	  flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
 	  break;
-	  
+
 	default:
 	  /* This means this STUN packet cannot be confused with whatsapp voice */
 #ifdef DEBUG_STUN
@@ -312,13 +336,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
  udp_stun_found:
   if(can_this_be_whatsapp_voice) {
     struct ndpi_packet_struct *packet = &flow->packet;
-    
+
     flow->protos.stun_ssl.stun.num_processed_pkts++;
 #ifdef DEBUG_STUN
     printf("==>> NDPI_PROTOCOL_WHATSAPP_VOICE\n");
 #endif
 
-    if((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478)) {           
+    if((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478)) {
       flow->guessed_host_protocol_id = (is_messenger_ip_address(ntohl(packet->iph->saddr)) || is_messenger_ip_address(ntohl(packet->iph->daddr))) ?
 	NDPI_PROTOCOL_MESSENGER : NDPI_PROTOCOL_WHATSAPP_VOICE;
     } else
