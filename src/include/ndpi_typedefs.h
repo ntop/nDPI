@@ -411,8 +411,14 @@ typedef enum {
 	      NDPI_HTTP_METHOD_CONNECT
 } ndpi_http_method;
 
+struct ndpi_lru_cache_entry {
+  u_int32_t key; /* Store the whole key to avoid ambiguities */
+  u_int32_t is_full:1, value:16, pad:15;
+};
+  
 struct ndpi_lru_cache {
-  u_int32_t num_entries, *entries;
+  u_int32_t num_entries;
+  struct ndpi_lru_cache_entry *entries;
 };
 
 struct ndpi_id_struct {
@@ -1056,6 +1062,9 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
+
+  /* NDPI_PROTOCOL_STUN and subprotocols */
+  struct ndpi_lru_cache *stun_cache;
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 

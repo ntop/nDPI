@@ -32,6 +32,8 @@
 
 /* #define DEBUG_STUN 1 */
 
+/* #define DEBUG_LRU 1 */
+
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
   u_int32_t cookie;
@@ -40,9 +42,41 @@ struct stun_packet_header {
 
 /* ************************************************************ */
 
+u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow) {
+  return(flow->packet.iph->saddr + flow->packet.udp->source);
+}
+
+/* ************************************************************ */
+
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					 u_int proto, struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_UNKNOWN);
+					 struct ndpi_flow_struct *flow,
+					 u_int app_proto, u_int proto) {
+  if(ndpi_struct->stun_cache == NULL)
+    ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
+
+  if(ndpi_struct->stun_cache
+     && flow->packet.iph
+     && flow->packet.udp
+     && (app_proto != NDPI_PROTOCOL_UNKNOWN)
+    ) /* Cache flow sender info */ {
+    u_int32_t key = get_stun_lru_key(flow);
+    u_int16_t cached_proto;
+    
+    if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
+#ifdef DEBUG_LRU
+      printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key, cached_proto, proto, app_proto);
+#endif
+      app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;      
+    } else {    
+#ifdef DEBUG_LRU
+      printf("[LRU] ADDING %u / %u.%u\n", key, proto, app_proto);
+#endif
+      
+      ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto);
+    }
+  }
+  
+  ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, proto);
 }
 
 typedef enum {
@@ -103,7 +137,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   *is_whatsapp = 0, *is_messenger = 0, *is_duo = 0;
 
   if(payload_length < sizeof(struct stun_packet_header)) {
-    /* This looks like an invlid packet */
+    /* This looks like an invalid packet */
 
     if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
       *is_whatsapp = 1;
@@ -124,6 +158,28 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   if(msg_type > 0x000C)
     return(NDPI_IS_NOT_STUN);
 
+  if(ndpi_struct->stun_cache) {
+    u_int16_t proto;
+    u_int32_t key = get_stun_lru_key(flow);
+    
+    if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */)) {
+#ifdef DEBUG_LRU
+      printf("[LRU] FOUND %u / %u\n", key, proto);
+#endif
+      
+      flow->guessed_host_protocol_id = proto, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+      return(NDPI_IS_STUN);
+    } else {
+#ifdef DEBUG_LRU
+      printf("[LRU] NOT FOUND %u\n", key);
+#endif     
+    }	  
+  } else {
+#ifdef DEBUG_LRU
+    printf("[LRU] NO/EMPTY CACHE\n");
+#endif
+  }
+  
   if(msg_type == 0x01 /* Binding Request */) {
     flow->protos.stun_ssl.stun.num_binding_requests++;
 
@@ -229,7 +285,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
 	    if(strstr((char*)flow->host_server_name, "google.com") != NULL) {
 	      *is_duo = 1;
-	      flow->guessed_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+	      flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 	      return(NDPI_IS_STUN);
 	    }
 	  }
@@ -245,8 +301,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	      *is_duo = 1;
 	      
 	      if(1) {
-		flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
-		flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+		flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 		return(NDPI_IS_NOT_STUN); /* This case is found also with signal traffic */
 	      } else
 		return(NDPI_IS_STUN);
@@ -386,20 +441,21 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
 	if(is_messenger) {
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
+	  ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
 	  return;
 	} else if(is_duo) {
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
+	  ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
 	  return;
 	} else if(flow->protos.stun_ssl.stun.is_skype) {
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
 
 	  if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
+	    ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
 	} else {
 	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
-	  ndpi_int_stun_add_connection(ndpi_struct,
-				       is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO) : NDPI_PROTOCOL_STUN, flow);
+	  ndpi_int_stun_add_connection(ndpi_struct, flow,
+				       is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO) : NDPI_PROTOCOL_STUN,
+				       NDPI_PROTOCOL_UNKNOWN);
 	}
 
 	return;
@@ -414,23 +470,22 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
     if(is_messenger) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
+      ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
       return;
     } else if(is_duo) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
+      ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
       return;
     } else if(flow->protos.stun_ssl.stun.is_skype) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
 
       /* flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT */
       if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
+	ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
     } else {
       NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
-      ndpi_int_stun_add_connection(ndpi_struct,
+      ndpi_int_stun_add_connection(ndpi_struct, flow,
 				   is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO)
-				   : NDPI_PROTOCOL_STUN,
-				   flow);
+				   : NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_UNKNOWN);
     }
 
     return;

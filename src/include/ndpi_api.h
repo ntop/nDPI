@@ -774,8 +774,9 @@ extern "C" {
   /* LRU cache */
   struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries);
   void ndpi_lru_free_cache(struct ndpi_lru_cache *c);
-  u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int8_t clean_key_when_found);
-  void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key);
+  u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
+			       u_int16_t *value, u_int8_t clean_key_when_found);
+  void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value);
   
   /**
    * Add a string to match to an automata

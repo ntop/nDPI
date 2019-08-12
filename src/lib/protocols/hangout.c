@@ -22,8 +22,12 @@
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HANGOUT_DUO
 
+/* #define DEBUG_LRU 1 */
+
 #include "ndpi_api.h"
 
+/* stun.c */
+extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow);
 
 /* https://support.google.com/a/answer/1279090?hl=en */
 #define HANGOUT_UDP_LOW_PORT  19302
@@ -85,11 +89,29 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
 
   if((packet->payload_packet_len > 24) && is_google_flow(ndpi_struct, flow)) {
     if(
-       ((packet->udp != NULL) && (isHangoutUDPPort(ntohs(packet->udp->source)) || isHangoutUDPPort(ntohs(packet->udp->dest))))
+       ((packet->udp != NULL) && (isHangoutUDPPort(ntohs(packet->udp->source))
+				  || isHangoutUDPPort(ntohs(packet->udp->dest))))
        ||
-       ((packet->tcp != NULL) && (isHangoutTCPPort(ntohs(packet->tcp->source)) || isHangoutTCPPort(ntohs(packet->tcp->dest))))) {
+       ((packet->tcp != NULL) && (isHangoutTCPPort(ntohs(packet->tcp->source))
+				  || isHangoutTCPPort(ntohs(packet->tcp->dest))))) {
       NDPI_LOG_INFO(ndpi_struct, "found Hangout\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_UNKNOWN);
+
+      /* Hangout is over STUN hence the LRU cache is shared */
+      if(ndpi_struct->stun_cache == NULL)
+	ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
+
+      if(ndpi_struct->stun_cache && flow->packet.iph && flow->packet.udp) {
+	u_int32_t key = get_stun_lru_key(flow);
+	
+#ifdef DEBUG_LRU
+	printf("[LRU] ADDING %u / %u.%u\n", key, NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_HANGOUT_DUO);
+#endif
+
+	ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, NDPI_PROTOCOL_HANGOUT_DUO);
+      }
+      
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO,
+				 NDPI_PROTOCOL_STUN);
       return;
     }
   }

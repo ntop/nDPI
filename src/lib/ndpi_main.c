@@ -51,6 +51,9 @@
 
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
+/* stun.c */
+extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow);
+
 static int _ndpi_debug_callbacks = 0;
 
 /* #define MATCH_DEBUG 1 */
@@ -2338,6 +2341,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct
     if(ndpi_struct->ookla_cache)
       ndpi_lru_free_cache(ndpi_struct->ookla_cache);
 
+    if(ndpi_struct->stun_cache)
+      ndpi_lru_free_cache(ndpi_struct->stun_cache);
+
     if(ndpi_struct->protocols_ptree)
       ndpi_Destroy_Patricia((patricia_tree_t*)ndpi_struct->protocols_ptree, free_ptree_data);
 
@@ -4103,10 +4109,11 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       // if(/* (flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
       if(flow->protos.stun_ssl.stun.num_processed_pkts && flow->protos.stun_ssl.stun.is_skype) {
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
-      } else
+      } else {
 	ndpi_set_detected_protocol(ndpi_struct, flow,
 				   flow->guessed_host_protocol_id,
 				   NDPI_PROTOCOL_STUN);
+      }
     }
   }
 
@@ -6181,7 +6188,8 @@ struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries) {
 
   if(!c) return(NULL);
 
-  c->entries = (u_int32_t*)calloc(num_entries, sizeof(u_int32_t));
+  c->entries = (struct ndpi_lru_cache_entry*)calloc(num_entries,
+						    sizeof(struct ndpi_lru_cache_entry));
 
   if(!c->entries) {
     free(c);
@@ -6197,21 +6205,23 @@ void ndpi_lru_free_cache(struct ndpi_lru_cache *c) {
   free(c);
 }
 
-
-u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int8_t clean_key_when_found) {
+u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t *value, u_int8_t clean_key_when_found) {
   u_int32_t slot = key % c->num_entries;
 
-  if(c->entries[slot] == key) {
-    if(clean_key_when_found) c->entries[slot] = 0;
+  if(c->entries[slot].is_full) {
+    *value = c->entries[slot].value;
+    if(clean_key_when_found) c->entries[slot].is_full = 0;
     return(1);
   } else
     return(0);
 }
 
-void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key) {
+void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value) {
   u_int32_t slot = key % c->num_entries;
 
-  c->entries[slot] = key;
+  c->entries[slot].is_full = 1,
+    c->entries[slot].key = key,
+    c->entries[slot].value = value;
 }
 
 /* ******************************************************************** */

@@ -35,7 +35,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   printf("[%s] [http_dont_dissect_response: %u]->> %s\n", __FUNCTION__,
 	 ndpi_struct->http_dont_dissect_response, flow->http.response_status_code);
 #endif
-  
+
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
     /* This is HTTP and it is not a sub protocol (e.g. skype or dropbox) */
 
@@ -157,7 +157,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 #endif
 
   /* Leave the statement below commented necessary in case of call to ndpi_get_partial_detection() */
-  
+
   /* if(!ndpi_struct->http_dont_dissect_response) */ {
     if((flow->http.url == NULL)
        && (packet->http_url_name.len > 0)
@@ -320,7 +320,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     /**
        check result of host subprotocol detection
-       
+
        if "detected" in flow == 0 then "detected" = "guess"
        else "guess" = "detected"
     **/
@@ -338,7 +338,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       if(flow->detected_protocol_stack[0] != flow->guessed_host_protocol_id)
 	flow->guessed_host_protocol_id = flow->detected_protocol_stack[0];
     }
-    
+
     if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
        && ((ndpi_struct->http_dont_dissect_response) || flow->http_detected)
        && (packet->http_origin.len > 0)) {
@@ -480,17 +480,17 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
 	if(packet->payload_packet_len >= 12) {
 	  char buf[4];
-	  
+
 	  /* Set server HTTP response code */
 	  strncpy(buf, (char*)&packet->payload[9], 3);
 	  buf[3] = '\0';
-	  
+
 	  flow->http.response_status_code = atoi(buf);
 	  /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
 	  if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
 	    flow->http.response_status_code = 0; /* Out of range */
 	}
-	
+
         ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
         check_content_type_and_change_protocol(ndpi_struct, flow);
         return;
@@ -533,14 +533,14 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
 	if(ndpi_struct->ookla_cache == NULL)
 	  ndpi_struct->ookla_cache = ndpi_lru_cache_init(1024);
-	
+
 	if(packet->iph != NULL && ndpi_struct->ookla_cache != NULL) {
 	  if(packet->tcp->source == htons(8080))
-	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->saddr);
+	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->saddr, 1 /* dummy */);
 	  else
-	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->daddr);	  
+	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->daddr, 1 /* dummy */);
 	}
-	
+
         return;
       }
 
