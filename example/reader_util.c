@@ -77,9 +77,156 @@
 #include "reader_util.h"
 #include "ndpi_classify.h"
 
-extern u_int8_t enable_protocol_guess, enable_joy_stats;
+extern u_int8_t enable_protocol_guess, enable_joy_stats, enable_payload_analyzer;
 extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 8 */, max_num_tcp_dissected_pkts /* 10 */;
+
+static u_int32_t flow_id = 0;
+
+/* ****************************************************** */
+
+struct payload_stats {
+  u_int8_t *pattern;
+  u_int8_t pattern_len;
+  u_int16_t num_occurrencies;
+  UT_hash_handle hh;   /* makes this structure hashable */
+};
+
+
+struct payload_stats *pstats = NULL;
+u_int32_t max_num_packets_per_flow      = 32;
+u_int32_t max_packet_payload_dissection = 32; /* Full payload */
+u_int16_t min_pattern_len = 4;
+u_int16_t max_pattern_len = 8;
+
+
+void ndpi_analyze_payload(struct ndpi_flow_info *flow,
+			  u_int8_t src_to_dst_direction,
+			  u_int8_t *payload,
+			  u_int16_t payload_len) {
+  struct payload_stats *ret;
+  u_int i;
+
+#ifdef DEBUG_PAYLOAD
+  for(i=0; i<payload_len; i++)
+    printf("%c", isprint(payload[i]) ? payload[i] : '.');  
+  printf("\n");
+#endif
+  
+  HASH_FIND(hh, pstats, payload, payload_len, ret);
+  if(ret == NULL) {
+    if((ret = (struct payload_stats*)calloc(1, sizeof(struct payload_stats))) == NULL)
+      return; /* OOM */
+
+    if((ret->pattern = (u_int8_t*)malloc(payload_len)) == NULL) {
+      free(ret);
+      return;
+    }
+
+    memcpy(ret->pattern, payload, payload_len);
+    ret->pattern_len = payload_len;
+    ret->num_occurrencies = 1;
+
+    HASH_ADD(hh, pstats, pattern[0], payload_len, ret);
+
+#ifdef DEBUG_PAYLOAD
+    printf("Added element [total: %u]\n", HASH_COUNT(pstats));
+#endif
+  } else {
+    ret->num_occurrencies++;
+    // printf("==> %u\n", ret->num_occurrencies);
+  }
+}
+
+
+void ndpi_payload_analyzer(struct ndpi_flow_info *flow,
+			   u_int8_t src_to_dst_direction,
+			   u_int8_t *payload, u_int16_t payload_len) {
+  u_int16_t i, j;
+  u_int16_t scan_len = ndpi_min(max_packet_payload_dissection, payload_len);
+  
+  if((flow->src2dst_pkt_count+flow->dst2src_pkt_count) < max_num_packets_per_flow) {
+#ifdef DEBUG_PAYLOAD
+    printf("[hashval: %u][proto: %u][vlan: %u][%s:%u <-> %s:%u][direction: %s][payload_len: %u]\n",
+	   flow->hashval, flow->protocol, flow->vlan_id,
+	   flow->src_name, flow->src_port,
+	   flow->dst_name, flow->dst_port,
+	   src_to_dst_direction ? "s2d" : "d2s",
+	   payload_len);
+#endif
+  } else
+    return;
+    
+  for(i=0; i<scan_len; i++) {
+    for(j=min_pattern_len; j <= max_pattern_len; j++) {
+      if((i+j) < payload_len) {
+	ndpi_analyze_payload(flow, src_to_dst_direction, &payload[i], j);
+	ndpi_analyze_payload(flow, src_to_dst_direction, &payload[i], j);
+      }
+    }
+  }
+}
+
+/* ***************************************************** */
+
+static int payload_stats_sort_asc(void *_a, void *_b) {
+  struct payload_stats *a = (struct payload_stats *)_a;
+  struct payload_stats *b = (struct payload_stats *)_b;
+
+  //return(a->num_occurrencies - b->num_occurrencies);
+  return(b->num_occurrencies - a->num_occurrencies);
+}
+
+/* ***************************************************** */
+
+void print_payload_stat(struct payload_stats *p) {
+  u_int i;
+
+  printf("\t[");
+  
+  for(i=0; i<p->pattern_len; i++) {
+    printf("%c", isprint(p->pattern[i]) ? p->pattern[i] : '.');
+  }
+
+  printf("]");
+  for(; i<16; i++) printf(" ");
+  printf("[");
+  
+  for(i=0; i<p->pattern_len; i++) {
+    printf("%s%02X", (i > 0) ? " " : "", isprint(p->pattern[i]) ? p->pattern[i] : '.');
+  }
+
+  printf("]");
+  
+  for(; i<16; i++) printf("  ");
+  for(i=p->pattern_len; i<max_pattern_len; i++) printf(" ");
+  
+  printf("[len: %u][num_occurrencies: %u]\n",
+	 p->pattern_len, p->num_occurrencies);
+}
+
+/* ***************************************************** */
+
+void ndpi_report_payload_stats() {
+  struct payload_stats *p, *tmp;
+  u_int num = 0, max_num = 25;
+
+  printf("\n\nPayload Analysis\n");
+  
+  HASH_SORT(pstats, payload_stats_sort_asc);
+
+  HASH_ITER(hh, pstats, p, tmp) {
+    if(num <= max_num) 
+      print_payload_stat(p);
+
+    free(p->pattern);
+    HASH_DEL(pstats, p);
+    free(p);
+    num++;
+  }
+}
+
+
 
 /* ***************************************************** */
 
@@ -515,6 +662,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
         workflow->num_allocated_flows++;
 
       memset(newflow, 0, sizeof(struct ndpi_flow_info));
+      newflow->flow_id = flow_id++;
       newflow->hashval = hashval;
       newflow->protocol = iph->protocol, newflow->vlan_id = vlan_id;
       newflow->src_ip = iph->saddr, newflow->dst_ip = iph->daddr;
@@ -679,7 +827,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 				  flow->src2dst_l4_bytes, 0, 1,
 				  flow->src2dst_byte_count, NULL);
   }
-  
+
   if(!flow->ndpi_flow) return;
 
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
@@ -806,23 +954,26 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       flow->dst2src_l4_bytes += payload_len;
     }
 
+    if(enable_payload_analyzer && (payload_len > 0))
+      ndpi_payload_analyzer(flow, src_to_dst_direction, payload, payload_len);
+
     if(enable_joy_stats) {
       /* Update BD, distribution and mean. */
       ndpi_flow_update_byte_count(flow, payload, payload_len, src_to_dst_direction);
       ndpi_flow_update_byte_dist_mean_var(flow, payload, payload_len, src_to_dst_direction);
     }
-    
+
     flow->last_seen = time;
 
     if(!flow->has_human_readeable_strings) {
       u_int8_t skip = 0;
-      
+
       if((proto == IPPROTO_TCP)
 	 && (
 	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)
-	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))	     
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
 	 ) {
 	if((flow->src2dst_packets+flow->dst2src_packets) < 10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
 	  skip = 1;
@@ -830,7 +981,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
       if(!skip) {
 	char outbuf[64] = { '\0' };
-	
+
 	if(ndpi_has_human_readeable_string(workflow->ndpi_struct, (char*)packet, header->caplen,
 					   human_readeable_string_len,
 					   flow->human_readeable_string_buffer,
@@ -843,7 +994,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	     (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)
-	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))	     
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
 	 )
 	flow->has_human_readeable_strings = 0;
     }
@@ -1148,7 +1299,7 @@ iph_check:
       proto = options[0];
       ip_len += 8 * (options[1] + 1);
     }
-    
+
     iph = NULL;
   } else {
     static u_int8_t ipv4_warning_used = 0;

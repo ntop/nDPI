@@ -124,6 +124,7 @@ typedef struct ndpi_ja3_fingerprints_host{
 
 // flow tracking
 typedef struct ndpi_flow_info {
+  u_int32_t flow_id;
   u_int32_t hashval;
   u_int32_t src_ip;
   u_int32_t dst_ip;

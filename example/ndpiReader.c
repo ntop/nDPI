@@ -81,7 +81,7 @@ static json_object *jArray_topStats;
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
-u_int8_t enable_protocol_guess = 1;
+u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0;
 u_int8_t verbose = 0, json_flag = 0, enable_joy_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
@@ -212,6 +212,8 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 #endif
 
 void test_lib(); /* Forward */
+
+extern void ndpi_report_payload_stats();
 
 /* ********************************** */
 
@@ -364,6 +366,7 @@ static void help(u_int long_help) {
 	 "  -J                        | Display flow SPLT (sequence of packet length and time)\n"
 	 "                            | and BD (byte distribution). See https://github.com/cisco/joy\n"
 	 "  -t                        | Dissect GTP/TZSP tunnels\n"
+	 "  -P                        | Enable payload analysis\n"
 	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -c <path>                 | Load custom categories from the specified file\n"
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
@@ -441,6 +444,7 @@ static struct option longopts[] = {
   { "help", no_argument, NULL, 'h'},
   { "json", required_argument, NULL, 'j'},
   { "joy", required_argument, NULL, 'J'},
+  { "payload-analysis", required_argument, NULL, 'P'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
 
@@ -591,7 +595,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:l:s:tv:V:n:j:Jrp:w:q0123:456:7:89:m:b:x:T:U:",
+  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:Pl:s:tv:V:n:j:Jrp:w:q0123:456:7:89:m:b:x:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -690,6 +694,10 @@ static void parseOptions(int argc, char **argv) {
 
     case 'J':
       enable_joy_stats = 1;
+      break;
+
+    case 'P':
+      enable_payload_analyzer = 1;
       break;
       
     case 'j':
@@ -850,6 +858,7 @@ static char* ipProto2Name(u_int16_t proto_id) {
 
 /* ********************************** */
 
+#if 0
 /**
  * @brief A faster replacement for inet_ntoa().
  */
@@ -879,6 +888,7 @@ char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
 
   return(cp);
 }
+#endif
 
 /* ********************************** */
 
@@ -2079,6 +2089,9 @@ void printPortStats(struct port_stats *stats) {
 /* *********************************************** */
 
 static void printFlowsStats() {
+  if(enable_payload_analyzer)
+    ndpi_report_payload_stats();
+  
   if(verbose) {
     int thread_id;
     FILE *out = results_file ? results_file : stdout;
