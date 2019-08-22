@@ -20,7 +20,7 @@ static void ndpi_int_tor_add_connection(struct ndpi_detection_module_struct
 
 int ndpi_is_tls_tor(struct ndpi_detection_module_struct *ndpi_struct,
 		    struct ndpi_flow_struct *flow, char *certificate) {  
-  int prev_num = 0, numbers_found = 0, num_found = 0, i, len, num_impossible = 0;
+  int len;
   char dummy[48], *dot, *name;
   
   if((certificate == NULL) || (certificate[0] == '\0'))
@@ -51,6 +51,8 @@ int ndpi_is_tls_tor(struct ndpi_detection_module_struct *ndpi_struct,
   len = strlen(name);
   
   if(len >= 5) {
+    int i, prev_num = 0, numbers_found = 0, num_found = 0, num_impossible = 0;
+    
     for(i = 0; name[i+1] != '\0'; i++) {
       // printf("***** [SSL] %s(): [%d][%c]", __FUNCTION__, i, name[i]);
       
@@ -66,7 +68,6 @@ int ndpi_is_tls_tor(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       } else
 	prev_num = 0;
-
       
       if(ndpi_match_bigram(ndpi_struct, &ndpi_struct->bigrams_automa, &name[i])) {
 	num_found++;

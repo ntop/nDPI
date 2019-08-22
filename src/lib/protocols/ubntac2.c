@@ -50,14 +50,16 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
       }
 
       if(found) {
-	char version[256];
-	int i, j, len;
-	
 	found += packet->payload[found+1] + 4; /* Skip model name */
 	found++; /* Skip len*/
 	
 	if(found < packet->payload_packet_len) {
-	  for(i=found, j=0; (packet->payload[i] != 0) && (i < packet->payload_packet_len) && (i < (sizeof(version)-1)); i++)
+	  char version[256];
+	  int i, j, len;
+	  
+	  for(i=found, j=0; (i < packet->payload_packet_len)
+		&& (i < (sizeof(version)-1))
+		&& (packet->payload[i] != 0); i++)
 	    version[j++] = packet->payload[i];
 	  
 	  version[j] = '\0';

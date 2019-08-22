@@ -242,7 +242,6 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	 || (handshake_protocol == 0x0b) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
 	u_int16_t tls_version;
-	int i;
 
 	if(packet->tcp)
 	  tls_version = ntohs(*((u_int16_t*)&packet->payload[header_len+4]));
