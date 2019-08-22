@@ -85,17 +85,23 @@ static u_int32_t flow_id = 0;
 
 /* ****************************************************** */
 
+struct flow_id_stats {
+  u_int32_t flow_id;
+  UT_hash_handle hh;   /* makes this structure hashable */
+};
+
 struct payload_stats {
   u_int8_t *pattern;
   u_int8_t pattern_len;
   u_int16_t num_occurrencies;
+  struct flow_id_stats *flows;
   UT_hash_handle hh;   /* makes this structure hashable */
 };
 
 
 struct payload_stats *pstats = NULL;
 u_int32_t max_num_packets_per_flow      = 32;
-u_int32_t max_packet_payload_dissection = 32; /* Full payload */
+u_int32_t max_packet_payload_dissection = 128;
 u_int16_t min_pattern_len = 4;
 u_int16_t max_pattern_len = 8;
 
@@ -106,7 +112,8 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 			  u_int16_t payload_len) {
   struct payload_stats *ret;
   u_int i;
-
+  struct flow_id_stats *f;
+  
 #ifdef DEBUG_PAYLOAD
   for(i=0; i<payload_len; i++)
     printf("%c", isprint(payload[i]) ? payload[i] : '.');  
@@ -135,6 +142,15 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
   } else {
     ret->num_occurrencies++;
     // printf("==> %u\n", ret->num_occurrencies);
+  }
+
+  HASH_FIND_INT(ret->flows, &flow->flow_id, f);
+  if(f == NULL) {
+    if((f = (struct flow_id_stats*)calloc(1, sizeof(struct flow_id_stats))) == NULL)
+      return; /* OOM */
+
+    f->flow_id = flow->flow_id;
+    HASH_ADD_INT(ret->flows, flow_id, f);
   }
 }
 
@@ -181,7 +197,8 @@ static int payload_stats_sort_asc(void *_a, void *_b) {
 
 void print_payload_stat(struct payload_stats *p) {
   u_int i;
-
+  struct flow_id_stats *s, *tmp;
+  
   printf("\t[");
   
   for(i=0; i<p->pattern_len; i++) {
@@ -201,8 +218,16 @@ void print_payload_stat(struct payload_stats *p) {
   for(; i<16; i++) printf("  ");
   for(i=p->pattern_len; i<max_pattern_len; i++) printf(" ");
   
-  printf("[len: %u][num_occurrencies: %u]\n",
+  printf("[len: %u][num_occurrencies: %u][flowId: ",
 	 p->pattern_len, p->num_occurrencies);
+
+  i = 0;
+  HASH_ITER(hh, p->flows, s, tmp) {
+    printf("%s%u", (i > 0) ? " " : "", s->flow_id);	   
+    i++;
+  }
+ 
+  printf("]\n");
 }
 
 /* ***************************************************** */

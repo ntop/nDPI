@@ -107,6 +107,9 @@ static time_t capture_until = 0;
 static u_int32_t num_flows;
 static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 
+extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection;
+extern u_int16_t min_pattern_len, max_pattern_len;
+
 struct flow_info {
   struct ndpi_flow_info *flow;
   u_int16_t thread_id;
@@ -366,7 +369,12 @@ static void help(u_int long_help) {
 	 "  -J                        | Display flow SPLT (sequence of packet length and time)\n"
 	 "                            | and BD (byte distribution). See https://github.com/cisco/joy\n"
 	 "  -t                        | Dissect GTP/TZSP tunnels\n"
-	 "  -P                        | Enable payload analysis\n"
+	 "  -P <a>:<b>:<c>:<d>        | Enable payload analysis:\n"
+	 "                            | <a> = min pattern len to search\n"
+	 "                            | <b> = max pattern len to search\n"
+	 "                            | <c> = max num packets per flow\n"
+	 "                            | <d> = max packet payload dissection\n"
+	 "                            | Default: %u:%u:%u:%u\n"
 	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -c <path>                 | Load custom categories from the specified file\n"
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
@@ -386,8 +394,9 @@ static void help(u_int long_help) {
 	 "  -U <num>                  | Max number of UDP processed packets before giving up [default: %u]\n"
 	 ,
 	 human_readeable_string_len,
-	 max_num_tcp_dissected_pkts,
-	 max_num_udp_dissected_pkts);
+	 min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
+	 max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts
+	 );
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -595,7 +604,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:Pl:s:tv:V:n:j:Jrp:w:q0123:456:7:89:m:b:x:T:U:",
+  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:P:l:s:tv:V:n:j:Jrp:w:q0123:456:7:89:m:b:x:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -697,7 +706,24 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'P':
-      enable_payload_analyzer = 1;
+      {
+	int _min_pattern_len, _max_pattern_len, _max_num_packets_per_flow, _max_packet_payload_dissection;
+	
+	enable_payload_analyzer = 1;
+	if(sscanf(optarg, "%d:%d:%d:%d", &_min_pattern_len, &_max_pattern_len,
+		  &_max_num_packets_per_flow, &_max_packet_payload_dissection) == 4) {
+	  min_pattern_len = _min_pattern_len, max_pattern_len = _max_pattern_len;
+	  max_num_packets_per_flow = _max_num_packets_per_flow, max_packet_payload_dissection = _max_packet_payload_dissection;
+	  if(min_pattern_len > max_pattern_len) min_pattern_len = max_pattern_len;
+	  if(min_pattern_len < 2)               min_pattern_len = 2;
+	  if(max_pattern_len > 16)              max_pattern_len = 16;
+	  if(max_num_packets_per_flow == 0)     max_num_packets_per_flow = 1;
+	  if(max_packet_payload_dissection < 4) max_packet_payload_dissection = 4;
+	} else {
+	  printf("Invalid -P format. Ignored\n");
+	  help(0);
+	}
+      }
       break;
       
     case 'j':
@@ -935,7 +961,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       );
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
-
+    if(enable_payload_analyzer) fprintf(out, "[flowId: %u]", flow->flow_id);
+    
     if(enable_joy_stats) {
       /* Print entropy values for monitored flows. */
       flowGetBDMeanandVariance(flow);
