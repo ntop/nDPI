@@ -35,32 +35,43 @@ void ndpi_search_teamspeak(struct ndpi_detection_module_struct *ndpi_struct, str
   struct ndpi_packet_struct *packet = &flow->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search teamspeak\n");
+
   
-  if (packet->udp != NULL) {
+#ifdef WEAK_DETECTION_CODE_DISABLED
+  if(packet->udp != NULL) {
     u_int16_t udport, usport;
+
     usport = ntohs(packet->udp->source), udport = ntohs(packet->udp->dest);
+
     /* http://www.imfirewall.com/en/protocols/teamSpeak.htm  */
-    if (((usport == 9987 || udport == 9987) || (usport == 8767 || udport == 8767)) && packet->payload_packet_len >= 20) {
+    if(((usport == 9987 || udport == 9987) || (usport == 8767 || udport == 8767)) && packet->payload_packet_len >= 20) {
        NDPI_LOG_INFO(ndpi_struct, "found TEAMSPEAK udp\n");
        ndpi_int_teamspeak_add_connection(ndpi_struct, flow);
     }
   }
-  else if (packet->tcp != NULL) {
-    u_int16_t tdport, tsport;
-    tsport = ntohs(packet->tcp->source), tdport = ntohs(packet->tcp->dest);
-  /* https://github.com/Youx/soliloque-server/wiki/Connection-packet */
-  if(packet->payload_packet_len >= 20) {
-    if (((memcmp(packet->payload, "\xf4\xbe\x03\x00", 4) == 0)) ||
-          ((memcmp(packet->payload, "\xf4\xbe\x02\x00", 4) == 0)) ||
+  else
+#endif
+    
+    if(packet->tcp != NULL) {
+      u_int16_t tdport, tsport;
+      tsport = ntohs(packet->tcp->source), tdport = ntohs(packet->tcp->dest);
+      /* https://github.com/Youx/soliloque-server/wiki/Connection-packet */
+      if(packet->payload_packet_len >= 20) {
+	if(((memcmp(packet->payload, "\xf4\xbe\x03\x00", 4) == 0)) ||
+	    ((memcmp(packet->payload, "\xf4\xbe\x02\x00", 4) == 0)) ||
             ((memcmp(packet->payload, "\xf4\xbe\x01\x00", 4) == 0))) {
-     NDPI_LOG_INFO(ndpi_struct, "found TEAMSPEAK tcp\n");
-     ndpi_int_teamspeak_add_connection(ndpi_struct, flow);
-    }  /* http://www.imfirewall.com/en/protocols/teamSpeak.htm  */
-  } else if ((tsport == 14534 || tdport == 14534) || (tsport == 51234 || tdport == 51234)) {
-     NDPI_LOG_INFO(ndpi_struct, "found TEAMSPEAK\n");
-     ndpi_int_teamspeak_add_connection(ndpi_struct, flow);
-   }
-  }
+	  NDPI_LOG_INFO(ndpi_struct, "found TEAMSPEAK tcp\n");
+	  ndpi_int_teamspeak_add_connection(ndpi_struct, flow);
+	}  /* http://www.imfirewall.com/en/protocols/teamSpeak.htm  */
+      }
+#if WEAK_DETECTION_CODE_DISABLED
+      else if((tsport == 14534 || tdport == 14534) || (tsport == 51234 || tdport == 51234)) {
+	NDPI_LOG_INFO(ndpi_struct, "found TEAMSPEAK\n");
+	ndpi_int_teamspeak_add_connection(ndpi_struct, flow);
+      }
+#endif
+    }
+  
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   return;
 }
