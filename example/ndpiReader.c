@@ -972,10 +972,13 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version));
     if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_tls.client_info);
+    if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
+    
     if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
 						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
     if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[server: %s]", flow->ssh_tls.server_info);
-
+    if(flow->ssh_tls.server_hassh[0] != '\0') fprintf(out, "[HASSH-S: %s]", flow->ssh_tls.server_hassh);
+    
     if(flow->ssh_tls.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s%s]", flow->ssh_tls.ja3_server,
 						    print_cipher(flow->ssh_tls.server_unsafe_cipher));
     if(flow->ssh_tls.server_organization[0] != '\0') fprintf(out, "[organization: %s]", flow->ssh_tls.server_organization);

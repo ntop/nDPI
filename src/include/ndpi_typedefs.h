@@ -1171,6 +1171,7 @@ struct ndpi_flow_struct {
 
     struct {
       char client_signature[48], server_signature[48];
+      char hassh_client[33], hassh_server[33];
     } ssh;
 
     struct {

@@ -862,6 +862,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.ssh.client_signature);
       snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
 	       flow->ndpi_flow->protos.ssh.server_signature);
+      snprintf(flow->ssh_tls.client_hassh, sizeof(flow->ssh_tls.client_hassh), "%s",
+	       flow->ndpi_flow->protos.ssh.hassh_client);
+      snprintf(flow->ssh_tls.server_hassh, sizeof(flow->ssh_tls.server_hassh), "%s",
+	       flow->ndpi_flow->protos.ssh.hassh_server);
     }
     /* TLS */
     else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
