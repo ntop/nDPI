@@ -120,7 +120,9 @@ static int ndpi_json_string_escape(const char *src, int src_len, char *dst, int 
 
 void ndpi_reset_serializer(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
-  
+
+  serializer->status = 0;
+
   if(serializer->fmt == ndpi_serialization_format_json) {
     u_int32_t buff_diff;
 
