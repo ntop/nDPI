@@ -364,7 +364,7 @@ int ndpi_serialize_end_of_record(ndpi_serializer *_serializer) {
 
   if(serializer->fmt == ndpi_serialization_format_json) {
     if(!(serializer->status & NDPI_SERIALIZER_STATUS_ARRAY)) {
-      // serializer->json_buffer[0] = '[';
+      serializer->buffer[0] = '[';
       serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used],
 					buff_diff, "]");
     }
