@@ -250,7 +250,6 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 #endif
 
 	NDPI_LOG_DBG2(ndpi_struct, "ssh stage 1 passed\n");
-	flow->l4.tcp.ssh_stage++;;
 	flow->guessed_host_protocol_id = flow->guessed_protocol_id = NDPI_PROTOCOL_SSH;
       } else {
 	NDPI_LOG_INFO(ndpi_struct, "found ssh\n");
@@ -261,6 +260,7 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       printf("\n[SSH] [completed stage: %u]\n", flow->l4.tcp.ssh_stage);
 #endif
 
+      flow->l4.tcp.ssh_stage = 3;
       return;
     }
   } else {
@@ -326,6 +326,10 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
     return;
   }
+
+#ifdef SSH_DEBUG
+  printf("\n[SSH] Excluding SSH");
+#endif
 
   NDPI_LOG_DBG(ndpi_struct, "excluding ssh at stage %d\n", flow->l4.tcp.ssh_stage);
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SSH);
