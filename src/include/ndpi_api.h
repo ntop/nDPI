@@ -830,6 +830,13 @@ extern "C" {
 				   u_int32_t key, u_int32_t value);
   int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
 				   u_int32_t key, u_int64_t value);
+  int ndpi_serialize_uint32_int32(ndpi_serializer *serializer,
+				  u_int32_t key, int32_t value);
+  int ndpi_serialize_uint32_int64(ndpi_serializer *serializer,
+				  u_int32_t key, int64_t value);
+  int ndpi_serialize_uint32_float(ndpi_serializer *serializer,
+				  u_int32_t key, float value,
+				  const char *format /* e.f. "%.2f" */);
   int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
 				   u_int32_t key, const char *value);
   int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
@@ -862,6 +869,12 @@ extern "C" {
 				     u_int32_t *key, u_int32_t *value);
   int ndpi_deserialize_uint32_uint64(ndpi_deserializer *deserializer,
 				     u_int32_t *key, u_int64_t *value);
+  int ndpi_deserialize_uint32_int32(ndpi_deserializer *deserializer,
+				    u_int32_t *key, int32_t *value);
+  int ndpi_deserialize_uint32_int64(ndpi_deserializer *deserializer,
+				    u_int32_t *key, int64_t *value);
+  int ndpi_deserialize_uint32_float(ndpi_deserializer *deserializer,
+				    u_int32_t *key, float *value);
   int ndpi_deserialize_uint32_string(ndpi_deserializer *deserializer,
 				     u_int32_t *key, ndpi_string *value);
   int ndpi_deserialize_string_int32(ndpi_deserializer *deserializer,
