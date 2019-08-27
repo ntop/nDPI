@@ -163,6 +163,10 @@ typedef struct ndpi_flow_info {
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
   } ssh_tls;
 
+  struct {
+    float pktlen_c_to_s, pktlen_s_to_c;
+  } entropy;
+  
   void *src_id, *dst_id;
 
   // Entropy fields

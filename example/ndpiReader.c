@@ -997,6 +997,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
 
+    if(flow->entropy.pktlen_c_to_s || flow->entropy.pktlen_s_to_c)
+      fprintf(out, "[pktlen entropy: %.2f / %.2f]", flow->entropy.pktlen_c_to_s, flow->entropy.pktlen_s_to_c);
+    
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version));
     if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_tls.client_info);
     if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
