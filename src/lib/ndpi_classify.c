@@ -52,7 +52,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
-
 #include "ndpi_main.h"
 #include "ndpi_classify.h"
 

@@ -1363,4 +1363,16 @@ typedef struct {
   u_int16_t str_len;
 } ndpi_string;
 
+/* **************************************** */
+
+struct ndpi_analyze_struct {
+  u_int32_t *values;
+  u_int32_t sum_total, num_data_entries, next_value_insert_index;
+  u_int16_t num_values_array_len /* lenght of the values array */;
+};
+
+#define DEFAULT_SERIES_LEN  64
+#define MAX_SERIES_LEN      512
+#define MIN_SERIES_LEN      8
+
 #endif /* __NDPI_TYPEDEFS_H__ */

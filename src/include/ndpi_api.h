@@ -891,6 +891,17 @@ extern "C" {
 				    ndpi_string *key, float *value);
   int ndpi_deserialize_end_of_record(ndpi_deserializer *deserializer);
 
+  /* Data analysis */
+  struct ndpi_analyze_struct* ndpi_init_data_analysis(u_int16_t _max_series_len);
+  void ndpi_free_data_analysis(struct ndpi_analyze_struct *d);
+  void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value);
+
+  float ndpi_data_average(struct ndpi_analyze_struct *s);
+  float ndpi_data_window_average(struct ndpi_analyze_struct *s);
+  
+  float ndpi_entropy(struct ndpi_analyze_struct *s);
+
+  void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */
 #ifdef __cplusplus
 }
 #endif

@@ -3353,6 +3353,32 @@ void serializerUnitTest() {
 
 /* *********************************************** */
 
+void analyzeUnitTest() {
+  struct ndpi_analyze_struct *s = ndpi_init_data_analysis(32);
+  u_int32_t i;
+
+  for(i=0; i<256; i++) {
+    ndpi_data_add_value(s, rand()*i);
+    // ndpi_data_add_value(s, i+1);
+  }
+
+  // ndpi_data_print_window_values(s);
+
+#ifdef RUN_DATA_ANALYSIS_THEN_QUIT
+  printf("Average: [all: %f][window: %f]\n",
+	 ndpi_data_average(s), ndpi_data_window_average(s));
+  printf("Entropy: %f\n", ndpi_entropy(s));
+#endif
+
+  ndpi_free_data_analysis(s);
+
+#ifdef RUN_DATA_ANALYSIS_THEN_QUIT
+  exit(0);
+#endif
+}
+
+/* *********************************************** */
+
 /**
  * @brief Produce bpf filter to filter ports and hosts
  * in order to remove a peak in terms of number of packets
@@ -3929,7 +3955,8 @@ int orginal_main(int argc, char **argv) {
     /* Internal checks */
     automataUnitTest();
     serializerUnitTest();
-
+    // analyzeUnitTest();
+    
     gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module();
 

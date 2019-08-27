@@ -145,6 +145,9 @@ typedef struct ndpi_flow_info {
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
 
+  // Flow data analysis
+  struct ndpi_analyze_struct *bytes_c_to_s, *bytes_s_to_c;
+  
   char info[96];
   char host_server_name[256];
   char bittorent_hash[41];

@@ -56,6 +56,9 @@
 #define SNAP                   0xaa
 #define BSTP                   0x42     /* Bridge Spanning Tree Protocol */
 
+/* Keep last 32 packets */
+#define DATA_ANALUYSIS_SLIDING_WINDOW    32
+
 /* mask for FCF */
 #define	WIFI_DATA                        0x2    /* 0000 0010 */
 #define FCF_TYPE(fc)     (((fc) >> 2) & 0x3)    /* 0000 0011 = 0x3 */
@@ -259,6 +262,8 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
   if(flow->ndpi_flow) { ndpi_flow_free(flow->ndpi_flow); flow->ndpi_flow = NULL; }
   if(flow->src_id)    { ndpi_free(flow->src_id); flow->src_id = NULL; }
   if(flow->dst_id)    { ndpi_free(flow->dst_id); flow->dst_id = NULL; }
+  if(flow->bytes_c_to_s) ndpi_free_data_analysis(flow->bytes_c_to_s);
+  if(flow->bytes_s_to_c) ndpi_free_data_analysis(flow->bytes_s_to_c);
 }
 
 /* ***************************************************** */
@@ -693,7 +698,9 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->src_ip = iph->saddr, newflow->dst_ip = iph->daddr;
       newflow->src_port = htons(*sport), newflow->dst_port = htons(*dport);
       newflow->ip_version = version;
-
+      newflow->bytes_c_to_s = ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
+	newflow->bytes_s_to_c =  ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
+      
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
 	inet_ntop(AF_INET, &newflow->dst_ip, newflow->dst_name, sizeof(newflow->dst_name));
@@ -978,9 +985,11 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(src_to_dst_direction) {
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
       flow->src2dst_l4_bytes += payload_len;
+      // ndpi_data_add_value(flow->bytes_c_to_s, rawsize);
     } else {
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
       flow->dst2src_l4_bytes += payload_len;
+      // ndpi_data_add_value(flow->bytes_s_to_c, rawsize);
     }
 
     if(enable_payload_analyzer && (payload_len > 0))
