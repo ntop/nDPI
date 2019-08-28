@@ -1369,6 +1369,11 @@ struct ndpi_analyze_struct {
   u_int32_t *values;
   u_int32_t sum_total, num_data_entries, next_value_insert_index;
   u_int16_t num_values_array_len /* lenght of the values array */;
+
+  struct {
+    /* https://www.johndcook.com/blog/standard_deviation/ */
+    float mu, q;
+  } stddev;
 };
 
 #define DEFAULT_SERIES_LEN  64

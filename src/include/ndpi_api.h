@@ -899,8 +899,11 @@ extern "C" {
   float ndpi_data_average(struct ndpi_analyze_struct *s);
   float ndpi_data_window_average(struct ndpi_analyze_struct *s);
   
-  float ndpi_entropy(struct ndpi_analyze_struct *s);
-
+  float ndpi_data_entropy(struct ndpi_analyze_struct *s);
+  float ndpi_data_variance(struct ndpi_analyze_struct *s);
+  float ndpi_data_stddev(struct ndpi_analyze_struct *s);
+  float ndpi_data_ratio(u_int32_t sent, u_int32_t rcvd);
+    
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */
 #ifdef __cplusplus
 }

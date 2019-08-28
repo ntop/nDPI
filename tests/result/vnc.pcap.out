@@ -1,4 +1,4 @@
 VNC	4551	329158	2
 
-	1	TCP 95.237.48.208:59791 <-> 192.168.2.110:6900 [proto: 89/VNC][cat: RemoteAccess/12][2485 pkts/199101 bytes <-> 1058 pkts/57444 bytes][PLAIN TEXT (ws57U@4.00)]
-	2	TCP 95.237.48.208:51559 <-> 192.168.2.110:6900 [proto: 89/VNC][cat: RemoteAccess/12][684 pkts/54893 bytes <-> 324 pkts/17720 bytes]
+	1	TCP 95.237.48.208:59791 <-> 192.168.2.110:6900 [proto: 89/VNC][cat: RemoteAccess/12][2485 pkts/199101 bytes <-> 1058 pkts/57444 bytes][pktlen c2s avg(stddev)/entropy: 5.0(80.1)/5.3][pktlen s2c avg(stddev)/entropy: 5.0(54.3)/2.7][bytes ratio: 0.55][PLAIN TEXT (ws57U@4.00)]
+	2	TCP 95.237.48.208:51559 <-> 192.168.2.110:6900 [proto: 89/VNC][cat: RemoteAccess/12][684 pkts/54893 bytes <-> 324 pkts/17720 bytes][pktlen c2s avg(stddev)/entropy: 5.0(80.3)/4.7][pktlen s2c avg(stddev)/entropy: 5.0(54.7)/4.2][bytes ratio: 0.51]

@@ -399,11 +399,11 @@ void ndpi_flow_info_freer(void *node) {
 
   ndpi_free_flow_info_half(flow);
 
-  if(flow->bytes_c_to_s)
-    ndpi_free_data_analysis(flow->bytes_c_to_s);  
+  if(flow->pktlen_c_to_s)
+    ndpi_free_data_analysis(flow->pktlen_c_to_s);  
   
-  if(flow->bytes_s_to_c)
-    ndpi_free_data_analysis(flow->bytes_s_to_c);  
+  if(flow->pktlen_s_to_c)
+    ndpi_free_data_analysis(flow->pktlen_s_to_c);  
 
   ndpi_free(flow);
 }
@@ -703,8 +703,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->src_ip = iph->saddr, newflow->dst_ip = iph->daddr;
       newflow->src_port = htons(*sport), newflow->dst_port = htons(*dport);
       newflow->ip_version = version;
-      newflow->bytes_c_to_s = ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
-	newflow->bytes_s_to_c =  ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
+      newflow->pktlen_c_to_s = ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
+	newflow->pktlen_s_to_c =  ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
       
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
@@ -842,7 +842,6 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 /* ****************************************************** */
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
-
   if(enable_joy_stats) {
     /* Update SPLT scores. */
 
@@ -869,10 +868,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
-
-  if(flow->bytes_c_to_s) flow->entropy.pktlen_c_to_s = ndpi_entropy(flow->bytes_c_to_s);
-  
-  if(flow->bytes_s_to_c) flow->entropy.pktlen_s_to_c = ndpi_entropy(flow->bytes_s_to_c);  
 
   if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_DHCP) {
     snprintf(flow->dhcp_fingerprint, sizeof(flow->dhcp_fingerprint), "%s", flow->ndpi_flow->protos.dhcp.fingerprint);
@@ -994,11 +989,11 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(src_to_dst_direction) {
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
       flow->src2dst_l4_bytes += payload_len;
-      if(flow->bytes_c_to_s) ndpi_data_add_value(flow->bytes_c_to_s, rawsize);
+      if(flow->pktlen_c_to_s) ndpi_data_add_value(flow->pktlen_c_to_s, rawsize);
     } else {
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
       flow->dst2src_l4_bytes += payload_len;
-      if(flow->bytes_s_to_c) ndpi_data_add_value(flow->bytes_s_to_c, rawsize);
+      if(flow->pktlen_s_to_c) ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
     }
 
     if(enable_payload_analyzer && (payload_len > 0))

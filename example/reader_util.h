@@ -120,7 +120,9 @@ typedef struct ndpi_ja3_fingerprints_host{
    UT_hash_handle hh;
 } ndpi_ja3_fingerprints_host;
 
-
+struct flow_metrics {
+  float entropy, average, stddev;
+};
 
 // flow tracking
 typedef struct ndpi_flow_info {
@@ -146,8 +148,8 @@ typedef struct ndpi_flow_info {
   ndpi_protocol detected_protocol;
 
   // Flow data analysis
-  struct ndpi_analyze_struct *bytes_c_to_s, *bytes_s_to_c;
-  
+  struct ndpi_analyze_struct *pktlen_c_to_s, *pktlen_s_to_c;
+    
   char info[96];
   char host_server_name[256];
   char bittorent_hash[41];
@@ -162,10 +164,6 @@ typedef struct ndpi_flow_info {
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
   } ssh_tls;
-
-  struct {
-    float pktlen_c_to_s, pktlen_s_to_c;
-  } entropy;
   
   void *src_id, *dst_id;
 

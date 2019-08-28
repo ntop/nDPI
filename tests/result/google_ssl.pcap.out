@@ -4,4 +4,4 @@ JA3 Host Stats:
 		 IP Address                  	 # JA3C     
 
 
-	1	TCP 172.31.3.224:42835 <-> 216.58.212.100:443 [proto: 91.126/TLS.Google][cat: Web/5][16 pkts/1512 bytes <-> 12 pkts/7596 bytes][TLSv1][server: www.google.com][JA3S: 7252ecc446aba4a3e474793ae320609a (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_SHA]
+	1	TCP 172.31.3.224:42835 <-> 216.58.212.100:443 [proto: 91.126/TLS.Google][cat: Web/5][16 pkts/1512 bytes <-> 12 pkts/7596 bytes][pktlen c2s avg(stddev)/entropy: 3.6(94.5)/86.7][pktlen s2c avg(stddev)/entropy: 2.9(633.0)/622.2][bytes ratio: -0.67][TLSv1][server: www.google.com][JA3S: 7252ecc446aba4a3e474793ae320609a (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_SHA]

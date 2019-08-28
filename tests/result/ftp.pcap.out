@@ -2,9 +2,9 @@ Unknown	1115	1122198	1
 FTP_CONTROL	68	5571	1
 FTP_DATA	9	1819	1
 
-	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes][PLAIN TEXT (vsFTPd 3.0.3)]
-	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][cat: Download-FileTransfer-FileSharing/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes][PLAIN TEXT (    1 0        0        1073741)]
+	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes][pktlen c2s avg(stddev)/entropy: 5.0(70.5)/6.7][pktlen s2c avg(stddev)/entropy: 4.6(99.2)/44.9][bytes ratio: 0.04][PLAIN TEXT (vsFTPd 3.0.3)]
+	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][cat: Download-FileTransfer-FileSharing/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes][pktlen c2s avg(stddev)/entropy: 2.3(68.4)/4.8][pktlen s2c avg(stddev)/entropy: 0.8(369.2)/520.6][bytes ratio: -0.62][PLAIN TEXT (    1 0        0        1073741)]
 
 
 Undetected flows:
-	1	TCP 192.168.1.212:50696 <-> 90.130.70.73:24523 [proto: 0/Unknown][380 pkts/25104 bytes <-> 735 pkts/1097094 bytes]
+	1	TCP 192.168.1.212:50696 <-> 90.130.70.73:24523 [proto: 0/Unknown][380 pkts/25104 bytes <-> 735 pkts/1097094 bytes][pktlen c2s avg(stddev)/entropy: 5.0(66.1)/0.9][pktlen s2c avg(stddev)/entropy: 4.9(1492.6)/135.1][bytes ratio: -0.96]

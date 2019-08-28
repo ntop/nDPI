@@ -1,8 +1,8 @@
 Mining	637	581074	6
 
-	1	TCP 192.168.1.142:55328 <-> 69.118.54.122:8333 [proto: 42/Mining][cat: Mining/99][2 pkts/281 bytes <-> 137 pkts/191029 bytes][PLAIN TEXT (version)]
-	2	TCP 192.168.1.142:55348 <-> 74.89.181.229:8333 [proto: 42/Mining][cat: Mining/99][55 pkts/28663 bytes <-> 117 pkts/134830 bytes][PLAIN TEXT (version)]
-	3	TCP 192.168.1.142:55383 <-> 66.68.83.22:8333 [proto: 42/Mining][cat: Mining/99][65 pkts/45271 bytes <-> 96 pkts/70339 bytes][PLAIN TEXT (version)]
-	4	TCP 192.168.1.142:55400 <-> 195.218.16.178:8333 [proto: 42/Mining][cat: Mining/99][47 pkts/26824 bytes <-> 72 pkts/55927 bytes][PLAIN TEXT (version)]
-	5	TCP 192.168.1.142:55317 <-> 188.165.213.169:8333 [proto: 42/Mining][cat: Mining/99][16 pkts/21673 bytes <-> 3 pkts/1771 bytes][PLAIN TEXT (version)]
-	6	TCP 192.168.1.142:55487 <-> 184.58.165.119:8333 [proto: 42/Mining][cat: Mining/99][24 pkts/3082 bytes <-> 3 pkts/1384 bytes][PLAIN TEXT (version)]
+	1	TCP 192.168.1.142:55328 <-> 69.118.54.122:8333 [proto: 42/Mining][cat: Mining/99][2 pkts/281 bytes <-> 137 pkts/191029 bytes][pktlen c2s avg(stddev)/entropy: 1.0(140.5)/30.5][pktlen s2c avg(stddev)/entropy: 5.0(1394.4)/378.4][bytes ratio: -1.00][PLAIN TEXT (version)]
+	2	TCP 192.168.1.142:55348 <-> 74.89.181.229:8333 [proto: 42/Mining][cat: Mining/99][55 pkts/28663 bytes <-> 117 pkts/134830 bytes][pktlen c2s avg(stddev)/entropy: 4.5(521.1)/577.7][pktlen s2c avg(stddev)/entropy: 4.6(1152.4)/588.7][bytes ratio: -0.65][PLAIN TEXT (version)]
+	3	TCP 192.168.1.142:55383 <-> 66.68.83.22:8333 [proto: 42/Mining][cat: Mining/99][65 pkts/45271 bytes <-> 96 pkts/70339 bytes][pktlen c2s avg(stddev)/entropy: 4.2(696.5)/636.6][pktlen s2c avg(stddev)/entropy: 4.3(732.7)/652.9][bytes ratio: -0.22][PLAIN TEXT (version)]
+	4	TCP 192.168.1.142:55400 <-> 195.218.16.178:8333 [proto: 42/Mining][cat: Mining/99][47 pkts/26824 bytes <-> 72 pkts/55927 bytes][pktlen c2s avg(stddev)/entropy: 4.2(570.7)/606.4][pktlen s2c avg(stddev)/entropy: 4.4(776.8)/673.2][bytes ratio: -0.35][PLAIN TEXT (version)]
+	5	TCP 192.168.1.142:55317 <-> 188.165.213.169:8333 [proto: 42/Mining][cat: Mining/99][16 pkts/21673 bytes <-> 3 pkts/1771 bytes][pktlen c2s avg(stddev)/entropy: 3.9(1354.6)/368.8][pktlen s2c avg(stddev)/entropy: 0.7(590.3)/654.1][bytes ratio: 0.85][PLAIN TEXT (version)]
+	6	TCP 192.168.1.142:55487 <-> 184.58.165.119:8333 [proto: 42/Mining][cat: Mining/99][24 pkts/3082 bytes <-> 3 pkts/1384 bytes][pktlen c2s avg(stddev)/entropy: 4.6(128.4)/12.3][pktlen s2c avg(stddev)/entropy: 0.9(461.3)/472.0][bytes ratio: 0.38][PLAIN TEXT (version)]

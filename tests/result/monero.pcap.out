@@ -1,4 +1,4 @@
 Mining	319	166676	2
 
-	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][PLAIN TEXT (method)]
-	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes][PLAIN TEXT (method)]
+	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][pktlen c2s avg(stddev)/entropy: 4.5(900.3)/708.7][pktlen s2c avg(stddev)/entropy: 4.7(116.8)/98.8][bytes ratio: 0.83][PLAIN TEXT (method)]
+	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes][pktlen c2s avg(stddev)/entropy: 3.0(185.6)/394.9][pktlen s2c avg(stddev)/entropy: 4.3(254.9)/138.0][bytes ratio: -0.14][PLAIN TEXT (method)]

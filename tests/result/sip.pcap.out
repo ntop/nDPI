@@ -2,7 +2,7 @@ RTP	9	1926	1
 SIP	102	47087	2
 RTCP	1	146	1
 
-	1	UDP 192.168.1.2:5060 <-> 212.242.33.35:5060 [proto: 100/SIP][cat: VoIP/10][53 pkts/21940 bytes <-> 31 pkts/15635 bytes][PLAIN TEXT (REGISTER sip)]
-	2	UDP 192.168.1.2:5060 <-> 200.68.120.81:5060 [proto: 100/SIP][cat: VoIP/10][15 pkts/7568 bytes <-> 3 pkts/1944 bytes][PLAIN TEXT (INVITE sip)]
-	3	UDP 192.168.1.2:30000 -> 212.242.33.36:40392 [proto: 87/RTP][cat: Media/1][9 pkts/1926 bytes -> 0 pkts/0 bytes][PLAIN TEXT (VRUDKBuYs)]
-	4	UDP 192.168.1.2:30001 -> 212.242.33.36:40393 [proto: 165/RTCP][cat: VoIP/10][1 pkts/146 bytes -> 0 pkts/0 bytes][PLAIN TEXT (11894297)]
+	1	UDP 192.168.1.2:5060 <-> 212.242.33.35:5060 [proto: 100/SIP][cat: VoIP/10][53 pkts/21940 bytes <-> 31 pkts/15635 bytes][pktlen c2s avg(stddev)/entropy: 4.4(414.0)/343.3][pktlen s2c avg(stddev)/entropy: 4.9(504.4)/85.4][bytes ratio: 0.17][PLAIN TEXT (REGISTER sip)]
+	2	UDP 192.168.1.2:5060 <-> 200.68.120.81:5060 [proto: 100/SIP][cat: VoIP/10][15 pkts/7568 bytes <-> 3 pkts/1944 bytes][pktlen c2s avg(stddev)/entropy: 3.8(504.5)/179.9][pktlen s2c avg(stddev)/entropy: 1.6(648.0)/8.0][bytes ratio: 0.59][PLAIN TEXT (INVITE sip)]
+	3	UDP 192.168.1.2:30000 -> 212.242.33.36:40392 [proto: 87/RTP][cat: Media/1][9 pkts/1926 bytes -> 0 pkts/0 bytes][pktlen c2s avg(stddev)/entropy: 3.2(214.0)/0.0][pktlen s2c avg(stddev)/entropy: 0.0(nan)/0.0][bytes ratio: 1.00][PLAIN TEXT (VRUDKBuYs)]
+	4	UDP 192.168.1.2:30001 -> 212.242.33.36:40393 [proto: 165/RTCP][cat: VoIP/10][1 pkts/146 bytes -> 0 pkts/0 bytes][pktlen c2s avg(stddev)/entropy: 0.0(146.0)/0.0][pktlen s2c avg(stddev)/entropy: 0.0(nan)/0.0][bytes ratio: 1.00][PLAIN TEXT (11894297)]
