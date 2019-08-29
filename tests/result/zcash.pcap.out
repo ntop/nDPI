@@ -1,3 +1,3 @@
 Mining	145	20644	1
 
-	1	TCP 192.168.2.92:55190 <-> 178.32.196.217:9050 [proto: 42/Mining][cat: Mining/99][83 pkts/11785 bytes <-> 62 pkts/8859 bytes][pktlen c2s avg(stddev)/entropy: 4.7(142.0)/91.4][pktlen s2c avg(stddev)/entropy: 4.8(142.9)/88.4][bytes ratio: 0.14][PLAIN TEXT (method)]
+	1	TCP 192.168.2.92:55190 <-> 178.32.196.217:9050 [proto: 42/Mining][cat: Mining/99][83 pkts/11785 bytes <-> 62 pkts/8859 bytes][bytes ratio: 0.142 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 14079.3/18925.0 19638.4/20757.6 3.9/4.4][PLAIN TEXT (method)]

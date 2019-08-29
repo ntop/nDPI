@@ -1,6 +1,6 @@
 TINC	317	352291	4
 
-	1	UDP 185.83.218.112:55656 <-> 131.114.168.27:55656 [proto: 209/TINC][cat: VPN/2][29 pkts/30038 bytes <-> 105 pkts/139726 bytes][pktlen c2s avg(stddev)/entropy: 4.6(1035.8)/544.4][pktlen s2c avg(stddev)/entropy: 4.8(1330.7)/412.4][bytes ratio: -0.65][PLAIN TEXT (E@zUIs1)]
-	2	UDP 131.114.168.27:55655 <-> 185.83.218.112:55655 [proto: 209/TINC][cat: VPN/2][101 pkts/136966 bytes <-> 29 pkts/32550 bytes][pktlen c2s avg(stddev)/entropy: 4.8(1356.1)/400.1][pktlen s2c avg(stddev)/entropy: 4.6(1122.4)/533.9][bytes ratio: 0.62][PLAIN TEXT (Cr64lS)]
-	3	TCP 131.114.168.27:49290 <-> 185.83.218.112:55656 [proto: 209/TINC][cat: VPN/2][14 pkts/3812 bytes <-> 13 pkts/3098 bytes][pktlen c2s avg(stddev)/entropy: 2.7(272.3)/380.0][pktlen s2c avg(stddev)/entropy: 2.6(238.3)/362.6][bytes ratio: 0.10][PLAIN TEXT (1 94 64 0 0 5861ABF)]
-	4	TCP 131.114.168.27:59244 <-> 185.83.218.112:55655 [proto: 209/TINC][cat: VPN/2][15 pkts/3169 bytes <-> 11 pkts/2932 bytes][pktlen c2s avg(stddev)/entropy: 2.7(211.3)/345.2][pktlen s2c avg(stddev)/entropy: 2.4(266.5)/387.3][bytes ratio: 0.04][PLAIN TEXT (1 429 672 0 0 2)]
+	1	UDP 185.83.218.112:55656 <-> 131.114.168.27:55656 [proto: 209/TINC][cat: VPN/2][29 pkts/30038 bytes <-> 105 pkts/139726 bytes][bytes ratio: -0.646 (Download)][IAT c2s/s2c avg/stddev/entropy: 1279.1/343.6 4440.7/513.6 2.0/3.7][PLAIN TEXT (E@zUIs1)]
+	2	UDP 131.114.168.27:55655 <-> 185.83.218.112:55655 [proto: 209/TINC][cat: VPN/2][101 pkts/136966 bytes <-> 29 pkts/32550 bytes][bytes ratio: 0.616 (Upload)][IAT c2s/s2c avg/stddev/entropy: 429.0/1533.6 1112.1/6256.4 3.1/1.3][PLAIN TEXT (Cr64lS)]
+	3	TCP 131.114.168.27:49290 <-> 185.83.218.112:55656 [proto: 209/TINC][cat: VPN/2][14 pkts/3812 bytes <-> 13 pkts/3098 bytes][bytes ratio: 0.103 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 3643.0/3942.6 12495.0/12986.6 0.1/0.1][PLAIN TEXT (1 94 64 0 0 5861ABF)]
+	4	TCP 131.114.168.27:59244 <-> 185.83.218.112:55655 [proto: 209/TINC][cat: VPN/2][15 pkts/3169 bytes <-> 11 pkts/2932 bytes][bytes ratio: 0.039 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 3382.1/4730.0 12091.3/14085.7 0.1/0.1][PLAIN TEXT (1 429 672 0 0 2)]

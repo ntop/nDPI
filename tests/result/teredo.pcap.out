@@ -1,7 +1,7 @@
 Teredo	24	2574	5
 
-	1	UDP 10.112.16.67:51812 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][10 pkts/930 bytes <-> 4 pkts/374 bytes][pktlen c2s avg(stddev)/entropy: 3.3(93.0)/3.7][pktlen s2c avg(stddev)/entropy: 2.0(93.5)/2.1][bytes ratio: 0.43]
-	2	UDP 10.112.16.106:52513 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][2 pkts/206 bytes <-> 2 pkts/302 bytes][pktlen c2s avg(stddev)/entropy: 1.0(103.0)/0.0][pktlen s2c avg(stddev)/entropy: 1.0(151.0)/0.0][bytes ratio: -0.19]
-	3	UDP 10.112.16.64:56154 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][1 pkts/103 bytes <-> 1 pkts/151 bytes][pktlen c2s avg(stddev)/entropy: 0.0(103.0)/0.0][pktlen s2c avg(stddev)/entropy: 0.0(151.0)/0.0][bytes ratio: -0.19]
-	4	UDP 10.112.16.89:60381 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][1 pkts/103 bytes <-> 1 pkts/151 bytes][pktlen c2s avg(stddev)/entropy: 0.0(103.0)/0.0][pktlen s2c avg(stddev)/entropy: 0.0(151.0)/0.0][bytes ratio: -0.19]
-	5	UDP 10.112.16.92:63448 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][1 pkts/103 bytes <-> 1 pkts/151 bytes][pktlen c2s avg(stddev)/entropy: 0.0(103.0)/0.0][pktlen s2c avg(stddev)/entropy: 0.0(151.0)/0.0][bytes ratio: -0.19]
+	1	UDP 10.112.16.67:51812 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][10 pkts/930 bytes <-> 4 pkts/374 bytes][bytes ratio: 0.426 (Upload)][IAT c2s/s2c avg/stddev/entropy: 1941.3/4513.7 2480.4/3508.2 2.2/1.0]
+	2	UDP 10.112.16.106:52513 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][2 pkts/206 bytes <-> 2 pkts/302 bytes]
+	3	UDP 10.112.16.64:56154 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][1 pkts/103 bytes <-> 1 pkts/151 bytes]
+	4	UDP 10.112.16.89:60381 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][1 pkts/103 bytes <-> 1 pkts/151 bytes]
+	5	UDP 10.112.16.92:63448 <-> 194.136.28.76:3544 [proto: 214/Teredo][cat: Network/14][1 pkts/103 bytes <-> 1 pkts/151 bytes]

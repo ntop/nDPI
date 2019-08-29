@@ -1,10 +1,10 @@
 Unknown	6	2200	2
 AJP	26	4446	2
 
-	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][pktlen c2s avg(stddev)/entropy: 1.9(222.0)/285.7][pktlen s2c avg(stddev)/entropy: 2.3(111.5)/84.4][bytes ratio: 0.40][PLAIN TEXT (HTTP/1.1)]
-	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][pktlen c2s avg(stddev)/entropy: 1.9(222.0)/285.7][pktlen s2c avg(stddev)/entropy: 2.3(111.5)/84.4][bytes ratio: 0.40][PLAIN TEXT (HTTP/1.1)]
+	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c avg/stddev/entropy: 28.2/33.8 63.0/67.6 0.0/0.0][PLAIN TEXT (HTTP/1.1)]
+	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c avg/stddev/entropy: 28.2/33.8 63.0/67.6 0.0/0.0][PLAIN TEXT (HTTP/1.1)]
 
 
 Undetected flows:
-	1	80 93.88.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][4 pkts/2012 bytes -> 0 pkts/0 bytes][pktlen c2s avg(stddev)/entropy: 1.4(503.0)/409.0][pktlen s2c avg(stddev)/entropy: 0.0(nan)/0.0][bytes ratio: 1.00][PLAIN TEXT (HTTP/1.1)]
-	2	80 142.243.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][2 pkts/188 bytes -> 0 pkts/0 bytes][pktlen c2s avg(stddev)/entropy: 1.0(94.0)/0.0][pktlen s2c avg(stddev)/entropy: 0.0(nan)/0.0][bytes ratio: 1.00]
+	1	80 93.88.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][4 pkts/2012 bytes -> 0 pkts/0 bytes][PLAIN TEXT (HTTP/1.1)]
+	2	80 142.243.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][2 pkts/188 bytes -> 0 pkts/0 bytes]

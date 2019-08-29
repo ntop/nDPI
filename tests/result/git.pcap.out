@@ -1,3 +1,3 @@
 Git	90	74005	1
 
-	1	TCP 192.168.0.77:47991 <-> 5.153.231.21:9418 [proto: 226/Git][cat: Collaborative/15][41 pkts/3319 bytes <-> 49 pkts/70686 bytes][pktlen c2s avg(stddev)/entropy: 5.0(81.0)/81.7][pktlen s2c avg(stddev)/entropy: 4.9(1442.6)/705.8][bytes ratio: -0.91][PLAIN TEXT (0045git)]
+	1	TCP 192.168.0.77:47991 <-> 5.153.231.21:9418 [proto: 226/Git][cat: Collaborative/15][41 pkts/3319 bytes <-> 49 pkts/70686 bytes][bytes ratio: -0.910 (Download)][IAT c2s/s2c avg/stddev/entropy: 26.0/21.4 88.3/87.2 1.3/0.9][PLAIN TEXT (0045git)]

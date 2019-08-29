@@ -1,6 +1,6 @@
 YouTube	258	178495	1
 Google	31	13144	2
 
-	1	UDP 192.168.1.7:56074 <-> 216.58.198.33:443 [proto: 188.124/QUIC.YouTube][cat: Media/1][113 pkts/16111 bytes <-> 145 pkts/162384 bytes][Host: yt3.ggpht.com][pktlen c2s avg(stddev)/entropy: 4.9(142.6)/176.1][pktlen s2c avg(stddev)/entropy: 4.7(1119.9)/437.4][bytes ratio: -0.82][PLAIN TEXT (yt3.ggpht.com)]
-	2	UDP 192.168.1.7:53859 <-> 216.58.205.66:443 [proto: 188.126/QUIC.Google][cat: Web/5][9 pkts/3929 bytes <-> 9 pkts/4736 bytes][Host: googleads.g.doubleclick.net][pktlen c2s avg(stddev)/entropy: 2.3(436.6)/523.6][pktlen s2c avg(stddev)/entropy: 2.4(526.2)/546.1][bytes ratio: -0.09][PLAIN TEXT (googleads.g.doubleclick.net)]
-	3	UDP 192.168.1.7:54997 <-> 216.58.205.66:443 [proto: 188.126/QUIC.Google][cat: Web/5][7 pkts/2312 bytes <-> 6 pkts/2167 bytes][Host: pagead2.googlesyndication.com][pktlen c2s avg(stddev)/entropy: 1.8(330.3)/449.0][pktlen s2c avg(stddev)/entropy: 1.6(361.2)/478.5][bytes ratio: 0.03][PLAIN TEXT (pagead2.googlesyndication.com)]
+	1	UDP 192.168.1.7:56074 <-> 216.58.198.33:443 [proto: 188.124/QUIC.YouTube][cat: Media/1][113 pkts/16111 bytes <-> 145 pkts/162384 bytes][Host: yt3.ggpht.com][bytes ratio: -0.819 (Download)][IAT c2s/s2c avg/stddev/entropy: 27.5/21.0 199.3/180.7 4.1/3.9][PLAIN TEXT (yt3.ggpht.com)]
+	2	UDP 192.168.1.7:53859 <-> 216.58.205.66:443 [proto: 188.126/QUIC.Google][cat: Web/5][9 pkts/3929 bytes <-> 9 pkts/4736 bytes][Host: googleads.g.doubleclick.net][bytes ratio: -0.093 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 38.4/40.5 45.2/49.2 1.9/2.0][PLAIN TEXT (googleads.g.doubleclick.net)]
+	3	UDP 192.168.1.7:54997 <-> 216.58.205.66:443 [proto: 188.126/QUIC.Google][cat: Web/5][7 pkts/2312 bytes <-> 6 pkts/2167 bytes][Host: pagead2.googlesyndication.com][bytes ratio: 0.032 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 92.7/93.8 121.6/153.8 1.5/0.8][PLAIN TEXT (pagead2.googlesyndication.com)]
