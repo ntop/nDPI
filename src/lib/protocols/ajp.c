@@ -70,18 +70,17 @@ static void set_ajp_detected(struct ndpi_detection_module_struct *ndpi_struct,
 /*************************************************************************************************/
 
 static void ndpi_check_ajp(struct ndpi_detection_module_struct *ndpi_struct,
-  struct ndpi_flow_struct *flow)
-{
+			   struct ndpi_flow_struct *flow) {
   struct ajp_header ajp_hdr;
-
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if (packet->payload_packet_len < 5 /* ajp_header size*/) {
+  if (packet->payload_packet_len < sizeof(ajp_hdr)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
-  ajp_hdr = *((struct ajp_header *) (packet->payload));
+  memcpy(&ajp_hdr, packet->payload, sizeof(struct ajp_header));
+  
   ajp_hdr.magic = ntohs(ajp_hdr.magic);
   ajp_hdr.len = ntohs(ajp_hdr.len);
 
