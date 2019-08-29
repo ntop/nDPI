@@ -1,6 +1,6 @@
 MsSQL-TDS	38	16260	12
 
-	1	TCP 10.111.111.111:6666 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][cat: Database/11][7 pkts/8717 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 0.0/-nan 0.0/0.0 0.0/0.0]
+	1	TCP 10.111.111.111:6666 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][cat: Database/11][7 pkts/8717 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 0.0/0.0 0.0/0.0 0.0/0.0]
 	2	TCP 10.111.111.111:5555 <-> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][cat: Database/11][10 pkts/1552 bytes <-> 7 pkts/1521 bytes][bytes ratio: 0.010 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 793.8/1200.3 748.7/882.2 2.5/2.1][PLAIN TEXT (first                         )]
 	3	TCP 10.111.111.111:1111 <-> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][cat: Database/11][2 pkts/614 bytes <-> 2 pkts/524 bytes]
 	4	TCP 10.111.111.111:4444 -> 10.0.0.1:1433 [proto: 114/MsSQL-TDS][cat: Database/11][1 pkts/1136 bytes -> 0 pkts/0 bytes]

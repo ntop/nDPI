@@ -89,7 +89,7 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
 
 /* Compute the average on all values */
 float ndpi_data_average(struct ndpi_analyze_struct *s) {
-  return((float)s->sum_total / (float)s->num_data_entries);
+  return((s->num_data_entries == 0) ? 0 : ((float)s->sum_total / (float)s->num_data_entries));
 }
 
 /* ********************************************************************************* */

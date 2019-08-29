@@ -12,16 +12,16 @@ JA3 Host Stats:
 	1	 192.168.180.2            	 4      
 
 
-	1	TCP 192.168.180.2:49881 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media/1][751 pkts/44783 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 68.0/-nan 279.8/0.0 3.5/0.0][PLAIN TEXT (POST /catalog/vod)]
-	2	TCP 192.168.180.2:36680 -> 178.248.208.54:443 [proto: 91.218/TLS.OCS][cat: Media/1][20 pkts/6089 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 201.9/-nan 319.5/0.0 2.8/0.0][TLSv1][client: ocs.labgency.ws][JA3C: 0534a22b266a64a5cc9a90f7b5c483cc]
-	3	TCP 192.168.180.2:42590 -> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][cat: Media/1][83 pkts/5408 bytes -> 0 pkts/0 bytes][Host: www.ocs.fr][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 45.2/-nan 104.8/0.0 3.2/0.0][PLAIN TEXT (GET /data)]
-	4	TCP 192.168.180.2:39263 -> 23.21.230.199:443 [proto: 91.178/TLS.Amazon][cat: Web/5][20 pkts/2715 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 137.1/-nan 234.6/0.0 2.8/0.0][TLSv1][client: settings.crashlytics.com][JA3C: b030dba3ca09e2e484b9fa75adc4039c]
-	5	TCP 192.168.180.2:32946 -> 64.233.184.188:443 [proto: 91.239/TLS.GoogleServices][cat: Web/5][12 pkts/2212 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 37.5/-nan 25.7/0.0 3.0/0.0][TLSv1.2][client: mtalk.google.com][JA3C: 75edb912bc6f0a222ae3e3e47f5c89b1]
-	6	TCP 192.168.180.2:47803 -> 64.233.166.95:443 [proto: 91.126/TLS.Google][cat: Web/5][12 pkts/1608 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 52.4/-nan 37.5/0.0 3.0/0.0][TLSv1][JA3C: 5a236bfc3d18ddef1b1f2f4c9e765d66]
-	7	TCP 192.168.180.2:41223 -> 216.58.208.46:443 [proto: 91.126/TLS.Google][cat: Web/5][13 pkts/1448 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 66.8/-nan 68.2/0.0 2.9/0.0][TLSv1][JA3C: 5a236bfc3d18ddef1b1f2f4c9e765d66]
-	8	TCP 192.168.180.2:48250 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media/1][6 pkts/1092 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 271.6/-nan 394.5/0.0 1.0/0.0][PLAIN TEXT (POST /catalog/vod)]
-	9	TCP 192.168.180.2:44959 -> 137.135.129.206:80 [proto: 7.7/HTTP][cat: Web/5][7 pkts/540 bytes -> 0 pkts/0 bytes][Host: api.eu01.capptain.com][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 196.7/-nan 209.5/0.0 1.7/0.0][PLAIN TEXT (GET /ip)]
-	10	TCP 192.168.180.2:53356 -> 137.135.129.206:80 [proto: 7.7/HTTP][cat: Web/5][6 pkts/479 bytes -> 0 pkts/0 bytes][Host: api.eu01.capptain.com][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 45.8/-nan 38.7/0.0 1.7/0.0][PLAIN TEXT (GET /xmpp)]
+	1	TCP 192.168.180.2:49881 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media/1][751 pkts/44783 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 68.0/0.0 279.8/0.0 3.5/0.0][PLAIN TEXT (POST /catalog/vod)]
+	2	TCP 192.168.180.2:36680 -> 178.248.208.54:443 [proto: 91.218/TLS.OCS][cat: Media/1][20 pkts/6089 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 201.9/0.0 319.5/0.0 2.8/0.0][TLSv1][client: ocs.labgency.ws][JA3C: 0534a22b266a64a5cc9a90f7b5c483cc]
+	3	TCP 192.168.180.2:42590 -> 178.248.208.210:80 [proto: 7.218/HTTP.OCS][cat: Media/1][83 pkts/5408 bytes -> 0 pkts/0 bytes][Host: www.ocs.fr][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 45.2/0.0 104.8/0.0 3.2/0.0][PLAIN TEXT (GET /data)]
+	4	TCP 192.168.180.2:39263 -> 23.21.230.199:443 [proto: 91.178/TLS.Amazon][cat: Web/5][20 pkts/2715 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 137.1/0.0 234.6/0.0 2.8/0.0][TLSv1][client: settings.crashlytics.com][JA3C: b030dba3ca09e2e484b9fa75adc4039c]
+	5	TCP 192.168.180.2:32946 -> 64.233.184.188:443 [proto: 91.239/TLS.GoogleServices][cat: Web/5][12 pkts/2212 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 37.5/0.0 25.7/0.0 3.0/0.0][TLSv1.2][client: mtalk.google.com][JA3C: 75edb912bc6f0a222ae3e3e47f5c89b1]
+	6	TCP 192.168.180.2:47803 -> 64.233.166.95:443 [proto: 91.126/TLS.Google][cat: Web/5][12 pkts/1608 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 52.4/0.0 37.5/0.0 3.0/0.0][TLSv1][JA3C: 5a236bfc3d18ddef1b1f2f4c9e765d66]
+	7	TCP 192.168.180.2:41223 -> 216.58.208.46:443 [proto: 91.126/TLS.Google][cat: Web/5][13 pkts/1448 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 66.8/0.0 68.2/0.0 2.9/0.0][TLSv1][JA3C: 5a236bfc3d18ddef1b1f2f4c9e765d66]
+	8	TCP 192.168.180.2:48250 -> 178.248.208.54:80 [proto: 7.218/HTTP.OCS][cat: Media/1][6 pkts/1092 bytes -> 0 pkts/0 bytes][Host: ocu03.labgency.ws][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 271.6/0.0 394.5/0.0 1.0/0.0][PLAIN TEXT (POST /catalog/vod)]
+	9	TCP 192.168.180.2:44959 -> 137.135.129.206:80 [proto: 7.7/HTTP][cat: Web/5][7 pkts/540 bytes -> 0 pkts/0 bytes][Host: api.eu01.capptain.com][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 196.7/0.0 209.5/0.0 1.7/0.0][PLAIN TEXT (GET /ip)]
+	10	TCP 192.168.180.2:53356 -> 137.135.129.206:80 [proto: 7.7/HTTP][cat: Web/5][6 pkts/479 bytes -> 0 pkts/0 bytes][Host: api.eu01.capptain.com][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 45.8/0.0 38.7/0.0 1.7/0.0][PLAIN TEXT (GET /xmpp)]
 	11	TCP 192.168.180.2:47699 -> 64.233.184.188:5228 [proto: 126/Google][cat: Web/5][2 pkts/120 bytes -> 0 pkts/0 bytes]
 	12	UDP 192.168.180.2:3621 -> 8.8.8.8:53 [proto: 5.5/DNS][cat: Network/14][1 pkts/77 bytes -> 0 pkts/0 bytes][Host: xmpp.device06.eu01.capptain.com][PLAIN TEXT (device06)]
 	13	UDP 192.168.180.2:48770 -> 8.8.8.8:53 [proto: 5.228/DNS.PlayStore][cat: SoftwareUpdate/19][1 pkts/72 bytes -> 0 pkts/0 bytes][Host: android.clients.google.com][PLAIN TEXT (android)]
@@ -34,4 +34,4 @@ JA3 Host Stats:
 
 
 Undetected flows:
-	1	TCP 192.168.180.2:46166 -> 137.135.131.52:5122 [proto: 0/Unknown][6 pkts/360 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 6216.4/-nan 5472.9/0.0 1.8/0.0]
+	1	TCP 192.168.180.2:46166 -> 137.135.131.52:5122 [proto: 0/Unknown][6 pkts/360 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c avg/stddev/entropy: 6216.4/0.0 5472.9/0.0 1.8/0.0]
