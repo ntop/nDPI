@@ -2,7 +2,7 @@ CC=@CC@
 CXX=@CXX@
 CFLAGS=-g -I../src/include @CFLAGS@
 LIBNDPI=../src/lib/libndpi.a
-LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread @LDFLAGS@
+LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread -lm @LDFLAGS@
 OBJS=ndpiReader.o reader_util.o
 PREFIX?=@prefix@
 
