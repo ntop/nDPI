@@ -154,9 +154,22 @@ void ndpi_data_print_window_values(struct ndpi_analyze_struct *s) {
 
 /* ********************************************************************************* */
 
-float ndpi_data_ratio(u_int32_t sent, u_int32_t rcvd) {
-  int64_t s = (int64_t)sent +  (int64_t)rcvd;
-  int64_t d =  (int64_t)sent -  (int64_t)rcvd;
+/*
+  Upload / download ration
 
-  return((s == 0) ? 0 : ((float)d)/((float)s));
+  -1  Download
+  0   Mixed
+  1   Upload
+ */
+float ndpi_data_ratio(u_int32_t sent, u_int32_t rcvd) {
+  float s = (float)((int64_t)sent +  (int64_t)rcvd);
+  float d = (float)((int64_t)sent -  (int64_t)rcvd);
+  
+  return((s == 0) ? 0 : (d/s));
+}
+
+const char* ndpi_data_ratio2str(float ratio) {
+  if(ratio < -0.2) return("Download");
+  else if(ratio > 0.2) return("Upload");
+  else return("Mixed");
 }

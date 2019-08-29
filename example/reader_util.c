@@ -399,11 +399,11 @@ void ndpi_flow_info_freer(void *node) {
 
   ndpi_free_flow_info_half(flow);
 
-  if(flow->pktlen_c_to_s)
-    ndpi_free_data_analysis(flow->pktlen_c_to_s);  
+  if(flow->iat_c_to_s)
+    ndpi_free_data_analysis(flow->iat_c_to_s);  
   
-  if(flow->pktlen_s_to_c)
-    ndpi_free_data_analysis(flow->pktlen_s_to_c);  
+  if(flow->iat_s_to_c)
+    ndpi_free_data_analysis(flow->iat_s_to_c);  
 
   ndpi_free(flow);
 }
@@ -459,6 +459,8 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
   return(0); /* notreached */
 }
 
+/* ***************************************************** */
+
 /**
  * \brief Update the byte count for the flow record.
  * \param f Flow data
@@ -502,6 +504,8 @@ ndpi_flow_update_byte_count(struct ndpi_flow_info *flow, const void *x,
   }
 }
 
+/* ***************************************************** */
+
 /**
  * \brief Update the byte distribution mean for the flow record.
  * \param f Flow record
@@ -531,9 +535,10 @@ ndpi_flow_update_byte_dist_mean_var(ndpi_flow_info_t *flow, const void *x,
   }
 }
 
-float
-ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
-                                 unsigned int num_bytes)
+/* ***************************************************** */
+
+float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
+				       unsigned int num_bytes)
 {
   int i;
   float tmp, sum = 0.0;
@@ -703,8 +708,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->src_ip = iph->saddr, newflow->dst_ip = iph->daddr;
       newflow->src_port = htons(*sport), newflow->dst_port = htons(*dport);
       newflow->ip_version = version;
-      newflow->pktlen_c_to_s = ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
-	newflow->pktlen_s_to_c =  ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
+      newflow->iat_c_to_s = ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
+	newflow->iat_s_to_c =  ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
       
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
@@ -981,19 +986,41 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 			       &payload, &payload_len, &src_to_dst_direction, when);
 
   if(flow != NULL) {
+    struct timeval tdiff;
+
     workflow->stats.ip_packet_count++;
     workflow->stats.total_wire_bytes += rawsize + 24 /* CRC etc */,
       workflow->stats.total_ip_bytes += rawsize;
     ndpi_flow = flow->ndpi_flow;
 
     if(src_to_dst_direction) {
+      if(flow->src2dst_last_pkt_time.tv_sec) {
+	ndpi_timer_sub(&when, &flow->src2dst_last_pkt_time, &tdiff);
+	
+	if(flow->iat_c_to_s) {
+	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
+	  
+	  ndpi_data_add_value(flow->iat_c_to_s, ms);
+	}
+      }
+      
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
       flow->src2dst_l4_bytes += payload_len;
-      if(flow->pktlen_c_to_s) ndpi_data_add_value(flow->pktlen_c_to_s, rawsize);
+      memcpy(&flow->src2dst_last_pkt_time, &when, sizeof(when));
     } else {
+      if(flow->dst2src_last_pkt_time.tv_sec) {
+	ndpi_timer_sub(&when, &flow->dst2src_last_pkt_time, &tdiff);
+
+	if(flow->iat_s_to_c) {
+	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
+
+	  ndpi_data_add_value(flow->iat_s_to_c, ms);
+	}
+      }
+      
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
       flow->dst2src_l4_bytes += payload_len;
-      if(flow->pktlen_s_to_c) ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
+      memcpy(&flow->dst2src_last_pkt_time, &when, sizeof(when));      
     }
 
     if(enable_payload_analyzer && (payload_len > 0))

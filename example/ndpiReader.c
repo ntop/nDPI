@@ -943,7 +943,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   json_object *jObj;
 #endif
   FILE *out = results_file ? results_file : stdout;
-
+  
   if((verbose != 1) && (verbose != 2))
     return;
 
@@ -997,19 +997,18 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
 
-    if(flow->pktlen_c_to_s && flow->pktlen_s_to_c) {
-      fprintf(out, "[pktlen c2s avg(stddev)/entropy: %.1f(%.1f)/%.1f]",
-	      ndpi_data_entropy(flow->pktlen_c_to_s),
-	      ndpi_data_average(flow->pktlen_c_to_s),
-	      ndpi_data_stddev(flow->pktlen_c_to_s));
-   
-      fprintf(out, "[pktlen s2c avg(stddev)/entropy: %.1f(%.1f)/%.1f]",
-	      ndpi_data_entropy(flow->pktlen_s_to_c),
-	      ndpi_data_average(flow->pktlen_s_to_c),
-	      ndpi_data_stddev(flow->pktlen_s_to_c));
+    if((flow->src2dst_packets+flow->dst2src_packets) > 5) {
+      if(flow->iat_c_to_s && flow->iat_s_to_c) {
+	float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
+	fprintf(out, "[bytes ratio: %.3f (%s)]", data_ratio, ndpi_data_ratio2str(data_ratio));
+	
+	/* IAT (Inter Arrival Time) */
+	fprintf(out, "[IAT c2s/s2c avg/stddev/entropy: %.1f/%.1f %.1f/%.1f %.1f/%.1f]",
+		ndpi_data_average(flow->iat_c_to_s), ndpi_data_average(flow->iat_s_to_c),
+		ndpi_data_stddev(flow->iat_c_to_s),  ndpi_data_stddev(flow->iat_s_to_c),
+		ndpi_data_entropy(flow->iat_c_to_s), ndpi_data_entropy(flow->iat_s_to_c));
+      }
     }
-
-    fprintf(out, "[bytes ratio: %.2f]", ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes));
     
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version));
     if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[client: %s]", flow->ssh_tls.client_info);
