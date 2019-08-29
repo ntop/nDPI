@@ -47,11 +47,12 @@ enum ajp_packet_type {
   AJP_BODY = 11
 };
 
+PACK_ON
 struct ajp_header {
   uint16_t magic;
   uint16_t len;
   uint8_t code;
-};
+} PACK_OFF;
 
 static void set_ajp_detected(struct ndpi_detection_module_struct *ndpi_struct,
            struct ndpi_flow_struct *flow) {
