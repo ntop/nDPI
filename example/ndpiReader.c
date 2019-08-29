@@ -1839,6 +1839,17 @@ static void json_init() {
 
 /* *********************************************** */
 
+/**
+ * @brief JSON destroy function
+ */
+static void json_destroy() {
+  json_object_put(jArray_known_flows);
+  json_object_put(jArray_unknown_flows);
+  json_object_put(jArray_topStats);
+}
+
+/* *********************************************** */
+
 static void json_open_stats_file() {
   if((file_first_time && ((stats_fp = fopen(_statsFilePath,"w")) == NULL))
      ||
@@ -3251,6 +3262,8 @@ void test_lib() {
 
     terminateDetection(thread_id);
   }
+
+  json_destroy();
 }
 
 /* *********************************************** */
