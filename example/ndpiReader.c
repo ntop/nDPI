@@ -1839,6 +1839,7 @@ static void json_init() {
 
 /* *********************************************** */
 
+#ifdef HAVE_JSON_C
 /**
  * @brief JSON destroy function
  */
@@ -1847,6 +1848,7 @@ static void json_destroy() {
   json_object_put(jArray_unknown_flows);
   json_object_put(jArray_topStats);
 }
+#endif
 
 /* *********************************************** */
 
@@ -3263,7 +3265,9 @@ void test_lib() {
     terminateDetection(thread_id);
   }
 
+#ifdef HAVE_JSON_C
   json_destroy();
+#endif
 }
 
 /* *********************************************** */
