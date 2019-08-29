@@ -2655,8 +2655,13 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_mod,
     }
 
     if(is_tcp || is_udp) {
-      if(sscanf(value, "%u-%u", (u_int32_t *)&range.port_low, (u_int32_t *)&range.port_high) != 2)
+      u_int p_low, p_high;
+
+      if(sscanf(value, "%u-%u", &p_low, &p_high) == 2)
+	range.port_low = p_low, range.port_high = p_high;
+      else
 	range.port_low = range.port_high = atoi(&elem[4]);
+
       if(do_add)
 	addDefaultPort(ndpi_mod, &range, def, 1 /* Custom user proto */,
 		       is_tcp ? &ndpi_mod->tcpRoot : &ndpi_mod->udpRoot, __FUNCTION__,__LINE__);
