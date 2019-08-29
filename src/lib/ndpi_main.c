@@ -450,16 +450,34 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ****************************************************** */
 
+/*
+  TODO
+  This function should free the memory during program termination
+  
+ */
+static void ndpi_free_memory_at_termination(struct ndpi_detection_module_struct *ndpi_struct, char *buf) {
+
+
+}
+
+/* ****************************************************** */
+
 static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-					 char *value, int protocol_id,
+					 char *_value, int protocol_id,
 					 ndpi_protocol_category_t category,
-					 ndpi_protocol_breed_t breed)
-{
+					 ndpi_protocol_breed_t breed) {
+  char *value = ndpi_strdup(_value);
+
+  if(!value) return(-1); else ndpi_free_memory_at_termination(ndpi_struct, value);
+  
 #ifdef DEBUG
   NDPI_LOG_DEBUG2(ndpi_struct, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
 
-  return(ndpi_string_to_automa(ndpi_struct, &ndpi_struct->host_automa, value, protocol_id,
+  return(ndpi_string_to_automa(ndpi_struct,
+			       &ndpi_struct->host_automa,
+			       value,
+			       protocol_id,
 			       category, breed));
 }
 
