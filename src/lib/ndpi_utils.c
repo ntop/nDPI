@@ -84,7 +84,7 @@ void * ndpi_tsearch(const void *vkey, void **vrootp,
     int r;
 
     if((r = (*compar)(key, (*rootp)->key)) == 0)	/* T2: */
-      return ((void *)*rootp);	/* we found it! */
+      return ((*rootp)->key);	/* we found it! */
     rootp = (r < 0) ?
       &(*rootp)->left :		/* T3: follow left branch */
       &(*rootp)->right;		/* T4: follow right branch */
@@ -95,7 +95,7 @@ void * ndpi_tsearch(const void *vkey, void **vrootp,
     q->key = key;		/* initialize new node */
     q->left = q->right = (ndpi_node *)0;
   }
-  return ((void *)q);
+  return ((void *)q->key);
 }
 
 /* delete node with given key */
@@ -104,15 +104,13 @@ void * ndpi_tdelete(const void *vkey, void **vrootp,
 {
   ndpi_node **rootp = (ndpi_node **)vrootp;
   char *key = (char *)vkey;
-  ndpi_node *p = (ndpi_node *)1;
   ndpi_node *q;
   ndpi_node *r;
   int cmp;
 
   if(rootp == (ndpi_node **)0 || *rootp == (ndpi_node *)0)
-    return ((ndpi_node *)0);
+    return((void *)0);
   while ((cmp = (*compar)(key, (*rootp)->key)) != 0) {
-    p = *rootp;
     rootp = (cmp < 0) ?
       &(*rootp)->left :		/* follow left branch */
       &(*rootp)->right;		/* follow right branch */
@@ -134,9 +132,12 @@ void * ndpi_tdelete(const void *vkey, void **vrootp,
       q->right = (*rootp)->right;
     }
   }
+  key = (*rootp)->key;
   ndpi_free((ndpi_node *) *rootp);	/* D4: Free node */
   *rootp = q;				/* link parent to new node */
-  return(p);
+
+  /* Return the key to give the caller a chance to free custom data */
+  return(key);
 }
 
 /* Walk the nodes of a tree */

@@ -371,7 +371,7 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_mod,
     }
 
     node->proto = def, node->default_port = port, node->customUserProto = customUserProto;
-    ret = *(ndpi_default_ports_tree_node_t**)ndpi_tsearch(node, (void*)root, ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
+    ret = (ndpi_default_ports_tree_node_t*)ndpi_tsearch(node, (void*)root, ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
 
     if(ret != node) {
       NDPI_LOG_DBG(ndpi_mod, "[NDPI] %s:%d found duplicate for port %u: overwriting it with new value\n",
@@ -401,7 +401,7 @@ static int removeDefaultPort(ndpi_port_range *range,
 
   for(port=range->port_low; port<=range->port_high; port++) {
     node.proto = def, node.default_port = port;
-    ret = *(ndpi_default_ports_tree_node_t**)ndpi_tdelete(&node, (void*)root,
+    ret = (ndpi_default_ports_tree_node_t*)ndpi_tdelete(&node, (void*)root,
 							  ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
 
     if(ret != NULL) {
