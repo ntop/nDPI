@@ -53,8 +53,10 @@ void ndpi_search_teamspeak(struct ndpi_detection_module_struct *ndpi_struct, str
 #endif
     
     if(packet->tcp != NULL) {
+#if WEAK_DETECTION_CODE_DISABLED
       u_int16_t tdport, tsport;
       tsport = ntohs(packet->tcp->source), tdport = ntohs(packet->tcp->dest);
+#endif
       /* https://github.com/Youx/soliloque-server/wiki/Connection-packet */
       if(packet->payload_packet_len >= 20) {
 	if(((memcmp(packet->payload, "\xf4\xbe\x03\x00", 4) == 0)) ||
