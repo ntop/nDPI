@@ -1341,6 +1341,14 @@ typedef enum {
   ndpi_serialization_uint32_int32,
   ndpi_serialization_uint32_int64,
   ndpi_serialization_uint32_float,
+  ndpi_serialization_uint32_uint16,
+  ndpi_serialization_uint32_uint8,
+  ndpi_serialization_uint32_int16,
+  ndpi_serialization_uint32_int8,
+  ndpi_serialization_string_uint16,
+  ndpi_serialization_string_uint8,
+  ndpi_serialization_string_int16,
+  ndpi_serialization_string_int8
 } ndpi_serialization_element_type;
 
 #define NDPI_SERIALIZER_STATUS_COMMA (1 << 0)
