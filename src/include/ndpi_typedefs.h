@@ -1341,6 +1341,8 @@ typedef enum {
   ndpi_serialization_uint32_int32,
   ndpi_serialization_uint32_int64,
   ndpi_serialization_uint32_float,
+
+  /* 32/64 bit types are automatically encoded/decoded as 8/16 bit */
   ndpi_serialization_uint32_uint16,
   ndpi_serialization_uint32_uint8,
   ndpi_serialization_uint32_int16,
