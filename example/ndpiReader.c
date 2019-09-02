@@ -75,8 +75,8 @@ static char *_jsonFilePath          = NULL; /**< JSON file path  */
 static FILE *stats_fp               = NULL; /**< for Top Stats JSON file */
 #endif
 #ifdef HAVE_JSON_C
-static json_object *jArray_known_flows, *jArray_unknown_flows;
-static json_object *jArray_topStats;
+static json_object *jArray_known_flows = NULL, *jArray_unknown_flows = NULL;
+static json_object *jArray_topStats = NULL;
 #endif
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
@@ -107,7 +107,7 @@ static time_t capture_until = 0;
 static u_int32_t num_flows;
 static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 
-extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection;
+extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection, max_num_reported_top_payloads;
 extern u_int16_t min_pattern_len, max_pattern_len;
 
 struct flow_info {
@@ -328,7 +328,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
     
     if(num_bytes != 0) {
       double entropy = ndpi_flow_get_byte_count_entropy(array, num_bytes);
-      
+
       fprintf(out, "[entropy: %f]", entropy);
       fprintf(out, "[total_entropy: %f]", entropy * num_bytes);
     }
@@ -369,12 +369,13 @@ static void help(u_int long_help) {
 	 "  -J                        | Display flow SPLT (sequence of packet length and time)\n"
 	 "                            | and BD (byte distribution). See https://github.com/cisco/joy\n"
 	 "  -t                        | Dissect GTP/TZSP tunnels\n"
-	 "  -P <a>:<b>:<c>:<d>        | Enable payload analysis:\n"
+	 "  -P <a>:<b>:<c>:<d>:<e>    | Enable payload analysis:\n"
 	 "                            | <a> = min pattern len to search\n"
 	 "                            | <b> = max pattern len to search\n"
 	 "                            | <c> = max num packets per flow\n"
 	 "                            | <d> = max packet payload dissection\n"
-	 "                            | Default: %u:%u:%u:%u\n"
+	 "                            | <d> = max num reported payloads\n"
+	 "                            | Default: %u:%u:%u:%u:%u\n"
 	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -c <path>                 | Load custom categories from the specified file\n"
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
@@ -395,8 +396,7 @@ static void help(u_int long_help) {
 	 ,
 	 human_readeable_string_len,
 	 min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
-	 max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts
-	 );
+	 max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -707,18 +707,24 @@ static void parseOptions(int argc, char **argv) {
 
     case 'P':
       {
-	int _min_pattern_len, _max_pattern_len, _max_num_packets_per_flow, _max_packet_payload_dissection;
+	int _min_pattern_len, _max_pattern_len,
+	  _max_num_packets_per_flow, _max_packet_payload_dissection,
+	  _max_num_reported_top_payloads;
 	
 	enable_payload_analyzer = 1;
-	if(sscanf(optarg, "%d:%d:%d:%d", &_min_pattern_len, &_max_pattern_len,
-		  &_max_num_packets_per_flow, &_max_packet_payload_dissection) == 4) {
+	if(sscanf(optarg, "%d:%d:%d:%d:%d", &_min_pattern_len, &_max_pattern_len,
+		  &_max_num_packets_per_flow,
+		  &_max_packet_payload_dissection,
+		  &_max_num_reported_top_payloads) == 5) {
 	  min_pattern_len = _min_pattern_len, max_pattern_len = _max_pattern_len;
 	  max_num_packets_per_flow = _max_num_packets_per_flow, max_packet_payload_dissection = _max_packet_payload_dissection;
+	  max_num_reported_top_payloads = _max_num_reported_top_payloads;
 	  if(min_pattern_len > max_pattern_len) min_pattern_len = max_pattern_len;
 	  if(min_pattern_len < 2)               min_pattern_len = 2;
 	  if(max_pattern_len > 16)              max_pattern_len = 16;
 	  if(max_num_packets_per_flow == 0)     max_num_packets_per_flow = 1;
 	  if(max_packet_payload_dissection < 4) max_packet_payload_dissection = 4;
+	  if(max_num_reported_top_payloads == 0) max_num_reported_top_payloads = 1;
 	} else {
 	  printf("Invalid -P format. Ignored\n");
 	  help(0);
@@ -1844,9 +1850,20 @@ static void json_init() {
  * @brief JSON destroy function
  */
 static void json_destroy() {
-  json_object_put(jArray_known_flows);
-  json_object_put(jArray_unknown_flows);
-  json_object_put(jArray_topStats);
+  if(jArray_known_flows) {
+    json_object_put(jArray_known_flows);
+    jArray_known_flows = NULL;
+  }
+  
+  if(jArray_unknown_flows) {
+    json_object_put(jArray_unknown_flows);
+    jArray_unknown_flows = NULL;
+  }
+  
+  if(jArray_topStats) {
+    json_object_put(jArray_topStats);
+    jArray_topStats = NULL;
+  }
 }
 #endif
 
@@ -3383,6 +3400,8 @@ void serializerUnitTest() {
 
 /* *********************************************** */
 
+// #define RUN_DATA_ANALYSIS_THEN_QUIT 1
+
 void analyzeUnitTest() {
   struct ndpi_analyze_struct *s = ndpi_init_data_analysis(32);
   u_int32_t i;
@@ -3397,7 +3416,10 @@ void analyzeUnitTest() {
 #ifdef RUN_DATA_ANALYSIS_THEN_QUIT
   printf("Average: [all: %f][window: %f]\n",
 	 ndpi_data_average(s), ndpi_data_window_average(s));
-  printf("Entropy: %f\n", ndpi_entropy(s));
+  printf("Entropy: %f\n", ndpi_data_entropy(s));
+
+  printf("Min/Max: %u/%u\n",
+	  ndpi_data_min(s), ndpi_data_max(s));
 #endif
 
   ndpi_free_data_analysis(s);
@@ -3985,7 +4007,7 @@ int orginal_main(int argc, char **argv) {
     /* Internal checks */
     automataUnitTest();
     serializerUnitTest();
-    // analyzeUnitTest();
+    analyzeUnitTest();
     
     gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module();

@@ -105,6 +105,7 @@ struct payload_stats {
 struct payload_stats *pstats = NULL;
 u_int32_t max_num_packets_per_flow      = 32;
 u_int32_t max_packet_payload_dissection = 128;
+u_int32_t max_num_reported_top_payloads = 25;
 u_int16_t min_pattern_len = 4;
 u_int16_t max_pattern_len = 8;
 
@@ -237,14 +238,14 @@ void print_payload_stat(struct payload_stats *p) {
 
 void ndpi_report_payload_stats() {
   struct payload_stats *p, *tmp;
-  u_int num = 0, max_num = 25;
+  u_int num = 0;
 
   printf("\n\nPayload Analysis\n");
   
   HASH_SORT(pstats, payload_stats_sort_asc);
 
   HASH_ITER(hh, pstats, p, tmp) {
-    if(num <= max_num) 
+    if(num <= max_num_reported_top_payloads) 
       print_payload_stat(p);
 
     free(p->pattern);

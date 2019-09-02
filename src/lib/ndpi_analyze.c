@@ -46,15 +46,17 @@ struct ndpi_analyze_struct* ndpi_init_data_analysis(u_int16_t _max_series_len) {
     memset(ret, 0, sizeof(struct ndpi_analyze_struct));
   
   if(_max_series_len > MAX_SERIES_LEN) _max_series_len = MAX_SERIES_LEN;
-  if(_max_series_len == 0)             _max_series_len = 1; /* At least 1 element */
   ret->num_values_array_len = _max_series_len;
 
-  len = sizeof(u_int32_t)*ret->num_values_array_len;
-  if((ret->values = ndpi_malloc(len)) == NULL) {
-    ndpi_free(ret);
-    ret = NULL;
+  if(ret->num_values_array_len > 0) {
+    len = sizeof(u_int32_t)*ret->num_values_array_len;
+    if((ret->values = ndpi_malloc(len)) == NULL) {
+      ndpi_free(ret);
+      ret = NULL;
+    } else
+      memset(ret->values, 0, len);
   } else
-    memset(ret->values, 0, len);
+    ret->values = NULL;
   
   return(ret);
 }
@@ -62,7 +64,7 @@ struct ndpi_analyze_struct* ndpi_init_data_analysis(u_int16_t _max_series_len) {
 /* ********************************************************************************* */
 
 void ndpi_free_data_analysis(struct ndpi_analyze_struct *d) {
-  ndpi_free(d->values);
+  if(d->values) ndpi_free(d->values);
   ndpi_free(d);
 }
 
@@ -74,11 +76,22 @@ void ndpi_free_data_analysis(struct ndpi_analyze_struct *d) {
 void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
   float tmp_mu;
 
-  s->sum_total += value, s->num_data_entries++, s->values[s->next_value_insert_index] = value;
+  if(s->sum_total == 0)
+    s->min_val = s->max_val = value;
+  else {
+    if(value < s->min_val) s->min_val = value;
+    if(value > s->max_val) s->max_val = value;
+  }
 
-  if(++s->next_value_insert_index == s->num_values_array_len)
-    s->next_value_insert_index = 0;
+  s->sum_total += value, s->num_data_entries++;
+  
+  if(s->num_values_array_len) {
+    s->values[s->next_value_insert_index] = value;
 
+    if(++s->next_value_insert_index == s->num_values_array_len)
+      s->next_value_insert_index = 0;
+  }
+  
   /* Update stddev */
   tmp_mu = s->stddev.mu;
   s->stddev.mu = ((s->stddev.mu * (s->num_data_entries - 1)) + value) / s->num_data_entries;
@@ -91,6 +104,12 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
 float ndpi_data_average(struct ndpi_analyze_struct *s) {
   return((s->num_data_entries == 0) ? 0 : ((float)s->sum_total / (float)s->num_data_entries));
 }
+
+/* ********************************************************************************* */
+
+/* Return min/max on all values */
+u_int32_t ndpi_data_min(struct ndpi_analyze_struct *s) { return(s->min_val); }
+u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s->max_val); }
 
 /* ********************************************************************************* */
 
@@ -110,13 +129,16 @@ float ndpi_data_stddev(struct ndpi_analyze_struct *s) {
 
 /* Compute the average only on the sliding window */
 float ndpi_data_window_average(struct ndpi_analyze_struct *s) {
-  float   sum = 0.0;
-  u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
+  if(s->num_values_array_len) {
+    float   sum = 0.0;
+    u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
     
-  for(i=0; i<n; i++)
-    sum += s->values[i];
-
-  return((float)sum / (float)n);
+    for(i=0; i<n; i++)
+      sum += s->values[i];
+    
+    return((float)sum / (float)n);
+  } else
+    return(0);
 }
 
 /* ********************************************************************************* */
@@ -125,31 +147,36 @@ float ndpi_data_window_average(struct ndpi_analyze_struct *s) {
   Compute entropy on the last sliding window values
 */
 float ndpi_data_entropy(struct ndpi_analyze_struct *s) {
-  int i;
-  float sum = 0.0, total = 0.0;
-
-  for(i=0; i<s->num_values_array_len; i++)
-    total += s->values[i];
+  if(s->num_values_array_len) {
+    int i;
+    float sum = 0.0, total = 0.0;
     
-  for (i=0; i<s->num_values_array_len; i++) {
-    float tmp = (float)s->values[i] / (float)total;
+    for(i=0; i<s->num_values_array_len; i++)
+      total += s->values[i];
     
-    if(tmp > FLT_EPSILON)
-      sum -= tmp * logf(tmp);    
-  }
-  
-  return(sum / logf(2.0));
+    for (i=0; i<s->num_values_array_len; i++) {
+      float tmp = (float)s->values[i] / (float)total;
+      
+      if(tmp > FLT_EPSILON)
+	sum -= tmp * logf(tmp);    
+    }
+    
+    return(sum / logf(2.0));
+  } else
+    return(0);
 }
 
 /* ********************************************************************************* */
 
 void ndpi_data_print_window_values(struct ndpi_analyze_struct *s) {
-  u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
-  
-  for(i=0; i<n; i++)
-    printf("[%u: %u]", i, s->values[i]);
-
-  printf("\n");
+  if(s->num_values_array_len) {
+    u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
+    
+    for(i=0; i<n; i++)
+      printf("[%u: %u]", i, s->values[i]);
+    
+    printf("\n");
+  }
 }
 
 /* ********************************************************************************* */
