@@ -3403,7 +3403,7 @@ void serializerUnitTest() {
 // #define RUN_DATA_ANALYSIS_THEN_QUIT 1
 
 void analyzeUnitTest() {
-  struct ndpi_analyze_struct *s = ndpi_init_data_analysis(32);
+  struct ndpi_analyze_struct *s = ndpi_alloc_data_analysis(32);
   u_int32_t i;
 
   for(i=0; i<256; i++) {

@@ -760,8 +760,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->src_ip = iph->saddr, newflow->dst_ip = iph->daddr;
       newflow->src_port = htons(*sport), newflow->dst_port = htons(*dport);
       newflow->ip_version = version;
-      newflow->iat_c_to_s = ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
-	newflow->iat_s_to_c =  ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
+      newflow->iat_c_to_s = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
+	newflow->iat_s_to_c =  ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
 
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));

@@ -896,7 +896,8 @@ extern "C" {
   int ndpi_deserialize_end_of_record(ndpi_deserializer *deserializer);
 
   /* Data analysis */
-  struct ndpi_analyze_struct* ndpi_init_data_analysis(u_int16_t _max_series_len);
+  struct ndpi_analyze_struct* ndpi_alloc_data_analysis(u_int16_t _max_series_len);
+  void ndpi_init_data_analysis(struct ndpi_analyze_struct *s, u_int16_t _max_series_len);
   void ndpi_free_data_analysis(struct ndpi_analyze_struct *d);
   void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value);
 
