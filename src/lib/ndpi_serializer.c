@@ -572,10 +572,19 @@ int ndpi_serialize_uint32_int32(ndpi_serializer *_serializer,
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      "%s%d", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
   } else {
-    serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_int32;
-
-    ndpi_serialize_single_uint32(serializer, key);
-    ndpi_serialize_single_uint32(serializer, value);
+    if (value <= 127 && value >= -128) {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_int8;
+      ndpi_serialize_single_uint32(serializer, key);
+      ndpi_serialize_single_uint8(serializer, value);
+    } else if (value <= 32767 && value >= -32768) {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_int16;
+      ndpi_serialize_single_uint32(serializer, key);
+      ndpi_serialize_single_uint16(serializer, value);
+    } else {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_int32;
+      ndpi_serialize_single_uint32(serializer, key);
+      ndpi_serialize_single_uint32(serializer, value);
+    }
   }
 
   return(0);
@@ -613,10 +622,13 @@ int ndpi_serialize_uint32_int64(ndpi_serializer *_serializer,
 				      (long long int)value);
 
   } else {
-    serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_int64;
-
-    ndpi_serialize_single_uint32(serializer, key);
-    ndpi_serialize_single_uint64(serializer, value);
+    if (value <= 2147483647 && value >= -2147483648) {
+      return(ndpi_serialize_uint32_int32(_serializer, key, value));
+    } else {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_uint32_int64;
+      ndpi_serialize_single_uint32(serializer, key);
+      ndpi_serialize_single_uint64(serializer, value);
+    }
   }
 
   return(0);
@@ -747,10 +759,19 @@ int ndpi_serialize_string_int32(ndpi_serializer *_serializer,
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff,
 				      "%s%d", (serializer->size_used > 0) ? serializer->csv_separator : "", value);
   } else {
-    serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int32;
-
-    ndpi_serialize_single_string(serializer, key, klen);
-    ndpi_serialize_single_uint32(serializer, value);
+    if (value <= 127 && value >= -128) {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int8;
+      ndpi_serialize_single_string(serializer, key, klen);
+      ndpi_serialize_single_uint8(serializer, value);
+    } else if (value <= 32767 && value >= -32768) {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int16;
+      ndpi_serialize_single_string(serializer, key, klen);
+      ndpi_serialize_single_uint16(serializer, value);
+    } else {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int32;
+      ndpi_serialize_single_string(serializer, key, klen);
+      ndpi_serialize_single_uint32(serializer, value);
+    }
   }
 
   return(0);
@@ -796,10 +817,13 @@ int ndpi_serialize_string_int64(ndpi_serializer *_serializer,
 				      "%s%lld", (serializer->size_used > 0) ? serializer->csv_separator : "",
 				      (long long int)value);
   } else {
-    serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int64;
-
-    ndpi_serialize_single_string(serializer, key, klen);
-    ndpi_serialize_single_uint32(serializer, value);
+    if (value <= 2147483647 && value >= -2147483648) {
+      return(ndpi_serialize_string_int32(_serializer, key, value));
+    } else {
+      serializer->buffer[serializer->size_used++] = ndpi_serialization_string_int64;
+      ndpi_serialize_single_string(serializer, key, klen);
+      ndpi_serialize_single_uint32(serializer, value);
+    }
   }
 
   return(0);
