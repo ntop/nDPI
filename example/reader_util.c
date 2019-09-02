@@ -249,6 +249,16 @@ void ndpi_report_payload_stats() {
       print_payload_stat(p);
 
     free(p->pattern);
+
+    {
+      struct flow_id_stats *p1, *tmp1;
+      
+      HASH_ITER(hh, p->flows, p1, tmp1) {
+	HASH_DEL(p->flows, p1);
+	free(p1);
+      }
+    }
+    
     HASH_DEL(pstats, p);
     free(p);
     num++;
