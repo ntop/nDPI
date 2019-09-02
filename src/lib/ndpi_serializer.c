@@ -1135,6 +1135,14 @@ ndpi_serialization_element_type ndpi_deserialize_get_nextitem_type(ndpi_deserial
     case ndpi_serialization_string_uint8:
       et = ndpi_serialization_string_uint32;
     break;
+    case ndpi_serialization_uint32_int16:
+    case ndpi_serialization_uint32_int8:
+      et = ndpi_serialization_uint32_int32;
+    break;
+    case ndpi_serialization_string_int16:
+    case ndpi_serialization_string_int8:
+      et = ndpi_serialization_string_int32;
+    break;
     default:
     break;
   }
