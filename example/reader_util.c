@@ -93,11 +93,17 @@ struct flow_id_stats {
   UT_hash_handle hh;   /* makes this structure hashable */
 };
 
+struct packet_id_stats {
+  u_int32_t packet_id;
+  UT_hash_handle hh;   /* makes this structure hashable */
+};
+
 struct payload_stats {
   u_int8_t *pattern;
   u_int8_t pattern_len;
   u_int16_t num_occurrencies;
   struct flow_id_stats *flows;
+  struct packet_id_stats *packets;
   UT_hash_handle hh;   /* makes this structure hashable */
 };
 
@@ -109,21 +115,24 @@ u_int32_t max_num_reported_top_payloads = 25;
 u_int16_t min_pattern_len = 4;
 u_int16_t max_pattern_len = 8;
 
+/* *********************************************************** */
 
 void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 			  u_int8_t src_to_dst_direction,
 			  u_int8_t *payload,
-			  u_int16_t payload_len) {
+			  u_int16_t payload_len,
+			  u_int32_t packet_id) {
   struct payload_stats *ret;
   u_int i;
   struct flow_id_stats *f;
-  
+  struct packet_id_stats *p;
+
 #ifdef DEBUG_PAYLOAD
   for(i=0; i<payload_len; i++)
-    printf("%c", isprint(payload[i]) ? payload[i] : '.');  
+    printf("%c", isprint(payload[i]) ? payload[i] : '.');
   printf("\n");
 #endif
-  
+
   HASH_FIND(hh, pstats, payload, payload_len, ret);
   if(ret == NULL) {
     if((ret = (struct payload_stats*)calloc(1, sizeof(struct payload_stats))) == NULL)
@@ -156,15 +165,26 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
     f->flow_id = flow->flow_id;
     HASH_ADD_INT(ret->flows, flow_id, f);
   }
+
+  HASH_FIND_INT(ret->packets, &packet_id, p);
+  if(p == NULL) {
+    if((p = (struct packet_id_stats*)calloc(1, sizeof(struct packet_id_stats))) == NULL)
+      return; /* OOM */
+    p->packet_id = packet_id;
+    
+    HASH_ADD_INT(ret->packets, packet_id, p);
+  }
 }
 
+/* *********************************************************** */
 
 void ndpi_payload_analyzer(struct ndpi_flow_info *flow,
 			   u_int8_t src_to_dst_direction,
-			   u_int8_t *payload, u_int16_t payload_len) {
+			   u_int8_t *payload, u_int16_t payload_len,
+			   u_int32_t packet_id) {
   u_int16_t i, j;
   u_int16_t scan_len = ndpi_min(max_packet_payload_dissection, payload_len);
-  
+
   if((flow->src2dst_pkt_count+flow->dst2src_pkt_count) < max_num_packets_per_flow) {
 #ifdef DEBUG_PAYLOAD
     printf("[hashval: %u][proto: %u][vlan: %u][%s:%u <-> %s:%u][direction: %s][payload_len: %u]\n",
@@ -176,12 +196,11 @@ void ndpi_payload_analyzer(struct ndpi_flow_info *flow,
 #endif
   } else
     return;
-    
+
   for(i=0; i<scan_len; i++) {
     for(j=min_pattern_len; j <= max_pattern_len; j++) {
       if((i+j) < payload_len) {
-	ndpi_analyze_payload(flow, src_to_dst_direction, &payload[i], j);
-	ndpi_analyze_payload(flow, src_to_dst_direction, &payload[i], j);
+	ndpi_analyze_payload(flow, src_to_dst_direction, &payload[i], j, packet_id);
       }
     }
   }
@@ -202,9 +221,10 @@ static int payload_stats_sort_asc(void *_a, void *_b) {
 void print_payload_stat(struct payload_stats *p) {
   u_int i;
   struct flow_id_stats *s, *tmp;
-  
+  struct packet_id_stats *s1, *tmp1;
+
   printf("\t[");
-  
+
   for(i=0; i<p->pattern_len; i++) {
     printf("%c", isprint(p->pattern[i]) ? p->pattern[i] : '.');
   }
@@ -212,26 +232,38 @@ void print_payload_stat(struct payload_stats *p) {
   printf("]");
   for(; i<16; i++) printf(" ");
   printf("[");
-  
+
   for(i=0; i<p->pattern_len; i++) {
     printf("%s%02X", (i > 0) ? " " : "", isprint(p->pattern[i]) ? p->pattern[i] : '.');
   }
 
   printf("]");
-  
+
   for(; i<16; i++) printf("  ");
   for(i=p->pattern_len; i<max_pattern_len; i++) printf(" ");
-  
+
   printf("[len: %u][num_occurrencies: %u][flowId: ",
 	 p->pattern_len, p->num_occurrencies);
 
   i = 0;
   HASH_ITER(hh, p->flows, s, tmp) {
-    printf("%s%u", (i > 0) ? " " : "", s->flow_id);	   
+    printf("%s%u", (i > 0) ? " " : "", s->flow_id);
     i++;
   }
- 
+
+  printf("][packetIds: ");
+
+  /* ******************************** */
+
+  i = 0;
+  HASH_ITER(hh, p->packets, s1, tmp1) {
+    printf("%s%u", (i > 0) ? " " : "", s1->packet_id);
+    i++;
+  }
+
   printf("]\n");
+
+
 }
 
 /* ***************************************************** */
@@ -241,24 +273,33 @@ void ndpi_report_payload_stats() {
   u_int num = 0;
 
   printf("\n\nPayload Analysis\n");
-  
+
   HASH_SORT(pstats, payload_stats_sort_asc);
 
   HASH_ITER(hh, pstats, p, tmp) {
-    if(num <= max_num_reported_top_payloads) 
+    if(num <= max_num_reported_top_payloads)
       print_payload_stat(p);
 
     free(p->pattern);
 
     {
       struct flow_id_stats *p1, *tmp1;
-      
+
       HASH_ITER(hh, p->flows, p1, tmp1) {
 	HASH_DEL(p->flows, p1);
 	free(p1);
       }
     }
-    
+
+    {
+      struct packet_id_stats *p1, *tmp1;
+
+      HASH_ITER(hh, p->packets, p1, tmp1) {
+	HASH_DEL(p->packets, p1);
+	free(p1);
+      }
+    }
+
     HASH_DEL(pstats, p);
     free(p);
     num++;
@@ -411,10 +452,10 @@ void ndpi_flow_info_freer(void *node) {
   ndpi_free_flow_info_half(flow);
 
   if(flow->iat_c_to_s)
-    ndpi_free_data_analysis(flow->iat_c_to_s);  
-  
+    ndpi_free_data_analysis(flow->iat_c_to_s);
+
   if(flow->iat_s_to_c)
-    ndpi_free_data_analysis(flow->iat_s_to_c);  
+    ndpi_free_data_analysis(flow->iat_s_to_c);
 
   ndpi_free(flow);
 }
@@ -721,7 +762,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->ip_version = version;
       newflow->iat_c_to_s = ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
 	newflow->iat_s_to_c =  ndpi_init_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
-      
+
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
 	inet_ntop(AF_INET, &newflow->dst_ip, newflow->dst_name, sizeof(newflow->dst_name));
@@ -1007,14 +1048,14 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(src_to_dst_direction) {
       if(flow->src2dst_last_pkt_time.tv_sec) {
 	ndpi_timer_sub(&when, &flow->src2dst_last_pkt_time, &tdiff);
-	
+
 	if(flow->iat_c_to_s) {
 	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
-	  
+
 	  ndpi_data_add_value(flow->iat_c_to_s, ms);
 	}
       }
-      
+
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
       flow->src2dst_l4_bytes += payload_len;
       memcpy(&flow->src2dst_last_pkt_time, &when, sizeof(when));
@@ -1028,15 +1069,17 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	  ndpi_data_add_value(flow->iat_s_to_c, ms);
 	}
       }
-      
+
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
       flow->dst2src_l4_bytes += payload_len;
-      memcpy(&flow->dst2src_last_pkt_time, &when, sizeof(when));      
+      memcpy(&flow->dst2src_last_pkt_time, &when, sizeof(when));
     }
 
     if(enable_payload_analyzer && (payload_len > 0))
-      ndpi_payload_analyzer(flow, src_to_dst_direction, payload, payload_len);
-
+      ndpi_payload_analyzer(flow, src_to_dst_direction,
+			    payload, payload_len,
+			    workflow->stats.ip_packet_count);    
+    
     if(enable_joy_stats) {
       /* Update BD, distribution and mean. */
       ndpi_flow_update_byte_count(flow, payload, payload_len, src_to_dst_direction);
