@@ -848,6 +848,10 @@ extern "C" {
 				   const char *key, u_int64_t value);
   int ndpi_serialize_string_string(ndpi_serializer *serializer,
 				   const char *key, const char *value);
+  int ndpi_serialize_string_binary(ndpi_serializer *_serializer,
+				   const char *key, const char *_value,
+				   u_int16_t vlen);
+
   int ndpi_serialize_string_float(ndpi_serializer *serializer,
 				  const char *key, float value,
 				  const char *format /* e.f. "%.2f" */);
