@@ -1178,7 +1178,6 @@ int ndpi_deserialize_uint32_uint32(ndpi_deserializer *_deserializer,
   u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
   u_int16_t v16;
   u_int8_t v8;
-  int rc;
   u_int16_t expected =
       sizeof(u_int8_t) /* type */ +
       sizeof(u_int32_t) /* key */;
@@ -1194,7 +1193,7 @@ int ndpi_deserialize_uint32_uint32(ndpi_deserializer *_deserializer,
       expected += sizeof(u_int8_t);
     break;
     default:
-      rc = -1;
+      return -1;
     break;
   }
 
@@ -1219,7 +1218,7 @@ int ndpi_deserialize_uint32_uint32(ndpi_deserializer *_deserializer,
     break;
   }
 
-  return(rc);
+  return 0;
 }
 
 /* ********************************** */
@@ -1263,7 +1262,6 @@ int ndpi_deserialize_uint32_int32(ndpi_deserializer *_deserializer,
   u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
   int16_t v16;
   int8_t v8;
-  int rc;
   u_int16_t expected =
       sizeof(u_int8_t) /* type */ +
       sizeof(u_int32_t) /* key */;
@@ -1279,7 +1277,7 @@ int ndpi_deserialize_uint32_int32(ndpi_deserializer *_deserializer,
       expected += sizeof(int8_t);
     break;
     default:
-      rc = -1;
+      return -1;
     break;
   }
 
@@ -1304,7 +1302,7 @@ int ndpi_deserialize_uint32_int32(ndpi_deserializer *_deserializer,
     break;
   }
 
-  return(rc);
+  return 0;
 }
 
 /* ********************************** */
@@ -1396,7 +1394,6 @@ int ndpi_deserialize_string_int32(ndpi_deserializer *_deserializer,
   u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
   int16_t v16;
   int8_t v8;
-  int rc;
   u_int16_t expected =
       sizeof(u_int8_t) /* type */ +
       sizeof(u_int32_t) /* key */;
@@ -1412,7 +1409,7 @@ int ndpi_deserialize_string_int32(ndpi_deserializer *_deserializer,
       expected += sizeof(int8_t);
     break;
     default:
-      rc = -1;
+      return -1;
     break;
   }
 
@@ -1437,7 +1434,7 @@ int ndpi_deserialize_string_int32(ndpi_deserializer *_deserializer,
     break;
   }
 
-  return(rc);
+  return 0;
 }
 
 /* ********************************** */
@@ -1481,7 +1478,6 @@ int ndpi_deserialize_string_uint32(ndpi_deserializer *_deserializer,
   u_int32_t buff_diff = deserializer->buffer_size - deserializer->size_used;
   u_int16_t v16;
   u_int8_t v8;
-  int rc;
   u_int16_t expected =
       sizeof(u_int8_t) /* type */ +
       sizeof(u_int32_t) /* key */;
@@ -1497,7 +1493,7 @@ int ndpi_deserialize_string_uint32(ndpi_deserializer *_deserializer,
       expected += sizeof(u_int8_t);
     break;
     default:
-      rc = -1;
+      return -1;
     break;
   }
 
@@ -1522,7 +1518,7 @@ int ndpi_deserialize_string_uint32(ndpi_deserializer *_deserializer,
     break;
   }
 
-  return(rc);
+  return 0;
 }
 
 /* ********************************** */
