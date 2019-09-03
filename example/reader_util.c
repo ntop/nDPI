@@ -451,12 +451,14 @@ void ndpi_flow_info_freer(void *node) {
 
   ndpi_free_flow_info_half(flow);
 
-  if(flow->iat_c_to_s)
-    ndpi_free_data_analysis(flow->iat_c_to_s);
+  if(flow->iat_c_to_s) ndpi_free_data_analysis(flow->iat_c_to_s);
+  if(flow->iat_s_to_c) ndpi_free_data_analysis(flow->iat_s_to_c);
 
-  if(flow->iat_s_to_c)
-    ndpi_free_data_analysis(flow->iat_s_to_c);
+  if(flow->pktlen_c_to_s) ndpi_free_data_analysis(flow->pktlen_c_to_s);
+  if(flow->pktlen_s_to_c) ndpi_free_data_analysis(flow->pktlen_s_to_c);
 
+  if(flow->iat_flow) ndpi_free_data_analysis(flow->iat_flow);
+  
   ndpi_free(flow);
 }
 
@@ -762,6 +764,9 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       newflow->ip_version = version;
       newflow->iat_c_to_s = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
 	newflow->iat_s_to_c =  ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
+      newflow->pktlen_c_to_s = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
+	newflow->pktlen_s_to_c =  ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
+	newflow->iat_flow = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);;
 
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
@@ -1045,6 +1050,18 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       workflow->stats.total_ip_bytes += rawsize;
     ndpi_flow = flow->ndpi_flow;
 
+    if(flow->flow_last_pkt_time.tv_sec) {
+      ndpi_timer_sub(&when, &flow->flow_last_pkt_time, &tdiff);
+
+      if(flow->iat_flow) {
+	u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
+
+	if(ms > 0)
+	  ndpi_data_add_value(flow->iat_flow, ms);
+      }
+    }
+    memcpy(&flow->flow_last_pkt_time, &when, sizeof(when));
+
     if(src_to_dst_direction) {
       if(flow->src2dst_last_pkt_time.tv_sec) {
 	ndpi_timer_sub(&when, &flow->src2dst_last_pkt_time, &tdiff);
@@ -1056,6 +1073,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	}
       }
 
+      ndpi_data_add_value(flow->pktlen_c_to_s, rawsize);
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
       flow->src2dst_l4_bytes += payload_len;
       memcpy(&flow->src2dst_last_pkt_time, &when, sizeof(when));
@@ -1070,6 +1088,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	}
       }
 
+      ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize;
       flow->dst2src_l4_bytes += payload_len;
       memcpy(&flow->dst2src_last_pkt_time, &when, sizeof(when));
@@ -1086,6 +1105,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       ndpi_flow_update_byte_dist_mean_var(flow, payload, payload_len, src_to_dst_direction);
     }
 
+    if(flow->first_seen == 0)
+      flow->first_seen = time;
+    
     flow->last_seen = time;
 
     if(!flow->has_human_readeable_strings) {

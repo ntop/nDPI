@@ -1,5 +1,5 @@
 OpenVPN	298	57111	3
 
-	1	UDP 192.168.43.18:13680 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][cat: VPN/2][62 pkts/11508 bytes <-> 58 pkts/16664 bytes][bytes ratio: -0.183 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 315.0/297.8 845.2/1449.2 2.6/1.6][PLAIN TEXT (160727093158Z)]
-	2	TCP 192.168.1.77:60140 <-> 46.101.231.218:443 [proto: 159/OpenVPN][cat: VPN/2][44 pkts/7514 bytes <-> 51 pkts/7866 bytes][bytes ratio: -0.023 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 1491.0/1281.2 3230.7/3024.3 3.1/3.1][PLAIN TEXT (160630002150Z)]
-	3	UDP 192.168.43.12:41507 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][cat: VPN/2][49 pkts/7860 bytes <-> 34 pkts/5699 bytes][bytes ratio: 0.159 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 189.4/269.8 635.8/989.8 2.3/1.7][PLAIN TEXT (160727093158Z)]
+	1	UDP 192.168.43.18:13680 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][cat: VPN/2][62 pkts/11508 bytes <-> 58 pkts/16664 bytes][bytes ratio: -0.183 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 315.0/297.8 4013/10854 845.2/1449.2][Pkt Len c2s/s2c min/avg/max/stddev: 84/92 185.6/287.3 1214/1287 193.0/325.0][PLAIN TEXT (160727093158Z)]
+	2	TCP 192.168.1.77:60140 <-> 46.101.231.218:443 [proto: 159/OpenVPN][cat: VPN/2][44 pkts/7514 bytes <-> 51 pkts/7866 bytes][bytes ratio: -0.023 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1491.0/1281.2 11356/11265 3230.7/3024.3][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 170.8/154.2 1514/222 235.8/63.3][PLAIN TEXT (160630002150Z)]
+	3	UDP 192.168.43.12:41507 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][cat: VPN/2][49 pkts/7860 bytes <-> 34 pkts/5699 bytes][bytes ratio: 0.159 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 189.4/269.8 3857/5375 635.8/989.8][Pkt Len c2s/s2c min/avg/max/stddev: 84/92 160.4/167.6 1214/196 192.4/31.3][PLAIN TEXT (160727093158Z)]

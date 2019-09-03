@@ -1,4 +1,4 @@
 Mining	319	166676	2
 
-	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][bytes ratio: 0.831 (Upload)][IAT c2s/s2c avg/stddev/entropy: 6907.3/9743.6 14750.8/16753.8 3.0/3.5][PLAIN TEXT (method)]
-	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes][bytes ratio: -0.136 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 46311.0/48402.0 61156.2/61728.3 3.3/3.3][PLAIN TEXT (method)]
+	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][bytes ratio: 0.831 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 6907.3/9743.6 71734/71815 14750.8/16753.8][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 900.3/116.8 1514/376 708.7/98.8][PLAIN TEXT (method)]
+	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes][bytes ratio: -0.136 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 46311.0/48402.0 195463/195463 61156.2/61728.3][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 185.6/254.9 1498/364 394.9/138.0][PLAIN TEXT (method)]

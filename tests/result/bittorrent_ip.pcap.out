@@ -1,4 +1,4 @@
 BitTorrent	479	508018	2
 
-	1	TCP 77.222.174.20:2866 <-> 10.0.0.14:46610 [proto: 37/BitTorrent][cat: Download-FileTransfer-FileSharing/7][305 pkts/461770 bytes <-> 126 pkts/8316 bytes][bytes ratio: 0.965 (Upload)][IAT c2s/s2c avg/stddev/entropy: 7.9/19.2 74.7/112.9 2.7/3.3][PLAIN TEXT (n.m Hh)]
-	2	TCP 185.56.20.36:53646 <-> 10.0.0.14:35030 [proto: 37/BitTorrent][cat: Download-FileTransfer-FileSharing/7][25 pkts/36414 bytes <-> 23 pkts/1518 bytes][bytes ratio: 0.920 (Upload)][IAT c2s/s2c avg/stddev/entropy: 8.7/9.5 21.7/22.5 2.1/2.1][PLAIN TEXT (@RgmZT)]
+	1	TCP 77.222.174.20:2866 <-> 10.0.0.14:46610 [proto: 37/BitTorrent][cat: Download-FileTransfer-FileSharing/7][305 pkts/461770 bytes <-> 126 pkts/8316 bytes][bytes ratio: 0.965 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 7.9/19.2 966/924 74.7/112.9][Pkt Len c2s/s2c min/avg/max/stddev: 1514/66 1514.0/66.0 1514/66 0.0/0.0][PLAIN TEXT (n.m Hh)]
+	2	TCP 185.56.20.36:53646 <-> 10.0.0.14:35030 [proto: 37/BitTorrent][cat: Download-FileTransfer-FileSharing/7][25 pkts/36414 bytes <-> 23 pkts/1518 bytes][bytes ratio: 0.920 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 8.7/9.5 83/83 21.7/22.5][Pkt Len c2s/s2c min/avg/max/stddev: 78/66 1456.6/66.0 1514/66 281.4/0.0][PLAIN TEXT (@RgmZT)]

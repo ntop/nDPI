@@ -1,8 +1,8 @@
 Unknown	6	2200	2
 AJP	26	4446	2
 
-	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c avg/stddev/entropy: 28.2/33.8 63.0/67.6 0.0/0.0][PLAIN TEXT (HTTP/1.1)]
-	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c avg/stddev/entropy: 28.2/33.8 63.0/67.6 0.0/0.0][PLAIN TEXT (HTTP/1.1)]
+	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 169/0 28.2/33.8 169/169 63.0/67.6][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222.0/111.5 896/300 285.7/84.4][PLAIN TEXT (HTTP/1.1)]
+	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 169/0 28.2/33.8 169/169 63.0/67.6][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222.0/111.5 896/300 285.7/84.4][PLAIN TEXT (HTTP/1.1)]
 
 
 Undetected flows:

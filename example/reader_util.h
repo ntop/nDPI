@@ -137,7 +137,7 @@ typedef struct ndpi_flow_info {
   struct ndpi_flow_struct *ndpi_flow;
   char src_name[48], dst_name[48];
   u_int8_t ip_version;
-  u_int64_t last_seen;
+  u_int64_t first_seen, last_seen;
   u_int64_t src2dst_bytes, dst2src_bytes;
   u_int32_t src2dst_packets, dst2src_packets;
   u_int32_t src2dst_opackets, dst2src_opackets;
@@ -148,7 +148,8 @@ typedef struct ndpi_flow_info {
   ndpi_protocol detected_protocol;
 
   // Flow data analysis
-  struct ndpi_analyze_struct *iat_c_to_s, *iat_s_to_c;
+  struct ndpi_analyze_struct *iat_c_to_s, *iat_s_to_c, *iat_flow,
+    *pktlen_c_to_s, *pktlen_s_to_c;
     
   char info[96];
   char host_server_name[256];
@@ -167,7 +168,7 @@ typedef struct ndpi_flow_info {
   
   void *src_id, *dst_id;
 
-  struct timeval src2dst_last_pkt_time, dst2src_last_pkt_time;
+  struct timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
   
   // Entropy fields
   u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];       /*!< array of packet appdata lengths */

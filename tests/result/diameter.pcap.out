@@ -1,3 +1,3 @@
 Diameter	6	1980	1
 
-	1	TCP 10.201.9.245:50957 <-> 10.201.9.11:3868 [proto: 237/Diameter][cat: Web/5][3 pkts/1174 bytes <-> 3 pkts/806 bytes][bytes ratio: 0.186 (Mixed)][IAT c2s/s2c avg/stddev/entropy: 39.0/31.5 26.0/19.5 0.7/0.7][PLAIN TEXT (1263278878147)]
+	1	TCP 10.201.9.245:50957 <-> 10.201.9.11:3868 [proto: 237/Diameter][cat: Web/5][3 pkts/1174 bytes <-> 3 pkts/806 bytes][bytes ratio: 0.186 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 13/12 39.0/31.5 65/51 26.0/19.5][Pkt Len c2s/s2c min/avg/max/stddev: 362/226 391.3/268.7 414/290 21.7/30.2][PLAIN TEXT (1263278878147)]

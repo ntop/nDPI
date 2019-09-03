@@ -73,6 +73,7 @@ static char *_statsFilePath         = NULL; /**< Top stats file path */
 static char *_diagnoseFilePath      = NULL; /**< Top stats file path */
 static char *_jsonFilePath          = NULL; /**< JSON file path  */
 static FILE *stats_fp               = NULL; /**< for Top Stats JSON file */
+static FILE *csv_fp                 = NULL; /**< for CSV export */
 #endif
 #ifdef HAVE_JSON_C
 static json_object *jArray_known_flows = NULL, *jArray_unknown_flows = NULL;
@@ -347,7 +348,7 @@ static void help(u_int long_help) {
 #endif
 	 "[-f <filter>][-s <duration>][-m <duration>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-e <len>][-t][-v <level>]\n"
-	 "          [-n <threads>][-w <file>][-c <file>][-j <file>][-x <file>]\n"
+	 "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
 	 "          [-T <num>][-U <num>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
@@ -378,6 +379,7 @@ static void help(u_int long_help) {
 	 "                            | Default: %u:%u:%u:%u:%u\n"
 	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -c <path>                 | Load custom categories from the specified file\n"
+	 "  -C <path>                 | Write output in CSV format on the specified file\n"
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
 	 "                            | testing purposes in order to compare results across runs\n"
 	 "  -h                        | This help\n"
@@ -438,6 +440,8 @@ static struct option longopts[] = {
 
   /* ndpiReader options */
   { "enable-protocol-guess", no_argument, NULL, 'd'},
+  { "categories", required_argument, NULL, 'c'},
+  { "csv-dump", required_argument, NULL, 'C'},
   { "interface", required_argument, NULL, 'i'},
   { "filter", required_argument, NULL, 'f'},
   { "cpu-bind", required_argument, NULL, 'g'},
@@ -576,6 +580,26 @@ void extcap_capture() {
 
 /* ********************************** */
 
+void printCSVHeader() {
+  if(!csv_fp) return;
+
+  fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,");
+  fprintf(csv_fp, "src2dst_packets,src2dst_bytes,dst2src_packets,dst2src_bytes,");  
+  fprintf(csv_fp, "data_ratio,str_data_ratio,");
+    
+  /* IAT (Inter Arrival Time) */
+  fprintf(csv_fp, "iat_flow_min,iat_flow_avg,iat_flow_max,iat_flow_stddev,");
+  fprintf(csv_fp, "iat_c_to_s_min,iat_c_to_s_avg,iat_c_to_s_max,iat_c_to_s_stddev,");
+  fprintf(csv_fp, "iat_s_to_c_min,iat_s_to_c_avg,iat_s_to_c_max,iat_s_to_c_stddev,");
+  
+/* Packet Length */
+  fprintf(csv_fp, "pktlen_c_to_s_min,pktlen_c_to_s_avg,pktlen_c_to_s_max,pktlen_c_to_s_stddev");
+  fprintf(csv_fp, "pktlen_s_to_c_min,pktlen_s_to_c_avg,pktlen_s_to_c_max,pktlen_s_to_c_stddev");
+  fprintf(csv_fp, "\n");
+}
+
+/* ********************************** */
+
 /**
  * @brief Option parser
  */
@@ -604,7 +628,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "e:c:df:g:i:hp:P:l:s:tv:V:n:j:Jrp:w:q0123:456:7:89:m:b:x:T:U:",
+  while((opt = getopt_long(argc, argv, "e:c:C:df:g:i:hp:P:l:s:tv:V:n:j:Jrp:w:q0123:456:7:89:m:b:x:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -669,6 +693,13 @@ static void parseOptions(int argc, char **argv) {
 
     case 'c':
       _customCategoryFilePath = optarg;
+      break;
+
+    case 'C':
+      if((csv_fp = fopen(optarg, "w")) == NULL)
+	printf("Unable to write on CSV file %s\n", optarg);
+      else
+	printCSVHeader();
       break;
 
     case 's':
@@ -949,7 +980,48 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   json_object *jObj;
 #endif
   FILE *out = results_file ? results_file : stdout;
-  
+
+  if(csv_fp != NULL) {
+    char buf[32];
+    float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
+    float f = (float)flow->first_seen, l = (float)flow->last_seen;
+    
+    /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
+    
+    fprintf(csv_fp, "%u,%u,%.3f,%.3f,%s,%u,%s,%u,",
+	    flow->flow_id,
+	    flow->protocol,
+	    f/1000.0, l/1000.0,
+	    flow->src_name, ntohs(flow->src_port),
+	    flow->dst_name, ntohs(flow->dst_port)	   
+      );
+    
+    fprintf(csv_fp, "%u.%u,%s,",
+	   flow->detected_protocol.master_protocol, flow->detected_protocol.app_protocol,
+	   ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			      flow->detected_protocol, buf, sizeof(buf)));
+
+    fprintf(csv_fp, "%u,%llu,", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
+    fprintf(csv_fp, "%u,%llu,", flow->dst2src_packets, (long long unsigned int) flow->dst2src_bytes);
+
+    fprintf(csv_fp, "%.3f,%s,", data_ratio, ndpi_data_ratio2str(data_ratio));
+    
+    /* IAT (Inter Arrival Time) */
+    fprintf(csv_fp, "%u,%.1f,%u,%.1f",
+	    ndpi_data_min(flow->iat_flow), ndpi_data_average(flow->iat_flow), ndpi_data_max(flow->iat_flow), ndpi_data_stddev(flow->iat_flow));
+
+    fprintf(csv_fp, "%u,%.1f,%u,%.1f,%u,%.1f,%u,%.1f",
+	   ndpi_data_min(flow->iat_c_to_s), ndpi_data_average(flow->iat_c_to_s), ndpi_data_max(flow->iat_c_to_s), ndpi_data_stddev(flow->iat_c_to_s),
+	   ndpi_data_min(flow->iat_s_to_c), ndpi_data_average(flow->iat_s_to_c), ndpi_data_max(flow->iat_s_to_c), ndpi_data_stddev(flow->iat_s_to_c));
+
+    /* Packet Length */
+    fprintf(csv_fp, "%u,%.1f,%u,%.1f,%u,%.1f,%u,%.1f",
+	   ndpi_data_min(flow->pktlen_c_to_s), ndpi_data_average(flow->pktlen_c_to_s), ndpi_data_max(flow->pktlen_c_to_s), ndpi_data_stddev(flow->pktlen_c_to_s),
+	   ndpi_data_min(flow->pktlen_s_to_c), ndpi_data_average(flow->pktlen_s_to_c), ndpi_data_max(flow->pktlen_s_to_c), ndpi_data_stddev(flow->pktlen_s_to_c));
+
+     fprintf(csv_fp, "\n");
+  }
+ 
   if((verbose != 1) && (verbose != 2))
     return;
 
@@ -1006,13 +1078,22 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if((flow->src2dst_packets+flow->dst2src_packets) > 5) {
       if(flow->iat_c_to_s && flow->iat_s_to_c) {
 	float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
+
 	fprintf(out, "[bytes ratio: %.3f (%s)]", data_ratio, ndpi_data_ratio2str(data_ratio));
 	
 	/* IAT (Inter Arrival Time) */
-	fprintf(out, "[IAT c2s/s2c avg/stddev/entropy: %.1f/%.1f %.1f/%.1f %.1f/%.1f]",
-		ndpi_data_average(flow->iat_c_to_s), ndpi_data_average(flow->iat_s_to_c),
-		ndpi_data_stddev(flow->iat_c_to_s),  ndpi_data_stddev(flow->iat_s_to_c),
-		ndpi_data_entropy(flow->iat_c_to_s), ndpi_data_entropy(flow->iat_s_to_c));
+	fprintf(out, "[IAT c2s/s2c min/avg/max/stddev: %u/%u %.1f/%.1f %u/%u %.1f/%.1f]",
+		ndpi_data_min(flow->iat_c_to_s),     ndpi_data_min(flow->iat_s_to_c),
+		(float)ndpi_data_average(flow->iat_c_to_s), (float)ndpi_data_average(flow->iat_s_to_c),
+		ndpi_data_max(flow->iat_c_to_s),     ndpi_data_max(flow->iat_s_to_c),
+		(float)ndpi_data_stddev(flow->iat_c_to_s),  (float)ndpi_data_stddev(flow->iat_s_to_c));
+
+	/* Packet Length */
+	fprintf(out, "[Pkt Len c2s/s2c min/avg/max/stddev: %u/%u %.1f/%.1f %u/%u %.1f/%.1f]",
+		ndpi_data_min(flow->pktlen_c_to_s), ndpi_data_min(flow->pktlen_s_to_c),
+		ndpi_data_average(flow->pktlen_c_to_s), ndpi_data_average(flow->pktlen_s_to_c),
+		ndpi_data_max(flow->pktlen_c_to_s), ndpi_data_max(flow->pktlen_s_to_c),
+		ndpi_data_stddev(flow->pktlen_c_to_s),  ndpi_data_stddev(flow->pktlen_s_to_c));
       }
     }
     
@@ -2517,7 +2598,7 @@ static void printFlowsStats() {
 
     if(verbose > 1) {
     for(i=0; i<num_flows; i++)
-        printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
+      printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
     }
 
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
@@ -3998,7 +4079,7 @@ int orginal_main(int argc, char **argv) {
   int main(int argc, char **argv) {
 #endif
     int i;
-
+    
     if(ndpi_get_api_version() != NDPI_API_VERSION) {
       printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
       return(-1);
@@ -4041,14 +4122,12 @@ int orginal_main(int argc, char **argv) {
     for(i=0; i<num_loops; i++)
       test_lib();
 
-
-
     if(results_path)  free(results_path);
     if(results_file)  fclose(results_file);
     if(extcap_dumper) pcap_dump_close(extcap_dumper);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
-
-
+    if(csv_fp)        fclose(csv_fp);
+    
     return 0;
   }
 
