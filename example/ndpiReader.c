@@ -73,12 +73,10 @@ static char *_statsFilePath         = NULL; /**< Top stats file path */
 static char *_diagnoseFilePath      = NULL; /**< Top stats file path */
 static char *_jsonFilePath          = NULL; /**< JSON file path  */
 static FILE *stats_fp               = NULL; /**< for Top Stats JSON file */
-static FILE *csv_fp                 = NULL; /**< for CSV export */
-#endif
-#ifdef HAVE_JSON_C
 static json_object *jArray_known_flows = NULL, *jArray_unknown_flows = NULL;
 static json_object *jArray_topStats = NULL;
 #endif
+static FILE *csv_fp                 = NULL; /**< for CSV export */
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 /** User preferences **/
