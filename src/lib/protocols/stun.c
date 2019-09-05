@@ -30,9 +30,10 @@
 
 #define MAX_NUM_STUN_PKTS     8
 
-/* #define DEBUG_STUN 1 */
-
-/* #define DEBUG_LRU 1 */
+/*
+#define DEBUG_STUN 1
+#define DEBUG_LRU  1
+*/
 
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
@@ -42,8 +43,11 @@ struct stun_packet_header {
 
 /* ************************************************************ */
 
-u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow) {
-  return(flow->packet.iph->saddr + flow->packet.udp->source);
+u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
+  if(rev)
+    return(flow->packet.iph->daddr + flow->packet.udp->dest);
+  else
+    return(flow->packet.iph->saddr + flow->packet.udp->source);
 }
 
 /* ************************************************************ */
@@ -59,7 +63,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
      && flow->packet.udp
      && (app_proto != NDPI_PROTOCOL_UNKNOWN)
     ) /* Cache flow sender info */ {
-    u_int32_t key = get_stun_lru_key(flow);
+    u_int32_t key = get_stun_lru_key(flow, 0);
     u_int16_t cached_proto;
     
     if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
@@ -160,14 +164,33 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if(ndpi_struct->stun_cache) {
     u_int16_t proto;
-    u_int32_t key = get_stun_lru_key(flow);
-    
-    if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */)) {
+    u_int32_t key = get_stun_lru_key(flow, 0);
+    int rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */);
+
+    if(!rc) {
+      key = get_stun_lru_key(flow, 1);
+      rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */);      
+    }
+   
+    if(rc) {
 #ifdef DEBUG_LRU
-      printf("[LRU] FOUND %u / %u\n", key, proto);
+      printf("[LRU] Cache FOUND %u / %u\n", key, proto);
 #endif
       
       flow->guessed_host_protocol_id = proto, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+
+      switch(proto) {
+      case NDPI_PROTOCOL_WHATSAPP:
+	*is_whatsapp = 1;
+	break;
+      case NDPI_PROTOCOL_MESSENGER:
+	*is_messenger;
+	break;
+      case NDPI_PROTOCOL_HANGOUT_DUO:
+	*is_duo = 1;
+	break;
+      }
+      
       return(NDPI_IS_STUN);
     } else {
 #ifdef DEBUG_LRU
