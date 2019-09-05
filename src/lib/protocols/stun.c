@@ -30,10 +30,11 @@
 
 #define MAX_NUM_STUN_PKTS     8
 
-/*
+#if 0
 #define DEBUG_STUN 1
 #define DEBUG_LRU  1
-*/
+#endif
+
 
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
@@ -167,9 +168,17 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     u_int32_t key = get_stun_lru_key(flow, 0);
     int rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */);
 
+#ifdef DEBUG_LRU
+    printf("[LRU] Searching %u\n", key);
+#endif
+
     if(!rc) {
       key = get_stun_lru_key(flow, 1);
       rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */);      
+
+#ifdef DEBUG_LRU
+    printf("[LRU] Searching %u\n", key);
+#endif
     }
    
     if(rc) {
@@ -184,7 +193,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	*is_whatsapp = 1;
 	break;
       case NDPI_PROTOCOL_MESSENGER:
-	*is_messenger;
+	*is_messenger = 1;
 	break;
       case NDPI_PROTOCOL_HANGOUT_DUO:
 	*is_duo = 1;

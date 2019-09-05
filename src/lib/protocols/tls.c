@@ -32,9 +32,12 @@
 
 #define NDPI_MAX_TLS_REQUEST_SIZE 10000
 
-/* Skype.c */
+/* skype.c */
 extern u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow);
+
+/* stun.c */
+extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 /* **************************************** */
 
@@ -81,13 +84,12 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
 
 static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow, u_int32_t protocol) {
-  if((protocol != NDPI_PROTOCOL_TLS)
-     && (protocol != NDPI_PROTOCOL_TLS_NO_CERT)) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
-  } else {
-    protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);
-    ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
-  }
+  if((protocol != NDPI_PROTOCOL_TLS) && (protocol != NDPI_PROTOCOL_TLS_NO_CERT)) {
+    ;
+  } else
+    protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);  
+
+  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_TLS);
 }
 
 /* **************************************** */
@@ -1063,6 +1065,14 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
       flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
       
       if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
+	u_int32_t key = get_stun_lru_key(flow, 1);
+	
+	if(ndpi_struct->stun_cache == NULL)
+	  ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
+	ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, NDPI_PROTOCOL_SIGNAL);
+	
+	printf("[LRU] Adding Signal cached key %u\n", key);
+
 	/* In Signal protocol STUN turns into DTLS... */
 	ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SIGNAL);
       } else if(flow->protos.stun_ssl.ssl.ja3_server[0] != '\0') {
