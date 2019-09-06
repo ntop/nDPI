@@ -35,7 +35,6 @@
 #define DEBUG_LRU  1
 #endif
 
-
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
   u_int32_t cookie;
@@ -160,9 +159,20 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   msg_type = ntohs(h->msg_type) /* & 0x3EEF */, msg_len = ntohs(h->msg_len);
 
   /* https://www.iana.org/assignments/stun-parameters/stun-parameters.xhtml */
-  if(msg_type > 0x000C)
+  if(msg_type > 0x000C) {
+#ifdef DEBUG_STUN
+    printf("[STUN] msg_type = %04X\n", msg_type);
+#endif
     return(NDPI_IS_NOT_STUN);
+  }
 
+#if 0
+  if((flow->packet.udp->dest == htons(3480)) ||
+     (flow->packet.udp->source == htons(3480))
+    )
+    printf("[STUN] Here we go\n");;
+#endif
+  
   if(ndpi_struct->stun_cache) {
     u_int16_t proto;
     u_int32_t key = get_stun_lru_key(flow, 0);
@@ -197,6 +207,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	break;
       case NDPI_PROTOCOL_HANGOUT_DUO:
 	*is_duo = 1;
+	break;
+      case NDPI_PROTOCOL_SKYPE_CALL:
+	flow->protos.stun_ssl.stun.is_skype = 1;
 	break;
       }
       
@@ -351,6 +364,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #ifdef DEBUG_STUN
 	    printf("==> Skype found\n");
 #endif
+	    flow->guessed_protocol_id = NDPI_PROTOCOL_SKYPE_CALL;
 	    flow->protos.stun_ssl.stun.is_skype = 1;
 	    return(NDPI_IS_STUN);
 	  }
@@ -365,12 +379,14 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	case 0x8036:
 	case 0x8095:
 	case 0x0800:
+	case 0x8006: /* This is found on skype calls) */
 	  /* printf("====>>>> %04X\n", attribute); */
-	  flow->protos.stun_ssl.stun.is_skype = 1;
 #ifdef DEBUG_STUN
 	  printf("==> Skype (2) found\n");
 #endif
 
+	  flow->guessed_protocol_id = NDPI_PROTOCOL_SKYPE_CALL;
+	  flow->protos.stun_ssl.stun.is_skype = 1;
 	  return(NDPI_IS_STUN);
 	  break;
 
@@ -382,6 +398,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	     && (payload[offset+6] == 0x00)
 	     && ((payload[offset+7] == 0x02) || (payload[offset+7] == 0x03))
 	     ) {
+	    flow->guessed_protocol_id = NDPI_PROTOCOL_SKYPE_CALL;
 	    flow->protos.stun_ssl.stun.is_skype = 1;
 #ifdef DEBUG_STUN
 	    printf("==> Skype (3) found\n");
@@ -478,10 +495,10 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	} else if(is_duo) {
 	  ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
 	  return;
-	} else if(flow->protos.stun_ssl.stun.is_skype) {
+	} else if(flow->protos.stun_ssl.stun.is_skype || (flow->guessed_host_protocol_id = NDPI_PROTOCOL_SKYPE_CALL)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
 
-	  if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
+	  // if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
 	    ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
 	} else {
 	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
@@ -500,7 +517,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 			 packet->payload_packet_len,
 			 &is_whatsapp, &is_messenger, &is_duo) == NDPI_IS_STUN) {
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
-
+      
     if(is_messenger) {
       ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
       return;
@@ -511,7 +528,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
 
       /* flow->protos.stun_ssl.stun.num_binding_requests < 4) ? NDPI_PROTOCOL_SKYPE_CALL_IN : NDPI_PROTOCOL_SKYPE_CALL_OUT */
-      if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
+      // if((flow->protos.stun_ssl.stun.num_udp_pkts >= 6) || (flow->protos.stun_ssl.stun.num_binding_requests >= 3))
 	ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
     } else {
       NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
