@@ -1117,10 +1117,12 @@ static ndpi_network host_protocol_list[] = {
   /*
     Tor
     http://torstatus.blutmagie.de/ip_list_all.php/Tor_ip_list_ALL.csv
-    From 02/17/2017
+    From 09.09.2019
+    
+    Use utils/toripaddr2list.py to convert them
   */
-
-  { 0x0122A339 /* 1.34.163.57/32 */, 32, NDPI_PROTOCOL_TOR },
+  
+  { 0x0122a339 /* 1.34.163.57/32 */, 32, NDPI_PROTOCOL_TOR },
   { 0x01EA0B8E /* 1.234.11.142/32 */, 32, NDPI_PROTOCOL_TOR },
   { 0x01F4E33D /* 1.244.227.61/32 */, 32, NDPI_PROTOCOL_TOR },
   { 0x02054D8A /* 2.5.77.138/32 */, 32, NDPI_PROTOCOL_TOR },

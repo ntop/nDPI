@@ -5,12 +5,13 @@ NTP	1	90	1
 NetBIOS	12	1579	2
 DHCP	1	342	1
 QQ	26	9402	2
+TLS_No_Cert	179	76956	1
 IGMP	24	1280	4
 TLS	21	1209	3
 ICMPV6	4	328	3
 Google	113	24811	15
 LLMNR	12	944	6
-WeChat	1251	606425	49
+WeChat	1072	529469	48
 GoogleDocs	15	5114	2
 
 JA3 Host Stats: 
@@ -18,7 +19,7 @@ JA3 Host Stats:
 	1	 192.168.1.103            	 3      
 
 
-	1	TCP 203.205.151.162:443 <-> 192.168.1.103:54058 [proto: 64.197/TLS_No_Cert.WeChat][cat: SocialNetwork/6][88 pkts/15114 bytes <-> 91 pkts/61842 bytes][bytes ratio: -0.607 (Download)][IAT c2s/s2c min/avg/max/stddev: 3/11 6361.1/6145.5 150373/150695 17282.8/17139.3][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 171.8/679.6 264/1254 98.8/593.7][PLAIN TEXT (@WPDFg)]
+	1	TCP 203.205.151.162:443 <-> 192.168.1.103:54058 [proto: 91.64/TLS.TLS_No_Cert][cat: Web/5][88 pkts/15114 bytes <-> 91 pkts/61842 bytes][bytes ratio: -0.607 (Download)][IAT c2s/s2c min/avg/max/stddev: 3/11 6361.1/6145.5 150373/150695 17282.8/17139.3][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 171.8/679.6 264/1254 98.8/593.7]
 	2	TCP 192.168.1.103:54101 <-> 203.205.151.162:443 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][46 pkts/12575 bytes <-> 40 pkts/53424 bytes][bytes ratio: -0.619 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 349.1/392.2 10035/9998 1472.1/1580.5][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 273.4/1335.6 1306/4350 407.2/922.0][TLSv1.2][client: web.wechat.com][JA3C: e330bca99c8a5256ae126a55c4c725c5][server: web.wechat.com][JA3S: 699a80bdb17efe157c861f92c5bf5d1d][organization: Tencent Mobility Limited][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	3	TCP 192.168.1.103:54103 <-> 203.205.151.162:443 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][50 pkts/23958 bytes <-> 46 pkts/39684 bytes][bytes ratio: -0.247 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 471.3/504.3 9999/10002 1663.9/1763.2][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 479.2/862.7 1306/4059 492.4/921.8][TLSv1.2][client: web.wechat.com][JA3C: e330bca99c8a5256ae126a55c4c725c5][server: web.wechat.com][JA3S: 699a80bdb17efe157c861f92c5bf5d1d][organization: Tencent Mobility Limited][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	4	TCP 192.168.1.103:54113 <-> 203.205.151.162:443 [proto: 91.197/TLS.WeChat][cat: SocialNetwork/6][38 pkts/8933 bytes <-> 35 pkts/35112 bytes][bytes ratio: -0.594 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 741.7/807.0 10037/10000 2245.0/2387.7][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 235.1/1003.2 1306/1494 368.4/649.4][TLSv1.2][client: web.wechat.com][JA3C: e330bca99c8a5256ae126a55c4c725c5][server: web.wechat.com][JA3S: 699a80bdb17efe157c861f92c5bf5d1d][organization: Tencent Mobility Limited][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]

@@ -4,10 +4,11 @@ MDNS	8	1736	2
 NTP	2	180	1
 SSDP	101	38156	6
 SkypeCall	730	71378	170
+TLS_No_Cert	16	5980	1
 ICMP	8	656	1
 IGMP	5	258	4
 TLS	96	8876	7
-Dropbox	38	17948	5
+Dropbox	22	11968	4
 Skype	1409	253031	79
 Apple	3	168	1
 AppleiCloud	88	20520	2
@@ -26,7 +27,7 @@ JA3 Host Stats:
 	4	TCP 192.168.1.34:50128 <-> 17.172.100.36:443 [proto: 91.143/TLS.AppleiCloud][cat: Web/5][43 pkts/9635 bytes <-> 43 pkts/10651 bytes][bytes ratio: -0.050 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1102.2/1098.6 41869/42024 6370.8/6397.3][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 224.1/247.7 680/1494 261.3/323.6][TLSv1.2][client: p05-keyvalueservice.icloud.com][JA3C: 799135475da362592a4be9199d258726][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_MD5]
 	5	TCP 192.168.1.34:50119 <-> 86.31.35.30:59621 [proto: 125.38/Skype.SkypeCall][cat: VoIP/10][62 pkts/6941 bytes <-> 38 pkts/5325 bytes][bytes ratio: 0.132 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1526.0/2020.8 30032/29763 5632.1/6606.9][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 112.0/140.1 820/1249 115.1/200.8]
 	6	UDP 192.168.1.92:50084 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][14 pkts/7281 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 468.9/0.0 3090/0 1099.8/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 475/0 520.1/0.0 555/0 30.8/0.0][PLAIN TEXT (NOTIFY )]
-	7	TCP 108.160.170.46:443 <-> 192.168.1.34:49445 [proto: 64.121/TLS_No_Cert.Dropbox][cat: Cloud/13][8 pkts/1636 bytes <-> 8 pkts/4344 bytes][bytes ratio: -0.453 (Download)][IAT c2s/s2c min/avg/max/stddev: 141/2 20148.7/20128.9 53811/53950 23475.9/23611.6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 204.5/543.0 343/1020 138.5/477.0]
+	7	TCP 108.160.170.46:443 <-> 192.168.1.34:49445 [proto: 91.64/TLS.TLS_No_Cert][cat: Web/5][8 pkts/1636 bytes <-> 8 pkts/4344 bytes][bytes ratio: -0.453 (Download)][IAT c2s/s2c min/avg/max/stddev: 141/2 20148.7/20128.9 53811/53950 23475.9/23611.6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 204.5/543.0 343/1020 138.5/477.0]
 	8	TCP 192.168.1.34:50117 <-> 71.238.7.203:18767 [proto: 125.38/Skype.SkypeCall][cat: VoIP/10][24 pkts/3136 bytes <-> 19 pkts/2618 bytes][bytes ratio: 0.090 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1742.7/2214.8 25523/25387 5394.8/5950.9][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 130.7/137.8 843/1090 185.2/225.7]
 	9	TCP 192.168.1.34:50126 <-> 91.190.216.23:12350 [proto: 125/Skype][cat: VoIP/10][16 pkts/4788 bytes <-> 4 pkts/372 bytes][bytes ratio: 0.856 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 2193.9/10972.3 5155/32874 2204.3/15486.8][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 299.2/93.0 398/172 147.0/45.9]
 	10	TCP 192.168.1.34:50138 <-> 71.238.7.203:18767 [proto: 125.38/Skype.SkypeCall][cat: VoIP/10][19 pkts/2797 bytes <-> 13 pkts/2175 bytes][bytes ratio: 0.125 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/74 2015.9/440.9 30125/3022 6850.2/781.0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 147.2/167.3 842/1090 204.7/267.5]
