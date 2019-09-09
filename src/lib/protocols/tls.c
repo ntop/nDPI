@@ -87,7 +87,7 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
   if((protocol != NDPI_PROTOCOL_TLS) && (protocol != NDPI_PROTOCOL_TLS_NO_CERT)) {
     ;
   } else
-    protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);  
+    protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);
 
   ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_TLS);
 }
@@ -193,7 +193,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
       return(0);
     }
   }
-  
+
   flow->protos.stun_ssl.ssl.ssl_version = pkt_tls_version;
 
   memset(&ja3, 0, sizeof(ja3));
@@ -225,7 +225,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     total_len += header_len;
-    
+
     memset(buffer, 0, buffer_len);
 
     /* Truncate total len, search at least in incomplete packet */
@@ -235,11 +235,11 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
     /* At least "magic" 3 bytes, null for string end, otherwise no need to waste cpu cycles */
     if(total_len > 4) {
       u_int16_t base_offset = packet->tcp ? 43 : 59;
-      
+
 #ifdef DEBUG_TLS
       printf("SSL [len: %u][handshake_protocol: %02X]\n", packet->payload_packet_len, handshake_protocol);
 #endif
-      
+
       if((handshake_protocol == 0x02)
 	 || (handshake_protocol == 0x0b) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
@@ -249,7 +249,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  tls_version = ntohs(*((u_int16_t*)&packet->payload[header_len+4]));
 	else
 	  tls_version = ntohs(*((u_int16_t*)&packet->payload[header_len+12]));
-	
+
 	ja3.tls_version = tls_version;
 
 	if(handshake_protocol == 0x02) {
@@ -260,8 +260,8 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  printf("SSL Server Hello [version: 0x%04X]\n", tls_version);
 #endif
 
-	  /* 
-	     The server hello decides about the SSL version of this flow 
+	  /*
+	     The server hello decides about the SSL version of this flow
 	     https://networkengineering.stackexchange.com/questions/55752/why-does-wireshark-show-version-tls-1-2-here-instead-of-tls-1-3
 	  */
 	  flow->protos.stun_ssl.ssl.ssl_version = tls_version;
@@ -272,7 +272,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    if(tls_version < 0x7F15 /* TLS 1.3 lacks of session id */)
 	      offset += session_id_len+1;
 	  }
-	  
+
 	  ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	  flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0]);
 	  flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
@@ -408,13 +408,13 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  if(packet->tcp)
 	    tls_version = ntohs(*((u_int16_t*)&packet->payload[header_len+4]));
-	  else 
+	  else
 	    tls_version = ntohs(*((u_int16_t*)&packet->payload[header_len+12]));
-	  
+
 	  session_id_len = packet->payload[base_offset];
-	  
+
 	  ja3.tls_version = tls_version;
-	  
+
 	  if((session_id_len+base_offset+2) <= total_len) {
 	    u_int16_t cipher_len, cipher_offset;
 
@@ -425,7 +425,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      cipher_len = ntohs(*((u_int16_t*)&packet->payload[base_offset+2]));
 	      cipher_offset = base_offset+4;
 	    }
-	    
+
 #ifdef DEBUG_TLS
 	    printf("Client SSL [client cipher_len: %u][tls_version: 0x%04X]\n", cipher_len, tls_version);
 #endif
@@ -537,7 +537,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      }
 		    } else if(extension_id == 10 /* supported groups */) {
 		      u_int16_t s_offset = offset+extension_offset + 2;
-		      
+
 #ifdef DEBUG_TLS
 		      printf("Client SSL [EllipticCurveGroups: len=%u]\n", extension_len);
 #endif
@@ -571,7 +571,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      }
 		    } else if(extension_id == 11 /* ec_point_formats groups */) {
 		      u_int16_t s_offset = offset+extension_offset + 1;
-		      
+
 #ifdef DEBUG_TLS
 		      printf("Client SSL [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
@@ -640,7 +640,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("[JA3] Client: %s \n", ja3_str);
 #endif
-		    
+
 		    ndpi_MD5Init(&ctx);
 		    ndpi_MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
 		    ndpi_MD5Final(md5_hash, &ctx);
@@ -670,6 +670,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
+/* See https://blog.catchpoint.com/2017/05/12/dissecting-tls-using-wireshark/ */
 void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 			struct ndpi_flow_struct *flow,
 			char *buffer, int buffer_len) {
@@ -681,7 +682,8 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t total_len  = (packet->payload[3] << 8) + packet->payload[4] + 5 /* SSL Header */;
   u_int8_t handshake_protocol = packet->payload[5]; /* handshake protocol a bit misleading, it is message type according TLS specs */
 
-  if(handshake_protocol != 0x02 && handshake_protocol != 0xb /* Server Hello and Certificate message types are interesting for us */)
+  if((handshake_protocol != 0x02)
+     && (handshake_protocol != 0xb) /* Server Hello and Certificate message types are interesting for us */)
     return;
 
   /* Truncate total len, search at least in incomplete packet */
@@ -728,6 +730,65 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 	printf("Certificate organization: %s\n", flow->protos.stun_ssl.ssl.server_organization);
 #endif
+      }
+    } else if((packet->payload[i] == 0x30) && (packet->payload[i+1] == 0x1e) && (packet->payload[i+2] == 0x17)) {
+      u_int8_t len = packet->payload[i+3];
+      u_int offset = i+4;
+
+      if((offset+len) < packet->payload_packet_len) {
+	char utcDate[32];
+
+#ifdef DEBUG_TLS
+	printf("[CERTIFICATE] notBefore [len: %u][", len);
+	for(j=0; j<len; j++) printf("%c", packet->payload[i+4+j]);
+	printf("]\n");
+#endif
+
+	if(len < (sizeof(utcDate)-1)) {
+	  struct tm utc;
+	  
+	  strncpy(utcDate, (const char*)&packet->payload[i+4], len);
+	  utcDate[len] = '\0';
+
+	  /* 141021000000Z */	    
+	  if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
+#ifdef DEBUG_TLS
+	    printf("[CERTIFICATE] notBefore %u [%s]\n", mktime(&utc), utcDate);
+#endif
+	    flow->protos.stun_ssl.ssl.notBefore = mktime(&utc);
+	  }
+	}
+	
+	offset += len;
+
+	if((offset+1) < packet->payload_packet_len) {
+	  len = packet->payload[offset+1];
+
+	  offset += 2;
+
+	  if((offset+len) < packet->payload_packet_len) {
+#ifdef DEBUG_TLS
+	    printf("[CERTIFICATE] notAfter [len: %u][", len);
+	    for(j=0; j<len; j++) printf("%c", packet->payload[offset+j]);
+	    printf("]\n");
+#endif
+
+	    if(len < (sizeof(utcDate)-1)) {
+	      struct tm utc;
+	      
+	      strncpy(utcDate, (const char*)&packet->payload[offset], len);
+	      utcDate[len] = '\0';
+	      
+	      /* 141021000000Z */	    
+	      if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
+#ifdef DEBUG_TLS
+		printf("[CERTIFICATE] notAfter %u [%s]\n", mktime(&utc), utcDate);
+#endif
+		flow->protos.stun_ssl.ssl.notAfter = mktime(&utc);
+	      }
+	    }
+	  }
+	}
       }
     }
   }
@@ -1057,17 +1118,17 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	   flow->guessed_host_protocol_id, rc, packet->payload_packet_len, flow->protos.stun_ssl.ssl.ja3_server,
 	   flow->protos.stun_ssl.ssl.ssl_version);
 #endif
-    
+
     if((rc == 0) && (flow->protos.stun_ssl.ssl.ssl_version != 0)) {
       flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
-      
+
       if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
 	u_int32_t key = get_stun_lru_key(flow, 1);
-	
+
 	if(ndpi_struct->stun_cache == NULL)
 	  ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
 	ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, NDPI_PROTOCOL_SIGNAL);
-	
+
 	printf("[LRU] Adding Signal cached key %u\n", key);
 
 	/* In Signal protocol STUN turns into DTLS... */
@@ -1077,10 +1138,10 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
       }
     }
-    
+
     return;
   }
-  
+
   if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS) {
     if(flow->l4.tcp.ssl_stage == 3 && packet->payload_packet_len > 20 && flow->packet_counter < 5) {
       /* this should only happen, when we detected SSL with a packet that had parts of the certificate in subsequent packets
@@ -1098,12 +1159,12 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	return;
       }
     }
-      
+
     return;
   }
 
   NDPI_LOG_DBG(ndpi_struct, "search ssl\n");
-    
+
   /* Check if this is whatsapp first (this proto runs over port 443) */
   if((packet->payload_packet_len > 5)
      && ((packet->payload[0] == 'W')
@@ -1122,8 +1183,8 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
     /* No whatsapp, let's try SSL */
     if(tlsDetectProtocolFromCertificate(ndpi_struct, flow) > 0)
       return;
-  }  
-  
+  }
+
   if(packet->payload_packet_len > 40 && flow->l4.tcp.ssl_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "first ssl packet\n");
     // SSLv2 Record
@@ -1155,7 +1216,7 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
   }
-  
+
   if(packet->payload_packet_len > 40 &&
      flow->l4.tcp.ssl_stage == 1 + packet->packet_direction
      && flow->packet_direction_counter[packet->packet_direction] < 5) {
@@ -1195,7 +1256,7 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  
+
   return;
 }
 

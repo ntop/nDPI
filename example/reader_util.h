@@ -162,6 +162,7 @@ typedef struct ndpi_flow_info {
       client_hassh[33], server_hassh[33],
       server_organization[64],
       ja3_client[33], ja3_server[33];
+    time_t notBefore, notAfter;
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
   } ssh_tls;

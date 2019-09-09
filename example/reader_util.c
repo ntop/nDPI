@@ -977,6 +977,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.stun_ssl.ssl.server_certificate);
       snprintf(flow->ssh_tls.server_organization, sizeof(flow->ssh_tls.server_organization), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);
+      flow->ssh_tls.notBefore = flow->ndpi_flow->protos.stun_ssl.ssl.notBefore;
+      flow->ssh_tls.notAfter = flow->ndpi_flow->protos.stun_ssl.ssl.notAfter;
       snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client);
       snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",

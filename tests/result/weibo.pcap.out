@@ -22,7 +22,7 @@ JA3 Host Stats:
 	10	TCP 192.168.1.105:59119 <-> 114.134.80.162:80 [proto: 7/HTTP][cat: Web/5][5 pkts/736 bytes <-> 4 pkts/863 bytes][Host: weibo.com][bytes ratio: -0.079 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 175.8/231.7 353/348 174.3/163.8][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 147.2/215.8 500/689 176.6/273.3][PLAIN TEXT (GET /login.php)]
 	11	TCP 192.168.1.105:35811 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][3 pkts/604 bytes <-> 2 pkts/140 bytes][Host: js.t.sinajs.cn][PLAIN TEXT (KGET /t)]
 	12	TCP 192.168.1.105:42275 <-> 222.73.28.96:80 [proto: 7.200/HTTP.Sina(Weibo)][cat: SocialNetwork/6][3 pkts/610 bytes <-> 1 pkts/66 bytes][Host: u1.img.mobile.sina.cn][PLAIN TEXT (GET /public/files/image/620)]
-	13	TCP 192.168.1.105:50827 <-> 47.89.65.229:443 [proto: 91/TLS][cat: Web/5][3 pkts/382 bytes <-> 1 pkts/66 bytes][TLSv1][client: g.alicdn.com][JA3C: 58e7f64db6e4fe4941dd9691d421196c][PLAIN TEXT (g.alicdn.com)]
+	13	TCP 192.168.1.105:50827 <-> 47.89.65.229:443 [proto: 91/TLS][cat: Web/5][3 pkts/382 bytes <-> 1 pkts/66 bytes][TLSv1][Client: g.alicdn.com][JA3C: 58e7f64db6e4fe4941dd9691d421196c][PLAIN TEXT (g.alicdn.com)]
 	14	UDP 192.168.1.105:53543 <-> 192.168.1.1:53 [proto: 5.200/DNS.Sina(Weibo)][cat: SocialNetwork/6][1 pkts/75 bytes <-> 1 pkts/191 bytes][Host: img.t.sinajs.cn]
 	15	UDP 192.168.1.105:41352 <-> 192.168.1.1:53 [proto: 5.200/DNS.Sina(Weibo)][cat: SocialNetwork/6][1 pkts/74 bytes <-> 1 pkts/190 bytes][Host: js.t.sinajs.cn]
 	16	UDP 192.168.1.105:51440 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/72 bytes <-> 1 pkts/171 bytes][Host: g.alicdn.com][PLAIN TEXT (alicdn)]
