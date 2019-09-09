@@ -250,7 +250,7 @@ typedef enum {
   NDPI_PROTOCOL_STARCRAFT             = 213, /* Matteo Bracci <matteobracci1@gmail.com> */
   NDPI_PROTOCOL_TEREDO                = 214,
   NDPI_PROTOCOL_HOTSPOT_SHIELD        = 215,
-  NDPI_PROTOCOL_HEP                   = 216, /* sipcapture.org QXIP BV */
+  NDPI_PROTOCOL_IMO                   = 216,
   NDPI_PROTOCOL_GOOGLE_DRIVE          = 217,
   NDPI_PROTOCOL_OCS                   = 218,
   NDPI_PROTOCOL_OFFICE_365            = 219,

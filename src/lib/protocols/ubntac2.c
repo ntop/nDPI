@@ -51,7 +51,7 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
 
       if(found) {
 	found += packet->payload[found+1] + 4; /* Skip model name */
-	found++; /* Skip len*/
+	found++; /* Skip len */
 	
 	if(found < packet->payload_packet_len) {
 	  char version[256];

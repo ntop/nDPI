@@ -1191,11 +1191,15 @@ struct ndpi_flow_struct {
     } ssh;
 
     struct {
+      u_int8_t last_one_byte_pkt, last_byte;
+    } imo;
+    
+    struct {
       char answer[96];
     } mdns;
 
     struct {
-      char version[96];
+      char version[32];
     } ubntac2;
 
     struct {

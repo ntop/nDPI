@@ -817,11 +817,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "IPP", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HEP,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IMO,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "HEP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 9064, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 9063, 0, 0, 0, 0) /* UDP */);
+			    no_master, "IMO", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP,
 			    1 /* can_have_a_subprotocol */, no_master,
 			    no_master, "HTTP", NDPI_PROTOCOL_CATEGORY_WEB,
@@ -1266,7 +1266,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_TLS,
 			    1 /* can_have_a_subprotocol */, no_master,
 			    custom_master, "TLS", NDPI_PROTOCOL_CATEGORY_WEB,
-			    ndpi_build_default_ports(ports_a, 443, 3001 /* ntop */, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_a, 443, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSH,
 			    0 /* can_have_a_subprotocol */, no_master,
@@ -2858,8 +2858,8 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* SIP */
   init_sip_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* HEP */
-  init_hep_dissector(ndpi_struct, &a, detection_bitmask);
+  /* IMO */
+  init_imo_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* Teredo */
   init_teredo_dissector(ndpi_struct, &a, detection_bitmask);
