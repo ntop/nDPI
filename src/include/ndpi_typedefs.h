@@ -1362,11 +1362,18 @@ typedef enum {
 #define NDPI_SERIALIZER_STATUS_EOR   (1 << 2)
 
 typedef struct {
-  u_int32_t buffer_size, size_used;
+  u_int32_t flags;
+  u_int32_t size_used;
+} ndpi_private_serializer_status;
+
+typedef struct {
+  ndpi_private_serializer_status status;
+  u_int32_t buffer_size;
   ndpi_serialization_format fmt;
-  u_int32_t status;
   u_int8_t *buffer;
   char csv_separator[2];
+  u_int8_t has_snapshot;
+  ndpi_private_serializer_status snapshot;
 } ndpi_private_serializer;
 
 #define ndpi_private_deserializer ndpi_private_serializer
