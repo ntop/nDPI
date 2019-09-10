@@ -867,6 +867,7 @@ extern "C" {
 				 u_int8_t *serialized_buffer,
 				 u_int32_t serialized_buffer_len);
   
+  ndpi_serialization_format ndpi_deserialize_get_format(ndpi_deserializer *_deserializer);
   ndpi_serialization_type ndpi_deserialize_get_item_type(ndpi_deserializer *deserializer, ndpi_serialization_type *key_type);
   int ndpi_deserialize_next(ndpi_deserializer *deserializer);
 

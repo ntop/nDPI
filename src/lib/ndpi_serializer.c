@@ -142,7 +142,7 @@ void ndpi_reset_serializer(ndpi_serializer *_serializer) {
     serializer->size_used += snprintf((char *) &serializer->buffer[serializer->size_used], buff_diff, " {}");
   } else if(serializer->fmt == ndpi_serialization_format_csv)
     serializer->size_used = 0;
-  else /* TLV */
+  else /* ndpi_serialization_format_tlv */
     serializer->size_used = 2 * sizeof(u_int8_t);
 }
 
@@ -1154,6 +1154,13 @@ int ndpi_init_deserializer(ndpi_deserializer *deserializer,
   return(ndpi_init_deserializer_buf(deserializer,
 				    serializer->buffer,
 				    serializer->size_used));
+}
+
+/* ********************************** */
+
+ndpi_serialization_format ndpi_deserialize_get_format(ndpi_deserializer *_deserializer) {
+  ndpi_private_deserializer *deserializer = (ndpi_private_deserializer*)_deserializer;
+  return deserializer->fmt;
 }
 
 /* ********************************** */
