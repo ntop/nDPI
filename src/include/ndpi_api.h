@@ -881,6 +881,8 @@ extern "C" {
   int ndpi_deserialize_value_float(ndpi_deserializer *deserializer, float *value);
   int ndpi_deserialize_value_string(ndpi_deserializer *deserializer, ndpi_string *value);
 
+  int ndpi_deserialize_clone(ndpi_deserializer *deserializer, ndpi_serializer *serializer);
+
   /* Data analysis */
   struct ndpi_analyze_struct* ndpi_alloc_data_analysis(u_int16_t _max_series_len);
   void ndpi_init_data_analysis(struct ndpi_analyze_struct *s, u_int16_t _max_series_len);
