@@ -1340,6 +1340,8 @@ typedef enum {
   ndpi_serialization_format_csv
 } ndpi_serialization_format;
 
+/* Note: key supports string and uint32 (compressed to uint8/uint16) only,
+ * this is also enforced by the API */
 typedef enum {
   ndpi_serialization_unknown = 0,
   ndpi_serialization_end_of_record,
