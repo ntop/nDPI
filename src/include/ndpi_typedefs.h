@@ -1343,29 +1343,17 @@ typedef enum {
 typedef enum {
   ndpi_serialization_unknown = 0,
   ndpi_serialization_end_of_record,
-  ndpi_serialization_uint32_uint32,
-  ndpi_serialization_uint32_uint64,
-  ndpi_serialization_uint32_string,
-  ndpi_serialization_string_int32,
-  ndpi_serialization_string_int64,
-  ndpi_serialization_string_uint32,
-  ndpi_serialization_string_uint64,
-  ndpi_serialization_string_float,
-  ndpi_serialization_string_string,
-  ndpi_serialization_uint32_int32,
-  ndpi_serialization_uint32_int64,
-  ndpi_serialization_uint32_float,
-
-  /* 32/64 bit types are automatically encoded/decoded as 8/16 bit */
-  ndpi_serialization_uint32_uint16,
-  ndpi_serialization_uint32_uint8,
-  ndpi_serialization_uint32_int16,
-  ndpi_serialization_uint32_int8,
-  ndpi_serialization_string_uint16,
-  ndpi_serialization_string_uint8,
-  ndpi_serialization_string_int16,
-  ndpi_serialization_string_int8
-} ndpi_serialization_element_type;
+  ndpi_serialization_uint8,
+  ndpi_serialization_uint16,
+  ndpi_serialization_uint32,
+  ndpi_serialization_uint64,
+  ndpi_serialization_int8,
+  ndpi_serialization_int16,
+  ndpi_serialization_int32,
+  ndpi_serialization_int64,
+  ndpi_serialization_float,
+  ndpi_serialization_string
+} ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_STATUS_COMMA (1 << 0)
 #define NDPI_SERIALIZER_STATUS_ARRAY (1 << 1)

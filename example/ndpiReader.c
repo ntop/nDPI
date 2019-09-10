@@ -3418,7 +3418,8 @@ void serializerUnitTest() {
   assert(ndpi_init_deserializer(&deserializer, &serializer) != -1);
 
   while(1) {
-    ndpi_serialization_element_type et = ndpi_deserialize_get_nextitem_type(&deserializer);
+    ndpi_serialization_type kt, et;
+    et = ndpi_deserialize_get_item_type(&deserializer, &kt);
 
     if(et == ndpi_serialization_unknown)
       break;
@@ -3426,63 +3427,56 @@ void serializerUnitTest() {
       u_int32_t k32, v32;
       ndpi_string ks, vs;
       float vf;
-      
+     
+      switch(kt) {
+        case ndpi_serialization_uint32:
+          ndpi_deserialize_key_uint32(&deserializer, &k32);
+	  if(trace) printf("%u=", k32);
+          break;
+        case ndpi_serialization_string:
+          ndpi_deserialize_key_string(&deserializer, &ks);
+          if (trace) {
+	    u_int8_t bkp = ks.str[ks.str_len];
+	    ks.str[ks.str_len] = '\0';
+            printf("%s=", ks.str);
+	    ks.str[ks.str_len] = bkp;
+          }
+          break;
+        default:
+          printf("Unsupported TLV key type %u\n", kt);
+          return;
+      }
+ 
       switch(et) {
-      case ndpi_serialization_uint32_uint32:
-	assert(ndpi_deserialize_uint32_uint32(&deserializer, &k32, &v32) != -1);
-	if(trace) printf("%u=%u\n", k32, v32);
+      case ndpi_serialization_uint32:
+	assert(ndpi_deserialize_value_uint32(&deserializer, &v32) != -1);
+	if(trace) printf("%u\n", v32);
 	break;
 
-      case ndpi_serialization_uint32_string:
-	assert(ndpi_deserialize_uint32_string(&deserializer, &k32, &vs) != -1);
+      case ndpi_serialization_string:
+	assert(ndpi_deserialize_value_string(&deserializer, &vs) != -1);
 	if(trace) {
 	  u_int8_t bkp = vs.str[vs.str_len];
-
 	  vs.str[vs.str_len] = '\0';
-	  printf("%u=%s\n", k32, vs.str);
+	  printf("%s\n", vs.str);
 	  vs.str[vs.str_len] = bkp;
 	}
 	break;
 		  
-      case ndpi_serialization_string_string:
-	assert(ndpi_deserialize_string_string(&deserializer, &ks, &vs) != -1);
-	if(trace) {
-	  u_int8_t bkpk = ks.str[ks.str_len], bkp = vs.str[vs.str_len];
-
-	  ks.str[ks.str_len] = vs.str[vs.str_len] = '\0';
-	  printf("%s=%s\n", ks.str, vs.str);
-	  ks.str[ks.str_len] = bkpk, vs.str[vs.str_len] = bkp;
-	}
-	break;
-
-      case ndpi_serialization_string_uint32:
-	assert(ndpi_deserialize_string_uint32(&deserializer, &ks, &v32) != -1);
-	if(trace) {
-	  u_int8_t bkpk = ks.str[ks.str_len];
-
-	  ks.str[ks.str_len] = '\0';
-	  printf("%s=%u\n", ks.str, v32);
-	  ks.str[ks.str_len] = bkpk;
-        }
-	break;
-
-      case ndpi_serialization_string_float:
-	assert(ndpi_deserialize_string_float(&deserializer, &ks, &vf) != -1);
-	if(trace) {
-	  u_int8_t bkpk = ks.str[ks.str_len];
-
-	  ks.str[ks.str_len] = '\0';
-	  printf("%s=%f\n", ks.str, vf);
-	  ks.str[ks.str_len] = bkpk;
-        }
+      case ndpi_serialization_float:
+	assert(ndpi_deserialize_value_float(&deserializer, &vf) != -1);
+	if(trace) printf("%f\n", vf);
 	break;
 
       default:
+	if (trace) printf("\n");
         printf("serializerUnitTest: unsupported type %u detected!\n", et);
         return;
 	break;
       }
     }
+
+    ndpi_deserialize_next(&deserializer);
   }
 
   ndpi_term_serializer(&serializer);

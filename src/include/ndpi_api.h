@@ -867,33 +867,18 @@ extern "C" {
 				 u_int8_t *serialized_buffer,
 				 u_int32_t serialized_buffer_len);
   
-  ndpi_serialization_element_type ndpi_deserialize_get_nextitem_type(ndpi_deserializer *deserializer);
+  ndpi_serialization_type ndpi_deserialize_get_item_type(ndpi_deserializer *deserializer, ndpi_serialization_type *key_type);
+  int ndpi_deserialize_next(ndpi_deserializer *deserializer);
 
-  int ndpi_deserialize_uint32_uint32(ndpi_deserializer *deserializer,
-				     u_int32_t *key, u_int32_t *value);
-  int ndpi_deserialize_uint32_uint64(ndpi_deserializer *deserializer,
-				     u_int32_t *key, u_int64_t *value);
-  int ndpi_deserialize_uint32_int32(ndpi_deserializer *deserializer,
-				    u_int32_t *key, int32_t *value);
-  int ndpi_deserialize_uint32_int64(ndpi_deserializer *deserializer,
-				    u_int32_t *key, int64_t *value);
-  int ndpi_deserialize_uint32_float(ndpi_deserializer *deserializer,
-				    u_int32_t *key, float *value);
-  int ndpi_deserialize_uint32_string(ndpi_deserializer *deserializer,
-				     u_int32_t *key, ndpi_string *value);
-  int ndpi_deserialize_string_int32(ndpi_deserializer *deserializer,
-				  ndpi_string *key, int32_t *value);
-  int ndpi_deserialize_string_int64(ndpi_deserializer *deserializer,
-				    ndpi_string *key, int64_t *value);
-  int ndpi_deserialize_string_uint32(ndpi_deserializer *deserializer,
-				     ndpi_string *key, u_int32_t *value);
-  int ndpi_deserialize_string_uint64(ndpi_deserializer *deserializer,
-				     ndpi_string *key, u_int64_t *value);
-  int ndpi_deserialize_string_string(ndpi_deserializer *deserializer,
-				     ndpi_string *key, ndpi_string *value);
-  int ndpi_deserialize_string_float(ndpi_deserializer *deserializer,
-				    ndpi_string *key, float *value);
-  int ndpi_deserialize_end_of_record(ndpi_deserializer *deserializer);
+  int ndpi_deserialize_key_uint32(ndpi_deserializer *deserializer, u_int32_t *key);
+  int ndpi_deserialize_key_string(ndpi_deserializer *deserializer, ndpi_string *key);
+
+  int ndpi_deserialize_value_uint32(ndpi_deserializer *deserializer, u_int32_t *value);
+  int ndpi_deserialize_value_uint64(ndpi_deserializer *deserializer, u_int64_t *value);
+  int ndpi_deserialize_value_int32(ndpi_deserializer *deserializer, int32_t *value);
+  int ndpi_deserialize_value_int64(ndpi_deserializer *deserializer, int64_t *value);
+  int ndpi_deserialize_value_float(ndpi_deserializer *deserializer, float *value);
+  int ndpi_deserialize_value_string(ndpi_deserializer *deserializer, ndpi_string *value);
 
   /* Data analysis */
   struct ndpi_analyze_struct* ndpi_alloc_data_analysis(u_int16_t _max_series_len);
