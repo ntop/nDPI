@@ -1272,6 +1272,10 @@ static inline int ndpi_deserialize_get_single_size(ndpi_private_deserializer *de
     case ndpi_serialization_string:
       size = ndpi_deserialize_get_single_string_size(deserializer, offset);
     break;
+    case ndpi_serialization_end_of_record:
+    case ndpi_serialization_unknown:
+      size = 0;
+    break;
     default:
       return -2;
     break;
