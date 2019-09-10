@@ -1110,8 +1110,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {
       char notBefore[32], notAfter[32];
-      struct tm *before = gmtime(&flow->ssh_tls.notBefore);
-      struct tm *after  = gmtime(&flow->ssh_tls.notAfter);
+      struct tm a, b;
+      struct tm *before = gmtime_r(&flow->ssh_tls.notBefore, &a);
+      struct tm *after  = gmtime_r(&flow->ssh_tls.notAfter, &b);
 
       strftime(notBefore, sizeof(notBefore), "%F %T", before);
       strftime(notAfter, sizeof(notAfter), "%F %T", after);
