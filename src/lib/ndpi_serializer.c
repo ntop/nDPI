@@ -211,6 +211,8 @@ int ndpi_serializer_set_buffer_len(ndpi_serializer *_serializer, u_int32_t l) {
     p->buffer_size = l;
     return(0);
   }
+
+  return(-2);
 }
 
 /* ********************************** */
