@@ -199,7 +199,21 @@ u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *_serializer) {
   return(((ndpi_private_serializer*)_serializer)->size_used);
 }
 
-  /* ********************************** */
+/* ********************************** */
+
+int ndpi_serializer_set_buffer_len(ndpi_serializer *_serializer, u_int32_t l) {
+  ndpi_private_serializer *p = (ndpi_private_serializer*)_serializer;
+
+  if(p) {
+    if(p->buffer_size <= l)
+      return(-1); /* Invalid size */
+
+    p->buffer_size = l;
+    return(0);
+  }
+}
+
+/* ********************************** */
 
 void ndpi_serializer_set_csv_separator(ndpi_serializer *_serializer, char separator) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;

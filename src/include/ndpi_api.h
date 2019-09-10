@@ -858,11 +858,13 @@ extern "C" {
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
   char* ndpi_serializer_get_buffer(ndpi_serializer *_serializer, u_int32_t *buffer_len);
   u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *_serializer);
-    
+  int ndpi_serializer_set_buffer_len(ndpi_serializer *_serializer, u_int32_t l);
+  void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator);
+
+  
   /* Deserializer */
   int ndpi_init_deserializer(ndpi_deserializer *deserializer,
 			     ndpi_serializer *serializer);
-  void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator);
   int ndpi_init_deserializer_buf(ndpi_deserializer *deserializer,
 				 u_int8_t *serialized_buffer,
 				 u_int32_t serialized_buffer_len);
@@ -899,8 +901,7 @@ extern "C" {
   u_int32_t ndpi_data_min(struct ndpi_analyze_struct *s);
   u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s);
   float ndpi_data_ratio(u_int32_t sent, u_int32_t rcvd);
-  
-  
+    
   const char* ndpi_data_ratio2str(float ratio);
   
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */
