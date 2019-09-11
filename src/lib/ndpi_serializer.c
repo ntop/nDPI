@@ -148,13 +148,14 @@ void ndpi_reset_serializer(ndpi_serializer *_serializer) {
 
 /* ********************************** */
 
-int ndpi_init_serializer(ndpi_serializer *_serializer,
-			 ndpi_serialization_format fmt) {
+int ndpi_init_serializer_ll(ndpi_serializer *_serializer,
+			 ndpi_serialization_format fmt,
+			 u_int32_t buffer_size) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
   memset(serializer, 0, sizeof(ndpi_private_serializer));
 
-  serializer->buffer_size = 8192;
+  serializer->initial_buffer_size = serializer->buffer_size = buffer_size;
   serializer->buffer      = (u_int8_t *) malloc(serializer->buffer_size * sizeof(u_int8_t));
 
   if(serializer->buffer == NULL)
@@ -171,6 +172,13 @@ int ndpi_init_serializer(ndpi_serializer *_serializer,
   ndpi_reset_serializer(_serializer);
 
   return(1);
+}
+
+/* ********************************** */
+
+int ndpi_init_serializer(ndpi_serializer *_serializer,
+			 ndpi_serialization_format fmt) {
+  return ndpi_init_serializer_ll(_serializer, fmt, NDPI_SERIALIZER_DEFAULT_BUFFER_SIZE);
 }
 
 /* ********************************** */
@@ -242,8 +250,14 @@ static inline int ndpi_extend_serializer_buffer(ndpi_serializer *_serializer, u_
   void *r;
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
-  if(min_len < 1024)
-    min_len = 1024;
+  if (min_len < NDPI_SERIALIZER_DEFAULT_BUFFER_INCR) {
+    if (serializer->initial_buffer_size < NDPI_SERIALIZER_DEFAULT_BUFFER_INCR) {
+      if (min_len < serializer->initial_buffer_size)
+        min_len = serializer->initial_buffer_size;
+    } else {
+      min_len = NDPI_SERIALIZER_DEFAULT_BUFFER_INCR;
+    }
+  }
 
   new_size = serializer->buffer_size + min_len;
 
