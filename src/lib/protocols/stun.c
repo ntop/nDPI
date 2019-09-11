@@ -140,7 +140,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   *is_whatsapp = 0, *is_messenger = 0, *is_duo = 0;
 
-  if(payload_length < sizeof(struct stun_packet_header)) {
+  if(payload_length >= 512) {
+    return(NDPI_IS_NOT_STUN);
+  } else if(payload_length < sizeof(struct stun_packet_header)) {
     /* This looks like an invalid packet */
 
     if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {

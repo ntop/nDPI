@@ -39,14 +39,19 @@
   seastc = packet.ssh.encryption_algorithms_server_to_client
   smastc = packet.ssh.mac_algorithms_server_to_client
   scastc = packet.ssh.compression_algorithms_server_to_client
-  hasshs_str = ';'.join([skex, seastc, smastc, scastc])
+  hasshs_str = ';'.join([skex, seastc, smastc, scastc]) 
 
   [client]
   ckex = packet.ssh.kex_algorithms
   ceacts = packet.ssh.encryption_algorithms_client_to_server
   cmacts = packet.ssh.mac_algorithms_client_to_server
   ccacts = packet.ssh.compression_algorithms_client_to_server
-  hassh_str = ';'.join([ckex, ceacts, cmacts, ccacts])
+  hassh_str = ';'.join([ckex, ceacts, cmacts, ccacts]) 
+
+  NOTE
+  THe ECDSA key fingerprint is SHA256 -> ssh.kex.h_sig (wireshark)
+  is in the Message Code: Diffie-Hellman Key Exchange Reply (31) 
+  that usually is packet 14
 */
 
 /* #define SSH_DEBUG 1 */

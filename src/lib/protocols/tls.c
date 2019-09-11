@@ -30,6 +30,19 @@
 
 // #define DEBUG_TLS 1
 
+/*
+  NOTE
+
+  How to view the certificate fingerprint
+  1. Using wireshark save the certificate on certificate.bin file as explained
+     in https://security.stackexchange.com/questions/123851/how-can-i-extract-the-certificate-from-this-pcap-file
+
+  2. openssl x509 -inform der -in certificate.bin -text > certificate.der
+  3. openssl x509 -noout -fingerprint -sha1 -inform pem -in certificate.der
+     SHA1 Fingerprint=15:9A:76....
+
+ */
+
 #define NDPI_MAX_TLS_REQUEST_SIZE 10000
 
 /* skype.c */
