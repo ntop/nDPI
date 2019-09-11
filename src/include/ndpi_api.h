@@ -819,6 +819,8 @@ extern "C" {
   char* ndpi_ssl_version2str(u_int16_t version);
 
   /* Serializer */
+  int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,
+			      u_int32_t buffer_size);
   int ndpi_init_serializer(ndpi_serializer *serializer, ndpi_serialization_format fmt);
   void ndpi_term_serializer(ndpi_serializer *serializer);
   void ndpi_reset_serializer(ndpi_serializer *serializer);
