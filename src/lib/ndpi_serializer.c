@@ -1231,11 +1231,13 @@ void ndpi_serializer_rollback_snapshot(ndpi_serializer *_serializer) {
     serializer->has_snapshot = 0;
 
     if(serializer->fmt == ndpi_serialization_format_json) {
-      if(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY)
+      if(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY) {
         serializer->buffer[serializer->status.size_used-1] = ']';
-      else
+      } else {
+        serializer->buffer[0] = ' ';
         serializer->buffer[serializer->status.size_used-1] = '}';
-    }
+      }
+    } 
   }
 }
 
