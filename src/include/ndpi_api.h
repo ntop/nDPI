@@ -861,8 +861,8 @@ extern "C" {
   int ndpi_serializer_set_buffer_len(ndpi_serializer *_serializer, u_int32_t l);
   void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator);
 
-  void ndpi_serialize_set_snapshot(ndpi_serializer *serializer);
-  void ndpi_serialize_reset_to_snapshot(ndpi_serializer *serializer);
+  void ndpi_serializer_create_snapshot(ndpi_serializer *serializer);
+  void ndpi_serializer_rollback_snapshot(ndpi_serializer *serializer);
   
   /* Deserializer */
   int ndpi_init_deserializer(ndpi_deserializer *deserializer,

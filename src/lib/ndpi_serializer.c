@@ -1192,16 +1192,18 @@ int ndpi_serialize_string_string(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
-void ndpi_serialize_set_snapshot(ndpi_serializer *_serializer) {
+void ndpi_serializer_create_snapshot(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  
   memcpy(&serializer->snapshot, &serializer->status, sizeof(ndpi_private_serializer_status));
   serializer->has_snapshot = 1;
 }
 
 /* ********************************** */
 
-void ndpi_serialize_reset_to_snapshot(ndpi_serializer *_serializer) {
+void ndpi_serializer_rollback_snapshot(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  
   if (serializer->has_snapshot) {
     memcpy(&serializer->status, &serializer->snapshot, sizeof(ndpi_private_serializer_status));
     serializer->has_snapshot = 0;
