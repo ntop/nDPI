@@ -1357,6 +1357,9 @@ typedef enum {
   ndpi_serialization_string
 } ndpi_serialization_type;
 
+#define NDPI_SERIALIZER_DEFAULT_BUFFER_SIZE 8192
+#define NDPI_SERIALIZER_DEFAULT_BUFFER_INCR 1024
+
 #define NDPI_SERIALIZER_STATUS_COMMA (1 << 0)
 #define NDPI_SERIALIZER_STATUS_ARRAY (1 << 1)
 #define NDPI_SERIALIZER_STATUS_EOR   (1 << 2)
@@ -1368,6 +1371,7 @@ typedef struct {
 
 typedef struct {
   ndpi_private_serializer_status status;
+  u_int32_t initial_buffer_size;
   u_int32_t buffer_size;
   ndpi_serialization_format fmt;
   u_int8_t *buffer;
