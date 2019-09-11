@@ -440,9 +440,9 @@ static inline void ndpi_serialize_json_pre(ndpi_serializer *_serializer) {
     if(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY)
       serializer->status.size_used--; /* Remove ']'*/
     serializer->status.size_used--; /* Remove '}'*/
+    if(serializer->status.flags & NDPI_SERIALIZER_STATUS_COMMA)
+      serializer->buffer[serializer->status.size_used++] = ',';
   }
-  if(serializer->status.flags & NDPI_SERIALIZER_STATUS_COMMA)
-    serializer->buffer[serializer->status.size_used++] = ',';
 }
 
 /* ********************************** */
@@ -1194,7 +1194,15 @@ int ndpi_serialize_string_string(ndpi_serializer *_serializer,
 
 void ndpi_serializer_create_snapshot(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
-  
+
+#if 0
+  printf("[NDPI] Snapshot status: %s%s%s\n",
+    (serializer->status.flags & NDPI_SERIALIZER_STATUS_COMMA) ? " COMMA" : "",
+    (serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY) ? " ARRAY" : "",
+    (serializer->status.flags & NDPI_SERIALIZER_STATUS_EOR)   ? " EOR"   : ""
+  );
+#endif 
+ 
   memcpy(&serializer->snapshot, &serializer->status, sizeof(ndpi_private_serializer_status));
   serializer->has_snapshot = 1;
 }
@@ -1207,6 +1215,13 @@ void ndpi_serializer_rollback_snapshot(ndpi_serializer *_serializer) {
   if (serializer->has_snapshot) {
     memcpy(&serializer->status, &serializer->snapshot, sizeof(ndpi_private_serializer_status));
     serializer->has_snapshot = 0;
+
+    if(serializer->fmt == ndpi_serialization_format_json) {
+      if(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY)
+        serializer->buffer[serializer->status.size_used-1] = ']';
+      else
+        serializer->buffer[serializer->status.size_used-1] = '}';
+    }
   }
 }
 
