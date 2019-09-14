@@ -4059,7 +4059,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_MESSENGER)
 	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_VOICE))
       ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
-    else if((flow->l4.tcp.ssl_seen_client_cert == 1)
+    else if((flow->l4.tcp.tls_seen_client_cert == 1)
 	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
     } else {
@@ -4074,7 +4074,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
-	 && (flow->l4.tcp.ssl_stage > 1))
+	 && (flow->l4.tcp.tls_stage > 1))
 	flow->guessed_protocol_id = NDPI_PROTOCOL_TLS_NO_CERT;
 
       guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
@@ -4448,7 +4448,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
       }
     }
 
-    if((flow->l4.tcp.ssl_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
+    if((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
       unsigned long id;
       int rc = ndpi_match_custom_category(ndpi_struct,
 					  (char *)flow->protos.stun_ssl.ssl.client_certificate,
@@ -4501,7 +4501,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
        */
        ) {
       ndpi_process_extra_packet(ndpi_struct, flow, packet, packetlen, current_tick_l, src, dst);
-      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+      if(flow->check_extra_packets == 0)
+	ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+      
       return(ret);
     } else
       goto ret_protocols;

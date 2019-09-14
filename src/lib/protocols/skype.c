@@ -83,7 +83,8 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	      && flow->l4.tcp.seen_syn
 	      && flow->l4.tcp.seen_syn_ack
 	      && flow->l4.tcp.seen_ack) {
-
+      /* Disabled this logic as it's too weak and leads to false positives */
+#if 0
       if((payload_len == 8) || (payload_len == 3) || (payload_len == 17)) {
 	// printf("[SKYPE] payload_len=%u\n", payload_len);
 	/* printf("[SKYPE] %u/%u\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest)); */
@@ -95,6 +96,7 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
       }
 
       /* printf("[SKYPE] [id: %u][len: %d]\n", flow->l4.tcp.skype_packet_id, payload_len);  */
+#endif
     } else {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
