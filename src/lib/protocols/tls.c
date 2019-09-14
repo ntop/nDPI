@@ -710,7 +710,6 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
     return(0); /* We're good */
   
   if(flow->l4.tcp.tls_fingerprint_len > 0) {
-    unsigned char sha1[20];
     unsigned int i, avail = packet->payload_packet_len - flow->l4.tcp.tls_record_offset;
 
     if(avail > flow->l4.tcp.tls_fingerprint_len)
@@ -738,12 +737,12 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
     flow->l4.tcp.tls_fingerprint_len -= avail;
       
     if(flow->l4.tcp.tls_fingerprint_len == 0) {
-      SHA1Final(sha1, flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
+      SHA1Final(flow->l4.tcp.tls_sha1_certificate_fingerprint, flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
 
 #ifdef DEBUG_TLS
       printf("=>> [TLS] SHA-1: ");
       for(i=0;i<20;i++)
-	printf("%s%02X", (i > 0) ? ":" : "", sha1[i]);
+	printf("%s%02X", (i > 0) ? ":" : "", flow->l4.tcp.tls_sha1_certificate_fingerprint[i]);
       printf("\n");
 #endif
       
@@ -772,8 +771,12 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
 #ifdef DEBUG_TLS
     printf("=>> [TLS] Certificate found\n");
 #endif
-    flow->l4.tcp.tls_srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX));
-    
+
+    if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx == NULL)
+      flow->l4.tcp.tls_srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX));
+    else
+      printf("[TLS] Internal error: double allocation\n:");
+
     if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx) {
       SHA1Init(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
       flow->l4.tcp.tls_srv_cert_fingerprint_found = 1;

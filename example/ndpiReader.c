@@ -1024,6 +1024,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     return;
 
   if(!json_flag) {
+    u_int i;
+    
     fprintf(out, "\t%u", id);
 
     fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
@@ -1101,6 +1103,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
 						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
+    
     if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[Server: %s]", flow->ssh_tls.server_info);
     if(flow->ssh_tls.server_hassh[0] != '\0') fprintf(out, "[HASSH-S: %s]", flow->ssh_tls.server_hassh);
 
@@ -1108,6 +1111,20 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 						    print_cipher(flow->ssh_tls.server_unsafe_cipher));
     if(flow->ssh_tls.server_organization[0] != '\0') fprintf(out, "[Organization: %s]", flow->ssh_tls.server_organization);
 
+    if(flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS) {
+      if((flow->ssh_tls.sha1_cert_fingerprint[0] == 0)
+	 && (flow->ssh_tls.sha1_cert_fingerprint[1] == 0)
+	 && (flow->ssh_tls.sha1_cert_fingerprint[2] == 0))
+	; /* Looks empty */
+      else {
+	fprintf(out, "[Certificate SHA-1: ");
+	for(i=0; i<20; i++)
+	  fprintf(out, "%s%02X", (i > 0) ? ":" : "",
+		  flow->ssh_tls.sha1_cert_fingerprint[i] & 0xFF);
+	fprintf(out, "]");
+      }
+    }
+    
     if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {
       char notBefore[32], notAfter[32];
       struct tm a, b;
