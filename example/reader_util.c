@@ -809,7 +809,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
         newflow->src2dst_start = when;
       }
       newflow->src2dst_pkt_count++;
-      if (l4_data_len != 0XFEEDFACE) {
+      // Non zero app data.
+      if (l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
         newflow->src2dst_opackets++;
       }
       return newflow;
@@ -838,16 +839,17 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	*src = flow->dst_id, *dst = flow->src_id, *src_to_dst_direction = 0, flow->bidirectional = 1;
     }
     if (src_to_dst_direction) {
-      if (flow->src2dst_pkt_count < MAX_NUM_PKTS) {
+      if (flow->src2dst_pkt_count < max_num_packets_per_flow) {
         flow->src2dst_pkt_len[flow->src2dst_pkt_count] = l4_packet_len;
         flow->src2dst_pkt_time[flow->src2dst_pkt_count] = when;
-        flow->src2dst_pkt_count++;
       }
-      if (l4_data_len != 0XFEEDFACE) {
+      flow->src2dst_pkt_count++;
+      // Non zero app data.
+      if (l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
         flow->src2dst_opackets++;
       }
     } else {
-      if (flow->dst2src_pkt_count < MAX_NUM_PKTS) {
+      if (flow->dst2src_pkt_count < max_num_packets_per_flow) {
         flow->dst2src_pkt_len[flow->dst2src_pkt_count] = l4_packet_len;
         flow->dst2src_pkt_time[flow->dst2src_pkt_count] = when;
         if (flow->dst2src_pkt_count == 0) {
@@ -855,7 +857,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
         }
         flow->dst2src_pkt_count++;
       }
-      if (l4_data_len != 0XFEEDFACE) {
+      // Non zero app data.
+      if (l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
         flow->dst2src_opackets++;
       }
     }
@@ -904,14 +907,16 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 /* ****************************************************** */
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
-  if(enable_joy_stats) {
-    /* Update SPLT scores. */
+  if(enable_joy_stats &&
+     (flow->src2dst_packets == max_num_packets_per_flow ||
+      flow->dst2src_packets == max_num_packets_per_flow)) {
 
+    /* Update SPLT scores for first 32 packets. */
     if(flow->bidirectional)
       flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
 				  flow->dst2src_pkt_len, flow->dst2src_pkt_time,
 				  flow->src2dst_start, flow->dst2src_start,
-				  MAX_NUM_PKTS, flow->src_port, flow->dst_port,
+				  max_num_packets_per_flow, flow->src_port, flow->dst_port,
 				  flow->src2dst_packets, flow->dst2src_packets,
 				  flow->src2dst_opackets, flow->dst2src_opackets,
 				  flow->src2dst_l4_bytes, flow->dst2src_l4_bytes, 1,
@@ -919,7 +924,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     else
       flow->score = ndpi_classify(flow->src2dst_pkt_len, flow->src2dst_pkt_time,
 				  NULL, NULL, flow->src2dst_start, flow->src2dst_start,
-				  MAX_NUM_PKTS, flow->src_port, flow->dst_port,
+				  max_num_packets_per_flow, flow->src_port, flow->dst_port,
 				  flow->src2dst_packets, 0,
 				  flow->src2dst_opackets, 0,
 				  flow->src2dst_l4_bytes, 0, 1,

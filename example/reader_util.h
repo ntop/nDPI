@@ -57,7 +57,7 @@ extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
 /** maximum line length */
 #define LINEMAX 512
 #define MAX_BYTE_COUNT_ARRAY_LENGTH 256
-#define MAX_NUM_PKTS               100
+#define MAX_NUM_PKTS               32
 
 #define MAX_NUM_READER_THREADS     16
 #define IDLE_SCAN_PERIOD           10 /* msec (use TICK_RESOLUTION = 1000) */
@@ -172,18 +172,18 @@ typedef struct ndpi_flow_info {
   struct timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
   
   // Entropy fields
-  u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];       /*!< array of packet appdata lengths */
-  struct timeval src2dst_pkt_time[MAX_NUM_PKTS]; /*!< array of arrival times          */
-  u_int16_t dst2src_pkt_len[MAX_NUM_PKTS];       /*!< array of packet appdata lengths */
-  struct timeval dst2src_pkt_time[MAX_NUM_PKTS]; /*!< array of arrival times          */
-  struct timeval src2dst_start;                  /*!< first packet arrival time       */
-  struct timeval dst2src_start;                  /*!< first packet arrival time       */
-  u_int16_t src2dst_pkt_count;                   /*!< packet counts                   */
-  u_int16_t dst2src_pkt_count;                   /*!< packet counts                   */
-  u_int32_t src2dst_l4_bytes;                    /*!< packet counts                   */
-  u_int32_t dst2src_l4_bytes;                    /*!< packet counts                   */
-  u_int32_t src2dst_byte_count[256];             /*!< number of occurences of each byte   */
-  u_int32_t dst2src_byte_count[256];             /*!< number of occurences of each byte   */
+  u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
+  struct timeval src2dst_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
+  u_int16_t dst2src_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
+  struct timeval dst2src_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
+  struct timeval src2dst_start;                                /*!< first packet arrival time       */
+  struct timeval dst2src_start;                                /*!< first packet arrival time       */
+  u_int16_t src2dst_pkt_count;                                 /*!< packet counts                   */
+  u_int16_t dst2src_pkt_count;                                 /*!< packet counts                   */
+  u_int32_t src2dst_l4_bytes;                                  /*!< packet counts                   */
+  u_int32_t dst2src_l4_bytes;                                  /*!< packet counts                   */
+  u_int32_t src2dst_byte_count[MAX_BYTE_COUNT_ARRAY_LENGTH];   /*!< number of occurences of each byte   */
+  u_int32_t dst2src_byte_count[MAX_BYTE_COUNT_ARRAY_LENGTH];   /*!< number of occurences of each byte   */
   u_int32_t src2dst_num_bytes;
   u_int32_t dst2src_num_bytes;
   double src2dst_bd_mean;
