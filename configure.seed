@@ -70,29 +70,25 @@ if test $SYSTEM = "Darwin"; then
 fi
  
  
-HS_LIB=
-HS_INC=
-
 AC_ARG_WITH(hyperscan,          [  --with-hyperscan        Enable nDPI build with Intel Hyperscan])
 
-if test "${with_hyperscan+set}" = set; then
+AS_IF([test "${with_hyperscan+set}" = set],[
      BKP=$LIBS
      LIBS="$LIBS -lstdc++ -lm"
      AC_CHECK_LIB([hs], [hs_compile_multi], AC_DEFINE_UNQUOTED(HAVE_HYPERSCAN, 1, [Intel Hyperscan is present]))
      LIBS=$BKP
 
-     if test "x$ac_cv_lib_hs_hs_compile_multi" = xyes; then :
+     AS_IF([test "x$ac_cv_lib_hs_hs_compile_multi" = xyes],[
           AC_CHECK_LIB([m], [pow])
           AC_CHECK_LIB([stdc++], [main])
-          HS_INC=`pkg-config --cflags libhs`
-          HS_LIB=`pkg-config --libs libhs`
-          LDFLAGS="$LDFLAGS $HS_LIB"
+          PKG_CHECK_MODULES([HS],[libhs])
+          LDFLAGS="$LDFLAGS $HS_LIBS"
 	  AC_MSG_RESULT([compiling with Intel Hyperscan])
-     else
+     ],[
           AC_MSG_RESULT([Intel Hyperscan not found, exiting. See https://github.com/intel/hyperscan/blob/master/doc/dev-reference/getting_started.rst for install/build instructions])
           exit 1
-     fi
-fi
+     ])
+])
 
 if test -f $PCAP_HOME/libpcap/libpcap.a; then :
      echo "Using libpcap from $PCAP_HOME"
@@ -122,12 +118,10 @@ AC_ARG_ENABLE([json-c],
     AS_HELP_STRING([--disable-json-c], [Disable json-c support]))
 
 AS_IF([test "x$enable_json_c" != "xno"], [
-       PKG_CONFIG_PATH=/usr/local/share/pkgconfig:$PKG_CONFIG_PATH
-       pkg-config --exists json-c
-       AS_IF([test "$?" == "0"],
+       PKG_CHECK_MODULES([JSONC],[json-c],
              [
-              CFLAGS="$CFLAGS $(pkg-config --cflags json-c)"
-              LDFLAGS="$LDFLAGS $(pkg-config --libs json-c)"
+              CFLAGS="$CFLAGS $JSONC_CFLAGS"
+              LDFLAGS="$LDFLAGS $JSONC_LIBS"
               AC_CHECK_LIB(json-c, json_object_new_object, AC_DEFINE_UNQUOTED(HAVE_JSON_C, 1, [The JSON-C library is present]))
              ],
              [
@@ -159,8 +153,6 @@ AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
 AC_SUBST(DL_LIB)
-AC_SUBST(HS_LIB)
-AC_SUBST(HS_INC)
 AC_SUBST(DPDK_TARGET)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 
