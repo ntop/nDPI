@@ -173,6 +173,7 @@ u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, 
 
 /* ************************************************************************************* */
 
+#ifdef CODE_UNUSED
 ndpi_port_range * ndpi_build_default_ports_range(ndpi_port_range *ports,
 						 u_int16_t portA_low, u_int16_t portA_high,
 						 u_int16_t portB_low, u_int16_t portB_high,
@@ -189,6 +190,7 @@ ndpi_port_range * ndpi_build_default_ports_range(ndpi_port_range *ports,
 
   return(ports);
 }
+#endif
 
 /* *********************************************************************************** */
 
@@ -483,6 +485,7 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
 
 /* ****************************************************** */
 
+#ifdef CODE_UNUSED
 int ndpi_add_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				 char *value, int protocol_id,
 				 ndpi_protocol_category_t category,
@@ -490,6 +493,7 @@ int ndpi_add_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struc
   return(ndpi_string_to_automa(ndpi_struct, &ndpi_struct->content_automa,
 			       value, protocol_id, category, breed));
 }
+#endif
 
 /* ****************************************************** */
 
@@ -1767,7 +1771,7 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
   buf[min_buf_len] = '\0';
 
 #ifdef MATCH_DEBUG
-  printf("Searching [to search: %s/%u][pattern: %s/%u] [len: %u][match_num: %u][%s]\n",
+  printf("Searching [to search: %s/%u][pattern: %s/%u] [len: %d][match_num: %u][%s]\n",
 	 buf, (unigned int)txt->length, m->patterns->astring, m->patterns->length, min_len,
 	 m->match_num, m->patterns->astring);
 #endif
@@ -1807,7 +1811,7 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
      || (strncmp(buf, m->patterns->astring, min_len) == 0) /* begins with */
      ) {
 #ifdef MATCH_DEBUG
-    printf("Found match [%s][%s] [len: %u]"
+    printf("Found match [%s][%s] [len: %d]"
 	   // "[proto_id: %u]"
 	   "\n",
 	   buf, m->patterns->astring, min_len /* , *matching_protocol_id */);
@@ -1954,7 +1958,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
   va_end(args);
 
   if(ndpi_str != NULL) {
-    printf("%s:%s:%-3u - [%s]: %s",
+    printf("%s:%s:%-3d - [%s]: %s",
 	   file_name, func_name, line_number, ndpi_get_proto_name(ndpi_str, proto), str);
   } else {
     printf("Proto: %u, %s", proto, str);
@@ -2718,7 +2722,7 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod, cons
     goto close_fd;
   }
 
-  while(fd) {
+  while(1) {
     char *line = buffer;
     int line_len = buffer_len;
 
@@ -4725,8 +4729,9 @@ u_int32_t ndpi_bytestream_to_number(const u_int8_t * str, u_int16_t max_chars_to
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_bytestream_dec_or_hex_to_number(const u_int8_t * str, u_int16_t max_chars_to_read, u_int16_t * bytes_read)
-{
+#ifdef CODE_UNUSED
+u_int32_t ndpi_bytestream_dec_or_hex_to_number(const u_int8_t * str, u_int16_t max_chars_to_read,
+					       u_int16_t * bytes_read) {
   u_int32_t val;
   val = 0;
   if(max_chars_to_read <= 2 || str[0] != '0' || str[1] != 'x') {
@@ -4758,10 +4763,12 @@ u_int32_t ndpi_bytestream_dec_or_hex_to_number(const u_int8_t * str, u_int16_t m
   return (val);
 }
 
+#endif
+
 /* ********************************************************************************* */
 
-u_int64_t ndpi_bytestream_to_number64(const u_int8_t * str, u_int16_t max_chars_to_read, u_int16_t * bytes_read)
-{
+u_int64_t ndpi_bytestream_to_number64(const u_int8_t * str, u_int16_t max_chars_to_read,
+				      u_int16_t * bytes_read) {
   u_int64_t val;
   val = 0;
   // cancel if eof, ' ' or line end chars are reached
@@ -5396,11 +5403,13 @@ void NDPI_PROTOCOL_IP_clear(ndpi_ip_addr_t * ip) {
 
 /* ********************************************************************************* */
 
+#ifdef CODE_UNUSED
 /* NTOP */
 int NDPI_PROTOCOL_IP_is_set(const ndpi_ip_addr_t * ip)
 {
   return memcmp(ip, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", sizeof(ndpi_ip_addr_t)) != 0;
 }
+#endif
 
 /* ********************************************************************************* */
 
@@ -6164,6 +6173,7 @@ int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b) {
   return(0);
 }
 
+#ifdef CODE_UNUSED
 int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a) {
   int i;
 
@@ -6181,6 +6191,7 @@ void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
 
   printf("\n");
 }
+#endif
 
 u_int8_t ndpi_get_api_version() {
   return(NDPI_API_VERSION);
