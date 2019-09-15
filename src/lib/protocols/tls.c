@@ -190,12 +190,12 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      char *buffer, int buffer_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ja3_info ja3;
-  int i;
   u_int8_t invalid_ja3 = 0;
   u_int16_t pkt_tls_version = (packet->payload[1] << 8) + packet->payload[2], ja3_str_len;
   char ja3_str[JA3_STR_LEN];
   ndpi_MD5_CTX ctx;
   u_char md5_hash[16];
+  int i;
 
   if(packet->udp) {
     /* Check if this is DTLS or return */
@@ -256,7 +256,8 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	 || (handshake_protocol == 0x0b) /* Server Hello and Certificate message types are interesting for us */) {
 	u_int num_found = 0;
 	u_int16_t tls_version;
-
+	int i;
+	
 	if(packet->tcp)
 	  tls_version = ntohs(*((u_int16_t*)&packet->payload[header_len+4]));
 	else
@@ -447,7 +448,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
 
 #ifdef DEBUG_TLS
-		printf("Client SSL [cipher suite: %u/0x%04X] [%u/%u]\n", ntohs(*id), ntohs(*id), i, cipher_len);
+		printf("Client SSL [cipher suite: %u/0x%04X] [%d/%u]\n", ntohs(*id), ntohs(*id), i, cipher_len);
 #endif
 		if((*id == 0) || (packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1])) {
 		  /*
@@ -1022,7 +1023,8 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
 #endif
   
   /* 1 means keep looking for more packets */
-  return((!flow->l4.tcp.tls_srv_cert_fingerprint_processed) ? 1 : rc);
+  if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed) rc = 1;
+  return(rc);
 }
 
 /* **************************************** */
@@ -1318,7 +1320,7 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
     int rc = sslTryAndRetrieveServerCertificate(ndpi_struct, flow);
 
 #ifdef DEBUG_TLS
-    printf("==>> %u [rc: %u][len: %u][%s][version: %u]\n",
+    printf("==>> %u [rc: %d][len: %u][%s][version: %u]\n",
 	   flow->guessed_host_protocol_id, rc, packet->payload_packet_len, flow->protos.stun_ssl.ssl.ja3_server,
 	   flow->protos.stun_ssl.ssl.ssl_version);
 #endif
