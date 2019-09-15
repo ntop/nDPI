@@ -31,7 +31,7 @@
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 
-/* #define DEBUG_TLS 1 */
+// #define DEBUG_TLS 1
 
 #define DEBUG_FINGERPRINT 1
 
@@ -696,6 +696,9 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t multiple_messages;
 
+  if(flow->l4.tcp.tls_srv_cert_fingerprint_processed)
+    return(0); /* We're good */
+  
 #ifdef DEBUG_TLS
   printf("=>> [TLS] %s() [tls_record_offset=%d][payload_packet_len=%u][direction: %u][%02X %02X %02X...]\n",
 	 __FUNCTION__, flow->l4.tcp.tls_record_offset, packet->payload_packet_len,
@@ -710,7 +713,7 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
     return(0); /* We're good */
   
   if(flow->l4.tcp.tls_fingerprint_len > 0) {
-    unsigned int i, avail = packet->payload_packet_len - flow->l4.tcp.tls_record_offset;
+    unsigned int avail = packet->payload_packet_len - flow->l4.tcp.tls_record_offset;
 
     if(avail > flow->l4.tcp.tls_fingerprint_len)
       avail = flow->l4.tcp.tls_fingerprint_len;
@@ -740,10 +743,14 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
       SHA1Final(flow->l4.tcp.tls_sha1_certificate_fingerprint, flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
 
 #ifdef DEBUG_TLS
-      printf("=>> [TLS] SHA-1: ");
-      for(i=0;i<20;i++)
-	printf("%s%02X", (i > 0) ? ":" : "", flow->l4.tcp.tls_sha1_certificate_fingerprint[i]);
-      printf("\n");
+      {
+	int i;
+	
+	printf("=>> [TLS] SHA-1: ");
+	for(i=0;i<20;i++)
+	  printf("%s%02X", (i > 0) ? ":" : "", flow->l4.tcp.tls_sha1_certificate_fingerprint[i]);
+	printf("\n");
+      }
 #endif
       
       flow->l4.tcp.tls_srv_cert_fingerprint_processed = 1;
@@ -800,13 +807,23 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
     printf("=>> [TLS] Found record %02X [len: %u]\n",
 	   packet->payload[flow->l4.tcp.tls_record_offset+5], len);
 #endif
-    
-    flow->l4.tcp.tls_record_offset += len + 9;
 
-    if(flow->l4.tcp.tls_record_offset < packet->payload_packet_len)
-      return(getSSCertificateFingerprint(ndpi_struct, flow));
-    else {
-      flow->l4.tcp.tls_record_offset -= packet->payload_packet_len;      
+    if(len > 4096) {
+      /* This looks an invalid len: we giveup */
+      flow->l4.tcp.tls_record_offset = 0, flow->l4.tcp.tls_srv_cert_fingerprint_processed = 1;
+#ifdef DEBUG_TLS
+      printf("=>> [TLS] Invalid fingerprint processing %u <-> %u\n",
+	     ntohs(packet->tcp->source), ntohs(packet->tcp->dest));
+#endif
+      return(0);
+    } else {
+      flow->l4.tcp.tls_record_offset += len + 9;
+      
+      if(flow->l4.tcp.tls_record_offset < packet->payload_packet_len)
+	return(getSSCertificateFingerprint(ndpi_struct, flow));
+      else {
+	flow->l4.tcp.tls_record_offset -= packet->payload_packet_len;      
+      }
     }
   }
   

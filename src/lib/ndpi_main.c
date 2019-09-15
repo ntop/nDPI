@@ -3532,8 +3532,7 @@ void ndpi_apply_flow_protocol_to_packet(struct ndpi_flow_struct *flow,
 
 static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
-				   unsigned short packetlen)
-{
+				   unsigned short packetlen) {
   const struct ndpi_iphdr *decaps_iph = NULL;
   u_int16_t l3len;
   u_int16_t l4len;
@@ -3541,17 +3540,15 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   u_int8_t l4protocol;
   u_int8_t l4_result;
 
-  if (!flow) {
-    return 1;
-  }
+  if (!flow)
+    return 1;  
 
   /* reset payload_packet_len, will be set if ipv4 tcp or udp */
   flow->packet.payload_packet_len = 0;
   flow->packet.l4_packet_len = 0;
   flow->packet.l3_packet_len = packetlen;
 
-  flow->packet.tcp = NULL;
-  flow->packet.udp = NULL;
+  flow->packet.tcp = NULL, flow->packet.udp = NULL;
   flow->packet.generic_l4_ptr = NULL;
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   flow->packet.iphv6 = NULL;
@@ -3587,13 +3584,11 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
     return 1;
   }
 
-
   /* needed:
    *  - unfragmented packets
    *  - ip header <= packet len
    *  - ip total length >= packet len
    */
-
 
   l4ptr = NULL;
   l4len = 0;
@@ -3608,12 +3603,12 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 
   flow->packet.l4_protocol = l4protocol;
   flow->packet.l4_packet_len = l4len;
-
+  flow->l4_proto = l4protocol;
+  
   /* tcp / udp detection */
   if(l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */ ) {
     /* tcp */
     flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
-
     if(flow->packet.l4_packet_len >=flow->packet.tcp->doff * 4) {
       flow->packet.payload_packet_len =
 	flow->packet.l4_packet_len -flow->packet.tcp->doff * 4;
@@ -3863,6 +3858,7 @@ void check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
        && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_udp[a].detection_bitmask,
 			       detection_bitmask) != 0) {
       ndpi_struct->callback_buffer_udp[a].func(ndpi_struct, flow);
+	     
       // NDPI_LOG_DBG(ndpi_struct, "[UDP,CALL] dissector of protocol as callback_buffer idx =  %d\n",a);
       if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	break; /* Stop after detecting the first protocol */
@@ -6120,9 +6116,11 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow->http.url)          ndpi_free(flow->http.url);
     if(flow->http.content_type) ndpi_free(flow->http.content_type);
 
-    if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
-      ndpi_free(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
-
+    if(flow->l4_proto == IPPROTO_TCP) {
+      if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
+	ndpi_free(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
+    }
+    
     ndpi_free(flow);
   }
 }
@@ -6136,8 +6134,7 @@ char* ndpi_revision() { return(NDPI_GIT_RELEASE); }
 #ifdef WIN32
 
 /* https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows */
-int gettimeofday(struct timeval * tp, struct timezone * tzp)
-{
+int gettimeofday(struct timeval * tp, struct timezone * tzp) {
   // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
   // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
   // until 00:00:00 January 1, 1970
