@@ -1,0 +1,25 @@
+CC=@CC@
+CFLAGS=-I. -I../src/include -I./src/lib/third_party/include -shared -Wl,
+LIBNDPI=../src/lib/libndpi.so.@NDPI_VERSION_SHORT@
+LDFLAGS=$(CFILE) $(LIBNDPI) -lpcap
+SHARE = -soname,ndpi_wrap
+SO=ndpi_wrap.so
+OBJS = ndpi_wrap.o
+CFILE = ndpi_wrap.c
+PIC = -fPIC
+PREFIX?=/usr/local
+.PHONY: all
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)#do something for linux
+	SHARE=-install_name,ndpiReader.so
+endif
+
+all: $(SO)
+
+$(SO): $(CFILE) $(LIBNDPI)
+	$(CC) $(CFLAGS)$(SHARE) -o $@ $(PIC) $(LDFLAGS)
+	ln -s $(LIBNDPI) .
+
+clean:
+	/bin/rm -f $(SO)
