@@ -1164,8 +1164,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
 	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	 && (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server[0] == '\0'))
-	; /* Wait for JA3S certificate */
+	 && (!flow->ndpi_flow->l4.tcp.tls_srv_cert_fingerprint_processed))
+	; /* Wait for certificate fingerprint */
       else {
 	/* New protocol detected or give up */
 	flow->detection_completed = 1;

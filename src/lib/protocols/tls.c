@@ -65,19 +65,11 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
 						 struct ndpi_flow_struct *flow, u_int32_t protocol) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.ja3_client[0] != '\0'))
-     || ((flow->l4.tcp.tls_seen_server_cert == 1) && (flow->protos.stun_ssl.ssl.ja3_server[0] != '\0'))
-     // || (flow->host_server_name[0] != '\0')
-     )
-    protocol = NDPI_PROTOCOL_TLS;
-  else
-    protocol =  NDPI_PROTOCOL_TLS_NO_CERT;
+  protocol = NDPI_PROTOCOL_TLS;
 
   if(packet->tcp != NULL) {
     switch(protocol) {
-
     case NDPI_PROTOCOL_TLS:
-    case NDPI_PROTOCOL_TLS_NO_CERT:
       {
 	/*
 	  In case of SSL there are probably sub-protocols
@@ -104,9 +96,9 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
 
 static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow, u_int32_t protocol) {
-  if((protocol != NDPI_PROTOCOL_TLS) && (protocol != NDPI_PROTOCOL_TLS_NO_CERT)) {
+  if(protocol != NDPI_PROTOCOL_TLS)
     ;
-  } else
+  else
     protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);
 
   ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_TLS);
@@ -763,13 +755,23 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
       return(1); /* More packets please */
     }
   }  
+
+  if(packet->payload[flow->l4.tcp.tls_record_offset] == 0x15 /* Alert */) {
+    u_int len = ntohs(*(u_int16_t*)&packet->payload[flow->l4.tcp.tls_record_offset+3]) + 5 /* SSL header len */;
+
+    if(len < 10 /* Sanity check */) {
+      if((flow->l4.tcp.tls_record_offset+len) < packet->payload_packet_len)
+	flow->l4.tcp.tls_record_offset += len;
+    } else
+      goto invalid_len;
+  }
   
   multiple_messages = (packet->payload[flow->l4.tcp.tls_record_offset] == 0x16 /* Handshake */) ? 0 : 1;
 
 #ifdef DEBUG_TLS
   printf("=>> [TLS] [multiple_messages: %d]\n", multiple_messages);
 #endif
-  
+
   if((!multiple_messages) && (packet->payload[flow->l4.tcp.tls_record_offset] != 0x16 /* Handshake */))
     return(1);
   else if(((!multiple_messages) && (packet->payload[flow->l4.tcp.tls_record_offset+5] == 0xb) /* Certificate */)
@@ -809,6 +811,7 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
 #endif
 
     if(len > 4096) {
+    invalid_len:
       /* This looks an invalid len: we giveup */
       flow->l4.tcp.tls_record_offset = 0, flow->l4.tcp.tls_srv_cert_fingerprint_processed = 1;
 #ifdef DEBUG_TLS
@@ -1007,8 +1010,9 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
       if(((packet->tls_certificate_num_checks >= 3)
 	  && (flow->l4.tcp.seen_syn)
 	  && (flow->l4.tcp.seen_syn_ack)
-	  && (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */)
-	 || (flow->protos.stun_ssl.ssl.ja3_server[0] != '\0')
+	  && (flow->l4.tcp.seen_ack) /* We have seen the 3-way handshake */
+	  && flow->l4.tcp.tls_srv_cert_fingerprint_processed)
+	 /* || (flow->protos.stun_ssl.ssl.ja3_server[0] != '\0') */
 	 ) {
 	/* We're done processing extra packets since we've probably checked all possible cert packets */
 	return(rc);
@@ -1188,7 +1192,7 @@ static void tls_mark_and_payload_search(struct ndpi_detection_module_struct
        && (!(flow->l4.tcp.tls_seen_client_cert && flow->l4.tcp.tls_seen_server_cert))) {
       /* SSL without certificate (Skype, Ultrasurf?) */
       NDPI_LOG_INFO(ndpi_struct, "found ssl NO_CERT\n");
-      ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS_NO_CERT);
+      ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
     } else if((packet->tls_certificate_num_checks >= 3)
 	      && flow->l4.tcp.tls_srv_cert_fingerprint_processed) {
       NDPI_LOG_INFO(ndpi_struct, "found ssl\n");

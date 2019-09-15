@@ -1118,10 +1118,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_TLS, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TLS_NO_CERT,
-			    1 /* can_have_a_subprotocol */, custom_master,
-			    no_master, "TLS_No_Cert", NDPI_PROTOCOL_CATEGORY_WEB,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_FREE_64,
+			    0 /* can_have_a_subprotocol */, no_master,
+			    no_master, "Free64", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_IRC,
@@ -1262,10 +1261,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    custom_master[0] = NDPI_PROTOCOL_TLS_NO_CERT, custom_master[1] = NDPI_PROTOCOL_UNKNOWN;
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_TLS,
 			    1 /* can_have_a_subprotocol */, no_master,
-			    custom_master, "TLS", NDPI_PROTOCOL_CATEGORY_WEB,
+			    no_master, "TLS", NDPI_PROTOCOL_CATEGORY_WEB,
 			    ndpi_build_default_ports(ports_a, 443, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SSH,
@@ -4071,7 +4069,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
 	 && (flow->l4.tcp.tls_stage > 1))
-	flow->guessed_protocol_id = NDPI_PROTOCOL_TLS_NO_CERT;
+	flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 
       guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
 
@@ -4484,6 +4482,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   flow->num_processed_pkts++;
 
+  /* Init default */
+  ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+  
   if(flow->server_id == NULL) flow->server_id = dst; /* Default */
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     /*
@@ -4492,13 +4493,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     */
     if(flow->check_extra_packets
        /*
-	 && ((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS)
-	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_TLS))
+	 && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS)
        */
        ) {
       ndpi_process_extra_packet(ndpi_struct, flow, packet, packetlen, current_tick_l, src, dst);
-      if(flow->check_extra_packets == 0)
-	ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       
       return(ret);
     } else
