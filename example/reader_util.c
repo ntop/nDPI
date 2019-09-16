@@ -994,6 +994,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server);
       flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_unsafe_cipher;
       flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_cipher;
+      memcpy(flow->ssh_tls.sha1_cert_fingerprint,
+	     flow->ndpi_flow->l4.tcp.tls_sha1_certificate_fingerprint, 20);
     }
   }
 
@@ -1171,8 +1173,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
 	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	 && (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server[0] == '\0'))
-	; /* Wait for JA3S certificate */
+	 && (!flow->ndpi_flow->l4.tcp.tls_srv_cert_fingerprint_processed))
+	; /* Wait for certificate fingerprint */
       else {
 	/* New protocol detected or give up */
 	flow->detection_completed = 1;

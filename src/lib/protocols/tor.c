@@ -101,7 +101,7 @@ void ndpi_search_tor(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   NDPI_LOG_DBG(ndpi_struct, "search for TOR\n");
 
   if((packet->tcp != NULL)
-     && (!packet->ssl_certificate_detected)) {
+     && (!packet->tls_certificate_detected)) {
     u_int16_t dport, sport;
     
     sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);
