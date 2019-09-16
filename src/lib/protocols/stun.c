@@ -30,10 +30,8 @@
 
 #define MAX_NUM_STUN_PKTS     8
 
-#if 0
-#define DEBUG_STUN 1
-#define DEBUG_LRU  1
-#endif
+// #define DEBUG_STUN 1
+// #define DEBUG_LRU  1
 
 struct stun_packet_header {
   u_int16_t msg_type, msg_len;
@@ -52,9 +50,9 @@ u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
 
 /* ************************************************************ */
 
-static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					 struct ndpi_flow_struct *flow,
-					 u_int app_proto, u_int proto) {
+void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow,
+				  u_int app_proto, u_int proto) {
   if(ndpi_struct->stun_cache == NULL)
     ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
 
@@ -62,24 +60,40 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
      && flow->packet.iph
      && flow->packet.udp
      && (app_proto != NDPI_PROTOCOL_UNKNOWN)
-    ) /* Cache flow sender info */ {
+     ) /* Cache flow sender info */ {
     u_int32_t key = get_stun_lru_key(flow, 0);
     u_int16_t cached_proto;
-    
-    if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
+
+    if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key,
+			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
 #ifdef DEBUG_LRU
       printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key, cached_proto, proto, app_proto);
 #endif
-      app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;      
-    } else {    
+      app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
+    } else {
+      u_int32_t key1 = get_stun_lru_key(flow, 1);
+
+      if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key1,
+			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
 #ifdef DEBUG_LRU
-      printf("[LRU] ADDING %u / %u.%u\n", key, proto, app_proto);
+	printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key1, cached_proto, proto, app_proto);
 #endif
-      
-      ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto);
+	app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
+      } else {
+	if(app_proto != NDPI_PROTOCOL_STUN) {
+	  /* No sense to ass STUN, but only subprotocols */
+	  
+#ifdef DEBUG_LRU
+	  printf("[LRU] ADDING %u / %u.%u [%u -> %u]\n", key, proto, app_proto,
+		 ntohs(flow->packet.udp->source), ntohs(flow->packet.udp->dest));
+#endif
+	  
+	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto);
+	}
+      }
     }
   }
-  
+
   ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, proto);
 }
 
@@ -174,7 +188,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     )
     printf("[STUN] Here we go\n");;
 #endif
-  
+
   if(ndpi_struct->stun_cache) {
     u_int16_t proto;
     u_int32_t key = get_stun_lru_key(flow, 0);
@@ -186,18 +200,18 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
     if(!rc) {
       key = get_stun_lru_key(flow, 1);
-      rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */);      
+      rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto, 0 /* Don't remove it as it can be used for other connections */);
 
 #ifdef DEBUG_LRU
     printf("[LRU] Searching %u\n", key);
 #endif
     }
-   
+
     if(rc) {
 #ifdef DEBUG_LRU
       printf("[LRU] Cache FOUND %u / %u\n", key, proto);
 #endif
-      
+
       flow->guessed_host_protocol_id = proto, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
       switch(proto) {
@@ -214,19 +228,19 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	flow->protos.stun_ssl.stun.is_skype = 1;
 	break;
       }
-      
+
       return(NDPI_IS_STUN);
     } else {
 #ifdef DEBUG_LRU
       printf("[LRU] NOT FOUND %u\n", key);
-#endif     
-    }	  
+#endif
+    }
   } else {
 #ifdef DEBUG_LRU
     printf("[LRU] NO/EMPTY CACHE\n");
 #endif
   }
-  
+
   if(msg_type == 0x01 /* Binding Request */) {
     flow->protos.stun_ssl.stun.num_binding_requests++;
 
@@ -235,10 +249,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     else
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_STUN;
 
-    flow->protos.stun_ssl.stun.num_udp_pkts++;
-
-    if(msg_len == 0)
+    if(msg_len == 0) {
+      flow->protos.stun_ssl.stun.num_udp_pkts++;
       return(NDPI_IS_NOT_STUN); /* This to keep analyzing STUN instead of giving up */
+    }
   }
 
   if((msg_len == 0) && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)) {
@@ -330,9 +344,16 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	    for(j=0; j<i; j++)
 	      flow->host_server_name[j] = payload[k++];
 
+#ifdef DEBUG_STUN
+	    printf("==> [%s]\n", flow->host_server_name);
+#endif
+
 	    if(strstr((char*)flow->host_server_name, "google.com") != NULL) {
 	      *is_duo = 1;
 	      flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
+	      return(NDPI_IS_STUN);
+	    } else if(strstr((char*)flow->host_server_name, "whispersystems.org") != NULL) {
+	      flow->guessed_host_protocol_id = NDPI_PROTOCOL_SIGNAL, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 	      return(NDPI_IS_STUN);
 	    }
 	  }
@@ -345,13 +366,15 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	      *is_messenger = 1;
 	      return(NDPI_IS_STUN);
 	    } else if(msg_len == 76) {
+#if 0
 	      *is_duo = 1;
-	      
+
 	      if(1) {
 		flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO, flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 		return(NDPI_IS_NOT_STUN); /* This case is found also with signal traffic */
 	      } else
 		return(NDPI_IS_STUN);
+#endif
 	    }
 	  }
 	  break;
@@ -442,7 +465,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
  udp_stun_found:
   if(can_this_be_whatsapp_voice) {
     struct ndpi_packet_struct *packet = &flow->packet;
-
+    int rc;
+    
     flow->protos.stun_ssl.stun.num_processed_pkts++;
 #ifdef DEBUG_STUN
     printf("==>> NDPI_PROTOCOL_WHATSAPP_VOICE\n");
@@ -454,7 +478,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     } else
       flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
 					? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_VOICE;
-    return((flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN);
+
+    rc = (flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
+
+    if(rc == NDPI_IS_STUN)
+      ndpi_int_stun_add_connection(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_IS_STUN);
+
+    return(rc);
   } else {
     /*
       We cannot immediately say that this is STUN as there are other protocols
@@ -497,11 +527,14 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	} else if(is_duo) {
 	  ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
 	  return;
+	} else if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_SIGNAL) {
+	  ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_STUN);
+	  return;
 	} else if(flow->protos.stun_ssl.stun.is_skype || (flow->guessed_host_protocol_id = NDPI_PROTOCOL_SKYPE_CALL)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
 
 	  // if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
-	    ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
+	  ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
 	} else {
 	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
 	  ndpi_int_stun_add_connection(ndpi_struct, flow,
@@ -519,12 +552,15 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 			 packet->payload_packet_len,
 			 &is_whatsapp, &is_messenger, &is_duo) == NDPI_IS_STUN) {
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
-      
+
     if(is_messenger) {
       ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_STUN);
       return;
     } else if(is_duo) {
       ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN);
+      return;
+    } else if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_SIGNAL) {
+      ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_STUN);
       return;
     } else if(flow->protos.stun_ssl.stun.is_skype) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype\n");
