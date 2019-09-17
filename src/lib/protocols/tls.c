@@ -918,17 +918,18 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 
 	if(len < (sizeof(utcDate)-1)) {
 	  struct tm utc;
+	  utc.tm_isdst = -1; /* Not set by strptime */
 
 	  strncpy(utcDate, (const char*)&packet->payload[i+4], len);
 	  utcDate[len] = '\0';
 
 	  /* 141021000000Z */
-	  if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
+	  if(strptime(utcDate, "%d%m%y%H%M%SZ", &utc) != NULL) {
+	    flow->protos.stun_ssl.ssl.notBefore = timegm(&utc);
 #ifdef DEBUG_TLS
 	    printf("[CERTIFICATE] notBefore %u [%s]\n",
-		   (unsigned int)mktime(&utc), utcDate);
+		   flow->protos.stun_ssl.ssl.notBefore, utcDate);
 #endif
-	    flow->protos.stun_ssl.ssl.notBefore = timegm(&utc);
 	  }
 	}
 
@@ -948,17 +949,18 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    if(len < (sizeof(utcDate)-1)) {
 	      struct tm utc;
+	      utc.tm_isdst = -1; /* Not set by strptime */
 
 	      strncpy(utcDate, (const char*)&packet->payload[offset], len);
 	      utcDate[len] = '\0';
 
 	      /* 141021000000Z */
-	      if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
+	      if(strptime(utcDate, "%d%m%y%H%M%SZ", &utc) != NULL) {
+		flow->protos.stun_ssl.ssl.notAfter = timegm(&utc);
 #ifdef DEBUG_TLS
 		printf("[CERTIFICATE] notAfter %u [%s]\n",
-		       (unsigned int)mktime(&utc), utcDate);
+		       flow->protos.stun_ssl.ssl.notAfter, utcDate);
 #endif
-		flow->protos.stun_ssl.ssl.notAfter = timegm(&utc);
 	      }
 	    }
 	  }
