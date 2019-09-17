@@ -924,7 +924,7 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 	  utcDate[len] = '\0';
 
 	  /* 141021000000Z */
-	  if(strptime(utcDate, "%d%m%y%H%M%SZ", &utc) != NULL) {
+	  if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
 	    flow->protos.stun_ssl.ssl.notBefore = timegm(&utc);
 #ifdef DEBUG_TLS
 	    printf("[CERTIFICATE] notBefore %u [%s]\n",
@@ -955,7 +955,7 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 	      utcDate[len] = '\0';
 
 	      /* 141021000000Z */
-	      if(strptime(utcDate, "%d%m%y%H%M%SZ", &utc) != NULL) {
+	      if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
 		flow->protos.stun_ssl.ssl.notAfter = timegm(&utc);
 #ifdef DEBUG_TLS
 		printf("[CERTIFICATE] notAfter %u [%s]\n",
