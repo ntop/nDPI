@@ -530,7 +530,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	} else if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_SIGNAL) {
 	  ndpi_int_stun_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_STUN);
 	  return;
-	} else if(flow->protos.stun_ssl.stun.is_skype || (flow->guessed_host_protocol_id = NDPI_PROTOCOL_SKYPE_CALL)) {
+	} else if(flow->protos.stun_ssl.stun.is_skype || (flow->guessed_host_protocol_id == NDPI_PROTOCOL_SKYPE_CALL)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found Skype\n");
 
 	  // if((flow->protos.stun_ssl.stun.num_processed_pkts >= 8) || (flow->protos.stun_ssl.stun.num_binding_requests >= 4))
