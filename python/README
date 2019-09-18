@@ -1,0 +1,7 @@
+This direcgory contains the Python bindings for nDPI
+
+Usage:
+- python3 ndpi_example.py <interface>
+- python3 ndpi_example.py <pcap_file>
+
+Code courtesy of Massimo Puddu

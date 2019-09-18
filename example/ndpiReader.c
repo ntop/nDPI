@@ -584,15 +584,21 @@ void printCSVHeader() {
   fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,");
   fprintf(csv_fp, "src2dst_packets,src2dst_bytes,dst2src_packets,dst2src_bytes,");
   fprintf(csv_fp, "data_ratio,str_data_ratio,");
-
+ 
   /* IAT (Inter Arrival Time) */
   fprintf(csv_fp, "iat_flow_min,iat_flow_avg,iat_flow_max,iat_flow_stddev,");
   fprintf(csv_fp, "iat_c_to_s_min,iat_c_to_s_avg,iat_c_to_s_max,iat_c_to_s_stddev,");
   fprintf(csv_fp, "iat_s_to_c_min,iat_s_to_c_avg,iat_s_to_c_max,iat_s_to_c_stddev,");
 
-/* Packet Length */
-  fprintf(csv_fp, "pktlen_c_to_s_min,pktlen_c_to_s_avg,pktlen_c_to_s_max,pktlen_c_to_s_stddev");
-  fprintf(csv_fp, "pktlen_s_to_c_min,pktlen_s_to_c_avg,pktlen_s_to_c_max,pktlen_s_to_c_stddev");
+  /* Packet Length */
+  fprintf(csv_fp, "pktlen_c_to_s_min,pktlen_c_to_s_avg,pktlen_c_to_s_max,pktlen_c_to_s_stddev,");
+  fprintf(csv_fp, "pktlen_s_to_c_min,pktlen_s_to_c_avg,pktlen_s_to_c_max,pktlen_s_to_c_stddev,");
+
+  /* Flow info */
+  fprintf(csv_fp, "client_info,server_info,");
+  fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
+  fprintf(csv_fp, "tls_server_info,ja3s,tls_server_unsafe,");
+  fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh");
   fprintf(csv_fp, "\n");
 }
 
@@ -970,6 +976,23 @@ static char* print_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
+static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
+  switch(c) {
+  case ndpi_cipher_insecure:
+    return("INSECURE");
+    break;
+
+  case ndpi_cipher_weak:
+    return("WEAK");
+    break;
+
+  default:
+    return("OK");
+  }
+}
+
+/* ********************************** */
+
 /**
  * @brief Print the flow
  */
@@ -1001,22 +1024,39 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(csv_fp, "%u,%llu,", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
     fprintf(csv_fp, "%u,%llu,", flow->dst2src_packets, (long long unsigned int) flow->dst2src_bytes);
-
     fprintf(csv_fp, "%.3f,%s,", data_ratio, ndpi_data_ratio2str(data_ratio));
-
+  
     /* IAT (Inter Arrival Time) */
-    fprintf(csv_fp, "%u,%.1f,%u,%.1f",
+    fprintf(csv_fp, "%u,%.1f,%u,%.1f,",
 	    ndpi_data_min(flow->iat_flow), ndpi_data_average(flow->iat_flow), ndpi_data_max(flow->iat_flow), ndpi_data_stddev(flow->iat_flow));
 
-    fprintf(csv_fp, "%u,%.1f,%u,%.1f,%u,%.1f,%u,%.1f",
+    fprintf(csv_fp, "%u,%.1f,%u,%.1f,%u,%.1f,%u,%.1f,",
 	   ndpi_data_min(flow->iat_c_to_s), ndpi_data_average(flow->iat_c_to_s), ndpi_data_max(flow->iat_c_to_s), ndpi_data_stddev(flow->iat_c_to_s),
 	   ndpi_data_min(flow->iat_s_to_c), ndpi_data_average(flow->iat_s_to_c), ndpi_data_max(flow->iat_s_to_c), ndpi_data_stddev(flow->iat_s_to_c));
 
     /* Packet Length */
-    fprintf(csv_fp, "%u,%.1f,%u,%.1f,%u,%.1f,%u,%.1f",
+    fprintf(csv_fp, "%u,%.1f,%u,%.1f,%u,%.1f,%u,%.1f,",
 	   ndpi_data_min(flow->pktlen_c_to_s), ndpi_data_average(flow->pktlen_c_to_s), ndpi_data_max(flow->pktlen_c_to_s), ndpi_data_stddev(flow->pktlen_c_to_s),
 	   ndpi_data_min(flow->pktlen_s_to_c), ndpi_data_average(flow->pktlen_s_to_c), ndpi_data_max(flow->pktlen_s_to_c), ndpi_data_stddev(flow->pktlen_s_to_c));
 
+    fprintf(csv_fp, "%s,%s,",
+	    (flow->ssh_tls.client_info[0] != '\0')  ? flow->ssh_tls.client_info : "",
+	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
+    
+    fprintf(csv_fp, "%s,%s,%s,",
+	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version) : "",
+	    (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
+	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "");
+
+    fprintf(csv_fp, "%s,%s,",
+	    (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "",
+	    (flow->ssh_tls.ja3_server[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.server_unsafe_cipher) : "");
+
+    fprintf(csv_fp, "%s,%s",
+	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "",
+	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : ""
+	    );
+	    
      fprintf(csv_fp, "\n");
   }
 
@@ -1024,6 +1064,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     return;
 
   if(!json_flag) {
+    u_int i;
+    
     fprintf(out, "\t%u", id);
 
     fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
@@ -1101,6 +1143,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
 						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
+    
     if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[Server: %s]", flow->ssh_tls.server_info);
     if(flow->ssh_tls.server_hassh[0] != '\0') fprintf(out, "[HASSH-S: %s]", flow->ssh_tls.server_hassh);
 
@@ -1108,6 +1151,21 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 						    print_cipher(flow->ssh_tls.server_unsafe_cipher));
     if(flow->ssh_tls.server_organization[0] != '\0') fprintf(out, "[Organization: %s]", flow->ssh_tls.server_organization);
 
+    if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
+       || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)) {
+      if((flow->ssh_tls.sha1_cert_fingerprint[0] == 0)
+	 && (flow->ssh_tls.sha1_cert_fingerprint[1] == 0)
+	 && (flow->ssh_tls.sha1_cert_fingerprint[2] == 0))
+	; /* Looks empty */
+      else {
+	fprintf(out, "[Certificate SHA-1: ");
+	for(i=0; i<20; i++)
+	  fprintf(out, "%s%02X", (i > 0) ? ":" : "",
+		  flow->ssh_tls.sha1_cert_fingerprint[i] & 0xFF);
+	fprintf(out, "]");
+      }
+    }
+    
     if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {
       char notBefore[32], notAfter[32];
       struct tm a, b;
@@ -2253,13 +2311,22 @@ void printPortStats(struct port_stats *stats) {
 /* *********************************************** */
 
 static void printFlowsStats() {
+  int thread_id;
+  u_int32_t total_flows = 0;
+  FILE *out = results_file ? results_file : stdout;
+  
   if(enable_payload_analyzer)
     ndpi_report_payload_stats();
 
+  for(thread_id = 0; thread_id < num_threads; thread_id++)
+    total_flows += ndpi_thread_info[thread_id].workflow->num_allocated_flows;
+  
+  if((all_flows = (struct flow_info*)malloc(sizeof(struct flow_info)*total_flows)) == NULL) {
+    fprintf(out, "Fatal error: not enough memory\n");
+    exit(-1);
+  }
+  
   if(verbose) {
-    int thread_id;
-    FILE *out = results_file ? results_file : stdout;
-    u_int32_t total_flows = 0;
     ndpi_host_ja3_fingerprints *ja3ByHostsHashT = NULL; // outer hash table
     ndpi_ja3_fingerprints_host *hostByJA3C_ht = NULL;   // for client
     ndpi_ja3_fingerprints_host *hostByJA3S_ht = NULL;   // for server
@@ -2270,14 +2337,6 @@ static void printFlowsStats() {
     ndpi_ja3_info *tmp2 = NULL;
     unsigned int num_ja3_client;
     unsigned int num_ja3_server;
-
-    for(thread_id = 0; thread_id < num_threads; thread_id++)
-      total_flows += ndpi_thread_info[thread_id].workflow->num_allocated_flows;
-
-    if((all_flows = (struct flow_info*)malloc(sizeof(struct flow_info)*total_flows)) == NULL) {
-      fprintf(out, "Fatal error: not enough memory\n");
-      exit(-1);
-    }
 
     if(!json_flag) fprintf(out, "\n");
 
@@ -2607,8 +2666,8 @@ static void printFlowsStats() {
     qsort(all_flows, num_flows, sizeof(struct flow_info), cmpFlows);
 
     if(verbose > 1) {
-    for(i=0; i<num_flows; i++)
-      printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
+      for(i=0; i<num_flows; i++)
+	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
     }
 
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
@@ -2639,8 +2698,21 @@ static void printFlowsStats() {
     for(i=0; i<num_flows; i++)
       printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
 
-    free(all_flows);
+  } else if(csv_fp != NULL) {
+    int i;
+
+    num_flows = 0;
+    for(thread_id = 0; thread_id < num_threads; thread_id++) {
+      for(i=0; i<NUM_ROOTS; i++)
+	ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
+		   node_print_known_proto_walker, &thread_id);
+    }
+
+    for(i=0; i<num_flows; i++)
+	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);    
   }
+
+  free(all_flows);
 }
 
 /* *********************************************** */

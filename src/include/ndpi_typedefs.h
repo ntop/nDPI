@@ -602,12 +602,18 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_TELNET */
   u_int32_t telnet_stage:2;			// 0 - 2
 
+  void* tls_srv_cert_fingerprint_ctx;
+  
   /* NDPI_PROTOCOL_TLS */
-  u_int8_t ssl_seen_client_cert:1,
-    ssl_seen_server_cert:1,
-    ssl_seen_certificate:1,
-    ssl_stage:2; // 0 - 5
-
+  u_int8_t tls_seen_client_cert:1,
+    tls_seen_server_cert:1,
+    tls_seen_certificate:1,
+    tls_srv_cert_fingerprint_found:1,
+    tls_srv_cert_fingerprint_processed:1,
+    tls_stage:2, _pad:1; // 0 - 5
+  int16_t tls_record_offset, tls_fingerprint_len; /* Need to be signed */
+  u_int8_t tls_sha1_certificate_fingerprint[20];
+  
   /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
 
@@ -793,7 +799,7 @@ struct ndpi_packet_struct {
   u_int8_t tcp_retransmission;
   u_int8_t l4_protocol;
 
-  u_int8_t ssl_certificate_detected:4, ssl_certificate_num_checks:4;
+  u_int8_t tls_certificate_detected:4, tls_certificate_num_checks:4;
   u_int8_t packet_lines_parsed_complete:1,
     packet_direction:1, empty_line_position_set:1, pad:5;
 };
@@ -1110,7 +1116,7 @@ struct ndpi_flow_struct {
 
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
-  u_int8_t protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
+  u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
 
   /*
     if ndpi_struct->direction_detect_disable == 1
