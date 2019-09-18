@@ -31,7 +31,7 @@
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 
-// #define DEBUG_TLS 1
+/* #define DEBUG_TLS 1 */
 
 #define DEBUG_FINGERPRINT 1
 
@@ -647,6 +647,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  } /* while */
 
 		  if(!invalid_ja3) {
+		  compute_ja3c:
 		    ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.tls_handshake_version);
 
 		    for(i=0; i<ja3.num_cipher; i++) {
@@ -696,6 +697,9 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  return(2 /* Client Certificate */);
 		}
+	      } else if(offset == total_len) {
+		/* SSL does not have extensions etc */
+		goto compute_ja3c;
 	      }
 	    }
 	  }
