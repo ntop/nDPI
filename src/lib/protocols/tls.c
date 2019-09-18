@@ -918,17 +918,18 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 
 	if(len < (sizeof(utcDate)-1)) {
 	  struct tm utc;
+	  utc.tm_isdst = -1; /* Not set by strptime */
 
 	  strncpy(utcDate, (const char*)&packet->payload[i+4], len);
 	  utcDate[len] = '\0';
 
 	  /* 141021000000Z */
 	  if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
+	    flow->protos.stun_ssl.ssl.notBefore = timegm(&utc);
 #ifdef DEBUG_TLS
 	    printf("[CERTIFICATE] notBefore %u [%s]\n",
-		   (unsigned int)mktime(&utc), utcDate);
+		   flow->protos.stun_ssl.ssl.notBefore, utcDate);
 #endif
-	    flow->protos.stun_ssl.ssl.notBefore = timegm(&utc);
 	  }
 	}
 
@@ -948,17 +949,18 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    if(len < (sizeof(utcDate)-1)) {
 	      struct tm utc;
+	      utc.tm_isdst = -1; /* Not set by strptime */
 
 	      strncpy(utcDate, (const char*)&packet->payload[offset], len);
 	      utcDate[len] = '\0';
 
 	      /* 141021000000Z */
 	      if(strptime(utcDate, "%y%m%d%H%M%SZ", &utc) != NULL) {
+		flow->protos.stun_ssl.ssl.notAfter = timegm(&utc);
 #ifdef DEBUG_TLS
 		printf("[CERTIFICATE] notAfter %u [%s]\n",
-		       (unsigned int)mktime(&utc), utcDate);
+		       flow->protos.stun_ssl.ssl.notAfter, utcDate);
 #endif
-		flow->protos.stun_ssl.ssl.notAfter = timegm(&utc);
 	      }
 	    }
 	  }
@@ -1329,16 +1331,18 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
       flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 
       if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
-	u_int32_t key = get_stun_lru_key(flow, 1);
-
 	if(ndpi_struct->stun_cache == NULL)
 	  ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
-	ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, NDPI_PROTOCOL_SIGNAL);
 
+	if(ndpi_struct->stun_cache) {
 #ifdef DEBUG_TLS
-	printf("[LRU] Adding Signal cached key %u\n", key);
+	  printf("[LRU] Adding Signal cached keys\n");
 #endif
-	
+	  
+	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, get_stun_lru_key(flow, 0), NDPI_PROTOCOL_SIGNAL);
+	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, get_stun_lru_key(flow, 1), NDPI_PROTOCOL_SIGNAL);
+	}
+		
 	/* In Signal protocol STUN turns into DTLS... */
 	ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SIGNAL);
       } else if(flow->protos.stun_ssl.ssl.ja3_server[0] != '\0') {

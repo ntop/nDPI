@@ -1,7 +1,6 @@
 HTTP	11	726	3
 MDNS	8	952	4
 DHCP	10	3420	1
-STUN	27	2322	2
 ICMP	10	700	1
 RTP	44	7818	2
 TLS	8	589	2
@@ -9,7 +8,7 @@ Dropbox	4	2176	1
 Apple	190	50263	21
 WhatsApp	182	25154	2
 Spotify	3	258	1
-WhatsAppVoice	732	92802	16
+WhatsAppVoice	759	95124	18
 ApplePush	22	5926	1
 
 JA3 Host Stats: 
@@ -29,8 +28,8 @@ JA3 Host Stats:
 	10	UDP 192.168.2.4:52794 <-> 31.13.84.48:3478 [proto: 87/RTP][cat: Media/1][9 pkts/1842 bytes <-> 11 pkts/1151 bytes][bytes ratio: 0.231 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 1790.6/713.6 6986/6468 2740.8/1919.9][Pkt Len c2s/s2c min/avg/max/stddev: 68/64 204.7/104.6 331/128 81.8/22.8]
 	11	UDP 192.168.2.1:17500 -> 192.168.2.255:17500 [proto: 121/Dropbox][cat: Cloud/13][4 pkts/2176 bytes -> 0 pkts/0 bytes][PLAIN TEXT ( 3375359593)]
 	12	TCP 192.168.2.4:49199 <-> 17.172.100.70:993 [proto: 51.140/IMAPS.Apple][cat: Web/5][9 pkts/1130 bytes <-> 8 pkts/868 bytes][bytes ratio: 0.131 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 9/53 116.9/111.0 275/175 106.0/50.4][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 125.6/108.5 236/151 68.4/42.5]
-	13	UDP 192.168.2.4:51518 -> 1.194.90.191:60312 [proto: 78/STUN][cat: Network/14][15 pkts/1290 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 614/0 631.7/0.0 667/0 12.9/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86.0/0.0 86/0 0.0/0.0]
-	14	UDP 192.168.2.4:52794 -> 1.194.90.191:51727 [proto: 78/STUN][cat: Network/14][12 pkts/1032 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 625/0 631.1/0.0 644/0 5.5/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86.0/0.0 86/0 0.0/0.0]
+	13	UDP 192.168.2.4:51518 -> 1.194.90.191:60312 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][15 pkts/1290 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 614/0 631.7/0.0 667/0 12.9/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86.0/0.0 86/0 0.0/0.0]
+	14	UDP 192.168.2.4:52794 -> 1.194.90.191:51727 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][12 pkts/1032 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 625/0 631.1/0.0 644/0 5.5/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86.0/0.0 86/0 0.0/0.0]
 	15	ICMP 192.168.2.4:0 -> 91.253.176.65:0 [proto: 81/ICMP][cat: Network/14][10 pkts/700 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/0 4794.7/0.0 42598/0 13366.1/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 70/0 70.0/0.0 70/0 0.0/0.0]
 	16	UDP 192.168.2.4:51518 <-> 31.13.64.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
 	17	UDP 192.168.2.4:51518 <-> 31.13.70.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
