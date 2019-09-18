@@ -8217,6 +8217,9 @@ static ndpi_network host_protocol_list[] = {
   { 0xD040C900 /* 208.64.201.0/22 */, 22, NDPI_PROTOCOL_STEAM },
   { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
 
+  /* Line */
+  { 0x7DD1FC00 /* 125.209.252.0/24 */, 24, NDPI_PROTOCOL_LINE },	
+
   { 0x0, 0, 0 }
 };
 
