@@ -250,7 +250,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_STUN;
 
     if(msg_len == 0) {
-      flow->protos.stun_ssl.stun.num_udp_pkts++;
+      /* flow->protos.stun_ssl.stun.num_udp_pkts++; */
       return(NDPI_IS_NOT_STUN); /* This to keep analyzing STUN instead of giving up */
     }
   }
