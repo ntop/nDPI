@@ -262,6 +262,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
   uint32_t tmp[256], i;
   unsigned int num_bytes;
   double mean = 0.0, variance = 0.0;
+  struct ndpi_entropy last_entropy = flow->last_entropy;
 
   fflush(out);
 
@@ -270,38 +271,38 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
    * if this flow is bidirectional
    */
   if (!flow->bidirectional) {
-    array = flow->src2dst_byte_count;
-    num_bytes = flow->src2dst_l4_bytes;
+    array = last_entropy.src2dst_byte_count;
+    num_bytes = last_entropy.src2dst_l4_bytes;
     for (i=0; i<256; i++) {
-      tmp[i] = flow->src2dst_byte_count[i];
+      tmp[i] = last_entropy.src2dst_byte_count[i];
     }
 
-    if (flow->src2dst_num_bytes != 0) {
-      mean = flow->src2dst_bd_mean;
-      variance = flow->src2dst_bd_variance/(flow->src2dst_num_bytes - 1);
+    if (last_entropy.src2dst_num_bytes != 0) {
+      mean = last_entropy.src2dst_bd_mean;
+      variance = last_entropy.src2dst_bd_variance/(last_entropy.src2dst_num_bytes - 1);
       variance = sqrt(variance);
 
-      if (flow->src2dst_num_bytes == 1) {
+      if (last_entropy.src2dst_num_bytes == 1) {
         variance = 0.0;
       }
     }
   } else {
     for (i=0; i<256; i++) {
-      tmp[i] = flow->src2dst_byte_count[i] + flow->dst2src_byte_count[i];
+      tmp[i] = last_entropy.src2dst_byte_count[i] + last_entropy.dst2src_byte_count[i];
     }
     array = tmp;
-    num_bytes = flow->src2dst_l4_bytes + flow->dst2src_l4_bytes;
+    num_bytes = last_entropy.src2dst_l4_bytes + last_entropy.dst2src_l4_bytes;
 
-    if (flow->src2dst_num_bytes + flow->dst2src_num_bytes != 0) {
-      mean = ((double)flow->src2dst_num_bytes)/((double)(flow->src2dst_num_bytes+flow->dst2src_num_bytes))*flow->src2dst_bd_mean +
-             ((double)flow->dst2src_num_bytes)/((double)(flow->dst2src_num_bytes+flow->src2dst_num_bytes))*flow->dst2src_bd_mean;
+    if (last_entropy.src2dst_num_bytes + last_entropy.dst2src_num_bytes != 0) {
+      mean = ((double)last_entropy.src2dst_num_bytes)/((double)(last_entropy.src2dst_num_bytes+last_entropy.dst2src_num_bytes))*last_entropy.src2dst_bd_mean +
+             ((double)last_entropy.dst2src_num_bytes)/((double)(last_entropy.dst2src_num_bytes+last_entropy.src2dst_num_bytes))*last_entropy.dst2src_bd_mean;
 
-      variance = ((double)flow->src2dst_num_bytes)/((double)(flow->src2dst_num_bytes+flow->dst2src_num_bytes))*flow->src2dst_bd_variance +
-                 ((double)flow->dst2src_num_bytes)/((double)(flow->dst2src_num_bytes+flow->src2dst_num_bytes))*flow->dst2src_bd_variance;
+      variance = ((double)last_entropy.src2dst_num_bytes)/((double)(last_entropy.src2dst_num_bytes+last_entropy.dst2src_num_bytes))*last_entropy.src2dst_bd_variance +
+                 ((double)last_entropy.dst2src_num_bytes)/((double)(last_entropy.dst2src_num_bytes+last_entropy.src2dst_num_bytes))*last_entropy.dst2src_bd_variance;
 
-      variance = variance/((double)(flow->src2dst_num_bytes + flow->dst2src_num_bytes - 1));
+      variance = variance/((double)(last_entropy.src2dst_num_bytes + last_entropy.dst2src_num_bytes - 1));
       variance = sqrt(variance);
-      if (flow->src2dst_num_bytes + flow->dst2src_num_bytes == 1) {
+      if (last_entropy.src2dst_num_bytes + last_entropy.dst2src_num_bytes == 1) {
         variance = 0.0;
       }
     }
@@ -1085,7 +1086,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       /* Print entropy values for monitored flows. */
       flowGetBDMeanandVariance(flow);
       fflush(out);
-      fprintf(out, "[score: %.4f]", flow->score);
+      fprintf(out, "[score: %.4f]", flow->entropy.score);
     }
 
     if(flow->detected_protocol.master_protocol) {

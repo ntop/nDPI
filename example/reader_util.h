@@ -124,6 +124,32 @@ struct flow_metrics {
   float entropy, average, stddev;
 };
 
+struct ndpi_entropy {
+  // Entropy fields
+  struct timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
+  u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
+  struct timeval src2dst_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
+  u_int16_t dst2src_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
+  struct timeval dst2src_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
+  struct timeval src2dst_start;                                /*!< first packet arrival time       */
+  struct timeval dst2src_start;                                /*!< first packet arrival time       */
+  u_int32_t src2dst_opackets;                                  /*!< non-zero packet counts          */
+  u_int32_t dst2src_opackets;                                  /*!< non-zero packet counts          */
+  u_int16_t src2dst_pkt_count;                                 /*!< packet counts                   */
+  u_int16_t dst2src_pkt_count;                                 /*!< packet counts                   */
+  u_int32_t src2dst_l4_bytes;                                  /*!< packet counts                   */
+  u_int32_t dst2src_l4_bytes;                                  /*!< packet counts                   */
+  u_int32_t src2dst_byte_count[MAX_BYTE_COUNT_ARRAY_LENGTH];   /*!< number of occurences of each byte   */
+  u_int32_t dst2src_byte_count[MAX_BYTE_COUNT_ARRAY_LENGTH];   /*!< number of occurences of each byte   */
+  u_int32_t src2dst_num_bytes;
+  u_int32_t dst2src_num_bytes;
+  double src2dst_bd_mean;
+  double src2dst_bd_variance;
+  double dst2src_bd_mean;
+  double dst2src_bd_variance;
+  float score;
+};
+
 // flow tracking
 typedef struct ndpi_flow_info {
   u_int32_t flow_id;
@@ -140,7 +166,6 @@ typedef struct ndpi_flow_info {
   u_int64_t first_seen, last_seen;
   u_int64_t src2dst_bytes, dst2src_bytes;
   u_int32_t src2dst_packets, dst2src_packets;
-  u_int32_t src2dst_opackets, dst2src_opackets;
   u_int32_t has_human_readeable_strings;
   char human_readeable_string_buffer[32];
   
@@ -170,28 +195,9 @@ typedef struct ndpi_flow_info {
   
   void *src_id, *dst_id;
 
-  struct timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
+  struct ndpi_entropy entropy;
+  struct ndpi_entropy last_entropy;
   
-  // Entropy fields
-  u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
-  struct timeval src2dst_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
-  u_int16_t dst2src_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
-  struct timeval dst2src_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
-  struct timeval src2dst_start;                                /*!< first packet arrival time       */
-  struct timeval dst2src_start;                                /*!< first packet arrival time       */
-  u_int16_t src2dst_pkt_count;                                 /*!< packet counts                   */
-  u_int16_t dst2src_pkt_count;                                 /*!< packet counts                   */
-  u_int32_t src2dst_l4_bytes;                                  /*!< packet counts                   */
-  u_int32_t dst2src_l4_bytes;                                  /*!< packet counts                   */
-  u_int32_t src2dst_byte_count[MAX_BYTE_COUNT_ARRAY_LENGTH];   /*!< number of occurences of each byte   */
-  u_int32_t dst2src_byte_count[MAX_BYTE_COUNT_ARRAY_LENGTH];   /*!< number of occurences of each byte   */
-  u_int32_t src2dst_num_bytes;
-  u_int32_t dst2src_num_bytes;
-  double src2dst_bd_mean;
-  double src2dst_bd_variance;
-  double dst2src_bd_mean;
-  double dst2src_bd_variance;
-  float score;
 } ndpi_flow_info_t;
 
 
