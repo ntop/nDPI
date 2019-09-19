@@ -5517,58 +5517,46 @@ void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_add
 
 /* ********************************************************************************* */
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-/* get the string representation of ip
- * returns a pointer to a static string
- * only valid until the next call of this function */
-char *ndpi_get_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
-			 const ndpi_ip_addr_t * ip)
-{
+char *ndpi_get_ip_string(const ndpi_ip_addr_t * ip, char *buf, u_int buf_len) {
   const u_int8_t *a = (const u_int8_t *) &ip->ipv4;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  if(ip->ipv6.u6_addr.u6_addr32[0] != 0 ||
-     ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
+  if(ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
      ip->ipv6.u6_addr.u6_addr32[2] != 0 ||
      ip->ipv6.u6_addr.u6_addr32[3] != 0) {
 
-    const u_int16_t *b = ip->ipv6.u6_addr.u6_addr16;
-    snprintf(ndpi_struct->ip_string, 32, "%x:%x:%x:%x:%x:%x:%x:%x",
-	     ntohs(b[0]), ntohs(b[1]), ntohs(b[2]), ntohs(b[3]),
-	     ntohs(b[4]), ntohs(b[5]), ntohs(b[6]), ntohs(b[7]));
+    if(inet_ntop(AF_INET6, &ip->ipv6.u6_addr, buf, buf_len) == NULL)
+      buf[0] = '\0';
 
-    return ndpi_struct->ip_string;
+    return buf;
   }
 #endif
 
-  snprintf(ndpi_struct->ip_string, 32, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
+  snprintf(buf, buf_len, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
 
-  return ndpi_struct->ip_string;
+  return buf;
 
 }
 
-/* ********************************************************************************* */
+/* ****************************************************** */
 
-/* get the string representation of the source ip address from packet */
-char *ndpi_get_packet_src_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
-				    const struct ndpi_packet_struct *packet)
-{
-  ndpi_ip_addr_t ip;
-  ndpi_packet_src_ip_get(packet, &ip);
-  return ndpi_get_ip_string(ndpi_struct, &ip);
+/* Returns -1 on failutre, otherwise fills parsed_ip and returns the IP version */
+int ndpi_parse_ip_string(const char *ip_str, ndpi_ip_addr_t *parsed_ip) {
+  int rv = -1;
+  memset(parsed_ip, 0, sizeof(*parsed_ip));
+
+  if(strchr(ip_str, '.')) {
+    if(inet_pton(AF_INET, ip_str, &parsed_ip->ipv4) > 0)
+      rv = 4;
+#ifdef NDPI_DETECTION_SUPPORT_IPV6
+  } else {
+    if(inet_pton(AF_INET6, ip_str, &parsed_ip->ipv6) > 0)
+      rv = 6;
+#endif
+  }
+
+  return(rv);
 }
-
-/* ********************************************************************************* */
-
-/* get the string representation of the destination ip address from packet */
-char *ndpi_get_packet_dst_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
-				    const struct ndpi_packet_struct *packet)
-{
-  ndpi_ip_addr_t ip;
-  ndpi_packet_dst_ip_get(packet, &ip);
-  return ndpi_get_ip_string(ndpi_struct, &ip);
-}
-#endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
 /* ****************************************************** */
 

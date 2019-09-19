@@ -1064,10 +1064,6 @@ struct ndpi_detection_module_struct {
   u_int32_t zattoo_connection_timeout;
   u_int32_t jabber_stun_timeout;
   u_int32_t jabber_file_transfer_timeout;
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-#define NDPI_IP_STRING_SIZE 40
-  char ip_string[NDPI_IP_STRING_SIZE];
-#endif
   u_int8_t ip_version_limit;
   /* NDPI_PROTOCOL_BITTORRENT */
   struct hash_ip4p_table *bt_ht;
