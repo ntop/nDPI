@@ -41,6 +41,25 @@ struct stun_packet_header {
 
 /* ************************************************************ */
 
+static u_int8_t is_stun_based_proto(u_int16_t proto) {
+
+  switch(proto) {
+  case NDPI_PROTOCOL_WHATSAPP:
+  case NDPI_PROTOCOL_WHATSAPP_VOICE:
+  case NDPI_PROTOCOL_WHATSAPP_VIDEO:
+  case NDPI_PROTOCOL_MESSENGER:
+  case NDPI_PROTOCOL_HANGOUT_DUO:
+  case NDPI_PROTOCOL_SKYPE_CALL:
+  case NDPI_PROTOCOL_SIGNAL:
+  case NDPI_PROTOCOL_STUN:
+    return(1);
+  }
+ 
+  return(0);
+}
+
+/* ************************************************************ */
+
 u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
   if(rev)
     return(flow->packet.iph->daddr + flow->packet.udp->dest);
@@ -180,6 +199,19 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #ifdef DEBUG_STUN
     printf("[STUN] msg_type = %04X\n", msg_type);
 #endif
+    
+    if(is_stun_based_proto(flow->guessed_host_protocol_id)) {
+      /*
+	In this case we have the detected the typical STUN pattern
+	of modern protocols where the flow starts as STUN and becomes
+	something else that has nothing to do with STUN anymore
+      */
+      ndpi_int_stun_add_connection(ndpi_struct, flow,
+				   flow->guessed_host_protocol_id,
+				   NDPI_PROTOCOL_STUN);
+      return(NDPI_IS_STUN);
+    }
+    
     return(NDPI_IS_NOT_STUN);
   }
 
