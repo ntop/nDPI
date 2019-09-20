@@ -71,12 +71,12 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 #endif
       app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
     } else {
-      u_int32_t key1 = get_stun_lru_key(flow, 1);
+      u_int32_t key_rev = get_stun_lru_key(flow, 1);
 
-      if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key1,
+      if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key_rev,
 			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
 #ifdef DEBUG_LRU
-	printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key1, cached_proto, proto, app_proto);
+	printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key_rev, cached_proto, proto, app_proto);
 #endif
 	app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
       } else {
@@ -89,6 +89,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 #endif
 	  
 	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto);
+	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key_rev, app_proto);
 	}
       }
     }
@@ -250,7 +251,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_STUN;
 
     if(msg_len == 0) {
-      flow->protos.stun_ssl.stun.num_udp_pkts++;
+      /* flow->protos.stun_ssl.stun.num_udp_pkts++; */
       return(NDPI_IS_NOT_STUN); /* This to keep analyzing STUN instead of giving up */
     }
   }

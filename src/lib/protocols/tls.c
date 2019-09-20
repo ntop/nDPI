@@ -31,7 +31,7 @@
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 
-// #define DEBUG_TLS 1
+/* #define DEBUG_TLS 1 */
 
 #define DEBUG_FINGERPRINT 1
 
@@ -176,7 +176,7 @@ static void stripCertificateTrailer(char *buffer, int buffer_len) {
 #define MAX_NUM_JA3  128
 
 struct ja3_info {
-  u_int16_t tls_version;
+  u_int16_t tls_handshake_version;
   u_int16_t num_cipher, cipher[MAX_NUM_JA3];
   u_int16_t num_tls_extension, tls_extension[MAX_NUM_JA3];
   u_int16_t num_elliptic_curve, elliptic_curve[MAX_NUM_JA3];
@@ -263,7 +263,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	else
 	  tls_version = ntohs(*((u_int16_t*)&packet->payload[header_len+12]));
 
-	ja3.tls_version = tls_version;
+	ja3.tls_handshake_version = tls_version;
 
 	if(handshake_protocol == 0x02) {
 	  u_int16_t offset = base_offset, extension_len, j;
@@ -291,36 +291,49 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
 
 #ifdef DEBUG_TLS
-	  printf("SSL [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
+	  printf("TLS [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja3.cipher[0]);
 #endif
 
 	  offset += 2 + 1;
 	  extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
 
 #ifdef DEBUG_TLS
-	  printf("SSL [server][extension_len: %u]\n", extension_len);
+	  printf("TLS [server][extension_len: %u]\n", extension_len);
 #endif
 	  offset += 2;
 
 	  for(i=0; i<extension_len; ) {
-	    u_int16_t id, len;
+	    u_int16_t extension_id, extension_len;
 
 	    if(offset >= (packet->payload_packet_len+4)) break;
 
-	    id  = ntohs(*((u_int16_t*)&packet->payload[offset]));
-	    len = ntohs(*((u_int16_t*)&packet->payload[offset+2]));
+	    extension_id  = ntohs(*((u_int16_t*)&packet->payload[offset]));
+	    extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+2]));
 
 	    if(ja3.num_tls_extension < MAX_NUM_JA3)
-	      ja3.tls_extension[ja3.num_tls_extension++] = id;
+	      ja3.tls_extension[ja3.num_tls_extension++] = extension_id;
 
 #ifdef DEBUG_TLS
-	    printf("SSL [server][extension_id: %u/0x%04X]\n", id, id);
+	    printf("TLS [server][extension_id: %u/0x%04X][len: %u]\n",
+		   extension_id, extension_id, extension_len);
 #endif
 
-	    i += 4 + len, offset += 4 + len;
+	    if(extension_id == 43 /* supported versions */) {
+	      if(extension_len >= 2) {
+		u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[offset+4]));
+
+#ifdef DEBUG_TLS
+		printf("TLS [server] [TLS version: 0x%04X]\n", tls_version);
+#endif
+		
+		flow->protos.stun_ssl.ssl.ssl_version = tls_version;
+	      }
+	    }
+	    
+	    i += 4 + extension_len, offset += 4 + extension_len;
 	  }
 
-	  ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.tls_version);
+	  ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.tls_handshake_version);
 
 	  for(i=0; i<ja3.num_cipher; i++)
 	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.cipher[i]);
@@ -333,7 +346,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.tls_extension[i]);
 
 #ifdef DEBUG_TLS
-	  printf("SSL [server] %s\n", ja3_str);
+	  printf("TLS [server] %s\n", ja3_str);
 #endif
 
 #ifdef DEBUG_TLS
@@ -426,7 +439,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  session_id_len = packet->payload[base_offset];
 
-	  ja3.tls_version = tls_version;
+	  ja3.tls_handshake_version = tls_version;
 
 	  if((session_id_len+base_offset+2) <= total_len) {
 	    u_int16_t cipher_len, cipher_offset;
@@ -533,7 +546,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		      }
 		    }
-
+		   
 		    if(extension_id == 0 /* server name */) {
 		      u_int16_t len;
 
@@ -611,6 +624,19 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			printf("Client SSL Invalid len %u vs %u\n", s_offset+extension_len, total_len);
 #endif
 		      }
+		    } else if(extension_id == 43 /* supported versions */) {
+		      u_int8_t version_len = packet->payload[offset+4];
+		      
+		      if(version_len == (extension_len-1)) {
+			/* Sanity check */
+			u_int8_t j;
+			
+			for(j=0; j<version_len; j += 2) {
+			  u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[offset+5+j]));
+			  
+			  printf("Client SSL [TLS version: 0x%04X]\n", tls_version);
+			}
+		      }
 		    }
 
 		    extension_offset += extension_len;
@@ -621,7 +647,8 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  } /* while */
 
 		  if(!invalid_ja3) {
-		    ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.tls_version);
+		  compute_ja3c:
+		    ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.tls_handshake_version);
 
 		    for(i=0; i<ja3.num_cipher; i++) {
 		      ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
@@ -670,6 +697,9 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  return(2 /* Client Certificate */);
 		}
+	      } else if(offset == total_len) {
+		/* SSL does not have extensions etc */
+		goto compute_ja3c;
 	      }
 	    }
 	  }
