@@ -45,8 +45,7 @@ static u_int8_t is_stun_based_proto(u_int16_t proto) {
 
   switch(proto) {
   case NDPI_PROTOCOL_WHATSAPP:
-  case NDPI_PROTOCOL_WHATSAPP_VOICE:
-  case NDPI_PROTOCOL_WHATSAPP_VIDEO:
+  case NDPI_PROTOCOL_WHATSAPP_CALL:
   case NDPI_PROTOCOL_MESSENGER:
   case NDPI_PROTOCOL_HANGOUT_DUO:
   case NDPI_PROTOCOL_SKYPE_CALL:
@@ -318,7 +317,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     switch(flow->guessed_protocol_id) {
     case NDPI_PROTOCOL_HANGOUT_DUO:
     case NDPI_PROTOCOL_MESSENGER:
-    case NDPI_PROTOCOL_WHATSAPP_VOICE:
+    case NDPI_PROTOCOL_WHATSAPP_CALL:
       /* Don't overwrite the protocol with sub-STUN protocols */
       break;
 
@@ -502,15 +501,15 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     
     flow->protos.stun_ssl.stun.num_processed_pkts++;
 #ifdef DEBUG_STUN
-    printf("==>> NDPI_PROTOCOL_WHATSAPP_VOICE\n");
+    printf("==>> NDPI_PROTOCOL_WHATSAPP_CALL\n");
 #endif
 
     if((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478)) {
       flow->guessed_host_protocol_id = (is_messenger_ip_address(ntohl(packet->iph->saddr)) || is_messenger_ip_address(ntohl(packet->iph->daddr))) ?
-	NDPI_PROTOCOL_MESSENGER : NDPI_PROTOCOL_WHATSAPP_VOICE;
+	NDPI_PROTOCOL_MESSENGER : NDPI_PROTOCOL_WHATSAPP_CALL;
     } else
       flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
-					? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_VOICE;
+					? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_CALL;
 
     rc = (flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
 
@@ -571,7 +570,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	} else {
 	  NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n"); /* Ummmmm we're in the TCP branch. This code looks bad */
 	  ndpi_int_stun_add_connection(ndpi_struct, flow,
-				       is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO) : NDPI_PROTOCOL_STUN,
+				       is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_CALL : NDPI_PROTOCOL_STUN,
 				       NDPI_PROTOCOL_UNKNOWN);
 	}
 
@@ -604,8 +603,8 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     } else {
       NDPI_LOG_INFO(ndpi_struct, "found UDP stun\n");
       ndpi_int_stun_add_connection(ndpi_struct, flow,
-				   is_whatsapp ? (is_whatsapp == 1 ? NDPI_PROTOCOL_WHATSAPP_VOICE : NDPI_PROTOCOL_WHATSAPP_VIDEO)
-				   : NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_UNKNOWN);
+				   is_whatsapp ? NDPI_PROTOCOL_WHATSAPP_CALL : NDPI_PROTOCOL_STUN,
+				   NDPI_PROTOCOL_UNKNOWN);
     }
 
     return;

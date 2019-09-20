@@ -1,16 +1,16 @@
+WhatsAppCall	44	5916	8
 WhatsApp	217	22139	5
-WhatsAppVoice	44	5916	8
 
 	1	TCP 10.8.0.1:42241 <-> 173.192.222.189:5222 [proto: 142/WhatsApp][cat: Chat/9][30 pkts/2539 bytes <-> 32 pkts/3070 bytes][bytes ratio: -0.095 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1648.8/1542.2 28667/28718 5223.8/5079.2][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 84.6/95.9 299/559 55.4/94.3][PLAIN TEXT (Android)]
 	2	TCP 10.8.0.1:35480 <-> 184.173.179.46:443 [proto: 142/WhatsApp][cat: Chat/9][24 pkts/3029 bytes <-> 22 pkts/1961 bytes][bytes ratio: 0.214 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 586.2/638.9 10696/10748 2161.3/2265.3][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 126.2/89.1 590/469 124.1/91.7][PLAIN TEXT (Android)]
 	3	TCP 10.8.0.1:44819 <-> 158.85.58.42:5222 [proto: 142/WhatsApp][cat: Chat/9][15 pkts/2690 bytes <-> 15 pkts/2019 bytes][bytes ratio: 0.142 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 614.6/602.7 8044/4043 2061.7/1396.6][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 179.3/134.6 590/1022 202.7/240.7][PLAIN TEXT (Android)]
 	4	TCP 10.8.0.1:49721 <-> 158.85.58.109:5222 [proto: 142/WhatsApp][cat: Chat/9][26 pkts/2311 bytes <-> 26 pkts/2300 bytes][bytes ratio: 0.002 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 402.6/402.2 6149/6160 1222.3/1226.4][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 88.9/88.5 299/308 58.4/60.8][PLAIN TEXT (Android)]
 	5	TCP 10.8.0.1:51570 <-> 158.85.5.199:443 [proto: 142/WhatsApp][cat: Chat/9][14 pkts/1123 bytes <-> 13 pkts/1097 bytes][bytes ratio: 0.012 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 102.8/102.9 318/331 97.7/90.0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 80.2/84.4 231/286 43.9/62.4][PLAIN TEXT (Android)]
-	6	UDP 10.8.0.1:53620 <-> 31.13.73.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][5 pkts/840 bytes <-> 4 pkts/344 bytes][bytes ratio: 0.419 (Upload)][IAT c2s/s2c min/avg/max/stddev: 208/189 15170.2/209.7 60006/241 25885.9/22.5][Pkt Len c2s/s2c min/avg/max/stddev: 168/86 168.0/86.0 168/86 0.0/0.0]
-	7	UDP 10.8.0.1:53620 <-> 31.13.64.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
-	8	UDP 10.8.0.1:53620 <-> 31.13.74.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
-	9	UDP 10.8.0.1:53620 <-> 31.13.79.192:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
-	10	UDP 10.8.0.1:53620 <-> 31.13.84.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
-	11	UDP 10.8.0.1:53620 <-> 31.13.93.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
-	12	UDP 10.8.0.1:53620 <-> 173.252.121.1:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
-	13	UDP 10.8.0.1:53620 <-> 179.60.192.48:3478 [proto: 78.189/STUN.WhatsAppVoice][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
+	6	UDP 10.8.0.1:53620 <-> 31.13.73.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][5 pkts/840 bytes <-> 4 pkts/344 bytes][bytes ratio: 0.419 (Upload)][IAT c2s/s2c min/avg/max/stddev: 208/189 15170.2/209.7 60006/241 25885.9/22.5][Pkt Len c2s/s2c min/avg/max/stddev: 168/86 168.0/86.0 168/86 0.0/0.0]
+	7	UDP 10.8.0.1:53620 <-> 31.13.64.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
+	8	UDP 10.8.0.1:53620 <-> 31.13.74.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
+	9	UDP 10.8.0.1:53620 <-> 31.13.79.192:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
+	10	UDP 10.8.0.1:53620 <-> 31.13.84.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
+	11	UDP 10.8.0.1:53620 <-> 31.13.93.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
+	12	UDP 10.8.0.1:53620 <-> 173.252.121.1:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
+	13	UDP 10.8.0.1:53620 <-> 179.60.192.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes]
