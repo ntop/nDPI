@@ -36,17 +36,24 @@ void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   NDPI_LOG_DBG(ndpi_struct, "search line\n");
 
-  if(packet->iph) {
+  if (packet->iph) {
     /* 125.209.252.xxx */
-    if(((ntohl(packet->iph->saddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)
-       || ((ntohl(packet->iph->daddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)) {
-      if((packet->payload_packet_len == 110)
-	 && (flow->packet.payload[0] == 0xB6) && (flow->packet.payload[1] == 0x18)
-	 && (flow->packet.payload[2] == 0x00) && (flow->packet.payload[3] == 0x6A)) {
-	ndpi_line_report_protocol(ndpi_struct, flow);
-	return;
+    if (((ntohl(packet->iph->saddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00) ||
+        ((ntohl(packet->iph->daddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)) {
+      if ((packet->payload_packet_len == 110) && (flow->packet.payload[0] == 0xB6) &&
+          (flow->packet.payload[1] == 0x18) && (flow->packet.payload[2] == 0x00) &&
+          (flow->packet.payload[3] == 0x6A)) {
+        ndpi_line_report_protocol(ndpi_struct, flow);
+        return;
       }
     }
+  }
+
+  if ((packet->payload_packet_len == 46 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xb6130006) ||
+      (packet->payload_packet_len == 8 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xb6070004) ||
+      (packet->payload_packet_len == 16 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xb609000c)) {
+    ndpi_line_report_protocol(ndpi_struct, flow);
+    return;
   }
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -55,12 +62,9 @@ void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
 void init_line_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("Line", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_LINE,
-				      ndpi_search_line,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  ndpi_set_bitmask_protocol_detection("Line", ndpi_struct, detection_bitmask, *id, NDPI_PROTOCOL_LINE,
+                                      ndpi_search_line, NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
 
   *id += 1;
 }

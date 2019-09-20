@@ -719,6 +719,7 @@ char* ndpi_ssl_version2str(u_int16_t version) {
   case 0x0302: return("TLSv1.1");
   case 0x0303: return("TLSv1.2");
   case 0x0304: return("TLSv1.3");
+  case 0xfb1a: return("TLSv1.3 (Fizz)"); /* https://engineering.fb.com/security/fizz/ */
   case 0xfeff: return("DTLSv1.0");
   case 0xfefd: return("DTLSv1.2");
   }

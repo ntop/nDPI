@@ -1006,9 +1006,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Modbus", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 502, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_VIDEO,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_CALL,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "WhatsAppVideo", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "WhatsAppCall", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DATASAVER,
@@ -1122,7 +1122,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_FREE_64,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_64,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "Free64", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1249,9 +1249,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "PcAnywhere", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_VOICE,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_189,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "WhatsAppVoice", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "Free189", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_FILES,
@@ -4055,7 +4055,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       goto check_stun_export;
     else if((flow->guessed_protocol_id == NDPI_PROTOCOL_HANGOUT_DUO)
 	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_MESSENGER)
-	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_VOICE))
+	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_CALL))
       ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
     else if((flow->l4.tcp.tls_seen_client_cert == 1)
 	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
@@ -4131,13 +4131,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   check_stun_export:
     if(flow->protos.stun_ssl.stun.num_processed_pkts || flow->protos.stun_ssl.stun.num_udp_pkts) {
       // if(/* (flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
-      if(flow->protos.stun_ssl.stun.num_processed_pkts && flow->protos.stun_ssl.stun.is_skype) {
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
-      } else {
-	ndpi_set_detected_protocol(ndpi_struct, flow,
-				   flow->guessed_host_protocol_id,
-				   NDPI_PROTOCOL_STUN);
-      }
+      ndpi_set_detected_protocol(ndpi_struct, flow,
+				 flow->guessed_host_protocol_id,
+				 NDPI_PROTOCOL_STUN);
     }
   }
 
@@ -5517,58 +5513,46 @@ void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_add
 
 /* ********************************************************************************* */
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-/* get the string representation of ip
- * returns a pointer to a static string
- * only valid until the next call of this function */
-char *ndpi_get_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
-			 const ndpi_ip_addr_t * ip)
-{
+char *ndpi_get_ip_string(const ndpi_ip_addr_t * ip, char *buf, u_int buf_len) {
   const u_int8_t *a = (const u_int8_t *) &ip->ipv4;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  if(ip->ipv6.u6_addr.u6_addr32[0] != 0 ||
-     ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
+  if(ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
      ip->ipv6.u6_addr.u6_addr32[2] != 0 ||
      ip->ipv6.u6_addr.u6_addr32[3] != 0) {
 
-    const u_int16_t *b = ip->ipv6.u6_addr.u6_addr16;
-    snprintf(ndpi_struct->ip_string, 32, "%x:%x:%x:%x:%x:%x:%x:%x",
-	     ntohs(b[0]), ntohs(b[1]), ntohs(b[2]), ntohs(b[3]),
-	     ntohs(b[4]), ntohs(b[5]), ntohs(b[6]), ntohs(b[7]));
+    if(inet_ntop(AF_INET6, &ip->ipv6.u6_addr, buf, buf_len) == NULL)
+      buf[0] = '\0';
 
-    return ndpi_struct->ip_string;
+    return buf;
   }
 #endif
 
-  snprintf(ndpi_struct->ip_string, 32, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
+  snprintf(buf, buf_len, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
 
-  return ndpi_struct->ip_string;
+  return buf;
 
 }
 
-/* ********************************************************************************* */
+/* ****************************************************** */
 
-/* get the string representation of the source ip address from packet */
-char *ndpi_get_packet_src_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
-				    const struct ndpi_packet_struct *packet)
-{
-  ndpi_ip_addr_t ip;
-  ndpi_packet_src_ip_get(packet, &ip);
-  return ndpi_get_ip_string(ndpi_struct, &ip);
+/* Returns -1 on failutre, otherwise fills parsed_ip and returns the IP version */
+int ndpi_parse_ip_string(const char *ip_str, ndpi_ip_addr_t *parsed_ip) {
+  int rv = -1;
+  memset(parsed_ip, 0, sizeof(*parsed_ip));
+
+  if(strchr(ip_str, '.')) {
+    if(inet_pton(AF_INET, ip_str, &parsed_ip->ipv4) > 0)
+      rv = 4;
+#ifdef NDPI_DETECTION_SUPPORT_IPV6
+  } else {
+    if(inet_pton(AF_INET6, ip_str, &parsed_ip->ipv6) > 0)
+      rv = 6;
+#endif
+  }
+
+  return(rv);
 }
-
-/* ********************************************************************************* */
-
-/* get the string representation of the destination ip address from packet */
-char *ndpi_get_packet_dst_ip_string(struct ndpi_detection_module_struct *ndpi_struct,
-				    const struct ndpi_packet_struct *packet)
-{
-  ndpi_ip_addr_t ip;
-  ndpi_packet_dst_ip_get(packet, &ip);
-  return ndpi_get_ip_string(ndpi_struct, &ip);
-}
-#endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
 /* ****************************************************** */
 
