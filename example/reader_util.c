@@ -664,12 +664,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
     l4_offset = iph->ihl * 4;
     l3 = (const u_int8_t*)iph;
-    *proto = iph->protocol;
   } else {
     l4_offset = sizeof(struct ndpi_ipv6hdr);
     l3 = (const u_int8_t*)iph6;
-    *proto = iph6->ip6_hdr.ip6_un1_nxt;
   }
+
+  *proto = iph->protocol;
 
   if(l4_packet_len < 64)
     workflow->stats.packet_len[0]++;
