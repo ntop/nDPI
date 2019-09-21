@@ -1,7 +1,7 @@
 /*
  * btlib.c
  *
- * Copyright (C) 2011-18 - ntop.org
+ * Copyright (C) 2011-19 - ntop.org
  *               Contributed by Vitaly Lavrov <vel21ripn@gmail.com>
  *
  * This file is part of nDPI, an open source deep packet inspection

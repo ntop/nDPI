@@ -966,7 +966,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "SkypeCall", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TIKTOK,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TIKTOK,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "TikTok", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -5862,8 +5862,13 @@ int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_mod, char *ca
 
 void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
+  
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
-    printf("[%3d] %s\n", i, ndpi_mod->proto_defaults[i].protoName);
+    printf("%3d %-22s %-12s %s\n", i,
+	   ndpi_mod->proto_defaults[i].protoName,
+	   ndpi_get_proto_breed_name(ndpi_mod, ndpi_mod->proto_defaults[i].protoBreed),
+	   ndpi_category_get_name(ndpi_mod, ndpi_mod->proto_defaults[i].protoCategory)
+	   );
 }
 
 /* ****************************************************** */

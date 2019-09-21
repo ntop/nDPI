@@ -1,7 +1,7 @@
 /*
  * rx.c
  *
- * Copyright (C) 2012-18 - ntop.org
+ * Copyright (C) 2012-19 - ntop.org
  *
  * Giovanni Mascellani <gio@debian.org>
  *

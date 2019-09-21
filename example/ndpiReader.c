@@ -414,7 +414,8 @@ static void help(u_int long_help) {
 #endif
 
   if(long_help) {
-    printf("\n\nSupported protocols:\n");
+    printf("\n\nnDPI supported protocols:\n");
+    printf("%3s %-22s %-12s %s\n", "Id", "Protocol", "Breed", "Category");
     num_threads = 1;
     ndpi_dump_protocols(ndpi_info_mod);
   }

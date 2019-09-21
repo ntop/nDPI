@@ -1,8 +1,7 @@
 /*
  * stun.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
- * Copyright (C) 2011-18 - ntop.org
+ * Copyright (C) 2011-19 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -204,6 +203,32 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       return(NDPI_IS_STUN);
     }
 
+    /*
+      If we're here it's because this does not look like STUN anymore
+      as this was a flow that started as STUN and turned into something
+      else. Let's investigate what is that about
+    */
+    if(payload[0] == 0x16) {
+      /* Let's check if this is DTLS used by some socials */
+      struct ndpi_packet_struct *packet = &flow->packet;
+      u_int16_t total_len, version = htons(*((u_int16_t*)&packet->payload[1]));
+
+      switch(version) {
+      case 0xFEFF: /* DTLS 1.0 */
+      case 0xFEFD: /* DTLS 1.2 */	
+	total_len = ntohs(*((u_int16_t*)&packet->payload[11]))+13;
+
+	if(payload_length == total_len) {
+	  /* This is DTLS and the only protocol we know behaves like this is signal */
+	  flow->guessed_host_protocol_id = NDPI_PROTOCOL_SIGNAL;
+	  ndpi_int_stun_add_connection(ndpi_struct, flow,
+				       flow->guessed_protocol_id,
+				       flow->guessed_host_protocol_id);
+	  return(NDPI_IS_STUN);
+	}
+      }
+    }
+    
     return(NDPI_IS_NOT_STUN);
   }
 
