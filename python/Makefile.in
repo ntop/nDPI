@@ -1,6 +1,7 @@
 CC=@CC@
 CFLAGS=-I. -I../src/include -I./src/lib/third_party/include -shared -Wl,
-LIBNDPI=../src/lib/libndpi.so.@NDPI_VERSION_SHORT@
+#LIBNDPI=../src/lib/libndpi.so.@NDPI_VERSION_SHORT@
+LIBNDPI=../src/lib/libndpi.a
 LDFLAGS=$(CFILE) $(LIBNDPI) -lpcap
 SHARE = -soname,ndpi_wrap
 SO=ndpi_wrap.so
@@ -17,9 +18,9 @@ endif
 
 all: $(SO)
 
-$(SO): $(CFILE) $(LIBNDPI)
+$(SO): $(CFILE) $(LIBNDPI) Makefile
 	$(CC) $(CFLAGS)$(SHARE) -o $@ $(PIC) $(LDFLAGS)
-	ln -s $(LIBNDPI) .
+#	ln -s $(LIBNDPI) .
 
 clean:
 	/bin/rm -f $(SO)

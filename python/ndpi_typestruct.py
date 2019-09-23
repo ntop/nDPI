@@ -1,7 +1,7 @@
 #
 # ndpi_typestruct.h
 #
-# Copyright (C) 2011-18 - ntop.org
+# Copyright (C) 2019 - ntop.org
 #
 # nDPI is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -21,11 +21,10 @@
 import os
 from ctypes import *
 
-ndpi = CDLL(os.path.abspath("libndpi.so.2.9.0"))
-ndpi = CDLL(os.path.abspath("ndpi_wrap.so"))
+ndpi = CDLL('./ndpi_wrap.so')
 
 # NDPI_SELECTION_BITMASK_PROTOCOL_SIZE = c_uint32
-# ndpi_protocol_category_t, ndpi_protocol_breed_t e ndpi_log_level_t sono enumeratori e vengono impostati come c_int
+# ndpi_protocol_category_t, ndpi_protocol_breed_t e ndpi_log_level_t are enum and are imported as c_int
 
 class ndpi_detection_module_struct(Structure):
     pass
@@ -58,9 +57,9 @@ class ndpi_subprotocol_conf_struct(Structure):
     _fields_ = [("func", CFUNCTYPE(c_void_p,POINTER(ndpi_detection_module_struct),c_char_p,c_char_p,c_int))]
 
 class ndpi_automa(Structure):
-  _fields_ = [
-      ("ac_automa", c_void_p), #Real type is AC_AUTOMATA_t
-      ("ac_automa_finalized", c_uint8)
+    _fields_ = [
+        ("ac_automa", c_void_p), #Real type is AC_AUTOMATA_t
+        ("ac_automa_finalized", c_uint8)
     ]
 
 class struct_node_t(Structure):
@@ -102,13 +101,13 @@ class ndpi_default_ports_tree_node_t(Structure):
 
 # NDPI_PROTOCOL_BITTORRENT
 class spinlock_t(Structure):
-    _fields_ = [("val", c_int)] #volatile mancante
+    _fields_ = [("val", c_int)] #missing volatile
 
 class atomic_t(Structure):
-    _fields_ = [("counter", c_int)] #volatile mancante
+    _fields_ = [("counter", c_int)] #missing volatile
 
 class time_t(Structure):
-    _fields_ = [("counter", c_longlong)] #piattaforma dipendente, tuttavia è solo un intero
+    _fields_ = [("counter", c_longlong)] # piattaform dependent
 
 class hash_ip4p_node(Structure):
     pass
@@ -194,12 +193,12 @@ class custom_categories(Structure):
         ("ipAddresses", c_void_p),
         ("ipAddresses_shadow", c_void_p), # Patricia
         ("categories_loaded", c_uint8),
-        ]
+    ]
 
 
 ndpi_detection_module_struct._fields_ = [
-        ("detection_bitmask", NDPI_PROTOCOL_BITMASK),
-        ("generic_http_packet_bitmask", NDPI_PROTOCOL_BITMASK),
+    ("detection_bitmask", NDPI_PROTOCOL_BITMASK),
+    ("generic_http_packet_bitmask", NDPI_PROTOCOL_BITMASK),
 
         ("current_ts", c_uint32),
 
@@ -211,22 +210,22 @@ ndpi_detection_module_struct._fields_ = [
 
         #callback function buffer
         ("callback_buffer", ndpi_call_function_struct * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() + 1)),
-        ("callback_buffer_size", c_uint32),
+    ("callback_buffer_size", c_uint32),
 
         ("callback_buffer_tcp_no_payload", ndpi_call_function_struct * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() + 1)),
-        ("callback_buffer_size_tcp_no_payload", c_uint32),
+    ("callback_buffer_size_tcp_no_payload", c_uint32),
 
         ("callback_buffer_tcp_payload", ndpi_call_function_struct * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() + 1)),
-        ("callback_buffer_size_tcp_payload", c_uint32),
+    ("callback_buffer_size_tcp_payload", c_uint32),
 
         ("callback_buffer_udp", ndpi_call_function_struct * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() + 1)),
-        ("callback_buffer_size_udp", c_uint32),
+    ("callback_buffer_size_udp", c_uint32),
 
         ("callback_buffer_non_tcp_udp", ndpi_call_function_struct * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() + 1)),
-        ("callback_buffer_size_non_tcp_udp", c_uint32),
+    ("callback_buffer_size_non_tcp_udp", c_uint32),
 
         ("tcpRoot", POINTER(ndpi_default_ports_tree_node_t)),
-        ("udpRoot", POINTER(ndpi_default_ports_tree_node_t)),
+    ("udpRoot", POINTER(ndpi_default_ports_tree_node_t)),
 
         ("ndpi_log_level", c_uint), #default error
 
@@ -248,14 +247,14 @@ ndpi_detection_module_struct._fields_ = [
         ("subprotocol_conf", ndpi_subprotocol_conf_struct * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() + 1)),
 
         ("ndpi_num_supported_protocols", c_uint),
-        ("ndpi_num_custom_protocols", c_uint),
+    ("ndpi_num_custom_protocols", c_uint),
 
     #HTTP / DNS / HTTPS host matching * /
         ("host_automa", ndpi_automa), #Used for DNS / HTTPS
-        ("content_automa", ndpi_automa), # Used for HTTP subprotocol_detection
-        ("subprotocol_automa", ndpi_automa), # Used for HTTP subprotocol_detection
-        ("bigrams_automa", ndpi_automa), #TOR
-        ("impossible_bigrams_automa", ndpi_automa), # TOR
+    ("content_automa", ndpi_automa), # Used for HTTP subprotocol_detection
+    ("subprotocol_automa", ndpi_automa), # Used for HTTP subprotocol_detection
+    ("bigrams_automa", ndpi_automa), #TOR
+    ("impossible_bigrams_automa", ndpi_automa), # TOR
 
         ("custom_categories", custom_categories),
     #IP-based protocol detection
@@ -279,10 +278,10 @@ ndpi_detection_module_struct._fields_ = [
         ("orb_rstp_ts_timeout", c_uint32),
     # yahoo
         ("yahoo_detect_http_connections", c_uint8),
-        ("yahoo_lan_video_timeout", c_uint32),
-        ("zattoo_connection_timeout", c_uint32),
-        ("jabber_stun_timeout", c_uint32),
-        ("jabber_file_transfer_timeout", c_uint32),
+    ("yahoo_lan_video_timeout", c_uint32),
+    ("zattoo_connection_timeout", c_uint32),
+    ("jabber_stun_timeout", c_uint32),
+    ("jabber_file_transfer_timeout", c_uint32),
 
     # ifdef NDPI_ENABLE_DEBUG_MESSAGES
     # define NDPI_IP_STRING_SIZE 40
@@ -298,7 +297,7 @@ ndpi_detection_module_struct._fields_ = [
 
     # BT_ANNOUNCE
         ("bt_ann", POINTER(bt_announce)),
-        ("bt_ann_len", c_int),
+    ("bt_ann_len", c_int),
 
     # NDPI_PROTOCOL_OOKLA
         ("ookla_cache", POINTER(ndpi_lru_cache)),
@@ -309,13 +308,13 @@ ndpi_detection_module_struct._fields_ = [
         ("proto_defaults", ndpi_proto_defaults_t * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() + ndpi.ndpi_wrap_ndpi_max_num_custom_protocols())),
 
         ("http_dont_dissect_response", c_uint8, 1),
-        ("dns_dont_dissect_response", c_uint8, 1),
-        ("direction_detect_disable", c_uint8, 1), # disable internal detection of packet direction
-        ("disable_metadata_export", c_uint8, 1), # No metadata is exported
-        ("enable_category_substring_match", c_uint8, 1), # Default is perfect match
+    ("dns_dont_dissect_response", c_uint8, 1),
+    ("direction_detect_disable", c_uint8, 1), # disable internal detection of packet direction
+    ("disable_metadata_export", c_uint8, 1), # No metadata is exported
+    ("enable_category_substring_match", c_uint8, 1), # Default is perfect match
 
         ("hyperscan", c_void_p) # Intel Hyperscan
-    ]
+]
 
 class u6_addr(Union): # 128-bit IP6 address
     _fields_ = [
@@ -330,47 +329,47 @@ class ndpi_in6_addr(Structure):
 
 class ndpi_ip_addr_t(Union):
     _fields_ = [
-    ('ipv4', c_uint32),
-    ('ipv4_u_int8_t', c_uint8 * 4),
-    ('ipv6', ndpi_in6_addr),
-]
+        ('ipv4', c_uint32),
+        ('ipv4_u_int8_t', c_uint8 * 4),
+        ('ipv6', ndpi_in6_addr),
+    ]
 
 class ndpi_id_struct(Structure):
     _fields_ = [
-    ('detected_protocol_bitmask', NDPI_PROTOCOL_BITMASK),
-    ('rtsp_ip_address', ndpi_ip_addr_t),
-    ('yahoo_video_lan_timer', c_uint32),
-    ('irc_port', c_uint16 * 8),
-    ('last_time_port_used', c_uint32 * 8),
-    ('irc_ts', c_uint32),
-    ('gnutella_ts', c_uint32),
-    ('battlefield_ts', c_uint32),
-    ('thunder_ts', c_uint32),
-    ('rtsp_timer', c_uint32),
-    ('oscar_last_safe_access_time', c_uint32),
-    ('zattoo_ts', c_uint32),
-    ('jabber_stun_or_ft_ts', c_uint32),
-    ('directconnect_last_safe_access_time', c_uint32),
-    ('soulseek_last_safe_access_time', c_uint32),
-    ('detected_directconnect_port', c_uint16),
-    ('detected_directconnect_udp_port', c_uint16),
-    ('detected_directconnect_ssl_port', c_uint16),
-    ('bt_port_t', c_uint16 * 8),
-    ('bt_port_u', c_uint16 * 8),
-    ('jabber_voice_stun_port', c_uint16 * 6),
-    ('jabber_file_transfer_port', c_uint16 * 2),
-    ('detected_gnutella_port', c_uint16),
-    ('detected_gnutella_udp_port1', c_uint16),
-    ('detected_gnutella_udp_port2', c_uint16),
-    ('soulseek_listen_port', c_uint16),
-    ('irc_number_of_port', c_uint8),
-    ('oscar_ssl_session_id', c_uint8 * 33),
-    ('jabber_voice_stun_used_ports', c_uint8),
-    ('yahoo_video_lan_dir', c_uint32, 1),
-    ('yahoo_conf_logged_in', c_uint32, 1),
-    ('yahoo_voice_conf_logged_in', c_uint32, 1),
-    ('rtsp_ts_set', c_uint32, 1),
-]
+        ('detected_protocol_bitmask', NDPI_PROTOCOL_BITMASK),
+        ('rtsp_ip_address', ndpi_ip_addr_t),
+        ('yahoo_video_lan_timer', c_uint32),
+        ('irc_port', c_uint16 * 8),
+        ('last_time_port_used', c_uint32 * 8),
+        ('irc_ts', c_uint32),
+        ('gnutella_ts', c_uint32),
+        ('battlefield_ts', c_uint32),
+        ('thunder_ts', c_uint32),
+        ('rtsp_timer', c_uint32),
+        ('oscar_last_safe_access_time', c_uint32),
+        ('zattoo_ts', c_uint32),
+        ('jabber_stun_or_ft_ts', c_uint32),
+        ('directconnect_last_safe_access_time', c_uint32),
+        ('soulseek_last_safe_access_time', c_uint32),
+        ('detected_directconnect_port', c_uint16),
+        ('detected_directconnect_udp_port', c_uint16),
+        ('detected_directconnect_ssl_port', c_uint16),
+        ('bt_port_t', c_uint16 * 8),
+        ('bt_port_u', c_uint16 * 8),
+        ('jabber_voice_stun_port', c_uint16 * 6),
+        ('jabber_file_transfer_port', c_uint16 * 2),
+        ('detected_gnutella_port', c_uint16),
+        ('detected_gnutella_udp_port1', c_uint16),
+        ('detected_gnutella_udp_port2', c_uint16),
+        ('soulseek_listen_port', c_uint16),
+        ('irc_number_of_port', c_uint8),
+        ('oscar_ssl_session_id', c_uint8 * 33),
+        ('jabber_voice_stun_used_ports', c_uint8),
+        ('yahoo_video_lan_dir', c_uint32, 1),
+        ('yahoo_conf_logged_in', c_uint32, 1),
+        ('yahoo_voice_conf_logged_in', c_uint32, 1),
+        ('rtsp_ts_set', c_uint32, 1),
+    ]
 
 #struct flow
 class ndpi_flow_tcp_struct(Structure):
@@ -434,7 +433,7 @@ class ndpi_flow_tcp_struct(Structure):
         ('ppstream_stage', c_uint32, 3),
         ('memcached_matches', c_uint8),
         ('nest_log_sink_matches', c_uint8),
-]
+    ]
 
 class ndpi_flow_udp_struct(Structure):
     _fields_ = [
@@ -543,119 +542,119 @@ class tinc_cache_entry(Structure):
         ('src_address', c_uint32),
         ('dst_address', c_uint32),
         ('dst_port', c_uint16),
-]
+    ]
 
 class struct_ndpi_int_one_line_struct(Structure):
     _fields_ = [
-    ('ptr', POINTER(c_uint8)),
-    ('len', c_uint16),
-]
+        ('ptr', POINTER(c_uint8)),
+        ('len', c_uint16),
+    ]
 
 class struct_ndpi_iphdr_little_end(Structure):
     _fields_ = [
-    ('ihl', c_uint8, 4),
-    ('version', c_uint8, 4),
-    ('tos', c_uint8),
-    ('tot_len', c_uint16),
-    ('id', c_uint16),
-    ('frag_off', c_uint16),
-    ('ttl', c_uint8),
-    ('protocol', c_uint8),
-    ('check', c_uint16),
-    ('saddr', c_uint32),
-    ('daddr', c_uint32)]
+        ('ihl', c_uint8, 4),
+        ('version', c_uint8, 4),
+        ('tos', c_uint8),
+        ('tot_len', c_uint16),
+        ('id', c_uint16),
+        ('frag_off', c_uint16),
+        ('ttl', c_uint8),
+        ('protocol', c_uint8),
+        ('check', c_uint16),
+        ('saddr', c_uint32),
+        ('daddr', c_uint32)]
 
 class struct_ndpi_ip6_hdrctl(Structure):
     _fields_ = [
-    ('ip6_un1_flow', c_uint32),
-    ('ip6_un1_plen', c_uint16),
-    ('ip6_un1_nxt', c_uint8),
-    ('ip6_un1_hlim', c_uint8),
-]
+        ('ip6_un1_flow', c_uint32),
+        ('ip6_un1_plen', c_uint16),
+        ('ip6_un1_nxt', c_uint8),
+        ('ip6_un1_hlim', c_uint8),
+    ]
 
 class struct_ndpi_ipv6hdr(Structure):
     _fields_ = [
-    ('ip6_hdr', struct_ndpi_ip6_hdrctl),
-    ('ip6_src', ndpi_in6_addr),
-    ('ip6_dst', ndpi_in6_addr),
-]
+        ('ip6_hdr', struct_ndpi_ip6_hdrctl),
+        ('ip6_src', ndpi_in6_addr),
+        ('ip6_dst', ndpi_in6_addr),
+    ]
 
 class struct_ndpi_tcphdr(Structure):
     _fields_ = [
-    ('source', c_uint16),
-    ('dest', c_uint16),
-    ('seq', c_uint32),
-    ('ack_seq', c_uint32),
-    ('res1', c_uint16, 4),
-    ('doff', c_uint16, 4),
-    ('fin', c_uint16, 1),
-    ('syn', c_uint16, 1),
-    ('rst', c_uint16, 1),
-    ('psh', c_uint16, 1),
-    ('ack', c_uint16, 1),
-    ('urg', c_uint16, 1),
-    ('ece', c_uint16, 1),
-    ('cwr', c_uint16, 1),
-    ('window', c_uint16),
-    ('check', c_uint16),
-    ('urg_ptr', c_uint16),
-]
+        ('source', c_uint16),
+        ('dest', c_uint16),
+        ('seq', c_uint32),
+        ('ack_seq', c_uint32),
+        ('res1', c_uint16, 4),
+        ('doff', c_uint16, 4),
+        ('fin', c_uint16, 1),
+        ('syn', c_uint16, 1),
+        ('rst', c_uint16, 1),
+        ('psh', c_uint16, 1),
+        ('ack', c_uint16, 1),
+        ('urg', c_uint16, 1),
+        ('ece', c_uint16, 1),
+        ('cwr', c_uint16, 1),
+        ('window', c_uint16),
+        ('check', c_uint16),
+        ('urg_ptr', c_uint16),
+    ]
 
 class struct_ndpi_udphdr(Structure):
     _fields_ = [
-    ('source', c_uint16),
-    ('dest', c_uint16),
-    ('len', c_uint16),
-    ('check', c_uint16),
-]
+        ('source', c_uint16),
+        ('dest', c_uint16),
+        ('len', c_uint16),
+        ('check', c_uint16),
+    ]
 
 class ndpi_packet_struct(Structure):
     _fields_ = [
-    ('iph', POINTER(struct_ndpi_iphdr_little_end)),
-    ('iphv6', POINTER(struct_ndpi_ipv6hdr)),
-    ('tcp', POINTER(struct_ndpi_tcphdr)),
-    ('udp', POINTER(struct_ndpi_udphdr)),
-    ('generic_l4_ptr', POINTER(c_uint8)),
-    ('payload', POINTER(c_uint8)),
-    ('tick_timestamp', c_uint32),
-    ('tick_timestamp_l', c_uint64),
-    ('detected_protocol_stack', c_uint16 * 2),
-    ('detected_subprotocol_stack', c_uint8 * 2),
-    ('protocol_stack_info', c_uint16),
-    ('line', struct_ndpi_int_one_line_struct * 64),
-    ('host_line', struct_ndpi_int_one_line_struct),
-    ('forwarded_line', struct_ndpi_int_one_line_struct),
-    ('referer_line', struct_ndpi_int_one_line_struct),
-    ('content_line', struct_ndpi_int_one_line_struct),
-    ('accept_line', struct_ndpi_int_one_line_struct),
-    ('user_agent_line', struct_ndpi_int_one_line_struct),
-    ('http_url_name', struct_ndpi_int_one_line_struct),
-    ('http_encoding', struct_ndpi_int_one_line_struct),
-    ('http_transfer_encoding', struct_ndpi_int_one_line_struct),
-    ('http_contentlen', struct_ndpi_int_one_line_struct),
-    ('http_cookie', struct_ndpi_int_one_line_struct),
-    ('http_origin', struct_ndpi_int_one_line_struct),
-    ('http_x_session_type', struct_ndpi_int_one_line_struct),
-    ('server_line', struct_ndpi_int_one_line_struct),
-    ('http_method', struct_ndpi_int_one_line_struct),
-    ('http_response', struct_ndpi_int_one_line_struct),
-    ('http_num_headers', c_uint8),
-    ('l3_packet_len', c_uint16),
-    ('l4_packet_len', c_uint16),
-    ('payload_packet_len', c_uint16),
-    ('actual_payload_len', c_uint16),
-    ('num_retried_bytes', c_uint16),
-    ('parsed_lines', c_uint16),
-    ('parsed_unix_lines', c_uint16),
-    ('empty_line_position', c_uint16),
-    ('tcp_retransmission', c_uint8),
-    ('l4_protocol', c_uint8),
-    ('ssl_certificate_detected', c_uint8, 4),
-    ('ssl_certificate_num_checks', c_uint8, 4),
-    ('packet_lines_parsed_complete', c_uint8, 1),
-    ('packet_direction', c_uint8, 1),
-    ('empty_line_position_set', c_uint8, 1),
-]
+        ('iph', POINTER(struct_ndpi_iphdr_little_end)),
+        ('iphv6', POINTER(struct_ndpi_ipv6hdr)),
+        ('tcp', POINTER(struct_ndpi_tcphdr)),
+        ('udp', POINTER(struct_ndpi_udphdr)),
+        ('generic_l4_ptr', POINTER(c_uint8)),
+        ('payload', POINTER(c_uint8)),
+        ('tick_timestamp', c_uint32),
+        ('tick_timestamp_l', c_uint64),
+        ('detected_protocol_stack', c_uint16 * 2),
+        ('detected_subprotocol_stack', c_uint8 * 2),
+        ('protocol_stack_info', c_uint16),
+        ('line', struct_ndpi_int_one_line_struct * 64),
+        ('host_line', struct_ndpi_int_one_line_struct),
+        ('forwarded_line', struct_ndpi_int_one_line_struct),
+        ('referer_line', struct_ndpi_int_one_line_struct),
+        ('content_line', struct_ndpi_int_one_line_struct),
+        ('accept_line', struct_ndpi_int_one_line_struct),
+        ('user_agent_line', struct_ndpi_int_one_line_struct),
+        ('http_url_name', struct_ndpi_int_one_line_struct),
+        ('http_encoding', struct_ndpi_int_one_line_struct),
+        ('http_transfer_encoding', struct_ndpi_int_one_line_struct),
+        ('http_contentlen', struct_ndpi_int_one_line_struct),
+        ('http_cookie', struct_ndpi_int_one_line_struct),
+        ('http_origin', struct_ndpi_int_one_line_struct),
+        ('http_x_session_type', struct_ndpi_int_one_line_struct),
+        ('server_line', struct_ndpi_int_one_line_struct),
+        ('http_method', struct_ndpi_int_one_line_struct),
+        ('http_response', struct_ndpi_int_one_line_struct),
+        ('http_num_headers', c_uint8),
+        ('l3_packet_len', c_uint16),
+        ('l4_packet_len', c_uint16),
+        ('payload_packet_len', c_uint16),
+        ('actual_payload_len', c_uint16),
+        ('num_retried_bytes', c_uint16),
+        ('parsed_lines', c_uint16),
+        ('parsed_unix_lines', c_uint16),
+        ('empty_line_position', c_uint16),
+        ('tcp_retransmission', c_uint8),
+        ('l4_protocol', c_uint8),
+        ('ssl_certificate_detected', c_uint8, 4),
+        ('ssl_certificate_num_checks', c_uint8, 4),
+        ('packet_lines_parsed_complete', c_uint8, 1),
+        ('packet_direction', c_uint8, 1),
+        ('empty_line_position_set', c_uint8, 1),
+    ]
 
 ndpi_flow_struct._fields_ = [
     ("detected_protocol_stack", c_uint16 * ndpi.ndpi_wrap_ndpi_procol_size()),
@@ -686,15 +685,15 @@ ndpi_flow_struct._fields_ = [
 
   # Pointer to src or dst that identifies the server of this connection
     ("server_id", ndpi_id_struct),
-  # HTTP host or DNS query
+    # HTTP host or DNS query
     ("host_server_name", c_ubyte * 256),
 
 
   #  This structure below will not not stay inside the protos
-  #  structure below as HTTP is used by many subprotocols
-  #  such as FaceBook, Google... so it is hard to know
-  #  when to use it or not. Thus we leave it outside for the
-  #  time being.
+    #  structure below as HTTP is used by many subprotocols
+    #  such as FaceBook, Google... so it is hard to know
+    #  when to use it or not. Thus we leave it outside for the
+    #  time being.
 
 
     ("http", http),
