@@ -21,7 +21,8 @@
 import os
 from ctypes import *
 
-ndpi = CDLL('./ndpi_wrap.so')
+ndpi = CDLL(os.path.abspath("libndpi.so.2.9.0"))
+ndpi = CDLL(os.path.abspath("ndpi_wrap.so"))
 
 # NDPI_SELECTION_BITMASK_PROTOCOL_SIZE = c_uint32
 # ndpi_protocol_category_t, ndpi_protocol_breed_t e ndpi_log_level_t sono enumeratori e vengono impostati come c_int
