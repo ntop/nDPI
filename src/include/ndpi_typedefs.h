@@ -1,7 +1,7 @@
 /*
  * ndpi_typedefs.h
  *
- * Copyright (C) 2011-18 - ntop.org
+ * Copyright (C) 2011-19 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -1182,7 +1182,7 @@ struct ndpi_flow_struct {
       } ssl;
 
       struct {
-	u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests, is_skype;
+	u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests;
       } stun;
 
       /* We can have STUN over SSL/TLS thus they need to live together */

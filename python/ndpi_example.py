@@ -166,7 +166,7 @@ def packetcaptured(packet):
     #filling pcap_pkthdr
     h.len = h.caplen = len(packet)
     h.ts.tv_sec = int(packet["IP"].time/1000000)
-    h.ts.tv_usec = round(packet["IP"].time)
+    h.ts.tv_usec = int(packet["IP"].time)
 
     # real work
     if int(packet[1].frag) == 0:  # not fragmented packet

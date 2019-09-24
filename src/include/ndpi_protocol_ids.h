@@ -2,7 +2,7 @@
 /*
  * ndpi_protocol_ids.h
  *
- * Copyright (C) 2011-18 - ntop.org
+ * Copyright (C) 2011-19 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -79,7 +79,7 @@ typedef enum {
   NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
   NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) - Darryl Sokoloski <darryl@egloo.ca> */
   NDPI_PROTOCOL_MODBUS                = 44, /* Modbus */
-  NDPI_PROTOCOL_WHATSAPP_VIDEO        = 45,
+  NDPI_PROTOCOL_WHATSAPP_CALL         = 45, /* WhatsApp video ad audio calls go here */
   NDPI_PROTOCOL_DATASAVER             = 46, /* Protocols used to save data on Internet communications */  
   NDPI_PROTOCOL_XBOX                  = 47,
   NDPI_PROTOCOL_QQ                    = 48,
@@ -98,7 +98,7 @@ typedef enum {
   NDPI_PROTOCOL_QQLIVE                = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_SOULSEEK              = 63,
-  NDPI_FREE_64                        = 64,
+  NDPI_PROTOCOL_FREE_64               = 64,
   NDPI_PROTOCOL_IRC                   = 65,
   NDPI_PROTOCOL_AYIYA                 = 66,
   NDPI_PROTOCOL_UNENCRYPTED_JABBER    = 67,
@@ -223,7 +223,7 @@ typedef enum {
   NDPI_PROTOCOL_VEVO                  = 186,
   NDPI_PROTOCOL_PANDORA               = 187,
   NDPI_PROTOCOL_QUIC                  = 188, /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
-  NDPI_PROTOCOL_WHATSAPP_VOICE        = 189,
+  NDPI_PROTOCOL_FREE_189              = 189,
   NDPI_PROTOCOL_EAQ                   = 190,
   NDPI_PROTOCOL_OOKLA                 = 191,
   NDPI_PROTOCOL_AMQP                  = 192,

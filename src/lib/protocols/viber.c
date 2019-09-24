@@ -2,7 +2,7 @@
  * viber.c 
  *
  * Copyright (C) 2013 Remy Mudingay <mudingay@ill.fr>
- * Copyright (C) 2013-18 - ntop.org
+ * Copyright (C) 2013-19 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by

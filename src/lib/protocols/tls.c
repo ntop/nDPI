@@ -628,7 +628,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		      u_int8_t version_len = packet->payload[offset+4];
 		      
 		      if(version_len == (extension_len-1)) {
-			/* Sanity check */
+#ifdef DEBUG_TLS
 			u_int8_t j;
 			
 			for(j=0; j<version_len; j += 2) {
@@ -636,6 +636,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			  
 			  printf("Client SSL [TLS version: 0x%04X]\n", tls_version);
 			}
+#endif
 		      }
 		    }
 

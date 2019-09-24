@@ -966,7 +966,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "SkypeCall", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TIKTOK,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TIKTOK,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "TikTok", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1006,9 +1006,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "Modbus", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 502, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_VIDEO,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_CALL,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "WhatsAppVideo", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "WhatsAppCall", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DATASAVER,
@@ -1122,7 +1122,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_FREE_64,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_64,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "Free64", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1249,9 +1249,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "PcAnywhere", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_VOICE,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_189,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "WhatsAppVoice", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "Free189", NDPI_PROTOCOL_CATEGORY_VOIP,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_FILES,
@@ -4055,7 +4055,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       goto check_stun_export;
     else if((flow->guessed_protocol_id == NDPI_PROTOCOL_HANGOUT_DUO)
 	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_MESSENGER)
-	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_VOICE))
+	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_CALL))
       ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
     else if((flow->l4.tcp.tls_seen_client_cert == 1)
 	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
@@ -4131,13 +4131,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   check_stun_export:
     if(flow->protos.stun_ssl.stun.num_processed_pkts || flow->protos.stun_ssl.stun.num_udp_pkts) {
       // if(/* (flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
-      if(flow->protos.stun_ssl.stun.num_processed_pkts && flow->protos.stun_ssl.stun.is_skype) {
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
-      } else {
-	ndpi_set_detected_protocol(ndpi_struct, flow,
-				   flow->guessed_host_protocol_id,
-				   NDPI_PROTOCOL_STUN);
-      }
+      ndpi_set_detected_protocol(ndpi_struct, flow,
+				 flow->guessed_host_protocol_id,
+				 NDPI_PROTOCOL_STUN);
     }
   }
 
@@ -5866,8 +5862,13 @@ int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_mod, char *ca
 
 void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
+  
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
-    printf("[%3d] %s\n", i, ndpi_mod->proto_defaults[i].protoName);
+    printf("%3d %-22s %-12s %s\n", i,
+	   ndpi_mod->proto_defaults[i].protoName,
+	   ndpi_get_proto_breed_name(ndpi_mod, ndpi_mod->proto_defaults[i].protoBreed),
+	   ndpi_category_get_name(ndpi_mod, ndpi_mod->proto_defaults[i].protoCategory)
+	   );
 }
 
 /* ****************************************************** */
