@@ -322,13 +322,10 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
 
     /* Output the mean */
     if(num_bytes != 0) {
-      fprintf(out, "][byte_dist_mean: %f", mean);
-      fprintf(out, "][byte_dist_std: %f]", variance);
-    }
-
-    if(num_bytes != 0) {
       double entropy = ndpi_flow_get_byte_count_entropy(array, num_bytes);
 
+      fprintf(out, "][byte_dist_mean: %f", mean);
+      fprintf(out, "][byte_dist_std: %f]", variance);
       fprintf(out, "[entropy: %f]", entropy);
       fprintf(out, "[total_entropy: %f]", entropy * num_bytes);
     }
