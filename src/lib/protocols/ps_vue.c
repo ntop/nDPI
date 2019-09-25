@@ -38,11 +38,13 @@ static u_int8_t is_ps_vue_flow(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
 
   if(packet->iph) {
-    struct in_addr daddr;
+    struct in_addr saddr, daddr;
 
+    saddr.s_addr = packet->iph->saddr;
     daddr.s_addr = packet->iph->daddr;
 
-    if(ps_vue_ptree_match(ndpi_struct, &daddr)) {
+    if(ps_vue_ptree_match(ndpi_struct, &saddr) ||
+       ps_vue_ptree_match(ndpi_struct, &daddr)) {
       return(1);
     }
   }
@@ -80,7 +82,7 @@ void ndpi_search_ps_vue(struct ndpi_detection_module_struct *ndpi_struct, struct
 
 void init_ps_vue_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("PS_Vue", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("PS_VUE", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_PS_VUE,
 				      ndpi_search_ps_vue,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,

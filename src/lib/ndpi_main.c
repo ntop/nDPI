@@ -1124,7 +1124,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PS_VUE,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "PS_Vue", NDPI_PROTOCOL_CATEGORY_VIDEO,
+			    no_master, "PS_VUE", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_IRC,
