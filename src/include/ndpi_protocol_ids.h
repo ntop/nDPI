@@ -223,7 +223,7 @@ typedef enum {
   NDPI_PROTOCOL_VEVO                  = 186,
   NDPI_PROTOCOL_PANDORA               = 187,
   NDPI_PROTOCOL_QUIC                  = 188, /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
-  NDPI_PROTOCOL_FREE_189              = 189,
+  NDPI_PROTOCOL_ZOOM                  = 189, /* Zoom video conference. */
   NDPI_PROTOCOL_EAQ                   = 190,
   NDPI_PROTOCOL_OOKLA                 = 191,
   NDPI_PROTOCOL_AMQP                  = 192,

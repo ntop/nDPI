@@ -1249,9 +1249,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "PcAnywhere", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_189,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZOOM,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Free189", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "Zoom", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_FILES,
@@ -3308,6 +3308,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* Targus Getdata */
   init_targus_getdata_dissector(ndpi_struct, &a, detection_bitmask);
+
+  /* ZOOM */
+  init_zoom_dissector(ndpi_struct, &a, detection_bitmask);
 
   /* ----------------------------------------------------------------- */
 
