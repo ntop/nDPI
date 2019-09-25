@@ -27,24 +27,49 @@
 
 #include "ndpi_api.h"
 
-static u_int8_t is_zoom_tcp_port(struct ndpi_flow_struct *flow) {
+static u_int8_t is_zoom_tcp_src_port(struct ndpi_flow_struct *flow) {
 
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int16_t dport = ntohs(packet->tcp->dest);
+  u_int16_t sport = ntohs(packet->tcp->source);
 
-  if((dport == 8801) || (dport == 8802) || (dport == 5090) || (dport == 5091)){
+  if((sport == htons(8801)) || (sport == htons(8802)) ||
+     (sport == htons(5090)) || (sport == htons(5091))){
     return 1;
   }
   return 0;
 }
 
-static u_int8_t is_zoom_udp_port(struct ndpi_flow_struct *flow) {
+static u_int8_t is_zoom_tcp_dest_port(struct ndpi_flow_struct *flow) {
 
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t dport = ntohs(packet->tcp->dest);
 
-  if((dport == 3478) || (dport == 3479) || (dport == 5090) ||
-     (dport >= 8801 && dport <= 8810) || (dport >= 20000 && dport <= 64000)){
+  if((dport == htons(8801)) || (dport == htons(8802)) ||
+     (dport == htons(5090)) || (dport == htons(5091))){
+    return 1;
+  }
+  return 0;
+}
+
+static u_int8_t is_zoom_udp_src_port(struct ndpi_flow_struct *flow) {
+
+  struct ndpi_packet_struct *packet = &flow->packet;
+  u_int16_t sport = ntohs(packet->tcp->source);
+
+  if((sport == htons(3478)) || (sport == htons(3479)) || (sport == htons(5090)) ||
+     (sport >= htons(8801) && sport <= htons(8810)) || (sport >= htons(20000) && sport <= htons(64000))){
+    return 1;
+  }
+  return 0;
+}
+
+static u_int8_t is_zoom_udp_dest_port(struct ndpi_flow_struct *flow) {
+
+  struct ndpi_packet_struct *packet = &flow->packet;
+  u_int16_t dport = ntohs(packet->tcp->dest);
+
+  if((dport == htons(3478)) || (dport == htons(3479)) || (dport == htons(5090)) ||
+     (dport >= htons(8801) && dport <= htons(8810)) || (dport >= htons(20000) && dport <= htons(64000))){
     return 1;
   }
   return 0;
@@ -56,7 +81,7 @@ static u_int8_t zoom_ptree_match(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ******************************************* */
 
-static u_int8_t is_zoom_flow(struct ndpi_detection_module_struct *ndpi_struct,
+static u_int8_t is_zoom_dest_flow(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
@@ -73,6 +98,23 @@ static u_int8_t is_zoom_flow(struct ndpi_detection_module_struct *ndpi_struct,
   return(0);
 }
 
+static u_int8_t is_zoom_src_flow(struct ndpi_detection_module_struct *ndpi_struct,
+                             struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &flow->packet;
+
+  if(packet->iph) {
+    struct in_addr saddr;
+
+    saddr.s_addr = packet->iph->saddr;
+
+    if(zoom_ptree_match(ndpi_struct, &saddr)) {
+      return(1);
+    }
+  }
+
+  return(0);
+}
+
 static void ndpi_check_zoom(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow) {
 
@@ -82,8 +124,14 @@ static void ndpi_check_zoom(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->tcp != NULL)
     {
-      if (is_zoom_flow(ndpi_struct, flow) && is_zoom_tcp_port(flow)){
-        NDPI_LOG_INFO(ndpi_struct, "found zoom on tcp\n");
+      if (is_zoom_src_flow(ndpi_struct, flow) && is_zoom_tcp_src_port(flow)){
+        NDPI_LOG_INFO(ndpi_struct, "found zoom on tcp src\n");
+
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM,
+                                   NDPI_PROTOCOL_UNKNOWN);
+        return;
+      } else if (is_zoom_dest_flow(ndpi_struct, flow) && is_zoom_tcp_dest_port(flow)){
+        NDPI_LOG_INFO(ndpi_struct, "found zoom on tcp dest\n");
 
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM,
                                    NDPI_PROTOCOL_UNKNOWN);
@@ -92,8 +140,14 @@ static void ndpi_check_zoom(struct ndpi_detection_module_struct *ndpi_struct,
     }
   else if(packet->udp != NULL)
     {
-      if (is_zoom_flow(ndpi_struct, flow) && is_zoom_udp_port(flow)){
-        NDPI_LOG_INFO(ndpi_struct, "found zoom on udp\n");
+      if (is_zoom_src_flow(ndpi_struct, flow) && is_zoom_udp_src_port(flow)){
+        NDPI_LOG_INFO(ndpi_struct, "found zoom on src udp\n");
+
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM,
+                                   NDPI_PROTOCOL_UNKNOWN);
+        return;
+      } else if (is_zoom_dest_flow(ndpi_struct, flow) && is_zoom_udp_dest_port(flow)){
+        NDPI_LOG_INFO(ndpi_struct, "found zoom on dest udp\n");
 
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM,
                                    NDPI_PROTOCOL_UNKNOWN);
