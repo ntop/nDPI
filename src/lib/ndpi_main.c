@@ -4463,6 +4463,44 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ********************************************************************************* */
 
+static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
+  packet->parsed_lines = 0,
+  packet->empty_line_position_set = 0,
+  packet->host_line.ptr = NULL,
+  packet->host_line.len = 0,
+  packet->referer_line.ptr = NULL,
+  packet->referer_line.len = 0,
+  packet->content_line.ptr = NULL,
+  packet->content_line.len = 0,
+  packet->accept_line.ptr = NULL,
+  packet->accept_line.len = 0,
+  packet->user_agent_line.ptr = NULL,
+  packet->user_agent_line.len = 0,
+  packet->http_url_name.ptr = NULL,
+  packet->http_url_name.len = 0,
+  packet->http_encoding.ptr = NULL,
+  packet->http_encoding.len = 0,
+  packet->http_transfer_encoding.ptr = NULL,
+  packet->http_transfer_encoding.len = 0,
+  packet->http_contentlen.ptr = NULL,
+  packet->http_contentlen.len = 0,
+  packet->http_cookie.ptr = NULL,
+  packet->http_cookie.len = 0,
+  packet->http_origin.len = 0,
+  packet->http_origin.ptr = NULL,
+  packet->http_x_session_type.ptr = NULL,
+  packet->http_x_session_type.len = 0,
+  packet->server_line.ptr = NULL,
+  packet->server_line.len = 0,
+  packet->http_method.ptr = NULL,
+  packet->http_method.len = 0,
+  packet->http_response.ptr = NULL,
+  packet->http_response.len = 0,
+  packet->http_num_headers = 0;
+}
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
 					    const unsigned char *packet,
@@ -4704,8 +4742,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
      Invalidate packet memory to avoid accessing the pointers below
      when the packet is no longer accessible
   */
-  flow->packet.iph = NULL, flow->packet.tcp = NULL, flow->packet.udp = NULL;
-
+  flow->packet.iph = NULL, flow->packet.tcp = NULL, flow->packet.udp = NULL, flow->packet.payload = NULL;
+  ndpi_reset_packet_line_info(&flow->packet);
+  
   return(ret);
 }
 
@@ -4867,40 +4906,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
     return;
 
   packet->packet_lines_parsed_complete = 1;
-  packet->parsed_lines = 0;
-  packet->empty_line_position_set = 0;
-  packet->host_line.ptr = NULL;
-  packet->host_line.len = 0;
-  packet->referer_line.ptr = NULL;
-  packet->referer_line.len = 0;
-  packet->content_line.ptr = NULL;
-  packet->content_line.len = 0;
-  packet->accept_line.ptr = NULL;
-  packet->accept_line.len = 0;
-  packet->user_agent_line.ptr = NULL;
-  packet->user_agent_line.len = 0;
-  packet->http_url_name.ptr = NULL;
-  packet->http_url_name.len = 0;
-  packet->http_encoding.ptr = NULL;
-  packet->http_encoding.len = 0;
-  packet->http_transfer_encoding.ptr = NULL;
-  packet->http_transfer_encoding.len = 0;
-  packet->http_contentlen.ptr = NULL;
-  packet->http_contentlen.len = 0;
-  packet->http_cookie.ptr = NULL;
-  packet->http_cookie.len = 0;
-  packet->http_origin.len = 0;
-  packet->http_origin.ptr = NULL;
-  packet->http_x_session_type.ptr = NULL;
-  packet->http_x_session_type.len = 0;
-  packet->server_line.ptr = NULL;
-  packet->server_line.len = 0;
-  packet->http_method.ptr = NULL;
-  packet->http_method.len = 0;
-  packet->http_response.ptr = NULL;
-  packet->http_response.len = 0;
-  packet->http_num_headers=0;
-
+  ndpi_reset_packet_line_info(packet);
+  
   if((packet->payload_packet_len < 3)
      || (packet->payload == NULL))
     return;
