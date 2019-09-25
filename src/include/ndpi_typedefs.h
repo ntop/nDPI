@@ -1365,6 +1365,7 @@ typedef enum {
 #define NDPI_SERIALIZER_STATUS_COMMA (1 << 0)
 #define NDPI_SERIALIZER_STATUS_ARRAY (1 << 1)
 #define NDPI_SERIALIZER_STATUS_EOR   (1 << 2)
+#define NDPI_SERIALIZER_STATUS_SOB   (1 << 3)
 
 typedef struct {
   u_int32_t flags;

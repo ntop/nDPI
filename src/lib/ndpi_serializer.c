@@ -454,7 +454,10 @@ static inline void ndpi_serialize_json_pre(ndpi_serializer *_serializer) {
     if(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY)
       serializer->status.size_used--; /* Remove ']'*/
     serializer->status.size_used--; /* Remove '}'*/
-    if(serializer->status.flags & NDPI_SERIALIZER_STATUS_COMMA)
+
+    if (serializer->status.flags & NDPI_SERIALIZER_STATUS_SOB)
+      serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_SOB;
+    else if(serializer->status.flags & NDPI_SERIALIZER_STATUS_COMMA)
       serializer->buffer[serializer->status.size_used++] = ',';
   }
 }
@@ -1202,6 +1205,64 @@ int ndpi_serialize_string_binary(ndpi_serializer *_serializer,
 int ndpi_serialize_string_string(ndpi_serializer *_serializer,
 				 const char *key, const char *_value) {
   return(ndpi_serialize_binary_binary(_serializer, key, strlen(key), _value, strlen(_value)));
+}
+
+/* ********************************** */
+
+/* Serialize start of nested block (JSON only)*/
+int ndpi_serialize_start_of_block(ndpi_serializer *_serializer,
+				  const char *key) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  u_int32_t buff_diff = serializer->buffer_size - serializer->status.size_used;
+  u_int32_t needed, klen = strlen(key);
+
+  if (serializer->fmt != ndpi_serialization_format_json)
+    return -1;
+
+  needed = 16 + klen;
+
+  if (buff_diff < needed) {
+    if (ndpi_extend_serializer_buffer(_serializer, needed - buff_diff) < 0)
+      return(-1);
+    buff_diff = serializer->buffer_size - serializer->status.size_used;
+  }
+
+  ndpi_serialize_json_pre(_serializer);
+  serializer->status.size_used += ndpi_json_string_escape(key, klen,
+    (char *) &serializer->buffer[serializer->status.size_used], buff_diff);
+  buff_diff = serializer->buffer_size - serializer->status.size_used;
+  serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff, ": {");
+  buff_diff = serializer->buffer_size - serializer->status.size_used;
+  ndpi_serialize_json_post(_serializer);
+
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_SOB;
+
+  return(0);
+}
+
+/* ********************************** */
+
+/* Serialize start of nested block (JSON only)*/
+int ndpi_serialize_end_of_block(ndpi_serializer *_serializer) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  u_int32_t buff_diff = serializer->buffer_size - serializer->status.size_used;
+  u_int32_t needed;
+
+  if (serializer->fmt != ndpi_serialization_format_json)
+    return -1;
+
+  needed = 4;
+
+  if (buff_diff < needed) {
+    if (ndpi_extend_serializer_buffer(_serializer, needed - buff_diff) < 0)
+      return(-1);
+    buff_diff = serializer->buffer_size - serializer->status.size_used;
+  }
+
+  buff_diff = serializer->buffer_size - serializer->status.size_used;
+  ndpi_serialize_json_post(_serializer);
+
+  return(0);
 }
 
 /* ********************************** */
