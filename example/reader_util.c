@@ -1057,10 +1057,11 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       workflow->stats.total_ip_bytes += rawsize;
     ndpi_flow = flow->ndpi_flow;
 
-    if(flow->entropy.flow_last_pkt_time.tv_sec) {
-      ndpi_timer_sub(&when, &flow->entropy.flow_last_pkt_time, &tdiff);
     if((tcph != NULL) && (tcph->fin || tcph->rst || tcph->syn))
       begin_or_end_tcp = 1;
+
+    if(flow->entropy.flow_last_pkt_time.tv_sec) {
+      ndpi_timer_sub(&when, &flow->entropy.flow_last_pkt_time, &tdiff);
     
       if(flow->iat_flow) {
 	u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
