@@ -2,8 +2,8 @@ Unknown	1115	1122198	1
 FTP_CONTROL	68	5571	1
 FTP_DATA	9	1819	1
 
-	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 210.8/324.7 4743/4769 785.8/963.4][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70.5/99.2 96/307 6.7/44.9][PLAIN TEXT (vsFTPd 3.0.3)]
-	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][cat: Download-FileTransfer-FileSharing/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes][bytes ratio: -0.624 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 14.2/19.0 29/29 14.3/13.4][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68.4/369.2 78/1271 4.8/520.6][PLAIN TEXT (    1 0        0        1073741)]
+	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 216.2/337.6 4743/4769 795.1/980.3][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70.5/99.2 96/307 6.7/44.9][PLAIN TEXT (vsFTPd 3.0.3)]
+	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][cat: Download-FileTransfer-FileSharing/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes][bytes ratio: -0.624 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/28 19.0/28.5 29/29 13.4/0.5][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68.4/369.2 78/1271 4.8/520.6][PLAIN TEXT (    1 0        0        1073741)]
 
 
 Undetected flows:

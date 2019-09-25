@@ -1,7 +1,7 @@
 /*
- * ndpi_util.c
+ * reader_util.c
  *
- * Copyright (C) 2011-18 - ntop.org
+ * Copyright (C) 2011-19 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -1033,6 +1033,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   u_int16_t sport, dport, payload_len;
   u_int8_t *payload;
   u_int8_t src_to_dst_direction = 1;
+  u_int8_t begin_or_end_tcp = 0;
   struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
 
   if(iph)
@@ -1058,7 +1059,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
     if(flow->entropy.flow_last_pkt_time.tv_sec) {
       ndpi_timer_sub(&when, &flow->entropy.flow_last_pkt_time, &tdiff);
-
+    if((tcph != NULL) && (tcph->fin || tcph->rst || tcph->syn))
+      begin_or_end_tcp = 1;
+    
       if(flow->iat_flow) {
 	u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
 
@@ -1083,7 +1086,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize;
       memcpy(&flow->entropy.src2dst_last_pkt_time, &when, sizeof(when));
     } else {
-      if(flow->entropy.dst2src_last_pkt_time.tv_sec) {
+      if(flow->entropy.dst2src_last_pkt_time.tv_sec && (!begin_or_end_tcp)) {
 	ndpi_timer_sub(&when, &flow->entropy.dst2src_last_pkt_time, &tdiff);
 
 	if(flow->iat_s_to_c) {
