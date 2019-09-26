@@ -98,7 +98,7 @@ typedef enum {
   NDPI_PROTOCOL_QQLIVE                = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_SOULSEEK              = 63,
-  NDPI_PROTOCOL_FREE_64               = 64,
+  NDPI_PROTOCOL_PS_VUE                = 64,
   NDPI_PROTOCOL_IRC                   = 65,
   NDPI_PROTOCOL_AYIYA                 = 66,
   NDPI_PROTOCOL_UNENCRYPTED_JABBER    = 67,
@@ -223,7 +223,7 @@ typedef enum {
   NDPI_PROTOCOL_VEVO                  = 186,
   NDPI_PROTOCOL_PANDORA               = 187,
   NDPI_PROTOCOL_QUIC                  = 188, /* Andrea Buscarinu <andrea.buscarinu@gmail.com> - Michele Campus <michelecampus5@gmail.com> */
-  NDPI_PROTOCOL_FREE_189              = 189,
+  NDPI_PROTOCOL_ZOOM                  = 189, /* Zoom video conference. */
   NDPI_PROTOCOL_EAQ                   = 190,
   NDPI_PROTOCOL_OOKLA                 = 191,
   NDPI_PROTOCOL_AMQP                  = 192,
