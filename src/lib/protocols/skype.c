@@ -23,13 +23,6 @@
 
 #include "ndpi_api.h"
 
-static void ndpi_skype_report_protocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  /* printf("-> payload_len=%u\n", flow->packet.payload_packet_len); */
-  
-  NDPI_LOG_INFO(ndpi_struct, "found skype\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
-}
-
 static int is_port(u_int16_t a, u_int16_t b, u_int16_t c) {
   return(((a == c) || (b == c)) ? 1 : 0);
 }
@@ -60,7 +53,11 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	   ((payload_len >= 16)
 	    && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
 	    && (packet->payload[2] == 0x02))) {
-	  ndpi_skype_report_protocol(ndpi_struct, flow);
+
+	  if(is_port(sport, dport, 8801))
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN);
+	  else
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
 	}
       }
       
@@ -90,7 +87,7 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	/* printf("[SKYPE] %u/%u\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest)); */
 	
 	NDPI_LOG_INFO(ndpi_struct, "found skype\n");
-	ndpi_skype_report_protocol(ndpi_struct, flow);
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
       } else {
 	// printf("NO [SKYPE] payload_len=%u\n", payload_len);
       }

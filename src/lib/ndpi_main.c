@@ -3309,12 +3309,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* Targus Getdata */
   init_targus_getdata_dissector(ndpi_struct, &a, detection_bitmask);
 
-  /* ZOOM */
-  init_zoom_dissector(ndpi_struct, &a, detection_bitmask);
-
-  /* PS Vue */
-  init_ps_vue_dissector(ndpi_struct, &a, detection_bitmask);
-
   /* ----------------------------------------------------------------- */
 
   ndpi_struct->callback_buffer_size = a;

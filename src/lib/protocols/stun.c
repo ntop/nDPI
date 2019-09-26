@@ -144,7 +144,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   const u_int16_t payload_length) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
-
+  int rc;
+  
   /* STUN over TCP does not look good */
   if (flow->packet.tcp)
     return(NDPI_IS_NOT_STUN);
@@ -319,6 +320,11 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
         switch(attribute) {
+	case 0x0103:
+          flow->guessed_host_protocol_id = NDPI_PROTOCOL_ZOOM;
+          return NDPI_IS_STUN;
+	  break;
+	  
         case 0x4000:
         case 0x4001:
         case 0x4002:
@@ -457,15 +463,12 @@ udp_stun_found:
   printf("==>> NDPI_PROTOCOL_WHATSAPP_CALL\n");
 #endif
 
-  if ((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478)) {
-      flow->guessed_host_protocol_id = (is_messenger_ip_address(ntohl(packet->iph->saddr)) ||
-          is_messenger_ip_address(ntohl(packet->iph->daddr))) ? NDPI_PROTOCOL_MESSENGER :
-                                                                NDPI_PROTOCOL_WHATSAPP_CALL;
-  } else
-    flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) ||
-        is_google_ip_address(ntohl(packet->iph->daddr))) ? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_CALL;
-
-  int rc = (flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
+  if(is_messenger_ip_address(ntohl(packet->iph->saddr)) || is_messenger_ip_address(ntohl(packet->iph->daddr)))      
+    flow->guessed_host_protocol_id = NDPI_PROTOCOL_MESSENGER;
+  else if(is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
+    flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+  
+  rc = (flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
 
   return rc;
 }
