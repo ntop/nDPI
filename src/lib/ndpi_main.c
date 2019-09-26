@@ -6288,4 +6288,43 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
   return(0); /* OK */
 }
 
-/* **************************************** */
+/* ******************************************************************** */
+
+/* 
+   This function tells if it's possible to further dissect a given flow
+   0 - All possible dissection has been completed
+   1 - Additional dissection is possible
+*/
+u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_struct,
+					struct ndpi_flow_struct *flow) {
+
+#if 0
+  printf("[DEBUG] %s(%u.%u)\n", __FUNCTION__,
+	 flow->detected_protocol_stack[0],
+	 flow->detected_protocol_stack[1]);
+#endif
+  
+  if(flow->check_extra_packets) return(1);
+  
+  switch(flow->detected_protocol_stack[0]) {
+  case NDPI_PROTOCOL_TLS:
+    if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed)
+      return(1);
+    break;
+	
+  case NDPI_PROTOCOL_HTTP:
+    if(flow->host_server_name[0] == '\0')
+      return(1);
+    break;
+    
+  case NDPI_PROTOCOL_DNS:
+    if((ndpi_struct->dns_dont_dissect_response == 0)
+       && (flow->host_server_name[0] == '\0'))
+      return(1);
+    break;
+  }
+  
+  return(0);  
+}
+
+/* ******************************************************************** */

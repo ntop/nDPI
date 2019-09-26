@@ -807,7 +807,8 @@ extern "C" {
   int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struct ndpi_in6_addr *dst_ip,
 			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
 			    u_char *hash_buf, u_int8_t hash_buf_len);
-  
+  u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_struct,
+					  struct ndpi_flow_struct *flow);    
   u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
   const char* ndpi_cipher2str(u_int32_t cipher);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
