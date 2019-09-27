@@ -1,0 +1,3 @@
+#  Format: name\tcategory_id
+internetbadguys.com	100
+144.139.247.220	100

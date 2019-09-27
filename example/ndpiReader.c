@@ -1897,7 +1897,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	    int fields[4];
 
 
-	    if(verbose) printf("[Category] Loading %s\t%s\n", name, category);
+	    if(verbose && !quiet_mode) printf("[Category] Loading %s\t%s\n", name, category);
 
 	    if(sscanf(name, "%d.%d.%d.%d", &fields[0], &fields[1], &fields[2], &fields[3]) == 4)
 	      ndpi_load_ip_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
