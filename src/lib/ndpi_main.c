@@ -455,7 +455,7 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_struc
 /*
   TODO
   This function should free the memory during program termination
-  
+
  */
 static void ndpi_free_memory_at_termination(struct ndpi_detection_module_struct *ndpi_struct, char *buf) {
 
@@ -471,7 +471,7 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
   char *value = ndpi_strdup(_value);
 
   if(!value) return(-1); else ndpi_free_memory_at_termination(ndpi_struct, value);
-  
+
 #ifdef DEBUG
   NDPI_LOG_DEBUG2(ndpi_struct, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
@@ -1794,10 +1794,14 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
     if(whatfound
        && (whatfound != buf)
        && (m->patterns->astring[0] != '.')  /* The searched pattern does not start with . */
-       && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */
-       && (whatfound[-1] != '.')
-       )
-      return(0);
+       && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */) {
+      if(whatfound[-1] != '.') {
+	return(0);
+      } else {
+	memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t)); /* Partial match? */
+	return(0); /* Keep searching as probably there is a better match */
+      }
+    }
   }
 
   /*
@@ -2215,6 +2219,13 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
   rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
+  /*
+    As ac_automata_search can detect partial matches and continue the search process
+    in case rc == 0 (i.e. no match), we need to check if there is a partial match
+    and in this case return it
+  */
+  if((rc == 0) && (match.number != 0)) rc = 1;
+  
   return(rc ? match.number : 0);
 }
 
@@ -2236,6 +2247,13 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id
   rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
+  /*
+    As ac_automata_search can detect partial matches and continue the search process
+    in case rc == 0 (i.e. no match), we need to check if there is a partial match
+    and in this case return it
+  */
+  if((rc == 0) && (match.number != 0)) rc = 1;
+  
   *id = rc ? match.number : NDPI_PROTOCOL_UNKNOWN;
 
   return(*id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
@@ -3543,7 +3561,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   u_int8_t l4_result;
 
   if (!flow)
-    return 1;  
+    return 1;
 
   /* reset payload_packet_len, will be set if ipv4 tcp or udp */
   flow->packet.payload_packet_len = 0;
@@ -3606,7 +3624,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.l4_protocol = l4protocol;
   flow->packet.l4_packet_len = l4len;
   flow->l4_proto = l4protocol;
-  
+
   /* tcp / udp detection */
   if(l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */ ) {
     /* tcp */
@@ -3860,7 +3878,7 @@ void check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
        && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_udp[a].detection_bitmask,
 			       detection_bitmask) != 0) {
       ndpi_struct->callback_buffer_udp[a].func(ndpi_struct, flow);
-	     
+
       // NDPI_LOG_DBG(ndpi_struct, "[UDP,CALL] dissector of protocol as callback_buffer idx =  %d\n",a);
       if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	break; /* Stop after detecting the first protocol */
@@ -4528,7 +4546,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   /* Init default */
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
-  
+
   if(flow->server_id == NULL) flow->server_id = dst; /* Default */
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     /*
@@ -4541,7 +4559,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
        */
        ) {
       ndpi_process_extra_packet(ndpi_struct, flow, packet, packetlen, current_tick_l, src, dst);
-      
+
       return(ret);
     } else
       goto ret_protocols;
@@ -4747,7 +4765,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   */
   flow->packet.iph = NULL, flow->packet.tcp = NULL, flow->packet.udp = NULL, flow->packet.payload = NULL;
   ndpi_reset_packet_line_info(&flow->packet);
-  
+
   return(ret);
 }
 
@@ -4910,7 +4928,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
 
   packet->packet_lines_parsed_complete = 1;
   ndpi_reset_packet_line_info(packet);
-  
+
   if((packet->payload_packet_len < 3)
      || (packet->payload == NULL))
     return;
@@ -5875,7 +5893,7 @@ int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_mod, char *ca
 
 void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
-  
+
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
     printf("%3d %-22s %-12s %s\n", i,
 	   ndpi_mod->proto_defaults[i].protoName,
@@ -6115,6 +6133,13 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct,
   rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
+  /*
+    As ac_automata_search can detect partial matches and continue the search process
+    in case rc == 0 (i.e. no match), we need to check if there is a partial match
+    and in this case return it
+  */
+  if((rc == 0) && (match.number != 0)) rc = 1;
+  
   return(rc ? match.number : 0);
 }
 
@@ -6129,7 +6154,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
 	ndpi_free(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
     }
-    
+
     ndpi_free(flow);
   }
 }
@@ -6290,7 +6315,7 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 
 /* ******************************************************************** */
 
-/* 
+/*
    This function tells if it's possible to further dissect a given flow
    0 - All possible dissection has been completed
    1 - Additional dissection is possible
@@ -6303,28 +6328,28 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 	 flow->detected_protocol_stack[0],
 	 flow->detected_protocol_stack[1]);
 #endif
-  
+
   if(flow->check_extra_packets) return(1);
-  
+
   switch(flow->detected_protocol_stack[0]) {
   case NDPI_PROTOCOL_TLS:
     if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed)
       return(1);
     break;
-	
+
   case NDPI_PROTOCOL_HTTP:
     if(flow->host_server_name[0] == '\0')
       return(1);
     break;
-    
+
   case NDPI_PROTOCOL_DNS:
     if((ndpi_struct->dns_dont_dissect_response == 0)
        && (flow->host_server_name[0] == '\0'))
       return(1);
     break;
   }
-  
-  return(0);  
+
+  return(0);
 }
 
 /* ******************************************************************** */

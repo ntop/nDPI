@@ -263,12 +263,14 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
     if(j > 0) {
       ndpi_protocol_match_result ret_match;
+      u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow,
+						       (char *)flow->host_server_name,
+						       strlen((const char*)flow->host_server_name),
+						       &ret_match,
+						       NDPI_PROTOCOL_DNS);
 
-      ndpi_match_host_subprotocol(ndpi_struct, flow,
-				  (char *)flow->host_server_name,
-				  strlen((const char*)flow->host_server_name),
-				  &ret_match,
-				  NDPI_PROTOCOL_DNS);
+      if(ret_match.protocol_category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+	flow->category = ret_match.protocol_category;      
     }
 
 #ifdef DNS_DEBUG
