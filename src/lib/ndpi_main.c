@@ -978,7 +978,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WECHAT,
 			    0 /* can_have_a_subprotocol */, no_master, /* wechat.com */
-			    no_master, "WeChat", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
+			    no_master, "WeChat", NDPI_PROTOCOL_CATEGORY_CHAT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEMCACHED,
@@ -4738,8 +4738,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   } else
     ret.app_protocol = flow->detected_protocol_stack[0];
 
-  ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
-
+  /* Don;t overwrite the category if already set */
+  if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
+  else
+    ret.category = flow->category;
+  
   if((flow->num_processed_pkts == 1)
      && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN)
      && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)

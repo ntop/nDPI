@@ -8727,8 +8727,6 @@ ndpi_protocol_match host_match[] = {
   /* Detected "slack-assets2.s3-us-west-2.amazonaws.com.". Omitted "*amazonaws.com" CDN, but no generic pattern to use on first part */
   { "slack-assets2.s3-", NULL, "slack-assets2\\.s3-",                  "Slack",            NDPI_PROTOCOL_SLACK, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { "wechat.com", NULL, "wechat\\.com" TLD,                            "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-
   { "github.com", NULL, "github" TLD,                                  "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { ".github.com", NULL, "\\.github" TLD,                              "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
   { "github.io", NULL, NULL,                                           "Github",           NDPI_PROTOCOL_GITHUB, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
