@@ -1902,9 +1902,11 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	    if(sscanf(name, "%d.%d.%d.%d", &fields[0], &fields[1], &fields[2], &fields[3]) == 4)
 	      ndpi_load_ip_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				    name, (ndpi_protocol_category_t)atoi(category));
-	    else
+	    else {
+	      /* TODO free the strdup */
 	      ndpi_load_hostname_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-					  name, (ndpi_protocol_category_t)atoi(category));
+					  strdup(name), (ndpi_protocol_category_t)atoi(category));
+      }
 	  }
 	}
       }
