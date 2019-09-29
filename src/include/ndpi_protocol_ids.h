@@ -278,13 +278,14 @@ typedef enum {
   NDPI_PROTOCOL_GOOGLE_DOCS           = 241,
   NDPI_PROTOCOL_WHATSAPP_FILES        = 242, /* Videos, pictures, voice messages... */
   NDPI_PROTOCOL_TARGUS_GETDATA        = 243,
-  /*
+  NDPI_PROTOCOL_DNP3                  = 244,
+  NDPI_PROTOCOL_104                   = 245,    
+/*
     IMPORTANT
     before allocating a new identifier please fill up
     one of those named NDPI_PROTOCOL_FREE_XXX and not used
     (placeholders to avoid protocol renumbering)
   */
-  
   
   /* IMPORTANT:NDPI_LAST_IMPLEMENTED_PROTOCOL MUST BE THE LAST ELEMENT */
   NDPI_LAST_IMPLEMENTED_PROTOCOL

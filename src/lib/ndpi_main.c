@@ -1752,7 +1752,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "AmazonVideo", NDPI_PROTOCOL_CATEGORY_CLOUD,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DNP3,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "DNP3", NDPI_PROTOCOL_CATEGORY_NETWORK, 
+			    ndpi_build_default_ports(ports_a, 20000, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_104,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "104", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
+			    ndpi_build_default_ports(ports_a, 2404, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
 
