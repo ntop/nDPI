@@ -280,6 +280,7 @@ typedef enum {
   NDPI_PROTOCOL_TARGUS_GETDATA        = 243,
   NDPI_PROTOCOL_DNP3                  = 244,
   NDPI_PROTOCOL_104                   = 245,    
+  NDPI_PROTOCOL_HULU                  = 246,
 /*
     IMPORTANT
     before allocating a new identifier please fill up
