@@ -171,7 +171,7 @@ typedef enum {
   NDPI_PROTOCOL_LASTFM                = 134,
   NDPI_PROTOCOL_WAZE                  = 135,
   NDPI_PROTOCOL_YOUTUBE_UPLOAD        = 136, /* Upload files to youtube */
-  NDPI_PROTOCOL_GENERIC               = 137, /* Generic protocol used for category matching */
+  NDPI_PROTOCOL_FREE_137              = 137, /* Free */
   NDPI_PROTOCOL_CHECKMK               = 138,
   NDPI_PROTOCOL_AJP                   = 139, /* Leonn Paiva <leonn.paiva@gmail.com> */
   NDPI_PROTOCOL_APPLE                 = 140,

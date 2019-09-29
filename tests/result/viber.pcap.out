@@ -1,11 +1,10 @@
 DNS	8	1267	4
 MDNS	4	412	1
 ICMP	2	3028	1
-TLS	12	824	2
+TLS	31	8597	3
 ICMPV6	2	140	1
 Facebook	2	281	1
 Google	32	9133	3
-GenericProtocol	19	7773	1
 Viber	268	99524	9
 Amazon	71	24849	3
 
@@ -20,7 +19,7 @@ JA3 Host Stats:
 	4	TCP 192.168.0.17:33208 <-> 52.0.253.101:4244 [proto: 144/Viber][cat: VoIP/10][32 pkts/6563 bytes <-> 26 pkts/2782 bytes][bytes ratio: 0.405 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 1508.3/1866.6 10563/10701 2617.1/2836.9][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 205.1/107.0 657/176 184.2/42.7]
 	5	TCP 192.168.0.17:43702 <-> 172.217.23.78:443 [proto: 91.126/TLS.Google][cat: Web/5][15 pkts/5339 bytes <-> 12 pkts/3436 bytes][bytes ratio: 0.217 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 2423.6/3084.5 23555/23575 6404.8/7092.0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 355.9/286.3 1038/884 369.7/257.9][TLSv1.2][Client: app-measurement.com][JA3C: 3967ff2d2c9c4d144e7e30f24f4e9761][JA3S: 67619a80665d7ab92d1041b1d11f9164][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	6	TCP 192.168.0.17:36986 <-> 54.69.166.226:443 [proto: 91.178/TLS.Amazon][cat: Web/5][11 pkts/1437 bytes <-> 11 pkts/6412 bytes][bytes ratio: -0.634 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 92.8/81.8 273/298 101.7/110.9][Pkt Len c2s/s2c min/avg/max/stddev: 66/54 130.6/582.9 432/1514 111.7/601.3][TLSv1.2][Client: mapi.apptimize.com][JA3C: d8c87b9bfde38897979e41242626c2f3][Server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Certificate SHA-1: BC:4C:8F:EC:8B:7B:85:BD:54:61:8B:C0:7B:E7:A2:69:0B:F2:49:E5][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
-	7	TCP 192.168.0.17:55746 <-> 151.101.1.130:443 [proto: 91.137/TLS.GenericProtocol][cat: Media/1][10 pkts/1534 bytes <-> 9 pkts/6239 bytes][bytes ratio: -0.605 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 25.8/22.0 152/60 45.6/24.3][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 153.4/693.2 631/1514 169.0/615.5][TLSv1.2][Client: venetia.iad.appboy.com][JA3C: d8c87b9bfde38897979e41242626c2f3][Server: y.ssl.fastly.net][JA3S: 860fcf58fd757e26aa8911e5eaff6b53][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
+	7	TCP 192.168.0.17:55746 <-> 151.101.1.130:443 [proto: 91/TLS][cat: Media/1][10 pkts/1534 bytes <-> 9 pkts/6239 bytes][bytes ratio: -0.605 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 25.8/22.0 152/60 45.6/24.3][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 153.4/693.2 631/1514 169.0/615.5][TLSv1.2][Client: venetia.iad.appboy.com][JA3C: d8c87b9bfde38897979e41242626c2f3][Server: y.ssl.fastly.net][JA3S: 860fcf58fd757e26aa8911e5eaff6b53][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	8	TCP 192.168.0.17:36988 <-> 54.69.166.226:443 [proto: 91.178/TLS.Amazon][cat: Web/5][11 pkts/1462 bytes <-> 11 pkts/6163 bytes][bytes ratio: -0.617 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 82.7/70.2 185/191 87.4/90.5][Pkt Len c2s/s2c min/avg/max/stddev: 66/54 132.9/560.3 433/1514 110.8/605.1][TLSv1.2][Client: mapi.apptimize.com][JA3C: d8c87b9bfde38897979e41242626c2f3][Server: *.apptimize.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256]
 	9	UDP 192.168.0.17:47171 <-> 18.201.4.32:7985 [proto: 144/Viber][cat: VoIP/10][24 pkts/5035 bytes <-> 22 pkts/2302 bytes][bytes ratio: 0.372 (Upload)][IAT c2s/s2c min/avg/max/stddev: 15/15 313.5/341.8 529/529 202.0/188.2][Pkt Len c2s/s2c min/avg/max/stddev: 54/76 209.8/104.6 299/118 115.2/19.6][PLAIN TEXT (Android)]
 	10	UDP 192.168.0.17:38190 <-> 18.201.4.3:7985 [proto: 144/Viber][cat: VoIP/10][25 pkts/4344 bytes <-> 18 pkts/1872 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 236.1/328.9 531/531 238.8/225.3][Pkt Len c2s/s2c min/avg/max/stddev: 54/76 173.8/104.0 299/118 120.4/19.8][PLAIN TEXT (Android)]

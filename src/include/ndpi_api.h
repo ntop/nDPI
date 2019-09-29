@@ -383,13 +383,12 @@ extern "C" {
    * @return the ID of the matched subprotocol
    *
    */
-  int ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				  struct ndpi_flow_struct *flow,
-				  char *string_to_match,
-				  u_int string_to_match_len,
-				  ndpi_protocol_match_result *ret_match,
-				  u_int16_t master_protocol_id);
-
+  u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+					struct ndpi_flow_struct *flow,
+					char *string_to_match,
+					u_int string_to_match_len,
+					ndpi_protocol_match_result *ret_match,
+					u_int16_t master_protocol_id);  
 
   /**
    * Check if the string content passed match with a protocol
@@ -403,12 +402,12 @@ extern "C" {
    * @return the ID of the matched subprotocol
    *
    */
-  int ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				     struct ndpi_flow_struct *flow,
-				     char *string_to_match,
-				     u_int string_to_match_len,
-				     ndpi_protocol_match_result *ret_match,
-				     u_int16_t master_protocol_id);
+  u_int16_t ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+					   struct ndpi_flow_struct *flow,
+					   char *string_to_match,
+					   u_int string_to_match_len,
+					   ndpi_protocol_match_result *ret_match,
+					   u_int16_t master_protocol_id);
   /**
    * Exclude protocol from search
    *
@@ -755,7 +754,7 @@ extern "C" {
 				 u_int32_t daddr,
 				 ndpi_protocol *ret);
   int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
-				      char *name, unsigned long *id);
+				 char *name, unsigned long *id);
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   ndpi_protocol *ret);

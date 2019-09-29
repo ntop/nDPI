@@ -919,11 +919,10 @@ typedef enum {
 } ndpi_protocol_category_t;
 
 typedef enum {
-	      ndpi_pref_http_dont_dissect_response = 0,
-	      ndpi_pref_dns_dont_dissect_response,
-	      ndpi_pref_direction_detect_disable,
-	      ndpi_pref_disable_metadata_export,
-	      ndpi_pref_enable_category_substring_match
+   ndpi_pref_http_dont_dissect_response = 0,
+   ndpi_pref_dns_dont_dissect_response,
+   ndpi_pref_direction_detect_disable,
+   ndpi_pref_disable_metadata_export,
 } ndpi_detection_preference;
 
 /* ntop extensions */
@@ -1048,7 +1047,6 @@ struct ndpi_detection_module_struct {
 #else
     ndpi_automa hostnames, hostnames_shadow;
 #endif
-    void *hostnames_hash;
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
     u_int8_t categories_loaded;
   } custom_categories;
@@ -1102,8 +1100,7 @@ struct ndpi_detection_module_struct {
 
   u_int8_t http_dont_dissect_response:1, dns_dont_dissect_response:1,
     direction_detect_disable:1, /* disable internal detection of packet direction */
-    disable_metadata_export:1, /* No metadata is exported */
-    enable_category_substring_match:1 /* Default is perfect match */
+    disable_metadata_export:1   /* No metadata is exported */
     ;
 
   void *hyperscan; /* Intel Hyperscan */
@@ -1336,6 +1333,11 @@ typedef struct {
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match;
+
+typedef struct {
+  char *string_to_match, *hyperscan_string_to_match;
+  ndpi_protocol_category_t protocol_category;
+} ndpi_category_match;
 
 typedef struct {
   u_int32_t network;
