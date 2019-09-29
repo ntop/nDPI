@@ -713,10 +713,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *payload = (u_int8_t*)&l4[sizeof(struct ndpi_icmphdr )];
     *payload_len = (l4_packet_len > sizeof(struct ndpi_icmphdr)) ? l4_packet_len-sizeof(struct ndpi_icmphdr) : 0;
     l4_data_len = l4_packet_len - sizeof(struct ndpi_icmphdr);
+    *sport = *dport = 0;
   } else if (*proto == IPPROTO_ICMPV6) {
     *payload = (u_int8_t*)&l4[sizeof(struct ndpi_icmp6hdr)];
     *payload_len = (l4_packet_len > sizeof(struct ndpi_icmp6hdr)) ? l4_packet_len-sizeof(struct ndpi_icmp6hdr) : 0;
     l4_data_len = l4_packet_len - sizeof(struct ndpi_icmp6hdr);
+    *sport = *dport = 0;
   } else {
     // non tcp/udp protocols
     *sport = *dport = 0;
