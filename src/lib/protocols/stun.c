@@ -144,7 +144,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   const u_int16_t payload_length) {
   u_int16_t msg_type, msg_len;
   struct stun_packet_header *h = (struct stun_packet_header*)payload;
-
+  int rc;
+  
   /* STUN over TCP does not look good */
   if (flow->packet.tcp)
     return(NDPI_IS_NOT_STUN);
@@ -156,9 +157,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
     if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
-      return NDPI_IS_STUN;
+      return(NDPI_IS_STUN);
     } else
-      return NDPI_IS_NOT_STUN;
+      return(NDPI_IS_NOT_STUN);
   }
 
   if((strncmp((const char*)payload, (const char*)"RSP/", 4) == 0)
@@ -167,9 +168,11 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     goto udp_stun_found;
   }
 
-  msg_type = ntohs(h->msg_type);
-  msg_len = ntohs(h->msg_len);
+  msg_type = ntohs(h->msg_type), msg_len = ntohs(h->msg_len);
 
+  if(msg_type == 0)
+    return(NDPI_IS_NOT_STUN);  
+  
   /* https://www.iana.org/assignments/stun-parameters/stun-parameters.xhtml */
   if ((msg_type & 0x3EEF) > 0x000B && msg_type != 0x0800) {
 #ifdef DEBUG_STUN
@@ -194,12 +197,12 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
           if (payload_length == total_len) {
             /* This is DTLS and the only protocol we know behaves like this is signal */
             flow->guessed_host_protocol_id = NDPI_PROTOCOL_SIGNAL;
-            return NDPI_IS_STUN;
+            return(NDPI_IS_STUN);
           }
       }
     }
 
-    return NDPI_IS_NOT_STUN;
+    return(NDPI_IS_NOT_STUN);
   }
 
 #if 0
@@ -235,7 +238,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
       flow->guessed_host_protocol_id = proto;
-      return NDPI_IS_STUN;
+      return(NDPI_IS_STUN);
     } else {
 #ifdef DEBUG_LRU
       printf("[LRU] NOT FOUND %u\n", key);
@@ -257,7 +260,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
     if (!msg_len) {
       /* flow->protos.stun_ssl.stun.num_udp_pkts++; */
-      return NDPI_IS_NOT_STUN; /* This to keep analyzing STUN instead of giving up */
+      return(NDPI_IS_NOT_STUN); /* This to keep analyzing STUN instead of giving up */
     }
   }
 
@@ -270,11 +273,11 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if((payload[0] == 0x80 && payload_length < 512 && ((msg_len+20) <= payload_length))) {
     flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
-    return NDPI_IS_STUN; /* This is WhatsApp Call */
+    return(NDPI_IS_STUN); /* This is WhatsApp Call */
   } else if((payload[0] == 0x90) && (((msg_len+11) == payload_length) ||
                 (flow->protos.stun_ssl.stun.num_binding_requests >= 4))) {
     flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
-    return NDPI_IS_STUN; /* This is WhatsApp Call */
+    return(NDPI_IS_STUN); /* This is WhatsApp Call */
   }
 
   if (payload[0] != 0x80 && (msg_len + 20) > payload_length)
@@ -319,12 +322,17 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
         switch(attribute) {
+	case 0x0103:
+          flow->guessed_host_protocol_id = NDPI_PROTOCOL_ZOOM;
+          return(NDPI_IS_STUN);
+	  break;
+	  
         case 0x4000:
         case 0x4001:
         case 0x4002:
           /* These are the only messages apparently whatsapp voice can use */
           flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
-          return NDPI_IS_STUN;
+          return(NDPI_IS_STUN);
           break;
 
         case 0x0014: /* Realm */
@@ -346,10 +354,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
             if (strstr((char*) flow->host_server_name, "google.com") != NULL) {
                 flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
-                return NDPI_IS_STUN;
+                return(NDPI_IS_STUN);
             } else if (strstr((char*) flow->host_server_name, "whispersystems.org") != NULL) {
               flow->guessed_host_protocol_id = NDPI_PROTOCOL_SIGNAL;
-              return NDPI_IS_STUN;
+              return(NDPI_IS_STUN);
             }
           }
         }
@@ -359,14 +367,14 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
           if (msg_type == 0x0001) {
             if ((msg_len == 100) || (msg_len == 104)) {
               flow->guessed_host_protocol_id = NDPI_PROTOCOL_MESSENGER;
-              return NDPI_IS_STUN;
+              return(NDPI_IS_STUN);
             } else if(msg_len == 76) {
 #if 0
               if(1) {
                 flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
-                return NDPI_IS_NOT_STUN; /* This case is found also with signal traffic */
+                return(NDPI_IS_NOT_STUN); /* This case is found also with signal traffic */
               } else
-                return NDPI_IS_STUN;
+                return(NDPI_IS_STUN);
 #endif
             }
           }
@@ -383,7 +391,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
             printf("==> Skype found\n");
 #endif
             flow->guessed_host_protocol_id = NDPI_PROTOCOL_SKYPE_CALL;
-            return NDPI_IS_STUN;
+            return(NDPI_IS_STUN);
           }
 
           break;
@@ -404,7 +412,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
           flow->guessed_host_protocol_id = NDPI_PROTOCOL_SKYPE_CALL;
-          return NDPI_IS_STUN;
+          return(NDPI_IS_STUN);
           break;
 
         case 0x8070: /* Implementation Version */
@@ -416,13 +424,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
             flow->guessed_host_protocol_id = NDPI_PROTOCOL_SKYPE_CALL;
-            return NDPI_IS_STUN;
+            return(NDPI_IS_STUN);
           }
           break;
 
         case 0xFF03:
           flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
-          return NDPI_IS_STUN;
+          return(NDPI_IS_STUN);
           break;
 
         default:
@@ -438,15 +446,15 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       goto udp_stun_found;
     } else if(msg_type == 0x0800) {
       flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
-      return NDPI_IS_STUN;
+      return(NDPI_IS_STUN);
     }
   }
 
   if ((flow->protos.stun_ssl.stun.num_udp_pkts > 0) && (msg_type <= 0x00FF)) {
     flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
-    return NDPI_IS_STUN;
+    return(NDPI_IS_STUN);
   } else
-    return NDPI_IS_NOT_STUN;
+    return(NDPI_IS_NOT_STUN);
 
 udp_stun_found:
   flow->protos.stun_ssl.stun.num_processed_pkts++;
@@ -457,15 +465,12 @@ udp_stun_found:
   printf("==>> NDPI_PROTOCOL_WHATSAPP_CALL\n");
 #endif
 
-  if ((ntohs(packet->udp->source) == 3478) || (ntohs(packet->udp->dest) == 3478)) {
-      flow->guessed_host_protocol_id = (is_messenger_ip_address(ntohl(packet->iph->saddr)) ||
-          is_messenger_ip_address(ntohl(packet->iph->daddr))) ? NDPI_PROTOCOL_MESSENGER :
-                                                                NDPI_PROTOCOL_WHATSAPP_CALL;
-  } else
-    flow->guessed_host_protocol_id = (is_google_ip_address(ntohl(packet->iph->saddr)) ||
-        is_google_ip_address(ntohl(packet->iph->daddr))) ? NDPI_PROTOCOL_HANGOUT_DUO : NDPI_PROTOCOL_WHATSAPP_CALL;
-
-  int rc = (flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
+  if(is_messenger_ip_address(ntohl(packet->iph->saddr)) || is_messenger_ip_address(ntohl(packet->iph->daddr)))      
+    flow->guessed_host_protocol_id = NDPI_PROTOCOL_MESSENGER;
+  else if(is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
+    flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+  
+  rc = (flow->protos.stun_ssl.stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
 
   return rc;
 }

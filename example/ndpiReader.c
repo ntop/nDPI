@@ -1895,14 +1895,16 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	    int fields[4];
 
 
-	    if(verbose) printf("[Category] Loading %s\t%s\n", name, category);
+	    if(verbose && !quiet_mode) printf("[Category] Loading %s\t%s\n", name, category);
 
 	    if(sscanf(name, "%d.%d.%d.%d", &fields[0], &fields[1], &fields[2], &fields[3]) == 4)
 	      ndpi_load_ip_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				    name, (ndpi_protocol_category_t)atoi(category));
-	    else
+	    else {
+	      /* TODO free the strdup */
 	      ndpi_load_hostname_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-					  name, (ndpi_protocol_category_t)atoi(category));
+					  strdup(name), (ndpi_protocol_category_t)atoi(category));
+      }
 	  }
 	}
       }
@@ -3458,8 +3460,7 @@ void automataUnitTest() {
   assert(ndpi_add_string_to_automa(automa, "hello") == 0);
   assert(ndpi_add_string_to_automa(automa, "world") == 0);
   ndpi_finalize_automa(automa);
-  assert(ndpi_match_string(automa, "This is the wonderful world of nDPI") == 0);
-
+  assert(ndpi_match_string(automa, "This is the wonderful world of nDPI") == 1);
   ndpi_free_automa(automa);
 }
 

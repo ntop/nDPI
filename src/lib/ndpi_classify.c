@@ -299,6 +299,8 @@ ndpi_merge_splt_arrays (const uint16_t *pkt_len, const struct timeval *pkt_time,
             tmp = pkt_time_twin[r];
             ndpi_timer_sub(&tmp, &ts_start, &tmp_r);
             merged_times[s+r] = ndpi_timeval_to_milliseconds(tmp_r);
+            if (merged_times[s+r] == 0)
+                merged_times[s+r] = ndpi_timeval_to_microseconds(tmp_r);
             ts_start = tmp;
             r++;
         } else if (r >= r_idx) {
@@ -306,27 +308,35 @@ ndpi_merge_splt_arrays (const uint16_t *pkt_len, const struct timeval *pkt_time,
             tmp = pkt_time[s];
             ndpi_timer_sub(&tmp, &ts_start, &tmp_r);
             merged_times[s+r] = ndpi_timeval_to_milliseconds(tmp_r);
+            if (merged_times[s+r] == 0)
+                merged_times[s+r] = ndpi_timeval_to_microseconds(tmp_r);
             ts_start = tmp;
             s++;
         } else {
             if (ndpi_timer_lt(&pkt_time[s], &pkt_time_twin[r])) {
                 merged_lens[s+r] = pkt_len[s];
-	               tmp = pkt_time[s];
-	               ndpi_timer_sub(&tmp, &ts_start, &tmp_r);
-	               merged_times[s+r] = ndpi_timeval_to_milliseconds(tmp_r);
-	               ts_start = tmp;
+	        tmp = pkt_time[s];
+	        ndpi_timer_sub(&tmp, &ts_start, &tmp_r);
+	        merged_times[s+r] = ndpi_timeval_to_milliseconds(tmp_r);
+                if (merged_times[s+r] == 0)
+                    merged_times[s+r] = ndpi_timeval_to_microseconds(tmp_r);
+	        ts_start = tmp;
                 s++;
             } else {
                 merged_lens[s+r] = pkt_len_twin[r];
-	               tmp = pkt_time_twin[r];
-	               ndpi_timer_sub(&tmp, &ts_start, &tmp_r);
-	               merged_times[s+r] = ndpi_timeval_to_milliseconds(tmp_r);
-	               ts_start = tmp;
+	        tmp = pkt_time_twin[r];
+	        ndpi_timer_sub(&tmp, &ts_start, &tmp_r);
+	        merged_times[s+r] = ndpi_timeval_to_milliseconds(tmp_r);
+                if (merged_times[s+r] == 0)
+                    merged_times[s+r] = ndpi_timeval_to_microseconds(tmp_r);
+	        ts_start = tmp;
                 r++;
             }
         }
     }
     merged_times[0] = ndpi_timeval_to_milliseconds(start_m);
+    if (merged_times[0] == 0)
+        merged_times[0] = ndpi_timeval_to_microseconds(start_m);
 }
 
 /* transform lens array to Markov chain */
@@ -653,6 +663,18 @@ unsigned int
 ndpi_timeval_to_milliseconds(struct timeval ts)
 {
     unsigned int result = ts.tv_usec / 1000 + ts.tv_sec * 1000;
+    return result;
+}
+
+/**
+ * \brief Calculate the microseconds representation of a timeval.
+ * \param ts Timeval
+ * \return unsigned int - Milliseconds
+ */
+unsigned int
+ndpi_timeval_to_microseconds(struct timeval ts)
+{
+    unsigned int result = ts.tv_usec + ts.tv_sec * 1000 * 1000;
     return result;
 }
 

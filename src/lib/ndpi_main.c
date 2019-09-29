@@ -455,7 +455,7 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_struc
 /*
   TODO
   This function should free the memory during program termination
-  
+
  */
 static void ndpi_free_memory_at_termination(struct ndpi_detection_module_struct *ndpi_struct, char *buf) {
 
@@ -471,7 +471,7 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
   char *value = ndpi_strdup(_value);
 
   if(!value) return(-1); else ndpi_free_memory_at_termination(ndpi_struct, value);
-  
+
 #ifdef DEBUG
   NDPI_LOG_DEBUG2(ndpi_struct, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
@@ -978,7 +978,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WECHAT,
 			    0 /* can_have_a_subprotocol */, no_master, /* wechat.com */
-			    no_master, "WeChat", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
+			    no_master, "WeChat", NDPI_PROTOCOL_CATEGORY_CHAT,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MEMCACHED,
@@ -1122,9 +1122,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_64,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PS_VUE,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Free64", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
+			    no_master, "PS_VUE", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_IRC,
@@ -1249,9 +1249,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "PcAnywhere", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_189,
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZOOM,
 			    0 /* can_have_a_subprotocol */, no_master,
-			    no_master, "Free189", NDPI_PROTOCOL_CATEGORY_VOIP,
+			    no_master, "Zoom", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_FILES,
@@ -1555,7 +1555,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CISCOVPN,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "CiscoVPN", NDPI_PROTOCOL_CATEGORY_VPN,
-			    ndpi_build_default_ports(ports_a, 10000, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_a, 10000, 8008, 8009, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 10000, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEAMSPEAK,
 			    0 /* can_have_a_subprotocol */, no_master,
@@ -1752,7 +1752,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "AmazonVideo", NDPI_PROTOCOL_CATEGORY_CLOUD,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DNP3,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "DNP3", NDPI_PROTOCOL_CATEGORY_NETWORK, 
+			    ndpi_build_default_ports(ports_a, 20000, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_mod, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_104,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "104", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
+			    ndpi_build_default_ports(ports_a, 2404, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_mod);
 
@@ -1794,10 +1803,14 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
     if(whatfound
        && (whatfound != buf)
        && (m->patterns->astring[0] != '.')  /* The searched pattern does not start with . */
-       && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */
-       && (whatfound[-1] != '.')
-       )
-      return(0);
+       && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */) {
+      if(whatfound[-1] != '.') {
+	return(0);
+      } else {
+	memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t)); /* Partial match? */
+	return(0); /* Keep searching as probably there is a better match */
+      }
+    }
   }
 
   /*
@@ -2215,6 +2228,13 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
   rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
+  /*
+    As ac_automata_search can detect partial matches and continue the search process
+    in case rc == 0 (i.e. no match), we need to check if there is a partial match
+    and in this case return it
+  */
+  if((rc == 0) && (match.number != 0)) rc = 1;
+  
   return(rc ? match.number : 0);
 }
 
@@ -2236,6 +2256,13 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id
   rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
+  /*
+    As ac_automata_search can detect partial matches and continue the search process
+    in case rc == 0 (i.e. no match), we need to check if there is a partial match
+    and in this case return it
+  */
+  if((rc == 0) && (match.number != 0)) rc = 1;
+  
   *id = rc ? match.number : NDPI_PROTOCOL_UNKNOWN;
 
   return(*id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
@@ -3543,7 +3570,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   u_int8_t l4_result;
 
   if (!flow)
-    return 1;  
+    return 1;
 
   /* reset payload_packet_len, will be set if ipv4 tcp or udp */
   flow->packet.payload_packet_len = 0;
@@ -3606,7 +3633,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.l4_protocol = l4protocol;
   flow->packet.l4_packet_len = l4len;
   flow->l4_proto = l4protocol;
-  
+
   /* tcp / udp detection */
   if(l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */ ) {
     /* tcp */
@@ -3860,7 +3887,7 @@ void check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
        && NDPI_BITMASK_COMPARE(ndpi_struct->callback_buffer_udp[a].detection_bitmask,
 			       detection_bitmask) != 0) {
       ndpi_struct->callback_buffer_udp[a].func(ndpi_struct, flow);
-	     
+
       // NDPI_LOG_DBG(ndpi_struct, "[UDP,CALL] dissector of protocol as callback_buffer idx =  %d\n",a);
       if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	break; /* Stop after detecting the first protocol */
@@ -4044,8 +4071,14 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   if(flow == NULL)
     return(ret);
-  else
-    ret.category = flow->category;
+
+  /* Init defaults */
+  ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+  ret.category = flow->category;
+
+  /* Ensure that we don't change our mind if detection is already complete */
+  if((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) && (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
+    return(ret);
 
   /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
@@ -4460,6 +4493,44 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ********************************************************************************* */
 
+static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
+  packet->parsed_lines = 0,
+  packet->empty_line_position_set = 0,
+  packet->host_line.ptr = NULL,
+  packet->host_line.len = 0,
+  packet->referer_line.ptr = NULL,
+  packet->referer_line.len = 0,
+  packet->content_line.ptr = NULL,
+  packet->content_line.len = 0,
+  packet->accept_line.ptr = NULL,
+  packet->accept_line.len = 0,
+  packet->user_agent_line.ptr = NULL,
+  packet->user_agent_line.len = 0,
+  packet->http_url_name.ptr = NULL,
+  packet->http_url_name.len = 0,
+  packet->http_encoding.ptr = NULL,
+  packet->http_encoding.len = 0,
+  packet->http_transfer_encoding.ptr = NULL,
+  packet->http_transfer_encoding.len = 0,
+  packet->http_contentlen.ptr = NULL,
+  packet->http_contentlen.len = 0,
+  packet->http_cookie.ptr = NULL,
+  packet->http_cookie.len = 0,
+  packet->http_origin.len = 0,
+  packet->http_origin.ptr = NULL,
+  packet->http_x_session_type.ptr = NULL,
+  packet->http_x_session_type.len = 0,
+  packet->server_line.ptr = NULL,
+  packet->server_line.len = 0,
+  packet->http_method.ptr = NULL,
+  packet->http_method.len = 0,
+  packet->http_response.ptr = NULL,
+  packet->http_response.len = 0,
+  packet->http_num_headers = 0;
+}
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
 					    const unsigned char *packet,
@@ -4484,7 +4555,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   /* Init default */
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
-  
+
   if(flow->server_id == NULL) flow->server_id = dst; /* Default */
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     /*
@@ -4497,7 +4568,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
        */
        ) {
       ndpi_process_extra_packet(ndpi_struct, flow, packet, packetlen, current_tick_l, src, dst);
-      
+
       return(ret);
     } else
       goto ret_protocols;
@@ -4676,8 +4747,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   } else
     ret.app_protocol = flow->detected_protocol_stack[0];
 
-  ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
-
+  /* Don;t overwrite the category if already set */
+  if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    ndpi_fill_protocol_category(ndpi_struct, flow, &ret);
+  else
+    ret.category = flow->category;
+  
   if((flow->num_processed_pkts == 1)
      && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN)
      && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
@@ -4701,7 +4776,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
      Invalidate packet memory to avoid accessing the pointers below
      when the packet is no longer accessible
   */
-  flow->packet.iph = NULL, flow->packet.tcp = NULL, flow->packet.udp = NULL;
+  flow->packet.iph = NULL, flow->packet.tcp = NULL, flow->packet.udp = NULL, flow->packet.payload = NULL;
+  ndpi_reset_packet_line_info(&flow->packet);
 
   return(ret);
 }
@@ -4864,39 +4940,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struc
     return;
 
   packet->packet_lines_parsed_complete = 1;
-  packet->parsed_lines = 0;
-  packet->empty_line_position_set = 0;
-  packet->host_line.ptr = NULL;
-  packet->host_line.len = 0;
-  packet->referer_line.ptr = NULL;
-  packet->referer_line.len = 0;
-  packet->content_line.ptr = NULL;
-  packet->content_line.len = 0;
-  packet->accept_line.ptr = NULL;
-  packet->accept_line.len = 0;
-  packet->user_agent_line.ptr = NULL;
-  packet->user_agent_line.len = 0;
-  packet->http_url_name.ptr = NULL;
-  packet->http_url_name.len = 0;
-  packet->http_encoding.ptr = NULL;
-  packet->http_encoding.len = 0;
-  packet->http_transfer_encoding.ptr = NULL;
-  packet->http_transfer_encoding.len = 0;
-  packet->http_contentlen.ptr = NULL;
-  packet->http_contentlen.len = 0;
-  packet->http_cookie.ptr = NULL;
-  packet->http_cookie.len = 0;
-  packet->http_origin.len = 0;
-  packet->http_origin.ptr = NULL;
-  packet->http_x_session_type.ptr = NULL;
-  packet->http_x_session_type.len = 0;
-  packet->server_line.ptr = NULL;
-  packet->server_line.len = 0;
-  packet->http_method.ptr = NULL;
-  packet->http_method.len = 0;
-  packet->http_response.ptr = NULL;
-  packet->http_response.len = 0;
-  packet->http_num_headers=0;
+  ndpi_reset_packet_line_info(packet);
 
   if((packet->payload_packet_len < 3)
      || (packet->payload == NULL))
@@ -5862,7 +5906,7 @@ int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_mod, char *ca
 
 void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_mod) {
   int i;
-  
+
   for(i=0; i<(int)ndpi_mod->ndpi_num_supported_protocols; i++)
     printf("%3d %-22s %-12s %s\n", i,
 	   ndpi_mod->proto_defaults[i].protoName,
@@ -6102,6 +6146,13 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_struct,
   rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
   ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
+  /*
+    As ac_automata_search can detect partial matches and continue the search process
+    in case rc == 0 (i.e. no match), we need to check if there is a partial match
+    and in this case return it
+  */
+  if((rc == 0) && (match.number != 0)) rc = 1;
+  
   return(rc ? match.number : 0);
 }
 
@@ -6116,7 +6167,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
 	ndpi_free(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
     }
-    
+
     ndpi_free(flow);
   }
 }
@@ -6275,4 +6326,43 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
   return(0); /* OK */
 }
 
-/* **************************************** */
+/* ******************************************************************** */
+
+/*
+   This function tells if it's possible to further dissect a given flow
+   0 - All possible dissection has been completed
+   1 - Additional dissection is possible
+*/
+u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_struct,
+					struct ndpi_flow_struct *flow) {
+
+#if 0
+  printf("[DEBUG] %s(%u.%u)\n", __FUNCTION__,
+	 flow->detected_protocol_stack[0],
+	 flow->detected_protocol_stack[1]);
+#endif
+
+  if(flow->check_extra_packets) return(1);
+
+  switch(flow->detected_protocol_stack[0]) {
+  case NDPI_PROTOCOL_TLS:
+    if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed)
+      return(1);
+    break;
+
+  case NDPI_PROTOCOL_HTTP:
+    if(flow->host_server_name[0] == '\0')
+      return(1);
+    break;
+
+  case NDPI_PROTOCOL_DNS:
+    if((ndpi_struct->dns_dont_dissect_response == 0)
+       && (flow->host_server_name[0] == '\0'))
+      return(1);
+    break;
+  }
+
+  return(0);
+}
+
+/* ******************************************************************** */

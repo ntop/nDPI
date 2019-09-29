@@ -1,4 +1,4 @@
-READER="../example/ndpiReader -p ../example/protos.txt"
+READER="../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
 
 RC=0
 PCAPS=`cd pcap; /bin/ls *.pcap`

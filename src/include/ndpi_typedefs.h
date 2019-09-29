@@ -348,6 +348,20 @@ struct ndpi_icmphdr {
   } un;
 } PACK_OFF;
 
+/* +++++++++++++++++++++++ ICMP6 header +++++++++++++++++++++++ */
+
+PACK_ON
+struct ndpi_icmp6hdr {
+  uint8_t     icmp6_type;   /* type field */
+  uint8_t     icmp6_code;   /* code field */
+  uint16_t    icmp6_cksum;  /* checksum field */
+  union {
+    uint32_t  icmp6_un_data32[1]; /* type-specific field */
+    uint16_t  icmp6_un_data16[2]; /* type-specific field */
+    uint8_t   icmp6_un_data8[4];  /* type-specific field */
+  } icmp6_dataun;
+} PACK_OFF;
+
 /* +++++++++++++++++++++++ VXLAN header +++++++++++++++++++++++ */
 
 PACK_ON
