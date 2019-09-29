@@ -669,6 +669,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     l3 = (const u_int8_t*)iph6;
   }
 
+  *proto = iph->protocol;
+
   if(l4_packet_len < 64)
     workflow->stats.packet_len[0]++;
   else if(l4_packet_len >= 64 && l4_packet_len < 128)
@@ -685,10 +687,9 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   if(l4_packet_len > workflow->stats.max_packet_len)
     workflow->stats.max_packet_len = l4_packet_len;
 
-  *proto = iph->protocol;
   l4 = ((const u_int8_t *) l3 + l4_offset);
 
-  if(iph->protocol == IPPROTO_TCP && l4_packet_len >= 20) {
+  if(*proto == IPPROTO_TCP && l4_packet_len >= sizeof(struct ndpi_tcphdr)) {
     u_int tcp_len;
 
     // tcp
@@ -699,7 +700,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *payload = (u_int8_t*)&l4[tcp_len];
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
     l4_data_len = l4_packet_len - sizeof(struct ndpi_tcphdr);
-  } else if(iph->protocol == IPPROTO_UDP && l4_packet_len >= 8) {
+  } else if(*proto == IPPROTO_UDP && l4_packet_len >= sizeof(struct ndpi_udphdr)) {
     // udp
 
     workflow->stats.udp_count++;
@@ -708,6 +709,14 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *payload = (u_int8_t*)&l4[sizeof(struct ndpi_udphdr)];
     *payload_len = (l4_packet_len > sizeof(struct ndpi_udphdr)) ? l4_packet_len-sizeof(struct ndpi_udphdr) : 0;
     l4_data_len = l4_packet_len - sizeof(struct ndpi_udphdr);
+  } else if(*proto == IPPROTO_ICMP) {
+    *payload = (u_int8_t*)&l4[sizeof(struct ndpi_icmphdr )];
+    *payload_len = (l4_packet_len > sizeof(struct ndpi_icmphdr)) ? l4_packet_len-sizeof(struct ndpi_icmphdr) : 0;
+    l4_data_len = l4_packet_len - sizeof(struct ndpi_icmphdr);
+  } else if (*proto == IPPROTO_ICMPV6) {
+    *payload = (u_int8_t*)&l4[sizeof(struct ndpi_icmp6hdr)];
+    *payload_len = (l4_packet_len > sizeof(struct ndpi_icmp6hdr)) ? l4_packet_len-sizeof(struct ndpi_icmp6hdr) : 0;
+    l4_data_len = l4_packet_len - sizeof(struct ndpi_icmp6hdr);
   } else {
     // non tcp/udp protocols
     *sport = *dport = 0;

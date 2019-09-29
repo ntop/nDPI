@@ -87,6 +87,7 @@ unsigned int ndpi_timer_lt(const struct timeval *a, const struct timeval *b);
 void ndpi_timer_sub(const struct timeval *a, const struct timeval *b, struct timeval *result);
 void ndpi_timer_clear(struct timeval *a);
 unsigned int ndpi_timeval_to_milliseconds(struct timeval ts);
+unsigned int ndpi_timeval_to_microseconds(struct timeval ts);
 void ndpi_log_timestamp(char *log_ts, u_int log_ts_len);
 
 #endif /* NDPI_CLASSIFY_H */
