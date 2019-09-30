@@ -248,7 +248,12 @@ u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *nd
     return(0);
 
   switch(protoId) {
+    /* All dissectors that have calls to ndpi_match_host_subprotocol() */
   case NDPI_PROTOCOL_DNS:
+  case NDPI_PROTOCOL_HTTP:
+  case NDPI_PROTOCOL_TLS:
+  case NDPI_PROTOCOL_QUIC:
+  case NDPI_PROTOCOL_FBZERO:
     return(1);
     break;
 
