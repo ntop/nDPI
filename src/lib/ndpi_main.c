@@ -6332,7 +6332,6 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 */
 u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_str,
 					struct ndpi_flow_struct *flow) {
-
 #if 0
   printf("[DEBUG] %s(%u.%u)\n", __FUNCTION__,
 	 flow->detected_protocol_stack[0],
@@ -6355,6 +6354,12 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   case NDPI_PROTOCOL_DNS:
     if((ndpi_str->dns_dont_dissect_response == 0)
        && (flow->host_server_name[0] == '\0'))
+      return(1);
+    break;
+
+  case NDPI_PROTOCOL_SSH:
+    if((flow->protos.ssh.hassh_client[0] == '\0')
+       || (flow->protos.ssh.hassh_server[0] == '\0'))
       return(1);
     break;
   }
