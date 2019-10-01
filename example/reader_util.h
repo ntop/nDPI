@@ -167,6 +167,11 @@ typedef struct ndpi_flow_info {
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;    
   } ssh_tls;
+
+  struct {
+    char url[256];
+    u_int response_status_code;
+  } http;
   
   void *src_id, *dst_id;
 

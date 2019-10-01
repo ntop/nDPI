@@ -976,7 +976,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UBNTAC2) {
     snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
   }
-  if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_DNS) {
+  /* HTTP */
+  else if(flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP) {
+    if(flow->ndpi_flow->http.url != NULL) {
+      snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
+      flow->http.response_status_code = flow->ndpi_flow->http.response_status_code;
+    }
+  }
+  else if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_DNS) {
     /* SSH */
     if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH) {
       snprintf(flow->ssh_tls.client_info, sizeof(flow->ssh_tls.client_info), "%s",
