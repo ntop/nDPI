@@ -1101,7 +1101,7 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	NDPI_LOG_DBG2(ndpi_struct, "***** [SSL] %s\n", certificate);
 #endif
 	ndpi_protocol_match_result ret_match;
-	u_int32_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate,
+	u_int16_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate,
 							 strlen(certificate),
 							 &ret_match,
 							 NDPI_PROTOCOL_TLS);
@@ -1117,7 +1117,7 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 
 	  ndpi_set_detected_protocol(ndpi_struct, flow, subproto,
 				     ndpi_tls_refine_master_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS));
-	  return(rc); /* Fix courtesy of Gianluca Costa <g.costa@xplico.org> */
+	  return(rc);
 	}
 
 	if(ndpi_is_tls_tor(ndpi_struct, flow, certificate) != 0)

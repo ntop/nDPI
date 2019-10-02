@@ -55,11 +55,11 @@ struct edge
 
 AC_NODE_t * node_create            (void);
 AC_NODE_t * node_create_next       (AC_NODE_t * thiz, AC_ALPHABET_t alpha);
-void        node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str);
+void        node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str, u_int8_t is_existing);
 void        node_register_outgoing (AC_NODE_t * thiz, AC_NODE_t * next, AC_ALPHABET_t alpha);
 AC_NODE_t * node_find_next         (AC_NODE_t * thiz, AC_ALPHABET_t alpha);
 AC_NODE_t * node_findbs_next       (AC_NODE_t * thiz, AC_ALPHABET_t alpha);
-void        node_release           (AC_NODE_t * thiz);
+void        node_release           (AC_NODE_t * thiz, u_int8_t free_pattern);
 void        node_assign_id         (AC_NODE_t * thiz);
 void        node_sort_edges        (AC_NODE_t * thiz);
 

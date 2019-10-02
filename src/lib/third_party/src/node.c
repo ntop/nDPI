@@ -73,8 +73,15 @@ void node_init(AC_NODE_t * thiz)
  * FUNCTION: node_release
  * Release node
  ******************************************************************************/
-void node_release(AC_NODE_t * thiz)
+void node_release(AC_NODE_t * thiz, u_int8_t free_pattern)
 {
+  if(free_pattern) {
+    for(int i=0; i<thiz->matched_patterns_num; i++) {
+      if(!thiz->matched_patterns[i].is_existing)
+        ndpi_free(thiz->matched_patterns[i].astring);
+    }
+  }
+
   ndpi_free(thiz->matched_patterns);
   ndpi_free(thiz->outgoing);
   ndpi_free(thiz);
@@ -174,7 +181,7 @@ AC_NODE_t * node_create_next (AC_NODE_t * thiz, AC_ALPHABET_t alpha)
  * FUNCTION: node_register_matchstr
  * Adds the pattern to the list of accepted pattern.
  ******************************************************************************/
-void node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str)
+void node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str, u_int8_t is_existing)
 {
   /* Check if the new pattern already exists in the node list */
   if (node_has_matchstr(thiz, str))
@@ -192,6 +199,7 @@ void node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str)
 
   thiz->matched_patterns[thiz->matched_patterns_num].astring = str->astring;
   thiz->matched_patterns[thiz->matched_patterns_num].length = str->length;
+  thiz->matched_patterns[thiz->matched_patterns_num].is_existing = is_existing;
   memcpy(&thiz->matched_patterns[thiz->matched_patterns_num].rep, &str->rep, sizeof(AC_REP_t));
   thiz->matched_patterns_num++;
 }

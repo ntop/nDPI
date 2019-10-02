@@ -1136,6 +1136,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       }
     }
 
+    if(flow->http.url[0] != '\0')
+      fprintf(out, "[URL: %s][StatusCode: %u]",
+	      flow->http.url, flow->http.response_status_code);
+    
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version));
     if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_info);
     if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
@@ -1849,9 +1853,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 				 ndpi_pref_http_dont_dissect_response, 0);
   ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				 ndpi_pref_dns_dont_dissect_response, 0);
-  ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				 ndpi_pref_enable_category_substring_match, 1);
-
+  
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
 					   on_protocol_discovered,
 					   (void *)(uintptr_t)thread_id);
@@ -1904,7 +1906,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	      /* TODO free the strdup */
 	      ndpi_load_hostname_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 					  strdup(name), (ndpi_protocol_category_t)atoi(category));
-      }
+	    }
 	  }
 	}
       }

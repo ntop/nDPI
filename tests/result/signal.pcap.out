@@ -1,8 +1,8 @@
+DNS	2	186	1
 DHCP	4	1368	1
 Signal	512	282327	11
 ICMP	1	70	1
 TLS	20	1417	2
-GenericProtocol	2	186	1
 Apple	8	605	1
 AppleiTunes	90	29795	2
 
@@ -28,5 +28,5 @@ JA3 Host Stats:
 	15	TCP 192.168.2.17:56996 <-> 17.248.146.144:443 [proto: 91.140/TLS.Apple][cat: Web/5][4 pkts/341 bytes <-> 4 pkts/264 bytes][bytes ratio: 0.127 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.0/0.0 0/0 0.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 85.2/66.0 112/66 20.0/0.0]
 	16	TCP 192.168.2.17:57017 <-> 2.18.232.118:443 [proto: 91/TLS][cat: Web/5][5 pkts/317 bytes <-> 3 pkts/221 bytes][bytes ratio: 0.178 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.0/0.0 0/0 0.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 63.4/73.7 89/89 13.6/10.8]
 	17	UDP 192.168.2.17:56263 <-> 192.168.2.1:53 [proto: 5.39/DNS.Signal][cat: Chat/9][1 pkts/97 bytes <-> 1 pkts/193 bytes][Host: textsecure-service.whispersystems.org][PLAIN TEXT (textsecure)]
-	18	UDP 192.168.2.17:60793 <-> 192.168.2.1:53 [proto: 5.137/DNS.GenericProtocol][cat: Media/1][1 pkts/85 bytes <-> 1 pkts/101 bytes][Host: e673.dsce9.akamaiedge.net][PLAIN TEXT (akamaiedge)]
+	18	UDP 192.168.2.17:60793 <-> 192.168.2.1:53 [proto: 5/DNS][cat: Media/1][1 pkts/85 bytes <-> 1 pkts/101 bytes][Host: e673.dsce9.akamaiedge.net][PLAIN TEXT (akamaiedge)]
 	19	ICMP 192.168.2.17:0 -> 192.168.2.1:0 [proto: 81/ICMP][cat: Network/14][1 pkts/70 bytes -> 0 pkts/0 bytes]

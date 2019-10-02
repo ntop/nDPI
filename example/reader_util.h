@@ -57,7 +57,7 @@ extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
 /** maximum line length */
 #define LINEMAX 512
 #define MAX_BYTE_COUNT_ARRAY_LENGTH 256
-#define MAX_NUM_PKTS               32
+#define MAX_NUM_PKTS               10
 
 #define MAX_NUM_READER_THREADS     16
 #define IDLE_SCAN_PERIOD           10 /* msec (use TICK_RESOLUTION = 1000) */
@@ -192,6 +192,11 @@ typedef struct ndpi_flow_info {
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;    
   } ssh_tls;
+
+  struct {
+    char url[256];
+    u_int response_status_code;
+  } http;
   
   void *src_id, *dst_id;
 

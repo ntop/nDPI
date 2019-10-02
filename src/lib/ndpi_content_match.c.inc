@@ -1,7 +1,7 @@
 /*
  * ndpi_content_match.c
  *
- * Copyright (C) 2011-18 - ntop.org
+ * Copyright (C) 2011-19 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -8382,7 +8382,7 @@ https://www.regular-expressions.info/email.html
 
 /* ****************************************************** */
 
-ndpi_protocol_match host_match[] = {
+static ndpi_protocol_match host_match[] = {
   { "s3.ll.dash.row.aiv-cdn.net", NULL, "s3\\.ll\\.dash\\.row\\.aiv-cdn\\.net",          "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "s3-dub.cf.dash.row.aiv-cdn.net", NULL, "s3-dub\\.cf\\.dash\\.row\\.aiv-cdn\\.net",  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "dmqdd6hw24ucf.cloudfront.net", NULL, "dmqdd6hw24ucf\\.cloudfront\\.net",            "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
@@ -8425,16 +8425,9 @@ ndpi_protocol_match host_match[] = {
   { ".xboxlive.com", NULL, "xboxlive" TLD,                            "Xbox",             NDPI_PROTOCOL_XBOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { ".xboxlive.com.akadns.net", NULL, "xboxlive" TLD,                 "Xbox",             NDPI_PROTOCOL_XBOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { ".xboxlive.com.c.footprint.net", NULL, "xboxlive" TLD,            "Xbox",             NDPI_PROTOCOL_XBOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
-  { ".edgecastcdn.net", NULL, "egdecastcdn" TLD,                      "Unknown",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_SAFE },
-  { ".hwcdn.net", NULL, "hwcdn" TLD,                                  "Unknown",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_SAFE },
-  { ".llnwd.net", NULL, "llnwd" TLD,                                  "Unknown",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_SAFE },
-  { ".llns.net", NULL, "llns" TLD,                                    "Unknown",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_SAFE },
-  { ".fastly.net", NULL, "fastly" TLD,                                "Unknown",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_SAFE },
-  { ".akamaiedge.net", NULL, "akamaiedge" TLD,                        "Unknown",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_SAFE },
   { "e13555.b.akamaiedge.net", NULL, "e13555\\.b\\.akamaiedge" TLD,   "Playstation",      NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { "e1800.d.akamaiedge.net", NULL, "e1800\\.d\\.akamaiedge" TLD,     "Playstation",      NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
   { "e1879.e7.akamaiedge.net", NULL, "e1879\\.e7\\.akamaiedge" TLD,   "Playstation",      NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
-  { ".vultr.com", NULL, "vultr" TLD,                                  "Unknown",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".cnn.c", NULL, "\\.cnn" TLD,           "CNN",              NDPI_PROTOCOL_CNN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".cnn.net", NULL, NULL,                 "CNN",              NDPI_PROTOCOL_CNN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
@@ -8779,38 +8772,9 @@ ndpi_protocol_match host_match[] = {
 
   /*
     VidTO streaming service
-    NOTE: this is a possible candidate for NDPI_PROTOCOL_GENERIC
   */
   { ".vidto.me", NULL, "\\.vidto" TLD,                                 "VidTO",            NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".vidto.se", NULL, NULL,                                           "VidTO",            NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
-  /*
-    Not so popular services without a protocl dissector (and thus not worth a protocolId) that are handled/detected by categpory rather
-    than by protocol id. They are bound to a generic protocol (NDPI_PROTOCOL_GENERIC) and placed onto the right category
-  */
-  { "quickplay.com", NULL, "quickplay" TLD,                            "QuickPlay",        NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
-  { ".iqiyi.com", NULL, "\\.iqiyi" TLD,                                "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".qiyi.com", NULL, "\\.qiyi" TLD,                                  "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".71.am", NULL, "\\.71" TLD,                                       "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".qiyipic.com", NULL, "\\.qiyipic" TLD,                            "iQIYI",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
-  { ".1kxun.", NULL, "\\.1kxun\\.",                                    "1kxun",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { "tcad.wedolook.com", NULL, "tcad\\.wedolook" TLD,                  "1kxun",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
-  { "baidu.com", NULL, "baidu" TLD,                                    "baidu",            NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_FUN },
-
-  { "icq.", NULL, "icq" TLD,                                           "ICQ",              NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".icq.", NULL, NULL,                                               "ICQ",              NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
-
-
-  /* RapidVideo streaming */
-  { ".rapidvideo.com", NULL, "\\.rapidvideo" TLD,                      "RapidVideo",       NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".playercdn.net", NULL, "\\.playercdn" TLD,                        "RapidVideo",       NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-
-  /* showmax.com video streaming */
-  { "showmax.com", NULL, "showmax" TLD,                                "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
-  { "showmax.akamaized.net", NULL, "showmax\\.akamaized" TLD,          "Showmax",          NDPI_PROTOCOL_GENERIC, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
 
   { "snapcraft.io", NULL, "snapcraft\\.io" TLD,                        "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
   { "ubuntu.com", NULL, "ubuntu\\.com" TLD,                            "UbuntuONE",        NDPI_PROTOCOL_UBUNTUONE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
@@ -8822,6 +8786,33 @@ ndpi_protocol_match host_match[] = {
 
   { NULL, NULL, NULL, 0 }
 };
+
+/* ******************************************************************** */
+   
+static ndpi_category_match category_match[] = {
+   { ".edgecastcdn.net", "egdecastcdn" TLD,                       NDPI_PROTOCOL_CATEGORY_MEDIA },
+   { ".hwcdn.net", "hwcdn" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
+   { ".llnwd.net", "llnwd" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
+   { ".llns.net", "llns" TLD,                                     NDPI_PROTOCOL_CATEGORY_MEDIA },
+   { ".fastly.net", "fastly" TLD,                                 NDPI_PROTOCOL_CATEGORY_MEDIA },
+   { ".akamaiedge.net", "akamaiedge" TLD,                         NDPI_PROTOCOL_CATEGORY_MEDIA },
+   { ".vultr.com", "vultr" TLD,                                   NDPI_PROTOCOL_CATEGORY_CLOUD },
+   { "baidu.com", "baidu" TLD,                                    NDPI_PROTOCOL_CATEGORY_WEB },
+   { "icq.com", "icq" TLD,                                        NDPI_PROTOCOL_CATEGORY_CHAT },
+   { "quickplay.com", "quickplay" TLD,                            NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { ".iqiyi.com", "\\.iqiyi" TLD,                                NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { ".qiyi.com", "\\.qiyi" TLD,                                  NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { ".71.am", "\\.71" TLD,                                       NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { ".qiyipic.com", "\\.qiyipic" TLD,                            NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { ".1kxun.", "\\.1kxun\\.",                                    NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "tcad.wedolook.com", "tcad\\.wedolook" TLD,                  NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { ".rapidvideo.com", "\\.rapidvideo" TLD,                      NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { ".playercdn.net", "\\.playercdn" TLD,                        NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "showmax.com", "showmax" TLD,                                NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "showmax.akamaized.net", "showmax\\.akamaized" TLD,          NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { NULL, NULL, 0 }
+};
+
 /* ******************************************************************** */
 
 /*
@@ -8882,7 +8873,8 @@ static const char *ndpi_en_bigrams[] = {
   "mw", "nw", "ow", "pw", "rw", "sw", "tw", "uw", "ww", "xw", "yw", "zw", "ax", "ex", "ix", "nx", "ox",
   "rx", "ux", "xx", "yx", "ay", "by", "cy", "dy", "ey", "fy", "gy", "hy", "ky", "ly", "my", "ny", "oy",
   "py", "ry", "sy", "ty", "uy", "vy", "wy", "xy", "yy", "zy", "az", "bz", "cz", "dz", "ez", "gz", "iz",
-  "lz", "nz", "oz", "pz", "rz", "tz", "uz", "zz", NULL };
+  "lz", "nz", "oz", "pz", "rz", "tz", "uz", "zz",
+  NULL };
 
 /* ******************************************************************** */
 

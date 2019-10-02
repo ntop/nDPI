@@ -63,6 +63,7 @@ typedef struct
 {
   AC_ALPHABET_t * astring; /* String of alphabets */
   unsigned int length; /* Length of pattern */
+  u_int8_t is_existing; /* 1 if the node is already part of another AC_PATTERN_t */
   AC_REP_t rep; /* Representative string (optional) */
 } AC_PATTERN_t;
 
