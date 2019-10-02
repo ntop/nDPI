@@ -1288,11 +1288,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "AFP", NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,
 			    ndpi_build_default_ports(ports_a, 548, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 548, 0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_137,
-                            0 /* can_have_a_subprotocol */, no_master,
-                            no_master, "Free137", NDPI_PROTOCOL_CATEGORY_WEB,
-                            ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-                            ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HULU,
+			    0 /* can_have_a_subprotocol */, no_master,
+			    no_master, "Hulu", NDPI_PROTOCOL_CATEGORY_STREAMING,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CHECKMK,
                             0 /* can_have_a_subprotocol */, no_master,
                             no_master, "CHECKMK", NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,

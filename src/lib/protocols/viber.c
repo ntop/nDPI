@@ -2,7 +2,7 @@
  * viber.c 
  *
  * Copyright (C) 2013 Remy Mudingay <mudingay@ill.fr>
- * Copyright (C) 2013-19 - ntop.org
+ * Copyright (C) 2013-18 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -34,8 +34,11 @@ void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, struct 
   if(packet->udp != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "calculating dport over udp\n");
 
-    if((packet->payload_packet_len == 12 && packet->payload[2] == 0x03 && packet->payload[3] == 0x00)
+    if((packet->payload[2] == 0x03 && packet->payload[3] == 0x00)
        || (packet->payload_packet_len == 20 && packet->payload[2] == 0x09 && packet->payload[3] == 0x00)
+       || (packet->payload[2] == 0x01 && packet->payload[3] == 0x00 && packet->payload[4] == 0x05 && packet->payload[5] == 0x00)
+       || (packet->payload_packet_len == 34 && packet->payload[2] == 0x19 && packet->payload[3] == 0x00)
+       || (packet->payload_packet_len == 34 && packet->payload[2] == 0x1b && packet->payload[3] == 0x00)
        ) {
       NDPI_LOG_DBG(ndpi_struct, "found VIBER\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_UNKNOWN);

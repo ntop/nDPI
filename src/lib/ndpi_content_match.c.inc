@@ -8276,6 +8276,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xDD7A5980 /* 221.122.89.128/25 */, 25, NDPI_PROTOCOL_ZOOM },
   /* 2620:123:2000::/44 IPV6 */
 
+  /* PS_VUE IP address */
   { 0x08F8DA14 /* 8.248.218.20/32 */, 32, NDPI_PROTOCOL_PS_VUE },
   { 0x08FA6E14 /* 8.250.110.20/32 */, 32, NDPI_PROTOCOL_PS_VUE },
   { 0x08FC028B /* 8.252.2.139/32 */, 32, NDPI_PROTOCOL_PS_VUE },
@@ -8305,6 +8306,15 @@ static ndpi_network host_protocol_list[] = {
   { 0xA7CEDA7B /* 167.206.218.123/32*/, 32, NDPI_PROTOCOL_PS_VUE },
   { 0xA7CEDA82 /* 167.206.218.130/32*/, 32, NDPI_PROTOCOL_PS_VUE },
   { 0xA7CEDA8A /* 167.206.218.138/32*/, 32, NDPI_PROTOCOL_PS_VUE },
+
+  /* AS23286 Hulu, LLC. */
+  { 0x081C7C00 /* 8.28.124.0/24 */, 24, NDPI_PROTOCOL_HULU },
+  { 0x081C7D00 /* 8.28.125.0/24 */, 24, NDPI_PROTOCOL_HULU },
+  { 0xC7C83200 /* 199.200.50.0/23 */, 23, NDPI_PROTOCOL_HULU },
+  { 0xC7C83300 /* 199.200.51.0/24 */, 24, NDPI_PROTOCOL_HULU },
+  { 0xC73C7400 /* 199.60.116.0/24 */, 24, NDPI_PROTOCOL_HULU },
+  { 0xD05B9E00 /* 208.91.158.0/23 */, 23, NDPI_PROTOCOL_HULU },
+  { 0xD1F9BA00 /* 209.249.186.0/24 */, 24, NDPI_PROTOCOL_HULU },
 
   { 0x0, 0, 0 }
 };
@@ -8770,6 +8780,8 @@ static ndpi_protocol_match host_match[] = {
   { ".ppstream.com", NULL, "\\.ppstream" TLD,                          "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".pps.tv", NULL, "\\.pps\\.tv$",                                   "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
+  { ".hulu.com", NULL, "\\.hulu",                                       "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+  
   /*
     VidTO streaming service
   */
