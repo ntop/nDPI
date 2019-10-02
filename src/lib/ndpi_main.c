@@ -363,12 +363,12 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
 			   u_int8_t customUserProto,
 			   ndpi_default_ports_tree_node_t **root,
 			   const char *_func, int _line) {
-  ndpi_default_ports_tree_node_t *ret;
   u_int16_t port;
 
   for(port=range->port_low; port<=range->port_high; port++) {
     ndpi_default_ports_tree_node_t *node = (ndpi_default_ports_tree_node_t*)ndpi_malloc(sizeof(ndpi_default_ports_tree_node_t));
-
+    ndpi_default_ports_tree_node_t *ret;
+    
     if(!node) {
       NDPI_LOG_ERR(ndpi_str, "%s:%d not enough memory\n", _func, _line);
       break;
@@ -400,10 +400,11 @@ static int removeDefaultPort(ndpi_port_range *range,
 			     ndpi_default_ports_tree_node_t **root)
 {
   ndpi_default_ports_tree_node_t node;
-  ndpi_default_ports_tree_node_t *ret;
   u_int16_t port;
 
   for(port=range->port_low; port<=range->port_high; port++) {
+    ndpi_default_ports_tree_node_t *ret;
+    
     node.proto = def, node.default_port = port;
     ret = (ndpi_default_ports_tree_node_t*)ndpi_tdelete(&node, (void*)root,
 							  ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
@@ -2442,13 +2443,13 @@ int ndpi_get_protocol_id_master_proto(struct ndpi_detection_module_struct *ndpi_
 
 static ndpi_default_ports_tree_node_t* ndpi_get_guessed_protocol_id(struct ndpi_detection_module_struct *ndpi_str,
 								    u_int8_t proto, u_int16_t sport, u_int16_t dport) {
-  const void *ret;
   ndpi_default_ports_tree_node_t node;
 
   if(sport && dport) {
     int low  = ndpi_min(sport, dport);
     int high = ndpi_max(sport, dport);
-
+    const void *ret;
+    
     node.default_port = low; /* Check server port first */
     ret = ndpi_tfind(&node,
 		     (proto == IPPROTO_TCP) ? (void*)&ndpi_str->tcpRoot : (void*)&ndpi_str->udpRoot,
@@ -4314,7 +4315,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 #ifdef HAVE_HYPERSCAN
   if(ndpi_str->custom_categories.num_to_load > 0) {
     const char **expressions;
-    unsigned int *ids, i;
+    unsigned int *ids;
     int rc;
     struct hs_list *head = ndpi_str->custom_categories.to_load;
 
@@ -5874,10 +5875,10 @@ int ndpi_get_protocol_id(struct ndpi_detection_module_struct *ndpi_str, char *pr
 
 int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_str, char *cat) {
   int i;
-  const char *name;
 
   for(i = 0; i < NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
-    name = ndpi_category_get_name(ndpi_str, i);
+    const char *name = ndpi_category_get_name(ndpi_str, i);
+    
     if(strcasecmp(cat, name) == 0)
       return(i);
   }
@@ -5905,12 +5906,14 @@ void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str) {
  * first slen characters of s.
  */
 char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
-  char c, sc;
+  char c;
   size_t len;
 
   if((c = *find++) != '\0') {
     len = strnlen(find, slen);
     do {
+      char sc;
+      
       do {
 	if(slen-- < 1 || (sc = *s++) == '\0')
 	  return(NULL);
@@ -5930,12 +5933,14 @@ char* ndpi_strnstr(const char *s, const char *find, size_t slen) {
  * Same as ndpi_strnstr but case-insensitive
  */
 char* ndpi_strncasestr(const char *s, const char *find, size_t slen) {
-  char c, sc;
+  char c;
   size_t len;
 
   if((c = *find++) != '\0') {
     len = strlen(find);
     do {
+      char sc;
+      
       do {
 	if(slen-- < 1 || (sc = *s++) == '\0')
 	  return(NULL);

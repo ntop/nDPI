@@ -694,7 +694,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     workflow->stats.packet_len[4]++;
   else if(l4_packet_len >= 1500)
     workflow->stats.packet_len[5]++;
-
+  
   if(l4_packet_len > workflow->stats.max_packet_len)
     workflow->stats.max_packet_len = l4_packet_len;
 

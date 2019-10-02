@@ -516,9 +516,7 @@ ndpi_classify (const unsigned short *pkt_len, const struct timeval *pkt_time,
                 features[i+8+MC_BINS_LEN*MC_BINS_LEN+MC_BINS_TIME*MC_BINS_TIME] = bd[i]/((float)(ob));
             }
         }
-    }
 
-    if (ob+ib > 100 && use_bd) {
         score = ndpi_parameters_bd[0];
         for (i = 1; i < NUM_PARAMETERS_BD_LOGREG; i++) {
             score += features[i]*ndpi_parameters_bd[i];

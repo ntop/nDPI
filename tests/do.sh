@@ -1,3 +1,5 @@
+#!/bin/sh
+
 READER="../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
 
 RC=0

@@ -126,10 +126,6 @@ u_int16_t ht_get(hashtable_t *hashtable, char *key) {
   int bin = 0;
   entry_t *pair;
 
-#ifdef HASH_DEBUG
-    printf("*** %s() %s = %u ***\n", __FUNCTION__, key, pair->value);
-#endif
-
   bin = ht_hash(hashtable, key);
 
   /* Step through the bin, looking for our value. */
