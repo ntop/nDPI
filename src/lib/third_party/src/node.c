@@ -73,8 +73,13 @@ void node_init(AC_NODE_t * thiz)
  * FUNCTION: node_release
  * Release node
  ******************************************************************************/
-void node_release(AC_NODE_t * thiz)
+void node_release(AC_NODE_t * thiz, u_int8_t free_pattern)
 {
+  if(free_pattern) {
+    for(int i=0; i<thiz->matched_patterns_num; i++)
+      ndpi_free(thiz->matched_patterns[i].astring);
+  }
+
   ndpi_free(thiz->matched_patterns);
   ndpi_free(thiz->outgoing);
   ndpi_free(thiz);

@@ -447,21 +447,10 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
   else
     ac_pattern.length = strlen(ac_pattern.astring);
 
-  ac_automata_add(((AC_AUTOMATA_t*)automa->ac_automa), &ac_pattern);
+  if(ac_automata_add(((AC_AUTOMATA_t*)automa->ac_automa), &ac_pattern) != ACERR_SUCCESS)
+    return(-2);
 
   return(0);
-}
-
-/* ****************************************************** */
-
-/*
-  TODO
-  This function should free the memory during program termination
-
- */
-static void ndpi_free_memory_at_termination(struct ndpi_detection_module_struct *ndpi_str, char *buf) {
-
-
 }
 
 /* ****************************************************** */
@@ -470,19 +459,24 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
 					 char *_value, int protocol_id,
 					 ndpi_protocol_category_t category,
 					 ndpi_protocol_breed_t breed) {
+  int rv;
   char *value = ndpi_strdup(_value);
 
-  if(!value) return(-1); else ndpi_free_memory_at_termination(ndpi_str, value);
+  if(!value) return(-1);
 
 #ifdef DEBUG
   NDPI_LOG_DEBUG2(ndpi_str, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
 
-  return(ndpi_string_to_automa(ndpi_str,
+  rv = ndpi_string_to_automa(ndpi_str,
 			       &ndpi_str->host_automa,
 			       value,
 			       protocol_id,
-			       category, breed));
+			       category, breed);
+
+  if(rv != 0) ndpi_free(value);
+
+  return(rv);
 }
 
 /* ****************************************************** */
@@ -2207,7 +2201,7 @@ int ndpi_add_string_to_automa(void *_automa, char *str) {
   return(ndpi_add_string_value_to_automa(_automa, str, 1));
 }
 
-void ndpi_free_automa(void *_automa)     { ac_automata_release((AC_AUTOMATA_t*)_automa);  }
+void ndpi_free_automa(void *_automa)     { ac_automata_release((AC_AUTOMATA_t*)_automa, 0);  }
 void ndpi_finalize_automa(void *_automa) { ac_automata_finalize((AC_AUTOMATA_t*)_automa); }
 
 /* ****************************************************** */
@@ -2385,16 +2379,16 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ndpi_tdestroy(ndpi_str->tcpRoot, ndpi_free);
 
     if(ndpi_str->host_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->host_automa.ac_automa);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->host_automa.ac_automa, 1 /* free patterns strings memory */);
 
     if(ndpi_str->content_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->content_automa.ac_automa);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->content_automa.ac_automa, 0);
 
     if(ndpi_str->bigrams_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->bigrams_automa.ac_automa);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->bigrams_automa.ac_automa, 0);
 
     if(ndpi_str->impossible_bigrams_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->impossible_bigrams_automa.ac_automa);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->impossible_bigrams_automa.ac_automa, 0);
 
 #ifdef HAVE_HYPERSCAN
     destroy_hyperscan(ndpi_str);
@@ -2410,10 +2404,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     free_hyperscan_memory(ndpi_str->custom_categories.hostnames);
 #else
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa, 0);
 
     if(ndpi_str->custom_categories.hostnames_shadow.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa, 0);
 #endif
 
     if(ndpi_str->custom_categories.ipAddresses != NULL)
@@ -4375,7 +4369,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   }
 #else
   /* Free */
-  ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa);
+  ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa, 0);
 
   /* Finalize */
   ac_automata_finalize((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa);

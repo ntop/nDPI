@@ -227,8 +227,9 @@ void ac_automata_reset (AC_AUTOMATA_t * thiz)
  * Release all allocated memories to the automata
  * PARAMS:
  * AC_AUTOMATA_t * thiz: the pointer to the automata
+ * uint8_t free_pattern: if true, deallocate the patterns strings
  ******************************************************************************/
-void ac_automata_release (AC_AUTOMATA_t * thiz)
+void ac_automata_release (AC_AUTOMATA_t * thiz, u_int8_t free_pattern)
 {
   unsigned int i;
   AC_NODE_t * n;
@@ -236,7 +237,7 @@ void ac_automata_release (AC_AUTOMATA_t * thiz)
   for (i=0; i < thiz->all_nodes_num; i++)
     {
       n = thiz->all_nodes[i];
-      node_release(n);
+      node_release(n, free_pattern);
     }
   ndpi_free(thiz->all_nodes);
   ndpi_free(thiz);
