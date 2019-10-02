@@ -1,6 +1,6 @@
 Steam	104	9020	55
 
-	1	UDP 192.168.188.149:45665 <-> 72.165.61.188:27018 [proto: 74/Steam][cat: Game/8][5 pkts/846 bytes <-> 6 pkts/608 bytes][bytes ratio: 0.164 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 50/0 173.2/123.6 298/289 102.3/115.6][Pkt Len c2s/s2c min/avg/max/stddev: 78/78 169.2/101.3 366/158 116.8/27.6][PLAIN TEXT (H@VS01)]
+	1	UDP 192.168.188.149:45665 <-> 72.165.61.188:27018 [proto: 74/Steam][cat: Game/8][5 pkts/846 bytes <-> 6 pkts/608 bytes][bytes ratio: 0.164 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 50/0 148.7/123.6 298/289 107.4/115.6][Pkt Len c2s/s2c min/avg/max/stddev: 78/78 169.2/101.3 366/158 116.8/27.6][PLAIN TEXT (H@VS01)]
 	2	UDP 192.168.188.149:45665 <-> 68.142.91.34:27017 [proto: 74/Steam][cat: Game/8][1 pkts/78 bytes <-> 1 pkts/86 bytes]
 	3	UDP 192.168.188.149:45665 <-> 68.142.91.35:27017 [proto: 74/Steam][cat: Game/8][1 pkts/78 bytes <-> 1 pkts/86 bytes]
 	4	UDP 192.168.188.149:45665 <-> 68.142.91.36:27017 [proto: 74/Steam][cat: Game/8][1 pkts/78 bytes <-> 1 pkts/86 bytes]
