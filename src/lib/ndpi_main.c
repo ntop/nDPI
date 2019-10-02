@@ -4258,7 +4258,6 @@ void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
  */
 int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
 				char *name, ndpi_protocol_category_t category) {
-  AC_PATTERN_t ac_pattern;
 
   if(name == NULL)
     return(-1);
@@ -4266,8 +4265,6 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
 #if 0
   printf("===> %s() Loading %s as %u\n", __FUNCTION__, name, category);
 #endif
-
-    memset(&ac_pattern, 0, sizeof(ac_pattern));
 
 #ifdef HAVE_HYPERSCAN
     {
@@ -4287,6 +4284,10 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
 	return(-1);
     }
 #else
+    AC_PATTERN_t ac_pattern;
+
+    memset(&ac_pattern, 0, sizeof(ac_pattern));
+
     if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL)
       return(-1);
 
@@ -4336,6 +4337,11 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
       head = head->next;
     }
 
+    if(i != ndpi_str->custom_categories.num_to_load){
+      ndpi_free(expressions);
+      return(-1);
+    }
+
     free_hyperscan_memory(ndpi_str->custom_categories.hostnames);
     ndpi_str->custom_categories.hostnames = (struct hs*)ndpi_malloc(sizeof(struct hs));
 
@@ -4361,6 +4367,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
     }
 
     ndpi_str->custom_categories.to_load = NULL;
+    ndpi_str->custom_categories.num_to_load = 0;
 
     if(rc < 0) {
       ndpi_free(ndpi_str->custom_categories.hostnames);

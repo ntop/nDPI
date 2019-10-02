@@ -679,7 +679,7 @@ ndpi_timeval_to_microseconds(struct timeval ts)
 }
 
 void
-ndpi_log_timestamp(char *log_ts, u_int log_ts_len)
+ndpi_log_timestamp(char *log_ts, uint32_t log_ts_len)
 {
     struct timeval tv;
     time_t nowtime;
