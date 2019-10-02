@@ -108,7 +108,7 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
     return ACERR_DUPLICATE_PATTERN;
 
   n->final = 1;
-  node_register_matchstr(n, patt);
+  node_register_matchstr(n, patt, 0);
   thiz->total_patterns++;
 
   return ACERR_SUCCESS;
@@ -327,7 +327,7 @@ static void ac_automata_union_matchstrs (AC_NODE_t * node)
   while ((m = m->failure_node))
     {
       for (i=0; i < m->matched_patterns_num; i++)
-	node_register_matchstr(node, &(m->matched_patterns[i]));
+	node_register_matchstr(node, &(m->matched_patterns[i]), 1 /* this is an existing node */);
 
       if (m->final)
 	node->final = 1;
