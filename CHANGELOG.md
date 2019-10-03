@@ -1,5 +1,71 @@
 # CHANGELOG
 
+#### nDPI 3.0 (October 2019)
+
+## New Features
+
+* Implemented Sequence of Packet Length and Time (SPLT) and Byte Distribution (BD)
+  * Available as library and in `ndpiReader` with option `-J`
+* Added entropy, average, stddev, variance and bytes ratios calculation
+* Added Inter-Arrival Time (IAT) calculation
+* Implemented search of human readable strings
+  * Available as library and in `ndpiReader` with option `-e`
+* Fingerprints
+  * JA3 (https://github.com/salesforce/ja3)
+  * HASSH (https://github.com/salesforce/hassh)
+  * DHCP
+* Implemented a library to serialize/deserialize data in Type-Length-Value (TLV) format
+  * Used by nProbe/ntopng to exchange data via ZMQ
+
+## New Supported Protocols and Services
+
+* DTLS
+* Hulu
+* TikTok/Musical.ly
+* WhatsApp Video
+* DNSoverHTTPS
+* Datasaver
+* Line protocol
+* Added QUIC 046 support
+* Google Duo (detected as Hangout)
+* WireGuard VPN
+* IMO
+* Zoom.us
+
+## Improvements
+
+* TLS
+  * Organizations
+  * Ciphers
+  * Certificate analysis
+* Added PUBLISH/SUBSCRIBE methods to SIP
+* Implemented STUN cache to enhance matching of STUN-based protocols
+* Dissection improvements
+  * Viber
+  * WhatsApp
+  * AmazonVideo
+  * SnapChat
+  * FTP
+  * OpenVPN support for UDP-based VPNs
+  * Facebook Messenger mobile
+  * Various improvements for STUN, Hangout and Duo
+* Added new categories: CUSTOM_CATEGORY_ANTIMALWARE, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_CATEGORY_SHOPPING, NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY and NDPI_PROTOCOL_CATEGORY_FILE_SHARING
+* Added NDPI_PROTOCOL_DANGEROUS classification
+
+## Fixes
+
+* Fixed the dissection of certain invalid DNS responses
+* Fixed Spotify dissection
+* Fixed false positives with FTP and FTP_DATA
+* Fix to discard STUN over TCP flows
+* Fixed MySQL dissector
+* Fix category detection due to missing initialization
+* Fix DNS rsp_addr missing in some tiny responses
+* Various hardening fixes
+
+
+------------------------------------------------------------------------
+
 #### nDPI 2.8 (March 2019)
 
 ## New Supported Protocols and Services
