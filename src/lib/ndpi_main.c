@@ -6338,15 +6338,18 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 */
 u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_str,
 					struct ndpi_flow_struct *flow) {
+    u_int16_t proto = flow->detected_protocol_stack[1] ? flow->detected_protocol_stack[1] : flow->detected_protocol_stack[0];
+
 #if 0
-  printf("[DEBUG] %s(%u.%u)\n", __FUNCTION__,
+  printf("[DEBUG] %s(%u.%u): %u\n", __FUNCTION__,
 	 flow->detected_protocol_stack[0],
-	 flow->detected_protocol_stack[1]);
+	 flow->detected_protocol_stack[1],
+   proto);
 #endif
 
   if(flow->check_extra_packets) return(1);
 
-  switch(flow->detected_protocol_stack[0]) {
+  switch(proto) {
   case NDPI_PROTOCOL_TLS:
     if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed)
       return(1);
@@ -6359,7 +6362,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 
   case NDPI_PROTOCOL_DNS:
     if((ndpi_str->dns_dont_dissect_response == 0)
-       && (flow->host_server_name[0] == '\0'))
+       && (flow->protos.dns.num_answers == 0))
       return(1);
     break;
 

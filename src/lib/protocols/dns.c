@@ -195,6 +195,16 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* *********************************************** */
 
+static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  /* possibly dissect the DNS reply */
+  ndpi_search_dns(ndpi_struct, flow);
+
+  /* stop extra processing */
+  return(0);
+}
+
+/* *********************************************** */
+
 void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   int payload_offset;
   u_int8_t is_query;
@@ -271,9 +281,16 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 	ret.master_protocol = NDPI_PROTOCOL_DNS;
     }
     
-    if(is_query && (ndpi_struct->dns_dont_dissect_response == 0)) {
+    if(is_query && (ndpi_struct->dns_dont_dissect_response == 0) && (flow->num_processed_pkts == 1)) {
       /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
+
+      /* This is necessary to inform the core to call this dissector again */
+      flow->check_extra_packets = 1;
+
+      /* Dissect at most 1 more packets, hopefully the DNS response */
+      flow->max_extra_packets_to_check = 1;
+      flow->extra_packets_func = search_dns_again;
       return; /* The response will set the verdict */
     }
 
