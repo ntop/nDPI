@@ -8307,15 +8307,6 @@ static ndpi_network host_protocol_list[] = {
   { 0xA7CEDA82 /* 167.206.218.130/32*/, 32, NDPI_PROTOCOL_PS_VUE },
   { 0xA7CEDA8A /* 167.206.218.138/32*/, 32, NDPI_PROTOCOL_PS_VUE },
 
-  /* AS23286 Hulu, LLC. */
-  { 0x081C7C00 /* 8.28.124.0/24 */, 24, NDPI_PROTOCOL_HULU },
-  { 0x081C7D00 /* 8.28.125.0/24 */, 24, NDPI_PROTOCOL_HULU },
-  { 0xC7C83200 /* 199.200.50.0/23 */, 23, NDPI_PROTOCOL_HULU },
-  { 0xC7C83300 /* 199.200.51.0/24 */, 24, NDPI_PROTOCOL_HULU },
-  { 0xC73C7400 /* 199.60.116.0/24 */, 24, NDPI_PROTOCOL_HULU },
-  { 0xD05B9E00 /* 208.91.158.0/23 */, 23, NDPI_PROTOCOL_HULU },
-  { 0xD1F9BA00 /* 209.249.186.0/24 */, 24, NDPI_PROTOCOL_HULU },
-
   { 0x0, 0, 0 }
 };
 
@@ -8822,6 +8813,38 @@ static ndpi_category_match category_match[] = {
    { ".playercdn.net", "\\.playercdn" TLD,                        NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "showmax.com", "showmax" TLD,                                NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "showmax.akamaized.net", "showmax\\.akamaized" TLD,          NDPI_PROTOCOL_CATEGORY_STREAMING },
+
+   /* Hulu Streaming services AS23286 */
+   { "8.28.124.0/24",         NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "8.28.125.0/24",         NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "199.200.50.0/23",       NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "199.200.51.0/24",       NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "199.60.116.0/24",       NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "208.91.158.0/23",       NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "209.249.186.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+
+   /* Disney Streaming services AS11251 */
+   { "8.4.4.0/24",            NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "8.5.5.0/24",            NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "8.33.30.0/24",          NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "63.116.222.0/24",       NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "63.116.223.0/24",       NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.192.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.193.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.200.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.201.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.202.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.203.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.204.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.205.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.206.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.207.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.208.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.209.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.212.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.216.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "139.104.217.0/24",      NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
+
    { NULL, NULL, 0 }
 };
 

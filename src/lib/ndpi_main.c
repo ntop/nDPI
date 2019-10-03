@@ -4234,7 +4234,6 @@ void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
   char *ptr = strrchr(ip_address_and_mask, '/');
 
   if(ptr) {
-    ptr[0] = '\0';
     ptr++;
     if(atoi(ptr)>=0 && atoi(ptr)<=32)
       bits = atoi(ptr);
@@ -4304,13 +4303,20 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
 /* ********************************************************************************* */
 
 int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str) {
-  int i;
+  int i, ip_addr[4];
 
   /* First add the nDPI known categories matches */
-  for(i=0; category_match[i].string_to_match != NULL; i++)
-    ndpi_load_hostname_category(ndpi_str,
-				category_match[i].string_to_match,
-				category_match[i].protocol_category);
+  for(i=0; category_match[i].string_to_match != NULL; i++) {
+    if(sscanf(category_match[i].string_to_match, "%d.%d.%d.%d", &ip_addr[0], &ip_addr[1], &ip_addr[2], &ip_addr[3]) == 4){
+      ndpi_load_ip_category(ndpi_str,
+                            category_match[i].string_to_match,
+                            category_match[i].protocol_category);
+    } else{
+      ndpi_load_hostname_category(ndpi_str,
+                                  category_match[i].string_to_match,
+                                  category_match[i].protocol_category);
+    }
+  }
 
 #ifdef HAVE_HYPERSCAN
   if(ndpi_str->custom_categories.num_to_load > 0) {
