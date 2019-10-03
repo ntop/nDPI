@@ -1172,7 +1172,7 @@ struct ndpi_flow_struct {
   union {
     /* the only fields useful for nDPI and ntopng */
     struct {
-      u_int8_t num_queries, num_answers, reply_code;
+      u_int8_t num_queries, num_answers, reply_code, is_query;
       u_int16_t query_type, query_class, rsp_type;
       ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet */
     } dns;

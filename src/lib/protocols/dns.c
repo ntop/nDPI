@@ -199,8 +199,13 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
   /* possibly dissect the DNS reply */
   ndpi_search_dns(ndpi_struct, flow);
 
-  /* stop extra processing */
-  return(0);
+  if(flow->protos.dns.num_answers > 0) {
+    /* stop extra processing */
+    return(0);
+  }
+
+  /* Possibly more processing */
+  return(1);
 }
 
 /* *********************************************** */
@@ -280,16 +285,19 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       else
 	ret.master_protocol = NDPI_PROTOCOL_DNS;
     }
+
+    /* Report if this is a DNS query or reply */
+    flow->protos.dns.is_query = is_query;
     
-    if(is_query && (ndpi_struct->dns_dont_dissect_response == 0) && (flow->num_processed_pkts == 1)) {
+    if(is_query && (ndpi_struct->dns_dont_dissect_response == 0) && (flow->check_extra_packets == 0)) {
       /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
 
       /* This is necessary to inform the core to call this dissector again */
       flow->check_extra_packets = 1;
 
-      /* Dissect at most 1 more packets, hopefully the DNS response */
-      flow->max_extra_packets_to_check = 1;
+      /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
+      flow->max_extra_packets_to_check = 5;
       flow->extra_packets_func = search_dns_again;
       return; /* The response will set the verdict */
     }
