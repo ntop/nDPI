@@ -786,7 +786,12 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
 #endif
       return(1); /* More packets please */
     }
-  }  
+  }
+
+  if(packet->payload_packet_len <= flow->l4.tcp.tls_record_offset) {
+    /* Avoid invalid memory accesses */
+    return(1);
+  }
 
   if(packet->payload[flow->l4.tcp.tls_record_offset] == 0x15 /* Alert */) {
     u_int len = ntohs(*(u_int16_t*)&packet->payload[flow->l4.tcp.tls_record_offset+3]) + 5 /* SSL header len */;
@@ -833,7 +838,7 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
       return(0); /* That's all */
   } else if(flow->l4.tcp.tls_seen_certificate)
     return(0); /* That's all */  
-  else {
+  else if(packet->payload_packet_len > flow->l4.tcp.tls_record_offset+7) {
     /* This is a handshake but not a certificate record */
     u_int16_t len = ntohs(*(u_int16_t*)&packet->payload[flow->l4.tcp.tls_record_offset+7]);
 

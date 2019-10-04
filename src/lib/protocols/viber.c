@@ -31,7 +31,7 @@ void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, struct 
   
   NDPI_LOG_DBG(ndpi_struct, "search for VIBER\n");
   
-  if(packet->udp != NULL) {
+  if((packet->udp != NULL) && (packet->payload_packet_len > 5)) {
     NDPI_LOG_DBG2(ndpi_struct, "calculating dport over udp\n");
 
     if((packet->payload[2] == 0x03 && packet->payload[3] == 0x00)
