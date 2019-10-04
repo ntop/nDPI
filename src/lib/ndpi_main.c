@@ -2234,7 +2234,7 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
 
 /* ****************************************************** */
 
-int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id) {
+int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, unsigned long *id) {
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
@@ -2246,7 +2246,7 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id
      || (string_to_match[0] == '\0'))
     return(-2);
 
-  ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
+  ac_input_text.astring = string_to_match, ac_input_text.length = match_len;
   rc = ac_automata_search(automa, &ac_input_text, &match);
   ac_automata_reset(automa);
 
@@ -2283,7 +2283,7 @@ static int hyperscanCustomEventHandler(unsigned int id,
 /* *********************************************** */
 
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
-			       char *name, unsigned long *id) {
+			       char *name, u_int name_len, unsigned long *id) {
 #ifdef HAVE_HYPERSCAN
     if(ndpi_str->custom_categories.hostnames == NULL)
       return(-1);
@@ -2293,7 +2293,7 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
       *id = (unsigned long)-1;
 
       rc = hs_scan(ndpi_str->custom_categories.hostnames->database,
-		   name, strlen(name), 0,
+		   name, name_len, 0,
 		   ndpi_str->custom_categories.hostnames->scratch,
 		   hyperscanCustomEventHandler, id);
 
@@ -2306,21 +2306,27 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 	return(-1);
     }
 #else
-    return(ndpi_match_string_id(ndpi_str->custom_categories.hostnames.ac_automa, name, id));
+    return(ndpi_match_string_id(ndpi_str->custom_categories.hostnames.ac_automa, name, name_len, id));
 #endif
 }
 
 /* *********************************************** */
 
 int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str,
-				   char *name_or_ip, unsigned long *id) {
+				   char *name_or_ip, u_int name_len, unsigned long *id) {
   char ipbuf[64], *ptr;
   struct in_addr pin;
+  u_int cp_len = ndpi_min(sizeof(ipbuf)-1, name_len);
 
   if(!ndpi_str->custom_categories.categories_loaded)
     return(-1);
 
-  snprintf(ipbuf, sizeof(ipbuf)-1, "%s", name_or_ip);
+  if(cp_len > 0) {
+    memcpy(ipbuf, name_or_ip, cp_len);
+    ipbuf[cp_len] = '\0';
+  } else
+    ipbuf[0] = '\0';
+
   ptr = strrchr(ipbuf, '/');
 
   if(ptr)
@@ -2343,7 +2349,7 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     return(-1);
   } else
     /* Search Host */
-    return(ndpi_match_custom_category(ndpi_str, name_or_ip, id));
+    return(ndpi_match_custom_category(ndpi_str, name_or_ip, name_len, id));
 }
 
 /* *********************************************** */
@@ -4231,15 +4237,24 @@ void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
   patricia_node_t *node;
   struct in_addr pin;
   int bits = 32;
-  char *ptr = strrchr(ip_address_and_mask, '/');
+  char *ptr;
+  char ipbuf[64];
+
+  strncpy(ipbuf, ip_address_and_mask, sizeof(ipbuf));
+  ipbuf[sizeof(ipbuf) - 1] = '\0';
+
+  ptr = strrchr(ipbuf, '/');
 
   if(ptr) {
-    ptr++;
+    *(ptr++) = '\0';
     if(atoi(ptr)>=0 && atoi(ptr)<=32)
       bits = atoi(ptr);
   }
 
-  inet_pton(AF_INET, ip_address_and_mask, &pin);
+  if(inet_pton(AF_INET, ipbuf, &pin) != 1) {
+    NDPI_LOG_DBG2(ndpi_str, "Invalid ip/ip+netmask: %s\n", ip_address_and_mask);
+    return;
+  }
 
   if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow,
 			  AF_INET, &pin, bits)) != NULL)
@@ -4457,7 +4472,8 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
 
     if(flow->host_server_name[0] != '\0') {
       unsigned long id;
-      int rc = ndpi_match_custom_category(ndpi_str, (char *)flow->host_server_name, &id);
+      int rc = ndpi_match_custom_category(ndpi_str, (char *)flow->host_server_name,
+					  strlen((char *)flow->host_server_name), &id);
 
       if(rc == 0) {
 	flow->category = ret->category = (ndpi_protocol_category_t)id;
@@ -4469,6 +4485,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
       unsigned long id;
       int rc = ndpi_match_custom_category(ndpi_str,
 					  (char *)flow->protos.stun_ssl.ssl.client_certificate,
+					  strlen(flow->protos.stun_ssl.ssl.client_certificate),
 					  &id);
 
       if(rc == 0) {
@@ -6118,7 +6135,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
      && (ret_match->protocol_category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)) {
     unsigned long id = ret_match->protocol_category;
     
-    if(ndpi_get_custom_category_match(ndpi_str, string_to_match, &id) != -1) {
+    if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
       if(id != -1) {
 	flow->category = ret_match->protocol_category = id;
 	rc = master_protocol_id;
