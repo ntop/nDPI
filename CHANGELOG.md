@@ -3,31 +3,34 @@
 #### nDPI 3.0 (October 2019)
 
 ## New Features
-
-* Implemented Sequence of Packet Length and Time (SPLT) and Byte Distribution (BD)
+* nDPI now reports the protocol ASAP even when specific fields have not yet been dissected because such packets have not yet been observed. This is important for inline applications that can immediately act on traffic. Applications that need full dissection need to call the new API function ndpi_extra_dissection_possible() to check if metadata dissection has been completely performed or if there is more to read before declaring it completed.
+* TLS (formerly identified as SSL in nDPI v2.x) is now dissected more deeply, certificate validity is extracted as well certificate SHA-1.
+* nDPIreader can now export data in CSV format with option `-C`
+* Implemented Sequence of Packet Length and Time (SPLT) and Byte Distribution (BD) as specified by Cisco Joy (https://github.com/cisco/joy). This allows malware activities on encrypted TLS streams. Read more at https://blogs.cisco.com/security/detecting-encrypted-malware-traffic-without-decryption
   * Available as library and in `ndpiReader` with option `-J`
-* Added entropy, average, stddev, variance and bytes ratios calculation
-* Added Inter-Arrival Time (IAT) calculation
-* Implemented search of human readable strings
+* Promoted usage of protocol categories rather than protocol identifiers in order to classify protocols. This allows application protocols to be clustered in families and thus better managed by users/developers rather than using hundred of protocols unknown to most of the people.
+* Added Inter-Arrival Time (IAT) calculation used to detect protocol misbehaviour (e.g. slow-DoS detection)
+* Added data analysis features for computign metrics such as entropy, average, stddev, variance on a single and consistent place that will prevent when possible. This should ease traffic analysis on monitoring/security applications. New API calls have been implemented such as ndpi_data_XXX() to handle these calculations.
+* Initial release of Python bindings available under nDPI/python.
+* Implemented search of human readable strings for promoting data exfiltration detection
   * Available as library and in `ndpiReader` with option `-e`
 * Fingerprints
   * JA3 (https://github.com/salesforce/ja3)
   * HASSH (https://github.com/salesforce/hassh)
   * DHCP
-* Implemented a library to serialize/deserialize data in Type-Length-Value (TLV) format
+* Implemented a library to serialize/deserialize data in both Type-Length-Value (TLV) and JSON format
   * Used by nProbe/ntopng to exchange data via ZMQ
 
 ## New Supported Protocols and Services
 
-* DTLS
+* DTLS (i.e. TLS over UDP)
 * Hulu
 * TikTok/Musical.ly
 * WhatsApp Video
 * DNSoverHTTPS
 * Datasaver
 * Line protocol
-* Added QUIC 046 support
-* Google Duo (detected as Hangout)
+* Google Duo and Hangout merged
 * WireGuard VPN
 * IMO
 * Zoom.us
@@ -46,6 +49,7 @@
   * AmazonVideo
   * SnapChat
   * FTP
+  * QUIC
   * OpenVPN support for UDP-based VPNs
   * Facebook Messenger mobile
   * Various improvements for STUN, Hangout and Duo
