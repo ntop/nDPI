@@ -754,12 +754,12 @@ extern "C" {
 				 u_int32_t daddr,
 				 ndpi_protocol *ret);
   int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
-				 char *name, unsigned long *id);
+				 char *name, u_int name_len, unsigned long *id);
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   ndpi_protocol *ret);
   int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
-				      char *name_or_ip, unsigned long *id);
+				      char *name_or_ip, u_int name_len, unsigned long *id);
   int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
 				     ndpi_detection_preference pref,
 				     int value);
@@ -782,11 +782,12 @@ extern "C" {
    *
    * @par     The automata initialized with ndpi_init_automa();
    * @par     The (sub)string to search
+   * @par     The (sub)string length
    * @par     The id associated with the matched string or 0 id not found.
    * @return  0 in case of match, or -1 if no match, or -2 if an error occurred.
    *
    */
-  int ndpi_match_string_id(void *_automa, char *string_to_match, unsigned long *id);
+  int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, unsigned long *id);
 
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
