@@ -6358,8 +6358,6 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
    proto);
 #endif
 
-  if(flow->check_extra_packets) return(1);
-
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
     if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed)
