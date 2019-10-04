@@ -4417,14 +4417,19 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
     prefix_t prefix;
     patricia_node_t *node;
 
-    /* Make sure all in network byte order otherwise compares wont work */
-    fill_prefix_v4(&prefix, (struct in_addr *)&saddr,
-		   32, ((patricia_tree_t*)ndpi_str->protocols_ptree)->maxbits);
-    node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
-
-    if(!node) {
-      fill_prefix_v4(&prefix, (struct in_addr *)&daddr,
+    if(saddr == 0)
+      node = NULL;
+    else {
+      /* Make sure all in network byte order otherwise compares wont work */
+      fill_prefix_v4(&prefix, (struct in_addr *)&saddr,
 		     32, ((patricia_tree_t*)ndpi_str->protocols_ptree)->maxbits);
+      node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
+    }
+    
+    if(!node) {
+      if(daddr != 0)
+	fill_prefix_v4(&prefix, (struct in_addr *)&daddr,
+		       32, ((patricia_tree_t*)ndpi_str->protocols_ptree)->maxbits);
       node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
     }
 
