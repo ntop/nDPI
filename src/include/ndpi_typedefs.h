@@ -35,6 +35,13 @@ typedef enum {
 	      NDPI_LOG_DEBUG_EXTRA
 } ndpi_log_level_t;
 
+typedef enum {
+	      ndpi_l4_proto_unknown = 0,
+	      ndpi_l4_proto_tcp_only,
+	      ndpi_l4_proto_udp_only,
+	      ndpi_l4_proto_tcp_and_udp,
+} ndpi_l4_proto_info;
+
 /* NDPI_VISIT */
 typedef enum {
 	      ndpi_preorder,

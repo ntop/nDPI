@@ -412,9 +412,15 @@ static void help(u_int long_help) {
 #endif
 
   if(long_help) {
+    NDPI_PROTOCOL_BITMASK all;
+    
     printf("\n\nnDPI supported protocols:\n");
-    printf("%3s %-22s %-12s %s\n", "Id", "Protocol", "Breed", "Category");
+    printf("%3s %-22s %-8s %-12s %s\n", "Id", "Protocol", "Layer_4", "Breed", "Category");
     num_threads = 1;
+
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
+    
     ndpi_dump_protocols(ndpi_info_mod);
   }
   exit(!long_help);

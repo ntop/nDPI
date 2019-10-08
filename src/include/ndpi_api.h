@@ -759,11 +759,15 @@ extern "C" {
 				   struct ndpi_flow_struct *flow,
 				   ndpi_protocol *ret);
   int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
-				      char *name_or_ip, u_int name_len, unsigned long *id);
+				     char *name_or_ip, u_int name_len, unsigned long *id);
   int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
 				     ndpi_detection_preference pref,
 				     int value);
 
+  /* Tells to called on what l4 protocol given application protocol can be found */
+  ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t ndpi_proto_id);
+  const char* ndpi_get_l4_proto_name(ndpi_l4_proto_info proto);
+    
   ndpi_proto_defaults_t* ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
