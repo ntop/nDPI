@@ -2707,7 +2707,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
  *  - empty lines or lines starting with # are ignored
  */
 int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path) {
-  char buffer[512], *line, *name, *category;
+  char buffer[512], *line, *name, *category, *saveptr;
   FILE *fd;
   int len;
 
@@ -2730,10 +2730,10 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
       continue;
 
     line[len-1] = '\0';
-    name = strtok(line, "\t");
+    name = strtok_r(line, "\t", &saveptr);
 
     if(name) {
-      category = strtok(NULL, "\t");
+      category = strtok_r(NULL, "\t", &saveptr);
 
       if(category)
         ndpi_load_category(ndpi_str, name, (ndpi_protocol_category_t) atoi(category));
@@ -6483,6 +6483,8 @@ const char* ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
     return("TCP/UDP");
     break;
   }
+
+  return("");
 }
 
 /* ******************************************************************** */
