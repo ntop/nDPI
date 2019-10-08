@@ -1190,6 +1190,10 @@ struct ndpi_flow_struct {
     } ntp;
 
     struct {
+      char cname[24], realm[24];
+    } kerberos;
+
+    struct {
       struct {
 	u_int16_t ssl_version;
 	char client_certificate[64], server_certificate[64], server_organization[64];
