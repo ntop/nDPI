@@ -2411,10 +2411,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     free_hyperscan_memory(ndpi_str->custom_categories.hostnames);
 #else
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa, 0);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa, 1 /* free patterns strings memory */);
 
     if(ndpi_str->custom_categories.hostnames_shadow.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa, 0);
+      ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa, 1 /* free patterns strings memory */);
 #endif
 
     if(ndpi_str->custom_categories.ipAddresses != NULL)
@@ -4233,7 +4233,7 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str,
 /* ********************************************************************************* */
 
 void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
-			   char *ip_address_and_mask, ndpi_protocol_category_t category) {
+			   const char *ip_address_and_mask, ndpi_protocol_category_t category) {
   patricia_node_t *node;
   struct in_addr pin;
   int bits = 32;
@@ -4263,16 +4263,14 @@ void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
-/*
- *
- * IMPORTANT
- *
- * The *name pointer MUST be kept allocated until the automa is finalized and it
- * cannot be recycled across multiple ndpi_load_hostname_category() calls
- *
- */
 int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
-				char *name, ndpi_protocol_category_t category) {
+				const char *name_to_add, ndpi_protocol_category_t category) {
+  char *name;
+
+  if(name_to_add == NULL)
+    return(-1);
+
+  name = ndpi_strdup(name_to_add);
 
   if(name == NULL)
     return(-1);
@@ -4286,7 +4284,7 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
       struct hs_list *h = (struct hs_list*)ndpi_malloc(sizeof(struct hs_list));
 
       if(h) {
-	h->expression = ndpi_strdup(name), h->id = (unsigned int)category;
+	h->expression = name, h->id = (unsigned int)category;
 	if(h->expression == NULL) {
 	  ndpi_free(h);
 	  return(-2);
@@ -4398,7 +4396,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   }
 #else
   /* Free */
-  ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa, 0);
+  ac_automata_release((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames.ac_automa, 1 /* free patterns strings memory */);
 
   /* Finalize */
   ac_automata_finalize((AC_AUTOMATA_t*)ndpi_str->custom_categories.hostnames_shadow.ac_automa);

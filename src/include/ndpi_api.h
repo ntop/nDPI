@@ -745,9 +745,9 @@ extern "C" {
   int ndpi_match_string(void *_automa, char *string_to_match);
 
   void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
-			     char *ip_address_and_mask, ndpi_protocol_category_t category);
+				 const char *ip_address_and_mask, ndpi_protocol_category_t category);
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
-				  char *name, ndpi_protocol_category_t category);
+				 const char *name_to_add, ndpi_protocol_category_t category);
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
   int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int32_t saddr,
