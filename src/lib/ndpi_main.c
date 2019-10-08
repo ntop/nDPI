@@ -2698,6 +2698,57 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 /* ******************************************************************** */
 
 /*
+ * Format:
+ *
+ * <host|ip>	<category_id>
+ *
+ * Notes:
+ *  - host and category are separated by a single TAB
+ *  - empty lines or lines starting with # are ignored
+ */
+int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path) {
+  char buffer[512], *line, *name, *category;
+  FILE *fd;
+  int len;
+
+  fd = fopen(path, "r");
+
+  if(fd == NULL) {
+    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
+    return(-1);
+  }
+
+  while(fd) {
+    line = fgets(buffer, sizeof(buffer), fd);
+
+    if(line == NULL)
+      break;
+
+    len = strlen(line);
+
+    if((len <= 1) || (line[0] == '#'))
+      continue;
+
+    line[len-1] = '\0';
+    name = strtok(line, "\t");
+
+    if(name) {
+      category = strtok(NULL, "\t");
+
+      if(category)
+        ndpi_load_category(ndpi_str, name, (ndpi_protocol_category_t) atoi(category));
+    }
+  }
+
+  fclose(fd);
+  ndpi_enable_loaded_categories(ndpi_str);
+
+  return(0);
+}
+
+/* ******************************************************************** */
+
+/*
   Format:
   <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto>
 
@@ -4231,7 +4282,7 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
-void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
+int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
 			   const char *ip_address_and_mask, ndpi_protocol_category_t category) {
   patricia_node_t *node;
   struct in_addr pin;
@@ -4252,12 +4303,13 @@ void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
 
   if(inet_pton(AF_INET, ipbuf, &pin) != 1) {
     NDPI_LOG_DBG2(ndpi_str, "Invalid ip/ip+netmask: %s\n", ip_address_and_mask);
-    return;
+    return(-1);
   }
 
   if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow,
 			  AF_INET, &pin, bits)) != NULL)
     node->value.user_value = (int)category;
+  return(0);
 }
 
 /* ********************************************************************************* */
@@ -4316,21 +4368,30 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
+/* Loads an IP or name category */
+int ndpi_load_category(struct ndpi_detection_module_struct *ndpi_struct,
+				 const char *ip_or_name, ndpi_protocol_category_t category) {
+  int rv;
+
+  /* Try to load as IP address first */
+  rv = ndpi_load_ip_category(ndpi_struct, ip_or_name, category);
+
+  if(rv < 0) {
+    /* IP load failed, load as hostname */
+    rv = ndpi_load_hostname_category(ndpi_struct, ip_or_name, category);
+  }
+
+  return(rv);
+}
+
+/* ********************************************************************************* */
+
 int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str) {
-  int i, ip_addr[4];
+  int i;
 
   /* First add the nDPI known categories matches */
-  for(i=0; category_match[i].string_to_match != NULL; i++) {
-    if(sscanf(category_match[i].string_to_match, "%d.%d.%d.%d", &ip_addr[0], &ip_addr[1], &ip_addr[2], &ip_addr[3]) == 4){
-      ndpi_load_ip_category(ndpi_str,
-                            category_match[i].string_to_match,
-                            category_match[i].protocol_category);
-    } else{
-      ndpi_load_hostname_category(ndpi_str,
-                                  category_match[i].string_to_match,
-                                  category_match[i].protocol_category);
-    }
-  }
+  for(i=0; category_match[i].string_to_match != NULL; i++)
+    ndpi_load_category(ndpi_str, category_match[i].string_to_match, category_match[i].protocol_category);
 
 #ifdef HAVE_HYPERSCAN
   if(ndpi_str->custom_categories.num_to_load > 0) {
