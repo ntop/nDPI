@@ -4285,29 +4285,31 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
 
       if(h) {
 	h->expression = name, h->id = (unsigned int)category;
-	if(h->expression == NULL) {
-	  ndpi_free(h);
-	  return(-2);
-	}
-
 	h->next = ndpi_str->custom_categories.to_load;
 	ndpi_str->custom_categories.to_load = h;
 	ndpi_str->custom_categories.num_to_load++;
-      } else
-	return(-1);
+      } else {
+        free(name);
+        return(-1);
+      }
     }
 #else
     AC_PATTERN_t ac_pattern;
 
     memset(&ac_pattern, 0, sizeof(ac_pattern));
 
-    if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL)
+    if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL) {
+      free(name);
       return(-1);
+    }
 
     ac_pattern.astring = name, ac_pattern.length = strlen(ac_pattern.astring);
     ac_pattern.rep.number = (int)category;
 
-    ac_automata_add(ndpi_str->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
+    if(ac_automata_add(ndpi_str->custom_categories.hostnames_shadow.ac_automa, &ac_pattern) != ACERR_SUCCESS) {
+      free(name);
+      return(-1);
+    }
 #endif
 
   return(0);
