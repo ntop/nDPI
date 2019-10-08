@@ -1879,49 +1879,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
 
-  if(_customCategoryFilePath) {
-    FILE *fd = fopen(_customCategoryFilePath, "r");
-
-    if(fd) {
-      while(fd) {
-	char buffer[512], *line, *name, *category;
-	int i;
-
-	if(!(line = fgets(buffer, sizeof(buffer), fd)))
-	  break;
-
-	if(((i = strlen(line)) <= 1) || (line[0] == '#'))
-	  continue;
-	else
-	  line[i-1] = '\0';
-
-	name = strtok(line, "\t");
-	if(name) {
-	  category = strtok(NULL, "\t");
-
-	  if(category) {
-	    int fields[4];
-
-
-	    if(verbose && !quiet_mode) printf("[Category] Loading %s\t%s\n", name, category);
-
-	    if(sscanf(name, "%d.%d.%d.%d", &fields[0], &fields[1], &fields[2], &fields[3]) == 4)
-	      ndpi_load_ip_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				    name, (ndpi_protocol_category_t)atoi(category));
-	    else {
-	      ndpi_load_hostname_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-					  name, (ndpi_protocol_category_t)atoi(category));
-	    }
-	  }
-	}
-      }
-
-      ndpi_enable_loaded_categories(ndpi_thread_info[thread_id].workflow->ndpi_struct);
-    } else
-      printf("ERROR: Unable to read file %s\n", _customCategoryFilePath);
-
-    fclose(fd);
-  }
+  if(_customCategoryFilePath)
+    ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath);
 }
 
 /* *********************************************** */

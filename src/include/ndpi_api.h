@@ -613,6 +613,16 @@ extern "C" {
   int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod,
 			       const char* path);
 
+ /**
+   * Read a file and load the categories
+   *
+   * @par     ndpi_mod = the detection module
+   * @par     path     = the path of the file
+   * @return  0 if the file is loaded correctly;
+   *          -1 else
+   */
+  int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path);
+
   /**
    * Get the total number of the supported protocols
    *
@@ -744,10 +754,12 @@ extern "C" {
    */
   int ndpi_match_string(void *_automa, char *string_to_match);
 
-  void ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 const char *ip_address_and_mask, ndpi_protocol_category_t category);
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 const char *name_to_add, ndpi_protocol_category_t category);
+  int ndpi_load_category(struct ndpi_detection_module_struct *ndpi_struct,
+				 const char *ip_or_name, ndpi_protocol_category_t category);
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
   int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int32_t saddr,
