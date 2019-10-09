@@ -1006,12 +1006,13 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   json_object *jObj;
 #endif
   FILE *out = results_file ? results_file : stdout;
-
+  u_int8_t known_tls;
+  
   if(csv_fp != NULL) {
     char buf[32];
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
     float f = (float)flow->first_seen, l = (float)flow->last_seen;
-
+    
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
 
     fprintf(csv_fp, "%u,%u,%.3f,%.3f,%s,%u,%s,%u,",
@@ -1049,7 +1050,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
     
     fprintf(csv_fp, "%s,%s,%s,",
-	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version) : "",
+	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls) : "",
 	    (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
 	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "");
 
@@ -1146,7 +1147,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[URL: %s][StatusCode: %u]",
 	      flow->http.url, flow->http.response_status_code);
     
-    if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version));
+    if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
     if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_info);
     if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 
@@ -1310,9 +1311,13 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
-    if((!flow->detection_completed) && flow->ndpi_flow)
-      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct, flow->ndpi_flow, enable_protocol_guess);
-
+    if((!flow->detection_completed) && flow->ndpi_flow) {
+      u_int8_t proto_guessed;
+  
+      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
+						      flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
+    }
+    
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
 
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.app_protocol]       += flow->src2dst_packets + flow->dst2src_packets;
