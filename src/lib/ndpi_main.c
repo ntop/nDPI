@@ -4099,9 +4099,13 @@ ndpi_protocol ndpi_get_partial_detection(struct ndpi_detection_module_struct *nd
 /* ********************************************************************************* */
 
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str,
-				    struct ndpi_flow_struct *flow, u_int8_t enable_guess) {
+				    struct ndpi_flow_struct *flow,
+				    u_int8_t enable_guess,
+				    u_int8_t *protocol_was_guessed) {
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
 
+  *protocol_was_guessed = 0;
+  
   if(flow == NULL)
     return(ret);
 
@@ -4165,7 +4169,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	   && (flow->protos.stun_ssl.stun.num_processed_pkts > 0))
 	  guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
-
 	if(flow->host_server_name[0] != '\0') {
 	  ndpi_protocol_match_result ret_match;
 
@@ -4222,7 +4225,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
      && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
      && flow->packet.iph /* Guess only IPv4 */
      && (flow->packet.tcp || flow->packet.udp)
-     )
+     ) {
     ret = ndpi_guess_undetected_protocol(ndpi_str,
 					 flow,
 					 flow->packet.l4_protocol,
@@ -4231,7 +4234,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 					 ntohl(flow->packet.iph->daddr),
 					 ntohs(flow->packet.udp ? flow->packet.udp->dest : flow->packet.tcp->dest)
 					 );
-
+    *protocol_was_guessed = 1;
+  }
+  
   ndpi_fill_protocol_category(ndpi_str, flow, &ret);
 
   return(ret);
@@ -4733,8 +4738,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
       if(flow->packet.iph) {
 	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+	  u_int8_t protocol_was_guessed;
+	    
 	  /* ret.master_protocol = flow->guessed_protocol_id , ret.app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
-	  ret = ndpi_detection_giveup(ndpi_str, flow, 0);
+	  ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
 	}
 
 	ndpi_fill_protocol_category(ndpi_str, flow, &ret);
@@ -4827,6 +4834,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
      && (flow->packet.tcp->syn == 0)
      && (flow->guessed_protocol_id == 0)
      ) {
+    u_int8_t protocol_was_guessed;
+    
     /*
       This is a TCP flow
       - whose first packet is NOT a SYN
@@ -4835,7 +4844,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       We don't see how future packets can match anything
       hence we giveup here
     */
-    ret = ndpi_detection_giveup(ndpi_str, flow, 0);
+    ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
   }
 
  invalidate_ptr:

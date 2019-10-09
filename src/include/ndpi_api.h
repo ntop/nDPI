@@ -225,12 +225,14 @@ extern "C" {
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
    * @par    enable_guess = guess protocol if unknown
+   * @par    protocol_was_guessed = 1 if the protocol was guesses (requires enable_guess = 1), 0 otherwise
    * @return the detected protocol even if the flow is not completed;
    *
    */
   ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow,
-				      u_int8_t enable_guess);
+				      u_int8_t enable_guess,
+				      u_int8_t *protocol_was_guessed);
 
   /**
    * Processes an extra packet in order to get more information for a given protocol
@@ -833,7 +835,7 @@ extern "C" {
 				      char *buffer, u_int buffer_size,
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
-  char* ndpi_ssl_version2str(u_int16_t version);
+  char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version);
 
   /* Serializer */
   int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,

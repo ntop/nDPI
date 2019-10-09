@@ -710,9 +710,11 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 /* ********************************** */
 
-char* ndpi_ssl_version2str(u_int16_t version) {
+char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version) {
   static char v[12];
 
+  *unknown_tls_version = 0;
+  
   switch(version) {
   case 0x0300: return("SSLv3");
   case 0x0301: return("TLSv1");
@@ -727,6 +729,7 @@ char* ndpi_ssl_version2str(u_int16_t version) {
   if((version >= 0x7f00) && (version <= 0x7fff))
     return("TLSv1.3 (draft)");
 
+  *unknown_tls_version = 1;
   snprintf(v, sizeof(v), "TLS (%04X)", version);
   
   return(v);
