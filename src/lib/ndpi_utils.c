@@ -710,24 +710,28 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 /* ********************************** */
 
-char* ndpi_ssl_version2str(u_int16_t version) {
-  static char v[8];
+char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version) {
+  static char v[12];
 
+  *unknown_tls_version = 0;
+  
   switch(version) {
   case 0x0300: return("SSLv3");
   case 0x0301: return("TLSv1");
   case 0x0302: return("TLSv1.1");
   case 0x0303: return("TLSv1.2");
   case 0x0304: return("TLSv1.3");
-  case 0xfb1a: return("TLSv1.3 (Fizz)"); /* https://engineering.fb.com/security/fizz/ */
-  case 0xfeff: return("DTLSv1.0");
-  case 0xfefd: return("DTLSv1.2");
+  case 0XFB1A: return("TLSv1.3 (Fizz)"); /* https://engineering.fb.com/security/fizz/ */
+  case 0XFEFF: return("DTLSv1.0");
+  case 0XFEFD: return("DTLSv1.2");
   }
 
   if((version >= 0x7f00) && (version <= 0x7fff))
     return("TLSv1.3 (draft)");
 
-  snprintf(v, sizeof(v), "%04X", version);
+  *unknown_tls_version = 1;
+  snprintf(v, sizeof(v), "TLS (%04X)", version);
+  
   return(v);
 }
 

@@ -35,6 +35,13 @@ typedef enum {
 	      NDPI_LOG_DEBUG_EXTRA
 } ndpi_log_level_t;
 
+typedef enum {
+	      ndpi_l4_proto_unknown = 0,
+	      ndpi_l4_proto_tcp_only,
+	      ndpi_l4_proto_udp_only,
+	      ndpi_l4_proto_tcp_and_udp,
+} ndpi_l4_proto_info;
+
 /* NDPI_VISIT */
 typedef enum {
 	      ndpi_preorder,
@@ -1181,6 +1188,10 @@ struct ndpi_flow_struct {
       u_int8_t request_code;
       u_int8_t version;
     } ntp;
+
+    struct {
+      char cname[24], realm[24];
+    } kerberos;
 
     struct {
       struct {

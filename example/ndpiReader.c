@@ -412,9 +412,15 @@ static void help(u_int long_help) {
 #endif
 
   if(long_help) {
+    NDPI_PROTOCOL_BITMASK all;
+    
     printf("\n\nnDPI supported protocols:\n");
-    printf("%3s %-22s %-12s %s\n", "Id", "Protocol", "Breed", "Category");
+    printf("%3s %-22s %-8s %-12s %s\n", "Id", "Protocol", "Layer_4", "Breed", "Category");
     num_threads = 1;
+
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
+    
     ndpi_dump_protocols(ndpi_info_mod);
   }
   exit(!long_help);
@@ -1000,12 +1006,13 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   json_object *jObj;
 #endif
   FILE *out = results_file ? results_file : stdout;
-
+  u_int8_t known_tls;
+  
   if(csv_fp != NULL) {
     char buf[32];
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
     float f = (float)flow->first_seen, l = (float)flow->last_seen;
-
+    
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
 
     fprintf(csv_fp, "%u,%u,%.3f,%.3f,%s,%u,%s,%u,",
@@ -1043,7 +1050,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
     
     fprintf(csv_fp, "%s,%s,%s,",
-	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version) : "",
+	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls) : "",
 	    (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
 	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "");
 
@@ -1140,7 +1147,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[URL: %s][StatusCode: %u]",
 	      flow->http.url, flow->http.response_status_code);
     
-    if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version));
+    if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
     if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_info);
     if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 
@@ -1304,9 +1311,13 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   u_int16_t thread_id = *((u_int16_t *) user_data);
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
-    if((!flow->detection_completed) && flow->ndpi_flow)
-      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct, flow->ndpi_flow, enable_protocol_guess);
-
+    if((!flow->detection_completed) && flow->ndpi_flow) {
+      u_int8_t proto_guessed;
+  
+      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
+						      flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
+    }
+    
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
 
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.app_protocol]       += flow->src2dst_packets + flow->dst2src_packets;
@@ -1873,50 +1884,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
 
-  if(_customCategoryFilePath) {
-    FILE *fd = fopen(_customCategoryFilePath, "r");
-
-    if(fd) {
-      while(fd) {
-	char buffer[512], *line, *name, *category;
-	int i;
-
-	if(!(line = fgets(buffer, sizeof(buffer), fd)))
-	  break;
-
-	if(((i = strlen(line)) <= 1) || (line[0] == '#'))
-	  continue;
-	else
-	  line[i-1] = '\0';
-
-	name = strtok(line, "\t");
-	if(name) {
-	  category = strtok(NULL, "\t");
-
-	  if(category) {
-	    int fields[4];
-
-
-	    if(verbose && !quiet_mode) printf("[Category] Loading %s\t%s\n", name, category);
-
-	    if(sscanf(name, "%d.%d.%d.%d", &fields[0], &fields[1], &fields[2], &fields[3]) == 4)
-	      ndpi_load_ip_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				    name, (ndpi_protocol_category_t)atoi(category));
-	    else {
-	      /* TODO free the strdup */
-	      ndpi_load_hostname_category(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-					  strdup(name), (ndpi_protocol_category_t)atoi(category));
-	    }
-	  }
-	}
-      }
-
-      ndpi_enable_loaded_categories(ndpi_thread_info[thread_id].workflow->ndpi_struct);
-    } else
-      printf("ERROR: Unable to read file %s\n", _customCategoryFilePath);
-
-    fclose(fd);
-  }
+  if(_customCategoryFilePath)
+    ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath);
 }
 
 /* *********************************************** */

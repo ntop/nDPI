@@ -966,6 +966,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UBNTAC2) {
     snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
   }
+  /* KERBEROS */
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_KERBEROS) {
+    if(flow->ndpi_flow->protos.kerberos.cname[0] != '\0') {
+      snprintf(flow->info, sizeof(flow->info), "%s (%s)",
+	       flow->ndpi_flow->protos.kerberos.cname,
+	       flow->ndpi_flow->protos.kerberos.realm);
+    }
+  }
   /* HTTP */
   else if(flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP) {
     if(flow->ndpi_flow->http.url != NULL) {
@@ -1230,10 +1238,13 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	if(ndpi_flow && ndpi_flow->check_extra_packets)
 	  flow->check_extra_packets = 1;
 
-	if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+	if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
+	  u_int8_t proto_guessed;
+	  
 	  flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
-							  enable_protocol_guess);
-
+							  enable_protocol_guess, &proto_guessed);
+	}
+	
 	process_ndpi_collected_info(workflow, flow);
       }
     }
