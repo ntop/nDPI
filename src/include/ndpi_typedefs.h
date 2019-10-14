@@ -1438,4 +1438,8 @@ struct ndpi_analyze_struct {
 #define MAX_SERIES_LEN      512
 #define MIN_SERIES_LEN      8
 
+/* **************************************** */
+
+typedef struct ndpi_ptree ndpi_ptree_t;
+
 #endif /* __NDPI_TYPEDEFS_H__ */

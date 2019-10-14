@@ -837,6 +837,12 @@ extern "C" {
 				      char *outbuf, u_int outbuf_len);
   char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version);
 
+  /* ptree (trie) API */
+  ndpi_ptree_t* ndpi_ptree_create();
+  int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int8_t bits, uint user_data);
+  int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, uint *user_data);
+  void ndpi_ptree_destroy(ndpi_ptree_t *tree);
+
   /* Serializer */
   int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,
 			      u_int32_t buffer_size);

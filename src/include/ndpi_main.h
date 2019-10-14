@@ -114,6 +114,7 @@ extern "C" {
 
   extern int ndpi_parse_ip_string(const char *ip_str, ndpi_ip_addr_t *parsed_ip);
   extern char *ndpi_get_ip_string(const ndpi_ip_addr_t * ip, char *buf, u_int buf_len);
+  extern u_int8_t ndpi_is_ipv6(const ndpi_ip_addr_t *ip);
 
   extern char* ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_mod, u_int id);
   u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, const char *name);
