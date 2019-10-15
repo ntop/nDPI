@@ -619,24 +619,6 @@ float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
 
 /* ***************************************************** */
 
-static void patchIPv6Address(char *str) {
-  int i = 0, j = 0;
-
-  while(str[i] != '\0') {
-    if((str[i] == ':')
-       && (str[i+1] == '0')
-       && (str[i+2] == ':')) {
-      str[j++] = ':';
-      str[j++] = ':';
-      i += 3;
-    } else
-      str[j++] = str[i++];
-  }
-  if(str[j] != '\0') str[j] = '\0';
-}
-
-/* ***************************************************** */
-
 static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow,
 						 const u_int8_t version,
 						 u_int16_t vlan_id,
@@ -802,7 +784,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	inet_ntop(AF_INET6, &iph6->ip6_src, newflow->src_name, sizeof(newflow->src_name));
 	inet_ntop(AF_INET6, &iph6->ip6_dst, newflow->dst_name, sizeof(newflow->dst_name));
 	/* For consistency across platforms replace :0: with :: */
-	patchIPv6Address(newflow->src_name), patchIPv6Address(newflow->dst_name);
+	ndpi_patchIPv6Address(newflow->src_name), ndpi_patchIPv6Address(newflow->dst_name);
       }
 
       if((newflow->ndpi_flow = ndpi_flow_malloc(SIZEOF_FLOW_STRUCT)) == NULL) {
@@ -938,7 +920,6 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 /* ****************************************************** */
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
-
   if(!flow->ndpi_flow) return;
 
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
@@ -1037,8 +1018,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
  * @brief Clear entropy stats if it meets prereq.
  */
 static void
-ndpi_clear_entropy_stats(struct ndpi_flow_info *flow)
-{
+ndpi_clear_entropy_stats(struct ndpi_flow_info *flow) {
   if(flow->entropy.src2dst_pkt_count + flow->entropy.dst2src_pkt_count == max_num_packets_per_flow) {
     memcpy(&flow->last_entropy, &flow->entropy,  sizeof(struct ndpi_entropy));
     memset(&flow->entropy, 0x00, sizeof(struct ndpi_entropy));

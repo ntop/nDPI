@@ -714,7 +714,7 @@ char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version) {
   static char v[12];
 
   *unknown_tls_version = 0;
-  
+
   switch(version) {
   case 0x0300: return("SSLv3");
   case 0x0301: return("TLSv1");
@@ -731,8 +731,192 @@ char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version) {
 
   *unknown_tls_version = 1;
   snprintf(v, sizeof(v), "TLS (%04X)", version);
-  
+
   return(v);
+}
+
+/* ***************************************************** */
+
+void ndpi_patchIPv6Address(char *str) {
+  int i = 0, j = 0;
+
+  while(str[i] != '\0') {
+    if((str[i] == ':')
+       && (str[i+1] == '0')
+       && (str[i+2] == ':')) {
+      str[j++] = ':';
+      str[j++] = ':';
+      i += 3;
+    } else
+      str[j++] = str[i++];
+  }
+
+  if(str[j] != '\0') str[j] = '\0';
+}
+
+/* ********************************** */
+
+int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
+		   struct ndpi_flow_struct *flow,
+		   u_int8_t ip_version,
+		   u_int8_t l4_protocol, u_int16_t vlan_id,
+		   u_int32_t src_v4, u_int32_t dst_v4,
+		   struct ndpi_in6_addr *src_v6, struct ndpi_in6_addr *dst_v6,
+		   u_int16_t src_port, u_int16_t dst_port,
+		   ndpi_serializer *serializer) {
+  u_int16_t proto = flow->detected_protocol_stack[0] ? flow->detected_protocol_stack[0] : flow->detected_protocol_stack[1];
+  char buf[48], src_name[32], dst_name[32];
+
+  if(ndpi_init_serializer(serializer, ndpi_serialization_format_json) == -1)
+    return(-1);
+
+  if(ip_version == 4) {
+    inet_ntop(AF_INET, &src_v4, src_name, sizeof(src_name));
+    inet_ntop(AF_INET, &dst_v4, dst_name, sizeof(dst_name));
+  } else {
+    inet_ntop(AF_INET6, src_v6, src_name, sizeof(src_name));
+    inet_ntop(AF_INET6, dst_v6, dst_name, sizeof(dst_name));
+    /* For consistency across platforms replace :0: with :: */
+    ndpi_patchIPv6Address(src_name), ndpi_patchIPv6Address(dst_name);
+  }
+
+  ndpi_serialize_string_string(serializer, "src_ip", src_name);
+  ndpi_serialize_string_string(serializer, "dest_ip", dst_name);
+  ndpi_serialize_string_uint32(serializer, "src_port", src_port);
+  ndpi_serialize_string_uint32(serializer, "dst_port", dst_port);
+
+  switch(l4_protocol) {
+  case IPPROTO_TCP:
+    ndpi_serialize_string_string(serializer, "proto", "TCP");
+    break;
+
+  case IPPROTO_UDP:
+    ndpi_serialize_string_string(serializer, "proto", "UDP");
+    break;
+
+  case IPPROTO_ICMP:
+    ndpi_serialize_string_string(serializer, "proto", "ICMP");
+    break;
+
+  default:
+    ndpi_serialize_string_uint32(serializer, "proto", l4_protocol);
+    break;
+  }
+
+  ndpi_serialize_string_string(serializer, "app_proto", ndpi_get_proto_name(ndpi_struct, proto));
+
+  switch(proto) {
+  case NDPI_PROTOCOL_DHCP:
+    ndpi_serialize_start_of_block(serializer, "dhcp");
+    ndpi_serialize_string_string(serializer, "fingerprint", flow->protos.dhcp.fingerprint);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_BITTORRENT:
+    {
+      u_int i, j, n = 0;
+      char bittorent_hash[32];
+
+      for(i=0, j = 0; j < sizeof(bittorent_hash)-1; i++) {
+	sprintf(&bittorent_hash[j], "%02x",
+		flow->protos.bittorrent.hash[i]);
+
+	j += 2, n += flow->protos.bittorrent.hash[i];
+      }
+
+      if(n == 0) bittorent_hash[0] = '\0';
+
+      ndpi_serialize_start_of_block(serializer, "bittorrent");
+      ndpi_serialize_string_string(serializer, "hash", bittorent_hash);
+      ndpi_serialize_end_of_block(serializer);
+    }
+    break;
+
+  case NDPI_PROTOCOL_DNS:
+    ndpi_serialize_start_of_block(serializer, "dns");
+    ndpi_serialize_string_uint32(serializer, "num_queries", flow->protos.dns.num_queries);
+    ndpi_serialize_string_uint32(serializer, "num_answers", flow->protos.dns.num_answers);
+    ndpi_serialize_string_uint32(serializer, "reply_code",  flow->protos.dns.reply_code);
+    ndpi_serialize_string_uint32(serializer, "query_type",  flow->protos.dns.query_type);
+    ndpi_serialize_string_uint32(serializer, "rsp_type",    flow->protos.dns.rsp_type);
+
+    inet_ntop(AF_INET, &flow->protos.dns.rsp_addr, buf, sizeof(buf));
+    ndpi_serialize_string_string(serializer, "rsp_addr",    buf);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_MDNS:
+    ndpi_serialize_start_of_block(serializer, "mdns");
+    ndpi_serialize_string_string(serializer, "answer", flow->protos.mdns.answer);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_UBNTAC2:
+    ndpi_serialize_start_of_block(serializer, "ubntac2");
+    ndpi_serialize_string_string(serializer, "version", flow->protos.ubntac2.version);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_KERBEROS:
+    ndpi_serialize_start_of_block(serializer, "kerberos");
+    ndpi_serialize_string_string(serializer, "cname", flow->protos.kerberos.cname);
+    ndpi_serialize_string_string(serializer, "realm", flow->protos.kerberos.realm);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_HTTP:
+    ndpi_serialize_start_of_block(serializer, "http");
+    if(flow->host_server_name[0] != '\0')
+      ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
+    ndpi_serialize_string_string(serializer, "url", flow->http.url);
+    ndpi_serialize_string_uint32(serializer, "code", flow->http.response_status_code);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_SSH:
+    ndpi_serialize_start_of_block(serializer, "ssh");
+    ndpi_serialize_string_string(serializer, "client_signature", flow->protos.ssh.client_signature);
+    ndpi_serialize_string_string(serializer, "server_signature", flow->protos.ssh.server_signature);
+    ndpi_serialize_string_string(serializer, "hassh_client", flow->protos.ssh.hassh_client);
+    ndpi_serialize_string_string(serializer, "hassh_server", flow->protos.ssh.hassh_server);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_TLS:
+    {
+      char notBefore[32], notAfter[32];
+      struct tm a, b;
+      struct tm *before = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notBefore, &a);
+      struct tm *after  = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notAfter, &b);
+      u_int i, off;
+      
+      strftime(notBefore, sizeof(notBefore), "%F %T", before);
+      strftime(notAfter, sizeof(notAfter), "%F %T", after);
+      
+      ndpi_serialize_start_of_block(serializer, "tls");
+      ndpi_serialize_string_uint32(serializer, "version", flow->protos.stun_ssl.ssl.ssl_version);
+      ndpi_serialize_string_string(serializer, "client_cert", flow->protos.stun_ssl.ssl.client_certificate);
+      ndpi_serialize_string_string(serializer, "server_cert", flow->protos.stun_ssl.ssl.server_certificate);
+      ndpi_serialize_string_string(serializer, "issuer", flow->protos.stun_ssl.ssl.server_organization);
+      ndpi_serialize_string_string(serializer, "notbefore", notBefore);
+      ndpi_serialize_string_string(serializer, "notafter", notAfter);
+      ndpi_serialize_string_string(serializer, "ja3", flow->protos.stun_ssl.ssl.ja3_client);
+      ndpi_serialize_string_string(serializer, "ja3s", flow->protos.stun_ssl.ssl.ja3_server);
+      ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.stun_ssl.ssl.server_unsafe_cipher);
+      ndpi_serialize_string_string(serializer, "cipher", ndpi_cipher2str(flow->protos.stun_ssl.ssl.server_cipher));
+
+      for(i=0, off=0; i<20; i++)
+	off += snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
+			flow->l4.tcp.tls_sha1_certificate_fingerprint[i] & 0xFF);
+
+      ndpi_serialize_string_string(serializer, "fingerprint", buf);
+
+      ndpi_serialize_end_of_block(serializer);
+    }
+    break;
+  } /* switch */
+
+  return(0);
 }
 
 /* ********************************** */

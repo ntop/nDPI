@@ -583,6 +583,8 @@ static char* string2hex(const char *pat) {
   return(hexbuf);
 }
 
+/* ******************************************************************** */
+
 static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_str) {
   u_int num_patterns = 0, i, j;
   char **expressions;

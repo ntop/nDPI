@@ -836,6 +836,15 @@ extern "C" {
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
   char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version);
+  void ndpi_patchIPv6Address(char *str);
+  int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
+		     struct ndpi_flow_struct *flow,
+		     u_int8_t ip_version,
+		     u_int8_t l4_protocol, u_int16_t vlan_id,
+		     u_int32_t src_v4, u_int32_t dst_v4,
+		     struct ndpi_in6_addr *src_v6, struct ndpi_in6_addr *dst_v6,
+		     u_int16_t src_port, u_int16_t dst_port,
+		     ndpi_serializer *serializer);
 
   /* Serializer */
   int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,
