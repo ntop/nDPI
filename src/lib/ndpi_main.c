@@ -145,6 +145,14 @@ char * ndpi_strdup(const char *s)
 
 /* *********************************************************************************** */
 
+/* Opaque structure defined here */
+struct ndpi_ptree {
+  patricia_tree_t *v4;
+  patricia_tree_t *v6;
+};
+
+/* *********************************************************************************** */
+
 u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void) { return(sizeof(struct ndpi_flow_struct)); }
 
 /* *********************************************************************************** */
@@ -1837,7 +1845,7 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 
 /* ******************************************************************** */
 
-static int fill_prefix_v4(prefix_t *p, struct in_addr *a, int b, int mb) {
+static int fill_prefix_v4(prefix_t *p, const struct in_addr *a, int b, int mb) {
   do {
     if(b < 0 || b > mb)
       return(-1);
@@ -1850,6 +1858,18 @@ static int fill_prefix_v4(prefix_t *p, struct in_addr *a, int b, int mb) {
   } while(0);
 
   return(0);
+}
+
+/* ******************************************* */
+
+static int fill_prefix_v6(prefix_t *prefix, const struct in6_addr *addr, int bits, int maxbits) {
+  if(bits < 0 || bits > maxbits)
+    return -1;
+
+  memcpy(&prefix->add.sin6, addr, (maxbits + 7) / 8);
+  prefix->family = AF_INET6, prefix->bitlen = bits, prefix->ref_count = 0;
+
+  return 0;
 }
 
 /* ******************************************* */
@@ -5639,14 +5659,23 @@ void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_add
 
 /* ********************************************************************************* */
 
+u_int8_t ndpi_is_ipv6(const ndpi_ip_addr_t *ip) {
+#ifdef NDPI_DETECTION_SUPPORT_IPV6
+  return(ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
+         ip->ipv6.u6_addr.u6_addr32[2] != 0 ||
+         ip->ipv6.u6_addr.u6_addr32[3] != 0);
+#else
+  return(0);
+#endif
+}
+
+/* ********************************************************************************* */
+
 char *ndpi_get_ip_string(const ndpi_ip_addr_t * ip, char *buf, u_int buf_len) {
   const u_int8_t *a = (const u_int8_t *) &ip->ipv4;
 
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  if(ip->ipv6.u6_addr.u6_addr32[1] != 0 ||
-     ip->ipv6.u6_addr.u6_addr32[2] != 0 ||
-     ip->ipv6.u6_addr.u6_addr32[3] != 0) {
-
+  if(ndpi_is_ipv6(ip)) {
     if(inet_ntop(AF_INET6, &ip->ipv6.u6_addr, buf, buf_len) == NULL)
       buf[0] = '\0';
 
@@ -6513,4 +6542,89 @@ ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *n
   }
 
   return(ndpi_l4_proto_unknown); /* default */
+}
+
+/* ******************************************************************** */
+
+ndpi_ptree_t* ndpi_ptree_create() {
+  ndpi_ptree_t *tree = (ndpi_ptree_t*) ndpi_malloc(sizeof(ndpi_ptree_t));
+
+  if(tree) {
+    tree->v4 = ndpi_New_Patricia(32);
+    tree->v6 = ndpi_New_Patricia(128);
+
+    if((!tree->v4) || (!tree->v6)) {
+      ndpi_ptree_destroy(tree);
+      return(NULL);
+    }
+  }
+
+  return(tree);
+}
+
+/* ******************************************************************** */
+
+void ndpi_ptree_destroy(ndpi_ptree_t *tree) {
+  if(tree) {
+    if(tree->v4) ndpi_Destroy_Patricia(tree->v4, free_ptree_data);
+    if(tree->v6) ndpi_Destroy_Patricia(tree->v6, free_ptree_data);
+
+    ndpi_free(tree);
+  }
+}
+
+/* ******************************************************************** */
+
+int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int8_t bits, uint user_data) {
+  u_int8_t is_v6 = ndpi_is_ipv6(addr);
+  patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
+  prefix_t prefix;
+  patricia_node_t *node;
+
+  if(bits > ptree->maxbits)
+    return(-1);
+
+  if(is_v6)
+    fill_prefix_v6(&prefix, (const struct in6_addr*)&addr->ipv6, bits, ptree->maxbits);
+  else
+    fill_prefix_v4(&prefix, (const struct in_addr*)&addr->ipv4, bits, ptree->maxbits);
+
+  /* Verify that the node does not already exist */
+  node = ndpi_patricia_search_best(ptree, &prefix);
+
+  if(node && (node->prefix->bitlen == bits))
+    return(-2);
+
+  node = ndpi_patricia_lookup(ptree, &prefix);
+
+  if(node != NULL) {
+    node->value.user_value = user_data;
+    return(0);
+  }
+
+  return(-3);
+}
+
+/* ******************************************************************** */
+
+int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, uint *user_data) {
+  u_int8_t is_v6 = ndpi_is_ipv6(addr);
+  patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
+  prefix_t prefix;
+  patricia_node_t *node;
+  int bits = ptree->maxbits;
+
+  if(is_v6)
+    fill_prefix_v6(&prefix, (const struct in6_addr*)&addr->ipv6, bits, ptree->maxbits);
+  else
+    fill_prefix_v4(&prefix, (const struct in_addr*)&addr->ipv4, bits, ptree->maxbits);
+
+  node = ndpi_patricia_search_best(ptree, &prefix);
+
+  if(node) {
+    *user_data = node->value.user_value;
+    return(0);
+  }
+
+  return(-1);
 }
