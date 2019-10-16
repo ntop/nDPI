@@ -892,24 +892,30 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_TLS:
     if(flow->protos.stun_ssl.ssl.ssl_version) {
       char notBefore[32], notAfter[32];
-      struct tm a, b;
-      struct tm *before = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notBefore, &a);
-      struct tm *after  = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notAfter, &b);
+      struct tm a, b, *before = NULL, *after = NULL;
       u_int i, off;
       u_int8_t unknown_tls_version;
       char *version = ndpi_ssl_version2str(flow->protos.stun_ssl.ssl.ssl_version, &unknown_tls_version);
 
+      if(flow->protos.stun_ssl.ssl.notBefore)
+        before = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notBefore, &a);
+      if(flow->protos.stun_ssl.ssl.notAfter)
+        after  = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notAfter, &b);
+
       if(!unknown_tls_version) {
-	strftime(notBefore, sizeof(notBefore), "%F %T", before);
-	strftime(notAfter, sizeof(notAfter), "%F %T", after);
-      
 	ndpi_serialize_start_of_block(serializer, "tls");
 	ndpi_serialize_string_string(serializer, "version", version);
 	ndpi_serialize_string_string(serializer, "client_cert", flow->protos.stun_ssl.ssl.client_certificate);
 	ndpi_serialize_string_string(serializer, "server_cert", flow->protos.stun_ssl.ssl.server_certificate);
 	ndpi_serialize_string_string(serializer, "issuer", flow->protos.stun_ssl.ssl.server_organization);
-	if(flow->protos.stun_ssl.ssl.notBefore) ndpi_serialize_string_string(serializer, "notbefore", notBefore);
-	if(flow->protos.stun_ssl.ssl.notAfter) ndpi_serialize_string_string(serializer, "notafter", notAfter);
+	if(before) {
+          strftime(notBefore, sizeof(notBefore), "%F %T", before); 
+          ndpi_serialize_string_string(serializer, "notbefore", notBefore);
+        }
+	if(after) {
+	  strftime(notAfter, sizeof(notAfter), "%F %T", after);
+          ndpi_serialize_string_string(serializer, "notafter", notAfter);
+        }
 	ndpi_serialize_string_string(serializer, "ja3", flow->protos.stun_ssl.ssl.ja3_client);
 	ndpi_serialize_string_string(serializer, "ja3s", flow->protos.stun_ssl.ssl.ja3_server);
 	ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.stun_ssl.ssl.server_unsafe_cipher);
