@@ -844,6 +844,7 @@ extern "C" {
 		     u_int32_t src_v4, u_int32_t dst_v4,
 		     struct ndpi_in6_addr *src_v6, struct ndpi_in6_addr *dst_v6,
 		     u_int16_t src_port, u_int16_t dst_port,
+		     ndpi_protocol l7_protocol,
 		     ndpi_serializer *serializer);
 
   /* ptree (trie) API */

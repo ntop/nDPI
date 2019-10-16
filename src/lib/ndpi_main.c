@@ -6293,7 +6293,7 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
-    if(flow->http.url)          ndpi_free(flow->http.url);
+  if(flow->http.url)          ndpi_free(flow->http.url);
     if(flow->http.content_type) ndpi_free(flow->http.content_type);
 
     if(flow->l4_proto == IPPROTO_TCP) {
