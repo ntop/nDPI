@@ -782,8 +782,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_serialize_string_string(serializer, "src_ip", src_name);
   ndpi_serialize_string_string(serializer, "dest_ip", dst_name);
-  ndpi_serialize_string_uint32(serializer, "src_port", src_port);
-  ndpi_serialize_string_uint32(serializer, "dst_port", dst_port);
+  if(src_port) ndpi_serialize_string_uint32(serializer, "src_port", src_port);
+  if(dst_port) ndpi_serialize_string_uint32(serializer, "dst_port", dst_port);
 
   switch(l4_protocol) {
   case IPPROTO_TCP:
