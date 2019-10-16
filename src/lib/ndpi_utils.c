@@ -805,7 +805,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_serialize_start_of_block(serializer, "ndpi");
   ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
-  ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
+  if(l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
   ndpi_serialize_end_of_block(serializer);
 
   if(flow == NULL) return(0);
