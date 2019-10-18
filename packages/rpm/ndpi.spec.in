@@ -12,6 +12,8 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-root
 %{?el6:Requires: glibc >= 2.3.4 numactl coreutils }
 AutoReqProv: no
 
+%define debug_package %{nil}
+
 %description
 nDPI Open and Extensible LGPLv3 Deep Packet Inspection Library.
 
