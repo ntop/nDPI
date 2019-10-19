@@ -848,7 +848,7 @@ extern "C" {
 		     ndpi_serializer *serializer);
 
   /* ptree (trie) API */
-  ndpi_ptree_t* ndpi_ptree_create();
+  ndpi_ptree_t* ndpi_ptree_create(void);
   int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int8_t bits, uint user_data);
   int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, uint *user_data);
   void ndpi_ptree_destroy(ndpi_ptree_t *tree);

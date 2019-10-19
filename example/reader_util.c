@@ -185,7 +185,7 @@ void ndpi_payload_analyzer(struct ndpi_flow_info *flow,
   u_int16_t i, j;
   u_int16_t scan_len = ndpi_min(max_packet_payload_dissection, payload_len);
 
-  if((flow->entropy.src2dst_pkt_count+flow->entropy.dst2src_pkt_count) <= max_num_packets_per_flow) {
+  if((flow->src2dst_packets+flow->dst2src_packets) <= max_num_packets_per_flow) {
 #ifdef DEBUG_PAYLOAD
     printf("[hashval: %u][proto: %u][vlan: %u][%s:%u <-> %s:%u][direction: %s][payload_len: %u]\n",
 	   flow->hashval, flow->protocol, flow->vlan_id,
