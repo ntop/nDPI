@@ -756,22 +756,98 @@ void ndpi_patchIPv6Address(char *str) {
 /* ********************************** */
 
 void ndpi_user_pwd_payload_copy(u_int8_t *dest, u_int dest_len,
-			       const u_int8_t *src, u_int src_len) {
-  u_int i, j, k = dest_len-1;
+				u_int offset,
+				const u_int8_t *src, u_int src_len) {
+  u_int i, j=0, k = dest_len-1;
   
-  for(i=5, j=0; i<src_len; i++) {
-    if((j == k) || ((src[i] == '\r')
-		    || (src[i] == '\n')
-		    || (src[i] == ' ')
-		    ))
+  for(i=offset; (i<src_len) && (j<=k); i++) {
+    if((j == k) || (src[i] < ' '))
       break;
     
     dest[j++] = src[i];
   }
-  
-  dest[k] = '\0';
+
+  dest[j <=k ? j : k] = '\0';
 }
 
+/* ********************************** */
+/* ********************************** */
+
+/* http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c */
+
+static const unsigned char base64_table[65] =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+/**
+ * base64_decode - Base64 decode
+ * @src: Data to be decoded
+ * @len: Length of the data to be decoded
+ * @out_len: Pointer to output length variable
+ * Returns: Allocated buffer of out_len bytes of decoded data,
+ * or %NULL on failure
+ *
+ * Caller is responsible for freeing the returned buffer.
+ */
+u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len) {
+  u_char dtable[256], *out, *pos, block[4], tmp;
+  size_t i, count, olen;
+  int pad = 0;
+
+  memset(dtable, 0x80, 256);
+  for (i = 0; i < sizeof(base64_table) - 1; i++)
+    dtable[base64_table[i]] = (u_char) i;
+  dtable['='] = 0;
+
+  count = 0;
+  for (i = 0; i < len; i++) {
+    if (dtable[src[i]] != 0x80)
+      count++;
+  }
+
+  if (count == 0 || count % 4)
+    return NULL;
+
+  olen = count / 4 * 3;
+  pos = out = ndpi_malloc(olen);
+  if (out == NULL)
+    return NULL;
+
+  count = 0;
+  for (i = 0; i < len; i++) {
+    tmp = dtable[src[i]];
+    if (tmp == 0x80)
+      continue;
+
+    if (src[i] == '=')
+      pad++;
+    block[count] = tmp;
+    count++;
+    if (count == 4) {
+      *pos++ = (block[0] << 2) | (block[1] >> 4);
+      *pos++ = (block[1] << 4) | (block[2] >> 2);
+      *pos++ = (block[2] << 6) | block[3];
+      count = 0;
+      if (pad) {
+	if (pad == 1)
+	  pos--;
+	else if (pad == 2)
+	  pos -= 2;
+	else {
+	  /* Invalid padding */
+	  ndpi_free(out);
+	  return NULL;
+	}
+	break;
+      }
+    }
+  }
+
+  *out_len = pos - out;
+
+  return out;
+}
+
+/* ********************************** */
 /* ********************************** */
 
 int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
@@ -894,31 +970,45 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "http");
     if(flow->host_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
-    ndpi_serialize_string_string(serializer, "url", flow->http.url);
-    ndpi_serialize_string_uint32(serializer, "code", flow->http.response_status_code);
+    ndpi_serialize_string_string(serializer,   "url", flow->http.url);
+    ndpi_serialize_string_uint32(serializer,   "code", flow->http.response_status_code);
     ndpi_serialize_end_of_block(serializer);
     break;
 
   case NDPI_PROTOCOL_MAIL_IMAP:
     ndpi_serialize_start_of_block(serializer, "imap");
-    ndpi_serialize_string_string(serializer, "user", flow->protos.imap.username);
-    ndpi_serialize_string_string(serializer, "password", flow->protos.imap.password);
+    ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+      
+  case NDPI_PROTOCOL_MAIL_POP:
+    ndpi_serialize_start_of_block(serializer, "pop");
+    ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+      
+  case NDPI_PROTOCOL_MAIL_SMTP:
+    ndpi_serialize_start_of_block(serializer, "smtp");
+    ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
       
   case NDPI_PROTOCOL_FTP_CONTROL:
     ndpi_serialize_start_of_block(serializer, "ftp");
-    ndpi_serialize_string_string(serializer, "user", flow->protos.ftp.username);
-    ndpi_serialize_string_string(serializer, "password", flow->protos.ftp.password);
+    ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
       
   case NDPI_PROTOCOL_SSH:
     ndpi_serialize_start_of_block(serializer, "ssh");
-    ndpi_serialize_string_string(serializer, "client_signature", flow->protos.ssh.client_signature);
-    ndpi_serialize_string_string(serializer, "server_signature", flow->protos.ssh.server_signature);
-    ndpi_serialize_string_string(serializer, "hassh_client", flow->protos.ssh.hassh_client);
-    ndpi_serialize_string_string(serializer, "hassh_server", flow->protos.ssh.hassh_server);
+    ndpi_serialize_string_string(serializer,  "client_signature", flow->protos.ssh.client_signature);
+    ndpi_serialize_string_string(serializer,  "server_signature", flow->protos.ssh.server_signature);
+    ndpi_serialize_string_string(serializer,  "hassh_client", flow->protos.ssh.hassh_client);
+    ndpi_serialize_string_string(serializer,  "hassh_server", flow->protos.ssh.hassh_server);
     ndpi_serialize_end_of_block(serializer);
     break;
 

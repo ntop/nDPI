@@ -948,25 +948,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
   }
   /* FTP */
-  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_FTP_CONTROL) {
-    if(flow->ndpi_flow->protos.ftp.username[0] != '\0')
+  else if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_FTP_CONTROL)
+	  || /* IMAP */ (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MAIL_IMAP)
+	  || /* POP */  (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MAIL_POP)
+	  || /* SMTP */ (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MAIL_SMTP)) {
+    if(flow->ndpi_flow->protos.ftp_imap_pop_smtp.username[0] != '\0')
       snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
-	       flow->ndpi_flow->protos.ftp.username,
-	       flow->ndpi_flow->protos.ftp.password);
-  }
-  /* IMAP */
-  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MAIL_IMAP) {
-    if(flow->ndpi_flow->protos.imap.username[0] != '\0')
-      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
-	       flow->ndpi_flow->protos.imap.username,
-	       flow->ndpi_flow->protos.imap.password);
-  }
-  /* POP */
-  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MAIL_POP) {
-    if(flow->ndpi_flow->protos.pop.username[0] != '\0')
-      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
-	       flow->ndpi_flow->protos.pop.username,
-	       flow->ndpi_flow->protos.pop.password);
+	       flow->ndpi_flow->protos.ftp_imap_pop_smtp.username,
+	       flow->ndpi_flow->protos.ftp_imap_pop_smtp.password);
   }
   /* KERBEROS */
   else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_KERBEROS) {

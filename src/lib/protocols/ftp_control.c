@@ -47,15 +47,15 @@ static int ndpi_ftp_control_check_request(struct ndpi_flow_struct *flow,
 #endif
 
   if(ndpi_match_strprefix(payload, payload_len, "USER")) {
-    ndpi_user_pwd_payload_copy((u_int8_t*)flow->protos.ftp.username,
-			       sizeof(flow->protos.ftp.username),
+    ndpi_user_pwd_payload_copy((u_int8_t*)flow->protos.ftp_imap_pop_smtp.username,
+			       sizeof(flow->protos.ftp_imap_pop_smtp.username), 5,
 			       payload, payload_len);
     return 1;
   }
 
   if(ndpi_match_strprefix(payload, payload_len, "PASS")) {
-    ndpi_user_pwd_payload_copy((u_int8_t*)flow->protos.ftp.password,
-			       sizeof(flow->protos.ftp.password),
+    ndpi_user_pwd_payload_copy((u_int8_t*)flow->protos.ftp_imap_pop_smtp.password,
+			       sizeof(flow->protos.ftp_imap_pop_smtp.password), 5,
 			       payload, payload_len);
     return 1;
   }
@@ -1017,10 +1017,10 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
 
 #ifdef FTP_DEBUG
 	printf("%s() [user: %s][pwd: %s]\n", __FUNCTION__,
-	       flow->protos.ftp.username, flow->protos.ftp.password);
+	       flow->protos.ftp_imap_pop_smtp.username, flow->protos.ftp_imap_pop_smtp.password);
 #endif
 
-	if(flow->protos.ftp.password[0] == '\0')
+	if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0')
 	  flow->ftp_control_stage = 0;
 	else
 	  ndpi_int_ftp_control_add_connection(ndpi_struct, flow);

@@ -175,8 +175,8 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    if(column) {
 	      column[0] = '\0';
-	      snprintf(flow->protos.imap.username,
-		       sizeof(flow->protos.imap.username),
+	      snprintf(flow->protos.ftp_imap_pop_smtp.username,
+		       sizeof(flow->protos.ftp_imap_pop_smtp.username),
 		       "%s", item);
 
 	      column = strchr(&column[1], '"');
@@ -186,8 +186,8 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if(column) {
 		  column[0] = '\0';
-		  snprintf(flow->protos.imap.password,
-			   sizeof(flow->protos.imap.password),
+		  snprintf(flow->protos.ftp_imap_pop_smtp.password,
+			   sizeof(flow->protos.ftp_imap_pop_smtp.password),
 			   "%s", item);
 		}
 	      }
@@ -319,7 +319,7 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	 || (flow->l4.tcp.mail_imap_stage == 5)
 	 || (flow->l4.tcp.mail_imap_stage == 7)
 	 ) {
-	if((flow->protos.imap.username[0] != '\0')
+	if((flow->protos.ftp_imap_pop_smtp.username[0] != '\0')
 	   || (flow->l4.tcp.mail_imap_stage >= 7)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found MAIL_IMAP\n");
 	  ndpi_int_mail_imap_add_connection(ndpi_struct, flow);

@@ -1,8 +1,8 @@
 /*
  * mail_smtp.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
  * Copyright (C) 2011-19 - ntop.org
+ * Copyright (C) 2009-2011 by ipoque GmbH
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -45,17 +45,18 @@
 #define SMTP_BIT_RSET		0x1000
 #define SMTP_BIT_TlRM		0x2000
 
+/* #define SMTP_DEBUG 1 */
+
 static void ndpi_int_mail_smtp_add_connection(struct ndpi_detection_module_struct
-					      *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN);
+					      *ndpi_struct, struct ndpi_flow_struct *flow) {
+  ndpi_set_detected_protocol(ndpi_struct, flow,
+			     NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN);
 }
 
-void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
-			       *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-	
+
   NDPI_LOG_DBG(ndpi_struct, "search mail_smtp\n");
 
   if((packet->payload_packet_len > 2)
@@ -67,24 +68,25 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 
     NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow,packet);
 
-    for (a = 0; a < packet->parsed_lines; a++) {
+    for(a = 0; a < packet->parsed_lines; a++) {
       // expected server responses
-      if (packet->line[a].len >= 3) {
-	if (memcmp(packet->line[a].ptr, "220", 3) == 0) {
+      if(packet->line[a].len >= 3) {
+	if(memcmp(packet->line[a].ptr, "220", 3) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_220;
-	} else if (memcmp(packet->line[a].ptr, "250", 3) == 0) {
+	} else if(memcmp(packet->line[a].ptr, "250", 3) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_250;
-	} else if (memcmp(packet->line[a].ptr, "235", 3) == 0) {
+	} else if(memcmp(packet->line[a].ptr, "235", 3) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_235;
-	} else if (memcmp(packet->line[a].ptr, "334", 3) == 0) {
+	} else if(memcmp(packet->line[a].ptr, "334", 3) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_334;
-	} else if (memcmp(packet->line[a].ptr, "354", 3) == 0) {
+	} else if(memcmp(packet->line[a].ptr, "354", 3) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_354;
 	}
       }
+
       // expected client requests
-      if (packet->line[a].len >= 5) {
-	if ((((packet->line[a].ptr[0] == 'H' || packet->line[a].ptr[0] == 'h')
+      if(packet->line[a].len >= 5) {
+	if((((packet->line[a].ptr[0] == 'H' || packet->line[a].ptr[0] == 'h')
 	      && (packet->line[a].ptr[1] == 'E' || packet->line[a].ptr[1] == 'e'))
 	     || ((packet->line[a].ptr[0] == 'E' || packet->line[a].ptr[0] == 'e')
 		 && (packet->line[a].ptr[1] == 'H' || packet->line[a].ptr[1] == 'h')))
@@ -92,29 +94,93 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 	    && (packet->line[a].ptr[3] == 'O' || packet->line[a].ptr[3] == 'o')
 	    && packet->line[a].ptr[4] == ' ') {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_HELO_EHLO;
-	} else if ((packet->line[a].ptr[0] == 'M' || packet->line[a].ptr[0] == 'm')
+	  flow->protos.ftp_imap_pop_smtp.auth_found = 0;
+	} else if((packet->line[a].ptr[0] == 'M' || packet->line[a].ptr[0] == 'm')
 		   && (packet->line[a].ptr[1] == 'A' || packet->line[a].ptr[1] == 'a')
 		   && (packet->line[a].ptr[2] == 'I' || packet->line[a].ptr[2] == 'i')
 		   && (packet->line[a].ptr[3] == 'L' || packet->line[a].ptr[3] == 'l')
 		   && packet->line[a].ptr[4] == ' ') {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_MAIL;
-	} else if ((packet->line[a].ptr[0] == 'R' || packet->line[a].ptr[0] == 'r')
+	  flow->protos.ftp_imap_pop_smtp.auth_found = 0;
+	} else if((packet->line[a].ptr[0] == 'R' || packet->line[a].ptr[0] == 'r')
 		   && (packet->line[a].ptr[1] == 'C' || packet->line[a].ptr[1] == 'c')
 		   && (packet->line[a].ptr[2] == 'P' || packet->line[a].ptr[2] == 'p')
 		   && (packet->line[a].ptr[3] == 'T' || packet->line[a].ptr[3] == 't')
 		   && packet->line[a].ptr[4] == ' ') {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_RCPT;
-	} else if ((packet->line[a].ptr[0] == 'A' || packet->line[a].ptr[0] == 'a')
+	  flow->protos.ftp_imap_pop_smtp.auth_found = 0;
+	} else if((packet->line[a].ptr[0] == 'A' || packet->line[a].ptr[0] == 'a')
 		   && (packet->line[a].ptr[1] == 'U' || packet->line[a].ptr[1] == 'u')
 		   && (packet->line[a].ptr[2] == 'T' || packet->line[a].ptr[2] == 't')
 		   && (packet->line[a].ptr[3] == 'H' || packet->line[a].ptr[3] == 'h')
 		   && packet->line[a].ptr[4] == ' ') {
+#ifdef SMTP_DEBUG
+	  printf("%s() AUTH [%s]\n", __FUNCTION__, packet->line[a].ptr);
+#endif
+
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH;
+	  flow->protos.ftp_imap_pop_smtp.auth_found = 1;
+	} else {
+	  if(packet->line[a].ptr[3] != ' ') {
+#ifdef SMTP_DEBUG
+	    printf("%s() => [%s]\n", __FUNCTION__, packet->line[a].ptr);
+#endif
+	    
+	    if(flow->protos.ftp_imap_pop_smtp.auth_found) {
+	      if(flow->protos.ftp_imap_pop_smtp.username[0] == '\0') {
+		/* Username */
+		u_int8_t buf[48];
+		u_char *out;
+		size_t out_len;
+
+		ndpi_user_pwd_payload_copy(buf, sizeof(buf), 0,
+					   packet->line[a].ptr, packet->line[a].len);
+
+#ifdef SMTP_DEBUG
+		printf("%s() => [auth: %u] (1) [%s]\n", __FUNCTION__, flow->protos.ftp_imap_pop_smtp.auth_found, buf);
+#endif
+
+		out = ndpi_base64_decode((const u_char*)buf, (size_t)strlen((const char*)buf), &out_len);
+
+		if(out) {
+		  snprintf(flow->protos.ftp_imap_pop_smtp.username,
+			   sizeof(flow->protos.ftp_imap_pop_smtp.username), "%s", out);
+		  
+		  ndpi_free(out);
+		}
+	      } else if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0') {
+		/* Password */
+		u_int8_t buf[48];
+		u_char *out;
+		size_t out_len;
+
+		ndpi_user_pwd_payload_copy(buf, sizeof(buf), 0,
+					   packet->line[a].ptr, packet->line[a].len);
+
+#ifdef SMTP_DEBUG
+		printf("%s() => [auth: %u] (2) [%s]\n", __FUNCTION__, flow->protos.ftp_imap_pop_smtp.auth_found, buf);
+#endif
+
+		out = ndpi_base64_decode((const u_char*)buf, (size_t)strlen((const char*)buf), &out_len);
+
+		if(out) {
+		  snprintf(flow->protos.ftp_imap_pop_smtp.password,
+			   sizeof(flow->protos.ftp_imap_pop_smtp.password), "%s", out);
+		  ndpi_free(out);
+		}
+	      } else {
+		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+		return;
+	      }
+
+	      flow->protos.ftp_imap_pop_smtp.auth_found++;
+	    }
+	  }
 	}
       }
 
-      if (packet->line[a].len >= 8) {
-	if ((packet->line[a].ptr[0] == 'S' || packet->line[a].ptr[0] == 's')
+      if(packet->line[a].len >= 8) {
+	if((packet->line[a].ptr[0] == 'S' || packet->line[a].ptr[0] == 's')
 	    && (packet->line[a].ptr[1] == 'T' || packet->line[a].ptr[1] == 't')
 	    && (packet->line[a].ptr[2] == 'A' || packet->line[a].ptr[2] == 'a')
 	    && (packet->line[a].ptr[3] == 'R' || packet->line[a].ptr[3] == 'r')
@@ -126,47 +192,55 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 	}
       }
 
-      if (packet->line[a].len >= 4) {
-	if ((packet->line[a].ptr[0] == 'D' || packet->line[a].ptr[0] == 'd')
+      if(packet->line[a].len >= 4) {
+	if((packet->line[a].ptr[0] == 'D' || packet->line[a].ptr[0] == 'd')
 	    && (packet->line[a].ptr[1] == 'A' || packet->line[a].ptr[1] == 'a')
 	    && (packet->line[a].ptr[2] == 'T' || packet->line[a].ptr[2] == 't')
 	    && (packet->line[a].ptr[3] == 'A' || packet->line[a].ptr[3] == 'a')) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_DATA;
-	} else if ((packet->line[a].ptr[0] == 'N' || packet->line[a].ptr[0] == 'n')
+	} else if((packet->line[a].ptr[0] == 'N' || packet->line[a].ptr[0] == 'n')
 		   && (packet->line[a].ptr[1] == 'O' || packet->line[a].ptr[1] == 'o')
 		   && (packet->line[a].ptr[2] == 'O' || packet->line[a].ptr[2] == 'o')
 		   && (packet->line[a].ptr[3] == 'P' || packet->line[a].ptr[3] == 'p')) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_NOOP;
-	} else if ((packet->line[a].ptr[0] == 'R' || packet->line[a].ptr[0] == 'r')
+	} else if((packet->line[a].ptr[0] == 'R' || packet->line[a].ptr[0] == 'r')
 		   && (packet->line[a].ptr[1] == 'S' || packet->line[a].ptr[1] == 's')
 		   && (packet->line[a].ptr[2] == 'E' || packet->line[a].ptr[2] == 'e')
 		   && (packet->line[a].ptr[3] == 'T' || packet->line[a].ptr[3] == 't')) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_RSET;
 	}
       }
-
     }
 
     // now count the bits set in the bitmask
-    if (flow->l4.tcp.smtp_command_bitmask != 0) {
-      for (a = 0; a < 16; a++) {
+    if(flow->l4.tcp.smtp_command_bitmask != 0) {
+      for(a = 0; a < 16; a++) {
 	bit_count += (flow->l4.tcp.smtp_command_bitmask >> a) & 0x01;
       }
     }
     NDPI_LOG_DBG2(ndpi_struct, "seen smtp commands and responses: %u\n",
 	     bit_count);
 
-    if (bit_count >= 3) {
+    if(bit_count >= 3) {
       NDPI_LOG_INFO(ndpi_struct, "mail smtp identified\n");
-      ndpi_int_mail_smtp_add_connection(ndpi_struct, flow);
+
+#ifdef SMTP_DEBUG
+      printf("%s() [bit_count: %u][%s]\n", __FUNCTION__, bit_count, flow->protos.ftp_imap_pop_smtp.password);
+#endif
+
+      if(flow->protos.ftp_imap_pop_smtp.password[0] != '\0')
+	ndpi_int_mail_smtp_add_connection(ndpi_struct, flow);
+      
       return;
     }
-    if (bit_count >= 1 && flow->packet_counter < 12) {
+
+    if(bit_count >= 1 && flow->packet_counter < 12) {
       return;
     }
   }
+
   /* when the first or second packets are split into two packets, those packets are ignored. */
-  if (flow->packet_counter <= 4 &&
+  if(flow->packet_counter <= 4 &&
       packet->payload_packet_len >= 4 &&
       (ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a
        || memcmp(packet->payload, "220", 3) == 0 || memcmp(packet->payload, "EHLO", 4) == 0)) {
@@ -178,15 +252,14 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct
 
 }
 
-void init_mail_smtp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
-{
+void init_mail_smtp_dissector(struct ndpi_detection_module_struct *ndpi_struct,
+			      u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("MAIL_SMTP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_MAIL_SMTP,
 				      ndpi_search_mail_smtp_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);  
+				      ADD_TO_DETECTION_BITMASK);
 
   *id += 1;
 }
-
