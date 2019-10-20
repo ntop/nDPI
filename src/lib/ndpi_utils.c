@@ -628,7 +628,6 @@ static int ndpi_is_valid_char(char c) {
 
 /* ******************************************************************** */
 
-
 static int ndpi_find_non_eng_bigrams(struct ndpi_detection_module_struct *ndpi_struct,
 				     char *str) {
   char s[3];
@@ -881,6 +880,13 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
+  case NDPI_PROTOCOL_MAIL_IMAP:
+    ndpi_serialize_start_of_block(serializer, "imap");
+    ndpi_serialize_string_string(serializer, "user", flow->protos.imap.username);
+    ndpi_serialize_string_string(serializer, "password", flow->protos.imap.password);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+      
   case NDPI_PROTOCOL_FTP_CONTROL:
     ndpi_serialize_start_of_block(serializer, "ftp");
     ndpi_serialize_string_string(serializer, "user", flow->protos.ftp.username);

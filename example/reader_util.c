@@ -949,9 +949,17 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* FTP */
   else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_FTP_CONTROL) {
-    snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
-	     flow->ndpi_flow->protos.ftp.username,
-	     flow->ndpi_flow->protos.ftp.password);
+    if(flow->ndpi_flow->protos.ftp.username[0] != '\0')
+      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
+	       flow->ndpi_flow->protos.ftp.username,
+	       flow->ndpi_flow->protos.ftp.password);
+  }
+  /* IMAP */
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MAIL_IMAP) {
+    if(flow->ndpi_flow->protos.imap.username[0] != '\0')
+      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
+	       flow->ndpi_flow->protos.imap.username,
+	       flow->ndpi_flow->protos.imap.password);
   }
   /* KERBEROS */
   else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_KERBEROS) {
