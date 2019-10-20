@@ -6546,7 +6546,7 @@ ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *n
 
 /* ******************************************************************** */
 
-ndpi_ptree_t* ndpi_ptree_create() {
+ndpi_ptree_t* ndpi_ptree_create(void) {
   ndpi_ptree_t *tree = (ndpi_ptree_t*) ndpi_malloc(sizeof(ndpi_ptree_t));
 
   if(tree) {
