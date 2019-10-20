@@ -755,6 +755,25 @@ void ndpi_patchIPv6Address(char *str) {
 
 /* ********************************** */
 
+void ndpi_user_pwd_payload_copy(u_int8_t *dest, u_int dest_len,
+			       const u_int8_t *src, u_int src_len) {
+  u_int i, j, k = dest_len-1;
+  
+  for(i=5, j=0; i<src_len; i++) {
+    if((j == k) || ((src[i] == '\r')
+		    || (src[i] == '\n')
+		    || (src[i] == ' ')
+		    ))
+      break;
+    
+    dest[j++] = src[i];
+  }
+  
+  dest[k] = '\0';
+}
+
+/* ********************************** */
+
 int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   struct ndpi_flow_struct *flow,
 		   u_int8_t ip_version,

@@ -1243,6 +1243,10 @@ struct ndpi_flow_struct {
     } imap;
     
     struct {
+      char username[16], password[16];
+    } pop;
+    
+    struct {
       /* Bittorrent hash */
       u_char hash[20];
     } bittorrent;

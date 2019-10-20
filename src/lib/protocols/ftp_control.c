@@ -39,25 +39,6 @@ static void ndpi_int_ftp_control_add_connection(struct ndpi_detection_module_str
 
 /* *************************************************************** */
 
-static void ftp_payload_copy(u_int8_t *dest, u_int dest_len,
-			     const u_int8_t *src, u_int src_len) {
-  u_int i, j, k = dest_len-1;
-  
-  for(i=5, j=0; i<src_len; i++) {
-    if((j == k) || ((src[i] == '\r')
-		    || (src[i] == '\n')
-		    || (src[i] == ' ')
-		    ))
-      break;
-    
-    dest[j++] = src[i];
-  }
-  
-  dest[k] = '\0';
-}
-
-/* *************************************************************** */
-
 static int ndpi_ftp_control_check_request(struct ndpi_flow_struct *flow,
 					  const u_int8_t *payload,
 					  size_t payload_len) {
@@ -66,16 +47,16 @@ static int ndpi_ftp_control_check_request(struct ndpi_flow_struct *flow,
 #endif
 
   if(ndpi_match_strprefix(payload, payload_len, "USER")) {
-    ftp_payload_copy((u_int8_t*)flow->protos.ftp.username,
-		     sizeof(flow->protos.ftp.username),
-		     payload, payload_len);
+    ndpi_user_pwd_payload_copy((u_int8_t*)flow->protos.ftp.username,
+			       sizeof(flow->protos.ftp.username),
+			       payload, payload_len);
     return 1;
   }
 
   if(ndpi_match_strprefix(payload, payload_len, "PASS")) {
-    ftp_payload_copy((u_int8_t*)flow->protos.ftp.password,
-		     sizeof(flow->protos.ftp.password),
-		     payload, payload_len);
+    ndpi_user_pwd_payload_copy((u_int8_t*)flow->protos.ftp.password,
+			       sizeof(flow->protos.ftp.password),
+			       payload, payload_len);
     return 1;
   }
 

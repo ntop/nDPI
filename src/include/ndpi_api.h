@@ -837,6 +837,9 @@ extern "C" {
 				      char *outbuf, u_int outbuf_len);
   char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version);
   void ndpi_patchIPv6Address(char *str);
+  void ndpi_user_pwd_payload_copy(u_int8_t *dest, u_int dest_len,
+				  const u_int8_t *src, u_int src_len);
+
   int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		     struct ndpi_flow_struct *flow,
 		     u_int8_t ip_version,

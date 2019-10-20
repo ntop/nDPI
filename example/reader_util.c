@@ -961,6 +961,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	       flow->ndpi_flow->protos.imap.username,
 	       flow->ndpi_flow->protos.imap.password);
   }
+  /* POP */
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_MAIL_POP) {
+    if(flow->ndpi_flow->protos.pop.username[0] != '\0')
+      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
+	       flow->ndpi_flow->protos.pop.username,
+	       flow->ndpi_flow->protos.pop.password);
+  }
   /* KERBEROS */
   else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_KERBEROS) {
     if(flow->ndpi_flow->protos.kerberos.cname[0] != '\0') {
