@@ -881,6 +881,13 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
+  case NDPI_PROTOCOL_FTP_CONTROL:
+    ndpi_serialize_start_of_block(serializer, "ftp");
+    ndpi_serialize_string_string(serializer, "user", flow->protos.ftp.username);
+    ndpi_serialize_string_string(serializer, "password", flow->protos.ftp.password);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+      
   case NDPI_PROTOCOL_SSH:
     ndpi_serialize_start_of_block(serializer, "ssh");
     ndpi_serialize_string_string(serializer, "client_signature", flow->protos.ssh.client_signature);
@@ -909,10 +916,12 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_serialize_string_string(serializer, "client_cert", flow->protos.stun_ssl.ssl.client_certificate);
 	ndpi_serialize_string_string(serializer, "server_cert", flow->protos.stun_ssl.ssl.server_certificate);
 	ndpi_serialize_string_string(serializer, "issuer", flow->protos.stun_ssl.ssl.server_organization);
+
 	if(before) {
           strftime(notBefore, sizeof(notBefore), "%F %T", before); 
           ndpi_serialize_string_string(serializer, "notbefore", notBefore);
         }
+
 	if(after) {
 	  strftime(notAfter, sizeof(notAfter), "%F %T", after);
           ndpi_serialize_string_string(serializer, "notafter", notAfter);

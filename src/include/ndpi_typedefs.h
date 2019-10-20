@@ -1235,6 +1235,10 @@ struct ndpi_flow_struct {
     } http;
 
     struct {
+      char username[16], password[16];
+    } ftp;
+    
+    struct {
       /* Bittorrent hash */
       u_char hash[20];
     } bittorrent;
