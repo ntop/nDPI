@@ -820,9 +820,12 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
 
     if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx == NULL)
       flow->l4.tcp.tls_srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX));
-    else
-      printf("[TLS] Internal error: double allocation\n:");
-
+    else {
+#ifdef DEBUG_TLS 
+      printf("[TLS] Internal error: double allocation\n");
+#endif
+    }
+    
     if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx) {
       SHA1Init(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
       flow->l4.tcp.tls_srv_cert_fingerprint_found = 1;
