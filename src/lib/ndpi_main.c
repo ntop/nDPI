@@ -4651,18 +4651,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
 
   if(flow->server_id == NULL) flow->server_id = dst; /* Default */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    /*
-      With SSL we might want to dissect further packets to decode
-      the certificate type for instance
-    */
-    if(flow->check_extra_packets
-       /*
-	 && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS)
-       */
-       ) {
-      ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
 
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->check_extra_packets) {
+      ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
       return(ret);
     } else
       goto ret_protocols;
@@ -6467,7 +6459,7 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
 */
 u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_str,
 					struct ndpi_flow_struct *flow) {
-    u_int16_t proto = flow->detected_protocol_stack[1] ? flow->detected_protocol_stack[1] : flow->detected_protocol_stack[0];
+  u_int16_t proto = flow->detected_protocol_stack[1] ? flow->detected_protocol_stack[1] : flow->detected_protocol_stack[0];
 
 #if 0
   printf("[DEBUG] %s(%u.%u): %u\n", __FUNCTION__,
@@ -6490,6 +6482,14 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   case NDPI_PROTOCOL_DNS:
     if((ndpi_str->dns_dont_dissect_response == 0)
        && (flow->protos.dns.num_answers == 0))
+      return(1);
+    break;
+
+  case NDPI_PROTOCOL_FTP_CONTROL:
+  case NDPI_PROTOCOL_MAIL_POP:
+  case NDPI_PROTOCOL_MAIL_IMAP:
+  case NDPI_PROTOCOL_MAIL_SMTP:
+    if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0')
       return(1);
     break;
 

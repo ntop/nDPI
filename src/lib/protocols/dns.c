@@ -60,18 +60,19 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   }
 }
 /*
-   allowed chars for dns names A-Z 0-9 _ -
-   Perl script for generation map:
-   my @M;
-   for(my $ch=0; $ch < 256; $ch++) {
-   $M[$ch >> 5] |= 1 << ($ch & 0x1f) if chr($ch) =~ /[a-z0-9_-]/i;
-   }
-   print join(',', map { sprintf "0x%08x",$_ } @M),"\n";
+  allowed chars for dns names A-Z 0-9 _ -
+  Perl script for generation map:
+  my @M;
+  for(my $ch=0; $ch < 256; $ch++) {
+  $M[$ch >> 5] |= 1 << ($ch & 0x1f) if chr($ch) =~ /[a-z0-9_-]/i;
+  }
+  print join(',', map { sprintf "0x%08x",$_ } @M),"\n";
 */
 
-static uint32_t dns_validchar[8] = {
-				    0x00000000,0x03ff2000,0x87fffffe,0x07fffffe,0,0,0,0
-};
+static uint32_t dns_validchar[8] =
+  {
+   0x00000000,0x03ff2000,0x87fffffe,0x07fffffe,0,0,0,0
+  };
 
 /* *********************************************** */
 
@@ -239,7 +240,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
     ret.master_protocol   = NDPI_PROTOCOL_UNKNOWN;
     ret.app_protocol      = (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS;
-      
+
     if(invalid) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
@@ -262,7 +263,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
       while(j < max_len && cl != 0) {
 	c = flow->packet.payload[off++];
-	flow->host_server_name[j++] = (dns_validchar[c >> 5] & (1 << (c & 0x1f))) ? c : '_';
+	flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & (1 << (c & 0x1f))) ? c : '_');
 	cl--;
       }
     }
@@ -270,13 +271,13 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
     if(j > 0) {
       ndpi_protocol_match_result ret_match;
-      
+
       ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
 						     (char *)flow->host_server_name,
 						     strlen((const char*)flow->host_server_name),
 						     &ret_match,
 						     NDPI_PROTOCOL_DNS);
-      
+
       if(ret_match.protocol_category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
 	flow->category = ret_match.protocol_category;
 
@@ -288,7 +289,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
     /* Report if this is a DNS query or reply */
     flow->protos.dns.is_query = is_query;
-    
+
     if(is_query && (ndpi_struct->dns_dont_dissect_response == 0) && (flow->check_extra_packets == 0)) {
       /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);

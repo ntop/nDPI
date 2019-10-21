@@ -1070,14 +1070,12 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
 
 /* **************************************** */
 
-void sslInitExtraPacketProcessing(int caseNum, struct ndpi_flow_struct *flow) {
+static void sslInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
   flow->check_extra_packets = 1;
-  /* 0 is the case for waiting for the server certificate */
-  if(caseNum == 0) {
-    /* At most 7 packets should almost always be enough to find the server certificate if it's there */
-    flow->max_extra_packets_to_check = 7;
-    flow->extra_packets_func = sslTryAndRetrieveServerCertificate;
-  }
+
+  /* At most 7 packets should almost always be enough to find the server certificate if it's there */
+  flow->max_extra_packets_to_check = 7;
+  flow->extra_packets_func = sslTryAndRetrieveServerCertificate;
 }
 
 /* **************************************** */
@@ -1120,7 +1118,7 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	   * a few more packets. */
 	  if(((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0'))
 	     && ((flow->l4.tcp.tls_seen_server_cert != 1) && (flow->protos.stun_ssl.ssl.server_certificate[0] == '\0'))) {
-	    sslInitExtraPacketProcessing(0, flow);
+	    sslInitExtraPacketProcessing(flow);
 	  }
 
 	  ndpi_set_detected_protocol(ndpi_struct, flow, subproto,

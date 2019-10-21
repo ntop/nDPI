@@ -48,6 +48,11 @@ static void ndpi_int_mail_pop_add_connection(struct ndpi_detection_module_struct
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_POP, NDPI_PROTOCOL_UNKNOWN);
 }
 
+/* **************************************** */
+
+static void popInitExtraPacketProcessing(struct ndpi_flow_struct *flow);
+
+/* **************************************** */
 
 static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_module_struct
 						       *ndpi_struct, struct ndpi_flow_struct *flow) {
@@ -174,8 +179,10 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
 	NDPI_LOG_INFO(ndpi_struct, "mail_pop identified\n");
 	
 	if((flow->protos.ftp_imap_pop_smtp.password[0] != '\0')
-	   || (flow->l4.tcp.mail_pop_stage > 3))
+	   || (flow->l4.tcp.mail_pop_stage > 3)) {
 	  ndpi_int_mail_pop_add_connection(ndpi_struct, flow);
+	  popInitExtraPacketProcessing(flow);
+	}
       }
       
       return;      
@@ -202,6 +209,38 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
+
+/* **************************************** */
+
+int ndpi_extra_search_mail_pop_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow) {
+  int rc;
+  
+  ndpi_search_mail_pop_tcp(ndpi_struct, flow);
+
+  rc = (flow->protos.ftp_imap_pop_smtp.password[0] == '\0') ? 1 : 0;
+  
+#ifdef POP_DEBUG
+  printf("**** %s() [rc: %d]\n", __FUNCTION__, rc);
+#endif  
+
+  return(rc);
+}
+
+/* **************************************** */
+
+static void popInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
+#ifdef POP_DEBUG
+  printf("**** %s()\n", __FUNCTION__);
+#endif
+  
+  flow->check_extra_packets = 1;
+  /* At most 7 packets should almost always be enough */
+  flow->max_extra_packets_to_check = 7;
+  flow->extra_packets_func = ndpi_extra_search_mail_pop_tcp;
+}
+
+/* **************************************** */
 
 void init_mail_pop_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 			     u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
