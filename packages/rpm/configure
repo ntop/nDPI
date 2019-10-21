@@ -583,6 +583,7 @@ PACKAGE_URL=''
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+RPM_SIGN_CMD
 MAJOR_RELEASE
 GIT_REVISION
 KERNEL
@@ -1698,7 +1699,18 @@ PACKAGE_VERSION=`../version.sh --release`
 MAJOR_RELEASE=`../version.sh --major-release`
 GIT_REVISION=`../version.sh --revision`
 
+CENTOS_RELEASE=`cat /etc/centos-release | cut -d ' ' -f 3|cut -d '.' -f 1`
+if test $CENTOS_RELEASE = "release"; then
+  CENTOS_RELEASE=`cat /etc/centos-release | cut -d ' ' -f 4|cut -d '.' -f 1`
+fi
+
+RPM_SIGN_CMD="rpm --addsign"
+if test "$CENTOS_RELEASE" -ne 8; then
+  RPM_SIGN_CMD="./rpm-sign.exp"
+fi
+
 ac_config_files="$ac_config_files Makefile ndpi.spec"
+
 
 
 

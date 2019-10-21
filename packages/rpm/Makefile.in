@@ -29,8 +29,8 @@ build-rpm: build-src cleanup-rpm
 	tar cvfz $(HOME)/rpmbuild/SOURCES/ndpi-@PACKAGE_VERSION@.tgz ndpi-@PACKAGE_VERSION@
 	@rm -f $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
 	@rpmbuild -bb ./$(APPL).spec --define "buildnumber $(GIT_REVISION)"
-	@if [[ $EUID -ne 0 ]]; then ./rpm-sign.exp $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE); fi
-	@if [[ $EUID -ne 0 ]]; then ./rpm-sign.exp $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(DEV_PACKAGE); fi
+	@if [[ $EUID -ne 0 ]]; then @RPM_SIGN_CMD@ $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE); fi
+	@if [[ $EUID -ne 0 ]]; then @RPM_SIGN_CMD@ $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(DEV_PACKAGE); fi
 	@echo ""
 	@echo "Package contents:"
 	@rpm -qpl $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
