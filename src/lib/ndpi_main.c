@@ -1766,6 +1766,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "104", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 2404, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_S7COMM,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "S7Comm", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
+			    ndpi_build_default_ports(ports_a, 102, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_str);
