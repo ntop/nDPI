@@ -5969,9 +5969,11 @@ char* ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_str,
     return("Unsafe");
     break;
   case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
+    return("Potentially Dangerous");
+    break;
+  case NDPI_PROTOCOL_DANGEROUS:
     return("Dangerous");
     break;
-
   case NDPI_PROTOCOL_UNRATED:
   default:
     return("Unrated");
