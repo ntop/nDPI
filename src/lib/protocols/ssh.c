@@ -56,6 +56,8 @@
 
 /* #define SSH_DEBUG 1 */
 
+static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+  
 /* ************************************************************************ */
 
 static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
@@ -213,7 +215,23 @@ static void ndpi_ssh_zap_cr(char *str, int len) {
 
 /* ************************************************************************ */
 
-void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static int search_ssh_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  ndpi_search_ssh_tcp(ndpi_struct, flow);
+
+  if((flow->protos.ssh.hassh_client[0] != '\0')
+     && (flow->protos.ssh.hassh_server[0] == '\0')) {
+    /* stop extra processing */
+    flow->extra_packets_func = NULL; /* We're good now */
+    return(0);
+  }
+
+  /* Possibly more processing */
+  return(1);
+}
+
+/* ************************************************************************ */
+
+static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
 #ifdef SSH_DEBUG
@@ -238,6 +256,13 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       NDPI_LOG_DBG2(ndpi_struct, "ssh stage 0 passed\n");
       flow->l4.tcp.ssh_stage = 1 + packet->packet_direction;
       flow->guessed_host_protocol_id = flow->guessed_protocol_id = NDPI_PROTOCOL_SSH;
+      ndpi_int_ssh_add_connection(ndpi_struct, flow);
+      
+      /* This is necessary to inform the core to call this dissector again */
+      flow->check_extra_packets = 1;
+      flow->max_extra_packets_to_check = 8;
+      flow->extra_packets_func = search_ssh_again;
+
       return;
     }
   } else if(flow->l4.tcp.ssh_stage == (2 - packet->packet_direction)) {
@@ -327,6 +352,7 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     if(flow->l4.tcp.ssh_stage++ == 4) {
       NDPI_LOG_INFO(ndpi_struct, "found ssh\n");
       ndpi_int_ssh_add_connection(ndpi_struct, flow);
+      flow->extra_packets_func = NULL; /* We're good now */
     }
 
     return;
