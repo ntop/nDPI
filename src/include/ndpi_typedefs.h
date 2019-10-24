@@ -926,9 +926,7 @@ typedef enum {
 } ndpi_protocol_category_t;
 
 typedef enum {
-   ndpi_pref_http_dont_dissect_response = 0,
-   ndpi_pref_dns_dont_dissect_response,
-   ndpi_pref_direction_detect_disable,
+   ndpi_pref_direction_detect_disable = 0,
    ndpi_pref_disable_metadata_export,
 } ndpi_detection_preference;
 
@@ -1105,8 +1103,7 @@ struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t http_dont_dissect_response:1, dns_dont_dissect_response:1,
-    direction_detect_disable:1, /* disable internal detection of packet direction */
+  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */
     disable_metadata_export:1   /* No metadata is exported */
     ;
 
@@ -1275,7 +1272,6 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_HTTP */
   u_int8_t http_detected:1;
-  u_int16_t http_upper_protocol, http_lower_protocol;
 
   /* NDPI_PROTOCOL_RTSP */
   u_int8_t rtsprdt_stage:2, rtsp_control_flow:1;

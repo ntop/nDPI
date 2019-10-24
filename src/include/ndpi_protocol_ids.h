@@ -75,12 +75,12 @@ typedef enum {
   NDPI_PROTOCOL_SKYPE_CALL            = 38, /* Skype call and videocalls */
   NDPI_PROTOCOL_SIGNAL                = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached - Darryl Sokoloski <darryl@egloo.ca> */
-  NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */  
+  NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */
   NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
   NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) - Darryl Sokoloski <darryl@egloo.ca> */
   NDPI_PROTOCOL_MODBUS                = 44, /* Modbus */
   NDPI_PROTOCOL_WHATSAPP_CALL         = 45, /* WhatsApp video ad audio calls go here */
-  NDPI_PROTOCOL_DATASAVER             = 46, /* Protocols used to save data on Internet communications */  
+  NDPI_PROTOCOL_DATASAVER             = 46, /* Protocols used to save data on Internet communications */
   NDPI_PROTOCOL_XBOX                  = 47,
   NDPI_PROTOCOL_QQ                    = 48,
   NDPI_PROTOCOL_TIKTOK                = 49,
@@ -235,7 +235,7 @@ typedef enum {
   NDPI_PROTOCOL_MPEGTS                = 198,
   NDPI_PROTOCOL_SNAPCHAT              = 199,
   NDPI_PROTOCOL_SINA                  = 200,
-  NDPI_PROTOCOL_HANGOUT_DUO           = 201, /* Google Hangout ad Duo (merged as they are very similar) */ 
+  NDPI_PROTOCOL_HANGOUT_DUO           = 201, /* Google Hangout ad Duo (merged as they are very similar) */
   NDPI_PROTOCOL_IFLIX                 = 202, /* www.vizuamatix.com R&D team & M.Mallawaarachchie <manoj_ws@yahoo.com> */
   NDPI_PROTOCOL_GITHUB                = 203,
   NDPI_PROTOCOL_BJNP                  = 204,
@@ -279,14 +279,17 @@ typedef enum {
   NDPI_PROTOCOL_WHATSAPP_FILES        = 242, /* Videos, pictures, voice messages... */
   NDPI_PROTOCOL_TARGUS_GETDATA        = 243,
   NDPI_PROTOCOL_DNP3                  = 244,
-  NDPI_PROTOCOL_104                   = 245,    
+  NDPI_PROTOCOL_104                   = 245,
+  NDPI_PROTOCOL_BLOOMBERG             = 246,
+  NDPI_PROTOCOL_CAPWAP                = 247,
+  
 /*
     IMPORTANT
     before allocating a new identifier please fill up
     one of those named NDPI_PROTOCOL_FREE_XXX and not used
     (placeholders to avoid protocol renumbering)
   */
-  
+
   /* IMPORTANT:NDPI_LAST_IMPLEMENTED_PROTOCOL MUST BE THE LAST ELEMENT */
   NDPI_LAST_IMPLEMENTED_PROTOCOL
 } ndpi_protocol_id_t;

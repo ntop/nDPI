@@ -1007,9 +1007,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 #endif
   FILE *out = results_file ? results_file : stdout;
   u_int8_t known_tls;
+  char buf[32], buf1[64];
   
   if(csv_fp != NULL) {
-    char buf[32];
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
     float f = (float)flow->first_seen, l = (float)flow->last_seen;
     
@@ -1071,9 +1071,13 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(!json_flag) {
     u_int i;
-    
-    fprintf(out, "\t%u", id);
 
+#if 1
+    fprintf(out, "\t%u", id);
+#else
+    fprintf(out, "\t%u(%u)", id, flow->flow_id);
+#endif
+    
     fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
 
     fprintf(out, "%s%s%s:%u %s %s%s%s:%u ",
@@ -1093,18 +1097,12 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fflush(out);
       fprintf(out, "[score: %.4f]", flow->entropy.score);
     }
-
-    if(flow->detected_protocol.master_protocol) {
-      char buf[64];
-
-      fprintf(out, "[proto: %u.%u/%s]",
-	      flow->detected_protocol.master_protocol, flow->detected_protocol.app_protocol,
-	      ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				 flow->detected_protocol, buf, sizeof(buf)));
-    } else
-      fprintf(out, "[proto: %u/%s]",
-	      flow->detected_protocol.app_protocol,
-	      ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol.app_protocol));
+    
+    fprintf(out, "[proto: %s/%s]",
+	    ndpi_protocol2id(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			     flow->detected_protocol, buf, sizeof(buf)),
+	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			       flow->detected_protocol, buf1, sizeof(buf1)));
 
     if(flow->detected_protocol.category != 0)
       fprintf(out, "[cat: %s/%u]",
@@ -1273,7 +1271,9 @@ static void node_print_unknown_proto_walker(const void *node,
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN) return;
+  if((flow->detected_protocol.master_protocol != NDPI_PROTOCOL_UNKNOWN)
+     || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN))
+    return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) {
     /* Avoid walking the same node multiple times */
@@ -1292,7 +1292,9 @@ static void node_print_known_proto_walker(const void *node,
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) return;
+  if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN))
+    return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) {
     /* Avoid walking the same node multiple times */
@@ -1308,7 +1310,7 @@ static void node_print_known_proto_walker(const void *node,
  */
 static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
-  u_int16_t thread_id = *((u_int16_t *) user_data);
+  u_int16_t thread_id = *((u_int16_t *) user_data), proto;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
@@ -1320,9 +1322,11 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
 
-    ndpi_thread_info[thread_id].workflow->stats.protocol_counter[flow->detected_protocol.app_protocol]       += flow->src2dst_packets + flow->dst2src_packets;
-    ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[flow->detected_protocol.app_protocol] += flow->src2dst_bytes + flow->dst2src_bytes;
-    ndpi_thread_info[thread_id].workflow->stats.protocol_flows[flow->detected_protocol.app_protocol]++;
+    proto = flow->detected_protocol.app_protocol ? flow->detected_protocol.app_protocol : flow->detected_protocol.master_protocol;
+    
+    ndpi_thread_info[thread_id].workflow->stats.protocol_counter[proto]       += flow->src2dst_packets + flow->dst2src_packets;
+    ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[proto] += flow->src2dst_bytes + flow->dst2src_bytes;
+    ndpi_thread_info[thread_id].workflow->stats.protocol_flows[proto]++;
   }
 }
 
@@ -1860,11 +1864,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle);
 
   /* Preferences */
-  ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				 ndpi_pref_http_dont_dissect_response, 0);
-  ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				 ndpi_pref_dns_dont_dissect_response, 0);
-  
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
 					   on_protocol_discovered,
 					   (void *)(uintptr_t)thread_id);

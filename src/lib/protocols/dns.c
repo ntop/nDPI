@@ -32,6 +32,8 @@
 
 // #define DNS_DEBUG 1
 
+static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+
 /* *********************************************** */
 
 static u_int16_t get16(int *i, const u_int8_t *payload) {
@@ -84,6 +86,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
   memcpy(dns_header, (struct ndpi_dns_packet_header*)&flow->packet.payload[x],
 	 sizeof(struct ndpi_dns_packet_header));
+
   dns_header->tr_id = ntohs(dns_header->tr_id);
   dns_header->flags = ntohs(dns_header->flags);
   dns_header->num_queries = ntohs(dns_header->num_queries);
@@ -134,57 +137,68 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       /* This is a good reply: we dissect it both for request and response */
 
       /* Leave the statement below commented necessary in case of call to ndpi_get_partial_detection() */
-      /* if(ndpi_struct->dns_dont_dissect_response == 0) */ {
-	x++;
+      x++;
 
-	if(flow->packet.payload[x] != '\0') {
-	  while((x < flow->packet.payload_packet_len)
-		&& (flow->packet.payload[x] != '\0')) {
-	    x++;
-	  }
-
+      if(flow->packet.payload[x] != '\0') {
+	while((x < flow->packet.payload_packet_len)
+	      && (flow->packet.payload[x] != '\0')) {
 	  x++;
 	}
 
-	x += 4;
+	x++;
+      }
 
-	if(dns_header->num_answers > 0) {
-	  u_int16_t rsp_type;
-	  u_int16_t num;
+      x += 4;
 
-	  for(num = 0; num < dns_header->num_answers; num++) {
-	    u_int16_t data_len;
+      if(dns_header->num_answers > 0) {
+	u_int16_t rsp_type;
+	u_int16_t num;
 
-	    if((x+6) >= flow->packet.payload_packet_len) {
-	      break;
-	    }
+	for(num = 0; num < dns_header->num_answers; num++) {
+	  u_int16_t data_len;
 
-	    if((data_len = getNameLength(x, flow->packet.payload, flow->packet.payload_packet_len)) == 0) {
-	      break;
-	    } else
-	      x += data_len;
-
-	    rsp_type = get16(&x, flow->packet.payload);
-	    flow->protos.dns.rsp_type = rsp_type;
-
-	    /* here x points to the response "class" field */
-	    if((x+12) <= flow->packet.payload_packet_len) {
-	      x += 6;
-	      data_len = get16(&x, flow->packet.payload);
-
-	      if(((x + data_len) <= flow->packet.payload_packet_len)
-		 && (((rsp_type == 0x1) && (data_len == 4)) /* A */
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-		     || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
-#endif
-		     )) {
-		memcpy(&flow->protos.dns.rsp_addr, flow->packet.payload + x, data_len);
-	      }
-	    }
-
+	  if((x+6) >= flow->packet.payload_packet_len) {
 	    break;
 	  }
+
+	  if((data_len = getNameLength(x, flow->packet.payload, flow->packet.payload_packet_len)) == 0) {
+	    break;
+	  } else
+	    x += data_len;
+
+	  rsp_type = get16(&x, flow->packet.payload);
+	  flow->protos.dns.rsp_type = rsp_type;
+
+	  /* here x points to the response "class" field */
+	  if((x+12) <= flow->packet.payload_packet_len) {
+	    x += 6;
+	    data_len = get16(&x, flow->packet.payload);
+
+	    if(((x + data_len) <= flow->packet.payload_packet_len)
+	       && (((rsp_type == 0x1) && (data_len == 4)) /* A */
+#ifdef NDPI_DETECTION_SUPPORT_IPV6
+		   || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
+#endif
+		   )) {
+	      memcpy(&flow->protos.dns.rsp_addr, flow->packet.payload + x, data_len);
+	    }
+	  }
+
+	  break;
 	}
+      }
+     
+      if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
+	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
+	/* Request already set the protocol */
+	flow->extra_packets_func = NULL; /* We're good now */
+      } else {
+	/* We missed the request */
+	u_int16_t s_port = flow->packet.udp ? ntohs(flow->packet.udp->source) : ntohs(flow->packet.tcp->source);
+	
+	ndpi_set_detected_protocol(ndpi_struct, flow,
+				   (s_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS,
+				   NDPI_PROTOCOL_UNKNOWN);
       }
     } else
       return(1 /* invalid */);
@@ -202,6 +216,7 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
   if(flow->protos.dns.num_answers > 0) {
     /* stop extra processing */
+    flow->extra_packets_func = NULL; /* We're good now */
     return(0);
   }
 
@@ -211,7 +226,7 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
 /* *********************************************** */
 
-void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   int payload_offset;
   u_int8_t is_query;
   u_int16_t s_port = 0, d_port = 0;
@@ -290,7 +305,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     /* Report if this is a DNS query or reply */
     flow->protos.dns.is_query = is_query;
 
-    if(is_query && (ndpi_struct->dns_dont_dissect_response == 0) && (flow->check_extra_packets == 0)) {
+    if(is_query) {
       /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
 
