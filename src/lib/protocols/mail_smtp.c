@@ -283,12 +283,14 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
 
 static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
 #ifdef SMTP_DEBUG
-  printf("**** %s()\n", __FUNCTION__);
+  static u_int num = 0;
+  
+  printf("**** %s(%u)\n", __FUNCTION__, ++num);
 #endif
   
   flow->check_extra_packets = 1;
   /* At most 7 packets should almost always be enough */
-  flow->max_extra_packets_to_check = 7;
+  flow->max_extra_packets_to_check = 12;
   flow->extra_packets_func = ndpi_extra_search_mail_smtp_tcp;
 }
 

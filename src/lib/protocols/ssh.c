@@ -56,10 +56,38 @@
 
 /* #define SSH_DEBUG 1 */
 
+static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+  
+/* ************************************************************************ */
+
+static int search_ssh_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  ndpi_search_ssh_tcp(ndpi_struct, flow);
+
+  if((flow->protos.ssh.hassh_client[0] != '\0')
+     && (flow->protos.ssh.hassh_server[0] != '\0')) {
+    /* stop extra processing */
+    flow->extra_packets_func = NULL; /* We're good now */
+    return(0);
+  }
+
+  /* Possibly more processing */
+  return(1);
+}
+
 /* ************************************************************************ */
 
 static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow) {
+  if(flow->extra_packets_func != NULL)
+    return;
+
+  flow->guessed_host_protocol_id = flow->guessed_protocol_id = NDPI_PROTOCOL_SSH;
+  
+  /* This is necessary to inform the core to call this dissector again */
+  flow->check_extra_packets = 1;
+  flow->max_extra_packets_to_check = 12;
+  flow->extra_packets_func = search_ssh_again;
+  
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSH, NDPI_PROTOCOL_UNKNOWN);
 }
 
@@ -183,7 +211,7 @@ static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
   /* ssh.languages_server_to_client [None] */
 
 #ifdef SSH_DEBUG
-  printf("\n[SSH] %s\n", buf);
+  printf("[SSH] %s\n", buf);
 #endif
 
   return(buf_out_len);
@@ -191,7 +219,7 @@ static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
 invalid_payload:
 
 #ifdef SSH_DEBUG
-  printf("\n[SSH] Invalid packet payload\n");
+  printf("[SSH] Invalid packet payload\n");
 #endif
 
   return(0);
@@ -213,11 +241,11 @@ static void ndpi_ssh_zap_cr(char *str, int len) {
 
 /* ************************************************************************ */
 
-void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
 #ifdef SSH_DEBUG
-  printf("\n[SSH] [stage: %u]\n", flow->l4.tcp.ssh_stage);
+  printf("[SSH] %s()\n", __FUNCTION__);
 #endif
 
   if(flow->l4.tcp.ssh_stage == 0) {
@@ -231,13 +259,13 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	ndpi_ssh_zap_cr(flow->protos.ssh.client_signature, len);
 
 #ifdef SSH_DEBUG
-	printf("\n[SSH] [client_signature: %s]\n", flow->protos.ssh.client_signature);
+	printf("[SSH] [client_signature: %s]\n", flow->protos.ssh.client_signature);
 #endif
       }
 
       NDPI_LOG_DBG2(ndpi_struct, "ssh stage 0 passed\n");
       flow->l4.tcp.ssh_stage = 1 + packet->packet_direction;
-      flow->guessed_host_protocol_id = flow->guessed_protocol_id = NDPI_PROTOCOL_SSH;
+      ndpi_int_ssh_add_connection(ndpi_struct, flow);
       return;
     }
   } else if(flow->l4.tcp.ssh_stage == (2 - packet->packet_direction)) {
@@ -251,7 +279,7 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	ndpi_ssh_zap_cr(flow->protos.ssh.server_signature, len);
 
 #ifdef SSH_DEBUG
-	printf("\n[SSH] [server_signature: %s]\n", flow->protos.ssh.server_signature);
+	printf("[SSH] [server_signature: %s]\n", flow->protos.ssh.server_signature);
 #endif
 
 	NDPI_LOG_DBG2(ndpi_struct, "ssh stage 1 passed\n");
@@ -262,7 +290,7 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       }
 
 #ifdef SSH_DEBUG
-      printf("\n[SSH] [completed stage: %u]\n", flow->l4.tcp.ssh_stage);
+      printf("[SSH] [completed stage: %u]\n", flow->l4.tcp.ssh_stage);
 #endif
 
       flow->l4.tcp.ssh_stage = 3;
@@ -272,16 +300,16 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     u_int8_t msgcode = *(packet->payload + 5);
     ndpi_MD5_CTX ctx;
 
-#ifdef SSH_DEBUG
-    printf("\n[SSH] [stage: %u][msg: %u]\n", flow->l4.tcp.ssh_stage, msgcode);
-#endif
-
     if(msgcode == 20 /* key exchange init */) {
       char *hassh_buf = calloc(packet->payload_packet_len, sizeof(char));
       u_int i, len;
 
+#ifdef SSH_DEBUG
+      printf("[SSH] [stage: %u][msg: %u][direction: %u][key exchange init]\n", flow->l4.tcp.ssh_stage, msgcode, packet->packet_direction);
+#endif
+
       if(hassh_buf) {
-	if(flow->l4.tcp.ssh_stage == 3) {
+	if(packet->packet_direction == 0 /* client */) {
 	  u_char fingerprint_client[16];
 
 	  len = concat_hash_string(packet, hassh_buf, 1 /* client */);
@@ -292,7 +320,7 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
 #ifdef SSH_DEBUG
 	  {
-	    printf("\n[SSH] [client][%s][", hassh_buf);
+	    printf("[SSH] [client][%s][", hassh_buf);
 	    for(i=0; i<16; i++) printf("%02X", fingerprint_client[i]);
 	    printf("]\n");
 	  }
@@ -310,7 +338,7 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
 #ifdef SSH_DEBUG
 	  {
-	    printf("\n[SSH] [server][%s][", hassh_buf);
+	    printf("[SSH] [server][%s][", hassh_buf);
 	    for(i=0; i<16; i++) printf("%02X", fingerprint_server[i]);
 	    printf("]\n");
 	  }
@@ -322,18 +350,22 @@ void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
 	free(hassh_buf);
       }
+
+      ndpi_int_ssh_add_connection(ndpi_struct, flow);
     }
 
-    if(flow->l4.tcp.ssh_stage++ == 4) {
-      NDPI_LOG_INFO(ndpi_struct, "found ssh\n");
-      ndpi_int_ssh_add_connection(ndpi_struct, flow);
+    if((flow->protos.ssh.hassh_client[0] != '\0') && (flow->protos.ssh.hassh_server[0] != '\0')) {
+#ifdef SSH_DEBUG
+      printf("[SSH] Dissection completed\n");
+#endif
+      flow->extra_packets_func = NULL; /* We're good now */
     }
 
     return;
   }
 
 #ifdef SSH_DEBUG
-  printf("\n[SSH] Excluding SSH");
+  printf("[SSH] Excluding SSH");
 #endif
 
   NDPI_LOG_DBG(ndpi_struct, "excluding ssh at stage %d\n", flow->l4.tcp.ssh_stage);

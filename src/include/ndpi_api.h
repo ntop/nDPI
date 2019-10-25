@@ -207,18 +207,7 @@ extern "C" {
   void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
 					    const NDPI_PROTOCOL_BITMASK * detection_bitmask);
   
-  /**
-   *  Function to be called to see in case of unknown match to see if there is
-   *  a partial match that has been prevented by the current nDPI preferences configuration
-   *
-   * @par    ndpi_struct  = the detection module
-   * @par    flow         = the flow given for the detection module
-   * @return the detected protocol even if the flow is not completed;
-   *
-   */
-  ndpi_protocol ndpi_get_partial_detection(struct ndpi_detection_module_struct *ndpi_struct,
-					   struct ndpi_flow_struct *flow);
-  /**
+    /**
    *  Function to be called before we give up with detection for a given flow.
    *  This function reduces the NDPI_UNKNOWN_PROTOCOL detection
    *

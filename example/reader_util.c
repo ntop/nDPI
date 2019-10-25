@@ -1210,25 +1210,29 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     u_int enough_packets =
       (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_udp_dissected_pkts))
        || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_tcp_dissected_pkts))) ? 1 : 0;
-
+    
+#if 0
+    printf("%s()\n", __FUNCTION__);  
+#endif
+  
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time, src, dst);
 
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
-	 // TODO: remove the line below
-	 && (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	 && ndpi_extra_dissection_possible(workflow->ndpi_struct, ndpi_flow))
 	; /* Wait for certificate fingerprint */
       else {
 	/* New protocol detected or give up */
 	flow->detection_completed = 1;
 
+#if 0
 	/* Check if we should keep checking extra packets */
 	if(ndpi_flow && ndpi_flow->check_extra_packets)
 	  flow->check_extra_packets = 1;
-
+#endif
+	
 	if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 	  u_int8_t proto_guessed;
 	  
