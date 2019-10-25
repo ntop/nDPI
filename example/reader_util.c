@@ -966,7 +966,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
   }
   /* HTTP */
-  else if(flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP) {
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_HTTP) {
     if(flow->ndpi_flow->http.url != NULL) {
       snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
       flow->http.response_status_code = flow->ndpi_flow->http.response_status_code;
