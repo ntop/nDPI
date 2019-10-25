@@ -1,8 +1,8 @@
 Unknown	2460	893551	3
-DNS	28	3259	14
+DNS	32	3655	16
 HTTP	50	11137	5
 MDNS	24	4279	4
-NetBIOS	19	1938	3
+NetBIOS	15	1542	1
 SSDP	15	5625	9
 ICMP	2	126	2
 IGMP	8	378	6
@@ -68,10 +68,10 @@ JA3 Host Stats:
 	45	UDP 10.0.0.227:54851 <-> 75.75.76.76:53 [proto: 5/DNS][cat: Network/14][1 pkts/76 bytes <-> 1 pkts/157 bytes][Host: print.viasat.com][PLAIN TEXT (viasat)]
 	46	UDP 10.0.0.227:61328 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][1 pkts/216 bytes -> 0 pkts/0 bytes][PLAIN TEXT (SEARCH )]
 	47	UDP 10.0.0.227:63107 <-> 75.75.76.76:53 [proto: 5/DNS][cat: Network/14][1 pkts/65 bytes <-> 1 pkts/140 bytes][Host: local][PLAIN TEXT (servers)]
-	48	UDP 10.0.0.227:64972 <-> 75.75.75.75:53 [proto: 5.10/DNS.NetBIOS][cat: Network/14][1 pkts/101 bytes <-> 1 pkts/101 bytes][Host: lb._dns-sd._udp.0.128.28.172.in-addr.arpa]
+	48	UDP 10.0.0.227:64972 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/101 bytes <-> 1 pkts/101 bytes][Host: lb._dns-sd._udp.0.128.28.172.in-addr.arpa]
 	49	TCP 10.0.0.227:56865 <-> 10.0.0.149:8008 [proto: 161/CiscoVPN][cat: VPN/2][2 pkts/132 bytes <-> 1 pkts/66 bytes]
 	50	TCP 10.0.0.227:56885 <-> 184.25.56.53:80 [proto: 7/HTTP][cat: Web/5][2 pkts/132 bytes <-> 1 pkts/66 bytes]
-	51	UDP 10.0.0.227:61613 <-> 75.75.75.75:53 [proto: 5.10/DNS.NetBIOS][cat: Network/14][1 pkts/97 bytes <-> 1 pkts/97 bytes][Host: lb._dns-sd._udp.0.0.0.10.in-addr.arpa]
+	51	UDP 10.0.0.227:61613 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/97 bytes <-> 1 pkts/97 bytes][Host: lb._dns-sd._udp.0.0.0.10.in-addr.arpa]
 	52	UDP 10.0.0.227:49781 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/69 bytes <-> 1 pkts/117 bytes][Host: apple.com]
 	53	UDP 10.0.0.227:52879 <-> 75.75.76.76:53 [proto: 5/DNS][cat: Network/14][1 pkts/82 bytes <-> 1 pkts/98 bytes][Host: vco.pandion.viasat.com][PLAIN TEXT (pandion)]
 	54	0 [fe80::408:3e45:3abc:1552]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/180 bytes -> 0 pkts/0 bytes]

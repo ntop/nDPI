@@ -4180,29 +4180,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       ret.app_protocol = NDPI_PROTOCOL_HANGOUT_DUO;
     }
   }
-
-  if(enable_guess
-     && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-     && flow->packet.iph /* Guess only IPv4 */
-     && (flow->packet.tcp || flow->packet.udp)
-     ) {
-    ndpi_protocol ret1 = ndpi_guess_undetected_protocol(ndpi_str,
-							flow,
-							flow->packet.l4_protocol,
-							ntohl(flow->packet.iph->saddr),
-							ntohs(flow->packet.udp ? flow->packet.udp->source : flow->packet.tcp->source),
-							ntohl(flow->packet.iph->daddr),
-							ntohs(flow->packet.udp ? flow->packet.udp->dest : flow->packet.tcp->dest)
-							);
-
-    if(ret1.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
-      if(ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) ret.master_protocol = ret1.master_protocol;
-      if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)    ret.app_protocol    = ret1.app_protocol;
-      if(ret.category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) ret.category  = ret1.category;
-
-      *protocol_was_guessed = 1;
-    }
-  }
   
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN)
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);  
