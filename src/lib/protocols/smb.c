@@ -32,18 +32,20 @@ void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
   NDPI_LOG_DBG(ndpi_struct, "search SMB\n");
 
   /* Check connection over TCP */
-  if(packet->tcp) {
-    
+  if(packet->tcp) {    
     if(packet->tcp->dest == htons(445)
        && packet->payload_packet_len > (32 + 4 + 4)
        && (packet->payload_packet_len - 4) == ntohl(get_u_int32_t(packet->payload, 0))
        && get_u_int32_t(packet->payload, 4) == htonl(0xff534d42)) {
+      u_int8_t smbv1[] = { 0xff, 0x53, 0x4d, 0x42 };
       
-      NDPI_LOG_INFO(ndpi_struct, "found SMB\n");
+      NDPI_LOG_INFO(ndpi_struct, "found SMB\n");      
 
-      if(packet->payload[8] == 0x72)
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, NDPI_PROTOCOL_UNKNOWN);
-      else
+
+      if(memcmp(&packet->payload[4], smbv1, sizeof(smbv1)) == 0) {
+	if(packet->payload[8] != 0x72) /* Skip Negotiate request */
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, NDPI_PROTOCOL_UNKNOWN);
+      }else
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
