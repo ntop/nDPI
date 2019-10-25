@@ -714,14 +714,6 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
 				   ndpi_detection_preference pref,
 				   int value) {
   switch(pref) {
-  case ndpi_pref_http_dont_dissect_response:
-    ndpi_str->http_dont_dissect_response = (u_int8_t)value;
-    break;
-
-  case ndpi_pref_dns_dont_dissect_response:
-    ndpi_str->dns_dont_dissect_response = (u_int8_t)value;
-    break;
-
   case ndpi_pref_direction_detect_disable:
     ndpi_str->direction_detect_disable = (u_int8_t)value;
     break;
@@ -1770,6 +1762,19 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    1 /* no subprotocol */, no_master,
 			    no_master, "S7Comm", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 102, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+
+
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BLOOMBERG,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "Bloomberg", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+    
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CAPWAP,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "CAPWAP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
 
     /* calling function for host and content matched protocols */
@@ -4067,64 +4072,6 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
-static ndpi_protocol ndpi_process_partial_detection(struct ndpi_detection_module_struct *ndpi_str,
-						    struct ndpi_flow_struct *flow) {
-  ndpi_protocol ret;
-  ndpi_protocol_match_result ret_match;
-
-  ret.master_protocol = flow->guessed_protocol_id;
-  ret.app_protocol    = ndpi_match_host_subprotocol(ndpi_str, flow,
-						    (char *)flow->host_server_name,
-						    strlen((const char*)flow->host_server_name),
-						    &ret_match,
-						    flow->guessed_protocol_id);
-
-  if(flow->category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
-    ret.category = flow->category;
-  else
-    ret.category = ret_match.protocol_category;
-
-  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-    ret.app_protocol = ret.master_protocol;
-
-  ndpi_fill_protocol_category(ndpi_str, flow, &ret);
-
-  ndpi_int_change_protocol(ndpi_str, flow, ret.app_protocol, ret.master_protocol);
-
-  return(ret);
-}
-
-/* ********************************************************************************* */
-
-/*
-  You can call this function at any time in case of unknown match to see if there is
-  a partial match that has been prevented by the current nDPI preferences configuration
-*/
-ndpi_protocol ndpi_get_partial_detection(struct ndpi_detection_module_struct *ndpi_str,
-					 struct ndpi_flow_struct *flow) {
-  if((flow->guessed_protocol_id == NDPI_PROTOCOL_HTTP)
-     && (ndpi_str->http_dont_dissect_response == 0)
-     && (flow->host_server_name[0] != '\0')
-     && (!NDPI_ISSET(&flow->excluded_protocol_bitmask, flow->guessed_host_protocol_id)))
-    return(ndpi_process_partial_detection(ndpi_str, flow));
-  else if((flow->guessed_protocol_id == NDPI_PROTOCOL_DNS)
-	  && (ndpi_str->dns_dont_dissect_response == 0)
-	  && (flow->host_server_name[0] != '\0')
-	  && (!NDPI_ISSET(&flow->excluded_protocol_bitmask, flow->guessed_host_protocol_id)))
-    return(ndpi_process_partial_detection(ndpi_str, flow));
-  else {
-    ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN,
-			  NDPI_PROTOCOL_UNKNOWN,
-			  NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
-
-    if(flow) ret.category = flow->category;
-
-    return(ret);
-  }
-}
-
-/* ********************************************************************************* */
-
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str,
 				    struct ndpi_flow_struct *flow,
 				    u_int8_t enable_guess,
@@ -4158,15 +4105,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
     } else {
-      ndpi_protocol ret_g = ndpi_get_partial_detection(ndpi_str, flow);
-
-      if(ret_g.master_protocol != NDPI_PROTOCOL_UNKNOWN)
-	return(ret_g);
-      else {
-	if(!enable_guess)
-	  return(ret);
-      }
-
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
 	 && (flow->l4.tcp.tls_stage > 1))
@@ -4253,19 +4191,27 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
      && flow->packet.iph /* Guess only IPv4 */
      && (flow->packet.tcp || flow->packet.udp)
      ) {
-    ret = ndpi_guess_undetected_protocol(ndpi_str,
-					 flow,
-					 flow->packet.l4_protocol,
-					 ntohl(flow->packet.iph->saddr),
-					 ntohs(flow->packet.udp ? flow->packet.udp->source : flow->packet.tcp->source),
-					 ntohl(flow->packet.iph->daddr),
-					 ntohs(flow->packet.udp ? flow->packet.udp->dest : flow->packet.tcp->dest)
-					 );
-    *protocol_was_guessed = 1;
+    ndpi_protocol ret1 = ndpi_guess_undetected_protocol(ndpi_str,
+							flow,
+							flow->packet.l4_protocol,
+							ntohl(flow->packet.iph->saddr),
+							ntohs(flow->packet.udp ? flow->packet.udp->source : flow->packet.tcp->source),
+							ntohl(flow->packet.iph->daddr),
+							ntohs(flow->packet.udp ? flow->packet.udp->dest : flow->packet.tcp->dest)
+							);
+
+    if(ret1.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
+      if(ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) ret.master_protocol = ret1.master_protocol;
+      if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)    ret.app_protocol    = ret1.app_protocol;
+      if(ret.category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) ret.category  = ret1.category;
+
+      *protocol_was_guessed = 1;
+    }
   }
   
-  ndpi_fill_protocol_category(ndpi_str, flow, &ret);
-
+  if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+    ndpi_fill_protocol_category(ndpi_str, flow, &ret);  
+  
   return(ret);
 }
 
@@ -4840,7 +4786,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   } else
     ret.app_protocol = flow->detected_protocol_stack[0];
 
-  /* Don;t overwrite the category if already set */
+  /* Don't overwrite the category if already set */
   if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);
   else
@@ -5410,8 +5356,7 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str,
 				struct ndpi_flow_struct *flow,
 				u_int16_t upper_detected_protocol,
 				u_int16_t lower_detected_protocol) {
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
+  struct ndpi_id_struct *src = flow->src, *dst = flow->dst;
 
   ndpi_int_change_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol);
 
@@ -6480,13 +6425,12 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_HTTP:
-    if(flow->host_server_name[0] == '\0')
+    if((flow->host_server_name[0] == '\0') || (flow->http.response_status_code == 0))
       return(1);
     break;
 
   case NDPI_PROTOCOL_DNS:
-    if((ndpi_str->dns_dont_dissect_response == 0)
-       && (flow->protos.dns.num_answers == 0))
+    if(flow->protos.dns.num_answers == 0)
       return(1);
     break;
 

@@ -488,6 +488,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x344E0000 /* 52.78.0.0/16 */, 16, NDPI_PROTOCOL_AMAZON },
   { 0x344F0000 /* 52.79.0.0/16 */, 16, NDPI_PROTOCOL_AMAZON },
   { 0x34520000 /* 52.82.0.0/14 */, 14, NDPI_PROTOCOL_AMAZON },
+  { 0x34540000 /* 52.84.0.0/14 */, 14, NDPI_PROTOCOL_AMAZON },
   { 0x34580000 /* 52.88.0.0/13 */, 13, NDPI_PROTOCOL_AMAZON },
   { 0x345A0000 /* 52.90.0.0/15 */, 15, NDPI_PROTOCOL_AMAZON },
   { 0x345EE000 /* 52.94.224.0/19 */, 19, NDPI_PROTOCOL_AMAZON },
@@ -8400,9 +8401,18 @@ static ndpi_protocol_match host_match[] = {
   { "images-amazon.com", NULL, "images-amazon" TLD,                                      "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazonaws.com", NULL, "amazonaws" TLD,                                              "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "amazon-adsystem.com", NULL, "amazon-adsystem" TLD,                                  "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".aws.", NULL, "\\.aws\\." TLD,                                                      "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { ".cloudfront.net", NULL, "\\.cloudfront" TLD,                                        "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".us-west-2.compute.amazonaws.com", NULL, "\\.us-west-2\\.compute\\.amazonaws\\.com",       "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".us-west-2.compute.amazonaws.com", NULL, "\\.us-west-2\\.compute\\.amazonaws\\.com","Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
+  /* Microsoft + Azure */
+  { ".azure.com", NULL, "\\.azure.\\com" TLD,                                            "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
+  { ".windows.net", NULL, "\\.windows.\\net" TLD,                                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
+  { ".microsoft.com", NULL, "\\.microsoft.\\com" TLD,                                    "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
+
+  { ".bloombergvault.com", NULL, "\\.bloombergvault.\\com" TLD,                          "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
+  { ".bloomberg.com", NULL, "\\.bloomberg.\\com" TLD,                                    "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
+  
   { ".push.apple.com", NULL, "\\.push\\.apple" TLD,                   "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
   { ".apple-dns.net", NULL, "\\.apple-dns" TLD,                       "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".mzstatic.com", NULL, "\\.mzstatic" TLD,                         "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
