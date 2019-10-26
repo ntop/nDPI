@@ -123,7 +123,6 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 			  u_int16_t payload_len,
 			  u_int32_t packet_id) {
   struct payload_stats *ret;
-  u_int i;
   struct flow_id_stats *f;
   struct packet_id_stats *p;
 
