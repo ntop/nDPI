@@ -4578,6 +4578,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     if(flow->check_extra_packets) {
       ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
+      /* Update in case of new match */
+      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       return(ret);
     } else
       goto ret_protocols;
@@ -6053,6 +6055,25 @@ static int hyperscanEventHandler(unsigned int id, unsigned long long from,
 
 #endif
 
+/* **************************************** */
+
+static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_t new_proto) {
+  /* Sometimes certificates are more generic than previously identified protocols */
+
+  if((previous_proto == NDPI_PROTOCOL_UNKNOWN)
+     || (previous_proto == new_proto))
+    return(0);
+  
+  switch(previous_proto) {
+  case NDPI_PROTOCOL_WHATSAPP_CALL:
+  case NDPI_PROTOCOL_WHATSAPP_FILES:
+    if(new_proto == NDPI_PROTOCOL_WHATSAPP)
+      return(1);
+  }
+
+  return(0);
+}
+
 /* ****************************************************** */
 
 static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
@@ -6109,7 +6130,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   }
 #endif
 
-  if(matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+  if((matching_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+     && (!ndpi_is_more_generic_protocol(packet->detected_protocol_stack[0], matching_protocol_id))) {
     /* Move the protocol on slot 0 down one position */
     packet->detected_protocol_stack[1] = master_protocol_id,
       packet->detected_protocol_stack[0] = matching_protocol_id;

@@ -8579,7 +8579,8 @@ static ndpi_protocol_match host_match[] = {
   { "e7768.b.akamaiedge.net", NULL, "e7768\\.b\\.akamaiedge" TLD,      "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "e4593.dspg.akamaiedge.net", NULL, "e4593\\.dspg\\.akamaiedge" TLD,"Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "e4593.g.akamaiedge.net", NULL, "e4593\\.g\\.akamaiedge" TLD,      "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
-
+  { "*.gateway.messenger.live.com", NULL, "\\*\\.gateway\\.messenger\\.live" TLD, "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
+  
   { ".tuenti.com", NULL, "\\.tuenti" TLD,                              "Tuenti",           NDPI_PROTOCOL_TUENTI, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".twttr.com", NULL, "\\.twttr" TLD,                                "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
@@ -8669,7 +8670,6 @@ static ndpi_protocol_match host_match[] = {
   { "login.live.com", NULL, "login\\.live" TLD,                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
   { "bn1301.storage.live.com", NULL, "bn1301\\.storage\\.live" TLD,               "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE,NDPI_PROTOCOL_CATEGORY_CLOUD,  NDPI_PROTOCOL_ACCEPTABLE },
-  { "*.gateway.messenger.live.com", NULL, "\\*\\.gateway\\.messenger\\.live" TLD, "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
   { "skyapi.live.net", NULL, "skyapi\\.live" TLD,                                 "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
   { "d.docs.live.net", NULL, "d\\.docs\\.live" TLD,                               "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
   { "onedrive.live.com", NULL, "onedrive\\.live" TLD,                             "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },

@@ -38,7 +38,6 @@ struct stun_packet_header {
   u_int8_t  transaction_id[8];
 };
 
-
 /* ************************************************************ */
 
 u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
