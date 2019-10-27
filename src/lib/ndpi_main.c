@@ -1770,7 +1770,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    1 /* no subprotocol */, no_master,
 			    no_master, "CAPWAP", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+			    // ndpi_build_default_ports(ports_b, 5246, 5247, 0, 0, 0) /* UDP */
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */
+			    );
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_str);
@@ -3242,9 +3244,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* TEAMSPEAK */
   init_teamspeak_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* VIBER */
-  init_viber_dissector(ndpi_str, &a, detection_bitmask);
-
   /* TOR */
   init_tor_dissector(ndpi_str, &a, detection_bitmask);
 
@@ -3356,7 +3355,13 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* MODBUS */
   init_modbus_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* CAPWAP */
+  init_capwap_dissector(ndpi_str, &a, detection_bitmask);
+
   /*** Put false-positive sensitive protocols at the end ***/
+
+  /* VIBER */
+  init_viber_dissector(ndpi_str, &a, detection_bitmask);
 
   /* SKYPE */
   init_skype_dissector(ndpi_str, &a, detection_bitmask);
