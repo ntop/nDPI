@@ -1427,7 +1427,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     ip_offset += 4;
     vlan_packet = 1;
     // double tagging for 802.1Q
-    if(type == 0x8100) {
+    while((type == 0x8100) && (ip_offset < header->caplen)) {
       vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
       type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
       ip_offset += 4;
