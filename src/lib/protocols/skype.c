@@ -32,11 +32,17 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
+  /* No need to do ntohl() with 0xFFFFFFFF */
+  if(packet->iph && (packet->iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */)) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+
   if(flow->host_server_name[0] != '\0')
     return;
-
+  
   // UDP check
-  if(packet->udp != NULL) {
+  if(packet->udp != NULL) {    
     flow->l4.udp.skype_packet_id++;
 
     if(flow->l4.udp.skype_packet_id < 5) {
