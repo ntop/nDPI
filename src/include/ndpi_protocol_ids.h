@@ -282,6 +282,7 @@ typedef enum {
   NDPI_PROTOCOL_104                   = 245,
   NDPI_PROTOCOL_BLOOMBERG             = 246,
   NDPI_PROTOCOL_CAPWAP                = 247,
+  NDPI_PROTOCOL_ZABBIX                = 248,
   
 /*
     IMPORTANT
