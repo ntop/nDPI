@@ -3372,6 +3372,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* CAPWAP */
   init_capwap_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* ZABBIX */
+  init_zabbix_dissector(ndpi_str, &a, detection_bitmask);
+
   /*** Put false-positive sensitive protocols at the end ***/
 
   /* VIBER */
