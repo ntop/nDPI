@@ -979,6 +979,8 @@ static ndpi_network host_protocol_list[] = {
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
   { 0x17600000 /* 23.96.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
   { 0x34724A05 /* 52.114.74.5 */, 32, NDPI_PROTOCOL_SKYPE },
+  { 0x14B40000 /* 20.180.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
+  { 0x14B80000 /* 20.184.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
 
   /*
     Blizzard Entertainment, Inc
