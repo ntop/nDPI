@@ -8798,6 +8798,9 @@ static ndpi_protocol_match host_match[] = {
   { "musical.ly", NULL, "musical\\.ly" TLD,                            "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "muscdn.com", NULL, "muscndl\\.com" TLD,                           "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
+  { "brasilbandalarga.com.br", NULL, "brasilbandalarga\\.com" TLD,     "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".eaqbr.com.br", NULL, "\\.eaqbr\\.com" TLD,                       "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+
   { NULL, NULL, NULL, 0 }
 };
 
