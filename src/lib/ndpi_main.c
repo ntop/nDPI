@@ -1778,11 +1778,21 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */
 			    );
 
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_main.c"
+#endif
+
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_str);
 
     ndpi_validate_protocol_initialization(ndpi_str);
 }
+
+/* ****************************************************** */
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_protocols.c"
+#endif
 
 /* ****************************************************** */
 

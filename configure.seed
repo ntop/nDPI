@@ -68,8 +68,14 @@ SYSTEM=`uname -s`
 if test $SYSTEM = "Darwin"; then
  CC=clang
 fi
- 
- 
+
+CUSTOM_NDPI=
+
+if test -d ../nDPI-custom; then :
+   CUSTOM_NDPI="-DCUSTOM_NDPI_PROTOCOLS"
+   AC_MSG_RESULT([Compiling with custom nDPI protocols])
+fi
+
 AC_ARG_WITH(hyperscan,          [  --with-hyperscan        Enable nDPI build with Intel Hyperscan])
 
 AS_IF([test "${with_hyperscan+set}" = set],[
@@ -155,5 +161,5 @@ AC_SUBST(PCAP_LIB)
 AC_SUBST(DL_LIB)
 AC_SUBST(DPDK_TARGET)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
-
+AC_SUBST(CUSTOM_NDPI)
 AC_OUTPUT
