@@ -1769,8 +1769,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 5246, 5247, 0, 0, 0) /* UDP */
 			    );
-
-    /* TODO: Needs a pcap file for Zabbix */
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZABBIX,
 			    1 /* no subprotocol */, no_master,
 			    no_master, "Zabbix", NDPI_PROTOCOL_CATEGORY_NETWORK,
@@ -4688,7 +4686,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     } else
       flow->guessed_header_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
 
-    if(flow->guessed_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
+    if(flow->guessed_protocol_id > NDPI_MAX_SUPPORTED_PROTOCOLS) {
       /* This is a custom protocol and it has priority over everything else */
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN,
 	ret.app_protocol = flow->guessed_protocol_id ? flow->guessed_protocol_id : flow->guessed_host_protocol_id;
@@ -4724,7 +4722,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     }
   }
 
-  if(flow->guessed_host_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
+  if(flow->guessed_host_protocol_id > NDPI_MAX_SUPPORTED_PROTOCOLS) {
     /* This is a custom protocol and it has priority over everything else */
     ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.app_protocol = flow->guessed_host_protocol_id;
 
