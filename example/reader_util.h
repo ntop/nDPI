@@ -198,6 +198,10 @@ typedef struct ndpi_flow_info {
     u_int response_status_code;
   } http;
   
+  struct {
+    char username[32];
+  } telnet;
+  
   void *src_id, *dst_id;
 
   struct ndpi_entropy entropy;

@@ -89,7 +89,7 @@ static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
 static u_int8_t file_first_time = 1;
 #endif
 u_int8_t human_readeable_string_len = 5;
-u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 16;
+u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 32 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
@@ -1115,6 +1115,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->dst2src_packets > 0) ? "<->" : "->",
 	    flow->dst2src_packets, (long long unsigned int) flow->dst2src_bytes);
 
+    if(flow->telnet.username[0] != '\0')  fprintf(out, "[Username: %s]", flow->telnet.username);    
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
 
     if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);

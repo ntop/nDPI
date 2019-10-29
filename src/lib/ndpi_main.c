@@ -6460,6 +6460,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
        || (flow->protos.ssh.hassh_server[0] == '\0'))
       return(1);
     break;
+
+  case NDPI_PROTOCOL_TELNET:
+    if(!flow->protos.telnet.username_detected)
+      return(1);
+    break;
   }
 
   return(0);
@@ -6492,8 +6497,7 @@ const char* ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
 /* ******************************************************************** */
 
 ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct,
-					  u_int16_t ndpi_proto_id) {
-  
+					  u_int16_t ndpi_proto_id) {  
   if(ndpi_proto_id < ndpi_struct->ndpi_num_supported_protocols) {
     u_int16_t idx = ndpi_struct->proto_defaults[ndpi_proto_id].protoIdx;
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE bm = ndpi_struct->callback_buffer[idx].ndpi_selection_bitmask;
