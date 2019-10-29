@@ -50,7 +50,7 @@
 #include "third_party/include/ht_hash.h"
 
 /* stun.c */
-extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow);
+extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 static int _ndpi_debug_callbacks = 0;
 
@@ -1234,7 +1234,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "RDP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 3389, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_b, 3389, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VNC,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "VNC", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
@@ -1758,25 +1758,41 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "104", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 2404, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
-
-
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BLOOMBERG,
 			    1 /* no subprotocol */, no_master,
 			    no_master, "Bloomberg", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
-    
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);    
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CAPWAP,
 			    1 /* no subprotocol */, no_master,
 			    no_master, "CAPWAP", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_b, 5246, 5247, 0, 0, 0) /* UDP */
+			    );
+
+    /* TODO: Needs a pcap file for Zabbix */
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZABBIX,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "Zabbix", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 10050, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */
+			    );
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_main.c"
+#endif
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_str);
 
     ndpi_validate_protocol_initialization(ndpi_str);
 }
+
+/* ****************************************************** */
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_protocols.c"
+#endif
 
 /* ****************************************************** */
 
@@ -3242,9 +3258,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* TEAMSPEAK */
   init_teamspeak_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* VIBER */
-  init_viber_dissector(ndpi_str, &a, detection_bitmask);
-
   /* TOR */
   init_tor_dissector(ndpi_str, &a, detection_bitmask);
 
@@ -3356,7 +3369,13 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* MODBUS */
   init_modbus_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* CAPWAP */
+  init_capwap_dissector(ndpi_str, &a, detection_bitmask);
+
   /*** Put false-positive sensitive protocols at the end ***/
+
+  /* VIBER */
+  init_viber_dissector(ndpi_str, &a, detection_bitmask);
 
   /* SKYPE */
   init_skype_dissector(ndpi_str, &a, detection_bitmask);
@@ -4180,29 +4199,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       ret.app_protocol = NDPI_PROTOCOL_HANGOUT_DUO;
     }
   }
-
-  if(enable_guess
-     && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-     && flow->packet.iph /* Guess only IPv4 */
-     && (flow->packet.tcp || flow->packet.udp)
-     ) {
-    ndpi_protocol ret1 = ndpi_guess_undetected_protocol(ndpi_str,
-							flow,
-							flow->packet.l4_protocol,
-							ntohl(flow->packet.iph->saddr),
-							ntohs(flow->packet.udp ? flow->packet.udp->source : flow->packet.tcp->source),
-							ntohl(flow->packet.iph->daddr),
-							ntohs(flow->packet.udp ? flow->packet.udp->dest : flow->packet.tcp->dest)
-							);
-
-    if(ret1.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
-      if(ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) ret.master_protocol = ret1.master_protocol;
-      if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)    ret.app_protocol    = ret1.app_protocol;
-      if(ret.category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) ret.category  = ret1.category;
-
-      *protocol_was_guessed = 1;
-    }
-  }
   
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN)
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);  
@@ -4601,6 +4597,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     if(flow->check_extra_packets) {
       ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
+      /* Update in case of new match */
+      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       return(ret);
     } else
       goto ret_protocols;
@@ -6078,6 +6076,25 @@ static int hyperscanEventHandler(unsigned int id, unsigned long long from,
 
 #endif
 
+/* **************************************** */
+
+static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_t new_proto) {
+  /* Sometimes certificates are more generic than previously identified protocols */
+
+  if((previous_proto == NDPI_PROTOCOL_UNKNOWN)
+     || (previous_proto == new_proto))
+    return(0);
+  
+  switch(previous_proto) {
+  case NDPI_PROTOCOL_WHATSAPP_CALL:
+  case NDPI_PROTOCOL_WHATSAPP_FILES:
+    if(new_proto == NDPI_PROTOCOL_WHATSAPP)
+      return(1);
+  }
+
+  return(0);
+}
+
 /* ****************************************************** */
 
 static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
@@ -6134,7 +6151,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   }
 #endif
 
-  if(matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+  if((matching_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+     && (!ndpi_is_more_generic_protocol(packet->detected_protocol_stack[0], matching_protocol_id))) {
     /* Move the protocol on slot 0 down one position */
     packet->detected_protocol_stack[1] = master_protocol_id,
       packet->detected_protocol_stack[0] = matching_protocol_id;

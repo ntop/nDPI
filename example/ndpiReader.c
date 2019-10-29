@@ -1703,7 +1703,7 @@ static void deleteScanners(struct single_flow_info *scanners) {
 
   HASH_ITER(hh, scanners, s, tmp) {
     HASH_ITER(hh, s->ports, p, tmp2) {
-      HASH_DEL(s->ports, p);
+      if(s->ports) HASH_DEL(s->ports, p);
       free(p);
     }
     HASH_DEL(scanners, s);
@@ -2600,11 +2600,13 @@ static void printFlowsStats() {
 	//freeing the hash table
 	HASH_ITER(hh, ja3ByHostsHashT, ja3ByHost_element, tmp) {
 	  HASH_ITER(hh, ja3ByHost_element->host_client_info_hasht, info_of_element, tmp2) {
-	    HASH_DEL(ja3ByHost_element->host_client_info_hasht, info_of_element);
+	    if(ja3ByHost_element->host_client_info_hasht)
+	      HASH_DEL(ja3ByHost_element->host_client_info_hasht, info_of_element);
 	    free(info_of_element);
 	  }
 	  HASH_ITER(hh, ja3ByHost_element->host_server_info_hasht, info_of_element, tmp2) {
-	    HASH_DEL(ja3ByHost_element->host_server_info_hasht, info_of_element);
+	    if(ja3ByHost_element->host_server_info_hasht)
+	      HASH_DEL(ja3ByHost_element->host_server_info_hasht, info_of_element);
 	    free(info_of_element);
 	  }
 	  HASH_DEL(ja3ByHostsHashT, ja3ByHost_element);
@@ -2613,7 +2615,8 @@ static void printFlowsStats() {
 
 	HASH_ITER(hh, hostByJA3C_ht, hostByJA3Element, tmp3) {
 	  HASH_ITER(hh, hostByJA3C_ht->ipToDNS_ht, innerHashEl, tmp4) {
-	    HASH_DEL(hostByJA3Element->ipToDNS_ht, innerHashEl);
+	    if(hostByJA3Element->ipToDNS_ht)
+	      HASH_DEL(hostByJA3Element->ipToDNS_ht, innerHashEl);
 	    free(innerHashEl);
 	  }
 	  HASH_DEL(hostByJA3C_ht, hostByJA3Element);
@@ -2623,7 +2626,8 @@ static void printFlowsStats() {
 	hostByJA3Element = NULL;
 	HASH_ITER(hh, hostByJA3S_ht, hostByJA3Element, tmp3) {
 	  HASH_ITER(hh, hostByJA3S_ht->ipToDNS_ht, innerHashEl, tmp4) {
-	    HASH_DEL(hostByJA3Element->ipToDNS_ht, innerHashEl);
+	    if(hostByJA3Element->ipToDNS_ht)
+	      HASH_DEL(hostByJA3Element->ipToDNS_ht, innerHashEl);
 	    free(innerHashEl);
 	  }
 	  HASH_DEL(hostByJA3S_ht, hostByJA3Element);

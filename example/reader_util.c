@@ -123,7 +123,6 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 			  u_int16_t payload_len,
 			  u_int32_t packet_id) {
   struct payload_stats *ret;
-  u_int i;
   struct flow_id_stats *f;
   struct packet_id_stats *p;
 
@@ -966,7 +965,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
   }
   /* HTTP */
-  else if(flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP) {
+  else if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_HTTP) {
     if(flow->ndpi_flow->http.url != NULL) {
       snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
       flow->http.response_status_code = flow->ndpi_flow->http.response_status_code;
@@ -1428,7 +1427,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     ip_offset += 4;
     vlan_packet = 1;
     // double tagging for 802.1Q
-    if(type == 0x8100) {
+    while((type == 0x8100) && (ip_offset < header->caplen)) {
       vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
       type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
       ip_offset += 4;

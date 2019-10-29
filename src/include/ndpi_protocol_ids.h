@@ -1,4 +1,3 @@
-
 /*
  * ndpi_protocol_ids.h
  *
@@ -282,8 +281,13 @@ typedef enum {
   NDPI_PROTOCOL_104                   = 245,
   NDPI_PROTOCOL_BLOOMBERG             = 246,
   NDPI_PROTOCOL_CAPWAP                = 247,
-  
-/*
+  NDPI_PROTOCOL_ZABBIX                = 248,
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
+#endif  
+
+  /*
     IMPORTANT
     before allocating a new identifier please fill up
     one of those named NDPI_PROTOCOL_FREE_XXX and not used
