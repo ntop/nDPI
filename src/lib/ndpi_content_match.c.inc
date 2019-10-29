@@ -8853,6 +8853,7 @@ static ndpi_protocol_match host_match[] = {
   { "ttvnw.net", NULL, "ttvnw" TLD,                                    "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "static-cdn.jtvnw.net", NULL, "static-cdn\\.jtvnw" TLD,            "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "www-cdn.jtvnw.net", NULL, "www-cdn\\.jtvnw" TLD,                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+  { "twitch.tv", NULL, "twitch\\.tv$",                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
 
   { ".qq.com", NULL, "\\.qq" TLD,                                      "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".gtimg.com", NULL, "\\.gtimg" TLD,                                "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
