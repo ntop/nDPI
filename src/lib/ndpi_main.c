@@ -3518,6 +3518,9 @@ static int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struc
     }
     // the other extension headers have one byte for the next header type
     // and one byte for the extension header length in 8 byte steps minus the first 8 bytes
+    if (*l4len < 2) {
+      return(1);
+    }
     ehdr_len = (*l4ptr)[1];
     ehdr_len *= 8;
     ehdr_len += 8;
