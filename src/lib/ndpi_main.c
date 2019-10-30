@@ -3736,6 +3736,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 
 	if(flow->http.url)          ndpi_free(flow->http.url);
 	if(flow->http.content_type) ndpi_free(flow->http.content_type);
+	if(flow->http.user_agent)   ndpi_free(flow->http.user_agent);
 
 	backup  = flow->num_processed_pkts;
 	backup1 = flow->guessed_protocol_id;
@@ -5067,15 +5068,30 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str,
 	     || strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
         packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
         packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
+
+	while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
+	  packet->content_line.len--, packet->content_line.ptr++;
+	
         packet->http_num_headers++;
       }
       /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
-      if(packet->line[packet->parsed_lines].len > 13
-	 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0) {
+      if((packet->content_line.len == 0)
+	 && (packet->line[packet->parsed_lines].len > 13)
+	 && (strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {
         packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
         packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
         packet->http_num_headers++;
       }
+
+      if(packet->content_line.len > 0) {
+	/* application/json; charset=utf-8 */
+	char *c = strchr((char*)packet->content_line.ptr, ';');
+
+	if(c != NULL) {
+	  packet->content_line.len = c - (char*)packet->content_line.ptr;
+	}
+      }
+      
       /* "Accept:" header line in HTTP request. */
       if(packet->line[packet->parsed_lines].len > 8
 	 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Accept: ", 8) == 0) {
@@ -6249,8 +6265,9 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
-  if(flow->http.url)          ndpi_free(flow->http.url);
+  if(flow->http.url)            ndpi_free(flow->http.url);
     if(flow->http.content_type) ndpi_free(flow->http.content_type);
+    if(flow->http.user_agent)   ndpi_free(flow->http.user_agent);
 
     if(flow->l4_proto == IPPROTO_TCP) {
       if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
