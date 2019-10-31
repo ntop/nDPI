@@ -3411,12 +3411,16 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* WireGuard VPN */
   init_wireguard_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* AMAZON_VIDEO */
+  /* Amazon_Video */
   init_amazon_video_dissector(ndpi_str, &a, detection_bitmask);
 
   /* Targus Getdata */
   init_targus_getdata_dissector(ndpi_str, &a, detection_bitmask);
 
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_main_init.c"
+#endif
+  
   /* ----------------------------------------------------------------- */
 
   ndpi_str->callback_buffer_size = a;
