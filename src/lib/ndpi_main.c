@@ -5092,9 +5092,13 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str,
 
       if(packet->content_line.len > 0) {
 	/* application/json; charset=utf-8 */
-	char *c = strchr((char*)packet->content_line.ptr, ';');
+	char separator[] = { ';', '\r', '\0' };
+	int i;
 
-	if(c != NULL) {
+	for(i=0; separator[i] != '\0'; i++) {	
+	  char *c = strchr((char*)packet->content_line.ptr, separator[i]);
+	  
+	  if(c != NULL)
 	  packet->content_line.len = c - (char*)packet->content_line.ptr;
 	}
       }
