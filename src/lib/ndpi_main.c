@@ -5096,10 +5096,10 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str,
 	int i;
 
 	for(i=0; separator[i] != '\0'; i++) {	
-	  char *c = strchr((char*)packet->content_line.ptr, separator[i]);
+	  char *c = memchr((char*)packet->content_line.ptr, separator[i], packet->content_line.len);
 	  
 	  if(c != NULL)
-	  packet->content_line.len = c - (char*)packet->content_line.ptr;
+	    packet->content_line.len = c - (char*)packet->content_line.ptr;
 	}
       }
       
