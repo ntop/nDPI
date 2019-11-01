@@ -998,6 +998,23 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
+char* printUrlRisk(ndpi_url_risk risk) {
+  switch(risk) {
+    case ndpi_url_no_problem:
+      return("");
+      break;
+    case ndpi_url_possible_xss:
+      return(" ** XSS **");
+      break;
+    case ndpi_url_possible_sql_injection:
+      return(" ** SQL Injection **");
+      break;
+  }
+
+  return("");
+}
+/* ********************************** */
+
 /**
  * @brief Print the flow
  */
@@ -1143,8 +1160,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     }
 
     if(flow->http.url[0] != '\0')
-      fprintf(out, "[URL: %s][StatusCode: %u][ContentType: %s][UserAgent: %s]",
-	      flow->http.url, flow->http.response_status_code,
+      fprintf(out, "[URL: %s%s][StatusCode: %u][ContentType: %s][UserAgent: %s]",
+	      flow->http.url,
+	      printUrlRisk(ndpi_validate_url(flow->http.url)),
+	      flow->http.response_status_code,
 	      flow->http.content_type, flow->http.user_agent);
     
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));

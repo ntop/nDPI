@@ -42,6 +42,12 @@ typedef enum {
 	      ndpi_l4_proto_tcp_and_udp,
 } ndpi_l4_proto_info;
 
+typedef enum {
+   ndpi_url_no_problem = 0,
+   ndpi_url_possible_xss,
+   ndpi_url_possible_sql_injection
+  } ndpi_url_risk;
+
 /* NDPI_VISIT */
 typedef enum {
 	      ndpi_preorder,

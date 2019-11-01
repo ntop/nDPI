@@ -759,11 +759,11 @@ void ndpi_user_pwd_payload_copy(u_int8_t *dest, u_int dest_len,
 				u_int offset,
 				const u_int8_t *src, u_int src_len) {
   u_int i, j=0, k = dest_len-1;
-  
+
   for(i=offset; (i<src_len) && (j<=k); i++) {
     if((j == k) || (src[i] < ' '))
       break;
-    
+
     dest[j++] = src[i];
   }
 
@@ -857,7 +857,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   u_int32_t src_v4, u_int32_t dst_v4,
 		   struct ndpi_in6_addr *src_v6, struct ndpi_in6_addr *dst_v6,
 		   u_int16_t src_port, u_int16_t dst_port,
-		   ndpi_protocol l7_protocol,		   
+		   ndpi_protocol l7_protocol,
 		   ndpi_serializer *serializer) {
   char buf[64], src_name[32], dst_name[32];
 
@@ -976,7 +976,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "http");
     if(flow->host_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
-    ndpi_serialize_string_string(serializer,   "url", flow->http.url);    
+    ndpi_serialize_string_string(serializer,   "url", flow->http.url);
     ndpi_serialize_string_uint32(serializer,   "code", flow->http.response_status_code);
     ndpi_serialize_string_string(serializer,   "content_type", flow->http.content_type);
     ndpi_serialize_string_string(serializer,   "user_agent", flow->http.user_agent);
@@ -989,28 +989,28 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
-      
+
   case NDPI_PROTOCOL_MAIL_POP:
     ndpi_serialize_start_of_block(serializer, "pop");
     ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
     ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
-      
+
   case NDPI_PROTOCOL_MAIL_SMTP:
     ndpi_serialize_start_of_block(serializer, "smtp");
     ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
     ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
-      
+
   case NDPI_PROTOCOL_FTP_CONTROL:
     ndpi_serialize_start_of_block(serializer, "ftp");
     ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
     ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
-      
+
   case NDPI_PROTOCOL_SSH:
     ndpi_serialize_start_of_block(serializer, "ssh");
     ndpi_serialize_string_string(serializer,  "client_signature", flow->protos.ssh.client_signature);
@@ -1041,7 +1041,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_serialize_string_string(serializer, "issuer", flow->protos.stun_ssl.ssl.server_organization);
 
 	if(before) {
-          strftime(notBefore, sizeof(notBefore), "%F %T", before); 
+          strftime(notBefore, sizeof(notBefore), "%F %T", before);
           ndpi_serialize_string_string(serializer, "notbefore", notBefore);
         }
 
@@ -1061,7 +1061,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  ndpi_serialize_string_string(serializer, "fingerprint", buf);
 	}
-      
+
 	ndpi_serialize_end_of_block(serializer);
       }
     }
@@ -1072,3 +1072,146 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 /* ********************************** */
+
+/*
+  /dv/vulnerabilities/xss_r/?name=%3Cscript%3Econsole.log%28%27JUL2D3WXHEGWRAFJE2PI7OS71Z4Z8RFUHXGNFLUFYVP6M3OL55%27%29%3Bconsole.log%28document.cookie%29%3B%3C%2Fscript%3E
+  /dv/vulnerabilities/sqli/?id=1%27+and+1%3D1+union+select+null%2C+table_name+from+information_schema.tables%23&Submit=Submit
+*/
+
+/* https://www.rosettacode.org/wiki/URL_decoding#C */
+static int ishex(int x) {
+  return(x >= '0' && x <= '9') || (x >= 'a' && x <= 'f') || (x >= 'A' && x <= 'F');
+}
+
+/* ********************************** */
+
+static int ndpi_url_decode(const char *s, char *out) {
+  char *o;
+  const char *end = s + strlen(s);
+  int c;
+
+  for(o = out; s <= end; o++) {
+    c = *s++;
+    if(c == '+') c = ' ';
+    else if(c == '%' && (!ishex(*s++)||
+			  !ishex(*s++)||
+			  !sscanf(s - 2, "%2x", &c)))
+      return(-1);
+
+    if(out) *o = c;
+  }
+
+  return(o - out);
+}
+
+/* ********************************** */
+
+/* #define URL_CHECK_DEBUG 1 */
+
+static int find_occurrency(char *str, char *what) {
+  char *found = strstr(str, what);
+  u_int len;
+
+#ifdef URL_CHECK_DEBUG
+  printf("%s() [%s][%s]\n", __FUNCTION__, str, what);
+#endif
+
+  if(!found) return(0);
+
+  len = strlen(what);
+
+  if((found[len] != '\0') && (found[len] != ' ')
+     && ((found == str) || (found[-1] == ' ')))
+    return(1);
+  else
+    return(find_occurrency(&found[len], what));
+}
+
+/* ********************************** */
+
+static int ndpi_check_tokens(char* query, char* keywords[]) {
+#ifdef URL_CHECK_DEBUG
+  printf("%s() [%s]\n", __FUNCTION__, query);
+#endif
+  
+  for(int i=0; keywords[i] != NULL; i++) {
+    if(find_occurrency(query, keywords[i]) > 0)
+      return(1);
+  }
+
+  return(0);
+}
+
+/* ********************************** */
+
+static int ndpi_is_sql_injection(char* query) {
+  char* sql_keywords[]  = { "select", "from", "where", "any", "all", "join", "inner", "left", "right", "full",
+			    "table", "alter", "create", "delete", "union", "update", "drop", "group", "order",
+			    "limit", "primary", "column", NULL };
+  return(ndpi_check_tokens(query, sql_keywords));
+}
+
+/* ********************************** */
+
+static int ndpi_is_xss_injection(char* query) {
+  char* js_keywords[]  = { "<script>", "console.", "log.", NULL };
+  return(ndpi_check_tokens(query, js_keywords));
+}
+
+/* ********************************** */
+
+ndpi_url_risk ndpi_validate_url(char *url) {
+  char *orig_str = NULL, *str = NULL, *question_mark = strchr(url, '?');
+  ndpi_url_risk rc = ndpi_url_no_problem;
+
+  if(question_mark) {
+    char *tmp;
+
+    orig_str = str = ndpi_strdup(&question_mark[1]); /* Skip ? */
+
+    if(!str) goto validate_rc;
+
+    str = strtok_r(str, "&", &tmp);
+
+    while(str != NULL) {
+      char *value = strchr(str, '=');
+      char *decoded;
+
+      if(!value)
+	break;
+      else
+	value = &value[1];
+
+      if(value[0] != '\0') {
+	if(!(decoded = (char*)ndpi_malloc(strlen(value)+1)))
+	  break;
+
+	if(ndpi_url_decode(value, decoded) < 0) {
+	  /* Invalid string */
+	} else if(decoded[0] != '\0') {
+	  /* Valid string */
+
+	  if(ndpi_is_xss_injection(decoded))
+	    rc = ndpi_url_possible_xss;
+	  else if(ndpi_is_sql_injection(decoded))
+	    rc = ndpi_url_possible_sql_injection;
+
+#ifdef URL_CHECK_DEBUG
+	  printf("=>> [rc: %u] %s\n", rc, decoded);
+#endif
+	}
+
+	ndpi_free(decoded);
+
+	if(rc != ndpi_url_no_problem)
+	  break;
+      }
+      
+      str = strtok_r(NULL, "&", &tmp);
+    }
+  }
+
+ validate_rc:
+  if(orig_str) ndpi_free(orig_str);
+  return(rc);
+}
