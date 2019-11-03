@@ -1120,10 +1120,10 @@ static ndpi_network host_protocol_list[] = {
     Tor
     http://torstatus.blutmagie.de/ip_list_all.php/Tor_ip_list_ALL.csv
     From 09.09.2019
-    
+
     Use utils/toripaddr2list.py to convert them
   */
-  
+
   { 0x0122a339 /* 1.34.163.57/32 */, 32, NDPI_PROTOCOL_TOR },
   { 0x01EA0B8E /* 1.234.11.142/32 */, 32, NDPI_PROTOCOL_TOR },
   { 0x01F4E33D /* 1.244.227.61/32 */, 32, NDPI_PROTOCOL_TOR },
@@ -8220,7 +8220,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
 
   /* Line */
-  { 0x7DD1FC00 /* 125.209.252.0/24 */, 24, NDPI_PROTOCOL_LINE },	
+  { 0x7DD1FC00 /* 125.209.252.0/24 */, 24, NDPI_PROTOCOL_LINE },
 
   /* Zoom video conference app. */
   { 0x03501480 /* 3.80.20.128/25 */, 25, NDPI_PROTOCOL_ZOOM },
@@ -8629,7 +8629,7 @@ static ndpi_protocol_match host_match[] = {
 
   { ".bloombergvault.com", NULL, "\\.bloombergvault.\\com" TLD,                          "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
   { ".bloomberg.com", NULL, "\\.bloomberg.\\com" TLD,                                    "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
-  
+
   { ".push.apple.com", NULL, "\\.push\\.apple" TLD,                   "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
   { ".apple-dns.net", NULL, "\\.apple-dns" TLD,                       "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".mzstatic.com", NULL, "\\.mzstatic" TLD,                         "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
@@ -8708,8 +8708,10 @@ static ndpi_protocol_match host_match[] = {
 
     This traffic will bypass checks and blocks as it will include all the communications from/to
     the browser instead of using the standard communication mechanisms SSL/HTTP(S)/DNS
-  */
-  { ".googlezip.net", NULL, ".googlezip\\.net" TLD,                       "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },	 
+
+    https://github.com/curl/curl/wiki/DNS-over-HTTPS
+*/
+  { ".googlezip.net", NULL, ".googlezip\\.net" TLD,                       "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "datasaver.googleapis.com", NULL, "datasaver\\.googleapis\\.com" TLD, "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
   /* http://check.googlezip.net/connect [check browser connectivity] */
@@ -8841,7 +8843,7 @@ static ndpi_protocol_match host_match[] = {
   { "e4593.dspg.akamaiedge.net", NULL, "e4593\\.dspg\\.akamaiedge" TLD,"Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "e4593.g.akamaiedge.net", NULL, "e4593\\.g\\.akamaiedge" TLD,      "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "*.gateway.messenger.live.com", NULL, "\\*\\.gateway\\.messenger\\.live" TLD, "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
-  
+
   { ".tuenti.com", NULL, "\\.tuenti" TLD,                              "Tuenti",           NDPI_PROTOCOL_TUENTI, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".twttr.com", NULL, "\\.twttr" TLD,                                "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
@@ -9043,7 +9045,7 @@ static ndpi_protocol_match host_match[] = {
   { ".pps.tv", NULL, "\\.pps\\.tv$",                                   "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
   { ".hulu.com", NULL, "\\.hulu",                                       "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  
+
   /*
     VidTO streaming service
   */
@@ -9062,7 +9064,7 @@ static ndpi_protocol_match host_match[] = {
 };
 
 /* ******************************************************************** */
-   
+
 static ndpi_category_match category_match[] = {
    { ".edgecastcdn.net", "egdecastcdn" TLD,                       NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".hwcdn.net", "hwcdn" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
@@ -9196,5 +9198,3 @@ static const char *ndpi_en_impossible_bigrams[] = {
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zs", "zx", "wh", "wk",
   "wb", "zk", "kp", "zk", "xy",
   NULL };
-
-
