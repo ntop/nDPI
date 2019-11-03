@@ -602,7 +602,7 @@ void printCSVHeader() {
   /* Flow info */
   fprintf(csv_fp, "client_info,server_info,");
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
-  fprintf(csv_fp, "tls_server_info,ja3s,tls_server_unsafe,");
+  fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh");
   fprintf(csv_fp, "\n");
 }
