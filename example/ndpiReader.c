@@ -1028,7 +1028,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
-    float f = (float)flow->first_seen, l = (float)flow->last_seen;
+    double f = (double)flow->first_seen, l = (double)flow->last_seen;
     
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
 
