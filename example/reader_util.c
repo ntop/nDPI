@@ -457,6 +457,14 @@ void ndpi_flow_info_freer(void *node) {
 
   ndpi_free_flow_info_half(flow);
 
+  ndpi_free_flow_data_analysis(flow);
+
+  ndpi_free(flow);
+}
+
+/* ***************************************************** */
+
+void ndpi_free_flow_data_analysis(struct ndpi_flow_info *flow) {
   if(flow->iat_c_to_s) ndpi_free_data_analysis(flow->iat_c_to_s);
   if(flow->iat_s_to_c) ndpi_free_data_analysis(flow->iat_s_to_c);
 
@@ -464,8 +472,6 @@ void ndpi_flow_info_freer(void *node) {
   if(flow->pktlen_s_to_c) ndpi_free_data_analysis(flow->pktlen_s_to_c);
 
   if(flow->iat_flow) ndpi_free_data_analysis(flow->iat_flow);
-
-  ndpi_free(flow);
 }
 
 /* ***************************************************** */
