@@ -602,7 +602,7 @@ void printCSVHeader() {
   /* Flow info */
   fprintf(csv_fp, "client_info,server_info,");
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
-  fprintf(csv_fp, "tls_server_info,ja3s,tls_server_unsafe,");
+  fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh");
   fprintf(csv_fp, "\n");
 }
@@ -1028,7 +1028,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
-    float f = (float)flow->first_seen, l = (float)flow->last_seen;
+    double f = (double)flow->first_seen, l = (double)flow->last_seen;
     
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
 
@@ -1805,6 +1805,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
         undetected_flows_deleted = 1;
 
       ndpi_free_flow_info_half(flow);
+      ndpi_free_flow_data_analysis(flow);
       ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */

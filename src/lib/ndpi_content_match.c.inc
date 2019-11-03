@@ -979,6 +979,8 @@ static ndpi_network host_protocol_list[] = {
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
   { 0x17600000 /* 23.96.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
   { 0x34724A05 /* 52.114.74.5 */, 32, NDPI_PROTOCOL_SKYPE },
+  { 0x14B40000 /* 20.180.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
+  { 0x14B80000 /* 20.184.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
 
   /*
     Blizzard Entertainment, Inc
@@ -8897,6 +8899,7 @@ static ndpi_protocol_match host_match[] = {
   { "ttvnw.net", NULL, "ttvnw" TLD,                                    "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "static-cdn.jtvnw.net", NULL, "static-cdn\\.jtvnw" TLD,            "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "www-cdn.jtvnw.net", NULL, "www-cdn\\.jtvnw" TLD,                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+  { "twitch.tv", NULL, "twitch\\.tv$",                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
 
   { ".qq.com", NULL, "\\.qq" TLD,                                      "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".gtimg.com", NULL, "\\.gtimg" TLD,                                "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
@@ -9040,6 +9043,7 @@ static ndpi_protocol_match host_match[] = {
   { "tupdate.com", NULL, "tupdate" TLD,                                "Telegram",         NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".pastebin.com", NULL, "\\.pastebin" TLD,                          "Pastebin",         NDPI_PROTOCOL_PASTEBIN, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
+  { "pastebin.com", NULL, "^pastebin" TLD,                             "Pastebin",         NDPI_PROTOCOL_PASTEBIN, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
 
   { ".ppstream.com", NULL, "\\.ppstream" TLD,                          "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".pps.tv", NULL, "\\.pps\\.tv$",                                   "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
@@ -9059,6 +9063,9 @@ static ndpi_protocol_match host_match[] = {
   { "whispersystems.org", NULL, "whispersystems\\.org" TLD,            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "musical.ly", NULL, "musical\\.ly" TLD,                            "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "muscdn.com", NULL, "muscndl\\.com" TLD,                           "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+
+  { "brasilbandalarga.com.br", NULL, "brasilbandalarga\\.com" TLD,     "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".eaqbr.com.br", NULL, "\\.eaqbr\\.com" TLD,                       "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
 
   { NULL, NULL, NULL, 0 }
 };
