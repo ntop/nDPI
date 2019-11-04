@@ -89,7 +89,7 @@ static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
 static u_int8_t file_first_time = 1;
 #endif
 u_int8_t human_readeable_string_len = 5;
-u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 32 /* due to telnet */;
+u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
