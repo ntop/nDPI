@@ -50,7 +50,7 @@
 #include "third_party/include/ht_hash.h"
 
 /* stun.c */
-extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow);
+extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 static int _ndpi_debug_callbacks = 0;
 
@@ -1234,7 +1234,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "RDP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			    ndpi_build_default_ports(ports_a, 3389, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			    ndpi_build_default_ports(ports_b, 3389, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VNC,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "VNC", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
@@ -1758,30 +1758,44 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "104", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 2404, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BLOOMBERG,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "Bloomberg", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);    
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CAPWAP,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "CAPWAP", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 5246, 5247, 0, 0, 0) /* UDP */
+			    );
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZABBIX,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "Zabbix", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 10050, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */
+			    );
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_S7COMM,
 			    1 /* no subprotocol */, no_master,
 			    no_master, "S7Comm", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 102, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
 
-
-    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BLOOMBERG,
-			    1 /* no subprotocol */, no_master,
-			    no_master, "Bloomberg", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
-    
-    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CAPWAP,
-			    1 /* no subprotocol */, no_master,
-			    no_master, "CAPWAP", NDPI_PROTOCOL_CATEGORY_NETWORK,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_main.c"
+#endif
 
     /* calling function for host and content matched protocols */
     init_string_based_protocols(ndpi_str);
 
     ndpi_validate_protocol_initialization(ndpi_str);
 }
+
+/* ****************************************************** */
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_protocols.c"
+#endif
 
 /* ****************************************************** */
 
@@ -3247,9 +3261,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* TEAMSPEAK */
   init_teamspeak_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* VIBER */
-  init_viber_dissector(ndpi_str, &a, detection_bitmask);
-
   /* TOR */
   init_tor_dissector(ndpi_str, &a, detection_bitmask);
 
@@ -3361,7 +3372,16 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* MODBUS */
   init_modbus_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* CAPWAP */
+  init_capwap_dissector(ndpi_str, &a, detection_bitmask);
+
+  /* ZABBIX */
+  init_zabbix_dissector(ndpi_str, &a, detection_bitmask);
+
   /*** Put false-positive sensitive protocols at the end ***/
+
+  /* VIBER */
+  init_viber_dissector(ndpi_str, &a, detection_bitmask);
 
   /* SKYPE */
   init_skype_dissector(ndpi_str, &a, detection_bitmask);
@@ -3396,12 +3416,16 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* WireGuard VPN */
   init_wireguard_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* AMAZON_VIDEO */
+  /* Amazon_Video */
   init_amazon_video_dissector(ndpi_str, &a, detection_bitmask);
 
   /* Targus Getdata */
   init_targus_getdata_dissector(ndpi_str, &a, detection_bitmask);
 
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_main_init.c"
+#endif
+  
   /* ----------------------------------------------------------------- */
 
   ndpi_str->callback_buffer_size = a;
@@ -3503,6 +3527,9 @@ static int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struc
     }
     // the other extension headers have one byte for the next header type
     // and one byte for the extension header length in 8 byte steps minus the first 8 bytes
+    if (*l4len < 2) {
+      return(1);
+    }
     ehdr_len = (*l4ptr)[1];
     ehdr_len *= 8;
     ehdr_len += 8;
@@ -3721,6 +3748,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 
 	if(flow->http.url)          ndpi_free(flow->http.url);
 	if(flow->http.content_type) ndpi_free(flow->http.content_type);
+	if(flow->http.user_agent)   ndpi_free(flow->http.user_agent);
 
 	backup  = flow->num_processed_pkts;
 	backup1 = flow->guessed_protocol_id;
@@ -4185,29 +4213,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       ret.app_protocol = NDPI_PROTOCOL_HANGOUT_DUO;
     }
   }
-
-  if(enable_guess
-     && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-     && flow->packet.iph /* Guess only IPv4 */
-     && (flow->packet.tcp || flow->packet.udp)
-     ) {
-    ndpi_protocol ret1 = ndpi_guess_undetected_protocol(ndpi_str,
-							flow,
-							flow->packet.l4_protocol,
-							ntohl(flow->packet.iph->saddr),
-							ntohs(flow->packet.udp ? flow->packet.udp->source : flow->packet.tcp->source),
-							ntohl(flow->packet.iph->daddr),
-							ntohs(flow->packet.udp ? flow->packet.udp->dest : flow->packet.tcp->dest)
-							);
-
-    if(ret1.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
-      if(ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) ret.master_protocol = ret1.master_protocol;
-      if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)    ret.app_protocol    = ret1.app_protocol;
-      if(ret.category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) ret.category  = ret1.category;
-
-      *protocol_was_guessed = 1;
-    }
-  }
   
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN)
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);  
@@ -4606,6 +4611,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     if(flow->check_extra_packets) {
       ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
+      /* Update in case of new match */
+      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       return(ret);
     } else
       goto ret_protocols;
@@ -4692,7 +4699,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     } else
       flow->guessed_header_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
 
-    if(flow->guessed_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
+    if(flow->guessed_protocol_id > NDPI_MAX_SUPPORTED_PROTOCOLS) {
       /* This is a custom protocol and it has priority over everything else */
       ret.master_protocol = NDPI_PROTOCOL_UNKNOWN,
 	ret.app_protocol = flow->guessed_protocol_id ? flow->guessed_protocol_id : flow->guessed_host_protocol_id;
@@ -4728,7 +4735,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     }
   }
 
-  if(flow->guessed_host_protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS-1)) {
+  if(flow->guessed_host_protocol_id > NDPI_MAX_SUPPORTED_PROTOCOLS) {
     /* This is a custom protocol and it has priority over everything else */
     ret.master_protocol = NDPI_PROTOCOL_UNKNOWN, ret.app_protocol = flow->guessed_host_protocol_id;
 
@@ -5073,15 +5080,34 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str,
 	     || strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type: ", 14) == 0)) {
         packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
         packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
+
+	while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
+	  packet->content_line.len--, packet->content_line.ptr++;
+	
         packet->http_num_headers++;
       }
       /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
-      if(packet->line[packet->parsed_lines].len > 13
-	 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0) {
+      if((packet->content_line.len == 0)
+	 && (packet->line[packet->parsed_lines].len > 13)
+	 && (strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {
         packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
         packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
         packet->http_num_headers++;
       }
+
+      if(packet->content_line.len > 0) {
+	/* application/json; charset=utf-8 */
+	char separator[] = { ';', '\r', '\0' };
+	int i;
+
+	for(i=0; separator[i] != '\0'; i++) {	
+	  char *c = memchr((char*)packet->content_line.ptr, separator[i], packet->content_line.len);
+	  
+	  if(c != NULL)
+	    packet->content_line.len = c - (char*)packet->content_line.ptr;
+	}
+      }
+      
       /* "Accept:" header line in HTTP request. */
       if(packet->line[packet->parsed_lines].len > 8
 	 && strncasecmp((const char *)packet->line[packet->parsed_lines].ptr, "Accept: ", 8) == 0) {
@@ -5919,9 +5945,11 @@ char* ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_str,
     return("Unsafe");
     break;
   case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
+    return("Potentially Dangerous");
+    break;
+  case NDPI_PROTOCOL_DANGEROUS:
     return("Dangerous");
     break;
-
   case NDPI_PROTOCOL_UNRATED:
   default:
     return("Unrated");
@@ -6081,6 +6109,25 @@ static int hyperscanEventHandler(unsigned int id, unsigned long long from,
 
 #endif
 
+/* **************************************** */
+
+static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_t new_proto) {
+  /* Sometimes certificates are more generic than previously identified protocols */
+
+  if((previous_proto == NDPI_PROTOCOL_UNKNOWN)
+     || (previous_proto == new_proto))
+    return(0);
+  
+  switch(previous_proto) {
+  case NDPI_PROTOCOL_WHATSAPP_CALL:
+  case NDPI_PROTOCOL_WHATSAPP_FILES:
+    if(new_proto == NDPI_PROTOCOL_WHATSAPP)
+      return(1);
+  }
+
+  return(0);
+}
+
 /* ****************************************************** */
 
 static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
@@ -6137,7 +6184,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   }
 #endif
 
-  if(matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+  if((matching_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+     && (!ndpi_is_more_generic_protocol(packet->detected_protocol_stack[0], matching_protocol_id))) {
     /* Move the protocol on slot 0 down one position */
     packet->detected_protocol_stack[1] = master_protocol_id,
       packet->detected_protocol_stack[0] = matching_protocol_id;
@@ -6235,8 +6283,9 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
-  if(flow->http.url)          ndpi_free(flow->http.url);
+  if(flow->http.url)            ndpi_free(flow->http.url);
     if(flow->http.content_type) ndpi_free(flow->http.content_type);
+    if(flow->http.user_agent)   ndpi_free(flow->http.user_agent);
 
     if(flow->l4_proto == IPPROTO_TCP) {
       if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
@@ -6447,6 +6496,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
        || (flow->protos.ssh.hassh_server[0] == '\0'))
       return(1);
     break;
+
+  case NDPI_PROTOCOL_TELNET:
+    if(!flow->protos.telnet.username_detected)
+      return(1);
+    break;
   }
 
   return(0);
@@ -6479,8 +6533,7 @@ const char* ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
 /* ******************************************************************** */
 
 ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct,
-					  u_int16_t ndpi_proto_id) {
-  
+					  u_int16_t ndpi_proto_id) {  
   if(ndpi_proto_id < ndpi_struct->ndpi_num_supported_protocols) {
     u_int16_t idx = ndpi_struct->proto_defaults[ndpi_proto_id].protoIdx;
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE bm = ndpi_struct->callback_buffer[idx].ndpi_selection_bitmask;

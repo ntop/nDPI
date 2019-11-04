@@ -42,6 +42,12 @@ typedef enum {
 	      ndpi_l4_proto_tcp_and_udp,
 } ndpi_l4_proto_info;
 
+typedef enum {
+   ndpi_url_no_problem = 0,
+   ndpi_url_possible_xss,
+   ndpi_url_possible_sql_injection
+  } ndpi_url_risk;
+
 /* NDPI_VISIT */
 typedef enum {
 	      ndpi_preorder,
@@ -1168,7 +1174,7 @@ struct ndpi_flow_struct {
   */
   struct {
     ndpi_http_method method;
-    char *url, *content_type;
+    char *url, *content_type, *user_agent;
     u_int8_t num_request_headers, num_response_headers;
     u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     u_int16_t response_status_code; /* 200, 404, etc. */
@@ -1216,6 +1222,12 @@ struct ndpi_flow_struct {
     struct {
       u_int8_t last_one_byte_pkt, last_byte;
     } imo;
+    
+    struct {
+      u_int8_t username_detected:1, username_found:1, skip_next:1, _pad:5;
+      u_int8_t character_id;
+      char username[32];
+    } telnet;
     
     struct {
       char answer[96];

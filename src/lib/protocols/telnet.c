@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -29,14 +29,70 @@
 
 #include "ndpi_api.h"
 
+/* #define TELNET_DEBUG 1 */
+
+/* ************************************************************************ */
+
+static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
+			       struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &flow->packet;
+
+#ifdef TELNET_DEBUG
+  printf("==> %s() [%s]\n", __FUNCTION__, packet->payload);
+#endif
+  
+  if(packet->payload[0] == 0xFF)
+    return(1);
+
+  if(packet->payload_packet_len > 0) {
+    int i;
+
+    if((!flow->protos.telnet.username_found)
+       && (packet->payload_packet_len > 6)) {
+
+      if(strncasecmp((char*)packet->payload, "login:", 6) == 0) {
+	flow->protos.telnet.username_found = 1;
+      }
+
+      return(1);
+    }
+
+    if(packet->payload[0] == '\r') {
+      flow->protos.telnet.username_detected = 1;
+      flow->protos.telnet.username[flow->protos.telnet.character_id] = '\0';
+      return(0);
+    }
+
+    for(i=0; i<packet->payload_packet_len; i++) {
+      if(!flow->protos.telnet.skip_next) {
+	if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.username)-1))
+	  flow->protos.telnet.username[flow->protos.telnet.character_id++] = packet->payload[i];
+	flow->protos.telnet.skip_next = 1;
+      } else
+	flow->protos.telnet.skip_next = 0;
+    }
+  }
+
+  /* Possibly more processing */
+  return(1);
+}
+
+/* ************************************************************************ */
 
 static void ndpi_int_telnet_add_connection(struct ndpi_detection_module_struct
-					   *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+					   *ndpi_struct, struct ndpi_flow_struct *flow) {
+  flow->guessed_host_protocol_id = flow->guessed_protocol_id = NDPI_PROTOCOL_TELNET;
+
+  /* This is necessary to inform the core to call this dissector again */
+  flow->check_extra_packets = 1;
+  flow->max_extra_packets_to_check = 64;
+  flow->extra_packets_func = search_telnet_again;
+
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELNET, NDPI_PROTOCOL_UNKNOWN);
 }
 
-	
+/* ************************************************************************ */
+
 #if !defined(WIN32)
 static inline
 #elif defined(MINGW_GCC)
@@ -44,62 +100,73 @@ __mingw_forceinline static
 #else
 __forceinline static
 #endif
-u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct,
+		    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
   u_int16_t a;
 
-  if (packet->payload_packet_len < 3) {
-    return 0;
-  }
+#ifdef TELNET_DEBUG
+  printf("==> %s()\n", __FUNCTION__);
+#endif
 
-  if (!(packet->payload[0] == 0xff
-	&& packet->payload[1] > 0xf9 && packet->payload[1] != 0xff && packet->payload[2] < 0x28)) {
-    return 0;
-  }
+  if(packet->payload_packet_len < 3)
+    return(0);
+
+  if(!((packet->payload[0] == 0xff)
+       && (packet->payload[1] > 0xf9)
+       && (packet->payload[1] != 0xff)
+       && (packet->payload[2] < 0x28)))
+    return(0);
 
   a = 3;
 
   while (a < packet->payload_packet_len - 2) {
     // commands start with a 0xff byte followed by a command byte >= 0xf0 and < 0xff
     // command bytes 0xfb to 0xfe are followed by an option byte <= 0x28
-    if (!(packet->payload[a] != 0xff ||
+    if(!(packet->payload[a] != 0xff ||
 	  (packet->payload[a] == 0xff && (packet->payload[a + 1] >= 0xf0) && (packet->payload[a + 1] <= 0xfa)) ||
 	  (packet->payload[a] == 0xff && (packet->payload[a + 1] >= 0xfb) && (packet->payload[a + 1] != 0xff)
-	   && (packet->payload[a + 2] <= 0x28)))) {
-      return 0;
-    }
+	   && (packet->payload[a + 2] <= 0x28))))
+      return(0);
+
     a++;
   }
 
   return 1;
 }
 
-/* this detection also works asymmetrically */
-void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct
-			    *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+/* ************************************************************************ */
 
+/* this detection also works asymmetrically */
+void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+			    struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search telnet\n");
 
-  if (search_iac(ndpi_struct, flow) == 1) {
-
-    if (flow->l4.tcp.telnet_stage == 2) {
+  if(search_iac(ndpi_struct, flow) == 1) {
+    if(flow->l4.tcp.telnet_stage == 2) {
       NDPI_LOG_INFO(ndpi_struct, "found telnet\n");
       ndpi_int_telnet_add_connection(ndpi_struct, flow);
       return;
     }
+
     flow->l4.tcp.telnet_stage++;
     NDPI_LOG_DBG2(ndpi_struct, "telnet stage %u\n", flow->l4.tcp.telnet_stage);
     return;
   }
 
-  if ((flow->packet_counter < 12 && flow->l4.tcp.telnet_stage > 0) || flow->packet_counter < 6) {
+  if(((flow->packet_counter < 12) && (flow->l4.tcp.telnet_stage > 0)) || (flow->packet_counter < 6)) {
+#ifdef TELNET_DEBUG
+    printf("==> [%s:%u] %s()\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return;
   } else {
+#ifdef TELNET_DEBUG
+    printf("==> [%s:%u] %s()\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
+  
   return;
 }
 
@@ -112,6 +179,5 @@ void init_telnet_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
   *id += 1;
 }

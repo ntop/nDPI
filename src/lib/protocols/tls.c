@@ -67,7 +67,7 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
 						 struct ndpi_flow_struct *flow, u_int32_t protocol) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  protocol = NDPI_PROTOCOL_TLS;
+  // protocol = NDPI_PROTOCOL_TLS;
 
   if(packet->tcp != NULL) {
     switch(protocol) {
@@ -424,9 +424,25 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	      if(num_dots >= 1) {
 		if(!ndpi_struct->disable_metadata_export) {
+		  ndpi_protocol_match_result ret_match;
+		  u_int16_t subproto;
+		  
 		  stripCertificateTrailer(buffer, buffer_len);
 		  snprintf(flow->protos.stun_ssl.ssl.server_certificate,
 			   sizeof(flow->protos.stun_ssl.ssl.server_certificate), "%s", buffer);
+		  
+#ifdef DEBUG_TLS
+		  printf("[server_certificate: %s]\n", flow->protos.stun_ssl.ssl.server_certificate);
+#endif
+		  
+		  subproto = ndpi_match_host_subprotocol(ndpi_struct, flow,
+							 flow->protos.stun_ssl.ssl.server_certificate,
+							 strlen(flow->protos.stun_ssl.ssl.server_certificate),
+							 &ret_match,
+							 NDPI_PROTOCOL_TLS);
+
+		  if(subproto != NDPI_PROTOCOL_UNKNOWN)
+		    ndpi_set_detected_protocol(ndpi_struct, flow, subproto, NDPI_PROTOCOL_TLS);
 		}
 
 		return(1 /* Server Certificate */);
@@ -1111,11 +1127,16 @@ int tlsDetectProtocolFromCertificate(struct ndpi_detection_module_struct *ndpi_s
 	NDPI_LOG_DBG2(ndpi_struct, "***** [SSL] %s\n", certificate);
 #endif
 	ndpi_protocol_match_result ret_match;
-	u_int16_t subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate,
-							 strlen(certificate),
-							 &ret_match,
-							 NDPI_PROTOCOL_TLS);
+	u_int16_t subproto;
 
+	if(certificate[0] == '\0')
+	  subproto = NDPI_PROTOCOL_UNKNOWN;
+	else
+	  subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, certificate,
+						 strlen(certificate),
+						 &ret_match,
+						 NDPI_PROTOCOL_TLS);
+	
 	if(subproto != NDPI_PROTOCOL_UNKNOWN) {
 	  /* If we've detected the subprotocol from client certificate but haven't had a chance
 	   * to see the server certificate yet, set up extra packet processing to wait
