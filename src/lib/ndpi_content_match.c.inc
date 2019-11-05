@@ -979,6 +979,8 @@ static ndpi_network host_protocol_list[] = {
   { 0x4237DF00 /* 65.55.223.0 */, 26, NDPI_PROTOCOL_SKYPE },
   { 0x17600000 /* 23.96.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
   { 0x34724A05 /* 52.114.74.5 */, 32, NDPI_PROTOCOL_SKYPE },
+  { 0x14B40000 /* 20.180.0.0 */, 14, NDPI_PROTOCOL_SKYPE },
+  { 0x14B80000 /* 20.184.0.0 */, 13, NDPI_PROTOCOL_SKYPE },
 
   /*
     Blizzard Entertainment, Inc
@@ -1120,10 +1122,10 @@ static ndpi_network host_protocol_list[] = {
     Tor
     http://torstatus.blutmagie.de/ip_list_all.php/Tor_ip_list_ALL.csv
     From 09.09.2019
-    
+
     Use utils/toripaddr2list.py to convert them
   */
-  
+
   { 0x0122a339 /* 1.34.163.57/32 */, 32, NDPI_PROTOCOL_TOR },
   { 0x01EA0B8E /* 1.234.11.142/32 */, 32, NDPI_PROTOCOL_TOR },
   { 0x01F4E33D /* 1.244.227.61/32 */, 32, NDPI_PROTOCOL_TOR },
@@ -8220,7 +8222,7 @@ static ndpi_network host_protocol_list[] = {
   { 0xD04EA400 /* 208.78.164.0/22 */, 22, NDPI_PROTOCOL_STEAM },
 
   /* Line */
-  { 0x7DD1FC00 /* 125.209.252.0/24 */, 24, NDPI_PROTOCOL_LINE },	
+  { 0x7DD1FC00 /* 125.209.252.0/24 */, 24, NDPI_PROTOCOL_LINE },
 
   /* Zoom video conference app. */
   { 0x03501480 /* 3.80.20.128/25 */, 25, NDPI_PROTOCOL_ZOOM },
@@ -8629,7 +8631,7 @@ static ndpi_protocol_match host_match[] = {
 
   { ".bloombergvault.com", NULL, "\\.bloombergvault.\\com" TLD,                          "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
   { ".bloomberg.com", NULL, "\\.bloomberg.\\com" TLD,                                    "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
-  
+
   { ".push.apple.com", NULL, "\\.push\\.apple" TLD,                   "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
   { ".apple-dns.net", NULL, "\\.apple-dns" TLD,                       "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".mzstatic.com", NULL, "\\.mzstatic" TLD,                         "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
@@ -8708,8 +8710,10 @@ static ndpi_protocol_match host_match[] = {
 
     This traffic will bypass checks and blocks as it will include all the communications from/to
     the browser instead of using the standard communication mechanisms SSL/HTTP(S)/DNS
-  */
-  { ".googlezip.net", NULL, ".googlezip\\.net" TLD,                       "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },	 
+
+    https://github.com/curl/curl/wiki/DNS-over-HTTPS
+*/
+  { ".googlezip.net", NULL, ".googlezip\\.net" TLD,                       "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "datasaver.googleapis.com", NULL, "datasaver\\.googleapis\\.com" TLD, "DataSaver",     NDPI_PROTOCOL_DATASAVER, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
   /* http://check.googlezip.net/connect [check browser connectivity] */
@@ -8718,6 +8722,50 @@ static ndpi_protocol_match host_match[] = {
   { "dns.google", NULL, "dns\\.google" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   // { "mozilla.cloudflare-dns.com", NULL, "mozilla\\.cloudflare-dns\\.com" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE }, /* Firefox */
   { "cloudflare-dns.com", NULL, "cloudflare-dns\\.com" TLD, "DNSoverHTTPS",     NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "commons.host", NULL, "commons\\.host" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.li", NULL, "doh\\.li" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns9.quad9.net", NULL, "dns9\\.quad9\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.opendns.com", NULL, "doh\\.opendns\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.dns.sb", NULL, "doh\\.dns\\.sb" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.netweaver.uk", NULL, "doh\\.netweaver\\.uk" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.dns-over-https.com", NULL, "dns\\.dns-over-https\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "jp.tiarap.org", NULL, "jp\\.tiarap\\.org" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.dnsoverhttps.net", NULL, "dns\\.dnsoverhttps\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.powerdns.org", NULL, "doh\\.powerdns\\.org" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "adblock.mydns.network", NULL, "adblock\\.mydns\\.network" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "jp.tiar.app", NULL, "jp\\.tiar\\.app" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.crypto.sx", NULL, "doh\\.crypto\\.sx" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.quad9.net", NULL, "dns\\.quad9\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.containerpi.com", NULL, "dns\\.containerpi\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "ibksturm.synology.me", NULL, "ibksturm\\.synology\\.me" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.captnemo.in", NULL, "doh\\.captnemo\\.in" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.rubyfish.cn", NULL, "dns\\.rubyfish\\.cn" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.42l.fr", NULL, "doh\\.42l\\.fr" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns-family.adguard.com", NULL, "dns-family\\.adguard\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "appliedprivacy.net", NULL, "appliedprivacy\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.cleanbrowsing.org", NULL, "doh\\.cleanbrowsing\\.org" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns10.quad9.net", NULL, "dns10\\.quad9\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh-ch.blahdns.com", NULL, "doh-ch\\.blahdns\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.seby.io", NULL, "doh\\.seby\\.io" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.adguard.com", NULL, "dns\\.adguard\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "ibuki.cgnat.net", NULL, "ibuki\\.cgnat\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "jcdns.fun", NULL, "jcdns\\.fun" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh-2.seby.io", NULL, "doh-2\\.seby\\.io" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.tiar.app", NULL, "doh\\.tiar\\.app" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.dnswarden.com", NULL, "doh\\.dnswarden\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh-de.blahdns.com", NULL, "doh-de\\.blahdns\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh-jp.blahdns.com", NULL, "doh-jp\\.blahdns\\.com" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.appliedprivacy.net", NULL, "doh\\.appliedprivacy\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.tiarap.org", NULL, "doh\\.tiarap\\.org" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.armadillodns.net", NULL, "doh\\.armadillodns\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns-nyc.aaflalo.me", NULL, "dns-nyc\\.aaflalo\\.me" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.aa.net.uk", NULL, "dns\\.aa\\.net\\.uk" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.aaflalo.me", NULL, "dns\\.aaflalo\\.me" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns11.quad9.net", NULL, "dns11\\.quad9\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "dns.nextdns.io", NULL, "dns\\.nextdns\\.io" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "doh.securedns.eu", NULL, "doh\\.securedns\\.eu" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "rdns.faelix.net", NULL, "rdns\\.faelix\\.net" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { "captnemo.in", NULL, "captnemo\\.in" TLD, "DNSoverHTTPS", NDPI_PROTOCOL_DNS_OVER_HTTPS, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
 
 
   /*
@@ -8797,7 +8845,7 @@ static ndpi_protocol_match host_match[] = {
   { "e4593.dspg.akamaiedge.net", NULL, "e4593\\.dspg\\.akamaiedge" TLD,"Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "e4593.g.akamaiedge.net", NULL, "e4593\\.g\\.akamaiedge" TLD,      "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { "*.gateway.messenger.live.com", NULL, "\\*\\.gateway\\.messenger\\.live" TLD, "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
-  
+
   { ".tuenti.com", NULL, "\\.tuenti" TLD,                              "Tuenti",           NDPI_PROTOCOL_TUENTI, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".twttr.com", NULL, "\\.twttr" TLD,                                "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
@@ -8851,6 +8899,7 @@ static ndpi_protocol_match host_match[] = {
   { "ttvnw.net", NULL, "ttvnw" TLD,                                    "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "static-cdn.jtvnw.net", NULL, "static-cdn\\.jtvnw" TLD,            "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "www-cdn.jtvnw.net", NULL, "www-cdn\\.jtvnw" TLD,                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+  { "twitch.tv", NULL, "twitch\\.tv$",                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
 
   { ".qq.com", NULL, "\\.qq" TLD,                                      "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
   { ".gtimg.com", NULL, "\\.gtimg" TLD,                                "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
@@ -8994,12 +9043,13 @@ static ndpi_protocol_match host_match[] = {
   { "tupdate.com", NULL, "tupdate" TLD,                                "Telegram",         NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".pastebin.com", NULL, "\\.pastebin" TLD,                          "Pastebin",         NDPI_PROTOCOL_PASTEBIN, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
+  { "pastebin.com", NULL, "^pastebin" TLD,                             "Pastebin",         NDPI_PROTOCOL_PASTEBIN, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS },
 
   { ".ppstream.com", NULL, "\\.ppstream" TLD,                          "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
   { ".pps.tv", NULL, "\\.pps\\.tv$",                                   "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
   { ".hulu.com", NULL, "\\.hulu",                                       "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  
+
   /*
     VidTO streaming service
   */
@@ -9014,11 +9064,14 @@ static ndpi_protocol_match host_match[] = {
   { "musical.ly", NULL, "musical\\.ly" TLD,                            "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "muscdn.com", NULL, "muscndl\\.com" TLD,                           "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
+  { "brasilbandalarga.com.br", NULL, "brasilbandalarga\\.com" TLD,     "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+  { ".eaqbr.com.br", NULL, "\\.eaqbr\\.com" TLD,                       "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
+
   { NULL, NULL, NULL, 0 }
 };
 
 /* ******************************************************************** */
-   
+
 static ndpi_category_match category_match[] = {
    { ".edgecastcdn.net", "egdecastcdn" TLD,                       NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".hwcdn.net", "hwcdn" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
@@ -9152,5 +9205,3 @@ static const char *ndpi_en_impossible_bigrams[] = {
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zs", "zx", "wh", "wk",
   "wb", "zk", "kp", "zk", "xy",
   NULL };
-
-

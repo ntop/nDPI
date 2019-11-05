@@ -29,14 +29,18 @@
 
 #include "ndpi_api.h"
 
+/* #define TELNET_DEBUG 1 */
+
 /* ************************************************************************ */
 
 static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  // printf("==> %s()\n", __FUNCTION__);
-
+#ifdef TELNET_DEBUG
+  printf("==> %s() [%s]\n", __FUNCTION__, packet->payload);
+#endif
+  
   if(packet->payload[0] == 0xFF)
     return(1);
 
@@ -81,7 +85,7 @@ static void ndpi_int_telnet_add_connection(struct ndpi_detection_module_struct
 
   /* This is necessary to inform the core to call this dissector again */
   flow->check_extra_packets = 1;
-  flow->max_extra_packets_to_check = 32;
+  flow->max_extra_packets_to_check = 64;
   flow->extra_packets_func = search_telnet_again;
 
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELNET, NDPI_PROTOCOL_UNKNOWN);
@@ -101,6 +105,10 @@ u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
 
   u_int16_t a;
+
+#ifdef TELNET_DEBUG
+  printf("==> %s()\n", __FUNCTION__);
+#endif
 
   if(packet->payload_packet_len < 3)
     return(0);
@@ -147,11 +155,18 @@ void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if(((flow->packet_counter < 12) && (flow->l4.tcp.telnet_stage > 0)) || (flow->packet_counter < 6))
+  if(((flow->packet_counter < 12) && (flow->l4.tcp.telnet_stage > 0)) || (flow->packet_counter < 6)) {
+#ifdef TELNET_DEBUG
+    printf("==> [%s:%u] %s()\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return;
-  else
+  } else {
+#ifdef TELNET_DEBUG
+    printf("==> [%s:%u] %s()\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-
+  }
+  
   return;
 }
 

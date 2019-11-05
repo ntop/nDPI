@@ -941,6 +941,8 @@ extern "C" {
   const char* ndpi_data_ratio2str(float ratio);
   
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */
+
+  ndpi_url_risk ndpi_validate_url(char *url);
 #ifdef __cplusplus
 }
 #endif

@@ -89,7 +89,7 @@ static u_int8_t stats_flag = 0, bpf_filter_flag = 0;
 static u_int8_t file_first_time = 1;
 #endif
 u_int8_t human_readeable_string_len = 5;
-u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 32 /* due to telnet */;
+u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
@@ -602,7 +602,7 @@ void printCSVHeader() {
   /* Flow info */
   fprintf(csv_fp, "client_info,server_info,");
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
-  fprintf(csv_fp, "tls_server_info,ja3s,tls_server_unsafe,");
+  fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh");
   fprintf(csv_fp, "\n");
 }
@@ -998,6 +998,23 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
+char* printUrlRisk(ndpi_url_risk risk) {
+  switch(risk) {
+    case ndpi_url_no_problem:
+      return("");
+      break;
+    case ndpi_url_possible_xss:
+      return(" ** XSS **");
+      break;
+    case ndpi_url_possible_sql_injection:
+      return(" ** SQL Injection **");
+      break;
+  }
+
+  return("");
+}
+/* ********************************** */
+
 /**
  * @brief Print the flow
  */
@@ -1011,7 +1028,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
-    float f = (float)flow->first_seen, l = (float)flow->last_seen;
+    double f = (double)flow->first_seen, l = (double)flow->last_seen;
     
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
 
@@ -1147,8 +1164,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     }
 
     if(flow->http.url[0] != '\0')
-      fprintf(out, "[URL: %s][StatusCode: %u][ContentType: %s][UserAgent: %s]",
-	      flow->http.url, flow->http.response_status_code,
+      fprintf(out, "[URL: %s%s][StatusCode: %u][ContentType: %s][UserAgent: %s]",
+	      flow->http.url,
+	      printUrlRisk(ndpi_validate_url(flow->http.url)),
+	      flow->http.response_status_code,
 	      flow->http.content_type, flow->http.user_agent);
     
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
@@ -1790,6 +1809,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
         undetected_flows_deleted = 1;
 
       ndpi_free_flow_info_half(flow);
+      ndpi_free_flow_data_analysis(flow);
       ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */
