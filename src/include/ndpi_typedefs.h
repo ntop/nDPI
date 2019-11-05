@@ -42,6 +42,13 @@ typedef enum {
 	      ndpi_l4_proto_tcp_and_udp,
 } ndpi_l4_proto_info;
 
+typedef enum {
+  ndpi_no_tunnel = 0,
+  ndpi_gtp_tunnel,
+  ndpi_capwap_tunnel,
+  ndpi_tzsp_tunnel,
+} ndpi_packet_tunnel;
+
 /* NDPI_VISIT */
 typedef enum {
 	      ndpi_preorder,

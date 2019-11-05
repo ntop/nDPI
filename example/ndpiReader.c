@@ -1097,8 +1097,12 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fflush(out);
       fprintf(out, "[score: %.4f]", flow->entropy.score);
     }
-    
-    fprintf(out, "[proto: %s/%s]",
+
+    fprintf(out, "[proto: ");
+    if(flow->tunnel_type != ndpi_no_tunnel)
+      fprintf(out, "%s:", ndpi_tunnel2str(flow->tunnel_type));
+      
+    fprintf(out, "%s/%s]",
 	    ndpi_protocol2id(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			     flow->detected_protocol, buf, sizeof(buf)),
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,

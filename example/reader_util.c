@@ -69,7 +69,8 @@
 /* mask for Bad FCF presence */
 #define BAD_FCS                         0x50    /* 0101 0000 */
 
-#define GTP_U_V1_PORT                   2152
+#define GTP_U_V1_PORT                  2152
+#define NDPI_CAPWAP_DATA_PORT          5247
 #define TZSP_PORT                      37008
 
 #ifndef DLT_LINUX_SLL
@@ -621,6 +622,7 @@ float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
 static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow,
 						 const u_int8_t version,
 						 u_int16_t vlan_id,
+						 ndpi_packet_tunnel tunnel_type,
 						 const struct ndpi_iphdr *iph,
 						 const struct ndpi_ipv6hdr *iph6,
 						 u_int16_t ip_offset,
@@ -684,7 +686,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   if(*proto == IPPROTO_TCP && l4_packet_len >= sizeof(struct ndpi_tcphdr)) {
     u_int tcp_len;
 
-    // tcp
+    // TCP
     workflow->stats.tcp_count++;
     *tcph = (struct ndpi_tcphdr *)l4;
     *sport = ntohs((*tcph)->source), *dport = ntohs((*tcph)->dest);
@@ -693,8 +695,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     *payload_len = ndpi_max(0, l4_packet_len-4*(*tcph)->doff);
     l4_data_len = l4_packet_len - sizeof(struct ndpi_tcphdr);
   } else if(*proto == IPPROTO_UDP && l4_packet_len >= sizeof(struct ndpi_udphdr)) {
-    // udp
-
+    // UDP
     workflow->stats.udp_count++;
     *udph = (struct ndpi_udphdr *)l4;
     *sport = ntohs((*udph)->source), *dport = ntohs((*udph)->dest);
@@ -766,6 +767,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       memset(newflow, 0, sizeof(struct ndpi_flow_info));
       newflow->flow_id = flow_id++;
       newflow->hashval = hashval;
+      newflow->tunnel_type = tunnel_type;
       newflow->protocol = iph->protocol, newflow->vlan_id = vlan_id;
       newflow->src_ip = iph->saddr, newflow->dst_ip = iph->daddr;
       newflow->src_port = htons(*sport), newflow->dst_port = htons(*dport);
@@ -882,6 +884,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
 static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflow,
 						  u_int16_t vlan_id,
+						  ndpi_packet_tunnel tunnel_type,
 						  const struct ndpi_ipv6hdr *iph6,
 						  u_int16_t ip_offset,
 						  struct ndpi_tcphdr **tcph,
@@ -908,7 +911,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
     iph.protocol = options[0];
   }
 
-  return(get_ndpi_flow_info(workflow, 6, vlan_id, &iph, iph6, ip_offset,
+  return(get_ndpi_flow_info(workflow, 6, vlan_id, tunnel_type,
+			    &iph, iph6, ip_offset,
 			    sizeof(struct ndpi_ipv6hdr),
 			    ntohs(iph6->ip6_hdr.ip6_un1_plen),
 			    tcph, udph, sport, dport,
@@ -1056,6 +1060,7 @@ ndpi_clear_entropy_stats(struct ndpi_flow_info *flow) {
 static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 					   const u_int64_t time,
 					   u_int16_t vlan_id,
+					   ndpi_packet_tunnel tunnel_type,
 					   const struct ndpi_iphdr *iph,
 					   struct ndpi_ipv6hdr *iph6,
 					   u_int16_t ip_offset,
@@ -1076,14 +1081,16 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
 
   if(iph)
-    flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id, iph, NULL,
+    flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id,
+			      tunnel_type, iph, NULL,
 			      ip_offset, ipsize,
 			      ntohs(iph->tot_len) - (iph->ihl * 4),
 			      &tcph, &udph, &sport, &dport,
 			      &src, &dst, &proto,
 			      &payload, &payload_len, &src_to_dst_direction, when);
   else
-    flow = get_ndpi_flow_info6(workflow, vlan_id, iph6, ip_offset,
+    flow = get_ndpi_flow_info6(workflow, vlan_id,
+			       tunnel_type, iph6, ip_offset,
 			       &tcph, &udph, &sport, &dport,
 			       &src, &dst, &proto,
 			       &payload, &payload_len, &src_to_dst_direction, when);
@@ -1291,7 +1298,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   struct ndpi_ipv6hdr *iph6;
 
   struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
-
+  ndpi_packet_tunnel tunnel_type = ndpi_no_tunnel;
+  
   /* lengths and offsets */
   u_int16_t eth_offset = 0;
   u_int16_t radio_len;
@@ -1430,6 +1438,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     return(nproto);
   }
 
+ether_type_check:
   /* check ether type */
   switch(type) {
   case VLAN:
@@ -1546,6 +1555,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       u_int8_t flags = packet[offset];
       u_int8_t message_type = packet[offset+1];
 
+      tunnel_type = ndpi_gtp_tunnel;
+      
       if((((flags & 0xE0) >> 5) == 1 /* GTPv1 */) &&
 	 (message_type == 0xFF /* T-PDU */)) {
 
@@ -1563,11 +1574,13 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       }
     } else if((sport == TZSP_PORT) || (dport == TZSP_PORT)) {
       /* https://en.wikipedia.org/wiki/TZSP */
-      u_int offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
-      u_int8_t version = packet[offset];
-      u_int8_t ts_type    = packet[offset+1];
+      u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
+      u_int8_t version       = packet[offset];
+      u_int8_t ts_type       = packet[offset+1];
       u_int16_t encapsulates = ntohs(*((u_int16_t*)&packet[offset+2]));
 
+      tunnel_type = ndpi_tzsp_tunnel;
+      
       if((version == 1) && (ts_type == 0) && (encapsulates == 1)) {
 	u_int8_t stop = 0;
 
@@ -1599,11 +1612,33 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	  }
 	}
       }
+    } else if(sport == NDPI_CAPWAP_DATA_PORT) {
+      /* We dissect ONLY CAPWAP traffic */
+      u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
+
+      if((offset+40) < header->caplen) {
+	u_int16_t msg_len = packet[offset+1] >> 1;
+	
+	offset += msg_len;
+
+	if(packet[offset] == 0x02) {
+	  /* IEEE 802.11 Data */
+
+	  offset += 24;
+	  /* LLC header is 8 bytes */
+	  type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));
+
+	  ip_offset = offset + 8;
+
+	  tunnel_type = ndpi_capwap_tunnel;
+	  goto iph_check;
+	}
+      }
     }
   }
 
   /* process the packet */
-  return(packet_processing(workflow, time, vlan_id, iph, iph6,
+  return(packet_processing(workflow, time, vlan_id, tunnel_type, iph, iph6,
 			   ip_offset, header->caplen - ip_offset,
 			   header->caplen, header, packet, header->ts));
 }

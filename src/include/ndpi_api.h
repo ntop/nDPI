@@ -818,6 +818,7 @@ extern "C" {
 					  struct ndpi_flow_struct *flow);    
   u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
   const char* ndpi_cipher2str(u_int32_t cipher);
+  const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
   int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,

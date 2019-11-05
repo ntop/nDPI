@@ -1072,3 +1072,25 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 /* ********************************** */
+
+const char* ndpi_tunnel2str(ndpi_packet_tunnel tt) {
+  switch(tt) {
+  case ndpi_no_tunnel:
+    return("No-Tunnel");
+    break;
+    
+  case ndpi_gtp_tunnel:
+    return("GTP");
+    break;
+    
+  case ndpi_capwap_tunnel:
+    return("CAPWAP");
+    break;
+    
+  case ndpi_tzsp_tunnel:
+    return("TZSP");
+    break;
+  }
+}
+
+/* ********************************** */
