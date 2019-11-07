@@ -138,11 +138,22 @@ extern "C" {
 
   /**
    * Returns a new initialized detection module
+   * Note that before you can use it you can still load
+   * hosts and do other things. As soon as you are ready to use
+   * it do not forget to call first ndpi_finalize_initalization()
    *
    * @return  the initialized detection module
    *
    */
   struct ndpi_detection_module_struct *ndpi_init_detection_module(void);
+
+  /**
+   * Completes the initialization (2nd step)
+   *
+   * @return  the initialized detection module
+   *
+   */
+  void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str);
 
   /**
    * Frees the memory allocated in the specified flow

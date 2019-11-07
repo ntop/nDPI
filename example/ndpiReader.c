@@ -1911,6 +1911,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   if(_customCategoryFilePath)
     ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath);
+
+  ndpi_finalize_initalization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 }
 
 /* *********************************************** */

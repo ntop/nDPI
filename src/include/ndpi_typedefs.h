@@ -1057,7 +1057,8 @@ struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa; /* TOR */
-
+  /* IMPORTANT: please update ndpi_finalize_initalization() whenever you add a new automa */
+  
   struct {
 #ifdef HAVE_HYPERSCAN
     struct hs *hostnames;

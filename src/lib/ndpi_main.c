@@ -2221,6 +2221,37 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
 /* *********************************************** */
 
+void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) {
+  u_int i;
+
+  for(i=0; i<4; i++) {
+    ndpi_automa *automa;
+
+    switch(i) {
+    case 0:
+      automa = &ndpi_str->host_automa;
+      break;
+
+    case 1:
+      automa = &ndpi_str->content_automa;
+      break;
+
+    case 2:
+      automa = &ndpi_str->bigrams_automa;
+      break;
+
+    case 3:
+      automa = &ndpi_str->impossible_bigrams_automa;
+      break;
+    }
+    
+    ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
+    automa->ac_automa_finalized = 1;
+  }
+}
+
+/* *********************************************** */
+
 /* Wrappers */
 void* ndpi_init_automa(void) {
   return(ac_automata_init(ac_match_handler));
@@ -2261,7 +2292,6 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
 
   ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
   rc = ac_automata_search(automa, &ac_input_text, &match);
-  ac_automata_reset(automa);
 
   /*
     As ac_automata_search can detect partial matches and continue the search process
@@ -2289,7 +2319,6 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, 
 
   ac_input_text.astring = string_to_match, ac_input_text.length = match_len;
   rc = ac_automata_search(automa, &ac_input_text, &match);
-  ac_automata_reset(automa);
 
   /*
     As ac_automata_search can detect partial matches and continue the search process
@@ -6072,13 +6101,12 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
     return(NDPI_PROTOCOL_UNKNOWN);
 
   if(!automa->ac_automa_finalized) {
-    ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
-    automa->ac_automa_finalized = 1;
+    printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initalization()\n", __FILE__, __LINE__);
+    return(0); /* No matches */
   }
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
   ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
-  ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
   /* We need to take into account also rc==0 that is used for partial matches */
     ret_match->protocol_id = match.number,
@@ -6256,13 +6284,12 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
 
   if(!automa->ac_automa_finalized) {
-    ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
-    automa->ac_automa_finalized = 1;
+    printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initalization()\n", __FILE__, __LINE__);
+    return(0); /* No matches */
   }
 
   ac_input_text.astring = bigram_to_match, ac_input_text.length = 2;
   rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
-  ac_automata_reset(((AC_AUTOMATA_t*)automa->ac_automa));
 
   /*
     As ac_automata_search can detect partial matches and continue the search process
