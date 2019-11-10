@@ -1379,6 +1379,14 @@ typedef struct {
   u_int8_t value;
 } ndpi_network;
 
+typedef u_int32_t ndpi_init_prefs;
+
+typedef enum
+  {
+   ndpi_no_prefs = 0,
+   ndpi_dont_load_tor_hosts,
+  } ndpi_prefs;
+
 typedef struct {
   int protocol_id;
   ndpi_protocol_category_t protocol_category;

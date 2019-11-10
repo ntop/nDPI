@@ -4169,7 +4169,7 @@ int orginal_main(int argc, char **argv) {
     analyzeUnitTest();
 
     gettimeofday(&startup_time, NULL);
-    ndpi_info_mod = ndpi_init_detection_module();
+    ndpi_info_mod = ndpi_init_detection_module(0 /* Don't skip tor hosts */);
 
     if(ndpi_info_mod == NULL) return -1;
 

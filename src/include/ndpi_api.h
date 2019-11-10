@@ -142,10 +142,11 @@ extern "C" {
    * hosts and do other things. As soon as you are ready to use
    * it do not forget to call first ndpi_finalize_initalization()
    *
+   * @par prefs = load preferences
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module(void);
+  struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs);
 
   /**
    * Completes the initialization (2nd step)

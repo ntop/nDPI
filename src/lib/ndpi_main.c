@@ -1946,13 +1946,17 @@ static patricia_node_t* add_to_ptree(patricia_tree_t *tree, int family,
 /* ******************************************* */
 
 static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
-				 void *ptree, ndpi_network host_list[]) {
+				 void *ptree, ndpi_network host_list[],
+				 u_int8_t skip_tor_hosts) {
   int i;
 
   for(i=0; host_list[i].network != 0x0; i++) {
     struct in_addr pin;
     patricia_node_t *node;
 
+    if(skip_tor_hosts && (host_list[i].value == NDPI_PROTOCOL_TOR))
+      continue;
+	
     pin.s_addr = htonl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET,
 			    &pin, host_list[i].cidr /* bits */)) != NULL)
@@ -2135,7 +2139,7 @@ static const char* categories[] = {
 
 /* ******************************************************************** */
 
-struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
+struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
   int i;
 
@@ -2153,7 +2157,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
   if((ndpi_str->protocols_ptree = ndpi_New_Patricia(32 /* IPv4 */)) != NULL)
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree,
+			 host_protocol_list,
+			 prefs & ndpi_dont_load_tor_hosts);
 
   NDPI_BITMASK_RESET(ndpi_str->detection_bitmask);
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
