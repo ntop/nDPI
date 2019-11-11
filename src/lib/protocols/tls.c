@@ -764,7 +764,12 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
     return(1); /* More packets please */
   else if(flow->l4.tcp.tls_srv_cert_fingerprint_processed)
     return(0); /* We're good */
-  
+
+  if(packet->payload_packet_len <= flow->l4.tcp.tls_record_offset) {
+    /* Avoid invalid memory accesses */
+    return(1);
+  }
+
   if(flow->l4.tcp.tls_fingerprint_len > 0) {
     unsigned int avail = packet->payload_packet_len - flow->l4.tcp.tls_record_offset;
 
@@ -815,11 +820,6 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
 #endif
       return(1); /* More packets please */
     }
-  }
-
-  if(packet->payload_packet_len <= flow->l4.tcp.tls_record_offset) {
-    /* Avoid invalid memory accesses */
-    return(1);
   }
 
   if(packet->payload[flow->l4.tcp.tls_record_offset] == 0x15 /* Alert */) {
