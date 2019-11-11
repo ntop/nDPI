@@ -1945,6 +1945,61 @@ static patricia_node_t* add_to_ptree(patricia_tree_t *tree, int family,
 
 /* ******************************************* */
 
+/*
+  Load a file containing IPv4 addresses in CIDR format as 'protocol_id' 
+
+  Return: the number of entries loaded or -1 in case of error
+*/
+int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
+			 const char *path, u_int16_t protocol_id) {
+  char buffer[128], *line, *addr, *cidr, *saveptr;
+  FILE *fd;
+  int len;
+  u_int num_loaded = 0;
+  
+  fd = fopen(path, "r");
+
+  if(fd == NULL) {
+    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
+    return(-1);
+  }
+
+  while(fd) {
+    line = fgets(buffer, sizeof(buffer), fd);
+
+    if(line == NULL)
+      break;
+
+    len = strlen(line);
+
+    if((len <= 1) || (line[0] == '#'))
+      continue;
+
+    line[len-1] = '\0';
+    addr = strtok_r(line, "/", &saveptr);
+
+    if(addr) {
+      cidr = strtok_r(NULL, "\n", &saveptr);
+
+      if(cidr) {
+	struct in_addr pin;
+	patricia_node_t *node;
+	
+	pin.s_addr = inet_addr(addr);
+	if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET,
+				&pin, atoi(cidr) /* bits */)) != NULL)
+	  node->value.user_value = protocol_id, num_loaded++;
+      }
+    }
+  }
+
+  fclose(fd);
+  return(num_loaded);
+}
+
+
+/* ******************************************* */
+
 static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 				 void *ptree, ndpi_network host_list[],
 				 u_int8_t skip_tor_hosts) {
