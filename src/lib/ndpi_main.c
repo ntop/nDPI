@@ -1979,17 +1979,15 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
     addr = strtok_r(line, "/", &saveptr);
 
     if(addr) {
+      struct in_addr pin;
+      patricia_node_t *node;
+      
       cidr = strtok_r(NULL, "\n", &saveptr);
-
-      if(cidr) {
-	struct in_addr pin;
-	patricia_node_t *node;
-	
-	pin.s_addr = inet_addr(addr);
-	if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET,
-				&pin, atoi(cidr) /* bits */)) != NULL)
-	  node->value.user_value = protocol_id, num_loaded++;
-      }
+      
+      pin.s_addr = inet_addr(addr);
+      if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET,
+			      &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL)
+	node->value.user_value = protocol_id, num_loaded++;
     }
   }
 
