@@ -867,10 +867,7 @@ extern "C" {
   int ndpi_init_serializer(ndpi_serializer *serializer, ndpi_serialization_format fmt);
   void ndpi_term_serializer(ndpi_serializer *serializer);
   void ndpi_reset_serializer(ndpi_serializer *serializer);
-  int ndpi_serialize_string_int32(ndpi_serializer *serializer,
-				  const char *key, int32_t value);
-  int ndpi_serialize_string_int64(ndpi_serializer *serializer,
-				  const char *key, int64_t value);  
+
   int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer,
 				   u_int32_t key, u_int32_t value);
   int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer,
@@ -884,6 +881,13 @@ extern "C" {
 				  const char *format /* e.f. "%.2f" */);
   int ndpi_serialize_uint32_string(ndpi_serializer *serializer,
 				   u_int32_t key, const char *value);
+  int ndpi_serialize_uint32_boolean(ndpi_serializer *serializer,
+				    u_int32_t key, u_int8_t value);
+
+  int ndpi_serialize_string_int32(ndpi_serializer *serializer,
+				  const char *key, int32_t value);
+  int ndpi_serialize_string_int64(ndpi_serializer *serializer,
+				  const char *key, int64_t value);  
   int ndpi_serialize_string_uint32(ndpi_serializer *serializer,
 				   const char *key, u_int32_t value);
   int ndpi_serialize_string_uint32_format(ndpi_serializer *serializer,
@@ -896,10 +900,12 @@ extern "C" {
   int ndpi_serialize_string_binary(ndpi_serializer *_serializer,
 				   const char *key, const char *_value,
 				   u_int16_t vlen);
-
   int ndpi_serialize_string_float(ndpi_serializer *serializer,
 				  const char *key, float value,
 				  const char *format /* e.f. "%.2f" */);
+  int ndpi_serialize_string_boolean(ndpi_serializer *serializer,
+				    const char *key, u_int8_t value);
+
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
   int ndpi_serialize_start_of_block(ndpi_serializer *_serializer,
 				    const char *key);

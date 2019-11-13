@@ -816,6 +816,38 @@ int ndpi_serialize_uint32_string(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
+int ndpi_serialize_uint32_boolean(ndpi_serializer *_serializer,
+				  u_int32_t key, u_int8_t value) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  u_int32_t buff_diff = serializer->buffer_size - serializer->status.size_used;
+  u_int32_t needed = 24;
+
+  if(serializer->fmt != ndpi_serialization_format_json &&
+     serializer->fmt != ndpi_serialization_format_csv)
+    return -1;
+
+  if(buff_diff < needed) {
+    if(ndpi_extend_serializer_buffer(_serializer, needed - buff_diff) < 0)
+      return(-1);
+    buff_diff = serializer->buffer_size - serializer->status.size_used;
+  }
+
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    ndpi_serialize_json_pre(_serializer);
+    serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff,
+				      "\"%u\":%s", key, value ? "true" : "false");
+    ndpi_serialize_json_post(_serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff,
+      "%s%s", (serializer->status.size_used > 0) ? serializer->csv_separator : "",
+      value ? "true" : "false");
+  }
+
+  return(0);
+}
+
+/* ********************************** */
+
 static int ndpi_serialize_binary_int32(ndpi_serializer *_serializer,
 				       const char *key, u_int16_t klen,
 				       int32_t value) {
@@ -1182,7 +1214,6 @@ static int ndpi_serialize_binary_binary(ndpi_serializer *_serializer,
     buff_diff = serializer->buffer_size - serializer->status.size_used;
     serializer->status.size_used += ndpi_json_string_escape(value, vlen,
 						     (char *) &serializer->buffer[serializer->status.size_used], buff_diff);
-    buff_diff = serializer->buffer_size - serializer->status.size_used;
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
     serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff,
@@ -1211,6 +1242,47 @@ int ndpi_serialize_string_binary(ndpi_serializer *_serializer,
 int ndpi_serialize_string_string(ndpi_serializer *_serializer,
 				 const char *key, const char *_value) {
   return(ndpi_serialize_binary_binary(_serializer, key, strlen(key), _value, strlen(_value)));
+}
+
+/* ********************************** */
+
+int ndpi_serialize_string_boolean(ndpi_serializer *_serializer,
+				  const char *key, u_int8_t value) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  u_int32_t buff_diff = serializer->buffer_size - serializer->status.size_used;
+  u_int16_t klen = strlen(key);
+  u_int32_t needed;
+
+  if(serializer->fmt != ndpi_serialization_format_json &&
+     serializer->fmt != ndpi_serialization_format_csv)
+    return -1;
+
+  if(ndpi_is_number(key, klen))
+    return(ndpi_serialize_uint32_boolean(_serializer, atoi(key), value));
+
+  needed = klen + 16;
+
+  if(buff_diff < needed) {
+    if(ndpi_extend_serializer_buffer(_serializer, needed - buff_diff) < 0)
+      return(-1);
+    buff_diff = serializer->buffer_size - serializer->status.size_used;
+  }
+
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    ndpi_serialize_json_pre(_serializer);
+    serializer->status.size_used += ndpi_json_string_escape(key, klen,
+						     (char *) &serializer->buffer[serializer->status.size_used], buff_diff);
+    buff_diff = serializer->buffer_size - serializer->status.size_used;
+    serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff, ":%s",
+      value ? "true" : "false");
+    ndpi_serialize_json_post(_serializer);
+  } else if(serializer->fmt == ndpi_serialization_format_csv) {
+    serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff,
+      "%s%s", (serializer->status.size_used > 0) ? serializer->csv_separator : "",
+      value ? "true" : "false");
+  }
+
+  return(0);
 }
 
 /* ********************************** */
