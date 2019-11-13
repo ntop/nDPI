@@ -1148,7 +1148,7 @@ static int find_occurrency(char *str, char *what) {
 
   len = strlen(what);
 
-  if((found[len] != '\0') && (found[len] != ' ')
+  if(((found[len] != '\0') || (found[len] != ' '))
      && ((found == str) || (found[-1] == ' ')))
     return(1);
   else
