@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-file: ndpi_bindings.py
+file: ndpi_typestruct.py
 This file is part of nDPI.
 
 Copyright (C) 2011-19 - ntop.org

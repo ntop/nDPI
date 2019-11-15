@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License along with nDP
 If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ndpi_bindings import *
+from ndpi_typestruct import *
 from ctypes import *
 from scapy.all import *
 import sys

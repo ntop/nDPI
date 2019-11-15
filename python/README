@@ -1,4 +1,4 @@
-This directory contains the Python bindings for nDPI
+This directory contains the Python3 bindings for nDPI
 
 Demo example:
 - python3 ndpi_example.py <interface>
