@@ -1,7 +1,11 @@
-This direcgory contains the Python bindings for nDPI
+This directory contains the Python3 bindings for nDPI
 
-Usage:
+Demo example:
 - python3 ndpi_example.py <interface>
 - python3 ndpi_example.py <pcap_file>
 
-Code courtesy of Massimo Puddu
+Additional example (using nfstream package):
+- python3 flow_printer.py <interface>
+- python3 flow_printer.py <pcap_file>
+
+Code courtesy of: Massimo Puddu, Zied Aouini
