@@ -109,7 +109,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    if((realm_offset+realm_len) < packet->payload_packet_len) {
 		      char realm_str[24];
 
-		      if(realm_len >= sizeof(realm_str))
+		      if(realm_len > sizeof(realm_str)-1)
 			realm_len = sizeof(realm_str);
 
 		      strncpy(realm_str, (char*)&packet->payload[realm_offset+1], realm_len);
