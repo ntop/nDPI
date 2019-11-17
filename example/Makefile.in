@@ -27,7 +27,7 @@ dpdk:
 	make -f Makefile.dpdk
 
 check:
-	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I../src/include  -I/usr/local/include/json-c  *.c
+	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I../src/include *.c
 
 clean:
 	/bin/rm -f *.o ndpiReader ndpiReader.dpdk
