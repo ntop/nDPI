@@ -978,10 +978,12 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* KERBEROS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_KERBEROS)) {
-    if(flow->ndpi_flow->protos.kerberos.cname[0] != '\0') {
-      snprintf(flow->info, sizeof(flow->info), "%s (%s)",
-	       flow->ndpi_flow->protos.kerberos.cname,
-	       flow->ndpi_flow->protos.kerberos.realm);
+    if((flow->ndpi_flow->protos.kerberos.hostname[0] != '\0')
+       || (flow->ndpi_flow->protos.kerberos.username[0] != '\0')) {
+      snprintf(flow->info, sizeof(flow->info), "%s%s (%s)",
+	       flow->ndpi_flow->protos.kerberos.hostname,
+	       flow->ndpi_flow->protos.kerberos.username,
+	       flow->ndpi_flow->protos.kerberos.domain);
     }
   }
   /* HTTP */

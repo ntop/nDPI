@@ -1203,7 +1203,8 @@ struct ndpi_flow_struct {
     } ntp;
 
     struct {
-      char cname[24], realm[24];
+      
+      char hostname[24], domain[24], username[24];
     } kerberos;
 
     struct {

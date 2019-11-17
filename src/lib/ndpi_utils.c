@@ -960,9 +960,10 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case NDPI_PROTOCOL_KERBEROS:
-    ndpi_serialize_start_of_block(serializer, "kerberos");
-    ndpi_serialize_string_string(serializer, "cname", flow->protos.kerberos.cname);
-    ndpi_serialize_string_string(serializer, "realm", flow->protos.kerberos.realm);
+    ndpi_serialize_start_of_block(serializer, "kerberos");    
+    ndpi_serialize_string_string(serializer, "hostname", flow->protos.kerberos.hostname);
+    ndpi_serialize_string_string(serializer, "domain", flow->protos.kerberos.domain);
+    ndpi_serialize_string_string(serializer, "username", flow->protos.kerberos.username);
     ndpi_serialize_end_of_block(serializer);
     break;
 
