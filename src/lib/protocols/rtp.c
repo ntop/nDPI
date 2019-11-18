@@ -95,21 +95,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	 /* http://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
        )
     ) {
-    struct ndpi_packet_struct *packet = &flow->packet;
-
-    if(packet->iph) {
-      /* 125.209.252.xxx */
-      if(((ntohl(packet->iph->saddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)
-	 || ((ntohl(packet->iph->daddr) & 0xFFFFFF00 /* 255.255.255.0 */) == 0x7DD1FC00)) {
-	if((flow->packet.payload[0] == 0x80)
-	   && ((flow->packet.payload[1] == 0x78) || (flow->packet.payload[1] == 0xE8))
-	  ) {
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LINE, NDPI_PROTOCOL_LINE);
-	  return;
-	}
-      }
-    }
-
     NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_UNKNOWN);
     return;
