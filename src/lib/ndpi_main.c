@@ -316,6 +316,9 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
 
   name = ndpi_strdup(protoName);
 
+  if(ndpi_str->proto_defaults[protoId].protoName)
+    ndpi_free(ndpi_str->proto_defaults[protoId].protoName);
+
   ndpi_str->proto_defaults[protoId].protoName = name,
     ndpi_str->proto_defaults[protoId].protoCategory = protoCategory,
     ndpi_str->proto_defaults[protoId].protoId = protoId,
