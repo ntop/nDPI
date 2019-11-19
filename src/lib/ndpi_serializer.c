@@ -215,6 +215,12 @@ u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *_serializer) {
 
 /* ********************************** */
 
+u_int32_t ndpi_serializer_get_internal_buffer_size(ndpi_serializer *_serializer) {
+  return(((ndpi_private_serializer*)_serializer)->buffer_size);
+}
+
+/* ********************************** */
+
 int ndpi_serializer_set_buffer_len(ndpi_serializer *_serializer, u_int32_t l) {
   ndpi_private_serializer *p = (ndpi_private_serializer*)_serializer;
 
@@ -266,6 +272,7 @@ static inline int ndpi_extend_serializer_buffer(ndpi_serializer *_serializer, u_
   }
 
   new_size = serializer->buffer_size + min_len;
+  new_size = ((new_size / 4) + 1) * 4; /* required by zmq encryption */
 
   r = realloc((void *) serializer->buffer, new_size);
 

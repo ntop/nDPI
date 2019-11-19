@@ -897,7 +897,7 @@ extern "C" {
 				   const char *key, u_int64_t value);
   int ndpi_serialize_string_string(ndpi_serializer *serializer,
 				   const char *key, const char *value);
-  int ndpi_serialize_string_binary(ndpi_serializer *_serializer,
+  int ndpi_serialize_string_binary(ndpi_serializer *serializer,
 				   const char *key, const char *_value,
 				   u_int16_t vlen);
   int ndpi_serialize_string_float(ndpi_serializer *serializer,
@@ -907,12 +907,13 @@ extern "C" {
 				    const char *key, u_int8_t value);
 
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
-  int ndpi_serialize_start_of_block(ndpi_serializer *_serializer,
+  int ndpi_serialize_start_of_block(ndpi_serializer *serializer,
 				    const char *key);
-  int ndpi_serialize_end_of_block(ndpi_serializer *_serializer);
-  char* ndpi_serializer_get_buffer(ndpi_serializer *_serializer, u_int32_t *buffer_len);
-  u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *_serializer);
-  int ndpi_serializer_set_buffer_len(ndpi_serializer *_serializer, u_int32_t l);
+  int ndpi_serialize_end_of_block(ndpi_serializer *serializer);
+  char* ndpi_serializer_get_buffer(ndpi_serializer *serializer, u_int32_t *buffer_len);
+  u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *serializer);
+  u_int32_t ndpi_serializer_get_internal_buffer_size(ndpi_serializer *serializer);
+  int ndpi_serializer_set_buffer_len(ndpi_serializer *serializer, u_int32_t l);
   void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator);
 
   void ndpi_serializer_create_snapshot(ndpi_serializer *serializer);
