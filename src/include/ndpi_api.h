@@ -855,6 +855,8 @@ extern "C" {
 		     ndpi_protocol l7_protocol,
 		     ndpi_serializer *serializer);
 
+  void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
+
   /* ptree (trie) API */
   ndpi_ptree_t* ndpi_ptree_create(void);
   int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int8_t bits, uint user_data);

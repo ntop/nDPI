@@ -48,6 +48,7 @@
 #include "ndpi_content_match.c.inc"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ht_hash.h"
+#include "third_party/include/ndpi_md5.h"
 
 /* stun.c */
 extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
@@ -6710,4 +6711,14 @@ int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, uint *
   }
 
   return(-1);
+}
+
+/* ******************************************************************** */
+
+void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]) {
+  ndpi_MD5_CTX ctx;
+
+  ndpi_MD5Init(&ctx);
+  ndpi_MD5Update(&ctx, data, data_len);
+  ndpi_MD5Final(hash, &ctx);
 }
