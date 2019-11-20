@@ -55,8 +55,14 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	 ) {
 	;
       } else {
-	if(((payload_len == 3) && ((packet->payload[2] & 0x0F)== 0x0d)) ||
+	/* Too many false positives */
+	if(((payload_len == 3) && ((packet->payload[2] & 0x0F)== 0x0d))
+	   ||
 	   ((payload_len >= 16)
+	    && (((packet->payload[0] & 0xC0) >> 6) == 0x02 /* RTPv2 */
+		|| (((packet->payload[0] & 0xF0) >> 4) == 0 /* Zoom */)
+		|| (((packet->payload[0] & 0xF0) >> 4) == 0x07 /* Skype */)
+		)
 	    && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
 	    && (packet->payload[0] != 0x0)  /* Avoid invalid CAPWAP detection */
 	    && (packet->payload[2] == 0x02))) {
