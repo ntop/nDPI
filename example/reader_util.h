@@ -201,14 +201,13 @@ typedef struct ndpi_flow_info {
   } http;
   
   struct {
-    char username[32];
+    char username[32], password[32];
   } telnet;
   
   void *src_id, *dst_id;
 
   struct ndpi_entropy entropy;
-  struct ndpi_entropy last_entropy;
-  
+  struct ndpi_entropy last_entropy;  
 } ndpi_flow_info_t;
 
 

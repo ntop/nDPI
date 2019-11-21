@@ -1,8 +1,8 @@
 /*
  * telnet.c
  *
- * Copyright (C) 2009-2011 by ipoque GmbH
  * Copyright (C) 2011-19 - ntop.org
+ * Copyright (C) 2009-2011 by ipoque GmbH
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -47,6 +47,34 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->payload_packet_len > 0) {
     int i;
 
+    if(flow->protos.telnet.username_detected) {
+      if((!flow->protos.telnet.password_found)
+	 && (packet->payload_packet_len > 6)) {
+	
+	if(strncasecmp((char*)packet->payload, "password:", 9) == 0) {
+	  flow->protos.telnet.password_found = 1;
+	}
+	
+	return(1);
+      }
+      
+      if(packet->payload[0] == '\r') {
+	if(!flow->protos.telnet.password_found)
+	  return(1);
+	
+	flow->protos.telnet.password_detected = 1;
+	flow->protos.telnet.password[flow->protos.telnet.character_id] = '\0';
+	return(0);
+      }
+
+      for(i=0; i<packet->payload_packet_len; i++) {
+	if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.password)-1))
+	  flow->protos.telnet.password[flow->protos.telnet.character_id++] = packet->payload[i];
+      }
+
+      return(1);
+    }
+    
     if((!flow->protos.telnet.username_found)
        && (packet->payload_packet_len > 6)) {
 
@@ -60,7 +88,8 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
     if(packet->payload[0] == '\r') {
       flow->protos.telnet.username_detected = 1;
       flow->protos.telnet.username[flow->protos.telnet.character_id] = '\0';
-      return(0);
+      flow->protos.telnet.character_id = 0;
+      return(1);
     }
 
     for(i=0; i<packet->payload_packet_len; i++) {

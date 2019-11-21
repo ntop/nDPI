@@ -6580,7 +6580,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_TELNET:
-    if(!flow->protos.telnet.username_detected)
+    if(!flow->protos.telnet.password_detected)
       return(1);
     break;
   }

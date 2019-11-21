@@ -1234,9 +1234,11 @@ struct ndpi_flow_struct {
     } imo;
     
     struct {
-      u_int8_t username_detected:1, username_found:1, skip_next:1, _pad:5;
+      u_int8_t username_detected:1, username_found:1,
+	password_detected:1, password_found:1,
+	skip_next:1, _pad:3;
       u_int8_t character_id;
-      char username[32];
+      char username[32], password[32];
     } telnet;
     
     struct {
@@ -1255,7 +1257,7 @@ struct ndpi_flow_struct {
     } http;
 
     struct {
-      u_int8_t auth_found;
+      u_int8_t auth_found:1;
       char username[16], password[16];
     } ftp_imap_pop_smtp;
   
