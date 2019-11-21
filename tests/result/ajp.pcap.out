@@ -1,10 +1,10 @@
 Unknown	6	2200	2
 AJP	26	4446	2
 
-	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.0/0.0 0/0 0.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222.0/111.5 896/300 285.7/84.4][PLAIN TEXT (HTTP/1.1)]
-	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.0/0.0 0/0 0.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222.0/111.5 896/300 285.7/84.4][PLAIN TEXT (HTTP/1.1)]
+	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][Goodput ratio: 67.9/36.0][0.17 sec][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.0/0.0 0/0 0.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222.0/111.5 896/300 285.7/84.4][PLAIN TEXT (HTTP/1.1)]
+	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][Goodput ratio: 67.9/36.0][< 1 sec][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.0/0.0 0/0 0.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222.0/111.5 896/300 285.7/84.4][PLAIN TEXT (HTTP/1.1)]
 
 
 Undetected flows:
-	1	80 93.88.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][4 pkts/2012 bytes -> 0 pkts/0 bytes][PLAIN TEXT (HTTP/1.1)]
-	2	80 142.243.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][2 pkts/188 bytes -> 0 pkts/0 bytes]
+	1	80 93.88.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][4 pkts/2012 bytes -> 0 pkts/0 bytes][Goodput ratio: 0.0/0.0][0.17 sec][PLAIN TEXT (HTTP/1.1)]
+	2	80 142.243.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][2 pkts/188 bytes -> 0 pkts/0 bytes][Goodput ratio: 0.0/0.0][0.17 sec]

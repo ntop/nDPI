@@ -1,3 +1,3 @@
 BGP	14	969	1
 
-	1	TCP 100.16.1.2:18324 <-> 100.16.1.1:179 [proto: 13/BGP][cat: Network/14][7 pkts/388 bytes <-> 7 pkts/581 bytes][bytes ratio: -0.199 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 10013.6/9944.2 50028/49681 20007.2/19868.4][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 55.4/83.0 101/195 19.7/48.8]
+	1	TCP 100.16.1.2:18324 <-> 100.16.1.1:179 [proto: 13/BGP][cat: Network/14][7 pkts/388 bytes <-> 7 pkts/581 bytes][Goodput ratio: 19.5/46.2][50.10 sec][bytes ratio: -0.199 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 10013.6/9944.2 50028/49681 20007.2/19868.4][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 55.4/83.0 101/195 19.7/48.8]

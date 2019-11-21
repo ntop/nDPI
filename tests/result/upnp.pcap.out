@@ -1,4 +1,4 @@
 UPnP	14	9912	2
 
-	1	UDP [fe80::3441:3d24:6d30:a807]:58932 -> [ff02::c]:3702 [proto: 153/UPnP][cat: Network/14][7 pkts/5026 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 118/0 938.5/0.0 2000/0 751.7/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 718/0 718.0/0.0 718/0 0.0/0.0][PLAIN TEXT (xml version)]
-	2	UDP 192.168.61.66:58931 -> 239.255.255.250:3702 [proto: 153/UPnP][cat: Network/14][7 pkts/4886 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 179/0 1107.3/0.0 2004/0 740.1/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 698/0 698.0/0.0 698/0 0.0/0.0][PLAIN TEXT (xml version)]
+	1	UDP [fe80::3441:3d24:6d30:a807]:58932 -> [ff02::c]:3702 [proto: 153/UPnP][cat: Network/14][7 pkts/5026 bytes -> 0 pkts/0 bytes][Goodput ratio: 91.3/0.0][5.63 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 118/0 938.5/0.0 2000/0 751.7/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 718/0 718.0/0.0 718/0 0.0/0.0][PLAIN TEXT (xml version)]
+	2	UDP 192.168.61.66:58931 -> 239.255.255.250:3702 [proto: 153/UPnP][cat: Network/14][7 pkts/4886 bytes -> 0 pkts/0 bytes][Goodput ratio: 94.0/0.0][6.64 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 179/0 1107.3/0.0 2004/0 740.1/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 698/0 698.0/0.0 698/0 0.0/0.0][PLAIN TEXT (xml version)]

@@ -1,3 +1,3 @@
 Oscar	71	9386	1
 
-	1	TCP 10.30.29.3:63357 <-> 178.237.24.249:443 [proto: 69/Oscar][cat: Chat/9][38 pkts/3580 bytes <-> 33 pkts/5806 bytes][bytes ratio: -0.237 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2392.3/2606.7 58175/58215 10382.4/11141.6][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 94.2/175.9 369/1414 74.7/256.6][PLAIN TEXT (Adium/1.5.10)]
+	1	TCP 10.30.29.3:63357 <-> 178.237.24.249:443 [proto: 69/Oscar][cat: Chat/9][38 pkts/3580 bytes <-> 33 pkts/5806 bytes][Goodput ratio: 42.0/68.0][72.45 sec][bytes ratio: -0.237 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2392.3/2606.7 58175/58215 10382.4/11141.6][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 94.2/175.9 369/1414 74.7/256.6][PLAIN TEXT (Adium/1.5.10)]

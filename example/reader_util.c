@@ -1082,7 +1082,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   u_int8_t proto;
   struct ndpi_tcphdr *tcph = NULL;
   struct ndpi_udphdr *udph = NULL;
-  u_int16_t sport, dport, payload_len;
+  u_int16_t sport, dport, payload_len = 0;
   u_int8_t *payload;
   u_int8_t src_to_dst_direction = 1;
   u_int8_t begin_or_end_tcp = 0;

@@ -1,3 +1,3 @@
 GoogleHangoutDuo	19	2774	1
 
-	1	UDP 74.125.134.127:19305 -> 10.89.61.13:56406 [proto: 78.201/STUN.GoogleHangoutDuo][cat: VoIP/10][19 pkts/2774 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 993/0 1000.5/0.0 1010/0 5.2/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 146/0 146.0/0.0 146/0 0.0/0.0][PLAIN TEXT (sdiKGkw)]
+	1	UDP 74.125.134.127:19305 -> 10.89.61.13:56406 [proto: 78.201/STUN.GoogleHangoutDuo][cat: VoIP/10][19 pkts/2774 bytes -> 0 pkts/0 bytes][Goodput ratio: 71.2/0.0][18.02 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 993/0 1000.5/0.0 1010/0 5.2/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 146/0 146.0/0.0 146/0 0.0/0.0][PLAIN TEXT (sdiKGkw)]

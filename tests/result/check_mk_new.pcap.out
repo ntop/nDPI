@@ -1,3 +1,3 @@
 CHECKMK	98	20242	1
 
-	1	TCP 192.168.100.22:58998 <-> 192.168.100.50:6556 [proto: 138/CHECKMK][cat: DataTransfer/4][49 pkts/3242 bytes <-> 49 pkts/17000 bytes][bytes ratio: -0.680 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.6/0.5 4/4 1.0/0.9][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66.2/346.9 74/4162 1.1/757.9][PLAIN TEXT (k@Version)]
+	1	TCP 192.168.100.22:58998 <-> 192.168.100.50:6556 [proto: 138/CHECKMK][cat: DataTransfer/4][49 pkts/3242 bytes <-> 49 pkts/17000 bytes][Goodput ratio: 0.0/80.9][0.04 sec][bytes ratio: -0.680 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.6/0.5 4/4 1.0/0.9][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66.2/346.9 74/4162 1.1/757.9][PLAIN TEXT (k@Version)]

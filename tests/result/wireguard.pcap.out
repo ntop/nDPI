@@ -1,3 +1,3 @@
 WireGuard	2399	734182	1
 
-	1	UDP 139.162.192.157:51820 <-> 192.168.0.14:36116 [proto: 206/WireGuard][cat: VPN/2][1362 pkts/518526 bytes <-> 1037 pkts/215656 bytes][bytes ratio: 0.413 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 268.5/313.9 10882/13538 1111.4/1203.7][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 380.7/208.0 1404/1404 361.7/134.8][PLAIN TEXT (RJxM17)]
+	1	UDP 139.162.192.157:51820 <-> 192.168.0.14:36116 [proto: 206/WireGuard][cat: VPN/2][1362 pkts/518526 bytes <-> 1037 pkts/215656 bytes][Goodput ratio: 89.0/79.8][381.21 sec][bytes ratio: 0.413 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 268.5/313.9 10882/13538 1111.4/1203.7][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 380.7/208.0 1404/1404 361.7/134.8][PLAIN TEXT (RJxM17)]

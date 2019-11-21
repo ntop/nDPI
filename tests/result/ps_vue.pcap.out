@@ -2,11 +2,11 @@ PS_VUE	1724	2198169	1
 TLS	11	1401	5
 Amazon	5	1380	2
 
-	1	TCP 8.252.2.139:80 -> 192.168.1.132:59198 [proto: 7.64/HTTP.PS_VUE][cat: Video/26][1724 pkts/2198169 bytes -> 0 pkts/0 bytes][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 9.3/0.0 1184/0 55.9/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 1275.0/0.0 1372/0 336.5/0.0][PLAIN TEXT (ovwuGc)]
-	2	TCP 13.33.255.96:443 -> 192.168.1.132:55076 [proto: 91.178/TLS.Amazon][cat: Web/5][4 pkts/1294 bytes -> 0 pkts/0 bytes]
-	3	TCP 63.140.57.73:443 -> 192.168.1.132:61267 [proto: 91/TLS][cat: Web/5][2 pkts/791 bytes -> 0 pkts/0 bytes]
-	4	TCP 209.102.209.13:443 -> 192.168.1.132:65112 [proto: 91/TLS][cat: Web/5][3 pkts/193 bytes -> 0 pkts/0 bytes]
-	5	TCP 23.57.89.123:443 -> 192.168.1.132:52217 [proto: 91/TLS][cat: Web/5][2 pkts/139 bytes -> 0 pkts/0 bytes]
-	6	TCP 23.57.89.123:443 -> 192.168.1.132:55648 [proto: 91/TLS][cat: Web/5][2 pkts/139 bytes -> 0 pkts/0 bytes]
-	7	TCP 23.57.89.123:443 -> 192.168.1.132:62694 [proto: 91/TLS][cat: Web/5][2 pkts/139 bytes -> 0 pkts/0 bytes]
-	8	TCP 34.217.165.102:443 -> 192.168.1.132:63577 [proto: 91.178/TLS.Amazon][cat: Web/5][1 pkts/86 bytes -> 0 pkts/0 bytes]
+	1	TCP 8.252.2.139:80 -> 192.168.1.132:59198 [proto: 7.64/HTTP.PS_VUE][cat: Video/26][1724 pkts/2198169 bytes -> 0 pkts/0 bytes][Goodput ratio: 95.8/0.0][16.15 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 9.3/0.0 1184/0 55.9/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 1275.0/0.0 1372/0 336.5/0.0][PLAIN TEXT (ovwuGc)]
+	2	TCP 13.33.255.96:443 -> 192.168.1.132:55076 [proto: 91.178/TLS.Amazon][cat: Web/5][4 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 83.2/0.0][10.18 sec]
+	3	TCP 63.140.57.73:443 -> 192.168.1.132:61267 [proto: 91/TLS][cat: Web/5][2 pkts/791 bytes -> 0 pkts/0 bytes][Goodput ratio: 86.2/0.0][0.02 sec]
+	4	TCP 209.102.209.13:443 -> 192.168.1.132:65112 [proto: 91/TLS][cat: Web/5][3 pkts/193 bytes -> 0 pkts/0 bytes][Goodput ratio: 16.0/0.0][8.00 sec]
+	5	TCP 23.57.89.123:443 -> 192.168.1.132:52217 [proto: 91/TLS][cat: Web/5][2 pkts/139 bytes -> 0 pkts/0 bytes][Goodput ratio: 22.1/0.0][< 1 sec]
+	6	TCP 23.57.89.123:443 -> 192.168.1.132:55648 [proto: 91/TLS][cat: Web/5][2 pkts/139 bytes -> 0 pkts/0 bytes][Goodput ratio: 22.1/0.0][< 1 sec]
+	7	TCP 23.57.89.123:443 -> 192.168.1.132:62694 [proto: 91/TLS][cat: Web/5][2 pkts/139 bytes -> 0 pkts/0 bytes][Goodput ratio: 22.1/0.0][< 1 sec]
+	8	TCP 34.217.165.102:443 -> 192.168.1.132:63577 [proto: 91.178/TLS.Amazon][cat: Web/5][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 36.8/0.0][< 1 sec]

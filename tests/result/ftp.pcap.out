@@ -2,9 +2,9 @@ Unknown	1115	1122198	1
 FTP_CONTROL	68	5571	1
 FTP_DATA	9	1819	1
 
-	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes][User: anonymous][Pwd: NcFTP@][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 235.6/108.5 4743/1377 848.9/304.6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70.5/99.2 96/307 6.7/44.9][PLAIN TEXT (vsFTPd 3.0.3)]
-	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][cat: Download-FileTransfer-FileSharing/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes][bytes ratio: -0.624 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/28 14.2/28.5 29/29 14.3/0.5][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68.4/369.2 78/1271 4.8/520.6][PLAIN TEXT (    1 0        0        1073741)]
+	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes][Goodput ratio: 6.0/33.2][8.48 sec][User: anonymous][Pwd: NcFTP@][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 235.6/108.5 4743/1377 848.9/304.6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70.5/99.2 96/307 6.7/44.9][PLAIN TEXT (vsFTPd 3.0.3)]
+	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][cat: Download-FileTransfer-FileSharing/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes][Goodput ratio: 0.0/81.5][0.09 sec][bytes ratio: -0.624 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/28 14.2/28.5 29/29 14.3/0.5][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68.4/369.2 78/1271 4.8/520.6][PLAIN TEXT (    1 0        0        1073741)]
 
 
 Undetected flows:
-	1	TCP 192.168.1.212:50696 <-> 90.130.70.73:24523 [proto: 0/Unknown][380 pkts/25104 bytes <-> 735 pkts/1097094 bytes][bytes ratio: -0.955 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.4/0.2 29/29 2.5/1.7][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66.1/1492.6 78/1506 0.9/135.1]
+	1	TCP 192.168.1.212:50696 <-> 90.130.70.73:24523 [proto: 0/Unknown][380 pkts/25104 bytes <-> 735 pkts/1097094 bytes][Goodput ratio: 0.0/95.6][0.33 sec][bytes ratio: -0.955 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.4/0.2 29/29 2.5/1.7][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66.1/1492.6 78/1506 0.9/135.1]
