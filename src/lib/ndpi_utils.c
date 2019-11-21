@@ -970,6 +970,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_TELNET:
     ndpi_serialize_start_of_block(serializer, "telnet");
     ndpi_serialize_string_string(serializer, "username", flow->protos.telnet.username);
+    ndpi_serialize_string_string(serializer, "password", flow->protos.telnet.password);
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -1009,6 +1010,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "ftp");
     ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
     ndpi_serialize_string_string(serializer,  "password", flow->protos.ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_uint32(serializer,  "auth_failed", flow->protos.ftp_imap_pop_smtp.auth_failed);
     ndpi_serialize_end_of_block(serializer);
     break;
 

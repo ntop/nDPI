@@ -553,411 +553,21 @@ static int ndpi_ftp_control_check_response(struct ndpi_flow_struct *flow,
   printf("%s() [%s]\n", __FUNCTION__, payload);
 #endif
 
-  if(ndpi_match_strprefix(payload, payload_len, "110-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "120-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "125-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "150-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "202-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "211-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "212-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "213-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "214-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "215-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "220-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "221-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "225-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "226-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "227-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "228-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "229-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "230-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "231-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "232-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "250-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "257-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "331-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "332-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "350-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "421-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "425-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "426-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "430-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "434-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "450-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "451-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "452-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "501-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "502-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "503-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "504-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "530-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "532-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "550-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "551-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "552-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "553-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "631-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "632-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "633-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10054-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10060-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10061-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10066-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10068-")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "110 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "120 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "125 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "150 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "202 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "211 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "212 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "213 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "214 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "215 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "220 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "221 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "225 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "226 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "227 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "228 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "229 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "230 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "231 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "232 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "250 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "257 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "331 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "332 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "350 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "421 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "425 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "426 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "430 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "434 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "450 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "451 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "452 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "501 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "502 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "503 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "504 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "530 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "532 ")) {
-    return 1;
-  }
-  if(ndpi_match_strprefix(payload, payload_len, "550 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "551 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "552 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "553 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "631 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "632 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "633 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10054 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10060 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10061 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10066 ")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "10068 ")) {
-    return 1;
+  if(payload_len == 0) return(1);
+
+  switch(payload[0]) {
+  case '1':
+  case '2':
+  case '3':
+  case '6':
+    return(1);
+    break;
+
+  case '4':
+  case '5':
+    flow->protos.ftp_imap_pop_smtp.auth_failed = 1;
+    return(1);
+    break;
   }
 
   return 0;
@@ -972,8 +582,10 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
 
   /* Check connection over TCP */
   if(packet->tcp) {
+    u_int16_t twentyfive = htons(25);
+    
     /* Exclude SMTP, which uses similar commands. */
-    if(packet->tcp->dest == htons(25) || packet->tcp->source == htons(25)) {
+    if(packet->tcp->dest == twentyfive || packet->tcp->source == twentyfive) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
@@ -988,8 +600,7 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
     if(flow->ftp_control_stage == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "FTP_CONTROL stage 0: \n");
 
-      if((payload_len > 0)
-	 && ndpi_ftp_control_check_request(flow, packet->payload, payload_len)) {
+      if((payload_len > 0) && ndpi_ftp_control_check_request(flow, packet->payload, payload_len)) {
 	NDPI_LOG_DBG2(ndpi_struct,
 		      "Possible FTP_CONTROL request detected, we will look further for the response..\n");
 
@@ -1011,8 +622,7 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
       }
       
       /* This is a packet in another direction. Check if we find the proper response. */
-      if((payload_len > 0)
-	 && ndpi_ftp_control_check_response(flow, packet->payload, payload_len)) {
+      if((payload_len > 0) && ndpi_ftp_control_check_response(flow, packet->payload, payload_len)) {
 	NDPI_LOG_INFO(ndpi_struct, "found FTP_CONTROL\n");
 
 #ifdef FTP_DEBUG

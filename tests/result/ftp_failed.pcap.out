@@ -1,0 +1,3 @@
+FTP_CONTROL	18	1700	1
+
+	1	TCP [2a00:d40:1:3:192:12:193:11]:44724 <-> [2a00:800:1010::1]:21 [proto: 1/FTP_CONTROL][cat: Download-FileTransfer-FileSharing/7][10 pkts/892 bytes <-> 8 pkts/808 bytes][Goodput ratio: 2.7/13.8][7.24 sec][User: hello][Pwd: ][Auth Failed][bytes ratio: 0.049 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 895.6/1441.8 5304/5318 1756.8/2052.2][Pkt Len c2s/s2c min/avg/max/stddev: 86/86 89.2/101.0 98/126 4.2/15.4][PLAIN TEXT (vsFTPd 3.0.3)]

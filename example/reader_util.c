@@ -972,9 +972,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	  || /* POP */  is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_POP)
 	  || /* SMTP */ is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_SMTP)) {
     if(flow->ndpi_flow->protos.ftp_imap_pop_smtp.username[0] != '\0')
-      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s",
+      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s%s",
 	       flow->ndpi_flow->protos.ftp_imap_pop_smtp.username,
-	       flow->ndpi_flow->protos.ftp_imap_pop_smtp.password);
+	       flow->ndpi_flow->protos.ftp_imap_pop_smtp.password,
+	       flow->ndpi_flow->protos.ftp_imap_pop_smtp.auth_failed ? "][Auth Failed" : "");
   }
   /* KERBEROS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_KERBEROS)) {
