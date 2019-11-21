@@ -166,6 +166,7 @@ typedef struct ndpi_flow_info {
   u_int8_t ip_version;
   u_int64_t first_seen, last_seen;
   u_int64_t src2dst_bytes, dst2src_bytes;
+  u_int64_t src2dst_goodput_bytes, dst2src_goodput_bytes;
   u_int32_t src2dst_packets, dst2src_packets;
   u_int32_t has_human_readeable_strings;
   char human_readeable_string_buffer[32];

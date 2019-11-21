@@ -393,14 +393,14 @@ static void help(u_int long_help) {
 
   if(long_help) {
     NDPI_PROTOCOL_BITMASK all;
-    
+
     printf("\n\nnDPI supported protocols:\n");
     printf("%3s %-22s %-8s %-12s %s\n", "Id", "Protocol", "Layer_4", "Breed", "Category");
     num_threads = 1;
 
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
-    
+
     ndpi_dump_protocols(ndpi_info_mod);
   }
   exit(!long_help);
@@ -565,10 +565,10 @@ void extcap_capture() {
 void printCSVHeader() {
   if(!csv_fp) return;
 
-  fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,");
-  fprintf(csv_fp, "src2dst_packets,src2dst_bytes,dst2src_packets,dst2src_bytes,");
-  fprintf(csv_fp, "data_ratio,str_data_ratio,");
- 
+  fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,duration,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,");
+  fprintf(csv_fp, "src2dst_packets,src2dst_bytes,src2dst_goodput_bytes,dst2src_packets,dst2src_bytes,dst2src_goodput_bytes,");
+  fprintf(csv_fp, "data_ratio,str_data_ratio,src2dst_goodput_ratio,dst2src_goodput_ratio,");
+
   /* IAT (Inter Arrival Time) */
   fprintf(csv_fp, "iat_flow_min,iat_flow_avg,iat_flow_max,iat_flow_stddev,");
   fprintf(csv_fp, "iat_c_to_s_min,iat_c_to_s_avg,iat_c_to_s_max,iat_c_to_s_stddev,");
@@ -801,19 +801,22 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
+  if(_pcap_file[0] == NULL)
+    help(0);
+
 #ifndef USE_DPDK
-    if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
-      num_threads = 0;               /* setting number of threads = number of interfaces */
-      __pcap_file = strtok(_pcap_file[0], ",");
-      while(__pcap_file != NULL && num_threads < MAX_NUM_READER_THREADS) {
-        _pcap_file[num_threads++] = __pcap_file;
-        __pcap_file = strtok(NULL, ",");
-      }
-    } else {
-      if(num_threads > MAX_NUM_READER_THREADS) num_threads = MAX_NUM_READER_THREADS;
-      for(thread_id = 1; thread_id < num_threads; thread_id++)
-        _pcap_file[thread_id] = _pcap_file[0];
+  if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
+    num_threads = 0;               /* setting number of threads = number of interfaces */
+    __pcap_file = strtok(_pcap_file[0], ",");
+    while(__pcap_file != NULL && num_threads < MAX_NUM_READER_THREADS) {
+      _pcap_file[num_threads++] = __pcap_file;
+      __pcap_file = strtok(NULL, ",");
     }
+  } else {
+    if(num_threads > MAX_NUM_READER_THREADS) num_threads = MAX_NUM_READER_THREADS;
+    for(thread_id = 1; thread_id < num_threads; thread_id++)
+      _pcap_file[thread_id] = _pcap_file[0];
+  }
 
 #ifdef linux
     for(thread_id = 0; thread_id < num_threads; thread_id++)
@@ -963,17 +966,18 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   u_int8_t known_tls;
   char buf[32], buf1[64];
   u_int i;
-  
+
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
     double f = (double)flow->first_seen, l = (double)flow->last_seen;
-    
+
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
 
-    fprintf(csv_fp, "%u,%u,%.3f,%.3f,%s,%u,%s,%u,",
+    fprintf(csv_fp, "%u,%u,%.3f,%.3f,%.3f,%s,%u,%s,%u,",
 	    flow->flow_id,
 	    flow->protocol,
 	    f/1000.0, l/1000.0,
+	    (l-f)/1000.0,
 	    flow->src_name, ntohs(flow->src_port),
 	    flow->dst_name, ntohs(flow->dst_port)
 	    );
@@ -983,10 +987,14 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			       flow->detected_protocol, buf, sizeof(buf)));
 
-    fprintf(csv_fp, "%u,%llu,", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
-    fprintf(csv_fp, "%u,%llu,", flow->dst2src_packets, (long long unsigned int) flow->dst2src_bytes);
+    fprintf(csv_fp, "%u,%llu,%llu,", flow->src2dst_packets,
+	    (long long unsigned int) flow->src2dst_bytes, (long long unsigned int) flow->src2dst_goodput_bytes);
+    fprintf(csv_fp, "%u,%llu,%llu,", flow->dst2src_packets,
+	    (long long unsigned int) flow->dst2src_bytes, (long long unsigned int) flow->dst2src_goodput_bytes);
     fprintf(csv_fp, "%.3f,%s,", data_ratio, ndpi_data_ratio2str(data_ratio));
-  
+    fprintf(csv_fp, "%.1f,%.1f", 100.0*((float)flow->src2dst_goodput_bytes / (float)(flow->src2dst_bytes+1)),
+	    100.0*((float)flow->dst2src_goodput_bytes / (float)(flow->dst2src_bytes+1)));
+    
     /* IAT (Inter Arrival Time) */
     fprintf(csv_fp, "%u,%.1f,%u,%.1f,",
 	    ndpi_data_min(flow->iat_flow), ndpi_data_average(flow->iat_flow), ndpi_data_max(flow->iat_flow), ndpi_data_stddev(flow->iat_flow));
@@ -1003,7 +1011,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, "%s,%s,",
 	    (flow->ssh_tls.client_info[0] != '\0')  ? flow->ssh_tls.client_info : "",
 	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
-    
+
     fprintf(csv_fp, "%s,%s,%s,",
 	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls) : "",
 	    (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
@@ -1017,7 +1025,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "",
 	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : ""
 	    );
-	    
+
     fprintf(csv_fp, "\n");
   }
 
@@ -1029,7 +1037,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 #else
   fprintf(out, "\t%u(%u)", id, flow->flow_id);
 #endif
-    
+
   fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
 
   fprintf(out, "%s%s%s:%u %s %s%s%s:%u ",
@@ -1053,7 +1061,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   fprintf(out, "[proto: ");
   if(flow->tunnel_type != ndpi_no_tunnel)
     fprintf(out, "%s:", ndpi_tunnel2str(flow->tunnel_type));
-      
+
   fprintf(out, "%s/%s]",
 	  ndpi_protocol2id(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			   flow->detected_protocol, buf, sizeof(buf)),
@@ -1071,7 +1079,16 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	  (flow->dst2src_packets > 0) ? "<->" : "->",
 	  flow->dst2src_packets, (long long unsigned int) flow->dst2src_bytes);
 
-  if(flow->telnet.username[0] != '\0')  fprintf(out, "[Username: %s]", flow->telnet.username);    
+  fprintf(out, "[Goodput ratio: %.1f/%.1f]",
+	  100.0*((float)flow->src2dst_goodput_bytes / (float)(flow->src2dst_bytes+1)),
+	  100.0*((float)flow->dst2src_goodput_bytes / (float)(flow->dst2src_bytes+1)));
+
+  if(flow->last_seen > flow->first_seen)
+    fprintf(out, "[%.2f sec]", ((float)(flow->last_seen - flow->first_seen))/(float)1000);
+  else
+    fprintf(out, "[< 1 sec]");
+
+  if(flow->telnet.username[0] != '\0')  fprintf(out, "[Username: %s]", flow->telnet.username);
   if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
 
   if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
@@ -1104,14 +1121,14 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    printUrlRisk(ndpi_validate_url(flow->http.url)),
 	    flow->http.response_status_code,
 	    flow->http.content_type, flow->http.user_agent);
-    
+
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
   if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_info);
   if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 
   if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
 						  print_cipher(flow->ssh_tls.client_unsafe_cipher));
-    
+
   if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[Server: %s]", flow->ssh_tls.server_info);
   if(flow->ssh_tls.server_hassh[0] != '\0') fprintf(out, "[HASSH-S: %s]", flow->ssh_tls.server_hassh);
 
@@ -1133,7 +1150,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "]");
     }
   }
-    
+
   if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {
     char notBefore[32], notAfter[32];
     struct tm a, b;
@@ -1209,15 +1226,15 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
       u_int8_t proto_guessed;
-  
+
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
 						      flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
     }
-    
+
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
 
     proto = flow->detected_protocol.app_protocol ? flow->detected_protocol.app_protocol : flow->detected_protocol.master_protocol;
-    
+
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[proto]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[proto] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.protocol_flows[proto]++;
@@ -1899,18 +1916,18 @@ static void printFlowsStats() {
   int thread_id;
   u_int32_t total_flows = 0;
   FILE *out = results_file ? results_file : stdout;
-  
+
   if(enable_payload_analyzer)
     ndpi_report_payload_stats();
 
   for(thread_id = 0; thread_id < num_threads; thread_id++)
     total_flows += ndpi_thread_info[thread_id].workflow->num_allocated_flows;
-  
+
   if((all_flows = (struct flow_info*)malloc(sizeof(struct flow_info)*total_flows)) == NULL) {
     fprintf(out, "Fatal error: not enough memory\n");
     exit(-1);
   }
-  
+
   if(verbose) {
     ndpi_host_ja3_fingerprints *ja3ByHostsHashT = NULL; // outer hash table
     ndpi_ja3_fingerprints_host *hostByJA3C_ht = NULL;   // for client
@@ -2292,7 +2309,7 @@ static void printFlowsStats() {
     }
 
     for(i=0; i<num_flows; i++)
-	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);    
+	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
   }
 
   free(all_flows);
@@ -2416,7 +2433,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       }
 
       if(enable_protocol_guess)
-	printf("\tGuessed flow protos:   %-13u\n", cumulative_stats.guessed_flow_protocols);    
+	printf("\tGuessed flow protos:   %-13u\n", cumulative_stats.guessed_flow_protocols);
   }
 
 
