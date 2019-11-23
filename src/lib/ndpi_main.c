@@ -4879,7 +4879,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret.app_protocol = flow->detected_protocol_stack[0];
 
   /* Don't overwrite the category if already set */
-  if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+  if((flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+     && (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);
   else
     ret.category = flow->category;
@@ -6305,16 +6306,12 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   u_int16_t rc = ndpi_automa_match_string_subprotocol(ndpi_str,
 						      flow, string_to_match, string_to_match_len,
 						      master_protocol_id, ret_match, 1);
-
-  if((flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
-     && (ret_match->protocol_category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)) {
-    unsigned long id = ret_match->protocol_category;
-
-    if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
-      if(id != -1) {
-	flow->category = ret_match->protocol_category = id;
-	rc = master_protocol_id;
-      }
+  unsigned long id = ret_match->protocol_category;
+  
+  if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
+    if(id != -1) {
+      flow->category = ret_match->protocol_category = id;
+      rc = master_protocol_id;
     }
   }
 

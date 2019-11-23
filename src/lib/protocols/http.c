@@ -287,17 +287,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     NDPI_LOG_DBG2(ndpi_struct, "HOST line found %.*s\n",
 		  packet->host_line.len, packet->host_line.ptr);
 
-    /* call ndpi_match_host_subprotocol to see if there is a match with known-host HTTP subprotocol */
-    if(flow->http_detected) {
-      ndpi_protocol_match_result ret_match;
-
-      ndpi_match_host_subprotocol(ndpi_struct, flow,
-				  (char*)packet->host_line.ptr,
-				  packet->host_line.len,
-				  &ret_match,
-				  NDPI_PROTOCOL_HTTP);
-    }
-
     /* Copy result for nDPI apps */
     if(!ndpi_struct->disable_metadata_export) {
       len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
@@ -305,7 +294,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       flow->host_server_name[len] = '\0';
       flow->extra_packets_func = NULL; /* We're good now */
     }
-
+    
     flow->server_id = flow->dst;
 
     if(packet->forwarded_line.ptr) {

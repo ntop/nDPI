@@ -9069,13 +9069,18 @@ static ndpi_protocol_match host_match[] = {
 
 /* ******************************************************************** */
 
+/* 
+   IMPORTANT
+	
+   Do NOT pur here strings that overlap with string in host_match[]
+   specified above
+*/
 static ndpi_category_match category_match[] = {
    { ".edgecastcdn.net", "egdecastcdn" TLD,                       NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".hwcdn.net", "hwcdn" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".llnwd.net", "llnwd" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".llns.net", "llns" TLD,                                     NDPI_PROTOCOL_CATEGORY_MEDIA },
-   { ".fastly.net", "fastly" TLD,                                 NDPI_PROTOCOL_CATEGORY_MEDIA },
-   { ".akamaiedge.net", "akamaiedge" TLD,                         NDPI_PROTOCOL_CATEGORY_MEDIA },
+   { ".fastly.net", "fastly" TLD,                                 NDPI_PROTOCOL_CATEGORY_MEDIA },     
    { ".vultr.com", "vultr" TLD,                                   NDPI_PROTOCOL_CATEGORY_CLOUD },
    { "baidu.com", "baidu" TLD,                                    NDPI_PROTOCOL_CATEGORY_WEB },
    { "icq.com", "icq" TLD,                                        NDPI_PROTOCOL_CATEGORY_CHAT },
