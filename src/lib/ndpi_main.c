@@ -4205,7 +4205,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   /* TODO: add the remaining stage_XXXX protocols */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-    u_int16_t guessed_protocol_id, guessed_host_protocol_id;
+    u_int16_t guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN,
+      guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)
       goto check_stun_export;
