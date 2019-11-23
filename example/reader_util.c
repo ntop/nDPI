@@ -1321,7 +1321,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   u_int64_t time;
   u_int16_t ip_offset = 0, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
-  u_int8_t proto = 0;
+  u_int8_t proto = 0, recheck_type;
   /*u_int32_t label;*/
 
   /* counters */
@@ -1449,6 +1449,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   }
 
 ether_type_check:
+  recheck_type = 0;
+
   /* check ether type */
   switch(type) {
   case VLAN:
@@ -1456,13 +1458,16 @@ ether_type_check:
     type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
     ip_offset += 4;
     vlan_packet = 1;
+    
     // double tagging for 802.1Q
     while((type == 0x8100) && (ip_offset < header->caplen)) {
       vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
       type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
       ip_offset += 4;
     }
+    recheck_type = 1;
     break;
+    
   case MPLS_UNI:
   case MPLS_MULTI:
     mpls.u32 = *((uint32_t *) &packet[ip_offset]);
@@ -1475,16 +1480,23 @@ ether_type_check:
       mpls.u32 = ntohl(mpls.u32);
       ip_offset += 4;
     }
+    recheck_type = 1;
     break;
+    
   case PPPoE:
     workflow->stats.pppoe_count++;
     type = ETH_P_IP;
     ip_offset += 8;
+    recheck_type = 1;
     break;
+    
   default:
     break;
   }
-
+  
+  if(recheck_type)
+    goto ether_type_check;
+    
   workflow->stats.vlan_count += vlan_packet;
 
  iph_check:
