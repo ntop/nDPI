@@ -278,7 +278,7 @@ typedef enum {
   NDPI_PROTOCOL_WHATSAPP_FILES        = 242, /* Videos, pictures, voice messages... */
   NDPI_PROTOCOL_TARGUS_GETDATA        = 243,
   NDPI_PROTOCOL_DNP3                  = 244,
-  NDPI_PROTOCOL_104                   = 245,
+  NDPI_PROTOCOL_IEC60870              = 245, /* https://en.wikipedia.org/wiki/IEC_60870-5 */
   NDPI_PROTOCOL_BLOOMBERG             = 246,
   NDPI_PROTOCOL_CAPWAP                = 247,
   NDPI_PROTOCOL_ZABBIX                = 248,

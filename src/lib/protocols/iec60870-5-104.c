@@ -27,16 +27,16 @@
 #include "ndpi_protocol_ids.h"
 #include "ndpi_api.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_104
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_IEC60870
 
-void ndpi_search_104_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  NDPI_LOG_DBG(ndpi_struct, "search 104\n");
-  u_int16_t iec104_port = htons(2404); // port used by 104
+  u_int16_t iec104_port = htons(2404); // port used by IEC60870
 
   /* Check connection over TCP */
-    
+  NDPI_LOG_DBG(ndpi_struct, "search IEC60870\n");
+  
   if(packet->tcp) {
     /* The start byte of 104 is 0x68
      * The usual port: 2404
@@ -44,7 +44,7 @@ void ndpi_search_104_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     if((packet->payload[0] == 0x68) && 
        ((packet->tcp->dest == iec104_port) || (packet->tcp->source == iec104_port)) ){
       NDPI_LOG_INFO(ndpi_struct, "found 104\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_104, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IEC60870, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
@@ -56,9 +56,9 @@ void ndpi_search_104_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_104_dissector(struct ndpi_detection_module_struct *ndpi_struct,
                            u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {	
-  ndpi_set_bitmask_protocol_detection("104", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_104,
-				      ndpi_search_104_tcp,
+  ndpi_set_bitmask_protocol_detection("IEC60870", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_IEC60870,
+				      ndpi_search_iec60870_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);

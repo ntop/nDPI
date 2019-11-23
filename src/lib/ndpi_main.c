@@ -1757,9 +1757,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    no_master, "DNP3", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			    ndpi_build_default_ports(ports_a, 20000, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
-    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_104,
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IEC60870,
 			    1 /* no subprotocol */, no_master,
-			    no_master, "104", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
+			    no_master, "IEC60870", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
 			    ndpi_build_default_ports(ports_a, 2404, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0,   0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BLOOMBERG,
