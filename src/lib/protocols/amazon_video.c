@@ -1,7 +1,7 @@
 /*
  * amazon_video.c
  *
- * Copyright (C) 2018 by ntop.org
+ * Copyright (C) 2018-19 by ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -28,37 +28,36 @@
 #include "ndpi_api.h"
 
 static void ndpi_check_amazon_video(struct ndpi_detection_module_struct *ndpi_struct,
-				  struct ndpi_flow_struct *flow) {
-
+				    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search Amazon Prime\n");
 
-  if((packet->tcp != NULL) &&
-      (packet->payload[0] == 0xFE &&
-       packet->payload[1] == 0xED &&
-       packet->payload[2] == 0xFA &&
-       packet->payload[3] == 0xCE))
-    {
+  if(packet->payload_packet_len > 4) {
+    if((packet->tcp != NULL) &&
+       (packet->payload[0] == 0xFE &&
+	packet->payload[1] == 0xED &&
+	packet->payload[2] == 0xFA &&
+	packet->payload[3] == 0xCE)) {
       NDPI_LOG_INFO(ndpi_struct, "found Amazon Video on TCP\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN);
       return;
-    }
-  else if((packet->udp != NULL) &&
-	   (packet->payload[0] == 0xDE &&
-	    packet->payload[1] == 0xAD &&
-	    packet->payload[2] == 0xBE &&
-	    packet->payload[3] == 0xEF))
-    {
+    } else if((packet->udp != NULL) &&
+	      (packet->payload[0] == 0xDE &&
+	       packet->payload[1] == 0xAD &&
+	       packet->payload[2] == 0xBE &&
+	       packet->payload[3] == 0xEF)) {
       NDPI_LOG_INFO(ndpi_struct, "found Amazon Video on UDP\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN);
-    } else {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
+    }
   }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_struct,
+			      struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search amazon_video\n");
@@ -69,8 +68,8 @@ void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_struct, 
 }
 
 
-void init_amazon_video_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
-{
+void init_amazon_video_dissector(struct ndpi_detection_module_struct *ndpi_struct,
+				 u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("AMAZON_VIDEO", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_AMAZON_VIDEO,
 				      ndpi_search_amazon_video,
