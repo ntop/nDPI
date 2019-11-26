@@ -47,7 +47,9 @@ static u_int16_t get16(int *i, const u_int8_t *payload) {
 /* *********************************************** */
 
 static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
-  if(payload[i] == 0x00)
+  if(i >= payloadLen)
+    return(0);
+  else if(payload[i] == 0x00)
     return(1);
   else if(payload[i] == 0xC0)
     return(2);

@@ -492,6 +492,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  ndpi_parse_packet_line_info(ndpi_struct, flow);
 	} else {
 	  flow->l4.tcp.irc_3a_counter++;
+	  packet->parsed_lines = 0;
 	}
 	for (i = 0; i < packet->parsed_lines; i++) {
 	  if (packet->line[i].ptr[0] == ':') {
