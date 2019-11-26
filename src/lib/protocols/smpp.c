@@ -68,7 +68,7 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
       u_int32_t tmp_pdu_l = 0;
       u_int16_t pdu_c = 1;
       // loop PDUs (check if lengths are valid)
-      while(total_pdu_l < packet->payload_packet_len) {
+      while(total_pdu_l < (packet->payload_packet_len-4)) {
 	// get next PDU length
 	tmp_pdu_l = ntohl(get_u_int32_t(packet->payload, total_pdu_l));
 	// if zero or overflowing , return, will try the next TCP segment
