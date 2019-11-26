@@ -211,10 +211,11 @@ void ndpi_tdestroy(void *vrootp, void (*freefct)(void *))
 
 u_int8_t ndpi_net_match(u_int32_t ip_to_check,
 			u_int32_t net,
-			u_int32_t num_bits)
-{
+			u_int32_t num_bits) {
   u_int32_t mask = 0;
 
+  num_bits &= 0x1F; /* Avoid overflows */
+  
   mask = ~(~mask >> num_bits);
 
   return(((ip_to_check & mask) == (net & mask)) ? 1 : 0);
