@@ -2,7 +2,6 @@ Unknown	24	6428	14
 DNS	5	638	2
 HTTP	945	530967	19
 MDNS	1	82	1
-NTP	1	90	1
 NetBIOS	31	3589	8
 SSDP	143	36951	13
 DHCP	24	8208	5
@@ -12,6 +11,7 @@ TLS	105	21914	7
 DHCPV6	10	980	3
 Facebook	19	6840	2
 Google	12	991	4
+Apple	1	90	1
 LLMNR	89	6799	47
 
 JA3 Host Stats: 
@@ -127,7 +127,7 @@ JA3 Host Stats:
 	106	UDP 192.168.5.45:59789 -> 192.168.255.255:137 [proto: 10/NetBIOS][cat: System/18][1 pkts/92 bytes -> 0 pkts/0 bytes][Goodput ratio: 53.8/0.0][< 1 sec][Host: sanji-lifebook-][PLAIN TEXT ( FDEBEOEKEJ)]
 	107	UDP [fe80::e034:7be:d8f9:6197]:57143 -> [ff02::1:3]:5355 [proto: 154/LLMNR][cat: Network/14][1 pkts/91 bytes -> 0 pkts/0 bytes][Goodput ratio: 31.5/0.0][< 1 sec][Host: charming-pc][PLAIN TEXT (charming)]
 	108	UDP [fe80::e034:7be:d8f9:6197]:62756 -> [ff02::1:3]:5355 [proto: 154/LLMNR][cat: Network/14][1 pkts/91 bytes -> 0 pkts/0 bytes][Goodput ratio: 31.5/0.0][< 1 sec][Host: charming-pc][PLAIN TEXT (charming)]
-	109	UDP 192.168.5.16:123 -> 17.253.26.125:123 [proto: 9/NTP][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 52.7/0.0][< 1 sec]
+	109	UDP 192.168.5.16:123 -> 17.253.26.125:123 [proto: 9.140/NTP.Apple][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 52.7/0.0][< 1 sec]
 	110	UDP 192.168.5.64:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][cat: Network/14][1 pkts/82 bytes -> 0 pkts/0 bytes][Goodput ratio: 48.2/0.0][< 1 sec][PLAIN TEXT (googlecast)]
 	111	UDP 192.168.5.50:49766 -> 224.0.0.252:5355 [proto: 154/LLMNR][cat: Network/14][1 pkts/71 bytes -> 0 pkts/0 bytes][Goodput ratio: 40.3/0.0][< 1 sec][Host: charming-pc][PLAIN TEXT (charming)]
 	112	UDP 192.168.5.50:50030 -> 224.0.0.252:5355 [proto: 154/LLMNR][cat: Network/14][1 pkts/71 bytes -> 0 pkts/0 bytes][Goodput ratio: 40.3/0.0][< 1 sec][Host: charming-pc][PLAIN TEXT (charming)]

@@ -5,10 +5,9 @@ WhatsAppCall	803	102942	20
 ICMP	10	700	1
 TLS	8	589	2
 Dropbox	4	2176	1
-Apple	190	50263	21
+Apple	212	56189	22
 WhatsApp	182	25154	2
 Spotify	3	258	1
-ApplePush	22	5926	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -21,7 +20,7 @@ JA3 Host Stats:
 	4	TCP 192.168.2.4:49204 <-> 17.173.66.102:443 [proto: 91.140/TLS.Apple][cat: Web/5][29 pkts/11770 bytes <-> 24 pkts/6612 bytes][Goodput ratio: 86.5/80.2][34.28 sec][bytes ratio: 0.281 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 121.7/107.9 1665/1391 339.6/319.1][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 405.9/275.5 1494/1002 488.5/347.9][TLSv1.2][Client: p53-buy.itunes.apple.com][JA3C: 799135475da362592a4be9199d258726][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_MD5]
 	5	TCP 192.168.2.4:49201 <-> 17.178.104.12:443 [proto: 91.140/TLS.Apple][cat: Web/5][21 pkts/7644 bytes <-> 17 pkts/9576 bytes][Goodput ratio: 84.8/90.3][32.84 sec][bytes ratio: -0.112 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1908.9/36.8 30435/294 7133.2/81.8][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 364.0/563.3 1494/1494 552.5/634.4][TLSv1.2][Client: query.ess.apple.com][JA3C: 799135475da362592a4be9199d258726][Server: *.ess.apple.com][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][Organization: Apple Inc.][Certificate SHA-1: BD:E0:62:C3:F2:9D:09:5D:52:D4:AA:60:11:1B:36:1B:03:24:F1:9B][Validity: 2014-03-08 01:53:04 - 2029-03-08 01:53:04][Cipher: TLS_RSA_WITH_RC4_128_MD5]
 	6	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91.140/TLS.Apple][cat: Web/5][17 pkts/6166 bytes <-> 15 pkts/3539 bytes][Goodput ratio: 84.7/76.8][0.94 sec][bytes ratio: 0.271 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 35.8/42.0 225/228 76.0/80.9][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 362.7/235.9 1494/1002 464.1/321.5][TLSv1.2][Client: p53-buy.itunes.apple.com][JA3C: 799135475da362592a4be9199d258726][JA3S: c253ec3ad88e42f8da4032682892f9a0 (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_MD5]
-	7	TCP 192.168.2.4:49193 <-> 17.110.229.14:5223 [proto: 238/ApplePush][cat: Cloud/13][11 pkts/4732 bytes <-> 11 pkts/1194 bytes][Goodput ratio: 84.6/39.2][125.45 sec][bytes ratio: 0.597 (Upload)][IAT c2s/s2c min/avg/max/stddev: 53/0 12859.6/12856.5 101116/101113 33358.6/33358.7][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 430.2/108.5 1506/300 466.8/82.6][PLAIN TEXT (yfV.nY)]
+	7	TCP 192.168.2.4:49193 <-> 17.110.229.14:5223 [proto: 238.140/ApplePush.Apple][cat: Cloud/13][11 pkts/4732 bytes <-> 11 pkts/1194 bytes][Goodput ratio: 84.6/39.2][125.45 sec][bytes ratio: 0.597 (Upload)][IAT c2s/s2c min/avg/max/stddev: 53/0 12859.6/12856.5 101116/101113 33358.6/33358.7][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 430.2/108.5 1506/300 466.8/82.6][PLAIN TEXT (yfV.nY)]
 	8	UDP 192.168.2.4:51518 <-> 31.13.93.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][12 pkts/2341 bytes <-> 12 pkts/2484 bytes][Goodput ratio: 78.4/79.7][29.18 sec][bytes ratio: -0.030 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 2192.2/2121.8 18656/18299 5822.2/5720.0][Pkt Len c2s/s2c min/avg/max/stddev: 64/68 195.1/207.0 331/358 97.6/107.5]
 	9	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][cat: Network/14][10 pkts/3420 bytes -> 0 pkts/0 bytes][Goodput ratio: 87.7/0.0][59.94 sec][Host: lucas-imac][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1255/0 6659.6/0.0 9061/0 2879.9/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 342/0 342.0/0.0 342/0 0.0/0.0][DHCP Fingerprint: 1,3,6,15,119,95,252,44,46]
 	10	UDP 192.168.2.4:52794 <-> 31.13.84.48:3478 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][9 pkts/1842 bytes <-> 11 pkts/1151 bytes][Goodput ratio: 79.4/59.8][14.33 sec][bytes ratio: 0.231 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 1922.9/792.0 6986/6468 2906.0/2008.5][Pkt Len c2s/s2c min/avg/max/stddev: 68/64 204.7/104.6 331/128 81.8/22.8]

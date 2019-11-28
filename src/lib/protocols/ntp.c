@@ -58,8 +58,8 @@ void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct, struc
       return;
     }
   }
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

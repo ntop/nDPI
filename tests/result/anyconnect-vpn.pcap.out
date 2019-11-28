@@ -11,10 +11,10 @@ ICMPV6	18	2964	2
 Slack	29	4979	2
 Google	2	132	1
 AJP	5	390	1
-Apple	2	297	1
+Apple	7	656	2
 CiscoVPN	33	4378	2
 Amazon	36	3540	3
-ApplePush	11	1325	4
+ApplePush	6	966	3
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -51,7 +51,7 @@ JA3 Host Stats:
 	28	UDP 10.0.0.227:59582 <-> 75.75.75.75:53 [proto: 5.238/DNS.ApplePush][cat: Cloud/13][1 pkts/92 bytes <-> 1 pkts/323 bytes][Goodput ratio: 53.8/86.7][0.02 sec][Host: 1-courier.sandbox.push.apple.com][PLAIN TEXT (courier)]
 	29	TCP 10.0.0.227:56871 <-> 8.37.103.196:443 [proto: 91/TLS][cat: Web/5][1 pkts/66 bytes <-> 5 pkts/330 bytes][Goodput ratio: 0.0/0.0][20.32 sec][bytes ratio: -0.667 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0.0/0.0 0/0 0.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66.0/66.0 66/66 0.0/0.0]
 	30	TCP 10.0.0.227:56916 -> 10.0.0.151:8009 [proto: 139/AJP][cat: Web/5][5 pkts/390 bytes -> 0 pkts/0 bytes][Goodput ratio: 0.0/0.0][5.03 sec]
-	31	TCP 10.0.0.227:56886 <-> 17.57.144.116:5223 [proto: 238/ApplePush][cat: Cloud/13][3 pkts/174 bytes <-> 2 pkts/185 bytes][Goodput ratio: 0.0/28.5][0.02 sec]
+	31	TCP 10.0.0.227:56886 <-> 17.57.144.116:5223 [proto: 238.140/ApplePush.Apple][cat: Cloud/13][3 pkts/174 bytes <-> 2 pkts/185 bytes][Goodput ratio: 0.0/28.5][0.02 sec]
 	32	UDP 10.0.0.151:1900 -> 10.0.0.227:61328 [proto: 12/SSDP][cat: System/18][1 pkts/353 bytes -> 0 pkts/0 bytes][Goodput ratio: 87.9/0.0][< 1 sec][PLAIN TEXT (HTTP/1.1 200 OK)]
 	33	TCP 10.0.0.227:56910 <-> 35.201.124.9:443 [proto: 91/TLS][cat: Web/5][2 pkts/170 bytes <-> 2 pkts/164 bytes][Goodput ratio: 22.2/19.4][0.05 sec]
 	34	UDP 10.0.0.227:62427 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/84 bytes <-> 1 pkts/242 bytes][Goodput ratio: 49.4/82.3][0.02 sec][Host: detectportal.firefox.com][PLAIN TEXT (detectportal)]

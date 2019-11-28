@@ -1400,19 +1400,16 @@ void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t ret, skip_cert_processing = 0;
 
 #ifdef DEBUG_TLS
-  printf("%s()\n", __FUNCTION__);  
+  printf("==>> %u [len: %u][version: %u]\n",
+	 flow->guessed_host_protocol_id,
+	 packet->payload_packet_len,
+	 flow->protos.stun_ssl.ssl.ssl_version);
 #endif
   
   if(packet->udp != NULL) {
     /* DTLS dissector */
     int rc = sslTryAndRetrieveServerCertificate(ndpi_struct, flow);
-
-#ifdef DEBUG_TLS
-    printf("==>> %u [rc: %d][len: %u][%s][version: %u]\n",
-	   flow->guessed_host_protocol_id, rc, packet->payload_packet_len, flow->protos.stun_ssl.ssl.ja3_server,
-	   flow->protos.stun_ssl.ssl.ssl_version);
-#endif
-
+    
     if((rc == 0) && (flow->protos.stun_ssl.ssl.ssl_version != 0)) {
       flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 

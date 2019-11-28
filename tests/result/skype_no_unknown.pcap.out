@@ -9,8 +9,7 @@ IGMP	4	226	4
 TLS	79	7742	6
 Dropbox	16	7342	5
 Skype	1185	331827	60
-Apple	76	19581	1
-ApplePush	8	1118	1
+Apple	84	20699	2
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -57,7 +56,7 @@ JA3 Host Stats:
 	38	TCP 192.168.1.34:51267 <-> 111.221.74.18:40025 [proto: 125/Skype][cat: VoIP/10][10 pkts/785 bytes <-> 4 pkts/378 bytes][Goodput ratio: 15.9/28.0][17.94 sec][bytes ratio: 0.350 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 1703.2/147.5 4607/294 1700.3/146.5][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 78.5/94.5 159/164 27.6/40.3]
 	39	TCP 192.168.1.34:51232 <-> 157.56.52.28:443 [proto: 91.125/TLS.Skype][cat: VoIP/10][10 pkts/872 bytes <-> 3 pkts/285 bytes][Goodput ratio: 24.3/27.6][18.79 sec][bytes ratio: 0.507 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/199 2007.5/199.0 5293/199 1964.9/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 87.2/95.0 138/145 22.1/35.5]
 	40	UDP 192.168.1.1:137 <-> 192.168.1.34:137 [proto: 10/NetBIOS][cat: System/18][6 pkts/958 bytes <-> 2 pkts/184 bytes][Goodput ratio: 73.6/54.1][1.27 sec][Host: __msbrowse__][bytes ratio: 0.678 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1258 253.0/1258.0 1243/1258 495.0/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 104/92 159.7/92.0 271/92 78.7/0.0][PLAIN TEXT (FPFPENFDECFCEPFHFDEFFPFPACAB)]
-	41	TCP 17.143.160.149:5223 <-> 192.168.1.34:50407 [proto: 238/ApplePush][cat: Cloud/13][4 pkts/674 bytes <-> 4 pkts/444 bytes][Goodput ratio: 60.7/40.4][10.70 sec][bytes ratio: 0.206 (Upload)][IAT c2s/s2c min/avg/max/stddev: 215/1 3565.3/3493.7 10265/10480 4737.4/4940.1][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 168.5/111.0 279/156 102.7/45.0]
+	41	TCP 17.143.160.149:5223 <-> 192.168.1.34:50407 [proto: 238.140/ApplePush.Apple][cat: Cloud/13][4 pkts/674 bytes <-> 4 pkts/444 bytes][Goodput ratio: 60.7/40.4][10.70 sec][bytes ratio: 0.206 (Upload)][IAT c2s/s2c min/avg/max/stddev: 215/1 3565.3/3493.7 10265/10480 4737.4/4940.1][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 168.5/111.0 279/156 102.7/45.0]
 	42	UDP 192.168.1.34:17500 -> 192.168.1.255:17500 [proto: 121/Dropbox][cat: Cloud/13][2 pkts/1088 bytes -> 0 pkts/0 bytes][Goodput ratio: 92.2/0.0][30.07 sec][PLAIN TEXT ( 1573195445)]
 	43	UDP 192.168.1.34:17500 -> 255.255.255.255:17500 [proto: 121/Dropbox][cat: Cloud/13][2 pkts/1088 bytes -> 0 pkts/0 bytes][Goodput ratio: 92.2/0.0][30.07 sec][PLAIN TEXT ( 1573195445)]
 	44	UDP 192.168.1.92:17500 -> 192.168.1.255:17500 [proto: 121/Dropbox][cat: Cloud/13][2 pkts/1088 bytes -> 0 pkts/0 bytes][Goodput ratio: 92.2/0.0][30.05 sec][PLAIN TEXT ( 3375359593)]

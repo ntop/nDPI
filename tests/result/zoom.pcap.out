@@ -5,11 +5,11 @@ SSDP	1	168	1
 DHCP	1	321	1
 ntop	20	4265	1
 IMAPS	2	226	1
-ICMP	3	210	2
+ICMP	1	70	1
 TLS	2	114	1
 Google	26	8851	3
 Spotify	1	86	1
-Zoom	635	354005	19
+Zoom	637	354145	20
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -44,7 +44,7 @@ JA3 Host Stats:
 	26	UDP 192.168.1.117:57025 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][1 pkts/168 bytes -> 0 pkts/0 bytes][Goodput ratio: 74.6/0.0][< 1 sec][PLAIN TEXT (SEARCH )]
 	27	UDP 192.168.1.117:62988 <-> 192.168.1.1:53 [proto: 5.189/DNS.Zoom][cat: Video/26][1 pkts/72 bytes <-> 1 pkts/88 bytes][Goodput ratio: 41.1/51.7][0.04 sec][Host: www3.zoom.us]
 	28	UDP 192.168.1.117:64352 <-> 192.168.1.1:53 [proto: 5.189/DNS.Zoom][cat: Video/26][1 pkts/71 bytes <-> 1 pkts/87 bytes][Goodput ratio: 40.3/51.1][0.04 sec][Host: log.zoom.us]
-	29	ICMP 192.168.1.117:0 -> 162.255.38.14:0 [proto: 81/ICMP][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 39.7/0.0][0.01 sec]
+	29	ICMP 192.168.1.117:0 -> 162.255.38.14:0 [proto: 81.189/ICMP.Zoom][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 39.7/0.0][0.01 sec]
 	30	TCP 192.168.1.117:54798 <-> 13.225.84.182:443 [proto: 91/TLS][cat: Web/5][1 pkts/54 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0.0/0.0][0.04 sec]
 	31	UDP 192.168.1.117:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51.1/0.0][< 1 sec][PLAIN TEXT (spotify)]
 	32	UDP 192.168.1.117:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][cat: Music/25][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 50.6/0.0][< 1 sec][PLAIN TEXT (SpotUdp)]
