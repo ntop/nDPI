@@ -17,11 +17,23 @@ You should have received a copy of the GNU General Public License along with nfs
 If not, see <http://www.gnu.org/licenses/>.
 """
 
-from nfstream.streamer import Streamer
+from nfstream import NFStreamer
 import sys
 
-flow_streamer = Streamer(source=sys.argv[1])
-flows_count = 0
-for flow in flow_streamer:
-    print("flow[{}]: \n{}\n".format(flows_count, flow))
-    flows_count += 1
+
+path = sys.argv[1]
+flow_streamer = NFStreamer(source=path)
+result = {}
+try:
+    for flow in flow_streamer:
+        print(flow)
+        try:
+            result[flow.application_name] += flow.total_packets
+        except KeyError:
+            result[flow.application_name] = flow.total_packets
+    print("Summary (Application Name: Packets):")
+    print(result)
+except KeyboardInterrupt:
+    print("Summary (Application Name: Packets):")
+    print(result)
+    print("Terminated.")
