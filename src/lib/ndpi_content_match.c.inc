@@ -9095,7 +9095,10 @@ static ndpi_category_match category_match[] = {
    { ".playercdn.net", "\\.playercdn" TLD,                        NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "showmax.com", "showmax" TLD,                                NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "showmax.akamaized.net", "showmax\\.akamaized" TLD,          NDPI_PROTOCOL_CATEGORY_STREAMING },
-
+   { "skyq.sky.com", "skyq\\.sky\\.com" TLD,                      NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "iptv.sky.", "iptv\\.sky\\." TLD,                            NDPI_PROTOCOL_CATEGORY_STREAMING },
+   { "pcdn.skycdn.", "pcdn\\.skycdn\\." TLD,                      NDPI_PROTOCOL_CATEGORY_STREAMING },
+   
    /* Hulu Streaming services AS23286 */
    { "8.28.124.0/24",         NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "8.28.125.0/24",         NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
