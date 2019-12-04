@@ -309,7 +309,7 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  offset += 2 + 1;
 
-	  if(offset > packet->payload_packet_len)
+	  if((offset + 1) < packet->payload_packet_len) /* +1 because we are goint to read 2 bytes */
 	    extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	  else
 	    extension_len = 0;
