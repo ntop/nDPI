@@ -308,7 +308,11 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 	  offset += 2 + 1;
-	  extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
+
+	  if(offset > packet->payload_packet_len)
+	    extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
+	  else
+	    extension_len = 0;
 
 #ifdef DEBUG_TLS
 	  printf("TLS [server][extension_len: %u]\n", extension_len);
