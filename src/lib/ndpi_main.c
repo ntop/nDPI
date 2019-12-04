@@ -4702,7 +4702,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
       /* Update in case of new match */
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0], ret.category = flow->category;;
-      return(ret);
+      goto invalidate_ptr;
     } else
       goto ret_protocols;
   }
