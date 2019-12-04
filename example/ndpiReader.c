@@ -1121,9 +1121,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    flow->http.url,
 	    printUrlRisk(ndpi_validate_url(flow->http.url)),
 	    flow->http.response_status_code,
-	    flow->http.content_type,
-	    flow->http.user_agent,
-            printUrlRisk(ndpi_validate_url(flow->http.user_agent)));
+	    flow->http.content_type, flow->http.user_agent);
 
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
   if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_info);
