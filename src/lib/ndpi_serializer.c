@@ -200,7 +200,7 @@ char* ndpi_serializer_get_buffer(ndpi_serializer *_serializer, u_int32_t *buffer
   *buffer_len = serializer->status.size_used;
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    while(buf[0] == '\0')
+    while((buf[0] == '\0') || (buf[0] == ' '))
       buf++, *buffer_len = *buffer_len - 1;
   }
 
