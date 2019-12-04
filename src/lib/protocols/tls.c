@@ -874,7 +874,7 @@ int getSSCertificateFingerprint(struct ndpi_detection_module_struct *ndpi_struct
       return(0); /* That's all */
   } else if(flow->l4.tcp.tls_seen_certificate)
     return(0); /* That's all */  
-  else if(packet->payload_packet_len > flow->l4.tcp.tls_record_offset+7) {
+  else if(packet->payload_packet_len > flow->l4.tcp.tls_record_offset+7+1/* +1 because we are going to read 2 bytes */) {
     /* This is a handshake but not a certificate record */
     u_int16_t len = ntohs(*(u_int16_t*)&packet->payload[flow->l4.tcp.tls_record_offset+7]);
 
