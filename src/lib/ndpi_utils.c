@@ -48,6 +48,10 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ht_hash.h"
 
+#include "third_party/include/libinjection.h"
+#include "third_party/include/libinjection_sqli.h"
+#include "third_party/include/libinjection_xss.h"
+
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
 // #define MATCH_DEBUG 1
@@ -1138,56 +1142,20 @@ static int ndpi_url_decode(const char *s, char *out) {
 
 /* ********************************** */
 
-/* #define URL_CHECK_DEBUG 1 */
-
-static int find_occurrency(char *str, char *what) {
-  char *found = strstr(str, what);
-  u_int len;
-
-#ifdef URL_CHECK_DEBUG
-  printf("%s() [%s][%s]\n", __FUNCTION__, str, what);
-#endif
-
-  if(!found) return(0);
-
-  len = strlen(what);
-
-  if(((found[len] != '\0') || (found[len] != ' '))
-     && ((found == str) || (found[-1] == ' ')))
-    return(1);
-  else
-    return(find_occurrency(&found[len], what));
-}
-
-/* ********************************** */
-
-static int ndpi_check_tokens(char* query, char* keywords[]) {
-#ifdef URL_CHECK_DEBUG
-  printf("%s() [%s]\n", __FUNCTION__, query);
-#endif
-  
-  for(int i=0; keywords[i] != NULL; i++) {
-    if(find_occurrency(query, keywords[i]) > 0)
-      return(1);
-  }
-
-  return(0);
-}
-
-/* ********************************** */
-
 static int ndpi_is_sql_injection(char* query) {
-  char* sql_keywords[]  = { "select", "from", "where", "any", "all", "join", "inner", "left", "right", "full",
-			    "table", "alter", "create", "delete", "union", "update", "drop", "group", "order",
-			    "limit", "primary", "column", NULL };
-  return(ndpi_check_tokens(query, sql_keywords));
+  struct libinjection_sqli_state state;
+
+  size_t qlen = strlen(query);
+  libinjection_sqli_init(&state, query, qlen, FLAG_NONE);
+
+  return libinjection_is_sqli(&state);
 }
 
 /* ********************************** */
 
 static int ndpi_is_xss_injection(char* query) {
-  char* js_keywords[]  = { "<script>", "console.", "log.", NULL };
-  return(ndpi_check_tokens(query, js_keywords));
+  size_t qlen = strlen(query);
+  return libinjection_xss(query, qlen);
 }
 
 /* ********************************** */
