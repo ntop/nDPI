@@ -53,6 +53,7 @@
 #include <libgen.h>
 
 #include "reader_util.h"
+#include "intrusion_detection.h"
 
 
 /** Client parameters **/
@@ -566,6 +567,7 @@ void printCSVHeader() {
   if(!csv_fp) return;
 
   fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,duration,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,");
+  fprintf(csv_fp, "benign_score,dos_slow_score,dos_goldeneye_score,dos_hulk_score,ddos_score,hearthbleed_score,ftp_patator_score,ssh_patator_score,infiltration_score,");
   fprintf(csv_fp, "src2dst_packets,src2dst_bytes,src2dst_goodput_bytes,dst2src_packets,dst2src_bytes,dst2src_goodput_bytes,");
   fprintf(csv_fp, "data_ratio,str_data_ratio,src2dst_goodput_ratio,dst2src_goodput_ratio,");
 
@@ -577,6 +579,16 @@ void printCSVHeader() {
   /* Packet Length */
   fprintf(csv_fp, "pktlen_c_to_s_min,pktlen_c_to_s_avg,pktlen_c_to_s_max,pktlen_c_to_s_stddev,");
   fprintf(csv_fp, "pktlen_s_to_c_min,pktlen_s_to_c_avg,pktlen_s_to_c_max,pktlen_s_to_c_stddev,");
+
+  /* TCP flags */
+  fprintf(csv_fp, "cwr,ece,urg,ack,psh,rst,syn,fin,");
+
+  fprintf(csv_fp, "c_to_s_cwr,c_to_s_ece,c_to_s_urg,c_to_s_ack,c_to_s_psh,c_to_s_rst,c_to_s_syn,c_to_s_fin,");
+
+  fprintf(csv_fp, "s_to_c_cwr,s_to_c_ece,s_to_c_urg,s_to_c_ack,s_to_c_psh,s_to_c_rst,s_to_c_syn,s_to_c_fin,");
+
+  /* TCP window */
+  fprintf(csv_fp, "c_to_s_init_win,s_to_c_init_win,");
 
   /* Flow info */
   fprintf(csv_fp, "client_info,server_info,");
@@ -967,11 +979,40 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   char buf[32], buf1[64];
   u_int i;
 
+  double dos_ge_score;
+  double dos_slow_score;
+  double dos_hulk_score;
+  double ddos_score;
+
+  double hearthbleed_score;
+
+  double ftp_patator_score;
+  double ssh_patator_score;
+
+  double inf_score;
+
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
     double f = (double)flow->first_seen, l = (double)flow->last_seen;
 
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
+    dos_ge_score = Dos_goldeneye_score(flow);
+    
+    dos_slow_score = Dos_slow_score(flow);
+    dos_hulk_score = Dos_hulk_score(flow);
+    ddos_score = Ddos_score(flow);
+
+    hearthbleed_score = Hearthbleed_score(flow);
+
+    ftp_patator_score = Ftp_patator_score(flow);
+    ssh_patator_score = Ssh_patator_score(flow);
+
+    inf_score = Infiltration_score(flow);
+
+    
+    double benign_score = dos_ge_score < 1 && dos_slow_score < 1 && \
+    dos_hulk_score < 1 && ddos_score < 1 && hearthbleed_score < 1 && \
+    ftp_patator_score < 1 && ssh_patator_score < 1 && inf_score < 1 ? 1.1 : 0;
 
     fprintf(csv_fp, "%u,%u,%.3f,%.3f,%.3f,%s,%u,%s,%u,",
 	    flow->flow_id,
@@ -987,12 +1028,17 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			       flow->detected_protocol, buf, sizeof(buf)));
 
+    fprintf(csv_fp, "%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%9.lf,", \
+     benign_score, dos_slow_score, dos_ge_score, dos_hulk_score, \
+     ddos_score, hearthbleed_score, ftp_patator_score, \
+     ssh_patator_score, inf_score);
+
     fprintf(csv_fp, "%u,%llu,%llu,", flow->src2dst_packets,
 	    (long long unsigned int) flow->src2dst_bytes, (long long unsigned int) flow->src2dst_goodput_bytes);
     fprintf(csv_fp, "%u,%llu,%llu,", flow->dst2src_packets,
 	    (long long unsigned int) flow->dst2src_bytes, (long long unsigned int) flow->dst2src_goodput_bytes);
     fprintf(csv_fp, "%.3f,%s,", data_ratio, ndpi_data_ratio2str(data_ratio));
-    fprintf(csv_fp, "%.1f,%.1f", 100.0*((float)flow->src2dst_goodput_bytes / (float)(flow->src2dst_bytes+1)),
+    fprintf(csv_fp, "%.1f,%.1f,", 100.0*((float)flow->src2dst_goodput_bytes / (float)(flow->src2dst_bytes+1)),
 	    100.0*((float)flow->dst2src_goodput_bytes / (float)(flow->dst2src_bytes+1)));
     
     /* IAT (Inter Arrival Time) */
@@ -1008,22 +1054,32 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    ndpi_data_min(flow->pktlen_c_to_s), ndpi_data_average(flow->pktlen_c_to_s), ndpi_data_max(flow->pktlen_c_to_s), ndpi_data_stddev(flow->pktlen_c_to_s),
 	    ndpi_data_min(flow->pktlen_s_to_c), ndpi_data_average(flow->pktlen_s_to_c), ndpi_data_max(flow->pktlen_s_to_c), ndpi_data_stddev(flow->pktlen_s_to_c));
 
+    /* TCP flags */
+   fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->cwr_count, flow->ece_count, flow->urg_count, flow->ack_count, flow->psh_count, flow->rst_count, flow->syn_count, flow->fin_count);
+
+   fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->src2dst_cwr_count, flow->src2dst_ece_count, flow->src2dst_urg_count, flow->src2dst_ack_count, flow->src2dst_psh_count, flow->src2dst_rst_count, flow->src2dst_syn_count, flow->src2dst_fin_count);
+
+   fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->dst2src_cwr_count, flow->ece_count, flow->urg_count, flow->ack_count, flow->psh_count, flow->rst_count, flow->syn_count, flow->fin_count);
+
+   /* TCP window */
+   fprintf(csv_fp, "%u,%u,", flow->c_to_s_init_win, flow->s_to_c_init_win);
+
     fprintf(csv_fp, "%s,%s,",
-	    (flow->ssh_tls.client_info[0] != '\0')  ? flow->ssh_tls.client_info : "",
-	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
+	    (flow->ssh_tls.client_info[0] != '\0')  ? flow->ssh_tls.client_info : "0",
+	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "0");
 
     fprintf(csv_fp, "%s,%s,%s,",
-	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls) : "",
-	    (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
-	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "");
+	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls) : "0",
+	    (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "0",
+	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "0");
 
     fprintf(csv_fp, "%s,%s,",
-	    (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "",
-	    (flow->ssh_tls.ja3_server[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.server_unsafe_cipher) : "");
+	    (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "0",
+	    (flow->ssh_tls.ja3_server[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.server_unsafe_cipher) : "0");
 
     fprintf(csv_fp, "%s,%s",
-	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "",
-	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : ""
+	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "0",
+	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : "0"
 	    );
 
     fprintf(csv_fp, "\n");

@@ -1062,6 +1062,41 @@ ndpi_clear_entropy_stats(struct ndpi_flow_info *flow) {
   }
 }
 
+void update_tcp_flags_count(struct ndpi_flow_info* flow, struct ndpi_tcphdr* tcp, u_int8_t src_to_dst_direction){
+    if(tcp->cwr){
+        flow->cwr_count++;
+        src_to_dst_direction ? flow->src2dst_cwr_count++ : flow->dst2src_cwr_count++;
+    }
+    if(tcp->ece){
+        flow->ece_count++;
+        src_to_dst_direction ? flow->src2dst_ece_count++ : flow->dst2src_ece_count++;
+    }
+    if(tcp->rst){
+        flow->rst_count++;
+        src_to_dst_direction ? flow->src2dst_rst_count++ : flow->dst2src_rst_count++;
+    }
+    if(tcp->ack){
+        flow->ack_count++;
+        src_to_dst_direction ? flow->src2dst_ack_count++ : flow->dst2src_ack_count++;
+    }
+    if(tcp->fin){
+        flow->fin_count++;
+        src_to_dst_direction ? flow->src2dst_fin_count++ : flow->dst2src_fin_count++;
+    }
+    if(tcp->syn){
+        flow->syn_count++;
+        src_to_dst_direction ? flow->src2dst_syn_count++ : flow->dst2src_syn_count++;
+    }
+    if(tcp->psh){
+        flow->psh_count++;
+        src_to_dst_direction ? flow->src2dst_psh_count++ : flow->dst2src_psh_count++;
+    }
+    if(tcp->urg){
+        flow->urg_count++;
+        src_to_dst_direction ? flow->src2dst_urg_count++ : flow->dst2src_urg_count++;
+    }
+}
+
 /* ****************************************************** */
 /**
    Function to process the packet:
@@ -1116,6 +1151,15 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       workflow->stats.total_ip_bytes += rawsize;
     ndpi_flow = flow->ndpi_flow;
 
+    if(tcph != NULL){
+        update_tcp_flags_count(flow, tcph, src_to_dst_direction);
+        if(tcph->syn && !flow->src2dst_bytes){
+            flow->c_to_s_init_win = rawsize;
+        }else if(tcph->syn && tcph->ack && flow->src2dst_bytes == flow->c_to_s_init_win){
+            flow->s_to_c_init_win = rawsize;
+        }
+    }
+
     if((tcph != NULL) && (tcph->fin || tcph->rst || tcph->syn))
       begin_or_end_tcp = 1;
 
@@ -1155,7 +1199,6 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	  ndpi_data_add_value(flow->iat_s_to_c, ms);
 	}
       }
-
       ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize, flow->dst2src_goodput_bytes += payload_len;
       memcpy(&flow->entropy.dst2src_last_pkt_time, &when, sizeof(when));

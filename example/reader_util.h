@@ -32,6 +32,7 @@
 #include "uthash.h"
 #include <pcap.h>
 #include "ndpi_classify.h"
+#include "ndpi_typedefs.h"
 
 #ifdef USE_DPDK
 #include <rte_eal.h>
@@ -164,6 +165,15 @@ typedef struct ndpi_flow_info {
   struct ndpi_flow_struct *ndpi_flow;
   char src_name[48], dst_name[48];
   u_int8_t ip_version;
+  u_int32_t cwr_count, src2dst_cwr_count, dst2src_cwr_count;
+  u_int32_t ece_count, src2dst_ece_count, dst2src_ece_count;
+  u_int32_t urg_count, src2dst_urg_count, dst2src_urg_count;
+  u_int32_t ack_count, src2dst_ack_count, dst2src_ack_count;
+  u_int32_t psh_count, src2dst_psh_count, dst2src_psh_count;
+  u_int32_t syn_count, src2dst_syn_count, dst2src_syn_count;
+  u_int32_t fin_count, src2dst_fin_count, dst2src_fin_count;
+  u_int32_t rst_count, src2dst_rst_count, dst2src_rst_count;
+  u_int32_t c_to_s_init_win, s_to_c_init_win;
   u_int64_t first_seen, last_seen;
   u_int64_t src2dst_bytes, dst2src_bytes;
   u_int64_t src2dst_goodput_bytes, dst2src_goodput_bytes;
