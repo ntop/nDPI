@@ -242,7 +242,7 @@ static void reduceBDbits(uint32_t *bd, unsigned int len) {
 static void
 flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
   FILE *out = results_file ? results_file : stdout;
-
+  
   const uint32_t *array = NULL;
   uint32_t tmp[256], i;
   unsigned int num_bytes;
@@ -1008,8 +1008,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     ssh_patator_score = Ssh_patator_score(flow);
 
     inf_score = Infiltration_score(flow);
-
-    
+   
     double benign_score = dos_ge_score < 1 && dos_slow_score < 1 && \
     dos_hulk_score < 1 && ddos_score < 1 && hearthbleed_score < 1 && \
     ftp_patator_score < 1 && ssh_patator_score < 1 && inf_score < 1 ? 1.1 : 0;
@@ -1028,11 +1027,11 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			       flow->detected_protocol, buf, sizeof(buf)));
 
-    fprintf(csv_fp, "%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%.9lf,%9.lf,", \
-     benign_score, dos_slow_score, dos_ge_score, dos_hulk_score, \
-     ddos_score, hearthbleed_score, ftp_patator_score, \
-     ssh_patator_score, inf_score);
-
+    fprintf(csv_fp, "%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,", \
+	    benign_score, dos_slow_score, dos_ge_score, dos_hulk_score, \
+	    ddos_score, hearthbleed_score, ftp_patator_score,		\
+	    ssh_patator_score, inf_score);
+    
     fprintf(csv_fp, "%u,%llu,%llu,", flow->src2dst_packets,
 	    (long long unsigned int) flow->src2dst_bytes, (long long unsigned int) flow->src2dst_goodput_bytes);
     fprintf(csv_fp, "%u,%llu,%llu,", flow->dst2src_packets,
