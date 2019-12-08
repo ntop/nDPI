@@ -1189,6 +1189,17 @@ struct ndpi_flow_struct {
     u_int16_t response_status_code; /* 200, 404, etc. */
   } http;
 
+  /* 
+     Put outside of the union to avoid issues in case the protocol
+     is remapped to somethign pther than Kerberos due to a faulty
+     dissector
+  */
+  struct {    
+    char *pktbuf;
+    u_int16_t pktbuf_maxlen, pktbuf_currlen;
+  } kerberos_buf;
+
+
   union {
     /* the only fields useful for nDPI and ntopng */
     struct {
@@ -1203,8 +1214,6 @@ struct ndpi_flow_struct {
     } ntp;
 
     struct {
-      char *pktbuf;
-      u_int16_t pktbuf_maxlen, pktbuf_currlen;
       char hostname[48], domain[48], username[48];
     } kerberos;
 

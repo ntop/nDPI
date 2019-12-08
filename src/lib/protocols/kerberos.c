@@ -30,6 +30,8 @@
 
 //#define KERBEROS_DEBUG 1
 
+#define KERBEROS_PORT 88
+
 static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					     struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KERBEROS, NDPI_PROTOCOL_UNKNOWN);
@@ -41,34 +43,37 @@ static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct
 void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-#ifdef KERBEROS_DEBUG
   u_int16_t sport = packet->tcp ? ntohs(packet->tcp->source) : ntohs(packet->udp->source);
   u_int16_t dport = packet->tcp ? ntohs(packet->tcp->dest) : ntohs(packet->udp->dest);
-#endif
 
+  if((sport != KERBEROS_PORT) && (dport != KERBEROS_PORT)) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+  
   NDPI_LOG_DBG(ndpi_struct, "search KERBEROS\n");
 
 #ifdef KERBEROS_DEBUG
   printf("\n[Kerberos] Process packet [len: %u]\n", packet->payload_packet_len);
 #endif
     
-  if(flow->protos.kerberos.pktbuf != NULL) {
-    u_int missing = flow->protos.kerberos.pktbuf_maxlen - flow->protos.kerberos.pktbuf_currlen;
+  if(flow->kerberos_buf.pktbuf != NULL) {
+    u_int missing = flow->kerberos_buf.pktbuf_maxlen - flow->kerberos_buf.pktbuf_currlen;
 
     if(packet->payload_packet_len <= missing) {
-      memcpy(&flow->protos.kerberos.pktbuf[flow->protos.kerberos.pktbuf_currlen], packet->payload, packet->payload_packet_len);
-      flow->protos.kerberos.pktbuf_currlen += packet->payload_packet_len;
+      memcpy(&flow->kerberos_buf.pktbuf[flow->kerberos_buf.pktbuf_currlen], packet->payload, packet->payload_packet_len);
+      flow->kerberos_buf.pktbuf_currlen += packet->payload_packet_len;
 
-      if(flow->protos.kerberos.pktbuf_currlen == flow->protos.kerberos.pktbuf_maxlen) {
-	packet->payload = (u_int8_t *)flow->protos.kerberos.pktbuf;
-	packet->payload_packet_len = flow->protos.kerberos.pktbuf_currlen;
+      if(flow->kerberos_buf.pktbuf_currlen == flow->kerberos_buf.pktbuf_maxlen) {
+	packet->payload = (u_int8_t *)flow->kerberos_buf.pktbuf;
+	packet->payload_packet_len = flow->kerberos_buf.pktbuf_currlen;
 #ifdef KERBEROS_DEBUG
 	printf("[Kerberos] Packet is now full: processing\n");
 #endif
       } else {
 #ifdef KERBEROS_DEBUG
 	printf("[Kerberos] Missing %u bytes: skipping\n",
-	       flow->protos.kerberos.pktbuf_maxlen - flow->protos.kerberos.pktbuf_currlen);
+	       flow->kerberos_buf.pktbuf_maxlen - flow->kerberos_buf.pktbuf_currlen);
 #endif
 
 	return;
@@ -100,11 +105,11 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
       */
       if(kerberos_len > expected_len) {
 	if(packet->tcp) {
-	  flow->protos.kerberos.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
-	  if(flow->protos.kerberos.pktbuf != NULL) {
-	    flow->protos.kerberos.pktbuf_maxlen = kerberos_len+4;
-	    memcpy(flow->protos.kerberos.pktbuf, packet->payload, packet->payload_packet_len);
-	    flow->protos.kerberos.pktbuf_currlen = packet->payload_packet_len;
+	  flow->kerberos_buf.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
+	  if(flow->kerberos_buf.pktbuf != NULL) {
+	    flow->kerberos_buf.pktbuf_maxlen = kerberos_len+4;
+	    memcpy(flow->kerberos_buf.pktbuf, packet->payload, packet->payload_packet_len);
+	    flow->kerberos_buf.pktbuf_currlen = packet->payload_packet_len;
 	  }
 	}
 	
@@ -306,8 +311,8 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 		    /* If necessary we can decode sname */
 
-		    if(flow->protos.kerberos.pktbuf) ndpi_free(flow->protos.kerberos.pktbuf);
-		    flow->protos.kerberos.pktbuf = NULL;
+		    if(flow->kerberos_buf.pktbuf) ndpi_free(flow->kerberos_buf.pktbuf);
+		    flow->kerberos_buf.pktbuf = NULL;
 		  }
 		}
 	      }
@@ -316,9 +321,9 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		ndpi_int_kerberos_add_connection(ndpi_struct, flow);
 
 	      /* We set the protocol in the response */
-	      if(flow->protos.kerberos.pktbuf != NULL) {
-		free(flow->protos.kerberos.pktbuf);
-		flow->protos.kerberos.pktbuf = NULL;
+	      if(flow->kerberos_buf.pktbuf != NULL) {
+		free(flow->kerberos_buf.pktbuf);
+		flow->kerberos_buf.pktbuf = NULL;
 	      }
 	      
 	      return;

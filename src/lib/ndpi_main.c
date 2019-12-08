@@ -6373,10 +6373,10 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
-  if(flow->http.url)            ndpi_free(flow->http.url);
-    if(flow->http.content_type) ndpi_free(flow->http.content_type);
-    if(flow->http.user_agent)   ndpi_free(flow->http.user_agent);
-    if(flow->protos.kerberos.pktbuf) ndpi_free(flow->protos.kerberos.pktbuf);
+  if(flow->http.url)              ndpi_free(flow->http.url);
+    if(flow->http.content_type)   ndpi_free(flow->http.content_type);
+    if(flow->http.user_agent)     ndpi_free(flow->http.user_agent);
+    if(flow->kerberos_buf.pktbuf) ndpi_free(flow->kerberos_buf.pktbuf);
   
     if(flow->l4_proto == IPPROTO_TCP) {
       if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
