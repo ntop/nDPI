@@ -981,11 +981,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_KERBEROS)) {
     if((flow->ndpi_flow->protos.kerberos.hostname[0] != '\0')
        || (flow->ndpi_flow->protos.kerberos.username[0] != '\0')) {
-      snprintf(flow->info, sizeof(flow->info), "%s%s (%s)",
+      snprintf(flow->info, sizeof(flow->info), "%s%s%s%s",
+	       flow->ndpi_flow->protos.kerberos.domain /* = realm */,
+	       flow->ndpi_flow->protos.kerberos.domain[0] != '\0' ? "\\" : "",
 	       flow->ndpi_flow->protos.kerberos.hostname,
-	       flow->ndpi_flow->protos.kerberos.username,
+	       flow->ndpi_flow->protos.kerberos.username);
+    } else if(flow->ndpi_flow->protos.kerberos.domain[0] != '\0')
+      snprintf(flow->info, sizeof(flow->info), "%s",
 	       flow->ndpi_flow->protos.kerberos.domain);
-    }
   }
   /* HTTP */
   else if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP)
@@ -1171,21 +1174,21 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       if((flow->entropy.src2dst_pkt_count+flow->entropy.dst2src_pkt_count) <= max_num_packets_per_flow) {
         if(flow->bidirectional)
           flow->entropy.score = ndpi_classify(flow->entropy.src2dst_pkt_len, flow->entropy.src2dst_pkt_time,
-				     flow->entropy.dst2src_pkt_len, flow->entropy.dst2src_pkt_time,
-				     flow->entropy.src2dst_start, flow->entropy.dst2src_start,
-				     max_num_packets_per_flow, flow->src_port, flow->dst_port,
-				     flow->src2dst_packets, flow->dst2src_packets,
-				     flow->entropy.src2dst_opackets, flow->entropy.dst2src_opackets,
-				     flow->entropy.src2dst_l4_bytes, flow->entropy.dst2src_l4_bytes, 1,
-				     flow->entropy.src2dst_byte_count, flow->entropy.dst2src_byte_count);
-       else
-         flow->entropy.score = ndpi_classify(flow->entropy.src2dst_pkt_len, flow->entropy.src2dst_pkt_time,
-				     NULL, NULL, flow->entropy.src2dst_start, flow->entropy.src2dst_start,
-				     max_num_packets_per_flow, flow->src_port, flow->dst_port,
-				     flow->src2dst_packets, 0,
-				     flow->entropy.src2dst_opackets, 0,
-				     flow->entropy.src2dst_l4_bytes, 0, 1,
-				     flow->entropy.src2dst_byte_count, NULL);
+					      flow->entropy.dst2src_pkt_len, flow->entropy.dst2src_pkt_time,
+					      flow->entropy.src2dst_start, flow->entropy.dst2src_start,
+					      max_num_packets_per_flow, flow->src_port, flow->dst_port,
+					      flow->src2dst_packets, flow->dst2src_packets,
+					      flow->entropy.src2dst_opackets, flow->entropy.dst2src_opackets,
+					      flow->entropy.src2dst_l4_bytes, flow->entropy.dst2src_l4_bytes, 1,
+					      flow->entropy.src2dst_byte_count, flow->entropy.dst2src_byte_count);
+	else
+	  flow->entropy.score = ndpi_classify(flow->entropy.src2dst_pkt_len, flow->entropy.src2dst_pkt_time,
+					      NULL, NULL, flow->entropy.src2dst_start, flow->entropy.src2dst_start,
+					      max_num_packets_per_flow, flow->src_port, flow->dst_port,
+					      flow->src2dst_packets, 0,
+					      flow->entropy.src2dst_opackets, 0,
+					      flow->entropy.src2dst_l4_bytes, 0, 1,
+					      flow->entropy.src2dst_byte_count, NULL);
       }
     }
 

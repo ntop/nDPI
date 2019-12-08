@@ -28,7 +28,7 @@
 
 #include "ndpi_api.h"
 
-/* #define KERBEROS_DEBUG 1 */
+//#define KERBEROS_DEBUG 1
 
 static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					     struct ndpi_flow_struct *flow) {
@@ -41,61 +41,194 @@ static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct
 void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
+#ifdef KERBEROS_DEBUG
+  u_int16_t sport = packet->tcp ? ntohs(packet->tcp->source) : ntohs(packet->udp->source);
+  u_int16_t dport = packet->tcp ? ntohs(packet->tcp->dest) : ntohs(packet->udp->dest);
+#endif
 
   NDPI_LOG_DBG(ndpi_struct, "search KERBEROS\n");
 
+#ifdef KERBEROS_DEBUG
+  printf("\n[Kerberos] Process packet [len: %u]\n", packet->payload_packet_len);
+#endif
+    
+  if(flow->protos.kerberos.pktbuf != NULL) {
+    u_int missing = flow->protos.kerberos.pktbuf_maxlen - flow->protos.kerberos.pktbuf_currlen;
+
+    if(packet->payload_packet_len <= missing) {
+      memcpy(&flow->protos.kerberos.pktbuf[flow->protos.kerberos.pktbuf_currlen], packet->payload, packet->payload_packet_len);
+      flow->protos.kerberos.pktbuf_currlen += packet->payload_packet_len;
+
+      if(flow->protos.kerberos.pktbuf_currlen == flow->protos.kerberos.pktbuf_maxlen) {
+	packet->payload = (u_int8_t *)flow->protos.kerberos.pktbuf;
+	packet->payload_packet_len = flow->protos.kerberos.pktbuf_currlen;
+#ifdef KERBEROS_DEBUG
+	printf("[Kerberos] Packet is now full: processing\n");
+#endif
+      } else {
+#ifdef KERBEROS_DEBUG
+	printf("[Kerberos] Missing %u bytes: skipping\n",
+	       flow->protos.kerberos.pktbuf_maxlen - flow->protos.kerberos.pktbuf_currlen);
+#endif
+
+	return;
+      }
+    }
+  }
+
   /* I have observed 0a,0c,0d,0e at packet->payload[19/21], maybe there are other possibilities */
   if(packet->payload_packet_len >= 4) {
-    u_int32_t kerberos_len = ntohl(get_u_int32_t(packet->payload, 0));
-    u_int32_t expected_len = packet->payload_packet_len - 4;
+    u_int32_t kerberos_len, expected_len;
+    u_int16_t base_offset = 0;
 
-    if(kerberos_len < 1514) {
+    if(packet->tcp) {
+      kerberos_len = ntohl(get_u_int32_t(packet->payload, 0)),
+	expected_len = packet->payload_packet_len - 4;
+      base_offset = 4;
+    } else
+      base_offset = 0, kerberos_len = expected_len = packet->payload_packet_len;
+
+#ifdef KERBEROS_DEBUG
+    printf("[Kerberos] [Kerberos len: %u][expected_len: %u]\n", kerberos_len, expected_len);
+#endif
+
+    if(kerberos_len < 12000) {
       /*
 	Kerberos packets might be too long for a TCP packet
 	so it could be split across two packets. Instead of
 	rebuilding the stream we use a heuristic approach
       */
-      if(kerberos_len >= expected_len) {
+      if(kerberos_len > expected_len) {
+	if(packet->tcp) {
+	  flow->protos.kerberos.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
+	  if(flow->protos.kerberos.pktbuf != NULL) {
+	    flow->protos.kerberos.pktbuf_maxlen = kerberos_len+4;
+	    memcpy(flow->protos.kerberos.pktbuf, packet->payload, packet->payload_packet_len);
+	    flow->protos.kerberos.pktbuf_currlen = packet->payload_packet_len;
+	  }
+	}
+	
+	return;
+      } else if(kerberos_len == expected_len) {
 	if(packet->payload_packet_len > 128) {
-	  u_int16_t koffset;
+	  u_int16_t koffset, i;
 
-	  if(packet->payload[14] == 0x05) /* PVNO */
-	    koffset = 19;
-	  else
-	    koffset = 21;
+	  for(i=8; i<16; i++)
+	    if((packet->payload[base_offset+i] == 0x03)
+	       && (packet->payload[base_offset+i+1] == 0x02)
+	       && (packet->payload[base_offset+i+2] == 0x01)
+	       && (packet->payload[base_offset+i+3] != 0x05)
+	       )
+	      break;
 
-	  if((packet->payload[koffset] == 0x0a || packet->payload[koffset] == 0x0c || packet->payload[koffset] == 0x0d || packet->payload[koffset] == 0x0e)) {
+	  koffset = base_offset + i + 3;
+
 #ifdef KERBEROS_DEBUG
-	    printf("[Kerberos] Packet found\n");
+	  printf("[Kerberos] [msg-type: 0x%02X/%u][koffset: %u]\n",
+		 packet->payload[koffset], packet->payload[koffset], koffset);
 #endif
 
-	    if(packet->payload[koffset] == 0x0a) /* AS-REQ */ {
-	      u_int16_t koffsetp, pad_data_len, body_offset;
-	      
-	      koffsetp = koffset + 4;
-	      pad_data_len = packet->payload[koffsetp];	      
-	      body_offset  = pad_data_len + koffsetp;
+	  if(((packet->payload[koffset] == 0x0A)
+	      || (packet->payload[koffset] == 0x0C)
+	      || (packet->payload[koffset] == 0x0D)
+	      || (packet->payload[koffset] == 0x0E))) {
+	    u_int16_t koffsetp, body_offset, pad_len;
+	    u_int8_t msg_type = packet->payload[koffset];
+
+#ifdef KERBEROS_DEBUG
+	    printf("[Kerberos] Packet found 0x%02X/%u\n", msg_type, msg_type);
+#endif
+	    if(msg_type != 0x0d) /* TGS-REP */ {
+	      /* Process only on requests */
+	      if(packet->payload[koffset+1] == 0xA3) {
+		if(packet->payload[koffset+3] == 0x30)
+		  pad_len = packet->payload[koffset+4];
+		else {
+		  /* Long pad */
+		  pad_len = packet->payload[koffset+2];
+		  for(i=3; i<10; i++) if(packet->payload[koffset+i] == pad_len) break;
+
+		  pad_len = (packet->payload[koffset+i+1] << 8) + packet->payload[koffset+i+2];
+		  koffset += i-2;
+		}
+	      } else
+		pad_len = 0;
+
+#ifdef KERBEROS_DEBUG
+	      printf("pad_len=0x%02X/%u\n", pad_len, pad_len);
+#endif
+
+	      if(pad_len > 0) {
+		koffsetp = koffset + 2;
+		for(i=0; i<4; i++) if(packet->payload[koffsetp] != 0x30) koffsetp++; /* ASN.1 */
+#ifdef KERBEROS_DEBUG
+		printf("koffsetp=%u [%02X %02X] [byte 0 must be 0x30]\n", koffsetp, packet->payload[koffsetp], packet->payload[koffsetp+1]);
+#endif
+	      } else
+		koffsetp = koffset;
+
+	      body_offset = koffsetp + 1 + pad_len;
+
+	      for(i=0; i<10; i++) if(packet->payload[body_offset] != 0x05) body_offset++; /* ASN.1 */
+#ifdef KERBEROS_DEBUG
+	      printf("body_offset=%u [%02X %02X] [byte 0 must be 0x05]\n", body_offset, packet->payload[body_offset], packet->payload[body_offset+1]);
+#endif
+	    }
+	    
+	    if(msg_type == 0x0A) /* AS-REQ */ {
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Processing AS-REQ\n");
+#endif
+
 
 	      if(body_offset < packet->payload_packet_len) {
-		u_int name_offset = body_offset + 30;
+		u_int16_t name_offset;
 
-		if(name_offset < packet->payload_packet_len) {
-		  u_int cname_len = packet->payload[name_offset];
-
-		  if((cname_len+name_offset) < packet->payload_packet_len) {
-		    u_int realm_len, realm_offset = cname_len + name_offset + 4, i;
-		    char cname_str[24];
-
-		    if(cname_len > sizeof(cname_str)-1)
-		      cname_len = sizeof(cname_str)-1;
-
-		    strncpy(cname_str, (char*)&packet->payload[name_offset+1], cname_len);
-		    cname_str[cname_len] = '\0';
-		    for(i=0; i<cname_len; i++) cname_str[i] = tolower(cname_str[i]);
+		name_offset = body_offset + 13;
+		for(i=0; i<10; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
 
 #ifdef KERBEROS_DEBUG
-		    printf("[Kerberos Cname][len: %u][%s]\n", cname_len, cname_str);
+		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
 #endif
+
+		if(name_offset < packet->payload_packet_len) {
+		  u_int cname_len;
+
+		  name_offset += 1;
+		  if(packet->payload[name_offset+1] < ' ') /* Isn't printable ? */
+		    name_offset++;
+
+		  if(packet->payload[name_offset+1] == 0x1b)
+		    name_offset += 2;
+		  
+		  cname_len = packet->payload[name_offset];
+
+		  if((cname_len+name_offset) < packet->payload_packet_len) {
+		    u_int realm_len, realm_offset, i;
+		    char cname_str[48];
+		    u_int8_t num_cname = 0;
+
+		    while(++num_cname <= 2) {
+		      if(cname_len > sizeof(cname_str)-1)
+			cname_len = sizeof(cname_str)-1;
+
+		      strncpy(cname_str, (char*)&packet->payload[name_offset+1], cname_len);
+		      cname_str[cname_len] = '\0';
+		      for(i=0; i<cname_len; i++) cname_str[i] = tolower(cname_str[i]);
+
+#ifdef KERBEROS_DEBUG
+		      printf("[AS-REQ][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n",
+			     sport, dport, cname_len, cname_str);
+#endif
+
+		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b)) {
+			name_offset += cname_len + 2;
+			cname_len = packet->payload[name_offset];
+		      } else
+			break;
+		    }
+
+		    realm_offset = cname_len + name_offset + 3;
 
 		    /* if cname does not end with a $ then it's a username */
 		    if(cname_len && cname_str[cname_len-1] == '$') {
@@ -104,62 +237,97 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    } else
 		      snprintf(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username), "%s", cname_str);
 
+		    for(i=0; i<10; i++) if(packet->payload[realm_offset] != 0x1b) name_offset++; /* ASN.1 */
+#ifdef KERBEROS_DEBUG
+		    printf("realm_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", realm_offset, packet->payload[realm_offset], packet->payload[realm_offset+1]);
+#endif
+		    realm_offset += 1;
+		    //if(num_cname == 2) realm_offset++;
 		    realm_len = packet->payload[realm_offset];
 
 		    if((realm_offset+realm_len) < packet->payload_packet_len) {
-		      char realm_str[24];
+		      char realm_str[48];
 
 		      if(realm_len > sizeof(realm_str)-1)
 			realm_len = sizeof(realm_str);
 
-		      strncpy(realm_str, (char*)&packet->payload[realm_offset+1], realm_len);
+		      realm_offset += 1;
+
+		      strncpy(realm_str, (char*)&packet->payload[realm_offset], realm_len);
 		      realm_str[realm_len] = '\0';
 		      for(i=0; i<realm_len; i++) realm_str[i] = tolower(realm_str[i]);
 
 #ifdef KERBEROS_DEBUG
-		      printf("[Kerberos Realm][len: %u][%s]\n", realm_len, realm_str);
+		      printf("[AS-REQ][Kerberos Realm][len: %u][%s]\n", realm_len, realm_str);
 #endif
 		      snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
 		    }
 		  }
 		}
-	      }
-	    } else if(packet->payload[koffset] == 0x0c) /* TGS-REQ */ {
-	      u_int16_t koffsetp, pad_data_len, body_offset;
-
-	      koffsetp = koffset + 3;
-	      pad_data_len = ntohs(*((u_int16_t*)&packet->payload[koffsetp]));
-	      body_offset = pad_data_len + koffsetp + 4;
+	      } 
+	    } else if(msg_type == 0x0c) /* TGS-REQ */ {
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Processing TGS-REQ\n");
+#endif
 
 	      if(body_offset < packet->payload_packet_len) {
-		u_int name_offset = body_offset + 14;
+		u_int name_offset, padding_offset = body_offset + 4;
+
+		name_offset = padding_offset;
+		for(i=0; i<10; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
+
+#ifdef KERBEROS_DEBUG
+		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
+#endif
 
 		if(name_offset < packet->payload_packet_len) {
-		  u_int realm_len = packet->payload[name_offset];
+		  u_int realm_len;
+
+		  name_offset++;
+		  realm_len = packet->payload[name_offset];
 
 		  if((realm_len+name_offset) < packet->payload_packet_len) {
 		    u_int i;
-		    char realm_str[24];
+		    char realm_str[48];
 
 		    if(realm_len > sizeof(realm_str)-1)
 		      realm_len = sizeof(realm_str)-1;
 
-		    strncpy(realm_str, (char*)&packet->payload[name_offset+1], realm_len);
+		    name_offset += 1;
+
+		    strncpy(realm_str, (char*)&packet->payload[name_offset], realm_len);
 		    realm_str[realm_len] = '\0';
 		    for(i=0; i<realm_len; i++) realm_str[i] = tolower(realm_str[i]);
 
 #ifdef KERBEROS_DEBUG
-		    printf("[Kerberos Realm][len: %u][%s]\n", realm_len, realm_str);
+		    printf("[TGS-REQ][s/dport: %u/%u][Kerberos Realm][len: %u][%s]\n", sport, dport, realm_len, realm_str);
 #endif
 		    snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
+
+		    /* If necessary we can decode sname */
+
+		    if(flow->protos.kerberos.pktbuf) ndpi_free(flow->protos.kerberos.pktbuf);
+		    flow->protos.kerberos.pktbuf = NULL;
 		  }
 		}
 	      }
 
+	      if(packet->udp)
+		ndpi_int_kerberos_add_connection(ndpi_struct, flow);
+
 	      /* We set the protocol in the response */
+	      if(flow->protos.kerberos.pktbuf != NULL) {
+		free(flow->protos.kerberos.pktbuf);
+		flow->protos.kerberos.pktbuf = NULL;
+	      }
+	      
 	      return;
-	    } else if(packet->payload[koffset] == 0x0d) /* TGS-RES */ {
+	    } else if(msg_type == 0x0d) /* TGS-REP */ {
 	      u_int16_t koffsetp, pad_data_len, cname_offset;
+	      
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Processing TGS-REP\n");
+#endif
 
 	      koffsetp = koffset + 4;
 	      pad_data_len = packet->payload[koffsetp];
@@ -170,20 +338,21 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int8_t cname_len = packet->payload[cname_offset];
 
 		if((cname_offset+cname_offset) < packet->payload_packet_len) {
-		  char cname_str[24];
+		  char cname_str[48];
 		  u_int i;
-		  
+
 		  if(cname_len > sizeof(cname_str)-1)
 		    cname_len = sizeof(cname_str)-1;
-		  
+
 		  strncpy(cname_str, (char*)&packet->payload[cname_offset+1], cname_len);
 		  cname_str[cname_len] = '\0';
 		  for(i=0; i<cname_len; i++) cname_str[i] = tolower(cname_str[i]);
-		  
+
 #ifdef KERBEROS_DEBUG
-		  printf("[Kerberos Cname][len: %u][%s]\n", cname_len, cname_str);
+		  printf("[TGS-REP][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n",
+			 sport, dport, cname_len, cname_str);
 #endif
-		  
+
 		  if(cname_len && cname_str[cname_len-1] == '$') {
 		    cname_str[cname_len-1] = '\0';
 		    snprintf(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname), "%s", cname_str);
@@ -194,7 +363,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 	      }
 	    }
-	    
+
 	    return;
 	  }
 
@@ -208,6 +377,11 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
     } else {
+#ifdef KERBEROS_DEBUG
+      printf("[Kerberos][s/dport: %u/%u] Skipping packet: too long [kerberos_len: %u]\n",
+	     sport, dport, kerberos_len);
+#endif
+
       if(flow->protos.kerberos.domain[0] != '\0')
 	return;
     }
@@ -222,7 +396,7 @@ void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("Kerberos", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_KERBEROS,
 				      ndpi_search_kerberos,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

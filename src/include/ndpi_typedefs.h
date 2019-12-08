@@ -1203,8 +1203,9 @@ struct ndpi_flow_struct {
     } ntp;
 
     struct {
-      
-      char hostname[24], domain[24], username[24];
+      char *pktbuf;
+      u_int16_t pktbuf_maxlen, pktbuf_currlen;
+      char hostname[48], domain[48], username[48];
     } kerberos;
 
     struct {
