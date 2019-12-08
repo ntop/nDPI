@@ -484,7 +484,7 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
 		packet->payload_packet_len);
 
   /* Check first char */
-  if(!strchr(http_fs,packet->payload[0])) return 0;
+  if(!packet->payload_packet_len || !strchr(http_fs,packet->payload[0])) return 0;
   /**
      FIRST PAYLOAD PACKET FROM CLIENT
   **/

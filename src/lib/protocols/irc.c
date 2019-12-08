@@ -495,7 +495,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  packet->parsed_lines = 0;
 	}
 	for (i = 0; i < packet->parsed_lines; i++) {
-	  if (packet->line[i].ptr[0] == ':') {
+	  if ((packet->line[i].len > 0) && packet->line[i].ptr[0] == ':') {
 	    flow->l4.tcp.irc_3a_counter++;
 	    if (flow->l4.tcp.irc_3a_counter == 7) {	/* ':' == 0x3a */
 	      NDPI_LOG_INFO(ndpi_struct, "found irc. 0x3a. seven times.");

@@ -296,7 +296,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
       flow->l4.tcp.ssh_stage = 3;
       return;
     }
-  } else {
+  } else if(packet->payload_packet_len > 5) {
     u_int8_t msgcode = *(packet->payload + 5);
     ndpi_MD5_CTX ctx;
 

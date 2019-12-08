@@ -4252,6 +4252,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	if(flow->host_server_name[0] != '\0') {
 	  ndpi_protocol_match_result ret_match;
 
+	  memset(&ret_match, 0, sizeof(ret_match));
+
 	  ndpi_match_host_subprotocol(ndpi_str, flow,
 				      (char *)flow->host_server_name,
 				      strlen((const char*)flow->host_server_name),
@@ -4700,7 +4702,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
       /* Update in case of new match */
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0], ret.category = flow->category;;
-      return(ret);
+      goto invalidate_ptr;
     } else
       goto ret_protocols;
   }
@@ -5096,7 +5098,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str,
 
   for(a = 0; (a < packet->payload_packet_len)
 	&& (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
-    if((a + 1) == packet->payload_packet_len)
+    if((a + 1) >= packet->payload_packet_len)
       return; /* Return if only one byte remains (prevent invalid reads past end-of-buffer) */
 
     if(get_u_int16_t(packet->payload, a) == ntohs(0x0d0a)) { /* If end of line char sequence CR+NL "\r\n", process line */
