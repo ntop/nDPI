@@ -43,8 +43,7 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
     if((payload_len < 20) || (payload_len > 4096))
 	return;
 
-    if((payload_len > sizeof(struct radius_header))
-       && (h->code > 0)
+    if((h->code > 0)
        && (h->code <= 13)
        && (ntohs(h->len) == payload_len)) {
       NDPI_LOG_INFO(ndpi_struct, "Found radius\n");
@@ -52,6 +51,7 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
 
       return;
     }
+    
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }

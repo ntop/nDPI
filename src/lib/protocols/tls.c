@@ -352,16 +352,22 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.tls_handshake_version);
 
-	  for(i=0; i<ja3.num_cipher; i++)
-	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.cipher[i]);
+	  for(i=0; i<ja3.num_cipher; i++) {
+	    int rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.cipher[i]);
 
+	    if(rc <= 0) break; else ja3_str_len += rc;
+	  }
+	  
 	  ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
 
 	  /* ********** */
 
-	  for(i=0; i<ja3.num_tls_extension; i++)
-	    ja3_str_len += snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.tls_extension[i]);
+	  for(i=0; i<ja3.num_tls_extension; i++) {
+	    int rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.tls_extension[i]);
 
+	    if(rc <= 0) break; else ja3_str_len += rc;
+	  }
+	  
 #ifdef DEBUG_TLS
 	  printf("TLS [server] %s\n", ja3_str);
 #endif
@@ -374,10 +380,12 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  ndpi_MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
 	  ndpi_MD5Final(md5_hash, &ctx);
 
-	  for(i=0, j=0; i<16; i++)
-	    j += snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
-			  sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
-
+	  for(i=0, j=0; i<16; i++) {
+	    int rc = snprintf(&flow->protos.stun_ssl.ssl.ja3_server[j],
+			      sizeof(flow->protos.stun_ssl.ssl.ja3_server)-j, "%02x", md5_hash[i]);
+	    if(rc <= 0) break; else j += rc;
+	  }
+	  
 #ifdef DEBUG_TLS
 	  printf("[JA3] Server: %s \n", flow->protos.stun_ssl.ssl.ja3_server);
 #endif

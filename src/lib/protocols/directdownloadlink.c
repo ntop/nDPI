@@ -56,7 +56,7 @@ u_int8_t search_ddl_domains(struct ndpi_detection_module_struct *ndpi_struct, st
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t filename_start = 0;
-  u_int8_t i = 1;
+  u_int16_t i = 1;
   u_int16_t host_line_len_without_port;
 
   if (packet->payload_packet_len < 100) {

@@ -42,7 +42,7 @@ void ndpi_search_sflow(struct ndpi_detection_module_struct *ndpi_struct, struct 
     return;
   }
 
-// FIXME  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void init_sflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)

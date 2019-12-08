@@ -259,7 +259,9 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       SOULSEEK_DETECT;
       return;
     }
+    
     if(flow->l4.tcp.soulseek_stage && flow->packet_counter < 11) {
+      ;
     } else {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }

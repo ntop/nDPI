@@ -1063,9 +1063,12 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_serialize_string_string(serializer, "cipher", ndpi_cipher2str(flow->protos.stun_ssl.ssl.server_cipher));
 
 	if(flow->l4.tcp.tls_sha1_certificate_fingerprint[0] != '\0') {
-	  for(i=0, off=0; i<20; i++)
-	    off += snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
-			    flow->l4.tcp.tls_sha1_certificate_fingerprint[i] & 0xFF);
+	  for(i=0, off=0; i<20; i++) {
+	    int rc = snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
+			      flow->l4.tcp.tls_sha1_certificate_fingerprint[i] & 0xFF);
+	    
+	    if(rc <= 0) break; else off += rc;
+	  }
 
 	  ndpi_serialize_string_string(serializer, "fingerprint", buf);
 	}

@@ -1512,20 +1512,20 @@ static int receivers_sort_asc(void *_a, void *_b) {
 /*@brief removes first (size - max) elements from hash table.
  * hash table is ordered in ascending order.
  */
-static struct receiver *cutBackTo(struct receiver **receivers, u_int32_t size, u_int32_t max) {
+static struct receiver *cutBackTo(struct receiver **rcvrs, u_int32_t size, u_int32_t max) {
   struct receiver *r, *tmp;
   int i=0;
   int count;
 
   if(size < max) //return the original table
-    return *receivers;
+    return *rcvrs;
 
   count = size - max;
 
-  HASH_ITER(hh, *receivers, r, tmp) {
+  HASH_ITER(hh, *rcvrs, r, tmp) {
     if(i++ == count)
       return r;
-    HASH_DEL(*receivers, r);
+    HASH_DEL(*rcvrs, r);
     free(r);
   }
 
@@ -1563,11 +1563,11 @@ static void mergeTables(struct receiver **primary, struct receiver **secondary) 
 }
 /* *********************************************** */
 
-static void deleteReceivers(struct receiver *receivers) {
+static void deleteReceivers(struct receiver *rcvrs) {
   struct receiver *current, *tmp;
 
-  HASH_ITER(hh, receivers, current, tmp) {
-    HASH_DEL(receivers, current);
+  HASH_ITER(hh, rcvrs, current, tmp) {
+    HASH_DEL(rcvrs, current);
     free(current);
   }
 }
@@ -1587,16 +1587,16 @@ static void deleteReceivers(struct receiver *receivers) {
  * else
  *   update table1
  */
-static void updateReceivers(struct receiver **receivers, u_int32_t dst_addr,
+static void updateReceivers(struct receiver **rcvrs, u_int32_t dst_addr,
                             u_int8_t version, u_int32_t num_pkts,
-                            struct receiver **topReceivers) {
+                            struct receiver **topRcvrs) {
   struct receiver *r;
   u_int32_t size;
   int a;
 
-  HASH_FIND_INT(*receivers, (int *)&dst_addr, r);
+  HASH_FIND_INT(*rcvrs, (int *)&dst_addr, r);
   if(r == NULL) {
-    if(((size = HASH_COUNT(*receivers)) < MAX_TABLE_SIZE_1)
+    if(((size = HASH_COUNT(*rcvrs)) < MAX_TABLE_SIZE_1)
        || ((a = acceptable(num_pkts)) != 0)){
       r = (struct receiver *)malloc(sizeof(struct receiver));
       if(!r) return;
@@ -1605,20 +1605,20 @@ static void updateReceivers(struct receiver **receivers, u_int32_t dst_addr,
       r->version = version;
       r->num_pkts = num_pkts;
 
-      HASH_ADD_INT(*receivers, addr, r);
+      HASH_ADD_INT(*rcvrs, addr, r);
 
-      if((size = HASH_COUNT(*receivers)) > MAX_TABLE_SIZE_2){
+      if((size = HASH_COUNT(*rcvrs)) > MAX_TABLE_SIZE_2){
 
-        HASH_SORT(*receivers, receivers_sort_asc);
-        *receivers = cutBackTo(receivers, size, MAX_TABLE_SIZE_1);
-        mergeTables(receivers, topReceivers);
+        HASH_SORT(*rcvrs, receivers_sort_asc);
+        *rcvrs = cutBackTo(rcvrs, size, MAX_TABLE_SIZE_1);
+        mergeTables(rcvrs, topRcvrs);
 
-        if((size = HASH_COUNT(*topReceivers)) > MAX_TABLE_SIZE_1){
-          HASH_SORT(*topReceivers, receivers_sort_asc);
-          *topReceivers = cutBackTo(topReceivers, size, MAX_TABLE_SIZE_1);
+        if((size = HASH_COUNT(*topRcvrs)) > MAX_TABLE_SIZE_1){
+          HASH_SORT(*topRcvrs, receivers_sort_asc);
+          *topRcvrs = cutBackTo(topRcvrs, size, MAX_TABLE_SIZE_1);
         }
 
-        *receivers = NULL;
+        *rcvrs = NULL;
       }
     }
   }
@@ -2921,7 +2921,6 @@ pcap_loop:
  * @brief Begin, process, end detection process
  */
 void test_lib() {
-  struct timeval end;
   u_int64_t processing_time_usec, setup_time_usec;
   long thread_id;
 

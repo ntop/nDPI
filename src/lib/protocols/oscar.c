@@ -580,7 +580,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 		{
 		  /* request ID */
 		  req_ID = get_u_int32_t(packet->payload, 12);
-		  if((req_ID <= ((u_int32_t)-1)))
+		  /* if((req_ID <= ((u_int32_t)-1))) */
 		    {
 		      NDPI_LOG_INFO(ndpi_struct, "found OSCAR\n");
 		      ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -740,10 +740,13 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 		 || memcmp(packet->payload, "\x00\x0d\x00\x87\x01\xc1", 6) == 0)))) {
       flow->oscar_video_voice = 1;
     }
+
+#if 0
     if (flow->oscar_video_voice && ntohs(get_u_int16_t(packet->payload, 0)) == packet->payload_packet_len
 	&& packet->payload[2] == 0x00 && packet->payload[3] == 0x00) {
     }
-
+#endif
+    
     if (packet->payload_packet_len >= 70 && ntohs(get_u_int16_t(packet->payload, 4)) == packet->payload_packet_len) {
       if (memcmp(packet->payload, "OFT", 3) == 0 &&
 	  ((packet->payload[3] == '3' && ((memcmp(&packet->payload[4], "\x01\x00\x01\x01", 4) == 0)

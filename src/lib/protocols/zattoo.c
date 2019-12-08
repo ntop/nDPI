@@ -164,12 +164,15 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
 	NDPI_LOG_DBG2(ndpi_struct, "need next packet, seen pattern 0x0000\n");
 	return;
       }
+#if 0
       if(packet->payload_packet_len > 50
 	  && packet->payload[0] == 0x03
 	  && packet->payload[1] == 0x04
 	  && packet->payload[2] == 0x00
 	  && packet->payload[3] == 0x04 && packet->payload[4] == 0x0a && packet->payload[5] == 0x00) {
       }
+#endif
+      
       NDPI_LOG_DBG2(ndpi_struct, "need next packet, seen pattern 0x030400040a00\n");
       return;
       
