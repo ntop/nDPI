@@ -538,10 +538,6 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
 static void
 ndpi_flow_update_byte_count(struct ndpi_flow_info *flow, const void *x,
                             unsigned int len, u_int8_t src_to_dst_direction) {
-  const unsigned char *data = x;
-  u_int32_t i;
-  u_int32_t current_count = 0;
-
   /*
    * implementation note: The spec says that 4000 octets is enough of a
    * sample size to accurately reflect the byte distribution. Also, to avoid
@@ -551,6 +547,8 @@ ndpi_flow_update_byte_count(struct ndpi_flow_info *flow, const void *x,
 
   if((flow->entropy.src2dst_pkt_count+flow->entropy.dst2src_pkt_count) <= max_num_packets_per_flow) {
     /* octet count was already incremented before processing this payload */
+    u_int32_t current_count;
+    
     if(src_to_dst_direction) {
       current_count = flow->entropy.src2dst_l4_bytes - len;
     } else {
@@ -558,6 +556,9 @@ ndpi_flow_update_byte_count(struct ndpi_flow_info *flow, const void *x,
     }
 
     if(current_count < ETTA_MIN_OCTETS) {
+      u_int32_t i;
+      const unsigned char *data = x;
+      
       for(i=0; i<len; i++) {
         if(src_to_dst_direction) {
           flow->entropy.src2dst_byte_count[data[i]]++;
@@ -586,11 +587,13 @@ static void
 ndpi_flow_update_byte_dist_mean_var(ndpi_flow_info_t *flow, const void *x,
                                     unsigned int len, u_int8_t src_to_dst_direction) {
   const unsigned char *data = x;
-  double delta;
-  unsigned int i;
 
   if((flow->entropy.src2dst_pkt_count+flow->entropy.dst2src_pkt_count) <= max_num_packets_per_flow) {
+    unsigned int i;
+    
     for(i=0; i<len; i++) {
+      double delta;
+      
       if(src_to_dst_direction) {
         flow->entropy.src2dst_num_bytes += 1;
         delta = ((double)data[i] - flow->entropy.src2dst_bd_mean);
@@ -612,15 +615,16 @@ float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
 				       unsigned int num_bytes)
 {
   int i;
-  float tmp, sum = 0.0;
+  float sum = 0.0;
 
-  for(i=0; i<256; i++) {
-    tmp = (float) byte_count[i] / (float) num_bytes;
+  for(i=0; i<256; i++) {    
+    float tmp = (float) byte_count[i] / (float) num_bytes;
+    
     if(tmp > FLT_EPSILON) {
       sum -= tmp * logf(tmp);
     }
   }
-  return sum / logf(2.0);
+  return(sum / logf(2.0));
 }
 
 /* ***************************************************** */
@@ -687,7 +691,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   if(l4_packet_len > workflow->stats.max_packet_len)
     workflow->stats.max_packet_len = l4_packet_len;
 
-  l4 = ((const u_int8_t *) l3 + l4_offset);
+  l4 =& ((const u_int8_t *) l3)[l4_offset];
 
   if(*proto == IPPROTO_TCP && l4_packet_len >= sizeof(struct ndpi_tcphdr)) {
     u_int tcp_len;

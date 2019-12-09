@@ -209,7 +209,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		  cname_len = packet->payload[name_offset];
 
 		  if((cname_len+name_offset) < packet->payload_packet_len) {
-		    u_int realm_len, realm_offset, i;
+		    u_int realm_len, realm_offset;
 		    char cname_str[48];
 		    u_int8_t num_cname = 0;
 
@@ -254,7 +254,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		      char realm_str[48];
 
 		      if(realm_len > sizeof(realm_str)-1)
-			realm_len = sizeof(realm_str);
+			realm_len = sizeof(realm_str)-1;
 
 		      realm_offset += 1;
 
@@ -292,7 +292,6 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		  realm_len = packet->payload[name_offset];
 
 		  if((realm_len+name_offset) < packet->payload_packet_len) {
-		    u_int i;
 		    char realm_str[48];
 
 		    if(realm_len > sizeof(realm_str)-1)
@@ -328,7 +327,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	      
 	      return;
 	    } else if(msg_type == 0x0d) /* TGS-REP */ {
-	      u_int16_t koffsetp, pad_data_len, cname_offset;
+	      u_int16_t pad_data_len, cname_offset;
 	      
 #ifdef KERBEROS_DEBUG
 	      printf("[Kerberos] Processing TGS-REP\n");
@@ -344,8 +343,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if((cname_offset+cname_offset) < packet->payload_packet_len) {
 		  char cname_str[48];
-		  u_int i;
-
+		  
 		  if(cname_len > sizeof(cname_str)-1)
 		    cname_len = sizeof(cname_str)-1;
 
