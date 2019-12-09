@@ -38,7 +38,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
 
 #ifdef TELNET_DEBUG
-  printf("==> %s() [%s]\n", __FUNCTION__, packet->payload);
+  printf("==> %s() [%s][direction: %u]\n", __FUNCTION__, packet->payload, packet->packet_direction);
 #endif
   
   if(packet->payload[0] == 0xFF)
@@ -67,11 +67,13 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 	return(0);
       }
 
-      for(i=0; i<packet->payload_packet_len; i++) {
-	if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.password)-1))
-	  flow->protos.telnet.password[flow->protos.telnet.character_id++] = packet->payload[i];
+      if(packet->packet_direction == 0) /* client -> server */ {
+	for(i=0; i<packet->payload_packet_len; i++) {
+	  if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.password)-1))
+	    flow->protos.telnet.password[flow->protos.telnet.character_id++] = packet->payload[i];
+	}
       }
-
+      
       return(1);
     }
     
@@ -93,12 +95,10 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     for(i=0; i<packet->payload_packet_len; i++) {
-      if(!flow->protos.telnet.skip_next) {
+      if(packet->packet_direction == 0) /* client -> server */ {
 	if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.username)-1))
 	  flow->protos.telnet.username[flow->protos.telnet.character_id++] = packet->payload[i];
-	flow->protos.telnet.skip_next = 1;
-      } else
-	flow->protos.telnet.skip_next = 0;
+      }
     }
   }
 
