@@ -147,7 +147,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 					   packet->line[a].ptr, packet->line[a].len);
 
 #ifdef SMTP_DEBUG
-		printf("%s() => [auth: %u] (1) [%s]\n", __FUNCTION__, flow->protos.ftp_imap_pop_smtp.auth_found, buf);
+		printf("%s() => [auth: %u] (username) [%s]\n", __FUNCTION__, flow->protos.ftp_imap_pop_smtp.auth_found, buf);
 #endif
 
 		out = ndpi_base64_decode((const u_char*)buf, (size_t)strlen((const char*)buf), &out_len);
@@ -168,7 +168,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 					   packet->line[a].ptr, packet->line[a].len);
 
 #ifdef SMTP_DEBUG
-		printf("%s() => [auth: %u] (2) [%s]\n", __FUNCTION__, flow->protos.ftp_imap_pop_smtp.auth_found, buf);
+		printf("%s() => [auth: %u] (password) [%s]\n", __FUNCTION__, flow->protos.ftp_imap_pop_smtp.auth_found, buf);
 #endif
 
 		out = ndpi_base64_decode((const u_char*)buf, (size_t)strlen((const char*)buf), &out_len);
@@ -182,8 +182,6 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 		return;
 	      }
-
-	      flow->protos.ftp_imap_pop_smtp.auth_found++;
 	    }
 	  }
 	}
