@@ -45,4 +45,4 @@ cat configure | sed "s/#define PACKAGE/#define NDPI_PACKAGE/g" | sed "s/#define 
 cat configure.tmp > configure
 
 chmod +x configure
-./configure $*
+./configure "$*"

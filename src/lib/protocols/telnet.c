@@ -186,12 +186,12 @@ void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(((flow->packet_counter < 12) && (flow->l4.tcp.telnet_stage > 0)) || (flow->packet_counter < 6)) {
 #ifdef TELNET_DEBUG
-    printf("==> [%s:%u] %s()\n", __FILE__, __LINE__, __FUNCTION__);
+    printf("==> [%s:%d] %s()\n", __FILE__, __LINE__, __FUNCTION__);
 #endif
     return;
   } else {
 #ifdef TELNET_DEBUG
-    printf("==> [%s:%u] %s()\n", __FILE__, __LINE__, __FUNCTION__);
+    printf("==> [%s:%d] %s()\n", __FILE__, __LINE__, __FUNCTION__);
 #endif
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }

@@ -107,7 +107,8 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 #if 1
 		offset += snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
 				   sizeof(flow->protos.dhcp.fingerprint) - offset,
-				   "%s%u", (idx > 0) ? "," : "", dhcp->options[i+2+idx] & 0xFF);
+				   "%s%u", (idx > 0) ? "," : "",
+				   (unsigned int)dhcp->options[i+2+idx] & 0xFF);
 #else
 		offset += snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
 				   sizeof(flow->protos.dhcp.fingerprint) - offset,

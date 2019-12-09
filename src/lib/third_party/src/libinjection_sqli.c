@@ -525,7 +525,7 @@ static size_t parse_slash(struct libinjection_sqli_state * sf)
      *  are an automatic black ban!
      */
 
-    if (memchr2(cur + 2, (size_t)(ptr - (cur + 1)), '/', '*') !=  NULL) {
+    if(ptr && (memchr2(cur + 2, (size_t)(ptr - (cur + 1)), '/', '*') !=  NULL)) {
         ctype = TYPE_EVIL;
     } else if (is_mysql_comment(cs, slen, pos)) {
         ctype = TYPE_EVIL;

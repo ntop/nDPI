@@ -1995,7 +1995,7 @@ static void printFlowsStats() {
     ndpi_ja3_info *tmp2 = NULL;
     unsigned int num_ja3_client;
     unsigned int num_ja3_server;
-
+    
     fprintf(out, "\n");
 
     num_flows = 0;
@@ -2164,7 +2164,7 @@ static void printFlowsStats() {
 	    num_ja3_server = HASH_COUNT(ja3ByHost_element->host_server_info_hasht);
 
 	    if(num_ja3_client > 0) {
-	      fprintf(out, "\t%d\t %-24s \t %-7d\n",
+	      fprintf(out, "\t%d\t %-24s \t %-7u\n",
 		      i,
 		      ja3ByHost_element->ip_string,
 		      num_ja3_client
@@ -2985,9 +2985,9 @@ void test_lib() {
 /* *********************************************** */
 
 void automataUnitTest() {
-  void *automa;
+  void *automa = ndpi_init_automa();
 
-  assert((automa = ndpi_init_automa()));
+  assert(automa);
   assert(ndpi_add_string_to_automa(automa, "hello") == 0);
   assert(ndpi_add_string_to_automa(automa, "world") == 0);
   ndpi_finalize_automa(automa);
@@ -3008,8 +3008,8 @@ void serializerUnitTest() {
     char kbuf[32], vbuf[32];
     assert(ndpi_serialize_uint32_uint32(&serializer, i, i*i) != -1);
 
-    snprintf(kbuf, sizeof(kbuf), "Hello %u", i);
-    snprintf(vbuf, sizeof(vbuf), "World %u", i);
+    snprintf(kbuf, sizeof(kbuf), "Hello %d", i);
+    snprintf(vbuf, sizeof(vbuf), "World %d", i);
     assert(ndpi_serialize_uint32_string(&serializer, i, "Hello") != -1);
     assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
     assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);

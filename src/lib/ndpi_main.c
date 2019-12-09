@@ -439,7 +439,8 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
 				 ndpi_protocol_breed_t breed) {
   AC_PATTERN_t ac_pattern;
 
-  if(protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS)) {
+  if((value == NULL)
+     || (protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS))) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] protoId=%d: INTERNAL ERROR\n", protocol_id);
     return(-1);
   }
@@ -1800,7 +1801,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
 static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
   int min_len = (txt->length < m->patterns->length) ? txt->length : m->patterns->length;
-  char buf[64] = { '\0' };
+  char buf[64] = { '\0' }, *whatfound;
   int min_buf_len = (txt->length > 63 /* sizeof(buf)-1 */) ? 63 : txt->length;
   u_int buf_len = strlen(buf);
 
@@ -1809,27 +1810,26 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 
 #ifdef MATCH_DEBUG
   printf("Searching [to search: %s/%u][pattern: %s/%u] [len: %d][match_num: %u][%s]\n",
-	 buf, (unigned int)txt->length, m->patterns->astring, m->patterns->length, min_len,
-	 m->match_num, m->patterns->astring);
+	 buf, (unigned int)txt->length, m->patterns->astring, (unigned int)m->patterns->length,
+	 min_len, m->match_num, m->patterns->astring);
 #endif
 
-  {
-    char *whatfound = strstr(buf, m->patterns->astring);
+  whatfound = strstr(buf, m->patterns->astring);
 
 #ifdef MATCH_DEBUG
-    printf("[NDPI] %s() [searching=%s][pattern=%s][%s][%c]\n",
-	   __FUNCTION__, buf,  m->patterns->astring,
-	   whatfound ? whatfound : "<NULL>",
-	   whatfound[-1]);
+  printf("[NDPI] %s() [searching=%s][pattern=%s][%s][%c]\n",
+	 __FUNCTION__, buf,  m->patterns->astring,
+	 whatfound ? whatfound : "<NULL>",
+	 whatfound[-1]);
 #endif
 
+  if(whatfound) {
     /*
       The patch below allows in case of pattern ws.amazon.com
       to avoid matching aws.amazon.com whereas a.ws.amazon.com
       has to match
     */
-    if(whatfound
-       && (whatfound != buf)
+    if((whatfound != buf)
        && (m->patterns->astring[0] != '.')  /* The searched pattern does not start with . */
        && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */) {
       if(whatfound[-1] != '.') {
@@ -1968,7 +1968,7 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
   }
 
-  while(fd) {
+  while(1) {
     line = fgets(buffer, sizeof(buffer), fd);
 
     if(line == NULL)
@@ -2851,7 +2851,7 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
     return(-1);
   }
 
-  while(fd) {
+  while(1) {
     line = fgets(buffer, sizeof(buffer), fd);
 
     if(line == NULL)
@@ -3658,7 +3658,8 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   if(l3 == NULL || l3_len < sizeof(struct ndpi_iphdr))
     return(1);
 
-  iph = (const struct ndpi_iphdr *) l3;
+  if((iph = (const struct ndpi_iphdr *) l3) == NULL)
+    return(1);
 
   if(iph->version == IPVERSION && iph->ihl >= 5) {
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
@@ -4065,7 +4066,7 @@ void check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_str,
 	 && NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer_udp[a].detection_bitmask,
 				 detection_bitmask) != 0) {
 	ndpi_str->callback_buffer_udp[a].func(ndpi_str, flow);
-	
+
 	// NDPI_LOG_DBG(ndpi_str, "[UDP,CALL] dissector of protocol as callback_buffer idx =  %d\n",a);
 	if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	  break; /* Stop after detecting the first protocol */
@@ -4914,7 +4915,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret.master_protocol = ret.app_protocol;
     ret.app_protocol = flow->guessed_host_protocol_id;
   }
-  
+
  invalidate_ptr:
   /*
      Invalidate packet memory to avoid accessing the pointers below
@@ -6377,7 +6378,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow->http.content_type)   ndpi_free(flow->http.content_type);
     if(flow->http.user_agent)     ndpi_free(flow->http.user_agent);
     if(flow->kerberos_buf.pktbuf) ndpi_free(flow->kerberos_buf.pktbuf);
-  
+
     if(flow->l4_proto == IPPROTO_TCP) {
       if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
 	ndpi_free(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
