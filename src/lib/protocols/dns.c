@@ -279,8 +279,11 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       if(j && j < max_len) flow->host_server_name[j++] = '.';
 
       while(j < max_len && cl != 0) {
+	u_int32_t shift;
+	
 	c = flow->packet.payload[off++];
-	flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & (1 << (c & 0x1f))) ? c : '_');
+	shift = 1 << (c & 0x1f);
+	flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & shift) ? c : '_');
 	cl--;
       }
     }

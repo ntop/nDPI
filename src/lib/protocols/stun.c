@@ -350,9 +350,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
             memset(flow->host_server_name, 0, sizeof(flow->host_server_name));
 
-            for(j=0; j<i; j++)
-              flow->host_server_name[j] = payload[k++];
-
+            for(j=0; j<i; j++) {
+	      if((k+i) < payload_length)
+		flow->host_server_name[j] = payload[k++];
+	      else
+		break;
+	    }
+	    
 #ifdef DEBUG_STUN
             printf("==> [%s]\n", flow->host_server_name);
 #endif

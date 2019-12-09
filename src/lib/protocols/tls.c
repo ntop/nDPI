@@ -593,14 +593,17 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 		      len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
 		      len = (u_int)ndpi_min(len, buffer_len-1);
-		      strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
-		      buffer[len] = '\0';
 
-		      stripCertificateTrailer(buffer, buffer_len);
-
-		      if(!ndpi_struct->disable_metadata_export) {
-			snprintf(flow->protos.stun_ssl.ssl.client_certificate,
-				 sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
+		      if((offset+extension_offset+5+len) < packet->payload_packet_len) {
+			strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
+			buffer[len] = '\0';
+			
+			stripCertificateTrailer(buffer, buffer_len);
+			
+			if(!ndpi_struct->disable_metadata_export) {
+			  snprintf(flow->protos.stun_ssl.ssl.client_certificate,
+				   sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
+			}
 		      }
 		    } else if(extension_id == 10 /* supported groups */) {
 		      u_int16_t s_offset = offset+extension_offset + 2;
