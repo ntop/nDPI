@@ -242,7 +242,6 @@ static void reduceBDbits(uint32_t *bd, unsigned int len) {
 static void
 flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
   FILE *out = results_file ? results_file : stdout;
-  
   const uint32_t *array = NULL;
   uint32_t tmp[256], i;
   unsigned int num_bytes;
@@ -294,6 +293,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
   }
 
   if(enable_joy_stats) {
+#if 0
     if(verbose > 1) {
       reduceBDbits(tmp, 256);
       array = tmp;
@@ -304,15 +304,23 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
 
       fprintf(out, "%u]", (unsigned char)array[i]);
     }
-
+#endif
+    
     /* Output the mean */
     if(num_bytes != 0) {
       double entropy = ndpi_flow_get_byte_count_entropy(array, num_bytes);
 
-      fprintf(out, "][byte_dist_mean: %f", mean);
-      fprintf(out, "][byte_dist_std: %f]", variance);
-      fprintf(out, "[entropy: %f]", entropy);
-      fprintf(out, "[total_entropy: %f]", entropy * num_bytes);
+      if(csv_fp) {
+	fprintf(csv_fp, ",%.3f,%.3f,%.3f,%.3f", mean, variance, entropy, entropy * num_bytes);
+      } else {
+	fprintf(out, "[byte_dist_mean: %f", mean);
+	fprintf(out, "][byte_dist_std: %f]", variance);
+	fprintf(out, "[entropy: %f]", entropy);
+	fprintf(out, "[total_entropy: %f]", entropy * num_bytes);
+      }
+    } else {
+      if(csv_fp)
+	fprintf(csv_fp, ",%.3f,%.3f,%.3f,%.3f", 0.0, 0.0, 0.0, 0.0);
     }
   }
 }
@@ -595,6 +603,12 @@ void printCSVHeader() {
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh");
+
+  /* Joy */
+  if(enable_joy_stats) {
+    fprintf(csv_fp, ",byte_dist_mean,byte_dist_std,entropy,total_entropy");  
+  }
+  
   fprintf(csv_fp, "\n");
 }
 
@@ -1080,13 +1094,18 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "0",
 	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : "0"
 	    );
-
-    fprintf(csv_fp, "\n");
   }
 
-  if((verbose != 1) && (verbose != 2))
+  if((verbose != 1) && (verbose != 2)) {
+    if(csv_fp && enable_joy_stats) {
+      flowGetBDMeanandVariance(flow);
+      fprintf(csv_fp, "\n");
+    }
+    
     return;
+  }
 
+  if(csv_fp) {
 #if 1
   fprintf(out, "\t%u", id);
 #else
@@ -1105,14 +1124,18 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
   if(enable_payload_analyzer) fprintf(out, "[flowId: %u]", flow->flow_id);
-
+  }
+  
   if(enable_joy_stats) {
     /* Print entropy values for monitored flows. */
     flowGetBDMeanandVariance(flow);
+    fprintf(csv_fp, "\n");
     fflush(out);
     fprintf(out, "[score: %.4f]", flow->entropy.score);
   }
 
+
+    
   fprintf(out, "[proto: ");
   if(flow->tunnel_type != ndpi_no_tunnel)
     fprintf(out, "%s:", ndpi_tunnel2str(flow->tunnel_type));
