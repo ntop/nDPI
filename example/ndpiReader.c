@@ -1105,7 +1105,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     return;
   }
 
-  if(csv_fp) {
+  if(csv_fp || (verbose > 1)) {
 #if 1
   fprintf(out, "\t%u", id);
 #else
@@ -1133,8 +1133,6 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fflush(out);
     fprintf(out, "[score: %.4f]", flow->entropy.score);
   }
-
-
     
   fprintf(out, "[proto: ");
   if(flow->tunnel_type != ndpi_no_tunnel)
