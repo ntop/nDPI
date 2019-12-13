@@ -694,8 +694,6 @@ static void parseOptions(int argc, char **argv) {
     case 'C':
       if((csv_fp = fopen(optarg, "w")) == NULL)
 	printf("Unable to write on CSV file %s\n", optarg);
-      else
-	printCSVHeader();
       break;
 
     case 's':
@@ -829,6 +827,9 @@ static void parseOptions(int argc, char **argv) {
 
   if(_pcap_file[0] == NULL)
     help(0);
+
+  if(csv_fp)
+    printCSVHeader();
 
 #ifndef USE_DPDK
   if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
@@ -1099,9 +1100,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if((verbose != 1) && (verbose != 2)) {
     if(csv_fp && enable_joy_stats) {
       flowGetBDMeanandVariance(flow);
-      fprintf(csv_fp, "\n");
     }
-    
+
+    fprintf(csv_fp, "\n");
     return;
   }
 
