@@ -786,7 +786,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	newflow->iat_s_to_c =  ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
       newflow->pktlen_c_to_s = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
 	newflow->pktlen_s_to_c =  ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
-	newflow->iat_flow = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);;
+	newflow->iat_flow = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
 
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
@@ -1170,7 +1170,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(flow->entropy.flow_last_pkt_time.tv_sec) {
       ndpi_timer_sub(&when, &flow->entropy.flow_last_pkt_time, &tdiff);
     
-      if(flow->iat_flow) {
+      if(flow->iat_flow
+	 && (tdiff.tv_sec >= 0) /* Discard backward time */
+	 ) {
 	u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
 
 	if(ms > 0)
@@ -1183,7 +1185,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       if(flow->entropy.src2dst_last_pkt_time.tv_sec) {
 	ndpi_timer_sub(&when, &flow->entropy.src2dst_last_pkt_time, &tdiff);
 
-	if(flow->iat_c_to_s) {
+	if(flow->iat_c_to_s
+	   && (tdiff.tv_sec >= 0) /* Discard backward time */ 
+	   ) {
 	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
 
 	  ndpi_data_add_value(flow->iat_c_to_s, ms);
