@@ -694,8 +694,9 @@ int ndpi_serialize_uint32_int64(ndpi_serializer *_serializer,
 				      (serializer->status.size_used > 0) ? serializer->csv_separator : "",
 				      (long long int)value);
 
-  } else {
-    if(value <= 2147483647 && value >= -2147483648) {
+  }
+  else {
+    if((value & 0xFFFFFFFF) == value) {
       return(ndpi_serialize_uint32_int32(_serializer, key, value));
     } else {
       ndpi_serialization_type kt;
@@ -957,7 +958,7 @@ int ndpi_serialize_binary_int64(ndpi_serializer *_serializer,
 				      "%s%lld", (serializer->status.size_used > 0) ? serializer->csv_separator : "",
 				      (long long int)value);
   } else {
-    if(value <= 2147483647 && value >= -2147483648) {
+    if ((value & 0xFFFFFFFF) == value) {
       return(ndpi_serialize_string_int32(_serializer, key, value));
     } else {
       serializer->buffer[serializer->status.size_used++] = (ndpi_serialization_string << 4) | ndpi_serialization_int64;

@@ -43,8 +43,7 @@
 #ifndef NDPI_CLASSIFY_H
 #define NDPI_CLASSIFY_H
 
-#include <stdint.h>
-#include <sys/time.h>
+
 
 /* constants */
 #define NUM_PARAMETERS_SPLT_LOGREG 208

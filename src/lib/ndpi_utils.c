@@ -21,20 +21,19 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#include "ndpi_config.h"
-#endif
 
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
-#include "ahocorasick.h"
-#include "libcache.h"
+
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
-#include "ndpi_api.h"
 #include "ndpi_config.h"
+#include "ndpi_api.h"
+
+#include "ahocorasick.h"
+#include "libcache.h"
 
 #include <time.h>
 #ifndef WIN32

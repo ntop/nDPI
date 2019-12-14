@@ -21,20 +21,17 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#include "ndpi_config.h"
-#endif
 
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
-#include "ahocorasick.h"
-#include "libcache.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
-#include "ndpi_api.h"
 #include "ndpi_config.h"
+#include "ndpi_api.h"
+#include "ahocorasick.h"
+#include "libcache.h"
 
 #include <time.h>
 #ifndef WIN32
@@ -1886,13 +1883,17 @@ static int fill_prefix_v4(prefix_t *p, const struct in_addr *a, int b, int mb) {
 /* ******************************************* */
 
 static int fill_prefix_v6(prefix_t *prefix, const struct in6_addr *addr, int bits, int maxbits) {
-  if(bits < 0 || bits > maxbits)
+#ifdef PATRICIA_IPV6
+    if(bits < 0 || bits > maxbits)
     return -1;
 
   memcpy(&prefix->add.sin6, addr, (maxbits + 7) / 8);
   prefix->family = AF_INET6, prefix->bitlen = bits, prefix->ref_count = 0;
 
   return 0;
+#else
+    return(-1);
+#endif
 }
 
 /* ******************************************* */
@@ -2306,10 +2307,16 @@ void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) 
     case 3:
       automa = &ndpi_str->impossible_bigrams_automa;
       break;
+
+    default:
+        automa = NULL;
+        break;
     }
 
-    ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
-    automa->ac_automa_finalized = 1;
+    if (automa) {
+        ac_automata_finalize((AC_AUTOMATA_t*)automa->ac_automa);
+        automa->ac_automa_finalized = 1;
+    }
   }
 }
 

@@ -42,13 +42,10 @@
  */
 
 #define _GNU_SOURCE
-#ifdef HAVE_CONFIG_H
-#include "ndpi_config.h"
-#endif
 
 #include <stdio.h>
 #include <ctype.h>
-#include <sys/time.h>
+// #include <sys/time.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
@@ -56,10 +53,13 @@
 #include "ndpi_classify.h"
 
 /** finds the minimum value between to inputs */
+#ifndef min
 #define min(a,b) \
     ({ __typeof__ (a) _a = (a); \
        __typeof__ (b) _b = (b); \
        _a < _b ? _a : _b; })
+#endif
+
 
 //bias (1) + w (207)
 //const float ndpi_parameters_splt[NUM_PARAMETERS_SPLT_LOGREG] = {
