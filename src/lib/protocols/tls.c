@@ -401,16 +401,18 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	  if(((packet->payload[i] == 0x04) && (packet->payload[i+1] == 0x03) && (packet->payload[i+2] == 0x0c))
 	     || ((packet->payload[i] == 0x04) && (packet->payload[i+1] == 0x03) && (packet->payload[i+2] == 0x13))
 	     || ((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x03))) {
-	    u_int8_t server_len = packet->payload[i+3];
+	    u_int8_t server_len, off = 0;
 
 	    if(packet->payload[i] == 0x55) {
-	      num_found++;
+	      num_found++, off++;
 
 	      if(num_found != 2) continue;
 	    }
 
+	    server_len = packet->payload[i+3+off];
+	    
 	    if((server_len+i+3) < packet->payload_packet_len) {
-	      char *server_name = (char*)&packet->payload[i+4];
+	      char *server_name = (char*)&packet->payload[i+4+off];
 	      u_int8_t begin = 0, len, j, num_dots;
 
 	      while(begin < server_len) {
@@ -420,11 +422,14 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		  break;
 	      }
 
-	      // len = ndpi_min(server_len-begin, buffer_len-1);
-	      len = buffer_len-1;
+	      len = ndpi_min(server_len-begin, buffer_len-1);
+	      // len = buffer_len-1;
+
 	      strncpy(buffer, &server_name[begin], len);
 	      buffer[len] = '\0';
 
+	      // if(len != (buffer_len-1)) printf("len=%u  / buffer_len-1=%u\n", len, buffer_len-1);
+	      
 	      /* We now have to check if this looks like an IP address or host name */
 	      for(j=0, num_dots = 0; j<len; j++) {
 		if(!ndpi_isprint((buffer[j]))) {
