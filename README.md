@@ -2,6 +2,7 @@
 # nDPI
 
 [![Build Status](https://travis-ci.org/ntop/nDPI.png?branch=dev)](https://travis-ci.org/ntop/nDPI)
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/ntop/nDPI?svg=true)](https://ci.appveyor.com/project/ntop/ndpi)
 [![Code Quality: Cpp](https://img.shields.io/lgtm/grade/cpp/g/ntop/nDPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ntop/nDPI/context:cpp)
 [![Total Alerts](https://img.shields.io/lgtm/alerts/g/ntop/nDPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ntop/nDPI/alerts)
 
