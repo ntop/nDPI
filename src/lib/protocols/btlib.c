@@ -39,7 +39,9 @@ typedef unsigned long long int u_int64_t;
 
 #include <stdint.h>
 #include <stdlib.h>
+#ifndef WIN32
 #include <arpa/inet.h>
+#endif
 #endif
 
 #include "btlib.h"
