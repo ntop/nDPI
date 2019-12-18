@@ -314,7 +314,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
        https://en.wikipedia.org/wiki/Skype_for_Business
        */
 
-      while((offset+2) < payload_length) {
+      while((offset+4) < payload_length) {
         u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
         u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
         u_int16_t x = (len + 4) % 4;
