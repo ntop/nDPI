@@ -1,0 +1,3 @@
+*.sh     -crlf
+*.ac     -crlf
+*.am     -crlf

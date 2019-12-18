@@ -15,6 +15,7 @@ libdir     = ${prefix}/lib
 includedir = ${prefix}/include/ndpi
 CC         = @CC@
 CFLAGS     += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -O2 -g -Wall @CUSTOM_NDPI@
+LDFLAGS    = @LDFLAGS@
 RANLIB     = ranlib
 
 OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) $(patsubst ./%.c, ./%.o, $(wildcard ./*.c))
@@ -42,15 +43,15 @@ ndpi_main.c: ndpi_content_match.c.inc
 
 $(NDPI_LIB_STATIC): $(OBJECTS)
 	   ar rc $@ $(OBJECTS)
-	   $(RANLIB) $@	       
+	   $(RANLIB) $@      
 
 $(NDPI_LIB_SHARED): $(OBJECTS)
-	$(CC) -shared -fPIC $(SONAME_FLAG) -o $@ $(OBJECTS)
+	$(CC) -shared -fPIC $(SONAME_FLAG) -o $@ $(OBJECTS) $(LDFLAGS)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 
 %.o: %.c $(HEADERS) Makefile
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
 clean:
 	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo $(NDPI_LIB_SHARED)
