@@ -16,6 +16,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 from os.path import abspath, dirname
 import cffi
+import sys
 
 cc = """
 typedef enum {
@@ -977,11 +978,16 @@ struct ndpi_flow_struct {
   */
   struct {
     ndpi_http_method method;
-    char *url, *content_type;
+    char *url, *content_type, *user_agent;
     uint8_t num_request_headers, num_response_headers;
     uint8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     uint16_t response_status_code; /* 200, 404, etc. */
   } http;
+
+  struct {    
+    char *pktbuf;
+    uint16_t pktbuf_maxlen, pktbuf_currlen;
+  } kerberos_buf;
 
   union {
     /* the only fields useful for nDPI and ntopng */
@@ -996,22 +1002,22 @@ struct ndpi_flow_struct {
       uint8_t version;
     } ntp;
 
-    struct {
-      char cname[24], realm[24];
+   struct {
+      char hostname[48], domain[48], username[48];
     } kerberos;
 
     struct {
       struct {
-	uint16_t ssl_version;
-	char client_certificate[64], server_certificate[64], server_organization[64];
-	uint32_t notBefore, notAfter;
-	char ja3_client[33], ja3_server[33];
-	uint16_t server_cipher;
-	ndpi_cipher_weakness server_unsafe_cipher;
+            uint16_t ssl_version;
+            char client_certificate[64], server_certificate[64], server_organization[64];
+            uint32_t notBefore, notAfter;
+            char ja3_client[33], ja3_server[33];
+            uint16_t server_cipher;
+            ndpi_cipher_weakness server_unsafe_cipher;
       } ssl;
 
       struct {
-	uint8_t num_udp_pkts, num_processed_pkts, num_binding_requests;
+            uint8_t num_udp_pkts, num_processed_pkts, num_binding_requests;
       } stun;
 
       /* We can have STUN over SSL/TLS thus they need to live together */
@@ -1027,6 +1033,12 @@ struct ndpi_flow_struct {
     } imo;
 
     struct {
+      uint8_t username_detected:1, username_found:1, password_detected:1, password_found:1, _pad:4;
+      uint8_t character_id;
+      char username[32], password[32];
+    } telnet;
+
+    struct {
       char answer[96];
     } mdns;
 
@@ -1040,6 +1052,11 @@ struct ndpi_flow_struct {
       /* Via HTTP X-Forwarded-For */
       uint8_t nat_ip[24];
     } http;
+
+    struct {
+      uint8_t auth_found:1, auth_failed:1, _pad:5;
+      char username[16], password[16];
+    } ftp_imap_pop_smtp;
 
     struct {
       /* Bittorrent hash */
@@ -1211,10 +1228,13 @@ void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str);
 
 
 class NDPI():
-    def __init__(self, libpath=None):
+    def __init__(self, libpath=None, max_tcp_dissections=10, max_udp_dissections=16):
         self._ffi = cffi.FFI()
         if libpath is None:
-            self._ndpi = self._ffi.dlopen(dirname(abspath(__file__)) + '/libs/libndpi.so')
+            if "win" in sys.platform[:3]:
+                self._ndpi = self._ffi.dlopen(dirname(abspath(__file__)) + '/libs/libndpi.dll')
+            else:
+                self._ndpi = self._ffi.dlopen(dirname(abspath(__file__)) + '/libs/libndpi.so')
         else:
             self._ndpi = self._ffi.dlopen(libpath)
         self._ffi.cdef(cc)
@@ -1236,6 +1256,8 @@ class NDPI():
         self.SIZEOF_FLOW_STRUCT = self._ffi.sizeof("struct ndpi_flow_struct")
         self.SIZEOF_ID_STRUCT = self._ffi.sizeof("struct ndpi_id_struct")
         self.NULL = self._ffi.NULL
+        self.max_tcp_dissections = max_tcp_dissections
+        self.max_udp_dissections = max_udp_dissections
 
     def new_ndpi_flow(self):
         f = self._ffi.cast('struct ndpi_flow_struct*', self._ndpi.ndpi_flow_malloc(self.SIZEOF_FLOW_STRUCT))
