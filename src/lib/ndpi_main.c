@@ -4578,10 +4578,11 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
     }
 
     if(!node) {
-      if(daddr != 0)
+      if(daddr != 0) {
 	fill_prefix_v4(&prefix, (struct in_addr *)&daddr,
 		       32, ((patricia_tree_t*)ndpi_str->protocols_ptree)->maxbits);
-      node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
+	node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
+      }
     }
 
     if(node) {
