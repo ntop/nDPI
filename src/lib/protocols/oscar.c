@@ -83,10 +83,10 @@ static void ndpi_int_oscar_add_connection(struct ndpi_detection_module_struct *n
 
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OSCAR, NDPI_PROTOCOL_UNKNOWN);
 
-  if (src != NULL) {
+  if(src != NULL) {
     src->oscar_last_safe_access_time = packet->tick_timestamp;
   }
-  if (dst != NULL) {
+  if(dst != NULL) {
     dst->oscar_last_safe_access_time = packet->tick_timestamp;
   }
 }
@@ -107,10 +107,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
   u_int16_t family;
   u_int16_t type;
   u_int16_t flag;
-  u_int32_t req_ID;
-
   struct ndpi_packet_struct * packet = &flow->packet;
-
   struct ndpi_id_struct * src = flow->src;
   struct ndpi_id_struct * dst = flow->dst;
 
@@ -124,7 +121,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
    * [ 4 byte of data ]
    *
    * */
-  if (packet->payload_packet_len >= 6 && packet->payload[0] == 0x2a)
+  if(packet->payload_packet_len >= 6 && packet->payload[0] == 0x2a)
     {
 
       /* FLAP__FRAME_TYPE (Channel)*/
@@ -140,7 +137,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	 + TLVs         | [Class: FLAP__SIGNON_TAGS] TLVs   +
 	 +--------------------------------------------------+
       */
-      if (channel == SIGNON &&
+      if(channel == SIGNON &&
 	  get_u_int16_t(packet->payload, 4) == htons(packet->payload_packet_len - 6) &&
 	  get_u_int32_t(packet->payload, 6) == htonl(FLAPVERSION))
 	{
@@ -153,28 +150,28 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      return;
 	    }
 	  /* /\* SCREEN_NAME *\/ */
-	  /* if (get_u_int16_t(packet->payload, 10) == htons(SCREEN_NAME)) /\* packet->payload[10] == 0x00 && packet->payload[11] == 0x01 *\/ */
+	  /* if(get_u_int16_t(packet->payload, 10) == htons(SCREEN_NAME)) /\* packet->payload[10] == 0x00 && packet->payload[11] == 0x01 *\/ */
 	  /*   { */
 	  /*     NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Screen Name \n"); */
 	  /*     ndpi_int_oscar_add_connection(ndpi_struct, flow); */
 	  /*     return; */
 	  /*   } */
 	  /* /\* PASSWD *\/ */
-	  /* if (get_u_int16_t(packet->payload, 10) == htons(PASSWD)) /\* packet->payload[10] == 0x00 && packet->payload[11] == 0x02 *\/ */
+	  /* if(get_u_int16_t(packet->payload, 10) == htons(PASSWD)) /\* packet->payload[10] == 0x00 && packet->payload[11] == 0x02 *\/ */
 	  /*   { */
 	  /*     NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Password (roasted) \n"); */
 	  /*     ndpi_int_oscar_add_connection(ndpi_struct, flow); */
 	  /*     return; */
 	  /*   } */
 	  /* CLIENT_NAME */
-	  if (get_u_int16_t(packet->payload, 10) == htons(CLIENT_NAME)) /* packet->payload[10] == 0x00 && packet->payload[11] == 0x03 */
+	  if(get_u_int16_t(packet->payload, 10) == htons(CLIENT_NAME)) /* packet->payload[10] == 0x00 && packet->payload[11] == 0x03 */
 	    {
 	      NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Client Name \n");
 	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	      return;
 	    }
 	  /* LOGIN_COOKIE */
-	  if (get_u_int16_t(packet->payload, 10) == htons(LOGIN_COOKIE) &&
+	  if(get_u_int16_t(packet->payload, 10) == htons(LOGIN_COOKIE) &&
 	      get_u_int16_t(packet->payload, 12) == htons(0x0100))
 	    {
 	      if(get_u_int16_t(packet->payload, packet->payload_packet_len - 5) == htons(MULTICONN_FLAGS)) /* MULTICONN_FLAGS */
@@ -191,35 +188,35 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 		}
 	    }
 	  /* MAJOR_VERSION */
-	  if (get_u_int16_t(packet->payload, 10) == htons(MAJOR_VERSION))
+	  if(get_u_int16_t(packet->payload, 10) == htons(MAJOR_VERSION))
 	    {
 	      NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Major_Version \n");
 	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	      return;
 	    }
 	  /* MINOR_VERSION */
-	  if (get_u_int16_t(packet->payload, 10) == htons(MINOR_VERSION))
+	  if(get_u_int16_t(packet->payload, 10) == htons(MINOR_VERSION))
 	    {
 	      NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Minor_Version \n");
 	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	      return;
 	    }
 	  /* POINT_VERSION */
-	  if (get_u_int16_t(packet->payload, 10) == htons(POINT_VERSION))
+	  if(get_u_int16_t(packet->payload, 10) == htons(POINT_VERSION))
 	    {
 	      NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Point_Version \n");
 	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	      return;
 	    }
 	  /* BUILD_NUM */
-	  if (get_u_int16_t(packet->payload, 10) == htons(BUILD_NUM))
+	  if(get_u_int16_t(packet->payload, 10) == htons(BUILD_NUM))
 	    {
 	      NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Build_Num \n");
 	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	      return;
 	    }
 	  /* CLIENT_RECONNECT */
-	  if (get_u_int16_t(packet->payload, 10) == htons(CLIENT_RECONNECT))
+	  if(get_u_int16_t(packet->payload, 10) == htons(CLIENT_RECONNECT))
 	    {
 	      NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Client_Reconnect \n");
 	      ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -244,24 +241,24 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	 + requestId    | 4 byte                        +
 	 +----------------------------------------------+
       */
-      if (channel == DATA)
+      if(channel == DATA)
 	{
-	  if (packet->payload_packet_len >= 8)
+	  if(packet->payload_packet_len >= 8)
 	    family = get_u_int16_t(packet->payload, 6);
 	  else
 	    family = 0;
-	  if (packet->payload_packet_len >= 10)
+	  if(packet->payload_packet_len >= 10)
 	    type = get_u_int16_t(packet->payload, 8);
 	  else
 	    type = 0;
-	  if (family == 0 || type == 0)
+	  if(family == 0 || type == 0)
 	  {
 	      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	      return;
 	  }
 
 	  /* Family 0x0001 */
-	  if (family == htons(GE_SE_CTL))
+	  if(family == htons(GE_SE_CTL))
 	    {
 	      switch (type) {
 
@@ -297,7 +294,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0002 */
-	  if (family == htons(LOC_SRV))
+	  if(family == htons(LOC_SRV))
 	    {
 	      switch (type) {
 
@@ -320,7 +317,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0003 */
-	  if (family == htons(BUDDY_LIST))
+	  if(family == htons(BUDDY_LIST))
 	    {
 	      switch (type) {
 
@@ -340,7 +337,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0004 */
-	  if (family == htons(IM))
+	  if(family == htons(IM))
 	    {
 	      switch (type) {
 
@@ -361,7 +358,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0006 */
-	  if (family == htons(IS))
+	  if(family == htons(IS))
 	    {
 	      switch (type) {
 
@@ -372,7 +369,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0007 */
-	  if (family == htons(ACC_ADM))
+	  if(family == htons(ACC_ADM))
 	    {
 	      switch (type) {
 
@@ -389,7 +386,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0008 */
-	  if (family == htons(POPUP))
+	  if(family == htons(POPUP))
 	    {
 	      switch (type) {
 
@@ -399,7 +396,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0009 */
-	  if (family == htons(PMS))
+	  if(family == htons(PMS))
 	    {
 	      switch (type) {
 
@@ -418,7 +415,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x000b */
-	  if (family == htons(USS))
+	  if(family == htons(USS))
 	    {
 	      switch (type) {
 
@@ -430,7 +427,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x000d */
-	  if (family == htons(CHAT_ROOM_SETUP))
+	  if(family == htons(CHAT_ROOM_SETUP))
 	    {
 	      switch (type) {
 
@@ -447,7 +444,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x000e */
-	  if (family == htons(CHAT_ROOM_ACT))
+	  if(family == htons(CHAT_ROOM_ACT))
 	    {
 	      switch (type) {
 
@@ -464,7 +461,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x000f */
-	  if (family == htons(USER_SRCH))
+	  if(family == htons(USER_SRCH))
 	    {
 	      switch (type) {
 
@@ -477,7 +474,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0010 */
-	  if (family == htons(BUDDY_ICON_SERVER))
+	  if(family == htons(BUDDY_ICON_SERVER))
 	    {
 	      switch (type) {
 
@@ -492,7 +489,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0013 */
-	  if (family == htons(SERVER_STORED_INFO))
+	  if(family == htons(SERVER_STORED_INFO))
 	    {
 	      switch (type) {
 
@@ -521,7 +518,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0015 */
-	  if (family == htons(ICQ))
+	  if(family == htons(ICQ))
 	    {
 	      switch (type) {
 
@@ -532,7 +529,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0017 */
-	  if (family == htons(INIT_AUTH))
+	  if(family == htons(INIT_AUTH))
 	    {
 	      switch (type) {
 
@@ -549,12 +546,12 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	      }
 	    }
 	  /* Family 0x0018 */
-	  if (family == htons(EMAIL))
+	  if(family == htons(EMAIL))
 	    {
 	      /* TODO */
 	    }
 	  /* Family 0x0085 */
-	  if (family == htons(IS_EXT))
+	  if(family == htons(IS_EXT))
 	    {
 	      switch (type) {
 
@@ -571,15 +568,15 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	    }
 
 	  /* flag */
-	  if (packet->payload_packet_len >= 12)
+	  if(packet->payload_packet_len >= 12)
 	  {
 	    flag = get_u_int16_t(packet->payload, 10);
-	    if (flag == htons(0x0000)|| flag == htons(0x8000) || flag == htons(0x0001))
+	    if(flag == htons(0x0000)|| flag == htons(0x8000) || flag == htons(0x0001))
 	      {
-	        if (packet->payload_packet_len >= 16)
+	        if(packet->payload_packet_len >= 16)
 		{
 		  /* request ID */
-		  req_ID = get_u_int32_t(packet->payload, 12);
+		  // u_int32_t req_ID = get_u_int32_t(packet->payload, 12);
 		  /* if((req_ID <= ((u_int32_t)-1))) */
 		    {
 		      NDPI_LOG_INFO(ndpi_struct, "found OSCAR\n");
@@ -594,7 +591,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	 ERROR -> FLAP__ERROR_CHANNEL_0x03
 	 A FLAP error - rare
       */
-      if (channel == O_ERROR)
+      if(channel == O_ERROR)
 	{
 	  NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Error frame \n");
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -604,7 +601,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	 Close down the FLAP connection gracefully.
 	 SIGNOFF: FLAP__SIGNOFF_CHANNEL_0x04
       */
-      if (channel == SIGNOFF)
+      if(channel == SIGNOFF)
 	{
 	  NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Signoff frame \n");
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -614,7 +611,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	 Send a heartbeat to server to help keep connection open.
 	 KEEP_ALIVE: FLAP__KEEP_ALIVE_CHANNEL_0x05
       */
-      if (channel == KEEP_ALIVE)
+      if(channel == KEEP_ALIVE)
 	{
 	  NDPI_LOG_INFO(ndpi_struct, "found OSCAR - Keep Alive frame \n");
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -624,11 +621,11 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 
 
   /* detect http connections */
-  if (packet->payload_packet_len >= 18) {
-    if ((packet->payload[0] == 'P') && (memcmp(packet->payload, "POST /photo/upload", 18) == 0)) {
+  if(packet->payload_packet_len >= 18) {
+    if((packet->payload[0] == 'P') && (memcmp(packet->payload, "POST /photo/upload", 18) == 0)) {
       NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow, packet);
-      if (packet->host_line.len >= 18 && packet->host_line.ptr != NULL) {
-	if (memcmp(packet->host_line.ptr, "lifestream.aol.com", 18) == 0) {
+      if(packet->host_line.len >= 18 && packet->host_line.ptr != NULL) {
+	if(memcmp(packet->host_line.ptr, "lifestream.aol.com", 18) == 0) {
 	  NDPI_LOG_INFO(ndpi_struct,
 		   "found OSCAR over HTTP, POST method\n");
 	  ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -637,9 +634,9 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
       }
     }
   }
-  if (packet->payload_packet_len > 40) {
-    if ((packet->payload[0] == 'G') && (memcmp(packet->payload, "GET /", 5) == 0)) {
-      if ((memcmp(&packet->payload[5], "aim/fetchEvents?aimsid=", 23) == 0) ||
+  if(packet->payload_packet_len > 40) {
+    if((packet->payload[0] == 'G') && (memcmp(packet->payload, "GET /", 5) == 0)) {
+      if((memcmp(&packet->payload[5], "aim/fetchEvents?aimsid=", 23) == 0) ||
 	  (memcmp(&packet->payload[5], "aim/startSession?", 17) == 0) ||
 	  (memcmp(&packet->payload[5], "aim/gromit/aim_express", 22) == 0) ||
 	  (memcmp(&packet->payload[5], "b/ss/aolwpaim", 13) == 0) ||
@@ -649,9 +646,9 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	return;
       }
 
-      if ((memcmp(&packet->payload[5], "aim", 3) == 0) || (memcmp(&packet->payload[5], "im", 2) == 0)) {
+      if((memcmp(&packet->payload[5], "aim", 3) == 0) || (memcmp(&packet->payload[5], "im", 2) == 0)) {
 	NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow, packet);
-	if (packet->user_agent_line.len > 15 && packet->user_agent_line.ptr != NULL &&
+	if(packet->user_agent_line.len > 15 && packet->user_agent_line.ptr != NULL &&
 	    ((memcmp(packet->user_agent_line.ptr, "mobileAIM/", 10) == 0) ||
 	     (memcmp(packet->user_agent_line.ptr, "ICQ/", 4) == 0) ||
 	     (memcmp(packet->user_agent_line.ptr, "mobileICQ/", 10) == 0) ||
@@ -663,14 +660,14 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	}
       }
       NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow, packet);
-      if (packet->referer_line.ptr != NULL && packet->referer_line.len >= 22) {
+      if(packet->referer_line.ptr != NULL && packet->referer_line.len >= 22) {
 
-	if (memcmp(&packet->referer_line.ptr[packet->referer_line.len - NDPI_STATICSTRING_LEN("WidgetMain.swf")],
+	if(memcmp(&packet->referer_line.ptr[packet->referer_line.len - NDPI_STATICSTRING_LEN("WidgetMain.swf")],
 		   "WidgetMain.swf", NDPI_STATICSTRING_LEN("WidgetMain.swf")) == 0) {
 	  u_int16_t i;
 	  for (i = 0; i < (packet->referer_line.len - 22); i++) {
-	    if (packet->referer_line.ptr[i] == 'a') {
-	      if (memcmp(&packet->referer_line.ptr[i + 1], "im/gromit/aim_express", 21) == 0) {
+	    if(packet->referer_line.ptr[i] == 'a') {
+	      if(memcmp(&packet->referer_line.ptr[i + 1], "im/gromit/aim_express", 21) == 0) {
 		NDPI_LOG_INFO(ndpi_struct,
 			 "found OSCAR over HTTP : aim/gromit/aim_express\n");
 		ndpi_int_oscar_add_connection(ndpi_struct, flow);
@@ -681,13 +678,13 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	}
       }
     }
-    if (memcmp(packet->payload, "CONNECT ", 8) == 0) {
-      if (memcmp(packet->payload, "CONNECT login.icq.com:443 HTTP/1.", 33) == 0) {
+    if(memcmp(packet->payload, "CONNECT ", 8) == 0) {
+      if(memcmp(packet->payload, "CONNECT login.icq.com:443 HTTP/1.", 33) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found OSCAR ICQ-HTTP\n");
 	ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	return;
       }
-      if (memcmp(packet->payload, "CONNECT login.oscar.aol.com:5190 HTTP/1.", 40) == 0) {
+      if(memcmp(packet->payload, "CONNECT login.oscar.aol.com:5190 HTTP/1.", 40) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found OSCAR AIM-HTTP\n");
 	ndpi_int_oscar_add_connection(ndpi_struct, flow);
 	return;
@@ -696,32 +693,32 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
     }
   }
 
-  if (packet->payload_packet_len > 43
+  if(packet->payload_packet_len > 43
       && memcmp(packet->payload, "GET http://http.proxy.icq.com/hello HTTP/1.", 43) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found OSCAR ICQ-HTTP PROXY\n");
     ndpi_int_oscar_add_connection(ndpi_struct, flow);
     return;
   }
 
-  if (packet->payload_packet_len > 46
+  if(packet->payload_packet_len > 46
       && memcmp(packet->payload, "GET http://aimhttp.oscar.aol.com/hello HTTP/1.", 46) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found OSCAR AIM-HTTP PROXY\n");
     ndpi_int_oscar_add_connection(ndpi_struct, flow);
     return;
   }
 
-  if (packet->payload_packet_len > 5 && get_u_int32_t(packet->payload, 0) == htonl(0x05010003)) {
+  if(packet->payload_packet_len > 5 && get_u_int32_t(packet->payload, 0) == htonl(0x05010003)) {
     NDPI_LOG_DBG2(ndpi_struct, "Maybe OSCAR Picturetransfer\n");
     return;
   }
 
-  if (packet->payload_packet_len == 10 && get_u_int32_t(packet->payload, 0) == htonl(0x05000001) &&
+  if(packet->payload_packet_len == 10 && get_u_int32_t(packet->payload, 0) == htonl(0x05000001) &&
       get_u_int32_t(packet->payload, 4) == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Maybe OSCAR Picturetransfer\n");
     return;
   }
 
-  if (packet->payload_packet_len >= 70 &&
+  if(packet->payload_packet_len >= 70 &&
       memcmp(&packet->payload[packet->payload_packet_len - 26],
 	     "\x67\x00\x65\x00\x74\x00\x43\x00\x61\x00\x74\x00\x61\x00\x6c\x00\x6f\x00\x67", 19) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found OSCAR PICTURE TRANSFER\n");
@@ -729,9 +726,9 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
     return;
   }
 
-  if (NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_OSCAR) != 0) {
+  if(NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_OSCAR) != 0) {
 
-    if (flow->packet_counter == 1
+    if(flow->packet_counter == 1
 	&&
 	((packet->payload_packet_len == 9
 	  && memcmp(packet->payload, "\x00\x09\x00\x00\x83\x01\xc0\x00\x00", 9) == 0)
@@ -742,13 +739,13 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
     }
 
 #if 0
-    if (flow->oscar_video_voice && ntohs(get_u_int16_t(packet->payload, 0)) == packet->payload_packet_len
+    if(flow->oscar_video_voice && ntohs(get_u_int16_t(packet->payload, 0)) == packet->payload_packet_len
 	&& packet->payload[2] == 0x00 && packet->payload[3] == 0x00) {
     }
 #endif
     
-    if (packet->payload_packet_len >= 70 && ntohs(get_u_int16_t(packet->payload, 4)) == packet->payload_packet_len) {
-      if (memcmp(packet->payload, "OFT", 3) == 0 &&
+    if(packet->payload_packet_len >= 70 && ntohs(get_u_int16_t(packet->payload, 4)) == packet->payload_packet_len) {
+      if(memcmp(packet->payload, "OFT", 3) == 0 &&
 	  ((packet->payload[3] == '3' && ((memcmp(&packet->payload[4], "\x01\x00\x01\x01", 4) == 0)
 					  || (memcmp(&packet->payload[6], "\x01\x01\x00", 3) == 0)))
 	   || (packet->payload[3] == '2' && ((memcmp(&packet->payload[6], "\x01\x01", 2)
@@ -760,7 +757,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	return;
       }
 
-      if (memcmp(packet->payload, "ODC2", 4) == 0 && memcmp(&packet->payload[6], "\x00\x01\x00\x06", 4) == 0) {
+      if(memcmp(packet->payload, "ODC2", 4) == 0 && memcmp(&packet->payload[6], "\x00\x01\x00\x06", 4) == 0) {
 	//PICTURE TRANSFER PATTERN EXMAPLE::
 	//4f 44 43 32 00 4c 00 01 00 06 00 00 00 00 00 00  ODC2.L..........
 	NDPI_LOG_INFO(ndpi_struct, "found OSCAR PICTURE TRANSFER\n");
@@ -768,7 +765,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	return;
       }
     }
-    if (packet->payload_packet_len > 40 && (memcmp(&packet->payload[2], "\x04\x4a\x00", 3) == 0)
+    if(packet->payload_packet_len > 40 && (memcmp(&packet->payload[2], "\x04\x4a\x00", 3) == 0)
 	&& (memcmp(&packet->payload[6], "\x00\x00", 2) == 0)
 	&& packet->payload[packet->payload_packet_len - 15] == 'F'
 	&& packet->payload[packet->payload_packet_len - 12] == 'L'
@@ -776,21 +773,21 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	&& (memcmp(&packet->payload[packet->payload_packet_len - 2], "\x00\x00", 2) == 0)) {
       NDPI_LOG_INFO(ndpi_struct, "found OSCAR PICTURE TRANSFER\n");
       ndpi_int_oscar_add_connection(ndpi_struct, flow);
-      if (ntohs(packet->tcp->dest) == 443 || ntohs(packet->tcp->source) == 443) {
+      if(ntohs(packet->tcp->dest) == 443 || ntohs(packet->tcp->source) == 443) {
 	flow->oscar_ssl_voice_stage = 1;
       }
       return;
 
     }
   }
-  if (flow->packet_counter < 3 && packet->payload_packet_len > 11 && (memcmp(packet->payload, "\x00\x37\x04\x4a", 4)
+  if(flow->packet_counter < 3 && packet->payload_packet_len > 11 && (memcmp(packet->payload, "\x00\x37\x04\x4a", 4)
 								      || memcmp(packet->payload, "\x00\x0a\x04\x4a",
 										4))) {
     return;
   }
 
 
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_OSCAR) {
+  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_OSCAR) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
@@ -800,7 +797,7 @@ void ndpi_search_oscar(struct ndpi_detection_module_struct *ndpi_struct, struct 
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   NDPI_LOG_DBG(ndpi_struct, "search OSCAR\n");
-  if (packet->tcp != NULL) {
+  if(packet->tcp != NULL) {
     ndpi_search_oscar_tcp_connect(ndpi_struct, flow);
   }
 }
