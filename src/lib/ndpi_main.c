@@ -716,10 +716,6 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
     ndpi_str->direction_detect_disable = (u_int8_t)value;
     break;
 
-  case ndpi_pref_disable_metadata_export:
-    ndpi_str->disable_metadata_export = (u_int8_t)value;
-    break;
-
   default:
     return(-1);
   }

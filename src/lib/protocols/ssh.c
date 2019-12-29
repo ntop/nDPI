@@ -251,18 +251,16 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
   if(flow->l4.tcp.ssh_stage == 0) {
     if(packet->payload_packet_len > 7 && packet->payload_packet_len < 100
 	&& memcmp(packet->payload, "SSH-", 4) == 0) {
-      if(!ndpi_struct->disable_metadata_export) {
-        int len = ndpi_min(sizeof(flow->protos.ssh.client_signature)-1, packet->payload_packet_len);
-
-	strncpy(flow->protos.ssh.client_signature, (const char *)packet->payload, len);
-	flow->protos.ssh.client_signature[len] = '\0';
-	ndpi_ssh_zap_cr(flow->protos.ssh.client_signature, len);
-
+      int len = ndpi_min(sizeof(flow->protos.ssh.client_signature)-1, packet->payload_packet_len);
+      
+      strncpy(flow->protos.ssh.client_signature, (const char *)packet->payload, len);
+      flow->protos.ssh.client_signature[len] = '\0';
+      ndpi_ssh_zap_cr(flow->protos.ssh.client_signature, len);
+      
 #ifdef SSH_DEBUG
-	printf("[SSH] [client_signature: %s]\n", flow->protos.ssh.client_signature);
-#endif
-      }
-
+      printf("[SSH] [client_signature: %s]\n", flow->protos.ssh.client_signature);
+#endif      
+      
       NDPI_LOG_DBG2(ndpi_struct, "ssh stage 0 passed\n");
       flow->l4.tcp.ssh_stage = 1 + packet->packet_direction;
       ndpi_int_ssh_add_connection(ndpi_struct, flow);
@@ -271,24 +269,19 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
   } else if(flow->l4.tcp.ssh_stage == (2 - packet->packet_direction)) {
     if(packet->payload_packet_len > 7 && packet->payload_packet_len < 500
 	&& memcmp(packet->payload, "SSH-", 4) == 0) {
-      if(!ndpi_struct->disable_metadata_export) {
-	int len = ndpi_min(sizeof(flow->protos.ssh.server_signature)-1, packet->payload_packet_len);
-
-	strncpy(flow->protos.ssh.server_signature, (const char *)packet->payload, len);
-	flow->protos.ssh.server_signature[len] = '\0';
-	ndpi_ssh_zap_cr(flow->protos.ssh.server_signature, len);
-
+      int len = ndpi_min(sizeof(flow->protos.ssh.server_signature)-1, packet->payload_packet_len);
+      
+      strncpy(flow->protos.ssh.server_signature, (const char *)packet->payload, len);
+      flow->protos.ssh.server_signature[len] = '\0';
+      ndpi_ssh_zap_cr(flow->protos.ssh.server_signature, len);
+      
 #ifdef SSH_DEBUG
-	printf("[SSH] [server_signature: %s]\n", flow->protos.ssh.server_signature);
+      printf("[SSH] [server_signature: %s]\n", flow->protos.ssh.server_signature);
 #endif
-
-	NDPI_LOG_DBG2(ndpi_struct, "ssh stage 1 passed\n");
-	flow->guessed_host_protocol_id = flow->guessed_protocol_id = NDPI_PROTOCOL_SSH;
-      } else {
-	NDPI_LOG_INFO(ndpi_struct, "found ssh\n");
-	ndpi_int_ssh_add_connection(ndpi_struct, flow);
-      }
-
+      
+      NDPI_LOG_DBG2(ndpi_struct, "ssh stage 1 passed\n");
+      flow->guessed_host_protocol_id = flow->guessed_protocol_id = NDPI_PROTOCOL_SSH;
+      
 #ifdef SSH_DEBUG
       printf("[SSH] [completed stage: %u]\n", flow->l4.tcp.ssh_stage);
 #endif

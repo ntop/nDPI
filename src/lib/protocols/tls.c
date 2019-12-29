@@ -443,28 +443,25 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	      }
 
 	      if(num_dots >= 1) {
-		if(!ndpi_struct->disable_metadata_export) {
-		  ndpi_protocol_match_result ret_match;
-		  u_int16_t subproto;
-		  
-		  stripCertificateTrailer(buffer, buffer_len);
-		  snprintf(flow->protos.stun_ssl.ssl.server_certificate,
-			   sizeof(flow->protos.stun_ssl.ssl.server_certificate), "%s", buffer);
-		  
+		ndpi_protocol_match_result ret_match;
+		u_int16_t subproto;
+		
+		stripCertificateTrailer(buffer, buffer_len);
+		snprintf(flow->protos.stun_ssl.ssl.server_certificate,
+			 sizeof(flow->protos.stun_ssl.ssl.server_certificate), "%s", buffer);
+		
 #ifdef DEBUG_TLS
-		  printf("[server_certificate: %s]\n", flow->protos.stun_ssl.ssl.server_certificate);
+		printf("[server_certificate: %s]\n", flow->protos.stun_ssl.ssl.server_certificate);
 #endif
-		  
-		  subproto = ndpi_match_host_subprotocol(ndpi_struct, flow,
-							 flow->protos.stun_ssl.ssl.server_certificate,
-							 strlen(flow->protos.stun_ssl.ssl.server_certificate),
-							 &ret_match,
-							 NDPI_PROTOCOL_TLS);
-
-		  if(subproto != NDPI_PROTOCOL_UNKNOWN)
-		    ndpi_set_detected_protocol(ndpi_struct, flow, subproto, NDPI_PROTOCOL_TLS);
-		}
-
+		
+		subproto = ndpi_match_host_subprotocol(ndpi_struct, flow,
+						       flow->protos.stun_ssl.ssl.server_certificate,
+						       strlen(flow->protos.stun_ssl.ssl.server_certificate),
+						       &ret_match,
+						       NDPI_PROTOCOL_TLS);
+		
+		if(subproto != NDPI_PROTOCOL_UNKNOWN)
+		  ndpi_set_detected_protocol(ndpi_struct, flow, subproto, NDPI_PROTOCOL_TLS);				
 		return(1 /* Server Certificate */);
 	      }
 	    }
@@ -608,10 +605,9 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
 			
 			stripCertificateTrailer(buffer, buffer_len);
 			
-			if(!ndpi_struct->disable_metadata_export) {
-			  snprintf(flow->protos.stun_ssl.ssl.client_certificate,
-				   sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
-			}
+			snprintf(flow->protos.stun_ssl.ssl.client_certificate,
+				 sizeof(flow->protos.stun_ssl.ssl.client_certificate),
+				 "%s", buffer);
 		      }
 		    } else if(extension_id == 10 /* supported groups */) {
 		      u_int16_t s_offset = offset+extension_offset + 2;

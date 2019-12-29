@@ -941,7 +941,6 @@ typedef enum {
 
 typedef enum {
    ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_disable_metadata_export,
 } ndpi_detection_preference;
 
 /* ntop extensions */
@@ -1119,8 +1118,7 @@ struct ndpi_detection_module_struct {
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
   u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */
-    disable_metadata_export:1   /* No metadata is exported */
-    ;
+    _pad:7;
 
   void *hyperscan; /* Intel Hyperscan */
 };

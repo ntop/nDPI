@@ -149,9 +149,8 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
   //printf("==> %s\n", ua);
-  if(!ndpi_struct->disable_metadata_export) {
-    snprintf((char*)flow->protos.http.detected_os, sizeof(flow->protos.http.detected_os), "%s", ua);
-  }
+  snprintf((char*)flow->protos.http.detected_os,
+	   sizeof(flow->protos.http.detected_os), "%s", ua);  
 }
 
 /* ************************************************************* */
@@ -333,21 +332,17 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 		  packet->host_line.len, packet->host_line.ptr);
 
     /* Copy result for nDPI apps */
-    if(!ndpi_struct->disable_metadata_export) {
-      len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
-      strncpy((char*)flow->host_server_name, (char*)packet->host_line.ptr, len);
-      flow->host_server_name[len] = '\0';
-      flow->extra_packets_func = NULL; /* We're good now */
-    }
+    len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
+    strncpy((char*)flow->host_server_name, (char*)packet->host_line.ptr, len);
+    flow->host_server_name[len] = '\0';
+    flow->extra_packets_func = NULL; /* We're good now */
 
     flow->server_id = flow->dst;
 
     if(packet->forwarded_line.ptr) {
       len = ndpi_min(packet->forwarded_line.len, sizeof(flow->protos.http.nat_ip)-1);
-      if(!ndpi_struct->disable_metadata_export) {
-	strncpy((char*)flow->protos.http.nat_ip, (char*)packet->forwarded_line.ptr, len);
-	flow->protos.http.nat_ip[len] = '\0';
-      }
+      strncpy((char*)flow->protos.http.nat_ip, (char*)packet->forwarded_line.ptr, len);
+      flow->protos.http.nat_ip[len] = '\0';
     }
 
     ndpi_http_parse_subprotocol(ndpi_struct, flow);
