@@ -33,7 +33,7 @@
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 
 
-/* #define DEBUG_TLS 1 */
+/* #define DEBUG_TLS 1  */
 /* #define DEBUG_FINGERPRINT 1 */
 
 /*
@@ -252,7 +252,6 @@ int getTLScertificate(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     total_len += header_len;
-
     memset(buffer, 0, buffer_len);
 
     /* Truncate total len, search at least in incomplete packet */
@@ -966,8 +965,8 @@ void getSSLorganization(struct ndpi_detection_module_struct *ndpi_struct,
   memset(buffer, 0, buffer_len);
 
   /* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
-  u_int num_found = 0;
-  u_int i, j;
+  u_int num_found = 0, i, j;
+  
   for(i = 9; i < packet->payload_packet_len-4; i++) {
     /* Organization OID: 2.5.4.10 */
     if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x0a)) {
@@ -1083,7 +1082,6 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
       getSSCertificateFingerprint(ndpi_struct, flow);
   }
   
-#if 1
   /* consider only specific SSL packets (handshake) */
   if((packet->payload_packet_len > 9) && (packet->payload[0] == 0x16)) {
     char certificate[64];
@@ -1101,12 +1099,6 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
       getSSLorganization(ndpi_struct, flow, organization, sizeof(organization));
 
       packet->tls_certificate_detected++;
-#if 0
-      if((flow->l4.tcp.tls_seen_server_cert == 1)
-	 && (flow->protos.stun_ssl.ssl.server_certificate[0] != '\0'))
-        /* 0 means we've done processing extra packets (since we found what we wanted) */
-        return 0;
-#endif
     }
 
     if(flow->l4.tcp.tls_record_offset == 0) {
@@ -1123,7 +1115,6 @@ int sslTryAndRetrieveServerCertificate(struct ndpi_detection_module_struct *ndpi
       }
     }
   }
-#endif
   
   /* 1 means keep looking for more packets */
   if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed) rc = 1;

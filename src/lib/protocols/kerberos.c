@@ -28,7 +28,7 @@
 
 #include "ndpi_api.h"
 
-//#define KERBEROS_DEBUG 1
+/* #define KERBEROS_DEBUG 1 */
 
 #define KERBEROS_PORT 88
 
@@ -190,7 +190,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t name_offset;
 
 		name_offset = body_offset + 13;
-		for(i=0; i<10; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
+		for(i=0; i<20; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
 
 #ifdef KERBEROS_DEBUG
 		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
@@ -222,8 +222,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		      for(i=0; i<cname_len; i++) cname_str[i] = tolower(cname_str[i]);
 
 #ifdef KERBEROS_DEBUG
-		      printf("[AS-REQ][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n",
-			     sport, dport, cname_len, cname_str);
+		      printf("[AS-REQ][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n", sport, dport, cname_len, cname_str);
 #endif
 
 		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b)) {
@@ -242,7 +241,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    } else
 		      snprintf(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username), "%s", cname_str);
 
-		    for(i=0; i<10; i++) if(packet->payload[realm_offset] != 0x1b) name_offset++; /* ASN.1 */
+		    for(i=0; i<14; i++) if(packet->payload[realm_offset] != 0x1b) realm_offset++; /* ASN.1 */
 #ifdef KERBEROS_DEBUG
 		    printf("realm_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", realm_offset, packet->payload[realm_offset], packet->payload[realm_offset+1]);
 #endif
@@ -279,7 +278,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int name_offset, padding_offset = body_offset + 4;
 
 		name_offset = padding_offset;
-		for(i=0; i<10; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
+		for(i=0; i<14; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
 
 #ifdef KERBEROS_DEBUG
 		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);

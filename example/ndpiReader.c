@@ -602,7 +602,7 @@ void printCSVHeader() {
   fprintf(csv_fp, "client_info,server_info,");
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
-  fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh");
+  fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info");
 
   /* Joy */
   if(enable_joy_stats) {
@@ -1099,6 +1099,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "",
 	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : ""
 	    );
+
+    fprintf(csv_fp, ",%s", flow->info);
   }
 
   if((verbose != 1) && (verbose != 2)) {

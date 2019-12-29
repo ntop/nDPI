@@ -993,6 +993,15 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     } else if(flow->ndpi_flow->protos.kerberos.domain[0] != '\0')
       snprintf(flow->info, sizeof(flow->info), "%s",
 	       flow->ndpi_flow->protos.kerberos.domain);
+
+#if 0
+    if(flow->info[0] != '\0')
+      printf("->> (%d) [%s][%s][%s]<<--\n",
+	     htons(flow->src_port),
+	     flow->ndpi_flow->protos.kerberos.domain,
+	     flow->ndpi_flow->protos.kerberos.hostname,
+	     flow->ndpi_flow->protos.kerberos.username);
+#endif
   }
   /* HTTP */
   else if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP)
