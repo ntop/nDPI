@@ -159,14 +159,12 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 				 struct ndpi_flow_struct *flow) {
   if((flow->l4.tcp.http_stage == 0) || (flow->http.url && flow->http_detected)) {
     char *double_col = strchr((char*)flow->host_server_name, ':');
-    ndpi_protocol_match_result ret_match;
 
     if(double_col) double_col[0] = '\0';
 
-    ndpi_match_host_subprotocol(ndpi_struct, flow, (char *)flow->host_server_name,
-				strlen((const char *)flow->host_server_name),
-				&ret_match,
-				NDPI_PROTOCOL_HTTP);
+    ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, 
+				 (char *)flow->host_server_name,
+				 strlen((const char *)flow->host_server_name));
   }
 }
 

@@ -651,7 +651,6 @@ static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_str) {
       ndpi_free(expressions[i]);
 
   ndpi_free(expressions), ndpi_free(ids);
-
   ndpi_free(need_to_be_free);
 
   return(rc);
@@ -3834,6 +3833,9 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	if(flow->http.content_type) ndpi_free(flow->http.content_type);
 	if(flow->http.user_agent)   ndpi_free(flow->http.user_agent);
 
+	if(flow->l4.tcp.tls.message.buffer)
+	  ndpi_free(flow->l4.tcp.tls.message.buffer);
+
 	backup  = flow->num_processed_pkts;
 	backup1 = flow->guessed_protocol_id;
 	backup2 = flow->guessed_host_protocol_id;
@@ -4216,13 +4218,13 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_MESSENGER)
 	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_CALL))
       ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
-    else if((flow->l4.tcp.tls_seen_client_cert == 1)
+    else if((flow->l4.tcp.tls.hello_processed == 1)
 	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
     } else {
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
-	 && (flow->l4.tcp.tls_stage > 1))
+	 && flow->l4.tcp.tls.hello_processed)
 	flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 
       guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
@@ -4270,7 +4272,10 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       }
     }
   } else {
-    flow->detected_protocol_stack[1] = flow->guessed_protocol_id,
+    if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+      flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
+
+    if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
       flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
 
     if(flow->detected_protocol_stack[1] == flow->detected_protocol_stack[0])
@@ -4347,9 +4352,10 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str,
   if(flow->extra_packets_func) {
     if((flow->extra_packets_func(ndpi_str, flow)) == 0)
       flow->check_extra_packets = 0;
-  }
 
-  flow->num_extra_packets_checked++;
+    if(++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)
+      flow->extra_packets_func = NULL; /* Enough packets detected */    
+  }
 }
 
 /* ********************************************************************************* */
@@ -4614,7 +4620,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
 
-    if((flow->l4.tcp.tls_seen_client_cert == 1) && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
+    if(flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') {
       unsigned long id;
       int rc = ndpi_match_custom_category(ndpi_str,
 					  (char *)flow->protos.stun_ssl.ssl.client_certificate,
@@ -6329,6 +6335,33 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   return(rc);
 }
 
+/* **************************************** */
+
+int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow,
+				 u_int16_t master_protocol,				 
+				 char *name, u_int name_len) {
+  ndpi_protocol_match_result ret_match;
+  u_int16_t subproto, what_len;
+  char *what;
+  
+  if((name_len > 2) && (name[0] == '*') && (name[1] == '.'))
+    what = &name[1], what_len = name_len - 1;
+  else
+    what = name, what_len = name_len;
+  
+  subproto = ndpi_match_host_subprotocol(ndpi_struct, flow,
+					 what, what_len,
+					 &ret_match, master_protocol);
+  
+  if(subproto != NDPI_PROTOCOL_UNKNOWN) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol);
+    ndpi_int_change_category(ndpi_struct, flow, ret_match.protocol_category);
+    return(1);
+  } else
+    return(0);
+}
+
 /* ****************************************************** */
 
 u_int16_t ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
@@ -6378,10 +6411,12 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow->http.content_type)   ndpi_free(flow->http.content_type);
     if(flow->http.user_agent)     ndpi_free(flow->http.user_agent);
     if(flow->kerberos_buf.pktbuf) ndpi_free(flow->kerberos_buf.pktbuf);
-
+    if(flow->protos.stun_ssl.ssl.server_names)
+      ndpi_free(flow->protos.stun_ssl.ssl.server_names);
+    
     if(flow->l4_proto == IPPROTO_TCP) {
-      if(flow->l4.tcp.tls_srv_cert_fingerprint_ctx)
-	ndpi_free(flow->l4.tcp.tls_srv_cert_fingerprint_ctx);
+      if(flow->l4.tcp.tls.srv_cert_fingerprint_ctx)
+	ndpi_free(flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
     }
 
     ndpi_free(flow);
@@ -6561,8 +6596,8 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
-    if(!flow->l4.tcp.tls_srv_cert_fingerprint_processed)
-      return(1);
+    if(!flow->l4.tcp.tls.certificate_processed)
+      return(1); /* TODO: add check for TLS 1.3 */
     break;
 
   case NDPI_PROTOCOL_HTTP:

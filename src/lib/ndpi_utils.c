@@ -1044,7 +1044,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_serialize_start_of_block(serializer, "tls");
 	ndpi_serialize_string_string(serializer, "version", version);
 	ndpi_serialize_string_string(serializer, "client_cert", flow->protos.stun_ssl.ssl.client_certificate);
-	ndpi_serialize_string_string(serializer, "server_cert", flow->protos.stun_ssl.ssl.server_certificate);
+	if(flow->protos.stun_ssl.ssl.server_names)
+	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.stun_ssl.ssl.server_names);
 	ndpi_serialize_string_string(serializer, "issuer", flow->protos.stun_ssl.ssl.server_organization);
 
 	if(before) {
@@ -1061,10 +1062,10 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.stun_ssl.ssl.server_unsafe_cipher);
 	ndpi_serialize_string_string(serializer, "cipher", ndpi_cipher2str(flow->protos.stun_ssl.ssl.server_cipher));
 
-	if(flow->l4.tcp.tls_sha1_certificate_fingerprint[0] != '\0') {
+	if(flow->l4.tcp.tls.sha1_certificate_fingerprint[0] != '\0') {
 	  for(i=0, off=0; i<20; i++) {
 	    int rc = snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
-			      flow->l4.tcp.tls_sha1_certificate_fingerprint[i] & 0xFF);
+			      flow->l4.tcp.tls.sha1_certificate_fingerprint[i] & 0xFF);
 	    
 	    if(rc <= 0) break; else off += rc;
 	  }

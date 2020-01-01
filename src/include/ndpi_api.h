@@ -507,6 +507,21 @@ extern "C" {
 					   u_int16_t protoId);
 
   /**
+   * Set hostname-based protocol
+   *
+   * @par ndpi_mod          = the detection module
+   * @par flow              = the flow to which this communication belongs to
+   * @par master_protocol   = the master protocol for this flow
+   * @par name              = the host name
+   * @par name_len          = length of the host name
+   *
+   */
+  int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_mod,
+				   struct ndpi_flow_struct *flow,
+				   u_int16_t master_protocol,				 
+				   char *name, u_int name_len);
+
+  /**
    * Get protocol category as string
    *
    * @par     mod           = the detection module

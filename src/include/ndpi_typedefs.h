@@ -637,17 +637,19 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_TELNET */
   u_int32_t telnet_stage:2;			// 0 - 2
 
-  void* tls_srv_cert_fingerprint_ctx;
+  struct {
+    struct {
+      u_int8_t *buffer;
+      u_int buffer_len, buffer_used;
+    } message;
+    
+    void* srv_cert_fingerprint_ctx; /* SHA-1 */
   
-  /* NDPI_PROTOCOL_TLS */
-  u_int8_t tls_seen_client_cert:1,
-    tls_seen_server_cert:1,
-    tls_seen_certificate:1,
-    tls_srv_cert_fingerprint_found:1,
-    tls_srv_cert_fingerprint_processed:1,
-    tls_stage:2, _pad:1; // 0 - 5
-  int16_t tls_record_offset, tls_fingerprint_len; /* Need to be signed */
-  u_int8_t tls_sha1_certificate_fingerprint[20];
+    /* NDPI_PROTOCOL_TLS */
+    u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1, _pad:5;
+    int16_t fingerprint_len; /* Need to be signed */
+    u_int8_t sha1_certificate_fingerprint[20];
+  } tls;
   
   /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
@@ -1217,8 +1219,8 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
-	u_int16_t ssl_version;
-	char client_certificate[64], server_certificate[64], server_organization[64];
+	u_int16_t ssl_version, server_names_len;
+	char client_certificate[64], *server_names, server_organization[64];
 	u_int32_t notBefore, notAfter;
 	char ja3_client[33], ja3_server[33];
 	u_int16_t server_cipher;
