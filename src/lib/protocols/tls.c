@@ -394,7 +394,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		flow->protos.stun_ssl.ssl.server_names = newstr;
 		flow->protos.stun_ssl.ssl.server_names[flow->protos.stun_ssl.ssl.server_names_len] = ',';
 		strncpy(&flow->protos.stun_ssl.ssl.server_names[flow->protos.stun_ssl.ssl.server_names_len+1],
-			dNSName, dNSName_len);
+			dNSName, dNSName_len-1);
 		flow->protos.stun_ssl.ssl.server_names[newstr_len] = '\0';
 		flow->protos.stun_ssl.ssl.server_names_len = newstr_len;
 	      }
@@ -482,6 +482,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		 certificate_len);
   
       SHA1Final(flow->l4.tcp.tls.sha1_certificate_fingerprint, flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
+
+      flow->l4.tcp.tls.fingerprint_set = 1;
   
 #ifdef DEBUG_TLS
       {

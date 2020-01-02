@@ -646,8 +646,8 @@ struct ndpi_flow_tcp_struct {
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
   
     /* NDPI_PROTOCOL_TLS */
-    u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1, _pad:5;
-    int16_t fingerprint_len; /* Need to be signed */
+    u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1,
+	fingerprint_set:1, _pad:4;
     u_int8_t sha1_certificate_fingerprint[20];
   } tls;
   
