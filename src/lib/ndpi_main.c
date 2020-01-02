@@ -78,6 +78,12 @@ static int removeDefaultPort(ndpi_port_range *range,
 
 /* ****************************************** */
 
+static inline uint8_t flow_is_proto(struct ndpi_flow_struct *flow, u_int16_t p) {
+  return((flow->detected_protocol_stack[0] == p) || (flow->detected_protocol_stack[1] == p));
+}
+
+/* ****************************************** */
+
 void* ndpi_malloc(size_t size) { return(_ndpi_malloc ? _ndpi_malloc(size) : malloc(size)); }
 void* ndpi_flow_malloc(size_t size) { return(_ndpi_flow_malloc ? _ndpi_flow_malloc(size) : ndpi_malloc(size)); }
 
@@ -6411,10 +6417,11 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow->http.content_type)   ndpi_free(flow->http.content_type);
     if(flow->http.user_agent)     ndpi_free(flow->http.user_agent);
     if(flow->kerberos_buf.pktbuf) ndpi_free(flow->kerberos_buf.pktbuf);
-    if(flow->protos.stun_ssl.ssl.server_names)
-      ndpi_free(flow->protos.stun_ssl.ssl.server_names);
-    
-    if(flow->l4_proto == IPPROTO_TCP) {
+
+    if(flow_is_proto(flow, NDPI_PROTOCOL_TLS)) {
+      if(flow->protos.stun_ssl.ssl.server_names)
+	ndpi_free(flow->protos.stun_ssl.ssl.server_names);
+
       if(flow->l4.tcp.tls.srv_cert_fingerprint_ctx)
 	ndpi_free(flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
     }
