@@ -1083,7 +1083,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
    fprintf(csv_fp, "%u,%u,", flow->c_to_s_init_win, flow->s_to_c_init_win);
 
     fprintf(csv_fp, "%s,%s,",
-	    (flow->ssh_tls.client_info[0] != '\0')  ? flow->ssh_tls.client_info : "",
+	    (flow->ssh_tls.client_requested_server_name[0] != '\0')  ? flow->ssh_tls.client_requested_server_name : "",
 	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
 
     fprintf(csv_fp, "%s,%s,%s,",
@@ -1207,7 +1207,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    flow->http.content_type, flow->http.user_agent);
 
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
-  if(flow->ssh_tls.client_info[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_info);
+  if(flow->ssh_tls.client_requested_server_name[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_requested_server_name);
   if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 
   if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
@@ -2053,7 +2053,7 @@ static void printFlowsStats() {
 	    newHost->host_server_info_hasht = NULL;
 	    newHost->ip_string = all_flows[i].flow->src_name;
 	    newHost->ip = all_flows[i].flow->src_ip;
-	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_info;
+	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;
 
 	    ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
 	    newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
@@ -2086,7 +2086,7 @@ static void printFlowsStats() {
 
 	    newHost->ip = all_flows[i].flow->src_ip;
 	    newHost->ip_string = all_flows[i].flow->src_name;
-	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_info;;
+	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;;
 
 	    ndpi_ja3_fingerprints_host *newElement = malloc(sizeof(ndpi_ja3_fingerprints_host));
 	    newElement->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
@@ -2103,7 +2103,7 @@ static void printFlowsStats() {
 	      ndpi_ip_dns *newInnerElement = malloc(sizeof(ndpi_ip_dns));
 	      newInnerElement->ip = all_flows[i].flow->src_ip;
 	      newInnerElement->ip_string = all_flows[i].flow->src_name;
-	      newInnerElement->dns_name = all_flows[i].flow->ssh_tls.client_info;
+	      newInnerElement->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;
 	      HASH_ADD_INT(hostByJA3Found->ipToDNS_ht, ip, newInnerElement);
 	    }
 	  }
