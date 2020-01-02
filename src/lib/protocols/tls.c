@@ -382,11 +382,13 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 #endif
 
 	    if(flow->protos.stun_ssl.ssl.server_names == NULL)
-	      flow->protos.stun_ssl.ssl.server_names = ndpi_strdup(dNSName), flow->protos.stun_ssl.ssl.server_names_len = strlen(dNSName);
+	      flow->protos.stun_ssl.ssl.server_names = ndpi_strdup(dNSName),
+		flow->protos.stun_ssl.ssl.server_names_len = strlen(dNSName);
 	    else {
 	      u_int16_t dNSName_len = strlen(dNSName);
 	      u_int16_t newstr_len = flow->protos.stun_ssl.ssl.server_names_len + dNSName_len + 1;
-	      char *newstr = (char*)ndpi_realloc(flow->protos.stun_ssl.ssl.server_names, flow->protos.stun_ssl.ssl.server_names_len+1, newstr_len+1);
+	      char *newstr = (char*)ndpi_realloc(flow->protos.stun_ssl.ssl.server_names,
+						 flow->protos.stun_ssl.ssl.server_names_len+1, newstr_len+1);
 
 	      if(newstr) {
 		flow->protos.stun_ssl.ssl.server_names = newstr;
