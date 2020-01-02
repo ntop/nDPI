@@ -1043,7 +1043,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
       if(!unknown_tls_version) {
 	ndpi_serialize_start_of_block(serializer, "tls");
 	ndpi_serialize_string_string(serializer, "version", version);
-	ndpi_serialize_string_string(serializer, "client_cert", flow->protos.stun_ssl.ssl.client_certificate);
+	ndpi_serialize_string_string(serializer, "client_requested_server_name",
+				     flow->protos.stun_ssl.ssl.client_requested_server_name);
 	if(flow->protos.stun_ssl.ssl.server_names)
 	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.stun_ssl.ssl.server_names);
 	ndpi_serialize_string_string(serializer, "issuer", flow->protos.stun_ssl.ssl.server_organization);

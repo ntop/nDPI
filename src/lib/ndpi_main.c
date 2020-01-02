@@ -4219,7 +4219,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	    || (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_CALL))
       ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
     else if((flow->l4.tcp.tls.hello_processed == 1)
-	    && (flow->protos.stun_ssl.ssl.client_certificate[0] != '\0')) {
+	    && (flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0')) {
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
     } else {
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
@@ -4620,11 +4620,11 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
 
-    if(flow->protos.stun_ssl.ssl.client_certificate[0] != '\0') {
+    if(flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
       unsigned long id;
       int rc = ndpi_match_custom_category(ndpi_str,
-					  (char *)flow->protos.stun_ssl.ssl.client_certificate,
-					  strlen(flow->protos.stun_ssl.ssl.client_certificate),
+					  (char *)flow->protos.stun_ssl.ssl.client_requested_server_name,
+					  strlen(flow->protos.stun_ssl.ssl.client_requested_server_name),
 					  &id);
 
       if(rc == 0) {

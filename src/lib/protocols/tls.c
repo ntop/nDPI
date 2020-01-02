@@ -987,8 +987,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  cleanupServerName(buffer, sizeof(buffer));
 
-		  snprintf(flow->protos.stun_ssl.ssl.client_certificate,
-			   sizeof(flow->protos.stun_ssl.ssl.client_certificate), "%s", buffer);
+		  snprintf(flow->protos.stun_ssl.ssl.client_requested_server_name,
+			   sizeof(flow->protos.stun_ssl.ssl.client_requested_server_name),
+			   "%s", buffer);
 
 		  if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
 		    flow->l4.tcp.tls.subprotocol_detected = 1;

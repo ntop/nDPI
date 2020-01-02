@@ -1017,7 +1017,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     snprintf(flow->telnet.username, sizeof(flow->telnet.username), "%s", flow->ndpi_flow->protos.telnet.username);
     snprintf(flow->telnet.password, sizeof(flow->telnet.password), "%s", flow->ndpi_flow->protos.telnet.password);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)) {
-    snprintf(flow->ssh_tls.client_info, sizeof(flow->ssh_tls.client_info), "%s",
+    snprintf(flow->ssh_tls.client_requested_server_name,
+	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
 	     flow->ndpi_flow->protos.ssh.client_signature);
     snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
 	     flow->ndpi_flow->protos.ssh.server_signature);
@@ -1032,8 +1033,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	  || (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client[0] != '\0')
     ) {
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
-    snprintf(flow->ssh_tls.client_info, sizeof(flow->ssh_tls.client_info), "%s",
-	     flow->ndpi_flow->protos.stun_ssl.ssl.client_certificate);
+    snprintf(flow->ssh_tls.client_requested_server_name,
+	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
+	     flow->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name);
 
     if(flow->ndpi_flow->protos.stun_ssl.ssl.server_names_len > 0)
       flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.server_names);
