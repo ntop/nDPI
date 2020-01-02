@@ -200,6 +200,7 @@ typedef struct ndpi_flow_info {
       server_organization[64],
       ja3_client[33], ja3_server[33],
       sha1_cert_fingerprint[20];
+    u_int8_t sha1_cert_fingerprint_set;
     time_t notBefore, notAfter;
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;    

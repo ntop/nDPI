@@ -1224,11 +1224,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
      || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)) {
-    if((flow->ssh_tls.sha1_cert_fingerprint[0] == 0)
-       && (flow->ssh_tls.sha1_cert_fingerprint[1] == 0)
-       && (flow->ssh_tls.sha1_cert_fingerprint[2] == 0))
-      ; /* Looks empty */
-    else {
+    if(flow->ssh_tls.sha1_cert_fingerprint_set) {
       fprintf(out, "[Certificate SHA-1: ");
       for(i=0; i<20; i++)
 	fprintf(out, "%s%02X", (i > 0) ? ":" : "",

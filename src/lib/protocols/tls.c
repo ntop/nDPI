@@ -394,7 +394,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		flow->protos.stun_ssl.ssl.server_names = newstr;
 		flow->protos.stun_ssl.ssl.server_names[flow->protos.stun_ssl.ssl.server_names_len] = ',';
 		strncpy(&flow->protos.stun_ssl.ssl.server_names[flow->protos.stun_ssl.ssl.server_names_len+1],
-			dNSName, dNSName_len-1);
+			dNSName, dNSName_len+1);
 		flow->protos.stun_ssl.ssl.server_names[newstr_len] = '\0';
 		flow->protos.stun_ssl.ssl.server_names_len = newstr_len;
 	      }
@@ -581,7 +581,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     /* Split the element in blocks */
     u_int16_t processed = 5;
       
-    while(processed < len) {
+    while((processed+4) < len) {
       const u_int8_t *block = (const u_int8_t *)&flow->l4.tcp.tls.message.buffer[processed];
       u_int16_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
