@@ -19,10 +19,10 @@ ndpiReader: $(OBJS) $(LIBNDPI)
 
 install:
 	mkdir -p $(DESTDIR)$(PREFIX)/bin/
-	mkdir -p $(DESTDIR)$(PREFIX)/sbin/ndpi
+	mkdir -p $(DESTDIR)$(PREFIX)/share/ndpi
 	cp ndpiReader $(DESTDIR)$(PREFIX)/bin/
-	cp protos.txt $(DESTDIR)$(PREFIX)/sbin/ndpi/ndpiProtos.txt
-	cp mining_hosts.txt $(DESTDIR)$(PREFIX)/sbin/ndpi/ndpiCustomCategory.txt
+	cp protos.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiProtos.txt
+	cp mining_hosts.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiCustomCategory.txt
 	[ -f build/app/ndpiReader.dpdk ] && cp build/app/ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
 	[ -f ndpiReader.dpdk ] && cp ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
 
