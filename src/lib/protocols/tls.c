@@ -342,9 +342,6 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       }
     } else if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x1d) && (packet->payload[i+2] == 0x11)) {
       /* Organization OID: 2.5.29.17 (subjectAltName) */
-      u_int16_t servernames_len = 0;
-      char servernames[2048];
-
 #ifdef DEBUG_TLS
       printf("******* [TLS] Found subjectAltName\n");
 #endif
@@ -362,23 +359,19 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	     && ((i + packet->payload[i + 1] + 2) < packet->payload_packet_len)) {
 	    u_int8_t len = packet->payload[i + 1];
 	    char dNSName[256];
-	    int rc;
 
 	    i += 2;
+
+	    if(len > sizeof(dNSName)-1)
+	      break; /* String too long */
 	    
 	    strncpy(dNSName, (const char*)&packet->payload[i], len);
 	    dNSName[len] = '\0';
 
 	    cleanupServerName(dNSName, len);
 
-	    rc = snprintf(&servernames[servernames_len], sizeof(servernames)-servernames_len, "%s%s",
-			  (servernames_len == 0) ? "" : ",", dNSName);
-
-	    if(rc > 0)
-	      servernames_len += rc;
-
 #if DEBUG_TLS
-	    printf("[TLS] dNSName %s [%s]\n", dNSName, servernames);
+	    printf("[TLS] dNSName %s\n", dNSName);
 #endif
 
 	    if(flow->protos.stun_ssl.ssl.server_names == NULL)
