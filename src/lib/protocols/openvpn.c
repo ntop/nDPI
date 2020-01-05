@@ -1,7 +1,7 @@
 /*
  * openvpn.c
  *
- * Copyright (C) 2011-19 - ntop.org
+ * Copyright (C) 2011-20 - ntop.org
  *
  * OpenVPN TCP / UDP Detection - 128/160 hmac
  *

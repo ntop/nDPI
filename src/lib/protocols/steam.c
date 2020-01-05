@@ -1,7 +1,7 @@
 /*
  * steam.c
  *
- * Copyright (C) 2011-19 - ntop.org
+ * Copyright (C) 2011-20 - ntop.org
  * Copyright (C) 2014 Tomasz Bujlow <tomasz@skatnet.dk>
  * 
  * The signature is mostly based on the Libprotoident library
