@@ -40,14 +40,12 @@ void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_struct, str
 	u_int max_len = sizeof(flow->host_server_name) - 1;
 	u_int i, j;
 
-	if(!ndpi_struct->disable_metadata_export) {
-	  for(i=strlen((const char *)flow->host_server_name), j=0; (i<max_len) && (j<packet->payload_packet_len); i++, j++) {
-	    if((packet->payload[j] == '\n') || (packet->payload[j] == '\r')) break;	  
-	    flow->host_server_name[i] = packet->payload[j];
-	  }
-	  
-	  flow->host_server_name[i] = '\0';
+	for(i=strlen((const char *)flow->host_server_name), j=0; (i<max_len) && (j<packet->payload_packet_len); i++, j++) {
+	  if((packet->payload[j] == '\n') || (packet->payload[j] == '\r')) break;	  
+	  flow->host_server_name[i] = packet->payload[j];
 	}
+	
+	flow->host_server_name[i] = '\0';
 	
 	flow->server_id = ((sport == 43) || (sport == 4343)) ? flow->src : flow->dst;
 	

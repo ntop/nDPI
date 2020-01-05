@@ -8754,7 +8754,7 @@ static ndpi_protocol_match host_match[] = {
   // { ".googlezip.net", NULL, "\\.googlezip" TLD,                   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
   { "dns.google", NULL, "dns\\.google" TLD, "DoH_DoT",     NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
-  // { "mozilla.cloudflare-dns.com", NULL, "mozilla\\.cloudflare-dns\\.com" TLD, "DoH_DoT",     NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE }, /* Firefox */
+  { "mozilla.cloudflare-dns.com", NULL, "mozilla\\.cloudflare-dns\\.com" TLD, "DoH_DoT",     NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE }, /* Firefox */
   { "cloudflare-dns.com", NULL, "cloudflare-dns\\.com" TLD, "DoH_DoT",     NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   { "commons.host", NULL, "commons\\.host" TLD, "DoH_DoT", NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   { "doh.li", NULL, "doh\\.li" TLD, "DoH_DoT", NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },

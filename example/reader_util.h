@@ -94,7 +94,7 @@ typedef struct ndpi_ja3_info {
 
 // external hash table (host ip -> <ip string, hash table ja3c, hash table ja3s>)
 // used to aggregate ja3 fingerprints by hosts
-typedef struct ndpi_host_ja3_fingerprints{
+typedef struct ndpi_host_ja3_fingerprints {
    u_int32_t ip;
    char *ip_string;
    char *dns_name;
@@ -195,11 +195,12 @@ typedef struct ndpi_flow_info {
 
   struct {
     u_int16_t ssl_version;
-    char client_info[64], server_info[64],
-      client_hassh[33], server_hassh[33],
+    char client_requested_server_name[64], server_info[64],
+      client_hassh[33], server_hassh[33], *server_names,
       server_organization[64],
       ja3_client[33], ja3_server[33],
       sha1_cert_fingerprint[20];
+    u_int8_t sha1_cert_fingerprint_set;
     time_t notBefore, notAfter;
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;    

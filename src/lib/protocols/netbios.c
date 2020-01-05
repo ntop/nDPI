@@ -73,13 +73,10 @@ int ndpi_netbios_name_interpret(char *in, char *out, u_int out_len) {
 static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct
 					    *ndpi_struct, struct ndpi_flow_struct *flow) { 
   char name[64];
-
-  if(!ndpi_struct->disable_metadata_export) {
-    u_int off = flow->packet.payload[12] == 0x20 ? 12 : 14;
-    
-    if(ndpi_netbios_name_interpret((char*)&flow->packet.payload[off], name, sizeof(name)) > 0)
-      snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);    
-  }
+  u_int off = flow->packet.payload[12] == 0x20 ? 12 : 14;
+  
+  if(ndpi_netbios_name_interpret((char*)&flow->packet.payload[off], name, sizeof(name)) > 0)
+    snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);    
   
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETBIOS, NDPI_PROTOCOL_UNKNOWN);
 }

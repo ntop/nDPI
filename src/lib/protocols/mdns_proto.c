@@ -82,11 +82,9 @@ static int ndpi_int_check_mdns_payload(struct ndpi_detection_module_struct
 
     /* printf("==> [%d] %s\n", j, answer);  */
 
-    if(!ndpi_struct->disable_metadata_export) {
-      len = ndpi_min(sizeof(flow->protos.mdns.answer)-1, j);
-      strncpy(flow->protos.mdns.answer, (const char *)answer, len);
-      flow->protos.mdns.answer[len] = '\0';
-    }
+    len = ndpi_min(sizeof(flow->protos.mdns.answer)-1, j);
+    strncpy(flow->protos.mdns.answer, (const char *)answer, len);
+    flow->protos.mdns.answer[len] = '\0';
     
     NDPI_LOG_INFO(ndpi_struct, "found MDNS with answer query\n");
     return 1;
