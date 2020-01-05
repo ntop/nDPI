@@ -780,6 +780,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  offset += session_id_len+1;
       }
 
+      if((offset+3) > packet->payload_packet_len)
+	return(0); /* Not found */
+
       ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
       flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0]);
       flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
@@ -873,7 +876,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif      
     } else if(handshake_type == 0x01 /* Client Hello */) {
       u_int16_t cipher_len, cipher_offset;
-      
+
+      if((session_id_len+base_offset+3) > packet->payload_packet_len)
+	return(0); /* Not found */
+
       if(packet->tcp) {
 	cipher_len = packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
 	cipher_offset = base_offset + session_id_len + 3;
