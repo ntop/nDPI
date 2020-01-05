@@ -1,8 +1,11 @@
 CC=@CC@
 CXX=@CXX@
-CFLAGS=-g -I../src/include @CFLAGS@
-LIBNDPI=../src/lib/libndpi.a
+SRCHOME=../src
+CFLAGS=-g -I$(SRCHOME)/include @CFLAGS@
+LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread -lm @LDFLAGS@
+HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
+        $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=ndpiReader.o reader_util.o intrusion_detection.o
 PREFIX?=@prefix@
 
@@ -27,7 +30,7 @@ dpdk:
 	make -f Makefile.dpdk
 
 check:
-	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I../src/include *.c
+	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include *.c
 
 clean:
 	/bin/rm -f *.o ndpiReader ndpiReader.dpdk

@@ -625,7 +625,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int8_t handshake_type;
+  // u_int8_t handshake_type;
   u_int32_t handshake_len;
   u_int16_t p_len;
   const u_int8_t *p;
@@ -651,7 +651,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
     return(0); /* Giveup */
   }
 
-  handshake_type = packet->payload[13];
+  // handshake_type = packet->payload[13];
   handshake_len  = (packet->payload[14] << 16) + (packet->payload[15] << 8) + packet->payload[16];
 
   if((handshake_len+25) != packet->payload_packet_len)
