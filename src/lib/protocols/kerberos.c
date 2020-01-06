@@ -105,7 +105,9 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
       */
       if(kerberos_len > expected_len) {
 	if(packet->tcp) {
-	  flow->kerberos_buf.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
+	  if(flow->kerberos_buf.pktbuf == NULL)
+	    flow->kerberos_buf.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
+	  
 	  if(flow->kerberos_buf.pktbuf != NULL) {
 	    flow->kerberos_buf.pktbuf_maxlen = kerberos_len+4;
 	    memcpy(flow->kerberos_buf.pktbuf, packet->payload, packet->payload_packet_len);
