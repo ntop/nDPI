@@ -77,6 +77,8 @@ rm -fr $RPM_BUILD_ROOT
 /usr/local/lib/libndpi.so.@MAJOR_RELEASE@
 /usr/local/lib/libndpi.so.@PACKAGE_VERSION@
 /usr/local/bin/ndpiReader
+/usr/local/share/ndpi/ndpiCustomCategory.txt
+/usr/local/share/ndpi/ndpiProtos.txt
 /etc/ld.so.conf.d/ndpi.conf
 %{libdir}/pkgconfig/libndpi.pc
 
