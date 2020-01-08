@@ -1155,8 +1155,39 @@ static ndpi_network host_protocol_list[] = {
   { 0xAE597B3E /* 174.89.123.62/32 */, 32, NDPI_PROTOCOL_BITTORRENT },
 
   /*
+    Ethereum
+    curl -s https://raw.githubusercontent.com/ethereum/go-ethereum/master/params/bootnodes.go | grep -v '^/' | grep ':' | cut -d '@' -f 2 | cut -d ':' -f 1
+  */
+  { 0x128A6C43 /* 18.138.108.67/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x03D12D4F /* 3.209.45.79/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x22FF1771 /* 34.255.23.113/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x239EF497 /* 35.158.244.151/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34BBCF1B /* 52.187.207.27/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0xBFEAA2C6 /* 191.234.162.198/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34E7A56C /* 52.231.165.108/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x682AD919 /* 104.42.217.25/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x050153E2 /* 5.1.83.226/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34B0070A /* 52.176.7.10/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34B0644D /* 52.176.100.77/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34E8F398 /* 52.232.243.152/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0xC051D0DF /* 192.81.208.223/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34A92A65 /* 52.169.42.101/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34039EB8 /* 52.3.158.184/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x9F591CD3 /* 159.89.28.211/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x338D4E35 /* 51.141.78.53/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x0D5D3689 /* 13.93.54.137/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x5EED3672 /* 94.237.54.114/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x34409B93 /* 52.64.155.147/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0xD5BA1052 /* 213.186.16.82/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x343888C8 /* 52.56.136.200/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x23B1E2A8 /* 35.177.226.168/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x287603DF /* 40.118.3.223/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x287603DF /* 40.118.3.223/32 */, 32, NDPI_PROTOCOL_MINING },
+  { 0x287603DF /* 40.118.3.223/32 */, 32, NDPI_PROTOCOL_MINING },
+  
+  /*
     Tor
-    http://torstatus.blutmagie.de/ip_list_all.php/Tor_ip_list_ALL.csv
+    https://torstatus.rueckgr.at/ip_list_all.php/Tor_ip_list_ALL.csv
     From 09.09.2019
 
     Use utils/toripaddr2list.py to convert them
