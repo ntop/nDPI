@@ -176,50 +176,6 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 static void cleanupServerName(char *buffer, int buffer_len) {
   u_int i;
   
-#if 0
-  int is_puny;
-  
-  //  printf("->%s<-\n", buffer);
-
-  for(i = 0; i < buffer_len; i++) {
-    // printf("%c [%d]\n", buffer[i], buffer[i]);
-
-    if((buffer[i] != '.')
-       && (buffer[i] != '-')
-       && (buffer[i] != '_')
-       && (buffer[i] != '*')
-       && (!ndpi_isalpha(buffer[i]))
-       && (!ndpi_isdigit(buffer[i]))) {
-      buffer[i] = '\0';
-      buffer_len = i;
-      break;
-    }
-  }
-
-  /* check for punycode encoding */
-  is_puny = ndpi_check_punycode_string(buffer, buffer_len);
-
-  // not a punycode string - need more checks
-  if(is_puny == 0) {
-    if(i > 0) i--;
-
-    while(i > 0) {
-      if(!ndpi_isalpha(buffer[i])) {
-	buffer[i] = '\0';
-	buffer_len = i;
-	i--;
-      } else
-	break;
-    }
-
-    for(i = buffer_len; i > 0; i--) {
-      if(buffer[i] == '.') break;
-      else if(ndpi_isdigit(buffer[i]))
-	buffer[i] = '\0', buffer_len = i;
-    }
-  }
-#endif
-  
   /* Now all lowecase */
   for(i=0; i<buffer_len; i++)
     buffer[i] = tolower(buffer[i]);
@@ -362,7 +318,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	    i += 2;
 
-	    if(len > sizeof(dNSName)-1)
+	    if((len > sizeof(dNSName)-1) || (len == 0 /* Looks something went wrong */))
 	      break; /* String too long */
 	    
 	    strncpy(dNSName, (const char*)&packet->payload[i], len);
@@ -445,6 +401,9 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   while(certificates_offset < certificates_length) {
     u_int16_t certificate_len = (packet->payload[certificates_offset] << 16) + (packet->payload[certificates_offset+1] << 8) + packet->payload[certificates_offset+2];
 
+    if(certificate_len == 0) /* Invalid lenght */
+      break;
+    
     certificates_offset += 3;
 #ifdef DEBUG_TLS
     printf("[TLS] Processing %u bytes certificate [%02X %02X %02X]\n",
@@ -564,6 +523,9 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       break;
     }
 
+    if(len == 0) /* Something went wrong */
+      break;
+    
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Processing %u bytes message\n", len);
 #endif
