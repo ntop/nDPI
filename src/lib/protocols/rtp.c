@@ -124,12 +124,17 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-
+  u_int16_t source = ntohs(packet->udp->source);
+  u_int16_t dest = ntohs(packet->udp->dest);
+  
+  // printf("==> %s()\n", __FUNCTION__);
+  
   /* printf("*** %s(pkt=%d)\n", __FUNCTION__, flow->packet_counter); */
 
   if((packet->udp != NULL)
-     /* && (ntohs(packet->udp->source) > 1023) */
-     && (ntohs(packet->udp->dest) > 1023))
+     && (source != 30303) && (dest != 30303 /* Avoid to mix it with Ethereum that looks alike */)
+     && (dest > 1023)
+     )
     ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
 }
 

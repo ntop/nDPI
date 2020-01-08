@@ -1,6 +1,7 @@
 /*
  * rtmp.c
  *
+ * Copyright (C) 2020 - ntop.org
  * Copyright (C) 2014 Tomasz Bujlow <tomasz@skatnet.dk>
  * 
  * The signature is based on the Libprotoident library.
@@ -46,16 +47,16 @@ static void ndpi_check_rtmp(struct ndpi_detection_module_struct *ndpi_struct, st
   }
   
   /* Check if we so far detected the protocol in the request or not. */
-  if (flow->rtmp_stage == 0) {
-     NDPI_LOG_DBG2(ndpi_struct, "RTMP stage 0: \n");
+  if(flow->rtmp_stage == 0) {
+    NDPI_LOG_DBG2(ndpi_struct, "RTMP stage 0: \n");
      
-     if ((payload_len >= 4) && ((packet->payload[0] == 0x03) || (packet->payload[0] == 0x06))) {
-       NDPI_LOG_DBG2(ndpi_struct, "Possible RTMP request detected, we will look further for the response\n");
+    if ((payload_len >= 4) && ((packet->payload[0] == 0x03) || (packet->payload[0] == 0x06))) {
+      NDPI_LOG_DBG2(ndpi_struct, "Possible RTMP request detected, we will look further for the response\n");
        
-       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
-       flow->rtmp_stage = packet->packet_direction + 1;
-     }
-     
+      /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
+      flow->rtmp_stage = packet->packet_direction + 1;
+    } else
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   } else {
     NDPI_LOG_DBG2(ndpi_struct, "RTMP stage %u: \n", flow->rtmp_stage);
     
@@ -72,7 +73,6 @@ static void ndpi_check_rtmp(struct ndpi_detection_module_struct *ndpi_struct, st
       NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to RTMP, resetting the stage to 0\n");
       flow->rtmp_stage = 0;
     }
-    
   }
 }
 

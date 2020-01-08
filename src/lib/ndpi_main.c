@@ -989,7 +989,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MINING,
 			    0 /* can_have_a_subprotocol */, no_master,
 			    no_master, "Mining", CUSTOM_CATEGORY_MINING,
-			    ndpi_build_default_ports(ports_a, 8333, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_a, 8333, 30303, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NEST_LOG_SINK,
 			    0 /* can_have_a_subprotocol */, no_master,
