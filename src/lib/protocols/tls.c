@@ -490,7 +490,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
   int rc = 1;
-
+  u_int8_t something_went_wrong = 0;
+  
 #ifdef DEBUG_TLS_MEMORY
   printf("[TLS Mem] ndpi_search_tls_tcp() [payload_packet_len: %u]\n",
 	 packet->payload_packet_len);
@@ -501,7 +502,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_search_tls_tcp_memory(ndpi_struct, flow);
 
-  while(1) {
+  while(!something_went_wrong) {
     u_int16_t len, p_len;
     const u_int8_t *p;
 
@@ -523,8 +524,10 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       break;
     }
 
-    if(len == 0) /* Something went wrong */
+    if(len == 0) {
+      something_went_wrong = 1;
       break;
+    }
     
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Processing %u bytes message\n", len);
@@ -540,10 +543,17 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       const u_int8_t *block = (const u_int8_t *)&flow->l4.tcp.tls.message.buffer[processed];
       u_int16_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
+      if(block_len == 0) {
+	something_went_wrong = 1;
+	break;
+      }
+      
       packet->payload = block, packet->payload_packet_len = block_len+4;
 
-      if((processed+packet->payload_packet_len) > len)
+      if((processed+packet->payload_packet_len) > len) {
+	something_went_wrong = 1;
 	break;
+      }
       
 #ifdef DEBUG_TLS_MEMORY
       printf("*** [TLS Mem] Processing %u bytes block [%02X %02X %02X %02X %02X]\n",
@@ -572,7 +582,11 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   printf("[TLS Mem] Returning %u\n", rc);
 #endif
 
-  return(rc);
+  if(something_went_wrong) {
+    flow->check_extra_packets = 0, flow->extra_packets_func = NULL;
+    return(0); /* That's all */
+  } else
+    return(rc);
 }
 
 /* **************************************** */
@@ -621,6 +635,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = p, packet->payload_packet_len = p_len; /* Restore */
   
   ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
+  
   return(1); /* Keep working */
 }
 
@@ -1137,10 +1152,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
-static void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
+static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-
+  
 #ifdef DEBUG_TLS
   printf("==>> %s() %u [len: %u][version: %u]\n",
 	 __FUNCTION__,
@@ -1148,7 +1163,7 @@ static void ndpi_search_tls_tcp_udp(struct ndpi_detection_module_struct *ndpi_st
 	 packet->payload_packet_len,
 	 flow->protos.stun_ssl.ssl.ssl_version);
 #endif
-
+  
   if(packet->udp != NULL)
     ndpi_search_tls_udp(ndpi_struct, flow);
   else
@@ -1161,10 +1176,21 @@ void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 			u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("TLS", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TLS,
-				      ndpi_search_tls_tcp_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
+				      ndpi_search_tls_wrapper,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
+  *id += 1;
+
+  /* *************************************************** */
+
+  ndpi_set_bitmask_protocol_detection("TLS", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_TLS,
+				      ndpi_search_tls_wrapper,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+  
   *id += 1;
 }
