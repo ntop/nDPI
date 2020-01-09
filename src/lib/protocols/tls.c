@@ -399,10 +399,18 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Now let's process each individual certificates */
   while(certificates_offset < certificates_length) {
-    u_int16_t certificate_len = (packet->payload[certificates_offset] << 16) + (packet->payload[certificates_offset+1] << 8) + packet->payload[certificates_offset+2];
+    u_int32_t certificate_len = (packet->payload[certificates_offset] << 16) + (packet->payload[certificates_offset+1] << 8) + packet->payload[certificates_offset+2];
 
-    if(certificate_len == 0) /* Invalid lenght */
+    /* Invalid lenght */
+    if((certificate_len == 0) || ((certificates_offset+certificate_len) > (4+certificates_length))) {
+#ifdef DEBUG_TLS
+      printf("[TLS] Invalid length [certificate_len: %u][certificates_offset: %u][%u vs %u]\n",
+	     certificate_len, certificates_offset,
+	     (certificates_offset+certificate_len),
+	     certificates_length);
+#endif
       break;
+    }
     
     certificates_offset += 3;
 #ifdef DEBUG_TLS
@@ -541,7 +549,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       
     while((processed+4) < len) {
       const u_int8_t *block = (const u_int8_t *)&flow->l4.tcp.tls.message.buffer[processed];
-      u_int16_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
+      u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
       if(block_len == 0) {
 	something_went_wrong = 1;
