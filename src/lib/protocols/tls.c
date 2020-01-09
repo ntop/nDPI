@@ -569,10 +569,13 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     packet->payload = p, packet->payload_packet_len = p_len; /* Restore */
     flow->l4.tcp.tls.message.buffer_used -= len;
 
-    memmove(flow->l4.tcp.tls.message.buffer,
-	    &flow->l4.tcp.tls.message.buffer[len],
-	    flow->l4.tcp.tls.message.buffer_used);
-
+    if(flow->l4.tcp.tls.message.buffer_used > 0)
+      memmove(flow->l4.tcp.tls.message.buffer,
+	      &flow->l4.tcp.tls.message.buffer[len],
+	      flow->l4.tcp.tls.message.buffer_used);
+    else
+      break;
+	
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Left memory buffer %u bytes\n", flow->l4.tcp.tls.message.buffer_used);
 #endif
