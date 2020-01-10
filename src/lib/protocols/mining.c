@@ -49,6 +49,7 @@ void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
     else if(packet->iphv6 && ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) == 0xFF020000)
       ;
     else {
+      snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
