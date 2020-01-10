@@ -304,9 +304,9 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
       i += 3 /* skip the initial patten 55 1D 11 */;
       i++; /* skip the first type, 0x04 == BIT STRING, and jump to it's length */
-      i += packet->payload[i] & 0x80 ? packet->payload[i] & 0x7F : 0; /* skip BIT STRING length */
+      i += (packet->payload[i] & 0x80) ? (packet->payload[i] & 0x7F) : 0; /* skip BIT STRING length */
       i += 2; /* skip the second type, 0x30 == SEQUENCE, and jump to it's length */
-      i += packet->payload[i] & 0x80 ? packet->payload[i] & 0x7F : 0; /* skip SEQUENCE length */
+      i += (packet->payload[i] & 0x80) ? (packet->payload[i] & 0x7F) : 0; /* skip SEQUENCE length */
       i++;
 
       while(i < packet->payload_packet_len) {
@@ -497,7 +497,6 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  int rc = 1;
   u_int8_t something_went_wrong = 0;
   
 #ifdef DEBUG_TLS_MEMORY
@@ -597,7 +596,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     flow->check_extra_packets = 0, flow->extra_packets_func = NULL;
     return(0); /* That's all */
   } else
-    return(rc);
+    return(1);
 }
 
 /* **************************************** */
