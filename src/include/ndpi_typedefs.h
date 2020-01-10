@@ -1166,13 +1166,16 @@ struct ndpi_flow_struct {
     struct ndpi_flow_udp_struct udp;
   } l4;
 
+  /* Place textual flow info here */
+  char flow_extra_info[16];
+  
   /*
     Pointer to src or dst that identifies the
     server of this connection
   */
   struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
-  u_char host_server_name[256];
+  u_char host_server_name[240];
 
   /*
     This structure below will not not stay inside the protos
@@ -1198,7 +1201,6 @@ struct ndpi_flow_struct {
     char *pktbuf;
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
-
 
   union {
     /* the only fields useful for nDPI and ntopng */

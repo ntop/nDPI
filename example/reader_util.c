@@ -949,6 +949,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 
+  snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s",
+	   flow->ndpi_flow->flow_extra_info);
+
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)) {
     snprintf(flow->dhcp_fingerprint, sizeof(flow->dhcp_fingerprint), "%s", flow->ndpi_flow->protos.dhcp.fingerprint);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_BITTORRENT)) {

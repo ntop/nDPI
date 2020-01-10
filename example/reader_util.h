@@ -189,7 +189,8 @@ typedef struct ndpi_flow_info {
     *pktlen_c_to_s, *pktlen_s_to_c;
     
   char info[160];
-  char host_server_name[256];
+  char flow_extra_info[16];
+  char host_server_name[240];
   char bittorent_hash[41];
   char dhcp_fingerprint[48];
 
