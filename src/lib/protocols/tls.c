@@ -386,12 +386,12 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	 packet->payload[3], packet->payload[4], packet->payload[5]);
 #endif
 
-  if(packet->payload_packet_len != (length + 4))
+  if((packet->payload_packet_len != (length + 4)) || (packet->payload[1] != 0x0))
     return(-1); /* Invalid length */
 
   certificates_length = (packet->payload[4] << 16) + (packet->payload[5] << 8) + packet->payload[6];
   
-  if((certificates_length+3) != length)
+  if((packet->payload[4] != 0x0) || ((certificates_length+3) != length))
     return(-2); /* Invalid length */
    
   if((flow->l4.tcp.tls.srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX))) == NULL)
@@ -402,7 +402,9 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     u_int32_t certificate_len = (packet->payload[certificates_offset] << 16) + (packet->payload[certificates_offset+1] << 8) + packet->payload[certificates_offset+2];
 
     /* Invalid lenght */
-    if((certificate_len == 0) || ((certificates_offset+certificate_len) > (4+certificates_length))) {
+    if((certificate_len == 0)
+       || (packet->payload[certificates_offset] != 0x0)
+       || ((certificates_offset+certificate_len) > (4+certificates_length))) {
 #ifdef DEBUG_TLS
       printf("[TLS] Invalid length [certificate_len: %u][certificates_offset: %u][%u vs %u]\n",
 	     certificate_len, certificates_offset,
@@ -550,7 +552,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       const u_int8_t *block = (const u_int8_t *)&flow->l4.tcp.tls.message.buffer[processed];
       u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
-      if(block_len == 0) {
+      if((block_len == 0) || (block_len > len) || ((block[1] != 0x0))) {
 	something_went_wrong = 1;
 	break;
       }
@@ -723,7 +725,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   handshake_type = packet->payload[0];
   total_len = (packet->payload[1] << 16) +  (packet->payload[2] << 8) + packet->payload[3];
   
-  if(total_len > packet->payload_packet_len)
+  if((total_len > packet->payload_packet_len) || (packet->payload[1] != 0x0))
     return(0); /* Not found */
 
   total_len = packet->payload_packet_len;
