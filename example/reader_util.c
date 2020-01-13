@@ -1792,8 +1792,15 @@ u_int32_t ethernet_crc32(const void* data, size_t n_bytes) {
 
 #ifdef USE_DPDK
 
+#include <rte_version.h>
+#include <rte_ether.h>
+
 static const struct rte_eth_conf port_conf_default = {
+#if (RTE_VERSION < RTE_VERSION_NUM(19, 8, 0, 0))
 						      .rxmode = { .max_rx_pkt_len = ETHER_MAX_LEN }
+#else
+						      .rxmode = { .max_rx_pkt_len = RTE_ETHER_MAX_LEN }
+#endif
 };
 
 /* ************************************ */
