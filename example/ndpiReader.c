@@ -21,7 +21,9 @@
 #include "ndpi_config.h"
 
 #ifdef linux
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <sched.h>
 #endif
 #include <stdio.h>
