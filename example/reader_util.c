@@ -1424,6 +1424,9 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   datalink_type = (int)pcap_datalink(workflow->pcap_handle);
 #endif
 
+  if(header->caplen < 40)
+    return(nproto); /* Too short */
+  
  datalink_check:
   switch(datalink_type) {
   case DLT_NULL:
@@ -1587,7 +1590,8 @@ ether_type_check:
 
       if(cap_warning_used == 0) {
 	if(!workflow->prefs.quiet_mode)
-	  NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG, "\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
+	  NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_DEBUG,
+		   "\n\nWARNING: packet capture size is smaller than packet size, DETECTION MIGHT NOT WORK CORRECTLY\n\n");
 	cap_warning_used = 1;
       }
     }
