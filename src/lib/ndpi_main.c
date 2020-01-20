@@ -2846,7 +2846,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path) {
   char buffer[512], *line, *name, *category, *saveptr;
   FILE *fd;
-  int len;
+  int len, num = 0;
 
   fd = fopen(path, "r");
 
@@ -2872,15 +2872,19 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
     if(name) {
       category = strtok_r(NULL, "\t", &saveptr);
 
-      if(category)
-        ndpi_load_category(ndpi_str, name, (ndpi_protocol_category_t) atoi(category));
+      if(category) {
+        int rc = ndpi_load_category(ndpi_str, name, (ndpi_protocol_category_t) atoi(category));
+
+	if(rc >= 0)
+	  num++;
+      }
     }
   }
 
   fclose(fd);
   ndpi_enable_loaded_categories(ndpi_str);
 
-  return(0);
+  return(num);
 }
 
 /* ******************************************************************** */
