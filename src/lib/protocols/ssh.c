@@ -341,7 +341,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  flow->protos.ssh.hassh_server[32] = '\0';
 	}
 
-	free(hassh_buf);
+	ndpi_free(hassh_buf);
       }
 
       ndpi_int_ssh_add_connection(ndpi_struct, flow);

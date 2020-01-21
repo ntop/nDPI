@@ -322,7 +322,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 	      /* We set the protocol in the response */
 	      if(flow->kerberos_buf.pktbuf != NULL) {
-		free(flow->kerberos_buf.pktbuf);
+		ndpi_free(flow->kerberos_buf.pktbuf);
 		flow->kerberos_buf.pktbuf = NULL;
 	      }
 	      
