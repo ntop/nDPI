@@ -13,6 +13,10 @@ build_results() {
 	    CMD="$READER -q -i pcap/$f -w result/$f.out -v 2"
 	    $CMD 
 	fi
+	# test fuzz target built with sanitizer on input from corpus
+	if [ -f ../fuzz/fuzz_ndpi_reader ]; then
+		../fuzz/fuzz_ndpi_reader pcap/$f
+	fi
     done
 }
 
