@@ -97,7 +97,7 @@ before_script:
 #  - lcov --directory . --zerocounters
 
 script:
-  - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets else ./configure ; fi
+  - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else ./configure ; fi
   - make
 
 #after_script:
