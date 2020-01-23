@@ -24,3 +24,10 @@ endif
 fuzz_ndpi_reader_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_LDFLAGS) $(LDFLAGS) -o $@
+
+EXTRA_fuzz_ndpi_reader_DEPENDENCIES = fuzz_ndpi_reader_seed_corpus.zip
+
+testpcaps := $(wildcard ../tests/pcap/*.pcap)
+
+fuzz_ndpi_reader_seed_corpus.zip: $(testpcaps)
+	zip -r fuzz_ndpi_reader_seed_corpus.zip $(testpcaps)
