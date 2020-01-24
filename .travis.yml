@@ -89,7 +89,7 @@ matrix:
             - libpcap-dev
             - autogen
     - name: fuzzm
-      env: CXXFLAGS="-g -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" CFLAGS="-g -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g -fsanitize=memory" QA_FUZZ=msan CC=clang-7 && CXX=clang++-7
+      env: CXXFLAGS="-g -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" CFLAGS="-g -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g -fsanitize=memory" QA_FUZZ=msan CC=clang-7 && CXX=clang++-7 MSAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
       os: linux
       compiler: clang-7
       addons:
