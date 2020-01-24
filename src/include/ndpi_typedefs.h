@@ -53,7 +53,8 @@ typedef enum {
 typedef enum {
   ndpi_url_no_problem = 0,
   ndpi_url_possible_xss,
-  ndpi_url_possible_sql_injection
+  ndpi_url_possible_sql_injection,
+  ndpi_url_possible_rce_injection
 } ndpi_url_risk;
 
 /* NDPI_VISIT */

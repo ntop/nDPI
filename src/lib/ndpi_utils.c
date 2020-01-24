@@ -50,6 +50,7 @@
 #include "third_party/include/libinjection.h"
 #include "third_party/include/libinjection_sqli.h"
 #include "third_party/include/libinjection_xss.h"
+#include "third_party/include/rce_injection.h"
 
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
@@ -1164,6 +1165,125 @@ static int ndpi_is_xss_injection(char* query) {
 
 /* ********************************** */
 
+#ifdef HAVE_HYPERSCAN
+
+static void free_hyperscan(struct ndpi_detection_module_struct *ndpi_str,
+                           hs_compile_error_t *compile_err)
+{
+  if (ndpi_str) {
+    struct hs *hs = (struct hs*)ndpi_str->hyperscan;
+
+    if(hs) {
+      hs_free_scratch(hs->scratch);
+      hs_free_database(hs->database);
+      ndpi_free(hs);
+    }
+
+    ndpi_free(ndpi_str);
+  }
+
+  if (compile_err) {
+    hs_free_compile_error(compile_err);
+  }
+}
+
+/* ********************************** */
+
+static void ndpi_compile_rce_regex() {
+  hs_compile_error_t *compile_err;
+
+  for(int i = 0; i < N_RCE_REGEX; i++) {
+    struct ndpi_detection_module_struct *ndpi_str =
+        ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
+
+    ndpi_str->hyperscan = (void*)ndpi_malloc(sizeof(struct hs));
+
+    if(!ndpi_str->hyperscan) {
+      free_hyperscan(ndpi_str, NULL);
+      return;
+    }
+
+    comp_rx[i] = (struct hs*)ndpi_str->hyperscan;
+
+    if (hs_compile(rce_regex[i], HS_FLAG_DOTALL, HS_MODE_BLOCK, NULL,
+        &comp_rx[i]->database, &compile_err) != HS_SUCCESS)
+    {
+      #ifdef DEBUG
+      NDPI_LOG_ERR(ndpi_str, "ERROR: Unable to compile pattern \"%s\": %s\n",
+                   rce_regex[i], compile_err->message);
+      #endif
+
+      continue;
+    }
+
+    comp_rx[i]->scratch = NULL;
+
+    if(hs_alloc_scratch(comp_rx[i]->database, &comp_rx[i]->scratch) != HS_SUCCESS) {
+      #ifdef DEBUG
+      NDPI_LOG_ERR(ndpi_str, "ERROR: Unable to allocate hyperscan scratch space\n");
+      #endif
+
+      continue;
+    }
+  }
+
+  free_hyperscan(NULL, compile_err);
+}
+
+/* ********************************** */
+
+static int ndpi_is_rce_injection(char* query) {
+  if (!initialized_comp_rx) {
+    ndpi_compile_rce_regex();
+    initialized_comp_rx = 1;
+  }
+
+  hs_error_t status;
+
+  for(int i = 0; i < N_RCE_REGEX; i++) {
+    unsigned int length = strlen(query);
+
+    status = hs_scan(comp_rx[i]->database, query, length, 0, comp_rx[i]->scratch,
+                     NULL, (void *)rce_regex[i]);
+
+    if (status == HS_SUCCESS) {
+      return 1;
+    }
+    else if(status == HS_SCAN_TERMINATED) {
+      continue;
+    }
+    else {
+      #ifdef DEBUG
+      NDPI_LOG_ERR(ndpi_str, "ERROR: Unable to scan input buffer\n");
+      #endif
+
+      continue;
+    }
+  }
+
+  size_t ushlen = sizeof(ush_commands) / sizeof(ush_commands[0]);
+
+  for(int i = 0; i < ushlen; i++) {
+    if(strstr(query, ush_commands[i]) != NULL) {
+      return 1;
+    }
+  }
+
+  size_t pwshlen = sizeof(pwsh_commands) / sizeof(pwsh_commands[0]);
+
+  for(int i = 0; i < pwshlen; i++) {
+    if(strstr(query, pwsh_commands[i]) != NULL) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+#endif
+
+/* ********************************** */
+
 ndpi_url_risk ndpi_validate_url(char *url) {
   char *orig_str = NULL, *str = NULL, *question_mark = strchr(url, '?');
   ndpi_url_risk rc = ndpi_url_no_problem;
@@ -1199,6 +1319,10 @@ ndpi_url_risk ndpi_validate_url(char *url) {
 	    rc = ndpi_url_possible_xss;
 	  else if(ndpi_is_sql_injection(decoded))
 	    rc = ndpi_url_possible_sql_injection;
+#ifdef HAVE_HYPERSCAN
+	  else if(ndpi_is_rce_injection(decoded))
+	    rc = ndpi_url_possible_rce_injection;
+#endif
 
 #ifdef URL_CHECK_DEBUG
 	  printf("=>> [rc: %u] %s\n", rc, decoded);
