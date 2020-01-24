@@ -51,7 +51,7 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN);
 	}
 	return;
-      } else if(payload_len > 4) {
+      } else if(payload_len > 22) {
 	char citrix_header[] = { 0x1a, 0x43, 0x47, 0x50, 0x2f, 0x30, 0x31 };
 	
 	if((memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0)
