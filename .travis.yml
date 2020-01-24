@@ -79,14 +79,29 @@ matrix:
       env: CXXFLAGS="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" CFLAGS="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" LDFLAGS="-fsanitize=address" QA_FUZZ=asan
       compiler: clang
       os: linux
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
     - name: fuzzm
       env: CXXFLAGS="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" CFLAGS="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-fsanitize=memory" QA_FUZZ=msan
       compiler: clang
       os: linux
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
     - name: fuzzu
       env: CXXFLAGS="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link" CFLAGS="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link" LDFLAGS="-fsanitize=undefined" QA_FUZZ=ubsan
       compiler: clang
       os: linux
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
 
 
   before_install:
