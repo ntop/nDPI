@@ -1,4 +1,5 @@
 #include "reader_util.h"
+#include "ndpi_api.h"
 
 #include <pcap/pcap.h>
 
