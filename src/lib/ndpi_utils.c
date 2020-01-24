@@ -852,6 +852,55 @@ u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len) {
 }
 
 /* ********************************** */
+
+char* ndpi_base64_encode(unsigned char const* bytes_to_encode, ssize_t in_len) {
+  ssize_t len = 0, ret_size;
+  char *ret;
+  int i = 0;
+  unsigned char char_array_3[3];
+  unsigned char char_array_4[4];
+
+  ret_size = ((in_len+2)/3)*4;
+
+  if((ret = (char*)ndpi_malloc(ret_size+1)) == NULL)
+    return NULL;
+
+  while (in_len--) {
+    char_array_3[i++] = *(bytes_to_encode++);
+    if(i == 3) {
+      char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+      char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+      char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+      char_array_4[3] = char_array_3[2] & 0x3f;
+
+      for(i = 0; i < 4; i++)
+        ret[len++] = base64_table[char_array_4[i]];
+      i = 0;
+    }
+  }
+
+  if(i) {
+    for(int j = i; j < 3; j++)
+      char_array_3[j] = '\0';
+
+    char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+    char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+    char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+    char_array_4[3] = char_array_3[2] & 0x3f;
+
+    for(int j = 0; (j < i + 1); j++)
+      ret[len++] = base64_table[char_array_4[j]];
+
+    while((i++ < 3))
+      ret[len++] = '=';
+  }
+
+  ret[len++] = '\0';
+
+  return ret;
+}
+
+/* ********************************** */
 /* ********************************** */
 
 int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
