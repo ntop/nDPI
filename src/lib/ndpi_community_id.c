@@ -173,13 +173,10 @@ static int ndpi_community_id_peer_v6_is_less_than(struct ndpi_in6_addr *ip1, str
 /* **************************************************** */
 
 static void ndpi_community_id_sha1_hash(const uint8_t *message, size_t len, u_char *hash /* 20-bytes */) {
-  SHA1_CTX ctx;
-
+  SHA1_CTX ctx = { 0 };
   SHA1Init(&ctx);
   SHA1Update(&ctx, message, len);
   SHA1Final(hash, &ctx);
-
-  ndpi_free(&ctx);
 }
 
 /* **************************************************** */
@@ -187,9 +184,9 @@ static void ndpi_community_id_sha1_hash(const uint8_t *message, size_t len, u_ch
 /*
 https://github.com/corelight/community-id-spec/blob/bda913f617389df07cdaa23606e11bbd318e265c/community-id.py#L285
 */
-static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int8_t l4_proto,
+static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int16_t off, u_int8_t l4_proto,
              u_int16_t src_port, u_int16_t dst_port, char *hash_buf, u_int8_t hash_buf_len) {
-  u_int16_t off = 0;
+  u_int8_t pad = 0;
   uint32_t hash[5];
   char *community_id;
 
@@ -197,7 +194,7 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   off += ndpi_community_id_buf_copy(&comm_buf[off], &l4_proto, sizeof(l4_proto));
 
   /* Pad */
-  off += ndpi_community_id_buf_copy(&comm_buf[off], NULL, 1);
+  off += ndpi_community_id_buf_copy(&comm_buf[off], &pad, sizeof(pad));
 
   /* Source and destination ports */
   switch(l4_proto) {
@@ -206,27 +203,21 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   case IPPROTO_SCTP:
   case IPPROTO_UDP:
   case IPPROTO_TCP:
-    src_port = htons(src_port);
-    dst_port = htons(dst_port);
     off += ndpi_community_id_buf_copy(&comm_buf[off], &src_port, sizeof(src_port));
     off += ndpi_community_id_buf_copy(&comm_buf[off], &dst_port, sizeof(dst_port));
     break;
   }
 
-  /* Compute the sha1 of the result */
+  /* Compute SHA1 */
   ndpi_community_id_sha1_hash(comm_buf, off, (u_char*)hash);
 
-  /* First, we bring everything into network-byte-order */
-  for(u_int i = 0; i < 5; i++)
-    hash[i] = htonl(hash[i]);
-
-  /* Finally the base64 encoding */
+  /* Base64 encoding */
   community_id = ndpi_base64_encode((u_int8_t*)hash, sizeof(hash));
 
   if (community_id == NULL)
     return -1;
 
-#if 0 /* Debug Info */
+#if 1 /* Debug Info */
   printf("Hex output: ");
   for(int i = 0; i < off; i++)
     printf("%.2x ", comm_buf[i]);
@@ -240,12 +231,15 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   printf("Base64: %s\n", community_id);
 #endif
 
-  if (hash_buf_len < strlen(community_id)+1) {
+  if (hash_buf_len < 2 || hash_buf_len-2 < strlen(community_id)+1) {
     ndpi_free(community_id);
     return -1;
   }
 
-  strcpy(hash_buf, community_id);
+  /* Writing hash */
+  hash_buf[0] = '1';
+  hash_buf[1] = ':';
+  strcpy(&hash_buf[2], community_id);
   ndpi_free(community_id);
 
   return 0;
@@ -297,6 +291,12 @@ int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip,
     break;
   }
 
+  /* Convert tuple to NBO */
+  src_ip = htonl(src_ip);
+  dst_ip = htonl(dst_ip);
+  src_port = htons(src_port);
+  dst_port = htons(dst_port);
+
   /*
     The community id hash doesn't have the definition of client and server, it just sorts IP addresses
     and ports to make sure the smaller ip address is the first. This performs this check and
@@ -318,7 +318,7 @@ int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip,
   off += ndpi_community_id_buf_copy(&comm_buf[off], ip_a_ptr, sizeof(src_ip));
   off += ndpi_community_id_buf_copy(&comm_buf[off], ip_b_ptr, sizeof(dst_ip));
 
-  return ndpi_community_id_finalize_and_compute_hash(&comm_buf[off],
+  return ndpi_community_id_finalize_and_compute_hash(comm_buf, off,
            l4_proto, port_a, port_b, (char*)hash_buf, hash_buf_len);
 }
 
@@ -350,6 +350,10 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
     break;
   }
 
+  /* Convert tuple to NBO */
+  src_port = htons(src_port);
+  dst_port = htons(dst_port);
+
   if(icmp_one_way || ndpi_community_id_peer_v6_is_less_than(src_ip, dst_ip, src_port, dst_port)) {
     ip_a_ptr = src_ip, ip_b_ptr = dst_ip;
     port_a = src_port, port_b = dst_port;
@@ -365,7 +369,7 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
   off += ndpi_community_id_buf_copy(&comm_buf[off], ip_a_ptr, sizeof(struct ndpi_in6_addr));
   off += ndpi_community_id_buf_copy(&comm_buf[off], ip_b_ptr, sizeof(struct ndpi_in6_addr));
 
-  return ndpi_community_id_finalize_and_compute_hash(&comm_buf[off],
+  return ndpi_community_id_finalize_and_compute_hash(comm_buf, off,
            l4_proto, port_a, port_b, (char*)hash_buf, hash_buf_len);
 }
 
