@@ -300,7 +300,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	      setHttpUserAgent(ndpi_struct, flow, token);
 	  }
 	}
-      } else if(memcmp(ua, "netflix-ios-app", 15) == 0) {
+      } else if((packet->user_agent_line.len > 14) && (memcmp(ua, "netflix-ios-app", 15) == 0)) {
 	NDPI_LOG_INFO(ndpi_struct, "found netflix\n");
       	ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING);
       	return;
