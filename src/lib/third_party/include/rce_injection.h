@@ -1,4 +1,4 @@
-#ifdef HAVE_HYPERSCAN
+#ifdef HAVE_PCRE
 
 #ifndef NDPI_RCE_H
 #define NDPI_RCE_H
@@ -8,7 +8,7 @@
 #define N_RCE_REGEX 7
 
 /* Compiled regex */
-static struct hs *comp_rx[N_RCE_REGEX];
+static struct pcre_struct *comp_rx[N_RCE_REGEX];
 
 static unsigned int initialized_comp_rx = 0;
 
@@ -610,4 +610,4 @@ static const char *pwsh_commands[] = {
   "-PSConsoleFile"
 };
 
-#endif
+#endif //HAVE_PCRE

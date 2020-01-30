@@ -1003,6 +1003,15 @@ struct hs {
 };
 #endif
 
+#ifdef HAVE_PCRE
+#include <pcre.h>
+
+struct pcre_struct {
+  pcre *compiled;
+  pcre_extra *optimized;
+};
+#endif
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
