@@ -173,7 +173,7 @@ static int ndpi_community_id_peer_v6_is_less_than(struct ndpi_in6_addr *ip1, str
 /* **************************************************** */
 
 static void ndpi_community_id_sha1_hash(const uint8_t *message, size_t len, u_char *hash /* 20-bytes */) {
-  SHA1_CTX ctx = { 0 };
+  SHA1_CTX ctx;
   SHA1Init(&ctx);
   SHA1Update(&ctx, message, len);
   SHA1Final(hash, &ctx);
@@ -217,7 +217,7 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   if (community_id == NULL)
     return -1;
 
-#if 1 /* Debug Info */
+#if 0 /* Debug Info */
   printf("Hex output: ");
   for(int i = 0; i < off; i++)
     printf("%.2x ", comm_buf[i]);
