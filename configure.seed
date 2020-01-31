@@ -162,7 +162,7 @@ AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
 AC_CHECK_LIB(pcre, pcre_compile, AC_DEFINE_UNQUOTED(HAVE_PCRE, 1, [libpcre(-dev) is present]))
-if ${ac_cv_lib_pcre_pcre_compile+:} false; then :
+if test "x$ac_cv_lib_pcre_pcre_compile" = xyes; then :
 ADDITIONAL_LIBS=-lpcre
 fi
 
