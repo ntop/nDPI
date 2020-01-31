@@ -1603,7 +1603,8 @@ ether_type_check:
 
     if(iph->protocol == IPPROTO_IPV6) {
       ip_offset += ip_len;
-      goto iph_check;
+      if (ip_len > 0)
+        goto iph_check;
     }
 
     if((frag_off & 0x1FFF) != 0) {
