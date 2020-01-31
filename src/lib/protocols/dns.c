@@ -282,7 +282,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	u_int32_t shift;
 	
 	c = flow->packet.payload[off++];
-	shift = 1 << (c & 0x1f);
+	shift = ((u_int32_t) 1) << (c & 0x1f);
 	flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & shift) ? c : '_');
 	cl--;
       }
