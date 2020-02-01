@@ -1237,14 +1237,12 @@ static void ndpi_compile_rce_regex() {
 
     comp_rx[i]->optimized = pcre_study(comp_rx[i]->compiled, 0, &pcreErrorStr);
 
+    #ifdef DEBUG
     if(pcreErrorStr != NULL) {
-      #ifdef DEBUG
       NDPI_LOG_ERR(ndpi_str, "ERROR: Could not study '%s': %s\n", rce_regex[i],
                    pcreErrorStr);
-      #endif
-
-      continue;
     }
+    #endif
   }
 
   free((void *)pcreErrorStr);
@@ -1264,12 +1262,7 @@ static int ndpi_is_rce_injection(char* query) {
 
     pcreExecRet = pcre_exec(comp_rx[i]->compiled,
                             comp_rx[i]->optimized,
-                            query,
-                            length,
-                            0,
-                            0,
-                            subStrVec,
-                            30);
+                            query, length, 0, 0, subStrVec, 30);
 
     if (pcreExecRet >= 0) {
       return 1;
