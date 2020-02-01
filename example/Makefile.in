@@ -3,7 +3,7 @@ CXX=@CXX@
 SRCHOME=../src
 CFLAGS=-g -I$(SRCHOME)/include @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
-LDFLAGS=$(LIBNDPI) @PCAP_LIB@ -lpthread -lm @LDFLAGS@
+LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ -lpthread -lm @LDFLAGS@
 HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=ndpiReader.o reader_util.o intrusion_detection.o
