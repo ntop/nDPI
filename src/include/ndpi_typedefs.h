@@ -53,7 +53,8 @@ typedef enum {
 typedef enum {
   ndpi_url_no_problem = 0,
   ndpi_url_possible_xss,
-  ndpi_url_possible_sql_injection
+  ndpi_url_possible_sql_injection,
+  ndpi_url_possible_rce_injection
 } ndpi_url_risk;
 
 /* NDPI_VISIT */
@@ -999,6 +1000,15 @@ struct hs_list {
 struct hs {
   hs_database_t *database;
   hs_scratch_t  *scratch;
+};
+#endif
+
+#ifdef HAVE_PCRE
+#include <pcre.h>
+
+struct pcre_struct {
+  pcre *compiled;
+  pcre_extra *optimized;
 };
 #endif
 

@@ -981,6 +981,9 @@ char* printUrlRisk(ndpi_url_risk risk) {
     case ndpi_url_possible_sql_injection:
       return(" ** SQL Injection **");
       break;
+    case ndpi_url_possible_rce_injection:
+      return(" ** RCE Injection **");
+      break;
   }
 
   return("");

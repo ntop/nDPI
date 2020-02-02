@@ -50,6 +50,7 @@
 #include "third_party/include/libinjection.h"
 #include "third_party/include/libinjection_sqli.h"
 #include "third_party/include/libinjection_xss.h"
+#include "third_party/include/rce_injection.h"
 
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
@@ -1213,6 +1214,111 @@ static int ndpi_is_xss_injection(char* query) {
 
 /* ********************************** */
 
+#ifdef HAVE_PCRE
+
+static void ndpi_compile_rce_regex() {
+  const char *pcreErrorStr;
+  int pcreErrorOffset;
+
+  for(int i = 0; i < N_RCE_REGEX; i++) {
+    comp_rx[i] = (struct pcre_struct*)ndpi_malloc(sizeof(struct pcre_struct));
+
+    comp_rx[i]->compiled = pcre_compile(rce_regex[i], 0, &pcreErrorStr,
+                                        &pcreErrorOffset, NULL);
+
+    if(comp_rx[i]->compiled == NULL) {
+      #ifdef DEBUG
+      NDPI_LOG_ERR(ndpi_str, "ERROR: Could not compile '%s': %s\n", rce_regex[i],
+                   pcreErrorStr);
+      #endif
+
+      continue;
+    }
+
+    comp_rx[i]->optimized = pcre_study(comp_rx[i]->compiled, 0, &pcreErrorStr);
+
+    #ifdef DEBUG
+    if(pcreErrorStr != NULL) {
+      NDPI_LOG_ERR(ndpi_str, "ERROR: Could not study '%s': %s\n", rce_regex[i],
+                   pcreErrorStr);
+    }
+    #endif
+  }
+
+  free((void *)pcreErrorStr);
+}
+
+static int ndpi_is_rce_injection(char* query) {
+  if (!initialized_comp_rx) {
+    ndpi_compile_rce_regex();
+    initialized_comp_rx = 1;
+  }
+
+  int pcreExecRet;
+  int subStrVec[30];
+
+  for(int i = 0; i < N_RCE_REGEX; i++) {
+    unsigned int length = strlen(query);
+
+    pcreExecRet = pcre_exec(comp_rx[i]->compiled,
+                            comp_rx[i]->optimized,
+                            query, length, 0, 0, subStrVec, 30);
+
+    if (pcreExecRet >= 0) {
+      return 1;
+    }
+    #ifdef DEBUG
+    else {
+      switch(pcreExecRet) {
+        case PCRE_ERROR_NOMATCH:
+          NDPI_LOG_ERR(ndpi_str, "ERROR: String did not match the pattern\n");
+          break;
+        case PCRE_ERROR_NULL:
+          NDPI_LOG_ERR(ndpi_str, "ERROR: Something was null\n");
+          break;
+        case PCRE_ERROR_BADOPTION:
+          NDPI_LOG_ERR(ndpi_str, "ERROR: A bad option was passed\n");
+          break;
+        case PCRE_ERROR_BADMAGIC:
+          NDPI_LOG_ERR(ndpi_str, "ERROR: Magic number bad (compiled re corrupt?)\n");
+          break;
+        case PCRE_ERROR_UNKNOWN_NODE:
+          NDPI_LOG_ERR(ndpi_str, "ERROR: Something kooky in the compiled re\n");
+          break;
+        case PCRE_ERROR_NOMEMORY:
+          NDPI_LOG_ERR(ndpi_str, "ERROR: Ran out of memory\n");
+          break;
+        default:
+          NDPI_LOG_ERR(ndpi_str, "ERROR: Unknown error\n");
+          break;
+      }
+    }
+    #endif
+  }
+
+  size_t ushlen = sizeof(ush_commands) / sizeof(ush_commands[0]);
+
+  for(int i = 0; i < ushlen; i++) {
+    if(strstr(query, ush_commands[i]) != NULL) {
+      return 1;
+    }
+  }
+
+  size_t pwshlen = sizeof(pwsh_commands) / sizeof(pwsh_commands[0]);
+
+  for(int i = 0; i < pwshlen; i++) {
+    if(strstr(query, pwsh_commands[i]) != NULL) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+#endif
+
+/* ********************************** */
+
 ndpi_url_risk ndpi_validate_url(char *url) {
   char *orig_str = NULL, *str = NULL, *question_mark = strchr(url, '?');
   ndpi_url_risk rc = ndpi_url_no_problem;
@@ -1248,6 +1354,10 @@ ndpi_url_risk ndpi_validate_url(char *url) {
 	    rc = ndpi_url_possible_xss;
 	  else if(ndpi_is_sql_injection(decoded))
 	    rc = ndpi_url_possible_sql_injection;
+#ifdef HAVE_PCRE
+	  else if(ndpi_is_rce_injection(decoded))
+	    rc = ndpi_url_possible_rce_injection;
+#endif
 
 #ifdef URL_CHECK_DEBUG
 	  printf("=>> [rc: %u] %s\n", rc, decoded);
