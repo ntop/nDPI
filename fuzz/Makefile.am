@@ -14,7 +14,7 @@ fuzz_process_packet_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c
 fuzz_ndpi_reader_CFLAGS = -I../example/
-fuzz_ndpi_reader_LDFLAGS = ../example/libndpiReader.a ../src/lib/libndpi.a $(PCAP_LIB)
+fuzz_ndpi_reader_LDFLAGS = ../example/libndpiReader.a ../src/lib/libndpi.a $(PCAP_LIB) $(ADDITIONAL_LIBS)
 if HAS_FUZZLDFLAGS
     fuzz_ndpi_reader_LDFLAGS += $(LIB_FUZZING_ENGINE)
 else
