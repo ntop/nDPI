@@ -1,7 +1,7 @@
 bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c
-fuzz_process_packet_LDFLAGS = ../src/lib/libndpi.a
+fuzz_process_packet_LDFLAGS = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 if HAS_FUZZLDFLAGS
     fuzz_process_packet_LDFLAGS += $(LIB_FUZZING_ENGINE)
 else
