@@ -898,6 +898,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 						  ndpi_packet_tunnel tunnel_type,
 						  const struct ndpi_ipv6hdr *iph6,
 						  u_int16_t ip_offset,
+						  u_int16_t ipsize,
 						  struct ndpi_tcphdr **tcph,
 						  struct ndpi_udphdr **udph,
 						  u_int16_t *sport, u_int16_t *dport,
@@ -923,8 +924,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   }
 
   return(get_ndpi_flow_info(workflow, 6, vlan_id, tunnel_type,
-			    &iph, iph6, ip_offset,
-			    sizeof(struct ndpi_ipv6hdr),
+			    &iph, iph6, ip_offset, ipsize,
 			    ntohs(iph6->ip6_hdr.ip6_un1_plen),
 			    tcph, udph, sport, dport,
 			    src, dst, proto, payload,
@@ -1162,7 +1162,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 			      &payload, &payload_len, &src_to_dst_direction, when);
   else
     flow = get_ndpi_flow_info6(workflow, vlan_id,
-			       tunnel_type, iph6, ip_offset,
+			       tunnel_type, iph6, ip_offset, ipsize,
 			       &tcph, &udph, &sport, &dport,
 			       &src, &dst, &proto,
 			       &payload, &payload_len, &src_to_dst_direction, when);
@@ -1603,7 +1603,8 @@ ether_type_check:
 
     if(iph->protocol == IPPROTO_IPV6) {
       ip_offset += ip_len;
-      goto iph_check;
+      if (ip_len > 0)
+        goto iph_check;
     }
 
     if((frag_off & 0x1FFF) != 0) {
