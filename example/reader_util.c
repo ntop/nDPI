@@ -1544,7 +1544,7 @@ ether_type_check:
     vlan_packet = 1;
 
     // double tagging for 802.1Q
-    while((type == 0x8100) && (ip_offset < (u_int16_t)header->caplen)) {
+    while((type == 0x8100) && (ip_offset < ((u_int16_t)header->caplen))) {
       vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
       type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
       ip_offset += 4;
