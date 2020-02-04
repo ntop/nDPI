@@ -21,6 +21,9 @@
  *
  */
 
+#ifndef _INTRUSION_DETECTION_H_
+#define _INTRUSION_DETECTION_H_
+
 /*
   Code to detect attacks reported in
 
@@ -62,3 +65,5 @@ double Hearthbleed_score(struct ndpi_flow_info* flow);
 double Infiltration_score(struct ndpi_flow_info* flow);
 
 double Ssh_patator_score(struct ndpi_flow_info* flow);
+
+#endif /* _INTRUSION_DETECTION_H_ */

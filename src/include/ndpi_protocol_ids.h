@@ -22,12 +22,8 @@
  */
 
 
-#ifndef __NDPI_PROTOCOL_IDS_H__
-
-#endif
-
-#ifndef __NDPI_PROTOCOLS_DEFAULT_H__
-#define __NDPI_PROTOCOLS_DEFAULT_H__
+#ifndef __NDPI_PROTOCOLS_IDS_H__
+#define __NDPI_PROTOCOLS_IDS_H__
 
 #define NDPI_DETECTION_SUPPORT_IPV6
 #define NDPI_PROTOCOL_SIZE                  2

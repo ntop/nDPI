@@ -1777,9 +1777,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 			 ndpi_log_level_t log_level,
 			 const char *format, ...) {
   va_list va_ap;
-#ifndef WIN32
   struct tm result;
-#endif
 
   if(log_level <= nDPI_LogLevel) {
     char buf[8192], out_buf[8192];
@@ -1797,7 +1795,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
       extra_msg = "DEBUG: ";
 
     memset(buf, 0, sizeof(buf));
-    strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime,&result) );
+    strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime,&result));
     vsnprintf(buf, sizeof(buf)-1, format, va_ap);
 
     snprintf(out_buf, sizeof(out_buf), "%s %s%s", theDate, extra_msg, buf);
@@ -2504,7 +2502,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)processing_time_usec;
 	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)processing_time_usec;
 	float traffic_duration;
-
+	struct tm result;
+	
 	if(live_capture) traffic_duration = processing_time_usec;
 	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
 
@@ -2512,9 +2511,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
 	b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)traffic_duration;
 
-	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime(&pcap_start.tv_sec));
+	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime_r(&pcap_start.tv_sec, &result));
 	printf("\tAnalysis begin:        %s\n", when);
-	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime(&pcap_end.tv_sec));
+	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime_r(&pcap_end.tv_sec, &result));
 	printf("\tAnalysis end:          %s\n", when);
 	printf("\tTraffic throughput:    %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);

@@ -186,17 +186,17 @@ static void cleanupServerName(char *buffer, int buffer_len) {
 /* See https://blog.catchpoint.com/2017/05/12/dissecting-tls-using-wireshark/ */
 static void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow,
-				       u_int16_t offset, u_int16_t certificate_len) {
+				       u_int16_t p_offset, u_int16_t certificate_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int num_found = 0, i, j;
   char buffer[64] = { '\0' };
   
 #ifdef DEBUG_TLS
-  printf("[TLS] %s() [offset: %u][certificate_len: %u]\n", __FUNCTION__, offset, certificate_len);
+  printf("[TLS] %s() [offset: %u][certificate_len: %u]\n", __FUNCTION__, p_offset, certificate_len);
 #endif
 
   /* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
-  for(i = offset; i < certificate_len; i++) {
+  for(i = p_offset; i < certificate_len; i++) {
     /* Organization OID: 2.5.4.10 */
     if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x0a)) {
       u_int8_t server_len = packet->payload[i+4];
