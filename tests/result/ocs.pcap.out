@@ -22,14 +22,14 @@ JA3 Host Stats:
 	9	TCP 192.168.180.2:44959 -> 137.135.129.206:80 [proto: 7/HTTP][cat: Web/5][7 pkts/540 bytes -> 0 pkts/0 bytes][Goodput ratio: 31.1/0.0][1.18 sec][Host: api.eu01.capptain.com][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 196.7/0.0 503/0 209.5/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 52/0 77.1/0.0 136/0 37.3/0.0][URL: api.eu01.capptain.com/ip-to-country][StatusCode: 0][ContentType: ][UserAgent: ][PLAIN TEXT (GET /ip)]
 	10	TCP 192.168.180.2:53356 -> 137.135.129.206:80 [proto: 7/HTTP][cat: Web/5][6 pkts/479 bytes -> 0 pkts/0 bytes][Goodput ratio: 33.1/0.0][0.23 sec][Host: api.eu01.capptain.com][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/0 45.8/0.0 101/0 38.7/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 52/0 79.8/0.0 211/0 58.7/0.0][URL: api.eu01.capptain.com/xmpp-disco?deviceid=f2c993d6218f5e22fe284b2e90c82f3b&push_on_device=true&appid=ocs000003][StatusCode: 0][ContentType: ][UserAgent: ][PLAIN TEXT (GET /xmpp)]
 	11	TCP 192.168.180.2:47699 -> 64.233.184.188:5228 [proto: 126/Google][cat: Web/5][2 pkts/120 bytes -> 0 pkts/0 bytes][Goodput ratio: 0.0/0.0][8.01 sec]
-	12	UDP 192.168.180.2:3621 -> 8.8.8.8:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/77 bytes -> 0 pkts/0 bytes][Goodput ratio: 62.8/0.0][< 1 sec][Host: xmpp.device06.eu01.capptain.com][PLAIN TEXT (device06)]
-	13	UDP 192.168.180.2:48770 -> 8.8.8.8:53 [proto: 5.228/DNS.PlayStore][cat: SoftwareUpdate/19][1 pkts/72 bytes -> 0 pkts/0 bytes][Goodput ratio: 60.3/0.0][< 1 sec][Host: android.clients.google.com][PLAIN TEXT (android)]
-	14	UDP 192.168.180.2:40097 -> 8.8.8.8:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 59.2/0.0][< 1 sec][Host: settings.crashlytics.com][PLAIN TEXT (settings)]
-	15	UDP 192.168.180.2:1291 -> 8.8.8.8:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 57.4/0.0][< 1 sec][Host: api.eu01.capptain.com][PLAIN TEXT (capptain)]
-	16	UDP 192.168.180.2:11793 -> 8.8.8.8:53 [proto: 5.239/DNS.GoogleServices][cat: Web/5][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 56.1/0.0][< 1 sec][Host: play.googleapis.com][PLAIN TEXT (googleapis)]
-	17	UDP 192.168.180.2:38472 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][cat: Media/1][1 pkts/63 bytes -> 0 pkts/0 bytes][Goodput ratio: 54.7/0.0][< 1 sec][Host: ocu03.labgency.ws][PLAIN TEXT (labgency)]
-	18	UDP 192.168.180.2:2589 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][cat: Media/1][1 pkts/61 bytes -> 0 pkts/0 bytes][Goodput ratio: 53.2/0.0][< 1 sec][Host: ocs.labgency.ws][PLAIN TEXT (labgency)]
-	19	UDP 192.168.180.2:24245 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][cat: Media/1][1 pkts/56 bytes -> 0 pkts/0 bytes][Goodput ratio: 49.1/0.0][< 1 sec][Host: www.ocs.fr]
+	12	UDP 192.168.180.2:3621 -> 8.8.8.8:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/77 bytes -> 0 pkts/0 bytes][Goodput ratio: 62.8/0.0][< 1 sec][Host: xmpp.device06.eu01.capptain.com][::][PLAIN TEXT (device06)]
+	13	UDP 192.168.180.2:48770 -> 8.8.8.8:53 [proto: 5.228/DNS.PlayStore][cat: SoftwareUpdate/19][1 pkts/72 bytes -> 0 pkts/0 bytes][Goodput ratio: 60.3/0.0][< 1 sec][Host: android.clients.google.com][::][PLAIN TEXT (android)]
+	14	UDP 192.168.180.2:40097 -> 8.8.8.8:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 59.2/0.0][< 1 sec][Host: settings.crashlytics.com][::][PLAIN TEXT (settings)]
+	15	UDP 192.168.180.2:1291 -> 8.8.8.8:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 57.4/0.0][< 1 sec][Host: api.eu01.capptain.com][::][PLAIN TEXT (capptain)]
+	16	UDP 192.168.180.2:11793 -> 8.8.8.8:53 [proto: 5.239/DNS.GoogleServices][cat: Web/5][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 56.1/0.0][< 1 sec][Host: play.googleapis.com][::][PLAIN TEXT (googleapis)]
+	17	UDP 192.168.180.2:38472 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][cat: Media/1][1 pkts/63 bytes -> 0 pkts/0 bytes][Goodput ratio: 54.7/0.0][< 1 sec][Host: ocu03.labgency.ws][::][PLAIN TEXT (labgency)]
+	18	UDP 192.168.180.2:2589 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][cat: Media/1][1 pkts/61 bytes -> 0 pkts/0 bytes][Goodput ratio: 53.2/0.0][< 1 sec][Host: ocs.labgency.ws][::][PLAIN TEXT (labgency)]
+	19	UDP 192.168.180.2:24245 -> 8.8.8.8:53 [proto: 5.218/DNS.OCS][cat: Media/1][1 pkts/56 bytes -> 0 pkts/0 bytes][Goodput ratio: 49.1/0.0][< 1 sec][Host: www.ocs.fr][::]
 
 
 Undetected flows:

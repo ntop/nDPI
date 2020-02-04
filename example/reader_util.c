@@ -966,6 +966,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(n == 0) flow->bittorent_hash[0] = '\0';
   }
+  /* DNS */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DNS)) {
+    if(flow->ndpi_flow->protos.dns.rsp_type == 0x1)
+      inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr.ipv4, flow->info, sizeof(flow->info));
+    else
+      inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr.ipv6, flow->info, sizeof(flow->info));
+  }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {
     snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.mdns.answer);
