@@ -1826,7 +1826,11 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
     if((whatfound != buf)
        && (m->patterns->astring[0] != '.')  /* The searched pattern does not start with . */
        && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */) {
-      if(whatfound[-1] != '.') {
+      int len = strlen(m->patterns->astring);
+		       
+      if((whatfound[-1] != '.')
+	 || ((m->patterns->astring[len-1] != '.') && (whatfound[len] != '\0') /* endsWith does not hold here */)
+	 ) {
 	return(0);
       } else {
 	memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t)); /* Partial match? */
@@ -2422,28 +2426,28 @@ static int hyperscanCustomEventHandler(unsigned int id,
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 			       char *name, u_int name_len, unsigned long *id) {
 #ifdef HAVE_HYPERSCAN
-    if(ndpi_str->custom_categories.hostnames == NULL)
-      return(-1);
-    else {
-      hs_error_t rc;
-
-      *id = (unsigned long)-1;
-
-      rc = hs_scan(ndpi_str->custom_categories.hostnames->database,
-		   name, name_len, 0,
-		   ndpi_str->custom_categories.hostnames->scratch,
-		   hyperscanCustomEventHandler, id);
-
-      if(rc == HS_SCAN_TERMINATED) {
+  if(ndpi_str->custom_categories.hostnames == NULL)
+    return(-1);
+  else {
+    hs_error_t rc;
+    
+    *id = (unsigned long)-1;
+    
+    rc = hs_scan(ndpi_str->custom_categories.hostnames->database,
+		 name, name_len, 0,
+		 ndpi_str->custom_categories.hostnames->scratch,
+		 hyperscanCustomEventHandler, id);
+    
+    if(rc == HS_SCAN_TERMINATED) {
 #ifdef DEBUG
-	printf("[HS] Found category %lu for %s\n", *id, name);
+      printf("[HS] Found category %lu for %s\n", *id, name);
 #endif
-	return(0);
-      } else
-	return(-1);
-    }
+      return(0);
+    } else
+      return(-1);
+  }
 #else
-    return(ndpi_match_string_id(ndpi_str->custom_categories.hostnames.ac_automa, name, name_len, id));
+  return(ndpi_match_string_id(ndpi_str->custom_categories.hostnames.ac_automa, name, name_len, id));
 #endif
 }
 
@@ -4716,7 +4720,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     if(flow->check_extra_packets) {
       ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_tick_l, src, dst);
       /* Update in case of new match */
-      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0], ret.category = flow->category;;
+      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0], ret.category = flow->category;
       goto invalidate_ptr;
     } else
       goto ret_protocols;
@@ -6183,7 +6187,8 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
   AC_TEXT_t ac_input_text;
   ndpi_automa *automa = is_host_match ? &ndpi_str->host_automa : &ndpi_str->content_automa;
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
-
+  int rc;
+  
   if((automa->ac_automa == NULL) || (string_to_match_len == 0))
     return(NDPI_PROTOCOL_UNKNOWN);
 
@@ -6193,14 +6198,21 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
-  ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
+  rc = ac_automata_search(((AC_AUTOMATA_t*)automa->ac_automa), &ac_input_text, &match);
 
-  /* We need to take into account also rc==0 that is used for partial matches */
-    ret_match->protocol_id = match.number,
-      ret_match->protocol_category = match.category,
-      ret_match->protocol_breed = match.breed;
-
-    return(match.number);
+  /*
+    As ac_automata_search can detect partial matches and continue the search process
+    in case rc == 0 (i.e. no match), we need to check if there is a partial match
+    and in this case return it
+  */
+  if((rc == 0) && (match.number != 0)) rc = 1;
+  
+  /* We need to take into account also rc == 0 that is used for partial matches */
+  ret_match->protocol_id = match.number,
+    ret_match->protocol_category = match.category,
+    ret_match->protocol_breed = match.breed;
+  
+  return(rc ? match.number : 0);
 }
 
 #ifdef HAVE_HYPERSCAN
