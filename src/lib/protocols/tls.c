@@ -590,10 +590,6 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   }
 
-#ifdef DEBUG_TLS_MEMORY
-  printf("[TLS Mem] Returning %u\n", rc);
-#endif
-
   if(something_went_wrong) {
     flow->check_extra_packets = 0, flow->extra_packets_func = NULL;
     return(0); /* That's all */
