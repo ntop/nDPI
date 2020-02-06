@@ -201,7 +201,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
 	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
 	/* Request already set the protocol */
-	flow->extra_packets_func = NULL; /* We're good now */
+	// flow->extra_packets_func = NULL; /* Removed so the caller can keep dissecting DNS flows */
       } else {
 	/* We missed the request */
 	u_int16_t s_port = flow->packet.udp ? ntohs(flow->packet.udp->source) : ntohs(flow->packet.tcp->source);
@@ -223,12 +223,6 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   /* possibly dissect the DNS reply */
   ndpi_search_dns(ndpi_struct, flow);
-
-  if(flow->protos.dns.num_answers > 0) {
-    /* stop extra processing */
-    flow->extra_packets_func = NULL; /* We're good now */
-    return(0);
-  }
 
   /* Possibly more processing */
   return(1);
@@ -274,7 +268,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     /* extract host name server */
     max_len = sizeof(flow->host_server_name)-1;
     off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
-
+    
     while(j < max_len && off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
       uint8_t c, cl = flow->packet.payload[off++];
 
