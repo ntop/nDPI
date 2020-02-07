@@ -1064,7 +1064,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		while(s_offset < tot_alpn_len) {
 		  u_int8_t alpn_i, alpn_len = packet->payload[s_offset++];
 
-		  if((s_offset + alpn_len) < tot_alpn_len) {
+		  if((s_offset + alpn_len) <= tot_alpn_len) {
 #ifdef DEBUG_TLS
 		    printf("Client SSL [ALPN: %u]\n", alpn_len);
 #endif
@@ -1093,21 +1093,46 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if(flow->protos.stun_ssl.ssl.alpn == NULL)
 		  flow->protos.stun_ssl.ssl.alpn = ndpi_strdup(alpn_str);
 	      } else if(extension_id == 43 /* supported versions */) {
-		u_int8_t version_len = packet->payload[offset+4];
-
-		if(version_len == (extension_len-1)) {
+		u_int16_t s_offset = offset+extension_offset;
+		u_int8_t version_len = packet->payload[s_offset];
+		char version_str[256];
+		u_int8_t version_str_len = 0;
+		
 #ifdef DEBUG_TLS
+		printf("Client SSL [TLS version len: %u]\n", version_len);
+#endif
+		
+		if(version_len == (extension_len-1)) {
 		  u_int8_t j;
 
+		  s_offset++;
+		  
 		  for(j=0; j<version_len; j += 2) {
-		    u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[offset+5+j]));
-
-		    printf("Client SSL [TLS version: 0x%04X]\n", tls_version);
-		  }
+		    u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
+		    u_int8_t unknown_tls_version;
+		    
+#ifdef DEBUG_TLS
+		    printf("Client SSL [TLS version: %s/0x%04X]\n",
+			   ndpi_ssl_version2str(tls_version, &unknown_tls_version), tls_version);
 #endif
-		}
-	      }
 
+		    if((version_str_len+8) < sizeof(version_str)) {
+		      int rc = snprintf(&version_str[version_str_len],
+					sizeof(version_str) - version_str_len, "%s%s",
+					(version_str_len > 0) ? "," : "",
+					ndpi_ssl_version2str(tls_version, &unknown_tls_version));
+		      if(rc <= 0)
+			break;
+		      else
+			version_str_len += rc;
+		    }
+		  }
+		}
+
+		if(flow->protos.stun_ssl.ssl.tls_supported_versions == NULL)
+		  flow->protos.stun_ssl.ssl.tls_supported_versions = ndpi_strdup(version_str);
+	      }
+	      
 	      extension_offset += extension_len;
 
 #ifdef DEBUG_TLS

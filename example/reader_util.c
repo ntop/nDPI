@@ -972,7 +972,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr.ipv4, flow->info, sizeof(flow->info));
     else {
       inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr.ipv6, flow->info, sizeof(flow->info));
-      
+
       /* For consistency across platforms replace :0: with :: */
       ndpi_patchIPv6Address(flow->info);
     }
@@ -1070,9 +1070,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;
     }
 
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)
+    if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn
+       && flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)
+      snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
+	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
+	       flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
+    else if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)
       snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn);	  
+	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
   }
 
   if(flow->detection_completed && (!flow->check_extra_packets)) {
@@ -1299,7 +1304,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	if((flow->src2dst_packets+flow->dst2src_packets) < 10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
 	  skip = 1;
       }
-      
+
       if(!skip) {
 	if(ndpi_has_human_readeable_string(workflow->ndpi_struct, (char*)packet, header->caplen,
 					   human_readeable_string_len,
@@ -1314,7 +1319,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	     || is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
-	 )	
+	 )
 	flow->has_human_readeable_strings = 0;
     }
   } else { // flow is NULL
@@ -1441,7 +1446,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
   if(header->caplen < 40)
     return(nproto); /* Too short */
-  
+
  datalink_check:
   switch(datalink_type) {
   case DLT_NULL:
