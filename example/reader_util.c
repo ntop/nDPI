@@ -1069,6 +1069,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	   flow->ndpi_flow->l4.tcp.tls.sha1_certificate_fingerprint, 20);
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;
     }
+
+    if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)
+      snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
+	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn);	  
   }
 
   if(flow->detection_completed && (!flow->check_extra_packets)) {
@@ -1287,15 +1291,15 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
       if((proto == IPPROTO_TCP)
 	 && (
-	   is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)
-	   || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	   || is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
-	   || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
-	) {
+	     is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
+	     || is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
+	 ) {
 	if((flow->src2dst_packets+flow->dst2src_packets) < 10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
 	  skip = 1;
       }
-
+      
       if(!skip) {
 	if(ndpi_has_human_readeable_string(workflow->ndpi_struct, (char*)packet, header->caplen,
 					   human_readeable_string_len,
@@ -1306,11 +1310,11 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     } else {
       if((proto == IPPROTO_TCP)
 	 && (
-	   is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)
-	   || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	   || is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
-	   || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
-	 )
+	     is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
+	     || is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
+	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
+	 )	
 	flow->has_human_readeable_strings = 0;
     }
   } else { // flow is NULL

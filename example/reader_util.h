@@ -180,14 +180,14 @@ typedef struct ndpi_flow_info {
   u_int32_t src2dst_packets, dst2src_packets;
   u_int32_t has_human_readeable_strings;
   char human_readeable_string_buffer[32];
-  
+
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
 
   // Flow data analysis
   struct ndpi_analyze_struct *iat_c_to_s, *iat_s_to_c, *iat_flow,
     *pktlen_c_to_s, *pktlen_s_to_c;
-    
+
   char info[160];
   char flow_extra_info[16];
   char host_server_name[240];
@@ -204,22 +204,22 @@ typedef struct ndpi_flow_info {
     u_int8_t sha1_cert_fingerprint_set;
     time_t notBefore, notAfter;
     u_int16_t server_cipher;
-    ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;    
+    ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
   } ssh_tls;
 
   struct {
     char url[256], content_type[64], user_agent[128];
     u_int response_status_code;
   } http;
-  
+
   struct {
     char username[32], password[32];
   } telnet;
-  
+
   void *src_id, *dst_id;
 
   struct ndpi_entropy entropy;
-  struct ndpi_entropy last_entropy;  
+  struct ndpi_entropy last_entropy;
 } ndpi_flow_info_t;
 
 
