@@ -671,6 +671,9 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     l3 = (const u_int8_t*)iph;
   } else {
     l4_offset = sizeof(struct ndpi_ipv6hdr);
+    if(sizeof(struct ndpi_ipv6hdr) > ipsize)
+      return NULL;
+
     l3 = (const u_int8_t*)iph6;
   }
 
@@ -1513,6 +1516,10 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     if((radiotap->flags & BAD_FCS) == BAD_FCS) {
       workflow->stats.total_discarded_bytes +=  header->len;
       return(nproto);
+    }
+
+    if(header->caplen < eth_offset + radio_len + sizeof((struct ndpi_wifi_header)) {
+        return(nproto);
     }
 
     /* Calculate 802.11 header length (variable) */

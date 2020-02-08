@@ -41,6 +41,8 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   printf("==> %s() [%s][direction: %u]\n", __FUNCTION__, packet->payload, packet->packet_direction);
 #endif
   
+  if (packet->payload == NULL)
+    return(1);
   if(packet->payload[0] == 0xFF)
     return(1);
 
