@@ -105,13 +105,22 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
       */
       if(kerberos_len > expected_len) {
 	if(packet->tcp) {
-	  if(flow->kerberos_buf.pktbuf == NULL)
+	  if(flow->kerberos_buf.pktbuf == NULL) {
 	    flow->kerberos_buf.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
+
+	    if(flow->kerberos_buf.pktbuf != NULL) {
+	      flow->kerberos_buf.pktbuf_maxlen = kerberos_len+4;	      
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Allocated %u bytes\n", flow->kerberos_buf.pktbuf_maxlen);
+#endif	      
+	    }
+	  }
 	  
 	  if(flow->kerberos_buf.pktbuf != NULL) {
-	    flow->kerberos_buf.pktbuf_maxlen = kerberos_len+4;
-	    memcpy(flow->kerberos_buf.pktbuf, packet->payload, packet->payload_packet_len);
-	    flow->kerberos_buf.pktbuf_currlen = packet->payload_packet_len;
+	    if(packet->payload_packet_len <= flow->kerberos_buf.pktbuf_maxlen) {
+	      memcpy(flow->kerberos_buf.pktbuf, packet->payload, packet->payload_packet_len);
+	      flow->kerberos_buf.pktbuf_currlen = packet->payload_packet_len;
+	    }
 	  }
 	}
 	
