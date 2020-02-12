@@ -153,8 +153,10 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		out = ndpi_base64_decode((const u_char*)buf, (size_t)strlen((const char*)buf), &out_len);
 
 		if(out) {
-		  snprintf(flow->protos.ftp_imap_pop_smtp.username,
-			   sizeof(flow->protos.ftp_imap_pop_smtp.username), "%s", out);
+		  size_t len = ndpi_min(out_len, sizeof(flow->protos.ftp_imap_pop_smtp.username) - 1);
+
+		  memcpy(flow->protos.ftp_imap_pop_smtp.username, out, len);
+		  flow->protos.ftp_imap_pop_smtp.username[len] = '\0';
 		  
 		  ndpi_free(out);
 		}
