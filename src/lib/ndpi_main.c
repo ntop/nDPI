@@ -2503,7 +2503,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
   if(ndpi_str != NULL) {
     int i;
 
-    for(i=0; i<(int)ndpi_str->ndpi_num_supported_protocols; i++) {
+    for(i=0; i<(NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS); i++) {
       if(ndpi_str->proto_defaults[i].protoName)
 	ndpi_free(ndpi_str->proto_defaults[i].protoName);
     }
