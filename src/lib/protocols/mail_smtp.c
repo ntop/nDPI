@@ -143,7 +143,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		u_char *out;
 		size_t out_len;
 
-		ndpi_user_pwd_payload_copy(buf, sizeof(buf)-1, 0,
+		ndpi_user_pwd_payload_copy(buf, sizeof(buf), 0,
 					   packet->line[a].ptr, packet->line[a].len);
 
 #ifdef SMTP_DEBUG
@@ -176,8 +176,11 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		out = ndpi_base64_decode((const u_char*)buf, (size_t)strlen((const char*)buf), &out_len);
 
 		if(out) {
-		  snprintf(flow->protos.ftp_imap_pop_smtp.password,
-			   sizeof(flow->protos.ftp_imap_pop_smtp.password), "%s", out);
+		  size_t len = ndpi_min(out_len, sizeof(flow->protos.ftp_imap_pop_smtp.password) - 1);
+
+		  memcpy(flow->protos.ftp_imap_pop_smtp.password, out, len);
+		  flow->protos.ftp_imap_pop_smtp.password[len] = '\0';
+
 		  ndpi_free(out);
 		}
 	      } else {

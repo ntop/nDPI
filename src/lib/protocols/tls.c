@@ -483,8 +483,12 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case 0x0b: /* Certificate */
-    processCertificate(ndpi_struct, flow);
-    flow->l4.tcp.tls.certificate_processed = 1;
+    /* Important: populate the tls union fields only after
+     * ndpi_int_tls_add_connection has been called */
+    if(flow->l4.tcp.tls.hello_processed) {
+      processCertificate(ndpi_struct, flow);
+      flow->l4.tcp.tls.certificate_processed = 1;
+    }
     break;
 
   default:
