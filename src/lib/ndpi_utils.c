@@ -1379,3 +1379,14 @@ ndpi_url_risk ndpi_validate_url(char *url) {
   return(rc);
 }
 
+/* ******************************************************************** */
+
+u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
+				   ndpi_protocol proto) {
+  if((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN)
+     || (proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+     || (proto.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED))
+    return(1);
+  else
+    return(0);
+}

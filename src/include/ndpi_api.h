@@ -982,6 +982,9 @@ extern "C" {
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */
 
   ndpi_url_risk ndpi_validate_url(char *url);
+
+  u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
+				     ndpi_protocol proto);
 #ifdef __cplusplus
 }
 #endif
