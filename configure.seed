@@ -4,6 +4,15 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
+AC_ARG_WITH(llvm_sanitizer,     [  --with-llvm-sanitizer   Build with support for the LLVM address sanitizer])
+
+AS_IF([test "${with_llvm_sanitizer+set}" = set],[
+     CFLAGS="${CFLAGS} -Wno-unused-value -fsanitize=address -fno-omit-frame-pointer"
+     LDFLAGS="${LDFLAGS} -fsanitize=address"
+     CC=clang
+     CXX=clang++
+])
+
 LT_INIT
 
 AC_PROG_CC
