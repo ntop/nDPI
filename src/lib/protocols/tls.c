@@ -392,8 +392,10 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   if((packet->payload[4] != 0x0) || ((certificates_length+3) != length))
     return(-2); /* Invalid length */
 
-  if((flow->l4.tcp.tls.srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX))) == NULL)
-    return(-3); /* Not enough memory */
+  if(!flow->l4.tcp.tls.srv_cert_fingerprint_ctx) {
+    if((flow->l4.tcp.tls.srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX))) == NULL)
+      return(-3); /* Not enough memory */
+  }
 
   /* Now let's process each individual certificates */
   while(certificates_offset < certificates_length) {
