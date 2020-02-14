@@ -1,7 +1,7 @@
 CC=@CC@
 CXX=@CXX@
 SRCHOME=../src
-CFLAGS=-g -I$(SRCHOME)/include @CFLAGS@
+CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ -lpthread -lm @LDFLAGS@
 HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
