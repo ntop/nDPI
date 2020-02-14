@@ -1607,6 +1607,9 @@ ether_type_check:
 
  iph_check:
   /* Check and set IP header size and total packet length */
+  if (header->caplen < ip_offset + sizeof(struct ndpi_iphdr))
+    return(nproto); /* Too short for next IP header*/
+
   iph = (struct ndpi_iphdr *) &packet[ip_offset];
 
   /* just work on Ethernet packets that contain IP */
