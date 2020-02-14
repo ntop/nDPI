@@ -5,4 +5,4 @@ JA3 Host Stats:
 	1	 192.168.13.203           	 1      
 
 
-	1	UDP 192.168.13.203:40739 -> 192.168.13.57:56515 [proto: 91/TLS][cat: Web/5][2 pkts/394 bytes -> 0 pkts/0 bytes][Goodput ratio: 78.5/0.0][< 1 sec][DTLSv1.2][JA3C: bd743610892cec1efed851b2b5efd4f5]
+	1	UDP 192.168.13.203:40739 -> 192.168.13.57:56515 [proto: 91/TLS][cat: Web/5][2 pkts/394 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][< 1 sec][DTLSv1.2][JA3C: bd743610892cec1efed851b2b5efd4f5]

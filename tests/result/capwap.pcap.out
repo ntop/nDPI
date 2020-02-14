@@ -1,8 +1,8 @@
 DNS	2	166	1
 CAPWAP	395	98343	4
 
-	1	UDP 192.168.10.9:5246 <-> 192.168.10.10:12380 [proto: 247/CAPWAP][cat: Network/14][106 pkts/26144 bytes <-> 111 pkts/37530 bytes][Goodput ratio: 83.0/87.6][169.10 sec][bytes ratio: -0.179 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1420.8/1619.1 21349/21721 3881.1/4474.6][Pkt Len c2s/s2c min/avg/max/stddev: 106/115 246.6/338.1 1499/1499 292.0/381.5][PLAIN TEXT (Cisco Systems)]
-	2	UDP 192.168.10.10:12380 <-> 192.168.10.9:5247 [proto: 247/CAPWAP][cat: Network/14][170 pkts/33465 bytes <-> 3 pkts/437 bytes][Goodput ratio: 78.7/71.0][157.99 sec][bytes ratio: 0.974 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 964.3/0.0 3999/0 858.2/0.0][Pkt Len c2s/s2c min/avg/max/stddev: 93/125 196.9/145.7 470/168 78.3/17.6]
-	3	UDP 192.168.10.10:12380 -> 255.255.255.255:5246 [proto: 247/CAPWAP][cat: Network/14][4 pkts/660 bytes -> 0 pkts/0 bytes][Goodput ratio: 74.4/0.0][130.41 sec][PLAIN TEXT (838.61f)]
-	4	UDP 192.168.10.10:49259 -> 255.255.255.255:53 [proto: 5/DNS][cat: Network/14][2 pkts/166 bytes -> 0 pkts/0 bytes][Goodput ratio: 49.1/0.0][3.00 sec][Host: cisco-capwap-controller][::][PLAIN TEXT (CAPWAP)]
-	5	UDP 192.168.10.9:5246 -> 192.168.10.10:12379 [proto: 247/CAPWAP][cat: Network/14][1 pkts/107 bytes -> 0 pkts/0 bytes][Goodput ratio: 60.2/0.0][< 1 sec]
+	1	UDP 192.168.10.9:5246 <-> 192.168.10.10:12380 [proto: 247/CAPWAP][cat: Network/14][106 pkts/26144 bytes <-> 111 pkts/37530 bytes][Goodput ratio: 83/88][169.10 sec][bytes ratio: -0.179 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1421/1619 21349/21721 3881/4475][Pkt Len c2s/s2c min/avg/max/stddev: 106/115 247/338 1499/1499 292/381][PLAIN TEXT (Cisco Systems)]
+	2	UDP 192.168.10.10:12380 <-> 192.168.10.9:5247 [proto: 247/CAPWAP][cat: Network/14][170 pkts/33465 bytes <-> 3 pkts/437 bytes][Goodput ratio: 79/71][157.99 sec][bytes ratio: 0.974 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 964/0 3999/0 858/0][Pkt Len c2s/s2c min/avg/max/stddev: 93/125 197/146 470/168 78/18]
+	3	UDP 192.168.10.10:12380 -> 255.255.255.255:5246 [proto: 247/CAPWAP][cat: Network/14][4 pkts/660 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][130.41 sec][PLAIN TEXT (838.61f)]
+	4	UDP 192.168.10.10:49259 -> 255.255.255.255:53 [proto: 5/DNS][cat: Network/14][2 pkts/166 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][3.00 sec][Host: cisco-capwap-controller][::][PLAIN TEXT (CAPWAP)]
+	5	UDP 192.168.10.9:5246 -> 192.168.10.10:12379 [proto: 247/CAPWAP][cat: Network/14][1 pkts/107 bytes -> 0 pkts/0 bytes][Goodput ratio: 60/0][< 1 sec]
