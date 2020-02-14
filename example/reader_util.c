@@ -676,6 +676,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
     l3 = (const u_int8_t*)iph6;
   }
+  if (ipsize < l4_offset + l4_packet_len)
+    return NULL;
 
   *proto = iph->protocol;
 
