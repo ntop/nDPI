@@ -7,6 +7,7 @@ matrix:
 
     - os: linux
       compiler: gcc
+      dist: bionic
       addons:
         apt:
           packages:
@@ -15,6 +16,47 @@ matrix:
 
     - os: linux
       compiler: clang
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: gcc
+      dist: bionic
+      arch: arm64
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: clang
+      dist: bionic
+      arch: arm64
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: gcc
+      dist: bionic
+      arch: s390x
+      addons:
+        apt:
+          packages:
+            - libpcap-dev
+            - autogen
+
+    - os: linux
+      compiler: clang
+      dist: bionic
+      arch: s390x
       addons:
         apt:
           packages:
