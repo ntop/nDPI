@@ -43,25 +43,27 @@ matrix:
             - libpcap-dev
             - autogen
 
-    - os: linux
-      compiler: gcc
-      dist: bionic
-      arch: s390x
-      addons:
-        apt:
-          packages:
-            - libpcap-dev
-            - autogen
-
-    - os: linux
-      compiler: clang
-      dist: bionic
-      arch: s390x
-      addons:
-        apt:
-          packages:
-            - libpcap-dev
-            - autogen
+# Targets below have been disabled as we have no way
+# to debug on tsuch platforms at the moment
+#    - os: linux
+#      compiler: gcc
+#      dist: bionic
+#      arch: s390x
+#      addons:
+#        apt:
+#          packages:
+#            - libpcap-dev
+#            - autogen
+#
+#    - os: linux
+#      compiler: clang
+#      dist: bionic
+#      arch: s390x
+#      addons:
+#        apt:
+#          packages:
+#            - libpcap-dev
+#            - autogen
 
     - os: linux
       compiler: gcc-8
