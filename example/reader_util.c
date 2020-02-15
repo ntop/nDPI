@@ -676,6 +676,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
     l3 = (const u_int8_t*)iph6;
   }
+  if (ipsize < l4_offset + l4_packet_len)
+    return NULL;
 
   *proto = iph->protocol;
 
@@ -1605,6 +1607,9 @@ ether_type_check:
 
  iph_check:
   /* Check and set IP header size and total packet length */
+  if (header->caplen < ip_offset + sizeof(struct ndpi_iphdr))
+    return(nproto); /* Too short for next IP header*/
+
   iph = (struct ndpi_iphdr *) &packet[ip_offset];
 
   /* just work on Ethernet packets that contain IP */
