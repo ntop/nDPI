@@ -458,7 +458,18 @@ void ndpi_flow_info_freer(void *node) {
   ndpi_free_flow_data_analysis(flow);
 
   if(flow->ssh_tls.server_names) {
-    ndpi_free(flow->ssh_tls.server_names); flow->ssh_tls.server_names = NULL;
+    ndpi_free(flow->ssh_tls.server_names);
+    flow->ssh_tls.server_names = NULL;
+  }
+
+  if(flow->ssh_tls.tls_alpn) {
+    ndpi_free(flow->ssh_tls.tls_alpn);
+    flow->ssh_tls.tls_alpn = NULL;
+  }
+
+  if(flow->ssh_tls.tls_supported_versions) {
+    ndpi_free(flow->ssh_tls.tls_supported_versions);
+    flow->ssh_tls.tls_supported_versions = NULL;
   }
 
   ndpi_free(flow);
@@ -949,6 +960,8 @@ static u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id) {
 /* ****************************************************** */
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
+  u_int i;
+
   if(!flow->ndpi_flow) return;
 
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
@@ -960,7 +973,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)) {
     snprintf(flow->dhcp_fingerprint, sizeof(flow->dhcp_fingerprint), "%s", flow->ndpi_flow->protos.dhcp.fingerprint);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_BITTORRENT)) {
-    u_int i, j, n = 0;
+    u_int j, n = 0;
 
     for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
       sprintf(&flow->bittorent_hash[j], "%02x",
@@ -1073,6 +1086,20 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       memcpy(flow->ssh_tls.sha1_cert_fingerprint,
 	   flow->ndpi_flow->l4.tcp.tls.sha1_certificate_fingerprint, 20);
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;
+    }
+
+    if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn) {
+      if((flow->ssh_tls.tls_alpn = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)) != NULL) {
+	/* Replace , with ; to avoid issues with CSVs */
+	for(i=0; flow->ssh_tls.tls_alpn[i] != '\0'; i++) if(flow->ssh_tls.tls_alpn[i] == ',') flow->ssh_tls.tls_alpn[i] = ';';
+      }
+    }
+
+    if(flow->ssh_tls.tls_supported_versions) {
+      if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)) != NULL) {
+	/* Replace , with ; to avoid issues with CSVs */
+	for(i=0; flow->ssh_tls.tls_supported_versions[i] != '\0'; i++) if(flow->ssh_tls.tls_supported_versions[i] == ',') flow->ssh_tls.tls_supported_versions[i] = ';';
+      }
     }
 
     if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn
@@ -1522,7 +1549,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
     if(header->caplen < (eth_offset + radio_len + sizeof(struct ndpi_wifi_header)))
       return(nproto);
-    
+
 
     /* Calculate 802.11 header length (variable) */
     wifi = (struct ndpi_wifi_header*)( packet + eth_offset + radio_len);

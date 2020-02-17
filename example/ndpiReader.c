@@ -604,8 +604,9 @@ void printCSVHeader() {
   fprintf(csv_fp, "client_info,server_info,");
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
+  fprintf(csv_fp, "tls_alpn,tls_supported_versions,");
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info");
-
+  
   /* Joy */
   if(enable_joy_stats) {
     fprintf(csv_fp, ",byte_dist_mean,byte_dist_std,entropy,total_entropy");  
@@ -1091,15 +1092,17 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->ssh_tls.client_requested_server_name[0] != '\0')  ? flow->ssh_tls.client_requested_server_name : "",
 	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
 
-    fprintf(csv_fp, "%s,%s,%s,",
+    fprintf(csv_fp, "%s,%s,%s,%s,%s,",
 	    (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls) : "0",
 	    (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
-	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "0");
-
-    fprintf(csv_fp, "%s,%s,",
+	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "0",
 	    (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "",
 	    (flow->ssh_tls.ja3_server[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.server_unsafe_cipher) : "0");
-
+    
+    fprintf(csv_fp, "%s,%s,",
+	    flow->ssh_tls.tls_alpn                  ? flow->ssh_tls.tls_alpn : "",
+	    flow->ssh_tls.tls_supported_versions    ? flow->ssh_tls.tls_supported_versions : "" 
+	    );
     fprintf(csv_fp, "%s,%s",
 	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "",
 	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : ""
