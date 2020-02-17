@@ -973,7 +973,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
 		len = (u_int)ndpi_min(len, sizeof(buffer)-1);
 
-		if((offset+extension_offset+5+len) < packet->payload_packet_len) {
+		if((offset+extension_offset+5+len) <= packet->payload_packet_len) {
 		  strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
 		  buffer[len] = '\0';
 
