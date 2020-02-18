@@ -1476,10 +1476,11 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   datalink_type = (int)pcap_datalink(workflow->pcap_handle);
 #endif
 
-  if(header->caplen < 40)
-    return(nproto); /* Too short */
 
  datalink_check:
+  if(header->caplen < eth_offset + 40)
+    return(nproto); /* Too short */
+
   switch(datalink_type) {
   case DLT_NULL:
     if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
@@ -1680,6 +1681,8 @@ ether_type_check:
       return(nproto);
     }
   } else if(iph->version == 6) {
+    if (header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr))
+      return(nproto); /* Too short for IPv6 header*/
     iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
     proto = iph6->ip6_hdr.ip6_un1_nxt;
     ip_len = sizeof(struct ndpi_ipv6hdr);

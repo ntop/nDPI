@@ -168,6 +168,9 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  } else
 	    x += data_len;
 
+	  if((x+2) >= flow->packet.payload_packet_len) {
+	    break;
+	  }
 	  rsp_type = get16(&x, flow->packet.payload);
 	  flow->protos.dns.rsp_type = rsp_type;
 
