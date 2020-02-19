@@ -1,5 +1,91 @@
 # CHANGELOG
 
+#### nDPI 3.2 (February 2020)
+
+## New Features
+* New API calls
+  * Protocol detection: ndpi_is_protocol_detected
+  * Categories: ndpi_load_categories_file / ndpi_load_category
+  * JSON/TLV serialization: ndpi_serialize_string_boolean / ndpi_serialize_uint32_boolean
+  * Patricia tree: ndpi_load_ipv4_ptree
+  * Module initialization: ndpi_init_detection_module / ndpi_finalize_initalization
+  * Base64 encoding: ndpi_base64_encode
+  * JSON exprot: ndpi_flow2json
+  * Print protocol: ndpi_get_l4_proto_name / ndpi_get_l4_proto_info
+* Libfuzz integration
+* Implemented Community ID hash (API call ndpi_flowv6_flow_hash and ndpi_flowv4_flow_hash)
+* Detection of RCE in HTTP GET requests via PCRE
+* Integration of the libinjection library to detect SQL injections and XSS type attacks in HTTP requests
+
+## New Supported Protocols and Services
+* TLS
+  * Added ALPN support
+  * Added export of supported version in TLS header
+* Added Telnet dissector with metadata extraction
+* Added Zabbix dissector
+* Added POP3/IMAP metadata extraction
+* Added FTP user/password extraction
+* Added NetBIOS metadata extraction
+* Added Kerberos metadata extraction
+* Implemented SQL Injection and XSS attack detection
+* Host-based detection improvements and changes
+  * Added Microsoft range
+  * Added twitch.tv website
+  * Added brasilbandalarga.com.br and .eaqbr.com.br as EAQ
+  * Added 20.180.0.0/14, 20.184.0.0/13 range as Skype
+  * Added 52.84.0.0/14 range as Amazon
+  * Added ^pastebin.com
+  * Changed 13.64.0.0/11 range from Skype to Microsoft
+  * Refreshed Whatsapp server list, added *whatsapp-*.fbcdn.net IPs
+* Added public DNSoverHTTPS servers
+
+## Improvements
+* Reworked and improved the TLS dissector
+* Reworked Kerberos dissector
+* Improved DNS response decoding
+* Support for DNS continuous flow dissection
+* Improved Python bindings
+* Improved Ethereum support
+* Improved categories detection with streaming and HTTP
+* Support for IP-based detection to compute the application protocol 
+* Renamed protocol 104 to IEC60870 (more meaningful)
+* Added failed authentication support with FTP
+* Renamed DNSoverHTTPS to handle bot DoH and DoT
+* Implemented stacked DPI decoding
+* Improvements for CapWAP and Bloomberg
+* Improved SMB dissection
+* Improved SSH dissection
+* Added capwap support
+* Modified API signatures for ndpi_ssl_version2str / ndpi_detection_giveup
+* Removed ndpi_pref_http_dont_dissect_response / ndpi_pref_dns_dont_dissect_response (replaced by ndpi_extra_dissection_possible)
+
+## Fixes 
+* Fixed memory invalid access in SMTP and leaks in TLS
+* Fixed a few memory leaks
+* Fixrd invalid memory access in a few protocol dissectors (HTTP, memcached, Citrix, STUN, DNS, Amazon Video, TLS, Viber)
+* Fixed IPv6 address format across the various platforms/distributions
+* Fixed infinite loop in ndpi_workflow_process_packet
+* Fixed SHA1 certificate detection
+* Fixed custom protocol detection
+* Fixed SMTP dissection (including email)
+* Fixed Telnet dissection and invalid password report
+* Fixed invalid category matching in HTTP
+* Fixed Skype and STUN false positives
+* Fixed SQL Injection detection
+* Fixed invalid SMBv1 detection
+* Fixed SSH dissection
+* Fixed ndpi_ssl_version2str
+* Fixed ndpi_extra_dissection_possible
+* Fixed out of bounds read in ndpi_match_custom_category
+
+## Misc
+* ndpiReader
+  * CSV output enhancements
+  * Added tunnelling decapsulation
+  * Improved HTTP reporting
+
+------------------------------------------------------------------------
+
 #### nDPI 3.0 (October 2019)
 
 ## New Features
@@ -66,7 +152,6 @@
 * Fix category detection due to missing initialization
 * Fix DNS rsp_addr missing in some tiny responses
 * Various hardening fixes
-
 
 ------------------------------------------------------------------------
 
@@ -145,10 +230,10 @@
 * Deb and RPM packages: ndpi with shared libraries and binaries, ndpi-dev with headers and static libraries
 * Protocols now have an optional subprotocol: Spotify cannot have subprotocols, DNS can (DNS.Spotify) 
 * New API functions:
-  - ndpi_fill_ip_protocol_category to handle ICMP flows category
-  - ndpi_flowv4_flow_hash and ndpi_flowv6_flow_hash to support the Community ID Flow Hashing (https://github.com/corelight/community-id-spec)
-  - ndpi_protocol2id to print the protocol as ID
-  - ndpi_get_custom_category_match to search host in custom categories
+ * ndpi_fill_ip_protocol_category to handle ICMP flows category
+ * ndpi_flowv4_flow_hash and ndpi_flowv6_flow_hash to support the Community ID Flow Hashing (https://github.com/corelight/community-id-spec)
+ * ndpi_protocol2id to print the protocol as ID
+ * ndpi_get_custom_category_match to search host in custom categories
 * Changed ndpi_detection_giveup API: guess is now part of the call
 * Added DPDK support to ndpiReader
 * Removed Musical.ly protocol (service no longer used)
