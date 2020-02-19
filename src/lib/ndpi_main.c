@@ -3846,6 +3846,10 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	if(flow->http.url)                  { ndpi_free(flow->http.url); flow->http.url = NULL; }
 	if(flow->http.content_type)         { ndpi_free(flow->http.content_type); flow->http.content_type = NULL; }
 	if(flow->http.user_agent)           { ndpi_free(flow->http.user_agent); flow->http.user_agent = NULL; }
+	if(flow->kerberos_buf.pktbuf) {
+		ndpi_free(flow->kerberos_buf.pktbuf);
+		flow->kerberos_buf.pktbuf = NULL;
+	}
 	if(flow->l4.tcp.tls.message.buffer) {
 	    ndpi_free(flow->l4.tcp.tls.message.buffer);
 	    flow->l4.tcp.tls.message.buffer = NULL;

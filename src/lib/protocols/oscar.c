@@ -137,7 +137,7 @@ static void ndpi_search_oscar_tcp_connect(struct ndpi_detection_module_struct
 	 + TLVs         | [Class: FLAP__SIGNON_TAGS] TLVs   +
 	 +--------------------------------------------------+
       */
-      if(channel == SIGNON &&
+      if(channel == SIGNON && packet->payload_packet_len >= 10 &&
 	  get_u_int16_t(packet->payload, 4) == htons(packet->payload_packet_len - 6) &&
 	  get_u_int32_t(packet->payload, 6) == htonl(FLAPVERSION))
 	{
