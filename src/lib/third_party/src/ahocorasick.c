@@ -104,9 +104,17 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
     }
   }
 
-  if(n->final)
+  if(n->final) {
+#if 0
+    /* Original code */
     return ACERR_DUPLICATE_PATTERN;
-
+#else
+    /* ntop */
+    memcpy(&n->matched_patterns->rep, &patt->rep, sizeof(AC_REP_t));
+    return ACERR_SUCCESS;
+#endif
+  }
+      
   n->final = 1;
   node_register_matchstr(n, patt, 0);
   thiz->total_patterns++;
