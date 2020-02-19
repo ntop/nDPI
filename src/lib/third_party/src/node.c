@@ -139,7 +139,10 @@ AC_NODE_t * node_findbs_next (AC_NODE_t * thiz, AC_ALPHABET_t alpha)
  ******************************************************************************/
 int node_has_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * newstr)
 {
-  int i, j;
+  int i;
+#if 0
+  int j;
+#endif
   AC_PATTERN_t * str;
 
   for (i=0; i < thiz->matched_patterns_num; i++)
@@ -149,12 +152,19 @@ int node_has_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * newstr)
       if (str->length != newstr->length)
 	continue;
 
+#if 0
+      /* Original code */
       for (j=0; j<(int)str->length; j++)
 	if(str->astring[j] != newstr->astring[j])
 	  continue;
 
       if (j == str->length)
 	return 1;
+#else
+      /* https://github.com/ntop/nDPI/issues/837 */
+      if (strncmp(str->astring, newstr->astring, str->length) == 0)
+	return 1;
+#endif
     }
   return 0;
 }
