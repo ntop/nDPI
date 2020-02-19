@@ -4237,7 +4237,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     else if((flow->l4.tcp.tls.hello_processed == 1)
 	    && (flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0')) {
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
-    } else {
+    } else if(enable_guess) {
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
 	 && (flow->packet.l4_protocol == IPPROTO_TCP)
 	 && flow->l4.tcp.tls.hello_processed)
@@ -4287,7 +4287,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 				 guessed_protocol_id);
       }
     }
-  } else {
+  } else if(enable_guess) {
     if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
       flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
 
