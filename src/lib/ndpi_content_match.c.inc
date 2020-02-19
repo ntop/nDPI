@@ -1184,7 +1184,7 @@ static ndpi_network host_protocol_list[] = {
   { 0x287603DF /* 40.118.3.223/32 */, 32, NDPI_PROTOCOL_MINING },
   { 0x287603DF /* 40.118.3.223/32 */, 32, NDPI_PROTOCOL_MINING },
   { 0x287603DF /* 40.118.3.223/32 */, 32, NDPI_PROTOCOL_MINING },
-  
+
   /*
     Tor
     https://torstatus.rueckgr.at/ip_list_all.php/Tor_ip_list_ALL.csv
@@ -9128,6 +9128,7 @@ static ndpi_protocol_match host_match[] = {
   { "whispersystems.org", NULL, "whispersystems\\.org" TLD,            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
   { "musical.ly", NULL, "musical\\.ly" TLD,                            "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
   { "muscdn.com", NULL, "muscndl\\.com" TLD,                           "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+  { "byteoversea.com", NULL, "byteoversea\\.com" TLD,                  "TikTok",           NDPI_PROTOCOL_TIKTOK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
   { "brasilbandalarga.com.br", NULL, "brasilbandalarga\\.com" TLD,     "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   { ".eaqbr.com.br", NULL, "\\.eaqbr\\.com" TLD,                       "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
@@ -9137,9 +9138,9 @@ static ndpi_protocol_match host_match[] = {
 
 /* ******************************************************************** */
 
-/* 
+/*
    IMPORTANT
-	
+
    Do NOT pur here strings that overlap with string in host_match[]
    specified above
 */
@@ -9148,7 +9149,7 @@ static ndpi_category_match category_match[] = {
    { ".hwcdn.net", "hwcdn" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".llnwd.net", "llnwd" TLD,                                   NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".llns.net", "llns" TLD,                                     NDPI_PROTOCOL_CATEGORY_MEDIA },
-   { ".fastly.net", "fastly" TLD,                                 NDPI_PROTOCOL_CATEGORY_MEDIA },     
+   { ".fastly.net", "fastly" TLD,                                 NDPI_PROTOCOL_CATEGORY_MEDIA },
    { ".vultr.com", "vultr" TLD,                                   NDPI_PROTOCOL_CATEGORY_CLOUD },
    { "baidu.com", "baidu" TLD,                                    NDPI_PROTOCOL_CATEGORY_WEB },
    { "icq.com", "icq" TLD,                                        NDPI_PROTOCOL_CATEGORY_CHAT },
@@ -9166,7 +9167,7 @@ static ndpi_category_match category_match[] = {
    { "skyq.sky.com", "skyq\\.sky\\.com" TLD,                      NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "iptv.sky.", "iptv\\.sky\\." TLD,                            NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "pcdn.skycdn.", "pcdn\\.skycdn\\." TLD,                      NDPI_PROTOCOL_CATEGORY_STREAMING },
-   
+
    /* Hulu Streaming services AS23286 */
    { "8.28.124.0/24",         NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "8.28.125.0/24",         NULL,                               NDPI_PROTOCOL_CATEGORY_STREAMING },
