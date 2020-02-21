@@ -80,18 +80,18 @@ extern "C" {
 
 
   /**
-   * Get the size of the flow struct
+   * Get the size of the flow tcp struct
    *
-   * @return the size of the flow struct
+   * @return the size of the flow tcp struct
    *
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_tcp_struct(void);
 
 
   /**
-   * Get the size of the flow struct
+   * Get the size of the flow udp struct
    *
-   * @return the size of the flow struct
+   * @return the size of the flow udp struct
    *
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_udp_struct(void);
