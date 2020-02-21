@@ -165,6 +165,14 @@ u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void) { return(sizeof(struct 
 
 /* *********************************************************************************** */
 
+u_int32_t ndpi_detection_get_sizeof_ndpi_flow_tcp_struct(void) { return(sizeof(struct ndpi_flow_tcp_struct)); }
+
+/* *********************************************************************************** */
+
+u_int32_t ndpi_detection_get_sizeof_ndpi_flow_udp_struct(void) { return(sizeof(struct ndpi_flow_udp_struct)); }
+
+/* *********************************************************************************** */
+
 char * ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_str, u_int id) {
   return((id >= ndpi_str->ndpi_num_supported_protocols) ? NULL : ndpi_str->proto_defaults[id].protoName);
 }
