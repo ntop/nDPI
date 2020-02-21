@@ -712,11 +712,7 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_NEST_LOG_SINK */
   u_int8_t nest_log_sink_matches;
-}
-#ifndef WIN32
-  __attribute__ ((__packed__))
-#endif
-  ;
+};
 
 /* ************************************************** */
 
@@ -771,11 +767,7 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_WIREGUARD */
   u_int8_t wireguard_stage;
   u_int32_t wireguard_peer_index[2];
-}
-#ifndef WIN32
-  __attribute__ ((__packed__))
-#endif
-  ;
+};
 
 /* ************************************************** */
 
@@ -799,10 +791,6 @@ struct ndpi_packet_struct {
 
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_SIZE];
-
-#ifndef WIN32
-  __attribute__ ((__packed__))
-#endif
   u_int16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
@@ -1145,9 +1133,6 @@ typedef enum {
 
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
-#ifndef WIN32
-  __attribute__ ((__packed__))
-#endif
   u_int16_t protocol_stack_info;
 
   /* init parameter, internal used to set up timestamp,... */
