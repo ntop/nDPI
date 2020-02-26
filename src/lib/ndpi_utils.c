@@ -1032,10 +1032,12 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "http");
     if(flow->host_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
-    ndpi_serialize_string_string(serializer,   "url", flow->http.url);
-    ndpi_serialize_string_uint32(serializer,   "code", flow->http.response_status_code);
-    ndpi_serialize_string_string(serializer,   "content_type", flow->http.content_type);
-    ndpi_serialize_string_string(serializer,   "user_agent", flow->http.user_agent);
+    if(flow->http.url != NULL){
+      ndpi_serialize_string_string(serializer,   "url", flow->http.url);
+      ndpi_serialize_string_uint32(serializer,   "code", flow->http.response_status_code);
+      ndpi_serialize_string_string(serializer,   "content_type", flow->http.content_type);
+      ndpi_serialize_string_string(serializer,   "user_agent", flow->http.user_agent);
+    }
     ndpi_serialize_end_of_block(serializer);
     break;
 
