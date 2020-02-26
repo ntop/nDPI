@@ -1270,7 +1270,8 @@ int ndpi_serialize_string_binary(ndpi_serializer *_serializer,
 /* Key is a string, value is a string (strlen is used to compute the len) */
 int ndpi_serialize_string_string(ndpi_serializer *_serializer,
 				 const char *key, const char *_value) {
-  return(ndpi_serialize_binary_binary(_serializer, key, strlen(key), _value, strlen(_value)));
+  const char *value = _value ? _value : "";
+  return(ndpi_serialize_binary_binary(_serializer, key, strlen(key), value, strlen(value)));
 }
 
 /* ********************************** */
