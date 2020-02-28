@@ -1359,7 +1359,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     return(nproto);
   }
 
-  if(!flow->detection_completed && payload_len > 0) {
+  if(!flow->detection_completed) {
     u_int enough_packets =
       (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_udp_dissected_pkts))
        || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_tcp_dissected_pkts))) ? 1 : 0;
@@ -1371,7 +1371,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time, src, dst);
-
+    
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
 	 && ndpi_extra_dissection_possible(workflow->ndpi_struct, ndpi_flow))
@@ -1709,8 +1709,10 @@ ether_type_check:
   }
 
   if(workflow->prefs.decode_tunnels && (proto == IPPROTO_UDP)) {
+#if LUCA
     if (header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr))
       return(nproto); /* Too short for UDP header*/
+#endif
     struct ndpi_udphdr *udp = (struct ndpi_udphdr *)&packet[ip_offset+ip_len];
     u_int16_t sport = ntohs(udp->source), dport = ntohs(udp->dest);
 
