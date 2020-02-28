@@ -1359,7 +1359,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     return(nproto);
   }
 
-  if(!flow->detection_completed) {
+  if(!flow->detection_completed && payload_len > 0) {
     u_int enough_packets =
       (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_udp_dissected_pkts))
        || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_tcp_dissected_pkts))) ? 1 : 0;
@@ -1709,6 +1709,8 @@ ether_type_check:
   }
 
   if(workflow->prefs.decode_tunnels && (proto == IPPROTO_UDP)) {
+    if (header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr))
+      return(nproto); /* Too short for UDP header*/
     struct ndpi_udphdr *udp = (struct ndpi_udphdr *)&packet[ip_offset+ip_len];
     u_int16_t sport = ntohs(udp->source), dport = ntohs(udp->dest);
 
