@@ -1,4 +1,4 @@
-NetBIOS	1	252	1
+SMBv1	1	252	1
 TLS	246	102691	5
 DHCPV6	6	906	1
 Dropbox	10	1860	1
@@ -18,5 +18,5 @@ JA3 Host Stats:
 	7	TCP 192.168.1.252:51185 <-> 62.210.137.230:443 [proto: 91.163/TLS.Tor][cat: VPN/2][15 pkts/3634 bytes <-> 14 pkts/6027 bytes][Goodput ratio: 76/87][74.24 sec][bytes ratio: -0.248 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/15 6155/6464 63835/63837 17571/19124][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 242/430 640/1514 247/416][TLSv1][Client: www.6gyip7tqim7sieb.com][JA3C: 581a3c7f54555512b8cd16e87dfe165b][JA3S: 184d532a16876b78846ae6a03f654890][Certificate SHA-1: EE:86:E7:21:36:93:23:30:DB:A0:09:48:55:16:CB:A8:E9:DA:01:D0][Validity: 2013-11-02 00:00:00 - 2014-02-17 00:00:00][Cipher: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]
 	8	UDP 192.168.1.1:17500 -> 192.168.1.255:17500 [proto: 121/Dropbox][cat: Cloud/13][10 pkts/1860 bytes -> 0 pkts/0 bytes][Goodput ratio: 77/0][600.89 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 30033/0 66765/0 360548/0 103868/0][Pkt Len c2s/s2c min/avg/max/stddev: 186/0 186/0 186/0 0/0][PLAIN TEXT ( 676879976)]
 	9	UDP [fe80::c583:1972:5728:7323]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][cat: Network/14][6 pkts/906 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][31.41 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1227/0 6282/0 16006/0 5400/0][Pkt Len c2s/s2c min/avg/max/stddev: 151/0 151/0 151/0 0/0][PLAIN TEXT (Endian)]
-	10	UDP 192.168.1.252:138 -> 192.168.1.255:138 [proto: 10/NetBIOS][cat: System/18][1 pkts/252 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][< 1 sec][Host: endian-pc][PLAIN TEXT ( EFEOEEEJEBEOCNFAEDCACACACACACA)]
+	10	UDP 192.168.1.252:138 -> 192.168.1.255:138 [proto: 10.16/NetBIOS.SMBv1][cat: System/18][1 pkts/252 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][< 1 sec][Host: endian-pc][PLAIN TEXT ( EFEOEEEJEBEOCNFAEDCACACACACACA)]
 	11	TCP 192.168.1.252:51104 -> 157.56.30.46:443 [proto: 91/TLS][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec]
