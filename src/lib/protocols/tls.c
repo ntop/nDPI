@@ -1113,7 +1113,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  s_offset++;
 		  
-		  for(j=0; j<version_len; j += 2) {
+		  // careful not to overflow and loop forever with u_int8_t
+		  for(j=0; j+1<version_len; j += 2) {
 		    u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
 		    u_int8_t unknown_tls_version;
 		    
