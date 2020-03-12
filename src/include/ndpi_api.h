@@ -876,7 +876,7 @@ extern "C" {
   void ndpi_user_pwd_payload_copy(u_int8_t *dest, u_int dest_len, u_int offset,
 				  const u_int8_t *src, u_int src_len);
   u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len);
-  char* ndpi_base64_encode(unsigned char const* bytes_to_encode, ssize_t in_len);
+  char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len);
   int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 			   const char *path, u_int16_t protocol_id);
     

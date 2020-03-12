@@ -854,8 +854,8 @@ u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len) {
 
 /* ********************************** */
 
-char* ndpi_base64_encode(unsigned char const* bytes_to_encode, ssize_t in_len) {
-  ssize_t len = 0, ret_size;
+char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
+  size_t len = 0, ret_size;
   char *ret;
   int i = 0;
   unsigned char char_array_3[3];
