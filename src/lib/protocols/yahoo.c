@@ -62,6 +62,9 @@ __forceinline static
 #endif
 u_int8_t check_ymsg(const u_int8_t * payload, u_int16_t payload_packet_len)
 {
+  if (payload_packet_len < sizeof(struct ndpi_yahoo_header)) {
+    return 0;
+  }
   const struct ndpi_yahoo_header *yahoo = (struct ndpi_yahoo_header *) payload;
   
   u_int16_t yahoo_len_parsed = 0;
