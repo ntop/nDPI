@@ -66,10 +66,12 @@ static void ndpi_search_setup_capwap(struct ndpi_detection_module_struct *ndpi_s
     else
       offset = 15, to_add = 17;
 
-    msg_len = ntohs(*(u_int16_t*)&packet->payload[offset]);
+    if (packet->payload_packet_len >= offset + sizeof(u_int16_t)) {
+      msg_len = ntohs(*(u_int16_t*)&packet->payload[offset]);
 
-    if((msg_len+to_add) == packet->payload_packet_len)
-      goto capwap_found;
+      if((msg_len+to_add) == packet->payload_packet_len)
+        goto capwap_found;
+    }
   }
   
   if(

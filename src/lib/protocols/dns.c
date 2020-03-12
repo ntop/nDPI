@@ -113,7 +113,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
        && (((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
 	   || ((dns_header->num_answers == 0) && (dns_header->authority_rrs == 0)))) {
       /* This is a good query */
-      while(x < flow->packet.payload_packet_len) {
+      while(x+2 < flow->packet.payload_packet_len) {
         if(flow->packet.payload[x] == '\0') {
           x++;
           flow->protos.dns.query_type = get16(&x, flow->packet.payload);
