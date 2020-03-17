@@ -65,8 +65,7 @@ static int quic_len(u_int8_t l) {
 /* ***************************************************************** */
 
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
-		      struct ndpi_flow_struct *flow)
-{
+		      struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t udp_len = packet->payload_packet_len;
   u_int version_len = ((packet->payload[0] & 0x01) == 0) ? 0 : 4;
@@ -86,11 +85,14 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     if((packet->payload[1] == 'Q')
        && (packet->payload[2] == '0')
        && (packet->payload[3] == '4')
-       && (packet->payload[4] == '6')
-       && (version_len == 1)
-       )
-      quic_hlen = 18; /* TODO: Better handle Q046 */
-    else {
+       && (packet->payload[4] == '6')) {
+
+      /* 
+	 TODO: Better handle Q046
+	 https://tools.ietf.org/html/draft-ietf-quic-invariants-04
+       */
+      quic_hlen = 18;
+    } else {
       u_int16_t potential_stun_len = ntohs((*((u_int16_t*)&packet->payload[2])));
       
       if((version_len > 0) && (packet->payload[1+cid_len] != 'Q'))
