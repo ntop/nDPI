@@ -33,7 +33,7 @@ void ndpi_search_fix(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   struct ndpi_packet_struct *packet = &flow->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search FIX\n");
-  if(packet->tcp) {
+  if(packet->tcp && packet->payload_packet_len > 5) {
     // 8=
     if(packet->payload[0] == 0x38 && packet->payload[1] == 0x3d) {
       // FIX.

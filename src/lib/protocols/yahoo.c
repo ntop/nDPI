@@ -76,6 +76,9 @@ u_int8_t check_ymsg(const u_int8_t * payload, u_int16_t payload_packet_len)
     if(ylen >= payload_packet_len || yahoo_len_parsed >= payload_packet_len)
       break;
 
+    if (payload_packet_len < yahoo_len_parsed + sizeof(struct ndpi_yahoo_header)) {
+      return 0;
+    }
     yahoo = (struct ndpi_yahoo_header *) (payload + yahoo_len_parsed);
   }
   while(memcmp(yahoo->YMSG_str, "YMSG", 4) == 0);

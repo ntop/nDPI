@@ -141,7 +141,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       /* Leave the statement below commented necessary in case of call to ndpi_get_partial_detection() */
       x++;
 
-      if(flow->packet.payload[x] != '\0') {
+      if(x < flow->packet.payload_packet_len && flow->packet.payload[x] != '\0') {
 	while((x < flow->packet.payload_packet_len)
 	      && (flow->packet.payload[x] != '\0')) {
 	  x++;
