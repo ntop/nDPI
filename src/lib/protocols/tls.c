@@ -735,7 +735,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t base_offset    = packet->tcp ? 38 : 46;
     u_int16_t version_offset = packet->tcp ? 4 : 12;
     u_int16_t offset = 38, extension_len, j;
-    u_int8_t  session_id_len =  packet->tcp ? packet->payload[offset] : packet->payload[46];
+    u_int8_t  session_id_len =  0;
+    if (base_offset < total_len)
+      session_id_len = packet->payload[base_offset];
 
 #ifdef DEBUG_TLS
     printf("SSL [len: %u][handshake_type: %02X]\n", packet->payload_packet_len, handshake_type);
