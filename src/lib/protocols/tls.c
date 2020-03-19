@@ -1136,10 +1136,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			version_str_len += rc;
 		    }
 		  }
-		}
-
 		if(flow->protos.stun_ssl.ssl.tls_supported_versions == NULL)
 		  flow->protos.stun_ssl.ssl.tls_supported_versions = ndpi_strdup(version_str);
+		}
+
 	      }
 	      
 	      extension_offset += extension_len;
