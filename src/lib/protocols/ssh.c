@@ -96,6 +96,8 @@ static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
 static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
 				   char *buf, u_int8_t client_hash) {
   u_int16_t offset = 22, buf_out_len = 0;
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   u_int32_t len = ntohl(*(u_int32_t*)&packet->payload[offset]);
   offset += 4;
 
