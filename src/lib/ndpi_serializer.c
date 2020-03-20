@@ -1054,8 +1054,12 @@ int ndpi_serialize_string_uint32_format(ndpi_serializer *_serializer,
     */
 
     return(ndpi_serialize_string_uint32(_serializer, key, value));
-  } else
-    return(ndpi_serialize_string_uint32_format(_serializer, key, value, format));
+  } else {
+    char buf[16];
+    
+    snprintf(buf, sizeof(buf), format, value);
+    return(ndpi_serialize_string_string(_serializer, key, buf));
+  }
 }
 
 /* ********************************** */
