@@ -294,7 +294,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
     ndpi_MD5_CTX ctx;
 
     if(msgcode == 20 /* key exchange init */) {
-      char *hassh_buf = calloc(packet->payload_packet_len, sizeof(char));
+      char *hassh_buf = ndpi_calloc(packet->payload_packet_len, sizeof(char));
       u_int i, len;
 
 #ifdef SSH_DEBUG
