@@ -35,17 +35,17 @@ struct netbios_header {
 };
 
 /* The function below has been inherited by tcpdump */
-int ndpi_netbios_name_interpret(char *in, char *out, u_int out_len) {
+int ndpi_netbios_name_interpret(char *in, size_t inlen, char *out, u_int out_len) {
   int ret = 0, len;
   char *b;
-  
+
   len = (*in++)/2;
   b  = out;
   *out = 0;
 
-  if(len > (out_len-1) || len < 1)
-    return(-1);  
-  
+  if(len > (out_len-1) || len < 1 || 2*len > inlen)
+    return(-1);
+
   while (len--) {
     if(in[0] < 'A' || in[0] > 'P' || in[1] < 'A' || in[1] > 'P') {
       *out = 0;
@@ -53,7 +53,7 @@ int ndpi_netbios_name_interpret(char *in, char *out, u_int out_len) {
     }
 
     *out = ((in[0]-'A')<<4) + (in[1]-'A');
-        
+
     in += 2;
 
     if(isprint(*out))
@@ -69,13 +69,12 @@ int ndpi_netbios_name_interpret(char *in, char *out, u_int out_len) {
   return(ret);
 }
 
-
 static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct
 					    *ndpi_struct, struct ndpi_flow_struct *flow) { 
   char name[64];
   u_int off = flow->packet.payload[12] == 0x20 ? 12 : 14;
   
-  if(ndpi_netbios_name_interpret((char*)&flow->packet.payload[off], name, sizeof(name)) > 0)
+  if(ndpi_netbios_name_interpret((char*)&flow->packet.payload[off], flow->packet.payload_packet_len - off, name, sizeof(name)) > 0)
     snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);    
   
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETBIOS, NDPI_PROTOCOL_UNKNOWN);
