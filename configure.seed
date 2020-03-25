@@ -40,9 +40,15 @@ if test -d ".git"; then :
      #
      GIT_NUM=`git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
      GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
+
+     A=`git log src/include/ndpi_typedefs.h|wc -l`
+     B=`git log src/include/ndpi_protocol_ids.h|wc -l`
+     C=`git log src/include/ndpi_api.h.in|wc -l`
+     NDPI_API_VERSION=$((A+B+B))
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
      GIT_DATE=`date -u -r CHANGELOG.md`
+     NDPI_API_VERSION=`date +%s`
 fi
 
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
@@ -179,7 +185,8 @@ if test "${with_pcre+set}" = set; then :
   fi
 fi
 
-AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile])
+
+AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
@@ -195,4 +202,5 @@ AC_SUBST(DL_LIB)
 AC_SUBST(DPDK_TARGET)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 AC_SUBST(CUSTOM_NDPI)
+AC_SUBST(NDPI_API_VERSION)
 AC_OUTPUT
