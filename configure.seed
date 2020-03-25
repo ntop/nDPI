@@ -44,7 +44,7 @@ if test -d ".git"; then :
      A=`git log src/include/ndpi_typedefs.h|wc -l`
      B=`git log src/include/ndpi_protocol_ids.h|wc -l`
      C=`git log src/include/ndpi_api.h.in|wc -l`
-     NDPI_API_VERSION=$((A+B+B))
+     NDPI_API_VERSION=$((A+B+C))
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
      GIT_DATE=`date -u -r CHANGELOG.md`
