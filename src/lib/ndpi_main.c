@@ -6535,7 +6535,7 @@ void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
 }
 #endif
 
-u_int8_t ndpi_get_api_version() {
+int ndpi_get_api_version() {
   return(NDPI_API_VERSION);
 }
 
