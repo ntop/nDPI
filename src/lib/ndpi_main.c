@@ -3531,6 +3531,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* Targus Getdata */
   init_targus_getdata_dissector(ndpi_str, &a, detection_bitmask);
+  
+  /* S7 comm */
+  init_s7comm_dissector(ndpi_str, &a, detection_bitmask);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
