@@ -110,7 +110,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
       NDPI_LOG_INFO(ndpi_struct, "found QUIC\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
       
-      if(packet->payload[quic_hlen+12] != 0xA0)
+      if((udp_len > quic_hlen + 12) && (packet->payload[quic_hlen+12] != 0xA0))
 	quic_hlen++;
     }
     
