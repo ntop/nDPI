@@ -179,6 +179,8 @@ static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
     offset += 4 + len;
 
   /* ssh.compression_algorithms_client_to_server [C] */
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
 
   if(client_hash) {
