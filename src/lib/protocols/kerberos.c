@@ -45,6 +45,8 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t sport = packet->tcp ? ntohs(packet->tcp->source) : ntohs(packet->udp->source);
   u_int16_t dport = packet->tcp ? ntohs(packet->tcp->dest) : ntohs(packet->udp->dest);
+  const u_int8_t *original_packet_payload = NULL;
+  u_int16_t original_payload_packet_len = 0;
 
   if((sport != KERBEROS_PORT) && (dport != KERBEROS_PORT)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -65,6 +67,8 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
       flow->kerberos_buf.pktbuf_currlen += packet->payload_packet_len;
 
       if(flow->kerberos_buf.pktbuf_currlen == flow->kerberos_buf.pktbuf_maxlen) {
+	original_packet_payload = packet->payload;
+	original_payload_packet_len = packet->payload_packet_len;
 	packet->payload = (u_int8_t *)flow->kerberos_buf.pktbuf;
 	packet->payload_packet_len = flow->kerberos_buf.pktbuf_currlen;
 #ifdef KERBEROS_DEBUG
@@ -319,8 +323,11 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
 
 		    /* If necessary we can decode sname */
-
-		    if(flow->kerberos_buf.pktbuf) ndpi_free(flow->kerberos_buf.pktbuf);
+		    if(flow->kerberos_buf.pktbuf) {
+			    ndpi_free(flow->kerberos_buf.pktbuf);
+			    packet->payload = original_packet_payload;
+			    packet->payload_packet_len = original_payload_packet_len;
+		    }
 		    flow->kerberos_buf.pktbuf = NULL;
 		  }
 		}
@@ -332,6 +339,8 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	      /* We set the protocol in the response */
 	      if(flow->kerberos_buf.pktbuf != NULL) {
 		ndpi_free(flow->kerberos_buf.pktbuf);
+		packet->payload = original_packet_payload;
+		packet->payload_packet_len = original_payload_packet_len;
 		flow->kerberos_buf.pktbuf = NULL;
 	      }
 	      
