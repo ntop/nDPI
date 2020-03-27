@@ -1,5 +1,6 @@
 /*
  * s7comm.c
+ *
  * Copyright (C) 2011-20 - ntop.org
  * 
  * This file is part of nDPI, an open source deep packet inspection
