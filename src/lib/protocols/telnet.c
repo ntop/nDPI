@@ -49,7 +49,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(flow->protos.telnet.username_detected) {
     if((!flow->protos.telnet.password_found)
-	&& (packet->payload_packet_len > 6)) {
+	&& (packet->payload_packet_len > 9)) {
 	
       if(strncasecmp((char*)packet->payload, "password:", 9) == 0) {
 	flow->protos.telnet.password_found = 1;
