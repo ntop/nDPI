@@ -36,71 +36,68 @@
 static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
+  int i;
 
 #ifdef TELNET_DEBUG
   printf("==> %s() [%s][direction: %u]\n", __FUNCTION__, packet->payload, packet->packet_direction);
 #endif
   
-  if (packet->payload == NULL)
+  if (packet->payload == NULL || packet->payload_packet_len == 0)
     return(1);
   if(packet->payload[0] == 0xFF)
     return(1);
 
-  if(packet->payload_packet_len > 0) {
-    int i;
-
-    if(flow->protos.telnet.username_detected) {
-      if((!flow->protos.telnet.password_found)
-	 && (packet->payload_packet_len > 6)) {
+  if(flow->protos.telnet.username_detected) {
+    if((!flow->protos.telnet.password_found)
+	&& (packet->payload_packet_len > 6)) {
 	
-	if(strncasecmp((char*)packet->payload, "password:", 9) == 0) {
-	  flow->protos.telnet.password_found = 1;
-	}
-	
-	return(1);
-      }
-      
-      if(packet->payload[0] == '\r') {
-	if(!flow->protos.telnet.password_found)
-	  return(1);
-	
-	flow->protos.telnet.password_detected = 1;
-	flow->protos.telnet.password[flow->protos.telnet.character_id] = '\0';
-	return(0);
-      }
-
-      if(packet->packet_direction == 0) /* client -> server */ {
-	for(i=0; i<packet->payload_packet_len; i++) {
-	  if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.password)-1))
-	    flow->protos.telnet.password[flow->protos.telnet.character_id++] = packet->payload[i];
-	}
-      }
-      
-      return(1);
-    }
-    
-    if((!flow->protos.telnet.username_found)
-       && (packet->payload_packet_len > 6)) {
-
-      if(strncasecmp((char*)packet->payload, "login:", 6) == 0) {
-	flow->protos.telnet.username_found = 1;
+      if(strncasecmp((char*)packet->payload, "password:", 9) == 0) {
+	flow->protos.telnet.password_found = 1;
       }
 
       return(1);
     }
-
+      
     if(packet->payload[0] == '\r') {
-      flow->protos.telnet.username_detected = 1;
-      flow->protos.telnet.username[flow->protos.telnet.character_id] = '\0';
-      flow->protos.telnet.character_id = 0;
-      return(1);
+      if(!flow->protos.telnet.password_found)
+	return(1);
+	
+      flow->protos.telnet.password_detected = 1;
+      flow->protos.telnet.password[flow->protos.telnet.character_id] = '\0';
+      return(0);
     }
 
-    for(i=0; i<packet->payload_packet_len; i++) {
-      if(packet->packet_direction == 0) /* client -> server */ {
-	if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.username)-1))
-	  flow->protos.telnet.username[flow->protos.telnet.character_id++] = packet->payload[i];
+    if(packet->packet_direction == 0) /* client -> server */ {
+      for(i=0; i<packet->payload_packet_len; i++) {
+	if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.password)-1))
+	  flow->protos.telnet.password[flow->protos.telnet.character_id++] = packet->payload[i];
       }
+    }
+
+    return(1);
+  }
+
+  if((!flow->protos.telnet.username_found)
+     && (packet->payload_packet_len > 6)) {
+
+    if(strncasecmp((char*)packet->payload, "login:", 6) == 0) {
+      flow->protos.telnet.username_found = 1;
+    }
+
+    return(1);
+  }
+
+  if(packet->payload[0] == '\r') {
+    flow->protos.telnet.username_detected = 1;
+    flow->protos.telnet.username[flow->protos.telnet.character_id] = '\0';
+    flow->protos.telnet.character_id = 0;
+    return(1);
+  }
+
+  for(i=0; i<packet->payload_packet_len; i++) {
+    if(packet->packet_direction == 0) /* client -> server */ {
+      if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.username)-1))
+	flow->protos.telnet.username[flow->protos.telnet.character_id++] = packet->payload[i];
     }
   }
 
