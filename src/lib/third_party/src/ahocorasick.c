@@ -111,7 +111,7 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
 #else
     /* ntop */
     memcpy(&n->matched_patterns->rep, &patt->rep, sizeof(AC_REP_t));
-    return ACERR_SUCCESS;
+    return ACERR_DUPLICATE_PATTERN; /* Caller might need to free patt->astring */
 #endif
   }
       

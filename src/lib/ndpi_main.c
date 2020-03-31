@@ -443,8 +443,10 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
 				 ndpi_automa *automa,
 				 char *value, u_int16_t protocol_id,
 				 ndpi_protocol_category_t category,
-				 ndpi_protocol_breed_t breed) {
+				 ndpi_protocol_breed_t breed,
+				 u_int8_t free_str_on_duplicate) {
   AC_PATTERN_t ac_pattern;
+  AC_ERROR_t rc;
 
   if((value == NULL)
      || (protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS))) {
@@ -468,8 +470,11 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
   else
     ac_pattern.length = strlen(ac_pattern.astring);
 
-  if(ac_automata_add(((AC_AUTOMATA_t*)automa->ac_automa), &ac_pattern) != ACERR_SUCCESS)
+  rc = ac_automata_add(((AC_AUTOMATA_t*)automa->ac_automa), &ac_pattern);
+  if (rc != ACERR_DUPLICATE_PATTERN && rc != ACERR_SUCCESS)
     return(-2);
+  if (rc == ACERR_DUPLICATE_PATTERN && free_str_on_duplicate)
+    ndpi_free(value);
 
   return(0);
 }
@@ -493,7 +498,7 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
 			       &ndpi_str->host_automa,
 			       value,
 			       protocol_id,
-			       category, breed);
+			       category, breed, 1);
 
   if(rv != 0) ndpi_free(value);
 
@@ -508,7 +513,7 @@ int ndpi_add_content_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
 				 ndpi_protocol_category_t category,
 				 ndpi_protocol_breed_t breed) {
   return(ndpi_string_to_automa(ndpi_str, &ndpi_str->content_automa,
-			       value, protocol_id, category, breed));
+			       value, protocol_id, category, breed, 0));
 }
 #endif
 
@@ -729,12 +734,12 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   for(i=0; ndpi_en_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa,
 			  (char*)ndpi_en_bigrams[i],
-			  1, 1, 1);
+			  1, 1, 1, 0);
 
   for(i=0; ndpi_en_impossible_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa,
 			  (char*)ndpi_en_impossible_bigrams[i],
-			  1, 1, 1);
+			  1, 1, 1, 0);
 }
 
 /* ******************************************************************** */
@@ -2363,6 +2368,7 @@ void* ndpi_init_automa(void) {
 int ndpi_add_string_value_to_automa(void *_automa, char *str, unsigned long num) {
   AC_PATTERN_t ac_pattern;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
+  AC_ERROR_t rc;
 
   if(automa == NULL) return(-1);
 
@@ -2370,7 +2376,9 @@ int ndpi_add_string_value_to_automa(void *_automa, char *str, unsigned long num)
   ac_pattern.astring = str;
   ac_pattern.rep.number = num;
   ac_pattern.length = strlen(ac_pattern.astring);
-  return(ac_automata_add(automa, &ac_pattern) == ACERR_SUCCESS ? 0 : -1);
+
+  rc = ac_automata_add(automa, &ac_pattern);
+  return(rc == ACERR_SUCCESS || rc == ACERR_DUPLICATE_PATTERN ? 0 : -1);
 }
 
 int ndpi_add_string_to_automa(void *_automa, char *str) {
@@ -4479,6 +4487,7 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
     }
 #else
     AC_PATTERN_t ac_pattern;
+    AC_ERROR_t rc;
 
     memset(&ac_pattern, 0, sizeof(ac_pattern));
 
@@ -4490,10 +4499,13 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
     ac_pattern.astring = name, ac_pattern.length = strlen(ac_pattern.astring);
     ac_pattern.rep.number = (int)category;
 
-    if(ac_automata_add(ndpi_str->custom_categories.hostnames_shadow.ac_automa, &ac_pattern) != ACERR_SUCCESS) {
+    rc = ac_automata_add(ndpi_str->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
+    if (rc != ACERR_DUPLICATE_PATTERN && rc != ACERR_SUCCESS) {
       free(name);
       return(-1);
     }
+    if (rc == ACERR_DUPLICATE_PATTERN)
+      free(name);
 #endif
 
   return(0);
