@@ -734,7 +734,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   if(total_len > 4) {
     u_int16_t base_offset    = packet->tcp ? 38 : 46;
     u_int16_t version_offset = packet->tcp ? 4 : 12;
-    u_int16_t offset = 38, extension_len, j;
+    u_int16_t offset = packet->tcp ? 38 : 46, extension_len, j;
     u_int8_t  session_id_len =  0;
     if (base_offset < total_len)
       session_id_len = packet->payload[base_offset];

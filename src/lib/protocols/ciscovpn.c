@@ -36,6 +36,7 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
 
   if((tdport == 10000 && tsport == 10000) ||
      ((tsport == 443 || tdport == 443) &&
+      (packet->payload_packet_len >= 4) &&
       (packet->payload[0] == 0x17 &&
        packet->payload[1] == 0x01 &&
        packet->payload[2] == 0x00 &&
@@ -51,6 +52,7 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
     }
   else if(((tsport == 443 || tdport == 443) ||
           (tsport == 80 || tdport == 80)) &&
+          (packet->payload_packet_len >= 5) &&
           ((packet->payload[0] == 0x17 &&
            packet->payload[1] == 0x03 &&
            packet->payload[2] == 0x03 &&
@@ -64,6 +66,7 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
     }
   else if(((tsport == 8009 || tdport == 8009) ||
           (tsport == 8008 || tdport == 8008)) &&
+          (packet->payload_packet_len >= 5) &&
           ((packet->payload[0] == 0x17 &&
            packet->payload[1] == 0x03 &&
            packet->payload[2] == 0x03 &&
@@ -79,6 +82,7 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  (
 	   (usport == 10000 && udport == 10000)
 	   &&
+	   (packet->payload_packet_len >= 4) &&
 	   (packet->payload[0] == 0xfe &&
 	    packet->payload[1] == 0x57 &&
 	    packet->payload[2] == 0x7e &&

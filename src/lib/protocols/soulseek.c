@@ -196,7 +196,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  && !get_u_int16_t(packet->payload, 2)) {
 	const u_int32_t usrlen = get_l32(packet->payload, 5);
 
-	if(usrlen <= packet->payload_packet_len - 4 + 1 + 4 + 4 + 1 + 4) {
+	if(usrlen <= packet->payload_packet_len - (4 + 1 + 4 + 4 + 1 + 4)) {
 	  const u_int32_t typelen = get_l32(packet->payload, 4 + 1 + 4 + usrlen);
 	  const u_int8_t type = packet->payload[4 + 1 + 4 + usrlen + 4];
 	  if(typelen == 1 && (type == 'F' || type == 'P' || type == 'D')) {

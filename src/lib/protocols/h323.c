@@ -29,7 +29,7 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
     NDPI_LOG_DBG2(ndpi_struct, "calculated dport over tcp\n");
 
     /* H323  */
-    if(packet->payload_packet_len >= 3
+    if(packet->payload_packet_len >= 4
        && (packet->payload[0] == 0x03)
        && (packet->payload[1] == 0x00)) {
 	struct tpkt *t = (struct tpkt*)packet->payload;

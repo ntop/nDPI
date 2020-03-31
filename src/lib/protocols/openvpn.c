@@ -120,19 +120,22 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
 
       if(hmac_size > 0) {
         alen = ovpn_payload[P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size)];
-        session_remote = ovpn_payload + P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size) + 1 + alen * 4;
+        if (alen > 0) {
+	  session_remote = ovpn_payload + P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size) + 1 + alen * 4;
 
-        if(memcmp(flow->ovpn_session_id, session_remote, 8) == 0) {
-	  NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
-	  return;
-	} else {
-          NDPI_LOG_DBG2(ndpi_struct,
+          if(memcmp(flow->ovpn_session_id, session_remote, 8) == 0) {
+	    NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
+	    return;
+	  } else {
+            NDPI_LOG_DBG2(ndpi_struct,
 		   "key mismatch: %02x%02x%02x%02x%02x%02x%02x%02x\n",
 		   session_remote[0], session_remote[1], session_remote[2], session_remote[3],
 		   session_remote[4], session_remote[5], session_remote[6], session_remote[7]);
+            failed = 1;
+          }
+        } else
           failed = 1;
-        }
       } else
         failed = 1;
     } else
