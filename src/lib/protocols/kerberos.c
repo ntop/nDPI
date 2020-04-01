@@ -189,7 +189,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 	      body_offset = koffsetp + 1 + pad_len;
 
-	      for(i=0; i<10; i++) if(packet->payload[body_offset] != 0x05) body_offset++; /* ASN.1 */
+	      for(i=0; i<10; i++) if(body_offset<packet->payload_packet_len && packet->payload[body_offset] != 0x05) body_offset++; /* ASN.1 */
 #ifdef KERBEROS_DEBUG
 	      printf("body_offset=%u [%02X %02X] [byte 0 must be 0x05]\n", body_offset, packet->payload[body_offset], packet->payload[body_offset+1]);
 #endif
