@@ -43,6 +43,14 @@
 
 /* ********************************** */
 
+static u_int8_t ndpi_serialize_is_not_empty(ndpi_serializer *_serializer) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  
+  return(((serializer->status.flags & NDPI_SERIALIZER_STATUS_NOT_EMPTY) == NDPI_SERIALIZER_STATUS_NOT_EMPTY) ? 1 : 0);
+}
+
+/* ********************************** */
+
 static u_int64_t ndpi_htonll(u_int64_t v) {
   union { u_int32_t lv[2]; u_int64_t llv; } u;
   
@@ -442,14 +450,17 @@ int ndpi_serialize_end_of_record(ndpi_serializer *_serializer) {
     if(!(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY)) {
       serializer->buffer[0] = '[';
       serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used],
-					buff_diff, "]");
+					       buff_diff, "]");
     }
+    
     serializer->status.flags |= NDPI_SERIALIZER_STATUS_ARRAY | NDPI_SERIALIZER_STATUS_EOR;
     serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_COMMA;
   } else {
     serializer->buffer[serializer->status.size_used++] = ndpi_serialization_end_of_record;
   }
 
+  serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_NOT_EMPTY;
+  
   return(0);
 }
 
@@ -556,6 +567,7 @@ int ndpi_serialize_uint32_uint32(ndpi_serializer *_serializer,
     serializer->buffer[type_offset] = type;
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -607,6 +619,7 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *_serializer,
     }
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -660,6 +673,7 @@ int ndpi_serialize_uint32_int32(ndpi_serializer *_serializer,
     serializer->buffer[type_offset] = type;
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -713,6 +727,7 @@ int ndpi_serialize_uint32_int64(ndpi_serializer *_serializer,
     }
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -761,6 +776,7 @@ int ndpi_serialize_uint32_float(ndpi_serializer *_serializer,
     serializer->buffer[type_offset] = type;
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -811,6 +827,7 @@ static int ndpi_serialize_uint32_binary(ndpi_serializer *_serializer,
     serializer->buffer[type_offset] = type;
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -851,6 +868,7 @@ int ndpi_serialize_uint32_boolean(ndpi_serializer *_serializer,
       value ? "true" : "false");
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -908,6 +926,8 @@ static int ndpi_serialize_binary_int32(ndpi_serializer *_serializer,
     }
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
+  
   return(0);
 }
 
@@ -967,6 +987,7 @@ int ndpi_serialize_binary_int64(ndpi_serializer *_serializer,
     }
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -1030,6 +1051,7 @@ static int ndpi_serialize_binary_uint32(ndpi_serializer *_serializer,
     }
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -1056,7 +1078,7 @@ int ndpi_serialize_string_uint32_format(ndpi_serializer *_serializer,
     return(ndpi_serialize_string_uint32(_serializer, key, value));
   } else {
     char buf[16];
-    
+
     snprintf(buf, sizeof(buf), format, value);
     return(ndpi_serialize_string_string(_serializer, key, buf));
   }
@@ -1111,6 +1133,7 @@ static int ndpi_serialize_binary_uint64(ndpi_serializer *_serializer,
     }
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -1174,6 +1197,7 @@ static int ndpi_serialize_binary_float(ndpi_serializer *_serializer,
     ndpi_serialize_single_float(serializer, value);
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -1232,8 +1256,8 @@ static int ndpi_serialize_binary_raw(ndpi_serializer *_serializer,
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
     serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff,
-				      "%s%s", (serializer->status.size_used > 0) ? serializer->csv_separator : "",
-				      value);
+					     "%s%s", ndpi_serialize_is_not_empty(_serializer) ? serializer->csv_separator : "",
+					     value);
   } else {
     serializer->buffer[serializer->status.size_used++] = (ndpi_serialization_string << 4) | ndpi_serialization_string;
 
@@ -1241,6 +1265,7 @@ static int ndpi_serialize_binary_raw(ndpi_serializer *_serializer,
     ndpi_serialize_single_string(serializer, value, vlen);
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
@@ -1320,10 +1345,11 @@ int ndpi_serialize_string_boolean(ndpi_serializer *_serializer,
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
     serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used], buff_diff,
-      "%s%s", (serializer->status.size_used > 0) ? serializer->csv_separator : "",
+      "%s%s", ndpi_serialize_is_not_empty(_serializer) ? serializer->csv_separator : "",
       value ? "true" : "false");
   }
 
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
 }
 
