@@ -95,7 +95,7 @@ static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
 
 static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
 				   char *buf, u_int8_t client_hash) {
-  u_int16_t offset = 22, buf_out_len = 0;
+  u_int32_t offset = 22, buf_out_len = 0;
   if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
     goto invalid_payload;
   u_int32_t len = ntohl(*(u_int32_t*)&packet->payload[offset]);
@@ -110,105 +110,119 @@ static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
   buf[buf_out_len++] = ';';
   offset += len;
 
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   /* ssh.server_host_key_algorithms [None] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
+  if (len > UINT32_MAX - 4 - offset)
+    goto invalid_payload;
   offset += 4 + len;
 
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   /* ssh.encryption_algorithms_client_to_server [C] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
 
+  offset += 4;
   if(client_hash) {
-    offset += 4;
-
     if((offset >= packet->payload_packet_len) || (len >= packet->payload_packet_len-offset-1))
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
-    offset += len;
-  } else
-    offset += 4 + len;
+  }
+  if (len > UINT32_MAX - offset)
+    goto invalid_payload;
+  offset += len;
 
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   /* ssh.encryption_algorithms_server_to_client [S] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
 
+  offset += 4;
   if(!client_hash) {
-    offset += 4;
-
     if((offset >= packet->payload_packet_len) || (len >= packet->payload_packet_len-offset-1))
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
-    offset += len;
-  } else
-    offset += 4 + len;
+  }
+  if (len > UINT32_MAX - offset)
+    goto invalid_payload;
+  offset += len;
 
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   /* ssh.mac_algorithms_client_to_server [C] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
 
+  offset += 4;
   if(client_hash) {
-    offset += 4;
-
     if((offset >= packet->payload_packet_len) || (len >= packet->payload_packet_len-offset-1))
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
-    offset += len;
-  } else
-    offset += 4 + len;
+  }
+  if (len > UINT32_MAX - offset)
+    goto invalid_payload;
+  offset += len;
 
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   /* ssh.mac_algorithms_server_to_client [S] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
 
+  offset += 4;
   if(!client_hash) {
-    offset += 4;
-
     if((offset >= packet->payload_packet_len) || (len >= packet->payload_packet_len-offset-1))
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
-    offset += len;
-  } else
-    offset += 4 + len;
+  }
+  if (len > UINT32_MAX - offset)
+    goto invalid_payload;
+  offset += len;
 
   /* ssh.compression_algorithms_client_to_server [C] */
   if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
     goto invalid_payload;
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
 
+  offset += 4;
   if(client_hash) {
-    offset += 4;
-
     if((offset >= packet->payload_packet_len) || (len >= packet->payload_packet_len-offset-1))
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
     buf_out_len += len;
-    offset += len;
-  } else
-    offset += 4 + len;
+  }
+  if (len > UINT32_MAX - offset)
+    goto invalid_payload;
+  offset += len;
 
+  if(offset+sizeof(u_int32_t) >= packet->payload_packet_len)
+    goto invalid_payload;
   /* ssh.compression_algorithms_server_to_client [S] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
 
+  offset += 4;
   if(!client_hash) {
-    offset += 4;
-
     if((offset >= packet->payload_packet_len) || (len >= packet->payload_packet_len-offset-1))
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
     buf_out_len += len;
-    offset += len;
-  } else
-    offset += 4 + len;
+  }
+  if (len > UINT32_MAX - offset)
+    goto invalid_payload;
+  offset += len;
 
   /* ssh.languages_client_to_server [None] */
 
