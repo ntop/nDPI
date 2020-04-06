@@ -491,7 +491,7 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
   if(!value) return(-1);
 
 #ifdef DEBUG
-  NDPI_LOG_DEBUG2(ndpi_str, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
+  NDPI_LOG_DBG2(ndpi_str, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
 
   rv = ndpi_string_to_automa(ndpi_str,
@@ -3030,7 +3030,7 @@ void ndpi_set_bitmask_protocol_detection(char * label,
   */
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(*detection_bitmask, ndpi_protocol_id) != 0) {
 #ifdef DEBUG
-    NDPI_LOG_DBG2(ndpi_str
+    NDPI_LOG_DBG2(ndpi_str,
 		  "[NDPI] ndpi_set_bitmask_protocol_detection: %s : [callback_buffer] idx= %u, [proto_defaults] protocol_id=%u\n",
 		  label, idx, ndpi_protocol_id);
 #endif

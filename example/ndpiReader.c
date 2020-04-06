@@ -1117,7 +1117,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       flowGetBDMeanandVariance(flow);
     }
 
-    fprintf(csv_fp, "\n");
+    if(csv_fp)
+      fprintf(csv_fp, "\n");
     return;
   }
 
