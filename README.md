@@ -48,15 +48,7 @@ You can use nDPI to selectively block selected Internet traffic by embedding it 
 ### DISCLAIMER
 While we do our best to detect network protocols, we cannot guarantee that our software is error free and 100% accurate in protocol detection. Please make sure that you respect the privacy of users and you have proper authorization to listen, capture and inspect network traffic.
 
-### Creating A Source File Tar Ball
-
-If you want to distribute a source tar file of nDPI do:
-
-- make dist
-
-To ensure that a tar file includes all necessary files and to run tests on distribution do:
-
-- make distcheck
+nDPI is a registered trademark.
 
 [ntopng_logo]: https://camo.githubusercontent.com/0f789abcef232035c05e0d2e82afa3cc3be46485/687474703a2f2f7777772e6e746f702e6f72672f77702d636f6e74656e742f75706c6f6164732f323031312f30382f6e746f706e672d69636f6e2d313530783135302e706e67
 
