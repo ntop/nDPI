@@ -8676,7 +8676,6 @@ static ndpi_protocol_match host_match[] = {
   { ".aiv-delivery.net", NULL, "\\.aiv-delivery\\.net",                                  "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { ".aiv-cdn.net", NULL, "\\.aiv-cdn\\.net",                                            "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "1s3.lvlt.dash.us.aiv-cdn.net.c.footprint.net", NULL, "1s3\\.lvlt\\.dash\\.us\\.aiv-cdn\\.net\\.c\\.footprint\\.net",      "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-  { ".cloudfront.net", NULL, "\\.cloudfront\\.net",                                      "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { ".s.loris.llnwd.net", NULL, "\\.s\\.loris\\.llnwd\\.net",                            "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "atv-ext.amazon.com", NULL, NULL,                                                    "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "c.media-amazon.com", NULL, NULL,                                                    "AmazonVideo",      NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
@@ -8991,7 +8990,6 @@ static ndpi_protocol_match host_match[] = {
 
   { ".deezer.com", NULL, "\\.deezer" TLD,                              "Deezer",           NDPI_PROTOCOL_DEEZER, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
 
-  { ".microsoft.com", NULL, "\\.microsoft" TLD,                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { "i-msdn.sec.s-msft.com", NULL, "i-msdn.sec\\.s-msft" TLD,          "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE },
   { "i2-msdn.sec.s-msft.com", NULL, "i2-msdn\\.sec\\.s-msft" TLD,      "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".webtrends.com", NULL, "\\.webtrends" TLD,                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
@@ -9016,7 +9014,6 @@ static ndpi_protocol_match host_match[] = {
 
   { ".webex.com",      NULL, "\\.webex" TLD,                           "Webex",            NDPI_PROTOCOL_WEBEX, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
   { ".zoom.us",        NULL, "\\.zoom" TLD,                            "Zoom",             NDPI_PROTOCOL_ZOOM,  NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_ACCEPTABLE },
-  { ".cloudfront.net", NULL, "\\.cloudfront" TLD,                      "Zoom",             NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_ACCEPTABLE },
 
   { ".ocsdomain.com", NULL, "\\.ocsdomain" TLD,                        "OCS",              NDPI_PROTOCOL_OCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },
   { "ocs.fr", NULL, "ocs" TLD,                                         "OCS",              NDPI_PROTOCOL_OCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN },

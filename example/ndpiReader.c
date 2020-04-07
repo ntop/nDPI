@@ -95,7 +95,8 @@ static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 
 extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection, max_num_reported_top_payloads;
 extern u_int16_t min_pattern_len, max_pattern_len;
-
+extern void ndpi_self_check_host_match(); /* Self check function */
+  
 struct flow_info {
   struct ndpi_flow_info *flow;
   u_int16_t thread_id;
@@ -3242,6 +3243,7 @@ int orginal_main(int argc, char **argv) {
     automataUnitTest();
     serializerUnitTest();
     analyzeUnitTest();
+    ndpi_self_check_host_match();
 
     gettimeofday(&startup_time, NULL);
     ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
