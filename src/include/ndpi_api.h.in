@@ -945,7 +945,8 @@ extern "C" {
 				  const char *format /* e.f. "%.2f" */);
   int ndpi_serialize_string_boolean(ndpi_serializer *serializer,
 				    const char *key, u_int8_t value);
-
+  int ndpi_serialize_raw_record(ndpi_serializer *_serializer,
+				u_char *record, u_int32_t record_len);
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
   int ndpi_serialize_start_of_block(ndpi_serializer *serializer,
 				    const char *key);

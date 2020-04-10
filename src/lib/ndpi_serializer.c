@@ -3,9 +3,6 @@
  *
  * Copyright (C) 2011-20 - ntop.org
  *
- * This file is part of nDPI, an open source deep packet inspection
- * library based on the OpenDPI and PACE technology by ipoque GmbH
- *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -170,7 +167,7 @@ int ndpi_init_serializer_ll(ndpi_serializer *_serializer,
   memset(serializer, 0, sizeof(ndpi_private_serializer));
 
   serializer->initial_buffer_size = serializer->buffer_size = buffer_size;
-  serializer->buffer      = (u_int8_t *) malloc(serializer->buffer_size * sizeof(u_int8_t));
+  serializer->buffer      = (u_int8_t *) calloc(serializer->buffer_size, sizeof(u_int8_t));
 
   if(serializer->buffer == NULL)
     return(-1);
@@ -193,6 +190,36 @@ int ndpi_init_serializer_ll(ndpi_serializer *_serializer,
 int ndpi_init_serializer(ndpi_serializer *_serializer,
 			 ndpi_serialization_format fmt) {
   return(ndpi_init_serializer_ll(_serializer, fmt, NDPI_SERIALIZER_DEFAULT_BUFFER_SIZE));
+}
+
+/* ********************************** */
+
+static inline int ndpi_extend_serializer_buffer(ndpi_serializer *_serializer, u_int32_t min_len) {
+  u_int32_t new_size;
+  void *r;
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+
+  if(min_len < NDPI_SERIALIZER_DEFAULT_BUFFER_INCR) {
+    if(serializer->initial_buffer_size < NDPI_SERIALIZER_DEFAULT_BUFFER_INCR) {
+      if(min_len < serializer->initial_buffer_size)
+        min_len = serializer->initial_buffer_size;
+    } else {
+      min_len = NDPI_SERIALIZER_DEFAULT_BUFFER_INCR;
+    }
+  }
+
+  new_size = serializer->buffer_size + min_len;
+  new_size = ((new_size / 4) + 1) * 4; /* required by zmq encryption */
+
+  r = realloc((void *) serializer->buffer, new_size);
+
+  if(r == NULL)
+    return(-1);
+
+  serializer->buffer = r;
+  serializer->buffer_size = new_size;
+
+  return(0);
 }
 
 /* ********************************** */
@@ -261,36 +288,6 @@ void ndpi_term_serializer(ndpi_serializer *_serializer) {
     serializer->buffer_size = 0;
     serializer->buffer = NULL;
   }
-}
-
-/* ********************************** */
-
-static inline int ndpi_extend_serializer_buffer(ndpi_serializer *_serializer, u_int32_t min_len) {
-  u_int32_t new_size;
-  void *r;
-  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
-
-  if(min_len < NDPI_SERIALIZER_DEFAULT_BUFFER_INCR) {
-    if(serializer->initial_buffer_size < NDPI_SERIALIZER_DEFAULT_BUFFER_INCR) {
-      if(min_len < serializer->initial_buffer_size)
-        min_len = serializer->initial_buffer_size;
-    } else {
-      min_len = NDPI_SERIALIZER_DEFAULT_BUFFER_INCR;
-    }
-  }
-
-  new_size = serializer->buffer_size + min_len;
-  new_size = ((new_size / 4) + 1) * 4; /* required by zmq encryption */
-
-  r = realloc((void *) serializer->buffer, new_size);
-
-  if(r == NULL)
-    return(-1);
-
-  serializer->buffer = r;
-  serializer->buffer_size = new_size;
-
-  return(0);
 }
 
 /* ********************************** */
@@ -431,11 +428,60 @@ static inline void ndpi_deserialize_single_string(ndpi_private_deserializer *des
 
 /* ********************************** */
 
+/*
+  This function helps extending the existing serializer by adding a new
+  element in the array. This element is handled as raw without any
+  further check whatsoever
+*/
+int ndpi_serialize_raw_record(ndpi_serializer *_serializer,
+			      u_char *record, u_int32_t record_len) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  u_int32_t buff_diff = serializer->buffer_size - serializer->status.size_used;
+  u_int16_t needed = record_len;
+  u_int8_t add_comma = 0;
+    
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    needed += 1;
+
+    if(serializer->status.size_used == 3) /* Empty buffer [{} */
+      serializer->status.size_used = 2; /* Remove {} */
+    else
+      needed += 2, add_comma = 1;
+  }
+  
+  if(buff_diff < needed) {
+    if(ndpi_extend_serializer_buffer(_serializer, needed - buff_diff) < 0)
+      return(-1);
+    
+    buff_diff = serializer->buffer_size - serializer->status.size_used;
+  }
+
+  if(serializer->fmt == ndpi_serialization_format_json) {   
+    if(add_comma)
+      serializer->buffer[serializer->status.size_used-1] = ',';
+    else
+      serializer->status.size_used--;
+  }
+  
+  memcpy(&serializer->buffer[serializer->status.size_used], record, record_len);
+  serializer->status.size_used += record_len;
+
+  if(serializer->fmt == ndpi_serialization_format_json) {
+    serializer->buffer[serializer->status.size_used] = ']';
+    if(add_comma) serializer->status.size_used++;
+  }
+  
+  ndpi_serialize_end_of_record(_serializer);
+  
+  return(0);
+}
+
+/* ********************************** */
+
 int ndpi_serialize_end_of_record(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer_size - serializer->status.size_used;
-  u_int16_t needed =
-    sizeof(u_int8_t) /* type */;
+  u_int16_t needed = sizeof(u_int8_t) /* type */;
 
   if(serializer->fmt == ndpi_serialization_format_json)
     needed += 1;
@@ -452,7 +498,7 @@ int ndpi_serialize_end_of_record(ndpi_serializer *_serializer) {
       serializer->status.size_used += snprintf((char *) &serializer->buffer[serializer->status.size_used],
 					       buff_diff, "]");
     }
-    
+
     serializer->status.flags |= NDPI_SERIALIZER_STATUS_ARRAY | NDPI_SERIALIZER_STATUS_EOR;
     serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_COMMA;
   } else {
