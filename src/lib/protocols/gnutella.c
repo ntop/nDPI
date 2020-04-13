@@ -125,7 +125,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	}
       }
     }
-    if (packet->payload_packet_len > 50 && ((memcmp(packet->payload, "GET / HTTP", 9) == 0))) {
+    if (packet->payload_packet_len > 50 && ((memcmp(packet->payload, "GET / HTTP", 10) == 0))) {
       ndpi_parse_packet_line_info(ndpi_struct, flow);
       if ((packet->user_agent_line.ptr != NULL && packet->user_agent_line.len > 15
 	   && memcmp(packet->user_agent_line.ptr, "BearShare Lite ", 15) == 0)
