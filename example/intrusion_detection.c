@@ -53,7 +53,6 @@ double get_flow_score(ndpi_norm_value* scores, int n_metrics){
 /* ********************************** */
 
 double Ddos_score(struct ndpi_flow_info* flow){
-  double f = (double)flow->first_seen/1000.0, l = (double)flow->last_seen/1000.0;
   int n_metrics = 6;
   ndpi_norm_value* scores = malloc(n_metrics * sizeof(ndpi_norm_value));
   /* pktlen_c_to_s_avg */
@@ -105,7 +104,6 @@ double Ddos_score(struct ndpi_flow_info* flow){
 }
 
 double Dos_goldeneye_score(struct ndpi_flow_info* flow){
-  double f = (double)flow->first_seen/1000.0, l = (double)flow->last_seen/1000.0;
   int n_metrics = 6;
   ndpi_norm_value* scores = malloc(n_metrics * sizeof(ndpi_norm_value));
   /* pktlen_s_to_c_max */
@@ -208,7 +206,6 @@ double Dos_hulk_score(struct ndpi_flow_info* flow){
 }
 
 double Dos_slow_score(struct ndpi_flow_info* flow){
-  double f = (double)flow->first_seen/1000.0, l = (double)flow->last_seen/1000.0;
   int n_metrics = 6;
   ndpi_norm_value* scores = malloc(n_metrics * sizeof(ndpi_norm_value));
   /* pktlen_s_to_c_max */
@@ -260,7 +257,6 @@ double Dos_slow_score(struct ndpi_flow_info* flow){
 }
 
 double Ftp_patator_score(struct ndpi_flow_info* flow){
-  double f = (double)flow->first_seen/1000.0, l = (double)flow->last_seen/1000.0;
   int n_metrics = 6;
   ndpi_norm_value* scores = malloc(n_metrics * sizeof(ndpi_norm_value));
   /* iat_flow_min */
@@ -364,7 +360,6 @@ double Hearthbleed_score(struct ndpi_flow_info* flow){
 }
 
 double Infiltration_score(struct ndpi_flow_info* flow){
-  double f = (double)flow->first_seen/1000.0, l = (double)flow->last_seen/1000.0;
   int n_metrics = 6;
   ndpi_norm_value* scores = malloc(n_metrics * sizeof(ndpi_norm_value));
   /* pktlen_c_to_s_max */
@@ -416,7 +411,6 @@ double Infiltration_score(struct ndpi_flow_info* flow){
 }
 
 double Ssh_patator_score(struct ndpi_flow_info* flow){
-  double f = (double)flow->first_seen/1000.0, l = (double)flow->last_seen/1000.0;
   int n_metrics = 6;
   ndpi_norm_value* scores = malloc(n_metrics * sizeof(ndpi_norm_value));
   /* fin */

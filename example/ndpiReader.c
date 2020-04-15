@@ -218,6 +218,7 @@ FILE *trace = NULL;
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
 
+#if 0
 static void reduceBDbits(uint32_t *bd, unsigned int len) {
   int mask = 0;
   int shift = 0;
@@ -238,6 +239,7 @@ static void reduceBDbits(uint32_t *bd, unsigned int len) {
   for(i = 0; i < len; i++)
     bd[i] = bd[i] >> shift;
 }
+#endif
 
 /**
  * @brief Get flow byte distribution mean and variance
@@ -1530,12 +1532,14 @@ static int acceptable(u_int32_t num_pkts){
 
 /* *********************************************** */
 
+#if 0
 static int receivers_sort(void *_a, void *_b) {
   struct receiver *a = (struct receiver *)_a;
   struct receiver *b = (struct receiver *)_b;
 
   return(b->num_pkts - a->num_pkts);
 }
+#endif
 
 /* *********************************************** */
 

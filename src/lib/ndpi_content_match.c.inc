@@ -9137,7 +9137,7 @@ static ndpi_protocol_match host_match[] = {
   { "brasilbandalarga.com.br", NULL, "brasilbandalarga\\.com" TLD,     "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
   { ".eaqbr.com.br", NULL, "\\.eaqbr\\.com" TLD,                       "EAQ",              NDPI_PROTOCOL_EAQ, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
 
-  { NULL, NULL, NULL, 0 }
+  { NULL, NULL, NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE}
 };
 
 /* ******************************************************************** */
