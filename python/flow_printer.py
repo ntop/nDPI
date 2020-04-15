@@ -5,7 +5,7 @@
 file: flow_printer.py
 This file is part of nfstream.
 
-Copyright (C) 2019 - Zied Aouini <aouinizied@gmail.com>
+Copyright (C) 2019-20 - Zied Aouini <aouinizied@gmail.com>
 
 nfstream is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,15 +22,15 @@ import sys
 
 
 path = sys.argv[1]
-flow_streamer = NFStreamer(source=path)
+flow_streamer = NFStreamer(source=path, statistics=True)
 result = {}
 try:
     for flow in flow_streamer:
         print(flow)
         try:
-            result[flow.application_name] += flow.total_packets
+            result[flow.application_name] += flow.bidirectional_packets
         except KeyError:
-            result[flow.application_name] = flow.total_packets
+            result[flow.application_name] = flow.bidirectional_packets
     print("Summary (Application Name: Packets):")
     print(result)
 except KeyboardInterrupt:
