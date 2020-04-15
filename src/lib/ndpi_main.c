@@ -4687,7 +4687,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
 
-    if(flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
+    if(flow->l4.tcp.tls.hello_processed == 1 && flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
       unsigned long id;
       int rc = ndpi_match_custom_category(ndpi_str,
 					  (char *)flow->protos.stun_ssl.ssl.client_requested_server_name,
