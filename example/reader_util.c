@@ -1745,6 +1745,9 @@ ether_type_check:
       }
     } else if((sport == TZSP_PORT) || (dport == TZSP_PORT)) {
       /* https://en.wikipedia.org/wiki/TZSP */
+      if (header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr) + 4)
+        return(nproto); /* Too short for TZSP*/
+
       u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
       u_int8_t version       = packet[offset];
       u_int8_t ts_type       = packet[offset+1];
