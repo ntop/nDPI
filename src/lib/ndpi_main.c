@@ -3645,7 +3645,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
  * 	nxt_hdr: protocol of the actual payload
  * returns 0 upon success and 1 upon failure
  */
-static int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr)
+int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr)
 {
   while((*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
     u_int16_t ehdr_len;
@@ -4687,7 +4687,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
 
-    if(flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
+    if(flow->l4.tcp.tls.hello_processed == 1 && flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
       unsigned long id;
       int rc = ndpi_match_custom_category(ndpi_str,
 					  (char *)flow->protos.stun_ssl.ssl.client_requested_server_name,

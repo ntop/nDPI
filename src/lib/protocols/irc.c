@@ -677,7 +677,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	      if (memcmp(&packet->line[i].ptr[j], "SEND ", 5) == 0
 		  || (memcmp(&packet->line[i].ptr[j], "CHAT", 4) == 0)
 		  || (memcmp(&packet->line[i].ptr[j], "chat", 4) == 0)
-		  || (memcmp(&packet->line[i].ptr[j], "sslchat", 7) == 0)
+		  || (j+7 < packet->line[i].len && memcmp(&packet->line[i].ptr[j], "sslchat", 7) == 0)
 		  || (memcmp(&packet->line[i].ptr[j], "TSEND", 5) == 0)) {
 		NDPI_LOG_DBG2(ndpi_struct, "found CHAT,chat,sslchat,TSEND.");
 		j += 4;

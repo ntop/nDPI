@@ -150,6 +150,10 @@ extern "C" {
 #define ndpi_match_strprefix(payload, payload_len, str)			\
   ndpi_match_prefix((payload), (payload_len), (str), (sizeof(str)-1))
 
+#ifdef NDPI_DETECTION_SUPPORT_IPV6
+    int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
