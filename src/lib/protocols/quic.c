@@ -130,7 +130,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	    while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
 	      sni_offset++;
 
-	    if((sni_offset+len) < udp_len) {
+	    if(len > 0 && (sni_offset+len) < udp_len) {
 	      int max_len = sizeof(flow->host_server_name)-1, j = 0;
 	      ndpi_protocol_match_result ret_match;
 	      
