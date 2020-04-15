@@ -135,7 +135,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
       return;
     }
     /* need message to or type for file-transfer */
-    if (memcmp(packet->payload, "<iq from=\"", 8) == 0 || memcmp(packet->payload, "<iq from=\'", 8) == 0) {
+    if (memcmp(packet->payload, "<iq from=\"", 10) == 0 || memcmp(packet->payload, "<iq from=\'", 10) == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "JABBER <iq from=\"\n");
       lastlen = packet->payload_packet_len - 11;
       for (x = 10; x < lastlen; x++) {
