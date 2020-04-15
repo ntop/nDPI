@@ -1146,10 +1146,11 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if(enable_joy_stats) {
     /* Print entropy values for monitored flows. */
     flowGetBDMeanandVariance(flow);
-    if(csv_fp) fprintf(csv_fp, "\n");
     fflush(out);
     fprintf(out, "[score: %.4f]", flow->entropy.score);
   }
+	
+  if(csv_fp) fprintf(csv_fp, "\n");
     
   fprintf(out, "[proto: ");
   if(flow->tunnel_type != ndpi_no_tunnel)
