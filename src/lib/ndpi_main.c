@@ -3645,7 +3645,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
  * 	nxt_hdr: protocol of the actual payload
  * returns 0 upon success and 1 upon failure
  */
-static int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr)
+int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr)
 {
   while((*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
     u_int16_t ehdr_len;

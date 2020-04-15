@@ -1691,12 +1691,11 @@ ether_type_check:
       return(nproto); /* Too short for IPv6 header*/
     iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
     proto = iph6->ip6_hdr.ip6_un1_nxt;
-    ip_len = sizeof(struct ndpi_ipv6hdr);
+    ip_len = ntohs(iph6->ip6_hdr.ip6_un1_plen);
 
-    if(proto == IPPROTO_DSTOPTS /* IPv6 destination option */) {
-      u_int8_t *options = (u_int8_t*)&packet[ip_offset+ip_len];
-      proto = options[0];
-      ip_len += 8 * (options[1] + 1);
+    const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
+    if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &proto) != 0) {
+      return(nproto);
     }
 
     iph = NULL;
