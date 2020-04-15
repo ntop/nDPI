@@ -456,6 +456,14 @@ void ndpi_flow_info_freer(void *node) {
 
   ndpi_free_flow_info_half(flow);
   ndpi_free_flow_data_analysis(flow);
+  ndpi_free_flow_tls_data(flow);
+
+  ndpi_free(flow);
+}
+
+/* ***************************************************** */
+
+void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
 
   if(flow->ssh_tls.server_names) {
     ndpi_free(flow->ssh_tls.server_names);
@@ -471,8 +479,6 @@ void ndpi_flow_info_freer(void *node) {
     ndpi_free(flow->ssh_tls.tls_supported_versions);
     flow->ssh_tls.tls_supported_versions = NULL;
   }
-
-  ndpi_free(flow);
 }
 
 /* ***************************************************** */

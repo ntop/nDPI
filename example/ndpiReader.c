@@ -1117,7 +1117,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
       flowGetBDMeanandVariance(flow);
     }
 
-    fprintf(csv_fp, "\n");
+    if(csv_fp)
+      fprintf(csv_fp, "\n");
     return;
   }
 
@@ -1752,6 +1753,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 
       ndpi_free_flow_info_half(flow);
       ndpi_free_flow_data_analysis(flow);
+      ndpi_free_flow_tls_data(flow);
       ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */

@@ -43,7 +43,7 @@ static int ndpi_ftp_control_check_request(struct ndpi_flow_struct *flow,
 					  const u_int8_t *payload,
 					  size_t payload_len) {
 #ifdef FTP_DEBUG
-  printf("%s() [%s]\n", __FUNCTION__, payload);
+  printf("%s() [%.*s]\n", __FUNCTION__, (int)payload_len, payload);
 #endif
 
   if(ndpi_match_strprefix(payload, payload_len, "USER")) {
@@ -550,7 +550,7 @@ static int ndpi_ftp_control_check_response(struct ndpi_flow_struct *flow,
 					   const u_int8_t *payload,
 					   size_t payload_len) {
 #ifdef FTP_DEBUG
-  printf("%s() [%s]\n", __FUNCTION__, payload);
+  printf("%s() [%.*s]\n", __FUNCTION__, (int)payload_len, payload);
 #endif
 
   if(payload_len == 0) return(1);

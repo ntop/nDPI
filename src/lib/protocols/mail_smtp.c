@@ -125,7 +125,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  && (packet->line[a].ptr[3] == 'H' || packet->line[a].ptr[3] == 'h')
 		  && packet->line[a].ptr[4] == ' ') {
 #ifdef SMTP_DEBUG
-	  printf("%s() AUTH [%s]\n", __FUNCTION__, packet->line[a].ptr);
+	  printf("%s() AUTH [%.*s]\n", __FUNCTION__, packet->line[a].len, packet->line[a].ptr);
 #endif
 
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH;
@@ -133,7 +133,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	} else {
 	  if(packet->line[a].ptr[3] != ' ') {
 #ifdef SMTP_DEBUG
-	    printf("%s() => [%s]\n", __FUNCTION__, packet->line[a].ptr);
+	    printf("%s() => [%.*s]\n", __FUNCTION__, packet->line[a].len, packet->line[a].ptr);
 #endif
 	    
 	    if(flow->protos.ftp_imap_pop_smtp.auth_found) {
