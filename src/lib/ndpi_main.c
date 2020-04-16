@@ -1805,12 +1805,17 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			    ndpi_build_default_ports(ports_a, 10050, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */
 			    );
-     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_S7COMM,
-          1 /* no subprotocol */, no_master,
-          no_master, "s7comm", NDPI_PROTOCOL_CATEGORY_NETWORK,
-          ndpi_build_default_ports(ports_a, 102, 0, 0, 0, 0) /* TCP */,
-          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */
-          );
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_S7COMM,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "s7comm", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			    ndpi_build_default_ports(ports_a, 102, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);    
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MSTEAMS,
+			    1 /* no subprotocol */, no_master,
+			    no_master, "Teams", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
+			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */
+			    );
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"

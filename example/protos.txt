@@ -10,13 +10,7 @@ tcp:3000@ntop
 #  Format:
 #  host:"<value>",host:"<value>",.....@<subproto>
 
-host:"googlesyndication.com"@Google
-host:"venere.com"@Venere
-host:"kataweb.it",host:"repubblica.it"@Repubblica
-host:"ntop"@ntop
-host:"atv-ext.amazon.com",host:"*.api.amazon.com",host:"*.api.amazonvideo.com"@AmazonVideo
-host:"*.amazonaws.com"@AmazonVideo
-host:"*.netflix.com"@Netflix
+host:"disneyplus.com"host:"cdn.registerdisney.go.com",host:"disney-portal.my.onetrust.com",host:"disneyplus.bn5x.net",host:"disney-plus.net"@DisneyPlus
 host:"*.lvlt.dash.us.aiv-cdn.net.c.footprint.net"@AmazonVideo
 host:"api-global.netflix.com"@Netflix
 #  IP based Subprotocols

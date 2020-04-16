@@ -8997,7 +8997,13 @@ static ndpi_protocol_match host_match[] = {
   { "bing.com", NULL, "bing" TLD,                                      "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
   { ".visualstudio.com", NULL, "\\.visualstudio" TLD,                  "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE },
   { "login.live.com", NULL, "login\\.live" TLD,                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
-
+  { "teams.microsoft.com", NULL, "teams\\.microsoft\\.com" TLD,       "Teams",            NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE },
+  { "-teams.cloudapp.net", NULL, "-teams\\.cloudapp\\.net" TLD,          "Teams",            NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE },  
+  { "teams.trafficmanager.net", NULL, "teams\\.trafficmanager\\.net" TLD, "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE },
+  { "teams-msgapi.trafficmanager.net", NULL, "teams-msgapi\\.trafficmanager\\.net" TLD, "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE },
+  { "teams.office.net", NULL, "teams\\.office\\.net" TLD, "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE },
+  { "teams.office.com", NULL, "teams\\.office\\.com" TLD, "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE },
+  
   { "bn1301.storage.live.com", NULL, "bn1301\\.storage\\.live" TLD,               "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE,NDPI_PROTOCOL_CATEGORY_CLOUD,  NDPI_PROTOCOL_ACCEPTABLE },
   { "skyapi.live.net", NULL, "skyapi\\.live" TLD,                                 "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
   { "d.docs.live.net", NULL, "d\\.docs\\.live" TLD,                               "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },

@@ -279,6 +279,7 @@ typedef enum {
   NDPI_PROTOCOL_CAPWAP                = 247,
   NDPI_PROTOCOL_ZABBIX                = 248,
   NDPI_PROTOCOL_S7COMM                = 249,
+  NDPI_PROTOCOL_MSTEAMS               = 250,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
