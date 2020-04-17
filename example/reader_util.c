@@ -965,6 +965,13 @@ static u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id) {
 
 /* ****************************************************** */
 
+void correct_csv_data_field(char* data) {
+  /* Replace , with ; to avoid issues with CSVs */
+	for(u_int i=0; data[i] != '\0'; i++) if(data[i] == ',') data[i] = ';';
+}
+
+/* ****************************************************** */
+
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
   u_int i;
 
@@ -1095,27 +1102,28 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
 
     if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn) {
-      if((flow->ssh_tls.tls_alpn = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)) != NULL) {
-	/* Replace , with ; to avoid issues with CSVs */
-	for(i=0; flow->ssh_tls.tls_alpn[i] != '\0'; i++) if(flow->ssh_tls.tls_alpn[i] == ',') flow->ssh_tls.tls_alpn[i] = ';';
-      }
+      if((flow->ssh_tls.tls_alpn = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)) != NULL)
+        correct_csv_data_field(flow->ssh_tls.tls_alpn);
     }
 
     if(flow->ssh_tls.tls_supported_versions) {
-      if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)) != NULL) {
-	/* Replace , with ; to avoid issues with CSVs */
-	for(i=0; flow->ssh_tls.tls_supported_versions[i] != '\0'; i++) if(flow->ssh_tls.tls_supported_versions[i] == ',') flow->ssh_tls.tls_supported_versions[i] = ';';
-      }
+      if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)) != NULL)
+	      correct_csv_data_field(flow->ssh_tls.tls_supported_versions);
     }
 
     if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn
-       && flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)
-      snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
-	       flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
-    else if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)
+       && flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions) {
+        correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+        correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
+        snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
+	        flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
+	        flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
+       }
+    else if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn) {
+      correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
       snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
 	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+    }
   }
 
   if(flow->detection_completed && (!flow->check_extra_packets)) {
