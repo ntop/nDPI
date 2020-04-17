@@ -95,9 +95,24 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
       /* This is a good query  fe577e2b */
       NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
       ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
-    } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  }
+    } 
+  else if(
+	  (
+	   (usport == 443 || udport == 443)
+	   &&
+	   (packet->payload_packet_len >= 5) &&
+	   (packet->payload[0] == 0x17 &&
+	    packet->payload[1] == 0x01 &&
+	    packet->payload[2] == 0x00 &&
+	    packet->payload[3] == 0x00 &&
+	    packet->payload[4] == 0x01)
+	   )
+	  )
+    {
+      NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
+      ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
+      return;
+    } 
 
 }
 
