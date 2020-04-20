@@ -693,7 +693,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
     l3 = (const u_int8_t*)iph6;
   }
-  if (ipsize < l4_offset + l4_packet_len)
+  if(ipsize < l4_offset + l4_packet_len)
     return NULL;
 
   *proto = iph->protocol;
@@ -848,12 +848,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       *src = newflow->src_id, *dst = newflow->dst_id;
       newflow->entropy.src2dst_pkt_len[newflow->entropy.src2dst_pkt_count] = l4_data_len;
       newflow->entropy.src2dst_pkt_time[newflow->entropy.src2dst_pkt_count] = when;
-      if (newflow->entropy.src2dst_pkt_count == 0) {
+      if(newflow->entropy.src2dst_pkt_count == 0) {
         newflow->entropy.src2dst_start = when;
       }
       newflow->entropy.src2dst_pkt_count++;
       // Non zero app data.
-      if (l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
+      if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
         newflow->entropy.src2dst_opackets++;
         newflow->entropy.src2dst_l4_bytes += l4_data_len;
       }
@@ -882,29 +882,29 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       else
 	*src = rflow->dst_id, *dst = rflow->src_id, *src_to_dst_direction = 0, rflow->bidirectional = 1;
     }
-    if (src_to_dst_direction) {
-      if (rflow->entropy.src2dst_pkt_count < max_num_packets_per_flow) {
+    if(src_to_dst_direction) {
+      if(rflow->entropy.src2dst_pkt_count < max_num_packets_per_flow) {
         rflow->entropy.src2dst_pkt_len[rflow->entropy.src2dst_pkt_count] = l4_data_len;
         rflow->entropy.src2dst_pkt_time[rflow->entropy.src2dst_pkt_count] = when;
         rflow->entropy.src2dst_l4_bytes += l4_data_len;
         rflow->entropy.src2dst_pkt_count++;
       }
       // Non zero app data.
-      if (l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
+      if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
         rflow->entropy.src2dst_opackets++;
       }
     } else {
-      if (rflow->entropy.dst2src_pkt_count < max_num_packets_per_flow) {
+      if(rflow->entropy.dst2src_pkt_count < max_num_packets_per_flow) {
         rflow->entropy.dst2src_pkt_len[rflow->entropy.dst2src_pkt_count] = l4_data_len;
         rflow->entropy.dst2src_pkt_time[rflow->entropy.dst2src_pkt_count] = when;
-        if (rflow->entropy.dst2src_pkt_count == 0) {
+        if(rflow->entropy.dst2src_pkt_count == 0) {
           rflow->entropy.dst2src_start = when;
         }
         rflow->entropy.dst2src_l4_bytes += l4_data_len;
         rflow->entropy.dst2src_pkt_count++;
       }
       // Non zero app data.
-      if (l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
+      if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
         rflow->entropy.dst2src_opackets++;
       }
     }
@@ -961,7 +961,7 @@ static u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id) {
 
 void correct_csv_data_field(char* data) {
   /* Replace , with ; to avoid issues with CSVs */
-	for(u_int i=0; data[i] != '\0'; i++) if(data[i] == ',') data[i] = ';';
+  for(u_int i=0; data[i] != '\0'; i++) if(data[i] == ',') data[i] = ';';
 }
 
 /* ****************************************************** */
@@ -1070,7 +1070,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if((is_ndpi_proto(flow, NDPI_PROTOCOL_TLS))
 	  || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	  || (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client[0] != '\0')
-    ) {
+	  ) {
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
     snprintf(flow->ssh_tls.client_requested_server_name,
 	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
@@ -1091,7 +1091,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->l4.tcp.tls.fingerprint_set) {
       memcpy(flow->ssh_tls.sha1_cert_fingerprint,
-	   flow->ndpi_flow->l4.tcp.tls.sha1_certificate_fingerprint, 20);
+	     flow->ndpi_flow->l4.tcp.tls.sha1_certificate_fingerprint, 20);
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;
     }
 
@@ -1102,17 +1102,17 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ssh_tls.tls_supported_versions) {
       if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)) != NULL)
-	      correct_csv_data_field(flow->ssh_tls.tls_supported_versions);
+	correct_csv_data_field(flow->ssh_tls.tls_supported_versions);
     }
 
     if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn
        && flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions) {
-        correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
-        correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
-        snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
-	        flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
-	        flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
-       }
+      correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+      correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
+      snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
+	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
+	       flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
+    }
     else if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn) {
       correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
       snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
@@ -1147,38 +1147,38 @@ ndpi_clear_entropy_stats(struct ndpi_flow_info *flow) {
 }
 
 void update_tcp_flags_count(struct ndpi_flow_info* flow, struct ndpi_tcphdr* tcp, u_int8_t src_to_dst_direction){
-    if(tcp->cwr){
-        flow->cwr_count++;
-        src_to_dst_direction ? flow->src2dst_cwr_count++ : flow->dst2src_cwr_count++;
-    }
-    if(tcp->ece){
-        flow->ece_count++;
-        src_to_dst_direction ? flow->src2dst_ece_count++ : flow->dst2src_ece_count++;
-    }
-    if(tcp->rst){
-        flow->rst_count++;
-        src_to_dst_direction ? flow->src2dst_rst_count++ : flow->dst2src_rst_count++;
-    }
-    if(tcp->ack){
-        flow->ack_count++;
-        src_to_dst_direction ? flow->src2dst_ack_count++ : flow->dst2src_ack_count++;
-    }
-    if(tcp->fin){
-        flow->fin_count++;
-        src_to_dst_direction ? flow->src2dst_fin_count++ : flow->dst2src_fin_count++;
-    }
-    if(tcp->syn){
-        flow->syn_count++;
-        src_to_dst_direction ? flow->src2dst_syn_count++ : flow->dst2src_syn_count++;
-    }
-    if(tcp->psh){
-        flow->psh_count++;
-        src_to_dst_direction ? flow->src2dst_psh_count++ : flow->dst2src_psh_count++;
-    }
-    if(tcp->urg){
-        flow->urg_count++;
-        src_to_dst_direction ? flow->src2dst_urg_count++ : flow->dst2src_urg_count++;
-    }
+  if(tcp->cwr){
+    flow->cwr_count++;
+    src_to_dst_direction ? flow->src2dst_cwr_count++ : flow->dst2src_cwr_count++;
+  }
+  if(tcp->ece){
+    flow->ece_count++;
+    src_to_dst_direction ? flow->src2dst_ece_count++ : flow->dst2src_ece_count++;
+  }
+  if(tcp->rst){
+    flow->rst_count++;
+    src_to_dst_direction ? flow->src2dst_rst_count++ : flow->dst2src_rst_count++;
+  }
+  if(tcp->ack){
+    flow->ack_count++;
+    src_to_dst_direction ? flow->src2dst_ack_count++ : flow->dst2src_ack_count++;
+  }
+  if(tcp->fin){
+    flow->fin_count++;
+    src_to_dst_direction ? flow->src2dst_fin_count++ : flow->dst2src_fin_count++;
+  }
+  if(tcp->syn){
+    flow->syn_count++;
+    src_to_dst_direction ? flow->src2dst_syn_count++ : flow->dst2src_syn_count++;
+  }
+  if(tcp->psh){
+    flow->psh_count++;
+    src_to_dst_direction ? flow->src2dst_psh_count++ : flow->dst2src_psh_count++;
+  }
+  if(tcp->urg){
+    flow->urg_count++;
+    src_to_dst_direction ? flow->src2dst_urg_count++ : flow->dst2src_urg_count++;
+  }
 }
 
 /* ****************************************************** */
@@ -1236,12 +1236,12 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     ndpi_flow = flow->ndpi_flow;
 
     if(tcph != NULL){
-        update_tcp_flags_count(flow, tcph, src_to_dst_direction);
-        if(tcph->syn && !flow->src2dst_bytes){
-            flow->c_to_s_init_win = rawsize;
-        }else if(tcph->syn && tcph->ack && flow->src2dst_bytes == flow->c_to_s_init_win){
-            flow->s_to_c_init_win = rawsize;
-        }
+      update_tcp_flags_count(flow, tcph, src_to_dst_direction);
+      if(tcph->syn && !flow->src2dst_bytes){
+	flow->c_to_s_init_win = rawsize;
+      }else if(tcph->syn && tcph->ack && flow->src2dst_bytes == flow->c_to_s_init_win){
+	flow->s_to_c_init_win = rawsize;
+      }
     }
 
     if((tcph != NULL) && (tcph->fin || tcph->rst || tcph->syn))
@@ -1590,7 +1590,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     return(nproto);
   }
 
-ether_type_check:
+ ether_type_check:
   recheck_type = 0;
 
   /* check ether type */
@@ -1643,7 +1643,7 @@ ether_type_check:
 
  iph_check:
   /* Check and set IP header size and total packet length */
-  if (header->caplen < ip_offset + sizeof(struct ndpi_iphdr))
+  if(header->caplen < ip_offset + sizeof(struct ndpi_iphdr))
     return(nproto); /* Too short for next IP header*/
 
   iph = (struct ndpi_iphdr *) &packet[ip_offset];
@@ -1671,7 +1671,7 @@ ether_type_check:
 
     if(iph->protocol == IPPROTO_IPV6) {
       ip_offset += ip_len;
-      if (ip_len > 0)
+      if(ip_len > 0)
         goto iph_check;
     }
 
@@ -1689,20 +1689,18 @@ ether_type_check:
       return(nproto);
     }
   } else if(iph->version == 6) {
-    if (header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr))
+    if(header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr))
       return(nproto); /* Too short for IPv6 header*/
     iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
     proto = iph6->ip6_hdr.ip6_un1_nxt;
     ip_len = ntohs(iph6->ip6_hdr.ip6_un1_plen);
-    if (header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr + ntohs(iph_v6->ip6_hdr.ip6_un1_plen))
+    if(header->caplen < (ip_offset + sizeof(struct ndpi_ipv6hdr) + ntohs(iph6->ip6_hdr.ip6_un1_plen)))
       return(nproto); /* Too short for IPv6 payload*/
-
 
     const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
     if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &proto) != 0) {
       return(nproto);
     }
-    iph6->ip6_hdr.ip6_un1_nxt = proto;
 
     iph = NULL;
   } else {
@@ -1720,97 +1718,99 @@ ether_type_check:
   }
 
   if(workflow->prefs.decode_tunnels && (proto == IPPROTO_UDP)) {
-    if (header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr))
+    if(header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr))
       return(nproto); /* Too short for UDP header*/
-    struct ndpi_udphdr *udp = (struct ndpi_udphdr *)&packet[ip_offset+ip_len];
-    u_int16_t sport = ntohs(udp->source), dport = ntohs(udp->dest);
+    else {
+      struct ndpi_udphdr *udp = (struct ndpi_udphdr *)&packet[ip_offset+ip_len];
+      u_int16_t sport = ntohs(udp->source), dport = ntohs(udp->dest);
 
-    if((sport == GTP_U_V1_PORT) || (dport == GTP_U_V1_PORT)) {
-      /* Check if it's GTPv1 */
-      u_int offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
-      u_int8_t flags = packet[offset];
-      u_int8_t message_type = packet[offset+1];
+      if((sport == GTP_U_V1_PORT) || (dport == GTP_U_V1_PORT)) {
+	/* Check if it's GTPv1 */
+	u_int offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
+	u_int8_t flags = packet[offset];
+	u_int8_t message_type = packet[offset+1];
 
-      tunnel_type = ndpi_gtp_tunnel;
+	tunnel_type = ndpi_gtp_tunnel;
 
-      if((((flags & 0xE0) >> 5) == 1 /* GTPv1 */) &&
-	 (message_type == 0xFF /* T-PDU */)) {
+	if((((flags & 0xE0) >> 5) == 1 /* GTPv1 */) &&
+	   (message_type == 0xFF /* T-PDU */)) {
 
-	ip_offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr)+8; /* GTPv1 header len */
-	if(flags & 0x04) ip_offset += 1; /* next_ext_header is present */
-	if(flags & 0x02) ip_offset += 4; /* sequence_number is present (it also includes next_ext_header and pdu_number) */
-	if(flags & 0x01) ip_offset += 1; /* pdu_number is present */
+	  ip_offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr)+8; /* GTPv1 header len */
+	  if(flags & 0x04) ip_offset += 1; /* next_ext_header is present */
+	  if(flags & 0x02) ip_offset += 4; /* sequence_number is present (it also includes next_ext_header and pdu_number) */
+	  if(flags & 0x01) ip_offset += 1; /* pdu_number is present */
 
-	iph = (struct ndpi_iphdr *) &packet[ip_offset];
+	  iph = (struct ndpi_iphdr *) &packet[ip_offset];
 
-	if(iph->version != IPVERSION) {
-	  // printf("WARNING: not good (packet_id=%u)!\n", (unsigned int)workflow->stats.raw_packet_count);
-	  goto v4_warning;
-	}
-      }
-    } else if((sport == TZSP_PORT) || (dport == TZSP_PORT)) {
-      /* https://en.wikipedia.org/wiki/TZSP */
-      if (header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr) + 4)
-        return(nproto); /* Too short for TZSP*/
-
-      u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
-      u_int8_t version       = packet[offset];
-      u_int8_t ts_type       = packet[offset+1];
-      u_int16_t encapsulates = ntohs(*((u_int16_t*)&packet[offset+2]));
-
-      tunnel_type = ndpi_tzsp_tunnel;
-
-      if((version == 1) && (ts_type == 0) && (encapsulates == 1)) {
-	u_int8_t stop = 0;
-
-	offset += 4;
-
-	while((!stop) && (offset < header->caplen)) {
-	  u_int8_t tag_type = packet[offset];
-	  u_int8_t tag_len;
-
-	  switch(tag_type) {
-	  case 0: /* PADDING Tag */
-	    tag_len = 1;
-	    break;
-	  case 1: /* END Tag */
-	    tag_len = 1, stop = 1;
-	    break;
-	  default:
-	    tag_len = packet[offset+1];
-	    break;
-	  }
-
-	  offset += tag_len;
-
-	  if(offset >= header->caplen)
-	    return(nproto); /* Invalid packet */
-	  else {
-	    eth_offset = offset;
-	    goto datalink_check;
+	  if(iph->version != IPVERSION) {
+	    // printf("WARNING: not good (packet_id=%u)!\n", (unsigned int)workflow->stats.raw_packet_count);
+	    goto v4_warning;
 	  }
 	}
-      }
-    } else if(sport == NDPI_CAPWAP_DATA_PORT) {
-      /* We dissect ONLY CAPWAP traffic */
-      u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
+      } else if((sport == TZSP_PORT) || (dport == TZSP_PORT)) {
+	/* https://en.wikipedia.org/wiki/TZSP */
+	if(header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr) + 4)
+	  return(nproto); /* Too short for TZSP*/
 
-      if((offset+40) < header->caplen) {
-	u_int16_t msg_len = packet[offset+1] >> 1;
+	u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
+	u_int8_t version       = packet[offset];
+	u_int8_t ts_type       = packet[offset+1];
+	u_int16_t encapsulates = ntohs(*((u_int16_t*)&packet[offset+2]));
 
-	offset += msg_len;
+	tunnel_type = ndpi_tzsp_tunnel;
 
-	if(packet[offset] == 0x02) {
-	  /* IEEE 802.11 Data */
+	if((version == 1) && (ts_type == 0) && (encapsulates == 1)) {
+	  u_int8_t stop = 0;
 
-	  offset += 24;
-	  /* LLC header is 8 bytes */
-	  type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));
+	  offset += 4;
 
-	  ip_offset = offset + 8;
+	  while((!stop) && (offset < header->caplen)) {
+	    u_int8_t tag_type = packet[offset];
+	    u_int8_t tag_len;
 
-	  tunnel_type = ndpi_capwap_tunnel;
-	  goto iph_check;
+	    switch(tag_type) {
+	    case 0: /* PADDING Tag */
+	      tag_len = 1;
+	      break;
+	    case 1: /* END Tag */
+	      tag_len = 1, stop = 1;
+	      break;
+	    default:
+	      tag_len = packet[offset+1];
+	      break;
+	    }
+
+	    offset += tag_len;
+
+	    if(offset >= header->caplen)
+	      return(nproto); /* Invalid packet */
+	    else {
+	      eth_offset = offset;
+	      goto datalink_check;
+	    }
+	  }
+	}
+      } else if(sport == NDPI_CAPWAP_DATA_PORT) {
+	/* We dissect ONLY CAPWAP traffic */
+	u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
+
+	if((offset+40) < header->caplen) {
+	  u_int16_t msg_len = packet[offset+1] >> 1;
+
+	  offset += msg_len;
+
+	  if(packet[offset] == 0x02) {
+	    /* IEEE 802.11 Data */
+
+	    offset += 24;
+	    /* LLC header is 8 bytes */
+	    type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));
+
+	    ip_offset = offset + 8;
+
+	    tunnel_type = ndpi_capwap_tunnel;
+	    goto iph_check;
+	  }
 	}
       }
     }
@@ -1879,7 +1879,7 @@ u_int32_t ethernet_crc32(const void* data, size_t n_bytes) {
 #include <rte_ether.h>
 
 static const struct rte_eth_conf port_conf_default = {
-#if (RTE_VERSION < RTE_VERSION_NUM(19, 8, 0, 0))
+#if(RTE_VERSION < RTE_VERSION_NUM(19, 8, 0, 0))
 						      .rxmode = { .max_rx_pkt_len = ETHER_MAX_LEN }
 #else
 						      .rxmode = { .max_rx_pkt_len = RTE_ETHER_MAX_LEN }
