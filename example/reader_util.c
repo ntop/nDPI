@@ -939,12 +939,6 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   iph.daddr = iph6->ip6_dst.u6_addr.u6_addr32[2] + iph6->ip6_dst.u6_addr.u6_addr32[3];
   iph.protocol = iph6->ip6_hdr.ip6_un1_nxt;
 
-  if(iph.protocol == IPPROTO_DSTOPTS /* IPv6 destination option */) {
-    const u_int8_t *options = (const u_int8_t*)iph6 + sizeof(const struct ndpi_ipv6hdr);
-
-    iph.protocol = options[0];
-  }
-
   return(get_ndpi_flow_info(workflow, 6, vlan_id, tunnel_type,
 			    &iph, iph6, ip_offset, ipsize,
 			    ntohs(iph6->ip6_hdr.ip6_un1_plen),
@@ -1700,11 +1694,15 @@ ether_type_check:
     iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
     proto = iph6->ip6_hdr.ip6_un1_nxt;
     ip_len = ntohs(iph6->ip6_hdr.ip6_un1_plen);
+    if (header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr + ntohs(iph_v6->ip6_hdr.ip6_un1_plen))
+      return(nproto); /* Too short for IPv6 payload*/
+
 
     const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
     if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &proto) != 0) {
       return(nproto);
     }
+    iph6->ip6_hdr.ip6_un1_nxt = proto;
 
     iph = NULL;
   } else {
