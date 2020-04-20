@@ -1190,6 +1190,8 @@ static ndpi_network host_protocol_list[] = {
     https://torstatus.rueckgr.at/ip_list_all.php/Tor_ip_list_ALL.csv
     From 09.09.2019
 
+    https://panwdbl.appspot.com/lists/ettor.txt
+
     Use utils/toripaddr2list.py to convert them
   */
 
