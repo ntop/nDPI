@@ -937,7 +937,13 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   iph.version = IPVERSION;
   iph.saddr = iph6->ip6_src.u6_addr.u6_addr32[2] + iph6->ip6_src.u6_addr.u6_addr32[3];
   iph.daddr = iph6->ip6_dst.u6_addr.u6_addr32[2] + iph6->ip6_dst.u6_addr.u6_addr32[3];
-  iph.protocol = iph6->ip6_hdr.ip6_un1_nxt;
+  u_int8_t l4proto = iph6->ip6_hdr.ip6_un1_nxt;
+  u_int16_t ip_len = ntohs(iph6->ip6_hdr.ip6_un1_plen);
+  const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
+  if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &l4proto) != 0) {
+    return(NULL);
+  }
+  iph.protocol = l4proto;
 
   return(get_ndpi_flow_info(workflow, 6, vlan_id, tunnel_type,
 			    &iph, iph6, ip_offset, ipsize,
