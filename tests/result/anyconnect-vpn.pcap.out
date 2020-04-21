@@ -75,7 +75,7 @@ JA3 Host Stats:
 	52	UDP 10.0.0.227:61613 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/97 bytes <-> 1 pkts/97 bytes][Goodput ratio: 56/56][0.02 sec][Host: lb._dns-sd._udp.0.0.0.10.in-addr.arpa][::]
 	53	UDP 10.0.0.227:49781 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/69 bytes <-> 1 pkts/117 bytes][Goodput ratio: 39/64][0.02 sec][Host: apple.com][17.178.96.59]
 	54	UDP 10.0.0.227:52879 <-> 75.75.76.76:53 [proto: 5/DNS][cat: Network/14][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.04 sec][Host: vco.pandion.viasat.com][8.37.102.91][PLAIN TEXT (pandion)]
-	55	0 [fe80::408:3e45:3abc:1552]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/180 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.02 sec]
+	55	ICMPV6 [fe80::408:3e45:3abc:1552]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/180 bytes -> 0 pkts/0 bytes][Goodput ratio: 31/0][1.02 sec]
 	56	UDP 10.0.0.227:51990 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/75 bytes <-> 1 pkts/91 bytes][Goodput ratio: 43/53][0.04 sec][Host: mail.viasat.com][8.37.103.196][PLAIN TEXT (viasat)]
 	57	UDP 10.0.0.227:57253 <-> 75.75.75.75:53 [proto: 5/DNS][cat: Network/14][1 pkts/71 bytes <-> 1 pkts/87 bytes][Goodput ratio: 40/51][0.02 sec][Host: mozilla.org][63.245.208.195][PLAIN TEXT (mozilla)]
 	58	UDP 10.0.0.227:58155 <-> 75.75.76.76:53 [proto: 5.118/DNS.Slack][cat: Collaborative/15][1 pkts/69 bytes <-> 1 pkts/85 bytes][Goodput ratio: 39/50][0.03 sec][Host: slack.com][99.86.34.156]

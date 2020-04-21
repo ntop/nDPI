@@ -54,7 +54,7 @@ JA3 Host Stats:
 	36	UDP 192.168.2.17:55457 <-> 192.168.2.1:53 [proto: 5.140/DNS.Apple][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/214 bytes][Goodput ratio: 43/80][0.04 sec][Host: mesu.apple.com][17.253.105.202][PLAIN TEXT (akadns)]
 	37	UDP 192.168.2.17:62526 <-> 192.168.2.1:53 [proto: 5.140/DNS.Apple][cat: Web/5][1 pkts/73 bytes <-> 1 pkts/212 bytes][Goodput ratio: 42/80][0.05 sec][Host: cl4.apple.com][104.73.61.30][PLAIN TEXT (origin)]
 	38	UDP 192.168.2.17:52682 <-> 192.168.2.1:53 [proto: 5.143/DNS.AppleiCloud][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/203 bytes][Goodput ratio: 43/79][0.04 sec][Host: www.icloud.com][23.45.74.46][PLAIN TEXT (icloud)]
-	39	0 [fe80::823:3f17:8298:a29c]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/260 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.00 sec]
+	39	ICMPV6 [fe80::823:3f17:8298:a29c]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/260 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][1.00 sec]
 	40	UDP 192.168.2.17:55914 <-> 192.168.2.1:53 [proto: 5.140/DNS.Apple][cat: Web/5][1 pkts/82 bytes <-> 1 pkts/146 bytes][Goodput ratio: 48/71][0.04 sec][Host: gsp85-ssl.ls.apple.com][17.130.2.46][PLAIN TEXT (akadns)]
 	41	UDP 192.168.2.17:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][cat: Network/14][2 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 61/0][1.02 sec][PLAIN TEXT (homekit)]
 	42	UDP 192.168.2.17:64203 <-> 192.168.2.1:53 [proto: 5.140/DNS.Apple][cat: Web/5][1 pkts/80 bytes <-> 1 pkts/135 bytes][Goodput ratio: 47/68][0.04 sec][Host: basejumper.apple.com][::][PLAIN TEXT (basejumper)]
