@@ -1216,7 +1216,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   u_int8_t *payload;
   u_int8_t src_to_dst_direction = 1;
   u_int8_t begin_or_end_tcp = 0;
-  struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
+  struct ndpi_proto nproto = NDPI_PROTOCOL_NULL;
 
   if(iph)
     flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id,
@@ -1447,7 +1447,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   /** --- IPv6 header --- **/
   struct ndpi_ipv6hdr *iph6;
 
-  struct ndpi_proto nproto = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN };
+  struct ndpi_proto nproto = NDPI_PROTOCOL_NULL;
   ndpi_packet_tunnel tunnel_type = ndpi_no_tunnel;
 
   /* lengths and offsets */

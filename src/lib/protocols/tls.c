@@ -316,8 +316,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	    i += 2;
 
-	    if((len > sizeof(dNSName)-1) || (len == 0 /* Looks something went wrong */))
-	      break; /* String too long */
+	    /* The check "len > sizeof(dNSName) - 1" will be always false. If we add it,
+	       the compiler is smart enough to detect it and throws a warning */
+	    if((len == 0 /* Looks something went wrong */))
+	      break;
 
 	    strncpy(dNSName, (const char*)&packet->payload[i], len);
 	    dNSName[len] = '\0';
