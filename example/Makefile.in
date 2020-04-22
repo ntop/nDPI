@@ -23,7 +23,7 @@ ndpiReader: libndpiReader.a $(LIBNDPI) $(EXECUTABLE_SOURCES:%.c=%.o)
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
-install:
+install: ndpiReader
 	mkdir -p $(DESTDIR)$(PREFIX)/bin/
 	mkdir -p $(DESTDIR)$(PREFIX)/share/ndpi
 	cp ndpiReader $(DESTDIR)$(PREFIX)/bin/
