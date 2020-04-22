@@ -4213,7 +4213,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
             As Google has recently introduced Duo,
             we need to distinguish between it and hangout
             thing that should be handled by the STUN dissector
-            */    
+            */
             ret.app_protocol = NDPI_PROTOCOL_HANGOUT_DUO;
         }
     }
