@@ -1810,22 +1810,26 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	/* We dissect ONLY CAPWAP traffic */
 	u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
 
-	if((offset+40) < header->caplen) {
-	  u_int16_t msg_len = packet[offset+1] >> 1;
+	if((offset+1) < header->caplen) {
+	  uint8_t preamble = packet[offset];
 
-	  offset += msg_len;
+	  if((preamble & 0x0F) == 0) { /* CAPWAP header */
+	    u_int16_t msg_len = (packet[offset+1] & 0xF8) >> 1;
 
-	  if(packet[offset] == 0x02) {
-	    /* IEEE 802.11 Data */
+	    offset += msg_len;
 
-	    offset += 24;
-	    /* LLC header is 8 bytes */
-	    type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));
+	    if((offset + 32 < header->caplen) && (packet[offset] == 0x02)) {
+	      /* IEEE 802.11 Data */
 
-	    ip_offset = offset + 8;
+	      offset += 24;
+	      /* LLC header is 8 bytes */
+	      type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));
 
-	    tunnel_type = ndpi_capwap_tunnel;
-	    goto iph_check;
+	      ip_offset = offset + 8;
+
+	      tunnel_type = ndpi_capwap_tunnel;
+	      goto iph_check;
+	    }
 	  }
 	}
       }
