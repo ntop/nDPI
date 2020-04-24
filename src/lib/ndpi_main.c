@@ -3412,6 +3412,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
     /* S7 comm */
     init_s7comm_dissector(ndpi_str, &a, detection_bitmask);
 
+    /* IEC 60870-5-104 */
+    init_104_dissector(ndpi_str, &a, detection_bitmask);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
