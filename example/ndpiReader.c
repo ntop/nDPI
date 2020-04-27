@@ -2519,9 +2519,13 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
 
 	printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
-	t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
-	b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)traffic_duration;
-
+	if(traffic_duration != 0) {
+	  t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
+	  b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)traffic_duration;
+	} else {
+	  t = 0;
+	  b = 0;
+	}
 	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime_r(&pcap_start.tv_sec, &result));
 	printf("\tAnalysis begin:        %s\n", when);
 	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime_r(&pcap_end.tv_sec, &result));

@@ -1,0 +1,8 @@
+Microsoft	4	2188	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.0.1              	 1      
+
+
+	1	TCP 192.168.0.1:64455 <-> 10.10.10.1:443 [proto: 91.212/TLS.Microsoft][cat: Web/5][2 pkts/520 bytes <-> 2 pkts/1668 bytes][Goodput ratio: 43/82][< 1 sec][ALPN: h2;http/1.1][TLSv1.2][Client: www.bing.com][JA3C: 9e10692f1b7f78228b2d4e424db3a98c]
