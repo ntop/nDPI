@@ -1451,6 +1451,9 @@ int ndpi_serialize_end_of_block(ndpi_serializer *_serializer) {
     buff_diff = serializer->buffer_size - serializer->status.size_used;
   }
 
+  if(serializer->status.flags & NDPI_SERIALIZER_STATUS_SOB) /* Empty block */
+    serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_SOB;
+
   // buff_diff = serializer->buffer_size - serializer->status.size_used;
   ndpi_serialize_json_post(_serializer);
 
