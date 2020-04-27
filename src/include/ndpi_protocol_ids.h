@@ -265,8 +265,8 @@ typedef enum {
   NDPI_PROTOCOL_LINKEDIN              = 233, /* Paulo Angelo <pa@pauloangelo.com> */
   NDPI_PROTOCOL_SOUNDCLOUD            = 234,
   NDPI_PROTOCOL_CSGO                  = 235, /* Counter-Strike Global Offensive, Dota = 2 */
-  NDPI_PROTOCOL_LISP	              = 236,
-  NDPI_PROTOCOL_DIAMETER	      = 237,
+  NDPI_PROTOCOL_LISP	                = 236,
+  NDPI_PROTOCOL_DIAMETER	            = 237,
   NDPI_PROTOCOL_APPLE_PUSH            = 238,
   NDPI_PROTOCOL_GOOGLE_SERVICES       = 239,
   NDPI_PROTOCOL_AMAZON_VIDEO          = 240,
@@ -280,6 +280,7 @@ typedef enum {
   NDPI_PROTOCOL_ZABBIX                = 248,
   NDPI_PROTOCOL_S7COMM                = 249,
   NDPI_PROTOCOL_MSTEAMS               = 250,
+  NDPI_PROTOCOL_WEBSOCKET             = 251, /* Leonn Paiva <leonn.paiva@gmail.com> */
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
