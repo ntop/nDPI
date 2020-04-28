@@ -208,7 +208,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
        && (packet->http_url_name.len > 0)
        && (packet->host_line.len > 0)) {
 	if( (packet->http_url_name.len == packet->host_line.len) && (strncmp((char*)packet->host_line.ptr, (char*)packet->http_url_name.ptr, packet->http_url_name.len)==0) ) {	
-		flow->http.url = ndpi_malloc(packet->host_line.len);
+		flow->http.url = ndpi_malloc(packet->host_line.len + 1 );
 		if(flow->http.url) {
 			strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
 			flow->http.url[ packet->host_line.len ] = '\0';
@@ -216,7 +216,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	}
 	else if( (packet->host_line.len < packet->http_url_name.len)  && (strstr((char*)packet->host_line.ptr,(char*)packet->http_url_name.ptr) !=NULL) ){
 			int len= packet->http_url_name.len ;
-			flow->http.url = ndpi_malloc(len);
+			flow->http.url = ndpi_malloc(len +1 );
 			if(flow->http.url) {
 				strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
 				flow->http.url[ packet->http_url_name.len ] = '\0';
