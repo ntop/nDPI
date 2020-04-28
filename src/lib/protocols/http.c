@@ -207,15 +207,22 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     if((flow->http.url == NULL)
        && (packet->http_url_name.len > 0)
        && (packet->host_line.len > 0)) {
-      int len = packet->http_url_name.len + packet->host_line.len + 1;
-
-      flow->http.url = ndpi_malloc(len);
-      if(flow->http.url) {
-	strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
-	strncpy(&flow->http.url[packet->host_line.len], (char*)packet->http_url_name.ptr,
-		packet->http_url_name.len);
-	flow->http.url[len-1] = '\0';
-      }
+	if( (packet->http_url_name.len == packet->host_line.len) && (strncmp((char*)packet->host_line.ptr, (char*)packet->http_url_name.ptr, packet->http_url_name.len)==0) ) {	
+		flow->http.url = ndpi_malloc(packet->host_line.len+1);
+		if(flow->http.url) {
+			strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
+			flow->http.url[ packet->host_line.len] = '\0';
+		}
+	}
+	else {
+		int len = packet->http_url_name.len + packet->host_line.len + 1;
+		flow->http.url = ndpi_malloc(len);
+		if(flow->http.url) {
+			strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
+			strncpy(&flow->http.url[packet->host_line.len], (char*)packet->http_url_name.ptr,packet->http_url_name.len);
+			flow->http.url[len-1] = '\0';
+      		}
+	}
 
       if(flow->packet.http_method.len < 3)
         flow->http.method = NDPI_HTTP_METHOD_UNKNOWN;
