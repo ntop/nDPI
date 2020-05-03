@@ -915,6 +915,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                             NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
                             ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                             ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+    ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NATS,
+                            0 /* can_have_a_subprotocol */, no_master, no_master, "Nats",
+                            NDPI_PROTOCOL_CATEGORY_RPC,
+                            ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                            ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
     ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_NTOP, 0 /* can_have_a_subprotocol */, no_master,
                             no_master, "ntop", NDPI_PROTOCOL_CATEGORY_NETWORK,
                             ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -2980,8 +2985,8 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
     /* DIRECTCONNECT */
     init_directconnect_dissector(ndpi_str, &a, detection_bitmask);
 
-    /* MSN */
-    init_msn_dissector(ndpi_str, &a, detection_bitmask);
+    /* NATS */
+    init_nats_dissector(ndpi_str, &a, detection_bitmask);
 
     /* YAHOO */
     init_yahoo_dissector(ndpi_str, &a, detection_bitmask);

@@ -97,7 +97,7 @@ typedef enum {
   NDPI_PROTOCOL_IRC                   = 65,
   NDPI_PROTOCOL_AYIYA                 = 66,
   NDPI_PROTOCOL_UNENCRYPTED_JABBER    = 67,
-  NDPI_PROTOCOL_MSN                   = 68,
+  NDPI_PROTOCOL_NATS                  = 68,
   NDPI_PROTOCOL_OSCAR                 = 69,
   NDPI_PROTOCOL_YAHOO                 = 70,
   NDPI_PROTOCOL_BATTLEFIELD           = 71,

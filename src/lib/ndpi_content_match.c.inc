@@ -8891,8 +8891,6 @@ static ndpi_protocol_match host_match[] = {
 
   { ".last.fm", NULL, "\\.last\\.fm$",                            "LastFM",           NDPI_PROTOCOL_LASTFM, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
 
-  { "msn.com", NULL, "msn" TLD,                                   "MSN",              NDPI_PROTOCOL_MSN, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE }, /* News site */
-
   { "netflix.com", NULL, "netflix" TLD,                           "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "nflxext.com", NULL, "nflxext" TLD,                           "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
   { "nflximg.com", NULL, "nflximg" TLD,                           "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
@@ -8991,6 +8989,7 @@ static ndpi_protocol_match host_match[] = {
 
   { ".deezer.com", NULL, "\\.deezer" TLD,                              "Deezer",           NDPI_PROTOCOL_DEEZER, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
 
+  { "msn.com", NULL, "msn" TLD,                                   "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
   { "i-msdn.sec.s-msft.com", NULL, "i-msdn.sec\\.s-msft" TLD,          "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE },
   { "i2-msdn.sec.s-msft.com", NULL, "i2-msdn\\.sec\\.s-msft" TLD,      "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE },
   { ".webtrends.com", NULL, "\\.webtrends" TLD,                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
