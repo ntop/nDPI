@@ -102,7 +102,10 @@ typedef struct the_prefix_t {
 /* pointer to usr data (ex. route flap info) */
 union patricia_node_value_t {
   void *user_data;
-  unsigned int user_value;
+
+  /* User-defined values */
+  u_int16_t user_value;
+  u_int16_t user_value2;
 };
 
 typedef struct _patricia_node_t {

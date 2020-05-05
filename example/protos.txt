@@ -17,6 +17,6 @@ host:"api-global.netflix.com"@Netflix
 #  Format:
 #  ip:<value>,ip:<value>,.....@<subproto>
 
-ip:213.75.170.11@CustomProtocol
-ip:8.248.73.247@AmazonPrime
+ip:213.75.170.11/32:443@CustomProtocol
+ip:8.248.73.247:443@AmazonPrime
 ip:54.80.47.130@AmazonPrime
