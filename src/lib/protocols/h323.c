@@ -25,7 +25,11 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   NDPI_LOG_DBG(ndpi_struct, "search H323\n");
 
-  if(packet->tcp != NULL) {
+  /*
+    The TPKT protocol is used by ISO 8072 (on port 102)
+    and H.323. So this check below is to avoid ambiguities
+  */
+  if((packet->tcp != NULL) && (packet->tcp->dest != ntohs(102))) {
     NDPI_LOG_DBG2(ndpi_struct, "calculated dport over tcp\n");
 
     /* H323  */
@@ -62,7 +66,7 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	  return;
 	}
-      }    
+      }
   } else if(packet->udp != NULL) {
     sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
     NDPI_LOG_DBG2(ndpi_struct, "calculated dport over udp\n");

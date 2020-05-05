@@ -51,7 +51,12 @@ void ndpi_search_mssql_tds(struct ndpi_detection_module_struct *ndpi_struct, str
 
   NDPI_LOG_DBG(ndpi_struct, "search mssql_tds\n");
 
-  if(packet->payload_packet_len < sizeof(struct tds_packet_header)) {
+  if((packet->payload_packet_len < sizeof(struct tds_packet_header))
+     /*
+       The TPKT protocol used by ISO 8072 (on port 102) is similar
+       to this potocol and it can cause false positives 
+     */
+     || (packet->tcp->dest == ntohs(102))) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }

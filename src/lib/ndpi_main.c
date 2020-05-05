@@ -1816,8 +1816,10 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
       cidr = strtok_r(NULL, "\n", &saveptr);
 
       pin.s_addr = inet_addr(addr);
-      if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL)
-	node->value.user_value = protocol_id, node->value.user_value2 = 0 /* port */, num_loaded++;
+      if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL) {
+	node->value.user_value = protocol_id; // node->value.additional_user_value = 0 /* port */;
+	num_loaded++;
+      }
     }
   }
 
@@ -1840,8 +1842,9 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
       continue;
 
     pin.s_addr = htonl(host_list[i].network);
-    if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL)
-      node->value.user_value = host_list[i].value, node->value.user_value2 = 0;
+    if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL) {
+      node->value.user_value = host_list[i].value; // node->value.additional_user_value = 0;
+    }
   }
 }
 
@@ -1880,8 +1883,9 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   
   inet_pton(AF_INET, value, &pin);
   
-  if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL)
-    node->value.user_value = protocol_id, node->value.user_value2 = port;
+  if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
+    node->value.user_value = protocol_id; // node->value.additional_user_value = port;
+  }
   
   return(0);
 }
@@ -4240,8 +4244,9 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str, const c
     return(-1);
   }
 
-  if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow, AF_INET, &pin, bits)) != NULL)
-    node->value.user_value = (u_int16_t)category, node->value.user_value2 = 0;
+  if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow, AF_INET, &pin, bits)) != NULL) {
+    node->value.user_value = (u_int16_t)category; // node->value.additional_user_value = 0;
+  }
   
   return(0);
 }
@@ -6507,7 +6512,7 @@ int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr,
   node = ndpi_patricia_lookup(ptree, &prefix);
 
   if(node != NULL) {
-    node->value.user_value = user_data, node->value.user_value2 = 0;
+    node->value.user_value = user_data; // node->value.additional_user_value = 0;
     
     return(0);
   }
