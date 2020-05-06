@@ -96,10 +96,16 @@ extern "C" {
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_udp_struct(void);
 
+  /*
+    Same as the API call above but used for matching raw id's added
+    via ndpi_add_string_value_to_automa()
+  */
+  int ndpi_match_string_value(void *_automa, char *string_to_match,
+			      u_int match_len, u_int32_t *num);
 
   /**
    * nDPI personal allocation and free functions
-  **/
+   **/
   void * ndpi_malloc(size_t size);
   void * ndpi_calloc(unsigned long count, size_t size);
   void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
