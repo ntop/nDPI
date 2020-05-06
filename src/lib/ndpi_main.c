@@ -441,8 +441,9 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, 
 
   if(automa->ac_automa == NULL)
     return(-2);
-  ac_pattern.astring = value, ac_pattern.rep.number = protocol_id, ac_pattern.rep.category = (u_int16_t) category,
-    ac_pattern.rep.breed = (u_int16_t) breed;
+
+  ac_pattern.astring = value, ac_pattern.rep.number = protocol_id,
+    ac_pattern.rep.category = (u_int16_t) category, ac_pattern.rep.breed = (u_int16_t) breed;
 
 #ifdef MATCH_DEBUG
   printf("Adding to automa [%s][protocol_id: %u][category: %u][breed: %u]\n", value, protocol_id, category, breed);
@@ -533,136 +534,6 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str, ndp
 
 /* ******************************************************************** */
 
-#ifdef HAVE_HYPERSCAN
-
-static int hyperscan_load_patterns(struct hs *hs, u_int num_patterns, const char **expressions, unsigned int *ids) {
-  hs_compile_error_t *compile_err;
-
-  if(hs_compile_multi(expressions, NULL, ids, num_patterns, HS_MODE_BLOCK, NULL, &hs->database, &compile_err) !=
-     HS_SUCCESS) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to initialize hyperscan database\n");
-    hs_free_compile_error(compile_err);
-    return(-1);
-  }
-
-  hs->scratch = NULL;
-  if(hs_alloc_scratch(hs->database, &hs->scratch) != HS_SUCCESS) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to allocate hyperscan scratch space\n");
-    hs_free_database(hs->database);
-    return(-1);
-  }
-
-  return(0);
-}
-
-/* ******************************************************************** */
-
-static char *string2hex(const char *pat) {
-  u_int patlen, i;
-  char *hexbuf, *buf;
-
-  patlen = strlen(pat);
-  hexbuf = (char *) ndpi_calloc(sizeof(char), patlen * 4 + 1);
-  if(!hexbuf)
-    return(NULL);
-
-  for (i = 0, buf = hexbuf; i < patlen; i++, buf += 4) {
-    snprintf(buf, 5, "\\x%02x", (unsigned char) pat[i]);
-  }
-  *buf = '\0';
-
-  return(hexbuf);
-}
-
-/* ******************************************************************** */
-
-static int init_hyperscan(struct ndpi_detection_module_struct *ndpi_str) {
-  u_int num_patterns = 0, i, j;
-  char **expressions;
-  unsigned int *ids;
-  unsigned char *need_to_be_free;
-  struct hs *hs;
-  int rc;
-
-  ndpi_str->hyperscan = (void *) ndpi_malloc(sizeof(struct hs));
-  if(!ndpi_str->hyperscan)
-    return(-1);
-  hs = (struct hs *) ndpi_str->hyperscan;
-
-  for (i = 0; (host_match[i].string_to_match != NULL) || (host_match[i].pattern_to_match != NULL); i++)
-    num_patterns++;
-
-  expressions = (char **) ndpi_calloc(sizeof(char *), num_patterns + 1);
-  if(!expressions)
-    return(-1);
-
-  ids = (unsigned int *) ndpi_calloc(sizeof(unsigned int), num_patterns + 1);
-  if(!ids) {
-    ndpi_free(expressions);
-    return(-1);
-  }
-
-  need_to_be_free = (unsigned char *) ndpi_calloc(sizeof(unsigned char), num_patterns + 1);
-  if(!need_to_be_free) {
-    ndpi_free(expressions);
-    ndpi_free(ids);
-    return(-1);
-  }
-
-  for (i = 0, j = 0; host_match[i].string_to_match != NULL || host_match[i].pattern_to_match != NULL; i++) {
-    if(host_match[i].pattern_to_match) {
-      expressions[j] = host_match[i].pattern_to_match;
-      ids[j] = host_match[i].protocol_id;
-      need_to_be_free[j] = 0;
-      ++j;
-    } else {
-      expressions[j] = string2hex(host_match[i].string_to_match);
-      if(expressions[j] != NULL) {
-	ids[j] = host_match[i].protocol_id;
-	need_to_be_free[j] = 1;
-	++j;
-      } else {
-#ifdef DEBUG
-	printf("Fail to calloc memory for %s\n", host_match[i].string_to_match);
-#endif
-      }
-    }
-    /*printf("[DEBUG] %s\n", j ? expressions[j - 1] : "No Expression");*/
-  }
-
-  rc = hyperscan_load_patterns(hs, j, (const char **) expressions, ids);
-
-  for (i = 0; i < j; ++i)
-    if(need_to_be_free[i])
-      ndpi_free(expressions[i]);
-
-  ndpi_free(expressions), ndpi_free(ids);
-  ndpi_free(need_to_be_free);
-
-  return(rc);
-}
-
-/* ******************************************************************** */
-
-static void free_hyperscan_memory(struct hs *h) {
-  if(h) {
-    hs_free_scratch(h->scratch);
-    hs_free_database(h->database);
-    ndpi_free(h);
-  }
-}
-
-/* ******************************************************************** */
-
-static void destroy_hyperscan(struct ndpi_detection_module_struct *ndpi_str) {
-  if(ndpi_str->hyperscan)
-    free_hyperscan_memory((struct hs *) ndpi_str->hyperscan);
-}
-
-#endif
-
-/* ******************************************************************** */
-
 /* Self check function to be called onli for testing purposes */
 void ndpi_self_check_host_match() {
   u_int32_t i, j;
@@ -683,11 +554,6 @@ void ndpi_self_check_host_match() {
 
 static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_str) {
   int i;
-
-#ifdef HAVE_HYPERSCAN
-  // TODO check return value
-  init_hyperscan(ndpi_str);
-#endif
 
   for (i = 0; host_match[i].string_to_match != NULL; i++)
     ndpi_init_protocol_match(ndpi_str, &host_match[i]);
@@ -2128,13 +1994,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     return(NULL);
   }
 
-#ifdef HAVE_HYPERSCAN
-  ndpi_str->custom_categories.num_to_load = 0, ndpi_str->custom_categories.to_load = NULL;
-  ndpi_str->custom_categories.hostnames = NULL;
-#else
   ndpi_str->custom_categories.hostnames.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
-#endif
 
   ndpi_str->custom_categories.ipAddresses = ndpi_New_Patricia(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_New_Patricia(32 /* IPv4 */);
@@ -2259,13 +2120,16 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
 
 /* ****************************************************** */
 
-int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, u_int32_t *id) {
+int ndpi_match_string_protocol_id(void *_automa, char *string_to_match,
+				  u_int match_len, u_int16_t *protocol_id,
+				  ndpi_protocol_category_t *category,
+				  ndpi_protocol_breed_t *breed) {
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
   AC_REP_t match = { 0, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   int rc;
 
-  *id = -1;
+  *protocol_id = (u_int16_t)-1;
   if((automa == NULL) || (string_to_match == NULL) || (string_to_match[0] == '\0'))
     return(-2);
 
@@ -2280,61 +2144,33 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, 
   if((rc == 0) && (match.number != 0))
     rc = 1;
 
-  *id = rc ? match.number : NDPI_PROTOCOL_UNKNOWN;
+  if(rc)
+    *protocol_id = match.number, *category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+      *breed = NDPI_PROTOCOL_UNRATED;
+  else
+    *protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
-  return((*id != 0 /* NDPI_PROTOCOL_UNKNOWN */) ? 0 : -1);
+  return((*protocol_id != NDPI_PROTOCOL_UNKNOWN) ? 0 : -1);
 }
-
-/* *********************************************** */
-
-#ifdef HAVE_HYPERSCAN
-
-static int hyperscanCustomEventHandler(unsigned int id, unsigned long long from, unsigned long long to,
-                                       unsigned int flags, void *ctx) {
-  *((uonsigned long *) ctx) = (unsigned long) id;
-
-#ifdef DEBUG
-  printf("[HS] Found category %u\n", id);
-#endif
-
-  return(HS_SCAN_TERMINATED);
-}
-#endif
 
 /* *********************************************** */
 
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 			       char *name, u_int name_len,
-                               u_int32_t *id) {
-#ifdef HAVE_HYPERSCAN
-  if(ndpi_str->custom_categories.hostnames == NULL)
-    return(-1);
-  else {
-    hs_error_t rc;
-
-    *id = (u_int32_t) -1;
-
-    rc = hs_scan(ndpi_str->custom_categories.hostnames->database, name, name_len, 0,
-		 ndpi_str->custom_categories.hostnames->scratch, hyperscanCustomEventHandler, id);
-
-    if(rc == HS_SCAN_TERMINATED) {
-#ifdef DEBUG
-      printf("[HS] Found category %lu for %s\n", *id, name);
-#endif
-      return(0);
-    } else
-      return(-1);
-  }
-#else
-  return(ndpi_match_string_id(ndpi_str->custom_categories.hostnames.ac_automa,
-			      name, name_len, id));
-#endif
+                               ndpi_protocol_category_t *category) {
+  ndpi_protocol_breed_t breed;
+  u_int16_t id;  
+  int rc = ndpi_match_string_protocol_id(ndpi_str->custom_categories.hostnames.ac_automa,
+					 name, name_len, &id, category, &breed);
+    
+  return(rc);
 }
 
 /* *********************************************** */
 
 int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str,
-				   char *name_or_ip, u_int name_len, u_int32_t *id) {
+				   char *name_or_ip, u_int name_len,
+				   ndpi_protocol_category_t *id) {
   char ipbuf[64], *ptr;
   struct in_addr pin;
   u_int cp_len = ndpi_min(sizeof(ipbuf) - 1, name_len);
@@ -2369,9 +2205,10 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     }
 
     return(-1);
-  } else
+  } else {
     /* Search Host */
     return(ndpi_match_custom_category(ndpi_str, name_or_ip, name_len, id));
+  }
 }
 
 /* *********************************************** */
@@ -2422,19 +2259,6 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->impossible_bigrams_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->impossible_bigrams_automa.ac_automa, 0);
 
-#ifdef HAVE_HYPERSCAN
-    destroy_hyperscan(ndpi_str);
-
-    while (ndpi_str->custom_categories.to_load != NULL) {
-      struct hs_list *next = ndpi_str->custom_categories.to_load->next;
-
-      ndpi_free(ndpi_str->custom_categories.to_load->expression);
-      ndpi_free(ndpi_str->custom_categories.to_load);
-      ndpi_str->custom_categories.to_load = next;
-    }
-
-    free_hyperscan_memory(ndpi_str->custom_categories.hostnames);
-#else
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
 			  1 /* free patterns strings memory */);
@@ -2442,7 +2266,6 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->custom_categories.hostnames_shadow.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames_shadow.ac_automa,
 			  1 /* free patterns strings memory */);
-#endif
 
     if(ndpi_str->custom_categories.ipAddresses != NULL)
       ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
@@ -4309,21 +4132,6 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, c
   printf("===> %s() Loading %s as %u\n", __FUNCTION__, name, category);
 #endif
 
-#ifdef HAVE_HYPERSCAN
-  {
-    struct hs_list *h = (struct hs_list *) ndpi_malloc(sizeof(struct hs_list));
-
-    if(h) {
-      h->expression = name, h->id = (unsigned int) category;
-      h->next = ndpi_str->custom_categories.to_load;
-      ndpi_str->custom_categories.to_load = h;
-      ndpi_str->custom_categories.num_to_load++;
-    } else {
-      free(name);
-      return(-1);
-    }
-  }
-#else
   AC_PATTERN_t ac_pattern;
   AC_ERROR_t rc;
 
@@ -4342,9 +4150,9 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, c
     free(name);
     return(-1);
   }
+
   if(rc == ACERR_DUPLICATE_PATTERN)
     free(name);
-#endif
 
   return(0);
 }
@@ -4376,68 +4184,6 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   for (i = 0; category_match[i].string_to_match != NULL; i++)
     ndpi_load_category(ndpi_str, category_match[i].string_to_match, category_match[i].protocol_category);
 
-#ifdef HAVE_HYPERSCAN
-  if(ndpi_str->custom_categories.num_to_load > 0) {
-    const char **expressions;
-    unsigned int *ids;
-    int rc;
-    struct hs_list *head = ndpi_str->custom_categories.to_load;
-
-    expressions = (const char **) ndpi_calloc(sizeof(char *), ndpi_str->custom_categories.num_to_load + 1);
-    if(!expressions)
-      return(-1);
-
-    ids = (unsigned int *) ndpi_calloc(sizeof(unsigned int), ndpi_str->custom_categories.num_to_load + 1);
-    if(!ids) {
-      ndpi_free(expressions);
-      return(-1);
-    }
-
-    for (i = 0; head != NULL; i++) {
-#ifdef DEBUG
-      printf("[HS] Loading category %u for %s\n", head->id, head->expression);
-#endif
-      expressions[i] = head->expression, ids[i] = head->id;
-      head = head->next;
-    }
-
-    if(i != ndpi_str->custom_categories.num_to_load) {
-      ndpi_free(expressions);
-      return(-1);
-    }
-
-    free_hyperscan_memory(ndpi_str->custom_categories.hostnames);
-    ndpi_str->custom_categories.hostnames = (struct hs *) ndpi_malloc(sizeof(struct hs));
-
-    if(ndpi_str->custom_categories.hostnames == NULL) {
-      ndpi_free(expressions);
-      ndpi_free(ids);
-      return(-1); /* Failed */
-    }
-
-    rc = hyperscan_load_patterns(ndpi_str->custom_categories.hostnames, ndpi_str->custom_categories.num_to_load,
-				 expressions, ids);
-    ndpi_free(expressions), ndpi_free(ids);
-
-    head = ndpi_str->custom_categories.to_load;
-    while (head != NULL) {
-      struct hs_list *next = head->next;
-
-      ndpi_free(head->expression);
-      ndpi_free(head);
-
-      head = next;
-    }
-
-    ndpi_str->custom_categories.to_load = NULL;
-    ndpi_str->custom_categories.num_to_load = 0;
-
-    if(rc < 0) {
-      ndpi_free(ndpi_str->custom_categories.hostnames);
-      ndpi_str->custom_categories.hostnames = NULL;
-    }
-  }
-#else
   /* Free */
   ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
 		      1 /* free patterns strings memory */);
@@ -4450,7 +4196,6 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 
   /* Realloc */
   ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
-#endif
 
   if(ndpi_str->custom_categories.ipAddresses != NULL)
     ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
@@ -6024,22 +5769,6 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
   return(rc ? match.number : 0);
 }
 
-#ifdef HAVE_HYPERSCAN
-
-/* ******************************************************************** */
-
-static int hyperscanEventHandler(unsigned int id, unsigned long long from, unsigned long long to, unsigned int flags,
-                                 void *ctx) {
-  *((int *) ctx) = (int) id;
-
-  NDPI_LOG_DBG2(ndpi_str, "[NDPI] Match with: %d [from: %llu][to: %llu]\n", id, from, to);
-
-  /* return HS_SCAN_TERMINATED; */
-  return(0); /* keep searching */
-}
-
-#endif
-
 /* **************************************** */
 
 static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_t new_proto) {
@@ -6067,35 +5796,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   int matching_protocol_id;
   struct ndpi_packet_struct *packet = &flow->packet;
 
-#ifndef HAVE_HYPERSCAN
   matching_protocol_id =
     ndpi_match_string_subprotocol(ndpi_str, string_to_match, string_to_match_len, ret_match, is_host_match);
-#else
-  struct hs *hs = (struct hs *) ndpi_str->hyperscan;
-  hs_error_t status;
-
-  matching_protocol_id = NDPI_PROTOCOL_UNKNOWN;
-  /*
-    TODO HYPERSCAN
-    In case of match fill up ret_match and set flow protocol + category
-  */
-  status = hs_scan(hs->database, string_to_match, string_to_match_len, 0, hs->scratch, hyperscanEventHandler,
-		   &matching_protocol_id);
-
-  if(status == HS_SUCCESS) {
-    NDPI_LOG_DBG2(ndpi_str, "[NDPI] Hyperscan engine completed normally. Result: %s [%d][%s]\n",
-		  ndpi_get_proto_name(ndpi_str, matching_protocol_id), matching_protocol_id, string_to_match);
-  } else if(status == HS_SCAN_TERMINATED) {
-    NDPI_LOG_DBG2(ndpi_str, "[NDPI] Hyperscan engine was terminated by callback. Result: %s [%d][%s]\n",
-		  ndpi_get_proto_name(ndpi_str, matching_protocol_id), matching_protocol_id, string_to_match);
-  } else {
-    NDPI_LOG_DBG2(ndpi_str, "[NDPI] Hyperscan returned with error.\n");
-  }
-
-  ret_match->protocol_id = matching_protocol_id,
-    ret_match->protocol_category = ndpi_str->proto_defaults[matching_protocol_id].protoCategory,
-    ret_match->protocol_breed = ndpi_str->proto_defaults[matching_protocol_id].protoBreed;
-#endif
 
 #ifdef DEBUG
   {
@@ -6143,7 +5845,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
                                       ndpi_protocol_match_result *ret_match, u_int16_t master_protocol_id) {
   u_int16_t rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
 						      master_protocol_id, ret_match, 1);
-  u_int32_t id = ret_match->protocol_category;
+  ndpi_protocol_category_t id = ret_match->protocol_category;
 
   if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
     /* if(id != -1) */ {

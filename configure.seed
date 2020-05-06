@@ -92,26 +92,6 @@ if test -d ../nDPI-custom; then :
    AC_MSG_RESULT([Compiling with custom nDPI protocols])
 fi
 
-AC_ARG_WITH(hyperscan,          [  --with-hyperscan        Enable nDPI build with Intel Hyperscan])
-
-AS_IF([test "${with_hyperscan+set}" = set],[
-     BKP=$LIBS
-     LIBS="$LIBS -lstdc++ -lm"
-     AC_CHECK_LIB([hs], [hs_compile_multi], AC_DEFINE_UNQUOTED(HAVE_HYPERSCAN, 1, [Intel Hyperscan is present]))
-     LIBS=$BKP
-
-     AS_IF([test "x$ac_cv_lib_hs_hs_compile_multi" = xyes],[
-          AC_CHECK_LIB([m], [pow])
-          AC_CHECK_LIB([stdc++], [main])
-          PKG_CHECK_MODULES([HS],[libhs])
-          LDFLAGS="$LDFLAGS $HS_LIBS"
-	  AC_MSG_RESULT([compiling with Intel Hyperscan])
-     ],[
-          AC_MSG_RESULT([Intel Hyperscan not found, exiting. See https://github.com/intel/hyperscan/blob/master/doc/dev-reference/getting_started.rst for install/build instructions])
-          exit 1
-     ])
-])
-
 case "$host" in
    *-*-mingw32*|*-*-msys)
       CFLAGS="${CFLAGS} -DOS_WIN32"

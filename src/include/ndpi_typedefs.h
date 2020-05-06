@@ -976,21 +976,6 @@ typedef struct ndpi_proto {
 /* Needed to have access to HAVE_* defines */
 #include "ndpi_config.h"
 
-#ifdef HAVE_HYPERSCAN
-#include <hs/hs.h>
-
-struct hs_list {
-  char *expression;
-  unsigned int id;
-  struct hs_list *next;
-};
-
-struct hs {
-  hs_database_t *database;
-  hs_scratch_t  *scratch;
-};
-#endif
-
 #ifdef HAVE_PCRE
 #include <pcre.h>
 
@@ -1059,13 +1044,7 @@ struct ndpi_detection_module_struct {
   /* IMPORTANT: please update ndpi_finalize_initalization() whenever you add a new automa */
   
   struct {
-#ifdef HAVE_HYPERSCAN
-    struct hs *hostnames;
-    unsigned int num_to_load;
-    struct hs_list *to_load;
-#else
     ndpi_automa hostnames, hostnames_shadow;
-#endif
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
     u_int8_t categories_loaded;
   } custom_categories;
@@ -1373,14 +1352,14 @@ struct ndpi_flow_struct {
 };
 
 typedef struct {
-  char *string_to_match, *string2_to_match, *pattern_to_match, *proto_name;
+  char *string_to_match, *proto_name;
   int protocol_id;
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match;
 
 typedef struct {
-  char *string_to_match, *hyperscan_string_to_match;
+  char *string_to_match;
   ndpi_protocol_category_t protocol_category;
 } ndpi_category_match;
 
