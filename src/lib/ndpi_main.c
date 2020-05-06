@@ -2195,7 +2195,9 @@ void *ndpi_init_automa(void) {
   return(ac_automata_init(ac_match_handler));
 }
 
-int ndpi_add_string_value_to_automa(void *_automa, char *str, unsigned long num) {
+/* ****************************************************** */
+
+int ndpi_add_string_value_to_automa(void *_automa, char *str, u_int32_t num) {
   AC_PATTERN_t ac_pattern;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
   AC_ERROR_t rc;
@@ -2204,21 +2206,28 @@ int ndpi_add_string_value_to_automa(void *_automa, char *str, unsigned long num)
     return(-1);
 
   memset(&ac_pattern, 0, sizeof(ac_pattern));
-  ac_pattern.astring = str;
+  ac_pattern.astring    = str;
   ac_pattern.rep.number = num;
-  ac_pattern.length = strlen(ac_pattern.astring);
+  ac_pattern.length     = strlen(ac_pattern.astring);
 
   rc = ac_automata_add(automa, &ac_pattern);
   return(rc == ACERR_SUCCESS || rc == ACERR_DUPLICATE_PATTERN ? 0 : -1);
 }
 
+/* ****************************************************** */
+
 int ndpi_add_string_to_automa(void *_automa, char *str) {
   return(ndpi_add_string_value_to_automa(_automa, str, 1));
 }
 
+/* ****************************************************** */
+
 void ndpi_free_automa(void *_automa) {
   ac_automata_release((AC_AUTOMATA_t *) _automa, 0);
 }
+
+/* ****************************************************** */
+
 void ndpi_finalize_automa(void *_automa) {
   ac_automata_finalize((AC_AUTOMATA_t *) _automa);
 }
@@ -2226,7 +2235,7 @@ void ndpi_finalize_automa(void *_automa) {
 /* ****************************************************** */
 
 int ndpi_match_string(void *_automa, char *string_to_match) {
-  AC_REP_t match = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED};
+  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
   int rc;
@@ -2250,10 +2259,10 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
 
 /* ****************************************************** */
 
-int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, u_int16_t *id) {
+int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, u_int32_t *id) {
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
-  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
+  AC_REP_t match = { 0, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   int rc;
 
   *id = -1;
@@ -2273,7 +2282,7 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, 
 
   *id = rc ? match.number : NDPI_PROTOCOL_UNKNOWN;
 
-  return(*id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
+  return((*id != 0 /* NDPI_PROTOCOL_UNKNOWN */) ? 0 : -1);
 }
 
 /* *********************************************** */
@@ -2282,7 +2291,7 @@ int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, 
 
 static int hyperscanCustomEventHandler(unsigned int id, unsigned long long from, unsigned long long to,
                                        unsigned int flags, void *ctx) {
-  *((unsigned long *) ctx) = (unsigned long) id;
+  *((uonsigned long *) ctx) = (unsigned long) id;
 
 #ifdef DEBUG
   printf("[HS] Found category %u\n", id);
@@ -2296,14 +2305,14 @@ static int hyperscanCustomEventHandler(unsigned int id, unsigned long long from,
 
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 			       char *name, u_int name_len,
-                               u_int16_t *id) {
+                               u_int32_t *id) {
 #ifdef HAVE_HYPERSCAN
   if(ndpi_str->custom_categories.hostnames == NULL)
     return(-1);
   else {
     hs_error_t rc;
 
-    *id = (unsigned long) -1;
+    *id = (u_int32_t) -1;
 
     rc = hs_scan(ndpi_str->custom_categories.hostnames->database, name, name_len, 0,
 		 ndpi_str->custom_categories.hostnames->scratch, hyperscanCustomEventHandler, id);
@@ -2318,14 +2327,14 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
   }
 #else
   return(ndpi_match_string_id(ndpi_str->custom_categories.hostnames.ac_automa,
-			       name, name_len, id));
+			      name, name_len, id));
 #endif
 }
 
 /* *********************************************** */
 
 int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str,
-				   char *name_or_ip, u_int name_len, u_int16_t *id) {
+				   char *name_or_ip, u_int name_len, u_int32_t *id) {
   char ipbuf[64], *ptr;
   struct in_addr pin;
   u_int cp_len = ndpi_min(sizeof(ipbuf) - 1, name_len);
@@ -4502,7 +4511,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
     }
 
     if(flow->host_server_name[0] != '\0') {
-      u_int16_t id;
+      u_int32_t id;
       int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->host_server_name,
 					  strlen((char *) flow->host_server_name), &id);
 
@@ -4514,7 +4523,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
 
     if(flow->l4.tcp.tls.hello_processed == 1 &&
        flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
-      u_int16_t id;
+      u_int32_t id;
       int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.stun_ssl.ssl.client_requested_server_name,
 					  strlen(flow->protos.stun_ssl.ssl.client_requested_server_name), &id);
 
@@ -6134,7 +6143,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
                                       ndpi_protocol_match_result *ret_match, u_int16_t master_protocol_id) {
   u_int16_t rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
 						      master_protocol_id, ret_match, 1);
-  u_int16_t id = ret_match->protocol_category;
+  u_int32_t id = ret_match->protocol_category;
 
   if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
     /* if(id != -1) */ {
