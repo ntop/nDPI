@@ -1733,7 +1733,28 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
   fill_prefix_v4(&prefix, pin, 32, ((patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->protocols_ptree, &prefix);
 
-  return(node ? node->value.user_value : NDPI_PROTOCOL_UNKNOWN);
+  return(node ? node->value.uv.user_value : NDPI_PROTOCOL_UNKNOWN);
+}
+
+/* ******************************************* */
+
+u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
+					struct in_addr *pin /* network byte order */,
+					u_int16_t port /* network byte order */) {
+  prefix_t prefix;
+  patricia_node_t *node;
+
+  /* Make sure all in network byte order otherwise compares wont work */
+  fill_prefix_v4(&prefix, pin, 32, ((patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->protocols_ptree, &prefix);
+
+  if(node) {
+    if((node->value.uv.additional_user_value == 0)
+       || (node->value.uv.additional_user_value == port))
+      return(node->value.uv.user_value);
+  }
+    
+  return(NDPI_PROTOCOL_UNKNOWN);
 }
 
 /* ******************************************* */
@@ -1816,7 +1837,7 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 
       pin.s_addr = inet_addr(addr);
       if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL) {
-	node->value.user_value = protocol_id; // node->value.additional_user_value = 0 /* port */;
+	node->value.uv.user_value = protocol_id, node->value.uv.additional_user_value = 0 /* port */;
 	num_loaded++;
       }
     }
@@ -1842,7 +1863,7 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 
     pin.s_addr = htonl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL) {
-      node->value.user_value = host_list[i].value; // node->value.additional_user_value = 0;
+      node->value.uv.user_value = host_list[i].value, node->value.uv.additional_user_value = 0;
     }
   }
 }
@@ -1885,7 +1906,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   inet_pton(AF_INET, value, &pin);
 
   if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
-    node->value.user_value = protocol_id; // node->value.additional_user_value = port;
+    node->value.uv.user_value = protocol_id, node->value.uv.additional_user_value = htons(port);
   }
 
   return(0);
@@ -2333,7 +2354,7 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
 
     if(node) {
-      *id = node->value.user_value;
+      *id = node->value.uv.user_value;
 
       return(0);
     }
@@ -4035,15 +4056,23 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
   if(flow->packet.iph) {
     struct in_addr addr;
-
+    u_int16_t sport, dport;
+    
     addr.s_addr = flow->packet.iph->saddr;
-
+    
+    if((flow->l4_proto == IPPROTO_TCP) && flow->packet.tcp)
+      sport = flow->packet.tcp->source, dport = flow->packet.tcp->dest;
+    else if((flow->l4_proto == IPPROTO_UDP) && flow->packet.udp)
+      sport = flow->packet.udp->source, dport = flow->packet.udp->dest;
+    else
+      sport = dport = 0;
+    
     /* guess host protocol */
-    ret = ndpi_network_ptree_match(ndpi_str, &addr);
+    ret = ndpi_network_port_ptree_match(ndpi_str, &addr, sport);
 
     if(ret == NDPI_PROTOCOL_UNKNOWN) {
       addr.s_addr = flow->packet.iph->daddr;
-      ret = ndpi_network_ptree_match(ndpi_str, &addr);
+      ret = ndpi_network_port_ptree_match(ndpi_str, &addr, dport);
     }
   }
 
@@ -4246,7 +4275,7 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str, const c
   }
 
   if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow, AF_INET, &pin, bits)) != NULL) {
-    node->value.user_value = (u_int16_t)category; // node->value.additional_user_value = 0;
+    node->value.uv.user_value = (u_int16_t)category, node->value.uv.additional_user_value = 0;
   }
 
   return(0);
@@ -4451,7 +4480,7 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
     }
 
     if(node) {
-      ret->category = (ndpi_protocol_category_t) node->value.user_value;
+      ret->category = (ndpi_protocol_category_t) node->value.uv.user_value;
 
       return(1);
     }
@@ -4660,15 +4689,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     } else {
       /* guess host protocol */
       if(flow->packet.iph) {
-	struct in_addr addr;
 
-	addr.s_addr = flow->packet.iph->saddr;
-	flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_str, &addr);
-
-	if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) {
-	  addr.s_addr = flow->packet.iph->daddr;
-	  flow->guessed_host_protocol_id = ndpi_network_ptree_match(ndpi_str, &addr);
-	}
+	flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
 
 	/*
 	  We could implement a shortcut here skipping dissectors for
@@ -6513,7 +6535,7 @@ int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr,
   node = ndpi_patricia_lookup(ptree, &prefix);
 
   if(node != NULL) {
-    node->value.user_value = user_data; // node->value.additional_user_value = 0;
+    node->value.uv.user_value = user_data, node->value.uv.additional_user_value = 0;
 
     return(0);
   }
@@ -6539,7 +6561,7 @@ int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
   node = ndpi_patricia_search_best(ptree, &prefix);
 
   if(node) {
-    *user_data = node->value.user_value;
+    *user_data = node->value.uv.user_value;
 
     return(0);
   }

@@ -146,6 +146,21 @@ extern "C" {
 				     struct in_addr *pin);
 
   /**
+   * Returns the nDPI protocol id for IP+port-based protocol detection
+   *
+   * @par    ndpi_struct  = the struct created for the protocol detection
+   * @par    pin          = IP host address (MUST BE in network byte order):
+   *                        See man(7) ip for details
+   * @par    port         = The port (MUST BE in network byte order) or
+   *                        0 if ignored
+   * @return the nDPI protocol ID
+   *
+   */
+  u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndpi_struct,
+					  struct in_addr *pin /* network byte order */,
+					  u_int16_t port /* network byte order */);
+
+  /**
    * Init single protocol match
    *
    * @par ndpi_mod  = the struct created for the protocol detection

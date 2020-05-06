@@ -513,8 +513,7 @@ ndpi_patricia_search_best2 (patricia_tree_t *patricia, prefix_t *prefix, int inc
 		 node->bit);
 #endif /* PATRICIA_DEBUG */
       node = node->r;
-    }
-    else {
+    } else {
 #ifdef PATRICIA_DEBUG
       if(node->prefix)
 	fprintf (stderr, "patricia_search_best: take left %s/%d\n", 

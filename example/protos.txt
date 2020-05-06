@@ -17,6 +17,25 @@ host:"api-global.netflix.com"@Netflix
 #  Format:
 #  ip:<value>,ip:<value>,.....@<subproto>
 
+#
+# NOTES
+# 1) the port of a custom protocol is optional but if
+#    specified it must match the port.
+# 2) you can specify up to 1 port per IP address
+# 3) if you specify a custom ip:<IP>:<PORT> rule,
+#    even if the <PORT> doesn't match the <IP>
+#    (if best match during the search) will
+#    have priority as best match. Example if
+#    you specify a <Google IP>:<port 9999> and
+#    in your traffic have match for such IP but
+#    with a port other than 9999, the IP address
+#    begin a best match will hve preference over
+#    <Google IP> so this protocol will not be
+#    detected as <L7 proto>.Google but only
+#    as <L7 proto>
+#
+
 ip:213.75.170.11/32:443@CustomProtocol
 ip:8.248.73.247:443@AmazonPrime
 ip:54.80.47.130@AmazonPrime
+

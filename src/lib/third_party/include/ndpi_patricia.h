@@ -104,7 +104,9 @@ union patricia_node_value_t {
   void *user_data;
 
   /* User-defined values */
-  u_int32_t user_value;
+  struct {
+    u_int16_t user_value, additional_user_value;
+  } uv;
 };
 
 typedef struct _patricia_node_t {
