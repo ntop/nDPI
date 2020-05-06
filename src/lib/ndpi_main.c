@@ -1694,16 +1694,14 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 /* ******************************************************************** */
 
 static int fill_prefix_v4(prefix_t *p, const struct in_addr *a, int b, int mb) {
-  do {
-    if(b < 0 || b > mb)
-      return(-1);
+  if(b < 0 || b > mb)
+    return(-1);
 
-    memset(p, 0, sizeof(prefix_t));
-    memcpy(&p->add.sin, a, (mb + 7) / 8);
-    p->family = AF_INET;
-    p->bitlen = b;
-    p->ref_count = 0;
-  } while (0);
+  memset(p, 0, sizeof(prefix_t));
+  memcpy(&p->add.sin, a, (mb + 7) / 8);
+  p->family = AF_INET;
+  p->bitlen = b;
+  p->ref_count = 0;
 
   return(0);
 }
@@ -1770,6 +1768,7 @@ static patricia_node_t *add_to_ptree(patricia_tree_t *tree, int family, void *ad
   fill_prefix_v4(&prefix, (struct in_addr *) addr, bits, tree->maxbits);
 
   node = ndpi_patricia_lookup(tree, &prefix);
+  if(node) memset(&node->value, 0, sizeof(node->value));
 
   return(node);
 }
@@ -1858,7 +1857,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   char *ptr = strrchr(value, '/');
   u_int16_t port = 0; /* Format ip:8.248.73.247:443 */
   char *double_column;
-  
+
   if(ptr) {
     ptr[0] = '\0';
     ptr++;
@@ -1867,7 +1866,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
       double_column[0] = '\0';
       port = atoi(&double_column[1]);
     }
-    
+
     if(atoi(ptr) >= 0 && atoi(ptr) <= 32)
       bits = atoi(ptr);
   } else {
@@ -1877,16 +1876,18 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
     */
     double_column = strrchr(value, ':');
 
-    if(double_column)
-      port = atoi(&double_column[1]);    
+    if(double_column) {
+      double_column[0] = '\0';
+      port = atoi(&double_column[1]);
+    }
   }
-  
+
   inet_pton(AF_INET, value, &pin);
-  
+
   if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
     node->value.user_value = protocol_id; // node->value.additional_user_value = port;
   }
-  
+
   return(0);
 }
 
@@ -2231,7 +2232,7 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
 int ndpi_match_string_id(void *_automa, char *string_to_match, u_int match_len, u_int16_t *id) {
   AC_TEXT_t ac_input_text;
   AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
-  AC_REP_t match = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED};
+  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   int rc;
 
   *id = -1;
@@ -2333,7 +2334,7 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
 
     if(node) {
       *id = node->value.user_value;
-      
+
       return(0);
     }
 
@@ -4247,10 +4248,10 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str, const c
   if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow, AF_INET, &pin, bits)) != NULL) {
     node->value.user_value = (u_int16_t)category; // node->value.additional_user_value = 0;
   }
-  
+
   return(0);
 }
- 
+
 
 /* ********************************************************************************* */
 
@@ -4451,7 +4452,7 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
 
     if(node) {
       ret->category = (ndpi_protocol_category_t) node->value.user_value;
-      
+
       return(1);
     }
   }
@@ -4487,7 +4488,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
       u_int16_t id;
       int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.stun_ssl.ssl.client_requested_server_name,
 					  strlen(flow->protos.stun_ssl.ssl.client_requested_server_name), &id);
-      
+
       if(rc == 0) {
 	flow->category = ret->category = (ndpi_protocol_category_t) id;
 	return;
@@ -6255,7 +6256,7 @@ int gettimeofday(struct timeval *tp, struct timezone *tzp) {
 }
 #endif
 
-int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b) { 
+int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b) {
   int i;
 
   for (i = 0; i < NDPI_NUM_FDS_BITS; i++) {
@@ -6279,7 +6280,7 @@ int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a) {
 
 void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
   int i;
-  
+
   for (i = 0; i < NDPI_NUM_FDS_BITS; i++)
     printf("[%d=%u]", i, a.fds_bits[i]);
 
@@ -6513,7 +6514,7 @@ int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr,
 
   if(node != NULL) {
     node->value.user_value = user_data; // node->value.additional_user_value = 0;
-    
+
     return(0);
   }
 
@@ -6539,7 +6540,7 @@ int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
 
   if(node) {
     *user_data = node->value.user_value;
-    
+
     return(0);
   }
 
