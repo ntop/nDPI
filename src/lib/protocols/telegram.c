@@ -1,8 +1,8 @@
 /*
  * telegram.c
  *
- * Copyright (C) 2014 by Gianluca Costa xplico.org
  * Copyright (C) 2012-20 - ntop.org
+ * Copyright (C) 2014 by Gianluca Costa xplico.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -30,37 +30,75 @@
 #include "ndpi_api.h"
 
 static void ndpi_int_telegram_add_connection(struct ndpi_detection_module_struct
-                                             *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+                                             *ndpi_struct, struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_UNKNOWN);
   NDPI_LOG_INFO(ndpi_struct, "found telegram\n");
 }
 
+static u_int8_t is_telegram_port_range(u_int16_t port) {
+  if((port >= 500) && (port <= 600))
+    return(1);
 
-void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+
+  return(0);
+}
+
+void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struct,
+			  struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int16_t dport /* , sport */;
-  
+
   NDPI_LOG_DBG(ndpi_struct, "search telegram\n");
 
-  if (packet->payload_packet_len == 0)
+  if(packet->payload_packet_len == 0)
     return;
-  if (packet->tcp != NULL) {
-    if (packet->payload_packet_len > 56) {
-      dport = ntohs(packet->tcp->dest);
-      /* sport = ntohs(packet->tcp->source); */
 
-      if (packet->payload[0] == 0xef && (
-          dport == 443 || dport == 80 || dport == 25
-        )) {
-        if (packet->payload[1] == 0x7f) {
+  if(packet->tcp != NULL) {
+    if(packet->payload_packet_len > 56) {
+      u_int16_t dport = ntohs(packet->tcp->dest);
+      /* u_int16_t sport = ntohs(packet->tcp->source); */
+
+      if(packet->payload[0] == 0xef && (dport == 443 || dport == 80 || dport == 25)) {
+        if(packet->payload[1] == 0x7f) {
           ndpi_int_telegram_add_connection(ndpi_struct, flow);
-        }
-        else if (packet->payload[1]*4 <= packet->payload_packet_len - 1) {
+        } else if(packet->payload[1]*4 <= packet->payload_packet_len - 1) {
           ndpi_int_telegram_add_connection(ndpi_struct, flow);
         }
         return;
+      }
+    }
+  } else if(packet->udp != NULL) {
+    /*
+      The latest telegram protocol
+      - contains a sequence of 12 consecutive 0xFF packets
+      - it uses low UDP ports in the 500 ramge
+     */
+
+    if(packet->payload_packet_len >= 40) {
+      u_int16_t sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
+
+      if(is_telegram_port_range(sport) || is_telegram_port_range(dport)) {
+	u_int i=0, found = 0;
+
+	for(i=0; i<packet->payload_packet_len; i++) {
+	  if(packet->payload[i] == 0xFF) {
+	    found = 1;
+	    break;
+	  }
+	}
+
+	if(!found) return;
+
+	for(i += 1; i<packet->payload_packet_len; i++) {
+	  if(packet->payload[i] == 0xFF)
+	    found++;
+	  else
+	    break;
+	}
+
+	if(found == 12)	{
+	  ndpi_int_telegram_add_connection(ndpi_struct, flow);
+	  return;
+	}
       }
     }
   }
@@ -80,4 +118,3 @@ void init_telegram_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 
   *id += 1;
 }
-
