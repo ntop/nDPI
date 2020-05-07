@@ -1,3 +1,4 @@
+p
 plibrary_includedir=$(includedir)/libndpi-@VERSION@/libndpi
 
 library_include_HEADERS = ndpi_api.h \

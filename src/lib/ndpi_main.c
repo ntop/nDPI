@@ -5976,6 +5976,12 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       if(flow->protos.stun_ssl.ssl.tls_supported_versions)
 	ndpi_free(flow->protos.stun_ssl.ssl.tls_supported_versions);
 
+      if(flow->protos.stun_ssl.ssl.issuerDN)
+	ndpi_free(flow->protos.stun_ssl.ssl.issuerDN);
+
+      if(flow->protos.stun_ssl.ssl.subjectDN)
+	ndpi_free(flow->protos.stun_ssl.ssl.subjectDN);
+
       if(flow->l4.tcp.tls.srv_cert_fingerprint_ctx)
 	ndpi_free(flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
     }

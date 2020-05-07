@@ -1099,7 +1099,6 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 				     flow->protos.stun_ssl.ssl.client_requested_server_name);
 	if(flow->protos.stun_ssl.ssl.server_names)
 	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.stun_ssl.ssl.server_names);
-	ndpi_serialize_string_string(serializer, "issuer", flow->protos.stun_ssl.ssl.server_organization);
 
 	if(before) {
           strftime(notBefore, sizeof(notBefore), "%F %T", before);
@@ -1115,6 +1114,18 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.stun_ssl.ssl.server_unsafe_cipher);
 	ndpi_serialize_string_string(serializer, "cipher", ndpi_cipher2str(flow->protos.stun_ssl.ssl.server_cipher));
 
+	if(flow->protos.stun_ssl.ssl.issuerDN)
+	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.stun_ssl.ssl.issuerDN);
+	
+	if(flow->protos.stun_ssl.ssl.subjectDN)
+	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.stun_ssl.ssl.subjectDN);
+
+	if(flow->protos.stun_ssl.ssl.alpn)
+	  ndpi_serialize_string_string(serializer, "alpn", flow->protos.stun_ssl.ssl.alpn);
+	
+	if(flow->protos.stun_ssl.ssl.tls_supported_versions)
+	  ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.stun_ssl.ssl.tls_supported_versions);	
+	
 	if(flow->l4.tcp.tls.sha1_certificate_fingerprint[0] != '\0') {
 	  for(i=0, off=0; i<20; i++) {
 	    int rc = snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",

@@ -608,6 +608,7 @@ void printCSVHeader() {
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "tls_alpn,tls_supported_versions,");
+  fprintf(csv_fp, "tls_issuerDN,tls_subjectDN,");  
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info");
   
   /* Joy */
@@ -1106,6 +1107,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    flow->ssh_tls.tls_alpn                  ? flow->ssh_tls.tls_alpn : "",
 	    flow->ssh_tls.tls_supported_versions    ? flow->ssh_tls.tls_supported_versions : "" 
 	    );
+    fprintf(csv_fp, "%s,%s,",
+	    flow->ssh_tls.tls_issuerDN              ? flow->ssh_tls.tls_issuerDN : "",
+	    flow->ssh_tls.tls_subjectDN             ? flow->ssh_tls.tls_subjectDN : "" 
+	    );
     fprintf(csv_fp, "%s,%s",
 	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "",
 	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : ""
@@ -1234,7 +1239,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(flow->ssh_tls.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s%s]", flow->ssh_tls.ja3_server,
 						  print_cipher(flow->ssh_tls.server_unsafe_cipher));
-  if(flow->ssh_tls.server_organization[0] != '\0') fprintf(out, "[Organization: %s]", flow->ssh_tls.server_organization);
+
+  if(flow->ssh_tls.tls_issuerDN)  fprintf(out, "[Issuer: %s]", flow->ssh_tls.tls_issuerDN);
+  if(flow->ssh_tls.tls_subjectDN) fprintf(out, "[Subject: %s]", flow->ssh_tls.tls_subjectDN);
 
   if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
      || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)) {

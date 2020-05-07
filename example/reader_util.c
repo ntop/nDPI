@@ -479,6 +479,16 @@ void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     ndpi_free(flow->ssh_tls.tls_supported_versions);
     flow->ssh_tls.tls_supported_versions = NULL;
   }
+
+  if(flow->ssh_tls.tls_issuerDN) {
+    ndpi_free(flow->ssh_tls.tls_issuerDN);
+    flow->ssh_tls.tls_issuerDN = NULL;
+  }
+
+  if(flow->ssh_tls.tls_subjectDN) {
+    ndpi_free(flow->ssh_tls.tls_subjectDN);
+    flow->ssh_tls.tls_subjectDN = NULL;
+  }
 }
 
 /* ***************************************************** */
@@ -1084,8 +1094,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->protos.stun_ssl.ssl.server_names_len > 0)
       flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.server_names);
-    snprintf(flow->ssh_tls.server_organization, sizeof(flow->ssh_tls.server_organization), "%s",
-	     flow->ndpi_flow->protos.stun_ssl.ssl.server_organization);
     flow->ssh_tls.notBefore = flow->ndpi_flow->protos.stun_ssl.ssl.notBefore;
     flow->ssh_tls.notAfter = flow->ndpi_flow->protos.stun_ssl.ssl.notAfter;
     snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
@@ -1106,6 +1114,12 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
         correct_csv_data_field(flow->ssh_tls.tls_alpn);
     }
 
+    if(flow->ndpi_flow->protos.stun_ssl.ssl.issuerDN)
+      flow->ssh_tls.tls_issuerDN = strdup(flow->ndpi_flow->protos.stun_ssl.ssl.issuerDN);
+    
+    if(flow->ndpi_flow->protos.stun_ssl.ssl.subjectDN)
+      flow->ssh_tls.tls_subjectDN = strdup(flow->ndpi_flow->protos.stun_ssl.ssl.subjectDN);
+    
     if(flow->ssh_tls.tls_supported_versions) {
       if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)) != NULL)
 	correct_csv_data_field(flow->ssh_tls.tls_supported_versions);
