@@ -181,12 +181,47 @@ static void cleanupServerName(char *buffer, int buffer_len) {
 
 /* **************************************** */
 
+/*
+  Return code
+  -1: error (buffer too short)
+   0: OK but buffer is not human readeable (so something went wrong)
+   1: OK
+ */
+static int extractRDNSequence(struct ndpi_packet_struct *packet,
+			      u_int offset, char *buffer, u_int buffer_len) {
+  u_int8_t str_len = packet->payload[offset+4], is_printable = 1;
+  char *str;
+  u_int len, j;
+  
+  // packet is truncated... further inspection is not needed
+  if((offset+4+str_len) >= packet->payload_packet_len)
+    return(-1);
+
+  str = (char*)&packet->payload[offset+5];
+  
+  len = (u_int)ndpi_min(str_len, buffer_len-1);
+  strncpy(buffer, str, len);
+  buffer[len] = '\0';
+
+  // check string is printable
+  for(j = 0; j < len; j++) {
+    if(!ndpi_isprint(buffer[j])) {
+      is_printable = 0;
+      break;
+    }
+  }
+
+  return(is_printable);
+}
+
+/* **************************************** */
+
 /* See https://blog.catchpoint.com/2017/05/12/dissecting-tls-using-wireshark/ */
 static void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow,
 				       u_int16_t p_offset, u_int16_t certificate_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int num_found = 0, i, j;
+  u_int num_found = 0, i;
   char buffer[64] = { '\0' };
 
 #ifdef DEBUG_TLS
@@ -197,33 +232,15 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
   for(i = p_offset; i < certificate_len; i++) {
     /* Organization OID: 2.5.4.10 */
     if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x0a)) {
-      u_int8_t server_len = packet->payload[i+4];
+      int rc = extractRDNSequence(packet, i, buffer, sizeof(buffer));
+
+      if(rc == -1) break;
 
       num_found++;
       /* what we want is subject certificate, so we bypass the issuer certificate */
       if(num_found != 2) continue;
 
-      // packet is truncated... further inspection is not needed
-      if(i+4+server_len >= packet->payload_packet_len) {
-	break;
-      }
-
-      char *server_org = (char*)&packet->payload[i+5];
-
-      u_int len = (u_int)ndpi_min(server_len, sizeof(buffer)-1);
-      strncpy(buffer, server_org, len);
-      buffer[len] = '\0';
-
-      // check if organization string are all printable
-      u_int8_t is_printable = 1;
-      for(j = 0; j < len; j++) {
-	if(!ndpi_isprint(buffer[j])) {
-	  is_printable = 0;
-	  break;
-	}
-      }
-
-      if(is_printable == 1) {
+      if(rc == 1) {
 	snprintf(flow->protos.stun_ssl.ssl.server_organization,
 		 sizeof(flow->protos.stun_ssl.ssl.server_organization), "%s", buffer);
 #ifdef DEBUG_TLS
