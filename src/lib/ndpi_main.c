@@ -2305,6 +2305,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->custom_categories.ipAddresses_shadow != NULL)
       ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->custom_categories.ipAddresses_shadow, free_ptree_data);
 
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/ndpi_exit_detection_module.c"
+#endif
+    
     ndpi_free(ndpi_str);
   }
 }

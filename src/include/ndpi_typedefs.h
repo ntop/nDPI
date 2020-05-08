@@ -1099,7 +1099,9 @@ struct ndpi_detection_module_struct {
   u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */
     _pad:7;
 
-  void *hyperscan; /* Intel Hyperscan */
+#ifdef CUSTOM_NDPI_PROTOCOLS
+  #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
+#endif
 };
 
 #endif /* NDPI_LIB_COMPILATION */
