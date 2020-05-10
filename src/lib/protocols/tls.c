@@ -839,7 +839,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
     tls_version = ntohs(*((u_int16_t*)&packet->payload[version_offset]));
     flow->protos.stun_ssl.ssl.ssl_version = ja3.tls_handshake_version = tls_version;
-
+    if(flow->protos.stun_ssl.ssl.ssl_version < 0x0302) /* TLSv1.1 */
+      NDPI_SET_BIT_16(flow->risk, NDPI_TLS_OBSOLETE_VERSION);
+    
     if(handshake_type == 0x02 /* Server Hello */) {
       int i, rc;
 
@@ -862,7 +864,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	return(0); /* Not found */
 
       ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
-      flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0]);
+      if((flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0])) == 1)
+	NDPI_SET_BIT_16(flow->risk, NDPI_TLS_WEAK_CIPHER);
+      
       flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
 
 #ifdef DEBUG_TLS
