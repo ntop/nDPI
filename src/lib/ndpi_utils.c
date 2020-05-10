@@ -1410,14 +1410,22 @@ const char* ndpi_risk2str(ndpi_risk risk) {
   switch(risk) {
   case NDPI_URL_POSSIBLE_XSS:
     return("XSS attack");
+
   case NDPI_URL_POSSIBLE_SQL_INJECTION:
     return("SQL injection");
+
   case NDPI_URL_POSSIBLE_RCE_INJECTION:
     return("RCE injection");
+
   case NDPI_BINARY_APPLICATION_TRANSFER:
     return("Binary application transfer");
+
   case NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT:
     return("Known protocol on non standard port");
+
+  case NDPI_TLS_SELFSIGNED_CERTIFICATE:
+    return("Self-signed Certificate");
+    
   default:  
     return("");
   }

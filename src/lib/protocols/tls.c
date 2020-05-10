@@ -450,6 +450,11 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
   }
 
   if(rdn_len) flow->protos.stun_ssl.ssl.subjectDN = strdup(rdnSeqBuf);
+
+  if(flow->protos.stun_ssl.ssl.subjectDN && flow->protos.stun_ssl.ssl.subjectDN
+     && (!strcmp(flow->protos.stun_ssl.ssl.subjectDN, flow->protos.stun_ssl.ssl.issuerDN)))
+    NDPI_SET_BIT_16(flow->risk, NDPI_TLS_SELFSIGNED_CERTIFICATE);
+      
 #if DEBUG_TLS
   printf("[TLS] %s() SubjectDN [%s]\n", __FUNCTION__, rdnSeqBuf);
 #endif
