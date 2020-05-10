@@ -193,7 +193,8 @@ typedef struct ndpi_flow_info {
   char host_server_name[240];
   char bittorent_hash[41];
   char dhcp_fingerprint[48];
-
+  ndpi_risk risk;
+  
   struct {
     u_int16_t ssl_version;
     char client_requested_server_name[64], server_info[64],

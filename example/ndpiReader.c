@@ -975,26 +975,6 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
-char* printUrlRisk(ndpi_url_risk risk) {
-  switch(risk) {
-    case ndpi_url_no_problem:
-      return("");
-      break;
-    case ndpi_url_possible_xss:
-      return(" ** XSS **");
-      break;
-    case ndpi_url_possible_sql_injection:
-      return(" ** SQL Injection **");
-      break;
-    case ndpi_url_possible_rce_injection:
-      return(" ** RCE Injection **");
-      break;
-  }
-
-  return("");
-}
-/* ********************************** */
-
 /**
  * @brief Print the flow
  */
@@ -1218,13 +1198,34 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     }
   }
 
-  if(flow->http.url[0] != '\0')
-    fprintf(out, "[URL: %s%s][StatusCode: %u][ContentType: %s][UserAgent: %s]",
-	    flow->http.url,
-	    printUrlRisk(ndpi_validate_url(flow->http.url)),
-	    flow->http.response_status_code,
-	    flow->http.content_type, flow->http.user_agent);
+  if(flow->http.url[0] != '\0') {
+    u_int16_t risk = ndpi_validate_url(flow->http.url);
 
+    if(risk != NDPI_NO_RISK)
+      flow->risk |= risk;
+    
+    fprintf(out, "[URL: %s[StatusCode: %u]",
+	    flow->http.url, flow->http.response_status_code);
+
+    if(flow->http.content_type[0] != '\0')
+      fprintf(out, "[ContentType: %s]", flow->http.content_type);
+
+    if(flow->http.user_agent[0] != '\0')
+      fprintf(out, "[UserAgent: %s]", flow->http.user_agent);
+  }
+
+  if(flow->risk) {
+    u_int i;
+    
+    fprintf(out, "[Risk: ");
+
+    for(i=0; i<NDPI_MAX_RISK; i++)
+      if(NDPI_ISSET_BIT_16(flow->risk, i))
+	fprintf(out, "** %s **", ndpi_risk2str(i));
+    
+    fprintf(out, "]");
+  }
+  
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
   if(flow->ssh_tls.client_requested_server_name[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_requested_server_name);
   if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
@@ -3042,6 +3043,25 @@ void test_lib() {
 
 /* *********************************************** */
 
+static void bitmapUnitTest() {
+  u_int16_t val, i, j;
+
+  for(i=0; i<16; i++) {
+    NDPI_ZERO_16(val);
+    NDPI_SET_BIT_16(val, i);
+    
+    assert(NDPI_ISSET_BIT_16(val, i));
+    
+    for(j=0; j<16; j++) {
+      if(j != i) {
+	assert(!NDPI_ISSET_BIT_16(val, j));
+      }
+    }
+  }
+}
+
+/* *********************************************** */
+
 void automataUnitTest() {
   void *automa = ndpi_init_automa();
 
@@ -3258,6 +3278,7 @@ int orginal_main(int argc, char **argv) {
     }
 
     /* Internal checks */
+    bitmapUnitTest();
     automataUnitTest();
     serializerUnitTest();
     analyzeUnitTest();

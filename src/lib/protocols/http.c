@@ -33,6 +33,25 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 
 /* *********************************************** */
 
+static void ndpi_analyze_content_signature(struct ndpi_flow_struct *flow) { 
+  if((flow->initial_binary_bytes_len >= 2) && (flow->initial_binary_bytes[0] == 0x4D) && (flow->initial_binary_bytes[1] == 0x5A))
+    NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Win executable */
+  else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0x7F) && (flow->initial_binary_bytes[1] == 'E')
+	  && (flow->initial_binary_bytes[2] == 'L') && (flow->initial_binary_bytes[3] == 'F'))
+    NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
+  else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0xCF) && (flow->initial_binary_bytes[1] == 0xFA)
+	  && (flow->initial_binary_bytes[2] == 0xED) && (flow->initial_binary_bytes[3] == 0xFE))
+    NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
+  else if(flow->initial_binary_bytes_len >= 8) {
+    u_int8_t exec_pattern[] = { 0x64, 0x65, 0x78, 0x0A, 0x30, 0x33, 0x35, 0x00 };
+    
+    if(memcmp(flow->initial_binary_bytes, exec_pattern, 8) == 0)
+      NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Dalvik Executable (Android) */
+  }
+}
+
+/* *********************************************** */
+
 static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow) {
   ndpi_search_http_tcp(ndpi_struct, flow);
@@ -41,8 +60,12 @@ static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_
   printf("=> %s()\n", __FUNCTION__);
 #endif
 
-  if((flow->host_server_name[0] != '\0') && (flow->http.response_status_code != 0)) {
+  if((flow->host_server_name[0] != '\0')
+     && (flow->http.response_status_code != 0)
+     ) {
     /* stop extra processing */
+    
+    if(flow->initial_binary_bytes_len) ndpi_analyze_content_signature(flow);
     flow->extra_packets_func = NULL; /* We're good now */
     return(0);
   }
@@ -612,7 +635,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 		  "Found more than one line, we look further for the next packet...\n");
 
     if(packet->line[0].len >= (9 + filename_start)
-       && memcmp(&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) == 0) { /* Request line complete. Ex. "GET / HTTP/1.1" */
+       && memcmp(&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) == 0) {
+      /* Request line complete. Ex. "GET / HTTP/1.1" */
 
       packet->http_url_name.ptr = &packet->payload[filename_start];
       packet->http_url_name.len = packet->line[0].len - (filename_start + 9);
@@ -634,50 +658,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	 && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
 	goto ookla_found;
       }
-
-#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
-      /* check PPStream protocol or iQiyi service
-	 (iqiyi is delivered by ppstream) */
-      // substring in url
-      if(ndpi_strnstr((const char*) &packet->payload[filename_start], "iqiyi.com",
-		      (packet->payload_packet_len - filename_start)) != NULL) {
-	if(flow->kxun_counter == 0) {
-	  flow->l4.tcp.ppstream_stage++;
-	  flow->iqiyi_counter++;
-	  check_content_type_and_change_protocol(ndpi_struct, flow); /* ***** CHECK ****** */
-	  return;
-	}
-      }
-
-      // additional field in http payload
-      x = 1;
-      while((packet->line[x].len >= 4) && (packet->line[x+1].len >= 5) && (packet->line[x+2].len >= 10)) {
-	if(packet->line[x].ptr && ((memcmp(packet->line[x].ptr, "qyid", 4)) == 0)
-	   && packet->line[x+1].ptr && ((memcmp(packet->line[x+1].ptr, "qypid", 5)) == 0)
-	   && packet->line[x+2].ptr && ((memcmp(packet->line[x+2].ptr, "qyplatform", 10)) == 0)
-	   ) {
-	  flow->l4.tcp.ppstream_stage++;
-	  flow->iqiyi_counter++;
-	  check_content_type_and_change_protocol(ndpi_struct, flow);
-	  return;
-	}
-	x++;
-      }
-#endif
-
-#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
-      /* Check for 1kxun packet */
-      int a;
-      for (a = 0; a < packet->parsed_lines; a++) {
-	if(packet->line[a].len >= 14 && (memcmp(packet->line[a].ptr, "Client-Source:", 14)) == 0) {
-	  if((memcmp(packet->line[a].ptr+15, "1kxun", 5)) == 0) {
-	    flow->kxun_counter++;
-	    check_content_type_and_change_protocol(ndpi_struct, flow);
-	    return;
-	  }
-	}
-      }
-#endif
 
       if((packet->http_url_name.len > 7)
 	 && (!strncmp((const char*) packet->http_url_name.ptr, "http://", 7))) {

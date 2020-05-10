@@ -339,6 +339,10 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str, ndpi
     if(tcpDefPorts[j].port_low != 0)
       addDefaultPort(ndpi_str, &tcpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->tcpRoot,
 		     __FUNCTION__, __LINE__);
+
+    /* No port range, just the lower port */
+    ndpi_str->proto_defaults[protoId].tcp_default_ports[j] = tcpDefPorts[j].port_low;
+    ndpi_str->proto_defaults[protoId].udp_default_ports[j] = udpDefPorts[j].port_low;
   }
 }
 
@@ -385,8 +389,7 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str, ndpi_p
     }
 
     node->proto = def, node->default_port = port, node->customUserProto = customUserProto;
-    ret = (ndpi_default_ports_tree_node_t *) ndpi_tsearch(
-							  node, (void *) root, ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
+    ret = (ndpi_default_ports_tree_node_t *) ndpi_tsearch(node, (void *) root, ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
 
     if(ret != node) {
       NDPI_LOG_DBG(ndpi_str, "[NDPI] %s:%d found duplicate for port %u: overwriting it with new value\n", _func,
@@ -708,7 +711,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 177, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_DANGEROUS, NDPI_PROTOCOL_SMBV1, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "SMBv1", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 445, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SYSLOG, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Syslog", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
@@ -1220,7 +1223,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_APPLE_PUSH,
 			  0 /* can_have_a_subprotocol */, no_master, no_master, "ApplePush",
-			  NDPI_PROTOCOL_CATEGORY_CLOUD, ndpi_build_default_ports(ports_a, 1, 0, 0, 0, 0) /* TCP */,
+			  NDPI_PROTOCOL_CATEGORY_CLOUD, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DROPBOX, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Dropbox", NDPI_PROTOCOL_CATEGORY_CLOUD,
@@ -3751,9 +3754,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str, str
 
 void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
                                 NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
-  if(!flow) {
-    return;
-  }
+  if(!flow)
+    return;  
 
   void *func = NULL;
   u_int32_t a;
@@ -4336,6 +4338,14 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
 
 /* ********************************************************************************* */
 
+#if 0
+static u_int16_t ndpi_checK_flow_port(, u_int16_t sport, u_int16_t dport) {
+
+}
+#endif
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_str,
                                             struct ndpi_flow_struct *flow, const unsigned char *packet,
                                             const unsigned short packetlen, const u_int64_t current_tick_l,
@@ -4569,6 +4579,48 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret.app_protocol = flow->guessed_host_protocol_id;
   }
 
+  if((!flow->risk_checked) && (ret.master_protocol != NDPI_PROTOCOL_UNKNOWN)) {
+    ndpi_default_ports_tree_node_t *found;
+    u_int16_t *default_ports, sport, dport;
+    
+    if(flow->packet.udp)
+      found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
+					   sport = ntohs(flow->packet.udp->source),
+					   dport = ntohs(flow->packet.udp->dest)),
+	default_ports = ndpi_str->proto_defaults[ret.master_protocol].udp_default_ports;
+    else if(flow->packet.tcp)
+      found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_TCP,
+					   sport = ntohs(flow->packet.tcp->source),
+					   dport = ntohs(flow->packet.tcp->dest)),
+	default_ports = ndpi_str->proto_defaults[ret.master_protocol].tcp_default_ports;	
+    else
+      found = NULL, default_ports = NULL;
+
+    if(found
+       && (found->proto->protoId != NDPI_PROTOCOL_UNKNOWN)
+       && (found->proto->protoId != ret.master_protocol)) {
+      // printf("******** %u / %u\n", found->proto->protoId, ret.master_protocol);
+      NDPI_SET_BIT_16(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+    } else if(default_ports && (default_ports[0] != 0)) {
+      u_int8_t found = 0, i;
+      
+      for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
+	if((default_ports[i] == sport) || (default_ports[i] == dport)) {
+	  found = 1;
+	  break;
+	}
+      } /* for */
+
+      if(!found) {
+	// printf("******** Invalid default port\n");
+	NDPI_SET_BIT_16(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+      }
+    }
+    
+    flow->risk_checked = 1;
+  }
+    
+
  invalidate_ptr:
   /*
     Invalidate packet memory to avoid accessing the pointers below
@@ -4730,14 +4782,14 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
   u_int32_t a;
   struct ndpi_packet_struct *packet = &flow->packet;
 
+  if((packet->payload_packet_len < 3) || (packet->payload == NULL))
+    return;
+
   if(packet->packet_lines_parsed_complete != 0)
     return;
 
   packet->packet_lines_parsed_complete = 1;
   ndpi_reset_packet_line_info(packet);
-
-  if((packet->payload_packet_len < 3) || (packet->payload == NULL))
-    return;
 
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
@@ -4746,10 +4798,24 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
     if((a + 1) >= packet->payload_packet_len)
       return; /* Return if only one byte remains (prevent invalid reads past end-of-buffer) */
 
-    if(get_u_int16_t(packet->payload, a) ==
-       ntohs(0x0d0a)) { /* If end of line char sequence CR+NL "\r\n", process line */
-      packet->line[packet->parsed_lines].len = (u_int16_t)(
-							   ((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
+    if(get_u_int16_t(packet->payload, a) == ntohs(0x0d0a)) {
+      /* If end of line char sequence CR+NL "\r\n", process line */
+
+      if(get_u_int16_t(packet->payload, a+2) == ntohs(0x0d0a)) {
+	/* \r\n\r\n */
+	int diff; /* No unsigned ! */
+	u_int32_t a1 = a + 4;
+
+	diff = ndpi_min(packet->payload_packet_len-a1, sizeof(flow->initial_binary_bytes));
+	
+	if(diff > 0) {
+	  memcpy(&flow->initial_binary_bytes, &packet->payload[a1], diff);
+	  flow->initial_binary_bytes_len = diff;
+	}
+      }
+
+      packet->line[packet->parsed_lines].len =
+	(u_int16_t)(((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
 
       /* First line of a HTTP response parsing. Expected a "HTTP/1.? ???" */
       if(packet->parsed_lines == 0 && packet->line[0].len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&

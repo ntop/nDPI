@@ -1332,9 +1332,9 @@ static int ndpi_is_rce_injection(char* query) {
 
 /* ********************************** */
 
-ndpi_url_risk ndpi_validate_url(char *url) {
+ndpi_risk ndpi_validate_url(char *url) {
   char *orig_str = NULL, *str = NULL, *question_mark = strchr(url, '?');
-  ndpi_url_risk rc = ndpi_url_no_problem;
+  ndpi_risk rc = NDPI_NO_RISK;
 
   if(question_mark) {
     char *tmp;
@@ -1364,12 +1364,12 @@ ndpi_url_risk ndpi_validate_url(char *url) {
 	  /* Valid string */
 
 	  if(ndpi_is_xss_injection(decoded))
-	    rc = ndpi_url_possible_xss;
+	    rc = NDPI_URL_POSSIBLE_XSS;
 	  else if(ndpi_is_sql_injection(decoded))
-	    rc = ndpi_url_possible_sql_injection;
+	    rc = NDPI_URL_POSSIBLE_SQL_INJECTION;
 #ifdef HAVE_PCRE
 	  else if(ndpi_is_rce_injection(decoded))
-	    rc = ndpi_url_possible_rce_injection;
+	    rc = NDPI_URL_POSSIBLE_RCE_INJECTION;
 #endif
 
 #ifdef URL_CHECK_DEBUG
@@ -1379,7 +1379,7 @@ ndpi_url_risk ndpi_validate_url(char *url) {
 
 	ndpi_free(decoded);
 
-	if(rc != ndpi_url_no_problem)
+	if(rc != NDPI_NO_RISK)
 	  break;
       }
       
@@ -1402,4 +1402,23 @@ u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str
     return(1);
   else
     return(0);
+}
+
+/* ******************************************************************** */
+
+const char* ndpi_risk2str(ndpi_risk risk) {
+  switch(risk) {
+  case NDPI_URL_POSSIBLE_XSS:
+    return("XSS attack");
+  case NDPI_URL_POSSIBLE_SQL_INJECTION:
+    return("SQL injection");
+  case NDPI_URL_POSSIBLE_RCE_INJECTION:
+    return("RCE injection");
+  case NDPI_BINARY_APPLICATION_TRANSFER:
+    return("Binary application transfer");
+  case NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT:
+    return("Known protocol on non standard port");
+  default:  
+    return("");
+  }
 }
