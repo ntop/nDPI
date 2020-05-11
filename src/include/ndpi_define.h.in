@@ -274,6 +274,12 @@
 #define NDPI_BITMASK_SET_ALL(a)   NDPI_ONE(&a)
 #define NDPI_BITMASK_SET(a, b)    { memcpy(&a, &b, sizeof(NDPI_PROTOCOL_BITMASK)); }
 
+#define NDPI_SET_BIT_16(num, n)    num |= 1UL << n
+#define NDPI_CLR_BIT_16(num, n)    num &= ~(1UL << n)
+#define NDPI_CLR_BIT_16(num, n)    num &= ~(1UL << n)                                                                                                                
+#define NDPI_ZERO_16(num)          num = 0
+#define NDPI_ISSET_BIT_16(num, n)  (num & (1 << n))
+
 /* this is a very very tricky macro *g*,
  * the compiler will remove all shifts here if the protocol is static...
  */
