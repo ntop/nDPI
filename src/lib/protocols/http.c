@@ -90,6 +90,12 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_STREAMING;
 	return(flow->category);
       }
+      if(ndpi_strncasestr((const char *)&packet->content_line.ptr[app_len], "exe",
+			  packet->content_line.len-app_len) != NULL) {
+	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_SYSTEM_OS;
+	NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
+	return(flow->category);
+      }
     }
 
     switch(packet->content_line.ptr[0]) {
