@@ -57,7 +57,7 @@ void ndpi_search_nats_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(!match) continue;
 
       if(ndpi_strnstr((const char *)match, "\r\n",
-		      flow->packet.payload_packet_len - ((unsigned long)flow->packet.payload - (unsigned long)match)) != NULL) {
+		      flow->packet.payload_packet_len - ((unsigned long)match - (unsigned long)flow->packet.payload)) != NULL) {
 	NDPI_LOG_INFO(ndpi_struct, "found NATS\n");
 
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NATS, NDPI_PROTOCOL_UNKNOWN);
