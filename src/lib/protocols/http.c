@@ -245,6 +245,19 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       }
     }
 
+  /* catch application/exe mime-type */
+  if(packet->content_line.ptr != NULL) {
+    u_int app_len = sizeof("application");
+    if(packet->content_line.len > app_len) {
+      if(ndpi_strncasestr((const char *)&packet->content_line.ptr[app_len], "exe",
+        packet->content_line.len-app_len) != NULL) {
+          ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_EXECUTABLE_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
+          NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer\n");
+          return;
+      }
+    }
+  }
+
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
     /**
        Format examples:
