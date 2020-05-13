@@ -206,28 +206,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(flow->http_detected && (flow->http.response_status_code != 0))
     return;
 
-#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
-  /* PPStream */
-  if(flow->l4.tcp.ppstream_stage > 0 && flow->iqiyi_counter == 0) {
-    NDPI_LOG_INFO(ndpi_struct, "found PPStream\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PPSTREAM,
-			       NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_STREAMING);
-  } else if(flow->iqiyi_counter > 0) {
-    NDPI_LOG_INFO(ndpi_struct, "found iQiyi\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IQIYI,
-			       NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_STREAMING);
-  }
-#endif
-
-#if defined(NDPI_PROTOCOL_1KXUN) || defined(NDPI_PROTOCOL_IQIYI)
-  /* 1KXUN */
-  if(flow->kxun_counter > 0) {
-    NDPI_LOG_INFO(ndpi_struct, "found 1kxun\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_1KXUN, NDPI_PROTOCOL_CATEGORY_STREAMING);
-  }
-#endif
-
-    if((flow->http.url == NULL)
+  if((flow->http.url == NULL)
        && (packet->http_url_name.len > 0)
        && (packet->host_line.len > 0)) {
       int len = packet->http_url_name.len + packet->host_line.len + 1;
