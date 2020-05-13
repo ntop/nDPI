@@ -281,7 +281,6 @@ typedef enum {
   NDPI_PROTOCOL_S7COMM                = 249,
   NDPI_PROTOCOL_MSTEAMS               = 250,
   NDPI_PROTOCOL_WEBSOCKET             = 251, /* Leonn Paiva <leonn.paiva@gmail.com> */
-  NDPI_PROTOCOL_EXECUTABLE_HTTP       = 252,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
