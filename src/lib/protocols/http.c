@@ -412,6 +412,16 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
 		  packet->content_line.len, packet->content_line.ptr);
 
+    /*check for potentially dangerous http traffic and flag it*/
+    u_int app_len = sizeof("application");
+    if(packet->content_line.len > app_len) {
+      if(ndpi_strncasestr((const char *)&packet->content_line.ptr[app_len], "exe",
+        packet->content_line.len-app_len) != NULL) {
+          NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); 
+          NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer\n");
+      }
+    }
+
     if((flow->http.content_type == NULL) && (packet->content_line.len > 0)) {
       int len = packet->content_line.len + 1;
 
