@@ -85,9 +85,16 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     u_int app_len = sizeof("application");
 
     if(packet->content_line.len > app_len) {
-      if(ndpi_strncasestr((const char *)&packet->content_line.ptr[app_len], "mpeg",
-			  packet->content_line.len-app_len) != NULL) {
+      const char *app = (const char *)&packet->content_line.ptr[app_len];
+      u_int app_len_avail =  packet->content_line.len-app_len;
+       
+      if(ndpi_strncasestr(app, "mpeg", app_len_avail) != NULL) {
 	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_STREAMING;
+	return(flow->category);
+      } else if(ndpi_strncasestr(app, "exe", app_len_avail) != NULL) {
+	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
+	NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); 
+	NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer\n");
 	return(flow->category);
       }
     }
@@ -411,16 +418,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(packet->content_line.ptr != NULL && packet->content_line.len != 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
 		  packet->content_line.len, packet->content_line.ptr);
-
-    /*check for potentially dangerous http traffic and flag it*/
-    u_int app_len = sizeof("application");
-    if(packet->content_line.len > app_len) {
-      if(ndpi_strncasestr((const char *)&packet->content_line.ptr[app_len], "exe",
-        packet->content_line.len-app_len) != NULL) {
-          NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); 
-          NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer\n");
-      }
-    }
 
     if((flow->http.content_type == NULL) && (packet->content_line.len > 0)) {
       int len = packet->content_line.len + 1;
