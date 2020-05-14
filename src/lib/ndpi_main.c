@@ -4960,6 +4960,13 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	packet->http_contentlen.len = packet->line[packet->parsed_lines].len - 16;
 	packet->http_num_headers++;
       }
+      /* "Content-Disposition"*/
+      if(packet->line[packet->parsed_lines].len > 21 &&
+	 ((strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Disposition: ", 21) == 0))) {
+	packet->content_disposition_line.ptr = &packet->line[packet->parsed_lines].ptr[21];
+	packet->content_disposition_line.len = packet->line[packet->parsed_lines].len - 21;
+	packet->http_num_headers++;
+      }
       /* "Cookie:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 8 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Cookie: ", 8) == 0) {
