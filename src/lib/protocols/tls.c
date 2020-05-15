@@ -373,11 +373,17 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 #endif
 	      }
 	    }
+
+	    if((flow->packet.tick_timestamp < flow->protos.stun_ssl.ssl.notBefore)
+	       || (flow->packet.tick_timestamp > flow->protos.stun_ssl.ssl.notAfter))
+	    NDPI_SET_BIT_16(flow->risk, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
 	  }
 	}
       }
     } else if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x1d) && (packet->payload[i+2] == 0x11)) {
       /* Organization OID: 2.5.29.17 (subjectAltName) */
+      u_int8_t matched_name = 0;
+      
 #ifdef DEBUG_TLS
       printf("******* [TLS] Found subjectAltName\n");
 #endif
@@ -409,9 +415,15 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	    cleanupServerName(dNSName, len);
 
 #if DEBUG_TLS
-	    printf("[TLS] dNSName %s\n", dNSName);
+	    printf("[TLS] dNSName %s [%s]\n", dNSName, flow->protos.stun_ssl.ssl.client_requested_server_name);
 #endif
-
+	    if(matched_name == 0) {
+	      if((dNSName[0] == '*') && strstr(flow->protos.stun_ssl.ssl.client_requested_server_name, &dNSName[1]))
+		matched_name = 1;
+	      else if(strcmp(flow->protos.stun_ssl.ssl.client_requested_server_name, dNSName) == 0)
+		matched_name = 1;
+	    }
+	    
 	    if(flow->protos.stun_ssl.ssl.server_names == NULL)
 	      flow->protos.stun_ssl.ssl.server_names = ndpi_strdup(dNSName),
 		flow->protos.stun_ssl.ssl.server_names_len = strlen(dNSName);
@@ -446,6 +458,9 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	  break;
 	}
       } /* while */
+
+      if(!matched_name)
+	NDPI_SET_BIT_16(flow->risk, NDPI_TLS_CERTIFICATE_MISMATCH); /* Certificate mismatch */
     }
   }
 

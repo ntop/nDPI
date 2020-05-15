@@ -60,17 +60,19 @@ typedef enum {
   NDPI_TLS_SELFSIGNED_CERTIFICATE,
   NDPI_TLS_OBSOLETE_VERSION,
   NDPI_TLS_WEAK_CIPHER,
-
+  NDPI_TLS_CERTIFICATE_EXPIRED,
+  NDPI_TLS_CERTIFICATE_MISMATCH,
+  
   /* Leave this as last member */
   NDPI_MAX_RISK
 } ndpi_risk;
 
 /* NDPI_VISIT */
 typedef enum {
-	      ndpi_preorder,
-	      ndpi_postorder,
-	      ndpi_endorder,
-	      ndpi_leaf
+   ndpi_preorder,
+   ndpi_postorder,
+   ndpi_endorder,
+   ndpi_leaf
 } ndpi_VISIT;
 
 /* NDPI_NODE */

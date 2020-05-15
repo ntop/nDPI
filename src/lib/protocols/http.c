@@ -127,7 +127,6 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
       for (int i = 0; binary_file_ext[i] != NULL; i++) {
         if (ndpi_strncasestr((const char*)&packet->content_disposition_line.ptr[attachment_len],
             binary_file_ext[i], filename_len)) {
-          printf("got %s\n", binary_file_ext[i]);
           flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
           NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
           NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
