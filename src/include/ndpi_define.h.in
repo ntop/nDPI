@@ -278,6 +278,7 @@
 #define NDPI_CLR_BIT(num, n)    num &= ~(1UL << n)
 #define NDPI_CLR_BIT(num, n)    num &= ~(1UL << n)
 #define NDPI_ISSET_BIT(num, n)  (num & (1 << n))
+#define NDPI_ZERO_BIT(num)      num = 0
 
 /* this is a very very tricky macro *g*,
  * the compiler will remove all shifts here if the protocol is static...

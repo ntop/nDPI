@@ -1199,10 +1199,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   }
 
   if(flow->http.url[0] != '\0') {
-    u_int16_t risk = ndpi_validate_url(flow->http.url);
+    ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
 
     if(risk != NDPI_NO_RISK)
-      flow->risk |= risk;
+      NDPI_SET_BIT(flow->risk, risk);
     
     fprintf(out, "[URL: %s[StatusCode: %u]",
 	    flow->http.url, flow->http.response_status_code);
@@ -3046,13 +3046,13 @@ void test_lib() {
 static void bitmapUnitTest() {
   u_int32_t val, i, j;
 
-  for(i=0; i<16; i++) {
-    val = 0;
+  for(i=0; i<32; i++) {
+    NDPI_ZERO_BIT(val);
     NDPI_SET_BIT(val, i);
     
     assert(NDPI_ISSET_BIT(val, i));
     
-    for(j=0; j<16; j++) {
+    for(j=0; j<32; j++) {
       if(j != i) {
 	assert(!NDPI_ISSET_BIT(val, j));
       }

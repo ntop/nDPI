@@ -64,10 +64,13 @@ typedef enum {
   NDPI_TLS_CERTIFICATE_MISMATCH,
   NDPI_HTTP_SUSPICIOUS_USER_AGENT,
   NDPI_HTTP_NUMERIC_IP_HOST,
+  NDPI_HTTP_SUSPICIOUS_URL,
   
   /* Leave this as last member */
   NDPI_MAX_RISK
-} ndpi_risk;
+} ndpi_risk_enum;
+
+typedef u_int32_t ndpi_risk;
 
 /* NDPI_VISIT */
 typedef enum {

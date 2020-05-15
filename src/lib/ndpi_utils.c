@@ -1332,9 +1332,9 @@ static int ndpi_is_rce_injection(char* query) {
 
 /* ********************************** */
 
-ndpi_risk ndpi_validate_url(char *url) {
+ndpi_risk_enum ndpi_validate_url(char *url) {
   char *orig_str = NULL, *str = NULL, *question_mark = strchr(url, '?');
-  ndpi_risk rc = NDPI_NO_RISK;
+  ndpi_risk_enum rc = NDPI_NO_RISK;
 
   if(question_mark) {
     char *tmp;
@@ -1389,6 +1389,15 @@ ndpi_risk ndpi_validate_url(char *url) {
 
  validate_rc:
   if(orig_str) ndpi_free(orig_str);
+
+  if(rc == NDPI_NO_RISK) {
+    /* Let's do an extra check */
+    if(strstr(url, "..")) {
+      /* 127.0.0.1/msadc/..%255c../..%255c../..%255c../winnt/system32/cmd.exe */
+      rc = NDPI_HTTP_SUSPICIOUS_URL;
+    }
+  }
+  
   return(rc);
 }
 
@@ -1406,7 +1415,9 @@ u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str
 
 /* ******************************************************************** */
 
-const char* ndpi_risk2str(ndpi_risk risk) {
+const char* ndpi_risk2str(ndpi_risk_enum risk) {
+  static char buf[16];
+  
   switch(risk) {
   case NDPI_URL_POSSIBLE_XSS:
     return("XSS attack");
@@ -1443,8 +1454,12 @@ const char* ndpi_risk2str(ndpi_risk risk) {
 
   case NDPI_HTTP_NUMERIC_IP_HOST:
     return("HTTP Numeric IP Address");
+
+  case NDPI_HTTP_SUSPICIOUS_URL:
+    return("HTTP Suspicious URL");
     
-  default:  
-    return("");
+  default:
+    snprintf(buf, sizeof(buf), "%d", (int)risk);
+    return(buf);
   }
 }

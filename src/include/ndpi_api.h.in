@@ -1029,12 +1029,12 @@ extern "C" {
   
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */
 
-  ndpi_risk ndpi_validate_url(char *url);
+  ndpi_risk_enum ndpi_validate_url(char *url);
 
   u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
 				     ndpi_protocol proto);
 
-  const char* ndpi_risk2str(ndpi_risk risk);
+  const char* ndpi_risk2str(ndpi_risk_enum risk);
 #ifdef __cplusplus
 }
 #endif

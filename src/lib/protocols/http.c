@@ -266,10 +266,18 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
   strncpy(buf, ip, ip_len);
   buf[ip_len] = '\0';
 
-  ip_addr.s_addr = inet_addr(buf);;
+  ip_addr.s_addr = inet_addr(buf);
   if(strcmp(inet_ntoa(ip_addr), buf) == 0) {
     NDPI_SET_BIT(flow->risk, NDPI_HTTP_NUMERIC_IP_HOST);   
   }
+}
+
+/* ************************************************************* */
+
+static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow,
+				char *url) {
+
 }
 
 /* ************************************************************* */
@@ -302,6 +310,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	strncpy(&flow->http.url[packet->host_line.len], (char*)packet->http_url_name.ptr,
 		packet->http_url_name.len);
 	flow->http.url[len-1] = '\0';
+
+	ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[packet->host_line.len]);
       }
 
       if(flow->packet.http_method.len < 3)
