@@ -214,7 +214,6 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
   /* Good reference for future implementations:
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
-  //printf("==> %s\n", ua);
   snprintf((char*)flow->protos.http.detected_os,
 	   sizeof(flow->protos.http.detected_os), "%s", ua);  
 }
@@ -231,6 +230,23 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, 
 				 (char *)flow->host_server_name,
 				 strlen((const char *)flow->host_server_name));
+  }
+}
+
+/* ************************************************************* */
+
+static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow,
+				  char *ua) {
+  if((!ua) || (ua[0] == '\0')) return;
+
+  // printf("[%s:%d] ==> '%s'\n", __FILE__, __LINE__, ua);
+  
+  if((strlen(ua) < 4)
+     || (!strcmp(ua, "test"))
+     || (!strcmp(ua, "<?"))
+     || ndpi_match_bigram(ndpi_struct, &ndpi_struct->bigrams_automa, ua)) {
+    NDPI_SET_BIT_16(flow->risk, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
   }
 }
 
@@ -300,7 +316,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       strncpy(ua, (const char *)packet->user_agent_line.ptr, mlen);
       ua[mlen] = '\0';
-
+      
       if(strncmp(ua, "Mozilla", 7) == 0) {
 	char *parent = strchr(ua, '(');
 
@@ -360,6 +376,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	strncpy(flow->http.user_agent, (char*)packet->user_agent_line.ptr,
 		packet->user_agent_line.len);
 	flow->http.user_agent[packet->user_agent_line.len] = '\0';
+
+	ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent);
       }
     }
 

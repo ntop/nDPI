@@ -1437,6 +1437,9 @@ const char* ndpi_risk2str(ndpi_risk risk) {
     
   case NDPI_TLS_CERTIFICATE_MISMATCH:
     return("TLS Certificate Mismatch");
+
+  case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
+    return("HTTP Suspicious User-Agent");
     
   default:  
     return("");
