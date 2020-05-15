@@ -1440,6 +1440,9 @@ const char* ndpi_risk2str(ndpi_risk risk) {
 
   case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
     return("HTTP Suspicious User-Agent");
+
+  case NDPI_HTTP_NUMERIC_IP_HOST:
+    return("HTTP Numeric IP Address");
     
   default:  
     return("");

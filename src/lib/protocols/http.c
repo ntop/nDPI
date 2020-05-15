@@ -51,18 +51,23 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 
 static void ndpi_analyze_content_signature(struct ndpi_flow_struct *flow) { 
   if((flow->initial_binary_bytes_len >= 2) && (flow->initial_binary_bytes[0] == 0x4D) && (flow->initial_binary_bytes[1] == 0x5A))
-    NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Win executable */
+    NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Win executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0x7F) && (flow->initial_binary_bytes[1] == 'E')
 	  && (flow->initial_binary_bytes[2] == 'L') && (flow->initial_binary_bytes[3] == 'F'))
-    NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
+    NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0xCF) && (flow->initial_binary_bytes[1] == 0xFA)
 	  && (flow->initial_binary_bytes[2] == 0xED) && (flow->initial_binary_bytes[3] == 0xFE))
-    NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
+    NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
+  else if((flow->initial_binary_bytes_len >= 3)
+	  && (flow->initial_binary_bytes[0] == '#')
+	  && (flow->initial_binary_bytes[1] == '!')
+	  && (flow->initial_binary_bytes[2] == '/'))
+    NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Unix script (e.g. #!/bin/sh) */
   else if(flow->initial_binary_bytes_len >= 8) {
     u_int8_t exec_pattern[] = { 0x64, 0x65, 0x78, 0x0A, 0x30, 0x33, 0x35, 0x00 };
     
     if(memcmp(flow->initial_binary_bytes, exec_pattern, 8) == 0)
-      NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Dalvik Executable (Android) */
+      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Dalvik Executable (Android) */
   }
 }
 
@@ -111,7 +116,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
   for (int i = 0; binary_file_mimes[i] != NULL; i++) {
     if (ndpi_strncasestr(app, binary_file_mimes[i], app_len_avail) != NULL) {
       flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-      NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
+      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
       NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
       return(flow->category);
     }
@@ -128,7 +133,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
         if (ndpi_strncasestr((const char*)&packet->content_disposition_line.ptr[attachment_len],
             binary_file_ext[i], filename_len)) {
           flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-          NDPI_SET_BIT_16(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
+          NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
           NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
           return(flow->category);
         }
@@ -246,7 +251,24 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
      || (!strcmp(ua, "test"))
      || (!strcmp(ua, "<?"))
      || ndpi_match_bigram(ndpi_struct, &ndpi_struct->bigrams_automa, ua)) {
-    NDPI_SET_BIT_16(flow->risk, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+    NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+  }
+}
+
+/* ************************************************************* */
+
+static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow,
+				  char *ip, u_int ip_len) {
+  char buf[22];
+  struct in_addr ip_addr;
+  
+  strncpy(buf, ip, ip_len);
+  buf[ip_len] = '\0';
+
+  ip_addr.s_addr = inet_addr(buf);;
+  if(strcmp(inet_ntoa(ip_addr), buf) == 0) {
+    NDPI_SET_BIT(flow->risk, NDPI_HTTP_NUMERIC_IP_HOST);   
   }
 }
 
@@ -270,6 +292,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
        && (packet->host_line.len > 0)) {
       int len = packet->http_url_name.len + packet->host_line.len + 1;
 
+      if(isdigit(packet->host_line.ptr[0])
+	 && (packet->host_line.len < 21)) 
+	ndpi_check_numeric_ip(ndpi_struct, flow, (char*)packet->host_line.ptr, packet->host_line.len);
+      
       flow->http.url = ndpi_malloc(len);
       if(flow->http.url) {
 	strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);

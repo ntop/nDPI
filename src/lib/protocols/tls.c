@@ -376,7 +376,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	    if((flow->packet.tick_timestamp < flow->protos.stun_ssl.ssl.notBefore)
 	       || (flow->packet.tick_timestamp > flow->protos.stun_ssl.ssl.notAfter))
-	    NDPI_SET_BIT_16(flow->risk, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
+	    NDPI_SET_BIT(flow->risk, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
 	  }
 	}
       }
@@ -460,7 +460,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       } /* while */
 
       if(!matched_name)
-	NDPI_SET_BIT_16(flow->risk, NDPI_TLS_CERTIFICATE_MISMATCH); /* Certificate mismatch */
+	NDPI_SET_BIT(flow->risk, NDPI_TLS_CERTIFICATE_MISMATCH); /* Certificate mismatch */
     }
   }
 
@@ -468,7 +468,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
   if(flow->protos.stun_ssl.ssl.subjectDN && flow->protos.stun_ssl.ssl.issuerDN
      && (!strcmp(flow->protos.stun_ssl.ssl.subjectDN, flow->protos.stun_ssl.ssl.issuerDN)))
-    NDPI_SET_BIT_16(flow->risk, NDPI_TLS_SELFSIGNED_CERTIFICATE);
+    NDPI_SET_BIT(flow->risk, NDPI_TLS_SELFSIGNED_CERTIFICATE);
       
 #if DEBUG_TLS
   printf("[TLS] %s() SubjectDN [%s]\n", __FUNCTION__, rdnSeqBuf);
@@ -855,7 +855,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     tls_version = ntohs(*((u_int16_t*)&packet->payload[version_offset]));
     flow->protos.stun_ssl.ssl.ssl_version = ja3.tls_handshake_version = tls_version;
     if(flow->protos.stun_ssl.ssl.ssl_version < 0x0302) /* TLSv1.1 */
-      NDPI_SET_BIT_16(flow->risk, NDPI_TLS_OBSOLETE_VERSION);
+      NDPI_SET_BIT(flow->risk, NDPI_TLS_OBSOLETE_VERSION);
     
     if(handshake_type == 0x02 /* Server Hello */) {
       int i, rc;
@@ -880,7 +880,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
       ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
       if((flow->protos.stun_ssl.ssl.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0])) == 1)
-	NDPI_SET_BIT_16(flow->risk, NDPI_TLS_WEAK_CIPHER);
+	NDPI_SET_BIT(flow->risk, NDPI_TLS_WEAK_CIPHER);
       
       flow->protos.stun_ssl.ssl.server_cipher = ja3.cipher[0];
 

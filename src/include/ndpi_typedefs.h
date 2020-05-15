@@ -63,6 +63,7 @@ typedef enum {
   NDPI_TLS_CERTIFICATE_EXPIRED,
   NDPI_TLS_CERTIFICATE_MISMATCH,
   NDPI_HTTP_SUSPICIOUS_USER_AGENT,
+  NDPI_HTTP_NUMERIC_IP_HOST,
   
   /* Leave this as last member */
   NDPI_MAX_RISK
@@ -1167,7 +1168,7 @@ struct ndpi_flow_struct {
   u_char host_server_name[240];
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
   u_int8_t risk_checked;
-  u_int16_t risk; /* Issues found with this flow [bitmask of ndpi_risk] */
+  u_int32_t risk; /* Issues found with this flow [bitmask of ndpi_risk] */
   
   /*
     This structure below will not not stay inside the protos

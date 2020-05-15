@@ -4600,7 +4600,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
        && (found->proto->protoId != NDPI_PROTOCOL_UNKNOWN)
        && (found->proto->protoId != ret.master_protocol)) {
       // printf("******** %u / %u\n", found->proto->protoId, ret.master_protocol);
-      NDPI_SET_BIT_16(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+      NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
     } else if(default_ports && (default_ports[0] != 0)) {
       u_int8_t found = 0, i;
       
@@ -4613,7 +4613,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
       if(!found) {
 	// printf("******** Invalid default port\n");
-	NDPI_SET_BIT_16(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+	NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
       }
     }
     

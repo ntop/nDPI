@@ -1220,7 +1220,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(out, "[Risk: ");
 
     for(i=0; i<NDPI_MAX_RISK; i++)
-      if(NDPI_ISSET_BIT_16(flow->risk, i))
+      if(NDPI_ISSET_BIT(flow->risk, i))
 	fprintf(out, "** %s **", ndpi_risk2str(i));
     
     fprintf(out, "]");
@@ -3044,17 +3044,17 @@ void test_lib() {
 /* *********************************************** */
 
 static void bitmapUnitTest() {
-  u_int16_t val, i, j;
+  u_int32_t val, i, j;
 
   for(i=0; i<16; i++) {
-    NDPI_ZERO_16(val);
-    NDPI_SET_BIT_16(val, i);
+    val = 0;
+    NDPI_SET_BIT(val, i);
     
-    assert(NDPI_ISSET_BIT_16(val, i));
+    assert(NDPI_ISSET_BIT(val, i));
     
     for(j=0; j<16; j++) {
       if(j != i) {
-	assert(!NDPI_ISSET_BIT_16(val, j));
+	assert(!NDPI_ISSET_BIT(val, j));
       }
     }
   }
