@@ -932,7 +932,7 @@ static ndpi_network host_protocol_list[] = {
 
   { 0xD873D000 /* 216.115.208.0 */, 20, NDPI_PROTOCOL_CITRIX },
   { 0xD8DB7000 /* 216.219.112.0 */, 20, NDPI_PROTOCOL_CITRIX },
-  { 0xAD630000 /* 173.99.0.0    */, 18, NDPI_PROTOCOL_CITRIX },
+  { 0xADC70000 /* 173.199.0.0   */, 18, NDPI_PROTOCOL_CITRIX },
 
   /*
     Cisco Webex LLC
