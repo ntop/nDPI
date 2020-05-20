@@ -161,7 +161,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     /* This looks like an invalid packet */
 
     if(flow->protos.stun_ssl.stun.num_udp_pkts > 0) {
-      flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
+      // flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
       return(NDPI_IS_STUN);
     } else
       return(NDPI_IS_NOT_STUN);
