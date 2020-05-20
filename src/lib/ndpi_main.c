@@ -2273,6 +2273,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->stun_cache)
       ndpi_lru_free_cache(ndpi_str->stun_cache);
 
+    if(ndpi_str->msteams_cache)
+      ndpi_lru_free_cache(ndpi_str->msteams_cache);
+
     if(ndpi_str->protocols_ptree)
       ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->protocols_ptree, free_ptree_data);
 
@@ -3487,12 +3490,17 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   return(0);
 }
 
+/* ************************************************ */
+
 void ndpi_apply_flow_protocol_to_packet(struct ndpi_flow_struct *flow, struct ndpi_packet_struct *packet) {
   memcpy(&packet->detected_protocol_stack, &flow->detected_protocol_stack, sizeof(packet->detected_protocol_stack));
   memcpy(&packet->protocol_stack_info, &flow->protocol_stack_info, sizeof(packet->protocol_stack_info));
 }
 
-static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+/* ************************************************ */
+
+static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str,
+				   struct ndpi_flow_struct *flow,
                                    unsigned short packetlen) {
   const struct ndpi_iphdr *decaps_iph = NULL;
   u_int16_t l3len;
@@ -3630,7 +3638,10 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   return(0);
 }
 
-void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+/* ************************************************ */
+
+void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
+			      struct ndpi_flow_struct *flow) {
   if(!flow) {
     return;
   } else {
@@ -3752,6 +3763,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str, str
   }
 }
 
+/* ************************************************ */
+
 void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
                                 NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
   if(!flow)
@@ -3792,6 +3805,8 @@ void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_str, s
     }
   }
 }
+
+/* ************************************************ */
 
 void check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
                               NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
@@ -3834,7 +3849,10 @@ void check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_str, str
   }
 }
 
-void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+/* ************************************************ */
+
+void check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *ndpi_str,
+			      struct ndpi_flow_struct *flow,
                               NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
   void *func = NULL;
   u_int32_t a;
@@ -4338,11 +4356,49 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
 
 /* ********************************************************************************* */
 
-#if 0
-static u_int16_t ndpi_checK_flow_port(, u_int16_t sport, u_int16_t dport) {
+static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
+				    struct ndpi_flow_struct *flow,
+				    ndpi_protocol *ret) {
+  /* 
+     Skype for a host doing MS Teams means MS Teams
+     (MS Teams uses Skype as transport protocol for voice/video)
+  */
+  
+  switch(ret->app_protocol) {
+  case NDPI_PROTOCOL_MSTEAMS:
+    if(flow->packet.iph && flow->packet.tcp) {
+      // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
+      
+      if(ndpi_str->msteams_cache == NULL)
+	ndpi_str->msteams_cache = ndpi_lru_cache_init(1024);
 
+      if(ndpi_str->msteams_cache)
+	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
+			      flow->packet.iph->saddr,
+			      flow->packet.tick_timestamp & 0xFFFF /* 16 bit */);
+    }
+    break;
+
+  case NDPI_PROTOCOL_SKYPE:
+  case NDPI_PROTOCOL_SKYPE_CALL:
+    if(flow->packet.iph
+       && flow->packet.udp
+       && ndpi_str->msteams_cache) {
+      u_int16_t when;
+      
+      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, flow->packet.iph->saddr,
+			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
+	u_int16_t tdiff = (flow->packet.tick_timestamp & 0xFFFF) - when;
+
+	if(tdiff < 60 /* sec */) {
+	  // printf("====>> NDPI_PROTOCOL_SKYPE(_CALL) -> NDPI_PROTOCOL_MSTEAMS [%u]\n", tdiff);
+	  ret->app_protocol = NDPI_PROTOCOL_MSTEAMS;
+	}
+      }
+    }
+    break;
+  } /* switch */  
 }
-#endif
 
 /* ********************************************************************************* */
 
@@ -4619,8 +4675,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     
     flow->risk_checked = 1;
   }
-    
-
+  
+  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
+  
  invalidate_ptr:
   /*
     Invalidate packet memory to avoid accessing the pointers below

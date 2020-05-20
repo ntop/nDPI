@@ -1111,6 +1111,9 @@ struct ndpi_detection_module_struct {
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
 
+  /* NDPI_PROTOCOL_MSTEAMS */
+  struct ndpi_lru_cache *msteams_cache;
+
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
   u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */
