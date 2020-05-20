@@ -1204,14 +1204,14 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(risk != NDPI_NO_RISK)
       NDPI_SET_BIT(flow->risk, risk);
     
-    fprintf(out, "[URL: %s[StatusCode: %u]",
+    fprintf(out, "[URL: %s][StatusCode: %u]",
 	    flow->http.url, flow->http.response_status_code);
 
     if(flow->http.content_type[0] != '\0')
-      fprintf(out, "[ContentType: %s]", flow->http.content_type);
+      fprintf(out, "[Content-Type: %s]", flow->http.content_type);
 
     if(flow->http.user_agent[0] != '\0')
-      fprintf(out, "[UserAgent: %s]", flow->http.user_agent);
+      fprintf(out, "[User-Agent: %s]", flow->http.user_agent);
   }
 
   if(flow->risk) {
