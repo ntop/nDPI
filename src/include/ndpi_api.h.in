@@ -191,7 +191,7 @@ extern "C" {
   /**
    * Completes the initialization (2nd step)
    *
-   * @return  the initialized detection module
+   * @par ndpi_str = the struct created for the protocol detection
    *
    */
   void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str);
