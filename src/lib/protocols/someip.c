@@ -87,7 +87,7 @@ static void ndpi_int_someip_add_connection (struct ndpi_detection_module_struct 
   NDPI_LOG_INFO(ndpi_struct, "found SOME/IP\n");
 }
 
-static u_int32_t someip_data_cover_32(u_int8_t *data)
+static u_int32_t someip_data_cover_32(const u_int8_t *data)
 {
   u_int32_t value;
 
