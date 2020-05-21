@@ -2,7 +2,7 @@ Unknown	35	14201	2
 DNS	14	1947	7
 DHCP	7	2323	2
 ntop	40	9816	3
-SkypeCall	93	19649	12
+SkypeCall	49	10800	4
 ICMP	2	140	1
 TLS	107	45011	5
 Dropbox	18	11162	3
@@ -12,7 +12,7 @@ Spotify	1	82	1
 Telegram	3	186	1
 Microsoft	403	283797	11
 Microsoft365	136	52120	6
-Teams	1870	1025774	25
+Teams	1914	1034623	33
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -59,17 +59,17 @@ JA3 Host Stats:
 	38	TCP 192.168.1.6:50014 <-> 52.114.250.152:443 [proto: 91.250/TLS.Teams][cat: Collaborative/15][14 pkts/1347 bytes <-> 11 pkts/6975 bytes][Goodput ratio: 42/91][0.22 sec][bytes ratio: -0.676 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 16/22 43/84 20/30][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 96/634 289/1506 73/570][Risk: ** TLS Certificate Mismatch **][TLSv1.2][Client: 52.114.250.152][JA3C: e4d448cdfe06dc1243c1eb026c74ac9a][ServerNames: tr.teams.microsoft.com,*.tr.teams.microsoft.com,turn.teams.microsoft.com,*.turn.teams.microsoft.com,*.relay.teams.microsoft.com][JA3S: 986571066668055ae9481cb84fda634a][Issuer: C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, OU=Microsoft IT, CN=Microsoft IT TLS CA 5][Subject: CN=tr.teams.microsoft.com][Certificate SHA-1: A7:90:8D:41:ED:24:D2:83:48:95:90:CE:18:D3:A6:C2:62:7A:07:75][Validity: 2019-05-24 14:10:26 - 2021-05-24 14:10:26][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384]
 	39	TCP 192.168.1.6:60566 <-> 167.99.215.164:4434 [proto: 91.26/TLS.ntop][cat: Network/14][9 pkts/3029 bytes <-> 8 pkts/2213 bytes][Goodput ratio: 80/76][2.73 sec][ALPN: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: 0.156 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/1 351/431 1977/2053 668/728][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 337/277 1012/1291 385/397][Risk: ** Known protocol on non standard port **][TLSv1.2][Client: dati.ntop.org][JA3C: 7120d65624bcd2e02ed4b01388d84cdb][JA3S: 410b9bedaf65dd26c6fe547154d60db4][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384]
 	40	TCP 192.168.1.6:60546 <-> 167.99.215.164:4434 [proto: 91.26/TLS.ntop][cat: Network/14][10 pkts/2195 bytes <-> 10 pkts/2077 bytes][Goodput ratio: 69/68][5.38 sec][ALPN: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: 0.028 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 650/754 5000/5000 1645/1734][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 220/208 1021/1292 308/364][Risk: ** Known protocol on non standard port **][TLSv1.2][Client: dati.ntop.org][JA3C: 7120d65624bcd2e02ed4b01388d84cdb][JA3S: 410b9bedaf65dd26c6fe547154d60db4][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384]
-	41	UDP 192.168.1.6:50036 <-> 52.114.250.137:3478 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][5 pkts/1390 bytes <-> 4 pkts/733 bytes][Goodput ratio: 85/77][4.06 sec][bytes ratio: 0.309 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/100 1003/774 2235/2092 994/932][Pkt Len c2s/s2c min/avg/max/stddev: 228/174 278/183 314/198 33/10][PLAIN TEXT (rtcmedia)]
+	41	UDP 192.168.1.6:50036 <-> 52.114.250.137:3478 [proto: 78.250/STUN.Teams][cat: VoIP/10][5 pkts/1390 bytes <-> 4 pkts/733 bytes][Goodput ratio: 85/77][4.06 sec][bytes ratio: 0.309 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/100 1003/774 2235/2092 994/932][Pkt Len c2s/s2c min/avg/max/stddev: 228/174 278/183 314/198 33/10][PLAIN TEXT (rtcmedia)]
 	42	UDP 192.168.0.1:68 -> 255.255.255.255:67 [proto: 18/DHCP][cat: Network/14][6 pkts/1926 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][25.01 sec][Host: tl-sg116e][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4986/0 5001/0 5018/0 11/0][Pkt Len c2s/s2c min/avg/max/stddev: 321/0 321/0 321/0 0/0][DHCP Fingerprint: 1,3]
-	43	UDP 192.168.1.6:50016 <-> 52.114.250.141:3478 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][4 pkts/1162 bytes <-> 3 pkts/546 bytes][Goodput ratio: 85/77][1.99 sec][bytes ratio: 0.361 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/98 611/101 1783/104 829/3][Pkt Len c2s/s2c min/avg/max/stddev: 256/174 290/182 314/198 25/11][PLAIN TEXT (rtcmedia)]
+	43	UDP 192.168.1.6:50016 <-> 52.114.250.141:3478 [proto: 78.250/STUN.Teams][cat: VoIP/10][4 pkts/1162 bytes <-> 3 pkts/546 bytes][Goodput ratio: 85/77][1.99 sec][bytes ratio: 0.361 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/98 611/101 1783/104 829/3][Pkt Len c2s/s2c min/avg/max/stddev: 256/174 290/182 314/198 25/11][PLAIN TEXT (rtcmedia)]
 	44	TCP 93.62.150.157:443 <-> 192.168.1.6:60512 [proto: 91/TLS][cat: Web/5][2 pkts/1258 bytes <-> 2 pkts/108 bytes][Goodput ratio: 89/0][< 1 sec]
-	45	UDP 192.168.1.6:50017 <-> 52.114.250.141:3478 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][3 pkts/594 bytes <-> 3 pkts/611 bytes][Goodput ratio: 79/79][4.05 sec][bytes ratio: -0.014 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 99/97 2002/2002 3906/3906 1904/1904][Pkt Len c2s/s2c min/avg/max/stddev: 110/187 198/204 256/229 63/18][PLAIN TEXT (The request did not contain a M)]
-	46	UDP 192.168.1.6:50037 <-> 52.114.250.137:3478 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][3 pkts/594 bytes <-> 3 pkts/611 bytes][Goodput ratio: 79/79][4.05 sec][bytes ratio: -0.014 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 95/94 2000/2000 3905/3905 1905/1906][Pkt Len c2s/s2c min/avg/max/stddev: 110/187 198/204 256/229 63/18][PLAIN TEXT (The request did not contain a M)]
+	45	UDP 192.168.1.6:50017 <-> 52.114.250.141:3478 [proto: 78.250/STUN.Teams][cat: VoIP/10][3 pkts/594 bytes <-> 3 pkts/611 bytes][Goodput ratio: 79/79][4.05 sec][bytes ratio: -0.014 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 99/97 2002/2002 3906/3906 1904/1904][Pkt Len c2s/s2c min/avg/max/stddev: 110/187 198/204 256/229 63/18][PLAIN TEXT (The request did not contain a M)]
+	46	UDP 192.168.1.6:50037 <-> 52.114.250.137:3478 [proto: 78.250/STUN.Teams][cat: VoIP/10][3 pkts/594 bytes <-> 3 pkts/611 bytes][Goodput ratio: 79/79][4.05 sec][bytes ratio: -0.014 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 95/94 2000/2000 3905/3905 1905/1906][Pkt Len c2s/s2c min/avg/max/stddev: 110/187 198/204 256/229 63/18][PLAIN TEXT (The request did not contain a M)]
 	47	UDP 93.71.110.205:16333 <-> 192.168.1.6:50036 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][3 pkts/414 bytes <-> 5 pkts/634 bytes][Goodput ratio: 69/67][2.31 sec][bytes ratio: -0.210 (Download)][IAT c2s/s2c min/avg/max/stddev: 101/15 634/572 1166/1168 532/565][Pkt Len c2s/s2c min/avg/max/stddev: 130/88 138/127 154/158 11/27][Risk: ** Known protocol on non standard port **]
-	48	UDP 192.168.1.6:50016 -> 192.168.0.4:50005 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][5 pkts/770 bytes -> 0 pkts/0 bytes][Goodput ratio: 73/0][1.22 sec][Risk: ** Known protocol on non standard port **]
-	49	UDP 192.168.1.6:50036 -> 192.168.0.4:50020 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][5 pkts/770 bytes -> 0 pkts/0 bytes][Goodput ratio: 73/0][1.22 sec][Risk: ** Known protocol on non standard port **]
-	50	UDP 192.168.1.6:50016 <-> 52.114.250.123:3478 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][1 pkts/110 bytes <-> 2 pkts/424 bytes][Goodput ratio: 61/80][0.12 sec][PLAIN TEXT (The request did not contain a M)]
-	51	UDP 192.168.1.6:50036 <-> 52.114.250.123:3478 [proto: 78.38/STUN.SkypeCall][cat: VoIP/10][1 pkts/110 bytes <-> 2 pkts/424 bytes][Goodput ratio: 61/80][0.12 sec][PLAIN TEXT (The request did not contain a M)]
+	48	UDP 192.168.1.6:50016 -> 192.168.0.4:50005 [proto: 78.250/STUN.Teams][cat: VoIP/10][5 pkts/770 bytes -> 0 pkts/0 bytes][Goodput ratio: 73/0][1.22 sec][Risk: ** Known protocol on non standard port **]
+	49	UDP 192.168.1.6:50036 -> 192.168.0.4:50020 [proto: 78.250/STUN.Teams][cat: VoIP/10][5 pkts/770 bytes -> 0 pkts/0 bytes][Goodput ratio: 73/0][1.22 sec][Risk: ** Known protocol on non standard port **]
+	50	UDP 192.168.1.6:50016 <-> 52.114.250.123:3478 [proto: 78.250/STUN.Teams][cat: VoIP/10][1 pkts/110 bytes <-> 2 pkts/424 bytes][Goodput ratio: 61/80][0.12 sec][PLAIN TEXT (The request did not contain a M)]
+	51	UDP 192.168.1.6:50036 <-> 52.114.250.123:3478 [proto: 78.250/STUN.Teams][cat: VoIP/10][1 pkts/110 bytes <-> 2 pkts/424 bytes][Goodput ratio: 61/80][0.12 sec][PLAIN TEXT (The request did not contain a M)]
 	52	UDP 192.168.1.6:17500 -> 192.168.1.255:17500 [proto: 121/Dropbox][cat: Cloud/13][1 pkts/527 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][< 1 sec][PLAIN TEXT (version)]
 	53	UDP 192.168.1.6:17500 -> 255.255.255.255:17500 [proto: 121/Dropbox][cat: Cloud/13][1 pkts/527 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][< 1 sec][PLAIN TEXT (version)]
 	54	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][cat: Network/14][1 pkts/397 bytes -> 0 pkts/0 bytes][Goodput ratio: 89/0][< 1 sec][PLAIN TEXT (6.10.1)]

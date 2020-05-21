@@ -49,7 +49,7 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 
 /* *********************************************** */
 
-static void ndpi_analyze_content_signature(struct ndpi_flow_struct *flow) { 
+static void ndpi_analyze_content_signature(struct ndpi_flow_struct *flow) {
   if((flow->initial_binary_bytes_len >= 2) && (flow->initial_binary_bytes[0] == 0x4D) && (flow->initial_binary_bytes[1] == 0x5A))
     NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Win executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0x7F) && (flow->initial_binary_bytes[1] == 'E')
@@ -65,7 +65,7 @@ static void ndpi_analyze_content_signature(struct ndpi_flow_struct *flow) {
     NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Unix script (e.g. #!/bin/sh) */
   else if(flow->initial_binary_bytes_len >= 8) {
     u_int8_t exec_pattern[] = { 0x64, 0x65, 0x78, 0x0A, 0x30, 0x33, 0x35, 0x00 };
-    
+
     if(memcmp(flow->initial_binary_bytes, exec_pattern, 8) == 0)
       NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER); /* Dalvik Executable (Android) */
   }
@@ -85,7 +85,7 @@ static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_
      && (flow->http.response_status_code != 0)
      ) {
     /* stop extra processing */
-    
+
     if(flow->initial_binary_bytes_len) ndpi_analyze_content_signature(flow);
     flow->extra_packets_func = NULL; /* We're good now */
     return(0);
@@ -108,7 +108,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     if(packet->content_line.len > app_len) {
       const char *app = (const char *)&packet->content_line.ptr[app_len];
       u_int app_len_avail =  packet->content_line.len-app_len;
-       
+
       if(ndpi_strncasestr(app, "mpeg", app_len_avail) != NULL) {
 	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_STREAMING;
 	return(flow->category);
@@ -146,7 +146,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 		     ndpi_min(packet->content_line.len, 5)) == 0)
 	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_MEDIA;
       break;
-      
+
     case 'v':
       if(strncasecmp((const char *)packet->content_line.ptr, "video",
 		     ndpi_min(packet->content_line.len, 5)) == 0)
@@ -220,7 +220,7 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
   snprintf((char*)flow->protos.http.detected_os,
-	   sizeof(flow->protos.http.detected_os), "%s", ua);  
+	   sizeof(flow->protos.http.detected_os), "%s", ua);
 }
 
 /* ************************************************************* */
@@ -232,7 +232,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 
     if(double_col) double_col[0] = '\0';
 
-    ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, 
+    ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP,
 				 (char *)flow->host_server_name,
 				 strlen((const char *)flow->host_server_name));
   }
@@ -246,7 +246,7 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
   if((!ua) || (ua[0] == '\0')) return;
 
   // printf("[%s:%d] ==> '%s'\n", __FILE__, __LINE__, ua);
-  
+
   if((strlen(ua) < 4)
      || (!strcmp(ua, "test"))
      || (!strcmp(ua, "<?"))
@@ -262,13 +262,13 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
 				  char *ip, u_int ip_len) {
   char buf[22];
   struct in_addr ip_addr;
-  
+
   strncpy(buf, ip, ip_len);
   buf[ip_len] = '\0';
 
   ip_addr.s_addr = inet_addr(buf);
   if(strcmp(inet_ntoa(ip_addr), buf) == 0) {
-    NDPI_SET_BIT(flow->risk, NDPI_HTTP_NUMERIC_IP_HOST);   
+    NDPI_SET_BIT(flow->risk, NDPI_HTTP_NUMERIC_IP_HOST);
   }
 }
 
@@ -301,9 +301,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       int len = packet->http_url_name.len + packet->host_line.len + 1;
 
       if(isdigit(packet->host_line.ptr[0])
-	 && (packet->host_line.len < 21)) 
+	 && (packet->host_line.len < 21))
 	ndpi_check_numeric_ip(ndpi_struct, flow, (char*)packet->host_line.ptr, packet->host_line.len);
-      
+
       flow->http.url = ndpi_malloc(len);
       if(flow->http.url) {
 	strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
@@ -352,7 +352,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       strncpy(ua, (const char *)packet->user_agent_line.ptr, mlen);
       ua[mlen] = '\0';
-      
+
       if(strncmp(ua, "Mozilla", 7) == 0) {
 	char *parent = strchr(ua, '(');
 
@@ -597,6 +597,30 @@ static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 
 /*************************************************************************************************/
 
+#if 0
+static const char* suspicious_http_header_keys[] =
+  {
+   "Cores",
+   NULL
+  };
+#endif
+
+static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow) {
+#if 0
+  int i;
+  
+  for(i=0; (i<packet->parsed_lines) && (packet->line[i].ptr != NULL); i++) {
+    printf("-->> [len: %u] [%s]\n", packet->line[i].len, packet->line[i].ptr);
+
+    if(match_found)
+      NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+  }
+#endif
+}
+
+/*************************************************************************************************/
+
 static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -694,6 +718,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 		  "Filename HTTP found: %d, we look for line info..\n", filename_start);
 
     ndpi_parse_packet_line_info(ndpi_struct, flow);
+    ndpi_check_http_header(ndpi_struct, flow);
 
     if(packet->parsed_lines <= 1) {
       NDPI_LOG_DBG2(ndpi_struct,
