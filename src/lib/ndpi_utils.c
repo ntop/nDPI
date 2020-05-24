@@ -902,6 +902,26 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
 }
 
 /* ********************************** */
+
+static void ndpi_serialize_risk(ndpi_serializer *serializer,
+				struct ndpi_flow_struct *flow) {
+  if(flow->risk != 0) {
+    u_int32_t i;
+
+    ndpi_serialize_start_of_block(serializer, "flow_risk");
+    
+    for(i = 0; i < NDPI_MAX_RISK; i++) {
+      ndpi_risk_enum r = (ndpi_risk_enum)i;
+      
+      if(NDPI_ISSET_BIT(flow->risk, r))
+	ndpi_serialize_uint32_string(serializer, i, ndpi_risk2str(r));
+    }
+    
+    ndpi_serialize_end_of_block(serializer);
+  }
+}
+
+/* ********************************** */
 /* ********************************** */
 
 int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
@@ -951,6 +971,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
   }
 
+  ndpi_serialize_risk(serializer, flow);
+  
   ndpi_serialize_start_of_block(serializer, "ndpi");
   ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
   if(l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
