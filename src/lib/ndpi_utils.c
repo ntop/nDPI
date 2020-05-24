@@ -903,8 +903,8 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
 
 /* ********************************** */
 
-static void ndpi_serialize_risk(ndpi_serializer *serializer,
-				struct ndpi_flow_struct *flow) {
+void ndpi_serialize_risk(ndpi_serializer *serializer,
+			 struct ndpi_flow_struct *flow) {
   if(flow->risk != 0) {
     u_int32_t i;
 
