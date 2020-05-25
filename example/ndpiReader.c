@@ -840,6 +840,11 @@ static void parseOptions(int argc, char **argv) {
     printCSVHeader();
 
 #ifndef USE_DPDK
+  if(do_capture) {
+    quiet_mode = 1;
+    extcap_capture();
+  }
+
   if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
     num_threads = 0;               /* setting number of threads = number of interfaces */
     __pcap_file = strtok(_pcap_file[0], ",");
