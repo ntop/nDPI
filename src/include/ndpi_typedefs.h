@@ -1438,6 +1438,8 @@ typedef enum {
 #define NDPI_SERIALIZER_STATUS_EOR       (1 << 2)
 #define NDPI_SERIALIZER_STATUS_SOB       (1 << 3)
 #define NDPI_SERIALIZER_STATUS_NOT_EMPTY (1 << 4)
+#define NDPI_SERIALIZER_STATUS_LIST      (1 << 5)
+#define NDPI_SERIALIZER_STATUS_SOL       (1 << 6)
 
 typedef struct {
   u_int32_t flags;

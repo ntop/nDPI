@@ -973,6 +973,9 @@ extern "C" {
   int ndpi_serialize_raw_record(ndpi_serializer *_serializer,
 				u_char *record, u_int32_t record_len);
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
+  int ndpi_serialize_start_of_list(ndpi_serializer *serializer,
+				   const char *key);
+  int ndpi_serialize_end_of_list(ndpi_serializer *serializer);
   int ndpi_serialize_start_of_block(ndpi_serializer *serializer,
 				    const char *key);
   int ndpi_serialize_end_of_block(ndpi_serializer *serializer);
