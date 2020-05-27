@@ -1,4 +1,4 @@
-Cloudflare	51	11967	3
+Cloudflare	21	5229	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -6,5 +6,3 @@ JA3 Host Stats:
 
 
 	1	TCP 192.168.1.57:50076 <-> 104.22.72.170:443 [proto: 91.220/TLS.Cloudflare][cat: Web/5][11 pkts/1609 bytes <-> 10 pkts/3620 bytes][Goodput ratio: 62/84][0.11 sec][ALPN: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.385 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/8 27/27 10/11][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 146/362 770/1506 204/501][TLSv1.3][JA3C: e5ef852e686954ba9fe060fbfa881e15][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Cipher: TLS_AES_128_GCM_SHA256]
-	2	TCP 192.168.1.57:50077 <-> 104.22.72.170:443 [proto: 91.220/TLS.Cloudflare][cat: Web/5][10 pkts/1555 bytes <-> 9 pkts/3543 bytes][Goodput ratio: 64/85][0.10 sec][ALPN: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.390 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 10/8 26/24 10/10][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 156/394 770/1506 212/519][TLSv1.3][JA3C: e5ef852e686954ba9fe060fbfa881e15][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Cipher: TLS_AES_128_GCM_SHA256]
-	3	TCP 192.168.1.57:50052 <-> 104.22.72.170:443 [proto: 91.220/TLS.Cloudflare][cat: Web/5][6 pkts/505 bytes <-> 5 pkts/1135 bytes][Goodput ratio: 36/76][0.03 sec][bytes ratio: -0.384 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/1 23/4 10/2][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 84/227 164/518 44/189][PLAIN TEXT (tg@q/Y)]
