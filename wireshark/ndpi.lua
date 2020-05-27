@@ -895,10 +895,12 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    -- The trick below avoids to process the packet twice
 
    if(pinfo.visited == true) then
-      local eth_trailer = f_eth_trailer()
+      local eth_trailer = {f_eth_trailer()}
 
-      if(eth_trailer ~= nil) then
-	 local eth_trailer = getval(eth_trailer)
+      -- Depending on Wireshark configuration, there may be multiple ethernet trailer fields.
+      -- Ours should be the last one, anyway
+      if(eth_trailer[#eth_trailer] ~= nil) then
+	 local eth_trailer = getval(eth_trailer[#eth_trailer])
 	 local magic = string.sub(eth_trailer, 1, 11)
 
 	 if(magic == "19:68:09:24") then
