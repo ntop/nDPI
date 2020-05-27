@@ -8390,8 +8390,11 @@ static ndpi_network host_protocol_list[] = {
   { 0xD0163900 /* 208.22.57.0/24 */,   24, NDPI_PROTOCOL_BLOOMBERG },
   { 0x45BFC000 /* 69.191.192.0/18 */,  18, NDPI_PROTOCOL_BLOOMBERG },
 
-  /* Microsoft
-     https://docs.microsoft.com/en-us/office365/enterprise/urls-and-ip-address-ranges
+  /* 
+     Microsoft
+     
+     [JSON] https://endpoints.office.com/endpoints/worldwide?clientrequestid=b10c5ed1-bad1-445f-b386-b919946339a7
+     [HTML] https://docs.microsoft.com/en-us/office365/enterprise/urls-and-ip-address-ranges
   */
  { 0x0D6B0698 /* 13.107.6.152/31 */, 31, NDPI_PROTOCOL_MICROSOFT_365 },
  { 0x0D6B120A /* 13.107.18.10/31 */, 31, NDPI_PROTOCOL_MICROSOFT_365 },

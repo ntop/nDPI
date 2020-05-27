@@ -1622,7 +1622,7 @@ u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndp
        || (node->value.uv.additional_user_value == port))
       return(node->value.uv.user_value);
   }
-    
+
   return(NDPI_PROTOCOL_UNKNOWN);
 }
 
@@ -2194,10 +2194,10 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 			       char *name, u_int name_len,
                                ndpi_protocol_category_t *category) {
   ndpi_protocol_breed_t breed;
-  u_int16_t id;  
+  u_int16_t id;
   int rc = ndpi_match_string_protocol_id(ndpi_str->custom_categories.hostnames.ac_automa,
 					 name, name_len, &id, category, &breed);
-    
+
   return(rc);
 }
 
@@ -2314,7 +2314,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/ndpi_exit_detection_module.c"
 #endif
-    
+
     ndpi_free(ndpi_str);
   }
 }
@@ -3768,7 +3768,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 void check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
                                 NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
   if(!flow)
-    return;  
+    return;
 
   void *func = NULL;
   u_int32_t a;
@@ -3945,16 +3945,16 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
   if(flow->packet.iph) {
     struct in_addr addr;
     u_int16_t sport, dport;
-    
+
     addr.s_addr = flow->packet.iph->saddr;
-    
+
     if((flow->l4_proto == IPPROTO_TCP) && flow->packet.tcp)
       sport = flow->packet.tcp->source, dport = flow->packet.tcp->dest;
     else if((flow->l4_proto == IPPROTO_UDP) && flow->packet.udp)
       sport = flow->packet.udp->source, dport = flow->packet.udp->dest;
     else
       sport = dport = 0;
-    
+
     /* guess host protocol */
     ret = ndpi_network_port_ptree_match(ndpi_str, &addr, sport);
 
@@ -4359,16 +4359,16 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				    struct ndpi_flow_struct *flow,
 				    ndpi_protocol *ret) {
-  /* 
+  /*
      Skype for a host doing MS Teams means MS Teams
      (MS Teams uses Skype as transport protocol for voice/video)
   */
-  
+
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MSTEAMS:
     if(flow->packet.iph && flow->packet.tcp) {
       // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
-      
+
       if(ndpi_str->msteams_cache == NULL)
 	ndpi_str->msteams_cache = ndpi_lru_cache_init(1024);
 
@@ -4385,7 +4385,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
        && flow->packet.udp
        && ndpi_str->msteams_cache) {
       u_int16_t when;
-      
+
       if(ndpi_lru_find_cache(ndpi_str->msteams_cache, flow->packet.iph->saddr,
 			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
 	u_int16_t tdiff = (flow->packet.tick_timestamp & 0xFFFF) - when;
@@ -4393,11 +4393,16 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 	if(tdiff < 60 /* sec */) {
 	  // printf("====>> NDPI_PROTOCOL_SKYPE(_CALL) -> NDPI_PROTOCOL_MSTEAMS [%u]\n", tdiff);
 	  ret->app_protocol = NDPI_PROTOCOL_MSTEAMS;
+
+	  /* Refresh cache */
+	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
+				flow->packet.iph->saddr,
+				flow->packet.tick_timestamp & 0xFFFF /* 16 bit */);
 	}
       }
     }
     break;
-  } /* switch */  
+  } /* switch */
 }
 
 /* ********************************************************************************* */
@@ -4638,7 +4643,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if((!flow->risk_checked) && (ret.master_protocol != NDPI_PROTOCOL_UNKNOWN)) {
     ndpi_default_ports_tree_node_t *found;
     u_int16_t *default_ports, sport, dport;
-    
+
     if(flow->packet.udp)
       found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
 					   sport = ntohs(flow->packet.udp->source),
@@ -4648,7 +4653,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_TCP,
 					   sport = ntohs(flow->packet.tcp->source),
 					   dport = ntohs(flow->packet.tcp->dest)),
-	default_ports = ndpi_str->proto_defaults[ret.master_protocol].tcp_default_ports;	
+	default_ports = ndpi_str->proto_defaults[ret.master_protocol].tcp_default_ports;
     else
       found = NULL, default_ports = NULL;
 
@@ -4659,7 +4664,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
     } else if(default_ports && (default_ports[0] != 0)) {
       u_int8_t found = 0, i;
-      
+
       for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
 	if((default_ports[i] == sport) || (default_ports[i] == dport)) {
 	  found = 1;
@@ -4672,12 +4677,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
       }
     }
-    
+
     flow->risk_checked = 1;
   }
-  
+
   ndpi_reconcile_protocols(ndpi_str, flow, &ret);
-  
+
  invalidate_ptr:
   /*
     Invalidate packet memory to avoid accessing the pointers below
@@ -4865,7 +4870,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	u_int32_t a1 = a + 4;
 
 	diff = ndpi_min(packet->payload_packet_len-a1, sizeof(flow->initial_binary_bytes));
-	
+
 	if(diff > 0) {
 	  memcpy(&flow->initial_binary_bytes, &packet->payload[a1], diff);
 	  flow->initial_binary_bytes_len = diff;
