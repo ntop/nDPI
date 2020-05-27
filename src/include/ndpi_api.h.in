@@ -1036,6 +1036,7 @@ extern "C" {
 
   u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
 				     ndpi_protocol proto);
+  void ndpi_serialize_risk(ndpi_serializer *serializer, struct ndpi_flow_struct *flow);
 
   const char* ndpi_risk2str(ndpi_risk_enum risk);
 #ifdef __cplusplus
