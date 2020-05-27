@@ -172,6 +172,7 @@ struct ndpi_packet_trailer {
 };
 
 static pcap_dumper_t *extcap_dumper = NULL;
+static pcap_t *extcap_fifo_h = NULL;
 static char extcap_buf[16384];
 static char *extcap_capture_fifo    = NULL;
 static u_int16_t extcap_packet_filter = (u_int16_t)-1;
@@ -559,7 +560,16 @@ void extcap_capture() {
   if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
 #endif
 
-  if((extcap_dumper = pcap_dump_open(pcap_open_dead(DLT_EN10MB, 16384 /* MTU */),
+  if((extcap_fifo_h = pcap_open_dead(DLT_EN10MB, 16384 /* MTU */)) == NULL) {
+    fprintf(stderr, "Error pcap_open_dead");
+
+#ifdef DEBUG_TRACE
+    if(trace) fprintf(trace, "Error pcap_open_dead\n");
+#endif
+    return;
+  }
+
+  if((extcap_dumper = pcap_dump_open(extcap_fifo_h,
 				     extcap_capture_fifo)) == NULL) {
     fprintf(stderr, "Unable to open the pcap dumper on %s", extcap_capture_fifo);
 
@@ -3512,6 +3522,7 @@ int orginal_main(int argc, char **argv) {
     if(results_path)  free(results_path);
     if(results_file)  fclose(results_file);
     if(extcap_dumper) pcap_dump_close(extcap_dumper);
+    if(extcap_fifo_h) pcap_close(extcap_fifo_h);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
     if(csv_fp)        fclose(csv_fp);
 
