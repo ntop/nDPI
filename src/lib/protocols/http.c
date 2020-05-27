@@ -600,21 +600,42 @@ static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 #if 0
 static const char* suspicious_http_header_keys[] =
   {
-   "Cores",
-   NULL
+    "Cores",
+    "Arch",
+    "Mem",
+    "Os",
+    "Osname",
+    "Osversion",
+    "Root",
+    "Uuid",
+    "S",
+    "TLS_version",
+    "X-Hire-Me",
+    NULL
   };
 #endif
 
 static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow) {
 #if 0
-  int i;
+  int i,s;
+  unsigned int header_len;
+  const u_int8_t* header_limit;
+
+  struct ndpi_packet_struct *packet = &flow->packet;
   
   for(i=0; (i<packet->parsed_lines) && (packet->line[i].ptr != NULL); i++) {
-    printf("-->> [len: %u] [%s]\n", packet->line[i].len, packet->line[i].ptr);
-
-    if(match_found)
-      NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+    if((header_limit = memchr(packet->line[i].ptr, ':', (packet->line[i].len)))){
+      header_len = header_limit - packet->line[i].ptr;
+      for(s=0; suspicious_http_header_keys[s] != NULL; s++){
+        if(!strncmp((const char*) packet->line[i].ptr ,
+                  suspicious_http_header_keys[s], 
+                  header_len)){
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+            break;
+          }
+      }
+    }
   }
 #endif
 }
