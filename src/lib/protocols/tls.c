@@ -34,13 +34,13 @@ extern char *strptime(const char *s, const char *format, struct tm *tm);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
 
-// #define DEBUG_TLS_MEMORY 1
-// #define DEBUG_TLS 1
-
+// #define DEBUG_TLS_MEMORY       1
+// #define DEBUG_TLS              1
 
 // #define DEBUG_CERTIFICATE_HASH
 
-/* #define DEBUG_FINGERPRINT 1 */
+/* #define DEBUG_FINGERPRINT      1 */
+/* #define DEBUG_ENCRYPTED_SNI    1 */
 
 /*
   NOTE
@@ -1252,10 +1252,53 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if(flow->protos.stun_ssl.ssl.tls_supported_versions == NULL)
 		  flow->protos.stun_ssl.ssl.tls_supported_versions = ndpi_strdup(version_str);
 		}
+	      } else if(extension_id == 65486 /* encrypted server name */) {
+		u_int16_t e_offset = offset+extension_offset;
+		u_int16_t initial_offset = e_offset;
+		u_int16_t e_sni_len, cipher_suite = ntohs(*((u_int16_t*)&packet->payload[e_offset]));
 
+		flow->protos.stun_ssl.ssl.encrypted_sni.cipher_suite = cipher_suite;
+		
+		e_offset += 2; /* Cipher suite len */
+		
+		/* Key Share Entry */
+		e_offset += 2; /* Group */
+		e_offset +=  ntohs(*((u_int16_t*)&packet->payload[e_offset])) + 2; /* Lenght */
+
+		if((e_offset+4) < packet->payload_packet_len) {
+		  /* Record Digest */
+		  e_offset +=  ntohs(*((u_int16_t*)&packet->payload[e_offset])) + 2; /* Lenght */
+		  
+		  if((e_offset+4) < packet->payload_packet_len) {
+		    e_sni_len = ntohs(*((u_int16_t*)&packet->payload[e_offset]));
+		    e_offset += 2;
+		    
+		    if((e_offset+e_sni_len-extension_len-initial_offset) >= 0) {
+#ifdef DEBUG_ENCRYPTED_SNI
+		      printf("Client SSL [Encrypted Server Name len: %u]\n", e_sni_len);
+#endif
+
+		      flow->protos.stun_ssl.ssl.encrypted_sni.esni = (char*)ndpi_malloc(e_sni_len*2+1);
+
+		      if(flow->protos.stun_ssl.ssl.encrypted_sni.esni) {
+			u_int16_t i, off;
+			
+			for(i=e_offset, off=0; i<(e_offset+e_sni_len); i++) {
+			  int rc = sprintf(&flow->protos.stun_ssl.ssl.encrypted_sni.esni[off], "%02X", packet->payload[i] & 0XFF);
+
+			  if(rc <= 0) {
+			    flow->protos.stun_ssl.ssl.encrypted_sni.esni[off] = '\0';
+			    break;
+			  } else
+			    off += rc;
+			}
+		      }
+		    }
+		  }
+		}
 	      }
 
-	      extension_offset += extension_len;
+	      extension_offset += extension_len; /* Move to the next extension */
 
 #ifdef DEBUG_TLS
 	      printf("Client SSL [extension_offset/len: %u/%u]\n", extension_offset, extension_len);

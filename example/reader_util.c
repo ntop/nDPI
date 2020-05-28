@@ -489,6 +489,11 @@ void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     ndpi_free(flow->ssh_tls.tls_subjectDN);
     flow->ssh_tls.tls_subjectDN = NULL;
   }
+
+  if(flow->ssh_tls.encrypted_sni.esni) {
+    ndpi_free(flow->ssh_tls.encrypted_sni.esni);
+    flow->ssh_tls.encrypted_sni.esni = NULL;
+  }
 }
 
 /* ***************************************************** */
@@ -1121,6 +1126,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     
     if(flow->ndpi_flow->protos.stun_ssl.ssl.subjectDN)
       flow->ssh_tls.tls_subjectDN = strdup(flow->ndpi_flow->protos.stun_ssl.ssl.subjectDN);
+
+    if(flow->ndpi_flow->protos.stun_ssl.ssl.encrypted_sni.esni) {
+      flow->ssh_tls.encrypted_sni.esni = strdup(flow->ndpi_flow->protos.stun_ssl.ssl.encrypted_sni.esni);
+      flow->ssh_tls.encrypted_sni.cipher_suite = flow->ndpi_flow->protos.stun_ssl.ssl.encrypted_sni.cipher_suite;
+    }
     
     if(flow->ssh_tls.tls_supported_versions) {
       if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)) != NULL)

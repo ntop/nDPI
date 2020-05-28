@@ -6124,6 +6124,9 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
       if(flow->l4.tcp.tls.srv_cert_fingerprint_ctx)
 	ndpi_free(flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
+
+      if(flow->protos.stun_ssl.ssl.encrypted_sni.esni)
+	ndpi_free(flow->protos.stun_ssl.ssl.encrypted_sni.esni);
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
