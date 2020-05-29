@@ -597,26 +597,83 @@ static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
 
 /*************************************************************************************************/
 
-#if 0
-static const char* suspicious_http_header_keys[] =
-  {
-   "Cores",
-   NULL
-  };
-#endif
+static const char* suspicious_http_header_keys_A[] = { "Arch", NULL};
+static const char* suspicious_http_header_keys_C[] = { "Cores", NULL};
+static const char* suspicious_http_header_keys_M[] = { "Mem", NULL};
+static const char* suspicious_http_header_keys_O[] = { "Os", "Osname", "Osversion", NULL};
+static const char* suspicious_http_header_keys_R[] = { "Root", NULL};
+static const char* suspicious_http_header_keys_S[] = { "S", NULL};
+static const char* suspicious_http_header_keys_T[] = { "TLS_version", NULL};
+static const char* suspicious_http_header_keys_U[] = { "Uuid", NULL};
+static const char* suspicious_http_header_keys_X[] = { "X-Hire-Me", NULL};
+
+
+static int is_a_suspicious_header(const char* suspicious_headers[], struct ndpi_int_one_line_struct packet_line){
+  int i;
+  unsigned int header_len;
+  const u_int8_t* header_limit;
+
+  if((header_limit = memchr(packet_line.ptr, ':', packet_line.len))){
+      header_len = header_limit - packet_line.ptr;
+      for(i=0; suspicious_headers[i] != NULL; i++){
+        if(!strncasecmp((const char*) packet_line.ptr,
+                        suspicious_headers[i], 
+                        header_len))
+            return 1;
+      }
+  }
+  return 0;
+}
 
 static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow) {
-#if 0
   int i;
-  
-  for(i=0; (i<packet->parsed_lines) && (packet->line[i].ptr != NULL); i++) {
-    printf("-->> [len: %u] [%s]\n", packet->line[i].len, packet->line[i].ptr);
 
-    if(match_found)
-      NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
-  }
-#endif
+  struct ndpi_packet_struct *packet = &flow->packet;
+
+  for(i=0; (i<packet->parsed_lines) && (packet->line[i].ptr != NULL); i++) {
+    switch(packet->line[i].ptr[0]){
+        case 'A':
+          if(is_a_suspicious_header(suspicious_http_header_keys_A, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'C':
+          if(is_a_suspicious_header(suspicious_http_header_keys_C, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'M':
+          if(is_a_suspicious_header(suspicious_http_header_keys_M, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'O':
+          if(is_a_suspicious_header(suspicious_http_header_keys_O, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'R':
+          if(is_a_suspicious_header(suspicious_http_header_keys_R, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'S':
+          if(is_a_suspicious_header(suspicious_http_header_keys_S, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'T':
+          if(is_a_suspicious_header(suspicious_http_header_keys_T, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'U':
+          if(is_a_suspicious_header(suspicious_http_header_keys_U, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        case 'X':
+          if(is_a_suspicious_header(suspicious_http_header_keys_X, packet->line[i]))
+            NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_HEADER);
+          break;
+        default:
+          continue;
+      }
+    }
+    return;
 }
 
 /*************************************************************************************************/
