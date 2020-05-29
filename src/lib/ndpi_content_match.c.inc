@@ -8390,9 +8390,9 @@ static ndpi_network host_protocol_list[] = {
   { 0xD0163900 /* 208.22.57.0/24 */,   24, NDPI_PROTOCOL_BLOOMBERG },
   { 0x45BFC000 /* 69.191.192.0/18 */,  18, NDPI_PROTOCOL_BLOOMBERG },
 
-  /* 
+  /*
      Microsoft
-     
+
      [JSON] https://endpoints.office.com/endpoints/worldwide?clientrequestid=b10c5ed1-bad1-445f-b386-b919946339a7
      [HTML] https://docs.microsoft.com/en-us/office365/enterprise/urls-and-ip-address-ranges
   */
@@ -8768,6 +8768,10 @@ static ndpi_protocol_match host_match[] =
    /* http://check.googlezip.net/connect [check browser connectivity] */
    // { ".googlezip.net",                   "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE },
 
+   /*
+      https://github.com/bambenek/block-doh/blob/master/db.doh-redirect
+      https://github.com/curl/curl/wiki/DNS-over-HTTPS
+   */
    { "dns.google", "DoH_DoT",     NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },
    { "mozilla.cloudflare-dns.com", "DoH_DoT",     NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE }, /* Firefox */
    { "cloudflare-dns.com", "DoH_DoT",     NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE },

@@ -1479,6 +1479,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_HTTP_SUSPICIOUS_URL:
     return("HTTP Suspicious URL");
+
+  case NDPI_HTTP_SUSPICIOUS_HEADER:
+    return("HTTP Suspicious Header");
     
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
