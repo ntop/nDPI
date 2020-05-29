@@ -629,11 +629,12 @@ static int is_a_suspicious_header(const char* suspicious_headers[], struct ndpi_
 
 static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow) {
-  int i;
-
+  u_int32_t i;
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  for(i=0; (i < packet->parsed_lines) && (packet->line[i].ptr != NULL) && (packet->line[i].len > 0); i++) {
+  for(i=0; (i < packet->parsed_lines)
+	&& (packet->line[i].ptr != NULL)
+	&& (packet->line[i].len > 0); i++) {
     switch(packet->line[i].ptr[0]){
     case 'A':
       if(is_a_suspicious_header(suspicious_http_header_keys_A, packet->line[i])) {
