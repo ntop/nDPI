@@ -1253,6 +1253,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  flow->protos.stun_ssl.ssl.tls_supported_versions = ndpi_strdup(version_str);
 		}
 	      } else if(extension_id == 65486 /* encrypted server name */) {
+		/* 
+		   - https://tools.ietf.org/html/draft-ietf-tls-esni-06 
+		   - https://blog.cloudflare.com/encrypted-sni/
+		*/
 		u_int16_t e_offset = offset+extension_offset;
 		u_int16_t initial_offset = e_offset;
 		u_int16_t e_sni_len, cipher_suite = ntohs(*((u_int16_t*)&packet->payload[e_offset]));
