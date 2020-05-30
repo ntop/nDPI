@@ -28,20 +28,16 @@
 #include "ndpi_api.h"
 #include <stdlib.h>
 
-static const char* binary_file_mimes[] = {
-  "exe",
-  "vnd.ms-cab-compressed",
-  "vnd.microsoft.portable-executable"
-  "x-msdownload",
-  "x-dosexec",
-  NULL
-};
+static const char* binary_file_mimes_e[] = { "exe", NULL };
+static const char* binary_file_mimes_v[] = { "vnd.ms-cab-compressed", "vnd.microsoft.portable-executable", NULL };
+static const char* binary_file_mimes_x[] = { "x-msdownload", "x-dosexec", NULL };
 
+#define ATTACHMENT_LEN    3
 static const char* binary_file_ext[] = {
-  ".exe",
-  ".msi",
-  ".cab",
-  NULL
+					"exe",
+					"msi",
+					"cab",
+					NULL
 };
 
 static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
@@ -112,34 +108,51 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
       if(ndpi_strncasestr(app, "mpeg", app_len_avail) != NULL) {
 	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_STREAMING;
 	return(flow->category);
-      } else {
-  for (int i = 0; binary_file_mimes[i] != NULL; i++) {
-    if (ndpi_strncasestr(app, binary_file_mimes[i], app_len_avail) != NULL) {
-      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
-      NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
-      return(flow->category);
-    }
-  }
+      } else if (app_len_avail > 1) {
+	const char** cmp_mimes = NULL;
+
+	switch(app[0]) {
+	case 'e': cmp_mimes = binary_file_mimes_e; break;
+	case 'v': cmp_mimes = binary_file_mimes_v; break;
+	case 'x': cmp_mimes = binary_file_mimes_x; break;
+	}
+
+	if(cmp_mimes) {
+	  for(int i = 0; cmp_mimes[i] != NULL; i++) {
+	    if(ndpi_strncasestr(app, cmp_mimes[i], app_len_avail) != NULL) {
+	      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
+	      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
+	      NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
+	      return(flow->category);
+	    }
+	  }
+	}
       }
     }
 
     /* check for attachment */
-  if (packet->content_disposition_line.len > 0) {
-    uint8_t attachment_len = sizeof("attachment; filename");
-    if (packet->content_disposition_line.len > attachment_len) {
-      uint8_t filename_len = packet->content_disposition_line.len - attachment_len;
-      for (int i = 0; binary_file_ext[i] != NULL; i++) {
-        if (ndpi_strncasestr((const char*)&packet->content_disposition_line.ptr[attachment_len],
-            binary_file_ext[i], filename_len)) {
-          flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-          NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
-          NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
-          return(flow->category);
-        }
+    if (packet->content_disposition_line.len > 0) {
+      u_int8_t attachment_len = sizeof("attachment; filename");
+
+      if(packet->content_disposition_line.len > attachment_len) {
+	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
+
+	if(filename_len > ATTACHMENT_LEN) {
+	  attachment_len += filename_len-ATTACHMENT_LEN-1;
+	  
+	  for(int i = 0; binary_file_ext[i] != NULL; i++) {    
+	    if(strncmp((const char*)&packet->content_disposition_line.ptr[attachment_len],
+		      binary_file_ext[i], ATTACHMENT_LEN) == 0) {
+	      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
+	      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
+	      NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
+	      return(flow->category);
+	    }
+	  }
+	}
       }
     }
-  }
+    
     switch(packet->content_line.ptr[0]) {
     case 'a':
       if(strncasecmp((const char *)packet->content_line.ptr, "audio",
