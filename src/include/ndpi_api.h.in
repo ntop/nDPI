@@ -137,7 +137,7 @@ extern "C" {
    *         NULL if the substring is not found
    *
    */
-  char* ndpi_strncasestr(const char *s, const char *find, size_t slen);
+  const char* ndpi_strncasestr(const char *s, const char *find, size_t slen);
 
   /**
    * Returns the nDPI protocol id for IP-based protocol detection

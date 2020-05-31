@@ -5906,27 +5906,21 @@ char *ndpi_strnstr(const char *s, const char *find, size_t slen) {
 /*
  * Same as ndpi_strnstr but case-insensitive
  */
-char *ndpi_strncasestr(const char *s, const char *find, size_t slen) {
-  char c;
-  size_t len;
+const char * ndpi_strncasestr(const char *str1, const char *str2, size_t len) {
+  size_t str1_len = strnlen(str1, len);
+  size_t str2_len = strlen(str2);
+  size_t i;
 
-  if((c = *find++) != '\0') {
-    len = strlen(find);
-    do {
-      char sc;
-
-      do {
-	if(slen-- < 1 || (sc = *s++) == '\0')
-	  return(NULL);
-      } while (sc != c);
-
-      if(len > slen)
-	return(NULL);
-    } while (strncasecmp(s, find, len) != 0);
-
-    s--;
+  for(i = 0; i < (str1_len - str2_len + 1); i++){
+    if(str1[0] == '\0')
+      return NULL;    
+    else if(strncasecmp(str1, str2, str2_len) == 0)
+      return(str1);
+    
+    str1++;
   }
-  return((char *) s);
+
+  return NULL;
 }
 
 /* ****************************************************** */
