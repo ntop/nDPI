@@ -102,13 +102,13 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     u_int app_len = sizeof("application");
 
     if(packet->content_line.len > app_len) {
-      const char *app = (const char *)&packet->content_line.ptr[app_len];
-      u_int app_len_avail =  packet->content_line.len-app_len;
+      const char *app     = (const char *)&packet->content_line.ptr[app_len];
+      u_int app_len_avail = packet->content_line.len-app_len;
 
       if(ndpi_strncasestr(app, "mpeg", app_len_avail) != NULL) {
 	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_STREAMING;
 	return(flow->category);
-      } else if (app_len_avail > 1) {
+      } else if(app_len_avail > 3) {
 	const char** cmp_mimes = NULL;
 
 	switch(app[0]) {
@@ -117,8 +117,10 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	case 'x': cmp_mimes = binary_file_mimes_x; break;
 	}
 
-	if(cmp_mimes) {
-	  for(int i = 0; cmp_mimes[i] != NULL; i++) {
+	if(cmp_mimes != NULL) {
+	  u_int8_t i;
+	  
+	  for(i = 0; cmp_mimes[i] != NULL; i++) {
 	    if(ndpi_strncasestr(app, cmp_mimes[i], app_len_avail) != NULL) {
 	      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 	      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
