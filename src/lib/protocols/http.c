@@ -105,7 +105,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
       const char *app     = (const char *)&packet->content_line.ptr[app_len];
       u_int app_len_avail = packet->content_line.len-app_len;
 
-      if(ndpi_strncasestr(app, "mpeg", app_len_avail) != NULL) {
+      if(strncasecmp(app, "mpeg", app_len_avail) == 0) {
 	flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_STREAMING;
 	return(flow->category);
       } else if(app_len_avail > 3) {
@@ -121,7 +121,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	  u_int8_t i;
 	  
 	  for(i = 0; cmp_mimes[i] != NULL; i++) {
-	    if(ndpi_strncasestr(app, cmp_mimes[i], app_len_avail) != NULL) {
+	    if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
 	      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 	      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
 	      NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
