@@ -202,11 +202,13 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 
 	      if(body_offset < packet->payload_packet_len) {
-		u_int16_t name_offset;
-
-		name_offset = body_offset + 13;
-		for(i=0; i<20; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
-
+		u_int16_t name_offset = body_offset + 13;
+		
+		for(i=0; (i<20) && (name_offset < packet->payload_packet_len); i++) {
+		  if(packet->payload[name_offset] != 0x1b)
+		    name_offset++; /* ASN.1 */
+		}
+		
 #ifdef KERBEROS_DEBUG
 		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
 #endif
