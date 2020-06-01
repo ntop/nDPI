@@ -47,7 +47,7 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
 
     if((packet->udp->source == spotify_port)
        && (packet->udp->dest == spotify_port)) {
-      if(payload_len > 2) {
+      if(payload_len >= 7) {
 	if(memcmp(packet->payload, "SpotUdp", 7) == 0) {
 	  NDPI_LOG_INFO(ndpi_struct, "found spotify udp dissector\n");
 	  ndpi_int_spotify_add_connection(ndpi_struct, flow, 0);
