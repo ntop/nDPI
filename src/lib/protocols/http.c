@@ -119,7 +119,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 	if(cmp_mimes != NULL) {
 	  u_int8_t i;
-	  
+
 	  for(i = 0; cmp_mimes[i] != NULL; i++) {
 	    if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
 	      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
@@ -141,20 +141,23 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 	if(filename_len > ATTACHMENT_LEN) {
 	  attachment_len += filename_len-ATTACHMENT_LEN-1;
-	  
-	  for(int i = 0; binary_file_ext[i] != NULL; i++) {    
-	    if(strncmp((const char*)&packet->content_disposition_line.ptr[attachment_len],
-		      binary_file_ext[i], ATTACHMENT_LEN) == 0) {
-	      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-	      NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
-	      NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
-	      return(flow->category);
+
+	  if((attachment_len+ATTACHMENT_LEN) <= packet->content_disposition_line.len) {
+	    for(int i = 0; binary_file_ext[i] != NULL; i++) {
+	      /* Use memcmp in case content-disposition contains binary data */
+	      if(memcmp((const char*)&packet->content_disposition_line.ptr[attachment_len],
+			 binary_file_ext[i], ATTACHMENT_LEN) == 0) {
+		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
+		NDPI_SET_BIT(flow->risk, NDPI_BINARY_APPLICATION_TRANSFER);
+		NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
+		return(flow->category);
+	      }
 	    }
 	  }
 	}
       }
     }
-    
+
     switch(packet->content_line.ptr[0]) {
     case 'a':
       if(strncasecmp((const char *)packet->content_line.ptr, "audio",
@@ -193,7 +196,6 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   if((flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) || (http_protocol != NDPI_PROTOCOL_HTTP))
     flow->guessed_host_protocol_id = http_protocol;
 
-  category = ndpi_http_check_content(ndpi_struct, flow);
   ndpi_int_reset_protocol(flow);
   ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_HTTP);
 
@@ -201,7 +203,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   flow->check_extra_packets = 1;
   flow->max_extra_packets_to_check = 5;
   flow->extra_packets_func = ndpi_search_http_tcp_again;
-  flow->http_detected = 1, flow->guessed_category = flow->category = category;
+  flow->http_detected = 1;
 }
 
 /* ************************************************************* */
@@ -532,7 +534,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	strncpy(flow->http.content_type, (char*)packet->content_line.ptr,
 		packet->content_line.len);
 	flow->http.content_type[packet->content_line.len] = '\0';
-      }
+
+	flow->guessed_category = flow->category = ndpi_http_check_content(ndpi_struct, flow);}
     }
 
     if(flow->http_detected) {
