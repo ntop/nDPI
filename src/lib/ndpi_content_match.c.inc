@@ -8936,6 +8936,7 @@ static ndpi_protocol_match host_match[] =
 
    { ".spotify.",                               "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
    { "audio-fa.scdn.co",                   "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotifycdn.net",                   "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
 
    { "edge-mqtt.facebook.com",        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
    { "mqtt-mini.facebook.com",        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE }, /* Messenger Lite */
