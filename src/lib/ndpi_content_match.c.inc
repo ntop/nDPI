@@ -8886,6 +8886,8 @@ static ndpi_protocol_match host_match[] =
    { "nflxvideo.net",                       "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
    { "nflxso.net",                             "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
 
+   { ".teamviewer.com",                                    "Teamviewer",            NDPI_PROTOCOL_TEAMVIEWER, NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS, NDPI_PROTOCOL_ACCEPTABLE },
+
    { ".skype.",                                    "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
    { ".skypeassets.",                        "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
    { ".skypedata.",                            "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
