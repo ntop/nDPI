@@ -1094,7 +1094,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
 	     flow->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name);
 
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.server_names_len > 0)
+    if(flow->ndpi_flow->protos.stun_ssl.ssl.server_names_len > 0 && flow->ndpi_flow->protos.stun_ssl.ssl.server_names)
       flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.server_names);
     flow->ssh_tls.notBefore = flow->ndpi_flow->protos.stun_ssl.ssl.notBefore;
     flow->ssh_tls.notAfter = flow->ndpi_flow->protos.stun_ssl.ssl.notAfter;
