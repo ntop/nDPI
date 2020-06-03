@@ -8673,6 +8673,8 @@ static ndpi_protocol_match host_match[] =
    { ".cloudfront.net",                                        "Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
    { ".us-west-2.compute.amazonaws.com","Amazon",           NDPI_PROTOCOL_AMAZON, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE },
 
+   { ".teamviewer.com",                                        "Teamviewer",           NDPI_PROTOCOL_TEAMVIEWER, NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS, NDPI_PROTOCOL_ACCEPTABLE },
+   
    /* Microsoft + Azure */
    { ".azure.com",                                            "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
    { ".windows.net",                                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE },
