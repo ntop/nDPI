@@ -1435,6 +1435,7 @@ typedef enum {
   ndpi_serialization_string
 } ndpi_serialization_type;
 
+#define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
 #define NDPI_SERIALIZER_DEFAULT_BUFFER_SIZE 8192
 #define NDPI_SERIALIZER_DEFAULT_BUFFER_INCR 1024
 
@@ -1445,18 +1446,29 @@ typedef enum {
 #define NDPI_SERIALIZER_STATUS_NOT_EMPTY (1 << 4)
 #define NDPI_SERIALIZER_STATUS_LIST      (1 << 5)
 #define NDPI_SERIALIZER_STATUS_SOL       (1 << 6)
+#define NDPI_SERIALIZER_STATUS_HDR_DONE  (1 << 7)
+
+typedef struct {
+  u_int32_t size_used;
+} ndpi_private_serializer_buffer_status;
 
 typedef struct {
   u_int32_t flags;
-  u_int32_t size_used;
+  ndpi_private_serializer_buffer_status buffer;
+  ndpi_private_serializer_buffer_status header;
 } ndpi_private_serializer_status;
 
 typedef struct {
+  u_int32_t initial_size;
+  u_int32_t size;
+  u_int8_t *data;
+} ndpi_private_serializer_buffer;
+
+typedef struct {
   ndpi_private_serializer_status status;
-  u_int32_t initial_buffer_size;
-  u_int32_t buffer_size;
+  ndpi_private_serializer_buffer buffer;
+  ndpi_private_serializer_buffer header;
   ndpi_serialization_format fmt;
-  u_int8_t *buffer;
   char csv_separator[2];
   u_int8_t has_snapshot;
   ndpi_private_serializer_status snapshot;

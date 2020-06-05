@@ -3084,22 +3084,26 @@ void serializerUnitTest() {
   ndpi_serializer serializer, deserializer;
   int i;
   u_int8_t trace = 0;
-  u_int8_t use_json = 0;
+  ndpi_serialization_format fmt = ndpi_serialization_format_tlv;
 
-  assert(ndpi_init_serializer(&serializer, use_json ? ndpi_serialization_format_json : ndpi_serialization_format_tlv) != -1);
+  //trace = 1;
+  //fmt = ndpi_serialization_format_json;
+  //fmt = ndpi_serialization_format_csv;
+
+  assert(ndpi_init_serializer(&serializer, fmt) != -1);
 
   for(i=0; i<16; i++) {
     char kbuf[32], vbuf[32];
-    snprintf(kbuf, sizeof(kbuf), "Hello %d", i);
-    snprintf(vbuf, sizeof(vbuf), "World %d", i);
+    snprintf(kbuf, sizeof(kbuf), "Key %d", i);
+    snprintf(vbuf, sizeof(vbuf), "Value %d", i);
     assert(ndpi_serialize_uint32_uint32(&serializer, i, i*i) != -1);
-    assert(ndpi_serialize_uint32_string(&serializer, i, "Hello") != -1);
+    assert(ndpi_serialize_uint32_string(&serializer, i, "Data") != -1);
     assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
     assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);
     assert(ndpi_serialize_string_float(&serializer,  kbuf, (float)(i*i), "%f") != -1);
   }
 
-  if (use_json) {
+  if (fmt == ndpi_serialization_format_json) {
 
     assert(ndpi_serialize_start_of_list(&serializer, "List") != -1);
 
@@ -3118,6 +3122,22 @@ void serializerUnitTest() {
       u_int32_t buffer_len = 0;
       char *buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
       printf("%s\n", buffer);
+      exit(0);
+    }
+
+  } else if (fmt == ndpi_serialization_format_csv) {
+
+    if(trace) {
+      u_int32_t buffer_len = 0;
+      char *buffer;
+
+      buffer = ndpi_serializer_get_header(&serializer, &buffer_len);
+      printf("%s\n", buffer);
+
+      buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+      printf("%s\n", buffer);
+
+      exit(0);
     }
 
   } else {
