@@ -131,6 +131,10 @@ void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size) {
 /* ****************************************** */
 
 char *ndpi_strdup(const char *s) {
+  if( s == NULL ){
+    return NULL;
+  }
+
   int len = strlen(s);
   char *m = ndpi_malloc(len + 1);
 
