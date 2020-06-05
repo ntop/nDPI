@@ -3101,6 +3101,7 @@ void serializerUnitTest() {
     assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
     assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);
     assert(ndpi_serialize_string_float(&serializer,  kbuf, (float)(i*i), "%f") != -1);
+    if ((i&0x3) == 0x3) ndpi_serialize_end_of_record(&serializer);
   }
 
   if (fmt == ndpi_serialization_format_json) {
