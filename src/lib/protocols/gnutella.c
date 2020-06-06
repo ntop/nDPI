@@ -41,7 +41,7 @@ static void ndpi_int_gnutella_add_connection(struct ndpi_detection_module_struct
   NDPI_LOG_INFO(ndpi_struct, "found GNUTELLA\n");
 
   if (src != NULL) {
-    src->gnutella_ts = packet->tick_timestamp;
+    src->gnutella_ts = packet->current_time_ms;
     if (packet->udp != NULL) {
       if (!src->detected_gnutella_udp_port1) {
 	src->detected_gnutella_udp_port1 = (packet->udp->source);
@@ -58,7 +58,7 @@ static void ndpi_int_gnutella_add_connection(struct ndpi_detection_module_struct
     }
   }
   if (dst != NULL) {
-    dst->gnutella_ts = packet->tick_timestamp;
+    dst->gnutella_ts = packet->current_time_ms;
   }
 }
 
@@ -74,19 +74,19 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 
   if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_GNUTELLA) {
     if (src != NULL && ((u_int32_t)
-			(packet->tick_timestamp - src->gnutella_ts) < ndpi_struct->gnutella_timeout)) {
+			(packet->current_time_ms - src->gnutella_ts) < ndpi_struct->gnutella_timeout)) {
       NDPI_LOG_DBG2(ndpi_struct, "save src connection packet detected\n");
-      src->gnutella_ts = packet->tick_timestamp;
+      src->gnutella_ts = packet->current_time_ms;
     } else if (dst != NULL && ((u_int32_t)
-			       (packet->tick_timestamp - dst->gnutella_ts) < ndpi_struct->gnutella_timeout)) {
+			       (packet->current_time_ms - dst->gnutella_ts) < ndpi_struct->gnutella_timeout)) {
       NDPI_LOG_DBG2(ndpi_struct, "save dst connection packet detected\n");
-      dst->gnutella_ts = packet->tick_timestamp;
+      dst->gnutella_ts = packet->current_time_ms;
     }
-    if (src != NULL && (packet->tick_timestamp - src->gnutella_ts) > ndpi_struct->gnutella_timeout) {
+    if (src != NULL && (packet->current_time_ms - src->gnutella_ts) > ndpi_struct->gnutella_timeout) {
       src->detected_gnutella_udp_port1 = 0;
       src->detected_gnutella_udp_port2 = 0;
     }
-    if (dst != NULL && (packet->tick_timestamp - dst->gnutella_ts) > ndpi_struct->gnutella_timeout) {
+    if (dst != NULL && (packet->current_time_ms - dst->gnutella_ts) > ndpi_struct->gnutella_timeout) {
       dst->detected_gnutella_udp_port1 = 0;
       dst->detected_gnutella_udp_port2 = 0;
     }
@@ -236,7 +236,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
   } else if (packet->udp != NULL) {
     if (src != NULL && (packet->udp->source == src->detected_gnutella_udp_port1 ||
 			packet->udp->source == src->detected_gnutella_udp_port2) &&
-	(packet->tick_timestamp - src->gnutella_ts) < ndpi_struct->gnutella_timeout) {
+	(packet->current_time_ms - src->gnutella_ts) < ndpi_struct->gnutella_timeout) {
       NDPI_LOG_DBG2(ndpi_struct, "port based detection\n\n");
       ndpi_int_gnutella_add_connection(ndpi_struct, flow);
     }

@@ -998,7 +998,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
-    double f = (double)flow->first_seen, l = (double)flow->last_seen;
+    double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
 
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
     dos_ge_score = Dos_goldeneye_score(flow);
@@ -1164,8 +1164,8 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	  100.0*((float)flow->src2dst_goodput_bytes / (float)(flow->src2dst_bytes+1)),
 	  100.0*((float)flow->dst2src_goodput_bytes / (float)(flow->dst2src_bytes+1)));
 
-  if(flow->last_seen > flow->first_seen)
-    fprintf(out, "[%.2f sec]", ((float)(flow->last_seen - flow->first_seen))/(float)1000);
+  if(flow->last_seen_ms > flow->first_seen_ms)
+    fprintf(out, "[%.2f sec]", ((float)(flow->last_seen_ms - flow->first_seen_ms))/(float)1000);
   else
     fprintf(out, "[< 1 sec]");
 
@@ -1761,7 +1761,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
     return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
-    if(flow->last_seen + MAX_IDLE_TIME < ndpi_thread_info[thread_id].workflow->last_time) {
+    if(flow->last_seen_ms + MAX_IDLE_TIME < ndpi_thread_info[thread_id].workflow->last_time) {
 
       /* update stats */
       node_proto_guess_walker(node, which, depth, user_data);
@@ -3182,7 +3182,7 @@ void serializerUnitTest() {
 	    break;
           default:
             printf("ERROR: Unsupported TLV key type %u\n", kt);
-	    // exit(0);
+	    //exit(0);
 	    return;
 	  }
 

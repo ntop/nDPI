@@ -1222,7 +1222,7 @@ void update_tcp_flags_count(struct ndpi_flow_info* flow, struct ndpi_tcphdr* tcp
    @Note: ipsize = header->len - ip_offset ; rawsize = header->len
 */
 static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
-					   const u_int64_t time,
+					   const u_int64_t time_ms,
 					   u_int16_t vlan_id,
 					   ndpi_packet_tunnel tunnel_type,
 					   const struct ndpi_iphdr *iph,
@@ -1355,10 +1355,10 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       }
     }
 
-    if(flow->first_seen == 0)
-      flow->first_seen = time;
+    if(flow->first_seen_ms == 0)
+      flow->first_seen_ms = time_ms;
 
-    flow->last_seen = time;
+    flow->last_seen_ms = time_ms;
 
     /* Copy packets entropy if num packets count == 10 */
     ndpi_clear_entropy_stats(flow);
@@ -1410,7 +1410,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
-							    ipsize, time, src, dst);
+							    ipsize, time_ms, src, dst);
     
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
@@ -1484,7 +1484,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   int wifi_len = 0;
   int pyld_eth_len = 0;
   int check;
-  u_int64_t time;
+  u_int64_t time_ms;
   u_int16_t ip_offset = 0, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0, recheck_type;
@@ -1497,15 +1497,15 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   workflow->stats.raw_packet_count++;
 
   /* setting time */
-  time = ((uint64_t) header->ts.tv_sec) * TICK_RESOLUTION + header->ts.tv_usec / (1000000 / TICK_RESOLUTION);
+  time_ms = ((uint64_t) header->ts.tv_sec) * TICK_RESOLUTION + header->ts.tv_usec / (1000000 / TICK_RESOLUTION);
 
   /* safety check */
-  if(workflow->last_time > time) {
+  if(workflow->last_time > time_ms) {
     /* printf("\nWARNING: timestamp bug in the pcap file (ts delta: %llu, repairing)\n", ndpi_thread_info[thread_id].last_time - time); */
-    time = workflow->last_time;
+    time_ms = workflow->last_time;
   }
   /* update last time value */
-  workflow->last_time = time;
+  workflow->last_time = time_ms;
 
   /*** check Data Link type ***/
   int datalink_type;
@@ -1863,7 +1863,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   }
 
   /* process the packet */
-  return(packet_processing(workflow, time, vlan_id, tunnel_type, iph, iph6,
+  return(packet_processing(workflow, time_ms, vlan_id, tunnel_type, iph, iph6,
 			   ip_offset, header->caplen - ip_offset,
 			   header->caplen, header, packet, header->ts));
 }

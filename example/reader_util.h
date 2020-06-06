@@ -174,7 +174,7 @@ typedef struct ndpi_flow_info {
   u_int32_t fin_count, src2dst_fin_count, dst2src_fin_count;
   u_int32_t rst_count, src2dst_rst_count, dst2src_rst_count;
   u_int32_t c_to_s_init_win, s_to_c_init_win;
-  u_int64_t first_seen, last_seen;
+  u_int64_t first_seen_ms, last_seen_ms;
   u_int64_t src2dst_bytes, dst2src_bytes;
   u_int64_t src2dst_goodput_bytes, dst2src_goodput_bytes;
   u_int32_t src2dst_packets, dst2src_packets;

@@ -399,25 +399,25 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
   }
   if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_IRC) {
     if (src != NULL && ((u_int32_t)
-			(packet->tick_timestamp - src->irc_ts) < ndpi_struct->irc_timeout)) {
+			(packet->current_time_ms - src->irc_ts) < ndpi_struct->irc_timeout)) {
       NDPI_LOG_DBG2(ndpi_struct, "irc : save src connection packet detected\n");
-      src->irc_ts = packet->tick_timestamp;
+      src->irc_ts = packet->current_time_ms;
     } else if (dst != NULL && ((u_int32_t)
-			       (packet->tick_timestamp - dst->irc_ts) < ndpi_struct->irc_timeout)) {
+			       (packet->current_time_ms - dst->irc_ts) < ndpi_struct->irc_timeout)) {
       NDPI_LOG_DBG2(ndpi_struct, "irc : save dst connection packet detected\n");
-      dst->irc_ts = packet->tick_timestamp;
+      dst->irc_ts = packet->current_time_ms;
     }
   }
 
   if (((dst != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_IRC)
 	&& ((u_int32_t)
-	    (packet->tick_timestamp - dst->irc_ts)) <
+	    (packet->current_time_ms - dst->irc_ts)) <
 	ndpi_struct->irc_timeout)) || (src != NULL
 				       &&
 				       NDPI_COMPARE_PROTOCOL_TO_BITMASK
 				       (src->detected_protocol_bitmask, NDPI_PROTOCOL_IRC)
 				       && ((u_int32_t)
-					   (packet->tick_timestamp - src->irc_ts)) < ndpi_struct->irc_timeout)) {
+					   (packet->current_time_ms - src->irc_ts)) < ndpi_struct->irc_timeout)) {
     if (packet->tcp != NULL) {
       sport = packet->tcp->source;
       dport = packet->tcp->dest;
@@ -425,7 +425,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     if (dst != NULL) {
       for (counter = 0; counter < dst->irc_number_of_port; counter++) {
 	if (dst->irc_port[counter] == sport || dst->irc_port[counter] == dport) {
-	  dst->last_time_port_used[counter] = packet->tick_timestamp;
+	  dst->last_time_port_used[counter] = packet->current_time_ms;
 	  NDPI_LOG_INFO(ndpi_struct, "found IRC: dest port matched with the DCC port");
 	  ndpi_int_irc_add_connection(ndpi_struct, flow);
 	  return;
@@ -435,7 +435,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     if (src != NULL) {
       for (counter = 0; counter < src->irc_number_of_port; counter++) {
 	if (src->irc_port[counter] == sport || src->irc_port[counter] == dport) {
-	  src->last_time_port_used[counter] = packet->tick_timestamp;
+	  src->last_time_port_used[counter] = packet->current_time_ms;
 	  NDPI_LOG_INFO(ndpi_struct, "found  IRC: Source port matched with the DCC port");
 	  ndpi_int_irc_add_connection(ndpi_struct, flow);
 	  return;
@@ -716,7 +716,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d jjeeeeeeeeeeeeeeeeeeeeeeeee",
 			     ntohs(get_u_int16_t(src->irc_port, 0)));
 			}
-			src->irc_ts = packet->tick_timestamp;
+			src->irc_ts = packet->current_time_ms;
 		      } else if (port != 0 && src->irc_number_of_port == NDPI_PROTOCOL_IRC_MAXPORT) {
 			if (!ndpi_is_duplicate(src, port)) {
 			  less = 0;
@@ -724,7 +724,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 			  src->irc_port[less] = port;
 			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d", ntohs(get_u_int16_t(src->irc_port, 0)));
 			}
-			src->irc_ts = packet->tick_timestamp;
+			src->irc_ts = packet->current_time_ms;
 		      }
 		      if (dst == NULL) {
 			break;
@@ -747,7 +747,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d", ntohs(get_u_int16_t(dst->irc_port, 0)));
 			  NDPI_LOG_DBG2(ndpi_struct, "juuuuuuuuuuuuuuuu");
 			}
-			dst->irc_ts = packet->tick_timestamp;
+			dst->irc_ts = packet->current_time_ms;
 		      } else if (port != 0 && dst->irc_number_of_port == NDPI_PROTOCOL_IRC_MAXPORT) {
 			if (!ndpi_is_duplicate(dst, port)) {
 			  less = 0;
@@ -756,7 +756,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
 			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d", ntohs(get_u_int16_t(dst->irc_port, 0)));
 			}
-			dst->irc_ts = packet->tick_timestamp;
+			dst->irc_ts = packet->current_time_ms;
 		      }
 
 		      break;

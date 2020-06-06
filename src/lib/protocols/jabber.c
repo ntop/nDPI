@@ -81,9 +81,9 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 		ntohs(src->jabber_file_transfer_port[0]),
 		ntohs(src->jabber_file_transfer_port[1]));
       if (((u_int32_t)
-	   (packet->tick_timestamp - src->jabber_stun_or_ft_ts)) >= ndpi_struct->jabber_file_transfer_timeout) {
+	   (packet->current_time_ms - src->jabber_stun_or_ft_ts)) >= ndpi_struct->jabber_file_transfer_timeout) {
 	NDPI_LOG_DBG2(ndpi_struct, "JABBER src stun timeout %u %u\n",
-			src->jabber_stun_or_ft_ts, packet->tick_timestamp);
+			src->jabber_stun_or_ft_ts, packet->current_time_ms);
 	src->jabber_file_transfer_port[0] = 0;
 	src->jabber_file_transfer_port[1] = 0;
       } else if (src->jabber_file_transfer_port[0] == packet->tcp->dest
@@ -101,9 +101,9 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 		ntohs(dst->jabber_file_transfer_port[0]),
 		ntohs(dst->jabber_file_transfer_port[1]));
       if (((u_int32_t)
-	   (packet->tick_timestamp - dst->jabber_stun_or_ft_ts)) >= ndpi_struct->jabber_file_transfer_timeout) {
+	   (packet->current_time_ms - dst->jabber_stun_or_ft_ts)) >= ndpi_struct->jabber_file_transfer_timeout) {
 	NDPI_LOG_DBG2(ndpi_struct, "JABBER dst stun timeout %u %u\n",
-			dst->jabber_stun_or_ft_ts, packet->tick_timestamp);
+			dst->jabber_stun_or_ft_ts, packet->current_time_ms);
 	dst->jabber_file_transfer_port[0] = 0;
 	dst->jabber_file_transfer_port[1] = 0;
       } else if (dst->jabber_file_transfer_port[0] == packet->tcp->dest
@@ -143,11 +143,11 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 	  if (memcmp(&packet->payload[x], "port=", 5) == 0) {
 	    NDPI_LOG_DBG2(ndpi_struct, "port=\n");
 	    if (src != NULL) {
-	      src->jabber_stun_or_ft_ts = packet->tick_timestamp;
+	      src->jabber_stun_or_ft_ts = packet->current_time_ms;
 	    }
 
 	    if (dst != NULL) {
-	      dst->jabber_stun_or_ft_ts = packet->tick_timestamp;
+	      dst->jabber_stun_or_ft_ts = packet->current_time_ms;
 	    }
 	    x += 6;
 	    j_port = ntohs_ndpi_bytestream_to_number(&packet->payload[x], packet->payload_packet_len, &x);
@@ -204,11 +204,11 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 	  if (memcmp(&packet->payload[x], "port=", 5) == 0) {
 	    NDPI_LOG_DBG2(ndpi_struct, "port=\n");
 	    if (src != NULL) {
-	      src->jabber_stun_or_ft_ts = packet->tick_timestamp;
+	      src->jabber_stun_or_ft_ts = packet->current_time_ms;
 	    }
 
 	    if (dst != NULL) {
-	      dst->jabber_stun_or_ft_ts = packet->tick_timestamp;
+	      dst->jabber_stun_or_ft_ts = packet->current_time_ms;
 	    }
 
 	    x += 6;

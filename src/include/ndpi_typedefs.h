@@ -509,17 +509,11 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_ts;
 
-  /* NDPI_PROTOCOL_BATTLEFIELD */
-  u_int32_t battlefield_ts;
-
   /* NDPI_PROTOCOL_THUNDER */
   u_int32_t thunder_ts;
 
   /* NDPI_PROTOCOL_RTSP */
   u_int32_t rtsp_timer;
-
-  /* NDPI_PROTOCOL_OSCAR */
-  u_int32_t oscar_last_safe_access_time;
 
   /* NDPI_PROTOCOL_ZATTOO */
   u_int32_t zattoo_ts;
@@ -560,9 +554,6 @@ struct ndpi_id_struct {
 
   /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_number_of_port;
-
-  /* NDPI_PROTOCOL_OSCAR */
-  u_int8_t oscar_ssl_session_id[33];
 
   /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   u_int8_t jabber_voice_stun_used_ports;
@@ -733,14 +724,8 @@ struct ndpi_flow_tcp_struct {
 /* ************************************************** */
 
 struct ndpi_flow_udp_struct {
-  /* NDPI_PROTOCOL_BATTLEFIELD */
-  u_int32_t battlefield_msg_id;
-
   /* NDPI_PROTOCOL_SNMP */
   u_int32_t snmp_msg_id;
-
-  /* NDPI_PROTOCOL_BATTLEFIELD */
-  u_int32_t battlefield_stage:3;
 
   /* NDPI_PROTOCOL_SNMP */
   u_int32_t snmp_stage:2;
@@ -802,8 +787,7 @@ struct ndpi_packet_struct {
   const u_int8_t *generic_l4_ptr;	/* is set only for non tcp-udp traffic */
   const u_int8_t *payload;
 
-  u_int32_t tick_timestamp;
-  u_int64_t tick_timestamp_l;
+  u_int64_t current_time_ms;
 
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_SIZE];
@@ -1074,16 +1058,12 @@ struct ndpi_detection_module_struct {
   u_int32_t irc_timeout;
   /* gnutella parameters */
   u_int32_t gnutella_timeout;
-  /* battlefield parameters */
-  u_int32_t battlefield_timeout;
   /* thunder parameters */
   u_int32_t thunder_timeout;
   /* SoulSeek parameters */
   u_int32_t soulseek_connection_ip_tick_timeout;
   /* rtsp parameters */
   u_int32_t rtsp_connection_timeout;
-  /* tvants parameters */
-  u_int32_t tvants_connection_timeout;
   /* rstp */
   u_int32_t orb_rstp_ts_timeout;
   /* yahoo */
@@ -1329,9 +1309,6 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_THUNDER */
   u_int8_t thunder_stage:2;		        // 0 - 3
-
-  /* NDPI_PROTOCOL_OSCAR */
-  u_int8_t oscar_ssl_voice_stage:3, oscar_video_voice:1;
 
   /* NDPI_PROTOCOL_FLORENSIA */
   u_int8_t florensia_stage:1;

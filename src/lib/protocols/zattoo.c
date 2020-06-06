@@ -46,9 +46,9 @@ u_int8_t ndpi_int_zattoo_user_agent_set(struct ndpi_detection_module_struct *ndp
 
 #define ZATTOO_DETECTED \
       if (src != NULL)				 \
-	src->zattoo_ts = packet->tick_timestamp; \
+	src->zattoo_ts = packet->current_time_ms; \
       if (dst != NULL)				 \
-	dst->zattoo_ts = packet->tick_timestamp; \
+	dst->zattoo_ts = packet->current_time_ms; \
 						 \
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZATTOO, NDPI_PROTOCOL_UNKNOWN)
 
@@ -63,10 +63,10 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
   NDPI_LOG_DBG(ndpi_struct, "search ZATTOO\n");
 
   if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_ZATTOO) {
-    if(src != NULL && ((u_int32_t) (packet->tick_timestamp - src->zattoo_ts) < ndpi_struct->zattoo_connection_timeout))
-      src->zattoo_ts = packet->tick_timestamp;
-    if (dst != NULL && ((u_int32_t) (packet->tick_timestamp - dst->zattoo_ts) < ndpi_struct->zattoo_connection_timeout))
-      dst->zattoo_ts = packet->tick_timestamp;
+    if(src != NULL && ((u_int32_t) (packet->current_time_ms - src->zattoo_ts) < ndpi_struct->zattoo_connection_timeout))
+      src->zattoo_ts = packet->current_time_ms;
+    if (dst != NULL && ((u_int32_t) (packet->current_time_ms - dst->zattoo_ts) < ndpi_struct->zattoo_connection_timeout))
+      dst->zattoo_ts = packet->current_time_ms;
     return;
   }
   /* search over TCP */

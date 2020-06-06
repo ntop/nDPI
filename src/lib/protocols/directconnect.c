@@ -85,7 +85,7 @@ static void ndpi_int_directconnect_add_connection(struct ndpi_detection_module_s
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 
   if(src != NULL) {
-    src->directconnect_last_safe_access_time = packet->tick_timestamp;
+    src->directconnect_last_safe_access_time = packet->current_time_ms;
     if(connection_type == DIRECT_CONNECT_TYPE_PEER) {
       if(packet->tcp != NULL
 	  && flow->setup_packet_direction != packet->packet_direction && src->detected_directconnect_port == 0) {
@@ -101,7 +101,7 @@ static void ndpi_int_directconnect_add_connection(struct ndpi_detection_module_s
 
   }
   if(dst != NULL) {
-    dst->directconnect_last_safe_access_time = packet->tick_timestamp;
+    dst->directconnect_last_safe_access_time = packet->current_time_ms;
     if(connection_type == DIRECT_CONNECT_TYPE_PEER) {
       if(packet->tcp != NULL
 	  && flow->setup_packet_direction == packet->packet_direction && dst->detected_directconnect_port == 0) {
@@ -162,9 +162,9 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
   if(src != NULL) {
     if(src->detected_directconnect_port == packet->tcp->source) {
       if((u_int32_t)
-	  (packet->tick_timestamp -
+	  (packet->current_time_ms -
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
-	src->directconnect_last_safe_access_time = packet->tick_timestamp;
+	src->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_port));
 	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
@@ -176,9 +176,9 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
     }
     if(src->detected_directconnect_ssl_port == packet->tcp->dest) {
       if((u_int32_t)
-	  (packet->tick_timestamp -
+	  (packet->current_time_ms -
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
-	src->directconnect_last_safe_access_time = packet->tick_timestamp;
+	src->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_ssl_port));
 	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
@@ -194,9 +194,9 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
   if(dst != NULL) {
     if(dst->detected_directconnect_port == packet->tcp->dest) {
       if((u_int32_t)
-	  (packet->tick_timestamp -
+	  (packet->current_time_ms -
 	   dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
-	dst->directconnect_last_safe_access_time = packet->tick_timestamp;
+	dst->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_port));
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
@@ -208,9 +208,9 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
     }
     if(dst->detected_directconnect_ssl_port == packet->tcp->dest) {
       if((u_int32_t)
-	  (packet->tick_timestamp -
+	  (packet->current_time_ms -
 	   dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
-	dst->directconnect_last_safe_access_time = packet->tick_timestamp;
+	dst->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_DBG(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_ssl_port));
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
@@ -319,10 +319,10 @@ static void ndpi_search_directconnect_udp(struct ndpi_detection_module_struct
 
   if(dst != NULL && dst->detected_directconnect_udp_port == packet->udp->dest) {
     if((u_int32_t)
-	(packet->tick_timestamp -
+	(packet->current_time_ms -
 	 dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 
-      dst->directconnect_last_safe_access_time = packet->tick_timestamp;
+      dst->directconnect_last_safe_access_time = packet->current_time_ms;
       NDPI_LOG_INFO(ndpi_struct, "found DC using udp port %d\n", ntohs(dst->detected_directconnect_udp_port));
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
       return;
@@ -405,16 +405,16 @@ void ndpi_search_directconnect(struct ndpi_detection_module_struct
 
   if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
     if(src != NULL && ((u_int32_t)
-			(packet->tick_timestamp -
+			(packet->current_time_ms -
 			 src->directconnect_last_safe_access_time) <
 			ndpi_struct->directconnect_connection_ip_tick_timeout)) {
-      src->directconnect_last_safe_access_time = packet->tick_timestamp;
+      src->directconnect_last_safe_access_time = packet->current_time_ms;
 
     } else if(dst != NULL && ((u_int32_t)
-			       (packet->tick_timestamp -
+			       (packet->current_time_ms -
 				dst->directconnect_last_safe_access_time) <
 			       ndpi_struct->directconnect_connection_ip_tick_timeout)) {
-      dst->directconnect_last_safe_access_time = packet->tick_timestamp;
+      dst->directconnect_last_safe_access_time = packet->current_time_ms;
     } else {
       packet->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
       NDPI_LOG_DBG2(ndpi_struct, "skipping as unknown due to timeout\n");

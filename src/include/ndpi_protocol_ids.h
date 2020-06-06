@@ -87,7 +87,7 @@ typedef enum {
   NDPI_PROTOCOL_ZATTOO                = 55,
   NDPI_PROTOCOL_SHOUTCAST             = 56,
   NDPI_PROTOCOL_SOPCAST               = 57,
-  NDPI_PROTOCOL_TVANTS                = 58,
+  NDPI_PROTOCOL_FREE_58               = 58, /* Free */
   NDPI_PROTOCOL_TVUPLAYER             = 59,
   NDPI_PROTOCOL_HTTP_DOWNLOAD         = 60,
   NDPI_PROTOCOL_QQLIVE                = 61,
@@ -98,9 +98,9 @@ typedef enum {
   NDPI_PROTOCOL_AYIYA                 = 66,
   NDPI_PROTOCOL_UNENCRYPTED_JABBER    = 67,
   NDPI_PROTOCOL_NATS                  = 68,
-  NDPI_PROTOCOL_OSCAR                 = 69,
+  NDPI_PROTOCOL_FREE_69               = 69, /* Free */
   NDPI_PROTOCOL_YAHOO                 = 70,
-  NDPI_PROTOCOL_BATTLEFIELD           = 71,
+  NDPI_PROTOCOL_FREE_71               = 71, /* Free */
   NDPI_PROTOCOL_GOOGLE_PLUS           = 72,
   NDPI_PROTOCOL_IP_VRRP               = 73,
   NDPI_PROTOCOL_STEAM                 = 74, /* Tomasz Bujlow <tomasz@skatnet.dk> */
@@ -119,7 +119,7 @@ typedef enum {
   NDPI_PROTOCOL_RTP                   = 87,
   NDPI_PROTOCOL_RDP                   = 88,
   NDPI_PROTOCOL_VNC                   = 89,
-  NDPI_PROTOCOL_PCANYWHERE            = 90,
+  NDPI_PROTOCOL_FREE90                = 90, /* Free */
   NDPI_PROTOCOL_TLS                   = 91,
   NDPI_PROTOCOL_SSH                   = 92,
   NDPI_PROTOCOL_USENET                = 93,

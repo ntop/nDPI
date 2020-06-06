@@ -349,6 +349,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	  offset += 2;
 
 	  if((offset+len) < packet->payload_packet_len) {
+	    u_int32_t time_sec = flow->packet.current_time_ms / 1000;
 #ifdef DEBUG_TLS
 	    u_int j;
 	    
@@ -374,8 +375,9 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      }
 	    }
 
-	    if((flow->packet.tick_timestamp < flow->protos.stun_ssl.ssl.notBefore)
-	       || (flow->packet.tick_timestamp > flow->protos.stun_ssl.ssl.notAfter))
+	    
+	    if((time_sec < flow->protos.stun_ssl.ssl.notBefore)
+	       || (time_sec > flow->protos.stun_ssl.ssl.notAfter))
 	    NDPI_SET_BIT(flow->risk, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
 	  }
 	}
