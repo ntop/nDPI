@@ -1823,6 +1823,8 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 
       /* update stats */
       node_proto_guess_walker(node, which, depth, user_data);
+      if(verbose == 3)
+        port_stats_walker(node, which, depth, user_data);
 
       if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
