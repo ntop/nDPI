@@ -606,7 +606,7 @@ int ndpi_serialize_end_of_record(ndpi_serializer *_serializer) {
 
     serializer->status.flags |= NDPI_SERIALIZER_STATUS_ARRAY | NDPI_SERIALIZER_STATUS_EOR;
     serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_COMMA;
-  } else {
+  } else /* ndpi_serialization_format_tlv */ {
     serializer->buffer.data[serializer->status.buffer.size_used++] = ndpi_serialization_end_of_record;
   }
 

@@ -3089,14 +3089,17 @@ void serializerUnitTest() {
   for(loop_id=0; loop_id<3; loop_id++) {
     switch(loop_id) {
     case 0:
+      if (trace) printf("--- TLV test ---\n");
       fmt = ndpi_serialization_format_tlv;
       break;
 
     case 1:
+      if (trace) printf("--- JSON test ---\n");
       fmt = ndpi_serialization_format_json;
       break;
 
     case 2:
+      if (trace) printf("--- CSV test ---\n");
       fmt = ndpi_serialization_format_csv;
       break;
     }
@@ -3132,7 +3135,6 @@ void serializerUnitTest() {
 	u_int32_t buffer_len = 0;
 	char *buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
 	printf("%s\n", buffer);
-	exit(0);
       }
     } else if (fmt == ndpi_serialization_format_csv) {
       if(trace) {
@@ -3144,8 +3146,6 @@ void serializerUnitTest() {
 
 	buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
 	printf("%s\n", buffer);
-
-	exit(0);
       }
 
     } else {
@@ -3159,9 +3159,11 @@ void serializerUnitTest() {
 
 	et = ndpi_deserialize_get_item_type(&deserializer, &kt);
 
-	if(et == ndpi_serialization_unknown)
+	if(et == ndpi_serialization_unknown) {
 	  break;
-	else {
+        } else if(et == ndpi_serialization_end_of_record) {
+          if (trace) printf("EOR\n");
+	} else {
 	  u_int32_t k32, v32;
 	  ndpi_string ks, vs;
 	  float vf;
@@ -3182,7 +3184,7 @@ void serializerUnitTest() {
 	    break;
           default:
             printf("ERROR: Unsupported TLV key type %u\n", kt);
-	    // exit(0);
+	    exit(0);
 	    return;
 	  }
 
@@ -3220,6 +3222,9 @@ void serializerUnitTest() {
 
     ndpi_term_serializer(&serializer);
   }
+
+  if (trace)
+    exit(0);
 }
 
 /* *********************************************** */
