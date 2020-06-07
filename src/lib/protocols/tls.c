@@ -315,7 +315,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
       if((offset+len) < packet->payload_packet_len) {
 	char utcDate[32];
-
+	
 #ifdef DEBUG_TLS
 	u_int j;
 	
@@ -678,7 +678,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	break;
       }
 
-      packet->payload = block, packet->payload_packet_len = block_len+4;
+      packet->payload = block, packet->payload_packet_len = ndpi_min(block_len+4, flow->l4.tcp.tls.message.buffer_used);
 
       if((processed+packet->payload_packet_len) > len) {
 	something_went_wrong = 1;
