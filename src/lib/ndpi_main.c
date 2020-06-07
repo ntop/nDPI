@@ -4853,7 +4853,7 @@ u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t *str, u_int16_t max_chars_to_re
 void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
   u_int32_t a;
   struct ndpi_packet_struct *packet = &flow->packet;
-
+    
   if((packet->payload_packet_len < 3) || (packet->payload == NULL))
     return;
 
@@ -4866,19 +4866,17 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
 
-  for (a = 0; (a < packet->payload_packet_len) && (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
-    if((a + 1) >= packet->payload_packet_len)
-      return; /* Return if only one byte remains (prevent invalid reads past end-of-buffer) */
-
-    if(get_u_int16_t(packet->payload, a) == ntohs(0x0d0a)) {
+  for (a = 0; ((a+1) < packet->payload_packet_len) && (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
+    if((packet->payload[a] == 0x0d) && (packet->payload[a+1] == 0x0a)) {
       /* If end of line char sequence CR+NL "\r\n", process line */
 
       if(((a + 3) <= packet->payload_packet_len)
-	 && (get_u_int16_t(packet->payload, a+2) == ntohs(0x0d0a))) {
+	 && (packet->payload[a+2] == 0x0d)
+	 && (packet->payload[a+3] == 0x0a)) {
 	/* \r\n\r\n */
 	int diff; /* No unsigned ! */
 	u_int32_t a1 = a + 4;
-
+	
 	diff = packet->payload_packet_len - a1;
 
 	if(diff > 0) {
