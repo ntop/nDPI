@@ -1495,6 +1495,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_HTTP_SUSPICIOUS_HEADER:
     return("HTTP Suspicious Header");
     
+  case NDPI_TLS_NOT_CARRYING_HTTPS:
+    return("TLS (probably) not carrying HTTPS");
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

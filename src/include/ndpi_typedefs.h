@@ -50,6 +50,11 @@ typedef enum {
   ndpi_l2tp_tunnel,
 } ndpi_packet_tunnel;
 
+/*
+  NOTE
+  When the typedef below is modified don't forget
+  to update ndpi_risk2str (in ndpi_utils.c)
+ */
 typedef enum {
   NDPI_NO_RISK = 0,
   NDPI_URL_POSSIBLE_XSS,
@@ -66,6 +71,7 @@ typedef enum {
   NDPI_HTTP_NUMERIC_IP_HOST,
   NDPI_HTTP_SUSPICIOUS_URL,
   NDPI_HTTP_SUSPICIOUS_HEADER,
+  NDPI_TLS_NOT_CARRYING_HTTPS,
   
   /* Leave this as last member */
   NDPI_MAX_RISK

@@ -1381,6 +1381,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 	    }
 
+	    /* Before returning to the caller we need to make a final check */
+	    if((flow->protos.stun_ssl.ssl.ssl_version >= 0x0303) /* >= TLSv1.2 */
+	       && (flow->protos.stun_ssl.ssl.alpn == NULL) /* No ALPN */) {
+	      NDPI_SET_BIT(flow->risk, NDPI_TLS_NOT_CARRYING_HTTPS);
+	    }
+
 	    return(2 /* Client Certificate */);
 	  } else {
 #ifdef DEBUG_TLS
