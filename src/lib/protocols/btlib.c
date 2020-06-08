@@ -23,12 +23,13 @@
  */
 
 #include "ndpi_api.h"
-
+#if 0
 #ifndef NDPI_NO_STD_INC
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
+#include <unistd.h>
 #include <strings.h>
 
 /*
@@ -41,6 +42,7 @@ typedef unsigned long long int u_int64_t;
 #include <stdlib.h>
 #ifndef WIN32
 #include <arpa/inet.h>
+#endif
 #endif
 #endif
 

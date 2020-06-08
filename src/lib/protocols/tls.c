@@ -309,7 +309,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	printf("[TLS] %s() IssuerDN [%s]\n", __FUNCTION__, rdnSeqBuf);
 #endif
 
-	if(rdn_len) flow->protos.stun_ssl.ssl.issuerDN = strdup(rdnSeqBuf);
+	if(rdn_len) flow->protos.stun_ssl.ssl.issuerDN = ndpi_strdup(rdnSeqBuf);
 	rdn_len = 0; /* Reset buffer */
       }
 
@@ -472,7 +472,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
     }
   }
 
-  if(rdn_len) flow->protos.stun_ssl.ssl.subjectDN = strdup(rdnSeqBuf);
+  if(rdn_len) flow->protos.stun_ssl.ssl.subjectDN = ndpi_strdup(rdnSeqBuf);
 
   if(flow->protos.stun_ssl.ssl.subjectDN && flow->protos.stun_ssl.ssl.issuerDN
      && (!strcmp(flow->protos.stun_ssl.ssl.subjectDN, flow->protos.stun_ssl.ssl.issuerDN)))

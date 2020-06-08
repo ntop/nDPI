@@ -66,6 +66,8 @@
 #else
 #ifndef WIN32
 #  include <netinet/in.h> /* for struct in_addr */
+#else
+#include <ndpi_win32.h>
 #endif
 #endif
 
