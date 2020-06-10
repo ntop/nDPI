@@ -50,6 +50,7 @@
 #define PREFETCH_OFFSET    3
 
 extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
+extern int dpdk_port_deinit(int port);
 #endif
 
 /* ETTA Spec defiintions for feature readiness */

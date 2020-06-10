@@ -2032,4 +2032,9 @@ int dpdk_port_init(int port, struct rte_mempool *mbuf_pool) {
   return 0;
 }
 
+int dpdk_port_deinit(int port) {
+  rte_eth_dev_stop(port);
+  rte_eth_dev_close(port);
+}
+
 #endif

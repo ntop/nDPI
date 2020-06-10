@@ -3091,6 +3091,10 @@ void test_lib() {
     }
   }
 
+#ifdef USE_DPDK
+  dpdk_port_deinit(dpdk_port_id);
+#endif
+
   gettimeofday(&end, NULL);
   processing_time_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
   setup_time_usec = begin.tv_sec*1000000 + begin.tv_usec - (startup_time.tv_sec*1000000 + startup_time.tv_usec);
