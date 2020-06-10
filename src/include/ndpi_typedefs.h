@@ -1489,4 +1489,12 @@ struct ndpi_analyze_struct {
 
 typedef struct ndpi_ptree ndpi_ptree_t;
 
+/* **************************************** */
+
+struct ndpi_hll {
+  u_int8_t bits;  
+  size_t size;
+  u_int8_t *registers;
+};
+
 #endif /* __NDPI_TYPEDEFS_H__ */

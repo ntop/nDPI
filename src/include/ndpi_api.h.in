@@ -1043,6 +1043,22 @@ extern "C" {
   void ndpi_serialize_risk(ndpi_serializer *serializer, struct ndpi_flow_struct *flow);
 
   const char* ndpi_risk2str(ndpi_risk_enum risk);
+
+  /* ******************************* */
+
+  /* HyperLogLog cardinality estimator */
+
+  /* Memory lifecycle */
+  int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits);
+  void ndpi_hll_destroy(struct ndpi_hll *hll);
+
+  /* Add values */
+  void ndpi_hll_add(struct ndpi_hll *hll, const char *data, size_t data_len);
+  void ndpi_hll_add_number(struct ndpi_hll *hll, u_int32_t value) ;
+
+  /* Get cardinality estimation */
+  double ndpi_hll_count(struct ndpi_hll *hll);
+  
 #ifdef __cplusplus
 }
 #endif

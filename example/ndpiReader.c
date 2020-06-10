@@ -3048,6 +3048,23 @@ void test_lib() {
 
 /* *********************************************** */
 
+static void hllUnitTest() {
+  struct ndpi_hll h;
+  u_int8_t bits = 8; /* >= 4, <= 16 */
+  u_int32_t i;
+    
+  assert(ndpi_hll_init(&h, bits) == 0);
+
+  for(i=0; i<21320; i++)
+    ndpi_hll_add_number(&h, i);
+
+  /* printf("Count estimate: %f\n", ndpi_hll_count(&h)); */
+  
+  ndpi_hll_destroy(&h);
+}
+
+/* *********************************************** */
+
 static void bitmapUnitTest() {
   u_int32_t val, i, j;
 
@@ -3341,6 +3358,7 @@ int orginal_main(int argc, char **argv) {
     }
 
     /* Internal checks */
+    hllUnitTest();
     bitmapUnitTest();
     automataUnitTest();
     serializerUnitTest();

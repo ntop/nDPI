@@ -200,8 +200,36 @@ float ndpi_data_ratio(u_int32_t sent, u_int32_t rcvd) {
   return((s == 0) ? 0 : (d/s));
 }
 
+/* ********************************************************************************* */
+
 const char* ndpi_data_ratio2str(float ratio) {
   if(ratio < -0.2) return("Download");
   else if(ratio > 0.2) return("Upload");
   else return("Mixed");
+}
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+#include "third_party/src/hll/hll.c"
+#include "third_party/src/hll/MurmurHash3.c"
+
+int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits) {
+  return(hll_init(hll, bits));
+}
+
+void ndpi_hll_destroy(struct ndpi_hll *hll) {
+  hll_destroy(hll);
+}
+
+void ndpi_hll_add(struct ndpi_hll *hll, const char *data, size_t data_len) {
+  hll_add(hll, (const void *)data, data_len);
+}
+
+void ndpi_hll_add_number(struct ndpi_hll *hll, u_int32_t value) {
+  hll_add(hll, (const void *)&value, sizeof(value));
+}
+
+double ndpi_hll_count(struct ndpi_hll *hll) {
+  return(hll_count(hll));
 }
