@@ -843,9 +843,6 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
-  if(_pcap_file[0] == NULL)
-    help(0);
-
   if(csv_fp)
     printCSVHeader();
 
@@ -854,6 +851,9 @@ static void parseOptions(int argc, char **argv) {
     quiet_mode = 1;
     extcap_capture();
   }
+
+  if(_pcap_file[0] == NULL)
+    help(0);
 
   if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
     num_threads = 0;               /* setting number of threads = number of interfaces */
