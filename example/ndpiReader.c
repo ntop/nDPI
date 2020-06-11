@@ -417,6 +417,7 @@ static void help(u_int long_help) {
 
     ndpi_dump_protocols(ndpi_info_mod);
   }
+  
   exit(!long_help);
 }
 
@@ -3048,6 +3049,59 @@ void test_lib() {
 
 /* *********************************************** */
 
+static void dgaUnitTest() {
+  const char *s[] = {
+		     "zoomam104zc.zoom.us",
+		     "5CI_DOMBIN",
+		     "ALICEGATE",
+		     "BOWIE",
+		     "D002465",
+		     "DESKTOP-RB5T12G",
+		     "ECI_DOM",
+		     "ECI_DOMA",
+		     "ECI_DOMAIN",
+		     "ENDIAN-PC",
+		     "GFILE",
+		     "GIOVANNI-PC",
+		     "GUNNAR",
+		     "ISATAP",
+		     "LAB111",
+		     "LP-RKERUR-OSX",
+		     "LUCAS-IMAC",
+		     "LUCASMACBOOKPRO",
+		     "MACBOOKAIR-E1D0",
+		     "MDJR98",
+		     "NASFILE",
+		     "SANJI-LIFEBOOK-",
+		     "SC.ARRANCAR.ORG",
+		     "WORKG",
+		     "WORKGROUP",
+		     "XSTREAM_HY",
+		     "__MSBROWSE__",
+		     "mqtt.facebook.com",
+		     NULL
+  };
+  int i;  
+  NDPI_PROTOCOL_BITMASK all;
+  struct ndpi_detection_module_struct *ndpi_str =  ndpi_init_detection_module(ndpi_no_prefs);
+
+  assert(ndpi_str != NULL);
+  
+  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
+
+  ndpi_finalize_initalization(ndpi_str);
+    
+  assert(ndpi_str != NULL);
+
+  for(i=0; s[i] != NULL; i++) {
+    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)s[i]) == 0);
+  }
+
+  ndpi_exit_detection_module(ndpi_str);
+}
+
+/* *********************************************** */
+
 static void hllUnitTest() {
   struct ndpi_hll h;
   u_int8_t bits = 8; /* >= 4, <= 16 */
@@ -3357,18 +3411,19 @@ int orginal_main(int argc, char **argv) {
       return(-1);
     }
 
+    gettimeofday(&startup_time, NULL);
+    ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
+
+    if(ndpi_info_mod == NULL) return -1;
+
     /* Internal checks */
+    dgaUnitTest();
     hllUnitTest();
     bitmapUnitTest();
     automataUnitTest();
     serializerUnitTest();
     analyzeUnitTest();
     ndpi_self_check_host_match();
-
-    gettimeofday(&startup_time, NULL);
-    ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
-
-    if(ndpi_info_mod == NULL) return -1;
 
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 

@@ -292,8 +292,10 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	cl--;
       }
     }
-    flow->host_server_name[j] = '\0';
 
+    flow->host_server_name[j] = '\0';
+    ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name);
+    
     if(j > 0) {
       ndpi_protocol_match_result ret_match;
 

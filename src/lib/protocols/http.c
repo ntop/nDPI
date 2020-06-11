@@ -284,9 +284,8 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
   buf[ip_len] = '\0';
 
   ip_addr.s_addr = inet_addr(buf);
-  if(strcmp(inet_ntoa(ip_addr), buf) == 0) {
+  if(strcmp(inet_ntoa(ip_addr), buf) == 0)
     NDPI_SET_BIT(flow->risk, NDPI_HTTP_NUMERIC_IP_HOST);
-  }
 }
 
 /* ************************************************************* */
@@ -294,7 +293,7 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
 static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow,
 				char *url) {
-
+  /* Nothing to do */
 }
 
 /* ************************************************************* */
@@ -451,6 +450,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     flow->host_server_name[len] = '\0';
     flow->extra_packets_func = NULL; /* We're good now */
 
+    ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name);
     flow->server_id = flow->dst;
 
     if(packet->forwarded_line.ptr) {

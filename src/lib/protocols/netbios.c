@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 
@@ -41,14 +41,14 @@ struct netbios_header {
 int ndpi_netbios_name_interpret(char *in, size_t inlen, char *out, u_int out_len) {
   int ret = 0, len;
   char *b;
-  
+
   len = (*in++)/2;
   b  = out;
   *out = 0;
 
   if(len > (out_len-1) || len < 1 || 2*len > inlen)
-    return(-1);  
-  
+    return(-1);
+
   while (len--) {
     if(in[0] < 'A' || in[0] > 'P' || in[1] < 'A' || in[1] > 'P') {
       *out = 0;
@@ -56,7 +56,7 @@ int ndpi_netbios_name_interpret(char *in, size_t inlen, char *out, u_int out_len
     }
 
     *out = ((in[0]-'A')<<4) + (in[1]-'A');
-        
+
     in += 2;
 
     if(isprint(*out))
@@ -76,13 +76,16 @@ int ndpi_netbios_name_interpret(char *in, size_t inlen, char *out, u_int out_len
 
 static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
-					    u_int16_t sub_protocol) { 
+					    u_int16_t sub_protocol) {
   char name[64];
   u_int off = flow->packet.payload[12] == 0x20 ? 12 : 14;
 
   if((off < flow->packet.payload_packet_len) &&
-     ndpi_netbios_name_interpret((char*)&flow->packet.payload[off], flow->packet.payload_packet_len - off, name, sizeof(name)) > 0)
-      snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);    
+     ndpi_netbios_name_interpret((char*)&flow->packet.payload[off], flow->packet.payload_packet_len - off, name, sizeof(name)) > 0) {
+      snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
+
+      ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name);
+  }
 
   if(sub_protocol == NDPI_PROTOCOL_UNKNOWN)
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETBIOS, NDPI_PROTOCOL_UNKNOWN);
@@ -96,9 +99,9 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 			 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t dport;
-  
+
   NDPI_LOG_DBG(ndpi_struct, "search netbios\n");
-  
+
   if(packet->udp != NULL) {
     dport = ntohs(packet->udp->dest);
 
@@ -110,7 +113,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
       h.transaction_id = ntohs(h.transaction_id), h.flags = ntohs(h.flags),
 	h.questions = ntohs(h.questions), h.answer_rrs = ntohs(h.answer_rrs),
 	h.authority_rrs = ntohs(h.authority_rrs), h.additional_rrs = ntohs(h.additional_rrs);
-      
+
       NDPI_LOG_DBG(ndpi_struct, "found netbios port 137 and payload_packet_len 50\n");
 
       if(h.flags == 0 &&
@@ -123,18 +126,18 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(((h.flags & 0x8710) == 0x10) &&
 	 h.questions == 1 &&
 	 h.answer_rrs == 0 &&
 	 h.authority_rrs == 0) {
 
 	NDPI_LOG_INFO(ndpi_struct, "found netbios with questions = 1 and answers = 0, authority = 0 and broadcast \n");
-	
+
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(packet->payload[2] == 0x80 &&
 	 h.questions == 1 &&
 	 h.answer_rrs == 0 &&
@@ -145,7 +148,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(h.flags == 0x4000 &&
 	 h.questions == 1 &&
 	 h.answer_rrs == 0 &&
@@ -156,7 +159,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(h.flags == 0x8400 &&
 	 h.questions == 0 &&
 	 h.answer_rrs == 1 &&
@@ -168,7 +171,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(h.flags == 0x8500 &&
 	 h.questions == 0 &&
 	 h.answer_rrs == 1 &&
@@ -180,7 +183,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(((h.flags == 0x2900) || (h.flags == 0x2910)) &&
 	 h.questions == 1 &&
 	 h.answer_rrs == 0 &&
@@ -192,7 +195,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(h.flags == 0xAD86 &&
 	 h.questions == 0 &&
 	 h.answer_rrs == 1 &&
@@ -204,7 +207,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_int_netbios_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 	return;
       }
-      
+
       if(h.flags == 0x0110 &&
 	 h.questions == 1 &&
 	 h.answer_rrs == 0 &&
@@ -333,25 +336,25 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
       }
       /* TODO: extend according to rfc1002 */
     }
-    
+
     /* check standard NETBIOS over udp to port 138 */
 
     /* netbios header token from http://www.protocolbase.net/protocols/protocol_NBDGM.php */
 
     if((dport == 138) && (packet->payload_packet_len >= 14)) {
       u_int16_t netbios_len = ntohs(get_u_int16_t(packet->payload, 10));
-      
-      if(netbios_len == packet->payload_packet_len - 14) {     
+
+      if(netbios_len == packet->payload_packet_len - 14) {
 	NDPI_LOG_DBG2(ndpi_struct, "found netbios port 138 and payload length >= 112 \n");
-      
+
 	if(packet->payload[0] >= 0x10 && packet->payload[0] <= 0x16) {
 	  u_int32_t source_ip = ntohl(get_u_int32_t(packet->payload, 4));
-				      
+
 	  NDPI_LOG_DBG2(ndpi_struct, "found netbios with MSG-type 0x10,0x11,0x12,0x13,0x14,0x15 or 0x16\n");
 
 	  if(source_ip == ntohl(packet->iph->saddr)) {
 	    int16_t leftover = netbios_len - 82; /* NetBIOS len */
-	      
+
 	    NDPI_LOG_INFO(ndpi_struct, "found netbios with checked ip-address\n");
 
 	    ndpi_int_netbios_add_connection(ndpi_struct, flow, (leftover > 0) ? NDPI_PROTOCOL_SMBV1 : NDPI_PROTOCOL_UNKNOWN);

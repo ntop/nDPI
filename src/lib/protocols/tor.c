@@ -48,45 +48,16 @@ int ndpi_is_tls_tor(struct ndpi_detection_module_struct *ndpi_struct,
   if((dot = strrchr(dummy, '.')) == NULL) return(0);
   name = &dot[1];
 
-  len = strlen(name);
-  
-  if(len >= 5) {
-    int i, prev_num = 0, numbers_found = 0, num_found = 0, num_impossible = 0;
-    
-    for(i = 0; name[i+1] != '\0'; i++) {
-      // printf("***** [SSL] %s(): [%d][%c]", __FUNCTION__, i, name[i]);
-      
-      if((name[i] >= '0') && (name[i] <= '9')) {
-	if(prev_num != 1) {
-	  numbers_found++;
-
-	  if(numbers_found == 2) {
-	    ndpi_int_tor_add_connection(ndpi_struct, flow);
-	    return(1);
-	  }
-	  prev_num = 1;
-	}
-      } else
-	prev_num = 0;
-      
-      if(ndpi_match_bigram(ndpi_struct, &ndpi_struct->bigrams_automa, &name[i])) {
-	num_found++;
-      } else if(ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, &name[i])) {
-	num_impossible++;
-      }
-    }
-
-    if((num_found == 0) || (num_impossible > 1)) {
+  if(ndpi_check_dga_name(ndpi_struct, flow, name)) {
+    ndpi_int_tor_add_connection(ndpi_struct, flow);
+    return(1);
+  } else {
+#ifdef PEDANTIC_TOR_CHECK
+    if(gethostbyname(certificate) == NULL) {
       ndpi_int_tor_add_connection(ndpi_struct, flow);
       return(1);
-    } else {
-#ifdef PEDANTIC_TOR_CHECK
-      if(gethostbyname(certificate) == NULL) {
-	ndpi_int_tor_add_connection(ndpi_struct, flow);
-	return(1);
-      }
-#endif
     }
+#endif
   }
 
   return(0);

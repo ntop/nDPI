@@ -1497,6 +1497,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     
   case NDPI_TLS_NOT_CARRYING_HTTPS:
     return("TLS (probably) not carrying HTTPS");
+
+  case NDPI_SUSPICIOUS_DGA_DOMAIN:
+    return("Suspicious DGA domain name");
     
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);

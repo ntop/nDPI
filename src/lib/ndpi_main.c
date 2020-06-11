@@ -4354,12 +4354,12 @@ static int ndpi_check_protocol_port_mismatch_exceptions(struct ndpi_detection_mo
       break;
     }
   }
-  
+
   return(0);
 }
 
 /* ********************************************************************************* */
-				    
+
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow,
 				     ndpi_protocol *ret) {
@@ -4818,28 +4818,28 @@ u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t *str, u_int16_t max_chars_to_re
   c = ndpi_bytestream_to_number(str, max_chars_to_read, &read);
   if(c > 255 || oldread == read || max_chars_to_read == read || str[read] != '.')
     return(0);
-  
+
   read++;
   val = c << 24;
   oldread = read;
   c = ndpi_bytestream_to_number(&str[read], max_chars_to_read - read, &read);
   if(c > 255 || oldread == read || max_chars_to_read == read || str[read] != '.')
     return(0);
-  
+
   read++;
   val = val + (c << 16);
   oldread = read;
   c = ndpi_bytestream_to_number(&str[read], max_chars_to_read - read, &read);
   if(c > 255 || oldread == read || max_chars_to_read == read || str[read] != '.')
     return(0);
-  
+
   read++;
   val = val + (c << 8);
   oldread = read;
   c = ndpi_bytestream_to_number(&str[read], max_chars_to_read - read, &read);
   if(c > 255 || oldread == read || max_chars_to_read == read)
     return(0);
-  
+
   val = val + c;
 
   *bytes_read = *bytes_read + read;
@@ -4853,7 +4853,7 @@ u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t *str, u_int16_t max_chars_to_re
 void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
   u_int32_t a;
   struct ndpi_packet_struct *packet = &flow->packet;
-    
+
   if((packet->payload_packet_len < 3) || (packet->payload == NULL))
     return;
 
@@ -4876,7 +4876,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	/* \r\n\r\n */
 	int diff; /* No unsigned ! */
 	u_int32_t a1 = a + 4;
-	
+
 	diff = packet->payload_packet_len - a1;
 
 	if(diff > 0) {
@@ -5889,10 +5889,10 @@ const char * ndpi_strncasestr(const char *str1, const char *str2, size_t len) {
 
   for(i = 0; i < (str1_len - str2_len + 1); i++){
     if(str1[0] == '\0')
-      return NULL;    
+      return NULL;
     else if(strncasecmp(str1, str2, str2_len) == 0)
       return(str1);
-    
+
     str1++;
   }
 
@@ -6472,4 +6472,85 @@ void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]) {
   ndpi_MD5Init(&ctx);
   ndpi_MD5Update(&ctx, data, data_len);
   ndpi_MD5Final(hash, &ctx);
+}
+
+/* ******************************************************************** */
+
+static int enough(int a, int b) {
+  u_int8_t percentage = 20;
+  
+  if(b == 0) return(0);
+  if(a == 0) return(1);
+
+  if(b > ((a*percentage)/100)) return(1);
+  
+  return(0);
+}
+
+/* ******************************************************************** */
+
+int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
+			struct ndpi_flow_struct *flow,
+			char *name) {
+  int len = strlen(name), rc = 0;
+ 
+  if(len >= 5) {
+    int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0;
+    char tmp[128];
+
+    len = snprintf(tmp, sizeof(tmp)-1, "%s", name);
+    if(len < 0) return(0);
+    
+    for(i=0, j=0; (i<len) && (j<(sizeof(tmp)-1)); i++) {
+      if(isdigit(name[i]))
+	continue;
+      else
+	tmp[j++] = tolower(tmp[i]);
+    }
+
+    len = j;
+    
+    for(i = 0; tmp[i+1] != '\0'; i++) {
+      if(isdigit(tmp[i])) continue;
+	
+      switch(tmp[i]) {
+      case '-':
+      case ':':
+      case '.':
+	continue;
+	break;
+      }
+
+      if(isdigit(tmp[i+1])) continue;
+	 
+      num_bigram_checks++;
+
+      if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &tmp[i])) {
+	num_found++;
+      } else if(ndpi_match_bigram(ndpi_str,
+				  &ndpi_str->impossible_bigrams_automa,
+				  &tmp[i])) {
+#ifdef DGA_DEBUG
+	printf("IMPOSSIBLE %s\n", &tmp[i]);
+#endif
+	num_impossible++;
+      }
+    }
+
+    if(num_bigram_checks
+       && ((num_found == 0)
+	   || (enough(num_found, num_impossible))))
+      rc = 1;    
+
+    if(rc && flow)
+      NDPI_SET_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
+
+#ifdef DGA_DEBUG
+    if(rc)
+      printf("DGA %s [%s][num_found: %u][num_impossible: %u]\n",
+	     tmp, name, num_found, num_impossible);
+#endif
+  }
+  
+  return(rc);
 }

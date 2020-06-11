@@ -926,6 +926,11 @@ extern "C" {
   int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, uint *user_data);
   void ndpi_ptree_destroy(ndpi_ptree_t *tree);
 
+  /* DGA */
+  int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
+			  struct ndpi_flow_struct *flow,
+			  char *name);
+  
   /* Serializer */
   int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,
 			      u_int32_t buffer_size);
