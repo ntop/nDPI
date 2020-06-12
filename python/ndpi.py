@@ -303,6 +303,8 @@ typedef enum {
   NDPI_HTTP_NUMERIC_IP_HOST,
   NDPI_HTTP_SUSPICIOUS_URL,
   NDPI_HTTP_SUSPICIOUS_HEADER,
+  NDPI_TLS_NOT_CARRYING_HTTPS,
+  NDPI_SUSPICIOUS_DGA_DOMAIN,
   /* Leave this as last member */
   NDPI_MAX_RISK
 } ndpi_risk_enum;
@@ -429,17 +431,11 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_GNUTELLA */
   uint32_t gnutella_ts;
 
-  /* NDPI_PROTOCOL_BATTLEFIELD */
-  uint32_t battlefield_ts;
-
   /* NDPI_PROTOCOL_THUNDER */
   uint32_t thunder_ts;
 
   /* NDPI_PROTOCOL_RTSP */
   uint32_t rtsp_timer;
-
-  /* NDPI_PROTOCOL_OSCAR */
-  uint32_t oscar_last_safe_access_time;
 
   /* NDPI_PROTOCOL_ZATTOO */
   uint32_t zattoo_ts;
@@ -480,9 +476,6 @@ struct ndpi_id_struct {
 
   /* NDPI_PROTOCOL_IRC */
   uint8_t irc_number_of_port;
-
-  /* NDPI_PROTOCOL_OSCAR */
-  uint8_t oscar_ssl_session_id[33];
 
   /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   uint8_t jabber_voice_stun_used_ports;
@@ -648,14 +641,8 @@ struct ndpi_flow_tcp_struct {
 };
 
 struct ndpi_flow_udp_struct {
-  /* NDPI_PROTOCOL_BATTLEFIELD */
-  uint32_t battlefield_msg_id;
-
   /* NDPI_PROTOCOL_SNMP */
   uint32_t snmp_msg_id;
-
-  /* NDPI_PROTOCOL_BATTLEFIELD */
-  uint32_t battlefield_stage:3;
 
   /* NDPI_PROTOCOL_SNMP */
   uint32_t snmp_stage:2;
@@ -713,8 +700,7 @@ struct ndpi_packet_struct {
   const uint8_t *generic_l4_ptr;	/* is set only for non tcp-udp traffic */
   const uint8_t *payload;
 
-  uint32_t tick_timestamp;
-  uint64_t tick_timestamp_l;
+  uint64_t current_time_ms;
 
   uint16_t detected_protocol_stack[2];
   uint8_t detected_subprotocol_stack[2];
@@ -956,16 +942,12 @@ struct ndpi_detection_module_struct {
   uint32_t irc_timeout;
   /* gnutella parameters */
   uint32_t gnutella_timeout;
-  /* battlefield parameters */
-  uint32_t battlefield_timeout;
   /* thunder parameters */
   uint32_t thunder_timeout;
   /* SoulSeek parameters */
   uint32_t soulseek_connection_ip_tick_timeout;
   /* rtsp parameters */
   uint32_t rtsp_connection_timeout;
-  /* tvants parameters */
-  uint32_t tvants_connection_timeout;
   /* rstp */
   uint32_t orb_rstp_ts_timeout;
   /* yahoo */
@@ -1099,6 +1081,10 @@ struct ndpi_flow_struct {
       uint32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];
       uint16_t server_cipher;
+      struct {
+        uint16_t cipher_suite;
+        char *esni;
+      } encrypted_sni;
       ndpi_cipher_weakness server_unsafe_cipher;
       } ssl;
 
@@ -1196,9 +1182,6 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_THUNDER */
   uint8_t thunder_stage:2;		        // 0 - 3
-
-  /* NDPI_PROTOCOL_OSCAR */
-  uint8_t oscar_ssl_voice_stage:3, oscar_video_voice:1;
 
   /* NDPI_PROTOCOL_FLORENSIA */
   uint8_t florensia_stage:1;
