@@ -1,5 +1,4 @@
-SOCKS	135	9351	1
-DNP3	408	29403	7
+DNP3	543	38754	8
 
 	1	TCP 10.0.0.8:2828 <-> 10.0.0.3:20000 [proto: 244/DNP3][cat: Network/14][60 pkts/4041 bytes <-> 78 pkts/7164 bytes][Goodput ratio: 17/38][121.83 sec][bytes ratio: -0.279 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 421/302 13044/8439 1926/1115][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 67/92 79/145 5/37][Plen Bins: 64,3,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 10.0.0.9:1080 <-> 10.0.0.3:20000 [proto: 172/SOCKS][cat: Web/5][72 pkts/4659 bytes <-> 63 pkts/4692 bytes][Goodput ratio: 10/27][384.60 sec][bytes ratio: -0.004 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 4732/3049 75028/40127 13787/9968][Pkt Len c2s/s2c min/avg/max/stddev: 60/62 65/74 81/147 7/16][Plen Bins: 96,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

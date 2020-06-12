@@ -3288,6 +3288,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* IEC 60870-5-104 */
   init_104_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* DNP3 */
+  init_dnp3_dissector(ndpi_str, &a, detection_bitmask);
+
   /* WEBSOCKET */
   init_websocket_dissector(ndpi_str, &a, detection_bitmask);
 
