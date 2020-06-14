@@ -1954,7 +1954,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if(ndpi_str == NULL) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    NDPI_LOG_ERR(ndpi_str, "ndpi_init_detection_module initial malloc failed for ndpi_str\n");
+    /* We can't use NDPI_LOG* functions yet! */
+    fprintf(stderr, "ndpi_init_detection_module initial malloc failed for ndpi_str\n");
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
     return(NULL);
   }
@@ -1963,6 +1964,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
+  NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
   if((ndpi_str->protocols_ptree = ndpi_New_Patricia(32 /* IPv4 */)) != NULL)
@@ -6245,6 +6247,12 @@ u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *nd
 
 u_int ndpi_get_ndpi_detection_module_size() {
   return(sizeof(struct ndpi_detection_module_struct));
+}
+
+void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_str, NDPI_PROTOCOL_BITMASK debug_bitmask) {
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  ndpi_str->debug_bitmask = debug_bitmask;
+#endif
 }
 
 void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){

@@ -589,8 +589,10 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
   int i;
 
   NDPI_LOG_DBG2(ndpi_struct, "====>>>> HTTP: %c%c%c%c [len: %u]\n",
-		non_ctrl(packet->payload[0]), non_ctrl(packet->payload[1]),
-		non_ctrl(packet->payload[2]), non_ctrl(packet->payload[3]),
+		packet->payload_packet_len > 0 ? packet->payload[0] : '.',
+		packet->payload_packet_len > 1 ? packet->payload[1] : '.',
+		packet->payload_packet_len > 2 ? packet->payload[2] : '.',
+		packet->payload_packet_len > 3 ? packet->payload[3] : '.',
 		packet->payload_packet_len);
 
   /* Check first char */

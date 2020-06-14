@@ -20,9 +20,8 @@
  */
 
 #include "ndpi_protocol_ids.h"
-#include "ndpi_api.h"
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_NATS
+#include "ndpi_api.h"
 
 static const char* commands[] =
   {
