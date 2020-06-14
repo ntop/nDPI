@@ -6505,7 +6505,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       if(isdigit(name[i]))
 	continue;
       else
-	tmp[j++] = tolower(tmp[i]);
+	tmp[j++] = tolower(name[i]);
     }
 
     len = j;
