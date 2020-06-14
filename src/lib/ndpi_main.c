@@ -4870,7 +4870,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
     if((packet->payload[a] == 0x0d) && (packet->payload[a+1] == 0x0a)) {
       /* If end of line char sequence CR+NL "\r\n", process line */
 
-      if(((a + 3) <= packet->payload_packet_len)
+      if(((a + 3) < packet->payload_packet_len)
 	 && (packet->payload[a+2] == 0x0d)
 	 && (packet->payload[a+3] == 0x0a)) {
 	/* \r\n\r\n */
