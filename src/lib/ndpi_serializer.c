@@ -245,6 +245,13 @@ int ndpi_serializer_set_buffer_len(ndpi_serializer *_serializer, u_int32_t l) {
 
 /* ********************************** */
 
+ndpi_serialization_format ndpi_serializer_get_format(ndpi_serializer *_serializer) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  return serializer->fmt;
+}
+
+/* ********************************** */
+
 void ndpi_serializer_set_csv_separator(ndpi_serializer *_serializer, char separator) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 

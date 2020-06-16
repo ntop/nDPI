@@ -935,6 +935,7 @@ extern "C" {
   u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *serializer);
   u_int32_t ndpi_serializer_get_internal_buffer_size(ndpi_serializer *serializer);
   int ndpi_serializer_set_buffer_len(ndpi_serializer *serializer, u_int32_t l);
+  ndpi_serialization_format ndpi_serializer_get_format(ndpi_serializer *serializer);
   void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator);
 
   void ndpi_serializer_create_snapshot(ndpi_serializer *serializer);
