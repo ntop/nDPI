@@ -6083,8 +6083,12 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
 
   if(!automa->ac_automa_finalized) {
+#if 1
+    ndpi_finalize_initalization(ndpi_str);
+#else
     printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initalization()\n", __FILE__, __LINE__);
     return(0); /* No matches */
+#endif
   }
 
   ac_input_text.astring = bigram_to_match, ac_input_text.length = 2;
@@ -6483,12 +6487,12 @@ void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]) {
 
 static int enough(int a, int b) {
   u_int8_t percentage = 20;
-  
+
   if(b == 0) return(0);
   if(a == 0) return(1);
 
-  if(b > ((a*percentage)/100)) return(1);
-  
+  if(b > (((a+1)*percentage)/100)) return(1);
+
   return(0);
 }
 
@@ -6498,14 +6502,14 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
 			char *name) {
   int len = strlen(name), rc = 0;
- 
+
   if(len >= 5) {
     int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0;
     char tmp[128];
 
     len = snprintf(tmp, sizeof(tmp)-1, "%s", name);
     if(len < 0) return(0);
-    
+
     for(i=0, j=0; (i<len) && (j<(sizeof(tmp)-1)); i++) {
       if(isdigit(name[i]))
 	continue;
@@ -6513,11 +6517,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	tmp[j++] = tolower(name[i]);
     }
 
+    tmp[j] = '\0';
     len = j;
-    
-    for(i = 0; tmp[i+1] != '\0'; i++) {
+
+    for(i = 0; i < len; i++) {
       if(isdigit(tmp[i])) continue;
-	
+
       switch(tmp[i]) {
       case '-':
       case ':':
@@ -6527,7 +6532,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       }
 
       if(isdigit(tmp[i+1])) continue;
-	 
+
       num_bigram_checks++;
 
       if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &tmp[i])) {
@@ -6543,9 +6548,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     if(num_bigram_checks
-       && ((num_found == 0)
-	   || (enough(num_found, num_impossible))))
-      rc = 1;    
+       && (num_impossible > 0)
+       && ((num_found == 0) || enough(num_found, num_impossible)))
+      rc = 1;
 
     if(rc && flow)
       NDPI_SET_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
@@ -6556,6 +6561,6 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	     tmp, name, num_found, num_impossible);
 #endif
   }
-  
+
   return(rc);
 }
