@@ -3050,7 +3050,20 @@ void test_lib() {
 /* *********************************************** */
 
 static void dgaUnitTest() {
-  const char *s[] = {
+  const char *dga[] = {
+		     "lbjamwptxz",
+		     "l54c2e21e80ba5471be7a8402cffb98768.so",
+		     "wdd7ee574106a84807a601beb62dd851f0.hk",
+		     "jaa12148a5831a5af92aa1d8fe6059e276.ws",
+		     "www.e6r5p57kbafwrxj3plz.com",
+		     // "grdawgrcwegpjaoo.eu",
+		     "mcfpeqbotiwxfxqu.eu",
+		     "adgxwxhqsegnrsih.eu",		     
+		     NULL
+  };
+
+  const char *non_dga[] = {
+		     "mz.gov.pl",
 		     "zoomam104zc.zoom.us",
 		     "5CI_DOMBIN",
 		     "ALICEGATE",
@@ -3093,9 +3106,12 @@ static void dgaUnitTest() {
     
   assert(ndpi_str != NULL);
 
-  for(i=0; s[i] != NULL; i++) {
-    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)s[i]) == 0);
-  }
+  for(i=0; dga[i] != NULL; i++)
+    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i]) == 1);
+  
+  for(i=0; non_dga[i] != NULL; i++)
+    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i]) == 0);
+  
 
   ndpi_exit_detection_module(ndpi_str);
 }

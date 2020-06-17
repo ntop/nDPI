@@ -571,9 +571,14 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   // ac_automata_display(ndpi_str->host_automa.ac_automa, 'n');
 #endif
 
+#if 1
   for (i = 0; ndpi_en_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_bigrams[i], 1, 1, 1, 0);
-
+#else
+  for (i = 0; ndpi_en_popular_bigrams[i] != NULL; i++)
+    ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_popular_bigrams[i], 1, 1, 1, 0);
+#endif
+  
   for (i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa, (char *) ndpi_en_impossible_bigrams[i], 1,
 			  1, 1, 0);
@@ -4372,6 +4377,13 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
      Skype for a host doing MS Teams means MS Teams
      (MS Teams uses Skype as transport protocol for voice/video)
   */
+  
+  if(flow) {
+    /* Do not go for DNS when there is an application protocol. Example DNS.Apple */
+    if((flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
+       && (flow->detected_protocol_stack[0] /* app */ != flow->detected_protocol_stack[1] /* major */))
+      NDPI_CLR_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
+  }  
 
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MSTEAMS:
@@ -6498,58 +6510,101 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
+// #define DGA_DEBUG 1
+
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
 			char *name) {
-  int len = strlen(name), rc = 0;
+  int len, rc = 0;
 
+  len = strlen(name);
+  
   if(len >= 5) {
-    int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0;
-    char tmp[128];
+    int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0, num_digits = 0, num_vowels = 0, num_words = 0;
+    char tmp[128], *word, *tok_tmp;
 
     len = snprintf(tmp, sizeof(tmp)-1, "%s", name);
     if(len < 0) return(0);
 
     for(i=0, j=0; (i<len) && (j<(sizeof(tmp)-1)); i++) {
-      if(isdigit(name[i]))
-	continue;
-      else
 	tmp[j++] = tolower(name[i]);
     }
 
     tmp[j] = '\0';
     len = j;
 
-    for(i = 0; i < len; i++) {
-      if(isdigit(tmp[i])) continue;
+    for(word = strtok_r(tmp, ".", &tok_tmp); ; word = strtok_r(NULL, ".", &tok_tmp)) {
+      if(!word) break;
 
-      switch(tmp[i]) {
-      case '-':
-      case ':':
-      case '.':
-	continue;
-	break;
-      }
+      num_words++;
+      
+      if(strlen(word) < 3) continue;
 
-      if(isdigit(tmp[i+1])) continue;
-
-      num_bigram_checks++;
-
-      if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &tmp[i])) {
-	num_found++;
-      } else if(ndpi_match_bigram(ndpi_str,
-				  &ndpi_str->impossible_bigrams_automa,
-				  &tmp[i])) {
 #ifdef DGA_DEBUG
-	printf("IMPOSSIBLE %s\n", &tmp[i]);
+      printf("-> %s [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
 #endif
-	num_impossible++;
-      }
-    }
+      
+      for(i = 0; word[i+1] != '\0'; i++) {
+	if(isdigit(word[i])) {
+	  num_digits++;
+	  
+	  // if(!isdigit(word[i+1])) num_impossible++;
+	  
+	  continue;	  
+	}
+	
+	switch(word[i]) {
+	case '_':
+	case '-':
+	case ':':
+	  continue;
+	  break;
+	
+	case '.':
+	  continue;
+	  break;
+	}
 
+	switch(word[i]) {
+	case 'a':
+	case 'e':
+	case 'i':
+	case 'o':
+	case 'u':
+	  num_vowels++;
+	  break;
+	}
+	
+	if(isdigit(word[i+1])) {
+	  num_digits++;
+	  // num_impossible++;
+	  continue;
+	}
+	
+	num_bigram_checks++;
+
+	if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
+	  num_found++;
+	} else {
+	  if(ndpi_match_bigram(ndpi_str,
+			       &ndpi_str->impossible_bigrams_automa,
+			       &word[i])) {
+#ifdef DGA_DEBUG
+	    printf("IMPOSSIBLE %s\n", &word[i]);
+#endif
+	    num_impossible++;
+	  }
+	}
+      } /* for */
+    } /* for */
+
+#ifdef DGA_DEBUG
+    printf("[num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u]\n",
+	   num_found, num_impossible, num_digits, num_bigram_checks, num_vowels, j-num_vowels);
+#endif
+	    
     if(num_bigram_checks
-       && (num_impossible > 0)
-       && ((num_found == 0) || enough(num_found, num_impossible)))
+       && ((num_found == 0) || ((num_digits > 5) && (num_words <= 3)) || enough(num_found, num_impossible)))
       rc = 1;
 
     if(rc && flow)
@@ -6557,8 +6612,8 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 #ifdef DGA_DEBUG
     if(rc)
-      printf("DGA %s [%s][num_found: %u][num_impossible: %u]\n",
-	     tmp, name, num_found, num_impossible);
+      printf("DGA %s [num_found: %u][num_impossible: %u]\n",
+	     name, num_found, num_impossible);
 #endif
   }
 
