@@ -1200,14 +1200,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    printf("Client SSL [ALPN: %u]\n", alpn_len);
 #endif
 
-		    if((alpn_str_len+alpn_len+1) < sizeof(alpn_str)) {
+		    if((alpn_str_len+alpn_len+1) < (sizeof(alpn_str)-1)) {
 		      if(alpn_str_len > 0) {
 			alpn_str[alpn_str_len] = ',';
 			alpn_str_len++;
 		      }
 
 		      for(alpn_i=0; alpn_i<alpn_len; alpn_i++)
-			alpn_str[alpn_str_len+alpn_i] =  packet->payload[s_offset+alpn_i];
+			alpn_str[alpn_str_len+alpn_i] = packet->payload[s_offset+alpn_i];
 
 		      s_offset += alpn_len, alpn_str_len += alpn_len;;
 		    } else

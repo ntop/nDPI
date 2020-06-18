@@ -280,13 +280,13 @@ extern "C" {
    * (like SSL getting both client and server certificate even if we already know after
    * seeing the client certificate what the protocol is)
    *
-   * @par    ndpi_struct   = the detection module
-   * @par    flow          = pointer to the connection state machine
-   * @par    packet        = unsigned char pointer to the Layer 3 (IP header)
-   * @par    packetlen     = the length of the packet
-   * @par    current_tick  = the current timestamp for the packet
-   * @par    src           = pointer to the source subscriber state machine
-   * @par    dst           = pointer to the destination subscriber state machine
+   * @par    ndpi_struct    = the detection module
+   * @par    flow           = pointer to the connection state machine
+   * @par    packet         = unsigned char pointer to the Layer 3 (IP header)
+   * @par    packetlen      = the length of the packet
+   * @par    packet_time_ms = the current timestamp for the packet (expressed in msec)
+   * @par    src            = pointer to the source subscriber state machine
+   * @par    dst            = pointer to the destination subscriber state machine
    * @return void
    *
    */
@@ -294,7 +294,7 @@ extern "C" {
 				 struct ndpi_flow_struct *flow,
 				 const unsigned char *packet,
 				 const unsigned short packetlen,
-				 const u_int64_t current_tick,
+				 const u_int64_t packet_time_ms,
 				 struct ndpi_id_struct *src,
 				 struct ndpi_id_struct *dst);
 
@@ -302,13 +302,13 @@ extern "C" {
    * Processes one packet and returns the ID of the detected protocol.
    * This is the MAIN PACKET PROCESSING FUNCTION.
    *
-   * @par    ndpi_struct   = the detection module
-   * @par    flow          = pointer to the connection state machine
-   * @par    packet        = unsigned char pointer to the Layer 3 (IP header)
-   * @par    packetlen     = the length of the packet
-   * @par    current_tick  = the current timestamp for the packet
-   * @par    src           = pointer to the source subscriber state machine
-   * @par    dst           = pointer to the destination subscriber state machine
+   * @par    ndpi_struct    = the detection module
+   * @par    flow           = pointer to the connection state machine
+   * @par    packet         = unsigned char pointer to the Layer 3 (IP header)
+   * @par    packetlen      = the length of the packet
+   * @par    packet_time_ms = the current timestamp for the packet (expressed in msec)
+   * @par    src            = pointer to the source subscriber state machine
+   * @par    dst            = pointer to the destination subscriber state machine
    * @return the detected ID of the protocol
    *
    */
@@ -316,7 +316,7 @@ extern "C" {
 					      struct ndpi_flow_struct *flow,
 					      const unsigned char *packet,
 					      const unsigned short packetlen,
-					      const u_int64_t current_tick,
+					      const u_int64_t packet_time_ms,
 					      struct ndpi_id_struct *src,
 					      struct ndpi_id_struct *dst);
   /**
