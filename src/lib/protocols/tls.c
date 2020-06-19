@@ -196,6 +196,14 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
   char *str;
   u_int len, j;
 
+  if (*rdnSeqBuf_offset >= rdnSeqBuf_len) {
+#ifdef DEBUG_TLS
+    printf("[TLS] %s() [buffer capacity reached][%u]\n",
+           __FUNCTION__, rdnSeqBuf_len);
+#endif
+    return -1;
+  }
+
   // packet is truncated... further inspection is not needed
   if((offset+4+str_len) >= packet->payload_packet_len)
     return(-1);
@@ -235,7 +243,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 				       u_int16_t p_offset, u_int16_t certificate_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int num_found = 0, i;
-  char buffer[64] = { '\0' }, rdnSeqBuf[1024] = { '\0' };
+  char buffer[64] = { '\0' }, rdnSeqBuf[2048] = { '\0' };
   u_int rdn_len = 0;
 
 #ifdef DEBUG_TLS
