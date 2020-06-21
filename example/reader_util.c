@@ -77,6 +77,11 @@
 #define DLT_LINUX_SLL  113
 #endif
 
+#define PLEN_MAX         1504
+#define PLEN_BIN_LEN     32
+#define PLEN_NUM_BINS    47 /* 47*32 = 1504 */
+#define MAX_NUM_BIN_PKTS 256
+
 #include "ndpi_main.h"
 #include "reader_util.h"
 #include "ndpi_classify.h"
@@ -458,6 +463,13 @@ void ndpi_flow_info_freer(void *node) {
   ndpi_free_flow_data_analysis(flow);
   ndpi_free_flow_tls_data(flow);
 
+#ifdef DIRECTION_BINS
+  ndpi_free_bin(&flow->payload_len_bin_src2dst);
+  ndpi_free_bin(&flow->payload_len_bin_dst2src);
+#else
+  ndpi_free_bin(&flow->payload_len_bin);
+#endif
+  
   ndpi_free(flow);
 }
 
@@ -826,6 +838,13 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	newflow->pktlen_s_to_c =  ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW),
 	newflow->iat_flow = ndpi_alloc_data_analysis(DATA_ANALUYSIS_SLIDING_WINDOW);
 
+#ifdef DIRECTION_BINS
+      ndpi_init_bin(&newflow->payload_len_bin_src2dst, ndpi_bin_family8, PLEN_NUM_BINS);
+      ndpi_init_bin(&newflow->payload_len_bin_dst2src, ndpi_bin_family8, PLEN_NUM_BINS);
+#else
+      ndpi_init_bin(&newflow->payload_len_bin, ndpi_bin_family8, PLEN_NUM_BINS);
+#endif
+      
       if(version == IPVERSION) {
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
 	inet_ntop(AF_INET, &newflow->dst_ip, newflow->dst_name, sizeof(newflow->dst_name));
@@ -838,6 +857,11 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
       if((newflow->ndpi_flow = ndpi_flow_malloc(SIZEOF_FLOW_STRUCT)) == NULL) {
 	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(2): not enough memory\n", __FUNCTION__);
+#ifdef DIRECTION_BINS
+	ndpi_free_bin(&newflow->payload_len_bin_src2dst), ndpi_free_bin(&newflow->payload_len_bin_dst2src);
+#else
+	ndpi_free_bin(&newflow->payload_len_bin);
+#endif
 	free(newflow);
 	return(NULL);
       } else
@@ -845,6 +869,11 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
       if((newflow->src_id = ndpi_malloc(SIZEOF_ID_STRUCT)) == NULL) {
 	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(3): not enough memory\n", __FUNCTION__);
+#ifdef DIRECTION_BINS
+	ndpi_free_bin(&newflow->payload_len_bin_src2dst), ndpi_free_bin(&newflow->payload_len_bin_dst2src);
+#else
+	ndpi_free_bin(&newflow->payload_len_bin);
+#endif
 	free(newflow);
 	return(NULL);
       } else
@@ -852,6 +881,11 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
       if((newflow->dst_id = ndpi_malloc(SIZEOF_ID_STRUCT)) == NULL) {
 	NDPI_LOG(0, workflow->ndpi_struct, NDPI_LOG_ERROR, "[NDPI] %s(4): not enough memory\n", __FUNCTION__);
+#ifdef DIRECTION_BINS
+	ndpi_free_bin(&newflow->payload_len_bin_src2dst), ndpi_free_bin(&newflow->payload_len_bin_dst2src);
+#else
+	ndpi_free_bin(&newflow->payload_len_bin);
+#endif
 	free(newflow);
 	return(NULL);
       } else
@@ -1214,6 +1248,20 @@ void update_tcp_flags_count(struct ndpi_flow_info* flow, struct ndpi_tcphdr* tcp
 }
 
 /* ****************************************************** */
+
+u_int8_t plen2slot(u_int16_t plen) {  
+  /* 
+     Slots [32 bytes lenght]
+     0..31, 32..63 ... 
+  */
+
+  if(plen > PLEN_MAX)
+    return(PLEN_NUM_BINS-1);
+  else
+    return(plen/PLEN_BIN_LEN);
+}
+
+/* ****************************************************** */
 /**
    Function to process the packet:
    determine the flow of a packet and try to decode it
@@ -1291,9 +1339,10 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	  ndpi_data_add_value(flow->iat_flow, ms);
       }
     }
-    memcpy(&flow->entropy.flow_last_pkt_time, &when, sizeof(when));
 
-    if(src_to_dst_direction) {
+    memcpy(&flow->entropy.flow_last_pkt_time, &when, sizeof(when));
+    
+    if(src_to_dst_direction) {     
       if(flow->entropy.src2dst_last_pkt_time.tv_sec) {
 	ndpi_timer_sub(&when, &flow->entropy.src2dst_last_pkt_time, &tdiff);
 
@@ -1309,7 +1358,12 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       ndpi_data_add_value(flow->pktlen_c_to_s, rawsize);
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize, flow->src2dst_goodput_bytes += payload_len;
       memcpy(&flow->entropy.src2dst_last_pkt_time, &when, sizeof(when));
-    } else {
+
+#ifdef DIRECTION_BINS
+      if(payload_len && (flow->src2dst_packets < MAX_NUM_BIN_PKTS))
+	ndpi_inc_bin(&flow->payload_len_bin_src2dst, plen2slot(payload_len));
+#endif
+    } else {      
       if(flow->entropy.dst2src_last_pkt_time.tv_sec && (!begin_or_end_tcp)) {
 	ndpi_timer_sub(&when, &flow->entropy.dst2src_last_pkt_time, &tdiff);
 
@@ -1322,7 +1376,17 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize, flow->dst2src_goodput_bytes += payload_len;
       memcpy(&flow->entropy.dst2src_last_pkt_time, &when, sizeof(when));
+
+#ifdef DIRECTION_BINS
+      if(payload_len && (flow->dst2src_packets < MAX_NUM_BIN_PKTS))
+	ndpi_inc_bin(&flow->payload_len_bin_dst2src, plen2slot(payload_len));
+#endif
     }
+
+#ifndef DIRECTION_BINS
+    if(payload_len && ((flow->src2dst_packets+flow->dst2src_packets) < MAX_NUM_BIN_PKTS))
+	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(payload_len));
+#endif
 
     if(enable_payload_analyzer && (payload_len > 0))
       ndpi_payload_analyzer(flow, src_to_dst_direction,

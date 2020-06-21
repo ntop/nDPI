@@ -976,6 +976,33 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
+void print_bin(const char *label, struct ndpi_bin *b) {
+  u_int8_t i;
+  FILE *out = results_file ? results_file : stdout;
+  
+  ndpi_normalize_bin(b);
+
+  fprintf(out, "[%s: ", label);
+  
+  for(i=0; i<b->num_bins; i++) {
+    switch(b->family) {
+    case ndpi_bin_family8:
+      fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
+      break;
+    case ndpi_bin_family16:
+      fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
+      break;
+    case ndpi_bin_family32:
+      fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
+    break;
+    }
+  }
+
+  fprintf(out, "]");
+}
+
+/* ********************************** */
+
 /**
  * @brief Print the flow
  */
@@ -1273,12 +1300,23 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(out, "[Validity: %s - %s]", notBefore, notAfter);
   }
 
-  if(flow->ssh_tls.server_cipher != '\0') fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher));
-  if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
-  if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
+  if(flow->ssh_tls.server_cipher != '\0') fprintf(out, "[Cipher: %s]",
+						  ndpi_cipher2str(flow->ssh_tls.server_cipher));
+  if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]",
+					      flow->bittorent_hash);
+  if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]",
+						flow->dhcp_fingerprint);
 
-  if(flow->has_human_readeable_strings) fprintf(out, "[PLAIN TEXT (%s)]", flow->human_readeable_string_buffer);
+  if(flow->has_human_readeable_strings) fprintf(out, "[PLAIN TEXT (%s)]",
+						flow->human_readeable_string_buffer);
 
+#ifdef DIRECTION_BINS
+  print_bin("Plen c2s", &flow->payload_len_bin_src2dst);
+  print_bin("Plen s2c", &flow->payload_len_bin_dst2src);
+#else
+  print_bin("Plen Bins", &flow->payload_len_bin);
+#endif
+  
   fprintf(out, "\n");
 }
 

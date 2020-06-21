@@ -1064,6 +1064,13 @@ extern "C" {
 
   /* Get cardinality estimation */
   double ndpi_hll_count(struct ndpi_hll *hll);
+
+  /* ******************************* */
+  
+  int  ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins);
+  void ndpi_free_bin(struct ndpi_bin *b);
+  void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id); 
+  void ndpi_normalize_bin(struct ndpi_bin *b);
   
 #ifdef __cplusplus
 }

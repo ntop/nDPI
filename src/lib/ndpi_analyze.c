@@ -233,3 +233,86 @@ void ndpi_hll_add_number(struct ndpi_hll *hll, u_int32_t value) {
 double ndpi_hll_count(struct ndpi_hll *hll) {
   return(hll_count(hll));
 }
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins) {
+  b->num_bins = num_bins, b->family = f, b->num_incs = 0;
+
+  switch(f) {
+  case ndpi_bin_family8:
+    if((b->u.bins8 = (u_int8_t*)calloc(num_bins, sizeof(u_int8_t))) == NULL)
+      return(-1);
+    break;
+    
+  case ndpi_bin_family16:
+    if((b->u.bins16 = (u_int16_t*)calloc(num_bins, sizeof(u_int16_t))) == NULL)
+      return(-1);
+    break;
+    
+  case ndpi_bin_family32:
+    if((b->u.bins32 = (u_int32_t*)calloc(num_bins, sizeof(u_int32_t))) == NULL)
+      return(-1);
+    break;
+  }
+
+  return(0);
+}
+
+void ndpi_free_bin(struct ndpi_bin *b) {
+  switch(b->family) {
+  case ndpi_bin_family8:
+    free(b->u.bins8);
+    break;
+  case ndpi_bin_family16:
+    free(b->u.bins16);
+    break;
+  case ndpi_bin_family32:
+    free(b->u.bins32);
+    break;
+  }
+}
+
+void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id) {
+  if(slot_id >= b->num_bins) slot_id = 0;
+
+  b->num_incs += 1;
+  
+  switch(b->family) {
+  case ndpi_bin_family8:
+    b->u.bins8[slot_id]++;
+    break;
+  case ndpi_bin_family16:
+    b->u.bins16[slot_id]++;
+    break;
+  case ndpi_bin_family32:
+    b->u.bins32[slot_id]++;
+    break;
+  }
+}
+
+/*
+  Each bin slot is transformed in a % with respect to the value total
+ */
+void ndpi_normalize_bin(struct ndpi_bin *b) {
+  u_int8_t i;
+
+  if(b->num_incs == 0) return;
+  
+  switch(b->family) {
+  case ndpi_bin_family8:
+    for(i=0; i<b->num_bins; i++)
+      b->u.bins8[i] = (b->u.bins8[i]*100) / b->num_incs;
+    break;
+  case ndpi_bin_family16:
+    for(i=0; i<b->num_bins; i++)
+      b->u.bins16[i] = (b->u.bins16[i]*100) / b->num_incs;
+    break;
+  case ndpi_bin_family32:
+    for(i=0; i<b->num_bins; i++)
+      b->u.bins32[i] = (b->u.bins32[i]*100) / b->num_incs;
+    break;
+  }
+}
+

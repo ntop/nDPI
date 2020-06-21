@@ -226,6 +226,13 @@ typedef struct ndpi_flow_info {
 
   struct ndpi_entropy entropy;
   struct ndpi_entropy last_entropy;
+
+  /* Payload lenght bins */
+#ifdef DIRECTION_BINS
+  struct ndpi_bin payload_len_bin_src2dst, payload_len_bin_dst2src;
+#else
+  struct ndpi_bin payload_len_bin;
+#endif
 } ndpi_flow_info_t;
 
 
