@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd "$(dirname "${0}")"
+
 READER="../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
 
 RC=0
