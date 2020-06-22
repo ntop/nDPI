@@ -4,13 +4,11 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
-AC_ARG_WITH(llvm_sanitizer,     [  --with-llvm-sanitizer   Build with support for the LLVM address sanitizer])
+AC_ARG_WITH(sanitizer,     [  --with-sanitizer      Build with support for address, undefined and leak sanitizer])
 
-AS_IF([test "${with_llvm_sanitizer+set}" = set],[
-     CFLAGS="${CFLAGS} -g -O2 -Wno-unused-value -fsanitize=address -fno-omit-frame-pointer"
-     LDFLAGS="${LDFLAGS} -fsanitize=address"
-     CC=clang
-     CXX=clang++
+AS_IF([test "${with_sanitizer+set}" = set],[
+     CFLAGS="${CFLAGS} -g3 -O0 -Wno-unused-value -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize=shift -fsanitize=leak -fno-omit-frame-pointer"
+     LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize=shift -fsanitize=leak"
 ])
 
 LT_INIT
@@ -130,6 +128,9 @@ AS_IF([test "x$enable_fuzztargets" = "xyes"], [
     AC_PROG_CXX
     AC_LANG_PUSH(C++)
     tmp_saved_flags=$[]_AC_LANG_PREFIX[]FLAGS
+    AX_CHECK_COMPILE_FLAG([-fsanitize=fuzzer],,
+        [AC_MSG_ERROR([--enable-fuzztargets requires -fsanitize=fuzzer which is only supported by LLVM])],
+        [-Werror])
     AS_IF([test "x$LIB_FUZZING_ENGINE" = "x"], [
         LIB_FUZZING_ENGINE=-fsanitize=fuzzer
         AC_SUBST(LIB_FUZZING_ENGINE)
