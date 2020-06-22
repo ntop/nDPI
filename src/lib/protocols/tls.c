@@ -29,7 +29,6 @@
 #include "ndpi_md5.h"
 #include "ndpi_sha1.h"
 
-
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
@@ -1165,7 +1164,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		printf("Client SSL [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
-		if((s_offset+extension_len) < total_len) {
+		if((s_offset+extension_len-1) <= total_len) {
 		  for(i=0; i<extension_len-1;i++) {
 		    u_int8_t s_group = packet->payload[s_offset+i];
 

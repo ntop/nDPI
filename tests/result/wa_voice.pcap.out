@@ -45,4 +45,4 @@ JA3 Host Stats:
 
 
 Undetected flows:
-	1	TCP 192.168.2.12:49352 <-> 169.254.162.244:49159 [proto: 0/Unknown][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.2.12:49352 <-> 169.254.162.244:49159 [proto: 0/Unknown][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][< 1 sec]

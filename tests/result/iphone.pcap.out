@@ -65,7 +65,7 @@ JA3 Host Stats:
 	47	UDP 192.168.2.1:51411 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][1 pkts/168 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	48	ICMPV6 [fe80::823:3f17:8298:a29c]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][cat: Network/14][2 pkts/132 bytes -> 0 pkts/0 bytes][Goodput ratio: 6/0][4.21 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	49	ICMPV6 [::]:0 -> [ff02::1:ff98:a29c]:0 [proto: 102/ICMPV6][cat: Network/14][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 28/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	50	IGMP 192.168.2.17:0 -> 224.0.0.22:0 [proto: 82/IGMP][cat: Network/14][1 pkts/54 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	50	IGMP 192.168.2.17:0 -> 224.0.0.22:0 [proto: 82/IGMP][cat: Network/14][1 pkts/54 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec]
 
 
 Undetected flows:

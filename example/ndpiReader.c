@@ -977,28 +977,32 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 /* ********************************** */
 
 void print_bin(const char *label, struct ndpi_bin *b) {
-  u_int8_t i;
-  FILE *out = results_file ? results_file : stdout;
+  if(b->num_incs == 0)
+    return;
+  else {
+    u_int8_t i;
+    FILE *out = results_file ? results_file : stdout;
   
-  ndpi_normalize_bin(b);
+    ndpi_normalize_bin(b);
 
-  fprintf(out, "[%s: ", label);
+    fprintf(out, "[%s: ", label);
   
-  for(i=0; i<b->num_bins; i++) {
-    switch(b->family) {
-    case ndpi_bin_family8:
-      fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
-      break;
-    case ndpi_bin_family16:
-      fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
-      break;
-    case ndpi_bin_family32:
-      fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
-    break;
+    for(i=0; i<b->num_bins; i++) {
+      switch(b->family) {
+      case ndpi_bin_family8:
+	fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
+	break;
+      case ndpi_bin_family16:
+	fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
+	break;
+      case ndpi_bin_family32:
+	fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
+	break;
+      }
     }
-  }
 
-  fprintf(out, "]");
+    fprintf(out, "]");
+  }
 }
 
 /* ********************************** */
