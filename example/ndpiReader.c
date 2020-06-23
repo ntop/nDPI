@@ -1829,9 +1829,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
-      ndpi_free_flow_info_half(flow);
-      ndpi_free_flow_data_analysis(flow);
-      ndpi_free_flow_tls_data(flow);
+      ndpi_flow_info_free_data(flow);
       ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */
