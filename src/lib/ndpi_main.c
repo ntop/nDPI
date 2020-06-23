@@ -4379,7 +4379,8 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->http_cookie.len = 0, packet->http_origin.len = 0, packet->http_origin.ptr = NULL,
     packet->http_x_session_type.ptr = NULL, packet->http_x_session_type.len = 0, packet->server_line.ptr = NULL,
     packet->server_line.len = 0, packet->http_method.ptr = NULL, packet->http_method.len = 0,
-    packet->http_response.ptr = NULL, packet->http_response.len = 0, packet->http_num_headers = 0;
+    packet->http_response.ptr = NULL, packet->http_response.len = 0, packet->http_num_headers = 0,
+    packet->forwarded_line.ptr = NULL, packet->forwarded_line.len = 0;
 }
 
 /* ********************************************************************************* */
