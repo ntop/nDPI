@@ -3141,7 +3141,8 @@ static void dgaUnitTest() {
   struct ndpi_detection_module_struct *ndpi_str =  ndpi_init_detection_module(ndpi_no_prefs);
 
   assert(ndpi_str != NULL);
-  
+
+  NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
   ndpi_finalize_initalization(ndpi_str);
