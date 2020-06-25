@@ -18,7 +18,10 @@ libndpiReader.a: $(COMMON_SOURCES:%.c=%.o) $(LIBNDPI)
 	ar rsv libndpiReader.a $(COMMON_SOURCES:%.c=%.o)
 
 ndpiReader: libndpiReader.a $(LIBNDPI) $(EXECUTABLE_SOURCES:%.c=%.o)
-	$(CXX) $(CFLAGS) $(EXECUTABLE_SOURCES:%.c=%.o) libndpiReader.a -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $(EXECUTABLE_SOURCES:%.c=%.o) libndpiReader.a -o $@ $(LDFLAGS)
+
+ndpiSimpleIntegration: ndpiSimpleIntegration.o
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
