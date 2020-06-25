@@ -20,8 +20,8 @@ if test -z $AUTOCONF; then
     exit
 else
     V=`autoconf --version | head -1 | cut -d ' ' -f 4`
-    if [ $V="2.6.3" ]; then
-	FUZZY="dnl> "
+    if [ "$V" = '2.6.3' ]; then
+        FUZZY="dnl> "
     fi
 fi
 
