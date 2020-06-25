@@ -13,10 +13,16 @@ LIBTOOL=$(command -v libtool)
 LIBTOOLIZE=$(command -v libtoolize)
 AUTORECONF=$(command -v autoreconf)
 PKG_CONFIG=$(command -v pkg-config)
+FUZZY=
 
 if test -z $AUTOCONF; then
     echo "autoconf is missing: please install it and try again"
     exit
+else
+    V=`autoconf --version | head -1 | cut -d ' ' -f 4`
+    if [ $V="2.6.3" ]; then
+	FUZZY="dnl> "
+    fi
 fi
 
 if test -z $AUTOMAKE; then
@@ -44,6 +50,7 @@ cat configure.seed | sed \
     -e "s/@NDPI_MINOR@/$NDPI_MINOR/g" \
     -e "s/@NDPI_PATCH@/$NDPI_PATCH/g" \
     -e "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" \
+    -e "s/@FUZZY@/$FUZZY/g" \
     > configure.ac
 
 autoreconf -ivf

@@ -152,7 +152,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	      || (packet->payload[koffset] == 0x0C)
 	      || (packet->payload[koffset] == 0x0D)
 	      || (packet->payload[koffset] == 0x0E))) {
-	    u_int16_t koffsetp, body_offset, pad_len;
+	    u_int16_t koffsetp, body_offset = 0, pad_len;
 	    u_int8_t msg_type = packet->payload[koffset];
 
 #ifdef KERBEROS_DEBUG
