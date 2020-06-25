@@ -1,6 +1,5 @@
 #include <arpa/inet.h>
 #include <errno.h>
-#include <linux/if_ether.h>
 #include <netinet/in.h>
 #include <ndpi_api.h>
 #include <ndpi_main.h>
@@ -19,6 +18,18 @@
 #define IDLE_SCAN_PERIOD 10000 /* msec */
 #define MAX_IDLE_TIME 300000 /* msec */
 #define INITIAL_THREAD_HASH 0x03dd018b
+
+#ifndef ETH_P_IP
+#define ETH_P_IP 0x0800
+#endif
+
+#ifndef ETH_P_IPV6
+#define ETH_P_IPV6 0x86DD
+#endif
+
+#ifndef ETH_P_ARP
+#define ETH_P_ARP  0x0806
+#endif
 
 enum nDPI_l3_type {
     L3_IP, L3_IP6
