@@ -87,12 +87,14 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t payloadType, payload_type = payload[1] & 0x7F;
 
   /* Check whether this is an RTP flow */
+  if( payload_type == 0)
+	return;
   if((payload_len >= 12)
      && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */
      && ((payload_type < 72) || (payload_type > 76))
      && ((payload_type <= 34)
 	 || ((payload_type >= 96) && (payload_type <= 127))
-	 /* http://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
+	/* http://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
        )
     ) {
     NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");

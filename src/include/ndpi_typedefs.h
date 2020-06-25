@@ -758,6 +758,9 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
 
+  /* NDPI_PROTOCOL_CITRIX */
+  u_int8_t citrix_packet_id;
+
   /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage;
 

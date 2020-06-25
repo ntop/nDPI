@@ -29,6 +29,28 @@
 
 
 /* ************************************ */
+static char *ndpi_udp_citrix_strnstr(const char *s, const char *find, size_t slen)
+{
+    char c;
+    size_t len;
+    if ((c = *find++) != '\0') {
+        len = strnlen(find, slen);
+        do {
+            char sc;
+
+            do {
+		(sc = *s++);
+                if (slen-- < 1 )
+                    return (NULL);
+            } while (sc != c);
+            if (len > slen)
+                return (NULL);
+        } while (strncmp(s, find, len) != 0);
+        s--;
+    }
+
+    return ((char *) s);
+}
 
 static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -45,7 +67,7 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
        && flow->l4.tcp.seen_ack) {
       if(payload_len == 6) {
 	char citrix_header[] = { 0x07, 0x07, 0x49, 0x43, 0x41, 0x00 };
-	
+
 	if(memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0) {
 	  NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN);
@@ -53,7 +75,6 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
 	return;
       } else if(payload_len > 22) {
 	char citrix_header[] = { 0x1a, 0x43, 0x47, 0x50, 0x2f, 0x30, 0x31 };
-	
 	if((memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0)
 	   || (ndpi_strnstr((const char *)packet->payload, "Citrix.TcpProxyService", payload_len) != NULL)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
@@ -69,6 +90,20 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
     
     return;
   }
+  else if(packet->udp != NULL) {
+          flow->l4.udp.citrix_packet_id++;
+
+          if(flow->l4.udp.citrix_packet_id > 0 ){
+
+                  if(ndpi_udp_citrix_strnstr((const char *)packet->payload, "Citrix.TcpProxyService", payload_len) != NULL) {
+                          NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
+                          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN);
+                  }
+                  return;
+          }
+          return;
+  }
+
 }
 
 void ndpi_search_citrix(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -88,7 +123,7 @@ void init_citrix_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   ndpi_set_bitmask_protocol_detection("Citrix", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_CITRIX,
 				      ndpi_search_citrix,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
