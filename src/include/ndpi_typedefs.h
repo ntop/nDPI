@@ -52,8 +52,9 @@ typedef enum {
 
 /*
   NOTE
-  When the typedef below is modified don't forget
-  to update ndpi_risk2str (in ndpi_utils.c)
+  When the typedef below is modified don't forget to update
+  - ndpi_risk2str (in ndpi_utils.c)
+  - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
  */
 typedef enum {
   NDPI_NO_RISK = 0,

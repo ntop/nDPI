@@ -1503,6 +1503,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_MALFORMED_PACKET:
     return("Malformed packet");
+
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
