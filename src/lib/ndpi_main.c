@@ -578,7 +578,7 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   for (i = 0; ndpi_en_popular_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_popular_bigrams[i], 1, 1, 1, 0);
 #endif
-  
+
   for (i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa, (char *) ndpi_en_impossible_bigrams[i], 1,
 			  1, 1, 0);
@@ -2421,6 +2421,21 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       return(NDPI_PROTOCOL_IP_GRE);
       break;
     case NDPI_ICMP_PROTOCOL_TYPE:
+      {
+	/* Run some basic consistency tests */
+
+	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
+	  NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+	else {
+	  u_int8_t icmp_type = (u_int8_t)flow->packet.payload[0];
+	  u_int8_t icmp_code = (u_int8_t)flow->packet.payload[1];
+
+	  /* https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml */
+	  if(((icmp_type >= 44) && (icmp_type <= 252))
+	     || (icmp_code > 15))
+	    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+	}
+      }
       return(NDPI_PROTOCOL_IP_ICMP);
       break;
     case NDPI_IGMP_PROTOCOL_TYPE:
@@ -2439,6 +2454,22 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       return(NDPI_PROTOCOL_IP_IP_IN_IP);
       break;
     case NDPI_ICMPV6_PROTOCOL_TYPE:
+      {
+	/* Run some basic consistency tests */
+
+	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
+	  NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+	else {
+	  u_int8_t icmp6_type = (u_int8_t)flow->packet.payload[0];
+	  u_int8_t icmp6_code = (u_int8_t)flow->packet.payload[1];
+
+	  /* https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6 */
+	  if(((icmp6_type >= 5) && (icmp6_type <= 127))
+	     || (icmp6_type >= 156)
+	     || ((icmp6_code > 7) && (icmp6_type != 255)))
+	    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+	}
+      }
       return(NDPI_PROTOCOL_IP_ICMPV6);
       break;
     case 112:
@@ -3621,6 +3652,10 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
     flow->packet.udp = (struct ndpi_udphdr *) l4ptr;
     flow->packet.payload_packet_len = flow->packet.l4_packet_len - 8;
     flow->packet.payload = ((u_int8_t *) flow->packet.udp) + 8;
+  } else if((l4protocol == IPPROTO_ICMP && flow->packet.l4_packet_len >= sizeof(struct ndpi_icmphdr))
+	    || (l4protocol == IPPROTO_ICMPV6 && flow->packet.l4_packet_len >= sizeof(struct ndpi_icmp6hdr))) {
+    flow->packet.payload = ((u_int8_t *) l4ptr);
+    flow->packet.payload_packet_len = flow->packet.l4_packet_len;
   } else {
     flow->packet.generic_l4_ptr = l4ptr;
   }
@@ -4378,13 +4413,13 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
      Skype for a host doing MS Teams means MS Teams
      (MS Teams uses Skype as transport protocol for voice/video)
   */
-  
+
   if(flow) {
     /* Do not go for DNS when there is an application protocol. Example DNS.Apple */
     if((flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
        && (flow->detected_protocol_stack[0] /* app */ != flow->detected_protocol_stack[1] /* major */))
       NDPI_CLR_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
-  }  
+  }
 
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MSTEAMS:
@@ -6519,7 +6554,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
   int len, rc = 0;
 
   len = strlen(name);
-  
+
   if(len >= 5) {
     int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0, num_digits = 0, num_vowels = 0, num_words = 0;
     char tmp[128], *word, *tok_tmp;
@@ -6538,29 +6573,29 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       if(!word) break;
 
       num_words++;
-      
+
       if(strlen(word) < 3) continue;
 
 #ifdef DGA_DEBUG
       printf("-> %s [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
 #endif
-      
+
       for(i = 0; word[i+1] != '\0'; i++) {
 	if(isdigit(word[i])) {
 	  num_digits++;
-	  
+
 	  // if(!isdigit(word[i+1])) num_impossible++;
-	  
-	  continue;	  
+
+	  continue;
 	}
-	
+
 	switch(word[i]) {
 	case '_':
 	case '-':
 	case ':':
 	  continue;
 	  break;
-	
+
 	case '.':
 	  continue;
 	  break;
@@ -6575,13 +6610,13 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	  num_vowels++;
 	  break;
 	}
-	
+
 	if(isdigit(word[i+1])) {
 	  num_digits++;
 	  // num_impossible++;
 	  continue;
 	}
-	
+
 	num_bigram_checks++;
 
 	if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
@@ -6603,7 +6638,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     printf("[num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u]\n",
 	   num_found, num_impossible, num_digits, num_bigram_checks, num_vowels, j-num_vowels);
 #endif
-	    
+
     if(num_bigram_checks
        && ((num_found == 0) || ((num_digits > 5) && (num_words <= 3)) || enough(num_found, num_impossible)))
       rc = 1;

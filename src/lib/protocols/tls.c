@@ -508,14 +508,18 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	 packet->payload[3], packet->payload[4], packet->payload[5]);
 #endif
 
-  if((packet->payload_packet_len != (length + 4)) || (packet->payload[1] != 0x0))
+  if((packet->payload_packet_len != (length + 4)) || (packet->payload[1] != 0x0)) {
+    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(-1); /* Invalid length */
-
+  }
+  
   certificates_length = (packet->payload[4] << 16) + (packet->payload[5] << 8) + packet->payload[6];
 
-  if((packet->payload[4] != 0x0) || ((certificates_length+3) != length))
+  if((packet->payload[4] != 0x0) || ((certificates_length+3) != length)) {
+    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(-2); /* Invalid length */
-
+  }
+  
   if(!flow->l4.tcp.tls.srv_cert_fingerprint_ctx) {
     if((flow->l4.tcp.tls.srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX))) == NULL)
       return(-3); /* Not enough memory */

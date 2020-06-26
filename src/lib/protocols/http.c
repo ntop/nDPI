@@ -594,7 +594,9 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
 		packet->payload_packet_len);
 
   /* Check first char */
-  if(!packet->payload_packet_len || !strchr(http_fs,packet->payload[0])) return 0;
+  if(!packet->payload_packet_len || !strchr(http_fs,packet->payload[0]))
+    return 0;
+  
   /**
      FIRST PAYLOAD PACKET FROM CLIENT
   **/
@@ -1011,9 +1013,10 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 
 ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_mod,
 				      struct ndpi_flow_struct *flow) {
-  if(!flow)
+  if(!flow) {
+    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(NDPI_HTTP_METHOD_UNKNOWN);
-  else
+  } else
     return(flow->http.method);
 }
 

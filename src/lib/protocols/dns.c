@@ -104,9 +104,11 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   /* 0x8000 RESPONSE */
   else if((dns_header->flags & FLAGS_MASK) == 0x8000)
     *is_query = 0;
-  else
+  else {
+    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(1 /* invalid */);
-
+  }
+  
   if(*is_query) {
     /* DNS Request */
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
@@ -125,16 +127,18 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	} else
 	  x++;
       }
-    } else
+    } else {
+      NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
       return(1 /* invalid */);
+    }
   } else {
     /* DNS Reply */
     flow->protos.dns.reply_code = dns_header->flags & 0x0F;
 
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
-       && (((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
-	   || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
-	   || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
+       && ((((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
+	    || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
+	    || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS))))
        ) {
       /* This is a good reply: we dissect it both for request and response */
 
@@ -213,8 +217,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 				   (s_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS,
 				   NDPI_PROTOCOL_UNKNOWN);
       }
-    } else
-      return(1 /* invalid */);
+    }
   }
 
   /* Valid */

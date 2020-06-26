@@ -89,8 +89,10 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  u_int8_t len = ndpi_min(dhcp->options[i+1] /* len as found in the packet */,
 				  dhcp_options_size - (i+2) /* 1 for the type and 1 for the value */);
 
-	  if(len == 0) break;
-
+	  if(len == 0)
+	    break;
+	  
+	  
 #ifdef DHCP_DEBUG
 	  NDPI_LOG_DBG2(ndpi_struct, "[DHCP] Id=%d [len=%d]\n", id, len);
 #endif
@@ -150,8 +152,8 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 }
 
 
-void init_dhcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
-{
+void init_dhcp_dissector(struct ndpi_detection_module_struct *ndpi_struct,
+			 u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("DHCP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_DHCP,
 				      ndpi_search_dhcp_udp,
