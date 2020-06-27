@@ -16,7 +16,7 @@ LT_INIT
 AC_PROG_CC(clang gcc)
 AM_PROG_CC_C_O(clang gcc)
 AC_PROG_CXX(clang++ g++)
-AC_PROG_CC_STDC
+AC_PROG_CC_STDC(clang gcc)
 AC_LANG_WERROR
 AX_PTHREAD
 
@@ -34,7 +34,7 @@ if test -d ".git"; then :
      GIT_DATE=`git log -1 --format=%cd`
      #
      # On CentOS 6 `git rev-list HEAD --count` does not work
-     # 
+     #
      #
      GIT_NUM=`git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
      GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
@@ -126,6 +126,8 @@ AC_ARG_ENABLE(fuzztargets,
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 
 @FUZZY@ AS_IF([test "x$enable_fuzztargets" = "xyes"], [
+@FUZZY@     AC_PROG_CXX
+@FUZZY@     AC_LANG_PUSH(C++)
 @FUZZY@     tmp_saved_flags=$[]_AC_LANG_PREFIX[]FLAGS
 @FUZZY@     AX_CHECK_COMPILE_FLAG([-fsanitize=fuzzer],,
 @FUZZY@         [AC_MSG_ERROR([--enable-fuzztargets requires -fsanitize=fuzzer which is only supported by LLVM])],
@@ -150,6 +152,7 @@ AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 @FUZZY@         [ AC_MSG_RESULT(no) ]
 @FUZZY@     )
 @FUZZY@     _AC_LANG_PREFIX[]FLAGS=$tmp_saved_flags
+@FUZZY@     AC_LANG_POP()
 @FUZZY@ ])
 AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
