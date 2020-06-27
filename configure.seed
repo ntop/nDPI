@@ -13,9 +13,9 @@ AS_IF([test "${with_sanitizer+set}" = set],[
 
 LT_INIT
 
-AC_PROG_CC
-AM_PROG_CC_C_O
-AC_PROG_CXX
+AC_PROG_CC(clang gcc)
+AM_PROG_CC_C_O(clang gcc)
+AC_PROG_CXX(clang++ g++)
 AC_PROG_CC_STDC
 AC_LANG_WERROR
 AX_PTHREAD
@@ -126,8 +126,6 @@ AC_ARG_ENABLE(fuzztargets,
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 
 @FUZZY@ AS_IF([test "x$enable_fuzztargets" = "xyes"], [
-@FUZZY@     AC_PROG_CXX
-@FUZZY@     AC_LANG_PUSH(C++)
 @FUZZY@     tmp_saved_flags=$[]_AC_LANG_PREFIX[]FLAGS
 @FUZZY@     AX_CHECK_COMPILE_FLAG([-fsanitize=fuzzer],,
 @FUZZY@         [AC_MSG_ERROR([--enable-fuzztargets requires -fsanitize=fuzzer which is only supported by LLVM])],
@@ -152,7 +150,6 @@ AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 @FUZZY@         [ AC_MSG_RESULT(no) ]
 @FUZZY@     )
 @FUZZY@     _AC_LANG_PREFIX[]FLAGS=$tmp_saved_flags
-@FUZZY@     AC_LANG_POP()
 @FUZZY@ ])
 AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
