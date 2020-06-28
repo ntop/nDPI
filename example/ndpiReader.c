@@ -843,9 +843,6 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
-  if(_pcap_file[0] == NULL)
-    help(0);
-
   if(csv_fp)
     printCSVHeader();
 
@@ -854,6 +851,9 @@ static void parseOptions(int argc, char **argv) {
     quiet_mode = 1;
     extcap_capture();
   }
+
+  if(_pcap_file[0] == NULL)
+    help(0);
 
   if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
     num_threads = 0;               /* setting number of threads = number of interfaces */
@@ -1823,13 +1823,13 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 
       /* update stats */
       node_proto_guess_walker(node, which, depth, user_data);
+      if(verbose == 3)
+        port_stats_walker(node, which, depth, user_data);
 
       if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
-      ndpi_free_flow_info_half(flow);
-      ndpi_free_flow_data_analysis(flow);
-      ndpi_free_flow_tls_data(flow);
+      ndpi_flow_info_free_data(flow);
       ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count--;
 
       /* adding to a queue (we can't delete it from the tree inline ) */
@@ -3088,6 +3088,10 @@ void test_lib() {
       exit(-1);
     }
   }
+
+#ifdef USE_DPDK
+  dpdk_port_deinit(dpdk_port_id);
+#endif
 
   gettimeofday(&end, NULL);
   processing_time_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);

@@ -818,14 +818,14 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
 /* https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967 */
 
 #define JA3_STR_LEN 1024
-#define MAX_NUM_JA3  128
+#define MAX_NUM_JA3  512
 
 struct ja3_info {
   u_int16_t tls_handshake_version;
   u_int16_t num_cipher, cipher[MAX_NUM_JA3];
   u_int16_t num_tls_extension, tls_extension[MAX_NUM_JA3];
   u_int16_t num_elliptic_curve, elliptic_curve[MAX_NUM_JA3];
-  u_int8_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA3];
+  u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA3];
 };
 
 /* **************************************** */

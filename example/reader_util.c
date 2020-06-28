@@ -459,23 +459,13 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
 void ndpi_flow_info_freer(void *node) {
   struct ndpi_flow_info *flow = (struct ndpi_flow_info*)node;
 
-  ndpi_free_flow_info_half(flow);
-  ndpi_free_flow_data_analysis(flow);
-  ndpi_free_flow_tls_data(flow);
-
-#ifdef DIRECTION_BINS
-  ndpi_free_bin(&flow->payload_len_bin_src2dst);
-  ndpi_free_bin(&flow->payload_len_bin_dst2src);
-#else
-  ndpi_free_bin(&flow->payload_len_bin);
-#endif
-  
+  ndpi_flow_info_free_data(flow);
   ndpi_free(flow);
 }
 
 /* ***************************************************** */
 
-void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
+static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
 
   if(flow->ssh_tls.server_names) {
     ndpi_free(flow->ssh_tls.server_names);
@@ -510,7 +500,7 @@ void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
 
 /* ***************************************************** */
 
-void ndpi_free_flow_data_analysis(struct ndpi_flow_info *flow) {
+static void ndpi_free_flow_data_analysis(struct ndpi_flow_info *flow) {
   if(flow->iat_c_to_s) ndpi_free_data_analysis(flow->iat_c_to_s);
   if(flow->iat_s_to_c) ndpi_free_data_analysis(flow->iat_s_to_c);
 
@@ -518,6 +508,22 @@ void ndpi_free_flow_data_analysis(struct ndpi_flow_info *flow) {
   if(flow->pktlen_s_to_c) ndpi_free_data_analysis(flow->pktlen_s_to_c);
 
   if(flow->iat_flow) ndpi_free_data_analysis(flow->iat_flow);
+}
+
+/* ***************************************************** */
+
+void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
+
+  ndpi_free_flow_info_half(flow);
+  ndpi_free_flow_data_analysis(flow);
+  ndpi_free_flow_tls_data(flow);
+
+#ifdef DIRECTION_BINS
+  ndpi_free_bin(&flow->payload_len_bin_src2dst);
+  ndpi_free_bin(&flow->payload_len_bin_dst2src);
+#else
+  ndpi_free_bin(&flow->payload_len_bin);
+#endif
 }
 
 /* ***************************************************** */
@@ -2030,6 +2036,11 @@ int dpdk_port_init(int port, struct rte_mempool *mbuf_pool) {
   rte_eth_promiscuous_enable(port);
 
   return 0;
+}
+
+int dpdk_port_deinit(int port) {
+  rte_eth_dev_stop(port);
+  rte_eth_dev_close(port);
 }
 
 #endif

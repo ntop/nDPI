@@ -3288,6 +3288,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* IEC 60870-5-104 */
   init_104_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* DNP3 */
+  init_dnp3_dissector(ndpi_str, &a, detection_bitmask);
+
   /* WEBSOCKET */
   init_websocket_dissector(ndpi_str, &a, detection_bitmask);
 
@@ -4376,7 +4379,8 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->http_cookie.len = 0, packet->http_origin.len = 0, packet->http_origin.ptr = NULL,
     packet->http_x_session_type.ptr = NULL, packet->http_x_session_type.len = 0, packet->server_line.ptr = NULL,
     packet->server_line.len = 0, packet->http_method.ptr = NULL, packet->http_method.len = 0,
-    packet->http_response.ptr = NULL, packet->http_response.len = 0, packet->http_num_headers = 0;
+    packet->http_response.ptr = NULL, packet->http_response.len = 0, packet->http_num_headers = 0,
+    packet->forwarded_line.ptr = NULL, packet->forwarded_line.len = 0;
 }
 
 /* ********************************************************************************* */
