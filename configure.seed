@@ -13,10 +13,18 @@ AS_IF([test "${with_sanitizer+set}" = set],[
 
 LT_INIT
 
-AC_PROG_CC(clang gcc)
-AM_PROG_CC_C_O(clang gcc)
-AC_PROG_CXX(clang++ g++)
-AC_PROG_CC_STDC(clang gcc)
+SYSTEM=`uname -s`
+if test $SYSTEM = "Darwin"; then
+  AC_PROG_CC(clang gcc)
+  AM_PROG_CC_C_O(clang gcc)
+  AC_PROG_CXX(clang++ g++)
+  AC_PROG_CC_STDC(clang gcc)
+else
+  AC_PROG_CC
+  AM_PROG_CC_C_O
+  AC_PROG_CXX
+  AC_PROG_CC_STDC
+fi
 AC_LANG_WERROR
 AX_PTHREAD
 
@@ -78,10 +86,6 @@ else
 fi
 
 MACHINE=`uname -m`
-SYSTEM=`uname -s`
-if test $SYSTEM = "Darwin"; then
- CC=clang
-fi
 
 CUSTOM_NDPI=
 
