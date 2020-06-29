@@ -324,6 +324,49 @@ void ndpi_normalize_bin(struct ndpi_bin *b) {
 
 /* ********************************************************************************* */
 
+char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf, u_int out_buf_len) {
+  u_int8_t i;
+  u_int len = 0;
+
+  if(!out_buf) return(out_buf); else out_buf[0] = '\0';
+  
+  if(normalize_first)
+    ndpi_normalize_bin(b);
+  
+  switch(b->family) {
+  case ndpi_bin_family8:
+    for(i=0; i<b->num_bins; i++) {
+      int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
+
+      if(rc < 0) break;
+      len += rc;
+    }
+    break;
+    
+  case ndpi_bin_family16:
+    for(i=0; i<b->num_bins; i++) {
+      int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
+
+      if(rc < 0) break;
+      len += rc;
+    }
+    break;
+    
+  case ndpi_bin_family32:
+    for(i=0; i<b->num_bins; i++) {
+      int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
+      
+      if(rc < 0) break;
+      len += rc;
+    }
+    break;
+  }
+  
+  return(out_buf);
+}
+
+/* ********************************************************************************* */
+
 /* 
    Determines how similar are two bins
 

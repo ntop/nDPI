@@ -3114,7 +3114,8 @@ static void binUnitTest() {
   struct ndpi_bin b1, b2;
   u_int8_t num_bins = 32;
   u_int32_t i;
-
+  char out_buf[128];
+  
   srand(time(NULL));
   
   ndpi_init_bin(&b1, ndpi_bin_family8, num_bins), ndpi_init_bin(&b2, ndpi_bin_family8, num_bins);
@@ -3122,9 +3123,13 @@ static void binUnitTest() {
   for(i=0; i<32; i++)
     ndpi_inc_bin(&b1, rand() % num_bins), ndpi_inc_bin(&b2, rand() % num_bins);
 
-  ndpi_bin_similarity(&b1, &b1, 0);
-  ndpi_bin_similarity(&b1, &b2, 0);
-	 
+#if 0
+  printf("1) %s\n", ndpi_print_bin(&b1, 0, out_buf, sizeof(out_buf)));
+  printf("2) %s\n", ndpi_print_bin(&b2, 0, out_buf, sizeof(out_buf)));
+
+  printf("Similarity: %f\n\n", ndpi_bin_similarity(&b1, &b2, 1));
+#endif
+  
   ndpi_free_bin(&b1), ndpi_free_bin(&b2);
 }
 
