@@ -9,7 +9,7 @@ PCAPS=`cd pcap; /bin/ls *.pcap`
 
 fuzzy_testing() {
 	if [ -f ../fuzz/fuzz_ndpi_reader ]; then
-		../fuzz/fuzz_ndpi_reader -max_total_time=592 -print_pcs=1 -jobs=1 -workers=1 pcap/
+		../fuzz/fuzz_ndpi_reader -max_total_time=${MAX_TOTAL_TIME:-592} -print_pcs=1 -workers=${FUZZY_WORKERS:-0} -jobs=${FUZZY_JOBS:-0} pcap/
 	fi
 }
 
