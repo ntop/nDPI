@@ -260,6 +260,8 @@ int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins)
   return(0);
 }
 
+/* ********************************************************************************* */
+
 void ndpi_free_bin(struct ndpi_bin *b) {
   switch(b->family) {
   case ndpi_bin_family8:
@@ -273,6 +275,8 @@ void ndpi_free_bin(struct ndpi_bin *b) {
     break;
   }
 }
+
+/* ********************************************************************************* */
 
 void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id) {
   if(slot_id >= b->num_bins) slot_id = 0;
@@ -291,6 +295,8 @@ void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id) {
     break;
   }
 }
+
+/* ********************************************************************************* */
 
 /*
   Each bin slot is transformed in a % with respect to the value total
@@ -316,3 +322,44 @@ void ndpi_normalize_bin(struct ndpi_bin *b) {
   }
 }
 
+/* ********************************************************************************* */
+
+/* 
+   Determines how similar are two bins
+
+   0 = Very differet
+   ... (gray zone)
+   1 = Alike
+
+   See https://en.wikipedia.org/wiki/Cosine_similarity for more details
+*/
+float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t normalize_first) {
+  u_int8_t i;
+  u_int32_t sumxx = 0, sumxy = 0, sumyy = 0;
+    
+  if((b1->num_incs == 0) || (b2->num_incs == 0)
+     || (b1->family != b2->family) || (b1->num_bins != b2->num_bins))
+    return(0);
+
+  if(normalize_first)
+    ndpi_normalize_bin(b1), ndpi_normalize_bin(b2);
+  
+  switch(b1->family) {
+  case ndpi_bin_family8:
+    for(i=0; i<b1->num_bins; i++)
+      sumxx += b1->u.bins8[i] * b1->u.bins8[i], sumyy += b2->u.bins8[i] * b2->u.bins8[i], sumxy += b1->u.bins8[i] * b2->u.bins8[i];
+    break;
+  case ndpi_bin_family16:
+    for(i=0; i<b1->num_bins; i++)
+      sumxx += b1->u.bins16[i] * b1->u.bins16[i], sumyy += b2->u.bins16[i] * b2->u.bins16[i], sumxy += b1->u.bins16[i] * b2->u.bins16[i];
+    break;
+  case ndpi_bin_family32:
+    for(i=0; i<b1->num_bins; i++)
+      sumxx += b1->u.bins32[i] * b1->u.bins32[i], sumyy += b2->u.bins32[i] * b2->u.bins32[i], sumxy += b1->u.bins32[i] * b2->u.bins32[i];
+    break;
+  }
+
+  return((float)sumxy / sqrt((float)(sumxx * sumyy)));
+}
+  
+/* ********************************************************************************* */

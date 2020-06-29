@@ -3110,6 +3110,26 @@ void test_lib() {
 
 /* *********************************************** */
 
+static void binUnitTest() {
+  struct ndpi_bin b1, b2;
+  u_int8_t num_bins = 32;
+  u_int32_t i;
+
+  srand(time(NULL));
+  
+  ndpi_init_bin(&b1, ndpi_bin_family8, num_bins), ndpi_init_bin(&b2, ndpi_bin_family8, num_bins);
+  
+  for(i=0; i<32; i++)
+    ndpi_inc_bin(&b1, rand() % num_bins), ndpi_inc_bin(&b2, rand() % num_bins);
+
+  ndpi_bin_similarity(&b1, &b1, 0);
+  ndpi_bin_similarity(&b1, &b2, 0);
+	 
+  ndpi_free_bin(&b1), ndpi_free_bin(&b2);
+}
+
+/* *********************************************** */
+
 static void dgaUnitTest() {
   const char *dga[] = {
 		     "lbjamwptxz",
@@ -3495,6 +3515,7 @@ int orginal_main(int argc, char **argv) {
     if(ndpi_info_mod == NULL) return -1;
 
     /* Internal checks */
+    binUnitTest();
     dgaUnitTest();
     hllUnitTest();
     bitmapUnitTest();
