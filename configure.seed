@@ -7,8 +7,8 @@ AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_ARG_WITH(sanitizer,     [  --with-sanitizer      Build with support for address, undefined and leak sanitizer])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
-     CFLAGS="${CFLAGS} -g3 -O0 -Wno-unused-value -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize=shift -fsanitize=leak -fno-omit-frame-pointer"
-     LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize=shift -fsanitize=leak"
+     CFLAGS="${CFLAGS} -g3 -O0 -Wno-unused-value -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
+     LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak"
 ])
 
 LT_INIT
