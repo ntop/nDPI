@@ -275,7 +275,7 @@ u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *nd
   if(protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS)
     return(0);
 
-  switch (protoId) {
+  switch(protoId) {
     /* All dissectors that have calls to ndpi_match_host_subprotocol() */
   case NDPI_PROTOCOL_DNS:
     return(1);
@@ -588,7 +588,7 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str, ndpi_detection_preference pref,
                                    int value) {
-  switch (pref) {
+  switch(pref) {
   case ndpi_pref_direction_detect_disable:
     ndpi_str->direction_detect_disable = (u_int8_t) value;
     break;
@@ -2028,7 +2028,7 @@ void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) 
   for (i = 0; i < 4; i++) {
     ndpi_automa *automa;
 
-    switch (i) {
+    switch(i) {
     case 0:
       automa = &ndpi_str->host_automa;
       break;
@@ -2376,7 +2376,7 @@ static ndpi_default_ports_tree_node_t *ndpi_get_guessed_protocol_id(struct ndpi_
   as they have been excluded
 */
 u_int8_t is_udp_guessable_protocol(u_int16_t l7_guessed_proto) {
-  switch (l7_guessed_proto) {
+  switch(l7_guessed_proto) {
   case NDPI_PROTOCOL_QUIC:
   case NDPI_PROTOCOL_SNMP:
   case NDPI_PROTOCOL_NETFLOW:
@@ -2412,7 +2412,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
   } else {
     /* No TCP/UDP */
 
-    switch (proto) {
+    switch(proto) {
     case NDPI_IPSEC_PROTOCOL_ESP:
     case NDPI_IPSEC_PROTOCOL_AH:
       return(NDPI_PROTOCOL_IP_IPSEC);
@@ -2421,7 +2421,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       return(NDPI_PROTOCOL_IP_GRE);
       break;
     case NDPI_ICMP_PROTOCOL_TYPE:
-      if (flow) {
+      if(flow) {
 	/* Run some basic consistency tests */
 
 	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
@@ -2454,7 +2454,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       return(NDPI_PROTOCOL_IP_IP_IN_IP);
       break;
     case NDPI_ICMPV6_PROTOCOL_TYPE:
-      if (flow) {
+      if(flow) {
 	/* Run some basic consistency tests */
 
 	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
@@ -2518,7 +2518,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     at[0] = 0, proto = &at[1];
 
   for (i = 0; proto[i] != '\0'; i++) {
-    switch (proto[i]) {
+    switch(proto[i]) {
     case '/':
     case '&':
     case '^':
@@ -5711,7 +5711,7 @@ char *ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_str,
 /* ****************************************************** */
 
 int ndpi_is_custom_category(ndpi_protocol_category_t category) {
-  switch (category) {
+  switch(category) {
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
@@ -5734,7 +5734,7 @@ void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_str,
   if(!name)
     return;
 
-  switch (category) {
+  switch(category) {
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
     snprintf(ndpi_str->custom_category_labels[0], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
     break;
@@ -5775,7 +5775,7 @@ const char *ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_str
   }
 
   if((category >= NDPI_PROTOCOL_CATEGORY_CUSTOM_1) && (category <= NDPI_PROTOCOL_CATEGORY_CUSTOM_5)) {
-    switch (category) {
+    switch(category) {
     case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
       return(ndpi_str->custom_category_labels[0]);
     case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
@@ -5841,7 +5841,7 @@ ndpi_protocol_breed_t ndpi_get_proto_breed(struct ndpi_detection_module_struct *
 
 char *ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_str,
 				ndpi_protocol_breed_t breed_id) {
-  switch (breed_id) {
+  switch(breed_id) {
   case NDPI_PROTOCOL_SAFE:
     return("Safe");
     break;
@@ -6009,7 +6009,7 @@ static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_
   if((previous_proto == NDPI_PROTOCOL_UNKNOWN) || (previous_proto == new_proto))
     return(0);
 
-  switch (previous_proto) {
+  switch(previous_proto) {
   case NDPI_PROTOCOL_WHATSAPP_CALL:
   case NDPI_PROTOCOL_WHATSAPP_FILES:
     if(new_proto == NDPI_PROTOCOL_WHATSAPP)
@@ -6353,7 +6353,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 	 proto);
 #endif
 
-  switch (proto) {
+  switch(proto) {
   case NDPI_PROTOCOL_TLS:
     if(!flow->l4.tcp.tls.certificate_processed)
       return(1); /* TODO: add check for TLS 1.3 */
@@ -6394,7 +6394,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 /* ******************************************************************** */
 
 const char *ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
-  switch (proto) {
+  switch(proto) {
   case ndpi_l4_proto_unknown:
     return("");
     break;
