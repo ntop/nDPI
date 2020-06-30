@@ -2421,7 +2421,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       return(NDPI_PROTOCOL_IP_GRE);
       break;
     case NDPI_ICMP_PROTOCOL_TYPE:
-      {
+      if (flow) {
 	/* Run some basic consistency tests */
 
 	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
@@ -2454,7 +2454,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       return(NDPI_PROTOCOL_IP_IP_IN_IP);
       break;
     case NDPI_ICMPV6_PROTOCOL_TYPE:
-      {
+      if (flow) {
 	/* Run some basic consistency tests */
 
 	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
