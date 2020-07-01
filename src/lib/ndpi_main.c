@@ -1953,10 +1953,10 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   int i;
 
   if(ndpi_str == NULL) {
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    /* We can't use NDPI_LOG* functions yet! */
-    fprintf(stderr, "ndpi_init_detection_module initial malloc failed for ndpi_str\n");
-#endif /* NDPI_ENABLE_DEBUG_MESSAGES */
+    /* Logging this error is a bit tricky. At this point, we can't use NDPI_LOG*
+       functions yet, we don't have a custom log function and, as a library,
+       we shouldn't use stdout/stderr. Since this error is quite unlikely,
+       simply avoid any logs at all */
     return(NULL);
   }
 
@@ -2010,8 +2010,10 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->custom_categories.ipAddresses = ndpi_New_Patricia(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_New_Patricia(32 /* IPv4 */);
 
-  if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL))
+  if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL)) {
+    NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating Patricia trees\n");
     return(NULL);
+  }
 
   ndpi_init_protocol_defaults(ndpi_str);
 
