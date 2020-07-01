@@ -1298,7 +1298,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    e_sni_len = ntohs(*((u_int16_t*)&packet->payload[e_offset]));
 		    e_offset += 2;
 
-		    if((e_offset+e_sni_len-extension_len-initial_offset) >= 0) {
+		    if((e_offset+e_sni_len-extension_len-initial_offset) >= 0 &&
+		        e_offset+e_sni_len < packet->payload_packet_len) {
 #ifdef DEBUG_ENCRYPTED_SNI
 		      printf("Client SSL [Encrypted Server Name len: %u]\n", e_sni_len);
 #endif
