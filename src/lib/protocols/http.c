@@ -722,6 +722,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t filename_start; /* the filename in the request method line, e.g., "GET filename_start..."*/
 
+  if (packet->payload_packet_len == 0)
+    return;
   packet->packet_lines_parsed_complete = 0;
 
   /* Check if we so far detected the protocol in the request or not. */
@@ -915,8 +917,12 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     */
     if((flow->l4.tcp.http_stage - packet->packet_direction) == 1) { /* Expected a response package */
 
-      if(flow->http_detected)
+      if(flow->http_detected) {
+        /* Could be another request, try to parse some lines. */
+        ndpi_parse_packet_line_info(ndpi_struct, flow);
+        check_content_type_and_change_protocol(ndpi_struct, flow);
         return;
+      }
 
       NDPI_LOG_DBG2(ndpi_struct,
 		    " SECOND PAYLOAD TRAFFIC FROM CLIENT, FIRST PACKET MIGHT HAVE BEEN HTTP...UNKNOWN TRAFFIC, HERE FOR HTTP again.. \n");
