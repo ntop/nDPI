@@ -909,7 +909,7 @@ static ndpi_network host_protocol_list[] = {
 
 
   /* Teamviewer 159.122.189.32-63 */
-  { 0x9F7ABD30 /* 159.122.189.32 */, 21, NDPI_PROTOCOL_TEAMVIEWER },
+  { 0x9F7ABD20 /* 159.122.189.32 */, 27, NDPI_PROTOCOL_TEAMVIEWER },
 
 #if 0
   /*
