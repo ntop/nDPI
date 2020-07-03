@@ -125,6 +125,12 @@ float ndpi_data_variance(struct ndpi_analyze_struct *s) {
 
 /* ********************************************************************************* */
 
+/*
+  See the link below for "Population and sample standard deviation review"
+  https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/variance-standard-deviation-sample/a/population-and-sample-standard-deviation-review
+  
+  In nDPI we use an approximate stddev calculation to avoid storing all data in memory
+*/
 /* Compute the standard deviation on all values */
 float ndpi_data_stddev(struct ndpi_analyze_struct *s) {
   return(sqrt(ndpi_data_variance(s)));
