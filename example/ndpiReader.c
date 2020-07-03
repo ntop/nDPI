@@ -3498,6 +3498,25 @@ void bpf_filter_port_array_add(int filter_array[], int size, int port) {
 
 /* *********************************************** */
 
+void analysisUnitTest() {
+  struct ndpi_analyze_struct *s = ndpi_alloc_data_analysis(32);
+  u_int32_t i;
+  
+  for(i=0; i<256; i++)
+    ndpi_data_add_value(s, i);
+
+  if(0) {
+    ndpi_data_print_window_values(s);
+    printf("Average: [all: %f][window: %f]\n", ndpi_data_average(s), ndpi_data_window_average(s));
+    printf("Entropy: %f\n", ndpi_data_entropy(s));
+    printf("StdDev:  %f\n", ndpi_data_stddev(s));
+    printf("Min/Max: %u/%u\n", ndpi_data_min(s), ndpi_data_max(s));
+  }
+
+  ndpi_free_data_analysis(s);
+}
+
+/* *********************************************** */
 
 /**
    @brief MAIN FUNCTION
@@ -3528,7 +3547,7 @@ int orginal_main(int argc, char **argv) {
     serializerUnitTest();
     analyzeUnitTest();
     ndpi_self_check_host_match();
-
+    analysisUnitTest();
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
     parseOptions(argc, argv);
