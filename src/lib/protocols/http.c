@@ -805,6 +805,13 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
         return;
       }
 
+      /* try to get some additional request header info even if the packet may not be HTTP */
+      ndpi_parse_packet_line_info(ndpi_struct, flow);
+      if (packet->http_num_headers > 0) {
+        check_content_type_and_change_protocol(ndpi_struct, flow);
+        return;
+      }
+
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       http_bitmask_exclude_other(flow);
       return;
