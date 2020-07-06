@@ -15,12 +15,12 @@ LT_INIT
 
 SYSTEM=`uname -s`
 if test $SYSTEM = "Darwin"; then
-  AC_PROG_CC(clang gcc)
+dnl>  AC_PROG_CC(clang gcc)
   AM_PROG_CC_C_O(clang gcc)
   AC_PROG_CXX(clang++ g++)
   AC_PROG_CC_STDC(clang gcc)
 else
-  AC_PROG_CC
+dnl>  AC_PROG_CC
   AM_PROG_CC_C_O
   AC_PROG_CXX
   AC_PROG_CC_STDC
