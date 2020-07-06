@@ -118,28 +118,33 @@ int main(int argc, char ** argv)
 
   if (fseek(pcap_file, 0, SEEK_END) != 0) {
     perror("fseek(SEEK_END) failed");
+    fclose(pcap_file);
     return 1;
   }
 
   pcap_file_size = ftell(pcap_file);
   if (pcap_file_size < 0) {
     perror("ftell failed");
+    fclose(pcap_file);
     return 1;
   }
 
   if (fseek(pcap_file, 0, SEEK_SET) != 0) {
     perror("fseek(0, SEEK_SET)  failed");
+    fclose(pcap_file);
     return 1;
   }
 
   pcap_buffer = malloc(pcap_file_size);
   if (pcap_buffer == NULL) {
     perror("malloc failed");
+    fclose(pcap_file);
     return 1;
   }
 
   if (fread(pcap_buffer, sizeof(*pcap_buffer), pcap_file_size, pcap_file) != pcap_file_size) {
     perror("fread failed");
+    fclose(pcap_file);
     return 1;
   }
 
