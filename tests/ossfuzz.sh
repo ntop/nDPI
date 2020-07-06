@@ -27,4 +27,6 @@ sh autogen.sh
 ./configure --enable-fuzztargets
 make
 make -C fuzz fuzz_ndpi_reader_seed_corpus.zip
-cp -v fuzz/fuzz* "$OUT/"
+# copy fuzz executables to output directory
+cp -v fuzz/fuzz_ndpi_reader "$OUT/"
+cp -v fuzz/fuzz_process_packet "$OUT/"
