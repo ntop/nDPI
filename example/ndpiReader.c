@@ -1157,7 +1157,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(csv_fp, ",%s,", flow->info);
 
+#ifndef DIRECTION_BINS
     print_bin(csv_fp, NULL, &flow->payload_len_bin);
+#endif
   }
 
   if((verbose != 1) && (verbose != 2)) {
@@ -2454,8 +2456,49 @@ static void printFlowsStats() {
     qsort(all_flows, num_flows, sizeof(struct flow_info), cmpFlows);
 
     if(verbose > 1) {
-      for(i=0; i<num_flows; i++)
+#ifndef DIRECTION_BINS
+      struct ndpi_bin *bins = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_flows);
+      u_int16_t *cluster_ids = (u_int16_t*)ndpi_malloc(sizeof(u_int16_t)*num_flows);;
+#endif
+      
+      for(i=0; i<num_flows; i++) {
+#ifndef DIRECTION_BINS
+	if(bins && cluster_ids)
+	  memcpy(&bins[i], &all_flows[i].flow->payload_len_bin, sizeof(struct ndpi_bin));
+#endif
+	
 	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
+      }
+
+#if 0
+#ifndef DIRECTION_BINS
+      if(bins && cluster_ids) {
+	u_int8_t num_clusters = 8;
+	char buf[64];
+	u_int j;
+	
+	ndpi_cluster_bins(bins, num_flows, num_clusters, cluster_ids);
+
+	for(j=0; j<num_clusters; j++) {	  
+	  for(i=0; i<num_flows; i++) {
+	    if(cluster_ids[i] != j) continue;
+	    
+	    printf("%u\t%s\t%s:%u <-> %s:%u\n",
+		   cluster_ids[i],
+		   ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
+				      all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
+		   all_flows[i].flow->src_name,
+		   ntohs(all_flows[i].flow->src_port),
+		   all_flows[i].flow->src_name,
+		   ntohs(all_flows[i].flow->dst_port));
+	  }
+	}
+	
+	ndpi_free(bins);
+	ndpi_free(cluster_ids);
+      }
+#endif
+#endif
     }
 
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
