@@ -384,7 +384,9 @@ static void help(u_int long_help) {
 	 "  -V <1-4>                  | nDPI logging level\n"
 	 "                            | 1 - trace, 2 - debug, 3 - full debug\n"
 	 "                            | >3 - full debug + log enabled for all protocols (i.e. '-u all')\n"
-	 "  -u proto|num[,...]        | Enable logging only for such protocol(s)\n"
+	 "  -u all|proto|num[,...]    | Enable logging only for such protocol(s)\n"
+	 "                            | If this flag is present multiple times (directly, or via '-V'),\n"
+	 "                            | only the last instance will be considered\n"
 	 "  -T <num>                  | Max number of TCP processed packets before giving up [default: %u]\n"
 	 "  -U <num>                  | Max number of UDP processed packets before giving up [default: %u]\n"
 	 ,
@@ -736,11 +738,13 @@ static void parseOptions(int argc, char **argv) {
       if(nDPI_LogLevel < 0) nDPI_LogLevel = 0;
       if(nDPI_LogLevel > 3) {
 	nDPI_LogLevel = 3;
+	free(_debug_protocols);
 	_debug_protocols = strdup("all");
       }
       break;
 
     case 'u':
+      free(_debug_protocols);
       _debug_protocols = strdup(optarg);
       break;
 
@@ -819,6 +823,7 @@ static void parseOptions(int argc, char **argv) {
 
     case '8':
       nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
+      free(_debug_protocols);
       _debug_protocols = strdup("all");
       break;
 
@@ -3525,6 +3530,7 @@ int orginal_main(int argc, char **argv) {
     if(extcap_fifo_h) pcap_close(extcap_fifo_h);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
     if(csv_fp)        fclose(csv_fp);
+    free(_debug_protocols);
 
     return 0;
   }
