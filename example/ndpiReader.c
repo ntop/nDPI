@@ -383,7 +383,10 @@ static void help(u_int long_help) {
 	 "                            | 3 = port stats\n"
 	 "  -V <1-4>                  | nDPI logging level\n"
 	 "                            | 1 - trace, 2 - debug, 3 - full debug\n"
-	 "                            | >3 - full debug + dbg_proto = all\n"
+	 "                            | >3 - full debug + log enabled for all protocols (i.e. '-u all')\n"
+	 "  -u all|proto|num[,...]    | Enable logging only for such protocol(s)\n"
+	 "                            | If this flag is present multiple times (directly, or via '-V'),\n"
+	 "                            | only the last instance will be considered\n"
 	 "  -T <num>                  | Max number of TCP processed packets before giving up [default: %u]\n"
 	 "  -U <num>                  | Max number of UDP processed packets before giving up [default: %u]\n"
 	 ,
@@ -402,7 +405,6 @@ static void help(u_int long_help) {
 	 "  --extcap-capture-filter\n"
 	 "  --fifo <path to file or pipe>\n"
 	 "  --debug\n"
-	 "  --dbg-proto proto|num[,...]\n"
     );
 #endif
 
@@ -434,7 +436,6 @@ static struct option longopts[] = {
   { "extcap-capture-filter", required_argument, NULL, '6'},
   { "fifo", required_argument, NULL, '7'},
   { "debug", no_argument, NULL, '8'},
-  { "dbg-proto", required_argument, NULL, 257},
   { "ndpi-proto-filter", required_argument, NULL, '9'},
 
   /* ndpiReader options */
@@ -453,6 +454,7 @@ static struct option longopts[] = {
   { "revision", no_argument, NULL, 'r'},
   { "verbose", no_argument, NULL, 'v'},
   { "version", no_argument, NULL, 'V'},
+  { "dbg-proto", required_argument, NULL, 'u'},
   { "help", no_argument, NULL, 'h'},
   { "joy", required_argument, NULL, 'J'},
   { "payload-analysis", required_argument, NULL, 'P'},
@@ -660,7 +662,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "e:c:C:df:g:i:hp:P:l:s:tv:V:n:Jrp:w:q0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "e:c:C:df:g:i:hp:P:l:s:tv:V:u:n:Jrp:w:q0123:456:7:89:m:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -736,8 +738,14 @@ static void parseOptions(int argc, char **argv) {
       if(nDPI_LogLevel < 0) nDPI_LogLevel = 0;
       if(nDPI_LogLevel > 3) {
 	nDPI_LogLevel = 3;
+	free(_debug_protocols);
 	_debug_protocols = strdup("all");
       }
+      break;
+
+    case 'u':
+      free(_debug_protocols);
+      _debug_protocols = strdup(optarg);
       break;
 
     case 'h':
@@ -815,16 +823,13 @@ static void parseOptions(int argc, char **argv) {
 
     case '8':
       nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
+      free(_debug_protocols);
       _debug_protocols = strdup("all");
       break;
 
     case '9':
       extcap_packet_filter = ndpi_get_proto_by_name(ndpi_info_mod, optarg);
       if(extcap_packet_filter == NDPI_PROTOCOL_UNKNOWN) extcap_packet_filter = atoi(optarg);
-      break;
-
-    case 257:
-      _debug_protocols = strdup(optarg);
       break;
 
     case 'T':
@@ -3574,6 +3579,7 @@ int orginal_main(int argc, char **argv) {
     if(extcap_fifo_h) pcap_close(extcap_fifo_h);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
     if(csv_fp)        fclose(csv_fp);
+    free(_debug_protocols);
 
     return 0;
   }

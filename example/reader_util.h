@@ -336,4 +336,14 @@ float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256], unsigned 
 
 extern int nDPI_LogLevel;
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+ #define LOG(log_level, args...)	\
+  {					\
+    if(log_level <= nDPI_LogLevel)	\
+      printf(args);			\
+  }
+#else
+ #define LOG(...) {}
+#endif
+
 #endif

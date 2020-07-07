@@ -25,9 +25,8 @@
  */
 
 #include "ndpi_protocol_ids.h"
-#include "ndpi_api.h"
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_IEC60870
+#include "ndpi_api.h"
 
 void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {

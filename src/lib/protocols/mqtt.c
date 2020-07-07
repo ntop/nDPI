@@ -79,7 +79,11 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 	}
 
 	NDPI_LOG_DBG2(ndpi_struct, "====>>>> Mqtt header: %4x%4x%4x%4x [len: %u]\n",
-			packet->payload[0], packet->payload[1], packet->payload[2], packet->payload[3], packet->payload_packet_len);
+		      packet->payload_packet_len > 0 ? packet->payload[0] : '.',
+		      packet->payload_packet_len > 1 ? packet->payload[1] : '.',
+		      packet->payload_packet_len > 2 ? packet->payload[2] : '.',
+		      packet->payload_packet_len > 3 ? packet->payload[3] : '.',
+		      packet->payload_packet_len);
 	if (packet->payload_packet_len < 2) {
 		NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt .. mandatory header not found!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
