@@ -3136,7 +3136,7 @@ static void binUnitTest() {
 
   srand(time(NULL));
 
-  assert((bins = (struct ndpi_bin*)malloc(sizeof(struct ndpi_bin)*num_bins)) != NULL);
+  assert((bins = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_bins)) != NULL);
 
   for(i=0; i<num_bins; i++) {
     ndpi_init_bin(&bins[i], ndpi_bin_family8, num_points);
@@ -3146,7 +3146,6 @@ static void binUnitTest() {
 
     ndpi_normalize_bin(&bins[i]);
   }
-
 
   ndpi_cluster_bins(bins, num_bins, num_clusters, cluster_ids);
 
@@ -3164,7 +3163,7 @@ static void binUnitTest() {
   for(i=0; i<num_bins; i++)
     ndpi_free_bin(&bins[i]);
 
-  free(bins);
+  ndpi_free(bins);
 }
 
 /* *********************************************** */
