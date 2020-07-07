@@ -67,9 +67,9 @@ static char *results_path           = NULL;
 static char * bpfFilter             = NULL; /**< bpf filter  */
 static char *_protoFilePath         = NULL; /**< Protocol file path  */
 static char *_customCategoryFilePath= NULL; /**< Custom categories file path  */
-static FILE *csv_fp                 = NULL; /**< for CSV export */
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
+FILE *csv_fp                 = NULL; /**< for CSV export */
 /** User preferences **/
 u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0;
 u_int8_t verbose = 0, enable_joy_stats = 0;
@@ -96,7 +96,7 @@ static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection, max_num_reported_top_payloads;
 extern u_int16_t min_pattern_len, max_pattern_len;
 extern void ndpi_self_check_host_match(); /* Self check function */
-  
+
 struct flow_info {
   struct ndpi_flow_info *flow;
   u_int16_t thread_id;
@@ -311,7 +311,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
       fprintf(out, "%u]", (unsigned char)array[i]);
     }
 #endif
-    
+
     /* Output the mean */
     if(num_bytes != 0) {
       double entropy = ndpi_flow_get_byte_count_entropy(array, num_bytes);
@@ -420,7 +420,7 @@ static void help(u_int long_help) {
 
     ndpi_dump_protocols(ndpi_info_mod);
   }
-  
+
   exit(!long_help);
 }
 
@@ -621,14 +621,16 @@ void printCSVHeader() {
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "tls_alpn,tls_supported_versions,");
-  fprintf(csv_fp, "tls_issuerDN,tls_subjectDN,");  
-  fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info");
-  
+#if 0
+  fprintf(csv_fp, "tls_issuerDN,tls_subjectDN,");
+#endif
+  fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info,plen_bins");
+
   /* Joy */
   if(enable_joy_stats) {
-    fprintf(csv_fp, ",byte_dist_mean,byte_dist_std,entropy,total_entropy");  
+    fprintf(csv_fp, ",byte_dist_mean,byte_dist_std,entropy,total_entropy");
   }
-  
+
   fprintf(csv_fp, "\n");
 }
 
@@ -996,32 +998,33 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
-void print_bin(const char *label, struct ndpi_bin *b) {
+void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
   if(b->num_incs == 0)
     return;
   else {
     u_int8_t i;
     FILE *out = results_file ? results_file : stdout;
-  
+    const char *sep = label ? "," : ";";
+
     ndpi_normalize_bin(b);
 
-    fprintf(out, "[%s: ", label);
-  
+    if(label) fprintf(fout, "[%s: ", label);
+
     for(i=0; i<b->num_bins; i++) {
       switch(b->family) {
       case ndpi_bin_family8:
-	fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
+	fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins8[i]);
 	break;
       case ndpi_bin_family16:
-	fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
+	fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins16[i]);
 	break;
       case ndpi_bin_family32:
-	fprintf(out, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
+	fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins32[i]);
 	break;
       }
     }
 
-    fprintf(out, "]");
+    if(label) fprintf(fout, "]");
   }
 }
 
@@ -1054,7 +1057,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
     dos_ge_score = Dos_goldeneye_score(flow);
-    
+
     dos_slow_score = Dos_slow_score(flow);
     dos_hulk_score = Dos_hulk_score(flow);
     ddos_score = Ddos_score(flow);
@@ -1065,7 +1068,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     ssh_patator_score = Ssh_patator_score(flow);
 
     inf_score = Infiltration_score(flow);
-   
+
     double benign_score = dos_ge_score < 1 && dos_slow_score < 1 && \
     dos_hulk_score < 1 && ddos_score < 1 && hearthbleed_score < 1 && \
     ftp_patator_score < 1 && ssh_patator_score < 1 && inf_score < 1 ? 1.1 : 0;
@@ -1087,12 +1090,12 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			       flow->detected_protocol, buf, sizeof(buf)),
 	    flow->host_server_name);
-    
+
     fprintf(csv_fp, "%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,", \
 	    benign_score, dos_slow_score, dos_ge_score, dos_hulk_score, \
 	    ddos_score, hearthbleed_score, ftp_patator_score,		\
 	    ssh_patator_score, inf_score);
-    
+
     fprintf(csv_fp, "%u,%llu,%llu,", flow->src2dst_packets,
 	    (long long unsigned int) flow->src2dst_bytes, (long long unsigned int) flow->src2dst_goodput_bytes);
     fprintf(csv_fp, "%u,%llu,%llu,", flow->dst2src_packets,
@@ -1100,7 +1103,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, "%.3f,%s,", data_ratio, ndpi_data_ratio2str(data_ratio));
     fprintf(csv_fp, "%.1f,%.1f,", 100.0*((float)flow->src2dst_goodput_bytes / (float)(flow->src2dst_bytes+1)),
 	    100.0*((float)flow->dst2src_goodput_bytes / (float)(flow->dst2src_bytes+1)));
-    
+
     /* IAT (Inter Arrival Time) */
     fprintf(csv_fp, "%u,%.1f,%u,%.1f,",
 	    ndpi_data_min(flow->iat_flow), ndpi_data_average(flow->iat_flow), ndpi_data_max(flow->iat_flow), ndpi_data_stddev(flow->iat_flow));
@@ -1134,21 +1137,27 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "0",
 	    (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "",
 	    (flow->ssh_tls.ja3_server[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.server_unsafe_cipher) : "0");
-    
+
     fprintf(csv_fp, "%s,%s,",
 	    flow->ssh_tls.tls_alpn                  ? flow->ssh_tls.tls_alpn : "",
-	    flow->ssh_tls.tls_supported_versions    ? flow->ssh_tls.tls_supported_versions : "" 
+	    flow->ssh_tls.tls_supported_versions    ? flow->ssh_tls.tls_supported_versions : ""
 	    );
+
+#if 0
     fprintf(csv_fp, "%s,%s,",
 	    flow->ssh_tls.tls_issuerDN              ? flow->ssh_tls.tls_issuerDN : "",
-	    flow->ssh_tls.tls_subjectDN             ? flow->ssh_tls.tls_subjectDN : "" 
+	    flow->ssh_tls.tls_subjectDN             ? flow->ssh_tls.tls_subjectDN : ""
 	    );
+#endif
+
     fprintf(csv_fp, "%s,%s",
 	    (flow->ssh_tls.client_hassh[0] != '\0') ? flow->ssh_tls.client_hassh : "",
 	    (flow->ssh_tls.server_hassh[0] != '\0') ? flow->ssh_tls.server_hassh : ""
 	    );
 
-    fprintf(csv_fp, ",%s", flow->info);
+    fprintf(csv_fp, ",%s,", flow->info);
+
+    print_bin(csv_fp, NULL, &flow->payload_len_bin);
   }
 
   if((verbose != 1) && (verbose != 2)) {
@@ -1181,16 +1190,16 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
   if(enable_payload_analyzer) fprintf(out, "[flowId: %u]", flow->flow_id);
   }
-  
+
   if(enable_joy_stats) {
     /* Print entropy values for monitored flows. */
     flowGetBDMeanandVariance(flow);
     fflush(out);
     fprintf(out, "[score: %.4f]", flow->entropy.score);
   }
-	
+
   if(csv_fp) fprintf(csv_fp, "\n");
-    
+
   fprintf(out, "[proto: ");
   if(flow->tunnel_type != ndpi_no_tunnel)
     fprintf(out, "%s:", ndpi_tunnel2str(flow->tunnel_type));
@@ -1255,7 +1264,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(risk != NDPI_NO_RISK)
       NDPI_SET_BIT(flow->risk, risk);
-    
+
     fprintf(out, "[URL: %s][StatusCode: %u]",
 	    flow->http.url, flow->http.response_status_code);
 
@@ -1268,16 +1277,16 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(flow->risk) {
     u_int i;
-    
+
     fprintf(out, "[Risk: ");
 
     for(i=0; i<NDPI_MAX_RISK; i++)
       if(NDPI_ISSET_BIT(flow->risk, i))
 	fprintf(out, "** %s **", ndpi_risk2str(i));
-    
+
     fprintf(out, "]");
   }
-  
+
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ssh_tls.ssl_version, &known_tls));
   if(flow->ssh_tls.client_requested_server_name[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_requested_server_name);
   if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
@@ -1335,12 +1344,12 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 						flow->human_readeable_string_buffer);
 
 #ifdef DIRECTION_BINS
-  print_bin("Plen c2s", &flow->payload_len_bin_src2dst);
-  print_bin("Plen s2c", &flow->payload_len_bin_dst2src);
+  print_bin(out, "Plen c2s", &flow->payload_len_bin_src2dst);
+  print_bin(out, "Plen s2c", &flow->payload_len_bin_dst2src);
 #else
-  print_bin("Plen Bins", &flow->payload_len_bin);
+  print_bin(out, "Plen Bins", &flow->payload_len_bin);
 #endif
-  
+
   fprintf(out, "\n");
 }
 
@@ -2112,7 +2121,7 @@ static void printFlowsStats() {
     ndpi_ja3_info *tmp2 = NULL;
     unsigned int num_ja3_client;
     unsigned int num_ja3_server;
-    
+
     fprintf(out, "\n");
 
     num_flows = 0;
@@ -2590,7 +2599,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)processing_time_usec;
 	float traffic_duration;
 	struct tm result;
-	
+
 	if(live_capture) traffic_duration = processing_time_usec;
 	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
 
@@ -3116,26 +3125,44 @@ void test_lib() {
 /* *********************************************** */
 
 static void binUnitTest() {
-  struct ndpi_bin b1, b2;
+  struct ndpi_bin *bins;
+  u_int8_t versbose = 0;
   u_int8_t num_bins = 32;
-  u_int32_t i;
+  u_int8_t num_points = 24;
+  u_int32_t i, j;
+  u_int8_t num_clusters = 3;
+  u_int16_t cluster_ids[256];
   char out_buf[128];
-  
+
   srand(time(NULL));
-  
-  ndpi_init_bin(&b1, ndpi_bin_family8, num_bins), ndpi_init_bin(&b2, ndpi_bin_family8, num_bins);
-  
-  for(i=0; i<32; i++)
-    ndpi_inc_bin(&b1, rand() % num_bins), ndpi_inc_bin(&b2, rand() % num_bins);
 
-#if 0
-  printf("1) %s\n", ndpi_print_bin(&b1, 0, out_buf, sizeof(out_buf)));
-  printf("2) %s\n", ndpi_print_bin(&b2, 0, out_buf, sizeof(out_buf)));
+  assert((bins = (struct ndpi_bin*)malloc(sizeof(struct ndpi_bin)*num_bins)) != NULL);
 
-  printf("Similarity: %f\n\n", ndpi_bin_similarity(&b1, &b2, 1));
-#endif
-  
-  ndpi_free_bin(&b1), ndpi_free_bin(&b2);
+  for(i=0; i<num_bins; i++) {
+    ndpi_init_bin(&bins[i], ndpi_bin_family8, num_points);
+
+    for(j=0; j<num_points; j++)
+      ndpi_set_bin(&bins[i], j, rand() % 0xFF);
+
+    ndpi_normalize_bin(&bins[i]);
+  }
+
+
+  ndpi_cluster_bins(bins, num_bins, num_clusters, cluster_ids);
+
+  for(j=0; j<num_clusters; j++) {
+    if(verbose) printf("\n");
+    
+    for(i=0; i<num_bins; i++) {
+      if(cluster_ids[i] == j) {
+	if(verbose) printf("[%u] %s\n", cluster_ids[i], ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
+      }
+    }
+  }
+  // printf("Similarity: %f\n\n", ndpi_bin_similarity(&b1, &b2, 1));
+
+  for(i=0; i<num_bins; i++)
+    ndpi_free_bin(&bins[i]);
 }
 
 /* *********************************************** */
@@ -3149,7 +3176,7 @@ static void dgaUnitTest() {
 		     "www.e6r5p57kbafwrxj3plz.com",
 		     // "grdawgrcwegpjaoo.eu",
 		     "mcfpeqbotiwxfxqu.eu",
-		     "adgxwxhqsegnrsih.eu",		     
+		     "adgxwxhqsegnrsih.eu",
 		     NULL
   };
 
@@ -3185,7 +3212,7 @@ static void dgaUnitTest() {
 		     "mqtt.facebook.com",
 		     NULL
   };
-  int i;  
+  int i;
   NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str =  ndpi_init_detection_module(ndpi_no_prefs);
 
@@ -3195,15 +3222,15 @@ static void dgaUnitTest() {
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
   ndpi_finalize_initalization(ndpi_str);
-    
+
   assert(ndpi_str != NULL);
 
   for(i=0; dga[i] != NULL; i++)
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i]) == 1);
-  
+
   for(i=0; non_dga[i] != NULL; i++)
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i]) == 0);
-  
+
 
   ndpi_exit_detection_module(ndpi_str);
 }
@@ -3214,14 +3241,14 @@ static void hllUnitTest() {
   struct ndpi_hll h;
   u_int8_t bits = 8; /* >= 4, <= 16 */
   u_int32_t i;
-    
+
   assert(ndpi_hll_init(&h, bits) == 0);
 
   for(i=0; i<21320; i++)
     ndpi_hll_add_number(&h, i);
 
   /* printf("Count estimate: %f\n", ndpi_hll_count(&h)); */
-  
+
   ndpi_hll_destroy(&h);
 }
 
@@ -3233,9 +3260,9 @@ static void bitmapUnitTest() {
   for(i=0; i<32; i++) {
     NDPI_ZERO_BIT(val);
     NDPI_SET_BIT(val, i);
-    
+
     assert(NDPI_ISSET_BIT(val, i));
-    
+
     for(j=0; j<32; j++) {
       if(j != i) {
 	assert(!NDPI_ISSET_BIT(val, j));
@@ -3506,7 +3533,7 @@ void bpf_filter_port_array_add(int filter_array[], int size, int port) {
 void analysisUnitTest() {
   struct ndpi_analyze_struct *s = ndpi_alloc_data_analysis(32);
   u_int32_t i;
-  
+
   for(i=0; i<256; i++)
     ndpi_data_add_value(s, i);
 

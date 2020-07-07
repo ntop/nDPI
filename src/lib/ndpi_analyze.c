@@ -284,24 +284,79 @@ void ndpi_free_bin(struct ndpi_bin *b) {
 
 /* ********************************************************************************* */
 
-void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id) {
+void ndpi_set_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
   if(slot_id >= b->num_bins) slot_id = 0;
 
-  b->num_incs += 1;
+  b->num_incs += val;
   
   switch(b->family) {
   case ndpi_bin_family8:
-    b->u.bins8[slot_id]++;
+    b->u.bins8[slot_id] = (u_int8_t)val;
     break;
   case ndpi_bin_family16:
-    b->u.bins16[slot_id]++;
+    b->u.bins16[slot_id] = (u_int16_t)val;
     break;
   case ndpi_bin_family32:
-    b->u.bins32[slot_id]++;
+    b->u.bins32[slot_id] = (u_int32_t)val;
     break;
   }
 }
 
+/* ********************************************************************************* */
+
+void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
+  if(slot_id >= b->num_bins) slot_id = 0;
+
+  b->num_incs += val;
+  
+  switch(b->family) {
+  case ndpi_bin_family8:
+    b->u.bins8[slot_id] += (u_int8_t)val;
+    break;
+  case ndpi_bin_family16:
+    b->u.bins16[slot_id] += (u_int16_t)val;
+    break;
+  case ndpi_bin_family32:
+    b->u.bins32[slot_id] += (u_int32_t)val;
+    break;
+  }
+}
+
+/* ********************************************************************************* */
+
+u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int8_t slot_id) {
+  if(slot_id >= b->num_bins) slot_id = 0;
+  
+  switch(b->family) {
+  case ndpi_bin_family8:
+    return(b->u.bins8[slot_id]);
+    break;
+  case ndpi_bin_family16:
+    return(b->u.bins16[slot_id]);
+    break;
+  case ndpi_bin_family32:
+    return(b->u.bins32[slot_id]);
+    break;
+  }
+}
+
+/* ********************************************************************************* */
+
+void ndpi_reset_bin(struct ndpi_bin *b) {
+  b->num_incs = 0;
+  
+  switch(b->family) {
+  case ndpi_bin_family8:
+    memset(b->u.bins8, 0, sizeof(u_int8_t)*b->num_bins);
+    break;
+  case ndpi_bin_family16:
+    memset(b->u.bins16, 0, sizeof(u_int16_t)*b->num_bins);
+    break;
+  case ndpi_bin_family32:
+    memset(b->u.bins32, 0, sizeof(u_int32_t)*b->num_bins);
+    break;
+  }
+}
 /* ********************************************************************************* */
 
 /*
@@ -387,7 +442,8 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t nor
   u_int32_t sumxx = 0, sumxy = 0, sumyy = 0;
     
   if((b1->num_incs == 0) || (b2->num_incs == 0)
-     || (b1->family != b2->family) || (b1->num_bins != b2->num_bins))
+     // || (b1->family != b2->family)
+     || (b1->num_bins != b2->num_bins))
     return(0);
 
   if(normalize_first)
@@ -411,4 +467,111 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t nor
   return((float)sumxy / sqrt((float)(sumxx * sumyy)));
 }
   
+/* ********************************************************************************* */
+
+/*
+  Clusters bins into 'num_clusters'
+  - (in) bins: a vection 'num_bins' long of bins to cluster
+  - (in) 'num_clusters': number of desired clusters 0...(num_clusters-1)
+  - (out) 'cluster_ids': a vector 'num_bins' long containing the id's of each clustered bin
+
+  See
+  - https://en.wikipedia.org/wiki/K-means_clustering
+ */
+int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
+		      u_int8_t num_clusters, u_int16_t *cluster_ids) {
+  u_int16_t i, j, max_iterations = 100, num_iterations = 0, num_moves;
+  struct ndpi_bin *centroids;
+  u_int8_t verbose = 0;
+  
+  if(num_clusters > num_bins) return(-1);
+
+  if((centroids = (struct ndpi_bin*)malloc(sizeof(struct ndpi_bin)*num_clusters)) == NULL)
+    return(-2);
+  else {
+    for(i=0; i<num_clusters; i++)
+      ndpi_init_bin(&centroids[i], ndpi_bin_family32 /* Use 32 bit to avoid overlaps */, bins[0].num_bins);
+  }
+
+  /* Reset the id's */
+  memset(cluster_ids, 0, sizeof(u_int16_t) * num_bins);
+
+  /* Randomly pick a cluster id */
+  for(i=0; i<num_clusters; i++) cluster_ids[i] = i;
+
+  /* Assign the remaining bins to the nearest cluster */
+  for(i=num_clusters; i<num_bins; i++) {
+    u_int16_t j;
+    float top_similarity = -1;
+    u_int8_t cluster_id;
+
+    for(j=0; j<num_clusters; j++) {
+      float similarity = ndpi_bin_similarity(&bins[i], &bins[j], 0);
+
+      if(similarity > top_similarity)
+	cluster_id = j, top_similarity = similarity;
+    }
+
+    cluster_ids[i] = cluster_id;
+  }
+
+  /* Now let's try to find a better arrangement */
+  while(num_iterations++ < max_iterations) {
+    /* Find the center of each cluster */
+
+    if(verbose) printf("Iteration %u\n", num_iterations);
+    
+    for(i=0; i<num_clusters; i++)
+      ndpi_reset_bin(&centroids[i]);
+		      
+    for(i=0; i<num_bins; i++) {
+      for(j=0; j<bins[i].num_bins; j++) {
+	ndpi_inc_bin(&centroids[cluster_ids[i]], j, ndpi_get_bin_value(&bins[i], j));
+      }
+    }
+
+    for(i=0; i<num_clusters; i++) {
+      char out_buf[256];
+      
+      ndpi_normalize_bin(&centroids[i]);
+      if(verbose)
+	printf("Centroid [%u] %s\n", cluster_ids[i],
+	       ndpi_print_bin(&centroids[i], 0, out_buf, sizeof(out_buf)));
+    }
+
+    /* Now let's check if there are bins to move across clusters */
+    num_moves = 0;    
+    
+    for(i=0; i<num_bins; i++) {
+      u_int16_t j;
+      float top_similarity = -1;
+      u_int8_t cluster_id;
+
+      for(j=0; j<num_clusters; j++) {
+	float similarity = ndpi_bin_similarity(&bins[i], &centroids[j], 0);
+	
+	if(similarity > top_similarity)
+	  cluster_id = j, top_similarity = similarity;
+      }
+      
+      if((top_similarity > 0) && (cluster_ids[i] != cluster_id)) {
+	if(verbose)
+	  printf("Moved bin %u from cluster %u -> %u [similarity: %f]\n",
+		 i, cluster_ids[i], cluster_id, top_similarity);
+	
+	cluster_ids[i] = cluster_id;
+	num_moves++;
+      }
+    }
+
+    if(num_moves == 0)
+      break;
+  }
+
+  for(i=0; i<num_clusters; i++)
+    ndpi_free_bin(&centroids[i]);
+
+  return(0);
+}
+
 /* ********************************************************************************* */

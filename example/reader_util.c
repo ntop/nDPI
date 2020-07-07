@@ -89,7 +89,7 @@
 extern u_int8_t enable_protocol_guess, enable_joy_stats, enable_payload_analyzer;
 extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 8 */, max_num_tcp_dissected_pkts /* 10 */;
-
+extern FILE *csv_fp;
 static u_int32_t flow_id = 0;
 
 /* ****************************************************** */
@@ -1176,14 +1176,24 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
        && flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions) {
       correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
       correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
-      snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
-	       flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
+
+      if(csv_fp)
+	snprintf(flow->info, sizeof(flow->info), "%s",
+		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+      else
+	snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
+		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
+		 flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
     }
     else if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn) {
       correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
-      snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
-	       flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+
+      if(csv_fp)
+	snprintf(flow->info, sizeof(flow->info), "%s,",
+		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+      else
+	snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
+		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
     }
   }
 
@@ -1385,8 +1395,13 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     }
 
 #ifndef DIRECTION_BINS
-    if(payload_len && ((flow->src2dst_packets+flow->dst2src_packets) < MAX_NUM_BIN_PKTS))
-	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(payload_len));
+    if(payload_len && ((flow->src2dst_packets+flow->dst2src_packets) < MAX_NUM_BIN_PKTS)) {
+#if 0
+      /* Discard packets until the protocol is detected */
+      if(flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+#endif
+	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(payload_len), 1);
+    }
 #endif
 
     if(enable_payload_analyzer && (payload_len > 0))

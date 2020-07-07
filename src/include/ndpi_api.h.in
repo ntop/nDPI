@@ -931,7 +931,7 @@ extern "C" {
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			  struct ndpi_flow_struct *flow,
 			  char *name);
-  
+
   /* Serializer */
   int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,
 			      u_int32_t buffer_size);
@@ -1067,14 +1067,18 @@ extern "C" {
   double ndpi_hll_count(struct ndpi_hll *hll);
 
   /* ******************************* */
-  
+
   int  ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins);
   void ndpi_free_bin(struct ndpi_bin *b);
-  void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id); 
+  void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val);
+  void ndpi_set_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t value);
+  u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int8_t slot_id);
+  void ndpi_reset_bin(struct ndpi_bin *b);
   void ndpi_normalize_bin(struct ndpi_bin *b);
   char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf, u_int out_buf_len);
   float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t normalize_first);
-  
+  int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
+			u_int8_t num_clusters, u_int16_t *cluster_ids);
 
 #ifdef __cplusplus
 }
