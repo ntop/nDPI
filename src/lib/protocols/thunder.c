@@ -118,6 +118,7 @@ void ndpi_int_search_thunder_tcp(struct ndpi_detection_module_struct
 	packet->content_line.len == 24 &&
 	memcmp(packet->content_line.ptr, "application/octet-stream",
 	       24) == 0 && packet->empty_line_position_set < (packet->payload_packet_len - 8)
+	&& packet->payload_packet_len > (packet->empty_line_position + 5)
 	&& packet->payload[packet->empty_line_position + 2] >= 0x30
 	&& packet->payload[packet->empty_line_position + 2] < 0x40
 	&& packet->payload[packet->empty_line_position + 3] == 0x00
