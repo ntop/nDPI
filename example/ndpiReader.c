@@ -3163,6 +3163,8 @@ static void binUnitTest() {
 
   for(i=0; i<num_bins; i++)
     ndpi_free_bin(&bins[i]);
+
+  free(bins);
 }
 
 /* *********************************************** */

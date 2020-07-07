@@ -486,7 +486,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   
   if(num_clusters > num_bins) return(-1);
 
-  if((centroids = (struct ndpi_bin*)malloc(sizeof(struct ndpi_bin)*num_clusters)) == NULL)
+  if((centroids = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_clusters)) == NULL)
     return(-2);
   else {
     for(i=0; i<num_clusters; i++)
@@ -570,6 +570,8 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
   for(i=0; i<num_clusters; i++)
     ndpi_free_bin(&centroids[i]);
+
+  ndpi_free(centroids);
 
   return(0);
 }
