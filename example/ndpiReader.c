@@ -2470,9 +2470,9 @@ static void printFlowsStats() {
 	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
       }
 
-#if 0
 #ifndef DIRECTION_BINS
       if(bins && cluster_ids) {
+#if 0
 	u_int8_t num_clusters = 8;
 	char buf[64];
 	u_int j;
@@ -2494,10 +2494,10 @@ static void printFlowsStats() {
 	  }
 	}
 	
+#endif
 	ndpi_free(bins);
 	ndpi_free(cluster_ids);
       }
-#endif
 #endif
     }
 
