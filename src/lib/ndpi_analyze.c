@@ -338,6 +338,8 @@ u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int8_t slot_id) {
     return(b->u.bins32[slot_id]);
     break;
   }
+
+  return(0);
 }
 
 /* ********************************************************************************* */
@@ -503,7 +505,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   for(i=num_clusters; i<num_bins; i++) {
     u_int16_t j;
     float top_similarity = -1;
-    u_int8_t cluster_id;
+    u_int8_t cluster_id = 0;
 
     for(j=0; j<num_clusters; j++) {
       float similarity = ndpi_bin_similarity(&bins[i], &bins[j], 0);
@@ -545,7 +547,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
     for(i=0; i<num_bins; i++) {
       u_int16_t j;
       float top_similarity = -1;
-      u_int8_t cluster_id;
+      u_int8_t cluster_id = 0;
 
       for(j=0; j<num_clusters; j++) {
 	float similarity = ndpi_bin_similarity(&bins[i], &centroids[j], 0);
