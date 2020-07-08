@@ -89,7 +89,6 @@
 extern u_int8_t enable_protocol_guess, enable_joy_stats, enable_payload_analyzer;
 extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 8 */, max_num_tcp_dissected_pkts /* 10 */;
-extern FILE *csv_fp;
 static u_int32_t flow_id = 0;
 
 /* ****************************************************** */
@@ -1022,7 +1021,7 @@ void correct_csv_data_field(char* data) {
 
 /* ****************************************************** */
 
-void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
+void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow, FILE * csv_fp) {
   u_int i;
 
   if(!flow->ndpi_flow) return;
@@ -1290,7 +1289,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 					   u_int16_t ipsize, u_int16_t rawsize,
 					   const struct pcap_pkthdr *header,
 					   const u_char *packet,
-                                           struct timeval when) {
+                       struct timeval when,
+                       FILE * csv_fp) {
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow_info *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
@@ -1513,7 +1513,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 							  enable_protocol_guess, &proto_guessed);
 	}
 
-	process_ndpi_collected_info(workflow, flow);
+	process_ndpi_collected_info(workflow, flow, csv_fp);
       }
     }
   }
@@ -1525,7 +1525,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
-					       const u_char *packet) {
+					       const u_char *packet,
+                           FILE * csv_fp) {
   /*
    * Declare pointers to packet headers
    */
@@ -1945,7 +1946,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   /* process the packet */
   return(packet_processing(workflow, time_ms, vlan_id, tunnel_type, iph, iph6,
 			   ip_offset, header->caplen - ip_offset,
-			   header->caplen, header, packet, header->ts));
+			   header->caplen, header, packet, header->ts,
+               csv_fp));
 }
 
 /* ********************************************************** */

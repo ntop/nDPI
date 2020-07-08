@@ -1414,7 +1414,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 						      flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
     }
 
-    process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
+    process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow, csv_fp);
 
     proto = flow->detected_protocol.app_protocol ? flow->detected_protocol.app_protocol : flow->detected_protocol.master_protocol;
 
@@ -2913,7 +2913,7 @@ static void ndpi_process_packet(u_char *args,
   uint8_t *packet_checked = malloc(header->caplen);
 
   memcpy(packet_checked, packet, header->caplen);
-  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked);
+  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, csv_fp);
 
   if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
   pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
