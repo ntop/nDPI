@@ -305,6 +305,7 @@ typedef enum {
   NDPI_HTTP_SUSPICIOUS_HEADER,
   NDPI_TLS_NOT_CARRYING_HTTPS,
   NDPI_SUSPICIOUS_DGA_DOMAIN,
+  NDPI_MALFORMED_PACKET,
   /* Leave this as last member */
   NDPI_MAX_RISK
 } ndpi_risk_enum;
