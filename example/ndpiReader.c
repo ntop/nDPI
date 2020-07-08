@@ -71,7 +71,7 @@ static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 FILE *csv_fp                 = NULL; /**< for CSV export */
 /** User preferences **/
-u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0;
+u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0;
 u_int8_t verbose = 0, enable_joy_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
@@ -341,7 +341,7 @@ static void help(u_int long_help) {
 #ifndef USE_DPDK
 	 "-i <file|device> "
 #endif
-	 "[-f <filter>][-s <duration>][-m <duration>]\n"
+	 "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-e <len>][-t][-v <level>]\n"
 	 "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
 	 "          [-T <num>][-U <num>]\n\n"
@@ -355,6 +355,7 @@ static void help(u_int long_help) {
 	 "  -l <num loops>            | Number of detection loops (test only)\n"
 	 "  -n <num threads>          | Number of threads. Default: number of interfaces in -i.\n"
 	 "                            | Ignored with pcap files.\n"
+	 "  -b <num bin clusters>     | Number of bin clusters\n"
 #ifdef linux
          "  -g <id:id...>             | Thread affinity mask (one core id per thread)\n"
 #endif
@@ -664,13 +665,18 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "e:c:C:df:g:i:hp:P:l:s:tv:V:u:n:Jrp:w:q0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "b:e:c:C:df:g:i:hp:P:l:s:tv:V:u:n:Jrp:w:q0123:456:7:89:m:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
 
     switch (opt) {
+    case 'b':
+      if((num_bin_clusters = atoi(optarg)) > 32)
+	num_bin_clusters = 32;
+      break;
+
     case 'd':
       enable_protocol_guess = 0;
       break;
@@ -998,8 +1004,8 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
-void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
-  if(b->num_incs == 0)
+void print_bin(FILE *fout, const char *label, struct ndpi_bin *b, u_int8_t print_zero_bin) {
+  if((!print_zero_bin) && (b->num_incs == 0))
     return;
   else {
     u_int8_t i;
@@ -1158,7 +1164,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, ",%s,", flow->info);
 
 #ifndef DIRECTION_BINS
-    print_bin(csv_fp, NULL, &flow->payload_len_bin);
+    print_bin(csv_fp, NULL, &flow->payload_len_bin, 0);
 #endif
   }
 
@@ -1346,10 +1352,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 						flow->human_readeable_string_buffer);
 
 #ifdef DIRECTION_BINS
-  print_bin(out, "Plen c2s", &flow->payload_len_bin_src2dst);
-  print_bin(out, "Plen s2c", &flow->payload_len_bin_dst2src);
+  print_bin(out, "Plen c2s", &flow->payload_len_bin_src2dst, 0);
+  print_bin(out, "Plen s2c", &flow->payload_len_bin_dst2src, 0);
 #else
-  print_bin(out, "Plen Bins", &flow->payload_len_bin);
+  print_bin(out, "Plen Bins", &flow->payload_len_bin, 0);
 #endif
 
   fprintf(out, "\n");
@@ -2460,43 +2466,70 @@ static void printFlowsStats() {
       struct ndpi_bin *bins = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_flows);
       u_int16_t *cluster_ids = (u_int16_t*)ndpi_malloc(sizeof(u_int16_t)*num_flows);;
 #endif
-      
+
       for(i=0; i<num_flows; i++) {
 #ifndef DIRECTION_BINS
 	if(bins && cluster_ids)
 	  memcpy(&bins[i], &all_flows[i].flow->payload_len_bin, sizeof(struct ndpi_bin));
 #endif
-	
+
 	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
       }
 
 #ifndef DIRECTION_BINS
-      if(bins && cluster_ids) {
-#if 0
-	u_int8_t num_clusters = 8;
+      if(bins && cluster_ids && (num_bin_clusters > 0)) {
 	char buf[64];
 	u_int j;
+	struct ndpi_bin *centroids;
 	
-	ndpi_cluster_bins(bins, num_flows, num_clusters, cluster_ids);
+	if((centroids = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_bin_clusters)) != NULL) {
+	  for(i=0; i<num_bin_clusters; i++)
+	    ndpi_init_bin(&centroids[i], ndpi_bin_family32 /* Use 32 bit to avoid overlaps */,
+			  bins[0].num_bins);
+	  
+	  ndpi_cluster_bins(bins, num_flows, num_bin_clusters, cluster_ids, centroids);
 
-	for(j=0; j<num_clusters; j++) {	  
-	  for(i=0; i<num_flows; i++) {
-	    if(cluster_ids[i] != j) continue;
-	    
-	    printf("%u\t%s\t%s:%u <-> %s:%u\n",
-		   cluster_ids[i],
-		   ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
-				      all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
-		   all_flows[i].flow->src_name,
-		   ntohs(all_flows[i].flow->src_port),
-		   all_flows[i].flow->src_name,
-		   ntohs(all_flows[i].flow->dst_port));
-	  }
-	}
+	  printf("\n"
+		 "\tBin clusters\n"
+		 "\t------------\n");
 	
-#endif
-	ndpi_free(bins);
-	ndpi_free(cluster_ids);
+	  for(j=0; j<num_bin_clusters; j++) {
+	    u_int16_t num_printed = 0;
+
+	    for(i=0; i<num_flows; i++) {
+	      if(cluster_ids[i] != j) continue;
+
+	      if(num_printed == 0) {
+		printf("\tCluster [");
+		print_bin(out, NULL, &centroids[j], 1);
+		printf("]\n");
+	      }
+
+	      printf("\t%-10s\t%s:%u <-> %s:%u\t[",
+		     // cluster_ids[i],
+		     ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
+					all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
+		     all_flows[i].flow->src_name,
+		     ntohs(all_flows[i].flow->src_port),
+		     all_flows[i].flow->src_name,
+		     ntohs(all_flows[i].flow->dst_port));
+
+	      print_bin(out, NULL, &all_flows[i].flow->payload_len_bin, 0);
+	      printf("]\n");
+	      num_printed++;
+	    }
+
+	    if(num_printed) printf("\n");
+	  }
+	  
+	  for(i=0; i<num_bin_clusters; i++)
+	    ndpi_free_bin(&centroids[i]);
+	  
+	  ndpi_free(centroids);
+	  
+	  ndpi_free(bins);
+	  ndpi_free(cluster_ids);
+	}
       }
 #endif
     }
@@ -3190,14 +3223,16 @@ static void binUnitTest() {
     ndpi_normalize_bin(&bins[i]);
   }
 
-  ndpi_cluster_bins(bins, num_bins, num_clusters, cluster_ids);
+  ndpi_cluster_bins(bins, num_bins, num_clusters, cluster_ids, NULL);
 
   for(j=0; j<num_clusters; j++) {
     if(verbose) printf("\n");
-    
+
     for(i=0; i<num_bins; i++) {
       if(cluster_ids[i] == j) {
-	if(verbose) printf("[%u] %s\n", cluster_ids[i], ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
+	if(verbose)
+	  printf("[%u] %s\n", cluster_ids[i],
+		 ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
       }
     }
   }

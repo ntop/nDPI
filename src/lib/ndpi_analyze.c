@@ -476,25 +476,29 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t nor
   - (in) bins: a vection 'num_bins' long of bins to cluster
   - (in) 'num_clusters': number of desired clusters 0...(num_clusters-1)
   - (out) 'cluster_ids': a vector 'num_bins' long containing the id's of each clustered bin
-
+  - (out) 'centroids': an optional 'num_clusters' long vector of (centroid) bins
   See
   - https://en.wikipedia.org/wiki/K-means_clustering
  */
 int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
-		      u_int8_t num_clusters, u_int16_t *cluster_ids) {
+		      u_int8_t num_clusters, u_int16_t *cluster_ids,
+		      struct ndpi_bin *centroids) {
   u_int16_t i, j, max_iterations = 100, num_iterations = 0, num_moves;
-  struct ndpi_bin *centroids;
-  u_int8_t verbose = 0;
+  u_int8_t verbose = 0, alloc_centroids = 0;
   
   if(num_clusters > num_bins) return(-1);
 
-  if((centroids = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_clusters)) == NULL)
-    return(-2);
-  else {
-    for(i=0; i<num_clusters; i++)
-      ndpi_init_bin(&centroids[i], ndpi_bin_family32 /* Use 32 bit to avoid overlaps */, bins[0].num_bins);
-  }
+  if(centroids == NULL) {
+    alloc_centroids = 1;
 
+    if((centroids = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_clusters)) == NULL)
+      return(-2);
+    else {
+      for(i=0; i<num_clusters; i++)
+	ndpi_init_bin(&centroids[i], ndpi_bin_family32 /* Use 32 bit to avoid overlaps */, bins[0].num_bins);
+    }
+  }
+  
   /* Reset the id's */
   memset(cluster_ids, 0, sizeof(u_int16_t) * num_bins);
 
@@ -570,11 +574,13 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
       break;
   }
 
-  for(i=0; i<num_clusters; i++)
-    ndpi_free_bin(&centroids[i]);
+  if(alloc_centroids) {
+    for(i=0; i<num_clusters; i++)
+      ndpi_free_bin(&centroids[i]);
 
-  ndpi_free(centroids);
-
+    ndpi_free(centroids);
+  }
+  
   return(0);
 }
 

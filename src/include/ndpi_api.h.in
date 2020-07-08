@@ -1078,7 +1078,8 @@ extern "C" {
   char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf, u_int out_buf_len);
   float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t normalize_first);
   int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
-			u_int8_t num_clusters, u_int16_t *cluster_ids);
+			u_int8_t num_clusters, u_int16_t *cluster_ids,
+			struct ndpi_bin *centroids);
 
 #ifdef __cplusplus
 }
