@@ -1686,6 +1686,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       break;
 
     /* Check ether_type from LLC */
+    if(header->caplen < (eth_offset + wifi_len + radio_len + sizeof(struct ndpi_llc_header_snap)))
+      return(nproto);
     llc = (struct ndpi_llc_header_snap*)(packet + eth_offset + wifi_len + radio_len);
     if(llc->dsap == SNAP)
       type = ntohs(llc->snap.proto_ID);
