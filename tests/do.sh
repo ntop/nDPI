@@ -20,6 +20,9 @@ build_results() {
 		if [ ! -f result/$f.out ]; then
 			CMD="$READER -q -t -i pcap/$f -w result/$f.out -v 2"
 			$CMD
+			if [ $? -ne 0 ]; then
+				RC=1
+			fi
 		fi
 	done
 }
@@ -29,6 +32,9 @@ check_results() {
 		if [ -f result/$f.out ]; then
 			CMD="$READER -q -t -i pcap/$f -w /tmp/reader.out -v 2"
 			$CMD
+			if [ $? -ne 0 ]; then
+				RC=1
+			fi
 			NUM_DIFF=`diff result/$f.out /tmp/reader.out | wc -l`
 
 			if [ $NUM_DIFF -eq 0 ]; then
