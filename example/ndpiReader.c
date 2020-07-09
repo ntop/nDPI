@@ -1004,34 +1004,30 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 /* ********************************** */
 
-void print_bin(FILE *fout, const char *label, struct ndpi_bin *b, u_int8_t print_zero_bin) {
-  if((!print_zero_bin) && (b->num_incs == 0))
-    return;
-  else {
-    u_int8_t i;
-    FILE *out = results_file ? results_file : stdout;
-    const char *sep = label ? "," : ";";
+void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
+  u_int8_t i;
+  FILE *out = results_file ? results_file : stdout;
+  const char *sep = label ? "," : ";";
 
-    ndpi_normalize_bin(b);
+  ndpi_normalize_bin(b);
 
-    if(label) fprintf(fout, "[%s: ", label);
+  if(label) fprintf(fout, "[%s: ", label);
 
-    for(i=0; i<b->num_bins; i++) {
-      switch(b->family) {
-      case ndpi_bin_family8:
-	fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins8[i]);
-	break;
-      case ndpi_bin_family16:
-	fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins16[i]);
-	break;
-      case ndpi_bin_family32:
-	fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins32[i]);
-	break;
-      }
+  for(i=0; i<b->num_bins; i++) {
+    switch(b->family) {
+    case ndpi_bin_family8:
+      fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins8[i]);
+      break;
+    case ndpi_bin_family16:
+      fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins16[i]);
+      break;
+    case ndpi_bin_family32:
+      fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins32[i]);
+      break;
     }
-
-    if(label) fprintf(fout, "]");
   }
+
+  if(label) fprintf(fout, "]");  
 }
 
 /* ********************************** */
@@ -1164,7 +1160,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, ",%s,", flow->info);
 
 #ifndef DIRECTION_BINS
-    print_bin(csv_fp, NULL, &flow->payload_len_bin, 0);
+    print_bin(csv_fp, NULL, &flow->payload_len_bin);
 #endif
   }
 
@@ -1352,10 +1348,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 						flow->human_readeable_string_buffer);
 
 #ifdef DIRECTION_BINS
-  print_bin(out, "Plen c2s", &flow->payload_len_bin_src2dst, 0);
-  print_bin(out, "Plen s2c", &flow->payload_len_bin_dst2src, 0);
+  print_bin(out, "Plen c2s", &flow->payload_len_bin_src2dst);
+  print_bin(out, "Plen s2c", &flow->payload_len_bin_dst2src);
 #else
-  print_bin(out, "Plen Bins", &flow->payload_len_bin, 0);
+  print_bin(out, "Plen Bins", &flow->payload_len_bin);
 #endif
 
   fprintf(out, "\n");
@@ -2469,8 +2465,10 @@ static void printFlowsStats() {
 
       for(i=0; i<num_flows; i++) {
 #ifndef DIRECTION_BINS
-	if(bins && cluster_ids)
+	if(bins && cluster_ids) {
 	  memcpy(&bins[i], &all_flows[i].flow->payload_len_bin, sizeof(struct ndpi_bin));
+	  ndpi_normalize_bin(&bins[i]);
+	}
 #endif
 
 	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
@@ -2500,8 +2498,8 @@ static void printFlowsStats() {
 	      if(cluster_ids[i] != j) continue;
 
 	      if(num_printed == 0) {
-		printf("\tCluster [");
-		print_bin(out, NULL, &centroids[j], 1);
+		printf("\tCluster %u [", j);
+		print_bin(out, NULL, &centroids[j]);
 		printf("]\n");
 	      }
 
@@ -2514,8 +2512,8 @@ static void printFlowsStats() {
 		     all_flows[i].flow->src_name,
 		     ntohs(all_flows[i].flow->dst_port));
 
-	      print_bin(out, NULL, &all_flows[i].flow->payload_len_bin, 0);
-	      printf("]\n");
+	      print_bin(out, NULL, &bins[i]);
+	      printf("][score: %f]\n", ndpi_bin_similarity(&centroids[j], &bins[i], 0));
 	      num_printed++;
 	    }
 
@@ -3201,7 +3199,7 @@ void test_lib() {
 /* *********************************************** */
 
 static void binUnitTest() {
-  struct ndpi_bin *bins;
+  struct ndpi_bin *bins, b0, b1;
   u_int8_t versbose = 0;
   u_int8_t num_bins = 32;
   u_int8_t num_points = 24;
@@ -3242,6 +3240,20 @@ static void binUnitTest() {
     ndpi_free_bin(&bins[i]);
 
   ndpi_free(bins);
+
+  /* ************************ */
+  
+  ndpi_init_bin(&b0, ndpi_bin_family8, 16);
+  ndpi_init_bin(&b1, ndpi_bin_family8, 16);
+
+  ndpi_set_bin(&b0, 1, 100);
+  ndpi_set_bin(&b1, 1, 100);
+  
+  printf("Similarity: %f\n\n", ndpi_bin_similarity(&b0, &b1, 1));
+
+  ndpi_free_bin(&b0), ndpi_free_bin(&b1);
+
+  // exit(0);
 }
 
 /* *********************************************** */
@@ -3650,7 +3662,7 @@ int orginal_main(int argc, char **argv) {
     if(ndpi_info_mod == NULL) return -1;
 
     /* Internal checks */
-    binUnitTest();
+    // binUnitTest();
     dgaUnitTest();
     hllUnitTest();
     bitmapUnitTest();

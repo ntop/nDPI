@@ -1070,6 +1070,7 @@ extern "C" {
 
   int  ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins);
   void ndpi_free_bin(struct ndpi_bin *b);
+  struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b);
   void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val);
   void ndpi_set_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t value);
   u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int8_t slot_id);

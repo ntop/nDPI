@@ -1510,9 +1510,8 @@ enum ndpi_bin_family {
 };
 
 struct ndpi_bin {
-  u_int8_t num_bins;
+  u_int8_t num_bins, is_empty;
   enum ndpi_bin_family family;
-  u_int32_t num_incs;
   
   union {
     u_int8_t  *bins8; /* num_bins bins */

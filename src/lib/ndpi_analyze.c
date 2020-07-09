@@ -128,7 +128,7 @@ float ndpi_data_variance(struct ndpi_analyze_struct *s) {
 /*
   See the link below for "Population and sample standard deviation review"
   https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/variance-standard-deviation-sample/a/population-and-sample-standard-deviation-review
-  
+
   In nDPI we use an approximate stddev calculation to avoid storing all data in memory
 */
 /* Compute the standard deviation on all values */
@@ -244,21 +244,21 @@ double ndpi_hll_count(struct ndpi_hll *hll) {
 /* ********************************************************************************* */
 
 int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins) {
-  b->num_bins = num_bins, b->family = f, b->num_incs = 0;
+  b->num_bins = num_bins, b->family = f, b->is_empty = 1;
 
   switch(f) {
   case ndpi_bin_family8:
-    if((b->u.bins8 = (u_int8_t*)calloc(num_bins, sizeof(u_int8_t))) == NULL)
+    if((b->u.bins8 = (u_int8_t*)ndpi_calloc(num_bins, sizeof(u_int8_t))) == NULL)
       return(-1);
     break;
-    
+
   case ndpi_bin_family16:
-    if((b->u.bins16 = (u_int16_t*)calloc(num_bins, sizeof(u_int16_t))) == NULL)
+    if((b->u.bins16 = (u_int16_t*)ndpi_calloc(num_bins, sizeof(u_int16_t))) == NULL)
       return(-1);
     break;
-    
+
   case ndpi_bin_family32:
-    if((b->u.bins32 = (u_int32_t*)calloc(num_bins, sizeof(u_int32_t))) == NULL)
+    if((b->u.bins32 = (u_int32_t*)ndpi_calloc(num_bins, sizeof(u_int32_t))) == NULL)
       return(-1);
     break;
   }
@@ -284,11 +284,47 @@ void ndpi_free_bin(struct ndpi_bin *b) {
 
 /* ********************************************************************************* */
 
+struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
+  struct ndpi_bin *out = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin));
+
+  if(!out) return(NULL);
+
+  out->num_bins = b->num_bins, out->family = b->family, out->is_empty = b->is_empty;
+
+  switch(out->family) {
+  case ndpi_bin_family8:
+    if((out->u.bins8 = (u_int8_t*)ndpi_calloc(out->num_bins, sizeof(u_int8_t))) == NULL) {
+      free(out);
+      return(NULL);
+    } else
+      memcpy(out->u.bins8, b->u.bins8, out->num_bins*sizeof(u_int8_t));
+    break;
+
+  case ndpi_bin_family16:
+    if((out->u.bins16 = (u_int16_t*)ndpi_calloc(out->num_bins, sizeof(u_int16_t))) == NULL) {
+      free(out);
+      return(NULL);
+    } else
+      memcpy(out->u.bins16, b->u.bins16, out->num_bins*sizeof(u_int16_t));
+    break;
+
+  case ndpi_bin_family32:
+    if((out->u.bins32 = (u_int32_t*)ndpi_calloc(out->num_bins, sizeof(u_int32_t))) == NULL) {
+      free(out);
+      return(NULL);
+    } else
+      memcpy(out->u.bins32, b->u.bins32, out->num_bins*sizeof(u_int32_t));
+    break;
+  }
+
+  return(out);
+}
+
+/* ********************************************************************************* */
+
 void ndpi_set_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
   if(slot_id >= b->num_bins) slot_id = 0;
 
-  b->num_incs += val;
-  
   switch(b->family) {
   case ndpi_bin_family8:
     b->u.bins8[slot_id] = (u_int8_t)val;
@@ -305,10 +341,10 @@ void ndpi_set_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
 /* ********************************************************************************* */
 
 void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
+  b->is_empty = 0;
+  
   if(slot_id >= b->num_bins) slot_id = 0;
 
-  b->num_incs += val;
-  
   switch(b->family) {
   case ndpi_bin_family8:
     b->u.bins8[slot_id] += (u_int8_t)val;
@@ -326,7 +362,7 @@ void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
 
 u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int8_t slot_id) {
   if(slot_id >= b->num_bins) slot_id = 0;
-  
+
   switch(b->family) {
   case ndpi_bin_family8:
     return(b->u.bins8[slot_id]);
@@ -345,8 +381,8 @@ u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int8_t slot_id) {
 /* ********************************************************************************* */
 
 void ndpi_reset_bin(struct ndpi_bin *b) {
-  b->num_incs = 0;
-  
+  b->is_empty = 1;
+
   switch(b->family) {
   case ndpi_bin_family8:
     memset(b->u.bins8, 0, sizeof(u_int8_t)*b->num_bins);
@@ -366,21 +402,34 @@ void ndpi_reset_bin(struct ndpi_bin *b) {
  */
 void ndpi_normalize_bin(struct ndpi_bin *b) {
   u_int8_t i;
+  u_int32_t tot = 0;
 
-  if(b->num_incs == 0) return;
+  if(b->is_empty) return;
   
   switch(b->family) {
   case ndpi_bin_family8:
-    for(i=0; i<b->num_bins; i++)
-      b->u.bins8[i] = (b->u.bins8[i]*100) / b->num_incs;
+    for(i=0; i<b->num_bins; i++) tot += b->u.bins8[i];
+
+    if(tot > 0) {
+      for(i=0; i<b->num_bins; i++)
+	b->u.bins8[i] = (b->u.bins8[i]*100) / tot;
+    }
     break;
   case ndpi_bin_family16:
-    for(i=0; i<b->num_bins; i++)
-      b->u.bins16[i] = (b->u.bins16[i]*100) / b->num_incs;
+    for(i=0; i<b->num_bins; i++) tot += b->u.bins16[i];
+
+    if(tot > 0) {
+      for(i=0; i<b->num_bins; i++)
+	b->u.bins16[i] = (b->u.bins16[i]*100) / tot;
+    }
     break;
   case ndpi_bin_family32:
-    for(i=0; i<b->num_bins; i++)
-      b->u.bins32[i] = (b->u.bins32[i]*100) / b->num_incs;
+    for(i=0; i<b->num_bins; i++) tot += b->u.bins32[i];
+
+    if(tot > 0) {
+      for(i=0; i<b->num_bins; i++)
+	b->u.bins32[i] = (b->u.bins32[i]*100) / tot;
+    }
     break;
   }
 }
@@ -392,10 +441,10 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
   u_int len = 0;
 
   if(!out_buf) return(out_buf); else out_buf[0] = '\0';
-  
+
   if(normalize_first)
     ndpi_normalize_bin(b);
-  
+
   switch(b->family) {
   case ndpi_bin_family8:
     for(i=0; i<b->num_bins; i++) {
@@ -405,7 +454,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
       len += rc;
     }
     break;
-    
+
   case ndpi_bin_family16:
     for(i=0; i<b->num_bins; i++) {
       int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
@@ -414,61 +463,85 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
       len += rc;
     }
     break;
-    
+
   case ndpi_bin_family32:
     for(i=0; i<b->num_bins; i++) {
       int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
-      
+
       if(rc < 0) break;
       len += rc;
     }
     break;
   }
-  
+
   return(out_buf);
 }
 
 /* ********************************************************************************* */
 
-/* 
+// #define COSINE_SIMILARITY
+
+/*
    Determines how similar are two bins
 
+   Cosine Similiarity
    0 = Very differet
    ... (gray zone)
    1 = Alike
 
    See https://en.wikipedia.org/wiki/Cosine_similarity for more details
+
+   ---
+   Euclidean similarity
+
+   0 = alike
+   ...
+   the higher the more different
 */
 float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t normalize_first) {
   u_int8_t i;
-  u_int32_t sumxx = 0, sumxy = 0, sumyy = 0;
-    
-  if((b1->num_incs == 0) || (b2->num_incs == 0)
-     // || (b1->family != b2->family)
-     || (b1->num_bins != b2->num_bins))
-    return(0);
+
+  if(
+     // (b1->family != b2->family) ||
+     (b1->num_bins != b2->num_bins))
+    return(-1);
 
   if(normalize_first)
     ndpi_normalize_bin(b1), ndpi_normalize_bin(b2);
-  
-  switch(b1->family) {
-  case ndpi_bin_family8:
-    for(i=0; i<b1->num_bins; i++)
-      sumxx += b1->u.bins8[i] * b1->u.bins8[i], sumyy += b2->u.bins8[i] * b2->u.bins8[i], sumxy += b1->u.bins8[i] * b2->u.bins8[i];
-    break;
-  case ndpi_bin_family16:
-    for(i=0; i<b1->num_bins; i++)
-      sumxx += b1->u.bins16[i] * b1->u.bins16[i], sumyy += b2->u.bins16[i] * b2->u.bins16[i], sumxy += b1->u.bins16[i] * b2->u.bins16[i];
-    break;
-  case ndpi_bin_family32:
-    for(i=0; i<b1->num_bins; i++)
-      sumxx += b1->u.bins32[i] * b1->u.bins32[i], sumyy += b2->u.bins32[i] * b2->u.bins32[i], sumxy += b1->u.bins32[i] * b2->u.bins32[i];
-    break;
-  }
 
-  return((float)sumxy / sqrt((float)(sumxx * sumyy)));
+#ifdef COSINE_SIMILARITY
+  {
+    u_int32_t sumxx = 0, sumxy = 0, sumyy = 0;
+
+    for(i=0; i<b1->num_bins; i++) {
+      u_int32_t a = ndpi_get_bin_value(b1, i);
+      u_int32_t b = ndpi_get_bin_value(b2, i);
+      
+      sumxx += a*a, sumyy += b*b, sumxy += a*b;
+    }
+    
+    if((sumxx == 0) || (sumyy == 0))
+      return(0);
+    else
+      return((float)sumxy / sqrt((float)(sumxx * sumyy)));
+  }
+#else
+  {
+    u_int32_t sum = 0;
+
+    for(i=0; i<b1->num_bins; i++) {
+      u_int32_t a = ndpi_get_bin_value(b1, i);
+      u_int32_t b = ndpi_get_bin_value(b2, i);
+
+      sum += pow(a-b, 2);
+    }
+    
+    /* The lower the more similar */
+    return(sqrt(sum));
+  }
+#endif
 }
-  
+
 /* ********************************************************************************* */
 
 /*
@@ -483,10 +556,14 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t nor
 int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 		      u_int8_t num_clusters, u_int16_t *cluster_ids,
 		      struct ndpi_bin *centroids) {
-  u_int16_t i, j, max_iterations = 100, num_iterations = 0, num_moves;
+  u_int16_t i, j, max_iterations = 25, num_iterations, num_moves;
   u_int8_t verbose = 0, alloc_centroids = 0;
-  
-  if(num_clusters > num_bins) return(-1);
+  char out_buf[256];
+
+  if(num_clusters > num_bins) num_clusters = num_bins;
+
+  if(verbose)
+    printf("Distributing %u bins over %u clusters\n", num_bins, num_clusters);
 
   if(centroids == NULL) {
     alloc_centroids = 1;
@@ -498,38 +575,61 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 	ndpi_init_bin(&centroids[i], ndpi_bin_family32 /* Use 32 bit to avoid overlaps */, bins[0].num_bins);
     }
   }
-  
+
   /* Reset the id's */
   memset(cluster_ids, 0, sizeof(u_int16_t) * num_bins);
 
   /* Randomly pick a cluster id */
-  for(i=0; i<num_clusters; i++) cluster_ids[i] = i;
+  for(i=0; i<num_clusters; i++) {
+    cluster_ids[i] = i;
+
+    if(verbose)
+      printf("Initializing cluster %u: %s\n", i,
+	     ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
+
+  }
 
   /* Assign the remaining bins to the nearest cluster */
   for(i=num_clusters; i<num_bins; i++) {
     u_int16_t j;
-    float top_similarity = -1;
+    float best_similarity;
     u_int8_t cluster_id = 0;
+
+#ifdef COSINE_SIMILARITY
+    best_similarity = -1;
+#else
+    best_similarity = 99999999999;
+#endif
 
     for(j=0; j<num_clusters; j++) {
       float similarity = ndpi_bin_similarity(&bins[i], &bins[j], 0);
 
-      if(similarity > top_similarity)
-	cluster_id = j, top_similarity = similarity;
+#ifdef COSINE_SIMILARITY
+      if(similarity > best_similarity)
+#else
+	if(similarity < best_similarity)
+#endif
+	cluster_id = j, best_similarity = similarity;
     }
+
+    if(verbose)
+      printf("Assigned bin to cluster %u: %s [score: %f]\n", cluster_id,
+	     ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)), best_similarity);
 
     cluster_ids[i] = cluster_id;
   }
+
+  num_iterations = 0;
 
   /* Now let's try to find a better arrangement */
   while(num_iterations++ < max_iterations) {
     /* Find the center of each cluster */
 
     if(verbose) printf("Iteration %u\n", num_iterations);
-    
+
     for(i=0; i<num_clusters; i++)
       ndpi_reset_bin(&centroids[i]);
-		      
+
     for(i=0; i<num_bins; i++) {
       for(j=0; j<bins[i].num_bins; j++) {
 	ndpi_inc_bin(&centroids[cluster_ids[i]], j, ndpi_get_bin_value(&bins[i], j));
@@ -537,34 +637,50 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
     }
 
     for(i=0; i<num_clusters; i++) {
-      char out_buf[256];
-      
       ndpi_normalize_bin(&centroids[i]);
+
       if(verbose)
-	printf("Centroid [%u] %s\n", cluster_ids[i],
+	printf("Centroid [%u] %s\n", i,
 	       ndpi_print_bin(&centroids[i], 0, out_buf, sizeof(out_buf)));
     }
 
     /* Now let's check if there are bins to move across clusters */
-    num_moves = 0;    
-    
+    num_moves = 0;
+
     for(i=0; i<num_bins; i++) {
       u_int16_t j;
-      float top_similarity = -1;
+      float best_similarity;
       u_int8_t cluster_id = 0;
 
+#ifdef COSINE_SIMILARITY
+    best_similarity = -1;
+#else
+    best_similarity = 99999999999;
+#endif
+
       for(j=0; j<num_clusters; j++) {
-	float similarity = ndpi_bin_similarity(&bins[i], &centroids[j], 0);
+	float similarity;
+
+	if(centroids[j].is_empty) continue;
 	
-	if(similarity > top_similarity)
-	  cluster_id = j, top_similarity = similarity;
+	similarity = ndpi_bin_similarity(&bins[i], &centroids[j], 0);
+
+	if(verbose)
+	  printf("Bin %u / centroid %u [similarity: %f]\n", i, j, similarity);
+
+#ifdef COSINE_SIMILARITY
+      if(similarity > best_similarity)
+#else
+	if(similarity < best_similarity)
+#endif 	  
+	  cluster_id = j, best_similarity = similarity;
       }
-      
-      if((top_similarity > 0) && (cluster_ids[i] != cluster_id)) {
+
+      if(/* (best_similarity > 0) && */ (cluster_ids[i] != cluster_id)) {
 	if(verbose)
 	  printf("Moved bin %u from cluster %u -> %u [similarity: %f]\n",
-		 i, cluster_ids[i], cluster_id, top_similarity);
-	
+		 i, cluster_ids[i], cluster_id, best_similarity);
+
 	cluster_ids[i] = cluster_id;
 	num_moves++;
       }
@@ -580,7 +696,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
     ndpi_free(centroids);
   }
-  
+
   return(0);
 }
 
