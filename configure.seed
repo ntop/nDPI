@@ -114,10 +114,7 @@ case "$host" in
       else
          AC_CHECK_LIB([pcap], [pcap_open_live], [PCAP_LIB="-lpcap"])
 	 if test $ac_cv_lib_pcap_pcap_open_live = "no"; then :
-            echo ""
-            echo "ERROR: Missing libpcap(-dev) library required to compile the example application"
-            echo "ERROR: Please install it and try again"
-            exit
+		 AC_MSG_ERROR([Missing libpcap(-dev) library required to compile the example application. Please install it and try again.])
 	 fi
       fi
       ;;

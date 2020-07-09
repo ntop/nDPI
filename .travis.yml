@@ -67,6 +67,7 @@ matrix:
 
     - os: linux
       compiler: gcc-8
+      dist: bionic
       addons:
         apt:
           sources:
@@ -80,6 +81,7 @@ matrix:
 
     - os: linux
       compiler: gcc-9
+      dist: bionic
       addons:
         apt:
           sources:
@@ -93,6 +95,7 @@ matrix:
 
     - os: linux
       compiler: clang-8
+      dist: xential
       addons:
         apt:
           sources:
@@ -107,6 +110,7 @@ matrix:
 
     - os: linux
       compiler: clang-7
+      dist: xential
       addons:
         apt:
           sources:
@@ -120,9 +124,10 @@ matrix:
         - MATRIX_EVAL="CC=clang-7"
 
     - name: fuzza
-      env: CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" LDFLAGS="-g3 -O0" QA_FUZZ=asan CC=clang-7 && ASAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
+      env: QA_FUZZ=asan CC=clang-7 CXX=clang++-7 && ASAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
       os: linux
       compiler: clang-7
+      dist: xential
       addons:
         apt:
           sources:
@@ -133,9 +138,10 @@ matrix:
             - libpcap-dev
             - autogen
     - name: fuzzm
-      env: CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=memory" QA_FUZZ=msan CC=clang-7 && MSAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
+      env: CFLAGS="-fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-fsanitize=memory" QA_FUZZ=msan CC=clang-7 CXX=clang++-7 && MSAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
       os: linux
       compiler: clang-7
+      dist: xential
       addons:
         apt:
           sources:
@@ -146,9 +152,10 @@ matrix:
             - libpcap-dev
             - autogen
     - name: fuzzu
-      env: CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" LDFLAGS="-g3 -O0" QA_FUZZ=ubsan CC=clang-7
+      env: QA_FUZZ=ubsan CC=clang-7 CXX=clang++-7
       os: linux
       compiler: clang-7
+      dist: xential
       addons:
         apt:
           sources:
