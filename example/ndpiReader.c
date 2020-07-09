@@ -2475,7 +2475,7 @@ static void printFlowsStats() {
       }
 
 #ifndef DIRECTION_BINS
-      if(bins && cluster_ids && (num_bin_clusters > 0)) {
+  if(bins && cluster_ids && (num_bin_clusters > 0)) {
 	char buf[64];
 	u_int j;
 	struct ndpi_bin *centroids;
@@ -2524,11 +2524,14 @@ static void printFlowsStats() {
 	    ndpi_free_bin(&centroids[i]);
 	  
 	  ndpi_free(centroids);
-	  
-	  ndpi_free(bins);
-	  ndpi_free(cluster_ids);
 	}
-      }
+  }
+  if (cluster_ids != NULL) {
+    ndpi_free(cluster_ids);
+  }
+  if (bins != NULL) {
+    ndpi_free(bins);
+  }
 #endif
     }
 
