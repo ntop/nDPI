@@ -714,9 +714,8 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 /* ********************************** */
 
-char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version) {
-  static char v[12];
-
+char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
+                           u_int16_t version, u_int8_t *unknown_tls_version) {
   *unknown_tls_version = 0;
 
   switch(version) {
@@ -728,15 +727,32 @@ char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version) {
   case 0XFB1A: return("TLSv1.3 (Fizz)"); /* https://engineering.fb.com/security/fizz/ */
   case 0XFEFF: return("DTLSv1.0");
   case 0XFEFD: return("DTLSv1.2");
+  case 0x0A0A:
+  case 0x1A1A:
+  case 0x2A2A:
+  case 0x3A3A:
+  case 0x4A4A:
+  case 0x5A5A:
+  case 0x6A6A:
+  case 0x7A7A:
+  case 0x8A8A:
+  case 0x9A9A:
+  case 0xAAAA:
+  case 0xBABA:
+  case 0xCACA:
+  case 0xDADA:
+  case 0xEAEA:
+  case 0xFAFA: return("GREASE");
   }
 
   if((version >= 0x7f00) && (version <= 0x7fff))
     return("TLSv1.3 (draft)");
 
   *unknown_tls_version = 1;
-  snprintf(v, sizeof(v), "TLS (%04X)", version);
+  snprintf(flow->protos.stun_ssl.ssl.ssl_version_str,
+           sizeof(flow->protos.stun_ssl.ssl.ssl_version_str), "TLS (%04X)", version);
 
-  return(v);
+  return(flow->protos.stun_ssl.ssl.ssl_version_str);
 }
 
 /* ***************************************************** */
@@ -1066,7 +1082,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       struct tm a, b, *before = NULL, *after = NULL;
       u_int i, off;
       u_int8_t unknown_tls_version;
-      char *version = ndpi_ssl_version2str(flow->protos.stun_ssl.ssl.ssl_version, &unknown_tls_version);
+      char *version = ndpi_ssl_version2str(flow, flow->protos.stun_ssl.ssl.ssl_version, &unknown_tls_version);
 
       if(flow->protos.stun_ssl.ssl.notBefore)
         before = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notBefore, &a);
