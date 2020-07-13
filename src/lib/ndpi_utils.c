@@ -749,10 +749,14 @@ char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
     return("TLSv1.3 (draft)");
 
   *unknown_tls_version = 1;
-  snprintf(flow->protos.stun_ssl.ssl.ssl_version_str,
-           sizeof(flow->protos.stun_ssl.ssl.ssl_version_str), "TLS (%04X)", version);
 
-  return(flow->protos.stun_ssl.ssl.ssl_version_str);
+  if(flow != NULL) {
+    snprintf(flow->protos.stun_ssl.ssl.ssl_version_str,
+	     sizeof(flow->protos.stun_ssl.ssl.ssl_version_str), "TLS (%04X)", version);
+    
+    return(flow->protos.stun_ssl.ssl.ssl_version_str);
+  } else
+    return("");
 }
 
 /* ***************************************************** */
