@@ -1076,6 +1076,7 @@ struct ndpi_flow_struct {
 
     struct {
       struct {
+      char ssl_version_str[12];
       uint16_t ssl_version, server_names_len;
       char client_requested_server_name[64], *server_names,
       *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
