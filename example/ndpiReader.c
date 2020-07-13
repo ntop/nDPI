@@ -2943,6 +2943,9 @@ static void ndpi_process_packet(u_char *args,
   /* allocate an exact size buffer to check overflows */
   uint8_t *packet_checked = malloc(header->caplen);
 
+  if(packet_checked == NULL){
+    return ;
+  }
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, csv_fp);
 
@@ -3047,7 +3050,10 @@ static void ndpi_process_packet(u_char *args,
      Leave the free as last statement to avoid crashes when ndpi_detection_giveup()
      is called above by printResults()
   */
-  free(packet_checked);
+  if(packet_checked){
+    free(packet_checked);
+    packet_checked = NULL;
+  }
 }
 
 /**
