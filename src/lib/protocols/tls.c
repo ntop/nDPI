@@ -1263,7 +1263,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		      int rc = snprintf(&version_str[version_str_len],
 					sizeof(version_str) - version_str_len, "%s%s",
 					(version_str_len > 0) ? "," : "",
-					ndpi_ssl_version2str(tls_version, &unknown_tls_version));
+					ndpi_ssl_version2str(flow, tls_version, &unknown_tls_version));
 		      if(rc <= 0)
 			break;
 		      else

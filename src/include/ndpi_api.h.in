@@ -897,7 +897,8 @@ extern "C" {
 				      char *buffer, u_int buffer_size,
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
-  char* ndpi_ssl_version2str(u_int16_t version, u_int8_t *unknown_tls_version);
+  char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
+                             u_int16_t version, u_int8_t *unknown_tls_version);
   void ndpi_patchIPv6Address(char *str);
   void ndpi_user_pwd_payload_copy(u_int8_t *dest, u_int dest_len, u_int offset,
 				  const u_int8_t *src, u_int src_len);
