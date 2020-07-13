@@ -1123,6 +1123,11 @@ typedef enum {
    ndpi_cipher_insecure = NDPI_CIPHER_INSECURE
 } ndpi_cipher_weakness;
 
+/*
+  NOTE
+  When the struct below is modified don't forget to update
+  - ndpi_flow_struct (in python/ndpi.py)
+ */
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   u_int16_t protocol_stack_info;
