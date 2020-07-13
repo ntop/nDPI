@@ -139,11 +139,11 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 
   HASH_FIND(hh, pstats, payload, payload_len, ret);
   if(ret == NULL) {
-    if((ret = (struct payload_stats*)calloc(1, sizeof(struct payload_stats))) == NULL)
+    if((ret = (struct payload_stats*)ndpi_calloc(1, sizeof(struct payload_stats))) == NULL)
       return; /* OOM */
 
-    if((ret->pattern = (u_int8_t*)malloc(payload_len)) == NULL) {
-      free(ret);
+    if((ret->pattern = (u_int8_t*)ndpi_malloc(payload_len)) == NULL) {
+      ndpi_free(ret);
       return;
     }
 
@@ -163,7 +163,7 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 
   HASH_FIND_INT(ret->flows, &flow->flow_id, f);
   if(f == NULL) {
-    if((f = (struct flow_id_stats*)calloc(1, sizeof(struct flow_id_stats))) == NULL)
+    if((f = (struct flow_id_stats*)ndpi_calloc(1, sizeof(struct flow_id_stats))) == NULL)
       return; /* OOM */
 
     f->flow_id = flow->flow_id;
@@ -172,7 +172,7 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 
   HASH_FIND_INT(ret->packets, &packet_id, p);
   if(p == NULL) {
-    if((p = (struct packet_id_stats*)calloc(1, sizeof(struct packet_id_stats))) == NULL)
+    if((p = (struct packet_id_stats*)ndpi_calloc(1, sizeof(struct packet_id_stats))) == NULL)
       return; /* OOM */
     p->packet_id = packet_id;
 
@@ -284,14 +284,14 @@ void ndpi_report_payload_stats() {
     if(num <= max_num_reported_top_payloads)
       print_payload_stat(p);
 
-    free(p->pattern);
+    ndpi_free(p->pattern);
 
     {
       struct flow_id_stats *p1, *tmp1;
 
       HASH_ITER(hh, p->flows, p1, tmp1) {
 	HASH_DEL(p->flows, p1);
-	free(p1);
+	ndpi_free(p1);
       }
     }
 
@@ -300,12 +300,12 @@ void ndpi_report_payload_stats() {
 
       HASH_ITER(hh, p->packets, p1, tmp1) {
 	HASH_DEL(p->packets, p1);
-	free(p1);
+	ndpi_free(p1);
       }
     }
 
     HASH_DEL(pstats, p);
-    free(p);
+    ndpi_free(p);
     num++;
   }
 }
@@ -323,15 +323,15 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 extern u_int32_t current_ndpi_memory, max_ndpi_memory;
 
 /**
- * @brief malloc wrapper function
+ * @brief ndpi_malloc wrapper function
  */
-static void *malloc_wrapper(size_t size) {
+static void *ndpi_malloc_wrapper(size_t size) {
   current_ndpi_memory += size;
 
   if(current_ndpi_memory > max_ndpi_memory)
     max_ndpi_memory = current_ndpi_memory;
 
-  return malloc(size);
+  return(malloc(size)); /* Don't change to ndpi_malloc !!!!! */
 }
 
 /* ***************************************************** */
@@ -340,7 +340,7 @@ static void *malloc_wrapper(size_t size) {
  * @brief free wrapper function
  */
 static void free_wrapper(void *freeable) {
-  free(freeable);
+  free(freeable); /* Don't change to ndpi_free !!!!! */
 }
 
 /* ***************************************************** */
@@ -411,10 +411,10 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
 
-  set_ndpi_malloc(malloc_wrapper), set_ndpi_free(free_wrapper);
+  set_ndpi_malloc(ndpi_malloc_wrapper), set_ndpi_free(free_wrapper);
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
 
-  /* TODO: just needed here to init ndpi malloc wrapper */
+  /* TODO: just needed here to init ndpi ndpi_malloc wrapper */
   module = ndpi_init_detection_module(ndpi_no_prefs);
 
   if(module == NULL) {
@@ -529,8 +529,8 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow) {
     ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
 
   ndpi_exit_detection_module(workflow->ndpi_struct);
-  free(workflow->ndpi_flows_root);
-  free(workflow);
+  ndpi_free(workflow->ndpi_flows_root);
+  ndpi_free(workflow);
 }
 
 /* ***************************************************** */
@@ -816,7 +816,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	       workflow->prefs.max_ndpi_flows);
       exit(-1);
     } else {
-      struct ndpi_flow_info *newflow = (struct ndpi_flow_info*)malloc(sizeof(struct ndpi_flow_info));
+      struct ndpi_flow_info *newflow = (struct ndpi_flow_info*)ndpi_malloc(sizeof(struct ndpi_flow_info));
 
       if(newflow == NULL) {
 	LOG(NDPI_LOG_ERROR, "[NDPI] %s(1): not enough memory\n", __FUNCTION__);
@@ -862,7 +862,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 #else
 	ndpi_free_bin(&newflow->payload_len_bin);
 #endif
-	free(newflow);
+	ndpi_free(newflow);
 	return(NULL);
       } else
 	memset(newflow->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
@@ -874,7 +874,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 #else
 	ndpi_free_bin(&newflow->payload_len_bin);
 #endif
-	free(newflow);
+	ndpi_free(newflow);
 	return(NULL);
       } else
 	memset(newflow->src_id, 0, SIZEOF_ID_STRUCT);
@@ -886,7 +886,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 #else
 	ndpi_free_bin(&newflow->payload_len_bin);
 #endif
-	free(newflow);
+	ndpi_free(newflow);
 	return(NULL);
       } else
 	memset(newflow->dst_id, 0, SIZEOF_ID_STRUCT);

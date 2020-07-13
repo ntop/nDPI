@@ -532,7 +532,7 @@ void extcap_config() {
   printf("arg {number=%d}{call=-i}{display=Pcap File to Analyze}{type=fileselect}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 
-  protos = (struct ndpi_proto_sorter*)malloc(sizeof(struct ndpi_proto_sorter) * ndpi_num_supported_protocols);
+  protos = (struct ndpi_proto_sorter*)ndpi_malloc(sizeof(struct ndpi_proto_sorter) * ndpi_num_supported_protocols);
   if(!protos) exit(0);
 
   for(i=0; i<(int) ndpi_num_supported_protocols; i++) {
@@ -551,7 +551,7 @@ void extcap_config() {
     printf("value {arg=%d}{value=%d}{display=%s (%d)}\n", argidx, protos[i].id,
 	   protos[i].name, protos[i].id);
 
-  free(protos);
+  ndpi_free(protos);
 
   exit(0);
 }
@@ -746,13 +746,13 @@ static void parseOptions(int argc, char **argv) {
       if(nDPI_LogLevel < 0) nDPI_LogLevel = 0;
       if(nDPI_LogLevel > 3) {
 	nDPI_LogLevel = 3;
-	free(_debug_protocols);
+	ndpi_free(_debug_protocols);
 	_debug_protocols = strdup("all");
       }
       break;
 
     case 'u':
-      free(_debug_protocols);
+      ndpi_free(_debug_protocols);
       _debug_protocols = strdup(optarg);
       break;
 
@@ -831,7 +831,7 @@ static void parseOptions(int argc, char **argv) {
 
     case '8':
       nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
-      free(_debug_protocols);
+      ndpi_free(_debug_protocols);
       _debug_protocols = strdup("all");
       break;
 
@@ -1436,17 +1436,17 @@ void updateScanners(struct single_flow_info **scanners, u_int32_t saddr,
   HASH_FIND_INT(*scanners, (int *)&saddr, f);
 
   if(f == NULL) {
-    f = (struct single_flow_info*)malloc(sizeof(struct single_flow_info));
+    f = (struct single_flow_info*)ndpi_malloc(sizeof(struct single_flow_info));
     if(!f) return;
     f->saddr = saddr;
     f->version = version;
     f->tot_flows = 1;
     f->ports = NULL;
 
-    p = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
+    p = (struct port_flow_info*)ndpi_malloc(sizeof(struct port_flow_info));
 
     if(!p) {
-      free(f);
+      ndpi_free(f);
       return;
     } else
       p->port = dport, p->num_flows = 1;
@@ -1460,7 +1460,7 @@ void updateScanners(struct single_flow_info **scanners, u_int32_t saddr,
     HASH_FIND_INT(f->ports, (int *)&dport, pp);
 
     if(pp == NULL) {
-      pp = (struct port_flow_info*)malloc(sizeof(struct port_flow_info));
+      pp = (struct port_flow_info*)ndpi_malloc(sizeof(struct port_flow_info));
       if(!pp) return;
       pp->port = dport, pp->num_flows = 1;
 
@@ -1492,7 +1492,7 @@ int updateIpTree(u_int32_t key, u_int8_t version,
       &(*rootp)->right;		/* T4: follow right branch */
   }
 
-  q = (addr_node *) malloc(sizeof(addr_node));	/* T5: key not found */
+  q = (addr_node *) ndpi_malloc(sizeof(addr_node));	/* T5: key not found */
   if(q != (addr_node *)0) {	                /* make new node */
     *rootp = q;			                /* link new node to old */
 
@@ -1515,7 +1515,7 @@ void freeIpTree(addr_node *root) {
 
   freeIpTree(root->left);
   freeIpTree(root->right);
-  free(root);
+  ndpi_free(root);
 }
 
 /* *********************************************** */
@@ -1575,7 +1575,7 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
   HASH_FIND_INT(*stats, &port, s);
   if(s == NULL) {
-    s = (struct port_stats*)calloc(1, sizeof(struct port_stats));
+    s = (struct port_stats*)ndpi_calloc(1, sizeof(struct port_stats));
     if(!s) return;
 
     s->port = port, s->num_pkts = num_pkts, s->num_bytes = num_bytes;
@@ -1583,9 +1583,9 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
     updateTopIpAddress(addr, version, proto, 1, s->top_ip_addrs, MAX_NUM_IP_ADDRESS);
 
-    s->addr_tree = (addr_node *) malloc(sizeof(addr_node));
+    s->addr_tree = (addr_node *) ndpi_malloc(sizeof(addr_node));
     if(!s->addr_tree) {
-      free(s);
+      ndpi_free(s);
       return;
     }
 
@@ -1657,7 +1657,7 @@ static struct receiver *cutBackTo(struct receiver **rcvrs, u_int32_t size, u_int
     if(i++ == count)
       return r;
     HASH_DEL(*rcvrs, r);
-    free(r);
+    ndpi_free(r);
   }
 
   return(NULL);
@@ -1676,7 +1676,7 @@ static void mergeTables(struct receiver **primary, struct receiver **secondary) 
   HASH_ITER(hh, *primary, r, tmp) {
     HASH_FIND_INT(*secondary, (int *)&(r->addr), s);
     if(s == NULL){
-      s = (struct receiver *)malloc(sizeof(struct receiver));
+      s = (struct receiver *)ndpi_malloc(sizeof(struct receiver));
       if(!s) return;
 
       s->addr = r->addr;
@@ -1689,7 +1689,7 @@ static void mergeTables(struct receiver **primary, struct receiver **secondary) 
       s->num_pkts += r->num_pkts;
 
     HASH_DEL(*primary, r);
-    free(r);
+    ndpi_free(r);
   }
 }
 /* *********************************************** */
@@ -1699,7 +1699,7 @@ static void deleteReceivers(struct receiver *rcvrs) {
 
   HASH_ITER(hh, rcvrs, current, tmp) {
     HASH_DEL(rcvrs, current);
-    free(current);
+    ndpi_free(current);
   }
 }
 
@@ -1729,7 +1729,7 @@ static void updateReceivers(struct receiver **rcvrs, u_int32_t dst_addr,
   if(r == NULL) {
     if(((size = HASH_COUNT(*rcvrs)) < MAX_TABLE_SIZE_1)
        || ((a = acceptable(num_pkts)) != 0)){
-      r = (struct receiver *)malloc(sizeof(struct receiver));
+      r = (struct receiver *)ndpi_malloc(sizeof(struct receiver));
       if(!r) return;
 
       r->addr = dst_addr;
@@ -1766,10 +1766,10 @@ static void deleteScanners(struct single_flow_info *scanners) {
   HASH_ITER(hh, scanners, s, tmp) {
     HASH_ITER(hh, s->ports, p, tmp2) {
       if(s->ports) HASH_DEL(s->ports, p);
-      free(p);
+      ndpi_free(p);
     }
     HASH_DEL(scanners, s);
-    free(s);
+    ndpi_free(s);
   }
 }
 
@@ -1781,7 +1781,7 @@ static void deletePortsStats(struct port_stats *stats) {
   HASH_ITER(hh, stats, current_port, tmp) {
     HASH_DEL(stats, current_port);
     freeIpTree(current_port->addr_tree);
-    free(current_port);
+    ndpi_free(current_port);
   }
 }
 
@@ -2109,7 +2109,7 @@ static void printFlowsStats() {
   for(thread_id = 0; thread_id < num_threads; thread_id++)
     total_flows += ndpi_thread_info[thread_id].workflow->num_allocated_flows;
 
-  if((all_flows = (struct flow_info*)malloc(sizeof(struct flow_info)*total_flows)) == NULL) {
+  if((all_flows = (struct flow_info*)ndpi_malloc(sizeof(struct flow_info)*total_flows)) == NULL) {
     fprintf(out, "Fatal error: not enough memory\n");
     exit(-1);
   }
@@ -2148,14 +2148,14 @@ static void printFlowsStats() {
 	  //host ip -> ja3
 	  if(ja3ByHostFound == NULL){
 	    //adding the new host
-	    ndpi_host_ja3_fingerprints *newHost = malloc(sizeof(ndpi_host_ja3_fingerprints));
+	    ndpi_host_ja3_fingerprints *newHost = ndpi_malloc(sizeof(ndpi_host_ja3_fingerprints));
 	    newHost->host_client_info_hasht = NULL;
 	    newHost->host_server_info_hasht = NULL;
 	    newHost->ip_string = all_flows[i].flow->src_name;
 	    newHost->ip = all_flows[i].flow->src_ip;
 	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;
 
-	    ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
+	    ndpi_ja3_info *newJA3 = ndpi_malloc(sizeof(ndpi_ja3_info));
 	    newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
 	    newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.client_unsafe_cipher;
 	    //adding the new ja3 fingerprint
@@ -2171,7 +2171,7 @@ static void printFlowsStats() {
 			  all_flows[i].flow->ssh_tls.ja3_client, infoFound);
 
 	    if(infoFound == NULL){
-	      ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
+	      ndpi_ja3_info *newJA3 = ndpi_malloc(sizeof(ndpi_ja3_info));
 	      newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
 	      newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.client_unsafe_cipher;
 	      HASH_ADD_KEYPTR(hh, ja3ByHostFound->host_client_info_hasht,
@@ -2182,13 +2182,13 @@ static void printFlowsStats() {
 	  //ja3 -> host ip
 	  HASH_FIND_STR(hostByJA3C_ht, all_flows[i].flow->ssh_tls.ja3_client, hostByJA3Found);
 	  if(hostByJA3Found == NULL){
-	    ndpi_ip_dns *newHost = malloc(sizeof(ndpi_ip_dns));
+	    ndpi_ip_dns *newHost = ndpi_malloc(sizeof(ndpi_ip_dns));
 
 	    newHost->ip = all_flows[i].flow->src_ip;
 	    newHost->ip_string = all_flows[i].flow->src_name;
 	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;;
 
-	    ndpi_ja3_fingerprints_host *newElement = malloc(sizeof(ndpi_ja3_fingerprints_host));
+	    ndpi_ja3_fingerprints_host *newElement = ndpi_malloc(sizeof(ndpi_ja3_fingerprints_host));
 	    newElement->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
 	    newElement->unsafe_cipher = all_flows[i].flow->ssh_tls.client_unsafe_cipher;
 	    newElement->ipToDNS_ht = NULL;
@@ -2200,7 +2200,7 @@ static void printFlowsStats() {
 	    ndpi_ip_dns *innerElement = NULL;
 	    HASH_FIND_INT(hostByJA3Found->ipToDNS_ht, &(all_flows[i].flow->src_ip), innerElement);
 	    if(innerElement == NULL){
-	      ndpi_ip_dns *newInnerElement = malloc(sizeof(ndpi_ip_dns));
+	      ndpi_ip_dns *newInnerElement = ndpi_malloc(sizeof(ndpi_ip_dns));
 	      newInnerElement->ip = all_flows[i].flow->src_ip;
 	      newInnerElement->ip_string = all_flows[i].flow->src_name;
 	      newInnerElement->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;
@@ -2214,14 +2214,14 @@ static void printFlowsStats() {
 	  HASH_FIND_INT(ja3ByHostsHashT, &(all_flows[i].flow->dst_ip), ja3ByHostFound);
 	  if(ja3ByHostFound == NULL){
 	    //adding the new host in the hash table
-	    ndpi_host_ja3_fingerprints *newHost = malloc(sizeof(ndpi_host_ja3_fingerprints));
+	    ndpi_host_ja3_fingerprints *newHost = ndpi_malloc(sizeof(ndpi_host_ja3_fingerprints));
 	    newHost->host_client_info_hasht = NULL;
 	    newHost->host_server_info_hasht = NULL;
 	    newHost->ip_string = all_flows[i].flow->dst_name;
 	    newHost->ip = all_flows[i].flow->dst_ip;
 	    newHost->dns_name = all_flows[i].flow->ssh_tls.server_info;
 
-	    ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
+	    ndpi_ja3_info *newJA3 = ndpi_malloc(sizeof(ndpi_ja3_info));
 	    newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_server;
 	    newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.server_unsafe_cipher;
 	    //adding the new ja3 fingerprint
@@ -2235,7 +2235,7 @@ static void printFlowsStats() {
 	    HASH_FIND_STR(ja3ByHostFound->host_server_info_hasht,
 			  all_flows[i].flow->ssh_tls.ja3_server, infoFound);
 	    if(infoFound == NULL){
-	      ndpi_ja3_info *newJA3 = malloc(sizeof(ndpi_ja3_info));
+	      ndpi_ja3_info *newJA3 = ndpi_malloc(sizeof(ndpi_ja3_info));
 	      newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_server;
 	      newJA3->unsafe_cipher = all_flows[i].flow->ssh_tls.server_unsafe_cipher;
 	      HASH_ADD_KEYPTR(hh, ja3ByHostFound->host_server_info_hasht,
@@ -2245,13 +2245,13 @@ static void printFlowsStats() {
 
 	  HASH_FIND_STR(hostByJA3S_ht, all_flows[i].flow->ssh_tls.ja3_server, hostByJA3Found);
 	  if(hostByJA3Found == NULL){
-	    ndpi_ip_dns *newHost = malloc(sizeof(ndpi_ip_dns));
+	    ndpi_ip_dns *newHost = ndpi_malloc(sizeof(ndpi_ip_dns));
 
 	    newHost->ip = all_flows[i].flow->dst_ip;
 	    newHost->ip_string = all_flows[i].flow->dst_name;
 	    newHost->dns_name = all_flows[i].flow->ssh_tls.server_info;;
 
-	    ndpi_ja3_fingerprints_host *newElement = malloc(sizeof(ndpi_ja3_fingerprints_host));
+	    ndpi_ja3_fingerprints_host *newElement = ndpi_malloc(sizeof(ndpi_ja3_fingerprints_host));
 	    newElement->ja3 = all_flows[i].flow->ssh_tls.ja3_server;
 	    newElement->unsafe_cipher = all_flows[i].flow->ssh_tls.server_unsafe_cipher;
 	    newElement->ipToDNS_ht = NULL;
@@ -2264,7 +2264,7 @@ static void printFlowsStats() {
 
 	    HASH_FIND_INT(hostByJA3Found->ipToDNS_ht, &(all_flows[i].flow->dst_ip), innerElement);
 	    if(innerElement == NULL){
-	      ndpi_ip_dns *newInnerElement = malloc(sizeof(ndpi_ip_dns));
+	      ndpi_ip_dns *newInnerElement = ndpi_malloc(sizeof(ndpi_ip_dns));
 	      newInnerElement->ip = all_flows[i].flow->dst_ip;
 	      newInnerElement->ip_string = all_flows[i].flow->dst_name;
 	      newInnerElement->dns_name = all_flows[i].flow->ssh_tls.server_info;
@@ -2419,25 +2419,25 @@ static void printFlowsStats() {
 	  HASH_ITER(hh, ja3ByHost_element->host_client_info_hasht, info_of_element, tmp2) {
 	    if(ja3ByHost_element->host_client_info_hasht)
 	      HASH_DEL(ja3ByHost_element->host_client_info_hasht, info_of_element);
-	    free(info_of_element);
+	    ndpi_free(info_of_element);
 	  }
 	  HASH_ITER(hh, ja3ByHost_element->host_server_info_hasht, info_of_element, tmp2) {
 	    if(ja3ByHost_element->host_server_info_hasht)
 	      HASH_DEL(ja3ByHost_element->host_server_info_hasht, info_of_element);
-	    free(info_of_element);
+	    ndpi_free(info_of_element);
 	  }
 	  HASH_DEL(ja3ByHostsHashT, ja3ByHost_element);
-	  free(ja3ByHost_element);
+	  ndpi_free(ja3ByHost_element);
 	}
 
 	HASH_ITER(hh, hostByJA3C_ht, hostByJA3Element, tmp3) {
 	  HASH_ITER(hh, hostByJA3C_ht->ipToDNS_ht, innerHashEl, tmp4) {
 	    if(hostByJA3Element->ipToDNS_ht)
 	      HASH_DEL(hostByJA3Element->ipToDNS_ht, innerHashEl);
-	    free(innerHashEl);
+	    ndpi_free(innerHashEl);
 	  }
 	  HASH_DEL(hostByJA3C_ht, hostByJA3Element);
-	  free(hostByJA3Element);
+	  ndpi_free(hostByJA3Element);
 	}
 
 	hostByJA3Element = NULL;
@@ -2445,10 +2445,10 @@ static void printFlowsStats() {
 	  HASH_ITER(hh, hostByJA3S_ht->ipToDNS_ht, innerHashEl, tmp4) {
 	    if(hostByJA3Element->ipToDNS_ht)
 	      HASH_DEL(hostByJA3Element->ipToDNS_ht, innerHashEl);
-	    free(innerHashEl);
+	    ndpi_free(innerHashEl);
 	  }
 	  HASH_DEL(hostByJA3S_ht, hostByJA3Element);
-	  free(hostByJA3Element);
+	  ndpi_free(hostByJA3Element);
 	}
       }
     }
@@ -2568,7 +2568,7 @@ static void printFlowsStats() {
 	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
   }
 
-  free(all_flows);
+  ndpi_free(all_flows);
 }
 
 /* *********************************************** */
@@ -2941,7 +2941,7 @@ static void ndpi_process_packet(u_char *args,
   u_int16_t thread_id = *((u_int16_t*)args);
 
   /* allocate an exact size buffer to check overflows */
-  uint8_t *packet_checked = malloc(header->caplen);
+  uint8_t *packet_checked = ndpi_malloc(header->caplen);
 
   if(packet_checked == NULL){
     return ;
@@ -3051,7 +3051,7 @@ static void ndpi_process_packet(u_char *args,
      is called above by printResults()
   */
   if(packet_checked){
-    free(packet_checked);
+    ndpi_free(packet_checked);
     packet_checked = NULL;
   }
 }
@@ -3111,7 +3111,7 @@ void * processing_thread(void *_thread_id) {
       gettimeofday(&h.ts, NULL);
 
       ndpi_process_packet((u_char*)&thread_id, &h, (const u_char *)data);
-      rte_pktmbuf_free(bufs[i]);
+      rte_pktmbuf_ndpi_free(bufs[i]);
     }
   }
 #else
@@ -3697,13 +3697,13 @@ int orginal_main(int argc, char **argv) {
     for(i=0; i<num_loops; i++)
       test_lib();
 
-    if(results_path)  free(results_path);
+    if(results_path)  ndpi_free(results_path);
     if(results_file)  fclose(results_file);
     if(extcap_dumper) pcap_dump_close(extcap_dumper);
     if(extcap_fifo_h) pcap_close(extcap_fifo_h);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
     if(csv_fp)        fclose(csv_fp);
-    free(_debug_protocols);
+    ndpi_free(_debug_protocols);
 
     return 0;
   }
