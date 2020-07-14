@@ -39,25 +39,25 @@ struct netbios_header {
 
 /* The function below has been inherited by tcpdump */
 int ndpi_netbios_name_interpret(char *in, size_t inlen, char *out, u_int out_len) {
-  int ret = 0, len;
+  int ret = 0, len, idx = inlen;
   char *b;
 
   len = (*in++)/2;
   b  = out;
   *out = 0;
 
-  if(len > (out_len-1) || len < 1 || 2*len > inlen)
+  if((len > (out_len-1)) || (len < 1) || ((2*len) > inlen))
     return(-1);
 
-  while (len--) {
-    if(in[0] < 'A' || in[0] > 'P' || in[1] < 'A' || in[1] > 'P') {
+  while(len--) {
+    if((idx < 2) || (in[0] < 'A') || (in[0] > 'P') || (in[1] < 'A') || (in[1] > 'P')) {
       *out = 0;
       break;
     }
 
-    *out = ((in[0]-'A')<<4) + (in[1]-'A');
+    *out = ((in[0] - 'A') << 4) + (in[1] - 'A');
 
-    in += 2;
+    in += 2, idx -= 2;
 
     if(isprint(*out))
       out++, ret++;
