@@ -157,6 +157,32 @@ float ndpi_data_window_average(struct ndpi_analyze_struct *s) {
 
 /* ********************************************************************************* */
 
+/* Compute the variance only on the sliding window */
+float ndpi_data_window_variance(struct ndpi_analyze_struct *s) {
+  if(s->num_values_array_len) {
+    float   sum = 0.0, avg = ndpi_data_window_average(s);
+    u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
+
+    if(n == 0)
+      return(0);
+    
+    for(i=0; i<n; i++)
+      sum += pow(s->values[i]-avg, 2);
+
+    return((float)sum / (float)n);
+  } else
+    return(0);
+}
+
+/* ********************************************************************************* */
+
+/* Compute the variance only on the sliding window */
+float ndpi_data_window_stddev(struct ndpi_analyze_struct *s) {
+  return(sqrt(ndpi_data_window_variance(s)));
+}
+
+  /* ********************************************************************************* */
+
 /*
   Compute entropy on the last sliding window values
 */

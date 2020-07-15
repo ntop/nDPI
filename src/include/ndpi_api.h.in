@@ -1030,9 +1030,13 @@ extern "C" {
   void ndpi_free_data_analysis(struct ndpi_analyze_struct *d);
   void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value);
 
-  float ndpi_data_average(struct ndpi_analyze_struct *s);
+  /* Sliding-window only */
   float ndpi_data_window_average(struct ndpi_analyze_struct *s);
+  float ndpi_data_window_variance(struct ndpi_analyze_struct *s);
+  float ndpi_data_window_stddev(struct ndpi_analyze_struct *s);
 
+  /* All data */
+  float ndpi_data_average(struct ndpi_analyze_struct *s);
   float ndpi_data_entropy(struct ndpi_analyze_struct *s);
   float ndpi_data_variance(struct ndpi_analyze_struct *s);
   float ndpi_data_stddev(struct ndpi_analyze_struct *s);
