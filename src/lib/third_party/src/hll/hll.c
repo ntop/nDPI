@@ -67,6 +67,10 @@ void hll_destroy(struct ndpi_hll *hll) {
   hll->registers = NULL;
 }
 
+void hll_reset(struct ndpi_hll *hll) {
+  memset(hll->registers, 0, hll->size);
+}
+
 static __inline void _hll_add_hash(struct ndpi_hll *hll, u_int32_t hash) {
   u_int32_t index = hash >> (32 - hll->bits);
   u_int8_t rank = _hll_rank(hash, hll->bits);

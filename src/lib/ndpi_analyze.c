@@ -144,6 +144,9 @@ float ndpi_data_window_average(struct ndpi_analyze_struct *s) {
     float   sum = 0.0;
     u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
 
+    if(n == 0)
+      return(0);
+    
     for(i=0; i<n; i++)
       sum += s->values[i];
 
@@ -226,6 +229,10 @@ int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits) {
 
 void ndpi_hll_destroy(struct ndpi_hll *hll) {
   hll_destroy(hll);
+}
+
+void ndpi_hll_reset(struct ndpi_hll *hll) {
+  hll_reset(hll);
 }
 
 void ndpi_hll_add(struct ndpi_hll *hll, const char *data, size_t data_len) {

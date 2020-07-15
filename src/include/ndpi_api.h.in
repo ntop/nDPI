@@ -1059,7 +1059,8 @@ extern "C" {
   /* Memory lifecycle */
   int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits);
   void ndpi_hll_destroy(struct ndpi_hll *hll);
-
+  void ndpi_hll_reset(struct ndpi_hll *hll);
+  
   /* Add values */
   void ndpi_hll_add(struct ndpi_hll *hll, const char *data, size_t data_len);
   void ndpi_hll_add_number(struct ndpi_hll *hll, u_int32_t value) ;
