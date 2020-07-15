@@ -124,17 +124,16 @@ matrix:
         - MATRIX_EVAL="CC=clang-7"
 
     - name: fuzza
-      env: QA_FUZZ=asan CC=clang-7 CXX=clang++-7 && ASAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
+      env: QA_FUZZ=asan CC=clang-9 CXX=clang++-9 && ASAN_SYMBOLIZER_PATH=/usr/bin/asan_symbolize-9
       os: linux
-      compiler: clang-7
-      dist: xential
+      compiler: clang-9
+      dist: bionic
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-7
           packages:
-            - clang-7
+            - clang-9
             - libpcap-dev
             - autogen
     - name: fuzzm
