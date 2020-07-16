@@ -85,12 +85,6 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
 	ndpi_int_xbox_add_connection(ndpi_struct, flow);
 	NDPI_LOG_INFO(ndpi_struct, "found xbox udp port connection detected\n");
 	return;
-    }else if(dport == 3544 || sport == 3544)
-    {
-        ndpi_int_xbox_add_connection(ndpi_struct, flow);
-        NDPI_LOG_INFO(ndpi_struct, "found xbox udp port connection detected\n");
-        NDPI_LOG_DBG(ndpi_struct, "%s %d \n", __FUNCTION__, __LINE__);
-        return;
     }
 
     /* exclude here all non matched udp traffic, exclude here tcp only if http has been excluded, because xbox could use http */
