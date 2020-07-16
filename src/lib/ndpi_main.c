@@ -100,16 +100,13 @@ void *ndpi_calloc(unsigned long count, size_t size) {
 /* ****************************************** */
 
 void ndpi_free(void *ptr) {
-  if(_ndpi_free){
-    if(ptr){
-      _ndpi_free(ptr);
-    }
-  }else{
-    if(ptr){
-      free(ptr);
-    }
-  }
-    
+  if(_ndpi_free) {
+    if(ptr)
+      _ndpi_free(ptr);    
+  } else {
+    if(ptr)
+      free(ptr);    
+  }  
 }
 
 /* ****************************************** */
