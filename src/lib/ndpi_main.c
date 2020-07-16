@@ -100,10 +100,16 @@ void *ndpi_calloc(unsigned long count, size_t size) {
 /* ****************************************** */
 
 void ndpi_free(void *ptr) {
-  if(_ndpi_free)
-    _ndpi_free(ptr);
-  else
-    free(ptr);
+  if(_ndpi_free){
+    if(ptr){
+      _ndpi_free(ptr);
+    }
+  }else{
+    if(ptr){
+      free(ptr);
+    }
+  }
+    
 }
 
 /* ****************************************** */
@@ -812,7 +818,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TEREDO, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Teredo", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 3544, 0, 0, 0, 0) /* UDP */);
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(
 			  ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WECHAT, 0 /* can_have_a_subprotocol */, no_master, /* wechat.com */
 			  no_master, "WeChat", NDPI_PROTOCOL_CATEGORY_CHAT, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -870,7 +876,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX, 0 /* can_have_a_subprotocol */, no_master,
 			  no_master, "Xbox", NDPI_PROTOCOL_CATEGORY_GAME,
 			  ndpi_build_default_ports(ports_a, 3074, 3076, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 3074, 3076, 500, 3544, 4500) /* UDP */);
+			  ndpi_build_default_ports(ports_b, 3074, 3076, 500, 4500, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PLAYSTATION, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Playstation", NDPI_PROTOCOL_CATEGORY_GAME,
 			  ndpi_build_default_ports(ports_a, 1935, 3478, 3479, 3480, 0) /* TCP */,
@@ -4928,7 +4934,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
   packet->line[packet->parsed_lines].len = 0;
 
   for (a = 0; ((a+1) < packet->payload_packet_len) && (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
-    if(((a + 1) < packet->payload_packet_len) &&(packet->payload[a] == 0x0d) && (packet->payload[a+1] == 0x0a)) {
+    if((packet->payload[a] == 0x0d) && (packet->payload[a+1] == 0x0a)) {
       /* If end of line char sequence CR+NL "\r\n", process line */
 
       if(((a + 3) < packet->payload_packet_len)
