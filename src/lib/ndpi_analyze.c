@@ -112,6 +112,16 @@ float ndpi_data_average(struct ndpi_analyze_struct *s) {
 
 /* ********************************************************************************* */
 
+u_int32_t ndpi_data_last(struct ndpi_analyze_struct *s) {
+  if((s->num_data_entries == 0) || (s->sum_total == 0))
+    return(0);
+  
+  if(s->next_value_insert_index == 0)
+    return(s->values[s->num_values_array_len-1]);
+  else
+    return(s->values[s->next_value_insert_index-1]);  
+}
+
 /* Return min/max on all values */
 u_int32_t ndpi_data_min(struct ndpi_analyze_struct *s) { return(s->min_val); }
 u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s->max_val); }
