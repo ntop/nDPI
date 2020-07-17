@@ -922,7 +922,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       for(i=0; i<extension_len; ) {
 	u_int16_t extension_id, extension_len;
 
-	if(offset >= (packet->payload_packet_len+4)) break;
+	if((offset+4) > packet->payload_packet_len) break;
 
 	extension_id  = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+2]));
