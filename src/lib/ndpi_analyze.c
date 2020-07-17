@@ -75,6 +75,14 @@ void ndpi_free_data_analysis(struct ndpi_analyze_struct *d) {
 
 /* ********************************************************************************* */
 
+void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
+  memset(d, 0, sizeof(struct ndpi_analyze_struct));
+  memset(d->values, 0, sizeof(u_int32_t)*d->num_values_array_len);
+  d->num_data_entries = 0;  
+}
+
+/* ********************************************************************************* */
+
 /*
   Add a new point to analyze
  */
