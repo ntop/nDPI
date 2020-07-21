@@ -29,6 +29,8 @@
 #include "ndpi_api.h"
 #include "ndpi_md5.h"
 
+#include <string.h>
+
 /*
   HASSH - https://github.com/salesforce/hassh
 
@@ -60,17 +62,102 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
   
 /* ************************************************************************ */
 
+static int ssh_has_old_signature(char *signature) {
+  int is_old = 0;
+  int i = 0;
+
+  char *old_versions[46] = {
+    "OpenSSH_1.2.2",
+    "OpenSSH_2.5.1",
+    "OpenSSH_2.9.9",
+    "OpenSSH_3.0",
+    "OpenSSH_3.4",
+    "OpenSSH_3.5",
+    "OpenSSH_3.6",
+    "OpenSSH_3.6.1",
+    "OpenSSH_3.7",
+    "OpenSSH_3.7.1",
+    "OpenSSH_3.8",
+    "OpenSSH_3.9",
+    "OpenSSH_4.0",
+    "OpenSSH_4.1",
+    "OpenSSH_4.2",
+    "OpenSSH_4.3",
+    "OpenSSH_4.4",
+    "OpenSSH_4.5",
+    "OpenSSH_4.6",
+    "OpenSSH_4.7",
+    "OpenSSH_4.9",
+    "OpenSSH_5.0",
+    "OpenSSH_5.1",
+    "OpenSSH_5.2",
+    "OpenSSH_5.3",
+    "OpenSSH_5.4",
+    "OpenSSH_5.5",
+    "OpenSSH_5.6",
+    "OpenSSH_5.7",
+    "OpenSSH_5.8",
+    "OpenSSH_5.9",
+    "OpenSSH_6.0",
+    "OpenSSH_6.1",
+    "OpenSSH_6.2",
+    "OpenSSH_6.3",
+    "OpenSSH_6.4",
+    "OpenSSH_6.5",
+    "OpenSSH_6.6",
+    "OpenSSH_6.7",
+    "OpenSSH_6.8",
+    "OpenSSH_6.9",
+    "OpenSSH_7.0",
+    "OpenSSH_7.1",
+    "OpenSSH_7.3",
+    "OpenSSH_7.4",
+    "OpenSSH_7.5"
+  };
+
+  while (i < 46 && !is_old) {
+    if (strstr(old_versions[i], signature) != NULL)
+      is_old = 1;
+
+    i++;
+  }
+
+  return is_old;
+}
+
+/* ************************************************************************ */
+
 static void ssh_analyse_signature_version(struct ndpi_detection_module_struct *ndpi_struct,
 					  struct ndpi_flow_struct *flow,
 					  char *str_to_check,
 					  u_int8_t is_client_signature) {
 
+  if (str_to_check == NULL) return;
   
-  /*
+  char *copy = (char*)malloc(sizeof(char)*strlen(str_to_check));
+  char *rest;
+  char *signature;
+  int obsolete_ssh_version;
+
+  strcpy(copy, str_to_check);
+
+  strtok_r(copy, "-", &rest); // SSH
+  strtok_r(NULL, "-", &rest); // 2.0
+  
+  // OpenSSH_X.X
+  signature = strtok_r(NULL, "-", &rest);
+
+  if (signature == NULL) return;
+
+  obsolete_ssh_version = ssh_has_old_signature(signature);
+
+  #ifdef SSH_DEBUG
+    if(obsolete_ssh_version)
+      printf("[SSH] %s: obsolete signature\n", signature);
+  #endif
+  
   if(obsolete_ssh_version)
     NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE : NDPI_SSH_OBSOLETE_SERVER_SIGNATURE);
-  */
-  
 }
   
 /* ************************************************************************ */
