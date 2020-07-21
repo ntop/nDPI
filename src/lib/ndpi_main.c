@@ -6636,6 +6636,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	num_bigram_checks++;
 
+#ifdef DGA_DEBUG
+	printf("-> Checking %c%c\n", word[i], word[i+1]);
+#endif
+
 	if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
 	  num_found++;
 	} else {
