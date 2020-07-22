@@ -60,6 +60,21 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
   
 /* ************************************************************************ */
 
+static void ssh_analyse_signature_version(struct ndpi_detection_module_struct *ndpi_struct,
+					  struct ndpi_flow_struct *flow,
+					  char *str_to_check,
+					  u_int8_t is_client_signature) {
+
+  
+  /*
+  if(obsolete_ssh_version)
+    NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE : NDPI_SSH_OBSOLETE_SERVER_SIGNATURE);
+  */
+  
+}
+  
+/* ************************************************************************ */
+
 static int search_ssh_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   ndpi_search_ssh_tcp(ndpi_struct, flow);
 
@@ -287,6 +302,8 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
       strncpy(flow->protos.ssh.client_signature, (const char *)packet->payload, len);
       flow->protos.ssh.client_signature[len] = '\0';
       ndpi_ssh_zap_cr(flow->protos.ssh.client_signature, len);
+
+      ssh_analyse_signature_version(ndpi_struct, flow, flow->protos.ssh.client_signature, 1);
       
 #ifdef SSH_DEBUG
       printf("[SSH] [client_signature: %s]\n", flow->protos.ssh.client_signature);
@@ -305,6 +322,8 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
       strncpy(flow->protos.ssh.server_signature, (const char *)packet->payload, len);
       flow->protos.ssh.server_signature[len] = '\0';
       ndpi_ssh_zap_cr(flow->protos.ssh.server_signature, len);
+
+      ssh_analyse_signature_version(ndpi_struct, flow, flow->protos.ssh.server_signature, 0);
       
 #ifdef SSH_DEBUG
       printf("[SSH] [server_signature: %s]\n", flow->protos.ssh.server_signature);

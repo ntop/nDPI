@@ -9271,7 +9271,7 @@ static const char *ndpi_en_bigrams[] = {
   "ru", "su", "tu", "uu", "vu", "wu", "xu", "yu", "zu", "av", "bv", "dv", "ev", "iv", "lv", "mv", "nv",
   "ov", "rv", "sv", "tv", "uv", "vv", "zv", "aw", "bw", "dw", "ew", "fw", "gw", "hw", "iw", "kw", "lw",
   "mw", "nw", "ow", "pw", "rw", "sw", "tw", "uw", "ww", "xw", "yw", "zw", "ax", "ex", "ix", "nx", "ox",
-  "rx", "ux", "xx", "yx", "ay", "by", "cy", "dy", "ey", "fy", "gy", "hy", "ky", "ly", "my", "ny", "oy",
+  "rx", "ux", /* "xx", */ "yx", "ay", "by", "cy", "dy", "ey", "fy", "gy", "hy", "ky", "ly", "my", "ny", "oy",
   "py", "ry", "sy", "ty", "uy", "vy", "wy", "xy", "yy", "zy", "az", "bz", "cz", "dz", "ez", "gz", "iz",
   "lz", "nz", "oz", "pz", "rz", "tz", "uz", "zz",
   NULL };
@@ -9331,7 +9331,7 @@ static const char *ndpi_en_impossible_bigrams[] = {
   "qg", "qh", "qj", "qk", "ql", "qm", "qn", "qo", "qp", "qr", "qs", "qt", "qv", "qw", "qx", "qy", "uu",
   "qz", "sx", "sz", "tq", "tx", "vb", "vc", "vd", "vf", "vg", "vh", "vj", "vm", "vn", /* "vp", Removed for vpbank.com */ "bw", /* "vk", "zr" Removed for kavkazr */
   "vq", "vt", "vw", "vx", "vz", "wq", "wv", "wx", "wz", /* "xb", foxbusiness.com */
-  	"xg", "xj", "xk", "xv", "xz", "xw", "yd", /*"yp", Removed for paypal */
+  "xg", "xj", "xk", "xv", "xz", "xw", "yd", /*"yp", Removed for paypal */
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zs", "zx", "wh", "wk",
-  "wb", "zk", "kp", "zk", "xy",
+  "wb", "zk", "kp", "zk", "xy", "xx",
   NULL };
