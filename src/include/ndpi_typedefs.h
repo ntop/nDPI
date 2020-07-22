@@ -1172,7 +1172,7 @@ struct ndpi_flow_struct {
   u_char host_server_name[240];
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
   u_int8_t risk_checked;
-  u_int32_t risk; /* Issues found with this flow [bitmask of ndpi_risk] */
+  ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
   
   /*
     This structure below will not not stay inside the protos

@@ -92,6 +92,7 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
       if (patch < PATCH_CUTOFF) obsolete_ssh_version = 1;
   }
   
+<<<<<<< HEAD
   if (obsolete_ssh_version) {
       #ifdef SSH_DEBUG
         printf("[SSH] [SSH Version: %d.%d.%d]\n", major, minor, patch);
@@ -99,6 +100,40 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
 
       NDPI_SET_BIT(flow->risk, (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER));
   }
+||||||| f83d0b18
+  /*
+  if(obsolete_ssh_version)
+    NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE : NDPI_SSH_OBSOLETE_SERVER_SIGNATURE);
+  */
+  
+=======
+  /*
+  if(obsolete_ssh_version)
+    NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE : NDPI_SSH_OBSOLETE_SERVER_SIGNATURE);
+  */
+}
+  
+/* ************************************************************************ */
+
+static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
+			       struct ndpi_flow_struct *flow,
+			       char *cipher, u_int cipher_len,
+			       u_int8_t is_client_signature) {
+  /*
+    List of obsolete ciphers can be found at
+    https://www.linuxminion.com/deprecated-ssh-cryptographic-settings/
+  */
+#ifdef SSH_DEBUG
+  u_int i;
+  
+  printf("[%s] ", is_client_signature ? "CLIENT" : "SERVER");
+
+  for(i=0; i<cipher_len; i++)
+    printf("%c", cipher[i]);
+
+  printf("\n");
+#endif
+>>>>>>> ntop_origin/dev
 }
   
 /* ************************************************************************ */
@@ -136,7 +171,9 @@ static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
 
 /* ************************************************************************ */
 
-static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
+static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow,
+				    struct ndpi_packet_struct *packet,
 				    char *buf, u_int8_t client_hash) {
   u_int32_t offset = 22, len, buf_out_len = 0, max_payload_len = packet->payload_packet_len-sizeof(u_int32_t);
   const u_int32_t len_max = 65565;
@@ -178,6 +215,7 @@ static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
+    ssh_analyse_cipher(ndpi_struct, flow, (char*)&packet->payload[offset], len, 1 /* client */);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
   }
@@ -198,6 +236,7 @@ static u_int16_t concat_hash_string(struct ndpi_packet_struct *packet,
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
+    ssh_analyse_cipher(ndpi_struct, flow, (char*)&packet->payload[offset], len, 0 /* server */);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
   }
@@ -383,7 +422,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	if(packet->packet_direction == 0 /* client */) {
 	  u_char fingerprint_client[16];
 
-	  len = concat_hash_string(packet, hassh_buf, 1 /* client */);
+	  len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 1 /* client */);
 
 	  ndpi_MD5Init(&ctx);
 	  ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);
@@ -401,7 +440,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	} else {
 	  u_char fingerprint_server[16];
 
-	  len = concat_hash_string(packet, hassh_buf, 0 /* server */);
+	  len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 0 /* server */);
 
 	  ndpi_MD5Init(&ctx);
 	  ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);
