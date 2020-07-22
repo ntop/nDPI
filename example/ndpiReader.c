@@ -2513,7 +2513,12 @@ static void printFlowsStats() {
 		     ntohs(all_flows[i].flow->dst_port));
 
 	      print_bin(out, NULL, &bins[i]);
-	      printf("][score: %f]\n", ndpi_bin_similarity(&centroids[j], &bins[i], 0));
+	      printf("][score: %f]", ndpi_bin_similarity(&centroids[j], &bins[i], 0));
+
+	      if(all_flows[i].flow->ssh_tls.client_requested_server_name[0] != '\0')
+		fprintf(out, "[%s]", all_flows[i].flow->ssh_tls.client_requested_server_name);
+	      
+	      printf("\n");
 	      num_printed++;
 	    }
 
