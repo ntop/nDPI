@@ -25,7 +25,9 @@
 #include "ndpi_protocol_ids.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SSH
-#define VERSION_CUTOFF 7.0
+#define MAJOR_CUTOFF 7
+#define MINOR_CUTOFF 0
+#define PATCH_CUTOFF 0
 
 #include "ndpi_api.h"
 #include "ndpi_md5.h"
@@ -70,18 +72,29 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
 
   if (str_to_check == NULL) return;
 
-  float version = 0.0;
+  int major = 0;
+  int minor = 0;
+  int patch = 0;
   int obsolete_ssh_version = 0;
 
-  sscanf(str_to_check, "SSH-%*f-OpenSSH_%f.%*s", &version);
+  if (sscanf(str_to_check, "SSH-%*f-OpenSSH_%d.%d.%d", &major, &minor, &patch) < 0) 
+    return;
 
-  if (version == 0.0) return;
+  if ((major || minor || patch) == 0) return;
 
-  obsolete_ssh_version = version < VERSION_CUTOFF;
+  /* checking if is an old version */ 
+  if (major < MAJOR_CUTOFF) obsolete_ssh_version = 1;
+
+  else if (major == MAJOR_CUTOFF) {   
+    if (minor < MINOR_CUTOFF) obsolete_ssh_version = 1;
+    
+    else if (minor == MINOR_CUTOFF)
+      if (patch < PATCH_CUTOFF) obsolete_ssh_version = 1;
+  }
   
   if (obsolete_ssh_version) {
       #ifdef SSH_DEBUG
-        printf("[SSH] [SSH Version: %.1f]\n", version);
+        printf("[SSH] [SSH Version: %d.%d.%d]\n", major, minor, patch);
       #endif
 
       NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER);
