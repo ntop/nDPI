@@ -2509,7 +2509,7 @@ static void printFlowsStats() {
 					all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
 		     all_flows[i].flow->src_name,
 		     ntohs(all_flows[i].flow->src_port),
-		     all_flows[i].flow->src_name,
+		     all_flows[i].flow->dst_name,
 		     ntohs(all_flows[i].flow->dst_port));
 
 	      print_bin(out, NULL, &bins[i]);
