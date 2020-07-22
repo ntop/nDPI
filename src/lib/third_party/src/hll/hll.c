@@ -47,6 +47,26 @@ static __inline u_int8_t _hll_rank(u_int32_t hash, u_int8_t bits) {
   return i;
 }
 
+/*
+  IMPORTANT: memory usage notes
+  
+  [i: 4] 16 bytes
+  [i: 5] 32 bytes
+  [i: 6] 64 bytes
+  [i: 7] 128 bytes
+  [i: 8] 256 bytes
+  [i: 9] 512 bytes
+  [i: 10] 1024 bytes
+  [i: 11] 2048 bytes
+  [i: 12] 4096 bytes
+  [i: 13] 8192 bytes
+  [i: 14] 16384 bytes
+  [i: 15] 32768 bytes
+  [i: 16] 65536 bytes
+  [i: 17] 131072 bytes
+  [i: 18] 262144 bytes
+  [i: 19] 524288 bytes
+*/
 int hll_init(struct ndpi_hll *hll, u_int8_t bits) {
   if(bits < 4 || bits > 20) {
     errno = ERANGE;
