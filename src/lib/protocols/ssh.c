@@ -59,7 +59,7 @@
   that usually is packet 14
 */
 
-#define SSH_DEBUG 1
+/* #define SSH_DEBUG 1 */
 
 static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
@@ -77,7 +77,7 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
   int patch = 0;
   int obsolete_ssh_version = 0;
 
-  if (sscanf(str_to_check, "SSH-%*f-OpenSSH_%d.%d.%d", &major, &minor, &patch) < 0) 
+  if (sscanf(str_to_check, "SSH-%*f-OpenSSH_%d.%d.%d", &major, &minor, &patch) != 3) 
     return;
 
   if ((major || minor || patch) == 0) return;
@@ -92,7 +92,6 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
       if (patch < PATCH_CUTOFF) obsolete_ssh_version = 1;
   }
   
-<<<<<<< HEAD
   if (obsolete_ssh_version) {
       #ifdef SSH_DEBUG
         printf("[SSH] [SSH Version: %d.%d.%d]\n", major, minor, patch);
@@ -100,42 +99,58 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
 
       NDPI_SET_BIT(flow->risk, (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER));
   }
-||||||| f83d0b18
-  /*
-  if(obsolete_ssh_version)
-    NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE : NDPI_SSH_OBSOLETE_SERVER_SIGNATURE);
-  */
-  
-=======
-  /*
-  if(obsolete_ssh_version)
-    NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE : NDPI_SSH_OBSOLETE_SERVER_SIGNATURE);
-  */
 }
   
 /* ************************************************************************ */
 
 static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow,
-			       char *cipher, u_int cipher_len,
+			       char *ciphers, u_int cipher_len,
 			       u_int8_t is_client_signature) {
-  /*
-    List of obsolete ciphers can be found at
-    https://www.linuxminion.com/deprecated-ssh-cryptographic-settings/
-  */
-#ifdef SSH_DEBUG
-  u_int i;
-  
-  printf("[%s] ", is_client_signature ? "CLIENT" : "SERVER");
 
-  for(i=0; i<cipher_len; i++)
-    printf("%c", cipher[i]);
+  char *rem;
+  char *cipher;
+  int found_obsolete_cipher = 0;
 
-  printf("\n");
-#endif
->>>>>>> ntop_origin/dev
+  char *obsolete_ciphers[6] = {
+    "arcfour256",
+    "arcfour128",
+    "3des-cbc",
+    "blowfish-cbc",
+    "cast128-cbc",
+    "arcfour",
+  };
+
+  char *copy = (char*)ndpi_calloc(cipher_len, sizeof(char));
+
+  if (strncpy(copy, ciphers, cipher_len) == NULL) 
+    return;
+
+  cipher = strtok_r(copy, ",", &rem);
+
+  while (cipher && !found_obsolete_cipher) {
+
+    for (int i = 0; i < 6; i++) {
+      if (strcmp(cipher, obsolete_ciphers[i]) == 0) {
+        found_obsolete_cipher = 1;
+        break;
+      }
+    }
+
+    cipher = strtok_r(NULL, ",", &rem);
+  }
+
+  if (found_obsolete_cipher) {
+    #ifdef SSH_DEBUG
+      printf("[SSH] [SSH obsolete cipher]\n");
+    #endif
+
+    NDPI_SET_BIT(flow->risk, (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER));
+  }
+
+  ndpi_free(copy);
 }
-  
+
 /* ************************************************************************ */
 
 static int search_ssh_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
