@@ -1525,10 +1525,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Malformed packet");
 
   case NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE:
-    return("SSH obsolete client signature");
+    return("SSH Obsolete Client Signature");
 
   case NDPI_SSH_OBSOLETE_SERVER_SIGNATURE:
-    return("SSH obsolete server signature");
+    return("SSH Obsolete Server Signature");
 
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
