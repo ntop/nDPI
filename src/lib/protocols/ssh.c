@@ -25,7 +25,7 @@
 #include "ndpi_protocol_ids.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SSH
-#define VERSION_CUTOFF 7
+#define VERSION_CUTOFF 7.0
 
 #include "ndpi_api.h"
 #include "ndpi_md5.h"
@@ -57,7 +57,7 @@
   that usually is packet 14
 */
 
-/* #define SSH_DEBUG 1 */
+#define SSH_DEBUG 1
 
 static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
@@ -70,52 +70,22 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
 
   if (str_to_check == NULL) return;
 
-  char *rem;
-  char *signature;
-  char *version;
-  int major_number;
-
-  char *copy = (char*)ndpi_malloc(sizeof(char)*(strlen(str_to_check)+1));
+  float version = 0.0;
   int obsolete_ssh_version = 0;
 
-  /*
-    string example: SSH-2.0-OpenSSH_5.3
-  */
-  strcpy(copy, str_to_check);
+  sscanf(str_to_check, "SSH-%*f-OpenSSH_%f.%*s", &version);
 
-  /* SSH */
-  strtok_r(copy, "-", &rem);
+  if (version == 0.0) return;
 
-  /* 2.0 */
-  strtok_r(NULL, "-", &rem);
+  obsolete_ssh_version = version < VERSION_CUTOFF;
   
-  /* signature = OpenSSH_5.3 */
-  signature = strtok_r(NULL, "-", &rem);
-  
-  /* OpenSSH */
-  strtok_r(signature, "_", &rem);
+  if (obsolete_ssh_version) {
+      #ifdef SSH_DEBUG
+        printf("[SSH] [SSH Version: %.1f]\n", version);
+      #endif
 
-  /* version = 5.3 */
-  version = strtok_r(NULL, "_", &rem);
-
-  if (version == NULL) return;
-
-  /* major_number = 5 */
-  major_number = atoi(strtok_r(version, ".", &rem));
-
-  if (major_number < VERSION_CUTOFF) {
-    obsolete_ssh_version = 1;
+      NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER);
   }
-
-  #ifdef SSH_DEBUG
-    if(obsolete_ssh_version)
-      printf("[SSH] Obsolete signature\n");
-  #endif
-  
-  if(obsolete_ssh_version)
-    NDPI_SET_BIT(flow->risk, is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_SIGNATURE : NDPI_SSH_OBSOLETE_SERVER_SIGNATURE);
-
-  ndpi_free(copy);
 }
   
 /* ************************************************************************ */
