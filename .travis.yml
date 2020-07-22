@@ -120,7 +120,7 @@ matrix:
         - MATRIX_EVAL="CC=clang-7"
 
     - name: fuzza
-      env: CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" LDFLAGS="-g3 -O0" QA_FUZZ=asan CC=clang-7 && ASAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
+      env: CXXFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=address" QA_FUZZ=asan CC=clang-7 && CXX=clang++-7 ASAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
       os: linux
       compiler: clang-7
       addons:
@@ -133,7 +133,7 @@ matrix:
             - libpcap-dev
             - autogen
     - name: fuzzm
-      env: CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=memory" QA_FUZZ=msan CC=clang-7 && MSAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
+      env: CXXFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=memory" QA_FUZZ=msan CC=clang-7 && CXX=clang++-7 MSAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
       os: linux
       compiler: clang-7
       addons:
@@ -146,7 +146,7 @@ matrix:
             - libpcap-dev
             - autogen
     - name: fuzzu
-      env: CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" LDFLAGS="-g3 -O0" QA_FUZZ=ubsan CC=clang-7
+      env: CXXFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link" CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=undefined" QA_FUZZ=ubsan CC=clang-7 && CXX=clang++-7
       os: linux
       compiler: clang-7
       addons:
@@ -168,7 +168,7 @@ before_script:
 #  - lcov --directory . --zerocounters
 
 script:
-  - if [ -n "$QA_FUZZ" -a "$QA_FUZZ" != "msan" ]; then ./configure --enable-fuzztargets ; else ./configure ; fi
+  - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else ./configure ; fi
   - make
 
 #after_script:
