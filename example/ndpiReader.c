@@ -2503,8 +2503,8 @@ static void printFlowsStats() {
 		printf("]\n");
 	      }
 
-	      printf("\t%-10s\t%s:%u <-> %s:%u\t[",
-		     // cluster_ids[i],
+	      printf("\t%u\t%-10s\t%s:%u <-> %s:%u\t[",
+		     i,
 		     ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
 					all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
 		     all_flows[i].flow->src_name,
@@ -2513,7 +2513,7 @@ static void printFlowsStats() {
 		     ntohs(all_flows[i].flow->dst_port));
 
 	      print_bin(out, NULL, &bins[i]);
-	      printf("][score: %f]", ndpi_bin_similarity(&centroids[j], &bins[i], 0));
+	      printf("][similarity: %f]", ndpi_bin_similarity(&centroids[j], &bins[i], 0));
 
 	      if(all_flows[i].flow->ssh_tls.client_requested_server_name[0] != '\0')
 		fprintf(out, "[%s]", all_flows[i].flow->ssh_tls.client_requested_server_name);

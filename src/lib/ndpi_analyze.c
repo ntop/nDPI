@@ -583,8 +583,11 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t nor
     for(i=0; i<b1->num_bins; i++) {
       u_int32_t a = ndpi_get_bin_value(b1, i);
       u_int32_t b = ndpi_get_bin_value(b2, i);
+      u_int32_t diff = (a > b) ? (a - b) : (b - a);
+      
+      if(a != b) sum += pow(diff, 2);
 
-      sum += pow(a-b, 2);
+      // printf("[a: %u][b: %u][sum: %u]\n", a, b, sum);
     }
 
     /* The lower the more similar */
@@ -614,7 +617,9 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   char out_buf[256];
   float *bin_score;
   u_int16_t num_cluster_elems[MAX_NUM_CLUSTERS] = { 0 };
-  
+
+  srand(time(NULL));
+
   if(num_clusters > num_bins)         num_clusters = num_bins;
   if(num_clusters > MAX_NUM_CLUSTERS) num_clusters = MAX_NUM_CLUSTERS;
 
@@ -623,7 +628,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
   if((bin_score = (float*)ndpi_calloc(num_bins, sizeof(float))) == NULL)
     return(-2);
-  
+
   if(centroids == NULL) {
     alloc_centroids = 1;
 
@@ -640,44 +645,16 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   memset(cluster_ids, 0, sizeof(u_int16_t) * num_bins);
 
   /* Randomly pick a cluster id */
-  for(i=0; i<num_clusters; i++) {
-    cluster_ids[i] = i;
-
-    if(verbose)
-      printf("Initializing cluster %u: %s\n", i,
-	     ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
-
-    num_cluster_elems[i]++;
-  }
-
-  /* Assign the remaining bins to the nearest cluster */
-  for(i=num_clusters; i<num_bins; i++) {
-    u_int16_t j;
-    float best_similarity;
-    u_int8_t cluster_id = 0;
-
-#ifdef COSINE_SIMILARITY
-    best_similarity = -1;
-#else
-    best_similarity = 99999999999;
-#endif
-
-    for(j=0; j<num_clusters; j++) {
-      float similarity = ndpi_bin_similarity(&bins[i], &bins[j], 0);
-
-#ifdef COSINE_SIMILARITY
-      if(similarity > best_similarity)
-#else
-	if(similarity < best_similarity)
-#endif
-	cluster_id = j, best_similarity = similarity;
-    }
-
-    if(verbose)
-      printf("Assigned bin to cluster %u: %s [score: %f]\n", cluster_id,
-	     ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)), best_similarity);
+  for(i=0; i<num_bins; i++) {
+    u_int cluster_id = rand() % num_clusters;
 
     cluster_ids[i] = cluster_id;
+
+    if(verbose)
+      printf("Initializing cluster %u for bin %u: %s\n",
+	     cluster_id, i,
+	     ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
+
     num_cluster_elems[cluster_id]++;
   }
 
@@ -685,16 +662,17 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
   /* Now let's try to find a better arrangement */
   while(num_iterations++ < max_iterations) {
-    /* Find the center of each cluster */
-    memset(bin_score, 0, num_bins*sizeof(float));  
+
+    /* Compute the centroids for each cluster */
+    memset(bin_score, 0, num_bins*sizeof(float));
 
     if(verbose) {
       printf("\nIteration %u\n", num_iterations);
-      
+
       for(j=0; j<num_clusters; j++)
 	printf("Cluster %u: %u bins\n", j, num_cluster_elems[j]);
     }
-    
+
     for(i=0; i<num_clusters; i++)
       ndpi_reset_bin(&centroids[i]);
 
@@ -717,8 +695,12 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
     for(i=0; i<num_bins; i++) {
       u_int16_t j;
-      float best_similarity;
+      float best_similarity, current_similarity = 0;
       u_int8_t cluster_id = 0;
+
+      if(verbose)
+	printf("Analysing bin %u [cluster: %u]\n",
+	       i, cluster_ids[i]);
 
 #ifdef COSINE_SIMILARITY
       best_similarity = -1;
@@ -733,6 +715,9 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
 	similarity = ndpi_bin_similarity(&bins[i], &centroids[j], 0);
 
+	if(j == cluster_ids[i])
+	  current_similarity = similarity;
+	
 	if(verbose)
 	  printf("Bin %u / centroid %u [similarity: %f]\n", i, j, similarity);
 
@@ -747,9 +732,17 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 #endif
       }
 
-      bin_score[i] = best_similarity;
+      if((best_similarity == current_similarity) && (num_cluster_elems[cluster_ids[i]] > 1)) {
+	/*
+          In case of identical similarity let's leave things as they are
+          this unless this is a cluster with only one element
+	*/
+	cluster_id = cluster_ids[i];
+      }
       
-      if(/* (best_similarity > 0) && */ (cluster_ids[i] != cluster_id)) {
+      bin_score[i] = best_similarity;
+
+      if(cluster_ids[i] != cluster_id) {
 	if(verbose)
 	  printf("Moved bin %u from cluster %u -> %u [similarity: %f]\n",
 		 i, cluster_ids[i], cluster_id, best_similarity);
@@ -770,14 +763,15 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 	printf("Cluster %u: %u bins\n", j, num_cluster_elems[j]);
     }
 
+#if 0
     for(j=0; j<num_clusters; j++) {
       if(num_cluster_elems[j] == 0) {
 	u_int16_t candidate;
 	float score;
-	
+
 	if(verbose)
 	  printf("\nCluster %u is empty: need to rebalance\n", j);
-		 
+
 #ifdef COSINE_SIMILARITY
 	score = 99999999999;
 
@@ -787,13 +781,13 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 	}
 #else
 	score = 0;
-	
+
 	for(i=0; i<num_bins; i++) {
 	  if((cluster_ids[i] != j) && (bin_score[i] > score) && (num_cluster_elems[cluster_ids[i]] > 1))
-	    score = bin_score[i], candidate = i;	 
+	    score = bin_score[i], candidate = i;
 	}
 #endif
-	
+
 	if(verbose)
 	  printf("Rebalance: moving bin %u from cluster %u -> %u [similarity: %f]\n",
 		 candidate, cluster_ids[candidate], j, score);
@@ -803,6 +797,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 	cluster_ids[candidate] = j;
       }
     }
+#endif
   } /* while(...) */
 
   if(alloc_centroids) {
@@ -813,7 +808,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   }
 
   ndpi_free(bin_score);
-  
+
   return(0);
 }
 
