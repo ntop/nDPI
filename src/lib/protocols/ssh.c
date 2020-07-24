@@ -71,25 +71,54 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
 					  u_int8_t is_client_signature) {
 
   if (str_to_check == NULL) return;
+  
+  int i;
+  int matches;
+  int major   = 0;
+  int minor   = 0;
+  int patch   = 0;
+  u_int8_t version_match = 0;
+  u_int8_t obsolete_ssh_version = 0;
+  
+  const char *ssh_servers_strings[] = {
+    "SSH-%*f-OpenSSH_%d.%d.%d",     /* OpenSSH */
+    "SSH-%*f-APACHE-SSHD-%d.%d.%d", /* Apache MINA SSHD */
+    "SSH-%*f-FileZilla_%d.%d.%d",   /* FileZilla SSH*/
+    "SSH-%*f-paramiko_%d.%d.%d",    /* Paramiko SSH */
+    "SSH-%*f-dropbear_%d.%d",       /* Dropbear SSH */
+    NULL, 
+  };
 
-  int major = 0;
-  int minor = 0;
-  int patch = 0;
-  int obsolete_ssh_version = 0;
+  int versions_cutoff[][3] = {
+    /* maj,min,patch */
 
-  if (sscanf(str_to_check, "SSH-%*f-OpenSSH_%d.%d.%d", &major, &minor, &patch) != 3) 
-    return;
+    {7,0,0},    /* OpenSSH */
+    {2,5,1},    /* Apache MINA SSHD */
+    {3,40,0},   /* FileZilla SSH */
+    {2,4,0},    /* Paramiko SSH */
+    {2020,0,0}  /* Dropbear SSH (leave patch field as 0)*/
 
-  if ((major || minor || patch) == 0) return;
+  };
+
+  for (i = 0; ssh_servers_strings[i]; i++) {
+    matches = sscanf(str_to_check, ssh_servers_strings[i], &major, &minor, &patch);
+
+    if (matches == 3 || matches == 2) {
+      version_match = 1;
+      break;
+    }
+  }
+
+  if (!version_match) return;
 
   /* checking if is an old version */ 
-  if (major < MAJOR_CUTOFF) obsolete_ssh_version = 1;
+  if (major < versions_cutoff[i][0]) obsolete_ssh_version = 1;
 
-  else if (major == MAJOR_CUTOFF) {   
-    if (minor < MINOR_CUTOFF) obsolete_ssh_version = 1;
+  else if (major == versions_cutoff[i][0]) {   
+    if (minor < versions_cutoff[i][1]) obsolete_ssh_version = 1;
     
-    else if (minor == MINOR_CUTOFF)
-      if (patch < PATCH_CUTOFF) obsolete_ssh_version = 1;
+    else if (minor == versions_cutoff[i][1])
+      if (patch < versions_cutoff[i][2]) obsolete_ssh_version = 1;
   }
   
   if (obsolete_ssh_version) {
@@ -110,18 +139,22 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
 
   char *rem;
   char *cipher;
-  int found_obsolete_cipher = 0;
+  u_int8_t found_obsolete_cipher = 0;
 
-  char *obsolete_ciphers[6] = {
+  const char *obsolete_ciphers[] = {
     "arcfour256",
     "arcfour128",
     "3des-cbc",
     "blowfish-cbc",
     "cast128-cbc",
     "arcfour",
+    NULL, 
   };
 
   char *copy = (char*)ndpi_calloc(cipher_len, sizeof(char));
+  if (copy == NULL) {
+    return;
+  }
 
   if (strncpy(copy, ciphers, cipher_len) == NULL) 
     return;
@@ -130,7 +163,7 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
 
   while (cipher && !found_obsolete_cipher) {
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; obsolete_ciphers[i]; i++) {
       if (strcmp(cipher, obsolete_ciphers[i]) == 0) {
         found_obsolete_cipher = 1;
         break;
