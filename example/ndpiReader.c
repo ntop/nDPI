@@ -2529,11 +2529,12 @@ static void printFlowsStats() {
 	    ndpi_free_bin(&centroids[i]);
 	  
 	  ndpi_free(centroids);
-	  
-	  ndpi_free(bins);
-	  ndpi_free(cluster_ids);
 	}
       }
+      if(bins)
+        ndpi_free(bins);
+      if(cluster_ids)
+        ndpi_free(cluster_ids);
 #endif
     }
 
