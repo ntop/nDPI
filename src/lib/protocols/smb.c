@@ -44,8 +44,9 @@ void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       NDPI_LOG_INFO(ndpi_struct, "found SMB\n");
 
       if(memcmp(&packet->payload[4], smbv1, sizeof(smbv1)) == 0) {
-	if(packet->payload[8] != 0x72) /* Skip Negotiate request */ {
+	if(packet->payload[8] != 0x72) /* Skip Negotiate request */ {	  
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, NDPI_PROTOCOL_NETBIOS);
+	  NDPI_SET_BIT(flow->risk, NDPI_SMB_INSECURE_VERSION);
 	}
       } else
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23, NDPI_PROTOCOL_NETBIOS);

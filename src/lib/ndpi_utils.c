@@ -1530,6 +1530,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER:
     return("SSH Obsolete Server Version/Cipher");
     
+  case NDPI_SMB_INSECURE_VERSION:
+    return("SMB Insecure Version");
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
