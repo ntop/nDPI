@@ -353,6 +353,8 @@
 
 #define NDPI_OPTIMAL_HLL_NUM_BUCKETS           16
 
+#define NDPI_MAX_NUM_DISSECTED_TLS_BLOCKS      32
+
 #ifdef __APPLE__
 
 #include <libkern/OSByteOrder.h>

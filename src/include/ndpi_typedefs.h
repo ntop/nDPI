@@ -669,7 +669,8 @@ struct ndpi_flow_tcp_struct {
     /* NDPI_PROTOCOL_TLS */
     u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1,
 	fingerprint_set:1, _pad:4;
-    u_int8_t sha1_certificate_fingerprint[20];
+    u_int8_t sha1_certificate_fingerprint[20], num_tls_blocks;
+    u_int16_t tls_blocks_len[NDPI_MAX_NUM_DISSECTED_TLS_BLOCKS];
   } tls;
   
   /* NDPI_PROTOCOL_POSTGRES */
@@ -1006,7 +1007,8 @@ struct ndpi_detection_module_struct {
 
   u_int32_t current_ts;
   u_int32_t ticks_per_second;
-
+  u_int16_t num_tls_blocks_to_follow;
+  
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
 #endif
