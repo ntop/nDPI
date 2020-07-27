@@ -124,31 +124,34 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	     && (packet->payload[i+3] == 0)) {
 	    u_int32_t offset = (*((u_int32_t*)&packet->payload[i+4]));
 	    u_int32_t prev_offset = (*((u_int32_t*)&packet->payload[i-4]));
-	    int len = offset-prev_offset;
-	    int sni_offset = i+prev_offset+1;
 
-	    while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
-	      sni_offset++;
-
-	    if(len > 0 && (sni_offset+len) < udp_len) {
-	      int max_len = sizeof(flow->host_server_name)-1, j = 0;
-	      ndpi_protocol_match_result ret_match;
+	    if(offset > prev_offset) {
+	      u_int32_t len = offset-prev_offset;
+	      u_int32_t sni_offset = i+prev_offset+1;
 	      
-	      if(len > max_len) len = max_len;
+	      while((sni_offset < udp_len) && (packet->payload[sni_offset] == '-'))
+		sni_offset++;
 	      
-	      while((len > 0) && (sni_offset < udp_len)) {
-		flow->host_server_name[j++] = packet->payload[sni_offset];
-		sni_offset++, len--;
+	      if(len > 0 && (sni_offset+len) < udp_len) {
+		u_int32_t max_len = sizeof(flow->host_server_name)-1, j = 0;
+		ndpi_protocol_match_result ret_match;
+		
+		if(len > max_len) len = max_len;
+		
+		while((len > 0) && (sni_offset < udp_len)) {
+		  flow->host_server_name[j++] = packet->payload[sni_offset];
+		  sni_offset++, len--;
+		}
+		
+		ndpi_match_host_subprotocol(ndpi_struct, flow, 
+					    (char *)flow->host_server_name,
+					    strlen((const char*)flow->host_server_name),
+					    &ret_match,
+					    NDPI_PROTOCOL_QUIC);	      
 	      }
 	      
-	      ndpi_match_host_subprotocol(ndpi_struct, flow, 
-					  (char *)flow->host_server_name,
-					  strlen((const char*)flow->host_server_name),
-					  &ret_match,
-					  NDPI_PROTOCOL_QUIC);	      
+	      break;
 	    }
-
-	    break;
 	  }
 	}
       }
