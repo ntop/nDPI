@@ -1949,6 +1949,10 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
     ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath);
 
   ndpi_finalize_initalization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
+
+#ifdef USE_TLS_LEN
+  ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 1);
+#endif
 }
 
 /* *********************************************** */
@@ -2460,7 +2464,7 @@ static void printFlowsStats() {
     if(verbose > 1) {
 #ifndef DIRECTION_BINS
       struct ndpi_bin *bins = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_flows);
-      u_int16_t *cluster_ids = (u_int16_t*)ndpi_malloc(sizeof(u_int16_t)*num_flows);;
+      u_int16_t *cluster_ids = (u_int16_t*)ndpi_malloc(sizeof(u_int16_t)*num_flows);
 #endif
 
       for(i=0; i<num_flows; i++) {

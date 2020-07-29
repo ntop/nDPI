@@ -79,7 +79,7 @@
 
 #define PLEN_MAX         1504
 #define PLEN_BIN_LEN     32
-#define PLEN_NUM_BINS    47 /* 47*32 = 1504 */
+#define PLEN_NUM_BINS    48 /* 47*32 = 1504 */
 #define MAX_NUM_BIN_PKTS 256
 
 #include "ndpi_main.h"
@@ -1021,6 +1021,20 @@ void correct_csv_data_field(char* data) {
 
 /* ****************************************************** */
 
+u_int8_t plen2slot(u_int16_t plen) {  
+  /* 
+     Slots [32 bytes lenght]
+     0..31, 32..63 ... 
+  */
+
+  if(plen > PLEN_MAX)
+    return(PLEN_NUM_BINS-1);
+  else
+    return(plen/PLEN_BIN_LEN);
+}
+
+/* ****************************************************** */
+
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow, FILE * csv_fp) {
   u_int i;
 
@@ -1194,6 +1208,17 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
 		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
     }
+
+#ifdef USE_TLS_LEN
+    /* For TLS we use TLS block lenght instead of payload lenght */
+    ndpi_reset_bin(&flow->payload_len_bin);
+    
+    for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
+      u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_application_blocks_len[i]);
+      printf("%u\n", len);
+      ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+    }
+#endif
   }
 
   if(flow->detection_completed && (!flow->check_extra_packets)) {
@@ -1255,20 +1280,6 @@ void update_tcp_flags_count(struct ndpi_flow_info* flow, struct ndpi_tcphdr* tcp
     flow->urg_count++;
     src_to_dst_direction ? flow->src2dst_urg_count++ : flow->dst2src_urg_count++;
   }
-}
-
-/* ****************************************************** */
-
-u_int8_t plen2slot(u_int16_t plen) {  
-  /* 
-     Slots [32 bytes lenght]
-     0..31, 32..63 ... 
-  */
-
-  if(plen > PLEN_MAX)
-    return(PLEN_NUM_BINS-1);
-  else
-    return(plen/PLEN_BIN_LEN);
 }
 
 /* ****************************************************** */

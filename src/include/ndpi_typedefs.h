@@ -670,7 +670,7 @@ struct ndpi_flow_tcp_struct {
     u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1,
 	fingerprint_set:1, _pad:4;
     u_int8_t sha1_certificate_fingerprint[20], num_tls_blocks;
-    u_int16_t tls_blocks_len[NDPI_MAX_NUM_DISSECTED_TLS_BLOCKS];
+    int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;
   
   /* NDPI_PROTOCOL_POSTGRES */
@@ -947,6 +947,7 @@ typedef enum {
 
 typedef enum {
    ndpi_pref_direction_detect_disable = 0,
+   ndpi_pref_enable_tls_block_dissection
 } ndpi_detection_preference;
 
 /* ntop extensions */

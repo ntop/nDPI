@@ -593,9 +593,13 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(flow->l4.tcp.tls.num_tls_blocks >= ndpi_struct->num_tls_blocks_to_follow) {
-    flow->extra_packets_func = NULL; /* We're good now */
+#ifdef DEBUG_TLS_BLOCKS
+    printf("*** [TLS Block] Enough blocks dissected\n");
+#endif
+    
+    flow->extra_packets_func = NULL; /* We're good now */  
   }
-
+  
   return(1);
 }
 
@@ -649,10 +653,11 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   while(!something_went_wrong) {
     u_int16_t len, p_len;
     const u_int8_t *p;
-
+    u_int8_t content_type;
+      
     if(flow->l4.tcp.tls.message.buffer_used < 5)
       return(1); /* Keep working */
-
+    
     len = (flow->l4.tcp.tls.message.buffer[3] << 8) + flow->l4.tcp.tls.message.buffer[4] + 5;
 
     if(len > flow->l4.tcp.tls.message.buffer_used) {
@@ -677,10 +682,14 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     printf("[TLS Mem] Processing %u bytes message\n", len);
 #endif
 
+    content_type = flow->l4.tcp.tls.message.buffer[0];
+    
     /* Overwriting packet payload */
     p = packet->payload, p_len = packet->payload_packet_len; /* Backup */
 
-    if((len > 9) && (!flow->l4.tcp.tls.certificate_processed)) {
+    if((len > 9)
+       && (content_type != 0x17 /* Application Data */)
+       && (!flow->l4.tcp.tls.certificate_processed)) {
       /* Split the element in blocks */
       u_int16_t processed = 5;
 
@@ -701,32 +710,20 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  break;
 	}
 
-#ifdef DEBUG_TLS_MEMORY
-	printf("*** [TLS Mem] Processing %u bytes block [%02X %02X %02X %02X %02X]\n",
-	       packet->payload_packet_len,
-	       packet->payload[0], packet->payload[1], packet->payload[2], packet->payload[3], packet->payload[4]);
-#endif
-
-	processTLSBlock(ndpi_struct, flow);
-	if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
-	  flow->l4.tcp.tls.tls_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] = packet->payload_packet_len;
-
-#ifdef DEBUG_TLS_BLOCKS
-	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u]\n",
-	       packet->payload_packet_len, flow->l4.tcp.tls.num_tls_blocks);
-#endif
-
 	processed += packet->payload_packet_len;
       }
     } else {
       /* Process element as a whole */
-      if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
-	flow->l4.tcp.tls.tls_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] = len-5;
-      
+      if(content_type == 0x17 /* Application Data */) {
+	if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
+	  flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
+	    (packet->packet_direction == 0) ? (len-5) : -(len-5);
+	
 #ifdef DEBUG_TLS_BLOCKS
-      printf("*** [TLS Block] [len: %u][num_tls_blocks: %u]\n",
-	     len-5, flow->l4.tcp.tls.num_tls_blocks);
+	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
+	       len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
 #endif
+      }
     }
 
     packet->payload = p, packet->payload_packet_len = p_len; /* Restore */
@@ -744,7 +741,12 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   }
 
-  if(something_went_wrong) {
+  if(something_went_wrong
+     || (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow)
+     ) {
+#ifdef DEBUG_TLS_BLOCKS
+    printf("*** [TLS Block] No more blocks\n");
+#endif
     flow->check_extra_packets = 0;
     flow->extra_packets_func = NULL;
     return(0); /* That's all */
@@ -809,7 +811,7 @@ static void tlsInitExtraPacketProcessing(struct ndpi_detection_module_struct *nd
   flow->check_extra_packets = 1;
 
   /* At most 12 packets should almost always be enough to find the server certificate if it's there */
-  flow->max_extra_packets_to_check = 12 + (ndpi_struct->num_tls_blocks_to_follow*2);
+  flow->max_extra_packets_to_check = 12 + (ndpi_struct->num_tls_blocks_to_follow*4);
   flow->extra_packets_func = (flow->packet.udp != NULL) ? ndpi_search_tls_udp : ndpi_search_tls_tcp;
 }
 

@@ -596,6 +596,10 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
     ndpi_str->direction_detect_disable = (u_int8_t) value;
     break;
 
+  case ndpi_pref_enable_tls_block_dissection:
+    ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
+    break;
+
   default:
     return(-1);
   }
@@ -6370,6 +6374,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   case NDPI_PROTOCOL_TLS:
     if((!flow->l4.tcp.tls.certificate_processed)
        || (flow->l4.tcp.tls.num_tls_blocks <= ndpi_str->num_tls_blocks_to_follow)) {
+      // printf("*** %u/%u\n", flow->l4.tcp.tls.num_tls_blocks, ndpi_str->num_tls_blocks_to_follow);
       return(1); /* TODO: add check for TLS 1.3 */
     }
     break;
