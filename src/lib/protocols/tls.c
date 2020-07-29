@@ -710,6 +710,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  break;
 	}
 
+	processTLSBlock(ndpi_struct, flow);
+	
 	processed += packet->payload_packet_len;
       }
     } else {
@@ -1282,7 +1284,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 #ifdef DEBUG_TLS
 		    printf("Client SSL [TLS version: %s/0x%04X]\n",
-			   ndpi_ssl_version2str(tls_version, &unknown_tls_version), tls_version);
+			   ndpi_ssl_version2str(NULL, tls_version, &unknown_tls_version), tls_version);
 #endif
 
 		    if((version_str_len+8) < sizeof(version_str)) {
