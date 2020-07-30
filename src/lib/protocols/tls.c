@@ -592,7 +592,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     certificates_offset += certificate_len;
   }
 
-  if(flow->l4.tcp.tls.num_tls_blocks >= ndpi_struct->num_tls_blocks_to_follow) {
+  if(( ndpi_struct->num_tls_blocks_to_follow != 0)
+     && (flow->l4.tcp.tls.num_tls_blocks >= ndpi_struct->num_tls_blocks_to_follow)) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] Enough blocks dissected\n");
 #endif
@@ -744,7 +745,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(something_went_wrong
-     || (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow)
+     || ((ndpi_struct->num_tls_blocks_to_follow > 0)
+	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
      ) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
