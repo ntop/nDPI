@@ -43,7 +43,7 @@
 #ifndef NDPI_CLASSIFY_H
 #define NDPI_CLASSIFY_H
 
-
+#include "ndpi_includes.h"
 
 /* constants */
 #define NUM_PARAMETERS_SPLT_LOGREG 208
@@ -66,27 +66,27 @@ extern float parameters_bd[NUM_PARAMETERS_BD_LOGREG];
 extern float parameters_splt[NUM_PARAMETERS_SPLT_LOGREG];
 
 /* Classifier functions */
-float ndpi_classify(const unsigned short *pkt_len, const struct timeval *pkt_time,
-       const unsigned short *pkt_len_twin, const struct timeval *pkt_time_twin,
-       struct timeval start_time, struct timeval start_time_twin, uint32_t max_num_pkt_len,
+float ndpi_classify(const unsigned short *pkt_len, const pkt_timeval *pkt_time,
+       const unsigned short *pkt_len_twin, const pkt_timeval *pkt_time_twin,
+       pkt_timeval start_time, pkt_timeval start_time_twin, uint32_t max_num_pkt_len,
        uint16_t sp, uint16_t dp, uint32_t op, uint32_t ip, uint32_t np_o, uint32_t np_i,
        uint32_t ob, uint32_t ib, uint16_t use_bd, const uint32_t *bd, const uint32_t *bd_t);
 
-void ndpi_merge_splt_arrays(const uint16_t *pkt_len, const struct timeval *pkt_time,
-       const uint16_t *pkt_len_twin, const struct timeval *pkt_time_twin,
-       struct timeval start_time, struct timeval start_time_twin,
+void ndpi_merge_splt_arrays(const uint16_t *pkt_len, const pkt_timeval *pkt_time,
+       const uint16_t *pkt_len_twin, const pkt_timeval *pkt_time_twin,
+       pkt_timeval start_time, pkt_timeval start_time_twin,
        uint16_t s_idx, uint16_t r_idx,
        uint16_t *merged_lens, uint16_t *merged_times);
 
 void ndpi_update_params(classifier_type_codes_t param_type, const char *param_file);
 
 void ndpi_flow_info_freer(void *node);
-unsigned int ndpi_timer_eq(const struct timeval *a, const struct timeval *b);
-unsigned int ndpi_timer_lt(const struct timeval *a, const struct timeval *b);
-void ndpi_timer_sub(const struct timeval *a, const struct timeval *b, struct timeval *result);
-void ndpi_timer_clear(struct timeval *a);
-unsigned int ndpi_timeval_to_milliseconds(struct timeval ts);
-unsigned int ndpi_timeval_to_microseconds(struct timeval ts);
+unsigned int ndpi_timer_eq(const pkt_timeval *a, const pkt_timeval *b);
+unsigned int ndpi_timer_lt(const pkt_timeval *a, const pkt_timeval *b);
+void ndpi_timer_sub(const pkt_timeval *a, const pkt_timeval *b, pkt_timeval *result);
+void ndpi_timer_clear(pkt_timeval *a);
+unsigned int ndpi_timeval_to_milliseconds(pkt_timeval ts);
+unsigned int ndpi_timeval_to_microseconds(pkt_timeval ts);
 void ndpi_log_timestamp(char *log_ts, uint32_t log_ts_len);
 
 #endif /* NDPI_CLASSIFY_H */

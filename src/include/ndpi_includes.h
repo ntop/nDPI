@@ -57,8 +57,13 @@
 #if defined __NetBSD__ || defined __OpenBSD__
 #include <netinet/in_systm.h>
 
-#ifdef __OpenBSD__
+#if defined __OpenBSD__
+#include <net/bpf.h>
 #include <pthread.h>
+
+#if !defined IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif /* IPPROTO_SCTP */
 
 #endif
 #endif
@@ -66,5 +71,11 @@
 #endif
 
 #endif	/* Win32 */
+
+#if defined __OpenBSD__
+typedef struct bpf_timeval pkt_timeval;
+#else
+typedef struct timeval pkt_timeval;
+#endif /* __OpenBSD__ */
 
 #endif /* __NDPI_INCLUDES_H__ */

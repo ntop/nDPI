@@ -240,9 +240,9 @@ float ndpi_parameters_bd[NUM_PARAMETERS_BD_LOGREG] = {
 };
 
 /**
- * \fn void ndpi_merge_splt_arrays (const uint16_t *pkt_len, const struct timeval *pkt_time,
- const uint16_t *pkt_len_twin, const struct timeval *pkt_time_twin,
- struct timeval start_time, struct timeval start_time_twin,
+ * \fn void ndpi_merge_splt_arrays (const uint16_t *pkt_len, const pkt_timeval *pkt_time,
+ const uint16_t *pkt_len_twin, const pkt_timeval *pkt_time_twin,
+ pkt_timeval start_time, pkt_timeval start_time_twin,
  uint16_t s_idx, uint16_t r_idx,
  uint16_t *merged_lens, uint16_t *merged_times,
  uint32_t max_num_pkt_len, uint32_t max_merged_num_pkts)
@@ -260,16 +260,16 @@ float ndpi_parameters_bd[NUM_PARAMETERS_BD_LOGREG] = {
  * \return none
  */
 void
-ndpi_merge_splt_arrays (const uint16_t *pkt_len, const struct timeval *pkt_time,
-                        const uint16_t *pkt_len_twin, const struct timeval *pkt_time_twin,
-                        struct timeval start_time, struct timeval start_time_twin,
+ndpi_merge_splt_arrays (const uint16_t *pkt_len, const pkt_timeval *pkt_time,
+                        const uint16_t *pkt_len_twin, const pkt_timeval *pkt_time_twin,
+                        pkt_timeval start_time, pkt_timeval start_time_twin,
                         uint16_t s_idx, uint16_t r_idx,
                         uint16_t *merged_lens, uint16_t *merged_times)
 {
   int s,r;
-  struct timeval ts_start = { 0, 0 }; /* initialize to avoid spurious warnings */
-  struct timeval tmp, tmp_r;
-  struct timeval start_m;
+  pkt_timeval ts_start = { 0, 0 }; /* initialize to avoid spurious warnings */
+  pkt_timeval tmp, tmp_r;
+  pkt_timeval start_m;
 
   if(r_idx + s_idx == 0) {
     return ;
@@ -419,9 +419,9 @@ ndpi_get_mc_rep_times (uint16_t *times, float *time_mc, uint16_t num_packets)
 }
 
 /**
- * \fn float classify (const unsigned short *pkt_len, const struct timeval *pkt_time,
- const unsigned short *pkt_len_twin, const struct timeval *pkt_time_twin,
- struct timeval start_time, struct timeval start_time_twin, uint32_t max_num_pkt_len,
+ * \fn float classify (const unsigned short *pkt_len, const pkt_timeval *pkt_time,
+ const unsigned short *pkt_len_twin, const pkt_timeval *pkt_time_twin,
+ pkt_timeval start_time, pkt_timeval start_time_twin, uint32_t max_num_pkt_len,
  uint16_t sp, uint16_t dp, uint32_t op, uint32_t ip, uint32_t np_o, uint32_t np_i,
  uint32_t ob, uint32_t ib, uint16_t use_bd, const uint32_t *bd, const uint32_t *bd_t)
  * \param pkt_len length of the packet
@@ -445,9 +445,9 @@ ndpi_get_mc_rep_times (uint16_t *times, float *time_mc, uint16_t num_packets)
  * \return float score
  */
 float
-ndpi_classify (const unsigned short *pkt_len, const struct timeval *pkt_time,
-               const unsigned short *pkt_len_twin, const struct timeval *pkt_time_twin,
-               struct timeval start_time, struct timeval start_time_twin, uint32_t max_num_pkt_len,
+ndpi_classify (const unsigned short *pkt_len, const pkt_timeval *pkt_time,
+               const unsigned short *pkt_len_twin, const pkt_timeval *pkt_time_twin,
+               pkt_timeval start_time, pkt_timeval start_time_twin, uint32_t max_num_pkt_len,
                uint16_t sp, uint16_t dp, uint32_t op, uint32_t ip, uint32_t np_o, uint32_t np_i,
                uint32_t ob, uint32_t ib, uint16_t use_bd, const uint32_t *bd, const uint32_t *bd_t)
 {
@@ -604,8 +604,8 @@ ndpi_update_params (classifier_type_codes_t param_type, const char *param_file)
  * \return 1 if equal, 0 otherwise
  */
 unsigned int
-ndpi_timer_eq(const struct timeval *a,
-              const struct timeval *b)
+ndpi_timer_eq(const pkt_timeval *a,
+              const pkt_timeval *b)
 {
   if(a->tv_sec == b->tv_sec && a->tv_usec == b->tv_usec) {
     return 1;
@@ -615,8 +615,8 @@ ndpi_timer_eq(const struct timeval *a,
 }
 
 unsigned int
-ndpi_timer_lt(const struct timeval *a,
-              const struct timeval *b)
+ndpi_timer_lt(const pkt_timeval *a,
+              const pkt_timeval *b)
 {
   return (a->tv_sec == b->tv_sec) ?
     (a->tv_usec < b->tv_usec):(a->tv_sec < b->tv_sec);
@@ -630,9 +630,9 @@ ndpi_timer_lt(const struct timeval *a,
  * \return none
  */
 void
-ndpi_timer_sub(const struct timeval *a,
-               const struct timeval *b,
-               struct timeval *result)
+ndpi_timer_sub(const pkt_timeval *a,
+               const pkt_timeval *b,
+               pkt_timeval *result)
 {
   result->tv_sec = a->tv_sec - b->tv_sec;
   result->tv_usec = a->tv_usec - b->tv_usec;
@@ -648,7 +648,7 @@ ndpi_timer_sub(const struct timeval *a,
  * \return none
  */
 void
-ndpi_timer_clear(struct timeval *a)
+ndpi_timer_clear(pkt_timeval *a)
 {
   a->tv_sec = a->tv_usec = 0;
 }
@@ -659,7 +659,7 @@ ndpi_timer_clear(struct timeval *a)
  * \return unsigned int - Milliseconds
  */
 unsigned int
-ndpi_timeval_to_milliseconds(struct timeval ts)
+ndpi_timeval_to_milliseconds(pkt_timeval ts)
 {
   unsigned int result = ts.tv_usec / 1000 + ts.tv_sec * 1000;
   return result;
@@ -671,7 +671,7 @@ ndpi_timeval_to_milliseconds(struct timeval ts)
  * \return unsigned int - Milliseconds
  */
 unsigned int
-ndpi_timeval_to_microseconds(struct timeval ts)
+ndpi_timeval_to_microseconds(pkt_timeval ts)
 {
   unsigned int result = ts.tv_usec + ts.tv_sec * 1000 * 1000;
   return result;
@@ -680,7 +680,7 @@ ndpi_timeval_to_microseconds(struct timeval ts)
 void
 ndpi_log_timestamp(char *log_ts, uint32_t log_ts_len)
 {
-  struct timeval tv;
+  pkt_timeval tv;
   time_t nowtime;
   struct tm nowtm_r;
   char tmbuf[NDPI_TIMESTAMP_LEN];
