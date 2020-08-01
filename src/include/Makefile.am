@@ -8,4 +8,5 @@ library_include_HEADERS = ndpi_api.h \
 		ndpi_protocol_ids.h \
 		ndpi_protocols.h \
 		ndpi_win32.h \
+		ndpi_includes_OpenBSD.h \
 		ndpi_includes.h
