@@ -80,11 +80,17 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
   r = pcap_next_ex(pkts, &header, &pkt);
   while (r > 0) {
-    /* allocate an exact size buffer to check overflows */
-    uint8_t *packet_checked = malloc(header->caplen);
-    memcpy(packet_checked, pkt, header->caplen);
-    ndpi_workflow_process_packet(workflow, header, packet_checked, NULL);
-    free(packet_checked);
+    if(header->caplen >= 42 /* ARP+ size */) {
+      /* allocate an exact size buffer to check overflows */
+      uint8_t *packet_checked = malloc(header->caplen);
+
+      if(packet_checked) {
+	memcpy(packet_checked, pkt, header->caplen);
+	ndpi_workflow_process_packet(workflow, header, packet_checked, NULL);
+	free(packet_checked);
+      }
+    }
+
     r = pcap_next_ex(pkts, &header, &pkt);
   }
   ndpi_workflow_free(workflow);

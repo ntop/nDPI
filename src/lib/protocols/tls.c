@@ -479,7 +479,8 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
     }
   }
 
-  if(rdn_len) flow->protos.stun_ssl.ssl.subjectDN = ndpi_strdup(rdnSeqBuf);
+  if(rdn_len && (flow->protos.stun_ssl.ssl.subjectDN == NULL))
+    flow->protos.stun_ssl.ssl.subjectDN = ndpi_strdup(rdnSeqBuf);
 
   if(flow->protos.stun_ssl.ssl.subjectDN && flow->protos.stun_ssl.ssl.issuerDN
      && (!strcmp(flow->protos.stun_ssl.ssl.subjectDN, flow->protos.stun_ssl.ssl.issuerDN)))
