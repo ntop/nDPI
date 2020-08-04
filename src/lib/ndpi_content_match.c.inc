@@ -9175,6 +9175,21 @@ static ndpi_category_match category_match[] = {
    { "iptv.sky.",                        NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "pcdn.skycdn.",                     NDPI_PROTOCOL_CATEGORY_STREAMING },
 
+   /* https://success.tanaza.com/s/article/How-Automatic-Detection-of-Captive-Portal-works */
+   { "captive.apple.com",                NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "thinkdifferent.us",                NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "airport.us",                       NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "gsp1.apple.com",                   NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "msftconnecttest.com",              NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "testconnectivity.microsoft.com",   NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "msftncsi.com",                     NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "msftncsi.com.edgesuite.net",       NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "teredo.ipv6.microsoft.com",        NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "teredo.ipv6.microsoft.com.nsatc.net",   NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "detectportal.firefox.com",         NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "connectivitycheck.android.com",    NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "connectivitycheck.gstatic.com",    NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+
    /* Hulu Streaming services AS23286 */
    { "8.28.124.0/24",                   NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "8.28.125.0/24",                   NDPI_PROTOCOL_CATEGORY_STREAMING },

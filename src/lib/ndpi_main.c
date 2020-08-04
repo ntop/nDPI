@@ -1875,7 +1875,7 @@ static const char *categories[] = {
 				   "Shopping",
 				   "Productivity",
 				   "FileSharing",
-				   "",
+				   "ConnectivityCheck",
 				   "",
 				   "",
 				   "",
