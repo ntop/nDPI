@@ -71,6 +71,7 @@ static void ndpi_analyze_content_signature(struct ndpi_flow_struct *flow) {
 
 static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow) {
+
   ndpi_search_http_tcp(ndpi_struct, flow);
 
 #ifdef HTTP_DEBUG
@@ -133,7 +134,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     }
 
     /* check for attachment */
-    if (packet->content_disposition_line.len > 0) {
+    if(packet->content_disposition_line.len > 0) {
       u_int8_t attachment_len = sizeof("attachment; filename");
 
       if(packet->content_disposition_line.len > attachment_len) {
@@ -224,7 +225,7 @@ static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
 
 static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow, char *ua) {
-  if (    !strcmp(ua, "Windows NT 5.0"))  ua = "Windows 2000";
+  if(    !strcmp(ua, "Windows NT 5.0"))  ua = "Windows 2000";
   else if(!strcmp(ua, "Windows NT 5.1"))  ua = "Windows XP";
   else if(!strcmp(ua, "Windows NT 5.2"))  ua = "Windows Server 2003";
   else if(!strcmp(ua, "Windows NT 6.0"))  ua = "Windows Vista";
@@ -741,7 +742,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
   packet->packet_lines_parsed_complete = 0;
 
   /* Check if we so far detected the protocol in the request or not. */
-  if(flow->l4.tcp.http_stage == 0) {
+  if((packet->payload_packet_len > 0) /* Needed in case of extra packet processing */
+     && (flow->l4.tcp.http_stage == 0)) {
     /* Expected a request */
     flow->http_detected = 0;
 
@@ -823,7 +825,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       /* try to get some additional request header info even if the packet may not be HTTP */
       ndpi_parse_packet_line_info(ndpi_struct, flow);
-      if (packet->http_num_headers > 0) {
+      if(packet->http_num_headers > 0) {
         check_content_type_and_change_protocol(ndpi_struct, flow);
         return;
       }

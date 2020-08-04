@@ -42,9 +42,9 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   printf("==> %s() [%s][direction: %u]\n", __FUNCTION__, packet->payload, packet->packet_direction);
 #endif
   
-  if (packet->payload == NULL || packet->payload_packet_len == 0)
-    return(1);
-  if(packet->payload[0] == 0xFF)
+  if((packet->payload == NULL)
+     || (packet->payload_packet_len == 0)
+     || (packet->payload[0] == 0xFF))
     return(1);
 
   if(flow->protos.telnet.username_detected) {
