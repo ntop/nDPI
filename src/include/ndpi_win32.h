@@ -76,9 +76,6 @@ typedef unsigned       __int64 u_int64_t;
 extern unsigned long waitForNextEvent(unsigned long ulDelay /* ms */);
 
 #define sleep(a /* sec */)              waitForNextEvent(1000*a /* ms */)
-#ifndef localtime_r
-#define localtime_r(a, b)               localtime_s(b, a)
-#endif
 #define strtok_r                        strtok_s
 #define timegm                          _mkgmtime
 
