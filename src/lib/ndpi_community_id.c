@@ -167,13 +167,15 @@ static int ndpi_community_id_peer_v4_is_less_than(u_int32_t ip1, u_int32_t ip2, 
 
 static int ndpi_community_id_peer_v6_is_less_than(struct ndpi_in6_addr *ip1, struct ndpi_in6_addr *ip2, u_int16_t p1, u_int16_t p2) {
   int comp = memcmp(ip1, ip2, sizeof(struct ndpi_in6_addr));
+
   return comp < 0 || (comp == 0 && p1 < p2);
 }
 
 /* **************************************************** */
 
-static void ndpi_community_id_sha1_hash(const uint8_t *message, size_t len, u_char *hash /* 20-bytes */) {
+void ndpi_string_sha1_hash(const uint8_t *message, size_t len, u_char *hash /* 20-bytes */) {
   SHA1_CTX ctx;
+
   SHA1Init(&ctx);
   SHA1Update(&ctx, message, len);
   SHA1Final(hash, &ctx);
@@ -185,7 +187,8 @@ static void ndpi_community_id_sha1_hash(const uint8_t *message, size_t len, u_ch
 https://github.com/corelight/community-id-spec/blob/bda913f617389df07cdaa23606e11bbd318e265c/community-id.py#L285
 */
 static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int16_t off, u_int8_t l4_proto,
-             u_int16_t src_port, u_int16_t dst_port, char *hash_buf, u_int8_t hash_buf_len) {
+						       u_int16_t src_port, u_int16_t dst_port,
+						       char *hash_buf, u_int8_t hash_buf_len) {
   u_int8_t pad = 0;
   uint32_t hash[5];
   char *community_id;
@@ -209,7 +212,7 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   }
 
   /* Compute SHA1 */
-  ndpi_community_id_sha1_hash(comm_buf, off, (u_char*)hash);
+  ndpi_string_sha1_hash(comm_buf, off, (u_char*)hash);
 
   /* Base64 encoding */
   community_id = ndpi_base64_encode((u_int8_t*)hash, sizeof(hash));
