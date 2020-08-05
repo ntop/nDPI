@@ -316,7 +316,9 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	printf("[TLS] %s() IssuerDN [%s]\n", __FUNCTION__, rdnSeqBuf);
 #endif
 
-	if(rdn_len) flow->protos.stun_ssl.ssl.issuerDN = ndpi_strdup(rdnSeqBuf);
+	if(rdn_len && (flow->protos.stun_ssl.ssl.issuerDN == NULL))
+	  flow->protos.stun_ssl.ssl.issuerDN = ndpi_strdup(rdnSeqBuf);
+	
 	rdn_len = 0; /* Reset buffer */
       }
 

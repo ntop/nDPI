@@ -3321,7 +3321,7 @@ static void dgaUnitTest() {
   };
   int i;
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_str =  ndpi_init_detection_module(ndpi_no_prefs);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
 
   assert(ndpi_str != NULL);
 
@@ -3337,7 +3337,6 @@ static void dgaUnitTest() {
 
   for(i=0; non_dga[i] != NULL; i++)
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i]) == 0);
-
 
   ndpi_exit_detection_module(ndpi_str);
 }
