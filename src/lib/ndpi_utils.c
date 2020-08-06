@@ -874,6 +874,7 @@ u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len) {
 
 /* ********************************** */
 
+/* NOTE: caller MUST free returned pointer */
 char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
   size_t len = 0, ret_size;
   char *ret;

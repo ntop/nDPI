@@ -217,7 +217,7 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   /* Base64 encoding */
   community_id = ndpi_base64_encode((u_int8_t*)hash, sizeof(hash));
 
-  if (community_id == NULL)
+  if(community_id == NULL)
     return -1;
 
 #if 0 /* Debug Info */
@@ -234,7 +234,7 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   printf("Base64: %s\n", community_id);
 #endif
 
-  if (hash_buf_len < 2 || hash_buf_len-2 < strlen(community_id)+1) {
+  if(hash_buf_len < 2 || hash_buf_len-2 < strlen(community_id)+1) {
     ndpi_free(community_id);
     return -1;
   }
