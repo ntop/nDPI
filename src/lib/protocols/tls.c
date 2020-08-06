@@ -1434,6 +1434,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      NDPI_SET_BIT(flow->risk, NDPI_TLS_NOT_CARRYING_HTTPS);
 	    }
 
+	    if(flow->protos.stun_ssl.ssl.encrypted_sni.esni &&
+	       flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
+	      NDPI_SET_BIT(flow->risk, NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
+	    }
+
 	    return(2 /* Client Certificate */);
 	  } else {
 #ifdef DEBUG_TLS

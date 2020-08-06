@@ -1533,7 +1533,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     
   case NDPI_SMB_INSECURE_VERSION:
     return("SMB Insecure Version");
-    
+
+  case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
+    return("TLS Suspicious ESNI Usage");
+
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
