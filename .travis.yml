@@ -170,6 +170,7 @@ before_script:
 script:
   - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else ./configure ; fi
   - make
+  - make -C example ndpiSimpleIntegration
 
 #after_script:
   - cd tests
