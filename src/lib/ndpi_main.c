@@ -2591,11 +2591,17 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
       is_ip = 1, value = &attr[3];
     else if(strncmp(attr, "host:", 5) == 0) {
       /* host:"<value>",host:"<value>",.....@<subproto> */
+      u_int i, max_len;
+      
       value = &attr[5];
       if(value[0] == '"')
 	value++; /* remove leading " */
-      if(value[strlen(value) - 1] == '"')
-	value[strlen(value) - 1] = '\0'; /* remove trailing " */
+
+      max_len = strlen(value) - 1;
+      if(value[max_len] == '"')
+	value[max_len] = '\0'; /* remove trailing " */
+
+      for(i=0; i<max_len; i++) value[i] = tolower(value[i]);
     }
 
     if(is_tcp || is_udp) {
@@ -6105,7 +6111,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
                                  u_int16_t master_protocol, char *name, u_int name_len) {
   ndpi_protocol_match_result ret_match;
-  u_int16_t subproto, what_len;
+  u_int16_t subproto, what_len, i;
   char *what;
 
   if((name_len > 2) && (name[0] == '*') && (name[1] == '.'))
@@ -6113,6 +6119,9 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
   else
     what = name, what_len = name_len;
 
+  /* Convert it first to lowercase: we assume meory is writable as in nDPI dissctors */
+  for(i=0; i<name_len; i++) what[i] = tolower(what[i]);
+  
   subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len, &ret_match, master_protocol);
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
