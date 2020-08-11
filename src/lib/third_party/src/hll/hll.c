@@ -34,6 +34,7 @@ u_int32_t _hll_hash(const struct ndpi_hll *hll) {
   return MurmurHash3_x86_32(hll->registers, (u_int32_t)hll->size, 0);
 }
 
+/* Count the number of leading zero's */
 static __inline u_int8_t _hll_rank(u_int32_t hash, u_int8_t bits) {
   u_int8_t i;
 
@@ -48,24 +49,26 @@ static __inline u_int8_t _hll_rank(u_int32_t hash, u_int8_t bits) {
 }
 
 /*
-  IMPORTANT: memory usage notes
+  IMPORTANT: HyperLogLog Memory and StandardError Notes
   
-  [i: 4] 16 bytes
-  [i: 5] 32 bytes
-  [i: 6] 64 bytes
-  [i: 7] 128 bytes
-  [i: 8] 256 bytes
-  [i: 9] 512 bytes
-  [i: 10] 1024 bytes
-  [i: 11] 2048 bytes
-  [i: 12] 4096 bytes
-  [i: 13] 8192 bytes
-  [i: 14] 16384 bytes
-  [i: 15] 32768 bytes
-  [i: 16] 65536 bytes
-  [i: 17] 131072 bytes
-  [i: 18] 262144 bytes
-  [i: 19] 524288 bytes
+  StdError = 1.04/sqrt(2^i)
+
+  [i: 4] 16 bytes      [StdError: 26%  ]
+  [i: 5] 32 bytes      [StdError: 18.4%]
+  [i: 6] 64 bytes      [StdError: 13%  ]
+  [i: 7] 128 bytes     [StdError: 9.2% ]
+  [i: 8] 256 bytes     [StdError: 6.5% ]
+  [i: 9] 512 bytes     [StdError: 4.6% ]
+  [i: 10] 1024 bytes   [StdError: 3.25%]
+  [i: 11] 2048 bytes   [StdError: 2.3% ]
+  [i: 12] 4096 bytes   [StdError: 1.6% ]
+  [i: 13] 8192 bytes   [StdError: 1.15%]
+  [i: 14] 16384 bytes  [StdError: 0.81%]
+  [i: 15] 32768 bytes  [StdError: 0.57%]
+  [i: 16] 65536 bytes  [StdError: 0.41%]
+  [i: 17] 131072 bytes [StdError: 0.29%]
+  [i: 18] 262144 bytes [StdError: 0.2% ]
+  [i: 19] 524288 bytes [StdError: 0.14%]
 */
 int hll_init(struct ndpi_hll *hll, u_int8_t bits) {
   if(bits < 4 || bits > 20) {
@@ -73,9 +76,9 @@ int hll_init(struct ndpi_hll *hll, u_int8_t bits) {
     return -1;
   }
 
-  hll->bits = bits;
-  hll->size = (size_t)1 << bits;
-  hll->registers = ndpi_calloc(hll->size, 1);
+  hll->bits = bits; /* Number of bits of buckets number */
+  hll->size = (size_t)1 << bits; /* Number of buckets 2^bits */
+  hll->registers = ndpi_calloc(hll->size, 1); /* Create the bucket register counters */
 
   /* printf("%lu bytes\n", hll->size); */
   return 0;
@@ -96,12 +99,11 @@ void hll_reset(struct ndpi_hll *hll) {
 
 static __inline void _hll_add_hash(struct ndpi_hll *hll, u_int32_t hash) {
   if(hll->registers) {
-    u_int32_t index = hash >> (32 - hll->bits);
-    u_int8_t rank = _hll_rank(hash, hll->bits);
+    u_int32_t index = hash >> (32 - hll->bits);   /* Use the first 'hll->bits' bits as bucket index */
+    u_int8_t rank   = _hll_rank(hash, hll->bits); /* Count the number of leading 0 */
     
-    if(rank > hll->registers[index]) {
-      hll->registers[index] = rank;
-    }
+    if(rank > hll->registers[index])
+      hll->registers[index] = rank; /* Store the largest number of lesding zeros for the bucket */    
   }
 }
 
