@@ -6579,7 +6579,7 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
-// #define DGA_DEBUG 1
+/* #define DGA_DEBUG 1 */
 
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
@@ -6656,18 +6656,16 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	printf("-> Checking %c%c\n", word[i], word[i+1]);
 #endif
 
-	if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
-	  num_found++;
-	} else {
-	  if(ndpi_match_bigram(ndpi_str,
-			       &ndpi_str->impossible_bigrams_automa,
-			       &word[i])) {
+	if(ndpi_match_bigram(ndpi_str,
+			     &ndpi_str->impossible_bigrams_automa,
+			     &word[i])) {
 #ifdef DGA_DEBUG
-	    printf("IMPOSSIBLE %s\n", &word[i]);
+	  printf("IMPOSSIBLE %s\n", &word[i]);
 #endif
-	    num_impossible++;
-	  }
-	}
+	  num_impossible++;
+	} else if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
+	  num_found++;
+	}	      
       } /* for */
     } /* for */
 
