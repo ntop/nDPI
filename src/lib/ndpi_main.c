@@ -4736,21 +4736,34 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
     if(found
        && (found->proto->protoId != NDPI_PROTOCOL_UNKNOWN)
-       && (found->proto->protoId != ret.master_protocol)) {
+       && (found->proto->protoId != ret.master_protocol)
+       && (found->proto->protoId != ret.app_protocol)
+       ) {
       // printf("******** %u / %u\n", found->proto->protoId, ret.master_protocol);
 
       if(!ndpi_check_protocol_port_mismatch_exceptions(ndpi_str, flow, found, &ret))
 	NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
     } else if(default_ports && (default_ports[0] != 0)) {
-      u_int8_t found = 0, i;
+      u_int8_t found = 0, i, num_loops = 0;
 
+    check_default_ports:
       for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
 	if((default_ports[i] == sport) || (default_ports[i] == dport)) {
 	  found = 1;
 	  break;
-	}
+	}	
       } /* for */
 
+      if((num_loops == 0) && (!found)) {
+	if(flow->packet.udp)
+	  default_ports = ndpi_str->proto_defaults[ret.app_protocol].udp_default_ports;
+	else
+	  default_ports = ndpi_str->proto_defaults[ret.app_protocol].tcp_default_ports;
+	
+	num_loops = 1;
+	goto check_default_ports;
+      }
+      
       if(!found) {
 	// printf("******** Invalid default port\n");
 	NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
