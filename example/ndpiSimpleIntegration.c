@@ -847,7 +847,7 @@ static void ndpi_process_packet(uint8_t * const args,
         }
     }
 
-    if (flow_to_process->ndpi_flow->num_extra_packets_checked <
+    if (flow_to_process->ndpi_flow->num_extra_packets_checked <=
         flow_to_process->ndpi_flow->max_extra_packets_to_check)
     {
         /*
