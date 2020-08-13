@@ -847,7 +847,7 @@ static void ndpi_process_packet(uint8_t * const args,
         }
     }
 
-    if (flow_to_process->ndpi_flow->num_extra_packets_checked <
+    if (flow_to_process->ndpi_flow->num_extra_packets_checked <=
         flow_to_process->ndpi_flow->max_extra_packets_to_check)
     {
         /*
@@ -873,7 +873,8 @@ static void ndpi_process_packet(uint8_t * const args,
                         workflow->packets_captured,
                         reader_thread->array_index,
                         flow_to_process->flow_id,
-                        ndpi_ssl_version2str(flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
+                        ndpi_ssl_version2str(flow_to_process->ndpi_flow,
+                                             flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
                                              &unknown_tls_version),
                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name,
                         (flow_to_process->ndpi_flow->protos.stun_ssl.ssl.alpn != NULL ?
@@ -889,7 +890,8 @@ static void ndpi_process_packet(uint8_t * const args,
                         workflow->packets_captured,
                         reader_thread->array_index,
                         flow_to_process->flow_id,
-                        ndpi_ssl_version2str(flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
+                        ndpi_ssl_version2str(flow_to_process->ndpi_flow,
+                                             flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
                                              &unknown_tls_version),
                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.server_names_len,
                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.server_names,
