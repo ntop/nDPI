@@ -3121,7 +3121,7 @@ void * processing_thread(void *_thread_id) {
       gettimeofday(&h.ts, NULL);
 
       ndpi_process_packet((u_char*)&thread_id, &h, (const u_char *)data);
-      rte_pktmbuf_ndpi_free(bufs[i]);
+      rte_pktmbuf_free(bufs[i]);
     }
   }
 #else
