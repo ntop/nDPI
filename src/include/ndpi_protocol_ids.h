@@ -87,7 +87,7 @@ typedef enum {
   NDPI_PROTOCOL_ZATTOO                = 55,
   NDPI_PROTOCOL_SHOUTCAST             = 56,
   NDPI_PROTOCOL_SOPCAST               = 57,
-  NDPI_PROTOCOL_FREE_58               = 58, /* Free */
+  NDPI_PROTOCOL_DISCORD               = 58,
   NDPI_PROTOCOL_TVUPLAYER             = 59,
   NDPI_PROTOCOL_HTTP_DOWNLOAD         = 60,
   NDPI_PROTOCOL_QQLIVE                = 61,
