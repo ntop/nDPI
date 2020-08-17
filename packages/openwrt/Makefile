@@ -1,22 +1,22 @@
 #
-# Copyright (C) 2018 - ntop.org
+# Copyright (C) 2018-20 - ntop.org
 #
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libndpi
-PKG_VERSION:=1333.ab2f3ce
+PKG_VERSION:=17022020
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/ntop/nDPI.git
-PKG_SOURCE_VERSION:=ebf89f46e3f69d0bb8aa4c836c52ee4964431f6c
+PKG_SOURCE_VERSION:=1f921562d1d7962f1d23ca5b59c25f9b65073460
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_PROTO:=git
 
 PKG_MAINTAINER:=Luca Deri <deri@ntop.org>
 PKG_LICENSE:=GPL3
-PKG_BUILD_DEPENDS:=+libpcap
+PKG_BUILD_DEPENDS:=
 PKG_BUILD_PARALLEL:=1
 
 # autogen fix
@@ -27,7 +27,6 @@ include $(INCLUDE_DIR)/package.mk
 define Package/libndpi
   SECTION:=network
   CATEGORY:=Network
-  #DEPENDS:=+libc +libjson-c +libpthread 
   TITLE:=nDPI Deep Packet Inspection Library
   URL:=https://www.ntop.org
 endef
@@ -37,8 +36,7 @@ define Package/libndpi/description
 endef
 
 CONFIGURE_ARGS += \
-        --with-pic \
-	--disable-json-c \
+	--with-only-libndpi
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
