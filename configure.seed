@@ -67,6 +67,8 @@ else
      NDPI_API_VERSION=`date +%s | cut -c7-10`
 fi
 
+NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
+
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
