@@ -4,6 +4,14 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
+EXTRA_TARGETS="example tests"
+AC_ARG_WITH(only-libndpi,  AS_HELP_STRING([--with-only-libndpi], [Build only libndpi (no examples, tests etc)]))
+AS_IF([test "${with_only_libndpi+set}" = set],[
+  EXTRA_TARGETS=""
+])
+
+
+
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
@@ -187,4 +195,5 @@ AC_SUBST(DPDK_TARGET)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 AC_SUBST(CUSTOM_NDPI)
 AC_SUBST(NDPI_API_VERSION)
+AC_SUBST(EXTRA_TARGETS)
 AC_OUTPUT
