@@ -711,6 +711,9 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_MAIL_IMAP */
   u_int32_t mail_imap_stage:3, mail_imap_starttls:2;
 
+  /* NDPI_PROTOCOL_SOAP */
+  u_int32_t soap_stage:1;
+
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
 
