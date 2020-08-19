@@ -57,7 +57,7 @@
 #if defined __NetBSD__ || defined __OpenBSD__
 #include <netinet/in_systm.h>
 
-#ifdef __OpenBSD__
+#if defined __OpenBSD__
 #include <pthread.h>
 
 #endif
@@ -66,5 +66,9 @@
 #endif
 
 #endif	/* Win32 */
+
+#if defined __OpenBSD__
+#include "ndpi_includes_OpenBSD.h"
+#endif /* __OpenBSD__ */
 
 #endif /* __NDPI_INCLUDES_H__ */

@@ -31,6 +31,7 @@
 
 #include "ndpi_api.h"
 #include "ndpi_config.h"
+#include "ndpi_includes.h"
 
 #include <time.h>
 #ifndef WIN32

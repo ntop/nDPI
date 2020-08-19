@@ -31,6 +31,7 @@
 
 #include "uthash.h"
 #include <pcap.h>
+#include "ndpi_includes.h"
 #include "ndpi_classify.h"
 #include "ndpi_typedefs.h"
 
@@ -128,13 +129,13 @@ struct flow_metrics {
 
 struct ndpi_entropy {
   // Entropy fields
-  struct timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
+  pkt_timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
   u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
-  struct timeval src2dst_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
+  pkt_timeval src2dst_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
   u_int16_t dst2src_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
-  struct timeval dst2src_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
-  struct timeval src2dst_start;                                /*!< first packet arrival time       */
-  struct timeval dst2src_start;                                /*!< first packet arrival time       */
+  pkt_timeval dst2src_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
+  pkt_timeval src2dst_start;                                /*!< first packet arrival time       */
+  pkt_timeval dst2src_start;                                /*!< first packet arrival time       */
   u_int32_t src2dst_opackets;                                  /*!< non-zero packet counts          */
   u_int32_t dst2src_opackets;                                  /*!< non-zero packet counts          */
   u_int16_t src2dst_pkt_count;                                 /*!< packet counts                   */

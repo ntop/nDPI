@@ -692,7 +692,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 						 u_int8_t **payload,
 						 u_int16_t *payload_len,
 						 u_int8_t *src_to_dst_direction,
-                                                 struct timeval when) {
+                                                 pkt_timeval when) {
   u_int32_t idx, l4_offset, hashval;
   struct ndpi_flow_info flow;
   void *ret;
@@ -979,7 +979,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
 						  u_int8_t **payload,
 						  u_int16_t *payload_len,
 						  u_int8_t *src_to_dst_direction,
-                                                  struct timeval when) {
+                                                  pkt_timeval when) {
   struct ndpi_iphdr iph;
 
   memset(&iph, 0, sizeof(iph));
@@ -1300,7 +1300,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 					   u_int16_t ipsize, u_int16_t rawsize,
 					   const struct pcap_pkthdr *header,
 					   const u_char *packet,
-                       struct timeval when,
+                       pkt_timeval when,
                        FILE * csv_fp) {
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow_info *flow = NULL;
@@ -1330,7 +1330,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 			       &payload, &payload_len, &src_to_dst_direction, when);
 
   if(flow != NULL) {
-    struct timeval tdiff;
+    pkt_timeval tdiff;
 
     workflow->stats.ip_packet_count++;
     workflow->stats.total_wire_bytes += rawsize + 24 /* CRC etc */,
