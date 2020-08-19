@@ -78,16 +78,15 @@ ADDITIONAL_LIBS=
 PCAP_HOME=$HOME/PF_RING/userland
 
 DPDK_TARGET=
+AC_MSG_CHECKING([DPDK (used by ndpiReader)])
 if test -d $HOME/DPDK; then :
-     echo "Enabling DPDK support in ndpiReader"
+      AC_MSG_RESULT(yes)
      DPDK_TARGET=dpdk
 else
-    echo  "DPDK support disabled (missing $HOME/DPDK)"
+     AC_MSG_RESULT([no (missing $HOME/DPDK)])
 fi
 
-if test -d $PCAP_HOME; then :
-     echo -n ""
-else
+if ! test -d $PCAP_HOME; then :
      PCAP_HOME=`pwd`/../../PF_RING/userland
 fi
 SHORT_MACHINE=`uname -m | cut -b1-3`
