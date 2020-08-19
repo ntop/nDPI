@@ -40,7 +40,7 @@ void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
        && get_u_int8_t(packet->payload, 2) == 0x00	//3rd byte of packet length
        && get_u_int8_t(packet->payload, 3) == 0x00	//packet sequence number is 0 for startup packet
        && get_u_int8_t(packet->payload, 5) > 0x30	//server version > 0
-       && get_u_int8_t(packet->payload, 5) < 0x37	//server version < 7
+       && get_u_int8_t(packet->payload, 5) < 0x39	//server version < 9
        && get_u_int8_t(packet->payload, 6) == 0x2e	//dot
        ) {
 #if 0
