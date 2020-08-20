@@ -1,0 +1,3 @@
+DoH_DoT	2	1464	1
+
+	1	UDP 51.120.20.202:49241 <-> 72.119.217.29:443 [proto: 188.196/QUIC.DoH_DoT][cat: Network/14][1 pkts/1392 bytes <-> 1 pkts/72 bytes][Goodput ratio: 97/41][0.05 sec][Host: dns.google.com][PLAIN TEXT (dns.google.com)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]

@@ -930,6 +930,10 @@ extern "C" {
   int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int32_t *user_data);
   void ndpi_ptree_destroy(ndpi_ptree_t *tree);
 
+  /* General purpose utilities */
+  u_int64_t ndpi_htonll(u_int64_t v);
+  u_int64_t ndpi_ntohll(u_int64_t v);
+
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			  struct ndpi_flow_struct *flow,
