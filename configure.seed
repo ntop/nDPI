@@ -169,6 +169,12 @@ AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
+AC_ARG_ENABLE([gcrypt],
+  [AS_HELP_STRING([--disable-gcrypt], [Avoid compiling with libgcrypt/libgpg-error, even if they are present. QUIC sub-classification may be missing])],
+  [:],
+  [AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
+   AC_CHECK_LIB(gpg-error, gpg_strerror_r)])
+
 dnl> PCRE
 AC_ARG_WITH(pcre,          [  --with-pcre        Enable nDPI build with libpcre])
 if test "${with_pcre+set}" = set; then :

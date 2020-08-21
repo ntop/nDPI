@@ -1412,6 +1412,7 @@ typedef enum
   {
    ndpi_no_prefs = 0,
    ndpi_dont_load_tor_hosts,
+   ndpi_dont_init_libgcrypt,
   } ndpi_prefs;
 
 typedef struct {
