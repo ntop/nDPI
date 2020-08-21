@@ -51,6 +51,7 @@ extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 static int _ndpi_debug_callbacks = 0;
 
+/* #define DGA_DEBUG 1   */
 /* #define MATCH_DEBUG 1 */
 
 /* ****************************************** */
@@ -6599,14 +6600,13 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
-/* #define DGA_DEBUG 1 */
-
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
 			char *name) {
   int len, rc = 0;
   u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0;
-  
+  u_int8_t max_domain_element_len = 0, curr_domain_element_len = 0;
+
   len = strlen(name);
 
   if(len >= 5) {
@@ -6624,20 +6624,61 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	    max_num_char_repetitions = num_char_repetitions;
 	} else
 	  num_char_repetitions = 1, last_char = tmp[j];
+
+	switch(tmp[j]) {
+	case '.':
+	case '-':
+	case '_':
+	case '/':
+	case ')':
+	case '(':
+	case ';':
+	case ':':
+	case '[':
+	case ']':
+	case ' ':
+	  /*
+	    Domain/word separator chars 
+
+	    NOTE:
+	    this function is used also to detect other type of issues
+	    such as invalid/suspiciuous user agent
+	   */
+	  if(curr_domain_element_len > max_domain_element_len)
+	    max_domain_element_len = curr_domain_element_len;
+	  
+	  curr_domain_element_len = 0;
+	break;
+	
+	default:
+	  curr_domain_element_len++;
+	  break;
+	}
 	
 	j++;
     }
+    
+    if(curr_domain_element_len > max_domain_element_len)
+      max_domain_element_len = curr_domain_element_len;
 
-    if(max_num_char_repetitions > 5 /* num or consecutive repeated chars */) {
-      /*
-	In case of a name with too many consecutive chars an alert is triggered
-	This is the case for instance of the wildcard DNS query used by NetBIOS
-	(ckaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) and that can be exploited
-	for reflection attacks
-	- https://www.akamai.com/uk/en/multimedia/documents/state-of-the-internet/ddos-reflection-netbios-name-server-rpc-portmap-sentinel-udp-threat-advisory.pdf
-	- http://ubiqx.org/cifs/NetBIOS.html
+#ifdef DGA_DEBUG
+    printf("[DGA] [max_num_char_repetitions: %u][max_domain_element_len: %u]\n",
+	   max_num_char_repetitions, max_domain_element_len);
+#endif
+    
+    if(
+       (max_num_char_repetitions > 5 /* num or consecutive repeated chars */)
+       /*
+	 In case of a name with too many consecutive chars an alert is triggered
+	 This is the case for instance of the wildcard DNS query used by NetBIOS
+	 (ckaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) and that can be exploited
+	 for reflection attacks
+	 - https://www.akamai.com/uk/en/multimedia/documents/state-of-the-internet/ddos-reflection-netbios-name-server-rpc-portmap-sentinel-udp-threat-advisory.pdf
+	 - http://ubiqx.org/cifs/NetBIOS.html
        */
-      NDPI_SET_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
+       || (max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */)
+       ) {
+      if(flow) NDPI_SET_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
       return(1);
     }
     

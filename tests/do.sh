@@ -35,7 +35,7 @@ check_results() {
 				printf "%-32s\tOK\n" "$f"
 			else
 				printf "%-32s\tERROR\n" "$f"
-				echo "$CMD"
+				echo "$CMD [old vs new]"
 				diff result/$f.out /tmp/reader.out
 				RC=1
 			fi

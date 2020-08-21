@@ -83,10 +83,10 @@ typedef enum {
   NDPI_BLACKLISTED_HOST,
   
   /* Leave this as last member */
-  NDPI_MAX_RISK
+  NDPI_MAX_RISK /* must be <= 31 due to (**) */
 } ndpi_risk_enum;
 
-typedef u_int32_t ndpi_risk;
+typedef u_int32_t ndpi_risk; /* (**) */
 
 /* NDPI_VISIT */
 typedef enum {
