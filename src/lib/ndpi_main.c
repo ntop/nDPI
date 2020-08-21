@@ -6233,7 +6233,8 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 
-    if(flow_is_proto(flow, NDPI_PROTOCOL_TLS)) {
+    if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
+       flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {
       if(flow->protos.stun_ssl.ssl.server_names)
 	ndpi_free(flow->protos.stun_ssl.ssl.server_names);
 

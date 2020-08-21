@@ -31,7 +31,7 @@
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow);
+				    struct ndpi_flow_struct *flow, int is_quic);
 
 // #define DEBUG_TLS_MEMORY       1
 // #define DEBUG_TLS              1
@@ -616,7 +616,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   switch(packet->payload[0] /* block type */) {
   case 0x01: /* Client Hello */
   case 0x02: /* Server Hello */
-    processClientServerHello(ndpi_struct, flow);
+    processClientServerHello(ndpi_struct, flow, 0);
     flow->l4.tcp.tls.hello_processed = 1;
     ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
     break;
@@ -864,7 +864,7 @@ struct ja3_info {
 /* **************************************** */
 
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow) {
+			     struct ndpi_flow_struct *flow, int is_quic) {
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ja3_info ja3;
   u_int8_t invalid_ja3 = 0;
@@ -876,6 +876,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t total_len;
   u_int8_t handshake_type;
   char buffer[64] = { '\0' };
+  int is_dtls = packet->udp && (!is_quic);
 
 #ifdef DEBUG_TLS
   printf("SSL %s() called\n", __FUNCTION__);
@@ -893,9 +894,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* At least "magic" 3 bytes, null for string end, otherwise no need to waste cpu cycles */
   if(total_len > 4) {
-    u_int16_t base_offset    = packet->tcp ? 38 : 46;
-    u_int16_t version_offset = packet->tcp ? 4 : 12;
-    u_int16_t offset = packet->tcp ? 38 : 46, extension_len, j;
+    u_int16_t base_offset    = (!is_dtls) ? 38 : 46;
+    u_int16_t version_offset = (!is_dtls) ? 4 : 12;
+    u_int16_t offset = (!is_dtls) ? 38 : 46, extension_len, j;
     u_int8_t  session_id_len =  0;
     if (base_offset < total_len)
       session_id_len = packet->payload[base_offset];
@@ -1029,7 +1030,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       if((session_id_len+base_offset+3) > packet->payload_packet_len)
 	return(0); /* Not found */
 
-      if(packet->tcp) {
+      if(!is_dtls) {
 	cipher_len = packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
 	cipher_offset = base_offset + session_id_len + 3;
       } else {
@@ -1079,7 +1080,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	u_int16_t compression_len;
 	u_int16_t extensions_len;
 
-	offset += packet->tcp ? 1 : 2;
+	offset += (!is_dtls) ? 1 : 2;
 	compression_len = packet->payload[offset];
 	offset++;
 
@@ -1149,9 +1150,16 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  snprintf(flow->protos.stun_ssl.ssl.client_requested_server_name,
 			   sizeof(flow->protos.stun_ssl.ssl.client_requested_server_name),
 			   "%s", buffer);
-
-		  if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
-		    flow->l4.tcp.tls.subprotocol_detected = 1;
+#ifdef DEBUG_TLS
+		  printf("[TLS] SNI: [%s]\n", buffer);
+#endif
+		  if(!is_quic) {
+		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
+		      flow->l4.tcp.tls.subprotocol_detected = 1;
+		  } else {
+		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
+		      flow->l4.tcp.tls.subprotocol_detected = 1;
+		  }
 
 		  ndpi_check_dga_name(ndpi_struct, flow, flow->protos.stun_ssl.ssl.client_requested_server_name);
 		} else {
@@ -1289,7 +1297,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 #ifdef DEBUG_TLS
 		    printf("Client SSL [TLS version: %s/0x%04X]\n",
-			   ndpi_ssl_version2str(NULL, tls_version, &unknown_tls_version), tls_version);
+			   ndpi_ssl_version2str(flow, tls_version, &unknown_tls_version), tls_version);
 #endif
 
 		    if((version_str_len+8) < sizeof(version_str)) {
