@@ -107,11 +107,11 @@ void *ndpi_calloc(unsigned long count, size_t size) {
 void ndpi_free(void *ptr) {
   if(_ndpi_free) {
     if(ptr)
-      _ndpi_free(ptr);    
+      _ndpi_free(ptr);
   } else {
     if(ptr)
-      free(ptr);    
-  }  
+      free(ptr);
+  }
 }
 
 /* ****************************************** */
@@ -2619,7 +2619,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     else if(strncmp(attr, "host:", 5) == 0) {
       /* host:"<value>",host:"<value>",.....@<subproto> */
       u_int i, max_len;
-      
+
       value = &attr[5];
       if(value[0] == '"')
 	value++; /* remove leading " */
@@ -4781,7 +4781,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	if((default_ports[i] == sport) || (default_ports[i] == dport)) {
 	  found = 1;
 	  break;
-	}	
+	}
       } /* for */
 
       if((num_loops == 0) && (!found)) {
@@ -4789,11 +4789,11 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	  default_ports = ndpi_str->proto_defaults[ret.app_protocol].udp_default_ports;
 	else
 	  default_ports = ndpi_str->proto_defaults[ret.app_protocol].tcp_default_ports;
-	
+
 	num_loops = 1;
 	goto check_default_ports;
       }
-      
+
       if(!found) {
 	// printf("******** Invalid default port\n");
 	NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
@@ -6164,7 +6164,7 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
 
   /* Convert it first to lowercase: we assume meory is writable as in nDPI dissctors */
   for(i=0; i<name_len; i++) what[i] = tolower(what[i]);
-  
+
   subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len, &ret_match, master_protocol);
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
@@ -6668,7 +6668,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	case ']':
 	case ' ':
 	  /*
-	    Domain/word separator chars 
+	    Domain/word separator chars
 
 	    NOTE:
 	    this function is used also to detect other type of issues
@@ -6676,18 +6676,18 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	   */
 	  if(curr_domain_element_len > max_domain_element_len)
 	    max_domain_element_len = curr_domain_element_len;
-	  
+
 	  curr_domain_element_len = 0;
 	break;
-	
+
 	default:
 	  curr_domain_element_len++;
 	  break;
 	}
-	
+
 	j++;
     }
-    
+
     if(curr_domain_element_len > max_domain_element_len)
       max_domain_element_len = curr_domain_element_len;
 
@@ -6695,7 +6695,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     printf("[DGA] [max_num_char_repetitions: %u][max_domain_element_len: %u]\n",
 	   max_num_char_repetitions, max_domain_element_len);
 #endif
-    
+
     if(
        (max_num_char_repetitions > 5 /* num or consecutive repeated chars */)
        /*
@@ -6711,7 +6711,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       if(flow) NDPI_SET_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
       return(1);
     }
-    
+
     tmp[j] = '\0';
     len = j;
 
@@ -6778,7 +6778,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	  num_impossible++;
 	} else if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
 	  num_found++;
-	}	      
+	}
       } /* for */
     } /* for */
 
