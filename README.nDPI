@@ -5,17 +5,18 @@ Prerequisites
 - GNU autotools/libtool
 - libpcap or PF_RING (optional but recommended)
 - apt-get install libjson-c-dev (for JSON support)
+- libgcrypt20-dev (for QUIC support)
 
 On Ubuntu/Debian
 - apt-get install build-essential
-- apt-get install git autoconf automake autogen libpcap-dev libtool
+- apt-get install git autoconf automake autogen libpcap-dev libtool libgcrypt20-dev
 
 On Fedora/CentOS
 - yum groupinstall "Development tools"
-- yum install git autoconf automake autogen libpcap-devel libtool
+- yum install git autoconf automake autogen libpcap-devel libtool libgcrypt-devel
 
 On MacOSX (using http://brew.sh)
-brew install autoconf automake libtool git
+brew install autoconf automake libtool git libgcrypt
 
 On FreeBSD
-- pkg install autoconf automake libtool gmake git
+- pkg install autoconf automake libtool gmake git libgcrypt
