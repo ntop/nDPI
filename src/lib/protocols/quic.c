@@ -16,10 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * Based on code of:
- * Andrea Buscarinu - <andrea.buscarinu@gmail.com>
- * Michele Campus - <campus@ntop.org>
- *
  */
 
 #if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
@@ -38,13 +34,13 @@
 
 /* This dissector handles GQUIC and IETF-QUIC both.
    Main references:
-    * https://groups.google.com/a/chromium.org/g/proto-quic/c/wVHBir-uRU0?pli=1
-    * https://groups.google.com/a/chromium.org/g/proto-quic/c/OAVgFqw2fko/m/jCbjP0AVAAAJ
-    * https://groups.google.com/a/chromium.org/g/proto-quic/c/OAVgFqw2fko/m/-NYxlh88AgAJ
-    * https://docs.google.com/document/d/1FcpCJGTDEMblAs-Bm5TYuqhHyUqeWpqrItw2vkMFsdY/edit
-    * https://tools.ietf.org/html/draft-ietf-quic-tls-29
-    * https://tools.ietf.org/html/draft-ietf-quic-transport-29
-*/
+   * https://groups.google.com/a/chromium.org/g/proto-quic/c/wVHBir-uRU0?pli=1
+   * https://groups.google.com/a/chromium.org/g/proto-quic/c/OAVgFqw2fko/m/jCbjP0AVAAAJ
+   * https://groups.google.com/a/chromium.org/g/proto-quic/c/OAVgFqw2fko/m/-NYxlh88AgAJ
+   * https://docs.google.com/document/d/1FcpCJGTDEMblAs-Bm5TYuqhHyUqeWpqrItw2vkMFsdY/edit
+   * https://tools.ietf.org/html/draft-ietf-quic-tls-29
+   * https://tools.ietf.org/html/draft-ietf-quic-transport-29
+   */
 
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                                     struct ndpi_flow_struct *flow, int is_quic);
@@ -69,14 +65,14 @@ extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_st
 static int is_version_gquic(uint32_t version)
 {
   return ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
-         ((version & 0xFFFFFF00) == 0x51303400) /* Q04X */ ||
-         ((version & 0xFFFFFF00) == 0x51303300) /* Q03X */ ||
-         ((version & 0xFFFFFF00) == 0x51303200) /* Q02X */;
+    ((version & 0xFFFFFF00) == 0x51303400) /* Q04X */ ||
+    ((version & 0xFFFFFF00) == 0x51303300) /* Q03X */ ||
+    ((version & 0xFFFFFF00) == 0x51303200) /* Q02X */;
 }
 static int is_version_quic(uint32_t version)
 {
   return ((version & 0xFFFFFF00) == 0xFF000000) /* IETF */ ||
-         ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */;
+    ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */;
 }
 static int is_version_valid(uint32_t version)
 {
@@ -132,7 +128,7 @@ static int is_version_supported(uint32_t version)
 static int is_version_with_encrypted_header(uint32_t version)
 {
   return is_version_quic(version) ||
-         ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */;
+    ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */;
 }
 
 static int quic_len(const uint8_t *buf, uint64_t *value)
@@ -186,13 +182,13 @@ char *__gcry_err(gpg_error_t err, char *buf, size_t buflen)
 static uint64_t pntoh64(const void *p)
 {
   return (uint64_t)*((const uint8_t *)(p)+0)<<56|
-         (uint64_t)*((const uint8_t *)(p)+1)<<48|
-         (uint64_t)*((const uint8_t *)(p)+2)<<40|
-         (uint64_t)*((const uint8_t *)(p)+3)<<32|
-         (uint64_t)*((const uint8_t *)(p)+4)<<24|
-         (uint64_t)*((const uint8_t *)(p)+5)<<16|
-         (uint64_t)*((const uint8_t *)(p)+6)<<8|
-         (uint64_t)*((const uint8_t *)(p)+7)<<0;
+    (uint64_t)*((const uint8_t *)(p)+1)<<48|
+    (uint64_t)*((const uint8_t *)(p)+2)<<40|
+    (uint64_t)*((const uint8_t *)(p)+3)<<32|
+    (uint64_t)*((const uint8_t *)(p)+4)<<24|
+    (uint64_t)*((const uint8_t *)(p)+5)<<16|
+    (uint64_t)*((const uint8_t *)(p)+6)<<8|
+    (uint64_t)*((const uint8_t *)(p)+7)<<0;
 }
 static void phton64(uint8_t *p, uint64_t v)
 {
@@ -229,14 +225,14 @@ typedef struct _StringInfo {
 
 /* QUIC decryption context. */
 typedef struct quic_cipher {
-   gcry_cipher_hd_t hp_cipher;  /* Header protection cipher. */
-   gcry_cipher_hd_t pp_cipher;  /* Packet protection cipher. */
-   uint8_t pp_iv[TLS13_AEAD_NONCE_LENGTH];
+  gcry_cipher_hd_t hp_cipher;  /* Header protection cipher. */
+  gcry_cipher_hd_t pp_cipher;  /* Packet protection cipher. */
+  uint8_t pp_iv[TLS13_AEAD_NONCE_LENGTH];
 } quic_cipher;
 
 typedef struct quic_decrypt_result {
-    uint8_t *data; /* Decrypted result on success (file-scoped). */
-    uint32_t data_len;   /* Size of decrypted data. */
+  uint8_t *data; /* Decrypted result on success (file-scoped). */
+  uint32_t data_len;   /* Size of decrypted data. */
 } quic_decrypt_result_t;
 
 
@@ -274,7 +270,7 @@ static gcry_error_t hkdf_expand(int hashalgo, const uint8_t *prk, uint32_t prk_l
 
   /* Some sanity checks */
   if(!(out_len > 0 && out_len <= 255 * hash_len) ||
-      !(hash_len > 0 && hash_len <= sizeof(lastoutput))) {
+     !(hash_len > 0 && hash_len <= sizeof(lastoutput))) {
     return GPG_ERR_INV_ARG;
   }
 
@@ -307,8 +303,8 @@ static gcry_error_t hkdf_expand(int hashalgo, const uint8_t *prk, uint32_t prk_l
 static gcry_error_t hkdf_extract(int hashalgo, const uint8_t *salt, size_t salt_len,
 				 const uint8_t *ikm, size_t ikm_len, uint8_t *prk)
 {
-    /* PRK = HMAC-Hash(salt, IKM) where salt is key, and IKM is input. */
-    return ws_hmac_buffer(hashalgo, prk, ikm, ikm_len, salt, salt_len);
+  /* PRK = HMAC-Hash(salt, IKM) where salt is key, and IKM is input. */
+  return ws_hmac_buffer(hashalgo, prk, ikm, ikm_len, salt, salt_len);
 }
 
 
@@ -326,18 +322,18 @@ static int tls13_hkdf_expand_label_context(int md, const StringInfo *secret,
 					   const uint8_t *context_hash, uint8_t context_length,
 					   uint16_t out_len, uint8_t **out)
 {
-    /* RFC 8446 Section 7.1:
-     * HKDF-Expand-Label(Secret, Label, Context, Length) =
-     *      HKDF-Expand(Secret, HkdfLabel, Length)
-     * struct {
-     *     uint16 length = Length;
-     *     opaque label<7..255> = "tls13 " + Label; // "tls13 " is label prefix.
-     *     opaque context<0..255> = Context;
-     * } HkdfLabel;
-     *
-     * RFC 5869 HMAC-based Extract-and-Expand Key Derivation Function (HKDF):
-     * HKDF-Expand(PRK, info, L) -> OKM
-     */
+  /* RFC 8446 Section 7.1:
+   * HKDF-Expand-Label(Secret, Label, Context, Length) =
+   *      HKDF-Expand(Secret, HkdfLabel, Length)
+   * struct {
+   *     uint16 length = Length;
+   *     opaque label<7..255> = "tls13 " + Label; // "tls13 " is label prefix.
+   *     opaque context<0..255> = Context;
+   * } HkdfLabel;
+   *
+   * RFC 5869 HMAC-based Extract-and-Expand Key Derivation Function (HKDF):
+   * HKDF-Expand(PRK, info, L) -> OKM
+   */
   gcry_error_t err;
   const unsigned int label_prefix_length = (unsigned int)strlen(label_prefix);
   const unsigned label_length = (unsigned int)strlen(label);
@@ -415,7 +411,7 @@ static int tls13_hkdf_expand_label(int md, const StringInfo *secret,
 				   const char *label_prefix, const char *label,
 				   uint16_t out_len, unsigned char **out)
 {
-    return tls13_hkdf_expand_label_context(md, secret, label_prefix, label, NULL, 0, out_len, out);
+  return tls13_hkdf_expand_label_context(md, secret, label_prefix, label, NULL, 0, out_len, out);
 }
 
 
@@ -426,14 +422,14 @@ static int tls13_hkdf_expand_label(int md, const StringInfo *secret,
 static int quic_hkdf_expand_label(int hash_algo, uint8_t *secret, uint32_t secret_len,
 				  const char *label, uint8_t *out, uint32_t out_len)
 {
-    const StringInfo secret_si = { secret, secret_len };
-    uint8_t *out_mem = NULL;
-    if(tls13_hkdf_expand_label(hash_algo, &secret_si, "tls13 ", label, out_len, &out_mem)) {
-        memcpy(out, out_mem, out_len);
-        ndpi_free(out_mem);
-        return 1;
-    }
-    return 0;
+  const StringInfo secret_si = { secret, secret_len };
+  uint8_t *out_mem = NULL;
+  if(tls13_hkdf_expand_label(hash_algo, &secret_si, "tls13 ", label, out_len, &out_mem)) {
+    memcpy(out, out_mem, out_len);
+    ndpi_free(out_mem);
+    return 1;
+  }
+  return 0;
 }
 static void quic_cipher_reset(quic_cipher *cipher)
 {
@@ -465,7 +461,7 @@ static int quic_cipher_init(quic_cipher *cipher, int hash_algo,
   }
 
   return gcry_cipher_setkey(cipher->hp_cipher, hp_key, key_length) == 0 &&
-         gcry_cipher_setkey(cipher->pp_cipher, write_key, key_length) == 0;
+    gcry_cipher_setkey(cipher->pp_cipher, write_key, key_length) == 0;
 }
 /**
  * Maps a Packet Protection cipher to the Packet Number protection cipher.
@@ -490,7 +486,7 @@ static int quic_get_pn_cipher_algo(int cipher_algo, int *hp_cipher_mode)
 static int quic_cipher_prepare(quic_cipher *cipher, int hash_algo, int cipher_algo,
 			       int cipher_mode, uint8_t *secret)
 {
-#if 0    
+#if 0
   /* Clear previous state (if any). */
   quic_cipher_reset(cipher);
 #endif
@@ -556,7 +552,7 @@ static int quic_decrypt_header(const uint8_t *packet_payload,
     break;
   default:
     return 0;
-   }
+  }
 
   /* https://tools.ietf.org/html/draft-ietf-quic-tls-22#section-5.4.1 */
   uint8_t packet0 = packet_payload[0];
@@ -635,7 +631,7 @@ static void quic_decrypt_message(quic_cipher *cipher, const uint8_t *packet_payl
     ndpi_free(header);
     return;
   }
-  memcpy(atag, packet_payload + header_length + buffer_length, 16); 
+  memcpy(atag, packet_payload + header_length + buffer_length, 16);
 
   memcpy(nonce, cipher->pp_iv, TLS13_AEAD_NONCE_LENGTH);
   /* Packet number is left-padded with zeroes and XORed with write_iv */
@@ -705,20 +701,20 @@ static int quic_derive_initial_secrets(uint32_t version,
    * Hash for handshake packets is SHA-256 (output size 32).
    */
   static const uint8_t handshake_salt_draft_22[20] = {
-    0x7f, 0xbc, 0xdb, 0x0e, 0x7c, 0x66, 0xbb, 0xe9, 0x19, 0x3a,
-    0x96, 0xcd, 0x21, 0x51, 0x9e, 0xbd, 0x7a, 0x02, 0x64, 0x4a
+						      0x7f, 0xbc, 0xdb, 0x0e, 0x7c, 0x66, 0xbb, 0xe9, 0x19, 0x3a,
+						      0x96, 0xcd, 0x21, 0x51, 0x9e, 0xbd, 0x7a, 0x02, 0x64, 0x4a
   };
   static const uint8_t handshake_salt_draft_23[20] = {
-    0xc3, 0xee, 0xf7, 0x12, 0xc7, 0x2e, 0xbb, 0x5a, 0x11, 0xa7,
-    0xd2, 0x43, 0x2b, 0xb4, 0x63, 0x65, 0xbe, 0xf9, 0xf5, 0x02,
+						      0xc3, 0xee, 0xf7, 0x12, 0xc7, 0x2e, 0xbb, 0x5a, 0x11, 0xa7,
+						      0xd2, 0x43, 0x2b, 0xb4, 0x63, 0x65, 0xbe, 0xf9, 0xf5, 0x02,
   };
   static const uint8_t handshake_salt_draft_29[20] = {
-    0xaf, 0xbf, 0xec, 0x28, 0x99, 0x93, 0xd2, 0x4c, 0x9e, 0x97,
-    0x86, 0xf1, 0x9c, 0x61, 0x11, 0xe0, 0x43, 0x90, 0xa8, 0x99
+						      0xaf, 0xbf, 0xec, 0x28, 0x99, 0x93, 0xd2, 0x4c, 0x9e, 0x97,
+						      0x86, 0xf1, 0x9c, 0x61, 0x11, 0xe0, 0x43, 0x90, 0xa8, 0x99
   };
   static const uint8_t hanshake_salt_draft_q50[20] = {
-    0x50, 0x45, 0x74, 0xEF, 0xD0, 0x66, 0xFE, 0x2F, 0x9D, 0x94,
-    0x5C, 0xFC, 0xDB, 0xD3, 0xA7, 0xF0, 0xD3, 0xB5, 0x6B, 0x45
+						      0x50, 0x45, 0x74, 0xEF, 0xD0, 0x66, 0xFE, 0x2F, 0x9D, 0x94,
+						      0x5C, 0xFC, 0xDB, 0xD3, 0xA7, 0xF0, 0xD3, 0xB5, 0x6B, 0x45
   };
 
   gcry_error_t err;
@@ -732,12 +728,12 @@ static int quic_derive_initial_secrets(uint32_t version,
 		       sizeof(hanshake_salt_draft_q50),
                        cid, cid_len, secret);
   } else if(is_quic_ver_less_than(version, 22) ||
-	     version == V_MVFST_22) {
+	    version == V_MVFST_22) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_22,
 		       sizeof(handshake_salt_draft_22),
                        cid, cid_len, secret);
   } else if(is_quic_ver_less_than(version, 28) ||
-             version == V_MVFST_27) {
+	    version == V_MVFST_27) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_23,
 		       sizeof(handshake_salt_draft_23),
                        cid, cid_len, secret);
@@ -754,7 +750,7 @@ static int quic_derive_initial_secrets(uint32_t version,
   }
 
   if(!quic_hkdf_expand_label(GCRY_MD_SHA256, secret, sizeof(secret), "client in",
-			      client_initial_secret, HASH_SHA2_256_LENGTH)) {
+			     client_initial_secret, HASH_SHA2_256_LENGTH)) {
 #ifdef DEBUG_CRYPT
     printf("Key expansion (client) failed: %s\n", __gcry_err(err, buferr, sizeof(buferr)));
 #endif
@@ -765,7 +761,7 @@ static int quic_derive_initial_secrets(uint32_t version,
 }
 
 /*
- * End Wireshark code 
+ * End Wireshark code
  */
 
 
@@ -784,7 +780,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   uint8_t client_secret[HASH_SHA2_256_LENGTH];
 
   if(quic_derive_initial_secrets(version, dest_conn_id, dest_conn_id_len,
-			  	  client_secret) != 0) {
+				 client_secret) != 0) {
     NDPI_LOG_DBG(ndpi_struct, "Error quic_derive_initial_secrets\n");
     return NULL;
   }
@@ -797,7 +793,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
     NDPI_LOG_DBG(ndpi_struct, "Error quic_cipher_prepare\n");
     return NULL;
   }
-  
+
   /* Type(1) + version(4) + DCIL + DCID + SCIL + SCID */
   pn_offset = 1 + 4 + 1 + dest_conn_id_len + 1 + source_conn_id_len;
   pn_offset += quic_len(&packet->payload[pn_offset], &token_length);
@@ -811,12 +807,12 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
 		pn_offset, token_length, payload_length);
 
   if(!quic_decrypt_header(&packet->payload[0], pn_offset, cipher.hp_cipher,
-			   GCRY_CIPHER_AES128, &first_byte, &pkn32)) {
+			  GCRY_CIPHER_AES128, &first_byte, &pkn32)) {
     quic_cipher_reset(&cipher);
     return NULL;
   }
   NDPI_LOG_DBG2(ndpi_struct, "first_byte 0x%x pkn32 0x%x\n", first_byte, pkn32);
-  
+
   pkn_len = (first_byte & 3) + 1;
   /* TODO: is it always true in Initial Packets? */
   packet_number = pkn32;
@@ -824,9 +820,9 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   offset = pn_offset + pkn_len;
   quic_decrypt_message(&cipher, &packet->payload[0], packet->payload_packet_len,
 		       offset, first_byte, pkn_len, packet_number, &decryption);
-  
+
   quic_cipher_reset(&cipher);
-  
+
   if(decryption.data_len) {
     *clear_payload_len = decryption.data_len;
     return decryption.data;
@@ -930,7 +926,7 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
 
   if(*crypto_data_len + counter > clear_payload_len) {
     NDPI_LOG_ERR(ndpi_struct, "Invalid length %lu + %d > %d version 0x%x\n",
-		 *crypto_data_len, counter, clear_payload_len, version);
+		 (unsigned long)*crypto_data_len, counter, clear_payload_len, version);
     return NULL;
   }
   return crypto_data;
@@ -1002,7 +998,7 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload_packet_len = crypto_data_len;
 
   processClientServerHello(ndpi_struct, flow, 1);
-    
+
   /* Restore */
   packet->payload = p;
   packet->payload_packet_len = p_len;
@@ -1046,7 +1042,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 #if 0
     printf("crypto_data_len %u prev_offset %u offset %u len %d\n",
-		      crypto_data_len, prev_offset, offset, len);
+	   crypto_data_len, prev_offset, offset, len);
 #endif
     if((memcmp(tag, "SNI\0", 4) == 0) &&
        (tag_offset_start + prev_offset + len < crypto_data_len)) {
@@ -1100,7 +1096,7 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
   } else if(pub_bit5 && !pub_bit2) {
     if(!pub_bit8) {
       NDPI_LOG_DBG2(ndpi_struct, "Packet without version\n")
-    } else {
+	} else {
       *version = ntohl(*((u_int32_t *)&packet->payload[9]));
     }
   }
@@ -1112,7 +1108,7 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
   if(is_gquic_ver_less_than(*version, 43) &&
      (!pub_bit5 || pub_bit3 != 0 || pub_bit4 != 0)) {
     NDPI_LOG_ERR(ndpi_struct, "Version 0x%x invalid flags 0x%x\n",
-		  *version, first_byte);
+		 *version, first_byte);
     return 0;
   }
   if((*version == V_Q046) &&
@@ -1176,7 +1172,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(!is_version_supported(version)) {
     NDPI_LOG_ERR(ndpi_struct, "Unsupported version 0x%x\n", version)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
