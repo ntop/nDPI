@@ -1,0 +1,3 @@
+QUIC	353	400490	1
+
+	1	UDP 10.230.40.168:62196 <-> 94.97.225.146:443 [proto: 188/QUIC][cat: Web/5][43 pkts/13029 bytes <-> 310 pkts/387461 bytes][Goodput ratio: 91/98][0.20 sec][bytes ratio: -0.935 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 15/43 3/3][Pkt Len c2s/s2c min/avg/max/stddev: 59/66 303/1250 1260/1280 452/176][PLAIN TEXT (FSboeS)][Plen Bins: 4,4,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,85,0,0,0,0,0,0,0,0]

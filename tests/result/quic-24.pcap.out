@@ -1,0 +1,8 @@
+QUIC	15	8000	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.9.0.1                 	 1      
+
+
+	1	UDP 10.9.0.1:41436 <-> 10.9.0.2:443 [proto: 188/QUIC][cat: Web/5][7 pkts/4672 bytes <-> 8 pkts/3328 bytes][Goodput ratio: 94/90][30.04 sec][ALPN: h3-24][TLS Supported Versions: TLSv1.3][bytes ratio: 0.168 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 6006/4 30007/12 12000/4][Pkt Len c2s/s2c min/avg/max/stddev: 82/81 667/416 1294/1294 562/406][TLSv1.3][Client: localhost][JA3C: b3e43d74f4b790abca2f5fe7dd06e7cf][PLAIN TEXT (Udwn.wf)][Plen Bins: 0,34,0,6,6,0,0,0,6,0,6,0,0,0,0,6,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0]

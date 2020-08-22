@@ -3699,6 +3699,10 @@ int orginal_main(int argc, char **argv) {
 	     "------------------------------------------------------------\n\n");
 
       printf("Using nDPI (%s) [%d thread(s)]\n", ndpi_revision(), num_threads);
+
+      const char *gcrypt_ver = ndpi_get_gcrypt_version();
+      if(gcrypt_ver)
+        printf("Using libgcrypt version %s\n", gcrypt_ver);
     }
 
     signal(SIGINT, sigproc);

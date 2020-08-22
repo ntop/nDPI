@@ -32,6 +32,10 @@
 #include "ahocorasick.h"
 #include "libcache.h"
 
+#ifdef HAVE_LIBGCRYPT
+#include <gcrypt.h>
+#endif
+
 #include <time.h>
 #ifndef WIN32
 #include <unistd.h>
@@ -1978,6 +1982,24 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
   NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
+
+#ifdef HAVE_LIBGCRYPT
+  if(!(prefs & ndpi_dont_init_libgcrypt)) {
+    if(!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
+      const char *gcrypt_ver = gcry_check_version(NULL);
+      if (!gcrypt_ver) {
+        NDPI_LOG_ERR(ndpi_str, "Error initializing libgcrypt\n");
+        ndpi_free(ndpi_str);
+        return NULL;
+      }
+      NDPI_LOG_DBG(ndpi_str, "Libgcrypt %s\n", gcrypt_ver);
+      /* Tell Libgcrypt that initialization has completed. */
+      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
+    }
+  } else {
+    NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
+  }
+#endif
 
   if((ndpi_str->protocols_ptree = ndpi_New_Patricia(32 /* IPv4 */)) != NULL)
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list, prefs & ndpi_dont_load_tor_hosts);
@@ -6211,7 +6233,8 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 
-    if(flow_is_proto(flow, NDPI_PROTOCOL_TLS)) {
+    if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
+       flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {
       if(flow->protos.stun_ssl.ssl.server_names)
 	ndpi_free(flow->protos.stun_ssl.ssl.server_names);
 
@@ -6309,6 +6332,13 @@ void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
 
 u_int16_t ndpi_get_api_version() {
   return(NDPI_API_VERSION);
+}
+
+const char *ndpi_get_gcrypt_version(void) {
+#ifdef HAVE_LIBGCRYPT
+  return gcry_check_version(NULL);
+#endif
+  return NULL;
 }
 
 ndpi_proto_defaults_t *ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_str) {

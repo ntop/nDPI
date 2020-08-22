@@ -1,0 +1,8 @@
+QUIC	20	7191	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 2e4a:774d:26fd:7f9b:785b:2d1b:4f8a:63c7 	 1      
+
+
+	1	UDP [2e4a:774d:26fd:7f9b:785b:2d1b:4f8a:63c7]:50339 <-> [3bcc:9991:faba:bae1:cd2a:e2fd:b3be:c5ab]:443 [proto: 188/QUIC][cat: Web/5][10 pkts/2613 bytes <-> 10 pkts/4578 bytes][Goodput ratio: 76/86][0.11 sec][ALPN: h3-22][TLS Supported Versions: TLSv1.3][bytes ratio: -0.273 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/8 38/34 12/15][Pkt Len c2s/s2c min/avg/max/stddev: 92/94 261/458 1342/1342 373/458][TLSv1.3][Client: quic.aiortc.org][JA3C: d9e7bdb15af8e499820ca74a68affd78][Plen Bins: 5,35,15,10,5,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0]

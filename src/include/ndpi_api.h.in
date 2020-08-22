@@ -182,6 +182,10 @@ extern "C" {
    * hosts and do other things. As soon as you are ready to use
    * it do not forget to call first ndpi_finalize_initalization()
    *
+   * You can call this function multiple times, (i.e. to create multiple
+   * indipendent detection contexts) but all these calls MUST NOT run
+   * in parallel
+   *
    * @par prefs = load preferences
    * @return  the initialized detection module
    *
@@ -879,6 +883,7 @@ extern "C" {
   //void * ndpi_calloc(unsigned long count, size_t size);
   //void ndpi_free(void *ptr);
   u_int16_t ndpi_get_api_version(void);
+  const char *ndpi_get_gcrypt_version(void);
 
   /* https://github.com/corelight/community-id-spec */
   int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip, u_int16_t src_port, u_int16_t dst_port,
@@ -929,6 +934,10 @@ extern "C" {
   int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int8_t bits, u_int32_t user_data);
   int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int32_t *user_data);
   void ndpi_ptree_destroy(ndpi_ptree_t *tree);
+
+  /* General purpose utilities */
+  u_int64_t ndpi_htonll(u_int64_t v);
+  u_int64_t ndpi_ntohll(u_int64_t v);
 
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
