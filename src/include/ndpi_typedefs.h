@@ -923,6 +923,7 @@ typedef enum {
 		 to test connectivity
 	       */
 	      NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK,
+	      NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
 
 	      /* Some custom categories */
 	      CUSTOM_CATEGORY_MINING           = 99,

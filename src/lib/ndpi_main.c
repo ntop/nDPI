@@ -847,7 +847,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_a, 11095, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MODBUS, 1 /* no subprotocol */, no_master,
-			  no_master, "Modbus", NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
+			  no_master, "Modbus", NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
 			  ndpi_build_default_ports(ports_a, 502, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHATSAPP_CALL,
@@ -1457,12 +1457,12 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  NDPI_PROTOCOL_CATEGORY_CLOUD, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DNP3, 1 /* no subprotocol */, no_master,
-			  no_master, "DNP3", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  no_master, "DNP3", NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
 			  ndpi_build_default_ports(ports_a, 20000, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IEC60870, 1 /* no subprotocol */,
 			  no_master, no_master, "IEC60870",
-			  NDPI_PROTOCOL_CATEGORY_NETWORK, /* Perhaps IoT in the future */
+			  NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
 			  ndpi_build_default_ports(ports_a, 2404, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BLOOMBERG, 1 /* no subprotocol */,
@@ -1885,7 +1885,7 @@ static const char *categories[] = {
 				   "Productivity",
 				   "FileSharing",
 				   "ConnectivityCheck",
-				   "",
+				   "IoT-Scada",
 				   "",
 				   "",
 				   "",
