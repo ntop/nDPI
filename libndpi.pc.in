@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: libndpi
 Description: deep packet inspection library
 Version: @VERSION@
-Libs: -L${libdir} -lndpi
+Libs: -L${libdir} -lndpi @ADDITIONAL_LIBS@
 Cflags: -I${includedir}/ndpi
