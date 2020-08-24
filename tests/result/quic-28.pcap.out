@@ -1,0 +1,8 @@
+Cloudflare	253	246793	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.9.0.2                 	 1      
+
+
+	1	UDP 10.9.0.2:60106 <-> 104.26.11.240:443 [proto: 188.220/QUIC.Cloudflare][cat: Web/5][34 pkts/6856 bytes <-> 219 pkts/239937 bytes][Goodput ratio: 79/96][2.76 sec][ALPN: h3-28;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: -0.944 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 77/14 1007/1023 229/91][Pkt Len c2s/s2c min/avg/max/stddev: 85/84 202/1096 1242/1242 325/364][TLSv1.3][Client: www.wireshark.org][JA3C: 1e022f87823477abd6a79c31d70062d7][PLAIN TEXT (tGLddu)][Plen Bins: 0,16,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,80,0,0,0,0,0,0,0,0,0,0]

@@ -845,7 +845,7 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
   uint64_t unused;
 
   counter = 0;
-  while(clear_payload[counter] == 0 && counter < clear_payload_len)
+  while(counter < clear_payload_len && clear_payload[counter] == 0)
     counter += 1;
   if(counter >= clear_payload_len)
     return NULL;
