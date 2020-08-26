@@ -477,6 +477,10 @@ PACK_ON struct tinc_cache_entry {
   u_int16_t dst_port;
 } PACK_OFF;
 
+/* 
+   In case the typedef below is modified, please update 
+   ndpi_http_method2str (ndpi_utils.c)
+*/
 typedef enum {
 	      NDPI_HTTP_METHOD_UNKNOWN = 0,
 	      NDPI_HTTP_METHOD_OPTIONS,

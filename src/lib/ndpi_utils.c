@@ -1545,3 +1545,22 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return(buf);
   }
 }
+
+/* ******************************************************************** */
+
+const char* ndpi_http_method2str(ndpi_http_method m) {
+  switch(m) {
+    // case NDPI_HTTP_METHOD_UNKNOWN: return("Unknown");
+  case NDPI_HTTP_METHOD_OPTIONS: return("OPTIONS");
+  case NDPI_HTTP_METHOD_GET:     return("GET");
+  case NDPI_HTTP_METHOD_HEAD:    return("HEAD");
+  case NDPI_HTTP_METHOD_PATCH:   return("PATCH");
+  case NDPI_HTTP_METHOD_POST:    return("POST");
+  case NDPI_HTTP_METHOD_PUT:     return("PUT");
+  case NDPI_HTTP_METHOD_DELETE:  return("DELETE");
+  case NDPI_HTTP_METHOD_TRACE:   return("TRACE");
+  case NDPI_HTTP_METHOD_CONNECT: return("CONNECT");  
+  }
+  
+  return("Unknown HTTP method");
+}
