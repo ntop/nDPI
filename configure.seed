@@ -167,18 +167,22 @@ AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
+dnl> GCRYPT
 AC_ARG_ENABLE([gcrypt],
   [AS_HELP_STRING([--disable-gcrypt], [Avoid compiling with libgcrypt/libgpg-error, even if they are present. QUIC sub-classification may be missing])],
   [:],
   [AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
    AC_CHECK_LIB(gpg-error, gpg_strerror_r)])
+if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes; then :
+  ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt"
+fi
 
 dnl> PCRE
 AC_ARG_WITH(pcre,          [  --with-pcre        Enable nDPI build with libpcre])
 if test "${with_pcre+set}" = set; then :
   AC_CHECK_LIB(pcre, pcre_compile, AC_DEFINE_UNQUOTED(HAVE_PCRE, 1, [libpcre(-dev) is present]))
   if test "x$ac_cv_lib_pcre_pcre_compile" = xyes; then :
-    ADDITIONAL_LIBS=-lpcre
+    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lpcre"
   fi
 fi
 
