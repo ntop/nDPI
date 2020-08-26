@@ -1550,7 +1550,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
 const char* ndpi_http_method2str(ndpi_http_method m) {
   switch(m) {
-    // case NDPI_HTTP_METHOD_UNKNOWN: return("Unknown");
+  case NDPI_HTTP_METHOD_UNKNOWN: break;
   case NDPI_HTTP_METHOD_OPTIONS: return("OPTIONS");
   case NDPI_HTTP_METHOD_GET:     return("GET");
   case NDPI_HTTP_METHOD_HEAD:    return("HEAD");
@@ -1559,8 +1559,32 @@ const char* ndpi_http_method2str(ndpi_http_method m) {
   case NDPI_HTTP_METHOD_PUT:     return("PUT");
   case NDPI_HTTP_METHOD_DELETE:  return("DELETE");
   case NDPI_HTTP_METHOD_TRACE:   return("TRACE");
-  case NDPI_HTTP_METHOD_CONNECT: return("CONNECT");  
+  case NDPI_HTTP_METHOD_CONNECT: return("CONNECT");
   }
   
   return("Unknown HTTP method");
+}
+
+/* ******************************************************************** */
+
+ndpi_http_method ndpi_http_str2method(const char* method) {
+  switch(method[0]) {
+  case 'O': return(NDPI_HTTP_METHOD_OPTIONS);
+  case 'G': return(NDPI_HTTP_METHOD_GET);
+  case 'H': return(NDPI_HTTP_METHOD_HEAD);
+
+  case 'P':
+    switch(method[1]) {
+    case 'A':return(NDPI_HTTP_METHOD_PATCH);
+    case 'O':return(NDPI_HTTP_METHOD_POST);
+    case 'U':return(NDPI_HTTP_METHOD_PUT);
+    }
+    break;
+    
+  case 'D':  return(NDPI_HTTP_METHOD_DELETE);
+  case 'T':  return(NDPI_HTTP_METHOD_TRACE);
+  case 'C':  return(NDPI_HTTP_METHOD_CONNECT);
+  }
+  
+  return(NDPI_HTTP_METHOD_UNKNOWN);
 }
