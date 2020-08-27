@@ -1587,7 +1587,7 @@ ndpi_http_method ndpi_http_str2method(const char* method, ssize_t method_len) {
   case 'D':  return(NDPI_HTTP_METHOD_DELETE);
   case 'T':  return(NDPI_HTTP_METHOD_TRACE);
   case 'C':  return(NDPI_HTTP_METHOD_CONNECT);
-
-  default:   return(NDPI_HTTP_METHOD_UNKNOWN);
   }
+
+  return(NDPI_HTTP_METHOD_UNKNOWN);
 }
