@@ -337,10 +337,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[packet->host_line.len]);
       }
 
-      if(flow->packet.http_method.len < 3)
-        flow->http.method = NDPI_HTTP_METHOD_UNKNOWN;
-      else
-	flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr);
+      flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr, flow->packet.http_method.len);
     }
 
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {

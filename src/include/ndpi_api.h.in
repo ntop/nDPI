@@ -930,7 +930,7 @@ extern "C" {
   void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
 
   const char* ndpi_http_method2str(ndpi_http_method m);
-  ndpi_http_method ndpi_http_str2method(const char* method);
+  ndpi_http_method ndpi_http_str2method(const char* method, ssize_t method_len);
   
   /* ptree (trie) API */
   ndpi_ptree_t* ndpi_ptree_create(void);

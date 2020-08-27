@@ -1567,7 +1567,10 @@ const char* ndpi_http_method2str(ndpi_http_method m) {
 
 /* ******************************************************************** */
 
-ndpi_http_method ndpi_http_str2method(const char* method) {
+ndpi_http_method ndpi_http_str2method(const char* method, ssize_t method_len) {
+  if(!method || method_len < 3)
+    return(NDPI_HTTP_METHOD_UNKNOWN);
+
   switch(method[0]) {
   case 'O': return(NDPI_HTTP_METHOD_OPTIONS);
   case 'G': return(NDPI_HTTP_METHOD_GET);
@@ -1584,7 +1587,7 @@ ndpi_http_method ndpi_http_str2method(const char* method) {
   case 'D':  return(NDPI_HTTP_METHOD_DELETE);
   case 'T':  return(NDPI_HTTP_METHOD_TRACE);
   case 'C':  return(NDPI_HTTP_METHOD_CONNECT);
+
+  default:   return(NDPI_HTTP_METHOD_UNKNOWN);
   }
-  
-  return(NDPI_HTTP_METHOD_UNKNOWN);
 }
