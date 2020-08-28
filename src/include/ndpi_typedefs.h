@@ -27,6 +27,8 @@
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 
+#include "dns.h"
+
 /* NDPI_LOG_LEVEL */
 typedef enum {
 	      NDPI_LOG_ERROR,
@@ -1224,7 +1226,12 @@ struct ndpi_flow_struct {
       u_int8_t num_queries, num_answers, reply_code, is_query;
       u_int16_t query_type, query_class, rsp_type;
       ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet */
-    } dns;
+#ifdef __DNS_H__
+      u_int16_t tr_id, flags;
+      /* the RR lists of responses */
+      struct dnsRRList_t *dnsAnswerRRList, *dnsAuthorityRRList, *dnsAdditionalRRList;
+#endif   
+  } dns;
 
     struct {
       u_int8_t request_code;

@@ -21,10 +21,13 @@
  *
  */
 
+#include <stdbool.h>
+
 #include "ndpi_protocol_ids.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DNS
 
+#include "dns.h"
 #include "ndpi_api.h"
 
 
@@ -44,9 +47,116 @@ static u_int16_t get16(int *i, const u_int8_t *payload) {
   return(ntohs(v));
 }
 
+static u_int32_t get32(int *i, const u_int8_t *payload) {
+  uint32_t v = *(uint32_t*)&payload[*i];
+
+  (*i) += 4;
+
+  return(ntohl(v));
+}
+
+static struct dnsRRList_t *add_RR_elem_to_list(struct dnsRRList_t *currList, struct dnsRR_t *newItem) {
+
+  //printf("DBG(add_RR_elem_to_list): list: %p, item: %p\n",currList,newItem);    
+  struct dnsRRList_t *retList= calloc(1, sizeof(struct dnsRRList_t));
+  if ( retList ) {
+    retList->rrItem= newItem;
+    retList->nextItem= NULL;
+
+    if ( currList ) {
+       currList->nextItem= retList;
+       retList->prevItem= currList;
+    } else {
+       retList->prevItem= NULL;
+    }
+    //printf("DBG(add_RR_elem_to_list): return list: %p\n",retList);
+    return retList;
+  }
+  
+  //printf("DBG(add_RR_elem_to_list): ERR: input pointer nil \n");
+  return NULL;
+}
+
+void free_dns_QSec(struct dnsQuestionSec_t *qs) {
+        ndpi_free(qs->questionName);
+        ndpi_free(qs);
+}
+
+void free_dns_RR(struct dnsRR_t *rr) {
+        ndpi_free(rr->rrName);
+        switch(rr->rrType) {
+                case 2:
+                        ndpi_free(rr->RData.NSDName);
+                        break;
+                case 5:
+                        ndpi_free(rr->RData.CName);
+                        break;
+                case 6:
+                        ndpi_free(rr->RData.SOA.MName);
+                        ndpi_free(rr->RData.SOA.RName);
+                        break;
+                case 12:
+                        ndpi_free(rr->RData.PTRDName);
+                        break;
+                case 15:
+                        ndpi_free(rr->RData.MX.exchange);
+                        break;
+                case 16:
+                        ndpi_free(rr->RData.txtData);
+                        break;
+        };
+        ndpi_free(rr);
+}
+
+void clear_dns_RR_list(struct dnsRRList_t* currList, unsigned char bForward) {
+        while (currList) {
+                free_dns_RR(currList->rrItem);
+                struct dnsRRList_t* tmp= (bForward) ? currList->nextItem :  currList->prevItem;
+                ndpi_free( currList );
+                currList= tmp;
+        }
+}
+
 /* *********************************************** */
 
-static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
+/*
+ *   get the DNS name length, 
+ *     using the DNS Name Notation and Message Compression Technique
+ *       so:
+ *               if there is a pointer to other location of packet (c0), 
+ *                       jumps there and continue with count.
+ *                               return the real length of dns name, without change the pointer  
+ */
+u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
+  u_int8_t len=0,retLen=0;
+  // printf("DBG(getNameLength): off=%d/%d\n",i,payloadLen);
+     if(i >= payloadLen)
+         return(0);
+     else if(payload[i] == 0x00)
+         return(0);
+     else if(payload[i] == 0xC0) {
+         u_int8_t noff = payload[i+1];   // jump to new position
+   					 // printf("DBG(getNameLength): jump to pos=%d\n",noff);
+         retLen=getNameLength(noff, payload, payloadLen);
+                                         // printf("DBG(getNameLength): returned c0 len=%d\n",retLen);
+         return (retLen);
+    } else {
+         len = payload[i]+1; // word length and dot or termination char
+         u_int8_t off = len; // new offset 
+                                         // printf("DBG(getNameLength): curr len=%d\n",len);
+         if(off == 0) /* Bad packet */
+           return(0);
+         else {
+	                                // printf("DBG(getNameLength): delta len=%d\n",len);
+          retLen=getNameLength(i+off, payload, payloadLen);
+                                        // printf("DBG(getNameLength): returned len=%d\n",retLen);
+          return (len + retLen);
+         }
+    }
+                                                                                                                              }
+  
+/*
+ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   if(i >= payloadLen)
     return(0);
   else if(payload[i] == 0x00)
@@ -57,12 +167,15 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
     u_int8_t len = payload[i];
     u_int8_t off = len + 1;
 
-    if(off == 0) /* Bad packet */
+    if(off == 0) / * Bad packet * /
       return(0);
     else
       return(off + getNameLength(i+off, payload, payloadLen));
   }
-}
+}*/
+
+
+
 /*
   allowed chars for dns names A-Z 0-9 _ -
   Perl script for generation map:
@@ -77,6 +190,296 @@ static uint32_t dns_validchar[8] =
   {
    0x00000000,0x03ff2000,0x87fffffe,0x07fffffe,0,0,0,0
   };
+
+/* *********************************************** */
+/*
+        parse and retrieve a dns name, 
+        using the DNS Name Notation and Message Compression Technique
+        at exit increment offset of pointer on payload
+        
+   NB: if return_field pointer points to an area of max_len bytes, and
+        retrieved dns name is longer, the returned value is truncated!  
+*/
+
+void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8_t *payload, const u_int payloadLen ) {
+        u_int j= 0, off, cloff= 0, data_len, tmpv;
+
+        //printf("DBG(parseDnsName)\n");
+
+        // printf("DBG(parseDnsName) initial offset: %d\n",*i);
+        off=(u_int)*i;
+        data_len= getNameLength(off, payload, payloadLen);
+        // printf("DBG(parseDnsName): len %d, space: %d\n",data_len,max_len);
+
+        u_char *dnsName= ndpi_calloc(data_len+1,sizeof(u_char));
+        if ( return_field && dnsName) {
+
+                while(j < data_len && off < payloadLen && payload[off] != '\0') {
+                  uint8_t c, cl = payload[off++];       //init label counter
+
+                  // printf("DBG(parseDnsName): off: %d, value: %02X %c\n",off, cl, cl);
+                  if( (cl & 0xc0) != 0 ) {
+                        cloff=(cloff)?cloff:off+1;              // save return offset, first time
+                        tmpv= (payload[off++]);                 // change offset
+                        off = tmpv;
+                        // printf("DBG(parseDnsName): saved offset %d for jump to new off: %d\n",cloff, off);
+                        continue;
+                  } else if (off + cl >= payloadLen) {
+                        j = 0;
+                        break;
+                  }
+
+                  if(j && j < data_len) dnsName[j++] = '.';     // replace the label length with dot, except the at first 
+
+                  while(j < data_len && cl != 0) {
+                        u_int32_t shift;
+
+                        c = payload[off++];
+                        shift = ((u_int32_t) 1) << (c & 0x1f);
+                        dnsName[j++] = tolower((dns_validchar[c >> 5] & shift) ? c : '_');
+                        cl--;
+                  }
+                }
+
+                dnsName[j] = '\0';      // terminate dnsName
+
+                if(j > 0) {
+                        j = MIN(max_len,j);
+                        // printf("DBG(parseDnsName): offset iniziale: (%d), len:[%d] ? c0_inc_offset:[%d]\n", *i, j, cloff);
+                        *i= (cloff)?cloff:(j+2+*i);
+                        strncpy((char*)return_field,(char*)dnsName,j);
+                        // printf("DBG(parseDnsName): result: (%d) [%s]; new offset:[%d]\n", j, dnsName, *i);
+                }
+        }
+        else
+                printf("ERR: input pointer nil [%p] or failed to allocate memory.\n",return_field);
+
+        // printf("DBG(parseDnsName) final offset: %d\n",*i);
+
+        ndpi_free(dnsName);     // free memory
+}
+
+/* *********************************************** */
+
+/*
+        scan and parse a RR section (Answer,Authority,Additional) of DNS packet
+        increment the offset in the payload, after the last rr record successfully parsed
+
+*/
+struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload, const u_int payloadLen ) {
+
+        struct dnsRRList_t *retRRList=NULL, *lastRRListItem=NULL;
+        u_int off= (u_int)*i; // init offset 
+
+        //printf("DBG(parseDnsRRs): off initialized = %u\n", off);
+
+        for (int k=0; k<nitems; k++) {
+
+                //printf("DBG(parseDnsRRs): next record start at offset=%u\n", off);    
+
+                struct dnsRR_t *currItem= ndpi_calloc( 1, sizeof(struct dnsRR_t) );
+                if ( currItem ) {
+                        size_t data_len;
+
+                        //printf("DBG(parseDnsRRs): extracting data of item no. %d/%d \n",(k+1),nitems);
+
+                        /* parse the rrName */
+                        if((data_len = getNameLength(off, payload, payloadLen)) == 0) {
+                                printf("ERR(parseDnsRRs): 0 length of dns name \n");
+                                ndpi_free(currItem);
+                                break;
+                        }
+
+                       currItem->rrName = ndpi_calloc( 1, 1+data_len );
+                        if ( currItem->rrName ) {
+                                parseDnsName( (u_char*)currItem->rrName, data_len, (int*)&off, payload, payloadLen );
+                                //printf("DBG(parseDnsRRs): rrName: (%u) %s\n",(u_int)data_len,currItem->rrName);
+                        }
+                        else {
+                                printf("ERR(parseDnsRRs): fail to allocate memory for dns name\n");
+                                ndpi_free(currItem);
+                                return NULL;
+                        }
+
+                        currItem->rrType =  get16((int*)&off, payload);                                                 // resource type
+                        currItem->rrClass = get16((int*)&off, payload);                                                 // class of the resource record
+                        currItem->rrTTL= get32((int*)&off, payload);                                                    // cache time to live                   
+                        currItem->rrRDL= get16((int*)&off, payload);                                                    // resource data length
+
+
+                        //printf("DBG(parseDnsRRs): type:%u, class:%u, ttl:%u, RDlen: %u\n",currItem->rrType,currItem->rrClass,currItem->rrTTL,currItem->rrRDL);
+                        switch(currItem->rrType) {
+                                
+                                case DNS_TYPE_A:
+                                        memcpy(&currItem->RData.addressIP, &payload[off], sizeof(uint32_t));
+                                        //printf("DBG(parseDnsRRs): A [%p]\n",&currItem->RData.addressIP);
+                                        off+=4;
+                                        break;
+
+                                case DNS_TYPE_NS:
+                                        if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
+                                                currItem->RData.NSDName= calloc(data_len, sizeof(char));
+                                                if ( currItem->RData.NSDName ) {
+                                                        parseDnsName( (u_char*)currItem->RData.NSDName, data_len, (int*)&off, payload, payloadLen );
+                                                        //printf("DBG(parseDnsRRs): NS: (%u) %s\n",(u_int)data_len,currItem->RData.NSDName);
+                                                } else {
+                                                        printf("ERR(parseDnsRRs): fail to allocate memory for NS [ ]\n");
+                                                        ndpi_free(currItem->rrName);
+                                                        ndpi_free(currItem);
+                                                        return NULL;
+                                                }
+                                        }
+                                        else {
+                                                printf("ERR(parseDnsRRs): fail to allocate memory for txtData [ ]\n");
+                                                ndpi_free(currItem->rrName);
+                                                ndpi_free(currItem);
+                                                return NULL;
+                                        }
+                                        break;
+
+                                case DNS_TYPE_CNAME:
+                                        if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
+                                                currItem->RData.CName= calloc(data_len, sizeof(char));
+                                                if ( currItem->RData.CName ) {
+                                                        parseDnsName( (u_char*)currItem->RData.CName, data_len, (int*)&off, payload, payloadLen );
+                                                        //printf("DBG(parseDnsRRs): CNAME: (%u) %s\n",(u_int)data_len,currItem->RData.CName);
+                                                } else {
+                                                        printf("ERR(parseDnsRRs): fail to allocate memory for CNAME [ ]\n");
+                                                        ndpi_free(currItem->rrName);
+                                                        ndpi_free(currItem);
+                                                        return NULL;
+                                                }
+                                        }
+                                        else {
+                                                printf("ERR(parseDnsRRs): fail to allocate memory for txtData [ ]\n");
+                                                ndpi_free(currItem->rrName);
+                                                ndpi_free(currItem);
+                                                return NULL;
+                                        }
+                                        break;
+
+                                case DNS_TYPE_SOA:
+                                        // extract SOA Master name
+                                        if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
+                                                currItem->RData.SOA.MName= calloc(data_len, sizeof(char));
+                                                if ( currItem->RData.SOA.MName ) {
+                                                        parseDnsName( (u_char*)currItem->RData.SOA.MName, data_len, (int*)&off, payload, payloadLen );
+                                                        //printf("DBG(parseDnsRRs): SOA.MName: (%u) %s\n",(u_int)data_len, currItem->RData.SOA.MName);                                                  
+                                                }
+                                                else {
+                                                        printf("ERR(parseDnsRRs): fail to allocate memory for SOA.MName [ ]\n");
+                                                        ndpi_free(currItem->rrName);
+                                                        ndpi_free(currItem);
+                                                        return NULL;
+                                                }
+                                        } else currItem->RData.SOA.MName= NULL;
+
+                                        // extract SOA Responsible name
+                                        if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
+                                                currItem->RData.SOA.RName= calloc(data_len, sizeof(char));
+                                                if ( currItem->RData.SOA.RName ) {
+                                                        parseDnsName( (u_char*)currItem->RData.SOA.RName, data_len, (int*)&off, payload, payloadLen );
+                                                        //printf("DBG(parseDnsRRs): SOA.RName: (%u) %s\n",(u_int)data_len,currItem->RData.SOA.RName);                                                   
+                                                } else {
+                                                        printf("ERR(parseDnsRRs): fail to allocate memory for SOA.RName [ ]\n");
+                                                        ndpi_free(currItem->RData.SOA.MName);
+                                                        ndpi_free(currItem->rrName);
+                                                        ndpi_free(currItem);
+                                                        return NULL;
+                                                }
+ }
+                                        else currItem->RData.SOA.RName= NULL;
+
+                                        currItem->RData.SOA.Serial= get32((int*)&off, payload);         // serial
+                                        currItem->RData.SOA.Refresh= get32((int*)&off, payload);        // refresh
+                                        currItem->RData.SOA.Retry= get32((int*)&off, payload);  // retry
+                                        currItem->RData.SOA.Expire= get32((int*)&off, payload);         // expire
+                                        currItem->RData.SOA.Minimum= get32((int*)&off, payload);        // minimum
+
+                                        break;
+                                case DNS_TYPE_PTR:
+                                        if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
+                                                currItem->RData.PTRDName= calloc(data_len, sizeof(char));
+                                                if ( currItem->RData.PTRDName ) {
+                                                        parseDnsName( (u_char*)currItem->RData.PTRDName, data_len, (int*)&off, payload, payloadLen );
+                                                        //printf("DBG(parseDnsRRs): PTR: (%u) %s\n",(u_int)data_len,currItem->RData.PTRDName);
+                                                } else {
+                                                        printf("ERR(parseDnsRRs): fail to allocate memory for PTR [ ]\n");
+                                                        ndpi_free(currItem->rrName);
+                                                        ndpi_free(currItem);
+                                                        return NULL;
+                                                }
+                                        }
+                                        else {
+                                                printf("ERR(parseDnsRRs): fail to allocate memory for PTR [ ]\n");
+                                                ndpi_free(currItem->rrName);
+                                                ndpi_free(currItem);
+                                                return NULL;
+                                        }
+                                        break;
+
+ case DNS_TYPE_MX:
+                                        currItem->RData.MX.preference= payload[off++];
+                                        if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
+                                                currItem->RData.MX.exchange= calloc(data_len, sizeof(char));
+                                                if ( currItem->RData.MX.exchange ) {
+                                                        parseDnsName( (u_char*)currItem->RData.MX.exchange, data_len, (int*)&off, payload, payloadLen );
+                                                        //printf("DBG(parseDnsRRs): MX: (%u) %s - P: %d\n",(u_int)data_len,currItem->RData.MX.exchange,currItem->RData.MX.preference);  
+                                                } else {
+                                                        printf("ERR(parseDnsRRs): fail to allocate memory for MX [ ]\n");
+                                                        ndpi_free(currItem->rrName);
+                                                        ndpi_free(currItem);
+                                                        return NULL;
+                                                }
+
+                                        }
+                                        else {
+                                                printf("ERR(parseDnsRRs): fail to allocate memory for txtData [ ]\n");
+                                                ndpi_free(currItem->rrName);
+                                                ndpi_free(currItem);
+                                                return NULL;
+                                        }
+                                        break;
+
+                                case DNS_TYPE_TXT:
+                                        currItem->RData.txtData= ndpi_calloc((1+currItem->rrRDL), sizeof(char));
+                                        if (currItem->RData.txtData) {
+                                                memcpy(currItem->RData.txtData, &payload[off], currItem->rrRDL);
+                                                currItem->RData.txtData[currItem->rrRDL]='\0';
+                                                //printf("DBG(parseDnsRRs): [(%u) %s]\n",currItem->rrRDL,currItem->RData.txtData);
+                                                off+= currItem->rrRDL;
+                                        } else {
+                                                printf("ERR(parseDnsRRs): fail to allocate memory for txtData [ ]\n");
+                                                ndpi_free(currItem->rrName);
+                                                ndpi_free(currItem);
+                                                return NULL;
+                                        }
+                                        break;
+case DNS_TYPE_AAAA:
+                                        memcpy(&currItem->RData.addressIPv6, &payload[off], currItem->rrRDL);
+                                        //printf("DBG(parseDnsRRs): AAAA [%p]\n",&currItem->RData.addressIPv6);
+                                        off+=16;
+                                        break;
+
+                                default:
+                                        printf("RR type: [%02X] not managed.\n",currItem->rrType);
+                        }
+
+                        // fill the list
+                        if ( retRRList ) {
+                                lastRRListItem= add_RR_elem_to_list(lastRRListItem, currItem);
+                        } else {
+                                // list empty: first item
+                                retRRList= add_RR_elem_to_list(NULL, currItem);
+                                lastRRListItem= retRRList;
+                        }
+                }
+                else
+                        printf("ERR(parseDnsRRs): fail to allocate memory for a RR.\n");
+        }
+        *i=off;
+        return retRRList;
+}
 
 /* *********************************************** */
 
@@ -145,6 +548,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       /* Leave the statement below commented necessary in case of call to ndpi_get_partial_detection() */
       x++;
 
+// skip 'Question Name' section, because do its extraction after
+
       if(x < flow->packet.payload_packet_len && flow->packet.payload[x] != '\0') {
 	while((x < flow->packet.payload_packet_len)
 	      && (flow->packet.payload[x] != '\0')) {
@@ -155,8 +560,32 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       x += 4;
+// skip 'Question Name' section, because do its extraction after
 
       if(dns_header->num_answers > 0) {
+
+#ifdef __DNS_H__
+
+                flow->protos.dns.dnsAnswerRRList= parseDnsRRs(dns_header->num_answers,&x,flow->packet.payload,flow->packet.payload_packet_len);
+
+                // for compatibility with previous code, set the following variables with the first answer
+                if ( flow->protos.dns.dnsAnswerRRList ) {
+
+                        struct dnsRR_t *firstRR = flow->protos.dns.dnsAnswerRRList->rrItem;
+                        if (firstRR) {
+                                flow->protos.dns.rsp_type= firstRR->rrType;
+                                flow->protos.dns.query_class= firstRR->rrClass;
+
+                                if ( (((firstRR->rrType == 0x1) && (firstRR->rrRDL == 4)) /* A */
+#ifdef NDPI_DETECTION_SUPPORT_IPV6
+                                        || ((firstRR->rrType == 0x1c) && (firstRR->rrRDL == 16)) /* AAAA */
+#endif
+                                )) {
+                                        memcpy(&flow->protos.dns.rsp_addr, &firstRR->RData, firstRR->rrRDL);
+                                }
+                        }
+                }
+#else
 	u_int16_t rsp_type;
 	u_int16_t num;
 
@@ -203,7 +632,24 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  
 	  break;
 	}
+#endif
       }
+#ifdef __DNS_H__
+          else
+                  flow->protos.dns.dnsAnswerRRList= NULL;
+
+          if(dns_header->authority_rrs > 0)
+                flow->protos.dns.dnsAuthorityRRList= parseDnsRRs(dns_header->authority_rrs,&x, flow->packet.payload, flow->packet.payload_packet_len);
+          else
+                  flow->protos.dns.dnsAuthorityRRList= NULL;
+
+          if(dns_header->additional_rrs > 0)
+                flow->protos.dns.dnsAdditionalRRList= parseDnsRRs(dns_header->additional_rrs,&x, flow->packet.payload, flow->packet.payload_packet_len);
+          else
+                  flow->protos.dns.dnsAdditionalRRList= NULL;
+
+#endif
+
      
       if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
 	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
@@ -274,7 +720,15 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     /* extract host name server */
     max_len = sizeof(flow->host_server_name)-1;
     off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
-    
+
+    #ifdef __DNS_H__
+        // printf("DBG(ndpi_search_dns): max len: %d, offset: %u\n", max_len, off);
+        parseDnsName( flow->host_server_name, max_len, (int*)&off, flow->packet.payload, flow->packet.payload_packet_len ); 
+        j = strlen((const char*)flow->host_server_name);
+
+        //printf("DBG(ndpi_search_dns): len: %d, [%s]\n", j, flow->host_server_name);
+#else
+
     while(j < max_len && off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
       uint8_t c, cl = flow->packet.payload[off++];
 
@@ -297,10 +751,12 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     }
 
     flow->host_server_name[j] = '\0';
-    
+#endif
+
     if(j > 0) {
       ndpi_protocol_match_result ret_match;
 
+	/* check for domain generation algorithm using */
       ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name);
       
       ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
@@ -334,7 +790,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       return; /* The response will set the verdict */
     }
 
-    flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
+    //flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
       flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
 
 #ifdef DNS_DEBUG
