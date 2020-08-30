@@ -436,7 +436,6 @@ static struct option longopts[] = {
   { "capture", no_argument, NULL, '5'},
   { "extcap-capture-filter", required_argument, NULL, '6'},
   { "fifo", required_argument, NULL, '7'},
-  { "debug", no_argument, NULL, '8'},
   { "ndpi-proto-filter", required_argument, NULL, '9'},
 
   /* ndpiReader options */
@@ -453,8 +452,9 @@ static struct option longopts[] = {
   { "capture-duration", required_argument, NULL, 's'},
   { "decode-tunnels", no_argument, NULL, 't'},
   { "revision", no_argument, NULL, 'r'},
-  { "verbose", no_argument, NULL, 'v'},
-  { "version", no_argument, NULL, 'V'},
+  { "verbose", required_argument, NULL, 'v'},
+  { "version", no_argument, NULL, 'r'},
+  { "ndpi-log-level", required_argument, NULL, 'V'},
   { "dbg-proto", required_argument, NULL, 'u'},
   { "help", no_argument, NULL, 'h'},
   { "joy", required_argument, NULL, 'J'},
@@ -743,11 +743,11 @@ static void parseOptions(int argc, char **argv) {
 
     case 'V':
       nDPI_LogLevel  = atoi(optarg);
-      if(nDPI_LogLevel < 0) nDPI_LogLevel = 0;
-      if(nDPI_LogLevel > 3) {
-	nDPI_LogLevel = 3;
-	ndpi_free(_debug_protocols);
-	_debug_protocols = strdup("all");
+      if(nDPI_LogLevel < NDPI_LOG_ERROR) nDPI_LogLevel = NDPI_LOG_ERROR;
+      if(nDPI_LogLevel > NDPI_LOG_DEBUG_EXTRA) {
+	    nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
+	    ndpi_free(_debug_protocols);
+	    _debug_protocols = strdup("all");
       }
       break;
 
@@ -827,12 +827,6 @@ static void parseOptions(int argc, char **argv) {
 
     case '7':
       extcap_capture_fifo = strdup(optarg);
-      break;
-
-    case '8':
-      nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
-      ndpi_free(_debug_protocols);
-      _debug_protocols = strdup("all");
       break;
 
     case '9':
