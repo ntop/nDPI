@@ -197,7 +197,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   if((flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) || (http_protocol != NDPI_PROTOCOL_HTTP))
     flow->guessed_host_protocol_id = http_protocol;
 
-  ndpi_int_reset_protocol(flow);
+  // ndpi_int_reset_protocol(flow);
   ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_HTTP);
 
   /* This is necessary to inform the core to call this dissector again */
@@ -339,6 +339,11 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr, flow->packet.http_method.len);
     }
 
+  if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
+    if(strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0)
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP);
+  }
+  
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
     /**
        Format examples:
