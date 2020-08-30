@@ -269,7 +269,6 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
   if((strlen(ua) < 4)
      || (!strncmp(ua, "test", 4))
      || (!strncmp(ua, "<?", 2))
-     || strchr(ua, ';')
      || strchr(ua, '{')
      || strchr(ua, '}')
      || ndpi_check_dga_name(ndpi_struct, NULL, ua)

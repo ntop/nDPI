@@ -55,7 +55,7 @@ extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 static int _ndpi_debug_callbacks = 0;
 
-/* #define DGA_DEBUG 1   */
+/* #define DGA_DEBUG 1 */
 /* #define MATCH_DEBUG 1 */
 
 /* ****************************************** */
@@ -6644,7 +6644,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     char tmp[128], *word, *tok_tmp;
 
     len = snprintf(tmp, sizeof(tmp)-1, "%s", name);
-    if(len < 0) return(0);
+    if(len < 0) {
+#ifdef DGA_DEBUG
+      printf("[DGA] Too short");
+#endif
+      return(0);
+    }
 
     for(i=0, j=0; (i<len) && (j<(sizeof(tmp)-1)); i++) {
 	tmp[j] = tolower(name[i]);
@@ -6709,6 +6714,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
        || (max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */)
        ) {
       if(flow) NDPI_SET_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
+#ifdef DGA_DEBUG
+      printf("[DGA] Found!");
+#endif
       return(1);
     }
 
@@ -6800,6 +6808,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	     name, num_found, num_impossible);
 #endif
   }
+
+#ifdef DGA_DEBUG
+  printf("[DGA] Result: %u", rc);
+#endif
 
   return(rc);
 }
