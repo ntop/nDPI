@@ -80,7 +80,7 @@ typedef enum {
   NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER,
   NDPI_SMB_INSECURE_VERSION,
   NDPI_TLS_SUSPICIOUS_ESNI_USAGE,
-  NDPI_BLACKLISTED_HOST,
+  NDPI_UNSAFE_PROTOCOL,
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 31 due to (**) */

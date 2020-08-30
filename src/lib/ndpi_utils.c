@@ -1537,8 +1537,8 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
     return("TLS Suspicious ESNI Usage");
 
-  case NDPI_BLACKLISTED_HOST:
-    return("Blacklisted Host");
+  case NDPI_UNSAFE_PROTOCOL:
+    return("Unsafe Protocol");
 
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
