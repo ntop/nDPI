@@ -57,6 +57,8 @@ extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_st
 #define V_Q043		0x51303433
 #define V_Q046		0x51303436
 #define V_Q050		0x51303530
+#define V_T050		0x54303530
+#define V_T051		0x54303531
 #define V_MVFST_22	0xfaceb001
 #define V_MVFST_27	0xfaceb002
 
@@ -64,7 +66,8 @@ extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_st
 
 static int is_version_gquic(uint32_t version)
 {
-  return ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
+  return ((version & 0xFFFFFF00) == 0x54303500) /* T05X */ ||
+    ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
     ((version & 0xFFFFFF00) == 0x51303400) /* Q04X */ ||
     ((version & 0xFFFFFF00) == 0x51303300) /* Q03X */ ||
     ((version & 0xFFFFFF00) == 0x51303200) /* Q02X */;
@@ -121,6 +124,8 @@ static int is_version_supported(uint32_t version)
           version == V_Q043 ||
           version == V_Q046 ||
           version == V_Q050 ||
+          version == V_T050 ||
+          version == V_T051 ||
 	  version == V_MVFST_22 ||
 	  version == V_MVFST_27 ||
           is_quic_ver_greater_than(version, 23));
@@ -128,8 +133,15 @@ static int is_version_supported(uint32_t version)
 static int is_version_with_encrypted_header(uint32_t version)
 {
   return is_version_quic(version) ||
-    ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */;
+    ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
+    ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
 }
+static int is_version_with_tls(uint32_t version)
+{
+  return is_version_quic(version) ||
+    ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
+}
+
 
 static int quic_len(const uint8_t *buf, uint64_t *value)
 {
@@ -718,6 +730,14 @@ static int quic_derive_initial_secrets(uint32_t version,
 						      0x50, 0x45, 0x74, 0xEF, 0xD0, 0x66, 0xFE, 0x2F, 0x9D, 0x94,
 						      0x5C, 0xFC, 0xDB, 0xD3, 0xA7, 0xF0, 0xD3, 0xB5, 0x6B, 0x45
   };
+  static const uint8_t hanshake_salt_draft_t50[20] = {
+						      0x7f, 0xf5, 0x79, 0xe5, 0xac, 0xd0, 0x72, 0x91, 0x55, 0x80,
+						      0x30, 0x4c, 0x43, 0xa2, 0x36, 0x7c, 0x60, 0x48, 0x83, 0x10
+  };
+  static const uint8_t hanshake_salt_draft_t51[20] = {
+						      0x7a, 0x4e, 0xde, 0xf4, 0xe7, 0xcc, 0xee, 0x5f, 0xa4, 0x50,
+						      0x6c, 0x19, 0x12, 0x4f, 0xc8, 0xcc, 0xda, 0x6e, 0x03, 0x3d
+  };
 
   gcry_error_t err;
   uint8_t secret[HASH_SHA2_256_LENGTH];
@@ -728,6 +748,14 @@ static int quic_derive_initial_secrets(uint32_t version,
   if(version == V_Q050) {
     err = hkdf_extract(GCRY_MD_SHA256, hanshake_salt_draft_q50,
 		       sizeof(hanshake_salt_draft_q50),
+                       cid, cid_len, secret);
+  } else if(version == V_T050) {
+    err = hkdf_extract(GCRY_MD_SHA256, hanshake_salt_draft_t50,
+		       sizeof(hanshake_salt_draft_t50),
+                       cid, cid_len, secret);
+  } else if(version == V_T051) {
+    err = hkdf_extract(GCRY_MD_SHA256, hanshake_salt_draft_t51,
+		       sizeof(hanshake_salt_draft_t51),
                        cid, cid_len, secret);
   } else if(is_quic_ver_less_than(version, 22) ||
 	    version == V_MVFST_22) {
@@ -883,7 +911,7 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
     counter += 2;
     crypto_data = &clear_payload[counter];
 
-  } else if(version == V_Q050) {
+  } else if(version == V_Q050 || version == V_T050 || version == V_T051) {
     if(first_nonzero_payload_byte == 0x40 ||
        first_nonzero_payload_byte == 0x60) {
       /* Probably an ACK/NACK frame: this CHLO is not the first one but try
@@ -1204,7 +1232,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   /*
    * 6) Process ClientHello/CHLO from the Crypto Data
    */
-  if(is_version_gquic(version)) {
+  if(!is_version_with_tls(version)) {
     process_chlo(ndpi_struct, flow, crypto_data, crypto_data_len);
   } else {
     process_tls(ndpi_struct, flow, crypto_data, crypto_data_len);
