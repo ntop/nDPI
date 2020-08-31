@@ -716,7 +716,9 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
                            u_int16_t version, u_int8_t *unknown_tls_version) {
-  *unknown_tls_version = 0;
+
+  if(unknown_tls_version)
+    *unknown_tls_version = 0;
 
   switch(version) {
   case 0x0300: return("SSLv3");
@@ -748,7 +750,8 @@ char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
   if((version >= 0x7f00) && (version <= 0x7fff))
     return("TLSv1.3 (draft)");
 
-  *unknown_tls_version = 1;
+  if(unknown_tls_version)
+    *unknown_tls_version = 1;
 
   if(flow != NULL) {
     snprintf(flow->protos.stun_ssl.ssl.ssl_version_str,
