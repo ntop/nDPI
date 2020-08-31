@@ -1017,6 +1017,11 @@ struct pcre_struct {
 };
 #endif
 
+typedef enum {
+  ndpi_stun_cache,
+  ndpi_hangout_cache
+} ndpi_lru_cache_type;
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -1128,9 +1133,10 @@ struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */
-    _pad:7;
+  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
 
+  void (*ndpi_notify_lru_add_handler_ptr)(ndpi_lru_cache_type cache_type, u_int32_t proto, u_int32_t app_proto);
+  
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
 #endif
@@ -1546,6 +1552,5 @@ struct ndpi_bin {
     u_int32_t *bins32; /* num_bins bins */
   } u;
 };
-
 
 #endif /* __NDPI_TYPEDEFS_H__ */

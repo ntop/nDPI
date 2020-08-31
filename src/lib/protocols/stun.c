@@ -88,7 +88,12 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 #endif
 
 	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto);
+	  if(ndpi_struct->ndpi_notify_lru_add_handler_ptr)
+	    ndpi_struct->ndpi_notify_lru_add_handler_ptr(ndpi_stun_cache, key, app_proto);
+
 	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key_rev, app_proto);
+	  if(ndpi_struct->ndpi_notify_lru_add_handler_ptr)
+	    ndpi_struct->ndpi_notify_lru_add_handler_ptr(ndpi_stun_cache, key_rev, app_proto);
 	}
       }
     }

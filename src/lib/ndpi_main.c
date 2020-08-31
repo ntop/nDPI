@@ -1968,6 +1968,15 @@ static const char *categories[] = {
 
 /* ******************************************************************** */
 
+#ifdef TEST_LRU_HANDLER
+void test_lru_handler(ndpi_lru_cache_type cache_type, u_int32_t proto, u_int32_t app_proto) {
+
+  printf("[test_lru_handler] %u / %u / %u\n", cache_type, proto, app_proto);
+}
+#endif
+
+/* ******************************************************************** */
+
 struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
   int i;
@@ -1982,6 +1991,10 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   memset(ndpi_str, 0, sizeof(struct ndpi_detection_module_struct));
 
+#ifdef TEST_LRU_HANDLER
+  ndpi_str->ndpi_notify_lru_add_handler_ptr = test_lru_handler;
+#endif
+  
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
   NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
