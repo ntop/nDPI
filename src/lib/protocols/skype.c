@@ -64,13 +64,14 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 		|| (((packet->payload[0] & 0xF0) >> 4) == 0x07 /* Skype */)
 		)
 	    && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
-	    && (packet->payload[0] != 0x0)  /* Avoid invalid CAPWAP detection */
+	    && (packet->payload[0] != 0x00) /* Avoid invalid CAPWAP detection */
 	    && (packet->payload[2] == 0x02))) {
 
-	  if(is_port(sport, dport, 8801))
+	  if(is_port(sport, dport, 8801)) {
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN);
-	  else
+	  } else if (payload_len >= 16 && packet->payload[0] != 0x01) /* Avoid invalid Cisco HSRP detection / RADIUS */ {
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
+	  }
 	}
       }
       

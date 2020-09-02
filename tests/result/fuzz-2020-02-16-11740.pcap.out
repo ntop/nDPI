@@ -1,7 +1,6 @@
 Unknown	12	3985	12
-SkypeCall	1	725	1
 VRRP	1	725	1
-Radius	301	145048	63
+Radius	302	145773	64
 
 	1	UDP 10.12.64.30:29200 <-> 198.226.25.53:1812 [proto: 146/Radius][cat: Network/14][110 pkts/79894 bytes <-> 102 pkts/24138 bytes][Goodput ratio: 93/82][2575.21 sec][bytes ratio: 0.536 (Upload)][IAT c2s/s2c min/avg/max/stddev: 21/154 25882/28068 567977/452627 16551/21163][Pkt Len c2s/s2c min/avg/max/stddev: 697/179 726/237 745/318 596/53][PLAIN TEXT (50311480271516480@wlan.mnc480.m)][Plen Bins: 0,0,0,0,12,12,10,0,12,0,0,0,0,0,0,0,0,0,0,0,14,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 10.12.64.30:29200 <-> 198.226.25.62:1812 [proto: 146/Radius][cat: Network/14][12 pkts/8682 bytes <-> 6 pkts/1365 bytes][Goodput ratio: 94/81][1507.26 sec][bytes ratio: 0.728 (Upload)][IAT c2s/s2c min/avg/max/stddev: 195/217 150274/201744 597367/597234 30890/2147483648][Pkt Len c2s/s2c min/avg/max/stddev: 660/165 724/228 745/318 27/65][PLAIN TEXT (50311480281501589@wlan.mnc480.m)][Plen Bins: 0,0,0,5,11,5,0,0,11,0,0,0,0,0,0,0,0,0,0,5,16,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -22,7 +21,7 @@ Radius	301	145048	63
 	17	UDP 10.76.64.30:29200 -> 198.226.25.53:1812 [proto: 146/Radius][cat: Network/14][1 pkts/745 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][PLAIN TEXT (0311480071394304@wlan.mncD)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	18	UDP 57.12.64.30:29200 -> 198.226.25.53:28948 [proto: 146/Radius][cat: Network/14][1 pkts/745 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][PLAIN TEXT (50311480250864628)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	UDP 182.12.64.30:29200 -> 198.226.25.53:1812 [proto: 146/Radius][cat: Network/14][1 pkts/745 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][PLAIN TEXT (5031148)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	20	UDP 10.12.64.30:29200 -> 198.119.25.53:1812 [proto: 125.38/Skype.SkypeCall][cat: VoIP/10][1 pkts/725 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][Risk: ** Known protocol on non standard port **][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	20	UDP 10.12.64.30:29200 -> 198.119.25.53:1812 [proto: 146/Radius][cat: Network/14][1 pkts/725 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	21	UDP 10.12.64.30:29200 -> 198.226.25.53:1796 [proto: 146/Radius][cat: Network/14][1 pkts/725 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][PLAIN TEXT (11480073638072@wlan.mnc)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	UDP 10.12.64.30:29200 -> 198.226.37.0:1812 [proto: 146/Radius][cat: Network/14][1 pkts/725 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][PLAIN TEXT (50311480250864628@wlan.Vn)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	23	UDP 10.12.64.30:29232 -> 198.226.25.53:1812 [proto: 146/Radius][cat: Network/14][1 pkts/725 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][PLAIN TEXT (50311480073638072@wlan.mnc480.m)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

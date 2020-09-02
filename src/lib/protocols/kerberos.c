@@ -309,7 +309,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
 #endif
 
-		if(name_offset < (packet->payload_packet_len+1)) {
+		if(name_offset < (packet->payload_packet_len - 1)) {
 		  u_int realm_len;
 
 		  name_offset++;
