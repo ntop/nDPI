@@ -1439,8 +1439,9 @@ typedef enum {
   ndpi_serialization_format_csv
 } ndpi_serialization_format;
 
-/* Note: key supports string and uint32 (compressed to uint8/uint16) only,
- * this is also enforced by the API */
+/* Note: 
+ * - up to 16 types (TLV encoding: "4 bit key type" << 4 | "4 bit value type")
+ * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API */
 typedef enum {
   ndpi_serialization_unknown = 0,
   ndpi_serialization_end_of_record,
@@ -1453,7 +1454,9 @@ typedef enum {
   ndpi_serialization_int32,
   ndpi_serialization_int64,
   ndpi_serialization_float,
-  ndpi_serialization_string
+  ndpi_serialization_string,
+  ndpi_serialization_start_of_block,
+  ndpi_serialization_end_of_block
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024

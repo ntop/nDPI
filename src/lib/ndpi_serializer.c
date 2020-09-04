@@ -1743,14 +1743,15 @@ int ndpi_serialize_end_of_list(ndpi_serializer *_serializer) {
 
 /* ********************************** */
 
-/* Serialize start of nested block (JSON only)*/
-int ndpi_serialize_start_of_block(ndpi_serializer *_serializer,
-				  const char *key) {
+/* Serialize start of nested block */
+int ndpi_serialize_start_of_block_binary(ndpi_serializer *_serializer,
+				         const char *key, u_int16_t klen) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-  u_int32_t needed, klen = strlen(key);
+  u_int32_t needed;
 
-  if(serializer->fmt != ndpi_serialization_format_json)
+  if(serializer->fmt != ndpi_serialization_format_json && 
+     serializer->fmt != ndpi_serialization_format_tlv)
     return(-1);
 
   needed = 16 + klen;
@@ -1761,17 +1762,33 @@ int ndpi_serialize_start_of_block(ndpi_serializer *_serializer,
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   }
 
-  ndpi_serialize_json_pre(_serializer);
-  serializer->status.buffer.size_used += ndpi_json_string_escape(key, klen,
-    (char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff);
-  buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-  serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, ": {");
-  buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-  ndpi_serialize_json_post(_serializer);
-
-  serializer->status.flags |= NDPI_SERIALIZER_STATUS_SOB;
+  if (serializer->fmt == ndpi_serialization_format_json) {
+    ndpi_serialize_json_pre(_serializer);
+    serializer->status.buffer.size_used += ndpi_json_string_escape(key, klen,
+      (char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff);
+    buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
+    serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, ": {");
+    buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
+    ndpi_serialize_json_post(_serializer);
+  
+    serializer->status.flags |= NDPI_SERIALIZER_STATUS_SOB;
+  } else /* ndpi_serialization_format_tlv */ {
+    serializer->buffer.data[serializer->status.buffer.size_used++] = ndpi_serialization_start_of_block;
+    ndpi_serialize_single_string(serializer, key, klen);
+  }
 
   return(0);
+}
+
+/* ********************************** */
+
+/* Serialize start of nested block */
+int ndpi_serialize_start_of_block(ndpi_serializer *_serializer,
+				  const char *_key) {
+  const char *key = _key ? _key : "";
+  u_int16_t klen = strlen(key);
+
+  return ndpi_serialize_start_of_block_binary(_serializer, key, klen);
 }
 
 /* ********************************** */
@@ -1782,7 +1799,8 @@ int ndpi_serialize_end_of_block(ndpi_serializer *_serializer) {
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
 
-  if(serializer->fmt != ndpi_serialization_format_json)
+  if(serializer->fmt != ndpi_serialization_format_json && 
+     serializer->fmt != ndpi_serialization_format_tlv)
     return(-1);
 
   needed = 4;
@@ -1793,11 +1811,16 @@ int ndpi_serialize_end_of_block(ndpi_serializer *_serializer) {
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   }
 
-  if(serializer->status.flags & NDPI_SERIALIZER_STATUS_SOB) /* Empty block */
-    serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_SOB;
+  if (serializer->fmt == ndpi_serialization_format_json) {
 
-  // buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-  ndpi_serialize_json_post(_serializer);
+    if(serializer->status.flags & NDPI_SERIALIZER_STATUS_SOB) /* Empty block */
+      serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_SOB;
+
+    // buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
+    ndpi_serialize_json_post(_serializer);
+  } else {
+    serializer->buffer.data[serializer->status.buffer.size_used++] = ndpi_serialization_end_of_block;
+  }
 
   return(0);
 }
@@ -1987,9 +2010,11 @@ static inline int ndpi_deserialize_get_single_size(ndpi_private_deserializer *de
     size = sizeof(float);
     break;
   case ndpi_serialization_string:
+  case ndpi_serialization_start_of_block:
     size = ndpi_deserialize_get_single_string_size(deserializer, offset);
     break;
   case ndpi_serialization_end_of_record:
+  case ndpi_serialization_end_of_block:
   case ndpi_serialization_unknown:
     size = 0;
     break;
@@ -2003,6 +2028,8 @@ static inline int ndpi_deserialize_get_single_size(ndpi_private_deserializer *de
 
 /* ********************************** */
 
+/* Move the current offset (status.buffer.size_used) to point
+ * to the next element */
 int ndpi_deserialize_next(ndpi_deserializer *_deserializer) {
   ndpi_private_deserializer *deserializer = (ndpi_private_deserializer *) _deserializer;
   u_int32_t buff_diff = deserializer->buffer.size - deserializer->status.buffer.size_used;
@@ -2077,6 +2104,7 @@ int ndpi_deserialize_key_uint32(ndpi_deserializer *_deserializer,
 
 /* ********************************** */
 
+/* Return the string key for the current element */
 int ndpi_deserialize_key_string(ndpi_deserializer *_deserializer,
 				ndpi_string *key) {
   ndpi_private_deserializer *deserializer = (ndpi_private_deserializer*)_deserializer;
@@ -2297,6 +2325,7 @@ int ndpi_deserialize_value_float(ndpi_deserializer *_deserializer,
 
 /* ********************************** */
 
+/* Return the string value for the current element */
 int ndpi_deserialize_value_string(ndpi_deserializer *_deserializer,
 				  ndpi_string *value) {
   ndpi_private_deserializer *deserializer = (ndpi_private_deserializer*)_deserializer;
@@ -2309,12 +2338,14 @@ int ndpi_deserialize_value_string(ndpi_deserializer *_deserializer,
   if(buff_diff < expected) return(-2);
 
   kt = ndpi_deserialize_get_key_subtype(deserializer);
+
   size = ndpi_deserialize_get_single_size(deserializer, kt, deserializer->status.buffer.size_used + expected);
   if(size < 0) return(-2);
 
   expected += size;
 
   et = ndpi_deserialize_get_value_subtype(deserializer);
+
   size = ndpi_deserialize_get_single_size(deserializer, et, deserializer->status.buffer.size_used + expected);
   if(size < 0) return(-2);
 
@@ -2391,8 +2422,14 @@ int ndpi_deserialize_clone_all(ndpi_deserializer *deserializer, ndpi_serializer 
 
     if(et == ndpi_serialization_end_of_record) {
       ndpi_serialize_end_of_record(serializer);
-      ndpi_deserialize_next(deserializer);
-      continue;
+      goto next;
+    } else if(et == ndpi_serialization_start_of_block) {
+      ndpi_deserialize_key_string(deserializer, &ks);
+      ndpi_serialize_start_of_block_binary(serializer, ks.str, ks.str_len);
+      goto next;
+    } else if(et == ndpi_serialization_end_of_block) {
+      ndpi_serialize_end_of_block(serializer);
+      goto next;
     }
 
     key_is_string = 0;
@@ -2449,6 +2486,7 @@ int ndpi_deserialize_clone_all(ndpi_deserializer *deserializer, ndpi_serializer 
       return(-2);
     }
 
+   next:
     ndpi_deserialize_next(deserializer);
   }
 
