@@ -237,7 +237,7 @@ typedef enum {
   NDPI_PROTOCOL_FREE_205              = 205,
   NDPI_PROTOCOL_WIREGUARD             = 206,
   NDPI_PROTOCOL_SMPP                  = 207, /* Damir Franusic <df@release14.org> */
-  NDPI_PROTOCOL_DNSCRYPT              = 208,
+  NDPI_PROTOCOL_DNSCRYPT              = 208, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_TINC                  = 209, /* William Guglielmo <william@deselmo.com> */
   NDPI_PROTOCOL_DEEZER                = 210,
   NDPI_PROTOCOL_INSTAGRAM             = 211, /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */
