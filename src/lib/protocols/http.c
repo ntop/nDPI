@@ -278,6 +278,90 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
   }
 }
 
+int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
+			    struct ndpi_flow_struct *flow,
+			    const u_int8_t *ua_ptr, u_int16_t ua_ptr_len)
+{
+  /**
+      Format examples:
+      Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ....
+      Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0
+   */
+  if(ua_ptr_len > 7) {
+    char ua[256];
+    u_int mlen = ndpi_min(ua_ptr_len, sizeof(ua)-1);
+
+    strncpy(ua, (const char *)ua_ptr, mlen);
+    ua[mlen] = '\0';
+
+    if(strncmp(ua, "Mozilla", 7) == 0) {
+      char *parent = strchr(ua, '(');
+
+      if(parent) {
+	char *token, *end;
+
+	parent++;
+	end = strchr(parent, ')');
+	if(end) end[0] = '\0';
+
+	token = strsep(&parent, ";");
+	if(token) {
+	  if((strcmp(token, "X11") == 0)
+	     || (strcmp(token, "compatible") == 0)
+	     || (strcmp(token, "Linux") == 0)
+	     || (strcmp(token, "Macintosh") == 0)
+	     ) {
+	    token = strsep(&parent, ";");
+	    if(token && (token[0] == ' ')) token++; /* Skip space */
+
+	    if(token
+	       && ((strcmp(token, "U") == 0)
+		   || (strncmp(token, "MSIE", 4) == 0))) {
+	      token = strsep(&parent, ";");
+	      if(token && (token[0] == ' ')) token++; /* Skip space */
+
+              if(token && (strncmp(token, "Update", 6)  == 0)) {
+                token = strsep(&parent, ";");
+
+                if(token && (token[0] == ' ')) token++; /* Skip space */
+
+                if(token && (strncmp(token, "AOL", 3)  == 0)) {
+
+                  token = strsep(&parent, ";");
+                  if(token && (token[0] == ' ')) token++; /* Skip space */
+                }
+              }
+            }
+          }
+
+          if(token)
+            setHttpUserAgent(ndpi_struct, flow, token);
+	}
+      }
+    } else if((ua_ptr_len > 14) && (memcmp(ua, "netflix-ios-app", 15) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found netflix\n");
+      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING);
+      return -1;
+    }
+  }
+
+  if(flow->http.user_agent == NULL) {
+    int len = ua_ptr_len + 1;
+
+    flow->http.user_agent = ndpi_malloc(len);
+    if(flow->http.user_agent) {
+      strncpy(flow->http.user_agent, (char*)ua_ptr, ua_ptr_len);
+      flow->http.user_agent[ua_ptr_len] = '\0';
+
+      ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent);
+    }
+  }
+
+  NDPI_LOG_DBG2(ndpi_struct, "User Agent Type line found %.*s\n",
+		ua_ptr_len, ua_ptr);
+  return 0;
+}
+
 /* ************************************************************* */
 
 static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_struct,
@@ -311,6 +395,7 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 						   struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
+  int ret;
 
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_UNKNOWN);
 
@@ -345,84 +430,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
   
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
-    /**
-       Format examples:
-       Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ....
-       Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0
-    */
-    if(packet->user_agent_line.len > 7) {
-      char ua[256];
-      u_int mlen = ndpi_min(packet->user_agent_line.len, sizeof(ua)-1);
-
-      strncpy(ua, (const char *)packet->user_agent_line.ptr, mlen);
-      ua[mlen] = '\0';
-
-      if(strncmp(ua, "Mozilla", 7) == 0) {
-	char *parent = strchr(ua, '(');
-
-	if(parent) {
-	  char *token, *end;
-
-	  parent++;
-	  end = strchr(parent, ')');
-	  if(end) end[0] = '\0';
-
-	  token = strsep(&parent, ";");
-	  if(token) {
-	    if((strcmp(token, "X11") == 0)
-	       || (strcmp(token, "compatible") == 0)
-	       || (strcmp(token, "Linux") == 0)
-	       || (strcmp(token, "Macintosh") == 0)
-	       ) {
-	      token = strsep(&parent, ";");
-	      if(token && (token[0] == ' ')) token++; /* Skip space */
-
-	      if(token
-		 && ((strcmp(token, "U") == 0)
-		     || (strncmp(token, "MSIE", 4) == 0))) {
-		token = strsep(&parent, ";");
-		if(token && (token[0] == ' ')) token++; /* Skip space */
-
-		if(token && (strncmp(token, "Update", 6)  == 0)) {
-		  token = strsep(&parent, ";");
-
-		  if(token && (token[0] == ' ')) token++; /* Skip space */
-
-		  if(token && (strncmp(token, "AOL", 3)  == 0)) {
-
-		    token = strsep(&parent, ";");
-		    if(token && (token[0] == ' ')) token++; /* Skip space */
-		  }
-		}
-	      }
-	    }
-
-	    if(token)
-	      setHttpUserAgent(ndpi_struct, flow, token);
-	  }
-	}
-      } else if((packet->user_agent_line.len > 14) && (memcmp(ua, "netflix-ios-app", 15) == 0)) {
-	NDPI_LOG_INFO(ndpi_struct, "found netflix\n");
-      	ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING);
-      	return;
-      }
-    }
-
-    if(flow->http.user_agent == NULL) {
-      int len = packet->user_agent_line.len + 1;
-
-      flow->http.user_agent = ndpi_malloc(len);
-      if(flow->http.user_agent) {
-	strncpy(flow->http.user_agent, (char*)packet->user_agent_line.ptr,
-		packet->user_agent_line.len);
-	flow->http.user_agent[packet->user_agent_line.len] = '\0';
-
-	ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent);
-      }
-    }
-
-    NDPI_LOG_DBG2(ndpi_struct, "User Agent Type line found %.*s\n",
-		  packet->user_agent_line.len, packet->user_agent_line.ptr);
+    ret = http_process_user_agent(ndpi_struct, flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
+    /* TODO: Is it correct to avoid setting ua, host_name,... if we have a (Netflix) subclassification? */
+    if(ret != 0)
+      return;
   }
 
   /* check for host line */

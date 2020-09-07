@@ -1139,6 +1139,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* TLS */
   else if((is_ndpi_proto(flow, NDPI_PROTOCOL_TLS))
+	  || ((is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)))
 	  || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
 	  || (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client[0] != '\0')
 	  ) {
@@ -1146,6 +1147,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     snprintf(flow->ssh_tls.client_requested_server_name,
 	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
 	     flow->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name);
+
+    snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
 
     if(flow->ndpi_flow->protos.stun_ssl.ssl.server_names_len > 0 && flow->ndpi_flow->protos.stun_ssl.ssl.server_names)
       flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.server_names);

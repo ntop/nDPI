@@ -1268,10 +1268,10 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->http.content_type[0] != '\0')
       fprintf(out, "[Content-Type: %s]", flow->http.content_type);
-
-    if(flow->http.user_agent[0] != '\0')
-      fprintf(out, "[User-Agent: %s]", flow->http.user_agent);
   }
+
+  if(flow->http.user_agent[0] != '\0')
+    fprintf(out, "[User-Agent: %s]", flow->http.user_agent);
 
   if(flow->risk) {
     u_int i;
