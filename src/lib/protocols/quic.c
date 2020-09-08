@@ -43,7 +43,10 @@
    */
 
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
-                                    struct ndpi_flow_struct *flow, int is_quic);
+                                    struct ndpi_flow_struct *flow, uint32_t quic_version);
+extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
+                                   struct ndpi_flow_struct *flow,
+                                   const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
 
 /* Versions */
 #define V_Q024		0x51303234
@@ -141,9 +144,13 @@ static int is_version_with_tls(uint32_t version)
   return is_version_quic(version) ||
     ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
 }
+int is_version_with_var_int_transport_params(uint32_t version)
+{
+  return (is_version_quic(version) && is_quic_ver_greater_than(version, 27)) ||
+    (version == V_T051);
+}
 
-
-static int quic_len(const uint8_t *buf, uint64_t *value)
+int quic_len(const uint8_t *buf, uint64_t *value)
 {
   *value = buf[0];
   switch((*value) >> 6) {
@@ -1015,7 +1022,8 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
 }
 static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
 			struct ndpi_flow_struct *flow,
-			const u_int8_t *crypto_data, uint32_t crypto_data_len)
+			const u_int8_t *crypto_data, uint32_t crypto_data_len,
+			uint32_t version)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
@@ -1027,7 +1035,7 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = crypto_data;
   packet->payload_packet_len = crypto_data_len;
 
-  processClientServerHello(ndpi_struct, flow, 1);
+  processClientServerHello(ndpi_struct, flow, version);
 
   /* Restore */
   packet->payload = p;
@@ -1049,6 +1057,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   uint32_t prev_offset;
   uint32_t tag_offset_start, offset, len, sni_len;
   ndpi_protocol_match_result ret_match;
+  int sni_found = 0, ua_found = 0;
 
   if(crypto_data_len < 6)
     return;
@@ -1086,7 +1095,19 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
                                   (char *)flow->host_server_name,
                                   strlen((const char*)flow->host_server_name),
                                   &ret_match, NDPI_PROTOCOL_QUIC);
-      return;
+      sni_found = 1;
+      if (ua_found)
+        return;
+    }
+    if((memcmp(tag, "UAID", 4) == 0) &&
+       (tag_offset_start + prev_offset + len < crypto_data_len)) {
+      NDPI_LOG_DBG2(ndpi_struct, "UA: [%.*s]\n", len, &crypto_data[tag_offset_start + prev_offset]);
+
+      http_process_user_agent(ndpi_struct, flow,
+                              &crypto_data[tag_offset_start + prev_offset], len);
+      ua_found = 1;
+      if (sni_found)
+        return;
     }
 
     prev_offset = offset;
@@ -1235,7 +1256,7 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   if(!is_version_with_tls(version)) {
     process_chlo(ndpi_struct, flow, crypto_data, crypto_data_len);
   } else {
-    process_tls(ndpi_struct, flow, crypto_data, crypto_data_len);
+    process_tls(ndpi_struct, flow, crypto_data, crypto_data_len, version);
   }
   if(is_version_with_encrypted_header(version)) {
     ndpi_free(clear_payload);

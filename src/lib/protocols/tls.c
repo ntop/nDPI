@@ -31,7 +31,13 @@
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow, int is_quic);
+				    struct ndpi_flow_struct *flow, uint32_t quic_version);
+extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
+                                   struct ndpi_flow_struct *flow,
+                                   const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
+/* QUIC/GQUIC stuff */
+extern int quic_len(const uint8_t *buf, uint64_t *value);
+extern int is_version_with_var_int_transport_params(uint32_t version);
 
 // #define DEBUG_TLS_MEMORY       1
 // #define DEBUG_TLS              1
@@ -864,7 +870,7 @@ struct ja3_info {
 /* **************************************** */
 
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow, int is_quic) {
+			     struct ndpi_flow_struct *flow, uint32_t quic_version) {
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ja3_info ja3;
   u_int8_t invalid_ja3 = 0;
@@ -876,6 +882,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t total_len;
   u_int8_t handshake_type;
   char buffer[64] = { '\0' };
+  int is_quic = (quic_version != 0);
   int is_dtls = packet->udp && (!is_quic);
 
 #ifdef DEBUG_TLS
@@ -1364,6 +1371,44 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		      }
 		    }
 		  }
+		}
+	      } else if(extension_id == 65445 /* QUIC transport parameters */) {
+		u_int16_t s_offset = offset+extension_offset;
+		uint32_t final_offset;
+		int using_var_int = is_version_with_var_int_transport_params(quic_version);
+
+		if(!using_var_int) {
+		  u_int16_t seq_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+		  s_offset += 2;
+	          final_offset = MIN(total_len, s_offset + seq_len);
+		} else {
+	          final_offset = MIN(total_len, s_offset + extension_len);
+		}
+
+		while(s_offset < final_offset) {
+		  u_int64_t param_type, param_len;
+
+                  if(!using_var_int) {
+		    param_type = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+		    param_len = ntohs(*((u_int16_t*)&packet->payload[s_offset + 2]));
+		    s_offset += 4;
+		  } else {
+		    s_offset += quic_len(&packet->payload[s_offset], &param_type);
+		    s_offset += quic_len(&packet->payload[s_offset], &param_len);
+		  }
+
+#ifdef DEBUG_TLS
+		  printf("Client SSL [QUIC TP: Param 0x%x Len %d]\n", (int)param_type, (int)param_len);
+#endif
+		  if(param_type==0x3129) {
+#ifdef DEBUG_TLS
+		      printf("UA [%.*s]\n", (int)param_len, &packet->payload[s_offset]);
+#endif
+		      http_process_user_agent(ndpi_struct, flow,
+					      &packet->payload[s_offset], param_len);
+		      break;
+		  }
+		  s_offset += param_len;
 		}
 	      }
 
