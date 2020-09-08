@@ -31,6 +31,7 @@
 
 #include "ndpi_config.h"
 #include "ndpi_api.h"
+#include "ndpi_includes.h"
 
 #include "ahocorasick.h"
 #include "libcache.h"
@@ -1270,12 +1271,12 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.stun_ssl.ssl.server_names);
 
 	if(before) {
-          strftime(notBefore, sizeof(notBefore), "%F %T", before);
+          strftime(notBefore, sizeof(notBefore), "%Y-%m-%d %H:%M:%S", before);
           ndpi_serialize_string_string(serializer, "notbefore", notBefore);
         }
 
 	if(after) {
-	  strftime(notAfter, sizeof(notAfter), "%F %T", after);
+	  strftime(notAfter, sizeof(notAfter), "%Y-%m-%d %H:%M:%S", after);
           ndpi_serialize_string_string(serializer, "notafter", notAfter);
         }
 	ndpi_serialize_string_string(serializer, "ja3", flow->protos.stun_ssl.ssl.ja3_client);
