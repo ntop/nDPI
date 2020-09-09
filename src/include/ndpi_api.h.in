@@ -945,7 +945,7 @@ extern "C" {
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			  struct ndpi_flow_struct *flow,
-			  char *name);
+			  char *name, u_int8_t is_hostname);
 
   /* Serializer */
   int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,

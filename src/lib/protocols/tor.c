@@ -48,7 +48,7 @@ int ndpi_is_tls_tor(struct ndpi_detection_module_struct *ndpi_struct,
   if((dot = strrchr(dummy, '.')) == NULL) return(0);
   name = &dot[1];
 
-  if(ndpi_check_dga_name(ndpi_struct, flow, name)) {
+  if(ndpi_check_dga_name(ndpi_struct, flow, name, 1)) {
     ndpi_int_tor_add_connection(ndpi_struct, flow);
     return(1);
   } else {

@@ -6665,10 +6665,10 @@ static int enough(int a, int b) {
 
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
-			char *name) {
+			char *name, u_int8_t is_hostname) {
   int len, rc = 0;
-  u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0;
-  u_int8_t max_domain_element_len = 0, curr_domain_element_len = 0;
+  u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0, num_dots = 0;
+  u_int8_t max_domain_element_len = 0, curr_domain_element_len = 0, first_element_is_numeric = 1;
 
   len = strlen(name);
 
@@ -6685,45 +6685,52 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     for(i=0, j=0; (i<len) && (j<(sizeof(tmp)-1)); i++) {
-	tmp[j] = tolower(name[i]);
+      tmp[j] = tolower(name[i]);
 
-	if(last_char == tmp[j]) {
-	  if(++num_char_repetitions > max_num_char_repetitions)
-	    max_num_char_repetitions = num_char_repetitions;
-	} else
-	  num_char_repetitions = 1, last_char = tmp[j];
+      if(tmp[j] == '.')
+	num_dots++;
+      else if(num_dots == 0) {
+	if(!isnumber(tmp[j]))
+	  first_element_is_numeric = 0;
+      }
+	
+      if(last_char == tmp[j]) {
+	if(++num_char_repetitions > max_num_char_repetitions)
+	  max_num_char_repetitions = num_char_repetitions;
+      } else
+	num_char_repetitions = 1, last_char = tmp[j];
 
-	switch(tmp[j]) {
-	case '.':
-	case '-':
-	case '_':
-	case '/':
-	case ')':
-	case '(':
-	case ';':
-	case ':':
-	case '[':
-	case ']':
-	case ' ':
-	  /*
-	    Domain/word separator chars
+      switch(tmp[j]) {
+      case '.':
+      case '-':
+      case '_':
+      case '/':
+      case ')':
+      case '(':
+      case ';':
+      case ':':
+      case '[':
+      case ']':
+      case ' ':
+	/*
+	  Domain/word separator chars
 
-	    NOTE:
-	    this function is used also to detect other type of issues
-	    such as invalid/suspiciuous user agent
-	   */
-	  if(curr_domain_element_len > max_domain_element_len)
-	    max_domain_element_len = curr_domain_element_len;
+	  NOTE:
+	  this function is used also to detect other type of issues
+	  such as invalid/suspiciuous user agent
+	*/
+	if(curr_domain_element_len > max_domain_element_len)
+	  max_domain_element_len = curr_domain_element_len;
 
-	  curr_domain_element_len = 0;
+	curr_domain_element_len = 0;
 	break;
 
-	default:
-	  curr_domain_element_len++;
-	  break;
-	}
+      default:
+	curr_domain_element_len++;
+	break;
+      }
 
-	j++;
+      j++;
     }
 
     if(curr_domain_element_len > max_domain_element_len)
@@ -6735,7 +6742,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 #endif
 
     if(
-       (max_num_char_repetitions > 5 /* num or consecutive repeated chars */)
+       (is_hostname
+	&& (num_dots > 5)
+	&& (!first_element_is_numeric)
+	&& (strstr(tmp, "in-addr.arpa") == NULL)
+	)
+       || (max_num_char_repetitions > 5 /* num or consecutive repeated chars */)
        /*
 	 In case of a name with too many consecutive chars an alert is triggered
 	 This is the case for instance of the wildcard DNS query used by NetBIOS

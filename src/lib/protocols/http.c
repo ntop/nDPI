@@ -263,15 +263,12 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
 				  char *ua) {
   if((!ua) || (ua[0] == '\0')) return;
 
-  // printf("***** [%s:%d] ==> '%s'\n", __FILE__, __LINE__, ua);
-  // printf("***** %u\n", ndpi_check_dga_name(ndpi_struct, NULL, "uclient-fetch]"));
-
   if((strlen(ua) < 4)
      || (!strncmp(ua, "test", 4))
      || (!strncmp(ua, "<?", 2))
      || strchr(ua, '{')
      || strchr(ua, '}')
-     || ndpi_check_dga_name(ndpi_struct, NULL, ua)
+     || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
      // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
      ) {
     NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
@@ -438,7 +435,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     flow->host_server_name[len] = '\0';
     flow->extra_packets_func = NULL; /* We're good now */
 
-    if(len > 0) ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name);
+    if(len > 0) ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
     flow->server_id = flow->dst;
 
     if(packet->forwarded_line.ptr) {
