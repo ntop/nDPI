@@ -6690,7 +6690,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       if(tmp[j] == '.')
 	num_dots++;
       else if(num_dots == 0) {
-	if(!isnumber(tmp[j]))
+	if(!isdigit(tmp[j]))
 	  first_element_is_numeric = 0;
       }
 	
