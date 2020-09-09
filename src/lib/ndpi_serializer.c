@@ -1138,9 +1138,9 @@ int ndpi_serialize_uint32_boolean(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
-static int ndpi_serialize_binary_int32(ndpi_serializer *_serializer,
-				       const char *key, u_int16_t klen,
-				       int32_t value) {
+int ndpi_serialize_binary_int32(ndpi_serializer *_serializer,
+			        const char *key, u_int16_t klen,
+			        int32_t value) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
@@ -1288,8 +1288,8 @@ int ndpi_serialize_string_int64(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
-static int ndpi_serialize_binary_uint32(ndpi_serializer *_serializer,
-					const char *key, u_int16_t klen, u_int32_t value) {
+int ndpi_serialize_binary_uint32(ndpi_serializer *_serializer,
+				const char *key, u_int16_t klen, u_int32_t value) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
@@ -1389,9 +1389,9 @@ int ndpi_serialize_string_uint32_format(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
-static int ndpi_serialize_binary_uint64(ndpi_serializer *_serializer,
-					const char *key, u_int16_t klen,
-					u_int64_t value) {
+int ndpi_serialize_binary_uint64(ndpi_serializer *_serializer,
+				const char *key, u_int16_t klen,
+				u_int64_t value) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
@@ -1462,11 +1462,11 @@ int ndpi_serialize_string_uint64(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
-static int ndpi_serialize_binary_float(ndpi_serializer *_serializer,
-				       const char *key,
-				       u_int16_t klen,
-				       float value,
-				       const char *format /* e.f. "%.2f" */) {
+int ndpi_serialize_binary_float(ndpi_serializer *_serializer,
+			        const char *key,
+			        u_int16_t klen,
+			        float value,
+			        const char *format /* e.f. "%.2f" */) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
@@ -1597,11 +1597,11 @@ static int ndpi_serialize_binary_raw(ndpi_serializer *_serializer,
 /* ********************************** */
 
 /* Key is a <string, len> pair, value is a <string, len> pair */ 
-static int ndpi_serialize_binary_binary(ndpi_serializer *_serializer,
-					const char *key,
-					u_int16_t klen,
-					const char *_value,
-					u_int16_t vlen) {
+int ndpi_serialize_binary_binary(ndpi_serializer *_serializer,
+				 const char *key,
+				 u_int16_t klen,
+				 const char *_value,
+				 u_int16_t vlen) {
   const char *value = _value ? _value : "";
 
   if(ndpi_is_number(key, klen))
