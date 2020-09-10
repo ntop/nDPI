@@ -37,6 +37,7 @@ extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_str
                                    const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
 /* QUIC/GQUIC stuff */
 extern int quic_len(const uint8_t *buf, uint64_t *value);
+extern int quic_len_buffer_still_required(uint8_t value);
 extern int is_version_with_var_int_transport_params(uint32_t version);
 
 // #define DEBUG_TLS_MEMORY       1
@@ -1374,13 +1375,17 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 	      } else if(extension_id == 65445 /* QUIC transport parameters */) {
 		u_int16_t s_offset = offset+extension_offset;
-		uint32_t final_offset;
+		uint16_t final_offset;
 		int using_var_int = is_version_with_var_int_transport_params(quic_version);
 
 		if(!using_var_int) {
-		  u_int16_t seq_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
-		  s_offset += 2;
-	          final_offset = MIN(total_len, s_offset + seq_len);
+		  if(s_offset+1 >= total_len) {
+		    final_offset = 0; /* Force skipping extension */
+		  } else {
+		    u_int16_t seq_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+		    s_offset += 2;
+	            final_offset = MIN(total_len, s_offset + seq_len);
+		  }
 		} else {
 	          final_offset = MIN(total_len, s_offset + extension_len);
 		}
@@ -1389,17 +1394,29 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  u_int64_t param_type, param_len;
 
                   if(!using_var_int) {
+		    if(s_offset+3 >= final_offset)
+		      break;
 		    param_type = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 		    param_len = ntohs(*((u_int16_t*)&packet->payload[s_offset + 2]));
 		    s_offset += 4;
 		  } else {
+		    if(s_offset >= final_offset ||
+		       (s_offset + quic_len_buffer_still_required(packet->payload[s_offset])) >= final_offset)
+		      break;
 		    s_offset += quic_len(&packet->payload[s_offset], &param_type);
+
+		    if(s_offset >= final_offset ||
+		       (s_offset + quic_len_buffer_still_required(packet->payload[s_offset])) >= final_offset)
+		      break;
 		    s_offset += quic_len(&packet->payload[s_offset], &param_len);
 		  }
 
 #ifdef DEBUG_TLS
 		  printf("Client SSL [QUIC TP: Param 0x%x Len %d]\n", (int)param_type, (int)param_len);
 #endif
+		  if(s_offset+param_len >= final_offset)
+		    break;
+
 		  if(param_type==0x3129) {
 #ifdef DEBUG_TLS
 		      printf("UA [%.*s]\n", (int)param_len, &packet->payload[s_offset]);

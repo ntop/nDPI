@@ -170,6 +170,22 @@ int quic_len(const uint8_t *buf, uint64_t *value)
     return 0;
   }
 }
+int quic_len_buffer_still_required(uint8_t value)
+{
+  switch(value >> 6) {
+  case 0:
+    return 0;
+  case 1:
+    return 1;
+  case 2:
+    return 3;
+  case 3:
+    return 7;
+  default: /* No Possible */
+    return 0;
+  }
+}
+
 
 static uint16_t gquic_get_u16(const uint8_t *buf, uint32_t version)
 {
