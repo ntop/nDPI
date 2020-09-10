@@ -6670,21 +6670,29 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
   u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0, num_dots = 0;
   u_int8_t max_domain_element_len = 0, curr_domain_element_len = 0, first_element_is_numeric = 1;
 
+  if(!name) return(0);
+
+#ifdef DGA_DEBUG
+  printf("[DGA] %s\n", name);
+#endif
+  
   len = strlen(name);
 
   if(len >= 5) {
     int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0, num_digits = 0, num_vowels = 0, num_words = 0;
     char tmp[128], *word, *tok_tmp;
-
-    len = snprintf(tmp, sizeof(tmp)-1, "%s", name);
+    u_int max_tmp_len = sizeof(tmp)-1;
+  
+    len = snprintf(tmp, max_tmp_len, "%s", name);
     if(len < 0) {
 #ifdef DGA_DEBUG
       printf("[DGA] Too short");
 #endif
       return(0);
-    }
+    } else
+      tmp[len < max_tmp_len ? len : max_tmp_len] = '\0';
 
-    for(i=0, j=0; (i<len) && (j<(sizeof(tmp)-1)); i++) {
+    for(i=0, j=0; (i<len) && (j<max_tmp_len); i++) {
       tmp[j] = tolower(name[i]);
 
       if(tmp[j] == '.')
