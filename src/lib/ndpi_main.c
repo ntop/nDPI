@@ -6663,6 +6663,23 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
+static u_int8_t endsWith(char *str, char *ends, u_int8_t ends_len) {
+  u_int str_len = str ? strlen(str) : 0;
+  u_int8_t rc;
+  
+  if(str_len < ends_len) return(0);
+
+  rc = (strncmp(&str[str_len-ends_len], ends, ends_len) != 0) ? 0 : 1;
+
+#ifdef DGA_DEBUG
+  printf("[DGA] %s / %s [rc: %u]\n", str, ends, rc);
+#endif
+  
+  return(rc);
+}
+
+/* ******************************************************************** */
+
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
 			char *name, u_int8_t is_hostname) {
@@ -6753,7 +6770,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
        (is_hostname
 	&& (num_dots > 5)
 	&& (!first_element_is_numeric)
-	&& (strstr(tmp, "in-addr.arpa") == NULL)
+	&& (!endsWith(tmp, "in-addr.arpa", 12))
 	)
        || (max_num_char_repetitions > 5 /* num or consecutive repeated chars */)
        /*
