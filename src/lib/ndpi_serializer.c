@@ -130,6 +130,7 @@ static int ndpi_json_string_escape(const char *src, int src_len, char *dst, int 
 
 /* ********************************** */
 
+#if UNUSED
 /*
  * Similar to snprintf, this returns the number of bytes actually written
  * in any case (unlike snprintf which returns, if the output is truncated,
@@ -151,6 +152,7 @@ static inline int ndpi_snappend(char *buf, size_t size, const char *fmt, ...) {
 
   return wlen;
 }
+#endif
 
 /* ********************************** */
 
