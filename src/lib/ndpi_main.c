@@ -6475,6 +6475,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_DNS:
+  case NDPI_PROTOCOL_MDNS:
     if(flow->protos.dns.num_answers == 0)
       return(1);
     break;
