@@ -903,7 +903,9 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
     if(counter + 2 + offset_len + 2 /*gquic_get_u16 reads 2 bytes */  > clear_payload_len)
       return NULL;
     if(clear_payload[counter + 1] != 0x01) {
+#ifdef QUIC_DEBUG
       NDPI_LOG_ERR(ndpi_struct, "Unexpected stream ID version 0x%x\n", version);
+#endif
       return NULL;
     }
     counter += 2 + offset_len;
@@ -936,7 +938,9 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
     if(first_nonzero_payload_byte != 0x06) {
       if(first_nonzero_payload_byte != 0x02 &&
          first_nonzero_payload_byte != 0x1C) {
+#ifdef QUIC_DEBUG
         NDPI_LOG_ERR(ndpi_struct, "Unexpected frame 0x%x\n", first_nonzero_payload_byte);
+#endif
       } else {
         NDPI_LOG_DBG(ndpi_struct, "Unexpected ACK/CC frame\n");
       }
@@ -945,8 +949,10 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
     if(counter + 2 + 8 >= clear_payload_len) /* quic_len reads 8 bytes, at most */
       return NULL;
     if(clear_payload[counter + 1] != 0x00) {
+#ifdef QUIC_DEBUG
       NDPI_LOG_ERR(ndpi_struct, "Unexpected crypto stream offset 0x%x\n",
 		   clear_payload[counter + 1]);
+#endif
       return NULL;
     }
     counter += 2;
@@ -955,8 +961,10 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
   }
 
   if(*crypto_data_len + counter > clear_payload_len) {
+#ifdef QUIC_DEBUG
     NDPI_LOG_ERR(ndpi_struct, "Invalid length %lu + %d > %d version 0x%x\n",
 		 (unsigned long)*crypto_data_len, counter, clear_payload_len, version);
+#endif
     return NULL;
   }
   return crypto_data;
@@ -1053,7 +1061,9 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   if(crypto_data_len < 6)
     return;
   if(memcmp(crypto_data, "CHLO", 4) != 0) {
+#ifdef QUIC_DEBUG
     NDPI_LOG_ERR(ndpi_struct, "Unexpected handshake message");
+#endif
     return;
   }
   num_tags = (*(uint16_t *)&crypto_data[4]);
@@ -1137,13 +1147,16 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(is_gquic_ver_less_than(*version, 43) &&
      (!pub_bit5 || pub_bit3 != 0 || pub_bit4 != 0)) {
-    NDPI_LOG_ERR(ndpi_struct, "Version 0x%x invalid flags 0x%x\n",
-		 *version, first_byte);
+#ifdef QUIC_DEBUG
+    NDPI_LOG_ERR(ndpi_struct, "Version 0x%x invalid flags 0x%x\n", *version, first_byte);
+#endif
     return 0;
   }
   if((*version == V_Q046) &&
      (pub_bit7 != 1 || pub_bit8 != 1)) {
+#ifdef QUIC_DEBUG
     NDPI_LOG_ERR(ndpi_struct, "Q46 invalid flag 0x%x\n", first_byte);
+#endif
     return 0;
   }
   if((is_version_quic(*version) || (*version == V_Q046) || (*version == V_Q050)) &&
@@ -1201,8 +1214,10 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
    */
 
   if(!is_version_supported(version)) {
-    NDPI_LOG_ERR(ndpi_struct, "Unsupported version 0x%x\n", version)
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+#ifdef QUIC_DEBUG
+    NDPI_LOG_ERR(ndpi_struct, "Unsupported version 0x%x\n", version);
+#endif
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
