@@ -3077,9 +3077,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* NETBIOS */
   init_netbios_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* MDNS */
-  init_mdns_dissector(ndpi_str, &a, detection_bitmask);
-
   /* IPP */
   init_ipp_dissector(ndpi_str, &a, detection_bitmask);
 

@@ -1172,7 +1172,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_MDNS:
     ndpi_serialize_start_of_block(serializer, "mdns");
-    ndpi_serialize_string_string(serializer, "answer", flow->protos.mdns.answer);
+    ndpi_serialize_string_string(serializer, "answer", (const char*)flow->host_server_name);
     ndpi_serialize_end_of_block(serializer);
     break;
 

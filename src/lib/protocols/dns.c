@@ -27,12 +27,44 @@
 
 #include "ndpi_api.h"
 
-
 #define FLAGS_MASK 0x8000
 
-// #define DNS_DEBUG 1
+/* #define DNS_DEBUG 1 */
+
+#define DNS_PORT   53
+#define LLMNR_PORT 5355
+#define MDNS_PORT  5353
 
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+
+/* *********************************************** */
+
+static u_int16_t checkPort(u_int16_t port) {
+  switch(port) {
+  case DNS_PORT:
+    return(NDPI_PROTOCOL_DNS);
+    break;
+  case LLMNR_PORT:
+    return(NDPI_PROTOCOL_LLMNR);
+    break;
+  case MDNS_PORT:
+    return(NDPI_PROTOCOL_MDNS);
+    break;
+  }
+
+  return(0);
+}
+
+/* *********************************************** */
+
+static u_int16_t checkDNSSubprotocol(u_int16_t sport, u_int16_t dport) {
+  u_int16_t rc = checkPort(sport);
+
+  if(rc == 0)
+    return(checkPort(dport));
+  else
+    return(rc);
+}
 
 /* *********************************************** */
 
@@ -108,7 +140,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(1 /* invalid */);
   }
-  
+
   if(*is_query) {
     /* DNS Request */
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
@@ -182,7 +214,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  if((x+12) <= flow->packet.payload_packet_len) {
 	    x += 6;
 	    data_len = get16(&x, flow->packet.payload);
-	    
+
 	    if((x + data_len) <= flow->packet.payload_packet_len) {
 	      // printf("[rsp_type: %u][data_len: %u]\n", rsp_type, data_len);
 
@@ -190,7 +222,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		x += data_len;
 		continue; /* Skip CNAME */
 	      }
-	      
+
 	      if((((rsp_type == 0x1) && (data_len == 4)) /* A */
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
 		  || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
@@ -200,11 +232,11 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	      }
 	    }
 	  }
-	  
+
 	  break;
 	}
       }
-     
+
       if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
 	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
 	/* Request already set the protocol */
@@ -212,10 +244,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       } else {
 	/* We missed the request */
 	u_int16_t s_port = flow->packet.udp ? ntohs(flow->packet.udp->source) : ntohs(flow->packet.tcp->source);
-	
-	ndpi_set_detected_protocol(ndpi_struct, flow,
-				   (s_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS,
-				   NDPI_PROTOCOL_UNKNOWN);
+
+	ndpi_set_detected_protocol(ndpi_struct, flow, checkPort(s_port), NDPI_PROTOCOL_UNKNOWN);
       }
     }
   }
@@ -256,15 +286,18 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     return;
   }
 
-  if((s_port == 53 || d_port == 53 || d_port == 5355)
+  if(((s_port == DNS_PORT) || (d_port == DNS_PORT)
+      || (s_port == MDNS_PORT) || (d_port == MDNS_PORT)
+      || (d_port == LLMNR_PORT))
      && (flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset)) {
     struct ndpi_dns_packet_header dns_header;
     int j = 0, max_len, off;
     int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query);
     ndpi_protocol ret;
+    u_int num_queries, idx;
 
-    ret.master_protocol   = NDPI_PROTOCOL_UNKNOWN;
-    ret.app_protocol      = (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS;
+    ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+    ret.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : ((d_port == MDNS_PORT) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
 
     if(invalid) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -274,7 +307,35 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     /* extract host name server */
     max_len = sizeof(flow->host_server_name)-1;
     off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
-    
+
+    /* Before continuing let's dissect the following queries to see if they are valid */
+    for(idx=off, num_queries=0; (num_queries < dns_header.num_queries) && (idx < flow->packet.payload_packet_len);) {
+      u_int8_t name_len = flow->packet.payload[idx];
+
+#ifdef DNS_DEBUG
+      printf("[DNS] [name_len: %u]\n", name_len);
+#endif
+
+      if(name_len == 0) {
+	/* End of query */
+	num_queries++;
+	idx += 5;
+	continue;
+      }
+
+      if((name_len+idx) >= flow->packet.payload_packet_len) {
+	/* Invalid */
+#ifdef DNS_DEBUG
+	printf("[DNS] Invalid query len [%u >= %u]\n",
+	       (name_len+idx),
+	       flow->packet.payload_packet_len);
+#endif
+	NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+	break;
+      } else
+	idx += name_len+1;
+    }
+
     while(j < max_len && off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
       uint8_t c, cl = flow->packet.payload[off++];
 
@@ -288,7 +349,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
       while(j < max_len && cl != 0) {
 	u_int32_t shift;
-	
+
 	c = flow->packet.payload[off++];
 	shift = ((u_int32_t) 1) << (c & 0x1f);
 	flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & shift) ? c : '_');
@@ -297,12 +358,12 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     }
 
     flow->host_server_name[j] = '\0';
-    
+
     if(j > 0) {
       ndpi_protocol_match_result ret_match;
 
       ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
-      
+
       ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
 						     (char *)flow->host_server_name,
 						     strlen((const char*)flow->host_server_name),
@@ -313,7 +374,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	flow->category = ret_match.protocol_category;
 
       if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-	ret.master_protocol = (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS;
+	ret.master_protocol = checkDNSSubprotocol(s_port, d_port);
       else
 	ret.master_protocol = NDPI_PROTOCOL_DNS;
     }
