@@ -1,5 +1,6 @@
 CC=@CC@
 CXX=@CXX@
+BUILD_MINGW=@BUILD_MINGW@
 SRCHOME=../src
 CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
@@ -8,6 +9,12 @@ HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=ndpiReader.o reader_util.o intrusion_detection.o
 PREFIX?=@prefix@
+
+ifneq ($(BUILD_MINGW),)
+all:
+	@echo 'Examples disabled due to mingw build.'
+
+else
 
 all: ndpiReader @DPDK_TARGET@
 
@@ -50,3 +57,5 @@ clean:
 distclean: clean
 	/bin/rm -f Makefile.dpdk
 	/bin/rm -f Makefile
+
+endif
