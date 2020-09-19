@@ -8,4 +8,4 @@ endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libndpi.pc
 
-EXTRA_DIST = autogen.sh
+EXTRA_DIST = autogen.sh configure.seed

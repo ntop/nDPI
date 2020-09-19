@@ -179,6 +179,7 @@ script:
   - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else ./configure ; fi
   - make
   - make -C example ndpiSimpleIntegration
+  - make dist
 
 #after_script:
   - cd tests
