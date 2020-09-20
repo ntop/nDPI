@@ -234,7 +234,7 @@ u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
 
 /* ****************************************** */
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 /* http://opensource.apple.com/source/Libc/Libc-186/string.subproj/strcasecmp.c */
 
 /*
