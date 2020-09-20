@@ -5034,7 +5034,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       }
 
       packet->line[packet->parsed_lines].len =
-	(u_int16_t)(((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
+	(u_int16_t)(((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
 
       /* First line of a HTTP response parsing. Expected a "HTTP/1.? ???" */
       if(packet->parsed_lines == 0 && packet->line[0].len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
@@ -5256,8 +5256,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 
   if(packet->parsed_lines >= 1) {
     packet->line[packet->parsed_lines].len =
-      (u_int16_t)(((unsigned long) &packet->payload[packet->payload_packet_len]) -
-		  ((unsigned long) packet->line[packet->parsed_lines].ptr));
+      (u_int16_t)(((size_t) &packet->payload[packet->payload_packet_len]) -
+		  ((size_t) packet->line[packet->parsed_lines].ptr));
     packet->parsed_lines++;
   }
 }
@@ -5284,7 +5284,7 @@ void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_s
   for (a = 0; a < end; a++) {
     if(packet->payload[a] == 0x0a) {
       packet->line[packet->parsed_lines].len = (u_int16_t)(
-							   ((unsigned long) &packet->payload[a]) - ((unsigned long) packet->line[packet->parsed_lines].ptr));
+							   ((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
 
       if(a > 0 && packet->payload[a - 1] == 0x0d)
 	packet->line[packet->parsed_lines].len--;

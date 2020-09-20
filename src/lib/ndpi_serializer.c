@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <sys/types.h>
 
 #include "ndpi_api.h"
@@ -36,6 +37,14 @@
 
 #if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
 #include <sys/endian.h>
+#endif
+
+#ifdef WIN32
+#define NDPI_I64_FORMAT "%" PRId64
+#define NDPI_U64_FORMAT "%" PRIu64
+#else
+#define NDPI_I64_FORMAT "%lld"
+#define NDPI_U64_FORMAT "%llu"
 #endif
 
 /* ********************************** */
@@ -829,7 +838,7 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *_serializer,
 
     serializer->status.buffer.size_used += snprintf((char *) 
       &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%llu", (unsigned long long)value);
+      NDPI_U64_FORMAT, (unsigned long long)value);
 
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
@@ -838,7 +847,7 @@ int ndpi_serialize_uint32_uint64(ndpi_serializer *_serializer,
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
     serializer->status.buffer.size_used += snprintf((char *)
       &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%llu", (unsigned long long)value);
+      NDPI_U64_FORMAT, (unsigned long long)value);
   } else {
     if(value <= 0xffffffff) {
       return(ndpi_serialize_uint32_uint32(_serializer, key, value));
@@ -961,7 +970,7 @@ int ndpi_serialize_uint32_int64(ndpi_serializer *_serializer,
 
     serializer->status.buffer.size_used += snprintf((char *) 
       &serializer->buffer.data[serializer->status.buffer.size_used], 
-      buff_diff, "%lld", (long long int)value);
+      buff_diff, NDPI_I64_FORMAT, (long long int)value);
 
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
@@ -970,7 +979,7 @@ int ndpi_serialize_uint32_int64(ndpi_serializer *_serializer,
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
     serializer->status.buffer.size_used += snprintf((char *)
       &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%lld", (long long int)value);
+      NDPI_I64_FORMAT, (long long int)value);
   }
   else {
     if((value & 0xFFFFFFFF) == value) {
@@ -1282,7 +1291,7 @@ int ndpi_serialize_binary_int64(ndpi_serializer *_serializer,
 
     serializer->status.buffer.size_used += snprintf((char *) 
       &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%lld", (long long int)value);
+      NDPI_I64_FORMAT, (long long int)value);
 
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
@@ -1290,7 +1299,7 @@ int ndpi_serialize_binary_int64(ndpi_serializer *_serializer,
     ndpi_serialize_csv_pre(serializer);
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
     serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%lld", (long long int)value);
+      NDPI_I64_FORMAT, (long long int)value);
   } else {
     if ((value & 0xFFFFFFFF) == value) {
       return(ndpi_serialize_string_int32(_serializer, key, value));
@@ -1455,7 +1464,7 @@ int ndpi_serialize_binary_uint64(ndpi_serializer *_serializer,
 
     serializer->status.buffer.size_used += snprintf((char *) 
       &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%llu", (unsigned long long)value);
+      NDPI_U64_FORMAT, (unsigned long long)value);
 
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
@@ -1464,7 +1473,7 @@ int ndpi_serialize_binary_uint64(ndpi_serializer *_serializer,
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
     serializer->status.buffer.size_used += snprintf((char *)
       &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%llu", (unsigned long long)value);
+      NDPI_U64_FORMAT, (unsigned long long)value);
   } else {
     if(value <= 0xffffffff) {
       return(ndpi_serialize_string_uint32(_serializer, key, value));

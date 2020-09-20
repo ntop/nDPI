@@ -29,12 +29,18 @@ NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
 ifneq ($(OS),Windows_NT)
 OS := $(shell uname)
 endif
+BUILD_MINGW    		 = @BUILD_MINGW@
 
 ifeq ($(OS),Darwin)
 CC=clang
 SONAME_FLAG=
 else
+ifneq ($(BUILD_MINGW),)
+NDPI_LIB_SHARED_BASE = libndpi
+NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE)-@NDPI_VERSION_SHORT@.dll
+else
 SONAME_FLAG=-Wl,-soname,$(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
+endif
 endif
 
 all: $(NDPI_LIBS)
