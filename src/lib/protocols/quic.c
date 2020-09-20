@@ -64,6 +64,7 @@ extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_str
 #define V_T051		0x54303531
 #define V_MVFST_22	0xfaceb001
 #define V_MVFST_27	0xfaceb002
+#define V_MVFST_EXP	0xfaceb00e
 
 #define QUIC_MAX_CID_LENGTH  20
 
@@ -131,6 +132,7 @@ static int is_version_supported(uint32_t version)
           version == V_T051 ||
 	  version == V_MVFST_22 ||
 	  version == V_MVFST_27 ||
+	  version == V_MVFST_EXP ||
           is_quic_ver_greater_than(version, 23));
 }
 static int is_version_with_encrypted_header(uint32_t version)
@@ -786,7 +788,8 @@ static int quic_derive_initial_secrets(uint32_t version,
 		       sizeof(handshake_salt_draft_22),
                        cid, cid_len, secret);
   } else if(is_quic_ver_less_than(version, 28) ||
-	    version == V_MVFST_27) {
+	    version == V_MVFST_27 ||
+	    version == V_MVFST_EXP) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_23,
 		       sizeof(handshake_salt_draft_23),
                        cid, cid_len, secret);
