@@ -47,6 +47,18 @@ check_results() {
 }
 
 check_unit() {
+
+	case "$CXXFLAGS" in
+		# Skipping tests with sanitizer enabled due to use-of-uninitialized-value in json-c
+		*sanitize* )
+			echo "Skipping unit tests for this environment"
+			return
+		;;
+		* )
+			echo "Running unit tests.."
+		;;
+	esac
+
 	$UNIT
 	UNIT_RC=$?
 	if [ $UNIT_RC -ne 0 ]; then
