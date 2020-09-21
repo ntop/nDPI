@@ -147,7 +147,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   const u_int8_t * payload,
 					   const u_int16_t payload_length) {
   u_int16_t msg_type, msg_len;
-  struct stun_packet_header *h = (struct stun_packet_header*)payload;
   int rc;
   
   /* STUN over TCP does not look good */
@@ -178,7 +177,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     goto udp_stun_found;
   }
 
-  msg_type = ntohs(h->msg_type), msg_len = ntohs(h->msg_len);
+  msg_type = ntohs(*((u_int16_t*)payload));
+  msg_len  = ntohs(*((u_int16_t*)&payload[2]));
 
   if(msg_type == 0)
     return(NDPI_IS_NOT_STUN);  
