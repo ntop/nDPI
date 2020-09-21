@@ -35,7 +35,64 @@
 #define LLMNR_PORT 5355
 #define MDNS_PORT  5353
 
-static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
+			    struct ndpi_flow_struct *flow);
+
+/* *********************************************** */
+
+static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow,
+				u_int16_t dns_type) {
+  /* https://en.wikipedia.org/wiki/List_of_DNS_record_types */
+
+  switch(dns_type) {
+    /* Obsolete record types */
+  case 3:
+  case 4:
+  case 254:
+  case 7:
+  case 8:
+  case 9:
+  case 14:
+  case 253:
+  case 11:
+  case 33:
+  case 10:
+  case 38:
+  case 30:
+  case 25:
+  case 24:
+  case 13:
+  case 17:
+  case 19:
+  case 20:
+  case 21:
+  case 22:
+  case 23:
+  case 26:
+  case 31:
+  case 32:
+  case 34:
+  case 42:
+  case 40:
+  case 27:
+  case 100:
+  case 101:
+  case 102:
+  case 103:
+  case 99:
+  case 56:
+  case 57:
+  case 58:
+  case 104:
+  case 105:
+  case 106:
+  case 107:
+  case 259:
+    NDPI_SET_BIT(flow->risk, NDPI_DNS_SUSPICIOUS_TRAFFIC);
+    break;
+  }
+}
 
 /* *********************************************** */
 
@@ -153,7 +210,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
           flow->protos.dns.query_type = get16(&x, flow->packet.payload);
 #ifdef DNS_DEBUG
           NDPI_LOG_DBG2(ndpi_struct, "query_type=%2d\n", flow->protos.dns.query_type);
-	  printf("[DNS] query_type=%d\n", flow->protos.dns.query_type);
+	  printf("[DNS] [request] query_type=%d\n", flow->protos.dns.query_type);
 #endif
 	  break;
 	} else
@@ -199,7 +256,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	    break;
 	  }
 
-	  if((data_len = getNameLength(x, flow->packet.payload, flow->packet.payload_packet_len)) == 0) {
+	  if((data_len = getNameLength(x, flow->packet.payload,
+				       flow->packet.payload_packet_len)) == 0) {
 	    break;
 	  } else
 	    x += data_len;
@@ -207,7 +265,15 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  if((x+2) >= flow->packet.payload_packet_len) {
 	    break;
 	  }
+
 	  rsp_type = get16(&x, flow->packet.payload);
+
+#ifdef DNS_DEBUG
+	  printf("[DNS] [response] response_type=%d\n", rsp_type);
+#endif
+
+	  ndpi_check_dns_type(ndpi_struct, flow, rsp_type);
+	  
 	  flow->protos.dns.rsp_type = rsp_type;
 
 	  /* here x points to the response "class" field */

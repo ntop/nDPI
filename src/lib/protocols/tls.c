@@ -325,7 +325,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	if(rdn_len && (flow->protos.stun_ssl.ssl.issuerDN == NULL))
 	  flow->protos.stun_ssl.ssl.issuerDN = ndpi_strdup(rdnSeqBuf);
-	
+
 	rdn_len = 0; /* Reset buffer */
       }
 
@@ -607,10 +607,10 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] Enough blocks dissected\n");
 #endif
-    
-    flow->extra_packets_func = NULL; /* We're good now */  
+
+    flow->extra_packets_func = NULL; /* We're good now */
   }
-  
+
   return(1);
 }
 
@@ -665,10 +665,10 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t len, p_len;
     const u_int8_t *p;
     u_int8_t content_type;
-      
+
     if(flow->l4.tcp.tls.message.buffer_used < 5)
       return(1); /* Keep working */
-    
+
     len = (flow->l4.tcp.tls.message.buffer[3] << 8) + flow->l4.tcp.tls.message.buffer[4] + 5;
 
     if(len > flow->l4.tcp.tls.message.buffer_used) {
@@ -694,7 +694,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
     content_type = flow->l4.tcp.tls.message.buffer[0];
-    
+
     /* Overwriting packet payload */
     p = packet->payload, p_len = packet->payload_packet_len; /* Backup */
 
@@ -722,7 +722,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
 
 	processTLSBlock(ndpi_struct, flow);
-	
+
 	processed += packet->payload_packet_len;
       }
     } else {
@@ -731,7 +731,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
 	  flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
 	    (packet->packet_direction == 0) ? (len-5) : -(len-5);
-	
+
 #ifdef DEBUG_TLS_BLOCKS
 	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
 	       len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
@@ -1510,6 +1510,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    if(flow->protos.stun_ssl.ssl.encrypted_sni.esni &&
 	       flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
 	      NDPI_SET_BIT(flow->risk, NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
+	    }
+
+	    /* Add check for missing SNI */
+	    if((flow->protos.stun_ssl.ssl.client_requested_server_name[0] == 0)
+	       && (flow->protos.stun_ssl.ssl.ssl_version >= 0x0302) /* TLSv1.1 */) {
+	      /* This is a bit suspicious */
+	      NDPI_SET_BIT(flow->risk, NDPI_TLS_MISSING_SNI);
 	    }
 
 	    return(2 /* Client Certificate */);

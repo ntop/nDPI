@@ -1708,6 +1708,12 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_UNSAFE_PROTOCOL:
     return("Unsafe Protocol");
 
+  case NDPI_DNS_SUSPICIOUS_TRAFFIC:
+    return("Suspicious DNS traffic"); /* Exfiltration ? */
+    
+  case NDPI_TLS_MISSING_SNI:
+    return("SNI TLS extension was missing");
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

@@ -219,7 +219,7 @@ int serializerUnitTest() {
     ndpi_term_serializer(&serializer);
   }
 
-  printf("%s: OK\n", __FUNCTION__);
+  printf("%s                      OK\n", __FUNCTION__);
   return 0;
 }
 
