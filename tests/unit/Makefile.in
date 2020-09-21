@@ -29,5 +29,8 @@ clean:
 	/bin/rm -f .*.o.cmd .*.o.d
 	/bin/rm -rf build
 
+distdir:
+
+
 distclean: clean
 	/bin/rm -f Makefile
