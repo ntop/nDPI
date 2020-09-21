@@ -3,6 +3,7 @@
 cd "$(dirname "${0}")"
 
 READER="../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
+UNIT="./unit/unit"
 
 RC=0
 PCAPS=`cd pcap; /bin/ls *.pcap`
@@ -45,8 +46,17 @@ check_results() {
 	done
 }
 
+check_unit() {
+	$UNIT
+	UNIT_RC=$?
+	if [ $UNIT_RC -ne 0 ]; then
+		RC=1
+	fi
+}
+
 fuzzy_testing
 build_results
 check_results
+check_unit
 
 exit $RC
