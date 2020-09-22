@@ -29,6 +29,9 @@ clean:
 	/bin/rm -f .*.o.cmd .*.o.d
 	/bin/rm -rf build
 
+install:
+	echo ""
+
 distdir:
 
 
