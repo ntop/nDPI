@@ -1128,15 +1128,19 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
       if (ua_found)
         return;
     }
-    if((memcmp(tag, "UAID", 4) == 0) &&
-       (tag_offset_start + prev_offset + len < crypto_data_len)) {
-      NDPI_LOG_DBG2(ndpi_struct, "UA: [%.*s]\n", len, &crypto_data[tag_offset_start + prev_offset]);
 
-      http_process_user_agent(ndpi_struct, flow,
-                              &crypto_data[tag_offset_start + prev_offset], len);
-      ua_found = 1;
-      if (sni_found)
-        return;
+    if(memcmp(tag, "UAID", 4) == 0) {
+      u_int uaid_offset = tag_offset_start + prev_offset;
+            
+      if((uaid_offset + len) < crypto_data_len) {      
+	NDPI_LOG_DBG2(ndpi_struct, "UA: [%.*s]\n", len, &crypto_data[uaid_offset]);
+	
+	http_process_user_agent(ndpi_struct, flow, &crypto_data[uaid_offset], len); /* http.c */
+	ua_found = 1;
+	
+	if (sni_found)
+	  return;
+      }
     }
 
     prev_offset = offset;

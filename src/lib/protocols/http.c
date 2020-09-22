@@ -347,7 +347,7 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 
     flow->http.user_agent = ndpi_malloc(len);
     if(flow->http.user_agent) {
-      strncpy(flow->http.user_agent, (char*)ua_ptr, ua_ptr_len);
+      memcpy(flow->http.user_agent, (char*)ua_ptr, ua_ptr_len);
       flow->http.user_agent[ua_ptr_len] = '\0';
 
       ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent);
