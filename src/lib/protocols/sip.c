@@ -48,139 +48,128 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
   const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if (payload_len > 4) {
+  if(payload_len > 4) {
     /* search for STUN Turn ChannelData Prefix */
     u_int16_t message_len = ntohs(get_u_int16_t(packet->payload, 2));
-    if (payload_len - 4 == message_len) {
+
+    if(payload_len - 4 == message_len) {
       NDPI_LOG_DBG2(ndpi_struct, "found STUN TURN ChannelData prefix\n");
       payload_len -= 4;
       packet_payload += 4;
     }
   }
 
-  if (payload_len >= 14)
-      {
+  if(payload_len >= 14) {
+    if((memcmp(packet_payload, "NOTIFY ", 7) == 0 || memcmp(packet_payload, "notify ", 7) == 0)
+       && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
 
-	if ((memcmp(packet_payload, "NOTIFY ", 7) == 0 || memcmp(packet_payload, "notify ", 7) == 0)
-	    && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip NOTIFY\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
 
-	  NDPI_LOG_INFO(ndpi_struct, "found sip NOTIFY\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
+    if((memcmp(packet_payload, "REGISTER ", 9) == 0 || memcmp(packet_payload, "register ", 9) == 0)
+       && (memcmp(&packet_payload[9], "SIP:", 4) == 0 || memcmp(&packet_payload[9], "sip:", 4) == 0)) {
 
-	if ((memcmp(packet_payload, "REGISTER ", 9) == 0 || memcmp(packet_payload, "register ", 9) == 0)
-	    && (memcmp(&packet_payload[9], "SIP:", 4) == 0 || memcmp(&packet_payload[9], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip REGISTER\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
 
-	  NDPI_LOG_INFO(ndpi_struct, "found sip REGISTER\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
+    if((memcmp(packet_payload, "INVITE ", 7) == 0 || memcmp(packet_payload, "invite ", 7) == 0)
+       && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip INVITE\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
 
-	if ((memcmp(packet_payload, "INVITE ", 7) == 0 || memcmp(packet_payload, "invite ", 7) == 0)
-	    && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip INVITE\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
+    /* seen this in second direction on the third position,
+     * maybe it could be deleted, if somebody sees it in the first direction,
+     * please delete this comment.
+     */
 
-	/* seen this in second direction on the third position,
-	 * maybe it could be deleted, if somebody sees it in the first direction,
-	 * please delete this comment.
-	 */
-
-	/*
-	if (memcmp(packet_payload, "SIP/2.0 200 OK", 14) == 0 || memcmp(packet_payload, "sip/2.0 200 OK", 14) == 0) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip SIP/2.0 0K\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-        */
-        if (memcmp(packet_payload, "SIP/2.0 ", 8) == 0 || memcmp(packet_payload, "sip/2.0 ", 8) == 0) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip SIP/2.0 *\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-
-        if ((memcmp(packet_payload, "BYE ", 4) == 0 || memcmp(packet_payload, "bye ", 4) == 0)
-	    && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip BYE\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-
-        if ((memcmp(packet_payload, "ACK ", 4) == 0 || memcmp(packet_payload, "ack ", 4) == 0)
-	    && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip ACK\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-
-        if ((memcmp(packet_payload, "CANCEL ", 7) == 0 || memcmp(packet_payload, "cancel ", 7) == 0)
-	    && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip CANCEL\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-
-        if ((memcmp(packet_payload, "PUBLISH ", 8) == 0 || memcmp(packet_payload, "publish ", 8) == 0)
-	    && (memcmp(&packet_payload[8], "SIP:", 4) == 0 || memcmp(&packet_payload[8], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip PUBLISH\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-
-        if ((memcmp(packet_payload, "SUBSCRIBE ", 10) == 0 || memcmp(packet_payload, "subscribe ", 10) == 0)
-	    && (memcmp(&packet_payload[10], "SIP:", 4) == 0 || memcmp(&packet_payload[10], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip SUBSCRIBE\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-        
-        /* SIP message extension RFC 3248 */
-        if ((memcmp(packet_payload, "MESSAGE ", 8) == 0 || memcmp(packet_payload, "message ", 8) == 0)
-	    && (memcmp(&packet_payload[8], "SIP:", 4) == 0 || memcmp(&packet_payload[8], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip MESSAGE\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-
-	/* Courtesy of Miguel Quesada <mquesadab@gmail.com> */
-	if ((memcmp(packet_payload, "OPTIONS ", 8) == 0
-	     || memcmp(packet_payload, "options ", 8) == 0)
-	    && (memcmp(&packet_payload[8], "SIP:", 4) == 0
-		|| memcmp(&packet_payload[8], "sip:", 4) == 0)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found sip OPTIONS\n");
-	  ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
+    /*
+      if(memcmp(packet_payload, "SIP/2.0 200 OK", 14) == 0 || memcmp(packet_payload, "sip/2.0 200 OK", 14) == 0) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip SIP/2.0 0K\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
       }
+    */
+    if(memcmp(packet_payload, "SIP/2.0 ", 8) == 0 || memcmp(packet_payload, "sip/2.0 ", 8) == 0) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip SIP/2.0 *\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    if((memcmp(packet_payload, "BYE ", 4) == 0 || memcmp(packet_payload, "bye ", 4) == 0)
+       && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip BYE\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    if((memcmp(packet_payload, "ACK ", 4) == 0 || memcmp(packet_payload, "ack ", 4) == 0)
+       && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip ACK\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    if((memcmp(packet_payload, "CANCEL ", 7) == 0 || memcmp(packet_payload, "cancel ", 7) == 0)
+       && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip CANCEL\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    if((memcmp(packet_payload, "PUBLISH ", 8) == 0 || memcmp(packet_payload, "publish ", 8) == 0)
+       && (memcmp(&packet_payload[8], "SIP:", 4) == 0 || memcmp(&packet_payload[8], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip PUBLISH\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    if((memcmp(packet_payload, "SUBSCRIBE ", 10) == 0 || memcmp(packet_payload, "subscribe ", 10) == 0)
+       && (memcmp(&packet_payload[10], "SIP:", 4) == 0 || memcmp(&packet_payload[10], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip SUBSCRIBE\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+        
+    /* SIP message extension RFC 3248 */
+    if((memcmp(packet_payload, "MESSAGE ", 8) == 0 || memcmp(packet_payload, "message ", 8) == 0)
+       && (memcmp(&packet_payload[8], "SIP:", 4) == 0 || memcmp(&packet_payload[8], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip MESSAGE\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    /* Courtesy of Miguel Quesada <mquesadab@gmail.com> */
+    if((memcmp(packet_payload, "OPTIONS ", 8) == 0
+	|| memcmp(packet_payload, "options ", 8) == 0)
+       && (memcmp(&packet_payload[8], "SIP:", 4) == 0
+	   || memcmp(&packet_payload[8], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip OPTIONS\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+  }
 
   /* add bitmask for tcp only, some stupid udp programs
    * send a very few (< 10 ) packets before invite (mostly a 0x0a0x0d, but just search the first 3 payload_packets here */
-  if (packet->udp != NULL && flow->packet_counter < 20) {
+  if(packet->udp != NULL && flow->packet_counter < 20) {
     NDPI_LOG_DBG2(ndpi_struct, "need next packet\n");
     return;
   }
 
   /* for STUN flows we need some more packets */
-  if (packet->udp != NULL && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN && flow->packet_counter < 40) {
+  if(packet->udp != NULL && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STUN && flow->packet_counter < 40) {
     NDPI_LOG_DBG2(ndpi_struct, "need next STUN packet\n");
     return;
   }
 
-  if (payload_len == 4 && get_u_int32_t(packet_payload, 0) == 0) {
+  if(payload_len == 4 && get_u_int32_t(packet_payload, 0) == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "maybe sip. need next packet\n");
-    return;
-  }
-
-  if (payload_len > 30 && packet_payload[0] == 0x90
-      && packet_payload[3] == payload_len - 20 && get_u_int32_t(packet_payload, 4) == 0
-      && get_u_int32_t(packet_payload, 8) == 0) {
-    flow->sip_yahoo_voice = 1;
-    NDPI_LOG_DBG2(ndpi_struct, "maybe sip yahoo. need next packet\n");
-  }
-  if (flow->sip_yahoo_voice && flow->packet_counter < 10) {
     return;
   }
 
@@ -193,14 +182,17 @@ void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
   NDPI_LOG_DBG(ndpi_struct, "search sip\n");
 
-  /* skip marked packets */
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {
-    if (packet->tcp_retransmission == 0) {
-      ndpi_search_sip_handshake(ndpi_struct, flow);
+  if(flow->packet_counter > 5)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  else {
+    /* skip marked packets */
+    if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {
+      if(packet->tcp_retransmission == 0) {
+	ndpi_search_sip_handshake(ndpi_struct, flow);
+      }
     }
   }
 }
-
 
 void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {

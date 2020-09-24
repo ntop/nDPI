@@ -82,7 +82,7 @@ typedef enum {
   NDPI_PROTOCOL_RTSP                  = 50,
   NDPI_PROTOCOL_MAIL_IMAPS            = 51,
   NDPI_PROTOCOL_ICECAST               = 52,
-  NDPI_PROTOCOL_PPLIVE                = 53, /* Tomasz Bujlow <tomasz@skatnet.dk> */
+  NDPI_PROTOCOL_FREE_53               = 53,
   NDPI_PROTOCOL_PPSTREAM              = 54,
   NDPI_PROTOCOL_ZATTOO                = 55,
   NDPI_PROTOCOL_SHOUTCAST             = 56,
@@ -212,7 +212,7 @@ typedef enum {
   NDPI_PROTOCOL_CNN                   = 180, /* Tomasz Bujlow <tomasz@skatnet.dk> */
   NDPI_PROTOCOL_MEGACO                = 181, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_REDIS                 = 182,
-  NDPI_PROTOCOL_PANDO                 = 183, /* Tomasz Bujlow <tomasz@skatnet.dk> */
+  NDPI_PROTOCOL_FREE_183              = 183,
   NDPI_PROTOCOL_VHUA                  = 184,
   NDPI_PROTOCOL_TELEGRAM              = 185, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_VEVO                  = 186,

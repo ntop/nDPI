@@ -117,19 +117,24 @@ void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struc
     case 5:
     case 7:
     case 9:
-      if((n == 0) || (n > 30))
+      if((n == 0) || (n > 30)) {
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
-
+      }
+      
       switch(version) {
       case 1:
 	expected_len = n * sizeof(struct flow_ver1_rec) + 16 /* header */;
 	break;
+
       case 5:
 	expected_len = n * sizeof(struct flow_ver5_rec) + 24 /* header */;
 	break;
+
       case 7:
 	expected_len = n * sizeof(struct flow_ver7_rec) + 24 /* header */;
 	break;
+
       case 9:
 	/* We need to check the template */
 	break;
@@ -142,16 +147,21 @@ void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struc
 
       uptime_offset = 8;
       break;
+
     case 10: /* IPFIX */
       {      
 	u_int16_t ipfix_len = n;
 
-	if(ipfix_len != payload_len)
+	if(ipfix_len != payload_len) {
+	  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	  return;
+	}
       }    
       uptime_offset = 4;
       break;
+      
     default:
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
 
@@ -167,7 +177,8 @@ void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struc
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETFLOW, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
-  }
+  } else
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void init_netflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)

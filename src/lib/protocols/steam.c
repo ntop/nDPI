@@ -267,7 +267,6 @@ void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct 
       return;
     }
 
-
     /* skip marked or retransmitted packets */
     if(packet->tcp_retransmission != 0) {
       return;

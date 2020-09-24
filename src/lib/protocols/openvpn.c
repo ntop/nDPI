@@ -3,6 +3,29 @@
  *
  * Copyright (C) 2011-20 - ntop.org
  *
+  *
+ * nDPI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * nDPI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "ndpi_protocol_ids.h"
+
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_OPENVPN
+
+#include "ndpi_api.h"
+
+/*
  * OpenVPN TCP / UDP Detection - 128/160 hmac
  *
  * Detection based upon these openvpn protocol properties:
@@ -20,13 +43,6 @@
  *  - TLS certificate extraction
  *
  */
-
-#include "ndpi_protocol_ids.h"
-
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_OPENVPN
-
-#include "ndpi_api.h"
-
 
 #define P_CONTROL_HARD_RESET_CLIENT_V1  (0x01 << 3)
 #define P_CONTROL_HARD_RESET_CLIENT_V2  (0x07 << 3)
@@ -105,17 +121,17 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
     }
     
     if(flow->ovpn_counter < P_HARD_RESET_CLIENT_MAX_COUNT && (opcode == P_CONTROL_HARD_RESET_CLIENT_V1 ||
-				    opcode == P_CONTROL_HARD_RESET_CLIENT_V2)) {
+							      opcode == P_CONTROL_HARD_RESET_CLIENT_V2)) {
       if(check_pkid_and_detect_hmac_size(ovpn_payload) > 0) {
         memcpy(flow->ovpn_session_id, ovpn_payload+1, 8);
 
         NDPI_LOG_DBG2(ndpi_struct,
-		 "session key: %02x%02x%02x%02x%02x%02x%02x%02x\n",
-		 flow->ovpn_session_id[0], flow->ovpn_session_id[1], flow->ovpn_session_id[2], flow->ovpn_session_id[3],
-		 flow->ovpn_session_id[4], flow->ovpn_session_id[5], flow->ovpn_session_id[6], flow->ovpn_session_id[7]);
+		      "session key: %02x%02x%02x%02x%02x%02x%02x%02x\n",
+		      flow->ovpn_session_id[0], flow->ovpn_session_id[1], flow->ovpn_session_id[2], flow->ovpn_session_id[3],
+		      flow->ovpn_session_id[4], flow->ovpn_session_id[5], flow->ovpn_session_id[6], flow->ovpn_session_id[7]);
       }
     } else if(flow->ovpn_counter >= 1 && flow->ovpn_counter <= P_HARD_RESET_CLIENT_MAX_COUNT &&
-            (opcode == P_CONTROL_HARD_RESET_SERVER_V1 || opcode == P_CONTROL_HARD_RESET_SERVER_V2)) {
+	      (opcode == P_CONTROL_HARD_RESET_SERVER_V1 || opcode == P_CONTROL_HARD_RESET_SERVER_V2)) {
 
       hmac_size = check_pkid_and_detect_hmac_size(ovpn_payload);
 
@@ -152,10 +168,12 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
 
     flow->ovpn_counter++;
     
-    if(failed) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    }
+    if(failed)
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);  
   }
+
+  if(flow->packet_counter > 5)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);    
 }
 
 void init_openvpn_dissector(struct ndpi_detection_module_struct *ndpi_struct,

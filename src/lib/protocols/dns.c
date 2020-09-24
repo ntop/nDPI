@@ -486,6 +486,9 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   }
+
+  if(flow->packet_counter > 3)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void init_dns_dissector(struct ndpi_detection_module_struct *ndpi_struct,

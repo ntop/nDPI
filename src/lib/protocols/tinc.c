@@ -58,9 +58,9 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN);
       }
     }
-
+    
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
-
   } else if(packet->tcp != NULL) {
     if(payload_len == 0) {
       if(packet->tcp->syn == 1 && packet->tcp->ack == 0) {

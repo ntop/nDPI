@@ -860,6 +860,7 @@ struct ndpi_detection_module_struct;
 struct ndpi_flow_struct;
 
 struct ndpi_call_function_struct {
+  u_int16_t ndpi_protocol_id;
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask;
@@ -1163,7 +1164,7 @@ struct ndpi_flow_struct {
 
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
-  u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1,
+  u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, fail_with_unknown:1,
     init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
 
   /*
@@ -1330,9 +1331,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int8_t directconnect_stage:2;	      // 0 - 1
 
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int8_t sip_yahoo_voice:1;
-
   /* NDPI_PROTOCOL_HTTP */
   u_int8_t http_detected:1;
 
@@ -1366,14 +1364,8 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_RTMP */
   u_int8_t rtmp_stage:2;
 
-  /* NDPI_PROTOCOL_PANDO */
-  u_int8_t pando_stage:3;
-
   /* NDPI_PROTOCOL_STEAM */
   u_int16_t steam_stage:3, steam_stage1:3, steam_stage2:2, steam_stage3:2;
-
-  /* NDPI_PROTOCOL_PPLIVE */
-  u_int8_t pplive_stage1:3, pplive_stage2:2, pplive_stage3:2;
 
   /* NDPI_PROTOCOL_STARCRAFT */
   u_int8_t starcraft_udp_stage : 3;	// 0-7

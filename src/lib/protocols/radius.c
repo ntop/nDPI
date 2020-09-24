@@ -40,9 +40,11 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
   if(packet->udp != NULL) {
     struct radius_header *h = (struct radius_header*)packet->payload;
     /* RFC2865: The minimum length is 20 and maximum length is 4096. */
-    if((payload_len < 20) || (payload_len > 4096))
-	return;
-
+    if((payload_len < 20) || (payload_len > 4096)) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
+    }
+    
     if((h->code > 0)
        && (h->code <= 13)
        && (ntohs(h->len) == payload_len)) {
