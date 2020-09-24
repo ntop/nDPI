@@ -165,7 +165,7 @@ matrix:
             - libjson-c-dev
             - autogen
     - name: fuzzu
-      env: CXXFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link" CFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -Og -fsanitize=undefined" QA_FUZZ=ubsan CC=clang-7 && CXX=clang++-7
+      env: CXXFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link -fno-sanitize=alignment" CFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link -fno-sanitize=alignment" LDFLAGS="-g3 -Og -fsanitize=undefined -fno-sanitize=alignment" QA_FUZZ=ubsan CC=clang-7 && CXX=clang++-7
       os: linux
       compiler: clang-7
       addons:
