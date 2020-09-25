@@ -76,7 +76,7 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    const u_int8_t * payload, const u_int16_t payload_len) {
-  u_int8_t payloadType, payload_type = payload[1] & 0x7F;
+  u_int8_t payloadType, payload_type;
 
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
@@ -85,6 +85,8 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
+  payload_type = payload[1] & 0x7F;
+  
   /* Check whether this is an RTP flow */
   if((payload_len >= 12)
      && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */
