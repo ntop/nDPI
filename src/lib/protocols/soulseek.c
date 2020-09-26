@@ -121,11 +121,17 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  }
 
 	  index += get_l32(packet->payload, index) + 4;
-	}
-	if(index + get_l32(packet->payload, index) == packet->payload_packet_len - 4 && !get_u_int16_t(packet->payload, 10)) {
+	} /* while */
+	
+	if((packet->payload_packet_len >= (index+4))
+	   && (index + get_l32(packet->payload, index)) == (packet->payload_packet_len - 4)
+	   && (get_u_int16_t(packet->payload, 10) != 0)) {
 	  /* This structure seems to be soulseek proto */
 	  index = get_l32(packet->payload, 8) + 12;	// end of "user name"
-	  if((index + 4) <= packet->payload_packet_len && !get_u_int16_t(packet->payload, index + 2))	// for passwd len
+
+	  if(((index + 4) <= packet->payload_packet_len)
+	     && (packet->payload_packet_len >= (index+4))
+	     && (!get_u_int16_t(packet->payload, index + 2)))	// for passwd len
 	    {
 	      index += get_l32(packet->payload, index) + 4;	//end of  "Passwd"
 	      if((index + 4 + 4) <= packet->payload_packet_len && !get_u_int16_t(packet->payload, index + 6))	// to read version,hashlen
@@ -142,7 +148,8 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
       if (packet->payload_packet_len > 8
-	  && packet->payload_packet_len < 200 && get_l32(packet->payload, 0) == packet->payload_packet_len - 4) {
+	  && (packet->payload_packet_len < 200)
+	  && get_l32(packet->payload, 0) == (packet->payload_packet_len - 4)) {
 	//Server Messages:
 	const u_int32_t msgcode = get_l32(packet->payload, 4);
 
