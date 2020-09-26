@@ -52,10 +52,12 @@
 #include <sys/mman.h>
 #include <libgen.h>
 
-#include "json.h"
-
 #include "ndpi_config.h"
 #include "ndpi_api.h"
+
+#ifdef HAVE_JSON_H
+#include "json.h" /* JSON-C */
+#endif
 
 static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 static int verbose = 0;
@@ -63,6 +65,7 @@ static int verbose = 0;
 /* *********************************************** */
 
 int serializerUnitTest() {
+#ifdef HAVE_JSON_H
   ndpi_serializer serializer, deserializer;
   int i, loop_id;
   u_int8_t verbose = 0;
@@ -220,6 +223,7 @@ int serializerUnitTest() {
   }
 
   printf("%s                      OK\n", __FUNCTION__);
+#endif
   return 0;
 }
 

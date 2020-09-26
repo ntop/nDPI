@@ -71,7 +71,11 @@ NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
-AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h])
+dnl> used by json-c
+JSONC_INC=`pkg-config --cflags json-c`
+CFLAGS="${CFLAGS} ${JSONC_INC}"
+
+AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h json.h])
 
 ADDITIONAL_LIBS=
 PCAP_HOME=$HOME/PF_RING/userland
@@ -196,8 +200,6 @@ AC_SUBST(NDPI_MAJOR)
 AC_SUBST(NDPI_MINOR)
 AC_SUBST(NDPI_PATCH)
 AC_SUBST(NDPI_VERSION_SHORT)
-AC_SUBST(SVN_DATE)
-AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
 AC_SUBST(ADDITIONAL_LIBS)
