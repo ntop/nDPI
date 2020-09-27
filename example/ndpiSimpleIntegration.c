@@ -922,8 +922,8 @@ static void ndpi_process_packet(uint8_t * const args,
 				printf("\tDNS ID #%04Xh - query num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] %s\n",
 					flow_to_process->ndpi_flow->protos.dns.tr_id,
 					flow_to_process->ndpi_flow->protos.dns.num_queries,
-					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp, flow_to_process->ndpi_flow->protos.dns.query_type),
-					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss, flow_to_process->ndpi_flow->protos.dns.query_class),
+					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
 					flow_to_process->ndpi_flow-> host_server_name );
 						
 			} else { 
@@ -931,10 +931,10 @@ static void ndpi_process_packet(uint8_t * const args,
 							
 				printf("\tDNS ID #%04Xh - response (code: %s) num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] - %s\n",
 					flow_to_process->ndpi_flow->protos.dns.tr_id,				
-					dnsRespCode(dnsResp, flow_to_process->ndpi_flow->protos.dns.reply_code),
+					dnsRespCode(dnsResp,sizeof(dnsResp),flow_to_process->ndpi_flow->protos.dns.reply_code),
 					flow_to_process->ndpi_flow->protos.dns.num_answers,
-					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp, flow_to_process->ndpi_flow->protos.dns.query_type),
-					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,flow_to_process->ndpi_flow->protos.dns.query_class),
+					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
 					flow_to_process->ndpi_flow-> host_server_name );
 				
 				struct dnsRRList_t* currList = flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList;
@@ -945,15 +945,15 @@ static void ndpi_process_packet(uint8_t * const args,
 					struct dnsRR_t* currRR = currList->rrItem;
 					// printf("DNS response list item: [%p]\n",currRR);
 
-					dnsRData(line, currRR);
+					dnsRData(line,sizeof(line),currRR);
 					
 					if ( currRR->rrType==DNS_TYPE_A || currRR->rrType==DNS_TYPE_AAAA ) {
 						if ( answerIp[0]>0 ) {
 							strncat(answerIp,"|",sizeof(answerIp));
 						}
-						strncat(answerIp, dnsType(dnsTyp, currRR->rrType),sizeof(answerIp));
+						strncat(answerIp, dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),sizeof(answerIp));
 						strncat(answerIp,";",sizeof(answerIp));
-						//strncat(answerIp, dnsClass(dnsClss, currRR->rrClass),sizeof(answerIp));
+						//strncat(answerIp, dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),sizeof(answerIp));
 						size_t pos= strlen(answerIp);
 						snprintf(&answerIp[pos],sizeof(answerIp)-pos,"%d",currRR->rrClass);
 						strncat(answerIp,";",sizeof(answerIp));
@@ -961,8 +961,8 @@ static void ndpi_process_packet(uint8_t * const args,
 					}
 					printf("\t RR %s %s %s ttl:%usec - %s\n",
 						currRR->rrName,
-						dnsType(dnsTyp, currRR->rrType),
-						dnsClass(dnsClss, currRR->rrClass),
+						dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
 						currRR->rrTTL,
 						line);
 					
@@ -977,12 +977,12 @@ static void ndpi_process_packet(uint8_t * const args,
 					struct dnsRR_t* currRR = currList->rrItem;
 					// printf("DNS response list item: [%p]\n",currRR);
 
-					dnsRData(line, currRR);
+					dnsRData(line,sizeof(line),currRR);
 									
 					printf("\t RR %s %s %s ttl:%usec - %s\n",
 						currRR->rrName,
-						dnsType(dnsTyp, currRR->rrType),
-						dnsClass(dnsClss, currRR->rrClass),
+						dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
 						currRR->rrTTL,
 						line);
 						
@@ -997,12 +997,12 @@ static void ndpi_process_packet(uint8_t * const args,
 					struct dnsRR_t* currRR = currList->rrItem;
 					// printf("DNS response list item: [%p]\n",currRR);
 
-					dnsRData(line, currRR);
+					dnsRData(line,sizeof(line),currRR);
 									
 					printf("\t RR %s %s %s ttl:%usec - %s\n",
 						currRR->rrName,
-						dnsType(dnsTyp, currRR->rrType),
-						dnsClass(dnsClss, currRR->rrClass),
+						dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
 						currRR->rrTTL,
 						line);
 					currList = currList->nextItem;

@@ -20,14 +20,16 @@
 
 
 
-/* extern declaration */
-extern void * ndpi_malloc(size_t size);
-extern void * ndpi_calloc(unsigned long count, size_t size);
-extern void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
-extern char * ndpi_strdup(const char *s);
-extern void   ndpi_free(void *ptr);
-extern void * ndpi_flow_malloc(size_t size);
-extern void   ndpi_flow_free(void *ptr);
+/* extern declaration used here */
+void * ndpi_malloc(size_t size);
+void * ndpi_calloc(unsigned long count, size_t size);
+void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
+/*
+char * ndpi_strdup(const char *s);
+void   ndpi_free(void *ptr);
+void * ndpi_flow_malloc(size_t size);
+void   ndpi_flow_free(void *ptr);
+*/
 
 enum DnsResponseCode
 {
@@ -96,7 +98,7 @@ enum DnsType
 	/** Pointer record */
 	DNS_TYPE_PTR= 12,
 	/** Host information record */
-	DNS_TYPE_HINFO,
+	DNS_TYPE_HINFO, 
 	/** mailbox or mail list information record */
 	DNS_TYPE_MINFO,
 	/** Mail exchanger record */
@@ -136,7 +138,7 @@ enum DnsType
 	/** DNS Nimrod Locator record */
 	DNS_TYPE_NIMLOC,
 	/** Service locator record */
-	DNS_TYPE_SRV,
+	DNS_TYPE_SRV, 
 	/** Asynchronous Transfer Mode address record */
 	DNS_TYPE_ATMA,
 	/** Naming Authority Pointer record */
@@ -173,6 +175,9 @@ enum DnsType
 	DNS_TYPE_NSEC3,
 	/** NSEC3 parameters */
 	DNS_TYPE_NSEC3PARAM=51,
+	
+	/** AFXR parameters */
+	DNS_TYPE_AFXR=252,
 	
 	/** All cached records */
 	DNS_TYPE_ALL = 255
@@ -263,6 +268,13 @@ typedef struct dnsRR_t {
 		
 		char *PTRDName;							// rrType=12
 		
+		struct {								// rrType=13
+			uint8_t cpu_len;
+			char* 	cpu;
+			uint8_t os_len;
+			char* 	os;
+		} HINFO;
+		
 		struct {								// rrType=15
 			uint8_t preference;
 			char* 	exchange;
@@ -281,12 +293,8 @@ typedef struct dnsRRList_t {
 } dnsRRList;
 
 
-/* dns support */
-extern void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8_t *payload, const u_int payloadLen );
-extern struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload, const u_int payloadLen );
-
-extern void free_dns_QSec(struct dnsQuestionSec_t *qs);
-extern void free_dns_RR(struct dnsRR_t *rr);
-extern void clear_dns_RR_list(struct dnsRRList_t* currList, unsigned char bForward);
+/* dns support: function declared and implementated here*/
+void free_dns_QSec(struct dnsQuestionSec_t *qs);
+void clear_dns_RR_list(struct dnsRRList_t* currList, unsigned char bForward);
 
 #endif 

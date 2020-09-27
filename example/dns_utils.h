@@ -4,12 +4,12 @@
 
 #include "ndpi_typedefs.h"
 
- char* prot4L(char *ret, int protCode);
- char* dnsRespCode(char *ret, enum DnsResponseCode respCode);
- char* dnsClass(char *ret, enum DnsClass classIndex);
- char* dnsType(char *ret, enum DnsType typeCode);
- char* dnsRData(char *ret, struct dnsRR_t *rr );
+extern char* prot4L(char *ret, size_t len, int protCode);
+extern char* dnsRespCode(char *ret, size_t len, enum DnsResponseCode respCode);
+extern char* dnsClass(char *ret, size_t len, enum DnsClass classIndex);
+extern char* dnsType(char *ret, size_t len, enum DnsType typeCode);
+extern char *dnsRData(char *ret, size_t len, struct dnsRR_t *rr );
 
- void ndpi_patchIPv6Address(char *str);
+void ndpi_patchIPv6Address(char *str);
 
 #endif
