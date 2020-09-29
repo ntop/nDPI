@@ -1,8 +1,8 @@
 CC=@CC@
-CFLAGS=-I. -I../src/include -I./src/lib/third_party/include -shared -Wl,
+CFLAGS=-I. -I../src/include -I./src/lib/third_party/include @CFLAGS@ @CUSTOM_NDPI@ -shared
 #LIBNDPI=../src/lib/libndpi.so.@NDPI_VERSION_SHORT@
 LIBNDPI=../src/lib/libndpi.a
-LDFLAGS=$(CFILE) $(LIBNDPI) -lpcap
+LDFLAGS=$(CFILE) $(LIBNDPI) -lpcap @ADDITIONAL_LIBS@
 SHARE = -soname,ndpi_wrap
 SO=ndpi_wrap.so
 OBJS = ndpi_wrap.o
@@ -19,7 +19,7 @@ endif
 all: $(SO)
 
 $(SO): $(CFILE) $(LIBNDPI) Makefile
-	$(CC) $(CFLAGS)$(SHARE) -o $@ $(PIC) $(LDFLAGS)
+	$(CC) $(CFLAGS) -Wl,$(SHARE) -o $@ $(PIC) $(LDFLAGS)
 #	ln -s $(LIBNDPI) .
 
 clean:

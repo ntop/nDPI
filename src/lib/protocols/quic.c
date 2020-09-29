@@ -31,6 +31,7 @@
 #endif
 
 // #define DEBUG_CRYPT
+// #define QUIC_DEBUG
 
 /* This dissector handles GQUIC and IETF-QUIC both.
    Main references:
@@ -898,7 +899,7 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
   const u_int8_t *crypto_data;
   uint32_t counter;
   uint8_t first_nonzero_payload_byte, offset_len;
-  uint64_t unused;
+  uint64_t unused, offset;
 
   counter = 0;
   while(counter < clear_payload_len && clear_payload[counter] == 0)
@@ -972,16 +973,17 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
       }
       return NULL;
     }
-    if(counter + 2 + 8 >= clear_payload_len) /* quic_len reads 8 bytes, at most */
+    counter += 1;
+    if(counter + 8 + 8 >= clear_payload_len) /* quic_len reads 8 bytes, at most */
       return NULL;
-    if(clear_payload[counter + 1] != 0x00) {
+    counter += quic_len(&clear_payload[counter], &offset);
+    if(offset != 0) {
 #ifdef QUIC_DEBUG
       NDPI_LOG_ERR(ndpi_struct, "Unexpected crypto stream offset 0x%x\n",
-		   clear_payload[counter + 1]);
+		   offset);
 #endif
       return NULL;
     }
-    counter += 2;
     counter += quic_len(&clear_payload[counter], crypto_data_len);
     crypto_data = &clear_payload[counter];
   }

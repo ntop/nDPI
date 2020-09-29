@@ -59,3 +59,4 @@ cat configure.tmp > configure
 
 chmod +x configure
 ./configure $@
+
