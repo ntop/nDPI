@@ -8,4 +8,4 @@ endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libndpi.pc
 
-EXTRA_DIST = autogen.sh configure.seed
+EXTRA_DIST = README.md CHANGELOG.md CONTRIBUTING.md README.protocols autogen.sh configure.seed wireshark python windows utils packages doc/nDPI_QuickStartGuide.pages doc/nDPI_QuickStartGuide.pdf example/MacOS example/Win32
