@@ -20,7 +20,6 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>

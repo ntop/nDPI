@@ -9,7 +9,6 @@
  *
  */
 
-
 #ifndef __DNS_H__
 #define __DNS_H__
 
@@ -18,8 +17,6 @@
 
 // #define DNS_DEBUG 1
 // #define DEBUG_DNS_MEMORY
-
-
 
 /* extern declaration used here */
 void * ndpi_malloc(size_t size);

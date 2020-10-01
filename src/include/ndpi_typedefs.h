@@ -29,6 +29,7 @@
 
 #include "dns.h"
 
+
 /* NDPI_LOG_LEVEL */
 typedef enum {
 	      NDPI_LOG_ERROR,
