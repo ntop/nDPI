@@ -70,7 +70,7 @@ typedef enum {
   NDPI_TLS_OBSOLETE_VERSION,
   NDPI_TLS_WEAK_CIPHER,
   NDPI_TLS_CERTIFICATE_EXPIRED,
-  NDPI_TLS_CERTIFICATE_MISMATCH,
+  NDPI_TLS_CERTIFICATE_MISMATCH, /* 10 */
   NDPI_HTTP_SUSPICIOUS_USER_AGENT,
   NDPI_HTTP_NUMERIC_IP_HOST,
   NDPI_HTTP_SUSPICIOUS_URL,
@@ -80,9 +80,11 @@ typedef enum {
   NDPI_MALFORMED_PACKET,
   NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER,
   NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER,
-  NDPI_SMB_INSECURE_VERSION,
+  NDPI_SMB_INSECURE_VERSION, /* 20 */
   NDPI_TLS_SUSPICIOUS_ESNI_USAGE,
-  NDPI_BLACKLISTED_HOST,
+  NDPI_UNSAFE_PROTOCOL,
+  NDPI_DNS_SUSPICIOUS_TRAFFIC,
+  NDPI_TLS_MISSING_SNI,
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 31 due to (**) */
@@ -864,6 +866,7 @@ struct ndpi_detection_module_struct;
 struct ndpi_flow_struct;
 
 struct ndpi_call_function_struct {
+  u_int16_t ndpi_protocol_id;
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask;
@@ -1023,6 +1026,11 @@ struct pcre_struct {
 };
 #endif
 
+typedef enum {
+  ndpi_stun_cache,
+  ndpi_hangout_cache
+} ndpi_lru_cache_type;
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -1134,9 +1142,10 @@ struct ndpi_detection_module_struct {
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
-  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */
-    _pad:7;
+  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
 
+  void (*ndpi_notify_lru_add_handler_ptr)(ndpi_lru_cache_type cache_type, u_int32_t proto, u_int32_t app_proto);
+  
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
 #endif
@@ -1161,7 +1170,7 @@ struct ndpi_flow_struct {
 
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
-  u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1,
+  u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, fail_with_unknown:1,
     init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
 
   /*
@@ -1289,10 +1298,6 @@ struct ndpi_flow_struct {
     } telnet;
     
     struct {
-      char answer[96];
-    } mdns;
-
-    struct {
       char version[32];
     } ubntac2;
 
@@ -1338,9 +1343,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int8_t directconnect_stage:2;	      // 0 - 1
 
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int8_t sip_yahoo_voice:1;
-
   /* NDPI_PROTOCOL_HTTP */
   u_int8_t http_detected:1;
 
@@ -1374,14 +1376,8 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_RTMP */
   u_int8_t rtmp_stage:2;
 
-  /* NDPI_PROTOCOL_PANDO */
-  u_int8_t pando_stage:3;
-
   /* NDPI_PROTOCOL_STEAM */
   u_int16_t steam_stage:3, steam_stage1:3, steam_stage2:2, steam_stage3:2;
-
-  /* NDPI_PROTOCOL_PPLIVE */
-  u_int8_t pplive_stage1:3, pplive_stage2:2, pplive_stage3:2;
 
   /* NDPI_PROTOCOL_STARCRAFT */
   u_int8_t starcraft_udp_stage : 3;	// 0-7
@@ -1445,8 +1441,9 @@ typedef enum {
   ndpi_serialization_format_csv
 } ndpi_serialization_format;
 
-/* Note: key supports string and uint32 (compressed to uint8/uint16) only,
- * this is also enforced by the API */
+/* Note: 
+ * - up to 16 types (TLV encoding: "4 bit key type" << 4 | "4 bit value type")
+ * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API */
 typedef enum {
   ndpi_serialization_unknown = 0,
   ndpi_serialization_end_of_record,
@@ -1459,7 +1456,9 @@ typedef enum {
   ndpi_serialization_int32,
   ndpi_serialization_int64,
   ndpi_serialization_float,
-  ndpi_serialization_string
+  ndpi_serialization_string,
+  ndpi_serialization_start_of_block,
+  ndpi_serialization_end_of_block
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
@@ -1517,11 +1516,10 @@ typedef struct {
 struct ndpi_analyze_struct {
   u_int32_t *values;
   u_int32_t min_val, max_val, sum_total, num_data_entries, next_value_insert_index;
-  u_int16_t num_values_array_len /* lenght of the values array */;
+  u_int16_t num_values_array_len /* length of the values array */;
 
   struct {
-    /* https://www.johndcook.com/blog/standard_deviation/ */
-    float mu, q;
+    u_int64_t sum_square_total;
   } stddev;
 };
 
@@ -1559,6 +1557,5 @@ struct ndpi_bin {
     u_int32_t *bins32; /* num_bins bins */
   } u;
 };
-
 
 #endif /* __NDPI_TYPEDEFS_H__ */

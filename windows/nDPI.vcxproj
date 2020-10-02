@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7331961B-A2B5-45B1-B144-AFDEFBB0EB01}</ProjectGuid>
+    <RootNamespace>nDPIdev</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>nDPI</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir);$(ProjectDir)dummy\folder\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(ProjectDir)dummy\folder\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir);$(ProjectDir)dummy\folder\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\protocols\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\include\;$(ProjectDir)..\..\..\..\submodules\nDPI\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>false</StringPooling>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <AssemblyDebug>true</AssemblyDebug>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\protocols\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\include\;$(ProjectDir)..\..\..\..\submodules\nDPI\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>false</StringPooling>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalUsingDirectories>$(ProjectDir);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <AssemblyDebug>true</AssemblyDebug>
+    </Link>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\protocols\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\include\;$(ProjectDir)..\..\..\..\submodules\nDPI\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <AdditionalUsingDirectories>$(ProjectDir);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\protocols\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\include\;$(ProjectDir)..\..\..\..\submodules\nDPI\;$(ProjectDir)..\..\..\..\submodules\nDPI\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <AdditionalUsingDirectories>$(ProjectDir);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\afp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\bjnp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\kxun.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\third_party\src\ahocorasick.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\aimini.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\applejuice.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\armagetron.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ayiya.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\battlefield.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\bgp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\bittorrent.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\btlib.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ciscovpn.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\citrix.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\coap.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\collectd.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\corba.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\crossfire.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\dcerpc.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\dhcp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\dhcpv6.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\directconnect.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\directdownloadlink.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\dns.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\dofus.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\drda.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\dropbox.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\eaq.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\edonkey.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\fasttrack.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\fiesta.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\filetopia.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\attic\flash.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\florensia.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\attic\ftp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ftp_control.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ftp_data.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\git.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\gnutella.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\gtp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\guildwars.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\h323.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\halflife2_and_mods.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\hangout.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\hep.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\http.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\http_activesync.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\iax.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\icecast.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ipp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\irc.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\jabber.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\kakaotalk_voice.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\kerberos.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\kontiki.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ldap.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\lotus_notes.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mail_imap.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mail_pop.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mail_smtp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\attic\manolito.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\maplestory.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mdns.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\megaco.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mgcp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mms.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mpegts.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mqtt.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\msn.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mssql_tds.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\mysql.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\ndpi_main.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\netbios.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\netflow.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\nfs.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\third_party\src\node.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\noe.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\non_tcp_udp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ntp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\openft.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\openvpn.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\oracle.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\oscar.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\pando.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\pcanywhere.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\attic\popo.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\postgres.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\pplive.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ppstream.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\pptp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\qq.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\quake.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\quic.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\radius.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\rdp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\redis_net.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\rsync.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\rtcp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\rtmp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\rtp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\rtsp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\rx.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\attic\secondlife.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\sflow.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\shoutcast.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\sip.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\skinny.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\skype.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\smb.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\snmp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\socks45.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\socrates.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\sopcast.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\third_party\src\sort.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\soulseek.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\spotify.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ssdp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ssh.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ssl.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\starcraft.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\stealthnet.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\steam.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\stun.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\syslog.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\tcp_udp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\teamspeak.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\teamviewer.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\telegram.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\telnet.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\teredo.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\tftp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\thunder.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\tor.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\tvants.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\tvuplayer.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\ubntac2.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\usenet.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\vhua.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\viber.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\vmware.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\vnc.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\warcraft3.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\whoisdas.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\world_of_kung_fu.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\world_of_warcraft.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\xbox.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\xdmcp.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\yahoo.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\zattoo.c" />
+    <ClCompile Include="..\..\..\..\submodules\nDPI\src\lib\protocols\zeromq.c" />
+    <ClCompile Include="ndpi.c" />
+    <ClCompile Include="ndpi_util.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\lib\protocols\btlib.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\lib\third_party\include\actypes.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\lib\third_party\include\ahocorasick.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_api.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_define.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_includes.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_main.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\lib\third_party\include\ndpi_patricia.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_protocol_ids.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_protocols.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_typedefs.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_unix.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\include\ndpi_win32.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\lib\third_party\include\node.h" />
+    <ClInclude Include="..\..\..\..\submodules\nDPI\src\lib\third_party\include\sort.h" />
+    <ClInclude Include="arpa\inet.h" />
+    <ClInclude Include="bpf.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="getopt.h" />
+    <ClInclude Include="ndpi_util.h" />
+    <ClInclude Include="ndpi_utils.h" />
+    <ClInclude Include="strings.h" />
+    <ClInclude Include="unistd.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\submodules\nDPI\src\lib\ndpi_content_match.c.inc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

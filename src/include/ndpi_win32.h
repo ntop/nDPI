@@ -31,6 +31,8 @@
 #define __mingw_forceinline __inline__ __attribute__((__always_inline__,__gnu_inline__))
 #endif
 
+#undef _WIN32_WINNT
+#define _WIN32_WINNT _WIN32_WINNT_WIN8
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
@@ -39,6 +41,7 @@
 #include <getopt.h>   /* getopt from: http://www.pwilson.net/sample.html. */
 #include <process.h>  /* for getpid() and the exec..() family */
 #include <stdint.h>
+#include <time.h>
 
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
@@ -47,6 +50,17 @@
 #define _WS2TCPIP_H_ /* Avoid compilation problems */
 
 #define	IPVERSION	4 /* on *nix it is defined in netinet/ip.h */ 
+
+#ifndef MIN
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+#endif
+
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+
+#undef gettimeofday
+#define gettimeofday mingw_gettimeofday
 
 extern char* strsep(char **sp, char *sep);
 
@@ -78,5 +92,12 @@ extern unsigned long waitForNextEvent(unsigned long ulDelay /* ms */);
 #define sleep(a /* sec */)              waitForNextEvent(1000*a /* ms */)
 #define strtok_r                        strtok_s
 #define timegm                          _mkgmtime
+
+static inline struct tm * localtime_r(const time_t *timep, struct tm * result)
+{
+    struct tm *timeinfo;
+    timeinfo = localtime(timep);
+    return timeinfo;
+}
 
 #endif /* __NDPI_WIN32_H__ */

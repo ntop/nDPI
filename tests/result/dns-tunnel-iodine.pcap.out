@@ -1,0 +1,3 @@
+DNS	434	70252	1
+
+	1	UDP 10.0.2.30:44639 <-> 10.0.2.20:53 [proto: 5/DNS][cat: Network/14][222 pkts/26136 bytes <-> 212 pkts/44116 bytes][Goodput ratio: 64/80][24.49 sec][Host: vaaaakardli.pirate.sea][::][bytes ratio: -0.256 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 127/88 4005/4005 543/524][Pkt Len c2s/s2c min/avg/max/stddev: 82/93 118/208 323/1512 67/175][Risk: ** Suspicious DNS traffic **][PLAIN TEXT (vaaaakardli)][Plen Bins: 0,40,1,15,29,3,0,1,8,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -1,0 +1,8 @@
+GoogleServices	12	8420	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 40.154.127.200           	 1      
+
+
+	1	UDP 40.154.127.200:49836 <-> 166.240.188.209:443 [proto: 188.239/QUIC.GoogleServices][cat: Web/5][6 pkts/3146 bytes <-> 6 pkts/5274 bytes][Goodput ratio: 92/95][0.42 sec][ALPN: h3-T050][TLS Supported Versions: TLSv1.3][bytes ratio: -0.253 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 61/61 178/136 71/62][Pkt Len c2s/s2c min/avg/max/stddev: 75/68 524/879 1392/1392 614/541][User-Agent: Chrome/85.0.4183.83 Windows NT 6.1; Win64; x64][TLSv1.3][Client: fonts.googleapis.com][JA3C: a2fc589336b7c13b674c1bab24655ce7][Plen Bins: 8,25,8,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,0,0,0,0,0]

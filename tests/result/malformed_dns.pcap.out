@@ -1,0 +1,3 @@
+DNS	6	5860	1
+
+	1	UDP 127.0.0.1:50435 <-> 127.0.0.1:53 [proto: 5/DNS][cat: Network/14][2 pkts/140 bytes <-> 4 pkts/5720 bytes][Goodput ratio: 40/97][5.03 sec][Host: www.xt.com][0.0.0.0][bytes ratio: -0.952 (Download)][IAT c2s/s2c min/avg/max/stddev: 4999/13 4999/1670 4999/4983 0/2343][Pkt Len c2s/s2c min/avg/max/stddev: 70/1430 70/1430 70/1430 0/0][Risk: ** Malformed packet **][PLAIN TEXT (AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA)][Plen Bins: 33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,66,0,0,0,0]

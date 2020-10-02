@@ -51,6 +51,7 @@
 #include <math.h>
 #include "ndpi_main.h"
 #include "ndpi_classify.h"
+#include "ndpi_includes.h"
 
 /** finds the minimum value between to inputs */
 #ifndef min

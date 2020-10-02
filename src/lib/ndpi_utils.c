@@ -31,6 +31,7 @@
 
 #include "ndpi_config.h"
 #include "ndpi_api.h"
+#include "ndpi_includes.h"
 
 #include "ahocorasick.h"
 #include "libcache.h"
@@ -233,7 +234,7 @@ u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
 
 /* ****************************************** */
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 /* http://opensource.apple.com/source/Libc/Libc-186/string.subproj/strcasecmp.c */
 
 /*
@@ -336,6 +337,9 @@ u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher) {
 
 /* ***************************************************** */
 
+/*
+  Some values coming from packet-tls-utils.c (wireshark)
+*/
 const char* ndpi_cipher2str(u_int32_t cipher) {
   switch(cipher) {
   case 0x000000: return("TLS_NULL_WITH_NULL_NULL");
@@ -497,7 +501,31 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x0000C4: return("TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256");
   case 0x0000C5: return("TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256");
   case 0x0000FF: return("TLS_EMPTY_RENEGOTIATION_INFO_SCSV");
-  case 0x00c001: return("TLS_ECDH_ECDSA_WITH_NULL_SHA");
+    /* RFC 8701 */
+  case 0x0A0A: return("Reserved (GREASE)");
+    /* RFC 8446 */
+  case 0x1301: return("TLS_AES_128_GCM_SHA256");
+  case 0x1302: return("TLS_AES_256_GCM_SHA384");
+  case 0x1303: return("TLS_CHACHA20_POLY1305_SHA256");
+  case 0x1304: return("TLS_AES_128_CCM_SHA256");
+  case 0x1305: return("TLS_AES_128_CCM_8_SHA256");
+    /* RFC 8701 */
+  case 0x1A1A: return("Reserved (GREASE)");
+  case 0x2A2A: return("Reserved (GREASE)");
+  case 0x3A3A: return("Reserved (GREASE)");
+  case 0x4A4A: return("Reserved (GREASE)");
+    /* From RFC 7507 */
+  case 0x5600: return("TLS_FALLBACK_SCSV");
+    /* RFC 8701 */
+  case 0x5A5A: return("Reserved (GREASE)");
+  case 0x6A6A: return("Reserved (GREASE)");
+  case 0x7A7A: return("Reserved (GREASE)");
+  case 0x8A8A: return("Reserved (GREASE)");
+  case 0x9A9A: return("Reserved (GREASE)");
+  case 0xAAAA: return("Reserved (GREASE)");
+  case 0xBABA: return("Reserved (GREASE)");
+
+  case 0x00c001: return("TLS_ECDH_ECDSA_WITH_NULL_SHA");    
   case 0x00c002: return("TLS_ECDH_ECDSA_WITH_RC4_128_SHA");
   case 0x00c003: return("TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA");
   case 0x00c004: return("TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA");
@@ -556,6 +584,148 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x00C039: return("TLS_ECDHE_PSK_WITH_NULL_SHA");
   case 0x00C03A: return("TLS_ECDHE_PSK_WITH_NULL_SHA256");
   case 0x00C03B: return("TLS_ECDHE_PSK_WITH_NULL_SHA384");
+    /* RFC 6209 */
+  case 0xC03C: return("TLS_RSA_WITH_ARIA_128_CBC_SHA256");
+  case 0xC03D: return("TLS_RSA_WITH_ARIA_256_CBC_SHA384");
+  case 0xC03E: return("TLS_DH_DSS_WITH_ARIA_128_CBC_SHA256");
+  case 0xC03F: return("TLS_DH_DSS_WITH_ARIA_256_CBC_SHA384");
+  case 0xC040: return("TLS_DH_RSA_WITH_ARIA_128_CBC_SHA256");
+  case 0xC041: return("TLS_DH_RSA_WITH_ARIA_256_CBC_SHA384");
+  case 0xC042: return("TLS_DHE_DSS_WITH_ARIA_128_CBC_SHA256");
+  case 0xC043: return("TLS_DHE_DSS_WITH_ARIA_256_CBC_SHA384");
+  case 0xC044: return("TLS_DHE_RSA_WITH_ARIA_128_CBC_SHA256");
+  case 0xC045: return("TLS_DHE_RSA_WITH_ARIA_256_CBC_SHA384");
+  case 0xC046: return("TLS_DH_anon_WITH_ARIA_128_CBC_SHA256");
+  case 0xC047: return("TLS_DH_anon_WITH_ARIA_256_CBC_SHA384");
+  case 0xC048: return("TLS_ECDHE_ECDSA_WITH_ARIA_128_CBC_SHA256");
+  case 0xC049: return("TLS_ECDHE_ECDSA_WITH_ARIA_256_CBC_SHA384");
+  case 0xC04A: return("TLS_ECDH_ECDSA_WITH_ARIA_128_CBC_SHA256");
+  case 0xC04B: return("TLS_ECDH_ECDSA_WITH_ARIA_256_CBC_SHA384");
+  case 0xC04C: return("TLS_ECDHE_RSA_WITH_ARIA_128_CBC_SHA256");
+  case 0xC04D: return("TLS_ECDHE_RSA_WITH_ARIA_256_CBC_SHA384");
+  case 0xC04E: return("TLS_ECDH_RSA_WITH_ARIA_128_CBC_SHA256");
+  case 0xC04F: return("TLS_ECDH_RSA_WITH_ARIA_256_CBC_SHA384");
+  case 0xC050: return("TLS_RSA_WITH_ARIA_128_GCM_SHA256");
+  case 0xC051: return("TLS_RSA_WITH_ARIA_256_GCM_SHA384");
+  case 0xC052: return("TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256");
+  case 0xC053: return("TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384");
+  case 0xC054: return("TLS_DH_RSA_WITH_ARIA_128_GCM_SHA256");
+  case 0xC055: return("TLS_DH_RSA_WITH_ARIA_256_GCM_SHA384");
+  case 0xC056: return("TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256");
+  case 0xC057: return("TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384");
+  case 0xC058: return("TLS_DH_DSS_WITH_ARIA_128_GCM_SHA256");
+  case 0xC059: return("TLS_DH_DSS_WITH_ARIA_256_GCM_SHA384");
+  case 0xC05A: return("TLS_DH_anon_WITH_ARIA_128_GCM_SHA256");
+  case 0xC05B: return("TLS_DH_anon_WITH_ARIA_256_GCM_SHA384");
+  case 0xC05C: return("TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256");
+  case 0xC05D: return("TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384");
+  case 0xC05E: return("TLS_ECDH_ECDSA_WITH_ARIA_128_GCM_SHA256");
+  case 0xC05F: return("TLS_ECDH_ECDSA_WITH_ARIA_256_GCM_SHA384");
+  case 0xC060: return("TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256");
+  case 0xC061: return("TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384");
+  case 0xC062: return("TLS_ECDH_RSA_WITH_ARIA_128_GCM_SHA256");
+  case 0xC063: return("TLS_ECDH_RSA_WITH_ARIA_256_GCM_SHA384");
+  case 0xC064: return("TLS_PSK_WITH_ARIA_128_CBC_SHA256");
+  case 0xC065: return("TLS_PSK_WITH_ARIA_256_CBC_SHA384");
+  case 0xC066: return("TLS_DHE_PSK_WITH_ARIA_128_CBC_SHA256");
+  case 0xC067: return("TLS_DHE_PSK_WITH_ARIA_256_CBC_SHA384");
+  case 0xC068: return("TLS_RSA_PSK_WITH_ARIA_128_CBC_SHA256");
+  case 0xC069: return("TLS_RSA_PSK_WITH_ARIA_256_CBC_SHA384");
+  case 0xC06A: return("TLS_PSK_WITH_ARIA_128_GCM_SHA256");
+  case 0xC06B: return("TLS_PSK_WITH_ARIA_256_GCM_SHA384");
+  case 0xC06C: return("TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256");
+  case 0xC06D: return("TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384");
+  case 0xC06E: return("TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256");
+  case 0xC06F: return("TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384");
+  case 0xC070: return("TLS_ECDHE_PSK_WITH_ARIA_128_CBC_SHA256");
+  case 0xC071: return("TLS_ECDHE_PSK_WITH_ARIA_256_CBC_SHA384");
+    /* RFC 6367 */
+  case 0xC072: return("TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC073: return("TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384");
+  case 0xC074: return("TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC075: return("TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384");
+  case 0xC076: return("TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC077: return("TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384");
+  case 0xC078: return("TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC079: return("TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384");
+  case 0xC07A: return("TLS_RSA_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC07B: return("TLS_RSA_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC07C: return("TLS_DHE_RSA_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC07D: return("TLS_DHE_RSA_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC07E: return("TLS_DH_RSA_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC07F: return("TLS_DH_RSA_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC080: return("TLS_DHE_DSS_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC081: return("TLS_DHE_DSS_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC082: return("TLS_DH_DSS_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC083: return("TLS_DH_DSS_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC084: return("TLS_DH_anon_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC085: return("TLS_DH_anon_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC086: return("TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC087: return("TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC088: return("TLS_ECDH_ECDSA_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC089: return("TLS_ECDH_ECDSA_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC08A: return("TLS_ECDHE_RSA_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC08B: return("TLS_ECDHE_RSA_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC08C: return("TLS_ECDH_RSA_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC08D: return("TLS_ECDH_RSA_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC08E: return("TLS_PSK_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC08F: return("TLS_PSK_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC090: return("TLS_DHE_PSK_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC091: return("TLS_DHE_PSK_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC092: return("TLS_RSA_PSK_WITH_CAMELLIA_128_GCM_SHA256");
+  case 0xC093: return("TLS_RSA_PSK_WITH_CAMELLIA_256_GCM_SHA384");
+  case 0xC094: return("TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC095: return("TLS_PSK_WITH_CAMELLIA_256_CBC_SHA384");
+  case 0xC096: return("TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC097: return("TLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384");
+  case 0xC098: return("TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC099: return("TLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384");
+  case 0xC09A: return("TLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256");
+  case 0xC09B: return("TLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384");
+    /* RFC 6655 */
+  case 0xC09C: return("TLS_RSA_WITH_AES_128_CCM");
+  case 0xC09D: return("TLS_RSA_WITH_AES_256_CCM");
+  case 0xC09E: return("TLS_DHE_RSA_WITH_AES_128_CCM");
+  case 0xC09F: return("TLS_DHE_RSA_WITH_AES_256_CCM");
+  case 0xC0A0: return("TLS_RSA_WITH_AES_128_CCM_8");
+  case 0xC0A1: return("TLS_RSA_WITH_AES_256_CCM_8");
+  case 0xC0A2: return("TLS_DHE_RSA_WITH_AES_128_CCM_8");
+  case 0xC0A3: return("TLS_DHE_RSA_WITH_AES_256_CCM_8");
+  case 0xC0A4: return("TLS_PSK_WITH_AES_128_CCM");
+  case 0xC0A5: return("TLS_PSK_WITH_AES_256_CCM");
+  case 0xC0A6: return("TLS_DHE_PSK_WITH_AES_128_CCM");
+  case 0xC0A7: return("TLS_DHE_PSK_WITH_AES_256_CCM");
+  case 0xC0A8: return("TLS_PSK_WITH_AES_128_CCM_8");
+  case 0xC0A9: return("TLS_PSK_WITH_AES_256_CCM_8");
+  case 0xC0AA: return("TLS_PSK_DHE_WITH_AES_128_CCM_8");
+  case 0xC0AB: return("TLS_PSK_DHE_WITH_AES_256_CCM_8");
+    /* RFC 7251 */
+  case 0xC0AC: return("TLS_ECDHE_ECDSA_WITH_AES_128_CCM");
+  case 0xC0AD: return("TLS_ECDHE_ECDSA_WITH_AES_256_CCM");
+  case 0xC0AE: return("TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8");
+  case 0xC0AF: return("TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8");
+    /* RFC 8492 */
+  case 0xC0B0: return("TLS_ECCPWD_WITH_AES_128_GCM_SHA256");
+  case 0xC0B1: return("TLS_ECCPWD_WITH_AES_256_GCM_SHA384");
+  case 0xC0B2: return("TLS_ECCPWD_WITH_AES_128_CCM_SHA256");
+  case 0xC0B3: return("TLS_ECCPWD_WITH_AES_256_CCM_SHA384");
+    /* draft-camwinget-tls-ts13-macciphersuites */
+  case 0xC0B4: return("TLS_SHA256_SHA256");
+  case 0xC0B5: return("TLS_SHA384_SHA384");
+    /* https://www.ietf.org/archive/id/draft-cragie-tls-ecjpake-01.txt */
+  case 0xC0FF: return("TLS_ECJPAKE_WITH_AES_128_CCM_8");
+    /* draft-smyshlyaev-tls12-gost-suites */
+  case 0xC100: return("TLS_GOSTR341112_256_WITH_KUZNYECHIK_CTR_OMAC");
+  case 0xC101: return("TLS_GOSTR341112_256_WITH_MAGMA_CTR_OMAC");
+  case 0xC102: return("TLS_GOSTR341112_256_WITH_28147_CNT_IMIT");
+    /* draft-smyshlyaev-tls13-gost-suites */
+  case 0xC103: return("TLS_GOSTR341112_256_WITH_KUZNYECHIK_MGM_L");
+  case 0xC104: return("TLS_GOSTR341112_256_WITH_MAGMA_MGM_L");
+  case 0xC105: return("TLS_GOSTR341112_256_WITH_KUZNYECHIK_MGM_S");
+  case 0xC106: return("TLS_GOSTR341112_256_WITH_MAGMA_MGM_S");
+    /* RFC 8701 */
+  case 0xCACA: return("Reserved (GREASE)");
+
   case 0x00CC13: return("TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256");
   case 0x00CC14: return("TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256");
   case 0x00CC15: return("TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256");
@@ -594,11 +764,6 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
   case 0x060040: return("SSL2_DES_64_CBC_WITH_MD5");
   case 0x0700c0: return("SSL2_DES_192_EDE3_CBC_WITH_MD5");
   case 0x080080: return("SSL2_RC4_64_WITH_MD5");
-  case 0x001301: return("TLS_AES_128_GCM_SHA256");
-  case 0x001302: return("TLS_AES_256_GCM_SHA384");
-  case 0x001303: return("TLS_CHACHA20_POLY1305_SHA256");
-  case 0x001304: return("TLS_AES_128_CCM_SHA256");
-  case 0x001305: return("TLS_AES_128_CCM_8_SHA256");
 
   default:
     {
@@ -716,7 +881,9 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
                            u_int16_t version, u_int8_t *unknown_tls_version) {
-  *unknown_tls_version = 0;
+
+  if(unknown_tls_version)
+    *unknown_tls_version = 0;
 
   switch(version) {
   case 0x0300: return("SSLv3");
@@ -748,7 +915,8 @@ char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
   if((version >= 0x7f00) && (version <= 0x7fff))
     return("TLSv1.3 (draft)");
 
-  *unknown_tls_version = 1;
+  if(unknown_tls_version)
+    *unknown_tls_version = 1;
 
   if(flow != NULL) {
     snprintf(flow->protos.stun_ssl.ssl.ssl_version_str,
@@ -1005,7 +1173,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_MDNS:
     ndpi_serialize_start_of_block(serializer, "mdns");
-    ndpi_serialize_string_string(serializer, "answer", flow->protos.mdns.answer);
+    ndpi_serialize_string_string(serializer, "answer", (const char*)flow->host_server_name);
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -1103,12 +1271,12 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.stun_ssl.ssl.server_names);
 
 	if(before) {
-          strftime(notBefore, sizeof(notBefore), "%F %T", before);
+          strftime(notBefore, sizeof(notBefore), "%Y-%m-%d %H:%M:%S", before);
           ndpi_serialize_string_string(serializer, "notbefore", notBefore);
         }
 
 	if(after) {
-	  strftime(notAfter, sizeof(notAfter), "%F %T", after);
+	  strftime(notAfter, sizeof(notAfter), "%Y-%m-%d %H:%M:%S", after);
           ndpi_serialize_string_string(serializer, "notafter", notAfter);
         }
 	ndpi_serialize_string_string(serializer, "ja3", flow->protos.stun_ssl.ssl.ja3_client);
@@ -1537,9 +1705,15 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
     return("TLS Suspicious ESNI Usage");
 
-  case NDPI_BLACKLISTED_HOST:
-    return("Blacklisted Host");
+  case NDPI_UNSAFE_PROTOCOL:
+    return("Unsafe Protocol");
 
+  case NDPI_DNS_SUSPICIOUS_TRAFFIC:
+    return("Suspicious DNS traffic"); /* Exfiltration ? */
+    
+  case NDPI_TLS_MISSING_SNI:
+    return("SNI TLS extension was missing");
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

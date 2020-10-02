@@ -252,7 +252,9 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    realm_offset = cname_len + name_offset + 3;
 
 		    /* if cname does not end with a $ then it's a username */
-		    if(cname_len && cname_str[cname_len-1] == '$') {
+		    if(cname_len
+		       && (cname_len < sizeof(cname_str))
+		       && (cname_str[cname_len-1] == '$')) {
 		      cname_str[cname_len-1] = '\0';
 		      snprintf(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname), "%s", cname_str);
 		    } else
@@ -309,7 +311,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
 #endif
 
-		if(name_offset < packet->payload_packet_len) {
+		if(name_offset < (packet->payload_packet_len - 1)) {
 		  u_int realm_len;
 
 		  name_offset++;

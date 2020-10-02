@@ -76,6 +76,8 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    const u_int8_t * payload, const u_int16_t payload_len) {
+  u_int8_t payloadType, payload_type;
+
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
   if((payload_len < 2) || flow->protos.stun_ssl.stun.num_binding_requests) {
@@ -83,9 +85,8 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  //struct ndpi_packet_struct *packet = &flow->packet;
-  u_int8_t payloadType, payload_type = payload[1] & 0x7F;
-
+  payload_type = payload[1] & 0x7F;
+  
   /* Check whether this is an RTP flow */
   if((payload_len >= 12)
      && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */
@@ -105,13 +106,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       NDPI_LOG_INFO(ndpi_struct, "Found Skype for Business (former MS Lync)\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
       return;
-    } else /* RTCP */ {
-#if 0
-      /* If it's RTCP the RTCP decoder will catch it */
-      NDPI_LOG_INFO(ndpi_struct, "Found MS RTCP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTCP, NDPI_PROTOCOL_UNKNOWN);
-      return;
-#endif
     }
   }
 
@@ -136,6 +130,8 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
      && (dest > 1023)
      )
     ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
+  else
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 /* *************************************************************** */

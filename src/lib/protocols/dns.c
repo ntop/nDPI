@@ -32,9 +32,99 @@
 
 #define FLAGS_MASK 0x8000
 
-// #define DNS_DEBUG 1
+/* #define DNS_DEBUG 1 */
 
-static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+#define DNS_PORT   53
+#define LLMNR_PORT 5355
+#define MDNS_PORT  5353
+
+static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
+			    struct ndpi_flow_struct *flow);
+
+/* *********************************************** */
+
+static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow,
+				u_int16_t dns_type) {
+  /* https://en.wikipedia.org/wiki/List_of_DNS_record_types */
+
+  switch(dns_type) {
+    /* Obsolete record types */
+  case 3:
+  case 4:
+  case 254:
+  case 7:
+  case 8:
+  case 9:
+  case 14:
+  case 253:
+  case 11:
+  case 33:
+  case 10:
+  case 38:
+  case 30:
+  case 25:
+  case 24:
+  case 13:
+  case 17:
+  case 19:
+  case 20:
+  case 21:
+  case 22:
+  case 23:
+  case 26:
+  case 31:
+  case 32:
+  case 34:
+  case 42:
+  case 40:
+  case 27:
+  case 100:
+  case 101:
+  case 102:
+  case 103:
+  case 99:
+  case 56:
+  case 57:
+  case 58:
+  case 104:
+  case 105:
+  case 106:
+  case 107:
+  case 259:
+    NDPI_SET_BIT(flow->risk, NDPI_DNS_SUSPICIOUS_TRAFFIC);
+    break;
+  }
+}
+
+/* *********************************************** */
+
+static u_int16_t checkPort(u_int16_t port) {
+  switch(port) {
+  case DNS_PORT:
+    return(NDPI_PROTOCOL_DNS);
+    break;
+  case LLMNR_PORT:
+    return(NDPI_PROTOCOL_LLMNR);
+    break;
+  case MDNS_PORT:
+    return(NDPI_PROTOCOL_MDNS);
+    break;
+  }
+
+  return(0);
+}
+
+/* *********************************************** */
+
+static u_int16_t checkDNSSubprotocol(u_int16_t sport, u_int16_t dport) {
+  u_int16_t rc = checkPort(sport);
+
+  if(rc == 0)
+    return(checkPort(dport));
+  else
+    return(rc);
+}
 
 /* *********************************************** */
 
@@ -705,10 +795,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       } else {
 	/* We missed the request */
 	u_int16_t s_port = flow->packet.udp ? ntohs(flow->packet.udp->source) : ntohs(flow->packet.tcp->source);
-	
-	ndpi_set_detected_protocol(ndpi_struct, flow,
-				   (s_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS,
-				   NDPI_PROTOCOL_UNKNOWN);
+
+	ndpi_set_detected_protocol(ndpi_struct, flow, checkPort(s_port), NDPI_PROTOCOL_UNKNOWN);
       }
     }
   }

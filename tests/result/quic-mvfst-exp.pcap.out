@@ -1,0 +1,8 @@
+Facebook	30	26309	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 2aac:cdf7:d506:7807:9092:75f:a963:f4ab 	 1      
+
+
+	1	UDP [2aac:cdf7:d506:7807:9092:75f:a963:f4ab]:57587 <-> [3f65:ece9:fe71:6e2a:face:b00c::358e]:443 [proto: 188.119/QUIC.Facebook][cat: SocialNetwork/6][9 pkts/4054 bytes <-> 21 pkts/22255 bytes][Goodput ratio: 86/94][0.16 sec][ALPN: h3-fb-05][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft)][bytes ratio: -0.692 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 15/4 55/56 19/13][Pkt Len c2s/s2c min/avg/max/stddev: 93/105 450/1060 1294/1294 505/429][TLSv1.3][Client: video.fmct2-3.fna.fbcdn.net][JA3C: 61d8a93ff379660087082a82411f19a2][PLAIN TEXT (wEPCri)][Plen Bins: 3,20,3,0,0,0,0,0,3,0,3,0,0,0,0,0,0,3,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,61,0,0,0,0,0,0,0,0,0]

@@ -2,7 +2,7 @@ PS_VUE	1724	2198169	1
 TLS	11	1401	5
 Amazon	5	1380	2
 
-	1	TCP 8.252.2.139:80 -> 192.168.1.132:59198 [proto: 7.64/HTTP.PS_VUE][cat: Video/26][1724 pkts/2198169 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][16.15 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/0 1184/0 56/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 1275/0 1372/0 336/0][PLAIN TEXT (ovwuGc)][Plen Bins: 5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,91,0,0,0,0,0,0]
+	1	TCP 8.252.2.139:80 -> 192.168.1.132:59198 [proto: 7.64/HTTP.PS_VUE][cat: Video/26][1724 pkts/2198169 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][16.15 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/0 1184/0 56/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 1275/0 1372/0 1319/0][PLAIN TEXT (ovwuGc)][Plen Bins: 5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,91,0,0,0,0,0,0]
 	2	TCP 13.33.255.96:443 -> 192.168.1.132:55076 [proto: 91.178/TLS.Amazon][cat: Web/5][4 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][10.18 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 63.140.57.73:443 -> 192.168.1.132:61267 [proto: 91/TLS][cat: Web/5][2 pkts/791 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][0.02 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	TCP 209.102.209.13:443 -> 192.168.1.132:65112 [proto: 91/TLS][cat: Web/5][3 pkts/193 bytes -> 0 pkts/0 bytes][Goodput ratio: 16/0][8.00 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

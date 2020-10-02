@@ -1,0 +1,3 @@
+Google	2	262	1
+
+	1	UDP 192.168.1.168:65311 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][cat: Web/5][1 pkts/103 bytes <-> 1 pkts/159 bytes][Goodput ratio: 59/73][0.02 sec][Host: gmr02c.16.0.fhkfhsdkfhsk.tunnel.example.com][::][Risk: ** Suspicious DGA domain name **][PLAIN TEXT (fhkfhsdkfhsk)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

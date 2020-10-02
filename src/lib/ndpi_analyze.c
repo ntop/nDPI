@@ -87,8 +87,6 @@ void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
   Add a new point to analyze
  */
 void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
-  float tmp_mu;
-
   if(s->sum_total == 0)
     s->min_val = s->max_val = value;
   else {
@@ -105,10 +103,14 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
       s->next_value_insert_index = 0;
   }
 
-  /* Update stddev */
-  tmp_mu = s->stddev.mu;
-  s->stddev.mu = ((s->stddev.mu * (s->num_data_entries - 1)) + value) / s->num_data_entries;
-  s->stddev.q = s->stddev.q + (value - tmp_mu)*(value - s->stddev.mu);
+  /*
+    Optimized stddev calculation
+    
+    https://www.khanacademy.org/math/probability/data-distributions-a1/summarizing-spread-distributions/a/calculating-standard-deviation-step-by-step
+    https://math.stackexchange.com/questions/683297/how-to-calculate-standard-deviation-without-detailed-historical-data
+    http://mathcentral.uregina.ca/QQ/database/QQ.09.02/carlos1.html
+  */
+  s->stddev.sum_square_total += value * value;
 }
 
 /* ********************************************************************************* */
@@ -138,7 +140,7 @@ u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s->max_val); }
 
 /* Compute the variance on all values */
 float ndpi_data_variance(struct ndpi_analyze_struct *s) {
-  return(s->num_data_entries ? (s->stddev.q / s->num_data_entries) : 0);
+  return(s->num_data_entries ? (float)(s->stddev.sum_square_total - ((s->sum_total * s->sum_total) / (s->num_data_entries))) / (float)s->num_data_entries : 0);
 }
 
 /* ********************************************************************************* */

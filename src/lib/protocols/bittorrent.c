@@ -389,10 +389,8 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 
   /* This is broadcast */
   if(packet->iph) {
-
     if((packet->iph->saddr == 0xFFFFFFFF) || (packet->iph->daddr == 0xFFFFFFFF))
       goto exclude_bt;
-
     
     if(packet->udp) {
       u_int16_t sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
@@ -417,9 +415,11 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
       char *bt_search = "BT-SEARCH * HTTP/1.1\r\n";
 
       if((ntohs(packet->udp->source) < 1024)
-	 || (ntohs(packet->udp->dest) < 1024) /* High ports only */)
+	 || (ntohs(packet->udp->dest) < 1024) /* High ports only */) {
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
-
+      }
+      
       /*
 	Check for uTP http://www.bittorrent.org/beps/bep_0029.html
 
@@ -464,7 +464,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 
       flow->bittorrent_stage++;
 
-      if(flow->bittorrent_stage < 10) {
+      if(flow->bittorrent_stage < 5) {
 	  /* We have detected bittorrent but we need to wait until we get a hash */
 
 	  if(packet->payload_packet_len > 19 /* min size */) {
@@ -489,6 +489,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 
 	return;
       }
+
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   }

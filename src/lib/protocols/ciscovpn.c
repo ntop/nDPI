@@ -1,6 +1,22 @@
 /*
  * ciscovpn.c
- * Copyright (C) 2013 by Remy Mudingay <mudingay@ill.fr>
+ *
+ * Copyright (C) 2013-20 - ntop.org
+ * 
+ * nDPI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * nDPI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Dissector developed by Remy Mudingay <mudingay@ill.fr>
  *
  */
 
@@ -10,11 +26,14 @@
 
 #include "ndpi_api.h"
 
+/* ****************************************************************** */
 
 static void ndpi_int_ciscovpn_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CISCOVPN, NDPI_PROTOCOL_UNKNOWN);
 }
+
+/* ****************************************************************** */
 
 void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -29,6 +48,7 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
     tsport = ntohs(packet->tcp->source), tdport = ntohs(packet->tcp->dest);
     NDPI_LOG_DBG2(ndpi_struct, "calculated CISCOVPN over tcp ports\n");
   }
+
   if(packet->udp != NULL) {
     usport = ntohs(packet->udp->source), udport = ntohs(packet->udp->dest);
     NDPI_LOG_DBG2(ndpi_struct, "calculated CISCOVPN over udp ports\n");
@@ -42,22 +62,20 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
        packet->payload[2] == 0x00 &&
        packet->payload[3] == 0x00)
       )
-     )
-
-    {
-      /* This is a good query  17010000*/
-      NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
-      ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
-      return;
-    }
+     ) {
+    /* This is a good query  17010000*/
+    NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
+    ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
+    return;
+  }
   else if(((tsport == 443 || tdport == 443) ||
-          (tsport == 80 || tdport == 80)) &&
+	   (tsport == 80 || tdport == 80)) &&
           (packet->payload_packet_len >= 5) &&
           ((packet->payload[0] == 0x17 &&
-           packet->payload[1] == 0x03 &&
-           packet->payload[2] == 0x03 &&
-           packet->payload[3] == 0x00 &&
-           packet->payload[4] == 0x3A)))
+	    packet->payload[1] == 0x03 &&
+	    packet->payload[2] == 0x03 &&
+	    packet->payload[3] == 0x00 &&
+	    packet->payload[4] == 0x3A)))
     {
       /* TLS signature of Cisco AnyConnect 0X170303003A */
       NDPI_LOG_INFO(ndpi_struct, "found CISCO Anyconnect VPN\n");
@@ -65,13 +83,13 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
       return;
     }
   else if(((tsport == 8009 || tdport == 8009) ||
-          (tsport == 8008 || tdport == 8008)) &&
+	   (tsport == 8008 || tdport == 8008)) &&
           (packet->payload_packet_len >= 5) &&
           ((packet->payload[0] == 0x17 &&
-           packet->payload[1] == 0x03 &&
-           packet->payload[2] == 0x03 &&
-           packet->payload[3] == 0x00 &&
-           packet->payload[4] == 0x69)))
+	    packet->payload[1] == 0x03 &&
+	    packet->payload[2] == 0x03 &&
+	    packet->payload[3] == 0x00 &&
+	    packet->payload[4] == 0x69)))
     {
       /* TCP signature of Cisco AnyConnect 0X1703030069 */
       NDPI_LOG_INFO(ndpi_struct, "found CISCO Anyconnect VPN\n");
@@ -90,30 +108,29 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
 	   )
 	  )
     {
-
-
       /* This is a good query  fe577e2b */
       NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
       ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
-    } 
-  else if(
-	  (
-	   (usport == 443 || udport == 443)
-	   &&
-	   (packet->payload_packet_len >= 5) &&
-	   (packet->payload[0] == 0x17 &&
-	    packet->payload[1] == 0x01 &&
-	    packet->payload[2] == 0x00 &&
-	    packet->payload[3] == 0x00 &&
-	    packet->payload[4] == 0x01)
-	   )
-	  )
+    } else if(
+	      (
+	       (usport == 443 || udport == 443)
+	       &&
+	       (packet->payload_packet_len >= 5) &&
+	       (packet->payload[0] == 0x17 &&
+		packet->payload[1] == 0x01 &&
+		packet->payload[2] == 0x00 &&
+		packet->payload[3] == 0x00 &&
+		packet->payload[4] == 0x01)
+	       )
+	      )
     {
       NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
       ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
       return;
     } 
 
+  if(flow->num_processed_pkts > 5)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

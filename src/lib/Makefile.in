@@ -29,12 +29,18 @@ NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
 ifneq ($(OS),Windows_NT)
 OS := $(shell uname)
 endif
+BUILD_MINGW    		 = @BUILD_MINGW@
 
 ifeq ($(OS),Darwin)
 CC=clang
 SONAME_FLAG=
 else
+ifneq ($(BUILD_MINGW),)
+NDPI_LIB_SHARED_BASE = libndpi
+NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE)-@NDPI_VERSION_SHORT@.dll
+else
 SONAME_FLAG=-Wl,-soname,$(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
+endif
 endif
 
 all: $(NDPI_LIBS)
@@ -55,6 +61,12 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 
 clean:
 	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo libndpi.so*
+
+distdir:
+	cp ndpi_content_match.c.inc '$(distdir)/'
+	find . -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
+	find ../include -type f -name '*.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
+	find . -type f -name '*.c' -o -name '*.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
 
 distclean: clean
 	/bin/rm -f Makefile

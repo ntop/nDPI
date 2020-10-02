@@ -1,10 +1,11 @@
 AC_INIT([libndpi], [@NDPI_VERSION_SHORT@])
 
+AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
-EXTRA_TARGETS="example tests"
+EXTRA_TARGETS="example tests tests/unit"
 AC_ARG_WITH(only-libndpi,  AS_HELP_STRING([--with-only-libndpi], [Build only libndpi (no examples, tests etc)]))
 AS_IF([test "${with_only_libndpi+set}" = set],[
   EXTRA_TARGETS=""
@@ -70,7 +71,11 @@ NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
-AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h])
+dnl> used by json-c
+JSONC_INC=`pkg-config --cflags json-c`
+CFLAGS="${CFLAGS} ${JSONC_INC}"
+
+AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h json.h])
 
 ADDITIONAL_LIBS=
 PCAP_HOME=$HOME/PF_RING/userland
@@ -107,6 +112,7 @@ case "$host" in
    *-*-mingw32*|*-*-msys)
       CFLAGS="${CFLAGS} -DOS_WIN32"
       LDFLAGS="${LDFLAGS} -lws2_32 -lucrtbase"
+      BUILD_MINGW=1
       ;;
    *)
       if test -f $PCAP_HOME/libpcap/libpcap.a; then :
@@ -187,15 +193,13 @@ if test "${with_pcre+set}" = set; then :
 fi
 
 
-AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
+AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
 AC_SUBST(NDPI_MINOR)
 AC_SUBST(NDPI_PATCH)
 AC_SUBST(NDPI_VERSION_SHORT)
-AC_SUBST(SVN_DATE)
-AC_SUBST(JSON_C_LIB)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
 AC_SUBST(ADDITIONAL_LIBS)
@@ -205,4 +209,5 @@ AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
 AC_SUBST(CUSTOM_NDPI)
 AC_SUBST(NDPI_API_VERSION)
 AC_SUBST(EXTRA_TARGETS)
+AC_SUBST(BUILD_MINGW)
 AC_OUTPUT

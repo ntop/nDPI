@@ -82,7 +82,7 @@ typedef enum {
   NDPI_PROTOCOL_RTSP                  = 50,
   NDPI_PROTOCOL_MAIL_IMAPS            = 51,
   NDPI_PROTOCOL_ICECAST               = 52,
-  NDPI_PROTOCOL_PPLIVE                = 53, /* Tomasz Bujlow <tomasz@skatnet.dk> */
+  NDPI_PROTOCOL_FREE_53               = 53,
   NDPI_PROTOCOL_PPSTREAM              = 54,
   NDPI_PROTOCOL_ZATTOO                = 55,
   NDPI_PROTOCOL_SHOUTCAST             = 56,
@@ -212,7 +212,7 @@ typedef enum {
   NDPI_PROTOCOL_CNN                   = 180, /* Tomasz Bujlow <tomasz@skatnet.dk> */
   NDPI_PROTOCOL_MEGACO                = 181, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_REDIS                 = 182,
-  NDPI_PROTOCOL_PANDO                 = 183, /* Tomasz Bujlow <tomasz@skatnet.dk> */
+  NDPI_PROTOCOL_FREE_183              = 183,
   NDPI_PROTOCOL_VHUA                  = 184,
   NDPI_PROTOCOL_TELEGRAM              = 185, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_VEVO                  = 186,
@@ -237,7 +237,7 @@ typedef enum {
   NDPI_PROTOCOL_FREE_205              = 205,
   NDPI_PROTOCOL_WIREGUARD             = 206,
   NDPI_PROTOCOL_SMPP                  = 207, /* Damir Franusic <df@release14.org> */
-  NDPI_PROTOCOL_DNSCRYPT              = 208,
+  NDPI_PROTOCOL_DNSCRYPT              = 208, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_TINC                  = 209, /* William Guglielmo <william@deselmo.com> */
   NDPI_PROTOCOL_DEEZER                = 210,
   NDPI_PROTOCOL_INSTAGRAM             = 211, /* Andrea Buscarinu <andrea.buscarinu@gmail.com> */

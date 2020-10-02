@@ -1,0 +1,5 @@
+STUN	1	62	1
+TFTP	98	29793	1
+
+	1	UDP 192.168.0.10:3445 <-> 192.168.0.253:50618 [proto: 96/TFTP][cat: DataTransfer/4][49 pkts/26853 bytes <-> 49 pkts/2940 bytes][Goodput ratio: 92/7][0.18 sec][bytes ratio: 0.803 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/2 3/3 9/7 2/2][Pkt Len c2s/s2c min/avg/max/stddev: 69/60 548/60 558/60 69/0][PLAIN TEXT (Network Working Group          )][Plen Bins: 51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.0.253:50618 -> 192.168.0.10:69 [proto: 78/STUN][cat: Network/14][1 pkts/62 bytes -> 0 pkts/0 bytes][Goodput ratio: 32/0][< 1 sec][PLAIN TEXT (1350.txt)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

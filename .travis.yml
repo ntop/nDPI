@@ -13,6 +13,7 @@ matrix:
           packages:
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
 
     - os: linux
@@ -23,6 +24,7 @@ matrix:
           packages:
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
 
     - os: linux
@@ -34,6 +36,7 @@ matrix:
           packages:
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
 
     - os: linux
@@ -45,6 +48,7 @@ matrix:
           packages:
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
 
 # Targets below have been disabled as we have no way
@@ -57,6 +61,7 @@ matrix:
 #        apt:
 #          packages:
 #            - libpcap-dev
+#            - libjson-c-dev
 #            - autogen
 #
 #    - os: linux
@@ -67,6 +72,7 @@ matrix:
 #        apt:
 #          packages:
 #            - libpcap-dev
+#            - libjson-c-dev
 #            - autogen
 
     - os: linux
@@ -79,6 +85,7 @@ matrix:
             - g++-8
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
       env:
         - MATRIX_EVAL="CC=gcc-8"
@@ -93,6 +100,7 @@ matrix:
             - g++-9
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
       env:
         - MATRIX_EVAL="CC=gcc-9"
@@ -108,6 +116,7 @@ matrix:
             - clang-8
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
       env:
         - MATRIX_EVAL="CC=clang-8"
@@ -123,6 +132,7 @@ matrix:
             - clang-7
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
       env:
         - MATRIX_EVAL="CC=clang-7"
@@ -140,6 +150,7 @@ matrix:
             - clang-7
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
     - name: fuzzm
       env: CXXFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=memory" QA_FUZZ=msan CC=clang && CXX=clang++
@@ -151,9 +162,10 @@ matrix:
           packages:
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
     - name: fuzzu
-      env: CXXFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link" CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=undefined" QA_FUZZ=ubsan CC=clang-7 && CXX=clang++-7
+      env: CXXFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link -fno-sanitize=alignment" CFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link -fno-sanitize=alignment" LDFLAGS="-g3 -Og -fsanitize=undefined -fno-sanitize=alignment" QA_FUZZ=ubsan CC=clang-7 && CXX=clang++-7
       os: linux
       compiler: clang-7
       addons:
@@ -165,6 +177,7 @@ matrix:
             - clang-7
             - libpcap-dev
             - libgcrypt20-dev
+            - libjson-c-dev
             - autogen
 
 
@@ -179,6 +192,7 @@ script:
   - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else ./configure ; fi
   - make
   - make -C example ndpiSimpleIntegration
+  - make dist
 
 #after_script:
   - cd tests

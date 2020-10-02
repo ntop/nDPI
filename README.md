@@ -8,7 +8,7 @@
 
 ## What is nDPI ?
 
-nDPI is an open source LGPLv3 library for deep-packet inspection. Based on OpenDPI it includes ntop extensions. We have tried to push them into the OpenDPI source tree but nobody answered emails so we have decided to create our own source tree
+nDPI® is an open source LGPLv3 library for deep-packet inspection. Based on OpenDPI it includes ntop extensions. We have tried to push them into the OpenDPI source tree but nobody answered emails so we have decided to create our own source tree
 
 ### How To Compile nDPI
 
@@ -50,7 +50,7 @@ You can use nDPI to selectively block selected Internet traffic by embedding it 
 ### DISCLAIMER
 While we do our best to detect network protocols, we cannot guarantee that our software is error free and 100% accurate in protocol detection. Please make sure that you respect the privacy of users and you have proper authorization to listen, capture and inspect network traffic.
 
-nDPI is a registered trademark.
+nDPI is a registered trademark in the US and EU.
 
 [ntopng_logo]: https://camo.githubusercontent.com/0f789abcef232035c05e0d2e82afa3cc3be46485/687474703a2f2f7777772e6e746f702e6f72672f77702d636f6e74656e742f75706c6f6164732f323031312f30382f6e746f706e672d69636f6e2d313530783135302e706e67
 
