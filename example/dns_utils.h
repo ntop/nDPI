@@ -1,5 +1,4 @@
 
-
 #ifndef _DNS_UTILS_H
 #define _DNS_UTILS_H
 
