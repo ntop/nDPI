@@ -50,6 +50,9 @@
 #include "third_party/include/ht_hash.h"
 #include "third_party/include/ndpi_md5.h"
 
+
+#define	IPv6VERSION	6 
+
 /* stun.c */
 extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
@@ -126,7 +129,7 @@ void ndpi_flow_free(void *ptr) {
 /* ****************************************** */
 
 void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size) {
-  void *ret = ndpi_malloc(new_size);
+  void *ret = ndpi_calloc(new_size, sizeof(char));
 
   if(!ret)
     return(ret);
@@ -3508,7 +3511,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
   }
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  else if(iph->version == 6 && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
+  else if(iph->version == IPv6VERSION && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
     NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
     iph_v6 = (const struct ndpi_ipv6hdr *) l3;
     iph = NULL;
@@ -3624,7 +3627,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
   }
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
-  else if(decaps_iph && decaps_iph->version == 6 && l3len >= sizeof(struct ndpi_ipv6hdr) &&
+  else if(decaps_iph && decaps_iph->version == IPv6VERSION && l3len >= sizeof(struct ndpi_ipv6hdr) &&
 	  (ndpi_str->ip_version_limit & NDPI_DETECTION_ONLY_IPV4) == 0) {
     NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
     flow->packet.iphv6 = (struct ndpi_ipv6hdr *) flow->packet.iph;
@@ -3742,7 +3745,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     const struct ndpi_ipv6hdr *iphv6 = packet->iphv6;
 #endif
     const struct ndpi_tcphdr *tcph = packet->tcp;
-    const struct ndpi_udphdr *udph = flow->packet.udp;
+    const struct ndpi_udphdr *udph = packet->udp;
 
     packet->tcp_retransmission = 0, packet->packet_direction = 0;
 
@@ -3775,11 +3778,11 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       if(tcph->syn != 0 && tcph->ack == 0 && flow->l4.tcp.seen_syn == 0 && flow->l4.tcp.seen_syn_ack == 0 &&
 	 flow->l4.tcp.seen_ack == 0) {
 	flow->l4.tcp.seen_syn = 1;
-      }
+      } else 
       if(tcph->syn != 0 && tcph->ack != 0 && flow->l4.tcp.seen_syn == 1 && flow->l4.tcp.seen_syn_ack == 0 &&
 	 flow->l4.tcp.seen_ack == 0) {
 	flow->l4.tcp.seen_syn_ack = 1;
-      }
+      } else
       if(tcph->syn == 0 && tcph->ack == 1 && flow->l4.tcp.seen_syn == 1 && flow->l4.tcp.seen_syn_ack == 1 &&
 	 flow->l4.tcp.seen_ack == 0) {
 	flow->l4.tcp.seen_ack = 1;
@@ -6285,6 +6288,14 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
     if(flow->http.url)
       ndpi_free(flow->http.url);
+
+    for (int i=0; i<2; i++ ) {     
+       if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+        ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
+        flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
+        flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
+      }
+    }
     if(flow->http.content_type)
       ndpi_free(flow->http.content_type);
     if(flow->http.user_agent)
@@ -6293,12 +6304,10 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       ndpi_free(flow->kerberos_buf.pktbuf);
     if(flow_is_proto(flow, NDPI_PROTOCOL_DNS)) {
       if (flow->protos.dns.dnsAnswerRRList)
-      clear_dns_RR_list(flow->protos.dns.dnsAnswerRRList,1);
+      clear_dns_RR_list(&flow->protos.dns.dnsAnswerRRList,1);      
       if (flow->protos.dns.dnsAuthorityRRList)
-      clear_dns_RR_list(flow->protos.dns.dnsAuthorityRRList,1);
-      if (flow->protos.dns.dnsAdditionalRRList)                         
-        
-      clear_dns_RR_list(flow->protos.dns.dnsAdditionalRRList,1);
+      clear_dns_RR_list(&flow->protos.dns.dnsAuthorityRRList,1);
+      if (flow->protos.dns.dnsAdditionalRRList)              	clear_dns_RR_list(&flow->protos.dns.dnsAdditionalRRList,1);
     } 
     if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {

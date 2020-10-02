@@ -201,14 +201,14 @@ static void free_dns_RR(struct dnsRR_t *rr) {
 				if (rr->RData.MX.exchange) ndpi_free(rr->RData.MX.exchange);
 				break;		
 			case 16:
-				if (rr->RData.txtData) ndpi_free(rr->RData.txtData);		
+				if (rr->RData.TXT.txtData) ndpi_free(rr->RData.TXT.txtData);		
 				break;		
 		};	
 		ndpi_free(rr);
 	}
 }
 	
-void clear_dns_RR_list(struct dnsRRList_t* currList, unsigned char bForward) {	
+void clear_dns_RR_list(struct dnsRRList_t** currList, unsigned char bForward) {	
 	//printf("DBG(clear_dns_RR_list): currList=%p, bForward=%d \n",currList,bForward);
 	while (currList) {		
 		free_dns_RR(currList->rrItem);
