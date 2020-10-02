@@ -6307,7 +6307,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       clear_dns_RR_list(&flow->protos.dns.dnsAnswerRRList,1);      
       if (flow->protos.dns.dnsAuthorityRRList)
       clear_dns_RR_list(&flow->protos.dns.dnsAuthorityRRList,1);
-      if (flow->protos.dns.dnsAdditionalRRList)              	clear_dns_RR_list(&flow->protos.dns.dnsAdditionalRRList,1);
+      if (flow->protos.dns.dnsAdditionalRRList)            	 clear_dns_RR_list(&flow->protos.dns.dnsAdditionalRRList,1);
     } 
     if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {
