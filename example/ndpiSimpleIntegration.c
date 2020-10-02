@@ -9,13 +9,14 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
+
+#include "dns_utils.h"
 
 #define MAX_FLOW_ROOTS_PER_THREAD 2048
 #define MAX_IDLE_FLOWS_PER_THREAD 64
 #define TICK_RESOLUTION 1000
-#define MAX_READER_THREADS 4
+#define MAX_READER_THREADS 1
 #define IDLE_SCAN_PERIOD 10000 /* msec */
 #define MAX_IDLE_TIME 300000 /* msec */
 #define INITIAL_THREAD_HASH 0x03dd018b
@@ -74,6 +75,8 @@ struct nDPI_flow_info {
     struct ndpi_flow_struct * ndpi_flow;
     struct ndpi_id_struct * ndpi_src;
     struct ndpi_id_struct * ndpi_dst;
+
+    char info[160];
 };
 
 struct nDPI_workflow {
@@ -134,8 +137,7 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
     }
 
     if (workflow->pcap_handle == NULL) {
-        fprintf(stderr, "pcap_open_live / pcap_open_offline_with_tstamp_precision: %.*s\n",
-                (int) PCAP_ERRBUF_SIZE, pcap_error_buffer);
+        fprintf(stderr, "pcap_open_live / pcap_open_offline_with_tstamp_precision: %s\n", pcap_error_buffer);
         free_workflow(&workflow);
         return NULL;
     }
@@ -206,25 +208,9 @@ static void free_workflow(struct nDPI_workflow ** const workflow)
     *workflow = NULL;
 }
 
-static char * get_default_pcapdev(char *errbuf)
-{
-    char * ifname;
-    pcap_if_t * all_devices = NULL;
-
-    if (pcap_findalldevs(&all_devices, errbuf) != 0)
-    {
-        return NULL;
-    }
-
-    ifname = strdup(all_devices[0].name);
-    pcap_freealldevs(all_devices);
-
-    return ifname;
-}
-
 static int setup_reader_threads(char const * const file_or_device)
 {
-    char * file_or_default_device;
+    char const * file_or_default_device;
     char pcap_error_buffer[PCAP_ERRBUF_SIZE];
 
     if (reader_thread_count > MAX_READER_THREADS) {
@@ -232,28 +218,23 @@ static int setup_reader_threads(char const * const file_or_device)
     }
 
     if (file_or_device == NULL) {
-        file_or_default_device = get_default_pcapdev(pcap_error_buffer);
+        file_or_default_device = pcap_lookupdev(pcap_error_buffer);
         if (file_or_default_device == NULL) {
-            fprintf(stderr, "pcap_findalldevs: %.*s\n", (int) PCAP_ERRBUF_SIZE, pcap_error_buffer);
+            fprintf(stderr, "pcap_lookupdev: %s\n", pcap_error_buffer);
             return 1;
         }
     } else {
-        file_or_default_device = strdup(file_or_device);
-        if (file_or_default_device == NULL) {
-            return 1;
-        }
+        file_or_default_device = file_or_device;
     }
 
     for (int i = 0; i < reader_thread_count; ++i) {
         reader_threads[i].workflow = init_workflow(file_or_default_device);
         if (reader_threads[i].workflow == NULL)
         {
-            free(file_or_default_device);
             return 1;
         }
     }
 
-    free(file_or_default_device);
     return 0;
 }
 
@@ -870,7 +851,7 @@ static void ndpi_process_packet(uint8_t * const args,
         }
     }
 
-    if (flow_to_process->ndpi_flow->num_extra_packets_checked <=
+    if (flow_to_process->ndpi_flow->num_extra_packets_checked <
         flow_to_process->ndpi_flow->max_extra_packets_to_check)
     {
         /*
@@ -897,7 +878,7 @@ static void ndpi_process_packet(uint8_t * const args,
                         reader_thread->array_index,
                         flow_to_process->flow_id,
                         ndpi_ssl_version2str(flow_to_process->ndpi_flow,
-                                             flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
+					     flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
                                              &unknown_tls_version),
                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name,
                         (flow_to_process->ndpi_flow->protos.stun_ssl.ssl.alpn != NULL ?
@@ -924,7 +905,113 @@ static void ndpi_process_packet(uint8_t * const args,
                          flow_to_process->ndpi_flow->protos.stun_ssl.ssl.subjectDN : "-"));
                 flow_to_process->tls_server_hello_seen = 1;
             }
-        }
+        } /* DNS */
+	else if(flow_to_process->detected_l7_protocol.master_protocol == NDPI_PROTOCOL_DNS ||
+                flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_DNS ||
+     	        flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_LLMNR) {
+			
+			char dnsResp[40]={0};
+			char dnsClss[10]={0};
+			char dnsTyp[20]={0};
+			char line[1024]={0};
+			char prot_L4_str[51] = {0};
+			char answerIp[1024]={0};
+			
+			if (flow_to_process->ndpi_flow->protos.dns.is_query ) {
+						
+				printf("\tDNS ID #%04Xh - query num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] %s\n",
+					flow_to_process->ndpi_flow->protos.dns.tr_id,
+					flow_to_process->ndpi_flow->protos.dns.num_queries,
+					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
+					flow_to_process->ndpi_flow-> host_server_name );
+						
+			} else { 
+				flow_to_process->info[0]='\0'; 
+							
+				printf("\tDNS ID #%04Xh - response (code: %s) num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] - %s\n",
+					flow_to_process->ndpi_flow->protos.dns.tr_id,				
+					dnsRespCode(dnsResp,sizeof(dnsResp),flow_to_process->ndpi_flow->protos.dns.reply_code),
+					flow_to_process->ndpi_flow->protos.dns.num_answers,
+					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
+					flow_to_process->ndpi_flow-> host_server_name );
+				
+				struct dnsRRList_t* currList = flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList;
+				//printf("DNS response list: [%p]\n",currList);
+				if ( currList!=NULL ) printf("\tDNS ANSWER ---------------- \n");
+				unsigned char first=1;
+				while (currList!=NULL) {
+					struct dnsRR_t* currRR = currList->rrItem;
+					// printf("DNS response list item: [%p]\n",currRR);
+
+					dnsRData(line,sizeof(line),currRR);
+					
+					if ( currRR->rrType==DNS_TYPE_A || currRR->rrType==DNS_TYPE_AAAA ) {
+						if ( answerIp[0]>0 ) {
+							strncat(answerIp,"|",sizeof(answerIp));
+						}
+						strncat(answerIp, dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),sizeof(answerIp));
+						strncat(answerIp,";",sizeof(answerIp));
+						//strncat(answerIp, dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),sizeof(answerIp));
+						size_t pos= strlen(answerIp);
+						snprintf(&answerIp[pos],sizeof(answerIp)-pos,"%d",currRR->rrClass);
+						strncat(answerIp,";",sizeof(answerIp));
+						strncat(answerIp, line,sizeof(answerIp));
+					}
+					printf("\t RR %s %s %s ttl:%usec - %s\n",
+						currRR->rrName,
+						dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
+						currRR->rrTTL,
+						line);
+					
+					currList = currList->nextItem;
+				};
+			
+				currList = flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList;
+				//printf("DNS response list: [%p]\n",currList);
+			
+				if ( currList!=NULL ) printf("\tDNS AUTHORITY ---------------- \n");
+				while (currList!=NULL) {
+					struct dnsRR_t* currRR = currList->rrItem;
+					// printf("DNS response list item: [%p]\n",currRR);
+
+					dnsRData(line,sizeof(line),currRR);
+									
+					printf("\t RR %s %s %s ttl:%usec - %s\n",
+						currRR->rrName,
+						dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
+						currRR->rrTTL,
+						line);
+						
+					currList = currList->nextItem;
+				};
+			
+				currList = flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList;
+				//printf("DNS response list: [%p]\n",currList);
+			
+				if ( currList!=NULL ) printf("\tDNS ADDITIONAL ---------------- \n");
+				while (currList!=NULL) {
+					struct dnsRR_t* currRR = currList->rrItem;
+					// printf("DNS response list item: [%p]\n",currRR);
+
+					dnsRData(line,sizeof(line),currRR);
+									
+					printf("\t RR %s %s %s ttl:%usec - %s\n",
+						currRR->rrName,
+						dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
+						currRR->rrTTL,
+						line);
+					currList = currList->nextItem;
+				};
+			}
+			// printf("host server: %s \n", flow_to_process->ndpi_flow-> host_server_name);		
+
+		}
+		
     }
 }
 
