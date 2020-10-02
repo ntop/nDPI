@@ -17,6 +17,7 @@
 
 
 // #define DNS_DEBUG 1
+// #define DEBUG_DNS_MEMORY
 
 
 
@@ -138,11 +139,11 @@ enum DnsType
 	/** DNS Nimrod Locator record */
 	DNS_TYPE_NIMLOC,
 	/** Service locator record */
-	DNS_TYPE_SRV, 
+	DNS_TYPE_SRVS= 33, 
 	/** Asynchronous Transfer Mode address record */
 	DNS_TYPE_ATMA,
 	/** Naming Authority Pointer record */
-	DNS_TYPE_NAPTR,
+	DNS_TYPE_NAPTR= 35,
 	/** Key eXchanger record */
 	DNS_TYPE_KX,
 	/** Certificate record */
@@ -176,9 +177,14 @@ enum DnsType
 	/** NSEC3 parameters */
 	DNS_TYPE_NSEC3PARAM=51,
 	
-	/** AFXR parameters */
-	DNS_TYPE_AFXR=252,
-	
+	/** IXFR parameters */
+	DNS_TYPE_IXFR=251,	
+	/** AXFR parameters */
+	DNS_TYPE_AXFR=252,		
+	/** request for Mail Box parameters */
+	DNS_TYPE_MAILB=253,		
+	/** request for Mail Agent resources */
+	DNS_TYPE_MAILA=254,			
 	/** All cached records */
 	DNS_TYPE_ALL = 255
 	
@@ -252,13 +258,13 @@ typedef struct dnsRR_t {
 	union {
 		uint32_t addressIP;						// rrType=1
 		
-		char* NSDName; 							// rrType=2
+		char *NSDName; 							// rrType=2
 		
-		char* CName;							// rrType=5
+		char *CName;							// rrType=5
 		
 		struct {								// rrType=6
-			char* MName;
-			char* RName;
+			char *MName;
+			char *RName;
 			uint32_t Serial;
 			uint32_t Refresh;
 			uint32_t Retry;
@@ -270,19 +276,62 @@ typedef struct dnsRR_t {
 		
 		struct {								// rrType=13
 			uint8_t cpu_len;
-			char* 	cpu;
+			char *cpu;
 			uint8_t os_len;
-			char* 	os;
+			char *os;
 		} HINFO;
 		
 		struct {								// rrType=15
-			uint8_t preference;
-			char* 	exchange;
+			uint16_t preference;
+			char *exchange;
 		} MX;
 		
-		char *txtData;							// rrType=16
+		struct {								// rrType=16
+			uint8_t txt_len;
+			char *txtData;
+		} TXT;	
 		
+		struct {								// rrType=17
+			char *mailbox;
+			char *respPerson;
+		} RP;
+				
+		struct {								// rrType=18
+			uint16_t subtype;
+			char *hostname;
+		} AFSDB;
+			
 		struct ndpi_ip6_addrBIS addressIPv6; 	// rrType=28 
+		
+		struct {								// rrType=29
+			uint8_t  version;
+			uint8_t  size;
+			uint8_t  hprecs, vprecs;
+			uint32_t latit, longit, alt;
+		} LOC;
+		
+		struct {								// rrType=33
+			char	*service;
+			char	*protocol;
+			uint16_t priority;
+			uint16_t weight;
+			uint16_t port;
+			char	*target;			
+		} SRVS;
+		
+		struct {								// rrType=35
+			uint16_t order;
+			uint16_t preference;
+			uint8_t flags_len;
+			uint8_t	*flags;
+			uint8_t service_len;
+			uint8_t	*service;
+			uint8_t re_len;
+			uint8_t	*regex;
+			uint8_t re_replace_len;
+			char	*replacement;
+		} NAPTR;
+		
 	} RData;
 } dnsRR; // end of dnsRR
 
@@ -295,6 +344,6 @@ typedef struct dnsRRList_t {
 
 /* dns support: function declared and implementated here*/
 void free_dns_QSec(struct dnsQuestionSec_t *qs);
-void clear_dns_RR_list(struct dnsRRList_t* currList, unsigned char bForward);
+void clear_dns_RR_list(struct dnsRRList_t** list, unsigned char bForward);
 
 #endif 
