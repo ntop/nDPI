@@ -68,7 +68,6 @@ int serializerUnitTest() {
 #ifdef HAVE_JSON_H
   ndpi_serializer serializer, deserializer;
   int i, loop_id;
-  u_int8_t verbose = 0;
   ndpi_serialization_format fmt;
   u_int32_t buffer_len;
   char *buffer;
@@ -230,7 +229,8 @@ int serializerUnitTest() {
 /* *********************************************** */
 
 int main(int argc, char **argv) {
-
+  int c;
+  
   if (ndpi_get_api_version() != NDPI_API_VERSION) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
     return -1;
@@ -241,6 +241,18 @@ int main(int argc, char **argv) {
   if (ndpi_info_mod == NULL)
     return -1;
 
+  while((c = getopt(argc, argv, "vh")) != -1) {
+    switch(c) {
+    case 'v':
+      verbose = 1;
+      break;
+      
+    default:
+      printf("Usage: unit [-v] [-h]\n");
+      return(0);
+    }
+  }
+    
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
 
