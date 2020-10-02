@@ -439,7 +439,9 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		  printf("[TLS] dNSName %s [%s]\n", dNSName, flow->protos.stun_ssl.ssl.client_requested_server_name);
 #endif
 		  if(matched_name == 0) {
-		    if((dNSName[0] == '*') && strstr(flow->protos.stun_ssl.ssl.client_requested_server_name, &dNSName[1]))
+		    if(flow->protos.stun_ssl.ssl.client_requested_server_name[0] == '\0')
+		      matched_name = 1;	/* No SNI */
+		    else if((dNSName[0] == '*') && strstr(flow->protos.stun_ssl.ssl.client_requested_server_name, &dNSName[1]))
 		      matched_name = 1;
 		    else if(strcmp(flow->protos.stun_ssl.ssl.client_requested_server_name, dNSName) == 0)
 		      matched_name = 1;
