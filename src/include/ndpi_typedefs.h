@@ -430,11 +430,6 @@ struct ndpi_vxlanhdr {
 /* ******************* ********************* ****************** */
 /* ************************************************************ */
 
-typedef struct message {
-  u_int8_t *buffer;
-  u_int buffer_len, buffer_used, max_expected;
-} message_t;
-
 /* NDPI_PROTOCOL_BITTORRENT */
 typedef struct spinlock {
   volatile int    val;
@@ -671,10 +666,11 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_TELNET */
   u_int32_t telnet_stage:2;			// 0 - 2
 
-  message_t dns_segments_buf[2];
-	
   struct {
-	message_t message;
+    struct {
+      u_int8_t *buffer;
+      u_int buffer_len, buffer_used;
+    } message;
     
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
   
@@ -1232,11 +1228,10 @@ struct ndpi_flow_struct {
       ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet */
 #ifdef __DNS_H__
       u_int16_t tr_id, flags;
-      u_int8_t dns_request_complete:1,dns_response_complete:1,dns_request_seen:1,dns_response_seen:1,dns_request_print:1,dns_response_print:1,:2;
-	/* the RR lists of responses */
-	    struct dnsRRList_t *dnsAnswerRRList, *dnsAuthorityRRList, *dnsAdditionalRRList;
-#endif	  
-    } dns;
+      /* the RR lists of responses */
+      struct dnsRRList_t *dnsAnswerRRList, *dnsAuthorityRRList, *dnsAdditionalRRList;
+#endif   
+  } dns;
 
     struct {
       u_int8_t request_code;

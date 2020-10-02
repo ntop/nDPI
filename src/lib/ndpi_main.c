@@ -126,8 +126,7 @@ void ndpi_flow_free(void *ptr) {
 /* ****************************************** */
 
 void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size) {
-  //void *ret = ndpi_malloc(new_size);
-  void *ret = ndpi_calloc(new_size, sizeof(char));
+  void *ret = ndpi_malloc(new_size);
 
   if(!ret)
     return(ret);
@@ -3662,20 +3661,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	 flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
 	u_int8_t backup;
 	u_int16_t backup1, backup2;
-		
-	for (int i=0; i<2; i++ ) {
-		/*if(flow->l4.tcp.http_segments_buf[i].buffer) {
-		  ndpi_free(flow->l4.tcp.http_segments_buf[i].buffer);
-		  flow->l4.tcp.http_segments_buf[i].buffer=NULL;
-		  flow->l4.tcp.http_segments_buf[i].buffer_len=flow->l4.tcp.http_segments_buf[i].buffer_used=0;
-		}*/
-		if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-		  ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-		  flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-		  flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-		}    
-	}
-	
+
 	if(flow->http.url) {
 	  ndpi_free(flow->http.url);
 	  flow->http.url = NULL;
@@ -3697,13 +3683,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	  flow->l4.tcp.tls.message.buffer = NULL;
 	  flow->l4.tcp.tls.message.buffer_len = flow->l4.tcp.tls.message.buffer_used = 0;
 	}
-	for (int i=0; i<2; i++ ) {
-		if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-		  ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-		  flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-		  flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-		}
-	}
+
 	backup = flow->num_processed_pkts;
 	backup1 = flow->guessed_protocol_id;
 	backup2 = flow->guessed_host_protocol_id;
@@ -6246,20 +6226,6 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
     if(flow->http.url)
       ndpi_free(flow->http.url);
-  
-	for (int i=0; i<2; i++ ) {
-    /*  if(flow->l4.tcp.http_segments_buf[i].buffer) {
-        ndpi_free(flow->l4.tcp.http_segments_buf[i].buffer);
-        flow->l4.tcp.http_segments_buf[i].buffer=NULL;
-        flow->l4.tcp.http_segments_buf[i].buffer_len=flow->l4.tcp.http_segments_buf[i].buffer_used=0;
-      }*/
-       if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-        ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-        flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-        flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-      }
-    }
-  
     if(flow->http.content_type)
       ndpi_free(flow->http.content_type);
     if(flow->http.user_agent)
@@ -6268,20 +6234,12 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       ndpi_free(flow->kerberos_buf.pktbuf);
     if(flow_is_proto(flow, NDPI_PROTOCOL_DNS)) {
       if (flow->protos.dns.dnsAnswerRRList)
-      clear_dns_RR_list(&flow->protos.dns.dnsAnswerRRList,1);
+      clear_dns_RR_list(flow->protos.dns.dnsAnswerRRList,1);
       if (flow->protos.dns.dnsAuthorityRRList)
-      clear_dns_RR_list(&flow->protos.dns.dnsAuthorityRRList,1);
+      clear_dns_RR_list(flow->protos.dns.dnsAuthorityRRList,1);
       if (flow->protos.dns.dnsAdditionalRRList)                         
         
-      clear_dns_RR_list(&flow->protos.dns.dnsAdditionalRRList,1);
-	  
-	  for (int i=0; i<2; i++ ) {
-		if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-		  ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-		  flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-		  flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-		}
-	  }
+      clear_dns_RR_list(flow->protos.dns.dnsAdditionalRRList,1);
     } 
     if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {
