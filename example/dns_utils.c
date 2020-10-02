@@ -21,6 +21,7 @@ char* prot4L(char *ret, size_t len, int protCode) {
 	return ret;
 }
 
+
 static unsigned int poweroften[10] = {1, 10, 100, 1000, 10000, 100000,
                                  1000000,10000000,100000000,1000000000};
 								 
