@@ -21,7 +21,7 @@
  *
  */
 
- #include <stdbool.h>
+#include <stdbool.h>
  
 #include "ndpi_protocol_ids.h"
 
@@ -149,6 +149,7 @@ static struct dnsRRList_t *add_RR_elem_to_list(struct dnsRRList_t *currList, str
 	//printf("DBG(add_RR_elem_to_list): list: %p, item: %p\n",currList,newItem);	
 	struct dnsRRList_t *retList= ndpi_calloc(1, sizeof(struct dnsRRList_t));
 	if ( retList ) {
+		//printf("DBG(add_RR_elem_to_list): new item: %p\n",retList);	
 		retList->rrItem= newItem;
 		retList->nextItem= NULL;
 		
@@ -201,7 +202,7 @@ static void free_dns_RR(struct dnsRR_t *rr) {
 				break;		
 			case DNS_TYPE_TXT:
 				if (rr->RData.TXT.txtData) ndpi_free(rr->RData.TXT.txtData);		
-				break;		
+				break;
 			case DNS_TYPE_RP:
 				if (rr->RData.RP.mailbox) ndpi_free(rr->RData.RP.mailbox);
 				if (rr->RData.RP.respPerson) ndpi_free(rr->RData.RP.respPerson);
@@ -228,7 +229,7 @@ static void free_dns_RR(struct dnsRR_t *rr) {
 		ndpi_free(rr);
 	}
 }
-	
+
 // NB: if used again, check to set to NULL
 void clear_dns_RR_list(struct dnsRRList_t **list, unsigned char bForward) {	
 	//printf("DBG(clear_dns_RR_list): *currList=%p, bForward=%d \n",*currList,bForward);
@@ -241,7 +242,7 @@ void clear_dns_RR_list(struct dnsRRList_t **list, unsigned char bForward) {
 		//printf("DBG(clear_dns_RR_list): delete item: %p\n",currList);
 		ndpi_free( currList );
 		currList= tmp;		
-	}	
+	}
 	*list=NULL;
 }
 
@@ -258,7 +259,7 @@ void clear_dns_RR_list(struct dnsRRList_t **list, unsigned char bForward) {
 */  
 u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   u_int16_t len=0,retLen=0;
-  // printf("DBG(getNameLength): off=%d/%d\n",i,payloadLen);
+   //printf("DBG(getNameLength): off=%d/%d\n",i,payloadLen);
   if(i >= payloadLen)
     return(0);
   else if(payload[i] == 0x00)
@@ -268,20 +269,20 @@ u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
 	 //printf("DBG(getNameLength): new off(LO)=%d\n",noff);
 	 //printf("DBG(getNameLength): new off(HI)=%d\n",((payload[i] & 0x3f)<<8));
 	noff += ((payload[i] & 0x3f)<<8);
-	// printf("DBG(getNameLength): jump to pos=%d\n",noff);
+	 //printf("DBG(getNameLength): jump to pos=%d\n",noff);
     retLen=getNameLength(noff, payload, payloadLen);
-	// printf("DBG(getNameLength): returned c0 len=%d\n",retLen);
+	 //printf("DBG(getNameLength): returned c0 len=%d\n",retLen);
 	return (retLen);
   } else {
     len = payload[i]+1;	// word length and dot or termination char
     u_int16_t off = len; // new offset 
-	// printf("DBG(getNameLength): curr len=%d\n",len);
+	 //printf("DBG(getNameLength): curr len=%d\n",len);
     if(off == 0) /* Bad packet */
       return(0);
     else {
-	  // printf("DBG(getNameLength): delta len=%d\n",len);
+	   //printf("DBG(getNameLength): delta len=%d\n",len);
 	  retLen=getNameLength(i+off, payload, payloadLen);
-	  // printf("DBG(getNameLength): returned len=%d\n",retLen);
+	  //printf("DBG(getNameLength): returned len=%d\n",retLen);
 	  return (len + retLen);
 	}      
   }
@@ -319,10 +320,10 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 	
 	//printf("DBG(parseDnsName)\n");
 	
-	// printf("DBG(parseDnsName) initial offset: %d\n",*i);
+	//printf("DBG(parseDnsName) initial offset: %d\n",*i);
 	off=(u_int)*i;
 	data_len= getNameLength(off, payload, payloadLen);
-	// printf("DBG(parseDnsName): len %d, space: %d\n",data_len,max_len);
+	//printf("DBG(parseDnsName): len %d, space: %d\n",data_len,max_len);
 	
 	u_char *dnsName= ndpi_calloc(data_len+1,sizeof(u_char));
 	if ( return_field && dnsName) {
@@ -338,7 +339,7 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 			 //printf("DBG(getNameLength): new off(LO)=%d\n",payload[off]);	 		 
 			tmpv= ( (cl & 0x3f)<<8) + payload[off++];			// change offset
 			off = tmpv;
-			// printf("DBG(parseDnsName): saved offset %d for jump to new off: %d\n",cloff, off);
+			//printf("DBG(parseDnsName): saved offset %d for jump to new off: %d\n",cloff, off);
 			if (wd>255) {
 				printf("ERR(parseDnsName): parsing: %.*s, j/tot: %d/%u, off: %d, value: %02Xh %c\n", data_len, dnsName, j, data_len, off, cl, cl);		  
 				wd=0; 
@@ -366,16 +367,16 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 				
 		if(j > 0) {
 			j = MIN(max_len,j);
-			// printf("DBG(parseDnsName): offset iniziale: (%d), len:[%d] ? c0_inc_offset:[%d]\n", *i, j, cloff);
+			//printf("DBG(parseDnsName): offset iniziale: (%d), len:[%d] ? c0_inc_offset:[%d]\n", *i, j, cloff);
 			*i= (cloff)?cloff:(j+2+*i);
 			strncpy((char*)return_field,(char*)dnsName,j);
-			// printf("DBG(parseDnsName): result: (%d) [%s]; new offset:[%d]\n", j, dnsName, *i);
+			//printf("DBG(parseDnsName): result: (%d) [%s]; new offset:[%d]\n", j, dnsName, *i);
 		}
 	}
 	else
 		printf("ERR: input pointer nil [%p] or failed to allocate memory.\n",return_field);
 	
-	// printf("DBG(parseDnsName) final offset: %d\n",*i);
+	//printf("DBG(parseDnsName) final offset: %d\n",*i);
 	
 	ndpi_free(dnsName);	// free memory
 	wd=0;
@@ -397,12 +398,12 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 	//printf("DBG(parseDnsRRs): off initialized = %u\n", off);
 	
 	for ( k=0; k<nitems; k++) {	
-		//printf("DBG(parseDnsRRs): next record start at offset=%u\n", off);	
+		//printf("DBG(parseDnsRRs): next record start at offset=%u\n", off);		
 		struct dnsRR_t *currItem= ndpi_calloc( 1, sizeof(struct dnsRR_t) ); 
 		if ( currItem ) {
-			size_t data_len;		
+			size_t data_len;
 			char *pstr,*tmpstr;				
-			//printf("DBG(parseDnsRRs): extracting data of item no. %d/%d \n",(k+1),nitems);
+			//printf("DBG(parseDnsRRs): extracting data of item no. %d/%d \n",(k+1),nitems);				
 			/* parse the rrName */
 			if((data_len = getNameLength(off, payload, payloadLen)) == 0) {
 				printf("ERR(parseDnsRRs): 0 length of dns name \n");
@@ -474,7 +475,7 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 						currItem->RData.SOA.MName= ndpi_calloc(data_len, sizeof(char));
 						if ( currItem->RData.SOA.MName ) {
 							parseDnsName( (u_char*)currItem->RData.SOA.MName, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): SOA.MName: (%u) %s\n",(u_int)data_len, currItem->RData.SOA.MName);							
+							//printf("DBG(parseDnsRRs): SOA.MName: (%u) %s\n",(u_int)data_len, currItem->RData.SOA.MName);
 							//TODO: must manage the @ on the first dot.
 						}			
 						else { 
@@ -522,7 +523,7 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 						}					
 					} 
 					else currItem->RData.RP.mailbox= NULL;
-					
+
 					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
 						currItem->RData.RP.respPerson= ndpi_calloc(data_len, sizeof(char));
 						if ( currItem->RData.RP.respPerson ) {
@@ -538,7 +539,7 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 					} 
 					else currItem->RData.RP.respPerson= NULL;
 					break;
-				
+
 				case DNS_TYPE_PTR:
 					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
 						currItem->RData.PTRDName= ndpi_calloc(data_len, sizeof(char));
@@ -568,7 +569,7 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 						ndpi_free(currItem->rrName);
 						ndpi_free(currItem);
 						return NULL; 
-					}					
+					}
 
 					currItem->RData.HINFO.os_len= payload[off++];
 					//printf("DBG(parseDnsRRs): DNS_TYPE_HINFO os len: %d\n",currItem->RData.HINFO.os_len);
@@ -612,12 +613,12 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 							currItem->RData.TXT.txtData[currItem->RData.TXT.txt_len]='\0';
 							//printf("DBG(parseDnsRRs): TXT [(%u) %s]\n",currItem->RData.TXT.txt_len,currItem->RData.TXT.txtData);
 							off+= currItem->RData.TXT.txt_len;
-					} else {
+						} else {
 							printf("ERR(parseDnsRRs): fail to allocate memory for TXT [ ]\n");
-						ndpi_free(currItem->rrName);
-						ndpi_free(currItem);
-						return NULL; 
-					}
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							return NULL; 
+						}
 					} 
 					else currItem->RData.TXT.txtData= NULL; 
 					break;
@@ -909,15 +910,15 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       /* This is a good query */
       while(x+2 < flow->packet.payload_packet_len) {
         if(flow->packet.payload[x] == '\0') {
-          x++;
-          flow->protos.dns.query_type = get16((int*)&x, flow->packet.payload);
-		  
-		  dns_class =  get16((int*)&x, flow->packet.payload); x -=2;
-		  flow->protos.dns.query_class = dns_class;
+			x++;
+			flow->protos.dns.query_type = get16((int*)&x, flow->packet.payload);
+			
+			dns_class =  get16((int*)&x, flow->packet.payload); x -=2;
+			flow->protos.dns.query_class = dns_class;
 		  
 #ifdef DNS_DEBUG
           NDPI_LOG_DBG2(ndpi_struct, "query_type=%2d\n", flow->protos.dns.query_type);
-#endif
+#endif		
 			flow->protos.dns.dns_request_complete=1;
 			flow->protos.dns.dns_request_seen=flow->protos.dns.dns_request_print=0;
 			//printf("DBG(search_valid_dns): query processed and complete. \n");
@@ -956,20 +957,20 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       }
       x += 4;
 	  // end skip 'Question Name' section
-
+	
 	  u_int notfound = 1;
       if(dns_header->num_answers > 0) {
 		flow->protos.dns.dns_response_complete=1;	// response headers complete!
-		  
+
 #ifdef __DNS_H__
-		   
+		
 		//printf("DBG(search_valid_dns): parsing RR records... \n");
 
 	  	/* WARNING: if there is a flow active it need to free allocated memory! */
 		flow->protos.dns.dnsAnswerRRList= parseDnsRRs(dns_header->num_answers,&x,flow->packet.payload,flow->packet.payload_packet_len, &notfound);
 		//printf("DBG(search_valid_dns): parsing RR answer done... \n");
 		flow->protos.dns.dns_response_complete &= !(notfound>0);
-		
+
 		// for compatibility with previous code, set the following variables with the first answer
 		if ( flow->protos.dns.dnsAnswerRRList ) {
 			
@@ -977,6 +978,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			if (firstRR) {
 				flow->protos.dns.rsp_type= firstRR->rrType;
 				flow->protos.dns.query_class= firstRR->rrClass;
+
+				 ndpi_check_dns_type(ndpi_struct, flow, firstRR->rrType);
 				
 				if ( (((firstRR->rrType == 0x1) && (firstRR->rrRDL == 4)) /* A */
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
@@ -1006,7 +1009,15 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		  if((x+2) >= flow->packet.payload_packet_len) {
 			break;
 		  }
-		  rsp_type = get16((int*)&x, flow->packet.payload);
+
+	  rsp_type = get16(&x, flow->packet.payload);
+
+#ifdef DNS_DEBUG
+	  printf("[DNS] [response] response_type=%d\n", rsp_type);
+#endif
+
+	  ndpi_check_dns_type(ndpi_struct, flow, rsp_type);
+	  
 		  flow->protos.dns.rsp_type = rsp_type;
 		  
 		  //dns_class =  get16((int*)&x, flow->packet.payload); x -=2;
@@ -1060,7 +1071,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
      //printf("DBG(search_valid_dns): packet processed. \n");
 	 flow->protos.dns.dns_response_seen=flow->protos.dns.dns_response_print=0;
-     
+
       if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
 	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
 	/* Request already set the protocol */
@@ -1069,9 +1080,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	/* We missed the request */
 	u_int16_t s_port = flow->packet.udp ? ntohs(flow->packet.udp->source) : ntohs(flow->packet.tcp->source);
 
-	ndpi_set_detected_protocol(ndpi_struct, flow,
-				   (s_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS,
-				   NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, checkPort(s_port), NDPI_PROTOCOL_UNKNOWN);
       }
     }
 	//printf("DBG(search_valid_dns): response processed. \n");
@@ -1203,32 +1212,34 @@ static u_int8_t swap_packet_ref(struct ndpi_flow_struct *flow, int *ploff) {
 /* *********************************************** */
 
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  int payload_offset;
-  u_int8_t is_query;
-  u_int16_t s_port = 0, d_port = 0;
+	int payload_offset;
+	u_int8_t is_query;
+	u_int16_t s_port = 0, d_port = 0;
 
 	// init the temp variables
 	oldPayload=NULL;
 	oldPayloadLen= 0;
 
-  NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
+  	NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
 
-  if(flow->packet.udp != NULL) {
-    s_port = ntohs(flow->packet.udp->source);
-    d_port = ntohs(flow->packet.udp->dest);
-    payload_offset = 0;
-  } else if(flow->packet.tcp != NULL) /* pkt size > 512 bytes */ {
-    s_port = ntohs(flow->packet.tcp->source);
-    d_port = ntohs(flow->packet.tcp->dest);
+	if(flow->packet.udp != NULL) {
+		s_port = ntohs(flow->packet.udp->source);
+		d_port = ntohs(flow->packet.udp->dest);
+		payload_offset = 0;
+	} else if(flow->packet.tcp != NULL) /* pkt size > 512 bytes */ {
+		s_port = ntohs(flow->packet.tcp->source);
+		d_port = ntohs(flow->packet.tcp->dest);
 		payload_offset = 2;	// skip the bytes of length
-  } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
+	} else {
+		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+		return;
+	}
 
   	//printf("DBG(ndpi_search_dns): s:%u - d:%u -> payload len: %u\n",s_port,d_port,flow->packet.payload_packet_len); 
   
-  	if(s_port == 53 || d_port == 53 || d_port == 5355) {
+  	if ((s_port == DNS_PORT) || (d_port == DNS_PORT) 
+	  	|| (s_port == MDNS_PORT) || (d_port == MDNS_PORT) 
+		|| (d_port == LLMNR_PORT)) {
 	  
 		// concatene the segments, if not retrasmission ---------
 		if ( !flow->packet.tcp_retransmission ) {
@@ -1244,129 +1255,155 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 		if ( swap_packet_ref(flow, &payload_offset)  // not yet received all expected bytes...
 			  && flow->packet.payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset) {
 			
-    struct ndpi_dns_packet_header dns_header;
-    int j = 0, max_len, off;
+			struct ndpi_dns_packet_header dns_header;
+			int j = 0, max_len, off;
 			
-    int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query);
+			int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query);
 			//printf("DBG(ndpi_search_dns): check for invalid result=%d\n", invalid);
-	
-    ndpi_protocol ret;
+			
+			ndpi_protocol ret;
 
-    ret.master_protocol   = NDPI_PROTOCOL_UNKNOWN;
-    ret.app_protocol      = (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS;
+			ret.master_protocol   = NDPI_PROTOCOL_UNKNOWN;
+			ret.app_protocol      = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : ((d_port == MDNS_PORT) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
 
-    if(invalid) {
+			if(invalid) {
 				// restore packet pointers and free buffer
 				restorePacketPayload(flow, 1);
 				
 				// because of checking every time all buffer, whether invalid exclude it from flow
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-      return;
-    }
+				NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+				return;
+			}
 
-	    /* extract host name server from 'question section' */
-    max_len = sizeof(flow->host_server_name)-1;
-    off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
-	
+				/* extract host name server from 'question section' */
+			max_len = sizeof(flow->host_server_name)-1;
+			off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
+			
 #ifdef __DNS_H__
 			//printf("DBG(ndpi_search_dns): host_server_name max len: %d, offset: %u\n", max_len, off);
-	parseDnsName( flow->host_server_name, max_len, (int*)&off, flow->packet.payload, flow->packet.payload_packet_len );	
-	j = strlen((const char*)flow->host_server_name);
-	
-	//printf("DBG(ndpi_search_dns): len: %d, [%s]\n", j, flow->host_server_name);
+			parseDnsName( flow->host_server_name, max_len, (int*)&off, flow->packet.payload, flow->packet.payload_packet_len );	
+			j = strlen((const char*)flow->host_server_name);
+
+			//printf("DBG(ndpi_search_dns): len: %d, [%s]\n", j, flow->host_server_name);
 #else
-    
-    while(j < max_len && off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
-      uint8_t c, cl = flow->packet.payload[off++];	//init label counter
+/* Before continuing let's dissect the following queries to see if they are valid */
+    for(idx=off, num_queries=0; (num_queries < dns_header.num_queries) && (idx < flow->packet.payload_packet_len);) {
+      u_int8_t name_len = flow->packet.payload[idx];
 
-      if( (cl & 0xc0) != 0 || // we not support compressed names in query
-			off + cl  >= flow->packet.payload_packet_len) {
-		j = 0;	
-		break;
-      }
-
-      if(j && j < max_len) flow->host_server_name[j++] = '.';	// replace the label length with dot, except the at first 
-
-	  while(j < max_len && cl != 0) {
-		u_int32_t shift;
-		
-		c = flow->packet.payload[off++];
-		shift = ((u_int32_t) 1) << (c & 0x1f);
-		flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & shift) ? c : '_');
-		cl--;
-      }
-    }
-
-    flow->host_server_name[j] = '\0';	
-#endif	
-    
-    if(j > 0) {
-      ndpi_protocol_match_result ret_match;
-
-	  /* check for domain generation algorithm using */
-      ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name);
-      
-      ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
-						     (char *)flow->host_server_name,
-						     strlen((const char*)flow->host_server_name),
-						     &ret_match,
-						     NDPI_PROTOCOL_DNS);
-
-      if(ret_match.protocol_category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
-		flow->category = ret_match.protocol_category;
-
-      if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-		ret.master_protocol = (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS;
-      else
-		ret.master_protocol = NDPI_PROTOCOL_DNS;
-    }
-
-    /* Report if this is a DNS query or reply */
-    flow->protos.dns.is_query = is_query;
-	
-	flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries;	// always set!
-	
-    if(is_query) {
-				//flow->protos.dns.dns_request_complete=1;
-      /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
-      ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
-
-      /* This is necessary to inform the core to call this dissector again */
-      flow->check_extra_packets = 1;
-
-      /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
-      flow->max_extra_packets_to_check = 5;
-      flow->extra_packets_func = search_dns_again;
-      return; /* The response will set the verdict */
-    }
-
-	flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
-  
 #ifdef DNS_DEBUG
-    NDPI_LOG_DBG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
-		  flow->protos.dns.num_queries, flow->protos.dns.num_answers,
-		  flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
-		  );
+      printf("[DNS] [name_len: %u]\n", name_len);
+#endif
+
+      if(name_len == 0) {
+		/* End of query */
+		num_queries++;
+		idx += 5;
+		continue;
+      }
+
+      if((name_len+idx) >= flow->packet.payload_packet_len) {
+	/* Invalid */
+#ifdef DNS_DEBUG
+		printf("[DNS] Invalid query len [%u >= %u]\n",
+			(name_len+idx),
+	    	flow->packet.payload_packet_len);
+#endif
+		NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+			break;
+      	} else
+			idx += name_len+1;
+      	}			
+		while(j < max_len && off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
+			uint8_t c, cl = flow->packet.payload[off++];	//init label counter
+
+			if( (cl & 0xc0) != 0 || // we not support compressed names in query
+					off + cl  >= flow->packet.payload_packet_len) {
+				j = 0;	
+				break;
+			}
+
+			if(j && j < max_len) flow->host_server_name[j++] = '.';	// replace the label length with dot, except the at first 
+
+			while(j < max_len && cl != 0) {
+				u_int32_t shift;
+				
+				c = flow->packet.payload[off++];
+				shift = ((u_int32_t) 1) << (c & 0x1f);
+				flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & shift) ? c : '_');
+				cl--;
+			}
+		}
+
+		flow->host_server_name[j] = '\0';	
+#endif	
+			
+			if(j > 0) {
+				ndpi_protocol_match_result ret_match;
+
+				/* check for domain generation algorithm using */
+				ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name,1);
+				
+				ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
+										(char *)flow->host_server_name,
+										strlen((const char*)flow->host_server_name),
+										&ret_match,
+										NDPI_PROTOCOL_DNS);
+
+				if(ret_match.protocol_category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+					flow->category = ret_match.protocol_category;
+
+				if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+					ret.master_protocol = checkDNSSubprotocol(s_port, d_port);
+				else
+					ret.master_protocol = NDPI_PROTOCOL_DNS;
+			}
+
+			/* Report if this is a DNS query or reply */
+			flow->protos.dns.is_query = is_query;
+			
+			flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries;	// always set!
+			
+			if(is_query) {
+				//flow->protos.dns.dns_request_complete=1;
+				/* In this case we say that the protocol has been detected just to let apps carry on with their activities */
+				ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
+
+				/* This is necessary to inform the core to call this dissector again */
+				flow->check_extra_packets = 1;
+
+				/* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
+				flow->max_extra_packets_to_check = 5;
+				flow->extra_packets_func = search_dns_again;
+				return; /* The response will set the verdict */
+			}
+
+			flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
+		
+#ifdef DNS_DEBUG
+			NDPI_LOG_DBG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
+				flow->protos.dns.num_queries, flow->protos.dns.num_answers,
+				flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
+				);
 #endif
 			//printf("DBG(ndpi_search_dns): detected prot: %d.%d\n", flow->packet.detected_protocol_stack[0],flow->packet.detected_protocol_stack[1]);
-    if(flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-      /**
-	 Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
-	 matched a subprotocol
-      **/
-      NDPI_LOG_INFO(ndpi_struct, "found DNS\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
-    } else {
-      if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
+			if(flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+				/**
+				 Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
+				matched a subprotocol
+				**/
+				NDPI_LOG_INFO(ndpi_struct, "found DNS\n");
+				ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
+			} else {
+				if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
 					|| (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {					
 					// flow is ok, buffer contains all data, 
 					// but do not free packet payload because it is managed in other part
 				} else {
 					// restore packet pointers and free buffer
 					restorePacketPayload(flow, 1);					
-		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    }
-  }
+					NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+				}
+			}
 	 	}
 
 		// restore packet pointers for other dissectors
