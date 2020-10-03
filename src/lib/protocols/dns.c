@@ -277,14 +277,17 @@ u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
     len = payload[i]+1;	// word length and dot or termination char
     u_int16_t off = len; // new offset 
 	 //printf("DBG(getNameLength): curr len=%d\n",len);
-    if(off == 0) /* Bad packet */
-      return(0);
-    else {
+
+    // if(off == 0) /* Bad packet */
+    //   return(0);
+    // else {
 	   //printf("DBG(getNameLength): delta len=%d\n",len);
+
 	  retLen=getNameLength(i+off, payload, payloadLen);
 	  //printf("DBG(getNameLength): returned len=%d\n",retLen);
 	  return (len + retLen);
-	}      
+	  
+	//}      
   }
 }
 
@@ -340,7 +343,8 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 			tmpv= ( (cl & 0x3f)<<8) + payload[off++];			// change offset
 			off = tmpv;
 			//printf("DBG(parseDnsName): saved offset %d for jump to new off: %d\n",cloff, off);
-			if (wd>255) {
+			if (wd>=250) {
+				// used to exit when the parsing loops!!
 				printf("ERR(parseDnsName): parsing: %.*s, j/tot: %d/%u, off: %d, value: %02Xh %c\n", data_len, dnsName, j, data_len, off, cl, cl);		  
 				wd=0; 
 				return;
