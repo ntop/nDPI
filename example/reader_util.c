@@ -1075,7 +1075,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {
-    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->host_server_name);
+    char *name = flow->ndpi_flow->host_server_name; /* Trick to avoid warning(s) */
+    snprintf(flow->info, sizeof(flow->info), "%s", name);
   }
   /* UBNTAC2 */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_UBNTAC2)) {
