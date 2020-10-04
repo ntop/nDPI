@@ -343,7 +343,7 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 			tmpv= ( (cl & 0x3f)<<8) + payload[off++];			// change offset
 			off = tmpv;
 			//printf("DBG(parseDnsName): saved offset %d for jump to new off: %d\n",cloff, off);
-			if (wd>=250) {
+			if (++wd>=250) {
 				// used to exit when the parsing loops!!
 				printf("ERR(parseDnsName): parsing: %.*s, j/tot: %d/%u, off: %d, value: %02Xh %c\n", data_len, dnsName, j, data_len, off, cl, cl);		  
 				wd=0; 
