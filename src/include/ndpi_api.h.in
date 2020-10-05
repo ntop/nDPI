@@ -1087,6 +1087,7 @@ extern "C" {
 			u_int8_t num_clusters, u_int16_t *cluster_ids,
 			struct ndpi_bin *centroids);
 
+  u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long);
 #ifdef __cplusplus
 }
 #endif
