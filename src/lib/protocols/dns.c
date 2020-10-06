@@ -318,7 +318,7 @@ static uint32_t dns_validchar[8] =
 	retrieved dns name is longer, the returned value is truncated!	
 */
 void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8_t *payload, const u_int payloadLen ) {
-	static int8_t wd=0;	// watchdog 
+	static uint8_t wd=0;	// watchdog 
 	u_int j= 0, off, cloff= 0, data_len, tmpv;
 	
 	//printf("DBG(parseDnsName)\n");
@@ -343,7 +343,7 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 			tmpv= ( (cl & 0x3f)<<8) + payload[off++];			// change offset
 			off = tmpv;
 			//printf("DBG(parseDnsName): saved offset %d for jump to new off: %d\n",cloff, off);
-			if (++wd>=250) {
+			if ((++wd)>=250) {
 				// used to exit when the parsing loops!!
 				printf("ERR(parseDnsName): parsing: %.*s, j/tot: %d/%u, off: %d, value: %02Xh %c\n", data_len, dnsName, j, data_len, off, cl, cl);		  
 				wd=0; 
