@@ -976,9 +976,9 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		flow->protos.dns.dns_response_complete &= !(notfound>0);
 
 		// for compatibility with previous code, set the following variables with the first answer
-		if ( flow->protos.dns.dnsAnswerRRList ) {
-			
-			struct dnsRR_t *firstRR = flow->protos.dns.dnsAnswerRRList->rrItem;
+		struct dnsRRList_t* currList = flow->protos.dns.dnsAnswerRRList;
+		while ( currList!=NULL ) {
+			struct dnsRR_t* firstRR = currList->rrItem;
 			if (firstRR) {
 				flow->protos.dns.rsp_type= firstRR->rrType;
 				flow->protos.dns.query_class= firstRR->rrClass;
@@ -991,8 +991,10 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 				)) {
 					memcpy(&flow->protos.dns.rsp_addr, &firstRR->RData, firstRR->rrRDL);
+					break;
 				}					
 			}
+			currList = currList->nextItem;
 		}		
 #else		  
 		u_int16_t rsp_type;
