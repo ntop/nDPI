@@ -5,7 +5,7 @@ SRCHOME=../src
 CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ -lpthread -lm @LDFLAGS@
-HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
+HEADERS=intrusion_detection.h reader_util.h dns_utils.h $(SRCHOME)/include/ndpi_api.h \
         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=ndpiReader.o reader_util.o intrusion_detection.o
 PREFIX?=@prefix@
@@ -27,8 +27,8 @@ libndpiReader.a: $(COMMON_SOURCES:%.c=%.o) $(LIBNDPI)
 ndpiReader: libndpiReader.a $(LIBNDPI) ndpiReader.o
 	$(CC) $(CFLAGS) ndpiReader.o libndpiReader.a -o $@ $(LDFLAGS)
 
-ndpiSimpleIntegration: ndpiSimpleIntegration.o
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+ndpiSimpleIntegration: dns_utils.o ndpiSimpleIntegration.o
+	$(CC) $(CFLAGS) dns_utils.o $< -o $@ $(LDFLAGS)
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
