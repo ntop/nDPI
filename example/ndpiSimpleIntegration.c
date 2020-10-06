@@ -911,13 +911,17 @@ static void ndpi_process_packet(uint8_t * const args,
      	        flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_LLMNR) {
 			
 			char dnsResp[40]={0};
-			char dnsClss[10]={0};
+			char dnsClss[25]={0};
 			char dnsTyp[20]={0};
 			char line[1024]={0};
 			char prot_L4_str[51] = {0};
 			char answerIp[1024]={0};
 			
-			if (flow_to_process->ndpi_flow->protos.dns.is_query ) {
+			if (flow_to_process->ndpi_flow->protos.dns.is_query 
+                    && flow_to_process->ndpi_flow->protos.dns.dns_request_complete
+                    && !flow_to_process->ndpi_flow->protos.dns.dns_request_seen ) {
+                    
+                    flow_to_process->ndpi_flow->protos.dns.dns_request_seen=1; 
 						
 				printf("\tDNS ID #%04Xh - query num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] %s\n",
 					flow_to_process->ndpi_flow->protos.dns.tr_id,
@@ -925,10 +929,18 @@ static void ndpi_process_packet(uint8_t * const args,
 					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
 					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
 					flow_to_process->ndpi_flow-> host_server_name );
-						
-			} else { 
-				flow_to_process->info[0]='\0'; 
-							
+
+                /* if there is a flow active it needs to free eventually allocated memory of list of previous answers! */
+                if ( flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList,1);
+                if ( flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList,1);
+                if ( flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList,1);
+		
+			} else if ( !flow_to_process->ndpi_flow->protos.dns.is_query
+                    && flow_to_process->ndpi_flow->protos.dns.dns_response_complete
+                    && !flow_to_process->ndpi_flow->protos.dns.dns_response_seen ) { 
+                    flow_to_process->info[0]='\0'; 
+                    flow_to_process->ndpi_flow->protos.dns.dns_response_seen=1;               
+    						
 				printf("\tDNS ID #%04Xh - response (code: %s) num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] - %s\n",
 					flow_to_process->ndpi_flow->protos.dns.tr_id,				
 					dnsRespCode(dnsResp,sizeof(dnsResp),flow_to_process->ndpi_flow->protos.dns.reply_code),
@@ -940,7 +952,6 @@ static void ndpi_process_packet(uint8_t * const args,
 				struct dnsRRList_t* currList = flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList;
 				//printf("DNS response list: [%p]\n",currList);
 				if ( currList!=NULL ) printf("\tDNS ANSWER ---------------- \n");
-				unsigned char first=1;
 				while (currList!=NULL) {
 					struct dnsRR_t* currRR = currList->rrItem;
 					// printf("DNS response list item: [%p]\n",currRR);
@@ -959,12 +970,13 @@ static void ndpi_process_packet(uint8_t * const args,
 						strncat(answerIp,";",sizeof(answerIp));
 						strncat(answerIp, line,sizeof(answerIp));
 					}
-					printf("\t RR %s %s %s ttl:%usec - %s\n",
-						currRR->rrName,
-						dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
-						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
-						currRR->rrTTL,
-						line);
+                    //          <owner> <TTL> <class> <type> 
+                    printf("\t RR  %s ttl:%usec, %s %s - %s\n",
+                        currRR->rrName,
+                        currRR->rrTTL,
+                        dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
+                        dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
+                        line);
 					
 					currList = currList->nextItem;
 				};
@@ -1007,6 +1019,12 @@ static void ndpi_process_packet(uint8_t * const args,
 						line);
 					currList = currList->nextItem;
 				};
+
+                /* after seen free allocated memory of list ! */
+                if ( flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList,1);
+                if ( flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList,1);
+                if ( flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList,1);
+
 			}
 			// printf("host server: %s \n", flow_to_process->ndpi_flow-> host_server_name);		
 

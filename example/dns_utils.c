@@ -8,21 +8,20 @@ static unsigned int poweroften[10] = {1, 10, 100, 1000, 10000, 100000,
 
 static char* conv2meter(char *ret, size_t len, u_int8_t mis) {
     u_int8_t bs, ex;
-    int val;
     if ( ret ) {
         bs= ((mis>>4) & 0xf) % 10;
         ex= (mis & 0x0f) % 10;
-        val= bs * poweroften[ex];
+        int val= bs * poweroften[ex];
         //printf("DBG(conv2m): b: %u, e:%u, tmp:%f -> %u\n", bs, ex, pp, val );
         snprintf(ret,len,"%d.%.2d m",val/100, val%100);
     }
     return ret;
 }
 
-static char* conv2Coord(char *ret, size_t len, u_int32_t coord, char letters[2]) {
-    int tmpVal, tmpSec, tmpMin, tmpDeg, tmpFrac;
-    char letter;
+static char* conv2Coord(char *ret, size_t len, u_int32_t coord, char letters[2]) {    
     if ( ret ) {
+        char letter;
+        int tmpVal, tmpSec, tmpMin, tmpDeg, tmpFrac;
         tmpVal= coord- ((unsigned)1<<31);
         if ( tmpVal<0 ) {
             letter= letters[1];
@@ -43,10 +42,10 @@ static char* conv2Coord(char *ret, size_t len, u_int32_t coord, char letters[2])
     return ret;
 }
 static char* conv2Alt(char *ret, size_t len, u_int32_t alt) {
-    int altmeters, altfrac;
-
-    char letter;
+    
     if ( ret ) {
+        char letter;
+        int altmeters, altfrac;
         altmeters= (alt>10000000) ? alt-10000000: 10000000-alt;
         altfrac= altmeters % 100;
         altmeters= altmeters/100 * ((alt>10000000)?1:11);
@@ -90,19 +89,19 @@ char* dnsClass(char *ret, size_t len, enum DnsClass classIndex) {
     if ( ret ) {
         switch(classIndex) {	
             case DNS_CLASS_IN: 
-                snprintf(ret,len,"IN", classIndex);
+                snprintf(ret,len,"IN");
                 break;
             case DNS_CLASS_IN_QU: 
-                snprintf(ret,len,"IN_QU", classIndex);
+                snprintf(ret,len,"IN_QU");
                 break;                
             case DNS_CLASS_CH: 
-                snprintf(ret,len,"CH", classIndex);
+                snprintf(ret,len,"CH");
                 break;                
             case DNS_CLASS_HS: 
-                snprintf(ret,len,"HS", classIndex);
+                snprintf(ret,len,"HS");
                 break;                
             case DNS_CLASS_ANY: 
-                snprintf(ret,len,"ANY", classIndex);
+                snprintf(ret,len,"ANY");
                 break;                
             default:
                 snprintf(ret,len,"UNKNOWN CLASS %02Xh (%u)",classIndex, classIndex);
@@ -295,11 +294,12 @@ char* dnsType(char *ret, size_t len, enum DnsType typeCode) {
 }
 
 char *dnsRData(char *ret, size_t len, struct dnsRR_t *rr ) {
-    char sTemp1[25]={0},sTemp2[25]={0},sTemp3[25]={0},sTemp4[25]={0},sTemp5[25]={0},sTemp6[25]={0};
-
+    
 	//printf("DBG(dnsRData) rr=%p; buffer=%p, sz=%d\n",rr, ret, len);
     
     if ( ret && rr ) {
+        char sTemp1[25]={0},sTemp2[25]={0},sTemp3[25]={0},sTemp4[25]={0},sTemp5[25]={0},sTemp6[25]={0};
+
         //printf("DBG(dnsRData) rr type = %02Xh (%u)\n",rr->rrType,rr->rrType);
         switch(rr->rrType) {
             case DNS_TYPE_A:
