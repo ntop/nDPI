@@ -285,9 +285,10 @@ int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
 	   //printf("DBG(getNameLength): delta len=%d\n",len);
 
 	  retLen=getNameLength(i+off, payload, payloadLen);
+	  if (retLen<0) return -2;
+
 	  //printf("DBG(getNameLength): returned len=%d\n",retLen);
-	  return (len + retLen);
-	  
+	  return (len + retLen);	  
 	//}      
   }
 }
@@ -320,7 +321,8 @@ static uint32_t dns_validchar[8] =
 */
 void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8_t *payload, const u_int payloadLen ) {
 	static uint8_t wd=0;	// watchdog 
-	u_int j= 0, off, cloff= 0, data_len, tmpv;
+	u_int j= 0, off, cloff= 0, tmpv;
+	int data_len;
 	
 	//printf("DBG(parseDnsName)\n");
 	
@@ -328,6 +330,9 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 	off=(u_int)*i;
 	data_len= getNameLength(off, payload, payloadLen);
 	//printf("DBG(parseDnsName): len %d, space: %d\n",data_len,max_len);
+
+	if ( data_len<0 )	// not valid value, return
+		return;
 	
 	u_char *dnsName= ndpi_calloc(data_len+1,sizeof(u_char));
 	if ( return_field && dnsName) {
@@ -405,16 +410,16 @@ int8_t checkDnsNameAndAllocate(u_int off, const u_int8_t *payload, const u_int p
 								char **pName, size_t *ret_name_len, uint8_t *packetError, 
 								const char* labelDnsName) {
 
-	uint8_t error_flag=0;
+	uint8_t error_flag=0; 
 	if (packetError!=NULL) *packetError=0;	// reset error flag
 	
-	if ( off<0 || payloadLen<0 || payload==NULL ) {
+	if ( payload==NULL ) {
 		printf("ERR(checkDnsNameAndAllocate): invalid input parameters %s: off:%u, lenp: %u, p:%p\n", 
 			(labelDnsName!=NULL)?labelDnsName:"", off, payloadLen, payload);
 		return -1;	// invalid parameters
 	}
 
-	size_t name_len = getNameLength(off, payload, payloadLen);
+	int name_len = getNameLength(off, payload, payloadLen);
 	if ( name_len<0 ) {
 		// error retrieving dns name length
 		if (packetError!=NULL) *packetError=1;
