@@ -258,7 +258,9 @@ void clear_dns_RR_list(struct dnsRRList_t **list, unsigned char bForward) {
 	return the real length of dns name, without change the pointer  
 */  
 int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
-  u_int16_t len=0,retLen=0;
+  u_int16_t len=0; 
+  int retLen=0;
+  
    //printf("DBG(getNameLength): off=%d/%d\n",i,payloadLen);
   if(i >= payloadLen) {
     /* Error / Bad packet */
