@@ -16,7 +16,7 @@ all:
 
 else
 
-all: ndpiReader @DPDK_TARGET@
+all: ndpiReader ndpiSimpleIntegration @DPDK_TARGET@
 
 EXECUTABLE_SOURCES := ndpiReader.c ndpiSimpleIntegration.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
@@ -28,7 +28,7 @@ ndpiReader: libndpiReader.a $(LIBNDPI) ndpiReader.o
 	$(CC) $(CFLAGS) ndpiReader.o libndpiReader.a -o $@ $(LDFLAGS)
 
 ndpiSimpleIntegration: ndpiSimpleIntegration.o
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) dns_utils.o $< -o $@ $(LDFLAGS)
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
