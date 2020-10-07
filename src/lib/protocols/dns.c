@@ -257,7 +257,7 @@ void clear_dns_RR_list(struct dnsRRList_t **list, unsigned char bForward) {
 	jumps there and continue with count.
 	return the real length of dns name, without change the pointer  
 */  
-u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
+int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   u_int16_t len=0,retLen=0;
    //printf("DBG(getNameLength): off=%d/%d\n",i,payloadLen);
   if(i >= payloadLen) {
@@ -401,7 +401,7 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
  * if it can return the length of dns name, set it before 
  * return the error condition (0=success)
  */
-uint8_t checkDnsNameAndAllocate(u_int off, const u_int8_t *payload, const u_int payloadLen, 
+int8_t checkDnsNameAndAllocate(u_int off, const u_int8_t *payload, const u_int payloadLen, 
 								char **pName, size_t *ret_name_len, uint8_t *packetError, 
 								const char* labelDnsName) {
 
