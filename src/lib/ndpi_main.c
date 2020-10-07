@@ -3677,6 +3677,13 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 	u_int8_t backup;
 	u_int16_t backup1, backup2;
 
+  for (int i=0; i<2; i++ ) {
+    if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+      ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
+      flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
+      flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
+    }
+  }
 	if(flow->http.url) {
 	  ndpi_free(flow->http.url);
 	  flow->http.url = NULL;

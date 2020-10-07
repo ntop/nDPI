@@ -410,7 +410,7 @@ int8_t checkDnsNameAndAllocate(u_int off, const u_int8_t *payload, const u_int p
 								char **pName, size_t *ret_name_len, uint8_t *packetError, 
 								const char* labelDnsName) {
 
-	uint8_t error_flag=0; 
+	uint8_t error_flag=0;
 	if (packetError!=NULL) *packetError=0;	// reset error flag
 	
 	if ( payload==NULL ) {
@@ -968,7 +968,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
     } else {
-	  printf("DBG(search_valid_dns):malformed/risky? \n");
+	  //printf("DBG(search_valid_dns):malformed/risky? \n");
       NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
       return(1 /* invalid */);
     }
