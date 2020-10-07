@@ -260,9 +260,10 @@ void clear_dns_RR_list(struct dnsRRList_t **list, unsigned char bForward) {
 u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   u_int16_t len=0,retLen=0;
    //printf("DBG(getNameLength): off=%d/%d\n",i,payloadLen);
-  if(i >= payloadLen)
-    return(0);
-  else if(payload[i] == 0x00)
+  if(i >= payloadLen) {
+    /* Error / Bad packet */
+    return(-1);
+  } else if(payload[i] == 0x00)
     return(0);
   else if ((payload[i] & 0xc0) != 0) {
 	u_int16_t noff = payload[i+1];	// jump to new position
@@ -377,8 +378,12 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 			//printf("DBG(parseDnsName): result: (%d) [%s]; new offset:[%d]\n", j, dnsName, *i);
 		}
 	}
+	else if (return_field==NULL && max_len==0) {
+		// it could be the case of dns name with 0 length, increment pointer
+		(*i)++;
+	}
 	else
-		printf("ERR: input pointer nil [%p] or failed to allocate memory.\n",return_field);
+		printf("ERR: input pointer [%p] or failed to allocate memory.\n",return_field);
 	
 	//printf("DBG(parseDnsName) final offset: %d\n",*i);
 	
@@ -389,12 +394,63 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 
 /* *********************************************** */
 
+/**
+ * this function search for the length of dns name; if finds it and parameters are set, try to allocate memory and return length
+ * if there is a packet malformed error, return immediately (-1)
+ * if the problem is the memory allocation, set error flag and continue...checking 
+ * if it can return the length of dns name, set it before 
+ * return the error condition (0=success)
+ */
+uint8_t checkDnsNameAndAllocate(u_int off, const u_int8_t *payload, const u_int payloadLen, 
+								char **pName, size_t *ret_name_len, uint8_t *packetError, 
+								const char* labelDnsName) {
+
+	uint8_t error_flag=0;
+	if (packetError!=NULL) *packetError=0;	// reset error flag
+	
+	if ( off<0 || payloadLen<0 || payload==NULL ) {
+		printf("ERR(checkDnsNameAndAllocate): invalid input parameters %s: off:%u, lenp: %u, p:%p\n", 
+			(labelDnsName!=NULL)?labelDnsName:"", off, payloadLen, payload);
+		return -1;	// invalid parameters
+	}
+
+	size_t name_len = getNameLength(off, payload, payloadLen);
+	if ( name_len<0 ) {
+		// error retrieving dns name length
+		if (packetError!=NULL) *packetError=1;
+		printf("ERR(checkDnsNameAndAllocate): error retrieving dns name %s\n", (labelDnsName!=NULL)?labelDnsName:"");
+		return -2;
+	}
+	
+	if( pName!=NULL ) {		
+		if ( name_len>0 ) {
+			*pName = ndpi_calloc( name_len, sizeof(char) );
+			if ( *pName==NULL ) {
+				// failed to allocate memory
+				printf("ERR(checkDnsNameAndAllocate): fail to allocate memory for dns name %s\n", (labelDnsName!=NULL)?labelDnsName:"");
+				error_flag=-3;
+			}
+		}
+		else 
+			*pName=NULL; // 0 length name is ok		
+	}  
+		
+	if (ret_name_len!=NULL) {
+		*ret_name_len= name_len;
+	}
+
+	//printf("DBG(checkDnsNameAndAllocate): OK retrieving dns name %s; err=%d\n", (labelDnsName!=NULL)?labelDnsName:"", error_flag);
+	return error_flag;	// success
+}
+
+
 /*
 	scan and parse a RR section (Answer,Authority,Additional) of DNS packet
 	increment the offset in the payload, after the last rr record successfully parsed
 
 */
-struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload, const u_int payloadLen, u_int *notfound ) {
+struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, 
+		const u_int8_t *payload, const u_int payloadLen, u_int *notfound, struct ndpi_flow_struct *flow ) {
 	
 	struct dnsRRList_t *retRRList=NULL, *lastRRListItem=NULL;
 	u_int k=0, off= (u_int)*i; // init offset 
@@ -402,29 +458,25 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 	//printf("DBG(parseDnsRRs): off initialized = %u\n", off);
 	
 	for ( k=0; k<nitems; k++) {	
-		//printf("DBG(parseDnsRRs): next record start at offset=%u\n", off);		
+		//printf("DBG(parseDnsRRs): next record start at offset=%u\n", off);
 		struct dnsRR_t *currItem= ndpi_calloc( 1, sizeof(struct dnsRR_t) ); 
 		if ( currItem ) {
 			size_t data_len;
+			uint8_t malformed;	// set to 1, for malformed packet error
 			char *pstr,*tmpstr;				
-			//printf("DBG(parseDnsRRs): extracting data of item no. %d/%d \n",(k+1),nitems);				
+			//printf("DBG(parseDnsRRs): extracting data of item no. %d/%d \n",(k+1),nitems);
+
 			/* parse the rrName */
-			if((data_len = getNameLength(off, payload, payloadLen)) == 0) {
-				printf("ERR(parseDnsRRs): 0 length of dns name \n");
+			if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->rrName, &data_len, &malformed, "[rrName]") ) {
+				parseDnsName( (u_char*)currItem->rrName, data_len, (int*)&off, payload, payloadLen );
+				//printf("DBG(parseDnsRRs): rrName: [%p] (%u) %s\n",currItem->rrName,(u_int)data_len,currItem->rrName);
+			} else  {
+				printf("ERR(parseDnsRRs): dns name retrieving error: RR NAME \n");
+				if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
 				ndpi_free(currItem);
 				break;
 			}
-			currItem->rrName = ndpi_calloc( data_len, sizeof(char) );
-			if ( currItem->rrName ) {
-				parseDnsName( (u_char*)currItem->rrName, data_len, (int*)&off, payload, payloadLen );
-				//printf("DBG(parseDnsRRs): rrName: [%p] (%u) %s\n",currItem->rrName,(u_int)data_len,currItem->rrName);
-			}
-			else {
-				printf("ERR(parseDnsRRs): fail to allocate memory for dns name\n");
-				ndpi_free(currItem);
-				return NULL; 
-			}
-
+			
 			currItem->rrType =  get16((int*)&off, payload); 						// resource type
 			currItem->rrClass = get16((int*)&off, payload); 						// class of the resource record
 			currItem->rrTTL= get32((int*)&off, payload);							// cache time to live			
@@ -442,69 +494,58 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 					break;
 				
 				case DNS_TYPE_NS:
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.NSDName= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.NSDName ) {
-							parseDnsName( (u_char*)currItem->RData.NSDName, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): NS: (%u) %s\n",(u_int)data_len,currItem->RData.NSDName);
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for NS\n");
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}					
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.NSDName, &data_len, &malformed, "[NSDName]") ) {
+						parseDnsName( (u_char*)currItem->RData.NSDName, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): NS: (%u) %s\n",(u_int)data_len,currItem->RData.NSDName);
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: NS DName\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
 					}
-					else currItem->RData.NSDName= NULL; 
 					break;
 				
 				case DNS_TYPE_CNAME:
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.CName= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.CName ) {
-							parseDnsName( (u_char*)currItem->RData.CName, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): CNAME: (%u) %s\n",(u_int)data_len,currItem->RData.CName);
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for CNAME\n");
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}				
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.CName, &data_len, &malformed, "[CName]") ) {
+						parseDnsName( (u_char*)currItem->RData.CName, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): CNAME: (%u) %s\n",(u_int)data_len,currItem->RData.CName);
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: CName\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 				
 					}
-					else currItem->RData.CName= NULL; 
 					break;
 				
 				case DNS_TYPE_SOA:
 					// extract SOA Master name
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.SOA.MName= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.SOA.MName ) {
-							parseDnsName( (u_char*)currItem->RData.SOA.MName, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): SOA.MName: (%u) %s\n",(u_int)data_len, currItem->RData.SOA.MName);
-							//TODO: must manage the @ on the first dot.
-						}			
-						else { 
-							printf("ERR(parseDnsRRs): fail to allocate memory for SOA.MName\n");
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}
-					} else currItem->RData.SOA.MName= NULL;
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.SOA.MName, &data_len, &malformed, "[SOA.MName]") ) {
+						parseDnsName( (u_char*)currItem->RData.SOA.MName, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): SOA.MName: (%u) %s\n",(u_int)data_len, currItem->RData.SOA.MName);
+						//TODO: must manage the @ on the first dot.
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: SOA.MName\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
+					} 
 					
 					// extract SOA Responsible name
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.SOA.RName= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.SOA.RName ) {
-							parseDnsName( (u_char*)currItem->RData.SOA.RName, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): SOA.RName: (%u) %s\n",(u_int)data_len,currItem->RData.SOA.RName);							
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for SOA.RName\n");
-							ndpi_free(currItem->RData.SOA.MName);
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}					
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.SOA.RName, &data_len, &malformed, "[SOA.RName]") ) {
+						parseDnsName( (u_char*)currItem->RData.SOA.RName, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): SOA.RName: (%u) %s\n",(u_int)data_len,currItem->RData.SOA.RName);
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: SOA.RName\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+
+						ndpi_free(currItem->RData.SOA.MName);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
 					} 
-					else currItem->RData.SOA.RName= NULL;
 					
 					currItem->RData.SOA.Serial= get32((int*)&off, payload); 	// serial
 					currItem->RData.SOA.Refresh= get32((int*)&off, payload); 	// refresh
@@ -514,50 +555,44 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 					break;
 
 				case DNS_TYPE_RP:
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.RP.mailbox= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.RP.mailbox ) {
-							parseDnsName( (u_char*)currItem->RData.RP.mailbox, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): RP mailbox: (%u) %s\n",(u_int)data_len,currItem->RData.RP.mailbox);							
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for RP mailbox\n");
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}					
-					} 
-					else currItem->RData.RP.mailbox= NULL;
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.RP.mailbox, &data_len, &malformed, "[RP mailbox]") ) {
+						parseDnsName( (u_char*)currItem->RData.RP.mailbox, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): RP mailbox: (%u) %s\n",(u_int)data_len,currItem->RData.RP.mailbox);	
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: RP mailbox\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
 
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.RP.respPerson= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.RP.respPerson ) {
-							parseDnsName( (u_char*)currItem->RData.RP.respPerson, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): RP respPerson: (%u) %s\n",(u_int)data_len,currItem->RData.RP.respPerson);							
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for RP respPerson\n");
-							ndpi_free(currItem->RData.RP.mailbox);
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}					
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
+					} 					
+
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.RP.respPerson, &data_len, &malformed, "[RP respPerson]") ) {
+						parseDnsName( (u_char*)currItem->RData.RP.respPerson, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): RP respPerson: (%u) %s\n",(u_int)data_len,currItem->RData.RP.respPerson);	
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: RP respPerson\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+
+						ndpi_free(currItem->RData.RP.mailbox);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
 					} 
-					else currItem->RData.RP.respPerson= NULL;
 					break;
 
 				case DNS_TYPE_PTR:
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.PTRDName= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.PTRDName ) {
-							parseDnsName( (u_char*)currItem->RData.PTRDName, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): PTR: (%u) %s\n",(u_int)data_len,currItem->RData.PTRDName);
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for PTR\n");
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}				
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.PTRDName, &data_len, &malformed, "[PTRDName]") ) {
+						parseDnsName( (u_char*)currItem->RData.PTRDName, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): PTR: (%u) %s\n",(u_int)data_len,currItem->RData.PTRDName);	
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: PTR DName\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
 					}
-					else currItem->RData.PTRDName= NULL;
 					break;
 					
 				case DNS_TYPE_HINFO:
@@ -593,19 +628,16 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 					
 				case DNS_TYPE_MX:
 					currItem->RData.MX.preference= get16((int*)&off, payload); 
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.MX.exchange= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.MX.exchange ) {
-							parseDnsName( (u_char*)currItem->RData.MX.exchange, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): MX: (%u) %s - Pref: %d\n",(u_int)data_len,currItem->RData.MX.exchange,currItem->RData.MX.preference);	
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for MX\n");
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.MX.exchange, &data_len, &malformed, "[MX]") ) {
+						parseDnsName( (u_char*)currItem->RData.MX.exchange, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): MX: (%u) %s - Pref: %d\n",(u_int)data_len,currItem->RData.MX.exchange,currItem->RData.MX.preference);
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: MX\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
 					}
-					else currItem->RData.MX.exchange= NULL; 
 					break;
 				
 				case DNS_TYPE_TXT:
@@ -630,19 +662,16 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 				case DNS_TYPE_AFSDB:
 					//printf("DBG(parseDnsRRs): DNS_TYPE_AFSDB: len: %d\n",currItem->rrRDL);
 					currItem->RData.AFSDB.subtype= get16((int*)&off, payload); 
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.AFSDB.hostname= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.AFSDB.hostname ) {
-							parseDnsName( (u_char*)currItem->RData.AFSDB.hostname, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): AFSDB: (%u) %s - subtype: %d\n",(u_int)data_len,currItem->RData.AFSDB.hostname,currItem->RData.AFSDB.subtype);	
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for MX [ ]\n");
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}						
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.AFSDB.hostname, &data_len, &malformed, "[AFSDBHOST]") ) {
+						parseDnsName( (u_char*)currItem->RData.AFSDB.hostname, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): MX: (%u) %s - Pref: %d\n",(u_int)data_len,currItem->RData.MX.exchange,currItem->RData.MX.preference);
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: AFSDB HOST\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
 					}
-					else currItem->RData.AFSDB.hostname= NULL; 
 					break;
 					
 				case DNS_TYPE_AAAA:
@@ -726,21 +755,18 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 					currItem->RData.SRVS.port= get16((int*)&off, payload);
 					//printf("DBG(parseDnsRRs): SRVS: priority: %u, weight: %u, port: %u, \n",(u_int)currItem->RData.SRVS.priority,currItem->RData.SRVS.weight,currItem->RData.SRVS.port);	
 
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
-						currItem->RData.SRVS.target= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.SRVS.target ) {
-							parseDnsName( (u_char*)currItem->RData.SRVS.target, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): SRVS target: (%u) %s\n",(u_int)data_len,currItem->RData.SRVS.target);
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for SRVS [ ]\n");
-							ndpi_free(currItem->RData.SRVS.protocol);
-							ndpi_free(currItem->RData.SRVS.service);
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}						
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.SRVS.target, &data_len, &malformed, "[SRVSTARGET]") ) {
+						parseDnsName( (u_char*)currItem->RData.SRVS.target, data_len, (int*)&off, payload, payloadLen );
+						//printf("DBG(parseDnsRRs): SRVS target: (%u) %s\n",(u_int)data_len,currItem->RData.SRVS.target);
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: SRVS TARGET\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+						ndpi_free(currItem->RData.SRVS.protocol);
+						ndpi_free(currItem->RData.SRVS.service);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						return NULL; 
 					} 
-					else currItem->RData.SRVS.target= NULL;
 					break;
 
 				case DNS_TYPE_NAPTR:
@@ -800,23 +826,21 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 					}
 					else currItem->RData.NAPTR.regex= NULL;
 
-					if((data_len = getNameLength(off, payload, payloadLen)) > 0) {
+
+					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.NAPTR.replacement, &data_len, &malformed, "[NAPTRreplacement]") ) {
+						parseDnsName( (u_char*)currItem->RData.NAPTR.replacement, data_len, (int*)&off, payload, payloadLen );
 						currItem->RData.NAPTR.re_replace_len=data_len-1;
-						currItem->RData.NAPTR.replacement= ndpi_calloc(data_len, sizeof(char));
-						if ( currItem->RData.NAPTR.replacement ) {
-							parseDnsName( (u_char*)currItem->RData.NAPTR.replacement, data_len, (int*)&off, payload, payloadLen );
-							//printf("DBG(parseDnsRRs): NAPTR replacement: (%u) %s\n",(u_int)data_len,currItem->RData.NAPTR.replacement);
-						} else {
-							printf("ERR(parseDnsRRs): fail to allocate memory for NAPTR:replacement [ ]\n");
-							ndpi_free(currItem->RData.NAPTR.flags);
-							ndpi_free(currItem->RData.NAPTR.service);
-							ndpi_free(currItem->RData.NAPTR.regex);
-							ndpi_free(currItem->rrName);
-							ndpi_free(currItem);
-							return NULL; 
-						}						
+						//printf("DBG(parseDnsRRs): NAPTR replacement: (%u) %s\n",(u_int)data_len,currItem->RData.NAPTR.replacement);
+					} else  {
+						printf("ERR(parseDnsRRs): dns name retrieving error: NAPTR:replacement\n");
+						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+						ndpi_free(currItem->RData.NAPTR.flags);
+						ndpi_free(currItem->RData.NAPTR.service);
+						ndpi_free(currItem->RData.NAPTR.regex);
+						ndpi_free(currItem->rrName);
+						ndpi_free(currItem);
+						break;
 					}
-					else currItem->RData.NAPTR.replacement= NULL;
 
 					off = offsaved+ currItem->rrRDL;	// restore the offset for error
 					break;
@@ -828,7 +852,7 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 					break;
 								
 				default:
-					printf("RR type: [%02X] not managed.\n",currItem->rrType);
+					printf("RR type: [%02X] not managed (ID:%u]).\n",currItem->rrType, flow->protos.dns.tr_id);
 			}
 			
 			// fill the list
@@ -856,6 +880,13 @@ struct dnsRRList_t *parseDnsRRs(u_int8_t nitems, int *i, const u_int8_t *payload
 	}
 
 	*notfound=nitems-k;	// returns the number of not found
+
+	// if the numbert of retrieved items, is not equal to those waited: not valid packet!!
+	if (*notfound>0) {
+		printf("ERR(parseDnsRRs): missing %u RR parsing the section!\n", *notfound);
+		NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+	}
+
 	*i=off;
 	//printf("DBG(parseDnsRRs): returning result=%u, offset=%u, list=%p\n", *notfound,*i, retRRList);
 	return retRRList;
@@ -883,7 +914,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
   x += sizeof(struct ndpi_dns_packet_header);
  
-  //printf("DBG(search_valid_dns): #%02Xh, counters: [%d,%d,%d,%d]\n",dns_header->tr_id,dns_header->num_queries,dns_header->num_answers,dns_header->authority_rrs,dns_header->additional_rrs);
+  //printf("DBG(search_valid_dns): #%02Xh, counters: [%d,%d,%d,%d], flags: %04Xh\n",dns_header->tr_id, dns_header->num_queries, dns_header->num_answers, dns_header->authority_rrs, dns_header->additional_rrs,dns_header->flags);
   
   /* 0x0000 QUERY */
   if((dns_header->flags & FLAGS_MASK) == 0x0000)
@@ -905,7 +936,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   if(*is_query) {
 	flow->protos.dns.dns_request_complete=0;
 	flow->protos.dns.dns_response_complete=0;
-	//printf("DBG(search_valid_dns): query processing. \n");
+	// printf("DBG(search_valid_dns): query processing. \n");
     /* DNS Request */
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
        && (((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
@@ -932,7 +963,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
     } else {
-		//printf("DBG(search_valid_dns):malformed/risky? \n");
+	  printf("DBG(search_valid_dns):malformed/risky? \n");
       NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
       return(1 /* invalid */);
     }
@@ -971,7 +1002,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		//printf("DBG(search_valid_dns): parsing RR records... \n");
 
 	  	/* WARNING: if there is a flow active it need to free allocated memory! */
-		flow->protos.dns.dnsAnswerRRList= parseDnsRRs(dns_header->num_answers,&x,flow->packet.payload,flow->packet.payload_packet_len, &notfound);
+		flow->protos.dns.dnsAnswerRRList= parseDnsRRs(dns_header->num_answers,&x,flow->packet.payload,flow->packet.payload_packet_len, &notfound, flow);
 		//printf("DBG(search_valid_dns): parsing RR answer done... \n");
 		flow->protos.dns.dns_response_complete &= !(notfound>0);
 
@@ -1061,14 +1092,14 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		  flow->protos.dns.dnsAnswerRRList= NULL;	
 
 	  if(dns_header->authority_rrs > 0) {
-		flow->protos.dns.dnsAuthorityRRList= parseDnsRRs(dns_header->authority_rrs,&x, flow->packet.payload, flow->packet.payload_packet_len, &notfound);
+		flow->protos.dns.dnsAuthorityRRList= parseDnsRRs(dns_header->authority_rrs,&x, flow->packet.payload, flow->packet.payload_packet_len, &notfound,flow);
 		flow->protos.dns.dns_response_complete &= !(notfound>0);
 		//printf("DBG(search_valid_dns): parsing RR authority done... \n");
 	  } else
 		  flow->protos.dns.dnsAuthorityRRList= NULL;
 		
 	  if(dns_header->additional_rrs > 0) {
-		flow->protos.dns.dnsAdditionalRRList= parseDnsRRs(dns_header->additional_rrs,&x, flow->packet.payload, flow->packet.payload_packet_len, &notfound);
+		flow->protos.dns.dnsAdditionalRRList= parseDnsRRs(dns_header->additional_rrs,&x, flow->packet.payload, flow->packet.payload_packet_len, &notfound,flow);
 		flow->protos.dns.dns_response_complete &= !(notfound>0);
 		//printf("DBG(search_valid_dns): parsing RR additional done... \n");
 	  } else
