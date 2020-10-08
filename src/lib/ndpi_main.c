@@ -3660,6 +3660,16 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.l4_packet_len = l4len;
   flow->l4_proto = l4protocol;
 
+  /* initialize the buffer to manage segments */
+  for (int i=0; i<2; i++ ) {
+    if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+      //printf("DBG(ndpi_init_packet_header): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
+      ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
+      flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
+      flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
+    }
+  }
+
   /* tcp / udp detection */
   if (l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */) {
     /* tcp */
@@ -3676,15 +3686,6 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
         flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
           u_int8_t backup;
           u_int16_t backup1, backup2;
-
-          for (int i=0; i<2; i++ ) {
-            if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-              //printf("DBG(ndpi_init_packet_header): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
-              ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-              flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-              flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-            }
-          }
 
           if(flow->http.url) {
             ndpi_free(flow->http.url);
@@ -6296,7 +6297,23 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
 
-    
+    for (int i=0; i<2; i++ ) {     
+      if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+        //printf("DBG(ndpi_free_flow): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
+        ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
+        flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
+        flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
+      }
+    }
+
+    if(flow->http.url)
+      ndpi_free(flow->http.url);    
+    if(flow->http.content_type)
+      ndpi_free(flow->http.content_type);
+    if(flow->http.user_agent)
+      ndpi_free(flow->http.user_agent);
+    if(flow->kerberos_buf.pktbuf)
+      ndpi_free(flow->kerberos_buf.pktbuf);
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_DNS)) {
       if (flow->protos.dns.dnsAnswerRRList)
@@ -6336,23 +6353,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
       if(flow->l4.tcp.tls.message.buffer)
 	      ndpi_free(flow->l4.tcp.tls.message.buffer);
-      if(flow->http.url)
-        ndpi_free(flow->http.url);    
-      if(flow->http.content_type)
-        ndpi_free(flow->http.content_type);
-      if(flow->http.user_agent)
-        ndpi_free(flow->http.user_agent);
-      if(flow->kerberos_buf.pktbuf)
-        ndpi_free(flow->kerberos_buf.pktbuf);
 
-      for (int i=0; i<2; i++ ) {     
-        if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-          //printf("DBG(ndpi_free_flow): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
-          ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-          flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-          flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-        }
-      }
     }
 
     ndpi_free(flow);
