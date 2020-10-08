@@ -3660,8 +3660,18 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.l4_packet_len = l4len;
   flow->l4_proto = l4protocol;
 
+  /* initialize the buffer to manage segments */
+  for (int i=0; i<2; i++ ) {
+    if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+      //printf("DBG(ndpi_init_packet_header): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
+      ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
+      flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
+      flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
+    }
+  }
+
   /* tcp / udp detection */
-  if(l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */) {
+  if (l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */) {
     /* tcp */
     flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
     if(flow->packet.l4_packet_len >= flow->packet.tcp->doff * 4) {
@@ -3673,45 +3683,45 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
        * idea: reset detection state if a connection is unknown
        */
       if(flow->packet.tcp->syn != 0 && flow->packet.tcp->ack == 0 && flow->init_finished != 0 &&
-	 flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-	u_int8_t backup;
-	u_int16_t backup1, backup2;
+        flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+          u_int8_t backup;
+          u_int16_t backup1, backup2;
 
-	if(flow->http.url) {
-	  ndpi_free(flow->http.url);
-	  flow->http.url = NULL;
-	}
-	if(flow->http.content_type) {
-	  ndpi_free(flow->http.content_type);
-	  flow->http.content_type = NULL;
-	}
-	if(flow->http.user_agent) {
-	  ndpi_free(flow->http.user_agent);
-	  flow->http.user_agent = NULL;
-	}
-	if(flow->kerberos_buf.pktbuf) {
-	  ndpi_free(flow->kerberos_buf.pktbuf);
-	  flow->kerberos_buf.pktbuf = NULL;
-	}
-	if(flow->l4.tcp.tls.message.buffer) {
-	  ndpi_free(flow->l4.tcp.tls.message.buffer);
-	  flow->l4.tcp.tls.message.buffer = NULL;
-	  flow->l4.tcp.tls.message.buffer_len = flow->l4.tcp.tls.message.buffer_used = 0;
-	}
+          if(flow->http.url) {
+            ndpi_free(flow->http.url);
+            flow->http.url = NULL;
+          }
+          if(flow->http.content_type) {
+            ndpi_free(flow->http.content_type);
+            flow->http.content_type = NULL;
+          }
+          if(flow->http.user_agent) {
+            ndpi_free(flow->http.user_agent);
+            flow->http.user_agent = NULL;
+          }
+          if(flow->kerberos_buf.pktbuf) {
+            ndpi_free(flow->kerberos_buf.pktbuf);
+            flow->kerberos_buf.pktbuf = NULL;
+          }
+          if(flow->l4.tcp.tls.message.buffer) {
+            ndpi_free(flow->l4.tcp.tls.message.buffer);
+            flow->l4.tcp.tls.message.buffer = NULL;
+            flow->l4.tcp.tls.message.buffer_len = flow->l4.tcp.tls.message.buffer_used = 0;
+          }
 
-	backup = flow->num_processed_pkts;
-	backup1 = flow->guessed_protocol_id;
-	backup2 = flow->guessed_host_protocol_id;
-	memset(flow, 0, sizeof(*(flow)));
+          backup = flow->num_processed_pkts;
+          backup1 = flow->guessed_protocol_id;
+          backup2 = flow->guessed_host_protocol_id;
+          memset(flow, 0, sizeof(*(flow)));
 
-	/* Restore pointers */
-	flow->num_processed_pkts = backup;
-	flow->guessed_protocol_id = backup1;
-	flow->guessed_host_protocol_id = backup2;
-	flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
+          /* Restore pointers */
+          flow->num_processed_pkts = backup;
+          flow->guessed_protocol_id = backup1;
+          flow->guessed_host_protocol_id = backup2;
+          flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
 
-	NDPI_LOG_DBG(ndpi_str, "tcp syn packet for unknown protocol, reset detection state\n");
-      }
+          NDPI_LOG_DBG(ndpi_str, "tcp syn packet for unknown protocol, reset detection state\n");
+        }
     } else {
       /* tcp header not complete */
       flow->packet.tcp = NULL;
@@ -6286,56 +6296,64 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
-    if(flow->http.url)
-      ndpi_free(flow->http.url);
 
     for (int i=0; i<2; i++ ) {     
-       if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+      if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+        //printf("DBG(ndpi_free_flow): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
         ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
         flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
         flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
       }
     }
+
+    if(flow->http.url)
+      ndpi_free(flow->http.url);    
     if(flow->http.content_type)
       ndpi_free(flow->http.content_type);
     if(flow->http.user_agent)
       ndpi_free(flow->http.user_agent);
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
+
     if(flow_is_proto(flow, NDPI_PROTOCOL_DNS)) {
       if (flow->protos.dns.dnsAnswerRRList)
-      clear_dns_RR_list(&flow->protos.dns.dnsAnswerRRList,1);      
+        clear_dns_RR_list(&flow->protos.dns.dnsAnswerRRList,1);      
       if (flow->protos.dns.dnsAuthorityRRList)
-      clear_dns_RR_list(&flow->protos.dns.dnsAuthorityRRList,1);
-      if (flow->protos.dns.dnsAdditionalRRList)            	 clear_dns_RR_list(&flow->protos.dns.dnsAdditionalRRList,1);
+        clear_dns_RR_list(&flow->protos.dns.dnsAuthorityRRList,1);
+      if (flow->protos.dns.dnsAdditionalRRList)            	 
+        clear_dns_RR_list(&flow->protos.dns.dnsAdditionalRRList,1);
     } 
+
     if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {
+
       if(flow->protos.stun_ssl.ssl.server_names)
-	ndpi_free(flow->protos.stun_ssl.ssl.server_names);
+        ndpi_free(flow->protos.stun_ssl.ssl.server_names);
 
       if(flow->protos.stun_ssl.ssl.alpn)
-	ndpi_free(flow->protos.stun_ssl.ssl.alpn);
+        ndpi_free(flow->protos.stun_ssl.ssl.alpn);
 
       if(flow->protos.stun_ssl.ssl.tls_supported_versions)
-	ndpi_free(flow->protos.stun_ssl.ssl.tls_supported_versions);
+        ndpi_free(flow->protos.stun_ssl.ssl.tls_supported_versions);
 
       if(flow->protos.stun_ssl.ssl.issuerDN)
-	ndpi_free(flow->protos.stun_ssl.ssl.issuerDN);
+        ndpi_free(flow->protos.stun_ssl.ssl.issuerDN);
 
       if(flow->protos.stun_ssl.ssl.subjectDN)
-	ndpi_free(flow->protos.stun_ssl.ssl.subjectDN);
+        ndpi_free(flow->protos.stun_ssl.ssl.subjectDN);
 
       if(flow->l4.tcp.tls.srv_cert_fingerprint_ctx)
-	ndpi_free(flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
+        ndpi_free(flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
 
       if(flow->protos.stun_ssl.ssl.encrypted_sni.esni)
-	ndpi_free(flow->protos.stun_ssl.ssl.encrypted_sni.esni);
+        ndpi_free(flow->protos.stun_ssl.ssl.encrypted_sni.esni);
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
+
       if(flow->l4.tcp.tls.message.buffer)
-	ndpi_free(flow->l4.tcp.tls.message.buffer);
+	      ndpi_free(flow->l4.tcp.tls.message.buffer);
+
     }
 
     ndpi_free(flow);
