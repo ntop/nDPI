@@ -25,7 +25,7 @@ static char* conv2Coord(char *ret, size_t len, u_int32_t coord, char letters[2])
         tmpVal= coord- ((unsigned)1<<31);
         if ( tmpVal<0 ) {
             letter= letters[1];
-            tmpVal=- tmpVal;
+            tmpVal= -tmpVal;
         } else {
             letter= letters[0];
         }
