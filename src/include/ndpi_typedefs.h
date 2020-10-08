@@ -673,7 +673,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_TELNET */
   u_int32_t telnet_stage:2;			// 0 - 2
 
-  char	security_gap[255];	// buffer to protect following structure
   message_t dns_segments_buf[2];
 	
   struct {

@@ -960,15 +960,15 @@ static void ndpi_process_packet(uint8_t * const args,
 					
 					if ( currRR->rrType==DNS_TYPE_A || currRR->rrType==DNS_TYPE_AAAA ) {
 						if ( answerIp[0]>0 ) {
-							strncat(answerIp,"|", (sizeof(answerIp)-strlen(answerIp)-1) );
+							strncat(answerIp,"|",sizeof(answerIp));
 						}
-						strncat(answerIp, dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),(sizeof(answerIp)-strlen(answerIp)-1));
-						strncat(answerIp,";",(sizeof(answerIp)-strlen(answerIp)-1));
-						//strncat(answerIp, dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),(sizeof(answerIp)-strlen(answerIp)-1));
+						strncat(answerIp, dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),sizeof(answerIp));
+						strncat(answerIp,";",sizeof(answerIp));
+						//strncat(answerIp, dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),sizeof(answerIp));
 						size_t pos= strlen(answerIp);
 						snprintf(&answerIp[pos],sizeof(answerIp)-pos,"%d",currRR->rrClass);
-						strncat(answerIp,";",(sizeof(answerIp)-strlen(answerIp)-1));
-						strncat(answerIp, line,(sizeof(answerIp)-strlen(answerIp)-1));
+						strncat(answerIp,";",sizeof(answerIp));
+						strncat(answerIp, line,sizeof(answerIp));
 					}
                     //          <owner> <TTL> <class> <type> 
                     printf("\t RR  %s ttl:%usec, %s %s - %s\n",
