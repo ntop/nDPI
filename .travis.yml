@@ -197,6 +197,7 @@ script:
 #after_script:
   - cd tests
   - ./do.sh
+  - ./do-unit.sh
 
 #after_success:
 #- cd ${TRAVIS_BUILD_DIR}
