@@ -1930,7 +1930,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	    }
 	  }
 	}
-      } else if(sport == NDPI_CAPWAP_DATA_PORT) {
+      } else if((sport == NDPI_CAPWAP_DATA_PORT) || (dport == NDPI_CAPWAP_DATA_PORT)) {
 	/* We dissect ONLY CAPWAP traffic */
 	u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
 
