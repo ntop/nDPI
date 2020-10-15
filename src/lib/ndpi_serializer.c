@@ -1726,14 +1726,14 @@ int ndpi_serialize_string_boolean(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
-/* Serialize start of simple list (JSON only)*/
-int ndpi_serialize_start_of_list(ndpi_serializer *_serializer,
-				  const char *key) {
+int ndpi_serialize_start_of_list_binary(ndpi_serializer *_serializer,
+					const char *key, u_int16_t klen) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-  u_int32_t needed, klen = strlen(key);
+  u_int32_t needed;
 
-  if(serializer->fmt != ndpi_serialization_format_json)
+  if(serializer->fmt != ndpi_serialization_format_json &&
+     serializer->fmt != ndpi_serialization_format_tlv)
     return(-1);
 
   needed = 16 + klen;
@@ -1744,34 +1744,55 @@ int ndpi_serialize_start_of_list(ndpi_serializer *_serializer,
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   }
 
-  ndpi_serialize_json_pre(_serializer);
+  if (serializer->fmt == ndpi_serialization_format_json) {
+    ndpi_serialize_json_pre(_serializer);
 
-  serializer->status.buffer.size_used += ndpi_json_string_escape(key, klen,
-    (char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff);
-  buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
+    serializer->status.buffer.size_used += ndpi_json_string_escape(key, klen,
+      (char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff);
+    buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
 
-  serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, ": [");
+    serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, ": [");
 
-  serializer->status.flags |= NDPI_SERIALIZER_STATUS_LIST | NDPI_SERIALIZER_STATUS_SOL;
+    serializer->status.flags |= NDPI_SERIALIZER_STATUS_LIST | NDPI_SERIALIZER_STATUS_SOL;
 
-  ndpi_serialize_json_post(_serializer);
+    ndpi_serialize_json_post(_serializer);
+  } else {
+    serializer->buffer.data[serializer->status.buffer.size_used++] = ndpi_serialization_start_of_list;
+    ndpi_serialize_single_string(serializer, key, klen);
+  }
 
   return(0);
 }
 
 /* ********************************** */
 
-/* Serialize start of simple list (JSON only)*/
+/* Serialize start of simple values list */
+int ndpi_serialize_start_of_list(ndpi_serializer *_serializer,
+				 const char *_key) {
+  const char *key = _key ? _key : "";
+  u_int16_t klen = strlen(key);
+
+  return ndpi_serialize_start_of_list_binary(_serializer, key, klen);
+}
+
+/* ********************************** */
+
+/* Serialize end of simple values list */
 int ndpi_serialize_end_of_list(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
-  if(serializer->fmt != ndpi_serialization_format_json)
+  if(serializer->fmt != ndpi_serialization_format_json &&
+     serializer->fmt != ndpi_serialization_format_tlv)
     return(-1);
 
-  if(serializer->status.flags & NDPI_SERIALIZER_STATUS_SOL) /* Empty list */
-    serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_SOL;
+  if (serializer->fmt == ndpi_serialization_format_json) {
+    if(serializer->status.flags & NDPI_SERIALIZER_STATUS_SOL) /* Empty list */
+      serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_SOL;
 
-  serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_LIST;
+    serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_LIST;
+  } else {
+    serializer->buffer.data[serializer->status.buffer.size_used++] = ndpi_serialization_end_of_list;
+  }
 
   return(0);
 }
@@ -2464,6 +2485,13 @@ int ndpi_deserialize_clone_all(ndpi_deserializer *deserializer, ndpi_serializer 
       goto next;
     } else if(et == ndpi_serialization_end_of_block) {
       ndpi_serialize_end_of_block(serializer);
+      goto next;
+    } else if(et == ndpi_serialization_start_of_list) {
+      ndpi_deserialize_key_string(deserializer, &ks);
+      ndpi_serialize_start_of_list_binary(serializer, ks.str, ks.str_len);
+      goto next;
+    } else if(et == ndpi_serialization_end_of_list) {
+      ndpi_serialize_end_of_list(serializer);
       goto next;
     }
 

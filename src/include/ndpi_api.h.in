@@ -1218,6 +1218,16 @@ extern "C" {
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
 
   /**
+   * Serialize the start of a list with an unterminated string key, where the next serialized items 
+   * will be added (note: keys for the new items are ignored)
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @return 0 on success, a negative number otherwise
+   */
+  int ndpi_serialize_start_of_list_binary(ndpi_serializer *_serializer, const char *key, u_int16_t klen);
+
+  /**
    * Serialize the start of a list, where the next serialized items will be added (note: keys for
    * the new items are ignored)
    * @param serializer The serializer handle 

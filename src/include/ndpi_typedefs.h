@@ -1446,7 +1446,9 @@ typedef enum {
   ndpi_serialization_float,
   ndpi_serialization_string,
   ndpi_serialization_start_of_block,
-  ndpi_serialization_end_of_block
+  ndpi_serialization_end_of_block,
+  ndpi_serialization_start_of_list,
+  ndpi_serialization_end_of_list
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
