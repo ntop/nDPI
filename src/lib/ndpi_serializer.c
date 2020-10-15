@@ -1749,6 +1749,7 @@ int ndpi_serialize_start_of_list_binary(ndpi_serializer *_serializer,
 
     serializer->status.buffer.size_used += ndpi_json_string_escape(key, klen,
       (char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff);
+
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
 
     serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, ": [");
@@ -2067,10 +2068,12 @@ static inline int ndpi_deserialize_get_single_size(ndpi_private_deserializer *de
     break;
   case ndpi_serialization_string:
   case ndpi_serialization_start_of_block:
+  case ndpi_serialization_start_of_list:
     size = ndpi_deserialize_get_single_string_size(deserializer, offset);
     break;
   case ndpi_serialization_end_of_record:
   case ndpi_serialization_end_of_block:
+  case ndpi_serialization_end_of_list:
   case ndpi_serialization_unknown:
     size = 0;
     break;
