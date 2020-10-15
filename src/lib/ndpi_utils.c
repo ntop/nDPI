@@ -1211,6 +1211,13 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
+  case NDPI_PROTOCOL_QUIC:
+    ndpi_serialize_start_of_block(serializer, "quic");
+    if(flow->host_server_name[0] != '\0')
+      ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
   case NDPI_PROTOCOL_MAIL_IMAP:
     ndpi_serialize_start_of_block(serializer, "imap");
     ndpi_serialize_string_string(serializer,  "user", flow->protos.ftp_imap_pop_smtp.username);
