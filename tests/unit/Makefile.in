@@ -6,7 +6,7 @@ SRCHOME=../../src
 JSON_INC = $(shell pkg-config --cflags json-c)
 JSON_LIB = $(shell pkg-config --libs json-c)
 
-CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include $(JSON_INC) @CFLAGS@
+CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include $(JSON_INC) @PCAP_INC@ @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ $(JSON_LIB) -lpthread -lm @LDFLAGS@
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
