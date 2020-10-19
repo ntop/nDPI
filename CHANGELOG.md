@@ -16,6 +16,8 @@
 * SMBv1
 * WebSocket
 * TLS: added ESNI support
+* SOAP
+* DNScrypt
 
 ## Improvements
 * Python CFFI bindings
@@ -25,8 +27,8 @@
 * CiscoVPN
 * H323
 * MDNS
-* SOAP
 * MySQL 8
+* IEC 60870-5-104
 * DoH/DoT dissection improvements
 * Office365 renamed to Microsoft365
 * Major protocol dissection improvement in particular with unknwon traffic
@@ -50,7 +52,8 @@
 
 ## MISC
 * Created demo app for nDPI newcomers
-	
+* Removed obsolete pplive and pando protocols
+
 #### nDPI 3.2 (February 2020)
 
 ## New Features
