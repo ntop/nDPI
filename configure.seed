@@ -71,9 +71,8 @@ NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
-dnl> used by json-c
-JSONC_INC=`pkg-config --cflags json-c`
-CFLAGS="${CFLAGS} ${JSONC_INC}"
+dnl> used by json-c for unit tests
+PKG_CHECK_MODULES([JSONC], [json-c])
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h json.h])
 
@@ -210,4 +209,6 @@ AC_SUBST(CUSTOM_NDPI)
 AC_SUBST(NDPI_API_VERSION)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(BUILD_MINGW)
+AC_SUBST(JSONC_CFLAGS)
+AC_SUBST(JSONC_LIBS)
 AC_OUTPUT
