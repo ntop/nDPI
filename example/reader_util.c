@@ -1942,9 +1942,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
 	    offset += msg_len;
 
-	    if((offset + 32 < header->caplen) && (packet[offset] == 0x02)) {
+	    if((offset + 32 < header->caplen)) {
 	      /* IEEE 802.11 Data */
-
 	      offset += 24;
 	      /* LLC header is 8 bytes */
 	      type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));
