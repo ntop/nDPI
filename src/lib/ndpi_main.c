@@ -927,8 +927,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, no_master, "TVUplayer", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_DOWNLOAD,
-			  1 /* can_have_a_subprotocol */, no_master, no_master, "HTTP_Download",
+  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE60,
+			  1 /* can_have_a_subprotocol */, no_master, no_master, "FREE60",
 			  NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
@@ -1141,8 +1141,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, no_master, "Guildwars", NDPI_PROTOCOL_CATEGORY_GAME,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HTTP_ACTIVESYNC,
-			  1 /* can_have_a_subprotocol */, no_master, no_master, "HTTP_ActiveSync",
+  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE110,
+			  1 /* can_have_a_subprotocol */, no_master, no_master, "FREE110",
 			  NDPI_PROTOCOL_CATEGORY_CLOUD, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_KERBEROS, 0 /* can_have_a_subprotocol */,
@@ -3014,9 +3014,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* XBOX */
   init_xbox_dissector(ndpi_str, &a, detection_bitmask);
-
-  /* HTTP_APPLICATION_ACTIVESYNC */
-  init_http_activesync_dissector(ndpi_str, &a, detection_bitmask);
 
   /* SMB */
   init_smb_dissector(ndpi_str, &a, detection_bitmask);

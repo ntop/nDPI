@@ -89,7 +89,7 @@ typedef enum {
   NDPI_PROTOCOL_SOPCAST               = 57,
   NDPI_PROTOCOL_DISCORD               = 58,
   NDPI_PROTOCOL_TVUPLAYER             = 59,
-  NDPI_PROTOCOL_HTTP_DOWNLOAD         = 60,
+  NDPI_PROTOCOL_FREE60                = 60,
   NDPI_PROTOCOL_QQLIVE                = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_SOULSEEK              = 63,
@@ -139,7 +139,7 @@ typedef enum {
   NDPI_PROTOCOL_FIESTA                = 107,
   NDPI_PROTOCOL_FLORENSIA             = 108,
   NDPI_PROTOCOL_GUILDWARS             = 109,
-  NDPI_PROTOCOL_HTTP_ACTIVESYNC       = 110,
+  NDPI_PROTOCOL_FREE110               = 110, /* Free */
   NDPI_PROTOCOL_KERBEROS              = 111,
   NDPI_PROTOCOL_LDAP                  = 112,
   NDPI_PROTOCOL_MAPLESTORY            = 113,
