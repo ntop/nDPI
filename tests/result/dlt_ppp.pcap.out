@@ -1,0 +1,8 @@
+QUIC	1	1230	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 193.167.0.252            	 1      
+
+
+	1	UDP 193.167.0.252:44083 -> 193.167.100.100:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1230 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-29][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][TLSv1.3][Client: server4][JA3C: fe94e313a5d76fb687c85443cdfa8170][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0]
