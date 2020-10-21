@@ -4582,11 +4582,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   u_int32_t a, num_calls = 0;
   ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
   
-  if(flow->fail_with_unknown) {
-    // printf("%s(): FAIL_WITH_UNKNOWN\n", __FUNCTION__); 
-    return(ret);
-  }
-  
   if(ndpi_str->ndpi_log_level >= NDPI_LOG_TRACE)
     NDPI_LOG(flow ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN, ndpi_str, NDPI_LOG_TRACE,
 	     "START packet processing\n");
@@ -4595,6 +4590,11 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     return(ret);
   else
     ret.category = flow->category;
+
+  if(flow->fail_with_unknown) {
+    // printf("%s(): FAIL_WITH_UNKNOWN\n", __FUNCTION__);
+    return(ret);
+  }
 
   flow->num_processed_pkts++;
 
