@@ -775,6 +775,7 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
+  u_int8_t skype_crc[4];
 
   /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage;

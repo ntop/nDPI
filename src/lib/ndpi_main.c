@@ -4605,17 +4605,15 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->server_id == NULL)
     flow->server_id = dst; /* Default */
 
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    if(flow->check_extra_packets) {
-      ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);
-      /* Update in case of new match */
-      ret.master_protocol = flow->detected_protocol_stack[1],
-	ret.app_protocol = flow->detected_protocol_stack[0],
-	ret.category = flow->category;
-      goto invalidate_ptr;
-    } else
-      goto ret_protocols;
-  }
+  if(flow->check_extra_packets) {
+    ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);
+    /* Update in case of new match */
+    ret.master_protocol = flow->detected_protocol_stack[1],
+    ret.app_protocol = flow->detected_protocol_stack[0],
+    ret.category = flow->category;
+    goto invalidate_ptr;
+  } else if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+    goto ret_protocols;
 
   /* need at least 20 bytes for ip header */
   if(packetlen < 20) {
@@ -6534,6 +6532,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 
   case NDPI_PROTOCOL_TELNET:
     if(!flow->protos.telnet.password_detected)
+      return(1);
+    break;
+
+  case NDPI_PROTOCOL_SKYPE:
+    if (flow->extra_packets_func)
       return(1);
     break;
   }
