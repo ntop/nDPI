@@ -604,7 +604,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     certificates_offset += certificate_len;
   }
 
-  if(( ndpi_struct->num_tls_blocks_to_follow != 0)
+  if((ndpi_struct->num_tls_blocks_to_follow != 0)
      && (flow->l4.tcp.tls.num_tls_blocks >= ndpi_struct->num_tls_blocks_to_follow)) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] Enough blocks dissected\n");
@@ -628,6 +628,17 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     processClientServerHello(ndpi_struct, flow, 0);
     flow->l4.tcp.tls.hello_processed = 1;
     ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
+
+#ifdef DEBUG_TLS
+    printf("*** TLS [version: %02X][%s Hello]\n",
+	   flow->protos.stun_ssl.ssl.ssl_version,
+	   (packet->payload[0] == 0x01) ? "Client" : "Server");
+#endif
+
+    if((flow->protos.stun_ssl.ssl.ssl_version >= 0x0304 /* TLS 1.3 */)
+       && (packet->payload[0] == 0x02 /* Server Hello */)) {
+      flow->l4.tcp.tls.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
+    }
     break;
 
   case 0x0b: /* Certificate */
@@ -700,6 +711,15 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     /* Overwriting packet payload */
     p = packet->payload, p_len = packet->payload_packet_len; /* Backup */
 
+    if(content_type == 0x14 /* Change Cipher Spec */) {
+      /*
+	Ignore Application Data up until change cipher
+	so in this case we reset the number of observed
+	TLS blocks
+      */
+      flow->l4.tcp.tls.num_tls_blocks = 0;
+    }
+
     if((len > 9)
        && (content_type != 0x17 /* Application Data */)
        && (!flow->l4.tcp.tls.certificate_processed)) {
@@ -729,7 +749,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       }
     } else {
       /* Process element as a whole */
-      if(content_type == 0x17 /* Application Data */) {
+      if((content_type == 0x17 /* Application Data */)
+	 && (flow->l4.tcp.tls.certificate_processed)) {
 	if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
 	  flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
 	    (packet->packet_direction == 0) ? (len-5) : -(len-5);

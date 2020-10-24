@@ -965,7 +965,7 @@ typedef enum {
 
 typedef enum {
    ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_enable_tls_block_dissection
+   ndpi_pref_enable_tls_block_dissection /* nDPI considers only those blocks past the certificate exchange */
 } ndpi_detection_preference;
 
 /* ntop extensions */
