@@ -1032,6 +1032,7 @@ struct ndpi_detection_module_struct {
   u_int32_t current_ts;
   u_int32_t ticks_per_second;
   u_int16_t num_tls_blocks_to_follow;
+  u_int8_t skip_tls_blocks_until_change_cipher:1, _notused:7;
   
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;

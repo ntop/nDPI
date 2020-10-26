@@ -76,7 +76,7 @@ u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_cluster
 u_int8_t verbose = 0, enable_joy_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
-u_int8_t human_readeable_string_len = 5;
+u_int8_t human_readeable_string_len = 5, enable_doh_dot_detection = 0;
 u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
@@ -212,6 +212,48 @@ extern void ndpi_report_payload_stats();
 #ifdef DEBUG_TRACE
 FILE *trace = NULL;
 #endif
+
+/* ********************************** */
+
+#define NUM_DOH_BINS 2
+
+struct ndpi_bin doh_ndpi_bins[NUM_DOH_BINS];
+
+u_int8_t doh_centroids[NUM_DOH_BINS][PLEN_NUM_BINS] = {
+  { 23,25,3,0,26,0,0,0,0,0,0,0,0,0,2,0,0,15,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+  { 35,30,21,0,0,0,2,4,0,0,5,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+};
+
+float doh_max_distance = 35.5;
+
+void init_doh_bins() {
+  u_int i;
+
+  for(i=0; i<NUM_DOH_BINS; i++) {
+    ndpi_init_bin(&doh_ndpi_bins[i], ndpi_bin_family8, PLEN_NUM_BINS);
+    doh_ndpi_bins[i].u.bins8 = doh_centroids[i];
+  }
+}
+
+/* *********************************************** */
+
+u_int check_bin_doh_similarity(struct ndpi_bin *bin, float *similarity) {
+  u_int i;
+  float lowest_similarity = 9999999999;
+
+  for(i=0; i<NUM_DOH_BINS; i++) {
+    *similarity = ndpi_bin_similarity(&doh_ndpi_bins[i], bin, 0);
+
+    if(*similarity <= doh_max_distance)
+      return(1);
+
+    if(*similarity < lowest_similarity) lowest_similarity = *similarity;
+  }
+
+  *similarity = lowest_similarity;
+
+  return(0);
+}
 
 /* *********************************************** */
 
@@ -391,7 +433,7 @@ static void help(u_int long_help) {
 	 "-i <file|device> "
 #endif
 	 "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
-	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-e <len>][-t][-v <level>]\n"
+	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-D][-e <len>][-t][-v <level>]\n"
 	 "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
 	 "          [-T <num>][-U <num>] [-x <domain>]\n\n"
 	 "Usage:\n"
@@ -439,6 +481,7 @@ static void help(u_int long_help) {
 	 "                            | only the last instance will be considered\n"
 	 "  -T <num>                  | Max number of TCP processed packets before giving up [default: %u]\n"
 	 "  -U <num>                  | Max number of UDP processed packets before giving up [default: %u]\n"
+	 "  -D                        | Enable DoH traffic analysis based on content (no DPI)\n"
 	 "  -x <domain>               | Check domain name [Test only]\n"
 	 ,
 	 human_readeable_string_len,
@@ -715,7 +758,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "b:e:c:C:df:g:i:hp:P:l:s:tu:v:V:n:Jrp:x:w:q0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "b:e:c:C:dDf:g:i:hp:P:l:s:tu:v:V:n:Jrp:x:w:q0123:456:7:89:m:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -729,6 +772,10 @@ static void parseOptions(int argc, char **argv) {
 
     case 'd':
       enable_protocol_guess = 0;
+      break;
+
+    case 'D':
+      enable_doh_dot_detection = 1;
       break;
 
     case 'e':
@@ -2000,9 +2047,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   ndpi_finalize_initalization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 
-#ifdef USE_TLS_LEN
-  ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 1);
-#endif
+  if(enable_doh_dot_detection)
+    ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 1);
 }
 
 /* *********************************************** */
@@ -2513,23 +2559,63 @@ static void printFlowsStats() {
 
     if(verbose > 1) {
 #ifndef DIRECTION_BINS
-      struct ndpi_bin *bins = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_flows);
-      u_int16_t *cluster_ids = (u_int16_t*)ndpi_malloc(sizeof(u_int16_t)*num_flows);
+      struct ndpi_bin *bins   = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin)*num_flows);
+      u_int16_t *cluster_ids  = (u_int16_t*)ndpi_malloc(sizeof(u_int16_t)*num_flows);
+      u_int32_t num_flow_bins = 0;
 #endif
 
       for(i=0; i<num_flows; i++) {
 #ifndef DIRECTION_BINS
+	if(enable_doh_dot_detection) {
+	  /* Discard flows with few packets per direction */
+	  if((all_flows[i].flow->src2dst_packets < 10)
+	     || (all_flows[i].flow->dst2src_packets < 10)
+	     /* Ignore flows for which we have not seen the beginning */
+	     )
+	    goto print_flow;
+
+	  if(all_flows[i].flow->protocol == 6 /* TCP */) {
+	    /* Discard flows with no SYN as we need to check ALPN */
+	    if((all_flows[i].flow->src2dst_syn_count == 0) || (all_flows[i].flow->dst2src_syn_count == 0))
+	      goto print_flow;
+
+	    if(all_flows[i].flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS) {
+	      if((all_flows[i].flow->src2dst_packets+all_flows[i].flow->dst2src_packets) < 40)
+		goto print_flow; /* Too few packets for TLS negotiation etc */
+	    }
+	  }
+	}
+
 	if(bins && cluster_ids) {
-	  memcpy(&bins[i], &all_flows[i].flow->payload_len_bin, sizeof(struct ndpi_bin));
-	  ndpi_normalize_bin(&bins[i]);
+	  u_int j;
+	  u_int8_t not_empty;
+
+	  if(enable_doh_dot_detection) {
+	    not_empty = 0;
+
+	    /* Check if bins are empty (and in this case discard it) */
+	    for(j=0; j<all_flows[i].flow->payload_len_bin.num_bins; j++)
+	      if(all_flows[i].flow->payload_len_bin.u.bins8[j] != 0) {
+		not_empty = 1;
+		break;
+	      }
+	  } else
+	    not_empty = 1;
+
+	  if(not_empty) {
+	    memcpy(&bins[num_flow_bins], &all_flows[i].flow->payload_len_bin, sizeof(struct ndpi_bin));
+	    ndpi_normalize_bin(&bins[num_flow_bins]);
+	    num_flow_bins++;
+	  }
 	}
 #endif
 
+      print_flow:
 	printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
       }
 
 #ifndef DIRECTION_BINS
-      if(bins && cluster_ids && (num_bin_clusters > 0)) {
+      if(bins && cluster_ids && (num_bin_clusters > 0) && (num_flow_bins > 0)) {
 	char buf[64];
 	u_int j;
 	struct ndpi_bin *centroids;
@@ -2539,7 +2625,7 @@ static void printFlowsStats() {
 	    ndpi_init_bin(&centroids[i], ndpi_bin_family32 /* Use 32 bit to avoid overlaps */,
 			  bins[0].num_bins);
 
-	  ndpi_cluster_bins(bins, num_flows, num_bin_clusters, cluster_ids, centroids);
+	  ndpi_cluster_bins(bins, num_flow_bins, num_bin_clusters, cluster_ids, centroids);
 
 	  printf("\n"
 		 "\tBin clusters\n"
@@ -2547,8 +2633,11 @@ static void printFlowsStats() {
 
 	  for(j=0; j<num_bin_clusters; j++) {
 	    u_int16_t num_printed = 0;
+	    float max_similarity = 0;
 
-	    for(i=0; i<num_flows; i++) {
+	    for(i=0; i<num_flow_bins; i++) {
+	      float similarity, s;
+
 	      if(cluster_ids[i] != j) continue;
 
 	      if(num_printed == 0) {
@@ -2567,16 +2656,38 @@ static void printFlowsStats() {
 		     ntohs(all_flows[i].flow->dst_port));
 
 	      print_bin(out, NULL, &bins[i]);
-	      printf("][similarity: %f]", ndpi_bin_similarity(&centroids[j], &bins[i], 0));
+	      printf("][similarity: %f]",
+		     (similarity = ndpi_bin_similarity(&centroids[j], &bins[i], 0)));
 
 	      if(all_flows[i].flow->ssh_tls.client_requested_server_name[0] != '\0')
 		fprintf(out, "[%s]", all_flows[i].flow->ssh_tls.client_requested_server_name);
 
+	      if(enable_doh_dot_detection) {
+		if(((all_flows[i].flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
+		    || (all_flows[i].flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
+		    || (all_flows[i].flow->detected_protocol.app_protocol == NDPI_PROTOCOL_DOH_DOT)
+		    )
+		   && all_flows[i].flow->ssh_tls.tls_alpn /* ALPN */
+		   ) {
+		  if(check_bin_doh_similarity(&bins[i], &s))
+		    printf("[DoH (%f distance)]", s);
+		  else
+		    printf("[NO DoH (%f distance)]", s);
+		} else {
+		  if(all_flows[i].flow->ssh_tls.tls_alpn == NULL)
+		    printf("[NO DoH check: missing ALPN]");
+		}
+	      }
+
 	      printf("\n");
 	      num_printed++;
+	      if(similarity > max_similarity) max_similarity = similarity;
 	    }
 
-	    if(num_printed) printf("\n");
+	    if(num_printed) {
+	      printf("\tMax similarity: %f\n", max_similarity);
+	      printf("\n");
+	    }
 	  }
 
 	  for(i=0; i<num_bin_clusters; i++)
@@ -3594,6 +3705,8 @@ int orginal_main(int argc, char **argv) {
       ndpiCheckHostStringMatch(domain_to_check);
       exit(0);
     }
+
+    if(enable_doh_dot_detection) init_doh_bins();
 
     if(!quiet_mode) {
       printf("\n-----------------------------------------------------------\n"

@@ -603,10 +603,11 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
 
   case ndpi_pref_enable_tls_block_dissection:
     /*
-       If this option is enabled only the TLS Application data blocks past the
-       certificate negotiation are considered
+      If this option is enabled only the TLS Application data blocks past the
+      certificate negotiation are considered
     */
     ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
+    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
     break;
 
   default:

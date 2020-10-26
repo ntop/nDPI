@@ -468,6 +468,7 @@ void ndpi_normalize_bin(struct ndpi_bin *b) {
 	b->u.bins8[i] = (b->u.bins8[i]*100) / tot;
     }
     break;
+    
   case ndpi_bin_family16:
     for(i=0; i<b->num_bins; i++) tot += b->u.bins16[i];
 
@@ -476,6 +477,7 @@ void ndpi_normalize_bin(struct ndpi_bin *b) {
 	b->u.bins16[i] = (b->u.bins16[i]*100) / tot;
     }
     break;
+
   case ndpi_bin_family32:
     for(i=0; i<b->num_bins; i++) tot += b->u.bins32[i];
 
