@@ -335,7 +335,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
  * @brief Print help instructions
  */
 static void help(u_int long_help) {
-  printf("Welcome to nDPI %s\n\n", ndpi_revision());
+  printf("Welcome to nDPI %s (API rev.%u)\n\n", ndpi_revision(), ndpi_get_api_version());
 
   printf("ndpiReader "
 #ifndef USE_DPDK
