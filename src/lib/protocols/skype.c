@@ -27,6 +27,36 @@ static int is_port(u_int16_t a, u_int16_t b, u_int16_t c) {
   return(((a == c) || (b == c)) ? 1 : 0);
 }
 
+static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &flow->packet;
+  u_int32_t payload_len = packet->payload_packet_len;
+
+  const uint8_t id_flags_iv_crc_len = 11;
+  const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
+  const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
+
+  if ((payload_len >= id_flags_iv_crc_len) && (packet->payload[2] == 0x02 /* Payload flag */ )) {
+    u_int8_t detected = 1;
+
+    /* Check if both packets have the same CRC */
+    for (int i = 0; i < crc_len && detected; i++) {
+      if (packet->payload[crc_offset + i] != flow->l4.udp.skype_crc[i])
+        detected = 0;
+    }
+
+    if (detected) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
+      flow->extra_packets_func = NULL;
+
+      /* Stop checking extra packets */
+      return 0;
+    }
+  }
+
+  /* Check more packets */
+  return 1;
+}
+
 static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
   // const u_int8_t *packet_payload = packet->payload;
@@ -73,6 +103,21 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_CALL, NDPI_PROTOCOL_SKYPE);
 	  }
 	}
+
+        if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+          const uint8_t id_flags_iv_crc_len = 11;
+          const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
+          const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
+          if ((payload_len >= id_flags_iv_crc_len) && (packet->payload[2] == 0x02 /* Payload flag */ ) && !flow->extra_packets_func) {
+            flow->check_extra_packets = 1;
+            flow->max_extra_packets_to_check = 5;
+            flow->extra_packets_func = ndpi_check_skype_udp_again;
+
+            memcpy(flow->l4.udp.skype_crc, &packet->payload[crc_offset], crc_len);
+            return;
+          }
+        }
+
       }
       
       // return;
