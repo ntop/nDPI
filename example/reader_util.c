@@ -86,9 +86,9 @@
 extern u_int8_t enable_protocol_guess, enable_joy_stats, enable_payload_analyzer;
 extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 8 */, max_num_tcp_dissected_pkts /* 10 */;
-extern u_int8_t enable_doh_dot_detection;
 static u_int32_t flow_id = 0;
 
+u_int8_t enable_doh_dot_detection = 0;
 /* ****************************************************** */
 
 struct flow_id_stats {
