@@ -19,6 +19,7 @@ ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 endif
 
 override_dh_installdocs:
+	# FIXME: nDPI does currently not have any up2date doc
 
 override_dh_auto_install:
 	make -j1 install DESTDIR="$(CURDIR)/debian/tmp" AM_UPDATE_INFO_DIR=no
