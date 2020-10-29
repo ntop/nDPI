@@ -14,6 +14,9 @@ AutoReqProv: no
 
 %define debug_package %{nil}
 
+# Make sure .build-id is not part of the package
+%define _build_id_links none
+
 %description
 nDPI Open and Extensible LGPLv3 Deep Packet Inspection Library.
 
