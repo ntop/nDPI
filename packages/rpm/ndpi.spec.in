@@ -43,9 +43,9 @@ you will need to install %{name}-dev.
 %build
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 
-%define includedir    /usr/local/include/ndpi
-%define libdir        /usr/local/lib
-%define bindir        /usr/local/bin
+%define includedir    /usr/include/ndpi
+%define libdir        /usr/lib
+%define bindir        /usr/bin
 
 %install
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
@@ -62,7 +62,7 @@ cd $RPM_BUILD_ROOT%{libdir}/; ln -s libndpi.so.@PACKAGE_VERSION@ libndpi.so.@MAJ
 cd $RPM_BUILD_ROOT%{libdir}/; ln -s libndpi.so.@PACKAGE_VERSION@ libndpi.so; cd -
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 cp $HOME/nDPI/packages/etc/ld.so.conf.d/ndpi.conf $RPM_BUILD_ROOT/etc/ld.so.conf.d
-rm -rf $RPM_BUILD_ROOT/usr/local/sbin/ndpi
+rm -rf $RPM_BUILD_ROOT/usr/sbin/ndpi
 strip $RPM_BUILD_ROOT%{bindir}/*
 rm -fr %{buildroot}%{includedir}/ndpi_win32.h
 #sed -i -e "s/#include \"ndpi_win32.h\"//g" %{buildroot}%{includedir}/ndpi_main.h
@@ -73,12 +73,12 @@ rm -fr $RPM_BUILD_ROOT
 %files
 %defattr(-, root, root)
 
-/usr/local/lib/libndpi.so
-/usr/local/lib/libndpi.so.@MAJOR_RELEASE@
-/usr/local/lib/libndpi.so.@PACKAGE_VERSION@
-/usr/local/bin/ndpiReader
-/usr/local/share/ndpi/ndpiCustomCategory.txt
-/usr/local/share/ndpi/ndpiProtos.txt
+/usr/lib/libndpi.so
+/usr/lib/libndpi.so.@MAJOR_RELEASE@
+/usr/lib/libndpi.so.@PACKAGE_VERSION@
+/usr/bin/ndpiReader
+/usr/share/ndpi/ndpiCustomCategory.txt
+/usr/share/ndpi/ndpiProtos.txt
 /etc/ld.so.conf.d/ndpi.conf
 %{libdir}/pkgconfig/libndpi.pc
 
