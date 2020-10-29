@@ -47,7 +47,9 @@ you will need to install %{name}-dev.
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 
 %define includedir    /usr/include/ndpi
-%define libdir        /usr/lib
+%{?el6:%define libdir /usr/lib}
+%{?el7:%define libdir /usr/lib}
+%{?el8:%define libdir /usr/lib64}
 %define bindir        /usr/bin
 
 %install
