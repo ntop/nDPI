@@ -6,11 +6,15 @@ matrix:
       compiler: clang
 
     - os: linux
+      env: BUILD_DPKG_PACKAGE=y
       compiler: gcc
       dist: bionic
       addons:
         apt:
           packages:
+            - fakeroot
+            - debhelper
+            - dpkg-dev
             - libpcap-dev
             - libgcrypt20-dev
             - libjson-c-dev
@@ -189,7 +193,10 @@ before_script:
 #  - lcov --directory . --zerocounters
 
 script:
-  - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else ./configure ; fi
+  - if [ -n "${QA_FUZZ}" ]; then ./configure --enable-fuzztargets ; else \
+    ./configure ; fi
+  - if [ -n "${BUILD_DPKG_PACKAGE}" ]; then cd ./packages/ubuntu ; \
+    ./configure && dpkg-buildpackage -b -us -uc ; cd ../.. ; fi
   - make
   - make -C example ndpiSimpleIntegration
   - make dist
