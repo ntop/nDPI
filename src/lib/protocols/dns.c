@@ -586,6 +586,7 @@ struct dnsQSList_t *parseDnsQSecs(u_int8_t nitems, int *i,
 				}
 				lastQSListItem= retQSList;
 			}
+			currQsItem= NULL;
 		}
 		else 
 			printf("ERR(parseDnsQSecs): fail to allocate memory for a DNS QS.\n");
@@ -1341,7 +1342,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 				)) {
 					memcpy(&flow->protos.dns.rsp_addr, &firstRR->RData, firstRR->rrRDL);
 					break;
-				}					
+				}				
 			}
 			currList = currList->nextItem;
 		}		
@@ -1805,7 +1806,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 					// but do not free packet payload because it is managed in other part
 				} else {
 					// restore packet pointers and free buffer
-					restorePacketPayload(flow, &payload_offset, 1);					
+					clear_all_list(flow);
+					if ( is_tcp) restorePacketPayload(flow, &payload_offset, 1);					
 					NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 				}
 			}
