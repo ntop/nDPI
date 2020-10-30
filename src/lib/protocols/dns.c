@@ -1525,7 +1525,7 @@ void ndpi_search_dns_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 
   if(flow->packet.tcp != NULL 
 	&& packet->payload_packet_len>2 
-	&& dns_segments_buf->buffer_used == 0) {
+	&& dns_segments_buf->buffer_used==0 ) {
 		int off=0;
 		// only tcp and the first time!!
 		dns_segments_buf->max_expected = get16(&off, packet->payload);

@@ -113,7 +113,7 @@ char* dnsClass(char *ret, size_t len, enum DnsClass classIndex) {
 char* dnsType(char *ret, size_t len, enum DnsType typeCode) {
 	//printf("DBG(dnsType) typeCode=%u; buffer=%p, sz=%d\n",typeCode, ret, len);
 	
-    if ( ret ) {		
+    if ( ret && len>0 ) {	
         switch(typeCode) {	
             case DNS_TYPE_A: /** IPv4 address record */
                 snprintf(ret,len,"A");

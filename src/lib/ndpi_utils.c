@@ -1777,25 +1777,25 @@ ndpi_http_method ndpi_http_str2method(const char* method, ssize_t method_len) {
   return(NDPI_HTTP_METHOD_UNKNOWN);
 }
 
-
+#define ARRAYSZ_255 255
 void printRawData(const uint8_t *ptr, size_t len) {		
 	uint8_t *p=(uint8_t*)ptr;
 	DBGINFO("ptr=%p, len=%llu", ptr, (unsigned long long)len)
 	if (p && len>0) {
     size_t ctLines=0,i,j;
-    char line1[255]={0}, line2[255]={0}, temp[255];
+    char line1[ARRAYSZ_255]={0}, line2[ARRAYSZ_255]={0}, temp[ARRAYSZ_255];
     snprintf(line1,sizeof(line1),"\t%05X",(unsigned int)(16*ctLines));
 		for (i=0; i<len; i++) {
 			
 			if (i>0 && i%16==0) {		        
 				printf("%s\t%s\n", line1,line2);
 				ctLines++;
-        snprintf(line1,sizeof(line1),"\t%05X",(unsigned int)(16*ctLines));
-				snprintf(line2,sizeof(line2),"%s","");
+        snprintf(line1,ARRAYSZ_255,"\t%05X",(unsigned int)(16*ctLines));
+				snprintf(line2,ARRAYSZ_255,"%s","");
 			}      
-      snprintf(temp,sizeof(temp)," %02X", (uint8_t)*p);
+      snprintf(temp,ARRAYSZ_255," %02X", (uint8_t)*p);
       strncat(line1, temp, 3);
-      snprintf(temp,sizeof(temp),"%c", (isprint(*p)? *(p):'.'));
+      snprintf(temp,ARRAYSZ_255,"%c", (isprint(*p)? *(p):'.'));
       strncat(line2, temp, 1);
       p++;
 		}

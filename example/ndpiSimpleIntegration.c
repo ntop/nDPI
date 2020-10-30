@@ -958,16 +958,18 @@ static void ndpi_process_packet(uint8_t * const args,
 					dnsRData(line,sizeof(line),currRR);
 					
 					if ( currRR->rrType==DNS_TYPE_A || currRR->rrType==DNS_TYPE_AAAA ) {
+                        size_t bufsz= sizeof(answerIp);
+                        memset(answerIp,0,bufsz);
 						if ( answerIp[0]>0 ) {
-							strncat(answerIp,"|", (sizeof(answerIp)-strlen(answerIp)-1) );
+							strncat(answerIp,"|", (bufsz - strlen(answerIp) - 1) );
 						}
-						strncat(answerIp, dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),(sizeof(answerIp)-strlen(answerIp)-1));
-						strncat(answerIp,";",(sizeof(answerIp)-strlen(answerIp)-1));
+						strncat(answerIp, dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),(bufsz - strlen(answerIp)-1));
+						strncat(answerIp,";",(bufsz - strlen(answerIp)-1));
 						//strncat(answerIp, dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),(sizeof(answerIp)-strlen(answerIp)-1));
 						size_t pos= strlen(answerIp);
-						snprintf(&answerIp[pos],sizeof(answerIp)-pos,"%d",currRR->rrClass);
-						strncat(answerIp,";",(sizeof(answerIp)-strlen(answerIp)-1));
-						strncat(answerIp, line,(sizeof(answerIp)-strlen(answerIp)-1));
+						snprintf(&answerIp[pos], bufsz -pos,"%d",currRR->rrClass);
+						strncat(answerIp,";", bufsz -strlen(answerIp)-1);
+						strncat(answerIp, line, bufsz -strlen(answerIp)-1);
 					}
                     //          <owner> <TTL> <class> <type> 
                     printf("\t RR  %s ttl:%usec, %s %s - %s\n",
