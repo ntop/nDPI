@@ -6307,7 +6307,7 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
 
-    for (int i=0; i<2; i++ ) {     
+    for (int i=0; i<2; i++ ) {
       if(flow->l4.tcp.dns_segments_buf[i].buffer) {
         //printf("DBG(ndpi_free_flow): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
         ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
@@ -6317,7 +6317,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     }
 
     if(flow->http.url)
-      ndpi_free(flow->http.url);    
+      ndpi_free(flow->http.url);
     if(flow->http.content_type)
       ndpi_free(flow->http.content_type);
     if(flow->http.user_agent)

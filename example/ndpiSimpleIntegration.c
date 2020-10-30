@@ -892,8 +892,8 @@ static void ndpi_process_packet(uint8_t * const args,
                         reader_thread->array_index,
                         flow_to_process->flow_id,
                         ndpi_ssl_version2str(flow_to_process->ndpi_flow,
-					     flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
-                                             &unknown_tls_version),
+                                                flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
+                                                &unknown_tls_version),
                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name,
                         (flow_to_process->ndpi_flow->protos.stun_ssl.ssl.alpn != NULL ?
                          flow_to_process->ndpi_flow->protos.stun_ssl.ssl.alpn : "-"));
