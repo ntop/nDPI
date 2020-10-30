@@ -44,7 +44,6 @@ static char* conv2Coord(char *ret, size_t len, u_int32_t coord, char letters[2])
 static char* conv2Alt(char *ret, size_t len, u_int32_t alt) {
     
     if ( ret ) {
-        char letter;
         int altmeters, altfrac;
         altmeters= (alt>10000000) ? alt-10000000: 10000000-alt;
         altfrac= altmeters % 100;

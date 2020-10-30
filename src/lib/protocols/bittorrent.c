@@ -464,7 +464,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 
       flow->bittorrent_stage++;
 
-      if(flow->bittorrent_stage < 5) {
+      if(flow->bittorrent_stage < 10) {
 	  /* We have detected bittorrent but we need to wait until we get a hash */
 
 	  if(packet->payload_packet_len > 19 /* min size */) {

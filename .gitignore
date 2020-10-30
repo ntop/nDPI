@@ -54,3 +54,4 @@ stamp-h1
 *.swp
 /test-driver
 /tests/Makefile
+*.bak

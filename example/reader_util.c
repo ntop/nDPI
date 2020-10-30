@@ -1038,8 +1038,16 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   if(!flow->ndpi_flow) return;
 
-  snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
-	   flow->ndpi_flow->host_server_name);
+  flow->http.ishost= flow->ndpi_flow->http.ishost;
+  if (flow->http.ishost) {
+    snprintf(flow->host_name, sizeof(flow->host_name), "%s", flow->ndpi_flow->host_name);
+  } 
+  flow->http.isserver= flow->ndpi_flow->http.isserver;
+  if (flow->http.isserver) {
+    snprintf(flow->server_name, sizeof(flow->server_name), "%s", flow->ndpi_flow->server_name);
+  }
+
+  snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s", flow->ndpi_flow->host_server_name);
 
   snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s",
 	   flow->ndpi_flow->flow_extra_info);

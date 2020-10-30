@@ -1334,7 +1334,13 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(flow->telnet.username[0] != '\0')  fprintf(out, "[Username: %s]", flow->telnet.username);
   if(flow->telnet.password[0] != '\0')  fprintf(out, "[Password: %s]", flow->telnet.password);
+
+  if(flow->http.isserver||flow->http.ishost) {
+    if(flow->host_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_name);
+    if(flow->server_name[0] != '\0') fprintf(out, "[Server: %s]", flow->server_name);
+  } else {
   if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
+  }
 
   if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
   if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);

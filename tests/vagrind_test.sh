@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-READER="valgrind -q --leak-check=full ../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
+READER="valgrind -q --error-exitcode=1 --leak-check=full ../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
 
 RC=0
 PCAPS=`cd pcap; /bin/ls *.pcap`
@@ -11,6 +11,8 @@ check_results() {
     for f in $PCAPS; do 
 	  CMD="$READER -q -i pcap/$f > /tmp/reader.out"
 	  $CMD
+	  result=$?
+	  if [ $result -ne 0 ]; then echo "MEM-ERR: > $CMD --> $result"; fi
 	  NUM_DIFF=0
 
 	  if [ -f /tmp/reader.out ]; then

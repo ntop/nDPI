@@ -27,8 +27,8 @@ libndpiReader.a: $(COMMON_SOURCES:%.c=%.o) $(LIBNDPI)
 ndpiReader: libndpiReader.a $(LIBNDPI) ndpiReader.o
 	$(CC) $(CFLAGS) ndpiReader.o libndpiReader.a -o $@ $(LDFLAGS)
 
-ndpiSimpleIntegration: ndpiSimpleIntegration.o
-	$(CC) $(CFLAGS) dns_utils.o $< -o $@ $(LDFLAGS)
+ndpiSimpleIntegration: ndpiSimpleIntegration.o dns_utils.o $(LIBNDPI) 
+	$(CC) $(CFLAGS) $? -o $@ $(LDFLAGS)
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@

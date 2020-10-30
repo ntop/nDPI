@@ -198,6 +198,8 @@ typedef struct ndpi_flow_info {
   char info[160];
   char flow_extra_info[16];
   char host_server_name[240];
+  char host_name[240];
+  char server_name[240];
   char bittorent_hash[41];
   char dhcp_fingerprint[48];
   ndpi_risk risk;
@@ -223,6 +225,7 @@ typedef struct ndpi_flow_info {
   struct {
     char url[256], content_type[64], user_agent[128];
     u_int response_status_code;
+    uint8_t ishost:1,isserver:1;
   } http;
 
   struct {

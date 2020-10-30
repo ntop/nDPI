@@ -849,10 +849,10 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     }
 
     NDPI_LOG_DBG2(ndpi_struct,
-		  "Filename HTTP found: %d, we look for line info..\n", filename_start);
+		  "Filename HTTP found method length: %d, we look for line info..\n", filename_start);
 
     ndpi_parse_packet_line_info(ndpi_struct, flow);
-    ndpi_check_http_header(ndpi_struct, flow);
+    ndpi_check_http_header(ndpi_struct, flow);  // only risk check
 
     if(packet->parsed_lines <= 1) {
       NDPI_LOG_DBG2(ndpi_struct,
@@ -918,11 +918,10 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
            with the HTTP specs. However this might be a waste of time as
            in 99.99% of the cases is like that.
         */
+        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
+        flow->http_detected = 1; // needed if extra_func is set
 
-	ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
-	flow->http_detected = 1;
-	NDPI_LOG_DBG2(ndpi_struct,
-		      "HTTP START Found, we will look further for the response...\n");
+        NDPI_LOG_DBG2(ndpi_struct, "HTTP START Found, we will look further for the response...\n");
 	flow->l4.tcp.http_stage = packet->packet_direction + 1; // packet_direction 0: stage 1, packet_direction 1: stage 2
         check_content_type_and_change_protocol(ndpi_struct, flow);
         return;
@@ -948,7 +947,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
     /**
        At first check, if this is for sure a response packet
-       (in another direction. If not, if HTTP is detected do nothing now and return,
+       (in another direction). If not, if HTTP is detected do nothing now and return,
        otherwise check the second packet for the HTTP request
     */
     if((flow->l4.tcp.http_stage - packet->packet_direction) == 1) { /* Expected a response package */
@@ -1054,30 +1053,37 @@ ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_
   if(!flow) {
     NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(NDPI_HTTP_METHOD_UNKNOWN);
-  } else
-    return(flow->http.method);
+  } 
+  return(flow->http.method);
 }
 
 /* ********************************* */
 
 char* ndpi_get_http_url(struct ndpi_detection_module_struct *ndpi_mod,
 			struct ndpi_flow_struct *flow) {
-  if((!flow) || (!flow->http.url))
+  if((!flow) || (!flow->http.url)) {
     return("");
-  else
-    return(flow->http.url);
+  }
+  return(flow->http.url);
 }
 
 /* ********************************* */
 
 char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod,
 				 struct ndpi_flow_struct *flow) {
-  if((!flow) || (!flow->http.content_type))
+  if((!flow) || (!flow->http.content_type)){
     return("");
-  else
-    return(flow->http.content_type);
+  }
+  return(flow->http.content_type);
 }
 
+u_int ndpi_get_http_content_length(struct ndpi_detection_module_struct *ndpi_mod,
+				 struct ndpi_flow_struct *flow) {
+  if((!flow) || (flow->http.content_length<=0)) {
+    return(0);
+  }
+  return(flow->http.content_length);
+}
 
 void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
 			 NDPI_PROTOCOL_BITMASK *detection_bitmask) {

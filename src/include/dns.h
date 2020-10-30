@@ -4,6 +4,18 @@
  *
  * contains some structs and definitions of DNS protocol
  *
+ * from RFC: 1035 ------------------------------------------------------------
+ 2.3.4. Size limits
+Various objects and parameters in the DNS have size limits.  They are
+listed below.  Some could be easily changed, others are more
+fundamental.
+
+labels          63 octets or less
+names           255 octets or less
+TTL             positive values of a signed 32 bit number.
+UDP messages    512 octets or less
+ * ---------------------------------------------------------------------------
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -14,23 +26,52 @@
 #define __DNS_H__
 
 #include "ndpi_includes.h"
-
+#include "ndpi_utils.h"
 
 // #define DNS_DEBUG 1
-// #define DEBUG_DNS_MEMORY
+// #define DEBUG_DNS_MEMORY 1
+// #define DEBUG_DNS_MEM_POINTERS 1
+// #define DEBUG_DNS_TRACE 1
+// #define DEBUG_DNS_INFO 1
 
+#ifdef DEBUG_DNS_MEM_POINTERS
+#undef DBGPOINTER
+#define DBGPOINTER(m, args...) MYDBG(m, ##args)
+#else
+#define DBGPOINTER(m, args...) 
+#endif
 
+#ifdef DEBUG_DNS_INFO
+#undef DBGINFO
+#define DBGINFO(m, args...) MYDBG(m, ##args)
+#else
+#define DBGINFO(m, args...) 
+#endif
+
+#ifdef DEBUG_DNS_TRACE
+#undef DBGTRACER
+#define DBGTRACER(m, args...) MYDBG(m, ##args)
+#else
+#define DBGTRACER(m, args...) 
+#endif
+
+#define ERRLOG(m, ...)  \
+	printf(" ERR [%s:%s:%u]: \t" m "\n", __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__);
+
+#define DNS_PORT   53
+#define LLMNR_PORT 5355
+#define MDNS_PORT  5353
+
+#ifdef NDPI_MAX_DNS_REQUESTS
+#undef NDPI_MAX_DNS_REQUESTS
+#endif
+#define NDPI_MAX_DNS_REQUESTS                   65535
 
 /* extern declaration used here */
 void * ndpi_malloc(size_t size);
 void * ndpi_calloc(unsigned long count, size_t size);
 void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
-/*
-char * ndpi_strdup(const char *s);
-void   ndpi_free(void *ptr);
-void * ndpi_flow_malloc(size_t size);
-void   ndpi_flow_free(void *ptr);
-*/
+
 
 enum DnsResponseCode
 {
@@ -105,7 +146,7 @@ enum DnsType
 	/** Mail exchanger record */
 	DNS_TYPE_MX= 15,
 	/** Text record */
-	DNS_TYPE_TXT= 16,
+	DNS_TYPE_TXT= 16, //
 	/** Responsible person record */
 	DNS_TYPE_RP,
 	/** AFS database record */
@@ -155,7 +196,7 @@ enum DnsType
 	/** Kitchen sink record */
 	DNS_TYPE_SINK,
 	/** Option record */
-	DNS_TYPE_OPT,
+	DNS_TYPE_OPT, // 41
 	/** Address Prefix List record */
 	DNS_TYPE_APL,
 	/** Delegation signer record */
@@ -246,6 +287,10 @@ typedef struct dnsQuestionSec_t {
 	u_int16_t query_type, query_class;	
 } dnsQuestionSec;
 
+typedef struct dnsQSList_t {
+	struct dnsQuestionSec_t *qsItem;
+	struct dnsQSList_t *prevItem, *nextItem; 
+} dnsQSList;
 
 typedef struct dnsRR_t {
 	char* 		rrName;		// string or pointer to name of object
@@ -332,6 +377,8 @@ typedef struct dnsRR_t {
 			char	*replacement;
 		} NAPTR;
 		
+		uint8_t	*unKnownTypeData;
+
 	} RData;
 } dnsRR; // end of dnsRR
 
@@ -343,7 +390,7 @@ typedef struct dnsRRList_t {
 
 
 /* dns support: function declared and implementated here*/
-void free_dns_QSec(struct dnsQuestionSec_t *qs);
-void clear_dns_RR_list(struct dnsRRList_t** list, unsigned char bForward);
+void clear_dns_QS_list(struct dnsQSList_t **qsList, unsigned char bForward);
+void clear_dns_RR_list(struct dnsRRList_t **rrList, unsigned char bForward);
 
 #endif 
