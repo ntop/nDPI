@@ -75,8 +75,6 @@ struct nDPI_flow_info {
     struct ndpi_flow_struct * ndpi_flow;
     struct ndpi_id_struct * ndpi_src;
     struct ndpi_id_struct * ndpi_dst;
-
-    char info[160];
 };
 
 struct nDPI_workflow {
@@ -208,6 +206,22 @@ static void free_workflow(struct nDPI_workflow ** const workflow)
     *workflow = NULL;
 }
 
+static char * get_default_pcapdev(char *errbuf)	
+{	
+    char * ifname;	
+    pcap_if_t * all_devices = NULL;	
+
+    if (pcap_findalldevs(&all_devices, errbuf) != 0)	
+    {	
+        return NULL;	
+    }	
+
+    ifname = strdup(all_devices[0].name);	
+    pcap_freealldevs(all_devices);	
+
+    return ifname;	
+}
+
 static int setup_reader_threads(char const * const file_or_device)
 {
     char const * file_or_default_device;
@@ -218,9 +232,9 @@ static int setup_reader_threads(char const * const file_or_device)
     }
 
     if (file_or_device == NULL) {
-        file_or_default_device = pcap_lookupdev(pcap_error_buffer);
+        file_or_default_device = get_default_pcapdev(pcap_error_buffer);
         if (file_or_default_device == NULL) {
-            fprintf(stderr, "pcap_lookupdev: %s\n", pcap_error_buffer);
+            fprintf(stderr, "pcap_findalldevs: %.*s\n", (int) PCAP_ERRBUF_SIZE, pcap_error_buffer);
             return 1;
         }
     } else {
@@ -937,7 +951,6 @@ static void ndpi_process_packet(uint8_t * const args,
 			} else if ( !flow_to_process->ndpi_flow->protos.dns.is_query
                     && flow_to_process->ndpi_flow->protos.dns.dns_response_complete
                     && !flow_to_process->ndpi_flow->protos.dns.dns_response_seen ) { 
-                    flow_to_process->info[0]='\0'; 
                     flow_to_process->ndpi_flow->protos.dns.dns_response_seen=1;               
     						
 				printf("\tDNS ID #%04Xh - response (code: %s) num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] - %s\n",

@@ -249,11 +249,11 @@ enum DnsClass
 	/** Hesiod class */
 	DNS_CLASS_HS = 4,
 	/** NONE class */
-	DNS_CLASS_NONE = 0xFE,
+	DNS_CLASS_NONE = 254, 		// 0x00FE
 	/** ANY class */
-	DNS_CLASS_ANY = 255,
+	DNS_CLASS_ANY = 255, 		// 0x00FF
 	/** Internet class with QU flag set to True */
-	DNS_CLASS_IN_QU = 32769		
+	DNS_CLASS_IN_QU = 32769		// 0x8001	
 };
 
 
