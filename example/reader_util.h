@@ -54,6 +54,11 @@ extern int dpdk_port_init(int port, struct rte_mempool *mbuf_pool);
 extern int dpdk_port_deinit(int port);
 #endif
 
+#define PLEN_MAX         1504
+#define PLEN_BIN_LEN     32
+#define PLEN_NUM_BINS    48 /* 47*32 = 1504 */
+#define MAX_NUM_BIN_PKTS 256
+
 /* ETTA Spec defiintions for feature readiness */
 #define ETTA_MIN_PACKETS 10
 #define ETTA_MIN_OCTETS 4000

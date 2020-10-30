@@ -1,5 +1,59 @@
 # CHANGELOG
 
+#### nDPI 3.4 (October 2020)
+
+## New Features
+* Completely reworked and extended QUIC dissector
+* Added flow risk concept to move nDPI towards result interpretation
+* Added ndpi_dpi2json() API call
+* Added DGA risk for names that look like a DGA
+* Added HyperLogLog cardinality estimator API calls
+* Added ndpi_bin_XXX API calls to handle bin handling
+* Fully fuzzy tested code that has greatly improved reliability and robustness
+
+## New Supported Protocols and Services
+* QUIC
+* SMBv1
+* WebSocket
+* TLS: added ESNI support
+* SOAP
+* DNScrypt
+
+## Improvements
+* Python CFFI bindings
+* Various TLS extensions and fixes including extendede metadata support
+* Added various pcap files for testing corner cases in protocols
+* Various improvements in JSON/Binary data serialization
+* CiscoVPN
+* H323
+* MDNS
+* MySQL 8
+* IEC 60870-5-104
+* DoH/DoT dissection improvements
+* Office365 renamed to Microsoft365
+* Major protocol dissection improvement in particular with unknwon traffic
+* Improvement in Telegram v6 protocol support
+* HTTP improvements to detect file download/upload and binary files
+* BitTorrent and WhatsApp dissection improvement
+* Spotify
+* Added detection of malformed packets
+* Fuzzy testing support has been greatly improved
+* SSH code cleanup
+
+## Fixes
+* Fixed various memory leaks and race conditions in protocol decoding
+* NATS, CAPWAP dissector
+* Removed HyperScan support that greatly simplified the code
+* ARM platform fixes on memory alignment
+* Wireshark extcap support
+* DPDK support
+* OpenWRT, OpenBSD support
+* MINGW compiler support
+
+## MISC
+* Created demo app for nDPI newcomers
+* Removed obsolete pplive and pando protocols
+
 #### nDPI 3.2 (February 2020)
 
 ## New Features
@@ -47,7 +101,7 @@
 * Improved Python bindings
 * Improved Ethereum support
 * Improved categories detection with streaming and HTTP
-* Support for IP-based detection to compute the application protocol 
+* Support for IP-based detection to compute the application protocol
 * Renamed protocol 104 to IEC60870 (more meaningful)
 * Added failed authentication support with FTP
 * Renamed DNSoverHTTPS to handle bot DoH and DoT
@@ -59,7 +113,7 @@
 * Modified API signatures for ndpi_ssl_version2str / ndpi_detection_giveup
 * Removed ndpi_pref_http_dont_dissect_response / ndpi_pref_dns_dont_dissect_response (replaced by ndpi_extra_dissection_possible)
 
-## Fixes 
+## Fixes
 * Fixed memory invalid access in SMTP and leaks in TLS
 * Fixed a few memory leaks
 * Fixrd invalid memory access in a few protocol dissectors (HTTP, memcached, Citrix, STUN, DNS, Amazon Video, TLS, Viber)
@@ -228,7 +282,7 @@
 ## Other
 
 * Deb and RPM packages: ndpi with shared libraries and binaries, ndpi-dev with headers and static libraries
-* Protocols now have an optional subprotocol: Spotify cannot have subprotocols, DNS can (DNS.Spotify) 
+* Protocols now have an optional subprotocol: Spotify cannot have subprotocols, DNS can (DNS.Spotify)
 * New API functions:
  * ndpi_fill_ip_protocol_category to handle ICMP flows category
  * ndpi_flowv4_flow_hash and ndpi_flowv6_flow_hash to support the Community ID Flow Hashing (https://github.com/corelight/community-id-spec)

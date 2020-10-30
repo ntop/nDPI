@@ -24,9 +24,9 @@ else
   fi
 fi
 
-NDPI_VERS=`../version.sh --release`
-MAJOR_RELEASE=`../version.sh --major-release`
-GIT_REVISION=`../version.sh --revision`
+NDPI_VERS=`$(dirname "${0}")/../version.sh --release`
+MAJOR_RELEASE=`$(dirname "${0}")/../version.sh --major-release`
+GIT_REVISION=`$(dirname "${0}")/../version.sh --revision`
 
 AC_CONFIG_FILES([Makefile debian/changelog debian/files debian/control])
 

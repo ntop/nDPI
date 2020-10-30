@@ -1,0 +1,12 @@
+Howto Build Debian packages
+---------------------------
+
+Initial configuration and debian/changelog generation:
+./configure
+
+Build a binary (GPG signed) nDPI package with:
+dpkg-buildpackage -b
+
+Or build a binary (unsigned) nDPI package with:
+dpkg-buildpackage -b -us -uc
+

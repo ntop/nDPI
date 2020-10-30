@@ -108,7 +108,11 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
           const uint8_t id_flags_iv_crc_len = 11;
           const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
           const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
-          if ((payload_len >= id_flags_iv_crc_len) && (packet->payload[2] == 0x02 /* Payload flag */ ) && !flow->extra_packets_func) {
+
+          if ((payload_len >= id_flags_iv_crc_len)
+	      && (packet->payload[2] == 0x02 /* Payload flag */ )
+	      && (payload_len >= (crc_offset+crc_len))
+	      && (!flow->extra_packets_func)) {
             flow->check_extra_packets = 1;
             flow->max_extra_packets_to_check = 5;
             flow->extra_packets_func = ndpi_check_skype_udp_again;

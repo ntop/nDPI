@@ -1,57 +1,93 @@
 #
-# Copyright (C) 2018-20 - ntop.org
+# Copyright (C) 2017 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
 #
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libndpi
-PKG_VERSION:=17022020
+PKG_VERSION:=3.4
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/ntop/nDPI.git
-PKG_SOURCE_VERSION:=1f921562d1d7962f1d23ca5b59c25f9b65073460
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://codeload.github.com/ntop/nDPI/tar.gz/$(PKG_VERSION)?
+PKG_HASH:=dc9b291c7fde94edb45fb0f222e0d93c93f8d6d37f4efba20ebd9c655bfcedf9
+PKG_BUILD_DIR:=$(BUILD_DIR)/nDPI-$(PKG_VERSION)
 
-PKG_MAINTAINER:=Luca Deri <deri@ntop.org>
-PKG_LICENSE:=GPL3
-PKG_BUILD_DEPENDS:=
+PKG_MAINTAINER:=Banglang Huang <banglang.huang@foxmail.com>, Toni Uhlig <matzeton@googlemail.com>
+PKG_LICENSE:=LGPL-3.0-or-later
+PKG_LICENSE_FILES:=COPYING
+
+PKG_FIXUP:=autoreconf
+PKG_REMOVE_FILES:=autogen.sh
+PKG_BUILD_DEPENDS:=libpcap
 PKG_BUILD_PARALLEL:=1
 
-# autogen fix
-PKG_FIXUP:=autoreconf
-
+include $(INCLUDE_DIR)/uclibc++.mk
 include $(INCLUDE_DIR)/package.mk
 
+ifeq ($(CONFIG_LIBNDPI_GCRYPT),)
+CONFIGURE_ARGS += --disable-gcrypt
+endif
+
 define Package/libndpi
-  SECTION:=network
-  CATEGORY:=Network
-  TITLE:=nDPI Deep Packet Inspection Library
-  URL:=https://www.ntop.org
+  SECTION:=libs
+  CATEGORY:=Libraries
+  TITLE:=Library for deep-packet inspection
+  URL:=https://github.com/ntop/nDPI
+  DEPENDS:=$(CXX_DEPENDS) +LIBNDPI_GCRYPT:libgcrypt +libpcap +libjson-c
 endef
 
 define Package/libndpi/description
- Open and Extensible GPLv3 Deep Packet Inspection Library
+  nDPI is an open source LGPLv3 library for deep-packet inspection.
+  Based on OpenDPI it includes ntop extensions.
 endef
 
-CONFIGURE_ARGS += \
-	--with-only-libndpi
+define Package/libndpi/config
+config LIBNDPI_GCRYPT
+	bool "GCrypt support"
+	depends on PACKAGE_libndpi
+	default n
+	help
+	  This option enables QUIC client hello decryption.
+	  Disabled by default.
+endef
 
 define Build/Prepare
-	$(call Build/Prepare/Default)
-endef
-
-define Build/Configure
-	( cd $(PKG_BUILD_DIR); ./autogen.sh )
-	$(call Build/Configure/Default)
+	$(PKG_UNPACK)
+	$(Build/Patch)
+	mv $(PKG_BUILD_DIR)/configure.seed $(PKG_BUILD_DIR)/configure.ac
+	$(SED) "s/@NDPI_MAJOR@/3/g" \
+		-e "s/@NDPI_MINOR@/4/g" \
+		-e "s/@NDPI_PATCH@/0/g" \
+		-e "s/@NDPI_VERSION_SHORT@/3.4.0/g" \
+		-e "s/@FUZZY@/dnl> /g" \
+		$(PKG_BUILD_DIR)/configure.ac
 endef
 
 define Build/InstallDev
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/local/include/libndpi
-	$(CP) $(PKG_BUILD_DIR)/src/include/* $(STAGING_DIR)/usr/local/include/libndpi
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/local/lib
-	$(CP) $(PKG_BUILD_DIR)/src/lib/libndpi.* $(STAGING_DIR)/usr/local/lib
+	$(INSTALL_DIR) $(1)/usr/include/ndpi
+	$(CP) $(PKG_BUILD_DIR)/src/include/*.h \
+		$(1)/usr/include/ndpi/
+
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_BUILD_DIR)/src/lib/libndpi.so* \
+		$(1)/usr/lib/
+
+	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
+	$(CP) $(PKG_BUILD_DIR)/libndpi.pc \
+		$(1)/usr/lib/pkgconfig/
+endef
+
+define Package/libndpi/install
+	$(INSTALL_DIR) $(1)/usr/lib/
+	$(CP) $(PKG_BUILD_DIR)/src/lib/libndpi.so* \
+		$(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/bin/
+	$(CP) $(PKG_BUILD_DIR)/example/ndpiReader \
+		$(1)/usr/bin/
 endef
 
 $(eval $(call BuildPackage,libndpi))

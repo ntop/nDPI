@@ -38,6 +38,8 @@
 #include <float.h>
 #endif
 
+#include "reader_util.h"
+
 #ifndef ETH_P_IP
 #define ETH_P_IP               0x0800 	/* IPv4 */
 #endif
@@ -77,11 +79,6 @@
 #define DLT_LINUX_SLL  113
 #endif
 
-#define PLEN_MAX         1504
-#define PLEN_BIN_LEN     32
-#define PLEN_NUM_BINS    48 /* 47*32 = 1504 */
-#define MAX_NUM_BIN_PKTS 256
-
 #include "ndpi_main.h"
 #include "reader_util.h"
 #include "ndpi_classify.h"
@@ -91,6 +88,7 @@ extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 8 */, max_num_tcp_dissected_pkts /* 10 */;
 static u_int32_t flow_id = 0;
 
+u_int8_t enable_doh_dot_detection = 0;
 /* ****************************************************** */
 
 struct flow_id_stats {
@@ -1213,16 +1211,17 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
     }
 
-#ifdef USE_TLS_LEN
-    /* For TLS we use TLS block lenght instead of payload lenght */
-    ndpi_reset_bin(&flow->payload_len_bin);
-    
-    for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
-      u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_application_blocks_len[i]);
-      printf("%u\n", len);
-      ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+    if(enable_doh_dot_detection) {
+      /* For TLS we use TLS block lenght instead of payload lenght */
+      ndpi_reset_bin(&flow->payload_len_bin);
+      
+      for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
+	u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_application_blocks_len[i]);
+	
+	/* printf("[TLS_LEN] %u\n", len); */
+	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+      }
     }
-#endif
   }
 
   if(flow->detection_completed && (!flow->check_extra_packets)) {
@@ -1637,9 +1636,14 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     /* Cisco PPP - 9 or 104 */
   case DLT_C_HDLC:
   case DLT_PPP:
-    chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
-    ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
-    type = ntohs(chdlc->proto_code);
+    if(packet[0] == 0x0f || packet[0] == 0x8f) {
+      chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
+      ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+      type = ntohs(chdlc->proto_code);
+    } else {
+      ip_offset = 2;
+      type = ntohs(*((u_int16_t*)&packet[eth_offset]));
+    }
     break;
 
     /* IEEE 802.3 Ethernet - 1 */
@@ -1942,9 +1946,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
 	    offset += msg_len;
 
-	    if((offset + 32 < header->caplen) && (packet[offset] == 0x02)) {
+	    if((offset + 32 < header->caplen)) {
 	      /* IEEE 802.11 Data */
-
 	      offset += 24;
 	      /* LLC header is 8 bytes */
 	      type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));
