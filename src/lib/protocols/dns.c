@@ -530,59 +530,58 @@ struct dnsQSList_t *parseDnsQSecs(u_int8_t nitems, int *i,
 	
 	for ( k=0; k<nitems && no_error; k++) {	
 		DBGTRACER("next record start at offset=%u", off)		
-		struct dnsQuestionSec_t *currItem= ndpi_calloc( 1, sizeof(struct dnsQuestionSec_t) ); 
-		DBGPOINTER("allocated %lu bytes memory for pointer: %p.",sizeof(struct dnsQuestionSec_t),currItem ) 
+		struct dnsQuestionSec_t *currQsItem= ndpi_calloc( 1, sizeof(struct dnsQuestionSec_t) ); 
+		DBGPOINTER("allocated %lu bytes memory for pointer: %p.",sizeof(struct dnsQuestionSec_t),currQsItem ) 
 			
-		if ( currItem ) {
+		if ( currQsItem ) {
 			size_t data_len;
 			uint8_t malformed;	// set to 1, for malformed packet error
 			//char *pstr,*tmpstr;				
 			DBGTRACER("extracting data of item no. %d/%d",(k+1),nitems)
 
 			/* parse the rrName */
-			if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->questionName, &data_len, &malformed, "[qsName]") ) {
-				parseDnsName( (u_char*)currItem->questionName, data_len, (int*)&off, payload, payloadLen );
-				DBGTRACER("qsName: [%p] (%u) %.*s",currItem->questionName,(u_int)data_len,(u_int)data_len,currItem->questionName)
+			if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currQsItem->questionName, &data_len, &malformed, "[qsName]") ) {
+				parseDnsName( (u_char*)currQsItem->questionName, data_len, (int*)&off, payload, payloadLen );
+				DBGTRACER("qsName: [%p] (%u) %.*s",currQsItem->questionName,(u_int)data_len,(u_int)data_len,currQsItem->questionName)
 			} else  {
 				printf("ERR(parseDnsQSecs): dns name retrieving error: QS NAME \n");
 				if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-				ndpi_free(currItem);
+				ndpi_free(currQsItem);
 				break;
 			}
 
 			if ( off+4 > payloadLen ) {
 				printf("ERR(parseDnsQSecs): malformed packet: len (%u) less then need.\n",payloadLen);
-
 				NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-				free_dns_QSec(currItem);
-				no_error=0;
+				free_dns_QSec(currQsItem);
+				break;
 			} 
 			else if ( no_error ) {
-				currItem->query_type =  get16((int*)&off, payload); 		// query type
-				currItem->query_class = get16((int*)&off, payload); 		// class of the query record
+				currQsItem->query_type =  get16((int*)&off, payload); 		// query type
+				currQsItem->query_class = get16((int*)&off, payload); 		// class of the query record
 			}
 
 			// fill the list
 			if ( retQSList ) {
-				lastQSListItem= add_QS_elem_to_list(lastQSListItem, currItem);
+				lastQSListItem= add_QS_elem_to_list(lastQSListItem, currQsItem);
 				if (!lastQSListItem) {
 					//ERR
 					printf("ERR: failed to add a new element [%s], type:%u, class:%u.\n",
-							currItem->questionName,currItem->query_type,currItem->query_class);
+							currQsItem->questionName,currQsItem->query_type,currQsItem->query_class);
 					
 					clear_dns_QS_list(&retQSList,1);
-					free_dns_QSec(currItem);
+					free_dns_QSec(currQsItem);
 					no_error=0;
 				}
 			} else if (no_error) {
 				// list empty: first item
-				retQSList= add_QS_elem_to_list(NULL, currItem);
+				retQSList= add_QS_elem_to_list(NULL, currQsItem);
 				if (!retQSList) {
 					//ERR
 					printf("ERR: failed to add a new element [%s], type:%u, class:%u.\n",
-							currItem->questionName,currItem->query_type,currItem->query_class);
+							currQsItem->questionName,currQsItem->query_type,currQsItem->query_class);
 					
-					free_dns_QSec(currItem);
+					free_dns_QSec(currQsItem);
 					no_error=0;
 				}
 				lastQSListItem= retQSList;
