@@ -2021,6 +2021,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow, struct ndpi_tc
       fragment_t *item = (fragment_t*)fragW->fragments_list[sorted_indexes[i].item_index];
 
       DBGINFO("copying data item no:%u of len: %lu to buffer: %p (offset:%lu)", sorted_indexes[i].item_index, (unsigned long int)item->len, buffer, (unsigned long int)item->offset)
+      // tot_length =  SUM(..item->len..), and check on offset at point 2!!
       memcpy((void*)(buffer+item->offset),item->data, item->len);
 
       // free memory item
