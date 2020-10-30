@@ -547,6 +547,7 @@ struct dnsQSList_t *parseDnsQSecs(u_int8_t nitems, int *i,
 				printf("ERR(parseDnsQSecs): dns name retrieving error: QS NAME \n");
 				if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
 				ndpi_free(currQsItem);
+				no_error=0;
 				break;
 			}
 
@@ -554,6 +555,7 @@ struct dnsQSList_t *parseDnsQSecs(u_int8_t nitems, int *i,
 				printf("ERR(parseDnsQSecs): malformed packet: len (%u) less then need.\n",payloadLen);
 				NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
 				free_dns_QSec(currQsItem);
+				no_error=0;
 				break;
 			} 
 			else if ( no_error ) {
@@ -585,6 +587,8 @@ struct dnsQSList_t *parseDnsQSecs(u_int8_t nitems, int *i,
 					no_error=0;
 				}
 				lastQSListItem= retQSList;
+			} else {
+				free_dns_QSec(currQsItem);
 			}
 			currQsItem= NULL;
 		}
@@ -596,6 +600,9 @@ struct dnsQSList_t *parseDnsQSecs(u_int8_t nitems, int *i,
 	DBGTRACER("end of parsing of QS.")
 
 	*notfound=nitems-k;	// returns the number of not found
+	if (!no_error) {
+		clear_dns_QS_list(&retQSList,1);
+	}
 
 	// if the numbert of retrieved items, is not equal to those waited: not valid packet!!
 	if (*notfound>0) {
