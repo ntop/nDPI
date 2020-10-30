@@ -322,9 +322,8 @@ static void clear_all_list(struct ndpi_flow_struct *flow) {
 	jumps there and continue with count.
 	return the real length of dns name, without change the pointer  
 */  
-int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
-  u_int16_t len=0; 
-  int retLen=0;
+int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) { 
+  int retLen;
   
   DBGTRACER("off/tot => %d/%d",i,payloadLen)
 
@@ -348,7 +347,7 @@ int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
 	 DBGTRACER("returned from c0 jump len=%d",retLen)
 	return (retLen);
   } else {
-    len = payload[i]+1;	// word length and dot or termination char
+    u_int16_t len= payload[i]+1;	// word length and dot or termination char
     u_int16_t off = len; // new offset 
 	 DBGTRACER("curr len=%d",len)
 
@@ -404,7 +403,7 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 	if ( return_field && dnsName) {
 		
 		while(j < data_len && off < payloadLen && payload[off] != '\0') {
-		  uint8_t c, cl = payload[off++];	//init label counter
+		  uint8_t cl = payload[off++];	//init label counter
 
 		  DBGTRACER("parsing: j/tot: %d/%u, off: %d, value: %02Xh [%c]",j, data_len, off, cl, cl)
 		  if( (cl & 0xc0) != 0 ) {
@@ -418,7 +417,8 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 			if ((++wd)>=250) {
 				// used to exit when the parsing loops!!
 				dnsName[j] = '\0';	// terminate dnsName
-				printf("ERR(parseDnsName): parsing: %.*s, j/tot: %d/%u, off: %d, value: %02Xh %c\n", data_len, dnsName, j, data_len, off, cl, cl);		  
+				//printf("ERR(parseDnsName): parsing: %.*s, j/tot: %d/%u, off: %d, value: %02Xh %c\n", data_len, dnsName, j, data_len, off, cl, cl);
+				printf("ERR(parseDnsName): parsing: %.*s, j/tot: %u/%d, off: %u, value: %02Xh %c\n", data_len, dnsName, j, data_len, off, cl, cl);		  
 				wd=0; 
 				return;
 			}
@@ -431,6 +431,7 @@ void parseDnsName( u_char *return_field, const int max_len, int *i, const u_int8
 		  if(j && j < data_len) dnsName[j++] = '.';	// replace the label length with dot, except the at first 
 
 		  while(j < data_len && cl != 0) {
+			uint8_t c;
 			u_int32_t shift;
 			
 			c = payload[off++];
@@ -1023,7 +1024,7 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 						ndpi_free(currItem->RData.NAPTR.regex);
 						ndpi_free(currItem->rrName);
 						ndpi_free(currItem);
-								no_error=0;
+						no_error=0;
 						break;
 					}
 
@@ -1049,7 +1050,7 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 			DBGINFO("RR item (%p): [%s] ready to add to dnsRR list: (%p)",currItem, currItem->rrName, lastRRListItem)
 
 			// fill the list
-			if ( retRRList ) {
+			if ( retRRList && no_error ) {
 				lastRRListItem= add_RR_elem_to_list(lastRRListItem, currItem);
 				if (!lastRRListItem) {
 					//ERR
@@ -1175,7 +1176,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 #else
 	  u_int notfound = 1;
 
-	  if(dns_header->num_queries > 0) {
+	  //if(dns_header->num_queries > 0) {
 		if ( flow->protos.dns.dnsQueriesList!=NULL ) clear_dns_QS_list(&flow->protos.dns.dnsQueriesList,1);
 		flow->protos.dns.dnsQueriesList= parseDnsQSecs(dns_header->num_queries,&x, flow->packet.payload, flow->packet.payload_packet_len, &notfound, flow);
 		DBGINFO("parsing dnsQS-R (%p) done... ", flow->protos.dns.dnsQueriesList)
@@ -1198,8 +1199,9 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		flow->protos.dns.dns_request_complete= 1;
 		flow->protos.dns.dns_request_seen=flow->protos.dns.dns_request_print=0;
 		DBGTRACER("query processed and complete.");
-	  } else
-		flow->protos.dns.dnsQueriesList= NULL;  
+	  //} else
+	  //  flow->protos.dns.dnsQueriesList= NULL;
+
 #endif 
 
 	  if(dns_header->additional_rrs > 0) {
@@ -1245,7 +1247,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       //x++;
 #if 1
 
- 	if(dns_header->num_queries > 0) {
+ 	//if(dns_header->num_queries > 0) {
 		if ( flow->protos.dns.dnsQueriesList!=NULL ) clear_dns_QS_list(&flow->protos.dns.dnsQueriesList,1);
 		DBGTRACER("parsing QS records... ")
 		flow->protos.dns.dnsQueriesList= parseDnsQSecs(dns_header->num_queries ,&x,flow->packet.payload,flow->packet.payload_packet_len, &notfound, flow);
@@ -1259,10 +1261,10 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			return(1 /* invalid */);			
 		}
 		
-	} else {
+	/*} else {
 		  flow->protos.dns.dnsQueriesList= NULL;
 		  x += 4;
-	}
+	}*/
 
 #else
 	  // skip 'Question Name' section, because do its extraction after
@@ -1686,7 +1688,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 			idx += name_len+1;
       	}			
 		while(j < max_len && off < flow->packet.payload_packet_len && flow->packet.payload[off] != '\0') {
-			uint8_t c, cl = flow->packet.payload[off++];	//init label counter
+			uint8_t cl = flow->packet.payload[off++];	//init label counter
 
 			if( (cl & 0xc0) != 0 || // we not support compressed names in query
 					off + cl  >= flow->packet.payload_packet_len) {
@@ -1697,6 +1699,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 			if(j && j < max_len) flow->host_server_name[j++] = '.';	// replace the label length with dot, except the at first 
 
 			while(j < max_len && cl != 0) {
+				uint8_t c;
 				u_int32_t shift;
 				
 				c = flow->packet.payload[off++];

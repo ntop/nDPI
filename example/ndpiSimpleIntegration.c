@@ -914,7 +914,6 @@ static void ndpi_process_packet(uint8_t * const args,
 			char dnsClss[25]={0};
 			char dnsTyp[20]={0};
 			char line[1024]={0};
-			char prot_L4_str[51] = {0};
 			char answerIp[1024]={0};
 			
 			if (flow_to_process->ndpi_flow->protos.dns.is_query 
