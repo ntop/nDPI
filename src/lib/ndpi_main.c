@@ -3449,21 +3449,25 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
     if(*nxt_hdr == 59) {
       return(1);
     }
+    
     // fragment extension header has fixed size of 8 bytes and the first byte is the next header type
     if(*nxt_hdr == 44) {
       if(*l4len < 8) {
 	return(1);
       }
+      
       *nxt_hdr = (*l4ptr)[0];
       *l4len -= 8;
       (*l4ptr) += 8;
       continue;
     }
+    
     // the other extension headers have one byte for the next header type
     // and one byte for the extension header length in 8 byte steps minus the first 8 bytes
     if(*l4len < 2) {
       return(1);
     }
+    
     ehdr_len = (*l4ptr)[1];
     ehdr_len *= 8;
     ehdr_len += 8;
@@ -3471,10 +3475,16 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
     if(*l4len < ehdr_len) {
       return(1);
     }
+    
     *nxt_hdr = (*l4ptr)[0];
+
+    if(*l4len < ehdr_len)
+      return(1);
+    
     *l4len -= ehdr_len;
     (*l4ptr) += ehdr_len;
   }
+  
   return(0);
 }
 #endif /* NDPI_DETECTION_SUPPORT_IPV6 */
@@ -4608,17 +4618,15 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->server_id == NULL)
     flow->server_id = dst; /* Default */
 
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    if(flow->check_extra_packets) {
-      ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);
-      /* Update in case of new match */
-      ret.master_protocol = flow->detected_protocol_stack[1],
-	ret.app_protocol = flow->detected_protocol_stack[0],
-	ret.category = flow->category;
-      goto invalidate_ptr;
-    } else
-      goto ret_protocols;
-  }
+  if(flow->check_extra_packets) {
+    ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);
+    /* Update in case of new match */
+    ret.master_protocol = flow->detected_protocol_stack[1],
+    ret.app_protocol = flow->detected_protocol_stack[0],
+    ret.category = flow->category;
+    goto invalidate_ptr;
+  } else if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+    goto ret_protocols;
 
   /* need at least 20 bytes for ip header */
   if(packetlen < 20) {
@@ -6559,6 +6567,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 
   case NDPI_PROTOCOL_TELNET:
     if(!flow->protos.telnet.password_detected)
+      return(1);
+    break;
+
+  case NDPI_PROTOCOL_SKYPE:
+    if (flow->extra_packets_func)
       return(1);
     break;
   }

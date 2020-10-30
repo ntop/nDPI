@@ -782,6 +782,7 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
+  u_int8_t skype_crc[4];
 
   /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage;
@@ -1459,7 +1460,9 @@ typedef enum {
   ndpi_serialization_float,
   ndpi_serialization_string,
   ndpi_serialization_start_of_block,
-  ndpi_serialization_end_of_block
+  ndpi_serialization_end_of_block,
+  ndpi_serialization_start_of_list,
+  ndpi_serialization_end_of_list
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
