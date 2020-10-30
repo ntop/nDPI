@@ -856,8 +856,10 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   pn_offset += quic_len(&packet->payload[pn_offset], &token_length);
   pn_offset += token_length;
   /* Checks: quic_len reads 8 bytes, at most; quic_decrypt_header reads other 20 bytes */
-  if(pn_offset + 8 + (4 + 16) >= packet->payload_packet_len)
+  if(pn_offset + 8 + (4 + 16) >= packet->payload_packet_len) {
+    quic_cipher_reset(&cipher);
     return NULL;
+  }
   pn_offset += quic_len(&packet->payload[pn_offset], &payload_length);
 
   NDPI_LOG_DBG2(ndpi_struct, "pn_offset %d token_length %d payload_length %d\n",
