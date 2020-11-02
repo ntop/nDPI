@@ -1095,7 +1095,6 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					clear_dns_RR_list(&retRRList,1);
 					free_dns_RR(currItem);
 					retRRList= NULL;
-					no_error=0;
 					break;	// exit from loop
 				}
 			} else if (no_error) {
