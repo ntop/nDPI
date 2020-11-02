@@ -5501,8 +5501,14 @@ void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_str
   if(!flow)
     return;
 
+  if(flow_is_proto(flow, NDPI_PROTOCOL_DNS) 
+    || flow_is_proto(flow, NDPI_PROTOCOL_MDNS)
+    || flow_is_proto(flow, NDPI_PROTOCOL_LLMNR) ) {
+    clear_all_dns_list(flow);
+  }
+
   flow->detected_protocol_stack[0] = upper_detected_protocol,
-    flow->detected_protocol_stack[1] = lower_detected_protocol;
+  flow->detected_protocol_stack[1] = lower_detected_protocol;
 }
 
 /* ********************************************************************************* */
