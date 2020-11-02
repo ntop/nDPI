@@ -1313,7 +1313,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  // end skip 'Question Name' section
 #endif
 
-	  flow->protos.dns.dns_response_complete=1;	// response headers complete!	
+	  flow->protos.dns.dns_response_complete=1;	// response headers complete initialization
       if(dns_header->num_answers > 0) {
 
 #ifdef __DNS_H__
@@ -1798,7 +1798,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 				flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
 				);
 #endif
-			DBGINFO("detected prot: %d.%d", flow->packet.detected_protocol_stack[0],flow->packet.detected_protocol_stack[1])
+			DBGINFO("detected prot: %d.%d", flow->packet.detected_protocol_stack[1],flow->packet.detected_protocol_stack[0])
 			if(flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
 				/**
 				 Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
