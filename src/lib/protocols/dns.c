@@ -611,7 +611,7 @@ struct dnsQSList_t *parseDnsQSecs(u_int8_t nitems, int *i,
 	}
 
 	*i=off;
-	DBGINFO("returning result=%u, offset=%u, list=%p", *notfound,*i, retRRList)
+	DBGINFO("returning result=%u, offset=%u, list=%p", *notfound,*i, retQSList)
 	return retQSList;
 }
 
