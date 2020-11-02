@@ -1312,9 +1312,9 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       x += 4;
 	  // end skip 'Question Name' section
 #endif
-	
+
+	  flow->protos.dns.dns_response_complete=1;	// response headers complete!	
       if(dns_header->num_answers > 0) {
-		flow->protos.dns.dns_response_complete=1;	// response headers complete!
 
 #ifdef __DNS_H__
 		
@@ -1821,8 +1821,10 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	 	}
 
 		// restore packet pointers for other dissectors
-		if ( is_tcp) restorePacketPayload(flow, &payload_offset, 0);
-		DBGTRACER("restorePacketPayload...")
+		if ( is_tcp) {
+			restorePacketPayload(flow, &payload_offset, 0);
+			DBGTRACER("restorePacketPayload...")
+		}
   	}
 
 
