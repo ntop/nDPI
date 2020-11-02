@@ -30,9 +30,9 @@ UDP messages    512 octets or less
 
 // #define DNS_DEBUG 1
 // #define DEBUG_DNS_MEMORY 1
-// #define DEBUG_DNS_MEM_POINTERS 1
-// #define DEBUG_DNS_TRACE 1
-// #define DEBUG_DNS_INFO 1
+ #define DEBUG_DNS_MEM_POINTERS 1
+ #define DEBUG_DNS_TRACE 1
+ #define DEBUG_DNS_INFO 1
 
 #ifdef DEBUG_DNS_MEM_POINTERS
 #undef DBGPOINTER
