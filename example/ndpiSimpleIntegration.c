@@ -920,14 +920,17 @@ static void ndpi_process_packet(uint8_t * const args,
                 flow_to_process->tls_server_hello_seen = 1;
             }
         } /* DNS */
-	else if(flow_to_process->detected_l7_protocol.master_protocol == NDPI_PROTOCOL_DNS ||
+	    else if( flow_to_process->detected_l7_protocol.master_protocol == NDPI_PROTOCOL_DNS ||
                 flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_DNS ||
-     	        flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_LLMNR) {
+                flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_LLMNR ||
+                flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_MDNS ) {
 			
 			char dnsResp[40]={0};
 			char dnsClss[25]={0};
 			char dnsTyp[20]={0};
 			char line[1024]={0};
+            				
+            unsigned char first=1;
 			char answerIp[1024]={0};
 			
 			if (flow_to_process->ndpi_flow->protos.dns.is_query 
@@ -943,11 +946,28 @@ static void ndpi_process_packet(uint8_t * const args,
 					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
 					flow_to_process->ndpi_flow-> host_server_name );
 
+                struct dnsQSList_t* queriesList= flow_to_process->ndpi_flow->protos.dns.dnsQueriesList;
+                if ( queriesList!=NULL ) printf("\tDNS QUERIES ---------------- \n");
+                while (queriesList!=NULL) {
+                    struct dnsQuestionSec_t* currQS = queriesList->qsItem;
+                    // printf("DNS response list item: [%p]\n",currQS);
+
+                    // dnsRData(line,sizeof(line),currQS);
+                    
+                    //          <owner> <TTL> <class> <type> 
+                    printf("\t QUERY %d %s - %s %s \n",
+                        first,
+                        currQS->questionName,
+                        dnsType(dnsTyp,sizeof(dnsTyp),currQS->query_type),
+                        dnsClass(dnsClss,sizeof(dnsClss),currQS->query_class));
+                    
+                    queriesList = queriesList->nextItem;
+                    first++;
+                };
+
                 /* if there is a flow active it needs to free eventually allocated memory of list of previous answers! */
-                if ( flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList,1);
-                if ( flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList,1);
-                if ( flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList,1);
-		
+               clear_all_dns_list(flow_to_process->ndpi_flow);
+
 			} else if ( !flow_to_process->ndpi_flow->protos.dns.is_query
                     && flow_to_process->ndpi_flow->protos.dns.dns_response_complete
                     && !flow_to_process->ndpi_flow->protos.dns.dns_response_seen ) { 
@@ -960,7 +980,27 @@ static void ndpi_process_packet(uint8_t * const args,
 					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
 					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
 					flow_to_process->ndpi_flow-> host_server_name );
-				
+                    
+                struct dnsQSList_t* queriesList= flow_to_process->ndpi_flow->protos.dns.dnsQueriesList;
+                if ( queriesList!=NULL ) printf("\tDNS QUERIES ---------------- \n");
+                while (queriesList!=NULL) {
+                    struct dnsQuestionSec_t* currQS = queriesList->qsItem;
+                    // printf("DNS response list item: [%p]\n",currQS);
+
+                    // dnsRData(line,sizeof(line),currQS);
+                    
+                    //          <owner> <TTL> <class> <type> 
+                    printf("\t QUERY %d %s - %s %s \n",
+                        first,
+                        currQS->questionName,
+                        dnsType(dnsTyp,sizeof(dnsTyp),currQS->query_type),
+                        dnsClass(dnsClss,sizeof(dnsClss),currQS->query_class));
+                    
+                    queriesList = queriesList->nextItem;
+                    first++;
+                };
+
+                first=1;                
 				struct dnsRRList_t* currList = flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList;
 				//printf("DNS response list: [%p]\n",currList);
 				if ( currList!=NULL ) printf("\tDNS ANSWER ---------------- \n");
@@ -985,7 +1025,8 @@ static void ndpi_process_packet(uint8_t * const args,
 						strncat(answerIp, line, bufsz -strlen(answerIp)-1);
 					}
                     //          <owner> <TTL> <class> <type> 
-                    printf("\t RR  %s ttl:%usec, %s %s - %s\n",
+                    printf("\t RR %d %s ttl:%usec, %s %s - %s\n",
+                        first,
                         currRR->rrName,
                         currRR->rrTTL,
                         dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
@@ -1035,10 +1076,7 @@ static void ndpi_process_packet(uint8_t * const args,
 				};
 
                 /* after seen free allocated memory of list ! */
-                if ( flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList,1);
-                if ( flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList,1);
-                if ( flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList!=NULL ) clear_dns_RR_list(&flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList,1);
-
+                clear_all_dns_list(flow_to_process->ndpi_flow);
 			}
 			// printf("host server: %s \n", flow_to_process->ndpi_flow-> host_server_name);		
 

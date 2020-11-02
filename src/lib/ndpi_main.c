@@ -6336,12 +6336,8 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       ndpi_free(flow->kerberos_buf.pktbuf);
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_DNS)) {
-      if (flow->protos.dns.dnsAnswerRRList)
-        clear_dns_RR_list(&flow->protos.dns.dnsAnswerRRList,1);      
-      if (flow->protos.dns.dnsAuthorityRRList)
-        clear_dns_RR_list(&flow->protos.dns.dnsAuthorityRRList,1);
-      if (flow->protos.dns.dnsAdditionalRRList)            	 
-        clear_dns_RR_list(&flow->protos.dns.dnsAdditionalRRList,1);
+      /* free memory of dns lists */
+      clear_all_dns_list(flow);
     } 
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
