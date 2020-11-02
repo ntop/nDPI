@@ -306,7 +306,7 @@ void clear_dns_RR_list(struct dnsRRList_t **rrList, unsigned char bForward) {
 	*rrList=NULL;
 }
 
-static void clear_all_list(struct ndpi_flow_struct *flow) {
+void clear_all_dns_list(struct ndpi_flow_struct *flow) {
 	if ( flow->protos.dns.dnsQueriesList!=NULL ) clear_dns_QS_list(&flow->protos.dns.dnsQueriesList,1);
 	if ( flow->protos.dns.dnsAnswerRRList!=NULL ) clear_dns_RR_list(&flow->protos.dns.dnsAnswerRRList,1);
 	if ( flow->protos.dns.dnsAuthorityRRList!=NULL ) clear_dns_RR_list(&flow->protos.dns.dnsAuthorityRRList,1);
@@ -1219,7 +1219,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		if ( notfound>0 || !flow->protos.dns.dnsQueriesList) {
 			ERRLOG("ID=#%02Xh, malformed/risky? queries expected:%u, current offset:%u vs packet len:%u", dns_header->tr_id, dns_header->num_queries, x, flow->packet.payload_packet_len )
 			NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-			clear_all_list(flow);
+			clear_all_dns_list(flow);
 			return(1 /* invalid */);			
 		} 
 		// for compatibility with previous code, set the following variables with the first QR, from Query Section
@@ -1247,7 +1247,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		if (notfound>0 || !flow->protos.dns.dnsAdditionalRRList) {
 			ERRLOG("ID=#%02Xh, malformed/risky? additional RR expected:%u, current offset:%u vs packet len:%u", dns_header->tr_id, dns_header->additional_rrs, x, flow->packet.payload_packet_len )			
 			NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-			clear_all_list(flow);
+			clear_all_dns_list(flow);
 			return(1 /* invalid */);			
 		}		
 	  } else
@@ -1257,7 +1257,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  ERRLOG("ID=#%02Xh, %s malformed/risky? queries_num:%u, hflag:%02xh, answer_num:%u, auth_num:%u, add_num:%u; current offset:%u vs packet len:%u ", dns_header->tr_id, (*is_query?"R":"A"), dns_header->num_queries, dns_header->flags, dns_header->num_answers, dns_header->authority_rrs, dns_header->additional_rrs, x, flow->packet.payload_packet_len)
       NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-	  clear_all_list(flow);
+	  clear_all_dns_list(flow);
       return(1 /* invalid */);
     }
 	
@@ -1291,7 +1291,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		if (notfound>0 || !flow->protos.dns.dnsQueriesList) {
 			ERRLOG("ID=#%02Xh, malformed/risky? queries expected:%u, current offset:%u vs packet len:%u", dns_header->tr_id, dns_header->num_queries, x, flow->packet.payload_packet_len )
 			NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-			clear_all_list(flow);
+			clear_all_dns_list(flow);
 			return(1 /* invalid */);			
 		}
 		
@@ -1328,7 +1328,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		if (notfound>0 || !flow->protos.dns.dnsAnswerRRList) {
 			ERRLOG("ID=#%02Xh, malformed/risky? queries expected:%u, current offset:%u vs packet len:%u", dns_header->tr_id, dns_header->num_answers, x, flow->packet.payload_packet_len )
 			NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-			clear_all_list(flow);
+			clear_all_dns_list(flow);
 			return(1 /* invalid */);			
 		}
 
@@ -1427,7 +1427,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		if (notfound>0 || !flow->protos.dns.dnsAuthorityRRList) {
 			ERRLOG("ID=#%02Xh, malformed/risky? auth RR expected:%u, current offset:%u vs packet len:%u", dns_header->tr_id, dns_header->authority_rrs, x, flow->packet.payload_packet_len )
 			NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-			clear_all_list(flow);
+			clear_all_dns_list(flow);
 			return(1 /* invalid */);			
 		}
 	  } else
@@ -1443,7 +1443,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		if (notfound>0 || !flow->protos.dns.dnsAdditionalRRList) {
 			ERRLOG("ID=#%02Xh, malformed/risky? additional RR expected:%u, current offset:%u vs packet len:%u", dns_header->tr_id, dns_header->additional_rrs, x, flow->packet.payload_packet_len )
 			NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
-			clear_all_list(flow);
+			clear_all_dns_list(flow);
 			return(1 /* invalid */);			
 		}
 		
@@ -1813,7 +1813,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 					// but do not free packet payload because it is managed in other part
 				} else {
 					// restore packet pointers and free buffer
-					clear_all_list(flow);
+					clear_all_dns_list(flow);
 					if ( is_tcp) restorePacketPayload(flow, &payload_offset, 1);					
 					NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 				}

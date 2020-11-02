@@ -392,5 +392,6 @@ typedef struct dnsRRList_t {
 /* dns support: function declared and implementated here*/
 void clear_dns_QS_list(struct dnsQSList_t **qsList, unsigned char bForward);
 void clear_dns_RR_list(struct dnsRRList_t **rrList, unsigned char bForward);
+// void clear_all_dns_list(struct ndpi_flow_struct *flow);
 
 #endif 

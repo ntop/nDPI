@@ -78,6 +78,10 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str, ndpi_p
 
 static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def, ndpi_default_ports_tree_node_t **root);
 
+
+/* from dns.c */
+extern void clear_all_dns_list(struct ndpi_flow_struct *flow);
+
 /* ****************************************** */
 
 static inline uint8_t flow_is_proto(struct ndpi_flow_struct *flow, u_int16_t p) {
@@ -3548,7 +3552,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     u_int16_t len = ntohs(iph->tot_len);
     u_int16_t hlen = (iph->ihl * 4);
 
-    l4ptr = (((const u_int8_t *) iph) + iph->ihl * 4);
+      l4ptr = (((const u_int8_t *) iph) + hlen);
 
     if(len == 0)
       len = l3_len;
