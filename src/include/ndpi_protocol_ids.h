@@ -89,7 +89,7 @@ typedef enum {
   NDPI_PROTOCOL_SOPCAST               = 57,
   NDPI_PROTOCOL_DISCORD               = 58,
   NDPI_PROTOCOL_TVUPLAYER             = 59,
-  NDPI_PROTOCOL_FREE60                = 60,
+  NDPI_PROTOCOL_MONGODB               = 60, /* Leonn Paiva <leonn.paiva@gmail.com> */
   NDPI_PROTOCOL_QQLIVE                = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_SOULSEEK              = 63,
@@ -286,7 +286,7 @@ typedef enum {
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
-#endif  
+#endif
 
   /*
     IMPORTANT
