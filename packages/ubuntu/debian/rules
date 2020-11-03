@@ -1,35 +1,50 @@
 #!/usr/bin/make -f
 
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+# Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
-DPKG_EXPORT_BUILDFLAGS = 1
+package=ndpi
 
-include /usr/share/dpkg/buildflags.mk
-include /usr/share/dpkg/pkg-info.mk
+build: build-stamp
+build-stamp:
+	dh_testdir
 
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
 
-%:
-	dh $@
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
 
-override_dh_auto_test:
-ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	cd ../../tests && LD_LIBRARY_PATH=$(CURDIR)/src/lib ./do.sh
-	cd ../../tests && LD_LIBRARY_PATH=$(CURDIR)/src/lib ./do-unit.sh
-endif
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
 
-override_dh_installdocs:
-	# FIXME: nDPI does currently not have any up2date doc
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_prep
+	#dh_clean -k
+	dh_installdirs
+	dh_installinit
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	mkdir -p ./debian/ndpi ./debian/ndpi-dev
+	cp -r ./debian/ndpi-tmp/*     ./debian/ndpi/
+	cp -r ./debian/ndpi-dev-tmp/* ./debian/ndpi-dev/
+	-find ./debian/ndpi -executable -type f | xargs strip
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
 
-override_dh_auto_install:
-	make -j1 install DESTDIR="$(CURDIR)/debian/tmp" AM_UPDATE_INFO_DIR=no
-	# ndpi package
-	mkdir -p "$(CURDIR)/debian/ndpi/usr/"
-	mv -v "$(CURDIR)/debian/tmp/usr/bin"   "$(CURDIR)/debian/ndpi/usr/"
-	mv -v "$(CURDIR)/debian/tmp/usr/lib"   "$(CURDIR)/debian/ndpi/usr/"
-	mv -v "$(CURDIR)/debian/tmp/usr/share" "$(CURDIR)/debian/ndpi/usr/"
-	# ndpi-dev package
-	mkdir -p "$(CURDIR)/debian/ndpi-dev/usr/include"
-	mv -v "$(CURDIR)/debian/tmp/usr/include/ndpi" "$(CURDIR)/debian/ndpi-dev/usr/include/"
-
-.PHONY: override_dh_auto_configure override_dh_installdocs override_dh_auto_install
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
