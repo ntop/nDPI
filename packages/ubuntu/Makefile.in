@@ -1,46 +1,17 @@
-#
-# Change it according to your setup
-#
 NDPI_HOME=$(PWD)/../..
-NDPI_BUILD=${NDPI_HOME}/packages/ubuntu
+NDPI_BUILD="$(realpath ${NDPI_HOME}/packages/ubuntu)"
 
 all: clean ndpi
 
 ndpi:
-	\rm -rf ./debian/ndpi-tmp ./debian/ndpi-dev-tmp ./debian/ndpi ./debian/ndpi-dev
-	mkdir -p ./debian/ndpi-tmp ./debian/ndpi-dev-tmp
-	mkdir -p  ./debian/ndpi-tmp/usr/lib ./debian/ndpi-tmp/usr/bin 
-	mkdir -p ./debian/ndpi-dev-tmp/usr/lib ./debian/ndpi-dev-tmp/usr/include/ndpi
-	cd ${NDPI_HOME}; ./autogen.sh; ./configure; make
-	cp $(NDPI_HOME)/src/lib/libndpi.so.@NDPI_VERS@ ./debian/ndpi-tmp/usr/lib/
-	cd ./debian/ndpi-tmp/usr/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so; cd -
-	cd ./debian/ndpi-tmp/usr/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so.@MAJOR_RELEASE@; cd -
-	cp $(NDPI_HOME)/src/lib/libndpi.a ./debian/ndpi-dev-tmp/usr/lib/
-	cp $(NDPI_HOME)/example/ndpiReader ./debian/ndpi-tmp/usr/bin/
-	cp $(NDPI_HOME)/src/include/*.h ./debian/ndpi-dev-tmp/usr/include/ndpi/
-	-rm -fr ./debian/ndpi-dev-tmp/usr/include/ndpi/ndpi_win32.h*
-	@echo
-	@find ./debian/ndpi-tmp -name "*~" -exec /bin/rm {} ';'
-	@find ./debian/ndpi-dev-tmp -name "*~" -exec /bin/rm {} ';'
-	dpkg-buildpackage -rfakeroot -d -us -uc
-	dpkg-sig --sign builder -k D1EB60BE ../ndpi*deb
-	@\rm -f ../ndpi*dsc ../ndpi*.gz ../ndpi*changes
-	@/bin/mv ../ndpi*deb .
-	@echo
-	@echo "Package built."
-	@/bin/ls ndpi*deb
-	@echo "-------------------------------"
-	-dpkg --contents ndpi_*.deb
-	@echo "-------------------------------"
-	@echo "-------------------------------"
-	-dpkg --contents ndpi-dev_*.deb
-	@echo "-------------------------------"
+	cd ${NDPI_HOME}; ./autogen.sh --prefix="/usr"; make
 
 distclean:
-	echo "dummy distclean"
+	-cd ${NDPI_HOME} && make distclean
 
 install:
-	echo "dummy install"
+	cd ${NDPI_HOME}; make install DESTDIR="${NDPI_BUILD}/debian/tmp" AM_UPDATE_INFO_DIR=no
 
 clean:
-	-rm -rf *~ *deb ./usr ./debian/ndpi ./debian/ndpi-dev ./debian/ndpi-tmp ./debian/ndpi-dev-tmp
+	-cd ${NDPI_HOME} && make clean
+	-rm -rf *~ *deb ./usr ./debian/ndpi ./debian/ndpi-dev ./debian/ndpi ./debian/ndpi-dev
