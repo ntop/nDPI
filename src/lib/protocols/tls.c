@@ -767,7 +767,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
 
-    packet->payload = p, packet->payload_packet_len = p_len; /* Restore */
+    packet->payload = p;
+    packet->payload_packet_len = p_len; /* Restore */
     flow->l4.tcp.tls.message.buffer_used -= len;
 
     if(flow->l4.tcp.tls.message.buffer_used > 0)
