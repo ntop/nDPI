@@ -740,7 +740,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
 
 	packet->payload = block;
-        packet->payload_packet_len = ndpi_min(block_len+4, flow->l4.tcp.tls.message.buffer_used);
+	packet->payload_packet_len = ndpi_min(block_len+4, flow->l4.tcp.tls.message.buffer_used);
 
 	if((processed+packet->payload_packet_len) > len) {
 	  something_went_wrong = 1;
