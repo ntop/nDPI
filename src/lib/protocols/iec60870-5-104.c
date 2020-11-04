@@ -20,8 +20,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Origianally created by Cesar HM <cesar91hoyos@gmail.com>
- *
  */
 
 #include "ndpi_protocol_ids.h"
@@ -38,27 +36,26 @@ void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search IEC60870\n");
   
   if(packet->tcp) {
-    /* The start byte of 104 is 0x68 */
-    if(packet->payload[0] == 0x68) {
-      /* 
-	 Teoretically there is a port to use but it is not compulsory
-	 to use it hence better not count on it
-      */
-#ifdef CHECK_PORT
-      u_int16_t iec104_port = htons(2404); // port used by IEC60870
-
-      if((packet->tcp->dest == iec104_port) || (packet->tcp->source == iec104_port))
-#endif
-      {
-	u_int8_t len = packet->payload[1];
-
-	if(packet->payload_packet_len == (len+2)) {
-	  NDPI_LOG_INFO(ndpi_struct, "Found IEC60870-104\n");
-
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IEC60870, NDPI_PROTOCOL_UNKNOWN);
-	  return;
-	}
-      }
+    u_int16_t offset = 0, found = 0;
+    
+    while(offset < packet->payload_packet_len) {
+      /* The start byte of 104 is 0x68 */
+      if(packet->payload[offset] == 0x68) {
+	u_int8_t len = packet->payload[offset+1];
+	
+	if(len == 0) 
+	  break;
+	else
+	  offset += len + 2, found = 1;
+      } else
+	break;
+    }
+    
+    if(found) {
+      NDPI_LOG_INFO(ndpi_struct, "Found IEC60870-104\n");
+      
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IEC60870, NDPI_PROTOCOL_UNKNOWN);
+      return;
     }
   }
   
