@@ -710,7 +710,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     content_type = flow->l4.tcp.tls.message.buffer[0];
 
     /* Overwriting packet payload */
-    p = packet->payload, p_len = packet->payload_packet_len; /* Backup */
+    p = packet->payload;
+    p_len = packet->payload_packet_len; /* Backup */
 
     if(content_type == 0x14 /* Change Cipher Spec */) {
       if(ndpi_struct->skip_tls_blocks_until_change_cipher) {
