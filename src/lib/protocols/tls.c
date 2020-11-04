@@ -151,7 +151,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 #endif
   }
 
-  if(avail_bytes >= packet->payload_packet_len) {
+  if(packet->payload_packet_len > 0 && avail_bytes >= packet->payload_packet_len) {
     memcpy(&flow->l4.tcp.tls.message.buffer[flow->l4.tcp.tls.message.buffer_used],
 	   packet->payload, packet->payload_packet_len);
 
