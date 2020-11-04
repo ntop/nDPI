@@ -142,7 +142,8 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 				 flow->l4.tcp.tls.message.buffer_len, new_len);
     if(!newbuf) return;
 
-    flow->l4.tcp.tls.message.buffer = (u_int8_t*)newbuf, flow->l4.tcp.tls.message.buffer_len = new_len;
+    flow->l4.tcp.tls.message.buffer = (u_int8_t*)newbuf;
+    flow->l4.tcp.tls.message.buffer_len = new_len;
     avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
 
 #ifdef DEBUG_TLS_MEMORY
