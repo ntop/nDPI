@@ -840,7 +840,8 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   processTLSBlock(ndpi_struct, flow);
 
-  packet->payload = p, packet->payload_packet_len = p_len; /* Restore */
+  packet->payload = p;
+  packet->payload_packet_len = p_len; /* Restore */
 
   ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
 
