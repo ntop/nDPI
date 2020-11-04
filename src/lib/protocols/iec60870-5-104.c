@@ -2,9 +2,7 @@
  * iec60870-5-104.c
  * Extension for industrial 104 protocol recognition
  *
- * Created by Cesar HM <cesar91hoyos@gmail.com>
- *
- * Copyright (C) 2019 - ntop.org
+ * Copyright (C) 2019-20 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -22,35 +20,50 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * Origianally created by Cesar HM <cesar91hoyos@gmail.com>
+ *
  */
 
 #include "ndpi_protocol_ids.h"
+
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_IEC60870
+
 #include "ndpi_api.h"
 
 void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int16_t iec104_port = htons(2404); // port used by IEC60870
 
   /* Check connection over TCP */
   NDPI_LOG_DBG(ndpi_struct, "search IEC60870\n");
   
   if(packet->tcp) {
-    /* The start byte of 104 is 0x68
-     * The usual port: 2404
-     */
-    if((packet->payload[0] == 0x68) && 
-       ((packet->tcp->dest == iec104_port) || (packet->tcp->source == iec104_port)) ){
-      NDPI_LOG_INFO(ndpi_struct, "found 104\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IEC60870, NDPI_PROTOCOL_UNKNOWN);
-      return;
+    /* The start byte of 104 is 0x68 */
+    if(packet->payload[0] == 0x68) {
+      /* 
+	 Teoretically there is a port to use but it is not compulsory
+	 to use it hence better not count on it
+      */
+#ifdef CHECK_PORT
+      u_int16_t iec104_port = htons(2404); // port used by IEC60870
+
+      if((packet->tcp->dest == iec104_port) || (packet->tcp->source == iec104_port))
+#endif
+      {
+	u_int8_t len = packet->payload[1];
+
+	if(packet->payload_packet_len == (len+2)) {
+	  NDPI_LOG_INFO(ndpi_struct, "Found IEC60870-104\n");
+
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IEC60870, NDPI_PROTOCOL_UNKNOWN);
+	  return;
+	}
+      }
     }
   }
   
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);   
 }
-
 
 
 void init_104_dissector(struct ndpi_detection_module_struct *ndpi_struct,
