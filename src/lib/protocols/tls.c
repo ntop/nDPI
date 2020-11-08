@@ -1539,7 +1539,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    /* Add check for missing SNI */
 	    if((flow->protos.stun_ssl.ssl.client_requested_server_name[0] == 0)
-	       && (flow->protos.stun_ssl.ssl.ssl_version >= 0x0302) /* TLSv1.1 */) {
+	       && (flow->protos.stun_ssl.ssl.ssl_version >= 0x0302) /* TLSv1.1 */
+	       && (flow->protos.stun_ssl.ssl.encrypted_sni.esni == NULL) /* No ESNI */
+	       ) {
 	      /* This is a bit suspicious */
 	      NDPI_SET_BIT(flow->risk, NDPI_TLS_MISSING_SNI);
 	    }
