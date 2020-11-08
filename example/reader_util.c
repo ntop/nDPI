@@ -1646,6 +1646,16 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     }
     break;
 
+  case DLT_IPV4:
+    type = ETH_P_IP;
+    ip_offset = 0;
+    break;
+
+  case DLT_IPV6:
+    type = ETH_P_IPV6;
+    ip_offset = 0;
+    break;
+
     /* IEEE 802.3 Ethernet - 1 */
   case DLT_EN10MB:
     ethernet = (struct ndpi_ethhdr *) &packet[eth_offset];
