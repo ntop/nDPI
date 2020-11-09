@@ -142,7 +142,8 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 				 flow->l4.tcp.tls.message.buffer_len, new_len);
     if(!newbuf) return;
 
-    flow->l4.tcp.tls.message.buffer = (u_int8_t*)newbuf, flow->l4.tcp.tls.message.buffer_len = new_len;
+    flow->l4.tcp.tls.message.buffer = (u_int8_t*)newbuf;
+    flow->l4.tcp.tls.message.buffer_len = new_len;
     avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
 
 #ifdef DEBUG_TLS_MEMORY
@@ -150,7 +151,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 #endif
   }
 
-  if(avail_bytes >= packet->payload_packet_len) {
+  if(packet->payload_packet_len > 0 && avail_bytes >= packet->payload_packet_len) {
     memcpy(&flow->l4.tcp.tls.message.buffer[flow->l4.tcp.tls.message.buffer_used],
 	   packet->payload, packet->payload_packet_len);
 
@@ -709,7 +710,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     content_type = flow->l4.tcp.tls.message.buffer[0];
 
     /* Overwriting packet payload */
-    p = packet->payload, p_len = packet->payload_packet_len; /* Backup */
+    p = packet->payload;
+    p_len = packet->payload_packet_len; /* Backup */
 
     if(content_type == 0x14 /* Change Cipher Spec */) {
       if(ndpi_struct->skip_tls_blocks_until_change_cipher) {
@@ -738,7 +740,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  break;
 	}
 
-	packet->payload = block, packet->payload_packet_len = ndpi_min(block_len+4, flow->l4.tcp.tls.message.buffer_used);
+	packet->payload = block;
+	packet->payload_packet_len = ndpi_min(block_len+4, flow->l4.tcp.tls.message.buffer_used);
 
 	if((processed+packet->payload_packet_len) > len) {
 	  something_went_wrong = 1;
@@ -764,7 +767,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
 
-    packet->payload = p, packet->payload_packet_len = p_len; /* Restore */
+    packet->payload = p;
+    packet->payload_packet_len = p_len; /* Restore */
     flow->l4.tcp.tls.message.buffer_used -= len;
 
     if(flow->l4.tcp.tls.message.buffer_used > 0)
@@ -836,7 +840,8 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   processTLSBlock(ndpi_struct, flow);
 
-  packet->payload = p, packet->payload_packet_len = p_len; /* Restore */
+  packet->payload = p;
+  packet->payload_packet_len = p_len; /* Restore */
 
   ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
 
