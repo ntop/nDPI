@@ -283,6 +283,7 @@ typedef enum {
   NDPI_PROTOCOL_WEBSOCKET             = 251, /* Leonn Paiva <leonn.paiva@gmail.com> */
   NDPI_PROTOCOL_ANYDESK               = 252, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_SOAP                  = 253, /* Toni Uhlig <matzeton@googlemail.com> */
+  NDPI_PROTOCOL_AMONG_US              = 254, /* Toni Uhlig <matzeton@googlemail.com> */
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
