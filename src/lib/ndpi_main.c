@@ -69,6 +69,9 @@ static void (*_ndpi_flow_free)(void *ptr);
 static void *(*_ndpi_malloc)(size_t size);
 static void (*_ndpi_free)(void *ptr);
 
+extern void add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph);
+extern uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph);
+
 /* ****************************************** */
 
 /* Forward */
@@ -3501,13 +3504,25 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
 
 static u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
   //#ifdef REQUIRE_FULL_PACKETS
-  if(ipsize < iph->ihl * 4 || ipsize < ntohs(iph->tot_len) || ntohs(iph->tot_len) < iph->ihl * 4 ||
-     (iph->frag_off & htons(0x1FFF)) != 0) {
-    return(0);
+  u_int16_t tot_len = ntohs(iph->tot_len);
+  if ( ipsize < iph->ihl * 4 || ipsize < tot_len || tot_len < iph->ihl * 4 ) 
+    // packet too small
+    return(1);
+  else if ((iph->frag_off & htons(0x2000)) != 0) {
+    // MF=1 : this is a fragment and not the last -> add to buffer
+    //printf("DBG(ndpi_iph_is_valid_and_not_fragmented): ipv4 fragment and not the last! (off=%u) \n", (htons(iph->frag_off) & 0x1FFF)<<3);
+    
+    // MUST add to buffer
+    return(3);
+  } else if ((iph->frag_off & htons(0x1FFF)) != 0) {
+    // MF=0, this is (a fragment, but) the last fragment!
+    //printf("DBG(ndpi_iph_is_valid_and_not_fragmented): ipv4 fragment and the last! (0ff=%u) \n", (htons(iph->frag_off) & 0x1FFF)<<3);
+
+    // MUST to reassemble the packet!
+    return(2);
   }
   //#endif
-
-  return(1);
+  return(0);
 }
 
 static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t *l3,
@@ -3521,10 +3536,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   const u_int8_t *l4ptr = NULL;
   u_int8_t l4protocol = 0;
 
-  if(l3 == NULL || l3_len < sizeof(struct ndpi_iphdr))
-    return(1);
-
-  if((iph = (const struct ndpi_iphdr *) l3) == NULL)
+  if((iph = (const struct ndpi_iphdr *) l3) == NULL || l3_len < sizeof(struct ndpi_iphdr))
     return(1);
 
   if(iph->version == IPVERSION && iph->ihl >= 5) {
@@ -3552,7 +3564,10 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   }
 #endif
 
-  if(iph != NULL && ndpi_iph_is_valid_and_not_fragmented(iph, l3_len)) {
+  if(iph != NULL) {
+    u_int8_t check4Frag = ndpi_iph_is_valid_and_not_fragmented(iph, l3_len);
+
+    if (!check4Frag) {
     u_int16_t len = ntohs(iph->tot_len);
     u_int16_t hlen = (iph->ihl * 4);
 
@@ -3563,6 +3578,10 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 
     l4len = (len > hlen) ? (len - hlen) : 0;
     l4protocol = iph->protocol;
+  }
+    else 
+      return check4Frag; 
+
   }
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   else if(iph_v6 != NULL && (l3_len - sizeof(struct ndpi_ipv6hdr)) >= ntohs(iph_v6->ip6_hdr.ip6_un1_plen)) {
@@ -3680,16 +3699,6 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.l4_packet_len = l4len;
   flow->l4_proto = l4protocol;
 
-  /* initialize the buffer to manage segments */
-  for (int i=0; i<2; i++ ) {
-    if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-      //printf("DBG(ndpi_init_packet_header): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
-      ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-      flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-      flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-    }
-  }
-
   /* tcp / udp detection */
   if (l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */) {
     /* tcp */
@@ -3707,6 +3716,23 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
           u_int8_t backup;
           u_int16_t backup1, backup2;
 
+        //printf("DBG(ndpi_init_packet_header): SYN packet\n");
+    
+        /* initialize the buffer to manage segments for a new http/dns connection */
+        flow->tcp_segments_management=1;
+        for (int i=0; i<2; i++ ) {
+          // reset counter tcp segments management lists 
+          flow->tcp_segments_list[i].ct_frag=0;
+          
+          if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+            //printf("DBG(ndpi_init_packet_header): freeing pointer to segment dns buffer: (%d) %p\n", i, flow->l4.tcp.dns_segments_buf[i].buffer);
+            ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
+            flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
+            flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
+          }    
+        }
+        flow->http.content_length=0;
+        
           if(flow->http.url) {
             ndpi_free(flow->http.url);
             flow->http.url = NULL;
@@ -3763,10 +3789,10 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 
 /* ************************************************ */
 
-void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
+uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 			      struct ndpi_flow_struct *flow) {
   if(!flow) {
-    return;
+    return 0;
   } else {
     /* const for gcc code optimization and cleaner code */
     struct ndpi_packet_struct *packet = &flow->packet;
@@ -3817,22 +3843,39 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	 flow->l4.tcp.seen_ack == 0) {
 	flow->l4.tcp.seen_ack = 1;
       }
-      if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0) ||
-	 (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0)) {
-	/* initialize tcp sequence counters */
-	/* the ack flag needs to be set to get valid sequence numbers from the other
-	 * direction. Usually it will catch the second packet syn+ack but it works
-	 * also for asymmetric traffic where it will use the first data packet
-	 *
-	 * if the syn flag is set add one to the sequence number,
-	 * otherwise use the payload length.
-	 */
-	if(tcph->ack != 0) {
-	  flow->next_tcp_seq_nr[flow->packet.packet_direction] =
-	    ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
 
-	  flow->next_tcp_seq_nr[1 - flow->packet.packet_direction] = ntohl(tcph->ack_seq);
-	}
+      // check sequence, if there is missing packet, add it to buffer
+      if ( check_for_sequence(flow, tcph) ) {
+        // if here added segment to list for next elaboration
+        //printf("DBG(ndpi_connection_tracking): segment bufferized...\n");
+        // skip extra processing for after...
+        return 0;
+      } 
+      
+      //printf("DBG(ndpi_connection_tracking): seq:%u, ack:%u\n", ntohl(tcph->seq),ntohl(tcph->ack_seq) );
+      //printf("DBG(ndpi_connection_tracking): next_seq:%u, next_ack:%u\n", flow->next_tcp_seq_nr[1],flow->next_tcp_seq_nr[0] );
+
+      if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0) ||
+	       (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0)) {
+        /* initialize tcp sequence counters */
+        /* the ack flag needs to be set to get valid sequence numbers from the other
+        * direction. Usually it will catch the second packet syn+ack but it works
+        * also for asymmetric traffic where it will use the first data packet
+        *
+        * if the syn flag is set add one to the sequence number,
+        * otherwise use the payload length.
+        */
+        if(tcph->ack != 0) {
+          flow->next_tcp_seq_nr[flow->packet.packet_direction] =
+            ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
+
+          flow->next_tcp_seq_nr[1 - flow->packet.packet_direction] = ntohl(tcph->ack_seq);
+
+          //printf("DBG(ndpi_connection_tracking): ACK: initial setting: next seq:%u, next ack:%u\n",flow->next_tcp_seq_nr[flow->packet.packet_direction],flow->next_tcp_seq_nr[1 - flow->packet.packet_direction] );
+
+          //fragments_wrapper_t *fragW= &flow->tcp_segments_list[flow->packet.packet_direction];
+          //fragW->initial_offset= tcph->syn ? (0xffffffff & ntohl(tcph->seq))+1 :(0xffffffff & ntohl(tcph->seq));
+        }
       } else if(packet->payload_packet_len > 0) {
 	/* check tcp sequence counters */
 	if(((u_int32_t)(ntohl(tcph->seq) - flow->next_tcp_seq_nr[packet->packet_direction])) >
@@ -3884,6 +3927,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       flow->byte_counter[packet->packet_direction] += packet->payload_packet_len;
     }
   }
+  return 1;
 }
 
 /* ************************************************ */
@@ -4267,7 +4311,7 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str, st
 
   /* detect traffic for tcp or udp only */
   flow->src = src, flow->dst = dst;
-  ndpi_connection_tracking(ndpi_str, flow);
+  if ( ndpi_connection_tracking(ndpi_str, flow) ) {
 
   /* call the extra packet function (which may add more data/info to flow) */
   if(flow->extra_packets_func) {
@@ -4277,6 +4321,7 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str, st
     if(++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)
       flow->extra_packets_func = NULL; /* Enough packets detected */
   }
+}
 }
 
 /* ********************************************************************************* */
@@ -4620,6 +4665,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   }
 
   flow->num_processed_pkts++;
+  flow->tcp_segments_management=1;
 
   /* Init default */
   ret.master_protocol = flow->detected_protocol_stack[1],
@@ -4896,6 +4942,16 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     flow->fail_with_unknown = 1;
 
  invalidate_ptr:
+  //printf("DBG(ndpi_detection_process_packet): invalidate_ptr\n");
+  //printf("DBG(ndpi_detection_process_packet): check/freeing payload (frag?%d) -> (len: %u): %p\n", flow->must_free[flow->packet.packet_direction], flow->packet.payload_packet_len,flow->packet.payload);
+  if (flow->must_free[flow->packet.packet_direction] && 
+      flow->packet.payload_packet_len>0 && flow->packet.payload) {
+    // if the payload is allocated for segments reassembling, it must be free
+    ndpi_free((void*)flow->packet.payload);
+    // flow->packet.payload=NULL; done after
+    flow->packet.payload_packet_len=0;
+    flow->must_free[flow->packet.packet_direction]=0;
+  }  
   /*
     Invalidate packet memory to avoid accessing the pointers below
     when the packet is no longer accessible
@@ -6321,15 +6377,6 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
 
-    for (int i=0; i<2; i++ ) {
-      if(flow->l4.tcp.dns_segments_buf[i].buffer) {
-        //printf("DBG(ndpi_free_flow): freeing pointer to segment buffer: %p\n", flow->l4.tcp.dns_segments_buf[i].buffer);
-        ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
-        flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
-        flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
-      }
-    }
-
     if(flow->http.url)
       ndpi_free(flow->http.url);
     if(flow->http.content_type)
@@ -6339,7 +6386,10 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 
-    if(flow_is_proto(flow, NDPI_PROTOCOL_DNS)) {
+    if(flow_is_proto(flow, NDPI_PROTOCOL_DNS)                 //  5
+      || flow_is_proto(flow, NDPI_PROTOCOL_MDNS)              //  8
+      || flow_is_proto(flow, NDPI_PROTOCOL_LLMNR)             //154
+      ) {
       /* free memory of dns lists */
       clear_all_dns_list(flow);
     } 
@@ -6366,13 +6416,25 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
       if(flow->protos.stun_ssl.ssl.encrypted_sni.esni)
         ndpi_free(flow->protos.stun_ssl.ssl.encrypted_sni.esni);
+    for (int i=0; i<2; i++ ) {
+      //printf("DBG(ndpi_free_flow): freeing %u tcp segments \n", flow->tcp_segments_list[i].ct_frag);
+      free_fragment(&flow->tcp_segments_list[i]);
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
-      if(flow->l4.tcp.tls.message.buffer)
+      if(flow->l4.tcp.tls.message.buffer) {
 	      ndpi_free(flow->l4.tcp.tls.message.buffer);
     }
 
+	for (int i=0; i<2; i++ ) {
+if(flow->l4.tcp.dns_segments_buf[i].buffer) {
+          //printf("DBG(ndpi_free_flow): freeing pointer to segment dns buffer: (%d) %p\n", i, flow->l4.tcp.dns_segments_buf[i].buffer);
+          ndpi_free(flow->l4.tcp.dns_segments_buf[i].buffer);
+          flow->l4.tcp.dns_segments_buf[i].buffer=NULL;
+          flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
+        }
+      } 
+	}
     ndpi_free(flow);
   }
 }
