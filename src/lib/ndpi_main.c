@@ -1141,9 +1141,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, no_master, "Guildwars", NDPI_PROTOCOL_CATEGORY_GAME,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE110,
-			  1 /* can_have_a_subprotocol */, no_master, no_master, "FREE110",
-			  NDPI_PROTOCOL_CATEGORY_CLOUD, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AMAZON_ALEXA,
+			  1 /* can_have_a_subprotocol */, no_master, no_master, "AmazonAlexa",
+			  NDPI_PROTOCOL_CATEGORY_VOCAL_ASSISTANT, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_KERBEROS, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Kerberos", NDPI_PROTOCOL_CATEGORY_NETWORK,
@@ -1894,7 +1894,7 @@ static const char *categories[] = {
   "FileSharing",
   "ConnectivityCheck",
   "IoT-Scada",
-  "",
+  "VocalAssistant",
   "",
   "",
   "",

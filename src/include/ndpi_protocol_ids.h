@@ -139,7 +139,7 @@ typedef enum {
   NDPI_PROTOCOL_FIESTA                = 107,
   NDPI_PROTOCOL_FLORENSIA             = 108,
   NDPI_PROTOCOL_GUILDWARS             = 109,
-  NDPI_PROTOCOL_FREE110               = 110, /* Free */
+  NDPI_PROTOCOL_AMAZON_ALEXA          = 110, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_KERBEROS              = 111,
   NDPI_PROTOCOL_LDAP                  = 112,
   NDPI_PROTOCOL_MAPLESTORY            = 113,
