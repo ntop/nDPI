@@ -1,5 +1,5 @@
 Unknown	304	72496	2
-DNS	10	1000	5
+DNS	8	716	4
 MDNS	282	60976	9
 NetBIOS	3	276	1
 SSDP	15	2709	5
@@ -11,6 +11,7 @@ Google	6	5708	2
 Spotify	9	742	2
 OpenVPN	2	212	1
 Telegram	908	185304	12
+Microsoft	2	284	1
 GoogleServices	2	186	1
 
 	1	UDP 192.168.1.77:28150 <-> 91.108.8.1:533 [proto: 185/Telegram][cat: Chat/9][12 pkts/1272 bytes <-> 276 pkts/68136 bytes][Goodput ratio: 60/83][16.92 sec][bytes ratio: -0.963 (Download)][IAT c2s/s2c min/avg/max/stddev: 48/0 290/61 504/476 186/43][Pkt Len c2s/s2c min/avg/max/stddev: 74/90 106/247 138/330 24/241][PLAIN TEXT (ByFasn)][Plen Bins: 0,2,4,3,0,19,37,21,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -45,7 +46,7 @@ GoogleServices	2	186	1
 	30	UDP 192.168.1.53:54306 -> 239.255.255.250:1900 [proto: 12/SSDP][cat: System/18][2 pkts/336 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][2.00 sec][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	UDP 192.168.1.77:5353 -> 192.168.1.53:5353 [proto: 8/MDNS][cat: Network/14][1 pkts/320 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][< 1 sec][Host: _companion-link._tcp.local][_companion-link._tcp.local][PLAIN TEXT (companion)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 192.168.1.77:54595 <-> 192.168.1.1:53 [proto: 5.26/DNS.ntop][cat: Network/14][2 pkts/166 bytes <-> 1 pkts/136 bytes][Goodput ratio: 49/69][8.49 sec][Host: b._dns-sd._udp.ntop.org][::][PLAIN TEXT (postmaster)][Plen Bins: 0,66,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	33	UDP 192.168.1.77:52118 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/75 bytes <-> 1 pkts/209 bytes][Goodput ratio: 43/80][0.01 sec][Host: in.appcenter.ms][20.44.78.251][PLAIN TEXT (appcenter)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	33	UDP 192.168.1.77:52118 <-> 192.168.1.1:53 [proto: 5.212/DNS.Microsoft][cat: Cloud/13][1 pkts/75 bytes <-> 1 pkts/209 bytes][Goodput ratio: 43/80][0.01 sec][Host: in.appcenter.ms][20.44.78.251][PLAIN TEXT (appcenter)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	UDP 192.168.1.77:137 -> 192.168.1.255:137 [proto: 10/NetBIOS][cat: System/18][3 pkts/276 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][< 1 sec][Host: workgroup][PLAIN TEXT ( FHEPFCELEHFCEPFFFACACACACACACA)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	35	UDP 192.168.1.43:138 -> 192.168.1.255:138 [proto: 10.16/NetBIOS.SMBv1][cat: System/18][1 pkts/243 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][< 1 sec][Host: desktop-rb5t12g][Risk: ** Unsafe Protocol **][PLAIN TEXT ( EEEFFDELFEEPFACNFCECDFFEDBDCEH)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	36	UDP 192.168.1.77:23174 -> 87.11.205.195:60723 [proto: 159/OpenVPN][cat: VPN/2][2 pkts/212 bytes -> 0 pkts/0 bytes][Goodput ratio: 60/0][1.50 sec][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
