@@ -8875,6 +8875,7 @@ static ndpi_protocol_match host_match[] =
    { "itunes-apple.com",                     "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
    { "itunes.apple.com",                   "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { "tlnk.io",         	                      "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "guzzoni.apple.",         	   "AppleSiri",      NDPI_PROTOCOL_APPLE_SIRI, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
    { ".wbagora.com",                              "Playstation",      NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_UNRATED },
    { ".wbplay.com",                                "Playstation",      NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_UNRATED },
    { ".xbox.com",                                    "Xbox",             NDPI_PROTOCOL_XBOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
