@@ -212,7 +212,7 @@ typedef enum {
   NDPI_PROTOCOL_CNN                   = 180, /* Tomasz Bujlow <tomasz@skatnet.dk> */
   NDPI_PROTOCOL_MEGACO                = 181, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_REDIS                 = 182,
-  NDPI_PROTOCOL_FREE_183              = 183,
+  NDPI_PROTOCOL_PINTEREST             = 183, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_VHUA                  = 184,
   NDPI_PROTOCOL_TELEGRAM              = 185, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_VEVO                  = 186,
