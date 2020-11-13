@@ -9129,9 +9129,21 @@ static ndpi_protocol_match host_match[] =
 
    { ".vevo.com",                                  "Vevo",             NDPI_PROTOCOL_VEVO,    NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
 
-   { ".spotify.",                               "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
-   { "audio-fa.scdn.co",                   "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
-   { "spotifycdn.net",                   "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { ".spotify.com",                            "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { ".scdn.co",                                "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { ".pscdn.co",                               "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotifycdn.net",                          "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotifycdn.com",                          "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "audio4-ak-spotify-com.akamaized.net",     "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "audio-ak-spotify-com.akamaized.net",      "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "heads-ak-spotify-com.akamaized.net",      "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotify-com.akamaized.net",               "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotify.com.edgesuite.net",               "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotify.map.fastly.net",                  "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotify.edgekey.net",                     "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { "spotify.demdex.net",                      "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+   { ".spotilocal.com",                         "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN },
+
 
    { "edge-mqtt.facebook.com",        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
    { "mqtt-mini.facebook.com",        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE }, /* Messenger Lite */
