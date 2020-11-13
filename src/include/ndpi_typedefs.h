@@ -935,7 +935,7 @@ typedef enum {
 	      /*
 		 The category below is used for vocal assistance services.
 	       */
-	      NDPI_PROTOCOL_CATEGORY_VOCAL_ASSISTANT,
+	      NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT,
 
 	      /* Some custom categories */
 	      CUSTOM_CATEGORY_MINING           = 99,
