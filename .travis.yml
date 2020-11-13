@@ -193,9 +193,9 @@ before_script:
 #  - lcov --directory . --zerocounters
 
 script:
-  - if [ -n "${QA_FUZZ}" ]; then ./configure --enable-fuzztargets ; else \
+  - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else
     ./configure ; fi
-  - if [ -n "${BUILD_DPKG_PACKAGE}" ]; then cd ./packages/ubuntu ; \
+  - if [ -n "$BUILD_DPKG_PACKAGE" ]; then cd ./packages/ubuntu ;
     ./configure && dpkg-buildpackage -b -us -uc ; cd ../.. ; fi
   - make
   - make -C example ndpiSimpleIntegration

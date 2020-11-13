@@ -782,6 +782,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  NDPI_PROTOCOL_CATEGORY_RPC,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_AMONG_US, 1 /* no subprotocol */,
+			  no_master, no_master, "AmongUs", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 22023, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_NTOP, 0 /* can_have_a_subprotocol */, no_master,
 			  no_master, "ntop", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -939,11 +943,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  no_master, no_master, "TVUplayer", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE60,
-			  1 /* can_have_a_subprotocol */, no_master, no_master, "FREE60",
-			  NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_QQLIVE, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "QQLive", NDPI_PROTOCOL_CATEGORY_VIDEO,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -972,10 +971,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UNENCRYPTED_JABBER,
 			  0 /* can_have_a_subprotocol */, no_master, no_master, "Unencrypted_Jabber",
 			  NDPI_PROTOCOL_CATEGORY_WEB, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_69, 0 /* can_have_a_subprotocol */,
-			  no_master, no_master, "Free69", NDPI_PROTOCOL_CATEGORY_CHAT,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_71, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Free71", NDPI_PROTOCOL_CATEGORY_GAME,
@@ -1517,6 +1512,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOAP, 1 /* no subprotocol */,
 			  no_master, no_master, "SOAP", NDPI_PROTOCOL_CATEGORY_RPC,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MONGODB, 1 /* no subprotocol */,
+			  no_master, no_master, "MongoDB", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 27017, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -3361,6 +3360,11 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* DNScrypt */
   init_dnscrypt_dissector(ndpi_str, &a, detection_bitmask);
+
+  /* MongoDB */
+  init_mongodb_dissector(ndpi_str, &a, detection_bitmask);
+
+  init_among_us_dissector(ndpi_str, &a, detection_bitmask);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
@@ -6342,7 +6346,6 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {
-
       if(flow->protos.stun_ssl.ssl.server_names)
         ndpi_free(flow->protos.stun_ssl.ssl.server_names);
 
@@ -6366,10 +6369,8 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
-
       if(flow->l4.tcp.tls.message.buffer)
 	      ndpi_free(flow->l4.tcp.tls.message.buffer);
-
     }
 
     ndpi_free(flow);

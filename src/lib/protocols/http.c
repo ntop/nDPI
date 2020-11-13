@@ -388,12 +388,15 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow,
 				  char *ip, u_int ip_len) {
-  char buf[22];
+  char buf[22], *double_dot;
   struct in_addr ip_addr;
 
   strncpy(buf, ip, ip_len);
   buf[ip_len] = '\0';
 
+  if((double_dot = strchr(buf, ':')) != NULL)
+    double_dot[0] = '\0';
+  
   ip_addr.s_addr = inet_addr(buf);
   if(strcmp(inet_ntoa(ip_addr), buf) == 0)
     NDPI_SET_BIT(flow->risk, NDPI_HTTP_NUMERIC_IP_HOST);

@@ -1548,7 +1548,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
 					       const u_char *packet,
-                           FILE * csv_fp) {
+					       FILE * csv_fp) {
   /*
    * Declare pointers to packet headers
    */
@@ -1652,6 +1652,16 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       ip_offset = 2;
       type = ntohs(*((u_int16_t*)&packet[eth_offset]));
     }
+    break;
+
+  case DLT_IPV4:
+    type = ETH_P_IP;
+    ip_offset = 0;
+    break;
+
+  case DLT_IPV6:
+    type = ETH_P_IPV6;
+    ip_offset = 0;
     break;
 
     /* IEEE 802.3 Ethernet - 1 */
@@ -1833,16 +1843,20 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   } else if(iph->version == 6) {
     if(header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr))
       return(nproto); /* Too short for IPv6 header*/
+    
     iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
     proto = iph6->ip6_hdr.ip6_un1_nxt;
     ip_len = ntohs(iph6->ip6_hdr.ip6_un1_plen);
+
     if(header->caplen < (ip_offset + sizeof(struct ndpi_ipv6hdr) + ntohs(iph6->ip6_hdr.ip6_un1_plen)))
       return(nproto); /* Too short for IPv6 payload*/
 
     const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
+
     if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &proto) != 0) {
       return(nproto);
     }
+
     if(proto == IPPROTO_IPV6 || proto == IPPROTO_IPIP) {
       if(l4ptr > packet) { /* Better safe than sorry */
         ip_offset = (l4ptr - packet);
@@ -1861,6 +1875,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 		 "\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
       ipv4_warning_used = 1;
     }
+    
     workflow->stats.total_discarded_bytes +=  header->len;
     return(nproto);
   }

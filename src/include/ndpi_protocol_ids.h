@@ -89,7 +89,7 @@ typedef enum {
   NDPI_PROTOCOL_SOPCAST               = 57,
   NDPI_PROTOCOL_DISCORD               = 58,
   NDPI_PROTOCOL_TVUPLAYER             = 59,
-  NDPI_PROTOCOL_FREE60                = 60,
+  NDPI_PROTOCOL_MONGODB               = 60, /* Leonn Paiva <leonn.paiva@gmail.com> */
   NDPI_PROTOCOL_QQLIVE                = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_SOULSEEK              = 63,
@@ -98,7 +98,7 @@ typedef enum {
   NDPI_PROTOCOL_AYIYA                 = 66,
   NDPI_PROTOCOL_UNENCRYPTED_JABBER    = 67,
   NDPI_PROTOCOL_NATS                  = 68,
-  NDPI_PROTOCOL_FREE_69               = 69, /* Free */
+  NDPI_PROTOCOL_AMONG_US              = 69, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_YAHOO                 = 70,
   NDPI_PROTOCOL_FREE_71               = 71, /* Free */
   NDPI_PROTOCOL_GOOGLE_PLUS           = 72,
@@ -284,9 +284,10 @@ typedef enum {
   NDPI_PROTOCOL_ANYDESK               = 252, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_SOAP                  = 253, /* Toni Uhlig <matzeton@googlemail.com> */
 
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
-#endif  
+#endif
 
   /*
     IMPORTANT

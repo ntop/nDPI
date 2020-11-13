@@ -1,0 +1,14 @@
+Unknown	3	230	1
+MongoDB	24	2510	7
+
+	1	TCP 10.10.10.16:51358 <-> 10.10.10.17:27017 [VLAN: 100][proto: 60/MongoDB][cat: Database/11][3 pkts/491 bytes <-> 1 pkts/78 bytes][Goodput ratio: 55/0][0.00 sec][PLAIN TEXT (admin.)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 10.10.10.10:51822 <-> 10.10.10.11:27017 [VLAN: 300][proto: 60/MongoDB][cat: Database/11][3 pkts/469 bytes <-> 1 pkts/78 bytes][Goodput ratio: 53/0][0.34 sec][PLAIN TEXT (admin.)][Plen Bins: 0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 10.10.10.18:64566 <-> 10.10.10.19:30000 [VLAN: 300][proto: 60/MongoDB][cat: Database/11][3 pkts/295 bytes <-> 1 pkts/78 bytes][Goodput ratio: 25/0][0.10 sec][PLAIN TEXT (InactiveUserIdentity.)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 10.10.10.12:55582 <-> 10.10.10.13:27017 [VLAN: 300][proto: 60/MongoDB][cat: Database/11][3 pkts/281 bytes <-> 1 pkts/78 bytes][Goodput ratio: 21/0][0.16 sec][PLAIN TEXT (abtest.)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	TCP 10.10.10.14:61503 <-> 10.10.10.15:27017 [VLAN: 100][proto: 60/MongoDB][cat: Database/11][3 pkts/280 bytes <-> 1 pkts/78 bytes][Goodput ratio: 21/0][0.01 sec][PLAIN TEXT (admin.)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	TCP 10.10.10.10:51822 -> 10.10.10.11:27017 [VLAN: 50][proto: 60/MongoDB][cat: Database/11][2 pkts/152 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][0.34 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	TCP 10.10.10.12:55582 -> 10.10.10.13:27017 [VLAN: 50][proto: 60/MongoDB][cat: Database/11][2 pkts/152 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][0.16 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	TCP 10.10.10.18:64566 <-> 10.10.10.19:30000 [VLAN: 50][proto: 0/Unknown][2 pkts/152 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][0.10 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
