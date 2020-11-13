@@ -69,6 +69,9 @@ static void (*_ndpi_flow_free)(void *ptr);
 static void *(*_ndpi_malloc)(size_t size);
 static void (*_ndpi_free)(void *ptr);
 
+extern void add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph);
+extern uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph);
+
 /* ****************************************** */
 
 /* Forward */
