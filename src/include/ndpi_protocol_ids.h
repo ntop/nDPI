@@ -119,7 +119,7 @@ typedef enum {
   NDPI_PROTOCOL_RTP                   = 87,
   NDPI_PROTOCOL_RDP                   = 88,
   NDPI_PROTOCOL_VNC                   = 89,
-  NDPI_PROTOCOL_FREE90                = 90, /* Free */
+  NDPI_PROTOCOL_TUMBLR                = 90, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_TLS                   = 91,
   NDPI_PROTOCOL_SSH                   = 92,
   NDPI_PROTOCOL_USENET                = 93,

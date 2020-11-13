@@ -9328,7 +9328,11 @@ static ndpi_protocol_match host_match[] =
    { "discord.com",                  "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
    { "discord.gg",                   "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
    { "discord.media",                "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
-   
+
+   /*
+     Tumblr social network service
+   */
+   { "tumblr.com",                   "Tumblr",        NDPI_PROTOCOL_TUMBLR, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE }
   };
