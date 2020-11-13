@@ -407,7 +407,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 #endif
 
   if(flow->l4.tcp.ssh_stage == 0) {
-    if(packet->payload_packet_len > 7 && packet->payload_packet_len < 100
+    if(packet->payload_packet_len > 7
        && memcmp(packet->payload, "SSH-", 4) == 0) {
       int len = ndpi_min(sizeof(flow->protos.ssh.client_signature)-1, packet->payload_packet_len);
       

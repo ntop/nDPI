@@ -38,6 +38,8 @@
 #include <float.h>
 #endif
 
+#include "reader_util.h"
+
 #ifndef ETH_P_IP
 #define ETH_P_IP               0x0800 	/* IPv4 */
 #endif
@@ -77,11 +79,6 @@
 #define DLT_LINUX_SLL  113
 #endif
 
-#define PLEN_MAX         1504
-#define PLEN_BIN_LEN     32
-#define PLEN_NUM_BINS    48 /* 47*32 = 1504 */
-#define MAX_NUM_BIN_PKTS 256
-
 #include "ndpi_main.h"
 #include "reader_util.h"
 #include "ndpi_classify.h"
@@ -91,6 +88,7 @@ extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 8 */, max_num_tcp_dissected_pkts /* 10 */;
 static u_int32_t flow_id = 0;
 
+u_int8_t enable_doh_dot_detection = 0;
 /* ****************************************************** */
 
 struct flow_id_stats {
@@ -1075,7 +1073,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {
-    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->host_server_name);
+    char *name = (char*)flow->ndpi_flow->host_server_name; /* Trick to avoid warning(s) */
+    snprintf(flow->info, sizeof(flow->info), "%s", name);
   }
   /* UBNTAC2 */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_UBNTAC2)) {
@@ -1212,16 +1211,17 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
     }
 
-#ifdef USE_TLS_LEN
-    /* For TLS we use TLS block lenght instead of payload lenght */
-    ndpi_reset_bin(&flow->payload_len_bin);
-    
-    for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
-      u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_application_blocks_len[i]);
-      printf("%u\n", len);
-      ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+    if(enable_doh_dot_detection) {
+      /* For TLS we use TLS block lenght instead of payload lenght */
+      ndpi_reset_bin(&flow->payload_len_bin);
+      
+      for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
+	u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_application_blocks_len[i]);
+	
+	/* printf("[TLS_LEN] %u\n", len); */
+	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+      }
     }
-#endif
   }
 
   if(flow->detection_completed && (!flow->check_extra_packets)) {
@@ -1540,7 +1540,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
 					       const u_char *packet,
-                           FILE * csv_fp) {
+					       FILE * csv_fp) {
   /*
    * Declare pointers to packet headers
    */
@@ -1636,9 +1636,24 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     /* Cisco PPP - 9 or 104 */
   case DLT_C_HDLC:
   case DLT_PPP:
-    chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
-    ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
-    type = ntohs(chdlc->proto_code);
+    if(packet[0] == 0x0f || packet[0] == 0x8f) {
+      chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
+      ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+      type = ntohs(chdlc->proto_code);
+    } else {
+      ip_offset = 2;
+      type = ntohs(*((u_int16_t*)&packet[eth_offset]));
+    }
+    break;
+
+  case DLT_IPV4:
+    type = ETH_P_IP;
+    ip_offset = 0;
+    break;
+
+  case DLT_IPV6:
+    type = ETH_P_IPV6;
+    ip_offset = 0;
     break;
 
     /* IEEE 802.3 Ethernet - 1 */
@@ -1820,16 +1835,20 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   } else if(iph->version == 6) {
     if(header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr))
       return(nproto); /* Too short for IPv6 header*/
+    
     iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
     proto = iph6->ip6_hdr.ip6_un1_nxt;
     ip_len = ntohs(iph6->ip6_hdr.ip6_un1_plen);
+
     if(header->caplen < (ip_offset + sizeof(struct ndpi_ipv6hdr) + ntohs(iph6->ip6_hdr.ip6_un1_plen)))
       return(nproto); /* Too short for IPv6 payload*/
 
     const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
+
     if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &proto) != 0) {
       return(nproto);
     }
+
     if(proto == IPPROTO_IPV6 || proto == IPPROTO_IPIP) {
       if(l4ptr > packet) { /* Better safe than sorry */
         ip_offset = (l4ptr - packet);
@@ -1848,6 +1867,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 		 "\n\nWARNING: only IPv4/IPv6 packets are supported in this demo (nDPI supports both IPv4 and IPv6), all other packets will be discarded\n\n");
       ipv4_warning_used = 1;
     }
+    
     workflow->stats.total_discarded_bytes +=  header->len;
     return(nproto);
   }
@@ -1929,7 +1949,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	    }
 	  }
 	}
-      } else if(sport == NDPI_CAPWAP_DATA_PORT) {
+      } else if((sport == NDPI_CAPWAP_DATA_PORT) || (dport == NDPI_CAPWAP_DATA_PORT)) {
 	/* We dissect ONLY CAPWAP traffic */
 	u_int offset           = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
 
@@ -1941,9 +1961,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
 	    offset += msg_len;
 
-	    if((offset + 32 < header->caplen) && (packet[offset] == 0x02)) {
+	    if((offset + 32 < header->caplen)) {
 	      /* IEEE 802.11 Data */
-
 	      offset += 24;
 	      /* LLC header is 8 bytes */
 	      type = ntohs((u_int16_t)*((u_int16_t*)&packet[offset+6]));

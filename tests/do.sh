@@ -3,7 +3,6 @@
 cd "$(dirname "${0}")"
 
 READER="../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
-UNIT="./unit/unit"
 
 RC=0
 PCAPS=`cd pcap; /bin/ls *.pcap`
@@ -46,30 +45,8 @@ check_results() {
     done
 }
 
-check_unit() {
-
-    case "$CXXFLAGS" in
-	# Skipping tests with sanitizer enabled due to use-of-uninitialized-value in json-c
-	*sanitize* )
-	    echo "Skipping unit tests for this environment"
-	    return
-	    ;;
-	* )
-	    echo ""
-	    echo "Running unit tests.."
-	    ;;
-    esac
-
-    $UNIT
-    UNIT_RC=$?
-    if [ $UNIT_RC -ne 0 ]; then
-	RC=1
-    fi
-}
-
 fuzzy_testing
 build_results
 check_results
-check_unit
 
 exit $RC

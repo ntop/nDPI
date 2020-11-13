@@ -66,7 +66,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 
   /* this detection also works for asymmetric dhcp traffic */
 
-  /*check standard DHCP 0.0.0.0:68 -> 255.255.255.255:67 */
+  /* check standard DHCP 0.0.0.0:68 -> 255.255.255.255:67 */
   if(packet->udp) {
     dhcp_packet_t *dhcp = (dhcp_packet_t*)packet->payload;
 

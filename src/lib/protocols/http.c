@@ -32,6 +32,10 @@ static const char* binary_file_mimes_e[] = { "exe", NULL };
 static const char* binary_file_mimes_v[] = { "vnd.ms-cab-compressed", "vnd.microsoft.portable-executable", NULL };
 static const char* binary_file_mimes_x[] = { "x-msdownload", "x-dosexec", NULL };
 
+static const char* download_file_mimes_b[] = { "bz", "bz2", NULL };
+static const char* download_file_mimes_o[] = { "octet-stream", NULL };
+static const char* download_file_mimes_x[] = { "x-tar", "x-zip", "x-bzip", NULL };
+
 #define ATTACHMENT_LEN    3
 static const char* binary_file_ext[] = {
 					"exe",
@@ -113,7 +117,27 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	const char** cmp_mimes = NULL;
 
 	switch(app[0]) {
-	case 'e': cmp_mimes = binary_file_mimes_e; break;
+	case 'b': cmp_mimes = download_file_mimes_b; break;
+	case 'o': cmp_mimes = download_file_mimes_o; break;	  
+	case 'x': cmp_mimes = download_file_mimes_x; break;
+	}
+
+	if(cmp_mimes != NULL) {
+	  u_int8_t i;
+
+	  for(i = 0; cmp_mimes[i] != NULL; i++) {
+	    if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
+	      flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
+	      NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
+	      break;
+	    }
+	  }
+	}
+
+	/* ***************************************** */
+	
+	switch(app[0]) {
+	case 'e': cmp_mimes = binary_file_mimes_e; break;	  
 	case 'v': cmp_mimes = binary_file_mimes_v; break;
 	case 'x': cmp_mimes = binary_file_mimes_x; break;
 	}
@@ -364,12 +388,15 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow,
 				  char *ip, u_int ip_len) {
-  char buf[22];
+  char buf[22], *double_dot;
   struct in_addr ip_addr;
 
   strncpy(buf, ip, ip_len);
   buf[ip_len] = '\0';
 
+  if((double_dot = strchr(buf, ':')) != NULL)
+    double_dot[0] = '\0';
+  
   ip_addr.s_addr = inet_addr(buf);
   if(strcmp(inet_ntoa(ip_addr), buf) == 0)
     NDPI_SET_BIT(flow->risk, NDPI_HTTP_NUMERIC_IP_HOST);

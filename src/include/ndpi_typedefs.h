@@ -782,6 +782,7 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
+  u_int8_t skype_crc[4];
 
   /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage;
@@ -972,7 +973,7 @@ typedef enum {
 
 typedef enum {
    ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_enable_tls_block_dissection
+   ndpi_pref_enable_tls_block_dissection /* nDPI considers only those blocks past the certificate exchange */
 } ndpi_detection_preference;
 
 /* ntop extensions */
@@ -1039,6 +1040,7 @@ struct ndpi_detection_module_struct {
   u_int32_t current_ts;
   u_int32_t ticks_per_second;
   u_int16_t num_tls_blocks_to_follow;
+  u_int8_t skip_tls_blocks_until_change_cipher:1, _notused:7;
   
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
@@ -1459,7 +1461,9 @@ typedef enum {
   ndpi_serialization_float,
   ndpi_serialization_string,
   ndpi_serialization_start_of_block,
-  ndpi_serialization_end_of_block
+  ndpi_serialization_end_of_block,
+  ndpi_serialization_start_of_list,
+  ndpi_serialization_end_of_list
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024

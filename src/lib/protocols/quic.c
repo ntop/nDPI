@@ -856,12 +856,21 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   pn_offset += quic_len(&packet->payload[pn_offset], &token_length);
   pn_offset += token_length;
   /* Checks: quic_len reads 8 bytes, at most; quic_decrypt_header reads other 20 bytes */
-  if(pn_offset + 8 + (4 + 16) >= packet->payload_packet_len)
+  if(pn_offset + 8 + (4 + 16) >= packet->payload_packet_len) {
+    quic_cipher_reset(&cipher);
     return NULL;
+  }
   pn_offset += quic_len(&packet->payload[pn_offset], &payload_length);
 
   NDPI_LOG_DBG2(ndpi_struct, "pn_offset %d token_length %d payload_length %d\n",
 		pn_offset, token_length, payload_length);
+
+  if (pn_offset + payload_length > packet->payload_packet_len) {
+    NDPI_LOG_DBG(ndpi_struct, "Too short %d %d\n", pn_offset + payload_length,
+                 packet->payload_packet_len);
+    quic_cipher_reset(&cipher);
+    return NULL;
+  }
 
   if(!quic_decrypt_header(&packet->payload[0], pn_offset, cipher.hp_cipher,
 			  GCRY_CIPHER_AES128, &first_byte, &pkn32)) {
@@ -875,7 +884,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   packet_number = pkn32;
 
   offset = pn_offset + pkn_len;
-  quic_decrypt_message(&cipher, &packet->payload[0], packet->payload_packet_len,
+  quic_decrypt_message(&cipher, &packet->payload[0], pn_offset + payload_length,
 		       offset, first_byte, pkn_len, packet_number, &decryption);
 
   quic_cipher_reset(&cipher);

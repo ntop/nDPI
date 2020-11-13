@@ -949,55 +949,393 @@ extern "C" {
 			  struct ndpi_flow_struct *flow,
 			  char *name, u_int8_t is_hostname);
 
-  /* Serializer */
-  int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt,
-			      u_int32_t buffer_size);
+  /* Serializer (supports JSON, TLV, CSV) */
+
+  /**
+   * Initialize a serializer handle (allocated by the caller).
+   * @param serializer The serializer handle 
+   * @param fmt The serialization format (ndpi_serialization_format_json, ndpi_serialization_format_tlv, ndpi_serialization_format_csv)
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_init_serializer(ndpi_serializer *serializer, ndpi_serialization_format fmt);
+
+  /**
+   * Initialize a serializer handle. Same as ndpi_init_serializer, but with some low-level settings.
+   * @param serializer The serializer handle 
+   * @param fmt The serialization format (ndpi_serialization_format_json, ndpi_serialization_format_tlv, ndpi_serialization_format_csv)
+   * @param buffer_size The initial internal buffer_size
+   * @return 0 on success, a negative number otherwise 
+   */
+  int ndpi_init_serializer_ll(ndpi_serializer *serializer, ndpi_serialization_format fmt, u_int32_t buffer_size);
+
+  /**
+   * Release all allocated data structure.
+   * @param serializer The serializer handle 
+   */
   void ndpi_term_serializer(ndpi_serializer *serializer);
+
+  /**
+   * Reset the serializer (cleanup the internal buffer to start a new serialization)
+   * @param serializer The serializer handle 
+   */
   void ndpi_reset_serializer(ndpi_serializer *serializer);
 
+  /**
+   * Serialize a 32-bit unsigned int key and a 32-bit unsigned int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_uint32_uint32(ndpi_serializer *serializer, u_int32_t key, u_int32_t value);
+
+  /**
+   * Serialize a 32-bit unsigned int key and a 64-bit unsigned int value 
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_uint32_uint64(ndpi_serializer *serializer, u_int32_t key, u_int64_t value);
+
+  /**
+   * Serialize a 32-bit unsigned int key and a 32-bit signed int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_uint32_int32(ndpi_serializer *serializer, u_int32_t key, int32_t value);
+
+  /**
+   * Serialize a 32-bit unsigned int key and a 64-bit signed int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_uint32_int64(ndpi_serializer *serializer, u_int32_t key, int64_t value);
+
+  /**
+   * Serialize a 32-bit unsigned int key and a float value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @param format The float value format
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_uint32_float(ndpi_serializer *serializer, u_int32_t key, float value, const char *format /* e.f. "%.2f" */);
+
+  /**
+   * Serialize a 32-bit unsigned int key and a string value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_uint32_string(ndpi_serializer *serializer, u_int32_t key, const char *value);
+
+  /**
+   * Serialize a 32-bit unsigned int key and a boolean value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_uint32_boolean(ndpi_serializer *serializer, u_int32_t key, u_int8_t value);
+
+  /**
+   * Serialize an unterminated string key and a 32-bit signed int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_binary_int32(ndpi_serializer *_serializer, const char *key, u_int16_t klen, int32_t value);
+
+  /**
+   * Serialize a string key and a 32-bit signed int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_int32(ndpi_serializer *serializer, const char *key, int32_t value);
+
+  /**
+   * Serialize an unterminated string key and a 64-bit signed int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_binary_int64(ndpi_serializer *_serializer, const char *key, u_int16_t klen, int64_t value);
+
+  /**
+   * Serialize a string key and a 64-bit signed int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_int64(ndpi_serializer *serializer, const char *key, int64_t value);
+
+  /**
+   * Serialize an unterminated string key and a 32-bit unsigned int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_binary_uint32(ndpi_serializer *_serializer, const char *key, u_int16_t klen, u_int32_t value);
+
+  /**
+   * Serialize a string key and a 32-bit unsigned int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_uint32(ndpi_serializer *serializer, const char *key, u_int32_t value);
+
+  /**
+   * Serialize a string key and a float value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @param format The float format
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_uint32_format(ndpi_serializer *serializer, const char *key, u_int32_t value, const char *format);
+
+  /**
+   * Serialize an unterminated string key and a 64-bit unsigned int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_binary_uint64(ndpi_serializer *_serializer, const char *key, u_int16_t klen, u_int64_t value);
+
+  /**
+   * Serialize a string key and a 64-bit unsigned int value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_uint64(ndpi_serializer *serializer, const char *key, u_int64_t value);
+
+  /**
+   * Serialize an unterminated string key and an unterminated string value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @param value The field value
+   * @param vlen The value length
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_binary_binary(ndpi_serializer *_serializer, const char *key, u_int16_t klen, const char *_value, u_int16_t vlen);
+
+  /**
+   * Serialize a string key and a string value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_string(ndpi_serializer *serializer, const char *key, const char *value);
+
+  /**
+   * Serialize a string key and an unterminated string value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @param vlen The value length
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_binary(ndpi_serializer *serializer, const char *key, const char *_value, u_int16_t vlen);
+
+  /**
+   * Serialize a string key and a raw value (this is a string which is added to the JSON without any quote or escaping)
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @param vlen The value length
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_raw(ndpi_serializer *_serializer, const char *key, const char *_value, u_int16_t vlen);
+
+  /**
+   * Serialize an unterminated string key and a float value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @param value The field value
+   * @param format The float format
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_binary_float(ndpi_serializer *_serializer, const char *key, u_int16_t klen, float value, const char *format /* e.f. "%.2f" */);
+
+  /**
+   * Serialize a string key and a a float value 
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @param format The float format
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_float(ndpi_serializer *serializer, const char *key, float value, const char *format /* e.f. "%.2f" */);
+
+  /**
+   * Serialize a string key and a boolean value
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_string_boolean(ndpi_serializer *serializer, const char *key, u_int8_t value);
+
+  /**
+   * Serialize a raw record in an array (this is a low-level function and its use is not recommended)
+   * @param serializer The serializer handle 
+   * @param record The record value
+   * @param record_len The record length
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_raw_record(ndpi_serializer *_serializer, u_char *record, u_int32_t record_len);
+
+  /**
+   * Serialize an End-Of-Record (the current object becomes is terminated and added to an array,
+   * and a new object is created where the next items will be added)
+   * @param serializer The serializer handle 
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_end_of_record(ndpi_serializer *serializer);
+
+  /**
+   * Serialize the start of a list with an unterminated string key, where the next serialized items 
+   * will be added (note: keys for the new items are ignored)
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @return 0 on success, a negative number otherwise
+   */
+  int ndpi_serialize_start_of_list_binary(ndpi_serializer *_serializer, const char *key, u_int16_t klen);
+
+  /**
+   * Serialize the start of a list, where the next serialized items will be added (note: keys for
+   * the new items are ignored)
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_start_of_list(ndpi_serializer *serializer, const char *key);
+
+  /**
+   * Serialize the end of a list
+   * @param serializer The serializer handle 
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_end_of_list(ndpi_serializer *serializer);
+
+  /**
+   * Serialize the start of a block with an unterminated string key 
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param klen The key length
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_start_of_block_binary(ndpi_serializer *_serializer, const char *key, u_int16_t klen);
+
+  /**
+   * Serialize the start of a block with a string key 
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_start_of_block(ndpi_serializer *serializer, const char *key);
+
+  /**
+   * Serialize the end of a block 
+   * @param serializer The serializer handle 
+   * @param key The field name or ID
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serialize_end_of_block(ndpi_serializer *serializer);
+
+  /**
+   * Return the serialized buffer
+   * @param serializer The serializer handle 
+   * @param buffer_len The buffer length (out)
+   * @return The buffer
+   */
   char* ndpi_serializer_get_buffer(ndpi_serializer *serializer, u_int32_t *buffer_len);
+
+  /**
+   * Return the current serialized buffer length
+   * @param serializer The serializer handle 
+   * @return The buffer length
+   */
   u_int32_t ndpi_serializer_get_buffer_len(ndpi_serializer *serializer);
+
+  /**
+   * Return the real internal buffer size (containing the serialized buffer)
+   * @param serializer The serializer handle
+   * @return The internal buffer size
+   */
   u_int32_t ndpi_serializer_get_internal_buffer_size(ndpi_serializer *serializer);
+
+  /**
+   * Change the serializer buffer length
+   * @param serializer The serializer handle 
+   * @param l The new buffer length 
+   * @return 0 on success, a negative number otherwise
+   */
   int ndpi_serializer_set_buffer_len(ndpi_serializer *serializer, u_int32_t l);
+
+  /**
+   * Return the configured serialization format
+   * @param serializer The serializer handle 
+   * @return The serialization format
+   */
   ndpi_serialization_format ndpi_serializer_get_format(ndpi_serializer *serializer);
+
+  /**
+   * Set the CSV separator
+   * @param serializer The serializer handle 
+   * @param separator The separator
+   */
   void ndpi_serializer_set_csv_separator(ndpi_serializer *serializer, char separator);
+
+  /**
+   * Return the header automatically built from keys (CSV only)
+   * @param serializer The serializer handle 
+   * @param buffer_len The buffer length (out)
+   * @return The header
+   */
   char* ndpi_serializer_get_header(ndpi_serializer *serializer, u_int32_t *buffer_len);
 
+  /**
+   * Create a snapshot of the internal buffer for later rollback (ndpi_serializer_rollback_snapshot)
+   * @param serializer The serializer handle 
+   */
   void ndpi_serializer_create_snapshot(ndpi_serializer *serializer);
+
+  /**
+   * Rollback to the latest snapshot
+   * @param serializer The serializer handle 
+   */
   void ndpi_serializer_rollback_snapshot(ndpi_serializer *serializer);
 
-  /* Deserializer */
+  /* Deserializer (supports TLV only) */
+
   int ndpi_init_deserializer(ndpi_deserializer *deserializer,
 			     ndpi_serializer *serializer);
   int ndpi_init_deserializer_buf(ndpi_deserializer *deserializer,
@@ -1087,6 +1425,7 @@ extern "C" {
 			u_int8_t num_clusters, u_int16_t *cluster_ids,
 			struct ndpi_bin *centroids);
 
+  u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long);
 #ifdef __cplusplus
 }
 #endif
