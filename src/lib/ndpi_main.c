@@ -6416,10 +6416,13 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
       if(flow->protos.stun_ssl.ssl.encrypted_sni.esni)
         ndpi_free(flow->protos.stun_ssl.ssl.encrypted_sni.esni);
+    for (int i=0; i<2; i++ ) {
+      //printf("DBG(ndpi_free_flow): freeing %u tcp segments \n", flow->tcp_segments_list[i].ct_frag);
+      free_fragment(&flow->tcp_segments_list[i]);
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
-      if(flow->l4.tcp.tls.message.buffer)
+      if(flow->l4.tcp.tls.message.buffer) {
 	      ndpi_free(flow->l4.tcp.tls.message.buffer);
     }
 
