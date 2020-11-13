@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "dns_utils.h"
@@ -75,8 +76,6 @@ struct nDPI_flow_info {
     struct ndpi_flow_struct * ndpi_flow;
     struct ndpi_id_struct * ndpi_src;
     struct ndpi_id_struct * ndpi_dst;
-
-    char info[160];
 };
 
 struct nDPI_workflow {
@@ -137,7 +136,8 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
     }
 
     if (workflow->pcap_handle == NULL) {
-        fprintf(stderr, "pcap_open_live / pcap_open_offline_with_tstamp_precision: %s\n", pcap_error_buffer);
+        fprintf(stderr, "pcap_open_live / pcap_open_offline_with_tstamp_precision: %.*s\n",
+                (int) PCAP_ERRBUF_SIZE, pcap_error_buffer);
         free_workflow(&workflow);
         return NULL;
     }
@@ -208,9 +208,25 @@ static void free_workflow(struct nDPI_workflow ** const workflow)
     *workflow = NULL;
 }
 
+static char * get_default_pcapdev(char *errbuf)
+{
+    char * ifname;
+    pcap_if_t * all_devices = NULL;
+
+    if (pcap_findalldevs(&all_devices, errbuf) != 0)
+    {
+        return NULL;
+    }
+
+    ifname = strdup(all_devices[0].name);
+    pcap_freealldevs(all_devices);
+
+    return ifname;
+}
+
 static int setup_reader_threads(char const * const file_or_device)
 {
-    char const * file_or_default_device;
+    char * file_or_default_device;
     char pcap_error_buffer[PCAP_ERRBUF_SIZE];
 
     if (reader_thread_count > MAX_READER_THREADS) {
@@ -218,23 +234,28 @@ static int setup_reader_threads(char const * const file_or_device)
     }
 
     if (file_or_device == NULL) {
-        file_or_default_device = pcap_lookupdev(pcap_error_buffer);
+        file_or_default_device = get_default_pcapdev(pcap_error_buffer);
         if (file_or_default_device == NULL) {
-            fprintf(stderr, "pcap_lookupdev: %s\n", pcap_error_buffer);
+            fprintf(stderr, "pcap_findalldevs: %.*s\n", (int) PCAP_ERRBUF_SIZE, pcap_error_buffer);
             return 1;
         }
     } else {
-        file_or_default_device = file_or_device;
+        file_or_default_device = strdup(file_or_device);
+        if (file_or_default_device == NULL) {
+            return 1;
+        }
     }
 
     for (int i = 0; i < reader_thread_count; ++i) {
         reader_threads[i].workflow = init_workflow(file_or_default_device);
         if (reader_threads[i].workflow == NULL)
         {
+            free(file_or_default_device);
             return 1;
         }
     }
 
+    free(file_or_default_device);
     return 0;
 }
 
@@ -851,7 +872,7 @@ static void ndpi_process_packet(uint8_t * const args,
         }
     }
 
-    if (flow_to_process->ndpi_flow->num_extra_packets_checked <
+    if (flow_to_process->ndpi_flow->num_extra_packets_checked <=
         flow_to_process->ndpi_flow->max_extra_packets_to_check)
     {
         /*

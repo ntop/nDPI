@@ -6340,7 +6340,6 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_QUIC)) {
-
       if(flow->protos.stun_ssl.ssl.server_names)
         ndpi_free(flow->protos.stun_ssl.ssl.server_names);
 
@@ -6364,10 +6363,8 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
-
       if(flow->l4.tcp.tls.message.buffer)
 	      ndpi_free(flow->l4.tcp.tls.message.buffer);
-
     }
 
     ndpi_free(flow);
