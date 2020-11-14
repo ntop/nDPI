@@ -9153,7 +9153,7 @@ static ndpi_protocol_match host_match[] =
    { "edge-mqtt.facebook.com",        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
    { "mqtt-mini.facebook.com",        "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE }, /* Messenger Lite */
    { "messenger.com",                 "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
-   { ".m.me",                 "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
+   { ".m.me",                         "Messenger",        NDPI_PROTOCOL_MESSENGER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
    { ".pandora.com",                            "Pandora",          NDPI_PROTOCOL_PANDORA,  NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
@@ -9161,10 +9161,11 @@ static ndpi_protocol_match host_match[] =
 
    { ".kakao.com",                                "KakaoTalk",        NDPI_PROTOCOL_KAKAOTALK, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE },
 
-   { "ttvnw.net",                                    "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
-   { "static-cdn.jtvnw.net",            "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
-   { "www-cdn.jtvnw.net",                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
-   { "twitch.tv",                  "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "ttvnw.net",                       "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "jtvnw.net",                       "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "twitch.tv",                       "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "twitchcdn.net",                   "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "twitchsvc.net",                   "Twitch",           NDPI_PROTOCOL_TWITCH, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
 
    { ".qq.com",                                      "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
    { ".gtimg.com",                                "QQ",               NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN },
