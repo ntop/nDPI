@@ -9247,7 +9247,9 @@ static ndpi_protocol_match host_match[] =
    { "onedrive.live.com",               "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE },
 
    { "update.microsoft.com",            "WindowsUpdate",    NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
-   { ".windowsupdate.com",                "WindowsUpdate",    NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+   { ".windowsupdate.com",              "WindowsUpdate",    NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+   { ".ntservicepack.microsoft.com",    "WindowsUpdate",    NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
+   { ".wustat.windows.com",             "WindowsUpdate",    NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
 
    { "worldofwarcraft.com",                "WorldOfWarcraft",  NDPI_PROTOCOL_WORLDOFWARCRAFT, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
