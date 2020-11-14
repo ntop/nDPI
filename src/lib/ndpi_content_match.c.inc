@@ -9080,8 +9080,8 @@ static ndpi_protocol_match host_match[] =
    { "nflxext.com",                           "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
    { "nflximg.com",                           "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
    { "nflximg.net",                           "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
-   { "nflxvideo.net",                       "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
-   { "nflxso.net",                             "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "nflxvideo.net",                         "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "nflxso.net",                            "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
 
    { ".skype.",                                    "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
    { ".skypeassets.",                              "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
@@ -9363,6 +9363,10 @@ static ndpi_protocol_match host_match[] =
 
    { ".hulustream.com",                                 "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { ".hulu.com",                                       "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "assetshuluimcom-a.akamaihd.net",                  "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "ibhuluimcom-a.akamaihd.net",                      "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { ".huluad.com",                                     "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { ".huluim.com",                                     "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
    /*
      VidTO streaming service
