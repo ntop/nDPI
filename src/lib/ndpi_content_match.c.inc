@@ -9181,6 +9181,7 @@ static ndpi_protocol_match host_match[] =
    */
    { "tumblr.com",                   "Tumblr",        NDPI_PROTOCOL_TUMBLR, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
 
+   /*
      Reddit social network service
    */
    { ".redd.it",                   "Reddit",        NDPI_PROTOCOL_REDDIT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
