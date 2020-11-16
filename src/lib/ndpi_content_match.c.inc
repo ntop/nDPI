@@ -9332,22 +9332,21 @@ static ndpi_protocol_match host_match[] =
    /*
      Pinterest social network service
    */
-   { ".pinimg.com",                      "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.global.map.fastly.net",  "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.map.fastly.net",         "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.com",                    "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.ca",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.cl",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.de",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.dk",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.es",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.fr",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.jp",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.nz",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.pt",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.ru",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.co.kr",                  "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
-   { "pinterest.co.uk",                  "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { ".pinimg.com",                      "Pinterest",      NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.global.map.fastly.net",  "Pinterest",      NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.map.fastly.net",         "Pinterest",      NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.co.",                  "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   
+   /*
+     DisneyPlus streaming service
+   */
+   { "dssott.com.akamaized.net",               "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "disney-plus.net",                        "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "disneyplus.com",                         "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "dssott.com",                             "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "disneyplus.com.ssl.sc.omtrdc.net",       "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "search-api-disney.bamgrid.com",          "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE }
   };

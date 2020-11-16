@@ -100,7 +100,7 @@ typedef enum {
   NDPI_PROTOCOL_NATS                  = 68,
   NDPI_PROTOCOL_AMONG_US              = 69, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_YAHOO                 = 70,
-  NDPI_PROTOCOL_FREE_71               = 71, /* Free */
+  NDPI_PROTOCOL_DISNEYPLUS            = 71, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_GOOGLE_PLUS           = 72,
   NDPI_PROTOCOL_IP_VRRP               = 73,
   NDPI_PROTOCOL_STEAM                 = 74, /* Tomasz Bujlow <tomasz@skatnet.dk> */
