@@ -5,7 +5,7 @@ cd "$(dirname "${0}")"
 READER="../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt"
 
 RC=0
-PCAPS=`cd pcap; /bin/ls *.pcap*`
+PCAPS=`cd pcap; /bin/ls *.pcap *.pcapng`
 
 fuzzy_testing() {
     if [ -f ../fuzz/fuzz_ndpi_reader ]; then
