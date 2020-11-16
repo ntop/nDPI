@@ -9330,6 +9330,15 @@ static ndpi_protocol_match host_match[] =
    { "discord.media",                "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
 
    /*
+     Reddit social network service
+   */
+   { ".redd.it",                   "Reddit",        NDPI_PROTOCOL_REDDIT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { ".reddit.com",                "Reddit",        NDPI_PROTOCOL_REDDIT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { ".redditmedia.com",           "Reddit",        NDPI_PROTOCOL_REDDIT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { ".redditstatic.com",          "Reddit",        NDPI_PROTOCOL_REDDIT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { ".reddit.map.fastly.net",          "Reddit",        NDPI_PROTOCOL_REDDIT, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+
+   /*
      Pinterest social network service
    */
    { ".pinimg.com",                      "Pinterest",      NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
