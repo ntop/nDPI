@@ -8616,6 +8616,7 @@ static ndpi_protocol_match host_match[] =
    { "itunes-apple.com",                          "AppleStore",       NDPI_PROTOCOL_APPLESTORE, NDPI_PROTOCOL_CATEGORY_SW_UPDATE, NDPI_PROTOCOL_SAFE },
    { "itunes.apple.com",                          "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { "tlnk.io",         	                      "AppleiTunes",      NDPI_PROTOCOL_APPLE_ITUNES, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "guzzoni.apple.",         	   "AppleSiri",      NDPI_PROTOCOL_APPLE_SIRI, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
    { ".wbagora.com",                              "Playstation",      NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_UNRATED },
    { ".wbplay.com",                                "Playstation",      NDPI_PROTOCOL_PLAYSTATION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_UNRATED },
    { ".xbox.com",                                    "Xbox",             NDPI_PROTOCOL_XBOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
@@ -9149,6 +9150,31 @@ static ndpi_protocol_match host_match[] =
    { "discord.com",                  "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
    { "discord.gg",                   "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
    { "discord.media",                "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+
+   /*
+     Amazon Alexa services
+   */
+   { "alexa.amazon.com",             "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "amazonalexa.com",              "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-1-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-2-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-3-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-4-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-5-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-6-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-7-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-8-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-9-na.amazon.com",    "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-10-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-11-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-12-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-13-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-14-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-15-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-16-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-17-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-18-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
+   { "avs-alexa-19-na.amazon.com",   "AmazonAlexa",        NDPI_PROTOCOL_AMAZON_ALEXA, NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, NDPI_PROTOCOL_ACCEPTABLE },
 
    /*
      Tumblr social network service

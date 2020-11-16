@@ -139,7 +139,7 @@ typedef enum {
   NDPI_PROTOCOL_FIESTA                = 107,
   NDPI_PROTOCOL_FLORENSIA             = 108,
   NDPI_PROTOCOL_GUILDWARS             = 109,
-  NDPI_PROTOCOL_FREE110               = 110, /* Free */
+  NDPI_PROTOCOL_AMAZON_ALEXA          = 110, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_KERBEROS              = 111,
   NDPI_PROTOCOL_LDAP                  = 112,
   NDPI_PROTOCOL_MAPLESTORY            = 113,
@@ -283,6 +283,7 @@ typedef enum {
   NDPI_PROTOCOL_WEBSOCKET             = 251, /* Leonn Paiva <leonn.paiva@gmail.com> */
   NDPI_PROTOCOL_ANYDESK               = 252, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_SOAP                  = 253, /* Toni Uhlig <matzeton@googlemail.com> */
+  NDPI_PROTOCOL_APPLE_SIRI            = 254, /* Zied Aouini <aouinizied@gmail.com> */
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS

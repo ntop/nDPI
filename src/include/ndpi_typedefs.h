@@ -932,6 +932,10 @@ typedef enum {
 	       */
 	      NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK,
 	      NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
+	      /*
+		 The category below is used for vocal assistance services.
+	       */
+	      NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT,
 
 	      /* Some custom categories */
 	      CUSTOM_CATEGORY_MINING           = 99,
