@@ -100,7 +100,7 @@ typedef enum {
   NDPI_PROTOCOL_NATS                  = 68,
   NDPI_PROTOCOL_AMONG_US              = 69, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_YAHOO                 = 70,
-  NDPI_PROTOCOL_FREE_71               = 71, /* Free */
+  NDPI_PROTOCOL_DISNEYPLUS            = 71, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_GOOGLE_PLUS           = 72,
   NDPI_PROTOCOL_IP_VRRP               = 73,
   NDPI_PROTOCOL_STEAM                 = 74, /* Tomasz Bujlow <tomasz@skatnet.dk> */
@@ -212,7 +212,7 @@ typedef enum {
   NDPI_PROTOCOL_CNN                   = 180, /* Tomasz Bujlow <tomasz@skatnet.dk> */
   NDPI_PROTOCOL_MEGACO                = 181, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_REDIS                 = 182,
-  NDPI_PROTOCOL_FREE_183              = 183,
+  NDPI_PROTOCOL_PINTEREST             = 183, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_VHUA                  = 184,
   NDPI_PROTOCOL_TELEGRAM              = 185, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_VEVO                  = 186,
