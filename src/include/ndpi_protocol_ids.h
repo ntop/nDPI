@@ -100,7 +100,7 @@ typedef enum {
   NDPI_PROTOCOL_NATS                  = 68,
   NDPI_PROTOCOL_AMONG_US              = 69, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_YAHOO                 = 70,
-  NDPI_PROTOCOL_FREE_71               = 71, /* Free */
+  NDPI_PROTOCOL_DISNEYPLUS            = 71, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_GOOGLE_PLUS           = 72,
   NDPI_PROTOCOL_IP_VRRP               = 73,
   NDPI_PROTOCOL_STEAM                 = 74, /* Tomasz Bujlow <tomasz@skatnet.dk> */
@@ -212,7 +212,7 @@ typedef enum {
   NDPI_PROTOCOL_CNN                   = 180, /* Tomasz Bujlow <tomasz@skatnet.dk> */
   NDPI_PROTOCOL_MEGACO                = 181, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_REDIS                 = 182,
-  NDPI_PROTOCOL_FREE_183              = 183,
+  NDPI_PROTOCOL_PINTEREST             = 183, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_VHUA                  = 184,
   NDPI_PROTOCOL_TELEGRAM              = 185, /* Gianluca Costa <g.costa@xplico.org> */
   NDPI_PROTOCOL_VEVO                  = 186,
@@ -234,7 +234,7 @@ typedef enum {
   NDPI_PROTOCOL_IFLIX                 = 202, /* www.vizuamatix.com R&D team & M.Mallawaarachchie <manoj_ws@yahoo.com> */
   NDPI_PROTOCOL_GITHUB                = 203,
   NDPI_PROTOCOL_BJNP                  = 204,
-  NDPI_PROTOCOL_FREE_205              = 205,
+  NDPI_PROTOCOL_REDDIT                = 205, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_WIREGUARD             = 206,
   NDPI_PROTOCOL_SMPP                  = 207, /* Damir Franusic <df@release14.org> */
   NDPI_PROTOCOL_DNSCRYPT              = 208, /* Toni Uhlig <matzeton@googlemail.com> */
