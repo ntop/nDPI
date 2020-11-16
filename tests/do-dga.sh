@@ -19,7 +19,7 @@ RC=0
 
 get_evaluation_data_size() {
   DGA_DATA_SIZE=`wc -l dga/test_dga.csv | awk '{split($0,a," "); print a[1]}'`
-  NON_DGA_DATA_SIZE=`wc -l dga/test_non_dga.csv | awk '{split($0,a," "); print a[1]}'
+  NON_DGA_DATA_SIZE=`wc -l dga/test_non_dga.csv | awk '{split($0,a," "); print a[1]}'`
   DATA_SIZE=$(( $NON_DGA_DATA_SIZE + $DGA_DATA_SIZE ))
 }
 
