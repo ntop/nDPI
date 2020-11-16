@@ -1,0 +1,36 @@
+CC=@CC@
+CXX=@CXX@
+
+SRCHOME=../../src
+
+CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @JSONC_CFLAGS@ @PCAP_INC@ @CFLAGS@
+LIBNDPI=$(SRCHOME)/lib/libndpi.a
+LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ -lpthread -lm @LDFLAGS@
+HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
+OBJS=dga_evaluate
+PREFIX?=@prefix@
+
+all: dga_evaluate
+
+EXECUTABLE_SOURCES := dga_evaluate.c
+COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
+
+dga_evaluate: $(LIBNDPI) dga_evaluate.o
+	$(CC) $(CFLAGS) dga_evaluate.o -o $@ $(LDFLAGS)
+
+%.o: %.c $(HEADERS) Makefile
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	/bin/rm -f *.o dga_evaluate
+	/bin/rm -f .*.o.cmd .*.o.d
+	/bin/rm -rf build
+
+install:
+	echo ""
+
+distdir:
+
+
+distclean: clean
+	/bin/rm -f Makefile

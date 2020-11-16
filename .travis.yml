@@ -205,6 +205,7 @@ script:
   - cd tests
   - ./do.sh
   - ./do-unit.sh
+  - ./do-dga.sh
 
 #after_success:
 #- cd ${TRAVIS_BUILD_DIR}
