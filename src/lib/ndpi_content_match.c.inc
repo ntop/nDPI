@@ -9328,6 +9328,15 @@ static ndpi_protocol_match host_match[] =
    { "discord.com",                  "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
    { "discord.gg",                   "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
    { "discord.media",                "Discord",        NDPI_PROTOCOL_DISCORD, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE },
+
+   /*
+     Pinterest social network service
+   */
+   { ".pinimg.com",                      "Pinterest",      NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.global.map.fastly.net",  "Pinterest",      NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.map.fastly.net",         "Pinterest",      NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.",                     "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
+   { "pinterest.co.",                  "Pinterest",        NDPI_PROTOCOL_PINTEREST, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN },
    
    /*
      DisneyPlus streaming service
