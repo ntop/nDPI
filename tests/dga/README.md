@@ -27,6 +27,13 @@ wget https://raw.githubusercontent.com/chrmor/DGA_domains_dataset/master/dga_dom
 
 We split the dataset into DGA and NON-DGA and we keep 10% of each as test set and 90% as training set.
 
+```shell
+python3 -m pip install pandas
+python3 -m pip install sklearn
+```
+
+Instruction using python3
+
 ```python3
 from sklearn.model_selection import train_test_split
 import pandas as pd
@@ -60,4 +67,4 @@ You can evaluate your modifications performances before submitting it as follows
 ```
 
 If your modifications decreases baseline performances, test will fails.
-If not (well done), test pass and you must update the baseline metrics with your obtained ones.
+If not (well done), test passed and you must update the baseline metrics with your obtained ones.
