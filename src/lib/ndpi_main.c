@@ -141,8 +141,10 @@ void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size) {
   if(!ret)
     return(ret);
   else {
-    memcpy(ret, ptr, old_size);
-    ndpi_free(ptr);
+    if (ptr) {
+      memcpy(ret, ptr, old_size);
+      ndpi_free(ptr);
+    }
     return(ret);
   }
 }
@@ -4311,17 +4313,20 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str, st
 
   /* detect traffic for tcp or udp only */
   flow->src = src, flow->dst = dst;
-  if ( ndpi_connection_tracking(ndpi_str, flow) ) {
+  if ( ndpi_connection_tracking(ndpi_str, flow) || 
+      ! (flow_is_proto(flow, NDPI_PROTOCOL_DNS) 
+        || flow_is_proto(flow, NDPI_PROTOCOL_MDNS)
+        || flow_is_proto(flow, NDPI_PROTOCOL_LLMNR) )) {
 
-  /* call the extra packet function (which may add more data/info to flow) */
-  if(flow->extra_packets_func) {
-    if((flow->extra_packets_func(ndpi_str, flow)) == 0)
-      flow->check_extra_packets = 0;
+    /* call the extra packet function (which may add more data/info to flow) */
+    if(flow->extra_packets_func) {
+      if((flow->extra_packets_func(ndpi_str, flow)) == 0)
+        flow->check_extra_packets = 0;
 
-    if(++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)
-      flow->extra_packets_func = NULL; /* Enough packets detected */
+      if(++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)
+        flow->extra_packets_func = NULL; /* Enough packets detected */
+    }
   }
-}
 }
 
 /* ********************************************************************************* */
