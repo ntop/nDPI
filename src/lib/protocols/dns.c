@@ -804,7 +804,7 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					}
 
 					currItem->RData.HINFO.os_len= payload[off++];
-						DBGINFO("DNS_TYPE_HINFO os len: %d",currItem->RData.HINFO.os_len)
+					DBGINFO("DNS_TYPE_HINFO os len: %d",currItem->RData.HINFO.os_len)
 					currItem->RData.HINFO.os= ndpi_calloc(currItem->RData.HINFO.os_len+1, sizeof(char));
 					if (currItem->RData.HINFO.os) {
 						memcpy(currItem->RData.HINFO.os, &payload[off],currItem->RData.HINFO.os_len);
@@ -853,11 +853,11 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 				
 				case DNS_TYPE_AFSDB:
-						DBGTRACER("DNS_TYPE_AFSDB: len: %d",currItem->rrRDL)
+					DBGTRACER("DNS_TYPE_AFSDB: len: %d",currItem->rrRDL)
 					currItem->RData.AFSDB.subtype= get16((int*)&off, payload); 
 					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.AFSDB.hostname, &data_len, &malformed, "[AFSDBHOST]") ) {
 						parseDnsName( (u_char*)currItem->RData.AFSDB.hostname, data_len, (int*)&off, payload, payloadLen );
-								DBGINFO("MX: (%u) %s - Pref: %d",(u_int)data_len,currItem->RData.MX.exchange,currItem->RData.MX.preference)
+						DBGINFO("MX: (%u) %s - Pref: %d",(u_int)data_len,currItem->RData.MX.exchange,currItem->RData.MX.preference)
 					} else  {
 						printf("ERR(parseDnsRRs): dns name retrieving error: AFSDB HOST\n");
 						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
@@ -868,8 +868,7 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 					
 				case DNS_TYPE_AAAA:
-					if ( currItem->rrRDL <= sizeof(struct ndpi_ip6_addrBIS) && 
-						( (off+currItem->rrRDL) < payloadLen) ) {
+					if ( currItem->rrRDL <= sizeof(struct ndpi_ip6_addrBIS) ) {
 						memcpy(&currItem->RData.addressIPv6, &payload[off], currItem->rrRDL);
 						DBGINFO("AAAA [%p]",&currItem->RData.addressIPv6)
 						off+=16;
