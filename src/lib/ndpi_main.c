@@ -136,8 +136,9 @@ void ndpi_flow_free(void *ptr) {
 /* ****************************************** */
 
 void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size) {
-  void *ret = ndpi_calloc(new_size, sizeof(char));
 
+  if ( !ptr && old_size>0 ) return NULL; 
+  void *ret = ndpi_calloc(new_size, sizeof(char));
   if(!ret)
     return(ret);
   else {
