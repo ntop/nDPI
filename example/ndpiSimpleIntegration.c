@@ -938,7 +938,6 @@ static void ndpi_process_packet(uint8_t * const args,
 			char line[1024]={0};
             				
             unsigned char first=1;
-			char answerIp[1024]={0};
 			
 			if (flow_to_process->ndpi_flow->protos.dns.is_query 
                     && flow_to_process->ndpi_flow->protos.dns.dns_request_complete
@@ -1017,20 +1016,6 @@ static void ndpi_process_packet(uint8_t * const args,
 
 					dnsRData(line,sizeof(line),currRR);
 					
-					if ( currRR->rrType==DNS_TYPE_A || currRR->rrType==DNS_TYPE_AAAA ) {
-                        size_t bufsz= sizeof(answerIp);
-                        memset(answerIp,0,bufsz);
-						if ( answerIp[0]>0 ) {
-							strncat(answerIp,"|", (bufsz - strlen(answerIp) - 1) );
-						}
-						strncat(answerIp, dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),(bufsz - strlen(answerIp)-1));
-						strncat(answerIp,";",(bufsz - strlen(answerIp)-1));
-						//strncat(answerIp, dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),(sizeof(answerIp)-strlen(answerIp)-1));
-						size_t pos= strlen(answerIp);
-						snprintf(&answerIp[pos], bufsz -pos,"%d",currRR->rrClass);
-						strncat(answerIp,";", bufsz -strlen(answerIp)-1);
-						strncat(answerIp, line, bufsz -strlen(answerIp)-1);
-					}
                     //          <owner> <TTL> <class> <type> 
                     printf("\t RR %d %s ttl:%usec, %s %s - %s\n",
                         first,

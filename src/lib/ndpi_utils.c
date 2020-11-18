@@ -1794,14 +1794,14 @@ void printRawData(const uint8_t *ptr, size_t len) {
 				snprintf(line2,ARRAYSZ_255,"%s","");
 			}      
       snprintf(temp,ARRAYSZ_255," %02X", (uint8_t)*p);
-      strncat(line1, temp, 3);
+      strncat(line1, temp, ARRAYSZ_255-strlen(line1));
       snprintf(temp,ARRAYSZ_255,"%c", (isprint(*p)? *(p):'.'));
-      strncat(line2, temp, 1);
+      strncat(line2, temp, ARRAYSZ_255-strlen(line2));
       p++;
 		}
 		uint8_t exv= i%16;
 		for(j=exv;exv>0 && j<16;j++) {
-      strncat(line1, "   ", 3);
+      strncat(line1, "   ", ARRAYSZ_255-strlen(line1));
 		}
 		printf("%s\t%s\n", line1,line2);
 	}

@@ -38,6 +38,403 @@
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow);
 
+/* ****************************************************** */
+
+static unsigned int poweroften[10] = {1, 10, 100, 1000, 10000, 100000,
+                                 1000000,10000000,100000000,1000000000};
+
+static char* conv2meter(char *ret, size_t len, u_int8_t mis) {
+    u_int8_t bs, ex;
+    if ( ret ) {
+        bs= ((mis>>4) & 0xf) % 10;
+        ex= (mis & 0x0f) % 10;
+        int val= bs * poweroften[ex];
+        //printf("DBG(conv2m): b: %u, e:%u, tmp:%f -> %u\n", bs, ex, pp, val );
+        snprintf(ret,len,"%d.%.2d m",val/100, val%100);
+    }
+    return ret;
+}
+
+static char* conv2Coord(char *ret, size_t len, u_int32_t coord, char letters[2]) {    
+    if ( ret ) {
+        char letter;
+        int tmpVal, tmpSec, tmpMin, tmpDeg, tmpFrac;
+        tmpVal= coord- ((unsigned)1<<31);
+        if ( tmpVal<0 ) {
+            letter= letters[1];
+            tmpVal= -tmpVal;
+        } else {
+            letter= letters[0];
+        }
+        tmpFrac= tmpVal % 1000;
+        tmpVal /=1000;
+        tmpSec= tmpVal % 60;
+        tmpVal /= 60;
+        tmpMin= tmpVal % 60;
+        tmpVal /= 60;
+        tmpDeg= tmpVal;
+        
+        snprintf(ret,len,"%d %.2d %.2d.%.3d %c",tmpDeg,tmpMin,tmpSec,tmpFrac,letter);
+    }
+    return ret;
+}
+static char* conv2Alt(char *ret, size_t len, u_int32_t alt) {
+    
+    if ( ret ) {
+        int altmeters, altfrac;
+        altmeters= (alt>10000000) ? alt-10000000: 10000000-alt;
+        altfrac= altmeters % 100;
+        altmeters= altmeters/100 * ((alt>10000000)?1:11);
+        snprintf(ret,len,"%d.%.2dm",altmeters,altfrac);
+    }
+    return ret;
+}
+
+char* dnsRespCode(char *ret, size_t len, enum DnsResponseCode respCode) {
+    //printf("DBG(dnsRespCode) respCode=%u; buffer=%p, sz=%d\n",respCode, ret, len);
+	
+    if ( ret ) {
+        switch(respCode) {	
+            case NoError: 
+                snprintf(ret,len,"OK");
+                break;
+            case FormatError: 
+            case ServerFailure: 
+            case NameError: 
+            case NotImplemented: 
+            case Refused: 
+            case YX_Domain: 
+            case YX_RR_Set: 
+            case NotAuth: 
+            case NotZone: 
+                snprintf(ret,len,"ERROR: %02Xh (%u)", respCode, respCode);
+                break;
+                
+            default:
+                snprintf(ret,len,"UNKNOWN %02Xh (%u)",respCode, respCode);
+        }
+    }
+	//printf("DBG(dnsRespCode) respCode=%u -> [%s]\n",respCode, ret); 
+	return ret;
+}
+
+
+char* dnsClass(char *ret, size_t len, enum DnsClass classIndex) {
+    //printf("DBG(dnsClass) classIndex=%u; buffer=%p, sz=%d\n",classIndex, ret, len);
+	
+    if ( ret ) {
+        switch(classIndex) {	
+            case DNS_CLASS_IN: 
+                snprintf(ret,len,"IN");
+                break;
+            case DNS_CLASS_IN_QU: 
+                snprintf(ret,len,"IN_QU");
+                break;                
+            case DNS_CLASS_CH: 
+                snprintf(ret,len,"CH");
+                break;                
+            case DNS_CLASS_HS: 
+                snprintf(ret,len,"HS");
+                break;                
+            case DNS_CLASS_ANY: 
+                snprintf(ret,len,"ANY");
+                break;                
+            default:
+                snprintf(ret,len,"UNKNOWN CLASS %02Xh (%u)",classIndex, classIndex);
+        }
+    }
+	//printf("DBG(dnsClass) classIndex=%u -> [%s]\n",classIndex, ret); 
+	return ret;
+}
+
+char* dnsType(char *ret, size_t len, enum DnsType typeCode) {
+	//printf("DBG(dnsType) typeCode=%u; buffer=%p, sz=%d\n",typeCode, ret, len);
+	
+    if ( ret && len>0 ) {	
+        switch(typeCode) {	
+            case DNS_TYPE_A: /** IPv4 address record */
+                snprintf(ret,len,"A");
+                break;
+            case DNS_TYPE_NS: /** Name Server record */
+                snprintf(ret,len,"NS");
+                break;
+            case DNS_TYPE_MD: /** Obsolete, replaced by MX */
+                snprintf(ret,len,"MD");
+                break;
+            case DNS_TYPE_MF: /** Obsolete, replaced by MX */
+                snprintf(ret,len,"MF");
+                break;
+            case DNS_TYPE_CNAME: /** Canonical name record */
+                snprintf(ret,len,"CNAME");
+                break;
+            case DNS_TYPE_SOA: /** Start of Authority record */
+                snprintf(ret,len,"SOA");
+                break;
+            case DNS_TYPE_MB: /** mailbox domain name record */
+                snprintf(ret,len,"MB");
+                break;
+            case DNS_TYPE_MG: /** mail group member record */
+                snprintf(ret,len,"MG");
+                break;
+            case DNS_TYPE_MR: /** mail rename domain name record */
+                snprintf(ret,len,"MR");
+                break;
+            case DNS_TYPE_NULL_R: /** NULL record */
+                snprintf(ret,len,"NULL Record");
+                break;
+            case DNS_TYPE_WKS: /** well known service description record */
+                snprintf(ret,len,"WKS");
+                break;
+            case DNS_TYPE_PTR: /** Pointer record */
+                snprintf(ret,len,"PTR");
+                break;
+            case DNS_TYPE_HINFO: /** Host information record */
+                snprintf(ret,len,"HINFO");
+                break;
+            case DNS_TYPE_MINFO: /** mailbox or mail list information record */
+                snprintf(ret,len,"MINFO");
+                break;
+            case DNS_TYPE_MX: /** Mail exchanger record */
+                snprintf(ret,len,"MX");
+                break;
+            case DNS_TYPE_TXT: /** Text record */
+                snprintf(ret,len,"TXT");
+                break;
+            case DNS_TYPE_RP: /** Responsible person record */
+                snprintf(ret,len,"RP");
+                break;
+            case DNS_TYPE_AFSDB: /** AFS database record */
+                snprintf(ret,len,"AFSDB");
+                break;
+            case DNS_TYPE_X25: /** DNS X25 resource record */
+                snprintf(ret,len,"X25");
+                break;
+            case DNS_TYPE_ISDN: /** Integrated Services Digital Network record */
+                snprintf(ret,len,"ISDN");
+                break;
+            case DNS_TYPE_RT: /** Route Through record */
+                snprintf(ret,len,"RT");
+                break;
+            case DNS_TYPE_NSAP: /** network service access point address record */
+                snprintf(ret,len,"NSAP");
+                break;
+            case DNS_TYPE_NSAP_PTR: /** network service access point address pointer record */
+                snprintf(ret,len,"NSAPTR");
+                break;
+            case DNS_TYPE_SIG: /** Signature record */
+                snprintf(ret,len,"SIG");
+                break;
+            case DNS_TYPE_KEY: /** Key record */
+                snprintf(ret,len,"KEY");
+                break;
+            case DNS_TYPE_PX: /** Mail Mapping Information record */
+                snprintf(ret,len,"PX");
+                break;
+            case DNS_TYPE_GPOS: /** DNS Geographical Position record */
+                snprintf(ret,len,"GPOS");
+                break;
+            case DNS_TYPE_AAAA: /** IPv6 address record */
+                snprintf(ret,len,"AAAA");
+                break;
+            case DNS_TYPE_LOC: /**     Location record */
+                snprintf(ret,len,"LOC");
+                break;
+            case DNS_TYPE_NXT: /** Obsolete record */
+                snprintf(ret,len,"NXT");
+                break;
+            case DNS_TYPE_EID: /** DNS Endpoint Identifier record */
+                snprintf(ret,len,"EID");
+                break;
+            case DNS_TYPE_NIMLOC: /** DNS Nimrod Locator record */
+                snprintf(ret,len,"NIMLOC");
+                break;
+            case DNS_TYPE_SRVS: /** Service locator record */
+                snprintf(ret,len,"SRV");
+                break;
+            case DNS_TYPE_ATMA: /** Asynchronous Transfer Mode address record */
+                snprintf(ret,len,"ATMA");
+                break;
+            case DNS_TYPE_NAPTR: /** Naming Authority Pointer record */
+                snprintf(ret,len,"NAPTR");
+                break;
+            case DNS_TYPE_KX: /** Key eXchanger record */
+                snprintf(ret,len,"KX");
+                break;
+            case DNS_TYPE_CERT: /** Certificate record */
+                snprintf(ret,len,"CERT");
+                break;
+            case DNS_TYPE_A6: /** Obsolete, replaced by AAAA type */
+                snprintf(ret,len,"A6");
+                break;
+            case DNS_TYPE_DNAM: /** Delegation Name record */
+                snprintf(ret,len,"DNAM");
+                break;
+            case DNS_TYPE_SINK: /** Kitchen sink record */
+                snprintf(ret,len,"SINK");
+                break;
+            case DNS_TYPE_OPT: /** Option record */
+                snprintf(ret,len,"OPT");
+                break;
+            case DNS_TYPE_APL: /** Address Prefix List record */
+                snprintf(ret,len,"APL");
+                break;
+            case DNS_TYPE_DS: /** Delegation signer record */
+                snprintf(ret,len,"DS");
+                break;
+            case DNS_TYPE_SSHFP: /** SSH Public Key Fingerprint record */
+                snprintf(ret,len,"SSHFP");
+                break;
+            case DNS_TYPE_IPSECKEY: /** IPsec Key record */
+                snprintf(ret,len,"IPSECKEY");
+                break;
+            case DNS_TYPE_RRSIG: /** DNSSEC signature record */
+                snprintf(ret,len,"RRSIG");
+                break;
+            case DNS_TYPE_NSEC: /** Next-Secure record */
+                snprintf(ret,len,"NSEC");
+                break;
+            case DNS_TYPE_DNSKEY: /** DNS Key record */
+                snprintf(ret,len,"DNSKEY");
+                break;
+            case DNS_TYPE_DHCID: /** DHCP identifier record */
+                snprintf(ret,len,"DHCID");
+                break;
+            case DNS_TYPE_NSEC3: /** NSEC record version 3 */
+                snprintf(ret,len,"NSEC3");
+                break;
+            case DNS_TYPE_NSEC3PARAM: /** NSEC3 parameters */
+                snprintf(ret,len,"NSEC3PARAM");
+                break;
+            case DNS_TYPE_IXFR: /** IXFR */
+                snprintf(ret,len,"IXFR");
+                break;
+            case DNS_TYPE_AXFR: /** AXFR */
+                snprintf(ret,len,"AXFR");
+                break;
+            case DNS_TYPE_MAILB: /** MAILB */
+                snprintf(ret,len,"MAILB");
+                break;
+            case DNS_TYPE_MAILA: /** MAILA */
+                snprintf(ret,len,"MAILA");
+                break;
+            case DNS_TYPE_ALL: /** All cached records */
+                snprintf(ret,len,"ALL");
+                break;
+            
+            default:
+                snprintf(ret,len,"UNKNOWN %02Xh (%u)",typeCode,typeCode);
+        }
+	}
+	//printf("DBG(dnsType) typeCode=%u -> [%s]\n",typeCode, ret); 
+	return ret;
+}
+
+char *dnsRData(char *ret, size_t len, struct dnsRR_t *rr ) {
+    
+	//printf("DBG(dnsRData) rr=%p; buffer=%p, sz=%d\n",rr, ret, len);
+    
+    if ( ret && rr ) {
+        char sTemp1[25]={0},sTemp2[25]={0},sTemp3[25]={0},sTemp4[25]={0},sTemp5[25]={0},sTemp6[25]={0};
+
+        //printf("DBG(dnsRData) rr type = %02Xh (%u)\n",rr->rrType,rr->rrType);
+        switch(rr->rrType) {
+            case DNS_TYPE_A:
+                //printRawData((uint8_t*)&rr->RData.addressIP,4);
+                inet_ntop(AF_INET, &rr->RData.addressIP, ret,len);			
+                //printf("DBG(dnsRData) rrType= %u - (%d) %s\n",rr->rrType, strlen(ret),ret);
+                break;
+                
+            case DNS_TYPE_NS:
+                snprintf(ret,len, "%s", rr->RData.NSDName);
+                break;			
+                
+            case DNS_TYPE_CNAME:
+                snprintf(ret,len, "%s", rr->RData.CName);
+                break;
+                
+            case DNS_TYPE_SOA:
+                // Admin: azuredns-hostmaster.microsoft.com, Primary Server: ns1-03.azure-dns.com, Default TTL: 300, Expire: 2419200, Refresh: 3600, Retry: 300, Serial: 1	
+                snprintf(ret,len, "Admin: %s, Primary Server: %s, Default TTL: %u, Expire: %u, Refresh: %u, Retry: %u, Serial: %u", 
+                    rr->RData.SOA.RName,rr->RData.SOA.MName,rr->RData.SOA.Minimum,rr->RData.SOA.Expire,rr->RData.SOA.Refresh,rr->RData.SOA.Retry,rr->RData.SOA.Serial);
+                break;
+            
+            case DNS_TYPE_PTR:
+                snprintf(ret,len, "%s", rr->RData.PTRDName);
+                break;
+
+			case DNS_TYPE_HINFO:
+                snprintf(ret,len, "CPU: (%d) %s, OS: (%d) %s", rr->RData.HINFO.cpu_len, rr->RData.HINFO.cpu, rr->RData.HINFO.os_len, rr->RData.HINFO.os);
+                break;
+				
+            case DNS_TYPE_MX:
+                snprintf(ret,len, "(priority: %d) %s", rr->RData.MX.preference, rr->RData.MX.exchange);
+                break;
+            
+            case DNS_TYPE_TXT:
+                snprintf(ret,len, "(%u) %s", rr->RData.TXT.txt_len,rr->RData.TXT.txtData);
+                break;
+
+            case DNS_TYPE_RP:
+                //Master file format: <owner> <ttl> <class> RP <mbox-dname> <txt-dname>
+                snprintf(ret,len, "mailbox: %s, TXT: %s", rr->RData.RP.mailbox,rr->RData.RP.respPerson);
+                break;
+
+            case DNS_TYPE_AFSDB:
+                //Master file format: <owner> <ttl> <class> AFSDB <subtype> <hostname>
+                snprintf(ret,len, "subtype: %d, hostname: %s", rr->RData.AFSDB.subtype, rr->RData.AFSDB.hostname);
+                break;
+
+            case DNS_TYPE_AAAA:	
+                //printRawData((uint8_t*)&rr->RData.addressIP,16);
+                inet_ntop(AF_INET6, (struct sockaddr_in6 *)&rr->RData.addressIPv6, ret,len);
+                /* For consistency across platforms replace :0: with :: */
+                ndpi_patchIPv6Address(ret);
+                break;
+
+            case DNS_TYPE_LOC:
+                /*Master file format: <owner> <ttl> <class> LOC ( d1 [m1 [s1]] {"N"|"S"} d2 [m2 [s2]]
+                               {"E"|"W"} alt["m"] [siz["m"] [hp["m"]
+                               [vp["m"]]]] )*/
+                snprintf(ret,len, "%s %s alt: %s siz: %s hp: %s vp: %s ", 
+                    conv2Coord(sTemp1,sizeof(sTemp1),rr->RData.LOC.latit,"NS"),
+                    conv2Coord(sTemp2,sizeof(sTemp2),rr->RData.LOC.longit,"EW"),
+                    conv2Alt(sTemp3,sizeof(sTemp3),rr->RData.LOC.alt),
+                    conv2meter(sTemp4, sizeof(sTemp4),rr->RData.LOC.size), 
+                    conv2meter(sTemp5, sizeof(sTemp5),rr->RData.LOC.hprecs),
+                    conv2meter(sTemp6, sizeof(sTemp6),rr->RData.LOC.vprecs) );
+                break;
+
+            case DNS_TYPE_SRVS:
+                /* Master file format: _Service._Proto.Name TTL Class SRV Priority Weight Port Target */
+                snprintf(ret,len, "(service:%s, protocol: %s) priority:%d, weight:%d, port:%d, target: %s", 
+                    rr->RData.SRVS.service,rr->RData.SRVS.protocol,
+                    rr->RData.SRVS.priority,rr->RData.SRVS.weight,
+                    rr->RData.SRVS.port,rr->RData.SRVS.target);
+                break;
+
+            case DNS_TYPE_NAPTR:
+                snprintf(ret,len, "order:%d, preferences:%d, flags: (%d) %.*s, service: (%d) %.*s, regex: (%d) %.*s, replacement: (%d) %.*s", 
+                    rr->RData.NAPTR.order,rr->RData.NAPTR.preference,
+                    rr->RData.NAPTR.flags_len,rr->RData.NAPTR.flags_len,rr->RData.NAPTR.flags,
+                    rr->RData.NAPTR.service_len,rr->RData.NAPTR.service_len,rr->RData.NAPTR.service,
+                    rr->RData.NAPTR.re_len,rr->RData.NAPTR.re_len,rr->RData.NAPTR.regex,
+                    rr->RData.NAPTR.re_replace_len,rr->RData.NAPTR.re_replace_len,rr->RData.NAPTR.replacement);
+                break;
+
+            case DNS_TYPE_IXFR:
+            case DNS_TYPE_AXFR:
+                //snprintf(ret,len, "%s", rr->RData.txtData);
+                break;
+
+            default:
+                snprintf(ret,len,"UNKNOWN %02Xh (%u)",rr->rrType,rr->rrType);
+        }
+    }
+	//printf("DBG(dnsRData) line=[%s]\n", ret);
+
+	return ret;
+}
+
 /* *********************************************** */
 
 static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct,
@@ -680,7 +1077,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 			switch(currItem->rrType) {
 				
 				case DNS_TYPE_A:
-					// sizeof(addressIP) = sizeof(uint32_t)
+						if ( off+4>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet A RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					memcpy(&currItem->RData.addressIP, &payload[off], sizeof(uint32_t));
 					DBGINFO("A [%p]",&currItem->RData.addressIP)
 					off+=4;
@@ -739,7 +1144,17 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 						ndpi_free(currItem);
 								no_error=0;
 					} 
-					
+						if ( off+20>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet SOA RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.SOA.MName);
+							ndpi_free(currItem->RData.SOA.RName);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					currItem->RData.SOA.Serial= get32((int*)&off, payload); 	// serial
 					currItem->RData.SOA.Refresh= get32((int*)&off, payload); 	// refresh
 					currItem->RData.SOA.Retry= get32((int*)&off, payload); 		// retry
@@ -790,6 +1205,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					
 				case DNS_TYPE_HINFO:
 					currItem->RData.HINFO.cpu_len= payload[off++];
+						if ( off+currItem->RData.HINFO.cpu_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on CPU of HINFO RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 						DBGINFO("DNS_TYPE_HINFO: cpu len: %d",currItem->RData.HINFO.cpu_len)
 					currItem->RData.HINFO.cpu= ndpi_calloc(currItem->RData.HINFO.cpu_len+1, sizeof(char));
 					if (currItem->RData.HINFO.cpu) {
@@ -804,6 +1228,16 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					}
 
 					currItem->RData.HINFO.os_len= payload[off++];
+						if ( off+currItem->RData.HINFO.os_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on OS of HINFO RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.HINFO.cpu);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGINFO("DNS_TYPE_HINFO os len: %d",currItem->RData.HINFO.os_len)
 					currItem->RData.HINFO.os= ndpi_calloc(currItem->RData.HINFO.os_len+1, sizeof(char));
 					if (currItem->RData.HINFO.os) {
@@ -835,6 +1269,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 				
 				case DNS_TYPE_TXT:
 					currItem->RData.TXT.txt_len=payload[off++];
+						if ( off+currItem->RData.TXT.txt_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on TXT RR \n");							
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					if( currItem->RData.TXT.txt_len>0) {
 						currItem->RData.TXT.txtData= ndpi_calloc((1+currItem->RData.TXT.txt_len), sizeof(char));
 						if (currItem->RData.TXT.txtData) {
@@ -853,6 +1296,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 				
 				case DNS_TYPE_AFSDB:
+						if ( off+3>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on AFSDB RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGTRACER("DNS_TYPE_AFSDB: len: %d",currItem->rrRDL)
 					currItem->RData.AFSDB.subtype= get16((int*)&off, payload); 
 					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.AFSDB.hostname, &data_len, &malformed, "[AFSDBHOST]") ) {
@@ -884,6 +1336,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 
 				case DNS_TYPE_LOC:
+						if ( off+currItem->rrRDL>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on LOC RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGTRACER("DNS_TYPE_LOC len: %d",currItem->rrRDL)
 					currItem->RData.LOC.version= payload[off++];					
 					currItem->RData.LOC.size= payload[off++];
@@ -904,6 +1365,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 					
 				case DNS_TYPE_SRVS:
+						if ( off+7>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on SRVS RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 						DBGINFO("DNS_TYPE_SRVS len: %d",currItem->rrRDL)
 					data_len= strlen(currItem->rrName);
 					tmpstr= ndpi_calloc(data_len+1,sizeof(char));
@@ -977,6 +1447,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 
 				case DNS_TYPE_NAPTR:
+						if ( off+5>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on NAPTR RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGINFO("DNS_TYPE_NAPTR:\n")	
 					currItem->RData.NAPTR.order= get16((int*)&off, payload);
 					currItem->RData.NAPTR.preference= get16((int*)&off, payload);
@@ -1000,7 +1479,7 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					} else if ( (currItem->RData.NAPTR.flags_len + off) >= payloadLen ) {
 						malformed=1;
 						printf("ERR(parseDnsRRs): malformed packet on NAPTR RR \n");
-						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
 						ndpi_free(currItem->rrName);
 						ndpi_free(currItem);
 						no_error=0;
@@ -1009,6 +1488,16 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					else currItem->RData.NAPTR.flags=NULL;
 
 					currItem->RData.NAPTR.service_len= payload[off++];
+						if ( off+currItem->RData.NAPTR.service_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on NAPTR RR(service) \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.NAPTR.flags);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					if (currItem->RData.NAPTR.service_len>0) {
 						currItem->RData.NAPTR.service= ndpi_calloc(1+currItem->RData.NAPTR.service_len, sizeof(char));
 						if ( currItem->RData.NAPTR.service ) {
@@ -1027,6 +1516,17 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					else currItem->RData.NAPTR.service=NULL;
 
 					currItem->RData.NAPTR.re_len= payload[off++];
+						if ( off+currItem->RData.NAPTR.re_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on NAPTR RR(re) \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.NAPTR.flags);
+							ndpi_free(currItem->RData.NAPTR.service);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					if (currItem->RData.NAPTR.re_len>0) {
 						currItem->RData.NAPTR.regex= ndpi_calloc(currItem->RData.NAPTR.re_len+1, sizeof(char));
 						if ( currItem->RData.NAPTR.regex ) {
@@ -1044,7 +1544,6 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 						}
 					}
 					else currItem->RData.NAPTR.regex= NULL;
-
 
 					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.NAPTR.replacement, &data_len, &malformed, "[NAPTRreplacement]") ) {
 						parseDnsName( (u_char*)currItem->RData.NAPTR.replacement, data_len, (int*)&off, payload, payloadLen );

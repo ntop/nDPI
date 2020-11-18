@@ -390,8 +390,15 @@ typedef struct dnsRRList_t {
 
 
 /* dns support: function declared and implementated here*/
-void clear_dns_QS_list(struct dnsQSList_t **qsList, unsigned char bForward);
-void clear_dns_RR_list(struct dnsRRList_t **rrList, unsigned char bForward);
+extern void clear_dns_QS_list(struct dnsQSList_t **qsList, unsigned char bForward);
+extern void clear_dns_RR_list(struct dnsRRList_t **rrList, unsigned char bForward);
 // void clear_all_dns_list(struct ndpi_flow_struct *flow);
+
+extern char* dnsRespCode(char *ret, size_t len, enum DnsResponseCode respCode);
+extern char* dnsClass(char *ret, size_t len, enum DnsClass classIndex);
+extern char* dnsType(char *ret, size_t len, enum DnsType typeCode);
+extern char *dnsRData(char *ret, size_t len, struct dnsRR_t *rr );
+
+extern void ndpi_patchIPv6Address(char *str);
 
 #endif 
