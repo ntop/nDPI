@@ -1261,7 +1261,7 @@ struct ndpi_flow_struct {
       /* the RR lists of responses */
       struct dnsRRList_t *dnsAnswerRRList, *dnsAuthorityRRList, *dnsAdditionalRRList;
 #endif   
-  } dns;
+    } dns;
 
     struct {
       u_int8_t request_code;
@@ -1275,18 +1275,18 @@ struct ndpi_flow_struct {
     struct {
       struct {
         char ssl_version_str[12];
-	u_int16_t ssl_version, server_names_len;
-	char client_requested_server_name[64], *server_names,
-	  *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
-	u_int32_t notBefore, notAfter;
-	char ja3_client[33], ja3_server[33];
-	u_int16_t server_cipher;
+      	u_int16_t ssl_version, server_names_len;
+	      char client_requested_server_name[64], *server_names,
+	        *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
+	      u_int32_t notBefore, notAfter;
+	      char ja3_client[33], ja3_server[33];
+	      u_int16_t server_cipher;
 
-	struct {
-	  u_int16_t cipher_suite;
-	  char *esni;
-	} encrypted_sni;
-	ndpi_cipher_weakness server_unsafe_cipher;
+        struct {
+          u_int16_t cipher_suite;
+          char *esni;
+        } encrypted_sni;
+      	ndpi_cipher_weakness server_unsafe_cipher;
       } ssl;
 
       struct {
