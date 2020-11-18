@@ -1519,10 +1519,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      ndpi_MD5Final(md5_hash, &ctx);
 
 	      for(i=0, j=0; i<16; i++) {
-		rc = snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
-			      sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x",
-			      md5_hash[i]);
-		if(rc > 0) j += rc; else break;
+			rc = snprintf(&flow->protos.stun_ssl.ssl.ja3_client[j],
+				sizeof(flow->protos.stun_ssl.ssl.ja3_client)-j, "%02x",
+			    md5_hash[i]);
+			if(rc > 0) j += rc; else break;
 	      }
 #ifdef DEBUG_TLS
 	      printf("[JA3] Client: %s \n", flow->protos.stun_ssl.ssl.ja3_client);
