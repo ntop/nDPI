@@ -1077,7 +1077,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 			switch(currItem->rrType) {
 				
 				case DNS_TYPE_A:
-					// sizeof(addressIP) = sizeof(uint32_t)
+						if ( off+4>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet A RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					memcpy(&currItem->RData.addressIP, &payload[off], sizeof(uint32_t));
 					DBGINFO("A [%p]",&currItem->RData.addressIP)
 					off+=4;
@@ -1136,7 +1144,17 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 						ndpi_free(currItem);
 								no_error=0;
 					} 
-					
+						if ( off+20>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet SOA RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.SOA.MName);
+							ndpi_free(currItem->RData.SOA.RName);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					currItem->RData.SOA.Serial= get32((int*)&off, payload); 	// serial
 					currItem->RData.SOA.Refresh= get32((int*)&off, payload); 	// refresh
 					currItem->RData.SOA.Retry= get32((int*)&off, payload); 		// retry
@@ -1187,6 +1205,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					
 				case DNS_TYPE_HINFO:
 					currItem->RData.HINFO.cpu_len= payload[off++];
+						if ( off+currItem->RData.HINFO.cpu_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on CPU of HINFO RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 						DBGINFO("DNS_TYPE_HINFO: cpu len: %d",currItem->RData.HINFO.cpu_len)
 					currItem->RData.HINFO.cpu= ndpi_calloc(currItem->RData.HINFO.cpu_len+1, sizeof(char));
 					if (currItem->RData.HINFO.cpu) {
@@ -1201,6 +1228,16 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					}
 
 					currItem->RData.HINFO.os_len= payload[off++];
+						if ( off+currItem->RData.HINFO.os_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on OS of HINFO RR \n");	
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.HINFO.cpu);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGINFO("DNS_TYPE_HINFO os len: %d",currItem->RData.HINFO.os_len)
 					currItem->RData.HINFO.os= ndpi_calloc(currItem->RData.HINFO.os_len+1, sizeof(char));
 					if (currItem->RData.HINFO.os) {
@@ -1232,6 +1269,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 				
 				case DNS_TYPE_TXT:
 					currItem->RData.TXT.txt_len=payload[off++];
+						if ( off+currItem->RData.TXT.txt_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on TXT RR \n");							
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					if( currItem->RData.TXT.txt_len>0) {
 						currItem->RData.TXT.txtData= ndpi_calloc((1+currItem->RData.TXT.txt_len), sizeof(char));
 						if (currItem->RData.TXT.txtData) {
@@ -1250,6 +1296,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 				
 				case DNS_TYPE_AFSDB:
+						if ( off+3>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on AFSDB RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGTRACER("DNS_TYPE_AFSDB: len: %d",currItem->rrRDL)
 					currItem->RData.AFSDB.subtype= get16((int*)&off, payload); 
 					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.AFSDB.hostname, &data_len, &malformed, "[AFSDBHOST]") ) {
@@ -1281,6 +1336,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 
 				case DNS_TYPE_LOC:
+						if ( off+currItem->rrRDL>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on LOC RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGTRACER("DNS_TYPE_LOC len: %d",currItem->rrRDL)
 					currItem->RData.LOC.version= payload[off++];					
 					currItem->RData.LOC.size= payload[off++];
@@ -1301,6 +1365,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 					
 				case DNS_TYPE_SRVS:
+						if ( off+7>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on SRVS RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 						DBGINFO("DNS_TYPE_SRVS len: %d",currItem->rrRDL)
 					data_len= strlen(currItem->rrName);
 					tmpstr= ndpi_calloc(data_len+1,sizeof(char));
@@ -1374,6 +1447,15 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					break;
 
 				case DNS_TYPE_NAPTR:
+						if ( off+5>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on NAPTR RR \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					DBGINFO("DNS_TYPE_NAPTR:\n")	
 					currItem->RData.NAPTR.order= get16((int*)&off, payload);
 					currItem->RData.NAPTR.preference= get16((int*)&off, payload);
@@ -1397,7 +1479,7 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					} else if ( (currItem->RData.NAPTR.flags_len + off) >= payloadLen ) {
 						malformed=1;
 						printf("ERR(parseDnsRRs): malformed packet on NAPTR RR \n");
-						if (malformed) NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
 						ndpi_free(currItem->rrName);
 						ndpi_free(currItem);
 						no_error=0;
@@ -1406,6 +1488,16 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					else currItem->RData.NAPTR.flags=NULL;
 
 					currItem->RData.NAPTR.service_len= payload[off++];
+						if ( off+currItem->RData.NAPTR.service_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on NAPTR RR(service) \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.NAPTR.flags);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					if (currItem->RData.NAPTR.service_len>0) {
 						currItem->RData.NAPTR.service= ndpi_calloc(1+currItem->RData.NAPTR.service_len, sizeof(char));
 						if ( currItem->RData.NAPTR.service ) {
@@ -1424,6 +1516,17 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 					else currItem->RData.NAPTR.service=NULL;
 
 					currItem->RData.NAPTR.re_len= payload[off++];
+						if ( off+currItem->RData.NAPTR.re_len>payloadLen ) {
+							printf("ERR(parseDnsRRs): malformed packet on NAPTR RR(re) \n");
+							malformed=1;
+							NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+							ndpi_free(currItem->RData.NAPTR.flags);
+							ndpi_free(currItem->RData.NAPTR.service);
+							ndpi_free(currItem->rrName);
+							ndpi_free(currItem);
+							no_error=0;
+							break;
+						}
 					if (currItem->RData.NAPTR.re_len>0) {
 						currItem->RData.NAPTR.regex= ndpi_calloc(currItem->RData.NAPTR.re_len+1, sizeof(char));
 						if ( currItem->RData.NAPTR.regex ) {
@@ -1441,7 +1544,6 @@ struct dnsRRList_t *parseDnsRRs(uint8_t nitems, int *i,
 						}
 					}
 					else currItem->RData.NAPTR.regex= NULL;
-
 
 					if ( !checkDnsNameAndAllocate(off, payload, payloadLen, &currItem->RData.NAPTR.replacement, &data_len, &malformed, "[NAPTRreplacement]") ) {
 						parseDnsName( (u_char*)currItem->RData.NAPTR.replacement, data_len, (int*)&off, payload, payloadLen );
