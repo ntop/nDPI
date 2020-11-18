@@ -26,6 +26,10 @@ Please note that the pre-requisites for compilation include:
 - GNU tools (autogen, automake, autoconf, libtool)
 - GNU C compiler (gcc)
 
+On Debian/Ubuntu systems do:
+- sudo apt-get install build-essential git bison flex libpcap-dev libtool libtool-bin autoconf pkg-config automake autogen libjson-c-dev libnuma-dev libgcrypt20-dev libpcre2-dev
+
+
 ### How To Add A New Protocol Dissector
 
 The entire procedure of adding new protocols in detail:
