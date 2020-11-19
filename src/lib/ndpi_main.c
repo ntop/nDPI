@@ -3493,10 +3493,6 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
     }
 
     *nxt_hdr = (*l4ptr)[0];
-
-    if(*l4len < ehdr_len)
-      return(1);
-
     *l4len -= ehdr_len;
     (*l4ptr) += ehdr_len;
   }
@@ -4680,15 +4676,30 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->server_id == NULL)
     flow->server_id = dst; /* Default */
 
+  /*
+  // if the flow is unknown, I cannot call an extra function!! (about what?)
+  // so I call extra only if I already set a protocol (I can be sure o unsure of that...)
+  //
   if(flow->check_extra_packets) {
     ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);
-    /* Update in case of new match */
+    //* Update in case of new match 
     ret.master_protocol = flow->detected_protocol_stack[1],
     ret.app_protocol = flow->detected_protocol_stack[0],
     ret.category = flow->category;
     goto invalidate_ptr;
   } else if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
     goto ret_protocols;
+  */
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->check_extra_packets) {
+      ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);
+      /* Update in case of new match */
+      ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0],
+    	ret.category = flow->category;
+      goto invalidate_ptr;
+    } else
+      goto ret_protocols;
+  }
 
   /* need at least 20 bytes for ip header */
   if(packetlen < 20) {
