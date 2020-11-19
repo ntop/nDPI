@@ -1924,7 +1924,9 @@ uint8_t add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr
       new_frag->data= (void*)ndpi_calloc(new_frag->len, sizeof(char));
       DBGPOINTER("new_frag->data=> %p",new_frag->data)
       if ( new_frag->data ) {
-        memcpy((char*)new_frag->data,flow->packet.payload,new_frag->len);
+        void *dst= new_frag->data;
+        void *src= flow->packet.payload;
+        memcpy(dst,src,new_frag->len);
         fragW->fragments_list[fragW->ct_frag++]= new_frag; 
       } else {
         flow->tcp_segments_management= 0; 
