@@ -1921,7 +1921,7 @@ uint8_t add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr
       DBGTRACER("offset calculation: seq %u, init: %u, offset result: %u", ntohl(tcph->seq), fragW->initial_offset, new_frag->offset)
       new_frag->len= flow->packet.payload_packet_len;      
        
-      new_frag->data= (void*)ndpi_calloc(new_frag->len, sizeof(char));
+      new_frag->data= (uint8_t *)ndpi_calloc(new_frag->len, sizeof(char));
       DBGPOINTER("new_frag->data=> %p",new_frag->data)
       if ( new_frag->data ) {
         char *dst= new_frag->data;
