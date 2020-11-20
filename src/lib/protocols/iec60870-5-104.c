@@ -38,7 +38,7 @@ void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->tcp) {
     u_int16_t offset = 0, found = 0;
     
-    while(offset < packet->payload_packet_len) {
+    while(offset + 1 < packet->payload_packet_len) {
       /* The start byte of 104 is 0x68 */
       if(packet->payload[offset] == 0x68) {
 	u_int8_t len = packet->payload[offset+1];
