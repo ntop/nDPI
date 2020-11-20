@@ -80,7 +80,8 @@ static int is_version_gquic(uint32_t version)
 static int is_version_quic(uint32_t version)
 {
   return ((version & 0xFFFFFF00) == 0xFF000000) /* IETF */ ||
-    ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */;
+    ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */ ||
+    ((version & 0x0F0F0F0F) == 0x0a0a0a0a) /* Forcing Version Negotiation */;
 }
 static int is_version_valid(uint32_t version)
 {
@@ -90,6 +91,14 @@ static uint8_t get_u8_quic_ver(uint32_t version)
 {
   if((version >> 8) == 0xff0000)
     return (uint8_t)version;
+  /* "Versions that follow the pattern 0x?a?a?a?a are reserved for use in
+     forcing version negotiation to be exercised".
+     It is tricky to return a correct draft version: such number is primarly
+     used to select a proper salt (which depends on the version itself), but
+     we don't have a real version here! Let's hope that we need to handle
+     only latest drafts... */
+  if ((version & 0x0F0F0F0F) == 0x0a0a0a0a)
+    return 29;
   return 0;
 }
 #ifdef HAVE_LIBGCRYPT
@@ -151,6 +160,13 @@ int is_version_with_var_int_transport_params(uint32_t version)
 {
   return (is_version_quic(version) && is_quic_ver_greater_than(version, 27)) ||
     (version == V_T051);
+}
+int is_version_with_ietf_long_header(uint32_t version)
+{
+  /* At least draft-ietf-quic-invariants-06, or newer*/
+  return is_version_quic(version) ||
+    ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
+    ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
 }
 
 int quic_len(const uint8_t *buf, uint64_t *value)
@@ -1032,19 +1048,15 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
     clear_payload = (uint8_t *)&packet->payload[30];
     *clear_payload_len = packet->payload_packet_len - 30;
   } else {
+    /* Upper limit of CIDs length has been already validated. If dest_conn_id_len is 0,
+       this is probably the Initial Packet from the server */
     dest_conn_id_len = packet->payload[5];
-    if(dest_conn_id_len == 0 ||
-       dest_conn_id_len > QUIC_MAX_CID_LENGTH) {
+    if(dest_conn_id_len == 0) {
       NDPI_LOG_DBG(ndpi_struct, "Packet 0x%x with dest_conn_id_len %d\n",
 		   version, dest_conn_id_len);
       return NULL;
     }
     source_conn_id_len = packet->payload[6 + dest_conn_id_len];
-    if(source_conn_id_len > QUIC_MAX_CID_LENGTH) {
-      NDPI_LOG_DBG(ndpi_struct, "Packet 0x%x with source_conn_id_len %d\n",
-		   version, source_conn_id_len);
-      return NULL;
-    }
 #ifdef HAVE_LIBGCRYPT
     const u_int8_t *dest_conn_id = &packet->payload[6];
     clear_payload = decrypt_initial_packet(ndpi_struct, flow,
@@ -1168,6 +1180,7 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t first_byte;
   u_int8_t pub_bit1, pub_bit2, pub_bit3, pub_bit4, pub_bit5, pub_bit7, pub_bit8;
+  u_int8_t dest_conn_id_len, source_conn_id_len;
 
   /* According to draft-ietf-quic-transport-29: "Clients MUST ensure that UDP
      datagrams containing Initial packets have UDP payloads of at least 1200
@@ -1218,6 +1231,33 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
      (pub_bit3 != 0 || pub_bit4 != 0)) {
     NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not Initial Packet\n", *version);
     return 0;
+  }
+
+  /* Forcing Version Negotiation packets are QUIC Initial Packets (i.e.
+     Long Header). It should also be quite rare that a client sends this kind
+     of traffic with the QUIC bit greased i.e. having a server token.
+     Accordind to https://tools.ietf.org/html/draft-thomson-quic-bit-grease-00#section-3.1
+     "A client MAY also clear the QUIC Bit in Initial packets that are sent
+      to establish a new connection.  A client can only clear the QUIC Bit
+      if the packet includes a token provided by the server in a NEW_TOKEN
+      frame on a connection where the server also included the
+      grease_quic_bit transport parameter." */
+  if((*version & 0x0F0F0F0F) == 0x0a0a0a0a &&
+     !(pub_bit1 == 1 && pub_bit2 == 1)) {
+    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x with first byte 0x%x\n", first_byte);
+    return 0;
+  }
+
+  /* Check that CIDs lengths are valid: QUIC limits the CID length to 20 */
+  if(is_version_with_ietf_long_header(*version)) {
+    dest_conn_id_len = packet->payload[5];
+    source_conn_id_len = packet->payload[5 + 1 + dest_conn_id_len];
+    if (dest_conn_id_len > QUIC_MAX_CID_LENGTH ||
+        source_conn_id_len > QUIC_MAX_CID_LENGTH) {
+      NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x invalid CIDs length %u %u",
+		     *version, dest_conn_id_len, source_conn_id_len);
+      return 0;
+    }
   }
 
   /* TODO: add some other checks to avoid false positives */
