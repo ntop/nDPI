@@ -497,7 +497,7 @@ static int quic_cipher_init(quic_cipher *cipher, int hash_algo,
   if(!quic_hkdf_expand_label(hash_algo, secret, hash_len, "quic key", write_key, key_length) ||
      !quic_hkdf_expand_label(hash_algo, secret, hash_len, "quic iv", cipher->pp_iv, sizeof(cipher->pp_iv)) ||
      !quic_hkdf_expand_label(hash_algo, secret, hash_len, "quic hp", hp_key, key_length)) {
-    return 1;
+    return 0;
   }
 
   return gcry_cipher_setkey(cipher->hp_cipher, hp_key, key_length) == 0 &&
