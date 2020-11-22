@@ -8,7 +8,7 @@ cp ~/nDPI/packages/openwrt/Makefile .
 cd myopenwrt_directory
 make menuconfig
 
-Go under network and select
+Go under libraries and select
 
 <M> libndpi.............................. nDPI Deep Packet Inspection Library
 
