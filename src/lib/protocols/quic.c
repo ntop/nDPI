@@ -1029,7 +1029,10 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
 {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int8_t *clear_payload;
-  u_int8_t dest_conn_id_len, source_conn_id_len;
+  u_int8_t dest_conn_id_len;
+#ifdef HAVE_LIBGCRYPT
+  u_int8_t source_conn_id_len;
+#endif
 
   if(is_gquic_ver_less_than(version, 43)) {
     clear_payload = (uint8_t *)&packet->payload[26];
@@ -1056,8 +1059,8 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
 		   version, dest_conn_id_len);
       return NULL;
     }
-    source_conn_id_len = packet->payload[6 + dest_conn_id_len];
 #ifdef HAVE_LIBGCRYPT
+    source_conn_id_len = packet->payload[6 + dest_conn_id_len];
     const u_int8_t *dest_conn_id = &packet->payload[6];
     clear_payload = decrypt_initial_packet(ndpi_struct, flow,
 					   dest_conn_id, dest_conn_id_len,
