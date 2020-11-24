@@ -731,7 +731,7 @@ extern "C" {
    *
    * @par     ndpi_mod = the detection module
    * @par     flow     = the detected flow
-   * @return  the HTTP method information about the flow
+   * @return  the HTTP url information about the flow
    *
   */
   char* ndpi_get_http_url(struct ndpi_detection_module_struct *ndpi_mod,
@@ -742,7 +742,7 @@ extern "C" {
    *
    * @par     ndpi_mod = the detection module
    * @par     flow     = the detected flow
-   * @return  the HTTP method information about the flow
+   * @return  the HTTP content type information about the flow
    *
   */
   char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod,
