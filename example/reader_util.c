@@ -1140,7 +1140,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if((is_ndpi_proto(flow, NDPI_PROTOCOL_TLS))
 	  || ((is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)))
 	  || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	  || (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client[0] != '\0')
+	  /*|| (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client[0] != '\0' ) */
 	  ) {
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
     snprintf(flow->ssh_tls.client_requested_server_name,
