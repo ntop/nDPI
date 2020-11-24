@@ -3732,7 +3732,6 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
             flow->l4.tcp.dns_segments_buf[i].buffer_len=flow->l4.tcp.dns_segments_buf[i].buffer_used=0;
           }    
         }
-        flow->http.content_length=0;
         
 	if(flow->http.url) {
 	  ndpi_free(flow->http.url);
@@ -4678,9 +4677,13 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(flow->server_id == NULL)
     flow->server_id = dst; /* Default */
 
+  /*
+  // if the flow is unknown, I cannot call an extra function!! (about what?)
+  // so I call extra only if I already set a protocol (I can be sure o unsure of that...)
+  //
   if(flow->check_extra_packets) {
     ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);
-    /* Update in case of new match */
+    //* Update in case of new match 
     ret.master_protocol = flow->detected_protocol_stack[1],
     ret.app_protocol = flow->detected_protocol_stack[0],
     ret.category = flow->category;
