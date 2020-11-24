@@ -12,6 +12,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "dns_utils.h"
+
 #define MAX_FLOW_ROOTS_PER_THREAD 2048
 #define MAX_IDLE_FLOWS_PER_THREAD 64
 #define TICK_RESOLUTION 1000
@@ -924,7 +926,154 @@ static void ndpi_process_packet(uint8_t * const args,
                          flow_to_process->ndpi_flow->protos.stun_ssl.ssl.subjectDN : "-"));
                 flow_to_process->tls_server_hello_seen = 1;
             }
+        } /* DNS */
+	    else if( flow_to_process->detected_l7_protocol.master_protocol == NDPI_PROTOCOL_DNS ||
+                flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_DNS ||
+                flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_LLMNR ||
+                flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_MDNS ) {
+			
+			char dnsResp[40]={0};
+			char dnsClss[25]={0};
+			char dnsTyp[20]={0};
+			char line[1024]={0};
+            				
+            unsigned char first=1;
+			
+			if (flow_to_process->ndpi_flow->protos.dns.is_query 
+                    && flow_to_process->ndpi_flow->protos.dns.dns_request_complete
+                    && !flow_to_process->ndpi_flow->protos.dns.dns_request_seen ) {
+                    
+                    flow_to_process->ndpi_flow->protos.dns.dns_request_seen=1; 
+						
+				printf("\tDNS ID #%04Xh - query num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] %s\n",
+					flow_to_process->ndpi_flow->protos.dns.tr_id,
+					flow_to_process->ndpi_flow->protos.dns.num_queries,
+					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
+					flow_to_process->ndpi_flow-> host_server_name );
+
+                struct dnsQSList_t* queriesList= flow_to_process->ndpi_flow->protos.dns.dnsQueriesList;
+                if ( queriesList!=NULL ) printf("\tDNS QUERIES ---------------- \n");
+                while (queriesList!=NULL) {
+                    struct dnsQuestionSec_t* currQS = queriesList->qsItem;
+                    // printf("DNS response list item: [%p]\n",currQS);
+
+                    // dnsRData(line,sizeof(line),currQS);
+                    
+                    //          <owner> <TTL> <class> <type> 
+                    printf("\t QUERY %d %s - %s %s \n",
+                        first,
+                        currQS->questionName,
+                        dnsType(dnsTyp,sizeof(dnsTyp),currQS->query_type),
+                        dnsClass(dnsClss,sizeof(dnsClss),currQS->query_class));
+                    
+                    queriesList = queriesList->nextItem;
+                    first++;
+                };
+
+                /* if there is a flow active it needs to free eventually allocated memory of list of previous answers! */
+               clear_all_dns_list(flow_to_process->ndpi_flow);
+
+			} else if ( !flow_to_process->ndpi_flow->protos.dns.is_query
+                    && flow_to_process->ndpi_flow->protos.dns.dns_response_complete
+                    && !flow_to_process->ndpi_flow->protos.dns.dns_response_seen ) { 
+                    flow_to_process->ndpi_flow->protos.dns.dns_response_seen=1;               
+    						
+				printf("\tDNS ID #%04Xh - response (code: %s) num: %u - type:[%02Xh - %s] - class: [%02Xh - %s] - %s\n",
+					flow_to_process->ndpi_flow->protos.dns.tr_id,				
+					dnsRespCode(dnsResp,sizeof(dnsResp),flow_to_process->ndpi_flow->protos.dns.reply_code),
+					flow_to_process->ndpi_flow->protos.dns.num_answers,
+					flow_to_process->ndpi_flow->protos.dns.query_type, dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+					flow_to_process->ndpi_flow->protos.dns.query_class, dnsClass(dnsClss,sizeof(dnsClss),flow_to_process->ndpi_flow->protos.dns.query_class),
+					flow_to_process->ndpi_flow-> host_server_name );
+                    
+                struct dnsQSList_t* queriesList= flow_to_process->ndpi_flow->protos.dns.dnsQueriesList;
+                if ( queriesList!=NULL ) printf("\tDNS QUERIES ---------------- \n");
+                while (queriesList!=NULL) {
+                    struct dnsQuestionSec_t* currQS = queriesList->qsItem;
+                    // printf("DNS response list item: [%p]\n",currQS);
+
+                    // dnsRData(line,sizeof(line),currQS);
+                    
+                    //          <owner> <TTL> <class> <type> 
+                    printf("\t QUERY %d %s - %s %s \n",
+                        first,
+                        currQS->questionName,
+                        dnsType(dnsTyp,sizeof(dnsTyp),currQS->query_type),
+                        dnsClass(dnsClss,sizeof(dnsClss),currQS->query_class));
+                    
+                    queriesList = queriesList->nextItem;
+                    first++;
+                };
+
+                first=1;                
+				struct dnsRRList_t* currList = flow_to_process->ndpi_flow->protos.dns.dnsAnswerRRList;
+				//printf("DNS response list: [%p]\n",currList);
+				if ( currList!=NULL ) printf("\tDNS ANSWER ---------------- \n");
+				while (currList!=NULL) {
+					struct dnsRR_t* currRR = currList->rrItem;
+					// printf("DNS response list item: [%p]\n",currRR);
+
+					dnsRData(line,sizeof(line),currRR);
+					
+                    //          <owner> <TTL> <class> <type> 
+                    printf("\t RR %d %s ttl:%usec, %s %s - %s\n",
+                        first,
+                        currRR->rrName,
+                        currRR->rrTTL,
+                        dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
+                        dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
+                        line);
+					
+					currList = currList->nextItem;
+				};
+			
+				currList = flow_to_process->ndpi_flow->protos.dns.dnsAuthorityRRList;
+				//printf("DNS response list: [%p]\n",currList);
+			
+				if ( currList!=NULL ) printf("\tDNS AUTHORITY ---------------- \n");
+				while (currList!=NULL) {
+					struct dnsRR_t* currRR = currList->rrItem;
+					// printf("DNS response list item: [%p]\n",currRR);
+
+					dnsRData(line,sizeof(line),currRR);
+									
+					printf("\t RR %s %s %s ttl:%usec - %s\n",
+						currRR->rrName,
+						dnsType(dnsTyp,sizeof(dnsTyp),currRR->rrType),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
+						currRR->rrTTL,
+						line);
+						
+					currList = currList->nextItem;
+				};
+			
+				currList = flow_to_process->ndpi_flow->protos.dns.dnsAdditionalRRList;
+				//printf("DNS response list: [%p]\n",currList);
+			
+				if ( currList!=NULL ) printf("\tDNS ADDITIONAL ---------------- \n");
+				while (currList!=NULL) {
+					struct dnsRR_t* currRR = currList->rrItem;
+					// printf("DNS response list item: [%p]\n",currRR);
+
+					dnsRData(line,sizeof(line),currRR);
+									
+					printf("\t RR %s %s %s ttl:%usec - %s\n",
+						currRR->rrName,
+						dnsType(dnsTyp,sizeof(dnsTyp),flow_to_process->ndpi_flow->protos.dns.query_type),
+						dnsClass(dnsClss,sizeof(dnsClss),currRR->rrClass),
+						currRR->rrTTL,
+						line);
+					currList = currList->nextItem;
+				};
+
+                /* after seen free allocated memory of list ! */
+                clear_all_dns_list(flow_to_process->ndpi_flow);
         }
+			// printf("host server: %s \n", flow_to_process->ndpi_flow-> host_server_name);		
+
+		}
+		
     }
 }
 

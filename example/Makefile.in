@@ -5,7 +5,7 @@ SRCHOME=../src
 CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @PCAP_INC@ @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ -lpthread -lm @LDFLAGS@
-HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
+HEADERS=intrusion_detection.h reader_util.h dns_utils.h $(SRCHOME)/include/ndpi_api.h \
         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=ndpiReader.o reader_util.o intrusion_detection.o
 PREFIX?=@prefix@
@@ -27,8 +27,8 @@ libndpiReader.a: $(COMMON_SOURCES:%.c=%.o) $(LIBNDPI)
 ndpiReader: libndpiReader.a $(LIBNDPI) ndpiReader.o
 	$(CC) $(CFLAGS) ndpiReader.o libndpiReader.a -o $@ $(LDFLAGS)
 
-ndpiSimpleIntegration: ndpiSimpleIntegration.o
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+ndpiSimpleIntegration: ndpiSimpleIntegration.o $(LIBNDPI) 
+	$(CC) $(CFLAGS) $? -o $@ $(LDFLAGS)
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -49,7 +49,7 @@ check:
 	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include *.c
 
 clean:
-	/bin/rm -f *.o ndpiReader ndpiReader.dpdk
+	/bin/rm -f *.o ndpiReader ndpiSimpleIntegration ndpiReader.dpdk
 	/bin/rm -f .*.dpdk.cmd .*.o.cmd *.dpdk.map .*.o.d
 	/bin/rm -f _install _postbuild _postinstall _preinstall
 	/bin/rm -rf build

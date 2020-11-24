@@ -27,6 +27,9 @@
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 
+#include "dns.h"
+#include "ndpi_utils.h"
+
 /* NDPI_LOG_LEVEL */
 typedef enum {
 	      NDPI_LOG_ERROR,
@@ -430,6 +433,11 @@ struct ndpi_vxlanhdr {
 /* ******************* ********************* ****************** */
 /* ************************************************************ */
 
+typedef struct message {
+  u_int8_t *buffer;
+  u_int buffer_len, buffer_used, max_expected;
+} message_t;
+
 /* NDPI_PROTOCOL_BITTORRENT */
 typedef struct spinlock {
   volatile int    val;
@@ -666,11 +674,9 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_TELNET */
   u_int32_t telnet_stage:2;			// 0 - 2
 
+  message_t dns_segments_buf[2];
   struct {
-    struct {
-      u_int8_t *buffer;
-      u_int buffer_len, buffer_used;
-    } message;
+    message_t message;
     
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
   
@@ -1179,9 +1185,16 @@ struct ndpi_flow_struct {
   */
   u_int32_t next_tcp_seq_nr[2];
 
+  /* tcp_segments lists */
+  u_int8_t tcp_segments_management:1;
+  u_int8_t not_sorted[2],must_free[2];     // 0: client->server and 1: server->client
+  uint32_t trigger[2];        // the seq waited number to start to reassembly
+  fragments_wrapper_t tcp_segments_list[2];
+  // -----------------------------------------
+
   u_int8_t max_extra_packets_to_check;
   u_int8_t num_extra_packets_checked;
-  u_int8_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
+  u_int16_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
 
   int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
@@ -1235,10 +1248,18 @@ struct ndpi_flow_struct {
 
   union {
     /* the only fields useful for nDPI and ntopng */
-    struct {
+    struct {      
       u_int8_t num_queries, num_answers, reply_code, is_query;
       u_int16_t query_type, query_class, rsp_type;
-      ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet */
+      ndpi_ip_addr_t rsp_addr; /* The addresses in the DNS response packet */
+#ifdef __DNS_H__
+      u_int16_t tr_id, flags;
+      u_int8_t dns_request_complete:1,dns_response_complete:1,dns_request_seen:1,dns_response_seen:1,dns_request_print:1,dns_response_print:1,:2;
+	/* the queries lists */
+      struct dnsQSList_t *dnsQueriesList;
+      /* the RR lists of responses */
+      struct dnsRRList_t *dnsAnswerRRList, *dnsAuthorityRRList, *dnsAdditionalRRList;
+#endif   
     } dns;
 
     struct {

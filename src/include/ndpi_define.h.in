@@ -341,7 +341,7 @@
 #define snprintf _snprintf
 #endif
 
-#define NDPI_MAX_DNS_REQUESTS                   16
+#define NDPI_MAX_DNS_REQUESTS                   64
 #define NDPI_MIN_NUM_STUN_DETECTION             8
 
 #define NDPI_MAJOR                              @NDPI_MAJOR@

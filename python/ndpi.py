@@ -344,6 +344,11 @@ typedef struct ndpi_protocol_bitmask_struct {
   ndpi_ndpi_mask fds_bits[16];
 } NDPI_PROTOCOL_BITMASK;
 
+typedef struct message {
+  u_int8_t *buffer;
+  u_int buffer_len, buffer_used, max_expected;
+} message_t;
+
 /* NDPI_PROTOCOL_BITTORRENT */
 typedef struct spinlock {
   volatile int    val;
@@ -576,11 +581,10 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_TELNET */
   uint32_t telnet_stage:2;			// 0 - 2
 
+  message_t dns_segments_buf[2];
+	
   struct {
-    struct {
-      uint8_t *buffer;
-      unsigned buffer_len, buffer_used;
-    } message;
+    message_t message;
 
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
 
@@ -1028,7 +1032,7 @@ struct ndpi_flow_struct {
   uint32_t next_tcp_seq_nr[2];
   uint8_t max_extra_packets_to_check;
   uint8_t num_extra_packets_checked;
-  uint8_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
+  uint16_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
 
   int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
   /*
