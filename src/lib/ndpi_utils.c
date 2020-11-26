@@ -1139,7 +1139,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_BITTORRENT:
     {
       u_int i, j, n = 0;
-      char bittorent_hash[32];
+      char bittorent_hash[sizeof(flow->protos.bittorrent.hash)*2+1];
 
       for(i=0, j = 0; j < sizeof(bittorent_hash)-1; i++) {
 	sprintf(&bittorent_hash[j], "%02x",
