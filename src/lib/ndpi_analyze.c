@@ -110,7 +110,7 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
     https://math.stackexchange.com/questions/683297/how-to-calculate-standard-deviation-without-detailed-historical-data
     http://mathcentral.uregina.ca/QQ/database/QQ.09.02/carlos1.html
   */
-  s->stddev.sum_square_total += value * value;
+  s->stddev.sum_square_total += (u_int64_t)value * (u_int64_t)value;
 }
 
 /* ********************************************************************************* */
