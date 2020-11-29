@@ -375,7 +375,6 @@ struct ndpi_dns_packet_header {
 typedef union
 {
   u_int32_t ipv4;
-  u_int8_t ipv4_u_int8_t[4];
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
   struct ndpi_in6_addr ipv6;
 #endif
