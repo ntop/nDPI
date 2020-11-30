@@ -1553,4 +1553,31 @@ struct ndpi_bin {
   } u;
 };
 
+/* **************************** */
+
+typedef struct {
+  ndpi_ip_addr_t ip;
+  u_int8_t cidr;
+  u_int8_t ip_v6:1, _notused:7;
+  u_int16_t l4_port;
+} ndpi_rule_peer;
+
+typedef enum {
+  rule_pass,
+  rule_drop
+} ndpi_rule_action;
+  
+typedef struct {
+  u_int16_t id;
+  char *description;
+  u_int8_t l4_proto;
+  ndpi_rule_action action;
+  ndpi_rule_peer client, server; /* Network byte order */
+  u_int16_t l7_proto;
+} ndpi_rule;
+
+typedef struct {
+  u_int32_t num_rules;
+} ndpi_rules;
+
 #endif /* __NDPI_TYPEDEFS_H__ */

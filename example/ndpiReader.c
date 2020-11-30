@@ -3669,6 +3669,16 @@ void analysisUnitTest() {
 
 /* *********************************************** */
 
+void rulesUnitTest() {
+#ifdef HAVE_JSON_H
+#ifdef DEBUG_RULES
+  ndpi_parse_rules(ndpi_info_mod, "../rules/sample_rules.txt");
+#endif
+#endif
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -3698,6 +3708,7 @@ int orginal_main(int argc, char **argv) {
     analyzeUnitTest();
     ndpi_self_check_host_match();
     analysisUnitTest();
+    rulesUnitTest();
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
     parseOptions(argc, argv);

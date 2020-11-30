@@ -1,0 +1,3 @@
+{"rule":{"id":1,"description":"dummy rule"},"network":{"transport":6,"protocol":"tls"},"client":{"ip":"192.168.0.1/24","port":1234},"server":{"ip":"0.0.0.0/0","port":25}}
+{"rule":{"id":2,"description":"dummy rule"},"network":{"transport":"tcp","protocol":"tls"},"action":{"verdict":"pass","marker":1}}
+{s"rule":{"id":3},"network":{"transport":"udp","protocol":"dns"}}
