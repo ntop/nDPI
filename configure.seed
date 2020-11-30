@@ -76,7 +76,10 @@ AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
 dnl> used by json-c for unit tests
-PKG_CHECK_MODULES([JSONC], [json-c])
+PKG_CHECK_MODULES([JSONC], [json-c], [JSONC_LIBS=`pkg-config --cflags json-c`, JSONC_CFLAGS=`pkg-config --libs json-c`])
+
+LIBS="$LIBS $JSONC_LIBS"
+CFLAGS="$CFLAGS $JSONC_CFLAGS"
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h json.h])
 
