@@ -1013,7 +1013,10 @@ typedef struct ndpi_proto {
 #ifdef NDPI_LIB_COMPILATION
 
 /* Needed to have access to HAVE_* defines */
+#ifndef _NDPI_CONFIG_H_
 #include "ndpi_config.h"
+#define _NDPI_CONFIG_H_
+#endif
 
 #ifdef HAVE_PCRE
 #include <pcre.h>
