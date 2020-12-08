@@ -1259,6 +1259,12 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   }
   if(i != num_tags)
     NDPI_LOG_DBG(ndpi_struct, "Something went wrong in tags iteration\n");
+
+  /* Add check for missing SNI */
+  if((flow->protos.stun_ssl.ssl.client_requested_server_name[0] == 0)) {
+    /* This is a bit suspicious */
+    NDPI_SET_BIT(flow->risk, NDPI_TLS_MISSING_SNI);
+  }
 }
 
 
