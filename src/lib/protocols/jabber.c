@@ -24,7 +24,7 @@
 
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNENCRYPTED_JABBER
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_JABBER
 
 #include "ndpi_api.h"
 
@@ -93,7 +93,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 	NDPI_LOG_INFO(ndpi_struct, "found jabber file transfer\n");
 
 	ndpi_int_jabber_add_connection(ndpi_struct, flow,
-				       NDPI_PROTOCOL_UNENCRYPTED_JABBER);
+				       NDPI_PROTOCOL_JABBER);
       }
     }
     if (dst != NULL && dst->jabber_file_transfer_port[0] != 0) {
@@ -113,7 +113,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 	NDPI_LOG_INFO(ndpi_struct, "found jabber file transfer\n");
 
 	ndpi_int_jabber_add_connection(ndpi_struct, flow,
-				       NDPI_PROTOCOL_UNENCRYPTED_JABBER);
+				       NDPI_PROTOCOL_JABBER);
       }
     }
     return;
@@ -125,7 +125,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 
 
   /* this part parses a packet and searches for port=. it works asymmetrically. */
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNENCRYPTED_JABBER) {
+  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_JABBER) {
     u_int16_t lastlen;
     u_int16_t j_port = 0;
     /* check for google jabber voip connections ... */
@@ -270,7 +270,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
        || ndpi_strnstr((const char *)&packet->payload[13], "xmlns:stream=\"http://etherx.jabber.org/streams\"", start)) {
   
       /* Protocol family */
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNENCRYPTED_JABBER);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER);
 
       /* search for subprotocols */
       check_content_type_and_change_protocol(ndpi_struct, flow, 13);
@@ -292,8 +292,8 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 
 void init_jabber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("Unencrypted_Jabber", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_UNENCRYPTED_JABBER,
+  ndpi_set_bitmask_protocol_detection("Jabber", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_JABBER,
 				      ndpi_search_jabber_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
