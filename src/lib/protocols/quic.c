@@ -1171,6 +1171,7 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload_packet_len = crypto_data_len;
 
   processClientServerHello(ndpi_struct, flow, version);
+  flow->l4.tcp.tls.hello_processed = 1; /* Allow matching of custom categories */
 
   /* Restore */
   packet->payload = p;
@@ -1233,6 +1234,8 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
                                   (char *)flow->protos.stun_ssl.ssl.client_requested_server_name,
                                   strlen((const char*)flow->protos.stun_ssl.ssl.client_requested_server_name),
                                   &ret_match, NDPI_PROTOCOL_QUIC);
+      flow->l4.tcp.tls.hello_processed = 1; /* Allow matching of custom categories */
+
       sni_found = 1;
       if (ua_found)
         return;
