@@ -214,7 +214,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 		if(name_offset < packet->payload_packet_len) {
-		  u_int cname_len;
+		  u_int cname_len = 0;
 
 		  name_offset += 1;
 		  if(packet->payload[name_offset+1] < ' ') /* Isn't printable ? */
