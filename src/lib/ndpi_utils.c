@@ -1213,8 +1213,23 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_QUIC:
     ndpi_serialize_start_of_block(serializer, "quic");
-    if(flow->host_server_name[0] != '\0')
-      ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
+    if(flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0')
+      ndpi_serialize_string_string(serializer, "client_requested_server_name",
+                                   flow->protos.stun_ssl.ssl.client_requested_server_name);
+    if(flow->http.user_agent)
+      ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
+    if(flow->protos.stun_ssl.ssl.ssl_version) {
+      u_int8_t unknown_tls_version;
+      char *version = ndpi_ssl_version2str(flow, flow->protos.stun_ssl.ssl.ssl_version, &unknown_tls_version);
+
+      if(!unknown_tls_version)
+	ndpi_serialize_string_string(serializer, "version", version);
+      if(flow->protos.stun_ssl.ssl.alpn)
+        ndpi_serialize_string_string(serializer, "alpn", flow->protos.stun_ssl.ssl.alpn);
+      ndpi_serialize_string_string(serializer, "ja3", flow->protos.stun_ssl.ssl.ja3_client);
+      if(flow->protos.stun_ssl.ssl.tls_supported_versions)
+        ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.stun_ssl.ssl.tls_supported_versions);
+    }
     ndpi_serialize_end_of_block(serializer);
     break;
 
