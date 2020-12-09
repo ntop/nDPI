@@ -6,17 +6,16 @@
 # make Makefile
 #
 
-
 #
 # Installation directories
 #
 prefix     = @prefix@
 libdir     = ${prefix}/lib
 includedir = ${prefix}/include/ndpi
-CC         = @CC@
+CC         = @GNU_PREFIX@@CC@
 CFLAGS     += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -Wall @CFLAGS@ @CUSTOM_NDPI@
 LDFLAGS    = @LDFLAGS@ @ADDITIONAL_LIBS@ @LIBS@ -lm
-RANLIB     = ranlib
+RANLIB     = @GNU_PREFIX@ranlib
 
 OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) $(patsubst ./%.c, ./%.o, $(wildcard ./*.c))
 HEADERS   = $(wildcard ../include/*.h)
@@ -48,7 +47,7 @@ all: $(NDPI_LIBS)
 ndpi_main.c: ndpi_content_match.c.inc
 
 $(NDPI_LIB_STATIC): $(OBJECTS)
-	   ar rc $@ $(OBJECTS)
+	   @GNU_PREFIX@ar rc $@ $(OBJECTS)
 	   $(RANLIB) $@      
 
 $(NDPI_LIB_SHARED): $(OBJECTS)
