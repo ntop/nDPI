@@ -110,7 +110,8 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       u_int32_t index = 0;
 
       if(packet->payload_packet_len >= 12 && packet->payload_packet_len < 300 && get_l32(packet->payload, 4) == 1) {
-	while (!get_u_int16_t(packet->payload, index + 2)
+	while (index + 4 < packet->payload_packet_len &&
+	       !get_u_int16_t(packet->payload, index + 2)
 	       && (index + get_l32(packet->payload, index)) < packet->payload_packet_len - 4) {
 	  if(get_l32(packet->payload, index) < 8)	/*Minimum soulseek login msg is 8B */
 	    break;
