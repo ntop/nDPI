@@ -1613,7 +1613,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
 
  datalink_check:
-  if(header->caplen < eth_offset + 40)
+  // 20 for min iph and 8 for min UDP
+  if(header->caplen < eth_offset + 28)
     return(nproto); /* Too short */
 
   switch(datalink_type) {
