@@ -428,7 +428,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     if(j > 0) {
       ndpi_protocol_match_result ret_match;
 
-      ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
+      ndpi_predict_dga(ndpi_struct, flow, (char*)flow->host_server_name, 0.25);
 
       ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
 						     (char *)flow->host_server_name,

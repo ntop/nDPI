@@ -1198,9 +1198,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
 		      flow->l4.tcp.tls.subprotocol_detected = 1;
 		  }
-
-		  ndpi_check_dga_name(ndpi_struct, flow,
-				      flow->protos.stun_ssl.ssl.client_requested_server_name, 1);
+		  ndpi_predict_dga(ndpi_struct, flow, flow->protos.stun_ssl.ssl.client_requested_server_name, 0.25);
 		} else {
 #ifdef DEBUG_TLS
 		  printf("[TLS] Extensions server len too short: %u vs %u\n",

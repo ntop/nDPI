@@ -85,7 +85,7 @@ static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct 
 				 flow->packet.payload_packet_len - off, name, sizeof(name)) > 0) {
       snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
 
-      ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
+      ndpi_predict_dga(ndpi_struct, flow, (char*)flow->host_server_name, 0.25);
   }
 
   if(sub_protocol == NDPI_PROTOCOL_UNKNOWN)

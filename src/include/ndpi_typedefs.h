@@ -1084,10 +1084,11 @@ struct ndpi_detection_module_struct {
   u_int ndpi_num_custom_protocols;
 
   /* HTTP/DNS/HTTPS host matching */
-  ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
-    content_automa,                            /* Used for HTTP subprotocol_detection */
-    subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
-    bigrams_automa, impossible_bigrams_automa; /* TOR */
+  ndpi_automa host_automa,                      /* Used for DNS/HTTPS */
+  content_automa,                               /* Used for HTTP subprotocol_detection */
+  subprotocol_automa,                           /* Used for HTTP subprotocol_detection */
+  bigrams_automa, impossible_bigrams_automa,    /* TOR */
+  dga_trigrams_automa, non_dga_trigrams_automa; /* Used for DGA detection */
   /* IMPORTANT: please update ndpi_finalize_initalization() whenever you add a new automa */
   
   struct {

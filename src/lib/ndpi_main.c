@@ -46,9 +46,11 @@
 #endif
 
 #include "ndpi_content_match.c.inc"
+#include "ndpi_dga_tree.c.inc"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ht_hash.h"
 #include "third_party/include/ndpi_md5.h"
+
 
 /* stun.c */
 extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
@@ -590,6 +592,13 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   for (i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa, (char *) ndpi_en_impossible_bigrams[i], 1,
 			  1, 1, 0);
+
+  // DGA detection automatas
+  for (i = 0; ndpi_dga_trigrams[i] != NULL; i++)
+    ndpi_string_to_automa(ndpi_str, &ndpi_str->dga_trigrams_automa, (char *) ndpi_dga_trigrams[i], 1, 1, 1, 0);
+
+  for (i = 0; ndpi_non_dga_trigrams[i] != NULL; i++)
+    ndpi_string_to_automa(ndpi_str, &ndpi_str->non_dga_trigrams_automa, (char *) ndpi_non_dga_trigrams[i], 1, 1, 1, 0);
 }
 
 /* ******************************************************************** */
@@ -2056,6 +2065,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->content_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->impossible_bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
+  ndpi_str->non_dga_trigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
+  ndpi_str->dga_trigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
 
   if((sizeof(categories) / sizeof(char *)) != NDPI_PROTOCOL_NUM_CATEGORIES) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] invalid categories length: expected %u, got %u\n", NDPI_PROTOCOL_NUM_CATEGORIES,
@@ -2088,7 +2099,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 6; i++) {
     ndpi_automa *automa;
 
     switch(i) {
@@ -2106,6 +2117,14 @@ void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) 
 
     case 3:
       automa = &ndpi_str->impossible_bigrams_automa;
+      break;
+
+    case 4:
+      automa = &ndpi_str->non_dga_trigrams_automa;
+      break;
+
+    case 5:
+      automa = &ndpi_str->dga_trigrams_automa;
       break;
 
     default:
@@ -2364,6 +2383,12 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->impossible_bigrams_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->impossible_bigrams_automa.ac_automa, 0);
+
+    if(ndpi_str->dga_trigrams_automa.ac_automa != NULL)
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->dga_trigrams_automa.ac_automa, 0);
+
+    if(ndpi_str->non_dga_trigrams_automa.ac_automa != NULL)
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->non_dga_trigrams_automa.ac_automa, 0);
 
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
@@ -6934,4 +6959,172 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 #endif
 
   return(rc);
+}
+
+
+int ndpi_match_trigram(struct ndpi_detection_module_struct *ndpi_str, ndpi_automa *automa, char *trigram_to_match) {
+  AC_TEXT_t ac_input_text;
+  AC_REP_t match = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED};
+  int rc;
+  if ((automa->ac_automa == NULL) || (trigram_to_match == NULL)) return -1;
+  if (!automa->ac_automa_finalized) ndpi_finalize_initalization(ndpi_str);
+  ac_input_text.astring = trigram_to_match, ac_input_text.length = 3;
+  rc = ac_automata_search(((AC_AUTOMATA_t *) automa->ac_automa), &ac_input_text, &match);
+  if ((rc == 0) && (match.number != 0)) rc = 1;
+  return (rc ? match.number : 0);
+}
+
+
+void dga_update_dist_features(uint8_t *dist,
+                              int idx,
+                              int total_length,
+                              float *norm_entropy,
+                              float *gini,
+                              float *classification_error) {
+  float dx = (float)dist[idx]/total_length;
+  if (dx != 0) { // we work on non zero only.
+    (*norm_entropy) += (dx * log2(dx));
+    (*gini) += dx * dx;
+    if (dx > (*classification_error)) (*classification_error) = dx;
+    dist[idx] = 0; // if same char hit again, ignored as the computation is already performed.
+                   // name to parse will be most of the time shorter than 255 lookup table, so we optimize it by
+                   // iterating over it instead of 255 dist array.
+                   // We make use of the same trigram iteration and we process the 2 last chars.
+  }
+  return;
+}
+
+
+int ndpi_predict_dga(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                     char *to_predict, float sensitivity) {
+  if (!to_predict) return 0;
+  int total_length = 0, num_repetitions = 0, max_num_repetitions = 0, last_char = -1;
+  float norm_entropy = 0, dga_probability = 0, gini = 0, classification_error = 0;
+  uint8_t dist[255];
+  memset(dist, 0, 255);
+  total_length = strlen(to_predict);
+
+  if (total_length >= 4) {
+    int i = 0, num_trigrams = 0, num_digits = 0, num_vowels = 0, num_hexs = 0, num_consonants = 0, num_dots = 0;
+    int num_dga_trigrams=0, num_non_dga_trigrams=0;
+
+    // we perform a char based pass: lowercase and precompute some features.
+    for(; i < total_length; i++) {
+      to_predict[i] = tolower(to_predict[i]); // lowercase each char.
+      dist[(int)to_predict[i]]++; // increment per char distribution.
+      switch (to_predict[i]) {
+        // we count: vowels, hexadecimal chars, consonants, digits and dots.
+	    case 'a':
+	    case 'e':
+	      num_vowels++;
+	      num_hexs++;
+	      break;
+	    case 'i':
+	    case 'o':
+	    case 'u':
+	      num_vowels++;
+	      break;
+	    case 'b':
+	    case 'c':
+	    case 'd':
+	    case 'f':
+          num_consonants++;
+          num_hexs++;
+          break;
+	    case 'g':
+	    case 'h':
+	    case 'j':
+	    case 'k':
+	    case 'l':
+	    case 'm':
+	    case 'n':
+	    case 'p':
+	    case 'q':
+	    case 'r':
+	    case 's':
+	    case 't':
+	    case 'v':
+	    case 'w':
+	    case 'x':
+	    case 'y':
+	    case 'z':
+	      num_consonants++;
+	      break;
+	    case '.':
+	      num_dots++;
+	      break;
+	    case '0':
+	    case '1':
+        case '2':
+        case '3':
+	    case '4':
+	    case '5':
+	    case '6':
+	    case '7':
+	    case '8':
+	    case '9':
+	      num_digits++;
+	      num_hexs++;
+	      break;
+	    default:
+	      continue;
+	      break;
+	  }
+
+	  // Compute max consecutive repetitions within the domain
+	  if ((int)to_predict[i] == last_char) num_repetitions++;
+	  else num_repetitions = 0;
+	  if (num_repetitions > max_num_repetitions) max_num_repetitions = num_repetitions;
+	  last_char = (int)to_predict[i]; // we use ascii code as we initiated last_chat with -1 for first char skip.
+    }
+
+
+    // we perform a trigram based pass
+    for (; num_trigrams + 3 <= total_length; num_trigrams++) {
+      dga_update_dist_features(dist, (int)to_predict[num_trigrams], total_length, &norm_entropy, &gini, &classification_error);
+      if (ndpi_match_trigram(ndpi_str, &ndpi_str->dga_trigrams_automa, &to_predict[num_trigrams])) num_dga_trigrams++;
+      if (ndpi_match_trigram(ndpi_str, &ndpi_str->non_dga_trigrams_automa, &to_predict[num_trigrams])) num_non_dga_trigrams++;
+    }
+    // do not forget the 2 last chars
+    dga_update_dist_features(dist, (int)to_predict[num_trigrams], total_length, &norm_entropy, &gini, &classification_error);
+    dga_update_dist_features(dist, (int)to_predict[num_trigrams+1], total_length, &norm_entropy, &gini, &classification_error);
+    // Features normalization
+    norm_entropy = (norm_entropy * (-1))/log2(total_length);
+    gini = 1 - gini;
+    classification_error = 1 - classification_error;
+    /* Debug purposes only
+    printf("%s,%f,%f,%f,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+           to_predict, norm_entropy, gini, classification_error, num_non_dga_trigrams, num_dga_trigrams, num_trigrams,
+           total_length, num_digits, num_vowels, num_hexs, num_consonants, num_dots);
+    */
+    dga_probability = dga_predict_proba(norm_entropy, gini, classification_error, num_non_dga_trigrams, num_dga_trigrams,
+                                        num_trigrams, total_length, num_digits, num_vowels, num_hexs, num_consonants,
+                                        num_dots);
+
+#ifdef DGA_DEBUG
+    printf("[DGA] to_predict              : %s\n", to_predict);
+    printf("      max_num_repetitions     : %d\n", max_num_repetitions);
+    printf("      num_dga_trigrams        : %d\n", num_dga_trigrams);
+    printf("      num_non_dga_trigrams    : %d\n", num_non_dga_trigrams);
+    printf("      num_trigrams            : %d\n", num_trigrams);
+    printf("      num_digits              : %d\n", num_digits);
+    printf("      num_vowels              : %d\n", num_vowels);
+    printf("      num_hexs                : %d\n", num_hexs);
+    printf("      num_consonants          : %d\n", num_consonants);
+    printf("      num_dots                : %d\n", num_dots);
+    printf("      total_length            : %d\n", total_length);
+    printf("      norm_entropy            : %f\n", norm_entropy);
+    printf("      gini                    : %f\n", gini);
+    printf("      classification_error    : %f\n", classification_error);
+    printf("      dga_proba               : %f\n", dga_probability);
+    printf("      sensitivity threshold   : %f\n", (float)(1 - sensitivity));
+#endif
+
+    // return result and set risk bit depending on configured sensitivity.
+    if (dga_probability >= (float)(1 - sensitivity)) {
+      if (flow) NDPI_SET_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
+      return 1;
+    }
+  }
+  return 0;
 }

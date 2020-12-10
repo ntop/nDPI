@@ -949,6 +949,21 @@ extern "C" {
 			  struct ndpi_flow_struct *flow,
 			  char *name, u_int8_t is_hostname);
 
+  /*
+   * ndpi_predict_dga_name: Estimate is a name is DGA or not according to a sensitivity threshold
+   *
+   * @par    ndpi_struct         = the detection module
+   * @par    flow                = ndpi flow structure, if DGA: DGA_RISK_BIT will be set.
+   * @par    to_predict          = the hostname to predict (e.g. HTTP/HTTPS/DNS hostnames)
+   * @par    sensitivity         = estimator sensitivity (e.g: 0.1, 0.88, 0.2, 0.98):
+                                   low sensitivity: estimator predicts less DGA but more accurate.
+                                   high sensitivity: estimator predicts more DGA but less accurate.
+   * @return True if DGA else False
+   *
+   */
+  int ndpi_predict_dga(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                       char *to_predict, float sensitivity);
+
   /* Serializer (supports JSON, TLV, CSV) */
 
   /**
