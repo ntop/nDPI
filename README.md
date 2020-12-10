@@ -29,6 +29,10 @@ Please note that the pre-requisites for compilation include:
 On Debian/Ubuntu systems do:
 - sudo apt-get install build-essential git bison flex libpcap-dev libtool libtool-bin autoconf pkg-config automake autogen libjson-c-dev libnuma-dev libgcrypt20-dev libpcre2-dev
 
+FreeBSD
+- sudo pkg install gcc git autoconf automake libtool devel/pkgconf json-c gmake
+
+Remember to use gmake and not make on FreeBSD
 
 ### How To Add A New Protocol Dissector
 
