@@ -1691,7 +1691,7 @@ u_int8_t ndpi_is_tor_flow(struct ndpi_detection_module_struct *ndpi_str, struct 
 
 /* ******************************************* */
 
-static patricia_node_t *add_to_ptree(patricia_tree_t *tree, int family, void *addr, int bits) {
+static patricia_node_t* add_to_ptree(patricia_tree_t *tree, int family, void *addr, int bits) {
   prefix_t prefix;
   patricia_node_t *node;
 

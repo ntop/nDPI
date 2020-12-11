@@ -1571,17 +1571,38 @@ typedef enum {
   rule_drop
 } ndpi_rule_action;
   
-typedef struct {
+typedef struct _ndpi_rule {
+  /* Ancillary information */
   u_int16_t id;
   char *description;
+
+  /* Keys */
   u_int8_t l4_proto;
-  ndpi_rule_action action;
   ndpi_rule_peer client, server; /* Network byte order */
   u_int16_t l7_proto;
+  u_int8_t reverseable_rule:1 /* src <-> dst */, _not_used:7;
+  
+  /* Rule actions */
+  ndpi_rule_action action;
+  
+  /* Internal use */
+  struct _ndpi_rule *list_next; /* Linked list of rules */
+  
 } ndpi_rule;
 
+/*
+  Matching order
+  - L7 protocol
+  - match client/server
+
+ */
 typedef struct {
   u_int32_t num_rules;
+  ndpi_rule *root;
+
+  ndpi_rule *l7_rules[NDPI_LAST_IMPLEMENTED_PROTOCOL], *l7_any;
+
+  
 } ndpi_rules;
 
 #endif /* __NDPI_TYPEDEFS_H__ */
