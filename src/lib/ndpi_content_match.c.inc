@@ -8826,6 +8826,7 @@ static ndpi_protocol_match host_match[] =
    { "nflximg.net",                           "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
    { "nflxvideo.net",                         "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
    { "nflxso.net",                            "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN },
+   { "fast.com",                              "NetFlix",          NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_SAFE },
 
    { ".skype.",                                    "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
    { ".skypeassets.",                              "Skype",            NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE },
