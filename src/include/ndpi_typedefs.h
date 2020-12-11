@@ -956,11 +956,12 @@ typedef enum {
 		in ndpi_main.c
 	      */
 
-	      NDPI_PROTOCOL_NUM_CATEGORIES /*
+	      NDPI_PROTOCOL_NUM_CATEGORIES, /*
 					     NOTE: Keep this as last member
 					     Unused as value but useful to getting the number of elements
 					     in this datastructure
 					   */
+              NDPI_PROTOCOL_ANY_CATEGORY /* Used to handle wildcards */
 } ndpi_protocol_category_t;
 
 typedef enum {
