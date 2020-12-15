@@ -97,6 +97,7 @@ extern "C" {
 
   extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
 				      ndpi_protocol_breed_t protoBreed, u_int16_t protoId,
+				      ndpi_protocol_extid_t extid,
 				      u_int8_t can_have_a_subprotocol,
 				      u_int16_t tcp_alias_protoId[2],
 				      u_int16_t udp_alias_protoId[2], char *protoName,
@@ -153,6 +154,10 @@ extern "C" {
 #ifdef NDPI_DETECTION_SUPPORT_IPV6
     int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t ** l4ptr, u_int16_t * l4len, u_int8_t * nxt_hdr);
 #endif
+
+/* Internal <-> external ID mappings */
+ndpi_protocol_extid_t ndpi_intid_to_extid(u_int16_t protoId);
+u_int16_t ndpi_extid_to_intid(ndpi_protocol_extid_t extId);
 
 #ifdef __cplusplus
 }
