@@ -359,10 +359,6 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
             setHttpUserAgent(ndpi_struct, flow, token);
 	}
       }
-    } else if((ua_ptr_len > 14) && (memcmp(ua, "netflix-ios-app", 15) == 0)) {
-      NDPI_LOG_INFO(ndpi_struct, "found netflix\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_NETFLIX, NDPI_PROTOCOL_CATEGORY_STREAMING);
-      return -1;
     }
   }
 
@@ -849,7 +845,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       http_bitmask_exclude_other(flow);
       return;
-    }
+    } else
+      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
 
     NDPI_LOG_DBG2(ndpi_struct,
 		  "Filename HTTP found: %d, we look for line info..\n", filename_start);
