@@ -441,7 +441,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[packet->host_line.len]);
       }
 
-      flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr, flow->packet.http_method.len);
+      flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr,
+					       (u_int16_t)flow->packet.http_method.len);
     }
 
   if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
