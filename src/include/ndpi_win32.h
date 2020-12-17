@@ -59,8 +59,10 @@
 #define IPPROTO_SCTP 132
 #endif
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
 #undef gettimeofday
 #define gettimeofday mingw_gettimeofday
+#endif
 
 extern char* strsep(char **sp, char *sep);
 
@@ -93,11 +95,6 @@ extern unsigned long waitForNextEvent(unsigned long ulDelay /* ms */);
 #define strtok_r                        strtok_s
 #define timegm                          _mkgmtime
 
-static inline struct tm * localtime_r(const time_t *timep, struct tm * result)
-{
-    struct tm *timeinfo;
-    timeinfo = localtime(timep);
-    return timeinfo;
-}
+extern struct tm* localtime_r(const time_t* timep, struct tm* r);
 
 #endif /* __NDPI_WIN32_H__ */
