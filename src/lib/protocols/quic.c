@@ -1226,6 +1226,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
       sni_len = MIN(len, sizeof(flow->protos.stun_ssl.ssl.client_requested_server_name) - 1);
       memcpy(flow->protos.stun_ssl.ssl.client_requested_server_name,
              &crypto_data[tag_offset_start + prev_offset], sni_len);
+      flow->protos.stun_ssl.ssl.client_requested_server_name[sni_len] = '\0';
 
       NDPI_LOG_DBG2(ndpi_struct, "SNI: [%s]\n",
                     flow->protos.stun_ssl.ssl.client_requested_server_name);
@@ -1235,6 +1236,9 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
                                   strlen((const char*)flow->protos.stun_ssl.ssl.client_requested_server_name),
                                   &ret_match, NDPI_PROTOCOL_QUIC);
       flow->l4.tcp.tls.hello_processed = 1; /* Allow matching of custom categories */
+
+      ndpi_check_dga_name(ndpi_struct, flow,
+                          flow->protos.stun_ssl.ssl.client_requested_server_name, 1);
 
       sni_found = 1;
       if (ua_found)
