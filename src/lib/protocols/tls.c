@@ -1432,7 +1432,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    }
 		  }
 		}
-	      } else if(extension_id == 65445 /* QUIC transport parameters */) {
+	      } else if(extension_id == 65445 || /* QUIC transport parameters (drafts version) */
+		        extension_id == 57) { /* QUIC transport parameters (final version) */
 		u_int16_t s_offset = offset+extension_offset;
 		uint16_t final_offset;
 		int using_var_int = is_version_with_var_int_transport_params(quic_version);

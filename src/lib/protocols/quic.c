@@ -50,6 +50,7 @@ extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_str
                                    const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
 
 /* Versions */
+#define V_1		0x00000001
 #define V_Q024		0x51303234
 #define V_Q025		0x51303235
 #define V_Q030		0x51303330
@@ -79,7 +80,8 @@ static int is_version_gquic(uint32_t version)
 }
 static int is_version_quic(uint32_t version)
 {
-  return ((version & 0xFFFFFF00) == 0xFF000000) /* IETF */ ||
+  return version == V_1 ||
+    ((version & 0xFFFFFF00) == 0xFF000000) /* IETF Drafts*/ ||
     ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */ ||
     ((version & 0x0F0F0F0F) == 0x0a0a0a0a) /* Forcing Version Negotiation */;
 }
@@ -89,8 +91,13 @@ static int is_version_valid(uint32_t version)
 }
 static uint8_t get_u8_quic_ver(uint32_t version)
 {
+  /* IETF Draft versions */
   if((version >> 8) == 0xff0000)
     return (uint8_t)version;
+  /* QUIC (final?) constants for v1 are defined in draft-33 */
+  if (version == 0x00000001) {
+    return 33;
+  }
   /* "Versions that follow the pattern 0x?a?a?a?a are reserved for use in
      forcing version negotiation to be exercised".
      It is tricky to return a correct draft version: such number is primarly
@@ -847,7 +854,10 @@ static int quic_derive_initial_secrets(uint32_t version,
 						      0x7a, 0x4e, 0xde, 0xf4, 0xe7, 0xcc, 0xee, 0x5f, 0xa4, 0x50,
 						      0x6c, 0x19, 0x12, 0x4f, 0xc8, 0xcc, 0xda, 0x6e, 0x03, 0x3d
   };
-
+  static const uint8_t handshake_salt_v1[20] = {
+						0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
+						0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
+  };
   gcry_error_t err;
   uint8_t secret[HASH_SHA2_256_LENGTH];
 #ifdef DEBUG_CRYPT
@@ -877,9 +887,13 @@ static int quic_derive_initial_secrets(uint32_t version,
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_23,
 		       sizeof(handshake_salt_draft_23),
                        cid, cid_len, secret);
-  } else {
+  } else if(is_quic_ver_less_than(version, 32)) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_29,
 		       sizeof(handshake_salt_draft_29),
+                       cid, cid_len, secret);
+  } else {
+    err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_v1,
+		       sizeof(handshake_salt_v1),
                        cid, cid_len, secret);
   }
   if(err) {
