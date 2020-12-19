@@ -70,14 +70,14 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
   if(packet->udp) {
     dhcp_packet_t *dhcp = (dhcp_packet_t*)packet->payload;
 
-    if((packet->payload_packet_len >= 244 /* 244 is the offset of options[0] in dhcp_packet_t */)
+    if((packet->payload_packet_len >= 240 /* 240 is the offset of options[0] in dhcp_packet_t */)
        && (packet->udp->source == htons(67) || packet->udp->source == htons(68))
        && (packet->udp->dest == htons(67) || packet->udp->dest == htons(68))
        && (dhcp->magic == htonl(DHCP_OPTION_MAGIC_NUMBER))) {
       u_int i = 0, foundValidMsgType = 0;
 
       u_int dhcp_options_size = ndpi_min(DHCP_VEND_LEN /* maximum size of options in dhcp_packet_t */,
-					 packet->payload_packet_len - 244);
+					 packet->payload_packet_len - 240);
 
       while(i + 1 /* for the len */ < dhcp_options_size) {
 	u_int8_t id  = dhcp->options[i];
