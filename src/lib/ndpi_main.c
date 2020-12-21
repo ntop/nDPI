@@ -6509,10 +6509,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
-    if((!flow->l4.tcp.tls.certificate_processed)
-       || (flow->l4.tcp.tls.num_tls_blocks <= ndpi_str->num_tls_blocks_to_follow)) {
+    if(flow->l4.tcp.tls.certificate_processed) return(0);
+
+    if(flow->l4.tcp.tls.num_tls_blocks <= ndpi_str->num_tls_blocks_to_follow) {
       // printf("*** %u/%u\n", flow->l4.tcp.tls.num_tls_blocks, ndpi_str->num_tls_blocks_to_follow);
-      return(1); /* TODO: add check for TLS 1.3 */
+      return(1);
     }
     break;
 
