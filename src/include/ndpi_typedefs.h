@@ -669,6 +669,7 @@ struct ndpi_flow_tcp_struct {
     struct {
       u_int8_t *buffer;
       u_int buffer_len, buffer_used;
+      u_int32_t next_seq[2]; /* Directions */
     } message;
     
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
