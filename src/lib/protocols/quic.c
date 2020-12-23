@@ -1181,6 +1181,13 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
      Negotiated version is only present in the ServerHello message too, but
      fortunately, QUIC always uses TLS version 1.3 */
   flow->protos.stun_ssl.ssl.ssl_version = 0x0304;
+
+  /* DNS-over-QUIC: ALPN is "doq" or "doq-XXX" (for drafts versions) */
+  if(flow->protos.stun_ssl.ssl.alpn &&
+     strncmp(flow->protos.stun_ssl.ssl.alpn, "doq", 3) == 0) {
+    NDPI_LOG_DBG(ndpi_struct, "Found DOQ (ALPN: [%s])\n", flow->protos.stun_ssl.ssl.alpn);
+    ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_QUIC);
+  }
 }
 static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 			 struct ndpi_flow_struct *flow,

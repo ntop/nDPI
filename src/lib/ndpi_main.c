@@ -875,7 +875,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DOH_DOT, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "DoH_DoT", NDPI_PROTOCOL_CATEGORY_NETWORK /* dummy */,
 			  ndpi_build_default_ports(ports_a, 853, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			  ndpi_build_default_ports(ports_b, 784, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_REDDIT, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Reddit", NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
