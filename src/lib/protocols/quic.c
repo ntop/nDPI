@@ -982,6 +982,12 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   packet_number = pkn32;
 
   offset = pn_offset + pkn_len;
+  if (!(pn_offset + payload_length >= offset + 16)) {
+    NDPI_LOG_DBG(ndpi_struct, "No room for Auth Tag %d %d",
+                 pn_offset + payload_length, offset);
+    quic_ciphers_reset(&ciphers);
+    return NULL;
+  }
   quic_decrypt_message(&ciphers.pp_cipher, &packet->payload[0], pn_offset + payload_length,
 		       offset, first_byte, pkn_len, packet_number, &decryption);
 
