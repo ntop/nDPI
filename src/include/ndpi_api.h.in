@@ -1427,9 +1427,6 @@ extern "C" {
 
   u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long);
 
-  /* ******************************* */
-  
-  ndpi_rules* ndpi_parse_rules(struct ndpi_detection_module_struct *ndpi_str, char *path);  
 #ifdef __cplusplus
 }
 #endif
