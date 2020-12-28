@@ -4488,6 +4488,15 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
 
 /* ********************************************************************************* */
 
+static int ndpi_is_ntop_protocol(ndpi_protocol *ret) {
+  if((ret->master_protocol == NDPI_PROTOCOL_HTTP) && (ret->app_protocol == NDPI_PROTOCOL_NTOP))
+    return(1);
+  else
+    return(0);
+}
+
+/* ********************************************************************************* */
+
 static int ndpi_check_protocol_port_mismatch_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 							struct ndpi_flow_struct *flow,
 							ndpi_default_ports_tree_node_t *expected_proto,
@@ -4498,6 +4507,8 @@ static int ndpi_check_protocol_port_mismatch_exceptions(struct ndpi_detection_mo
     options available
   */
 
+  if(ndpi_is_ntop_protocol(returned_proto)) return(1);
+	     
   if(returned_proto->master_protocol == NDPI_PROTOCOL_TLS) {
     switch(expected_proto->proto->protoId) {
     case NDPI_PROTOCOL_MAIL_IMAPS:
@@ -4847,7 +4858,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
       if(!ndpi_check_protocol_port_mismatch_exceptions(ndpi_str, flow, found, &ret))
 	NDPI_SET_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
-    } else if(default_ports && (default_ports[0] != 0)) {
+    } else if((!ndpi_is_ntop_protocol(&ret)) && default_ports && (default_ports[0] != 0)) {
       u_int8_t found = 0, i, num_loops = 0;
 
     check_default_ports:

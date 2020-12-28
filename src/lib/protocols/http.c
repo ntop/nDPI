@@ -446,8 +446,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
 
   if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
-    if(strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0)
+    if(strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP);
+      NDPI_CLR_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+    }
   }
   
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
