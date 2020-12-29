@@ -4324,7 +4324,7 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, c
   memset(&ac_pattern, 0, sizeof(ac_pattern));
 
   if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL) {
-    free(name);
+    ndpi_free(name);
     return(-1);
   }
 
@@ -4333,12 +4333,12 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, c
 
   rc = ac_automata_add(ndpi_str->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
   if(rc != ACERR_DUPLICATE_PATTERN && rc != ACERR_SUCCESS) {
-    free(name);
+    ndpi_free(name);
     return(-1);
   }
 
   if(rc == ACERR_DUPLICATE_PATTERN)
-    free(name);
+    ndpi_free(name);
 
   return(0);
 }
