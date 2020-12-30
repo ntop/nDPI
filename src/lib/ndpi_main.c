@@ -6330,13 +6330,13 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       if(flow->protos.stun_ssl.ssl.server_names)
 	ndpi_free(flow->protos.stun_ssl.ssl.server_names);
 
+      if(flow->protos.stun_ssl.ssl.alpn)
+	ndpi_free(flow->protos.stun_ssl.ssl.alpn);
+	
+      if(flow->protos.stun_ssl.ssl.tls_supported_versions)
+        ndpi_free(flow->protos.stun_ssl.ssl.tls_supported_versions);
+	
       if(!is_quic) {
-	if(flow->protos.stun_ssl.ssl.alpn)
-	  ndpi_free(flow->protos.stun_ssl.ssl.alpn);
-	
-	if(flow->protos.stun_ssl.ssl.tls_supported_versions)
-	  ndpi_free(flow->protos.stun_ssl.ssl.tls_supported_versions);
-	
 	if(flow->protos.stun_ssl.ssl.issuerDN)
 	  ndpi_free(flow->protos.stun_ssl.ssl.issuerDN);
 	
