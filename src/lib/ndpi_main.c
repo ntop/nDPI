@@ -6683,7 +6683,7 @@ int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr,
 /* ******************************************************************** */
 
 int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
-			  const ndpi_ip_addr_t *addr, uint *user_data) {
+			  const ndpi_ip_addr_t *addr, u_int64_t *user_data) {
   u_int8_t is_v6 = ndpi_is_ipv6(addr);
   patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
   prefix_t prefix;
@@ -6698,7 +6698,7 @@ int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
   node = ndpi_patricia_search_best(ptree, &prefix);
 
   if(node) {
-    *user_data = node->value.u.uv32.user_value;
+    *user_data = node->value.u.uv64;
 
     return(0);
   }
