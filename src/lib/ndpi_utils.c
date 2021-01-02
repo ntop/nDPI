@@ -1721,6 +1721,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_MISSING_SNI:
     return("SNI TLS extension was missing");
     
+  case NDPI_HTTP_SUSPICIOUS_CONTENT:
+    return("HTTP suspicious content");
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

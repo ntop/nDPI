@@ -316,6 +316,7 @@ typedef enum {
   NDPI_UNSAFE_PROTOCOL,
   NDPI_DNS_SUSPICIOUS_TRAFFIC,
   NDPI_TLS_MISSING_SNI,
+  NDPI_HTTP_SUSPICIOUS_CONTENT,
   /* Leave this as last member */
   NDPI_MAX_RISK
 } ndpi_risk_enum;

@@ -423,27 +423,27 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     return;
 
   if((flow->http.url == NULL)
-       && (packet->http_url_name.len > 0)
-       && (packet->host_line.len > 0)) {
-      int len = packet->http_url_name.len + packet->host_line.len + 1;
+     && (packet->http_url_name.len > 0)
+     && (packet->host_line.len > 0)) {
+    int len = packet->http_url_name.len + packet->host_line.len + 1;
 
-      if(isdigit(packet->host_line.ptr[0])
-	 && (packet->host_line.len < 21))
-	ndpi_check_numeric_ip(ndpi_struct, flow, (char*)packet->host_line.ptr, packet->host_line.len);
+    if(isdigit(packet->host_line.ptr[0])
+       && (packet->host_line.len < 21))
+      ndpi_check_numeric_ip(ndpi_struct, flow, (char*)packet->host_line.ptr, packet->host_line.len);
 
-      flow->http.url = ndpi_malloc(len);
-      if(flow->http.url) {
-	strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
-	strncpy(&flow->http.url[packet->host_line.len], (char*)packet->http_url_name.ptr,
-		packet->http_url_name.len);
-	flow->http.url[len-1] = '\0';
+    flow->http.url = ndpi_malloc(len);
+    if(flow->http.url) {
+      strncpy(flow->http.url, (char*)packet->host_line.ptr, packet->host_line.len);
+      strncpy(&flow->http.url[packet->host_line.len], (char*)packet->http_url_name.ptr,
+	      packet->http_url_name.len);
+      flow->http.url[len-1] = '\0';
 
-	ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[packet->host_line.len]);
-      }
-
-      flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr,
-					       (u_int16_t)flow->packet.http_method.len);
+      ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[packet->host_line.len]);
     }
+
+    flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr,
+					     (u_int16_t)flow->packet.http_method.len);
+  }
 
   if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
     if(strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
@@ -749,6 +749,15 @@ static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_str
 
 /*************************************************************************************************/
 
+static int ndpi_http_is_print(char c) {
+  if(isprint(c) || (c == '\t') || (c == '\r') || (c == '\n'))
+    return(1);
+  else
+    return(0);
+}
+
+/*************************************************************************************************/
+
 static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -787,6 +796,63 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
 	ndpi_parse_packet_line_info(ndpi_struct, flow);
         check_content_type_and_change_protocol(ndpi_struct, flow);
+
+
+	{
+	  const u_int8_t *double_ret = (const u_int8_t *)ndpi_strnstr((const char *)packet->payload, "\r\n\r\n", packet->payload_packet_len);
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+	  printf("==>>> [len: %u] ", packet->payload_packet_len);
+#endif
+	  
+	  if(double_ret) {
+	    u_int len;
+
+	    len = packet->payload_packet_len - (double_ret - packet->payload);
+
+	    if(len >= 8 /* 4 chars for \r\n\r\n and at least 4 charts for content guess */) {
+	      double_ret += 4;
+	      
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+	      int i;
+	      
+	      for(i=0; i<packet->content_line.len; i++)
+		printf("%c", packet->content_line.ptr[i]);
+  
+	      printf(" [len: %u] [%02X %02X %02X %02X][%c%c%c%c]", len,
+		     double_ret[0], double_ret[1], double_ret[2], double_ret[3],
+		     double_ret[0], double_ret[1], double_ret[2], double_ret[3]
+		     );
+#endif
+	      
+	      if(strnstr((const char *)packet->content_line.ptr, "text/", packet->content_line.len)
+		 || strnstr((const char *)packet->content_line.ptr, "/json", packet->content_line.len)
+		 ) {
+		/* This is supposed to be a hunan-readeable text file */
+
+		if(ndpi_http_is_print(double_ret[0]) && ndpi_http_is_print(double_ret[1])
+		   && ndpi_http_is_print(double_ret[2]) && ndpi_http_is_print(double_ret[3])) {
+		  /* OK */
+		} else {
+		  /* Looks bad: last resort check if it's gzipped [1F 8B 08 00] */
+
+		  if((double_ret[0] == 0x1F)
+		     && (double_ret[1] == 0x8B)
+		     && (double_ret[2] == 0x08)
+		     && (double_ret[3] == 0x00)) {
+		    /* Looks like compressed data */
+		  } else
+		    NDPI_SET_BIT(flow->risk, NDPI_HTTP_SUSPICIOUS_CONTENT);		  
+		}
+	      }
+	    }
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+	    printf("\n");
+#endif
+	  }
+	}
+	
         return;
       }
 
