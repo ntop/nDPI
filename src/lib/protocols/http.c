@@ -825,8 +825,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 		     );
 #endif
 	      
-	      if(strnstr((const char *)packet->content_line.ptr, "text/", packet->content_line.len)
-		 || strnstr((const char *)packet->content_line.ptr, "/json", packet->content_line.len)
+	      if(ndpi_strnstr((const char *)packet->content_line.ptr, "text/", packet->content_line.len)
+		 || ndpi_strnstr((const char *)packet->content_line.ptr, "/json", packet->content_line.len)
 		 ) {
 		/* This is supposed to be a hunan-readeable text file */
 
