@@ -6310,7 +6310,7 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ****************************************************** */
 
-void ndpi_free_flow(struct ndpi_flow_struct *flow) {
+void ndpi_free_flow_data(struct ndpi_flow_struct *flow) {
   if(flow) {
     u_int is_quic = flow_is_proto(flow, NDPI_PROTOCOL_QUIC);
     
@@ -6355,7 +6355,12 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
       if(flow->l4.tcp.tls.message.buffer)
 	ndpi_free(flow->l4.tcp.tls.message.buffer);
     }
+  }
+}
 
+void ndpi_free_flow(struct ndpi_flow_struct *flow) {
+  if (flow) {
+    ndpi_free_flow_data(flow);
     ndpi_free(flow);
   }
 }
