@@ -1576,6 +1576,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  1 /* can_have_a_subprotocol */, no_master, no_master, "AppleSiri",
 			  NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SNAPCHAT_CALL,
+			  0 /* can_have_a_subprotocol */, no_master, no_master, "SnapchatCall",
+			  NDPI_PROTOCOL_CATEGORY_VOIP, ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -7068,6 +7072,11 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     case NDPI_PROTOCOL_SKYPE:
       if(flow->extra_packets_func)
 	return(1);
+      break;
+
+    case NDPI_PROTOCOL_QUIC:
+      if(flow->extra_packets_func)
+        return(1);
       break;
     }
 

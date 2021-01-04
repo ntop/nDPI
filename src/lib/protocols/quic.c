@@ -1382,6 +1382,65 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ***************************************************************** */
 
+static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow, u_int32_t version)
+{
+  /* For the time being we need extra processing only to detect Snapchat calls,
+     i.e. RTP/RTCP multiplxed with QUIC.
+     We noticed that Snapchat uses Q046, without any SNI */
+
+  if(version == V_Q046 &&
+     flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0') {
+    NDPI_LOG_DBG2(ndpi_struct, "We have further work to do\n");
+    return 1;
+  }
+  return 0;
+}
+
+static int is_valid_rtp_payload_type(uint8_t type)
+{
+  /* https://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
+  return type <= 34 || (type >= 96 && type <= 127);
+}
+
+static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &flow->packet;
+
+  /* We are elaborating a packet following the initial CHLO/ClientHello.
+     Mutiplexing QUIC with RTP/RTCP should be quite generic, but
+     for the time being, we known only NDPI_PROTOCOL_SNAPCHAT_CALL having such behaviour */
+
+  NDPI_LOG_DBG(ndpi_struct, "search QUIC extra func\n");
+
+  /* If this packet is still a Q046 one we need to keep going */
+  if(packet->payload[0] & 0x40) {
+    NDPI_LOG_DBG(ndpi_struct, "Still QUIC\n");
+    return 1; /* Keep going */
+  }
+
+  NDPI_LOG_DBG2(ndpi_struct, "No more QUIC: nothing to do on QUIC side\n");
+  flow->extra_packets_func = NULL;
+
+  /* This might be a RTP/RTCP stream: let's check it */
+  /* TODO: the cleanest solution should be triggering the rtp/rtcp dissector, but
+     I have not been able to that that so I reimplemented a basic RTP/RTCP detection.*/
+  if((packet->payload[0] >> 6) == 2 && /* Version 2 */
+     packet->payload_packet_len > 1 &&
+     (packet->payload[1] == 201 || /* RTCP, Receiver Report */
+      packet->payload[1] == 200 || /* RTCP, Sender Report */
+      is_valid_rtp_payload_type(packet->payload[1] & 0x7F)) /* RTP */) {
+    NDPI_LOG_DBG(ndpi_struct, "Found RTP/RTCP over QUIC\n");
+    ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SNAPCHAT_CALL, NDPI_PROTOCOL_QUIC);
+  } else {
+    /* Unexpected traffic pattern: we should investigate it... */
+    NDPI_LOG_INFO(ndpi_struct, "To investigate...\n");
+  }
+
+  return 0;
+}
+
 void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow)
 {
@@ -1464,6 +1523,15 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   }
   if(is_version_with_encrypted_header(version)) {
     ndpi_free(clear_payload);
+  }
+
+  /*
+   * 7) We need to process other packets than ClientHello/CHLO?
+   */
+  if(eval_extra_processing(ndpi_struct, flow, version)) {
+    flow->check_extra_packets = 1;
+    flow->max_extra_packets_to_check = 24; /* TODO */
+    flow->extra_packets_func = ndpi_search_quic_extra;
   }
 }
 
