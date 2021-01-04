@@ -1,0 +1,8 @@
+QUIC	992	1340722	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 ::1                      	 1      
+
+
+	1	UDP [::1]:51430 <-> [::1]:4443 [proto: 188/QUIC][cat: Web/5][99 pkts/14736 bytes <-> 893 pkts/1325986 bytes][Goodput ratio: 58/96][0.01 sec][ALPN: h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][bytes ratio: -0.978 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 3/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/93 149/1485 1502/1502 183/146][Risk: ** SNI TLS extension was missing **][TLSv1.3][JA3C: 0299b052ace53a14c3a04aceb5efd247][PLAIN TEXT (NLZzZw)][Plen Bins: 0,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,72,0,0]
