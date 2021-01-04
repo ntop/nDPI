@@ -1111,7 +1111,6 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 
 void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
   u_int8_t i;
-  FILE *out = results_file ? results_file : stdout;
   const char *sep = label ? "," : ";";
 
   ndpi_normalize_bin(b);
@@ -3384,9 +3383,9 @@ void test_lib() {
 
 /* *********************************************** */
 
+#if 0
 static void binUnitTest() {
   struct ndpi_bin *bins, b0, b1;
-  u_int8_t versbose = 0;
   u_int8_t num_bins = 32;
   u_int8_t num_points = 24;
   u_int32_t i, j;
@@ -3441,6 +3440,7 @@ static void binUnitTest() {
 
   // exit(0);
 }
+#endif
 
 /* *********************************************** */
 
