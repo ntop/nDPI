@@ -201,9 +201,17 @@ extern "C" {
   void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str);
 
   /**
-   * Frees the memory allocated in the specified flow
+   * Frees the dynamic memory allocated members in the specified flow
    *
-   * @par flow  = the flow to deallocate
+   * @par flow  = the flow struct which dynamic allocated members should be deallocated
+   *
+   */
+  void ndpi_free_flow_data(struct ndpi_flow_struct *flow);
+
+  /**
+   * Frees the dynamic memory allocated members in the specified flow and the flow struct itself
+   *
+   * @par flow  = the flow struct and its dynamic allocated members that should be deallocated
    *
    */
   void ndpi_free_flow(struct ndpi_flow_struct *flow);
