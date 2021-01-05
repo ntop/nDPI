@@ -139,18 +139,18 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
   avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
   
   if(avail_bytes < packet->payload_packet_len) {
-    u_int new_len = flow->l4.tcp.tls.message.buffer_len + packet->payload_packet_len;
+    u_int new_len = flow->l4.tcp.tls.message.buffer_len + packet->payload_packet_len - avail_bytes + 1;
     void *newbuf  = ndpi_realloc(flow->l4.tcp.tls.message.buffer,
 				 flow->l4.tcp.tls.message.buffer_len, new_len);
     if(!newbuf) return;
 
-    flow->l4.tcp.tls.message.buffer = (u_int8_t*)newbuf;
-    flow->l4.tcp.tls.message.buffer_len = new_len;
-    avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
-
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Enlarging %u -> %u buffer\n", flow->l4.tcp.tls.message.buffer_len, new_len);
 #endif
+
+    flow->l4.tcp.tls.message.buffer = (u_int8_t*)newbuf;
+    flow->l4.tcp.tls.message.buffer_len = new_len;
+    avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
   }
 
   if(packet->payload_packet_len > 0 && avail_bytes >= packet->payload_packet_len) {
