@@ -1376,6 +1376,9 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(out, "[URL: %s][StatusCode: %u]",
 	    flow->http.url, flow->http.response_status_code);
 
+    if(flow->http.request_content_type[0] != '\0')
+      fprintf(out, "[Req Content-Type: %s]", flow->http.request_content_type);
+
     if(flow->http.content_type[0] != '\0')
       fprintf(out, "[Content-Type: %s]", flow->http.content_type);
   }

@@ -631,19 +631,34 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
 		  packet->content_line.len, packet->content_line.ptr);
 
-    if((flow->http.content_type == NULL) && (packet->content_line.len > 0)) {
-      int len = packet->content_line.len + 1;
-
-      flow->http.content_type = ndpi_malloc(len);
-      if(flow->http.content_type) {
-	strncpy(flow->http.content_type, (char*)packet->content_line.ptr,
-		packet->content_line.len);
-	flow->http.content_type[packet->content_line.len] = '\0';
-
-	flow->guessed_category = flow->category = ndpi_http_check_content(ndpi_struct, flow);
+    if(flow->http.response_status_code == 0) {
+      /* Request */
+      if((flow->http.request_content_type == NULL) && (packet->content_line.len > 0)) {
+	int len = packet->content_line.len + 1;
+	
+	flow->http.request_content_type = ndpi_malloc(len);
+	if(flow->http.request_content_type) {
+	  strncpy(flow->http.request_content_type, (char*)packet->content_line.ptr,
+		  packet->content_line.len);
+	  flow->http.request_content_type[packet->content_line.len] = '\0';
+	}
       }
-    }
-
+    } else {
+      /* Response */
+      if((flow->http.content_type == NULL) && (packet->content_line.len > 0)) {
+	int len = packet->content_line.len + 1;
+	
+	flow->http.content_type = ndpi_malloc(len);
+	if(flow->http.content_type) {
+	  strncpy(flow->http.content_type, (char*)packet->content_line.ptr,
+		  packet->content_line.len);
+	  flow->http.content_type[packet->content_line.len] = '\0';
+	  
+	  flow->guessed_category = flow->category = ndpi_http_check_content(ndpi_struct, flow);
+	}
+      }
+    }    
+    
     if(flow->http_detected) {
       ndpi_protocol_match_result ret_match;
 
