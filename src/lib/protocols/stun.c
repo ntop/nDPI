@@ -149,8 +149,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   u_int16_t msg_type, msg_len;
   int rc;
   
-  /* No need to do ntohl() with 0xFFFFFFFF */
-  if(flow->packet.iph && (flow->packet.iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */)) {
+  if(flow->packet.iph &&
+     ((flow->packet.iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */) ||
+     ((ntohl(flow->packet.iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */))) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return(NDPI_IS_NOT_STUN);
   }
