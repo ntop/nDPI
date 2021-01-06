@@ -855,7 +855,7 @@ struct ndpi_packet_struct {
 
   u_int8_t tls_certificate_detected:4, tls_certificate_num_checks:4;
   u_int8_t packet_lines_parsed_complete:1,
-    packet_direction:1, empty_line_position_set:1, pad:5;
+    packet_direction:1, empty_line_position_set:1, http_check_content:1, pad:4;
 };
 
 struct ndpi_detection_module_struct;
