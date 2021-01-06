@@ -112,9 +112,7 @@ static void ndpi_http_check_human_redeable_content(struct ndpi_detection_module_
 						   const u_int8_t *content, u_int16_t content_len) {
   if(content_len >= 4) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    int i;
-  
-    printf(" [len: %u] [%02X %02X %02X %02X][%c%c%c%c]", len,
+    printf(" [len: %u] [%02X %02X %02X %02X][%c%c%c%c]", content_len,
 	   content[0], content[1], content[2], content[3],
 	   content[0], content[1], content[2], content[3]
 	   );
@@ -146,7 +144,7 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   printf("==>>> [len: %u] ", packet->payload_packet_len);
-  printf("->> %s\n", (const char *)packet->content_line.ptr);
+  printf("->> %.*s\n", packet->content_line.len, (const char *)packet->content_line.ptr);
 #endif
   
   if(double_ret) {
