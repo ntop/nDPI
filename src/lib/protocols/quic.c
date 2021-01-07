@@ -1171,6 +1171,7 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload_packet_len = crypto_data_len;
 
   processClientServerHello(ndpi_struct, flow, version);
+  flow->l4.tcp.tls.hello_processed = 1; /* Allow matching of custom categories */
 
   /* Restore */
   packet->payload = p;
@@ -1222,16 +1223,23 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
     if((memcmp(tag, "SNI\0", 4) == 0) &&
        (tag_offset_start + prev_offset + len < crypto_data_len)) {
-      sni_len = MIN(len, sizeof(flow->host_server_name) - 1);
-      memcpy(flow->host_server_name,
+      sni_len = MIN(len, sizeof(flow->protos.stun_ssl.ssl.client_requested_server_name) - 1);
+      memcpy(flow->protos.stun_ssl.ssl.client_requested_server_name,
              &crypto_data[tag_offset_start + prev_offset], sni_len);
+      flow->protos.stun_ssl.ssl.client_requested_server_name[sni_len] = '\0';
 
-      NDPI_LOG_DBG2(ndpi_struct, "SNI: [%s]\n", flow->host_server_name);
+      NDPI_LOG_DBG2(ndpi_struct, "SNI: [%s]\n",
+                    flow->protos.stun_ssl.ssl.client_requested_server_name);
 
       ndpi_match_host_subprotocol(ndpi_struct, flow,
-                                  (char *)flow->host_server_name,
-                                  strlen((const char*)flow->host_server_name),
+                                  (char *)flow->protos.stun_ssl.ssl.client_requested_server_name,
+                                  strlen((const char*)flow->protos.stun_ssl.ssl.client_requested_server_name),
                                   &ret_match, NDPI_PROTOCOL_QUIC);
+      flow->l4.tcp.tls.hello_processed = 1; /* Allow matching of custom categories */
+
+      ndpi_check_dga_name(ndpi_struct, flow,
+                          flow->protos.stun_ssl.ssl.client_requested_server_name, 1);
+
       sni_found = 1;
       if (ua_found)
         return;
@@ -1255,6 +1263,12 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   }
   if(i != num_tags)
     NDPI_LOG_DBG(ndpi_struct, "Something went wrong in tags iteration\n");
+
+  /* Add check for missing SNI */
+  if((flow->protos.stun_ssl.ssl.client_requested_server_name[0] == 0)) {
+    /* This is a bit suspicious */
+    NDPI_SET_BIT(flow->risk, NDPI_TLS_MISSING_SNI);
+  }
 }
 
 
