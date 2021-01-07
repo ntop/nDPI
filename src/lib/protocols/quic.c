@@ -98,6 +98,12 @@ static uint8_t get_u8_quic_ver(uint32_t version)
   if (version == 0x00000001) {
     return 33;
   }
+
+  if (version == V_MVFST_22)
+    return 22;
+  if (version == V_MVFST_27 || version == V_MVFST_EXP)
+    return 27;
+
   /* "Versions that follow the pattern 0x?a?a?a?a are reserved for use in
      forcing version negotiation to be exercised".
      It is tricky to return a correct draft version: such number is primarly
@@ -876,14 +882,11 @@ static int quic_derive_initial_secrets(uint32_t version,
     err = hkdf_extract(GCRY_MD_SHA256, hanshake_salt_draft_t51,
 		       sizeof(hanshake_salt_draft_t51),
                        cid, cid_len, secret);
-  } else if(is_quic_ver_less_than(version, 22) ||
-	    version == V_MVFST_22) {
+  } else if(is_quic_ver_less_than(version, 22)) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_22,
 		       sizeof(handshake_salt_draft_22),
                        cid, cid_len, secret);
-  } else if(is_quic_ver_less_than(version, 28) ||
-	    version == V_MVFST_27 ||
-	    version == V_MVFST_EXP) {
+  } else if(is_quic_ver_less_than(version, 28)) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_23,
 		       sizeof(handshake_salt_draft_23),
                        cid, cid_len, secret);
@@ -982,6 +985,12 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   packet_number = pkn32;
 
   offset = pn_offset + pkn_len;
+  if (!(pn_offset + payload_length >= offset + 16)) {
+    NDPI_LOG_DBG(ndpi_struct, "No room for Auth Tag %d %d",
+                 pn_offset + payload_length, offset);
+    quic_ciphers_reset(&ciphers);
+    return NULL;
+  }
   quic_decrypt_message(&ciphers.pp_cipher, &packet->payload[0], pn_offset + payload_length,
 		       offset, first_byte, pkn_len, packet_number, &decryption);
 

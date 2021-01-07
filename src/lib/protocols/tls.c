@@ -1474,7 +1474,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		  printf("Client SSL [QUIC TP: Param 0x%x Len %d]\n", (int)param_type, (int)param_len);
 #endif
-		  if(s_offset+param_len >= final_offset)
+		  if(s_offset+param_len > final_offset)
 		    break;
 
 		  if(param_type==0x3129) {
