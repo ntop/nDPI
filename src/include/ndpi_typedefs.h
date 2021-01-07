@@ -1259,8 +1259,8 @@ struct ndpi_flow_struct {
       struct {
         char ssl_version_str[12];
 	u_int16_t ssl_version, server_names_len;
-	char client_requested_server_name[64], *server_names,
-	  *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
+	char client_requested_server_name[256], /* SNI hostname length: RFC 4366 */
+	  *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
 	u_int32_t notBefore, notAfter;
 	char ja3_client[33], ja3_server[33];
 	u_int16_t server_cipher;
