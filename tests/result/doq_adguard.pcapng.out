@@ -1,0 +1,8 @@
+DoH_DoT	296	44445	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.12.169           	 1      
+
+
+	1	UDP 192.168.12.169:41070 <-> 94.140.14.14:784 [proto: 188.196/QUIC.DoH_DoT][cat: Network/14][164 pkts/17196 bytes <-> 132 pkts/27249 bytes][Goodput ratio: 60/80][38.08 sec][ALPN: doq-i00][TLS Supported Versions: TLSv1.3][bytes ratio: -0.226 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 232/242 2999/3045 449/458][Pkt Len c2s/s2c min/avg/max/stddev: 72/81 105/206 1274/1294 132/268][TLSv1.3][Client: dns.adguard.com][JA3C: 1e022f87823477abd6a79c31d70062d7][PLAIN TEXT (AKToSb)][Plen Bins: 15,47,16,9,4,0,2,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0]

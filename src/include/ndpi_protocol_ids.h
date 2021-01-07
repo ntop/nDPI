@@ -225,7 +225,7 @@ typedef enum {
   NDPI_PROTOCOL_KAKAOTALK             = 193, /* KakaoTalk Chat (no voice call) */
   NDPI_PROTOCOL_KAKAOTALK_VOICE       = 194, /* KakaoTalk Voice */
   NDPI_PROTOCOL_TWITCH                = 195, /* Edoardo Dominici <edoaramis@gmail.com> */
-  NDPI_PROTOCOL_DOH_DOT               = 196, /* DoH (DNS over HTTPS), DoT (DNS over TLS) */
+  NDPI_PROTOCOL_DOH_DOT               = 196, /* DoH (DNS over HTTPS), DoT (DNS over TLS), DoQ (DNS over QUIC). TODO: rename in NDPI_PROTOCOL_DOH_DOT_DOQ? */
   NDPI_PROTOCOL_WECHAT                = 197,
   NDPI_PROTOCOL_MPEGTS                = 198,
   NDPI_PROTOCOL_SNAPCHAT              = 199,

@@ -1,0 +1,10 @@
+ICMPV6	6	1170	1
+DoH_DoT	14	4788	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 ::1                      	 1      
+
+
+	1	UDP [::1]:47826 <-> [::1]:784 [proto: 188.196/QUIC.DoH_DoT][cat: Network/14][3 pkts/1690 bytes <-> 11 pkts/3098 bytes][Goodput ratio: 89/78][3.16 sec][ALPN: doq-i00][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][bytes ratio: -0.294 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/7 1/329 2/1601 1/517][Pkt Len c2s/s2c min/avg/max/stddev: 117/117 563/282 1294/1294 521/340][Risk: ** SNI TLS extension was missing **][TLSv1.3][JA3C: c0ce40fbb78cbf86a14e6a38b26d6ede][Plen Bins: 0,21,50,0,0,0,7,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0]
+	2	ICMPV6 [::1]:0 -> [::1]:0 [proto: 102/ICMPV6][cat: Network/14][6 pkts/1170 bytes -> 0 pkts/0 bytes][Goodput ratio: 68/0][3.10 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 100/0 620/0 1601/0 546/0][Pkt Len c2s/s2c min/avg/max/stddev: 195/0 195/0 195/0 0/0][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
