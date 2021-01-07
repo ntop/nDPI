@@ -3,7 +3,7 @@
  * This file is part of multifast.
  *
  Copyright 2010-2012 Kamiar Kanani <kamiar.kanani@gmail.com>
- Copyright 2012-2019 ntop.org (Incremental improvements)
+ Copyright 2012-21   ntop.org (Incremental improvements)
  
  multifast is free software: you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by

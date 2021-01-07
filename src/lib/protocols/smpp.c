@@ -2,7 +2,7 @@
  * smpp.c
  * 
  * Copyright (C) 2016 - Damir Franusic <df@release14.org>
- * Copyright (C) 2016-20 - ntop.org
+ * Copyright (C) 2016-21 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by

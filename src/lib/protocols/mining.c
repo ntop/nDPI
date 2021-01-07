@@ -1,7 +1,7 @@
 /*
  * mining.c [Bitcoin, Ethereum, ZCash, Monero]
  *
- * Copyright (C) 2018-20 - ntop.org
+ * Copyright (C) 2018-21 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH

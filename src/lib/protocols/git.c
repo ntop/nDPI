@@ -1,7 +1,7 @@
 /*
  * git.c
  *
- * Copyright (C) 2012-20 - ntop.org
+ * Copyright (C) 2012-21 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
