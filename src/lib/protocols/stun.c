@@ -531,12 +531,13 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
     return;
   }
 
+  if(flow->protos.stun_ssl.stun.num_udp_pkts >= MAX_NUM_STUN_PKTS)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+
   if(flow->packet_counter > 0) {
     /* This might be a RTP stream: let's make sure we check it */
     NDPI_CLR(&flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
   }
-
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
