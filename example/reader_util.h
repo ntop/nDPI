@@ -29,7 +29,7 @@
 #ifndef __NDPI_UTIL_H__
 #define __NDPI_UTIL_H__
 
-#include "uthash.h"
+#include "../src/lib/third_party/include/uthash.h"
 #include <pcap.h>
 #include "ndpi_includes.h"
 #include "ndpi_classify.h"

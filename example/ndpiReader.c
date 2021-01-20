@@ -48,7 +48,7 @@
 #include <assert.h>
 #include <math.h>
 #include "ndpi_api.h"
-#include "uthash.h"
+#include "../src/lib/third_party/include/uthash.h"
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
