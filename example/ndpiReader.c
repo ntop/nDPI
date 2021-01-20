@@ -114,7 +114,7 @@ struct info_pair {
   int count;
 };
 
-typedef struct node_a{
+typedef struct node_a {
   u_int32_t addr;
   u_int8_t version; /* IP version */
   char proto[16]; /*app level protocol*/
@@ -3690,6 +3690,25 @@ void rulesUnitTest() {
 
 /* *********************************************** */
 
+void hashUnitTest() {
+  ndpi_str_hash *h = ndpi_hash_alloc(16384);
+  char* dict[] = { "hello", "world", NULL };
+  int i;
+  
+  assert(h);
+
+  for(i=0; dict[i] != NULL; i++) {
+    u_int8_t l = strlen(dict[i]), v;
+
+    assert(ndpi_hash_add_entry(h, dict[i], l, i) == 0);
+    assert(ndpi_hash_find_entry(h, dict[i], l, &v) == 0);
+  }
+  
+  ndpi_hash_free(h);
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -3712,6 +3731,7 @@ int orginal_main(int argc, char **argv) {
 
     /* Internal checks */
     // binUnitTest();
+    hashUnitTest();
     dgaUnitTest();
     hllUnitTest();
     bitmapUnitTest();
@@ -3811,3 +3831,4 @@ int orginal_main(int argc, char **argv) {
     return 0;
   }
 #endif /* WIN32 */
+

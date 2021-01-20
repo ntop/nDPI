@@ -1559,4 +1559,21 @@ struct ndpi_bin {
   } u;
 };
 
+/* **************************************** */
+
+struct ndpi_str_hash_info {
+  char *key;         /* Key   */
+  u_int8_t key_len;
+  u_int8_t value;    /* Value */
+  struct ndpi_str_hash_info *next;
+};
+
+typedef struct {
+  u_int32_t num_buckets, max_num_entries;
+  struct ndpi_str_hash_info **buckets;
+} ndpi_str_hash;
+
+
+/* **************************************** */
+
 #endif /* __NDPI_TYPEDEFS_H__ */
