@@ -858,7 +858,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   // handshake_type = packet->payload[13];
   handshake_len  = (packet->payload[14] << 16) + (packet->payload[15] << 8) + packet->payload[16];
-
+  
   if((handshake_len+25) != packet->payload_packet_len)
     goto no_dtls;
 
@@ -871,7 +871,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = p;
   packet->payload_packet_len = p_len; /* Restore */
 
-  ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
+  ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
 
   return(1); /* Keep working */
 }
@@ -895,6 +895,9 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
   printf("[TLS] %s()\n", __FUNCTION__);
 #endif
 
+  if((flow->packet.udp != NULL) && (protocol == NDPI_PROTOCOL_TLS))
+    protocol = NDPI_PROTOCOL_DTLS;
+    
   if((flow->detected_protocol_stack[0] == protocol)
      || (flow->detected_protocol_stack[1] == protocol)) {
     if(!flow->check_extra_packets)
@@ -907,7 +910,7 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
   else
     protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_TLS);
+  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, protocol);
   tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
 
@@ -1637,8 +1640,8 @@ void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* *************************************************** */
 
-  ndpi_set_bitmask_protocol_detection("TLS", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_TLS,
+  ndpi_set_bitmask_protocol_detection("DTLS", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_DTLS,
 				      ndpi_search_tls_wrapper,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,

@@ -1,7 +1,7 @@
 /*
- * upnp.c
+ * wsd.c
  *
- * Copyright (C) 2018 - ntop.org
+ * Copyright (C) 2018-21 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,19 +18,21 @@
  *
  */
 
+/* https://en.wikipedia.org/wiki/WS-Discovery */
+
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UPNP
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_WSD
 
 #include "ndpi_api.h"
 
-#define UPNP_PORT 3702
+#define WSD_PORT 3702
 
-void ndpi_search_upnp(struct ndpi_detection_module_struct *ndpi_struct,
+void ndpi_search_wsd(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  NDPI_LOG_DBG(ndpi_struct, "search upnp\n");
+  NDPI_LOG_DBG(ndpi_struct, "search wsd\n");
 
   if(packet->udp
      && (
@@ -40,23 +42,23 @@ void ndpi_search_upnp(struct ndpi_detection_module_struct *ndpi_struct,
 	 (packet->iphv6 && ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) == 0xFF020000)
 #endif
 	 )
-     && (ntohs(packet->udp->dest) == UPNP_PORT)
+     && (ntohs(packet->udp->dest) == WSD_PORT)
      && (packet->payload_packet_len >= 40)
      && (strncmp((char*)packet->payload, "<?xml", 5) == 0)
      ) {
     NDPI_LOG_INFO(ndpi_struct,"found teredo\n");
-    ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UPNP, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WSD, NDPI_PROTOCOL_UNKNOWN);
   } else {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 
 
-void init_upnp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-			 NDPI_PROTOCOL_BITMASK *detection_bitmask) {
-  ndpi_set_bitmask_protocol_detection("UPNP", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_UPNP,
-				      ndpi_search_upnp,
+void init_wsd_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
+			NDPI_PROTOCOL_BITMASK *detection_bitmask) {
+  ndpi_set_bitmask_protocol_detection("WSD", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_WSD,
+				      ndpi_search_wsd,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);

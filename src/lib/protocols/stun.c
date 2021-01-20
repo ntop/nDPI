@@ -202,9 +202,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	total_len = ntohs(*((u_int16_t*) &packet->payload[11])) + 13;
 
 	if(payload_length == total_len) {
-	  /* This is DTLS and the only protocol we know behaves like this is signal */
-	  flow->guessed_host_protocol_id = NDPI_PROTOCOL_SIGNAL;
-	  return(NDPI_IS_STUN);
+	  flow->guessed_host_protocol_id = NDPI_PROTOCOL_DTLS;
+	  return(NDPI_IS_NOT_STUN);
 	}
       }
     }

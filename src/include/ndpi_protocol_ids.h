@@ -59,7 +59,7 @@ typedef enum {
   NDPI_PROTOCOL_COAP                  = 27,
   NDPI_PROTOCOL_VMWARE                = 28,
   NDPI_PROTOCOL_MAIL_SMTPS            = 29,
-  NDPI_PROTOCOL_FREE_30               = 30, /* Free */
+  NDPI_PROTOCOL_DTLS                  = 30,
   NDPI_PROTOCOL_UBNTAC2               = 31, /* Ubiquity UBNT AirControl = 2 - Thomas Fjellstrom <thomas+ndpi@fjellstrom.ca> */
   NDPI_PROTOCOL_KONTIKI               = 32,
   NDPI_PROTOCOL_OPENFT                = 33,
@@ -182,7 +182,7 @@ typedef enum {
   NDPI_PROTOCOL_LOTUS_NOTES           = 150,
   NDPI_PROTOCOL_SAP                   = 151,
   NDPI_PROTOCOL_GTP                   = 152,
-  NDPI_PROTOCOL_UPNP                  = 153,
+  NDPI_PROTOCOL_WSD                   = 153,
   NDPI_PROTOCOL_LLMNR                 = 154,
   NDPI_PROTOCOL_REMOTE_SCAN           = 155,
   NDPI_PROTOCOL_SPOTIFY               = 156,
