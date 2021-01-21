@@ -1269,14 +1269,14 @@ struct ndpi_flow_struct {
 	  char *esni;
 	} encrypted_sni;
 	ndpi_cipher_weakness server_unsafe_cipher;
-      } ssl;
+      } tls_quic;
 
       struct {
 	u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests;
       } stun;
 
       /* We can have STUN over SSL/TLS thus they need to live together */
-    } stun_ssl;
+    } tls_quic_stun;
 
     struct {
       char client_signature[48], server_signature[48];

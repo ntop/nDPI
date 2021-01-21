@@ -4132,7 +4132,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
     }
     else if((flow->l4.tcp.tls.hello_processed == 1) &&
-	    (flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0')) {
+	    (flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0')) {
       *protocol_was_guessed = 1;
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
     } else if(enable_guess) {
@@ -4157,8 +4157,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	flow->guessed_protocol_id = guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
       if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
-	if((guessed_protocol_id == 0) && (flow->protos.stun_ssl.stun.num_binding_requests > 0) &&
-	   (flow->protos.stun_ssl.stun.num_processed_pkts > 0))
+	if((guessed_protocol_id == 0) && (flow->protos.tls_quic_stun.stun.num_binding_requests > 0) &&
+	   (flow->protos.tls_quic_stun.stun.num_processed_pkts > 0))
 	  guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
 	if(flow->host_server_name[0] != '\0') {
@@ -4198,8 +4198,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) &&
      (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
   check_stun_export:
-    if(flow->protos.stun_ssl.stun.num_processed_pkts || flow->protos.stun_ssl.stun.num_udp_pkts) {
-      // if(/* (flow->protos.stun_ssl.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
+    if(flow->protos.tls_quic_stun.stun.num_processed_pkts || flow->protos.tls_quic_stun.stun.num_udp_pkts) {
+      // if(/* (flow->protos.tls_quic_stun.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
       *protocol_was_guessed = 1;
       ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN);
     }
@@ -4455,10 +4455,10 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
     }
 
     if(flow->l4.tcp.tls.hello_processed == 1 &&
-       flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0') {
+       flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0') {
       u_int32_t id;
-      int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.stun_ssl.ssl.client_requested_server_name,
-					  strlen(flow->protos.stun_ssl.ssl.client_requested_server_name), &id);
+      int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.tls_quic_stun.tls_quic.client_requested_server_name,
+					  strlen(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name), &id);
 
       if(rc == 0) {
 	flow->category = ret->category = (ndpi_protocol_category_t) id;
@@ -6332,23 +6332,23 @@ void ndpi_free_flow_data(struct ndpi_flow_struct *flow) {
       ndpi_free(flow->kerberos_buf.pktbuf);
 
     if(is_quic || flow_is_proto(flow, NDPI_PROTOCOL_TLS)) {
-      if(flow->protos.stun_ssl.ssl.server_names)
-	ndpi_free(flow->protos.stun_ssl.ssl.server_names);
+      if(flow->protos.tls_quic_stun.tls_quic.server_names)
+	ndpi_free(flow->protos.tls_quic_stun.tls_quic.server_names);
 
-      if(flow->protos.stun_ssl.ssl.alpn)
-	ndpi_free(flow->protos.stun_ssl.ssl.alpn);
+      if(flow->protos.tls_quic_stun.tls_quic.alpn)
+	ndpi_free(flow->protos.tls_quic_stun.tls_quic.alpn);
 	
-      if(flow->protos.stun_ssl.ssl.tls_supported_versions)
-        ndpi_free(flow->protos.stun_ssl.ssl.tls_supported_versions);
+      if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
+        ndpi_free(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
 	
-      if(flow->protos.stun_ssl.ssl.issuerDN)
-	ndpi_free(flow->protos.stun_ssl.ssl.issuerDN);
+      if(flow->protos.tls_quic_stun.tls_quic.issuerDN)
+	ndpi_free(flow->protos.tls_quic_stun.tls_quic.issuerDN);
       
-      if(flow->protos.stun_ssl.ssl.subjectDN)
-	ndpi_free(flow->protos.stun_ssl.ssl.subjectDN);
+      if(flow->protos.tls_quic_stun.tls_quic.subjectDN)
+	ndpi_free(flow->protos.tls_quic_stun.tls_quic.subjectDN);
       
-      if(flow->protos.stun_ssl.ssl.encrypted_sni.esni)
-	ndpi_free(flow->protos.stun_ssl.ssl.encrypted_sni.esni);
+      if(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni)
+	ndpi_free(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni);
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
