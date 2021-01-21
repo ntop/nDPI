@@ -456,6 +456,7 @@ class Http(Structure):
         ("num_response_headers", c_uint8),
         ("request_version", c_uint8),
         ("response_status_code", c_uint16),
+        ("detected_os", c_char * 32),
     ]
 
 
@@ -535,7 +536,6 @@ class Ubntac2(Structure):
 
 class Http2(Structure):
     _fields_ = [
-        ("detected_os", c_char * 32),
         ("nat_ip", c_char * 24)
     ]
 
