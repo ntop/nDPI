@@ -21,6 +21,21 @@ matrix:
             - autogen
 
     - os: linux
+      env: DISABLE_GCRYPT=y
+      compiler: gcc
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - fakeroot
+            - debhelper
+            - dpkg-dev
+            - libpcap-dev
+            - libgcrypt20-dev
+            - libjson-c-dev
+            - autogen
+
+    - os: linux
       compiler: clang
       dist: bionic
       addons:
@@ -197,6 +212,7 @@ script:
     ./configure ; fi
   - if [ -n "$BUILD_DPKG_PACKAGE" ]; then cd ./packages/ubuntu ;
     ./configure && dpkg-buildpackage -b -us -uc ; cd ../.. ; fi
+  - if [ -n "$DISABLE_GCRYPT" ]; then ./configure --disable-gcrypt ; fi
   - make
   - make -C example ndpiSimpleIntegration
   - make dist
