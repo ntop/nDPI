@@ -1318,10 +1318,10 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	if(flow->protos.stun_ssl.ssl.tls_supported_versions)
 	  ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.stun_ssl.ssl.tls_supported_versions);	
 	
-	if(flow->l4.tcp.tls.sha1_certificate_fingerprint[0] != '\0') {
+	if(flow->protos.stun_ssl.ssl.sha1_certificate_fingerprint[0] != '\0') {
 	  for(i=0, off=0; i<20; i++) {
 	    int rc = snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
-			      flow->l4.tcp.tls.sha1_certificate_fingerprint[i] & 0xFF);
+			      flow->protos.stun_ssl.ssl.sha1_certificate_fingerprint[i] & 0xFF);
 	    
 	    if(rc <= 0) break; else off += rc;
 	  }

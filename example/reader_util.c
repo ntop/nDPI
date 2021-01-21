@@ -1164,7 +1164,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->l4.tcp.tls.fingerprint_set) {
       memcpy(flow->ssh_tls.sha1_cert_fingerprint,
-	     flow->ndpi_flow->l4.tcp.tls.sha1_certificate_fingerprint, 20);
+	     flow->ndpi_flow->protos.stun_ssl.ssl.sha1_certificate_fingerprint, 20);
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;
     }
 

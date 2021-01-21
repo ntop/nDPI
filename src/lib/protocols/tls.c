@@ -540,7 +540,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t certificates_length, length = (packet->payload[1] << 16) + (packet->payload[2] << 8) + packet->payload[3];
   u_int16_t certificates_offset = 7;
   u_int8_t num_certificates_found = 0;
-
+  SHA1_CTX srv_cert_fingerprint_ctx ;
+  
 #ifdef DEBUG_TLS
   printf("[TLS] %s() [payload_packet_len=%u][direction: %u][%02X %02X %02X %02X %02X %02X...]\n",
 	 __FUNCTION__, packet->payload_packet_len,
@@ -559,11 +560,6 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   if((packet->payload[4] != 0x0) || ((certificates_length+3) != length)) {
     NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(-2); /* Invalid length */
-  }
-
-  if(!flow->l4.tcp.tls.srv_cert_fingerprint_ctx) {
-    if((flow->l4.tcp.tls.srv_cert_fingerprint_ctx = (void*)ndpi_malloc(sizeof(SHA1_CTX))) == NULL)
-      return(-3); /* Not enough memory */
   }
 
   /* Now let's process each individual certificates */
@@ -595,7 +591,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     if(num_certificates_found++ == 0) /* Dissect only the first certificate that is the one we care */ {
       /* For SHA-1 we take into account only the first certificate and not all of them */
 
-      SHA1Init(flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
+      SHA1Init(&srv_cert_fingerprint_ctx);
 
 #ifdef DEBUG_CERTIFICATE_HASH
       {
@@ -608,11 +604,11 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
       }
 #endif
 
-      SHA1Update(flow->l4.tcp.tls.srv_cert_fingerprint_ctx,
+      SHA1Update(&srv_cert_fingerprint_ctx,
 		 &packet->payload[certificates_offset],
 		 certificate_len);
 
-      SHA1Final(flow->l4.tcp.tls.sha1_certificate_fingerprint, flow->l4.tcp.tls.srv_cert_fingerprint_ctx);
+      SHA1Final(flow->protos.stun_ssl.ssl.sha1_certificate_fingerprint, &srv_cert_fingerprint_ctx);
 
       flow->l4.tcp.tls.fingerprint_set = 1;
 
