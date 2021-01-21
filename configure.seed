@@ -216,6 +216,9 @@ if test "${with_pcre+set}" = set; then :
   fi
 fi
 
+# TCP segments management (buffer, sort and reassembly the segments)
+FRAG_MAN_ENABLED=1
+AC_DEFINE_UNQUOTED(FRAG_MAN, ${FRAG_MAN_ENABLED}, [Enable the TCP segments fragmentation management])
 
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/dga/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
@@ -237,4 +240,5 @@ AC_SUBST(BUILD_MINGW)
 AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
 AC_SUBST(GNU_PREFIX)
+AC_SUBST(FRAG_MAN_ENABLED)
 AC_OUTPUT

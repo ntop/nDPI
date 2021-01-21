@@ -27,6 +27,7 @@
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 
+#include "ndpi_utils.h"
 /* NDPI_LOG_LEVEL */
 typedef enum {
 	      NDPI_LOG_ERROR,
@@ -430,6 +431,12 @@ struct ndpi_vxlanhdr {
 /* ******************* ********************* ****************** */
 /* ************************************************************ */
 
+typedef struct message {
+  u_int8_t *buffer;
+  u_int buffer_len, buffer_used, max_expected;
+  u_int32_t next_seq[2]; /* Directions */
+} message_t;
+
 /* NDPI_PROTOCOL_BITTORRENT */
 typedef struct spinlock {
   volatile int    val;
@@ -667,11 +674,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t telnet_stage:2;			// 0 - 2
 
   struct {
-    struct {
-      u_int8_t *buffer;
-      u_int buffer_len, buffer_used;
-      u_int32_t next_seq[2]; /* Directions */
-    } message;
+    message_t message;
     
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
   
@@ -1184,9 +1187,19 @@ struct ndpi_flow_struct {
   */
   u_int32_t next_tcp_seq_nr[2];
 
+#ifdef FRAG_MAN
+  /* tcp_segments lists */
+  u_int8_t tcp_segments_management:1;
+  u_int8_t not_sorted[2],must_free[2];     // 0: client->server and 1: server->client
+  uint32_t trigger[2];                     // the seq waited number to start to reassembly
+  fragments_wrapper_t tcp_segments_list[2];
+#endif // FRAG_MAN
+
+  // -----------------------------------------
+
   u_int8_t max_extra_packets_to_check;
   u_int8_t num_extra_packets_checked;
-  u_int8_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
+  u_int16_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
 
   int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
@@ -1273,7 +1286,8 @@ struct ndpi_flow_struct {
       } ssl;
 
       struct {
-	u_int8_t num_udp_pkts, num_processed_pkts, num_binding_requests;
+		    u_int8_t num_udp_pkts, num_binding_requests;
+        u_int16_t num_processed_pkts;
       } stun;
 
       /* We can have STUN over SSL/TLS thus they need to live together */
