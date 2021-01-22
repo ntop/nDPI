@@ -897,11 +897,11 @@ static void ndpi_process_packet(uint8_t * const args,
                         reader_thread->array_index,
                         flow_to_process->flow_id,
                         ndpi_ssl_version2str(flow_to_process->ndpi_flow,
-                                             flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
+                                             flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.ssl_version,
                                              &unknown_tls_version),
-                        flow_to_process->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name,
-                        (flow_to_process->ndpi_flow->protos.stun_ssl.ssl.alpn != NULL ?
-                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.alpn : "-"));
+                        flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.client_requested_server_name,
+                        (flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn != NULL ?
+                         flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn : "-"));
                 flow_to_process->tls_client_hello_seen = 1;
             }
             if (flow_to_process->tls_server_hello_seen == 0 &&
@@ -914,14 +914,14 @@ static void ndpi_process_packet(uint8_t * const args,
                         reader_thread->array_index,
                         flow_to_process->flow_id,
                         ndpi_ssl_version2str(flow_to_process->ndpi_flow,
-                                             flow_to_process->ndpi_flow->protos.stun_ssl.ssl.ssl_version,
+                                             flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.ssl_version,
                                              &unknown_tls_version),
-                        flow_to_process->ndpi_flow->protos.stun_ssl.ssl.server_names_len,
-                        flow_to_process->ndpi_flow->protos.stun_ssl.ssl.server_names,
-                        (flow_to_process->ndpi_flow->protos.stun_ssl.ssl.issuerDN != NULL ?
-                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.issuerDN : "-"),
-                        (flow_to_process->ndpi_flow->protos.stun_ssl.ssl.subjectDN != NULL ?
-                         flow_to_process->ndpi_flow->protos.stun_ssl.ssl.subjectDN : "-"));
+                        flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names_len,
+                        flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names,
+                        (flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.issuerDN != NULL ?
+                         flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.issuerDN : "-"),
+                        (flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.subjectDN != NULL ?
+                         flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.subjectDN : "-"));
                 flow_to_process->tls_server_hello_seen = 1;
             }
         }
