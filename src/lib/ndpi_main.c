@@ -6887,8 +6887,16 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	}
 
 	switch(word[i]) {
-	case '_':
 	case '-':
+	  /* 
+	     Let's check for double+consecutive -- 
+	     that are usually ok
+	     r2---sn-uxaxpu5ap5-2n5e.gvt1.com
+	  */
+	  if(word[i+1] == '-')
+	    return(0); /* Double dash */
+	  
+	case '_':
 	case ':':
 	  continue;
 	  break;
