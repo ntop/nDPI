@@ -138,6 +138,11 @@ void ndpi_search_wireguard(struct ndpi_detection_module_struct
      * against the appropriate index for a match (stage 5).
      */
     u_int32_t receiver_index = get_u_int32_t(payload, 4);
+
+    /* We speculate this is wireguard, so let's remember it */
+    if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_WIREGUARD;
+    
     if (flow->l4.udp.wireguard_stage == 0) {
       flow->l4.udp.wireguard_stage = 3 + packet->packet_direction;
       flow->l4.udp.wireguard_peer_index[packet->packet_direction] = receiver_index;
