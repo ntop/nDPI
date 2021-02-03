@@ -307,7 +307,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 
   /* This is necessary to inform the core to call this dissector again */
   flow->check_extra_packets = 1;
-  flow->max_extra_packets_to_check = 5;
+  flow->max_extra_packets_to_check = 8;
   flow->extra_packets_func = ndpi_search_http_tcp_again;
   flow->http_detected = 1;
 }
