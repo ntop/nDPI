@@ -23,6 +23,7 @@ AS_IF([test "${with_mipsel+set}" = set],[
 
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
+AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
@@ -240,6 +241,7 @@ AC_SUBST(CUSTOM_NDPI)
 AC_SUBST(NDPI_API_VERSION)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(BUILD_MINGW)
+AC_SUBST(BUILD_FUZZTARGETS)
 AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
 AC_SUBST(GCRYPT_ENABLED)
