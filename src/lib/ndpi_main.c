@@ -3923,7 +3923,12 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	  flow->next_tcp_seq_nr[flow->packet.packet_direction] =
 	    ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
 
-	  flow->next_tcp_seq_nr[1 - flow->packet.packet_direction] = ntohl(tcph->ack_seq);
+	  /*
+	    Check to avoid discrepancies in case we analyze a flow that does not start with SYN...
+	    but that is already started when nDPI being to process it. See also (***) below
+	  */
+	  if(flow->num_processed_pkts > 1)
+	    flow->next_tcp_seq_nr[1 - flow->packet.packet_direction] = ntohl(tcph->ack_seq);
 	}
       } else if(packet->payload_packet_len > 0) {
 	/* check tcp sequence counters */
@@ -3940,7 +3945,9 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	    packet->num_retried_bytes =
 	      (u_int16_t)(flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq));
 	    packet->actual_payload_len = packet->payload_packet_len - packet->num_retried_bytes;
-	    flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
+
+	    if(flow->num_processed_pkts > 1) /* See also (***) above */
+	      flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
 	  }
 	}
 
