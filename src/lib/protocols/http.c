@@ -336,8 +336,8 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
   /* Good reference for future implementations:
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
-  snprintf((char*)flow->protos.http.detected_os,
-	   sizeof(flow->protos.http.detected_os), "%s", ua);
+  snprintf((char*)flow->http.detected_os,
+	   sizeof(flow->http.detected_os), "%s", ua);
 }
 
 /* ************************************************************* */

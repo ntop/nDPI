@@ -1068,6 +1068,8 @@ struct ndpi_flow_struct {
     uint8_t num_request_headers, num_response_headers;
     uint8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     uint16_t response_status_code; /* 200, 404, etc. */
+    uint8_t detected_os[32]; /* Via HTTP/QUIC User-Agent */
+
   } http;
 
   /* 
@@ -1145,8 +1147,6 @@ struct ndpi_flow_struct {
     } ubntac2;
 
     struct {
-      /* Via HTTP User-Agent */
-      uint8_t detected_os[32];
       /* Via HTTP X-Forwarded-For */
       uint8_t nat_ip[24];
     } http;
