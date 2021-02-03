@@ -681,7 +681,7 @@ struct ndpi_flow_tcp_struct {
     /* NDPI_PROTOCOL_TLS */
     u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1,
 	fingerprint_set:1, _pad:4;
-    u_int8_t sha1_certificate_fingerprint[20], num_tls_blocks;
+    u_int8_t num_tls_blocks;
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;
   
@@ -1277,13 +1277,14 @@ struct ndpi_flow_struct {
 	u_int32_t notBefore, notAfter;
 	char ja3_client[33], ja3_server[33];
 	u_int16_t server_cipher;
-
+	u_int8_t sha1_certificate_fingerprint[20];
+	
 	struct {
 	  u_int16_t cipher_suite;
 	  char *esni;
 	} encrypted_sni;
 	ndpi_cipher_weakness server_unsafe_cipher;
-      } ssl;
+      } tls_quic;
 
       struct {
 		    u_int8_t num_udp_pkts, num_binding_requests;
@@ -1291,7 +1292,7 @@ struct ndpi_flow_struct {
       } stun;
 
       /* We can have STUN over SSL/TLS thus they need to live together */
-    } stun_ssl;
+    } tls_quic_stun;
 
     struct {
       char client_signature[48], server_signature[48];
@@ -1572,5 +1573,22 @@ struct ndpi_bin {
     u_int32_t *bins32; /* num_bins bins */
   } u;
 };
+
+/* **************************************** */
+
+struct ndpi_str_hash_info {
+  char *key;         /* Key   */
+  u_int8_t key_len;
+  u_int8_t value;    /* Value */
+  struct ndpi_str_hash_info *next;
+};
+
+typedef struct {
+  u_int32_t num_buckets, max_num_entries;
+  struct ndpi_str_hash_info **buckets;
+} ndpi_str_hash;
+
+
+/* **************************************** */
 
 #endif /* __NDPI_TYPEDEFS_H__ */
