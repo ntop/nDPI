@@ -1389,6 +1389,14 @@ extern "C" {
   u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s);
   float ndpi_data_ratio(u_int32_t sent, u_int32_t rcvd);
 
+  /* ******************************* */
+
+  void  ndpi_init_rsi(struct ndpi_rsi_struct *s, u_int16_t num_learning_values);
+  void  ndpi_free_rsi(struct ndpi_rsi_struct *s);
+  float ndpi_rsi_add_value(struct ndpi_rsi_struct *s, const u_int32_t value);
+  
+  /* ******************************* */
+
   const char* ndpi_data_ratio2str(float ratio);
 
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */

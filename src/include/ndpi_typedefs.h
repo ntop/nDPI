@@ -1544,6 +1544,13 @@ struct ndpi_analyze_struct {
 
 /* **************************************** */
 
+struct ndpi_rsi_struct {
+  struct ndpi_analyze_struct *gains, *losses;
+  u_int32_t last_value;
+};
+
+/* **************************************** */
+
 typedef struct ndpi_ptree ndpi_ptree_t;
 
 /* **************************************** */

@@ -3690,6 +3690,30 @@ void rulesUnitTest() {
 
 /* *********************************************** */
 
+void rsiUnitTest() {
+  struct ndpi_rsi_struct s;
+  unsigned int v[] = {
+    2227, 2219, 2208, 2217, 2218, 2213, 2223, 2243, 2224, 2229,
+    2215, 2239, 2238, 2261, 2336, 2405, 2375, 2383, 2395, 2363,
+    2382, 2387, 2365, 2319, 2310, 2333, 2268, 2310, 2240, 2217,
+  };
+  u_int i, n = sizeof(v) / sizeof(unsigned int);
+
+  ndpi_init_rsi(&s, 8);
+  
+  for(i=0; i<n; i++) {
+    float rsi = ndpi_rsi_add_value(&s, v[i]);
+
+#if 0
+    printf("%2d) RSI = %f\n", i, rsi);
+#endif
+  }
+  
+  ndpi_free_rsi(&s);
+}
+
+/* *********************************************** */
+
 void hashUnitTest() {
   ndpi_str_hash *h = ndpi_hash_alloc(16384);
   char* dict[] = { "hello", "world", NULL };
@@ -3731,6 +3755,7 @@ int orginal_main(int argc, char **argv) {
 
     /* Internal checks */
     // binUnitTest();
+    rsiUnitTest();
     hashUnitTest();
     dgaUnitTest();
     hllUnitTest();

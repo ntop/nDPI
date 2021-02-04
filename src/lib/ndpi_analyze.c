@@ -817,3 +817,42 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 }
 
 /* ********************************************************************************* */
+
+/* 
+   RSI (Relative Strength Index)
+
+   RSI = 100 − [ 100/ (1 + (Average loss/Average gain)) ]
+
+   https://www.investopedia.com/terms/r/rsi.asp
+*/
+
+void ndpi_init_rsi(struct ndpi_rsi_struct *s, u_int16_t num_learning_values) {
+  s->gains  = ndpi_alloc_data_analysis(num_learning_values);
+  s->losses = ndpi_alloc_data_analysis(num_learning_values);
+  s->last_value = 0;
+}
+
+void ndpi_free_rsi(struct ndpi_rsi_struct *s) {
+  ndpi_free_data_analysis(s->gains), ndpi_free_data_analysis(s->losses);
+}
+
+float ndpi_rsi_add_value(struct ndpi_rsi_struct *s, const u_int32_t value) {
+  if(s->gains->num_data_entries == 0)
+    ndpi_data_add_value(s->gains, 0), ndpi_data_add_value(s->losses, 0);
+  else {
+    if(value > s->last_value)    
+      ndpi_data_add_value(s->gains, value - s->last_value), ndpi_data_add_value(s->losses, 0);
+    else
+      ndpi_data_add_value(s->losses, s->last_value - value), ndpi_data_add_value(s->gains, 0);
+  }
+  
+  s->last_value = value;
+
+  if(s->gains->num_data_entries >= s->gains->num_values_array_len) {
+    float relative_strength = ndpi_data_average(s->gains) / ndpi_data_average(s->losses);
+
+    /* printf("RSI: %f\n", relative_strength); */
+    return(100. - (100. / (1. + relative_strength)));
+  } else
+    return(-1); /* Too early */
+}
