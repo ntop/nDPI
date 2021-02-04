@@ -136,8 +136,7 @@ void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size) {
   if(!ret)
     return(ret);
   else {
-    if (ptr != NULL)
-    {
+    if(ptr != NULL) {
       memcpy(ret, ptr, old_size);
       ndpi_free(ptr);
     }
@@ -6470,7 +6469,10 @@ void ndpi_free_flow_data(struct ndpi_flow_struct *flow) {
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 
-    if(is_quic || flow_is_proto(flow, NDPI_PROTOCOL_TLS)) {
+    if(is_quic
+       || flow_is_proto(flow, NDPI_PROTOCOL_TLS)
+       || flow_is_proto(flow, NDPI_PROTOCOL_DTLS)
+       ) {
       if(flow->protos.tls_quic_stun.tls_quic.server_names)
 	ndpi_free(flow->protos.tls_quic_stun.tls_quic.server_names);
 
