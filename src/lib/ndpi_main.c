@@ -3764,49 +3764,10 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
         u_int8_t backup;
 	      u_int16_t backup1, backup2;
 
-#ifdef FRAG_MAN
-        /* initialize the buffer to manage segments for a new http/dns connection */
-        flow->tcp_segments_management=1;
-        for (int i=0; i<2; i++ ) {
-          // reset counter tcp segments management lists 
-          flow->tcp_segments_list[i].ct_frag=0;            
-        }
-#endif // FRAG_MAN
-
-        if(flow->http.url) {
-          ndpi_free(flow->http.url);
-          flow->http.url = NULL;
-        }
-
-        if(flow->http.content_type) {
-          ndpi_free(flow->http.content_type);
-          flow->http.content_type = NULL;
-        }
-
-        if(flow->http.request_content_type) {
-          ndpi_free(flow->http.request_content_type);
-          flow->http.request_content_type = NULL;
-        }
-
-        if(flow->http.user_agent) {
-          ndpi_free(flow->http.user_agent);
-          flow->http.user_agent = NULL;
-        }
-
-        if(flow->kerberos_buf.pktbuf) {
-          ndpi_free(flow->kerberos_buf.pktbuf);
-          flow->kerberos_buf.pktbuf = NULL;
-        }
-
-        if(flow->l4.tcp.tls.message.buffer) {
-          ndpi_free(flow->l4.tcp.tls.message.buffer);
-          flow->l4.tcp.tls.message.buffer = NULL;
-          flow->l4.tcp.tls.message.buffer_len = flow->l4.tcp.tls.message.buffer_used = 0;
-        }
-
         backup = flow->num_processed_pkts;
         backup1 = flow->guessed_protocol_id;
         backup2 = flow->guessed_host_protocol_id;
+        ndpi_free_flow_data(flow);
         memset(flow, 0, sizeof(*(flow)));
 
         /* Restore pointers */
@@ -3814,6 +3775,17 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
         flow->guessed_protocol_id = backup1;
         flow->guessed_host_protocol_id = backup2;
         flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
+        flow->l4_proto = IPPROTO_TCP;
+
+#ifdef FRAG_MAN
+        /* initialize the buffer to manage segments for a new http/dns connection */
+        flow->tcp_segments_management=1;
+        for (int i=0; i<2; i++ ) {
+          // reset counter tcp segments management lists
+          flow->tcp_segments_list[i].ct_frag=0;
+        }
+#endif // FRAG_MAN
+
 
         NDPI_LOG_DBG(ndpi_str, "tcp syn packet for unknown protocol, reset detection state\n");
       }
@@ -6495,6 +6467,10 @@ void ndpi_free_flow_data(struct ndpi_flow_struct *flow) {
     if(flow->l4_proto == IPPROTO_TCP) {
       if(flow->l4.tcp.tls.message.buffer)
 	ndpi_free(flow->l4.tcp.tls.message.buffer);
+#ifdef FRAG_MAN
+      free_fragment(&flow->tcp_segments_list[0]);
+      free_fragment(&flow->tcp_segments_list[1]);
+#endif
     }
   }
 }
