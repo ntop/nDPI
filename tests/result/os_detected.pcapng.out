@@ -1,0 +1,8 @@
+Google	1	1294	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.128            	 1      
+
+
+	1	UDP 192.168.1.128:39821 -> 8.8.8.8:443 [proto: 188.126/QUIC.Google][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: h3-29][TLS Supported Versions: TLSv1.3][User-Agent: Mozilla/5.0 (Windows NT 5.2; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko)][Risk: ** SNI TLS extension was missing **][TLSv1.3][JA3C: 9addef84847d700f759746b237c405c8][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]

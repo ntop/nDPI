@@ -111,12 +111,10 @@ static void ndpi_http_check_human_redeable_content(struct ndpi_detection_module_
 						   struct ndpi_flow_struct *flow,
 						   const u_int8_t *content, u_int16_t content_len) {
   if(content_len >= 4) {
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    printf(" [len: %u] [%02X %02X %02X %02X][%c%c%c%c]", content_len,
+    NDPI_LOG_DBG(ndpi_struct, " [len: %u] [%02X %02X %02X %02X][%c%c%c%c]", content_len,
 	   content[0], content[1], content[2], content[3],
 	   content[0], content[1], content[2], content[3]
 	   );
-#endif
 
     if(ndpi_http_is_print(content[0]) && ndpi_http_is_print(content[1])
        && ndpi_http_is_print(content[2]) && ndpi_http_is_print(content[3])) {
@@ -142,10 +140,8 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
   struct ndpi_packet_struct *packet = &flow->packet;
   const u_int8_t *double_ret = (const u_int8_t *)ndpi_strnstr((const char *)packet->payload, "\r\n\r\n", packet->payload_packet_len);
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  printf("==>>> [len: %u] ", packet->payload_packet_len);
-  printf("->> %.*s\n", packet->content_line.len, (const char *)packet->content_line.ptr);
-#endif
+  NDPI_LOG_DBG(ndpi_struct, "==>>> [len: %u] ", packet->payload_packet_len);
+  NDPI_LOG_DBG(ndpi_struct, "->> %.*s\n", packet->content_line.len, (const char *)packet->content_line.ptr);
   
   if(double_ret) {
     u_int len;
@@ -167,9 +163,7 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
       }
     }
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    printf("\n");
-#endif
+    NDPI_LOG_DBG(ndpi_struct, "\n");
   }
 }
 
@@ -307,7 +301,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 
   /* This is necessary to inform the core to call this dissector again */
   flow->check_extra_packets = 1;
-  flow->max_extra_packets_to_check = 5;
+  flow->max_extra_packets_to_check = 8;
   flow->extra_packets_func = ndpi_search_http_tcp_again;
   flow->http_detected = 1;
 }
@@ -342,8 +336,8 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
   /* Good reference for future implementations:
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
-  snprintf((char*)flow->protos.http.detected_os,
-	   sizeof(flow->protos.http.detected_os), "%s", ua);
+  snprintf((char*)flow->http.detected_os,
+	   sizeof(flow->http.detected_os), "%s", ua);
 }
 
 /* ************************************************************* */

@@ -23,6 +23,7 @@ AS_IF([test "${with_mipsel+set}" = set],[
 
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
+AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
@@ -189,23 +190,24 @@ AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
-if ! test "${with_mipsel+set}" = set; then :
 dnl> GCRYPT
+GCRYPT_ENABLED=1
 AC_ARG_ENABLE([gcrypt],
   [AS_HELP_STRING([--disable-gcrypt], [Avoid compiling with libgcrypt/libgpg-error, even if they are present. QUIC sub-classification may be missing])],
-  [:],
+  [GCRYPT_ENABLED=0],
   [AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)])
-if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes; then :
-  ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt"
-else
-  $as_unset ac_cv_lib_gcrypt_gcry_cipher_checktag
-  AC_CHECK_LIB(gpg-error, gpg_strerror_r)
-  AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
-  if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes -a "x$ac_cv_lib_gpg_error_gpg_strerror_r" = xyes; then :
-    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
+AS_IF([test "x$enable_gcrypt" = "xyes"], [
+  if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes; then :
+    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt"
+  else
+    $as_unset ac_cv_lib_gcrypt_gcry_cipher_checktag
+    AC_CHECK_LIB(gpg-error, gpg_strerror_r)
+    AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
+    if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes -a "x$ac_cv_lib_gpg_error_gpg_strerror_r" = xyes; then :
+      ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
+    fi
   fi
-fi
-fi
+])
 
 dnl> PCRE
 AC_ARG_WITH(pcre,          [  --with-pcre        Enable nDPI build with libpcre])
@@ -221,6 +223,8 @@ FRAG_MAN_ENABLED=1
 AC_DEFINE_UNQUOTED(FRAG_MAN, ${FRAG_MAN_ENABLED}, [Enable the TCP segments fragmentation management])
 
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/dga/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
+AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
+AC_CONFIG_FILES([tests/do_valgrind.sh], [chmod +x tests/do_valgrind.sh])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
@@ -237,8 +241,10 @@ AC_SUBST(CUSTOM_NDPI)
 AC_SUBST(NDPI_API_VERSION)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(BUILD_MINGW)
+AC_SUBST(BUILD_FUZZTARGETS)
 AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
+AC_SUBST(GCRYPT_ENABLED)
 AC_SUBST(GNU_PREFIX)
 AC_SUBST(FRAG_MAN_ENABLED)
 AC_OUTPUT

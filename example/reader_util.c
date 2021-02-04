@@ -783,7 +783,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
 #if 0
   printf("hashval=%u [%u][%u][%u:%u][%u:%u]\n", hashval, flow.protocol, flow.vlan_id,
-	 flow.src_ip, flow.src_port, flow.dst_ip, flow.dst_port);
+	 flow.src_ip, flow.src_port, ntohs(flow.dst_ip), ntohs(flow.dst_port));
 #endif
 
   idx = hashval % workflow->prefs.num_roots;
@@ -1141,75 +1141,75 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if((is_ndpi_proto(flow, NDPI_PROTOCOL_TLS))
 	  || ((is_quic = is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)))
 	  || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	  || (flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client[0] != '\0')
+	  || (flow->ndpi_flow->protos.tls_quic_stun.tls_quic.ja3_client[0] != '\0')
 	  ) {
-    flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.stun_ssl.ssl.ssl_version;
+    flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.ssl_version;
     snprintf(flow->ssh_tls.client_requested_server_name,
 	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
-	     flow->ndpi_flow->protos.stun_ssl.ssl.client_requested_server_name);
+	     flow->ndpi_flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
 
     snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
 
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.server_names_len > 0 && flow->ndpi_flow->protos.stun_ssl.ssl.server_names)
-      flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.server_names);
+    if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names_len > 0 && flow->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names)
+      flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names);
 
-    flow->ssh_tls.notBefore = flow->ndpi_flow->protos.stun_ssl.ssl.notBefore;
-    flow->ssh_tls.notAfter = flow->ndpi_flow->protos.stun_ssl.ssl.notAfter;
+    flow->ssh_tls.notBefore = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.notBefore;
+    flow->ssh_tls.notAfter = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.notAfter;
     snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
-	     flow->ndpi_flow->protos.stun_ssl.ssl.ja3_client);
+	     flow->ndpi_flow->protos.tls_quic_stun.tls_quic.ja3_client);
     snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
-	     flow->ndpi_flow->protos.stun_ssl.ssl.ja3_server);
-    flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_unsafe_cipher;
-    flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.stun_ssl.ssl.server_cipher;
+	     flow->ndpi_flow->protos.tls_quic_stun.tls_quic.ja3_server);
+    flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.server_unsafe_cipher;
+    flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.server_cipher;
 
     if(flow->ndpi_flow->l4.tcp.tls.fingerprint_set) {
       memcpy(flow->ssh_tls.sha1_cert_fingerprint,
-	     flow->ndpi_flow->l4.tcp.tls.sha1_certificate_fingerprint, 20);
+	     flow->ndpi_flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint, 20);
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;
     }
 
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn) {
-      if((flow->ssh_tls.tls_alpn = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.alpn)) != NULL)
+    if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn) {
+      if((flow->ssh_tls.tls_alpn = ndpi_strdup(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn)) != NULL)
 	correct_csv_data_field(flow->ssh_tls.tls_alpn);
     }
 
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.issuerDN)
-      flow->ssh_tls.tls_issuerDN = strdup(flow->ndpi_flow->protos.stun_ssl.ssl.issuerDN);
+    if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.issuerDN)
+      flow->ssh_tls.tls_issuerDN = strdup(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.issuerDN);
     
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.subjectDN)
-      flow->ssh_tls.tls_subjectDN = strdup(flow->ndpi_flow->protos.stun_ssl.ssl.subjectDN);
+    if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.subjectDN)
+      flow->ssh_tls.tls_subjectDN = strdup(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.subjectDN);
 
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.encrypted_sni.esni) {
-      flow->ssh_tls.encrypted_sni.esni = strdup(flow->ndpi_flow->protos.stun_ssl.ssl.encrypted_sni.esni);
-      flow->ssh_tls.encrypted_sni.cipher_suite = flow->ndpi_flow->protos.stun_ssl.ssl.encrypted_sni.cipher_suite;
+    if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni) {
+      flow->ssh_tls.encrypted_sni.esni = strdup(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni);
+      flow->ssh_tls.encrypted_sni.cipher_suite = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.encrypted_sni.cipher_suite;
     }
     
     if(flow->ssh_tls.tls_supported_versions) {
-      if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions)) != NULL)
+      if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)) != NULL)
 	correct_csv_data_field(flow->ssh_tls.tls_supported_versions);
     }
 
-    if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn
-       && flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions) {
-      correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
-      correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
+    if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn
+       && flow->ndpi_flow->protos.tls_quic_stun.tls_quic.tls_supported_versions) {
+      correct_csv_data_field(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn);
+      correct_csv_data_field(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
 
       if(csv_fp)
 	snprintf(flow->info, sizeof(flow->info), "%s",
-		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+		 flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn);
       else
 	snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
-		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn,
-		 flow->ndpi_flow->protos.stun_ssl.ssl.tls_supported_versions);
-    } else if(flow->ndpi_flow->protos.stun_ssl.ssl.alpn) {
-      correct_csv_data_field(flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+		 flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn,
+		 flow->ndpi_flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
+    } else if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn) {
+      correct_csv_data_field(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn);
 
       if(csv_fp)
 	snprintf(flow->info, sizeof(flow->info), "%s,",
-		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+		 flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn);
       else
 	snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
-		 flow->ndpi_flow->protos.stun_ssl.ssl.alpn);
+		 flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn);
     }
         
     if(enable_doh_dot_detection) {

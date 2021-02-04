@@ -1,0 +1,6 @@
+Unknown	29	1566	1
+
+
+
+Undetected flows:
+	1	TCP 10.0.0.2:0 -> 10.128.0.2:0 [proto: 0/Unknown][29 pkts/1566 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][8.51 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 302/0 304/0 305/0 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 54/0 54/0 0/0][PLAIN TEXT (hdflkda)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

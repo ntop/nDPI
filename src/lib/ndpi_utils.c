@@ -243,38 +243,38 @@ u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
  * based upon ascii character sequences.
  */
 static const u_char charmap[] = {
-				 '\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
-				 '\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
-				 '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
-				 '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037',
-				 '\040', '\041', '\042', '\043', '\044', '\045', '\046', '\047',
-				 '\050', '\051', '\052', '\053', '\054', '\055', '\056', '\057',
-				 '\060', '\061', '\062', '\063', '\064', '\065', '\066', '\067',
-				 '\070', '\071', '\072', '\073', '\074', '\075', '\076', '\077',
-				 '\100', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
-				 '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
-				 '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
-				 '\170', '\171', '\172', '\133', '\134', '\135', '\136', '\137',
-				 '\140', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
-				 '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
-				 '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
-				 '\170', '\171', '\172', '\173', '\174', '\175', '\176', '\177',
-				 '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
-				 '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
-				 '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
-				 '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237',
-				 '\240', '\241', '\242', '\243', '\244', '\245', '\246', '\247',
-				 '\250', '\251', '\252', '\253', '\254', '\255', '\256', '\257',
-				 '\260', '\261', '\262', '\263', '\264', '\265', '\266', '\267',
-				 '\270', '\271', '\272', '\273', '\274', '\275', '\276', '\277',
-				 '\300', '\301', '\302', '\303', '\304', '\305', '\306', '\307',
-				 '\310', '\311', '\312', '\313', '\314', '\315', '\316', '\317',
-				 '\320', '\321', '\322', '\323', '\324', '\325', '\326', '\327',
-				 '\330', '\331', '\332', '\333', '\334', '\335', '\336', '\337',
-				 '\340', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
-				 '\350', '\351', '\352', '\353', '\354', '\355', '\356', '\357',
-				 '\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
-				 '\370', '\371', '\372', '\373', '\374', '\375', '\376', '\377',
+  '\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
+  '\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
+  '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
+  '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037',
+  '\040', '\041', '\042', '\043', '\044', '\045', '\046', '\047',
+  '\050', '\051', '\052', '\053', '\054', '\055', '\056', '\057',
+  '\060', '\061', '\062', '\063', '\064', '\065', '\066', '\067',
+  '\070', '\071', '\072', '\073', '\074', '\075', '\076', '\077',
+  '\100', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
+  '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
+  '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
+  '\170', '\171', '\172', '\133', '\134', '\135', '\136', '\137',
+  '\140', '\141', '\142', '\143', '\144', '\145', '\146', '\147',
+  '\150', '\151', '\152', '\153', '\154', '\155', '\156', '\157',
+  '\160', '\161', '\162', '\163', '\164', '\165', '\166', '\167',
+  '\170', '\171', '\172', '\173', '\174', '\175', '\176', '\177',
+  '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
+  '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
+  '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
+  '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237',
+  '\240', '\241', '\242', '\243', '\244', '\245', '\246', '\247',
+  '\250', '\251', '\252', '\253', '\254', '\255', '\256', '\257',
+  '\260', '\261', '\262', '\263', '\264', '\265', '\266', '\267',
+  '\270', '\271', '\272', '\273', '\274', '\275', '\276', '\277',
+  '\300', '\301', '\302', '\303', '\304', '\305', '\306', '\307',
+  '\310', '\311', '\312', '\313', '\314', '\315', '\316', '\317',
+  '\320', '\321', '\322', '\323', '\324', '\325', '\326', '\327',
+  '\330', '\331', '\332', '\333', '\334', '\335', '\336', '\337',
+  '\340', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
+  '\350', '\351', '\352', '\353', '\354', '\355', '\356', '\357',
+  '\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
+  '\370', '\371', '\372', '\373', '\374', '\375', '\376', '\377',
 };
 
 int strcasecmp(const char *s1, const char *s2) {
@@ -919,10 +919,10 @@ char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
     *unknown_tls_version = 1;
 
   if(flow != NULL) {
-    snprintf(flow->protos.stun_ssl.ssl.ssl_version_str,
-	     sizeof(flow->protos.stun_ssl.ssl.ssl_version_str), "TLS (%04X)", version);
+    snprintf(flow->protos.tls_quic_stun.tls_quic.ssl_version_str,
+	     sizeof(flow->protos.tls_quic_stun.tls_quic.ssl_version_str), "TLS (%04X)", version);
     
-    return(flow->protos.stun_ssl.ssl.ssl_version_str);
+    return(flow->protos.tls_quic_stun.tls_quic.ssl_version_str);
   } else
     return("");
 }
@@ -1213,22 +1213,22 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_QUIC:
     ndpi_serialize_start_of_block(serializer, "quic");
-    if(flow->protos.stun_ssl.ssl.client_requested_server_name[0] != '\0')
+    if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "client_requested_server_name",
-                                   flow->protos.stun_ssl.ssl.client_requested_server_name);
+                                   flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
     if(flow->http.user_agent)
       ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
-    if(flow->protos.stun_ssl.ssl.ssl_version) {
+    if(flow->protos.tls_quic_stun.tls_quic.ssl_version) {
       u_int8_t unknown_tls_version;
-      char *version = ndpi_ssl_version2str(flow, flow->protos.stun_ssl.ssl.ssl_version, &unknown_tls_version);
+      char *version = ndpi_ssl_version2str(flow, flow->protos.tls_quic_stun.tls_quic.ssl_version, &unknown_tls_version);
 
       if(!unknown_tls_version)
 	ndpi_serialize_string_string(serializer, "version", version);
-      if(flow->protos.stun_ssl.ssl.alpn)
-        ndpi_serialize_string_string(serializer, "alpn", flow->protos.stun_ssl.ssl.alpn);
-      ndpi_serialize_string_string(serializer, "ja3", flow->protos.stun_ssl.ssl.ja3_client);
-      if(flow->protos.stun_ssl.ssl.tls_supported_versions)
-        ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.stun_ssl.ssl.tls_supported_versions);
+      if(flow->protos.tls_quic_stun.tls_quic.alpn)
+        ndpi_serialize_string_string(serializer, "alpn", flow->protos.tls_quic_stun.tls_quic.alpn);
+      ndpi_serialize_string_string(serializer, "ja3", flow->protos.tls_quic_stun.tls_quic.ja3_client);
+      if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
+        ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
     }
     ndpi_serialize_end_of_block(serializer);
     break;
@@ -1272,25 +1272,25 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case NDPI_PROTOCOL_TLS:
-    if(flow->protos.stun_ssl.ssl.ssl_version) {
+    if(flow->protos.tls_quic_stun.tls_quic.ssl_version) {
       char notBefore[32], notAfter[32];
       struct tm a, b, *before = NULL, *after = NULL;
       u_int i, off;
       u_int8_t unknown_tls_version;
-      char *version = ndpi_ssl_version2str(flow, flow->protos.stun_ssl.ssl.ssl_version, &unknown_tls_version);
+      char *version = ndpi_ssl_version2str(flow, flow->protos.tls_quic_stun.tls_quic.ssl_version, &unknown_tls_version);
 
-      if(flow->protos.stun_ssl.ssl.notBefore)
-        before = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notBefore, &a);
-      if(flow->protos.stun_ssl.ssl.notAfter)
-        after  = gmtime_r((const time_t *)&flow->protos.stun_ssl.ssl.notAfter, &b);
+      if(flow->protos.tls_quic_stun.tls_quic.notBefore)
+        before = gmtime_r((const time_t *)&flow->protos.tls_quic_stun.tls_quic.notBefore, &a);
+      if(flow->protos.tls_quic_stun.tls_quic.notAfter)
+        after  = gmtime_r((const time_t *)&flow->protos.tls_quic_stun.tls_quic.notAfter, &b);
 
       if(!unknown_tls_version) {
 	ndpi_serialize_start_of_block(serializer, "tls");
 	ndpi_serialize_string_string(serializer, "version", version);
 	ndpi_serialize_string_string(serializer, "client_requested_server_name",
-				     flow->protos.stun_ssl.ssl.client_requested_server_name);
-	if(flow->protos.stun_ssl.ssl.server_names)
-	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.stun_ssl.ssl.server_names);
+				     flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+	if(flow->protos.tls_quic_stun.tls_quic.server_names)
+	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.tls_quic_stun.tls_quic.server_names);
 
 	if(before) {
           strftime(notBefore, sizeof(notBefore), "%Y-%m-%d %H:%M:%S", before);
@@ -1301,27 +1301,27 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	  strftime(notAfter, sizeof(notAfter), "%Y-%m-%d %H:%M:%S", after);
           ndpi_serialize_string_string(serializer, "notafter", notAfter);
         }
-	ndpi_serialize_string_string(serializer, "ja3", flow->protos.stun_ssl.ssl.ja3_client);
-	ndpi_serialize_string_string(serializer, "ja3s", flow->protos.stun_ssl.ssl.ja3_server);
-	ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.stun_ssl.ssl.server_unsafe_cipher);
-	ndpi_serialize_string_string(serializer, "cipher", ndpi_cipher2str(flow->protos.stun_ssl.ssl.server_cipher));
+	ndpi_serialize_string_string(serializer, "ja3", flow->protos.tls_quic_stun.tls_quic.ja3_client);
+	ndpi_serialize_string_string(serializer, "ja3s", flow->protos.tls_quic_stun.tls_quic.ja3_server);
+	ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.tls_quic_stun.tls_quic.server_unsafe_cipher);
+	ndpi_serialize_string_string(serializer, "cipher", ndpi_cipher2str(flow->protos.tls_quic_stun.tls_quic.server_cipher));
 
-	if(flow->protos.stun_ssl.ssl.issuerDN)
-	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.stun_ssl.ssl.issuerDN);
+	if(flow->protos.tls_quic_stun.tls_quic.issuerDN)
+	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic_stun.tls_quic.issuerDN);
 	
-	if(flow->protos.stun_ssl.ssl.subjectDN)
-	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.stun_ssl.ssl.subjectDN);
+	if(flow->protos.tls_quic_stun.tls_quic.subjectDN)
+	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic_stun.tls_quic.subjectDN);
 
-	if(flow->protos.stun_ssl.ssl.alpn)
-	  ndpi_serialize_string_string(serializer, "alpn", flow->protos.stun_ssl.ssl.alpn);
+	if(flow->protos.tls_quic_stun.tls_quic.alpn)
+	  ndpi_serialize_string_string(serializer, "alpn", flow->protos.tls_quic_stun.tls_quic.alpn);
 	
-	if(flow->protos.stun_ssl.ssl.tls_supported_versions)
-	  ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.stun_ssl.ssl.tls_supported_versions);	
+	if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
+	  ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);	
 	
-	if(flow->l4.tcp.tls.sha1_certificate_fingerprint[0] != '\0') {
+	if(flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint[0] != '\0') {
 	  for(i=0, off=0; i<20; i++) {
 	    int rc = snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
-			      flow->l4.tcp.tls.sha1_certificate_fingerprint[i] & 0xFF);
+			      flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint[i] & 0xFF);
 	    
 	    if(rc <= 0) break; else off += rc;
 	  }
@@ -1442,7 +1442,7 @@ static int ndpi_url_decode(const char *s, char *out) {
     c = *s++;
     if(c == '+') c = ' ';
     else if(c == '%' && (!ishex(*s++)||
-			  !ishex(*s++)||
+			 !ishex(*s++)||
 			 !sscanf(s - 2, "%2x", (unsigned int*)&c)))
       return(-1);
 
@@ -1485,22 +1485,22 @@ static void ndpi_compile_rce_regex() {
                                         &pcreErrorOffset, NULL);
 
     if(comp_rx[i]->compiled == NULL) {
-      #ifdef DEBUG
+#ifdef DEBUG
       NDPI_LOG_ERR(ndpi_str, "ERROR: Could not compile '%s': %s\n", rce_regex[i],
                    pcreErrorStr);
-      #endif
+#endif
 
       continue;
     }
 
     comp_rx[i]->optimized = pcre_study(comp_rx[i]->compiled, 0, &pcreErrorStr);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     if(pcreErrorStr != NULL) {
       NDPI_LOG_ERR(ndpi_str, "ERROR: Could not study '%s': %s\n", rce_regex[i],
                    pcreErrorStr);
     }
-    #endif
+#endif
   }
 
   free((void *)pcreErrorStr);
@@ -1525,33 +1525,33 @@ static int ndpi_is_rce_injection(char* query) {
     if (pcreExecRet >= 0) {
       return 1;
     }
-    #ifdef DEBUG
+#ifdef DEBUG
     else {
       switch(pcreExecRet) {
-        case PCRE_ERROR_NOMATCH:
-          NDPI_LOG_ERR(ndpi_str, "ERROR: String did not match the pattern\n");
-          break;
-        case PCRE_ERROR_NULL:
-          NDPI_LOG_ERR(ndpi_str, "ERROR: Something was null\n");
-          break;
-        case PCRE_ERROR_BADOPTION:
-          NDPI_LOG_ERR(ndpi_str, "ERROR: A bad option was passed\n");
-          break;
-        case PCRE_ERROR_BADMAGIC:
-          NDPI_LOG_ERR(ndpi_str, "ERROR: Magic number bad (compiled re corrupt?)\n");
-          break;
-        case PCRE_ERROR_UNKNOWN_NODE:
-          NDPI_LOG_ERR(ndpi_str, "ERROR: Something kooky in the compiled re\n");
-          break;
-        case PCRE_ERROR_NOMEMORY:
-          NDPI_LOG_ERR(ndpi_str, "ERROR: Ran out of memory\n");
-          break;
-        default:
-          NDPI_LOG_ERR(ndpi_str, "ERROR: Unknown error\n");
-          break;
+      case PCRE_ERROR_NOMATCH:
+	NDPI_LOG_ERR(ndpi_str, "ERROR: String did not match the pattern\n");
+	break;
+      case PCRE_ERROR_NULL:
+	NDPI_LOG_ERR(ndpi_str, "ERROR: Something was null\n");
+	break;
+      case PCRE_ERROR_BADOPTION:
+	NDPI_LOG_ERR(ndpi_str, "ERROR: A bad option was passed\n");
+	break;
+      case PCRE_ERROR_BADMAGIC:
+	NDPI_LOG_ERR(ndpi_str, "ERROR: Magic number bad (compiled re corrupt?)\n");
+	break;
+      case PCRE_ERROR_UNKNOWN_NODE:
+	NDPI_LOG_ERR(ndpi_str, "ERROR: Something kooky in the compiled re\n");
+	break;
+      case PCRE_ERROR_NOMEMORY:
+	NDPI_LOG_ERR(ndpi_str, "ERROR: Ran out of memory\n");
+	break;
+      default:
+	NDPI_LOG_ERR(ndpi_str, "ERROR: Unknown error\n");
+	break;
       }
     }
-    #endif
+#endif
   }
 
   size_t ushlen = sizeof(ush_commands) / sizeof(ush_commands[0]);
@@ -2197,3 +2197,106 @@ u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long) {
 }
 
 /* ******************************************************************** */
+
+ndpi_str_hash* ndpi_hash_alloc(u_int32_t max_num_entries) {
+  ndpi_str_hash *h = (ndpi_str_hash*)malloc(sizeof(ndpi_str_hash));
+
+  if(!h) return(NULL);
+  if(max_num_entries < 1024) max_num_entries = 1024;
+  if(max_num_entries > 10000000) max_num_entries = 10000000;
+  
+  h->max_num_entries = max_num_entries, h->num_buckets = max_num_entries/2;
+  h->buckets = (struct ndpi_str_hash_info**)calloc(sizeof(struct ndpi_str_hash_info*), h->num_buckets);
+
+  if(h->buckets == NULL) {
+    free(h);
+    return(NULL);
+  } else
+    return(h);
+}
+
+/* ******************************************************************** */
+
+void ndpi_hash_free(ndpi_str_hash *h) {
+  u_int32_t i;
+  
+  for(i=0; i<h->num_buckets; i++) {
+    struct ndpi_str_hash_info *head = h->buckets[i];
+
+    while(head != NULL) {
+      struct ndpi_str_hash_info *next = head->next;
+
+      free(head->key);
+      free(head);
+      head = next;
+    }
+  }
+
+  free(h->buckets);
+  free(h);
+}
+
+/* ******************************************************************** */
+
+static u_int32_t _ndpi_hash_function(ndpi_str_hash *h, char *key, u_int8_t key_len) {
+  u_int32_t hv = 0;
+  u_int8_t i;
+
+  for(i=0; i<key_len; i++)
+    hv += key[i]*(i+1);
+
+  return(hv % h->num_buckets);
+}
+
+/* ******************************************************************** */
+
+static int _ndpi_hash_find_entry(ndpi_str_hash *h, u_int32_t hashval, char *key, u_int key_len, u_int8_t *value) {
+  struct ndpi_str_hash_info *head = h->buckets[hashval];
+  
+  while(head != NULL) {
+    if((head->key_len == key_len) && (memcmp(head->key, key, key_len) == 0)) {
+      *value = head->value;
+      return(0); /* Found */
+    }
+    
+    head = head-> next;
+  }
+
+  return(-1); /* Not found */
+}
+
+/* ******************************************************************** */
+
+int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int8_t *value) {
+  u_int32_t hv = _ndpi_hash_function(h, key, key_len);
+
+  return(_ndpi_hash_find_entry(h, hv, key, key_len, value));
+}
+
+/* ******************************************************************** */
+
+int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t value) {
+  u_int32_t hv = _ndpi_hash_function(h, key, key_len);
+  u_int8_t ret_value;
+  int rc = _ndpi_hash_find_entry(h, hv, key, key_len, &ret_value);
+
+  if(rc == -1) {
+    /* Not found */
+    struct ndpi_str_hash_info *e = (struct ndpi_str_hash_info*)malloc(sizeof(struct ndpi_str_hash_info));
+
+    if(e == NULL)
+      return(-2);
+    
+    if((e->key = (char*)malloc(key_len)) == NULL)
+      return(-3);
+
+    memcpy(e->key, key, key_len);
+    e->key_len = key_len, e->value = value;
+    e->next = h->buckets[hv];
+    h->buckets[hv] = e;
+
+    return(0);
+  } else
+    return(0);
+}
+

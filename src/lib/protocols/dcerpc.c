@@ -49,6 +49,8 @@ bool is_connection_oriented_dcerpc(struct ndpi_packet_struct *packet, struct ndp
 
 bool is_connectionless_dcerpc(struct ndpi_packet_struct *packet, struct ndpi_flow_struct *flow)
 {
+  u_int16_t fragment_len;
+  
   if (packet->udp == NULL)
     return false;
   if (packet->payload_packet_len < 80)
@@ -64,6 +66,14 @@ bool is_connectionless_dcerpc(struct ndpi_packet_struct *packet, struct ndpi_flo
   if (packet->payload[5] > 3) /* invalid floating point type */
     return false;
 
+  if(packet->payload[4] == 0x10)
+    fragment_len = (packet->payload[75] << 8) + packet->payload[74]; /* Big endian */
+  else
+    fragment_len = (packet->payload[74] << 8) + packet->payload[75]; /* Little endian */
+
+  if(packet->payload_packet_len != (fragment_len+76 /* offset */ + 4 /* rest of the packet */))
+    return false; /* Too short or too long, bot RPC */
+  
   return true;
 }
 

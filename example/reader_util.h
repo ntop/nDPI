@@ -29,7 +29,7 @@
 #ifndef __NDPI_UTIL_H__
 #define __NDPI_UTIL_H__
 
-#include "uthash.h"
+#include "../src/lib/third_party/include/uthash.h"
 #include <pcap.h>
 #include "ndpi_includes.h"
 #include "ndpi_classify.h"
@@ -204,7 +204,7 @@ typedef struct ndpi_flow_info {
   
   struct {
     u_int16_t ssl_version;
-    char client_requested_server_name[64], server_info[64],
+    char client_requested_server_name[256], server_info[64],
       client_hassh[33], server_hassh[33], *server_names,
       *tls_alpn, *tls_supported_versions,
       *tls_issuerDN, *tls_subjectDN,
