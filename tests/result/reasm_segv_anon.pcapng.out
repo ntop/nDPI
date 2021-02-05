@@ -1,0 +1,3 @@
+HTTP	82	77940	1
+
+	1	TCP 172.17.36.21:57619 <-> 63.190.145.43:80 [proto: GTP:7/HTTP][cat: Web/5][28 pkts/3184 bytes <-> 54 pkts/74756 bytes][Goodput ratio: 0/93][15.67 sec][bytes ratio: -0.918 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 448/205 1615/2133 476/518][Pkt Len c2s/s2c min/avg/max/stddev: 94/90 114/1384 130/1490 9/330][PLAIN TEXT (.iJoJJ)][Plen Bins: 0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,1,0,0,92,0,0,0,0]
