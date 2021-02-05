@@ -1545,8 +1545,10 @@ struct ndpi_analyze_struct {
 /* **************************************** */
 
 struct ndpi_rsi_struct {
-  struct ndpi_analyze_struct gains, losses;
-  u_int32_t last_value;
+  u_int8_t empty:1, rsi_ready:1, _notused:6;
+  u_int16_t num_values, next_index;
+  u_int32_t *gains, *losses;
+  u_int32_t last_value, total_gains, total_losses;
 };
 
 /* **************************************** */

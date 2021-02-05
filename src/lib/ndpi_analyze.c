@@ -821,42 +821,80 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 /* 
    RSI (Relative Strength Index)
 
-   RSI = 100 − [ 100/ (1 + (Average loss/Average gain)) ]
+   RSI = 100 − [ 100/ (1 + (Average gain/Average loss)) ]
 
    https://www.investopedia.com/terms/r/rsi.asp
 */
 
-void ndpi_init_rsi(struct ndpi_rsi_struct *s, u_int16_t num_learning_values) {
-  ndpi_init_data_analysis(&s->gains, num_learning_values);
-  ndpi_init_data_analysis(&s->losses, num_learning_values);
-  s->last_value = 0;
+int ndpi_alloc_rsi(struct ndpi_rsi_struct *s, u_int16_t num_learning_values) {
+  memset(s, 0, sizeof(struct ndpi_rsi_struct));
+
+  s->empty  = 1, s->num_values = num_learning_values;
+  s->gains  = (u_int32_t*)ndpi_calloc(num_learning_values, sizeof(u_int32_t));
+  s->losses = (u_int32_t*)ndpi_calloc(num_learning_values, sizeof(u_int32_t));
+
+  if(s->gains && s->losses) {
+    s->last_value = 0;
+    return(0);
+  } else {
+    if(s->gains)  free(s->gains);
+    if(s->losses) free(s->losses);
+    return(-1);
+  }
 }
 
 void ndpi_free_rsi(struct ndpi_rsi_struct *s) {
-  ndpi_free_data_analysis(&s->gains, 0), ndpi_free_data_analysis(&s->losses, 0);
+  ndpi_free(s->gains), ndpi_free(s->losses);
 }
 
 /*
   This function adds a new value and returns the computed RSI, or -1
   if there are too many points (< num_learning_values)
+
+  RSI < 30 (too many losses)
+  RSI > 70 (too many gains)
 */
 float ndpi_rsi_add_value(struct ndpi_rsi_struct *s, const u_int32_t value) {
-  if(s->gains.num_data_entries == 0)
-    ndpi_data_add_value(&s->gains, 0), ndpi_data_add_value(&s->losses, 0);
-  else {
-    if(value > s->last_value)    
-      ndpi_data_add_value(&s->gains, value - s->last_value), ndpi_data_add_value(&s->losses, 0);
-    else
-      ndpi_data_add_value(&s->losses, s->last_value - value), ndpi_data_add_value(&s->gains, 0);
+  float relative_strength;
+  
+  if(!s->empty) {
+    u_int32_t val;
+
+    s->total_gains -= s->gains[s->next_index], s->total_losses -= s->losses[s->next_index];
+    
+    if(value > s->last_value) {
+      val = value - s->last_value;
+      s->gains[s->next_index] = val, s->losses[s->next_index] = 0;
+      s->total_gains += val;
+#ifdef DEBUG_RSI
+      printf("Gain: %u\n", val);
+#endif
+    } else {
+      val = s->last_value - value;
+      s->losses[s->next_index] = val, s->gains[s->next_index] = 0;
+      s->total_losses += val;
+#ifdef DEBUG_RSI
+      printf("Loss: %u\n", val);
+#endif
+    }
+
+#ifdef DEBUG_RSI
+    printf("[value: %u][total_gains: %u][total_losses: %u][cur_idx: %u]\n", value, s->total_gains, s->total_losses, s->next_index);
+#endif
   }
   
-  s->last_value = value;
-
-  if(s->gains.num_data_entries >= s->gains.num_values_array_len) {
-    float relative_strength = ndpi_data_window_average(&s->gains) / ndpi_data_window_average(&s->losses);
-
-    /* printf("RSI: %f\n", relative_strength); */
+  s->last_value = value, s->next_index = (s->next_index + 1) % s->num_values, s->empty = 0;
+  if(s->next_index == 0) s->rsi_ready = 1; /* We have completed one round */
+  
+  if(!s->rsi_ready)
+    return(0);
+  else if(s->total_losses == 0) /* Avoid division by zero (**) */
+    return(100.);
+  else {
+    relative_strength = (float)s->total_gains / (float)s->total_losses; /* (**) */
+#ifdef DEBUG_RSI
+    printf("RSI: %f\n", relative_strength);
+#endif
     return(100. - (100. / (1. + relative_strength)));
-  } else
-    return(-1); /* Too early */
+  }
 }

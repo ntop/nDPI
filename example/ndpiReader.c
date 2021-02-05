@@ -3699,12 +3699,12 @@ void rsiUnitTest() {
   };
   u_int i, n = sizeof(v) / sizeof(unsigned int);
 
-  ndpi_init_rsi(&s, 8);
+  assert(ndpi_alloc_rsi(&s, 8) == 0);
   
   for(i=0; i<n; i++) {
     float rsi = ndpi_rsi_add_value(&s, v[i]);
 
-#if DEBUG
+#if 0
     printf("%2d) RSI = %f\n", i, rsi);
 #endif
   }
