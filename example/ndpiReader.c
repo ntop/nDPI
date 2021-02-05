@@ -3587,7 +3587,7 @@ void analyzeUnitTest() {
 	  ndpi_data_min(s), ndpi_data_max(s));
 #endif
 
-  ndpi_free_data_analysis(s);
+  ndpi_free_data_analysis(s, 1);
 
 #ifdef RUN_DATA_ANALYSIS_THEN_QUIT
   exit(0);
@@ -3675,7 +3675,7 @@ void analysisUnitTest() {
     printf("Min/Max: %u/%u\n", ndpi_data_min(s), ndpi_data_max(s));
   }
 
-  ndpi_free_data_analysis(s);
+  ndpi_free_data_analysis(s, 1);
 }
 
 /* *********************************************** */
@@ -3704,7 +3704,7 @@ void rsiUnitTest() {
   for(i=0; i<n; i++) {
     float rsi = ndpi_rsi_add_value(&s, v[i]);
 
-#if 0
+#if DEBUG
     printf("%2d) RSI = %f\n", i, rsi);
 #endif
   }
