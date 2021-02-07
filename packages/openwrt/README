@@ -1,10 +1,16 @@
-Howto Compile lindpi on OpenWRT
+Howto Compile libndpi on OpenWRT
 -------------------------------
 
 cd myopenwrt_directory
 mkdir package/network/services/libndpi
 cd package/network/services/libndpi
+
+# (a) Stable version
 cp ~/nDPI/packages/openwrt/Makefile .
+
+# (b) Dev version
+cp ~/nDPI/packages/openwrt/Makefile.dev Makefile
+
 cd myopenwrt_directory
 make menuconfig
 
@@ -23,3 +29,4 @@ make -j1 V=s package/network/services/libndpi/compile
 Other Documents
 ---------------
 https://openwrt.org/packages/pkgdata/libndpi
+
