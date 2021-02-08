@@ -3587,7 +3587,7 @@ void analyzeUnitTest() {
 	  ndpi_data_min(s), ndpi_data_max(s));
 #endif
 
-  ndpi_free_data_analysis(s);
+  ndpi_free_data_analysis(s, 1);
 
 #ifdef RUN_DATA_ANALYSIS_THEN_QUIT
   exit(0);
@@ -3675,7 +3675,7 @@ void analysisUnitTest() {
     printf("Min/Max: %u/%u\n", ndpi_data_min(s), ndpi_data_max(s));
   }
 
-  ndpi_free_data_analysis(s);
+  ndpi_free_data_analysis(s, 1);
 }
 
 /* *********************************************** */
@@ -3686,6 +3686,30 @@ void rulesUnitTest() {
   ndpi_parse_rules(ndpi_info_mod, "../rules/sample_rules.txt");
 #endif
 #endif
+}
+
+/* *********************************************** */
+
+void rsiUnitTest() {
+  struct ndpi_rsi_struct s;
+  unsigned int v[] = {
+    2227, 2219, 2208, 2217, 2218, 2213, 2223, 2243, 2224, 2229,
+    2215, 2239, 2238, 2261, 2336, 2405, 2375, 2383, 2395, 2363,
+    2382, 2387, 2365, 2319, 2310, 2333, 2268, 2310, 2240, 2217,
+  };
+  u_int i, n = sizeof(v) / sizeof(unsigned int);
+
+  assert(ndpi_alloc_rsi(&s, 8) == 0);
+  
+  for(i=0; i<n; i++) {
+    float rsi = ndpi_rsi_add_value(&s, v[i]);
+
+#if 0
+    printf("%2d) RSI = %f\n", i, rsi);
+#endif
+  }
+  
+  ndpi_free_rsi(&s);
 }
 
 /* *********************************************** */
@@ -3731,6 +3755,7 @@ int orginal_main(int argc, char **argv) {
 
     /* Internal checks */
     // binUnitTest();
+    rsiUnitTest();
     hashUnitTest();
     dgaUnitTest();
     hllUnitTest();

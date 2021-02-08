@@ -1,0 +1,6 @@
+Unknown	200	20067	1
+
+
+
+Undetected flows:
+	1	TCP 192.168.145.147:51218 <-> 10.209.8.148:21999 [proto: 0/Unknown][187 pkts/13776 bytes <-> 13 pkts/6291 bytes][Goodput ratio: 7/86][1475.07 sec][bytes ratio: 0.373 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 8292/21500 30100/30165 13444/13597][Pkt Len c2s/s2c min/avg/max/stddev: 60/122 74/484 113/793 8/332][PLAIN TEXT (details /)][Plen Bins: 80,8,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

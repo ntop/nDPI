@@ -618,7 +618,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 	printf("[TLS] SHA-1: ");
 	for(i=0;i<20;i++)
-	  printf("%s%02X", (i > 0) ? ":" : "", flow->l4.tcp.tls.sha1_certificate_fingerprint[i]);
+	  printf("%s%02X", (i > 0) ? ":" : "", flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint[i]);
 	printf("\n");
       }
 #endif
@@ -680,6 +680,16 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   return(0);
+}
+
+/* **************************************** */
+
+static void ndpi_looks_like_tls(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow) {
+  // ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
+  
+  if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+    flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;   
 }
 
 /* **************************************** */
@@ -773,21 +783,25 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
 
 	processTLSBlock(ndpi_struct, flow);
-
+	ndpi_looks_like_tls(ndpi_struct, flow);
+	
 	processed += packet->payload_packet_len;
       }
     } else {
       /* Process element as a whole */
-      if((content_type == 0x17 /* Application Data */)
-	 && (flow->l4.tcp.tls.certificate_processed)) {
-	if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
-	  flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
-	    (packet->packet_direction == 0) ? (len-5) : -(len-5);
-
+      if(content_type == 0x17 /* Application Data */) {
+	ndpi_looks_like_tls(ndpi_struct, flow);
+	
+	if(flow->l4.tcp.tls.certificate_processed) {  
+	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
+	    flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
+	      (packet->packet_direction == 0) ? (len-5) : -(len-5);
+	  
 #ifdef DEBUG_TLS_BLOCKS
-	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
-	       len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
+	  printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
+		 len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
 #endif
+	}
       }
     }
 

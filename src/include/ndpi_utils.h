@@ -8,7 +8,6 @@
 #define MYDBG(m, ...) \
 	printf(" DBG[%s:%s:%u]: \t" m "\n", __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__);
 
-
 // #define NDPI_ENABLE_DEBUG_POINTER_MESSAGES
 // #define NDPI_ENABLE_DEBUG_INFO_MESSAGES
 // #define NDPI_ENABLE_DEBUG_TRACE_MESSAGES
