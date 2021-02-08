@@ -1860,11 +1860,7 @@ void shell_sort_array(sorter_index_item_t arr[], int n) {
 	int j;
 	for(j = i; j >= interval && arr[j - interval].sort_value > temp.sort_value; j -= interval) {
 	  arr[j] = arr[j - interval];
-	  DBGTRACER("exchanged item no. %d (%d) with: %d (%d)", j, arr[j].sort_value, j-interval, temp.sort_value);
-	}
-
-	DBGTRACER("item no. %d value: %d", j, temp.sort_value);
-	arr[j] = temp;
+	  DBGTRACER("exchanged item no. %d (%d) with: %d (%d)", j, arr[j].sort_value, j-interval, temp.sort_value)
       }
       DBGTRACER("item no. %d value: %d", j, temp.sort_value)
       arr[j] = temp;
@@ -1890,17 +1886,15 @@ void free_fragment(fragments_wrapper_t *frag) {
    *
    * */
   if(frag) {
-    DBGTRACER("(frag:%p) freeing fragments list -> %p",frag, frag->fragments_list);
+    DBGTRACER("(frag:%p) freeing fragments list -> %p",frag, frag->fragments_list)
     if(frag->fragments_list) {
-      DBGTRACER("fragments are %u.",frag->ct_frag);
-	
+      DBGTRACER("fragments are %u.",frag->ct_frag)
       for(int y=0;y<frag->ct_frag;y++) {
 	if(frag->fragments_list[y]) {
 	  if(frag->fragments_list[y]->data) {
-	    DBGPOINTER("freeing fragment item %d -> %p",y, frag->fragments_list[y]);
+	    DBGPOINTER("freeing fragment item %d -> %p",y, frag->fragments_list[y])
 	    ndpi_free(frag->fragments_list[y]->data);
 	  }
-
 	  ndpi_free(frag->fragments_list[y]);
 	}
       }        
@@ -1920,7 +1914,7 @@ uint8_t add_segment_to_buffer(struct ndpi_flow_struct *flow, struct ndpi_tcphdr 
 
     if(flow->tcp_segments_management) {
       fragments_wrapper_t *fragW= &flow->tcp_segments_list[flow->packet.packet_direction];
-      DBGTRACER("tcp segments management enabled (list container: %p)", fragW);
+      DBGTRACER("tcp segments management enabled (list container: %p)", fragW)
 
       if(fragW->ct_frag == 0) {
 	if(fragW->fragments_list)
@@ -1928,7 +1922,7 @@ uint8_t add_segment_to_buffer(struct ndpi_flow_struct *flow, struct ndpi_tcphdr 
 
 	// initialize the offset with the first fragment seq number
 	fragW->initial_offset = new_expected_seq;
-	DBGTRACER("initialized initial_offset: %u)",fragW->initial_offset);
+	DBGTRACER("initialized initial_offset: %u)",fragW->initial_offset)
       }
     
       if(flow->packet.payload_packet_len > 0) {
@@ -1936,7 +1930,7 @@ uint8_t add_segment_to_buffer(struct ndpi_flow_struct *flow, struct ndpi_tcphdr 
 
 	// allocate memory for pointer
 	size_t new_len= (1+fragW->ct_frag) * sizeof(fragment_t*);
-	DBGTRACER("actual fragment list ct=%d, new size: %llu", fragW->ct_frag, (unsigned long long)new_len);
+	DBGTRACER("actual fragment list ct=%d, new size: %llu", fragW->ct_frag, (unsigned long long)new_len)
 
 	fragW->fragments_list = ndpi_realloc(fragW->fragments_list,(fragW->ct_frag * sizeof(fragment_t*)),new_len);
 	if(fragW->fragments_list == NULL) {
@@ -1975,7 +1969,7 @@ uint8_t add_segment_to_buffer(struct ndpi_flow_struct *flow, struct ndpi_tcphdr 
 	}
 
 	DBGTRACER("offset calculation: seq %u, init: %u, offset result: %u", ntohl(tcph->seq),
-		  fragW->initial_offset, new_frag->offset);
+		  fragW->initial_offset, new_frag->offset)
 	new_frag->len = flow->packet.payload_packet_len;      
        
 	new_frag->data = (void*)ndpi_calloc(new_frag->len, sizeof(char));
@@ -2013,10 +2007,8 @@ uint8_t add_segment_to_buffer(struct ndpi_flow_struct *flow, struct ndpi_tcphdr 
 //TODO: manage partial retrasmission
 
 /* ******************************************************************** */
-
 uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
-			     struct ndpi_tcphdr const * tcph,
-			     uint8_t **ret_buffer, size_t *len_buffer) {
+			     struct ndpi_tcphdr const * tcph,			     uint8_t **ret_buffer, size_t *len_buffer) {
   uint32_t ret_value = 0;
   uint16_t last_item = 0;
   size_t length = 0, tot_length = 0;
@@ -2030,10 +2022,10 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
   
   fragW = &flow->tcp_segments_list[flow->packet.packet_direction];
 
-  DBGTRACER("tcph:%p, ret_buffer:%p, len_buffer:%u", tcph, ret_buffer, len_buffer);
+  DBGTRACER("tcph:%p, ret_buffer:%p, len_buffer:%u", tcph, ret_buffer, len_buffer)
 
   // phase 1: calculate the size and fill the indexes array
-  DBGINFO("phase 1: init sorter, calculate the size of buffer to reassemble: %u items", fragW->ct_frag);
+  DBGINFO("phase 1: init sorter, calculate the size of buffer to reassemble: %u items", fragW->ct_frag)
 
   sorted_indexes = (sorter_index_item_t*)ndpi_calloc(fragW->ct_frag, sizeof(sorter_index_item_t));
 
@@ -2043,7 +2035,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
     return 0;
   }
 
-  DBGPOINTER("sorted_indexes=> %p", sorted_indexes);
+  DBGPOINTER("sorted_indexes=> %p", sorted_indexes)
   
   for(int i=0; i<fragW->ct_frag; i++) {
     fragment_t *item = (fragment_t*)fragW->fragments_list[i];
@@ -2053,12 +2045,11 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
     tot_length += item->len;
     
     DBGTRACER("segment (%d): len:%lu, offset: %u => partial buffer len: %lu",
-	      i, (long unsigned int)item->len, (unsigned int)item->offset, (long unsigned int)tot_length);
+	      i, (long unsigned int)item->len, (unsigned int)item->offset, (long unsigned int)tot_length)
   }
 
   // phase 2: sorts fragments and check fragments and sequences
-  DBGINFO(" phase 2 sorting %d segments and checking",fragW->ct_frag);
-
+  DBGINFO(" phase 2 sorting %d segments and checking",fragW->ct_frag)
   if(fragW->ct_frag>1) shell_sort_array(sorted_indexes, fragW->ct_frag);
 
   // checks
@@ -2067,7 +2058,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
 
     // 1: no segment offset can be > tot_length
     DBGTRACER("checking %d/%d element: offset=%lu vs t_length=%lu",
-              i, sorted_indexes[i].item_index, (unsigned long)item->offset, (unsigned long)tot_length);
+              i, sorted_indexes[i].item_index, (unsigned long)item->offset, (unsigned long)tot_length)
 
     if((item->offset+item->len) > (uint32_t)tot_length) {
       // update the last index of elements to elaborate
@@ -2102,7 +2093,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
   last_item++;  // index to number aligment
 
   // phase 3: allocate memory and fill the buffer
-  DBGINFO("phase 3: allocate memory for %u items and fill the buffer tot: %lu", last_item, (unsigned long int)tot_length);
+  DBGINFO("phase 3: allocate memory for %u items and fill the buffer tot: %lu", last_item, (unsigned long int)tot_length)
 
 #ifdef DEBUG_REASSEMBLY
   printf("[%s:%u] ==>> [tot_length: %u][length: %u]\n",
@@ -2125,17 +2116,20 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
 
     DBGINFO("copying data item no:%u of len: %lu to buffer: %p (offset:%lu)",
             sorted_indexes[i].item_index, (unsigned long int)item->len, buffer,
-            (unsigned long int)item->offset);
+            (unsigned long int)item->offset)
 
-    if((item->offset+item->len) > tot_length) {      
+    if((item->offset+item->len) > tot_length) { 
       //#ifdef DEBUG_REASSEMBLY
       printf("[%s:%u] ==>> Out of boundary [%u vs %u][offset: %u][len: %u][item: %u/%u]\n", __FILE__, __LINE__,
 	     (u_int32_t)(item->offset+item->len), (u_int32_t)tot_length,
 	     (u_int32_t)item->offset, (u_int32_t)item->len, i, last_item);
       //#endif
-      // continue;
-      // ERROR: CAN'T CONTINUE, BUT IS NOT POSSIBLE, BECAUSE tot_length = SUM(item->len)
-
+      
+      // this is not possible, BECAUSE tot_length = SUM(item->len)
+      // but if this succeeds, the behaviour is undefined! 
+      // I can continue or return with error
+      continue;
+      
     } else {
 #ifdef DEBUG_REASSEMBLY
       printf("[%s:%u] ==>> memcpy OK [%u vs %u][offset: %u][item: %u/%u]\n",
@@ -2144,9 +2138,8 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
 	     item->offset, i, last_item);
 #endif
     }
+      memcpy((void*)(buffer + item->offset), item->data, item->len);
     
-    memcpy((void*)(buffer + item->offset), item->data, item->len);
-
       // free memory item
       ndpi_free(item->data);
       item->data=NULL;
@@ -2155,7 +2148,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
   }
 
   if(last_item == fragW->ct_frag) {
-    DBGTRACER("all processed: free all memory!");
+    DBGTRACER("all processed: free all memory!")
     free_fragment(fragW);
   } else {
     // phase 4: re-organize the other segments, updating the list    
@@ -2163,7 +2156,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
     fragW->fragments_list = ndpi_calloc((fragW->ct_frag-last_item), sizeof(struct fragment_t*));
 
     DBGPOINTER("old segments list: %p, new segments list: %p.",
-               fragW_old_list, fragW->fragments_list);
+               fragW_old_list, fragW->fragments_list)
 
     if(!fragW->fragments_list) {
       // fprintf(stderr, "[%8u] Not enough memory for new segments list \n", flow->packet_counter);
@@ -2188,7 +2181,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
       */
 
       DBGTRACER("moving the item (%p), index %u - to position %u of new segments list; new offset: %u.",
-                item, sorted_indexes[i].item_index, i-last_item, item->offset );
+                item, sorted_indexes[i].item_index, i-last_item, item->offset )
     }
 
     // update the fragments countes
@@ -2196,33 +2189,32 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
     fragW->initial_offset += tot_length;
 
     DBGINFO("updated counter: %d and i_offset: %u.",
-            (unsigned)fragW->ct_frag, (unsigned)fragW->initial_offset);
+            (unsigned)fragW->ct_frag, (unsigned)fragW->initial_offset)
     
     DBGPOINTER("freeing old segments list: %p ", fragW_old_list)
       ndpi_free(fragW_old_list);
   }
 
   if(sorted_indexes) {
-    DBGPOINTER("freeing sorter indexes: %p ", sorted_indexes);
+    DBGPOINTER("freeing sorter indexes: %p ", sorted_indexes)
     ndpi_free(sorted_indexes);
   }
 
   if(len_buffer != NULL) {
       *len_buffer = tot_length;
   }
-
   if(ret_buffer != NULL) {
     *ret_buffer = (u_int8_t *) buffer;
     flow->must_free[flow->packet.packet_direction] = 1;
 
     DBGINFO("retrieved the buffer of segments (len:%lu) %p",
-            *len_buffer, *ret_buffer);
+            *len_buffer, *ret_buffer)
   } else {
-    DBGPOINTER("freeing buffer=> %p", buffer);
+    DBGPOINTER("freeing buffer=> %p", buffer)
     ndpi_free(buffer);
   }
 
-  DBGINFO("returning: %d", ret_value);
+  DBGINFO("returning: %d", ret_value)
   return(ret_value);
 }
 
@@ -2232,7 +2224,7 @@ uint8_t check_for_sequence(struct ndpi_flow_struct *flow, struct ndpi_tcphdr con
   uint8_t *ret_buffer=NULL;
   size_t len_buffer=0;
 
-  DBGINFO("## sorted flags: %d/%d ",flow->not_sorted[0],flow->not_sorted[1]);
+  DBGINFO("## sorted flags: %d/%d ",flow->not_sorted[0],flow->not_sorted[1])
 
   if(flow->tcp_next_seq_nr[flow->packet.packet_direction]) {
     uint32_t *trigger, expected;
@@ -2243,7 +2235,8 @@ uint8_t check_for_sequence(struct ndpi_flow_struct *flow, struct ndpi_tcphdr con
     trigger = &flow->trigger[flow->packet.packet_direction];
 
     DBGTRACER("dir:%d, trg:%u, next:%u", flow->packet.packet_direction,*trigger,
-	      flow->tcp_next_seq_nr[flow->packet.packet_direction]);
+	      flow->tcp_next_seq_nr[flow->packet.packet_direction])
+
 
     expected = (*not_sorted && *trigger) ? ndpi_min(*trigger, flow->tcp_next_seq_nr[flow->packet.packet_direction]) : flow->tcp_next_seq_nr[flow->packet.packet_direction];
 
@@ -2252,7 +2245,7 @@ uint8_t check_for_sequence(struct ndpi_flow_struct *flow, struct ndpi_tcphdr con
       DBGINFO("received a segment (seq:%u) over the waited (next:%u)", (0xffffffff & ntohl(tcph->seq)), waited)
       
       if(add_segment_to_buffer(flow, tcph, expected)) {
-	DBGTRACER("segment (seq:%u) bufferized, waiting for(next:%u)", (0xffffffff & ntohl(tcph->seq)), expected);
+	DBGTRACER("segment (seq:%u) bufferized, waiting for(next:%u)", (0xffffffff & ntohl(tcph->seq)), expected)
 
         // set flag a save the waited sequence number
         *not_sorted=1;
@@ -2262,7 +2255,8 @@ uint8_t check_for_sequence(struct ndpi_flow_struct *flow, struct ndpi_tcphdr con
       return 1;
 
     } else if(expected>(0xffffffff & ntohl(tcph->seq))) {
-      DBGINFO("received a segment (seq:%u) minus than the expected (next:%u): retransmission!!", (0xffffffff & ntohl(tcph->seq)), flow->next_tcp_seq_nr[flow->packet.packet_direction]);
+
+      DBGINFO("received a segment (seq:%u) minus than the expected (next:%u): retransmission!!", (0xffffffff & ntohl(tcph->seq)), flow->tcp_next_seq_nr[flow->packet.packet_direction])
 
       flow->packet.tcp_retransmission = 1;
 
@@ -2298,9 +2292,6 @@ uint8_t check_for_sequence(struct ndpi_flow_struct *flow, struct ndpi_tcphdr con
           }
         }
       }
-
-      // update the next sequence number for local management
-      //flow->tcp_next_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
     }    
     flow->tcp_next_seq_nr[flow->packet.packet_direction] = ntohl(tcph->seq) + flow->packet.payload_packet_len;
   } else {

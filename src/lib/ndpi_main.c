@@ -4999,7 +4999,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 #ifdef FRAG_MAN
     if((flow->must_free[flow->packet.packet_direction] == 1)
        && (flow->packet.payload_packet_len > 0)
-       && flow->packet.payload) {
+       && flow->packet.payload!=NULL) {
       // if the payload is allocated for segments reassembling, it must be freed
       ndpi_free((void*)flow->packet.payload);
       // flow->packet.payload=NULL; done after
