@@ -3733,6 +3733,40 @@ void hashUnitTest() {
 
 /* *********************************************** */
 
+void hwUnitTest() {
+  struct ndpi_hw_struct hw;
+  double v[] = { 10, 14, 8, 25, 16, 22, 14, 35, 15, 27, 218, 40, 28, 40, 25, 65 };
+  u_int i, j, num = sizeof(v) / sizeof(double);
+  u_int num_learning_points = 2;
+  u_int8_t trace = 0;
+  
+  for(j=0; j<2; j++) {
+    assert(ndpi_hw_init(&hw, num_learning_points, j /* 0=multiplicative, 1=additive */, 0.9, 0.9, 0.1, 0.05) == 0);
+
+    if(trace)
+      printf("\nHolt-Winters %s method\n", (j == 0) ? "multiplicative" : "additive");
+    
+    for(i=0; i<num; i++) {
+      double prediction, confidence_band;
+      double lower, upper;
+      int rc = ndpi_hw_add_value(&hw, v[i], &prediction, &confidence_band);
+      
+      lower = prediction - confidence_band, upper = prediction + confidence_band;
+
+      if(trace)
+	printf("%2u)\t%.3f\t%.3f\t%.3f\t%.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
+	       ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
+	       confidence_band);
+    }
+    
+    ndpi_hw_free(&hw);
+  }
+  
+  exit(0);
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -3753,8 +3787,9 @@ int orginal_main(int argc, char **argv) {
 
     if(ndpi_info_mod == NULL) return -1;
 
-    /* Internal checks */
+    /* Internal checks */    
     // binUnitTest();
+    hwUnitTest();
     rsiUnitTest();
     hashUnitTest();
     dgaUnitTest();

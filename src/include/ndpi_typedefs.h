@@ -1599,4 +1599,23 @@ typedef struct {
 
 /* **************************************** */
 
+#define HW_HISTORY_LEN   4
+
+struct ndpi_hw_struct {
+  struct {
+    u_int8_t use_hw_additive_seasonal;
+    double alpha, beta, gamma, ro;
+    u_int16_t num_season_periods; /* num of values of a season */
+  } params;
+
+  u_int32_t num_values;
+  double    u, v, sum_square_error;
+  
+  /* These two values need to store the signal history */
+  u_int32_t *y;
+  double    *s;
+};
+
+/* **************************************** */
+
 #endif /* __NDPI_TYPEDEFS_H__ */
