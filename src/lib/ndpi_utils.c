@@ -1959,7 +1959,7 @@ uint8_t add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr
 
 uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow, struct ndpi_tcphdr const * tcph, uint8_t **ret_buffer, size_t *len_buffer)
 {
-  DBGTRACER("tcph:%p, ret_buffer:%p, len_buffer:%u",tcph,ret_buffer,len_buffer)
+  DBGTRACER("tcph:%p, ret_buffer:%p, len_buffer:%u",tcph,ret_buffer,(unsigned)*len_buffer)
 
   // reassemble the fragments...
   uint32_t ret_value=0;
@@ -1988,7 +1988,7 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow, struct ndpi_tc
   }
 
   // phase 2: sorts fragments and check fragments and sequences
-  DBGINFO(" phase 2 sorting %d segments and checking",fragW->ct_frag)
+  DBGINFO("phase 2 sorting %d segments and checking",fragW->ct_frag)
   if (fragW->ct_frag>1) shell_sort_array(sorted_indexes, fragW->ct_frag);
 
   // checks
@@ -2002,7 +2002,8 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow, struct ndpi_tc
       DBGINFO("stop processing at %d/%d element: len= %u; offset= %u",i,sorted_indexes[i].item_index,(unsigned)length,(unsigned)item->offset)
 
       tot_length= length;
-      ret_value= (fragW->initial_offset)+(item->offset);  // set the first offset to wait for the next segment
+      //ret_value= (fragW->initial_offset)+(item->offset);  // set the first offset to wait for the next segment
+      ret_value= (fragW->initial_offset)+length;  // set the first offset to wait for the next segment (reduce of the bytes consumed/received)
       break;
     }
     // 2: for every len(buffer) must exists a offset fragment
@@ -2011,7 +2012,8 @@ uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow, struct ndpi_tc
       DBGINFO("checking %d/%d element: stop processing! len: %u; n_offset: %u", i,sorted_indexes[i].item_index,(unsigned)length,(unsigned)item->offset)
 
       tot_length= length;
-      ret_value= (fragW->initial_offset)+(item->offset);  // set the first offset to wait for the next segment
+      //ret_value= (fragW->initial_offset)+(item->offset);  // set the first offset to wait for the next segment
+       ret_value= (fragW->initial_offset)+length;  // set the first offset to wait for the next segment (reduce of the bytes consumed/received)
       break;
     } else {
       // continue to sum length data bytes
@@ -2104,7 +2106,7 @@ uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr co
   size_t len_buffer=0;
 
   DBGINFO("## sorted flags: %d/%d ",flow->not_sorted[0],flow->not_sorted[1])
-  if ( flow->next_tcp_seq_nr[flow->packet.packet_direction] ) {
+  if ( flow->tcp_next_seq_nr[flow->packet.packet_direction] ) {
     uint32_t *trigger;
     uint8_t *not_sorted;
 
@@ -2112,9 +2114,9 @@ uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr co
     not_sorted = &flow->not_sorted[flow->packet.packet_direction];
     trigger = &flow->trigger[flow->packet.packet_direction];
 
-    DBGTRACER("dir:%d, trg:%u, next:%u", flow->packet.packet_direction,*trigger, flow->next_tcp_seq_nr[flow->packet.packet_direction])
+    DBGTRACER("dir:%d, trigger:%u, next:%u", flow->packet.packet_direction,*trigger, flow->tcp_next_seq_nr[flow->packet.packet_direction])
 
-    uint32_t waited= (*not_sorted && *trigger) ? ndpi_min(*trigger,flow->next_tcp_seq_nr[flow->packet.packet_direction]) : flow->next_tcp_seq_nr[flow->packet.packet_direction];
+    uint32_t waited= (*not_sorted && *trigger) ? ndpi_min(*trigger,flow->tcp_next_seq_nr[flow->packet.packet_direction]) : flow->tcp_next_seq_nr[flow->packet.packet_direction];
     if ( waited<(0xffffffff & ntohl(tcph->seq))) {
       // segment not in order... almost 1 has been skipped! add this fragment to buffer
       DBGINFO("received a segment (seq:%u) over the waited (next:%u)", (0xffffffff & ntohl(tcph->seq)), waited)
@@ -2124,35 +2126,39 @@ uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr co
 
         // set flag a save the waited sequence number
         *not_sorted=1;
-        *trigger= *trigger ? ndpi_min(flow->next_tcp_seq_nr[flow->packet.packet_direction],*trigger):flow->next_tcp_seq_nr[flow->packet.packet_direction];
+        *trigger= *trigger ? ndpi_min(flow->tcp_next_seq_nr[flow->packet.packet_direction],*trigger):flow->tcp_next_seq_nr[flow->packet.packet_direction];
         DBGINFO("set flag and trigger[%d]: %u",flow->packet.packet_direction,*trigger)
       }
       return 1;
 
     } else if (waited>(0xffffffff & ntohl(tcph->seq))) {
-      DBGINFO("received a segment (seq:%u) minus than the waited (next:%u): retransmission!!", (0xffffffff & ntohl(tcph->seq)), flow->next_tcp_seq_nr[flow->packet.packet_direction])
+      DBGINFO("received a segment (seq:%u) minus than the waited (next:%u): retransmission!!", (0xffffffff & ntohl(tcph->seq)), flow->tcp_next_seq_nr[flow->packet.packet_direction])
 
       flow->packet.tcp_retransmission = 1;
 
       /* CHECK IF PARTIAL RETRY IS HAPPENING */
-      if((flow->next_tcp_seq_nr[flow->packet.packet_direction] - ntohl(tcph->seq) <
+      if((flow->tcp_next_seq_nr[flow->packet.packet_direction] - ntohl(tcph->seq) <
           flow->packet.payload_packet_len)) {
         /* num_retried_bytes actual_payload_len hold info about the partial retry
           analyzer which require this info can make use of this info
           Other analyzer can use packet->payload_packet_len */
-        flow->packet.num_retried_bytes = (u_int16_t)(flow->next_tcp_seq_nr[flow->packet.packet_direction] - ntohl(tcph->seq));
+        flow->packet.num_retried_bytes = (u_int16_t)(flow->tcp_next_seq_nr[flow->packet.packet_direction] - ntohl(tcph->seq));
         flow->packet.actual_payload_len = flow->packet.payload_packet_len - flow->packet.num_retried_bytes;
-        flow->next_tcp_seq_nr[flow->packet.packet_direction] = ntohl(tcph->seq) + flow->packet.payload_packet_len;
+        flow->tcp_next_seq_nr[flow->packet.packet_direction] = ntohl(tcph->seq) + flow->packet.payload_packet_len;
         DBGINFO("partial_bytes:%u",flow->packet.num_retried_bytes)
 
         //TODO: manage this!!
       }
 
     } else {
-      DBGTRACER("seq (%u) and waited (%u) matched! sorted flag: %d", (0xffffffff & ntohl(tcph->seq)), flow->next_tcp_seq_nr[flow->packet.packet_direction], *not_sorted)
+      DBGTRACER("seq (%u) and waited (%u) matched! sorted flag: %d", (0xffffffff & ntohl(tcph->seq)), flow->tcp_next_seq_nr[flow->packet.packet_direction], *not_sorted)
       if ( *not_sorted ) {
         if ( add_segment_to_buffer(flow, tcph, 0) ) {
-          *trigger= reassembly_fragment(flow,tcph,&ret_buffer,&len_buffer);
+
+          uint32_t retValue = reassembly_fragment(flow,tcph,&ret_buffer,&len_buffer);
+          // DBGINFO("==> TRIGGER COMPARING: %u vs %u", *trigger, retValue)
+          if (retValue<0) return 0;
+          *trigger= retValue;
           *not_sorted=(*trigger>0);
 
           if (len_buffer>0) {
@@ -2162,7 +2168,15 @@ uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr co
           }
         }
       }
-    }
+
+      // update the next sequence number for local management
+      //flow->tcp_next_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
+    }    
+    flow->tcp_next_seq_nr[flow->packet.packet_direction] = ntohl(tcph->seq) + flow->packet.payload_packet_len;
+  } else {
+    if (tcph->ack != 0) {
+      flow->tcp_next_seq_nr[flow->packet.packet_direction] = ntohl(tcph->seq) + (tcph->syn ? 1 : flow->packet.payload_packet_len);
+    } 
   }
   return 0;
 }

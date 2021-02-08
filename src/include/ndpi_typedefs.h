@@ -1189,6 +1189,7 @@ struct ndpi_flow_struct {
 
 #ifdef FRAG_MAN
   /* tcp_segments lists */
+  u_int32_t tcp_next_seq_nr[2];
   u_int8_t tcp_segments_management:1;
   u_int8_t not_sorted[2],must_free[2];     // 0: client->server and 1: server->client
   uint32_t trigger[2];                     // the seq waited number to start to reassembly

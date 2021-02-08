@@ -3859,19 +3859,19 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       packet->num_retried_bytes = 0;
 
       if(!ndpi_str->direction_detect_disable)
-	packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
+	      packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
       if(tcph->syn != 0 && tcph->ack == 0 && flow->l4.tcp.seen_syn == 0 && flow->l4.tcp.seen_syn_ack == 0 &&
-	 flow->l4.tcp.seen_ack == 0) {
-	flow->l4.tcp.seen_syn = 1;
+	        flow->l4.tcp.seen_ack == 0) {
+	      flow->l4.tcp.seen_syn = 1;
       } else 
       if(tcph->syn != 0 && tcph->ack != 0 && flow->l4.tcp.seen_syn == 1 && flow->l4.tcp.seen_syn_ack == 0 &&
-	 flow->l4.tcp.seen_ack == 0) {
-	flow->l4.tcp.seen_syn_ack = 1;
+          flow->l4.tcp.seen_ack == 0) {
+	      flow->l4.tcp.seen_syn_ack = 1;
       } else
       if(tcph->syn == 0 && tcph->ack == 1 && flow->l4.tcp.seen_syn == 1 && flow->l4.tcp.seen_syn_ack == 1 &&
-	 flow->l4.tcp.seen_ack == 0) {
-	flow->l4.tcp.seen_ack = 1;
+	        flow->l4.tcp.seen_ack == 0) {
+	      flow->l4.tcp.seen_ack = 1;
       }
 
 #ifdef FRAG_MAN
@@ -3884,63 +3884,63 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 #endif //FRAG_MAN
 
       if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0) ||
-	 (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0)) {
-	/* initialize tcp sequence counters */
-	/* the ack flag needs to be set to get valid sequence numbers from the other
-	 * direction. Usually it will catch the second packet syn+ack but it works
-	 * also for asymmetric traffic where it will use the first data packet
-	 *
-	 * if the syn flag is set add one to the sequence number,
-	 * otherwise use the payload length.
-	 */
-	if(tcph->ack != 0) {
-	  flow->next_tcp_seq_nr[flow->packet.packet_direction] =
-	    ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
+        (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0)) {
+        /* initialize tcp sequence counters */
+        /* the ack flag needs to be set to get valid sequence numbers from the other
+        * direction. Usually it will catch the second packet syn+ack but it works
+        * also for asymmetric traffic where it will use the first data packet
+        *
+        * if the syn flag is set add one to the sequence number,
+        * otherwise use the payload length.
+        */
+        if(tcph->ack != 0) {
+          flow->next_tcp_seq_nr[flow->packet.packet_direction] =
+            ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
 
-	  /*
-	    Check to avoid discrepancies in case we analyze a flow that does not start with SYN...
-	    but that is already started when nDPI being to process it. See also (***) below
-	  */
-	  if(flow->num_processed_pkts > 1)
-	    flow->next_tcp_seq_nr[1 - flow->packet.packet_direction] = ntohl(tcph->ack_seq);
-	}
+          /*
+            Check to avoid discrepancies in case we analyze a flow that does not start with SYN...
+            but that is already started when nDPI being to process it. See also (***) below
+          */
+          if(flow->num_processed_pkts > 1)
+            flow->next_tcp_seq_nr[1 - flow->packet.packet_direction] = ntohl(tcph->ack_seq);
+        }
       } else if(packet->payload_packet_len > 0) {
-	/* check tcp sequence counters */
-	if(((u_int32_t)(ntohl(tcph->seq) - flow->next_tcp_seq_nr[packet->packet_direction])) >
-	   ndpi_str->tcp_max_retransmission_window_size) {
-	  packet->tcp_retransmission = 1;
+        /* check tcp sequence counters */
+        if(((u_int32_t)(ntohl(tcph->seq) - flow->next_tcp_seq_nr[packet->packet_direction])) >
+          ndpi_str->tcp_max_retransmission_window_size) {
+          packet->tcp_retransmission = 1;
 
-	  /* CHECK IF PARTIAL RETRY IS HAPPENING */
-	  if((flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq) <
-	      packet->payload_packet_len)) {
-	    /* num_retried_bytes actual_payload_len hold info about the partial retry
-	       analyzer which require this info can make use of this info
-	       Other analyzer can use packet->payload_packet_len */
-	    packet->num_retried_bytes =
-	      (u_int16_t)(flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq));
-	    packet->actual_payload_len = packet->payload_packet_len - packet->num_retried_bytes;
+          /* CHECK IF PARTIAL RETRY IS HAPPENING */
+          if((flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq) <
+              packet->payload_packet_len)) {
+            /* num_retried_bytes actual_payload_len hold info about the partial retry
+              analyzer which require this info can make use of this info
+              Other analyzer can use packet->payload_packet_len */
+            packet->num_retried_bytes =
+              (u_int16_t)(flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq));
+            packet->actual_payload_len = packet->payload_packet_len - packet->num_retried_bytes;
 
-	    if(flow->num_processed_pkts > 1) /* See also (***) above */
-	      flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
-	  }
-	}
+            if(flow->num_processed_pkts > 1) /* See also (***) above */
+              flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
+          }
+        }
 
-	/* normal path
-	   actual_payload_len is initialized to payload_packet_len during tcp header parsing itself.
-	   It will be changed only in case of retransmission */
-	else {
-	  packet->num_retried_bytes = 0;
-	  flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
-	}
+        /* normal path
+          actual_payload_len is initialized to payload_packet_len during tcp header parsing itself.
+          It will be changed only in case of retransmission */
+        else {
+          packet->num_retried_bytes = 0;
+          flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
+        }
       }
 
       if(tcph->rst) {
-	flow->next_tcp_seq_nr[0] = 0;
-	flow->next_tcp_seq_nr[1] = 0;
+        flow->next_tcp_seq_nr[0] = 0;
+        flow->next_tcp_seq_nr[1] = 0;
       }
     } else if(udph != NULL) {
       if(!ndpi_str->direction_detect_disable)
-	packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
+	      packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
     }
 
     if(flow->packet_counter < MAX_PACKET_COUNTER && packet->payload_packet_len) {
