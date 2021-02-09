@@ -386,17 +386,12 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
   u_int8_t space = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search irc\n");
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC && flow->packet_counter > 70) {
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC && (flow->packet_counter > 10)) {
     NDPI_LOG_DBG(ndpi_struct, "exclude irc, packet_counter > 70\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_IRC);
     return;
   }
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC && flow->packet_counter > 30 &&
-      flow->l4.tcp.irc_stage2 == 0) {
-    NDPI_LOG_DBG(ndpi_struct, "exclude irc, packet_counter > 30\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_IRC);
-    return;
-  }
+
   if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_IRC) {
     if (src != NULL && ((u_int32_t)
 			(packet->current_time_ms - src->irc_ts) < ndpi_struct->irc_timeout)) {
@@ -444,8 +439,6 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     }
   }
 
-
-
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC
       && flow->packet_counter == 2 && (packet->payload_packet_len > 400 && packet->payload_packet_len < 1381)) {
     for (c1 = 50; c1 < packet->payload_packet_len - 23; c1++) {
@@ -475,6 +468,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       }
     }
   }
+  
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC &&
       ndpi_search_irc_ssl_detect_ninety_percent_but_very_fast(ndpi_struct, flow) != 0) {
     return;
