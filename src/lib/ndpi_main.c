@@ -4949,7 +4949,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 					     dport = ntohs(flow->packet.tcp->dest)),
 	  default_ports = ndpi_str->proto_defaults[ret.master_protocol].tcp_default_ports;
       else
-	found = NULL, default_ports = NULL;
+	found = NULL, default_ports = NULL, sport = dport = 0;
 
       if(found
 	 && (found->proto->protoId != NDPI_PROTOCOL_UNKNOWN)
