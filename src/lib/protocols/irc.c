@@ -439,6 +439,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     }
   }
 
+#if 0
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC
       && flow->packet_counter == 2 && (packet->payload_packet_len > 400 && packet->payload_packet_len < 1381)) {
     for (c1 = 50; c1 < packet->payload_packet_len - 23; c1++) {
@@ -468,6 +469,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
       }
     }
   }
+#endif
   
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC &&
       ndpi_search_irc_ssl_detect_ninety_percent_but_very_fast(ndpi_struct, flow) != 0) {
@@ -511,6 +513,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  || (memcmp(packet->payload, "PONG ", 5) == 0)
 	  || (memcmp(packet->payload, "PING ", 5) == 0)
 	  || (memcmp(packet->payload, "JOIN ", 5) == 0)
+	  || (memcmp(packet->payload, "MODE ", 5) == 0)
 	  || (memcmp(packet->payload, "NOTICE ", 7) == 0)
 	  || (memcmp(packet->payload, "PRIVMSG ", 8) == 0)
 	  || (memcmp(packet->payload, "VERSION ", 8) == 0)) {

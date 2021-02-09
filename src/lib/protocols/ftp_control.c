@@ -591,7 +591,7 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
     }
 
     /* Break after 20 packets. */
-    if(flow->packet_counter > 20) {
+    if(flow->packet_counter > 8) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
