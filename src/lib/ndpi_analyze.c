@@ -1058,3 +1058,65 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
     return(1); /* We're in business: forecast is meaningful now */
   }
 }
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+/*
+  Jitter calculator
+  
+  Used to determine how noisy is a signal
+*/
+
+int ndpi_jitter_init(struct ndpi_jitter_struct *s, u_int16_t num_learning_values) {
+  memset(s, 0, sizeof(struct ndpi_jitter_struct));
+
+  if(num_learning_values < 2) num_learning_values = 2;
+  
+  s->empty = 1, s->num_values = num_learning_values;
+  s->observations = (float*)ndpi_calloc(num_learning_values, sizeof(float));
+
+  if(s->observations) {
+    s->last_value = 0;
+    return(0);
+  } else
+    return(-1);  
+}
+
+/* ************************************* */
+
+void ndpi_free_jitter(struct ndpi_jitter_struct *s) {
+  ndpi_free(s->observations);
+}
+
+/* ************************************* */
+
+/*
+  This function adds a new value and returns the computed Jitter
+*/
+float ndpi_jitter_add_value(struct ndpi_jitter_struct *s, const float value) {
+  float val = fabsf(value - s->last_value);
+
+  if(s->empty && (s->next_index == 0))
+    ; /* Skip the first value as we are unable to calculate the difference */
+  else {
+    s->jitter_total -= s->observations[s->next_index];
+    s->observations[s->next_index] = val;
+    s->jitter_total += val;
+  }
+  
+  s->last_value = value, s->next_index = (s->next_index + 1) % s->num_values;
+  if(s->next_index == 0) s->jitter_ready = 1; /* We have completed one round */
+
+#ifdef DEBUG_JITTER
+  printf("[JITTER] [value: %.3f][diff: %.3f][jitter_total: %.3f] -> %.3f\n",
+	 value, val, s->jitter_total,
+	 s->jitter_ready ? (s->jitter_total / s->num_values) : -1);
+#endif
+  
+  if(!s->jitter_ready)
+    return(-1); /* Too early */
+  else 
+    return(s->jitter_total / s->num_values);
+}
+

@@ -1404,6 +1404,12 @@ extern "C" {
 
   /* ******************************* */
 
+  int   ndpi_jitter_init(struct ndpi_jitter_struct *hw, u_int16_t num_periods);
+  void  ndpi_jitter_free(struct ndpi_jitter_struct *hw);
+  float ndpi_jitter_add_value(struct ndpi_jitter_struct *s, const float value);
+
+  /* ******************************* */
+
   const char* ndpi_data_ratio2str(float ratio);
 
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */

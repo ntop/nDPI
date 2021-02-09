@@ -1553,6 +1553,14 @@ struct ndpi_rsi_struct {
 
 /* **************************************** */
 
+struct ndpi_jitter_struct {
+  u_int8_t empty:1, jitter_ready:1, _notused:6;
+  u_int16_t num_values, next_index;
+  float *observations, last_value, jitter_total;
+};
+
+/* **************************************** */
+
 typedef struct ndpi_ptree ndpi_ptree_t;
 
 /* **************************************** */

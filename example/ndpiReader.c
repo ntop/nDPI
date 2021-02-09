@@ -3765,6 +3765,25 @@ void hwUnitTest() {
 
 /* *********************************************** */
 
+void jitterUnitTest() {
+  struct ndpi_jitter_struct jitter;
+  float v[] = { 10, 14, 8, 25, 16, 22, 14, 35, 15, 27, 218, 40, 28, 40, 25, 65 };
+  u_int i, num = sizeof(v) / sizeof(float);
+  u_int num_learning_points = 4;
+  u_int8_t trace = 0;
+  
+  assert(ndpi_jitter_init(&jitter, num_learning_points) == 0);
+
+  for(i=0; i<num; i++) {
+    float rc = ndpi_jitter_add_value(&jitter, v[i]);
+				     
+    if(trace)
+      printf("%2u)\t%.3f\t%.3f\n", i, v[i], rc);
+  }
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -3788,6 +3807,7 @@ int orginal_main(int argc, char **argv) {
     /* Internal checks */    
     // binUnitTest();
     hwUnitTest();
+    jitterUnitTest();
     rsiUnitTest();
     hashUnitTest();
     dgaUnitTest();
