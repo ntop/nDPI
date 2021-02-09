@@ -843,13 +843,17 @@ int ndpi_alloc_rsi(struct ndpi_rsi_struct *s, u_int16_t num_learning_values) {
   }
 }
 
+/* ************************************* */
+
 void ndpi_free_rsi(struct ndpi_rsi_struct *s) {
   ndpi_free(s->gains), ndpi_free(s->losses);
 }
 
+/* ************************************* */
+
 /*
   This function adds a new value and returns the computed RSI, or -1
-  if there are too many points (< num_learning_values)
+  if there are too few points (< num_learning_values)
 
   RSI < 30 (too many losses)
   RSI > 70 (too many gains)
@@ -887,7 +891,7 @@ float ndpi_rsi_add_value(struct ndpi_rsi_struct *s, const u_int32_t value) {
   if(s->next_index == 0) s->rsi_ready = 1; /* We have completed one round */
 
   if(!s->rsi_ready)
-    return(0);
+    return(-1); /* Too early */
   else if(s->total_losses == 0) /* Avoid division by zero (**) */
     return(100.);
   else {
