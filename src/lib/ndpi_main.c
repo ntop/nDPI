@@ -4668,6 +4668,103 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
   }
 
+  /* ****************************************************** */
+
+  static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow, ndpi_protocol *ret) {
+    ret->master_protocol = ret->app_protocol = NDPI_PROTOCOL_UNKNOWN, ret->category = 0;
+    
+    if((!flow->protocol_id_already_guessed) && (flow->packet.iphv6 || flow->packet.iph)) {
+      u_int16_t sport, dport;
+      u_int8_t protocol;
+      u_int8_t user_defined_proto;
+      
+      flow->protocol_id_already_guessed = 1;
+
+      if(flow->packet.iphv6 != NULL) {
+	protocol = flow->packet.iphv6->ip6_hdr.ip6_un1_nxt;
+      } else
+	protocol = flow->packet.iph->protocol;	
+
+      if(flow->packet.udp)
+	sport = ntohs(flow->packet.udp->source), dport = ntohs(flow->packet.udp->dest);
+      else if(flow->packet.tcp)
+	sport = ntohs(flow->packet.tcp->source), dport = ntohs(flow->packet.tcp->dest);
+      else
+	sport = dport = 0;
+
+      /* guess protocol */
+      flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_str, flow, protocol, sport, dport, &user_defined_proto);
+      flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
+
+      if(ndpi_str->custom_categories.categories_loaded && flow->packet.iph) {
+	ndpi_fill_ip_protocol_category(ndpi_str, flow->packet.iph->saddr, flow->packet.iph->daddr, ret);
+	flow->guessed_header_category = ret->category;
+      } else
+	flow->guessed_header_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
+
+      if(flow->guessed_protocol_id >= NDPI_MAX_SUPPORTED_PROTOCOLS) {
+	/* This is a custom protocol and it has priority over everything else */
+	ret->master_protocol = NDPI_PROTOCOL_UNKNOWN,
+	  ret->app_protocol = flow->guessed_protocol_id ? flow->guessed_protocol_id : flow->guessed_host_protocol_id;
+	ndpi_fill_protocol_category(ndpi_str, flow, ret);
+	return(-1);
+      }
+
+      if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+	if(flow->packet.iph) {
+	  if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+	    u_int8_t protocol_was_guessed;
+
+	    /* ret->master_protocol = flow->guessed_protocol_id , ret->app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
+	    *ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
+	  }
+
+	  ndpi_fill_protocol_category(ndpi_str, flow, ret);
+	  return(-1);
+	}
+      } else {
+	/* guess host protocol */
+	if(flow->packet.iph) {
+
+	  flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
+
+	  /*
+	    We could implement a shortcut here skipping dissectors for
+	    protocols we have identified by other means such as with the IP
+
+	    However we do NOT stop here and skip invoking the dissectors
+	    because we want to dissect the flow (e.g. dissect the TLS)
+	    and extract metadata.
+	  */
+#if SKIP_INVOKING_THE_DISSECTORS
+	  if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+	    /*
+	      We have identified a protocol using the IP address so
+	      it is not worth to dissect the traffic as we already have
+	      the solution
+	    */
+	    ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
+	  }
+#endif
+	}
+      }
+    }
+
+    if(flow->guessed_host_protocol_id >= NDPI_MAX_SUPPORTED_PROTOCOLS) {
+      u_int32_t num_calls;
+      NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
+      
+      /* This is a custom protocol and it has priority over everything else */
+      ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
+
+      num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
+      ndpi_fill_protocol_category(ndpi_str, flow, ret);
+      return(-1);
+    }
+
+    return(0);
+  }
+
   /* ********************************************************************************* */
 
   ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_str,
@@ -4757,94 +4854,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(flow->packet.iphv6 != NULL)
       ndpi_selection_packet |= NDPI_SELECTION_BITMASK_PROTOCOL_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6;
 
-    if((!flow->protocol_id_already_guessed)
-       && (flow->packet.iphv6 || flow->packet.iph)) {
-      u_int16_t sport, dport;
-      u_int8_t protocol;
-      u_int8_t user_defined_proto;
-
-      flow->protocol_id_already_guessed = 1;
-
-      if(flow->packet.iphv6 != NULL) {
-	protocol = flow->packet.iphv6->ip6_hdr.ip6_un1_nxt;
-      } else
-	  protocol = flow->packet.iph->protocol;	
-
-      if(flow->packet.udp)
-	sport = ntohs(flow->packet.udp->source), dport = ntohs(flow->packet.udp->dest);
-      else if(flow->packet.tcp)
-	sport = ntohs(flow->packet.tcp->source), dport = ntohs(flow->packet.tcp->dest);
-      else
-	sport = dport = 0;
-
-      /* guess protocol */
-      flow->guessed_protocol_id =
-	(int16_t) ndpi_guess_protocol_id(ndpi_str, flow, protocol, sport, dport, &user_defined_proto);
-      flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
-
-      if(ndpi_str->custom_categories.categories_loaded && flow->packet.iph) {
-	ndpi_fill_ip_protocol_category(ndpi_str, flow->packet.iph->saddr, flow->packet.iph->daddr, &ret);
-	flow->guessed_header_category = ret.category;
-      } else
-	flow->guessed_header_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-
-      if(flow->guessed_protocol_id >= NDPI_MAX_SUPPORTED_PROTOCOLS) {
-	/* This is a custom protocol and it has priority over everything else */
-	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN,
-	  ret.app_protocol = flow->guessed_protocol_id ? flow->guessed_protocol_id : flow->guessed_host_protocol_id;
-	ndpi_fill_protocol_category(ndpi_str, flow, &ret);
-	goto invalidate_ptr;
-      }
-
-      if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-	if(flow->packet.iph) {
-	  if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-	    u_int8_t protocol_was_guessed;
-
-	    /* ret.master_protocol = flow->guessed_protocol_id , ret.app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
-	    ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
-	  }
-
-	  ndpi_fill_protocol_category(ndpi_str, flow, &ret);
-	  goto invalidate_ptr;
-	}
-      } else {
-	/* guess host protocol */
-	if(flow->packet.iph) {
-
-	  flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
-
-	  /*
-	    We could implement a shortcut here skipping dissectors for
-	    protocols we have identified by other means such as with the IP
-
-	    However we do NOT stop here and skip invoking the dissectors
-	    because we want to dissect the flow (e.g. dissect the TLS)
-	    and extract metadata.
-	  */
-#if SKIP_INVOKING_THE_DISSECTORS
-	  if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-	    /*
-	      We have identified a protocol using the IP address so
-	      it is not worth to dissect the traffic as we already have
-	      the solution
-	    */
-	    ret.master_protocol = flow->guessed_protocol_id, ret.app_protocol = flow->guessed_host_protocol_id;
-	  }
-#endif
-	}
-      }
-    }
-
-    if(flow->guessed_host_protocol_id >= NDPI_MAX_SUPPORTED_PROTOCOLS) {
-      /* This is a custom protocol and it has priority over everything else */
-      ret.master_protocol = flow->guessed_protocol_id, ret.app_protocol = flow->guessed_host_protocol_id;
-
-      num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
-      ndpi_fill_protocol_category(ndpi_str, flow, &ret);
+    if(ndpi_do_guess(ndpi_str, flow, &ret) == -1)
       goto invalidate_ptr;
-    }
-
+    
     num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
 
     a = flow->packet.detected_protocol_stack[0];
@@ -5819,7 +5831,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     return((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) ? proto.master_protocol : proto.app_protocol);
   }
 
-  /* ****************************************************** */
+/* ****************************************************** */
 
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_str,
 					       struct ndpi_flow_struct *flow, u_int8_t proto,
