@@ -37,10 +37,8 @@ void ndpi_search_wsd(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->udp
      && (
 	 (packet->iph && ((ntohl(packet->iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */))
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
 	 ||
 	 (packet->iphv6 && ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) == 0xFF020000)
-#endif
 	 )
      && (ntohs(packet->udp->dest) == WSD_PORT)
      && (packet->payload_packet_len >= 40)

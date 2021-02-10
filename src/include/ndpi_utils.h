@@ -42,9 +42,7 @@ typedef struct fragment_wrapper {
      uint8_t l4_protocol;
      uint32_t initial_offset;
      uint16_t ct_frag;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6     
      char   *flow_label;    // IP6
-#endif
      char gap[200];
      fragment_t **fragments_list;
 } fragments_wrapper_t;

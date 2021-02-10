@@ -43,9 +43,7 @@ void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
   struct ndpi_packet_struct *packet = &flow->packet;
 
   if (packet->iph == NULL) {
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
     if (packet->iphv6 == NULL)
-#endif
       return;
   }
 

@@ -3438,7 +3438,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   }
 }
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
 /* handle extension headers in IPv6 packets
  * arguments:
  * 	l4ptr: pointer to the byte following the initial IPv6 header
@@ -3497,7 +3496,6 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
 
   return(0);
 }
-#endif /* NDPI_DETECTION_SUPPORT_IPV6 */
 
 static u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
 
@@ -3561,9 +3559,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
                                                u_int16_t l3_len, const u_int8_t **l4_return, u_int16_t *l4_len_return,
                                                u_int8_t *l4_protocol_return, u_int32_t flags) {
   const struct ndpi_iphdr *iph = NULL;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
   const struct ndpi_ipv6hdr *iph_v6 = NULL;
-#endif
   u_int16_t l4len = 0;
   const u_int8_t *l4ptr = NULL;
   u_int8_t l4protocol = 0;
@@ -3577,27 +3573,21 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   if(iph->version == IPVERSION && iph->ihl >= 5) {
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
   }
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
   else if(iph->version == 6 && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
     NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
     iph_v6 = (const struct ndpi_ipv6hdr *) l3;
     iph = NULL;
-  }
-#endif
-  else {
+  } else {
     return(1);
   }
 
   if((flags & NDPI_DETECTION_ONLY_IPV6) && iph != NULL) {
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header found but excluded by flag\n");
     return(1);
-  }
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-  else if((flags & NDPI_DETECTION_ONLY_IPV4) && iph_v6 != NULL) {
+  } else if((flags & NDPI_DETECTION_ONLY_IPV4) && iph_v6 != NULL) {
     NDPI_LOG_DBG2(ndpi_str, "ipv6 header found but excluded by flag\n");
     return(1);
   }
-#endif
 
 #ifdef FRAG_MAN
   if(iph != NULL) {
@@ -3633,7 +3623,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     l4protocol = iph->protocol;
   }
 #endif //FRAGMAN
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
+
   else if(iph_v6 != NULL && (l3_len - sizeof(struct ndpi_ipv6hdr)) >= ntohs(iph_v6->ip6_hdr.ip6_un1_plen)) {
     l4ptr = (((const u_int8_t *) iph_v6) + sizeof(struct ndpi_ipv6hdr));
     l4len = ntohs(iph_v6->ip6_hdr.ip6_un1_plen);
@@ -3644,9 +3634,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
       return(1);
     }
 
-  }
-#endif
-  else {
+  } else {
     return(1);
   }
 
@@ -3694,36 +3682,23 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 
   flow->packet.tcp = NULL, flow->packet.udp = NULL;
   flow->packet.generic_l4_ptr = NULL;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
   flow->packet.iphv6 = NULL;
-#endif /* NDPI_DETECTION_SUPPORT_IPV6 */
 
   ndpi_apply_flow_protocol_to_packet(flow, &flow->packet);
 
   l3len = flow->packet.l3_packet_len;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-  if(flow->packet.iph != NULL) {
-#endif /* NDPI_DETECTION_SUPPORT_IPV6 */
-
+  if(flow->packet.iph != NULL)
     decaps_iph = flow->packet.iph;
-
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-  }
-#endif /* NDPI_DETECTION_SUPPORT_IPV6 */
 
   if(decaps_iph && decaps_iph->version == IPVERSION && decaps_iph->ihl >= 5) {
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
-  }
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-  else if(decaps_iph && decaps_iph->version == 6 && l3len >= sizeof(struct ndpi_ipv6hdr) &&
+  } else if(decaps_iph && decaps_iph->version == 6 && l3len >= sizeof(struct ndpi_ipv6hdr) &&
 	  (ndpi_str->ip_version_limit & NDPI_DETECTION_ONLY_IPV4) == 0) {
     NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
     flow->packet.iphv6 = (struct ndpi_ipv6hdr *) flow->packet.iph;
     flow->packet.iph = NULL;
-  }
-#endif
-  else {
+  } else {
     flow->packet.iph = NULL;
     return(1);
   }
@@ -3830,9 +3805,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       /* const for gcc code optimization and cleaner code */
       struct ndpi_packet_struct *packet = &flow->packet;
       const struct ndpi_iphdr *iph = packet->iph;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
       const struct ndpi_ipv6hdr *iphv6 = packet->iphv6;
-#endif
       const struct ndpi_tcphdr *tcph = packet->tcp;
       const struct ndpi_udphdr *udph = packet->udp;
 
@@ -3844,10 +3817,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	if(iph != NULL && ntohl(iph->saddr) < ntohl(iph->daddr))
 	  packet->packet_direction = 1;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-	if(iphv6 != NULL && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->ip6_src, &iphv6->ip6_dst) != 0)
+	if((iphv6 != NULL)
+	   && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->ip6_src, &iphv6->ip6_dst) != 0)
 	  packet->packet_direction = 1;
-#endif
       }
 
       packet->packet_lines_parsed_complete = 0;
@@ -4782,30 +4754,21 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(flow->packet.tcp_retransmission == 0)
       ndpi_selection_packet |= NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
     if(flow->packet.iphv6 != NULL)
       ndpi_selection_packet |= NDPI_SELECTION_BITMASK_PROTOCOL_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6;
-#endif /* NDPI_DETECTION_SUPPORT_IPV6 */
 
-    if((!flow->protocol_id_already_guessed) && (
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-						flow->packet.iphv6 ||
-#endif
-						flow->packet.iph)) {
+    if((!flow->protocol_id_already_guessed)
+       && (flow->packet.iphv6 || flow->packet.iph)) {
       u_int16_t sport, dport;
       u_int8_t protocol;
       u_int8_t user_defined_proto;
 
       flow->protocol_id_already_guessed = 1;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
       if(flow->packet.iphv6 != NULL) {
 	protocol = flow->packet.iphv6->ip6_hdr.ip6_un1_nxt;
       } else
-#endif
-	{
-	  protocol = flow->packet.iph->protocol;
-	}
+	  protocol = flow->packet.iph->protocol;	
 
       if(flow->packet.udp)
 	sport = ntohs(flow->packet.udp->source), dport = ntohs(flow->packet.udp->dest);
@@ -5719,8 +5682,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   /* check if the source ip address in packet and ip are equal */
   /* NTOP */
   int ndpi_packet_src_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t *ip) {
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-
     /* IPv6 */
     if(packet->iphv6 != NULL) {
       if(packet->iphv6->ip6_src.u6_addr.u6_addr32[0] == ip->ipv6.u6_addr.u6_addr32[0] &&
@@ -5731,7 +5692,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       //else
       return(0);
     }
-#endif
 
     /* IPv4 */
     if(packet->iph->saddr == ip->ipv4)
@@ -5743,8 +5703,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
   /* check if the destination ip address in packet and ip are equal */
   int ndpi_packet_dst_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t *ip) {
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-
     /* IPv6 */
     if(packet->iphv6 != NULL) {
       if(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0] == ip->ipv6.u6_addr.u6_addr32[0] &&
@@ -5755,7 +5713,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       //else
       return(0);
     }
-#endif
 
     /* IPv4 */
     if(packet->iph->saddr == ip->ipv4)
@@ -5771,20 +5728,16 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   void ndpi_packet_src_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t *ip) {
     NDPI_PROTOCOL_IP_clear(ip);
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-
     /* IPv6 */
     if(packet->iphv6 != NULL) {
       ip->ipv6.u6_addr.u6_addr32[0] = packet->iphv6->ip6_src.u6_addr.u6_addr32[0];
       ip->ipv6.u6_addr.u6_addr32[1] = packet->iphv6->ip6_src.u6_addr.u6_addr32[1];
       ip->ipv6.u6_addr.u6_addr32[2] = packet->iphv6->ip6_src.u6_addr.u6_addr32[2];
       ip->ipv6.u6_addr.u6_addr32[3] = packet->iphv6->ip6_src.u6_addr.u6_addr32[3];
-
-    } else
-#endif
-
+    } else {
       /* IPv4 */
       ip->ipv4 = packet->iph->saddr;
+    }
   }
 
   /* ********************************************************************************* */
@@ -5794,8 +5747,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t *ip) {
     NDPI_PROTOCOL_IP_clear(ip);
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-
     if(packet->iphv6 != NULL) {
       ip->ipv6.u6_addr.u6_addr32[0] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[0];
       ip->ipv6.u6_addr.u6_addr32[1] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[1];
@@ -5803,21 +5754,14 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       ip->ipv6.u6_addr.u6_addr32[3] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[3];
 
     } else
-
-#endif
-
       ip->ipv4 = packet->iph->daddr;
   }
 
   /* ********************************************************************************* */
 
   u_int8_t ndpi_is_ipv6(const ndpi_ip_addr_t *ip) {
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
     return(ip->ipv6.u6_addr.u6_addr32[1] != 0 || ip->ipv6.u6_addr.u6_addr32[2] != 0 ||
 	   ip->ipv6.u6_addr.u6_addr32[3] != 0);
-#else
-    return(0);
-#endif
   }
 
   /* ********************************************************************************* */
@@ -5825,14 +5769,12 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   char *ndpi_get_ip_string(const ndpi_ip_addr_t *ip, char *buf, u_int buf_len) {
     const u_int8_t *a = (const u_int8_t *) &ip->ipv4;
 
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
     if(ndpi_is_ipv6(ip)) {
       if(inet_ntop(AF_INET6, &ip->ipv6.u6_addr, buf, buf_len) == NULL)
 	buf[0] = '\0';
-
+      
       return(buf);
     }
-#endif
 
     snprintf(buf, buf_len, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
 
@@ -5849,11 +5791,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(strchr(ip_str, '.')) {
       if(inet_pton(AF_INET, ip_str, &parsed_ip->ipv4) > 0)
 	rv = 4;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
     } else {
       if(inet_pton(AF_INET6, ip_str, &parsed_ip->ipv6) > 0)
 	rv = 6;
-#endif
     }
 
     return(rv);

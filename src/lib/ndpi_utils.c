@@ -1878,9 +1878,7 @@ void free_fragment(fragments_wrapper_t *frag) {
    uint16_t id;
    uint8_t l4_protocol;
    uint8_t ct_frag;
-   #ifdef NDPI_DETECTION_SUPPORT_IPV6     
    char   *flow_label;    // IP6
-   #endif     
    fragment_t **fragments_list;
    } fragments_wrapper_t; 
    *

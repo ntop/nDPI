@@ -377,9 +377,7 @@ struct ndpi_dns_packet_header {
 typedef union
 {
   u_int32_t ipv4;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
   struct ndpi_in6_addr ipv6;
-#endif
 } ndpi_ip_addr_t;
 
 
@@ -809,9 +807,7 @@ struct ndpi_int_one_line_struct {
 
 struct ndpi_packet_struct {
   const struct ndpi_iphdr *iph;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
   const struct ndpi_ipv6hdr *iphv6;
-#endif
   const struct ndpi_tcphdr *tcp;
   const struct ndpi_udphdr *udp;
   const u_int8_t *generic_l4_ptr;	/* is set only for non tcp-udp traffic */
@@ -1127,10 +1123,7 @@ struct ndpi_detection_module_struct {
   u_int32_t jabber_file_transfer_timeout;
   u_int8_t ip_version_limit;
   /* NDPI_PROTOCOL_BITTORRENT */
-  struct hash_ip4p_table *bt_ht;
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
-  struct hash_ip4p_table *bt6_ht;
-#endif
+  struct hash_ip4p_table *bt_ht, *bt6_ht;
 
   /* BT_ANNOUNCE */
   struct bt_announce *bt_ann;

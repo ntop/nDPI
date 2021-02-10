@@ -290,9 +290,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	      }
 
 	      if((((rsp_type == 0x1) && (data_len == 4)) /* A */
-#ifdef NDPI_DETECTION_SUPPORT_IPV6
 		  || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
-#endif
 		  )) {
 		memcpy(&flow->protos.dns.rsp_addr, flow->packet.payload + x, data_len);
 	      }
