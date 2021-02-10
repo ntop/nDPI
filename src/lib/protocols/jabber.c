@@ -67,11 +67,15 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
   struct ndpi_packet_struct *packet = &flow->packet;
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
-
   u_int16_t x;
 
   NDPI_LOG_DBG(ndpi_struct, "search JABBER\n");
 
+  if (flow->packet_counter > 5) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+  
   /* search for jabber file transfer */
   /* this part is working asymmetrically */
   if (packet->tcp != NULL && packet->tcp->syn != 0 && packet->payload_packet_len == 0) {
