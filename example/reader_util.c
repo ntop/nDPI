@@ -812,7 +812,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       LOG(NDPI_LOG_ERROR,
 	       "maximum flow count (%u) has been exceeded\n",
 	       workflow->prefs.max_ndpi_flows);
-      exit(-1);
+      return NULL;
     } else {
       struct ndpi_flow_info *newflow = (struct ndpi_flow_info*)ndpi_malloc(sizeof(struct ndpi_flow_info));
 
