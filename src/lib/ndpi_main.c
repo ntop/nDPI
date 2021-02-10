@@ -6425,8 +6425,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
   void ndpi_free_flow_data(struct ndpi_flow_struct *flow) {
     if(flow) {
-      u_int is_quic = flow_is_proto(flow, NDPI_PROTOCOL_QUIC);
-    
       if(flow->http.url)
 	ndpi_free(flow->http.url);
 
@@ -6442,10 +6440,12 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       if(flow->kerberos_buf.pktbuf)
 	ndpi_free(flow->kerberos_buf.pktbuf);
 
-      if(is_quic
-	 || flow_is_proto(flow, NDPI_PROTOCOL_TLS)
-	 || flow_is_proto(flow, NDPI_PROTOCOL_DTLS)
-	 ) {
+	if (flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_POPS) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS)) {
 	if(flow->protos.tls_quic_stun.tls_quic.server_names)
 	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.server_names);
 
@@ -6463,7 +6463,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       
 	if(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni)
 	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni);
-      }
+	}
 
       if(flow->l4_proto == IPPROTO_TCP) {
 	if(flow->l4.tcp.tls.message.buffer)
