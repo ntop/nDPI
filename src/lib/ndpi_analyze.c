@@ -1085,7 +1085,7 @@ int ndpi_jitter_init(struct ndpi_jitter_struct *s, u_int16_t num_learning_values
 
 /* ************************************* */
 
-void ndpi_free_jitter(struct ndpi_jitter_struct *s) {
+void ndpi_jitter_free(struct ndpi_jitter_struct *s) {
   ndpi_free(s->observations);
 }
 
