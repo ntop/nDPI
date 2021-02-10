@@ -4288,7 +4288,8 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) &&
        (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
     check_stun_export:
-      if(flow->protos.tls_quic_stun.stun.num_processed_pkts || flow->protos.tls_quic_stun.stun.num_udp_pkts) {
+      /* if(flow->protos.tls_quic_stun.stun.num_processed_pkts || flow->protos.tls_quic_stun.stun.num_udp_pkts) */
+	{
 	// if(/* (flow->protos.tls_quic_stun.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
 	*protocol_was_guessed = 1;
 	ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN);
