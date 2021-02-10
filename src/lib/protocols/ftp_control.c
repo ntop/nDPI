@@ -590,7 +590,7 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
       return;
     }
 
-    /* Break after 20 packets. */
+    /* Break after 8 packets. */
     if(flow->packet_counter > 8) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
@@ -666,7 +666,7 @@ void init_ftp_control_dissector(struct ndpi_detection_module_struct *ndpi_struct
   ndpi_set_bitmask_protocol_detection("FTP_CONTROL", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_FTP_CONTROL,
 				      ndpi_search_ftp_control,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
