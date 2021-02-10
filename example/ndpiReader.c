@@ -3780,6 +3780,8 @@ void jitterUnitTest() {
     if(trace)
       printf("%2u)\t%.3f\t%.3f\n", i, v[i], rc);
   }
+
+  ndpi_jitter_free(&jitter);
 }
 
 /* *********************************************** */
