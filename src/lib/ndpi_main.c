@@ -4673,12 +4673,10 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow, ndpi_protocol *ret) {
     ret->master_protocol = ret->app_protocol = NDPI_PROTOCOL_UNKNOWN, ret->category = 0;
     
-    if((!flow->protocol_id_already_guessed) && (flow->packet.iphv6 || flow->packet.iph)) {
+    if(flow->packet.iphv6 || flow->packet.iph) {
       u_int16_t sport, dport;
       u_int8_t protocol;
-      u_int8_t user_defined_proto;
-      
-      flow->protocol_id_already_guessed = 1;
+      u_int8_t user_defined_proto;     
 
       if(flow->packet.iphv6 != NULL) {
 	protocol = flow->packet.iphv6->ip6_hdr.ip6_un1_nxt;
@@ -4693,7 +4691,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	sport = dport = 0;
 
       /* guess protocol */
-      flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_str, flow, protocol, sport, dport, &user_defined_proto);
+      flow->guessed_protocol_id      = (int16_t) ndpi_guess_protocol_id(ndpi_str, flow, protocol, sport, dport, &user_defined_proto);
       flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
 
       if(ndpi_str->custom_categories.categories_loaded && flow->packet.iph) {
@@ -4706,7 +4704,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	/* This is a custom protocol and it has priority over everything else */
 	ret->master_protocol = NDPI_PROTOCOL_UNKNOWN,
 	  ret->app_protocol = flow->guessed_protocol_id ? flow->guessed_protocol_id : flow->guessed_host_protocol_id;
-	ndpi_fill_protocol_category(ndpi_str, flow, ret);
+
+	/* The call below is useful but not necessary, so let's skip for the moment... */
+	// ndpi_fill_protocol_category(ndpi_str, flow, ret);
 	return(-1);
       }
 
@@ -4719,13 +4719,13 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	    *ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
 	  }
 
-	  ndpi_fill_protocol_category(ndpi_str, flow, ret);
+	  /* The call below is useful but not necessary, so let's skip for the moment... */
+	  // ndpi_fill_protocol_category(ndpi_str, flow, ret);
 	  return(-1);
 	}
       } else {
 	/* guess host protocol */
 	if(flow->packet.iph) {
-
 	  flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
 
 	  /*
@@ -4758,7 +4758,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
 
       num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
-      ndpi_fill_protocol_category(ndpi_str, flow, ret);
+
+      /* The call below is useful but not necessary, so let's skip for the moment... */
+      // ndpi_fill_protocol_category(ndpi_str, flow, ret);
       return(-1);
     }
 
@@ -4854,8 +4856,12 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(flow->packet.iphv6 != NULL)
       ndpi_selection_packet |= NDPI_SELECTION_BITMASK_PROTOCOL_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6;
 
-    if(ndpi_do_guess(ndpi_str, flow, &ret) == -1)
-      goto invalidate_ptr;
+    if(!flow->protocol_id_already_guessed) {
+      flow->protocol_id_already_guessed = 1;
+      
+      if(ndpi_do_guess(ndpi_str, flow, &ret) == -1)
+	goto invalidate_ptr;
+    }
     
     num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
 
@@ -5841,7 +5847,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     struct in_addr addr;
     ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
     u_int8_t user_defined_proto;
-
+    
     if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
       rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, proto, shost, dhost, sport, dport);
 
