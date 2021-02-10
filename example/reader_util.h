@@ -195,7 +195,7 @@ typedef struct ndpi_flow_info {
   struct ndpi_analyze_struct *iat_c_to_s, *iat_s_to_c, *iat_flow,
     *pktlen_c_to_s, *pktlen_s_to_c;
 
-  char info[160];
+  char info[255];
   char flow_extra_info[16];
   char host_server_name[240];
   char bittorent_hash[41];

@@ -3116,6 +3116,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* check_mk */
   init_checkmk_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* cpha */
+  init_cpha_dissector(ndpi_str, &a, detection_bitmask);
+
   /* AIMINI */
   init_aimini_dissector(ndpi_str, &a, detection_bitmask);
 
