@@ -4783,13 +4783,14 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     if(flow->guessed_host_protocol_id >= NDPI_MAX_SUPPORTED_PROTOCOLS) {
-      u_int32_t num_calls;
+      //u_int32_t num_calls;
       NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
 
       /* This is a custom protocol and it has priority over everything else */
       ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
 
-      num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
+      //num_calls = 
+      ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
 
       //if(ndpi_str->ndpi_num_custom_protocols != 0)
 	ndpi_fill_protocol_category(ndpi_str, flow, ret);
