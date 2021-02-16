@@ -1753,6 +1753,15 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_HTTP_SUSPICIOUS_CONTENT:
     return("HTTP suspicious content");
     
+  case NDPI_RISKY_ASN:
+    return("Risky ASN");
+    
+  case NDPI_RISKY_DOMAIN:
+    return("Risky domain name");
+    
+  case NDPI_RISKY_COUNTRY:
+    return("Risky country name");
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
