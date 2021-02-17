@@ -52,6 +52,10 @@ The entire procedure of adding new protocols in detail:
 ### How to use nDPI to Block Selected Traffic
 You can use nDPI to selectively block selected Internet traffic by embedding it onto an application (remember that nDPI is just a library). Both [ntopng](https://github.com/ntop/ntopng) and [nProbe cento](http://www.ntop.org/products/netflow/nprobe-cento/) can do this.
 
+### nDPI Paper Citation
+
+- Deri, Luca, et al. [nDPI: Open-source high-speed deep packet inspection](http://luca.ntop.org/nDPI.pdf) 2014 International Wireless Communications and Mobile Computing Conference (IWCMC). IEEE, 2014.
+
 ### nDPI-Related Projects
 - [nfstream](https://github.com/aouinizied/nfstream)
 
