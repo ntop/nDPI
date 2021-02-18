@@ -12,6 +12,7 @@
 // #define NDPI_ENABLE_DEBUG_INFO_MESSAGES
 // #define NDPI_ENABLE_DEBUG_TRACE_MESSAGES
 
+#ifdef FRAG_MAN
 #ifdef NDPI_ENABLE_DEBUG_POINTER_MESSAGES
 #define DBGPOINTER(m, args...) MYDBG(m, ##args)
 #else
@@ -58,11 +59,15 @@ typedef struct  {
 	int item_index;
 } sorter_index_item_t;
 
+
 /* ***************************************************** */
 
 extern void ins_sort_array(sorter_index_item_t arr[], int len);
 extern void shell_sort_array(sorter_index_item_t arr[], int len);
 extern void free_fragment(fragments_wrapper_t *frag);
+
+#endif
+
 
 extern void printRawData(const uint8_t *ptr, size_t len);
 //extern uint8_t add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph, uint32_t waited);

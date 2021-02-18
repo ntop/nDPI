@@ -1814,6 +1814,7 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
   return(NDPI_HTTP_METHOD_UNKNOWN);
 }
 
+#ifdef FRAG_MAN
 #define ARRAYSZ_255 255
 void printRawData(const uint8_t *ptr, size_t len) {		
   uint8_t *p=(uint8_t*)ptr;
@@ -1878,7 +1879,6 @@ void shell_sort_array(sorter_index_item_t arr[], int n) {
 }
 
 /* ******************************************************************** */
-#ifdef FRAG_MAN
 
 void free_fragment(fragments_wrapper_t *frag) {
   /*

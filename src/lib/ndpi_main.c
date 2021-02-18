@@ -3688,6 +3688,61 @@ void ndpi_apply_flow_protocol_to_packet(struct ndpi_flow_struct *flow, struct nd
   memcpy(&packet->protocol_stack_info, &flow->protocol_stack_info, sizeof(packet->protocol_stack_info));
 }
 
+/* ****************************************************** */
+
+void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
+    if (flow) {
+        if (flow->http.url)
+            ndpi_free(flow->http.url);
+
+        if (flow->http.content_type)
+            ndpi_free(flow->http.content_type);
+
+        if (flow->http.request_content_type)
+            ndpi_free(flow->http.request_content_type);
+
+        if (flow->http.user_agent)
+            ndpi_free(flow->http.user_agent);
+
+        if (flow->kerberos_buf.pktbuf)
+            ndpi_free(flow->kerberos_buf.pktbuf);
+
+        if (flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
+            flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
+            flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
+            flow_is_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS) ||
+            flow_is_proto(flow, NDPI_PROTOCOL_MAIL_POPS) ||
+            flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS)) {
+            if (flow->protos.tls_quic_stun.tls_quic.server_names)
+                ndpi_free(flow->protos.tls_quic_stun.tls_quic.server_names);
+
+            if (flow->protos.tls_quic_stun.tls_quic.alpn)
+                ndpi_free(flow->protos.tls_quic_stun.tls_quic.alpn);
+
+            if (flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
+                ndpi_free(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
+
+            if (flow->protos.tls_quic_stun.tls_quic.issuerDN)
+                ndpi_free(flow->protos.tls_quic_stun.tls_quic.issuerDN);
+
+            if (flow->protos.tls_quic_stun.tls_quic.subjectDN)
+                ndpi_free(flow->protos.tls_quic_stun.tls_quic.subjectDN);
+
+            if (flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni)
+                ndpi_free(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni);
+        }
+
+        if (flow->l4_proto == IPPROTO_TCP) {
+            if (flow->l4.tcp.tls.message.buffer)
+                ndpi_free(flow->l4.tcp.tls.message.buffer);
+#ifdef FRAG_MAN
+            free_fragment(&flow->tcp_segments_list[0]);
+            free_fragment(&flow->tcp_segments_list[1]);
+#endif
+        }
+    }
+}
+
 /* ************************************************ */
 
 static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str,
@@ -6417,59 +6472,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   /* ****************************************************** */
-
-  void ndpi_free_flow_data(struct ndpi_flow_struct *flow) {
-    if(flow) {
-      if(flow->http.url)
-	ndpi_free(flow->http.url);
-
-      if(flow->http.content_type)
-	ndpi_free(flow->http.content_type);
-
-      if(flow->http.request_content_type)
-	ndpi_free(flow->http.request_content_type);
-
-      if(flow->http.user_agent)
-	ndpi_free(flow->http.user_agent);
-
-      if(flow->kerberos_buf.pktbuf)
-	ndpi_free(flow->kerberos_buf.pktbuf);
-
-	if (flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
-        flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
-        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
-        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS) ||
-        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_POPS) ||
-        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS)) {
-	if(flow->protos.tls_quic_stun.tls_quic.server_names)
-	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.server_names);
-
-	if(flow->protos.tls_quic_stun.tls_quic.alpn)
-	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.alpn);
-
-	if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
-	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
-
-	if(flow->protos.tls_quic_stun.tls_quic.issuerDN)
-	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.issuerDN);
-
-	if(flow->protos.tls_quic_stun.tls_quic.subjectDN)
-	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.subjectDN);
-
-	if(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni)
-	  ndpi_free(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni);
-	}
-
-      if(flow->l4_proto == IPPROTO_TCP) {
-	if(flow->l4.tcp.tls.message.buffer)
-	  ndpi_free(flow->l4.tcp.tls.message.buffer);
-#ifdef FRAG_MAN
-	free_fragment(&flow->tcp_segments_list[0]);
-	free_fragment(&flow->tcp_segments_list[1]);
-#endif
-      }
-    }
-  }
 
   void ndpi_free_flow(struct ndpi_flow_struct *flow) {
     if(flow) {
