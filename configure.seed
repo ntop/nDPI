@@ -218,7 +218,16 @@ if test "${with_pcre+set}" = set; then :
   fi
 fi
 
-dnl>  TCP segments management (buffer, sort and reassembly the segments)
+dnl> GeoIP
+AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
+AC_HAVE_HEADERS(maxminddb.h)
+if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" &&
+      test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
+   ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lmaxminddb"
+   AC_DEFINE_UNQUOTED(HAVE_MAXMINDDB, 1, [MaxMind DB support])
+fi
+
+dnl> TCP segments management (buffer, sort and reassembly the segments)
 dnl> FRAG_MAN_ENABLED=1
 dnl> AC_DEFINE_UNQUOTED(FRAG_MAN, ${FRAG_MAN_ENABLED}, [Enable the TCP segments fragmentation management])
 

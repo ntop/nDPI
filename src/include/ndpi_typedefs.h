@@ -26,8 +26,12 @@
 
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
-
 #include "ndpi_utils.h"
+
+#ifdef HAVE_MAXMINDDB
+#include <maxminddb.h>
+#endif
+
 /* NDPI_LOG_LEVEL */
 typedef enum {
 	      NDPI_LOG_ERROR,
@@ -1152,6 +1156,11 @@ struct ndpi_detection_module_struct {
   
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
+#endif
+
+#ifdef HAVE_MAXMINDDB
+  MMDB_s mmdb_city, mmdb_as;
+  u_int8_t mmdb_city_loaded, mmdb_as_loaded;
 #endif
 };
 

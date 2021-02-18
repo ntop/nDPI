@@ -39,10 +39,18 @@ if test "$CENTOS_RELEASE" -ne 8; then
   RPM_SIGN_CMD="./rpm-sign.exp"
 fi
 
+AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
+AC_HAVE_HEADERS(maxminddb.h)
+if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" &&
+      test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
+      GEOIP_DEP="libmaxminddb"
+fi
+
 AC_CONFIG_FILES([Makefile ndpi.spec])
 
 AC_SUBST(PACKAGE_VERSION)
 AC_SUBST(PLATFORM)
+AC_SUBST(GEOIP_DEP)
 AC_SUBST(MACHINE)
 AC_SUBST(EXTN)
 AC_SUBST(DATE)

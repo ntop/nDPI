@@ -2449,6 +2449,8 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 #include "../../../nDPI-custom/ndpi_exit_detection_module.c"
 #endif
 
+    ndpi_free_geeoip(ndpi_str);
+    
     ndpi_free(ndpi_str);
   }
 }
@@ -7123,3 +7125,5 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     return(rc);
   }
+
+  /* ******************************************************************** */

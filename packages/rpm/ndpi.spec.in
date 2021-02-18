@@ -8,8 +8,9 @@ URL: http://www.ntop.org/products/deep-packet-inspection/ndpi/
 Source: ndpi-%{version}.tgz
 Packager: Luca Deri <deri@ntop.org>
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
-%{?el7:Requires: glibc >= 2.3.4 numactl coreutils }
-%{?el6:Requires: glibc >= 2.3.4 numactl coreutils }
+%{?el8:Requires: glibc >= 2.3.4 numactl coreutils @GEOIP_DEP@ }
+%{?el7:Requires: glibc >= 2.3.4 numactl coreutils @GEOIP_DEP@ }
+%{?el6:Requires: glibc >= 2.3.4 numactl coreutils @GEOIP_DEP@ }
 AutoReqProv: no
 
 %define debug_package %{nil}
