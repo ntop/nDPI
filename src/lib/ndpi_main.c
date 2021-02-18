@@ -450,36 +450,75 @@ static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
 
 /* ****************************************************** */
 
+/*
+  This is a function used to see if we need to
+  add a trailer $ in case the string is complete
+  or is a string that can be matched in the
+  middle of a domain name
+
+  Example:
+  microsoft.com    ->     microsoft.com$
+  apple.           ->     apple.
+*/
+static u_int8_t ndpi_is_middle_string_char(char c) {
+  switch(c) {
+  case '.':
+  case '-':
+  case '$': /* Do not add a double $$ */
+    return(1);
+    break;
+
+  default:
+    return(0);
+  }
+}
+
+/* ****************************************************** */
+
 static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, ndpi_automa *automa, char *value,
                                  u_int16_t protocol_id, ndpi_protocol_category_t category, ndpi_protocol_breed_t breed,
-                                 u_int8_t free_str_on_duplicate) {
+                                 u_int8_t free_str_on_duplicate, u_int8_t add_ends_with) {
   AC_PATTERN_t ac_pattern;
   AC_ERROR_t rc;
-
+  char buf[96];
+  u_int len, dot;
+  
   if((value == NULL) || (protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS))) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] protoId=%d: INTERNAL ERROR\n", protocol_id);
     return(-1);
   }
 
-  if(automa->ac_automa == NULL)
+  if((automa->ac_automa == NULL) || (value == NULL))
     return(-2);
 
-  ac_pattern.astring = value, ac_pattern.rep.number = protocol_id,
-    ac_pattern.rep.category = (u_int16_t) category, ac_pattern.rep.breed = (u_int16_t) breed;
+  len = strlen(value);
+  dot = len -1;
+
+  if((!add_ends_with) || ndpi_is_middle_string_char(value[dot]))
+    ac_pattern.astring = value, ac_pattern.length = len;
+  else {
+    u_int mlen = sizeof(buf)-2;
+    
+    len = ndpi_min(len, mlen);
+    ac_pattern.length = snprintf(buf, mlen, "%s$", value);
+    ac_pattern.astring = ndpi_strdup(buf);
+    free_str_on_duplicate = 1;
+  }
+  
+  ac_pattern.rep.number = protocol_id, ac_pattern.rep.category = (u_int16_t) category, ac_pattern.rep.breed = (u_int16_t) breed;
 
 #ifdef MATCH_DEBUG
-  printf("Adding to automa [%s][protocol_id: %u][category: %u][breed: %u]\n", value, protocol_id, category, breed);
+  printf("Adding to automa [%s][protocol_id: %u][category: %u][breed: %u]\n",
+	 ac_pattern.astring, protocol_id, category, breed);
 #endif
 
-  if(value == NULL)
-    ac_pattern.length = 0;
-  else
-    ac_pattern.length = strlen(ac_pattern.astring);
-
   rc = ac_automata_add(((AC_AUTOMATA_t *) automa->ac_automa), &ac_pattern);
-  if(rc != ACERR_DUPLICATE_PATTERN && rc != ACERR_SUCCESS)
+  if((rc != ACERR_DUPLICATE_PATTERN) && (rc != ACERR_SUCCESS)) {
+    if(free_str_on_duplicate) ndpi_free(value);
     return(-2);
-  if(rc == ACERR_DUPLICATE_PATTERN && free_str_on_duplicate)
+  }
+  
+  if((rc == ACERR_DUPLICATE_PATTERN) && free_str_on_duplicate)
     ndpi_free(value);
 
   return(0);
@@ -487,8 +526,10 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, 
 
 /* ****************************************************** */
 
-static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_str, char *_value, int protocol_id,
-                                         ndpi_protocol_category_t category, ndpi_protocol_breed_t breed) {
+static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
+					 char *_value, int protocol_id,
+                                         ndpi_protocol_category_t category,
+					 ndpi_protocol_breed_t breed) {
   int rv;
   char *value = ndpi_strdup(_value);
 
@@ -499,22 +540,13 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
   NDPI_LOG_DBG2(ndpi_str, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
 
-  rv = ndpi_string_to_automa(ndpi_str, &ndpi_str->host_automa, value, protocol_id, category, breed, 1);
+  rv = ndpi_string_to_automa(ndpi_str, &ndpi_str->host_automa, value, protocol_id, category, breed, 1, 1);
 
   if(rv != 0)
     ndpi_free(value);
 
   return(rv);
 }
-
-/* ****************************************************** */
-
-#ifdef CODE_UNUSED
-int ndpi_add_content_subprotocol(struct ndpi_detection_module_struct *ndpi_str, char *value, int protocol_id,
-                                 ndpi_protocol_category_t category, ndpi_protocol_breed_t breed) {
-  return(ndpi_string_to_automa(ndpi_str, &ndpi_str->content_automa, value, protocol_id, category, breed, 0));
-}
-#endif
 
 /* ****************************************************** */
 
@@ -550,7 +582,8 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str, ndp
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   }
 
-  ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match, match->protocol_id, match->protocol_category,
+  ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
+				match->protocol_id, match->protocol_category,
 				match->protocol_breed);
 }
 
@@ -588,15 +621,15 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 #if 1
   for (i = 0; ndpi_en_bigrams[i] != NULL; i++)
-    ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_bigrams[i], 1, 1, 1, 0);
+    ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_bigrams[i], 1, 1, 1, 0, 0);
 #else
   for (i = 0; ndpi_en_popular_bigrams[i] != NULL; i++)
-    ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_popular_bigrams[i], 1, 1, 1, 0);
+    ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_popular_bigrams[i], 1, 1, 1, 0, 0);
 #endif
 
   for (i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa, (char *) ndpi_en_impossible_bigrams[i], 1,
-			  1, 1, 0);
+			  1, 1, 0, 0);
 }
 
 /* ******************************************************************** */
@@ -4463,31 +4496,33 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, const char *name_to_add,
 				  ndpi_protocol_category_t category) {
     char *name;
-
+    u_int len;
+    AC_PATTERN_t ac_pattern;
+    AC_ERROR_t rc;
+    
     if(name_to_add == NULL)
       return(-1);
+    else
+      len = strlen(name_to_add);
 
-    name = ndpi_strdup(name_to_add);
-
-    if(name == NULL)
+    if((name = (char*)ndpi_malloc(len+3)) == NULL)
       return(-1);
+
+    memset(&ac_pattern, 0, sizeof(ac_pattern));
+    ac_pattern.length = snprintf(name, len+2, "%s%s", name_to_add,
+				 ndpi_is_middle_string_char(name_to_add[len-1]) ? "" : "$");
 
 #if 0
     printf("===> %s() Loading %s as %u\n", __FUNCTION__, name, category);
 #endif
-
-    AC_PATTERN_t ac_pattern;
-    AC_ERROR_t rc;
-
-    memset(&ac_pattern, 0, sizeof(ac_pattern));
 
     if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL) {
       ndpi_free(name);
       return(-1);
     }
 
-    ac_pattern.astring = name, ac_pattern.length = strlen(ac_pattern.astring);
-    ac_pattern.rep.number = (u_int32_t) category,  ac_pattern.rep.category = category;;
+    ac_pattern.astring = name;
+    ac_pattern.rep.number = (u_int32_t) category,  ac_pattern.rep.category = category;
 
     rc = ac_automata_add(ndpi_str->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
     if(rc != ACERR_DUPLICATE_PATTERN && rc != ACERR_SUCCESS) {
@@ -6386,11 +6421,21 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 					char *string_to_match, u_int string_to_match_len,
 					ndpi_protocol_match_result *ret_match, u_int16_t master_protocol_id) {
-    u_int16_t rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
-							master_protocol_id, ret_match, 1);
-    ndpi_protocol_category_t id = ret_match->protocol_category;
+    u_int16_t rc, buf_len, i;
+    ndpi_protocol_category_t id;
+    char buf[96];
 
-    if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
+    buf_len = ndpi_min(string_to_match_len, sizeof(buf)-2);    
+    for(i=0; i<buf_len; i++) buf[i] = tolower(string_to_match[i]);
+    buf[i++] = '$'; /* Add trailer $ */
+    buf[i] = '\0';
+    
+    rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow,
+					      buf, i,
+					      master_protocol_id, ret_match, 1);
+    id = ret_match->protocol_category;
+
+    if(ndpi_get_custom_category_match(ndpi_str, buf, i, &id) != -1) {
       /* if(id != -1) */ {
 	flow->category = ret_match->protocol_category = id;
 	rc = master_protocol_id;
@@ -6405,16 +6450,13 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
 				   u_int16_t master_protocol, char *name, u_int name_len) {
     ndpi_protocol_match_result ret_match;
-    u_int16_t subproto, what_len, i;
+    u_int16_t subproto, what_len;
     char *what;
 
     if((name_len > 2) && (name[0] == '*') && (name[1] == '.'))
       what = &name[1], what_len = name_len - 1;
     else
       what = name, what_len = name_len;
-
-    /* Convert it first to lowercase: we assume meory is writable as in nDPI dissctors */
-    for(i=0; i<name_len; i++) what[i] = tolower(what[i]);
 
     subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len, &ret_match, master_protocol);
 
