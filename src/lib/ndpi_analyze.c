@@ -140,7 +140,8 @@ u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s->max_val); }
 
 /* Compute the variance on all values */
 float ndpi_data_variance(struct ndpi_analyze_struct *s) {
-  return(s->num_data_entries ? ((float)s->stddev.sum_square_total - ((float)s->sum_total * (float)s->sum_total / (float)s->num_data_entries)) / (float)s->num_data_entries : 0.0);
+  float v = s->num_data_entries ? ((float)s->stddev.sum_square_total - ((float)s->sum_total * (float)s->sum_total / (float)s->num_data_entries)) / (float)s->num_data_entries : 0.0;
+  return((v < 0  /* rounding problem */) ? 0 : v);
 }
 
 /* ********************************************************************************* */
