@@ -32,7 +32,7 @@ AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
 AC_HAVE_HEADERS(maxminddb.h)
 if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" &&
       test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
-      GEOIP_DEP=", libmaxminddb"
+      GEOIP_DEP=", libmaxminddb0"
 fi
 
 AC_CONFIG_FILES([Makefile debian/changelog debian/files debian/control])
