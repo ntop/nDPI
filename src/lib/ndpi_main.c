@@ -483,7 +483,7 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, 
   char buf[96];
   u_int len, dot;
   
-  if((value == NULL) || (protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS))) {
+  if(protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] protoId=%d: INTERNAL ERROR\n", protocol_id);
     return(-1);
   }
@@ -494,15 +494,17 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, 
   len = strlen(value);
   dot = len -1;
 
-  if((!add_ends_with) || ndpi_is_middle_string_char(value[dot]))
-    ac_pattern.astring = value, ac_pattern.length = len;
-  else {
+  if((!add_ends_with) || ndpi_is_middle_string_char(value[dot])) {
+    ac_pattern.length = len;
+    ac_pattern.astring = value;
+  } else {
     u_int mlen = sizeof(buf)-2;
     
     len = ndpi_min(len, mlen);
     ac_pattern.length = snprintf(buf, mlen, "%s$", value);
-    ac_pattern.astring = ndpi_strdup(buf);
-    free_str_on_duplicate = 1;
+    free(value);
+    value = ndpi_strdup(buf);
+    ac_pattern.astring = value;
   }
   
   ac_pattern.rep.number = protocol_id, ac_pattern.rep.category = (u_int16_t) category, ac_pattern.rep.breed = (u_int16_t) breed;
@@ -513,10 +515,8 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, 
 #endif
 
   rc = ac_automata_add(((AC_AUTOMATA_t *) automa->ac_automa), &ac_pattern);
-  if((rc != ACERR_DUPLICATE_PATTERN) && (rc != ACERR_SUCCESS)) {
-    if(free_str_on_duplicate) ndpi_free(value);
+  if((rc != ACERR_DUPLICATE_PATTERN) && (rc != ACERR_SUCCESS))
     return(-2);
-  }
   
   if((rc == ACERR_DUPLICATE_PATTERN) && free_str_on_duplicate)
     ndpi_free(value);
