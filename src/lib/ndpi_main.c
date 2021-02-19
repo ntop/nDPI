@@ -619,13 +619,8 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   // ac_automata_display(ndpi_str->host_automa.ac_automa, 'n');
 #endif
 
-#if 1
   for (i = 0; ndpi_en_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_bigrams[i], 1, 1, 1, 0, 0);
-#else
-  for (i = 0; ndpi_en_popular_bigrams[i] != NULL; i++)
-    ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_popular_bigrams[i], 1, 1, 1, 0, 0);
-#endif
 
   for (i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa, (char *) ndpi_en_impossible_bigrams[i], 1,
