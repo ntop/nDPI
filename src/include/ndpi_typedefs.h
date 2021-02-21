@@ -91,7 +91,7 @@ typedef enum {
   NDPI_HTTP_SUSPICIOUS_CONTENT,
   NDPI_RISKY_ASN,
   NDPI_RISKY_DOMAIN,
-  NDPI_RISKY_COUNTRY,
+
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 31 due to (**) */
