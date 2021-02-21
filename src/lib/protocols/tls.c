@@ -1023,7 +1023,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	https://networkengineering.stackexchange.com/questions/55752/why-does-wireshark-show-version-tls-1-2-here-instead-of-tls-1-3
       */
       if(packet->udp)
-	offset += 1;
+	offset += session_id_len + 1;
       else {
 	if(tls_version < 0x7F15 /* TLS 1.3 lacks of session id */)
 	  offset += session_id_len+1;
@@ -1127,6 +1127,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
     } else if(handshake_type == 0x01 /* Client Hello */) {
       u_int16_t cipher_len, cipher_offset;
+      u_int8_t cookie_len = 0;
 
       if((session_id_len+base_offset+3) > packet->payload_packet_len)
 	return(0); /* Not found */
@@ -1135,8 +1136,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	cipher_len = packet->payload[session_id_len+base_offset+2] + (packet->payload[session_id_len+base_offset+1] << 8);
 	cipher_offset = base_offset + session_id_len + 3;
       } else {
-	cipher_len = ntohs(*((u_int16_t*)&packet->payload[base_offset+2]));
-	cipher_offset = base_offset+4;
+	cookie_len = packet->payload[base_offset+session_id_len+1];
+#ifdef DEBUG_TLS
+	printf("[JA3] Client: DTLS cookie len %d\n", cookie_len);
+#endif
+	if((session_id_len+base_offset+cookie_len+4) > packet->payload_packet_len)
+	  return(0); /* Not found */
+	cipher_len = ntohs(*((u_int16_t*)&packet->payload[base_offset+session_id_len+cookie_len+2]));
+	cipher_offset = base_offset + session_id_len + cookie_len + 4;
       }
 
 #ifdef DEBUG_TLS
@@ -1175,7 +1182,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
       }
 
-      offset = base_offset + session_id_len + cipher_len + 2;
+      offset = base_offset + session_id_len + cookie_len + cipher_len + 2;
 
       if(offset < total_len) {
 	u_int16_t compression_len;

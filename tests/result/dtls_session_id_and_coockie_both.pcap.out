@@ -1,3 +1,8 @@
 DTLS	4	604	1
 
-	1	UDP 185.196.113.239:50257 <-> 223.116.105.247:44443 [proto: 30/DTLS][cat: Web/5][2 pkts/302 bytes <-> 2 pkts/302 bytes][Goodput ratio: 72/72][0.06 sec][Plen Bins: 0,25,0,50,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 185.196.113.239          	 1      
+
+
+	1	UDP 185.196.113.239:50257 <-> 223.116.105.247:44443 [proto: 30/DTLS][cat: Web/5][2 pkts/302 bytes <-> 2 pkts/302 bytes][Goodput ratio: 72/72][0.06 sec][Risk: ** TLS (probably) not carrying HTTPS **** SNI TLS extension was missing **][DTLSv1.2][JA3C: e15c510766789ed8f49de0e37951c1da][Plen Bins: 0,25,0,50,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
