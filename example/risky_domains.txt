@@ -1,0 +1,11 @@
+# https://www.spamhaus.org/statistics/tlds/
+.fail
+.viajes
+.exposed
+.london
+.work
+.gq
+.ml
+.surk
+.tk
+.xyz

@@ -65,8 +65,9 @@ static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playli
 static FILE *results_file           = NULL;
 static char *results_path           = NULL;
 static char * bpfFilter             = NULL; /**< bpf filter  */
-static char *_protoFilePath         = NULL; /**< Protocol file path  */
+static char *_protoFilePath         = NULL; /**< Protocol file path */
 static char *_customCategoryFilePath= NULL; /**< Custom categories file path  */
+static char *_riskyDomainFilePath   = NULL; /**< Risky domain files */
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 FILE *csv_fp                 = NULL; /**< for CSV export */
@@ -437,7 +438,7 @@ static void help(u_int long_help) {
 	 "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-D][-e <len>][-t][-v <level>]\n"
 	 "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
-	 "          [-T <num>][-U <num>] [-x <domain>]\n\n"
+	 "          [-r <file>][-T <num>][-U <num>] [-x <domain>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
 	 "                            | device for live capture (comma-separated list)\n"
@@ -465,9 +466,9 @@ static void help(u_int long_help) {
 	 "                            | <d> = max packet payload dissection\n"
 	 "                            | <d> = max num reported payloads\n"
 	 "                            | Default: %u:%u:%u:%u:%u\n"
-	 "  -r                        | Print nDPI version and git revision\n"
 	 "  -c <path>                 | Load custom categories from the specified file\n"
 	 "  -C <path>                 | Write output in CSV format on the specified file\n"
+	 "  -r <path>                 | Load risky domain file\n"
 	 "  -w <path>                 | Write test output on the specified file. This is useful for\n"
 	 "                            | testing purposes in order to compare results across runs\n"
 	 "  -h                        | This help\n"
@@ -762,7 +763,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "b:e:c:C:dDf:g:i:Ihp:P:l:s:tu:v:V:n:Jrp:x:w:q0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "b:e:c:C:dDf:g:i:Ihp:P:l:r:s:tu:v:V:n:Jrp:x:w:q0123:456:7:89:m:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -829,6 +830,10 @@ static void parseOptions(int argc, char **argv) {
 	printf("Unable to write on CSV file %s\n", optarg);
       break;
 
+    case 'r':
+      _riskyDomainFilePath = optarg;
+      break;
+
     case 's':
       capture_for = atoi(optarg);
       capture_until = capture_for + time(NULL);
@@ -837,10 +842,6 @@ static void parseOptions(int argc, char **argv) {
     case 't':
       decode_tunnels = 1;
       break;
-
-    case 'r':
-      printf("ndpiReader - nDPI (%s)\n", ndpi_revision());
-      exit(0);
 
     case 'v':
       verbose = atoi(optarg);
@@ -2055,6 +2056,9 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   if(_customCategoryFilePath)
     ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath);
+
+  if(_riskyDomainFilePath)
+    ndpi_load_risk_domain_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _riskyDomainFilePath);
 
   ndpi_finalize_initalization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 

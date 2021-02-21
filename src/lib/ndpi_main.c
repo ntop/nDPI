@@ -2117,7 +2117,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->content_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->impossible_bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
-
+  ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
+  
   if((sizeof(categories) / sizeof(char *)) != NDPI_PROTOCOL_NUM_CATEGORIES) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] invalid categories length: expected %u, got %u\n", NDPI_PROTOCOL_NUM_CATEGORIES,
 		 (unsigned int) (sizeof(categories) / sizeof(char *)));
@@ -2149,7 +2150,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 5; i++) {
     ndpi_automa *automa;
 
     switch(i) {
@@ -2169,12 +2170,16 @@ void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) 
       automa = &ndpi_str->impossible_bigrams_automa;
       break;
 
+    case 4:
+      automa = &ndpi_str->risky_domain_automa;
+      break;
+
     default:
       automa = NULL;
       break;
     }
 
-    if(automa) {
+    if(automa && automa->ac_automa) {
       ac_automata_finalize((AC_AUTOMATA_t *) automa->ac_automa);
       automa->ac_automa_finalized = 1;
     }
@@ -2426,6 +2431,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->impossible_bigrams_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->impossible_bigrams_automa.ac_automa, 0);
 
+    if(ndpi_str->risky_domain_automa.ac_automa != NULL)
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->risky_domain_automa.ac_automa, 0);
+    
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
 			  1 /* free patterns strings memory */);
@@ -2800,6 +2808,73 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
   fclose(fd);
   ndpi_enable_loaded_categories(ndpi_str);
 
+  return(num);
+}
+
+/* ******************************************************************** */
+
+static int ndpi_load_risky_domain(struct ndpi_detection_module_struct *ndpi_str,
+				 char* domain_name) {
+  if(ndpi_str->risky_domain_automa.ac_automa == NULL)
+    ndpi_str->risky_domain_automa.ac_automa = ac_automata_init(ac_match_handler);
+
+  if(ndpi_str->risky_domain_automa.ac_automa) {
+    char buf[64];
+    u_int i, len;
+    
+    snprintf(buf, sizeof(buf)-1, "%s$", domain_name);
+    for (i = 0, len = strlen(buf)-1 /* Skip $ */; i < len; i++) buf[i] = tolower(buf[i]);    
+
+    return(ndpi_add_string_to_automa(ndpi_str->risky_domain_automa.ac_automa, buf));
+  }
+
+  return(-1);
+}
+
+/* ******************************************************************** */
+
+/*
+ * Format:
+ *
+ * <domain name>
+ *
+ * Notes:
+ *  - you can add a .<domain name> to avoid mismatches
+ */
+int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
+  char buffer[128], *line;
+  FILE *fd;
+  int len, num = 0;
+
+  fd = fopen(path, "r");
+
+  if(fd == NULL) {
+    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
+    return(-1);
+  }
+
+  while(1) {
+    line = fgets(buffer, sizeof(buffer), fd);
+
+    if(line == NULL)
+      break;
+
+    len = strlen(line);
+
+    if((len <= 1) || (line[0] == '#'))
+      continue;
+
+    line[len - 1] = '\0';
+    
+    if(ndpi_load_risky_domain(ndpi_str, line) >= 0)
+      num++;
+  }
+
+  fclose(fd);
+
+  if(ndpi_str->risky_domain_automa.ac_automa)
+    ac_automata_finalize((AC_AUTOMATA_t *)ndpi_str->risky_domain_automa.ac_automa);
+  
   return(num);
 }
 
@@ -6415,9 +6490,11 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
   /* ****************************************************** */
 
-  u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+  u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
+					struct ndpi_flow_struct *flow,
 					char *string_to_match, u_int string_to_match_len,
-					ndpi_protocol_match_result *ret_match, u_int16_t master_protocol_id) {
+					ndpi_protocol_match_result *ret_match,
+					u_int16_t master_protocol_id) {
     u_int16_t rc, buf_len, i;
     ndpi_protocol_category_t id;
     char buf[96];
@@ -6427,8 +6504,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     buf[i++] = '$'; /* Add trailer $ */
     buf[i] = '\0';
     
-    rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow,
-					      buf, i,
+    rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, buf, i,
 					      master_protocol_id, ret_match, 1);
     id = ret_match->protocol_category;
 
@@ -6439,12 +6515,20 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
 
+    if(ndpi_str->risky_domain_automa.ac_automa != NULL) {
+      u_int16_t rc1 = ndpi_match_string(ndpi_str->risky_domain_automa.ac_automa, buf);
+      
+      if(rc1 > 0)
+	NDPI_SET_BIT(flow->risk, NDPI_RISKY_DOMAIN);      
+    }
+    
     return(rc);
   }
 
   /* **************************************** */
 
-  int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
+  int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow,
 				   u_int16_t master_protocol, char *name, u_int name_len) {
     ndpi_protocol_match_result ret_match;
     u_int16_t subproto, what_len;
@@ -6455,7 +6539,8 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     else
       what = name, what_len = name_len;
 
-    subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len, &ret_match, master_protocol);
+    subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len,
+					   &ret_match, master_protocol);
 
     if(subproto != NDPI_PROTOCOL_UNKNOWN) {
       ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol);

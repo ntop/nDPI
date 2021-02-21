@@ -695,6 +695,16 @@ extern "C" {
    */
   int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path);
 
+ /**
+   * Read a file and load the list of risky domains
+   *
+   * @par     ndpi_mod = the detection module
+   * @par     path     = the path of the file
+   * @return  0 if the file is loaded correctly;
+   *          -1 else
+   */
+  int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, const char* path);
+
   /**
    * Get the total number of the supported protocols
    *
