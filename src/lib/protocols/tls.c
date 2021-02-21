@@ -546,8 +546,9 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
+  int is_dtls = packet->udp ? 1 : 0;
   u_int32_t certificates_length, length = (packet->payload[1] << 16) + (packet->payload[2] << 8) + packet->payload[3];
-  u_int16_t certificates_offset = 7;
+  u_int32_t certificates_offset = 7 + (is_dtls ? 8 : 0);
   u_int8_t num_certificates_found = 0;
   SHA1_CTX srv_cert_fingerprint_ctx ;
 
@@ -559,14 +560,16 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	 packet->payload[3], packet->payload[4], packet->payload[5]);
 #endif
 
-  if((packet->payload_packet_len != (length + 4)) || (packet->payload[1] != 0x0)) {
+  if((packet->payload_packet_len != (length + 4 + (is_dtls ? 8 : 0))) || (packet->payload[1] != 0x0)) {
     NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(-1); /* Invalid length */
   }
 
-  certificates_length = (packet->payload[4] << 16) + (packet->payload[5] << 8) + packet->payload[6];
+  certificates_length = (packet->payload[certificates_offset - 3] << 16) +
+                        (packet->payload[certificates_offset - 2] << 8) +
+                        packet->payload[certificates_offset - 1];
 
-  if((packet->payload[4] != 0x0) || ((certificates_length+3) != length)) {
+  if((packet->payload[certificates_offset - 3] != 0x0) || ((certificates_length+3) != length)) {
     NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
     return(-2); /* Invalid length */
   }
@@ -578,7 +581,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     /* Invalid lenght */
     if((certificate_len == 0)
        || (packet->payload[certificates_offset] != 0x0)
-       || ((certificates_offset+certificate_len) > (4+certificates_length))) {
+       || ((certificates_offset+certificate_len) > (4+certificates_length+(is_dtls ? 8 : 0)))) {
 #ifdef DEBUG_TLS
       printf("[TLS] Invalid length [certificate_len: %u][certificates_offset: %u][%u vs %u]\n",
 	     certificate_len, certificates_offset,
@@ -667,6 +670,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 			   struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
+  int ret;
 
   switch(packet->payload[0] /* block type */) {
   case 0x01: /* Client Hello */
@@ -691,7 +695,12 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     /* Important: populate the tls union fields only after
      * ndpi_int_tls_add_connection has been called */
     if(flow->l4.tcp.tls.hello_processed) {
-      processCertificate(ndpi_struct, flow);
+      ret = processCertificate(ndpi_struct, flow);
+      if (ret != 1) {
+#ifdef DEBUG_TLS
+        printf("[TLS] Error processing certificate: %d\n", ret);
+#endif
+      }
       flow->l4.tcp.tls.certificate_processed = 1;
     }
     break;
@@ -861,50 +870,97 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  // u_int8_t handshake_type;
   u_int32_t handshake_len;
-  u_int16_t p_len;
+  u_int16_t p_len, processed;
   const u_int8_t *p;
+  u_int8_t no_dtls = 0, change_cipher_found = 0;
 
 #ifdef DEBUG_TLS
   printf("[TLS] %s()\n", __FUNCTION__);
 #endif
 
-  /* Consider only specific SSL packets (handshake) */
-  if((packet->payload_packet_len < 17)
-     || (packet->payload[0]  != 0x16)
-     || (packet->payload[1]  != 0xfe) /* We ignore old DTLS versions */
-     || ((packet->payload[2] != 0xff) && (packet->payload[2] != 0xfd))
-     || ((ntohs(*((u_int16_t*)&packet->payload[11]))+13) != packet->payload_packet_len)
-    ) {
-  no_dtls:
-
-#ifdef DEBUG_TLS
-    printf("[TLS] No DTLS found\n");
-#endif
-
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return(0); /* Giveup */
-  }
-
-  // handshake_type = packet->payload[13];
-  handshake_len  = (packet->payload[14] << 16) + (packet->payload[15] << 8) + packet->payload[16];
-
-  if((handshake_len+25) != packet->payload_packet_len)
-    goto no_dtls;
-
   /* Overwriting packet payload */
   p = packet->payload, p_len = packet->payload_packet_len; /* Backup */
-  packet->payload = &packet->payload[13], packet->payload_packet_len -= 13;
 
-  processTLSBlock(ndpi_struct, flow);
+  /* Split the element in blocks */
+  processed = 0;
+  while(processed + 13 < p_len) {
+    u_int32_t block_len;
+    const u_int8_t *block = (const u_int8_t *)&p[processed];
+
+    if((block[0] != 0x16 && block[0] != 0x14) || /* Handshake, change-cipher-spec */
+       (block[1] != 0xfe) || /* We ignore old DTLS versions */
+       ((block[2] != 0xff) && (block[2] != 0xfd))) {
+#ifdef DEBUG_TLS
+      printf("[TLS] DTLS invalid block 0x%x or old version 0x%x-0x%x-0x%x\n",
+             block[0], block[1], block[2], block[3]);
+#endif
+      no_dtls = 1;
+      break;
+    }
+    block_len = ntohs(*((u_int16_t*)&block[11]));
+#ifdef DEBUG_TLS
+    printf("[TLS] DTLS block len: %d\n", block_len);
+#endif
+    if (block_len == 0 || (processed + block_len + 12 >= p_len)) {
+#ifdef DEBUG_TLS
+      printf("[TLS] DTLS invalid block len %d (processed %d, p_len %d)\n",
+             block_len, processed, p_len);
+#endif
+      no_dtls = 1;
+      break;
+    }
+    /* We process only handshake msgs */
+    if(block[0] == 0x16) {
+      if (processed + block_len + 13 > p_len) {
+#ifdef DEBUG_TLS
+        printf("[TLS] DTLS invalid len %d %d %d\n", processed, block_len, p_len);
+#endif
+        no_dtls = 1;
+        break;
+     }
+      /* TODO: handle (certificate) fragments */
+      handshake_len = (block[14] << 16) + (block[15] << 8) + block[16];
+      if((handshake_len + 12) != block_len) {
+#ifdef DEBUG_TLS
+        printf("[TLS] DTLS invalid handshake_len %d, %d)\n",
+               handshake_len, block_len);
+#endif
+        no_dtls = 1;
+        break;
+      }
+      packet->payload = &block[13];
+      packet->payload_packet_len = block_len;
+      processTLSBlock(ndpi_struct, flow);
+    } else {
+      /* Change-cipher-spec: any subsequent block might be encrypted */
+#ifdef DEBUG_TLS
+      printf("[TLS] Change-cipher-spec\n");
+#endif
+      change_cipher_found = 1;
+      processed += block_len + 13;
+      break;
+    }
+
+    processed += block_len + 13;
+  }
+  if(processed != p_len) {
+#ifdef DEBUG_TLS
+    printf("[TLS] DTLS invalid processed len %d/%d (%d)\n", processed, p_len, change_cipher_found);
+#endif
+    if(!change_cipher_found)
+      no_dtls = 1;
+  }
 
   packet->payload = p;
   packet->payload_packet_len = p_len; /* Restore */
 
-  ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
-
-  return(1); /* Keep working */
+  if(no_dtls || change_cipher_found) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return(0); /* That's all */
+  } else {
+    return(1); /* Keep working */
+  }
 }
 
 /* **************************************** */

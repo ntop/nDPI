@@ -6972,6 +6972,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     switch(proto) {
     case NDPI_PROTOCOL_TLS:
+    case NDPI_PROTOCOL_DTLS:
       if(flow->l4.tcp.tls.certificate_processed) return(0);
 
       if(flow->l4.tcp.tls.num_tls_blocks <= ndpi_str->num_tls_blocks_to_follow) {
