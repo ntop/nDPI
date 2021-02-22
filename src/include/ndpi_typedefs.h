@@ -91,6 +91,7 @@ typedef enum {
   NDPI_HTTP_SUSPICIOUS_CONTENT,
   NDPI_RISKY_ASN,
   NDPI_RISKY_DOMAIN,
+  NDPI_MALICIOUS_JA3,
 
   
   /* Leave this as last member */
@@ -1099,7 +1100,8 @@ struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa, /* TOR */
-    risky_domain_automa, tls_cert_subject_automa;
+    risky_domain_automa, tls_cert_subject_automa,
+    malicious_ja3_automa;
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
   
   struct {

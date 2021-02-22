@@ -1576,9 +1576,18 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			      md5_hash[i]);
 		if(rc > 0) j += rc; else break;
 	      }
+	      
 #ifdef DEBUG_TLS
 	      printf("[JA3] Client: %s \n", flow->protos.tls_quic_stun.tls_quic.ja3_client);
 #endif
+	      
+	      if(ndpi_struct->malicious_ja3_automa.ac_automa != NULL) {
+		u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_ja3_automa.ac_automa,
+						  flow->protos.tls_quic_stun.tls_quic.ja3_client);
+		
+		if(rc1 > 0)
+		  NDPI_SET_BIT(flow->risk, NDPI_MALICIOUS_JA3);
+	      }	      
 	    }
 
 	    /* Before returning to the caller we need to make a final check */
