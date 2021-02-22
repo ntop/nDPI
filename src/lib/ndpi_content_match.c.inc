@@ -9118,6 +9118,17 @@ static ndpi_protocol_match host_match[] =
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE }
   };
 
+/* ******************************************************************** */
+
+static ndpi_tls_cert_name_match tls_certificate_match [] = {
+  { "CN=AnyDesk Client",               NDPI_PROTOCOL_ANYDESK   },
+  { "O=Kakao",                         NDPI_PROTOCOL_KAKAOTALK },
+  { "O=ntop.org",                      NDPI_PROTOCOL_NTOP      },
+  { "CN=simplednscrypt.org",           NDPI_PROTOCOL_DNSCRYPT  },
+  { "CN=*.gateway.messenger.live.com", NDPI_PROTOCOL_SKYPE     },
+
+  { NULL, 0 }
+};
 
 /* ******************************************************************** */
 

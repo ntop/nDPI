@@ -205,7 +205,7 @@ char *ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_str, u_int 
 u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name) {
   u_int16_t i, num = ndpi_get_num_supported_protocols(ndpi_str);
 
-  for (i = 0; i < num; i++)
+  for(i = 0; i < num; i++)
     if(strcasecmp(ndpi_get_proto_by_id(ndpi_str, i), name) == 0)
       return(i);
 
@@ -350,7 +350,7 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str, ndpi
   memcpy(&ndpi_str->proto_defaults[protoId].master_tcp_protoId, tcp_master_protoId, 2 * sizeof(u_int16_t));
   memcpy(&ndpi_str->proto_defaults[protoId].master_udp_protoId, udp_master_protoId, 2 * sizeof(u_int16_t));
 
-  for (j = 0; j < MAX_DEFAULT_PORTS; j++) {
+  for(j = 0; j < MAX_DEFAULT_PORTS; j++) {
     if(udpDefPorts[j].port_low != 0)
       addDefaultPort(ndpi_str, &udpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->udpRoot,
 		     __FUNCTION__, __LINE__);
@@ -397,7 +397,7 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str, ndpi_p
                            const char *_func, int _line) {
   u_int16_t port;
 
-  for (port = range->port_low; port <= range->port_high; port++) {
+  for(port = range->port_low; port <= range->port_high; port++) {
     ndpi_default_ports_tree_node_t *node =
       (ndpi_default_ports_tree_node_t *) ndpi_malloc(sizeof(ndpi_default_ports_tree_node_t));
     ndpi_default_ports_tree_node_t *ret;
@@ -432,7 +432,7 @@ static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
   ndpi_default_ports_tree_node_t node;
   u_int16_t port;
 
-  for (port = range->port_low; port <= range->port_high; port++) {
+  for(port = range->port_low; port <= range->port_high; port++) {
     ndpi_default_ports_tree_node_t *ret;
 
     node.proto = def, node.default_port = port;
@@ -475,14 +475,16 @@ static u_int8_t ndpi_is_middle_string_char(char c) {
 
 /* ****************************************************** */
 
-static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, ndpi_automa *automa, char *value,
-                                 u_int16_t protocol_id, ndpi_protocol_category_t category, ndpi_protocol_breed_t breed,
+static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
+				 ndpi_automa *automa, char *value,
+                                 u_int16_t protocol_id, ndpi_protocol_category_t category,
+				 ndpi_protocol_breed_t breed,
                                  u_int8_t free_str_on_duplicate, u_int8_t add_ends_with) {
   AC_PATTERN_t ac_pattern;
   AC_ERROR_t rc;
   char buf[96];
   u_int len, dot;
-  
+
   if(protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] protoId=%d: INTERNAL ERROR\n", protocol_id);
     return(-1);
@@ -494,20 +496,23 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, 
   len = strlen(value);
   dot = len -1;
 
+  memset(&ac_pattern, 0, sizeof(ac_pattern));
+  
   if((!add_ends_with) || ndpi_is_middle_string_char(value[dot])) {
     ac_pattern.length = len;
     ac_pattern.astring = value;
   } else {
     u_int mlen = sizeof(buf)-2;
-    
+
     len = ndpi_min(len, mlen);
     ac_pattern.length = snprintf(buf, mlen, "%s$", value);
     free(value);
     value = ndpi_strdup(buf);
     ac_pattern.astring = value;
   }
-  
-  ac_pattern.rep.number = protocol_id, ac_pattern.rep.category = (u_int16_t) category, ac_pattern.rep.breed = (u_int16_t) breed;
+
+  ac_pattern.rep.number = protocol_id, ac_pattern.rep.category = (u_int16_t) category,
+    ac_pattern.rep.breed = (u_int16_t) breed;
 
 #ifdef MATCH_DEBUG
   printf("Adding to automa [%s][protocol_id: %u][category: %u][breed: %u]\n",
@@ -515,9 +520,10 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str, 
 #endif
 
   rc = ac_automata_add(((AC_AUTOMATA_t *) automa->ac_automa), &ac_pattern);
+
   if((rc != ACERR_DUPLICATE_PATTERN) && (rc != ACERR_SUCCESS))
     return(-2);
-  
+
   if((rc == ACERR_DUPLICATE_PATTERN) && free_str_on_duplicate)
     ndpi_free(value);
 
@@ -563,7 +569,8 @@ static int ndpi_remove_host_url_subprotocol(struct ndpi_detection_module_struct 
 
 /* ******************************************************************** */
 
-void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str, ndpi_protocol_match *match) {
+void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
+			      ndpi_protocol_match *match) {
   u_int16_t no_master[2] = {NDPI_PROTOCOL_NO_MASTER_PROTO, NDPI_PROTOCOL_NO_MASTER_PROTO};
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
 
@@ -589,12 +596,12 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str, ndp
 
 /* ******************************************************************** */
 
-/* Self check function to be called onli for testing purposes */
+/* Self check function to be called only for testing purposes */
 void ndpi_self_check_host_match() {
   u_int32_t i, j;
 
-  for (i = 0; host_match[i].string_to_match != NULL; i++) {
-    for (j = 0; host_match[j].string_to_match != NULL; j++) {
+  for(i = 0; host_match[i].string_to_match != NULL; i++) {
+    for(j = 0; host_match[j].string_to_match != NULL; j++) {
       if((i != j) && (strcmp(host_match[i].string_to_match, host_match[j].string_to_match) == 0)) {
 	printf("[INTERNAL ERROR]: Duplicate string detected '%s' [id: %u, id %u]\n",
 	       host_match[i].string_to_match, i, j);
@@ -610,8 +617,24 @@ void ndpi_self_check_host_match() {
 static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_str) {
   int i;
 
-  for (i = 0; host_match[i].string_to_match != NULL; i++)
+  for(i = 0; host_match[i].string_to_match != NULL; i++)
     ndpi_init_protocol_match(ndpi_str, &host_match[i]);
+
+  /* ************************ */
+  
+  for(i = 0; tls_certificate_match[i].string_to_match != NULL; i++) {
+#if 0
+    printf("%s() %s / %u\n", __FUNCTION__,
+	   tls_certificate_match[i].string_to_match,
+	   tls_certificate_match[i].protocol_id);
+#endif
+    
+    ndpi_add_string_value_to_automa(ndpi_str->tls_cert_subject_automa.ac_automa,
+				    tls_certificate_match[i].string_to_match,
+				    tls_certificate_match[i].protocol_id);
+  }
+
+  /* ************************ */
 
   ndpi_enable_loaded_categories(ndpi_str);
 
@@ -619,10 +642,10 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   // ac_automata_display(ndpi_str->host_automa.ac_automa, 'n');
 #endif
 
-  for (i = 0; ndpi_en_bigrams[i] != NULL; i++)
+  for(i = 0; ndpi_en_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_bigrams[i], 1, 1, 1, 0, 0);
 
-  for (i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
+  for(i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
     ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa, (char *) ndpi_en_impossible_bigrams[i], 1,
 			  1, 1, 0, 0);
 }
@@ -657,7 +680,7 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
 static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   int i;
 
-  for (i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
+  for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
     if(ndpi_str->proto_defaults[i].protoName == NULL) {
       NDPI_LOG_ERR(ndpi_str,
 		   "[NDPI] INTERNAL ERROR missing protoName initialization for [protoId=%d]: recovering\n", i);
@@ -1578,7 +1601,8 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 
 #ifdef MATCH_DEBUG
   printf("Searching [to search: %s/%u][pattern: %s/%u] [len: %d][match_num: %u][%s]\n", buf,
-	 (unigned int) txt->length, m->patterns->astring, (unigned int) m->patterns->length, min_len, m->match_num,
+	 (unsigned int) txt->length, m->patterns->astring,
+	 (unsigned int) m->patterns->length, min_len, m->match_num,
 	 m->patterns->astring);
 #endif
 
@@ -1785,7 +1809,7 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
   }
 
-  while (1) {
+  while(1) {
     line = fgets(buffer, sizeof(buffer), fd);
 
     if(line == NULL)
@@ -1824,7 +1848,7 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
                                  u_int8_t skip_tor_hosts) {
   int i;
 
-  for (i = 0; host_list[i].network != 0x0; i++) {
+  for(i = 0; host_list[i].network != 0x0; i++) {
     struct in_addr pin;
     patricia_node_t *node;
 
@@ -2117,8 +2141,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->content_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->impossible_bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
+  ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
-  
+
   if((sizeof(categories) / sizeof(char *)) != NDPI_PROTOCOL_NUM_CATEGORIES) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] invalid categories length: expected %u, got %u\n", NDPI_PROTOCOL_NUM_CATEGORIES,
 		 (unsigned int) (sizeof(categories) / sizeof(char *)));
@@ -2138,7 +2163,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   ndpi_init_protocol_defaults(ndpi_str);
 
-  for (i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
+  for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
     snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 	     (unsigned int) (i + 1));
 
@@ -2147,10 +2172,10 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
 /* *********************************************** */
 
-void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) {
+void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
-  for (i = 0; i < 5; i++) {
+  for(i = 0; i < 99; i++) {
     ndpi_automa *automa;
 
     switch(i) {
@@ -2174,9 +2199,12 @@ void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str) 
       automa = &ndpi_str->risky_domain_automa;
       break;
 
-    default:
-      automa = NULL;
+    case 5:
+      automa = &ndpi_str->tls_cert_subject_automa;
       break;
+
+    default:
+      return;
     }
 
     if(automa && automa->ac_automa) {
@@ -2392,7 +2420,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
   if(ndpi_str != NULL) {
     int i;
 
-    for (i = 0; i < (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS); i++) {
+    for(i = 0; i < (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS); i++) {
       if(ndpi_str->proto_defaults[i].protoName)
 	ndpi_free(ndpi_str->proto_defaults[i].protoName);
     }
@@ -2433,7 +2461,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->risky_domain_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->risky_domain_automa.ac_automa, 0);
-    
+
+    if(ndpi_str->tls_cert_subject_automa.ac_automa != NULL)
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->tls_cert_subject_automa.ac_automa, 0);
+
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
 			  1 /* free patterns strings memory */);
@@ -2453,7 +2484,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 #endif
 
     ndpi_free_geeoip(ndpi_str);
-    
+
     ndpi_free(ndpi_str);
   }
 }
@@ -2651,7 +2682,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
   } else
     at[0] = 0, proto = &at[1];
 
-  for (i = 0; proto[i] != '\0'; i++) {
+  for(i = 0; proto[i] != '\0'; i++) {
     switch(proto[i]) {
     case '/':
     case '&':
@@ -2666,7 +2697,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     }
   }
 
-  for (i = 0, def = NULL; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
+  for(i = 0, def = NULL; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
     if(ndpi_str->proto_defaults[i].protoName
        && strcasecmp(ndpi_str->proto_defaults[i].protoName, proto) == 0) {
       def = &ndpi_str->proto_defaults[i];
@@ -2702,7 +2733,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     }
   }
 
-  while ((elem = strsep(&rule, ",")) != NULL) {
+  while((elem = strsep(&rule, ",")) != NULL) {
     char *attr = elem, *value = NULL;
     ndpi_port_range range;
     int is_tcp = 0, is_udp = 0, is_ip = 0;
@@ -2779,7 +2810,7 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
     return(-1);
   }
 
-  while (1) {
+  while(1) {
     line = fgets(buffer, sizeof(buffer), fd);
 
     if(line == NULL)
@@ -2821,9 +2852,9 @@ static int ndpi_load_risky_domain(struct ndpi_detection_module_struct *ndpi_str,
   if(ndpi_str->risky_domain_automa.ac_automa) {
     char buf[64];
     u_int i, len;
-    
+
     snprintf(buf, sizeof(buf)-1, "%s$", domain_name);
-    for (i = 0, len = strlen(buf)-1 /* Skip $ */; i < len; i++) buf[i] = tolower(buf[i]);    
+    for(i = 0, len = strlen(buf)-1 /* Skip $ */; i < len; i++) buf[i] = tolower(buf[i]);
 
     return(ndpi_add_string_to_automa(ndpi_str->risky_domain_automa.ac_automa, buf));
   }
@@ -2865,7 +2896,7 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
       continue;
 
     line[len - 1] = '\0';
-    
+
     if(ndpi_load_risky_domain(ndpi_str, line) >= 0)
       num++;
   }
@@ -2874,7 +2905,7 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
 
   if(ndpi_str->risky_domain_automa.ac_automa)
     ac_automata_finalize((AC_AUTOMATA_t *)ndpi_str->risky_domain_automa.ac_automa);
-  
+
   return(num);
 }
 
@@ -2915,11 +2946,11 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
     goto close_fd;
   }
 
-  while (1) {
+  while(1) {
     char *line = buffer;
     int line_len = buffer_len;
 
-    while ((line = fgets(line, line_len, fd)) != NULL && line[strlen(line) - 1] != '\n') {
+    while((line = fgets(line, line_len, fd)) != NULL && line[strlen(line) - 1] != '\n') {
       i = strlen(line);
       old_buffer = buffer;
       old_buffer_len = buffer_len;
@@ -3512,7 +3543,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* now build the specific buffer for tcp, udp and non_tcp_udp */
   ndpi_str->callback_buffer_size_tcp_payload = 0;
   ndpi_str->callback_buffer_size_tcp_no_payload = 0;
-  for (a = 0; a < ndpi_str->callback_buffer_size; a++) {
+  for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
     if((ndpi_str->callback_buffer[a].ndpi_selection_bitmask &
 	(NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
 	 NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0) {
@@ -3539,7 +3570,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   }
 
   ndpi_str->callback_buffer_size_udp = 0;
-  for (a = 0; a < ndpi_str->callback_buffer_size; a++) {
+  for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
     if((ndpi_str->callback_buffer[a].ndpi_selection_bitmask &
 	(NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
 	 NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0) {
@@ -3554,7 +3585,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   }
 
   ndpi_str->callback_buffer_size_non_tcp_udp = 0;
-  for (a = 0; a < ndpi_str->callback_buffer_size; a++) {
+  for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
     if((ndpi_str->callback_buffer[a].ndpi_selection_bitmask &
 	(NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
 	 NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)) == 0 ||
@@ -3584,7 +3615,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
  */
 int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t **l4ptr,
                                        u_int16_t *l4len, u_int8_t *nxt_hdr) {
-  while ((*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
+  while((*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
     u_int16_t ehdr_len;
 
     // no next header
@@ -3796,49 +3827,49 @@ void ndpi_apply_flow_protocol_to_packet(struct ndpi_flow_struct *flow, struct nd
 /* ****************************************************** */
 
 void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
-    if (flow) {
-        if (flow->http.url)
+    if(flow) {
+        if(flow->http.url)
             ndpi_free(flow->http.url);
 
-        if (flow->http.content_type)
+        if(flow->http.content_type)
             ndpi_free(flow->http.content_type);
 
-        if (flow->http.request_content_type)
+        if(flow->http.request_content_type)
             ndpi_free(flow->http.request_content_type);
 
-        if (flow->http.user_agent)
+        if(flow->http.user_agent)
             ndpi_free(flow->http.user_agent);
 
-        if (flow->kerberos_buf.pktbuf)
+        if(flow->kerberos_buf.pktbuf)
             ndpi_free(flow->kerberos_buf.pktbuf);
 
-        if (flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
+        if(flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
             flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
             flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
             flow_is_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS) ||
             flow_is_proto(flow, NDPI_PROTOCOL_MAIL_POPS) ||
             flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS)) {
-            if (flow->protos.tls_quic_stun.tls_quic.server_names)
+            if(flow->protos.tls_quic_stun.tls_quic.server_names)
                 ndpi_free(flow->protos.tls_quic_stun.tls_quic.server_names);
 
-            if (flow->protos.tls_quic_stun.tls_quic.alpn)
+            if(flow->protos.tls_quic_stun.tls_quic.alpn)
                 ndpi_free(flow->protos.tls_quic_stun.tls_quic.alpn);
 
-            if (flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
+            if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
                 ndpi_free(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
 
-            if (flow->protos.tls_quic_stun.tls_quic.issuerDN)
+            if(flow->protos.tls_quic_stun.tls_quic.issuerDN)
                 ndpi_free(flow->protos.tls_quic_stun.tls_quic.issuerDN);
 
-            if (flow->protos.tls_quic_stun.tls_quic.subjectDN)
+            if(flow->protos.tls_quic_stun.tls_quic.subjectDN)
                 ndpi_free(flow->protos.tls_quic_stun.tls_quic.subjectDN);
 
-            if (flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni)
+            if(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni)
                 ndpi_free(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni);
         }
 
-        if (flow->l4_proto == IPPROTO_TCP) {
-            if (flow->l4.tcp.tls.message.buffer)
+        if(flow->l4_proto == IPPROTO_TCP) {
+            if(flow->l4.tcp.tls.message.buffer)
                 ndpi_free(flow->l4.tcp.tls.message.buffer);
 #ifdef FRAG_MAN
             free_fragment(&flow->tcp_segments_list[0]);
@@ -3946,7 +3977,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 #ifdef FRAG_MAN
         /* initialize the buffer to manage segments for a new http/dns connection */
         flow->tcp_segments_management=1;
-        for (int i=0; i<2; i++ ) {
+        for(int i=0; i<2; i++ ) {
           // reset counter tcp segments management lists
           flow->tcp_segments_list[i].ct_frag=0;
         }
@@ -4150,7 +4181,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	  func = ndpi_str->proto_defaults[flow->guessed_protocol_id].func, num_calls++;
     }
 
-    for (a = 0; a < ndpi_str->callback_buffer_size_non_tcp_udp; a++) {
+    for(a = 0; a < ndpi_str->callback_buffer_size_non_tcp_udp; a++) {
       if((func != ndpi_str->callback_buffer_non_tcp_udp[a].func) &&
 	 (ndpi_str->callback_buffer_non_tcp_udp[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
 	 ndpi_str->callback_buffer_non_tcp_udp[a].ndpi_selection_bitmask &&
@@ -4194,7 +4225,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-      for (a = 0; a < ndpi_str->callback_buffer_size_udp; a++) {
+      for(a = 0; a < ndpi_str->callback_buffer_size_udp; a++) {
 	if((func != ndpi_str->callback_buffer_udp[a].func) &&
 	   (ndpi_str->callback_buffer_udp[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
 	   ndpi_str->callback_buffer_udp[a].ndpi_selection_bitmask &&
@@ -4253,7 +4284,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       }
 
       if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-	for (a = 0; a < ndpi_str->callback_buffer_size_tcp_payload; a++) {
+	for(a = 0; a < ndpi_str->callback_buffer_size_tcp_payload; a++) {
 	  if((func != ndpi_str->callback_buffer_tcp_payload[a].func) &&
 	     (ndpi_str->callback_buffer_tcp_payload[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
 	     ndpi_str->callback_buffer_tcp_payload[a].ndpi_selection_bitmask &&
@@ -4286,7 +4317,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	    func = ndpi_str->proto_defaults[flow->guessed_protocol_id].func, num_calls++;
       }
 
-      for (a = 0; a < ndpi_str->callback_buffer_size_tcp_no_payload; a++) {
+      for(a = 0; a < ndpi_str->callback_buffer_size_tcp_no_payload; a++) {
 	if((func != ndpi_str->callback_buffer_tcp_payload[a].func) &&
 	   (ndpi_str->callback_buffer_tcp_no_payload[a].ndpi_selection_bitmask & *ndpi_selection_packet) ==
 	   ndpi_str->callback_buffer_tcp_no_payload[a].ndpi_selection_bitmask &&
@@ -4571,7 +4602,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     u_int len;
     AC_PATTERN_t ac_pattern;
     AC_ERROR_t rc;
-    
+
     if(name_to_add == NULL)
       return(-1);
     else
@@ -4632,7 +4663,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     int i;
 
     /* First add the nDPI known categories matches */
-    for (i = 0; category_match[i].string_to_match != NULL; i++)
+    for(i = 0; category_match[i].string_to_match != NULL; i++)
       ndpi_load_category(ndpi_str, category_match[i].string_to_match, category_match[i].protocol_category);
 
     /* Free */
@@ -4951,7 +4982,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       /* This is a custom protocol and it has priority over everything else */
       ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
 
-      //num_calls = 
+      //num_calls =
       ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
 
       //if(ndpi_str->ndpi_num_custom_protocols != 0)
@@ -5067,7 +5098,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(a != NDPI_PROTOCOL_UNKNOWN) {
       int i;
 
-      for (i = 0; i < sizeof(flow->host_server_name); i++) {
+      for(i = 0; i < sizeof(flow->host_server_name); i++) {
 	if(flow->host_server_name[i] != '\0')
 	  flow->host_server_name[i] = tolower(flow->host_server_name[i]);
 	else {
@@ -5204,7 +5235,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     val = 0;
 
     // cancel if eof, ' ' or line end chars are reached
-    while (*str >= '0' && *str <= '9' && max_chars_to_read > 0) {
+    while(*str >= '0' && *str <= '9' && max_chars_to_read > 0) {
       val *= 10;
       val += *str - '0';
       str++;
@@ -5229,7 +5260,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       max_chars_to_read -= 2;
       *bytes_read = *bytes_read + 2;
 
-      while (max_chars_to_read > 0) {
+      while(max_chars_to_read > 0) {
 	if(*str >= '0' && *str <= '9') {
 	  val *= 16;
 	  val += *str - '0';
@@ -5259,7 +5290,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     u_int64_t val;
     val = 0;
     // cancel if eof, ' ' or line end chars are reached
-    while (max_chars_to_read > 0 && *str >= '0' && *str <= '9') {
+    while(max_chars_to_read > 0 && *str >= '0' && *str <= '9') {
       val *= 10;
       val += *str - '0';
       str++;
@@ -5282,7 +5313,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       str += 2;
       max_chars_to_read -= 2;
       *bytes_read = *bytes_read + 2;
-      while (max_chars_to_read > 0) {
+      while(max_chars_to_read > 0) {
 	if(*str >= '0' && *str <= '9') {
 	  val *= 16;
 	  val += *str - '0';
@@ -5364,7 +5395,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     packet->line[packet->parsed_lines].ptr = packet->payload;
     packet->line[packet->parsed_lines].len = 0;
 
-    for (a = 0; ((a+1) < packet->payload_packet_len) && (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
+    for(a = 0; ((a+1) < packet->payload_packet_len) && (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
       if((packet->payload[a] == 0x0d) && (packet->payload[a+1] == 0x0a)) {
 	/* If end of line char sequence CR+NL "\r\n", process line */
 
@@ -5460,7 +5491,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	  packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
 	  packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
 
-	  while ((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
+	  while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
 	    packet->content_line.len--, packet->content_line.ptr++;
 
 	  packet->http_num_headers++;
@@ -5478,7 +5509,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	  char separator[] = {';', '\r', '\0'};
 	  int i;
 
-	  for (i = 0; separator[i] != '\0'; i++) {
+	  for(i = 0; separator[i] != '\0'; i++) {
 	    char *c = memchr((char *) packet->content_line.ptr, separator[i], packet->content_line.len);
 
 	    if(c != NULL)
@@ -5632,7 +5663,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     packet->line[packet->parsed_lines].ptr = packet->payload;
     packet->line[packet->parsed_lines].len = 0;
 
-    for (a = 0; a < end; a++) {
+    for(a = 0; a < end; a++) {
       if(packet->payload[a] == 0x0a) {
 	packet->line[packet->parsed_lines].len = (u_int16_t)(
 							     ((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
@@ -5669,7 +5700,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 						packet->payload[counter] == '-' || packet->payload[counter] == '_')) {
       NDPI_LOG_DBG2(ndpi_str, "first letter\n");
       counter++;
-      while (packet->payload_packet_len > counter &&
+      while(packet->payload_packet_len > counter &&
 	     ((packet->payload[counter] >= 'a' && packet->payload[counter] <= 'z') ||
 	      (packet->payload[counter] >= 'A' && packet->payload[counter] <= 'Z') ||
 	      (packet->payload[counter] >= '0' && packet->payload[counter] <= '9') ||
@@ -5680,7 +5711,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	if(packet->payload_packet_len > counter && packet->payload[counter] == '@') {
 	  NDPI_LOG_DBG2(ndpi_str, "@\n");
 	  counter++;
-	  while (packet->payload_packet_len > counter &&
+	  while(packet->payload_packet_len > counter &&
 		 ((packet->payload[counter] >= 'a' && packet->payload[counter] <= 'z') ||
 		  (packet->payload[counter] >= 'A' && packet->payload[counter] <= 'Z') ||
 		  (packet->payload[counter] >= '0' && packet->payload[counter] <= '9') ||
@@ -5860,7 +5891,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   void ndpi_int_reset_packet_protocol(struct ndpi_packet_struct *packet) {
     int a;
 
-    for (a = 0; a < NDPI_PROTOCOL_SIZE; a++)
+    for(a = 0; a < NDPI_PROTOCOL_SIZE; a++)
       packet->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;
   }
 
@@ -5870,7 +5901,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(flow) {
       int a;
 
-      for (a = 0; a < NDPI_PROTOCOL_SIZE; a++)
+      for(a = 0; a < NDPI_PROTOCOL_SIZE; a++)
 	flow->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;
     }
   }
@@ -6290,7 +6321,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int ndpi_get_protocol_id(struct ndpi_detection_module_struct *ndpi_str, char *proto) {
     int i;
 
-    for (i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
+    for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
       if(strcasecmp(proto, ndpi_str->proto_defaults[i].protoName) == 0)
 	return(i);
 
@@ -6302,7 +6333,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_str, char *cat) {
     int i;
 
-    for (i = 0; i < NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
+    for(i = 0; i < NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
       const char *name = ndpi_category_get_name(ndpi_str, i);
 
       if(strcasecmp(cat, name) == 0)
@@ -6317,7 +6348,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str) {
     int i;
 
-    for (i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
+    for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
       printf("%3d %-22s %-8s %-12s %s\n", i, ndpi_str->proto_defaults[i].protoName,
 	     ndpi_get_l4_proto_name(ndpi_get_l4_proto_info(ndpi_str, i)),
 	     ndpi_get_proto_breed_name(ndpi_str, ndpi_str->proto_defaults[i].protoBreed),
@@ -6342,10 +6373,10 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	do {
 	  if(slen-- < 1 || (sc = *s++) == '\0')
 	    return(NULL);
-	} while (sc != c);
+	} while(sc != c);
 	if(len > slen)
 	  return(NULL);
-      } while (strncmp(s, find, len) != 0);
+      } while(strncmp(s, find, len) != 0);
       s--;
     }
 
@@ -6397,7 +6428,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       return(NDPI_PROTOCOL_UNKNOWN);
 
     if(!automa->ac_automa_finalized) {
-      printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initalization()\n", __FILE__, __LINE__);
+      printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initialization()\n", __FILE__, __LINE__);
       return(0); /* No matches */
     }
 
@@ -6499,11 +6530,11 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     ndpi_protocol_category_t id;
     char buf[96];
 
-    buf_len = ndpi_min(string_to_match_len, sizeof(buf)-2);    
+    buf_len = ndpi_min(string_to_match_len, sizeof(buf)-2);
     for(i=0; i<buf_len; i++) buf[i] = tolower(string_to_match[i]);
     buf[i++] = '$'; /* Add trailer $ */
     buf[i] = '\0';
-    
+
     rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, buf, i,
 					      master_protocol_id, ret_match, 1);
     id = ret_match->protocol_category;
@@ -6517,11 +6548,11 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     if(ndpi_str->risky_domain_automa.ac_automa != NULL) {
       u_int16_t rc1 = ndpi_match_string(ndpi_str->risky_domain_automa.ac_automa, buf);
-      
+
       if(rc1 > 0)
-	NDPI_SET_BIT(flow->risk, NDPI_RISKY_DOMAIN);      
+	NDPI_SET_BIT(flow->risk, NDPI_RISKY_DOMAIN);
     }
-    
+
     return(rc);
   }
 
@@ -6574,9 +6605,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     if(!automa->ac_automa_finalized) {
 #if 1
-      ndpi_finalize_initalization(ndpi_str);
+      ndpi_finalize_initialization(ndpi_str);
 #else
-      printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initalization()\n", __FILE__, __LINE__);
+      printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initialization()\n", __FILE__, __LINE__);
       return(0); /* No matches */
 #endif
     }
@@ -6639,7 +6670,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b) {
     int i;
 
-    for (i = 0; i < NDPI_NUM_FDS_BITS; i++) {
+    for(i = 0; i < NDPI_NUM_FDS_BITS; i++) {
       if(a.fds_bits[i] & b.fds_bits[i])
 	return(1);
     }
@@ -6651,7 +6682,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a) {
     int i;
 
-    for (i = 0; i < NDPI_NUM_FDS_BITS; i++)
+    for(i = 0; i < NDPI_NUM_FDS_BITS; i++)
       if(a.fds_bits[i] != 0)
 	return(0);
 
@@ -6661,7 +6692,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
     int i;
 
-    for (i = 0; i < NDPI_NUM_FDS_BITS; i++)
+    for(i = 0; i < NDPI_NUM_FDS_BITS; i++)
       printf("[%d=%u]", i, a.fds_bits[i]);
 
     printf("\n");

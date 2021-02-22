@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
   assert(ndpi_str != NULL);
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
-  ndpi_finalize_initalization(ndpi_str);
+  ndpi_finalize_initialization(ndpi_str);
   assert(ndpi_str != NULL);
   int num_detections = 0;
 

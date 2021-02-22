@@ -1,0 +1,12 @@
+AnyDesk	2083	346113	4
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.187            	 1      
+	2	 192.168.1.178            	 1      
+
+
+	1	TCP 192.168.1.187:54164 <-> 192.168.1.178:7070 [proto: 91.252/TLS.AnyDesk][cat: Web/5][509 pkts/226247 bytes <-> 1555 pkts/115282 bytes][Goodput ratio: 88/22][22.84 sec][bytes ratio: 0.325 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 48/14 2966/3021 229/106][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 444/74 1511/1514 475/47][Risk: ** TLS (probably) not carrying HTTPS **** SNI TLS extension was missing **][TLSv1.2][JA3C: 3f2fba0262b1a22b739126dfb2fe7a7d][JA3S: ee644a8a34c434abca4b737ec1d9efad][Subject: CN=AnyDesk Client, CN=AnyDesk Client][Certificate SHA-1: F8:4E:27:4E:F9:33:35:2F:1A:69:71:D5:02:6B:B8:72:EF:B7:BA:B0][Cipher: TLS_DHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 0,64,6,1,3,1,1,1,0,1,1,0,0,1,1,0,3,0,0,0,0,0,3,1,0,1,1,0,1,0,0,0,0,1,0,0,1,0,0,0,1,0,0,1,0,1,0,0]
+	2	TCP 192.168.1.178:52039 <-> 192.168.1.187:7070 [proto: 91.252/TLS.AnyDesk][cat: Web/5][8 pkts/2035 bytes <-> 7 pkts/2157 bytes][Goodput ratio: 76/82][0.56 sec][bytes ratio: -0.029 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 92/40 406/85 150/33][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 254/308 1340/968 419/387][Risk: ** Weak TLS cipher **** TLS (probably) not carrying HTTPS **** SNI TLS extension was missing **][TLSv1.2][JA3C: 201999283915cc31cee6b15472ef3332][JA3S: 4b505adfb4a921c5a3a39d293b0811e1 (WEAK)][Subject: CN=AnyDesk Client, CN=AnyDesk Client][Certificate SHA-1: 86:4F:2A:9F:24:71:FD:0D:6A:35:56:AC:D8:7B:3A:19:E8:03:CA:2E][Cipher: TLS_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 0,20,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,20,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0]
+	3	UDP 192.168.1.187:55376 <-> 192.168.1.1:53 [proto: 5.252/DNS.AnyDesk][cat: RemoteAccess/12][1 pkts/90 bytes <-> 1 pkts/106 bytes][Goodput ratio: 53/60][0.01 sec][Host: relay-9b6827f2.net.anydesk.com][138.199.36.115][PLAIN TEXT (anydesk)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.1.187:59511 <-> 192.168.1.1:53 [proto: 5.252/DNS.AnyDesk][cat: RemoteAccess/12][1 pkts/90 bytes <-> 1 pkts/106 bytes][Goodput ratio: 53/60][0.01 sec][Host: relay-3185a847.net.anydesk.com][37.61.223.15][PLAIN TEXT (anydesk)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

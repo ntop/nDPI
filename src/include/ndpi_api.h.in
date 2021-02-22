@@ -180,7 +180,7 @@ extern "C" {
    * Returns a new initialized detection module
    * Note that before you can use it you can still load
    * hosts and do other things. As soon as you are ready to use
-   * it do not forget to call first ndpi_finalize_initalization()
+   * it do not forget to call first ndpi_finalize_initialization()
    *
    * You can call this function multiple times, (i.e. to create multiple
    * indipendent detection contexts) but all these calls MUST NOT run
@@ -198,7 +198,7 @@ extern "C" {
    * @par ndpi_str = the struct created for the protocol detection
    *
    */
-  void ndpi_finalize_initalization(struct ndpi_detection_module_struct *ndpi_str);
+  void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
 
   /**
    * Frees the dynamic memory allocated members in the specified flow

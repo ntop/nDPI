@@ -1099,8 +1099,8 @@ struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     bigrams_automa, impossible_bigrams_automa, /* TOR */
-    risky_domain_automa;
-  /* IMPORTANT: please update ndpi_finalize_initalization() whenever you add a new automa */
+    risky_domain_automa, tls_cert_subject_automa;
+  /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
   
   struct {
     ndpi_automa hostnames, hostnames_shadow;
@@ -1422,7 +1422,7 @@ struct ndpi_flow_struct {
 
 typedef struct {
   char *string_to_match, *proto_name;
-  int protocol_id;
+  u_int16_t protocol_id;
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match;
@@ -1431,6 +1431,11 @@ typedef struct {
   char *string_to_match;
   ndpi_protocol_category_t protocol_category;
 } ndpi_category_match;
+
+typedef struct {
+  char *string_to_match;
+  u_int16_t protocol_id;
+} ndpi_tls_cert_name_match;
 
 typedef struct {
   u_int32_t network;

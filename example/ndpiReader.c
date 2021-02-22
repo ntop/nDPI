@@ -273,7 +273,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
     return;
 
   ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
-  ndpi_finalize_initalization(ndpi_str);
+  ndpi_finalize_initialization(ndpi_str);
 
   // Display ALL Host strings ie host_match[] ?
   // void ac_automata_display (AC_AUTOMATA_t * thiz, char repcast);
@@ -2060,7 +2060,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   if(_riskyDomainFilePath)
     ndpi_load_risk_domain_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _riskyDomainFilePath);
 
-  ndpi_finalize_initalization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
+  ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 
   if(enable_doh_dot_detection)
     ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 1);
@@ -3505,7 +3505,7 @@ static void dgaUnitTest() {
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
-  ndpi_finalize_initalization(ndpi_str);
+  ndpi_finalize_initialization(ndpi_str);
 
   assert(ndpi_str != NULL);
 

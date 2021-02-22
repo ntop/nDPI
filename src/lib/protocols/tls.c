@@ -3,9 +3,6 @@
  *
  * Copyright (C) 2016-21 - ntop.org
  *
- * This file is part of nDPI, an open source deep packet inspection
- * library based on the OpenDPI and PACE technology by ipoque GmbH
- *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -114,7 +111,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 				struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int avail_bytes;
-  
+
   /* TCP */
 #ifdef DEBUG_TLS_MEMORY
   printf("[TLS Mem] Handling TCP/TLS flow [payload_len: %u][buffer_len: %u][direction: %u]\n",
@@ -137,7 +134,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
   }
 
   avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
-  
+
   if(avail_bytes < packet->payload_packet_len) {
     u_int new_len = flow->l4.tcp.tls.message.buffer_len + packet->payload_packet_len - avail_bytes + 1;
     void *newbuf  = ndpi_realloc(flow->l4.tcp.tls.message.buffer,
@@ -155,7 +152,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 
   if(packet->payload_packet_len > 0 && avail_bytes >= packet->payload_packet_len) {
     u_int8_t ok = 0;
-    
+
     if(flow->l4.tcp.tls.message.next_seq[packet->packet_direction] != 0) {
       if(ntohl(packet->tcp->seq) == flow->l4.tcp.tls.message.next_seq[packet->packet_direction])
 	ok = 1;
@@ -165,13 +162,13 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
     if(ok) {
       memcpy(&flow->l4.tcp.tls.message.buffer[flow->l4.tcp.tls.message.buffer_used],
 	     packet->payload, packet->payload_packet_len);
-      
+
       flow->l4.tcp.tls.message.buffer_used += packet->payload_packet_len;
 #ifdef DEBUG_TLS_MEMORY
       printf("[TLS Mem] Copied data to buffer [%u/%u bytes][direction: %u][tcp_seq: %u][next: %u]\n",
 	     flow->l4.tcp.tls.message.buffer_used, flow->l4.tcp.tls.message.buffer_len,
 	     packet->packet_direction,
-	     ntohl(packet->tcp->seq), 
+	     ntohl(packet->tcp->seq),
 	     ntohl(packet->tcp->seq)+packet->payload_packet_len);
 #endif
 
@@ -181,9 +178,9 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
       printf("[TLS Mem] Skipping packet [%u bytes][direction: %u][tcp_seq: %u][expected next: %u]\n",
 	     flow->l4.tcp.tls.message.buffer_len,
 	     packet->packet_direction,
-	     ntohl(packet->tcp->seq), 
+	     ntohl(packet->tcp->seq),
 	     ntohl(packet->tcp->seq)+packet->payload_packet_len);
-#endif      
+#endif
     }
   }
 }
@@ -519,8 +516,20 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
     }
   }
 
-  if(rdn_len && (flow->protos.tls_quic_stun.tls_quic.subjectDN == NULL))
+  if(rdn_len && (flow->protos.tls_quic_stun.tls_quic.subjectDN == NULL)) {
     flow->protos.tls_quic_stun.tls_quic.subjectDN = ndpi_strdup(rdnSeqBuf);
+
+    if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+      /* No idea what is happening behind the scenes: let's check the certificate */
+      u_int32_t proto_id;
+      int rc = ndpi_match_string_value(ndpi_struct->tls_cert_subject_automa.ac_automa,
+				       rdnSeqBuf, strlen(rdnSeqBuf),&proto_id);
+
+      if(rc == 0)
+	flow->detected_protocol_stack[0] = proto_id,
+	  flow->detected_protocol_stack[1] = NDPI_PROTOCOL_TLS;
+    }
+  }
 
   if(flow->protos.tls_quic_stun.tls_quic.subjectDN && flow->protos.tls_quic_stun.tls_quic.issuerDN
      && (!strcmp(flow->protos.tls_quic_stun.tls_quic.subjectDN, flow->protos.tls_quic_stun.tls_quic.issuerDN)))
@@ -541,7 +550,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t certificates_offset = 7;
   u_int8_t num_certificates_found = 0;
   SHA1_CTX srv_cert_fingerprint_ctx ;
-  
+
 #ifdef DEBUG_TLS
   printf("[TLS] %s() [payload_packet_len=%u][direction: %u][%02X %02X %02X %02X %02X %02X...]\n",
 	 __FUNCTION__, packet->payload_packet_len,
@@ -687,9 +696,9 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 static void ndpi_looks_like_tls(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow) {
   // ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
-  
+
   if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-    flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;   
+    flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 }
 
 /* **************************************** */
@@ -784,19 +793,19 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	processTLSBlock(ndpi_struct, flow);
 	ndpi_looks_like_tls(ndpi_struct, flow);
-	
+
 	processed += packet->payload_packet_len;
       }
     } else {
       /* Process element as a whole */
       if(content_type == 0x17 /* Application Data */) {
 	ndpi_looks_like_tls(ndpi_struct, flow);
-	
-	if(flow->l4.tcp.tls.certificate_processed) {  
+
+	if(flow->l4.tcp.tls.certificate_processed) {
 	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
 	    flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
 	      (packet->packet_direction == 0) ? (len-5) : -(len-5);
-	  
+
 #ifdef DEBUG_TLS_BLOCKS
 	  printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
 		 len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
@@ -868,7 +877,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   // handshake_type = packet->payload[13];
   handshake_len  = (packet->payload[14] << 16) + (packet->payload[15] << 8) + packet->payload[16];
-  
+
   if((handshake_len+25) != packet->payload_packet_len)
     goto no_dtls;
 
@@ -907,7 +916,7 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
 
   if((flow->packet.udp != NULL) && (protocol == NDPI_PROTOCOL_TLS))
     protocol = NDPI_PROTOCOL_DTLS;
-    
+
   if((flow->detected_protocol_stack[0] == protocol)
      || (flow->detected_protocol_stack[1] == protocol)) {
     if(!flow->check_extra_packets)
@@ -921,6 +930,7 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
     protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);
 
   ndpi_set_detected_protocol(ndpi_struct, flow, protocol, protocol);
+
   tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
 
