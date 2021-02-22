@@ -76,7 +76,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 	 sizeof(workflow->stats.protocol_counter_bytes));
   memset(workflow->stats.protocol_flows, 0,
 	 sizeof(workflow->stats.protocol_flows));
-  ndpi_finalize_initalization(workflow->ndpi_struct);
+  ndpi_finalize_initialization(workflow->ndpi_struct);
 
   r = pcap_next_ex(pkts, &header, &pkt);
   while (r > 0) {
