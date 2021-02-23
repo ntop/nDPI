@@ -1574,6 +1574,37 @@ struct ndpi_jitter_struct {
 
 /* **************************************** */
 
+#ifndef WIN32
+#define NDPI_PATRICIA_IPV6
+#else
+#undef NDPI_PATRICIA_IPV6
+#endif
+
+#ifndef AF_MAC
+#define AF_MAC            99
+#endif
+
+typedef struct _ndpi_prefix_t {
+  u_int16_t family;		/* AF_INET | AF_INET6 */
+  u_int16_t bitlen;		/* same as mask? */
+  int ref_count;		/* reference count */
+  union {
+    struct in_addr sin;
+#ifdef NDPI_PATRICIA_IPV6
+    struct in6_addr sin6;
+#endif /* IPV6 */
+    u_int8_t mac[6];
+  } add;
+} ndpi_prefix_t;
+
+typedef void (*ndpi_void_fn_t)(void *data);
+typedef void (*ndpi_void_fn2_t)(ndpi_prefix_t *prefix, void *data);
+
+typedef struct _ndpi_patricia_node_t ndpi_patricia_node_t;
+typedef struct _ndpi_patricia_tree_t ndpi_patricia_tree_t;
+
+/* **************************************** */
+
 typedef struct ndpi_ptree ndpi_ptree_t;
 
 /* **************************************** */

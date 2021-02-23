@@ -166,8 +166,8 @@ char *ndpi_strdup(const char *s) {
 /* Opaque structure defined here */
 struct ndpi_ptree
 {
-  patricia_tree_t *v4;
-  patricia_tree_t *v6;
+  ndpi_patricia_tree_t *v4;
+  ndpi_patricia_tree_t *v6;
 };
 
 /* *********************************************************************************** */
@@ -1660,11 +1660,11 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 
 /* ******************************************************************** */
 
-static int fill_prefix_v4(prefix_t *p, const struct in_addr *a, int b, int mb) {
+int ndpi_fill_prefix_v4(ndpi_prefix_t *p, const struct in_addr *a, int b, int mb) {
   if(b < 0 || b > mb)
     return(-1);
 
-  memset(p, 0, sizeof(prefix_t));
+  memset(p, 0, sizeof(ndpi_prefix_t));
   memcpy(&p->add.sin, a, (mb + 7) / 8);
   p->family = AF_INET;
   p->bitlen = b;
@@ -1675,8 +1675,8 @@ static int fill_prefix_v4(prefix_t *p, const struct in_addr *a, int b, int mb) {
 
 /* ******************************************* */
 
-static int fill_prefix_v6(prefix_t *prefix, const struct in6_addr *addr, int bits, int maxbits) {
-#ifdef PATRICIA_IPV6
+int ndpi_fill_prefix_v6(ndpi_prefix_t *prefix, const struct in6_addr *addr, int bits, int maxbits) {
+#ifdef NDPI_PATRICIA_IPV6
   if(bits < 0 || bits > maxbits)
     return -1;
 
@@ -1687,6 +1687,30 @@ static int fill_prefix_v6(prefix_t *prefix, const struct in6_addr *addr, int bit
 #else
   return(-1);
 #endif
+}
+
+/* ******************************************* */
+
+int ndpi_fill_prefix_mac(ndpi_prefix_t *prefix, u_int8_t *mac, int bits, int maxbits) {
+  if(bits < 0 || bits > maxbits)
+    return -1;
+
+  memcpy(prefix->add.mac, mac, 6);
+  prefix->family = AF_MAC, prefix->bitlen = bits, prefix->ref_count = 0;
+
+  return 0;
+}
+
+/* ******************************************* */
+
+void ndpi_patricia_set_node_u64(ndpi_patricia_node_t *node, u_int64_t value) {
+  node->value.u.uv64 = value;
+}
+
+/* ******************************************* */
+
+u_int64_t ndpi_patricia_get_node_u64(ndpi_patricia_node_t *node) {
+  return(node->value.u.uv64);
 }
 
 /* ******************************************* */
@@ -1707,8 +1731,8 @@ u_int8_t ndpi_is_public_ipv4(u_int32_t a /* host byte order */) {
 
 u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
                                    struct in_addr *pin /* network byte order */) {
-  prefix_t prefix;
-  patricia_node_t *node;
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
 
   if(ndpi_str->ndpi_num_custom_protocols == 0) {
     /*
@@ -1724,7 +1748,7 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
   }
 
   /* Make sure all in network byte order otherwise compares wont work */
-  fill_prefix_v4(&prefix, pin, 32, ((patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->protocols_ptree, &prefix);
 
   return(node ? node->value.u.uv32.user_value : NDPI_PROTOCOL_UNKNOWN);
@@ -1735,11 +1759,11 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
 u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
 					struct in_addr *pin /* network byte order */,
 					u_int16_t port /* network byte order */) {
-  prefix_t prefix;
-  patricia_node_t *node;
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
 
   /* Make sure all in network byte order otherwise compares wont work */
-  fill_prefix_v4(&prefix, pin, 32, ((patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->protocols_ptree, &prefix);
 
   if(node) {
@@ -1776,11 +1800,11 @@ u_int8_t ndpi_is_tor_flow(struct ndpi_detection_module_struct *ndpi_str, struct 
 
 /* ******************************************* */
 
-static patricia_node_t* add_to_ptree(patricia_tree_t *tree, int family, void *addr, int bits) {
-  prefix_t prefix;
-  patricia_node_t *node;
+static ndpi_patricia_node_t* add_to_ptree(ndpi_patricia_tree_t *tree, int family, void *addr, int bits) {
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
 
-  fill_prefix_v4(&prefix, (struct in_addr *) addr, bits, tree->maxbits);
+  ndpi_fill_prefix_v4(&prefix, (struct in_addr *) addr, bits, tree->maxbits);
 
   node = ndpi_patricia_lookup(tree, &prefix);
   if(node) memset(&node->value, 0, sizeof(node->value));
@@ -1825,7 +1849,7 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 
     if(addr) {
       struct in_addr pin;
-      patricia_node_t *node;
+      ndpi_patricia_node_t *node;
 
       cidr = strtok_r(NULL, "\n", &saveptr);
 
@@ -1850,7 +1874,7 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 
   for(i = 0; host_list[i].network != 0x0; i++) {
     struct in_addr pin;
-    patricia_node_t *node;
+    ndpi_patricia_node_t *node;
 
     if(skip_tor_hosts && (host_list[i].value == NDPI_PROTOCOL_TOR))
       continue;
@@ -1866,7 +1890,7 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 
 static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
 					char *value, u_int16_t protocol_id) {
-  patricia_node_t *node;
+  ndpi_patricia_node_t *node;
   struct in_addr pin;
   int bits = 32;
   char *ptr = strrchr(value, '/');
@@ -2111,7 +2135,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   }
 #endif
 
-  if((ndpi_str->protocols_ptree = ndpi_New_Patricia(32 /* IPv4 */)) != NULL)
+  if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL)
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list, prefs & ndpi_dont_load_tor_hosts);
 
   NDPI_BITMASK_RESET(ndpi_str->detection_bitmask);
@@ -2154,8 +2178,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->custom_categories.hostnames.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
 
-  ndpi_str->custom_categories.ipAddresses = ndpi_New_Patricia(32 /* IPv4 */);
-  ndpi_str->custom_categories.ipAddresses_shadow = ndpi_New_Patricia(32 /* IPv4 */);
+  ndpi_str->custom_categories.ipAddresses = ndpi_patricia_new(32 /* IPv4 */);
+  ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
 
   if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating Patricia trees\n");
@@ -2389,11 +2413,11 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
 
   if(inet_pton(AF_INET, ipbuf, &pin) == 1) {
     /* Search IP */
-    prefix_t prefix;
-    patricia_node_t *node;
+    ndpi_prefix_t prefix;
+    ndpi_patricia_node_t *node;
 
     /* Make sure all in network byte order otherwise compares wont work */
-    fill_prefix_v4(&prefix, &pin, 32, ((patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+    ndpi_fill_prefix_v4(&prefix, &pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
     node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
 
     if(node) {
@@ -2440,7 +2464,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ndpi_lru_free_cache(ndpi_str->msteams_cache);
 
     if(ndpi_str->protocols_ptree)
-      ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->protocols_ptree, free_ptree_data);
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree, free_ptree_data);
 
     if(ndpi_str->udpRoot != NULL)
       ndpi_tdestroy(ndpi_str->udpRoot, ndpi_free);
@@ -2478,10 +2502,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 			  1 /* free patterns strings memory */);
 
     if(ndpi_str->custom_categories.ipAddresses != NULL)
-      ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
     if(ndpi_str->custom_categories.ipAddresses_shadow != NULL)
-      ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->custom_categories.ipAddresses_shadow, free_ptree_data);
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses_shadow, free_ptree_data);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/ndpi_exit_detection_module.c"
@@ -4618,7 +4642,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
   int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str, const char *ip_address_and_mask,
 			    ndpi_protocol_category_t category) {
-    patricia_node_t *node;
+    ndpi_patricia_node_t *node;
     struct in_addr pin;
     int bits = 32;
     char *ptr;
@@ -4734,10 +4758,10 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
 
     if(ndpi_str->custom_categories.ipAddresses != NULL)
-      ndpi_Destroy_Patricia((patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
     ndpi_str->custom_categories.ipAddresses = ndpi_str->custom_categories.ipAddresses_shadow;
-    ndpi_str->custom_categories.ipAddresses_shadow = ndpi_New_Patricia(32 /* IPv4 */);
+    ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
 
     ndpi_str->custom_categories.categories_loaded = 1;
 
@@ -4749,22 +4773,22 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str, u_int32_t saddr, u_int32_t daddr,
 				     ndpi_protocol *ret) {
     if(ndpi_str->custom_categories.categories_loaded) {
-      prefix_t prefix;
-      patricia_node_t *node;
+      ndpi_prefix_t prefix;
+      ndpi_patricia_node_t *node;
 
       if(saddr == 0)
 	node = NULL;
       else {
 	/* Make sure all in network byte order otherwise compares wont work */
-	fill_prefix_v4(&prefix, (struct in_addr *) &saddr, 32,
-		       ((patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+	ndpi_fill_prefix_v4(&prefix, (struct in_addr *) &saddr, 32,
+		       ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
 	node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
       }
 
       if(!node) {
 	if(daddr != 0) {
-	  fill_prefix_v4(&prefix, (struct in_addr *) &daddr, 32,
-			 ((patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+	  ndpi_fill_prefix_v4(&prefix, (struct in_addr *) &daddr, 32,
+			 ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
 	  node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
 	}
       }
@@ -6950,8 +6974,8 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     ndpi_ptree_t *tree = (ndpi_ptree_t *) ndpi_malloc(sizeof(ndpi_ptree_t));
 
     if(tree) {
-      tree->v4 = ndpi_New_Patricia(32);
-      tree->v6 = ndpi_New_Patricia(128);
+      tree->v4 = ndpi_patricia_new(32);
+      tree->v6 = ndpi_patricia_new(128);
 
       if((!tree->v4) || (!tree->v6)) {
 	ndpi_ptree_destroy(tree);
@@ -6967,9 +6991,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   void ndpi_ptree_destroy(ndpi_ptree_t *tree) {
     if(tree) {
       if(tree->v4)
-	ndpi_Destroy_Patricia(tree->v4, free_ptree_data);
+	ndpi_patricia_destroy(tree->v4, free_ptree_data);
       if(tree->v6)
-	ndpi_Destroy_Patricia(tree->v6, free_ptree_data);
+	ndpi_patricia_destroy(tree->v6, free_ptree_data);
 
       ndpi_free(tree);
     }
@@ -6980,17 +7004,17 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr,
 			u_int8_t bits, u_int64_t user_data) {
     u_int8_t is_v6 = ndpi_is_ipv6(addr);
-    patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
-    prefix_t prefix;
-    patricia_node_t *node;
+    ndpi_patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
+    ndpi_prefix_t prefix;
+    ndpi_patricia_node_t *node;
 
     if(bits > ptree->maxbits)
       return(-1);
 
     if(is_v6)
-      fill_prefix_v6(&prefix, (const struct in6_addr *) &addr->ipv6, bits, ptree->maxbits);
+      ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *) &addr->ipv6, bits, ptree->maxbits);
     else
-      fill_prefix_v4(&prefix, (const struct in_addr *) &addr->ipv4, bits, ptree->maxbits);
+      ndpi_fill_prefix_v4(&prefix, (const struct in_addr *) &addr->ipv4, bits, ptree->maxbits);
 
     /* Verify that the node does not already exist */
     node = ndpi_patricia_search_best(ptree, &prefix);
@@ -7014,15 +7038,15 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
 			    const ndpi_ip_addr_t *addr, u_int64_t *user_data) {
     u_int8_t is_v6 = ndpi_is_ipv6(addr);
-    patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
-    prefix_t prefix;
-    patricia_node_t *node;
+    ndpi_patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
+    ndpi_prefix_t prefix;
+    ndpi_patricia_node_t *node;
     int bits = ptree->maxbits;
 
     if(is_v6)
-      fill_prefix_v6(&prefix, (const struct in6_addr *) &addr->ipv6, bits, ptree->maxbits);
+      ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *) &addr->ipv6, bits, ptree->maxbits);
     else
-      fill_prefix_v4(&prefix, (const struct in_addr *) &addr->ipv4, bits, ptree->maxbits);
+      ndpi_fill_prefix_v4(&prefix, (const struct in_addr *) &addr->ipv4, bits, ptree->maxbits);
 
     node = ndpi_patricia_search_best(ptree, &prefix);
 

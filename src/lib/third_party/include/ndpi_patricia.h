@@ -41,15 +41,11 @@
 #ifndef _NDPI_PATRICIA_H
 #define _NDPI_PATRICIA_H
 
-#ifndef WIN32
-#define PATRICIA_IPV6  HAVE_IPV6
-#else
-#undef PATRICIA_IPV6
-#endif
+#include "ndpi_api.h"
 
 /* typedef unsigned int u_int; */
 /* { from defs.h */
-#define prefix_touchar(prefix) ((u_char *)&(prefix)->add.sin)
+#define ndpi_prefix_touchar(prefix) ((u_char *)&(prefix)->add.sin)
 
 #define MAXLINE 1024
 
@@ -80,24 +76,12 @@
 
 /* { from mrt.h */
 
-typedef struct the_prefix4_t {
+typedef struct _prefix4_t {
   u_int16_t family;		/* AF_INET | AF_INET6 */
   u_int16_t bitlen;		/* same as mask? */
   int ref_count;		/* reference count */
   struct in_addr sin;
 } prefix4_t;
-
-typedef struct the_prefix_t {
-  u_int16_t family;		/* AF_INET | AF_INET6 */
-  u_int16_t bitlen;		/* same as mask? */
-  int ref_count;		/* reference count */
-  union {
-    struct in_addr sin;
-#ifdef PATRICIA_IPV6
-    struct in6_addr sin6;
-#endif /* IPV6 */
-  } add;
-} prefix_t;
 
 /* } */
 
@@ -115,35 +99,20 @@ union patricia_node_value_t {
   } u;
 };
 
-typedef struct _patricia_node_t {
+typedef struct _ndpi_patricia_node_t {
   u_int16_t bit;			/* flag if this node used */
-  prefix_t *prefix;		/* who we are in patricia tree */
-  struct _patricia_node_t *l, *r;	/* left and right children */
-  struct _patricia_node_t *parent;/* may be used */
+  ndpi_prefix_t *prefix;		/* who we are in patricia tree */
+  struct _ndpi_patricia_node_t *l, *r;	/* left and right children */
+  struct _ndpi_patricia_node_t *parent;/* may be used */
   void *data;			/* pointer to data */
   union patricia_node_value_t value;
-} patricia_node_t;
+} ndpi_patricia_node_t;
 
-typedef struct _patricia_tree_t {
-  patricia_node_t 	*head;
+typedef struct _ndpi_patricia_tree_t {
+  ndpi_patricia_node_t 	*head;
   u_int16_t		maxbits;	/* for IP, 32 bit addresses */
   int num_active_node;		/* for debug purpose */
-} patricia_tree_t;
-
-typedef void (*void_fn_t)(void *data);
-typedef void (*void_fn2_t)(prefix_t *prefix, void *data);
-
-/* renamed to ndpi_Patricia to avoid name conflicts */
-patricia_node_t *ndpi_patricia_search_exact (patricia_tree_t *patricia, prefix_t *prefix);
-patricia_node_t *ndpi_patricia_search_best (patricia_tree_t *patricia, prefix_t *prefix);
-patricia_node_t * ndpi_patricia_search_best2 (patricia_tree_t *patricia, prefix_t *prefix,
-					      int inclusive);
-patricia_node_t *ndpi_patricia_lookup (patricia_tree_t *patricia, prefix_t *prefix);
-void ndpi_patricia_remove (patricia_tree_t *patricia, patricia_node_t *node);
-patricia_tree_t *ndpi_New_Patricia (u_int16_t maxbits);
-void ndpi_Clear_Patricia (patricia_tree_t *patricia, void_fn_t func);
-void ndpi_Destroy_Patricia (patricia_tree_t *patricia, void_fn_t func);
-void ndpi_patricia_process (patricia_tree_t *patricia, void_fn2_t func);
+} ndpi_patricia_tree_t;
 
 #ifdef WIN32
 #define PATRICIA_MAXBITS	128
@@ -158,17 +127,17 @@ void ndpi_patricia_process (patricia_tree_t *patricia, void_fn2_t func);
 
 #define PATRICIA_WALK(Xhead, Xnode)			\
   do {							\
-    patricia_node_t *Xstack[PATRICIA_MAXBITS+1];	\
-    patricia_node_t **Xsp = Xstack;			\
-    patricia_node_t *Xrn = (Xhead);			\
+    ndpi_patricia_node_t *Xstack[PATRICIA_MAXBITS+1];	\
+    ndpi_patricia_node_t **Xsp = Xstack;			\
+    ndpi_patricia_node_t *Xrn = (Xhead);			\
     while ((Xnode = Xrn)) {				\
       if (Xnode->prefix)
 
 #define PATRICIA_WALK_ALL(Xhead, Xnode)			\
   do {							\
-    patricia_node_t *Xstack[PATRICIA_MAXBITS+1];	\
-    patricia_node_t **Xsp = Xstack;			\
-    patricia_node_t *Xrn = (Xhead);			\
+    ndpi_patricia_node_t *Xstack[PATRICIA_MAXBITS+1];	\
+    ndpi_patricia_node_t **Xsp = Xstack;			\
+    ndpi_patricia_node_t *Xrn = (Xhead);			\
     while ((Xnode = Xrn)) {				\
       if (1)
 
@@ -176,7 +145,7 @@ void ndpi_patricia_process (patricia_tree_t *patricia, void_fn2_t func);
     if (Xsp != Xstack) {			\
       Xrn = *(--Xsp);				\
     } else {					\
-      Xrn = (patricia_node_t *) 0;		\
+      Xrn = (ndpi_patricia_node_t *) 0;		\
     }						\
     continue; }
 
@@ -191,7 +160,7 @@ void ndpi_patricia_process (patricia_tree_t *patricia, void_fn2_t func);
   } else if (Xsp != Xstack) {			\
     Xrn = *(--Xsp);				\
   } else {					\
-    Xrn = (patricia_node_t *) 0;		\
+    Xrn = (ndpi_patricia_node_t *) 0;		\
   }						\
   }						\
     } while (0)
