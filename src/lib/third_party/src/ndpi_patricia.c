@@ -449,6 +449,13 @@ ndpi_patricia_walk_inorder(ndpi_patricia_node_t *node, ndpi_void_fn3_t func, voi
   return n;
 }
 
+size_t
+ndpi_patricia_walk_tree_inorder(ndpi_patricia_tree_t *patricia, ndpi_void_fn3_t func, void *data) {
+  if (patricia->head == NULL)
+    return 0;
+
+  return ndpi_patricia_walk_inorder(patricia->head, func, data);
+}
 
 ndpi_patricia_node_t *
 ndpi_patricia_search_exact (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix)

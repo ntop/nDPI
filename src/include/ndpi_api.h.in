@@ -975,11 +975,17 @@ extern "C" {
   ndpi_patricia_node_t *ndpi_patricia_search_exact(ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix);
   ndpi_patricia_node_t *ndpi_patricia_search_best(ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix);
   ndpi_patricia_node_t *ndpi_patricia_lookup(ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix);
+  size_t ndpi_patricia_walk_tree_inorder(ndpi_patricia_tree_t *patricia, ndpi_void_fn3_t func, void *data);
   size_t ndpi_patricia_walk_inorder(ndpi_patricia_node_t *node, ndpi_void_fn3_t func, void *data);
   void ndpi_patricia_remove(ndpi_patricia_tree_t *patricia, ndpi_patricia_node_t *node);
 
   void ndpi_patricia_set_node_u64(ndpi_patricia_node_t *node, u_int64_t value);
   u_int64_t ndpi_patricia_get_node_u64(ndpi_patricia_node_t *node);
+  void ndpi_patricia_set_node_data(ndpi_patricia_node_t *node, void *data);
+  void *ndpi_patricia_get_node_data(ndpi_patricia_node_t *node);
+  ndpi_prefix_t *ndpi_patricia_get_node_prefix(ndpi_patricia_node_t *node);
+  u_int16_t ndpi_patricia_get_node_bits(ndpi_patricia_node_t *node);
+  u_int16_t ndpi_patricia_get_maxbits(ndpi_patricia_tree_t *tree);
 
   /* ptree (trie) API - a wrapper on top of Patricia that seamlessly handle IPv4 and IPv6 */
   ndpi_ptree_t* ndpi_ptree_create(void);

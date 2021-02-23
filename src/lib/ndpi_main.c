@@ -1660,6 +1660,12 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 
 /* ******************************************************************** */
 
+u_int16_t ndpi_patricia_get_maxbits(ndpi_patricia_tree_t *tree) {
+  return(tree->maxbits);
+}
+
+/* ******************************************************************** */
+
 int ndpi_fill_prefix_v4(ndpi_prefix_t *p, const struct in_addr *a, int b, int mb) {
   if(b < 0 || b > mb)
     return(-1);
@@ -1699,6 +1705,30 @@ int ndpi_fill_prefix_mac(ndpi_prefix_t *prefix, u_int8_t *mac, int bits, int max
   prefix->family = AF_MAC, prefix->bitlen = bits, prefix->ref_count = 0;
 
   return 0;
+}
+
+/* ******************************************* */
+
+ndpi_prefix_t *ndpi_patricia_get_node_prefix(ndpi_patricia_node_t *node) {
+  return(node->prefix);
+}
+
+/* ******************************************* */
+
+u_int16_t ndpi_patricia_get_node_bits(ndpi_patricia_node_t *node) {
+  return(node->bit);
+}
+
+/* ******************************************* */
+
+void ndpi_patricia_set_node_data(ndpi_patricia_node_t *node, void *data) {
+  node->data = data;
+}
+
+/* ******************************************* */
+
+void *ndpi_patricia_get_node_data(ndpi_patricia_node_t *node) {
+  return(node->data);
 }
 
 /* ******************************************* */
