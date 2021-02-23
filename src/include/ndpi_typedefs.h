@@ -1597,11 +1597,12 @@ typedef struct _ndpi_prefix_t {
   } add;
 } ndpi_prefix_t;
 
-typedef void (*ndpi_void_fn_t)(void *data);
-typedef void (*ndpi_void_fn2_t)(ndpi_prefix_t *prefix, void *data);
-
 typedef struct _ndpi_patricia_node_t ndpi_patricia_node_t;
 typedef struct _ndpi_patricia_tree_t ndpi_patricia_tree_t;
+
+typedef void (*ndpi_void_fn_t)(void *data);
+typedef void (*ndpi_void_fn2_t)(ndpi_prefix_t *prefix, void *data);
+typedef void (*ndpi_void_fn3_t)(ndpi_patricia_node_t *node, void *data, void *user_data);
 
 /* **************************************** */
 

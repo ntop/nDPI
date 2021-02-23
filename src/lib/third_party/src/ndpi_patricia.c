@@ -428,22 +428,22 @@ ndpi_patricia_clone (const ndpi_patricia_tree_t * const from)
 }
 
 size_t
-ndpi_patricia_walk_inorder(ndpi_patricia_node_t *node, ndpi_void_fn2_t func)
+ndpi_patricia_walk_inorder(ndpi_patricia_node_t *node, ndpi_void_fn3_t func, void *data)
 {
   size_t n = 0;
   assert(func);
 
   if(node->l) {
-    n += ndpi_patricia_walk_inorder(node->l, func);
+    n += ndpi_patricia_walk_inorder(node->l, func, data);
   }
 
   if(node->prefix) {
-    func(node->prefix, node->data);
+    func(node, node->data, data);
     n++;
   }
 	
   if(node->r) {
-    n += ndpi_patricia_walk_inorder(node->r, func);
+    n += ndpi_patricia_walk_inorder(node->r, func, data);
   }
 
   return n;
