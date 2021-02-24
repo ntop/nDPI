@@ -1682,7 +1682,6 @@ int ndpi_fill_prefix_v4(ndpi_prefix_t *p, const struct in_addr *a, int b, int mb
 /* ******************************************* */
 
 int ndpi_fill_prefix_v6(ndpi_prefix_t *prefix, const struct in6_addr *addr, int bits, int maxbits) {
-#ifdef NDPI_PATRICIA_IPV6
   if(bits < 0 || bits > maxbits)
     return -1;
 
@@ -1690,9 +1689,6 @@ int ndpi_fill_prefix_v6(ndpi_prefix_t *prefix, const struct in6_addr *addr, int 
   prefix->family = AF_INET6, prefix->bitlen = bits, prefix->ref_count = 0;
 
   return 0;
-#else
-  return(-1);
-#endif
 }
 
 /* ******************************************* */
