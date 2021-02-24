@@ -1760,7 +1760,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Risky domain name");
 
   case NDPI_MALICIOUS_JA3:
-    return("Malicious JA3 Fingerprint");
+    return("Possibly Malicious JA3 Fingerprint");
 
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
