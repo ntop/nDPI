@@ -1574,12 +1574,6 @@ struct ndpi_jitter_struct {
 
 /* **************************************** */
 
-#ifndef WIN32
-#define NDPI_PATRICIA_IPV6
-#else
-#undef NDPI_PATRICIA_IPV6
-#endif
-
 #ifndef AF_MAC
 #define AF_MAC            99
 #endif
@@ -1590,9 +1584,7 @@ typedef struct _ndpi_prefix_t {
   int ref_count;		/* reference count */
   union {
     struct in_addr sin;
-#ifdef NDPI_PATRICIA_IPV6
     struct in6_addr sin6;
-#endif /* IPV6 */
     u_int8_t mac[6];
   } add;
 } ndpi_prefix_t;
