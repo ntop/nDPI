@@ -506,7 +506,7 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
 
     len = ndpi_min(len, mlen);
     ac_pattern.length = snprintf(buf, mlen, "%s$", value);
-    free(value);
+    ndpi_free(value);
     value = ndpi_strdup(buf);
     ac_pattern.astring = value;
   }
