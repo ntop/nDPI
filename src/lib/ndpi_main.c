@@ -2193,6 +2193,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->impossible_bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->malicious_ja3_automa.ac_automa = NULL; /* Initialized on demand */
+  ndpi_str->malicious_sha1_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
 
   if((sizeof(categories) / sizeof(char *)) != NDPI_PROTOCOL_NUM_CATEGORIES) {
@@ -2253,7 +2254,11 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
     case 5:
       automa = &ndpi_str->malicious_ja3_automa;
       break;
-      
+
+    case 6:
+      automa = &ndpi_str->malicious_sha1_automa;
+      break;
+
     default:
       return;
     }
@@ -2518,6 +2523,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->malicious_ja3_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_ja3_automa.ac_automa, 0);
+
+    if(ndpi_str->malicious_sha1_automa.ac_automa != NULL)
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_sha1_automa.ac_automa, 0);
 
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
@@ -2968,7 +2976,7 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
 /*
  * Format:
  *
- * <domain name>[,<other info>]
+ * <ja3 hash>[,<other info>]
  *
  */
 int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
@@ -3011,6 +3019,65 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
   fclose(fd);
 
   return(num);
+}
+
+/* ******************************************************************** */
+
+/*
+ * Format:
+ *
+ * <sha1 hash>
+ * <other info>,<sha1 hash>
+ * <other info>,<sha1 hash>[,<other info>[...]]
+ *
+ */
+int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str, const char *path)
+{
+  char buffer[128];
+  char *first_comma, *second_comma;
+  FILE *fd;
+  size_t len;
+  int num = 0;
+
+  if (ndpi_str->malicious_sha1_automa.ac_automa == NULL)
+    ndpi_str->malicious_sha1_automa.ac_automa = ac_automata_init(ac_match_handler);
+
+  fd = fopen(path, "r");
+
+  if (fd == NULL) {
+    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
+    return -1;
+  }
+
+  while (fgets(buffer, sizeof(buffer), fd) != NULL) {
+    len = strlen(buffer);
+
+    if (len <= 1 || buffer[0] == '#')
+      continue;
+
+    first_comma = strchr(buffer, ',');
+    if (first_comma != NULL) {
+      first_comma++;
+      second_comma = strchr(first_comma, ',');
+      if (second_comma == NULL)
+        second_comma = &buffer[len - 1];
+    } else {
+      first_comma = &buffer[0];
+      second_comma = &buffer[len - 1];
+    }
+
+    if ((second_comma - first_comma) != 40)
+      continue;
+    second_comma[0] = '\0';
+
+    for (size_t i = 0; i < 40; ++i)
+      first_comma[i] = toupper(first_comma[i]);
+
+    if (ndpi_add_string_to_automa(ndpi_str->malicious_sha1_automa.ac_automa, first_comma) >= 0)
+      num++;
+  }
+
+  return num;
 }
 
 /* ******************************************************************** */

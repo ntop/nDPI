@@ -621,16 +621,28 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
       flow->l4.tcp.tls.fingerprint_set = 1;
 
-#ifdef DEBUG_TLS
-      {
-	int i;
-
-	printf("[TLS] SHA-1: ");
-	for(i=0;i<20;i++)
-	  printf("%s%02X", (i > 0) ? ":" : "", flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint[i]);
-	printf("\n");
+      uint8_t * sha1 = flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint;
+      const size_t sha1_siz = sizeof(flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint);
+      char sha1_str[sha1_siz * 2 + 1];
+      static const char hexalnum[] = "0123456789ABCDEF";
+      for (size_t i = 0; i < sha1_siz; ++i) {
+        u_int8_t lower = (sha1[i] & 0x0F);
+        u_int8_t upper = (sha1[i] & 0xF0) >> 4;
+        sha1_str[i*2] = hexalnum[upper];
+        sha1_str[i*2 + 1] = hexalnum[lower];
       }
+      sha1_str[sha1_siz * 2] = '\0';
+
+#ifdef DEBUG_TLS
+      printf("[TLS] SHA-1: %s\n", sha1_str);
 #endif
+
+      if (ndpi_struct->malicious_sha1_automa.ac_automa != NULL) {
+        u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_sha1_automa.ac_automa, sha1_str);
+
+        if(rc1 > 0)
+          NDPI_SET_BIT(flow->risk, NDPI_MALICIOUS_SHA1);
+      }
 
       processCertificateElements(ndpi_struct, flow, certificates_offset, certificate_len);
     }
