@@ -969,7 +969,7 @@ int ndpi_hw_init(struct ndpi_hw_struct *hw,
 		 double alpha, double beta, double gamma, float significance) {
   memset(hw, 0, sizeof(struct ndpi_hw_struct));
 
-  hw->params.num_season_periods = num_periods;
+  hw->params.num_season_periods = num_periods + 1;
   hw->params.alpha      = alpha;
   hw->params.beta       = beta;
   hw->params.gamma      = gamma;
@@ -978,6 +978,8 @@ int ndpi_hw_init(struct ndpi_hw_struct *hw,
   if((significance < 0) || (significance > 1)) significance = 0.05;
   hw->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
 
+  hw->params.ro = 1.95996398454005;
+  
   if((hw->y = (u_int32_t*)ndpi_calloc(hw->params.num_season_periods, sizeof(u_int32_t))) == NULL)
     return(-1);
 
@@ -1038,14 +1040,12 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
     double prev_u = hw->u;
     double prev_v = hw->v;
     double prev_s = hw->s[idx];
-    double value  = (double)_value;;
-    double error;
+    double value  = (double)_value;
+    double sq, error;
 
-    hw->u      = ((hw->params.alpha * value) / prev_s) + (1 - hw->params.alpha) * (hw->u +  hw->v);
-    hw->v      = (hw->params.beta * (hw->u - prev_u))  + ((1 - hw->params.beta) * hw->v);
-    hw->s[idx] = (hw->params.gamma * (value / hw->u))  + ((1 - hw->params.gamma) * prev_s);
-
-    hw->num_values++, idx = (idx + 1) % hw->params.num_season_periods;
+    hw->u      = ((hw->params.alpha * value) / prev_s)  + ( 1 - hw->params.alpha) * (hw->u + hw->v);
+    hw->v      = (hw->params.beta   * (hw->u - prev_u)) + ((1 - hw->params.beta ) * hw->v);
+    hw->s[idx] = (hw->params.gamma  * (value / hw->u))  + ((1 - hw->params.gamma) * prev_s);
 
     if(hw->params.use_hw_additive_seasonal)
       *forecast = (prev_u + prev_v) + prev_s;
@@ -1054,8 +1054,11 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
 
     error                 = value - *forecast;
     hw->sum_square_error += error * error;
-    *confidence_band      = hw->params.ro * (sqrt(hw->sum_square_error / (hw->num_values - hw->params.num_season_periods)));
+    sq = sqrt(hw->sum_square_error / (hw->num_values + 2 - hw->params.num_season_periods));
+    *confidence_band      = hw->params.ro * sq;
 
+    hw->num_values++, idx = (idx + 1) % hw->params.num_season_periods;
+    
     return(1); /* We're in business: forecast is meaningful now */
   }
 }

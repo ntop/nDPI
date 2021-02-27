@@ -3787,6 +3787,114 @@ void hwUnitTest() {
 
 /* *********************************************** */
 
+void hwUnitTest2() {
+  struct ndpi_hw_struct hw;
+  u_int num_learning_points = 12;
+  u_int8_t trace = 1;
+  double v[] = {
+    31.908466339111,
+    87.339714050293,
+    173.47660827637,
+    213.92568969727,
+    223.32124328613,
+    230.60134887695,
+    238.09457397461,
+    245.8137512207,
+    251.09228515625,
+    251.09228515625,
+    259.21997070312,
+    261.98754882812,
+    264.78540039062,
+    264.78540039062,
+    270.47451782227,
+    273.3671875,
+    288.34222412109,
+    288.34222412109,
+    304.24795532227,
+    304.24795532227,
+    350.92227172852,
+    384.54431152344,
+    423.25942993164,
+    439.43322753906,
+    445.05981445312,
+    445.05981445312,
+    445.05981445312,
+    445.05981445312
+  };
+  u_int i, num = sizeof(v) / sizeof(double);
+  float alpha = 0.5, beta = 0.5, gamma = 0.1;
+
+  assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */, alpha, beta, gamma, 0.05) == 0);
+  
+  if(trace)
+    printf("\nHolt-Winters [alpha: %.1f][beta: %.1f][gamma: %.1f]\n", alpha, beta, gamma);
+  
+  for(i=0; i<num; i++) {
+    double prediction, confidence_band;
+    double lower, upper;
+    int rc = ndpi_hw_add_value(&hw, v[i], &prediction, &confidence_band);
+    
+    lower = prediction - confidence_band, upper = prediction + confidence_band;
+    
+    if(trace)
+      printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
+	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
+	     confidence_band);
+  }
+  
+  ndpi_hw_free(&hw);
+}
+
+/* *********************************************** */
+
+void hwUnitTest3() {
+  struct ndpi_hw_struct hw;
+  u_int num_learning_points = 3;
+  u_int8_t trace = 1;
+  double v[] = {
+    10,
+    14,
+    8,
+    25,
+    16,
+    22,
+    14,
+    35,
+    15,
+    27,
+    18,
+    40,
+    28,
+    40,
+    25,
+    65,
+  };
+  u_int i, num = sizeof(v) / sizeof(double);
+  float alpha = 0.5, beta = 0.5, gamma = 0.1;
+  assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */, alpha, beta, gamma, 0.05) == 0);
+  
+  if(trace)
+    printf("\nHolt-Winters [alpha: %.1f][beta: %.1f][gamma: %.1f]\n", alpha, beta, gamma);
+  
+  for(i=0; i<num; i++) {
+    double prediction, confidence_band;
+    double lower, upper;
+    int rc = ndpi_hw_add_value(&hw, v[i], &prediction, &confidence_band);
+    
+    lower = prediction - confidence_band, upper = prediction + confidence_band;
+    
+    if(trace)
+      printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n",
+	     i, v[i], prediction, lower, upper,
+	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
+	     confidence_band);
+  }
+  
+  ndpi_hw_free(&hw);
+}
+
+/* *********************************************** */
+
 void jitterUnitTest() {
   struct ndpi_jitter_struct jitter;
   float v[] = { 10, 14, 8, 25, 16, 22, 14, 35, 15, 27, 218, 40, 28, 40, 25, 65 };
@@ -3827,7 +3935,9 @@ int orginal_main(int argc, char **argv) {
     ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
 
     if(ndpi_info_mod == NULL) return -1;
-
+    
+    // hwUnitTest2();
+    
     /* Internal checks */    
     // binUnitTest();
     hwUnitTest();
