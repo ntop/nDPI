@@ -1029,6 +1029,8 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
 
       hw->u = _value / hw->s[hw->params.num_season_periods-1];
       hw->v = 0;
+      ndpi_free(hw->y);
+      hw->y = NULL;
     }
 
     *forecast = 0;
@@ -1042,10 +1044,18 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
     double prev_s = hw->s[idx];
     double value  = (double)_value;
     double sq, error;
-
-    hw->u      = ((hw->params.alpha * value) / prev_s)  + ( 1 - hw->params.alpha) * (hw->u + hw->v);
+    
+    if(prev_s != 0)
+      hw->u      = ((hw->params.alpha * value) / prev_s)  + ( 1 - hw->params.alpha) * (hw->u + hw->v);
+    else
+      hw->u      = 0; /* This should not happen */
+    
     hw->v      = (hw->params.beta   * (hw->u - prev_u)) + ((1 - hw->params.beta ) * hw->v);
-    hw->s[idx] = (hw->params.gamma  * (value / hw->u))  + ((1 - hw->params.gamma) * prev_s);
+
+    if(hw->u != 0)
+      hw->s[idx] = (hw->params.gamma  * (value / hw->u))  + ((1 - hw->params.gamma) * prev_s);
+    else
+      hw->s[idx] = 0;  /* This should not happen */
 
     if(hw->params.use_hw_additive_seasonal)
       *forecast = (prev_u + prev_v) + prev_s;
@@ -1057,8 +1067,15 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
     sq = sqrt(hw->sum_square_error / (hw->num_values + 2 - hw->params.num_season_periods));
     *confidence_band      = hw->params.ro * sq;
 
-    hw->num_values++, idx = (idx + 1) % hw->params.num_season_periods;
+#ifdef HW_DEBUG
+    printf("[num_values: %u][u: %.3f][v: %.3f][s: %.3f][error: %.3f][forecast: %.3f][sqe: %.3f][sq: %.3f][confidence_band: %.3f]\n",
+	   hw->num_values, hw->u, hw->v, hw->s[idx], error,
+	   *forecast, hw->sum_square_error,
+	   sq, *confidence_band);
+#endif
     
+    hw->num_values++, idx = (idx + 1) % hw->params.num_season_periods;
+
     return(1); /* We're in business: forecast is meaningful now */
   }
 }
