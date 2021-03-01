@@ -1020,42 +1020,49 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
   if(hw->num_values < hw->params.num_season_periods) {
     hw->y[hw->num_values++] = _value;
 
-    if(hw->num_values == hw->params.num_season_periods) {
-      double avg = ndpi_avg_inline(hw->y, hw->params.num_season_periods);
-      u_int i;
-
-      for(i=0; i<hw->params.num_season_periods; i++)
-	hw->s[i] = hw->y[i] / avg;
-
-      hw->u = _value / hw->s[hw->params.num_season_periods-1];
-      hw->v = 0;
-      ndpi_free(hw->y);
-      hw->y = NULL;
-    }
-
     *forecast = 0;
     *confidence_band = 0;
 
     return(0); /* Too early still training... */
   } else {
     u_int idx     = hw->num_values % hw->params.num_season_periods;
-    double prev_u = hw->u;
-    double prev_v = hw->v;
-    double prev_s = hw->s[idx];
-    double value  = (double)_value;
+    double prev_u, prev_v, prev_s, value  = (double)_value;
     double sq, error;
     
+    if(hw->num_values == hw->params.num_season_periods) {
+      double avg = ndpi_avg_inline(hw->y, hw->params.num_season_periods);
+      u_int i;
+
+      if(avg == 0) avg = 1; /* Avoid divisions by zero */
+      
+      for(i=0; i<hw->params.num_season_periods; i++)
+	hw->s[i] = hw->y[i] / avg;
+
+      i = hw->params.num_season_periods-1;
+      if(hw->s[i] == 0)
+	hw->u = 0;
+      else
+	hw->u = _value / hw->s[i];
+      
+      hw->v = 0;
+      ndpi_free(hw->y);
+      hw->y = NULL;
+    }
+
+    idx     = hw->num_values % hw->params.num_season_periods;
+    prev_u = hw->u, prev_v = hw->v, prev_s = hw->s[idx];
+     
     if(prev_s != 0)
-      hw->u      = ((hw->params.alpha * value) / prev_s)  + ( 1 - hw->params.alpha) * (hw->u + hw->v);
+      hw->u = ((hw->params.alpha * value) / prev_s)  + ( 1 - hw->params.alpha) * (hw->u + hw->v);
     else
-      hw->u      = 0; /* This should not happen */
+      hw->u = 0; /* Avoid divisions by zero */
     
-    hw->v      = (hw->params.beta   * (hw->u - prev_u)) + ((1 - hw->params.beta ) * hw->v);
+    hw->v = (hw->params.beta   * (hw->u - prev_u)) + ((1 - hw->params.beta ) * hw->v);
 
     if(hw->u != 0)
       hw->s[idx] = (hw->params.gamma  * (value / hw->u))  + ((1 - hw->params.gamma) * prev_s);
     else
-      hw->s[idx] = 0;  /* This should not happen */
+      hw->s[idx] = 0;  /* Avoid divisions by zero */
 
     if(hw->params.use_hw_additive_seasonal)
       *forecast = (prev_u + prev_v) + prev_s;
