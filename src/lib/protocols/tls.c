@@ -417,7 +417,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	    if((time_sec < flow->protos.tls_quic_stun.tls_quic.notBefore)
 	       || (time_sec > flow->protos.tls_quic_stun.tls_quic.notAfter))
-	    NDPI_SET_BIT(flow->risk, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
+	    ndpi_set_risk(flow, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
 	  }
 	}
       }
@@ -509,7 +509,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	    } /* while */
 
 	    if(!matched_name)
-	      NDPI_SET_BIT(flow->risk, NDPI_TLS_CERTIFICATE_MISMATCH); /* Certificate mismatch */
+	      ndpi_set_risk(flow, NDPI_TLS_CERTIFICATE_MISMATCH); /* Certificate mismatch */
 	  }
 	}
       }
@@ -533,7 +533,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
   if(flow->protos.tls_quic_stun.tls_quic.subjectDN && flow->protos.tls_quic_stun.tls_quic.issuerDN
      && (!strcmp(flow->protos.tls_quic_stun.tls_quic.subjectDN, flow->protos.tls_quic_stun.tls_quic.issuerDN)))
-    NDPI_SET_BIT(flow->risk, NDPI_TLS_SELFSIGNED_CERTIFICATE);
+    ndpi_set_risk(flow, NDPI_TLS_SELFSIGNED_CERTIFICATE);
 
 #if DEBUG_TLS
   printf("[TLS] %s() SubjectDN [%s]\n", __FUNCTION__, rdnSeqBuf);
@@ -561,7 +561,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
   if((packet->payload_packet_len != (length + 4 + (is_dtls ? 8 : 0))) || (packet->payload[1] != 0x0)) {
-    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
     return(-1); /* Invalid length */
   }
 
@@ -570,7 +570,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
                         packet->payload[certificates_offset - 1];
 
   if((packet->payload[certificates_offset - 3] != 0x0) || ((certificates_length+3) != length)) {
-    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
     return(-2); /* Invalid length */
   }
 
@@ -644,7 +644,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
         u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_sha1_automa.ac_automa, sha1_str);
 
         if(rc1 > 0)
-          NDPI_SET_BIT(flow->risk, NDPI_MALICIOUS_SHA1);
+          ndpi_set_risk(flow, NDPI_MALICIOUS_SHA1);
       }
 
       processCertificateElements(ndpi_struct, flow, certificates_offset, certificate_len);
@@ -1065,7 +1065,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     tls_version = ntohs(*((u_int16_t*)&packet->payload[version_offset]));
     flow->protos.tls_quic_stun.tls_quic.ssl_version = ja3.tls_handshake_version = tls_version;
     if(flow->protos.tls_quic_stun.tls_quic.ssl_version < 0x0302) /* TLSv1.1 */
-      NDPI_SET_BIT(flow->risk, NDPI_TLS_OBSOLETE_VERSION);
+      ndpi_set_risk(flow, NDPI_TLS_OBSOLETE_VERSION);
 
     if(handshake_type == 0x02 /* Server Hello */) {
       int i, rc;
@@ -1090,7 +1090,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
       ja3.num_cipher = 1, ja3.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
       if((flow->protos.tls_quic_stun.tls_quic.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.cipher[0])) == 1)
-	NDPI_SET_BIT(flow->risk, NDPI_TLS_WEAK_CIPHER);
+	ndpi_set_risk(flow, NDPI_TLS_WEAK_CIPHER);
 
       flow->protos.tls_quic_stun.tls_quic.server_cipher = ja3.cipher[0];
 
@@ -1324,9 +1324,28 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
 		      flow->l4.tcp.tls.subprotocol_detected = 1;
 		  }
+	  
+		  if(ndpi_check_dga_name(ndpi_struct, flow,
+					 flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, 1)) {
+		    char *sni = flow->protos.tls_quic_stun.tls_quic.client_requested_server_name;
+		    int len = strlen(sni);
 
-		  ndpi_check_dga_name(ndpi_struct, flow,
-				      flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, 1);
+#ifdef DEBUG_TLS
+		    printf("[TLS] SNI: (DGA) [%s]\n", flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+#endif
+		    
+		    if((len >= 4)
+		       && strcmp(&sni[len-4], ".com") /* Check if it ends in .com or .net */
+		       && strcmp(&sni[len-4], ".net")
+		       && strncmp(sni, "www.", 4)) /* Not starting with www.... */
+		      ;
+		    else
+		      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_TLS);
+		  } else {
+#ifdef DEBUG_TLS
+		    printf("[TLS] SNI: (NO DGA) [%s]\n", flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+#endif
+		  }
 		} else {
 #ifdef DEBUG_TLS
 		  printf("[TLS] Extensions server len too short: %u vs %u\n",
@@ -1661,21 +1680,21 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 						  flow->protos.tls_quic_stun.tls_quic.ja3_client);
 		
 		if(rc1 > 0)
-		  NDPI_SET_BIT(flow->risk, NDPI_MALICIOUS_JA3);
+		  ndpi_set_risk(flow, NDPI_MALICIOUS_JA3);
 	      }	      
 	    }
 
 	    /* Before returning to the caller we need to make a final check */
 	    if((flow->protos.tls_quic_stun.tls_quic.ssl_version >= 0x0303) /* >= TLSv1.2 */
 	       && (flow->protos.tls_quic_stun.tls_quic.alpn == NULL) /* No ALPN */) {
-	      NDPI_SET_BIT(flow->risk, NDPI_TLS_NOT_CARRYING_HTTPS);
+	      ndpi_set_risk(flow, NDPI_TLS_NOT_CARRYING_HTTPS);
 	    }
 
 	    /* Suspicious Domain Fronting:
 	       https://github.com/SixGenInc/Noctilucent/blob/master/docs/ */
 	    if(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni &&
 	       flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0') {
-	      NDPI_SET_BIT(flow->risk, NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
+	      ndpi_set_risk(flow, NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
 	    }
 
 	    /* Add check for missing SNI */
@@ -1684,7 +1703,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	       && (flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni == NULL) /* No ESNI */
 	       ) {
 	      /* This is a bit suspicious */
-	      NDPI_SET_BIT(flow->risk, NDPI_TLS_MISSING_SNI);
+	      ndpi_set_risk(flow, NDPI_TLS_MISSING_SNI);
 	    }
 
 	    return(2 /* Client Certificate */);

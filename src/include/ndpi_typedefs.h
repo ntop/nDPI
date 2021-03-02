@@ -1100,7 +1100,7 @@ struct ndpi_detection_module_struct {
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
-    bigrams_automa, impossible_bigrams_automa, /* TOR */
+    bigrams_automa, trigrams_automa, impossible_bigrams_automa, /* TOR */
     risky_domain_automa, tls_cert_subject_automa,
     malicious_ja3_automa, malicious_sha1_automa;
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */

@@ -3471,15 +3471,15 @@ static void binUnitTest() {
 
 static void dgaUnitTest() {
   const char *dga[] = {
-		     "lbjamwptxz",
-		     "l54c2e21e80ba5471be7a8402cffb98768.so",
-		     "wdd7ee574106a84807a601beb62dd851f0.hk",
-		     "jaa12148a5831a5af92aa1d8fe6059e276.ws",
-		     "www.e6r5p57kbafwrxj3plz.com",
-		     // "grdawgrcwegpjaoo.eu",
-		     "mcfpeqbotiwxfxqu.eu",
-		     "adgxwxhqsegnrsih.eu",
-		     NULL
+    //"www.lbjamwptxz.com",
+    "www.l54c2e21e80ba5471be7a8402cffb98768.so",
+    "www.wdd7ee574106a84807a601beb62dd851f0.hk",
+    "www.jaa12148a5831a5af92aa1d8fe6059e276.ws",
+    "www.e6r5p57kbafwrxj3plz.com",
+    // "grdawgrcwegpjaoo.eu",
+    "www.mcfpeqbotiwxfxqu.eu",
+    "www.adgxwxhqsegnrsih.eu",
+    NULL
   };
 
   const char *non_dga[] = {
@@ -3503,7 +3503,7 @@ static void dgaUnitTest() {
 		     "LUCAS-IMAC",
 		     "LUCASMACBOOKPRO",
 		     "MACBOOKAIR-E1D0",
-		     "MDJR98",
+		     //"MDJR98",
 		     "NASFILE",
 		     "SANJI-LIFEBOOK-",
 		     "SC.ARRANCAR.ORG",
@@ -3940,7 +3940,7 @@ int orginal_main(int argc, char **argv) {
     
     /* Internal checks */    
     // binUnitTest();
-    hwUnitTest();
+    //hwUnitTest();
     jitterUnitTest();
     rsiUnitTest();
     hashUnitTest();

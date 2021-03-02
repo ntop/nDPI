@@ -89,7 +89,7 @@ static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct
   case 106:
   case 107:
   case 259:
-    NDPI_SET_BIT(flow->risk, NDPI_DNS_SUSPICIOUS_TRAFFIC);
+    ndpi_set_risk(flow, NDPI_DNS_SUSPICIOUS_TRAFFIC);
     break;
   }
 }
@@ -194,7 +194,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   else if((dns_header->flags & FLAGS_MASK) == 0x8000)
     *is_query = 0;
   else {
-    NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
     return(1 /* invalid */);
   }
 
@@ -219,7 +219,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  x++;
       }
     } else {
-      NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
       return(1 /* invalid */);
     }
   } else {
@@ -408,7 +408,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 #ifdef DNS_DEBUG
 	printf("[DNS] Invalid query len [%u >= %u]\n", i+4, flow->packet.payload_packet_len);
 #endif
-	NDPI_SET_BIT(flow->risk, NDPI_MALFORMED_PACKET);
+	ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
 	break;
       } else
 	idx += tot_len+4, num_queries++;

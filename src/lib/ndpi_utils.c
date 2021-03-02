@@ -2450,3 +2450,12 @@ int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t 
     return(0);
 }
 
+/* ******************************************************************** */
+
+void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
+  u_int32_t v = 1 << r;
+  
+  // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
+  flow->risk |= v;
+
+}

@@ -175,7 +175,7 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(found_obsolete_cipher) {
-    NDPI_SET_BIT(flow->risk, (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER));
+    ndpi_set_risk(flow, (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER));
   }
 
   ndpi_free(cipher_copy);
