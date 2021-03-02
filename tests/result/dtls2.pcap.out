@@ -1,0 +1,8 @@
+DTLS	30	4991	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 61.68.110.153            	 1      
+
+
+	1	UDP 61.68.110.153:53045 <-> 212.32.214.39:61457 [proto: 30/DTLS][cat: Web/5][14 pkts/2246 bytes <-> 16 pkts/2745 bytes][Goodput ratio: 74/75][382.15 sec][bytes ratio: -0.100 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 2/241 27857/28359 60550/60551 26256/25033][Pkt Len c2s/s2c min/avg/max/stddev: 123/102 160/172 325/867 46/180][Risk: ** Weak TLS cipher **** TLS (probably) not carrying HTTPS **** SNI TLS extension was missing **][DTLSv1.0][JA3C: 1b45c913a0c0fde5f263502e65999485][JA3S: 749bd1edea60396ffaa65213b7971718 (WEAK)][Issuer: C=US][Subject: C=US, CN=*.relay.ros.rockstargames.com][Validity: 2014-09-12 21:31:19 - 2037-02-15 21:31:19][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA][PLAIN TEXT (140912213119Z)][Plen Bins: 0,3,43,46,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

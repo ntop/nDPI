@@ -1290,6 +1290,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case NDPI_PROTOCOL_TLS:
+  case NDPI_PROTOCOL_DTLS:
     if(flow->protos.tls_quic_stun.tls_quic.ssl_version) {
       char notBefore[32], notAfter[32];
       struct tm a, b, *before = NULL, *after = NULL;

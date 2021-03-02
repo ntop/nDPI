@@ -1,0 +1,8 @@
+DTLS	20	5978	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.186.198.149           	 1      
+
+
+	1	UDP 10.186.198.149:39347 <-> 35.210.59.134:44443 [proto: 30/DTLS][cat: Web/5][11 pkts/2624 bytes <-> 9 pkts/3354 bytes][Goodput ratio: 82/89][2.92 sec][bytes ratio: -0.122 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 324/76 2179/186 659/75][Pkt Len c2s/s2c min/avg/max/stddev: 167/90 239/373 416/1454 97/388][Risk: ** Weak TLS cipher **** TLS (probably) not carrying HTTPS **** SNI TLS extension was missing **][DTLSv1.0][JA3C: 3c3d129780d0066cd8936a6291a8d44f][JA3S: d45798bc098cd930de7eb2f5f866e994 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA][PLAIN TEXT (Opera Software ASA1)][Plen Bins: 0,5,0,35,5,10,10,0,10,10,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0]
