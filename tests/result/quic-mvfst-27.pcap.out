@@ -1,8 +1,0 @@
-Google	20	12887	1
-
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
-	1	 3ef4:2194:f4a6:3503:40cd:714:57:c4e4 	 1      
-
-
-	1	UDP [3ef4:2194:f4a6:3503:40cd:714:57:c4e4]:64229 <-> [2f3d:64d1:9d59:549b::200e]:443 [proto: 188.126/QUIC.Google][cat: Web/5][9 pkts/6081 bytes <-> 11 pkts/6806 bytes][Goodput ratio: 91/90][8.46 sec][ALPN: h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: -0.056 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/0 1198/938 8168/8161 2846/2554][Pkt Len c2s/s2c min/avg/max/stddev: 95/87 676/619 1392/1392 622/598][User-Agent: beta Chrome/84.0.4147.45 Windows NT 10.0; Win64; x64][TLSv1.3][Client: play.google.com][JA3C: 1e022f87823477abd6a79c31d70062d7][Plen Bins: 20,30,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,30,0,0,0,0,0,0]
