@@ -7286,6 +7286,9 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     if(!name) return(0);
 
+    if(flow && (flow->packet.detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
+      return(0); /* Ignore DGA check for protocols already fully detected */
+
 #ifdef DGA_DEBUG
     printf("[DGA] %s\n", name);
 #endif
