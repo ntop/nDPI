@@ -58,6 +58,8 @@ static int _ndpi_debug_callbacks = 0;
 /* #define DGA_DEBUG 1 */
 /* #define MATCH_DEBUG 1 */
 
+u_int ndpi_verbose_dga_detection = 0;
+
 /* ****************************************** */
 
 static void *(*_ndpi_flow_malloc)(size_t size);
@@ -497,7 +499,7 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
   dot = len -1;
 
   memset(&ac_pattern, 0, sizeof(ac_pattern));
-  
+
   if((!add_ends_with) || ndpi_is_middle_string_char(value[dot])) {
     ac_pattern.length = len;
     ac_pattern.astring = value;
@@ -621,14 +623,14 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
     ndpi_init_protocol_match(ndpi_str, &host_match[i]);
 
   /* ************************ */
-  
+
   for(i = 0; tls_certificate_match[i].string_to_match != NULL; i++) {
 #if 0
     printf("%s() %s / %u\n", __FUNCTION__,
 	   tls_certificate_match[i].string_to_match,
 	   tls_certificate_match[i].protocol_id);
 #endif
-    
+
     ndpi_add_string_value_to_automa(ndpi_str->tls_cert_subject_automa.ac_automa,
 				    tls_certificate_match[i].string_to_match,
 				    tls_certificate_match[i].protocol_id);
@@ -2997,7 +2999,7 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
 
   if(ndpi_str->malicious_ja3_automa.ac_automa == NULL)
     ndpi_str->malicious_ja3_automa.ac_automa = ac_automata_init(ac_match_handler);
-  
+
   fd = fopen(path, "r");
 
   if(fd == NULL) {
@@ -3007,7 +3009,7 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
 
   while(1) {
     char *comma;
-    
+
     line = fgets(buffer, sizeof(buffer), fd);
 
     if(line == NULL)
@@ -5014,7 +5016,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	NDPI_CLR_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
     }
 #endif
-    
+
     switch(ret->app_protocol) {
       /*
       Skype for a host doing MS Teams means MS Teams
@@ -6839,16 +6841,14 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if((rc == 0) && (match.number != 0))
       rc = 1;
 
-#ifdef TRIGRAM_CHECK
-    if(rc && match.number) {
+    if(ndpi_verbose_dga_detection && rc && match.number) {
       printf("[%s:%d] [NDPI] Trigram %c%c%c\n",
 	     __FILE__, __LINE__,
 	     trigram_to_match[0],
 	     trigram_to_match[1],
 	     trigram_to_match[2]);
     }
-#endif
-    
+
     return(rc ? match.number : 0);
   }
 
@@ -7223,11 +7223,11 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
   static int enough(int a, int b) {
     u_int8_t percentage = 20;
 
-    if(b == 0) return(0);
+    if(b <= 1) return(0);
     if(a == 0) return(1);
 
     if(b > (((a+1)*percentage)/100)) return(1);
-
+    
     return(0);
   }
 
@@ -7267,6 +7267,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     case 'o':
     case 'u':
     case 'y': // Not a real vowel...
+    case 'x': // Not a real vowel...
       return(1);
       break;
 
@@ -7274,39 +7275,45 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       return(0);
     }
   }
-  
+
   /* ******************************************************************** */
-  
+
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			  struct ndpi_flow_struct *flow,
 			  char *name, u_int8_t is_hostname) {
-    int len, rc = 0;
-    u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0, num_dots = 0;
+    int len, rc = 0, trigram_char_skip = 0;
+    u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0, num_dots = 0, num_trigram_dots = 0;
     u_int8_t max_domain_element_len = 0, curr_domain_element_len = 0, first_element_is_numeric = 1;
 
-    if(!name) return(0);
-
+    if((!name)
+       || (strchr(name, '_') != NULL)
+       || (endsWith(name, "in-addr.arpa", 12)))
+      return(0);
+    
     if(flow && (flow->packet.detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
       return(0); /* Ignore DGA check for protocols already fully detected */
 
-#ifdef DGA_DEBUG
-    printf("[DGA] %s\n", name);
-#endif
+    if(strncmp(name, "www.", 4) == 0)
+      name = &name[4];
+    
+    if(ndpi_verbose_dga_detection)
+      printf("[DGA check] %s\n", name);
 
     len = strlen(name);
 
     if(len >= 5) {
       int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0,
-	num_trigram_found = 0, num_trigram_checked = 0,
-	num_digits = 0, num_vowels = 0, num_words = 0;
+	num_trigram_found = 0, num_trigram_checked = 0, num_dash = 0,
+	num_digits = 0, num_vowels = 0, num_trigram_vowels = 0, num_words = 0, skip_next_bigram = 0;
       char tmp[128], *word, *tok_tmp;
       u_int max_tmp_len = sizeof(tmp)-1;
 
       len = snprintf(tmp, max_tmp_len, "%s", name);
       if(len < 0) {
-#ifdef DGA_DEBUG
-	printf("[DGA] Too short");
-#endif
+
+	if(ndpi_verbose_dga_detection)
+	  printf("[DGA] Too short");
+
 	return(0);
       } else
 	tmp[len < max_tmp_len ? len : max_tmp_len] = '\0';
@@ -7314,19 +7321,32 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       for(i=0, j=0; (i<len) && (j<max_tmp_len); i++) {
 	tmp[j] = tolower(name[i]);
 
-	if(tmp[j] == '.')
+	if(tmp[j] == '.') {
 	  num_dots++;
-	else if(num_dots == 0) {
+	} else if(num_dots == 0) {
 	  if(!isdigit(tmp[j]))
 	    first_element_is_numeric = 0;
 	}
-
+	
+	if(ndpi_is_vowel(tmp[j]))
+	  num_vowels++;
+	  
 	if(last_char == tmp[j]) {
 	  if(++num_char_repetitions > max_num_char_repetitions)
 	    max_num_char_repetitions = num_char_repetitions;
 	} else
 	  num_char_repetitions = 1, last_char = tmp[j];
-
+	
+	if(isdigit(tmp[j])) {
+	  num_digits++;
+	  
+	  if(((j+2)<len) && isdigit(tmp[j+1]) && (tmp[j+2] == '.')) {
+	    /* Check if there are too many digits */
+	    if(num_digits < 4)
+	      return(0); /* Double digits */
+	  }
+	}
+	
 	switch(tmp[j]) {
 	case '.':
 	case '-':
@@ -7360,22 +7380,20 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	j++;
       }
 
-      if(num_dots < 2) /* At least XXX.YYY.ZZZ */
+      if(num_dots == 0) /* Doesn't look like a domain name */
 	return(0);
 
       if(curr_domain_element_len > max_domain_element_len)
 	max_domain_element_len = curr_domain_element_len;
 
-#ifdef DGA_DEBUG
-      printf("[DGA] [max_num_char_repetitions: %u][max_domain_element_len: %u]\n",
-	     max_num_char_repetitions, max_domain_element_len);
-#endif
+      if(ndpi_verbose_dga_detection)
+	printf("[DGA] [max_num_char_repetitions: %u][max_domain_element_len: %u]\n",
+	       max_num_char_repetitions, max_domain_element_len);
 
       if(
 	 (is_hostname
 	  && (num_dots > 5)
 	  && (!first_element_is_numeric)
-	  && (!endsWith(tmp, "in-addr.arpa", 12))
 	  )
 	 || (max_num_char_repetitions > 5 /* num or consecutive repeated chars */)
 	 /*
@@ -7389,9 +7407,10 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	 || (max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */)
 	 ) {
 	if(flow) ndpi_set_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
-#ifdef DGA_DEBUG
-	printf("[DGA] Found!");
-#endif
+
+	if(ndpi_verbose_dga_detection)
+	  printf("[DGA] Found!");
+
 	return(1);
       }
 
@@ -7405,21 +7424,15 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
 	if(strlen(word) < 3) continue;
 
-#ifdef DGA_DEBUG
-	printf("-> %s [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
-#endif
+	if(ndpi_verbose_dga_detection)
+	  printf("-> word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
 
+	trigram_char_skip = 0;
+	
 	for(i = 0; word[i+1] != '\0'; i++) {
-	  if(isdigit(word[i])) {
-	    num_digits++;
-
-	    // if(!isdigit(word[i+1])) num_impossible++;
-
-	    continue;
-	  }
-
 	  switch(word[i]) {
 	  case '-':
+	    num_dash++;
 	    /*
 	       Let's check for double+consecutive --
 	       that are usually ok
@@ -7437,84 +7450,98 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	    continue;
 	    break;
 	  }
-
-#if 0
-	  switch(word[i]) {
-	  case 'a':
-	  case 'e':
-	  case 'i':
-	  case 'o':
-	  case 'u':
-	    num_vowels++;
-	    break;
-	  }
-#endif
-	  if(isdigit(word[i+1])) {
-	    num_digits++;
-	    // num_impossible++;
-	    continue;
-	  }
-
 	  num_bigram_checks++;
 
-#ifdef DGA_DEBUG
-	  printf("-> Checking %c%c\n", word[i], word[i+1]);
-#endif
+	  if(ndpi_verbose_dga_detection)
+	    printf("-> Checking %c%c\n", word[i], word[i+1]);
 
 	  if(ndpi_match_bigram(ndpi_str,
 			       &ndpi_str->impossible_bigrams_automa,
 			       &word[i])) {
-#ifdef DGA_DEBUG
-	    printf("IMPOSSIBLE %s\n", &word[i]);
-#endif
+	    if(ndpi_verbose_dga_detection)
+	      printf("IMPOSSIBLE %s\n", &word[i]);
+
 	    num_impossible++;
-	  } else if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
-	    num_found++;
+	  } else {
+	    if(!skip_next_bigram) {
+	      if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
+		num_found++, skip_next_bigram = 1;
+	      }
+	    } else
+	      skip_next_bigram = 0;
 	  }
 
-	  if((i > 0) && (word[0] != '_') && (word[i+2] != '\0')) {
+	  if((num_trigram_dots < 2) && (word[i+2] != '\0')) {
+	    if(ndpi_verbose_dga_detection)
+	      printf("***> %s [trigram_char_skip: %u]\n", &word[i], trigram_char_skip);
+	    
 	    if(ndpi_is_trigram_char(word[i]) && ndpi_is_trigram_char(word[i+1]) && ndpi_is_trigram_char(word[i+2])) {
-	      num_trigram_checked++;
-	      
-	      if(ndpi_match_trigram(ndpi_str, &ndpi_str->trigrams_automa, &word[i])) {
-		num_trigram_found++;
-	      }
-	    }
+	      if(trigram_char_skip) {
+		  trigram_char_skip--;
+	      } else {
+		num_trigram_checked++;
 
-	    /* Count vowels */
-	    num_vowels += ndpi_is_vowel(word[i]) + ndpi_is_vowel(word[i+1]) + ndpi_is_vowel(word[i+2]);	   
+		if(ndpi_match_trigram(ndpi_str, &ndpi_str->trigrams_automa, &word[i]))
+		  num_trigram_found++, trigram_char_skip = 2 /* 1 char overlap */;
+		else if(ndpi_verbose_dga_detection)
+		  printf("[NDPI] NO Trigram %c%c%c\n", word[i], word[i+1], word[i+2]);
+		
+		/* Count vowels */
+		num_trigram_vowels += ndpi_is_vowel(word[i]) + ndpi_is_vowel(word[i+1]) + ndpi_is_vowel(word[i+2]);
+	      }
+	    } else {
+	      if(word[i] == '.')
+		num_trigram_dots++;
+	      
+	      trigram_char_skip = 0;
+	    }
 	  }
 	} /* for */
       } /* for */
 
-#ifdef DGA_DEBUG
-      printf("[%s][num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u][num_trigram_found: %u/%u][vowels: %u]\n",
-	     name, num_found, num_impossible, num_digits, num_bigram_checks, num_vowels, j-num_vowels,
-	     num_trigram_checked, num_trigram_found, num_vowels);
-#endif
+      if(ndpi_verbose_dga_detection)
+	printf("[%s][num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u][num_trigram_vowels: %u][num_trigram_found: %u/%u][vowels: %u][rc: %u]\n",
+	       name, num_found, num_impossible, num_digits, num_bigram_checks, num_vowels, len, num_trigram_vowels,
+	       num_trigram_checked, num_trigram_found, num_vowels, rc);
 
-      if(num_bigram_checks
-	 && ((num_found == 0) || ((num_digits > 5) && (num_words <= 3))
-	     || enough(num_found, num_impossible) || ((num_trigram_checked > 3) && (num_trigram_found < (num_trigram_checked/2)))))
-	rc = 1;
-
-      if(num_trigram_checked && (num_vowels == 0))
-	rc = 1;
+      if((len > 16) && (num_dots < 3) && ((num_vowels*4) < (len-num_dots))) {
+	if((num_trigram_checked > 2) && (num_trigram_vowels >= (num_trigram_found-1)))
+	  ; /* skip me */
+	else
+	  rc = 1;
+      }
       
-#ifdef DGA_DEBUG
-      if(rc)
-	printf("DGA %s [num_found: %u][num_impossible: %u]\n",
-	       name, num_found, num_impossible);
-#endif
+      if(num_bigram_checks
+	 && (num_dots > 0)
+	 && ((num_found == 0) || ((num_digits > 5) && (num_words <= 3))
+	     || enough(num_found, num_impossible)
+	     || ((num_trigram_checked > 2)
+		 && ((num_trigram_found < (num_trigram_checked/2))
+		     || ((num_trigram_vowels < (num_trigram_found-1)) && (num_dash == 0) && (num_dots > 1)))
+		 )
+	     )
+	 )
+	rc = 1;
+
+      if((num_trigram_checked > 2) && (num_vowels == 0))
+	rc = 1;
+
+      if(num_dash > 2)
+	rc = 0;
+      
+      if(ndpi_verbose_dga_detection) {
+	if(rc)
+	  printf("DGA %s [num_found: %u][num_impossible: %u]\n",
+		 name, num_found, num_impossible);
+      }
     }
 
-#ifdef DGA_DEBUG
-    printf("[DGA] Result: %u", rc);
-#endif
+    if(ndpi_verbose_dga_detection)
+      printf("[DGA] Result: %u\n", rc);
 
     if(rc && flow)
       ndpi_set_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
-    
+
     return(rc);
   }
 

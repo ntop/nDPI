@@ -39,12 +39,15 @@ void help() {
 
 /* *********************************************** */
 
+extern int ndpi_verbose_dga_detection;
+
 int main(int argc, char **argv) {
   FILE *fd;
   char buffer[512];
   int verbose = 0;
+  int num_detections = 0;
   
-  if(argc != 2) help();
+  if(argc < 2) help();
   fd = fopen(argv[1], "r");
   
   if(fd == NULL) {
@@ -52,7 +55,12 @@ int main(int argc, char **argv) {
     exit(0);
   }
 
-  if(argv[1] != NULL) verbose = 1;
+  if(argv[2] != NULL) {
+    verbose = 1;
+    
+    if(argv[3] != NULL)
+      ndpi_verbose_dga_detection = 1;
+  }
   
   if (ndpi_get_api_version() != NDPI_API_VERSION) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
@@ -67,7 +75,6 @@ int main(int argc, char **argv) {
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
   ndpi_finalize_initialization(ndpi_str);
   assert(ndpi_str != NULL);
-  int num_detections = 0;
 
 
   while(fgets(buffer, sizeof(buffer), fd) != NULL) {

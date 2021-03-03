@@ -3530,9 +3530,11 @@ static void dgaUnitTest() {
   for(i=0; dga[i] != NULL; i++)
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i], 1) == 1);
 
-  for(i=0; non_dga[i] != NULL; i++)
+  for(i=0; non_dga[i] != NULL; i++) {
+    /* printf("Checking non DGA %s\n", non_dga[i]); */
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i], 1) == 0);
-
+  }
+  
   ndpi_exit_detection_module(ndpi_str);
 }
 
