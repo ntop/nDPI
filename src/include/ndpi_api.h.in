@@ -1254,7 +1254,17 @@ extern "C" {
   int ndpi_serialize_string_float(ndpi_serializer *serializer, const char *key, float value, const char *format /* e.f. "%.2f" */);
 
   /**
-   * Serialize a string key and a boolean value
+   * Serialize an unterminated string key and a boolean value (JSON/CSV only, not supported by TLV)
+   * @param serializer The serializer handle
+   * @param key The field name or ID
+   * @param klen The key length
+   * @param value The field value
+   * @return 0 on success, a negative number otherwise
+   */
+  int ndpi_serialize_binary_boolean(ndpi_serializer *_serializer, const char *key, u_int16_t klen, u_int8_t value);
+
+  /**
+   * Serialize a string key and a boolean value (JSON/CSV only, not supported by TLV)
    * @param serializer The serializer handle
    * @param key The field name or ID
    * @param value The field value

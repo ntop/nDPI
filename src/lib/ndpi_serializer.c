@@ -1673,11 +1673,10 @@ int ndpi_serialize_string_raw(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
-int ndpi_serialize_string_boolean(ndpi_serializer *_serializer,
-				  const char *key, u_int8_t value) {
+int ndpi_serialize_binary_boolean(ndpi_serializer *_serializer,
+				  const char *key, u_int16_t klen, u_int8_t value) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-  u_int16_t klen = strlen(key);
   u_int32_t needed;
 
   if(serializer->fmt != ndpi_serialization_format_json &&
@@ -1722,6 +1721,13 @@ int ndpi_serialize_string_boolean(ndpi_serializer *_serializer,
 
   serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
   return(0);
+}
+
+/* ********************************** */
+
+int ndpi_serialize_string_boolean(ndpi_serializer *_serializer,
+				  const char *key, u_int8_t value) {
+  return(ndpi_serialize_binary_boolean(_serializer, key, strlen(key), value));
 }
 
 /* ********************************** */
