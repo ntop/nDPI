@@ -283,6 +283,7 @@ typedef enum {
   NDPI_PROTOCOL_ANYDESK               = 252, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_SOAP                  = 253, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_APPLE_SIRI            = 254, /* Zied Aouini <aouinizied@gmail.com> */
+  NDPI_PROTOCOL_SNAPCHAT_CALL         = 255,
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
