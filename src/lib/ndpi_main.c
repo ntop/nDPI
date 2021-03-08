@@ -2533,16 +2533,19 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->impossible_bigrams_automa.ac_automa, 0);
 
     if(ndpi_str->risky_domain_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->risky_domain_automa.ac_automa, 0);
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->risky_domain_automa.ac_automa,
+                          1 /* free patterns strings memory */);
 
     if(ndpi_str->tls_cert_subject_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->tls_cert_subject_automa.ac_automa, 0);
 
     if(ndpi_str->malicious_ja3_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_ja3_automa.ac_automa, 0);
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_ja3_automa.ac_automa,
+                          1 /* free patterns strings memory */);
 
     if(ndpi_str->malicious_sha1_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_sha1_automa.ac_automa, 0);
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_sha1_automa.ac_automa,
+                           1 /* free patterns strings memory */);
 
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
@@ -2929,13 +2932,19 @@ static int ndpi_load_risky_domain(struct ndpi_detection_module_struct *ndpi_str,
     ndpi_str->risky_domain_automa.ac_automa = ac_automata_init(ac_match_handler);
 
   if(ndpi_str->risky_domain_automa.ac_automa) {
-    char buf[64];
+    char buf[64], *str;
     u_int i, len;
 
     snprintf(buf, sizeof(buf)-1, "%s$", domain_name);
     for(i = 0, len = strlen(buf)-1 /* Skip $ */; i < len; i++) buf[i] = tolower(buf[i]);
 
-    return(ndpi_add_string_to_automa(ndpi_str->risky_domain_automa.ac_automa, buf));
+    str = ndpi_strdup(buf);
+    if (str == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
+      return -1;
+    };
+
+    return(ndpi_add_string_to_automa(ndpi_str->risky_domain_automa.ac_automa, str));
   }
 
   return(-1);
@@ -2997,7 +3006,7 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
  *
  */
 int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
-  char buffer[128], *line;
+  char buffer[128], *line, *str;
   FILE *fd;
   int len, num = 0;
 
@@ -3029,7 +3038,13 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
     if((comma = strchr(line, ',')) != NULL)
       comma[0] = '\0';
 
-    if(ndpi_add_string_to_automa(ndpi_str->malicious_ja3_automa.ac_automa, line) >= 0)
+    str = ndpi_strdup(line);
+    if (str == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
+      return -1;
+    };
+
+    if(ndpi_add_string_to_automa(ndpi_str->malicious_ja3_automa.ac_automa, str) >= 0)
       num++;
   }
 
@@ -3051,7 +3066,7 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
 int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str, const char *path)
 {
   char buffer[128];
-  char *first_comma, *second_comma;
+  char *first_comma, *second_comma, *str;
   FILE *fd;
   size_t len;
   int num = 0;
@@ -3090,7 +3105,13 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
     for (size_t i = 0; i < 40; ++i)
       first_comma[i] = toupper(first_comma[i]);
 
-    if (ndpi_add_string_to_automa(ndpi_str->malicious_sha1_automa.ac_automa, first_comma) >= 0)
+    str = ndpi_strdup(first_comma);
+    if (str == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
+      return -1;
+    };
+
+    if (ndpi_add_string_to_automa(ndpi_str->malicious_sha1_automa.ac_automa, str) >= 0)
       num++;
   }
 
