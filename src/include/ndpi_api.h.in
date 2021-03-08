@@ -47,7 +47,12 @@ extern "C" {
 #define SAVE_DETECTION_BITMASK_AS_UNKNOWN     1
 #define NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN  0
 
-
+  /*
+    In case a custom DGA function is used, the fucntion
+    below must be overwritten,
+   */
+  extern ndpi_custom_dga_predict_fctn ndpi_dga_function;
+  
   /**
    * Check if a string is encoded with punycode
    * ( https://tools.ietf.org/html/rfc3492 )

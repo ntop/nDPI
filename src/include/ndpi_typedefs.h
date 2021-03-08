@@ -1662,6 +1662,9 @@ struct ndpi_hw_struct {
   double    *s;
 };
 
+/* Prototype used to define custom DGA detection function */
+typedef int (*ndpi_custom_dga_predict_fctn)(const char* domain, int domain_length);
+
 /* **************************************** */
 
 #endif /* __NDPI_TYPEDEFS_H__ */
