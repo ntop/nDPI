@@ -1,0 +1,3 @@
+WhatsAppCall	400	49657	1
+
+	1	UDP 10.54.0.101:55836 <-> 10.99.99.217:2598 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][175 pkts/22354 bytes <-> 225 pkts/27303 bytes][Goodput ratio: 67/65][14.17 sec][bytes ratio: -0.100 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 65/57 756/452 145/81][Pkt Len c2s/s2c min/avg/max/stddev: 62/62 128/121 1508/1504 260/195][Risk: ** Known protocol on non standard port **][PLAIN TEXT (Citrix.Tc)][Plen Bins: 47,38,3,1,1,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0]

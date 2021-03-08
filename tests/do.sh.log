@@ -1,0 +1,554 @@
+1kxun.pcap                      	OK
+443-chrome.pcap                 	OK
+443-curl.pcap                   	OK
+443-firefox.pcap                	OK
+443-git.pcap                    	OK
+443-opvn.pcap                   	OK
+443-safari.pcap                 	OK
+4in4tunnel.pcap                 	OK
+4in6tunnel.pcap                 	OK
+6in4tunnel.pcap                 	OK
+6in6tunnel.pcap                 	OK
+ajp.pcap                        	OK
+alexa-app.pcapng                	OK
+among_us.pcap                   	OK
+amqp.pcap                       	OK
+android.pcap                    	OK
+anyconnect-vpn.pcap             	OK
+anydesk-2.pcap                  	OK
+anydesk.pcap                    	OK
+bad-dns-traffic.pcap            	OK
+badpackets.pcap                 	OK
+BGP_Cisco_hdlc_slarp.pcap       	OK
+BGP_redist.pcap                 	OK
+bitcoin.pcap                    	OK
+bittorrent_ip.pcap              	OK
+bittorrent.pcap                 	OK
+bittorrent_utp.pcap             	OK
+bt_search.pcap                  	OK
+capwap.pcap                     	OK
+check_mk_new.pcap               	OK
+citrixudp.pcap                  	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/citrixudp.pcap -w /tmp/reader.out -v 2 [old vs new]
+1c1
+< WhatsAppCall	400	49657	1
+---
+> Citrix	400	49657	1
+3c3
+< 	1	UDP 10.54.0.101:55836 <-> 10.99.99.217:2598 [proto: 78.45/STUN.WhatsAppCall][cat: VoIP/10][175 pkts/22354 bytes <-> 225 pkts/27303 bytes][Goodput ratio: 67/65][14.17 sec][bytes ratio: -0.100 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 65/57 756/452 145/81][Pkt Len c2s/s2c min/avg/max/stddev: 62/62 128/121 1508/1504 260/195][Risk: ** Known protocol on non standard port **][PLAIN TEXT (Citrix.Tc)][Plen Bins: 47,38,3,1,1,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0]
+---
+> 	1	UDP 10.54.0.101:55836 <-> 10.99.99.217:2598 [proto: 132/Citrix][cat: Network/14][175 pkts/22354 bytes <-> 225 pkts/27303 bytes][Goodput ratio: 67/65][14.17 sec][bytes ratio: -0.100 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 65/57 756/452 145/81][Pkt Len c2s/s2c min/avg/max/stddev: 62/62 128/121 1508/1504 260/195][PLAIN TEXT (Citrix.Tc)][Plen Bins: 47,38,3,1,1,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0]
+coap_mqtt.pcap                  	OK
+cpha.pcap                       	OK
+dcerpc.pcap                     	OK
+diameter.pcap                   	OK
+dlt_ppp.pcap                    	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/dlt_ppp.pcap -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 193.167.0.252            	 1      
+< 
+< 
+< 	1	UDP 193.167.0.252:44083 -> 193.167.100.100:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1230 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-29][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][TLSv1.3][Client: server4][JA3C: fe94e313a5d76fb687c85443cdfa8170][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 193.167.0.252:44083 -> 193.167.100.100:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1230 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0]
+dnp3.pcap                       	OK
+dnscrypt-v1-and-resolver-pings.pcap	OK
+dnscrypt-v2-doh.pcap            	OK
+dns_doh.pcap                    	OK
+dns_dot.pcap                    	OK
+dns_exfiltration.pcap           	OK
+dns_long_domainname.pcap        	OK
+dns-tunnel-iodine.pcap          	OK
+doq_adguard.pcapng              	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/doq_adguard.pcapng -w /tmp/reader.out -v 2 [old vs new]
+1c1
+< DoH_DoT	296	44445	1
+---
+> QUIC	296	44445	1
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 192.168.12.169           	 1      
+< 
+< 
+< 	1	UDP 192.168.12.169:41070 <-> 94.140.14.14:784 [proto: 188.196/QUIC.DoH_DoT][cat: Network/14][164 pkts/17196 bytes <-> 132 pkts/27249 bytes][Goodput ratio: 60/80][38.08 sec][ALPN: doq-i00][TLS Supported Versions: TLSv1.3][bytes ratio: -0.226 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 232/242 2999/3045 449/458][Pkt Len c2s/s2c min/avg/max/stddev: 72/81 105/206 1274/1294 132/268][TLSv1.3][Client: dns.adguard.com][JA3C: 1e022f87823477abd6a79c31d70062d7][PLAIN TEXT (AKToSb)][Plen Bins: 15,47,16,9,4,0,2,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 192.168.12.169:41070 <-> 94.140.14.14:784 [proto: 188/QUIC][cat: Web/5][164 pkts/17196 bytes <-> 132 pkts/27249 bytes][Goodput ratio: 60/80][38.08 sec][bytes ratio: -0.226 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 232/242 2999/3045 449/458][Pkt Len c2s/s2c min/avg/max/stddev: 72/81 105/206 1274/1294 132/268][PLAIN TEXT (AKToSb)][Plen Bins: 15,47,16,9,4,0,2,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0]
+doq.pcapng                      	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/doq.pcapng -w /tmp/reader.out -v 2 [old vs new]
+2c2
+< DoH_DoT	14	4788	1
+---
+> QUIC	14	4788	1
+4,9c4
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 ::1                      	 1      
+< 
+< 
+< 	1	UDP [::1]:47826 <-> [::1]:784 [proto: 188.196/QUIC.DoH_DoT][cat: Network/14][3 pkts/1690 bytes <-> 11 pkts/3098 bytes][Goodput ratio: 89/78][3.16 sec][ALPN: doq-i00][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][bytes ratio: -0.294 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/7 1/329 2/1601 1/517][Pkt Len c2s/s2c min/avg/max/stddev: 117/117 563/282 1294/1294 521/340][Risk: ** SNI TLS extension was missing **][TLSv1.3][JA3C: c0ce40fbb78cbf86a14e6a38b26d6ede][Plen Bins: 0,21,50,0,0,0,7,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP [::1]:47826 <-> [::1]:784 [proto: 188/QUIC][cat: Web/5][3 pkts/1690 bytes <-> 11 pkts/3098 bytes][Goodput ratio: 89/78][3.16 sec][bytes ratio: -0.294 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/7 1/329 2/1601 1/517][Pkt Len c2s/s2c min/avg/max/stddev: 117/117 563/282 1294/1294 521/340][Plen Bins: 0,21,50,0,0,0,7,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0]
+dos_win98_smb_netbeui.pcap      	OK
+drda_db2.pcap                   	OK
+dropbox.pcap                    	OK
+dtls2.pcap                      	OK
+dtls_certificate_fragments.pcap 	OK
+dtls.pcap                       	OK
+dtls_session_id_and_coockie_both.pcap	OK
+EAQ.pcap                        	OK
+encrypted_sni.pcap              	OK
+ethereum.pcap                   	OK
+exe_download_as_png.pcap        	OK
+exe_download.pcap               	OK
+facebook.pcap                   	OK
+fix.pcap                        	OK
+ftp_failed.pcap                 	OK
+ftp.pcap                        	OK
+fuzz-2006-06-26-2594.pcap       	OK
+fuzz-2006-09-29-28586.pcap      	OK
+fuzz-2020-02-16-11740.pcap      	OK
+git.pcap                        	OK
+googledns_android10.pcap        	OK
+google_ssl.pcap                 	OK
+gquic.pcap                      	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/gquic.pcap -w /tmp/reader.out -v 2 [old vs new]
+3c3
+< 	1	UDP 10.44.5.25:61097 -> 216.58.213.163:443 [proto: 188.126/QUIC.Google][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][User-Agent: canary Chrome/85.0.4169.0 Windows NT 10.0; Win64; x64][Client: www.gstatic.com][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+---
+> 	1	UDP 10.44.5.25:61097 -> 216.58.213.163:443 [proto: 188.126/QUIC.Google][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+h323-overflow.pcap              	OK
+hangout.pcap                    	OK
+http-crash-content-disposition.pcap	OK
+http_ipv6.pcap                  	OK
+http-lines-split.pcap           	OK
+IEC104.pcap                     	OK
+iec60780-5-104.pcap             	OK
+imaps.pcap                      	OK
+instagram.pcap                  	OK
+ip_fragmented_garbage.pcap      	OK
+iphone.pcap                     	OK
+ipv6_in_gtp.pcap                	OK
+irc.pcap                        	OK
+ja3_lots_of_cipher_suites_2_anon.pcap	OK
+ja3_lots_of_cipher_suites.pcap  	OK
+KakaoTalk_chat.pcap             	OK
+KakaoTalk_talk.pcap             	OK
+kerberos.pcap                   	OK
+long_tls_certificate.pcap       	OK
+malformed_dns.pcap              	OK
+malformed_icmp.pcap             	OK
+malware.pcap                    	OK
+modbus.pcap                     	OK
+monero.pcap                     	OK
+mongodb.pcap                    	OK
+mpeg.pcap                       	OK
+mpegts.pcap                     	OK
+mssql_tds.pcap                  	OK
+mysql-8.pcap                    	OK
+nats.pcap                       	OK
+nest_log_sink.pcap              	OK
+netbios.pcap                    	OK
+netbios_wildcard_dns_query.pcap 	OK
+netflix.pcap                    	OK
+netflow-fritz.pcap              	OK
+netflowv9.pcap                  	OK
+nintendo.pcap                   	OK
+no_sni.pcap                     	OK
+NTPv2.pcap                      	OK
+NTPv3.pcap                      	OK
+NTPv4.pcap                      	OK
+ocs.pcap                        	OK
+ookla.pcap                      	OK
+openvpn.pcap                    	OK
+Oscar.pcap                      	OK
+os_detected.pcapng              	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/os_detected.pcapng -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 192.168.1.128            	 1      
+< 
+< 
+< 	1	UDP 192.168.1.128:39821 -> 8.8.8.8:443 [proto: 188.126/QUIC.Google][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: h3-29][TLS Supported Versions: TLSv1.3][User-Agent: Mozilla/5.0 (Windows NT 5.2; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko)][Risk: ** SNI TLS extension was missing **][TLSv1.3][JA3C: 9addef84847d700f759746b237c405c8][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 192.168.1.128:39821 -> 8.8.8.8:443 [proto: 188.126/QUIC.Google][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+pinterest.pcap                  	OK
+pps.pcap                        	OK
+ps_vue.pcap                     	OK
+quic046.pcap                    	OK
+quic_0RTT.pcap                  	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic_0RTT.pcap -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 ::1                      	 1      
+< 
+< 
+< 	1	UDP [::1]:60459 <-> [::1]:4443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/1294 bytes][Goodput ratio: 95/95][0.00 sec][ALPN: h3-32][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][TLSv1.3][Client: abcd][JA3C: a7b629a5bd67bfc25e2c78b3daa4c12f][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP [::1]:60459 <-> [::1]:4443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/1294 bytes][Goodput ratio: 95/95][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+quic-23.pcap                    	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-23.pcap -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 2e4a:774d:26fd:7f9b:785b:2d1b:4f8a:63c7 	 1      
+< 
+< 
+< 	1	UDP [2e4a:774d:26fd:7f9b:785b:2d1b:4f8a:63c7]:50339 <-> [3bcc:9991:faba:bae1:cd2a:e2fd:b3be:c5ab]:443 [proto: 188/QUIC][cat: Web/5][10 pkts/2613 bytes <-> 10 pkts/4578 bytes][Goodput ratio: 76/86][0.11 sec][ALPN: h3-22][TLS Supported Versions: TLSv1.3][bytes ratio: -0.273 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/8 38/34 12/15][Pkt Len c2s/s2c min/avg/max/stddev: 92/94 261/458 1342/1342 373/458][TLSv1.3][Client: quic.aiortc.org][JA3C: d9e7bdb15af8e499820ca74a68affd78][Plen Bins: 5,35,15,10,5,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0]
+---
+> 	1	UDP [2e4a:774d:26fd:7f9b:785b:2d1b:4f8a:63c7]:50339 <-> [3bcc:9991:faba:bae1:cd2a:e2fd:b3be:c5ab]:443 [proto: 188/QUIC][cat: Web/5][10 pkts/2613 bytes <-> 10 pkts/4578 bytes][Goodput ratio: 76/86][0.11 sec][bytes ratio: -0.273 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/8 38/34 12/15][Pkt Len c2s/s2c min/avg/max/stddev: 92/94 261/458 1342/1342 373/458][Plen Bins: 5,35,15,10,5,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0]
+quic-24.pcap                    	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-24.pcap -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 10.9.0.1                 	 1      
+< 
+< 
+< 	1	UDP 10.9.0.1:41436 <-> 10.9.0.2:443 [proto: 188/QUIC][cat: Web/5][7 pkts/4672 bytes <-> 8 pkts/3328 bytes][Goodput ratio: 94/90][30.04 sec][ALPN: h3-24][TLS Supported Versions: TLSv1.3][bytes ratio: 0.168 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 6006/4 30007/12 12000/4][Pkt Len c2s/s2c min/avg/max/stddev: 82/81 667/416 1294/1294 562/406][TLSv1.3][Client: localhost][JA3C: b3e43d74f4b790abca2f5fe7dd06e7cf][PLAIN TEXT (Udwn.wf)][Plen Bins: 0,34,0,6,6,0,0,0,6,0,6,0,0,0,0,6,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 10.9.0.1:41436 <-> 10.9.0.2:443 [proto: 188/QUIC][cat: Web/5][7 pkts/4672 bytes <-> 8 pkts/3328 bytes][Goodput ratio: 94/90][30.04 sec][bytes ratio: 0.168 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 6006/4 30007/12 12000/4][Pkt Len c2s/s2c min/avg/max/stddev: 82/81 667/416 1294/1294 562/406][PLAIN TEXT (Udwn.wf)][Plen Bins: 0,34,0,6,6,0,0,0,6,0,6,0,0,0,0,6,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0]
+quic-27.pcap                    	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-27.pcap -w /tmp/reader.out -v 2 [old vs new]
+1c1
+< Google	20	12887	1
+---
+> QUIC	20	12887	1
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 3ef4:2194:f4a6:3503:40cd:714:57:c4e4 	 1      
+< 
+< 
+< 	1	UDP [3ef4:2194:f4a6:3503:40cd:714:57:c4e4]:64229 <-> [2f3d:64d1:9d59:549b::200e]:443 [proto: 188.126/QUIC.Google][cat: Web/5][9 pkts/6081 bytes <-> 11 pkts/6806 bytes][Goodput ratio: 91/90][8.46 sec][ALPN: h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: -0.056 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/0 1198/938 8168/8161 2846/2554][Pkt Len c2s/s2c min/avg/max/stddev: 95/87 676/619 1392/1392 622/598][User-Agent: beta Chrome/84.0.4147.45 Windows NT 10.0; Win64; x64][TLSv1.3][Client: play.google.com][JA3C: 1e022f87823477abd6a79c31d70062d7][Plen Bins: 20,30,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,30,0,0,0,0,0,0]
+---
+> 	1	UDP [3ef4:2194:f4a6:3503:40cd:714:57:c4e4]:64229 <-> [2f3d:64d1:9d59:549b::200e]:443 [proto: 188/QUIC][cat: Web/5][9 pkts/6081 bytes <-> 11 pkts/6806 bytes][Goodput ratio: 91/90][8.46 sec][bytes ratio: -0.056 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/0 1198/938 8168/8161 2846/2554][Pkt Len c2s/s2c min/avg/max/stddev: 95/87 676/619 1392/1392 622/598][Plen Bins: 20,30,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,30,0,0,0,0,0,0]
+quic-28.pcap                    	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-28.pcap -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 10.9.0.2                 	 1      
+< 
+< 
+< 	1	UDP 10.9.0.2:60106 <-> 104.26.11.240:443 [proto: 188.220/QUIC.Cloudflare][cat: Web/5][34 pkts/6856 bytes <-> 219 pkts/239937 bytes][Goodput ratio: 79/96][2.76 sec][ALPN: h3-28;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: -0.944 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 77/14 1007/1023 229/91][Pkt Len c2s/s2c min/avg/max/stddev: 85/84 202/1096 1242/1242 325/364][TLSv1.3][Client: www.wireshark.org][JA3C: 1e022f87823477abd6a79c31d70062d7][PLAIN TEXT (tGLddu)][Plen Bins: 0,16,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,80,0,0,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 10.9.0.2:60106 <-> 104.26.11.240:443 [proto: 188.220/QUIC.Cloudflare][cat: Web/5][34 pkts/6856 bytes <-> 219 pkts/239937 bytes][Goodput ratio: 79/96][2.76 sec][bytes ratio: -0.944 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 77/14 1007/1023 229/91][Pkt Len c2s/s2c min/avg/max/stddev: 85/84 202/1096 1242/1242 325/364][PLAIN TEXT (tGLddu)][Plen Bins: 0,16,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,80,0,0,0,0,0,0,0,0,0,0]
+quic-29.pcap                    	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-29.pcap -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 10.9.0.1                 	 1      
+< 
+< 
+< 	1	UDP 10.9.0.1:36588 <-> 10.9.0.2:443 [proto: 188/QUIC][cat: Web/5][6 pkts/4555 bytes <-> 9 pkts/4831 bytes][Goodput ratio: 94/92][0.04 sec][ALPN: h3-29][TLS Supported Versions: TLSv1.3][bytes ratio: -0.029 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 6/3 18/8 7/3][Pkt Len c2s/s2c min/avg/max/stddev: 84/81 759/537 1294/1294 552/493][TLSv1.3][Client: localhost][JA3C: b3e43d74f4b790abca2f5fe7dd06e7cf][PLAIN TEXT (SYmlKmO)][Plen Bins: 0,27,0,13,0,0,0,0,6,0,6,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,34,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 10.9.0.1:36588 <-> 10.9.0.2:443 [proto: 188/QUIC][cat: Web/5][6 pkts/4555 bytes <-> 9 pkts/4831 bytes][Goodput ratio: 94/92][0.04 sec][bytes ratio: -0.029 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 6/3 18/8 7/3][Pkt Len c2s/s2c min/avg/max/stddev: 84/81 759/537 1294/1294 552/493][PLAIN TEXT (SYmlKmO)][Plen Bins: 0,27,0,13,0,0,0,0,6,0,6,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,34,0,0,0,0,0,0,0,0]
+quic-33.pcapng                  	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-33.pcapng -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 ::1                      	 1      
+< 
+< 
+< 	1	UDP [::1]:51430 <-> [::1]:4443 [proto: 188/QUIC][cat: Web/5][99 pkts/14736 bytes <-> 893 pkts/1325986 bytes][Goodput ratio: 58/96][0.01 sec][ALPN: h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][bytes ratio: -0.978 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 3/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/93 149/1485 1502/1502 183/146][Risk: ** SNI TLS extension was missing **][TLSv1.3][JA3C: 0299b052ace53a14c3a04aceb5efd247][PLAIN TEXT (NLZzZw)][Plen Bins: 0,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,72,0,0]
+---
+> 	1	UDP [::1]:51430 <-> [::1]:4443 [proto: 188/QUIC][cat: Web/5][99 pkts/14736 bytes <-> 893 pkts/1325986 bytes][Goodput ratio: 58/96][0.01 sec][bytes ratio: -0.978 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 3/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/93 149/1485 1502/1502 183/146][PLAIN TEXT (NLZzZw)][Plen Bins: 0,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,72,0,0]
+quic_interop_V.pcapng           	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic_interop_V.pcapng -w /tmp/reader.out -v 2 [old vs new]
+3,4c3
+< QUIC	195	201384	60
+< Microsoft	20	23462	3
+---
+> QUIC	215	224846	63
+6,24c5,17
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 2001:b07:ac9:d5ae:a4d3:fe47:691e:807d 	 1      
+< 	2	 192.168.1.128            	 1      
+< 
+< 
+< 	1	UDP 192.168.1.128:34511 -> 131.159.24.198:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.94 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1419/0 4800/0 1551/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: pandora.cm.in.tum.de][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (SezYZO)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	2	UDP 192.168.1.128:37643 -> 71.202.41.169:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.98 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 243/0 1426/0 4801/0 1546/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: 71.202.41.169][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (tIABbj)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	3	UDP 192.168.1.128:42468 -> 138.91.188.147:4433 [proto: 188.212/QUIC.Microsoft][cat: Cloud/13][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.98 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1425/0 4800/0 1548/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Risk: ** Known protocol on non standard port **][TLSv1.3][Client: quic.westus.cloudapp.azure.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	4	UDP 192.168.1.128:46334 -> 40.112.191.60:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.98 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 241/0 1426/0 4801/0 1545/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: f5quic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	5	UDP 192.168.1.128:49658 -> 193.190.10.98:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.96 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1423/0 4800/0 1549/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: quicker.edm.uhasselt.be][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	6	UDP 192.168.1.128:50705 -> 138.91.188.147:4434 [proto: 188.212/QUIC.Microsoft][cat: Cloud/13][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.86 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1409/0 4800/0 1558/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Risk: ** Known protocol on non standard port **][TLSv1.3][Client: quic.westus.cloudapp.azure.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	7	UDP 192.168.1.128:53402 -> 3.121.242.54:4434 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.97 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1423/0 4800/0 1549/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: ietf.akaquic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	8	UDP 192.168.1.128:59171 -> 193.190.10.98:4433 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.94 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1420/0 4800/0 1551/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: quicker.edm.uhasselt.be][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	9	UDP 192.168.1.128:59515 -> 193.190.10.98:4434 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.84 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1406/0 4800/0 1560/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: quicker.edm.uhasselt.be][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	10	UDP 192.168.1.128:60784 -> 3.121.242.54:4433 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.97 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1424/0 4800/0 1549/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: ietf.akaquic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	11	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:32957 -> [2606:4700:10::6816:826]:4433 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][9.99 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1427/0 4800/0 1547/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: cloudflare-quic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (uhbU.2)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+< 	12	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:41857 -> [2606:4700:10::6816:826]:4434 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][9.86 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 151/0 1408/0 4800/0 1559/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: cloudflare-quic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+< 	13	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:46242 -> [2600:1f18:2310:d230:5103:7d9e:7d75:374f]:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][9.85 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1407/0 4800/0 1559/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][TLSv1.3][Client: test.privateoctopus.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (QQ/o746)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 192.168.1.128:34511 -> 131.159.24.198:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.94 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1419/0 4800/0 1551/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][PLAIN TEXT (SezYZO)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	2	UDP 192.168.1.128:37643 -> 71.202.41.169:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.98 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 243/0 1426/0 4801/0 1546/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][PLAIN TEXT (tIABbj)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	3	UDP 192.168.1.128:42468 -> 138.91.188.147:4433 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.98 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1425/0 4800/0 1548/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	4	UDP 192.168.1.128:46334 -> 40.112.191.60:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.98 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 241/0 1426/0 4801/0 1545/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	5	UDP 192.168.1.128:49658 -> 193.190.10.98:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.96 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1423/0 4800/0 1549/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	6	UDP 192.168.1.128:50705 -> 138.91.188.147:4434 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.86 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1409/0 4800/0 1558/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	7	UDP 192.168.1.128:53402 -> 3.121.242.54:4434 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.97 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1423/0 4800/0 1549/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	8	UDP 192.168.1.128:59171 -> 193.190.10.98:4433 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.94 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1420/0 4800/0 1551/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	9	UDP 192.168.1.128:59515 -> 193.190.10.98:4434 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.84 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1406/0 4800/0 1560/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	10	UDP 192.168.1.128:60784 -> 3.121.242.54:4433 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][9.97 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1424/0 4800/0 1549/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	11	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:32957 -> [2606:4700:10::6816:826]:4433 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][9.99 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1427/0 4800/0 1547/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][PLAIN TEXT (uhbU.2)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+> 	12	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:41857 -> [2606:4700:10::6816:826]:4434 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][9.86 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 151/0 1408/0 4800/0 1559/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+> 	13	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:46242 -> [2600:1f18:2310:d230:5103:7d9e:7d75:374f]:443 [proto: 188/QUIC][cat: Web/5][8 pkts/10352 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][9.85 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 150/0 1407/0 4800/0 1559/0][Pkt Len c2s/s2c min/avg/max/stddev: 1294/0 1294/0 1294/0 0/0][PLAIN TEXT (QQ/o746)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+26,42c19,35
+< 	15	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:44924 <-> [2400:8902::f03c:91ff:fe69:a454]:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/194 bytes][Goodput ratio: 95/36][0.38 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: nghttp2.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	16	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:56213 <-> [2400:8902::f03c:91ff:fe69:a454]:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/194 bytes][Goodput ratio: 95/36][0.42 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: nghttp2.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	17	UDP 192.168.1.128:39975 <-> 138.91.188.147:443 [proto: 188.212/QUIC.Microsoft][cat: Cloud/13][2 pkts/2588 bytes <-> 2 pkts/170 bytes][Goodput ratio: 97/50][0.33 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.westus.cloudapp.azure.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	18	UDP 192.168.1.128:35263 <-> 202.238.220.92:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.41 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: mew.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	19	UDP 192.168.1.128:38933 <-> 202.238.220.92:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.41 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: mew.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	20	UDP 192.168.1.128:46576 <-> 40.112.191.60:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.33 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: f5quic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	21	UDP 192.168.1.128:53791 <-> 40.112.191.60:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.34 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: f5quic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	22	UDP 192.168.1.128:37784 <-> 140.227.52.92:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.42 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.examp1e.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	23	UDP 192.168.1.128:42456 <-> 133.242.206.244:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.45 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: h2o.examp1e.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	24	UDP 192.168.1.128:44619 <-> 140.227.52.92:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.42 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.examp1e.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (GypODF)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	25	UDP 192.168.1.128:45855 <-> 133.242.206.244:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.46 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: h2o.examp1e.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	26	UDP 192.168.1.128:57926 <-> 140.227.52.92:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.43 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.examp1e.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	27	UDP 192.168.1.128:37661 -> 71.202.41.169:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.15 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: 71.202.41.169][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	28	UDP 192.168.1.128:38366 -> 202.238.220.92:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.15 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: mew.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	29	UDP 192.168.1.128:49151 -> 133.242.206.244:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.18 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: h2o.examp1e.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	30	UDP 192.168.1.128:50289 -> 71.202.41.169:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.15 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: 71.202.41.169][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (dCEQah)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	31	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:38077 -> [2400:8902::f03c:91ff:fe69:a454]:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][0.15 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: nghttp2.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+---
+> 	15	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:44924 <-> [2400:8902::f03c:91ff:fe69:a454]:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/194 bytes][Goodput ratio: 95/36][0.38 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	16	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:56213 <-> [2400:8902::f03c:91ff:fe69:a454]:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/194 bytes][Goodput ratio: 95/36][0.42 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	17	UDP 192.168.1.128:39975 <-> 138.91.188.147:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/170 bytes][Goodput ratio: 97/50][0.33 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	18	UDP 192.168.1.128:35263 <-> 202.238.220.92:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.41 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	19	UDP 192.168.1.128:38933 <-> 202.238.220.92:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.41 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	20	UDP 192.168.1.128:46576 <-> 40.112.191.60:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.33 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	21	UDP 192.168.1.128:53791 <-> 40.112.191.60:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/138 bytes][Goodput ratio: 97/39][0.34 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	22	UDP 192.168.1.128:37784 <-> 140.227.52.92:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.42 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	23	UDP 192.168.1.128:42456 <-> 133.242.206.244:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.45 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	24	UDP 192.168.1.128:44619 <-> 140.227.52.92:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.42 sec][PLAIN TEXT (GypODF)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	25	UDP 192.168.1.128:45855 <-> 133.242.206.244:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.46 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	26	UDP 192.168.1.128:57926 <-> 140.227.52.92:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/122 bytes][Goodput ratio: 97/31][0.43 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	27	UDP 192.168.1.128:37661 -> 71.202.41.169:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.15 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	28	UDP 192.168.1.128:38366 -> 202.238.220.92:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.15 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	29	UDP 192.168.1.128:49151 -> 133.242.206.244:4433 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.18 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	30	UDP 192.168.1.128:50289 -> 71.202.41.169:4434 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.15 sec][PLAIN TEXT (dCEQah)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	31	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:38077 -> [2400:8902::f03c:91ff:fe69:a454]:443 [proto: 188/QUIC][cat: Web/5][2 pkts/2588 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][0.15 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+46,63c39,56
+< 	35	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:38394 <-> [2600:1f18:2310:d230:5103:7d9e:7d75:374f]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/113 bytes][Goodput ratio: 95/45][0.14 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: test.privateoctopus.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	36	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:52080 <-> [2600:1f18:2310:d230:5103:7d9e:7d75:374f]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/113 bytes][Goodput ratio: 95/45][0.13 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: test.privateoctopus.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	37	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:51040 <-> [2604:a880:800:a1::1279:3001]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/109 bytes][Goodput ratio: 95/43][0.09 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: http3-test.litespeedtech.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (bOP/lk)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	38	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:53760 <-> [2604:a880:800:a1::1279:3001]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/109 bytes][Goodput ratio: 95/43][0.09 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: http3-test.litespeedtech.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	39	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:48707 <-> [2a00:ac00:4000:400:2e0:4cff:fe68:199d]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/97 bytes][Goodput ratio: 95/36][0.05 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quant.eggert.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (BykFtI)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	40	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:52271 <-> [2a00:ac00:4000:400:2e0:4cff:fe68:199d]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/97 bytes][Goodput ratio: 95/36][0.05 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quant.eggert.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	41	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:60983 <-> [2a00:ac00:4000:400:2e0:4cff:fe68:199d]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/97 bytes][Goodput ratio: 95/36][0.05 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quant.eggert.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	42	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:35643 <-> [2001:19f0:4:34::1]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.10 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.rocks][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	43	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:37876 <-> [2a05:d018:ce9:8100:cd2a:e2fd:b3be:c5ab]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.04 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.aiortc.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	44	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:39945 <-> [2a05:d018:ce9:8100:cd2a:e2fd:b3be:c5ab]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.04 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.aiortc.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	45	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:44605 <-> [2a05:d018:ce9:8100:cd2a:e2fd:b3be:c5ab]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.04 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.aiortc.org][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	46	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:45852 <-> [2001:19f0:5:c21:5400:1ff:fe33:3b96]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.10 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.tech][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	47	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:46353 <-> [2606:4700:10::6816:826]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.02 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: cloudflare-quic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	48	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:49788 <-> [2001:4800:7817:101:be76:4eff:fe04:631d]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.13 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.ogre.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	49	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:53140 <-> [2001:4800:7817:101:be76:4eff:fe04:631d]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.13 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.ogre.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	50	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:49270 <-> [2001:bc8:47a4:1c25::1]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/85 bytes][Goodput ratio: 95/27][0.04 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: h3.stammw.eu][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	51	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:51185 <-> [2001:bc8:47a4:1c25::1]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/85 bytes][Goodput ratio: 95/27][0.03 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: h3.stammw.eu][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+< 	52	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:60346 <-> [2001:bc8:47a4:1c25::1]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/85 bytes][Goodput ratio: 95/27][0.03 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: h3.stammw.eu][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+---
+> 	35	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:38394 <-> [2600:1f18:2310:d230:5103:7d9e:7d75:374f]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/113 bytes][Goodput ratio: 95/45][0.14 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	36	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:52080 <-> [2600:1f18:2310:d230:5103:7d9e:7d75:374f]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/113 bytes][Goodput ratio: 95/45][0.13 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	37	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:51040 <-> [2604:a880:800:a1::1279:3001]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/109 bytes][Goodput ratio: 95/43][0.09 sec][PLAIN TEXT (bOP/lk)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	38	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:53760 <-> [2604:a880:800:a1::1279:3001]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/109 bytes][Goodput ratio: 95/43][0.09 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	39	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:48707 <-> [2a00:ac00:4000:400:2e0:4cff:fe68:199d]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/97 bytes][Goodput ratio: 95/36][0.05 sec][PLAIN TEXT (BykFtI)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	40	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:52271 <-> [2a00:ac00:4000:400:2e0:4cff:fe68:199d]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/97 bytes][Goodput ratio: 95/36][0.05 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	41	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:60983 <-> [2a00:ac00:4000:400:2e0:4cff:fe68:199d]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/97 bytes][Goodput ratio: 95/36][0.05 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	42	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:35643 <-> [2001:19f0:4:34::1]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.10 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	43	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:37876 <-> [2a05:d018:ce9:8100:cd2a:e2fd:b3be:c5ab]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.04 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	44	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:39945 <-> [2a05:d018:ce9:8100:cd2a:e2fd:b3be:c5ab]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.04 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	45	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:44605 <-> [2a05:d018:ce9:8100:cd2a:e2fd:b3be:c5ab]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.04 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	46	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:45852 <-> [2001:19f0:5:c21:5400:1ff:fe33:3b96]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.10 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	47	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:46353 <-> [2606:4700:10::6816:826]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.02 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	48	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:49788 <-> [2001:4800:7817:101:be76:4eff:fe04:631d]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.13 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	49	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:53140 <-> [2001:4800:7817:101:be76:4eff:fe04:631d]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/89 bytes][Goodput ratio: 95/30][0.13 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	50	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:49270 <-> [2001:bc8:47a4:1c25::1]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/85 bytes][Goodput ratio: 95/27][0.04 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	51	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:51185 <-> [2001:bc8:47a4:1c25::1]:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/85 bytes][Goodput ratio: 95/27][0.03 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+> 	52	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:60346 <-> [2001:bc8:47a4:1c25::1]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/85 bytes][Goodput ratio: 95/27][0.03 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+65,66c58,59
+< 	54	UDP 192.168.1.128:34903 <-> 18.189.84.245:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/77 bytes][Goodput ratio: 97/45][0.13 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: fb.mvfst.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+< 	55	UDP 192.168.1.128:43475 <-> 18.189.84.245:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/73 bytes][Goodput ratio: 97/42][0.12 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: fb.mvfst.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+---
+> 	54	UDP 192.168.1.128:34903 <-> 18.189.84.245:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/77 bytes][Goodput ratio: 97/45][0.13 sec][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+> 	55	UDP 192.168.1.128:43475 <-> 18.189.84.245:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/73 bytes][Goodput ratio: 97/42][0.12 sec][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+68,80c61,73
+< 	57	UDP 192.168.1.128:41587 -> 131.159.24.198:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: pandora.cm.in.tum.de][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	58	UDP 192.168.1.128:43735 -> 51.158.105.98:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.seemann.io][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	59	UDP 192.168.1.128:45250 -> 51.158.105.98:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.seemann.io][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	60	UDP 192.168.1.128:47010 -> 3.121.242.54:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: ietf.akaquic.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	61	UDP 192.168.1.128:48644 -> 131.159.24.198:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: pandora.cm.in.tum.de][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	62	UDP 192.168.1.128:51887 -> 51.158.105.98:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.seemann.io][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	63	UDP 192.168.1.128:54570 -> 18.189.84.245:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: fb.mvfst.net][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+< 	64	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:34442 -> [2001:4800:7817:101:be76:4eff:fe04:631d]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.ogre.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+< 	65	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:38689 -> [2001:19f0:5:c21:5400:1ff:fe33:3b96]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.tech][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][PLAIN TEXT (bSuZ88)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+< 	66	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:39624 -> [2001:19f0:5:c21:5400:1ff:fe33:3b96]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.tech][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+< 	67	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:43645 -> [2001:19f0:4:34::1]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.rocks][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+< 	68	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:44243 -> [2001:19f0:4:34::1]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: quic.rocks][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+< 	69	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:56073 -> [2604:a880:800:a1::1279:3001]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][ALPN: hq-30;h3-30;hq-29;h3-29;hq-28;h3-28;hq-27;h3-27][TLS Supported Versions: TLSv1.3][TLSv1.3][Client: http3-test.litespeedtech.com][JA3C: 7d9e7f6dec1cb1dd8b79d72b1366b6cf][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+---
+> 	57	UDP 192.168.1.128:41587 -> 131.159.24.198:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	58	UDP 192.168.1.128:43735 -> 51.158.105.98:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	59	UDP 192.168.1.128:45250 -> 51.158.105.98:4433 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	60	UDP 192.168.1.128:47010 -> 3.121.242.54:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	61	UDP 192.168.1.128:48644 -> 131.159.24.198:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	62	UDP 192.168.1.128:51887 -> 51.158.105.98:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	63	UDP 192.168.1.128:54570 -> 18.189.84.245:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+> 	64	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:34442 -> [2001:4800:7817:101:be76:4eff:fe04:631d]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+> 	65	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:38689 -> [2001:19f0:5:c21:5400:1ff:fe33:3b96]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][PLAIN TEXT (bSuZ88)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+> 	66	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:39624 -> [2001:19f0:5:c21:5400:1ff:fe33:3b96]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+> 	67	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:43645 -> [2001:19f0:4:34::1]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+> 	68	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:44243 -> [2001:19f0:4:34::1]:4434 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+> 	69	UDP [2001:b07:ac9:d5ae:a4d3:fe47:691e:807d]:56073 -> [2604:a880:800:a1::1279:3001]:443 [proto: 188/QUIC][cat: Web/5][1 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+quickplay.pcap                  	OK
+quic-mvfst-22_decryption_error.pcap	OK
+quic-mvfst-22.pcap              	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-mvfst-22.pcap -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 10.0.2.15                	 1      
+< 
+< 
+< 	1	UDP 10.0.2.15:35601 <-> 31.13.86.8:443 [proto: 188.119/QUIC.Facebook][cat: SocialNetwork/6][188 pkts/80544 bytes <-> 302 pkts/207759 bytes][Goodput ratio: 90/94][115.21 sec][ALPN: h3-fb-05;h1q-fb][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft)][bytes ratio: -0.441 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 276/385 10173/64999 1046/4119][Pkt Len c2s/s2c min/avg/max/stddev: 73/66 428/688 1274/1294 478/546][TLSv1.3][Client: graph.facebook.com][JA3C: a3795d067fbf6f44c8657f9e9cbae493][PLAIN TEXT (rPnDAD)][Plen Bins: 21,26,1,0,0,0,0,0,0,2,0,2,3,1,3,1,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,32,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 10.0.2.15:35601 <-> 31.13.86.8:443 [proto: 188.119/QUIC.Facebook][cat: SocialNetwork/6][188 pkts/80544 bytes <-> 302 pkts/207759 bytes][Goodput ratio: 90/94][115.21 sec][bytes ratio: -0.441 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 276/385 10173/64999 1046/4119][Pkt Len c2s/s2c min/avg/max/stddev: 73/66 428/688 1274/1294 478/546][PLAIN TEXT (rPnDAD)][Plen Bins: 21,26,1,0,0,0,0,0,0,2,0,2,3,1,3,1,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,32,0,0,0,0,0,0,0,0]
+quic-mvfst-27.pcapng            	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-mvfst-27.pcapng -w /tmp/reader.out -v 2 [old vs new]
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 10.0.2.15                	 1      
+< 
+< 
+< 	1	UDP 10.0.2.15:35957 <-> 69.171.250.15:443 [proto: 188.119/QUIC.Facebook][cat: SocialNetwork/6][7 pkts/3196 bytes <-> 13 pkts/8203 bytes][Goodput ratio: 79/85][8.96 sec][ALPN: h3-fb-05][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft)][bytes ratio: -0.439 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1782/811 8808/8827 3513/2535][Pkt Len c2s/s2c min/avg/max/stddev: 128/115 457/631 1326/1346 492/540][TLSv1.3][Client: graph.facebook.com][JA3C: 61d8a93ff379660087082a82411f19a2][PLAIN TEXT (Xic gcl)][Plen Bins: 20,25,10,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,0,0,0,5,0,0,0,0,0,5,20,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP 10.0.2.15:35957 <-> 69.171.250.15:443 [proto: 188.119/QUIC.Facebook][cat: SocialNetwork/6][7 pkts/3196 bytes <-> 13 pkts/8203 bytes][Goodput ratio: 79/85][8.96 sec][bytes ratio: -0.439 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1782/811 8808/8827 3513/2535][Pkt Len c2s/s2c min/avg/max/stddev: 128/115 457/631 1326/1346 492/540][PLAIN TEXT (Xic gcl)][Plen Bins: 20,25,10,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,0,0,0,5,0,0,0,0,0,5,20,0,0,0,0,0,0,0,0]
+quic-mvfst-exp.pcap             	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic-mvfst-exp.pcap -w /tmp/reader.out -v 2 [old vs new]
+1c1
+< Facebook	30	26309	1
+---
+> QUIC	30	26309	1
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 2aac:cdf7:d506:7807:9092:75f:a963:f4ab 	 1      
+< 
+< 
+< 	1	UDP [2aac:cdf7:d506:7807:9092:75f:a963:f4ab]:57587 <-> [3f65:ece9:fe71:6e2a:face:b00c::358e]:443 [proto: 188.119/QUIC.Facebook][cat: SocialNetwork/6][9 pkts/4054 bytes <-> 21 pkts/22255 bytes][Goodput ratio: 86/94][0.16 sec][ALPN: h3-fb-05][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft)][bytes ratio: -0.692 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 15/4 55/56 19/13][Pkt Len c2s/s2c min/avg/max/stddev: 93/105 450/1060 1294/1294 505/429][TLSv1.3][Client: video.fmct2-3.fna.fbcdn.net][JA3C: 61d8a93ff379660087082a82411f19a2][PLAIN TEXT (wEPCri)][Plen Bins: 3,20,3,0,0,0,0,0,3,0,3,0,0,0,0,0,0,3,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,61,0,0,0,0,0,0,0,0,0]
+---
+> 	1	UDP [2aac:cdf7:d506:7807:9092:75f:a963:f4ab]:57587 <-> [3f65:ece9:fe71:6e2a:face:b00c::358e]:443 [proto: 188/QUIC][cat: Web/5][9 pkts/4054 bytes <-> 21 pkts/22255 bytes][Goodput ratio: 86/94][0.16 sec][bytes ratio: -0.692 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 15/4 55/56 19/13][Pkt Len c2s/s2c min/avg/max/stddev: 93/105 450/1060 1294/1294 505/429][PLAIN TEXT (wEPCri)][Plen Bins: 3,20,3,0,0,0,0,0,3,0,3,0,0,0,0,0,0,3,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,61,0,0,0,0,0,0,0,0,0]
+quic.pcap                       	OK
+quic_q39.pcap                   	OK
+quic_q43.pcap                   	OK
+quic_q46_b.pcap                 	OK
+quic_q46.pcap                   	OK
+quic_q50.pcap                   	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic_q50.pcap -w /tmp/reader.out -v 2 [old vs new]
+3c3
+< 	1	UDP 248.144.129.147:39203 <-> 184.151.193.237:443 [proto: 188/QUIC][cat: Web/5][6 pkts/3579 bytes <-> 14 pkts/16855 bytes][Goodput ratio: 93/97][0.47 sec][bytes ratio: -0.650 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 85/27 210/221 80/63][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 596/1204 1392/1392 588/461][User-Agent: Chrome/83.0.4103.101 Android 8.0.0; LDN-L21][Client: www.googletagmanager.com][PLAIN TEXT (x.GdrZY)][Plen Bins: 5,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,0,0,0,0,0]
+---
+> 	1	UDP 248.144.129.147:39203 <-> 184.151.193.237:443 [proto: 188/QUIC][cat: Web/5][6 pkts/3579 bytes <-> 14 pkts/16855 bytes][Goodput ratio: 93/97][0.47 sec][bytes ratio: -0.650 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 85/27 210/221 80/63][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 596/1204 1392/1392 588/461][PLAIN TEXT (x.GdrZY)][Plen Bins: 5,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,0,0,0,0,0]
+quic_t50.pcap                   	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic_t50.pcap -w /tmp/reader.out -v 2 [old vs new]
+1c1
+< GoogleServices	12	8420	1
+---
+> QUIC	12	8420	1
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 40.154.127.200           	 1      
+< 
+< 
+< 	1	UDP 40.154.127.200:49836 <-> 166.240.188.209:443 [proto: 188.239/QUIC.GoogleServices][cat: Web/5][6 pkts/3146 bytes <-> 6 pkts/5274 bytes][Goodput ratio: 92/95][0.42 sec][ALPN: h3-T050][TLS Supported Versions: TLSv1.3][bytes ratio: -0.253 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 61/61 178/136 71/62][Pkt Len c2s/s2c min/avg/max/stddev: 75/68 524/879 1392/1392 614/541][User-Agent: Chrome/85.0.4183.83 Windows NT 6.1; Win64; x64][TLSv1.3][Client: fonts.googleapis.com][JA3C: a2fc589336b7c13b674c1bab24655ce7][Plen Bins: 8,25,8,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,0,0,0,0,0]
+---
+> 	1	UDP 40.154.127.200:49836 <-> 166.240.188.209:443 [proto: 188/QUIC][cat: Web/5][6 pkts/3146 bytes <-> 6 pkts/5274 bytes][Goodput ratio: 92/95][0.42 sec][bytes ratio: -0.253 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 61/61 178/136 71/62][Pkt Len c2s/s2c min/avg/max/stddev: 75/68 524/879 1392/1392 614/541][Plen Bins: 8,25,8,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,0,0,0,0,0]
+quic_t51.pcap                   	ERROR
+../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv -q -t -i pcap/quic_t51.pcap -w /tmp/reader.out -v 2 [old vs new]
+1c1
+< Google	642	573718	1
+---
+> QUIC	642	573718	1
+3,8c3
+< JA3 Host Stats: 
+< 		 IP Address                  	 # JA3C     
+< 	1	 187.227.136.152          	 1      
+< 
+< 
+< 	1	UDP 187.227.136.152:55356 <-> 211.247.147.90:443 [proto: 188.126/QUIC.Google][cat: Web/5][171 pkts/29017 bytes <-> 471 pkts/544701 bytes][Goodput ratio: 75/96][90.07 sec][ALPN: h3-T051][TLS Supported Versions: TLSv1.3][bytes ratio: -0.899 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 690/100 24967/10162 3186/822][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 170/1156 1392/1392 256/481][User-Agent: dev Chrome/86.0.4240.9 Windows NT 6.1; Win64; x64][TLSv1.3][Client: www.google.com][JA3C: 92e76078d514999cd950474995dab2b5][PLAIN TEXT (OO RJ/ Q)][Plen Bins: 11,29,2,1,0,2,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,0,0,0,0,0]
+---
+> 	1	UDP 187.227.136.152:55356 <-> 211.247.147.90:443 [proto: 188/QUIC][cat: Web/5][171 pkts/29017 bytes <-> 471 pkts/544701 bytes][Goodput ratio: 75/96][90.07 sec][bytes ratio: -0.899 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 690/100 24967/10162 3186/822][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 170/1156 1392/1392 256/481][PLAIN TEXT (OO RJ/ Q)][Plen Bins: 11,29,2,1,0,2,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,0,0,0,0,0]
+rdp.pcap                        	OK
+reasm_crash_anon.pcapng         	OK
+reasm_segv_anon.pcapng          	OK
+reddit.pcap                     	OK
+rx.pcap                         	OK
+s7comm.pcap                     	OK
+selfsigned.pcap                 	OK
+signal.pcap                     	OK
+simple-dnscrypt.pcap            	OK
+sip.pcap                        	OK
+skype-conference-call.pcap      	OK
+skype_no_unknown.pcap           	OK
+skype.pcap                      	OK
+skype_udp.pcap                  	OK
+smb_deletefile.pcap             	OK
+smbv1.pcap                      	OK
+smpp_in_general.pcap            	OK
+snapchat_call.pcapng            	OK
+snapchat.pcap                   	OK
+ssdp-m-search.pcap              	OK
+ssh.pcap                        	OK
+starcraft_battle.pcap           	OK
+steam.pcap                      	OK
+teams.pcap                      	OK
+teamspeak3.pcap                 	OK
+telegram.pcap                   	OK
+teredo.pcap                     	OK
+tftp_rrq.pcap                   	OK
+tinc.pcap                       	OK
+tk.pcap                         	OK
+tls-esni-fuzzed.pcap            	OK
+tls_esni_sni_both.pcap          	OK
+tls_long_cert.pcap              	OK
+tls-rdn-extract.pcap            	OK
+tls_verylong_certificate.pcap   	OK
+tor.pcap                        	OK
+trickbot.pcap                   	OK
+tumblr.pcap                     	OK
+ubntac2.pcap                    	OK
+upnp.pcap                       	OK
+viber.pcap                      	OK
+vnc.pcap                        	OK
+wa_video.pcap                   	OK
+wa_voice.pcap                   	OK
+waze.pcap                       	OK
+WebattackRCE.pcap               	OK
+WebattackSQLinj.pcap            	OK
+WebattackXSS.pcap               	OK
+webex.pcap                      	OK
+websocket.pcap                  	OK
+wechat.pcap                     	OK
+weibo.pcap                      	OK
+whatsappfiles.pcap              	OK
+whatsapp_login_call.pcap        	OK
+whatsapp_login_chat.pcap        	OK
+whatsapp_voice_and_message.pcap 	OK
+wireguard.pcap                  	OK
+youtube_quic.pcap               	OK
+youtubeupload.pcap              	OK
+zabbix.pcap                     	OK
+zcash.pcap                      	OK
+zoom.pcap                       	OK
+FAIL do.sh (exit status: 1)

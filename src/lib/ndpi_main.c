@@ -1260,7 +1260,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CITRIX, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Citrix", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 1494, 2598, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			  ndpi_build_default_ports(ports_b, 1494, 2598, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WEBEX, 0 /* can_have_a_subprotocol */,
 			  no_master, no_master, "Webex", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,

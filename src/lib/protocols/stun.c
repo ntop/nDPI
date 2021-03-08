@@ -277,7 +277,10 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   flow->protos.tls_quic_stun.stun.num_udp_pkts++;
 
-  if((payload[0] == 0x80 && payload_length < 512 && ((msg_len+20) <= payload_length))) {
+  /*check UDT Protocol handshake*/
+  if((payload[0] == 0x80 && payload_length>52 && ( htonl( *((u_int32_t*)&payload[48])) == flow->packet.iph->saddr || htonl( *((u_int32_t*)&payload[48])) == flow->packet.iph->daddr )) ) 
+    return(NDPI_IS_NOT_STUN);
+  else if((payload[0] == 0x80 && payload_length < 512 && ((msg_len+20) <= payload_length))) {
     flow->guessed_host_protocol_id = NDPI_PROTOCOL_WHATSAPP_CALL;
     return(NDPI_IS_STUN); /* This is WhatsApp Call */
   } else if((payload[0] == 0x90) && (((msg_len+11) == payload_length) ||
