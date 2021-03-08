@@ -128,8 +128,16 @@ void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   if((packet->udp != NULL)
      && (source != 30303) && (dest != 30303 /* Avoid to mix it with Ethereum that looks alike */)
      && (dest > 1023)
-     )
-    ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
+     ) {
+    /* Check UDT(UDP) handshake - Protocol Citrix */
+    if( ( packet->payload[0] == 0x80 &&  packet->payload_packet_len >52 && ( htonl( *((u_int32_t*)& packet->payload[48])) == packet->iph->saddr || htonl( *((u_int32_t*)& packet-> payload[48])) == packet->iph->daddr )) )
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    /*test UDT keepalive ntohs(0x8001), control ntohs(0x8002), Ack ntohs(0x8006) -  Protocol Citrix */
+    else if(  *(u_int16_t*)packet->payload == 0x0180 || *(u_int16_t*)packet->payload == 0x0280 || *(u_int16_t*)packet->payload == 0x0680)
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    else
+      ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
+  } 
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
