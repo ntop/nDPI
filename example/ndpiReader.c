@@ -80,7 +80,7 @@ u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_cluster
 u_int8_t verbose = 0, enable_joy_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
-u_int8_t human_readeable_string_len = 5;
+u_int8_t human_readeable_string_len = 5, enable_ja3_plus = 0;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
@@ -274,7 +274,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
+  ndpi_str = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
   ndpi_finalize_initialization(ndpi_str);
 
   // Display ALL Host strings ie host_match[] ?
@@ -440,7 +440,7 @@ static void help(u_int long_help) {
 	 "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-D][-e <len>][-t][-v <level>]\n"
 	 "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
-	 "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>]\n\n"
+	 "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>][-z]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
 	 "                            | device for live capture (comma-separated list)\n"
@@ -491,6 +491,7 @@ static void help(u_int long_help) {
 	 "  -D                        | Enable DoH traffic analysis based on content (no DPI)\n"
 	 "  -x <domain>               | Check domain name [Test only]\n"
 	 "  -I                        | Ignore VLAN id for flow hash calculation\n"
+	 "  -z                        | Enable JA3+\n"
 	 ,
 	 human_readeable_string_len,
 	 min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -767,7 +768,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "b:e:c:C:dDf:g:i:Ij:S:hp:P:l:r:s:tu:v:V:n:Jrp:x:w:q0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "b:e:c:C:dDf:g:i:Ij:S:hp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -966,6 +967,10 @@ static void parseOptions(int argc, char **argv) {
       if(max_num_udp_dissected_pkts < 3) max_num_udp_dissected_pkts = 3;
       break;
 
+    case 'z':
+      enable_ja3_plus = 1;
+      break;
+      
     default:
       help(0);
       break;
@@ -3516,7 +3521,7 @@ static void dgaUnitTest() {
   };
   int i;
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
 
   assert(ndpi_str != NULL);
 
@@ -3922,7 +3927,7 @@ void jitterUnitTest() {
    @brief MAIN FUNCTION
 **/
 #ifdef APP_HAS_OWN_MAIN
-int orginal_main(int argc, char **argv) {
+int original_main(int argc, char **argv) {
 #else
   int main(int argc, char **argv) {
 #endif
@@ -3933,11 +3938,6 @@ int orginal_main(int argc, char **argv) {
       return(-1);
     }
 
-    gettimeofday(&startup_time, NULL);
-    ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
-
-    if(ndpi_info_mod == NULL) return -1;
-    
     // hwUnitTest2();
     
     /* Internal checks */    
@@ -3954,16 +3954,21 @@ int orginal_main(int argc, char **argv) {
     ndpi_self_check_host_match();
     analysisUnitTest();
     rulesUnitTest();
+
+    
+    gettimeofday(&startup_time, NULL);
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
     parseOptions(argc, argv);
 
+    ndpi_info_mod = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
+    
+    if(ndpi_info_mod == NULL) return -1;
+    
     if(domain_to_check) {
       ndpiCheckHostStringMatch(domain_to_check);
       exit(0);
     }
-
-    if(enable_doh_dot_detection) init_doh_bins();
 
     if(!quiet_mode) {
       printf("\n-----------------------------------------------------------\n"

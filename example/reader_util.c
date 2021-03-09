@@ -402,7 +402,9 @@ static int parse_debug_proto(struct ndpi_detection_module_struct *ndpi_mod, char
 /* ***************************************************** */
 
 extern char *_debug_protocols;
+extern u_int8_t enable_ja3_plus;
 static int _debug_protocols_ok = 0;
+
 
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle) {
@@ -413,7 +415,7 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
 
   /* TODO: just needed here to init ndpi ndpi_malloc wrapper */
-  module = ndpi_init_detection_module(ndpi_no_prefs);
+  module = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");

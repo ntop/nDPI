@@ -1006,8 +1006,9 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
 
 /* https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967 */
 
-#define JA3_STR_LEN 1024
-#define MAX_NUM_JA3  512
+#define JA3_STR_LEN        1024
+#define MAX_NUM_JA3         512
+#define MAX_JA3_STRLEN      128
 
 struct ja3_info {
   u_int16_t tls_handshake_version;
@@ -1015,6 +1016,7 @@ struct ja3_info {
   u_int16_t num_tls_extension, tls_extension[MAX_NUM_JA3];
   u_int16_t num_elliptic_curve, elliptic_curve[MAX_NUM_JA3];
   u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA3];
+  char signature_algorithms[MAX_JA3_STRLEN], supported_versions[MAX_JA3_STRLEN], alpn[MAX_JA3_STRLEN];
 };
 
 /* **************************************** */
@@ -1324,7 +1326,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
 		      flow->l4.tcp.tls.subprotocol_detected = 1;
 		  }
-	  
+
 		  if(ndpi_check_dga_name(ndpi_struct, flow,
 					 flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, 1)) {
 		    char *sni = flow->protos.tls_quic_stun.tls_quic.client_requested_server_name;
@@ -1333,7 +1335,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: (DGA) [%s]\n", flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
 #endif
-		    
+
 		    if((len >= 4)
 		       && strcmp(&sni[len-4], ".com") /* Check if it ends in .com or .net */
 		       && strcmp(&sni[len-4], ".net")
@@ -1394,7 +1396,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("Client SSL [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
 		if((s_offset+extension_len-1) <= total_len) {
-		  for(i=0; i<extension_len-1;i++) {
+		  for(i=0; i<extension_len-1; i++) {
 		    u_int8_t s_group = packet->payload[s_offset+i];
 
 #ifdef DEBUG_TLS
@@ -1416,11 +1418,55 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  printf("Client SSL Invalid len %u vs %u\n", s_offset+extension_len, total_len);
 #endif
 		}
+	      } else if(extension_id == 13 /* signature algorithms */) {
+		u_int16_t s_offset = offset+extension_offset;
+		u_int16_t tot_signature_algorithms_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+
+#ifdef DEBUG_TLS
+		printf("Client SSL [SIGNATURE_ALGORITHMS: block_len=%u/len=%u]\n", extension_len, tot_signature_algorithms_len);
+#endif
+
+		s_offset += 2;
+		tot_signature_algorithms_len = ndpi_min((sizeof(ja3.signature_algorithms) / 2) - 1, tot_signature_algorithms_len);
+
+		for(i=0; i<tot_signature_algorithms_len; i++) {
+		  int rc = snprintf(&ja3.signature_algorithms[i*2], sizeof(ja3.signature_algorithms)-i*2, "%02X", packet->payload[s_offset+i]);
+
+		  if(rc < 0) break;
+		}
+
+		ja3.signature_algorithms[i*2] = '\0';
+
+#ifdef DEBUG_TLS
+		printf("Client SSL [SIGNATURE_ALGORITHMS: %s]\n", ja3.signature_algorithms);
+#endif
+	      } else if(extension_id == 43 /* supported versions */) {
+		u_int16_t s_offset = offset+extension_offset;
+		u_int8_t tot_supported_versions_len = (u_int8_t)packet->payload[s_offset];
+
+#ifdef DEBUG_TLS
+		printf("Client SSL [SUPPORTED_VERSIONS: block_len=%u/len=%u]\n", extension_len, tot_supported_versions_len);
+#endif
+
+		s_offset += 1;
+		tot_supported_versions_len = ndpi_min((sizeof(ja3.supported_versions) / 2) - 1, tot_supported_versions_len);
+
+		for(i=0; i<tot_supported_versions_len; i++) {
+		  int rc = snprintf(&ja3.supported_versions[i*2], sizeof(ja3.supported_versions)-i*2, "%02X", packet->payload[s_offset+i]);
+
+		  if(rc < 0) break;
+		}
+
+		ja3.supported_versions[i*2] = '\0';
+
+#ifdef DEBUG_TLS
+		printf("Client SSL [SUPPORTED_VERSIONS: %s]\n", ja3.supported_versions);
+#endif
 	      } else if(extension_id == 16 /* application_layer_protocol_negotiation */) {
 		u_int16_t s_offset = offset+extension_offset;
 		u_int16_t tot_alpn_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 		char alpn_str[256];
-		u_int8_t alpn_str_len = 0;
+		u_int8_t alpn_str_len = 0, i;
 
 #ifdef DEBUG_TLS
 		printf("Client SSL [ALPN: block_len=%u/len=%u]\n", extension_len, tot_alpn_len);
@@ -1459,6 +1505,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		if(flow->protos.tls_quic_stun.tls_quic.alpn == NULL)
 		  flow->protos.tls_quic_stun.tls_quic.alpn = ndpi_strdup(alpn_str);
+
+		snprintf(ja3.alpn, sizeof(ja3.alpn), "%s", alpn_str);
+
+		/* Replace , with - as in JA3 */
+		for(i=0; ja3.alpn[i] != '\0'; i++)
+		  if(ja3.alpn[i] == ',') ja3.alpn[i] = '-';
+		
 	      } else if(extension_id == 43 /* supported versions */) {
 		u_int16_t s_offset = offset+extension_offset;
 		u_int8_t version_len = packet->payload[s_offset];
@@ -1656,6 +1709,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if(rc > 0 && ja3_str_len + rc < JA3_STR_LEN) ja3_str_len += rc; else break;
 	      }
 
+	      if(ndpi_struct->enable_ja3_plus) {
+		rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len,
+			      ",%s,%s,%s", ja3.signature_algorithms, ja3.supported_versions, ja3.alpn);
+		if(rc > 0 && ja3_str_len + rc < JA3_STR_LEN) ja3_str_len += rc;		
+	      }
+	      
 #ifdef DEBUG_TLS
 	      printf("[JA3] Client: %s \n", ja3_str);
 #endif
@@ -1670,18 +1729,18 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			      md5_hash[i]);
 		if(rc > 0) j += rc; else break;
 	      }
-	      
+
 #ifdef DEBUG_TLS
 	      printf("[JA3] Client: %s \n", flow->protos.tls_quic_stun.tls_quic.ja3_client);
 #endif
-	      
+
 	      if(ndpi_struct->malicious_ja3_automa.ac_automa != NULL) {
 		u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_ja3_automa.ac_automa,
 						  flow->protos.tls_quic_stun.tls_quic.ja3_client);
-		
+
 		if(rc1 > 0)
 		  ndpi_set_risk(flow, NDPI_MALICIOUS_JA3);
-	      }	      
+	      }
 	    }
 
 	    /* Before returning to the caller we need to make a final check */
