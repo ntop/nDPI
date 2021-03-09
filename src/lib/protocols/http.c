@@ -930,13 +930,24 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	if(ndpi_struct->ookla_cache == NULL)
 	  ndpi_struct->ookla_cache = ndpi_lru_cache_init(1024);
 
-	if(packet->iph != NULL && ndpi_struct->ookla_cache != NULL) {
-	  if(packet->tcp->source == htons(8080))
-	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->saddr, 1 /* dummy */);
-	  else
-	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->daddr, 1 /* dummy */);
+	if(ndpi_struct->ookla_cache != NULL) {
+	  if(packet->iph != NULL) {
+	    if(packet->tcp->source == htons(8080))
+	      ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->saddr, 1 /* dummy */);
+	    else
+	      ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->daddr, 1 /* dummy */);
+	  } else if(packet->iphv6 != NULL) {
+	    u_int32_t h;
+	    
+	    if(packet->tcp->source == htons(8080))
+	      h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_src, sizeof(packet->iphv6->ip6_src));
+	    else
+	      h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, sizeof(packet->iphv6->ip6_dst));
+	    
+	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, h, 1 /* dummy */);
+	  }
 	}
-
+	
         return;
       }
 
