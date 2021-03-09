@@ -4377,7 +4377,10 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
 
-    if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+    if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
+        (ndpi_str->proto_defaults[flow->detected_protocol_stack[0]].can_have_a_subprotocol != 0 &&
+         flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN))
+    {
       for (u_int32_t a = 0; a < callback_buffer_size; a++) {
         if ((func != callback_buffer[a].func) &&
             (callback_buffer[a].ndpi_selection_bitmask & ndpi_selection_packet) ==
@@ -4387,9 +4390,15 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
             NDPI_BITMASK_COMPARE(callback_buffer[a].detection_bitmask,
                                  detection_bitmask) != 0)
         {
-          callback_buffer[a].func(ndpi_str, flow), num_calls++;
-          if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
-            break; /* Stop after detecting the first protocol */
+          callback_buffer[a].func(ndpi_str, flow);
+          num_calls++;
+
+          if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
+              (ndpi_str->proto_defaults[flow->detected_protocol_stack[0]].can_have_a_subprotocol == 0 ||
+               flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
+          {
+            break; /* Stop after the first detected protocol if we do not expect any subprotocols. */
+          }
         }
       }
     }
