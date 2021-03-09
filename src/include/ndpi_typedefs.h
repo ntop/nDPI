@@ -1450,10 +1450,10 @@ typedef u_int32_t ndpi_init_prefs;
 
 typedef enum
   {
-   ndpi_no_prefs = 0,
-   ndpi_dont_load_tor_hosts,
-   ndpi_dont_init_libgcrypt,
-   ndpi_enable_ja3_plus
+    ndpi_no_prefs            = 0,
+    ndpi_dont_load_tor_hosts = 1,
+    ndpi_dont_init_libgcrypt = 2,
+    ndpi_enable_ja3_plus     = 4
   } ndpi_prefs;
 
 typedef struct {
