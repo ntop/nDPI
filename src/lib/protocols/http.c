@@ -352,8 +352,8 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP,
 				    (char *)flow->host_server_name,
 				    strlen((const char *)flow->host_server_name)) == 0) {
-      if((strstr(flow->http.url, ":8080/downloading?n=0.") == 0)
-	 || (strstr(flow->http.url, ":8080/upload?n=0.") == 0)) {
+      if((strstr(flow->http.url, ":8080/downloading?n=0.") != NULL)
+	 || (strstr(flow->http.url, ":8080/upload?n=0.") != NULL)) {
 	/* This looks like Ookla speedtest */
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP);
       }
