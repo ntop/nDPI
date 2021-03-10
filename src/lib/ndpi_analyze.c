@@ -852,6 +852,8 @@ void ndpi_free_rsi(struct ndpi_rsi_struct *s) {
 
 /* ************************************* */
 
+// #define DEBUG_RSI
+
 /*
   This function adds a new value and returns the computed RSI, or -1
   if there are too few points (< num_learning_values)
@@ -941,6 +943,7 @@ double ndpi_avg_inline(u_int32_t *v, u_int num) {
 }
 
 /* *********************************************************** */
+/* *********************************************************** */
 
 /*
   Initializes Holt-Winters with Confidence Interval
@@ -951,7 +954,7 @@ double ndpi_avg_inline(u_int32_t *v, u_int num) {
    additive     If set to 1 will use the Holt-Winters additive seasonal (should be the default), otherwise the multiplicative seasonal.
    alpha        Level: specifies the coefficient for the level smoothing. Range 0..1. The higher α, the faster the method forgets old values
    beta         Trend: specifies the coefficient for the trend smoothing. Range 0..1.
-   gamma        Seasonal: specifies the coefficient for the seasonal smoothing. Range 0..1. With gamma = 0, seaasonal correction is not used.
+   gamma        Seasonal: specifies the coefficient for the seasonal smoothing. Range 0..1. With gamma = 0, seasonal correction is not used.
 
    significance Significance level for the forecats sed for computing lower and upper bands. Range 0..1. Typical values 0.05 or less.
                 See https://en.wikipedia.org/wiki/Statistical_significance
@@ -978,8 +981,6 @@ int ndpi_hw_init(struct ndpi_hw_struct *hw,
   if((significance < 0) || (significance > 1)) significance = 0.05;
   hw->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
 
-  hw->params.ro = 1.95996398454005;
-  
   if((hw->y = (u_int32_t*)ndpi_calloc(hw->params.num_season_periods, sizeof(u_int32_t))) == NULL)
     return(-1);
 
@@ -1028,13 +1029,13 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
     u_int idx     = hw->num_values % hw->params.num_season_periods;
     double prev_u, prev_v, prev_s, value  = (double)_value;
     double sq, error;
-    
+
     if(hw->num_values == hw->params.num_season_periods) {
       double avg = ndpi_avg_inline(hw->y, hw->params.num_season_periods);
       u_int i;
 
       if(avg == 0) avg = 1; /* Avoid divisions by zero */
-      
+
       for(i=0; i<hw->params.num_season_periods; i++)
 	hw->s[i] = hw->y[i] / avg;
 
@@ -1043,7 +1044,7 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
 	hw->u = 0;
       else
 	hw->u = _value / hw->s[i];
-      
+
       hw->v = 0;
       ndpi_free(hw->y);
       hw->y = NULL;
@@ -1051,12 +1052,12 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
 
     idx     = hw->num_values % hw->params.num_season_periods;
     prev_u = hw->u, prev_v = hw->v, prev_s = hw->s[idx];
-     
+
     if(prev_s != 0)
       hw->u = ((hw->params.alpha * value) / prev_s)  + ( 1 - hw->params.alpha) * (hw->u + hw->v);
     else
       hw->u = 0; /* Avoid divisions by zero */
-    
+
     hw->v = (hw->params.beta   * (hw->u - prev_u)) + ((1 - hw->params.beta ) * hw->v);
 
     if(hw->u != 0)
@@ -1080,7 +1081,7 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
 	   *forecast, hw->sum_square_error,
 	   sq, *confidence_band);
 #endif
-    
+
     hw->num_values++, idx = (idx + 1) % hw->params.num_season_periods;
 
     return(1); /* We're in business: forecast is meaningful now */
@@ -1092,7 +1093,7 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
 
 /*
   Jitter calculator
-  
+
   Used to determine how noisy is a signal
 */
 
@@ -1100,7 +1101,7 @@ int ndpi_jitter_init(struct ndpi_jitter_struct *s, u_int16_t num_learning_values
   memset(s, 0, sizeof(struct ndpi_jitter_struct));
 
   if(num_learning_values < 2) num_learning_values = 2;
-  
+
   s->empty = 1, s->num_values = num_learning_values;
   s->observations = (float*)ndpi_calloc(num_learning_values, sizeof(float));
 
@@ -1108,7 +1109,7 @@ int ndpi_jitter_init(struct ndpi_jitter_struct *s, u_int16_t num_learning_values
     s->last_value = 0;
     return(0);
   } else
-    return(-1);  
+    return(-1);
 }
 
 /* ************************************* */
@@ -1132,7 +1133,7 @@ float ndpi_jitter_add_value(struct ndpi_jitter_struct *s, const float value) {
     s->observations[s->next_index] = val;
     s->jitter_total += val;
   }
-  
+
   s->last_value = value, s->next_index = (s->next_index + 1) % s->num_values;
   if(s->next_index == 0) s->jitter_ready = 1; /* We have completed one round */
 
@@ -1141,10 +1142,75 @@ float ndpi_jitter_add_value(struct ndpi_jitter_struct *s, const float value) {
 	 value, val, s->jitter_total,
 	 s->jitter_ready ? (s->jitter_total / s->num_values) : -1);
 #endif
-  
+
   if(!s->jitter_ready)
     return(-1); /* Too early */
-  else 
+  else
     return(s->jitter_total / s->num_values);
 }
 
+
+/* *********************************************************** */
+/* *********************************************************** */
+
+/*
+  Single Exponential Smoothing
+*/
+
+int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance) {
+  memset(ses, 0, sizeof(struct ndpi_ses_struct));
+
+  ses->params.alpha = alpha;
+
+  if((significance < 0) || (significance > 1)) significance = 0.05;
+  ses->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
+
+  return(0);
+}
+
+/* *********************************************************** */
+
+/*
+   Returns the forecast and the band (forecast +/- band are the upper and lower values)
+
+   Input
+   ses:         Datastructure previously initialized
+   value        The value to add to the measurement
+
+   Output
+   forecast         The forecasted value
+   confidence_band  The value +/- on which the value should fall is not an anomaly
+
+   Return code
+   0                Too early: we're still in the learning phase. Output values are zero.
+   1                Normal processing: forecast and confidence_band are meaningful
+*/
+int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int32_t _value, double *forecast, double *confidence_band) {
+  double value = (double)_value, error;
+  int rc;
+
+  if(ses->num_values == 0)
+    *forecast = value;
+  else
+    *forecast = (ses->params.alpha * (ses->last_value - ses->last_forecast)) + ses->last_forecast;
+
+  error  = value - *forecast;
+  ses->sum_square_error += error * error;
+
+  if(ses->num_values > 0) {
+    double sq = sqrt(ses->sum_square_error / (ses->num_values+1));
+
+    *confidence_band = ses->params.ro * sq;
+    rc = 1;
+  } else
+    *confidence_band = 0, rc = 0;
+
+  ses->num_values++, ses->last_value = value, ses->last_forecast = *forecast;
+
+#ifdef SES_DEBUG
+  printf("[num_values: %u][[error: %.3f][forecast: %.3f][sqe: %.3f][sq: %.3f][confidence_band: %.3f]\n",
+	   ses->num_values, error, *forecast, ses->sum_square_error, sq, *confidence_band);
+#endif
+
+  return(rc);
+}

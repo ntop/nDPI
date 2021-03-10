@@ -3722,20 +3722,53 @@ void rulesUnitTest() {
 void rsiUnitTest() {
   struct ndpi_rsi_struct s;
   unsigned int v[] = {
+    31,
+    87,
+    173,
+    213,
+    223,
+    230,
+    238,
+    245,
+    251,
+    151,
+    259,
+    261,
+    264,
+    264,
+    270,
+    273,
+    288,
+    288,
+    304,
+    304,
+    350,
+    384,
+    423,
+    439,
+    445,
+    445,
+    445,
+    445
+  };
+
+  unsigned int v1[] = {
+
     2227, 2219, 2208, 2217, 2218, 2213, 2223, 2243, 2224, 2229,
     2215, 2239, 2238, 2261, 2336, 2405, 2375, 2383, 2395, 2363,
     2382, 2387, 2365, 2319, 2310, 2333, 2268, 2310, 2240, 2217,
   };
   u_int i, n = sizeof(v) / sizeof(unsigned int);
-
+  u_int debug = 0;
+  
   assert(ndpi_alloc_rsi(&s, 8) == 0);
   
   for(i=0; i<n; i++) {
     float rsi = ndpi_rsi_add_value(&s, v[i]);
 
-#if 0
-    printf("%2d) RSI = %f\n", i, rsi);
-#endif
+
+    if(debug)
+      printf("%2d) RSI = %f\n", i, rsi);
   }
   
   ndpi_free_rsi(&s);
@@ -3796,7 +3829,6 @@ void hwUnitTest() {
 
 void hwUnitTest2() {
   struct ndpi_hw_struct hw;
-  u_int num_learning_points = 12;
   u_int8_t trace = 1;
   double v[] = {
     31.908466339111,
@@ -3814,7 +3846,7 @@ void hwUnitTest2() {
     264.78540039062,
     264.78540039062,
     270.47451782227,
-    273.3671875,
+    173.3671875,
     288.34222412109,
     288.34222412109,
     304.24795532227,
@@ -3828,13 +3860,20 @@ void hwUnitTest2() {
     445.05981445312,
     445.05981445312
   };
+  u_int num_learning_points = 1;
   u_int i, num = sizeof(v) / sizeof(double);
-  float alpha = 0.5, beta = 0.5, gamma = 0.1;
-
-  assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */, alpha, beta, gamma, 0.05) == 0);
+  float alpha = 0.9, beta = 0.5, gamma = 1;
+  FILE *fd = fopen("/tmp/result.csv", "w");
   
-  if(trace)
+  assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */,
+		      alpha, beta, gamma, 0.05) == 0);
+  
+  if(trace) {
     printf("\nHolt-Winters [alpha: %.1f][beta: %.1f][gamma: %.1f]\n", alpha, beta, gamma);
+
+    if(fd)
+      fprintf(fd, "index;value;prediction;lower;upper;anomaly\n");
+  }
   
   for(i=0; i<num; i++) {
     double prediction, confidence_band;
@@ -3843,13 +3882,94 @@ void hwUnitTest2() {
     
     lower = prediction - confidence_band, upper = prediction + confidence_band;
     
-    if(trace)
+    if(trace) {
       printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
 	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
 	     confidence_band);
+
+      if(fd)
+	fprintf(fd, "%u;%.0f;%.0f;%.0f;%.0f;%s\n",
+		i, v[i], prediction, lower, upper,
+		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");      
+    }
+  }
+
+  if(fd) fclose(fd);
+	   
+  ndpi_hw_free(&hw);
+
+  //exit(0);
+}
+
+/* *********************************************** */
+
+void sesUnitTest() {
+  struct ndpi_ses_struct ses;
+  u_int8_t trace = 0;
+  double v[] = {
+    31.908466339111,
+    87.339714050293,
+    173.47660827637,
+    213.92568969727,
+    223.32124328613,
+    230.60134887695,
+    238.09457397461,
+    245.8137512207,
+    251.09228515625,
+    251.09228515625,
+    259.21997070312,
+    261.98754882812,
+    264.78540039062,
+    264.78540039062,
+    270.47451782227,
+    173.3671875,
+    288.34222412109,
+    288.34222412109,
+    304.24795532227,
+    304.24795532227,
+    350.92227172852,
+    384.54431152344,
+    423.25942993164,
+    439.43322753906,
+    445.05981445312,
+    445.05981445312,
+    445.05981445312,
+    445.05981445312
+  };
+  u_int num_learning_points = 1;
+  u_int i, num = sizeof(v) / sizeof(double);
+  float alpha = 0.9;
+  FILE *fd = fopen("/tmp/result.csv", "w");
+  
+  assert(ndpi_ses_init(&ses, alpha, 0.05) == 0);
+  
+  if(trace) {
+    printf("\nSingle Exponential Smoothing [alpha: %.1f]\n", alpha);
+
+    if(fd)
+      fprintf(fd, "index;value;prediction;lower;upper;anomaly\n");
   }
   
-  ndpi_hw_free(&hw);
+  for(i=0; i<num; i++) {
+    double prediction, confidence_band;
+    double lower, upper;
+    int rc = ndpi_ses_add_value(&ses, v[i], &prediction, &confidence_band);
+    
+    lower = prediction - confidence_band, upper = prediction + confidence_band;
+    
+    if(trace) {
+      printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
+	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
+	     confidence_band);
+
+      if(fd)
+	fprintf(fd, "%u;%.0f;%.0f;%.0f;%.0f;%s\n",
+		i, v[i], prediction, lower, upper,
+		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");      
+    }
+  }
+
+  if(fd) fclose(fd);
 }
 
 /* *********************************************** */
@@ -3938,8 +4058,12 @@ int original_main(int argc, char **argv) {
       return(-1);
     }
 
-    // hwUnitTest2();
-    
+#ifdef HW_TEST
+    hwUnitTest2();
+#endif
+
+    sesUnitTest();
+
     /* Internal checks */    
     // binUnitTest();
     //hwUnitTest();

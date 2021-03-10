@@ -1663,6 +1663,17 @@ struct ndpi_hw_struct {
   double    *s;
 };
 
+struct ndpi_ses_struct {
+  struct {
+    double alpha, ro;
+  } params;
+
+  u_int32_t num_values;
+  double sum_square_error, last_forecast, last_value;
+};
+
+/* **************************************** */
+
 /* Prototype used to define custom DGA detection function */
 typedef int (*ndpi_custom_dga_predict_fctn)(const char* domain, int domain_length);
 
