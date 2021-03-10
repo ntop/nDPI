@@ -1440,28 +1440,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		printf("Client SSL [SIGNATURE_ALGORITHMS: %s]\n", ja3.signature_algorithms);
 #endif
-	      } else if(extension_id == 43 /* supported versions */) {
-		u_int16_t s_offset = offset+extension_offset;
-		u_int8_t tot_supported_versions_len = (u_int8_t)packet->payload[s_offset];
-
-#ifdef DEBUG_TLS
-		printf("Client SSL [SUPPORTED_VERSIONS: block_len=%u/len=%u]\n", extension_len, tot_supported_versions_len);
-#endif
-
-		s_offset += 1;
-		tot_supported_versions_len = ndpi_min((sizeof(ja3.supported_versions) / 2) - 1, tot_supported_versions_len);
-
-		for(i=0; i<tot_supported_versions_len; i++) {
-		  int rc = snprintf(&ja3.supported_versions[i*2], sizeof(ja3.supported_versions)-i*2, "%02X", packet->payload[s_offset+i]);
-
-		  if(rc < 0) break;
-		}
-
-		ja3.supported_versions[i*2] = '\0';
-
-#ifdef DEBUG_TLS
-		printf("Client SSL [SUPPORTED_VERSIONS: %s]\n", ja3.supported_versions);
-#endif
 	      } else if(extension_id == 16 /* application_layer_protocol_negotiation */) {
 		u_int16_t s_offset = offset+extension_offset;
 		u_int16_t tot_alpn_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
@@ -1524,7 +1502,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if(version_len == (extension_len-1)) {
 		  u_int8_t j;
-
+		  u_int16_t supported_versions_offset = 0;
+		    
 		  s_offset++;
 
 		  // careful not to overflow and loop forever with u_int8_t
@@ -1546,10 +1525,22 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			break;
 		      else
 			version_str_len += rc;
+
+		      rc = snprintf(&ja3.supported_versions[supported_versions_offset],
+				    sizeof(ja3.supported_versions)-supported_versions_offset,
+				    "%s%04X", (j > 0) ? "-" : "", tls_version);
+
+		      if(rc > 0)
+			supported_versions_offset += rc;
 		    }
 		  }
-		if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions == NULL)
-		  flow->protos.tls_quic_stun.tls_quic.tls_supported_versions = ndpi_strdup(version_str);
+		  
+#ifdef DEBUG_TLS
+		  printf("Client SSL [SUPPORTED_VERSIONS: %s]\n", ja3.supported_versions);
+#endif
+
+		  if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions == NULL)
+		    flow->protos.tls_quic_stun.tls_quic.tls_supported_versions = ndpi_strdup(version_str);
 		}
 	      } else if(extension_id == 65486 /* encrypted server name */) {
 		/*
