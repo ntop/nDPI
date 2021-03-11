@@ -1672,6 +1672,15 @@ struct ndpi_ses_struct {
   double sum_square_error, last_forecast, last_value;
 };
 
+struct ndpi_des_struct {
+  struct {
+    double alpha, beta, ro;
+  } params;
+
+  u_int32_t num_values;
+  double sum_square_error, last_forecast, last_trend, last_value;
+};
+
 /* **************************************** */
 
 /* Prototype used to define custom DGA detection function */

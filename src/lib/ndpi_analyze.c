@@ -1214,3 +1214,70 @@ int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int32_t _value, doub
 
   return(rc);
 }
+
+/* *********************************************************** */
+/* *********************************************************** */
+
+/*
+  Double Exponential Smoothing
+*/
+
+int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance) {
+  memset(des, 0, sizeof(struct ndpi_des_struct));
+
+  des->params.alpha = alpha;
+
+  if((significance < 0) || (significance > 1)) significance = 0.05;
+  des->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
+
+  return(0);
+}
+
+/* *********************************************************** */
+
+/*
+   Returns the forecast and the band (forecast +/- band are the upper and lower values)
+
+   Input
+   des:         Datastructure previously initialized
+   value        The value to add to the measurement
+
+   Output
+   forecast         The forecasted value
+   confidence_band  The value +/- on which the value should fall is not an anomaly
+
+   Return code
+   0                Too early: we're still in the learning phase. Output values are zero.
+   1                Normal processing: forecast and confidence_band are meaningful
+*/
+int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int32_t _value, double *forecast, double *confidence_band) {
+  double value = (double)_value, error;
+  int rc;
+
+  if(des->num_values == 0)
+    *forecast = value, des->last_trend = 0;
+  else {
+    *forecast = (des->params.alpha * value) + ((1 - des->params.alpha) * (des->last_forecast + des->last_trend));
+    des->last_trend = (des->params.beta * (*forecast - des->last_forecast)) + ((1 - des->params.beta) * des->last_trend);
+  }
+  
+  error  = value - *forecast;
+  des->sum_square_error += error * error;
+  
+  if(des->num_values > 0) {
+    double sq = sqrt(des->sum_square_error / (des->num_values+1));
+    
+    *confidence_band = des->params.ro * sq;
+    rc = 1;
+  } else
+    *confidence_band = 0, rc = 0;
+
+  des->num_values++, des->last_value = value, des->last_forecast = *forecast;
+  
+#ifdef DES_DEBUG
+  printf("[num_values: %u][[error: %.3f][forecast: %.3f][trend: %.3f[sqe: %.3f][sq: %.3f][confidence_band: %.3f]\n",
+	 des->num_values, error, *forecast, des->last_trend, des->sum_square_error, sq, *confidence_band);
+#endif
+  
+  return(rc);
+}

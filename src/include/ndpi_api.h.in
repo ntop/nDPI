@@ -1479,6 +1479,11 @@ extern "C" {
 
   /* ******************************* */
 
+  int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
+  int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int32_t _value, double *forecast, double *confidence_band);
+
+  /* ******************************* */
+
   int   ndpi_jitter_init(struct ndpi_jitter_struct *hw, u_int16_t num_periods);
   void  ndpi_jitter_free(struct ndpi_jitter_struct *hw);
   float ndpi_jitter_add_value(struct ndpi_jitter_struct *s, const float value);

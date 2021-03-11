@@ -3939,7 +3939,7 @@ void sesUnitTest() {
   u_int num_learning_points = 1;
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9;
-  FILE *fd = fopen("/tmp/result.csv", "w");
+  FILE *fd = fopen("/tmp/ses_result.csv", "w");
   
   assert(ndpi_ses_init(&ses, alpha, 0.05) == 0);
   
@@ -3954,6 +3954,77 @@ void sesUnitTest() {
     double prediction, confidence_band;
     double lower, upper;
     int rc = ndpi_ses_add_value(&ses, v[i], &prediction, &confidence_band);
+    
+    lower = prediction - confidence_band, upper = prediction + confidence_band;
+    
+    if(trace) {
+      printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
+	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
+	     confidence_band);
+
+      if(fd)
+	fprintf(fd, "%u;%.0f;%.0f;%.0f;%.0f;%s\n",
+		i, v[i], prediction, lower, upper,
+		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");      
+    }
+  }
+
+  if(fd) fclose(fd);
+}
+
+/* *********************************************** */
+
+void desUnitTest() {
+  struct ndpi_des_struct des;
+  u_int8_t trace = 0;
+  double v[] = {
+    31.908466339111,
+    87.339714050293,
+    173.47660827637,
+    213.92568969727,
+    223.32124328613,
+    230.60134887695,
+    238.09457397461,
+    245.8137512207,
+    251.09228515625,
+    251.09228515625,
+    259.21997070312,
+    261.98754882812,
+    264.78540039062,
+    264.78540039062,
+    270.47451782227,
+    173.3671875,
+    288.34222412109,
+    288.34222412109,
+    304.24795532227,
+    304.24795532227,
+    350.92227172852,
+    384.54431152344,
+    423.25942993164,
+    439.43322753906,
+    445.05981445312,
+    445.05981445312,
+    445.05981445312,
+    445.05981445312
+  };
+  u_int num_learning_points = 1;
+  u_int i, num = sizeof(v) / sizeof(double);
+  float alpha = 0.9, beta = 0.5;
+  FILE *fd = fopen("/tmp/des_result.csv", "w");
+  
+  assert(ndpi_des_init(&des, alpha, beta, 0.05) == 0);
+  
+  if(trace) {
+    printf("\nDouble Exponential Smoothing [alpha: %.1f][beta: %.1f]\n", alpha, beta);
+
+    if(fd)
+      fprintf(fd, "index;value;prediction;lower;upper;anomaly\n");
+  }
+  
+  for(i=0; i<num; i++) {
+    double prediction, confidence_band;
+    double lower, upper;
+    int rc = ndpi_des_add_value(&des, v[i], &prediction, &confidence_band);
     
     lower = prediction - confidence_band, upper = prediction + confidence_band;
     
@@ -4063,7 +4134,8 @@ int original_main(int argc, char **argv) {
 #endif
 
     sesUnitTest();
-
+    desUnitTest();
+    
     /* Internal checks */    
     // binUnitTest();
     //hwUnitTest();
