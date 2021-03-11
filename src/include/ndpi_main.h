@@ -95,9 +95,11 @@ extern "C" {
 				       struct ndpi_flow_struct *flow,
 				       ndpi_protocol_category_t protocol_category);
 
+  extern void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_mod,
+				      int protoId, ...);
+
   extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
 				      ndpi_protocol_breed_t protoBreed, u_int16_t protoId,
-				      u_int8_t can_have_a_subprotocol,
 				      u_int16_t tcp_alias_protoId[2],
 				      u_int16_t udp_alias_protoId[2], char *protoName,
 				      ndpi_protocol_category_t protoCategory,
