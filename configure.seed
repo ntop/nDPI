@@ -219,12 +219,14 @@ if test "${with_pcre+set}" = set; then :
 fi
 
 dnl> GeoIP
-AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
-AC_HAVE_HEADERS(maxminddb.h)
-if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" &&
-      test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
-   ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lmaxminddb"
-   AC_DEFINE_UNQUOTED(HAVE_MAXMINDDB, 1, [MaxMind DB support])
+AC_ARG_WITH(maxminddb,          [  --with-maxminddb        Enable nDPI build with libmaxminddb])
+if test "${with_maxminddb+set}" = set; then :
+  AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
+  AC_HAVE_HEADERS(maxminddb.h)
+  if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" && test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
+    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lmaxminddb"
+    AC_DEFINE_UNQUOTED(HAVE_MAXMINDDB, 1, [MaxMind DB support])
+  fi
 fi
 
 dnl> TCP segments management (buffer, sort and reassembly the segments)
