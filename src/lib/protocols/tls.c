@@ -1008,7 +1008,7 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
 
 #define JA3_STR_LEN        1024
 #define MAX_NUM_JA3         512
-#define MAX_JA3_STRLEN      128
+#define MAX_JA3_STRLEN      256
 
 struct ja3_info {
   u_int16_t tls_handshake_version;
