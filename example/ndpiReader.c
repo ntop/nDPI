@@ -83,7 +83,7 @@ char *_debug_protocols = NULL;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
-static u_int32_t risk_stats[NDPI_MAX_RISK] = { 0 }, risks_found = 0;
+static u_int32_t risk_stats[NDPI_MAX_RISK] = { 0 }, risks_found = 0, flows_with_risks = 0;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
@@ -2244,6 +2244,8 @@ static void node_flow_risk_walker(const void *node, ndpi_VISIT which, int depth,
   if(f->risk) {
     u_int j;
 
+    flows_with_risks++;
+    
     for(j = 0; j < NDPI_MAX_RISK; j++) {
       ndpi_risk_enum r = (ndpi_risk_enum)j;
 
@@ -2266,7 +2268,7 @@ static void printRiskStats() {
     }
 
     if(risks_found) {
-      printf("\nRisk statistics:\n");
+      printf("\nRisk stats (found %u flows with risks):\n", flows_with_risks);
 
       for(i = 0; i < NDPI_MAX_RISK; i++) {
 	ndpi_risk_enum r = (ndpi_risk_enum)i;
@@ -2276,8 +2278,8 @@ static void printRiskStats() {
 		 (float)(risk_stats[r]*100)/(float)risks_found);
     }
 
-      printf("\n\tNOTE: as one flow can have multiple risks set, the sum of\n"
-	     "\t      flows with risks can exceed the number of observed flows\n");
+      printf("\n\tNOTE: as one flow can have multiple risks set, the sum of the\n"
+	     "\t      last column can exceed the number of flows with risks.\n");
       printf("\n\n");
     }
   }
