@@ -83,6 +83,7 @@ char *_debug_protocols = NULL;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
+static u_int32_t risk_stats[NDPI_MAX_RISK] = { 0 }, risks_found = 0;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
@@ -971,7 +972,7 @@ static void parseOptions(int argc, char **argv) {
     case 'z':
       enable_ja3_plus = 1;
       break;
-      
+
     default:
       help(0);
       break;
@@ -2237,6 +2238,53 @@ void printPortStats(struct port_stats *stats) {
 
 /* *********************************************** */
 
+static void node_flow_risk_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
+  struct ndpi_flow_info *f = *(struct ndpi_flow_info**)node;
+
+  if(f->risk) {
+    u_int j;
+
+    for(j = 0; j < NDPI_MAX_RISK; j++) {
+      ndpi_risk_enum r = (ndpi_risk_enum)j;
+
+      if(NDPI_ISSET_BIT(f->risk, r))
+	risks_found++, risk_stats[r]++;
+    }
+  }
+}
+
+/* *********************************************** */
+
+static void printRiskStats() {
+  if(!quiet_mode) {
+    u_int thread_id, i;
+
+    for(thread_id = 0; thread_id < num_threads; thread_id++) {
+      for(i=0; i<NUM_ROOTS; i++)
+	ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
+		 node_flow_risk_walker, &thread_id);
+    }
+
+    if(risks_found) {
+      printf("\nRisk statistics:\n");
+
+      for(i = 0; i < NDPI_MAX_RISK; i++) {
+	ndpi_risk_enum r = (ndpi_risk_enum)i;
+
+	if(risk_stats[r] != 0)
+	  printf("\t%-40s %5u [%4.01f %%]\n", ndpi_risk2str(r), risk_stats[r],
+		 (float)(risk_stats[r]*100)/(float)risks_found);
+    }
+
+      printf("\n\tNOTE: as one flow can have multiple risks set, the sum of\n"
+	     "\t      flows with risks can exceed the number of observed flows\n");
+      printf("\n\n");
+    }
+  }
+}
+
+/* *********************************************** */
+
 static void printFlowsStats() {
   int thread_id;
   u_int32_t total_flows = 0;
@@ -2410,7 +2458,6 @@ static void printFlowsStats() {
 	      HASH_ADD_INT(hostByJA3Found->ipToDNS_ht, ip, newInnerElement);
 	    }
 	  }
-
 	}
       }
 
@@ -2763,7 +2810,6 @@ static void printFlowsStats() {
 
     for(i=0; i<num_flows; i++)
       printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
-
   } else if(csv_fp != NULL) {
     int i;
 
@@ -2949,6 +2995,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
   // printf("\n\nTotal Flow Traffic: %llu (diff: %llu)\n", total_flow_bytes, cumulative_stats.total_ip_bytes-total_flow_bytes);
 
+  printRiskStats();
   printFlowsStats();
 
   if(verbose == 3) {
@@ -3540,7 +3587,7 @@ static void dgaUnitTest() {
     /* printf("Checking non DGA %s\n", non_dga[i]); */
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i], 1) == 0);
   }
-  
+
   ndpi_exit_detection_module(ndpi_str);
 }
 
@@ -3761,9 +3808,9 @@ void rsiUnitTest() {
   };
   u_int i, n = sizeof(v) / sizeof(unsigned int);
   u_int debug = 0;
-  
+
   assert(ndpi_alloc_rsi(&s, 8) == 0);
-  
+
   for(i=0; i<n; i++) {
     float rsi = ndpi_rsi_add_value(&s, v[i]);
 
@@ -3771,7 +3818,7 @@ void rsiUnitTest() {
     if(debug)
       printf("%2d) RSI = %f\n", i, rsi);
   }
-  
+
   ndpi_free_rsi(&s);
 }
 
@@ -3781,7 +3828,7 @@ void hashUnitTest() {
   ndpi_str_hash *h = ndpi_hash_alloc(16384);
   char* dict[] = { "hello", "world", NULL };
   int i;
-  
+
   assert(h);
 
   for(i=0; dict[i] != NULL; i++) {
@@ -3790,7 +3837,7 @@ void hashUnitTest() {
     assert(ndpi_hash_add_entry(h, dict[i], l, i) == 0);
     assert(ndpi_hash_find_entry(h, dict[i], l, &v) == 0);
   }
-  
+
   ndpi_hash_free(h);
 }
 
@@ -3802,18 +3849,18 @@ void hwUnitTest() {
   u_int i, j, num = sizeof(v) / sizeof(double);
   u_int num_learning_points = 2;
   u_int8_t trace = 0;
-  
+
   for(j=0; j<2; j++) {
     assert(ndpi_hw_init(&hw, num_learning_points, j /* 0=multiplicative, 1=additive */, 0.9, 0.9, 0.1, 0.05) == 0);
 
     if(trace)
       printf("\nHolt-Winters %s method\n", (j == 0) ? "multiplicative" : "additive");
-    
+
     for(i=0; i<num; i++) {
       double prediction, confidence_band;
       double lower, upper;
       int rc = ndpi_hw_add_value(&hw, v[i], &prediction, &confidence_band);
-      
+
       lower = prediction - confidence_band, upper = prediction + confidence_band;
 
       if(trace)
@@ -3821,7 +3868,7 @@ void hwUnitTest() {
 	       ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
 	       confidence_band);
     }
-    
+
     ndpi_hw_free(&hw);
   }
 }
@@ -3865,24 +3912,24 @@ void hwUnitTest2() {
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9, beta = 0.5, gamma = 1;
   FILE *fd = fopen("/tmp/result.csv", "w");
-  
+
   assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */,
 		      alpha, beta, gamma, 0.05) == 0);
-  
+
   if(trace) {
     printf("\nHolt-Winters [alpha: %.1f][beta: %.1f][gamma: %.1f]\n", alpha, beta, gamma);
 
     if(fd)
       fprintf(fd, "index;value;prediction;lower;upper;anomaly\n");
   }
-  
+
   for(i=0; i<num; i++) {
     double prediction, confidence_band;
     double lower, upper;
     int rc = ndpi_hw_add_value(&hw, v[i], &prediction, &confidence_band);
-    
+
     lower = prediction - confidence_band, upper = prediction + confidence_band;
-    
+
     if(trace) {
       printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
 	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
@@ -3891,12 +3938,12 @@ void hwUnitTest2() {
       if(fd)
 	fprintf(fd, "%u;%.0f;%.0f;%.0f;%.0f;%s\n",
 		i, v[i], prediction, lower, upper,
-		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");      
+		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");
     }
   }
 
   if(fd) fclose(fd);
-	   
+
   ndpi_hw_free(&hw);
 
   //exit(0);
@@ -3941,23 +3988,23 @@ void sesUnitTest() {
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9;
   FILE *fd = fopen("/tmp/ses_result.csv", "w");
-  
+
   assert(ndpi_ses_init(&ses, alpha, 0.05) == 0);
-  
+
   if(trace) {
     printf("\nSingle Exponential Smoothing [alpha: %.1f]\n", alpha);
 
     if(fd)
       fprintf(fd, "index;value;prediction;lower;upper;anomaly\n");
   }
-  
+
   for(i=0; i<num; i++) {
     double prediction, confidence_band;
     double lower, upper;
     int rc = ndpi_ses_add_value(&ses, v[i], &prediction, &confidence_band);
-    
+
     lower = prediction - confidence_band, upper = prediction + confidence_band;
-    
+
     if(trace) {
       printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
 	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
@@ -3966,7 +4013,7 @@ void sesUnitTest() {
       if(fd)
 	fprintf(fd, "%u;%.0f;%.0f;%.0f;%.0f;%s\n",
 		i, v[i], prediction, lower, upper,
-		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");      
+		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");
     }
   }
 
@@ -4012,23 +4059,23 @@ void desUnitTest() {
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9, beta = 0.5;
   FILE *fd = fopen("/tmp/des_result.csv", "w");
-  
+
   assert(ndpi_des_init(&des, alpha, beta, 0.05) == 0);
-  
+
   if(trace) {
     printf("\nDouble Exponential Smoothing [alpha: %.1f][beta: %.1f]\n", alpha, beta);
 
     if(fd)
       fprintf(fd, "index;value;prediction;lower;upper;anomaly\n");
   }
-  
+
   for(i=0; i<num; i++) {
     double prediction, confidence_band;
     double lower, upper;
     int rc = ndpi_des_add_value(&des, v[i], &prediction, &confidence_band);
-    
+
     lower = prediction - confidence_band, upper = prediction + confidence_band;
-    
+
     if(trace) {
       printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, v[i], prediction, lower, upper,
 	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
@@ -4037,7 +4084,7 @@ void desUnitTest() {
       if(fd)
 	fprintf(fd, "%u;%.0f;%.0f;%.0f;%.0f;%s\n",
 		i, v[i], prediction, lower, upper,
-		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");      
+		((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY");
     }
   }
 
@@ -4053,21 +4100,21 @@ void desUnitStressTest() {
   u_int i;
   float alpha = 0.9, beta = 0.5;
   double init_value = time(NULL) % 1000;
-    
+
   assert(ndpi_des_init(&des, alpha, beta, 0.05) == 0);
-  
+
   if(trace) {
     printf("\nDouble Exponential Smoothing [alpha: %.1f][beta: %.1f]\n", alpha, beta);
   }
-  
+
   for(i=0; i<512; i++) {
     double prediction, confidence_band;
     double lower, upper;
     double value = init_value + rand() % 25;
     int rc = ndpi_des_add_value(&des, value, &prediction, &confidence_band);
-    
+
     lower = prediction - confidence_band, upper = prediction + confidence_band;
-    
+
     if(trace) {
       printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, value, prediction, lower, upper,
 	     ((rc == 0) || ((value >= lower) && (value <= upper))) ? "OK" : "ANOMALY",
@@ -4103,24 +4150,24 @@ void hwUnitTest3() {
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.5, beta = 0.5, gamma = 0.1;
   assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */, alpha, beta, gamma, 0.05) == 0);
-  
+
   if(trace)
     printf("\nHolt-Winters [alpha: %.1f][beta: %.1f][gamma: %.1f]\n", alpha, beta, gamma);
-  
+
   for(i=0; i<num; i++) {
     double prediction, confidence_band;
     double lower, upper;
     int rc = ndpi_hw_add_value(&hw, v[i], &prediction, &confidence_band);
-    
+
     lower = prediction - confidence_band, upper = prediction + confidence_band;
-    
+
     if(trace)
       printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n",
 	     i, v[i], prediction, lower, upper,
 	     ((rc == 0) || ((v[i] >= lower) && (v[i] <= upper))) ? "OK" : "ANOMALY",
 	     confidence_band);
   }
-  
+
   ndpi_hw_free(&hw);
 }
 
@@ -4132,12 +4179,12 @@ void jitterUnitTest() {
   u_int i, num = sizeof(v) / sizeof(float);
   u_int num_learning_points = 4;
   u_int8_t trace = 0;
-  
+
   assert(ndpi_jitter_init(&jitter, num_learning_points) == 0);
 
   for(i=0; i<num; i++) {
     float rc = ndpi_jitter_add_value(&jitter, v[i]);
-				     
+
     if(trace)
       printf("%2u)\t%.3f\t%.3f\n", i, v[i], rc);
   }
@@ -4170,11 +4217,11 @@ int original_main(int argc, char **argv) {
     desUnitStressTest();
     exit(0);
 #endif
-    
+
     sesUnitTest();
     desUnitTest();
-    
-    /* Internal checks */    
+
+    /* Internal checks */
     // binUnitTest();
     //hwUnitTest();
     jitterUnitTest();
@@ -4189,16 +4236,16 @@ int original_main(int argc, char **argv) {
     analysisUnitTest();
     rulesUnitTest();
 
-    
+
     gettimeofday(&startup_time, NULL);
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
     parseOptions(argc, argv);
 
     ndpi_info_mod = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
-    
+
     if(ndpi_info_mod == NULL) return -1;
-    
+
     if(domain_to_check) {
       ndpiCheckHostStringMatch(domain_to_check);
       exit(0);
@@ -4284,4 +4331,3 @@ int original_main(int argc, char **argv) {
     return 0;
   }
 #endif /* WIN32 */
-
