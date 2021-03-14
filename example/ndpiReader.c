@@ -84,6 +84,7 @@ u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int32_t risk_stats[NDPI_MAX_RISK] = { 0 }, risks_found = 0, flows_with_risks = 0;
+static struct ndpi_stats cumulative_stats;
 static u_int16_t decode_tunnels = 0;
 static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
@@ -2268,7 +2269,9 @@ static void printRiskStats() {
     }
 
     if(risks_found) {
-      printf("\nRisk stats (found %u flows with risks):\n", flows_with_risks);
+      printf("\nRisk stats [found %u (%.1f %%) flows with risks]:\n",
+	     flows_with_risks,
+	     (100.*flows_with_risks)/(float)cumulative_stats.ndpi_flow_count);
 
       for(i = 0; i < NDPI_MAX_RISK; i++) {
 	ndpi_risk_enum r = (ndpi_risk_enum)i;
@@ -2838,7 +2841,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   u_int32_t i;
   u_int64_t total_flow_bytes = 0;
   u_int32_t avg_pkt_size = 0;
-  struct ndpi_stats cumulative_stats;
   int thread_id;
   char buf[32];
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
