@@ -1646,7 +1646,8 @@ typedef struct {
 
 /* **************************************** */
 
-#define HW_HISTORY_LEN   4
+#define HW_HISTORY_LEN               4
+#define MAX_SQUARE_ERROR_ITERATIONS 64 /* MUST be < num_values_rollup (256 max) */
 
 struct ndpi_hw_struct {
   struct {
@@ -1654,6 +1655,11 @@ struct ndpi_hw_struct {
     double alpha, beta, gamma, ro;
     u_int16_t num_season_periods; /* num of values of a season */
   } params;
+
+  struct {
+    double sum_square_error;
+    u_int8_t num_values_rollup;
+  } prev_error;
 
   u_int32_t num_values;
   double    u, v, sum_square_error;
@@ -1668,6 +1674,11 @@ struct ndpi_ses_struct {
     double alpha, ro;
   } params;
 
+  struct {
+    double sum_square_error;
+    u_int8_t num_values_rollup;
+  } prev_error;
+
   u_int32_t num_values;
   double sum_square_error, last_forecast, last_value;
 };
@@ -1676,6 +1687,11 @@ struct ndpi_des_struct {
   struct {
     double alpha, beta, ro;
   } params;
+
+  struct {
+    double sum_square_error;
+    u_int8_t num_values_rollup;
+  } prev_error;
 
   u_int32_t num_values;
   double sum_square_error, last_forecast, last_trend, last_value;

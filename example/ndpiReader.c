@@ -4045,6 +4045,38 @@ void desUnitTest() {
 
 /* *********************************************** */
 
+void desUnitStressTest() {
+  struct ndpi_des_struct des;
+  u_int8_t trace = 1;
+  u_int num_learning_points = 1;
+  u_int i;
+  float alpha = 0.9, beta = 0.5;
+  double init_value = time(NULL) % 1000;
+    
+  assert(ndpi_des_init(&des, alpha, beta, 0.05) == 0);
+  
+  if(trace) {
+    printf("\nDouble Exponential Smoothing [alpha: %.1f][beta: %.1f]\n", alpha, beta);
+  }
+  
+  for(i=0; i<512; i++) {
+    double prediction, confidence_band;
+    double lower, upper;
+    double value = init_value + rand() % 25;
+    int rc = ndpi_des_add_value(&des, value, &prediction, &confidence_band);
+    
+    lower = prediction - confidence_band, upper = prediction + confidence_band;
+    
+    if(trace) {
+      printf("%2u)\t%12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n", i, value, prediction, lower, upper,
+	     ((rc == 0) || ((value >= lower) && (value <= upper))) ? "OK" : "ANOMALY",
+	     confidence_band);
+    }
+  }
+}
+
+/* *********************************************** */
+
 void hwUnitTest3() {
   struct ndpi_hw_struct hw;
   u_int num_learning_points = 3;
@@ -4133,6 +4165,11 @@ int original_main(int argc, char **argv) {
     hwUnitTest2();
 #endif
 
+#ifdef STRESS_TEST
+    desUnitStressTest();
+    exit(0);
+#endif
+    
     sesUnitTest();
     desUnitTest();
     

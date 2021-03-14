@@ -1028,8 +1028,9 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
   } else {
     u_int idx     = hw->num_values % hw->params.num_season_periods;
     double prev_u, prev_v, prev_s, value  = (double)_value;
-    double sq, error;
-
+    double sq, error, sq_error;
+    u_int observations;
+    
     if(hw->num_values == hw->params.num_season_periods) {
       double avg = ndpi_avg_inline(hw->y, hw->params.num_season_periods);
       u_int i;
@@ -1071,8 +1072,10 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
       *forecast = (prev_u + prev_v) * prev_s;
 
     error                 = value - *forecast;
-    hw->sum_square_error += error * error;
-    sq = sqrt(hw->sum_square_error / (hw->num_values + 2 - hw->params.num_season_periods));
+    sq_error              =  error * error;
+    hw->sum_square_error += sq_error, hw->prev_error.sum_square_error += sq_error;;
+    observations = (hw->num_values < MAX_SQUARE_ERROR_ITERATIONS) ? hw->num_values : ((hw->num_values % MAX_SQUARE_ERROR_ITERATIONS) + MAX_SQUARE_ERROR_ITERATIONS);
+    sq = sqrt(hw->sum_square_error / (observations - hw->params.num_season_periods));
     *confidence_band      = hw->params.ro * sq;
 
 #ifdef HW_DEBUG
@@ -1083,6 +1086,11 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double 
 #endif
 
     hw->num_values++, idx = (idx + 1) % hw->params.num_season_periods;
+
+    if(++hw->prev_error.num_values_rollup == MAX_SQUARE_ERROR_ITERATIONS) {
+      hw->sum_square_error = hw->prev_error.sum_square_error;
+      hw->prev_error.num_values_rollup = 0, hw->prev_error.sum_square_error = 0;
+    }
 
     return(1); /* We're in business: forecast is meaningful now */
   }
@@ -1186,7 +1194,7 @@ int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance)
    1                Normal processing: forecast and confidence_band are meaningful
 */
 int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int32_t _value, double *forecast, double *confidence_band) {
-  double value = (double)_value, error;
+  double value = (double)_value, error, sq_error;
   int rc;
 
   if(ses->num_values == 0)
@@ -1195,10 +1203,12 @@ int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int32_t _value, doub
     *forecast = (ses->params.alpha * (ses->last_value - ses->last_forecast)) + ses->last_forecast;
 
   error  = value - *forecast;
-  ses->sum_square_error += error * error;
+  sq_error =  error * error;
+  ses->sum_square_error += sq_error, ses->prev_error.sum_square_error += sq_error;
 
   if(ses->num_values > 0) {
-    double sq = sqrt(ses->sum_square_error / (ses->num_values+1));
+    u_int observations = (ses->num_values < MAX_SQUARE_ERROR_ITERATIONS) ? (ses->num_values + 1) : ((ses->num_values % MAX_SQUARE_ERROR_ITERATIONS) + MAX_SQUARE_ERROR_ITERATIONS + 1);
+    double sq = sqrt(ses->sum_square_error / observations);
 
     *confidence_band = ses->params.ro * sq;
     rc = 1;
@@ -1206,6 +1216,11 @@ int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int32_t _value, doub
     *confidence_band = 0, rc = 0;
 
   ses->num_values++, ses->last_value = value, ses->last_forecast = *forecast;
+
+  if(++ses->prev_error.num_values_rollup == MAX_SQUARE_ERROR_ITERATIONS) {
+    ses->sum_square_error = ses->prev_error.sum_square_error;
+    ses->prev_error.num_values_rollup = 0, ses->prev_error.sum_square_error = 0;
+  }
 
 #ifdef SES_DEBUG
   printf("[num_values: %u][[error: %.3f][forecast: %.3f][sqe: %.3f][sq: %.3f][confidence_band: %.3f]\n",
@@ -1226,7 +1241,7 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
   memset(des, 0, sizeof(struct ndpi_des_struct));
 
   des->params.alpha = alpha;
-
+  
   if((significance < 0) || (significance > 1)) significance = 0.05;
   des->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
 
@@ -1251,7 +1266,7 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
    1                Normal processing: forecast and confidence_band are meaningful
 */
 int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int32_t _value, double *forecast, double *confidence_band) {
-  double value = (double)_value, error;
+  double value = (double)_value, error, sq_error;
   int rc;
 
   if(des->num_values == 0)
@@ -1262,10 +1277,12 @@ int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int32_t _value, doub
   }
   
   error  = value - *forecast;
-  des->sum_square_error += error * error;
+  sq_error =  error * error;
+  des->sum_square_error += sq_error, des->prev_error.sum_square_error += sq_error;
   
   if(des->num_values > 0) {
-    double sq = sqrt(des->sum_square_error / (des->num_values+1));
+    u_int observations = (des->num_values < MAX_SQUARE_ERROR_ITERATIONS) ? (des->num_values + 1) : ((des->num_values % MAX_SQUARE_ERROR_ITERATIONS) + MAX_SQUARE_ERROR_ITERATIONS + 1);
+    double sq = sqrt(des->sum_square_error / observations);
     
     *confidence_band = des->params.ro * sq;
     rc = 1;
@@ -1273,6 +1290,11 @@ int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int32_t _value, doub
     *confidence_band = 0, rc = 0;
 
   des->num_values++, des->last_value = value, des->last_forecast = *forecast;
+
+  if(++des->prev_error.num_values_rollup == MAX_SQUARE_ERROR_ITERATIONS) {
+    des->sum_square_error = des->prev_error.sum_square_error;
+    des->prev_error.num_values_rollup = 0, des->prev_error.sum_square_error = 0;
+  }
   
 #ifdef DES_DEBUG
   printf("[num_values: %u][[error: %.3f][forecast: %.3f][trend: %.3f[sqe: %.3f][sq: %.3f][confidence_band: %.3f]\n",
