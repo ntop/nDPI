@@ -89,6 +89,8 @@ extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts 
 static u_int32_t flow_id = 0;
 
 u_int8_t enable_doh_dot_detection = 0;
+u_int8_t enable_ja3_plus = 0;
+
 /* ****************************************************** */
 
 struct flow_id_stats {
@@ -402,9 +404,7 @@ static int parse_debug_proto(struct ndpi_detection_module_struct *ndpi_mod, char
 /* ***************************************************** */
 
 extern char *_debug_protocols;
-extern u_int8_t enable_ja3_plus;
 static int _debug_protocols_ok = 0;
-
 
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle) {

@@ -80,7 +80,7 @@ u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_cluster
 u_int8_t verbose = 0, enable_joy_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
-u_int8_t human_readeable_string_len = 5, enable_ja3_plus = 0;
+u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int16_t decode_tunnels = 0;
@@ -98,7 +98,7 @@ static time_t capture_until = 0;
 static u_int32_t num_flows;
 static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 
-extern u_int8_t enable_doh_dot_detection;
+extern u_int8_t enable_doh_dot_detection, enable_ja3_plus;
 extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection, max_num_reported_top_payloads;
 extern u_int16_t min_pattern_len, max_pattern_len;
 extern void ndpi_self_check_host_match(); /* Self check function */
