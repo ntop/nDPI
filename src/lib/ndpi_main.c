@@ -7339,7 +7339,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	  ndpi_set_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
       }
       
-      return(1);
+      return(rc);
     } else {    
       int len, rc = 0, trigram_char_skip = 0;
       u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0, num_dots = 0, num_trigram_dots = 0;
