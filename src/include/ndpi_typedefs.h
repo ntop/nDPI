@@ -809,6 +809,24 @@ struct ndpi_flow_udp_struct {
 
 /* ************************************************** */
 
+#define LINE_EQUALS(ndpi_int_one_line_struct, string_to_compare) \
+  ((ndpi_int_one_line_struct).len == strlen(string_to_compare) && \
+   LINE_CMP(ndpi_int_one_line_struct, string_to_compare, strlen(string_to_compare)) == 1)
+
+#define LINE_STARTS(ndpi_int_one_line_struct, string_to_compare) \
+  ((ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
+   LINE_CMP(ndpi_int_one_line_struct, string_to_compare, strlen(string_to_compare)) == 1)
+
+#define LINE_ENDS(ndpi_int_one_line_struct, string_to_compare) \
+  ((ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
+   memcmp((ndpi_int_one_line_struct).ptr + \
+          ((ndpi_int_one_line_struct).len - strlen(string_to_compare)), \
+          string_to_compare, strlen(string_to_compare)) == 0)
+
+#define LINE_CMP(ndpi_int_one_line_struct, string_to_compare, string_to_compare_length) \
+  ((ndpi_int_one_line_struct).ptr != NULL && \
+   memcmp((ndpi_int_one_line_struct).ptr, string_to_compare, string_to_compare_length) == 0)
+
 struct ndpi_int_one_line_struct {
   const u_int8_t *ptr;
   u_int16_t len;
