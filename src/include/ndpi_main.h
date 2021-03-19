@@ -31,6 +31,10 @@
 #include "ndpi_api.h"
 #include "ndpi_protocols.h"
 
+/* used by ndpi_set_proto_subprotocols */
+#define NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS (-1)
+#define NDPI_PROTOCOL_MATCHED_BY_CONTENT (-2)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
