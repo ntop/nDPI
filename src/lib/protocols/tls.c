@@ -1253,12 +1253,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       if(ndpi_struct->enable_ja3_plus) {
-	for(i=0; i<ja3.server.num_tls_extension; i++) {
-	  rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
-			(i > 0) ? "-" : "", ja3.server.tls_extension[i]);
-	  if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc; else break;
-	}
-
 	for(i=0; i<ja3.server.num_elliptic_curve_point_format; i++) {
 	  rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
 			(i > 0) ? "-" : "", ja3.server.elliptic_curve_point_format[i]);
