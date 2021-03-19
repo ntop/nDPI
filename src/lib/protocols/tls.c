@@ -39,8 +39,10 @@ extern int is_version_with_var_int_transport_params(uint32_t version);
 
 // #define DEBUG_TLS_MEMORY       1
 // #define DEBUG_TLS              1
-// #define DEBUG_TLS_BLOCKS          1
+// #define DEBUG_TLS_BLOCKS       1
 // #define DEBUG_CERTIFICATE_HASH
+
+// #define DEBUG_JA3C 1
 
 /* #define DEBUG_FINGERPRINT      1 */
 /* #define DEBUG_ENCRYPTED_SNI    1 */
@@ -1489,7 +1491,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		/* Replace , with - as in JA3 */
 		for(i=0; ja3.alpn[i] != '\0'; i++)
 		  if(ja3.alpn[i] == ',') ja3.alpn[i] = '-';
-		
+
 	      } else if(extension_id == 43 /* supported versions */) {
 		u_int16_t s_offset = offset+extension_offset;
 		u_int8_t version_len = packet->payload[s_offset];
@@ -1503,7 +1505,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if(version_len == (extension_len-1)) {
 		  u_int8_t j;
 		  u_int16_t supported_versions_offset = 0;
-		    
+
 		  s_offset++;
 
 		  // careful not to overflow and loop forever with u_int8_t
@@ -1534,7 +1536,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			supported_versions_offset += rc;
 		    }
 		  }
-		  
+
 #ifdef DEBUG_TLS
 		  printf("Client SSL [SUPPORTED_VERSIONS: %s]\n", ja3.supported_versions);
 #endif
@@ -1703,11 +1705,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      if(ndpi_struct->enable_ja3_plus) {
 		rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len,
 			      ",%s,%s,%s", ja3.signature_algorithms, ja3.supported_versions, ja3.alpn);
-		if(rc > 0 && ja3_str_len + rc < JA3_STR_LEN) ja3_str_len += rc;		
+		if(rc > 0 && ja3_str_len + rc < JA3_STR_LEN) ja3_str_len += rc;
 	      }
-	      
-#ifdef DEBUG_TLS
-	      printf("[JA3] Client: %s \n", ja3_str);
+
+#ifdef DEBUG_JA3C
+	      printf("[JA3+] Client: %s \n", ja3_str);
 #endif
 
 	      ndpi_MD5Init(&ctx);
@@ -1721,7 +1723,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if(rc > 0) j += rc; else break;
 	      }
 
-#ifdef DEBUG_TLS
+#ifdef DEBUG_JA3C
 	      printf("[JA3] Client: %s \n", flow->protos.tls_quic_stun.tls_quic.ja3_client);
 #endif
 
