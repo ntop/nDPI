@@ -7464,7 +7464,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	     - https://www.akamai.com/uk/en/multimedia/documents/state-of-the-internet/ddos-reflection-netbios-name-server-rpc-portmap-sentinel-udp-threat-advisory.pdf
 	     - http://ubiqx.org/cifs/NetBIOS.html
 	   */
-	   || (max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */)
+	   || ((max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */) && ((num_char_repetitions > 1) || (num_digits > 1)))	       
 	   ) {
 	  if(flow) ndpi_set_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
 

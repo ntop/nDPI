@@ -1444,11 +1444,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 		    if((len >= 4)
-		       && strcmp(&sni[len-4], ".com") /* Check if it ends in .com or .net */
-		       && strcmp(&sni[len-4], ".net")
-		       && strncmp(sni, "www.", 4)) /* Not starting with www.... */
-		      ;
-		    else
+		       /* Check if it ends in .com or .net */ 
+		       && ((strcmp(&sni[len-4], ".com") == 0) || (strcmp(&sni[len-4], ".net") == 0))
+		       && (strncmp(sni, "www.", 4) == 0)) /* Not starting with www.... */
 		      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_TLS);
 		  } else {
 #ifdef DEBUG_TLS

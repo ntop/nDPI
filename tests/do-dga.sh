@@ -4,9 +4,9 @@ cd "$(dirname "${0}")"
 
 # Baseline performances ------------------------------------------------------------------------------------------------
 # Important notes: BASE values must be integers examples and represents percentage (e.g. 79%, 98%).
-BASE_ACCURACY=71
+BASE_ACCURACY=69
 BASE_PRECISION=89
-BASE_RECALL=49
+BASE_RECALL=41
 # ----------------------------------------------------------------------------------------------------------------------
 
 DGA_EVALUATE="./dga/dga_evaluate"
