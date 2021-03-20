@@ -318,6 +318,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const u_char *packet,
                            FILE * csv_fp);
 
+int ndpi_is_datalink_supported(int datalink_type);
 
 /* flow callbacks for complete detected flow
    (ndpi_flow_info will be freed right after) */

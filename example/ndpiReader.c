@@ -3321,9 +3321,15 @@ static void ndpi_process_packet(u_char *args,
  * @brief Call pcap_loop() to process packets from a live capture or savefile
  */
 static void runPcapLoop(u_int16_t thread_id) {
-  if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL))
+  if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)) {
+    int datalink_type = pcap_datalink(ndpi_thread_info[thread_id].workflow->pcap_handle);
+    if(!ndpi_is_datalink_supported(datalink_type)) {
+      printf("Unsupported datalink %d. Skip pcap\n", datalink_type);
+      return;
+    }
     if(pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id) < 0)
       printf("Error while reading pcap file: '%s'\n", pcap_geterr(ndpi_thread_info[thread_id].workflow->pcap_handle));
+  }
 }
 
 /**
