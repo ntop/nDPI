@@ -843,7 +843,6 @@ struct ndpi_packet_struct {
   u_int64_t current_time_ms;
 
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
-  u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_SIZE];
   u_int16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
@@ -1006,9 +1005,8 @@ typedef struct ndpi_proto_defaults {
   char *protoName;
   ndpi_protocol_category_t protoCategory;
   u_int16_t * subprotocols;
-  size_t subprotocol_count;
+  u_int32_t subprotocol_count;
   u_int16_t protoId, protoIdx;
-  u_int16_t master_tcp_protoId[2], master_udp_protoId[2]; /* The main protocols on which this sub-protocol sits on */
   u_int16_t tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];
   ndpi_protocol_breed_t protoBreed;
   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
