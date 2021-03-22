@@ -656,7 +656,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
       uint8_t * sha1 = flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint;
       const size_t sha1_siz = sizeof(flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint);
-      char sha1_str[sha1_siz * 2 + 1];
+      char sha1_str[20 /* sha1_siz */ * 2 + 1];
       static const char hexalnum[] = "0123456789ABCDEF";
       for (size_t i = 0; i < sha1_siz; ++i) {
         u_int8_t lower = (sha1[i] & 0x0F);
