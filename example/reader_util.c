@@ -1541,6 +1541,26 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   return(flow->detected_protocol);
 }
 
+int ndpi_is_datalink_supported(int datalink_type)
+{
+  /* Keep in sync with the similar switch in ndpi_workflow_process_packet */
+  switch(datalink_type) {
+  case DLT_NULL:
+  case DLT_PPP_SERIAL:
+  case DLT_C_HDLC:
+  case DLT_PPP:
+  case DLT_IPV4:
+  case DLT_IPV6:
+  case DLT_EN10MB:
+  case DLT_LINUX_SLL:
+  case DLT_IEEE802_11_RADIO:
+  case DLT_RAW:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
 /* ****************************************************** */
 
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
@@ -1623,6 +1643,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   if(header->caplen < eth_offset + 28)
     return(nproto); /* Too short */
 
+  /* Keep in sync with ndpi_is_datalink_supported() */
   switch(datalink_type) {
   case DLT_NULL:
     if(ntohl(*((u_int32_t*)&packet[eth_offset])) == 2)
@@ -1737,7 +1758,9 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     break;
 
   default:
-    /* printf("Unknown datalink %d\n", datalink_type); */
+    /* We shoudn't be here, because we already checked that this datalink is supported.
+       Should ndpi_is_datalink_supported() be updated? */
+    printf("Unknown datalink %d\n", datalink_type);
     return(nproto);
   }
 
