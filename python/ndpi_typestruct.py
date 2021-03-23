@@ -94,11 +94,10 @@ class NDPIProtoDefaultsT(Structure):
     _fields_ = [
         ("protoName", c_char_p),
         ("protoCategory", c_uint),
-        ("can_have_a_subprotocol", c_uint8),
+        ("subprotocols", c_uint16_p),
+        ("subprotocol_count", c_uint32),
         ("protoId", c_uint16),
         ("protoIdx", c_uint16),
-        ("master_tcp_protoId", c_uint16 * 2),
-        ("master_udp_protoId", c_uint16 * 2),
         ("protoBreed", c_uint),
         ("func", CFUNCTYPE(None, POINTER(NDPIDetectionModuleStruct), POINTER(NDPIFlowStruct))),
     ]
@@ -653,7 +652,6 @@ class NDPIUdpHdr(Structure):
 class NDPIPacketStructStack(Structure):
     _pack_ = 1
     _fields_ = [
-        ('detected_subprotocol_stack', c_uint8 * ndpi.ndpi_wrap_ndpi_procol_size()),
         ('protocol_stack_info', c_uint16)
     ]
 

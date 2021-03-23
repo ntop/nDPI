@@ -246,7 +246,7 @@ void init_doh_bins() {
 
 u_int check_bin_doh_similarity(struct ndpi_bin *bin, float *similarity) {
   u_int i;
-  float lowest_similarity = 9999999999;
+  float lowest_similarity = 9999999999.0f;
 
   for(i=0; i<NUM_DOH_BINS; i++) {
     *similarity = ndpi_bin_similarity(&doh_ndpi_bins[i], bin, 0);

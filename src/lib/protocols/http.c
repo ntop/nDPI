@@ -573,7 +573,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     **/
     if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
       /* Avoid putting as subprotocol a "core" protocol such as SSL or DNS */
-      if(ndpi_struct->proto_defaults[flow->guessed_protocol_id].can_have_a_subprotocol == 0) {
+      if(ndpi_struct->proto_defaults[flow->guessed_protocol_id].subprotocol_count == 0) {
 	flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
 	if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
 	  flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;

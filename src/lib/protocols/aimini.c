@@ -33,21 +33,9 @@
 static void ndpi_int_aimini_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow/* ,  */
 					   /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AIMINI, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_AIMINI);
 }
 
-
-static u_int8_t is_special_aimini_host(struct ndpi_int_one_line_struct host_line)
-{
-	if (host_line.ptr != NULL && host_line.len >= NDPI_STATICSTRING_LEN("X.X.X.X.aimini.net")) {
-		if ((get_u_int32_t(host_line.ptr, 0) & htonl(0x00ff00ff)) == htonl(0x002e002e) &&
-			(get_u_int32_t(host_line.ptr, 4) & htonl(0x00ff00ff)) == htonl(0x002e002e) &&
-			memcmp(&host_line.ptr[8], "aimini.net", NDPI_STATICSTRING_LEN("aimini.net")) == 0) {
-			return 1;
-		}
-	}
-	return 0;
-}
 
 void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -232,45 +220,32 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 			ndpi_int_aimini_add_connection(ndpi_struct, flow);
 			return;
 		}
-	} else if (packet->tcp != NULL) {
-		if ((packet->payload_packet_len > NDPI_STATICSTRING_LEN("GET /player/") &&
-			 (memcmp(packet->payload, "GET /player/", NDPI_STATICSTRING_LEN("GET /player/")) == 0)) ||
-			(packet->payload_packet_len > NDPI_STATICSTRING_LEN("GET /play/?fid=") &&
-			 (memcmp(packet->payload, "GET /play/?fid=", NDPI_STATICSTRING_LEN("GET /play/?fid=")) == 0))) {
-			NDPI_LOG_DBG2(ndpi_struct, "HTTP packet detected\n");
-			ndpi_parse_packet_line_info(ndpi_struct, flow);
-			if (packet->host_line.ptr != NULL && packet->host_line.len > 11
-				&& (memcmp(&packet->host_line.ptr[packet->host_line.len - 11], ".aimini.net", 11) == 0)) {
+	}
+
+	if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP) {
+		if (flow->http.method == NDPI_HTTP_METHOD_GET)
+		{
+			if ((LINE_STARTS(packet->http_url_name, "/download/") == 1 ||
+			     LINE_STARTS(packet->http_url_name, "/player/") == 1 ||
+			     LINE_STARTS(packet->http_url_name, "/play/") == 1 ||
+                 LINE_STARTS(packet->http_url_name, "/member/") == 1) &&
+			    (LINE_ENDS(packet->host_line, ".aimini.net") == 1 ||
+                 LINE_ENDS(packet->host_line, ".aimini.com") == 1))
+			{
 				NDPI_LOG_INFO(ndpi_struct, "found AIMINI HTTP traffic\n");
 				ndpi_int_aimini_add_connection(ndpi_struct, flow);
 				return;
 			}
-		}
-		if (packet->payload_packet_len > 100) {
-			if (memcmp(packet->payload, "GET /", NDPI_STATICSTRING_LEN("GET /")) == 0) {
-				if (memcmp(&packet->payload[NDPI_STATICSTRING_LEN("GET /")], "play/",
-						   NDPI_STATICSTRING_LEN("play/")) == 0 ||
-					memcmp(&packet->payload[NDPI_STATICSTRING_LEN("GET /")], "download/",
-						   NDPI_STATICSTRING_LEN("download/")) == 0) {
-					ndpi_parse_packet_line_info(ndpi_struct, flow);
-					if (is_special_aimini_host(packet->host_line) == 1) {
-						NDPI_LOG_INFO(ndpi_struct,
-								"found AIMINI HTTP traffic\n");
-						ndpi_int_aimini_add_connection(ndpi_struct, flow);
-						return;
-					}
-				}
-			} else if (memcmp(packet->payload, "POST /", NDPI_STATICSTRING_LEN("POST /")) == 0) {
-				if (memcmp(&packet->payload[NDPI_STATICSTRING_LEN("POST /")], "upload/",
-						   NDPI_STATICSTRING_LEN("upload/")) == 0) {
-					ndpi_parse_packet_line_info(ndpi_struct, flow);
-					if (is_special_aimini_host(packet->host_line) == 1) {
-						NDPI_LOG_INFO(ndpi_struct,
-								"found AIMINI HTTP traffic detected.\n");
-						ndpi_int_aimini_add_connection(ndpi_struct, flow);
-						return;
-					}
-				}
+		} else if (flow->http.method == NDPI_HTTP_METHOD_POST)
+		{
+			if ((LINE_STARTS(packet->http_url_name, "/upload/") == 1 ||
+			     LINE_STARTS(packet->http_url_name, "/member/") == 1) &&
+			    (LINE_ENDS(packet->host_line, ".aimini.net") == 1 ||
+			     LINE_ENDS(packet->host_line, ".aimini.com") == 1))
+			{
+				NDPI_LOG_INFO(ndpi_struct, "found AIMINI HTTP traffic\n");
+				ndpi_int_aimini_add_connection(ndpi_struct, flow);
+				return;
 			}
 		}
 	}

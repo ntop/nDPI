@@ -809,6 +809,24 @@ struct ndpi_flow_udp_struct {
 
 /* ************************************************** */
 
+#define LINE_EQUALS(ndpi_int_one_line_struct, string_to_compare) \
+  ((ndpi_int_one_line_struct).len == strlen(string_to_compare) && \
+   LINE_CMP(ndpi_int_one_line_struct, string_to_compare, strlen(string_to_compare)) == 1)
+
+#define LINE_STARTS(ndpi_int_one_line_struct, string_to_compare) \
+  ((ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
+   LINE_CMP(ndpi_int_one_line_struct, string_to_compare, strlen(string_to_compare)) == 1)
+
+#define LINE_ENDS(ndpi_int_one_line_struct, string_to_compare) \
+  ((ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
+   memcmp((ndpi_int_one_line_struct).ptr + \
+          ((ndpi_int_one_line_struct).len - strlen(string_to_compare)), \
+          string_to_compare, strlen(string_to_compare)) == 0)
+
+#define LINE_CMP(ndpi_int_one_line_struct, string_to_compare, string_to_compare_length) \
+  ((ndpi_int_one_line_struct).ptr != NULL && \
+   memcmp((ndpi_int_one_line_struct).ptr, string_to_compare, string_to_compare_length) == 0)
+
 struct ndpi_int_one_line_struct {
   const u_int8_t *ptr;
   u_int16_t len;
@@ -825,7 +843,6 @@ struct ndpi_packet_struct {
   u_int64_t current_time_ms;
 
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
-  u_int8_t detected_subprotocol_stack[NDPI_PROTOCOL_SIZE];
   u_int16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
@@ -987,9 +1004,9 @@ typedef enum {
 typedef struct ndpi_proto_defaults {
   char *protoName;
   ndpi_protocol_category_t protoCategory;
-  u_int8_t can_have_a_subprotocol;
+  u_int16_t * subprotocols;
+  u_int32_t subprotocol_count;
   u_int16_t protoId, protoIdx;
-  u_int16_t master_tcp_protoId[2], master_udp_protoId[2]; /* The main protocols on which this sub-protocol sits on */
   u_int16_t tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];
   ndpi_protocol_breed_t protoBreed;
   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);

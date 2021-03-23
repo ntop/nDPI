@@ -710,7 +710,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 #ifdef COSINE_SIMILARITY
       best_similarity = -1;
 #else
-      best_similarity = 99999999999;
+      best_similarity = 99999999999.0f;
 #endif
 
       for(j=0; j<num_clusters; j++) {

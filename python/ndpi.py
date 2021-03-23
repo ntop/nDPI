@@ -716,7 +716,6 @@ struct ndpi_packet_struct {
   uint64_t current_time_ms;
 
   uint16_t detected_protocol_stack[2];
-  uint8_t detected_subprotocol_stack[2];
   uint16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[64];
@@ -870,9 +869,9 @@ typedef enum {
 typedef struct ndpi_proto_defaults {
   char *protoName;
   ndpi_protocol_category_t protoCategory;
-  uint8_t can_have_a_subprotocol;
+  u_int16_t * subprotocols;
+  size_t subprotocol_count;
   uint16_t protoId, protoIdx;
-  uint16_t master_tcp_protoId[2], master_udp_protoId[2]; /* The main protocols on which this sub-protocol sits on */
   uint16_t tcp_default_ports[5], udp_default_ports[5];
   ndpi_protocol_breed_t protoBreed;
   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
