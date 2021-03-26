@@ -7318,7 +7318,12 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
       if((!name)
 	 || (strchr(name, '_') != NULL)
-	 || (endsWith(name, "in-addr.arpa", 12)))
+	 || (endsWith(name, "in-addr.arpa", 12))
+	 /* Ignore TLD .local .lan and .home */
+	 || (endsWith(name, ".local", 6))
+	 || (endsWith(name, ".lan", 4))
+	 || (endsWith(name, ".home", 5))
+	 )
 	return(0);
     
       if(flow && (flow->packet.detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
