@@ -1531,6 +1531,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
 	  flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
 							  enable_protocol_guess, &proto_guessed);
+	  if(enable_protocol_guess) workflow->stats.guessed_flow_protocols++;
 	}
 
 	process_ndpi_collected_info(workflow, flow, csv_fp);

@@ -1542,6 +1542,8 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
 						      flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
+
+      if(enable_protocol_guess) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow, csv_fp);
