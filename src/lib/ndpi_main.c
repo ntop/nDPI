@@ -2550,6 +2550,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->stun_cache)
       ndpi_lru_free_cache(ndpi_str->stun_cache);
 
+    if(ndpi_str->mining_cache)
+      ndpi_lru_free_cache(ndpi_str->mining_cache);
+
     if(ndpi_str->msteams_cache)
       ndpi_lru_free_cache(ndpi_str->msteams_cache);
 
@@ -4584,6 +4587,18 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) && (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
       return(ret);
 
+    if(ndpi_str->mining_cache && flow->packet.iph) {
+      u_int16_t cached_proto;
+      u_int32_t key = flow->packet.iph->saddr + flow->packet.iph->daddr;
+      
+      if(ndpi_lru_find_cache(ndpi_str->mining_cache, key,
+			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
+	ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN);
+	ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+	return(ret);
+      }
+    }
+      
     /* TODO: add the remaining stage_XXXX protocols */
     if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
       u_int16_t guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN, guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
@@ -6493,12 +6508,17 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
       return("Potentially Dangerous");
       break;
+    case NDPI_PROTOCOL_TRACKER_ADS:
+      return("Tracker/Ads");
+      break;
     case NDPI_PROTOCOL_DANGEROUS:
       return("Dangerous");
       break;
     case NDPI_PROTOCOL_UNRATED:
-    default:
       return("Unrated");
+      break;
+    default:
+      return("???");
       break;
     }
   }
