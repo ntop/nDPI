@@ -26,6 +26,16 @@
 
 /* ************************************************************************** */
 
+static void cacheMiningHostTwins(struct ndpi_detection_module_struct *ndpi_struct,
+				 u_int32_t host_keys /* network byte order */) {
+  if(ndpi_struct->mining_cache == NULL) ndpi_struct->mining_cache = ndpi_lru_cache_init(1024);
+  
+  if(ndpi_struct->mining_cache)
+    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, host_keys, NDPI_PROTOCOL_MINING);
+}
+
+/* ************************************************************************** */
+
 void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
@@ -51,11 +61,18 @@ void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
     else {
       snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+      cacheMiningHostTwins(ndpi_struct, flow->packet.iph->saddr + flow->packet.iph->daddr);
       return;
     }
   }
   
   ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, __FILE__, __FUNCTION__, __LINE__);  
+}
+
+/* ************************************************************************** */
+
+static u_int8_t isEthPort(u_int16_t dport) {
+  return(((dport >= 30300) && (dport <= 30305)) ? 1 : 0);
 }
 
 /* ************************************************************************** */
@@ -68,7 +85,6 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Check connection over TCP */
   if(packet->payload_packet_len > 10) {
-
     if(packet->tcp->source == htons(8333)) {
       /*
 	Bitcoin
@@ -80,15 +96,23 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if((*to_match == magic) || (*to_match == magic1)) {
 	snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+	cacheMiningHostTwins(ndpi_struct, flow->packet.iph->saddr + flow->packet.iph->daddr);
+	return;
       }
     }
 
-    if((packet->payload_packet_len > 450)
+    if((packet->payload_packet_len > 300)
        && (packet->payload_packet_len < 600)
-       && (packet->tcp->dest == htons(30303) /* Ethereum port */)
        && (packet->payload[2] == 0x04)) {
-      snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+
+      if(isEthPort(ntohs(packet->tcp->dest)) /* Ethereum port */) {
+	snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+	cacheMiningHostTwins(ndpi_struct, flow->packet.iph->saddr + flow->packet.iph->daddr);
+	return;
+      } else
+	flow->guessed_protocol_id = NDPI_PROTOCOL_MINING;
+      
     } else if(ndpi_strnstr((const char *)packet->payload, "{", packet->payload_packet_len)
 	 && (
 	   ndpi_strnstr((const char *)packet->payload, "\"eth1.0\"", packet->payload_packet_len)
@@ -104,6 +128,8 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       */
       snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+      cacheMiningHostTwins(ndpi_struct, flow->packet.iph->saddr + flow->packet.iph->daddr);
+      return;
     } else if(ndpi_strnstr((const char *)packet->payload, "{", packet->payload_packet_len)
 	      && (ndpi_strnstr((const char *)packet->payload, "\"method\":", packet->payload_packet_len)
 		  || ndpi_strnstr((const char *)packet->payload, "\"blob\":", packet->payload_packet_len)
@@ -125,6 +151,8 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       */
       snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ZCash/Monero");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+      cacheMiningHostTwins(ndpi_struct, flow->packet.iph->saddr + flow->packet.iph->daddr);
+      return;
     }
   }
 

@@ -1166,6 +1166,9 @@ struct ndpi_detection_module_struct {
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
 
+  /* NDPI_PROTOCOL_MINING and subprotocols */
+  struct ndpi_lru_cache *mining_cache;
+  
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_cache;
 
