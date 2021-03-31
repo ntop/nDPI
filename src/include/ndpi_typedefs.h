@@ -28,6 +28,9 @@
 #include "ndpi_protocol_ids.h"
 #include "ndpi_utils.h"
 
+/* Used by both nDPI core and patricia code under third-party */
+#include "ndpi_patricia_typedefs.h"
+
 #ifdef HAVE_MAXMINDDB
 #include <maxminddb.h>
 #endif
@@ -1599,20 +1602,6 @@ struct ndpi_jitter_struct {
 #ifndef AF_MAC
 #define AF_MAC            99
 #endif
-
-typedef struct _ndpi_prefix_t {
-  u_int16_t family;		/* AF_INET | AF_INET6 */
-  u_int16_t bitlen;		/* same as mask? */
-  int ref_count;		/* reference count */
-  union {
-    struct in_addr sin;
-    struct in6_addr sin6;
-    u_int8_t mac[6];
-  } add;
-} ndpi_prefix_t;
-
-typedef struct _ndpi_patricia_node_t ndpi_patricia_node_t;
-typedef struct _ndpi_patricia_tree_t ndpi_patricia_tree_t;
 
 typedef void (*ndpi_void_fn_t)(void *data);
 typedef void (*ndpi_void_fn2_t)(ndpi_prefix_t *prefix, void *data);

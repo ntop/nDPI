@@ -43,6 +43,8 @@
 
 #include "ndpi_api.h"
 
+#include "ndpi_patricia_typedefs.h"
+
 /* typedef unsigned int u_int; */
 /* { from defs.h */
 #define ndpi_prefix_touchar(prefix) ((u_char *)&(prefix)->add.sin)
@@ -85,34 +87,6 @@ typedef struct _prefix4_t {
 
 /* } */
 
-/* pointer to usr data (ex. route flap info) */
-union patricia_node_value_t {
-  void *user_data;
-
-  /* User-defined values */
-  union {
-    struct {
-      u_int32_t user_value, additional_user_value;
-    } uv32;
-    
-    u_int64_t uv64;
-  } u;
-};
-
-typedef struct _ndpi_patricia_node_t {
-  u_int16_t bit;			/* flag if this node used */
-  ndpi_prefix_t *prefix;		/* who we are in patricia tree */
-  struct _ndpi_patricia_node_t *l, *r;	/* left and right children */
-  struct _ndpi_patricia_node_t *parent;/* may be used */
-  void *data;			/* pointer to data */
-  union patricia_node_value_t value;
-} ndpi_patricia_node_t;
-
-typedef struct _ndpi_patricia_tree_t {
-  ndpi_patricia_node_t 	*head;
-  u_int16_t		maxbits;	/* for IP, 32 bit addresses */
-  int num_active_node;		/* for debug purpose */
-} ndpi_patricia_tree_t;
 
 #ifdef WIN32
 #define PATRICIA_MAXBITS	128
