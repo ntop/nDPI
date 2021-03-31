@@ -1547,9 +1547,9 @@ extern "C" {
 
   /* ******************************* */
 
-  int ndpi_load_geeoip(struct ndpi_detection_module_struct *ndpi_str,
+  int ndpi_load_geoip(struct ndpi_detection_module_struct *ndpi_str,
 		       const char *ip_city_data, const char *ip_as_data);
-  void ndpi_free_geeoip(struct ndpi_detection_module_struct *ndpi_str);  
+  void ndpi_free_geoip(struct ndpi_detection_module_struct *ndpi_str);  
   int ndpi_get_geoip(struct ndpi_detection_module_struct *ndpi_str, char *ip,
 		     u_int32_t *asn, char *country_code, u_int8_t country_code_len);
 

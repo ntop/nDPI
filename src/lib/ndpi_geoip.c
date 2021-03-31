@@ -35,7 +35,7 @@
 
 /* ********************************************************************************* */
 
-int ndpi_load_geeoip(struct ndpi_detection_module_struct *ndpi_str,
+int ndpi_load_geoip(struct ndpi_detection_module_struct *ndpi_str,
 		     const char *ip_city_data, const char *ip_as_data) {
 #ifdef HAVE_MAXMINDDB
   int status;
@@ -59,7 +59,7 @@ int ndpi_load_geeoip(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
-void ndpi_free_geeoip(struct ndpi_detection_module_struct *ndpi_str) {
+void ndpi_free_geoip(struct ndpi_detection_module_struct *ndpi_str) {
 #ifdef HAVE_MAXMINDDB
   if(ndpi_str->mmdb_city_loaded) MMDB_close(&ndpi_str->mmdb_city);
   if(ndpi_str->mmdb_as_loaded)   MMDB_close(&ndpi_str->mmdb_as);

@@ -2613,7 +2613,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 #include "../../../nDPI-custom/ndpi_exit_detection_module.c"
 #endif
 
-    ndpi_free_geeoip(ndpi_str);
+    ndpi_free_geoip(ndpi_str);
 
     ndpi_free(ndpi_str);
   }
