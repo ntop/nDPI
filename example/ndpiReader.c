@@ -76,7 +76,7 @@ FILE *csv_fp                 = NULL; /**< for CSV export */
 static char* domain_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
-u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0;
+u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_joy_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
@@ -215,6 +215,8 @@ void test_lib(); /* Forward */
 extern void ndpi_report_payload_stats();
 
 /* ********************************** */
+
+#define DEBUG_TRACE
 
 #ifdef DEBUG_TRACE
 FILE *trace = NULL;
@@ -507,9 +509,9 @@ static void help(u_int long_help) {
 	 "  --extcap-interface <name>\n"
 	 "  --extcap-config\n"
 	 "  --capture\n"
-	 "  --extcap-capture-filter\n"
+	 "  --extcap-capture-filter <filter>\n"
 	 "  --fifo <path to file or pipe>\n"
-	 "  --debug\n"
+	 "  --ndpi-proto-filter <protocol>\n"
     );
 #endif
 
@@ -574,17 +576,19 @@ static struct option longopts[] = {
 /* ********************************** */
 
 void extcap_interfaces() {
-  printf("extcap {version=%s}\n", ndpi_revision());
+  printf("extcap {version=%s}{help=https://github.com/ntop/nDPI/tree/dev/wireshark}\n", ndpi_revision());
   printf("interface {value=ndpi}{display=nDPI interface}\n");
-  exit(0);
+
+  extcap_exit = 1;
 }
 
 /* ********************************** */
 
 void extcap_dlts() {
   u_int dlts_number = DLT_EN10MB;
+
   printf("dlt {number=%u}{name=%s}{display=%s}\n", dlts_number, "ndpi", "nDPI Interface");
-  exit(0);
+  extcap_exit = 1;
 }
 
 /* ********************************** */
@@ -629,17 +633,29 @@ int cmpFlows(const void *_a, const void *_b) {
 void extcap_config() {
   int i, argidx = 0;
   struct ndpi_proto_sorter *protos;
-  u_int ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
-  ndpi_proto_defaults_t *proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
+  u_int ndpi_num_supported_protocols;
+  ndpi_proto_defaults_t *proto_defaults;
+
+  ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
+  ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
+  proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
 
   /* -i <interface> */
-  printf("arg {number=%d}{call=-i}{display=Capture Interface}{type=string}"
+  printf("arg {number=%d}{call=-i}{display=Capture Interface}{type=string}{group=Live Capture}"
 	 "{tooltip=The interface name}\n", argidx++);
-  printf("arg {number=%d}{call=-i}{display=Pcap File to Analyze}{type=fileselect}"
+
+  printf("arg {number=%d}{call=-i}{display=Pcap File to Analyze}{type=fileselect}{mustexist=true}{group=Pcap}"
 	 "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 
+#if 0
+  /* Removed as it breaks! extcap */
   protos = (struct ndpi_proto_sorter*)ndpi_malloc(sizeof(struct ndpi_proto_sorter) * ndpi_num_supported_protocols);
   if(!protos) exit(0);
+
+  printf("arg {number=%d}{call=--ndpi-proto-filter}{display=nDPI Protocol Filter}{type=selector}{group=Filter}"
+	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
+
+  printf("value {arg=%d}{value=%d}{display=%s}{default=true}\n", argidx, 0, "No nDPI filtering");
 
   for(i=0; i<(int) ndpi_num_supported_protocols; i++) {
     protos[i].id = i;
@@ -648,18 +664,16 @@ void extcap_config() {
 
   qsort(protos, ndpi_num_supported_protocols, sizeof(struct ndpi_proto_sorter), cmpProto);
 
-  printf("arg {number=%d}{call=-9}{display=nDPI Protocol Filter}{type=selector}"
-	 "{tooltip=nDPI Protocol to be filtered}\n", argidx);
-
-  printf("value {arg=%d}{value=%d}{display=%s}\n", argidx, -1, "All Protocols (no nDPI filtering)");
-
   for(i=0; i<(int)ndpi_num_supported_protocols; i++)
-    printf("value {arg=%d}{value=%d}{display=%s (%d)}\n", argidx, protos[i].id,
+    printf("value {arg=%d}{value=%d}{display=%s (%d)}{default=false}{enabled=true}\n", argidx, protos[i].id,
 	   protos[i].name, protos[i].id);
 
   ndpi_free(protos);
+#endif
 
-  exit(0);
+  ndpi_exit_detection_module(ndpi_info_mod);
+
+  extcap_exit = 1;
 }
 
 /* ********************************** */
@@ -754,12 +768,6 @@ static void parseOptions(int argc, char **argv) {
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 
-#ifdef DEBUG_TRACE
-  trace = fopen("/tmp/ndpiReader.log", "a");
-
-  if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
-#endif
-
 #ifdef USE_DPDK
   {
     int ret = rte_eal_init(argc, argv);
@@ -774,7 +782,7 @@ static void parseOptions(int argc, char **argv) {
   while((opt = getopt_long(argc, argv, "b:e:c:C:dDf:g:i:Ij:S:hp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
-    if(trace) fprintf(trace, " #### -%c [%s] #### \n", opt, optarg ? optarg : "");
+    if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
 
     switch (opt) {
@@ -867,9 +875,9 @@ static void parseOptions(int argc, char **argv) {
       nDPI_LogLevel  = atoi(optarg);
       if(nDPI_LogLevel < NDPI_LOG_ERROR) nDPI_LogLevel = NDPI_LOG_ERROR;
       if(nDPI_LogLevel > NDPI_LOG_DEBUG_EXTRA) {
-	    nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
-	    ndpi_free(_debug_protocols);
-	    _debug_protocols = strdup("all");
+	nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
+	ndpi_free(_debug_protocols);
+	_debug_protocols = strdup("all");
       }
       break;
 
@@ -975,10 +983,17 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     default:
+#ifdef DEBUG_TRACE
+      if(trace) fprintf(trace, " #### Unknown option -%c: skipping it #### \n", opt);
+#endif
+
       help(0);
       break;
     }
   }
+
+  if(extcap_exit)
+    exit(0);
 
   if(csv_fp)
     printCSVHeader();
@@ -1008,17 +1023,17 @@ static void parseOptions(int argc, char **argv) {
   }
 
 #ifdef linux
-    for(thread_id = 0; thread_id < num_threads; thread_id++)
-      core_affinity[thread_id] = -1;
+  for(thread_id = 0; thread_id < num_threads; thread_id++)
+    core_affinity[thread_id] = -1;
 
-    if(num_cores > 1 && bind_mask != NULL) {
-      char *core_id = strtok(bind_mask, ":");
-      thread_id = 0;
-      while(core_id != NULL && thread_id < num_threads) {
-        core_affinity[thread_id++] = atoi(core_id) % num_cores;
-        core_id = strtok(NULL, ":");
-      }
+  if(num_cores > 1 && bind_mask != NULL) {
+    char *core_id = strtok(bind_mask, ":");
+    thread_id = 0;
+    while(core_id != NULL && thread_id < num_threads) {
+      core_affinity[thread_id++] = atoi(core_id) % num_cores;
+      core_id = strtok(NULL, ":");
     }
+  }
 #endif
 #endif
 
@@ -2248,7 +2263,7 @@ static void node_flow_risk_walker(const void *node, ndpi_VISIT which, int depth,
     u_int j;
 
     flows_with_risks++;
-    
+
     for(j = 0; j < NDPI_MAX_RISK; j++) {
       ndpi_risk_enum r = (ndpi_risk_enum)j;
 
@@ -4217,10 +4232,28 @@ int original_main(int argc, char **argv) {
 #endif
     int i;
 
+#ifdef DEBUG_TRACE
+    trace = fopen("/tmp/ndpiReader.log", "a");
+
+    if(trace) {
+      int i;
+
+      fprintf(trace, " #### %s #### \n", __FUNCTION__);
+      fprintf(trace, " #### [argc: %u] #### \n", argc);
+
+      for(i=0; i<argc; i++)
+	fprintf(trace, " #### [%d] [%s]\n", i, argv[i]);
+    }
+#endif
+
+
     if(ndpi_get_api_version() != NDPI_API_VERSION) {
       printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
       return(-1);
     }
+
+#ifndef DEBUG_TRACE
+    /* Skip tests when debugging */
 
 #ifdef HW_TEST
     hwUnitTest2();
@@ -4248,7 +4281,7 @@ int original_main(int argc, char **argv) {
     ndpi_self_check_host_match();
     analysisUnitTest();
     rulesUnitTest();
-
+#endif
 
     gettimeofday(&startup_time, NULL);
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
