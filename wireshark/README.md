@@ -6,8 +6,8 @@ nDPI can provide Wireshark protocol dissection to complement internal protocol d
 
 ## Installation
 
-- Copy the ndpiReader application (it is located under nDPI/example) to the Extcap path. See Wireshark -> About menu for identifying the extcap directory. Under OSX it is usually /Applications/Wireshark.app/Contents/MacOS/extcap
-- Copy the ndpi.lua plugin under ~/.wireshark/plugins (or in the global Wireshark plugins directory)
+- Copy the ndpiReader application (it is located under nDPI/example) to the Extcap path. See Wireshark -> About menu for identifying the "Personal Extcap path" directory. Under MacOS it is usually /Users/username/.wireshark/extcap
+- Copy the ndpi.lua plugin under ~/.local/lib/wireshark/plugins
 
 ## Usage
 

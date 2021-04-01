@@ -1,5 +1,5 @@
 --
--- (C) 2017-18 - ntop.org
+-- (C) 2017-21 - ntop.org
 --
 -- This plugin is part of nDPI (https://github.com/ntop/nDPI)
 --
@@ -17,9 +17,6 @@
 -- along with this program; if not, write to the Free Software Foundation,
 -- Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 --
-
--- wireshark ~/Dropbox/discovery/Daniele/alexa_sonos_only.pcap
--- cat /tmp/wireshark.sql | influx -database wireshark
 
 
 local ndpi_proto = Proto("ndpi", "nDPI Protocol Interpreter")
