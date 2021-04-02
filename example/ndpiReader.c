@@ -1036,10 +1036,6 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 #endif
-
-#ifdef DEBUG_TRACE
-  if(trace) fclose(trace);
-#endif
 }
 
 /* ********************************** */
@@ -4324,6 +4320,10 @@ int original_main(int argc, char **argv) {
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
     if(csv_fp)        fclose(csv_fp);
     ndpi_free(_debug_protocols);
+    
+#ifdef DEBUG_TRACE
+    if(trace) fclose(trace);
+#endif
 
     return 0;
   }
