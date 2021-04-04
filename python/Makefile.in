@@ -1,26 +1,33 @@
 CC=@CC@
-CFLAGS=-I. -I../src/include -I./src/lib/third_party/include @CFLAGS@ @CUSTOM_NDPI@ -shared
-#LIBNDPI=../src/lib/libndpi.so.@NDPI_VERSION_SHORT@
-LIBNDPI=../src/lib/libndpi.a
-LDFLAGS=$(CFILE) $(LIBNDPI) -lpcap  @LIBS@ @ADDITIONAL_LIBS@
-SHARE = -soname,ndpi_wrap
+
+BUILD_SRC=../src
+ROOT_SRC=@srcdir@/../src
+ROOT_PYTHON=@srcdir@
+
+PYTHON_EXEC?=python
+CFLAGS=-I$(ROOT_PYTHON) -I$(ROOT_SRC)/include -I$(BUILD_SRC)/include -I$(ROOT_SRC)/lib/third_party/include \
+	@CFLAGS@ @CUSTOM_NDPI@ -shared
+LIBNDPI=$(BUILD_SRC)/.libs/libndpi.a
+LDFLAGS=$(LIBNDPI) -lpcap  @LIBS@
+SHARE=-soname,ndpi_wrap
 SO=ndpi_wrap.so
-OBJS = ndpi_wrap.o
-CFILE = ndpi_wrap.c
-PIC = -fPIC
-PREFIX?=/usr/local
+CFILE=$(ROOT_PYTHON)/ndpi_wrap.c
+PIC=-fPIC -DPIC
+PREFIX?=@prefix@
 .PHONY: all
 
 UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)#do something for linux
-	SHARE=-install_name,ndpiReader.so
+ifeq ($(UNAME_S),Darwin)
+SHARE=-install_name,ndpiReader.so
 endif
 
 all: $(SO)
 
 $(SO): $(CFILE) $(LIBNDPI) Makefile
-	$(CC) $(CFLAGS) -Wl,$(SHARE) -o $@ $(PIC) $(LDFLAGS)
-#	ln -s $(LIBNDPI) .
+	$(CC) $(CFLAGS) -Wl,$(SHARE) $(CFILE) -o $@ $(PIC) $(LDFLAGS)
+
+example: $(SO)
+	env NDPI_WRAP="$(realpath ./ndpi_wrap.so)" $(PYTHON_EXEC) $(ROOT_PYTHON)/ndpi_example.py
 
 clean:
 	/bin/rm -f $(SO)

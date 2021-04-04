@@ -203,25 +203,25 @@ matrix:
 before_install:
   - eval "${MATRIX_EVAL}"
 
-before_script:
-  - ./autogen.sh
+#before_script:
 #  - lcov --directory . --zerocounters
 
 script:
-  - if [ -n "$QA_FUZZ" ]; then ./configure --enable-fuzztargets ; else
-    ./configure ; fi
-  - if [ -n "$BUILD_DPKG_PACKAGE" ]; then cd ./packages/ubuntu ;
-    ./configure && dpkg-buildpackage -b -us -uc ; cd ../.. ; fi
-  - if [ -n "$DISABLE_GCRYPT" ]; then ./configure --disable-gcrypt ; fi
+  - if [ -n "$QA_FUZZ" ]; then mkdir build && cd build && ../autogen.sh --enable-fuzztargets ;
+    elif [ -n "$DISABLE_GCRYPT" ]; then mkdir build && cd build && ../autogen.sh --disable-gcrypt ;
+    else mkdir build && cd build && ../autogen.sh ; fi
   - make
   - make -C example ndpiSimpleIntegration
   - make dist
-
-#after_script:
   - cd tests
   - ./do.sh
-  - ./do-unit.sh
+  - test -x ./do-unit.sh && ./do-unit.sh
   - ./do-dga.sh
+  - cd ..
+  - make distclean
+  - cd ..
+  - if [ -n "$BUILD_DPKG_PACKAGE" ]; then cd ./packages/ubuntu ;
+    ./configure && make ; cd ../.. ; fi
 
 #after_success:
 #- cd ${TRAVIS_BUILD_DIR}

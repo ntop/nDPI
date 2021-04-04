@@ -1,12 +1,20 @@
 CC=@CC@
 CXX=@CXX@
 BUILD_MINGW=@BUILD_MINGW@
-SRCHOME=../src
-CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @PCAP_INC@ @CFLAGS@
-LIBNDPI=$(SRCHOME)/lib/libndpi.a
-LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ -lpthread @LDFLAGS@
-HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
-        $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
+DPDK_TARGET=@DPDK_TARGET@
+
+BUILD_SRC=../src
+ROOT_SRC=@srcdir@/../src
+ROOT_EXAMPLES=@srcdir@
+
+CFLAGS=-g -fPIC -DPIC -I$(ROOT_SRC)/include -I$(BUILD_SRC)/include @PCAP_INC@ @CFLAGS@
+LIBNDPI=$(BUILD_SRC)/.libs/libndpi.a
+LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ -lpthread @LDFLAGS@
+HEADERS=$(ROOT_EXAMPLES)/intrusion_detection.h \
+		$(ROOT_EXAMPLES)/reader_util.h \
+		$(BUILD_SRC)/include/ndpi_api.h \
+		$(ROOT_SRC)/include/ndpi_typedefs.h \
+		$(ROOT_SRC)/include/ndpi_protocol_ids.h
 OBJS=ndpiReader.o reader_util.o intrusion_detection.o
 PREFIX?=@prefix@
 
@@ -16,47 +24,67 @@ all:
 
 else
 
-all: ndpiReader @DPDK_TARGET@
+all: ndpiReader $(DPDK_TARGET)
 
-EXECUTABLE_SOURCES := ndpiReader.c ndpiSimpleIntegration.c
-COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
+libndpiReader.a: $(LIBNDPI) reader_util.o intrusion_detection.o
+	ar rsv libndpiReader.a reader_util.o intrusion_detection.o
 
-libndpiReader.a: $(COMMON_SOURCES:%.c=%.o) $(LIBNDPI)
-	ar rsv libndpiReader.a $(COMMON_SOURCES:%.c=%.o)
-
-ndpiReader: libndpiReader.a $(LIBNDPI) ndpiReader.o
-	$(CC) $(CFLAGS) ndpiReader.o libndpiReader.a -o $@ $(LDFLAGS)
+ndpiReader: libndpiReader.a ndpiReader.o
+	$(CC) $(CFLAGS) ndpiReader.o -o $@ libndpiReader.a $(LDFLAGS)
 
 ndpiSimpleIntegration: ndpiSimpleIntegration.o
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
-%.o: %.c $(HEADERS) Makefile
-	$(CC) $(CFLAGS) -c $< -o $@
+%.o: $(ROOT_EXAMPLES)/%.c $(HEADERS) Makefile
+	$(CC) $(CFLAGS) -c $< -o $(notdir $@)
 
 install: ndpiReader
 	mkdir -p $(DESTDIR)$(PREFIX)/bin/
 	mkdir -p $(DESTDIR)$(PREFIX)/share/ndpi
 	cp ndpiReader $(DESTDIR)$(PREFIX)/bin/
-	cp protos.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiProtos.txt
-	cp mining_hosts.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiCustomCategory.txt
+	cp $(ROOT_EXAMPLES)/protos.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiProtos.txt
+	cp $(ROOT_EXAMPLES)/categories.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiCustomCategory.txt
+	cp $(ROOT_EXAMPLES)/mining_hosts.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiCustomHosts.txt
 	[ -f build/app/ndpiReader.dpdk ] && cp build/app/ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
 	[ -f ndpiReader.dpdk ] && cp ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
 
 dpdk:
+ifneq ($(DPDK_TARGET),)
 	make -f Makefile.dpdk
+else
+	@echo 'Skipping. DPDK needs to be enabled during configure.'
+endif
 
 check:
-	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include *.c
+	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force \
+		-I$(ROOT_SRC)/include \
+		-I$(BUILD_SRC)/include \
+		-I. \
+		$(ROOT_EXAMPLES)/*.c
 
 clean:
-	/bin/rm -f *.o ndpiReader ndpiReader.dpdk
+	/bin/rm -f *.o ndpiReader ndpiReader.dpdk ndpiSimpleIntegration libndpiReader.a
 	/bin/rm -f .*.dpdk.cmd .*.o.cmd *.dpdk.map .*.o.d
 	/bin/rm -f _install _postbuild _postinstall _preinstall
 	/bin/rm -rf build
 
 distdir:
-	cp categories.txt mining_hosts.txt protos.txt README.DPDK '$(distdir)/'
-	find . -maxdepth 1 -type f -name '*.c' -o -name '*.h' -o -name '*.py' | xargs -I'{}' cp '{}' '$(distdir)/{}'
+	cp \
+		$(ROOT_EXAMPLES)/categories.txt \
+		$(ROOT_EXAMPLES)/mining_hosts.txt \
+		$(ROOT_EXAMPLES)/protos.txt \
+		$(ROOT_EXAMPLES)/risky_domains.txt \
+		$(ROOT_EXAMPLES)/ja3_fingerprints.csv \
+		$(ROOT_EXAMPLES)/sha1_fingerprints.csv \
+		$(ROOT_EXAMPLES)/README.DPDK \
+		$(ROOT_EXAMPLES)/intrusion_detection.h \
+		$(ROOT_EXAMPLES)/ndpiSimpleIntegration.c \
+		$(ROOT_EXAMPLES)/reader_util.c \
+		$(ROOT_EXAMPLES)/ndpiReader.c \
+		$(ROOT_EXAMPLES)/ndpi2timeline.py \
+		$(ROOT_EXAMPLES)/intrusion_detection.c \
+		$(ROOT_EXAMPLES)/reader_util.h \
+		'$(distdir)/'
 
 distclean: clean
 	/bin/rm -f Makefile.dpdk

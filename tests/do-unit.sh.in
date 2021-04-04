@@ -1,0 +1,20 @@
+#!/bin/sh
+
+cd "$(dirname "${0}")"
+
+UNIT="./unit/unit"
+
+RC=0
+
+check_unit() {
+
+    $UNIT
+    UNIT_RC=$?
+    if [ $UNIT_RC -ne 0 ]; then
+	RC=1
+    fi
+}
+
+check_unit
+
+exit $RC

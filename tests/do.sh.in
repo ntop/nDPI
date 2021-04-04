@@ -1,26 +1,30 @@
 #!/bin/sh
 
-cd "$(dirname "${0}")"
+BUILD_TESTS="$(realpath $(dirname "${0}"))"
+cd "$(dirname "${0}")/@srcdir@"
 
 FUZZY_TESTING_ENABLED=@BUILD_FUZZTARGETS@
 
 GCRYPT_ENABLED=@GCRYPT_ENABLED@
 GCRYPT_PCAPS="gquic.pcap quic-23.pcap quic-24.pcap quic-27.pcap quic-28.pcap quic-29.pcap quic-mvfst-22.pcap quic-mvfst-27.pcapng quic-mvfst-exp.pcap quic_q50.pcap quic_t50.pcap quic_t51.pcap quic_0RTT.pcap quic_interop_V.pcapng quic-33.pcapng doq.pcapng doq_adguard.pcapng dlt_ppp.pcap os_detected.pcapng quic_frags_ch_out_of_order_same_packet_craziness.pcapng quic_frags_ch_in_multiple_packets.pcapng"
-READER="../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv"
+READER="${BUILD_TESTS}/../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv"
 
 RC=0
 PCAPS=`cd pcap; /bin/ls *.pcap *.pcapng`
 
-if [ ! -x "../example/ndpiReader" ]; then
-  echo "$0: Missing $(realpath ../example/ndpiReader)"
-  echo "$0: Run ./configure and make first"
+if [ ! -x "${BUILD_TESTS}/../example/ndpiReader" ]; then
+  echo "$0: Missing ${BUILD_TESTS}/../example/ndpiReader)"
+  echo "$0: Run make first."
   exit 1
 fi
 
 fuzzy_testing() {
-    if [ -f ../fuzz/fuzz_ndpi_reader ]; then
-	../fuzz/fuzz_ndpi_reader -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" pcap/
-    fi
+  if [ -f "${BUILD_TESTS}/../fuzz/fuzz_ndpi_reader" ]; then
+    ${BUILD_TESTS}/../fuzz/fuzz_ndpi_reader \
+      -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 \
+      -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" \
+      pcap/
+  fi
 }
 
 build_results() {

@@ -29,10 +29,19 @@ AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 AS_IF([test "${with_sanitizer+set}" = set],[
   CFLAGS="${CFLAGS} -g3 -O0 -Wno-unused-value -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
   LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak"
-])
+  ENABLE_SANITIZER=1
+], [ENABLE_SANITIZER=0])
 
+AC_ENABLE_SHARED
+AC_ENABLE_STATIC
 LT_INIT
 LT_LIB_M
+LIBS="$LIBS$LIBM "
+
+if test $srcdir != .  && test -d $srcdir/src/include/ndpi_config.h; then
+  AC_MSG_ERROR([building out of tree but $srcdir contains host-${host_noncanonical}.
+Use a pristine source tree when building in a separate tree])
+fi
 
 SYSTEM=`uname -s`
 if test $SYSTEM = "Darwin"; then
@@ -48,6 +57,13 @@ dnl>  AC_PROG_CC
 fi
 AC_LANG_WERROR
 AX_PTHREAD
+AC_TYPE_UINT8_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_SIZE_T
+AC_CHECK_TYPE(int)
+AC_CHECK_TYPE(long)
+AC_CHECK_TYPE(time_t)
 
 NDPI_VERSION_SHORT="@NDPI_VERSION_SHORT@"
 NDPI_MAJOR="@NDPI_MAJOR@"
@@ -76,7 +92,7 @@ if test -d ".git" || test -f ".git" ; then :
      NDPI_API_VERSION=$((A+B+C))
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
-     GIT_DATE=`date -u -r CHANGELOG.md`
+     GIT_DATE=`date -u -r "${srcdir}/CHANGELOG.md"`
      if test -z "$SOURCE_DATE_EPOCH" ; then :
          SOURCE_DATE_EPOCH=`date +%s`
      fi
@@ -93,12 +109,8 @@ if ! test "${with_mipsel+set}" = set && ! test "${with_only_libndpi+set}" = set;
    PKG_CHECK_MODULES([JSONC], [json-c], [JSONC_LIBS=`pkg-config --libs json-c` JSONC_CFLAGS=`pkg-config --cflags json-c`])
 fi
 
-LIBS="$LIBS $JSONC_LIBS"
-CFLAGS="$CFLAGS $JSONC_CFLAGS"
-
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h json.h])
 
-ADDITIONAL_LIBS="$LIBM"
 PCAP_HOME=$HOME/PF_RING/userland
 
 DPDK_TARGET=
@@ -205,41 +217,40 @@ AC_ARG_ENABLE([gcrypt],
   [GCRYPT_ENABLED=0],
   [AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)])
 AS_IF([test "x$enable_gcrypt" = "xyes"], [
-  if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes; then :
-    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt"
-  else
+  if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" != xyes; then :
     $as_unset ac_cv_lib_gcrypt_gcry_cipher_checktag
     AC_CHECK_LIB(gpg-error, gpg_strerror_r)
     AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
-    if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes -a "x$ac_cv_lib_gpg_error_gpg_strerror_r" = xyes; then :
-      ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
-    fi
   fi
 ])
 
 dnl> PCRE
-AC_ARG_WITH(pcre,          [  --with-pcre        Enable nDPI build with libpcre])
+AC_ARG_WITH(pcre, AS_HELP_STRING([--with-pcre], [Enable nDPI build with libpcre]))
 if test "${with_pcre+set}" = set; then :
-  AC_CHECK_LIB(pcre, pcre_compile, AC_DEFINE_UNQUOTED(HAVE_PCRE, 1, [libpcre(-dev) is present]))
+  AC_CHECK_LIB([pcre], [pcre_compile])
   if test "x$ac_cv_lib_pcre_pcre_compile" = xyes; then :
-    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lpcre"
+    AC_DEFINE_UNQUOTED(HAVE_PCRE, 1, [libpcre(-dev) is present])
   fi
 fi
 
 dnl> GeoIP
-AC_ARG_WITH(maxminddb,          [  --with-maxminddb        Enable nDPI build with libmaxminddb])
+AC_ARG_WITH(maxminddb, AS_HELP_STRING([--with-maxminddb], [Enable nDPI build with libmaxminddb]))
 if test "${with_maxminddb+set}" = set; then :
   AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
   AC_HAVE_HEADERS(maxminddb.h)
   if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" && test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
-    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lmaxminddb"
     AC_DEFINE_UNQUOTED(HAVE_MAXMINDDB, 1, [MaxMind DB support])
   fi
 fi
 
-AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/dga/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
+AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/dga/Makefile libndpi.pc src/include/ndpi_define.h src/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
-AC_CONFIG_FILES([tests/do_valgrind.sh], [chmod +x tests/do_valgrind.sh])
+AS_IF([test "${with_sanitizer+set}" = set],[],[
+  AC_CONFIG_FILES([tests/do_valgrind.sh], [chmod +x tests/do_valgrind.sh])
+dnl> Skipping tests with sanitizer enabled due to use-of-uninitialized-value in json-c
+  AC_CONFIG_FILES([tests/do-unit.sh], [chmod +x tests/do-unit.sh])
+])
+AC_CONFIG_FILES([tests/do-dga.sh], [chmod +x tests/do-dga.sh])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
@@ -248,7 +259,6 @@ AC_SUBST(NDPI_PATCH)
 AC_SUBST(NDPI_VERSION_SHORT)
 AC_SUBST(PCAP_INC)
 AC_SUBST(PCAP_LIB)
-AC_SUBST(ADDITIONAL_LIBS)
 AC_SUBST(DL_LIB)
 AC_SUBST(DPDK_TARGET)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
@@ -257,6 +267,7 @@ AC_SUBST(NDPI_API_VERSION)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(BUILD_MINGW)
 AC_SUBST(BUILD_FUZZTARGETS)
+AC_SUBST(ENABLE_SANITIZER)
 AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
 AC_SUBST(GCRYPT_ENABLED)

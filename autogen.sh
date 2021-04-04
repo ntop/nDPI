@@ -5,6 +5,8 @@ NDPI_MINOR="1"
 NDPI_PATCH="0"
 NDPI_VERSION_SHORT="$NDPI_MAJOR.$NDPI_MINOR.$NDPI_PATCH"
 
+SCRIPT_DIR="$(dirname ${0})"
+
 rm -f configure config.h config.h.in
 
 AUTOCONF=$(command -v autoconf)
@@ -45,19 +47,27 @@ if test -z $PKG_CONFIG; then
     exit
 fi
 
-cat configure.seed | sed \
+"${SCRIPT_DIR}/utils/generate_automake_am.sh"
+
+cat "${SCRIPT_DIR}/configure.seed" | sed \
     -e "s/@NDPI_MAJOR@/$NDPI_MAJOR/g" \
     -e "s/@NDPI_MINOR@/$NDPI_MINOR/g" \
     -e "s/@NDPI_PATCH@/$NDPI_PATCH/g" \
     -e "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" \
     -e "s/@FUZZY@/$FUZZY/g" \
-    > configure.ac
+    > "${SCRIPT_DIR}/configure.ac"
 
+OLDPWD="$(pwd)"
+cd "${SCRIPT_DIR}" || exit 1
 autoreconf -ivf
-cat configure | sed "s/#define PACKAGE/#define NDPI_PACKAGE/g" | sed "s/#define VERSION/#define NDPI_VERSION/g"  > configure.tmp
-cat configure.tmp > configure
+cd "${OLDPWD}" || exit 1
 
-echo "./configure $@"
-chmod +x configure
-./configure $@
+cat "${SCRIPT_DIR}/configure" | \
+    sed "s/#define PACKAGE/#define NDPI_PACKAGE/g" | \
+    sed "s/#define VERSION/#define NDPI_VERSION/g" \
+    > "${SCRIPT_DIR}/configure.tmp"
+cat "${SCRIPT_DIR}/configure.tmp" > "${SCRIPT_DIR}/configure"
 
+echo "${SCRIPT_DIR}/configure ${*}"
+chmod +x "${SCRIPT_DIR}/configure"
+${SCRIPT_DIR}/configure ${@}

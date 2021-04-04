@@ -9,17 +9,17 @@ BASE_PRECISION=89
 BASE_RECALL=41
 # ----------------------------------------------------------------------------------------------------------------------
 
-DGA_EVALUATE="./dga/dga_evaluate"
-DGA_DATA="dga/test_dga.csv"
-NON_DGA_DATA="dga/test_non_dga.csv"
+DGA_EVALUATE="dga/dga_evaluate"
+DGA_DATA="@srcdir@/dga/test_dga.csv"
+NON_DGA_DATA="@srcdir@/dga/test_non_dga.csv"
 DGA_DATA_SIZE=0
 NON_DGA_DATA_SIZE=0
 DATA_SIZE=0
 RC=0
 
 get_evaluation_data_size() {
-  DGA_DATA_SIZE=`wc -l dga/test_dga.csv | awk '{split($0,a," "); print a[1]}'`
-  NON_DGA_DATA_SIZE=`wc -l dga/test_non_dga.csv | awk '{split($0,a," "); print a[1]}'`
+  DGA_DATA_SIZE=`wc -l ${DGA_DATA} | awk '{split($0,a," "); print a[1]}'`
+  NON_DGA_DATA_SIZE=`wc -l ${NON_DGA_DATA} | awk '{split($0,a," "); print a[1]}'`
   DATA_SIZE=$(( $NON_DGA_DATA_SIZE + $DGA_DATA_SIZE ))
 }
 
@@ -29,9 +29,9 @@ evaluate_ndpi_dga_detection() {
   # Precision: TP / (TP + FP)
   # Recall: TP / (TP + FN)
 
-  TP=`$DGA_EVALUATE dga/test_dga.csv`
+  TP=`$DGA_EVALUATE ${DGA_DATA}`
   FN=$(( $DGA_DATA_SIZE - $TP ))
-  FP=`$DGA_EVALUATE dga/test_non_dga.csv`
+  FP=`$DGA_EVALUATE ${NON_DGA_DATA}`
   TN=$(( $NON_DGA_DATA_SIZE - $FP ))
 
   ACCURACY=`echo "print(int(((${TP} + ${TN})/(${TP} + ${TN} + ${FP} + ${FN}))*100))" | python3`

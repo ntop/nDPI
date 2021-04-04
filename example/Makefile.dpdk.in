@@ -15,7 +15,7 @@ RTE_TARGET ?= x86_64-native-linuxapp-gcc
 include $(RTE_SDK)/mk/rte.vars.mk
 
 APP = ndpiReader.dpdk
-LIBNDPI = $(PWD)/../src/lib/libndpi.a
+LIBNDPI = ../src/.libs/libndpi.a
 
 SRCS-y := reader_util.c intrusion_detection.c ndpiReader.c
 

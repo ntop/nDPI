@@ -4,6 +4,7 @@
 #define __NDPI_UTILS_H__
 
 #include "ndpi_define.h"
+#include "ndpi_includes.h"
 
 #define MYDBG(m, ...) \
 	printf(" DBG[%s:%s:%u]: \t" m "\n", __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__);

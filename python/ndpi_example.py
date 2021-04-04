@@ -100,6 +100,8 @@ lista = []  # used to avoid impropriate memory deallocation from python
 # check ndpi version
 if ndpi.ndpi_get_api_version() != ndpi.ndpi_wrap_get_api_version():
     print("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n")
+    print("libnDPI api version..: " + str(ndpi.ndpi_get_api_version()))
+    print("NDPI_WRAP api version: " + str(ndpi.ndpi_wrap_get_api_version()))
     sys.exit(-1)
 
 # create data structure of ndpi

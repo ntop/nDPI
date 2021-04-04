@@ -21,7 +21,14 @@ If not, see <http://www.gnu.org/licenses/>.
 from ctypes import CDLL, Structure, c_uint16, c_int, c_ulong, c_uint32, CFUNCTYPE, c_void_p, POINTER, c_char_p, c_uint8
 from ctypes import c_char, c_uint, c_int16, c_longlong, c_size_t, Union, c_ubyte, c_uint64, c_int32, c_ushort, cast
 from os.path import abspath, dirname
-ndpi = CDLL(dirname(abspath(__file__)) + '/ndpi_wrap.so')
+
+try:
+    ndpi = CDLL(dirname(abspath(__file__)) + '/ndpi_wrap.so')
+except OSError:
+    from os import getenv
+    if getenv('NDPI_WRAP') is None:
+        raise RuntimeError('Environment variable NDPI_WRAP not set and default path does not exist: ' + dirname(abspath(__file__)) + '/ndpi_wrap.so')
+    ndpi = CDLL(getenv('NDPI_WRAP'))
 
 # ----------------------------------------------- Structures -----------------------------------------------------------
 
@@ -94,7 +101,7 @@ class NDPIProtoDefaultsT(Structure):
     _fields_ = [
         ("protoName", c_char_p),
         ("protoCategory", c_uint),
-        ("subprotocols", c_uint16_p),
+        ("subprotocols", POINTER(c_uint16)),
         ("subprotocol_count", c_uint32),
         ("protoId", c_uint16),
         ("protoIdx", c_uint16),
