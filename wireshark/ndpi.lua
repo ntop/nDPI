@@ -37,6 +37,7 @@ ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "nt
 
 local f_eth_source        = Field.new("eth.src")
 local f_eth_trailer       = Field.new("eth.trailer")
+local f_vlan_trailer      = Field.new("vlan.trailer")
 local f_vlan_id           = Field.new("vlan.id")
 local f_arp_opcode        = Field.new("arp.opcode")
 local f_arp_sender_mac    = Field.new("arp.src.hw_mac")
@@ -893,16 +894,27 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
    if(pinfo.visited == true) then
       local eth_trailer = {f_eth_trailer()}
+      local vlan_trailer = {f_vlan_trailer()}
 
-      -- Depending on Wireshark configuration, there may be multiple ethernet trailer fields.
-      -- Ours should be the last one, anyway
-      if(eth_trailer[#eth_trailer] ~= nil) then
-	 local eth_trailer = getval(eth_trailer[#eth_trailer])
-	 local magic = string.sub(eth_trailer, 1, 11)
+      -- nDPI trailer is usually the (only one) ethernet trailer.
+      -- But, depending on Wireshark configuration and on L2 protocols, the
+      -- situation may be more complex. Let's try to handle the most common cases:
+      --  1) with (multiple) ethernet trailers, nDPI trailer is usually the last one
+      --  2) with VLAN encapsulation, nDPI trailer is usually recognized as vlan trailer
+      if(eth_trailer[#eth_trailer] ~= nil or
+         vlan_trailer[#vlan_trailer] ~= nil) then
+
+	 local ndpi_trailer
+	 if (eth_trailer[#eth_trailer] ~= nil) then
+	     ndpi_trailer = getval(eth_trailer[#eth_trailer])
+	 else
+	     ndpi_trailer = getval(vlan_trailer[#vlan_trailer])
+	 end
+	 local magic = string.sub(ndpi_trailer, 1, 11)
 
 	 if(magic == "19:68:09:24") then
 	    local ndpikey, srckey, dstkey, flowkey
-	    local elems                = string.split(string.sub(eth_trailer, 12), ":")
+	    local elems                = string.split(string.sub(ndpi_trailer, 12), ":")
 	    local ndpi_subtree         = tree:add(ndpi_proto, tvb(), "nDPI Protocol")
 	    local network_protocol     = tonumber(elems[2]..elems[3], 16) -- 16 = HEX
 	    local application_protocol = tonumber(elems[4]..elems[5], 16) -- 16 = HEX
