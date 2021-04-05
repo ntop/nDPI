@@ -24,38 +24,87 @@
 
 #include "ndpi_api.h"
 
+
+/* This code handles: GTP-U (port 2152), GTP-C (v1 and v2; port 2123) and GTP-PRIME
+   (port 3386).
+   It should be fine to ignore v0, since it should not be used anymore.
+
+   Message length checks and basic headers are not uniform across these protocols.
+
+   For GTPv2 (GTP-C v2), see TS 29.274 Sec. 5.5.1:
+   "Octets 3 to 4 represent the Message Length field. This field shall indicate
+   the length of the message in octets excluding the mandatory part of the GTP-C
+   header (the first 4 octets). The TEID (if present) and the Sequence Number
+   shall be included in the length count."
+
+   For GTP-PRIME TS 32.295 Sec. 6.1.1
+   "The Length indicates the length of payload (number of octets after the GTP'
+   header). The Sequence Number of the packet is part of the GTP' header."
+
+   For GTPv1 (GTP-U and GTP-C v1) TS TS 29.060 Sec. 6
+   "Length: This field indicates the length in octets of the payload, i.e. the
+   rest of the packet following the mandatory part of the GTP header (that is
+   the first 8 octets). The Sequence Number, the N-PDU Number or any Extension
+   headers shall be considered to be part of the payload, i.e. included in the
+   length count."
+
+*/
+
+#define HEADER_LEN_GTP_U	8
+#define HEADER_LEN_GTP_C_V1	8
+#define HEADER_LEN_GTP_C_V2	4
+#define HEADER_LEN_GTP_PRIME	6
+
+
+/* Common header for all GTP types */
 struct gtp_header_generic {
   u_int8_t flags, message_type;
   u_int16_t message_len;
-  u_int32_t teid;
 };
 
 static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
   if((packet->udp != NULL) && (payload_len > sizeof(struct gtp_header_generic))) {
     u_int32_t gtp_u  = ntohs(2152);
     u_int32_t gtp_c  = ntohs(2123);
-    u_int32_t gtp_v0 = ntohs(3386);
+    u_int32_t gtp_prime = ntohs(3386);
 
-    if((packet->udp->source == gtp_u) || (packet->udp->dest == gtp_u)
-       || (packet->udp->source == gtp_c) || (packet->udp->dest == gtp_c)
-       || (packet->udp->source == gtp_v0) || (packet->udp->dest == gtp_v0)
-       ) {
-      struct gtp_header_generic *gtp = (struct gtp_header_generic*)packet->payload;
-      u_int8_t gtp_version = (gtp->flags & 0xE0) >> 5;
+    struct gtp_header_generic *gtp = (struct gtp_header_generic *)packet->payload;
+    u_int8_t version = (gtp->flags & 0xE0) >> 5;
+    u_int8_t pt = (gtp->flags & 0x10) >> 4;
+    u_int16_t message_len = ntohs(gtp->message_len);
 
-      if((gtp_version == 0) || (gtp_version == 1) || (gtp_version == 2)) {
-	u_int16_t message_len = ntohs(gtp->message_len);
-	
-	if(message_len <= (payload_len-sizeof(struct gtp_header_generic))) {
-	  NDPI_LOG_INFO(ndpi_struct, "found gtp\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP, NDPI_PROTOCOL_UNKNOWN);
-	  return;
-	}
+    if((packet->udp->source == gtp_u) || (packet->udp->dest == gtp_u)) {
+      if((version == 1) && (pt == 1) &&
+         (payload_len >= HEADER_LEN_GTP_U) &&
+         (message_len <= (payload_len - HEADER_LEN_GTP_U))) {
+        NDPI_LOG_INFO(ndpi_struct, "found gtp-u\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP, NDPI_PROTOCOL_UNKNOWN);
+        return;
+      }
+    }
+    if((packet->udp->source == gtp_c) || (packet->udp->dest == gtp_c)) {
+      if(((version == 1) &&
+          (payload_len >= HEADER_LEN_GTP_C_V1) &&
+          (message_len == (payload_len - HEADER_LEN_GTP_C_V1))) ||
+         ((version == 2) &&
+          /* payload_len is always valid, because HEADER_LEN_GTP_C_V2 == sizeof(struct gtp_header_generic) */
+          (message_len <= (payload_len - HEADER_LEN_GTP_C_V2)))) {
+        NDPI_LOG_INFO(ndpi_struct, "found gtp-c\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP, NDPI_PROTOCOL_UNKNOWN);
+        return;
+      }
+    }
+    if((packet->udp->source == gtp_prime) || (packet->udp->dest == gtp_prime)) {
+      if((pt == 0) &&
+         (payload_len >= HEADER_LEN_GTP_PRIME) &&
+	 (message_len <= (payload_len - HEADER_LEN_GTP_PRIME))) {
+        NDPI_LOG_INFO(ndpi_struct, "found gtp-prime\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP, NDPI_PROTOCOL_UNKNOWN);
+        return;
       }
     }
   }
