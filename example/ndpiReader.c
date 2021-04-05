@@ -631,14 +631,19 @@ int cmpFlows(const void *_a, const void *_b) {
 /* ********************************** */
 
 void extcap_config() {
-  int i, argidx = 0;
+  int argidx = 0;
+#if 0
   struct ndpi_proto_sorter *protos;
   u_int ndpi_num_supported_protocols;
+  int i;
   ndpi_proto_defaults_t *proto_defaults;
+#endif
 
   ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
+#if 0
   ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
   proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
+#endif
 
   /* -i <interface> */
   printf("arg {number=%d}{call=-i}{display=Capture Interface}{type=string}{group=Live Capture}"
@@ -3545,6 +3550,8 @@ static void binUnitTest() {
 
 /* *********************************************** */
 
+#ifndef DEBUG_TRACE
+
 static void dgaUnitTest() {
   const char *dga[] = {
     //"www.lbjamwptxz.com",
@@ -3663,6 +3670,8 @@ void automataUnitTest() {
   assert(ndpi_match_string(automa, "This is the wonderful world of nDPI") == 1);
   ndpi_free_automa(automa);
 }
+
+#endif
 
 /* *********************************************** */
 
@@ -3824,12 +3833,6 @@ void rsiUnitTest() {
     445
   };
 
-  unsigned int v1[] = {
-
-    2227, 2219, 2208, 2217, 2218, 2213, 2223, 2243, 2224, 2229,
-    2215, 2239, 2238, 2261, 2336, 2405, 2375, 2383, 2395, 2363,
-    2382, 2387, 2365, 2319, 2310, 2333, 2268, 2310, 2240, 2217,
-  };
   u_int i, n = sizeof(v) / sizeof(unsigned int);
   u_int debug = 0;
 
@@ -4008,7 +4011,6 @@ void sesUnitTest() {
     445.05981445312,
     445.05981445312
   };
-  u_int num_learning_points = 1;
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9;
   FILE *fd = fopen("/tmp/ses_result.csv", "w");
@@ -4079,7 +4081,6 @@ void desUnitTest() {
     445.05981445312,
     445.05981445312
   };
-  u_int num_learning_points = 1;
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9, beta = 0.5;
   FILE *fd = fopen("/tmp/des_result.csv", "w");
@@ -4120,7 +4121,6 @@ void desUnitTest() {
 void desUnitStressTest() {
   struct ndpi_des_struct des;
   u_int8_t trace = 1;
-  u_int num_learning_points = 1;
   u_int i;
   float alpha = 0.9, beta = 0.5;
   double init_value = time(NULL) % 1000;
