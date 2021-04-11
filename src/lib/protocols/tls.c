@@ -674,7 +674,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
         u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_sha1_automa.ac_automa, sha1_str);
 
         if(rc1 > 0)
-          ndpi_set_risk(flow, NDPI_MALICIOUS_SHA1);
+          ndpi_set_risk(flow, NDPI_MALICIOUS_SHA1_CERTIFICATE);
       }
 
       processCertificateElements(ndpi_struct, flow, certificates_offset, certificate_len);

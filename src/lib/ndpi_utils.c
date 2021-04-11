@@ -1767,9 +1767,12 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_MALICIOUS_JA3:
     return("Possibly Malicious JA3 Fingerprint");
 
-  case NDPI_MALICIOUS_SHA1:
+  case NDPI_MALICIOUS_SHA1_CERTIFICATE:
     return("Possibly Malicious SSL Certificate SHA1 Fingerprint");
 
+  case NDPI_DESKTOP_OR_FILE_SHARING_SESSION:
+    return("Desktop/File Sharing Session");
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
