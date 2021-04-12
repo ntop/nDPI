@@ -555,9 +555,13 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       int rc = ndpi_match_string_value(ndpi_struct->tls_cert_subject_automa.ac_automa,
 				       rdnSeqBuf, strlen(rdnSeqBuf),&proto_id);
 
-      if(rc == 0)
+      if(rc == 0) {
 	flow->detected_protocol_stack[0] = proto_id,
 	  flow->detected_protocol_stack[1] = NDPI_PROTOCOL_TLS;
+
+	if(proto_id == NDPI_PROTOCOL_ANYDESK)
+	  ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+      }
     }
   }
 

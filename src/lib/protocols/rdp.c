@@ -49,6 +49,7 @@ void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       && get_u_int16_t(packet->payload, 6) == 0 && get_u_int16_t(packet->payload, 8) == 0 && get_u_int8_t(packet->payload, 10) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found RDP\n");
     ndpi_int_rdp_add_connection(ndpi_struct, flow);
+    ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
     return;
   }
 

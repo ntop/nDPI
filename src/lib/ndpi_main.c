@@ -4180,7 +4180,7 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.l4_packet_len = l4len;
   flow->l4_proto = l4protocol;
 
-  /* tcp / udp detection */
+  /* TCP / UDP detection */
   if(l4protocol == IPPROTO_TCP && flow->packet.l4_packet_len >= 20 /* min size of tcp */) {
     /* tcp */
     flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
@@ -5035,6 +5035,8 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     }
 #endif
 
+    // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
+    
     switch(ret->app_protocol) {
       /*
       Skype for a host doing MS Teams means MS Teams
@@ -5076,6 +5078,11 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	  }
 	}
       }
+      break;
+
+    case NDPI_PROTOCOL_ANYDESK:
+      if(flow->packet.tcp) /* TCP only */
+	ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
       break;
     } /* switch */
 
