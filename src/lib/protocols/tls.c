@@ -1074,8 +1074,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t version_offset = (!is_dtls) ? 4 : 12;
     u_int16_t offset = (!is_dtls) ? 38 : 46, extension_len, j;
     u_int8_t  session_id_len =  0;
-    if (base_offset < total_len)
-      session_id_len = packet->payload[base_offset];
+
+    if((base_offset >= total_len) ||
+       (version_offset + 1) >= total_len)
+      return 0; /* Not found */
+
+    session_id_len = packet->payload[base_offset];
 
 #ifdef DEBUG_TLS
     printf("TLS [len: %u][handshake_type: %02X]\n", packet->payload_packet_len, handshake_type);
@@ -1352,12 +1356,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       offset = base_offset + session_id_len + cookie_len + cipher_len + 2;
+      offset += (!is_dtls) ? 1 : 2;
 
       if(offset < total_len) {
 	u_int16_t compression_len;
 	u_int16_t extensions_len;
 
-	offset += (!is_dtls) ? 1 : 2;
 	compression_len = packet->payload[offset];
 	offset++;
 
@@ -1368,7 +1372,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	// offset += compression_len + 3;
 	offset += compression_len;
 
-	if(offset < total_len) {
+	if(offset+1 < total_len) {
 	  extensions_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	  offset += 2;
 
@@ -1382,8 +1386,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    u_int extension_offset = 0;
 	    u_int32_t j;
 
-	    while(extension_offset < extensions_len) {
+	    while(extension_offset < extensions_len &&
+		  offset+extension_offset+4 <= total_len) {
 	      u_int16_t extension_id, extension_len, extn_off = offset+extension_offset;
+
 
 	      extension_id = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
 	      extension_offset += 2;
@@ -1414,55 +1420,57 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		printf("[TLS] Extensions: found server name\n");
 #endif
+		if((offset+extension_offset+4) < packet->payload_packet_len) {
 
-		len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
-		len = (u_int)ndpi_min(len, sizeof(buffer)-1);
+		  len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
+		  len = (u_int)ndpi_min(len, sizeof(buffer)-1);
 
-		if((offset+extension_offset+5+len) <= packet->payload_packet_len) {
-		  strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
-		  buffer[len] = '\0';
+		  if((offset+extension_offset+5+len) <= packet->payload_packet_len) {
+		    strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
+		    buffer[len] = '\0';
 
-		  cleanupServerName(buffer, sizeof(buffer));
+		    cleanupServerName(buffer, sizeof(buffer));
 
-		  snprintf(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name,
-			   sizeof(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name),
-			   "%s", buffer);
+		    snprintf(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name,
+			     sizeof(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name),
+			     "%s", buffer);
 #ifdef DEBUG_TLS
-		  printf("[TLS] SNI: [%s]\n", buffer);
+		    printf("[TLS] SNI: [%s]\n", buffer);
 #endif
-		  if(!is_quic) {
-		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
-		      flow->l4.tcp.tls.subprotocol_detected = 1;
+		    if(!is_quic) {
+		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
+		        flow->l4.tcp.tls.subprotocol_detected = 1;
+		    } else {
+		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
+		        flow->l4.tcp.tls.subprotocol_detected = 1;
+		    }
+
+		    if(ndpi_check_dga_name(ndpi_struct, flow,
+					   flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, 1)) {
+		      char *sni = flow->protos.tls_quic_stun.tls_quic.client_requested_server_name;
+		      int len = strlen(sni);
+
+#ifdef DEBUG_TLS
+		      printf("[TLS] SNI: (DGA) [%s]\n", flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+#endif
+
+		      if((len >= 4)
+		         /* Check if it ends in .com or .net */
+		         && ((strcmp(&sni[len-4], ".com") == 0) || (strcmp(&sni[len-4], ".net") == 0))
+		         && (strncmp(sni, "www.", 4) == 0)) /* Not starting with www.... */
+		        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_TLS);
+		    } else {
+#ifdef DEBUG_TLS
+		      printf("[TLS] SNI: (NO DGA) [%s]\n", flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+#endif
+		    }
 		  } else {
-		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
-		      flow->l4.tcp.tls.subprotocol_detected = 1;
-		  }
-
-		  if(ndpi_check_dga_name(ndpi_struct, flow,
-					 flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, 1)) {
-		    char *sni = flow->protos.tls_quic_stun.tls_quic.client_requested_server_name;
-		    int len = strlen(sni);
-
 #ifdef DEBUG_TLS
-		    printf("[TLS] SNI: (DGA) [%s]\n", flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
-#endif
-
-		    if((len >= 4)
-		       /* Check if it ends in .com or .net */ 
-		       && ((strcmp(&sni[len-4], ".com") == 0) || (strcmp(&sni[len-4], ".net") == 0))
-		       && (strncmp(sni, "www.", 4) == 0)) /* Not starting with www.... */
-		      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_TLS);
-		  } else {
-#ifdef DEBUG_TLS
-		    printf("[TLS] SNI: (NO DGA) [%s]\n", flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+		    printf("[TLS] Extensions server len too short: %u vs %u\n",
+			   offset+extension_offset+5+len,
+			   packet->payload_packet_len);
 #endif
 		  }
-		} else {
-#ifdef DEBUG_TLS
-		  printf("[TLS] Extensions server len too short: %u vs %u\n",
-			 offset+extension_offset+5+len,
-			 packet->payload_packet_len);
-#endif
 		}
 	      } else if(extension_id == 10 /* supported groups */) {
 		u_int16_t s_offset = offset+extension_offset + 2;
