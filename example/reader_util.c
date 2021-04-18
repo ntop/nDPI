@@ -1910,23 +1910,40 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       struct ndpi_udphdr *udp = (struct ndpi_udphdr *)&packet[ip_offset+ip_len];
       u_int16_t sport = ntohs(udp->source), dport = ntohs(udp->dest);
 
-      if((sport == GTP_U_V1_PORT) || (dport == GTP_U_V1_PORT)) {
+      if(((sport == GTP_U_V1_PORT) || (dport == GTP_U_V1_PORT)) &&
+         (ip_offset + ip_len + sizeof(struct ndpi_udphdr) + 8 /* Minimum GTPv1 header len */ < header->caplen)) {
 	/* Check if it's GTPv1 */
 	u_int offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr);
 	u_int8_t flags = packet[offset];
 	u_int8_t message_type = packet[offset+1];
-
-	tunnel_type = ndpi_gtp_tunnel;
+	u_int8_t exts_parsing_error = 0;
 
 	if((((flags & 0xE0) >> 5) == 1 /* GTPv1 */) &&
 	   (message_type == 0xFF /* T-PDU */)) {
 
-	  ip_offset = ip_offset+ip_len+sizeof(struct ndpi_udphdr)+8; /* GTPv1 header len */
-	  if(flags & 0x04) ip_offset += 1; /* next_ext_header is present */
-	  if(flags & 0x02) ip_offset += 4; /* sequence_number is present (it also includes next_ext_header and pdu_number) */
-	  if(flags & 0x01) ip_offset += 1; /* pdu_number is present */
+	  offset += 8; /* GTPv1 header len */
+	  if(flags & 0x07)
+	    offset += 4; /* sequence_number + pdu_number + next_ext_header fields */
+	  /* Extensions parsing */
+	  if(flags & 0x04) {
+	    unsigned int ext_length = 0;
 
-	  if(ip_offset < header->caplen) {
+	    while(offset < header->caplen) {
+	      ext_length = packet[offset] << 2;
+	      offset += ext_length;
+	      if(offset >= header->caplen || ext_length == 0) {
+	        exts_parsing_error = 1;
+	        break;
+	      }
+	      if(packet[offset - 1] == 0)
+	        break;
+	    }
+	  }
+
+	  if(offset < header->caplen && !exts_parsing_error) {
+	    /* Ok, valid GTP-U */
+	    tunnel_type = ndpi_gtp_tunnel;
+	    ip_offset = offset;
 	    iph = (struct ndpi_iphdr *)&packet[ip_offset];
 	    if(iph->version == 6) {
 	      iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
