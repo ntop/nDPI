@@ -68,8 +68,7 @@ void ndpi_free_geoip(struct ndpi_detection_module_struct *ndpi_str) {
 
 /* ********************************************************************************* */
 
-int ndpi_get_geoip(struct ndpi_detection_module_struct *ndpi_str, char *ip,
-		   u_int32_t *asn, char *country_code, u_int8_t country_code_len) {
+int ndpi_get_geoip_asn(struct ndpi_detection_module_struct *ndpi_str, char *ip, u_int32_t *asn) {
 #ifdef HAVE_MAXMINDDB
   int gai_error, mmdb_error, status;
   MMDB_lookup_result_s result;
@@ -91,9 +90,26 @@ int ndpi_get_geoip(struct ndpi_detection_module_struct *ndpi_str, char *ip,
 	  *asn = 0;
       }
     }
-  }
 
-  if(ndpi_str->mmdb_city_loaded && (country_code_len > 0)) {
+    return(0);
+  }
+#endif
+
+  return(-2);
+}
+    
+/* ********************************************************************************* */
+
+int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_str, char *ip,
+				     char *country_code, u_int8_t country_code_len,
+				     char *continent, u_int8_t continent_len) {
+#ifdef HAVE_MAXMINDDB
+  int gai_error, mmdb_error;
+  MMDB_lookup_result_s result;
+  MMDB_entry_data_s entry_data;
+
+     
+  if(ndpi_str->mmdb_city_loaded) {
     int status;
 
     result = MMDB_lookup_string(&ndpi_str->mmdb_city, ip, &gai_error, &mmdb_error);
@@ -103,20 +119,35 @@ int ndpi_get_geoip(struct ndpi_detection_module_struct *ndpi_str, char *ip,
        || (!result.found_entry))
       country_code[0] = '\0';
     else {
-      status = MMDB_get_value(&result.entry, &entry_data, "country", "iso_code", NULL);
+      if(country_code_len > 0) {
+	status = MMDB_get_value(&result.entry, &entry_data, "country", "iso_code", NULL);
+	
+	if((status != MMDB_SUCCESS) || (!entry_data.has_data))
+	  country_code[0] = '\0';
+	else {
+	  int str_len = ndpi_min(entry_data.data_size, country_code_len);
+	  
+	  memcpy(country_code, entry_data.utf8_string, str_len);
+	  country_code[str_len] = '\0';
+	}
+      }
 
-      if((status != MMDB_SUCCESS) || (!entry_data.has_data))
-	country_code[0] = '\0';
-      else {
-	int str_len = ndpi_min(entry_data.data_size, country_code_len);
-
-	memcpy(country_code, entry_data.utf8_string, str_len);
-	country_code[str_len] = '\0';
+      if(continent_len > 0) {
+	status = MMDB_get_value(&result.entry, &entry_data, "continent", "names", "en", NULL);
+	
+	if((status != MMDB_SUCCESS) || (!entry_data.has_data))
+	  continent[0] = '\0';
+	else {
+	  int str_len = ndpi_min(entry_data.data_size, continent_len);
+	  
+	  memcpy(continent, entry_data.utf8_string, str_len);
+	  continent[str_len] = '\0';
+	}
       }
     }
-  }
 
-  return(0);
+    return(0);
+  }
 #endif
 
   return(-2);
