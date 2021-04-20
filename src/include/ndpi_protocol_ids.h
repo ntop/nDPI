@@ -264,8 +264,8 @@ typedef enum {
   NDPI_PROTOCOL_LINKEDIN              = 233, /* Paulo Angelo <pa@pauloangelo.com> */
   NDPI_PROTOCOL_SOUNDCLOUD            = 234,
   NDPI_PROTOCOL_CSGO                  = 235, /* Counter-Strike Global Offensive, Dota = 2 */
-  NDPI_PROTOCOL_LISP	                = 236,
-  NDPI_PROTOCOL_DIAMETER	            = 237,
+  NDPI_PROTOCOL_LISP                  = 236,
+  NDPI_PROTOCOL_DIAMETER              = 237,
   NDPI_PROTOCOL_APPLE_PUSH            = 238,
   NDPI_PROTOCOL_GOOGLE_SERVICES       = 239,
   NDPI_PROTOCOL_AMAZON_VIDEO          = 240,
@@ -284,6 +284,7 @@ typedef enum {
   NDPI_PROTOCOL_SOAP                  = 253, /* Toni Uhlig <matzeton@googlemail.com> */
   NDPI_PROTOCOL_APPLE_SIRI            = 254, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_SNAPCHAT_CALL         = 255,
+  NDPI_PROTOCOL_HPVIRTGRP             = 256, /* Toni Uhlig <matzeton@googlemail.com> */
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
