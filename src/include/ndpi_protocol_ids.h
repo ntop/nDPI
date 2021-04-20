@@ -285,6 +285,7 @@ typedef enum {
   NDPI_PROTOCOL_APPLE_SIRI            = 254, /* Zied Aouini <aouinizied@gmail.com> */
   NDPI_PROTOCOL_SNAPCHAT_CALL         = 255,
   NDPI_PROTOCOL_HPVIRTGRP             = 256, /* Toni Uhlig <matzeton@googlemail.com> */
+  NDPI_PROTOCOL_GENSHIN_IMPACT        = 257, /* Toni Uhlig <matzeton@googlemail.com> */
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
