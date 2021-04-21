@@ -56,6 +56,7 @@ typedef enum {
   ndpi_capwap_tunnel,
   ndpi_tzsp_tunnel,
   ndpi_l2tp_tunnel,
+  ndpi_vxlan_tunnel,
 } ndpi_packet_tunnel;
 
 /*

@@ -1433,6 +1433,10 @@ const char* ndpi_tunnel2str(ndpi_packet_tunnel tt) {
   case ndpi_l2tp_tunnel:
     return("L2TP");
     break;
+
+  case ndpi_vxlan_tunnel:
+    return("VXLAN");
+    break;
   }
 
   return("");
