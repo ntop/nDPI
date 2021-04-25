@@ -1,5 +1,5 @@
 /*
- * hpvirtgrp.c
+ * genshin_impact.c
  *
  * Copyright (C) 2012-21 - ntop.org
  *
@@ -20,33 +20,35 @@
 
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HPVIRTGRP
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_GENSHIN_IMPACT
 
 #include <stdlib.h>
 #include "ndpi_api.h"
 
 
-static void ndpi_int_hpvirtgrp_add_connection(
+static void ndpi_int_genshin_impact_add_connection(
                 struct ndpi_detection_module_struct *ndpi_struct,
                 struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HPVIRTGRP, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GENSHIN_IMPACT, NDPI_PROTOCOL_UNKNOWN);
 }
 
-static void ndpi_search_hpvirtgrp(struct ndpi_detection_module_struct *ndpi_struct,
-                                  struct ndpi_flow_struct *flow)
+static void ndpi_search_genshin_impact(struct ndpi_detection_module_struct *ndpi_struct,
+                                       struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct * packet = &flow->packet;
 
-  NDPI_LOG_DBG(ndpi_struct, "search hpvirtgrp\n");
+  NDPI_LOG_DBG(ndpi_struct, "search genshin-impact\n");
 
-  if (packet->tcp != NULL)
+  if (packet->udp != NULL)
   {
-    if (flow->packet_counter == 1 && packet->payload_packet_len >= 4 &&
-        packet->payload_packet_len == ntohs(*(u_int16_t*)&packet->payload[1]) &&
-        packet->payload[0] == 0x16 && packet->payload[3] == 0x00)
+    if (flow->packet_counter == 1 && packet->payload_packet_len >= 20 &&
+        ntohl(*(u_int32_t*)&packet->payload[0]) == 0x000000FF &&
+        ntohl(*(u_int32_t*)&packet->payload[4]) == 0x00000000 &&
+        ntohl(*(u_int32_t*)&packet->payload[12]) == 0x499602D2 &&
+        ntohl(*(u_int32_t*)&packet->payload[16]) == 0xFFFFFFFF)
     {
-      ndpi_int_hpvirtgrp_add_connection(ndpi_struct, flow);
+      ndpi_int_genshin_impact_add_connection(ndpi_struct, flow);
       return;
     }
   }
@@ -57,14 +59,14 @@ static void ndpi_search_hpvirtgrp(struct ndpi_detection_module_struct *ndpi_stru
 
 /* ***************************************************************** */
 
-void init_hpvirtgrp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-                              NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_genshin_impact_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
+                                   NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("HP Virtual Machine Group Management",
+  ndpi_set_bitmask_protocol_detection("Genshin Impact",
                                       ndpi_struct, detection_bitmask, *id,
-                                      NDPI_PROTOCOL_HPVIRTGRP,
-                                      ndpi_search_hpvirtgrp,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITH_PAYLOAD,
+                                      NDPI_PROTOCOL_GENSHIN_IMPACT,
+                                      ndpi_search_genshin_impact,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
 
