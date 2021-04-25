@@ -18,3 +18,6 @@ During capture the ndpiReader plugin will pass Wireshark the nDPI protocol infor
 ## nDPI Packet Filtering
 
 As nDPI is natively integrated into Wireshark, you can filter packets using the usual filtering mechanism. Example use "ndpi.protocol.name==BitTorrent" to filter all BitTorrent traffic.
+
+# tshark Lua Class
+The tshark directory contains a Lua class for processing packets with tshark
