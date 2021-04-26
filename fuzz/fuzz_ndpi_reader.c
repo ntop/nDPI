@@ -85,8 +85,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
       uint8_t *packet_checked = malloc(header->caplen);
 
       if(packet_checked) {
+	ndpi_risk flow_risk;
+	
 	memcpy(packet_checked, pkt, header->caplen);
-	ndpi_workflow_process_packet(workflow, header, packet_checked, NULL);
+	ndpi_workflow_process_packet(workflow, header, packet_checked, &flow_risk, NULL);
 	free(packet_checked);
       }
     }
