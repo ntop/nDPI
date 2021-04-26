@@ -1687,7 +1687,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		while(s_offset < tot_alpn_len && s_offset < total_len) {
 		  u_int8_t alpn_i, alpn_len = packet->payload[s_offset++];
 
-		  if((s_offset + alpn_len) <= tot_alpn_len) {
+		  if((s_offset + alpn_len) <= tot_alpn_len &&
+		     (s_offset + alpn_len) <= total_len) {
 #ifdef DEBUG_TLS
 		    printf("Client TLS [ALPN: %u]\n", alpn_len);
 #endif
