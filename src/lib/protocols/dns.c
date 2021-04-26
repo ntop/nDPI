@@ -29,7 +29,7 @@
 
 #define FLAGS_MASK 0x8000
 
-//#define DNS_DEBUG 1
+// #define DNS_DEBUG 1
 
 #define DNS_PORT   53
 #define LLMNR_PORT 5355
@@ -203,7 +203,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
        //       && (dns_header->num_answers == 0)
        && (((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
-	   || (dns_header->flags == 0x00) /* Standard Query */
+	   || ((dns_header->flags & 0xFCF0) == 0x00) /* Standard Query */
 	   || ((dns_header->num_answers == 0) && (dns_header->authority_rrs == 0)))) {
       /* This is a good query */
       while(x+2 < flow->packet.payload_packet_len) {
@@ -379,39 +379,51 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       u_int16_t i, tot_len = 0;
 
       for(i=idx; i<flow->packet.payload_packet_len;) {
-	u_int8_t name_len = flow->packet.payload[i]; /* Lenght of the individual name blocks aaa.bbb.com */
+	u_int8_t is_ptr = 0, name_len = flow->packet.payload[i]; /* Lenght of the individual name blocks aaa.bbb.com */
 	
 	if(name_len == 0) {
 	  tot_len++; /* \0 */
 	  /* End of query */
 	  break;
-	} else if((name_len & 0xC0) == 0xC0) {
-	  name_len = 1;
-	} 
+	} else if((name_len & 0xC0) == 0xC0)
+	  is_ptr = 1, name_len = 0; /* Pointer */
+
 #ifdef DNS_DEBUG
-	printf("[DNS] [name_len: %u]\n", name_len);
+	if((!is_ptr) && (name_len > 0)) {
+	  printf("[DNS] [name_len: %u][", name_len);
+	  
+	  {
+	    int idx;
+	    
+	    for(idx=0; idx<name_len; idx++)
+	      printf("%c", flow->packet.payload[i+1+idx]);
+	    
+	    printf("]\n");
+	  }
+	}
 #endif
 	
 	i += name_len+1, tot_len += name_len+1;
+	if(is_ptr) break;
       } /* for */
 
 #ifdef DNS_DEBUG
-      printf("[DNS] [tot_len: %u]\n\n", tot_len);
+      printf("[DNS] [tot_len: %u]\n\n", tot_len+4 /* type + class */);
 #endif
 
-      if(((i+4) > flow->packet.payload_packet_len)
+      if(((i+4 /* Skip query type and class */) > flow->packet.payload_packet_len)
 	 || ((flow->packet.payload[i+1] == 0x0) && (flow->packet.payload[i+2] == 0x0)) /* Query type cannot be 0 */
 	 || (tot_len > 253)
-	 )
-	{
+	 ) {
 	/* Invalid */
 #ifdef DNS_DEBUG
 	printf("[DNS] Invalid query len [%u >= %u]\n", i+4, flow->packet.payload_packet_len);
 #endif
 	ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
 	break;
-      } else
-	idx += tot_len+4, num_queries++;
+      } else {
+	idx = i+5, num_queries++;
+      }
     } /* for */
 
     while((j < max_len) && (off < flow->packet.payload_packet_len) && (flow->packet.payload[off] != '\0')) {
