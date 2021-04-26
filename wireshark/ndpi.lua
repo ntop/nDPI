@@ -26,6 +26,8 @@ local ndpi_fds    = ndpi_proto.fields
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
+ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT32, nil, base.DEC)
+ndpi_fds.flow_risk_str        = ProtoField.new("nDPI Flow Risk String", "ndpi.flow_risk_str", ftypes.STRING)
 
 local ntop_proto = Proto("ntop", "ntop Extensions")
 ntop_proto.fields = {}
@@ -886,6 +888,65 @@ function latency_dissector(tvb, pinfo, tree)
    end
 end
 
+
+function bit(p)
+   return 2 ^ (p - 1)  -- 1-based indexing
+end
+
+function hasbit(x, p)
+   return x % (p + p) >= p
+end
+
+local ndpi_risks = {
+   ['0'] = "No Risk",
+   ['1'] = "XSS attack",
+   ['2'] = "SQL injection",
+   ['3'] = "RCE injection",
+   ['4'] = "Binary application transfer",
+   ['5'] = "Known protocol on non standard port",
+   ['6'] = "Self-signed Certificate",
+   ['7'] = "Obsolete TLS version (< 1.1)",
+   ['8'] = "Weak TLS cipher",
+   ['9'] = "TLS Expired Certificate",    
+   ['10'] = "TLS Certificate Mismatch",
+   ['11'] = "HTTP Suspicious User-Agent",
+   ['12'] = "HTTP Numeric IP Address",
+   ['13'] = "HTTP Suspicious URL",
+   ['14'] = "HTTP Suspicious Header",
+   ['15'] = "TLS (probably) not carrying HTTPS",
+   ['16'] = "Suspicious DGA domain name",
+   ['17'] = "Malformed packet",
+   ['18'] = "SSH Obsolete Client Version/Cipher",
+   ['19'] = "SSH Obsolete Server Version/Cipher",
+   ['20'] = "SMB Insecure Version",
+   ['21'] = "TLS Suspicious ESNI Usage",
+   ['22'] = "Unsafe Protocol",
+   ['23'] = "Suspicious DNS traffic",
+   ['24'] = "SNI TLS extension was missing",
+   ['25'] = "HTTP suspicious content",
+   ['26'] = "Risky ASN",
+   ['27'] = "Risky domain name",
+   ['28'] = "Possibly Malicious JA3 Fingerprint",
+   ['29'] = "Possibly Malicious SSL Certificate SHA1 Fingerprint",
+   ['30'] = "Desktop/File Sharing Session",
+   ['31'] = ""
+}
+
+function map_ndpi_risk(r)
+   local ret = ""
+
+   if(r ~= 0) then
+      for i=0,31 do
+	 if(hasbit(r, bit(i))) then
+	    ret = ret.."["..ndpi_risks[(i-1)..""].."]"
+	 end
+      end
+   end
+   
+   return(ret)
+end
+
+
 -- the dissector function callback
 function ndpi_proto.dissector(tvb, pinfo, tree)
    -- Wireshark dissects the packet twice. We ignore the first
@@ -918,14 +979,18 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    local ndpi_subtree         = tree:add(ndpi_proto, tvb(), "nDPI Protocol")
 	    local network_protocol     = tonumber(elems[2]..elems[3], 16) -- 16 = HEX
 	    local application_protocol = tonumber(elems[4]..elems[5], 16) -- 16 = HEX
+	    local str_risk             = elems[6]..elems[7]..elems[8]..elems[9]
+	    local flow_risk            = tonumber(str_risk, 16) -- 16 = HEX
 	    local name                 = ""
 
-	    for i=6,21 do
+	    for i=10,25 do
 	       name = name .. string.char(tonumber(elems[i], 16))
 	    end
 
 	    ndpi_subtree:add(ndpi_fds.network_protocol, network_protocol)
 	    ndpi_subtree:add(ndpi_fds.application_protocol, application_protocol)
+	    ndpi_subtree:add(ndpi_fds.flow_risk, flow_risk)
+	    ndpi_subtree:add(ndpi_fds.flow_risk_str, map_ndpi_risk(flow_risk))
 	    ndpi_subtree:add(ndpi_fds.name, name)
 
 	    if(application_protocol ~= 0) then
@@ -954,7 +1019,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
 		     for k,v in pairsByValues(ndpi_flows, asc) do
 			if(k ~= flowkey) then
-			   table.remove(ndpi_flows, k)
+			   ndpi_flows[k] = nil -- Remove entry
 			   num_ndpi_flows = num_ndpi_flows + 1
 			   if(num_ndpi_flows == (2*max_num_entries)) then
 			      break

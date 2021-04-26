@@ -1306,8 +1306,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 					   u_int16_t ipsize, u_int16_t rawsize,
 					   const struct pcap_pkthdr *header,
 					   const u_char *packet,
-                       pkt_timeval when,
-                       FILE * csv_fp) {
+					   pkt_timeval when,
+					   ndpi_risk *flow_risk,
+					   FILE * csv_fp) {
   struct ndpi_id_struct *src, *dst;
   struct ndpi_flow_info *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
@@ -1539,6 +1540,18 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     }
   }
 
+#if 0
+  if(flow->risk != 0) {
+    FILE *r = fopen("/tmp/e", "a");
+
+    if(r) {
+      fprintf(r, "->>> %u [%08X]\n", flow->risk, flow->risk);
+      fclose(r);
+    }
+  }
+#endif
+  
+  *flow_risk = flow->risk;
   return(flow->detected_protocol);
 }
 
@@ -1567,6 +1580,7 @@ int ndpi_is_datalink_supported(int datalink_type)
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
 					       const u_char *packet,
+					       ndpi_risk *flow_risk,
 					       FILE * csv_fp) {
   /*
    * Declare pointers to packet headers
@@ -1615,6 +1629,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   /* counters */
   u_int8_t vlan_packet = 0;
 
+  *flow_risk = 0 /* NDPI_NO_RISK */;
+  
   /* Increment raw packet counter */
   workflow->stats.raw_packet_count++;
 
@@ -1637,7 +1653,6 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 #else
   datalink_type = (int)pcap_datalink(workflow->pcap_handle);
 #endif
-
 
  datalink_check:
   // 20 for min iph and 8 for min UDP
@@ -1729,7 +1744,6 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
     if(header->caplen < (eth_offset + radio_len + sizeof(struct ndpi_wifi_header)))
       return(nproto);
-
 
     /* Calculate 802.11 header length (variable) */
     wifi = (struct ndpi_wifi_header*)( packet + eth_offset + radio_len);
@@ -2030,7 +2044,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   return(packet_processing(workflow, time_ms, vlan_id, tunnel_type, iph, iph6,
 			   ip_offset, header->caplen - ip_offset,
 			   header->caplen, header, packet, header->ts,
-               csv_fp));
+			   flow_risk, csv_fp));
 }
 
 /* ********************************************************** */

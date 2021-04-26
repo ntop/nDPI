@@ -94,38 +94,38 @@ extern int dpdk_port_deinit(int port);
 
 // inner hash table (ja3 -> security state)
 typedef struct ndpi_ja3_info {
-   char * ja3;
-   ndpi_cipher_weakness unsafe_cipher;
-   UT_hash_handle hh;
+  char * ja3;
+  ndpi_cipher_weakness unsafe_cipher;
+  UT_hash_handle hh;
 } ndpi_ja3_info;
 
 // external hash table (host ip -> <ip string, hash table ja3c, hash table ja3s>)
 // used to aggregate ja3 fingerprints by hosts
 typedef struct ndpi_host_ja3_fingerprints {
-   u_int32_t ip;
-   char *ip_string;
-   char *dns_name;
-   ndpi_ja3_info *host_client_info_hasht;
-   ndpi_ja3_info *host_server_info_hasht;
+  u_int32_t ip;
+  char *ip_string;
+  char *dns_name;
+  ndpi_ja3_info *host_client_info_hasht;
+  ndpi_ja3_info *host_server_info_hasht;
 
-   UT_hash_handle hh;
+  UT_hash_handle hh;
 } ndpi_host_ja3_fingerprints;
 
 
 //inner hash table
 typedef struct ndpi_ip_dns{
-   u_int32_t ip;
-   char *ip_string;
-   char *dns_name; //server name if any;
-   UT_hash_handle hh;
+  u_int32_t ip;
+  char *ip_string;
+  char *dns_name; //server name if any;
+  UT_hash_handle hh;
 } ndpi_ip_dns;
 
 //hash table ja3 -> <host, ip, security>, used to aggregate host by ja3 fingerprints
 typedef struct ndpi_ja3_fingerprints_host{
-   char *ja3; //key
-   ndpi_cipher_weakness unsafe_cipher;
-   ndpi_ip_dns *ipToDNS_ht;
-   UT_hash_handle hh;
+  char *ja3; //key
+  ndpi_cipher_weakness unsafe_cipher;
+  ndpi_ip_dns *ipToDNS_ht;
+  UT_hash_handle hh;
 } ndpi_ja3_fingerprints_host;
 
 struct flow_metrics {
@@ -294,14 +294,14 @@ typedef struct ndpi_workflow {
   void **ndpi_flows_root;
   struct ndpi_detection_module_struct *ndpi_struct;
   u_int32_t num_allocated_flows;
- } ndpi_workflow_t;
+} ndpi_workflow_t;
 
 
 /* TODO: remove wrappers parameters and use ndpi global, when their initialization will be fixed... */
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle);
 
 
- /* workflow main free function */
+/* workflow main free function */
 void ndpi_workflow_free(struct ndpi_workflow * workflow);
 
 
@@ -316,7 +316,8 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
 					       const u_char *packet,
-                           FILE * csv_fp);
+					       ndpi_risk *flow_risk,
+					       FILE * csv_fp);
 
 int ndpi_is_datalink_supported(int datalink_type);
 
@@ -334,7 +335,7 @@ static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow *
   workflow->__flow_giveup_udata = udata;
 }
 
- /* compare two nodes in workflow */
+/* compare two nodes in workflow */
 int ndpi_workflow_node_cmp(const void *a, const void *b);
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow, FILE * csv_fp);
 u_int32_t ethernet_crc32(const void* data, size_t n_bytes);
@@ -346,13 +347,13 @@ float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256], unsigned 
 extern int nDPI_LogLevel;
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
- #define LOG(log_level, args...)	\
-  {					\
-    if(log_level <= nDPI_LogLevel)	\
-      printf(args);			\
+#define LOG(log_level, args...)			\
+  {						\
+    if(log_level <= nDPI_LogLevel)		\
+      printf(args);				\
   }
 #else
- #define LOG(...) {}
+#define LOG(...) {}
 #endif
 
 #endif

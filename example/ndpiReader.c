@@ -172,10 +172,12 @@ struct receiver {
 
 struct receiver *receivers = NULL, *topReceivers = NULL;
 
+#define WIRESHARK_NTOP_MAGIC 0x19680924
 
 struct ndpi_packet_trailer {
-  u_int32_t magic; /* 0x19682017 */
+  u_int32_t magic; /* WIRESHARK_NTOP_MAGIC */
   u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
+  ndpi_risk flow_risk;
   char name[16];
 };
 
@@ -3217,6 +3219,7 @@ static void ndpi_process_packet(u_char *args,
 				const struct pcap_pkthdr *header,
 				const u_char *packet) {
   struct ndpi_proto p;
+  ndpi_risk flow_risk;
   u_int16_t thread_id = *((u_int16_t*)args);
 
   /* allocate an exact size buffer to check overflows */
@@ -3226,7 +3229,7 @@ static void ndpi_process_packet(u_char *args,
     return ;
   }
   memcpy(packet_checked, packet, header->caplen);
-  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, csv_fp);
+  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, &flow_risk, csv_fp);
 
   if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
   pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
@@ -3281,7 +3284,8 @@ static void ndpi_process_packet(u_char *args,
     trailer = (struct ndpi_packet_trailer*)&extcap_buf[h.caplen];
     memcpy(extcap_buf, packet, h.caplen);
     memset(trailer, 0, sizeof(struct ndpi_packet_trailer));
-    trailer->magic = htonl(0x19680924);
+    trailer->magic = htonl(WIRESHARK_NTOP_MAGIC);
+    trailer->flow_risk = htonl(flow_risk);
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
