@@ -1776,7 +1776,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_DESKTOP_OR_FILE_SHARING_SESSION:
     return("Desktop/File Sharing Session");
-    
+
+  case NDPI_TLS_UNCOMMON_ALPN:
+    return("Uncommon TLS ALPN");
+
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2460,7 +2463,7 @@ int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t 
 /* ******************************************************************** */
 
 void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
-  u_int32_t v = 1 << r;
+  ndpi_risk v = 1ull << r;
   
   // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
   flow->risk |= v;
