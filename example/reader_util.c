@@ -1773,15 +1773,11 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     break;
 
   default:
-#ifndef BUILD_FUZZTARGETS
     /*
      * We shoudn't be here, because we already checked that this datalink is supported.
      * Should ndpi_is_datalink_supported() be updated?
-     *
-     * NOTE (toni): We get here quite often during fuzzing and it spams consoles and logfiles. ;)
      */
     printf("Unknown datalink %d\n", datalink_type);
-#endif
     return(nproto);
   }
 
