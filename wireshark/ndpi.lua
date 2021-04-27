@@ -26,7 +26,7 @@ local ndpi_fds    = ndpi_proto.fields
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
-ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT32, nil, base.DEC)
+ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64)
 ndpi_fds.flow_risk_str        = ProtoField.new("nDPI Flow Risk String", "ndpi.flow_risk_str", ftypes.STRING)
 
 local ntop_proto = Proto("ntop", "ntop Extensions")
@@ -977,23 +977,23 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    local ndpikey, srckey, dstkey, flowkey
 	    local elems                = string.split(string.sub(ndpi_trailer, 12), ":")
 	    local ndpi_subtree         = tree:add(ndpi_proto, tvb(), "nDPI Protocol")
-	    local network_protocol     = tonumber(elems[2]..elems[3], 16) -- 16 = HEX
-	    local application_protocol = tonumber(elems[4]..elems[5], 16) -- 16 = HEX
-	    local str_risk             = elems[6]..elems[7]..elems[8]..elems[9]
+	    local str_risk             = elems[6]..elems[7]..elems[8]..elems[9]..elems[10]..elems[11]..elems[12]..elems[13]
 	    local flow_risk            = tonumber(str_risk, 16) -- 16 = HEX
+	    local len                  = tvb:len()
 	    local name                 = ""
-
-	    for i=10,25 do
+	    
+	    for i=14,29 do
 	       name = name .. string.char(tonumber(elems[i], 16))
 	    end
 
-	    ndpi_subtree:add(ndpi_fds.network_protocol, network_protocol)
-	    ndpi_subtree:add(ndpi_fds.application_protocol, application_protocol)
-	    ndpi_subtree:add(ndpi_fds.flow_risk, flow_risk)
+	    ndpi_subtree:add(ndpi_fds.network_protocol, tvb(len-32, 2))
+	    ndpi_subtree:add(ndpi_fds.application_protocol, tvb(len-30, 2))
+	    ndpi_subtree:add(ndpi_fds.flow_risk, tvb(len-28, 8))
 	    ndpi_subtree:add(ndpi_fds.flow_risk_str, map_ndpi_risk(flow_risk))
-	    ndpi_subtree:add(ndpi_fds.name, name)
+	    ndpi_subtree:add(ndpi_fds.name, tvb(len-20, 16))
 
 	    if(application_protocol ~= 0) then
+	       
 	       -- Set protocol name in the wireshark protocol column (if not Unknown)
 	       pinfo.cols.protocol = name
 	       --print(network_protocol .. "/" .. application_protocol .. "/".. name)
