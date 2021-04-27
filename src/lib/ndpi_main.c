@@ -7361,6 +7361,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       if((!name)
 	 || (strchr(name, '_') != NULL)
 	 || (endsWith(name, "in-addr.arpa", 12))
+	 || (endsWith(name, "ip6.arpa", 8))
 	 /* Ignore TLD .local .lan and .home */
 	 || (endsWith(name, ".local", 6))
 	 || (endsWith(name, ".lan", 4))
