@@ -38,36 +38,40 @@ struct netbios_header {
 /* ****************************************************************** */
 
 /* The function below has been inherited by tcpdump */
-int ndpi_netbios_name_interpret(char *in, size_t inlen, char *out, u_int out_len) {
-  int ret = 0, len, idx = inlen;
-  char *b;
+int ndpi_netbios_name_interpret(char *in, size_t in_len, char *out, u_int out_len) {
+  u_int ret = 0, len, idx = in_len, out_idx = 0;
 
   len = (*in++)/2;
-  b  = out;
-  *out = 0;
+  out_len--;
+  out[out_idx] = 0;
 
-  if((len > (out_len-1)) || (len < 1) || ((2*len) > inlen))
+  if((len > out_len) || (len < 1) || ((2*len) > in_len))
     return(-1);
 
-  while(len--) {
+  while((len--) && (out_idx < out_len)) {
     if((idx < 2) || (in[0] < 'A') || (in[0] > 'P') || (in[1] < 'A') || (in[1] > 'P')) {
-      *out = 0;
+      out[out_idx] = 0;
       break;
     }
 
-    *out = ((in[0] - 'A') << 4) + (in[1] - 'A');
-
+    out[out_idx] = ((in[0] - 'A') << 4) + (in[1] - 'A');
     in += 2, idx -= 2;
 
-    if(isprint(*out))
-      out++, ret++;
+    if(isprint(out[out_idx]))
+      out_idx++, ret++;
   }
 
-  *out = 0;
-
-  /* Courtesy of Roberto F. De Luca <deluca@tandar.cnea.gov.ar> */
   /* Trim trailing whitespace from the returned string */
-  for(out--; out>=b && *out==' '; out--) *out = '\0';
+  if(out_idx > 0) {
+    out[out_idx] = 0;
+    out_idx--;
+
+    while((out_idx > 0) && (out[out_idx] == ' ')) {
+      out[out_idx] = 0;
+      out_idx--;
+    }
+
+  }
 
   return(ret);
 }
