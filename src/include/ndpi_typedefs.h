@@ -63,7 +63,7 @@ typedef enum {
   NOTE
   When the typedef below is modified don't forget to update
   - nDPI/wireshark/ndpi.lua
-  - ndpi_risk2str (in ndpi_utils.c)
+  - ndpi_risk2str and ndpi_risk2severity (in ndpi_utils.c)
   - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
   - ndpi_risk_enum (in python/ndpi.py)  
  */
@@ -107,6 +107,13 @@ typedef enum {
 
 typedef u_int64_t ndpi_risk; /* (**) */
 
+typedef enum {
+  NDPI_RISK_LOW,
+  NDPI_RISK_MEDIUM,
+  NDPI_RISK_HIGH,
+  NDPI_RISK_SEVERE
+} ndpi_risk_severity;
+  
 /* NDPI_VISIT */
 typedef enum {
    ndpi_preorder,
