@@ -1625,6 +1625,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		for(i=0; i<tot_signature_algorithms_len; i++) {
 		  int rc = snprintf(&ja3.client.signature_algorithms[i*2], sizeof(ja3.client.signature_algorithms)-i*2, "%02X", packet->payload[s_offset+i]);
 
+		  if(flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms < MAX_NUM_TLS_SIGNATURE_ALGORITHMS) {
+		    if(flow->protos.tls_quic_stun.tls_quic.client_signature_algorithms[flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms])
+		      flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms++;
+		  }
+		  
 		  if(rc < 0) break;
 		}
 

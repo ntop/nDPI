@@ -1209,6 +1209,8 @@ typedef enum {
    ndpi_cipher_insecure = NDPI_CIPHER_INSECURE
 } ndpi_cipher_weakness;
 
+#define MAX_NUM_TLS_SIGNATURE_ALGORITHMS 16
+
 /*
   NOTE
   When the struct below is modified don't forget to update
@@ -1319,8 +1321,9 @@ struct ndpi_flow_struct {
 	  *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
 	u_int32_t notBefore, notAfter;
 	char ja3_client[33], ja3_server[33];
-	u_int16_t server_cipher;
-	u_int8_t sha1_certificate_fingerprint[20];
+	u_int16_t server_cipher;	
+	u_int16_t client_signature_algorithms[MAX_NUM_TLS_SIGNATURE_ALGORITHMS];
+	u_int8_t num_tls_signature_algorithms, sha1_certificate_fingerprint[20];
 	
 	struct {
 	  u_int16_t cipher_suite;
