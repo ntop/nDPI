@@ -65,7 +65,7 @@ typedef enum {
   - nDPI/wireshark/ndpi.lua
   - ndpi_risk2str and ndpi_risk2severity (in ndpi_utils.c)
   - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
-  - ndpi_risk_enum (in python/ndpi.py)  
+  - ndpi_risk_enum (in python/ndpi.py)
  */
 typedef enum {
   NDPI_NO_RISK = 0,
@@ -113,7 +113,7 @@ typedef enum {
   NDPI_RISK_HIGH,
   NDPI_RISK_SEVERE
 } ndpi_risk_severity;
-  
+
 /* NDPI_VISIT */
 typedef enum {
    ndpi_preorder,
@@ -506,8 +506,8 @@ PACK_ON struct tinc_cache_entry {
   u_int16_t dst_port;
 } PACK_OFF;
 
-/* 
-   In case the typedef below is modified, please update 
+/*
+   In case the typedef below is modified, please update
    ndpi_http_method2str (ndpi_utils.c)
 */
 typedef enum {
@@ -527,7 +527,7 @@ struct ndpi_lru_cache_entry {
   u_int32_t key; /* Store the whole key to avoid ambiguities */
   u_int32_t is_full:1, value:16, pad:15;
 };
-  
+
 struct ndpi_lru_cache {
   u_int32_t num_entries;
   struct ndpi_lru_cache_entry *entries;
@@ -695,16 +695,16 @@ struct ndpi_flow_tcp_struct {
 
   struct {
     message_t message;
-    
+
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
-  
+
     /* NDPI_PROTOCOL_TLS */
     u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1,
 	fingerprint_set:1, _pad:4;
     u_int8_t num_tls_blocks;
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;
-  
+
   /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
 
@@ -965,7 +965,7 @@ typedef enum {
 	      NDPI_PROTOCOL_CATEGORY_SHOPPING,
 	      NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,
 	      NDPI_PROTOCOL_CATEGORY_FILE_SHARING,
-	      /* 
+	      /*
 		 The category below is used by sites who are used
 		 to test connectivity
 	       */
@@ -1081,7 +1081,7 @@ struct ndpi_detection_module_struct {
   u_int32_t ticks_per_second;
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
-  
+
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
 #endif
@@ -1134,7 +1134,7 @@ struct ndpi_detection_module_struct {
     risky_domain_automa, tls_cert_subject_automa,
     malicious_ja3_automa, malicious_sha1_automa;
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
-  
+
   struct {
     ndpi_automa hostnames, hostnames_shadow;
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
@@ -1181,7 +1181,7 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_MINING and subprotocols */
   struct ndpi_lru_cache *mining_cache;
-  
+
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_cache;
 
@@ -1190,7 +1190,7 @@ struct ndpi_detection_module_struct {
   u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
 
   void (*ndpi_notify_lru_add_handler_ptr)(ndpi_lru_cache_type cache_type, u_int32_t proto, u_int32_t app_proto);
-  
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
 #endif
@@ -1210,6 +1210,14 @@ typedef enum {
 } ndpi_cipher_weakness;
 
 #define MAX_NUM_TLS_SIGNATURE_ALGORITHMS 16
+
+struct tls_euristics {
+  /*
+    TLS euristics for detecting browsers usage
+    NOTE: expect false positives
+  */
+  u_int8_t is_safari_tls:1, is_firefox_tls:1, notused:6;
+};
 
 /*
   NOTE
@@ -1258,7 +1266,7 @@ struct ndpi_flow_struct {
 
   /* Place textual flow info here */
   char flow_extra_info[16];
-  
+
   /*
     Pointer to src or dst that identifies the
     server of this connection
@@ -1269,7 +1277,7 @@ struct ndpi_flow_struct {
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
   u_int8_t risk_checked;
   ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
-  
+
   /*
     This structure below will not not stay inside the protos
     structure below as HTTP is used by many subprotocols
@@ -1286,12 +1294,12 @@ struct ndpi_flow_struct {
     u_char detected_os[32]; /* Via HTTP/QUIC User-Agent */
   } http;
 
-  /* 
+  /*
      Put outside of the union to avoid issues in case the protocol
      is remapped to somethign pther than Kerberos due to a faulty
      dissector
   */
-  struct {    
+  struct {
     char *pktbuf;
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
@@ -1321,10 +1329,17 @@ struct ndpi_flow_struct {
 	  *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
 	u_int32_t notBefore, notAfter;
 	char ja3_client[33], ja3_server[33];
-	u_int16_t server_cipher;	
+	u_int16_t server_cipher;
+	u_int8_t sha1_certificate_fingerprint[20];
+
+#ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
+	/* Under #ifdef to save memory for those who do not need them */
+	u_int8_t num_tls_signature_algorithms;
 	u_int16_t client_signature_algorithms[MAX_NUM_TLS_SIGNATURE_ALGORITHMS];
-	u_int8_t num_tls_signature_algorithms, sha1_certificate_fingerprint[20];
-	
+#endif
+
+	struct tls_euristics browser_euristics;
+
 	struct {
 	  u_int16_t cipher_suite;
 	  char *esni;
@@ -1348,7 +1363,7 @@ struct ndpi_flow_struct {
     struct {
       u_int8_t last_one_byte_pkt, last_byte;
     } imo;
-    
+
     struct {
       u_int8_t username_detected:1, username_found:1,
 	password_detected:1, password_found:1,
@@ -1356,7 +1371,7 @@ struct ndpi_flow_struct {
       u_int8_t character_id;
       char username[32], password[32];
     } telnet;
-    
+
     struct {
       char version[32];
     } ubntac2;
@@ -1370,7 +1385,7 @@ struct ndpi_flow_struct {
       u_int8_t auth_found:1, auth_failed:1, _pad:5;
       char username[16], password[16];
     } ftp_imap_pop_smtp;
-  
+
     struct {
       /* Bittorrent hash */
       u_char hash[20];
@@ -1451,7 +1466,7 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_CSGO */
   u_int8_t csgo_strid[18],csgo_state,csgo_s2;
   u_int32_t csgo_id2;
-  
+
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
   struct ndpi_flow_struct *flow;
@@ -1505,7 +1520,7 @@ typedef enum {
   ndpi_serialization_format_csv
 } ndpi_serialization_format;
 
-/* Note: 
+/* Note:
  * - up to 16 types (TLV encoding: "4 bit key type" << 4 | "4 bit value type")
  * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API */
 typedef enum {
@@ -1627,7 +1642,7 @@ typedef struct ndpi_ptree ndpi_ptree_t;
 /* **************************************** */
 
 struct ndpi_hll {
-  u_int8_t bits;  
+  u_int8_t bits;
   size_t size;
   u_int8_t *registers;
 };
@@ -1643,7 +1658,7 @@ enum ndpi_bin_family {
 struct ndpi_bin {
   u_int8_t num_bins, is_empty;
   enum ndpi_bin_family family;
-  
+
   union {
     u_int8_t  *bins8; /* num_bins bins */
     u_int16_t *bins16; /* num_bins bins */
@@ -1685,7 +1700,7 @@ struct ndpi_hw_struct {
 
   u_int32_t num_values;
   double    u, v, sum_square_error;
-  
+
   /* These two values need to store the signal history */
   u_int32_t *y;
   double    *s;

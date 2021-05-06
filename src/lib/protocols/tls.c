@@ -1158,7 +1158,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       int i, rc;
 
       ja3.server.tls_handshake_version = tls_version;
-      
+
 #ifdef DEBUG_TLS
       printf("TLS Server Hello [version: 0x%04X]\n", tls_version);
 #endif
@@ -1312,7 +1312,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    printf("Server TLS Invalid len %u vs %u\n", s_offset+extension_len, total_len);
 #endif
 	  }
-	}      
+	}
 
 	i += 4 + extension_len, offset += 4 + extension_len;
       } /* for */
@@ -1347,16 +1347,16 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",%s", ja3.server.alpn);
 	  if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc;
 	}
-	
+
 #ifdef DEBUG_TLS
 	printf("[JA3+] Server: %s \n", ja3_str);
 #endif
-      } else {      
+      } else {
 #ifdef DEBUG_TLS
 	printf("[JA3] Server: %s \n", ja3_str);
 #endif
       }
-      
+
       ndpi_MD5Init(&ctx);
       ndpi_MD5Update(&ctx, (const unsigned char *)ja3_str, strlen(ja3_str));
       ndpi_MD5Final(md5_hash, &ctx);
@@ -1377,7 +1377,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       flow->protos.tls_quic_stun.tls_quic.ssl_version = ja3.client.tls_handshake_version = tls_version;
       if(flow->protos.tls_quic_stun.tls_quic.ssl_version < 0x0302) /* TLSv1.1 */
 	ndpi_set_risk(flow, NDPI_TLS_OBSOLETE_VERSION);
- 
+
       if((session_id_len+base_offset+3) > packet->payload_packet_len)
 	return(0); /* Not found */
 
@@ -1400,6 +1400,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
       if((cipher_offset+cipher_len) <= total_len) {
+	u_int8_t safari_ciphers = 0;
+
 	for(i=0; i<cipher_len;) {
 	  u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
 
@@ -1407,23 +1409,40 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  printf("Client TLS [cipher suite: %u/0x%04X] [%d/%u]\n", ntohs(*id), ntohs(*id), i, cipher_len);
 #endif
 	  if((*id == 0) || (packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1])) {
+	    u_int16_t cipher_id = ntohs(*id);
 	    /*
 	      Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
 	      https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
 	    */
 
 	    if(ja3.client.num_cipher < MAX_NUM_JA3)
-	      ja3.client.cipher[ja3.client.num_cipher++] = ntohs(*id);
+	      ja3.client.cipher[ja3.client.num_cipher++] = cipher_id;
 	    else {
 	      invalid_ja3 = 1;
 #ifdef DEBUG_TLS
 	      printf("Client TLS Invalid cipher %u\n", ja3.client.num_cipher);
 #endif
 	    }
+
+	    switch(cipher_id) {
+	    case 0x00c008: /* TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA */
+	    case 0x00C023: /* TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 */
+	    case 0x00C024: /* TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 */
+	    case 0x00c012: /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
+	    case 0x00C027: /* TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 */
+	    case 0x00C028: /* TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 */
+	    case 0x00003C: /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
+	    case 0x00003D: /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
+	      safari_ciphers++;
+	      break;
+	    }
 	  }
 
 	  i += 2;
-	}
+	} /* for */
+
+	if(safari_ciphers >= 6)
+	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
       } else {
 	invalid_ja3 = 1;
 #ifdef DEBUG_TLS
@@ -1622,16 +1641,31 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		s_offset += 2;
 		tot_signature_algorithms_len = ndpi_min((sizeof(ja3.client.signature_algorithms) / 2) - 1, tot_signature_algorithms_len);
 
+#ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
+		flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms = ndpi_min(tot_signature_algorithms_len, MAX_NUM_TLS_SIGNATURE_ALGORITHMS);
+
+		memcpy(flow->protos.tls_quic_stun.tls_quic.client_signature_algorithms,
+		       &packet->payload[s_offset], 2 /* 16 bit */*flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms);
+#endif
+
+
 		for(i=0; i<tot_signature_algorithms_len; i++) {
 		  int rc = snprintf(&ja3.client.signature_algorithms[i*2], sizeof(ja3.client.signature_algorithms)-i*2, "%02X", packet->payload[s_offset+i]);
 
-		  if(flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms < MAX_NUM_TLS_SIGNATURE_ALGORITHMS) {
-		    if(flow->protos.tls_quic_stun.tls_quic.client_signature_algorithms[flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms])
-		      flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms++;
-		  }
-		  
 		  if(rc < 0) break;
 		}
+
+		for(i=0; i<tot_signature_algorithms_len; i+=2) {
+		  u_int16_t cipher_id = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
+
+		  // printf("=>> %04X\n", cipher_id);
+
+		  if(cipher_id == 0x0603 /* ECDSA_SECP521R1_SHA512 */) {
+		    flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls = 1;
+		    break;
+		  }
+		}
+
 
 		ja3.client.signature_algorithms[i*2] = '\0';
 
