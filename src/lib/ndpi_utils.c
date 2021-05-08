@@ -1788,7 +1788,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
 /* ******************************************************************** */
 
-const ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
+ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
   switch(risk) {
   case NDPI_NO_RISK:
   case NDPI_MAX_RISK:
@@ -1831,6 +1831,10 @@ const ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
   case NDPI_BINARY_APPLICATION_TRANSFER:
     return(NDPI_RISK_SEVERE);
   }
+
+  /* We have added all possible ndpi_risk_enum values in the switch,
+     but the compiler complains anyway... Try to silence it */
+  return(NDPI_RISK_LOW);
 }
 
 /* ******************************************************************** */
