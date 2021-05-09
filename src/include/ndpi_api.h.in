@@ -1501,7 +1501,7 @@ extern "C" {
   void ndpi_serialize_risk(ndpi_serializer *serializer, struct ndpi_flow_struct *flow);
 
   const char* ndpi_risk2str(ndpi_risk_enum risk);
-  const ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk);
+  ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk);
   
   /* ******************************* */
 
