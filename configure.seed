@@ -76,7 +76,10 @@ if test -d ".git" || test -f ".git" ; then :
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
      GIT_DATE=`date -u -r CHANGELOG.md`
-     NDPI_API_VERSION=`date +%s | cut -c7-10`
+     if test -z "$SOURCE_DATE_EPOCH" ; then :
+         SOURCE_DATE_EPOCH=`date +%s`
+     fi
+     NDPI_API_VERSION=`echo $SOURCE_DATE_EPOCH | cut -c7-10`
 fi
 
 NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
