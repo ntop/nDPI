@@ -66,6 +66,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     free(pcap_path);
     return 0;
   }
+  if (ndpi_is_datalink_supported(pcap_datalink(pkts)) == 0)
+  {
+    /* Do not fail if the datalink type is not supported (may happen often during fuzzing). */
+    pcap_close(pkts);
+    remove(pcap_path);
+    free(pcap_path);
+    return 0;
+  }
   struct ndpi_workflow * workflow = ndpi_workflow_init(prefs, pkts);
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);
