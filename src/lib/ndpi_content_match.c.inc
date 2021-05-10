@@ -9419,7 +9419,13 @@ static ndpi_protocol_match host_match[] =
    { "dssott.com",                             "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { "disneyplus.com.ssl.sc.omtrdc.net",       "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { "search-api-disney.bamgrid.com",          "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   
 
+   /*
+     Activision
+    */
+   { "activision.",           "Activision",        NDPI_PROTOCOL_ACTIVISION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
+   { ".activision.com",       "Activision",        NDPI_PROTOCOL_ACTIVISION, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE }
   };
 
