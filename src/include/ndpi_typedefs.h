@@ -114,6 +114,11 @@ typedef enum {
   NDPI_RISK_SEVERE
 } ndpi_risk_severity;
 
+#define NDPI_SCORE_RISK_LOW      10
+#define NDPI_SCORE_RISK_MEDIUM   50
+#define NDPI_SCORE_RISK_HIGH    100
+#define NDPI_SCORE_RISK_SEVERE  250
+
 /* NDPI_VISIT */
 typedef enum {
    ndpi_preorder,

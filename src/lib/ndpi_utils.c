@@ -1839,6 +1839,39 @@ ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
 
 /* ******************************************************************** */
 
+u_int16_t ndpi_risk2score(ndpi_risk_enum risk) {
+  u_int16_t score = 0;
+  u_int32_t i;
+  
+  for(i = 0; i < NDPI_MAX_RISK; i++) {
+    ndpi_risk_enum r = (ndpi_risk_enum)i;
+    
+    if(NDPI_ISSET_BIT(risk, r)) {
+      switch(ndpi_risk2severity(r)) {
+      case NDPI_RISK_LOW:
+	score += NDPI_SCORE_RISK_LOW;
+	break;
+
+      case NDPI_RISK_MEDIUM:
+	score += NDPI_SCORE_RISK_MEDIUM;
+	break;
+
+      case NDPI_RISK_HIGH:
+	score += NDPI_SCORE_RISK_HIGH;
+	break;
+
+      case NDPI_RISK_SEVERE:
+	score += NDPI_SCORE_RISK_SEVERE;
+	break;
+      }
+    }
+  }
+
+  return(score);
+}
+
+/* ******************************************************************** */
+
 const char* ndpi_http_method2str(ndpi_http_method m) {
   switch(m) {
   case NDPI_HTTP_METHOD_UNKNOWN: break;

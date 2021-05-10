@@ -181,6 +181,7 @@ struct ndpi_packet_trailer {
   u_int32_t magic; /* WIRESHARK_NTOP_MAGIC */
   u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
   ndpi_risk flow_risk;
+  u_int16_t flow_score;
   char name[16];
 } PACK_OFF;
 
@@ -3294,6 +3295,7 @@ static void ndpi_process_packet(u_char *args,
     memset(trailer, 0, sizeof(struct ndpi_packet_trailer));
     trailer->magic = htonl(WIRESHARK_NTOP_MAGIC);
     trailer->flow_risk = htonl64(flow_risk);
+    trailer->flow_score = htons(ndpi_risk2score(flow_risk));
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];

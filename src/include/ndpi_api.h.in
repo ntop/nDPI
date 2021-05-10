@@ -1502,6 +1502,7 @@ extern "C" {
 
   const char* ndpi_risk2str(ndpi_risk_enum risk);
   ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk);
+  u_int16_t ndpi_risk2score(ndpi_risk_enum risk);
   
   /* ******************************* */
 
