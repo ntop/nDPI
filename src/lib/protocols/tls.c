@@ -497,8 +497,20 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		  if(matched_name == 0) {
 		    if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0')
 		      matched_name = 1;	/* No SNI */
-		    else if((dNSName[0] == '*') && strstr(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, &dNSName[1]))
-		      matched_name = 1;
+		    else if (dNSName[0] == '*')
+		    {
+		      char * label = strstr(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, &dNSName[1]);
+
+		      if (label != NULL)
+		      {
+		        char * first_dot = strchr(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, '.');
+
+		        if (first_dot == NULL || first_dot >= label)
+		        {
+		          matched_name = 1;
+		        }
+		      }
+		    }
 		    else if(strcmp(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, dNSName) == 0)
 		      matched_name = 1;
 		  }
