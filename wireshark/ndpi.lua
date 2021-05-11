@@ -28,7 +28,7 @@ ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndp
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
 ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64)
 ndpi_fds.flow_risk_str        = ProtoField.new("nDPI Flow Risk String", "ndpi.flow_risk_str", ftypes.STRING)
-ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT32)
+ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_score", ftypes.UINT32)
 
 local ntop_proto = Proto("ntop", "ntop Extensions")
 ntop_proto.fields = {}
