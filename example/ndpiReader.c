@@ -3176,7 +3176,7 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
       char filename[256] = { 0 };
 
       if(strstr((char*)pcap_file, (char*)".pcap"))
-	printf("ERROR: could not open pcap file %s: %s\n", pcap_file, pcap_error_buffer);
+	printf("ERROR: could not open pcap file: %s\n", pcap_error_buffer);
 
       /* Trying to open as a playlist as last attempt */
       else if((getNextPcapFileFromPlaylist(thread_id, filename, sizeof(filename)) != 0)
@@ -3357,7 +3357,8 @@ static void runPcapLoop(u_int16_t thread_id) {
       printf("Unsupported datalink %d. Skip pcap\n", datalink_type);
       return;
     }
-    if(pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id) < 0)
+    int ret = pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id);
+    if (ret == -1)
       printf("Error while reading pcap file: '%s'\n", pcap_geterr(ndpi_thread_info[thread_id].workflow->pcap_handle));
   }
 }
