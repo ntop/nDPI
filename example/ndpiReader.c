@@ -1480,6 +1480,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 #ifdef EURISTICS_CODE
   if(flow->ssh_tls.browser_euristics.is_safari_tls)  fprintf(out, "[Safari]");
   if(flow->ssh_tls.browser_euristics.is_firefox_tls) fprintf(out, "[Firefox]");
+  if(flow->ssh_tls.browser_euristics.is_chrome_tls)  fprintf(out, "[Chrome]");
 #endif
   
   if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {

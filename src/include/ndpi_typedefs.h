@@ -1221,7 +1221,7 @@ struct tls_euristics {
     TLS euristics for detecting browsers usage
     NOTE: expect false positives
   */
-  u_int8_t is_safari_tls:1, is_firefox_tls:1, notused:6;
+  u_int8_t is_safari_tls:1, is_firefox_tls:1, is_chrome_tls:1, notused:5;
 };
 
 /*

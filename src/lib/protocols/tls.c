@@ -1413,7 +1413,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
       if((cipher_offset+cipher_len) <= total_len) {
-	u_int8_t safari_ciphers = 0;
+	u_int8_t safari_ciphers = 0, chrome_ciphers = 0;
 
 	for(i=0; i<cipher_len;) {
 	  u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
@@ -1440,25 +1440,37 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    switch(cipher_id) {
 	    case TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:
 	    case TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
-	    case TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
-	    case TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:
-	    case TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:
-	    case TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:
-	    case TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:
-	    case TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:
-	    case TLS_RSA_WITH_AES_128_CBC_SHA:
-	    case TLS_RSA_WITH_AES_128_GCM_SHA256:
-	    case TLS_RSA_WITH_AES_256_CBC_SHA:
-	    case TLS_RSA_WITH_AES_256_GCM_SHA384:
 	      safari_ciphers++;
+	      break;
+	      
+	    case TLS_CIPHER_GREASE_RESERVED_0:
+	    case TLS_AES_128_GCM_SHA256:
+	    case TLS_AES_256_GCM_SHA384:
+	    case TLS_CHACHA20_POLY1305_SHA256:
+	      chrome_ciphers++;
+	      break;
+
+	    case TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
+	    case TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:
+	    case TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:	
+	    case TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:
+	    case TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:
+	    case TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:
+	    case TLS_RSA_WITH_AES_128_CBC_SHA:
+	    case TLS_RSA_WITH_AES_256_CBC_SHA:
+	    case TLS_RSA_WITH_AES_128_GCM_SHA256:
+	    case TLS_RSA_WITH_AES_256_GCM_SHA384:	 
+	      safari_ciphers++, chrome_ciphers++;
 	      break;
 	    }
 	  }
 
 	  i += 2;
 	} /* for */
-	
-	if(safari_ciphers == 12)
+
+	if(chrome_ciphers == 13)
+	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 1;
+	else if(safari_ciphers == 12)
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
       } else {
 	invalid_ja3 = 1;
@@ -1648,7 +1660,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		}
 	      } else if(extension_id == 13 /* signature algorithms */) {
-		u_int16_t s_offset = offset+extension_offset, safari_signature_algorithms = 0;
+		u_int16_t s_offset = offset+extension_offset, safari_signature_algorithms = 0, chrome_signature_algorithms = 0;
 		u_int16_t tot_signature_algorithms_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 
 #ifdef DEBUG_TLS
@@ -1689,15 +1701,21 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  case RSA_PSS_RSAE_SHA256:
 		  case RSA_PSS_RSAE_SHA384:
 		  case RSA_PSS_RSAE_SHA512:
-		    safari_signature_algorithms++;
+		    chrome_signature_algorithms++, safari_signature_algorithms++;
 		    break;
 		  }
 		}
 
-		if((safari_signature_algorithms != 8)
-		   || flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls)
-		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
-		  
+		if(flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls)
+		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0,
+		    flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
+
+		if(safari_signature_algorithms != 8)
+		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
+
+		if(chrome_signature_algorithms != 8)
+		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
+		
 		ja3.client.signature_algorithms[i*2] = '\0';
 
 #ifdef DEBUG_TLS
