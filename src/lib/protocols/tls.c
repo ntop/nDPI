@@ -25,6 +25,7 @@
 #include "ndpi_api.h"
 #include "ndpi_md5.h"
 #include "ndpi_sha1.h"
+#include "ndpi_encryption.h"
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1437,14 +1438,18 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    }
 
 	    switch(cipher_id) {
-	    case 0x00c008: /* TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA */
-	    case 0x00C023: /* TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 */
-	    case 0x00C024: /* TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 */
-	    case 0x00c012: /* TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA */
-	    case 0x00C027: /* TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 */
-	    case 0x00C028: /* TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 */
-	    case 0x00003C: /* TLS_RSA_WITH_AES_128_CBC_SHA256 */
-	    case 0x00003D: /* TLS_RSA_WITH_AES_256_CBC_SHA256 */
+	    case TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:
+	    case TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
+	    case TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
+	    case TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:
+	    case TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:
+	    case TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:
+	    case TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:
+	    case TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:
+	    case TLS_RSA_WITH_AES_128_CBC_SHA:
+	    case TLS_RSA_WITH_AES_128_GCM_SHA256:
+	    case TLS_RSA_WITH_AES_256_CBC_SHA:
+	    case TLS_RSA_WITH_AES_256_GCM_SHA384:
 	      safari_ciphers++;
 	      break;
 	    }
@@ -1452,8 +1457,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  i += 2;
 	} /* for */
-
-	if(safari_ciphers >= 6)
+	
+	if(safari_ciphers == 12)
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
       } else {
 	invalid_ja3 = 1;
@@ -1643,7 +1648,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		}
 	      } else if(extension_id == 13 /* signature algorithms */) {
-		u_int16_t s_offset = offset+extension_offset;
+		u_int16_t s_offset = offset+extension_offset, safari_signature_algorithms = 0;
 		u_int16_t tot_signature_algorithms_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 
 #ifdef DEBUG_TLS
@@ -1660,25 +1665,39 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		       &packet->payload[s_offset], 2 /* 16 bit */*flow->protos.tls_quic_stun.tls_quic.num_tls_signature_algorithms);
 #endif
 
-
 		for(i=0; i<tot_signature_algorithms_len; i++) {
 		  int rc = snprintf(&ja3.client.signature_algorithms[i*2], sizeof(ja3.client.signature_algorithms)-i*2, "%02X", packet->payload[s_offset+i]);
 
 		  if(rc < 0) break;
 		}
-
+		
 		for(i=0; i<tot_signature_algorithms_len; i+=2) {
 		  u_int16_t cipher_id = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
 		  // printf("=>> %04X\n", cipher_id);
 
-		  if(cipher_id == 0x0603 /* ECDSA_SECP521R1_SHA512 */) {
+		  switch(cipher_id) {
+		  case ECDSA_SECP521R1_SHA512:
 		    flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls = 1;
+		    break;
+
+		  case ECDSA_SECP256R1_SHA256:
+		  case ECDSA_SECP384R1_SHA384:
+		  case RSA_PKCS1_SHA256:
+		  case RSA_PKCS1_SHA384:
+		  case RSA_PKCS1_SHA512:
+		  case RSA_PSS_RSAE_SHA256:
+		  case RSA_PSS_RSAE_SHA384:
+		  case RSA_PSS_RSAE_SHA512:
+		    safari_signature_algorithms++;
 		    break;
 		  }
 		}
 
-
+		if((safari_signature_algorithms != 8)
+		   || flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls)
+		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
+		  
 		ja3.client.signature_algorithms[i*2] = '\0';
 
 #ifdef DEBUG_TLS
