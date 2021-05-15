@@ -41,7 +41,7 @@ struct netbios_header {
 int ndpi_netbios_name_interpret(char *in, size_t in_len, char *out, u_int out_len) {
   u_int ret = 0, len, idx = in_len, out_idx = 0;
 
-  len = (*in++)/2;
+  len = (*in++)/2, in_len--;
   out_len--;
   out[out_idx] = 0;
 

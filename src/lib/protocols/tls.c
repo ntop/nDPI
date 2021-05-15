@@ -1369,34 +1369,36 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	i += 4 + extension_len, offset += 4 + extension_len;
       } /* for */
 
-      ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.server.tls_handshake_version);
+      ja3_str_len = snprintf(ja3_str, JA3_STR_LEN, "%u,", ja3.server.tls_handshake_version);
 
-      for(i=0; i<ja3.server.num_cipher; i++) {
-	rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.server.cipher[i]);
+      for(i=0; (i<ja3.server.num_cipher) && (JA3_STR_LEN > ja3_str_len); i++) {
+	rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.server.cipher[i]);
 
 	if(rc <= 0) break; else ja3_str_len += rc;
       }
 
-      rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
-      if(rc > 0 && ja3_str_len + rc < JA3_STR_LEN) ja3_str_len += rc;
-
+      if(JA3_STR_LEN > ja3_str_len) {
+	rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, ",");
+	if(rc > 0 && ja3_str_len + rc < JA3_STR_LEN) ja3_str_len += rc;
+      }
+      
       /* ********** */
 
-      for(i=0; i<ja3.server.num_tls_extension; i++) {
-	int rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.server.tls_extension[i]);
+      for(i=0; (i<ja3.server.num_tls_extension) && (JA3_STR_LEN > ja3_str_len); i++) {
+	int rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, "%s%u", (i > 0) ? "-" : "", ja3.server.tls_extension[i]);
 
 	if(rc <= 0) break; else ja3_str_len += rc;
       }
 
       if(ndpi_struct->enable_ja3_plus) {
-	for(i=0; i<ja3.server.num_elliptic_curve_point_format; i++) {
-	  rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+	for(i=0; (i<ja3.server.num_elliptic_curve_point_format) && (JA3_STR_LEN > ja3_str_len); i++) {
+	  rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, "%s%u",
 			(i > 0) ? "-" : "", ja3.server.elliptic_curve_point_format[i]);
 	  if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc; else break;
 	}
 
-	if(ja3.server.alpn[0] != '\0') {
-	  rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",%s", ja3.server.alpn);
+	if((ja3.server.alpn[0] != '\0') && (JA3_STR_LEN > ja3_str_len)) {
+	  rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, ",%s", ja3.server.alpn);
 	  if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc;
 	}
 
@@ -1982,47 +1984,47 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      int rc;
 
 	    compute_ja3c:
-	      ja3_str_len = snprintf(ja3_str, sizeof(ja3_str), "%u,", ja3.client.tls_handshake_version);
+	      ja3_str_len = snprintf(ja3_str, JA3_STR_LEN, "%u,", ja3.client.tls_handshake_version);
 
 	      for(i=0; i<ja3.client.num_cipher; i++) {
-		rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+		rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, "%s%u",
 			      (i > 0) ? "-" : "", ja3.client.cipher[i]);
 		if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc; else break;
 	      }
 
-	      rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+	      rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, ",");
 	      if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc;
 
 	      /* ********** */
 
 	      for(i=0; i<ja3.client.num_tls_extension; i++) {
-		rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+		rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, "%s%u",
 			      (i > 0) ? "-" : "", ja3.client.tls_extension[i]);
 		if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc; else break;
 	      }
 
-	      rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+	      rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, ",");
 	      if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc;
 
 	      /* ********** */
 
 	      for(i=0; i<ja3.client.num_elliptic_curve; i++) {
-		rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+		rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, "%s%u",
 			      (i > 0) ? "-" : "", ja3.client.elliptic_curve[i]);
 		if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc; else break;
 	      }
 
-	      rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, ",");
+	      rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, ",");
 	      if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc;
 
 	      for(i=0; i<ja3.client.num_elliptic_curve_point_format; i++) {
-		rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len, "%s%u",
+		rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, "%s%u",
 			      (i > 0) ? "-" : "", ja3.client.elliptic_curve_point_format[i]);
 		if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc; else break;
 	      }
 
 	      if(ndpi_struct->enable_ja3_plus) {
-		rc = snprintf(&ja3_str[ja3_str_len], sizeof(ja3_str)-ja3_str_len,
+		rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len,
 			      ",%s,%s,%s", ja3.client.signature_algorithms, ja3.client.supported_versions, ja3.client.alpn);
 		if((rc > 0) && (ja3_str_len + rc < JA3_STR_LEN)) ja3_str_len += rc;
 	      }
