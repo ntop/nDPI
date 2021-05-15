@@ -455,6 +455,14 @@ extern "C" {
   /**
    * Check if the string content passed match with a protocol
    *
+   * @par    flow                = the flow where match the host
+   * @par    subprotocol_id      = subprotocol id
+   */
+  void ndpi_check_subprotocol_risk(struct ndpi_flow_struct *flow, u_int16_t subprotocol_id);
+
+  /**
+   * Check if the string content passed match with a protocol
+   *
    * @par    ndpi_struct         = the detection module
    * @par    flow                = the flow where match the host
    * @par    string_to_match     = the string to match
