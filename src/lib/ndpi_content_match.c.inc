@@ -9432,11 +9432,12 @@ static ndpi_protocol_match host_match[] =
 /* ******************************************************************** */
 
 static ndpi_tls_cert_name_match tls_certificate_match [] = {
-  { "CN=AnyDesk Client",               NDPI_PROTOCOL_ANYDESK   },
-  { "O=Kakao",                         NDPI_PROTOCOL_KAKAOTALK },
-  { "O=ntop.org",                      NDPI_PROTOCOL_NTOP      },
-  { "CN=simplednscrypt.org",           NDPI_PROTOCOL_DNSCRYPT  },
-  { "CN=*.gateway.messenger.live.com", NDPI_PROTOCOL_SKYPE     },
+  { "CN=AnyDesk Client",               NDPI_PROTOCOL_ANYDESK     },
+  { "O=Kakao",                         NDPI_PROTOCOL_KAKAOTALK   },
+  { "O=ntop.org",                      NDPI_PROTOCOL_NTOP        },
+  { "CN=simplednscrypt.org",           NDPI_PROTOCOL_DNSCRYPT    },
+  { "CN=*.gateway.messenger.live.com", NDPI_PROTOCOL_SKYPE       },
+  { "OU=FortiGate",                    NDPI_PROTOCOL_FORTICLIENT },
 
   { NULL, 0 }
 };

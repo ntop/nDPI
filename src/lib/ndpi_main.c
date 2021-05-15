@@ -1632,6 +1632,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Activision", NDPI_PROTOCOL_CATEGORY_GAME,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_FORTICLIENT,
+			  "FortiClient", NDPI_PROTOCOL_CATEGORY_VPN,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2561,6 +2565,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->stun_cache)
       ndpi_lru_free_cache(ndpi_str->stun_cache);
+
+    if(ndpi_str->tls_cert_cache)
+      ndpi_lru_free_cache(ndpi_str->tls_cert_cache);
 
     if(ndpi_str->mining_cache)
       ndpi_lru_free_cache(ndpi_str->mining_cache);
@@ -6750,6 +6757,16 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       ret_match->protocol_breed = NDPI_PROTOCOL_UNRATED;
 
     return(NDPI_PROTOCOL_UNKNOWN);
+  }
+
+  /* ****************************************************** */
+  
+  void ndpi_check_subprotocol_risk(struct ndpi_flow_struct *flow, u_int16_t subprotocol_id) {
+    switch(subprotocol_id) {
+    case NDPI_PROTOCOL_ANYDESK:
+      ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+      break;
+    }
   }
 
   /* ****************************************************** */

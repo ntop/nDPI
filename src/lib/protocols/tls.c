@@ -297,6 +297,31 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 
 /* **************************************** */
 
+static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow) {
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+    /* Subprotocol not yet set */
+
+    if(ndpi_struct->tls_cert_cache && flow->packet.iph) {
+      u_int32_t key = flow->packet.iph->daddr + flow->packet.tcp->dest;
+      u_int16_t cached_proto;
+
+      if(ndpi_lru_find_cache(ndpi_struct->tls_cert_cache, key,
+			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
+	ndpi_protocol ret = { NDPI_PROTOCOL_TLS, cached_proto, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
+
+	flow->detected_protocol_stack[0] = cached_proto,
+	flow->detected_protocol_stack[1] = NDPI_PROTOCOL_TLS;
+
+	flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+	ndpi_check_subprotocol_risk(flow, cached_proto);
+      }
+    }
+  }
+}
+
+/* **************************************** */
+
 /* See https://blog.catchpoint.com/2017/05/12/dissecting-tls-using-wireshark/ */
 static void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow,
@@ -569,11 +594,23 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 				       rdnSeqBuf, strlen(rdnSeqBuf),&proto_id);
 
       if(rc == 0) {
+	/* Match found */
+	ndpi_protocol ret = { NDPI_PROTOCOL_TLS, proto_id, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
+
 	flow->detected_protocol_stack[0] = proto_id,
 	  flow->detected_protocol_stack[1] = NDPI_PROTOCOL_TLS;
 
-	if(proto_id == NDPI_PROTOCOL_ANYDESK)
-	  ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+	flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+	ndpi_check_subprotocol_risk(flow, proto_id);
+
+	if(ndpi_struct->tls_cert_cache == NULL)
+	  ndpi_struct->tls_cert_cache = ndpi_lru_cache_init(1024);
+
+	if(ndpi_struct->tls_cert_cache && flow->packet.iph) {
+	  u_int32_t key = flow->packet.iph->daddr + flow->packet.tcp->dest;
+
+	  ndpi_lru_add_to_cache(ndpi_struct->tls_cert_cache, key, proto_id);
+	}
       }
     }
   }
@@ -736,6 +773,8 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
        && (packet->payload[0] == 0x02 /* Server Hello */)) {
       flow->l4.tcp.tls.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
     }
+
+    checkTLSSubprotocol(ndpi_struct, flow);
     break;
 
   case 0x0b: /* Certificate */
@@ -1442,7 +1481,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    case TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
 	      safari_ciphers++;
 	      break;
-	      
+
 	    case TLS_CIPHER_GREASE_RESERVED_0:
 	    case TLS_AES_128_GCM_SHA256:
 	    case TLS_AES_256_GCM_SHA384:
@@ -1452,14 +1491,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    case TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
 	    case TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:
-	    case TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:	
+	    case TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:
 	    case TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:
 	    case TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:
 	    case TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:
 	    case TLS_RSA_WITH_AES_128_CBC_SHA:
 	    case TLS_RSA_WITH_AES_256_CBC_SHA:
 	    case TLS_RSA_WITH_AES_128_GCM_SHA256:
-	    case TLS_RSA_WITH_AES_256_GCM_SHA384:	 
+	    case TLS_RSA_WITH_AES_256_GCM_SHA384:
 	      safari_ciphers++, chrome_ciphers++;
 	      break;
 	    }
@@ -1682,7 +1721,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  if(rc < 0) break;
 		}
-		
+
 		for(i=0; i<tot_signature_algorithms_len; i+=2) {
 		  u_int16_t cipher_id = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
@@ -1715,7 +1754,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if(chrome_signature_algorithms != 8)
 		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
-		
+
 		ja3.client.signature_algorithms[i*2] = '\0';
 
 #ifdef DEBUG_TLS
