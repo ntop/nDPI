@@ -236,10 +236,6 @@ if test "${with_maxminddb+set}" = set; then :
   fi
 fi
 
-dnl> TCP segments management (buffer, sort and reassembly the segments)
-dnl> FRAG_MAN_ENABLED=1
-dnl> AC_DEFINE_UNQUOTED(FRAG_MAN, ${FRAG_MAN_ENABLED}, [Enable the TCP segments fragmentation management])
-
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/dga/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_FILES([tests/do_valgrind.sh], [chmod +x tests/do_valgrind.sh])

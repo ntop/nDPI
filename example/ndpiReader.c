@@ -4244,7 +4244,7 @@ int original_main(int argc, char **argv) {
 #else
   int main(int argc, char **argv) {
 #endif
-    int i;
+    int i, skip_unit_tests = 0;
 
 #ifdef DEBUG_TRACE
     trace = fopen("/tmp/ndpiReader.log", "a");
@@ -4266,37 +4266,39 @@ int original_main(int argc, char **argv) {
       return(-1);
     }
 
+    if(!skip_unit_tests) {
 #ifndef DEBUG_TRACE
-    /* Skip tests when debugging */
+      /* Skip tests when debugging */
 
 #ifdef HW_TEST
-    hwUnitTest2();
+      hwUnitTest2();
 #endif
 
 #ifdef STRESS_TEST
-    desUnitStressTest();
-    exit(0);
+      desUnitStressTest();
+      exit(0);
 #endif
 
-    sesUnitTest();
-    desUnitTest();
+      sesUnitTest();
+      desUnitTest();
 
-    /* Internal checks */
-    // binUnitTest();
-    //hwUnitTest();
-    jitterUnitTest();
-    rsiUnitTest();
-    hashUnitTest();
-    dgaUnitTest();
-    hllUnitTest();
-    bitmapUnitTest();
-    automataUnitTest();
-    analyzeUnitTest();
-    ndpi_self_check_host_match();
-    analysisUnitTest();
-    rulesUnitTest();
+      /* Internal checks */
+      // binUnitTest();
+      //hwUnitTest();
+      jitterUnitTest();
+      rsiUnitTest();
+      hashUnitTest();
+      dgaUnitTest();
+      hllUnitTest();
+      bitmapUnitTest();
+      automataUnitTest();
+      analyzeUnitTest();
+      ndpi_self_check_host_match();
+      analysisUnitTest();
+      rulesUnitTest();
 #endif
-
+    }
+    
     gettimeofday(&startup_time, NULL);
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 

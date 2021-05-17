@@ -68,11 +68,6 @@ static void (*_ndpi_flow_free)(void *ptr);
 static void *(*_ndpi_malloc)(size_t size);
 static void (*_ndpi_free)(void *ptr);
 
-#ifdef FRAG_MAN
-extern void add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph);
-extern uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph);
-#endif // FRAG_MAN
-
 /* ****************************************** */
 
 /* Forward */
@@ -3925,35 +3920,6 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
 }
 
 static u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
-
-#ifdef FRAG_MAN
-  /*
-    the logic has been inverted!!! returned value:
-    0: not fragmented (instead of fragmented)
-    1: packet too small
-    2: fragmented and last, reassemble
-    3: fragmented but not the last, add to buffer
-  */
-  u_int16_t tot_len = ntohs(iph->tot_len);
-  if( ipsize < iph->ihl * 4 || ipsize < tot_len || tot_len < iph->ihl * 4 )
-    // packet too small
-    return(1);
-  else if((iph->frag_off & htons(0x2000)) != 0) {
-    // MF=1 : this is a fragment and not the last -> add to buffer
-    //printf("DBG(ndpi_iph_is_valid_and_not_fragmented): ipv4 fragment and not the last! (off=%u) \n", (htons(iph->frag_off) & 0x1FFF)<<3);
-
-    // MUST add to buffer
-    return(3);
-  } else if((iph->frag_off & htons(0x1FFF)) != 0) {
-    // MF=0, this is (a fragment, but) the last fragment!
-    //printf("DBG(ndpi_iph_is_valid_and_not_fragmented): ipv4 fragment and the last! (0ff=%u) \n", (htons(iph->frag_off) & 0x1FFF)<<3);
-
-    // MUST to reassemble the packet!
-    return(2);
-  }
-  return (0);
-
-#else // FRAG_MAN
   /*
     returned value:
     0: fragmented
@@ -3967,14 +3933,11 @@ static u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *ip
   //#endif
 
   return(1);
-
-#endif // FRAG_MAN
 }
 
 /*
   extract the l4 payload, if available
   returned value:
-  FRAG_MAN
   0: ok, extracted
   1: packet too small
   2,3: fragmented, ....
@@ -4016,26 +3979,6 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     return(1);
   }
 
-#ifdef FRAG_MAN
-  if(iph != NULL) {
-    u_int8_t check4Frag = ndpi_iph_is_valid_and_not_fragmented(iph, l3_len);
-    /* 0: not fragmented; 1: too small; 2,3: fragmented */
-    if(!check4Frag) {
-      u_int16_t len = ntohs(iph->tot_len);
-      u_int16_t hlen = (iph->ihl * 4);
-
-      l4ptr = (((const u_int8_t *) iph) + hlen);
-
-      if(len == 0)
-        len = l3_len;
-
-      l4len = (len > hlen) ? (len - hlen) : 0;
-      l4protocol = iph->protocol;
-    }
-    else
-      return check4Frag;
-  }
-#else //FRAGMAN
   /* 0: fragmented; 1: not fragmented */
   if(iph != NULL && ndpi_iph_is_valid_and_not_fragmented(iph, l3_len)) {
     u_int16_t len = ntohs(iph->tot_len);
@@ -4049,7 +3992,6 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     l4len = (len > hlen) ? (len - hlen) : 0;
     l4protocol = iph->protocol;
   }
-#endif //FRAGMAN
 
   else if(iph_v6 != NULL && (l3_len - sizeof(struct ndpi_ipv6hdr)) >= ntohs(iph_v6->ip6_hdr.ip6_un1_plen)) {
     l4ptr = (((const u_int8_t *) iph_v6) + sizeof(struct ndpi_ipv6hdr));
@@ -4134,10 +4076,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
         if(flow->l4_proto == IPPROTO_TCP) {
             if(flow->l4.tcp.tls.message.buffer)
                 ndpi_free(flow->l4.tcp.tls.message.buffer);
-#ifdef FRAG_MAN
-            free_fragment(&flow->tcp_segments_list[0]);
-            free_fragment(&flow->tcp_segments_list[1]);
-#endif
         }
     }
 }
@@ -4237,16 +4175,6 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
         flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
         flow->l4_proto = IPPROTO_TCP;
 
-#ifdef FRAG_MAN
-        /* initialize the buffer to manage segments for a new http/dns connection */
-        flow->tcp_segments_management=1;
-        for(int i=0; i<2; i++ ) {
-          // reset counter tcp segments management lists
-          flow->tcp_segments_list[i].ct_frag=0;
-        }
-#endif // FRAG_MAN
-
-
         NDPI_LOG_DBG(ndpi_str, "tcp syn packet for unknown protocol, reset detection state\n");
       }
     } else {
@@ -4270,19 +4198,11 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 
 /* ************************************************ */
 
-#ifdef FRAG_MAN
-uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
-				 struct ndpi_flow_struct *flow) {
-#else // FRAG_MAN
+
   void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 				struct ndpi_flow_struct *flow) {
-#endif // FRAG_MAN
     if(!flow) {
-#ifdef FRAG_MAN
-      return 0;
-#else // FRAG_MAN
       return;
-#endif // FRAG_MAN
     } else {
       /* const for gcc code optimization and cleaner code */
       struct ndpi_packet_struct *packet = &flow->packet;
@@ -4330,15 +4250,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	       flow->l4.tcp.seen_ack == 0) {
 	      flow->l4.tcp.seen_ack = 1;
 	    }
-
-#ifdef FRAG_MAN
-	// check sequence, if there is missing packet, add it to buffer
-	if( check_for_sequence(flow, tcph) ) {
-	  // if here added segment to list for next elaboration
-	  // and skip extra processing for after...
-	  return 0;
-	}
-#endif //FRAG_MAN
 
 	if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0) ||
 	   (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0)) {
@@ -4414,9 +4325,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	flow->byte_counter[packet->packet_direction] += packet->payload_packet_len;
       }
     }
-#ifdef FRAG_MAN
-    return 1;
-#endif // FRAG_MAN
   }
 
   /* ************************************************ */
@@ -4764,11 +4672,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     /* detect traffic for tcp or udp only */
     flow->src = src, flow->dst = dst;
 
-#ifdef FRAG_MAN
-    if( ndpi_connection_tracking(ndpi_str, flow) ) {
-#else // FRAG_MAN
       ndpi_connection_tracking(ndpi_str, flow);
-#endif // FRAG_MAN
 
       /* call the extra packet function (which may add more data/info to flow) */
       if(flow->extra_packets_func) {
@@ -4778,12 +4682,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	if(++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)
 	  flow->extra_packets_func = NULL; /* Enough packets detected */
       }
-#ifdef FRAG_MAN
-    }
-#endif // FRAG_MAN
   }
-
-
 
   /* ********************************************************************************* */
 
@@ -5236,7 +5135,7 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 					      struct ndpi_id_struct *src, struct ndpi_id_struct *dst) {
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
     u_int32_t a, num_calls = 0;
-    ndpi_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED };
+    ndpi_protocol ret = { flow->detected_protocol_stack[1], flow->detected_protocol_stack[0], flow->category };
 
     if(ndpi_str->ndpi_log_level >= NDPI_LOG_TRACE)
       NDPI_LOG(flow ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN, ndpi_str, NDPI_LOG_TRACE,
@@ -5253,9 +5152,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     flow->num_processed_pkts++;
-#ifdef FRAG_MAN
-    flow->tcp_segments_management=1;
-#endif // FRAG_MAN
 
     /* Init default */
     ret.master_protocol = flow->detected_protocol_stack[1],
@@ -5442,17 +5338,6 @@ uint8_t ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       flow->fail_with_unknown = 1;
 
   invalidate_ptr:
-#ifdef FRAG_MAN
-    if((flow->must_free[flow->packet.packet_direction] == 1)
-       && (flow->packet.payload_packet_len > 0)
-       && flow->packet.payload) {
-      // if the payload is allocated for segments reassembling, it must be freed
-      ndpi_free((void*)flow->packet.payload);
-      // flow->packet.payload=NULL; done after
-      flow->packet.payload_packet_len = 0;
-      flow->must_free[flow->packet.packet_direction] = 0;
-    }
-#endif // FRAG_MAN
     /*
       Invalidate packet memory to avoid accessing the pointers below
       when the packet is no longer accessible

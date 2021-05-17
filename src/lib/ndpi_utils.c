@@ -235,7 +235,7 @@ u_int8_t ndpi_net_match(u_int32_t ip_to_check,
   u_int32_t mask = 0;
 
   num_bits &= 0x1F; /* Avoid overflows */
-  
+
   mask = ~(~mask >> num_bits);
 
   return(((ip_to_check & mask) == (net & mask)) ? 1 : 0);
@@ -877,7 +877,7 @@ char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
   if(flow != NULL) {
     snprintf(flow->protos.tls_quic_stun.tls_quic.ssl_version_str,
 	     sizeof(flow->protos.tls_quic_stun.tls_quic.ssl_version_str), "TLS (%04X)", version);
-    
+
     return(flow->protos.tls_quic_stun.tls_quic.ssl_version_str);
   } else
     return("");
@@ -1054,14 +1054,14 @@ void ndpi_serialize_risk(ndpi_serializer *serializer,
     u_int32_t i;
 
     ndpi_serialize_start_of_block(serializer, "flow_risk");
-    
+
     for(i = 0; i < NDPI_MAX_RISK; i++) {
       ndpi_risk_enum r = (ndpi_risk_enum)i;
-      
+
       if(NDPI_ISSET_BIT(flow->risk, r))
 	ndpi_serialize_uint32_string(serializer, i, ndpi_risk2str(r));
     }
-    
+
     ndpi_serialize_end_of_block(serializer);
   }
 }
@@ -1077,7 +1077,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   char buf[64];
 
   if(flow == NULL) return(-1);
-  
+
   ndpi_serialize_start_of_block(serializer, "ndpi");
   ndpi_serialize_risk(serializer, flow);
   ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
@@ -1144,7 +1144,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case NDPI_PROTOCOL_KERBEROS:
-    ndpi_serialize_start_of_block(serializer, "kerberos");    
+    ndpi_serialize_start_of_block(serializer, "kerberos");
     ndpi_serialize_string_string(serializer, "hostname", flow->protos.kerberos.hostname);
     ndpi_serialize_string_string(serializer, "domain", flow->protos.kerberos.domain);
     ndpi_serialize_string_string(serializer, "username", flow->protos.kerberos.username);
@@ -1269,21 +1269,21 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
 	if(flow->protos.tls_quic_stun.tls_quic.issuerDN)
 	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic_stun.tls_quic.issuerDN);
-	
+
 	if(flow->protos.tls_quic_stun.tls_quic.subjectDN)
 	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic_stun.tls_quic.subjectDN);
 
 	if(flow->protos.tls_quic_stun.tls_quic.alpn)
 	  ndpi_serialize_string_string(serializer, "alpn", flow->protos.tls_quic_stun.tls_quic.alpn);
-	
+
 	if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
-	  ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);	
-	
+	  ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
+
 	if(flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint[0] != '\0') {
 	  for(i=0, off=0; i<20; i++) {
 	    int rc = snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
 			      flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint[i] & 0xFF);
-	    
+
 	    if(rc <= 0) break; else off += rc;
 	  }
 
@@ -1359,15 +1359,15 @@ const char* ndpi_tunnel2str(ndpi_packet_tunnel tt) {
   case ndpi_no_tunnel:
     return("No-Tunnel");
     break;
-    
+
   case ndpi_gtp_tunnel:
     return("GTP");
     break;
-    
+
   case ndpi_capwap_tunnel:
     return("CAPWAP");
     break;
-    
+
   case ndpi_tzsp_tunnel:
     return("TZSP");
     break;
@@ -1592,7 +1592,7 @@ ndpi_risk_enum ndpi_validate_url(char *url) {
 	if(rc != NDPI_NO_RISK)
 	  break;
       }
-      
+
       str = strtok_r(NULL, "&", &tmp);
     }
   }
@@ -1607,7 +1607,7 @@ ndpi_risk_enum ndpi_validate_url(char *url) {
       rc = NDPI_HTTP_SUSPICIOUS_URL;
     }
   }
-  
+
   return(rc);
 }
 
@@ -1627,7 +1627,7 @@ u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str
 
 const char* ndpi_risk2str(ndpi_risk_enum risk) {
   static char buf[16];
-  
+
   switch(risk) {
   case NDPI_URL_POSSIBLE_XSS:
     return("XSS attack");
@@ -1655,7 +1655,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_TLS_CERTIFICATE_EXPIRED:
     return("TLS Expired Certificate");
-    
+
   case NDPI_TLS_CERTIFICATE_MISMATCH:
     return("TLS Certificate Mismatch");
 
@@ -1670,7 +1670,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_HTTP_SUSPICIOUS_HEADER:
     return("HTTP Suspicious Header");
-    
+
   case NDPI_TLS_NOT_CARRYING_HTTPS:
     return("TLS (probably) not carrying HTTPS");
 
@@ -1685,7 +1685,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER:
     return("SSH Obsolete Server Version/Cipher");
-    
+
   case NDPI_SMB_INSECURE_VERSION:
     return("SMB Insecure Version");
 
@@ -1697,16 +1697,16 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_DNS_SUSPICIOUS_TRAFFIC:
     return("Suspicious DNS traffic"); /* Exfiltration ? */
-    
+
   case NDPI_TLS_MISSING_SNI:
     return("SNI TLS extension was missing");
-    
+
   case NDPI_HTTP_SUSPICIOUS_CONTENT:
     return("HTTP suspicious content");
-    
+
   case NDPI_RISKY_ASN:
     return("Risky ASN");
-    
+
   case NDPI_RISKY_DOMAIN:
     return("Risky domain name");
 
@@ -1758,7 +1758,7 @@ ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
   case NDPI_TLS_MISSING_SNI:
   case NDPI_HTTP_SUSPICIOUS_CONTENT:
   case NDPI_RISKY_ASN:
-  case NDPI_RISKY_DOMAIN:    
+  case NDPI_RISKY_DOMAIN:
     return(NDPI_RISK_MEDIUM);
 
   case NDPI_TLS_CERTIFICATE_EXPIRED:
@@ -1766,7 +1766,7 @@ ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
   case NDPI_HTTP_SUSPICIOUS_URL:
   case NDPI_SUSPICIOUS_DGA_DOMAIN:
     return(NDPI_RISK_HIGH);
-    
+
   case NDPI_URL_POSSIBLE_XSS:
   case NDPI_URL_POSSIBLE_SQL_INJECTION:
   case NDPI_URL_POSSIBLE_RCE_INJECTION:
@@ -1784,10 +1784,10 @@ ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
 u_int16_t ndpi_risk2score(ndpi_risk_enum risk) {
   u_int16_t score = 0;
   u_int32_t i;
-  
+
   for(i = 0; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
-    
+
     if(NDPI_ISSET_BIT(risk, r)) {
       switch(ndpi_risk2severity(r)) {
       case NDPI_RISK_LOW:
@@ -1827,7 +1827,7 @@ const char* ndpi_http_method2str(ndpi_http_method m) {
   case NDPI_HTTP_METHOD_TRACE:   return("TRACE");
   case NDPI_HTTP_METHOD_CONNECT: return("CONNECT");
   }
-  
+
   return("Unknown HTTP method");
 }
 
@@ -1849,7 +1849,7 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
     case 'U':return(NDPI_HTTP_METHOD_PUT);
     }
     break;
-    
+
   case 'D':  return(NDPI_HTTP_METHOD_DELETE);
   case 'T':  return(NDPI_HTTP_METHOD_TRACE);
   case 'C':  return(NDPI_HTTP_METHOD_CONNECT);
@@ -1857,501 +1857,6 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
 
   return(NDPI_HTTP_METHOD_UNKNOWN);
 }
-
-#ifdef FRAG_MAN
-#define ARRAYSZ_255 255
-void printRawData(const uint8_t *ptr, size_t len) {		
-  uint8_t *p=(uint8_t*)ptr;
-  DBGINFO("ptr=%p, len=%llu", ptr, (unsigned long long)len)
-    if(p && len > 0) {
-      size_t ctLines=0,i,j;
-      char line1[ARRAYSZ_255]={0}, line2[ARRAYSZ_255]={0}, temp[ARRAYSZ_255];
-      snprintf(line1,sizeof(line1),"\t%05X",(unsigned int)(16*ctLines));
-      for(i=0; i<len; i++) {
-			
-	if(i > 0 && i%16==0) {		        
-	  printf("%s\t%s\n", line1,line2);
-	  ctLines++;
-	  snprintf(line1,ARRAYSZ_255,"\t%05X",(unsigned int)(16*ctLines));
-	  snprintf(line2,ARRAYSZ_255,"%s","");
-	}      
-	snprintf(temp,ARRAYSZ_255," %02X", (uint8_t)*p);
-	strncat(line1, temp, 3);
-	snprintf(temp,ARRAYSZ_255,"%c", (isprint(*p)? *(p):'.'));
-	strncat(line2, temp, 1);
-	p++;
-      }
-      uint8_t exv= i%16;
-      for(j=exv;exv > 0 && j<16;j++) {
-	strncat(line1, "   ", 3);
-      }
-      printf("%s\t%s\n", line1,line2);
-    }
-  return;	
-}
-/* ******************************************************************** */
-
-// the struct is defined in ndpi_utils.h
-
-void ins_sort_array(sorter_index_item_t arr[], int len) {
-  DBGINFO("sorting  no. %u items", (unsigned)len)
-    for(int i=1; i<len; i++) {
-      for(int j=i; j > 0 && arr[j].sort_value<arr[j-1].sort_value; j--) {
-	sorter_index_item_t temp = arr[j];
-	arr[j] = arr[j-1];
-	arr[j-1] = temp;
-      }
-    }
-}
-
-void shell_sort_array(sorter_index_item_t arr[], int n) {
-  // Rearrange elements at each n/2, n/4, n/8, ... intervals
-  DBGINFO("sorting  no. %u items", (unsigned)n)
-    for(int interval = n / 2; interval > 0; interval /= 2) {
-      for(int i = interval; i < n; i += 1) {
-	sorter_index_item_t temp = arr[i];
-	int j;
-	for(j = i; j >= interval && arr[j - interval].sort_value > temp.sort_value; j -= interval) {
-	  arr[j] = arr[j - interval];
-	  DBGTRACER("exchanged item no. %d (%d) with: %d (%d)", j, arr[j].sort_value, j-interval, temp.sort_value);
-	}
-
-	DBGTRACER("item no. %d value: %d", j, temp.sort_value);
-	arr[j] = temp;
-      }
-    }
-}
-
-/* ******************************************************************** */
-
-void free_fragment(fragments_wrapper_t *frag) {
-  /*
-   *  
-   typedef struct fragment_wrapper {
-   uint16_t id;
-   uint8_t l4_protocol;
-   uint8_t ct_frag;
-   char   *flow_label;    // IP6
-   fragment_t **fragments_list;
-   } fragments_wrapper_t; 
-   *
-   * */
-  if(frag) {
-    DBGTRACER("(frag:%p) freeing fragments list -> %p",frag, frag->fragments_list);
-    if(frag->fragments_list) {
-      DBGTRACER("fragments are %u.",frag->ct_frag);
-	
-      for(int y=0;y<frag->ct_frag;y++) {
-	if(frag->fragments_list[y]) {
-	  if(frag->fragments_list[y]->data) {
-	    DBGPOINTER("freeing fragment item %d -> %p",y, frag->fragments_list[y]);
-	    ndpi_free(frag->fragments_list[y]->data);
-	  }
-
-	  ndpi_free(frag->fragments_list[y]);
-	}
-      }        
-      DBGPOINTER("freeing fragments list -> %p",frag->fragments_list)
-	ndpi_free(frag->fragments_list);
-      frag->fragments_list= NULL;
-    }
-    //reset counter and initial offset
-    frag->ct_frag=0;
-    frag->initial_offset=0;
-  }
-}
-
-/* ******************************************************************** */
-
-uint8_t add_segment_to_buffer(struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph, uint32_t new_expected_seq) {
-  DBGINFO("[flow:%p], dir: %d, seq:%u, ack:%u, len: %ubytes",
-          flow, flow->packet.packet_direction, ntohl(tcph->seq), ntohl(tcph->ack_seq), flow->packet.payload_packet_len)
-
-    if(flow->tcp_segments_management) {
-      fragments_wrapper_t *fragW= &flow->tcp_segments_list[flow->packet.packet_direction];
-      DBGTRACER("tcp segments management enabled (list container: %p)", fragW);
-
-      if(fragW->ct_frag == 0) {
-	if(fragW->fragments_list)
-	  free_fragment(fragW);
-
-	// initialize the offset with the first fragment seq number
-	fragW->initial_offset = new_expected_seq;
-	DBGTRACER("initialized initial_offset: %u)",fragW->initial_offset);
-      }
-    
-      if(flow->packet.payload_packet_len > 0) {
-	uint32_t seq;
-
-	// allocate memory for pointer
-	size_t new_len= (1+fragW->ct_frag) * sizeof(fragment_t*);
-	DBGTRACER("actual fragment list ct=%d, new size: %llu", fragW->ct_frag, (unsigned long long)new_len);
-
-	fragW->fragments_list = ndpi_realloc(fragW->fragments_list,(fragW->ct_frag * sizeof(fragment_t*)),new_len);
-	if(fragW->fragments_list == NULL) {
-	  flow->tcp_segments_management= 0; 
-	  // fprintf(stderr, "[%8u] Not enough memory for new fragment \n", flow->packet_counter);
-	  return 0;
-	}
-
-	DBGPOINTER("fragments_list initialized for item no. %u, list->%p i-esimo->%p",
-		   fragW->ct_frag, fragW->fragments_list, fragW->fragments_list[fragW->ct_frag]);
-
-	// allocate memory for item
-	fragment_t *new_frag = (fragment_t*)ndpi_calloc(1, sizeof(fragment_t));
-	if(new_frag == NULL) {
-	  flow->tcp_segments_management= 0; 
-	  free_fragment(fragW);
-	  // fprintf(stderr, "[%8u] Not enough memory for new fragment \n", flow->packet_counter);
-	  return 0;
-	}       
-
-	DBGPOINTER("new_frag=> %p",new_frag);
-
-	// fill item with offsetm len and data fragment/segment
-	seq = (0xffffffff & ntohl(tcph->seq));
-	if(seq >= fragW->initial_offset /* safety check */) {
-	  new_frag->offset = seq - fragW->initial_offset;
-	} else {
-	  /* CHECK THIS CASE
-	     fprintf(stderr, "[%8u] Bad seq or initial offset (seq = %u, initial offset = %u)\n",
-	     flow->packet_counter, seq, fragW->initial_offset);
-	  */
-	  flow->tcp_segments_management= 0;
-	  ndpi_free(new_frag);
-	  free_fragment(fragW);
-	  return 0;
-	}
-
-	DBGTRACER("offset calculation: seq %u, init: %u, offset result: %u", ntohl(tcph->seq),
-		  fragW->initial_offset, new_frag->offset);
-	new_frag->len = flow->packet.payload_packet_len;      
-       
-	new_frag->data = (void*)ndpi_calloc(new_frag->len, sizeof(char));
-	DBGPOINTER("new_frag->data=> %p",new_frag->data)
-	  if(new_frag->data) {
-	    memcpy(new_frag->data,flow->packet.payload,new_frag->len);
-
-#ifdef DEBUG_REASSEMBLY
-	    printf("[%s:%u] ==>> %s() [%p][offset: %u]\n",
-		   __FILE__, __LINE__, __FUNCTION__, new_frag, new_frag->offset);
-#endif
-
-	    fragW->fragments_list[fragW->ct_frag++]= new_frag; /* Add it to the list */
-	  } else {
-	    flow->tcp_segments_management= 0; 
-	    ndpi_free(new_frag);
-	    free_fragment(fragW);
-	    // fprintf(stderr, "[%8u] Not enough memory for new fragment data \n", flow->packet_counter);
-	    return 0;
-	  }
-
-	DBGINFO("item no. %u: %p->%p [off:%u, len:%u, data:%p]",
-		fragW->ct_frag, fragW->fragments_list, *fragW->fragments_list, 
-		(unsigned int) new_frag->offset, (unsigned int)new_frag->len, new_frag->data);
-
-	return fragW->ct_frag;
-      }
-    }
-  
-  return 0;
-}
-
-//TODO: manage partial retrasmission
-
-/* ******************************************************************** */
-
-uint32_t reassembly_fragment(struct ndpi_flow_struct *const flow,
-			     struct ndpi_tcphdr const * tcph,
-			     uint8_t **ret_buffer, size_t *len_buffer) {
-  uint32_t ret_value = 0;
-  uint16_t last_item = 0;
-  size_t length = 0, tot_length = 0;
-  sorter_index_item_t *sorted_indexes;
-  fragments_wrapper_t *fragW;
-  uint8_t *buffer;
-
-#ifdef DEBUG_REASSEMBLY
-  printf("[%s:%u] ==>> %s()\n", __FILE__, __LINE__, __FUNCTION__);
-#endif
-  
-  fragW = &flow->tcp_segments_list[flow->packet.packet_direction];
-
-  DBGTRACER("tcph:%p, ret_buffer:%p, len_buffer:%u", tcph, ret_buffer, len_buffer);
-
-  // phase 1: calculate the size and fill the indexes array
-  DBGINFO("phase 1: init sorter, calculate the size of buffer to reassemble: %u items", fragW->ct_frag);
-
-  sorted_indexes = (sorter_index_item_t*)ndpi_calloc(fragW->ct_frag, sizeof(sorter_index_item_t));
-
-  if(sorted_indexes == NULL) {
-    //fprintf(stderr, "[%8u] Not enough memory to sort the %u segments \n", flow->packet_counter, fragW->ct_frag); 
-    free_fragment(fragW);
-    return 0;
-  }
-
-  DBGPOINTER("sorted_indexes=> %p", sorted_indexes);
-  
-  for(int i=0; i<fragW->ct_frag; i++) {
-    fragment_t *item = (fragment_t*)fragW->fragments_list[i];
-    
-    sorted_indexes[i].sort_value = item->offset;
-    sorted_indexes[i].item_index = i;        
-    tot_length += item->len;
-    
-    DBGTRACER("segment (%d): len:%lu, offset: %u => partial buffer len: %lu",
-	      i, (long unsigned int)item->len, (unsigned int)item->offset, (long unsigned int)tot_length);
-  }
-
-  // phase 2: sorts fragments and check fragments and sequences
-  DBGINFO(" phase 2 sorting %d segments and checking",fragW->ct_frag);
-
-  if(fragW->ct_frag>1) shell_sort_array(sorted_indexes, fragW->ct_frag);
-
-  // checks
-  for(uint i=0; i<fragW->ct_frag; i++) {
-    fragment_t *item = (fragment_t*)fragW->fragments_list[ sorted_indexes[i].item_index ];
-
-    // 1: no segment offset can be > tot_length
-    DBGTRACER("checking %d/%d element: offset=%lu vs t_length=%lu",
-              i, sorted_indexes[i].item_index, (unsigned long)item->offset, (unsigned long)tot_length);
-
-    if((item->offset+item->len) > (uint32_t)tot_length) {
-      // update the last index of elements to elaborate
-      DBGINFO("stop processing at %d/%d element: len= %u; offset= %u",
-              i, sorted_indexes[i].item_index, (unsigned)length, (unsigned)item->offset)
-
-	// tot_length = length; /* CHECK THIS CASE */
-#ifdef DEBUG_REASSEMBLY
-	printf("[%s:%u] ==>> Too long [last_item: %u][offset: %u/len: %u][%p]\n", __FILE__, __LINE__,
-	       last_item, item->offset, item->len, item);
-#endif
-
-      tot_length = item->offset+item->len; /* CHECK THIS CASE */
-      
-      // set the first offset to wait for the next segment
-      ret_value = fragW->initial_offset + item->offset;
-      break;
-      // 2: for every len(buffer) must exists a offset fragment
-    } else if(item->offset != (uint32_t)length) {
-      // update the last index of elements to elaborate
-      DBGINFO("checking %d/%d element: stop processing! len: %u; n_offset: %u",
-              i, sorted_indexes[i].item_index, (unsigned)length, (unsigned)item->offset);
-
-      // tot_length = length; /* CHECK THIS CASE */
-
-      // set the first offset to wait for the next segment
-      ret_value = fragW->initial_offset + item->offset;
-      break;
-    } else {
-      // continue to sum length data bytes
-      length += item->len;
-      last_item = i;
-    }
-  }
-  last_item++;  // index to number aligment
-
-  // phase 3: allocate memory and fill the buffer
-  DBGINFO("phase 3: allocate memory for %u items and fill the buffer tot: %lu", last_item, (unsigned long int)tot_length);
-
-#ifdef DEBUG_REASSEMBLY
-  printf("[%s:%u] ==>> [tot_length: %u][length: %u]\n",
-	 __FILE__, __LINE__, (u_int32_t)tot_length, (u_int32_t)length);
-#endif
-  
-  buffer = ndpi_calloc(tot_length, sizeof(uint8_t));
-
-  if(buffer == NULL) {
-    // fprintf(stderr, "[%8u] Not enough memory for buffer for %u segments \n", flow->packet_counter,last_item);
-    free_fragment(fragW);
-    ndpi_free(sorted_indexes);
-    return 0;
-  }  
-
-  DBGPOINTER("buffer (len:%lu)=> %p", (unsigned long)tot_length, buffer);
-
-  for(uint i=0; i<last_item; i++) {
-    fragment_t *item = (fragment_t*) fragW->fragments_list[sorted_indexes[i].item_index];
-
-    DBGINFO("copying data item no:%u of len: %lu to buffer: %p (offset:%lu)",
-            sorted_indexes[i].item_index, (unsigned long int)item->len, buffer,
-            (unsigned long int)item->offset);
-
-    if((item->offset+item->len) > tot_length) {      
-      //#ifdef DEBUG_REASSEMBLY
-      printf("[%s:%u] ==>> Out of boundary [%u vs %u][offset: %u][len: %u][item: %u/%u]\n", __FILE__, __LINE__,
-	     (u_int32_t)(item->offset+item->len), (u_int32_t)tot_length,
-	     (u_int32_t)item->offset, (u_int32_t)item->len, i, last_item);
-      //#endif
-      continue;
-    } else {
-#ifdef DEBUG_REASSEMBLY
-      printf("[%s:%u] ==>> memcpy OK [%u vs %u][offset: %u][item: %u/%u]\n",
-	     __FILE__, __LINE__,
-	     (u_int32_t)(item->offset+item->len), (u_int32_t)tot_length,
-	     item->offset, i, last_item);
-#endif
-    }
-    
-    memcpy((void*)(buffer + item->offset), item->data, item->len);
-
-    // free memory item
-    ndpi_free(item->data);
-    item->data=NULL;
-    ndpi_free(item);
-    fragW->fragments_list[sorted_indexes[i].item_index]=NULL;
-  }
-
-  if(last_item == fragW->ct_frag) {
-    DBGTRACER("all processed: free all memory!");
-    free_fragment(fragW);
-  } else {
-    // phase 4: re-organize the other segments, updating the list    
-    fragment_t **fragW_old_list = fragW->fragments_list;
-    fragW->fragments_list = ndpi_calloc((fragW->ct_frag-last_item), sizeof(struct fragment_t*));
-
-    DBGPOINTER("old segments list: %p, new segments list: %p.",
-               fragW_old_list, fragW->fragments_list);
-
-    if(!fragW->fragments_list) {
-      // fprintf(stderr, "[%8u] Not enough memory for new segments list \n", flow->packet_counter);
-      free_fragment(fragW);
-      ndpi_free(buffer);
-      ndpi_free(sorted_indexes);
-      return 0;
-    }    
-
-    // re-fill the new segments list, updating the offsets
-    for(uint i = last_item; i < fragW->ct_frag; i++) {
-      fragment_t *item = (fragment_t*)fragW_old_list[sorted_indexes[i].item_index];
-      fragW->fragments_list[i-last_item] = item;
-      if(item->offset >= tot_length /* safety check */) {
-        item->offset -= tot_length;
-      }
-      /* CHECK THIS CASE
-	 else {
-	 fprintf(stderr, "[%8u] Bad offset update (item->offset = %u, tot_length = %lu)\n",
-	 flow->packet_counter, item->offset, tot_length);
-	 }
-      */
-
-      DBGTRACER("moving the item (%p), index %u - to position %u of new segments list; new offset: %u.",
-                item, sorted_indexes[i].item_index, i-last_item, item->offset );
-    }
-
-    // update the fragments countes
-    fragW->ct_frag -= last_item;
-    fragW->initial_offset += tot_length;
-
-    DBGINFO("updated counter: %d and i_offset: %u.",
-            (unsigned)fragW->ct_frag, (unsigned)fragW->initial_offset);
-    
-    DBGPOINTER("freeing old segments list: %p ", fragW_old_list)
-      ndpi_free(fragW_old_list);
-  }
-
-  if(sorted_indexes) {
-    DBGPOINTER("freeing sorter indexes: %p ", sorted_indexes);
-    ndpi_free(sorted_indexes);
-  }
-
-  if(len_buffer != NULL) {
-    *len_buffer = tot_length;
-  }
-
-  if(ret_buffer != NULL) {
-    *ret_buffer = (u_int8_t *) buffer;
-    flow->must_free[flow->packet.packet_direction] = 1;
-
-    DBGINFO("retrieved the buffer of segments (len:%lu) %p",
-            *len_buffer, *ret_buffer);
-  } else {
-    DBGPOINTER("freeing buffer=> %p", buffer);
-    ndpi_free(buffer);
-  }
-
-  DBGINFO("returning: %d", ret_value);
-  return(ret_value);
-}
-
-/* ******************************************************************** */
-
-uint8_t check_for_sequence(struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph) {
-  uint8_t *ret_buffer=NULL;
-  size_t len_buffer=0;
-
-  DBGINFO("## sorted flags: %d/%d ",flow->not_sorted[0],flow->not_sorted[1]);
-
-  if(flow->next_tcp_seq_nr[flow->packet.packet_direction]) {
-    uint32_t *trigger, expected;
-    uint8_t *not_sorted;
-
-    // use pointers to allow the modification
-    not_sorted = &flow->not_sorted[flow->packet.packet_direction];
-    trigger = &flow->trigger[flow->packet.packet_direction];
-
-    DBGTRACER("dir:%d, trg:%u, next:%u", flow->packet.packet_direction,*trigger,
-	      flow->next_tcp_seq_nr[flow->packet.packet_direction]);
-
-    expected = (*not_sorted && *trigger) ? ndpi_min(*trigger, flow->next_tcp_seq_nr[flow->packet.packet_direction]) : flow->next_tcp_seq_nr[flow->packet.packet_direction];
-
-    if(expected < (0xffffffff & ntohl(tcph->seq))) {
-      // segment not in order... almost 1 has been skipped! add this fragment to buffer
-      DBGINFO("received a segment (seq:%u) over the expected (next:%u)", (0xffffffff & ntohl(tcph->seq)), expected);
-      
-      if(add_segment_to_buffer(flow, tcph, expected)) {
-	DBGTRACER("segment (seq:%u) bufferized, waiting for(next:%u)", (0xffffffff & ntohl(tcph->seq)), expected);
-
-	// set flag a save the expected sequence number
-	*not_sorted=1;
-	*trigger= *trigger ? ndpi_min(flow->next_tcp_seq_nr[flow->packet.packet_direction],*trigger):flow->next_tcp_seq_nr[flow->packet.packet_direction];
-	DBGINFO("set flag and trigger[%d]: %u",flow->packet.packet_direction,*trigger);
-      }
-      return 1;
-
-    } else if(expected>(0xffffffff & ntohl(tcph->seq))) {
-      DBGINFO("received a segment (seq:%u) minus than the expected (next:%u): retransmission!!", (0xffffffff & ntohl(tcph->seq)), flow->next_tcp_seq_nr[flow->packet.packet_direction]);
-
-      flow->packet.tcp_retransmission = 1;
-
-      /* CHECK IF PARTIAL RETRY IS HAPPENING */
-      if((flow->next_tcp_seq_nr[flow->packet.packet_direction] - ntohl(tcph->seq) <
-	  flow->packet.payload_packet_len)) {
-	/* num_retried_bytes actual_payload_len hold info about the partial retry
-	   analyzer which require this info can make use of this info
-	   Other analyzer can use packet->payload_packet_len */
-	flow->packet.num_retried_bytes = (u_int16_t)(flow->next_tcp_seq_nr[flow->packet.packet_direction] - ntohl(tcph->seq));
-	flow->packet.actual_payload_len = flow->packet.payload_packet_len - flow->packet.num_retried_bytes;
-	flow->next_tcp_seq_nr[flow->packet.packet_direction] = ntohl(tcph->seq) + flow->packet.payload_packet_len;
-	DBGINFO("partial_bytes:%u",flow->packet.num_retried_bytes);
-
-	//TODO: manage this!!
-      }
-
-    } else {
-      DBGTRACER("seq (%u) and expected (%u) matched! sorted flag: %d",
-		(0xffffffff & ntohl(tcph->seq)),
-		flow->next_tcp_seq_nr[flow->packet.packet_direction],
-		*not_sorted);
-
-      if(*not_sorted) {
-	if(add_segment_to_buffer(flow, tcph, 0)) {
-	  *trigger= reassembly_fragment(flow,tcph,&ret_buffer,&len_buffer);
-	  *not_sorted=(*trigger > 0);
-
-	  if(len_buffer > 0) {
-	    // the previous pointers must not be free, because managed in other part
-	    flow->packet.payload_packet_len= len_buffer;
-	    flow->packet.payload= ret_buffer;
-	  }
-	}
-      }
-    }
-  }
-
-  return 0;
-}
-#endif // FRAG_MAN
 
 /* ******************************************************************** */
 
@@ -2390,7 +1895,7 @@ ndpi_str_hash* ndpi_hash_alloc(u_int32_t max_num_entries) {
   if(!h) return(NULL);
   if(max_num_entries < 1024) max_num_entries = 1024;
   if(max_num_entries > 10000000) max_num_entries = 10000000;
-  
+
   h->max_num_entries = max_num_entries, h->num_buckets = max_num_entries/2;
   h->buckets = (struct ndpi_str_hash_info**)calloc(sizeof(struct ndpi_str_hash_info*), h->num_buckets);
 
@@ -2405,7 +1910,7 @@ ndpi_str_hash* ndpi_hash_alloc(u_int32_t max_num_entries) {
 
 void ndpi_hash_free(ndpi_str_hash *h) {
   u_int32_t i;
-  
+
   for(i=0; i<h->num_buckets; i++) {
     struct ndpi_str_hash_info *head = h->buckets[i];
 
@@ -2438,13 +1943,13 @@ static u_int32_t _ndpi_hash_function(ndpi_str_hash *h, char *key, u_int8_t key_l
 
 static int _ndpi_hash_find_entry(ndpi_str_hash *h, u_int32_t hashval, char *key, u_int key_len, u_int8_t *value) {
   struct ndpi_str_hash_info *head = h->buckets[hashval];
-  
+
   while(head != NULL) {
     if((head->key_len == key_len) && (memcmp(head->key, key, key_len) == 0)) {
       *value = head->value;
       return(0); /* Found */
     }
-    
+
     head = head-> next;
   }
 
@@ -2472,7 +1977,7 @@ int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t 
 
     if(e == NULL)
       return(-2);
-    
+
     if((e->key = (char*)malloc(key_len)) == NULL)
       return(-3);
 
@@ -2490,7 +1995,7 @@ int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t 
 
 void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
   ndpi_risk v = 1ull << r;
-  
+
   // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
   flow->risk |= v;
 

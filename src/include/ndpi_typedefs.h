@@ -1247,14 +1247,6 @@ struct ndpi_flow_struct {
   */
   u_int32_t next_tcp_seq_nr[2];
 
-#ifdef FRAG_MAN
-  /* tcp_segments lists */
-  u_int8_t tcp_segments_management:1;
-  u_int8_t not_sorted[2],must_free[2];     // 0: client->server and 1: server->client
-  uint32_t trigger[2];                     // the seq waited number to start to reassembly
-  fragments_wrapper_t tcp_segments_list[2];
-#endif // FRAG_MAN
-
   // -----------------------------------------
 
   u_int8_t max_extra_packets_to_check;

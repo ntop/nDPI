@@ -1477,10 +1477,10 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH))
 	 ) {
 	if((flow->src2dst_packets+flow->dst2src_packets) < 10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
-	  skip = 1;
+	  skip = 1; /* Skip initial negotiation packets */
       }
 
-      if(!skip) {
+      if((!skip) && ((flow->src2dst_packets+flow->dst2src_packets) < 100)) {
 	if(ndpi_has_human_readeable_string(workflow->ndpi_struct, (char*)packet, header->caplen,
 					   human_readeable_string_len,
 					   flow->human_readeable_string_buffer,
