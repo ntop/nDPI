@@ -1781,7 +1781,7 @@ ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
 
 /* ******************************************************************** */
 
-u_int16_t ndpi_risk2score(ndpi_risk_enum risk) {
+u_int16_t ndpi_risk2score(ndpi_risk risk) {
   u_int16_t score = 0;
   u_int32_t i;
 

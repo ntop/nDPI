@@ -6183,6 +6183,12 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
     return((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) ? proto.master_protocol : proto.app_protocol);
   }
 
+  /* ****************************************************** */
+
+  u_int16_t ndpi_get_upper_proto(ndpi_protocol proto) {
+    return((proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) ? proto.app_protocol : proto.master_protocol);
+  }
+
 /* ****************************************************** */
 
   ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_str,
