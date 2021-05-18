@@ -989,9 +989,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       name = name .. string.char(tonumber(elems[i], 16))
 	    end
 
-	    ndpi_subtree:add(ndpi_fds.network_protocol, tvb(len-32, 2))
-	    ndpi_subtree:add(ndpi_fds.application_protocol, tvb(len-30, 2))
-	    ndpi_subtree:add(ndpi_fds.flow_risk, tvb(len-28, 8))
+	    ndpi_subtree:add(ndpi_fds.network_protocol, tvb(len-34, 2))
+	    ndpi_subtree:add(ndpi_fds.application_protocol, tvb(len-32, 2))
+	    ndpi_subtree:add(ndpi_fds.flow_risk, tvb(len-30, 8))
 	    ndpi_subtree:add(ndpi_fds.flow_risk_str, map_ndpi_risk(flow_risk))
 	    ndpi_subtree:add(ndpi_fds.flow_score, tvb(len-22, 2))
 	    ndpi_subtree:add(ndpi_fds.name, tvb(len-20, 16))
