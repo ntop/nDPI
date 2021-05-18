@@ -537,7 +537,7 @@ static void help(u_int long_help) {
     ndpi_dump_protocols(ndpi_info_mod);
 
     printf("\n\nnDPI supported risks:\n");
-    ndpi_dump_risks_score(ndpi_info_mod);
+    ndpi_dump_risks_score();
   }
 
   exit(!long_help);
