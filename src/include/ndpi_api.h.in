@@ -681,6 +681,13 @@ extern "C" {
   void ndpi_dump_protocols(struct ndpi_detection_module_struct *mod);
 
   /**
+   * Write the list of the scores and their associated risks
+   *
+   * @par  ndpi_mod = the detection module
+   */
+  void ndpi_dump_risks_score();
+
+  /**
    * Read a file and load the protocols
    *
    * Format: <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto>
@@ -1512,6 +1519,7 @@ extern "C" {
   void ndpi_serialize_risk(ndpi_serializer *serializer, struct ndpi_flow_struct *flow);
 
   const char* ndpi_risk2str(ndpi_risk_enum risk);
+  const char* ndpi_severity2str(ndpi_risk_severity s);
   ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk);
   u_int16_t ndpi_risk2score(ndpi_risk risk);
   

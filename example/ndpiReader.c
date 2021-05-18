@@ -535,6 +535,9 @@ static void help(u_int long_help) {
     ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
     ndpi_dump_protocols(ndpi_info_mod);
+
+    printf("\n\nnDPI supported risks:\n");
+    ndpi_dump_risks_score(ndpi_info_mod);
   }
 
   exit(!long_help);

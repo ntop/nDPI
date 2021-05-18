@@ -1714,7 +1714,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Possibly Malicious JA3 Fingerprint");
 
   case NDPI_MALICIOUS_SHA1_CERTIFICATE:
-    return("Possibly Malicious SSL Certificate SHA1 Fingerprint");
+    return("Possibly Malicious SSL Cert. SHA1 Fingerprint");
 
   case NDPI_DESKTOP_OR_FILE_SHARING_SESSION:
     return("Desktop/File Sharing Session");
@@ -1777,6 +1777,28 @@ ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
   /* We have added all possible ndpi_risk_enum values in the switch,
      but the compiler complains anyway... Try to silence it */
   return(NDPI_RISK_LOW);
+}
+
+/* ******************************************************************** */
+
+const char* ndpi_severity2str(ndpi_risk_severity s) {
+  switch(s) {
+  case NDPI_RISK_LOW:
+    return("Low");
+    break;
+    
+  case NDPI_RISK_MEDIUM:
+    return("Medium");
+    break;
+
+  case NDPI_RISK_HIGH:
+    return("High");
+    break;
+
+  case NDPI_RISK_SEVERE:
+    return("Severe");
+    break;
+  }
 }
 
 /* ******************************************************************** */

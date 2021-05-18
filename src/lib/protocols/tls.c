@@ -43,6 +43,8 @@ extern int is_version_with_var_int_transport_params(uint32_t version);
 // #define DEBUG_TLS_BLOCKS       1
 // #define DEBUG_CERTIFICATE_HASH
 
+// #define DEBUG_HEURISTIC
+
 // #define DEBUG_JA3C 1
 
 /* #define DEBUG_FINGERPRINT      1 */
@@ -1513,6 +1515,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 1;
 	else if(safari_ciphers == 12)
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
+
+#ifdef DEBUG_HEURISTIC
+	printf("[is_chrome_tls: %u][is_safari_tls: %u]\n",
+	       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls,
+	       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls);
+#endif
       } else {
 	invalid_ja3 = 1;
 #ifdef DEBUG_TLS
@@ -1725,11 +1733,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 
 		for(i=0; i<tot_signature_algorithms_len; i+=2) {
-		  u_int16_t cipher_id = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
+		  u_int16_t signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
-		  // printf("=>> %04X\n", cipher_id);
-
-		  switch(cipher_id) {
+#ifdef DEBUG_HEURISTIC
+		  printf("[TLS Signature Algorithm] 0x%04X\n", signature_algo);
+#endif
+		  switch(signature_algo) {
 		  case ECDSA_SECP521R1_SHA512:
 		    flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls = 1;
 		    break;
@@ -1756,6 +1765,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if(chrome_signature_algorithms != 8)
 		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
+
+#ifdef DEBUG_HEURISTIC
+		printf("[is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u]\n",
+		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls,
+		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls,
+		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls);
+#endif
 
 		ja3.client.signature_algorithms[i*2] = '\0';
 
