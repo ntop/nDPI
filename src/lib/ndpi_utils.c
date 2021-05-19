@@ -1807,6 +1807,8 @@ u_int16_t ndpi_risk2score(ndpi_risk risk) {
   u_int16_t score = 0;
   u_int32_t i;
 
+  if(risk == 0) return(0);
+  
   for(i = 0; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
 

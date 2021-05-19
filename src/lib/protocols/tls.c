@@ -1383,7 +1383,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	rc = snprintf(&ja3_str[ja3_str_len], JA3_STR_LEN-ja3_str_len, ",");
 	if(rc > 0 && ja3_str_len + rc < JA3_STR_LEN) ja3_str_len += rc;
       }
-      
+
       /* ********** */
 
       for(i=0; (i<ja3.server.num_tls_extension) && (JA3_STR_LEN > ja3_str_len); i++) {
@@ -1456,20 +1456,21 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
       if((cipher_offset+cipher_len) <= total_len) {
-	u_int8_t safari_ciphers = 0, chrome_ciphers = 0;
+	u_int8_t safari_ciphers = 0, chrome_ciphers = 0, this_is_not_safari = 0, looks_like_safari_on_big_sur = 0;
 
 	for(i=0; i<cipher_len;) {
 	  u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
-
-#ifdef DEBUG_TLS
-	  printf("Client TLS [cipher suite: %u/0x%04X] [%d/%u]\n", ntohs(*id), ntohs(*id), i, cipher_len);
-#endif
-	  if((*id == 0) || (packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1])) {
-	    u_int16_t cipher_id = ntohs(*id);
+	  u_int16_t cipher_id = ntohs(*id);
+	  
+	  if(packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1] /* Skip Grease */) {
 	    /*
 	      Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
 	      https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
 	    */
+
+#if defined(DEBUG_TLS) || defined(DEBUG_HEURISTIC)
+	    printf("Client TLS [non-GREASE cipher suite: %u/0x%04X] [%d/%u]\n", cipher_id, cipher_id, i, cipher_len);
+#endif
 
 	    if(ja3.client.num_cipher < MAX_NUM_JA3)
 	      ja3.client.cipher[ja3.client.num_cipher++] = cipher_id;
@@ -1480,13 +1481,16 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 	    }
 
+#if defined(DEBUG_TLS) || defined(DEBUG_HEURISTIC)
+	    printf("Client TLS [cipher suite: %u/0x%04X] [%d/%u]\n", cipher_id, cipher_id, i, cipher_len);
+#endif
+
 	    switch(cipher_id) {
 	    case TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:
 	    case TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
 	      safari_ciphers++;
 	      break;
 
-	    case TLS_CIPHER_GREASE_RESERVED_0:
 	    case TLS_AES_128_GCM_SHA256:
 	    case TLS_AES_256_GCM_SHA384:
 	    case TLS_CHACHA20_POLY1305_SHA256:
@@ -1505,21 +1509,42 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    case TLS_RSA_WITH_AES_256_GCM_SHA384:
 	      safari_ciphers++, chrome_ciphers++;
 	      break;
+
+	    case TLS_RSA_WITH_3DES_EDE_CBC_SHA:
+	      looks_like_safari_on_big_sur = 1;
+	      break;
 	    }
+	  } else {
+#if defined(DEBUG_TLS) || defined(DEBUG_HEURISTIC)
+	    printf("Client TLS [GREASE cipher suite: %u/0x%04X] [%d/%u]\n", cipher_id, cipher_id, i, cipher_len);
+#endif
+	    
+	    this_is_not_safari = 1; /* NOTE: BugSur and up have grease support */
 	  }
 
 	  i += 2;
 	} /* for */
 
+	/* NOTE:
+	   we do not check for duplicates as with signatures because
+	   this is time consuming and we want to avoid overhead whem possible
+	*/
+	if(this_is_not_safari)
+	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
+	else if((safari_ciphers == 12) || (this_is_not_safari && looks_like_safari_on_big_sur))
+	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
+	
 	if(chrome_ciphers == 13)
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 1;
-	else if(safari_ciphers == 12)
-	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
 
+	/* Note that both Safari and Chrome can overlap */
 #ifdef DEBUG_HEURISTIC
-	printf("[is_chrome_tls: %u][is_safari_tls: %u]\n",
+	printf("[CIPHERS] [is_chrome_tls: %u (%u)][is_safari_tls: %u (%u)][this_is_not_safari: %u]\n",
 	       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls,
-	       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls);
+	       chrome_ciphers,
+	       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls,
+	       safari_ciphers,
+	       this_is_not_safari);
 #endif
       } else {
 	invalid_ja3 = 1;
@@ -1709,7 +1734,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		}
 	      } else if(extension_id == 13 /* signature algorithms */) {
-		u_int16_t s_offset = offset+extension_offset, safari_signature_algorithms = 0, chrome_signature_algorithms = 0;
+		u_int16_t s_offset = offset+extension_offset, safari_signature_algorithms = 0, chrome_signature_algorithms = 0,
+		  duplicate_found = 0, last_signature = 0;
 		u_int16_t tot_signature_algorithms_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 
 #ifdef DEBUG_TLS
@@ -1735,8 +1761,38 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		for(i=0; i<tot_signature_algorithms_len; i+=2) {
 		  u_int16_t signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
+		  if(last_signature == signature_algo) {
+		    /* Consecutive duplication */
+		    duplicate_found = 1;
+		    continue;
+		  } else {
+		    /* Check for other duplications */
+		    u_int j, all_ok = 1;
+
+		    for(j=0; j<tot_signature_algorithms_len; j+=2) {
+		      if(j != i) {
+			u_int16_t j_signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
+
+			if((signature_algo == j_signature_algo)
+			   && (i < j) /* Don't skip both of them */) {
 #ifdef DEBUG_HEURISTIC
-		  printf("[TLS Signature Algorithm] 0x%04X\n", signature_algo);
+			  printf("[SIGNATURE] [TLS Signature Algorithm] Skipping duplicate 0x%04X\n", signature_algo);
+#endif
+			  
+			  duplicate_found = 1, all_ok = 0;
+			  break;
+			}
+		      }
+		    }
+
+		    if(!all_ok)
+		      continue;
+		  }
+
+		  last_signature = signature_algo;
+
+#ifdef DEBUG_HEURISTIC
+		  printf("[SIGNATURE] [TLS Signature Algorithm] 0x%04X\n", signature_algo);
 #endif
 		  switch(signature_algo) {
 		  case ECDSA_SECP521R1_SHA512:
@@ -1752,9 +1808,19 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  case RSA_PSS_RSAE_SHA384:
 		  case RSA_PSS_RSAE_SHA512:
 		    chrome_signature_algorithms++, safari_signature_algorithms++;
+#ifdef DEBUG_HEURISTIC
+		    printf("[SIGNATURE] [Chrome/Safari] Found 0x%04X [chrome: %u][safari: %u]\n",
+			   signature_algo, chrome_signature_algorithms, safari_signature_algorithms);
+#endif
+
 		    break;
 		  }
 		}
+
+#ifdef DEBUG_HEURISTIC
+		printf("[SIGNATURE] [safari_signature_algorithms: %u][chrome_signature_algorithms: %u]\n",
+		       safari_signature_algorithms, chrome_signature_algorithms);
+#endif
 
 		if(flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls)
 		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0,
@@ -1763,14 +1829,23 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if(safari_signature_algorithms != 8)
 		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
 
-		if(chrome_signature_algorithms != 8)
+		if((chrome_signature_algorithms != 8) || duplicate_found)
 		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
 
+		/* Avoid Chrome and Safari overlaps, thing that cannot happen with Firefox */
+		if(flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls)
+		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
+
+		if((flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls == 0)
+		   && duplicate_found)
+		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1; /* Safari */
+		
 #ifdef DEBUG_HEURISTIC
-		printf("[is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u]\n",
+		printf("[SIGNATURE] [is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u][duplicate_found: %u]\n",
 		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls,
 		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls,
-		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls);
+		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls,
+		       duplicate_found);
 #endif
 
 		ja3.client.signature_algorithms[i*2] = '\0';
