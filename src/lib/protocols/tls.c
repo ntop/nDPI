@@ -304,7 +304,7 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
     /* Subprotocol not yet set */
 
-    if(ndpi_struct->tls_cert_cache && flow->packet.iph) {
+    if(ndpi_struct->tls_cert_cache && flow->packet.iph && flow->packet.tcp) {
       u_int32_t key = flow->packet.iph->daddr + flow->packet.tcp->dest;
       u_int16_t cached_proto;
 
