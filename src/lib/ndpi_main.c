@@ -6497,7 +6497,7 @@ void ndpi_dump_risks_score() {
   for(i = 1; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
     ndpi_risk_severity s = ndpi_risk2severity(r);
-    u_int16_t score;
+    u_int16_t score = 0;
     
     switch(s) {
     case NDPI_RISK_LOW:

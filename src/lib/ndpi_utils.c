@@ -1799,6 +1799,8 @@ const char* ndpi_severity2str(ndpi_risk_severity s) {
     return("Severe");
     break;
   }
+
+  return("");
 }
 
 /* ******************************************************************** */
