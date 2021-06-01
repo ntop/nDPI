@@ -2279,16 +2279,18 @@ void printPortStats(struct port_stats *stats) {
 static void node_flow_risk_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   struct ndpi_flow_info *f = *(struct ndpi_flow_info**)node;
 
-  if(f->risk) {
-    u_int j;
+  if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
+    if(f->risk) {
+      u_int j;
 
-    flows_with_risks++;
+      flows_with_risks++;
 
-    for(j = 0; j < NDPI_MAX_RISK; j++) {
-      ndpi_risk_enum r = (ndpi_risk_enum)j;
+      for(j = 0; j < NDPI_MAX_RISK; j++) {
+        ndpi_risk_enum r = (ndpi_risk_enum)j;
 
-      if(NDPI_ISSET_BIT(f->risk, r))
-	risks_found++, risk_stats[r]++;
+        if(NDPI_ISSET_BIT(f->risk, r))
+	  risks_found++, risk_stats[r]++;
+      }
     }
   }
 }
