@@ -1071,7 +1071,7 @@ static void tlsCheckUncommonALPN(struct ndpi_flow_struct *flow)
     "http/0.9", "http/1.0", "http/1.1",
     "spdy/1", "spdy/2", "spdy/3", "spdy/3.1",
     "stun.turn", "stun.nat-discovery",
-    "h2", "h2c", "h2-16", "h2-15", "h2-14",
+    "h2", "h2c", "h2-16", "h2-15", "h2-14", "h2-fb",
     "webrtc", "c-webrtc",
     "ftp", "imap", "pop3", "managesieve", "coap",
     "xmpp-client", "xmpp-server",
