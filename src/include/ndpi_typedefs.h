@@ -63,9 +63,10 @@ typedef enum {
   NOTE
   When the typedef below is modified don't forget to update
   - nDPI/wireshark/ndpi.lua
-  - ndpi_risk2str and ndpi_risk2severity (in ndpi_utils.c)
+  - ndpi_risk2str (in ndpi_utils.c)
   - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
   - ndpi_risk_enum (in python/ndpi.py)
+  - ndpi_known_risks (ndpi_utils.c)
  */
 typedef enum {
   NDPI_NO_RISK = 0,
@@ -120,6 +121,21 @@ typedef enum {
   NDPI_SCORE_RISK_HIGH   = 100,
   NDPI_SCORE_RISK_SEVERE = 250,
 } ndpi_risk_score;
+
+typedef enum {
+  CLIENT_NO_RISK_PERCENTAGE   =   0, /* 100% server risk */
+  CLIENT_LOW_RISK_PERCENTAGE  =  10, /* 90%  server risk */
+  CLIENT_FAIR_RISK_PERCENTAGE =  50, /* 50%  server risk */
+  CLIENT_HIGH_RISK_PERCENTAGE =  90, /* 10%  server risk */
+  CLIENT_FULL_RISK_PERCENTAGE = 100 /* 0%   server risk */
+} risk_percentage;
+
+typedef struct {
+  ndpi_risk_enum risk;
+  ndpi_risk_severity severity;
+  risk_percentage default_client_risk_pctg; /* 0-100 */
+} ndpi_risk_info;
+
 
 /* NDPI_VISIT */
 typedef enum {
@@ -938,81 +954,81 @@ typedef enum {
 
 /* Abstract categories to group the protocols. */
 typedef enum {
-	      NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
-	      NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
-	      NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
-	      NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
-	      NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
-	      NDPI_PROTOCOL_CATEGORY_WEB,               /* Web/mobile protocols and services */
-	      NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
-	      NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,       /* Download, FTP, file transfer/sharing */
-	      NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
-	      NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
-	      NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
-	      NDPI_PROTOCOL_CATEGORY_DATABASE,          /* Protocols for database communication */
-	      NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
-	      NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
-	      NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
-	      NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
-	      NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
-	      NDPI_PROTOCOL_CATEGORY_STREAMING,         /* Streaming protocols */
-	      NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
-	      NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
+  NDPI_PROTOCOL_CATEGORY_UNSPECIFIED = 0,   /* For general services and unknown protocols */
+  NDPI_PROTOCOL_CATEGORY_MEDIA,             /* Multimedia and streaming */
+  NDPI_PROTOCOL_CATEGORY_VPN,               /* Virtual Private Networks */
+  NDPI_PROTOCOL_CATEGORY_MAIL,              /* Protocols to send/receive/sync emails */
+  NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,     /* AFS/NFS and similar protocols */
+  NDPI_PROTOCOL_CATEGORY_WEB,               /* Web/mobile protocols and services */
+  NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,    /* Social networks */
+  NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,       /* Download, FTP, file transfer/sharing */
+  NDPI_PROTOCOL_CATEGORY_GAME,              /* Online games */
+  NDPI_PROTOCOL_CATEGORY_CHAT,              /* Instant messaging */
+  NDPI_PROTOCOL_CATEGORY_VOIP,              /* Real-time communications and conferencing */
+  NDPI_PROTOCOL_CATEGORY_DATABASE,          /* Protocols for database communication */
+  NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,     /* Remote access and control */
+  NDPI_PROTOCOL_CATEGORY_CLOUD,             /* Online cloud services */
+  NDPI_PROTOCOL_CATEGORY_NETWORK,           /* Network infrastructure protocols */
+  NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,     /* Software for collaborative development, including Webmail */
+  NDPI_PROTOCOL_CATEGORY_RPC,               /* High level network communication protocols */
+  NDPI_PROTOCOL_CATEGORY_STREAMING,         /* Streaming protocols */
+  NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,         /* System/Operating System level applications */
+  NDPI_PROTOCOL_CATEGORY_SW_UPDATE,         /* Software update */
+  
+  /* See #define NUM_CUSTOM_CATEGORIES */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_3,          /* User custom category 3 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
+  NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
+  
+  /* Further categories... */
+  NDPI_PROTOCOL_CATEGORY_MUSIC,
+  NDPI_PROTOCOL_CATEGORY_VIDEO,
+  NDPI_PROTOCOL_CATEGORY_SHOPPING,
+  NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,
+  NDPI_PROTOCOL_CATEGORY_FILE_SHARING,
+  /*
+    The category below is used by sites who are used
+    to test connectivity
+  */
+  NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK,
+  NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
+  /*
+    The category below is used for vocal assistance services.
+  */
+  NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT,
+  
+  /* Some custom categories */
+  CUSTOM_CATEGORY_MINING           = 99,
+  CUSTOM_CATEGORY_MALWARE          = 100,
+  CUSTOM_CATEGORY_ADVERTISEMENT    = 101,
+  CUSTOM_CATEGORY_BANNED_SITE      = 102,
+  CUSTOM_CATEGORY_SITE_UNAVAILABLE = 103,
+  CUSTOM_CATEGORY_ALLOWED_SITE     = 104,
+  /*
+    The category below is used to track communications made by
+    security applications (e.g. sophosxl.net, spamhaus.org)
+    to track malware, spam etc.
+  */
+  CUSTOM_CATEGORY_ANTIMALWARE      = 105,
+  
+  /*
+    IMPORTANT
 
-	      /* See #define NUM_CUSTOM_CATEGORIES */
-	      NDPI_PROTOCOL_CATEGORY_CUSTOM_1,          /* User custom category 1 */
-	      NDPI_PROTOCOL_CATEGORY_CUSTOM_2,          /* User custom category 2 */
-	      NDPI_PROTOCOL_CATEGORY_CUSTOM_3,          /* User custom category 3 */
-	      NDPI_PROTOCOL_CATEGORY_CUSTOM_4,          /* User custom category 4 */
-	      NDPI_PROTOCOL_CATEGORY_CUSTOM_5,          /* User custom category 5 */
+    Please keep in sync with
 
-	      /* Further categories... */
-	      NDPI_PROTOCOL_CATEGORY_MUSIC,
-	      NDPI_PROTOCOL_CATEGORY_VIDEO,
-	      NDPI_PROTOCOL_CATEGORY_SHOPPING,
-	      NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,
-	      NDPI_PROTOCOL_CATEGORY_FILE_SHARING,
-	      /*
-		 The category below is used by sites who are used
-		 to test connectivity
-	       */
-	      NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK,
-	      NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
-	      /*
-		 The category below is used for vocal assistance services.
-	       */
-	      NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT,
+    static const char* categories[] = { ..}
 
-	      /* Some custom categories */
-	      CUSTOM_CATEGORY_MINING           = 99,
-	      CUSTOM_CATEGORY_MALWARE          = 100,
-	      CUSTOM_CATEGORY_ADVERTISEMENT    = 101,
-	      CUSTOM_CATEGORY_BANNED_SITE      = 102,
-	      CUSTOM_CATEGORY_SITE_UNAVAILABLE = 103,
-	      CUSTOM_CATEGORY_ALLOWED_SITE     = 104,
-	      /*
-		The category below is used to track communications made by
-		security applications (e.g. sophosxl.net, spamhaus.org)
-		to track malware, spam etc.
-	      */
-	      CUSTOM_CATEGORY_ANTIMALWARE      = 105,
+    in ndpi_main.c
+  */
 
-	      /*
-		IMPORTANT
-
-		Please keep in sync with
-
-		static const char* categories[] = { ..}
-
-		in ndpi_main.c
-	      */
-
-	      NDPI_PROTOCOL_NUM_CATEGORIES, /*
-					     NOTE: Keep this as last member
-					     Unused as value but useful to getting the number of elements
-					     in this datastructure
-					   */
-              NDPI_PROTOCOL_ANY_CATEGORY /* Used to handle wildcards */
+  NDPI_PROTOCOL_NUM_CATEGORIES, /*
+				  NOTE: Keep this as last member
+				  Unused as value but useful to getting the number of elements
+				  in this datastructure
+				*/
+  NDPI_PROTOCOL_ANY_CATEGORY /* Used to handle wildcards */
 } ndpi_protocol_category_t;
 
 typedef enum {

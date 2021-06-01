@@ -1436,7 +1436,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(flow->risk) {
     u_int i;
-
+    u_int16_t cli_score, srv_score;
     fprintf(out, "[Risk: ");
 
     for(i=0; i<NDPI_MAX_RISK; i++)
@@ -1445,7 +1445,7 @@ static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(out, "]");
 
-    fprintf(out, "[Risk Score: %u]", ndpi_risk2score(flow->risk));
+    fprintf(out, "[Risk Score: %u]", ndpi_risk2score(flow->risk, &cli_score, &srv_score));
   }
   
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ndpi_flow, flow->ssh_tls.ssl_version, &known_tls));
@@ -3288,9 +3288,10 @@ static void ndpi_process_packet(u_char *args,
        )
     ) {
     struct pcap_pkthdr h;
-    uint32_t *crc, delta = sizeof(struct ndpi_packet_trailer) + 4 /* ethernet trailer */;
+    u_int32_t *crc, delta = sizeof(struct ndpi_packet_trailer) + 4 /* ethernet trailer */;
     struct ndpi_packet_trailer *trailer;
-
+    u_int16_t cli_score, srv_score;
+    
     memcpy(&h, header, sizeof(h));
 
     if(h.caplen > (sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4)) {
@@ -3303,7 +3304,7 @@ static void ndpi_process_packet(u_char *args,
     memset(trailer, 0, sizeof(struct ndpi_packet_trailer));
     trailer->magic = htonl(WIRESHARK_NTOP_MAGIC);
     trailer->flow_risk = htonl64(flow_risk);
-    trailer->flow_score = htons(ndpi_risk2score(flow_risk));
+    trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];

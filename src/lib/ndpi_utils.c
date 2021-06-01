@@ -1730,57 +1730,6 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
 /* ******************************************************************** */
 
-ndpi_risk_severity ndpi_risk2severity(ndpi_risk_enum risk) {
-  switch(risk) {
-  case NDPI_NO_RISK:
-  case NDPI_MAX_RISK:
-  case NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT:
-  case NDPI_HTTP_NUMERIC_IP_HOST:
-  case NDPI_TLS_NOT_CARRYING_HTTPS:
-  case NDPI_MALFORMED_PACKET:
-  case NDPI_UNSAFE_PROTOCOL:
-  case NDPI_DESKTOP_OR_FILE_SHARING_SESSION:
-    return(NDPI_RISK_LOW);
-
-  case NDPI_TLS_SELFSIGNED_CERTIFICATE:
-  case NDPI_TLS_OBSOLETE_VERSION:
-  case NDPI_TLS_WEAK_CIPHER:
-  case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
-  case NDPI_HTTP_SUSPICIOUS_HEADER:
-  case NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER:
-  case NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER:
-  case NDPI_SMB_INSECURE_VERSION:
-  case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
-  case NDPI_MALICIOUS_JA3:
-  case NDPI_MALICIOUS_SHA1_CERTIFICATE:
-  case NDPI_TLS_UNCOMMON_ALPN:
-  case NDPI_DNS_SUSPICIOUS_TRAFFIC:
-  case NDPI_TLS_MISSING_SNI:
-  case NDPI_HTTP_SUSPICIOUS_CONTENT:
-  case NDPI_RISKY_ASN:
-  case NDPI_RISKY_DOMAIN:
-    return(NDPI_RISK_MEDIUM);
-
-  case NDPI_TLS_CERTIFICATE_EXPIRED:
-  case NDPI_TLS_CERTIFICATE_MISMATCH:
-  case NDPI_HTTP_SUSPICIOUS_URL:
-  case NDPI_SUSPICIOUS_DGA_DOMAIN:
-    return(NDPI_RISK_HIGH);
-
-  case NDPI_URL_POSSIBLE_XSS:
-  case NDPI_URL_POSSIBLE_SQL_INJECTION:
-  case NDPI_URL_POSSIBLE_RCE_INJECTION:
-  case NDPI_BINARY_APPLICATION_TRANSFER:
-    return(NDPI_RISK_SEVERE);
-  }
-
-  /* We have added all possible ndpi_risk_enum values in the switch,
-     but the compiler complains anyway... Try to silence it */
-  return(NDPI_RISK_LOW);
-}
-
-/* ******************************************************************** */
-
 const char* ndpi_severity2str(ndpi_risk_severity s) {
   switch(s) {
   case NDPI_RISK_LOW:
@@ -1805,33 +1754,45 @@ const char* ndpi_severity2str(ndpi_risk_severity s) {
 
 /* ******************************************************************** */
 
-u_int16_t ndpi_risk2score(ndpi_risk risk) {
+u_int16_t ndpi_risk2score(ndpi_risk risk,
+			  u_int16_t *client_score,
+			  u_int16_t *server_score) {
   u_int16_t score = 0;
   u_int32_t i;
 
+  *client_score = *server_score = 0; /* Reset values */
+  
   if(risk == 0) return(0);
   
   for(i = 0; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
 
     if(NDPI_ISSET_BIT(risk, r)) {
-      switch(ndpi_risk2severity(r)) {
+      ndpi_risk_info *info = ndpi_risk2severity(r);
+      u_int16_t val, client_score_val;
+      
+      switch(info->severity) {
       case NDPI_RISK_LOW:
-	score += NDPI_SCORE_RISK_LOW;
+	val = NDPI_SCORE_RISK_LOW;
 	break;
 
       case NDPI_RISK_MEDIUM:
-	score += NDPI_SCORE_RISK_MEDIUM;
+	val = NDPI_SCORE_RISK_MEDIUM;
 	break;
 
       case NDPI_RISK_HIGH:
-	score += NDPI_SCORE_RISK_HIGH;
+	val = NDPI_SCORE_RISK_HIGH;
 	break;
 
       case NDPI_RISK_SEVERE:
-	score += NDPI_SCORE_RISK_SEVERE;
+	val = NDPI_SCORE_RISK_SEVERE;
 	break;
       }
+
+      score += val;
+      client_score_val = (val * info->default_client_risk_pctg) / 100;
+
+      *client_score += client_score_val, *server_score += (val - client_score_val);
     }
   }
 
@@ -2024,5 +1985,6 @@ void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
 
   // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
   flow->risk |= v;
-
 }
+
+

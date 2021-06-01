@@ -70,6 +70,46 @@ static void (*_ndpi_free)(void *ptr);
 
 /* ****************************************** */
 
+static ndpi_risk_info ndpi_known_risks[] = {
+  { NDPI_NO_RISK,                               NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }, 
+  { NDPI_URL_POSSIBLE_XSS,                      NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_URL_POSSIBLE_SQL_INJECTION,            NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_URL_POSSIBLE_RCE_INJECTION,            NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_BINARY_APPLICATION_TRANSFER,           NDPI_RISK_SEVERE, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,   NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_TLS_SELFSIGNED_CERTIFICATE,            NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_TLS_OBSOLETE_VERSION,                  NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_TLS_WEAK_CIPHER,                       NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_TLS_CERTIFICATE_EXPIRED,               NDPI_RISK_HIGH,   CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_TLS_CERTIFICATE_MISMATCH,              NDPI_RISK_HIGH,   CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_HTTP_SUSPICIOUS_USER_AGENT,            NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_HTTP_NUMERIC_IP_HOST,                  NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_HTTP_SUSPICIOUS_URL,                   NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_HTTP_SUSPICIOUS_HEADER,                NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_TLS_NOT_CARRYING_HTTPS,                NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_SUSPICIOUS_DGA_DOMAIN,                 NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_MALFORMED_PACKET,                      NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER, NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER, NDPI_RISK_MEDIUM, CLIENT_LOW_RISK_PERCENTAGE  },
+  { NDPI_SMB_INSECURE_VERSION,                  NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_TLS_SUSPICIOUS_ESNI_USAGE,             NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_UNSAFE_PROTOCOL,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_DNS_SUSPICIOUS_TRAFFIC,                NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_TLS_MISSING_SNI,                       NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_HTTP_SUSPICIOUS_CONTENT,               NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_RISKY_ASN,                             NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_RISKY_DOMAIN,                          NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_MALICIOUS_JA3,                         NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_MALICIOUS_SHA1_CERTIFICATE,            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_DESKTOP_OR_FILE_SHARING_SESSION,       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_TLS_UNCOMMON_ALPN,                     NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE },
+
+  /* Leave this as last member */
+  { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
+};
+
+/* ****************************************** */
+
 /* Forward */
 static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str, ndpi_port_range *range,
                            ndpi_proto_defaults_t *def, u_int8_t customUserProto, ndpi_default_ports_tree_node_t **root,
@@ -719,7 +759,7 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
 /* ******************************************************************** */
 
 static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_struct *ndpi_str) {
-  int i;
+  u_int i, val;
 
   for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
     if(ndpi_str->proto_defaults[i].protoName == NULL) {
@@ -733,6 +773,13 @@ static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_s
 		     ndpi_str->proto_defaults[i].protoName ? ndpi_str->proto_defaults[i].protoName : "???");
       }
     }
+  }
+
+  /* Sanity check for risks initialization */
+  val = (sizeof(ndpi_known_risks) / sizeof(ndpi_risk_info)) - 1;
+  if(val != NDPI_MAX_RISK) {
+    NDPI_LOG_ERR(ndpi_str,  "[NDPI] INTERNAL ERROR Invalid ndpi_known_risks[] initialization [%u != %u]\n", val, NDPI_MAX_RISK);
+    exit(0);
   }
 }
 
@@ -6496,7 +6543,7 @@ void ndpi_dump_risks_score() {
 	 
   for(i = 1; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
-    ndpi_risk_severity s = ndpi_risk2severity(r);
+    ndpi_risk_severity s = ndpi_risk2severity(r)->severity;
     u_int16_t score = 0;
     
     switch(s) {
@@ -7576,3 +7623,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 }
   
 /* ******************************************************************** */
+
+ndpi_risk_info* ndpi_risk2severity(ndpi_risk_enum risk) {
+  return(&ndpi_known_risks[risk]);
+}
