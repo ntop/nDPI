@@ -104,7 +104,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF))) {
     if(payloadType == 1 /* RTP */) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype for Business (former MS Lync)\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN);
       return;
     }
   }
