@@ -18,6 +18,10 @@
 -- Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 --
 
+function bit(p)
+   return 2 ^ p  -- 0-based indexing
+end
+
 
 local ndpi_proto = Proto("ndpi", "nDPI Protocol Interpreter")
 ndpi_proto.fields = {}
@@ -26,9 +30,46 @@ local ndpi_fds    = ndpi_proto.fields
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
-ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64)
-ndpi_fds.flow_risk_str        = ProtoField.new("nDPI Flow Risk String", "ndpi.flow_risk_str", ftypes.STRING)
+ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64, nil, base.HEX)
 ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_score", ftypes.UINT32)
+
+local flow_risks = {}
+local num_bits_flow_risks = 64 -- 64 is the "right" value; if you want a more compact visualization you can lower it to max used bits
+flow_risks[0]  = ProtoField.bool("ndpi.flow_risk.unused0", "Unused", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: Unused bit")
+flow_risks[1]  = ProtoField.bool("ndpi.flow_risk.xss_attack", "XSS attack", num_bits_flow_risks, nil, bit(1), "nDPI Flow Risk: XSS attack")
+flow_risks[2]  = ProtoField.bool("ndpi.flow_risk.sql_injection", "SQL injection", num_bits_flow_risks, nil, bit(2), "nDPI Flow Risk: SQL injection")
+flow_risks[3]  = ProtoField.bool("ndpi.flow_risk.rce_injection", "RCE injection", num_bits_flow_risks, nil, bit(3), "nDPI Flow Risk: RCE injection")
+flow_risks[4]  = ProtoField.bool("ndpi.flow_risk.binary_application_transfer", "Binary application transfer", num_bits_flow_risks, nil, bit(4), "nDPI Flow Risk: Binary application transfer")
+flow_risks[5]  = ProtoField.bool("ndpi.flow_risk.known_protocol_on_non_standard_port", "Known protocol on non standard port", num_bits_flow_risks, nil, bit(5), "nDPI Flow Risk: Known protocol on non standard port")
+flow_risks[6]  = ProtoField.bool("ndpi.flow_risk.self_signed_certificate", "Self-signed Certificate", num_bits_flow_risks, nil, bit(6), "nDPI Flow Risk: Self-signed Certificate")
+flow_risks[7]  = ProtoField.bool("ndpi.flow_risk.obsolete_tls_version", "Obsolete TLS version (< 1.1)", num_bits_flow_risks, nil, bit(7), "nDPI Flow Risk: Obsolete TLS version (< 1.1)")
+flow_risks[8]  = ProtoField.bool("ndpi.flow_risk.weak_tls_cipher", "Weak TLS cipher", num_bits_flow_risks, nil, bit(8), "nDPI Flow Risk: Weak TLS cipher")
+flow_risks[9]  = ProtoField.bool("ndpi.flow_risk.tls_expired_certificate", "TLS Expired Certificate", num_bits_flow_risks, nil, bit(9), "nDPI Flow Risk: TLS Expired Certificate")
+flow_risks[10] = ProtoField.bool("ndpi.flow_risk.tls_certificate_mismatch", "TLS Certificate Mismatch", num_bits_flow_risks, nil, bit(10), "nDPI Flow Risk: TLS Certificate Mismatch")
+flow_risks[11] = ProtoField.bool("ndpi.flow_risk.http_suspicious_user_agent", "HTTP Suspicious User-Agent", num_bits_flow_risks, nil, bit(11), "nDPI Flow Risk: HTTP Suspicious User-Agent")
+flow_risks[12] = ProtoField.bool("ndpi.flow_risk.http_numeric_ip_address", "HTTP Numeric IP Address", num_bits_flow_risks, nil, bit(12), "nDPI Flow Risk: HTTP Numeric IP Address")
+flow_risks[13] = ProtoField.bool("ndpi.flow_risk.http_suspicious_url", "HTTP Suspicious URL", num_bits_flow_risks, nil, bit(13), "nDPI Flow Risk: HTTP Suspicious URL")
+flow_risks[14] = ProtoField.bool("ndpi.flow_risk.http_suspicious_header", "HTTP Suspicious Header", num_bits_flow_risks, nil, bit(14), "nDPI Flow Risk: HTTP Suspicious Header")
+flow_risks[15] = ProtoField.bool("ndpi.flow_risk.tls_probably_not_https", "TLS (probably) not carrying HTTPS", num_bits_flow_risks, nil, bit(15), "nDPI Flow Risk: TLS (probably) not carrying HTTPS")
+flow_risks[16] = ProtoField.bool("ndpi.flow_risk.suspicious_dga", "Suspicious DGA domain name", num_bits_flow_risks, nil, bit(16), "nDPI Flow Risk: Suspicious DGA domain name")
+flow_risks[17] = ProtoField.bool("ndpi.flow_risk.malformed_packet", "Malformed packet", num_bits_flow_risks, nil, bit(17), "nDPI Flow Risk: Malformed packet")
+flow_risks[18] = ProtoField.bool("ndpi.flow_risk.ssh_obsolete_client", "SSH Obsolete Client Version/Cipher", num_bits_flow_risks, nil, bit(18), "nDPI Flow Risk: SSH Obsolete Client Version/Cipher")
+flow_risks[19] = ProtoField.bool("ndpi.flow_risk.ssh_obsolete_server", "SSH Obsolete Server Version/Cipher", num_bits_flow_risks, nil, bit(19), "nDPI Flow Risk: SSH Obsolete Server Version/Cipher")
+flow_risks[20] = ProtoField.bool("ndpi.flow_risk.smb_insecure_version", "SMB Insecure Version", num_bits_flow_risks, nil, bit(20), "nDPI Flow Risk: SMB Insecure Version")
+flow_risks[21] = ProtoField.bool("ndpi.flow_risk.tls_suspicious_esni", "TLS Suspicious ESNI Usage", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: TLS Suspicious ESNI Usage")
+flow_risks[22] = ProtoField.bool("ndpi.flow_risk.unsafe_protocol", "Unsafe Protocol", num_bits_flow_risks, nil, bit(22), "nDPI Flow Risk: Unsafe Protocol")
+flow_risks[23] = ProtoField.bool("ndpi.flow_risk.suspicious_dns_traffic", "Suspicious DNS traffic", num_bits_flow_risks, nil, bit(23), "nDPI Flow Risk: Suspicious DNS traffic")
+flow_risks[24] = ProtoField.bool("ndpi.flow_risk.sni_tls_extension_missing", "SNI TLS extension was missing", num_bits_flow_risks, nil, bit(24), "nDPI Flow Risk: SNI TLS extension was missing")
+flow_risks[25] = ProtoField.bool("ndpi.flow_risk.http_suspicious_content", "HTTP suspicious content", num_bits_flow_risks, nil, bit(25), "nDPI Flow Risk: HTTP suspicious content")
+flow_risks[26] = ProtoField.bool("ndpi.flow_risk.risky_asn", "Risky ASN", num_bits_flow_risks, nil, bit(26), "nDPI Flow Risk: Risky ASN")
+flow_risks[27] = ProtoField.bool("ndpi.flow_risk.risky_domain_name", "Risky domain name", num_bits_flow_risks, nil, bit(27), "nDPI Flow Risk: Risky domain name")
+flow_risks[28] = ProtoField.bool("ndpi.flow_risk.possibly_malicious_ja3", "Possibly Malicious JA3 Fingerprint", num_bits_flow_risks, nil, bit(28), "nDPI Flow Risk: Possibly Malicious JA3 Fingerprint")
+flow_risks[29] = ProtoField.bool("ndpi.flow_risk.possibly_malicious_ssl_certificate_sha1", "Possibly Malicious SSL Certificate SHA1 Fingerprint", num_bits_flow_risks, nil, bit(29), "nDPI Flow Risk: Possibly Malicious SSL Certificate SHA1 Fingerprint")
+flow_risks[30] = ProtoField.bool("ndpi.flow_risk.desktop_file_sharing_session", "Desktop/File Sharing Session", num_bits_flow_risks, nil, bit(30), "nDPI Flow Risk: Desktop/File Sharing Session")
+flow_risks[31] = ProtoField.bool("ndpi.flow_risk.uncommon_tls_alpn", "Uncommon TLS ALPN", num_bits_flow_risks, nil, bit(31), "nDPI Flow Risk: Uncommon TLS ALPN")
+for _,v in pairs(flow_risks) do
+  ndpi_fds[#ndpi_fds + 1] = v
+end
 
 local ntop_proto = Proto("ntop", "ntop Extensions")
 ntop_proto.fields = {}
@@ -890,63 +931,10 @@ function latency_dissector(tvb, pinfo, tree)
 end
 
 
-function bit(p)
-   return 2 ^ (p - 1)  -- 1-based indexing
-end
 
 function hasbit(x, p)
    return x % (p + p) >= p
 end
-
-local ndpi_risks = {
-   ['0'] = "No Risk",
-   ['1'] = "XSS attack",
-   ['2'] = "SQL injection",
-   ['3'] = "RCE injection",
-   ['4'] = "Binary application transfer",
-   ['5'] = "Known protocol on non standard port",
-   ['6'] = "Self-signed Certificate",
-   ['7'] = "Obsolete TLS version (< 1.1)",
-   ['8'] = "Weak TLS cipher",
-   ['9'] = "TLS Expired Certificate",    
-   ['10'] = "TLS Certificate Mismatch",
-   ['11'] = "HTTP Suspicious User-Agent",
-   ['12'] = "HTTP Numeric IP Address",
-   ['13'] = "HTTP Suspicious URL",
-   ['14'] = "HTTP Suspicious Header",
-   ['15'] = "TLS (probably) not carrying HTTPS",
-   ['16'] = "Suspicious DGA domain name",
-   ['17'] = "Malformed packet",
-   ['18'] = "SSH Obsolete Client Version/Cipher",
-   ['19'] = "SSH Obsolete Server Version/Cipher",
-   ['20'] = "SMB Insecure Version",
-   ['21'] = "TLS Suspicious ESNI Usage",
-   ['22'] = "Unsafe Protocol",
-   ['23'] = "Suspicious DNS traffic",
-   ['24'] = "SNI TLS extension was missing",
-   ['25'] = "HTTP suspicious content",
-   ['26'] = "Risky ASN",
-   ['27'] = "Risky domain name",
-   ['28'] = "Possibly Malicious JA3 Fingerprint",
-   ['29'] = "Possibly Malicious SSL Certificate SHA1 Fingerprint",
-   ['30'] = "Desktop/File Sharing Session",
-   ['31'] = ""
-}
-
-function map_ndpi_risk(r)
-   local ret = ""
-
-   if(r ~= 0) then
-      for i=0,31 do
-	 if(hasbit(r, bit(i))) then
-	    ret = ret.."["..ndpi_risks[(i-1)..""].."]"
-	 end
-      end
-   end
-   
-   return(ret)
-end
-
 
 -- the dissector function callback
 function ndpi_proto.dissector(tvb, pinfo, tree)
@@ -984,6 +972,8 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    local flow_score           = tonumber(str_score, 16) -- 16 = HEX
 	    local len                  = tvb:len()
 	    local name                 = ""
+	    local flow_risk_tree
+
 	    
 	    for i=16,31 do
 	       name = name .. string.char(tonumber(elems[i], 16))
@@ -991,8 +981,19 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
 	    ndpi_subtree:add(ndpi_fds.network_protocol, tvb(len-34, 2))
 	    ndpi_subtree:add(ndpi_fds.application_protocol, tvb(len-32, 2))
-	    ndpi_subtree:add(ndpi_fds.flow_risk, tvb(len-30, 8))
-	    ndpi_subtree:add(ndpi_fds.flow_risk_str, map_ndpi_risk(flow_risk))
+
+	    flow_risk_tree = ndpi_subtree:add(ndpi_fds.flow_risk, tvb(len-30, 8))
+	    if (flow_risk ~= 0) then
+	      for i=0,63 do
+	        --If you want to visualize only proto fields of detected risks, enable the next "if" block
+                --if hasbit(flow_risk, bit(i)) then
+	          if flow_risks[i] ~= nil then
+	            flow_risk_tree:add(flow_risks[i], flow_risk)
+	        --end
+	        end
+	      end
+	    end
+
 	    ndpi_subtree:add(ndpi_fds.flow_score, tvb(len-22, 2))
 	    ndpi_subtree:add(ndpi_fds.name, tvb(len-20, 16))
 
