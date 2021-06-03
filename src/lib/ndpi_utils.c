@@ -1769,7 +1769,7 @@ u_int16_t ndpi_risk2score(ndpi_risk risk,
 
     if(NDPI_ISSET_BIT(risk, r)) {
       ndpi_risk_info *info = ndpi_risk2severity(r);
-      u_int16_t val, client_score_val;
+      u_int16_t val = 0, client_score_val;
       
       switch(info->severity) {
       case NDPI_RISK_LOW:
