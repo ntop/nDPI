@@ -185,8 +185,8 @@ AC_ERROR_t ac_automata_feature (AC_AUTOMATA_t * thiz, unsigned int feature)
 {
   if(!thiz) return ACERR_ERROR;
   if(thiz->all_nodes_num || thiz->total_patterns) return ACERR_ERROR;
-  thiz->to_lc = feature & AC_FEATURE_LC ? 1:0;
-  thiz->no_root_range = feature & AC_FEATURE_NO_ROOT_RANGE ? 1:0;
+  thiz->to_lc = (feature & AC_FEATURE_LC) != 0;
+  thiz->no_root_range = (feature & AC_FEATURE_NO_ROOT_RANGE) != 0;
   return ACERR_SUCCESS;
 }
 
@@ -249,7 +249,7 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
 AC_ERROR_t ac_automata_walk(AC_AUTOMATA_t * thiz,
         NODE_CALLBACK_f node_cb, ALPHA_CALLBACK_f alpha_cb, void *data)
 {
-  unsigned int i,ip,last;
+  unsigned int ip;
   AC_NODE_t *next, *n;
   struct ac_path * path = thiz->ac_path;
   AC_ERROR_t r;
@@ -259,6 +259,7 @@ AC_ERROR_t ac_automata_walk(AC_AUTOMATA_t * thiz,
   path[1].idx = 0;
 
   while(ip) {
+    unsigned int i,last;
     n = path[ip].n;
     i = path[ip].idx;
     last = !n->outgoing || (n->one && i > 0) || (!n->one && i >= n->outgoing->degree);
@@ -576,7 +577,7 @@ static AC_ERROR_t dump_node_common(AC_AUTOMATA_t * thiz,
         AC_NODE_t * n, int idx, void *data) {
     struct aho_dump_info *ai = (struct aho_dump_info *)data;
     char *rstr = ai->bufstr;
-    AC_PATTERN_t *sid;
+
     if(idx) return ACERR_SUCCESS;
     dump_node_header(n,ai);
     if (n->matched_patterns && n->matched_patterns->num && n->final) {
@@ -585,7 +586,7 @@ static AC_ERROR_t dump_node_common(AC_AUTOMATA_t * thiz,
 
         nl = snprintf(lbuf,sizeof(lbuf),"'%.100s' N:%d{",rstr,n->matched_patterns->num);
         for (j=0; j<n->matched_patterns->num; j++) {
-            sid = &n->matched_patterns->patterns[j];
+            AC_PATTERN_t *sid = &n->matched_patterns->patterns[j];
             if(j) nl += snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,", ");
             nl += snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,"%d %c%.100s%c",
                             sid->rep.number & 0x3fff,
@@ -759,8 +760,8 @@ static inline size_t bsf(uint32_t bits)
 #else
     size_t i=0;
     if(!bits) return i;
-    if((int16_t)bits == 0) { i+=16; bits >>=16; }
-    if((int8_t)bits == 0) i+=8;
+    if((uint16_t)bits == 0) { i+=16; bits >>=16; }
+    if((uint8_t)bits == 0) i+=8;
     return i;
 #endif
 }
@@ -776,9 +777,9 @@ static inline size_t bsf(uint64_t bits)
 #else
     size_t i=0;
     if(!bits) return i;
-    if((int32_t)bits == 0) { i+=32; bits >>=32; }
-    if((int16_t)bits == 0) { i+=16; bits >>=16; }
-    if((int8_t)bits == 0) i+=8;
+    if((uint32_t)bits == 0) { i+=32; bits >>=32; }
+    if((uint16_t)bits == 0) { i+=16; bits >>=16; }
+    if((uint8_t)bits == 0) i+=8;
     return i;
 #endif
 }
@@ -791,11 +792,11 @@ xmemchr(char *s, char i,int n)
 
   while(n > 0) {
     if (n >= LBLOCKSIZE && !UNALIGNED (s)) {
-      unsigned long int mask,nc;
+      unsigned long int mask;
       mask = c * DUPC;
 
       while (n >= LBLOCKSIZE) {
-        nc = DETECTNULL((*(unsigned long int *)s) ^ mask);
+        unsigned long int nc = DETECTNULL((*(unsigned long int *)s) ^ mask);
         if(nc)
             return s + (bsf(nc) >> 3);
         s += LBLOCKSIZE;
@@ -1070,12 +1071,12 @@ static int node_range_edges (AC_AUTOMATA_t *thiz, AC_NODE_t * node)
 {
     struct edge *e = node->outgoing;
     uint8_t *c = (uint8_t *)edge_get_alpha(node->outgoing);
-    uint8_t low = 0xff,high = 0, cc;
+    uint8_t low = 0xff,high = 0;
     int i;
 
     memset((char *)&e->cmap,0,sizeof(e->cmap));
     for(i = 0; i < e->degree; i++) {
-      cc = c[i];
+      uint8_t cc = c[i];
       if(cc < low) low = cc;
       if(cc > high) high = cc;
       e->cmap[cc >> 5] |= 1 << (cc & 0x1f);
