@@ -2319,6 +2319,13 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->custom_categories.ipAddresses = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
 
+  if(ndpi_str->host_automa.ac_automa)
+      ac_automata_feature(ndpi_str->host_automa.ac_automa,AC_FEATURE_LC);
+  if(ndpi_str->custom_categories.hostnames.ac_automa)
+      ac_automata_feature(ndpi_str->custom_categories.hostnames.ac_automa,AC_FEATURE_LC);
+  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa)
+      ac_automata_feature(ndpi_str->custom_categories.hostnames_shadow.ac_automa,AC_FEATURE_LC);
+
   if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating Patricia trees\n");
     return(NULL);
@@ -2441,6 +2448,7 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
     return(-2);
 
   ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
+  ac_input_text.ignore_case = 0;
   rc = ac_automata_search(automa, &ac_input_text, &match);
 
   /*
@@ -2470,6 +2478,7 @@ int ndpi_match_string_protocol_id(void *_automa, char *string_to_match,
     return(-2);
 
   ac_input_text.astring = string_to_match, ac_input_text.length = match_len;
+  ac_input_text.ignore_case = 0;
   rc = ac_automata_search(automa, &ac_input_text, &match);
 
   /*
@@ -2503,6 +2512,7 @@ int ndpi_match_string_value(void *_automa, char *string_to_match,
     return(-2);
 
   ac_input_text.astring = string_to_match, ac_input_text.length = match_len;
+  ac_input_text.ignore_case = 0;
   rc = ac_automata_search(automa, &ac_input_text, &match);
 
   /*
@@ -3020,8 +3030,11 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
 
 static int ndpi_load_risky_domain(struct ndpi_detection_module_struct *ndpi_str,
 				  char* domain_name) {
-  if(ndpi_str->risky_domain_automa.ac_automa == NULL)
+  if(ndpi_str->risky_domain_automa.ac_automa == NULL) {
     ndpi_str->risky_domain_automa.ac_automa = ac_automata_init(ac_match_handler);
+    if(ndpi_str->risky_domain_automa.ac_automa)
+	    ac_automata_feature(ndpi_str->risky_domain_automa.ac_automa,AC_FEATURE_LC);
+  }
 
   if(ndpi_str->risky_domain_automa.ac_automa) {
     char buf[64], *str;
@@ -6649,6 +6662,7 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
+  ac_input_text.ignore_case = 0;
   rc = ac_automata_search(((AC_AUTOMATA_t *) automa->ac_automa), &ac_input_text, &match);
 
   /*
@@ -6839,6 +6853,7 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   ac_input_text.astring = bigram_to_match, ac_input_text.length = 2;
+  ac_input_text.ignore_case = 0;
   rc = ac_automata_search(((AC_AUTOMATA_t *) automa->ac_automa), &ac_input_text, &match);
 
   /*
@@ -6873,6 +6888,7 @@ int ndpi_match_trigram(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   ac_input_text.astring = trigram_to_match, ac_input_text.length = 3;
+  ac_input_text.ignore_case = 0;
   rc = ac_automata_search(((AC_AUTOMATA_t *) automa->ac_automa), &ac_input_text, &match);
 
   /*
