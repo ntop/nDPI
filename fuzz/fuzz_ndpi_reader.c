@@ -86,6 +86,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 	 sizeof(workflow->stats.protocol_flows));
   ndpi_finalize_initialization(workflow->ndpi_struct);
 
+  header = NULL;
   r = pcap_next_ex(pkts, &header, &pkt);
   while (r > 0) {
     if(header->caplen >= 42 /* ARP+ size */) {
