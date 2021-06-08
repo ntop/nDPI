@@ -1,11 +1,10 @@
-
 --
--- Sharkfest 2021
+-- (C) 2021 - ntop.org
 --
 -- This is going to be an example of a lua script that can be written for cybersecurity reasons.
 -- DNS Request/Reply Ratio:
 
-
+local f_dns = Field.new("dns")
 local f_dns_response_flag = Field.new("dns.flags.response")
 local f_ip_src = Field.new("ip.src")
 local f_ip_dst = Field.new("ip.dst")
@@ -41,11 +40,12 @@ end
 
 local function processPackets(pinfo,tvb, dns_table) 
     -- Call the function that extracts the field
-    local dns = f_dns_response_flag()
+    local dns_traffic = f_dns()
+    local dns_flag = f_dns_response_flag()
 
     --Check if there is an DNS request or reply
-    if dns then
-        if dns.value == false then
+    if dns_traffic then
+        if dns_flag.value == false then
             local src = getstring(f_ip_src().value)
             local dst = getstring(f_ip_dst().value)
 
@@ -87,12 +87,14 @@ local function dnsReqRepRatio()
 	-- This function will be called once every few seconds to update our window
 	function tap.draw(t)
 		tw:clear()
+
+        local dangerous_flows = {}
+        local ok_flows = {}
 		
-        for flow in pairs(dns_table) do
+        for flow, data in pairs(dns_table) do
 			local requests = dns_table[flow]["requests"]
 			local replies = dns_table[flow]["replies"]
             local ratio = 0
-            local danger = ""
 
             if replies == 0 then
                 ratio = 0
@@ -101,11 +103,33 @@ local function dnsReqRepRatio()
             end
 
             if ratio ~= 1 then
-                danger = "-- DANGER: RATIO NOT 1 --\n"
+                dangerous_flows[#dangerous_flows + 1] = data
+                dangerous_flows[#dangerous_flows]["flow"] = flow
+                dangerous_flows[#dangerous_flows]["ratio"] = ratio
+            else
+                ok_flows[#ok_flows + 1] = data
+                ok_flows[#ok_flows]["flow"] = flow
+                ok_flows[#ok_flows]["ratio"] = ratio
             end
-
-			tw:append(danger .. flow .. ":\n\tRatio: " .. (ratio) .. "\n\tRequests: " .. requests .. "\n\tReplies: " .. replies .. "\n\n");
 		end
+
+        if #dangerous_flows > 0 then
+            tw:append("------------- DETECTED DNS REQUEST/REPLY RATIO -------------\n")
+            tw:append("------------- TOT SUSPICIOUS FLOWS DETECTED: " .. #dangerous_flows .. " -------------\n")
+        else
+            tw:append("------------- DNS REQUEST/REPLY RATIO SEEMS FINE -------------\n")
+        end
+
+        tw:append("------------- TOTAL DNS FLOWS DETECTED: " .. #dangerous_flows + #ok_flows .. " -------------\n\n")
+        
+        for _, data in pairs(dangerous_flows) do
+            local flow = data["flow"]
+			local requests = data["requests"]
+			local replies = data["replies"]
+            local ratio = data["ratio"]
+
+            tw:append(flow .. ":\n\tRatio: " .. (ratio) .. "\n\tRequests: " .. requests .. "\n\tReplies: " .. replies .. "\n\n");
+        end
 	end
 
 	-- This function will be called whenever a reset is needed

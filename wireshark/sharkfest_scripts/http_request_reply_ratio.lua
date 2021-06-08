@@ -1,6 +1,5 @@
-
 --
--- Sharkfest 2021
+-- (C) 2021 - ntop.org
 --
 -- This is going to be an example of a lua script that can be written for cybersecurity reasons.
 -- HTTP Request/Reply Ratio:
@@ -8,6 +7,7 @@
 -- that there are problems with the client that is sending the requests or there are problems with
 -- the server that should receive those requests.
 
+local f_http = Field.new("http")
 local f_http_request = Field.new("http.request")
 local f_http_reply = Field.new("http.response")
 local f_ip_src = Field.new("ip.src")
@@ -44,20 +44,23 @@ end
 
 local function processPackets(pinfo,tvb, http_table) 
     -- Call the function that extracts the field
+    local http_traffic = f_http()
     local http_request = f_http_request()
     local http_reply = f_http_reply()
 
     --Check if there is an HTTP request or reply
-    if http_request then
-        local src = getstring(f_ip_src().value)
-        local dst = getstring(f_ip_dst().value)
+    if http_traffic then
+        if http_request then
+            local src = getstring(f_ip_src().value)
+            local dst = getstring(f_ip_dst().value)
 
-        http_table = processResponse(http_table, "requests", src, dst)
-    elseif http_reply then
-        local dst = getstring(f_ip_src().value)
-        local src = getstring(f_ip_dst().value)
+            http_table = processResponse(http_table, "requests", src, dst)
+        elseif http_reply then
+            local dst = getstring(f_ip_src().value)
+            local src = getstring(f_ip_dst().value)
 
-        http_table = processResponse(http_table, "replies", src, dst)
+            http_table = processResponse(http_table, "replies", src, dst)
+        end
     end
 
     return http_table
@@ -90,7 +93,10 @@ local function httpReqRepRatio()
 	function tap.draw(t)
 		tw:clear()
 		
-        for flow in pairs(http_table) do
+        local dangerous_flows = {}
+        local ok_flows = {}
+
+        for flow, data in pairs(http_table) do
 			local requests = http_table[flow]["requests"]
 			local replies = http_table[flow]["replies"]
             local ratio = 0
@@ -103,11 +109,33 @@ local function httpReqRepRatio()
             end
 
             if ratio ~= 1 then
-                danger = "-- DANGER: RATIO NOT 1 --\n"
+                dangerous_flows[#dangerous_flows + 1] = data
+                dangerous_flows[#dangerous_flows]["flow"] = flow
+                dangerous_flows[#dangerous_flows]["ratio"] = ratio
+            else
+                ok_flows[#ok_flows + 1] = data
+                ok_flows[#ok_flows]["flow"] = flow
+                ok_flows[#ok_flows]["ratio"] = ratio
             end
-
-			tw:append(danger .. flow .. ":\n\tRatio: " .. (ratio) .. "\n\tRequests: " .. requests .. "\n\tReplies: " .. replies .. "\n\n");
 		end
+
+        if #dangerous_flows > 0 then
+            tw:append("------------- DETECTED HTTP REQUEST/REPLY RATIO -------------\n")
+            tw:append("------------- TOT SUSPICIOUS FLOWS DETECTED: " .. #dangerous_flows .. " -------------\n")
+        else
+            tw:append("------------- HTTP REQUEST/REPLY RATIO SEEMS FINE -------------\n")
+        end
+
+        tw:append("------------- TOTAL HTTP FLOWS DETECTED: " .. #dangerous_flows + #ok_flows .. " -------------\n\n")
+        
+        for _, data in pairs(dangerous_flows) do
+            local flow = data["flow"]
+			local requests = data["requests"]
+			local replies = data["replies"]
+            local ratio = data["ratio"]
+
+            tw:append(flow .. ":\n\tRatio: " .. (ratio) .. "\n\tRequests: " .. requests .. "\n\tReplies: " .. replies .. "\n\n");
+        end
 	end
 
 	-- This function will be called whenever a reset is needed

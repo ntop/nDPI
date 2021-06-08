@@ -1,6 +1,5 @@
-
 --
--- Sharkfest 2021
+-- (C) 2021 - ntop.org
 --
 -- This is going to be an example of a lua script that can be written for cybersecurity reasons.
 -- TCP No Data Exchanged:
@@ -98,18 +97,37 @@ local function tcpPayload()
 	-- This function will be called once every few seconds to update our window
 	function tap.draw(t)
 		tw:clear()
+
+        local dangerous_flows = {}
+        local ok_flows = {}
 		
-        for flow in pairs(tcp_table) do
-			local payload = tcp_table[flow]["payload"]
-            local fin = tcp_table[flow]["fin"]
-            local danger = ""
+        for flow, data in pairs(tcp_table) do
+			local payload = data["payload"]
 
             if tonumber(payload) == 0 then
-                danger = "-- DANGER: NO DATA EXCHANGED FOR THIS FLOW --\n"
+                dangerous_flows[#dangerous_flows + 1] = data
+                dangerous_flows[#dangerous_flows]["flow"] = flow
+            else
+                ok_flows[#ok_flows + 1] = data
+                ok_flows[#ok_flows]["flow"] = flow
             end
-
-			tw:append(danger .. flow .. ":\n\tPayload: " .. payload .. "\n\tFlow Ended: " .. tostring(fin) .. "\n\n");
 		end
+
+        if #dangerous_flows > 0 then
+            tw:append("------------- DETECTED TCP NO DATA EXCHANGED -------------\n")
+            tw:append("------------- TOT SUSPICIOUS FLOWS DETECTED: " .. #dangerous_flows .. "\n")
+        else
+            tw:append("------------- NO DATA EXCHANGED NOT DETECTED -------------\n")
+        end
+
+        tw:append("------------- TOTAL FLOWS DETECTED: " .. #dangerous_flows + #ok_flows .. "\n\n")
+        
+        for _, data in pairs(dangerous_flows) do
+            local flow = data["flow"]
+			local payload = data["payload"]
+
+            tw:append(flow .. ":\n\tPayload Len: " .. payload .. "\n\n");
+        end
 	end
 
 	-- This function will be called whenever a reset is needed
