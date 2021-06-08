@@ -6,7 +6,7 @@ mkdir package/network/services/libndpi
 cd package/network/services/libndpi
 
 # (a) Stable version
-cp ~/nDPI/packages/openwrt/Makefile .
+ln -s ~/nDPI/packages/openwrt/Makefile .
 
 # (b) Dev version
 cp ~/nDPI/packages/openwrt/Makefile.dev Makefile
