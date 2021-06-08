@@ -569,7 +569,7 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
   }
 
-  if((automa->ac_automa == NULL) || (value == NULL))
+  if((automa->ac_automa == NULL) || (value == NULL) || !*value)
     return(-2);
 
   len = strlen(value);
@@ -2345,6 +2345,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
+  if(ndpi_str->ac_automa_finalized) return;
+
   for(i = 0; i < 99; i++) {
     ndpi_automa *automa;
 
@@ -2382,13 +2384,12 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
       break;
 
     default:
+      ndpi_str->ac_automa_finalized = 1;
       return;
     }
 
-    if(automa && automa->ac_automa) {
-      ac_automata_finalize((AC_AUTOMATA_t *) automa->ac_automa);
-      automa->ac_automa_finalized = 1;
-    }
+    if(automa && automa->ac_automa)
+           ac_automata_finalize((AC_AUTOMATA_t *) automa->ac_automa);
   }
 }
 
@@ -2438,16 +2439,25 @@ void ndpi_finalize_automa(void *_automa) {
 
 /* ****************************************************** */
 
-int ndpi_match_string(void *_automa, char *string_to_match) {
+static int ndpi_match_string_common(AC_AUTOMATA_t *automa, char *string_to_match,size_t string_len,
+                u_int16_t *protocol_id, ndpi_protocol_category_t *category,
+                ndpi_protocol_breed_t *breed) {
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   AC_TEXT_t ac_input_text;
-  AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
   int rc;
 
-  if((automa == NULL) || (string_to_match == NULL) || (string_to_match[0] == '\0'))
-    return(-2);
+  if(protocol_id) *protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
-  ac_input_text.astring = string_to_match, ac_input_text.length = strlen(string_to_match);
+  if((automa == NULL) || (string_to_match == NULL) || (string_to_match[0] == '\0')) {
+    return(-2);
+  }
+
+  if(automa->automata_open) {
+    printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initialization()\n", __FILE__, __LINE__);
+    return(-1);
+  }
+
+  ac_input_text.astring = string_to_match, ac_input_text.length = string_len;
   ac_input_text.ignore_case = 0;
   rc = ac_automata_search(automa, &ac_input_text, &match);
 
@@ -2459,76 +2469,48 @@ int ndpi_match_string(void *_automa, char *string_to_match) {
   if((rc == 0) && (match.number != 0))
     rc = 1;
 
-  return(rc ? match.number : 0);
+  if(protocol_id)
+      *protocol_id = rc ? match.number:NDPI_PROTOCOL_UNKNOWN;
+  if(category)
+      *category = rc ? match.category:0;
+  if(breed) 
+      *breed = rc ? match.breed:0;
+  return rc;
+}
+
+int ndpi_match_string(void *_automa, char *string_to_match) {
+  uint16_t proto_id;
+  int rc;
+  if(!string_to_match)
+	  return(-2);
+  rc = ndpi_match_string_common(_automa,string_to_match,strlen(string_to_match),
+			  &proto_id, NULL, NULL);
+  if(rc < 0) return rc;
+  return rc ? proto_id : NDPI_PROTOCOL_UNKNOWN;
 }
 
 /* ****************************************************** */
 
-int ndpi_match_string_protocol_id(void *_automa, char *string_to_match,
+int ndpi_match_string_protocol_id(void *automa, char *string_to_match,
 				  u_int match_len, u_int16_t *protocol_id,
 				  ndpi_protocol_category_t *category,
 				  ndpi_protocol_breed_t *breed) {
-  AC_TEXT_t ac_input_text;
-  AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
-  AC_REP_t match = { 0, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
-  int rc;
 
-  *protocol_id = (u_int16_t)-1;
-  if((automa == NULL) || (string_to_match == NULL) || (string_to_match[0] == '\0'))
-    return(-2);
-
-  ac_input_text.astring = string_to_match, ac_input_text.length = match_len;
-  ac_input_text.ignore_case = 0;
-  rc = ac_automata_search(automa, &ac_input_text, &match);
-
-  /*
-    As ac_automata_search can detect partial matches and continue the search process
-    in case rc == 0 (i.e. no match), we need to check if there is a partial match
-    and in this case return it
-  */
-  if((rc == 0) && (match.number != 0))
-    rc = 1;
-
-  if(rc)
-    *protocol_id = (u_int16_t)match.number, *category = match.category,
-      *breed = match.breed;
-  else
-    *protocol_id = NDPI_PROTOCOL_UNKNOWN;
-
-  return((*protocol_id != NDPI_PROTOCOL_UNKNOWN) ? 0 : -1);
+  int rc = ndpi_match_string_common((AC_AUTOMATA_t*)automa, string_to_match,
+		  match_len, protocol_id, category, breed);
+  if(rc < 0) return rc;
+  return(*protocol_id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
 }
 
 /* ****************************************************** */
 
-int ndpi_match_string_value(void *_automa, char *string_to_match,
-			    u_int match_len, u_int32_t *num) {
-  AC_TEXT_t ac_input_text;
-  AC_AUTOMATA_t *automa = (AC_AUTOMATA_t *) _automa;
-  AC_REP_t match = { 0, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
-  int rc;
+int ndpi_match_string_value(void *automa, char *string_to_match,
+			    u_int match_len, u_int16_t *num) {
 
-  *num = (u_int32_t)-1;
-  if((automa == NULL) || (string_to_match == NULL) || (string_to_match[0] == '\0'))
-    return(-2);
-
-  ac_input_text.astring = string_to_match, ac_input_text.length = match_len;
-  ac_input_text.ignore_case = 0;
-  rc = ac_automata_search(automa, &ac_input_text, &match);
-
-  /*
-    As ac_automata_search can detect partial matches and continue the search process
-    in case rc == 0 (i.e. no match), we need to check if there is a partial match
-    and in this case return it
-  */
-  if((rc == 0) && (match.number != 0))
-    rc = 1;
-
-  if(rc)
-    *num = match.number;
-  else
-    *num = 0;
-
-  return(rc ? 0 : -1);
+  int rc = ndpi_match_string_common((AC_AUTOMATA_t *)automa, string_to_match,
+		  match_len, num, NULL, NULL);
+  if(rc < 0) return rc;
+  return rc ? 0 : -1;
 }
 
 /* *********************************************** */
@@ -2536,12 +2518,11 @@ int ndpi_match_string_value(void *_automa, char *string_to_match,
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 			       char *name, u_int name_len,
                                ndpi_protocol_category_t *category) {
-  ndpi_protocol_breed_t breed;
   u_int16_t id;
-  int rc = ndpi_match_string_protocol_id(ndpi_str->custom_categories.hostnames.ac_automa,
-					 name, name_len, &id, category, &breed);
-
-  return(rc);
+  int rc = ndpi_match_string_common(ndpi_str->custom_categories.hostnames.ac_automa,
+					 name, name_len, &id, category, NULL);
+  if(rc < 0) return rc;
+  return(id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
 }
 
 /* *********************************************** */
@@ -6634,36 +6615,16 @@ int ndpi_match_prefix(const u_int8_t *payload,
 int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str, char *string_to_match,
 				  u_int string_to_match_len, ndpi_protocol_match_result *ret_match,
 				  u_int8_t is_host_match) {
-  AC_TEXT_t ac_input_text;
   ndpi_automa *automa = is_host_match ? &ndpi_str->host_automa : &ndpi_str->content_automa;
-  AC_REP_t match = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED};
   int rc;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0))
     return(NDPI_PROTOCOL_UNKNOWN);
 
-  if(!automa->ac_automa_finalized) {
-    printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initialization()\n", __FILE__, __LINE__);
-    return(0); /* No matches */
-  }
-
-  ac_input_text.astring = string_to_match, ac_input_text.length = string_to_match_len;
-  ac_input_text.ignore_case = 0;
-  rc = ac_automata_search(((AC_AUTOMATA_t *) automa->ac_automa), &ac_input_text, &match);
-
-  /*
-    As ac_automata_search can detect partial matches and continue the search process
-    in case rc == 0 (i.e. no match), we need to check if there is a partial match
-    and in this case return it
-  */
-  if((rc == 0) && (match.number != 0))
-    rc = 1;
-
-  /* We need to take into account also rc == 0 that is used for partial matches */
-  ret_match->protocol_id = match.number, ret_match->protocol_category = match.category,
-    ret_match->protocol_breed = match.breed;
-
-  return(rc ? match.number : 0);
+  rc = ndpi_match_string_common(((AC_AUTOMATA_t *) automa->ac_automa),
+		  string_to_match,string_to_match_len, &ret_match->protocol_id,
+		  &ret_match->protocol_category, &ret_match->protocol_breed);
+  return rc < 0 ? rc : ret_match->protocol_id;
 }
 
 /* **************************************** */
@@ -6690,7 +6651,7 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 						      struct ndpi_flow_struct *flow, char *string_to_match,
 						      u_int string_to_match_len, u_int16_t master_protocol_id,
 						      ndpi_protocol_match_result *ret_match, u_int8_t is_host_match) {
-  int matching_protocol_id;
+  uint16_t matching_protocol_id;
   struct ndpi_packet_struct *packet = &flow->packet;
 
   matching_protocol_id =
@@ -6822,14 +6783,11 @@ u_int16_t ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *nd
 
 int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
 		      ndpi_automa *automa, char *bigram_to_match) {
-  AC_TEXT_t ac_input_text;
-  AC_REP_t match = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED};
-  int rc;
 
   if((automa->ac_automa == NULL) || (bigram_to_match == NULL))
     return(-1);
 
-  if(!automa->ac_automa_finalized) {
+  if(!ndpi_str->ac_automa_finalized) {
 #if 1
     ndpi_finalize_initialization(ndpi_str);
 #else
@@ -6837,34 +6795,19 @@ int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
     return(0); /* No matches */
 #endif
   }
-
-  ac_input_text.astring = bigram_to_match, ac_input_text.length = 2;
-  ac_input_text.ignore_case = 0;
-  rc = ac_automata_search(((AC_AUTOMATA_t *) automa->ac_automa), &ac_input_text, &match);
-
-  /*
-    As ac_automata_search can detect partial matches and continue the search process
-    in case rc == 0 (i.e. no match), we need to check if there is a partial match
-    and in this case return it
-  */
-  if((rc == 0) && (match.number != 0))
-    rc = 1;
-
-  return(rc ? match.number : 0);
+  return ndpi_match_string_common(automa->ac_automa,bigram_to_match,2, NULL, NULL, NULL);
 }
 
 /* ****************************************************** */
 
 int ndpi_match_trigram(struct ndpi_detection_module_struct *ndpi_str,
 		       ndpi_automa *automa, char *trigram_to_match) {
-  AC_TEXT_t ac_input_text;
-  AC_REP_t match = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED};
   int rc;
 
   if((automa->ac_automa == NULL) || (trigram_to_match == NULL))
     return(-1);
 
-  if(!automa->ac_automa_finalized) {
+  if(!ndpi_str->ac_automa_finalized) {
 #if 1
     ndpi_finalize_initialization(ndpi_str);
 #else
@@ -6872,20 +6815,8 @@ int ndpi_match_trigram(struct ndpi_detection_module_struct *ndpi_str,
     return(0); /* No matches */
 #endif
   }
-
-  ac_input_text.astring = trigram_to_match, ac_input_text.length = 3;
-  ac_input_text.ignore_case = 0;
-  rc = ac_automata_search(((AC_AUTOMATA_t *) automa->ac_automa), &ac_input_text, &match);
-
-  /*
-    As ac_automata_search can detect partial matches and continue the search process
-    in case rc == 0 (i.e. no match), we need to check if there is a partial match
-    and in this case return it
-  */
-  if((rc == 0) && (match.number != 0))
-    rc = 1;
-
-  if(ndpi_verbose_dga_detection && rc && match.number) {
+  rc = ndpi_match_string_common(automa->ac_automa,trigram_to_match,3, NULL, NULL, NULL);
+  if(ndpi_verbose_dga_detection && rc) {
     printf("[%s:%d] [NDPI] Trigram %c%c%c\n",
 	   __FILE__, __LINE__,
 	   trigram_to_match[0],
@@ -6893,7 +6824,7 @@ int ndpi_match_trigram(struct ndpi_detection_module_struct *ndpi_str,
 	   trigram_to_match[2]);
   }
 
-  return(rc ? match.number : 0);
+  return(rc);
 }
 
 /* ****************************************************** */
