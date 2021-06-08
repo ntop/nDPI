@@ -24,7 +24,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifndef WIN32
 #include <unistd.h>
+#else
+#define __SIZEOF_LONG__ 4
+#endif
 #include <stdint.h>
 #include <sys/types.h>
 #else
@@ -756,7 +760,7 @@ static inline size_t bsf(uint32_t bits)
 #else
     size_t i=0;
     if(!bits) return i;
-    if((bits & 0xffff)bits == 0) { i+=16; bits >>=16; }
+    if((bits & 0xffff) == 0) { i+=16; bits >>=16; }
     if((bits & 0xff) == 0) i+=8;
     return i;
 #endif

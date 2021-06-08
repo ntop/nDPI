@@ -184,10 +184,6 @@ typedef struct ac_node
   AC_ALPHABET_t  *a_ptr;
 } AC_NODE_t;
 
-#ifndef __SIZEOF_POINTER__
-#error SIZEOF_POINTER not defined!
-#endif
-
 struct edge {
   unsigned short degree;      /* Number of outgoing edges */
   unsigned short max;         /* Max capacity of allocated memory for outgoing */

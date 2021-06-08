@@ -6557,7 +6557,8 @@ void ndpi_dump_risks_score() {
   for(i = 1; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
     ndpi_risk risk   = 2 << (r-1);
-    ndpi_risk_severity s = ndpi_risk2severity(r)->severity;
+    ndpi_risk_info* info = ndpi_risk2severity(r);
+    ndpi_risk_severity s =info->severity;
     u_int16_t client_score, server_score;
     u_int16_t score = ndpi_risk2score(risk, &client_score, &server_score);
 
