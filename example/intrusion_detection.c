@@ -44,7 +44,8 @@ double normalize(ndpi_norm_value* tresholds){
 
 double get_flow_score(ndpi_norm_value* scores, int n_metrics){
   double flow_score = 0;
-  for(int i=0; i<n_metrics; i++){
+  int i;
+  for(i=0; i<n_metrics; i++){
     flow_score += normalize(&scores[i]);
   }
   return flow_score;

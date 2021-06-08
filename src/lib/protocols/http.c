@@ -238,12 +238,13 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
       if(packet->content_disposition_line.len > attachment_len) {
 	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
+	int i;
 
 	if(filename_len > ATTACHMENT_LEN) {
 	  attachment_len += filename_len-ATTACHMENT_LEN-1;
 
 	  if((attachment_len+ATTACHMENT_LEN) <= packet->content_disposition_line.len) {
-	    for(int i = 0; binary_file_ext[i] != NULL; i++) {
+	    for(i = 0; binary_file_ext[i] != NULL; i++) {
 	      /* Use memcmp in case content-disposition contains binary data */
 	      if(memcmp(&packet->content_disposition_line.ptr[attachment_len],
 			binary_file_ext[i], ATTACHMENT_LEN) == 0) {
@@ -715,7 +716,7 @@ static const char *http_fs = "CDGHOPR";
 static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
-  int i;
+  unsigned int i;
 
   NDPI_LOG_DBG2(ndpi_struct, "====>>>> HTTP: %c%c%c%c [len: %u]\n",
 		packet->payload_packet_len > 0 ? non_ctrl(packet->payload[0]) : '.',

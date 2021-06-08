@@ -71,7 +71,7 @@ u_int64_t ndpi_ntohll(u_int64_t v) {
 /* ********************************** */
 
 static int ndpi_is_number(const char *str, u_int32_t str_len) {
-  int i;
+  unsigned int i;
   
   for(i = 0; i < str_len; i++)
     if(!isdigit(str[i])) return(0);

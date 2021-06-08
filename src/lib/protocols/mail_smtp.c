@@ -88,7 +88,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  if(flow->host_server_name[0] == '\0') {
 	    if(packet->line[a].len > 4) {
-	      int i, len;
+	      int i;
+	      unsigned int len;
 
 	      if(packet->line[a].ptr[4] != '(') {
 		for(i=5; (i<packet->line[a].len-1) && (packet->line[a].ptr[i] != ' '); i++)

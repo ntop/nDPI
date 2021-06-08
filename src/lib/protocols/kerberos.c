@@ -302,7 +302,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 	      if(body_offset < packet->payload_packet_len) {
-		u_int name_offset, padding_offset = body_offset + 4;
+		u_int16_t name_offset, padding_offset = body_offset + 4;
 
 		name_offset = padding_offset;
 		for(i=0; i<14; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */

@@ -75,7 +75,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
     case 0:
     case 1:
       if(payload_len > 6 && memcmp(packet_payload, "0 ", 2) == 0 && packet_payload[2] != ' ') {
-	u_int16_t i = 3;
+	u_int32_t i = 3;
 	while(i < payload_len && packet_payload[i++] != ' ');
 	if(i+3 == payload_len && memcmp((packet_payload+i), "17\n", 3) == 0) {
 	  flow->tinc_state++;

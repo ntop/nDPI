@@ -1010,7 +1010,7 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
                         uint64_t frag_len, uint64_t frag_offset,
                         const u_int8_t **buf, u_int64_t *buf_len)
 {
-  const int max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... */
+  const uint64_t max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... */
 
   /* TODO: at the moment, this function is only a little more than a stub.
      We should reassemble the fragments, but nDPI lacks any proper generic
@@ -1580,7 +1580,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 {
   u_int32_t version;
   u_int8_t *clear_payload;
-  uint32_t clear_payload_len;
+  uint32_t clear_payload_len = 0;
   const u_int8_t *crypto_data;
   uint64_t crypto_data_len;
   int is_quic;

@@ -51,7 +51,7 @@ static u_int32_t skip_unknown_headers(const u_int8_t * payload, u_int32_t payloa
 }
 
 static u_int16_t parse_binf_message(struct ndpi_detection_module_struct
-				    *ndpi_struct, const u_int8_t * payload, int payload_len)
+				    *ndpi_struct, const u_int8_t * payload, uint32_t payload_len)
 {
   u_int32_t i = 4;
   u_int16_t bytes_read = 0;

@@ -13,7 +13,7 @@ prefix     = @prefix@
 libdir     = ${prefix}/lib
 includedir = ${prefix}/include/ndpi
 CC         = @GNU_PREFIX@@CC@
-CFLAGS     += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION -Wall @CFLAGS@ @CUSTOM_NDPI@
+CFLAGS     += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @CFLAGS@ @CUSTOM_NDPI@
 LDFLAGS    = @LDFLAGS@ @ADDITIONAL_LIBS@ @LIBS@
 RANLIB     = @GNU_PREFIX@ranlib
 

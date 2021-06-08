@@ -37,7 +37,7 @@ void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     
     if(((packet->tcp->dest == fourfourfive) || (packet->tcp->source == fourfourfive))
        && packet->payload_packet_len > (32 + 4 + 4)
-       && (packet->payload_packet_len - 4) == ntohl(get_u_int32_t(packet->payload, 0))
+       && ((uint32_t)packet->payload_packet_len - 4) == ntohl(get_u_int32_t(packet->payload, 0))
        ) {
       u_int8_t smbv1[] = { 0xff, 0x53, 0x4d, 0x42 };
 

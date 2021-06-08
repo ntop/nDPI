@@ -159,7 +159,7 @@ int main(int argc, char ** argv)
     return 1;
   }
 
-  if (fread(pcap_buffer, sizeof(*pcap_buffer), pcap_file_size, pcap_file) != pcap_file_size) {
+  if (fread(pcap_buffer, sizeof(*pcap_buffer), pcap_file_size, pcap_file) != (size_t)pcap_file_size) {
     perror("fread failed");
     fclose(pcap_file);
     free(pcap_buffer);

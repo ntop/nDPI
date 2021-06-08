@@ -112,7 +112,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(packet->payload_packet_len >= 12 && packet->payload_packet_len < 300 && get_l32(packet->payload, 4) == 1) {
 	while (index + 4 < packet->payload_packet_len &&
 	       !get_u_int16_t(packet->payload, index + 2)
-	       && (index + get_l32(packet->payload, index)) < packet->payload_packet_len - 4) {
+	       && (index + get_l32(packet->payload, index)) < (u_int32_t)packet->payload_packet_len - 4) {
 	  if(get_l32(packet->payload, index) < 8)	/*Minimum soulseek login msg is 8B */
 	    break;
 
@@ -125,7 +125,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	} /* while */
 	
 	if((packet->payload_packet_len >= (index+4))
-	   && (index + get_l32(packet->payload, index)) == (packet->payload_packet_len - 4)
+	   && (index + get_l32(packet->payload, index)) == (u_int32_t)packet->payload_packet_len -4
 	   && (get_u_int16_t(packet->payload, 10) != 0)) {
 	  /* This structure seems to be soulseek proto */
 	  index = get_l32(packet->payload, 8) + 12;	// end of "user name"
@@ -150,7 +150,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       }
       if (packet->payload_packet_len > 8
 	  && (packet->payload_packet_len < 200)
-	  && get_l32(packet->payload, 0) == (packet->payload_packet_len - 4)) {
+	  && get_l32(packet->payload, 0) == (u_int32_t)packet->payload_packet_len -4) {
 	//Server Messages:
 	const u_int32_t msgcode = get_l32(packet->payload, 4);
 
@@ -177,7 +177,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  }
 	}
 	//Peer Messages  : Peer Init Message Detection
-	if(get_l32(packet->payload, 0) == packet->payload_packet_len - 4) {
+	if(get_l32(packet->payload, 0) == (u_int32_t)packet->payload_packet_len - 4) {
 	  const u_int32_t typelen = get_l32(packet->payload, packet->payload_packet_len - 9);
 	  const u_int8_t type = packet->payload[packet->payload_packet_len - 5];
 	  const u_int32_t namelen = get_l32(packet->payload, 5);
@@ -204,7 +204,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  && !get_u_int16_t(packet->payload, 2)) {
 	const u_int32_t usrlen = get_l32(packet->payload, 5);
 
-	if(usrlen <= packet->payload_packet_len - (4 + 1 + 4 + 4 + 1 + 4)) {
+	if(usrlen <= (u_int32_t)packet->payload_packet_len - (4 + 1 + 4 + 4 + 1 + 4)) {
 	  const u_int32_t typelen = get_l32(packet->payload, 4 + 1 + 4 + usrlen);
 	  const u_int8_t type = packet->payload[4 + 1 + 4 + usrlen + 4];
 	  if(typelen == 1 && (type == 'F' || type == 'P' || type == 'D')) {
@@ -223,7 +223,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  SOULSEEK_DETECT;
 	  return;
 	}
-	if(get_l32(packet->payload, 0) == packet->payload_packet_len - 4) {
+	if(get_l32(packet->payload, 0) == (u_int32_t)packet->payload_packet_len - 4) {
 	  const u_int32_t msgcode = get_l32(packet->payload, 4);
 	  if(msgcode == 0x03 && packet->payload_packet_len >= 12)	//Server Message : Get Peer Address
 	    {

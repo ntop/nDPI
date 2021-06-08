@@ -30,7 +30,7 @@ static int is_port(u_int16_t a, u_int16_t b, u_int16_t c) {
 static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int32_t payload_len = packet->payload_packet_len;
-
+  int i;
   const uint8_t id_flags_iv_crc_len = 11;
   const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
   const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
@@ -48,7 +48,7 @@ static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_
     u_int8_t detected = 1;
 
     /* Check if both packets have the same CRC */
-    for (int i = 0; i < crc_len && detected; i++) {
+    for (i = 0; i < crc_len && detected; i++) {
       if (packet->payload[crc_offset + i] != flow->l4.udp.skype_crc[i])
         detected = 0;
     }

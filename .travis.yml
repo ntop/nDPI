@@ -6,7 +6,7 @@ matrix:
       compiler: clang
 
     - os: linux
-      env: BUILD_DPKG_PACKAGE=y
+      env: BUILD_DPKG_PACKAGE=y CFLAGS="-Werror"
       compiler: gcc
       dist: bionic
       addons:
@@ -21,7 +21,7 @@ matrix:
             - autogen
 
     - os: linux
-      env: DISABLE_GCRYPT=y
+      env: DISABLE_GCRYPT=y CFLAGS="-Werror"
       compiler: gcc
       dist: bionic
       addons:
@@ -36,6 +36,7 @@ matrix:
             - autogen
 
     - os: linux
+      env: CFLAGS="-Werror"
       compiler: clang
       dist: bionic
       addons:
@@ -47,6 +48,7 @@ matrix:
             - autogen
 
     - os: linux
+      env: CFLAGS="-Werror"
       compiler: gcc
       dist: bionic
       arch: arm64
@@ -59,6 +61,7 @@ matrix:
             - autogen
 
     - os: linux
+      env: CFLAGS="-Werror"
       compiler: clang
       dist: bionic
       arch: arm64
@@ -107,7 +110,7 @@ matrix:
             - libjson-c-dev
             - autogen
       env:
-        - MATRIX_EVAL="CC=gcc-8"
+        - MATRIX_EVAL="CC=gcc-8" CFLAGS="-Werror"
 
     - os: linux
       compiler: gcc-9
@@ -122,7 +125,7 @@ matrix:
             - libjson-c-dev
             - autogen
       env:
-        - MATRIX_EVAL="CC=gcc-9"
+        - MATRIX_EVAL="CC=gcc-9" CFLAGS="-Werror"
 
     - os: linux
       compiler: clang-8
@@ -138,7 +141,7 @@ matrix:
             - libjson-c-dev
             - autogen
       env:
-        - MATRIX_EVAL="CC=clang-8"
+        - MATRIX_EVAL="CC=clang-8" CFLAGS="-Werror"
 
     - os: linux
       compiler: clang-7
@@ -154,10 +157,10 @@ matrix:
             - libjson-c-dev
             - autogen
       env:
-        - MATRIX_EVAL="CC=clang-7"
+        - MATRIX_EVAL="CC=clang-7" CFLAGS="-Werror"
 
     - name: fuzza
-      env: CXXFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=address" QA_FUZZ=asan CC=clang-7 && CXX=clang++-7 ASAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
+      env: CXXFLAGS="-Werror -g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" CFLAGS="-Werror -g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=address" QA_FUZZ=asan CC=clang-7 && CXX=clang++-7 ASAN_SYMBOLIZER_PATH=/usr/local/clang-7.0.0/bin/llvm-symbolizer
       os: linux
       compiler: clang-7
       addons:
@@ -172,7 +175,7 @@ matrix:
             - libjson-c-dev
             - autogen
     - name: fuzzm
-      env: CXXFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" CFLAGS="-g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=memory" QA_FUZZ=msan CC=clang && CXX=clang++
+      env: CXXFLAGS="-Werror -g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" CFLAGS="-Werror -g3 -O0 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=memory -fsanitize=fuzzer-no-link" LDFLAGS="-g3 -O0 -fsanitize=memory" QA_FUZZ=msan CC=clang && CXX=clang++
       os: linux
       compiler: clang
       dist: bionic
@@ -184,7 +187,7 @@ matrix:
             - libjson-c-dev
             - autogen
     - name: fuzzu
-      env: CXXFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link -fno-sanitize=alignment" CFLAGS="-g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link -fno-sanitize=alignment" LDFLAGS="-g3 -Og -fsanitize=undefined -fno-sanitize=alignment" QA_FUZZ=ubsan CC=clang-7 && CXX=clang++-7
+      env: CXXFLAGS="-Werror -g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fsanitize=fuzzer-no-link -fno-sanitize=alignment" CFLAGS="-Werror -g3 -Og -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined -fno-sanitize-recover=undefined,integer -fsanitize=fuzzer-no-link -fno-sanitize=alignment" LDFLAGS="-g3 -Og -fsanitize=undefined -fno-sanitize=alignment" QA_FUZZ=ubsan CC=clang-7 && CXX=clang++-7
       os: linux
       compiler: clang-7
       addons:

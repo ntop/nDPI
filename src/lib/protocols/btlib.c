@@ -419,7 +419,7 @@ const u_int8_t *bt_decode(const u_int8_t *b, size_t *l, int *ret, bt_parse_data_
       if(c != ':') goto bad_data;
       break;
     }
-    if(d > *l) goto bad_data;
+    if((size_t)d > *l) goto bad_data;
     cbd->t = 2;
     cbd->v.s.s = b;
     cbd->v.s.l = d;

@@ -21,7 +21,7 @@ AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZ
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
-  CFLAGS="${CFLAGS} -g3 -O0 -Wno-unused-value -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
+  CFLAGS="${CFLAGS} -g3 -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
   LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak"
 ])
 
@@ -100,7 +100,7 @@ if ! test "${with_only_libndpi+set}" = set; then :
 fi
 
 LIBS="$LIBS $JSONC_LIBS"
-CFLAGS="$CFLAGS $JSONC_CFLAGS"
+CFLAGS="-W -Wall -Wno-unused-parameter $CFLAGS $JSONC_CFLAGS"
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])

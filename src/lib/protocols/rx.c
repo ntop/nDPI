@@ -48,19 +48,19 @@ struct ndpi_rx_header {
 } PACK_OFF;
 
 /* Type values */
-#define DATA	           1
-#define	ACK	           2
-#define	BUSY	           3	
-#define	ABORT	           4	
-#define	ACKALL	           5	
-#define	CHALLENGE          6	
-#define	RESPONSE           7	
-#define	DEBUG	           8	
-#define	PARAM_1            9	
-#define	PARAM_2           10	
-#define	PARAM_3           11	
-#define	PARAMS_4          12	
-#define	VERS	          13
+#define RX_DATA	           1
+#define	RX_ACK	           2
+#define	RX_BUSY	           3
+#define	RX_ABORT	   4
+#define	RX_ACKALL	   5
+#define	RX_CHALLENGE       6
+#define	RX_RESPONSE        7
+#define	RX_DEBUG           8
+#define	RX_PARAM_1         9
+#define	RX_PARAM_2        10
+#define	RX_PARAM_3        11
+#define	RX_PARAMS_4       12
+#define	RX_VERS	          13
 
 /* Flags values */
 #define EMPTY              0
@@ -108,7 +108,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   **/
   
   /* TYPE field */
-  if((header->type < DATA) || (header->type > VERS)) {
+  if((header->type < RX_DATA) || (header->type > RX_VERS)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
@@ -123,43 +123,43 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
     /* TYPE and FLAGS combo */
     switch(header->type)
     {
-      case DATA:
+      case RX_DATA:
 	if(header->flags == LAST_PKT || header->flags == EMPTY ||
 	   header->flags == PLUS_0 || header->flags == PLUS_1 ||
 	   header->flags == PLUS_2 || header->flags == REQ_ACK ||
 	   header->flags == MORE_1)
 	  goto security;
 	/* Fall-through */
-      case ACK:
+      case RX_ACK:
 	if(header->flags == CLIENT_INIT_1 || header->flags == CLIENT_INIT_2 ||
 	   header->flags == EMPTY)
 	  goto security;
 	/* Fall-through */
-      case CHALLENGE:
+      case RX_CHALLENGE:
 	if(header->flags == EMPTY || header->call_number == 0)
 	  goto security;
 	/* Fall-through */
-      case RESPONSE:
+      case RX_RESPONSE:
 	if(header->flags == EMPTY || header->call_number == 0)
 	  goto security;
 	/* Fall-through */
-      case ACKALL:
+      case RX_ACKALL:
 	if(header->flags == EMPTY)
 	  goto security;
 	/* Fall-through */
-      case BUSY:
+      case RX_BUSY:
 	goto security;
-      case ABORT:
+      case RX_ABORT:
 	goto security;
-      case DEBUG:
+      case RX_DEBUG:
 	goto security;
-      case PARAM_1:
+      case RX_PARAM_1:
 	goto security;
-      case PARAM_2:
+      case RX_PARAM_2:
         goto security;
-      case PARAM_3:
+      case RX_PARAM_3:
 	goto security;
-      case VERS:
+      case RX_VERS:
 	goto security;
       default:
 	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

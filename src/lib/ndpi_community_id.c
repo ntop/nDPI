@@ -189,7 +189,7 @@ https://github.com/corelight/community-id-spec/blob/bda913f617389df07cdaa23606e1
 */
 static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int16_t off, u_int8_t l4_proto,
 						       u_int16_t src_port, u_int16_t dst_port,
-						       char *hash_buf, u_int8_t hash_buf_len) {
+						       char *hash_buf, size_t hash_buf_len) {
   u_int8_t pad = 0;
   uint32_t hash[5];
   char *community_id;

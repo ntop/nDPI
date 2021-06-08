@@ -89,12 +89,12 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
 
 	//printf("%08X - %08X\n", ntohl(packet->iph->saddr), ntohl(packet->iph->daddr));
 
-    long src_addr = ntohl(packet->iph->saddr);
-    long dst_addr = ntohl(packet->iph->daddr);
-    long src_addr_masked_22 = src_addr & 0xFFFFFC00; // */22
-    long dst_addr_masked_22 = dst_addr & 0xFFFFFC00; // */22
-    long src_addr_masked_24 = src_addr & 0xFFFFFF00; // */24
-    long dst_addr_masked_24 = dst_addr & 0xFFFFFF00; // */24
+    unsigned long src_addr = ntohl(packet->iph->saddr);
+    unsigned long dst_addr = ntohl(packet->iph->daddr);
+    unsigned long src_addr_masked_22 = src_addr & 0xFFFFFC00; // */22
+    unsigned long dst_addr_masked_22 = dst_addr & 0xFFFFFC00; // */22
+    unsigned long src_addr_masked_24 = src_addr & 0xFFFFFF00; // */24
+    unsigned long dst_addr_masked_24 = dst_addr & 0xFFFFFF00; // */24
 
 	if(   src_addr_masked_22 == 0x4E1F0800 /* 78.31.8.0 */
 	   || dst_addr_masked_22 == 0x4E1F0800 /* 78.31.8.0 */

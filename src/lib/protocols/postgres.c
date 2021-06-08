@@ -79,19 +79,19 @@ void ndpi_search_postgres_tcp(struct ndpi_detection_module_struct
 		if (flow->l4.tcp.postgres_stage == 4 - packet->packet_direction)
 			if (packet->payload_packet_len > 8 &&
 				ntohl(get_u_int32_t(packet->payload, 5)) < 10 &&
-				ntohl(get_u_int32_t(packet->payload, 1)) == packet->payload_packet_len - 1 && packet->payload[0] == 0x52) {
+				ntohl(get_u_int32_t(packet->payload, 1)) == (uint32_t)packet->payload_packet_len - 1 && packet->payload[0] == 0x52) {
 				NDPI_LOG_INFO(ndpi_struct, "PostgreSQL detected, no SSL\n");
 				ndpi_int_postgres_add_connection(ndpi_struct, flow);
 				return;
 			}
 		if (flow->l4.tcp.postgres_stage == 6
-			&& ntohl(get_u_int32_t(packet->payload, 1)) == packet->payload_packet_len - 1 && packet->payload[0] == 'p') {
+			&& ntohl(get_u_int32_t(packet->payload, 1)) == (uint32_t)packet->payload_packet_len - 1 && packet->payload[0] == 'p') {
 			NDPI_LOG_INFO(ndpi_struct, "found postgres asymmetrically\n");
 			ndpi_int_postgres_add_connection(ndpi_struct, flow);
 			return;
 		}
 		if (flow->l4.tcp.postgres_stage == 5 && packet->payload[0] == 'R') {
-			if (ntohl(get_u_int32_t(packet->payload, 1)) == packet->payload_packet_len - 1) {
+			if (ntohl(get_u_int32_t(packet->payload, 1)) == (uint32_t)packet->payload_packet_len - 1) {
 				NDPI_LOG_INFO(ndpi_struct, "found postgres asymmetrically\n");
 				ndpi_int_postgres_add_connection(ndpi_struct, flow);
 				return;
