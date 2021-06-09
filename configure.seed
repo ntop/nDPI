@@ -87,7 +87,7 @@ NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
-if ! test "${with_mipsel+set}" = set; then :
+if ! test "${with_mipsel+set}" = set && ! test "${with_only_libndpi+set}" = set; then :
    dnl> used by json-c for unit tests
    PKG_CHECK_MODULES([JSONC], [json-c], [JSONC_LIBS=`pkg-config --libs json-c` JSONC_CFLAGS=`pkg-config --cflags json-c`])
 fi
