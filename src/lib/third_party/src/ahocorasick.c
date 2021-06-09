@@ -875,19 +875,20 @@ static AC_NODE_t *node_findbs_next_ac (AC_NODE_t * thiz, uint8_t alpha,int icase
 static int node_has_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * newstr)
 {
   int i;
-  AC_PATTERN_t * str;
+  
   if(!thiz->matched_patterns) return 0;
-  str = thiz->matched_patterns->patterns;
-
-  for (i=0; i < thiz->matched_patterns->num; str++,i++)
-    {
-      if (str->length != newstr->length)
-        continue;
-
-      if(!memcmp(str->astring,newstr->astring,str->length))
-        return 1;
-
-    }
+  
+  for (i=0; i < thiz->matched_patterns->num; i++)
+  {
+    AC_PATTERN_t *str = &(thiz->matched_patterns->patterns[i]);
+    
+    if (str->length != newstr->length)
+      continue;
+    
+    if(!memcmp(str->astring,newstr->astring,str->length))
+      return 1;    
+  }
+  
   return 0;
 }
 
