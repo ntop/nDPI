@@ -224,7 +224,7 @@ extern void ndpi_report_payload_stats();
 
 /* ********************************** */
 
-#define DEBUG_TRACE
+// #define DEBUG_TRACE
 
 #ifdef DEBUG_TRACE
 FILE *trace = NULL;
@@ -3592,6 +3592,7 @@ static void dgaUnitTest() {
   };
 
   const char *non_dga[] = {
+    "dns.msftncsi.com",
     "www.confindustriabrescia.it",
     "mz.gov.pl",
     "zoomam104zc.zoom.us",
@@ -3624,7 +3625,7 @@ static void dgaUnitTest() {
     "mqtt.facebook.com",
     NULL
   };
-  int i;
+  int debug = 0, i;
   NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
 
@@ -3637,14 +3638,16 @@ static void dgaUnitTest() {
 
   assert(ndpi_str != NULL);
 
-  for(i=0; dga[i] != NULL; i++)
-    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i], 1) == 1);
-
   for(i=0; non_dga[i] != NULL; i++) {
-    /* printf("Checking non DGA %s\n", non_dga[i]); */
+    if(debug) printf("Checking non DGA %s\n", non_dga[i]);
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i], 1) == 0);
   }
-
+  
+  for(i=0; dga[i] != NULL; i++) {
+    if(debug) printf("Checking DGA %s\n", non_dga[i]);
+    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i], 1) == 1);
+  }
+  
   ndpi_exit_detection_module(ndpi_str);
 }
 

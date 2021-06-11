@@ -7595,7 +7595,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	     || enough(num_found, num_impossible)
 	     || ((num_trigram_checked > 2)
 		 && ((num_trigram_found < (num_trigram_checked/2))
-		     || ((num_trigram_vowels < (num_trigram_found-1)) && (num_dash == 0) && (num_dots > 1)))
+		     || ((num_trigram_vowels < (num_trigram_found-1)) && (num_dash == 0) && (num_dots > 1) && (num_impossible > 0)))
 		 )
 	     )
 	 )
