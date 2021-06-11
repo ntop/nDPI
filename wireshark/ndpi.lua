@@ -33,6 +33,7 @@ ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.proto
 ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64, nil, base.HEX)
 ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_score", ftypes.UINT32)
 
+
 local flow_risks = {}
 local num_bits_flow_risks = 64 -- 64 is the "right" value; if you want a more compact visualization you can lower it to max used bits
 flow_risks[0]  = ProtoField.bool("ndpi.flow_risk.unused0", "Unused", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: Unused bit")
@@ -993,9 +994,22 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	        end
 	      end
 	    end
-
-	    ndpi_subtree:add(ndpi_fds.flow_score, tvb(len-22, 2))
+	    
+	    ndpi_subtree:add(ndpi_fds.flow_score, tvb(len-22, 2))	    
 	    ndpi_subtree:add(ndpi_fds.name, tvb(len-20, 16))
+
+	    if(flow_score > 0) then
+	       local level
+	       if(flow_score <= 10) then     -- NDPI_SCORE_RISK_LOW
+		  level = PI_NOTE
+	       elseif(flow_score <= 50) then -- NDPI_SCORE_RISK_MEDIUM
+		  level = PI_WARN
+	       else
+		  level = PI_ERROR
+	       end
+	       
+	       ndpi_subtree:add_expert_info(PI_MALFORMED, PI_WARN, "Non zero score")
+	    end
 
 	    if(application_protocol ~= 0) then	       
 	       -- Set protocol name in the wireshark protocol column (if not Unknown)
