@@ -114,10 +114,10 @@ local function dnsReqRepRatio()
 		end
 
         if #dangerous_flows > 0 then
-            tw:append("------------- DETECTED DNS REQUEST/REPLY RATIO -------------\n"\n)
-            tw:append("TOT SUSPICIOUS FLOWS DETECTED:\t" .. #dangerous_flows .. " -------------\n")
+	   tw:append("------------- DETECTED DNS REQUEST/REPLY RATIO -------------\n")
+	   tw:append("TOT SUSPICIOUS FLOWS DETECTED:\t" .. #dangerous_flows .. " -------------\n")
         else
-            tw:append("------------- DNS REQUEST/REPLY RATIO SEEMS FINE -------------\n\n")
+	   tw:append("------------- DNS REQUEST/REPLY RATIO SEEMS FINE -------------\n\n")
         end
 
         tw:append("TOTAL DNS FLOWS DETECTED:\t\t" .. #dangerous_flows + #ok_flows .. " -------------\n\n")
