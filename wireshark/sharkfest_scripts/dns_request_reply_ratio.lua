@@ -20,7 +20,7 @@ end
 --############################################
 
 local function processResponse(dns_table, req_or_rep, src, dst)
-    local key = src .. "->" .. dst
+    local key = src .. " -> " .. dst
 
     -- Create the table entry if needed
     if not dns_table[key] then
@@ -114,13 +114,13 @@ local function dnsReqRepRatio()
 		end
 
         if #dangerous_flows > 0 then
-            tw:append("------------- DETECTED DNS REQUEST/REPLY RATIO -------------\n")
-            tw:append("------------- TOT SUSPICIOUS FLOWS DETECTED: " .. #dangerous_flows .. " -------------\n")
+            tw:append("------------- DETECTED DNS REQUEST/REPLY RATIO -------------\n"\n)
+            tw:append("TOT SUSPICIOUS FLOWS DETECTED:\t" .. #dangerous_flows .. " -------------\n")
         else
-            tw:append("------------- DNS REQUEST/REPLY RATIO SEEMS FINE -------------\n")
+            tw:append("------------- DNS REQUEST/REPLY RATIO SEEMS FINE -------------\n\n")
         end
 
-        tw:append("------------- TOTAL DNS FLOWS DETECTED: " .. #dangerous_flows + #ok_flows .. " -------------\n\n")
+        tw:append("TOTAL DNS FLOWS DETECTED:\t\t" .. #dangerous_flows + #ok_flows .. " -------------\n\n")
         
         for _, data in pairs(dangerous_flows) do
             local flow = data["flow"]
@@ -128,7 +128,7 @@ local function dnsReqRepRatio()
 			local replies = data["replies"]
             local ratio = data["ratio"]
 
-            tw:append(flow .. ":\n\tRatio: " .. (ratio) .. "\n\tRequests: " .. requests .. "\n\tReplies: " .. replies .. "\n\n");
+            tw:append(flow .. ":\n\tRatio:\t\t" .. (ratio) .. "\n\tRequests:\t\t" .. requests .. "\n\tReplies:\t\t" .. replies .. "\n\n");
         end
 	end
 

@@ -26,23 +26,37 @@ end
 --############################################
 
 local function processResponse(tcp_table, src, src_port, dst, dst_port, payload)
-    local key = src .. ":" .. src_port .. " -> " .. dst .. ":" .. dst_port
+    local key = src .. " -> " .. dst
 
     -- Create the table entry if needed
     if not tcp_table[key] then
-        local key2 = dst .. ":" .. dst_port .. " -> " ..  src .. ":" .. src_port
+        local key2 = dst .. "->" ..  src
         if not tcp_table[key2] then
             tcp_table[key] = {
                 payload = 0,
-                fin = false
+                fin = false,
+                contacted_ports = 0,
+                dst_ports = {}
             }
         else
+            -- Switching src and dst ports and ip
+            local tmp = dst
             key = key2
+            dst = src
+            src = tmp
+            tmp = src_port
+            src_port = dst_port
+            dst_port = tmp
         end
     end
 
     -- Increase the stats
     tcp_table[key]["payload"] = tcp_table[key]["payload"] + getstring(payload.value)
+
+    if not tcp_table[key]["dst_ports"][dst_port] then
+        tcp_table[key]["dst_ports"][dst_port] = 1
+        tcp_table[key]["contacted_ports"] = tcp_table[key]["contacted_ports"] + 1        
+    end
 
     if getstring(f_conn_fin().value) == true then
         tcp_table[key]["fin"] = true
@@ -73,7 +87,7 @@ end
 
 --############################################
 
-local function tcpPayload()
+local function tcpSynScan()
 	-- Declare the window we will use
 	local tw = TextWindow.new("TCP No Data Exchanged")
 
@@ -103,8 +117,9 @@ local function tcpPayload()
 		
         for flow, data in pairs(tcp_table) do
 			local payload = data["payload"]
+			local contacted_ports = data["contacted_ports"]
 
-            if tonumber(payload) == 0 then
+            if tonumber(payload) == 0 and tonumber(contacted_ports) > 10 then
                 dangerous_flows[#dangerous_flows + 1] = data
                 dangerous_flows[#dangerous_flows]["flow"] = flow
             else
@@ -114,10 +129,10 @@ local function tcpPayload()
 		end
 
         if #dangerous_flows > 0 then
-            tw:append("------------- DETECTED TCP NO DATA EXCHANGED -------------\n\n")
+            tw:append("------------- DETECTED TCP SYN SCAN -------------\n\n")
             tw:append("TOT SUSPICIOUS FLOWS DETECTED:\t" .. #dangerous_flows .. "\n")
         else
-            tw:append("------------- NO DATA EXCHANGED NOT DETECTED -------------\n\n")
+            tw:append("------------- TCP SYN SCAN NOT DETECTED -------------\n\n")
         end
 
         tw:append("TOTAL FLOWS DETECTED:\t\t" .. #dangerous_flows + #ok_flows .. "\n\n")
@@ -125,8 +140,9 @@ local function tcpPayload()
         for _, data in pairs(dangerous_flows) do
             local flow = data["flow"]
 			local payload = data["payload"]
+			local contacted_ports = data["contacted_ports"]
 
-            tw:append(flow .. ":\n\tPayload Len:\t\t" .. payload .. "\n\n");
+            tw:append(flow .. ":\n\tTotal ports scanned:\t" .. tostring(contacted_ports) .. "\n\n");
         end
 	end
 
@@ -142,4 +158,4 @@ local function tcpPayload()
 end
 
 -- Register the menu Entry
-register_menu("Sharkfest/TCP No Data Exchanged", tcpPayload, MENU_TOOLS_UNSORTED)
+register_menu("Sharkfest/TCP SYN Scan", tcpSynScan, MENU_TOOLS_UNSORTED)
