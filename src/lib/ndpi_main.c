@@ -701,15 +701,18 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   /* ************************ */
 
   for(i = 0; tls_certificate_match[i].string_to_match != NULL; i++) {
+
 #if 0
     printf("%s() %s / %u\n", __FUNCTION__,
 	   tls_certificate_match[i].string_to_match,
 	   tls_certificate_match[i].protocol_id);
 #endif
 
+    /* Note: string_to_match is not malloc'ed here as ac_automata_release is
+     * called with free_pattern = 0 */
     ndpi_add_string_value_to_automa(ndpi_str->tls_cert_subject_automa.ac_automa,
-				    tls_certificate_match[i].string_to_match,
-				    tls_certificate_match[i].protocol_id);
+				    tls_certificate_match[i].string_to_match, 
+                                    tls_certificate_match[i].protocol_id);
   }
 
   /* ************************ */
@@ -2427,7 +2430,7 @@ int ndpi_add_string_to_automa(void *_automa, char *str) {
 /* ****************************************************** */
 
 void ndpi_free_automa(void *_automa) {
-  ac_automata_release((AC_AUTOMATA_t *) _automa, 0);
+  ac_automata_release((AC_AUTOMATA_t *) _automa, 1);
 }
 
 /* ****************************************************** */

@@ -840,7 +840,7 @@ extern "C" {
    * Add a string to match to an automata
    *
    * @par     The automata initialized with ndpi_init_automa();
-   * @par     The (sub)string to search
+   * @par     The (sub)string to search (malloc'ed memory)
    * @par     The number associated with this string
    * @return  0 in case of no error, or -1 if an error occurred.
    *
@@ -851,7 +851,7 @@ extern "C" {
    * Add a string to match to an automata. Same as ndpi_add_string_value_to_automa() with num set to 1
    *
    * @par     The automata initialized with ndpi_init_automa();
-   * @par     The (sub)string to search
+   * @par     The (sub)string to search (malloc'ed memory)
    * @return  0 in case of no error, or -1 if an error occurred.
    *
    */
