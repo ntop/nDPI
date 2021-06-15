@@ -923,11 +923,11 @@ struct ndpi_detection_module_struct;
 struct ndpi_flow_struct;
 
 struct ndpi_call_function_struct {
-  u_int16_t ndpi_protocol_id;
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
-  NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask;
   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
+  NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask;
+  u_int16_t ndpi_protocol_id;
   u_int8_t detection_feature;
 };
 
@@ -1056,7 +1056,6 @@ typedef struct ndpi_default_ports_tree_node {
 
 typedef struct _ndpi_automa {
   void *ac_automa; /* Real type is AC_AUTOMATA_t */
-  u_int8_t ac_automa_finalized;
 } ndpi_automa;
 
 typedef struct ndpi_proto {
@@ -1149,6 +1148,7 @@ struct ndpi_detection_module_struct {
   u_int ndpi_num_supported_protocols;
   u_int ndpi_num_custom_protocols;
 
+  int ac_automa_finalized;
   /* HTTP/DNS/HTTPS/QUIC host matching */
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
     content_automa,                            /* Used for HTTP subprotocol_detection */
@@ -1526,7 +1526,7 @@ typedef enum
   } ndpi_prefs;
 
 typedef struct {
-  int protocol_id;
+  u_int16_t protocol_id;
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match_result;

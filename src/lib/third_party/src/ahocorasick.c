@@ -413,7 +413,6 @@ int ac_automata_exact_match(AC_PATTERNS_t *mp,int pos, AC_TEXT_t *txt) {
 int ac_automata_search (AC_AUTOMATA_t * thiz,
         AC_TEXT_t * txt, AC_REP_t * param)
 {
-  uint8_t alpha;
   unsigned long position;
   int icase = 0,i;
   AC_MATCH_t *match;
@@ -438,7 +437,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
   /* This is the main search loop.
    * it must be keep as lightweight as possible. */
   while (position < txt->length) {
-      alpha = (uint8_t)apos[position];
+      uint8_t alpha = (uint8_t)apos[position];
       if(thiz->to_lc) alpha = aho_lc[alpha];
       if(!(next = node_findbs_next_ac(curr, (uint8_t)alpha, icase))) {
           if(curr->failure_node) /* we are not in the root node */
@@ -918,7 +917,7 @@ static AC_NODE_t * node_create_next (AC_NODE_t * thiz, AC_ALPHABET_t alpha)
   return next;
 }
 
-static inline int mp_data_size(int n) {
+static inline size_t mp_data_size(int n) {
     return sizeof(AC_PATTERNS_t) + n*sizeof(AC_PATTERN_t);
 }
 
@@ -1104,14 +1103,12 @@ static int node_range_edges (AC_AUTOMATA_t *thiz, AC_NODE_t * node)
         return 1;
     }
 
-//    if(e->degree < __SIZEOF_LONG__) return 0;
-
     i = (high - low)/8;
     if (i < thiz->add_to_range) i = thiz->add_to_range;
     i += REALLOC_CHUNK_OUTGOING-1;
     i -= i % REALLOC_CHUNK_OUTGOING;
 
-    if(high - low + 1 < e->max + i) {
+    if(high - low + 1 < e->max + i || (node->root && !thiz->no_root_range)) {
         int added = (high - low + 1) - e->max;
         struct edge *new_o = node_resize_outgoing(node->outgoing,added);
         if(new_o) {
@@ -1122,16 +1119,6 @@ static int node_range_edges (AC_AUTOMATA_t *thiz, AC_NODE_t * node)
         return 0;
     }
 
-    if(node->root && !thiz->no_root_range) {
-        struct edge *new_o;
-        int added = (high - low + 1) - e->max;
-        new_o = node_resize_outgoing(node->outgoing,added);
-        if(new_o) {
-            node->outgoing = new_o;
-            acho_2range(node,low,high);
-            return 1;
-        }
-    }
     return 0;
 }
 /******************************************************************************
