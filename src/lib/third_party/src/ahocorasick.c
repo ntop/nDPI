@@ -746,7 +746,9 @@ static void node_release(AC_NODE_t * thiz, int free_pattern)
 }
 
 /* Nonzero if X is not aligned on a "long" boundary.  */
+#undef UNALIGNED /* Windows defined it but differently from what Aho expects */
 #define UNALIGNED(X) ((long)X & (__SIZEOF_LONG__ - 1))
+
 #define LBLOCKSIZE __SIZEOF_LONG__ 
 
 #if __SIZEOF_LONG__ == 4
