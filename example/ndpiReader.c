@@ -49,6 +49,7 @@
 #include <math.h>
 #include "ndpi_api.h"
 #include "../src/lib/third_party/include/uthash.h"
+#include "../src/lib/third_party/include/ahocorasick.h"
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -1188,7 +1189,7 @@ void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
 /**
  * @brief Print the flow
  */
-static void printFlow(u_int16_t id, struct ndpi_flow_info *flow, u_int16_t thread_id) {
+static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t thread_id) {
   FILE *out = results_file ? results_file : stdout;
   u_int8_t known_tls;
   char buf[32], buf1[64];
@@ -4326,6 +4327,8 @@ int original_main(int argc, char **argv) {
     gettimeofday(&startup_time, NULL);
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
+  if(getenv("AHO_DEBUG"))
+	  ac_automata_enable_debug(1);
     parseOptions(argc, argv);
 
     ndpi_info_mod = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);

@@ -731,7 +731,7 @@ const char* ndpi_cipher2str(u_int32_t cipher) {
 
 /* ******************************************************************** */
 
-static int ndpi_is_other_char(char c) {
+static inline int ndpi_is_other_char(char c) {
   return((c == '.')
 	 || (c == ' ')
 	 || (c == '@')
@@ -741,13 +741,25 @@ static int ndpi_is_other_char(char c) {
 
 /* ******************************************************************** */
 
-static int ndpi_is_valid_char(char c) {
+static int _ndpi_is_valid_char(char c) {
   if(ispunct(c) && (!ndpi_is_other_char(c)))
     return(0);
   else
     return(isdigit(c)
 	   || isalpha(c)
 	   || ndpi_is_other_char(c));
+}
+static char ndpi_is_valid_char_tbl[256],ndpi_is_valid_char_tbl_init=0;
+
+static void _ndpi_is_valid_char_init(void) {
+  int c;
+  for(c=0; c < 256; c++) ndpi_is_valid_char_tbl[c] = _ndpi_is_valid_char(c);
+  ndpi_is_valid_char_tbl_init = 1;
+}
+static inline int ndpi_is_valid_char(char c) {
+	if(!ndpi_is_valid_char_tbl_init)
+		_ndpi_is_valid_char_init();
+	return ndpi_is_valid_char_tbl[(unsigned char)c];
 }
 
 /* ******************************************************************** */

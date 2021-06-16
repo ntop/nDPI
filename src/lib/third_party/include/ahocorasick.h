@@ -54,8 +54,11 @@ typedef char AC_ALPHABET_t;
  **/
 typedef struct {
   uint32_t number; /* Often used to store procotolId */
-  uint16_t breed,
-           category:14,from_start:1,at_end:1;
+  uint16_t breed, category;
+  uint16_t        level,        /* Domain level for comparison */
+                  from_start:1, /* match from start of string */
+                  at_end:1,     /* match at end of string */
+                  dot:1;        /* is domain name */
 } AC_REP_t;
 
 /* AC_PATTERN_t:
@@ -103,8 +106,10 @@ typedef struct {
 
 typedef struct
 {
-  AC_PATTERN_t *matched[4];   /* for ac_automata_exact_match() */
-  AC_PATTERN_t *patterns;     /* Array of matched pattern */
+  AC_PATTERN_t *matched[4],   /* for ac_automata_exact_match() */
+	       *last;         /* for callback              */
+  AC_PATTERN_t *patterns;     /* Array of matched pattern  */
+  unsigned int  match_map;    /* Matched patterns (bitmap) */
   unsigned int  position;     /* The end position of matching pattern(s) in the text */
   unsigned short int match_num;     /* Number of matched patterns */
   unsigned short int match_counter; /* Counter of found matches */
@@ -120,7 +125,7 @@ typedef struct
   AC_MATCH_t match;
   AC_ALPHABET_t * astring;    /* String of alphabets */
   unsigned short int  length, /* Length of string */
-	              ignore_case;
+	              option; /* AC_FEATURE_LC | AC_FEATURE_DEBUG */;
 } AC_TEXT_t;
 
 
@@ -218,7 +223,7 @@ typedef struct
    * means not finalized (is open). after finalizing automata you can not
    * add pattern to automata anymore. */
   unsigned short automata_open,
-		 to_lc:1, no_root_range:1; /* lowercase match */
+		 to_lc:1, no_root_range:1,debug:1; /* lowercase match */
 
   /* Statistic Variables */
   unsigned long total_patterns; /* Total patterns in the automata */
@@ -229,17 +234,20 @@ typedef struct
   int id;	/* node id */
   int add_to_range; /* for convert to range */
   int n_oc,n_range,n_find; /* statistics */
+  char name[32]; /* if debug != 0 */
 } AC_AUTOMATA_t;
 
 typedef AC_ERROR_t (*NODE_CALLBACK_f)(AC_AUTOMATA_t *, AC_NODE_t *,int idx, void *);
 
 typedef void (*ALPHA_CALLBACK_f)(AC_AUTOMATA_t *, AC_NODE_t *,AC_NODE_t *,int ,void *);
 
-#define AC_FEATURE_LC 1
-#define AC_FEATURE_NO_ROOT_RANGE 2
+#define AC_FEATURE_DEBUG 1 
+#define AC_FEATURE_LC 2
+#define AC_FEATURE_NO_ROOT_RANGE 4
 
 AC_AUTOMATA_t * ac_automata_init     (MATCH_CALLBACK_f mc);
 AC_ERROR_t      ac_automata_feature  (AC_AUTOMATA_t * thiz, unsigned int feature);
+AC_ERROR_t      ac_automata_name     (AC_AUTOMATA_t * thiz, char *name, int debug);
 AC_ERROR_t      ac_automata_add      (AC_AUTOMATA_t * thiz, AC_PATTERN_t * str);
 AC_ERROR_t      ac_automata_finalize (AC_AUTOMATA_t * thiz);
 AC_ERROR_t      ac_automata_walk     (AC_AUTOMATA_t * thiz, NODE_CALLBACK_f node_cb,
@@ -252,7 +260,9 @@ int             ac_automata_exact_match(AC_PATTERNS_t *mp,int pos, AC_TEXT_t *);
 void            ac_automata_clean    (AC_AUTOMATA_t * thiz);
 void            ac_automata_release  (AC_AUTOMATA_t * thiz, uint8_t free_pattern);
 #ifndef __KERNEL__
-void            ac_automata_dump     (AC_AUTOMATA_t * thiz, 
-					char *buf, size_t bufsize, char repcast);
+/* Global debug control. */
+void            ac_automata_enable_debug (int debug);
+/* See man open_memstream() for get result as string */
+void            ac_automata_dump     (AC_AUTOMATA_t * thiz, FILE *);
 #endif
-#endif  
+#endif
