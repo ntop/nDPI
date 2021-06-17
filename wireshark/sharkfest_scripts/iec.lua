@@ -252,6 +252,7 @@ function iec_analysis.dissector(tvb, pinfo, tree)
 
             -- end of: if ((payload ~= nil) and (tcplen > 3 )) then
             end
+            
          end
       -- end of: if ((tcplenRaw ~= nil) and (payloadRaw ~= nil )) then
       end
