@@ -1,5 +1,7 @@
 --
 -- (C) 2021 - switch.ch
+-- IEC 60870-5-14 expert anlysis PoC for sharkfest Europe 2021
+-- Version 1.0
 --
 
 
@@ -15,8 +17,12 @@ local f_cp56time_day       = Field.new("iec60870_asdu.cp56time.day")
 local f_cp56time_month     = Field.new("iec60870_asdu.cp56time.month")
 local f_cp56time_year      = Field.new("iec60870_asdu.cp56time.year")
 
-local f_tcplen	            = Field.new("tcp.len")
+local f_tcplen             = Field.new("tcp.len")
 local f_payload            = Field.new("tcp.payload")
+local f_src_port           = Field.new("tcp.srcport")
+local f_dst_port           = Field.new("tcp.dstport")
+
+local f_asdu_start         = Field.new("iec60870_asdu.start")
 
 
 -- ###############################################
@@ -41,7 +47,7 @@ function tprint(s, l, i)
       local indent = ""
 
       if(i ~= "") then
-	 indent = i .. "."
+    indent = i .. "."
       end
       indent = indent .. tostring(k)
 
@@ -88,12 +94,15 @@ function iec_analysis.dissector(tvb, pinfo, tree)
 
    if (pinfo.visited == true) then
 
-      
+      -- get raw data
       local tcplenRaw          = { f_tcplen() }
       local payloadRaw         = { f_payload() }
+      local dstportRaw         = { f_dst_port() }
+      local srcportRaw         = { f_src_port() }
+      local asdu_start       = { f_asdu_start() }
    
    
-      if ((tcplenRaw ~= nil) and (payloadRaw ~= nil )) then
+      if ((tcplenRaw ~= nil) and (payloadRaw ~= nil )) and (dstportRaw ~= nil) and (srcportRaw ~= nil) and (asdu_start ~= nil) then
 
 
          local cp56time_min       = { f_cp56time_min() } 
@@ -143,8 +152,10 @@ function iec_analysis.dissector(tvb, pinfo, tree)
 
  
          local tcplen    = tonumber(getval(tcplenRaw[#tcplenRaw]))
+         local srcport    = tonumber(getval(srcportRaw[#srcportRaw]))
+         local dstport    = tonumber(getval(dstportRaw[#dstportRaw]))
          local payload    = tostring(getval(payloadRaw[#payloadRaw]))
-      	
+         
          local APDU_type = {"Length", "Type", "Rx", "Tx", "TypeID", "TestFr", "StartPos", "CauseTx", "IOA", "NumIx"}
          local APDU = APDU_type
 
@@ -158,88 +169,90 @@ function iec_analysis.dissector(tvb, pinfo, tree)
          local APDU_StartPos = {}
 
          --read first APDU length and check wheater payload contains multiple APDUs or not
-         if ((payload ~= nil) and (tcplen > 3 )) then
-    
-            --define APDUs start positions, containing 0x68
-            if ((tonumber(string.sub(payload,4,5),16) + 2) < tcplen) then
-               --multiple APDUs
-               --loop through all APDU's
-               while StartPos < (tcplen*3-1) do
-                  APDU_StartPos[i] = StartPos
-                  APDU_length[i] = tonumber(string.sub(payload,StartPos + 3,StartPos + 3 + 1),16)
-                  
-                  StartPos = StartPos + 5 + APDU_length[i]*3 + 1
-                  i = i + 1
-               end
-
-            else
-               --single APDU
-               APDU_length[i] = tonumber(string.sub(payload,StartPos + 3,StartPos + 3 + 1),16)
-               APDU_StartPos[i] = StartPos
-            end  
-       
-            --process all APDUs
-            for j=1,#APDU_StartPos do
-
-
-               if (APDU_length[j] > 7) then
-                  APDU['NumIx'] = tonumber(string.sub(payload,APDU_StartPos[j]+21, APDU_StartPos[j] + 21 + 1),16)
-                  if ((APDU['NumIx'] * 6) > (APDU_length[j] - 10) and (APDU['NumIx'] >= 3)) then
-                     msg = " APDU object #" .. j  .. msg
+         --additional checks
+         if ((payload ~= nil) and (tcplen ~= nil ) and (asdu_start ~= nil ) and ((srcport == 2404) or (dstport == 2404)) ) then
+         
+            if ((tcplen > 3)  and (tonumber(string.sub(payload,StartPos,StartPos  + 1),16)==104)) then
+               --define APDUs start positions, containing 0x68
+               if ((tonumber(string.sub(payload,4,5),16) + 2) < tcplen) then
+                  --multiple APDUs
+                  --loop through all APDU's
+                  while StartPos < (tcplen*3-1) do
+                     APDU_StartPos[i] = StartPos
+                     APDU_length[i] = tonumber(string.sub(payload,StartPos + 3,StartPos + 3 + 1),16)
+                     
+                     StartPos = StartPos + 5 + APDU_length[i]*3 + 1
+                     i = i + 1
                   end
-                  APDU["TypeID"] = tonumber(string.sub(payload,APDU_StartPos[j]+ 18, APDU_StartPos[j] + 18 + 1),16)
-                  if ( not (APDU["TypeID"] == 9 
-                     or APDU["TypeID"] == 13 
-                     or APDU["TypeID"] == 36 
-                     or APDU["TypeID"] == 45 
-                     or APDU["TypeID"] == 46 
-                     or APDU["TypeID"] == 48
-                     or APDU["TypeID"] == 30 
-                     or APDU["TypeID"] == 103 
-                     or APDU["TypeID"] == 100 
-                     or APDU["TypeID"] == 37 )) then
-                     msg3 = "in ASDU #" .. j .. " (TypeID: " .. APDU["TypeID"] .. ")" .. msg3
-                  end
+
                else
-                  APDU['NumIx'] = 0 
-                  APDU["TypeID"] = 0
+                  --single APDU
+                  APDU_length[i] = tonumber(string.sub(payload,StartPos + 3,StartPos + 3 + 1),16)
+                  APDU_StartPos[i] = StartPos
+               end  
+          
+               --process all APDUs
+               for j=1,#APDU_StartPos do
+
+
+                  if (APDU_length[j] > 7) then
+                     APDU['NumIx'] = tonumber(string.sub(payload,APDU_StartPos[j]+21, APDU_StartPos[j] + 21 + 1),16)
+                     if ((APDU['NumIx'] * 6) > (APDU_length[j] - 10) and (APDU['NumIx'] >= 3)) then
+                        msg = " APDU object #" .. j  .. msg
+                     end
+                     APDU["TypeID"] = tonumber(string.sub(payload,APDU_StartPos[j]+ 18, APDU_StartPos[j] + 18 + 1),16)
+                     if ( not (APDU["TypeID"] == 9 
+                        or APDU["TypeID"] == 13 
+                        or APDU["TypeID"] == 36 
+                        or APDU["TypeID"] == 45 
+                        or APDU["TypeID"] == 46 
+                        or APDU["TypeID"] == 48
+                        or APDU["TypeID"] == 30 
+                        or APDU["TypeID"] == 103 
+                        or APDU["TypeID"] == 100 
+                        or APDU["TypeID"] == 37 )) then
+                        msg3 = "in ASDU #" .. j .. " (TypeID: " .. APDU["TypeID"] .. ")" .. msg3
+                     end
+                  else
+                     APDU['NumIx'] = 0 
+                     APDU["TypeID"] = 0
+                  end
+
+               -- end for loop   
                end
 
-            -- end for loop   
-            end
-
-            if (msg ~= "") then
-               msg = "Possible missing data, check for [] in IOAs in" .. msg
-            end
-
-            if #APDU_StartPos > 8 then
-               msg2 = "Payload contains more then 8 APDU objects (wireshark disects only 8 APDU objects). Number of APDU objects found: " .. #APDU_StartPos
-            end
-
-            if (msg3 ~= "") then
-               msg3 = "Not permitted TypeID(s) " .. msg3
-            end
-
-            -- Add analysis information to packet
-            if (msg ~= "") or (msg2 ~= "") or (msg3 ~= "") or (msgTime  ~= "") then
-               local iec_subtree = tree:add(iec_analysis, tvb(), "IEC 60870-5-104 Analysis")
                if (msg ~= "") then
-                  iec_subtree:add_expert_info(PI_PROTOCOL, PI_WARN, msg)
+                  msg = "Possible missing data, check for [] in IOAs in" .. msg
                end
-               if (msg2 ~= "") then
-                  iec_subtree:add_expert_info(PI_PROTOCOL, PI_NOTE, msg2)
+
+               if #APDU_StartPos > 8 then
+                  msg2 = "Payload contains more then 8 APDU objects. Number of APDU objects found: " .. #APDU_StartPos
                end
+
                if (msg3 ~= "") then
-                  iec_subtree:add_expert_info(PI_PROTOCOL, PI_NOTE, msg3)
+                  msg3 = "Not permitted TypeID(s) " .. msg3
                end
-               if (msgTime ~= "") then
-                  iec_subtree:add_expert_info(PI_PROTOCOL, PI_WARN, msgTime)
+
+               -- Add analysis information to packet
+               if (msg ~= "") or (msg2 ~= "") or (msg3 ~= "") or (msgTime  ~= "") then
+                  local iec_subtree = tree:add(iec_analysis, tvb(), "IEC 60870-5-104 Analysis")
+                  if (msg ~= "") then
+                     iec_subtree:add_expert_info(PI_PROTOCOL, PI_WARN, msg)
+                  end
+                  if (msg2 ~= "") then
+                     iec_subtree:add_expert_info(PI_PROTOCOL, PI_NOTE, msg2)
+                  end
+                  if (msg3 ~= "") then
+                     iec_subtree:add_expert_info(PI_PROTOCOL, PI_NOTE, msg3)
+                  end
+                  if (msgTime ~= "") then
+                     iec_subtree:add_expert_info(PI_PROTOCOL, PI_WARN, msgTime)
+                  end
                end
+
+            -- end of: if ((payload ~= nil) and (tcplen > 3 )) then
             end
-
-         -- end of: if ((payload ~= nil) and (tcplen > 3 )) then
          end
-
       -- end of: if ((tcplenRaw ~= nil) and (payloadRaw ~= nil )) then
       end
 
