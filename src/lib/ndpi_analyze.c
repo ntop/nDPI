@@ -1,7 +1,7 @@
 /*
  * ndpi_analyze.c
  *
- * Copyright (C) 2019 - ntop.org
+ * Copyright (C) 2019-21 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library.
@@ -932,7 +932,7 @@ static double ndpi_normal_cdf_inverse(double p) {
   }
 }
 
-double ndpi_avg_inline(u_int32_t *v, u_int num) {
+double ndpi_avg_inline(u_int64_t *v, u_int num) {
   double avg = 0;
   u_int i;
 
@@ -981,7 +981,7 @@ int ndpi_hw_init(struct ndpi_hw_struct *hw,
   if((significance < 0) || (significance > 1)) significance = 0.05;
   hw->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
 
-  if((hw->y = (u_int32_t*)ndpi_calloc(hw->params.num_season_periods, sizeof(u_int32_t))) == NULL)
+  if((hw->y = (u_int64_t*)ndpi_calloc(hw->params.num_season_periods, sizeof(u_int64_t))) == NULL)
     return(-1);
 
   if((hw->s = (double*)ndpi_calloc(hw->params.num_season_periods, sizeof(double))) == NULL) {
@@ -1017,7 +1017,7 @@ void ndpi_hw_free(struct ndpi_hw_struct *hw) {
    0                Too early: we're still in the learning phase. Output values are zero.
    1                Normal processing: forecast and confidence_band are meaningful
 */
-int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t _value, double *forecast,  double *confidence_band) {
+int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t _value, double *forecast,  double *confidence_band) {
   if(hw->num_values < hw->params.num_season_periods) {
     hw->y[hw->num_values++] = _value;
 
@@ -1193,7 +1193,7 @@ int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance)
    0                Too early: we're still in the learning phase. Output values are zero.
    1                Normal processing: forecast and confidence_band are meaningful
 */
-int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int32_t _value, double *forecast, double *confidence_band) {
+int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int64_t _value, double *forecast, double *confidence_band) {
   double value = (double)_value, error, sq_error;
   int rc;
 
@@ -1265,7 +1265,7 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
    0                Too early: we're still in the learning phase. Output values are zero.
    1                Normal processing: forecast and confidence_band are meaningful
 */
-int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int32_t _value, double *forecast, double *confidence_band) {
+int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int64_t _value, double *forecast, double *confidence_band) {
   double value = (double)_value, error, sq_error;
   int rc;
 

@@ -1720,7 +1720,7 @@ struct ndpi_hw_struct {
   double    u, v, sum_square_error;
 
   /* These two values need to store the signal history */
-  u_int32_t *y;
+  u_int64_t *y;
   double    *s;
 };
 

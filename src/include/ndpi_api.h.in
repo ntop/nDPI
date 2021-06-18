@@ -1489,17 +1489,17 @@ extern "C" {
   int  ndpi_hw_init(struct ndpi_hw_struct *hw, u_int16_t num_periods, u_int8_t additive_seeasonal,
 		    double alpha, double beta, double gamma, float significance);
   void ndpi_hw_free(struct ndpi_hw_struct *hw);
-  int  ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int32_t value, double *forecast,  double *confidence_band);
+  int  ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t value, double *forecast,  double *confidence_band);
 
   /* ******************************* */
 
   int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance);
-  int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int32_t _value, double *forecast, double *confidence_band);
+  int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int64_t _value, double *forecast, double *confidence_band);
 
   /* ******************************* */
 
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
-  int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int32_t _value, double *forecast, double *confidence_band);
+  int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int64_t _value, double *forecast, double *confidence_band);
 
   /* ******************************* */
 
