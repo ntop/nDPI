@@ -1006,16 +1006,99 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
 #endif /* HAVE_LIBGCRYPT */
 
 
+static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
+                        uint64_t frag_len, uint64_t frag_offset,
+                        const u_int8_t **buf, u_int64_t *buf_len)
+{
+  const int max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... */
+
+  /* TODO: at the moment, this function is only a little more than a stub.
+     We should reassemble the fragments, but nDPI lacks any proper generic
+     reassembler code. So, to keep the code simple here, try reassembling
+     the simplest case: only in-order fragments using a fixed-size buffer (i.e. no
+     retransmissions, no out-of-order, no overlapping...)
+  */
+
+  if(!flow->l4.udp.quic_reasm_buf) {
+    flow->l4.udp.quic_reasm_buf = ndpi_malloc(max_quic_reasm_buffer_len);
+    if(!flow->l4.udp.quic_reasm_buf)
+      return -1; /* Memory error */
+    flow->l4.udp.quic_reasm_buf_len = 0;
+  }
+  if(flow->l4.udp.quic_reasm_buf_len != frag_offset)
+    return -2; /* Out-of-order, retransmission, overlapping */
+  if(frag_offset + frag_len > max_quic_reasm_buffer_len)
+    return -3; /* Buffer too small */
+
+  memcpy(&flow->l4.udp.quic_reasm_buf[flow->l4.udp.quic_reasm_buf_len],
+	 frag, frag_len);
+  flow->l4.udp.quic_reasm_buf_len += frag_len;
+
+  *buf = flow->l4.udp.quic_reasm_buf;
+  *buf_len = flow->l4.udp.quic_reasm_buf_len;
+  return 0;
+}
+static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len)
+{
+  uint32_t msg_len;
+
+  if(buf_len >= 4) {
+    msg_len = (buf[1] << 16) + (buf[2] << 8) + buf[3];
+    if (4 + msg_len == buf_len) {
+      return 1;
+    }
+  }
+  return 0;
+}
+static int is_ch_reassembler_pending(struct ndpi_flow_struct *flow)
+{
+  return flow->l4.udp.quic_reasm_buf != NULL &&
+         !is_ch_complete(flow->l4.udp.quic_reasm_buf,
+			 flow->l4.udp.quic_reasm_buf_len);
+}
+static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
+                                                  struct ndpi_flow_struct *flow,
+						  const u_int8_t *frag,
+						  uint64_t frag_offset, uint64_t frag_len,
+						  uint64_t *crypto_data_len)
+{
+  const u_int8_t *crypto_data;
+  int rc;
+
+  NDPI_LOG_DBG2(ndpi_struct, "frag %d/%d\n", frag_offset, frag_len);
+
+  /* Fast path: no need of reassembler stuff */
+  if(frag_offset == 0 &&
+     is_ch_complete(frag, frag_len)) {
+    NDPI_LOG_DBG2(ndpi_struct, "Complete CH (fast path)\n");
+    *crypto_data_len = frag_len;
+    return frag;
+  }
+
+  rc = __reassemble(flow, frag, frag_len, frag_offset,
+                    &crypto_data, crypto_data_len);
+  if(rc == 0) {
+    if(is_ch_complete(crypto_data, *crypto_data_len)) {
+      NDPI_LOG_DBG2(ndpi_struct, "Reassembler completed!\n");
+      return crypto_data;
+    }
+    NDPI_LOG_DBG2(ndpi_struct, "CH not yet completed\n");
+  } else {
+    NDPI_LOG_DBG(ndpi_struct, "Reassembler error: %d\n", rc);
+  }
+  return NULL;
+}
+
 static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow,
 				      uint32_t version,
 				      u_int8_t *clear_payload, uint32_t clear_payload_len,
 				      uint64_t *crypto_data_len)
 {
-  const u_int8_t *crypto_data;
+  const u_int8_t *crypto_data = NULL;
   uint32_t counter;
   uint8_t first_nonzero_payload_byte, offset_len;
-  uint64_t unused, offset;
+  uint64_t unused, frag_offset, frag_len;
 
   counter = 0;
   while(counter < clear_payload_len && clear_payload[counter] == 0)
@@ -1054,6 +1137,13 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
     counter += 2 + offset_len;
     *crypto_data_len = gquic_get_u16(&clear_payload[counter], version);
     counter += 2;
+    if(*crypto_data_len + counter > clear_payload_len) {
+#ifdef QUIC_DEBUG
+      NDPI_LOG_ERR(ndpi_struct, "Invalid length %lu + %d > %d version 0x%x\n",
+		   (unsigned long)*crypto_data_len, counter, clear_payload_len, version);
+#endif
+      return NULL;
+    }
     crypto_data = &clear_payload[counter];
 
   } else if(version == V_Q050 || version == V_T050 || version == V_T051) {
@@ -1075,41 +1165,68 @@ static const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_
       return NULL;
     counter += quic_len(&clear_payload[counter], &unused);
     counter += quic_len(&clear_payload[counter], crypto_data_len);
+    if(*crypto_data_len + counter > clear_payload_len) {
+#ifdef QUIC_DEBUG
+      NDPI_LOG_ERR(ndpi_struct, "Invalid length %lu + %d > %d version 0x%x\n",
+		   (unsigned long)*crypto_data_len, counter, clear_payload_len, version);
+#endif
+      return NULL;
+    }
     crypto_data = &clear_payload[counter];
 
   } else {  /* All other versions */
-    if(first_nonzero_payload_byte != 0x06) {
-      if(first_nonzero_payload_byte != 0x02 &&
-         first_nonzero_payload_byte != 0x1C) {
-#ifdef QUIC_DEBUG
-        NDPI_LOG_ERR(ndpi_struct, "Unexpected frame 0x%x\n", first_nonzero_payload_byte);
-#endif
-      } else {
-        NDPI_LOG_DBG(ndpi_struct, "Unexpected ACK/CC frame\n");
+    while(counter < clear_payload_len) {
+      uint8_t frame_type = clear_payload[counter];
+      switch(frame_type) {
+      case 0x00:
+        NDPI_LOG_DBG2(ndpi_struct, "PADDING frame\n");
+        while(counter < clear_payload_len &&
+              clear_payload[counter] == 0)
+          counter += 1;
+        break;
+      case 0x01:
+        NDPI_LOG_DBG2(ndpi_struct, "PING frame\n");
+        counter += 1;
+        break;
+      case 0x06:
+        NDPI_LOG_DBG2(ndpi_struct, "CRYPTO frame\n");
+        counter += 1;
+        if(counter > clear_payload_len ||
+           counter + quic_len_buffer_still_required(clear_payload[counter]) > clear_payload_len)
+          return NULL;
+        counter += quic_len(&clear_payload[counter], &frag_offset);
+        if(counter > clear_payload_len ||
+           counter + quic_len_buffer_still_required(clear_payload[counter]) > clear_payload_len)
+          return NULL;
+        counter += quic_len(&clear_payload[counter], &frag_len);
+        if(frag_len + counter > clear_payload_len) {
+          NDPI_LOG_DBG(ndpi_struct, "Invalid crypto frag length %lu + %d > %d version 0x%x\n",
+                       (unsigned long)frag_len, counter, clear_payload_len, version);
+          return NULL;
+        }
+        crypto_data = get_reassembled_crypto_data(ndpi_struct, flow,
+                                                  &clear_payload[counter],
+                                                  frag_offset, frag_len,
+                                                  crypto_data_len);
+        if(crypto_data) {
+          return crypto_data;
+	}
+        NDPI_LOG_DBG(ndpi_struct, "Crypto reassembler pending\n");
+        counter += frag_len;
+        break;
+      case 0x1C: /* CC */
+      case 0x02: /* ACK */
+        NDPI_LOG_DBG2(ndpi_struct, "Unexpected CC/ACK frame\n");
+        return NULL;
+      default:
+        NDPI_LOG_DBG(ndpi_struct, "Unexpected frame 0x%x\n", frame_type);
+	return NULL;
       }
+    }
+    if(counter > clear_payload_len) {
+      NDPI_LOG_DBG(ndpi_struct, "Error parsing frames %d %d\n", counter, clear_payload_len);
       return NULL;
     }
-    counter += 1;
-    if(counter + 8 + 8 >= clear_payload_len) /* quic_len reads 8 bytes, at most */
-      return NULL;
-    counter += quic_len(&clear_payload[counter], &offset);
-    if(offset != 0) {
-#ifdef QUIC_DEBUG
-      NDPI_LOG_ERR(ndpi_struct, "Unexpected crypto stream offset 0x%x\n",
-		   offset);
-#endif
-      return NULL;
-    }
-    counter += quic_len(&clear_payload[counter], crypto_data_len);
-    crypto_data = &clear_payload[counter];
-  }
-
-  if(*crypto_data_len + counter > clear_payload_len) {
-#ifdef QUIC_DEBUG
-    NDPI_LOG_ERR(ndpi_struct, "Invalid length %lu + %d > %d version 0x%x\n",
-		 (unsigned long)*crypto_data_len, counter, clear_payload_len, version);
-#endif
-    return NULL;
   }
   return crypto_data;
 }
@@ -1385,12 +1502,16 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
 static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow, u_int32_t version)
 {
-  /* For the time being we need extra processing only to detect Snapchat calls,
-     i.e. RTP/RTCP multiplxed with QUIC.
-     We noticed that Snapchat uses Q046, without any SNI */
+  /* For the time being we need extra processing in two cases only:
+     1) to detect Snapchat calls, i.e. RTP/RTCP multiplxed with QUIC.
+        We noticed that Snapchat uses Q046, without any SNI.
+     2) to reassemble CH fragments on multiple UDP packets.
+     These two cases are mutually exclusive
+   */
 
-  if(version == V_Q046 &&
-     flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0') {
+  if((version == V_Q046 &&
+      flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0') ||
+     is_ch_reassembler_pending(flow)) {
     NDPI_LOG_DBG2(ndpi_struct, "We have further work to do\n");
     return 1;
   }
@@ -1403,16 +1524,29 @@ static int is_valid_rtp_payload_type(uint8_t type)
   return type <= 34 || (type >= 96 && type <= 127);
 }
 
+static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow);
 static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
   /* We are elaborating a packet following the initial CHLO/ClientHello.
-     Mutiplexing QUIC with RTP/RTCP should be quite generic, but
-     for the time being, we known only NDPI_PROTOCOL_SNAPCHAT_CALL having such behaviour */
+     Two cases:
+     1) Mutiplexing QUIC with RTP/RTCP. It should be quite generic, but
+        for the time being, we known only NDPI_PROTOCOL_SNAPCHAT_CALL having
+	such behaviour
+     2) CH reasssembling is going on */
+  /* TODO: could we unify ndpi_search_quic() and ndpi_search_quic_extra() somehow? */
 
   NDPI_LOG_DBG(ndpi_struct, "search QUIC extra func\n");
+
+  if (is_ch_reassembler_pending(flow)) {
+    ndpi_search_quic(ndpi_struct, flow);
+    return is_ch_reassembler_pending(flow);
+  }
+
+  /* RTP/RTCP stuff */
 
   /* If this packet is still a Q046 one we need to keep going */
   if(packet->payload[0] & 0x40) {
@@ -1441,8 +1575,8 @@ static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_stru
   return 0;
 }
 
-void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
-		      struct ndpi_flow_struct *flow)
+static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow)
 {
   u_int32_t version;
   u_int8_t *clear_payload;
@@ -1505,33 +1639,30 @@ void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   crypto_data = get_crypto_data(ndpi_struct, flow, version,
 				clear_payload, clear_payload_len,
 				&crypto_data_len);
-  if(!crypto_data) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    if(is_version_with_encrypted_header(version)) {
-      ndpi_free(clear_payload);
-    }
-    return;
-  }
 
   /*
-   * 6) Process ClientHello/CHLO from the Crypto Data
+   * 6) Process ClientHello/CHLO from the Crypto Data (if any)
    */
-  if(!is_version_with_tls(version)) {
-    process_chlo(ndpi_struct, flow, crypto_data, crypto_data_len);
-  } else {
-    process_tls(ndpi_struct, flow, crypto_data, crypto_data_len, version);
+  if(crypto_data) {
+    if(!is_version_with_tls(version)) {
+      process_chlo(ndpi_struct, flow, crypto_data, crypto_data_len);
+    } else {
+      process_tls(ndpi_struct, flow, crypto_data, crypto_data_len, version);
+    }
   }
   if(is_version_with_encrypted_header(version)) {
     ndpi_free(clear_payload);
   }
 
   /*
-   * 7) We need to process other packets than ClientHello/CHLO?
+   * 7) We need to process other packets than (the first) ClientHello/CHLO?
    */
   if(eval_extra_processing(ndpi_struct, flow, version)) {
     flow->check_extra_packets = 1;
     flow->max_extra_packets_to_check = 24; /* TODO */
     flow->extra_packets_func = ndpi_search_quic_extra;
+  } else if(!crypto_data) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 
