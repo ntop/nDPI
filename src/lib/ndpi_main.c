@@ -1729,12 +1729,15 @@ static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
       to avoid matching aws.amazon.com whereas a.ws.amazon.com
       has to match
     */
-    if((whatfound != buf) && (m->patterns->astring[0] != '.') /* The searched pattern does not start with . */
+    if((whatfound != buf)
+       && (strchr(whatfound, '=') == NULL) /* This is not a match from tls_certificate_match[] */
+       && (m->patterns->astring[0] != '.') /* The searched pattern does not start with . */
        && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */) {
       int len = strlen(m->patterns->astring);
 
-      if((whatfound[-1] != '.') || ((m->patterns->astring[len - 1] != '.') &&
-				    (whatfound[len] != '\0') /* endsWith does not hold here */)) {
+      if(((whatfound[-1] != '.') && (whatfound[0] != '-') && (whatfound[-1] != '-'))
+	 || ((m->patterns->astring[len - 1] != '.')
+	     && (whatfound[len] != '\0') /* endsWith does not hold here */)) {
 	return(0);
       } else {
 	memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t)); /* Partial match? */
