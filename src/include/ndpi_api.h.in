@@ -106,7 +106,7 @@ extern "C" {
     via ndpi_add_string_value_to_automa()
   */
   int ndpi_match_string_value(void *_automa, char *string_to_match,
-			      u_int match_len, u_int16_t *num);
+			      u_int match_len, u_int32_t *num);
 
   /**
    * nDPI personal allocation and free functions
