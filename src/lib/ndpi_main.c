@@ -692,6 +692,28 @@ void ndpi_self_check_host_match() {
 
 /* ******************************************************************** */
 
+#define XGRAMS_C 26
+static int ndpi_xgrams_inited = 0;
+static unsigned int bigrams_bitmap[(XGRAMS_C*XGRAMS_C+31)/32];
+static unsigned int imposible_bigrams_bitmap[(XGRAMS_C*XGRAMS_C+31)/32];
+static unsigned int trigrams_bitmap[(XGRAMS_C*XGRAMS_C*XGRAMS_C+31)/32];
+  
+
+static void ndpi_xgrams_init(unsigned int *dst,size_t dn, const char **src,size_t sn,int l) {
+unsigned int i,j,c;
+for(i=0;i < sn && src[i]; i++) {
+        for(j=0,c=0; j < l; j++) {
+          unsigned char a = (unsigned char)src[i][j];
+          if(a < 'a' || a > 'z') { printf("%u: c%u %c\n",i,j,a); abort(); }
+          c *= XGRAMS_C;
+          c += a - 'a';
+        }
+        if(src[i][l]) { printf("%u: c[%d] != 0\n",i,l); abort(); }
+        if((c >> 3) >= dn) abort(); 
+        dst[c >> 5] |= 1u << (c & 0x1f);
+}
+}
+
 static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_str) {
   int i;
 
@@ -722,16 +744,16 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 #ifdef MATCH_DEBUG
   // ac_automata_display(ndpi_str->host_automa.ac_automa, 'n');
 #endif
+  if(!ndpi_xgrams_inited) {
+    ndpi_xgrams_inited = 1;
+    ndpi_xgrams_init(bigrams_bitmap,sizeof(bigrams_bitmap),
+                ndpi_en_bigrams,sizeof(ndpi_en_bigrams)/sizeof(ndpi_en_bigrams[0]), 2);
 
-  for(i = 0; ndpi_en_bigrams[i] != NULL; i++)
-    ndpi_string_to_automa(ndpi_str, &ndpi_str->bigrams_automa, (char *) ndpi_en_bigrams[i], 1, 1, 1, 0, 0);
-
-  for(i = 0; ndpi_en_trigrams[i] != NULL; i++)
-    ndpi_string_to_automa(ndpi_str, &ndpi_str->trigrams_automa, (char *) ndpi_en_trigrams[i], 1, 1, 1, 0, 0);
-
-  for(i = 0; ndpi_en_impossible_bigrams[i] != NULL; i++)
-    ndpi_string_to_automa(ndpi_str, &ndpi_str->impossible_bigrams_automa, (char *) ndpi_en_impossible_bigrams[i], 1,
-			  1, 1, 0, 0);
+    ndpi_xgrams_init(imposible_bigrams_bitmap,sizeof(imposible_bigrams_bitmap),
+                ndpi_en_impossible_bigrams,sizeof(ndpi_en_impossible_bigrams)/sizeof(ndpi_en_impossible_bigrams[0]), 2);
+    ndpi_xgrams_init(trigrams_bitmap,sizeof(trigrams_bitmap),
+                ndpi_en_trigrams,sizeof(ndpi_en_trigrams)/sizeof(ndpi_en_trigrams[0]), 3);
+  }
 }
 
 /* ******************************************************************** */
@@ -2305,9 +2327,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   ndpi_str->host_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->content_automa.ac_automa = ac_automata_init(ac_match_handler);
-  ndpi_str->bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
-  ndpi_str->trigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
-  ndpi_str->impossible_bigrams_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(ac_match_handler);
   ndpi_str->malicious_ja3_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->malicious_sha1_automa.ac_automa = NULL; /* Initialized on demand */
@@ -2366,27 +2385,15 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
       break;
 
     case 2:
-      automa = &ndpi_str->bigrams_automa;
-      break;
-
-    case 3:
-      automa = &ndpi_str->impossible_bigrams_automa;
-      break;
-
-    case 4:
       automa = &ndpi_str->tls_cert_subject_automa;
       break;
 
-    case 5:
+    case 3:
       automa = &ndpi_str->malicious_ja3_automa;
       break;
 
-    case 6:
+    case 4:
       automa = &ndpi_str->malicious_sha1_automa;
-      break;
-
-    case 7:
-      automa = &ndpi_str->trigrams_automa;
       break;
 
     default:
@@ -2664,15 +2671,6 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->content_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->content_automa.ac_automa, 0);
-
-    if(ndpi_str->bigrams_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->bigrams_automa.ac_automa, 0);
-
-    if(ndpi_str->trigrams_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->trigrams_automa.ac_automa, 0);
-
-    if(ndpi_str->impossible_bigrams_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->impossible_bigrams_automa.ac_automa, 0);
 
     if(ndpi_str->risky_domain_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->risky_domain_automa.ac_automa,
@@ -6823,51 +6821,30 @@ u_int16_t ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *nd
 
 /* ****************************************************** */
 
-int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_str,
-		      ndpi_automa *automa, char *bigram_to_match) {
-
-  if((automa->ac_automa == NULL) || (bigram_to_match == NULL))
-    return(-1);
-
-  if(!ndpi_str->ac_automa_finalized) {
-#if 1
-    ndpi_finalize_initialization(ndpi_str);
-#else
-    printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initialization()\n", __FILE__, __LINE__);
-    return(0); /* No matches */
-#endif
+static inline int ndpi_match_xgram(unsigned int *map,int l,const char *str) {
+  unsigned int i,c;
+  for(i=0,c=0; *str && i < l; i++) {
+      unsigned char a = (unsigned char)(*str++);
+      if(a < 'a' || a > 'z') return 0;
+      c *= XGRAMS_C;
+      c += a-'a';
   }
-  return ndpi_match_string_common(automa->ac_automa,bigram_to_match,2, NULL, NULL, NULL);
+  return (map[c >> 5] & (1u << (c & 0x1f))) != 0;
+}
+int ndpi_match_bigram(const char *str) {
+  return ndpi_match_xgram(bigrams_bitmap, 2, str);
+}
+
+int ndpi_match_impossible_bigram(const char *str) {
+  return ndpi_match_xgram(imposible_bigrams_bitmap, 2, str);
 }
 
 /* ****************************************************** */
 
-int ndpi_match_trigram(struct ndpi_detection_module_struct *ndpi_str,
-		       ndpi_automa *automa, char *trigram_to_match) {
-  int rc;
-
-  if((automa->ac_automa == NULL) || (trigram_to_match == NULL))
-    return(-1);
-
-  if(!ndpi_str->ac_automa_finalized) {
-#if 1
-    ndpi_finalize_initialization(ndpi_str);
-#else
-    printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initialization()\n", __FILE__, __LINE__);
-    return(0); /* No matches */
-#endif
-  }
-  rc = ndpi_match_string_common(automa->ac_automa,trigram_to_match,3, NULL, NULL, NULL);
-  if(ndpi_verbose_dga_detection && rc) {
-    printf("[%s:%d] [NDPI] Trigram %c%c%c\n",
-	   __FILE__, __LINE__,
-	   trigram_to_match[0],
-	   trigram_to_match[1],
-	   trigram_to_match[2]);
-  }
-
-  return(rc);
+int ndpi_match_trigram(const char *str) {
+  return ndpi_match_xgram(trigrams_bitmap, 3, str);
 }
+
 
 /* ****************************************************** */
 
@@ -7506,16 +7483,14 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	  if(ndpi_verbose_dga_detection)
 	    printf("-> Checking %c%c\n", word[i], word[i+1]);
 
-	  if(ndpi_match_bigram(ndpi_str,
-			       &ndpi_str->impossible_bigrams_automa,
-			       &word[i])) {
+	  if(ndpi_match_impossible_bigram(&word[i])) {
 	    if(ndpi_verbose_dga_detection)
 	      printf("IMPOSSIBLE %s\n", &word[i]);
 
 	    num_impossible++;
 	  } else {
 	    if(!skip_next_bigram) {
-	      if(ndpi_match_bigram(ndpi_str, &ndpi_str->bigrams_automa, &word[i])) {
+	      if(ndpi_match_bigram(&word[i])) {
 		num_found++, skip_next_bigram = 1;
 	      }
 	    } else
@@ -7532,7 +7507,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	      } else {
 		num_trigram_checked++;
 
-		if(ndpi_match_trigram(ndpi_str, &ndpi_str->trigrams_automa, &word[i]))
+		if(ndpi_match_trigram(&word[i]))
 		  num_trigram_found++, trigram_char_skip = 2 /* 1 char overlap */;
 		else if(ndpi_verbose_dga_detection)
 		  printf("[NDPI] NO Trigram %c%c%c\n", word[i], word[i+1], word[i+2]);
