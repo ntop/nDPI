@@ -3433,8 +3433,11 @@ void * processing_thread(void *_thread_id) {
 pcap_loop:
   runPcapLoop(thread_id);
 
-  pcap_close(ndpi_thread_info[thread_id].workflow->pcap_handle);
+  if(ndpi_thread_info[thread_id].workflow->pcap_handle)
+    pcap_close(ndpi_thread_info[thread_id].workflow->pcap_handle);
+
   ndpi_thread_info[thread_id].workflow->pcap_handle = NULL;
+
   if(playlist_fp[thread_id] != NULL) { /* playlist: read next file */
     char filename[256];
 
