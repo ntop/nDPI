@@ -499,9 +499,7 @@ extern "C" {
    * @return  0
    *
    */
-  int ndpi_match_bigram(struct ndpi_detection_module_struct *ndpi_mod,
-			ndpi_automa *automa,
-			char *bigram_to_match);
+  int ndpi_match_bigram(const char *bigram_to_match);
 
   /**
    * Write the protocol name in the buffer -buf- as master_protocol.protocol

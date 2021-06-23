@@ -766,7 +766,7 @@ static int ndpi_find_non_eng_bigrams(struct ndpi_detection_module_struct *ndpi_s
 
   s[0] = tolower(str[0]), s[1] = tolower(str[1]), s[2] = '\0';
 
-  return(ndpi_match_bigram(ndpi_struct, &ndpi_struct->bigrams_automa, s));
+  return(ndpi_match_bigram(s));
 }
 
 /* ******************************************************************** */
