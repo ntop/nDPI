@@ -98,6 +98,7 @@ static struct timeval startup_time, begin, end;
 static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
 static struct timeval pcap_start = { 0, 0}, pcap_end = { 0, 0 };
+static struct bpf_program bpf_code,*bpf_cfilter = NULL;
 /** Detection parameters **/
 static time_t capture_for = 0;
 static time_t capture_until = 0;
@@ -3138,14 +3139,17 @@ next_line:
 static void configurePcapHandle(pcap_t * pcap_handle) {
 
   if(bpfFilter != NULL) {
-    struct bpf_program fcode;
 
-    if(pcap_compile(pcap_handle, &fcode, bpfFilter, 1, 0xFFFFFF00) < 0) {
-      printf("pcap_compile error: '%s'\n", pcap_geterr(pcap_handle));
-    } else {
-      if(pcap_setfilter(pcap_handle, &fcode) < 0) {
+    if(!bpf_cfilter) {
+      if(pcap_compile(pcap_handle, &bpf_code, bpfFilter, 1, 0xFFFFFF00) < 0) {
+        printf("pcap_compile error: '%s'\n", pcap_geterr(pcap_handle));
+        return;
+      }
+      bpf_cfilter = &bpf_code;
+    }
+    if(pcap_setfilter(pcap_handle, bpf_cfilter) < 0) {
 	printf("pcap_setfilter error: '%s'\n", pcap_geterr(pcap_handle));
-      } else
+    } else {
 	printf("Successfully set BPF filter to '%s'\n", bpfFilter);
     }
   }
@@ -3429,6 +3433,8 @@ void * processing_thread(void *_thread_id) {
 pcap_loop:
   runPcapLoop(thread_id);
 
+  pcap_close(ndpi_thread_info[thread_id].workflow->pcap_handle);
+  ndpi_thread_info[thread_id].workflow->pcap_handle = NULL;
   if(playlist_fp[thread_id] != NULL) { /* playlist: read next file */
     char filename[256];
 
@@ -3439,6 +3445,10 @@ pcap_loop:
     }
   }
 #endif
+  if(bpf_cfilter) {
+	  pcap_freecode(bpf_cfilter);
+	  bpf_cfilter = NULL;
+  }
 
   return NULL;
 }
