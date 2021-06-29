@@ -47,8 +47,6 @@
 #endif
 
 #include "third_party/include/ndpi_patricia.h"
-#include "third_party/include/ht_hash.h"
-
 #include "third_party/include/libinjection.h"
 #include "third_party/include/libinjection_sqli.h"
 #include "third_party/include/libinjection_xss.h"
