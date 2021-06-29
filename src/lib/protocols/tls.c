@@ -1849,7 +1849,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		       duplicate_found);
 #endif
 
-		ja3.client.signature_algorithms[i*2] = '\0';
+		if (i == tot_signature_algorithms_len) {
+		  ja3.client.signature_algorithms[i*2 - 1] = '\0';
+		} else {
+		  ja3.client.signature_algorithms[i*2] = '\0';
+		}
 
 #ifdef DEBUG_TLS
 		printf("Client TLS [SIGNATURE_ALGORITHMS: %s]\n", ja3.client.signature_algorithms);
