@@ -47,7 +47,6 @@
 
 #include "ndpi_content_match.c.inc"
 #include "third_party/include/ndpi_patricia.h"
-#include "third_party/include/ht_hash.h"
 #include "third_party/include/ndpi_md5.h"
 
 /* stun.c */
