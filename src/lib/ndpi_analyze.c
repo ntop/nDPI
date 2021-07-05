@@ -39,20 +39,16 @@
 void ndpi_init_data_analysis(struct ndpi_analyze_struct *ret, u_int16_t _max_series_len) {
   u_int32_t len;
 
-  memset(ret, 0, sizeof(struct ndpi_analyze_struct));
+  memset(ret, 0, sizeof(*ret));
 
   if(_max_series_len > MAX_SERIES_LEN) _max_series_len = MAX_SERIES_LEN;
   ret->num_values_array_len = _max_series_len;
 
   if(ret->num_values_array_len > 0) {
-    len = sizeof(u_int32_t)*ret->num_values_array_len;
-    if((ret->values = ndpi_malloc(len)) == NULL) {
-      ndpi_free(ret);
-      ret = NULL;
-    } else
+    len = sizeof(u_int32_t) * ret->num_values_array_len;
+    if((ret->values = ndpi_malloc(len)) != NULL)
       memset(ret->values, 0, len);
-  } else
-    ret->values = NULL;
+  }
 }
 
 /* ********************************************************************************* */
@@ -76,9 +72,15 @@ void ndpi_free_data_analysis(struct ndpi_analyze_struct *d, u_int8_t free_pointe
 /* ********************************************************************************* */
 
 void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
+  u_int32_t *values_bkp = d->values;
+  u_int32_t num_values_array_len_bpk = d->num_values_array_len;
+
   memset(d, 0, sizeof(struct ndpi_analyze_struct));
+
+  d->values = values_bkp;
+  d->num_values_array_len = num_values_array_len_bpk;
+
   memset(d->values, 0, sizeof(u_int32_t)*d->num_values_array_len);
-  d->num_data_entries = 0;
 }
 
 /* ********************************************************************************* */
