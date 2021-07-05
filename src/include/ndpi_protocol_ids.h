@@ -289,6 +289,8 @@ typedef enum {
   NDPI_PROTOCOL_ACTIVISION            = 258,
   NDPI_PROTOCOL_FORTICLIENT           = 259,
   NDPI_PROTOCOL_Z3950                 = 260, /* Toni Uhlig <matzeton@googlemail.com> */
+  NDPI_PROTOCOL_LIKEE                 = 261,
+  NDPI_PROTOCOL_GITLAB                = 262,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
