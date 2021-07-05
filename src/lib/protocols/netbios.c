@@ -43,6 +43,12 @@ static int is_printable_char(unsigned char c) {
 
 /* ****************************************************************** */
 
+static int is_stop_char(u_char c) {
+  return(((c < 'A') || (c > 'P')) ? 1 : 0);
+}
+
+/* ****************************************************************** */
+
 /* The function below has been inherited by tcpdump */
 int ndpi_netbios_name_interpret(u_char *in, size_t in_len, u_char *out, u_int out_len) {
   u_int ret = 0, len, idx = in_len, out_idx = 0;
@@ -57,7 +63,7 @@ int ndpi_netbios_name_interpret(u_char *in, size_t in_len, u_char *out, u_int ou
     return(-1);
 
   while((len--) && (out_idx < out_len)) {
-    if((idx < 2) || (in[0] < 'A') || (in[0] > 'P') || (in[1] < 'A') || (in[1] > 'P')) {
+    if((idx < 2) || is_stop_char(in[0]) || is_stop_char(in[1])) {
       out[out_idx] = 0;
       break;
     }
@@ -93,7 +99,7 @@ static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct 
 
   if((off < flow->packet.payload_packet_len)
      && ndpi_netbios_name_interpret((unsigned char*)&flow->packet.payload[off],
-				 flow->packet.payload_packet_len - off, name, sizeof(name)) > 0) {
+				    flow->packet.payload_packet_len - off, name, sizeof(name)-1) > 0) {
       snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
 
       ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
