@@ -62,15 +62,10 @@ static int z3950_parse_sequences(struct ndpi_packet_struct const * const packet,
     u_int8_t seq_length;
 
     payload = &packet->payload[payload_offset];
-    if (payload[0] == 0x9F)
+    if ((payload[0] & 0x1F) == 0x1F)
     {
-      if (payload_offset + 3 >= packet->payload_packet_len)
-      {
-        return -1;
-      }
-      payload_offset++;
-      payload = &packet->payload[payload_offset];
-      seq_type = payload[0];
+      /* We ignore decoding of complex sequences for now. */
+      return cur_sequences;
     } else {
       seq_type = payload[0] & 0x1F;
     }
@@ -103,7 +98,7 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
                               struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct * packet = &flow->packet;
-  int const minimum_expected_sequences = 7;
+  int const minimum_expected_sequences = 6;
 
   NDPI_LOG_DBG(ndpi_struct, "search z39.50\n");
 
