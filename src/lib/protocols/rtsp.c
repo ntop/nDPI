@@ -47,6 +47,15 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
 
   NDPI_LOG_DBG(ndpi_struct, "search RTSP\n");
 
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP &&
+      packet->parsed_lines > 0 &&
+      LINE_STARTS(packet->line[0], "SETUP rtsp://") != 0 &&
+      LINE_ENDS(packet->line[0], "RTSP/1.0") != 0)
+  {
+    ndpi_int_rtsp_add_connection(ndpi_struct, flow);
+    return;
+  }
+
   if (flow->rtsprdt_stage == 0
       && !(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_RTCP)
       ) {

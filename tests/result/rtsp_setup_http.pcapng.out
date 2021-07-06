@@ -1,0 +1,3 @@
+HTTP	1	233	1
+
+	1	TCP 172.28.5.170:63840 -> 172.28.4.26:8554 [proto: 50.7/RTSP.HTTP][cat: Media/1][1 pkts/233 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Risk: ** Known protocol on non standard port **][Risk Score: 10][PLAIN TEXT (SETUP rtsp)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
