@@ -658,7 +658,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       }
     }    
     
-    if(flow->http_detected) {
+    if(flow->http_detected && packet->content_line.ptr && *(char*)packet->content_line.ptr) {
       ndpi_protocol_match_result ret_match;
 
       ndpi_match_content_subprotocol(ndpi_struct, flow,
