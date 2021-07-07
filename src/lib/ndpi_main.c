@@ -6709,11 +6709,14 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 						      struct ndpi_flow_struct *flow, char *string_to_match,
 						      u_int string_to_match_len, u_int16_t master_protocol_id,
 						      ndpi_protocol_match_result *ret_match, u_int8_t is_host_match) {
-  uint16_t matching_protocol_id;
+  int matching_protocol_id;
   struct ndpi_packet_struct *packet = &flow->packet;
 
   matching_protocol_id =
     ndpi_match_string_subprotocol(ndpi_str, string_to_match, string_to_match_len, ret_match, is_host_match);
+
+  if(matching_protocol_id < 0)
+	  return NDPI_PROTOCOL_UNKNOWN;
 
 #ifdef DEBUG
   {
