@@ -425,7 +425,9 @@ extern "C" {
    * @par    string_to_match_len = the length of the string
    * @par    ret_match           = completed returned match information
    * @par    is_host_match       = value of the second field of struct ndpi_automa
-   * @return the ID of the matched subprotocol
+   * @return the ID of the matched subprotocol;
+   *         -1 if automa is not finalized;
+   *         -2 if automa==NULL or string_to_match==NULL or empty string_to_match
    *
    */
   int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
