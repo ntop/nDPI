@@ -499,8 +499,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   struct ndpi_packet_struct *packet = &flow->packet;
   int ret;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_UNKNOWN);
-
   if(flow->http_detected && (flow->http.response_status_code != 0))
     return;
 
@@ -667,7 +665,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
   }
 
-  ndpi_int_http_add_connection(ndpi_struct, flow, packet->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
+  if (ndpi_get_http_method(ndpi_struct, flow) != NDPI_HTTP_METHOD_UNKNOWN)
+  {
+    ndpi_int_http_add_connection(ndpi_struct, flow, packet->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
+  }
 }
 
 /* ************************************************************* */
