@@ -332,7 +332,6 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
   u_int num_found = 0, i;
   char buffer[64] = { '\0' }, rdnSeqBuf[2048] = { '\0' };
   u_int rdn_len = 0;
-  struct tm r, t, *bdt_time_sec=NULL, *bdt_after=NULL; 
 
 #ifdef DEBUG_TLS
   printf("[TLS] %s() [offset: %u][certificate_len: %u]\n", __FUNCTION__, p_offset, certificate_len);
@@ -471,18 +470,14 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		       flow->protos.tls_quic_stun.tls_quic.notAfter, utcDate);
 #endif
 	      }
+			struct tm r, *bdt_time_sec=NULL; 
+			bdt_time_sec = gmtime_r((const time_t *)&time_sec,&r);
+
+			if (bdt_time_sec)
+				if ((utc.tm_year - bdt_time_sec->tm_year > 2) 
+					|| (utc.tm_year - bdt_time_sec->tm_year > 1 && utc.tm_mon - bdt_time_sec->tm_mon > 1))
+			 		ndpi_set_risk(flow, NPDI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
 	    }
-
-		if(flow->protos.tls_quic_stun.tls_quic.notAfter&&time_sec){
-			bdt_after = gmtime_r((const time_t *)&flow->protos.tls_quic_stun.tls_quic.notAfter,&r);
-			bdt_time_sec = gmtime_r((const time_t *)&time_sec,&t);
-		}
-		if (bdt_after && bdt_time_sec)
-		if ((bdt_after->tm_year - bdt_time_sec->tm_year > 2) 
-			|| (bdt_after->tm_year - bdt_time_sec->tm_year > 1 && bdt_after->tm_mon - bdt_time_sec->tm_mon > 1))
-			 ndpi_set_risk(flow, NPDI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
-
-
 
 	    if((time_sec < flow->protos.tls_quic_stun.tls_quic.notBefore)
 	       || (time_sec > flow->protos.tls_quic_stun.tls_quic.notAfter))

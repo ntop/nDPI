@@ -34,7 +34,7 @@ extern "C" {
   /* The #define below is used for apps that dynamically link with nDPI to make
      sure that datastructures and in sync across versions
   */
-#define NDPI_API_VERSION                      4626
+#define NDPI_API_VERSION                      4632
 
 #define SIZEOF_ID_STRUCT                      ( sizeof(struct ndpi_id_struct)   )
 #define SIZEOF_FLOW_STRUCT                    ( sizeof(struct ndpi_flow_struct) )
