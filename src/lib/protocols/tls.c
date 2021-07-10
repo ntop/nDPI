@@ -421,6 +421,8 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	printf("]\n");
 #endif
 
+	u_int notAfterYear=0, notAfterMon=0, notBeforeYear=0, notBeforeMon=0;
+
 	if(len < (sizeof(utcDate)-1)) {
 	  struct tm utc;
 	  utc.tm_isdst = -1; /* Not set by strptime */
@@ -436,6 +438,8 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		   flow->protos.tls_quic_stun.tls_quic.notBefore, utcDate);
 #endif
 	  }
+	  notBeforeYear = utc.tm_year;
+	  notBeforeMon = utc.tm_mon;
 	}
 
 	offset += len;
@@ -470,14 +474,13 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		       flow->protos.tls_quic_stun.tls_quic.notAfter, utcDate);
 #endif
 	      }
-			struct tm r, *bdt_time_sec=NULL; 
-			bdt_time_sec = gmtime_r((const time_t *)&time_sec,&r);
-
-			if (bdt_time_sec)
-				if ((utc.tm_year - bdt_time_sec->tm_year > 2) 
-					|| (utc.tm_year - bdt_time_sec->tm_year > 1 && utc.tm_mon - bdt_time_sec->tm_mon > 1))
-			 		ndpi_set_risk(flow, NPDI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
+		  	notAfterYear = utc.tm_year;
+			notAfterMon = utc.tm_mon;
 	    }
+		
+		if ((notAfterYear - notBeforeYear >= 2) 
+			|| (notAfterYear - notBeforeYear >= 1 && notAfterMon - notBeforeMon > 1))
+			ndpi_set_risk(flow, NPDI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
 
 	    if((time_sec < flow->protos.tls_quic_stun.tls_quic.notBefore)
 	       || (time_sec > flow->protos.tls_quic_stun.tls_quic.notAfter))
