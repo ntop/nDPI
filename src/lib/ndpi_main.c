@@ -2154,7 +2154,7 @@ static const char *categories[] = {
   "DataTransfer",
   "Web",
   "SocialNetwork",
-  "Download-FileTransfer-FileSharing",
+  "FileTransfer",
   "Game",
   "Chat",
   "VoIP",
@@ -2177,9 +2177,9 @@ static const char *categories[] = {
   "Shopping",
   "Productivity",
   "FileSharing",
-  "ConnectivityCheck",
+  "ConnCheck",
   "IoT-Scada",
-  "VirtualAssistant",
+  "VirtAssistant",
   "",
   "",
   "",
@@ -4261,7 +4261,10 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
 
         u_int8_t backup;
 	u_int16_t backup1, backup2;
+	u_int16_t packet_direction_counter[2];
 
+	packet_direction_counter[0] = flow->packet_direction_counter[0];
+	packet_direction_counter[1] = flow->packet_direction_counter[1];
         backup = flow->num_processed_pkts;
         backup1 = flow->guessed_protocol_id;
         backup2 = flow->guessed_host_protocol_id;
@@ -4269,6 +4272,8 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
         memset(flow, 0, sizeof(*(flow)));
 
         /* Restore pointers */
+	flow->packet_direction_counter[0] = packet_direction_counter[0];
+	flow->packet_direction_counter[1] = packet_direction_counter[1];
         flow->num_processed_pkts = backup;
         flow->guessed_protocol_id = backup1;
         flow->guessed_host_protocol_id = backup2;
