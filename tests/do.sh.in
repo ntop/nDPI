@@ -36,6 +36,11 @@ build_results() {
 
 check_results() {
 	for f in $PCAPS; do
+	    if [ -n "$*" ]; then
+	    	SKIP_PCAP=1
+		for i in $* ; do [ "$f" = "$i" ] && SKIP_PCAP=0 && break ; done
+		[ $SKIP_PCAP = 1 ] && continue
+	    fi
 	    SKIP_PCAP=0
 	    if [ $GCRYPT_ENABLED -eq 0 ]; then
 	      for g in $GCRYPT_PCAPS; do
@@ -73,6 +78,6 @@ if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
     fuzzy_testing
 fi
 build_results
-check_results
+check_results $*
 
 exit $RC

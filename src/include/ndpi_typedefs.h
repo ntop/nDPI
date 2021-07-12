@@ -1503,6 +1503,7 @@ typedef struct {
   u_int16_t protocol_id;
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
+  int level; /* 0 by default */
 } ndpi_protocol_match;
 
 typedef struct {
@@ -1532,7 +1533,7 @@ typedef enum
   } ndpi_prefs;
 
 typedef struct {
-  u_int16_t protocol_id;
+  u_int32_t protocol_id;
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match_result;

@@ -542,7 +542,6 @@ static u_int8_t ndpi_is_middle_string_char(char c) {
   switch(c) {
   case '.':
   case '-':
-  case '$': /* Do not add a double $$ */
     return(1);
     break;
 
@@ -551,59 +550,85 @@ static u_int8_t ndpi_is_middle_string_char(char c) {
   }
 }
 
+/*******************************************************/
+
+static const u_int8_t ndpi_domain_level_automat[4][4]= {
+   /* symbol,'.','-',inc */
+   { 2,1,2,0 }, // start state
+   { 2,0,0,0 }, // first char is '.'; disable .. or .-
+   { 2,3,2,0 }, // part of domain name
+   { 2,0,0,1 }  // next level domain name; disable .. or .-
+};
+
+/*
+ * domain level
+ *  a. = 1
+ * .a. = 1
+ * a.b = 2
+ */
+
+static u_int8_t ndpi_domain_level(const char *name) {
+   u_int8_t level = 1, state = 0;
+   char c;
+   while((c = *name++) != '\0') {
+      c = c == '-' ? 2 : (c == '.' ? 1:0);
+      level += ndpi_domain_level_automat[state][3];
+      state  = ndpi_domain_level_automat[state][(uint8_t)c];
+      if(!state) break;
+   }
+   return state >= 2 ? level:0;
+}
+
 /* ****************************************************** */
 
 static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
-				 ndpi_automa *automa, char *value,
+				 AC_AUTOMATA_t *ac_automa, const char *value,
                                  u_int16_t protocol_id, ndpi_protocol_category_t category,
-				 ndpi_protocol_breed_t breed,
-                                 u_int8_t free_str_on_duplicate, u_int8_t add_ends_with) {
+				 ndpi_protocol_breed_t breed, uint8_t level,
+                                 u_int8_t add_ends_with) {
   AC_PATTERN_t ac_pattern;
   AC_ERROR_t rc;
-  char buf[96];
-  u_int len, dot;
+  u_int len;
+  char *value_dup = NULL;
 
   if(protocol_id >= (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] protoId=%d: INTERNAL ERROR\n", protocol_id);
     return(-1);
   }
 
-  if((automa->ac_automa == NULL) || (value == NULL) || !*value)
+  if((ac_automa == NULL) || (value == NULL) || !*value)
     return(-2);
 
-  len = strlen(value);
-  dot = len -1;
+  value_dup = ndpi_strdup(value);
+  if(!value_dup)
+       return(-1);
 
   memset(&ac_pattern, 0, sizeof(ac_pattern));
 
-  if((!add_ends_with) || ndpi_is_middle_string_char(value[dot])) {
-    ac_pattern.length = len;
-    ac_pattern.astring = value;
-  } else {
-    u_int mlen = sizeof(buf)-2;
+  len = strlen(value);
 
-    len = ndpi_min(len, mlen);
-    ac_pattern.length = snprintf(buf, mlen, "%s$", value);
-    ndpi_free(value);
-    value = ndpi_strdup(buf);
-    ac_pattern.astring = value;
-  }
-
-  ac_pattern.rep.number = protocol_id, ac_pattern.rep.category = (u_int16_t) category,
-    ac_pattern.rep.breed = (u_int16_t) breed;
+  ac_pattern.astring      = value_dup;
+  ac_pattern.length       = len;
+  ac_pattern.rep.number   = protocol_id;
+  ac_pattern.rep.category = (u_int16_t) category;
+  ac_pattern.rep.breed    = (u_int16_t) breed;
+  ac_pattern.rep.level    = level ? level : ndpi_domain_level(value);
+  ac_pattern.rep.at_end   = add_ends_with && !ndpi_is_middle_string_char(value[len-1]); /* len != 0 */
+  ac_pattern.rep.dot      = memchr(value,'.',len) != NULL;
 
 #ifdef MATCH_DEBUG
-  printf("Adding to automa [%s][protocol_id: %u][category: %u][breed: %u]\n",
-	 ac_pattern.astring, protocol_id, category, breed);
+  printf("Adding to %s %lx [%s%s][protocol_id: %u][category: %u][breed: %u][level: %u]\n",
+	 ac_automa->name,(unsigned long int)ac_automa,
+	 ac_pattern.astring,ac_pattern.rep.at_end? "$":"", protocol_id, category, breed,ac_pattern.rep.level);
 #endif
 
-  rc = ac_automata_add(((AC_AUTOMATA_t *) automa->ac_automa), &ac_pattern);
+  rc = ac_automata_add(ac_automa, &ac_pattern);
 
-  if((rc != ACERR_DUPLICATE_PATTERN) && (rc != ACERR_SUCCESS))
-    return(-2);
-
-  if((rc == ACERR_DUPLICATE_PATTERN) && free_str_on_duplicate)
-    ndpi_free(value);
+  if(rc != ACERR_SUCCESS) {
+        ndpi_free(value_dup);
+	if(rc != ACERR_DUPLICATE_PATTERN)
+		return (-2);
+  }
 
   return(0);
 }
@@ -611,25 +636,16 @@ static int ndpi_string_to_automa(struct ndpi_detection_module_struct *ndpi_str,
 /* ****************************************************** */
 
 static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
-					 char *_value, int protocol_id,
+					 char *value, int protocol_id,
                                          ndpi_protocol_category_t category,
-					 ndpi_protocol_breed_t breed) {
-  int rv;
-  char *value = ndpi_strdup(_value);
-
-  if(!value)
-    return(-1);
-
-#ifdef DEBUG
+					 ndpi_protocol_breed_t breed, uint8_t level) {
+#ifndef DEBUG
   NDPI_LOG_DBG2(ndpi_str, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
 
-  rv = ndpi_string_to_automa(ndpi_str, &ndpi_str->host_automa, value, protocol_id, category, breed, 1, 1);
+  return ndpi_string_to_automa(ndpi_str, (AC_AUTOMATA_t *)ndpi_str->host_automa.ac_automa,
+		  value, protocol_id, category, breed, level, 1);
 
-  if(rv != 0)
-    ndpi_free(value);
-
-  return(rv);
 }
 
 /* ****************************************************** */
@@ -668,7 +684,7 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
 
   ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
 				match->protocol_id, match->protocol_category,
-				match->protocol_breed);
+				match->protocol_breed, match->level);
 }
 
 /* ******************************************************************** */
@@ -1732,75 +1748,57 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
 /* ****************************************************** */
 
-static int ac_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
-  int min_len = (txt->length < m->patterns->length) ? txt->length : m->patterns->length;
-  char buf[64] = {'\0'}, *whatfound;
-  int min_buf_len = (txt->length > 63 /* sizeof(buf)-1 */) ? 63 : txt->length;
-  u_int buf_len = strlen(buf);
+#define MATCH_DEBUG_INFO(fmt, ...) if(txt->option & AC_FEATURE_DEBUG) printf(fmt, ##__VA_ARGS__)
 
-  strncpy(buf, txt->astring, min_buf_len);
-  buf[min_buf_len] = '\0';
+static int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
+  AC_PATTERN_t *pattern = m->patterns;
+  int i,start,end = m->position;
 
-#ifdef MATCH_DEBUG
-  printf("Searching [to search: %s/%u][pattern: %s/%u] [len: %d][match_num: %u][%s]\n", buf,
-	 (unsigned int) txt->length, m->patterns->astring,
-	 (unsigned int) m->patterns->length, min_len, m->match_num,
-	 m->patterns->astring);
-#endif
-
-  whatfound = strstr(buf, m->patterns->astring);
-
-#ifdef MATCH_DEBUG
-  printf("[NDPI] %s() [searching=%s][pattern=%s][%s][%c]\n", __FUNCTION__, buf, m->patterns->astring,
-	 whatfound ? whatfound : "<NULL>", whatfound[-1]);
-#endif
-
-  if(whatfound) {
+  for(i=0; i < m->match_num; i++,pattern++) { 
     /*
-      The patch below allows in case of pattern ws.amazon.com
-      to avoid matching aws.amazon.com whereas a.ws.amazon.com
-      has to match
-    */
-    if((whatfound != buf)
-       && (strchr(whatfound, '=') == NULL) /* This is not a match from tls_certificate_match[] */
-       && (m->patterns->astring[0] != '.') /* The searched pattern does not start with . */
-       && strchr(m->patterns->astring, '.') /* The matched pattern has a . (e.g. numeric or sym IPs) */) {
-      int len = strlen(m->patterns->astring);
+     * See ac_automata_exact_match()
+     * The bit is set if the pattern exactly matches AND
+     * the length of the pattern is longer than that of the previous one.
+     * Skip shorter (less precise) templates.
+     */
+    if(!(m->match_map & (1 << i)))
+	    continue;
+    start = end - pattern->length;
 
-      if(((whatfound[-1] != '.') && (whatfound[0] != '-') && (whatfound[-1] != '-'))
-	 || ((m->patterns->astring[len - 1] != '.')
-	     && (whatfound[len] != '\0') /* endsWith does not hold here */)) {
-	return(0);
-      } else {
-	memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t)); /* Partial match? */
-	return(0); /* Keep searching as probably there is a better match */
-      }
+    MATCH_DEBUG_INFO("[NDPI] Searching: [to search: %.*s/%u][pattern: %s%.*s%s/%u l:%u] %d-%d\n",
+            txt->length, txt->astring,(unsigned int) txt->length,
+	    m->patterns[0].rep.from_start ? "^":"",
+            (unsigned int) pattern->length, pattern->astring, 
+            m->patterns[0].rep.at_end ? "$":"", (unsigned int) pattern->length,m->patterns[0].rep.level,
+            start,end);
+
+    if(start == 0 && end == txt->length) {
+        *match = pattern->rep; txt->match.last = pattern;
+        MATCH_DEBUG_INFO("[NDPI] Searching: Found exact match. Proto %d \n",pattern->rep.number);
+        return 1;
+    }
+    /* pattern is DOMAIN.NAME and string x.DOMAIN.NAME ? */
+    if(start > 1 && !ndpi_is_middle_string_char(pattern->astring[0]) && pattern->rep.dot) {
+            /*
+              The patch below allows in case of pattern ws.amazon.com
+              to avoid matching aws.amazon.com whereas a.ws.amazon.com
+              has to match
+            */
+            if(ndpi_is_middle_string_char(txt->astring[start-1])) {
+		if(!txt->match.last || txt->match.last->rep.level < pattern->rep.level) {
+		    txt->match.last = pattern; *match = pattern->rep;
+                    MATCH_DEBUG_INFO("[NDPI] Searching: Found domain match. Proto %d \n",pattern->rep.number);
+		}
+            }
+            continue;
+    }
+
+    if(!txt->match.last || txt->match.last->rep.level < pattern->rep.level) {
+	txt->match.last = pattern; *match = pattern->rep;
+        MATCH_DEBUG_INFO("[NDPI] Searching: matched. Proto %d \n",pattern->rep.number);
     }
   }
-
-  /*
-    Return 1 for stopping to the first match.
-    We might consider searching for the more
-    specific match, paying more cpu cycles.
-  */
-  memcpy(match, &m->patterns[0].rep, sizeof(AC_REP_t));
-
-  if(((buf_len >= min_len) && (strncmp(&buf[buf_len - min_len], m->patterns->astring, min_len) == 0)) ||
-     (strncmp(buf, m->patterns->astring, min_len) == 0) /* begins with */
-     ) {
-#ifdef MATCH_DEBUG
-    printf("Found match [%s][%s] [len: %d]"
-	   // "[proto_id: %u]"
-	   "\n",
-	   buf, m->patterns->astring, min_len /* , *matching_protocol_id */);
-#endif
-    return(1); /* If the pattern found matches the string at the beginning we stop here */
-  } else {
-#ifdef MATCH_DEBUG
-    printf("NO match found: continue\n");
-#endif
-    return(0); /* 0 to continue searching, !0 to stop */
-  }
+  return 0;
 }
 
 /* ******************************************************************** */
@@ -2335,9 +2333,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->ndpi_num_supported_protocols = NDPI_MAX_SUPPORTED_PROTOCOLS;
   ndpi_str->ndpi_num_custom_protocols = 0;
 
-  ndpi_str->host_automa.ac_automa = ac_automata_init(ac_match_handler);
-  ndpi_str->content_automa.ac_automa = ac_automata_init(ac_match_handler);
-  ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(ac_match_handler);
+  ndpi_str->host_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
+  ndpi_str->content_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
+  ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(NULL);
   ndpi_str->malicious_ja3_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->malicious_sha1_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
@@ -2348,18 +2346,40 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     return(NULL);
   }
 
-  ndpi_str->custom_categories.hostnames.ac_automa = ac_automata_init(ac_match_handler);
-  ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
+  ndpi_str->custom_categories.hostnames.ac_automa = ac_automata_init(ac_domain_match_handler);
+  ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_domain_match_handler);
 
   ndpi_str->custom_categories.ipAddresses = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
 
-  if(ndpi_str->host_automa.ac_automa)
+  if(ndpi_str->host_automa.ac_automa) 
       ac_automata_feature(ndpi_str->host_automa.ac_automa,AC_FEATURE_LC);
+
   if(ndpi_str->custom_categories.hostnames.ac_automa)
       ac_automata_feature(ndpi_str->custom_categories.hostnames.ac_automa,AC_FEATURE_LC);
+
   if(ndpi_str->custom_categories.hostnames_shadow.ac_automa)
       ac_automata_feature(ndpi_str->custom_categories.hostnames_shadow.ac_automa,AC_FEATURE_LC);
+
+  if(ndpi_str->tls_cert_subject_automa.ac_automa)
+      ac_automata_feature(ndpi_str->tls_cert_subject_automa.ac_automa,AC_FEATURE_LC);
+
+  if(ndpi_str->content_automa.ac_automa)
+      ac_automata_feature(ndpi_str->content_automa.ac_automa,AC_FEATURE_LC);
+
+  /* ahocorasick debug */
+  /* Needed ac_automata_enable_debug(1) for show debug */
+  if(ndpi_str->host_automa.ac_automa) 
+      ac_automata_name(ndpi_str->host_automa.ac_automa,"host",AC_FEATURE_DEBUG);
+  if(ndpi_str->custom_categories.hostnames.ac_automa)
+      ac_automata_name(ndpi_str->custom_categories.hostnames.ac_automa,"ccat",0);
+  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa)
+      ac_automata_name(ndpi_str->custom_categories.hostnames_shadow.ac_automa,"ccat_sh",0);
+  if(ndpi_str->tls_cert_subject_automa.ac_automa)
+      ac_automata_name(ndpi_str->tls_cert_subject_automa.ac_automa,"tls_cert",AC_FEATURE_DEBUG);
+  if(ndpi_str->content_automa.ac_automa)
+      ac_automata_name(ndpi_str->content_automa.ac_automa,"content",AC_FEATURE_DEBUG);
+
 
   if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating Patricia trees\n");
@@ -2420,7 +2440,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
 /* Wrappers */
 void *ndpi_init_automa(void) {
-  return(ac_automata_init(ac_match_handler));
+  return(ac_automata_init(ac_domain_match_handler));
 }
 
 /* ****************************************************** */
@@ -2463,7 +2483,7 @@ void ndpi_finalize_automa(void *_automa) {
 /* ****************************************************** */
 
 static int ndpi_match_string_common(AC_AUTOMATA_t *automa, char *string_to_match,size_t string_len,
-				    u_int16_t *protocol_id, ndpi_protocol_category_t *category,
+				    u_int32_t *protocol_id, ndpi_protocol_category_t *category,
 				    ndpi_protocol_breed_t *breed) {
   AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   AC_TEXT_t ac_input_text;
@@ -2481,16 +2501,8 @@ static int ndpi_match_string_common(AC_AUTOMATA_t *automa, char *string_to_match
   }
 
   ac_input_text.astring = string_to_match, ac_input_text.length = string_len;
-  ac_input_text.ignore_case = 0;
+  ac_input_text.option = 0;
   rc = ac_automata_search(automa, &ac_input_text, &match);
-
-  /*
-    As ac_automata_search can detect partial matches and continue the search process
-    in case rc == 0 (i.e. no match), we need to check if there is a partial match
-    and in this case return it
-  */
-  if((rc == 0) && (match.number != 0))
-    rc = 1;
 
   if(protocol_id)
     *protocol_id = rc ? match.number : NDPI_PROTOCOL_UNKNOWN;
@@ -2507,7 +2519,7 @@ static int ndpi_match_string_common(AC_AUTOMATA_t *automa, char *string_to_match
 /* ****************************************************** */
 
 int ndpi_match_string(void *_automa, char *string_to_match) {
-  uint16_t proto_id;
+  uint32_t proto_id;
   int rc;
 
   if(!string_to_match)
@@ -2526,58 +2538,32 @@ int ndpi_match_string_protocol_id(void *automa, char *string_to_match,
 				  u_int match_len, u_int16_t *protocol_id,
 				  ndpi_protocol_category_t *category,
 				  ndpi_protocol_breed_t *breed) {
-  
+  u_int32_t proto_id;
   int rc = ndpi_match_string_common((AC_AUTOMATA_t*)automa, string_to_match,
-				    match_len, protocol_id, category, breed);
+				    match_len, &proto_id, category, breed);
   if(rc < 0) return rc;
-
-  return(*protocol_id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
+  *protocol_id = (u_int16_t)proto_id;
+  return(proto_id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
 }
 
 /* ****************************************************** */
 
-int ndpi_match_string_value(void *_automa, char *string_to_match,
-			    u_int match_len, u_int32_t *num) {
-  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
-  AC_TEXT_t ac_input_text;
-  int rc;
-  AC_AUTOMATA_t *automa = (AC_AUTOMATA_t*)_automa;
-    
-  if(num) *num = 0;
+int ndpi_match_string_value(void *automa, char *string_to_match,
+                           u_int match_len, u_int32_t *num) {
 
-  if((automa == NULL) || (string_to_match == NULL) || (string_to_match[0] == '\0')) {
-    return(-2);
-  }
-
-  if(automa->automata_open) {
-    printf("[%s:%d] [NDPI] Internal error: please call ndpi_finalize_initialization()\n", __FILE__, __LINE__);
-    return(-1);
-  }
-
-  ac_input_text.astring = string_to_match, ac_input_text.length = match_len;
-  ac_input_text.ignore_case = 0;
-  rc = ac_automata_search(automa, &ac_input_text, &match);
-
-  /*
-    As ac_automata_search can detect partial matches and continue the search process
-    in case rc == 0 (i.e. no match), we need to check if there is a partial match
-    and in this case return it
-  */
-  if((rc == 0) && (match.number != 0))
-    rc = 1;
-
-  if(num && rc)
-    *num = match.number;
-
+  int rc = ndpi_match_string_common((AC_AUTOMATA_t *)automa, string_to_match,
+                 match_len, num, NULL, NULL);
+  if(rc < 0) return rc;
   return rc ? 0 : -1;
-}
+ }
+
 
 /* *********************************************** */
 
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 			       char *name, u_int name_len,
                                ndpi_protocol_category_t *category) {
-  u_int16_t id;
+  u_int32_t id;
   int rc = ndpi_match_string_common(ndpi_str->custom_categories.hostnames.ac_automa,
 					 name, name_len, &id, category, NULL);
   if(rc < 0) return rc;
@@ -2993,7 +2979,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     } else {
       if(do_add)
 	ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-				      NDPI_PROTOCOL_ACCEPTABLE);
+				      NDPI_PROTOCOL_ACCEPTABLE,0);
       else
 	ndpi_remove_host_url_subprotocol(ndpi_str, value, subprotocol_id);
     }
@@ -3062,28 +3048,17 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
 static int ndpi_load_risky_domain(struct ndpi_detection_module_struct *ndpi_str,
 				  char* domain_name) {
   if(ndpi_str->risky_domain_automa.ac_automa == NULL) {
-    ndpi_str->risky_domain_automa.ac_automa = ac_automata_init(ac_match_handler);
-    if(ndpi_str->risky_domain_automa.ac_automa)
-	    ac_automata_feature(ndpi_str->risky_domain_automa.ac_automa,AC_FEATURE_LC);
+    ndpi_str->risky_domain_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
+    if(!ndpi_str->risky_domain_automa.ac_automa) return -1;
+    ac_automata_feature(ndpi_str->risky_domain_automa.ac_automa,AC_FEATURE_LC);
+    ac_automata_name(ndpi_str->risky_domain_automa.ac_automa,"risky",0);
   }
 
-  if(ndpi_str->risky_domain_automa.ac_automa) {
-    char buf[64], *str;
-    u_int i, len;
+  if(!ndpi_str->risky_domain_automa.ac_automa)
+    return -1;
 
-    snprintf(buf, sizeof(buf)-1, "%s$", domain_name);
-    for(i = 0, len = strlen(buf)-1 /* Skip $ */; i < len; i++) buf[i] = tolower(buf[i]);
-
-    str = ndpi_strdup(buf);
-    if (str == NULL) {
-      NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
-      return -1;
-    };
-
-    return(ndpi_add_string_to_automa(ndpi_str->risky_domain_automa.ac_automa, str));
-  }
-
-  return(-1);
+  return ndpi_string_to_automa(ndpi_str, (AC_AUTOMATA_t *)ndpi_str->risky_domain_automa.ac_automa, 
+                 domain_name, 1, 0, 0, 0, 1); /* domain, protocol, category, breed, level , at_end */
 }
 
 /* ******************************************************************** */
@@ -3147,7 +3122,9 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
   int len, num = 0;
 
   if(ndpi_str->malicious_ja3_automa.ac_automa == NULL)
-    ndpi_str->malicious_ja3_automa.ac_automa = ac_automata_init(ac_match_handler);
+    ndpi_str->malicious_ja3_automa.ac_automa = ac_automata_init(NULL);
+  if(ndpi_str->malicious_ja3_automa.ac_automa)
+	  ac_automata_name(ndpi_str->malicious_ja3_automa.ac_automa,"ja3",0);
 
   fd = fopen(path, "r");
 
@@ -3208,7 +3185,9 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
   int num = 0;
 
   if (ndpi_str->malicious_sha1_automa.ac_automa == NULL)
-    ndpi_str->malicious_sha1_automa.ac_automa = ac_automata_init(ac_match_handler);
+    ndpi_str->malicious_sha1_automa.ac_automa = ac_automata_init(NULL);
+  if(ndpi_str->malicious_sha1_automa.ac_automa)
+	  ac_automata_name(ndpi_str->malicious_sha1_automa.ac_automa,"sha1",0);
 
   fd = fopen(path, "r");
 
@@ -4826,45 +4805,15 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str, const c
 
 int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, const char *name_to_add,
 				ndpi_protocol_category_t category) {
-  char *name;
-  u_int len;
-  AC_PATTERN_t ac_pattern;
-  AC_ERROR_t rc;
+
+  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL)
+    return(-1);
 
   if(name_to_add == NULL)
     return(-1);
-  else
-    len = strlen(name_to_add);
 
-  if((name = (char*)ndpi_malloc(len+3)) == NULL)
-    return(-1);
-
-  memset(&ac_pattern, 0, sizeof(ac_pattern));
-  ac_pattern.length = snprintf(name, len+2, "%s%s", name_to_add,
-			       ndpi_is_middle_string_char(name_to_add[len-1]) ? "" : "$");
-
-#if 0
-  printf("===> %s() Loading %s as %u\n", __FUNCTION__, name, category);
-#endif
-
-  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL) {
-    ndpi_free(name);
-    return(-1);
-  }
-
-  ac_pattern.astring = name;
-  ac_pattern.rep.number = (u_int32_t) category,  ac_pattern.rep.category = category;
-
-  rc = ac_automata_add(ndpi_str->custom_categories.hostnames_shadow.ac_automa, &ac_pattern);
-  if(rc != ACERR_DUPLICATE_PATTERN && rc != ACERR_SUCCESS) {
-    ndpi_free(name);
-    return(-1);
-  }
-
-  if(rc == ACERR_DUPLICATE_PATTERN)
-    ndpi_free(name);
-
-  return(0);
+  return ndpi_string_to_automa(ndpi_str,(AC_AUTOMATA_t *)ndpi_str->custom_categories.hostnames_shadow.ac_automa,
+	name_to_add,category,category, 0, 0, 1); /* at_end */
 }
 
 /* ********************************************************************************* */
@@ -4905,7 +4854,11 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   ndpi_str->custom_categories.hostnames.ac_automa = ndpi_str->custom_categories.hostnames_shadow.ac_automa;
 
   /* Realloc */
-  ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_match_handler);
+  ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_domain_match_handler);
+  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa) {
+      ac_automata_feature(ndpi_str->custom_categories.hostnames_shadow.ac_automa,AC_FEATURE_LC);
+      ac_automata_name(ndpi_str->custom_categories.hostnames_shadow.ac_automa,"ccat_sh",0);
+  }
 
   if(ndpi_str->custom_categories.ipAddresses != NULL)
     ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
@@ -6779,20 +6732,14 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 				      char *string_to_match, u_int string_to_match_len,
 				      ndpi_protocol_match_result *ret_match,
 				      u_int16_t master_protocol_id) {
-  u_int16_t rc, buf_len, i;
+  u_int16_t rc;
   ndpi_protocol_category_t id;
-  char buf[96];
 
-  buf_len = ndpi_min(string_to_match_len, sizeof(buf)-2);
-  for(i=0; i<buf_len; i++) buf[i] = tolower(string_to_match[i]);
-  buf[i++] = '$'; /* Add trailer $ */
-  buf[i] = '\0';
-
-  rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, buf, i,
+  rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
 					    master_protocol_id, ret_match, 1);
   id = ret_match->protocol_category;
 
-  if(ndpi_get_custom_category_match(ndpi_str, buf, i, &id) != -1) {
+  if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
     /* if(id != -1) */ {
       flow->category = ret_match->protocol_category = id;
       rc = master_protocol_id;
@@ -6800,8 +6747,9 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   }
 
   if(ndpi_str->risky_domain_automa.ac_automa != NULL) {
-    u_int16_t rc1 = ndpi_match_string(ndpi_str->risky_domain_automa.ac_automa, buf);
-
+    u_int32_t proto_id;
+    u_int16_t rc1 = ndpi_match_string_common(ndpi_str->risky_domain_automa.ac_automa,
+			string_to_match,string_to_match_len, &proto_id, NULL, NULL);
     if(rc1 > 0)
       ndpi_set_risk(flow, NDPI_RISKY_DOMAIN);
   }
