@@ -1,3 +1,7 @@
+Guessed flow protos:	33
+
+DPI Packets (TCP):	77	(2.14 pkts/flow)
+
 Unknown	9	3031	2
 SMBv23	6	1914	3
 Kerberos	48	19194	24

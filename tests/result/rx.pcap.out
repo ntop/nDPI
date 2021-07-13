@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	5	(1.00 pkts/flow)
+
 RX	132	26475	5
 
 	1	UDP 131.114.219.168:7001 <-> 192.167.206.241:7000 [proto: 223/RX][cat: RPC/16][48 pkts/6808 bytes <-> 31 pkts/5568 bytes][Goodput ratio: 70/77][20.45 sec][bytes ratio: 0.100 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 509/13 19828/65 3094/18][Pkt Len c2s/s2c min/avg/max/stddev: 70/74 142/180 510/782 117/123][PLAIN TEXT (UZ.SNS.IT)][Plen Bins: 2,26,41,0,17,6,0,0,0,0,0,0,2,0,3,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

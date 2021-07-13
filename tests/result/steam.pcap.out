@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	55	(1.00 pkts/flow)
+
 Steam	104	9020	55
 
 	1	UDP 192.168.188.149:45665 <-> 72.165.61.188:27018 [proto: 74/Steam][cat: Game/8][5 pkts/846 bytes <-> 6 pkts/608 bytes][Goodput ratio: 75/58][0.69 sec][bytes ratio: 0.164 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 50/0 149/124 298/289 107/116][Pkt Len c2s/s2c min/avg/max/stddev: 78/78 169/101 366/158 117/28][PLAIN TEXT (H@VS01)][Plen Bins: 0,63,9,9,0,0,9,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

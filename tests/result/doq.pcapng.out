@@ -1,3 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+DPI Packets (other):	1	(1.00 pkts/flow)
+
 ICMPV6	6	1170	1
 DoH_DoT	14	4788	1
 

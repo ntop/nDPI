@@ -1,3 +1,7 @@
+Guessed flow protos:	639
+
+DPI Packets (TCP):	3972	(6.01 pkts/flow)
+
 HTTP	9374	4721148	661
 
 	1	TCP 172.16.0.1:59042 <-> 192.168.10.50:80 [proto: 7/HTTP][cat: Web/5][214 pkts/62915 bytes <-> 107 pkts/190654 bytes][Goodput ratio: 78/96][68.07 sec][Host: 205.174.165.68][bytes ratio: -0.504 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 340/680 4821/4822 530/629][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 294/1782 651/1935 251/393][URL: 205.174.165.68/dv/vulnerabilities/xss_r/][StatusCode: 200][Content-Type: text/html][User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0][Risk: ** HTTP Numeric IP Address **][Risk Score: 10][PLAIN TEXT (GET /dv/vulnerabilities/xss)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,49]

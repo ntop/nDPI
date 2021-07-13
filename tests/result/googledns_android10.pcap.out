@@ -1,3 +1,8 @@
+Guessed flow protos:	2
+
+DPI Packets (TCP):	117	(16.71 pkts/flow)
+DPI Packets (other):	1	(1.00 pkts/flow)
+
 Google	12	896	3
 DoH_DoT	520	131998	5
 

@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	2	(1.00 pkts/flow)
+
 BGP	2	322	2
 
 	1	TCP 2.2.2.2:179 -> 4.4.4.4:63535 [proto: 13/BGP][cat: Network/14][1 pkts/163 bytes -> 0 pkts/0 bytes][Goodput ratio: 70/0][< 1 sec][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

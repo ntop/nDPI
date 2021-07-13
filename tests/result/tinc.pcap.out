@@ -1,3 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	19	(9.50 pkts/flow)
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+
 TINC	317	352291	4
 
 	1	UDP 185.83.218.112:55656 <-> 131.114.168.27:55656 [proto: 209/TINC][cat: VPN/2][29 pkts/30038 bytes <-> 105 pkts/139726 bytes][Goodput ratio: 96/97][35.82 sec][bytes ratio: -0.646 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 244/335 1049/2670 434/517][Pkt Len c2s/s2c min/avg/max/stddev: 158/118 1036/1331 1502/1510 544/412][PLAIN TEXT (E@zUIs1)][Plen Bins: 0,0,2,7,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,2,3,1,0,2,73,0,0]

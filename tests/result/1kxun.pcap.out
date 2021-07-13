@@ -1,3 +1,8 @@
+Guessed flow protos:	27
+
+DPI Packets (TCP):	284	(9.47 pkts/flow)
+DPI Packets (UDP):	120	(1.21 pkts/flow)
+
 Unknown	24	6428	14
 DNS	5	638	2
 HTTP	945	530967	19

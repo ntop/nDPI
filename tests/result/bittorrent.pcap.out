@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	24	(1.00 pkts/flow)
+
 BitTorrent	299	305728	24
 
 	1	TCP 192.168.1.3:52915 <-> 198.100.146.9:60163 [proto: 37/BitTorrent][cat: FileTransfer/7][17 pkts/2745 bytes <-> 193 pkts/282394 bytes][Goodput ratio: 59/95][5.77 sec][bytes ratio: -0.981 (Download)][IAT c2s/s2c min/avg/max/stddev: 12/0 319/30 779/919 241/95][Pkt Len c2s/s2c min/avg/max/stddev: 83/80 161/1463 242/1506 58/218][BT Hash: dcfcdccfb9e670ccc3dd40c78c161f2bea243126][PLAIN TEXT (BitTorrent protocol)][Plen Bins: 2,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,93,0,0]

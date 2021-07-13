@@ -1,3 +1,9 @@
+Guessed flow protos:	169
+
+DPI Packets (TCP):	48	(2.29 pkts/flow)
+DPI Packets (UDP):	367	(1.63 pkts/flow)
+DPI Packets (other):	5	(1.00 pkts/flow)
+
 Unknown	30	3356	30
 FTP_CONTROL	36	2569	12
 DNS	301	26612	159

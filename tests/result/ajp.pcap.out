@@ -1,3 +1,8 @@
+Guessed flow protos:	2
+
+DPI Packets (TCP):	8	(4.00 pkts/flow)
+DPI Packets (other):	6	(3.00 pkts/flow)
+
 Unknown	6	2200	2
 AJP	26	4446	2
 

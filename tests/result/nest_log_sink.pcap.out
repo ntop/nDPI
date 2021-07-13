@@ -1,3 +1,8 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	176	(13.54 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+
 DNS	15	1612	1
 NestLogSink	457	44483	6
 Google	302	72365	7

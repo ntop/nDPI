@@ -1,3 +1,8 @@
+Guessed flow protos:	18
+
+DPI Packets (TCP):	266	(22.17 pkts/flow)
+DPI Packets (UDP):	8	(1.00 pkts/flow)
+
 Unknown	6	360	1
 HTTP	13	1019	2
 Google	30	3390	6

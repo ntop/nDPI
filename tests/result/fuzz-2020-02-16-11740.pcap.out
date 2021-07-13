@@ -1,3 +1,8 @@
+Guessed flow protos:	15
+
+DPI Packets (UDP):	70	(1.00 pkts/flow)
+DPI Packets (other):	7	(1.00 pkts/flow)
+
 Unknown	12	3985	12
 VRRP	1	725	1
 Radius	302	145773	64

@@ -1,3 +1,9 @@
+Guessed flow protos:	3
+
+DPI Packets (TCP):	110	(7.33 pkts/flow)
+DPI Packets (UDP):	5	(1.67 pkts/flow)
+DPI Packets (other):	1	(1.00 pkts/flow)
+
 DNS	2	186	1
 DHCP	4	1368	1
 Signal	512	282327	11

@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	10	(5.00 pkts/flow)
+
 VNC	4551	329158	2
 
 	1	TCP 95.237.48.208:59791 <-> 192.168.2.110:6900 [proto: 89/VNC][cat: RemoteAccess/12][2485 pkts/199101 bytes <-> 1058 pkts/57444 bytes][Goodput ratio: 32/1][16.52 sec][bytes ratio: 0.552 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/10 841/845 31/42][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 80/54 89/88 5/3][Risk: ** Desktop/File Sharing Session **][Risk Score: 10][Plen Bins: 88,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

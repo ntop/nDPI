@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	8	(4.00 pkts/flow)
+
 Mining	319	166676	2
 
 	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][Goodput ratio: 93/43][1091.42 sec][ZCash/Monero][bytes ratio: 0.831 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 7234/8131 71734/71815 15224/15291][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 900/117 1514/376 709/99][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (method)][Plen Bins: 28,2,0,1,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,29,0,0]

@@ -1,3 +1,7 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	445	(7.42 pkts/flow)
+
 TLS	612	384211	15
 Twitter	863	686585	3
 YouTube	881	966947	3

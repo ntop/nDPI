@@ -1,3 +1,7 @@
+Guessed flow protos:	17
+
+DPI Packets (TCP):	261	(7.05 pkts/flow)
+
 TLS	979	1924858	20
 Facebook	242	237988	2
 Google	634	607243	5

@@ -1,3 +1,7 @@
+Guessed flow protos:	6
+
+DPI Packets (TCP):	370	(61.67 pkts/flow)
+
 Mining	637	581074	6
 
 	1	TCP 192.168.1.142:55328 <-> 69.118.54.122:8333 [proto: 42/Mining][cat: Mining/99][2 pkts/281 bytes <-> 137 pkts/191029 bytes][Goodput ratio: 53/95][330.56 sec][bytes ratio: -0.997 (Download)][IAT c2s/s2c min/avg/max/stddev: 141657/0 141657/2644 141657/76010 0/11325][Pkt Len c2s/s2c min/avg/max/stddev: 110/86 140/1394 171/1514 30/378][PLAIN TEXT (version)][Plen Bins: 0,6,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0]

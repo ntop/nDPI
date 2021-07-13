@@ -1,3 +1,8 @@
+Guessed flow protos:	8
+
+DPI Packets (TCP):	86	(6.62 pkts/flow)
+DPI Packets (UDP):	4	(2.00 pkts/flow)
+
 Unknown	3	502	1
 ntop	80	36401	4
 TLS	26	3245	7

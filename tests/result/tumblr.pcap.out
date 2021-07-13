@@ -1,3 +1,7 @@
+Guessed flow protos:	38
+
+DPI Packets (TCP):	586	(12.47 pkts/flow)
+
 Yahoo	31	9933	1
 Tumblr	1733	1208864	2
 TLS	22811	22990118	42
