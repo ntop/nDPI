@@ -1,3 +1,9 @@
+Guessed flow protos:	68
+
+DPI Packets (TCP):	1780	(14.71 pkts/flow)
+DPI Packets (UDP):	64	(1.94 pkts/flow)
+DPI Packets (other):	6	(1.00 pkts/flow)
+
 DNS	4	400	2
 DHCP	3	1056	2
 ICMP	2	188	1

@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	3	(1.00 pkts/flow)
+
 GenshinImpact	45	10832	3
 
 	1	UDP 192.168.2.100:58766 <-> 47.245.143.85:22101 [proto: 257/GenshinImpact][cat: Game/8][7 pkts/1369 bytes <-> 8 pkts/3568 bytes][Goodput ratio: 78/91][1.63 sec][bytes ratio: -0.445 (Download)][IAT c2s/s2c min/avg/max/stddev: 9/0 312/266 818/750 343/309][Pkt Len c2s/s2c min/avg/max/stddev: 62/62 196/446 648/1223 192/449][Plen Bins: 20,13,0,6,13,20,0,0,0,6,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0]

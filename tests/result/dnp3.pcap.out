@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	80	(10.00 pkts/flow)
+
 DNP3	543	38754	8
 
 	1	TCP 10.0.0.8:2828 <-> 10.0.0.3:20000 [proto: 244/DNP3][cat: IoT-Scada/31][60 pkts/4041 bytes <-> 78 pkts/7164 bytes][Goodput ratio: 17/38][121.83 sec][bytes ratio: -0.279 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 421/302 13044/8439 1926/1115][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 67/92 79/145 5/37][Plen Bins: 64,3,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

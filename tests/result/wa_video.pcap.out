@@ -1,3 +1,8 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	81	(81.00 pkts/flow)
+DPI Packets (UDP):	13	(1.00 pkts/flow)
+
 SSDP	8	1377	3
 DHCP	2	684	1
 WhatsAppCall	1421	937506	7

@@ -1,3 +1,8 @@
+Guessed flow protos:	38
+
+DPI Packets (TCP):	112	(2.87 pkts/flow)
+DPI Packets (other):	1	(1.00 pkts/flow)
+
 Unknown	3	655	3
 HTTP	117	27855	36
 Cloudflare	1	854	1

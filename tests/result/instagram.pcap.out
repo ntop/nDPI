@@ -1,3 +1,9 @@
+Guessed flow protos:	18
+
+DPI Packets (TCP):	499	(16.63 pkts/flow)
+DPI Packets (UDP):	10	(1.43 pkts/flow)
+DPI Packets (other):	1	(1.00 pkts/flow)
+
 Unknown	1	66	1
 HTTP	116	91784	6
 ICMP	5	510	1

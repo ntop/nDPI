@@ -1,3 +1,8 @@
+Guessed flow protos:	3
+
+DPI Packets (TCP):	217	(3.88 pkts/flow)
+DPI Packets (UDP):	18	(1.00 pkts/flow)
+
 Mining	1939	208480	70
 Amazon	61	7631	4
 

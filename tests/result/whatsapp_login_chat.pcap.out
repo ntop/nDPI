@@ -1,3 +1,8 @@
+Guessed flow protos:	4
+
+DPI Packets (TCP):	75	(25.00 pkts/flow)
+DPI Packets (UDP):	7	(1.17 pkts/flow)
+
 Unknown	30	2963	1
 MDNS	2	202	2
 DHCP	6	2052	1

@@ -1,3 +1,8 @@
+Guessed flow protos:	26
+
+DPI Packets (TCP):	515	(9.36 pkts/flow)
+DPI Packets (UDP):	17	(8.50 pkts/flow)
+
 HTTP	22	3182	2
 TLS	106	11841	8
 SIP	22	15356	1

@@ -1,3 +1,7 @@
+Guessed flow protos:	8
+
+DPI Packets (TCP):	97	(12.12 pkts/flow)
+
 PS_VUE	1724	2198169	1
 TLS	11	1401	5
 Amazon	5	1380	2

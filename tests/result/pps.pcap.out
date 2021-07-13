@@ -1,3 +1,8 @@
+Guessed flow protos:	44
+
+DPI Packets (TCP):	159	(2.52 pkts/flow)
+DPI Packets (UDP):	201	(4.57 pkts/flow)
+
 Unknown	990	378832	34
 HTTP	1502	1849543	62
 SSDP	63	17143	10

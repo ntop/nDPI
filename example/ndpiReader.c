@@ -2916,6 +2916,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     }
 
     cumulative_stats.ndpi_flow_count += ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count;
+    cumulative_stats.flow_count[0] += ndpi_thread_info[thread_id].workflow->stats.flow_count[0];
+    cumulative_stats.flow_count[1] += ndpi_thread_info[thread_id].workflow->stats.flow_count[1];
+    cumulative_stats.flow_count[2] += ndpi_thread_info[thread_id].workflow->stats.flow_count[2];
     cumulative_stats.tcp_count   += ndpi_thread_info[thread_id].workflow->stats.tcp_count;
     cumulative_stats.udp_count   += ndpi_thread_info[thread_id].workflow->stats.udp_count;
     cumulative_stats.mpls_count  += ndpi_thread_info[thread_id].workflow->stats.mpls_count;
@@ -2925,6 +2928,10 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     for(i = 0; i < sizeof(cumulative_stats.packet_len)/sizeof(cumulative_stats.packet_len[0]); i++)
       cumulative_stats.packet_len[i] += ndpi_thread_info[thread_id].workflow->stats.packet_len[i];
     cumulative_stats.max_packet_len += ndpi_thread_info[thread_id].workflow->stats.max_packet_len;
+
+    cumulative_stats.dpi_packet_count[0] += ndpi_thread_info[thread_id].workflow->stats.dpi_packet_count[0];
+    cumulative_stats.dpi_packet_count[1] += ndpi_thread_info[thread_id].workflow->stats.dpi_packet_count[1];
+    cumulative_stats.dpi_packet_count[2] += ndpi_thread_info[thread_id].workflow->stats.dpi_packet_count[2];
   }
 
   if(cumulative_stats.total_wire_bytes == 0)
@@ -2996,8 +3003,39 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
       if(enable_protocol_guess)
 	printf("\tGuessed flow protos:   %-13u\n", cumulative_stats.guessed_flow_protocols);
+
+      if(cumulative_stats.flow_count[0])
+        printf("\tDPI Packets (TCP):     %-13llu (%.2f pkts/flow)\n",
+               (long long unsigned int)cumulative_stats.dpi_packet_count[0],
+               cumulative_stats.dpi_packet_count[0] / (float)cumulative_stats.flow_count[0]);
+      if(cumulative_stats.flow_count[1])
+        printf("\tDPI Packets (UDP):     %-13llu (%.2f pkts/flow)\n",
+               (long long unsigned int)cumulative_stats.dpi_packet_count[1],
+               cumulative_stats.dpi_packet_count[1] / (float)cumulative_stats.flow_count[1]);
+      if(cumulative_stats.flow_count[2])
+        printf("\tDPI Packets (other):   %-13llu (%.2f pkts/flow)\n",
+               (long long unsigned int)cumulative_stats.dpi_packet_count[2],
+               cumulative_stats.dpi_packet_count[2] / (float)cumulative_stats.flow_count[2]);
   }
 
+  if(results_file) {
+      if(enable_protocol_guess)
+        fprintf(results_file, "Guessed flow protos:\t%u\n\n", cumulative_stats.guessed_flow_protocols);
+
+      if(cumulative_stats.flow_count[0])
+        fprintf(results_file, "DPI Packets (TCP):\t%llu\t(%.2f pkts/flow)\n",
+               (long long unsigned int)cumulative_stats.dpi_packet_count[0],
+               cumulative_stats.dpi_packet_count[0] / (float)cumulative_stats.flow_count[0]);
+      if(cumulative_stats.flow_count[1])
+        fprintf(results_file, "DPI Packets (UDP):\t%llu\t(%.2f pkts/flow)\n",
+               (long long unsigned int)cumulative_stats.dpi_packet_count[1],
+               cumulative_stats.dpi_packet_count[1] / (float)cumulative_stats.flow_count[1]);
+      if(cumulative_stats.flow_count[2])
+        fprintf(results_file, "DPI Packets (other):\t%llu\t(%.2f pkts/flow)\n",
+               (long long unsigned int)cumulative_stats.dpi_packet_count[2],
+               cumulative_stats.dpi_packet_count[2] / (float)cumulative_stats.flow_count[2]);
+      fprintf(results_file, "\n");
+  }
 
   if(!quiet_mode) printf("\n\nDetected protocols:\n");
   for(i = 0; i <= ndpi_get_num_supported_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {

@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	54	(6.00 pkts/flow)
+
 HTTP	94	30008	9
 
 	1	TCP 172.16.0.1:36212 <-> 192.168.10.50:80 [proto: 7/HTTP][cat: Web/5][7 pkts/1070 bytes <-> 5 pkts/4487 bytes][Goodput ratio: 56/92][5.01 sec][Host: 205.174.165.68][bytes ratio: -0.615 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1002/3 5000/10 1999/5][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 153/897 666/2767 210/1090][URL: 205.174.165.68/dv/vulnerabilities/sqli/?id=1%27+and+1%3D1+union+select+null%2C+table_name+from+information_schema.tables%23&Submit=Submit][StatusCode: 200][Content-Type: text/html][User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0][Risk: ** SQL injection **** HTTP Numeric IP Address **][Risk Score: 260][PLAIN TEXT (GET /dv/vulnerabilities/sqli/)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,33]

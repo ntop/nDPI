@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	8	(1.00 pkts/flow)
+
 UBNTAC2	8	1736	8
 
 	1	UDP 192.168.1.1:34085 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][cat: Network/14][1 pkts/217 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][UniFiSecurityGateway.ER-e120.v4][PLAIN TEXT (UniFiSecurityGateway.ER)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

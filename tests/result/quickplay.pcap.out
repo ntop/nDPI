@@ -1,3 +1,7 @@
+Guessed flow protos:	10
+
+DPI Packets (TCP):	150	(7.14 pkts/flow)
+
 HTTP	133	96179	11
 QQ	12	4781	5
 Facebook	6	1740	3

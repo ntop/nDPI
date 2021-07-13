@@ -1,3 +1,7 @@
+Guessed flow protos:	113
+
+DPI Packets (UDP):	179	(1.58 pkts/flow)
+
 Google	6	8352	2
 QUIC	169	235248	110
 GoogleServices	4	5568	1

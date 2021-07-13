@@ -1,3 +1,7 @@
+Guessed flow protos:	3
+
+DPI Packets (TCP):	11	(3.67 pkts/flow)
+
 TLS	8	1891	2
 Amazon	3	560	1
 

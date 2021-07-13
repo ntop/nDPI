@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	27	(1.80 pkts/flow)
+
 Dropbox	848	90532	15
 
 	1	UDP 192.168.56.1:50318 <-> 192.168.56.101:17500 [proto: 121/Dropbox][cat: Cloud/13][100 pkts/13960 bytes <-> 100 pkts/6260 bytes][Goodput ratio: 70/33][11.19 sec][bytes ratio: 0.381 (Upload)][IAT c2s/s2c min/avg/max/stddev: 103/103 113/112 150/151 11/11][Pkt Len c2s/s2c min/avg/max/stddev: 136/59 140/63 143/66 2/2][PLAIN TEXT (messageType)][Plen Bins: 50,0,13,36,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

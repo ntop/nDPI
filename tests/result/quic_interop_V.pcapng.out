@@ -1,3 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	63	(1.00 pkts/flow)
+DPI Packets (other):	14	(1.00 pkts/flow)
+
 ICMP	21	7436	9
 ICMPV6	10	10642	5
 QUIC	195	201384	60

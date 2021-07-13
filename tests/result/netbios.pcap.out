@@ -1,3 +1,8 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	2	(2.00 pkts/flow)
+DPI Packets (UDP):	14	(1.00 pkts/flow)
+
 NetBIOS	258	24196	13
 SMBv1	2	486	2
 

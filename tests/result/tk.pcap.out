@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	6	(2.00 pkts/flow)
+
 DNS	6	566	3
 
 	1	UDP 192.168.1.178:53820 <-> 192.168.1.1:53 [proto: 5/DNS][cat: Network/14][1 pkts/72 bytes <-> 1 pkts/131 bytes][Goodput ratio: 41/67][0.05 sec][Host: whois.dot.tk][::][Risk: ** Risky domain name **][Risk Score: 50][PLAIN TEXT (freenom)][Plen Bins: 50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

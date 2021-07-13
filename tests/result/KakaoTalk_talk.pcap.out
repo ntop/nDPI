@@ -1,3 +1,8 @@
+Guessed flow protos:	12
+
+DPI Packets (TCP):	89	(5.93 pkts/flow)
+DPI Packets (UDP):	6	(1.20 pkts/flow)
+
 HTTP	5	280	1
 QQ	15	1727	1
 RTP	2991	398751	2

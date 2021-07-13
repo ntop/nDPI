@@ -893,6 +893,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
       ndpi_tsearch(newflow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp); /* Add */
       workflow->stats.ndpi_flow_count++;
+      if(*proto == IPPROTO_TCP)
+        workflow->stats.flow_count[0]++;
+      else if(*proto == IPPROTO_UDP)
+        workflow->stats.flow_count[1]++;
+      else
+        workflow->stats.flow_count[2]++;
 
       *src = newflow->src_id, *dst = newflow->dst_id;
       newflow->entropy.src2dst_pkt_len[newflow->entropy.src2dst_pkt_count] = l4_data_len;
@@ -1510,6 +1516,13 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 #if 0
     printf("%s()\n", __FUNCTION__);
 #endif
+
+    if(proto == IPPROTO_TCP)
+      workflow->stats.dpi_packet_count[0]++;
+    else if(proto == IPPROTO_UDP)
+      workflow->stats.dpi_packet_count[1]++;
+    else
+      workflow->stats.dpi_packet_count[2]++;
 
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,

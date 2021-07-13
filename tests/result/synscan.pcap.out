@@ -1,3 +1,7 @@
+Guessed flow protos:	1990
+
+DPI Packets (TCP):	2011	(1.01 pkts/flow)
+
 Unknown	1874	108700	1870
 FTP_CONTROL	2	116	2
 POP3	2	116	2

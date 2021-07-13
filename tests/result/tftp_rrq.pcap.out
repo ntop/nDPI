@@ -1,3 +1,7 @@
+Guessed flow protos:	1
+
+DPI Packets (UDP):	3	(1.50 pkts/flow)
+
 STUN	1	62	1
 TFTP	98	29793	1
 

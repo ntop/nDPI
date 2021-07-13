@@ -1,3 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (UDP):	5	(2.50 pkts/flow)
+
 OpenVPN	298	57111	3
 
 	1	UDP 192.168.43.18:13680 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][cat: VPN/2][62 pkts/11508 bytes <-> 58 pkts/16664 bytes][Goodput ratio: 77/85][19.24 sec][bytes ratio: -0.183 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 289/106 3994/2456 764/365][Pkt Len c2s/s2c min/avg/max/stddev: 84/92 186/287 1214/1287 193/325][PLAIN TEXT (160727093158Z)][Plen Bins: 0,33,19,9,29,0,0,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0]

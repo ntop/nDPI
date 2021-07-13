@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	4	(1.00 pkts/flow)
+
 RTP	9	1926	1
 SIP	102	47087	2
 RTCP	1	146	1

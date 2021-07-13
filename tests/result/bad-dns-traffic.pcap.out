@@ -1,3 +1,7 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	11	(3.67 pkts/flow)
+
 DNS	382	99374	3
 
 	1	UDP 192.168.43.91:56354 <-> 4.2.2.4:53 [proto: 5/DNS][cat: Network/14][203 pkts/51588 bytes <-> 146 pkts/43285 bytes][Goodput ratio: 83/86][92.47 sec][Host: c75900fdf525320021636f6d6d616e64202873697276696d65732900.skullseclabs.org][::][bytes ratio: 0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 6/15 482/284 1046/2080 456/471][Pkt Len c2s/s2c min/avg/max/stddev: 95/95 254/296 290/325 74/65][Risk: ** Suspicious DGA domain name **][Risk Score: 100][PLAIN TEXT (8244300)][Plen Bins: 0,5,5,0,0,0,0,50,39,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
