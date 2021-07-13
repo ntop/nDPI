@@ -35,6 +35,15 @@ static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_
   const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
   const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
 
+  if (flow->packet_counter > 2)
+  {
+    /*
+     * Process only one packet after the initial packet received.
+     * This is required to prevent fals-positives with other protocols e.g. dnscrypt.
+     */
+    return 0;
+  }
+
   if ((payload_len >= id_flags_iv_crc_len) && (packet->payload[2] == 0x02 /* Payload flag */ )) {
     u_int8_t detected = 1;
 

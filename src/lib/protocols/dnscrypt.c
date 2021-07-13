@@ -38,7 +38,7 @@ void ndpi_search_dnscrypt(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search dnscrypt\n");
 
-  if (flow->packet_counter > 2)
+  if (flow->packet_counter > 3)
   {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
