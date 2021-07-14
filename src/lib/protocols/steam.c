@@ -113,6 +113,15 @@ static void ndpi_check_steam_udp1(struct ndpi_detection_module_struct *ndpi_stru
     return;
   }
 
+  /* Check for Steam Datagram Relay (SDR) packets. */
+  if (payload_len > 8 &&
+      ndpi_ntohll(get_u_int64_t(packet->payload, 0)) == 0x0101736470696e67 /* "\x01\x01sdping" */)
+  {
+    NDPI_LOG_INFO(ndpi_struct, "found STEAM (Steam Datagram Relay)\n");
+    ndpi_int_steam_add_connection(ndpi_struct, flow);
+    return;
+  }
+
   /* Check if we so far detected the protocol in the request or not. */
   if (flow->steam_stage1 == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "STEAM stage 0: \n");
