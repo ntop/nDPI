@@ -1731,6 +1731,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_TLS_UNCOMMON_ALPN:
     return("Uncommon TLS ALPN");
+    
+  case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
+    return("TLS certificate validity longer than 13 months");
+
 
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
