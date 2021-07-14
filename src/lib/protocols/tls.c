@@ -94,6 +94,8 @@ union ja3_info {
  */
 
 #define NDPI_MAX_TLS_REQUEST_SIZE 10000
+#define TLS_THRESHOLD 34186659 // Threshold for certificate validity
+#define TLS_LIMIT_DATE 1598918400 // From 01/09/2020 TLS certificates lifespan is limited to 13 months
 
 /* skype.c */
 extern u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
@@ -421,8 +423,6 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	printf("]\n");
 #endif
     
-    u_int8_t notAfterYear=0, notAfterMon=0, notBeforeYear=0, notBeforeMon=0;
-
 	if(len < (sizeof(utcDate)-1)) {
 	  struct tm utc;
 	  utc.tm_isdst = -1; /* Not set by strptime */
@@ -438,8 +438,6 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		   flow->protos.tls_quic_stun.tls_quic.notBefore, utcDate);
 #endif
 	  }
-	  notBeforeYear = utc.tm_year;
-	  notBeforeMon = utc.tm_mon;
 	}
 
 	offset += len;
@@ -474,13 +472,11 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		       flow->protos.tls_quic_stun.tls_quic.notAfter, utcDate);
 #endif
 	      }
-	      notAfterYear = utc.tm_year;
-		  notAfterMon = utc.tm_mon;
 	    }
-        
-        if ((notAfterYear - notBeforeYear >= 2) 
-			|| (notAfterYear - notBeforeYear >= 1 && notAfterMon - notBeforeMon > 1))
-			ndpi_set_risk(flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
+
+		if (flow->protos.tls_quic_stun.tls_quic.notBefore > TLS_LIMIT_DATE) 
+        	if((flow->protos.tls_quic_stun.tls_quic.notAfter-flow->protos.tls_quic_stun.tls_quic.notBefore) > TLS_THRESHOLD)
+				ndpi_set_risk(flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
 
 	    if((time_sec < flow->protos.tls_quic_stun.tls_quic.notBefore)
 	       || (time_sec > flow->protos.tls_quic_stun.tls_quic.notAfter))
