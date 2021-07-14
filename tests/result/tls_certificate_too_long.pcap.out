@@ -1,15 +1,17 @@
-Protocol statistics:
-	Safe                         49251 bytes
-	Acceptable                   54851 bytes
-	Tracker/Ads                   3310 bytes
-	Unrated                       5582 bytes
+Guessed flow protos:	8
 
-Risk stats [found 10 (28.6 %) flows with risks]:
-	Binary application transfer                  2 [20.0 %]
-	TLS certificate validity longer than 13 months     8 [80.0 %]
+DPI Packets (TCP):	220	(13.75 pkts/flow)
+DPI Packets (UDP):	33	(1.94 pkts/flow)
+DPI Packets (other):	2	(1.00 pkts/flow)
 
-	NOTE: as one flow can have multiple risks set, the sum of the
-	      last column can exceed the number of flows with risks.
+Unknown	13	5582	1
+MDNS	5	983	3
+IGMP	2	92	2
+TLS	6	391	2
+Google	30	3310	5
+Apple	10	993	5
+Microsoft	123	47867	15
+Microsoft365	126	53776	2
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

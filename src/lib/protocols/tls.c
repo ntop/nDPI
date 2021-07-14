@@ -94,8 +94,8 @@ union ja3_info {
  */
 
 #define NDPI_MAX_TLS_REQUEST_SIZE 10000
-#define TLS_THRESHOLD 34186659 // Threshold for certificate validity
-#define TLS_LIMIT_DATE 1598918400 // From 01/09/2020 TLS certificates lifespan is limited to 13 months
+#define TLS_THRESHOLD             34186659 /* Threshold for certificate validity                                */
+#define TLS_LIMIT_DATE            1598918400 /* From 01/09/2020 TLS certificates lifespan is limited to 13 months */
 
 /* skype.c */
 extern u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
@@ -422,7 +422,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	for(j=0; j<len; j++) printf("%c", packet->payload[i+4+j]);
 	printf("]\n");
 #endif
-    
+
 	if(len < (sizeof(utcDate)-1)) {
 	  struct tm utc;
 	  utc.tm_isdst = -1; /* Not set by strptime */
@@ -456,7 +456,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	    for(j=0; j<len; j++) printf("%c", packet->payload[offset+j]);
 	    printf("]\n");
 #endif
-                
+
 	    if(len < (sizeof(utcDate)-1)) {
 	      struct tm utc;
 	      utc.tm_isdst = -1; /* Not set by strptime */
@@ -474,13 +474,13 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      }
 	    }
 
-		if (flow->protos.tls_quic_stun.tls_quic.notBefore > TLS_LIMIT_DATE) 
-        	if((flow->protos.tls_quic_stun.tls_quic.notAfter-flow->protos.tls_quic_stun.tls_quic.notBefore) > TLS_THRESHOLD)
-				ndpi_set_risk(flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
-
+	    if (flow->protos.tls_quic_stun.tls_quic.notBefore > TLS_LIMIT_DATE)
+	      if((flow->protos.tls_quic_stun.tls_quic.notAfter-flow->protos.tls_quic_stun.tls_quic.notBefore) > TLS_THRESHOLD)
+		ndpi_set_risk(flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
+	    
 	    if((time_sec < flow->protos.tls_quic_stun.tls_quic.notBefore)
 	       || (time_sec > flow->protos.tls_quic_stun.tls_quic.notAfter))
-	    ndpi_set_risk(flow, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
+	      ndpi_set_risk(flow, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
 	  }
 	}
       }
@@ -1467,7 +1467,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	for(i=0; i<cipher_len;) {
 	  u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
 	  u_int16_t cipher_id = ntohs(*id);
-	  
+
 	  if(packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1] /* Skip Grease */) {
 	    /*
 	      Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
@@ -1524,7 +1524,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #if defined(DEBUG_TLS) || defined(DEBUG_HEURISTIC)
 	    printf("Client TLS [GREASE cipher suite: %u/0x%04X] [%d/%u]\n", cipher_id, cipher_id, i, cipher_len);
 #endif
-	    
+
 	    this_is_not_safari = 1; /* NOTE: BugSur and up have grease support */
 	  }
 
@@ -1539,7 +1539,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
 	else if((safari_ciphers == 12) || (this_is_not_safari && looks_like_safari_on_big_sur))
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
-	
+
 	if(chrome_ciphers == 13)
 	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 1;
 
@@ -1784,7 +1784,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_HEURISTIC
 			  printf("[SIGNATURE] [TLS Signature Algorithm] Skipping duplicate 0x%04X\n", signature_algo);
 #endif
-			  
+
 			  duplicate_found = 1, all_ok = 0;
 			  break;
 			}
@@ -1845,7 +1845,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if((flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls == 0)
 		   && duplicate_found)
 		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1; /* Safari */
-		
+
 #ifdef DEBUG_HEURISTIC
 		printf("[SIGNATURE] [is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u][duplicate_found: %u]\n",
 		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls,
