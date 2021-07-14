@@ -9326,7 +9326,7 @@ static ndpi_protocol_match host_match[] =
    { ".pps.tv",                                   "PPStream",         NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
 
    { ".hulustream.com",                                 "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
-   { ".hulu.com",                                       "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
+   { "hulu.com",                                        "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { "assetshuluimcom-a.akamaihd.net",                  "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { "ibhuluimcom-a.akamaihd.net",                      "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
    { ".huluad.com",                                     "Hulu",            NDPI_PROTOCOL_HULU, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN },
@@ -9462,6 +9462,8 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "CN=AnyDesk Client",               NDPI_PROTOCOL_ANYDESK     },
   { "O=Kakao",                         NDPI_PROTOCOL_KAKAOTALK   },
   { "O=ntop.org",                      NDPI_PROTOCOL_NTOP        },
+  { "O=Netflix",                       NDPI_PROTOCOL_NETFLIX     },
+  { "O=Cloudflare",                    NDPI_PROTOCOL_CLOUDFLARE  },
   { "CN=simplednscrypt.org",           NDPI_PROTOCOL_DNSCRYPT    },
   { "CN=*.gateway.messenger.live.com", NDPI_PROTOCOL_SKYPE_TEAMS },
   { "OU=FortiGate",                    NDPI_PROTOCOL_FORTICLIENT },
