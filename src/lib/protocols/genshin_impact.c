@@ -22,7 +22,6 @@
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_GENSHIN_IMPACT
 
-#include <stdlib.h>
 #include "ndpi_api.h"
 
 

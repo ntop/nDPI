@@ -1887,17 +1887,17 @@ u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long) {
 /* ******************************************************************** */
 
 ndpi_str_hash* ndpi_hash_alloc(u_int32_t max_num_entries) {
-  ndpi_str_hash *h = (ndpi_str_hash*)malloc(sizeof(ndpi_str_hash));
+  ndpi_str_hash *h = (ndpi_str_hash*)ndpi_malloc(sizeof(ndpi_str_hash));
 
   if(!h) return(NULL);
   if(max_num_entries < 1024) max_num_entries = 1024;
   if(max_num_entries > 10000000) max_num_entries = 10000000;
 
   h->max_num_entries = max_num_entries, h->num_buckets = max_num_entries/2;
-  h->buckets = (struct ndpi_str_hash_info**)calloc(sizeof(struct ndpi_str_hash_info*), h->num_buckets);
+  h->buckets = (struct ndpi_str_hash_info**)ndpi_calloc(sizeof(struct ndpi_str_hash_info*), h->num_buckets);
 
   if(h->buckets == NULL) {
-    free(h);
+    ndpi_free(h);
     return(NULL);
   } else
     return(h);
@@ -1914,14 +1914,14 @@ void ndpi_hash_free(ndpi_str_hash *h) {
     while(head != NULL) {
       struct ndpi_str_hash_info *next = head->next;
 
-      free(head->key);
-      free(head);
+      ndpi_free(head->key);
+      ndpi_free(head);
       head = next;
     }
   }
 
-  free(h->buckets);
-  free(h);
+  ndpi_free(h->buckets);
+  ndpi_free(h);
 }
 
 /* ******************************************************************** */
@@ -1970,12 +1970,12 @@ int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t 
 
   if(rc == -1) {
     /* Not found */
-    struct ndpi_str_hash_info *e = (struct ndpi_str_hash_info*)malloc(sizeof(struct ndpi_str_hash_info));
+    struct ndpi_str_hash_info *e = (struct ndpi_str_hash_info*)ndpi_malloc(sizeof(struct ndpi_str_hash_info));
 
     if(e == NULL)
       return(-2);
-
-    if((e->key = (char*)malloc(key_len)) == NULL)
+    
+    if((e->key = (char*)ndpi_malloc(key_len)) == NULL)
       return(-3);
 
     memcpy(e->key, key, key_len);

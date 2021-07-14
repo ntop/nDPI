@@ -119,7 +119,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
 	ip = ndpi_bytestream_to_ipv4(&packet->payload[12], packet->payload_packet_len, &bytes_read);
 	
 	// and now test the firt 5 bytes of the payload for zattoo pattern
-	if(ip == packet->iph->daddr
+	if(packet->iph && ip == packet->iph->daddr
 	   && packet->empty_line_position_set != 0
 	   && ((packet->payload_packet_len - packet->empty_line_position) > 10)
 	   && packet->payload[packet->empty_line_position + 2] ==

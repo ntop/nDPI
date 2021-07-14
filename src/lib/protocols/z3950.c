@@ -22,7 +22,6 @@
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_Z3950
 
-#include <stdlib.h>
 #include "ndpi_api.h"
 
 /* https://github.com/wireshark/wireshark/blob/master/epan/dissectors/asn1/z3950/z3950.asn */

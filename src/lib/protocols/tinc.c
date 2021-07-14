@@ -33,7 +33,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
   u_int32_t payload_len = packet->payload_packet_len;
   
   if(packet->udp != NULL) {
-    if(ndpi_struct->tinc_cache != NULL) {
+    if(ndpi_struct->tinc_cache != NULL && packet->iph != NULL) {
       struct tinc_cache_entry tinc_cache_entry1 = {
         .src_address = packet->iph->saddr,
         .dst_address = packet->iph->daddr,
@@ -63,7 +63,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
     return;
   } else if(packet->tcp != NULL) {
     if(payload_len == 0) {
-      if(packet->tcp->syn == 1 && packet->tcp->ack == 0) {
+      if(packet->iph != NULL && packet->tcp->syn == 1 && packet->tcp->ack == 0) {
         flow->tinc_cache_entry.src_address = packet->iph->saddr;
         flow->tinc_cache_entry.dst_address = packet->iph->daddr;
         flow->tinc_cache_entry.dst_port = packet->tcp->dest;

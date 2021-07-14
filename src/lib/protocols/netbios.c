@@ -370,7 +370,7 @@ void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  NDPI_LOG_DBG2(ndpi_struct, "found netbios with MSG-type 0x10,0x11,0x12,0x13,0x14,0x15 or 0x16\n");
 
-	  if(source_ip == ntohl(packet->iph->saddr)) {
+	  if(packet->iph && source_ip == ntohl(packet->iph->saddr)) {
 	    int16_t leftover = netbios_len - 82; /* NetBIOS len */
 
 	    NDPI_LOG_INFO(ndpi_struct, "found netbios with checked ip-address\n");
