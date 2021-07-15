@@ -94,7 +94,7 @@ union ja3_info {
  */
 
 #define NDPI_MAX_TLS_REQUEST_SIZE 10000
-#define TLS_THRESHOLD             34186659 /* Threshold for certificate validity                                */
+#define TLS_THRESHOLD             34387200 /* Threshold for certificate validity                                */
 #define TLS_LIMIT_DATE            1598918400 /* From 01/09/2020 TLS certificates lifespan is limited to 13 months */
 
 /* skype.c */
