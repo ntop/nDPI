@@ -26,7 +26,6 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
 
 #include "ndpi_api.h"
-#include <stdlib.h>
 
 static const char* binary_file_mimes_e[] = { "exe", NULL };
 static const char* binary_file_mimes_v[] = { "vnd.ms-cab-compressed", "vnd.microsoft.portable-executable", NULL };
