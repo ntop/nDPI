@@ -2156,7 +2156,7 @@ static const char *categories[] = {
   "DataTransfer",
   "Web",
   "SocialNetwork",
-  "FileTransfer",
+  "Download",
   "Game",
   "Chat",
   "VoIP",
