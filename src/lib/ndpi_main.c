@@ -4245,26 +4245,63 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
       if(flow->packet.tcp->syn != 0 && flow->packet.tcp->ack == 0 && flow->init_finished != 0 &&
 	 flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
 
-        u_int8_t backup;
-	u_int16_t backup1, backup2;
+	u_int16_t guessed_protocol_id, guessed_host_protocol_id;
 	u_int16_t packet_direction_counter[2];
+        u_int8_t num_processed_pkts;
+	struct packet_save {
+	  const struct ndpi_iphdr *iph;
+	  const struct ndpi_ipv6hdr *iphv6;
+	  const u_int8_t *payload;
+	  u_int64_t current_time_ms;
+	  u_int16_t l3_packet_len;
+	  u_int16_t l4_packet_len;
+	  u_int16_t payload_packet_len;
+	  u_int16_t actual_payload_len;
+	  u_int8_t l4_protocol;
+	} packet;
 
-	packet_direction_counter[0] = flow->packet_direction_counter[0];
-	packet_direction_counter[1] = flow->packet_direction_counter[1];
-        backup = flow->num_processed_pkts;
-        backup1 = flow->guessed_protocol_id;
-        backup2 = flow->guessed_host_protocol_id;
+#define flow_save(a) a = flow->a
+#define flow_restore(a) flow->a = a
+
+	flow_save(packet_direction_counter[0]);
+	flow_save(packet_direction_counter[1]);
+	flow_save(num_processed_pkts);
+	flow_save(guessed_protocol_id);
+	flow_save(guessed_host_protocol_id);
+	flow_save(packet.iph);
+	flow_save(packet.iphv6);
+	flow_save(packet.payload);
+	flow_save(packet.current_time_ms);
+	flow_save(packet.l3_packet_len);
+	flow_save(packet.l4_packet_len);
+	flow_save(packet.payload_packet_len);
+	flow_save(packet.actual_payload_len);
+	flow_save(packet.l4_protocol);
+
         ndpi_free_flow_data(flow);
         memset(flow, 0, sizeof(*(flow)));
 
         /* Restore pointers */
-	flow->packet_direction_counter[0] = packet_direction_counter[0];
-	flow->packet_direction_counter[1] = packet_direction_counter[1];
-        flow->num_processed_pkts = backup;
-        flow->guessed_protocol_id = backup1;
-        flow->guessed_host_protocol_id = backup2;
         flow->packet.tcp = (struct ndpi_tcphdr *) l4ptr;
         flow->l4_proto = IPPROTO_TCP;
+
+	flow_restore(packet_direction_counter[0]);
+	flow_restore(packet_direction_counter[1]);
+	flow_restore(num_processed_pkts);
+	flow_restore(guessed_protocol_id);
+	flow_restore(guessed_host_protocol_id);
+	flow_restore(packet.iph);
+	flow_restore(packet.iphv6);
+	flow_restore(packet.payload);
+	flow_restore(packet.current_time_ms);
+	flow_restore(packet.l3_packet_len);
+	flow_restore(packet.l4_packet_len);
+	flow_restore(packet.payload_packet_len);
+	flow_restore(packet.actual_payload_len);
+	flow_restore(packet.l4_protocol);
+
+#undef flow_save
+#undef flow_restore
 
         NDPI_LOG_DBG(ndpi_str, "tcp syn packet for unknown protocol, reset detection state\n");
       }
