@@ -3724,7 +3724,9 @@ static void hllUnitTest() {
 
 static void bitmapUnitTest() {
   u_int32_t val, i, j;
+  u_int64_t val64;
 
+  /* With a 32 bit integer */
   for(i=0; i<32; i++) {
     NDPI_ZERO_BIT(val);
     NDPI_SET_BIT(val, i);
@@ -3734,6 +3736,20 @@ static void bitmapUnitTest() {
     for(j=0; j<32; j++) {
       if(j != i) {
 	assert(!NDPI_ISSET_BIT(val, j));
+      }
+    }
+  }
+
+  /* With a 64 bit integer */
+  for(i=0; i<64; i++) {
+    NDPI_ZERO_BIT(val64);
+    NDPI_SET_BIT(val64, i);
+
+    assert(NDPI_ISSET_BIT(val64, i));
+
+    for(j=0; j<64; j++) {
+      if(j != i) {
+	assert(!NDPI_ISSET_BIT(val64, j));
       }
     }
   }
