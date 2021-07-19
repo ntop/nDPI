@@ -102,6 +102,7 @@ typedef enum {
   NDPI_DESKTOP_OR_FILE_SHARING_SESSION, /* 30 */
   NDPI_TLS_UNCOMMON_ALPN,
   NDPI_TLS_CERT_VALIDITY_TOO_LONG,
+  NDPI_TLS_EXTENSION_SUSPICIOUS,
 
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */

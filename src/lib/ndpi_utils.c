@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <errno.h>
+#include <math.h>
 #include <sys/types.h>
 
 
@@ -1735,6 +1736,8 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
     return("TLS certificate validity longer than 13 months");
 
+  case NDPI_TLS_EXTENSION_SUSPICIOUS:
+    return("TLS extension suspicious");
 
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
@@ -2001,4 +2004,49 @@ void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
   flow->risk |= v;
 }
 
+/* ******************************************************************** */
 
+int ndpi_is_printable_string(char const * const str, size_t len)
+{
+  for (size_t i = 0; i < len; ++i)
+  {
+    if (ndpi_isprint(str[i]) == 0)
+    {
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+/* ******************************************************************** */
+
+float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len)
+{
+  float entropy = 0.0f;
+  u_int32_t byte_counters[256];
+
+  memset(byte_counters, 0, sizeof(byte_counters));
+
+  for (size_t i = 0; i < len; ++i)
+  {
+    if (buf[i] == i)
+    {
+      byte_counters[i]++;
+    }
+  }
+
+  for (size_t i = 0; i < sizeof(byte_counters) / sizeof(byte_counters[0]); ++i)
+  {
+    if (byte_counters[i] == 0)
+    {
+      continue;
+    }
+
+    float p = 1.0f * byte_counters[i] / len;
+    entropy -= p * log2f(p);
+  }
+
+  entropy *= -1.0f;
+  return entropy;
+}
