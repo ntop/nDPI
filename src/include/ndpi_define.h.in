@@ -282,10 +282,10 @@
 #define NDPI_BITMASK_SET_ALL(a)   NDPI_ONE(&a)
 #define NDPI_BITMASK_SET(a, b)    { memcpy(&a, &b, sizeof(NDPI_PROTOCOL_BITMASK)); }
 
-#define NDPI_SET_BIT(num, n)    num |= 1UL << ( n )
-#define NDPI_CLR_BIT(num, n)    num &= ~(1UL << ( n ))
-#define NDPI_CLR_BIT(num, n)    num &= ~(1UL << ( n ))
-#define NDPI_ISSET_BIT(num, n)  (num & (1UL << ( n )))
+#define NDPI_SET_BIT(num, n)    num |= 1ULL << ( n )
+#define NDPI_CLR_BIT(num, n)    num &= ~(1ULL << ( n ))
+#define NDPI_CLR_BIT(num, n)    num &= ~(1ULL << ( n ))
+#define NDPI_ISSET_BIT(num, n)  (num & (1ULL << ( n )))
 #define NDPI_ZERO_BIT(num)      num = 0
 
 /* this is a very very tricky macro *g*,
