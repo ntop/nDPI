@@ -222,19 +222,6 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 
 /* **************************************** */
 
-/* Can't call libc functions from kernel space, define some stub instead */
-
-#define ndpi_isalpha(ch) (((ch) >= 'a' && (ch) <= 'z') || ((ch) >= 'A' && (ch) <= 'Z'))
-#define ndpi_isdigit(ch) ((ch) >= '0' && (ch) <= '9')
-#define ndpi_isspace(ch) (((ch) >= '\t' && (ch) <= '\r') || ((ch) == ' '))
-#define ndpi_isprint(ch) ((ch) >= 0x20 && (ch) <= 0x7e)
-#define ndpi_ispunct(ch) (((ch) >= '!' && (ch) <= '/') ||	\
-			  ((ch) >= ':' && (ch) <= '@') ||	\
-			  ((ch) >= '[' && (ch) <= '`') ||	\
-			  ((ch) >= '{' && (ch) <= '~'))
-
-/* **************************************** */
-
 static void cleanupServerName(char *buffer, int buffer_len) {
   u_int i;
 
@@ -527,6 +514,11 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 			 flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, len,
 			 packet->payload_packet_len-i-len);
 #endif
+		  if (ndpi_is_printable_string(dNSName, len) == 0)
+		  {
+		    ndpi_set_risk(flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+		  }
+
 		  if(matched_name == 0) {
 		    if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0')
 		      matched_name = 1;	/* No SNI */
@@ -1095,11 +1087,6 @@ static void tlsCheckUncommonALPN(struct ndpi_flow_struct *flow)
     "doq-i00"
   };
 
-  /*
-   * If the ALPN list increases in size, iterating over all items for every incoming ALPN may
-   * have a performance impact. A hash map could solve this issue.
-   */
-
   char * alpn_start = flow->protos.tls_quic_stun.tls_quic.alpn;
   char * comma_or_nul = alpn_start;
   do {
@@ -1161,6 +1148,75 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
   ndpi_set_detected_protocol(ndpi_struct, flow, protocol, protocol);
 
   tlsInitExtraPacketProcessing(ndpi_struct, flow);
+}
+
+/* **************************************** */
+
+static void checkExtensions(struct ndpi_flow_struct * const flow, int is_dtls,
+                            u_int16_t extension_id, u_int16_t extension_len, u_int16_t extension_payload_offset)
+{
+  struct ndpi_packet_struct const * const packet = &flow->packet;
+
+  if (extension_payload_offset + extension_len > packet->payload_packet_len)
+  {
+#ifdef DEBUG_TLS
+    printf("[TLS] extension length exceeds remaining packet length: %u > %u.\n",
+           extension_len, packet->payload_packet_len - extension_payload_offset);
+#endif
+    ndpi_set_risk(flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+    return;
+  }
+
+  /* see: https://www.wireshark.org/docs/wsar_html/packet-tls-utils_8h_source.html */
+  static u_int16_t const allowed_non_iana_extensions[] = {
+    65486 /* ESNI */, 13172 /* NPN - Next Proto Neg */, 17513 /* ALPS */,
+    30032 /* Channel ID */, 65445 /* QUIC transport params */,
+    /* GREASE extensions */
+    2570, 6682, 10794, 14906, 19018, 23130, 27242,
+    31354, 35466, 39578, 43690, 47802, 51914, 56026,
+    60138, 64250,
+    /* Groups */
+    1035, 10794, 16696, 23130, 31354, 35466, 51914,
+    /* Ciphers */
+    102, 129, 52243, 52244, 57363, 65279, 65413
+  };
+  size_t const allowed_non_iana_extensions_size = sizeof(allowed_non_iana_extensions) /
+                                                  sizeof(allowed_non_iana_extensions[0]);
+
+  /* see: https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml */
+  if (extension_id > 59 && extension_id != 65281)
+  {
+    u_int8_t extension_found = 0;
+    for (size_t i = 0; i < allowed_non_iana_extensions_size; ++i)
+    {
+      if (allowed_non_iana_extensions[i] == extension_id)
+      {
+        extension_found = 1;
+        break;
+      }
+    }
+    if (extension_found == 0)
+    {
+#ifdef DEBUG_TLS
+      printf("[TLS] suspicious extension id: %u\n", extension_id);
+#endif
+      ndpi_set_risk(flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+      return;
+    }
+  }
+
+  /* Check for DTLS-only extensions. */
+  if (is_dtls == 0)
+  {
+    if (extension_id == 53 || extension_id == 54)
+    {
+#ifdef DEBUG_TLS
+      printf("[TLS] suspicious DTLS-only extension id: %u\n", extension_id);
+#endif
+      ndpi_set_risk(flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+      return;
+    }
+  }
 }
 
 /* **************************************** */
@@ -1274,6 +1330,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	printf("TLS [server][extension_id: %u/0x%04X][len: %u]\n",
 	       extension_id, extension_id, extension_len);
 #endif
+	checkExtensions(flow, is_dtls, extension_id, extension_len, offset + 4);
 
 	if(extension_id == 43 /* supported versions */) {
 	  if(extension_len >= 2) {
@@ -1604,6 +1661,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 	      printf("Client TLS [extension_id: %u][extension_len: %u]\n", extension_id, extension_len);
 #endif
+	      checkExtensions(flow, is_dtls, extension_id, extension_len, offset + extension_offset);
 
 	      if((extension_id == 0) || (packet->payload[extn_off] != packet->payload[extn_off+1])) {
 		/* Skip GREASE */
@@ -1641,6 +1699,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: [%s]\n", buffer);
 #endif
+		    if (ndpi_is_printable_string(buffer, len) == 0)
+		    {
+		       ndpi_set_risk(flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+		    }
+
 		    if(!is_quic) {
 		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
 		        flow->l4.tcp.tls.subprotocol_detected = 1;
