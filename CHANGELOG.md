@@ -1,5 +1,134 @@
 # CHANGELOG
 
+#### nDPI 3.6 (July 2021)
+
+## New Features
+ - Add API for computing RSI (Relative Strenght Index)
+ - Add GeoIP support
+ - Add fragments management
+ - Add API for jitter calculation
+ - Add single exponential smoothing API
+ - Add timeseries forecasting support implementing Holt-Winters with confidence interval
+ - Add support for MAC to radi tree and expose the full API to applications
+ - Add JA3+, with ALPN and elliptic curve
+ - Add double exponential smoothing implementation
+ - Extended API for managing flow risks
+ - Add flow risk score
+ - New flow risks:
+   - Desktop or File Sharing Session
+   - HTTP suspicious content (useful for tracking trickbot)
+   - Malicious JA3
+   - Malicious SHA1
+   - Risky domain
+   - Risky AS
+   - TLS Certificate Validity Too Long
+   - TLS Suspicious Extension
+
+## New Supported Protocols and Services
+ - New protocols:
+   - AmongUs
+   - AVAST SecureDNS
+   - CPHA (CheckPoint High Availability Protocol)
+   - DisneyPlus
+   - DTLS
+   - Genshin Impact
+   - HP Virtual Machine Group Management (hpvirtgrp)
+   - Mongodb
+   - Pinterest
+   - Reddit
+   - Snapchat VoIP calls
+   - Tumblr
+   - Virtual Asssitant (Alexa, Siri)
+   - Z39.50
+ - Add protocols to HTTP as subprotocols
+ - Add detection of TLS browser type
+ - Add connectionless DCE/RPC detection
+
+## Improvements
+ - Improve detection/dissection of:
+   - AnyDesk
+   - DNS
+   - Hulu
+   - DCE/RPC (avoid false positives)
+   - dnscrypt
+   - Facebook (add new networks)
+   - Fortigate
+   - FTP Control
+   - HTTP
+     - Fix user-agent parsing
+     - Fix logs when NDPI_ENABLE_DEBUG_MESSAGES is defined
+   - IEC104
+   - IEC60870
+   - IRC
+   - Netbios
+   - Netflix
+   - Ookla speedtest (detection over IPv6)
+   - openspeedtest.com
+   - Outlook / MicrosoftMail
+   - QUIC
+     - update to draft-33
+     - improve handling of SNI
+     - support for fragmented Client Hello
+     - support for DNS-over-QUIC
+   - RTSP
+   - RTSP via HTTP
+   - SNMP (reimplemented)
+   - Skype
+   - SSH
+   - Steam (Steam Datagram Relay - SDR)
+   - STUN (avoid false positives, improved Skype detection)
+   - TeamViewer (add new hosts)
+   - TOR (update hosts)
+   - TLS
+     - Certificate Subject matching
+     - Check for common ALPNs
+     - Reworked fingerprint calculation
+     - Fix extraction for TLS signature algorithms
+     - Fix ClientHello parsing
+   - UPnP
+   - wireguard
+ - Improve DGA detection
+ - Improve JA3
+ - Improve Mining detection
+ - Improve string matching algorithm
+ - Improve ndpi_pref_enable_tls_block_dissection
+ - Optimize speed and memory size
+ - Update ahocorasick library
+ - Improve subprotocols detection
+
+## Fixes
+ - Fix partial application matching
+ - Fix multiple segfault and leaks
+ - Fix uninitialized memory use
+ - Fix release of patterns allocated in ndpi_add_string_to_automa
+ - Fix return value of ndpi_match_string_subprotocol
+ - Fix setting of flow risks on 32 bit machines
+ - Fix TLS certificate threshold
+ - Fix a memory error in TLS JA3 code
+ - Fix false positives in Z39.50
+ - Fix off-by-one memory error for TLS-JA3
+ - Fix bug in ndpi_lru_find_cache
+ - Fix invalid xbox and playstation port guesses
+ - Fix CAPWAP tunnel decoding
+ - Fix parsing of DLT_PPP datalink type
+ - Fix dissection of QUIC initial packets coalesced with 0-RTT one
+ - Fix parsing of GTP headers
+ - Add bitmap boundary checks
+
+## Misc
+ - Update download category name
+ - Update category labels
+ - Renamed Skype in Skype_Teams (the protocol is now shared across these apps)
+ - Add IEC analysis wireshark plugin
+ - Flow risk visualization in Wireshark
+ - ndpiReader
+   - add statistics about nDPI performance
+   - fix memory leak
+   - fix collecting of risks statistics
+ - Move installed libraries from /usr/local to /usr
+ - Improve NDPI_API_VERSION generation
+ - Update ndpi_ptree_match_addr prototype
+
 #### nDPI 3.4 (October 2020)
 
 ## New Features
