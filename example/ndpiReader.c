@@ -61,7 +61,7 @@
 #define ntohl64(x) ( ( (uint64_t)(ntohl( (uint32_t)((x << 32) >> 32) )) << 32) | ntohl( ((uint32_t)(x >> 32)) ) )
 #define htonl64(x) ntohl64(x)
 
-#define EURISTICS_CODE 1
+#define HEURISTICS_CODE 1
 
 /** Client parameters **/
 
@@ -1484,10 +1484,10 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     }
   }
 
-#ifdef EURISTICS_CODE
-  if(flow->ssh_tls.browser_euristics.is_safari_tls)  fprintf(out, "[Safari]");
-  if(flow->ssh_tls.browser_euristics.is_firefox_tls) fprintf(out, "[Firefox]");
-  if(flow->ssh_tls.browser_euristics.is_chrome_tls)  fprintf(out, "[Chrome]");
+#ifdef HEURISTICS_CODE
+  if(flow->ssh_tls.browser_heuristics.is_safari_tls)  fprintf(out, "[Safari]");
+  if(flow->ssh_tls.browser_heuristics.is_firefox_tls) fprintf(out, "[Firefox]");
+  if(flow->ssh_tls.browser_heuristics.is_chrome_tls)  fprintf(out, "[Chrome]");
 #endif
   
   if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {

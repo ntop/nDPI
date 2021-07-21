@@ -941,9 +941,6 @@ extern "C" {
   void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
   void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str,
 			       ndpi_debug_function_ptr ndpi_debug_printf);
-  //void * ndpi_malloc(size_t size);
-  //void * ndpi_calloc(unsigned long count, size_t size);
-  //void ndpi_free(void *ptr);
   u_int16_t ndpi_get_api_version(void);
   const char *ndpi_get_gcrypt_version(void);
 
@@ -964,6 +961,9 @@ extern "C" {
 				      char *buffer, u_int buffer_size,
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
+  /* Return a flow info string (summarized). Does only work for DNS/HTTP/TLS/QUIC. */
+  const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
+                                 ndpi_protocol const * const l7_protocol);
   char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
                              u_int16_t version, u_int8_t *unknown_tls_version);
   int ndpi_netbios_name_interpret(u_char *in, u_int in_len, u_char *out, u_int out_len);
