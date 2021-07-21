@@ -1160,9 +1160,12 @@ struct ndpi_detection_module_struct {
     content_automa,                            /* Used for HTTP subprotocol_detection */
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     risky_domain_automa, tls_cert_subject_automa,
-    malicious_ja3_automa, malicious_sha1_automa;
+    malicious_ja3_automa, malicious_sha1_automa,
+    host_risk_mask_automa;  
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
 
+  void *ip_risk_mask_ptree;
+  
   struct {
     ndpi_automa hostnames, hostnames_shadow;
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */

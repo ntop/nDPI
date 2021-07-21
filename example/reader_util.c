@@ -1297,6 +1297,7 @@ void update_tcp_flags_count(struct ndpi_flow_info* flow, struct ndpi_tcphdr* tcp
 }
 
 /* ****************************************************** */
+
 /**
    Function to process the packet:
    determine the flow of a packet and try to decode it
@@ -1567,11 +1568,13 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 #endif
   
   *flow_risk = flow->risk;
+  
   return(flow->detected_protocol);
 }
 
-int ndpi_is_datalink_supported(int datalink_type)
-{
+/* ****************************************************** */
+
+int ndpi_is_datalink_supported(int datalink_type) {
   /* Keep in sync with the similar switch in ndpi_workflow_process_packet */
   switch(datalink_type) {
   case DLT_NULL:

@@ -39,3 +39,15 @@ ip:213.75.170.11/32:443@CustomProtocol
 ip:8.248.73.247:443@AmazonPrime
 ip:54.80.47.130@AmazonPrime
 
+#
+# Risk Exceptions
+#
+# ip_risk_mask:   used to mask flow risks for IP addresses
+# host_risk_mask: used to mask exceptions for domain names and hosts
+#
+# Syntax: <name>=<64 bit mask to be put in AND with the risk
+#
+# For IPs, the flow risk is put in AND (source IP mask OR destination IP mask)
+# For Flows with a hostname (e.g. TLS) the risk is also put in AND with the host_risk_mask
+ip_risk_mask:192.168.1.6=0
+host_risk_mask:"api-global.netflix.com"=0

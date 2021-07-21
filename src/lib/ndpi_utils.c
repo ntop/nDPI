@@ -2050,3 +2050,18 @@ float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len)
   entropy *= -1.0f;
   return entropy;
 }
+
+/* ******************************************* */
+
+char* ndpi_get_flow_name(struct ndpi_flow_struct *flow) {
+  if(!flow) goto no_flow_info;
+  
+  if(flow->host_server_name[0] != '\0')
+    return((char*)flow->host_server_name);
+  
+  if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0')
+    return(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+	   
+ no_flow_info:
+  return((char*)"");
+}
