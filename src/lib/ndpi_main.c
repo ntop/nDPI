@@ -1642,7 +1642,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AJP,
 			  "AJP", NDPI_PROTOCOL_CATEGORY_WEB,
-			  ndpi_build_default_ports(ports_a, 8009, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 8009, 8010, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TARGUS_GETDATA,
 			  "TargusDataspeed", NDPI_PROTOCOL_CATEGORY_NETWORK,
@@ -2823,7 +2823,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	/* Run some basic consistency tests */
 
 	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
-	  ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
+	  ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET);
 	else {
 	  u_int8_t icmp_type = (u_int8_t)flow->packet.payload[0];
 	  u_int8_t icmp_code = (u_int8_t)flow->packet.payload[1];
@@ -2831,7 +2831,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	  /* https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml */
 	  if(((icmp_type >= 44) && (icmp_type <= 252))
 	     || (icmp_code > 15))
-	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
+	    ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET);
 	}
       }
       return(NDPI_PROTOCOL_IP_ICMP);
@@ -2856,7 +2856,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	/* Run some basic consistency tests */
 
 	if(flow->packet.payload_packet_len < sizeof(struct ndpi_icmphdr))
-	  ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
+	  ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET);
 	else {
 	  u_int8_t icmp6_type = (u_int8_t)flow->packet.payload[0];
 	  u_int8_t icmp6_code = (u_int8_t)flow->packet.payload[1];
@@ -2865,7 +2865,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	  if(((icmp6_type >= 5) && (icmp6_type <= 127))
 	     || (icmp6_type >= 156)
 	     || ((icmp6_code > 7) && (icmp6_type != 255)))
-	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET);
+	    ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET);
 	}
       }
       return(NDPI_PROTOCOL_IP_ICMPV6);
@@ -2900,23 +2900,6 @@ char *strsep(char **sp, char *sep) {
   return(s);
 }
 #endif
-
-/* ********************************************************************************* */
-
-static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
-					       struct in_addr *pin /* network byte order */) {
-  ndpi_prefix_t prefix;
-  ndpi_patricia_node_t *node;
-
-  /* Make sure all in network byte order otherwise compares wont work */
-  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
-  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree, &prefix);
-
-  if(node)
-    return(node->value.u.uv64);
-  else    
-    return((u_int64_t)-1);
-}
 
 /* ******************************************************************** */
 
@@ -2954,6 +2937,22 @@ int ndpi_add_host_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
   if((ndpi_str->host_risk_mask_automa.ac_automa == NULL) || (host == NULL))
     return(-2);
 
+  /* Zap heading/trailing quotes */
+  switch(host[0]) {
+  case '"':
+  case '\'':
+    {
+      int len;
+      
+      host = &host[1];
+      len = strlen(host);
+      if(len > 0)
+	host[len-1] = '\0';
+    }
+    
+    break;
+  }
+  
   host_dup = ndpi_strdup(host);
   if(!host_dup)
     return(-1);
@@ -4734,49 +4733,6 @@ u_int32_t ndpi_check_flow_func(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
-void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
-				 struct ndpi_flow_struct *flow) {
-  char *host;
-  
-  if(flow->risk == 0) return; /* Nothing to do */
-
-  host = ndpi_get_flow_name(flow);
-  
-  if(host && (host[0] != '\0')) {
-    /* Check host exception */
-    ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
-    
-    if(automa->ac_automa) {
-      AC_TEXT_t ac_input_text;
-      AC_REP_t match;
-      
-      ac_input_text.astring = host, ac_input_text.length = strlen(host);
-      ac_input_text.option = 0;
-      
-      if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
-	flow->risk &= match.number64;
-    }
-  }
-
-  /* TODO: add IPv6 support */
-  if(flow->packet.iph) {
-    struct ndpi_packet_struct *packet = &flow->packet;
-    struct in_addr pin;
-    
-    if(flow->risk) {
-      pin.s_addr = packet->iph->saddr;
-      flow->risk &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
-    }
-    
-    if(flow->risk) {
-      pin.s_addr = packet->iph->daddr;
-      flow->risk &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
-    }
-  }
-}
-
-/* ********************************************************************************* */
-
 u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_str,
 				      struct ndpi_flow_struct *flow) {
   u_int16_t ret = NDPI_PROTOCOL_UNKNOWN;
@@ -5285,7 +5241,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   case NDPI_PROTOCOL_ANYDESK:
     if(flow->packet.tcp) /* TCP only */
-      ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+      ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
     break;
   } /* switch */
 
@@ -5294,7 +5250,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     case NDPI_PROTOCOL_UNSAFE:
     case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
     case NDPI_PROTOCOL_DANGEROUS:
-      ndpi_set_risk(flow, NDPI_UNSAFE_PROTOCOL);
+      ndpi_set_risk(ndpi_str, flow, NDPI_UNSAFE_PROTOCOL);
       break;
     default:
       /* Nothing to do */
@@ -5553,9 +5509,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret.master_protocol = ret.app_protocol;
     ret.app_protocol = flow->guessed_host_protocol_id;
   }
-
-  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
-  
+ 
   if((!flow->risk_checked)
      && ((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
      ) {
@@ -5566,12 +5520,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
 					   sport = ntohs(flow->packet.udp->source),
 					   dport = ntohs(flow->packet.udp->dest)),
-	default_ports = ndpi_str->proto_defaults[ret.master_protocol].udp_default_ports;
+	default_ports = ndpi_str->proto_defaults[ret.master_protocol ? ret.master_protocol : ret.app_protocol].udp_default_ports;
     else if(flow->packet.tcp)
       found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_TCP,
 					   sport = ntohs(flow->packet.tcp->source),
 					   dport = ntohs(flow->packet.tcp->dest)),
-	default_ports = ndpi_str->proto_defaults[ret.master_protocol].tcp_default_ports;
+	default_ports = ndpi_str->proto_defaults[ret.master_protocol ? ret.master_protocol : ret.app_protocol].tcp_default_ports;
     else
       found = NULL, default_ports = NULL, sport = dport = 0;
 
@@ -5582,8 +5536,23 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
        ) {
       // printf("******** %u / %u\n", found->proto->protoId, ret.master_protocol);
 
-      if(!ndpi_check_protocol_port_mismatch_exceptions(ndpi_str, flow, found, &ret))
-	ndpi_set_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+      if(!ndpi_check_protocol_port_mismatch_exceptions(ndpi_str, flow, found, &ret)) {
+	/*
+	  Before triggering the alert we need to make some extra checks
+	  - the protocol found is not running on the port we have found (i.e. two or more protools share the same default port)
+	*/
+	u_int8_t found = 0, i;
+
+	for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
+	  if(default_ports[i] == dport) {
+	    found = 1;
+	    break;
+	  }	  
+	} /* for */
+
+	if(!found)
+	  ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);	
+      }
     } else if((!ndpi_is_ntop_protocol(&ret)) && default_ports && (default_ports[0] != 0)) {
       u_int8_t found = 0, i, num_loops = 0;
 
@@ -5607,14 +5576,15 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
       if(!found) {
 	// printf("******** Invalid default port\n");
-	ndpi_set_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+	ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
       }
     }
 
-    ndpi_handle_risk_exceptions(ndpi_str, flow);
     flow->risk_checked = 1;
   }
 
+  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
+  
   if(num_calls == 0)
     flow->fail_with_unknown = 1;
 
@@ -6941,10 +6911,11 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 
 /* ****************************************************** */
   
-void ndpi_check_subprotocol_risk(struct ndpi_flow_struct *flow, u_int16_t subprotocol_id) {
+void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
+				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id) {
   switch(subprotocol_id) {
   case NDPI_PROTOCOL_ANYDESK:
-    ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+    ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
     break;
   }
 }
@@ -6973,9 +6944,10 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   if(ndpi_str->risky_domain_automa.ac_automa != NULL) {
     u_int32_t proto_id;
     u_int16_t rc1 = ndpi_match_string_common(ndpi_str->risky_domain_automa.ac_automa,
-					     string_to_match,string_to_match_len, &proto_id, NULL, NULL);
+					     string_to_match,string_to_match_len,
+					     &proto_id, NULL, NULL);
     if(rc1 > 0)
-      ndpi_set_risk(flow, NDPI_RISKY_DOMAIN);
+      ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN);
   }
 
   return(rc);
@@ -7496,7 +7468,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       
     if(rc) {
       if(flow)
-	ndpi_set_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
+	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
     }
       
     return(rc);
@@ -7632,7 +7604,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	 */
 	 || ((max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */) && ((num_char_repetitions > 1) || (num_digits > 1)))	       
 	 ) {
-	if(flow) ndpi_set_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
+	if(flow) ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
 
 	if(ndpi_verbose_dga_detection)
 	  printf("[DGA] Found!");
@@ -7764,7 +7736,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       printf("[DGA] Result: %u\n", rc);
 
     if(rc && flow)
-      ndpi_set_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
+      ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
 
     return(rc);
   }

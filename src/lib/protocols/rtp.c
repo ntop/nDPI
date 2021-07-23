@@ -77,10 +77,15 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    const u_int8_t * payload, const u_int16_t payload_len) {
   u_int8_t payloadType, payload_type;
-
+  u_int16_t d_port = ntohs(flow->packet.udp->dest);
+  
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
-  if((payload_len < 2) || flow->protos.tls_quic_stun.stun.num_binding_requests) {
+  if((payload_len < 2)
+     || (d_port == 5355 /* LLMNR_PORT */)
+     || (d_port == 5353 /* MDNS_PORT */)     
+     || flow->protos.tls_quic_stun.stun.num_binding_requests
+     ) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }

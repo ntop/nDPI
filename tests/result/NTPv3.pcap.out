@@ -4,4 +4,4 @@ DPI Packets (UDP):	1	(1.00 pkts/flow)
 
 NTP	1	90	1
 
-	1	UDP 175.144.140.29:123 -> 78.46.76.2:80 [proto: 9/NTP][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 175.144.140.29:123 -> 78.46.76.2:80 [proto: 9/NTP][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Risk: ** Known protocol on non standard port **][Risk Score: 10][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

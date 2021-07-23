@@ -29,14 +29,13 @@
 
 #include "ndpi_api.h"
 
-static void ndpi_int_rdp_add_connection(struct ndpi_detection_module_struct
-					*ndpi_struct, struct ndpi_flow_struct *flow)
-{
+static void ndpi_int_rdp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+					struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RDP, NDPI_PROTOCOL_UNKNOWN);
 }
 
-void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
+		     struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &flow->packet;
 	
   NDPI_LOG_DBG(ndpi_struct, "search RDP\n");
@@ -49,7 +48,7 @@ void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
       && get_u_int16_t(packet->payload, 6) == 0 && get_u_int16_t(packet->payload, 8) == 0 && get_u_int8_t(packet->payload, 10) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found RDP\n");
     ndpi_int_rdp_add_connection(ndpi_struct, flow);
-    ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+    ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
     return;
   }
 

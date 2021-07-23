@@ -151,7 +151,8 @@ extern "C" {
   int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str,
 					 const u_int8_t ** l4ptr, u_int16_t * l4len,
 					 u_int8_t * nxt_hdr);
-  void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r);
+  void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
+		     struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_is_printable_string(char const * const str, size_t len);
   float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len);
 #ifdef __cplusplus

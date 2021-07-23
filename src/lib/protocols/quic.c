@@ -1400,7 +1400,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   /* Add check for missing SNI */
   if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0') {
     /* This is a bit suspicious */
-    ndpi_set_risk(flow, NDPI_TLS_MISSING_SNI);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_MISSING_SNI);
   }
 }
 

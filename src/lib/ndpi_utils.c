@@ -2030,13 +2030,79 @@ int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t 
     return(0);
 }
 
+/* ********************************************************************************* */
+
+static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
+					       struct in_addr *pin /* network byte order */) {
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
+
+  /* Make sure all in network byte order otherwise compares wont work */
+  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree, &prefix);
+
+  if(node)
+    return(node->value.u.uv64);
+  else    
+    return((u_int64_t)-1);
+}
+
+/* ********************************************************************************* */
+
+static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
+					struct ndpi_flow_struct *flow) {
+  char *host;
+  
+  if(flow->risk == 0) return; /* Nothing to do */
+
+  host = ndpi_get_flow_name(flow);
+  
+  if(host && (host[0] != '\0')) {
+    /* Check host exception */
+    ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
+    
+    if(automa->ac_automa) {
+      AC_TEXT_t ac_input_text;
+      AC_REP_t match;
+      
+      ac_input_text.astring = host, ac_input_text.length = strlen(host);
+      ac_input_text.option = 0;
+      
+      if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
+	flow->risk &= match.number64;
+    }
+  }
+
+  /* TODO: add IPv6 support */
+  if(!flow->ip_risk_mask_evaluated) {
+    flow->host_risk_mask = (u_int64_t)-1; /* No mask */
+    
+    if(flow->packet.iph) {
+      struct ndpi_packet_struct *packet = &flow->packet;
+      struct in_addr pin;
+      
+      pin.s_addr = packet->iph->saddr;
+      flow->host_risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
+
+      pin.s_addr = packet->iph->daddr;
+      flow->host_risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
+    }
+
+    flow->ip_risk_mask_evaluated = 1;
+  }
+
+  flow->risk &= flow->host_risk_mask;
+}
+
 /* ******************************************************************** */
 
-void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
+void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
+		   struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
   ndpi_risk v = 1ull << r;
 
   // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
   flow->risk |= v;
+  ndpi_handle_risk_exceptions(ndpi_str, flow);
 }
 
 /* ******************************************************************** */
