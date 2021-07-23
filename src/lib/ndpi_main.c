@@ -4742,7 +4742,7 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 
   host = ndpi_get_flow_name(flow);
   
-  if(host) {
+  if(host && (host[0] != '\0')) {
     /* Check host exception */
     ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
     
@@ -5556,7 +5556,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   ndpi_reconcile_protocols(ndpi_str, flow, &ret);
   
-  if((!flow->risk_checked) && (ret.master_protocol != NDPI_PROTOCOL_UNKNOWN)) {
+  if((!flow->risk_checked)
+     && ((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
+     ) {
     ndpi_default_ports_tree_node_t *found;
     u_int16_t *default_ports, sport, dport;
 
@@ -5613,8 +5615,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     flow->risk_checked = 1;
   }
 
-  // printf("===> RISK=%llu\n", flow->risk);
-  
   if(num_calls == 0)
     flow->fail_with_unknown = 1;
 
