@@ -462,7 +462,7 @@ extern "C" {
    * @par    subprotocol_id      = subprotocol id
    */
   void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
-				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id) {
+				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id);
 
   /**
    * Check if the string content passed match with a protocol
