@@ -846,6 +846,41 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 
 /* ********************************** */
 
+static const char* ndpi_get_flow_info_by_proto_id(struct ndpi_flow_struct const * const flow,
+                                                  u_int16_t proto_id)
+{
+  switch (proto_id)
+  {
+    case NDPI_PROTOCOL_DNS:
+    case NDPI_PROTOCOL_HTTP:
+        return (char const *)flow->host_server_name;
+    case NDPI_PROTOCOL_QUIC:
+    case NDPI_PROTOCOL_TLS:
+        if (flow->l4.tcp.tls.hello_processed != 0)
+        {
+          return flow->protos.tls_quic_stun.tls_quic.client_requested_server_name;
+        }
+        break;
+  }
+
+  return NULL;
+}
+
+const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
+                               ndpi_protocol const * const l7_protocol)
+{
+  char const * const app_protocol_info = ndpi_get_flow_info_by_proto_id(flow, l7_protocol->app_protocol);
+
+  if (app_protocol_info != NULL)
+  {
+    return app_protocol_info;
+  }
+
+  return ndpi_get_flow_info_by_proto_id(flow, l7_protocol->master_protocol);
+}
+
+/* ********************************** */
+
 char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
                            u_int16_t version, u_int8_t *unknown_tls_version) {
 

@@ -1176,7 +1176,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;
     }
 
-    flow->ssh_tls.browser_euristics = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.browser_euristics;
+    flow->ssh_tls.browser_heuristics = flow->ndpi_flow->protos.tls_quic_stun.tls_quic.browser_heuristics;
     
     if(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn) {
       if((flow->ssh_tls.tls_alpn = ndpi_strdup(flow->ndpi_flow->protos.tls_quic_stun.tls_quic.alpn)) != NULL)

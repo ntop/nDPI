@@ -1593,12 +1593,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	   this is time consuming and we want to avoid overhead whem possible
 	*/
 	if(this_is_not_safari)
-	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
+	  flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls = 0;
 	else if((safari_ciphers == 12) || (this_is_not_safari && looks_like_safari_on_big_sur))
-	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1;
+	  flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls = 1;
 
 	if(chrome_ciphers == 13)
-	  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 1;
+	  flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_chrome_tls = 1;
 
 	/* Note that both Safari and Chrome can overlap */
 #ifdef DEBUG_HEURISTIC
@@ -1865,7 +1865,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		  switch(signature_algo) {
 		  case ECDSA_SECP521R1_SHA512:
-		    flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls = 1;
+		    flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_firefox_tls = 1;
 		    break;
 
 		  case ECDSA_SECP256R1_SHA256:
@@ -1891,23 +1891,23 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		       safari_signature_algorithms, chrome_signature_algorithms);
 #endif
 
-		if(flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls)
-		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0,
-		    flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
+		if(flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_firefox_tls)
+		  flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls = 0,
+		    flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_chrome_tls = 0;
 
 		if(safari_signature_algorithms != 8)
-		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 0;
+		   flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls = 0;
 
 		if((chrome_signature_algorithms != 8) || duplicate_found)
-		   flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
+		   flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_chrome_tls = 0;
 
 		/* Avoid Chrome and Safari overlaps, thing that cannot happen with Firefox */
-		if(flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls)
-		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls = 0;
+		if(flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls)
+		  flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_chrome_tls = 0;
 
-		if((flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls == 0)
+		if((flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_chrome_tls == 0)
 		   && duplicate_found)
-		  flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls = 1; /* Safari */
+		  flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls = 1; /* Safari */
 
 #ifdef DEBUG_HEURISTIC
 		printf("[SIGNATURE] [is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u][duplicate_found: %u]\n",

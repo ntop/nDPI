@@ -65,7 +65,8 @@ struct nDPI_flow_info {
   uint8_t detection_completed:1;
   uint8_t tls_client_hello_seen:1;
   uint8_t tls_server_hello_seen:1;
-  uint8_t reserved_00:2;
+  uint8_t flow_info_printed:1;
+  uint8_t reserved_00:1;
   uint8_t l4_protocol;
 
   struct ndpi_proto detected_l7_protocol;
@@ -857,10 +858,12 @@ static void ndpi_process_packet(uint8_t * const args,
       flow_to_process->detection_completed == 0)
     {
       if (flow_to_process->detected_l7_protocol.master_protocol != NDPI_PROTOCOL_UNKNOWN ||
-	  flow_to_process->detected_l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
-	flow_to_process->detection_completed = 1;
-	workflow->detected_flow_protocols++;
-	printf("[%8llu, %d, %4d][DETECTED] protocol: %s | app protocol: %s | category: %s\n",
+          flow_to_process->detected_l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+      {
+        flow_to_process->detection_completed = 1;
+        workflow->detected_flow_protocols++;
+
+        printf("[%8llu, %d, %4d][DETECTED] protocol: %s | app protocol: %s | category: %s\n",
 	       workflow->packets_captured,
 	       reader_thread->array_index,
 	       flow_to_process->flow_id,
@@ -884,6 +887,20 @@ static void ndpi_process_packet(uint8_t * const args,
        *
        * EoE - End of Example
        */
+
+      if (flow_to_process->flow_info_printed == 0)
+      {
+        char const * const flow_info = ndpi_get_flow_info(flow_to_process->ndpi_flow, &flow_to_process->detected_l7_protocol);
+        if (flow_info != NULL)
+        {
+          printf("[%8llu, %d, %4d] info: %s\n",
+            workflow->packets_captured,
+            reader_thread->array_index,
+            flow_to_process->flow_id,
+            flow_info);
+          flow_to_process->flow_info_printed = 1;
+        }
+      }
 
       if (flow_to_process->detected_l7_protocol.master_protocol == NDPI_PROTOCOL_TLS ||
 	  flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_TLS)
@@ -916,8 +933,10 @@ static void ndpi_process_packet(uint8_t * const args,
 		     ndpi_ssl_version2str(flow_to_process->ndpi_flow,
 					  flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.ssl_version,
 					  &unknown_tls_version),
-		     flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names_len,
-		     flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names,
+		     (flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names_len == 0 ?
+		      1 : flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names_len),
+		     (flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names == NULL ?
+		      "-" : flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.server_names),
 		     (flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.issuerDN != NULL ?
 		      flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.issuerDN : "-"),
 		     (flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.subjectDN != NULL ?
@@ -957,7 +976,7 @@ static void * processing_thread(void * const ndpi_thread_arg)
   struct nDPI_reader_thread const * const reader_thread =
     (struct nDPI_reader_thread *)ndpi_thread_arg;
 
-  printf("Starting ThreadID %d\n", reader_thread->array_index);
+  printf("Starting Thread %d\n", reader_thread->array_index);
   run_pcap_loop(reader_thread);
   reader_thread->workflow->error_or_eof = 1;
   return NULL;
@@ -1089,9 +1108,11 @@ int main(int argc, char ** argv)
 	 "----------------------------------\n"
 	 "nDPI version: %s\n"
 	 " API version: %u\n"
+	 "libgcrypt...: %s\n"
 	 "----------------------------------\n",
 	 argv[0],
-	 ndpi_revision(), ndpi_get_api_version());
+	 ndpi_revision(), ndpi_get_api_version(),
+	 (ndpi_get_gcrypt_version() == NULL ? "-" : ndpi_get_gcrypt_version()));
 
   if (setup_reader_threads((argc >= 2 ? argv[1] : NULL)) != 0) {
     fprintf(stderr, "%s: setup_reader_threads failed\n", argv[0]);

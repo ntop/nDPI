@@ -211,7 +211,7 @@ typedef struct ndpi_flow_info {
       ja3_client[33], ja3_server[33],
       sha1_cert_fingerprint[20];
     u_int8_t sha1_cert_fingerprint_set;
-    struct tls_euristics browser_euristics;
+    struct tls_heuristics browser_heuristics;
     
     struct {
       u_int16_t cipher_suite;

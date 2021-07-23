@@ -1245,9 +1245,9 @@ typedef enum {
 
 #define MAX_NUM_TLS_SIGNATURE_ALGORITHMS 16
 
-struct tls_euristics {
+struct tls_heuristics {
   /*
-    TLS euristics for detecting browsers usage
+    TLS heuristics for detecting browsers usage
     NOTE: expect false positives
   */
   u_int8_t is_safari_tls:1, is_firefox_tls:1, is_chrome_tls:1, notused:5;
@@ -1364,7 +1364,7 @@ struct ndpi_flow_struct {
 	u_int16_t client_signature_algorithms[MAX_NUM_TLS_SIGNATURE_ALGORITHMS];
 #endif
 
-	struct tls_euristics browser_euristics;
+	struct tls_heuristics browser_heuristics;
 
 	struct {
 	  u_int16_t cipher_suite;
