@@ -2056,20 +2056,25 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
   if(flow->risk == 0) return; /* Nothing to do */
 
   host = ndpi_get_flow_name(flow);
-  
-  if(host && (host[0] != '\0')) {
-    /* Check host exception */
-    ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
-    
-    if(automa->ac_automa) {
-      AC_TEXT_t ac_input_text;
-      AC_REP_t match;
+
+  if(!flow->host_risk_mask_evaluated) {
+    if(host && (host[0] != '\0')) {
+      /* Check host exception */
+      ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
       
-      ac_input_text.astring = host, ac_input_text.length = strlen(host);
-      ac_input_text.option = 0;
-      
-      if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
-	flow->risk &= match.number64;
+      if(automa->ac_automa) {
+	AC_TEXT_t ac_input_text;
+	AC_REP_t match;
+	
+	ac_input_text.astring = host, ac_input_text.length = strlen(host);
+	ac_input_text.option = 0;
+	
+	if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
+	  flow->risk &= match.number64;
+      }
+
+      /* Used to avoid double checks (e.g. in DNS req/rsp) */
+      flow->host_risk_mask_evaluated = 1;
     }
   }
 
