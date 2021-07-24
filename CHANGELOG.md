@@ -1,6 +1,6 @@
 # CHANGELOG
 
-#### nDPI 3.6 (July 2021)
+#### nDPI 4.0 (July 2021)
 
 ## New Features
  - Add API for computing RSI (Relative Strenght Index)
@@ -45,7 +45,10 @@
  - Add connectionless DCE/RPC detection
 
 ## Improvements
- - Improve detection/dissection of:
+   - 2.5x speed bump. Example ndpiReader with a long mixed pcap
+	v3.4 - nDPI throughput:       1.29 M pps / 3.35 Gb/sec
+	v4.0 - nDPI throughput:       3.35 M pps / 8.68 Gb/sec
+  - Improve detection/dissection of:
    - AnyDesk
    - DNS
    - Hulu
