@@ -2345,6 +2345,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->host_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   ndpi_str->content_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   ndpi_str->host_risk_mask_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
+  ndpi_str->common_alpns_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
+  load_common_alpns(ndpi_str);
   ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(NULL);
   ndpi_str->malicious_ja3_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->malicious_sha1_automa.ac_automa = NULL; /* Initialized on demand */
@@ -2380,6 +2382,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   if(ndpi_str->host_risk_mask_automa.ac_automa)
     ac_automata_feature(ndpi_str->host_risk_mask_automa.ac_automa,AC_FEATURE_LC);
 
+  if(ndpi_str->common_alpns_automa.ac_automa)
+    ac_automata_feature(ndpi_str->common_alpns_automa.ac_automa,AC_FEATURE_LC);
+
   /* ahocorasick debug */
   /* Needed ac_automata_enable_debug(1) for show debug */
   if(ndpi_str->host_automa.ac_automa) 
@@ -2399,6 +2404,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if(ndpi_str->host_risk_mask_automa.ac_automa)
     ac_automata_name(ndpi_str->host_risk_mask_automa.ac_automa,"content",AC_FEATURE_DEBUG);
+
+  if(ndpi_str->common_alpns_automa.ac_automa)
+    ac_automata_name(ndpi_str->common_alpns_automa.ac_automa,"content",AC_FEATURE_DEBUG);
 
   if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating Patricia trees\n");
@@ -2447,6 +2455,10 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
     case 5:
       automa = &ndpi_str->host_risk_mask_automa;
+      break;
+
+    case 6:
+      automa = &ndpi_str->common_alpns_automa;
       break;
 
     default:
@@ -2728,6 +2740,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->host_risk_mask_automa.ac_automa,
 			  1 /* free patterns strings memory */);
 
+    if(ndpi_str->common_alpns_automa.ac_automa != NULL)
+      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->common_alpns_automa.ac_automa,
+			  1 /* free patterns strings memory */);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/ndpi_exit_detection_module.c"
 #endif
@@ -2928,7 +2944,6 @@ int ndpi_add_ip_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
 
 int ndpi_add_host_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
 			    char *host, ndpi_risk mask) {
-  /* host_risk_mask_automa */
   AC_PATTERN_t ac_pattern;
   AC_ERROR_t rc;
   u_int len;

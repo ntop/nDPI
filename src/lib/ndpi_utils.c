@@ -1767,7 +1767,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_TLS_UNCOMMON_ALPN:
     return("Uncommon TLS ALPN");
-    
+
   case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
     return("TLS certificate validity longer than 13 months");
 
@@ -1787,7 +1787,7 @@ const char* ndpi_severity2str(ndpi_risk_severity s) {
   case NDPI_RISK_LOW:
     return("Low");
     break;
-    
+
   case NDPI_RISK_MEDIUM:
     return("Medium");
     break;
@@ -1813,16 +1813,16 @@ u_int16_t ndpi_risk2score(ndpi_risk risk,
   u_int32_t i;
 
   *client_score = *server_score = 0; /* Reset values */
-  
+
   if(risk == 0) return(0);
-  
+
   for(i = 0; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
 
     if(NDPI_ISSET_BIT(risk, r)) {
       ndpi_risk_info *info = ndpi_risk2severity(r);
       u_int16_t val = 0, client_score_val;
-      
+
       switch(info->severity) {
       case NDPI_RISK_LOW:
 	val = NDPI_SCORE_RISK_LOW;
@@ -2016,7 +2016,7 @@ int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t 
 
     if(e == NULL)
       return(-2);
-    
+
     if((e->key = (char*)ndpi_malloc(key_len)) == NULL)
       return(-3);
 
@@ -2043,7 +2043,7 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
 
   if(node)
     return(node->value.u.uv64);
-  else    
+  else
     return((u_int64_t)-1);
 }
 
@@ -2052,7 +2052,7 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
 static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 					struct ndpi_flow_struct *flow) {
   char *host;
-  
+
   if(flow->risk == 0) return; /* Nothing to do */
 
   host = ndpi_get_flow_name(flow);
@@ -2061,14 +2061,14 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
     if(host && (host[0] != '\0')) {
       /* Check host exception */
       ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
-      
+
       if(automa->ac_automa) {
 	AC_TEXT_t ac_input_text;
 	AC_REP_t match;
-	
+
 	ac_input_text.astring = host, ac_input_text.length = strlen(host);
 	ac_input_text.option = 0;
-	
+
 	if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
 	  flow->risk &= match.number64;
       }
@@ -2081,11 +2081,11 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
   /* TODO: add IPv6 support */
   if(!flow->ip_risk_mask_evaluated) {
     flow->host_risk_mask = (u_int64_t)-1; /* No mask */
-    
+
     if(flow->packet.iph) {
       struct ndpi_packet_struct *packet = &flow->packet;
       struct in_addr pin;
-      
+
       pin.s_addr = packet->iph->saddr;
       flow->host_risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
 
@@ -2161,13 +2161,74 @@ float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len)
 
 char* ndpi_get_flow_name(struct ndpi_flow_struct *flow) {
   if(!flow) goto no_flow_info;
-  
+
   if(flow->host_server_name[0] != '\0')
     return((char*)flow->host_server_name);
-  
+
   if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0')
     return(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
-	   
+
  no_flow_info:
   return((char*)"");
+}
+
+/* ******************************************* */
+
+void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str) {
+  /* see: https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml */
+  const char* const common_alpns[] = {
+    "http/0.9", "http/1.0", "http/1.1",
+    "spdy/1", "spdy/2", "spdy/3", "spdy/3.1",
+    "stun.turn", "stun.nat-discovery",
+    "h2", "h2c", "h2-16", "h2-15", "h2-14", "h2-fb",
+    "webrtc", "c-webrtc",
+    "ftp", "imap", "pop3", "managesieve", "coap",
+    "xmpp-client", "xmpp-server",
+    "acme-tls/1",
+    "mqtt", "dot", "ntske/1", "sunrpc",
+    "h3",
+    "smb",
+    "irc",
+
+    /* QUIC ALPNs */
+    "h3-T051", "h3-T050",
+    "h3-32", "h3-30", "h3-29", "h3-28", "h3-27", "h3-24", "h3-22",
+    "hq-30", "hq-29", "hq-28", "hq-27",
+    "h3-fb-05", "h1q-fb",
+    "doq-i00",
+
+    NULL /* end */
+  };
+  u_int i;
+
+  for(i=0; common_alpns[i] != NULL; i++) {
+    AC_PATTERN_t ac_pattern;
+
+    memset(&ac_pattern, 0, sizeof(ac_pattern));
+    ac_pattern.astring      = ndpi_strdup((char*)common_alpns[i]);
+    ac_pattern.length       = strlen(common_alpns[i]);
+
+    if(ac_automata_add(ndpi_str->common_alpns_automa.ac_automa, &ac_pattern) != ACERR_SUCCESS)
+      printf("%s(): unable to add %s\n", __FUNCTION__, common_alpns[i]);
+  }
+}
+
+/* ******************************************* */
+
+u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
+			  const char *alpn_to_check, u_int alpn_to_check_len) {
+  ndpi_automa *automa = &ndpi_str->common_alpns_automa;
+  
+  if(automa->ac_automa) {
+    AC_TEXT_t ac_input_text;
+    AC_REP_t match;
+    
+    ac_input_text.astring = (char*)alpn_to_check, ac_input_text.length = alpn_to_check_len;
+    ac_input_text.option = 0;
+    
+    if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
+      return(1);
+  }
+  
+  return(0);
 }

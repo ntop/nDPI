@@ -1472,8 +1472,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
     /* Copy packets entropy if num packets count == 10 */
     ndpi_clear_entropy_stats(flow);
-
-    if(!flow->has_human_readeable_strings) {
+    
+    if((human_readeable_string_len != 0) && (!flow->has_human_readeable_strings)) {
       u_int8_t skip = 0;
 
       if((proto == IPPROTO_TCP)

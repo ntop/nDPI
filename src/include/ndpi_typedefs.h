@@ -1161,7 +1161,7 @@ struct ndpi_detection_module_struct {
     subprotocol_automa,                        /* Used for HTTP subprotocol_detection */
     risky_domain_automa, tls_cert_subject_automa,
     malicious_ja3_automa, malicious_sha1_automa,
-    host_risk_mask_automa;  
+    host_risk_mask_automa, common_alpns_automa;  
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
 
   void *ip_risk_mask_ptree;
