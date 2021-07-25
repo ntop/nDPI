@@ -673,7 +673,7 @@ struct ndpi_flow_udp_struct {
   uint32_t halflife2_stage:2;		  // 0 - 2
 
   /* NDPI_PROTOCOL_TFTP */
-  uint32_t tftp_stage:1;
+  uint32_t tftp_stage:2;
 
   /* NDPI_PROTOCOL_AIMINI */
   uint32_t aimini_stage:5;

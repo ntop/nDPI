@@ -426,7 +426,7 @@ class NDPIFlowUdpStruct(Structure):
         ('snmp_stage', c_uint32, 2),
         ('ppstream_stage', c_uint32, 3),
         ('halflife2_stage', c_uint32, 2),
-        ('tftp_stage', c_uint32, 1),
+        ('tftp_stage', c_uint32, 2),
         ('aimini_stage', c_uint32, 5),
         ('xbox_stage', c_uint32, 1),
         ('wsus_stage', c_uint32, 1),
