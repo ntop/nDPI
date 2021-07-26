@@ -2057,6 +2057,10 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
 
   host = ndpi_get_flow_name(flow);
 
+  if((!flow->host_risk_mask_evaluated) && (!flow->ip_risk_mask_evaluated)) {
+    flow->risk_mask = (u_int64_t)-1; /* No mask */    
+  }
+  
   if(!flow->host_risk_mask_evaluated) {
     if(host && (host[0] != '\0')) {
       /* Check host exception */
@@ -2070,7 +2074,7 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
 	ac_input_text.option = 0;
 
 	if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
-	  flow->risk &= match.number64;
+	   flow->risk_mask &= match.number64;
       }
 
       /* Used to avoid double checks (e.g. in DNS req/rsp) */
@@ -2080,23 +2084,21 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
 
   /* TODO: add IPv6 support */
   if(!flow->ip_risk_mask_evaluated) {
-    flow->host_risk_mask = (u_int64_t)-1; /* No mask */
-
     if(flow->packet.iph) {
       struct ndpi_packet_struct *packet = &flow->packet;
       struct in_addr pin;
 
       pin.s_addr = packet->iph->saddr;
-      flow->host_risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
+      flow->risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
 
       pin.s_addr = packet->iph->daddr;
-      flow->host_risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
+      flow->risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
     }
 
     flow->ip_risk_mask_evaluated = 1;
   }
 
-  flow->risk &= flow->host_risk_mask;
+  flow->risk &= flow->risk_mask;
 }
 
 /* ******************************************************************** */
@@ -2112,12 +2114,9 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
-int ndpi_is_printable_string(char const * const str, size_t len)
-{
-  for (size_t i = 0; i < len; ++i)
-  {
-    if (ndpi_isprint(str[i]) == 0)
-    {
+int ndpi_is_printable_string(char const * const str, size_t len) {
+  for (size_t i = 0; i < len; ++i) {
+    if (ndpi_isprint(str[i]) == 0) {
       return 0;
     }
   }
@@ -2127,25 +2126,20 @@ int ndpi_is_printable_string(char const * const str, size_t len)
 
 /* ******************************************************************** */
 
-float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len)
-{
+float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len) {
   float entropy = 0.0f;
   u_int32_t byte_counters[256];
 
   memset(byte_counters, 0, sizeof(byte_counters));
 
-  for (size_t i = 0; i < len; ++i)
-  {
-    if (buf[i] == i)
-    {
+  for (size_t i = 0; i < len; ++i) {
+    if (buf[i] == i) {
       byte_counters[i]++;
     }
   }
 
-  for (size_t i = 0; i < sizeof(byte_counters) / sizeof(byte_counters[0]); ++i)
-  {
-    if (byte_counters[i] == 0)
-    {
+  for (size_t i = 0; i < sizeof(byte_counters) / sizeof(byte_counters[0]); ++i) {
+    if (byte_counters[i] == 0) {
       continue;
     }
 

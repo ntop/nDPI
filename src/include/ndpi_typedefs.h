@@ -1302,7 +1302,7 @@ struct ndpi_flow_struct {
   u_char host_server_name[240];
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
   u_int8_t risk_checked:1, ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, _notused:5;
-  ndpi_risk host_risk_mask; /* Stores the flow risk mask for flow peers */
+  ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
   ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
 
   /*
