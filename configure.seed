@@ -32,6 +32,7 @@ AS_IF([test "${with_sanitizer+set}" = set],[
 ])
 
 LT_INIT
+LT_LIB_M
 
 SYSTEM=`uname -s`
 if test $SYSTEM = "Darwin"; then
@@ -97,7 +98,7 @@ CFLAGS="$CFLAGS $JSONC_CFLAGS"
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h json.h])
 
-ADDITIONAL_LIBS=
+ADDITIONAL_LIBS="$LIBM"
 PCAP_HOME=$HOME/PF_RING/userland
 
 DPDK_TARGET=
