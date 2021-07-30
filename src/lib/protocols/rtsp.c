@@ -51,8 +51,8 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
   {
     ndpi_parse_packet_line_info(ndpi_struct, flow);
   }
+
   if (packet->parsed_lines > 0 &&
-      LINE_STARTS(packet->line[0], "SETUP rtsp://") != 0 &&
       LINE_ENDS(packet->line[0], "RTSP/1.0") != 0)
   {
     ndpi_int_rtsp_add_connection(ndpi_struct, flow);
@@ -102,6 +102,7 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
       return;
     }
   }
+
   if (packet->udp != NULL && packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
       && ((NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP) == 0)
 	  || (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTCP) == 0)
