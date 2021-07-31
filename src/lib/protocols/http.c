@@ -963,8 +963,17 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       http_bitmask_exclude_other(flow);
       return;
-    } else
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
+    } else {
+      /* This check is required as RTSP is pretty similiar to HTTP (prevent false-positives). */
+      if (strncmp((const char *)packet->payload + filename_start,
+                  "rtsp://", ndpi_min(7, packet->payload_packet_len - filename_start)) == 0)
+      {
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        return;
+      } else {
+        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
+      }
+    }
 
     NDPI_LOG_DBG2(ndpi_struct,
 		  "Filename HTTP found: %d, we look for line info..\n", filename_start);
