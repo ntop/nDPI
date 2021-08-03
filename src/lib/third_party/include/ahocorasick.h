@@ -126,7 +126,7 @@ typedef struct
   AC_MATCH_t match;
   AC_ALPHABET_t * astring;    /* String of alphabets */
   unsigned short int  length, /* Length of string */
-	              option; /* AC_FEATURE_LC | AC_FEATURE_DEBUG */;
+	                  option; /* AC_FEATURE_LC | AC_FEATURE_DEBUG */
 } AC_TEXT_t;
 
 
