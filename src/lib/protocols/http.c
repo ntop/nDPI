@@ -245,7 +245,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	  if((attachment_len+ATTACHMENT_LEN) <= packet->content_disposition_line.len) {
 	    for(int i = 0; binary_file_ext[i] != NULL; i++) {
 	      /* Use memcmp in case content-disposition contains binary data */
-	      if(memcmp((const char*)&packet->content_disposition_line.ptr[attachment_len],
+	      if(memcmp(&packet->content_disposition_line.ptr[attachment_len],
 			binary_file_ext[i], ATTACHMENT_LEN) == 0) {
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 		ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER);
@@ -733,9 +733,13 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
   **/
   for(i=0; i < sizeof(http_methods)/sizeof(http_methods[0]); i++) {
     if(packet->payload_packet_len >= http_methods[i].len &&
-       memcmp(packet->payload,http_methods[i].str,http_methods[i].len) == 0) {
+       strncasecmp((const char*)packet->payload,http_methods[i].str,http_methods[i].len) == 0) {
+      size_t url_start = http_methods[i].len;
+      while (url_start < packet->payload_packet_len &&
+             url_start < http_methods[i].len + 2048 && /* We assume 2048 chars as maximum for URLs. */
+             packet->payload[url_start] == ' ') { url_start++; }
       NDPI_LOG_DBG2(ndpi_struct, "HTTP: %sFOUND\n",http_methods[i].str);
-      return http_methods[i].len;
+      return url_start;
     }
   }
   return 0;
@@ -872,7 +876,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     if(filename_start == 0) { /* not a regular request. In the HTTP first stage, may be a truncated flow or other protocols */
       NDPI_LOG_DBG2(ndpi_struct, "Filename HTTP not found, we look for possible truncate flow..\n");
 
-      if(packet->payload_packet_len >= 7 && memcmp(packet->payload, "HTTP/1.", 7) == 0) {
+      if(packet->payload_packet_len >= 7 && strncasecmp((const char *)packet->payload, "HTTP/1.", 7) == 0) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP response\n");
 
 	if(packet->payload_packet_len >= 12) {
@@ -965,8 +969,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       return;
     } else {
       /* This check is required as RTSP is pretty similiar to HTTP (prevent false-positives). */
-      if (strncmp((const char *)packet->payload + filename_start,
-                  "rtsp://", ndpi_min(7, packet->payload_packet_len - filename_start)) == 0)
+      if (strncasecmp((const char *)packet->payload + filename_start,
+                      "rtsp://", ndpi_min(7, packet->payload_packet_len - filename_start)) == 0)
       {
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
         return;
@@ -997,7 +1001,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 		  "Found more than one line, we look further for the next packet...\n");
 
     if(packet->line[0].len >= (9 + filename_start)
-       && memcmp(&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) == 0) {
+       && strncasecmp((const char *)&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) == 0) {
       /* Request line complete. Ex. "GET / HTTP/1.1" */
 
       packet->http_url_name.ptr = &packet->payload[filename_start];
@@ -1022,13 +1026,13 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
 
       if((packet->http_url_name.len > 7)
-	 && (!strncmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
+	 && (!strncasecmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP_PROXY\n");
         ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_PROXY, NDPI_PROTOCOL_CATEGORY_WEB);
         check_content_type_and_change_protocol(ndpi_struct, flow);
       }
 
-      if(filename_start == 8 && (memcmp(packet->payload, "CONNECT ", 8) == 0)) {
+      if(filename_start == 8 && (strncasecmp((const char *)packet->payload, "CONNECT ", 8) == 0)) {
 	/* nathan@getoffmalawn.com */
         NDPI_LOG_INFO(ndpi_struct, "found HTTP_CONNECT\n");
         ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_CONNECT, NDPI_PROTOCOL_CATEGORY_WEB);
@@ -1106,7 +1110,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
       // http://www.slideshare.net/DSPIP/rtsp-analysis-wireshark
       if(packet->line[0].len >= 9
-	 && memcmp(&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) == 0) {
+	 && strncasecmp((const char *)&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) == 0) {
 
         NDPI_LOG_INFO(ndpi_struct, "found HTTP\n");
         ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
