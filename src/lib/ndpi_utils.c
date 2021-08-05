@@ -1126,6 +1126,9 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_serialize_start_of_block(serializer, "ndpi");
   ndpi_serialize_risk(serializer, flow);
+  if (l7_protocol.master_protocol == NDPI_PROTOCOL_IP_ICMP && flow->entropy > 0.0f) {
+    ndpi_serialize_string_float(serializer, "entropy", flow->entropy, "%.6f");
+  }
   ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
   ndpi_protocol_breed_t breed =
       ndpi_get_proto_breed(ndpi_struct,
@@ -1774,6 +1777,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_EXTENSION_SUSPICIOUS:
     return("TLS extension suspicious");
 
+  case NDPI_ENTROPY_SUSPICIOUS:
+    return("Entropy suspicious");
+
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2126,16 +2132,14 @@ int ndpi_is_printable_string(char const * const str, size_t len) {
 
 /* ******************************************************************** */
 
-float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len) {
+float ndpi_entropy(u_int8_t const * const buf, size_t len) {
   float entropy = 0.0f;
   u_int32_t byte_counters[256];
 
   memset(byte_counters, 0, sizeof(byte_counters));
 
   for (size_t i = 0; i < len; ++i) {
-    if (buf[i] == i) {
-      byte_counters[i]++;
-    }
+    byte_counters[buf[i]]++;
   }
 
   for (size_t i = 0; i < sizeof(byte_counters) / sizeof(byte_counters[0]); ++i) {
@@ -2143,11 +2147,10 @@ float ndpi_calculate_entropy(u_int8_t const * const buf, size_t len) {
       continue;
     }
 
-    float p = 1.0f * byte_counters[i] / len;
-    entropy -= p * log2f(p);
+    float const p = (float)byte_counters[i] / len;
+    entropy += p * log2f(1 / p);
   }
 
-  entropy *= -1.0f;
   return entropy;
 }
 
