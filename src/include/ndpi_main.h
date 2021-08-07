@@ -103,6 +103,7 @@ extern "C" {
 				      int protoId, ...);
 
   extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
+				      u_int8_t is_cleartext,
 				      ndpi_protocol_breed_t protoBreed, u_int16_t protoId, char *protoName,
 				      ndpi_protocol_category_t protoCategory,
 				      ndpi_port_range *tcpDefPorts,

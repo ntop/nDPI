@@ -1046,7 +1046,8 @@ typedef enum {
 typedef struct ndpi_proto_defaults {
   char *protoName;
   ndpi_protocol_category_t protoCategory;
-  u_int16_t * subprotocols;
+  u_int8_t isClearTextProto;
+  u_int16_t *subprotocols;
   u_int32_t subprotocol_count;
   u_int16_t protoId, protoIdx;
   u_int16_t tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];
