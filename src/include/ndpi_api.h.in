@@ -1054,7 +1054,9 @@ extern "C" {
   /* General purpose utilities */
   u_int64_t ndpi_htonll(u_int64_t v);
   u_int64_t ndpi_ntohll(u_int64_t v);
-
+  u_int8_t ndpi_is_valid_protoId(u_int16_t protoId);
+  u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str, ndpi_protocol proto);
+  
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			  struct ndpi_flow_struct *flow,
