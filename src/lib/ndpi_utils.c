@@ -1771,8 +1771,11 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
     return("TLS certificate validity longer than 13 months");
 
-  case NDPI_TLS_EXTENSION_SUSPICIOUS:
-    return("TLS extension suspicious");
+  case NDPI_TLS_SUSPICIOUS_EXTENSION:
+    return("TLS suspicious extension");
+
+  case NDPI_TLS_FATAL_ALERT:
+    return("TLS fatal alert");
 
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
