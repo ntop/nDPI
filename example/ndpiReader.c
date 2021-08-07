@@ -1368,6 +1368,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	  ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			     flow->detected_protocol, buf1, sizeof(buf1)));
 
+  fprintf(out, "[%s]",
+	  ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol) ? "Encrypted" : "ClearText");
+  
   if(flow->detected_protocol.category != 0)
     fprintf(out, "[cat: %s/%u]",
 	    ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
