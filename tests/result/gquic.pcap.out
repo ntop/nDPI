@@ -4,4 +4,4 @@ DPI Packets (UDP):	1	(1.00 pkts/flow)
 
 Google	1	1392	1
 
-	1	UDP 10.44.5.25:61097 -> 216.58.213.163:443 [proto: 188.126/QUIC.Google][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][User-Agent: canary Chrome/85.0.4169.0 Windows NT 10.0; Win64; x64][Client: www.gstatic.com][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	1	UDP 10.44.5.25:61097 -> 216.58.213.163:443 [proto: 188.126/QUIC.Google][Encrypted][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][User-Agent: canary Chrome/85.0.4169.0 Windows NT 10.0; Win64; x64][Client: www.gstatic.com][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
