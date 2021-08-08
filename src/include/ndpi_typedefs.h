@@ -67,6 +67,7 @@ typedef enum {
   - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
   - ndpi_risk_enum (in python/ndpi.py)
   - ndpi_known_risks (ndpi_utils.c)
+  - ndpi_known_risks (ndpi_main.c)
  */
 typedef enum {
   NDPI_NO_RISK = 0,
@@ -102,9 +103,10 @@ typedef enum {
   NDPI_DESKTOP_OR_FILE_SHARING_SESSION, /* 30 */
   NDPI_TLS_UNCOMMON_ALPN,
   NDPI_TLS_CERT_VALIDITY_TOO_LONG,
-  NDPI_TLS_EXTENSION_SUSPICIOUS,
+  NDPI_TLS_SUSPICIOUS_EXTENSION,
+  NDPI_TLS_FATAL_ALERT,
   NDPI_ENTROPY_SUSPICIOUS,
-
+  
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -1049,7 +1051,8 @@ typedef enum {
 typedef struct ndpi_proto_defaults {
   char *protoName;
   ndpi_protocol_category_t protoCategory;
-  u_int16_t * subprotocols;
+  u_int8_t isClearTextProto;
+  u_int16_t *subprotocols;
   u_int32_t subprotocol_count;
   u_int16_t protoId, protoIdx;
   u_int16_t tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];

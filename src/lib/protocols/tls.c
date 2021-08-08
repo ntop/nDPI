@@ -514,9 +514,8 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 			 flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, len,
 			 packet->payload_packet_len-i-len);
 #endif
-		  if (ndpi_is_printable_string(dNSName, len) == 0)
-		  {
-		    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+		  if (ndpi_is_printable_string(dNSName, len) == 0) {
+		    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
 		  }
 
 		  if(matched_name == 0) {
@@ -756,6 +755,10 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &flow->packet;
   int ret;
 
+#ifdef DEBUG_TL
+  printf("[TLS] Processing block %u\n", packet->payload[0]);
+#endif
+  
   switch(packet->payload[0] /* block type */) {
   case 0x01: /* Client Hello */
   case 0x02: /* Server Hello */
@@ -872,8 +875,20 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	*/
 	flow->l4.tcp.tls.num_tls_blocks = 0;
       }
-    }
+    } else if(content_type == 0x15 /* Alert */) {
+      /* https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132 */
+#ifdef DEBUG_TLS
+      printf("[TLS] *** TLS ALERT ***\n");
+#endif
 
+      if(len >= 7) {
+	u_int8_t alert_level = flow->l4.tcp.tls.message.buffer[5];
+
+	if(alert_level == 2 /* Warning (1), Fatal (2) */)
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_FATAL_ALERT);
+      }
+    }
+    
     if((len > 9)
        && (content_type != 0x17 /* Application Data */)
        && (!flow->l4.tcp.tls.certificate_processed)) {
@@ -1130,7 +1145,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
     printf("[TLS] extension length exceeds remaining packet length: %u > %u.\n",
            extension_len, packet->payload_packet_len - extension_payload_offset);
 #endif
-    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
     return;
   }
 
@@ -1167,7 +1182,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
       printf("[TLS] suspicious extension id: %u\n", extension_id);
 #endif
-      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
       return;
     }
   }
@@ -1180,7 +1195,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
       printf("[TLS] suspicious DTLS-only extension id: %u\n", extension_id);
 #endif
-      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
       return;
     }
   }
@@ -1669,7 +1684,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		    if (ndpi_is_printable_string(buffer, len) == 0)
 		    {
-		       ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_EXTENSION_SUSPICIOUS);
+		       ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
 		    }
 
 		    if(!is_quic) {

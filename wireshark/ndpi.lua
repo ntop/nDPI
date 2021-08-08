@@ -70,6 +70,8 @@ flow_risks[30] = ProtoField.bool("ndpi.flow_risk.desktop_file_sharing_session", 
 flow_risks[31] = ProtoField.bool("ndpi.flow_risk.uncommon_tls_alpn", "Uncommon TLS ALPN", num_bits_flow_risks, nil, bit(31), "nDPI Flow Risk: Uncommon TLS ALPN")
 -- FIXME: Workaround for masks 32+ bits
 -- flow_risks[32] = ProtoField.bool("ndpi.flow_risk.cert_validity_too_long", "TLS certificate validity longer than 13 months", num_bits_flow_risks, nil, bit(32), "nDPI Flow Risk: TLS certificate validity longer than 13 months")
+-- flow_risks[33] = ProtoField.bool("ndpi.flow_risk.suspicious_extension", "TLS suspicious extension", num_bits_flow_risks, nil, bit(33), "nDPI Flow Risk: TLS suspicious extension")
+-- flow_risks[34] = ProtoField.bool("ndpi.flow_risk.fatal_alert", "TLS fatal alert detected", num_bits_flow_risks, nil, bit(34), "nDPI Flow Risk: TLS fatal alert")
 
 for _,v in pairs(flow_risks) do
   ndpi_fds[#ndpi_fds + 1] = v

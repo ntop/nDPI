@@ -1774,8 +1774,11 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
     return("TLS certificate validity longer than 13 months");
 
-  case NDPI_TLS_EXTENSION_SUSPICIOUS:
-    return("TLS extension suspicious");
+  case NDPI_TLS_SUSPICIOUS_EXTENSION:
+    return("TLS suspicious extension");
+
+  case NDPI_TLS_FATAL_ALERT:
+    return("TLS fatal alert");
 
   case NDPI_ENTROPY_SUSPICIOUS:
     return("Entropy suspicious");
@@ -2228,4 +2231,22 @@ u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
   }
   
   return(0);
+}
+
+/* ******************************************* */
+
+u_int8_t ndpi_is_valid_protoId(u_int16_t protoId) {
+  return((protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS) ? 0 : 1);  
+}
+
+/* ******************************************* */
+
+u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
+				 ndpi_protocol proto) {
+
+  if(ndpi_is_valid_protoId(proto.master_protocol) && ndpi_is_valid_protoId(proto.app_protocol)) {    
+    return((ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
+	    && ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto) ? 0 : 1);
+  } else
+    return(0);
 }
