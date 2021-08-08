@@ -66,7 +66,6 @@ typedef enum {
   - ndpi_risk2str (in ndpi_utils.c)
   - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
   - ndpi_risk_enum (in python/ndpi.py)
-  - ndpi_known_risks (ndpi_utils.c)
   - ndpi_known_risks (ndpi_main.c)
  */
 typedef enum {
@@ -105,7 +104,7 @@ typedef enum {
   NDPI_TLS_CERT_VALIDITY_TOO_LONG,
   NDPI_TLS_SUSPICIOUS_EXTENSION,
   NDPI_TLS_FATAL_ALERT,
-  NDPI_ENTROPY_SUSPICIOUS,
+  NDPI_SUSPICIOUS_ENTROPY,
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */

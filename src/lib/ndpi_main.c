@@ -105,7 +105,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TLS_CERT_VALIDITY_TOO_LONG,            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_TLS_SUSPICIOUS_EXTENSION,              NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
   { NDPI_TLS_FATAL_ALERT,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
-  { NDPI_ENTROPY_SUSPICIOUS,                    NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_SUSPICIOUS_ENTROPY,                    NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
@@ -2855,13 +2855,13 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	  if(((icmp_type >= 44) && (icmp_type <= 252))
 	     || (icmp_code > 15))
 	    ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET);
-	  if (flow->packet.payload_packet_len > sizeof(struct ndpi_icmphdr))
-	  {
+	  
+	  if (flow->packet.payload_packet_len > sizeof(struct ndpi_icmphdr)) {
 	    flow->entropy = ndpi_entropy(flow->packet.payload + sizeof(struct ndpi_icmphdr),
 	                                 flow->packet.payload_packet_len - sizeof(struct ndpi_icmphdr));
-	    if (NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) != 0)
-	    {
-	      ndpi_set_risk(ndpi_str, flow, NDPI_ENTROPY_SUSPICIOUS);
+
+	    if (NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) != 0) {
+	      ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_ENTROPY);
 	    }
 	  }
 	}

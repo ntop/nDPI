@@ -1780,8 +1780,8 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_FATAL_ALERT:
     return("TLS fatal alert");
 
-  case NDPI_ENTROPY_SUSPICIOUS:
-    return("Entropy suspicious");
+  case NDPI_SUSPICIOUS_ENTROPY:
+    return("Suspicious entropy");
 
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
