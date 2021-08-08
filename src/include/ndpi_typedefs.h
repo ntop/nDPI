@@ -105,7 +105,8 @@ typedef enum {
   NDPI_TLS_CERT_VALIDITY_TOO_LONG,
   NDPI_TLS_SUSPICIOUS_EXTENSION,
   NDPI_TLS_FATAL_ALERT,
-
+  NDPI_ENTROPY_SUSPICIOUS,
+  
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -737,6 +738,8 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK */
   u_int32_t ddlink_server_direction:1;
+
+  /* Part of the TCP header. */
   u_int32_t seen_syn:1;
   u_int32_t seen_syn_ack:1;
   u_int32_t seen_ack:1;
@@ -1292,6 +1295,9 @@ struct ndpi_flow_struct {
     struct ndpi_flow_tcp_struct tcp;
     struct ndpi_flow_udp_struct udp;
   } l4;
+
+  /* Some protocols calculate the entropy. */
+  float entropy;
 
   /* Place textual flow info here */
   char flow_extra_info[16];
