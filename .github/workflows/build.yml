@@ -14,10 +14,16 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install dependencies
-        run: sudo apt-get install libpcap-dev libjson-c-dev libgcrypt20-dev
+        run: sudo apt-get install libpcap-dev libjson-c-dev libgcrypt20-dev gcc-arm-linux-gnueabihf
       - name: Configure
-        run: ./autogen.sh
+        run: env CFLAGS='-Werror' ./autogen.sh
       - name: Build
         run: make all
-      - name: Test
+      - name: Test DIFF
         run: ./tests/do.sh
+      - name: Test UNIT
+        run: ./tests/unit/unit
+      - name: Configure ARM
+        run: env CFLAGS='-Werror' ./autogen.sh --host=arm-linux-gnueabihf
+      - name: Build ARM
+        run: make all
