@@ -40,22 +40,7 @@
 
 #include "reader_util.h"
 
-#ifndef ETH_P_IP
-#define ETH_P_IP               0x0800 	/* IPv4 */
-#endif
-
-#ifndef ETH_P_IPv6
-#define ETH_P_IPV6	       0x86dd	/* IPv6 */
-#endif
-
-#define SLARP                  0x8035   /* Cisco Slarp */
-#define CISCO_D_PROTO          0x2000	/* Cisco Discovery Protocol */
-
-#define VLAN                   0x8100
-#define MPLS_UNI               0x8847
-#define MPLS_MULTI             0x8848
-#define PPPoE                  0x8864
-#define SNAP                   0xaa
+#define SNAP                   0XAA
 #define BSTP                   0x42     /* Bridge Spanning Tree Protocol */
 
 /* Keep last 32 packets */
@@ -1834,7 +1819,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     recheck_type = 1;
     break;
 
-  case PPPoE:
+  case PPPOE:
     workflow->stats.pppoe_count++;
     type = ETH_P_IP;
     ip_offset += 8;

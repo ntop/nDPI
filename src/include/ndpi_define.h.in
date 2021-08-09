@@ -382,4 +382,36 @@
 
 #endif /* __APPLE__ */
 
+#ifndef ETH_P_IP
+#define ETH_P_IP               0x0800 	/* IPv4 */
+#endif
+
+#ifndef ETH_P_IPv6
+#define ETH_P_IPV6	       0x86dd	/* IPv6 */
+#endif
+
+#ifndef CISCO_SLARP
+#define CISCO_SLARP            0x8035   /* Cisco Slarp */
+#endif
+
+#ifndef CISCO_D_PROTO
+#define CISCO_D_PROTO          0x2000	/* Cisco Discovery Protocol */
+#endif
+
+#ifndef VLAN
+#define VLAN                   0x8100
+#endif
+
+#ifndef MPLS_UNI
+#define MPLS_UNI               0x8847
+#endif
+
+#ifndef MPLS_MULTI
+#define MPLS_MULTI             0x8848
+#endif
+
+#ifndef PPPOE
+#define PPPOE                  0x8864
+#endif
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
