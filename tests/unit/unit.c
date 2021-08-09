@@ -33,6 +33,8 @@
 #else
 #include <unistd.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/mman.h>
 #endif
 
 #include <stdio.h>
@@ -44,12 +46,10 @@
 #include <pcap.h>
 #include <signal.h>
 #include <pthread.h>
-#include <sys/socket.h>
 #include <assert.h>
 #include <math.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/mman.h>
 #include <libgen.h>
 
 #include "ndpi_config.h"

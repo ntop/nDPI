@@ -1,6 +1,10 @@
+#ifndef WIN32
 #include <arpa/inet.h>
-#include <errno.h>
 #include <netinet/in.h>
+#else
+#include <windows.h>
+#endif
+#include <errno.h>
 #include <ndpi_api.h>
 #include <ndpi_main.h>
 #include <ndpi_typedefs.h>
@@ -130,12 +134,16 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
   if (access(file_or_device, R_OK) != 0 && errno == ENOENT) {
     workflow->pcap_handle = pcap_open_live(file_or_device, /* 1536 */ 65535, 1, 250, pcap_error_buffer);
   } else {
+#ifdef WIN32
+    workflow->pcap_handle = pcap_open_offline(file_or_device, pcap_error_buffer);
+#else
     workflow->pcap_handle = pcap_open_offline_with_tstamp_precision(file_or_device, PCAP_TSTAMP_PRECISION_MICRO,
 								    pcap_error_buffer);
+#endif
   }
 
   if (workflow->pcap_handle == NULL) {
-    fprintf(stderr, "pcap_open_live / pcap_open_offline_with_tstamp_precision: %.*s\n",
+    fprintf(stderr, "pcap_open_live / pcap_open_offline: %.*s\n",
 	    (int) PCAP_ERRBUF_SIZE, pcap_error_buffer);
     free_workflow(&workflow);
     return NULL;
@@ -994,6 +1002,7 @@ static int processing_threads_error_or_eof(void)
 
 static int start_reader_threads(void)
 {
+#ifndef WIN32
   sigset_t thread_signal_set, old_signal_set;
 
   sigfillset(&thread_signal_set);
@@ -1003,6 +1012,7 @@ static int start_reader_threads(void)
     fprintf(stderr, "pthread_sigmask: %s\n", strerror(errno));
     return 1;
   }
+#endif
 
   for (int i = 0; i < reader_thread_count; ++i) {
     reader_threads[i].array_index = i;

@@ -76,25 +76,10 @@ typedef uint           u_int32_t;
 typedef uint           u_int;
 typedef unsigned       __int64 u_int64_t;
 
-#define pthread_t                HANDLE
-#define pthread_mutex_t          HANDLE
-#define pthread_rwlock_t         pthread_mutex_t
-#define pthread_rwlock_init      pthread_mutex_init
-#define pthread_rwlock_wrlock    pthread_mutex_lock
-#define pthread_rwlock_rdlock    pthread_mutex_lock
-#define pthread_rwlock_unlock    pthread_mutex_unlock
-#define pthread_rwlock_destroy	 pthread_mutex_destroy
+#define gmtime_r(a, b)                  memcpy(b, gmtime(a), sizeof(struct tm))
 
-#define gmtime_r(a, b)           memcpy(b, gmtime(a), sizeof(struct tm))
-
-#define in_addr_t				unsigned long
-
-extern unsigned long waitForNextEvent(unsigned long ulDelay /* ms */);
-
-#define sleep(a /* sec */)              waitForNextEvent(1000*a /* ms */)
-#define strtok_r                        strtok_s
 #define timegm                          _mkgmtime
 
-extern struct tm* localtime_r(const time_t* timep, struct tm* r);
+#define sleep(a /* sec */)              Sleep(1000*a /* ms */)
 
 #endif /* __NDPI_WIN32_H__ */

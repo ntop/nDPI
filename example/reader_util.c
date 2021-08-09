@@ -26,16 +26,17 @@
 #endif
 
 #include <stdlib.h>
+#include <math.h>
+#include <float.h>
 
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <process.h>
 #include <io.h>
+#include <ip6_misc.h>
 #else
 #include <unistd.h>
 #include <netinet/in.h>
-#include <math.h>
-#include <float.h>
 #endif
 
 #include "reader_util.h"
@@ -1581,8 +1582,12 @@ int ndpi_is_datalink_supported(int datalink_type) {
   case DLT_PPP_SERIAL:
   case DLT_C_HDLC:
   case DLT_PPP:
+#ifdef DLT_IPV4
   case DLT_IPV4:
+#endif
+#ifdef DLT_IPV6
   case DLT_IPV6:
+#endif
   case DLT_EN10MB:
   case DLT_LINUX_SLL:
   case DLT_IEEE802_11_RADIO:
@@ -1708,15 +1713,19 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     }
     break;
 
+#ifdef DLT_IPV4
   case DLT_IPV4:
     type = ETH_P_IP;
     ip_offset = 0;
     break;
+#endif
 
+#ifdef DLT_IPV6
   case DLT_IPV6:
     type = ETH_P_IPV6;
     ip_offset = 0;
     break;
+#endif
 
     /* IEEE 802.3 Ethernet - 1 */
   case DLT_EN10MB:
@@ -1878,7 +1887,11 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     ip_len = ((u_int16_t)iph->ihl * 4);
     iph6 = NULL;
 
-    if(iph->protocol == IPPROTO_IPV6 || iph->protocol == IPPROTO_IPIP) {
+    if(iph->protocol == IPPROTO_IPV6
+#ifdef IPPROTO_IPIP
+       || iph->protocol == IPPROTO_IPIP
+#endif
+       ) {
       ip_offset += ip_len;
       if(ip_len > 0)
         goto iph_check;
@@ -1914,7 +1927,11 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       return(nproto);
     }
 
-    if(proto == IPPROTO_IPV6 || proto == IPPROTO_IPIP) {
+    if(proto == IPPROTO_IPV6
+#ifdef IPPROTO_IPIP
+       || proto == IPPROTO_IPIP
+#endif
+       ) {
       if(l4ptr > packet) { /* Better safe than sorry */
         ip_offset = (l4ptr - packet);
         goto iph_check;

@@ -37,6 +37,8 @@
 #else
 #include <unistd.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/mman.h>
 #endif
 #include <string.h>
 #include <stdarg.h>
@@ -44,7 +46,6 @@
 #include <pcap.h>
 #include <signal.h>
 #include <pthread.h>
-#include <sys/socket.h>
 #include <assert.h>
 #include <math.h>
 #include "ndpi_api.h"
@@ -52,7 +53,6 @@
 #include "../src/lib/third_party/include/ahocorasick.h"
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/mman.h>
 #include <libgen.h>
 
 #include "reader_util.h"
@@ -2996,9 +2996,23 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	  t = 0;
 	  b = 0;
 	}
-	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime_r(&pcap_start.tv_sec, &result));
+#ifdef WIN32
+	/* localtime() on Windows is thread-safe */
+	struct tm * tm_ptr = localtime(&pcap_start.tv_sec);
+	result = *tm_ptr;
+#else
+	localtime_r(&pcap_start.tv_sec, &result);
+#endif
+	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", &result);
 	printf("\tAnalysis begin:        %s\n", when);
-	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", localtime_r(&pcap_end.tv_sec, &result));
+#ifdef WIN32
+	/* localtime() on Windows is thread-safe */
+	tm_ptr = localtime(&pcap_end.tv_sec);
+	result = *tm_ptr;
+#else
+	localtime_r(&pcap_end.tv_sec, &result);
+#endif
+	strftime(when, sizeof(when), "%d/%b/%Y %H:%M:%S", &result);
 	printf("\tAnalysis end:          %s\n", when);
 	printf("\tTraffic throughput:    %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);
@@ -4442,11 +4456,12 @@ int original_main(int argc, char **argv) {
 /**
    @brief Timezone
 **/
+#ifndef __GNUC__
   struct timezone {
     int tz_minuteswest; /* minutes W of Greenwich */
     int tz_dsttime;     /* type of dst correction */
   };
-
+#endif
 
 /**
    @brief Set time

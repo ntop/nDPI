@@ -1,5 +1,6 @@
 CC=@CC@
 CXX=@CXX@
+BUILD_MINGW=@BUILD_MINGW@
 
 SRCHOME=../../src
 
@@ -9,6 +10,12 @@ LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ -lpthread @L
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=unit
 PREFIX?=@prefix@
+
+ifneq ($(BUILD_MINGW),)
+all:
+	@echo 'Unit tests disabled due to mingw build.'
+
+else
 
 all: unit
 
@@ -34,3 +41,5 @@ distdir:
 
 distclean: clean
 	/bin/rm -f Makefile
+
+endif
