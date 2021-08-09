@@ -383,7 +383,7 @@
 #endif /* __APPLE__ */
 
 #ifndef ETH_ARP
-#define ETH_ARP               0x0800 	/* IPv4 */
+#define ETH_ARP                0x0806
 #endif
 
 #ifndef ETH_P_IP
