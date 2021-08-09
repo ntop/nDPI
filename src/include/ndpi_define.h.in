@@ -382,6 +382,10 @@
 
 #endif /* __APPLE__ */
 
+#ifndef ETH_ARP
+#define ETH_ARP               0x0800 	/* IPv4 */
+#endif
+
 #ifndef ETH_P_IP
 #define ETH_P_IP               0x0800 	/* IPv4 */
 #endif
