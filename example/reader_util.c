@@ -1789,7 +1789,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
   /* check ether type */
   switch(type) {
-  case VLAN:
+  case ETH_P_VLAN:
     vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
     type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
     ip_offset += 4;
@@ -1804,8 +1804,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     recheck_type = 1;
     break;
 
-  case MPLS_UNI:
-  case MPLS_MULTI:
+  case ETH_P_MPLS_UNI:
+  case ETH_P_MPLS_MULTI:
     mpls.u32 = *((uint32_t *) &packet[ip_offset]);
     mpls.u32 = ntohl(mpls.u32);
     workflow->stats.mpls_count++;
@@ -1819,7 +1819,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     recheck_type = 1;
     break;
 
-  case PPPOE:
+  case ETH_P_PPPoE:
     workflow->stats.pppoe_count++;
     type = ETH_P_IP;
     ip_offset += 8;
