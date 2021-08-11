@@ -54,7 +54,7 @@ static void ndpi_int_mail_smtp_add_connection(struct ndpi_detection_module_struc
 #endif
 
   flow->guessed_protocol_id = NDPI_PROTOCOL_MAIL_SMTP; /* Avoid SMTPS to be used s sub-protocol */
-  
+
   ndpi_set_detected_protocol(ndpi_struct, flow,
 			     NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN);
 }
@@ -89,20 +89,24 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  if(flow->host_server_name[0] == '\0') {
 	    if(packet->line[a].len > 4) {
 	      int i, len;
-	      
-	      for(i=5; (i<packet->line[a].len-1) && (packet->line[a].ptr[i] != ' '); i++)
-		;
-	      
-	      len = i-4;
-	      /* Copy result for nDPI apps */
-	      len = ndpi_min(len, sizeof(flow->host_server_name)-1);
-	      strncpy((char*)flow->host_server_name, (char*)&packet->line[a].ptr[4], len);
-	      flow->host_server_name[len] = '\0';
 
-	      ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
-					   (char *)flow->host_server_name,
-					   strlen((const char *)flow->host_server_name));
-	      
+	      if(packet->line[a].ptr[4] != '(') {
+		for(i=5; (i<packet->line[a].len-1) && (packet->line[a].ptr[i] != ' '); i++)
+		  ;
+
+		if((packet->line[a].ptr[i+1] != '\r')
+		   && (packet->line[a].ptr[i+1] != '\n')) {
+		  len = i-4;
+		  /* Copy result for nDPI apps */
+		  len = ndpi_min(len, sizeof(flow->host_server_name)-1);
+		  strncpy((char*)flow->host_server_name, (char*)&packet->line[a].ptr[4], len);
+		  flow->host_server_name[len] = '\0';
+
+		  ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
+					       (char *)flow->host_server_name,
+					       strlen((const char *)flow->host_server_name));
+		}
+	      }
 	    }
 	  }
 	} else if(memcmp(packet->line[a].ptr, "250", 3) == 0) {
@@ -157,7 +161,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef SMTP_DEBUG
 	    printf("%s() => [%.*s]\n", __FUNCTION__, packet->line[a].len, packet->line[a].ptr);
 #endif
-	    
+
 	    if(flow->protos.ftp_imap_pop_smtp.auth_found) {
 	      if(flow->protos.ftp_imap_pop_smtp.username[0] == '\0') {
 		/* Username */
@@ -179,7 +183,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  memcpy(flow->protos.ftp_imap_pop_smtp.username, out, len);
 		  flow->protos.ftp_imap_pop_smtp.username[len] = '\0';
-		  
+
 		  ndpi_free(out);
 		}
 	      } else if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0') {
@@ -206,6 +210,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  ndpi_free(out);
 		}
 	      } else {
+		flow->host_server_name[0] = '\0';
 		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 		return;
 	      }
@@ -265,7 +270,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
       ndpi_int_mail_smtp_add_connection(ndpi_struct, flow);
-      smtpInitExtraPacketProcessing(flow);      
+      smtpInitExtraPacketProcessing(flow);
       return;
     }
 
@@ -292,14 +297,14 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow) {
   int rc;
-  
+
   ndpi_search_mail_smtp_tcp(ndpi_struct, flow);
 
   rc = (flow->protos.ftp_imap_pop_smtp.password[0] == '\0') ? 1 : 0;
-  
+
 #ifdef SMTP_DEBUG
   printf("**** %s() [rc: %d]\n", __FUNCTION__, rc);
-#endif  
+#endif
 
   return(rc);
 }
@@ -309,10 +314,10 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
 static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
 #ifdef SMTP_DEBUG
   static u_int num = 0;
-  
+
   printf("**** %s(%u)\n", __FUNCTION__, ++num);
 #endif
-  
+
   flow->check_extra_packets = 1;
   /* At most 7 packets should almost always be enough */
   flow->max_extra_packets_to_check = 12;
