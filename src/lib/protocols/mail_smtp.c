@@ -52,6 +52,8 @@ static void ndpi_int_mail_smtp_add_connection(struct ndpi_detection_module_struc
 #ifdef SMTP_DEBUG
   printf("**** %s()\n", __FUNCTION__);
 #endif
+
+  flow->guessed_protocol_id = NDPI_PROTOCOL_MAIL_SMTP; /* Avoid SMTPS to be used s sub-protocol */
   
   ndpi_set_detected_protocol(ndpi_struct, flow,
 			     NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN);
@@ -83,6 +85,26 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       if(packet->line[a].len >= 3) {
 	if(memcmp(packet->line[a].ptr, "220", 3) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_220;
+
+	  if(flow->host_server_name[0] == '\0') {
+	    if(packet->line[a].len > 4) {
+	      int i, len;
+	      
+	      for(i=5; (i<packet->line[a].len-1) && (packet->line[a].ptr[i] != ' '); i++)
+		;
+	      
+	      len = i-4;
+	      /* Copy result for nDPI apps */
+	      len = ndpi_min(len, sizeof(flow->host_server_name)-1);
+	      strncpy((char*)flow->host_server_name, (char*)&packet->line[a].ptr[4], len);
+	      flow->host_server_name[len] = '\0';
+
+	      ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
+					   (char *)flow->host_server_name,
+					   strlen((const char *)flow->host_server_name));
+	      
+	    }
+	  }
 	} else if(memcmp(packet->line[a].ptr, "250", 3) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_250;
 	} else if(memcmp(packet->line[a].ptr, "235", 3) == 0) {

@@ -30,8 +30,8 @@
 
 /* #define IMAP_DEBUG 1*/
 
-static void ndpi_int_mail_imap_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+static void ndpi_int_mail_imap_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN; /* Avoid IMAPS to be used s sub-protocol */
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_IMAP, NDPI_PROTOCOL_UNKNOWN);
 }
 

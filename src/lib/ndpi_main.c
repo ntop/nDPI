@@ -4406,7 +4406,6 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
        */
       if(flow->packet.tcp->syn != 0 && flow->packet.tcp->ack == 0 && flow->init_finished != 0 &&
 	 flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-
 	u_int16_t guessed_protocol_id, guessed_host_protocol_id;
 	u_int16_t packet_direction_counter[2];
         u_int8_t num_processed_pkts;
