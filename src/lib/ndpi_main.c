@@ -5416,6 +5416,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   flow->num_processed_pkts++;
 
+  if(flow->num_processed_pkts > NDPI_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT)
+    return(ret); /* Avoid spending too much time with this flow */
+  
   /* Init default */
   ret.master_protocol = flow->detected_protocol_stack[1],
     ret.app_protocol = flow->detected_protocol_stack[0];

@@ -918,10 +918,14 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	processed += packet->payload_packet_len;
       }
-    } else {
+    } else if(len > 5 /* Minimum block size */) {
       /* Process element as a whole */
       if(content_type == 0x17 /* Application Data */) {
-	ndpi_looks_like_tls(ndpi_struct, flow);
+	u_int32_t block_len   = ntohs((flow->l4.tcp.tls.message.buffer[3] << 16) + (flow->l4.tcp.tls.message.buffer[4] << 8));
+
+	/* Let's do a quick check to make sure this really looks like TLS */
+	if(block_len < 16384 /* Max TLS block size */)
+	  ndpi_looks_like_tls(ndpi_struct, flow);
 
 	if(flow->l4.tcp.tls.certificate_processed) {
 	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
