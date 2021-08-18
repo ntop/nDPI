@@ -35,8 +35,9 @@ ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_sco
 
 
 local flow_risks = {}
-local num_bits_flow_risks = 64 -- 64 is the "right" value; if you want a more compact visualization you can lower it to max used bits
-flow_risks[0]  = ProtoField.bool("ndpi.flow_risk.unused0", "Unused", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: Unused bit")
+-- Wireshark/Lua doesn't handle 64 bit integer very well, so we split the risk mask into two 32 bit integer values
+local num_bits_flow_risks = 32
+flow_risks[0]  = ProtoField.bool("ndpi.flow_risk.unused0", "Reserved", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: Reserved bit")
 flow_risks[1]  = ProtoField.bool("ndpi.flow_risk.xss_attack", "XSS attack", num_bits_flow_risks, nil, bit(1), "nDPI Flow Risk: XSS attack")
 flow_risks[2]  = ProtoField.bool("ndpi.flow_risk.sql_injection", "SQL injection", num_bits_flow_risks, nil, bit(2), "nDPI Flow Risk: SQL injection")
 flow_risks[3]  = ProtoField.bool("ndpi.flow_risk.rce_injection", "RCE injection", num_bits_flow_risks, nil, bit(3), "nDPI Flow Risk: RCE injection")
@@ -68,11 +69,13 @@ flow_risks[28] = ProtoField.bool("ndpi.flow_risk.possibly_malicious_ja3", "Possi
 flow_risks[29] = ProtoField.bool("ndpi.flow_risk.possibly_malicious_ssl_certificate_sha1", "Possibly Malicious SSL Certificate SHA1 Fingerprint", num_bits_flow_risks, nil, bit(29), "nDPI Flow Risk: Possibly Malicious SSL Certificate SHA1 Fingerprint")
 flow_risks[30] = ProtoField.bool("ndpi.flow_risk.desktop_file_sharing_session", "Desktop/File Sharing Session", num_bits_flow_risks, nil, bit(30), "nDPI Flow Risk: Desktop/File Sharing Session")
 flow_risks[31] = ProtoField.bool("ndpi.flow_risk.uncommon_tls_alpn", "Uncommon TLS ALPN", num_bits_flow_risks, nil, bit(31), "nDPI Flow Risk: Uncommon TLS ALPN")
--- FIXME: Workaround for masks 32+ bits
--- flow_risks[32] = ProtoField.bool("ndpi.flow_risk.cert_validity_too_long", "TLS certificate validity longer than 13 months", num_bits_flow_risks, nil, bit(32), "nDPI Flow Risk: TLS certificate validity longer than 13 months")
--- flow_risks[33] = ProtoField.bool("ndpi.flow_risk.suspicious_extension", "TLS suspicious extension", num_bits_flow_risks, nil, bit(33), "nDPI Flow Risk: TLS suspicious extension")
--- flow_risks[34] = ProtoField.bool("ndpi.flow_risk.fatal_alert", "TLS fatal alert detected", num_bits_flow_risks, nil, bit(34), "nDPI Flow Risk: TLS fatal alert")
--- flow_risks[35] = ProtoField.bool("ndpi.flow_risk.suspicious_entropy", "Suspicious entropy", num_bits_flow_risks, nil, bit(34), "nDPI Flow Risk: suspicious entropy")
+-- Restart bitmask from 0!
+flow_risks[32] = ProtoField.bool("ndpi.flow_risk.cert_validity_too_long", "TLS certificate validity longer than 13 months", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: TLS certificate validity longer than 13 months")
+flow_risks[33] = ProtoField.bool("ndpi.flow_risk.suspicious_extension", "TLS suspicious extension", num_bits_flow_risks, nil, bit(1), "nDPI Flow Risk: TLS suspicious extension")
+flow_risks[34] = ProtoField.bool("ndpi.flow_risk.fatal_alert", "TLS fatal alert detected", num_bits_flow_risks, nil, bit(2), "nDPI Flow Risk: TLS fatal alert")
+flow_risks[35] = ProtoField.bool("ndpi.flow_risk.suspicious_entropy", "Suspicious entropy", num_bits_flow_risks, nil, bit(3), "nDPI Flow Risk: suspicious entropy")
+-- Last one: keep in sync the bitmask when adding new risks!!
+flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(4))
 
 for _,v in pairs(flow_risks) do
   ndpi_fds[#ndpi_fds + 1] = v
@@ -1027,11 +1030,10 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    local ndpikey, srckey, dstkey, flowkey
 	    local elems                = string.split(string.sub(ndpi_trailer, 12), ":")
 	    local ndpi_subtree         = tree:add(ndpi_proto, tvb(), "nDPI Protocol")
-	    local str_risk             = elems[6]..elems[7]..elems[8]..elems[9]..elems[10]..elems[11]..elems[12]..elems[13]
-	    local flow_risk            = tonumber(str_risk, 16) -- 16 = HEX
 	    local str_score            = elems[14]..elems[15]
 	    local flow_score           = tonumber(str_score, 16) -- 16 = HEX
 	    local len                  = tvb:len()
+	    local flow_risk            = tvb(len-30, 8):uint64() -- UInt64 object!
 	    local name                 = ""
 	    local flow_risk_tree
 	    
@@ -1043,7 +1045,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    ndpi_subtree:add(ndpi_fds.application_protocol, tvb(len-32, 2))
 
 	    flow_risk_tree = ndpi_subtree:add(ndpi_fds.flow_risk, tvb(len-30, 8))
-	    if (flow_risk ~= 0) then
+	    if (flow_risk ~= UInt64(0, 0)) then
 	       local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).." - "..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
 
 	       if(flows_with_risks[rev_key] == nil) then
@@ -1055,15 +1057,13 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       end
 	       
 	       for i=0,63 do
-	        --If you want to visualize only proto fields of detected risks, enable the next "if" block
-                --if hasbit(flow_risk, bit(i)) then
-
 		 if flow_risks[i] ~= nil then
-	            flow_risk_tree:add(flow_risks[i], flow_risk)
-		    --end
+	            -- Wireshark/Lua doesn't handle 64 bit integer very well, so we split the risk mask into two 32 bit integer values
+	            flow_risk_tree:add(flow_risks[i], tvb(len - (i < 32 and 26 or 30), 4))
 		 end
 
-	      end
+	       end
+	       flow_risk_tree:add(flow_risks[64], tvb(len - 30, 4))
 	    end
 	    
 	    ndpi_subtree:add(ndpi_fds.flow_score, tvb(len-22, 2))	    
