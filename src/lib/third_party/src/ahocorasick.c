@@ -677,8 +677,13 @@ void ac_automata_dump(AC_AUTOMATA_t * thiz, FILE *file) {
   ai.bufstr[0] = '\0';
 
   ac_automata_walk(thiz,dump_node_common,dump_node_str,(void *)&ai);
+#ifdef WIN32
+  fprintf(ai.file,"---\n mem size %lu avg node size %d, node one char %d, <=8c %d, >8c %d, range %d\n---DUMP-END-\n",
+              (long unsigned int)ai.memcnt,(int)ai.memcnt/(thiz->all_nodes_num+1),(int)ai.node_oc,(int)ai.node_8c,(int)ai.node_xc,(int)ai.node_xr);
+#else
   fprintf(ai.file,"---\n mem size %zu avg node size %d, node one char %d, <=8c %d, >8c %d, range %d\n---DUMP-END-\n",
               ai.memcnt,(int)ai.memcnt/(thiz->all_nodes_num+1),(int)ai.node_oc,(int)ai.node_8c,(int)ai.node_xc,(int)ai.node_xr);
+#endif
 }
 #endif
 

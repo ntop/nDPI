@@ -688,7 +688,13 @@ ndpi_log_timestamp(char *log_ts, uint32_t log_ts_len)
 
   gettimeofday(&tv, NULL);
   nowtime = tv.tv_sec;
+#ifdef WIN32
+  /* localtime() on Windows is thread-safe */
+  struct tm * nowtm_r_ptr = localtime(&nowtime);
+  nowtm_r = *nowtm_r_ptr;
+#else
   localtime_r(&nowtime, &nowtm_r);
+#endif
   strftime(tmbuf, NDPI_TIMESTAMP_LEN, "%H:%M:%S", &nowtm_r);
   snprintf(log_ts, log_ts_len, "%s.%06ld", tmbuf, (long)tv.tv_usec);
 }

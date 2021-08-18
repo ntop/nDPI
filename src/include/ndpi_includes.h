@@ -38,7 +38,6 @@
 #else
 #include <sys/types.h>
 #include <sys/param.h>
-#include <pthread.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -57,10 +56,6 @@
 #if defined __NetBSD__ || defined __OpenBSD__
 #include <netinet/in_systm.h>
 
-#if defined __OpenBSD__
-#include <pthread.h>
-
-#endif
 #endif
 #endif
 #endif
