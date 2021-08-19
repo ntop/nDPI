@@ -914,7 +914,7 @@ static void ndpi_process_packet(uint8_t * const args,
 	  flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_TLS)
         {
 	  if (flow_to_process->tls_client_hello_seen == 0 &&
-	      flow_to_process->ndpi_flow->l4.tcp.tls.hello_processed != 0)
+	      flow_to_process->ndpi_flow->protos.tls_quic_stun.tls_quic.hello_processed != 0)
             {
 	      uint8_t unknown_tls_version = 0;
 	      printf("[%8llu, %d, %4d][TLS-CLIENT-HELLO] version: %s | sni: %s | alpn: %s\n",

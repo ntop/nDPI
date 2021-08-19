@@ -597,7 +597,7 @@ struct ndpi_flow_tcp_struct {
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
 
     /* NDPI_PROTOCOL_TLS */
-    uint8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1, fingerprint_set:1, _pad:4; 
+    uint8_t certificate_processed:1, fingerprint_set:1, _pad:6;
     uint8_t sha1_certificate_fingerprint[20], num_tls_blocks;
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS];
   } tls;
@@ -1117,6 +1117,8 @@ struct ndpi_flow_struct {
       uint32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];
       uint16_t server_cipher;
+      u_int8_t sha1_certificate_fingerprint[20];
+      u_int8_t hello_processed:1, subprotocol_detected:1, _pad:6;
       struct {
         uint16_t cipher_suite;
         char *esni;

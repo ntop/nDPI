@@ -856,7 +856,7 @@ static const char* ndpi_get_flow_info_by_proto_id(struct ndpi_flow_struct const 
         return (char const *)flow->host_server_name;
     case NDPI_PROTOCOL_QUIC:
     case NDPI_PROTOCOL_TLS:
-        if (flow->l4.tcp.tls.hello_processed != 0)
+        if (flow->protos.tls_quic_stun.tls_quic.hello_processed != 0)
         {
           return flow->protos.tls_quic_stun.tls_quic.client_requested_server_name;
         }

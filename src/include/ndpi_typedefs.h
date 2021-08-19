@@ -726,8 +726,7 @@ struct ndpi_flow_tcp_struct {
     void* srv_cert_fingerprint_ctx; /* SHA-1 */
 
     /* NDPI_PROTOCOL_TLS */
-    u_int8_t hello_processed:1, certificate_processed:1, subprotocol_detected:1,
-	fingerprint_set:1, _pad:4;
+    u_int8_t certificate_processed:1, fingerprint_set:1, _pad:6;
     u_int8_t num_tls_blocks;
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;
@@ -1366,6 +1365,7 @@ struct ndpi_flow_struct {
 	char ja3_client[33], ja3_server[33];
 	u_int16_t server_cipher;
 	u_int8_t sha1_certificate_fingerprint[20];
+	u_int8_t hello_processed:1, subprotocol_detected:1, _pad:6;
 
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
 	/* Under #ifdef to save memory for those who do not need them */
