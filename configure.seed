@@ -167,8 +167,8 @@ case "$host" in
          AC_CHECK_LIB([nl], [nl_handle_alloc], [PCAP_LIB="$PCAP_LIB -lnl"])
          # The dlopen() function is in libdl on GLIBC-based systems
          # and in the C library for *BSD systems
-         AC_CHECK_LIB([dl], [dlopen, dlsym],   [DL_LIB="-ldl"],[AC_CHECK_LIB([c],
-                            [dlopen, dlsym],   [DL_LIB="-lc"],
+         AC_CHECK_LIB([dl], [dlopen],   [DL_LIB="-ldl"],[AC_CHECK_LIB([c],
+                            [dlopen],   [DL_LIB="-lc"],
                             [AC_MSG_ERROR([unable to find the dlopen(), dlsym() functions]) ]) ])
       elif test "${with_only_libndpi+set}" != set; then :
          AC_CHECK_LIB([pcap], [pcap_open_live], [PCAP_LIB="-lpcap"])

@@ -1053,17 +1053,20 @@ static void parseOptions(int argc, char **argv) {
   }
 
 #ifdef linux
+#ifndef USE_DPDK
   for(thread_id = 0; thread_id < num_threads; thread_id++)
     core_affinity[thread_id] = -1;
 
   if(num_cores > 1 && bind_mask != NULL) {
     char *core_id = strtok(bind_mask, ":");
     thread_id = 0;
+    
     while(core_id != NULL && thread_id < num_threads) {
       core_affinity[thread_id++] = atoi(core_id) % num_cores;
       core_id = strtok(NULL, ":");
     }
   }
+#endif
 #endif
 #endif
 }
