@@ -222,7 +222,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 
 /* **************************************** */
 
-static void cleanupServerName(char *buffer, int buffer_len) {
+static void cleanupServerName(char *buffer, u_int buffer_len) {
   u_int i;
 
   /* Now all lowecase */
@@ -318,7 +318,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 				       struct ndpi_flow_struct *flow,
 				       u_int16_t p_offset, u_int16_t certificate_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
-  u_int num_found = 0, i;
+  u_int16_t num_found = 0, i;
   char buffer[64] = { '\0' }, rdnSeqBuf[2048] = { '\0' };
   u_int rdn_len = 0;
 
@@ -690,7 +690,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 #ifdef DEBUG_CERTIFICATE_HASH
       {
-	int i;
+	u_int32_t i;
 
 	for(i=0;i<certificate_len;i++)
 	  printf("%02X ", packet->payload[certificates_offset+i]);
@@ -711,7 +711,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
       const size_t sha1_siz = sizeof(flow->protos.tls_quic_stun.tls_quic.sha1_certificate_fingerprint);
       char sha1_str[20 /* sha1_siz */ * 2 + 1];
       static const char hexalnum[] = "0123456789ABCDEF";
-      for (size_t i = 0; i < sha1_siz; ++i) {
+      size_t i;
+      for (i = 0; i < sha1_siz; ++i) {
         u_int8_t lower = (sha1[i] & 0x0F);
         u_int8_t upper = (sha1[i] & 0xF0) >> 4;
         sha1_str[i*2] = hexalnum[upper];
@@ -1097,7 +1098,7 @@ static void tlsCheckUncommonALPN(struct ndpi_detection_module_struct *ndpi_struc
     
     if(!is_a_common_alpn(ndpi_struct, alpn_start, alpn_len)) {
 #ifdef DEBUG_TLS
-      printf("TLS uncommon ALPN found: %.*s\n", alpn_len, alpn);
+      printf("TLS uncommon ALPN found: %.*s\n", (int)alpn_len, alpn);
 #endif
       ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_UNCOMMON_ALPN);
       break;
@@ -1348,7 +1349,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      printf("Server TLS [ALPN: %u]\n", alpn_len);
 #endif
 
-	      if((alpn_str_len+alpn_len+1) < (sizeof(alpn_str)-1)) {
+	      if(((uint32_t)alpn_str_len+alpn_len+1) < (sizeof(alpn_str)-1)) {
 	        if(alpn_str_len > 0) {
 	          alpn_str[alpn_str_len] = ',';
 	          alpn_str_len++;
@@ -1823,7 +1824,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    continue;
 		  } else {
 		    /* Check for other duplications */
-		    u_int j, all_ok = 1;
+		    u_int all_ok = 1;
+		    int j;
 
 		    for(j=0; j<tot_signature_algorithms_len; j+=2) {
 		      if(j != i) {
@@ -1934,7 +1936,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    printf("Client TLS [ALPN: %u]\n", alpn_len);
 #endif
 
-		    if((alpn_str_len+alpn_len+1) < (sizeof(alpn_str)-1)) {
+		    if(((uint32_t)alpn_str_len+alpn_len+1) < (sizeof(alpn_str)-1)) {
 		      if(alpn_str_len > 0) {
 			alpn_str[alpn_str_len] = ',';
 			alpn_str_len++;
@@ -1968,7 +1970,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t s_offset = offset+extension_offset;
 		u_int8_t version_len = packet->payload[s_offset];
 		char version_str[256];
-		u_int8_t version_str_len = 0;
+		size_t version_str_len = 0;
 		version_str[0] = 0;
 #ifdef DEBUG_TLS
 		printf("Client TLS [TLS version len: %u]\n", version_len);

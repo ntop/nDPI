@@ -1008,7 +1008,8 @@ static u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id) {
 
 void correct_csv_data_field(char* data) {
   /* Replace , with ; to avoid issues with CSVs */
-  for(u_int i=0; data[i] != '\0'; i++) if(data[i] == ',') data[i] = ';';
+  u_int i;
+  for(i=0; data[i] != '\0'; i++) if(data[i] == ',') data[i] = ';';
 }
 
 /* ****************************************************** */
@@ -1621,7 +1622,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   ndpi_packet_tunnel tunnel_type = ndpi_no_tunnel;
 
   /* lengths and offsets */
-  u_int16_t eth_offset = 0;
+  u_int32_t eth_offset = 0;
   u_int16_t radio_len;
   u_int16_t fc;
   u_int16_t type = 0;
@@ -2172,6 +2173,7 @@ int dpdk_port_init(int port, struct rte_mempool *mbuf_pool) {
 int dpdk_port_deinit(int port) {
   rte_eth_dev_stop(port);
   rte_eth_dev_close(port);
+  return 0;
 }
 
 #endif

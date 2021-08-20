@@ -383,7 +383,7 @@ AC_ERROR_t ac_automata_finalize (AC_AUTOMATA_t * thiz) {
 int ac_automata_exact_match(AC_PATTERNS_t *mp,int pos, AC_TEXT_t *txt) {
     AC_PATTERN_t *patterns = mp->patterns;
     AC_PATTERN_t **matched = txt->match.matched;
-    int i;
+    unsigned int i;
     int match_map = 0;
     for(i=0; i < mp->num && i < ((sizeof(int)*8)-1); i++,patterns++) {
       do {

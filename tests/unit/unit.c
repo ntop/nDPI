@@ -68,7 +68,7 @@ int serializerUnitTest() {
 #ifdef HAVE_JSON_H
   ndpi_serializer serializer, deserializer;
   int i, loop_id;
-  ndpi_serialization_format fmt;
+  ndpi_serialization_format fmt = {0};
   u_int32_t buffer_len;
   char *buffer;
   enum json_tokener_error jerr;

@@ -687,7 +687,7 @@ extern "C" {
    *
    * @par  ndpi_mod = the detection module
    */
-  void ndpi_dump_risks_score();
+  void ndpi_dump_risks_score(void);
 
   /**
    * Read a file and load the protocols

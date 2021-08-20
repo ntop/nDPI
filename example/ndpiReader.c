@@ -66,7 +66,9 @@
 /** Client parameters **/
 
 static char *_pcap_file[MAX_NUM_READER_THREADS]; /**< Ingress pcap file/interfaces */
+#ifndef USE_DPDK
 static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playlist */
+#endif
 static FILE *results_file           = NULL;
 static char *results_path           = NULL;
 static char * bpfFilter             = NULL; /**< bpf filter  */
@@ -99,7 +101,10 @@ static struct timeval startup_time, begin, end;
 static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
 static struct timeval pcap_start = { 0, 0}, pcap_end = { 0, 0 };
-static struct bpf_program bpf_code,*bpf_cfilter = NULL;
+#ifndef USE_DPDK
+static struct bpf_program bpf_code;
+#endif
+static struct bpf_program *bpf_cfilter = NULL;
 /** Detection parameters **/
 static time_t capture_for = 0;
 static time_t capture_until = 0;
@@ -779,11 +784,14 @@ void printCSVHeader() {
  * @brief Option parser
  */
 static void parseOptions(int argc, char **argv) {
-  int option_idx = 0, do_capture = 0;
+  int option_idx = 0;
+  int opt;
+#ifndef USE_DPDK
   char *__pcap_file = NULL, *bind_mask = NULL;
-  int thread_id, opt;
+  int thread_id, do_capture = 0;
 #ifdef linux
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
+#endif
 #endif
 
 #ifdef USE_DPDK
@@ -847,9 +855,11 @@ static void parseOptions(int argc, char **argv) {
       bpfFilter = optarg;
       break;
 
+#ifndef USE_DPDK
     case 'g':
       bind_mask = optarg;
       break;
+#endif
 
     case 'l':
       num_loops = atoi(optarg);
@@ -969,9 +979,11 @@ static void parseOptions(int argc, char **argv) {
       extcap_config();
       break;
 
+#ifndef USE_DPDK
     case '5':
       do_capture = 1;
       break;
+#endif
 
     case '7':
       extcap_capture_fifo = strdup(optarg);
@@ -1668,7 +1680,8 @@ int updateIpTree(u_int32_t key, u_int8_t version,
 
     q->addr = key;
     q->version = version;
-    strncpy(q->proto, proto, sizeof(q->proto));
+    strncpy(q->proto, proto, sizeof(q->proto) - 1);
+    q->proto[sizeof(q->proto) - 1] = '\0';
     q->count = UPDATED_TREE;
     q->left = q->right = (addr_node *)0;
 
@@ -1703,7 +1716,8 @@ void updateTopIpAddress(u_int32_t addr, u_int8_t version, const char *proto,
   pair.addr = addr;
   pair.version = version;
   pair.count = count;
-  strncpy(pair.proto, proto, sizeof(pair.proto));
+  strncpy(pair.proto, proto, sizeof(pair.proto) - 1);
+  pair.proto[sizeof(pair.proto) - 1] = '\0';
 
   for(i=0; i<size; i++) {
     /* if the same ip with a bigger
@@ -1761,7 +1775,8 @@ static void updatePortStats(struct port_stats **stats, u_int32_t port,
 
     s->addr_tree->addr = addr;
     s->addr_tree->version = version;
-    strncpy(s->addr_tree->proto, proto, sizeof(s->addr_tree->proto));
+    strncpy(s->addr_tree->proto, proto, sizeof(s->addr_tree->proto) - 1);
+    s->addr_tree->proto[sizeof(s->addr_tree->proto) - 1] = '\0';
     s->addr_tree->count = 1;
     s->addr_tree->left = NULL;
     s->addr_tree->right = NULL;
@@ -1971,12 +1986,14 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
     sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
 
     /* get app level protocol */
-    if(flow->detected_protocol.master_protocol)
+    if(flow->detected_protocol.master_protocol) {
       ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			 flow->detected_protocol, proto, sizeof(proto));
-    else
+    } else {
       strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-					 flow->detected_protocol.app_protocol),sizeof(proto));
+					 flow->detected_protocol.app_protocol),sizeof(proto) - 1);
+      proto[sizeof(proto) - 1] = '\0';
+    }
 
     if(((r = strcmp(ipProto2Name(flow->protocol), "TCP")) == 0)
        && (flow->src2dst_packets == 1) && (flow->dst2src_packets == 0)) {
@@ -2354,7 +2371,7 @@ static void printFlowsStats() {
     ndpi_host_ja3_fingerprints *ja3ByHostsHashT = NULL; // outer hash table
     ndpi_ja3_fingerprints_host *hostByJA3C_ht = NULL;   // for client
     ndpi_ja3_fingerprints_host *hostByJA3S_ht = NULL;   // for server
-    int i;
+    unsigned int i;
     ndpi_host_ja3_fingerprints *ja3ByHost_element = NULL;
     ndpi_ja3_info *info_of_element = NULL;
     ndpi_host_ja3_fingerprints *tmp = NULL;
@@ -2860,7 +2877,7 @@ static void printFlowsStats() {
     for(i=0; i<num_flows; i++)
       printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
   } else if(csv_fp != NULL) {
-    int i;
+    unsigned int i;
 
     num_flows = 0;
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
@@ -3165,6 +3182,8 @@ void sigproc(int sig) {
 }
 
 
+#ifndef USE_DPDK
+
 /**
  * @brief Get the next pcap file from a passed playlist
  */
@@ -3188,7 +3207,6 @@ next_line:
   }
 }
 
-
 /**
  * @brief Configure the pcap handle
  */
@@ -3211,14 +3229,17 @@ static void configurePcapHandle(pcap_t * pcap_handle) {
   }
 }
 
+#endif
 
 /**
  * @brief Open a pcap file or a specified device - Always returns a valid pcap_t
  */
 static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_file) {
+#ifndef USE_DPDK
   u_int snaplen = 1536;
   int promisc = 1;
   char pcap_error_buffer[PCAP_ERRBUF_SIZE];
+#endif
   pcap_t * pcap_handle = NULL;
 
   /* trying to open a live interface */
@@ -3386,8 +3407,8 @@ static void ndpi_process_packet(u_char *args,
     printf("INTERNAL ERROR: ingress packet was modified by nDPI: this should not happen [thread_id=%u, packetId=%lu, caplen=%u]\n",
 	   thread_id, (unsigned long)ndpi_thread_info[thread_id].workflow->stats.raw_packet_count, header->caplen);
 
-  if((pcap_end.tv_sec-pcap_start.tv_sec) > pcap_analysis_duration) {
-    int i;
+  if((u_int32_t)(pcap_end.tv_sec-pcap_start.tv_sec) > pcap_analysis_duration) {
+    unsigned int i;
     u_int64_t processing_time_usec, setup_time_usec;
 
     gettimeofday(&end, NULL);
@@ -3420,6 +3441,7 @@ static void ndpi_process_packet(u_char *args,
   }
 }
 
+#ifndef USE_DPDK
 /**
  * @brief Call pcap_loop() to process packets from a live capture or savefile
  */
@@ -3435,13 +3457,16 @@ static void runPcapLoop(u_int16_t thread_id) {
       printf("Error while reading pcap file: '%s'\n", pcap_geterr(ndpi_thread_info[thread_id].workflow->pcap_handle));
   }
 }
+#endif
 
 /**
  * @brief Process a running thread
  */
 void * processing_thread(void *_thread_id) {
   long thread_id = (long) _thread_id;
+#ifndef USE_DPDK
   char pcap_error_buffer[PCAP_ERRBUF_SIZE];
+#endif
 
 #if defined(linux) && defined(HAVE_PTHREAD_SETAFFINITY_NP)
   if(core_affinity[thread_id] >= 0) {

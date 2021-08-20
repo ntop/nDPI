@@ -1048,7 +1048,7 @@ u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len) {
 char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
   size_t len = 0, ret_size;
   char *ret;
-  int i = 0;
+  int j, i = 0;
   unsigned char char_array_3[3];
   unsigned char char_array_4[4];
 
@@ -1072,7 +1072,7 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
   }
 
   if(i) {
-    for(int j = i; j < 3; j++)
+    for(j = i; j < 3; j++)
       char_array_3[j] = '\0';
 
     char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
@@ -1080,7 +1080,7 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
     char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
     char_array_4[3] = char_array_3[2] & 0x3f;
 
-    for(int j = 0; (j < i + 1); j++)
+    for(j = 0; (j < i + 1); j++)
       ret[len++] = base64_table[char_array_4[j]];
 
     while((i++ < 3))

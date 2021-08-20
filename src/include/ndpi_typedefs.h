@@ -1512,12 +1512,14 @@ struct ndpi_flow_struct {
   struct ndpi_id_struct *dst;
 };
 
+#define NDPI_PROTOCOL_DEFAULT_LEVEL	0
+
 typedef struct {
   char *string_to_match, *proto_name;
   u_int16_t protocol_id;
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
-  int level; /* 0 by default */
+  int level; /* NDPI_PROTOCOL_DEFAULT_LEVEL (0) by default */
 } ndpi_protocol_match;
 
 typedef struct {

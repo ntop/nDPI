@@ -723,7 +723,7 @@ static unsigned int imposible_bigrams_bitmap[(XGRAMS_C*XGRAMS_C+31)/32];
 static unsigned int trigrams_bitmap[(XGRAMS_C*XGRAMS_C*XGRAMS_C+31)/32];
   
 
-static void ndpi_xgrams_init(unsigned int *dst,size_t dn, const char **src,size_t sn,int l) {
+static void ndpi_xgrams_init(unsigned int *dst,size_t dn, const char **src,size_t sn, unsigned int l) {
   unsigned int i,j,c;
   for(i=0;i < sn && src[i]; i++) {
     for(j=0,c=0; j < l; j++) {
@@ -810,7 +810,7 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
 static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i, val;
 
-  for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
+  for(i = 0; i < ndpi_str->ndpi_num_supported_protocols; i++) {
     if(ndpi_str->proto_defaults[i].protoName == NULL) {
       NDPI_LOG_ERR(ndpi_str,
 		   "[NDPI] INTERNAL ERROR missing protoName initialization for [protoId=%d]: recovering\n", i);
@@ -2526,7 +2526,7 @@ void ndpi_finalize_automa(void *_automa) {
 static int ndpi_match_string_common(AC_AUTOMATA_t *automa, char *string_to_match,size_t string_len,
 				    u_int32_t *protocol_id, ndpi_protocol_category_t *category,
 				    ndpi_protocol_breed_t *breed) {
-  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
+  AC_REP_t match = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED, 0, 0, 0, 0, 0 };
   AC_TEXT_t ac_input_text;
   int rc;
 
@@ -2592,7 +2592,6 @@ int ndpi_match_string_protocol_id(void *automa, char *string_to_match,
 
 int ndpi_match_string_value(void *automa, char *string_to_match,
 			    u_int match_len, u_int32_t *num) {
-
   int rc = ndpi_match_string_common((AC_AUTOMATA_t *)automa, string_to_match,
 				    match_len, num, NULL, NULL);
   if(rc < 0) return rc;
@@ -3348,7 +3347,7 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
   char buffer[128];
   char *first_comma, *second_comma, *str;
   FILE *fd;
-  size_t len;
+  size_t i, len;
   int num = 0;
 
   if (ndpi_str->malicious_sha1_automa.ac_automa == NULL)
@@ -3384,7 +3383,7 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
       continue;
     second_comma[0] = '\0';
 
-    for (size_t i = 0; i < 40; ++i)
+    for (i = 0; i < 40; ++i)
       first_comma[i] = toupper(first_comma[i]);
 
     str = ndpi_strdup(first_comma);
@@ -4630,6 +4629,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
   u_int16_t proto_index = ndpi_str->proto_defaults[flow->guessed_protocol_id].protoIdx;
   u_int16_t proto_id = ndpi_str->proto_defaults[flow->guessed_protocol_id].protoId;
   NDPI_PROTOCOL_BITMASK detection_bitmask;
+  u_int32_t a;
 
   NDPI_SAVE_AS_BITMASK(detection_bitmask, flow->packet.detected_protocol_stack[0]);
 
@@ -4654,7 +4654,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 
   if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     {
-      for (u_int32_t a = 0; a < callback_buffer_size; a++) {
+      for (a = 0; a < callback_buffer_size; a++) {
         if ((func != callback_buffer[a].func) &&
             (callback_buffer[a].ndpi_selection_bitmask & ndpi_selection_packet) ==
 	    callback_buffer[a].ndpi_selection_bitmask &&
@@ -4675,7 +4675,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
     }
 
   /* Check for subprotocols. */
-  for (u_int32_t a = 0; a < ndpi_str->proto_defaults[flow->detected_protocol_stack[0]].subprotocol_count; a++)
+  for (a = 0; a < ndpi_str->proto_defaults[flow->detected_protocol_stack[0]].subprotocol_count; a++)
     {
       u_int16_t subproto_id = ndpi_str->proto_defaults[flow->detected_protocol_stack[0]].subprotocols[a];
       if (subproto_id == (uint16_t)NDPI_PROTOCOL_MATCHED_BY_CONTENT)
@@ -5493,7 +5493,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     a = NDPI_PROTOCOL_UNKNOWN;
 
   if(a != NDPI_PROTOCOL_UNKNOWN) {
-    int i;
+    unsigned int i;
 
     for(i = 0; i < sizeof(flow->host_server_name); i++) {
       if(flow->host_server_name[i] != '\0')
@@ -5812,7 +5812,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	diff = packet->payload_packet_len - a1;
 
 	if(diff > 0) {
-	  diff = ndpi_min(diff, sizeof(flow->initial_binary_bytes));
+	  diff = ndpi_min((unsigned int)diff, sizeof(flow->initial_binary_bytes));
 	  memcpy(&flow->initial_binary_bytes, &packet->payload[a1], diff);
 	  flow->initial_binary_bytes_len = diff;
 	}
@@ -6779,7 +6779,7 @@ void ndpi_dump_risks_score() {
 	 
   for(i = 1; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
-    ndpi_risk risk   = 2 << (r-1);
+    ndpi_risk risk   = (uint64_t)2 << (r-1);
     ndpi_risk_info* info = ndpi_risk2severity(r);
     ndpi_risk_severity s =info->severity;
     u_int16_t client_score, server_score;
@@ -6866,7 +6866,7 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
   rc = ndpi_match_string_common(((AC_AUTOMATA_t *) automa->ac_automa),
 				string_to_match,string_to_match_len, &ret_match->protocol_id,
 				&ret_match->protocol_category, &ret_match->protocol_breed);
-  return rc < 0 ? rc : ret_match->protocol_id;
+  return rc < 0 ? rc : (int)ret_match->protocol_id;
 }
 
 /* **************************************** */
@@ -7023,7 +7023,7 @@ u_int16_t ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *nd
 
 /* ****************************************************** */
 
-static inline int ndpi_match_xgram(unsigned int *map,int l,const char *str) {
+static inline int ndpi_match_xgram(unsigned int *map,unsigned int l,const char *str) {
   unsigned int i,c;
   for(i=0,c=0; *str && i < l; i++) {
     unsigned char a = (unsigned char)(*str++);
@@ -7066,7 +7066,7 @@ char *ndpi_revision() {
 /* ****************************************************** */
 
 int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b) {
-  int i;
+  unsigned int i;
 
   for(i = 0; i < NDPI_NUM_FDS_BITS; i++) {
     if(a.fds_bits[i] & b.fds_bits[i])
@@ -7078,7 +7078,7 @@ int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b) {
 
 #ifdef CODE_UNUSED
 int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a) {
-  int i;
+  unsigned int i;
 
   for(i = 0; i < NDPI_NUM_FDS_BITS; i++)
     if(a.fds_bits[i] != 0)
@@ -7088,7 +7088,7 @@ int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a) {
 }
 
 void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
-  int i;
+  unsigned int i;
 
   for(i = 0; i < NDPI_NUM_FDS_BITS; i++)
     printf("[%d=%u]", i, a.fds_bits[i]);
@@ -7508,11 +7508,11 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     len = strlen(name);
 
     if(len >= 5) {
-      int i, j, num_found = 0, num_impossible = 0, num_bigram_checks = 0,
+      int num_found = 0, num_impossible = 0, num_bigram_checks = 0,
 	num_trigram_found = 0, num_trigram_checked = 0, num_dash = 0,
 	num_digits = 0, num_vowels = 0, num_trigram_vowels = 0, num_words = 0, skip_next_bigram = 0;
       char tmp[128], *word, *tok_tmp;
-      u_int max_tmp_len = sizeof(tmp)-1;
+      u_int i, j, max_tmp_len = sizeof(tmp)-1;
 
       len = snprintf(tmp, max_tmp_len, "%s", name);
       if(len < 0) {
@@ -7522,9 +7522,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	return(0);
       } else
-	tmp[len < max_tmp_len ? len : max_tmp_len] = '\0';
+	tmp[(u_int)len < max_tmp_len ? (u_int)len : max_tmp_len] = '\0';
 
-      for(i=0, j=0; (i<len) && (j<max_tmp_len); i++) {
+      for(i=0, j=0; (i<(u_int)len) && (j<max_tmp_len); i++) {
 	tmp[j] = tolower(name[i]);
 
 	if(tmp[j] == '.') {
@@ -7546,7 +7546,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	if(isdigit(tmp[j])) {
 	  num_digits++;
 	  
-	  if(((j+2)<len) && isdigit(tmp[j+1]) && (tmp[j+2] == '.')) {
+	  if(((j+2)<(u_int)len) && isdigit(tmp[j+1]) && (tmp[j+2] == '.')) {
 	    /* Check if there are too many digits */
 	    if(num_digits < 4)
 	      return(0); /* Double digits */
@@ -7646,6 +7646,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	    */
 	    if(word[i+1] == '-')
 	      return(0); /* Double dash */
+	    continue;
 
 	  case '_':
 	  case ':':
