@@ -558,9 +558,9 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		    }
 		  }
 
-		  if(!flow->l4.tcp.tls.subprotocol_detected)
+		  if(!flow->protos.tls_quic_stun.tls_quic.subprotocol_detected)
 		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, dNSName, len))
-		      flow->l4.tcp.tls.subprotocol_detected = 1;
+		      flow->protos.tls_quic_stun.tls_quic.subprotocol_detected = 1;
 
 		  i += len;
 		} else {
@@ -764,7 +764,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   case 0x01: /* Client Hello */
   case 0x02: /* Server Hello */
     processClientServerHello(ndpi_struct, flow, 0);
-    flow->l4.tcp.tls.hello_processed = 1;
+    flow->protos.tls_quic_stun.tls_quic.hello_processed = 1;
     ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
 
 #ifdef DEBUG_TLS
@@ -784,7 +784,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   case 0x0b: /* Certificate */
     /* Important: populate the tls union fields only after
      * ndpi_int_tls_add_connection has been called */
-    if(flow->l4.tcp.tls.hello_processed) {
+    if(flow->protos.tls_quic_stun.tls_quic.hello_processed) {
       ret = processCertificate(ndpi_struct, flow);
       if (ret != 1) {
 #ifdef DEBUG_TLS
@@ -1694,10 +1694,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		    if(!is_quic) {
 		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
-		        flow->l4.tcp.tls.subprotocol_detected = 1;
+		        flow->protos.tls_quic_stun.tls_quic.subprotocol_detected = 1;
 		    } else {
 		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
-		        flow->l4.tcp.tls.subprotocol_detected = 1;
+		        flow->protos.tls_quic_stun.tls_quic.subprotocol_detected = 1;
 		    }
 
 		    if(ndpi_check_dga_name(ndpi_struct, flow,

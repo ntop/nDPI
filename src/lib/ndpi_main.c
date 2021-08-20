@@ -4834,13 +4834,13 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       *protocol_was_guessed = 1;
       ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
     }
-    else if((flow->l4.tcp.tls.hello_processed == 1) &&
+    else if((flow->protos.tls_quic_stun.tls_quic.hello_processed == 1) &&
 	    (flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0')) {
       *protocol_was_guessed = 1;
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
     } else if(enable_guess) {
       if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) && (flow->packet.l4_protocol == IPPROTO_TCP) &&
-	 flow->l4.tcp.tls.hello_processed)
+	 flow->protos.tls_quic_stun.tls_quic.hello_processed)
 	flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 
       guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
@@ -5138,7 +5138,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
       }
     }
 
-    if(flow->l4.tcp.tls.hello_processed == 1 &&
+    if(flow->protos.tls_quic_stun.tls_quic.hello_processed == 1 &&
        flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0') {
       u_int32_t id;
       int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.tls_quic_stun.tls_quic.client_requested_server_name,
