@@ -346,17 +346,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	    u_int16_t realm_len = ntohs(*((u_int16_t*)&payload[offset+2]));
 
 	    if(flow->host_server_name[0] == '\0') {
-	      u_int j, i = (realm_len > sizeof(flow->host_server_name)) ? sizeof(flow->host_server_name) : realm_len;
+	      u_int i;
 	      u_int k = offset+4;
 
-	      memset(flow->host_server_name, 0, sizeof(flow->host_server_name));
-
-	      for(j=0; j<i; j++) {
-		if((k+i) < payload_length)
-		  flow->host_server_name[j] = payload[k++];
-		else
-		  break;
-	      }
+	      i = ndpi_min(realm_len, sizeof(flow->host_server_name) - 1);
+	      i = ndpi_min(i, payload_length - k);
+	      memcpy(flow->host_server_name, payload + k, i);
+	      flow->host_server_name[i] = '\0';
 	    
 #ifdef DEBUG_STUN
 	      printf("==> [%s]\n", flow->host_server_name);
@@ -367,6 +363,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
                 return(NDPI_IS_STUN);
 	      } else if(strstr((char*) flow->host_server_name, "whispersystems.org") != NULL) {
 		flow->guessed_host_protocol_id = NDPI_PROTOCOL_SIGNAL;
+		return(NDPI_IS_STUN);
+	      } else if(strstr((char*) flow->host_server_name, "facebook") != NULL) {
+		flow->guessed_host_protocol_id = NDPI_PROTOCOL_MESSENGER;
 		return(NDPI_IS_STUN);
 	      }
 	    }
