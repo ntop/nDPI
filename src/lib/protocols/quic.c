@@ -196,7 +196,14 @@ int quic_len(const uint8_t *buf, uint64_t *value)
     *value = ntohl(*(uint32_t *)buf) & 0x3FFFFFFF;
     return 4;
   case 3:
-    *value = ndpi_ntohll(*(uint64_t *)buf) & 0x3FFFFFFFFFFFFFFF;
+    {
+      u_int64_t n;
+      
+      /* Necessary as simple cast crashes on ARM */
+      memcpy(&n, buf, sizeof(u_int64_t));    
+      
+      *value = ndpi_ntohll(n & 0x3FFFFFFFFFFFFFFF);
+    }
     return 8;
   default: /* No Possible */
     return 0;
