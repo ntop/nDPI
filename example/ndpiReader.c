@@ -2963,7 +2963,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   if(!quiet_mode) {
     printf("\nnDPI Memory statistics:\n");
     printf("\tnDPI Memory (once):      %-13s\n", formatBytes(ndpi_get_ndpi_detection_module_size(), buf, sizeof(buf)));
-    printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(sizeof(struct ndpi_flow_struct), buf, sizeof(buf)));
+    printf("\tFlow Memory (per flow):  %-13s\n", formatBytes( ndpi_detection_get_sizeof_ndpi_flow_struct() + 2*ndpi_detection_get_sizeof_ndpi_id_struct(), buf, sizeof(buf)));
     printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
     printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
     printf("\tSetup Time:              %lu msec\n", (unsigned long)(setup_time_usec/1000));
