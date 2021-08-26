@@ -292,6 +292,7 @@ typedef enum {
   NDPI_PROTOCOL_LIKEE                 = 261,
   NDPI_PROTOCOL_GITLAB                = 262,
   NDPI_PROTOCOL_AVAST_SECUREDNS       = 263, /* Toni Uhlig <matzeton@googlemail.com> */
+  NDPI_PROTOCOL_CASSANDRA             = 264, /* Lucas Santos <lfneiva.santos@gmail.com> */
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
