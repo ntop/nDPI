@@ -327,13 +327,13 @@ int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins)
 void ndpi_free_bin(struct ndpi_bin *b) {
   switch(b->family) {
   case ndpi_bin_family8:
-    free(b->u.bins8);
+    ndpi_free(b->u.bins8);
     break;
   case ndpi_bin_family16:
-    free(b->u.bins16);
+    ndpi_free(b->u.bins16);
     break;
   case ndpi_bin_family32:
-    free(b->u.bins32);
+    ndpi_free(b->u.bins32);
     break;
   }
 }
@@ -350,7 +350,7 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
   switch(out->family) {
   case ndpi_bin_family8:
     if((out->u.bins8 = (u_int8_t*)ndpi_calloc(out->num_bins, sizeof(u_int8_t))) == NULL) {
-      free(out);
+      ndpi_free(out);
       return(NULL);
     } else
       memcpy(out->u.bins8, b->u.bins8, out->num_bins*sizeof(u_int8_t));
@@ -358,7 +358,7 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
 
   case ndpi_bin_family16:
     if((out->u.bins16 = (u_int16_t*)ndpi_calloc(out->num_bins, sizeof(u_int16_t))) == NULL) {
-      free(out);
+      ndpi_free(out);
       return(NULL);
     } else
       memcpy(out->u.bins16, b->u.bins16, out->num_bins*sizeof(u_int16_t));
@@ -366,7 +366,7 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
 
   case ndpi_bin_family32:
     if((out->u.bins32 = (u_int32_t*)ndpi_calloc(out->num_bins, sizeof(u_int32_t))) == NULL) {
-      free(out);
+      ndpi_free(out);
       return(NULL);
     } else
       memcpy(out->u.bins32, b->u.bins32, out->num_bins*sizeof(u_int32_t));
@@ -840,8 +840,8 @@ int ndpi_alloc_rsi(struct ndpi_rsi_struct *s, u_int16_t num_learning_values) {
     s->last_value = 0;
     return(0);
   } else {
-    if(s->gains)  free(s->gains);
-    if(s->losses) free(s->losses);
+    if(s->gains)  ndpi_free(s->gains);
+    if(s->losses) ndpi_free(s->losses);
     return(-1);
   }
 }
@@ -987,7 +987,7 @@ int ndpi_hw_init(struct ndpi_hw_struct *hw,
     return(-1);
 
   if((hw->s = (double*)ndpi_calloc(hw->params.num_season_periods, sizeof(double))) == NULL) {
-    free(hw->y);
+    ndpi_free(hw->y);
     return(-1);
   }
 
