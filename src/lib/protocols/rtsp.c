@@ -42,9 +42,6 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
-
   NDPI_LOG_DBG(ndpi_struct, "search RTSP\n");
 
   if (packet->parsed_lines == 0)
@@ -84,20 +81,7 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
     if((memcmp(packet->payload, "RTSP/1.0 ", 9) == 0)
        || (strstr(buf, "rtsp://") != NULL)) {
       NDPI_LOG_DBG2(ndpi_struct, "found RTSP/1.0 \n");
-      if (dst != NULL) {
-	NDPI_LOG_DBG2(ndpi_struct, "found dst\n");
-	ndpi_packet_src_ip_get(packet, &dst->rtsp_ip_address);
-	dst->rtsp_timer = packet->current_time_ms;
-	dst->rtsp_ts_set = 1;
-      }
-      if (src != NULL) {
-	NDPI_LOG_DBG2(ndpi_struct, "found src\n");
-	ndpi_packet_dst_ip_get(packet, &src->rtsp_ip_address);
-	src->rtsp_timer = packet->current_time_ms;
-	src->rtsp_ts_set = 1;
-      }
       NDPI_LOG_INFO(ndpi_struct, "found RTSP\n");
-      flow->rtsp_control_flow = 1;
       ndpi_int_rtsp_add_connection(ndpi_struct, flow);
       return;
     }

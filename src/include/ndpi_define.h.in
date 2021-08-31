@@ -172,10 +172,7 @@
 #define NDPI_GNUTELLA_CONNECTION_TIMEOUT                        60
 #define NDPI_BATTLEFIELD_CONNECTION_TIMEOUT                     60
 #define NDPI_THUNDER_CONNECTION_TIMEOUT                         30
-#define NDPI_RTSP_CONNECTION_TIMEOUT                             5
 #define NDPI_TVANTS_CONNECTION_TIMEOUT                           5
-#define NDPI_YAHOO_DETECT_HTTP_CONNECTIONS                       1
-#define NDPI_YAHOO_LAN_VIDEO_TIMEOUT                            30
 #define NDPI_ZATTOO_CONNECTION_TIMEOUT                         120
 #define NDPI_ZATTOO_FLASH_TIMEOUT                                5
 #define NDPI_JABBER_STUN_TIMEOUT                                30

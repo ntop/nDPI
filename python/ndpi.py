@@ -439,8 +439,6 @@ struct ndpi_id_struct {
      to compare this, use:
   **/
   NDPI_PROTOCOL_BITMASK detected_protocol_bitmask;
-  /* NDPI_PROTOCOL_RTSP */
-  ndpi_ip_addr_t rtsp_ip_address;
 
   /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
   /* NDPI_PROTOCOL_IRC */
@@ -454,9 +452,6 @@ struct ndpi_id_struct {
 
   /* NDPI_PROTOCOL_THUNDER */
   uint32_t thunder_ts;
-
-  /* NDPI_PROTOCOL_RTSP */
-  uint32_t rtsp_timer;
 
   /* NDPI_PROTOCOL_ZATTOO */
   uint32_t zattoo_ts;
@@ -492,8 +487,6 @@ struct ndpi_id_struct {
 
   /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   uint8_t jabber_voice_stun_used_ports;
-
-  uint8_t rtsp_ts_set:1;
 };
 
 struct ndpi_flow_tcp_struct {
@@ -503,14 +496,8 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_MAIL_POP */
   uint16_t pop_command_bitmask;
 
-  /* NDPI_PROTOCOL_QQ */
-  uint16_t qq_nxt_len;
-
   /* NDPI_PROTOCOL_WHATSAPP */
   uint8_t wa_matched_so_far;
-
-  /* NDPI_PROTOCOL_TDS */
-  uint8_t tds_login_version;
 
   /* NDPI_PROTOCOL_IRC */
   uint8_t irc_stage;
@@ -531,34 +518,15 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_SOULSEEK */
   uint32_t soulseek_stage:2;
 
-  /* NDPI_PROTOCOL_TDS */
-  uint32_t tds_stage:3;
-
   /* NDPI_PROTOCOL_USENET */
   uint32_t usenet_stage:2;
 
-  /* NDPI_PROTOCOL_IMESH */
-  uint32_t imesh_stage:4;
-
   /* NDPI_PROTOCOL_HTTP */
-  uint32_t http_setup_dir:2;
   uint32_t http_stage:2;
   uint32_t http_empty_line_seen:1;
-  uint32_t http_wait_for_retransmission:1;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   uint32_t gnutella_stage:2;		       // 0 - 2
-
-  /* NDPI_CONTENT_MMS */
-  uint32_t mms_stage:2;
-
-  /* NDPI_PROTOCOL_YAHOO */
-  uint32_t yahoo_sip_comm:1;
-  uint32_t yahoo_http_proxy_stage:2;
-
-  /* NDPI_PROTOCOL_MSN */
-  uint32_t msn_stage:3;
-  uint32_t msn_ssl_ft:2;
 
   /* NDPI_PROTOCOL_SSH */
   uint32_t ssh_stage:3;
@@ -575,8 +543,6 @@ struct ndpi_flow_tcp_struct {
       unsigned buffer_len, buffer_used;
     } message;
 
-    void* srv_cert_fingerprint_ctx; /* SHA-1 */
-
     /* NDPI_PROTOCOL_TLS */
     uint8_t certificate_processed:1, fingerprint_set:1, _pad:6;
     uint8_t sha1_certificate_fingerprint[20], num_tls_blocks;
@@ -586,8 +552,7 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_POSTGRES */
   uint32_t postgres_stage:3;
 
-  /* NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK */
-  uint32_t ddlink_server_direction:1;
+  /* Part of the TCP header. */
   uint32_t seen_syn:1;
   uint32_t seen_syn_ack:1;
   uint32_t seen_ack:1;
@@ -603,9 +568,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_WORLDOFWARCRAFT */
   uint32_t wow_stage:2;
-
-  /* NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV */
-  uint32_t veoh_tv_stage:2;
 
   /* NDPI_PROTOCOL_SHOUTCAST */
   uint32_t shoutcast_stage:2;
@@ -646,12 +608,6 @@ struct ndpi_flow_tcp_struct {
 };
 
 struct ndpi_flow_udp_struct {
-  /* NDPI_PROTOCOL_SNMP */
-  uint32_t snmp_msg_id;
-
-  /* NDPI_PROTOCOL_SNMP */
-  uint32_t snmp_stage:2;
-
   /* NDPI_PROTOCOL_PPSTREAM */
   uint32_t ppstream_stage:3;		  // 0 - 7
 
@@ -666,9 +622,6 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_XBOX */
   uint32_t xbox_stage:1;
-
-  /* NDPI_PROTOCOL_WINDOWS_UPDATE */
-  uint32_t wsus_stage:1;
 
   /* NDPI_PROTOCOL_SKYPE */
   uint8_t skype_packet_id;
@@ -708,7 +661,6 @@ struct ndpi_packet_struct {
   uint64_t current_time_ms;
 
   uint16_t detected_protocol_stack[2];
-  uint16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[64];
   /* HTTP headers */
@@ -737,14 +689,12 @@ struct ndpi_packet_struct {
   uint16_t actual_payload_len;
   uint16_t num_retried_bytes;
   uint16_t parsed_lines;
-  uint16_t parsed_unix_lines;
   uint16_t empty_line_position;
   uint8_t tcp_retransmission;
   uint8_t l4_protocol;
 
-  uint8_t tls_certificate_detected:4, tls_certificate_num_checks:4;
   uint8_t packet_lines_parsed_complete:1,
-  packet_direction:1, empty_line_position_set:1, pad:5;
+  packet_direction:1, empty_line_position_set:1, http_check_content:1, pad:4;
 };
 
 struct ndpi_detection_module_struct;
@@ -960,13 +910,8 @@ struct ndpi_detection_module_struct {
   uint32_t thunder_timeout;
   /* SoulSeek parameters */
   uint32_t soulseek_connection_ip_tick_timeout;
-  /* rtsp parameters */
-  uint32_t rtsp_connection_timeout;
   /* rstp */
   uint32_t orb_rstp_ts_timeout;
-  /* yahoo */
-  uint8_t yahoo_detect_http_connections;
-  uint32_t yahoo_lan_video_timeout;
   uint32_t zattoo_connection_timeout;
   uint32_t jabber_stun_timeout;
   uint32_t jabber_file_transfer_timeout;
@@ -1008,7 +953,6 @@ typedef enum {
 
 struct ndpi_flow_struct {
   uint16_t detected_protocol_stack[2];
-  uint16_t protocol_stack_info;
   /* init parameter, internal used to set up timestamp,... */
   uint16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
   uint8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1,
@@ -1035,11 +979,6 @@ struct ndpi_flow_struct {
   /* Place textual flow info here */
   char flow_extra_info[16];
 
-  /*
-    Pointer to src or dst that identifies the
-    server of this connection
-  */
-  struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
   uint8_t host_server_name[240];
   uint8_t initial_binary_bytes[8], initial_binary_bytes_len;
@@ -1179,23 +1118,14 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_DIRECTCONNECT */
   uint8_t directconnect_stage:2;	      // 0 - 1
 
-  /* NDPI_PROTOCOL_YAHOO */
-  uint8_t sip_yahoo_voice:1;
-
   /* NDPI_PROTOCOL_HTTP */
   uint8_t http_detected:1;
 
   /* NDPI_PROTOCOL_RTSP */
-  uint8_t rtsprdt_stage:2, rtsp_control_flow:1;
-
-  /* NDPI_PROTOCOL_YAHOO */
-  uint8_t yahoo_detection_finished:2;
+  uint8_t rtsprdt_stage:2;
 
   /* NDPI_PROTOCOL_ZATTOO */
   uint8_t zattoo_stage:3;
-
-  /* NDPI_PROTOCOL_QQ */
-  uint8_t qq_stage:3;
 
   /* NDPI_PROTOCOL_THUNDER */
   uint8_t thunder_stage:2;		        // 0 - 3
@@ -1240,7 +1170,6 @@ struct ndpi_flow_struct {
   uint32_t csgo_id2;
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
-  struct ndpi_flow_struct *flow;
   struct ndpi_id_struct *src;
   struct ndpi_id_struct *dst;
 };

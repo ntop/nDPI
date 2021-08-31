@@ -47,8 +47,6 @@ void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_struct, str
 	
 	flow->host_server_name[i] = '\0';
 	
-	flow->server_id = ((sport == 43) || (sport == 4343)) ? flow->src : flow->dst;
-	
 	NDPI_LOG_INFO(ndpi_struct, "[WHOIS/DAS] %s\n", flow->host_server_name);
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN);
 	return;
