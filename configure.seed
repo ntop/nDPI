@@ -79,6 +79,8 @@ fi
 
 NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
 
+echo "Setting API version to $NDPI_API_VERSION"
+
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
