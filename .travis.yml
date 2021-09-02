@@ -4,6 +4,11 @@ matrix:
   include:
     - os: osx
       compiler: clang
+      addons:
+        homebrew:
+          packages:
+            - libgcrypt
+            - json-c
 
     - os: linux
       env: BUILD_DPKG_PACKAGE=y CFLAGS="-Werror"
