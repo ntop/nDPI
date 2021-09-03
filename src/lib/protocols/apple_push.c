@@ -29,7 +29,7 @@
 
 static void ndpi_check_apple_push(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(packet->iph) {
     /* https://support.apple.com/en-us/HT203609 */

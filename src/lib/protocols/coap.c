@@ -106,7 +106,7 @@ static int isCoAPport(u_int16_t port) {
 void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   struct ndpi_coap_hdr * h = (struct ndpi_coap_hdr*) packet->payload;
 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
@@ -115,8 +115,8 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
 
   // search for udp packet
   if(packet->udp != NULL) {
-    u_int16_t s_port = ntohs(flow->packet.udp->source);
-    u_int16_t d_port = ntohs(flow->packet.udp->dest);
+    u_int16_t s_port = ntohs(packet->udp->source);
+    u_int16_t d_port = ntohs(packet->udp->dest);
 
     if((!isCoAPport(s_port) && !isCoAPport(d_port))
        || (packet->payload_packet_len < 4) ) {   // header too short

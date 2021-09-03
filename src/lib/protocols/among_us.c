@@ -33,7 +33,7 @@ static void ndpi_int_among_us_add_connection(struct ndpi_detection_module_struct
 void ndpi_search_among_us(struct ndpi_detection_module_struct *ndpi_struct,
                           struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct * const packet = &flow->packet;
+  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
 
   /* handshake packet */
   if (packet->payload_packet_len > 9 &&

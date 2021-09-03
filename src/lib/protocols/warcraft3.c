@@ -37,7 +37,7 @@ static void ndpi_int_warcraft3_add_connection(struct ndpi_detection_module_struc
 void ndpi_search_warcraft3(struct ndpi_detection_module_struct
 			   *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
   u_int16_t l; /* 
 		  Leave it as u_int32_t because otherwise 'u_int16_t temp' 

@@ -101,7 +101,7 @@ static void ndpi_search_sopcast_tcp(struct ndpi_detection_module_struct
 				    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
 
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
   if (flow->packet_counter == 1 && packet->payload_packet_len == 54 && get_u_int16_t(packet->payload, 0) == ntohs(0x0036)) {
     if (ndpi_int_is_sopcast_tcp(packet->payload, packet->payload_packet_len)) {
@@ -118,7 +118,7 @@ static void ndpi_search_sopcast_tcp(struct ndpi_detection_module_struct
 static void ndpi_search_sopcast_udp(struct ndpi_detection_module_struct
 				    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
   NDPI_LOG_DBG(ndpi_struct, "search sopcast.  \n");
 
@@ -202,7 +202,7 @@ static void ndpi_search_sopcast_udp(struct ndpi_detection_module_struct
 void ndpi_search_sopcast(struct ndpi_detection_module_struct
 			 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if (packet->udp != NULL)
     ndpi_search_sopcast_udp(ndpi_struct, flow);

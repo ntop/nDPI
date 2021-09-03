@@ -30,7 +30,7 @@
 
 void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /* Check connection over TCP */
   NDPI_LOG_DBG(ndpi_struct, "search IEC60870\n");

@@ -58,7 +58,7 @@ static void popInitExtraPacketProcessing(struct ndpi_flow_struct *flow);
 
 static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_module_struct
 						       *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
   if(packet->payload_packet_len > 4) {
     if((packet->payload[0] == 'A' || packet->payload[0] == 'a')
@@ -147,7 +147,7 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
 void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
 			      *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t a = 0;
   u_int8_t bit_count = 0;
 

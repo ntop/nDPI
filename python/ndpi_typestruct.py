@@ -276,11 +276,9 @@ NDPIDetectionModuleStruct._fields_ = [
     ("tinc_cache", POINTER(Cache)),
     ("proto_defaults", NDPIProtoDefaultsT * (ndpi.ndpi_wrap_ndpi_max_supported_protocols() +
                                              ndpi.ndpi_wrap_ndpi_max_num_custom_protocols())),
-    ("http_dont_dissect_response", c_uint8, 1),
-    ("dns_dont_dissect_response", c_uint8, 1),
     ("direction_detect_disable", c_uint8, 1),
-    ("disable_metadata_export", c_uint8, 1),
-    ("hyperscan", c_void_p)
+    ('_pad', c_uint8, 7),
+    ('packet', NDPIPacketStruct),
 ]
 
 
@@ -408,6 +406,12 @@ class NDPIFlowUdpStruct(Structure):
         ('memcached_matches', c_uint8),
         ('wireguard_stage', c_uint8),
         ('wireguard_peer_index', c_uint32 * 2),
+        ('quic_reasm_buf', POINTER(c_uint8)),
+        ('quic_reasm_buf_len', c_uint32),
+        ('csgo_strid', c_uint8 * 18),
+        ('csgo_state', c_uint8),
+        ('csgo_s2', c_uint8),
+        ('csgo_id2', c_uint32),
     ]
 
 
@@ -735,15 +739,9 @@ NDPIFlowStruct._fields_ = [
     ('starcraft_udp_stage', c_uint8, 3),
     ('ovpn_session_id', c_uint8 * 8),
     ('ovpn_counter', c_uint8),
+    ('key_mining_cache', c_uint32),
     ('tinc_state', c_uint8),
     ('TincCacheEntry', TincCacheEntry),
-    ('csgo_strid', c_uint8 * 18),
-    ('csgo_state', c_uint8),
-    ('csgo_s2', c_uint8),
-    ('csgo_id2', c_uint32),
-    ('kxun_counter', c_uint16),
-    ('iqiyi_counter', c_uint16),
-    ('packet', NDPIPacketStruct),
     ('src', POINTER(NDPIIdStruct)),
     ('dst', POINTER(NDPIIdStruct))
 ]

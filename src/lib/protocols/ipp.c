@@ -37,7 +37,7 @@ static void ndpi_int_ipp_add_connection(struct ndpi_detection_module_struct *ndp
 
 void ndpi_search_ipp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;	
+	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	u_int8_t i;
 
 	NDPI_LOG_DBG(ndpi_struct, "search ipp\n");

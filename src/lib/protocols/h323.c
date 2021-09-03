@@ -33,7 +33,7 @@ struct tpkt {
 
 void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t dport = 0, sport = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search H323\n");

@@ -50,7 +50,7 @@ static void ndpi_int_direct_download_link_add_connection(struct ndpi_detection_m
 */
 u_int8_t search_ddl_domains(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t filename_start = 0;
   u_int16_t i = 1;
   u_int16_t host_line_len_without_port;

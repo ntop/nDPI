@@ -28,7 +28,7 @@
 void ndpi_search_megaco(struct ndpi_detection_module_struct *ndpi_struct,
 			struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   
   NDPI_LOG_DBG(ndpi_struct, "search for MEGACO\n");
   

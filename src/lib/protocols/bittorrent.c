@@ -63,19 +63,21 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 					      int bt_offset, int check_hash,
 					      const u_int8_t save_detection, const u_int8_t encrypted_connection)
 {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
   if(check_hash) {
     const char *bt_hash = NULL; /* 20 bytes long */
     
     if(bt_offset == -1) {
-      const char *bt_magic = ndpi_strnstr((const char *)flow->packet.payload,
-					  "BitTorrent protocol", flow->packet.payload_packet_len);
+      const char *bt_magic = ndpi_strnstr((const char *)packet->payload,
+					  "BitTorrent protocol", packet->payload_packet_len);
 
       if(bt_magic)
 	bt_hash = &bt_magic[19];
     } else
-      bt_hash = (const char*)&flow->packet.payload[28];
+      bt_hash = (const char*)&packet->payload[28];
 
-    if(bt_hash && (flow->packet.payload_packet_len >= (20 + (bt_hash-(const char*)flow->packet.payload))))
+    if(bt_hash && (packet->payload_packet_len >= (20 + (bt_hash-(const char*)packet->payload))))
       memcpy(flow->protos.bittorrent.hash, bt_hash, 20);
   }
 
@@ -85,7 +87,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module_struct
 						    *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t a = 0;
 
   if(packet->payload_packet_len == 1 && packet->payload[0] == 0x13) {
@@ -359,7 +361,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 /*Search for BitTorrent commands*/
 static void ndpi_int_search_bittorrent_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(packet->payload_packet_len == 0) {
     return;
@@ -384,7 +386,7 @@ static u_int8_t is_port(u_int16_t a, u_int16_t b, u_int16_t what) {
   
 void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   char *bt_proto = NULL;
 
   /* This is broadcast */

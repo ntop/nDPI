@@ -929,7 +929,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
 				       uint32_t *clear_payload_len)
 {
   uint64_t token_length, payload_length, packet_number;
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   uint8_t first_byte;
   uint32_t pkn32, pn_offset, pkn_len, offset;
   quic_ciphers ciphers; /* Client initial ciphers */
@@ -1235,7 +1235,7 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
 				  struct ndpi_flow_struct *flow,
 				  uint32_t version, uint32_t *clear_payload_len)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t *clear_payload;
   u_int8_t dest_conn_id_len;
 #ifdef HAVE_LIBGCRYPT
@@ -1286,7 +1286,7 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
 			const u_int8_t *crypto_data, uint32_t crypto_data_len,
 			uint32_t version)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /* Overwriting packet payload */
   u_int16_t p_len;
@@ -1409,7 +1409,7 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow,
 			      uint32_t *version)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t first_byte;
   u_int8_t pub_bit1, pub_bit2, pub_bit3, pub_bit4, pub_bit5, pub_bit7, pub_bit8;
   u_int8_t dest_conn_id_len, source_conn_id_len;
@@ -1529,7 +1529,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /* We are elaborating a packet following the initial CHLO/ClientHello.
      Two cases:

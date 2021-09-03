@@ -34,7 +34,7 @@ static void ndpi_int_ftp_data_add_connection(struct ndpi_detection_module_struct
 }
 
 static int ndpi_match_ftp_data_port(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /* Check connection over TCP */
   if(packet->tcp) {
@@ -46,7 +46,7 @@ static int ndpi_match_ftp_data_port(struct ndpi_detection_module_struct *ndpi_st
 }
 
 static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
   if(payload_len > 10) {
@@ -70,7 +70,7 @@ static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *nd
 }
 
 static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
   /* A FTP packet is pretty long so 256 is a bit conservative but it should be OK */
@@ -226,7 +226,7 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 static void ndpi_check_ftp_data(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /*
     Make sure we see the beginning of the connection as otherwise we might have

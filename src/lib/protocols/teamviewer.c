@@ -39,7 +39,7 @@ static void ndpi_int_teamview_add_connection(struct ndpi_detection_module_struct
 
 void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search teamwiewer\n");
   /*
@@ -48,9 +48,9 @@ void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struct, stru
 
     http://myip.ms/view/ip_owners/144885/Teamviewer_Gmbh.html
   */
-  if(flow->packet.iph) {
-    u_int32_t src = ntohl(flow->packet.iph->saddr);
-    u_int32_t dst = ntohl(flow->packet.iph->daddr);
+  if(packet->iph) {
+    u_int32_t src = ntohl(packet->iph->saddr);
+    u_int32_t dst = ntohl(packet->iph->daddr);
 
     /* 95.211.37.195 - 95.211.37.203 */
     if(((src >= 1607673283) && (src <= 1607673291))

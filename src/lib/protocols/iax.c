@@ -39,7 +39,7 @@ static void ndpi_int_iax_add_connection(struct ndpi_detection_module_struct *ndp
 
 static void ndpi_search_setup_iax(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t i;
   u_int16_t packet_len;
 
@@ -87,7 +87,7 @@ static void ndpi_search_setup_iax(struct ndpi_detection_module_struct *ndpi_stru
 
 void ndpi_search_iax(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(packet->udp 
      && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN))

@@ -29,7 +29,7 @@
 
 static void ndpi_check_targus_getdata(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(packet->iph) {
     u_int16_t targus_getdata_port       = ntohs(5201);

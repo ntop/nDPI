@@ -40,11 +40,11 @@ struct stun_packet_header {
 
 /* ************************************************************ */
 
-u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
+u_int32_t get_stun_lru_key(struct ndpi_packet_struct *packet, u_int8_t rev) {
   if(rev)
-    return(flow->packet.iph->daddr + flow->packet.udp->dest);
+    return(packet->iph->daddr + packet->udp->dest);
   else
-    return(flow->packet.iph->saddr + flow->packet.udp->source);
+    return(packet->iph->saddr + packet->udp->source);
 }
 
 /* ************************************************************ */
@@ -52,15 +52,17 @@ u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
 void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow,
 				  u_int proto, u_int app_proto) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
   if(ndpi_struct->stun_cache == NULL)
     ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
 
   if(ndpi_struct->stun_cache
-     && flow->packet.iph
-     && flow->packet.udp
+     && packet->iph
+     && packet->udp
      && (app_proto != NDPI_PROTOCOL_UNKNOWN)
      ) /* Cache flow sender info */ {
-    u_int32_t key = get_stun_lru_key(flow, 0);
+    u_int32_t key = get_stun_lru_key(packet, 0);
     u_int16_t cached_proto;
 
     if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key,
@@ -70,7 +72,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 #endif
       app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
     } else {
-      u_int32_t key_rev = get_stun_lru_key(flow, 1);
+      u_int32_t key_rev = get_stun_lru_key(packet, 1);
 
       if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key_rev,
 			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
@@ -146,12 +148,13 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   struct ndpi_flow_struct *flow,
 					   const u_int8_t * payload,
 					   const u_int16_t payload_length) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t msg_type, msg_len;
   int rc;
   
-  if(flow->packet.iph &&
-     ((flow->packet.iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */) ||
-     ((ntohl(flow->packet.iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */))) {
+  if(packet->iph &&
+     ((packet->iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */) ||
+     ((ntohl(packet->iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */))) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return(NDPI_IS_NOT_STUN);
   }
@@ -193,7 +196,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     */
     if(payload[0] == 0x16) {
       /* Let's check if this is DTLS used by some socials */
-      struct ndpi_packet_struct *packet = &flow->packet;
+      struct ndpi_packet_struct *packet = &ndpi_struct->packet;
       u_int16_t total_len, version = htons(*((u_int16_t*) &packet->payload[1]));
 
       switch (version) {
@@ -220,7 +223,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   if(ndpi_struct->stun_cache) {
     u_int16_t proto;
-    u_int32_t key = get_stun_lru_key(flow, 0);
+    u_int32_t key = get_stun_lru_key(packet, 0);
     int rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto,
                                  0 /* Don't remove it as it can be used for other connections */);
 
@@ -229,7 +232,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
     if(!rc) {
-      key = get_stun_lru_key(flow, 1);
+      key = get_stun_lru_key(packet, 1);
       rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto,
                                0 /* Don't remove it as it can be used for other connections */);
 
@@ -468,8 +471,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
  udp_stun_found:
   flow->protos.tls_quic_stun.stun.num_processed_pkts++;
 
-  struct ndpi_packet_struct *packet = &flow->packet;
-
 #ifdef DEBUG_STUN
   printf("==>> NDPI_PROTOCOL_WHATSAPP_CALL\n");
 #endif
@@ -486,7 +487,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
 void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 

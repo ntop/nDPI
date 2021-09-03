@@ -645,6 +645,14 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_WIREGUARD */
   uint8_t wireguard_stage;
   uint32_t wireguard_peer_index[2];
+
+  /* NDPI_PROTOCOL_QUIC */
+  u_int8_t *quic_reasm_buf;
+  u_int32_t quic_reasm_buf_len;
+
+  /* NDPI_PROTOCOL_CSGO */
+  uint8_t csgo_strid[18],csgo_state,csgo_s2;
+  uint32_t csgo_id2;
 };
 
 struct ndpi_int_one_line_struct {
@@ -941,6 +949,9 @@ struct ndpi_detection_module_struct {
 
   uint8_t direction_detect_disable:1, /* disable internal detection of packet direction */
     _pad:7;
+
+  /* Current packet */
+  struct ndpi_packet_struct packet;
 };
 
 #define NDPI_CIPHER_SAFE                        0
@@ -1163,15 +1174,13 @@ struct ndpi_flow_struct {
   uint8_t ovpn_session_id[8];
   uint8_t ovpn_counter;
 
+  /* Flow key used to search a match into the mining cache */
+  u_int32_t key_mining_cache;
+
   /* NDPI_PROTOCOL_TINC */
   uint8_t tinc_state;
   struct tinc_cache_entry tinc_cache_entry;
 
-  /* NDPI_PROTOCOL_CSGO */
-  uint8_t csgo_strid[18],csgo_state,csgo_s2;
-  uint32_t csgo_id2;
-  /* internal structures to save functions calls */
-  struct ndpi_packet_struct packet;
   struct ndpi_id_struct *src;
   struct ndpi_id_struct *dst;
 };

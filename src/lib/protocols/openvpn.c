@@ -81,7 +81,7 @@ int8_t check_pkid_and_detect_hmac_size(const u_int8_t * payload) {
 
 void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
                          struct ndpi_flow_struct* flow) {
-  struct ndpi_packet_struct* packet = &flow->packet;
+  struct ndpi_packet_struct* packet = &ndpi_struct->packet;
   const u_int8_t * ovpn_payload = packet->payload;
   const u_int8_t * session_remote;
   u_int8_t opcode;

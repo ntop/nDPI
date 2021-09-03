@@ -156,7 +156,7 @@ static int ndpi_edonkey_payload_check(const u_int8_t *data, u_int32_t len) {
 }
 
 static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
  
   /* Break after 20 packets. */

@@ -87,7 +87,7 @@ static int z3950_parse_sequences(struct ndpi_packet_struct const * const packet,
 
 static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
                               struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct * packet = &flow->packet;
+  struct ndpi_packet_struct * packet = &ndpi_struct->packet;
   int const minimum_expected_sequences = 6;
 
   NDPI_LOG_DBG(ndpi_struct, "search z39.50\n");

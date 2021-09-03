@@ -28,7 +28,7 @@ static int is_port(u_int16_t a, u_int16_t b, u_int16_t c) {
 }
 
 static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
   int i;
   const uint8_t id_flags_iv_crc_len = 11;
@@ -67,7 +67,7 @@ static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_
 }
 
 static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 

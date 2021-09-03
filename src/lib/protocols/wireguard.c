@@ -42,7 +42,7 @@ enum wg_message_type {
 void ndpi_search_wireguard(struct ndpi_detection_module_struct
 			   *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *payload = packet->payload;
   u_int8_t message_type = payload[0];
 

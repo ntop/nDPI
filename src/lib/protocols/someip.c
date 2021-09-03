@@ -101,7 +101,7 @@ static u_int32_t someip_data_cover_32(const u_int8_t *data)
 void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 			 struct ndpi_flow_struct *flow)
 {
-  const struct ndpi_packet_struct *packet = &flow->packet;
+  const struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   
   if (packet->payload_packet_len < 16) {
     NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,

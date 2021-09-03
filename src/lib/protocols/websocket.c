@@ -61,7 +61,7 @@ static void set_websocket_detected(struct ndpi_detection_module_struct *ndpi_str
 
 static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-    struct ndpi_packet_struct *packet = &flow->packet;
+    struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
     if (packet->payload_packet_len < sizeof(u_int16_t))
     {
