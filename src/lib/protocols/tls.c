@@ -97,12 +97,6 @@ union ja3_info {
 #define TLS_THRESHOLD             34387200 /* Threshold for certificate validity                                */
 #define TLS_LIMIT_DATE            1598918400 /* From 01/09/2020 TLS certificates lifespan is limited to 13 months */
 
-/* skype.c */
-extern u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
-			      struct ndpi_flow_struct *flow);
-
-/* stun.c */
-extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow, u_int32_t protocol);
