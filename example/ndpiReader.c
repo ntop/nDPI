@@ -787,9 +787,10 @@ static void parseOptions(int argc, char **argv) {
   int option_idx = 0;
   int opt;
 #ifndef USE_DPDK
-  char *__pcap_file = NULL, *bind_mask = NULL;
+  char *__pcap_file = NULL;
   int thread_id, do_capture = 0;
 #ifdef linux
+  char *bind_mask = NULL;
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 #endif
@@ -856,9 +857,11 @@ static void parseOptions(int argc, char **argv) {
       break;
 
 #ifndef USE_DPDK
+#ifdef linux
     case 'g':
       bind_mask = optarg;
       break;
+#endif
 #endif
 
     case 'l':
