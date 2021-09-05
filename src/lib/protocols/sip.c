@@ -178,8 +178,6 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 
 void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-
   NDPI_LOG_DBG(ndpi_struct, "search sip\n");
 
   if(flow->packet_counter > 5)
@@ -187,9 +185,7 @@ void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   else {
     /* skip marked packets */
     if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {
-      if(packet->tcp_retransmission == 0) {
-	ndpi_search_sip_handshake(ndpi_struct, flow);
-      }
+      ndpi_search_sip_handshake(ndpi_struct, flow);
     }
   }
 }
@@ -199,7 +195,7 @@ void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
   ndpi_set_bitmask_protocol_detection("SIP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_SIP,
 				      ndpi_search_sip,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,/* Fix courtesy of Miguel Quesada <mquesadab@gmail.com> */
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,/* Fix courtesy of Miguel Quesada <mquesadab@gmail.com> */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

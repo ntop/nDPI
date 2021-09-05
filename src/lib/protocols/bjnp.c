@@ -36,15 +36,11 @@ static void ndpi_check_bjnp(struct ndpi_detection_module_struct *ndpi_struct, st
 
 void ndpi_search_bjnp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-
   NDPI_LOG_DBG(ndpi_struct, "search bjnp\n");
 
   /* skip marked packets */
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BJNP) {
-    if (packet->tcp_retransmission == 0) {
-      ndpi_check_bjnp(ndpi_struct, flow);
-    }
+    ndpi_check_bjnp(ndpi_struct, flow);
   }
 }
 

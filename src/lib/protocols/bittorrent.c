@@ -406,8 +406,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
 
-    if((packet->tcp != NULL)
-	&& (packet->tcp_retransmission == 0 || packet->num_retried_bytes)) {
+    if(packet->tcp != NULL) {
       ndpi_int_search_bittorrent_tcp(ndpi_struct, flow);
     } else if(packet->udp != NULL) {
       /* UDP */
@@ -505,7 +504,7 @@ void init_bittorrent_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("BitTorrent", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_BITTORRENT,
 				      ndpi_search_bittorrent,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
