@@ -742,7 +742,7 @@ void extcap_capture() {
 void printCSVHeader() {
   if(!csv_fp) return;
 
-  fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,duration,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,server_name,");
+  fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,duration,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,server_name_sni,");
   fprintf(csv_fp, "benign_score,dos_slow_score,dos_goldeneye_score,dos_hulk_score,ddos_score,hearthbleed_score,ftp_patator_score,ssh_patator_score,infiltration_score,");
   fprintf(csv_fp, "c_to_s_pkts,c_to_s_bytes,c_to_s_goodput_bytes,s_to_c_pkts,s_to_c_bytes,s_to_c_goodput_bytes,");
   fprintf(csv_fp, "data_ratio,str_data_ratio,c_to_s_goodput_ratio,s_to_c_goodput_ratio,");
@@ -767,7 +767,7 @@ void printCSVHeader() {
   fprintf(csv_fp, "c_to_s_init_win,s_to_c_init_win,");
 
   /* Flow info */
-  fprintf(csv_fp, "client_info,server_info,");
+  fprintf(csv_fp, "server_info,");
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "tls_alpn,tls_supported_versions,");
@@ -1311,8 +1311,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
    /* TCP window */
    fprintf(csv_fp, "%u,%u,", flow->c_to_s_init_win, flow->s_to_c_init_win);
 
-    fprintf(csv_fp, "%s,%s,",
-	    (flow->ssh_tls.client_requested_server_name[0] != '\0')  ? flow->ssh_tls.client_requested_server_name : "",
+    fprintf(csv_fp, "%s,",
 	    (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
 
     fprintf(csv_fp, "%s,%s,%s,%s,%s,",
@@ -1421,7 +1420,15 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(flow->telnet.username)  fprintf(out, "[Username: %s]", flow->telnet.username);
   if(flow->telnet.password)  fprintf(out, "[Password: %s]", flow->telnet.password);
-  if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
+
+  if((flow->detected_protocol.master_protocol != NDPI_PROTOCOL_TLS)
+     && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_TLS)
+     && (flow->detected_protocol.master_protocol != NDPI_PROTOCOL_QUIC)
+     && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_QUIC)
+     && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_SSH)
+     && (flow->detected_protocol.master_protocol != NDPI_PROTOCOL_SSH)) {
+    if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
+  }
 
   if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
   if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);
@@ -1482,7 +1489,16 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   }
   
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ndpi_flow, flow->ssh_tls.ssl_version, &known_tls));
-  if(flow->ssh_tls.client_requested_server_name[0] != '\0') fprintf(out, "[Client: %s]", flow->ssh_tls.client_requested_server_name);
+
+  if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
+     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
+     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_QUIC)
+     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_QUIC)
+     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH)
+     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)) {
+    if(flow->host_server_name[0] != '\0') fprintf(out, "[Client: %s]", flow->host_server_name);
+  }
+
   if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 
   if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
@@ -2424,7 +2440,7 @@ static void printFlowsStats() {
 	    newHost->host_server_info_hasht = NULL;
 	    newHost->ip_string = all_flows[i].flow->src_name;
 	    newHost->ip = all_flows[i].flow->src_ip;
-	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;
+	    newHost->dns_name = all_flows[i].flow->host_server_name;
 
 	    ndpi_ja3_info *newJA3 = ndpi_malloc(sizeof(ndpi_ja3_info));
 	    newJA3->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
@@ -2457,7 +2473,7 @@ static void printFlowsStats() {
 
 	    newHost->ip = all_flows[i].flow->src_ip;
 	    newHost->ip_string = all_flows[i].flow->src_name;
-	    newHost->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;;
+	    newHost->dns_name = all_flows[i].flow->host_server_name;
 
 	    ndpi_ja3_fingerprints_host *newElement = ndpi_malloc(sizeof(ndpi_ja3_fingerprints_host));
 	    newElement->ja3 = all_flows[i].flow->ssh_tls.ja3_client;
@@ -2474,7 +2490,7 @@ static void printFlowsStats() {
 	      ndpi_ip_dns *newInnerElement = ndpi_malloc(sizeof(ndpi_ip_dns));
 	      newInnerElement->ip = all_flows[i].flow->src_ip;
 	      newInnerElement->ip_string = all_flows[i].flow->src_name;
-	      newInnerElement->dns_name = all_flows[i].flow->ssh_tls.client_requested_server_name;
+	      newInnerElement->dns_name = all_flows[i].flow->host_server_name;
 	      HASH_ADD_INT(hostByJA3Found->ipToDNS_ht, ip, newInnerElement);
 	    }
 	  }
@@ -2829,8 +2845,8 @@ static void printFlowsStats() {
 	      printf("][similarity: %f]",
 		     (similarity = ndpi_bin_similarity(&centroids[j], &bins[i], 0)));
 
-	      if(all_flows[i].flow->ssh_tls.client_requested_server_name[0] != '\0')
-		fprintf(out, "[%s]", all_flows[i].flow->ssh_tls.client_requested_server_name);
+	      if(all_flows[i].flow->host_server_name[0] != '\0')
+		fprintf(out, "[%s]", all_flows[i].flow->host_server_name);
 
 	      if(enable_doh_dot_detection) {
 		if(((all_flows[i].flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)

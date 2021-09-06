@@ -686,7 +686,7 @@ NDPIFlowStruct._fields_ = [
     ("num_processed_pkts", c_uint8),
     ("extra_packets_func", CFUNCTYPE(c_int, POINTER(NDPIDetectionModuleStruct), POINTER(NDPIFlowStruct))),
     ("l4", L4),
-    ("host_server_name", c_ubyte * 256),
+    ("host_server_name", c_char * 80),
     ("http", Http),
     ("stun", Stun),
     ("ftp_imap_pop_smtp", FtpImapPopSmtp),

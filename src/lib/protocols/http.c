@@ -371,8 +371,8 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     if(double_col) double_col[0] = '\0';
     
     if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP,
-				    (char *)flow->host_server_name,
-				    strlen((const char *)flow->host_server_name)) == 0) {
+				    flow->host_server_name,
+				    strlen(flow->host_server_name)) == 0) {
       if(flow->http.url &&
          ((strstr(flow->http.url, ":8080/downloading?n=0.") != NULL)
           || (strstr(flow->http.url, ":8080/upload?n=0.") != NULL))) {
@@ -566,12 +566,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 		  packet->host_line.len, packet->host_line.ptr);
 
     /* Copy result for nDPI apps */
-    len = ndpi_min(packet->host_line.len, sizeof(flow->host_server_name)-1);
-    strncpy((char*)flow->host_server_name, (char*)packet->host_line.ptr, len);
-    flow->host_server_name[len] = '\0';
+    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len);
     flow->extra_packets_func = NULL; /* We're good now */
 
-    if(len > 0) ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
+    if(strlen(flow->host_server_name) > 0) ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
 
     if(packet->forwarded_line.ptr) {
       len = ndpi_min(packet->forwarded_line.len, sizeof(flow->http.nat_ip)-1);

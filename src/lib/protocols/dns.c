@@ -368,6 +368,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query);
     ndpi_protocol ret;
     u_int num_queries, idx;
+    char _hostname[256];
 
     ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     ret.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : ((d_port == MDNS_PORT) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
@@ -378,7 +379,6 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     }
 
     /* extract host name server */
-    max_len = sizeof(flow->host_server_name)-1;
     off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
     /* Before continuing let's dissect the following queries to see if they are valid */
@@ -434,6 +434,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     } /* for */
 
     u_int8_t hostname_is_valid = 1;
+    max_len = sizeof(_hostname)-1;
     while((j < max_len) && (off < packet->payload_packet_len) && (packet->payload[off] != '\0')) {
       uint8_t c, cl = packet->payload[off++];
 
@@ -443,40 +444,43 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	break;
       }
 
-      if(j && (j < max_len)) flow->host_server_name[j++] = '.';
+      if(j && (j < max_len)) _hostname[j++] = '.';
 
-	  while((j < max_len) && (cl != 0)) {
-		  u_int32_t shift;
+      while((j < max_len) && (cl != 0)) {
+	u_int32_t shift;
 
-		  c = packet->payload[off++];
-		  shift = ((u_int32_t) 1) << (c & 0x1f);
-		  if ((dns_validchar[c >> 5] & shift)) {
-			  flow->host_server_name[j++] = tolower(c);
-		  } else {
-			  if (isprint(c) == 0) {
-			    hostname_is_valid = 0;
-			    flow->host_server_name[j++] = '?';
-			  } else {
-			    flow->host_server_name[j++] = '_';
-			  }
-		  }
-		  cl--;
-	  }
+        c = packet->payload[off++];
+        shift = ((u_int32_t) 1) << (c & 0x1f);
+        if((dns_validchar[c >> 5] & shift)) {
+          _hostname[j++] = tolower(c);
+	} else {
+          if (isprint(c) == 0) {
+            hostname_is_valid = 0;
+            _hostname[j++] = '?';
+	  } else {
+            _hostname[j++] = '_';
+          }
+	}
+	cl--;
+      }
     }
+
+    _hostname[j] = '\0';
+
+    ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, j);
+
     if (hostname_is_valid == 0) {
       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
     }
 
-    flow->host_server_name[j] = '\0';
-
     if(j > 0) {
       ndpi_protocol_match_result ret_match;
 
-      ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
+      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
 
       ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
-						     (char *)flow->host_server_name,
-						     strlen((const char*)flow->host_server_name),
+						     flow->host_server_name,
+						     strlen(flow->host_server_name),
 						     &ret_match,
 						     NDPI_PROTOCOL_DNS);
 

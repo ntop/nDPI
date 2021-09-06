@@ -1193,8 +1193,14 @@ struct ndpi_flow_struct {
   /* Place textual flow info here */
   char flow_extra_info[16];
 
-  /* HTTP host or DNS query */
-  u_char host_server_name[240];
+  /* General purpose field used to save mainly hostname/SNI information.
+   * In details it used for: DNS and NETBIOS name, HTTP and DHCP hostname,
+   * WHOIS request, TLS/QUIC server name and STUN realm.
+   *
+   * Please, think *very* hard before increasing its size!
+   */
+  char host_server_name[80];
+
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
   u_int8_t risk_checked:1, ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, _notused:5;
   ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
@@ -1262,7 +1268,6 @@ struct ndpi_flow_struct {
     struct {
       char ssl_version_str[12];
       u_int16_t ssl_version, server_names_len;
-      char client_requested_server_name[256]; /* SNI hostname length: RFC 4366 */
       char *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       u_int32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];

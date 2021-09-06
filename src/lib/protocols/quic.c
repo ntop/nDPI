@@ -1324,7 +1324,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   uint32_t i;
   uint16_t num_tags;
   uint32_t prev_offset;
-  uint32_t tag_offset_start, offset, len, sni_len;
+  uint32_t tag_offset_start, offset, len;
   ndpi_protocol_match_result ret_match;
   int sni_found = 0, ua_found = 0;
 
@@ -1356,22 +1356,20 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 	   crypto_data_len, tag_offset_start, prev_offset, offset, len);
 #endif
     if(memcmp(tag, "SNI\0", 4) == 0) {
-      sni_len = MIN(len, sizeof(flow->protos.tls_quic.client_requested_server_name) - 1);
-      memcpy(flow->protos.tls_quic.client_requested_server_name,
-             &crypto_data[tag_offset_start + prev_offset], sni_len);
-      flow->protos.tls_quic.client_requested_server_name[sni_len] = '\0';
+
+      ndpi_hostname_sni_set(flow, &crypto_data[tag_offset_start + prev_offset], len);
 
       NDPI_LOG_DBG2(ndpi_struct, "SNI: [%s]\n",
-                    flow->protos.tls_quic.client_requested_server_name);
+                    flow->host_server_name);
 
       ndpi_match_host_subprotocol(ndpi_struct, flow,
-                                  (char *)flow->protos.tls_quic.client_requested_server_name,
-                                  strlen((const char*)flow->protos.tls_quic.client_requested_server_name),
+                                  flow->host_server_name,
+                                  strlen(flow->host_server_name),
                                   &ret_match, NDPI_PROTOCOL_QUIC);
       flow->protos.tls_quic.hello_processed = 1; /* Allow matching of custom categories */
 
       ndpi_check_dga_name(ndpi_struct, flow,
-                          flow->protos.tls_quic.client_requested_server_name, 1);
+                          flow->host_server_name, 1);
 
       sni_found = 1;
       if (ua_found)
@@ -1396,7 +1394,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Something went wrong in tags iteration\n");
 
   /* Add check for missing SNI */
-  if(flow->protos.tls_quic.client_requested_server_name[0] == '\0') {
+  if(flow->host_server_name[0] == '\0') {
     /* This is a bit suspicious */
     ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_MISSING_SNI);
   }
@@ -1508,7 +1506,7 @@ static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struc
    */
 
   if((version == V_Q046 &&
-      flow->protos.tls_quic.client_requested_server_name[0] == '\0') ||
+      flow->host_server_name[0] == '\0') ||
      is_ch_reassembler_pending(flow)) {
     NDPI_LOG_DBG2(ndpi_struct, "We have further work to do\n");
     return 1;

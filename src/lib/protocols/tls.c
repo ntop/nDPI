@@ -478,7 +478,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       u_int8_t matched_name = 0;
 
       /* If the client hello was not observed or the requested name was missing, there is no need to trigger an alert */
-      if(flow->protos.tls_quic.client_requested_server_name[0] == '\0')
+      if(flow->host_server_name[0] == '\0')
 	matched_name = 1;
 	
 #ifdef DEBUG_TLS
@@ -520,7 +520,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 #if DEBUG_TLS
 		  printf("[TLS] dNSName %s [%s][len: %u][leftover: %d]\n", dNSName,
-			 flow->protos.tls_quic.client_requested_server_name, len,
+			 flow->host_server_name, len,
 			 packet->payload_packet_len-i-len);
 #endif
 		  if (ndpi_is_printable_string(dNSName, len) == 0) {
@@ -530,27 +530,24 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		  if(matched_name == 0) {
 #if DEBUG_TLS
 		    printf("[TLS] Trying to match '%s' with '%s'\n",
-			   flow->protos.tls_quic.client_requested_server_name,
+			   flow->host_server_name,
 			   dNSName);
 #endif
 
-		    if(flow->protos.tls_quic.client_requested_server_name[0] == '\0')
+		    if(flow->host_server_name[0] == '\0') {
 		      matched_name = 1;	/* No SNI */
-		    else if (dNSName[0] == '*')
-		      {
-			char * label = strstr(flow->protos.tls_quic.client_requested_server_name, &dNSName[1]);
+		    } else if (dNSName[0] == '*') {
+		      char * label = strstr(flow->host_server_name, &dNSName[1]);
 
-			if (label != NULL)
-			  {
-			    char * first_dot = strchr(flow->protos.tls_quic.client_requested_server_name, '.');
+		      if (label != NULL) {
+		        char * first_dot = strchr(flow->host_server_name, '.');
 
-			    if (first_dot == NULL || first_dot >= label)
-			      {
-				matched_name = 1;
-			      }
-			  }
-		      }
-		    else if(strcmp(flow->protos.tls_quic.client_requested_server_name, dNSName) == 0) {
+			if (first_dot == NULL || first_dot >= label) {
+                          matched_name = 1;
+			}
+                      }
+		    }
+		    else if(strcmp(flow->host_server_name, dNSName) == 0) {
 		      matched_name = 1;
 		    }
 		  }
@@ -1244,7 +1241,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t i, j;
   u_int16_t total_len;
   u_int8_t handshake_type;
-  char buffer[64] = { '\0' };
   int is_quic = (quic_version != 0);
   int is_dtls = packet->udp && (!is_quic);
 
@@ -1721,50 +1717,41 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if((offset+extension_offset+4) < packet->payload_packet_len) {
 
 		  len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
-		  len = (u_int)ndpi_min(len, sizeof(buffer)-1);
 
 		  if((offset+extension_offset+5+len) <= packet->payload_packet_len) {
-		    strncpy(buffer, (char*)&packet->payload[offset+extension_offset+5], len);
-		    buffer[len] = '\0';
 
-		    cleanupServerName(buffer, sizeof(buffer));
-
-		    snprintf(flow->protos.tls_quic.client_requested_server_name,
-			     sizeof(flow->protos.tls_quic.client_requested_server_name),
-			     "%s", buffer);
+		    char *sni = ndpi_hostname_sni_set(flow, &packet->payload[offset+extension_offset+5], len);
+		    int sni_len = strlen(sni);
 #ifdef DEBUG_TLS
-		    printf("[TLS] SNI: [%s]\n", buffer);
+		    printf("[TLS] SNI: [%s]\n", sni);
 #endif
-		    if (ndpi_is_printable_string(buffer, len) == 0)
+		    if (ndpi_is_printable_string(sni, sni_len) == 0)
 		    {
 		       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
 		    }
 
 		    if(!is_quic) {
-		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, buffer, strlen(buffer)))
+		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, sni, sni_len))
 		        flow->protos.tls_quic.subprotocol_detected = 1;
 		    } else {
-		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, buffer, strlen(buffer)))
+		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, sni, sni_len))
 		        flow->protos.tls_quic.subprotocol_detected = 1;
 		    }
 
 		    if(ndpi_check_dga_name(ndpi_struct, flow,
-					   flow->protos.tls_quic.client_requested_server_name, 1)) {
-		      char *sni = flow->protos.tls_quic.client_requested_server_name;
-		      int len = strlen(sni);
-
+					   sni, 1)) {
 #ifdef DEBUG_TLS
-		      printf("[TLS] SNI: (DGA) [%s]\n", flow->protos.tls_quic.client_requested_server_name);
+		      printf("[TLS] SNI: (DGA) [%s]\n", sni);
 #endif
 
-		      if((len >= 4)
+		      if((sni_len >= 4)
 		         /* Check if it ends in .com or .net */
-		         && ((strcmp(&sni[len-4], ".com") == 0) || (strcmp(&sni[len-4], ".net") == 0))
+		         && ((strcmp(&sni[sni_len-4], ".com") == 0) || (strcmp(&sni[sni_len-4], ".net") == 0))
 		         && (strncmp(sni, "www.", 4) == 0)) /* Not starting with www.... */
 		        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TOR, NDPI_PROTOCOL_TLS);
 		    } else {
 #ifdef DEBUG_TLS
-		      printf("[TLS] SNI: (NO DGA) [%s]\n", flow->protos.tls_quic.client_requested_server_name);
+		      printf("[TLS] SNI: (NO DGA) [%s]\n", sni);
 #endif
 		    }
 		  } else {
@@ -2268,12 +2255,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    /* Suspicious Domain Fronting:
 	       https://github.com/SixGenInc/Noctilucent/blob/master/docs/ */
 	    if(flow->protos.tls_quic.encrypted_sni.esni &&
-	       flow->protos.tls_quic.client_requested_server_name[0] != '\0') {
+	       flow->host_server_name[0] != '\0') {
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
 	    }
 
 	    /* Add check for missing SNI */
-	    if((flow->protos.tls_quic.client_requested_server_name[0] == 0)
+	    if(flow->host_server_name[0] == '\0'
 	       && (flow->protos.tls_quic.ssl_version >= 0x0302) /* TLSv1.1 */
 	       && (flow->protos.tls_quic.encrypted_sni.esni == NULL) /* No ESNI */
 	       ) {

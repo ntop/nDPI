@@ -147,12 +147,11 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		   && (packet->line[a].ptr[i+1] != '\n')) {
 		  len = i-4;
 		  /* Copy result for nDPI apps */
-		  len = ndpi_min(len, sizeof(flow->host_server_name)-1);
-		  strncpy((char*)flow->host_server_name, (char*)&packet->line[a].ptr[4], len);
-		  flow->host_server_name[len] = '\0';
-		  if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
-					          (char *)flow->host_server_name,
-					          strlen((const char *)flow->host_server_name))) {
+		  ndpi_hostname_sni_set(flow, &packet->line[a].ptr[4], len);
+
+		  if (ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
+						   flow->host_server_name,
+						   strlen(flow->host_server_name))) {
 		    /* We set the protocols; we need to initialize extra dissection
 		       to search for credentials */
 		    NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname matched\n");

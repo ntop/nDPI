@@ -197,7 +197,7 @@ typedef struct ndpi_flow_info {
 
   char info[255];
   char flow_extra_info[16];
-  char host_server_name[240];
+  char host_server_name[80]; /* Hostname/SNI */
   char *bittorent_hash;
   char *dhcp_fingerprint;
   char *dhcp_class_ident;
@@ -205,7 +205,7 @@ typedef struct ndpi_flow_info {
   
   struct {
     u_int16_t ssl_version;
-    char client_requested_server_name[256], server_info[64],
+    char server_info[64],
       client_hassh[33], server_hassh[33], *server_names,
       *tls_alpn, *tls_supported_versions,
       *tls_issuerDN, *tls_subjectDN,

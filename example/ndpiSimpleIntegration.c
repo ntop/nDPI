@@ -924,7 +924,7 @@ static void ndpi_process_packet(uint8_t * const args,
 		     ndpi_ssl_version2str(flow_to_process->ndpi_flow,
 					  flow_to_process->ndpi_flow->protos.tls_quic.ssl_version,
 					  &unknown_tls_version),
-		     flow_to_process->ndpi_flow->protos.tls_quic.client_requested_server_name,
+		     flow_to_process->ndpi_flow->host_server_name,
 		     (flow_to_process->ndpi_flow->protos.tls_quic.alpn != NULL ?
 		      flow_to_process->ndpi_flow->protos.tls_quic.alpn : "-"));
 	      flow_to_process->tls_client_hello_seen = 1;

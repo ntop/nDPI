@@ -1105,8 +1105,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {
-    char *name = (char*)flow->ndpi_flow->host_server_name; /* Trick to avoid warning(s) */
-    snprintf(flow->info, sizeof(flow->info), "%s", name);
+    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->host_server_name);
   }
   /* UBNTAC2 */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_UBNTAC2)) {
@@ -1161,8 +1160,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     if(flow->ndpi_flow->protos.telnet.password[0] != '\0')
       flow->telnet.password = ndpi_strdup(flow->ndpi_flow->protos.telnet.password);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)) {
-    snprintf(flow->ssh_tls.client_requested_server_name,
-	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
+    snprintf(flow->host_server_name,
+	     sizeof(flow->host_server_name), "%s",
 	     flow->ndpi_flow->protos.ssh.client_signature);
     snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
 	     flow->ndpi_flow->protos.ssh.server_signature);
@@ -1178,9 +1177,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	  || (flow->ndpi_flow->protos.tls_quic.ja3_client[0] != '\0')
 	  ) {
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.tls_quic.ssl_version;
-    snprintf(flow->ssh_tls.client_requested_server_name,
-	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
-	     flow->ndpi_flow->protos.tls_quic.client_requested_server_name);
 
     snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
 
