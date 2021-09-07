@@ -346,6 +346,11 @@
 #define snprintf _snprintf
 #endif
 
+#if defined(WIN32)
+#undef strtok_r
+#define strtok_r strtok_s
+#endif
+
 #define NDPI_MAX_DNS_REQUESTS                   16
 #define NDPI_MIN_NUM_STUN_DETECTION             8
 
