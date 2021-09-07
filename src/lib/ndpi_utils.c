@@ -1782,7 +1782,13 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_SUSPICIOUS_ENTROPY:
     return("Suspicious entropy");
-
+    
+  case NDPI_DNS_DIMENSION_ALERT:
+    return("DNS packet is larger than 512 bytes");
+    
+  case NDPI_DNS_FRAGMENTED:
+    return("DNS message is fragmented");
+  
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
