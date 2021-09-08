@@ -107,7 +107,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TLS_FATAL_ALERT,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_SUSPICIOUS_ENTROPY,                    NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
   
-  { NDPI_DNS_DIMENSION_ALERT,                   NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_DNS_LARGE_PACKET,                      NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_DNS_FRAGMENTED,                        NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
 
   /* Leave this as last member */
