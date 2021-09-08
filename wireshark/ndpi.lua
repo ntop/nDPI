@@ -75,11 +75,11 @@ flow_risks[33] = ProtoField.bool("ndpi.flow_risk.suspicious_extension", "TLS sus
 flow_risks[34] = ProtoField.bool("ndpi.flow_risk.fatal_alert", "TLS fatal alert detected", num_bits_flow_risks, nil, bit(2), "nDPI Flow Risk: TLS fatal alert")
 flow_risks[35] = ProtoField.bool("ndpi.flow_risk.suspicious_entropy", "Suspicious entropy", num_bits_flow_risks, nil, bit(3), "nDPI Flow Risk: suspicious entropy")
 
-flow_risks[36] = ProtoField.bool("ndpi.flow_risk.dns_large_packet", "DNS large packet", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: DNS packet is larger than 512 bytes")
-flow_risks[37] = ProtoField.bool("ndpi.flow_risk.dns_fragmented", "DNS fragmented", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: DNS message is fragmented")
+flow_risks[36] = ProtoField.bool("ndpi.flow_risk.dns_large_packet", "DNS large packet", num_bits_flow_risks, nil, bit(4), "nDPI Flow Risk: DNS packet is larger than 512 bytes")
+flow_risks[37] = ProtoField.bool("ndpi.flow_risk.dns_fragmented", "DNS fragmented", num_bits_flow_risks, nil, bit(5), "nDPI Flow Risk: DNS message is fragmented")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
-flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(4))
+flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(6))
 
 for _,v in pairs(flow_risks) do
   ndpi_fds[#ndpi_fds + 1] = v
