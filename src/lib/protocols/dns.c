@@ -518,27 +518,29 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
   if(flow->packet_counter > 3)
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     
-    
-  if(flow->packet.udp != NULL && flow->packet.payload_packet_len > PKT_LEN_ALERT)
-    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_DIMENSION_ALERT);
+  if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
+	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
+	   
+  	if(flow->packet.udp != NULL && flow->packet.payload_packet_len > PKT_LEN_ALERT)
+  	  ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_LARGE_PACKET);
   
-  const struct ndpi_iphdr *iph = flow->packet.iph;
-  const u_int8_t *l3 = (const u_int8_t *) flow->packet.iph;
-  const struct ndpi_ipv6hdr *iph_v6 = NULL;
-  const u_int16_t ipsize = flow->packet.l3_packet_len;
-    
-  if(iph != NULL && iph->version == 6 && ipsize >= sizeof(struct ndpi_ipv6hdr)) {
-    iph_v6 = (const struct ndpi_ipv6hdr *) l3;
-    iph = NULL;
-  }
-    
-  if((iph != NULL && (ipsize < iph->ihl * 4 || ipsize < ntohs(iph->tot_len) || ntohs(iph->tot_len) < iph->ihl * 4 
-  		|| ((iph->frag_off & htons(0x1FFF)) != 0) || ((iph->frag_off & htons(0x3FFF)) != 0)))
-  	|| (iph_v6 != NULL && iph_v6->ip6_hdr.ip6_un1_nxt == 44))
-    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED);
-
+  	const struct ndpi_iphdr *iph = flow->packet.iph;
+  	const u_int8_t *l3 = (const u_int8_t *) flow->packet.iph;
+  	const struct ndpi_ipv6hdr *iph_v6 = NULL;
+  	const u_int16_t ipsize = flow->packet.l3_packet_len;
+  	  
+  	if(iph != NULL && iph->version == 6 && ipsize >= sizeof(struct ndpi_ipv6hdr)) {
+  	  iph_v6 = (const struct ndpi_ipv6hdr *) l3;
+  	  iph = NULL;
+  	}
+  	  
+  	if((iph != NULL && (ipsize < iph->ihl * 4 || ipsize < ntohs(iph->tot_len) || ntohs(iph->tot_len) < iph->ihl * 4 
+  			|| ((iph->frag_off & htons(0x1FFF)) != 0) || ((iph->frag_off & htons(0x3FFF)) != 0)))
+  		|| (iph_v6 != NULL && iph_v6->ip6_hdr.ip6_un1_nxt == 44))
+  	  ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED);
+	
+   }
 }
-
 void init_dns_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 			u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("DNS", ndpi_struct, detection_bitmask, *id,
