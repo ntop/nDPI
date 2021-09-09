@@ -571,9 +571,6 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_RTSP */
   ndpi_ip_addr_t rtsp_ip_address;
 
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_video_lan_timer;
-
   /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
   /* NDPI_PROTOCOL_IRC */
 #define NDPI_PROTOCOL_IRC_MAXPORT 8
@@ -607,18 +604,10 @@ struct ndpi_id_struct {
   u_int16_t detected_directconnect_udp_port;
   u_int16_t detected_directconnect_ssl_port;
 
-  /* NDPI_PROTOCOL_BITTORRENT */
-#define NDPI_BT_PORTS 8
-  u_int16_t bt_port_t[NDPI_BT_PORTS];
-  u_int16_t bt_port_u[NDPI_BT_PORTS];
-
   /* NDPI_PROTOCOL_JABBER */
 #define JABBER_MAX_STUN_PORTS 6
   u_int16_t jabber_voice_stun_port[JABBER_MAX_STUN_PORTS];
   u_int16_t jabber_file_transfer_port[2];
-
-  /* NDPI_PROTOCOL_GNUTELLA */
-  u_int16_t detected_gnutella_port;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int16_t detected_gnutella_udp_port1;
@@ -633,16 +622,8 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_JABBER */
   u_int8_t jabber_voice_stun_used_ports;
 
-  /* NDPI_PROTOCOL_SIP */
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_video_lan_dir:1;
-
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_conf_logged_in:1;
-  u_int32_t yahoo_voice_conf_logged_in:1;
-
   /* NDPI_PROTOCOL_RTSP */
-  u_int32_t rtsp_ts_set:1;
+  u_int8_t rtsp_ts_set:1;
 };
 
 /* ************************************************** */
