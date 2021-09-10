@@ -106,6 +106,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TLS_SUSPICIOUS_EXTENSION,              NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
   { NDPI_TLS_FATAL_ALERT,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_SUSPICIOUS_ENTROPY,                    NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_CLEAR_TEXT_CREDENTIALS,                NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
@@ -5166,6 +5167,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
 static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
   packet->parsed_lines = 0, packet->empty_line_position_set = 0, packet->host_line.ptr = NULL,
     packet->host_line.len = 0, packet->referer_line.ptr = NULL, packet->referer_line.len = 0,
+    packet->authorization_line.len = 0,
     packet->content_line.ptr = NULL, packet->content_line.len = 0, packet->accept_line.ptr = NULL,
     packet->accept_line.len = 0, packet->user_agent_line.ptr = NULL, packet->user_agent_line.len = 0,
     packet->http_url_name.ptr = NULL, packet->http_url_name.len = 0, packet->http_encoding.ptr = NULL,
@@ -5894,6 +5896,19 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	}
 	packet->http_num_headers++;
       }
+
+      /* "Authorization:" header line in HTTP. */
+      if(packet->line[packet->parsed_lines].len > 15 &&
+	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Authorization: ", 15) == 0)) {
+	packet->authorization_line.ptr = &packet->line[packet->parsed_lines].ptr[15];
+	packet->authorization_line.len = packet->line[packet->parsed_lines].len - 15;
+
+	while((packet->authorization_line.len > 0) && (packet->authorization_line.ptr[0] == ' '))
+	  packet->authorization_line.len--, packet->authorization_line.ptr++;
+
+	packet->http_num_headers++;
+      }
+      
       /* "Content-Type:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 14 &&
 	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0 ||
@@ -5906,6 +5921,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 
 	packet->http_num_headers++;
       }
+
       /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
       if((packet->content_line.len == 0) && (packet->line[packet->parsed_lines].len > 13) &&
 	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {

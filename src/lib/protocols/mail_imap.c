@@ -162,6 +162,8 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  /* xxxx LOGIN "username" "password" */
 	  char str[256], *item;
 	  u_int len = packet->payload_packet_len >= sizeof(str) ? sizeof(str)-1 : packet->payload_packet_len;
+
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
 	  
 	  strncpy(str, (const char*)packet->payload, len);
 	  str[len] = '\0';

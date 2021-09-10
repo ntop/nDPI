@@ -105,6 +105,7 @@ typedef enum {
   NDPI_TLS_SUSPICIOUS_EXTENSION,
   NDPI_TLS_FATAL_ALERT,
   NDPI_SUSPICIOUS_ENTROPY,
+  NDPI_CLEAR_TEXT_CREDENTIALS,
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
@@ -898,6 +899,7 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct content_line;
   struct ndpi_int_one_line_struct content_disposition_line;
   struct ndpi_int_one_line_struct accept_line;
+  struct ndpi_int_one_line_struct authorization_line;
   struct ndpi_int_one_line_struct user_agent_line;
   struct ndpi_int_one_line_struct http_url_name;
   struct ndpi_int_one_line_struct http_encoding;

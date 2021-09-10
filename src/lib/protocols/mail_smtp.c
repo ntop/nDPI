@@ -187,6 +187,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  ndpi_free(out);
 		}
+		
+		ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
 	      } else if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0') {
 		/* Password */
 		u_int8_t buf[48];
@@ -210,6 +212,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  ndpi_free(out);
 		}
+
+		ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
 	      } else {
 		flow->host_server_name[0] = '\0';
 		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

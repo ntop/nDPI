@@ -1783,6 +1783,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_SUSPICIOUS_ENTROPY:
     return("Suspicious entropy");
 
+  case NDPI_CLEAR_TEXT_CREDENTIALS:
+    return("Clear-text credentials");
+
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
