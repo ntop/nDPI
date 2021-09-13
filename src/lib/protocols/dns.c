@@ -529,11 +529,12 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
   	const struct ndpi_ipv6hdr *iph_v6 = NULL;
   	const u_int16_t ipsize = flow->packet.l3_packet_len;
   	  
+  	// TODO: add support to RFC6891 to avoid some false positive
   	if(iph != NULL && iph->version == 6 && ipsize >= sizeof(struct ndpi_ipv6hdr)) {
   	  iph_v6 = (const struct ndpi_ipv6hdr *) l3;
   	  iph = NULL;
   	}
-  	  
+  	   
   	if((iph != NULL && (ipsize < iph->ihl * 4 || ipsize < ntohs(iph->tot_len) || ntohs(iph->tot_len) < iph->ihl * 4 
   			|| ((iph->frag_off & htons(0x1FFF)) != 0) || ((iph->frag_off & htons(0x3FFF)) != 0)))
   		|| (iph_v6 != NULL && iph_v6->ip6_hdr.ip6_un1_nxt == 44))
