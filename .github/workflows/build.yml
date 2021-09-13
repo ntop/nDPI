@@ -2,36 +2,56 @@ name: Build
 on:
   push:
     branches:
-      - master
+    - main
   pull_request:
+    branches:
+    - main
     types: [opened, synchronize, reopened]
+  release:
+    types: [created]
 jobs:
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
+  test:
+    name: ${{ matrix.os }} ${{ matrix.gcrypt }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11"]
+        gcrypt: ["DISABLE_GCRYPT=y", "DISABLE_GCRYPT=n"]
+
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Install dependencies
-        run: sudo apt-get install build-essential libc6-dev libpcap-dev libjson-c-dev libgcrypt20-dev gcc-arm-linux-gnueabihf gcc-mingw-w64
-      - name: Configure
-        run: env CFLAGS='-Werror' ./autogen.sh
-      - name: Build
-        run: make all
-      - name: Test DIFF
-        run: ./tests/do.sh
-      - name: Test UNIT
-        run: ./tests/unit/unit
-      - name: Configure (with debug logs)
-        run: make distclean && env CFLAGS='-Werror' ./autogen.sh --enable-debug-messages
-      - name: Build
-        run: make all
-      - name: Configure ARM
-        run: make distclean && env CFLAGS='-Werror' ./autogen.sh --host=arm-linux-gnueabihf --with-only-libndpi
-      - name: Build ARM
-        run: make all
-      - name: Configure Mingw-w64
-        run: make distclean && ./autogen.sh --host=x86_64-w64-mingw32
-      - name: Build Mingw-w64
-        run: make all
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+    - name: Install Ubuntu Prerequisites
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        sudo apt-get update
+        sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev libgcrypt20-dev
+        sudo apt-get install gcc-arm-linux-gnueabihf gcc-mingw-w64 libc6-dev
+    - name: Installing MacOS prerequisites
+      if: startsWith(matrix.os, 'macOS')
+      run: |
+        brew install autoconf automake libtool pkg-config gettext json-c libgcrypt
+    - name: Build nDPI
+      run: |
+        export ${{ matrix.gcrypt }}
+        env CFLAGS='-Werror' ./autogen.sh --enable-debug-messages
+        make all
+    - name: Test nDPI
+      run: |
+        cd tests
+        ./do.sh
+        ./do-unit.sh
+        ./do-dga.sh
+        cd ..
+    - name: Build nDPI (ARM)
+      if: startsWith(matrix.os, 'ubuntu-latest')
+      run: |
+        make distclean && env CFLAGS='-Werror' ./autogen.sh --host=arm-linux-gnueabihf --with-only-libndpi
+        make all
+    - name: Build nDPI (Mingw-w64)
+      if: startsWith(matrix.os, 'ubuntu-latest')
+      run: |
+        make distclean && ./autogen.sh --host=x86_64-w64-mingw32
+        make all
