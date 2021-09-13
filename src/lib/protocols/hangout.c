@@ -27,7 +27,7 @@
 #include "ndpi_api.h"
 
 /* stun.c */
-extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow);
+extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 /* https://support.google.com/a/answer/1279090?hl=en */
 #define HANGOUT_UDP_LOW_PORT  19302
@@ -88,8 +88,9 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search Hangout\n");
 
   if((packet->payload_packet_len > 24) && is_google_flow(ndpi_struct, flow)) {
+    int matched_src = 0;
     if(
-       ((packet->udp != NULL) && (isHangoutUDPPort(ntohs(packet->udp->source))
+       ((packet->udp != NULL) && (matched_src = isHangoutUDPPort(ntohs(packet->udp->source))
 				  || isHangoutUDPPort(ntohs(packet->udp->dest))))
        ||
        ((packet->tcp != NULL) && (isHangoutTCPPort(ntohs(packet->tcp->source))
@@ -101,7 +102,7 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
 
       if(ndpi_struct->stun_cache && flow->packet.iph && flow->packet.udp) {
-	u_int32_t key = get_stun_lru_key(flow);
+	u_int32_t key = get_stun_lru_key(flow, !matched_src);
 	
 #ifdef DEBUG_LRU
 	printf("[LRU] ADDING %u / %u.%u\n", key, NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_HANGOUT_DUO);

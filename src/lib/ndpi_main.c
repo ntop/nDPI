@@ -49,9 +49,6 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
 
-/* stun.c */
-extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
-
 static int _ndpi_debug_callbacks = 0;
 
 /* #define DGA_DEBUG 1 */
