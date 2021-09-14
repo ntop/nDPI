@@ -2,10 +2,10 @@ name: Build
 on:
   push:
     branches:
-    - master
+      - dev
   pull_request:
     branches:
-    - master
+      - dev
     types: [opened, synchronize, reopened]
   release:
     types: [created]
