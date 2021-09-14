@@ -1,4 +1,4 @@
-name: build_and_test
+name: Build
 on:
   push:
     branches:
@@ -52,13 +52,13 @@ jobs:
         ./do-unit.sh
         ./do-dga.sh
         cd ..
-    - name: Build nDPI [ARM] (runs only on ubuntu jobs)
-      if: startsWith(matrix.os, 'ubuntu')
+    - name: Build nDPI [ARM] (runs only on ubuntu-latest jobs)
+      if: startsWith(matrix.os, 'ubuntu-latest')
       run: |
         make distclean && env CFLAGS='-Werror' ./autogen.sh --host=arm-linux-gnueabihf --with-only-libndpi ${{ matrix.gcrypt }}
         make all
-    - name: Build nDPI [Mingw-w64] (runs only on ubuntu jobs)
-      if: startsWith(matrix.os, 'ubuntu')
+    - name: Build nDPI [Mingw-w64] (runs only on ubuntu-latest jobs)
+      if: startsWith(matrix.os, 'ubuntu-latest')
       run: |
         make distclean && ./autogen.sh --host=x86_64-w64-mingw32 ${{ matrix.gcrypt }}
         make all
