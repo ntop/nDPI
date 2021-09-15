@@ -67,6 +67,15 @@ typedef enum {
   - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
   - ndpi_risk_enum (in python/ndpi.py)
   - ndpi_known_risks (ndpi_main.c)
+
+  To make sure the risk is also seen by ntopng:
+  1. Add a new flow alert key to the enum FlowAlertTypeEnum in include/ntop_typedefs.h
+  2. Add the very same flow alert key to the table flow_alert_keys in scripts/lua/modules/alert_keys/flow_alert_keys.lua
+  3. Add the risk to the array risk_enum_to_alert_type in src/FlowRiskAlerts.cpp
+     - To initialize .alert_type use the flow alert key added in 1. and an AlertCategory
+     - To initialize .alert_lua_name use a unique string
+
+  Example: https://github.com/ntop/ntopng/commit/aecc1e3e6505a0522439dbb2b295a3703d3d0f9a
  */
 typedef enum {
   NDPI_NO_RISK = 0,
