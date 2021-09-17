@@ -37,6 +37,9 @@
 
 #define PKT_LEN_ALERT 512
 
+/* ndpi_main.c */
+extern u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize);
+
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow);
 
@@ -335,8 +338,6 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 /* *********************************************** */
 
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-
-  
   int payload_offset;
   u_int8_t is_query;
   u_int16_t s_port = 0, d_port = 0;
@@ -384,7 +385,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
       for(i=idx; i<flow->packet.payload_packet_len;) {
 	u_int8_t is_ptr = 0, name_len = flow->packet.payload[i]; /* Lenght of the individual name blocks aaa.bbb.com */
-	
+
 	if(name_len == 0) {
 	  tot_len++; /* \0 */
 	  /* End of query */
@@ -395,18 +396,18 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 #ifdef DNS_DEBUG
 	if((!is_ptr) && (name_len > 0)) {
 	  printf("[DNS] [name_len: %u][", name_len);
-	  
+
 	  {
 	    int idx;
-	    
+
 	    for(idx=0; idx<name_len; idx++)
 	      printf("%c", flow->packet.payload[i+1+idx]);
-	    
+
 	    printf("]\n");
 	  }
 	}
 #endif
-	
+
 	i += name_len+1, tot_len += name_len+1;
 	if(is_ptr) break;
       } /* for */
@@ -517,31 +518,24 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
   if(flow->packet_counter > 3)
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    
+
   if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
-	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
-	   
-  	if(flow->packet.udp != NULL && flow->packet.payload_packet_len > PKT_LEN_ALERT)
-  	  ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_LARGE_PACKET);
-  
-  	const struct ndpi_iphdr *iph = flow->packet.iph;
-  	const u_int8_t *l3 = (const u_int8_t *) flow->packet.iph;
-  	const struct ndpi_ipv6hdr *iph_v6 = NULL;
-  	const u_int16_t ipsize = flow->packet.l3_packet_len;
-  	  
-  	// TODO: add support to RFC6891 to avoid some false positive
-  	if(iph != NULL && iph->version == 6 && ipsize >= sizeof(struct ndpi_ipv6hdr)) {
-  	  iph_v6 = (const struct ndpi_ipv6hdr *) l3;
-  	  iph = NULL;
-  	}
-  	   
-  	if((iph != NULL && (ipsize < iph->ihl * 4 || ipsize < ntohs(iph->tot_len) || ntohs(iph->tot_len) < iph->ihl * 4 
-  			|| ((iph->frag_off & htons(0x1FFF)) != 0) || ((iph->frag_off & htons(0x3FFF)) != 0)))
-  		|| (iph_v6 != NULL && iph_v6->ip6_hdr.ip6_un1_nxt == 44))
-  	  ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED);
-	
-   }
+     || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
+    if(flow->packet.udp != NULL && flow->packet.payload_packet_len > PKT_LEN_ALERT)
+      ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_LARGE_PACKET);
+
+    if(flow->packet.iph != NULL) {
+      /* IPv4 */
+
+      /* 0: fragmented; 1: not fragmented */
+      if(ndpi_iph_is_valid_and_not_fragmented(flow->packet.iph, flow->packet.l3_packet_len) == 0)
+	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED);
+    }
+  }
 }
+
+/* *********************************************** */
+
 void init_dns_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 			u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
   ndpi_set_bitmask_protocol_detection("DNS", ndpi_struct, detection_bitmask, *id,

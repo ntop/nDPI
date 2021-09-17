@@ -4168,7 +4168,8 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
   return(0);
 }
 
-static u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
+/* Used by dns.c */
+u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
   /*
     returned value:
     0: fragmented
