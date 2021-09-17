@@ -115,6 +115,8 @@ typedef enum {
   NDPI_TLS_FATAL_ALERT,
   NDPI_SUSPICIOUS_ENTROPY,
   NDPI_CLEAR_TEXT_CREDENTIALS,
+  NDPI_DNS_LARGE_PACKET,
+  NDPI_DNS_FRAGMENTED,
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
@@ -149,7 +151,6 @@ typedef struct {
   ndpi_risk_severity severity;
   risk_percentage default_client_risk_pctg; /* 0-100 */
 } ndpi_risk_info;
-
 
 /* NDPI_VISIT */
 typedef enum {

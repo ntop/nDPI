@@ -104,6 +104,8 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TLS_FATAL_ALERT,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_SUSPICIOUS_ENTROPY,                    NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_CLEAR_TEXT_CREDENTIALS,                NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
+  { NDPI_DNS_LARGE_PACKET,                      NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_DNS_FRAGMENTED,                        NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
@@ -7495,8 +7497,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     int rc = ndpi_dga_function(name, is_hostname);
       
     if(rc) {
-      if(flow)
+      if(flow) {
 	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
+  	}
     }
       
     return(rc);
@@ -7632,7 +7635,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	 */
 	 || ((max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */) && ((num_char_repetitions > 1) || (num_digits > 1)))	       
 	 ) {
-	if(flow) ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
+	if(flow) {
+		ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
+		}
 
 	if(ndpi_verbose_dga_detection)
 	  printf("[DGA] Found!");
