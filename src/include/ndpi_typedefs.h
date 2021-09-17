@@ -67,6 +67,15 @@ typedef enum {
   - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
   - ndpi_risk_enum (in python/ndpi.py)
   - ndpi_known_risks (ndpi_main.c)
+
+  To make sure the risk is also seen by ntopng:
+  1. Add a new flow alert key to the enum FlowAlertTypeEnum in include/ntop_typedefs.h
+  2. Add the very same flow alert key to the table flow_alert_keys in scripts/lua/modules/alert_keys/flow_alert_keys.lua
+  3. Add the risk to the array risk_enum_to_alert_type in src/FlowRiskAlerts.cpp
+     - To initialize .alert_type use the flow alert key added in 1. and an AlertCategory
+     - To initialize .alert_lua_name use a unique string
+
+  Example: https://github.com/ntop/ntopng/commit/aecc1e3e6505a0522439dbb2b295a3703d3d0f9a
  */
 typedef enum {
   NDPI_NO_RISK = 0,
@@ -105,8 +114,9 @@ typedef enum {
   NDPI_TLS_SUSPICIOUS_EXTENSION,
   NDPI_TLS_FATAL_ALERT,
   NDPI_SUSPICIOUS_ENTROPY,
+  NDPI_CLEAR_TEXT_CREDENTIALS,
   NDPI_DNS_LARGE_PACKET,
-  NDPI_DNS_FRAGMENTED,    
+  NDPI_DNS_FRAGMENTED,
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
@@ -572,9 +582,6 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_RTSP */
   ndpi_ip_addr_t rtsp_ip_address;
 
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_video_lan_timer;
-
   /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
   /* NDPI_PROTOCOL_IRC */
 #define NDPI_PROTOCOL_IRC_MAXPORT 8
@@ -608,18 +615,10 @@ struct ndpi_id_struct {
   u_int16_t detected_directconnect_udp_port;
   u_int16_t detected_directconnect_ssl_port;
 
-  /* NDPI_PROTOCOL_BITTORRENT */
-#define NDPI_BT_PORTS 8
-  u_int16_t bt_port_t[NDPI_BT_PORTS];
-  u_int16_t bt_port_u[NDPI_BT_PORTS];
-
   /* NDPI_PROTOCOL_JABBER */
 #define JABBER_MAX_STUN_PORTS 6
   u_int16_t jabber_voice_stun_port[JABBER_MAX_STUN_PORTS];
   u_int16_t jabber_file_transfer_port[2];
-
-  /* NDPI_PROTOCOL_GNUTELLA */
-  u_int16_t detected_gnutella_port;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int16_t detected_gnutella_udp_port1;
@@ -634,16 +633,8 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_JABBER */
   u_int8_t jabber_voice_stun_used_ports;
 
-  /* NDPI_PROTOCOL_SIP */
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_video_lan_dir:1;
-
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_conf_logged_in:1;
-  u_int32_t yahoo_voice_conf_logged_in:1;
-
   /* NDPI_PROTOCOL_RTSP */
-  u_int32_t rtsp_ts_set:1;
+  u_int8_t rtsp_ts_set:1;
 };
 
 /* ************************************************** */
@@ -899,6 +890,7 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct content_line;
   struct ndpi_int_one_line_struct content_disposition_line;
   struct ndpi_int_one_line_struct accept_line;
+  struct ndpi_int_one_line_struct authorization_line;
   struct ndpi_int_one_line_struct user_agent_line;
   struct ndpi_int_one_line_struct http_url_name;
   struct ndpi_int_one_line_struct http_encoding;

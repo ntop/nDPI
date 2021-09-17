@@ -97,12 +97,6 @@ union ja3_info {
 #define TLS_THRESHOLD             34387200 /* Threshold for certificate validity                                */
 #define TLS_LIMIT_DATE            1598918400 /* From 01/09/2020 TLS certificates lifespan is limited to 13 months */
 
-/* skype.c */
-extern u_int8_t is_skype_flow(struct ndpi_detection_module_struct *ndpi_struct,
-			      struct ndpi_flow_struct *flow);
-
-/* stun.c */
-extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 
 static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow, u_int32_t protocol);
@@ -319,8 +313,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 				       u_int16_t p_offset, u_int16_t certificate_len) {
   struct ndpi_packet_struct *packet = &flow->packet;
   u_int16_t num_found = 0, i;
-  char buffer[64] = { '\0' }, rdnSeqBuf[2048] = { '\0' };
+  char buffer[64] = { '\0' }, rdnSeqBuf[2048];
   u_int rdn_len = 0;
+
+  rdnSeqBuf[0] = '\0';
 
 #ifdef DEBUG_TLS
   printf("[TLS] %s() [offset: %u][certificate_len: %u]\n", __FUNCTION__, p_offset, certificate_len);
@@ -1228,7 +1224,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   printf("TLS %s() called\n", __FUNCTION__);
 #endif
 
-  memset(&ja3, 0, sizeof(ja3));
 
   handshake_type = packet->payload[0];
   total_len = (packet->payload[1] << 16) +  (packet->payload[2] << 8) + packet->payload[3];
@@ -1259,6 +1254,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
     if(handshake_type == 0x02 /* Server Hello */) {
       int i, rc;
+
+      ja3.server.num_cipher = 0;
+      ja3.server.num_tls_extension = 0;
+      ja3.server.num_elliptic_curve_point_format = 0;
+      ja3.server.alpn[0] = '\0';
 
       ja3.server.tls_handshake_version = tls_version;
 
@@ -1479,6 +1479,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     } else if(handshake_type == 0x01 /* Client Hello */) {
       u_int16_t cipher_len, cipher_offset;
       u_int8_t cookie_len = 0;
+
+      ja3.client.num_cipher = 0;
+      ja3.client.num_tls_extension = 0;
+      ja3.client.num_elliptic_curve = 0;
+      ja3.client.num_elliptic_curve_point_format = 0;
+      ja3.client.signature_algorithms[0] = '\0';
+      ja3.client.supported_versions[0] = '\0';
+      ja3.client.alpn[0] = '\0';
 
       flow->protos.tls_quic_stun.tls_quic.ssl_version = ja3.client.tls_handshake_version = tls_version;
       if(flow->protos.tls_quic_stun.tls_quic.ssl_version < 0x0302) /* TLSv1.1 */

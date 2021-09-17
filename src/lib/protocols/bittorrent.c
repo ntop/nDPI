@@ -163,7 +163,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     }
 
     /* this is a self built client, not possible to catch asymmetrically */
-    if((packet->parsed_lines == 10 || (packet->parsed_lines == 11 && packet->line[11].len == 0))
+    if((packet->parsed_lines == 10 || (packet->parsed_lines == 11 && packet->line[10].len == 0))
 	&& packet->user_agent_line.ptr != NULL
 	&& packet->user_agent_line.len > 12
 	&& memcmp(packet->user_agent_line.ptr, "Mozilla/4.0 ",

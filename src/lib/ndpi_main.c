@@ -49,9 +49,6 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
 
-/* stun.c */
-extern u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
-
 static int _ndpi_debug_callbacks = 0;
 
 /* #define DGA_DEBUG 1 */
@@ -106,7 +103,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TLS_SUSPICIOUS_EXTENSION,              NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
   { NDPI_TLS_FATAL_ALERT,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_SUSPICIOUS_ENTROPY,                    NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
-  
+  { NDPI_CLEAR_TEXT_CREDENTIALS,                NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
   { NDPI_DNS_LARGE_PACKET,                      NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
   { NDPI_DNS_FRAGMENTED,                        NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
 
@@ -1436,7 +1433,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_QUIC,
 			  "QUIC", NDPI_PROTOCOL_CATEGORY_WEB,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 443, 80, 0, 0, 0) /* UDP */);
+			  ndpi_build_default_ports(ports_b, 443, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_subprotocols(ndpi_str, NDPI_PROTOCOL_QUIC,
 			      NDPI_PROTOCOL_MATCHED_BY_CONTENT,
 			      NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS); /* NDPI_PROTOCOL_QUIC can have (content-matched) subprotocols */
@@ -1745,6 +1742,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "AVAST SecureDNS", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),  /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0)); /* UDP */
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CASSANDRA,
+			  "Cassandra", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 9042, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -4033,6 +4034,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* AVAST SecureDNS */
   init_avast_securedns_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* Cassandra */
+  init_cassandra_dissector(ndpi_str, &a, detection_bitmask);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
@@ -5162,6 +5166,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
 static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
   packet->parsed_lines = 0, packet->empty_line_position_set = 0, packet->host_line.ptr = NULL,
     packet->host_line.len = 0, packet->referer_line.ptr = NULL, packet->referer_line.len = 0,
+    packet->authorization_line.len = 0,
     packet->content_line.ptr = NULL, packet->content_line.len = 0, packet->accept_line.ptr = NULL,
     packet->accept_line.len = 0, packet->user_agent_line.ptr = NULL, packet->user_agent_line.len = 0,
     packet->http_url_name.ptr = NULL, packet->http_url_name.len = 0, packet->http_encoding.ptr = NULL,
@@ -5890,6 +5895,19 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	}
 	packet->http_num_headers++;
       }
+
+      /* "Authorization:" header line in HTTP. */
+      if(packet->line[packet->parsed_lines].len > 15 &&
+	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Authorization: ", 15) == 0)) {
+	packet->authorization_line.ptr = &packet->line[packet->parsed_lines].ptr[15];
+	packet->authorization_line.len = packet->line[packet->parsed_lines].len - 15;
+
+	while((packet->authorization_line.len > 0) && (packet->authorization_line.ptr[0] == ' '))
+	  packet->authorization_line.len--, packet->authorization_line.ptr++;
+
+	packet->http_num_headers++;
+      }
+      
       /* "Content-Type:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 14 &&
 	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0 ||
@@ -5902,6 +5920,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 
 	packet->http_num_headers++;
       }
+
       /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
       if((packet->content_line.len == 0) && (packet->line[packet->parsed_lines].len > 13) &&
 	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {

@@ -1782,13 +1782,16 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_SUSPICIOUS_ENTROPY:
     return("Suspicious entropy");
+      
+  case NDPI_CLEAR_TEXT_CREDENTIALS:
+    return("Clear-text credentials");
     
   case NDPI_DNS_LARGE_PACKET:
-    return("DNS packet is larger than 512 bytes");
+    return("DNS packet larger than 512 bytes");
     
   case NDPI_DNS_FRAGMENTED:
-    return("DNS message is fragmented");
-  
+    return("Fragmented DNS message");
+      
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

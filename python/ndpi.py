@@ -327,6 +327,7 @@ typedef enum {
   NDPI_TLS_SUSPICIOUS_EXTENSION,
   NDPI_TLS_FATAL_ALERT,
   NDPI_SUSPICIOUS_ENTROPY,
+  NDPI_CLEAR_TEXT_CREDENTIALS,
   NDPI_DNS_LARGE_PACKET,
   NDPI_DNS_FRAGMENTED,
 
@@ -443,9 +444,6 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_RTSP */
   ndpi_ip_addr_t rtsp_ip_address;
 
-  /* NDPI_PROTOCOL_YAHOO */
-  uint32_t yahoo_video_lan_timer;
-
   /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
   /* NDPI_PROTOCOL_IRC */
 #define NDPI_PROTOCOL_IRC_MAXPORT 8
@@ -479,18 +477,10 @@ struct ndpi_id_struct {
   uint16_t detected_directconnect_udp_port;
   uint16_t detected_directconnect_ssl_port;
 
-  /* NDPI_PROTOCOL_BITTORRENT */
-#define NDPI_BT_PORTS 8
-  uint16_t bt_port_t[NDPI_BT_PORTS];
-  uint16_t bt_port_u[NDPI_BT_PORTS];
-
   /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
 #define JABBER_MAX_STUN_PORTS 6
   uint16_t jabber_voice_stun_port[JABBER_MAX_STUN_PORTS];
   uint16_t jabber_file_transfer_port[2];
-
-  /* NDPI_PROTOCOL_GNUTELLA */
-  uint16_t detected_gnutella_port;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   uint16_t detected_gnutella_udp_port1;
@@ -505,16 +495,7 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   uint8_t jabber_voice_stun_used_ports;
 
-  /* NDPI_PROTOCOL_SIP */
-  /* NDPI_PROTOCOL_YAHOO */
-  uint32_t yahoo_video_lan_dir:1;
-
-  /* NDPI_PROTOCOL_YAHOO */
-  uint32_t yahoo_conf_logged_in:1;
-  uint32_t yahoo_voice_conf_logged_in:1;
-
-  /* NDPI_PROTOCOL_RTSP */
-  uint32_t rtsp_ts_set:1;
+  uint8_t rtsp_ts_set:1;
 };
 
 struct ndpi_flow_tcp_struct {

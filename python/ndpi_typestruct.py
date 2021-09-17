@@ -313,7 +313,6 @@ class NDPIIdStruct(Structure):
     _fields_ = [
         ('detected_protocol_bitmask', NDPIProtocolBitMask),
         ('rtsp_ip_address', NDPIIpAddrT),
-        ('yahoo_video_lan_timer', c_uint32),
         ('irc_port', c_uint16 * 8),
         ('last_time_port_used', c_uint32 * 8),
         ('irc_ts', c_uint32),
@@ -329,21 +328,15 @@ class NDPIIdStruct(Structure):
         ('detected_directconnect_port', c_uint16),
         ('detected_directconnect_udp_port', c_uint16),
         ('detected_directconnect_ssl_port', c_uint16),
-        ('bt_port_t', c_uint16 * 8),
-        ('bt_port_u', c_uint16 * 8),
         ('jabber_voice_stun_port', c_uint16 * 6),
         ('jabber_file_transfer_port', c_uint16 * 2),
-        ('detected_gnutella_port', c_uint16),
         ('detected_gnutella_udp_port1', c_uint16),
         ('detected_gnutella_udp_port2', c_uint16),
         ('soulseek_listen_port', c_uint16),
         ('irc_number_of_port', c_uint8),
         ('oscar_ssl_session_id', c_uint8 * 33),
         ('jabber_voice_stun_used_ports', c_uint8),
-        ('yahoo_video_lan_dir', c_uint32, 1),
-        ('yahoo_conf_logged_in', c_uint32, 1),
-        ('yahoo_voice_conf_logged_in', c_uint32, 1),
-        ('rtsp_ts_set', c_uint32, 1),
+        ('rtsp_ts_set', c_uint8, 1),
     ]
 
 

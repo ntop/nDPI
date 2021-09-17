@@ -625,6 +625,13 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
   }
 
+  /* check for authorization line */
+  if(packet->authorization_line.ptr != NULL) {
+    NDPI_LOG_DBG2(ndpi_struct, "Authorization line found %.*s\n",
+		  packet->authorization_line.len, packet->authorization_line.ptr);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
+  }
+
   if(packet->content_line.ptr != NULL && packet->content_line.len != 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
 		  packet->content_line.len, packet->content_line.ptr);
