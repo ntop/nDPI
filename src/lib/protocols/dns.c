@@ -526,10 +526,20 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
     if(flow->packet.iph != NULL) {
       /* IPv4 */
+      u_int8_t flags = ((u_int8_t*)flow->packet.iph)[6];
 
       /* 0: fragmented; 1: not fragmented */
-      if(ndpi_iph_is_valid_and_not_fragmented(flow->packet.iph, flow->packet.l3_packet_len) == 0)
+      if((flags & 0xE0)
+	 || (ndpi_iph_is_valid_and_not_fragmented(flow->packet.iph, flow->packet.l3_packet_len) == 0)) {
 	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED);
+      }
+    } else if(flow->packet.iphv6 != NULL) {
+      /* IPv6 */
+      const struct ndpi_ip6_hdrctl *ip6_hdr = &flow->packet.iphv6->ip6_hdr;
+
+      if(ip6_hdr->ip6_un1_nxt == 0x2C /* Next Header: Fragment Header for IPv6 (44) */) {
+	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED);
+      }	
     }
   }
 }
