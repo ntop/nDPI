@@ -521,6 +521,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
   if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
      || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
+    /* TODO: add support to RFC6891 to avoid some false positives */
     if(flow->packet.udp != NULL && flow->packet.payload_packet_len > PKT_LEN_ALERT)
       ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_LARGE_PACKET);
 
@@ -529,7 +530,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       u_int8_t flags = ((u_int8_t*)flow->packet.iph)[6];
 
       /* 0: fragmented; 1: not fragmented */
-      if((flags & 0xE0)
+      if((flags & 0x20)
 	 || (ndpi_iph_is_valid_and_not_fragmented(flow->packet.iph, flow->packet.l3_packet_len) == 0)) {
 	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED);
       }

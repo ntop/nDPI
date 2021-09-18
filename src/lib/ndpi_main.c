@@ -5162,7 +5162,7 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
 static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
   packet->parsed_lines = 0, packet->empty_line_position_set = 0, packet->host_line.ptr = NULL,
     packet->host_line.len = 0, packet->referer_line.ptr = NULL, packet->referer_line.len = 0,
-    packet->authorization_line.len = 0,
+    packet->authorization_line.len = 0, packet->authorization_line.ptr = NULL,
     packet->content_line.ptr = NULL, packet->content_line.len = 0, packet->accept_line.ptr = NULL,
     packet->accept_line.len = 0, packet->user_agent_line.ptr = NULL, packet->user_agent_line.len = 0,
     packet->http_url_name.ptr = NULL, packet->http_url_name.len = 0, packet->http_encoding.ptr = NULL,
