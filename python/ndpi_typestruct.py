@@ -262,11 +262,8 @@ NDPIDetectionModuleStruct._fields_ = [
     ("battlefield_timeout", c_uint32),
     ("thunder_timeout", c_uint32),
     ("soulseek_connection_ip_tick_timeout", c_uint32),
-    ("rtsp_connection_timeout", c_uint32),
     ("tvants_connection_timeout", c_uint32),
     ("orb_rstp_ts_timeout", c_uint32),
-    ("yahoo_detect_http_connections", c_uint8),
-    ("yahoo_lan_video_timeout", c_uint32),
     ("zattoo_connection_timeout", c_uint32),
     ("jabber_stun_timeout", c_uint32),
     ("jabber_file_transfer_timeout", c_uint32),
@@ -312,7 +309,6 @@ class NDPIIpAddrT(Union):
 class NDPIIdStruct(Structure):
     _fields_ = [
         ('detected_protocol_bitmask', NDPIProtocolBitMask),
-        ('rtsp_ip_address', NDPIIpAddrT),
         ('irc_port', c_uint16 * 8),
         ('last_time_port_used', c_uint32 * 8),
         ('irc_ts', c_uint32),
@@ -336,7 +332,6 @@ class NDPIIdStruct(Structure):
         ('irc_number_of_port', c_uint8),
         ('oscar_ssl_session_id', c_uint8 * 33),
         ('jabber_voice_stun_used_ports', c_uint8),
-        ('rtsp_ts_set', c_uint8, 1),
     ]
 
 
@@ -345,9 +340,7 @@ class NDPIFlowTcpStruct(Structure):
     _fields_ = [
         ('smtp_command_bitmask', c_uint16),
         ('pop_command_bitmask', c_uint16),
-        ('qq_nxt_len', c_uint16),
         ('wa_matched_so_far', c_uint8),
-        ('tds_login_version', c_uint8),
         ('irc_stage', c_uint8),
         ('irc_port', c_uint8),
         ('h323_valid_packets', c_uint8),
@@ -357,23 +350,13 @@ class NDPIFlowTcpStruct(Structure):
         ('irc_direction', c_uint32, 2),
         ('irc_0x1000_full', c_uint32, 1),
         ('soulseek_stage', c_uint32, 2),
-        ('tds_stage', c_uint32, 3),
         ('usenet_stage', c_uint32, 2),
-        ('imesh_stage', c_uint32, 4),
-        ('http_setup_dir', c_uint32, 2),
         ('http_stage', c_uint32, 2),
         ('http_empty_line_seen', c_uint32, 1),
-        ('http_wait_for_retransmission', c_uint32, 1),
         ('gnutella_stage', c_uint32, 2),
-        ('mms_stage', c_uint32, 2),
-        ('yahoo_sip_comm', c_uint32, 1),
-        ('yahoo_http_proxy_stage', c_uint32, 2),
-        ('msn_stage', c_uint32, 3),
-        ('msn_ssl_ft', c_uint32, 2),
         ('ssh_stage', c_uint32, 3),
         ('vnc_stage', c_uint32, 2),
         ('telnet_stage', c_uint32, 2),
-        ('tls_srv_cert_fingerprint_ctx', c_void_p),
         ('tls_seen_client_cert', c_uint8, 1),
         ('tls_seen_server_cert', c_uint8, 1),
         ('tls_seen_certificate', c_uint8, 1),
@@ -384,7 +367,6 @@ class NDPIFlowTcpStruct(Structure):
         ('tls_fingerprint_len', c_int16),
         ('tls_sha1_certificate_fingerprint', c_uint8 * 20),
         ('postgres_stage', c_uint32, 3),
-        ('ddlink_server_direction', c_uint32, 1),
         ('seen_syn', c_uint32, 1),
         ('seen_syn_ack', c_uint32, 1),
         ('seen_ack', c_uint32, 1),
@@ -392,7 +374,6 @@ class NDPIFlowTcpStruct(Structure):
         ('dofus_stage', c_uint32, 1),
         ('fiesta_stage', c_uint32, 2),
         ('wow_stage', c_uint32, 2),
-        ('veoh_tv_stage', c_uint32, 2),
         ('shoutcast_stage', c_uint32, 2),
         ('rtp_special_packets_seen', c_uint32, 1),
         ('mail_pop_stage', c_uint32, 2),
@@ -413,16 +394,11 @@ class NDPIFlowTcpStruct(Structure):
 class NDPIFlowUdpStruct(Structure):
     _pack_ = 1
     _fields_ = [
-        ('battlefield_msg_id', c_uint32),
-        ('snmp_msg_id', c_uint32),
-        ('battlefield_stage', c_uint32, 3),
-        ('snmp_stage', c_uint32, 2),
         ('ppstream_stage', c_uint32, 3),
         ('halflife2_stage', c_uint32, 2),
         ('tftp_stage', c_uint32, 2),
         ('aimini_stage', c_uint32, 5),
         ('xbox_stage', c_uint32, 1),
-        ('wsus_stage', c_uint32, 1),
         ('skype_packet_id', c_uint8),
         ('teamviewer_stage', c_uint8),
         ('eaq_pkt_id', c_uint8),
@@ -642,13 +618,6 @@ class NDPIUdpHdr(Structure):
     ]
 
 
-class NDPIPacketStructStack(Structure):
-    _pack_ = 1
-    _fields_ = [
-        ('protocol_stack_info', c_uint16)
-    ]
-
-
 class NDPIPacketStruct(Structure):
     _fields_ = [
         ('iph', POINTER(NDPIIphdr)),
@@ -657,10 +626,8 @@ class NDPIPacketStruct(Structure):
         ('udp', POINTER(NDPIUdpHdr)),
         ('generic_l4_ptr', POINTER(c_uint8)),
         ('payload', POINTER(c_uint8)),
-        ('tick_timestamp', c_uint32),
-        ('tick_timestamp_l', c_uint64),
+        ('current_timestamp_ms', c_uint64),
         ('detected_protocol_stack', c_uint16 * ndpi.ndpi_wrap_ndpi_procol_size()),
-        ('ndpi_packet_stack', NDPIPacketStructStack),
         ('line', NDPIIntOneLineStruct * 64),
         ('host_line', NDPIIntOneLineStruct),
         ('forwarded_line', NDPIIntOneLineStruct),
@@ -685,16 +652,14 @@ class NDPIPacketStruct(Structure):
         ('actual_payload_len', c_uint16),
         ('num_retried_bytes', c_uint16),
         ('parsed_lines', c_uint16),
-        ('parsed_unix_lines', c_uint16),
         ('empty_line_position', c_uint16),
         ('tcp_retransmission', c_uint8),
         ('l4_protocol', c_uint8),
-        ('ssl_certificate_detected', c_uint8, 4),
-        ('ssl_certificate_num_checks', c_uint8, 4),
         ('packet_lines_parsed_complete', c_uint8, 1),
         ('packet_direction', c_uint8, 1),
         ('empty_line_position_set', c_uint8, 1),
-        ('pad', c_uint8, 5),
+        ('http_check_content', c_uint8, 1),
+        ('pad', c_uint8, 4),
     ]
 
 
@@ -702,7 +667,6 @@ class NDPIFlowStructStack(Structure):
     _pack_ = 1
     _fields_ = [
         ("detected_protocol_stack", c_uint16 * ndpi.ndpi_wrap_ndpi_procol_size()),
-        ("protocol_stack_info", c_uint16)
     ]
 
 
@@ -725,7 +689,6 @@ NDPIFlowStruct._fields_ = [
     ("num_processed_pkts", c_uint8),
     ("extra_packets_func", CFUNCTYPE(c_int, POINTER(NDPIDetectionModuleStruct), POINTER(NDPIFlowStruct))),
     ("l4", L4),
-    ("server_id", POINTER(NDPIIdStruct)),
     ("host_server_name", c_ubyte * 256),
     ("http", Http),
     ("protos", Protos),
@@ -738,15 +701,11 @@ NDPIFlowStruct._fields_ = [
     ('byte_counter', c_uint16 * 2),
     ('bittorrent_stage', c_uint8),
     ('directconnect_stage', c_uint8, 2),
-    ('sip_yahoo_voice', c_uint8, 1),
     ('http_detected', c_uint8, 1),
     ('http_upper_protocol', c_uint16),
     ('http_lower_protocol', c_uint16),
     ('rtsprdt_stage', c_uint8, 2),
-    ('rtsp_control_flow', c_uint8, 1),
-    ('yahoo_detection_finished', c_uint8, 2),
     ('zattoo_stage', c_uint8, 3),
-    ('qq_stage', c_uint8, 3),
     ('thunder_stage', c_uint8, 2),
     ('oscar_ssl_voice_stage', c_uint8, 3),
     ('oscar_video_voice', c_uint8, 1),
@@ -775,7 +734,6 @@ NDPIFlowStruct._fields_ = [
     ('kxun_counter', c_uint16),
     ('iqiyi_counter', c_uint16),
     ('packet', NDPIPacketStruct),
-    ('flow', POINTER(NDPIFlowStruct)),
     ('src', POINTER(NDPIIdStruct)),
     ('dst', POINTER(NDPIIdStruct))
 ]

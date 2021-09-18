@@ -38,18 +38,18 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
     uint32_t w = htonl(get_u_int32_t(packet->payload, 0));
     NDPI_LOG_DBG2(ndpi_struct, "CSGO: word %08x\n", w);
 
-    if(!flow->csgo_state && packet->payload_packet_len == 23 && w == 0xfffffffful) {
+    if(!flow->l4.udp.csgo_state && packet->payload_packet_len == 23 && w == 0xfffffffful) {
       if(!memcmp(packet->payload + 5, "connect0x", 9)) {
-        flow->csgo_state++;
-        memcpy(flow->csgo_strid, packet->payload + 5, 18);
+        flow->l4.udp.csgo_state++;
+        memcpy(flow->l4.udp.csgo_strid, packet->payload + 5, 18);
         NDPI_LOG_DBG2(ndpi_struct, "Found csgo connect0x\n");
         return;
       }
     }
 
-    if(flow->csgo_state == 1 && packet->payload_packet_len >= 42 && w == 0xfffffffful) {
-      if(!memcmp(packet->payload + 24, flow->csgo_strid, 18)) {
-        flow->csgo_state++;
+    if(flow->l4.udp.csgo_state == 1 && packet->payload_packet_len >= 42 && w == 0xfffffffful) {
+      if(!memcmp(packet->payload + 24, flow->l4.udp.csgo_strid, 18)) {
+        flow->l4.udp.csgo_state++;
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
         NDPI_LOG_INFO( ndpi_struct, "found csgo connect0x reply\n");
         return;
@@ -77,32 +77,32 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
       }
     }
 
-    if(flow->csgo_s2 < 3 && (w & 0xffff0000ul) == 0x0d1d0000) {
+    if(flow->l4.udp.csgo_s2 < 3 && (w & 0xffff0000ul) == 0x0d1d0000) {
       uint32_t w2 = get_u_int32_t(packet->payload, 2);
       if(packet->payload_packet_len == 13) {
-        if(!flow->csgo_s2) {
-          flow->csgo_id2 = w2;
-          flow->csgo_s2 = 1;
+        if(!flow->l4.udp.csgo_s2) {
+          flow->l4.udp.csgo_id2 = w2;
+          flow->l4.udp.csgo_s2 = 1;
           NDPI_LOG_DBG2( ndpi_struct, "Found csgo udp 0d1d step1\n");
           return;
         }
 
-	if(flow->csgo_s2 == 1 && flow->csgo_id2 == w2) {
+	if(flow->l4.udp.csgo_s2 == 1 && flow->l4.udp.csgo_id2 == w2) {
           NDPI_LOG_DBG2( ndpi_struct, "Found csgo udp 0d1d step1 DUP\n");
           return;
         }
-        flow->csgo_s2 = 3;
+        flow->l4.udp.csgo_s2 = 3;
         return;
       }
 
       if(packet->payload_packet_len == 15) {
-        if(flow->csgo_s2 == 1 && flow->csgo_id2 == w2) {
+        if(flow->l4.udp.csgo_s2 == 1 && flow->l4.udp.csgo_id2 == w2) {
           NDPI_LOG_INFO( ndpi_struct, "found csgo udp 0d1d\n");
           ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
           return;
         }
       }
-      flow->csgo_s2 = 3;
+      flow->l4.udp.csgo_s2 = 3;
     }
 
     if(packet->payload_packet_len >= 140 && (w == 0x02124c6c || w == 0x02125c6c) &&

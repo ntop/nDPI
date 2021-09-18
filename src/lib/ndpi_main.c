@@ -2339,7 +2339,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->directconnect_connection_ip_tick_timeout =
     NDPI_DIRECTCONNECT_CONNECTION_IP_TICK_TIMEOUT * ndpi_str->ticks_per_second;
 
-  ndpi_str->rtsp_connection_timeout = NDPI_RTSP_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
   ndpi_str->irc_timeout = NDPI_IRC_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
   ndpi_str->gnutella_timeout = NDPI_GNUTELLA_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
   ndpi_str->thunder_timeout = NDPI_THUNDER_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
@@ -4276,7 +4275,6 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 
 void ndpi_apply_flow_protocol_to_packet(struct ndpi_flow_struct *flow, struct ndpi_packet_struct *packet) {
   memcpy(&packet->detected_protocol_stack, &flow->detected_protocol_stack, sizeof(packet->detected_protocol_stack));
-  memcpy(&packet->protocol_stack_info, &flow->protocol_stack_info, sizeof(packet->protocol_stack_info));
 }
 
 /* ****************************************************** */
@@ -4948,9 +4946,6 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str, st
   if(flow == NULL)
     return;
 
-  if(flow->server_id == NULL)
-    flow->server_id = dst; /* Default */
-
   /* need at least 20 bytes for ip header */
   if(packetlen < 20) {
     return;
@@ -5431,9 +5426,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   /* Init default */
   ret.master_protocol = flow->detected_protocol_stack[1],
     ret.app_protocol = flow->detected_protocol_stack[0];
-
-  if(flow->server_id == NULL)
-    flow->server_id = dst; /* Default */
 
   if(flow->check_extra_packets) {
     ndpi_process_extra_packet(ndpi_str, flow, packet, packetlen, current_time_ms, src, dst);

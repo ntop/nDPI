@@ -579,8 +579,6 @@ struct ndpi_id_struct {
      to compare this, use:
   **/
   NDPI_PROTOCOL_BITMASK detected_protocol_bitmask;
-  /* NDPI_PROTOCOL_RTSP */
-  ndpi_ip_addr_t rtsp_ip_address;
 
   /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
   /* NDPI_PROTOCOL_IRC */
@@ -594,9 +592,6 @@ struct ndpi_id_struct {
 
   /* NDPI_PROTOCOL_THUNDER */
   u_int32_t thunder_ts;
-
-  /* NDPI_PROTOCOL_RTSP */
-  u_int32_t rtsp_timer;
 
   /* NDPI_PROTOCOL_ZATTOO */
   u_int32_t zattoo_ts;
@@ -632,9 +627,6 @@ struct ndpi_id_struct {
 
   /* NDPI_PROTOCOL_JABBER */
   u_int8_t jabber_voice_stun_used_ports;
-
-  /* NDPI_PROTOCOL_RTSP */
-  u_int8_t rtsp_ts_set:1;
 };
 
 /* ************************************************** */
@@ -646,14 +638,8 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int16_t pop_command_bitmask;
 
-  /* NDPI_PROTOCOL_QQ */
-  u_int16_t qq_nxt_len;
-
   /* NDPI_PROTOCOL_WHATSAPP */
   u_int8_t wa_matched_so_far;
-
-  /* NDPI_PROTOCOL_TDS */
-  u_int8_t tds_login_version;
 
   /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_stage;
@@ -674,34 +660,15 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_SOULSEEK */
   u_int32_t soulseek_stage:2;
 
-  /* NDPI_PROTOCOL_TDS */
-  u_int32_t tds_stage:3;
-
   /* NDPI_PROTOCOL_USENET */
   u_int32_t usenet_stage:2;
 
-  /* NDPI_PROTOCOL_IMESH */
-  u_int32_t imesh_stage:4;
-
   /* NDPI_PROTOCOL_HTTP */
-  u_int32_t http_setup_dir:2;
   u_int32_t http_stage:2;
   u_int32_t http_empty_line_seen:1;
-  u_int32_t http_wait_for_retransmission:1;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_stage:2;		       // 0 - 2
-
-  /* NDPI_CONTENT_MMS */
-  u_int32_t mms_stage:2;
-
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int32_t yahoo_sip_comm:1;
-  u_int32_t yahoo_http_proxy_stage:2;
-
-  /* NDPI_PROTOCOL_MSN */
-  u_int32_t msn_stage:3;
-  u_int32_t msn_ssl_ft:2;
 
   /* NDPI_PROTOCOL_SSH */
   u_int32_t ssh_stage:3;
@@ -715,8 +682,6 @@ struct ndpi_flow_tcp_struct {
   struct {
     message_t message;
 
-    void* srv_cert_fingerprint_ctx; /* SHA-1 */
-
     /* NDPI_PROTOCOL_TLS */
     u_int8_t certificate_processed:1, fingerprint_set:1, _pad:6;
     u_int8_t num_tls_blocks;
@@ -725,9 +690,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
-
-  /* NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK */
-  u_int32_t ddlink_server_direction:1;
 
   /* Part of the TCP header. */
   u_int32_t seen_syn:1;
@@ -745,9 +707,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_WORLDOFWARCRAFT */
   u_int32_t wow_stage:2;
-
-  /* NDPI_PROTOCOL_HTTP_APPLICATION_VEOHTV */
-  u_int32_t veoh_tv_stage:2;
 
   /* NDPI_PROTOCOL_SHOUTCAST */
   u_int32_t shoutcast_stage:2;
@@ -793,12 +752,6 @@ struct ndpi_flow_tcp_struct {
 /* ************************************************** */
 
 struct ndpi_flow_udp_struct {
-  /* NDPI_PROTOCOL_SNMP */
-  u_int32_t snmp_msg_id;
-
-  /* NDPI_PROTOCOL_SNMP */
-  u_int32_t snmp_stage:2;
-
   /* NDPI_PROTOCOL_PPSTREAM */
   u_int32_t ppstream_stage:3;		  // 0 - 7
 
@@ -813,9 +766,6 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_XBOX */
   u_int32_t xbox_stage:1;
-
-  /* NDPI_PROTOCOL_WINDOWS_UPDATE */
-  u_int32_t wsus_stage:1;
 
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
@@ -842,6 +792,10 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_QUIC */
   u_int8_t *quic_reasm_buf;
   u_int32_t quic_reasm_buf_len;
+
+  /* NDPI_PROTOCOL_CSGO */
+  u_int8_t csgo_strid[18],csgo_state,csgo_s2;
+  u_int32_t csgo_id2;
 };
 
 /* ************************************************** */
@@ -880,7 +834,6 @@ struct ndpi_packet_struct {
   u_int64_t current_time_ms;
 
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
-  u_int16_t protocol_stack_info;
 
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
   /* HTTP headers */
@@ -911,12 +864,10 @@ struct ndpi_packet_struct {
   u_int16_t actual_payload_len;
   u_int16_t num_retried_bytes;
   u_int16_t parsed_lines;
-  u_int16_t parsed_unix_lines;
   u_int16_t empty_line_position;
   u_int8_t tcp_retransmission;
   u_int8_t l4_protocol;
 
-  u_int8_t tls_certificate_detected:4, tls_certificate_num_checks:4;
   u_int8_t packet_lines_parsed_complete:1,
     packet_direction:1, empty_line_position_set:1, http_check_content:1, pad:4;
 };
@@ -1180,13 +1131,8 @@ struct ndpi_detection_module_struct {
   u_int32_t thunder_timeout;
   /* SoulSeek parameters */
   u_int32_t soulseek_connection_ip_tick_timeout;
-  /* rtsp parameters */
-  u_int32_t rtsp_connection_timeout;
   /* rstp */
   u_int32_t orb_rstp_ts_timeout;
-  /* yahoo */
-  u_int8_t yahoo_detect_http_connections;
-  u_int32_t yahoo_lan_video_timeout;
   u_int32_t zattoo_connection_timeout;
   u_int32_t jabber_stun_timeout;
   u_int32_t jabber_file_transfer_timeout;
@@ -1257,7 +1203,6 @@ struct tls_heuristics {
  */
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
-  u_int16_t protocol_stack_info;
 
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
@@ -1293,11 +1238,6 @@ struct ndpi_flow_struct {
   /* Place textual flow info here */
   char flow_extra_info[16];
 
-  /*
-    Pointer to src or dst that identifies the
-    server of this connection
-  */
-  struct ndpi_id_struct *server_id;
   /* HTTP host or DNS query */
   u_char host_server_name[240];
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
@@ -1448,16 +1388,10 @@ struct ndpi_flow_struct {
   u_int8_t http_detected:1;
 
   /* NDPI_PROTOCOL_RTSP */
-  u_int8_t rtsprdt_stage:2, rtsp_control_flow:1;
-
-  /* NDPI_PROTOCOL_YAHOO */
-  u_int8_t yahoo_detection_finished:2;
+  u_int8_t rtsprdt_stage:2;
 
   /* NDPI_PROTOCOL_ZATTOO */
   u_int8_t zattoo_stage:3;
-
-  /* NDPI_PROTOCOL_QQ */
-  u_int8_t qq_stage:3;
 
   /* NDPI_PROTOCOL_THUNDER */
   u_int8_t thunder_stage:2;		        // 0 - 3
@@ -1494,13 +1428,8 @@ struct ndpi_flow_struct {
   u_int8_t tinc_state;
   struct tinc_cache_entry tinc_cache_entry;
 
-  /* NDPI_PROTOCOL_CSGO */
-  u_int8_t csgo_strid[18],csgo_state,csgo_s2;
-  u_int32_t csgo_id2;
-
   /* internal structures to save functions calls */
   struct ndpi_packet_struct packet;
-  struct ndpi_flow_struct *flow;
   struct ndpi_id_struct *src;
   struct ndpi_id_struct *dst;
 };

@@ -554,7 +554,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     flow->extra_packets_func = NULL; /* We're good now */
 
     if(len > 0) ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
-    flow->server_id = flow->dst;
 
     if(packet->forwarded_line.ptr) {
       len = ndpi_min(packet->forwarded_line.len, sizeof(flow->protos.http.nat_ip)-1);
