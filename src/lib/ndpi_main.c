@@ -4122,7 +4122,7 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t **l4ptr,
                                        u_int16_t *l4len, u_int8_t *nxt_hdr) {
   while((*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
-    u_int16_t ehdr_len;
+    u_int16_t ehdr_len, frag_offset;
 
     // no next header
     if(*nxt_hdr == 59) {
@@ -4136,6 +4136,10 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
       }
 
       *nxt_hdr = (*l4ptr)[0];
+      frag_offset = ntohs(*(u_int16_t *)((*l4ptr) + 2)) >> 3;
+      // Handle ipv6 fragments as the ipv4 ones: keep the first fragment, drop the others
+      if (frag_offset != 0)
+          return(1);
       *l4len -= 8;
       (*l4ptr) += 8;
       continue;
