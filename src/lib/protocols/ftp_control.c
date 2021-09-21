@@ -64,6 +64,11 @@ static int ndpi_ftp_control_check_request(struct ndpi_detection_module_struct *n
     return 1;
   }
 
+  if(ndpi_match_strprefix(payload, payload_len, "AUTH") ||
+     ndpi_match_strprefix(payload, payload_len, "auth")) {
+    flow->protos.ftp_imap_pop_smtp.auth_found = 1;
+    return 1;
+  }
   /* ***************************************************** */
 
   if(ndpi_match_strprefix(payload, payload_len, "ABOR")) {
@@ -86,9 +91,6 @@ static int ndpi_ftp_control_check_request(struct ndpi_detection_module_struct *n
     return 1;
   }
 
-  if(ndpi_match_strprefix(payload, payload_len, "AUTH")) {
-    return 1;
-  }
   if(ndpi_match_strprefix(payload, payload_len, "CCC")) {
     return 1;
   }
@@ -318,10 +320,6 @@ static int ndpi_ftp_control_check_request(struct ndpi_detection_module_struct *n
   }
 
   if(ndpi_match_strprefix(payload, payload_len, "appe")) {
-    return 1;
-  }
-
-  if(ndpi_match_strprefix(payload, payload_len, "auth")) {
     return 1;
   }
 
@@ -564,6 +562,8 @@ static int ndpi_ftp_control_check_response(struct ndpi_flow_struct *flow,
   case '2':
   case '3':
   case '6':
+    if(flow->protos.ftp_imap_pop_smtp.auth_found == 1)
+      flow->protos.ftp_imap_pop_smtp.auth_tls = 1;
     return(1);
     break;
 
@@ -635,7 +635,8 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
 	       flow->protos.ftp_imap_pop_smtp.username, flow->protos.ftp_imap_pop_smtp.password);
 #endif
 
-	if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0')
+	if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0' &&
+	   flow->protos.ftp_imap_pop_smtp.auth_tls == 0) /* TODO: any values on dissecting TLS handshake? */
 	  flow->ftp_control_stage = 0;
 	else
 	  ndpi_int_ftp_control_add_connection(ndpi_struct, flow);
