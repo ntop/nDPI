@@ -11,7 +11,7 @@ on:
     types: [created]
 jobs:
   test:
-    name: ${{ matrix.os }} ${{ matrix.gcrypt }} ${{ format(matrix.compiler, '-cc') }}
+    name: ${{ matrix.os }} ${{ matrix.gcrypt }} ${{ matrix.compiler }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
@@ -21,13 +21,13 @@ jobs:
         compiler: ["default-cc"]
         # We test oldest (available) versus newest (available) compiler version on Ubuntu Latest
         include:
-          - compiler: "g{0}-7"
+          - compiler: "gcc-7"
             os: ubuntu-latest
-          - compiler: "g{0}-10"
+          - compiler: "gcc-10"
             os: ubuntu-latest
-          - compiler: "clang{0}-7"
+          - compiler: "clang-7"
             os: ubuntu-latest
-          - compiler: "clang{0}-12"
+          - compiler: "clang-12"
             os: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -44,15 +44,13 @@ jobs:
         run: |
           sudo apt-get install libgcrypt20-dev
       - name: Setup Ubuntu specified compiler (gcc)
-        if: startsWith(matrix.os, 'ubuntu')  && startsWith(matrix.compiler, 'g')
+        if: startsWith(matrix.os, 'ubuntu')  && startsWith(matrix.compiler, 'gcc')
         run: |
-          sudo apt-get install ${{ format(matrix.compiler, 'cc') }}
-          sudo apt-get install ${{ format(matrix.compiler, '++') }}
+          sudo apt-get install ${{ matrix.compiler }}
       - name: Setup Ubuntu specified compiler (clang)
-        if: startsWith(matrix.os, 'ubuntu')  && startsWith(matrix.compiler, 'c')
+        if: startsWith(matrix.os, 'ubuntu')  && startsWith(matrix.compiler, 'clang')
         run: |
-          sudo apt-get install ${{ format(matrix.compiler, '') }}
-          sudo apt-get install ${{ format(matrix.compiler, '++') }}
+          sudo apt-get install ${{ matrix.compiler }}
       - name: Installing MacOS prerequisites
         if: startsWith(matrix.os, 'macOS')
         run: |
@@ -61,21 +59,30 @@ jobs:
         if: startsWith(matrix.os, 'macOS') && !startsWith(matrix.gcrypt, '--disable-gcrypt')
         run: |
           brew install libgcrypt
-      - name: Configure nDPI
-        if: startsWith(matrix.compiler, 'default-cc')
+      - name: Configure nDPI on Ubuntu
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'default-cc')
         run: |
-          env CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+          env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+      - name: Configure nDPI on MacOS
+        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.compiler, 'default-cc')
+        run: |
+          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
       - name: Configure nDPI with specified GCC version on Ubuntu
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'g')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'gcc')
         run: |
-          env CC=${{ format(matrix.compiler, 'cc') }} CXX=${{ format(matrix.compiler, '++') }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
       - name: Configure nDPI with specified CLANG on Ubuntu
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'c')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'clang')
         run: |
-          env CC=${{ format(matrix.compiler, '') }} CXX=${{ format(matrix.compiler, '++') }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
-      - name: Build nDPI
+          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+      - name: Compile nDPI
         run: |
           make all
+          cd example
+          make ndpiSimpleIntegration
+          cd ../python
+          make
+          cd ..
       - name: Test nDPI [DIFF]
         run: |
           ./tests/do.sh
