@@ -1570,7 +1570,7 @@ static int ndpi_is_rce_injection(char* query) {
 
   size_t ushlen = sizeof(ush_commands) / sizeof(ush_commands[0]);
 
-  for(int i = 0; i < ushlen; i++) {
+  for(unsigned long i = 0; i < ushlen; i++) {
     if(strstr(query, ush_commands[i]) != NULL) {
       return 1;
     }
@@ -1578,7 +1578,7 @@ static int ndpi_is_rce_injection(char* query) {
 
   size_t pwshlen = sizeof(pwsh_commands) / sizeof(pwsh_commands[0]);
 
-  for(int i = 0; i < pwshlen; i++) {
+  for(unsigned long i = 0; i < pwshlen; i++) {
     if(strstr(query, pwsh_commands[i]) != NULL) {
       return 1;
     }
