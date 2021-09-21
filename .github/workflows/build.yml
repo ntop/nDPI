@@ -25,9 +25,9 @@ jobs:
             os: ubuntu-latest
           - compiler: "g{0}-10"
             os: ubuntu-latest
-          - compiler:  "clang{0}-7"
+          - compiler: "clang{0}-7"
             os: ubuntu-latest
-          - compiler:  "clang{0}-12"
+          - compiler: "clang{0}-12"
             os: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -68,11 +68,11 @@ jobs:
       - name: Configure nDPI with specified GCC version on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'g')
         run: |
-          env CC=${{ format(matrix.compiler, 'cc') }} CXX=${{ format(matrix.compiler, '++') }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}  
+          env CC=${{ format(matrix.compiler, 'cc') }} CXX=${{ format(matrix.compiler, '++') }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
       - name: Configure nDPI with specified CLANG on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'c')
         run: |
-          env CC=${{ format(matrix.compiler, '') }} CXX=${{ format(matrix.compiler, '++') }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }} 
+          env CC=${{ format(matrix.compiler, '') }} CXX=${{ format(matrix.compiler, '++') }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
       - name: Build nDPI
         run: |
           make all
