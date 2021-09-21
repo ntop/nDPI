@@ -238,11 +238,13 @@ AS_IF([test "x$enable_gcrypt" = "xyes"], [
 ])
 
 dnl> PCRE
+PCRE_ENABLED=0
 AC_ARG_WITH(pcre,          [  --with-pcre        Enable nDPI build with libpcre])
 if test "${with_pcre+set}" = set; then :
   AC_CHECK_LIB(pcre, pcre_compile, AC_DEFINE_UNQUOTED(HAVE_PCRE, 1, [libpcre(-dev) is present]))
   if test "x$ac_cv_lib_pcre_pcre_compile" = xyes; then :
     ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lpcre"
+    PCRE_ENABLED=1
   fi
 fi
 
