@@ -11,7 +11,7 @@ on:
     types: [created]
 jobs:
   test:
-    name: ${{ matrix.os }} ${{ matrix.gcrypt }} ${{ matrix.compiler }}
+    name: ${{ matrix.os }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
@@ -19,16 +19,58 @@ jobs:
         os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11"]
         gcrypt: ["--disable-gcrypt", ""]
         compiler: ["default-cc"]
-        # We test oldest (available) versus newest (available) compiler version on Ubuntu Latest
+        pcre: [""]
+        maxminddb: [""]
+        msan: [""]
         include:
           - compiler: "gcc-7"
             os: ubuntu-latest
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
           - compiler: "gcc-10"
             os: ubuntu-latest
-          - compiler: "clang-7"
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+          - compiler:  "clang-7"
             os: ubuntu-latest
-          - compiler: "clang-12"
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+          - compiler:  "clang-12"
             os: ubuntu-latest
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+          - compiler: "default-cc"
+            os: ubuntu-latest
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+          - compiler: "default-cc"
+            os: ubuntu-18.04
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+          - compiler:  "default-cc"
+            os: macOS-latest
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+          - compiler:  "default-cc"
+            os: macos-11
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
     steps:
       - uses: actions/checkout@v2
         with:
@@ -43,6 +85,14 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.gcrypt, '--disable-gcrypt')
         run: |
           sudo apt-get install libgcrypt20-dev
+      - name: Install Ubuntu Prerequisites (libpcre)
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.pcre, '--with-pcre')
+        run: |
+          sudo apt-get install libpcre3-dev
+      - name: Install Ubuntu Prerequisites (maxminddb)
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.maxminddb, '--with-maxminddb')
+        run: |
+          sudo apt-get install libmaxminddb-dev
       - name: Setup Ubuntu specified compiler (gcc)
         if: startsWith(matrix.os, 'ubuntu')  && startsWith(matrix.compiler, 'gcc')
         run: |
@@ -59,22 +109,30 @@ jobs:
         if: startsWith(matrix.os, 'macOS') && !startsWith(matrix.gcrypt, '--disable-gcrypt')
         run: |
           brew install libgcrypt
+      - name: Install MacOS Prerequisites (libpcre)
+        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.pcre, '--with-pcre')
+        run: |
+          brew install pcre
+      - name: Install MacOS Prerequisites (maxminddb)
+        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.maxminddb, '--with-maxminddb')
+        run: |
+          brew install libmaxminddb
       - name: Configure nDPI on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'default-cc')
         run: |
-          env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+          env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
       - name: Configure nDPI on MacOS
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.compiler, 'default-cc')
         run: |
-          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
       - name: Configure nDPI with specified GCC version on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'gcc')
         run: |
-          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
       - name: Configure nDPI with specified CLANG on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.compiler, 'clang')
         run: |
-          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }}
+          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
       - name: Compile nDPI
         run: |
           make all
@@ -95,7 +153,7 @@ jobs:
       - name: Configure nDPI [ARM] (runs only on ubuntu jobs)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
-          make distclean && env CFLAGS='-Werror' ./autogen.sh --host=arm-linux-gnueabihf --with-only-libndpi ${{ matrix.gcrypt }}
+          make distclean && env CFLAGS='-Werror' ./autogen.sh --host=arm-linux-gnueabihf --with-only-libndpi ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
       - name: Build nDPI [ARM] (runs only on ubuntu jobs)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
@@ -103,7 +161,7 @@ jobs:
       - name: Configure nDPI [Mingw-w64] (runs only on ubuntu jobs)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
-          make distclean && ./autogen.sh --host=x86_64-w64-mingw32 ${{ matrix.gcrypt }}
+          make distclean && ./autogen.sh --host=x86_64-w64-mingw32 ${{ matrix.gcrypt }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
       - name: Build nDPI [Mingw-w64] (runs only on ubuntu jobs)
         if: startsWith(matrix.os, 'ubuntu')
         run: |
