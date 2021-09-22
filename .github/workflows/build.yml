@@ -41,7 +41,7 @@ jobs:
           - compiler: "clang-7"
             os: ubuntu-latest
             arch: "x86_64"
-            gcrypt: "x86_64"
+            gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
