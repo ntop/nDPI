@@ -1343,7 +1343,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
     return;
   }
-  num_tags = (*(uint16_t *)&crypto_data[4]);
+  num_tags = le16toh(*(uint16_t *)&crypto_data[4]);
 
   tag_offset_start = 8 + 8 * num_tags;
   prev_offset = 0;
@@ -1351,7 +1351,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
     if(8 + 8 * i + 8 >= crypto_data_len)
       break;
     tag = &crypto_data[8 + 8 * i];
-    offset = *((u_int32_t *)&crypto_data[8 + 8 * i + 4]);
+    offset = le32toh(*((u_int32_t *)&crypto_data[8 + 8 * i + 4]));
     if(prev_offset > offset)
       break;
     len = offset - prev_offset;
