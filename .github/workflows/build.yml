@@ -80,21 +80,21 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
-          - compiler:  "default-cc"
+          - compiler: "default-cc"
             os: ubuntu-latest
             arch: "arm64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on arm64
-          - compiler:  "default-cc"
+          - compiler: "default-cc"
             os: ubuntu-latest
             arch: "armhf"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler:  "default-cc"
+          - compiler: "default-cc"
             os: ubuntu-latest
             arch: "s390x"
             gcrypt: ""
