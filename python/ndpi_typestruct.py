@@ -507,6 +507,15 @@ class Http2(Structure):
         ("nat_ip", c_char * 24)
     ]
 
+class FtpImapPopSmtp(Structure):
+    _fields_ = [
+        ("auth_found", c_uint8, 1),
+        ("auth_failed", c_uint8, 1),
+        ("auth_tls", c_uint8, 1),
+        ("_pad", c_uint8, 5),
+        ("username", c_char * 16),
+        ("password", c_char * 16)
+    ]
 
 class Bittorrent(Structure):
     _fields_ = [("hash", c_char * 20)]
@@ -529,6 +538,7 @@ class Protos(Union):
         ("mdns", Mdns),
         ("ubntac2", Ubntac2),
         ("http", Http2),
+        ("ftp_imap_pop_smtp", FtpImapPopSmtp),
         ("bittorrent", Bittorrent),
         ("dhcp", Dhcp)
     ]

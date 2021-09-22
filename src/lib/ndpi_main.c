@@ -7242,7 +7242,8 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   case NDPI_PROTOCOL_MAIL_POP:
   case NDPI_PROTOCOL_MAIL_IMAP:
   case NDPI_PROTOCOL_MAIL_SMTP:
-    if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0')
+    if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0' &&
+       flow->protos.ftp_imap_pop_smtp.auth_tls == 0)
       return(1);
     break;
 
