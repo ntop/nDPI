@@ -35,13 +35,13 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler:  "clang-7"
+          - compiler: "clang-7"
             os: ubuntu-latest
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler:  "clang-12"
+          - compiler: "clang-12"
             os: ubuntu-latest
             gcrypt: ""
             pcre: "--with-pcre"
@@ -59,13 +59,13 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler:  "default-cc"
+          - compiler: "default-cc"
             os: macOS-latest
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler:  "default-cc"
+          - compiler: "default-cc"
             os: macos-11
             gcrypt: ""
             pcre: "--with-pcre"
