@@ -72,7 +72,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 
   NDPI_LOG_DBG(ndpi_struct, "search GNUTELLA\n");
 
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_GNUTELLA) {
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_GNUTELLA) {
     if (src != NULL && ((u_int32_t)
 			(packet->current_time_ms - src->gnutella_ts) < ndpi_struct->gnutella_timeout)) {
       NDPI_LOG_DBG2(ndpi_struct, "save src connection packet detected\n");

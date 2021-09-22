@@ -67,7 +67,7 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
 
 
     if(packet->iph /* IPv4 Only: we need to support packet->iphv6 at some point */) {
-      /* if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */ {
+      /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */ {
 	/*
 	Spotify
 
@@ -126,7 +126,7 @@ void ndpi_search_spotify(struct ndpi_detection_module_struct *ndpi_struct, struc
   NDPI_LOG_DBG(ndpi_struct, "search spotify\n");
 
   /* skip marked packets */
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_SPOTIFY) {
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SPOTIFY) {
     if (packet->tcp_retransmission == 0) {
       ndpi_check_spotify(ndpi_struct, flow);
     }

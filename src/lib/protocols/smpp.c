@@ -42,7 +42,7 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
                           struct ndpi_flow_struct* flow)
 {
   NDPI_LOG_DBG(ndpi_struct, "search SMPP\n");
-  if (flow->packet.detected_protocol_stack[0] != NDPI_PROTOCOL_SMPP){
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SMPP){
     struct ndpi_packet_struct* packet = &flow->packet;
     // min SMPP packet length = 16 bytes
     if (packet->payload_packet_len < 16) {

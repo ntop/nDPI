@@ -44,7 +44,7 @@ void ndpi_search_soulseek_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->tcp) {
 
-    if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_SOULSEEK) {
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SOULSEEK) {
       NDPI_LOG_DBG2(ndpi_struct, "packet marked as Soulseek\n");
       if(src != NULL)
 	NDPI_LOG_DBG2(ndpi_struct,

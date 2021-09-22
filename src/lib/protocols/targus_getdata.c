@@ -55,12 +55,10 @@ static void ndpi_check_targus_getdata(struct ndpi_detection_module_struct *ndpi_
 
 void ndpi_search_targus_getdata(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-
   NDPI_LOG_DBG(ndpi_struct, "search targus getdata\n");
 
   /* skip marked packets */
-  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_TARGUS_GETDATA)
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_TARGUS_GETDATA)
     ndpi_check_targus_getdata(ndpi_struct, flow);
 }
 

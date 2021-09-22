@@ -150,7 +150,7 @@ void ndpi_int_search_thunder_http(struct ndpi_detection_module_struct
   struct ndpi_id_struct *dst = flow->dst;
 
 
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_THUNDER) {
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_THUNDER) {
     if (src != NULL && ((u_int32_t)
 			(packet->current_time_ms - src->thunder_ts) < ndpi_struct->thunder_timeout)) {
       NDPI_LOG_DBG2(ndpi_struct,

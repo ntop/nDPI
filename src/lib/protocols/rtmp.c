@@ -83,7 +83,7 @@ void ndpi_search_rtmp(struct ndpi_detection_module_struct *ndpi_struct, struct n
   NDPI_LOG_DBG(ndpi_struct, "search RTMP\n");
 
   /* skip marked packets */
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_RTMP) {
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RTMP) {
     if (packet->tcp_retransmission == 0) {
       ndpi_check_rtmp(ndpi_struct, flow);
     }

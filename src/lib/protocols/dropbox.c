@@ -77,7 +77,7 @@ void ndpi_search_dropbox(struct ndpi_detection_module_struct *ndpi_struct, struc
   NDPI_LOG_DBG(ndpi_struct, "search dropbox\n");
 
   /* skip marked packets */
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_DROPBOX) {
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_DROPBOX) {
     if (packet->tcp_retransmission == 0) {
       ndpi_check_dropbox(ndpi_struct, flow);
     }

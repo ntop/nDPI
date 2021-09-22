@@ -4275,12 +4275,6 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   return(0);
 }
 
-/* ************************************************ */
-
-void ndpi_apply_flow_protocol_to_packet(struct ndpi_flow_struct *flow, struct ndpi_packet_struct *packet) {
-  memcpy(&packet->detected_protocol_stack, &flow->detected_protocol_stack, sizeof(packet->detected_protocol_stack));
-}
-
 /* ****************************************************** */
 
 void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
@@ -4360,8 +4354,6 @@ static int ndpi_init_packet_header(struct ndpi_detection_module_struct *ndpi_str
   flow->packet.tcp = NULL, flow->packet.udp = NULL;
   flow->packet.generic_l4_ptr = NULL;
   flow->packet.iphv6 = NULL;
-
-  ndpi_apply_flow_protocol_to_packet(flow, &flow->packet);
 
   l3len = flow->packet.l3_packet_len;
 
@@ -4641,7 +4633,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   u_int32_t a;
 
-  NDPI_SAVE_AS_BITMASK(detection_bitmask, flow->packet.detected_protocol_stack[0]);
+  NDPI_SAVE_AS_BITMASK(detection_bitmask, flow->detected_protocol_stack[0]);
 
   if ((proto_id != NDPI_PROTOCOL_UNKNOWN) &&
       NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
@@ -5443,8 +5435,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   /* need at least 20 bytes for ip header */
   if(packetlen < 20) {
-    /* reset protocol which is normally done in init_packet_header */
-    ndpi_int_reset_packet_protocol(&flow->packet);
     goto invalidate_ptr;
   }
 
@@ -5493,7 +5483,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
 
-  a = flow->packet.detected_protocol_stack[0];
+  a = flow->detected_protocol_stack[0];
   if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->detection_bitmask, a) == 0)
     a = NDPI_PROTOCOL_UNKNOWN;
 
@@ -6255,28 +6245,10 @@ void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_str
 
 /* ********************************************************************************* */
 
-void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol) {
-  struct ndpi_packet_struct *packet = &flow->packet;
-  /* NOTE: everything below is identically to change_flow_protocol
-   *        except flow->packet If you want to change something here,
-   *        don't! Change it for the flow function and apply it here
-   *        as well */
-
-  if(!packet)
-    return;
-
-  packet->detected_protocol_stack[0] = upper_detected_protocol,
-    packet->detected_protocol_stack[1] = lower_detected_protocol;
-}
-
-/* ********************************************************************************* */
-
 /* generic function for changing the protocol
  *
  * what it does is:
  * 1.update the flow protocol stack with the new protocol
- * 2.update the packet protocol stack with the new protocol
  */
 void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 			      u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol) {
@@ -6297,7 +6269,6 @@ void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, str
   }
 
   ndpi_int_change_flow_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol);
-  ndpi_int_change_packet_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol);
 }
 
 /* ********************************************************************************* */
@@ -6305,16 +6276,6 @@ void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, str
 void ndpi_int_change_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 			      ndpi_protocol_category_t protocol_category) {
   flow->category = protocol_category;
-}
-
-/* ********************************************************************************* */
-
-/* turns a packet back to unknown */
-void ndpi_int_reset_packet_protocol(struct ndpi_packet_struct *packet) {
-  int a;
-
-  for(a = 0; a < NDPI_PROTOCOL_SIZE; a++)
-    packet->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;
 }
 
 /* ********************************************************************************* */
@@ -6913,7 +6874,6 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 						      u_int string_to_match_len, u_int16_t master_protocol_id,
 						      ndpi_protocol_match_result *ret_match, u_int8_t is_host_match) {
   int matching_protocol_id;
-  struct ndpi_packet_struct *packet = &flow->packet;
 
   matching_protocol_id =
     ndpi_match_string_subprotocol(ndpi_str, string_to_match, string_to_match_len, ret_match, is_host_match);
@@ -6935,18 +6895,15 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 #endif
 
   if((matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
-     (!ndpi_is_more_generic_protocol(packet->detected_protocol_stack[0], matching_protocol_id))) {
+     (!ndpi_is_more_generic_protocol(flow->detected_protocol_stack[0], matching_protocol_id))) {
     /* Move the protocol on slot 0 down one position */
-    packet->detected_protocol_stack[1] = master_protocol_id,
-      packet->detected_protocol_stack[0] = matching_protocol_id;
-
-    flow->detected_protocol_stack[0] = packet->detected_protocol_stack[0],
-      flow->detected_protocol_stack[1] = packet->detected_protocol_stack[1];
+    flow->detected_protocol_stack[1] = master_protocol_id,
+      flow->detected_protocol_stack[0] = matching_protocol_id;
 
     if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
       flow->category = ret_match->protocol_category;
 
-    return(packet->detected_protocol_stack[0]);
+    return(flow->detected_protocol_stack[0]);
   }
 
 #ifdef DEBUG
@@ -7517,7 +7474,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
        )
       return(0);
     
-    if(flow && (flow->packet.detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
+    if(flow && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
       return(0); /* Ignore DGA check for protocols already fully detected */
 
     if(strncmp(name, "www.", 4) == 0)

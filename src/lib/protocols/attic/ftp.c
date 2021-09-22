@@ -407,7 +407,7 @@ void ndpi_search_ftp_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
   if (src != NULL && ndpi_packet_dst_ip_eql(packet, &src->ftp_ip)
       && packet->tcp->syn != 0 && packet->tcp->ack == 0
-      && packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
+      && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
       && NDPI_COMPARE_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask,
 					  NDPI_PROTOCOL_FTP) != 0 && src->ftp_timer_set != 0) {
     NDPI_LOG(NDPI_PROTOCOL_FTP, ndpi_struct, NDPI_LOG_DEBUG, "possible ftp data, src!= 0.\n");
@@ -425,7 +425,7 @@ void ndpi_search_ftp_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 
   if (dst != NULL && ndpi_packet_src_ip_eql(packet, &dst->ftp_ip)
       && packet->tcp->syn != 0 && packet->tcp->ack == 0
-      && packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
+      && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
       && NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask,
 					  NDPI_PROTOCOL_FTP) != 0 && dst->ftp_timer_set != 0) {
     NDPI_LOG(NDPI_PROTOCOL_FTP, ndpi_struct, NDPI_LOG_DEBUG, "possible ftp data; dst!= 0.\n");
@@ -453,7 +453,7 @@ void ndpi_search_ftp_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
   /* skip excluded connections */
 
   // we test for FTP connection and search for passive mode
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_FTP) {
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_FTP) {
     NDPI_LOG(NDPI_PROTOCOL_FTP, ndpi_struct, NDPI_LOG_DEBUG,
 	     "detected ftp command mode. going to test data mode.\n");
     search_passive_ftp_mode(ndpi_struct, flow);
@@ -463,7 +463,7 @@ void ndpi_search_ftp_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
   }
 
 
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN && search_ftp(ndpi_struct, flow) != 0) {
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN && search_ftp(ndpi_struct, flow) != 0) {
     NDPI_LOG(NDPI_PROTOCOL_FTP, ndpi_struct, NDPI_LOG_DEBUG, "unknown. need next packet.\n");
 
     return;

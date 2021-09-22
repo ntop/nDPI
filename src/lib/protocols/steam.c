@@ -265,12 +265,12 @@ void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct 
     
     ndpi_check_steam_udp1(ndpi_struct, flow);
 	
-    if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
       return;   
 	
     ndpi_check_steam_udp2(ndpi_struct, flow);
 	
-    if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
       return;   
 	
     ndpi_check_steam_udp3(ndpi_struct, flow);
@@ -286,18 +286,18 @@ void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct 
       return;
     }
 
-    if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
       return;   
 
     NDPI_LOG_DBG(ndpi_struct, "search STEAM\n");
     ndpi_check_steam_http(ndpi_struct, flow);
 	
-    if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
       return;   
 
     ndpi_check_steam_tcp(ndpi_struct, flow);
 	
-    if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
       return;   
   }
 }

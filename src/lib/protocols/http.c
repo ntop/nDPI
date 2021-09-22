@@ -21,6 +21,8 @@
  *
  */
 
+#include <assert.h>
+
 #include "ndpi_protocol_ids.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
@@ -597,10 +599,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
 
     if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-      if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) {
+      if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) {
 	NDPI_LOG_INFO(ndpi_struct, "found HTTP/%s\n",
-		      ndpi_get_proto_name(ndpi_struct, packet->detected_protocol_stack[0]));
-	ndpi_int_http_add_connection(ndpi_struct, flow, packet->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
+		      ndpi_get_proto_name(ndpi_struct, flow->detected_protocol_stack[0]));
+	ndpi_int_http_add_connection(ndpi_struct, flow, flow->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
 	return; /* We have identified a sub-protocol so we're done */
       }
     }
@@ -674,7 +676,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   if (ndpi_get_http_method(ndpi_struct, flow) != NDPI_HTTP_METHOD_UNKNOWN)
   {
-    ndpi_int_http_add_connection(ndpi_struct, flow, packet->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
+    ndpi_int_http_add_connection(ndpi_struct, flow, flow->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
   }
 }
 

@@ -114,7 +114,7 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search SOME/IP\n");
 
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     return;
   }
  

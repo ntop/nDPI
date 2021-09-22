@@ -87,10 +87,6 @@ extern "C" {
   extern u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_struct,
 						struct ndpi_flow_struct *flow, u_int16_t counter);
 
-  extern void ndpi_int_change_packet_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-					      struct ndpi_flow_struct *flow,
-					      u_int16_t upper_detected_protocol,
-					      u_int16_t lower_detected_protocol);
   extern void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow,
 				       u_int16_t upper_detected_protocol,
@@ -109,7 +105,6 @@ extern "C" {
 				      ndpi_port_range *tcpDefPorts,
 				      ndpi_port_range *udpDefPorts);
 
-  extern void ndpi_int_reset_packet_protocol(struct ndpi_packet_struct *packet);
   extern void ndpi_int_reset_protocol(struct ndpi_flow_struct *flow);
 
   extern int ndpi_packet_src_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip);

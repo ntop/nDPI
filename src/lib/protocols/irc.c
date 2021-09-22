@@ -391,7 +391,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     return;
   }
 
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_IRC) {
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_IRC) {
     if (src != NULL && ((u_int32_t)
 			(packet->current_time_ms - src->irc_ts) < ndpi_struct->irc_timeout)) {
       NDPI_LOG_DBG2(ndpi_struct, "irc : save src connection packet detected\n");
