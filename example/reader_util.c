@@ -447,6 +447,25 @@ void ndpi_flow_info_freer(void *node) {
 
 static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
 
+  if(flow->dhcp_fingerprint) {
+    ndpi_free(flow->dhcp_fingerprint);
+    flow->dhcp_fingerprint = NULL;
+  }
+
+  if(flow->bittorent_hash) {
+    ndpi_free(flow->bittorent_hash);
+    flow->bittorent_hash = NULL;
+  }
+
+  if(flow->telnet.username) {
+    ndpi_free(flow->telnet.username);
+    flow->telnet.username = NULL;
+  }
+  if(flow->telnet.password) {
+    ndpi_free(flow->telnet.password);
+    flow->telnet.password = NULL;
+  }
+
   if(flow->ssh_tls.server_names) {
     ndpi_free(flow->ssh_tls.server_names);
     flow->ssh_tls.server_names = NULL;
@@ -488,6 +507,9 @@ static void ndpi_free_flow_data_analysis(struct ndpi_flow_info *flow) {
   if(flow->pktlen_s_to_c) ndpi_free_data_analysis(flow->pktlen_s_to_c, 1);
 
   if(flow->iat_flow) ndpi_free_data_analysis(flow->iat_flow, 1);
+
+  if(flow->entropy) ndpi_free(flow->entropy);
+  if(flow->last_entropy) ndpi_free(flow->last_entropy);
 }
 
 /* ***************************************************** */
@@ -576,14 +598,14 @@ ndpi_flow_update_byte_count(struct ndpi_flow_info *flow, const void *x,
    * the 4000th octet has been seen for a flow.
    */
 
-  if((flow->entropy.src2dst_pkt_count+flow->entropy.dst2src_pkt_count) <= max_num_packets_per_flow) {
+  if((flow->entropy->src2dst_pkt_count+flow->entropy->dst2src_pkt_count) <= max_num_packets_per_flow) {
     /* octet count was already incremented before processing this payload */
     u_int32_t current_count;
 
     if(src_to_dst_direction) {
-      current_count = flow->entropy.src2dst_l4_bytes - len;
+      current_count = flow->entropy->src2dst_l4_bytes - len;
     } else {
-      current_count = flow->entropy.dst2src_l4_bytes - len;
+      current_count = flow->entropy->dst2src_l4_bytes - len;
     }
 
     if(current_count < ETTA_MIN_OCTETS) {
@@ -592,9 +614,9 @@ ndpi_flow_update_byte_count(struct ndpi_flow_info *flow, const void *x,
 
       for(i=0; i<len; i++) {
         if(src_to_dst_direction) {
-          flow->entropy.src2dst_byte_count[data[i]]++;
+          flow->entropy->src2dst_byte_count[data[i]]++;
         } else {
-          flow->entropy.dst2src_byte_count[data[i]]++;
+          flow->entropy->dst2src_byte_count[data[i]]++;
         }
         current_count++;
         if(current_count >= ETTA_MIN_OCTETS) {
@@ -619,22 +641,22 @@ ndpi_flow_update_byte_dist_mean_var(ndpi_flow_info_t *flow, const void *x,
                                     unsigned int len, u_int8_t src_to_dst_direction) {
   const unsigned char *data = x;
 
-  if((flow->entropy.src2dst_pkt_count+flow->entropy.dst2src_pkt_count) <= max_num_packets_per_flow) {
+  if((flow->entropy->src2dst_pkt_count+flow->entropy->dst2src_pkt_count) <= max_num_packets_per_flow) {
     unsigned int i;
 
     for(i=0; i<len; i++) {
       double delta;
 
       if(src_to_dst_direction) {
-        flow->entropy.src2dst_num_bytes += 1;
-        delta = ((double)data[i] - flow->entropy.src2dst_bd_mean);
-        flow->entropy.src2dst_bd_mean += delta/((double)flow->entropy.src2dst_num_bytes);
-        flow->entropy.src2dst_bd_variance += delta*((double)data[i] - flow->entropy.src2dst_bd_mean);
+        flow->entropy->src2dst_num_bytes += 1;
+        delta = ((double)data[i] - flow->entropy->src2dst_bd_mean);
+        flow->entropy->src2dst_bd_mean += delta/((double)flow->entropy->src2dst_num_bytes);
+        flow->entropy->src2dst_bd_variance += delta*((double)data[i] - flow->entropy->src2dst_bd_mean);
       } else {
-        flow->entropy.dst2src_num_bytes += 1;
-        delta = ((double)data[i] - flow->entropy.dst2src_bd_mean);
-        flow->entropy.dst2src_bd_mean += delta/((double)flow->entropy.dst2src_num_bytes);
-        flow->entropy.dst2src_bd_variance += delta*((double)data[i] - flow->entropy.dst2src_bd_mean);
+        flow->entropy->dst2src_num_bytes += 1;
+        delta = ((double)data[i] - flow->entropy->dst2src_bd_mean);
+        flow->entropy->dst2src_bd_mean += delta/((double)flow->entropy->dst2src_num_bytes);
+        flow->entropy->dst2src_bd_variance += delta*((double)data[i] - flow->entropy->dst2src_bd_mean);
       }
     }
   }
@@ -886,16 +908,21 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
         workflow->stats.flow_count[2]++;
 
       *src = newflow->src_id, *dst = newflow->dst_id;
-      newflow->entropy.src2dst_pkt_len[newflow->entropy.src2dst_pkt_count] = l4_data_len;
-      newflow->entropy.src2dst_pkt_time[newflow->entropy.src2dst_pkt_count] = when;
-      if(newflow->entropy.src2dst_pkt_count == 0) {
-        newflow->entropy.src2dst_start = when;
-      }
-      newflow->entropy.src2dst_pkt_count++;
-      // Non zero app data.
-      if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
-        newflow->entropy.src2dst_opackets++;
-        newflow->entropy.src2dst_l4_bytes += l4_data_len;
+
+      if(enable_joy_stats) {
+        newflow->entropy = ndpi_calloc(1, sizeof(struct ndpi_entropy));
+        newflow->last_entropy = ndpi_calloc(1, sizeof(struct ndpi_entropy));
+        newflow->entropy->src2dst_pkt_len[newflow->entropy->src2dst_pkt_count] = l4_data_len;
+        newflow->entropy->src2dst_pkt_time[newflow->entropy->src2dst_pkt_count] = when;
+        if(newflow->entropy->src2dst_pkt_count == 0) {
+          newflow->entropy->src2dst_start = when;
+        }
+        newflow->entropy->src2dst_pkt_count++;
+        // Non zero app data.
+        if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
+          newflow->entropy->src2dst_opackets++;
+          newflow->entropy->src2dst_l4_bytes += l4_data_len;
+        }
       }
       return newflow;
     }
@@ -922,30 +949,32 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       else
 	*src = rflow->dst_id, *dst = rflow->src_id, *src_to_dst_direction = 0, rflow->bidirectional = 1;
     }
-    if(src_to_dst_direction) {
-      if(rflow->entropy.src2dst_pkt_count < max_num_packets_per_flow) {
-        rflow->entropy.src2dst_pkt_len[rflow->entropy.src2dst_pkt_count] = l4_data_len;
-        rflow->entropy.src2dst_pkt_time[rflow->entropy.src2dst_pkt_count] = when;
-        rflow->entropy.src2dst_l4_bytes += l4_data_len;
-        rflow->entropy.src2dst_pkt_count++;
-      }
-      // Non zero app data.
-      if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
-        rflow->entropy.src2dst_opackets++;
-      }
-    } else {
-      if(rflow->entropy.dst2src_pkt_count < max_num_packets_per_flow) {
-        rflow->entropy.dst2src_pkt_len[rflow->entropy.dst2src_pkt_count] = l4_data_len;
-        rflow->entropy.dst2src_pkt_time[rflow->entropy.dst2src_pkt_count] = when;
-        if(rflow->entropy.dst2src_pkt_count == 0) {
-          rflow->entropy.dst2src_start = when;
+    if(enable_joy_stats) {
+      if(src_to_dst_direction) {
+        if(rflow->entropy->src2dst_pkt_count < max_num_packets_per_flow) {
+          rflow->entropy->src2dst_pkt_len[rflow->entropy->src2dst_pkt_count] = l4_data_len;
+          rflow->entropy->src2dst_pkt_time[rflow->entropy->src2dst_pkt_count] = when;
+          rflow->entropy->src2dst_l4_bytes += l4_data_len;
+          rflow->entropy->src2dst_pkt_count++;
         }
-        rflow->entropy.dst2src_l4_bytes += l4_data_len;
-        rflow->entropy.dst2src_pkt_count++;
-      }
-      // Non zero app data.
-      if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
-        rflow->entropy.dst2src_opackets++;
+        // Non zero app data.
+        if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
+          rflow->entropy->src2dst_opackets++;
+        }
+      } else {
+        if(rflow->entropy->dst2src_pkt_count < max_num_packets_per_flow) {
+          rflow->entropy->dst2src_pkt_len[rflow->entropy->dst2src_pkt_count] = l4_data_len;
+          rflow->entropy->dst2src_pkt_time[rflow->entropy->dst2src_pkt_count] = when;
+          if(rflow->entropy->dst2src_pkt_count == 0) {
+            rflow->entropy->dst2src_start = when;
+          }
+          rflow->entropy->dst2src_l4_bytes += l4_data_len;
+          rflow->entropy->dst2src_pkt_count++;
+        }
+        // Non zero app data.
+        if(l4_data_len != 0XFEEDFACE && l4_data_len != 0) {
+          rflow->entropy->dst2src_opackets++;
+        }
       }
     }
 
@@ -1041,18 +1070,21 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   flow->risk = flow->ndpi_flow->risk;
 
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)) {
-    snprintf(flow->dhcp_fingerprint, sizeof(flow->dhcp_fingerprint), "%s", flow->ndpi_flow->protos.dhcp.fingerprint);
+    if(flow->ndpi_flow->protos.dhcp.fingerprint[0] != '\0')
+      flow->dhcp_fingerprint = ndpi_strdup(flow->ndpi_flow->protos.dhcp.fingerprint);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_BITTORRENT)) {
-    u_int j, n = 0;
+    u_int j;
 
-    for(i=0, j = 0; j < sizeof(flow->bittorent_hash)-1; i++) {
-      sprintf(&flow->bittorent_hash[j], "%02x",
-	      flow->ndpi_flow->protos.bittorrent.hash[i]);
+    if(flow->ndpi_flow->protos.bittorrent.hash[0] != '\0') {
+      flow->bittorent_hash = ndpi_malloc(sizeof(flow->ndpi_flow->protos.bittorrent.hash) * 2 + 1);
+      for(i=0, j = 0; i < sizeof(flow->ndpi_flow->protos.bittorrent.hash); i++) {
+        sprintf(&flow->bittorent_hash[j], "%02x",
+	        flow->ndpi_flow->protos.bittorrent.hash[i]);
 
-      j += 2, n += flow->ndpi_flow->protos.bittorrent.hash[i];
+        j += 2;
+      }
+      flow->bittorent_hash[j] = '\0';
     }
-
-    if(n == 0) flow->bittorent_hash[0] = '\0';
   }
   /* DNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DNS)) {
@@ -1118,8 +1150,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
     }
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TELNET)) {
-    snprintf(flow->telnet.username, sizeof(flow->telnet.username), "%s", flow->ndpi_flow->protos.telnet.username);
-    snprintf(flow->telnet.password, sizeof(flow->telnet.password), "%s", flow->ndpi_flow->protos.telnet.password);
+    if(flow->ndpi_flow->protos.telnet.username[0] != '\0')
+      flow->telnet.username = ndpi_strdup(flow->ndpi_flow->protos.telnet.username);
+    if(flow->ndpi_flow->protos.telnet.password[0] != '\0')
+      flow->telnet.password = ndpi_strdup(flow->ndpi_flow->protos.telnet.password);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)) {
     snprintf(flow->ssh_tls.client_requested_server_name,
 	     sizeof(flow->ssh_tls.client_requested_server_name), "%s",
@@ -1241,9 +1275,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
  */
 static void
 ndpi_clear_entropy_stats(struct ndpi_flow_info *flow) {
-  if(flow->entropy.src2dst_pkt_count + flow->entropy.dst2src_pkt_count == max_num_packets_per_flow) {
-    memcpy(&flow->last_entropy, &flow->entropy,  sizeof(struct ndpi_entropy));
-    memset(&flow->entropy, 0x00, sizeof(struct ndpi_entropy));
+  if(enable_joy_stats) {
+    if(flow->entropy->src2dst_pkt_count + flow->entropy->dst2src_pkt_count == max_num_packets_per_flow) {
+      memcpy(flow->last_entropy, flow->entropy,  sizeof(struct ndpi_entropy));
+      memset(flow->entropy, 0x00, sizeof(struct ndpi_entropy));
+    }
   }
 }
 
@@ -1355,8 +1391,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if((tcph != NULL) && (tcph->fin || tcph->rst || tcph->syn))
       begin_or_end_tcp = 1;
 
-    if(flow->entropy.flow_last_pkt_time.tv_sec) {
-      ndpi_timer_sub(&when, &flow->entropy.flow_last_pkt_time, &tdiff);
+    if(flow->flow_last_pkt_time.tv_sec) {
+      ndpi_timer_sub(&when, &flow->flow_last_pkt_time, &tdiff);
 
       if(flow->iat_flow
 	 && (tdiff.tv_sec >= 0) /* Discard backward time */
@@ -1368,11 +1404,11 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       }
     }
 
-    memcpy(&flow->entropy.flow_last_pkt_time, &when, sizeof(when));
-    
-    if(src_to_dst_direction) {     
-      if(flow->entropy.src2dst_last_pkt_time.tv_sec) {
-	ndpi_timer_sub(&when, &flow->entropy.src2dst_last_pkt_time, &tdiff);
+    memcpy(&flow->flow_last_pkt_time, &when, sizeof(when));
+
+    if(src_to_dst_direction) {
+      if(flow->src2dst_last_pkt_time.tv_sec) {
+	ndpi_timer_sub(&when, &flow->src2dst_last_pkt_time, &tdiff);
 
 	if(flow->iat_c_to_s
 	   && (tdiff.tv_sec >= 0) /* Discard backward time */
@@ -1385,15 +1421,15 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
       ndpi_data_add_value(flow->pktlen_c_to_s, rawsize);
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize, flow->src2dst_goodput_bytes += payload_len;
-      memcpy(&flow->entropy.src2dst_last_pkt_time, &when, sizeof(when));
+      memcpy(&flow->src2dst_last_pkt_time, &when, sizeof(when));
 
 #ifdef DIRECTION_BINS
       if(payload_len && (flow->src2dst_packets < MAX_NUM_BIN_PKTS))
 	ndpi_inc_bin(&flow->payload_len_bin_src2dst, plen2slot(payload_len));
 #endif
     } else {      
-      if(flow->entropy.dst2src_last_pkt_time.tv_sec && (!begin_or_end_tcp)) {
-	ndpi_timer_sub(&when, &flow->entropy.dst2src_last_pkt_time, &tdiff);
+      if(flow->dst2src_last_pkt_time.tv_sec && (!begin_or_end_tcp)) {
+	ndpi_timer_sub(&when, &flow->dst2src_last_pkt_time, &tdiff);
 
 	if(flow->iat_s_to_c) {
 	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
@@ -1403,7 +1439,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       }
       ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize, flow->dst2src_goodput_bytes += payload_len;
-      memcpy(&flow->entropy.dst2src_last_pkt_time, &when, sizeof(when));
+      memcpy(&flow->dst2src_last_pkt_time, &when, sizeof(when));
 
 #ifdef DIRECTION_BINS
       if(payload_len && (flow->dst2src_packets < MAX_NUM_BIN_PKTS))
@@ -1431,24 +1467,24 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       ndpi_flow_update_byte_count(flow, payload, payload_len, src_to_dst_direction);
       ndpi_flow_update_byte_dist_mean_var(flow, payload, payload_len, src_to_dst_direction);
       /* Update SPLT scores for first 32 packets. */
-      if((flow->entropy.src2dst_pkt_count+flow->entropy.dst2src_pkt_count) <= max_num_packets_per_flow) {
+      if((flow->entropy->src2dst_pkt_count+flow->entropy->dst2src_pkt_count) <= max_num_packets_per_flow) {
         if(flow->bidirectional)
-          flow->entropy.score = ndpi_classify(flow->entropy.src2dst_pkt_len, flow->entropy.src2dst_pkt_time,
-					      flow->entropy.dst2src_pkt_len, flow->entropy.dst2src_pkt_time,
-					      flow->entropy.src2dst_start, flow->entropy.dst2src_start,
+          flow->entropy->score = ndpi_classify(flow->entropy->src2dst_pkt_len, flow->entropy->src2dst_pkt_time,
+					      flow->entropy->dst2src_pkt_len, flow->entropy->dst2src_pkt_time,
+					      flow->entropy->src2dst_start, flow->entropy->dst2src_start,
 					      max_num_packets_per_flow, flow->src_port, flow->dst_port,
 					      flow->src2dst_packets, flow->dst2src_packets,
-					      flow->entropy.src2dst_opackets, flow->entropy.dst2src_opackets,
-					      flow->entropy.src2dst_l4_bytes, flow->entropy.dst2src_l4_bytes, 1,
-					      flow->entropy.src2dst_byte_count, flow->entropy.dst2src_byte_count);
+					      flow->entropy->src2dst_opackets, flow->entropy->dst2src_opackets,
+					      flow->entropy->src2dst_l4_bytes, flow->entropy->dst2src_l4_bytes, 1,
+					      flow->entropy->src2dst_byte_count, flow->entropy->dst2src_byte_count);
 	else
-	  flow->entropy.score = ndpi_classify(flow->entropy.src2dst_pkt_len, flow->entropy.src2dst_pkt_time,
-					      NULL, NULL, flow->entropy.src2dst_start, flow->entropy.src2dst_start,
+	  flow->entropy->score = ndpi_classify(flow->entropy->src2dst_pkt_len, flow->entropy->src2dst_pkt_time,
+					      NULL, NULL, flow->entropy->src2dst_start, flow->entropy->src2dst_start,
 					      max_num_packets_per_flow, flow->src_port, flow->dst_port,
 					      flow->src2dst_packets, 0,
-					      flow->entropy.src2dst_opackets, 0,
-					      flow->entropy.src2dst_l4_bytes, 0, 1,
-					      flow->entropy.src2dst_byte_count, NULL);
+					      flow->entropy->src2dst_opackets, 0,
+					      flow->entropy->src2dst_l4_bytes, 0, 1,
+					      flow->entropy->src2dst_byte_count, NULL);
       }
     }
 
@@ -1459,6 +1495,12 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
     /* Copy packets entropy if num packets count == 10 */
     ndpi_clear_entropy_stats(flow);
+    /* Reset IAT reeference times (see https://github.com/ntop/nDPI/pull/1316) */
+    if(((flow->src2dst_packets + flow->dst2src_packets) % max_num_packets_per_flow) == 0) {
+      memset(&flow->src2dst_last_pkt_time, '\0', sizeof(flow->src2dst_last_pkt_time));
+      memset(&flow->dst2src_last_pkt_time, '\0', sizeof(flow->dst2src_last_pkt_time));
+      memset(&flow->flow_last_pkt_time, '\0', sizeof(flow->flow_last_pkt_time));
+    }
     
     if((human_readeable_string_len != 0) && (!flow->has_human_readeable_strings)) {
       u_int8_t skip = 0;

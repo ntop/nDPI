@@ -367,47 +367,50 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
   uint32_t tmp[256], i;
   unsigned int num_bytes;
   double mean = 0.0, variance = 0.0;
-  struct ndpi_entropy last_entropy = flow->last_entropy;
+  struct ndpi_entropy *last_entropy = flow->last_entropy;
 
   fflush(out);
+
+  if(!last_entropy)
+   return;
 
   /*
    * Sum up the byte_count array for outbound and inbound flows,
    * if this flow is bidirectional
    */
   if (!flow->bidirectional) {
-    array = last_entropy.src2dst_byte_count;
-    num_bytes = last_entropy.src2dst_l4_bytes;
+    array = last_entropy->src2dst_byte_count;
+    num_bytes = last_entropy->src2dst_l4_bytes;
     for (i=0; i<256; i++) {
-      tmp[i] = last_entropy.src2dst_byte_count[i];
+      tmp[i] = last_entropy->src2dst_byte_count[i];
     }
 
-    if (last_entropy.src2dst_num_bytes != 0) {
-      mean = last_entropy.src2dst_bd_mean;
-      variance = last_entropy.src2dst_bd_variance/(last_entropy.src2dst_num_bytes - 1);
+    if (last_entropy->src2dst_num_bytes != 0) {
+      mean = last_entropy->src2dst_bd_mean;
+      variance = last_entropy->src2dst_bd_variance/(last_entropy->src2dst_num_bytes - 1);
       variance = sqrt(variance);
 
-      if (last_entropy.src2dst_num_bytes == 1) {
+      if (last_entropy->src2dst_num_bytes == 1) {
         variance = 0.0;
       }
     }
   } else {
     for (i=0; i<256; i++) {
-      tmp[i] = last_entropy.src2dst_byte_count[i] + last_entropy.dst2src_byte_count[i];
+      tmp[i] = last_entropy->src2dst_byte_count[i] + last_entropy->dst2src_byte_count[i];
     }
     array = tmp;
-    num_bytes = last_entropy.src2dst_l4_bytes + last_entropy.dst2src_l4_bytes;
+    num_bytes = last_entropy->src2dst_l4_bytes + last_entropy->dst2src_l4_bytes;
 
-    if (last_entropy.src2dst_num_bytes + last_entropy.dst2src_num_bytes != 0) {
-      mean = ((double)last_entropy.src2dst_num_bytes)/((double)(last_entropy.src2dst_num_bytes+last_entropy.dst2src_num_bytes))*last_entropy.src2dst_bd_mean +
-             ((double)last_entropy.dst2src_num_bytes)/((double)(last_entropy.dst2src_num_bytes+last_entropy.src2dst_num_bytes))*last_entropy.dst2src_bd_mean;
+    if (last_entropy->src2dst_num_bytes + last_entropy->dst2src_num_bytes != 0) {
+      mean = ((double)last_entropy->src2dst_num_bytes)/((double)(last_entropy->src2dst_num_bytes+last_entropy->dst2src_num_bytes))*last_entropy->src2dst_bd_mean +
+             ((double)last_entropy->dst2src_num_bytes)/((double)(last_entropy->dst2src_num_bytes+last_entropy->src2dst_num_bytes))*last_entropy->dst2src_bd_mean;
 
-      variance = ((double)last_entropy.src2dst_num_bytes)/((double)(last_entropy.src2dst_num_bytes+last_entropy.dst2src_num_bytes))*last_entropy.src2dst_bd_variance +
-                 ((double)last_entropy.dst2src_num_bytes)/((double)(last_entropy.dst2src_num_bytes+last_entropy.src2dst_num_bytes))*last_entropy.dst2src_bd_variance;
+      variance = ((double)last_entropy->src2dst_num_bytes)/((double)(last_entropy->src2dst_num_bytes+last_entropy->dst2src_num_bytes))*last_entropy->src2dst_bd_variance +
+                 ((double)last_entropy->dst2src_num_bytes)/((double)(last_entropy->dst2src_num_bytes+last_entropy->src2dst_num_bytes))*last_entropy->dst2src_bd_variance;
 
-      variance = variance/((double)(last_entropy.src2dst_num_bytes + last_entropy.dst2src_num_bytes - 1));
+      variance = variance/((double)(last_entropy->src2dst_num_bytes + last_entropy->dst2src_num_bytes - 1));
       variance = sqrt(variance);
-      if (last_entropy.src2dst_num_bytes + last_entropy.dst2src_num_bytes == 1) {
+      if (last_entropy->src2dst_num_bytes + last_entropy->dst2src_num_bytes == 1) {
         variance = 0.0;
       }
     }
@@ -1380,7 +1383,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     /* Print entropy values for monitored flows. */
     flowGetBDMeanandVariance(flow);
     fflush(out);
-    fprintf(out, "[score: %.4f]", flow->entropy.score);
+    fprintf(out, "[score: %.4f]", flow->entropy->score);
   }
 
   if(csv_fp) fprintf(csv_fp, "\n");
@@ -1418,8 +1421,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   else
     fprintf(out, "[< 1 sec]");
 
-  if(flow->telnet.username[0] != '\0')  fprintf(out, "[Username: %s]", flow->telnet.username);
-  if(flow->telnet.password[0] != '\0')  fprintf(out, "[Password: %s]", flow->telnet.password);
+  if(flow->telnet.username)  fprintf(out, "[Username: %s]", flow->telnet.username);
+  if(flow->telnet.password)  fprintf(out, "[Password: %s]", flow->telnet.password);
   if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
 
   if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
@@ -1534,9 +1537,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   if(flow->ssh_tls.server_cipher != '\0') fprintf(out, "[Cipher: %s]",
 						  ndpi_cipher2str(flow->ssh_tls.server_cipher));
-  if(flow->bittorent_hash[0] != '\0') fprintf(out, "[BT Hash: %s]",
+  if(flow->bittorent_hash) fprintf(out, "[BT Hash: %s]",
 					      flow->bittorent_hash);
-  if(flow->dhcp_fingerprint[0] != '\0') fprintf(out, "[DHCP Fingerprint: %s]",
+  if(flow->dhcp_fingerprint) fprintf(out, "[DHCP Fingerprint: %s]",
 						flow->dhcp_fingerprint);
 
   if(flow->has_human_readeable_strings) fprintf(out, "[PLAIN TEXT (%s)]",
