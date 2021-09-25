@@ -1355,8 +1355,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if((tcph != NULL) && (tcph->fin || tcph->rst || tcph->syn))
       begin_or_end_tcp = 1;
 
-    if(flow->entropy.flow_last_pkt_time.tv_sec) {
-      ndpi_timer_sub(&when, &flow->entropy.flow_last_pkt_time, &tdiff);
+    if(flow->flow_last_pkt_time.tv_sec) {
+      ndpi_timer_sub(&when, &flow->flow_last_pkt_time, &tdiff);
 
       if(flow->iat_flow
 	 && (tdiff.tv_sec >= 0) /* Discard backward time */
@@ -1368,11 +1368,11 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       }
     }
 
-    memcpy(&flow->entropy.flow_last_pkt_time, &when, sizeof(when));
+    memcpy(&flow->flow_last_pkt_time, &when, sizeof(when));
     
     if(src_to_dst_direction) {     
-      if(flow->entropy.src2dst_last_pkt_time.tv_sec) {
-	ndpi_timer_sub(&when, &flow->entropy.src2dst_last_pkt_time, &tdiff);
+      if(flow->src2dst_last_pkt_time.tv_sec) {
+	ndpi_timer_sub(&when, &flow->src2dst_last_pkt_time, &tdiff);
 
 	if(flow->iat_c_to_s
 	   && (tdiff.tv_sec >= 0) /* Discard backward time */
@@ -1385,15 +1385,15 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 
       ndpi_data_add_value(flow->pktlen_c_to_s, rawsize);
       flow->src2dst_packets++, flow->src2dst_bytes += rawsize, flow->src2dst_goodput_bytes += payload_len;
-      memcpy(&flow->entropy.src2dst_last_pkt_time, &when, sizeof(when));
+      memcpy(&flow->src2dst_last_pkt_time, &when, sizeof(when));
 
 #ifdef DIRECTION_BINS
       if(payload_len && (flow->src2dst_packets < MAX_NUM_BIN_PKTS))
 	ndpi_inc_bin(&flow->payload_len_bin_src2dst, plen2slot(payload_len));
 #endif
     } else {      
-      if(flow->entropy.dst2src_last_pkt_time.tv_sec && (!begin_or_end_tcp)) {
-	ndpi_timer_sub(&when, &flow->entropy.dst2src_last_pkt_time, &tdiff);
+      if(flow->dst2src_last_pkt_time.tv_sec && (!begin_or_end_tcp)) {
+	ndpi_timer_sub(&when, &flow->dst2src_last_pkt_time, &tdiff);
 
 	if(flow->iat_s_to_c) {
 	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
@@ -1403,7 +1403,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       }
       ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize, flow->dst2src_goodput_bytes += payload_len;
-      memcpy(&flow->entropy.dst2src_last_pkt_time, &when, sizeof(when));
+      memcpy(&flow->dst2src_last_pkt_time, &when, sizeof(when));
 
 #ifdef DIRECTION_BINS
       if(payload_len && (flow->dst2src_packets < MAX_NUM_BIN_PKTS))
