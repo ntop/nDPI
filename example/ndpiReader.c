@@ -4363,6 +4363,36 @@ void jitterUnitTest() {
 
 /* *********************************************** */
 
+void compressedBitmapUnitTest() {
+  ndpi_bitmap *b = ndpi_bitmap_alloc(), *b1;
+  u_int i, trace = 0;
+  size_t ser;
+  char *buf;
+  
+  for(i=0; i<1000; i++) {
+    u_int32_t v = rand();
+
+    if(trace) printf("%u ", v);
+    ndpi_bitmap_set(b, v);
+    assert(ndpi_bitmap_isset(b, v));
+  }
+
+  if(trace) printf("\n");
+
+  ser = ndpi_bitmap_serialize(b, &buf);
+  assert(ser > 0);
+
+  if(trace) printf("len: %lu\n", ser);
+  b1 = ndpi_bitmap_deserialize(buf);
+  assert(b1);
+  
+  ndpi_free(buf);
+  ndpi_bitmap_free(b);
+  ndpi_bitmap_free(b1);
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -4392,7 +4422,7 @@ int original_main(int argc, char **argv) {
       printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
       return(-1);
     }
-
+   
     if(!skip_unit_tests) {
 #ifndef DEBUG_TRACE
       /* Skip tests when debugging */
@@ -4423,6 +4453,7 @@ int original_main(int argc, char **argv) {
       ndpi_self_check_host_match();
       analysisUnitTest();
       rulesUnitTest();
+      compressedBitmapUnitTest();
 #endif
     }
     
