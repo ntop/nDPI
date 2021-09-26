@@ -32,6 +32,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <limits.h>
+#include <stdbool.h>
 
 #ifdef WIN32
 #include "ndpi_win32.h"
