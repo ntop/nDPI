@@ -1705,6 +1705,7 @@ typedef int (*ndpi_custom_dga_predict_fctn)(const char* domain, int domain_lengt
 /* **************************************** */
 
 typedef void ndpi_bitmap;
+typedef void ndpi_bitmap_iterator;
 
 /* **************************************** */
 

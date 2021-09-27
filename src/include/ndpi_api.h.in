@@ -1618,8 +1618,16 @@ extern "C" {
   void ndpi_bitmap_unset(ndpi_bitmap* b, u_int32_t value);
   bool ndpi_bitmap_isset(ndpi_bitmap* b, u_int32_t value);
   void ndpi_bitmap_clear(ndpi_bitmap* b);
+
   size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf);
   ndpi_bitmap* ndpi_bitmap_deserialize(char *buf);
+
+  void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and);
+  void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or);
+  
+  ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b);
+  void ndpi_bitmap_iterator_free(ndpi_bitmap* b);
+  bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, uint32_t *value);
 
   /* ******************************* */
   

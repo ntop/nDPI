@@ -218,6 +218,14 @@ static inline uint32_t croaring_detect_supported_architectures() {
     return buffer;
 }
 #else // defined(__cplusplus) and defined(_MSC_VER) && !defined(__clang__)
+#if defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)
+#define ROARING_DISABLE_AVX
+#undef __AVX2__
+/* CentOS 7 */
+static inline uint32_t croaring_detect_supported_architectures() {
+  return(dynamic_croaring_detect_supported_architectures());
+}
+#else
 #include <stdatomic.h>
 static inline uint32_t croaring_detect_supported_architectures() {
     static _Atomic int buffer = CROARING_UNINITIALIZED;
@@ -226,6 +234,7 @@ static inline uint32_t croaring_detect_supported_architectures() {
     }
     return buffer;
 }
+#endif // defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)
 #endif // defined(_MSC_VER) && !defined(__clang__)
 
 #ifdef ROARING_DISABLE_AVX
@@ -314,6 +323,12 @@ extern "C" {  // portability definitions are in global scope, not a namespace
 // Old visual studio systems won't support AVX2 well.
 #undef CROARING_IS_X64
 #endif
+
+#if defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5 /* RH 8 */)
+  /* RH 7 don't have atomic includes */
+#undef CROARING_IS_X64
+#endif
+
 
 #if defined(__clang_major__) && (__clang_major__<= 8) && !defined(__AVX2__)
 // Older versions of clang have a bug affecting us
@@ -7060,14 +7075,14 @@ static inline void tellmeall() {
                (long unsigned int)sizeof(size_t),
                (long unsigned int)sizeof(int));
     }
-#if __LITTLE_ENDIAN__
+#ifdef __LITTLE_ENDIAN__
 // This is what we expect!
 // printf("you have little endian machine");
 #endif
-#if __BIG_ENDIAN__
+#ifdef __BIG_ENDIAN__
     printf("you have a big endian machine");
 #endif
-#if __CHAR_BIT__
+#ifdef __CHAR_BIT__
     if (__CHAR_BIT__ != 8) printf("on your machine, chars don't have 8bits???");
 #endif
 }

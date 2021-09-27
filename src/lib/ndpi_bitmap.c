@@ -103,15 +103,8 @@ ndpi_bitmap* ndpi_bitmap_deserialize(char *buf) {
 /* ******************************************* */
 
 /* b = b & b_and */
-void ndpi_bitmap_and(ndpi_bitmap* b, ndpi_bitmap* b_and) {
+void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and) {
   roaring_bitmap_and_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_and);
-}
-
-/* ******************************************* */
-
-/* b = b | b_or */
-void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
-  roaring_bitmap_or_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_or);
 }
 
 /* ******************************************* */
@@ -129,7 +122,7 @@ ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
 
 /* ******************************************* */
 
-ndpi_bitmap_iterator* ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
+void ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
   return(roaring_free_uint32_iterator((ndpi_bitmap*)b));
 }
 
