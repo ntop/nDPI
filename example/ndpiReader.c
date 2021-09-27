@@ -4382,7 +4382,7 @@ void compressedBitmapUnitTest() {
   ser = ndpi_bitmap_serialize(b, &buf);
   assert(ser > 0);
 
-  if(trace) printf("len: %lu\n", ser);
+  if(trace) printf("len: %u\n", (unsigned int)ser);
   b1 = ndpi_bitmap_deserialize(buf);
   assert(b1);
   
