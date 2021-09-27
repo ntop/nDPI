@@ -4368,6 +4368,8 @@ void compressedBitmapUnitTest() {
   u_int i, trace = 0;
   size_t ser;
   char *buf;
+  ndpi_bitmap_iterator *it;
+  u_int32_t value;
   
   for(i=0; i<1000; i++) {
     u_int32_t v = rand();
@@ -4385,6 +4387,13 @@ void compressedBitmapUnitTest() {
   if(trace) printf("len: %u\n", (unsigned int)ser);
   b1 = ndpi_bitmap_deserialize(buf);
   assert(b1);
+
+  assert(it = ndpi_bitmap_iterator_alloc(b));
+  while(ndpi_bitmap_iterator_next(it, &value))
+    printf("%u ", value);
+
+  printf("\n");
+  ndpi_bitmap_iterator_free(it);
   
   ndpi_free(buf);
   ndpi_bitmap_free(b);
