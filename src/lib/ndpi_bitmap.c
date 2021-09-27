@@ -99,3 +99,48 @@ size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf) {
 ndpi_bitmap* ndpi_bitmap_deserialize(char *buf) {
   return((ndpi_bitmap*)roaring_bitmap_deserialize(buf));
 }
+
+/* ******************************************* */
+
+/* b = b & b_and */
+void ndpi_bitmap_and(ndpi_bitmap* b, ndpi_bitmap* b_and) {
+  roaring_bitmap_and_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_and);
+}
+
+/* ******************************************* */
+
+/* b = b | b_or */
+void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
+  roaring_bitmap_or_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_or);
+}
+
+/* ******************************************* */
+
+/* b = b | b_or */
+void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
+  roaring_bitmap_or_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_or);
+}
+
+/* ******************************************* */
+
+ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
+  return(roaring_create_iterator((ndpi_bitmap*)b));
+}
+
+/* ******************************************* */
+
+ndpi_bitmap_iterator* ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
+  return(roaring_free_uint32_iterator((ndpi_bitmap*)b));
+}
+
+/* ******************************************* */
+
+/* Return the next value in the bitmap iterator
+   
+   true is returned when a value is present, false when we reached the end 
+*/
+bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, uint32_t *value) {
+  uint32_t num = roaring_read_uint32_iterator((roaring_uint32_iterator_t*)i, value, 1);
+
+  return((num == 1) ? true /* found */ : false /* not found */);  
+}
