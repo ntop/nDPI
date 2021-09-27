@@ -53,8 +53,6 @@
 #include "third_party/include/libinjection_xss.h"
 #include "third_party/include/rce_injection.h"
 
-#include "third_party/include/roaring.h"
-
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
 
 // #define MATCH_DEBUG 1
@@ -2262,64 +2260,3 @@ u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
     return(0);
 }
 
-/* ******************************************* */
-
-ndpi_bitmap* ndpi_bitmap_alloc() {
-  return((ndpi_bitmap*)roaring_bitmap_create());
-}
-
-/* ******************************************* */
-
-void ndpi_bitmap_free(ndpi_bitmap* b) {
-  roaring_bitmap_free((const roaring_bitmap_t *)b);
-}
-
-/* ******************************************* */
-
-u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b) {
-  return(roaring_bitmap_get_cardinality((const roaring_bitmap_t *)b));
-}
-
-/* ******************************************* */
-
-void ndpi_bitmap_set(ndpi_bitmap* b, u_int32_t value) {
-  roaring_bitmap_add((roaring_bitmap_t *)b, value);
-}
-
-/* ******************************************* */
-
-void ndpi_bitmap_unset(ndpi_bitmap* b, u_int32_t value) {
-  roaring_bitmap_remove((roaring_bitmap_t *)b, value);
-}
-
-/* ******************************************* */
-
-bool ndpi_bitmap_isset(ndpi_bitmap* b, u_int32_t value) {
-  return(roaring_bitmap_contains((const roaring_bitmap_t *)b, value));
-}
-
-/* ******************************************* */
-
-void ndpi_bitmap_clear(ndpi_bitmap* b) {
-  roaring_bitmap_clear((roaring_bitmap_t *)b);
-}
-
-/* ******************************************* */
-
-size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf) {
-  const roaring_bitmap_t *r = (const roaring_bitmap_t *)b;
-  size_t s = roaring_bitmap_size_in_bytes(r);
-
-  *buf = (char*)ndpi_malloc(s);
-
-  if((*buf) == NULL) return(0);
-
-  return(roaring_bitmap_serialize(r, *buf));
-  
-}
-
-/* ******************************************* */
-
-ndpi_bitmap* ndpi_bitmap_deserialize(char *buf) {
-  return((ndpi_bitmap*)roaring_bitmap_deserialize(buf));
-}
