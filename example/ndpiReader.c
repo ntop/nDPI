@@ -4388,7 +4388,7 @@ void compressedBitmapUnitTest() {
   b1 = ndpi_bitmap_deserialize(buf);
   assert(b1);
 
-  assert(it = ndpi_bitmap_iterator_alloc(b));
+  assert((it = ndpi_bitmap_iterator_alloc(b)));
   while(ndpi_bitmap_iterator_next(it, &value))
     printf("%u ", value);
 
