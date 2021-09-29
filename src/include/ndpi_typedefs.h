@@ -833,8 +833,6 @@ struct ndpi_packet_struct {
 
   u_int64_t current_time_ms;
 
-  u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
-
   struct ndpi_int_one_line_struct line[NDPI_MAX_PARSE_LINES_PER_PACKET];
   /* HTTP headers */
   struct ndpi_int_one_line_struct host_line;

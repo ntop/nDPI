@@ -115,7 +115,7 @@ u_int8_t ndpi_check_starcraft_udp(struct ndpi_detection_module_struct* ndpi_stru
 void ndpi_search_starcraft(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow)
 {
   NDPI_LOG_DBG(ndpi_struct, "search Starcraft\n");
-  if (flow->packet.detected_protocol_stack[0] != NDPI_PROTOCOL_STARCRAFT) {
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_STARCRAFT) {
     struct ndpi_packet_struct* packet = &flow->packet;
     int8_t result = 0;
 

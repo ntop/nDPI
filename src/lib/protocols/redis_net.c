@@ -82,7 +82,7 @@ void ndpi_search_redis(struct ndpi_detection_module_struct *ndpi_struct, struct 
   NDPI_LOG_DBG(ndpi_struct, "search Redis\n");
 
   /* skip marked packets */
-  if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_REDIS) {
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_REDIS) {
     if (packet->tcp_retransmission == 0) {
       ndpi_check_redis(ndpi_struct, flow);
     }

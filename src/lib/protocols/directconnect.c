@@ -403,7 +403,7 @@ void ndpi_search_directconnect(struct ndpi_detection_module_struct
 
   NDPI_LOG_DBG(ndpi_struct, "search DC\n");
 
-  if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DIRECTCONNECT) {
     if(src != NULL && ((u_int32_t)
 			(packet->current_time_ms -
 			 src->directconnect_last_safe_access_time) <
@@ -416,7 +416,7 @@ void ndpi_search_directconnect(struct ndpi_detection_module_struct
 			       ndpi_struct->directconnect_connection_ip_tick_timeout)) {
       dst->directconnect_last_safe_access_time = packet->current_time_ms;
     } else {
-      packet->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
+      flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
       NDPI_LOG_DBG2(ndpi_struct, "skipping as unknown due to timeout\n");
     }
     return;

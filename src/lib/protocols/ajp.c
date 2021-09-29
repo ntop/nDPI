@@ -115,15 +115,13 @@ static void ndpi_check_ajp(struct ndpi_detection_module_struct *ndpi_struct,
 void ndpi_search_ajp(struct ndpi_detection_module_struct *ndpi_struct,
  struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-
   // Break after 20 packets.
   if(flow->packet_counter > 20) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
-  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     return;
   }
 

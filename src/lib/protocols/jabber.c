@@ -129,7 +129,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 
 
   /* this part parses a packet and searches for port=. it works asymmetrically. */
-  if (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_JABBER) {
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_JABBER) {
     u_int16_t lastlen;
     u_int16_t j_port = 0;
     /* check for google jabber voip connections ... */

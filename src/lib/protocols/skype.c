@@ -176,12 +176,10 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 
 void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-
   NDPI_LOG_DBG(ndpi_struct, "search skype\n");
 
   /* skip marked packets */
-  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_SKYPE_TEAMS)
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SKYPE_TEAMS)
     ndpi_check_skype(ndpi_struct, flow);
 }
 

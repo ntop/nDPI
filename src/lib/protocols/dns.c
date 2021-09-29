@@ -308,8 +308,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
 
-      if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
-	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
+      if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
+	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
 	/* Request already set the protocol */
 	// flow->extra_packets_func = NULL; /* Removed so the caller can keep dissecting DNS flows */
       } else {
@@ -500,7 +500,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 		  );
 #endif
 
-    if(flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
       /**
 	 Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
 	 matched a subprotocol
@@ -508,8 +508,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       NDPI_LOG_INFO(ndpi_struct, "found DNS\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
     } else {
-      if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
-	 || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS))
+      if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
+	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS))
 	;
       else
 	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -519,8 +519,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
   if(flow->packet_counter > 3)
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
-  if((flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
-     || (flow->packet.detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
+  if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
+     || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
     /* TODO: add support to RFC6891 to avoid some false positives */
     if(flow->packet.udp != NULL && flow->packet.payload_packet_len > PKT_LEN_ALERT)
       ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_LARGE_PACKET);

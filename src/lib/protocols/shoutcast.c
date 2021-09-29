@@ -50,7 +50,7 @@ void ndpi_search_shoutcast_tcp(struct ndpi_detection_module_struct
 			return;
 		}
 		if (flow->packet_counter < 3
-			&& packet->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP
+			&& flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP
 			) {
 			NDPI_LOG_DBG2(ndpi_struct,
 					"http detected, need next packet for shoutcast detection.\n");

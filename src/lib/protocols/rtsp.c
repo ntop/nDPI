@@ -57,7 +57,7 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
   }
 
   if (flow->rtsprdt_stage == 0
-      && !(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_RTCP)
+      && !(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_RTCP)
       ) {
     flow->rtsprdt_stage = 1 + packet->packet_direction;
     NDPI_LOG_DBG2(ndpi_struct, "maybe handshake 1; need next packet, return\n");
@@ -87,7 +87,7 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
     }
   }
 
-  if (packet->udp != NULL && packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
+  if (packet->udp != NULL && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
       && ((NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP) == 0)
 	  || (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTCP) == 0)
 	  )) {

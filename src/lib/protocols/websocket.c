@@ -98,8 +98,6 @@ static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struc
 
 void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-    struct ndpi_packet_struct *packet = &flow->packet;
-
     // Break after 6 packets.
     if (flow->packet_counter > 10)
     {
@@ -107,7 +105,7 @@ void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_struct, str
         return;
     }
 
-    if (packet->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+    if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
     {
         return;
     }

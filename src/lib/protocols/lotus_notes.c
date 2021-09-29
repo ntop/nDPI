@@ -59,12 +59,10 @@ static void ndpi_check_lotus_notes(struct ndpi_detection_module_struct *ndpi_str
 
 void ndpi_search_lotus_notes(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-
   NDPI_LOG_DBG(ndpi_struct, "search lotus_notes\n");
 
   /* skip marked packets */
-  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_LOTUS_NOTES)
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_LOTUS_NOTES)
     ndpi_check_lotus_notes(ndpi_struct, flow);
 }
 

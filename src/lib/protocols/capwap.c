@@ -106,7 +106,7 @@ void ndpi_search_capwap(struct ndpi_detection_module_struct *ndpi_struct, struct
 {
   struct ndpi_packet_struct *packet = &flow->packet;
 
-  if(packet->udp && (packet->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN))
+  if(packet->udp && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN))
     ndpi_search_setup_capwap(ndpi_struct, flow);
 }
 

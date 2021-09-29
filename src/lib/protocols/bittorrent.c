@@ -403,8 +403,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
       }
     }
   }
-
-  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
 
     if((packet->tcp != NULL)

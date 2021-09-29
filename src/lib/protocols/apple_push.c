@@ -55,12 +55,10 @@ static void ndpi_check_apple_push(struct ndpi_detection_module_struct *ndpi_stru
 
 void ndpi_search_apple_push(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
-
   NDPI_LOG_DBG(ndpi_struct, "search apple_push\n");
 
   /* skip marked packets */
-  if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_APPLE_PUSH)
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_APPLE_PUSH)
     ndpi_check_apple_push(ndpi_struct, flow);
 }
 

@@ -186,7 +186,7 @@ void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   else {
     /* skip marked packets */
-    if(packet->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {
+    if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {
       if(packet->tcp_retransmission == 0) {
 	ndpi_search_sip_handshake(ndpi_struct, flow);
       }

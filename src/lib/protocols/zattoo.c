@@ -62,7 +62,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
 
   NDPI_LOG_DBG(ndpi_struct, "search ZATTOO\n");
 
-  if(packet->detected_protocol_stack[0] == NDPI_PROTOCOL_ZATTOO) {
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_ZATTOO) {
     if(src != NULL && ((u_int32_t) (packet->current_time_ms - src->zattoo_ts) < ndpi_struct->zattoo_connection_timeout))
       src->zattoo_ts = packet->current_time_ms;
     if (dst != NULL && ((u_int32_t) (packet->current_time_ms - dst->zattoo_ts) < ndpi_struct->zattoo_connection_timeout))
