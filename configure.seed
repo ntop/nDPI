@@ -224,7 +224,7 @@ AC_ARG_ENABLE([gcrypt],
   [AS_HELP_STRING([--disable-gcrypt], [Avoid compiling with libgcrypt/libgpg-error, even if they are present. QUIC sub-classification may be missing])],
   [GCRYPT_ENABLED=0],
   [AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)])
-AS_IF([test "x$enable_gcrypt" = "xyes"], [
+AS_IF([test ${GCRYPT_ENABLED} -eq 1], [
   if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes; then :
     ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt"
   else
@@ -233,6 +233,8 @@ AS_IF([test "x$enable_gcrypt" = "xyes"], [
     AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
     if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes -a "x$ac_cv_lib_gpg_error_gpg_strerror_r" = xyes; then :
       ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
+    else
+      GCRYPT_ENABLED=0
     fi
   fi
 ])
