@@ -13,7 +13,7 @@ ndpi:
 	cp $(NDPI_HOME)/src/lib/libndpi.a ./debian/ndpi-dev-tmp/usr/lib/
 	cp $(NDPI_HOME)/example/ndpiReader ./debian/ndpi-tmp/usr/bin/
 	cp $(NDPI_HOME)/src/include/*.h ./debian/ndpi-dev-tmp/usr/include/ndpi/
-	cp $(NDPI_HOME)/libndpi.pc ./debian/ndpi-dev-tmp/usr/lib/pkgconfig
+	cp $(NDPI_HOME)/libndpi.pc ./debian/ndpi-dev-tmp/usr/lib/pkgconfig/
 	-rm -fr ./debian/ndpi-dev-tmp/usr/include/ndpi/ndpi_win32.h*
 	@echo
 	@find ./debian/ndpi-tmp -name "*~" -exec /bin/rm {} ';'
