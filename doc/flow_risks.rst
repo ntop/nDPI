@@ -5,156 +5,232 @@ nDPI is designed not just to detect application protocols in traffic flows but a
 
 Below you can find a description of each flow risk so that you can easily understand when a risk is triggered and its meaning. The flow risks are listed in numerical order as they are defined in ndpi_risk_enum.
 
+.. _Risk 001:
 
 NDPI_URL_POSSIBLE_XSS
 =====================
 HTTP only: this risk indicates a possible `XSS (Cross Side Scripting) <https://en.wikipedia.org/wiki/Cross-site_scripting>`_ attack.
 
+.. _Risk 002:
+
 NDPI_URL_POSSIBLE_SQL_INJECTION
 ===============================
 HTTP only: this risk indicates a possible `SQL Injection attack <https://en.wikipedia.org/wiki/SQL_injection>`_.
+
+.. _Risk 003:
 
 NDPI_URL_POSSIBLE_RCE_INJECTION
 ===============================
 HTTP only: this risk indicates a possible `RCE (Remote Code Execution) attack <https://en.wikipedia.org/wiki/Arbitrary_code_execution>`_.
 
+.. _Risk 004:
+
 NDPI_BINARY_APPLICATION_TRANSFER
 ================================
 HTTP only: this risk indicates that a binary application is downloaded/uploaded. Detected applications include Windows binaries, Linux executables, Unix scripts and Android apps.
+
+.. _Risk 005:
 
 NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT
 ========================================
 This risk indicates a known protocol used on a non standard port. Example HTTP is supposed to use TCP/80, and in case it is detected on TCP/1234 this risk is detected.
 
+.. _Risk 006:
+
 NDPI_TLS_SELFSIGNED_CERTIFICATE
 ===============================
 TLS/QUIC only: this risk is triggered when a `self-signed certificate <https://en.wikipedia.org/wiki/Self-signed_certificate>`_ is used.
 
+.. _Risk 007:
+
 NDPI_TLS_OBSOLETE_VERSION
 =========================
-Risk triggered when TLS version is older than 1.1.
+Risk 0triggered when TLS version is older than 1.1.
+
+.. _Risk 008:
 
 NDPI_TLS_WEAK_CIPHER
 ====================
-Risk triggered when an unsafe TLS cipher is used. See `this page <https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites>`_ for a list of insecure ciphers.
+Risk 0triggered when an unsafe TLS cipher is used. See `this page <https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites>`_ for a list of insecure ciphers.
+
+.. _Risk 009:
 
 NDPI_TLS_CERTIFICATE_EXPIRED
 ============================
-Risk triggered when a TLS certificate is expired, i.e. the current date falls outside of the certificate validity dates.
+Risk 0triggered when a TLS certificate is expired, i.e. the current date falls outside of the certificate validity dates.
+
+.. _Risk 010:
 
 NDPI_TLS_CERTIFICATE_MISMATCH
 =============================
-Risk triggered when a TLS certificate does not match the hostname we're accessing. Example you do http://www.aaa.com and the TLS certificate returned is for www.bbb.com.
+Risk 0triggered when a TLS certificate does not match the hostname we're accessing. Example you do http://www.aaa.com and the TLS certificate returned is for www.bbb.com.
+
+.. _Risk 011:
 
 NDPI_HTTP_SUSPICIOUS_USER_AGENT
 ===============================
 HTTP only: this risk is triggered whenever the user agent contains suspicious characters or its format is suspicious. Example: <?php something ?> is a typical suspicious user agent.
 
+.. _Risk 012:
+
 NDPI_HTTP_NUMERIC_IP_HOST
 =========================
 HTTP only: this risk is triggered whenever we're accessing a host using its IP rather than its symbolic name. Example http://1.2.3.4.
+
+.. _Risk 013:
 
 NDPI_HTTP_SUSPICIOUS_URL
 ========================
 HTTP only: this risk is triggered whenever the accessed URL is suspicious. Example: http://127.0.0.1/msadc/..%255c../..%255c../..%255c../winnt/system32/cmd.exe.
 
+.. _Risk 014:
+
 NDPI_HTTP_SUSPICIOUS_HEADER
 ===========================
 HTTP only: this risk is triggered whenever the HTTP peader contains suspicious entries such as Uuid, TLS_version, Osname that are unexpected on the HTTP header.
+
+.. _Risk 015:
 
 NDPI_TLS_NOT_CARRYING_HTTPS
 ===========================
 TLS only: this risk indicates that this TLS flow will not be used to transport HTTP content. Example VPNs use TLS to encrypt data rather to carry HTTP. This is useful to spot this type of cases.
 
+.. _Risk 016:
+
 NDPI_SUSPICIOUS_DGA_DOMAIN
 ==========================
 A `DGA <https://en.wikipedia.org/wiki/Domain_generation_algorithm>`_ is used to generate domain names often used by malwares. This risk indicates that this domain name can (but it's not 100% sure) a DGA as its name is suspicious.
+
+.. _Risk 017:
 
 NDPI_MALFORMED_PACKET
 =====================
 This risk is generated when a packet (e.g. a DNS packet) has an unexpected formt. This can indicate a protocol error or more often an attempt to jeopardize a valid protocol to carry other type of data.
 
+.. _Risk 018:
+
 NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER
 ==========================================
 This risk is generated whenever a SSH client uses an obsolete SSH protocol version or insecure ciphers.
+
+.. _Risk 019:
 
 NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER
 ==========================================
 This risk is generated whenever a SSH server uses an obsolete SSH protocol version or insecure ciphers.
 
+.. _Risk 020:
+
 NDPI_SMB_INSECURE_VERSION
 =========================
 This risk indicates that the `SMB <https://en.wikipedia.org/wiki/Server_Message_Block>`_ version used is insecure (i.e. v1).
+
+.. _Risk 021:
 
 NDPI_TLS_SUSPICIOUS_ESNI_USAGE
 ==============================
 `SNI <https://en.wikipedia.org/wiki/Server_Name_Indication>`_ is a way to carry in TLS the host/domain name we're accessing. ESNI means encrypted SNI and it is a way to mask SNI (carried in clear text in the TLS header) with encryption. While this practice is legal, it could be used for hiding data or for attacks such as a suspicious `domain fronting <https://github.com/SixGenInc/Noctilucent/blob/master/docs/>`_.
 
+.. _Risk 022:
+
 NDPI_UNSAFE_PROTOCOL
 ====================
 This risk indicates that the protocol used is insecure and that a secure protocol should be used (e.g. Telnet vs SSH).
+
+.. _Risk 023:
 
 NDPI_DNS_SUSPICIOUS_TRAFFIC
 ===========================
 This risk is returned when DNS traffic returns an unexpected/obsolete `record type <https://en.wikipedia.org/wiki/List_of_DNS_record_types>`_.
 
+.. _Risk 024:
+
 NDPI_TLS_MISSING_SNI
 ====================
 TLS needs to carry the the `SNI <https://en.wikipedia.org/wiki/Server_Name_Indication>`_ of the remote server we're accessing. Unfortunately SNI is optional in TLS so it can be omitted. In this case this risk is triggered as this is a non-standard situation that indicates a potential security problem or a protocol using TLS for other purposes (or a protocol bug).
+
+.. _Risk 025:
 
 NDPI_HTTP_SUSPICIOUS_CONTENT
 ============================
 HTTP only: risk reported when HTTP carries content in expected format. Example the HTTP header indicates that the context is text/html but the real content is not readeable (i.e. it can transport binary data). In general this is an attempt to use a valid MIME type to carry data that does not match the type.
 
+.. _Risk 026:
+
 NDPI_RISKY_ASN
 ==============
 This is a placeholder for traffic exchanged with `ASN <https://en.wikipedia.org/wiki/Autonomous_system_(Internet)>`_ that are considered risky. nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).
+
+.. _Risk 027:
 
 NDPI_RISKY_DOMAIN
 =================
 This is a placeholder for traffic exchanged with domain names that are considered risky. nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).
 
+.. _Risk 028:
+
 NDPI_MALICIOUS_JA3
 ==================
 `JA3 <https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967>`_ is a method to fingerprint TLS traffic. This risk indicates that the JA3 of the TLS connection is considered suspicious (i.e. it has been found in known malware JA3 blacklists). nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).
+
+.. _Risk 029:
 
 NDPI_MALICIOUS_SHA1_CERTIFICATE
 ===============================
 TLS certificates are uniquely identified with a `SHA1 <https://en.wikipedia.org/wiki/SHA-1>`_ hash value. If such hash is found on a blacklist, this risk can be used. As for other risks, this is a placeholder as nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).
 
+.. _Risk 030:
+
 NDPI_DESKTOP_OR_FILE_SHARING_SESSION
 ====================================
 This risk is set when the flow carries desktop or file sharing sessions (e.g. TeamViewer or AnyDesk just to mention two).
+
+.. _Risk 031:
 
 NDPI_TLS_UNCOMMON_ALPN
 ======================
 This risk is set when the `ALPN <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_ (it indicates the protocol carried into this TLS flow, for instance HTTP/1.1) is uncommon with respect to the list of expected values.
 
+.. _Risk 032:
+
 NDPI_TLS_CERT_VALIDITY_TOO_LONG
 ===============================
 From 01/09/2020 TLS certificates lifespan is limited to 13 months. This risk is triggered for certificates not respecting this directive.
+
+.. _Risk 033:
 
 NDPI_TLS_SUSPICIOUS_EXTENSION
 =============================
 This risk is triggered when the domain name (SNI extension) is not printable and thus it is a problem.
 
+.. _Risk 034:
+
 NDPI_TLS_FATAL_ALERT
 ====================
 This risk is triggered when a TLS fatal alert is detected in the TLS flow. See `this page <https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132>`_ for details.
+
+.. _Risk 035:
 
 NDPI_SUSPICIOUS_ENTROPY
 =======================
 This risk is used to detect suspicious data carried in ICMP packets whose entropy (used to measure how data is distributed, hence to indirectly guess the type of data carried on) is suspicious and thus that it can indicate a data leak.
 
+.. _Risk 036:
+
 NDPI_CLEAR_TEXT_CREDENTIALS
 ===========================
 Clear text protocols are not bad per-se, but they should be avoided when they carry credentials as they can be intercepted by malicious users. This risk is triggered whenever clear text protocols (e.g. FTP, HTTP, IMAP...) contain credentials in clear text (read it as nDPI does not trigger this risk for HTTP connections that do not carry credentials).
+
+.. _Risk 037:
 
 NDPI_DNS_LARGE_PACKET
 =====================
 `DNS <https://en.wikipedia.org/wiki/Domain_Name_System>`_ packets over UDP should be limited to 512 bytes. DNS packets over this threshold indicate a potential security risk (e.g. use DNS to carry data) or a misconfiguration.
 
+.. _Risk 038:
+
 NDPI_DNS_FRAGMENTED
 ===================
+
 UDP `DNS <https://en.wikipedia.org/wiki/Domain_Name_System>`_ packets cannot be fragmented. If so, this indicates a potential security risk (e.g. use DNS to carry data) or a misconfiguration.
 
