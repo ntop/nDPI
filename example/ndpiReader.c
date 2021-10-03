@@ -4389,10 +4389,11 @@ void compressedBitmapUnitTest() {
   assert(b1);
 
   assert((it = ndpi_bitmap_iterator_alloc(b)));
-  while(ndpi_bitmap_iterator_next(it, &value))
-    printf("%u ", value);
-
-  printf("\n");
+  while(ndpi_bitmap_iterator_next(it, &value)) {
+    if(trace) printf("%u ", value);
+  }
+  
+  if(trace) printf("\n");
   ndpi_bitmap_iterator_free(it);
   
   ndpi_free(buf);
