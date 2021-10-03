@@ -129,14 +129,10 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 }
 
 void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
-  struct ndpi_packet_struct* packet = &flow->packet;
-
   NDPI_LOG_DBG(ndpi_struct, "tinc detection\n");
 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_TINC) {
-    if(packet->tcp_retransmission == 0) {
-      ndpi_check_tinc(ndpi_struct, flow);
-    }
+    ndpi_check_tinc(ndpi_struct, flow);
   }
 }
 
@@ -145,7 +141,7 @@ void init_tinc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   ndpi_set_bitmask_protocol_detection("TINC", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TINC,
 				      ndpi_search_tinc,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

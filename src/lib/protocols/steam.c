@@ -255,8 +255,7 @@ static void ndpi_check_steam_udp3(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
-	
+
   if(flow->packet.udp != NULL) {
     if(flow->packet_counter > 5) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -281,11 +280,7 @@ void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct 
       return;
     }
 
-    /* skip marked or retransmitted packets */
-    if(packet->tcp_retransmission != 0) {
-      return;
-    }
-
+    /* skip marked packets */
     if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
       return;   
 
