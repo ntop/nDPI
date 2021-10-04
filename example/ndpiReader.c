@@ -459,7 +459,8 @@ static void help(u_int long_help) {
 	 "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
 	 "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-D][-e <len>][-t][-v <level>]\n"
 	 "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
-	 "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>][-z]\n\n"
+	 "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>][-z]\n"
+	 "          [-a <mode>]\n\n"
 	 "Usage:\n"
 	 "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
 	 "                            | device for live capture (comma-separated list)\n"
@@ -474,6 +475,10 @@ static void help(u_int long_help) {
 #ifdef linux
          "  -g <id:id...>             | Thread affinity mask (one core id per thread)\n"
 #endif
+	 "  -a <mode>                 | Generates option values for GUIs\n"
+	 "                            | 0 - List known protocols\n"
+	 "                            | 1 - List known categories\n"
+	 "                            | 2 - List known risks\n"
 	 "  -d                        | Disable protocol guess and use only DPI\n"
 	 "  -e <len>                  | Min human readeable string match len. Default %u\n"
 	 "  -q                        | Quiet mode\n"
@@ -806,13 +811,17 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "b:e:c:C:dDf:g:i:Ij:S:hp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "a:b:e:c:C:dDf:g:i:Ij:S:hp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
 			   longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
 #endif
 
     switch (opt) {
+    case 'a':
+      ndpi_generate_options(atoi(optarg));
+      break;
+      
     case 'b':
       if((num_bin_clusters = atoi(optarg)) > 32)
 	num_bin_clusters = 32;
