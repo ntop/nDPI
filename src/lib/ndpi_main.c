@@ -7514,6 +7514,15 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
     if(ndpi_match_string_subprotocol(ndpi_str, name, strlen(name), &ret_match, 1) > 0)
       return(0); /* Ignore DGA for known domain names */
+
+    if(isnumber(name[0])) {
+      struct in_addr ip_addr;
+      char buf[22];
+      
+      ip_addr.s_addr = inet_addr(buf);
+      if(strcmp(inet_ntoa(ip_addr), buf) == 0)
+	return(0); /* Ignore numeric IPs */
+    }
     
     if(strncmp(name, "www.", 4) == 0)
       name = &name[4];
