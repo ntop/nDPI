@@ -33,24 +33,21 @@ void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_struct, str
   if(packet->tcp != NULL) {
     u_int16_t sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);
     
-    if(((sport == 43) || (dport == 43)) || ((sport == 4343) || (dport == 4343))) {
+    if((((sport == 43) || (dport == 43)) || ((sport == 4343) || (dport == 4343))) &&
+       packet->payload_packet_len > 2 &&
+       packet->payload[packet->payload_packet_len - 2] == '\r' &&
+       packet->payload[packet->payload_packet_len - 1] == '\n') {
+	
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN);
 
-      if(packet->payload_packet_len > 0) {
-	
-	u_int max_len = sizeof(flow->host_server_name) - 1;
-	u_int i, j;
+      if((dport == 43) || (dport == 4343)) { /* Request */
+        u_int hostname_len = ndpi_min(sizeof(flow->host_server_name) - 1, (long unsigned int)packet->payload_packet_len - 2); /* Skip \r\n */
 
-	for(i=strlen((const char *)flow->host_server_name), j=0; (i<max_len) && (j<packet->payload_packet_len); i++, j++) {
-	  if((packet->payload[j] == '\n') || (packet->payload[j] == '\r')) break;	  
-	  flow->host_server_name[i] = packet->payload[j];
-	}
-	
-	flow->host_server_name[i] = '\0';
-	
-	NDPI_LOG_INFO(ndpi_struct, "[WHOIS/DAS] %s\n", flow->host_server_name);
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN);
-	return;
+        memcpy(flow->host_server_name, &packet->payload[0], hostname_len);
+        flow->host_server_name[hostname_len] = '\0';
+        NDPI_LOG_INFO(ndpi_struct, "[WHOIS/DAS] %s\n", flow->host_server_name);
       }
+      return;
     }
   }
 
