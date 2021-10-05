@@ -1697,7 +1697,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Self-signed Certificate");
 
   case NDPI_TLS_OBSOLETE_VERSION:
-    return("Obsolete TLS version (< 1.1)");
+    return("Obsolete TLS version (older than 1.1)");
 
   case NDPI_TLS_WEAK_CIPHER:
     return("Weak TLS cipher");
