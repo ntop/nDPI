@@ -7487,9 +7487,8 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     int rc = ndpi_dga_function(name, is_hostname);
 
     if(rc) {
-      if(flow) {
-	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
-  	}
+      if(flow)
+	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);  	
     }
 
     return(rc);
@@ -7497,7 +7496,8 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     int len, rc = 0, trigram_char_skip = 0;
     u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0, num_dots = 0, num_trigram_dots = 0;
     u_int8_t max_domain_element_len = 0, curr_domain_element_len = 0, first_element_is_numeric = 1;
-
+    ndpi_protocol_match_result ret_match;
+    
     if((!name)
        || (strchr(name, '_') != NULL)
        || (endsWith(name, "in-addr.arpa", 12))
@@ -7512,6 +7512,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if(flow && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
       return(0); /* Ignore DGA check for protocols already fully detected */
 
+    if(ndpi_match_string_subprotocol(ndpi_str, name, strlen(name), &ret_match, 1) > 0)
+      return(0); /* Ignore DGA for known domain names */
+    
     if(strncmp(name, "www.", 4) == 0)
       name = &name[4];
 

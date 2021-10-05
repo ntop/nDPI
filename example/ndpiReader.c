@@ -3701,8 +3701,6 @@ static void dgaUnitTest() {
   };
 
   const char *non_dga[] = {
-    "dns.msftncsi.com",
-    "www.confindustriabrescia.it",
     "mz.gov.pl",
     "zoomam104zc.zoom.us",
     "5CI_DOMBIN",
