@@ -79,7 +79,7 @@ bool is_connectionless_dcerpc(struct ndpi_packet_struct *packet, struct ndpi_flo
 
 void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search DCERPC\n");
   if (is_connection_oriented_dcerpc(packet, flow) || is_connectionless_dcerpc(packet, flow)) {

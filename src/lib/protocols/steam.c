@@ -35,7 +35,7 @@ static void ndpi_int_steam_add_connection(struct ndpi_detection_module_struct *n
 }
 
 static void ndpi_check_steam_http(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
   NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow, packet);
   if (packet->user_agent_line.ptr != NULL 
@@ -47,7 +47,7 @@ static void ndpi_check_steam_http(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 static void ndpi_check_steam_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 	
   if (flow->steam_stage == 0) {
@@ -104,7 +104,7 @@ static void ndpi_check_steam_tcp(struct ndpi_detection_module_struct *ndpi_struc
 }
 
 static void ndpi_check_steam_udp1(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 	
   if (ndpi_match_strprefix(packet->payload, payload_len, "VS01")) {
@@ -185,7 +185,7 @@ static void ndpi_check_steam_udp1(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 static void ndpi_check_steam_udp2(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
   /* Check if we so far detected the protocol in the request or not. */
@@ -220,7 +220,7 @@ static void ndpi_check_steam_udp2(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 static void ndpi_check_steam_udp3(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
   /* Check if we so far detected the protocol in the request or not. */
@@ -255,8 +255,9 @@ static void ndpi_check_steam_udp3(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if(flow->packet.udp != NULL) {
+  if(packet->udp != NULL) {
     if(flow->packet_counter > 5) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;

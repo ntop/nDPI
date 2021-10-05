@@ -94,12 +94,14 @@ int ndpi_netbios_name_interpret(u_char *in, u_int in_len, u_char *out, u_int out
 static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow,
 					    u_int16_t sub_protocol) {
-  unsigned char name[64];
-  u_int off = flow->packet.payload[12] == 0x20 ? 12 : 14;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if((off < flow->packet.payload_packet_len)
-     && ndpi_netbios_name_interpret((unsigned char*)&flow->packet.payload[off],
-		 (u_int)(flow->packet.payload_packet_len - off), name, sizeof(name)-1) > 0) {
+  unsigned char name[64];
+  u_int off = packet->payload[12] == 0x20 ? 12 : 14;
+
+  if((off < packet->payload_packet_len)
+     && ndpi_netbios_name_interpret((unsigned char*)&packet->payload[off],
+		 (u_int)(packet->payload_packet_len - off), name, sizeof(name)-1) > 0) {
       snprintf((char*)flow->host_server_name, sizeof(flow->host_server_name)-1, "%s", name);
 
       ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
@@ -115,7 +117,7 @@ static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct 
 
 void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct,
 			 struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t dport;
 
   NDPI_LOG_DBG(ndpi_struct, "search netbios\n");

@@ -40,7 +40,7 @@ static const char* commands[] =
 
 void ndpi_search_nats_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /* Check connection over TCP */
   NDPI_LOG_DBG(ndpi_struct, "search NATS\n");
@@ -49,14 +49,14 @@ void ndpi_search_nats_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     int i;
 
     for(i=0; commands[i] != NULL; i++) {
-      char *match = ndpi_strnstr((const char *)flow->packet.payload,
+      char *match = ndpi_strnstr((const char *)packet->payload,
 				 commands[i],
-				 flow->packet.payload_packet_len);
+				 packet->payload_packet_len);
 
       if(!match) continue;
 
       if(ndpi_strnstr((const char *)match, "\r\n",
-		      flow->packet.payload_packet_len - ((size_t)match - (size_t)flow->packet.payload)) != NULL) {
+		      packet->payload_packet_len - ((size_t)match - (size_t)packet->payload)) != NULL) {
 	NDPI_LOG_INFO(ndpi_struct, "found NATS\n");
 
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NATS, NDPI_PROTOCOL_UNKNOWN);

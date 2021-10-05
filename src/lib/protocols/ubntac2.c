@@ -33,7 +33,7 @@ static void ndpi_int_ubntac2_add_connection(struct ndpi_detection_module_struct 
 
 void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search ubntac2\n");
   NDPI_LOG_DBG2(ndpi_struct, "UBNTAC2 detection... plen:%i %i:%i\n", packet->payload_packet_len, ntohs(packet->udp->source), ntohs(packet->udp->dest));

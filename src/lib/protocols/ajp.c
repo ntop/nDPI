@@ -73,7 +73,7 @@ static void set_ajp_detected(struct ndpi_detection_module_struct *ndpi_struct,
 static void ndpi_check_ajp(struct ndpi_detection_module_struct *ndpi_struct,
 			   struct ndpi_flow_struct *flow) {
   struct ajp_header ajp_hdr;
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if (packet->payload_packet_len < sizeof(ajp_hdr)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

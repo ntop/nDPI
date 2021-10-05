@@ -39,7 +39,7 @@ static void ndpi_int_postgres_add_connection(struct ndpi_detection_module_struct
 void ndpi_search_postgres_tcp(struct ndpi_detection_module_struct
 								*ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
+	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	u_int16_t size;
 
 	if (flow->l4.tcp.postgres_stage == 0) {

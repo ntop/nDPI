@@ -103,7 +103,7 @@ static bool ndpi_check_valid_cassandra_opcode(uint8_t opcode)
 void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if (packet->tcp) {
     if (packet->payload_packet_len >= CASSANDRA_HEADER_LEN &&

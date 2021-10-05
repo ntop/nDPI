@@ -103,7 +103,7 @@ void ndpi_search_memcached(
 			   struct ndpi_detection_module_struct *ndpi_struct,
 			   struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *offset = packet->payload;
   u_int16_t length = packet->payload_packet_len;
   u_int8_t *matches;

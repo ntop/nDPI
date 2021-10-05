@@ -139,7 +139,7 @@ static void ndpi_http_check_human_redeable_content(struct ndpi_detection_module_
 
 static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *double_ret = (const u_int8_t *)ndpi_strnstr((const char *)packet->payload, "\r\n\r\n", packet->payload_packet_len);
 
   NDPI_LOG_DBG(ndpi_struct, "==>>> [len: %u] ", packet->payload_packet_len);
@@ -174,7 +174,7 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
 /* https://www.freeformatter.com/mime-types-list.html */
 static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_module_struct *ndpi_struct,
 							struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(packet->content_line.len > 0) {
     u_int app_len = sizeof("application");
@@ -314,7 +314,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if((packet->accept_line.len >= 28)
      && (memcmp(packet->accept_line.ptr, "application/x-rtsp-tunnelled", 28) == 0)) {
@@ -499,7 +499,7 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
 */
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 						   struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int ret;
 
   if(flow->http_detected && (flow->http.response_status_code != 0))
@@ -524,8 +524,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[packet->host_line.len]);
     }
 
-    flow->http.method = ndpi_http_str2method((const char*)flow->packet.http_method.ptr,
-					     (u_int16_t)flow->packet.http_method.len);
+    flow->http.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
+					     (u_int16_t)packet->http_method.len);
   }
 
   if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
@@ -723,7 +723,7 @@ static const char *http_fs = "CDGHOPR";
 
 static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   unsigned int i;
 
   NDPI_LOG_DBG2(ndpi_struct, "====>>>> HTTP: %c%c%c%c [len: %u]\n",
@@ -794,7 +794,7 @@ static int is_a_suspicious_header(const char* suspicious_headers[], struct ndpi_
 static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow) {
   u_int32_t i;
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   for(i=0; (i < packet->parsed_lines)
 	&& (packet->line[i].ptr != NULL)
@@ -862,7 +862,7 @@ static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_str
 
 static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t filename_start; /* the filename in the request method line, e.g., "GET filename_start..."*/
 
   packet->packet_lines_parsed_complete = 0;

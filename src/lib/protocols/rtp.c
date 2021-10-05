@@ -77,7 +77,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    const u_int8_t * payload, const u_int16_t payload_len) {
   u_int8_t payloadType, payload_type;
-  u_int16_t d_port = ntohs(flow->packet.udp->dest);
+  u_int16_t d_port = ntohs(ndpi_struct->packet.udp->dest);
   
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
@@ -122,7 +122,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 
 void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t source = ntohs(packet->udp->source);
   u_int16_t dest = ntohs(packet->udp->dest);
   

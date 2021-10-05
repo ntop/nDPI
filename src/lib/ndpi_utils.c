@@ -2101,9 +2101,9 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
   }
 
   /* TODO: add IPv6 support */
+  struct ndpi_packet_struct *packet = &ndpi_str->packet;
   if(!flow->ip_risk_mask_evaluated) {
-    if(flow->packet.iph) {
-      struct ndpi_packet_struct *packet = &flow->packet;
+    if(packet->iph) {
       struct in_addr pin;
 
       pin.s_addr = packet->iph->saddr;

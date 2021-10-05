@@ -35,8 +35,10 @@ __forceinline static
 #endif
 u_int8_t ndpi_int_zattoo_user_agent_set(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  if(flow->packet.user_agent_line.ptr != NULL && flow->packet.user_agent_line.len == 111) {
-    if(memcmp(flow->packet.user_agent_line.ptr + flow->packet.user_agent_line.len - 25, "Zattoo/4", sizeof("Zattoo/4") - 1) == 0) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len == 111) {
+    if(memcmp(packet->user_agent_line.ptr + packet->user_agent_line.len - 25, "Zattoo/4", sizeof("Zattoo/4") - 1) == 0) {
       NDPI_LOG_DBG(ndpi_struct, "found zattoo useragent\n");
       return 1;
     }
@@ -54,7 +56,7 @@ u_int8_t ndpi_int_zattoo_user_agent_set(struct ndpi_detection_module_struct *ndp
 
 void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 

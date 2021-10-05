@@ -34,7 +34,7 @@ static void ndpi_int_avast_securedns_add_connection(struct ndpi_detection_module
 static void ndpi_search_avast_securedns(struct ndpi_detection_module_struct *ndpi_struct,
                                         struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct * packet = &flow->packet;
+  struct ndpi_packet_struct * packet = &ndpi_struct->packet;
 
   if (packet->payload_packet_len < 34 ||
       ntohl(get_u_int32_t(packet->payload, 11)) != 0x00013209 ||

@@ -64,7 +64,7 @@ struct gtp_header_generic {
 
 static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
   if((packet->udp != NULL) && (payload_len > sizeof(struct gtp_header_generic))) {

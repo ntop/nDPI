@@ -25,7 +25,7 @@
 
 void ndpi_search_whatsapp(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   static u_int8_t whatsapp_sequence[] = {
     0x45, 0x44, 0x0, 0x01, 0x0, 0x0, 0x02, 0x08,
     0x0, 0x57, 0x41, 0x02, 0x0, 0x0, 0x0

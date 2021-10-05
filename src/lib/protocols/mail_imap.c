@@ -37,7 +37,7 @@ static void ndpi_int_mail_imap_add_connection(struct ndpi_detection_module_struc
 
 void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;       
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t i = 0;
   u_int16_t space_pos = 0;
   u_int16_t command_start = 0;

@@ -401,7 +401,7 @@ static void ndpi_ssh_zap_cr(char *str, int len) {
 /* ************************************************************************ */
 
 static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
 #ifdef SSH_DEBUG
   printf("[SSH] %s()\n", __FUNCTION__);

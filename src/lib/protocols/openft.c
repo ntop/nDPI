@@ -37,7 +37,7 @@ static void ndpi_int_openft_add_connection(struct ndpi_detection_module_struct
 void ndpi_search_openft_tcp(struct ndpi_detection_module_struct
 							  *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &flow->packet;
+	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
 	if (packet->payload_packet_len > 5 && memcmp(packet->payload, "GET /", 5) == 0) {
 		NDPI_LOG_DBG2(ndpi_struct, "HTTP packet detected\n");

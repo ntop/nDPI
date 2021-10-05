@@ -78,7 +78,7 @@ struct ndpi_rx_header {
 void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
                    struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
   NDPI_LOG_DBG2(ndpi_struct, "RX: pck: %d, dir[0]: %d, dir[1]: %d\n",

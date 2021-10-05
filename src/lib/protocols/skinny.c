@@ -32,7 +32,7 @@ static void ndpi_int_skinny_add_connection(struct ndpi_detection_module_struct
 
 void ndpi_search_skinny(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t dport = 0, sport = 0;
   const char pattern_9_bytes[9] = { 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
   const char pattern_8_bytes[8] = { 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };

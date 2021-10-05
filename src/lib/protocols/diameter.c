@@ -93,7 +93,7 @@ int is_diameter(struct ndpi_packet_struct *packet, int size_payload)
 void ndpi_search_diameter(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &flow->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   // Diameter is on TCP
   if(packet->tcp) {

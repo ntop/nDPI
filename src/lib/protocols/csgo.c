@@ -27,7 +27,7 @@
 #include "ndpi_api.h"
 
 void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
-  struct ndpi_packet_struct* packet = &flow->packet;
+  struct ndpi_packet_struct* packet = &ndpi_struct->packet;
 
   if(packet->udp != NULL) {
     if(packet->payload_packet_len < sizeof(uint32_t)) {
