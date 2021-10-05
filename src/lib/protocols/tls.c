@@ -1495,7 +1495,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       ja3.client.alpn[0] = '\0';
 
       flow->protos.tls_quic_stun.tls_quic.ssl_version = ja3.client.tls_handshake_version = tls_version;
-      if(flow->protos.tls_quic_stun.tls_quic.ssl_version < 0x0302) /* TLSv1.1 */
+      if(flow->protos.tls_quic_stun.tls_quic.ssl_version < 0x0303) /* < TLSv1.2 */
 	ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_OBSOLETE_VERSION);
 
       if((session_id_len+base_offset+3) > packet->payload_packet_len)
