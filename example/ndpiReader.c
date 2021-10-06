@@ -2915,7 +2915,6 @@ static void printFlowsStats() {
  */
 static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_usec) {
   u_int32_t i;
-  u_int64_t total_flow_bytes = 0;
   u_int32_t avg_pkt_size = 0;
   int thread_id;
   char buf[32];
@@ -3108,8 +3107,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	       (long long unsigned int)cumulative_stats.protocol_counter_bytes[i],
 	       cumulative_stats.protocol_flows[i]);
       }
-
-      total_flow_bytes += cumulative_stats.protocol_counter_bytes[i];
     }
   }
 
@@ -3124,8 +3121,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       }
     }
   }
-
-  // printf("\n\nTotal Flow Traffic: %llu (diff: %llu)\n", total_flow_bytes, cumulative_stats.total_ip_bytes-total_flow_bytes);
 
   printRiskStats();
   printFlowsStats();

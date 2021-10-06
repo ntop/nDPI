@@ -86,7 +86,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 
 #ifdef DEBUG_LRU
 	  printf("[LRU] ADDING %u / %u.%u [%u -> %u]\n", key, proto, app_proto,
-		 ntohs(flow->packet.udp->source), ntohs(flow->packet.udp->dest));
+		 ntohs(packet->udp->source), ntohs(packet->udp->dest));
 #endif
 
 	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto);

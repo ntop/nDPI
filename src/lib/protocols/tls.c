@@ -1098,7 +1098,7 @@ static void tlsCheckUncommonALPN(struct ndpi_detection_module_struct *ndpi_struc
     
     if(!is_a_common_alpn(ndpi_struct, alpn_start, alpn_len)) {
 #ifdef DEBUG_TLS
-      printf("TLS uncommon ALPN found: %.*s\n", (int)alpn_len, alpn);
+      printf("TLS uncommon ALPN found: %.*s\n", (int)alpn_len, alpn_start);
 #endif
       ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_UNCOMMON_ALPN);
       break;
@@ -1604,9 +1604,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	/* Note that both Safari and Chrome can overlap */
 #ifdef DEBUG_HEURISTIC
 	printf("[CIPHERS] [is_chrome_tls: %u (%u)][is_safari_tls: %u (%u)][this_is_not_safari: %u]\n",
-	       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls,
+	       flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_chrome_tls,
 	       chrome_ciphers,
-	       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls,
+	       flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls,
 	       safari_ciphers,
 	       this_is_not_safari);
 #endif
@@ -1914,9 +1914,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 #ifdef DEBUG_HEURISTIC
 		printf("[SIGNATURE] [is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u][duplicate_found: %u]\n",
-		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_firefox_tls,
-		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_chrome_tls,
-		       flow->protos.tls_quic_stun.tls_quic.browser_euristics.is_safari_tls,
+		       flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_firefox_tls,
+		       flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_chrome_tls,
+		       flow->protos.tls_quic_stun.tls_quic.browser_heuristics.is_safari_tls,
 		       duplicate_found);
 #endif
 
