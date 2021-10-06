@@ -218,7 +218,7 @@ static inline uint32_t croaring_detect_supported_architectures() {
     return buffer;
 }
 #else // defined(__cplusplus) and defined(_MSC_VER) && !defined(__clang__)
-#if defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)
+#if (defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)) || (__GNUC__ < 5)
 #define ROARING_DISABLE_AVX
 #undef __AVX2__
 /* CentOS 7 */
@@ -234,7 +234,7 @@ static inline uint32_t croaring_detect_supported_architectures() {
     }
     return buffer;
 }
-#endif // defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)
+#endif // (defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)) || (__GNUC__ < 5)
 #endif // defined(_MSC_VER) && !defined(__clang__)
 
 #ifdef ROARING_DISABLE_AVX
@@ -324,7 +324,7 @@ extern "C" {  // portability definitions are in global scope, not a namespace
 #undef CROARING_IS_X64
 #endif
 
-#if defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5 /* RH 8 */)
+#if (defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)) || (__GNUC__ < 5)
   /* RH 7 don't have atomic includes */
 #undef CROARING_IS_X64
 #endif
