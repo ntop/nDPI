@@ -41,7 +41,8 @@ void ndpi_search_zabbix(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search Zabbix\n");
 
-  if((packet->payload_packet_len > 4)
+  if(packet &&
+     (packet->payload_packet_len > 4)
      && (memcmp(packet->payload, tomatch, 5) == 0))    
     ndpi_int_zabbix_add_connection(ndpi_struct, flow);
   else
