@@ -1,4 +1,4 @@
-AC_INIT([libndpi], [@NDPI_VERSION_SHORT@])
+AC_INIT([libndpi], [4.1.0])
 
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_MACRO_DIR([m4])
@@ -43,10 +43,10 @@ dnl>  AC_PROG_CC
 fi
 AC_LANG_WERROR
 
-NDPI_VERSION_SHORT="@NDPI_VERSION_SHORT@"
-NDPI_MAJOR="@NDPI_MAJOR@"
-NDPI_MINOR="@NDPI_MINOR@"
-NDPI_PATCH="@NDPI_PATCH@"
+NDPI_MAJOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 1`
+NDPI_MINOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 2`
+NDPI_PATCH=`echo "${PACKAGE_VERSION}" | cut -d . -f 3`
+NDPI_VERSION_SHORT="$NDPI_MAJOR.$NDPI_MINOR.$NDPI_PATCH"
 
 AC_DEFINE_UNQUOTED(NDPI_MAJOR_RELEASE, "${NDPI_MAJOR}", [nDPI major release])
 AC_DEFINE_UNQUOTED(NDPI_MINOR_RELEASE, "${NDPI_MINOR}", [nDPI minor release])
@@ -185,35 +185,35 @@ AC_ARG_ENABLE([debug-messages],
     AS_HELP_STRING([--enable-debug-messages], [Define NDPI_ENABLE_DEBUG_MESSAGES=1]), [
 	AC_DEFINE(NDPI_ENABLE_DEBUG_MESSAGES, 1, [Enable ndpi_debug_messages]) ])
 
-@FUZZY@ AS_IF([test "x$enable_fuzztargets" = "xyes"], [
-@FUZZY@     AC_PROG_CXX
-@FUZZY@     AC_LANG_PUSH(C++)
-@FUZZY@     tmp_saved_flags=$[]_AC_LANG_PREFIX[]FLAGS
-@FUZZY@     AX_CHECK_COMPILE_FLAG([-fsanitize=fuzzer],,
-@FUZZY@         [AC_MSG_ERROR([--enable-fuzztargets requires -fsanitize=fuzzer which is only supported by LLVM])],
-@FUZZY@         [-Werror])
-@FUZZY@     AS_IF([test "x$LIB_FUZZING_ENGINE" = "x"], [
-@FUZZY@         LIB_FUZZING_ENGINE=-fsanitize=fuzzer
-@FUZZY@         AC_SUBST(LIB_FUZZING_ENGINE)
-@FUZZY@     ])
-@FUZZY@     _AC_LANG_PREFIX[]FLAGS="$[]_AC_LANG_PREFIX[]FLAGS $LIB_FUZZING_ENGINE"
-@FUZZY@     AC_MSG_CHECKING([whether $CXX accepts $LIB_FUZZING_ENGINE])
-@FUZZY@     AC_LINK_IFELSE([AC_LANG_SOURCE([[
-@FUZZY@ #include <sys/types.h>
-@FUZZY@ extern "C" int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size);
-@FUZZY@ extern "C" int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size) {
-@FUZZY@ (void)Data;
-@FUZZY@ (void)Size;
-@FUZZY@ return 0;
-@FUZZY@ }
-@FUZZY@         ]])],
-@FUZZY@         [ AC_MSG_RESULT(yes)
-@FUZZY@           has_sanitizefuzzer=yes],
-@FUZZY@         [ AC_MSG_RESULT(no) ]
-@FUZZY@     )
-@FUZZY@     _AC_LANG_PREFIX[]FLAGS=$tmp_saved_flags
-@FUZZY@     AC_LANG_POP()
-@FUZZY@ ])
+AS_IF([test "x$enable_fuzztargets" = "xyes"], [
+    AC_PROG_CXX
+    AC_LANG_PUSH(C++)
+    tmp_saved_flags=$[]_AC_LANG_PREFIX[]FLAGS
+    AX_CHECK_COMPILE_FLAG([-fsanitize=fuzzer],,
+        [AC_MSG_ERROR([--enable-fuzztargets requires -fsanitize=fuzzer which is only supported by LLVM])],
+        [-Werror])
+    AS_IF([test "x$LIB_FUZZING_ENGINE" = "x"], [
+        LIB_FUZZING_ENGINE=-fsanitize=fuzzer
+        AC_SUBST(LIB_FUZZING_ENGINE)
+    ])
+    _AC_LANG_PREFIX[]FLAGS="$[]_AC_LANG_PREFIX[]FLAGS $LIB_FUZZING_ENGINE"
+    AC_MSG_CHECKING([whether $CXX accepts $LIB_FUZZING_ENGINE])
+    AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/types.h>
+extern "C" int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size);
+extern "C" int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size) {
+(void)Data;
+(void)Size;
+return 0;
+}
+        ]])],
+        [ AC_MSG_RESULT(yes)
+          has_sanitizefuzzer=yes],
+        [ AC_MSG_RESULT(no) ]
+    )
+    _AC_LANG_PREFIX[]FLAGS=$tmp_saved_flags
+    AC_LANG_POP()
+])
 AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))

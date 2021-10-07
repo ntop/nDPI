@@ -1,10 +1,5 @@
 #!/bin/sh
 
-NDPI_MAJOR="4"
-NDPI_MINOR="1"
-NDPI_PATCH="0"
-NDPI_VERSION_SHORT="$NDPI_MAJOR.$NDPI_MINOR.$NDPI_PATCH"
-
 rm -f configure config.h config.h.in
 
 AUTOCONF=$(command -v autoconf)
@@ -13,16 +8,10 @@ LIBTOOL=$(command -v libtool)
 LIBTOOLIZE=$(command -v libtoolize)
 AUTORECONF=$(command -v autoreconf)
 PKG_CONFIG=$(command -v pkg-config)
-FUZZY=
 
 if test -z $AUTOCONF; then
     echo "autoconf is missing: please install it and try again"
     exit
-else
-    V=`autoconf --version | head -1 | cut -d ' ' -f 4`
-    if [ "$V" = '2.63' ]; then
-        FUZZY="dnl> "
-    fi
 fi
 
 if test -z $AUTOMAKE; then
@@ -45,17 +34,7 @@ if test -z $PKG_CONFIG; then
     exit
 fi
 
-cat configure.seed | sed \
-    -e "s/@NDPI_MAJOR@/$NDPI_MAJOR/g" \
-    -e "s/@NDPI_MINOR@/$NDPI_MINOR/g" \
-    -e "s/@NDPI_PATCH@/$NDPI_PATCH/g" \
-    -e "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" \
-    -e "s/@FUZZY@/$FUZZY/g" \
-    > configure.ac
-
 autoreconf -ivf
-cat configure | sed "s/#define PACKAGE/#define NDPI_PACKAGE/g" | sed "s/#define VERSION/#define NDPI_VERSION/g"  > configure.tmp
-cat configure.tmp > configure
 
 echo "./configure $@"
 chmod +x configure
