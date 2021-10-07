@@ -49,7 +49,8 @@ void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
      Ethereum P2P Discovery Protocol
      https://github.com/ConsenSys/ethereum-dissectors/blob/master/packet-ethereum-disc.c
   */
-  if((packet->payload_packet_len > 98)
+  if(packet->udp
+     && (packet->payload_packet_len > 98)
      && (packet->payload_packet_len < 1280)
      && ((source == 30303) || (dest == 30303))
      && (packet->payload[97] <= 0x04 /* NODES */)
@@ -85,7 +86,7 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search MINING TCP\n");
 
   /* Check connection over TCP */
-  if(packet->payload_packet_len > 10) {
+  if(packet->tcp && (packet->payload_packet_len > 10)) {
     if(packet->tcp->source == htons(8333)) {
       /*
 	Bitcoin
