@@ -117,12 +117,6 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
   struct flow_id_stats *f;
   struct packet_id_stats *p;
 
-#ifdef DEBUG_PAYLOAD
-  for(i=0; i<payload_len; i++)
-    printf("%c", isprint(payload[i]) ? payload[i] : '.');
-  printf("\n");
-#endif
-
   HASH_FIND(hh, pstats, payload, payload_len, ret);
   if(ret == NULL) {
     if((ret = (struct payload_stats*)ndpi_calloc(1, sizeof(struct payload_stats))) == NULL)
@@ -139,9 +133,6 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
 
     HASH_ADD(hh, pstats, pattern[0], payload_len, ret);
 
-#ifdef DEBUG_PAYLOAD
-    printf("Added element [total: %u]\n", HASH_COUNT(pstats));
-#endif
   } else {
     ret->num_occurrencies++;
     // printf("==> %u\n", ret->num_occurrencies);
@@ -175,17 +166,9 @@ void ndpi_payload_analyzer(struct ndpi_flow_info *flow,
   u_int16_t i, j;
   u_int16_t scan_len = ndpi_min(max_packet_payload_dissection, payload_len);
 
-  if((flow->src2dst_packets+flow->dst2src_packets) <= max_num_packets_per_flow) {
-#ifdef DEBUG_PAYLOAD
-    printf("[hashval: %u][proto: %u][vlan: %u][%s:%u <-> %s:%u][direction: %s][payload_len: %u]\n",
-	   flow->hashval, flow->protocol, flow->vlan_id,
-	   flow->src_name, flow->src_port,
-	   flow->dst_name, flow->dst_port,
-	   src_to_dst_direction ? "s2d" : "d2s",
-	   payload_len);
-#endif
-  } else
+  if((flow->src2dst_packets+flow->dst2src_packets) > max_num_packets_per_flow) {
     return;
+  }
 
   for(i=0; i<scan_len; i++) {
     for(j=min_pattern_len; j <= max_pattern_len; j++) {
@@ -765,12 +748,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 
   flow.protocol = iph->protocol, flow.vlan_id = vlan_id;
   flow.src_ip = iph->saddr, flow.dst_ip = iph->daddr;
-  flow.src_port = htons(*sport), flow.dst_port = htons(*dport);
-  flow.hashval = hashval = flow.protocol + flow.src_ip + flow.dst_ip + flow.src_port + flow.dst_port;
+  flow.src_port = *sport, flow.dst_port = *dport;
+  flow.hashval = hashval = flow.protocol + ntohl(flow.src_ip) + ntohl(flow.dst_ip) + flow.src_port + flow.dst_port;
 
-#if 0
+#if 1
   printf("hashval=%u [%u][%u][%u:%u][%u:%u]\n", hashval, flow.protocol, flow.vlan_id,
-	 flow.src_ip, flow.src_port, ntohs(flow.dst_ip), ntohs(flow.dst_port));
+	 flow.src_ip, flow.src_port, flow.dst_ip, flow.dst_port);
 #endif
 
   idx = hashval % workflow->prefs.num_roots;
