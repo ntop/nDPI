@@ -115,6 +115,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
           sudo apt-get install gcc-mingw-w64 libc6-dev
+          sudo apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe python3-pip
       - name: Install Ubuntu Prerequisites (libgcrypt)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.gcrypt, '--disable-gcrypt')
         run: |
@@ -191,6 +192,16 @@ jobs:
         if: startsWith(matrix.arch, 'x86_64')
         run: |
           ./tests/do-dga.sh
+      - name: Generate tarball
+        if: startsWith(matrix.os, 'ubuntu-latest') && startsWith(matrix.arch, 'x86_64')
+        run: |
+          make dist
+      - name: Generate documentation
+        if: startsWith(matrix.os, 'ubuntu-latest') && startsWith(matrix.arch, 'x86_64')
+        run: |
+          pip3 install --user sphinxcontrib.swaggerdoc
+          make -C doc text
+          make -C doc html
       - name: Configure nDPI [Mingw-w64] (runs only on ubuntu jobs)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
         run: |
