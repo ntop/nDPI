@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libndpi
-PKG_VERSION:=3.4
+PKG_VERSION:=4.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -58,13 +58,6 @@ endef
 define Build/Prepare
 	$(PKG_UNPACK)
 	$(Build/Patch)
-	mv $(PKG_BUILD_DIR)/configure.seed $(PKG_BUILD_DIR)/configure.ac
-	$(SED) "s/@NDPI_MAJOR@/3/g" \
-		-e "s/@NDPI_MINOR@/4/g" \
-		-e "s/@NDPI_PATCH@/0/g" \
-		-e "s/@NDPI_VERSION_SHORT@/3.4.0/g" \
-		-e "s/@FUZZY@/dnl> /g" \
-		$(PKG_BUILD_DIR)/configure.ac
 endef
 
 define Build/InstallDev
