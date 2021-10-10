@@ -11,7 +11,6 @@ compile
 /config.status
 /config.sub
 /configure
-/configure.ac
 /configure.tmp
 .cproject
 /depcomp
