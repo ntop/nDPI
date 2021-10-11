@@ -3,6 +3,9 @@
 cd "$(dirname "${0}")"
 
 FUZZY_TESTING_ENABLED=@BUILD_FUZZTARGETS@
+if [ "$NDPI_DISABLE_FUZZY" = "1" ]; then
+   FUZZY_TESTING_ENABLED=0
+fi
 
 #Remember: valgrind and *SAN are incompatible!
 VALGRIND=""

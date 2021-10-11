@@ -49,7 +49,7 @@ void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct, struc
       // 38 in binary representation is 00111000 
       flow->protos.ntp.version = (packet->payload[0] & 0x38) >> 3;
     
-      if (flow->protos.ntp.version == 2) {
+      if (packet->payload_packet_len > 3 && flow->protos.ntp.version == 2) {
         flow->protos.ntp.request_code = packet->payload[3];
       }
     

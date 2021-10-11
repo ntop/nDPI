@@ -635,14 +635,20 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	      NDPI_LOG_DBG2(ndpi_struct, "xdcc should match.");
 	    }
 	    j += 2;
-	    if (memcmp(&packet->line[i].ptr[j], "DCC ", 4) == 0) {
+	    if (j + 4 < packet->line[i].len &&
+            memcmp(&packet->line[i].ptr[j], "DCC ", 4) == 0) {
 	      j += 4;
 	      NDPI_LOG_DBG2(ndpi_struct, "found DCC.");
-	      if (memcmp(&packet->line[i].ptr[j], "SEND ", 5) == 0
-		  || (memcmp(&packet->line[i].ptr[j], "CHAT", 4) == 0)
-		  || (memcmp(&packet->line[i].ptr[j], "chat", 4) == 0)
-		  || (j+7 < packet->line[i].len && memcmp(&packet->line[i].ptr[j], "sslchat", 7) == 0)
-		  || (memcmp(&packet->line[i].ptr[j], "TSEND", 5) == 0)) {
+		  if ((j + 5 < packet->line[i].len &&
+		       memcmp(&packet->line[i].ptr[j], "SEND ", 5) == 0) ||
+		      (j + 4 < packet->line[i].len &&
+		       memcmp(&packet->line[i].ptr[j], "CHAT", 4) == 0) ||
+		      (j + 4 < packet->line[i].len &&
+		       memcmp(&packet->line[i].ptr[j], "chat", 4) == 0) ||
+		      (j + 7 < packet->line[i].len &&
+		       memcmp(&packet->line[i].ptr[j], "sslchat", 7) == 0) ||
+		      (j + 5 < packet->line[i].len &&
+		       memcmp(&packet->line[i].ptr[j], "TSEND", 5) == 0)) {
 		NDPI_LOG_DBG2(ndpi_struct, "found CHAT,chat,sslchat,TSEND.");
 		j += 4;
 

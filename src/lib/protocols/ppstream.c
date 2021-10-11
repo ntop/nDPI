@@ -51,7 +51,7 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
   /* check PPS over UDP */
   if(packet->udp != NULL) {
     /*** on port 17788 ***/
-    if(packet->payload_packet_len > 12 && ((ntohs(packet->udp->source) == PPS_PORT) || (ntohs(packet->udp->dest) == PPS_PORT))) {
+    if(packet->payload_packet_len > 14 && ((ntohs(packet->udp->source) == PPS_PORT) || (ntohs(packet->udp->dest) == PPS_PORT))) {
       if(((packet->payload_packet_len - 4 == get_l16(packet->payload, 0))
 	  || (packet->payload_packet_len == get_l16(packet->payload, 0))
 	  || (packet->payload_packet_len >= 6 && packet->payload_packet_len - 6 == get_l16(packet->payload, 0)))) {

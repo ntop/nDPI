@@ -477,8 +477,11 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	       || (bt_proto = ndpi_strnstr((const char *)packet->payload, "BitTorrent protocol", packet->payload_packet_len))
 	       ) {
 	    bittorrent_found:
-	      if(bt_proto && (packet->payload_packet_len > 47))
-		memcpy(flow->protos.bittorrent.hash, &bt_proto[27], 20);
+	      if(bt_proto != NULL && ((u_int8_t *)&bt_proto[27] - packet->payload +
+	         sizeof(flow->protos.bittorrent.hash)) < packet->payload_packet_len)
+	      {
+	        memcpy(flow->protos.bittorrent.hash, &bt_proto[27], sizeof(flow->protos.bittorrent.hash));
+	      }
 
 	      NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
 	      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0,

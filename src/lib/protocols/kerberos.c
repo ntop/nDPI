@@ -213,15 +213,21 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
 #endif
 
-		if(name_offset < packet->payload_packet_len) {
+		if(name_offset < packet->payload_packet_len - 1) {
 		  u_int cname_len = 0;
 
 		  name_offset += 1;
-		  if(packet->payload[name_offset+1] < ' ') /* Isn't printable ? */
+		  if(name_offset < packet->payload_packet_len - 1 &&
+		     isprint(packet->payload[name_offset+1]) == 0) /* Isn't printable ? */
+		  {
 		    name_offset++;
+		  }
 
-		  if(packet->payload[name_offset+1] == 0x1b)
+		  if(name_offset < packet->payload_packet_len - 1 &&
+		     packet->payload[name_offset+1] == 0x1b)
+		  {
 		    name_offset += 2;
+		  }
 		  
 		  cname_len = packet->payload[name_offset];
 
@@ -230,11 +236,16 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    char cname_str[48];
 		    u_int8_t num_cname = 0;
 
+			cname_str[0] = '\0'; // required, because cname_len
+
 		    while(++num_cname <= 2) {
 		      if(cname_len > sizeof(cname_str)-1)
-			cname_len = sizeof(cname_str)-1;
+		        cname_len = sizeof(cname_str)-1;
 
-		      strncpy(cname_str, (char*)&packet->payload[name_offset+1], cname_len);
+		      if (name_offset + cname_len + 1 >= packet->payload_packet_len)
+		        cname_len = 0;
+		      else
+		        strncpy(cname_str, (char*)&packet->payload[name_offset+1], cname_len);
 		      cname_str[cname_len] = '\0';
 		      for(i=0; i<cname_len; i++) cname_str[i] = tolower(cname_str[i]);
 
@@ -243,16 +254,18 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b)) {
-			name_offset += cname_len + 2;
-			cname_len = packet->payload[name_offset];
-		      } else
-			break;
+		        name_offset += cname_len + 2;
+		        if (name_offset < packet->payload_packet_len)
+		          cname_len = packet->payload[name_offset];
+		      } else{
+		        break;
+		      }
 		    }
 
 		    realm_offset = cname_len + name_offset + 3;
 
 		    /* if cname does not end with a $ then it's a username */
-		    if(cname_len
+		    if(cname_len > 0 && name_offset + cname_len + 1 < packet->payload_packet_len
 		       && (cname_len < sizeof(cname_str))
 		       && (cname_str[cname_len-1] == '$')) {
 		      cname_str[cname_len-1] = '\0';
@@ -305,7 +318,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t name_offset, padding_offset = body_offset + 4;
 
 		name_offset = padding_offset;
-		for(i=0; i<14; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
+		for(i=0; i<14 && name_offset < packet->payload_packet_len; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
 
 #ifdef KERBEROS_DEBUG
 		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
