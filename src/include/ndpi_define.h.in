@@ -179,11 +179,6 @@
 #define NDPI_JABBER_FT_TIMEOUT				         5
 #define NDPI_SOULSEEK_CONNECTION_IP_TICK_TIMEOUT               600
 
-#ifndef _NDPI_CONFIG_H_
-#include "ndpi_config.h"	/* To have access to NDPI_ENABLE_DEBUG_MESSAGES */
-#define _NDPI_CONFIG_H_
-#endif
-
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
  #define NDPI_LOG(proto, m, log_level, args...)		                                 \
   {								                         \

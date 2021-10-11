@@ -31,10 +31,6 @@
 /* Used by both nDPI core and patricia code under third-party */
 #include "ndpi_patricia_typedefs.h"
 
-#ifdef HAVE_MAXMINDDB
-#include <maxminddb.h>
-#endif
-
 /* NDPI_LOG_LEVEL */
 typedef enum {
 	      NDPI_LOG_ERROR,
@@ -1034,15 +1030,6 @@ typedef struct ndpi_proto {
 #define _NDPI_CONFIG_H_
 #endif
 
-#ifdef HAVE_PCRE
-#include <pcre.h>
-
-struct pcre_struct {
-  pcre *compiled;
-  pcre_extra *optimized;
-};
-#endif
-
 typedef enum {
   ndpi_stun_cache,
   ndpi_hangout_cache
@@ -1171,10 +1158,9 @@ struct ndpi_detection_module_struct {
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
 #endif
 
-#ifdef HAVE_MAXMINDDB
-  MMDB_s mmdb_city, mmdb_as;
+  /* GeoIP */
+  void *mmdb_city, *mmdb_as;
   u_int8_t mmdb_city_loaded, mmdb_as_loaded;
-#endif
 
   /* Current packet */
   struct ndpi_packet_struct packet;

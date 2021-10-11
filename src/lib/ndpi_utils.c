@@ -59,6 +59,15 @@
 
 // #define DEBUG_REASSEMBLY
 
+#ifdef HAVE_PCRE
+#include <pcre.h>
+
+struct pcre_struct {
+  pcre *compiled;
+  pcre_extra *optimized;
+};
+#endif
+
 /* ****************************************** */
 
 /* implementation of the punycode check function */

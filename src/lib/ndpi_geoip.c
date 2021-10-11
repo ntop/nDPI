@@ -21,10 +21,6 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#include "ndpi_config.h"
-#endif
-
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -33,6 +29,10 @@
 #include "ndpi_api.h"
 #include "ndpi_config.h"
 
+#ifdef HAVE_MAXMINDDB
+#include <maxminddb.h>
+#endif
+
 /* ********************************************************************************* */
 
 int ndpi_load_geoip(struct ndpi_detection_module_struct *ndpi_str,
@@ -40,13 +40,19 @@ int ndpi_load_geoip(struct ndpi_detection_module_struct *ndpi_str,
 #ifdef HAVE_MAXMINDDB
   int status;
 
+  ndpi_str->mmdb_city = (void*)ndpi_malloc(sizeof(MMDB_s));
+  ndpi_str->mmdb_as   = (void*)ndpi_malloc(sizeof(MMDB_s));
+  
+  if((ndpi_str->mmdb_city == NULL) || (ndpi_str->mmdb_as == NULL))
+    return(-1);
+  
   /* Open the MMDB files */
-  if((status = MMDB_open(ip_city_data, MMDB_MODE_MMAP, &ndpi_str->mmdb_city)) != MMDB_SUCCESS)
+  if((status = MMDB_open(ip_city_data, MMDB_MODE_MMAP, (MMDB_s*)ndpi_str->mmdb_city)) != MMDB_SUCCESS)
     return(-1);
   else
     ndpi_str->mmdb_city_loaded = 1;
 
-  if((status = MMDB_open(ip_as_data, MMDB_MODE_MMAP, &ndpi_str->mmdb_as)) != MMDB_SUCCESS)
+  if((status = MMDB_open(ip_as_data, MMDB_MODE_MMAP, (MMDB_s*)ndpi_str->mmdb_as)) != MMDB_SUCCESS)
     return(-2);
   else
     ndpi_str->mmdb_as_loaded = 1;
@@ -61,8 +67,11 @@ int ndpi_load_geoip(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_free_geoip(struct ndpi_detection_module_struct *ndpi_str) {
 #ifdef HAVE_MAXMINDDB
-  if(ndpi_str->mmdb_city_loaded) MMDB_close(&ndpi_str->mmdb_city);
-  if(ndpi_str->mmdb_as_loaded)   MMDB_close(&ndpi_str->mmdb_as);
+  if(ndpi_str->mmdb_city_loaded) MMDB_close((MMDB_s*)ndpi_str->mmdb_city);
+  if(ndpi_str->mmdb_as_loaded)   MMDB_close((MMDB_s*)ndpi_str->mmdb_as);
+
+  ndpi_free(ndpi_str->mmdb_city);
+  ndpi_free(ndpi_str->mmdb_as);
 #endif
 }
 
@@ -75,7 +84,7 @@ int ndpi_get_geoip_asn(struct ndpi_detection_module_struct *ndpi_str, char *ip, 
   MMDB_entry_data_s entry_data;
 
   if(ndpi_str->mmdb_as_loaded) {
-    result = MMDB_lookup_string(&ndpi_str->mmdb_as, ip, &gai_error, &mmdb_error);
+    result = MMDB_lookup_string((MMDB_s*)ndpi_str->mmdb_as, ip, &gai_error, &mmdb_error);
 
     if((gai_error != 0)
        || (mmdb_error != MMDB_SUCCESS)
@@ -112,7 +121,7 @@ int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_s
   if(ndpi_str->mmdb_city_loaded) {
     int status;
 
-    result = MMDB_lookup_string(&ndpi_str->mmdb_city, ip, &gai_error, &mmdb_error);
+    result = MMDB_lookup_string((MMDB_s*)ndpi_str->mmdb_city, ip, &gai_error, &mmdb_error);
 
     if((gai_error != 0)
        || (mmdb_error != MMDB_SUCCESS)
