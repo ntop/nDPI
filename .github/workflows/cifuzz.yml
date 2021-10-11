@@ -21,14 +21,14 @@ jobs:
           fuzz-seconds: 600
           dry-run: false
           sanitizer: ${{ matrix.sanitizer }}
-      - name: Check artifacts presence
+      - name: Check crash
+        # Run Fuzzers return success even when setting dry-run to false.
+        # A temporal workaround is to trigger failure manually if we fing crash files.
         run: |
-          ls out/artifacts
+          exit $(ls out/artifacts -l |wc -c)
       - name: Upload Crash
         uses: actions/upload-artifact@v1
-        # if: failure() 
-        # This is commented due to the fact that Run Fuzzers return success even when setting dry-run to false.
-        # A temporal workaround is to upload artifacts at each run.
+        if: failure()
         with:
           name: ${{ matrix.sanitizer }}-artifacts
           path: ./out/artifacts
