@@ -23,7 +23,6 @@ jobs:
        sanitizer: ${{ matrix.sanitizer }}
    - name: Upload Crash
      uses: actions/upload-artifact@v1
-     if: failure()
      with:
        name: ${{ matrix.sanitizer }}-artifacts
        path: ./out/artifacts
