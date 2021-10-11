@@ -350,7 +350,15 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 #if defined(WIN32)
 #undef strtok_r
 #define strtok_r strtok_s
+
+#if BYTE_ORDER == LITTLE_ENDIAN
+#define le16toh(x) (x)
+#define le32toh(x) (x)
+#else
+#error "byte order not supported"
 #endif
+
+#endif /* WIN32 */
 
 #define NDPI_MAX_DNS_REQUESTS                   16
 #define NDPI_MIN_NUM_STUN_DETECTION             8
