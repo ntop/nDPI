@@ -8,21 +8,21 @@ jobs:
       matrix:
         sanitizer: [address, undefined, memory]
     steps:
-    - name: Build Fuzzers - ${{ matrix.sanitizer }}
-      uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
-      with:
-        oss-fuzz-project-name: 'ndpi'
-        dry-run: false
-        sanitizer: ${{ matrix.sanitizer }}
-    - name: Run Fuzzers - ${{ matrix.sanitizer }}
-      uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
-      with:
-        oss-fuzz-project-name: 'ndpi'
-        fuzz-seconds: 600
-        dry-run: false
-        sanitizer: ${{ matrix.sanitizer }}
-    - name: Upload Crash
-      uses: actions/upload-artifact@v1
-      with:
-        name: ${{ matrix.sanitizer }}-artifacts
-        path: ./out/artifacts
+      - name: Build Fuzzers - ${{ matrix.sanitizer }}
+        uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
+        with:
+          oss-fuzz-project-name: 'ndpi'
+          dry-run: false
+          sanitizer: ${{ matrix.sanitizer }}
+      - name: Run Fuzzers - ${{ matrix.sanitizer }}
+        uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
+        with:
+          oss-fuzz-project-name: 'ndpi'
+          fuzz-seconds: 600
+          dry-run: false
+          sanitizer: ${{ matrix.sanitizer }}
+      - name: Upload Crash
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ matrix.sanitizer }}-artifacts
+          path: ./out/artifacts
