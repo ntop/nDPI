@@ -23,7 +23,7 @@ jobs:
           sanitizer: ${{ matrix.sanitizer }}
       - name: Check artifacts presence
         run: |
-          ls .out/artifacts/
+          ls /github/workspace/out/artifacts/
       - name: Upload Crash
         uses: actions/upload-artifact@v1
         # if: failure() 
