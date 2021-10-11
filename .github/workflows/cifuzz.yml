@@ -25,7 +25,7 @@ jobs:
         # Run Fuzzers return success even when setting dry-run to false.
         # A temporal workaround is to trigger failure manually if we fing crash files.
         run: |
-          exit $(ls out/artifacts -l |wc -c)
+          exit $(ls out/artifacts |wc -l)
       - name: Upload Crash (upload detected crash as artifacts)
         uses: actions/upload-artifact@v1
         if: failure()
