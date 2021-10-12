@@ -1243,7 +1243,8 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
   memset(des, 0, sizeof(struct ndpi_des_struct));
 
   des->params.alpha = alpha;
-  
+  des->params.beta = beta;
+	
   if((significance < 0) || (significance > 1)) significance = 0.05;
   des->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
 
