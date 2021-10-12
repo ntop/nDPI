@@ -1233,6 +1233,61 @@ int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int64_t _value, doub
 }
 
 /* *********************************************************** */
+
+/*
+  Computes the best alpha value using the specified values used for training
+*/
+void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
+  u_int i;
+  float alpha, best_alpha;
+  double sse, lowest_sse;
+  int trace = 0;
+
+  lowest_sse = 0, best_alpha = 0;
+
+  for(alpha=0.1; alpha<0.99; alpha += 0.05) {
+    struct ndpi_ses_struct ses;
+      
+    ndpi_ses_init(&ses, alpha, 0.05);
+
+    if(trace)
+      printf("\nDouble Exponential Smoothing [alpha: %.2f]\n", alpha);
+
+    sse = 0;
+
+    for(i=0; i<num_values; i++) {
+      double prediction, confidence_band;
+      double diff;
+
+      if(ndpi_ses_add_value(&ses, values[i], &prediction, &confidence_band) != 0) {
+	diff = fabs(prediction-values[i]);
+
+	if(trace)
+	  printf("%2u)\t%12.3f\t%.3f\t%.3f\n", i, values[i], prediction, diff);
+
+	sse += diff*diff;
+      }
+    }
+
+    if(lowest_sse == 0)
+      lowest_sse = sse, best_alpha = alpha; /* first run */
+    else {
+      if(sse <= lowest_sse)
+	lowest_sse = sse, best_alpha = alpha;
+    }
+
+    if(trace)
+      printf("[alpha: %.2f] - SSE: %.2f [BEST: alpha: %.2f/SSE: %.2f]\n", alpha, sse,
+	     best_alpha, lowest_sse);
+  } /* for (alpha) */
+
+  if(trace)
+    printf("BEST [alpha: %.2f][SSE: %.2f]\n", best_alpha, lowest_sse);
+
+  *ret_alpha = best_alpha;
+}
+
+/* *********************************************************** */
 /* *********************************************************** */
 
 /*
@@ -1305,4 +1360,61 @@ int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int64_t _value, doub
 #endif
   
   return(rc);
+}
+
+/* *********************************************************** */
+
+/*
+  Computes the best alpha and beta values using the specified values used for training
+*/
+void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, float *ret_beta) {
+  u_int i;
+  float alpha, best_alpha, best_beta, beta = 0;
+  double sse, lowest_sse;
+  int trace = 0;
+
+  lowest_sse = 0, best_alpha = 0, best_beta = 0;
+
+  for(beta=0.1; beta<0.99; beta += 0.05) {
+    for(alpha=0.1; alpha<0.99; alpha += 0.05) {
+      struct ndpi_des_struct des;
+      
+      ndpi_des_init(&des, alpha, beta, 0.05);
+
+      if(trace)
+	printf("\nDouble Exponential Smoothing [alpha: %.2f][beta: %.2f]\n", alpha, beta);
+
+      sse = 0;
+
+      for(i=0; i<num_values; i++) {
+	double prediction, confidence_band;
+	double diff;
+
+	if(ndpi_des_add_value(&des, values[i], &prediction, &confidence_band) != 0) {
+	  diff = fabs(prediction-values[i]);
+
+	  if(trace)
+	    printf("%2u)\t%12.3f\t%.3f\t%.3f\n", i, values[i], prediction, diff);
+
+	  sse += diff*diff;
+	}
+      }
+
+      if(lowest_sse == 0)
+	lowest_sse = sse, best_alpha = alpha, best_beta = beta; /* first run */
+      else {
+	if(sse <= lowest_sse)
+	  lowest_sse = sse, best_alpha = alpha, best_beta = beta;
+      }
+
+      if(trace)
+	printf("[alpha: %.2f][beta: %.2f] - SSE: %.2f [BEST: alpha: %.2f/beta: %.2f/SSE: %.2f]\n", alpha, beta, sse,
+	       best_alpha, best_beta, lowest_sse);
+    } /* for (alpha) */
+  } /* for (beta) */
+
+  if(trace)
+    printf("BEST [alpha: %.2f][beta: %.2f][SSE: %.2f]\n", best_alpha, best_beta, lowest_sse);
+
+  *ret_alpha = best_alpha, *ret_beta = best_beta;
 }

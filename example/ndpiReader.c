@@ -4191,6 +4191,8 @@ void sesUnitTest() {
   }
 
   if(fd) fclose(fd);
+
+  ndpi_ses_fitting(v, num, &alpha); /* Compute the best alpha */
 }
 
 /* *********************************************** */
@@ -4261,6 +4263,8 @@ void desUnitTest() {
   }
 
   if(fd) fclose(fd);
+
+  ndpi_des_fitting(v, num, &alpha, &beta); /* Compute the best alpha/beta */
 }
 
 /* *********************************************** */
