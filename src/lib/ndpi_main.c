@@ -7517,10 +7517,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
     if(isdigit(name[0])) {
       struct in_addr ip_addr;
-      char buf[22];
       
-      ip_addr.s_addr = inet_addr(buf);
-      if(strcmp(inet_ntoa(ip_addr), buf) == 0)
+      ip_addr.s_addr = inet_addr(name);
+      if(strcmp(inet_ntoa(ip_addr), name) == 0)
 	return(0); /* Ignore numeric IPs */
     }
     
