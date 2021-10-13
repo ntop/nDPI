@@ -16,12 +16,13 @@ A clear and concise description of what you expected to happen.
 ### Obtained behavior
 A clear and concise description of what happening.
 
-## Environment (please complete the following information):
+## nDPI Environment (please complete the following information):
 * OS name: [e.g. Ubuntu].
 * OS version: [e.g. 18.04]
 * Architecture: [e.g. arm64]
 * nDPI version or commit hash: [e.g. 4.0-stable or 937357e4bc55610f116f66d15a8e0fc1e260c02c].
 * nDPI compilation flags used: if you are building from source [e.g. --with-pcre --disable-gcrypt].
+* Attach the `config.log` file generated after `./configure` ran (if you are building from source).
 
 ## How to reproduce the reported bug
 
