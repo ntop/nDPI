@@ -4784,6 +4784,91 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
+static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
+				     struct ndpi_flow_struct *flow,
+				     ndpi_protocol *ret) {
+  struct ndpi_packet_struct *packet = &ndpi_str->packet;
+
+#if 0
+  if(flow) {
+    /* Do not go for DNS when there is an application protocol. Example DNS.Apple */
+    if((flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
+       && (flow->detected_protocol_stack[0] /* app */ != flow->detected_protocol_stack[1] /* major */))
+      NDPI_CLR_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
+  }
+#endif
+
+  // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
+
+  switch(ret->app_protocol) {
+    /*
+      Skype for a host doing MS Teams means MS Teams
+      (MS Teams uses Skype as transport protocol for voice/video)
+    */
+  case NDPI_PROTOCOL_MSTEAMS:
+    if(packet->iph && packet->tcp) {
+      // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
+
+      if(ndpi_str->msteams_cache == NULL)
+	ndpi_str->msteams_cache = ndpi_lru_cache_init(1024);
+
+      if(ndpi_str->msteams_cache)
+	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
+			      packet->iph->saddr,
+			      (packet->current_time_ms / 1000) & 0xFFFF /* 16 bit */);
+    }
+    break;
+
+  case NDPI_PROTOCOL_SKYPE_TEAMS:
+  case NDPI_PROTOCOL_SKYPE_CALL:
+    if(packet->iph
+       && packet->udp
+       && ndpi_str->msteams_cache) {
+      u_int16_t when;
+
+      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, packet->iph->saddr,
+			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
+	u_int16_t tdiff = ((packet->current_time_ms /1000) & 0xFFFF) - when;
+
+	if(tdiff < 60 /* sec */) {
+	  // printf("====>> NDPI_PROTOCOL_SKYPE(_CALL) -> NDPI_PROTOCOL_MSTEAMS [%u]\n", tdiff);
+	  ret->app_protocol = NDPI_PROTOCOL_MSTEAMS;
+
+	  /* Refresh cache */
+	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
+				packet->iph->saddr,
+				(packet->current_time_ms / 1000) & 0xFFFF /* 16 bit */);
+	}
+      }
+    }
+    break;
+
+  case NDPI_PROTOCOL_RDP:
+    ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+    break;
+    
+  case NDPI_PROTOCOL_ANYDESK:
+    if(packet->tcp) /* TCP only */
+      ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+    break;
+  } /* switch */
+
+  if(flow) {
+    switch(ndpi_get_proto_breed(ndpi_str, ret->app_protocol)) {
+    case NDPI_PROTOCOL_UNSAFE:
+    case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
+    case NDPI_PROTOCOL_DANGEROUS:
+      ndpi_set_risk(ndpi_str, flow, NDPI_UNSAFE_PROTOCOL);
+      break;
+    default:
+      /* Nothing to do */
+      break;
+    }
+  }
+}
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				    u_int8_t enable_guess, u_int8_t *protocol_was_guessed) {
   ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
@@ -4923,6 +5008,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
     *protocol_was_guessed = 1;
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);
+    ndpi_reconcile_protocols(ndpi_str, flow, &ret);
   }
 
   return(ret);
@@ -5189,88 +5275,6 @@ static int ndpi_check_protocol_port_mismatch_exceptions(struct ndpi_detection_mo
   }
 
   return(0);
-}
-
-/* ********************************************************************************* */
-
-static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
-				     struct ndpi_flow_struct *flow,
-				     ndpi_protocol *ret) {
-  struct ndpi_packet_struct *packet = &ndpi_str->packet;
-
-#if 0
-  if(flow) {
-    /* Do not go for DNS when there is an application protocol. Example DNS.Apple */
-    if((flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
-       && (flow->detected_protocol_stack[0] /* app */ != flow->detected_protocol_stack[1] /* major */))
-      NDPI_CLR_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
-  }
-#endif
-
-  // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
-
-  switch(ret->app_protocol) {
-    /*
-      Skype for a host doing MS Teams means MS Teams
-      (MS Teams uses Skype as transport protocol for voice/video)
-    */
-  case NDPI_PROTOCOL_MSTEAMS:
-    if(packet->iph && packet->tcp) {
-      // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
-
-      if(ndpi_str->msteams_cache == NULL)
-	ndpi_str->msteams_cache = ndpi_lru_cache_init(1024);
-
-      if(ndpi_str->msteams_cache)
-	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-			      packet->iph->saddr,
-			      (packet->current_time_ms / 1000) & 0xFFFF /* 16 bit */);
-    }
-    break;
-
-  case NDPI_PROTOCOL_SKYPE_TEAMS:
-  case NDPI_PROTOCOL_SKYPE_CALL:
-    if(packet->iph
-       && packet->udp
-       && ndpi_str->msteams_cache) {
-      u_int16_t when;
-
-      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, packet->iph->saddr,
-			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
-	u_int16_t tdiff = ((packet->current_time_ms /1000) & 0xFFFF) - when;
-
-	if(tdiff < 60 /* sec */) {
-	  // printf("====>> NDPI_PROTOCOL_SKYPE(_CALL) -> NDPI_PROTOCOL_MSTEAMS [%u]\n", tdiff);
-	  ret->app_protocol = NDPI_PROTOCOL_MSTEAMS;
-
-	  /* Refresh cache */
-	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-				packet->iph->saddr,
-				(packet->current_time_ms / 1000) & 0xFFFF /* 16 bit */);
-	}
-      }
-    }
-    break;
-
-  case NDPI_PROTOCOL_ANYDESK:
-    if(packet->tcp) /* TCP only */
-      ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
-    break;
-  } /* switch */
-
-  if(flow) {
-    switch(ndpi_get_proto_breed(ndpi_str, ret->app_protocol)) {
-    case NDPI_PROTOCOL_UNSAFE:
-    case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
-    case NDPI_PROTOCOL_DANGEROUS:
-      ndpi_set_risk(ndpi_str, flow, NDPI_UNSAFE_PROTOCOL);
-      break;
-    default:
-      /* Nothing to do */
-      break;
-    }
-  }
-
 }
 
 /* ****************************************************** */
