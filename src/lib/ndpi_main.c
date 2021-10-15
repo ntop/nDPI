@@ -4508,6 +4508,13 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	packet->packet_direction = 1;
     }
 
+    flow->is_ipv6 = (packet->iphv6 != NULL);
+    if(flow->is_ipv6 == 0) {
+      flow->saddr = packet->iph->saddr;
+      flow->daddr = packet->iph->daddr;
+    }
+    flow->last_packet_time_ms = packet->current_time_ms;
+
     packet->packet_lines_parsed_complete = 0;
 
     if(flow->init_finished == 0) {
@@ -4793,7 +4800,7 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow,
 				     ndpi_protocol *ret) {
-  struct ndpi_packet_struct *packet = &ndpi_str->packet;
+  /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup() */
 
 #if 0
   if(flow) {
@@ -4812,7 +4819,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       (MS Teams uses Skype as transport protocol for voice/video)
     */
   case NDPI_PROTOCOL_MSTEAMS:
-    if(packet->iph && packet->tcp) {
+    if(flow->is_ipv6 == 0 && flow->l4_proto == IPPROTO_TCP) {
       // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
 
       if(ndpi_str->msteams_cache == NULL)
@@ -4820,21 +4827,21 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
       if(ndpi_str->msteams_cache)
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-			      packet->iph->saddr,
-			      (packet->current_time_ms / 1000) & 0xFFFF /* 16 bit */);
+			      flow->saddr,
+			      (flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
     }
     break;
 
   case NDPI_PROTOCOL_SKYPE_TEAMS:
   case NDPI_PROTOCOL_SKYPE_CALL:
-    if(packet->iph
-       && packet->udp
+    if(flow->is_ipv6 == 0
+       && flow->l4_proto == IPPROTO_UDP
        && ndpi_str->msteams_cache) {
       u_int16_t when;
 
-      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, packet->iph->saddr,
+      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, flow->saddr,
 			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
-	u_int16_t tdiff = ((packet->current_time_ms /1000) & 0xFFFF) - when;
+	u_int16_t tdiff = ((flow->last_packet_time_ms /1000) & 0xFFFF) - when;
 
 	if(tdiff < 60 /* sec */) {
 	  // printf("====>> NDPI_PROTOCOL_SKYPE(_CALL) -> NDPI_PROTOCOL_MSTEAMS [%u]\n", tdiff);
@@ -4842,8 +4849,8 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
 	  /* Refresh cache */
 	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-				packet->iph->saddr,
-				(packet->current_time_ms / 1000) & 0xFFFF /* 16 bit */);
+				flow->saddr,
+				(flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
 	}
       }
     }
@@ -4854,7 +4861,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     break;
     
   case NDPI_PROTOCOL_ANYDESK:
-    if(packet->tcp) /* TCP only */
+    if(flow->l4_proto == IPPROTO_TCP) /* TCP only */
       ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
     break;
   } /* switch */
@@ -4898,10 +4905,10 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   /* TODO: this lookup seems in the wrong place here...
      Move it somewhere else (?) or setting flow->guessed_protocol_id directly in the mining dissector? */
-  if(ndpi_str->mining_cache && flow->key_mining_cache) {
+  if(ndpi_str->mining_cache && flow->is_ipv6 == 0) {
     u_int16_t cached_proto;
 
-    if(ndpi_lru_find_cache(ndpi_str->mining_cache, flow->key_mining_cache,
+    if(ndpi_lru_find_cache(ndpi_str->mining_cache, flow->saddr + flow->daddr,
 			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
       ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN);
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
@@ -5438,14 +5445,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   /* detect traffic for tcp or udp only */
   flow->src = src, flow->dst = dst;
-
-  /* If/when calling ndpi_detection_giveup(), if this flow is still un-classified,
-     we will check if it is some kind of mining stuff. Save now the key, because we don't
-     have packet information later.
-     It seems quite hacky: any better way to do that? */
-  if(flow->num_processed_pkts == 1 && packet->iph) {
-    flow->key_mining_cache = packet->iph->saddr + packet->iph->daddr;
-  }
 
   ndpi_connection_tracking(ndpi_str, flow);
 
