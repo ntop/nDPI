@@ -2262,9 +2262,13 @@ u_int8_t ndpi_is_valid_protoId(u_int16_t protoId) {
 u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 				 ndpi_protocol proto) {
 
-  if(ndpi_is_valid_protoId(proto.master_protocol) && ndpi_is_valid_protoId(proto.app_protocol)) {    
-    return((ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
-	    && ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto) ? 0 : 1);
+  if(ndpi_is_valid_protoId(proto.master_protocol) && ndpi_is_valid_protoId(proto.app_protocol)) {
+    if(ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
+       && (!ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto))
+      return(0);
+    else
+      return((ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
+	      && ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto) ? 0 : 1);
   } else
     return(0);
 }
