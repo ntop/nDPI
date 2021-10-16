@@ -4,4 +4,4 @@ DPI Packets (TCP):	36	(36.00 pkts/flow)
 
 Google	36	8403	1
 
-	1	TCP 10.0.0.1:57406 <-> 173.194.68.26:25 [proto: 3.126/SMTP.Google][Encrypted][cat: Web/5][17 pkts/2514 bytes <-> 19 pkts/5889 bytes][Goodput ratio: 55/79][0.48 sec][Host: mx.google.com][bytes ratio: -0.402 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 30/24 156/103 42/26][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 148/310 752/1484 168/444][PLAIN TEXT (x.google.com ESMTP s4)][Plen Bins: 23,18,13,9,4,4,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0]
+	1	TCP 10.0.0.1:57406 <-> 173.194.68.26:25 [proto: 3.126/SMTP.Google][ClearText][cat: Web/5][17 pkts/2514 bytes <-> 19 pkts/5889 bytes][Goodput ratio: 55/79][0.48 sec][Host: mx.google.com][bytes ratio: -0.402 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 30/24 156/103 42/26][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 148/310 752/1484 168/444][PLAIN TEXT (x.google.com ESMTP s4)][Plen Bins: 23,18,13,9,4,4,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0]

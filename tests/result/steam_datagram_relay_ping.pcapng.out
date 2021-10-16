@@ -4,4 +4,4 @@ DPI Packets (UDP):	1	(1.00 pkts/flow)
 
 Steam	2	2684	1
 
-	1	UDP 192.168.2.100:52157 -> 139.45.193.10:27018 [proto: 74/Steam][Encrypted][cat: Game/8][2 pkts/2684 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][2.52 sec][PLAIN TEXT (sdping)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0]
+	1	UDP 192.168.2.100:52157 -> 139.45.193.10:27018 [proto: 74/Steam][ClearText][cat: Game/8][2 pkts/2684 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][2.52 sec][PLAIN TEXT (sdping)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0]
