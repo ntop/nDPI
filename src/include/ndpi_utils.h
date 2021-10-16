@@ -16,6 +16,8 @@ extern void printRawData(const uint8_t *ptr, size_t len);
 //extern uint8_t add_segment_to_buffer( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph, uint32_t waited);
 //extern uint8_t check_for_sequence( struct ndpi_flow_struct *flow, struct ndpi_tcphdr const * tcph);
 
+extern u_int8_t ndpi_ends_with(char *str, char *ends);
+  
 /* **************************************** */
 
 /* Can't call libc functions from kernel space, define some stub instead */

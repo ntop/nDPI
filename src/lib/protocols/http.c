@@ -50,27 +50,45 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 
 /* *********************************************** */
 
+static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_struct *ndpi_struct,
+						 struct ndpi_flow_struct *flow) {
+  /*
+    Check known exceptions
+  */
+  if(ndpi_ends_with((char*)flow->host_server_name, ".windowsupdate.com"))
+    ;
+  else
+    ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER);    
+ }
+
+  /* *********************************************** */
+
 static void ndpi_analyze_content_signature(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow) {
+  u_int8_t set_risk = 0;
+  
   if((flow->initial_binary_bytes_len >= 2) && (flow->initial_binary_bytes[0] == 0x4D) && (flow->initial_binary_bytes[1] == 0x5A))
-    ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER); /* Win executable */
+   set_risk = 1; /* Win executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0x7F) && (flow->initial_binary_bytes[1] == 'E')
 	  && (flow->initial_binary_bytes[2] == 'L') && (flow->initial_binary_bytes[3] == 'F'))
-    ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
+   set_risk = 1; /* Linux executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0xCF) && (flow->initial_binary_bytes[1] == 0xFA)
 	  && (flow->initial_binary_bytes[2] == 0xED) && (flow->initial_binary_bytes[3] == 0xFE))
-    ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER); /* Linux executable */
+   set_risk = 1; /* Linux executable */
   else if((flow->initial_binary_bytes_len >= 3)
 	  && (flow->initial_binary_bytes[0] == '#')
 	  && (flow->initial_binary_bytes[1] == '!')
 	  && (flow->initial_binary_bytes[2] == '/'))
-    ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER); /* Unix script (e.g. #!/bin/sh) */
+   set_risk = 1; /* Unix script (e.g. #!/bin/sh) */
   else if(flow->initial_binary_bytes_len >= 8) {
     u_int8_t exec_pattern[] = { 0x64, 0x65, 0x78, 0x0A, 0x30, 0x33, 0x35, 0x00 };
 
     if(memcmp(flow->initial_binary_bytes, exec_pattern, 8) == 0)
-      ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER); /* Dalvik Executable (Android) */
+     set_risk = 1; /* Dalvik Executable (Android) */
   }
+
+  if(set_risk)
+    ndpi_set_binary_application_transfer(ndpi_struct, flow);
 }
 
 /* *********************************************** */
@@ -222,7 +240,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	    for(i = 0; cmp_mimes[i] != NULL; i++) {
 	      if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-		ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER);
+		ndpi_set_binary_application_transfer(ndpi_struct, flow);
 		NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
 		return(flow->category);
 	      }
@@ -251,7 +269,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	      if(memcmp(&packet->content_disposition_line.ptr[attachment_len],
 			binary_file_ext[i], ATTACHMENT_LEN) == 0) {
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-		ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER);
+		ndpi_set_binary_application_transfer(ndpi_struct, flow);
 		NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
 		return(flow->category);
 	      }
