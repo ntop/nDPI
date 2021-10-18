@@ -4107,18 +4107,19 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
 /* handle extension headers in IPv6 packets
  * arguments:
+ *  l3len: the packet length excluding the IPv6 header
  * 	l4ptr: pointer to the byte following the initial IPv6 header
- * 	l4len: the length of the IPv6 packet excluding the IPv6 header
+ * 	l4len: the length of the IPv6 packet parsed from the IPv6 header
  * 	nxt_hdr: next header value from the IPv6 header
  * result:
- * 	l4ptr: pointer to the start of the actual packet payload
- * 	l4len: length of the actual payload
- * 	nxt_hdr: protocol of the actual payload
+ * 	l4ptr: pointer to the start of the actual layer 4 header
+ * 	l4len: length of the actual layer 4 header
+ * 	nxt_hdr: first byte of the layer 4 packet
  * returns 0 upon success and 1 upon failure
  */
-int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t **l4ptr,
+int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
                                        u_int16_t *l4len, u_int8_t *nxt_hdr) {
-  while((*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
+  while(l3len > 1 && (*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
     u_int16_t ehdr_len, frag_offset;
 
     // no next header
@@ -4131,6 +4132,11 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
       if(*l4len < 8) {
 	return(1);
       }
+
+      if (l3len < 5) {
+        return 1;
+      }
+      l3len -= 5;
 
       *nxt_hdr = (*l4ptr)[0];
       frag_offset = ntohs(*(u_int16_t *)((*l4ptr) + 2)) >> 3;
@@ -4151,6 +4157,11 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
     ehdr_len = (*l4ptr)[1];
     ehdr_len *= 8;
     ehdr_len += 8;
+
+    if (ehdr_len > l3len) {
+      return 1;
+    }
+    l3len -= ehdr_len;
 
     if(*l4len < ehdr_len) {
       return(1);
@@ -4249,7 +4260,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     l4protocol = iph_v6->ip6_hdr.ip6_un1_nxt;
 
     // we need to handle IPv6 extension headers if present
-    if(ndpi_handle_ipv6_extension_headers(ndpi_str, &l4ptr, &l4len, &l4protocol) != 0) {
+    if(ndpi_handle_ipv6_extension_headers(l3_len - sizeof(struct ndpi_ipv6hdr), &l4ptr, &l4len, &l4protocol) != 0) {
       return(1);
     }
 
@@ -7009,6 +7020,7 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
   else
     what = name, what_len = name_len;
 
+  memset(&ret_match, 0, sizeof(ret_match));
   subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len,
 					 &ret_match, master_protocol);
 
@@ -7518,7 +7530,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
     if(isdigit(name[0])) {
       struct in_addr ip_addr;
-      
+
       ip_addr.s_addr = inet_addr(name);
       if(strcmp(inet_ntoa(ip_addr), name) == 0)
 	return(0); /* Ignore numeric IPs */

@@ -466,9 +466,7 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(flow->http.user_agent == NULL) {
-    int len = ua_ptr_len + 1;
-
-    flow->http.user_agent = ndpi_malloc(len);
+    flow->http.user_agent = ndpi_malloc(ua_ptr_len + 1);
     if(flow->http.user_agent) {
       memcpy(flow->http.user_agent, (char*)ua_ptr, ua_ptr_len);
       flow->http.user_agent[ua_ptr_len] = '\0';

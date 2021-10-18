@@ -980,7 +980,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
   u_int8_t l4proto = iph6->ip6_hdr.ip6_un1_nxt;
   u_int16_t ip_len = ntohs(iph6->ip6_hdr.ip6_un1_plen);
   const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
-  if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &l4proto) != 0) {
+  if(ndpi_handle_ipv6_extension_headers(ipsize - sizeof(struct ndpi_ipv6hdr), &l4ptr, &ip_len, &l4proto) != 0) {
     return(NULL);
   }
   iph.protocol = l4proto;
@@ -1908,8 +1908,9 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       return(nproto); /* Too short for IPv6 payload*/
 
     const u_int8_t *l4ptr = (((const u_int8_t *) iph6) + sizeof(struct ndpi_ipv6hdr));
+    u_int16_t ipsize = header->caplen - ip_offset;
 
-    if(ndpi_handle_ipv6_extension_headers(NULL, &l4ptr, &ip_len, &proto) != 0) {
+    if(ndpi_handle_ipv6_extension_headers(ipsize - sizeof(struct ndpi_ipv6hdr), &l4ptr, &ip_len, &proto) != 0) {
       return(nproto);
     }
 

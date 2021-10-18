@@ -144,7 +144,7 @@ extern "C" {
 #define ndpi_match_strprefix(payload, payload_len, str)			\
   ndpi_match_prefix((payload), (payload_len), (str), (sizeof(str)-1))
 
-  int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str,
+  int ndpi_handle_ipv6_extension_headers(u_int16_t l3len,
 					 const u_int8_t ** l4ptr, u_int16_t * l4len,
 					 u_int8_t * nxt_hdr);
   void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
