@@ -1198,13 +1198,18 @@ struct ndpi_flow_struct {
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, fail_with_unknown:1,
-    init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1;
+    init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1, is_ipv6:1;
 
   /*
     if ndpi_struct->direction_detect_disable == 1
     tcp sequence number connection tracking
   */
   u_int32_t next_tcp_seq_nr[2];
+
+  /* Flow addresses (used mainly for LRU lookups in ndpi_detection_giveup())
+   * TODO: ipv6. Note that LRU is ipv4 only, for the time being */
+  u_int32_t saddr;
+  u_int32_t daddr;
 
   // -----------------------------------------
 
@@ -1213,6 +1218,8 @@ struct ndpi_flow_struct {
   u_int16_t num_processed_pkts; /* <= WARNING it can wrap but we do expect people to giveup earlier */
 
   int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
+
+  u_int64_t last_packet_time_ms;
 
   /*
     the tcp / udp / other l4 value union
@@ -1414,9 +1421,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_OPENVPN */
   u_int8_t ovpn_session_id[8];
   u_int8_t ovpn_counter;
-
-  /* Flow key used to search a match into the mining cache */
-  u_int32_t key_mining_cache;
 
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;

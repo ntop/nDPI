@@ -2110,15 +2110,14 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
   }
 
   /* TODO: add IPv6 support */
-  struct ndpi_packet_struct *packet = &ndpi_str->packet;
   if(!flow->ip_risk_mask_evaluated) {
-    if(packet->iph) {
+    if(flow->is_ipv6 == 0) {
       struct in_addr pin;
 
-      pin.s_addr = packet->iph->saddr;
+      pin.s_addr = flow->saddr;
       flow->risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
 
-      pin.s_addr = packet->iph->daddr;
+      pin.s_addr = flow->daddr;
       flow->risk_mask &= ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
     }
 
