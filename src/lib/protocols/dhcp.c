@@ -61,6 +61,7 @@ static void ndpi_int_dhcp_add_connection(struct ndpi_detection_module_struct *nd
 void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int8_t msg_type = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search DHCP\n");
 
@@ -79,75 +80,102 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
       u_int dhcp_options_size = ndpi_min(DHCP_VEND_LEN /* maximum size of options in dhcp_packet_t */,
 					 packet->payload_packet_len - 244);
 
-      while(i + 1 /* for the len */ < dhcp_options_size) {
-	u_int8_t id  = dhcp->options[i];
 
-	if(id == 0xFF)
-	  break;
-	else {
-	  /* Prevent malformed packets to cause out-of-bounds accesses */
-	  u_int8_t len = ndpi_min(dhcp->options[i+1] /* len as found in the packet */,
+      /* Parse options in two steps (since we need first the message type and
+         it seems there is no specific order in the options list) */
+
+      /* First iteration: search for the message type */
+      while(i + 1 /* for the len */ < dhcp_options_size) {
+        u_int8_t id  = dhcp->options[i];
+
+        if(id == 0xFF)
+          break;
+        else {
+          /* Prevent malformed packets to cause out-of-bounds accesses */
+          u_int8_t len = ndpi_min(dhcp->options[i+1] /* len as found in the packet */,
+				  dhcp_options_size - (i+2) /* 1 for the type and 1 for the value */);
+          if(len == 0)
+            break;
+          if(id == 53 /* DHCP Message Type */) {
+            msg_type = dhcp->options[i+2];
+
+            if(msg_type <= 8) {
+              foundValidMsgType = 1;
+              break;
+            }
+          }
+          i += len + 2;
+        }
+      }
+
+      if(!foundValidMsgType) {
+#ifdef DHCP_DEBUG
+        NDPI_LOG_DBG2(ndpi_struct, "[DHCP] Invalid message type %d. Not dhcp\n", msg_type);
+#endif
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        return;
+      }
+
+      /* Ok, we have a valid DHCP packet -> we can write to flow->protos.dhcp */
+      NDPI_LOG_INFO(ndpi_struct, "found DHCP\n");
+      ndpi_int_dhcp_add_connection(ndpi_struct, flow);
+
+      /* Second iteration: parse the interesting options */
+      while(i + 1 /* for the len */ < dhcp_options_size) {
+        u_int8_t id  = dhcp->options[i];
+
+        if(id == 0xFF)
+         break;
+        else {
+          /* Prevent malformed packets to cause out-of-bounds accesses */
+          u_int8_t len = ndpi_min(dhcp->options[i+1] /* len as found in the packet */,
 				  dhcp_options_size - (i+2) /* 1 for the type and 1 for the value */);
 
-	  if(len == 0)
-	    break;
-	  
-	  
+          if(len == 0)
+            break;
+
 #ifdef DHCP_DEBUG
-	  NDPI_LOG_DBG2(ndpi_struct, "[DHCP] Id=%d [len=%d]\n", id, len);
+          NDPI_LOG_DBG2(ndpi_struct, "[DHCP] Id=%d [len=%d]\n", id, len);
 #endif
 
-	  if(id == 53 /* DHCP Message Type */) {
-	    u_int8_t msg_type = dhcp->options[i+2];
-
-	    if(msg_type <= 8) foundValidMsgType = 1;
-	  } else if(id == 55 /* Parameter Request List / Fingerprint */) {
-	    u_int idx, offset = 0;
+          if(id == 55 /* Parameter Request List / Fingerprint */) {
+            u_int idx, offset = 0;
 	    
-	    for(idx = 0; idx < len && offset < sizeof(flow->protos.dhcp.fingerprint) - 2; idx++) {
-	      int rc = snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
+            for(idx = 0; idx < len && offset < sizeof(flow->protos.dhcp.fingerprint) - 2; idx++) {
+              int rc = snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
 				sizeof(flow->protos.dhcp.fingerprint) - offset,
 				"%s%u", (idx > 0) ? "," : "",
 				(unsigned int)dhcp->options[i+2+idx] & 0xFF);
 	      
-	      if(rc < 0) break; else offset += rc;
-	    }
+              if(rc < 0) break; else offset += rc;
+            }
 	    
-	    flow->protos.dhcp.fingerprint[sizeof(flow->protos.dhcp.fingerprint) - 1] = '\0';	    
-	  } else if(id == 60 /* Class Identifier */) {
-	    char *name = (char*)&dhcp->options[i+2];
-	    int j = 0;
+            flow->protos.dhcp.fingerprint[sizeof(flow->protos.dhcp.fingerprint) - 1] = '\0';
+          } else if(id == 60 /* Class Identifier */) {
+            char *name = (char*)&dhcp->options[i+2];
+            int j = 0;
 	    
-	    j = ndpi_min(len, sizeof(flow->protos.dhcp.class_ident)-1);
-	    strncpy((char*)flow->protos.dhcp.class_ident, name, j);
-	    flow->protos.dhcp.class_ident[j] = '\0';
-	  } else if(id == 12 /* Host Name */) {
-	    char *name = (char*)&dhcp->options[i+2];
-	    int j = 0;
+            j = ndpi_min(len, sizeof(flow->protos.dhcp.class_ident)-1);
+            strncpy((char*)flow->protos.dhcp.class_ident, name, j);
+            flow->protos.dhcp.class_ident[j] = '\0';
+          } else if(id == 12 /* Host Name */) {
+            char *name = (char*)&dhcp->options[i+2];
+            int j = 0;
 	    
 #ifdef DHCP_DEBUG
-	    NDPI_LOG_DBG2(ndpi_struct, "[DHCP] '%.*s'\n",name,len);
+            NDPI_LOG_DBG2(ndpi_struct, "[DHCP] '%.*s'\n",name,len);
 	      //	    while(j < len) { printf( "%c", name[j]); j++; }; printf("\n");
 #endif
-	    j = ndpi_min(len, sizeof(flow->host_server_name)-1);
-	    strncpy((char*)flow->host_server_name, name, j);
-	    flow->host_server_name[j] = '\0';	    
-	  }
+            j = ndpi_min(len, sizeof(flow->host_server_name)-1);
+            strncpy((char*)flow->host_server_name, name, j);
+            flow->host_server_name[j] = '\0';
+          }
 
-	  i += len + 2;
-	}
+          i += len + 2;
+        }
       }
-
-      //get_u_int16_t(packet->payload, 240) == htons(0x3501)) {
-
-      if(foundValidMsgType) {
-	NDPI_LOG_INFO(ndpi_struct, "found DHCP\n");
-	ndpi_int_dhcp_add_connection(ndpi_struct, flow);
-      }
-      return;
     }
   }
-
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 

@@ -574,9 +574,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     if(len > 0) ndpi_check_dga_name(ndpi_struct, flow, (char*)flow->host_server_name, 1);
 
     if(packet->forwarded_line.ptr) {
-      len = ndpi_min(packet->forwarded_line.len, sizeof(flow->protos.http.nat_ip)-1);
-      strncpy((char*)flow->protos.http.nat_ip, (char*)packet->forwarded_line.ptr, len);
-      flow->protos.http.nat_ip[len] = '\0';
+      len = ndpi_min(packet->forwarded_line.len, sizeof(flow->http.nat_ip)-1);
+      strncpy((char*)flow->http.nat_ip, (char*)packet->forwarded_line.ptr, len);
+      flow->http.nat_ip[len] = '\0';
     }
 
     ndpi_http_parse_subprotocol(ndpi_struct, flow);

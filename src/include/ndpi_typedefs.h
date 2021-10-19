@@ -788,6 +788,9 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_RDP */
   u_int8_t rdp_to_srv[3], rdp_from_srv[3], rdp_to_srv_pkts, rdp_from_srv_pkts;   
+
+  /* NDPI_PROTOCOL_IMO */
+  u_int8_t imo_last_one_byte_pkt, imo_last_byte;
 };
 
 /* ************************************************** */
@@ -1248,6 +1251,7 @@ struct ndpi_flow_struct {
     u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     u_int16_t response_status_code; /* 200, 404, etc. */
     u_char detected_os[32]; /* Via HTTP/QUIC User-Agent */
+    u_char nat_ip[24]; /* Via HTTP X-Forwarded-For */
   } http;
 
   /*
@@ -1259,6 +1263,17 @@ struct ndpi_flow_struct {
     char *pktbuf;
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
+
+  struct {
+    u_int8_t num_udp_pkts, num_binding_requests;
+    u_int16_t num_processed_pkts;
+  } stun;
+
+  /* TODO: something clever to save memory */
+  struct {
+    u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
+    char username[32], password[16];
+  } ftp_imap_pop_smtp;
 
   union {
     /* the only fields useful for nDPI and ntopng */
@@ -1278,48 +1293,36 @@ struct ndpi_flow_struct {
     } kerberos;
 
     struct {
-      struct {
-        char ssl_version_str[12];
-	u_int16_t ssl_version, server_names_len;
-	char client_requested_server_name[256], /* SNI hostname length: RFC 4366 */
+      char ssl_version_str[12];
+      u_int16_t ssl_version, server_names_len;
+      char client_requested_server_name[256]; /* SNI hostname length: RFC 4366 */
+      char
 	  *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
-	u_int32_t notBefore, notAfter;
-	char ja3_client[33], ja3_server[33];
-	u_int16_t server_cipher;
-	u_int8_t sha1_certificate_fingerprint[20];
-	u_int8_t hello_processed:1, subprotocol_detected:1, _pad:6;
+      u_int32_t notBefore, notAfter;
+      char ja3_client[33], ja3_server[33];
+      u_int16_t server_cipher;
+      u_int8_t sha1_certificate_fingerprint[20];
+      u_int8_t hello_processed:1, subprotocol_detected:1, _pad:6;
 
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
-	/* Under #ifdef to save memory for those who do not need them */
-	u_int8_t num_tls_signature_algorithms;
-	u_int16_t client_signature_algorithms[MAX_NUM_TLS_SIGNATURE_ALGORITHMS];
+      /* Under #ifdef to save memory for those who do not need them */
+      u_int8_t num_tls_signature_algorithms;
+      u_int16_t client_signature_algorithms[MAX_NUM_TLS_SIGNATURE_ALGORITHMS];
 #endif
 
-	struct tls_heuristics browser_heuristics;
-
-	struct {
-	  u_int16_t cipher_suite;
-	  char *esni;
-	} encrypted_sni;
-	ndpi_cipher_weakness server_unsafe_cipher;
-      } tls_quic;
+      struct tls_heuristics browser_heuristics;
 
       struct {
-		    u_int8_t num_udp_pkts, num_binding_requests;
-        u_int16_t num_processed_pkts;
-      } stun;
-
-      /* We can have STUN over SSL/TLS thus they need to live together */
-    } tls_quic_stun;
+        u_int16_t cipher_suite;
+        char *esni;
+      } encrypted_sni;
+      ndpi_cipher_weakness server_unsafe_cipher;
+    } tls_quic;
 
     struct {
       char client_signature[48], server_signature[48];
       char hassh_client[33], hassh_server[33];
     } ssh;
-
-    struct {
-      u_int8_t last_one_byte_pkt, last_byte;
-    } imo;
 
     struct {
       u_int8_t username_detected:1, username_found:1,
@@ -1332,16 +1335,6 @@ struct ndpi_flow_struct {
     struct {
       char version[32];
     } ubntac2;
-
-    struct {
-      /* Via HTTP X-Forwarded-For */
-      u_char nat_ip[24];
-    } http;
-
-    struct {
-      u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
-      char username[32], password[16];
-    } ftp_imap_pop_smtp;
 
     struct {
       /* Bittorrent hash */

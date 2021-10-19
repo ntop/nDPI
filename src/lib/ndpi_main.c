@@ -4298,23 +4298,23 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_POPS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS)) {
-      if(flow->protos.tls_quic_stun.tls_quic.server_names)
-	ndpi_free(flow->protos.tls_quic_stun.tls_quic.server_names);
+      if(flow->protos.tls_quic.server_names)
+	ndpi_free(flow->protos.tls_quic.server_names);
 
-      if(flow->protos.tls_quic_stun.tls_quic.alpn)
-	ndpi_free(flow->protos.tls_quic_stun.tls_quic.alpn);
+      if(flow->protos.tls_quic.alpn)
+	ndpi_free(flow->protos.tls_quic.alpn);
 
-      if(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions)
-	ndpi_free(flow->protos.tls_quic_stun.tls_quic.tls_supported_versions);
+      if(flow->protos.tls_quic.tls_supported_versions)
+	ndpi_free(flow->protos.tls_quic.tls_supported_versions);
 
-      if(flow->protos.tls_quic_stun.tls_quic.issuerDN)
-	ndpi_free(flow->protos.tls_quic_stun.tls_quic.issuerDN);
+      if(flow->protos.tls_quic.issuerDN)
+	ndpi_free(flow->protos.tls_quic.issuerDN);
 
-      if(flow->protos.tls_quic_stun.tls_quic.subjectDN)
-	ndpi_free(flow->protos.tls_quic_stun.tls_quic.subjectDN);
+      if(flow->protos.tls_quic.subjectDN)
+	ndpi_free(flow->protos.tls_quic.subjectDN);
 
-      if(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni)
-	ndpi_free(flow->protos.tls_quic_stun.tls_quic.encrypted_sni.esni);
+      if(flow->protos.tls_quic.encrypted_sni.esni)
+	ndpi_free(flow->protos.tls_quic.encrypted_sni.esni);
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
@@ -4915,13 +4915,13 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     *protocol_was_guessed = 1;
     ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
   }
-  else if((flow->protos.tls_quic_stun.tls_quic.hello_processed == 1) &&
-          (flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0')) {
+  else if((flow->protos.tls_quic.hello_processed == 1) &&
+          (flow->protos.tls_quic.client_requested_server_name[0] != '\0')) {
     *protocol_was_guessed = 1;
     ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
   } else if(enable_guess) {
     if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) && (flow->l4_proto == IPPROTO_TCP) &&
-       flow->protos.tls_quic_stun.tls_quic.hello_processed)
+       flow->protos.tls_quic.hello_processed)
       flow->guessed_protocol_id = NDPI_PROTOCOL_TLS;
 
     guessed_protocol_id = flow->guessed_protocol_id, guessed_host_protocol_id = flow->guessed_host_protocol_id;
@@ -4941,8 +4941,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       flow->guessed_protocol_id = guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
     if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
-      if((guessed_protocol_id == 0) && (flow->protos.tls_quic_stun.stun.num_binding_requests > 0) &&
-         (flow->protos.tls_quic_stun.stun.num_processed_pkts > 0))
+      if((guessed_protocol_id == 0) && (flow->stun.num_binding_requests > 0) &&
+         (flow->stun.num_processed_pkts > 0))
 	guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
       if(flow->host_server_name[0] != '\0') {
@@ -4983,9 +4983,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) &&
      (flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)) {
   check_stun_export:
-    /* if(flow->protos.tls_quic_stun.stun.num_processed_pkts || flow->protos.tls_quic_stun.stun.num_udp_pkts) */
+    /* if(flow->protos.stun.num_processed_pkts || flow->protos.stun.num_udp_pkts) */
     {
-      // if(/* (flow->protos.tls_quic_stun.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
+      // if(/* (flow->protos.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
       *protocol_was_guessed = 1;
       ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN);
     }
@@ -5207,11 +5207,11 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
       }
     }
 
-    if(flow->protos.tls_quic_stun.tls_quic.hello_processed == 1 &&
-       flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0') {
+    if(flow->protos.tls_quic.hello_processed == 1 &&
+       flow->protos.tls_quic.client_requested_server_name[0] != '\0') {
       u_int32_t id;
-      int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.tls_quic_stun.tls_quic.client_requested_server_name,
-					  strlen(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name), &id);
+      int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.tls_quic.client_requested_server_name,
+					  strlen(flow->protos.tls_quic.client_requested_server_name), &id);
 
       if(rc == 0) {
 	flow->category = ret->category = (ndpi_protocol_category_t) id;
@@ -7222,9 +7222,9 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   case NDPI_PROTOCOL_MAIL_POP:
   case NDPI_PROTOCOL_MAIL_IMAP:
   case NDPI_PROTOCOL_MAIL_SMTP:
-    if(flow->protos.ftp_imap_pop_smtp.password[0] == '\0' &&
-       flow->protos.ftp_imap_pop_smtp.auth_tls == 0 &&
-       flow->protos.ftp_imap_pop_smtp.auth_done == 0)
+    if(flow->ftp_imap_pop_smtp.password[0] == '\0' &&
+       flow->ftp_imap_pop_smtp.auth_tls == 0 &&
+       flow->ftp_imap_pop_smtp.auth_done == 0)
       return(1);
     break;
 
@@ -7244,6 +7244,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_QUIC:
+    if(flow->extra_packets_func)
+      return(1);
+    break;
+
+  case NDPI_PROTOCOL_KERBEROS:
     if(flow->extra_packets_func)
       return(1);
     break;

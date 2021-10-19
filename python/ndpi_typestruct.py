@@ -406,6 +406,12 @@ class NDPIFlowUdpStruct(Structure):
         ('csgo_state', c_uint8),
         ('csgo_s2', c_uint8),
         ('csgo_id2', c_uint32),
+        ('rdp_to_srv', c_uint8 * 3),
+        ('rdp_from_srv', c_uint8 * 3),
+        ('rdp_to_srv_pkts,', c_uint8),
+        ('rdp_from_srv_pkts', c_uint8),
+        ('imo_last_one_byte_pkt,', c_uint8),
+        ('imo_last_byte', c_uint8),
     ]
 
 
@@ -423,6 +429,7 @@ class Http(Structure):
         ("request_version", c_uint8),
         ("response_status_code", c_uint16),
         ("detected_os", c_char * 32),
+        ("nat_ip", c_char * 24),
     ]
 
 
@@ -449,7 +456,7 @@ class Kerberos(Structure):
                 ("realm", c_char * 24)]
 
 
-class Ssl(Structure):
+class QuicSsl(Structure):
     _fields_ = [
         ("ssl_version", c_uint16),
         ("client_certificate", c_char * 64),
@@ -472,23 +479,12 @@ class Stun(Structure):
     ]
 
 
-class StunSsl(Structure):
-    _fields_ = [("ssl", Ssl), ("stun", Stun)]
-
-
 class Ssh(Structure):
     _fields_ = [
         ("client_signature", c_char * 48),
         ("server_signature", c_char * 48),
         ("hassh_client", c_char * 33),
         ("hassh_server", c_char * 33)
-    ]
-
-
-class Imo(Structure):
-    _fields_ = [
-        ("last_one_byte_pkt", c_uint8),
-        ("last_byte", c_uint8)
     ]
 
 
@@ -500,18 +496,14 @@ class Ubntac2(Structure):
     _fields_ = [("version", c_char * 32)]
 
 
-class Http2(Structure):
-    _fields_ = [
-        ("nat_ip", c_char * 24)
-    ]
-
 class FtpImapPopSmtp(Structure):
     _fields_ = [
         ("auth_found", c_uint8, 1),
         ("auth_failed", c_uint8, 1),
         ("auth_tls", c_uint8, 1),
-        ("_pad", c_uint8, 5),
-        ("username", c_char * 16),
+        ("auth_done", c_uint8, 1),
+        ("_pad", c_uint8, 4),
+        ("username", c_char * 32),
         ("password", c_char * 16)
     ]
 
@@ -530,13 +522,10 @@ class Protos(Union):
     _fields_ = [
         ("dns", Dns),
         ("kerberos", Kerberos),
-        ("stun_ssl", StunSsl),
+        ("quic_ssl", QuicSsl),
         ("ssh", Ssh),
-        ("imo", Imo),
         ("mdns", Mdns),
         ("ubntac2", Ubntac2),
-        ("http", Http2),
-        ("ftp_imap_pop_smtp", FtpImapPopSmtp),
         ("bittorrent", Bittorrent),
         ("dhcp", Dhcp)
     ]
@@ -699,6 +688,8 @@ NDPIFlowStruct._fields_ = [
     ("l4", L4),
     ("host_server_name", c_ubyte * 256),
     ("http", Http),
+    ("stun", Stun),
+    ("ftp_imap_pop_smtp", FtpImapPopSmtp),
     ("protos", Protos),
     ("excluded_protocol_bitmask", NDPIProtocolBitMask),
     ("category", c_int),

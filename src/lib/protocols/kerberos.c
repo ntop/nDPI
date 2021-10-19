@@ -32,6 +32,10 @@
 
 #define KERBEROS_PORT 88
 
+static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
+				      struct ndpi_flow_struct *flow);
+
+
 static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					     struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KERBEROS, NDPI_PROTOCOL_UNKNOWN);
@@ -158,6 +162,9 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef KERBEROS_DEBUG
 	    printf("[Kerberos] Packet found 0x%02X/%u\n", msg_type, msg_type);
 #endif
+
+	    ndpi_int_kerberos_add_connection(ndpi_struct, flow);
+
 	    if(msg_type != 0x0d) /* TGS-REP */ {
 	      /* Process only on requests */
 	      if(packet->payload[koffset+1] == 0xA3) {
@@ -309,6 +316,19 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		  }
 		}
 	      } 
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Setting extra func from AS-REQ\n");
+#endif
+	      flow->check_extra_packets = 1;
+	      flow->max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
+	      flow->extra_packets_func = ndpi_search_kerberos_extra;
+	    } else if(msg_type == 0x0e) /* AS-REQ */ {
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Processing AS-REQ\n");
+#endif
+	      /* Nothing specific to do; stop dissecting this flow */
+	      flow->extra_packets_func = NULL;
+
 	    } else if(msg_type == 0x0c) /* TGS-REQ */ {
 #ifdef KERBEROS_DEBUG
 	      printf("[Kerberos] Processing TGS-REQ\n");
@@ -357,18 +377,22 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		  }
 		}
 	      }
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Setting extra func from TGS-REQ\n");
+#endif
+	      if(!packet->udp) {
+	        flow->check_extra_packets = 1;
+	        flow->max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
+	        flow->extra_packets_func = ndpi_search_kerberos_extra;
+	      }
 
-	      if(packet->udp)
-		ndpi_int_kerberos_add_connection(ndpi_struct, flow);
-
-	      /* We set the protocol in the response */
 	      if(flow->kerberos_buf.pktbuf != NULL) {
 		ndpi_free(flow->kerberos_buf.pktbuf);
 		packet->payload = original_packet_payload;
 		packet->payload_packet_len = original_payload_packet_len;
 		flow->kerberos_buf.pktbuf = NULL;
 	      }
-	      
+
 	      return;
 	    } else if(msg_type == 0x0d) /* TGS-REP */ {
 	      u_int16_t pad_data_len, cname_offset;
@@ -403,22 +427,18 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		  if(cname_len && cname_str[cname_len-1] == '$') {
 		    cname_str[cname_len-1] = '\0';
 		    snprintf(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname), "%s", cname_str);
-		  } else
+		  } else {
 		    snprintf(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username), "%s", cname_str);
+		  }
 
-		  ndpi_int_kerberos_add_connection(ndpi_struct, flow);
+#ifdef KERBEROS_DEBUG
+		  printf("[TGS-REP] Found everything. disabling extra func\n");
+#endif
+	          flow->extra_packets_func = NULL;
 		}
 	      }
 	    }
 
-	    return;
-	  }
-
-	  if(packet->payload_packet_len > 21 &&
-	     packet->payload[16] == 0x05 &&
-	     (packet->payload[21] == 0x0a ||
-	      packet->payload[21] == 0x0c || packet->payload[21] == 0x0d || packet->payload[21] == 0x0e)) {
-	    ndpi_int_kerberos_add_connection(ndpi_struct, flow);
 	    return;
 	  }
 	}
@@ -437,6 +457,27 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
+static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
+				      struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+#ifdef KERBEROS_DEBUG
+  printf("[Kerberos] Extra function\n");
+#endif
+
+  /* Unfortunately, generic "extra function" code doesn't honour protocol bitmask */
+  /* TODO: handle that in ndpi_main.c for all the protocols */
+  if(packet->payload_packet_len == 0 ||
+     packet->tcp_retransmission)
+    return 1;
+
+  /* Possibly dissect the reply */
+  ndpi_search_kerberos(ndpi_struct, flow);
+
+  /* Possibly more processing */
+  return 1;
+}
 
 void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 			     u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {

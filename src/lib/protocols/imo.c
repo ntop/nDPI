@@ -39,11 +39,11 @@ void ndpi_search_imo(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
   if(packet->payload_packet_len == 1) {
     /* Two one byte consecutive packets with the same payload */ 
-    if((flow->protos.imo.last_one_byte_pkt == 1)
-       && (flow->protos.imo.last_byte == packet->payload[0]))
+    if((flow->l4.udp.imo_last_one_byte_pkt == 1)
+       && (flow->l4.udp.imo_last_byte == packet->payload[0]))
       ndpi_int_imo_add_connection(ndpi_struct, flow);
     else
-      flow->protos.imo.last_one_byte_pkt = 1, flow->protos.imo.last_byte = packet->payload[0];
+      flow->l4.udp.imo_last_one_byte_pkt = 1, flow->l4.udp.imo_last_byte = packet->payload[0];
   } else if(((packet->payload_packet_len == 10)
 	 && (packet->payload[0] == 0x09)
 	 && (packet->payload[1] == 0x02))
@@ -62,7 +62,7 @@ void ndpi_search_imo(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     if(flow->num_processed_pkts > 5)
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     else
-      flow->protos.imo.last_one_byte_pkt = 0;
+      flow->l4.udp.imo_last_one_byte_pkt = 0;
   }
 }
 
