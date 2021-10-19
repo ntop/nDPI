@@ -1474,7 +1474,7 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
       grease_quic_bit transport parameter." */
   if((*version & 0x0F0F0F0F) == 0x0a0a0a0a &&
      !(pub_bit1 == 1 && pub_bit2 == 1)) {
-    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x with first byte 0x%x\n", first_byte);
+    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x with first byte 0x%x\n", *version, first_byte);
     return 0;
   }
 

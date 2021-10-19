@@ -599,9 +599,6 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int32_t directconnect_last_safe_access_time;
 
-  /* NDPI_PROTOCOL_SOULSEEK */
-  u_int32_t soulseek_last_safe_access_time;
-
   /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int16_t detected_directconnect_port;
   u_int16_t detected_directconnect_udp_port;
@@ -615,9 +612,6 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int16_t detected_gnutella_udp_port1;
   u_int16_t detected_gnutella_udp_port2;
-
-  /* NDPI_PROTOCOL_SOULSEEK */
-  u_int16_t soulseek_listen_port;
 
   /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_number_of_port;
@@ -653,9 +647,6 @@ struct ndpi_flow_tcp_struct {
   u_int32_t irc_stage2:5;
   u_int32_t irc_direction:2;
   u_int32_t irc_0x1000_full:1;
-
-  /* NDPI_PROTOCOL_SOULSEEK */
-  u_int32_t soulseek_stage:2;
 
   /* NDPI_PROTOCOL_USENET */
   u_int32_t usenet_stage:2;
@@ -1118,8 +1109,6 @@ struct ndpi_detection_module_struct {
   u_int32_t gnutella_timeout;
   /* thunder parameters */
   u_int32_t thunder_timeout;
-  /* SoulSeek parameters */
-  u_int32_t soulseek_connection_ip_tick_timeout;
   /* rstp */
   u_int32_t orb_rstp_ts_timeout;
   u_int32_t zattoo_connection_timeout;
