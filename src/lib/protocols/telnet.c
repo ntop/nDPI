@@ -63,6 +63,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 	return(1);
 	
       flow->protos.telnet.password_detected = 1;
+      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
       flow->protos.telnet.password[flow->protos.telnet.character_id] = '\0';
       return(0);
     }
@@ -89,6 +90,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->payload[0] == '\r') {
     flow->protos.telnet.username_detected = 1;
+    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
     flow->protos.telnet.username[flow->protos.telnet.character_id] = '\0';
     flow->protos.telnet.character_id = 0;
     return(1);
