@@ -1536,7 +1536,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       if((cipher_offset+cipher_len) <= total_len) {
 	u_int8_t safari_ciphers = 0, chrome_ciphers = 0, this_is_not_safari = 0, looks_like_safari_on_big_sur = 0;
 
-	for(i=0; i<cipher_len;) {
+	for(i=0; i<cipher_len-1;) {
 	  u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
 	  u_int16_t cipher_id = ntohs(*id);
 
