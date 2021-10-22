@@ -1,0 +1,16 @@
+Guessed flow protos:	5
+
+DPI Packets (TCP):	5	(1.00 pkts/flow)
+
+Google	5	1165	5
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.11.11            	 2      
+
+
+	1	TCP 192.168.11.11:51587 -> 173.194.35.191:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/233 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Risk: ** Obsolete TLS version (older than 1.2) **][Risk Score: 100][TLSv1][Client: www.google.it][JA3C: 755cdaa3496eb8728247a639dee17aad][PLAIN TEXT (www.google.it)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.11.11:51588 -> 173.194.35.191:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/233 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Risk: ** Obsolete TLS version (older than 1.2) **][Risk Score: 100][TLSv1][JA3C: 05adadac4943351d1423c19e65c288d0][PLAIN TEXT (www.google.it)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 192.168.11.11:51589 -> 173.194.35.191:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/233 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Risk: ** Obsolete TLS version (older than 1.2) **][Risk Score: 100][TLSv1][PLAIN TEXT (www.google.it)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 192.168.11.11:51590 -> 173.194.35.191:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/233 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Risk: ** Obsolete TLS version (older than 1.2) **][Risk Score: 100][TLSv1][PLAIN TEXT (www.google.it)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	TCP 192.168.11.11:51591 -> 173.194.35.191:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/233 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Risk: ** Obsolete TLS version (older than 1.2) **][Risk Score: 100][TLSv1][PLAIN TEXT (www.google.it)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
