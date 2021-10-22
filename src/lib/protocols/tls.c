@@ -1943,7 +1943,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("Client TLS [SIGNATURE_ALGORITHMS: %s]\n", ja3.client.signature_algorithms);
 #endif
 	      } else if(extension_id == 16 /* application_layer_protocol_negotiation */ &&
-	                offset+extension_offset < total_len) {
+	                offset+extension_offset+1 < total_len) {
 		u_int16_t s_offset = offset+extension_offset;
 		u_int16_t tot_alpn_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 		char alpn_str[256];
