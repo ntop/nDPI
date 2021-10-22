@@ -1533,10 +1533,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       printf("Client TLS [client cipher_len: %u][tls_version: 0x%04X]\n", cipher_len, tls_version);
 #endif
 
-      if((cipher_offset+cipher_len) <= total_len) {
+      if((cipher_offset+cipher_len) <= total_len - 1) { /* -1 because variable "id" is a u_int16_t */
 	u_int8_t safari_ciphers = 0, chrome_ciphers = 0, this_is_not_safari = 0, looks_like_safari_on_big_sur = 0;
 
-	for(i=0; i<cipher_len-1;) {
+	for(i=0; i<cipher_len;) {
 	  u_int16_t *id = (u_int16_t*)&packet->payload[cipher_offset+i];
 	  u_int16_t cipher_id = ntohs(*id);
 
