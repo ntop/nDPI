@@ -18,7 +18,7 @@ Spotify	1	86	1
 	5	UDP 192.168.2.4:61697 <-> 192.168.2.1:53 [proto: 5.142/DNS.WhatsApp][ClearText][cat: Chat/9][1 pkts/76 bytes <-> 1 pkts/204 bytes][Goodput ratio: 44/79][0.03 sec][Host: e12.whatsapp.net][184.173.179.47][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	6	UDP [fe80::189c:c31b:1298:224]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][ClearText][cat: Network/14][1 pkts/111 bytes -> 0 pkts/0 bytes][Goodput ratio: 44/0][< 1 sec][Host: _raop._tcp.local][_raop._tcp.local][PLAIN TEXT (airplay)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	7	UDP 192.168.2.4:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][ClearText][cat: Network/14][1 pkts/91 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Host: _raop._tcp.local][_raop._tcp.local][PLAIN TEXT (airplay)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	8	UDP 192.168.2.1:57621 -> 192.168.2.255:57621 [proto: 156/Spotify][ClearText][cat: Music/25][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 192.168.2.1:57621 -> 192.168.2.255:57621 [proto: 156/Spotify][Encrypted][cat: Music/25][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 Undetected flows:

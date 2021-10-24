@@ -2261,7 +2261,9 @@ u_int8_t ndpi_is_valid_protoId(u_int16_t protoId) {
 u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 				 ndpi_protocol proto) {
 
-  if(ndpi_is_valid_protoId(proto.master_protocol) && ndpi_is_valid_protoId(proto.app_protocol)) {
+  if(proto.master_protocol == NDPI_PROTOCOL_UNKNOWN && ndpi_is_valid_protoId(proto.app_protocol)) {
+    return(!ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto);
+  } else if(ndpi_is_valid_protoId(proto.master_protocol) && ndpi_is_valid_protoId(proto.app_protocol)) {
     if(ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
        && (!ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto))
       return(0);
