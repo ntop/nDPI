@@ -4,4 +4,4 @@ DPI Packets (UDP):	1	(1.00 pkts/flow)
 
 QUIC	20	20434	1
 
-	1	UDP 248.144.129.147:39203 <-> 184.151.193.237:443 [proto: 188/QUIC][ClearText][cat: Web/5][6 pkts/3579 bytes <-> 14 pkts/16855 bytes][Goodput ratio: 93/97][0.47 sec][bytes ratio: -0.650 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 85/27 210/221 80/63][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 596/1204 1392/1392 588/461][User-Agent: Chrome/83.0.4103.101 Android 8.0.0; LDN-L21][Client: www.googletagmanager.com][PLAIN TEXT (x.GdrZY)][Plen Bins: 5,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,0,0,0,0,0]
+	1	UDP 248.144.129.147:39203 <-> 184.151.193.237:443 [proto: 188/QUIC][Encrypted][cat: Web/5][6 pkts/3579 bytes <-> 14 pkts/16855 bytes][Goodput ratio: 93/97][0.47 sec][bytes ratio: -0.650 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 85/27 210/221 80/63][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 596/1204 1392/1392 588/461][User-Agent: Chrome/83.0.4103.101 Android 8.0.0; LDN-L21][Client: www.googletagmanager.com][PLAIN TEXT (x.GdrZY)][Plen Bins: 5,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,0,0,0,0,0]
