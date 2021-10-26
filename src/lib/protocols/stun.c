@@ -82,7 +82,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 	app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
       } else {
 	if(app_proto != NDPI_PROTOCOL_STUN) {
-	  /* No sense to ass STUN, but only subprotocols */
+	  /* No sense to add STUN, but only subprotocols */
 
 #ifdef DEBUG_LRU
 	  printf("[LRU] ADDING %u / %u.%u [%u -> %u]\n", key, proto, app_proto,
@@ -180,11 +180,11 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   msg_type = ntohs(*((u_int16_t*)payload));
   msg_len  = ntohs(*((u_int16_t*)&payload[2]));
 
-  if(msg_type == 0)
+  if((msg_type == 0) || ((msg_len+20) != payload_length))
     return(NDPI_IS_NOT_STUN);  
   
   /* https://www.iana.org/assignments/stun-parameters/stun-parameters.xhtml */
-  if((msg_type & 0x3EEF) > 0x000B && msg_type != 0x0800) {
+  if(((msg_type & 0x3EEF) > 0x000B) && (msg_type != 0x0800)) {
 #ifdef DEBUG_STUN
     printf("[STUN] msg_type = %04X\n", msg_type);
 #endif
@@ -489,6 +489,8 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
+  // printf("==> %s()\n", __FUNCTION__)
+  
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 
   if(packet->payload == NULL)

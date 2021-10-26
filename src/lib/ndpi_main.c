@@ -3564,9 +3564,6 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* TLS+DTLS */
   init_tls_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* STUN */
-  init_stun_dissector(ndpi_str, &a, detection_bitmask);
-
   /* RTP */
   init_rtp_dissector(ndpi_str, &a, detection_bitmask);
 
@@ -3575,6 +3572,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
 
   /* RDP */
   init_rdp_dissector(ndpi_str, &a, detection_bitmask);
+
+  /* STUN */
+  init_stun_dissector(ndpi_str, &a, detection_bitmask);
 
   /* SIP */
   init_sip_dissector(ndpi_str, &a, detection_bitmask);
