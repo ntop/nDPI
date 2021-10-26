@@ -1800,7 +1800,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     
   case NDPI_DNS_FRAGMENTED:
     return("Fragmented DNS message");
-      
+
+  case NDPI_INVALID_CHARACTERS:
+    return("Text contains non-printable characters");
+
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2140,14 +2143,17 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
-int ndpi_is_printable_string(char const * const str, size_t len) {
+int ndpi_is_printable_string(char * const str, size_t len) {
+  int retval = 1;
+
   for (size_t i = 0; i < len; ++i) {
     if (ndpi_isprint(str[i]) == 0) {
-      return 0;
+      str[i] = '?';
+      retval = 0;
     }
   }
 
-  return 1;
+  return retval;
 }
 
 /* ******************************************************************** */

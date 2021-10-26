@@ -114,6 +114,7 @@ typedef enum {
   NDPI_CLEAR_TEXT_CREDENTIALS,
   NDPI_DNS_LARGE_PACKET,
   NDPI_DNS_FRAGMENTED,
+  NDPI_INVALID_CHARACTERS,
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */

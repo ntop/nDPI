@@ -234,3 +234,10 @@ NDPI_DNS_FRAGMENTED
 
 UDP `DNS <https://en.wikipedia.org/wiki/Domain_Name_System>`_ packets cannot be fragmented. If so, this indicates a potential security risk (e.g. use DNS to carry data) or a misconfiguration.
 
+.. _Risk 039:
+
+NDPI_INVALID_CHARACTERS
+=======================
+The risk is set whenever a dissected protocol contains characters not allowed in that protocol field.
+For example a DNS hostname must only contain a subset of all printable characters or else this risk is set.
+Additionally, some TLS protocol fields are checked for printable characters as well.

@@ -433,6 +433,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       }
     } /* for */
 
+    u_int8_t hostname_is_valid = 1;
     while((j < max_len) && (off < packet->payload_packet_len) && (packet->payload[off] != '\0')) {
       uint8_t c, cl = packet->payload[off++];
 
@@ -444,14 +445,26 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
       if(j && (j < max_len)) flow->host_server_name[j++] = '.';
 
-      while((j < max_len) && (cl != 0)) {
-	u_int32_t shift;
+	  while((j < max_len) && (cl != 0)) {
+		  u_int32_t shift;
 
-	c = packet->payload[off++];
-	shift = ((u_int32_t) 1) << (c & 0x1f);
-	flow->host_server_name[j++] = tolower((dns_validchar[c >> 5] & shift) ? c : '_');
-	cl--;
-      }
+		  c = packet->payload[off++];
+		  shift = ((u_int32_t) 1) << (c & 0x1f);
+		  if ((dns_validchar[c >> 5] & shift)) {
+			  flow->host_server_name[j++] = tolower(c);
+		  } else {
+			  if (isprint(c) == 0) {
+			    hostname_is_valid = 0;
+			    flow->host_server_name[j++] = '?';
+			  } else {
+			    flow->host_server_name[j++] = '_';
+			  }
+		  }
+		  cl--;
+	  }
+    }
+    if (hostname_is_valid == 0) {
+      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
     }
 
     flow->host_server_name[j] = '\0';
