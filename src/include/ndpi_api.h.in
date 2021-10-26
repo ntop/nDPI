@@ -424,7 +424,6 @@ extern "C" {
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
    * @par    ret_match           = completed returned match information
-   * @par    is_host_match       = value of the second field of struct ndpi_automa
    * @return the ID of the matched subprotocol;
    *         -1 if automa is not finalized;
    *         -2 if automa==NULL or string_to_match==NULL or empty string_to_match
@@ -433,8 +432,7 @@ extern "C" {
   int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				    char *string_to_match,
 				    u_int string_to_match_len,
-				    ndpi_protocol_match_result *ret_match,
-				    u_int8_t is_host_match);
+				    ndpi_protocol_match_result *ret_match);
   /**
    * Check if the host passed match with a protocol
    *
@@ -464,24 +462,6 @@ extern "C" {
   void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
 				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id);
 
-  /**
-   * Check if the string content passed match with a protocol
-   *
-   * @par    ndpi_struct         = the detection module
-   * @par    flow                = the flow where match the host
-   * @par    string_to_match     = the string to match
-   * @par    string_to_match_len = the length of the string
-   * @par    ret_match           = completed returned match information
-   * @par    master_protocol_id  = value of the ID associated to the master protocol detected
-   * @return the ID of the matched subprotocol
-   *
-   */
-  u_int16_t ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-					   struct ndpi_flow_struct *flow,
-					   char *string_to_match,
-					   u_int string_to_match_len,
-					   ndpi_protocol_match_result *ret_match,
-					   u_int16_t master_protocol_id);
   /**
    * Exclude protocol from search
    *

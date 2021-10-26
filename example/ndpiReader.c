@@ -285,7 +285,6 @@ void ndpiCheckHostStringMatch(char *testChar) {
   ndpi_protocol_match_result match = { NDPI_PROTOCOL_UNKNOWN,
 				       NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
   int  testRes;
-  u_int8_t is_host_match = 1;
   char appBufStr[64];
   ndpi_protocol detected_protocol;
   struct ndpi_detection_module_struct *ndpi_str;
@@ -302,8 +301,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
   // ac_automata_display( module->host_automa.ac_automa, 'n');
 
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
-					   testChar, strlen(testChar), &match,
-					   is_host_match);
+					   testChar, strlen(testChar), &match);
 
   if(testRes) {
     memset( &detected_protocol, 0, sizeof(ndpi_protocol) );
