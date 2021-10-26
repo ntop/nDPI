@@ -391,8 +391,12 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	printf("[TLS] %s() IssuerDN [%s]\n", __FUNCTION__, rdnSeqBuf);
 #endif
 
-	if(rdn_len && (flow->protos.tls_quic_stun.tls_quic.issuerDN == NULL))
+	if(rdn_len && (flow->protos.tls_quic_stun.tls_quic.issuerDN == NULL)) {
 	  flow->protos.tls_quic_stun.tls_quic.issuerDN = ndpi_strdup(rdnSeqBuf);
+	  if (ndpi_is_printable_string(rdnSeqBuf, rdn_len) == 0) {
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+	  }
+	}
 
 	rdn_len = 0; /* Reset buffer */
       }
@@ -513,7 +517,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 			 packet->payload_packet_len-i-len);
 #endif
 		  if (ndpi_is_printable_string(dNSName, len) == 0) {
-		    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
+		    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
 		  }
 
 		  if(matched_name == 0) {
@@ -565,6 +569,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 #if DEBUG_TLS
 		  printf("[TLS] Leftover %u bytes", packet->payload_packet_len - i);
 #endif
+		  ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
 		  break;
 		}
 	      } else {
@@ -1396,6 +1401,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 	  printf("Server TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
+	  if (ndpi_is_printable_string(alpn_str, alpn_str_len) == 0)
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+
 	  if(flow->protos.tls_quic_stun.tls_quic.alpn == NULL)
 	    flow->protos.tls_quic_stun.tls_quic.alpn = ndpi_strdup(alpn_str);
 
@@ -1718,7 +1726,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		    if (ndpi_is_printable_string(buffer, len) == 0)
 		    {
-		       ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_EXTENSION);
+		       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
 		    }
 
 		    if(!is_quic) {
