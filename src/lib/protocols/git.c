@@ -47,8 +47,11 @@ void ndpi_search_git(struct ndpi_detection_module_struct *ndpi_struct,
 	u_int32_t git_pkt_len;
 
 	memcpy(&len, &pp[offset], 4), len[4] = 0;
-	sscanf(len, "%x", &git_pkt_len);
-	       
+	if(sscanf(len, "%x", &git_pkt_len) != 1) {
+	  found_git = 0;
+	  break;
+	}
+
 	if((payload_len < git_pkt_len) || (git_pkt_len == 0 /* Bad */)) {
 	  found_git = 0;
 	  break;
