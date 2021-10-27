@@ -1189,6 +1189,13 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
+  case NDPI_PROTOCOL_NTP:
+    ndpi_serialize_start_of_block(serializer, "ntp");
+    ndpi_serialize_string_uint32(serializer, "request_code", flow->protos.ntp.request_code);
+    ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp.request_code);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
   case NDPI_PROTOCOL_MDNS:
     ndpi_serialize_start_of_block(serializer, "mdns");
     ndpi_serialize_string_string(serializer, "answer", (const char*)flow->host_server_name);
@@ -1234,6 +1241,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "client_requested_server_name",
                                    flow->protos.tls_quic_stun.tls_quic.client_requested_server_name);
+    if(flow->protos.tls_quic_stun.tls_quic.server_names)
+      ndpi_serialize_string_string(serializer, "server_names", flow->protos.tls_quic_stun.tls_quic.server_names);
     if(flow->http.user_agent)
       ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
     if(flow->protos.tls_quic_stun.tls_quic.ssl_version) {
@@ -1329,7 +1338,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic_stun.tls_quic.issuerDN);
 
 	if(flow->protos.tls_quic_stun.tls_quic.subjectDN)
-	  ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic_stun.tls_quic.subjectDN);
+	  ndpi_serialize_string_string(serializer, "subjectDN", flow->protos.tls_quic_stun.tls_quic.subjectDN);
 
 	if(flow->protos.tls_quic_stun.tls_quic.alpn)
 	  ndpi_serialize_string_string(serializer, "alpn", flow->protos.tls_quic_stun.tls_quic.alpn);
@@ -1363,7 +1372,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   struct ndpi_flow_struct *flow,
 		   u_int8_t ip_version,
-		   u_int8_t l4_protocol, u_int16_t vlan_id,
+		   u_int8_t l4_protocol,
 		   u_int32_t src_v4, u_int32_t dst_v4,
 		   struct ndpi_in6_addr *src_v6, struct ndpi_in6_addr *dst_v6,
 		   u_int16_t src_port, u_int16_t dst_port,
