@@ -185,7 +185,7 @@ void ndpi_string_sha1_hash(const uint8_t *message, size_t len, u_char *hash /* 2
 /* **************************************************** */
 
 /*
-https://github.com/corelight/community-id-spec/blob/bda913f617389df07cdaa23606e11bbd318e265c/community-id.py#L285
+  https://github.com/corelight/community-id-spec/blob/bda913f617389df07cdaa23606e11bbd318e265c/community-id.py#L285
 */
 static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int16_t off, u_int8_t l4_proto,
 						       u_int16_t src_port, u_int16_t dst_port,

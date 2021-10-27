@@ -1227,7 +1227,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   char ja3_str[JA3_STR_LEN];
   ndpi_MD5_CTX ctx;
   u_char md5_hash[16];
-  u_int32_t i;
+  u_int32_t i, j;
   u_int16_t total_len;
   u_int8_t handshake_type;
   char buffer[64] = { '\0' };
@@ -1252,7 +1252,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t base_offset    = (!is_dtls) ? 38 : 46;
     u_int16_t version_offset = (!is_dtls) ? 4 : 12;
     u_int16_t offset = (!is_dtls) ? 38 : 46;
-    u_int16_t j;
     u_int32_t tot_extension_len;
     u_int8_t  session_id_len =  0;
 
@@ -1269,7 +1268,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     tls_version = ntohs(*((u_int16_t*)&packet->payload[version_offset]));
 
     if(handshake_type == 0x02 /* Server Hello */) {
-      u_int32_t i;
       int rc;
 
       ja3.server.num_cipher = 0;
@@ -1669,7 +1667,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    /* Move to the first extension
 	       Type is u_int to avoid possible overflow on extension_len addition */
 	    u_int extension_offset = 0;
-	    u_int32_t j;
 
 	    while(extension_offset < extensions_len &&
 		  offset+extension_offset+4 <= total_len) {
@@ -1772,7 +1769,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 		if((s_offset+extension_len-2) <= total_len) {
-		  for(int i=0; i<extension_len-2 && s_offset + i + 1 < total_len; i += 2) {
+		  for(i=0; i<extension_len-2 && s_offset + i + 1 < total_len; i += 2) {
 		    u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
 #ifdef DEBUG_TLS
@@ -1803,7 +1800,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("Client TLS [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
 		if((s_offset+extension_len-1) <= total_len) {
-		  for(int i=0; i<extension_len-1 && s_offset+i < total_len; i++) {
+		  for(i=0; i<extension_len-1 && s_offset+i < total_len; i++) {
 		    u_int8_t s_group = packet->payload[s_offset+i];
 
 #ifdef DEBUG_TLS
@@ -1860,7 +1857,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  } else {
 		    /* Check for other duplications */
 		    u_int all_ok = 1;
-		    u_int32_t j;
 
 		    for(j=0; j<tot_signature_algorithms_len; j+=2) {
 		      if(j != i && s_offset + (int)j + 2 < packet->payload_packet_len) {
