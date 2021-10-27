@@ -327,8 +327,8 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
   /* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
   for(i = p_offset; i < certificate_len; i++) {
     /*
-       See https://www.ibm.com/support/knowledgecenter/SSFKSJ_7.5.0/com.ibm.mq.sec.doc/q009860_.htm
-       for X.509 certificate labels
+      See https://www.ibm.com/support/knowledgecenter/SSFKSJ_7.5.0/com.ibm.mq.sec.doc/q009860_.htm
+      for X.509 certificate labels
     */
     if((packet->payload[i] == 0x55) && (packet->payload[i+1] == 0x04) && (packet->payload[i+2] == 0x03)) {
       /* Common Name */
@@ -482,7 +482,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 #endif
 
       i += 3 /* skip the initial patten 55 1D 11 */;
-      i++; /* skip the first type, 0x04 == BIT STRING, and jump to it's length */
+
+      /* skip the first type, 0x04 == BIT STRING, and jump to it's length */
+      if(packet->payload[i] == 0x04) i++; else i += 4; /* 4 bytes, with the last byte set to 04 */
+      
       if(i < packet->payload_packet_len) {
 	i += (packet->payload[i] & 0x80) ? (packet->payload[i] & 0x7F) : 0; /* skip BIT STRING length */
 	if(i < packet->payload_packet_len) {
@@ -524,19 +527,24 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		    if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0')
 		      matched_name = 1;	/* No SNI */
 		    else if (dNSName[0] == '*')
-		    {
-		      char * label = strstr(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, &dNSName[1]);
-
-		      if (label != NULL)
 		      {
-		        char * first_dot = strchr(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, '.');
+			char * label = strstr(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, &dNSName[1]);
 
-		        if (first_dot == NULL || first_dot >= label)
-		        {
-		          matched_name = 1;
-		        }
+			if (label != NULL)
+			  {
+			    char * first_dot = strchr(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, '.');
+
+#if DEBUG_TLS
+			    printf("[TLS] Trying to match '%s' with '%s'\n",
+				   flow->protos.tls_quic_stun.tls_quic.client_requested_server_name,
+				   dNSName);
+#endif
+			    if (first_dot == NULL || first_dot >= label)
+			      {
+				matched_name = 1;
+			      }
+			  }
 		      }
-		    }
 		    else if(strcmp(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name, dNSName) == 0)
 		      matched_name = 1;
 		  }
@@ -583,7 +591,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	}
       }
     }
-  }
+  } /* for */
 
   if(rdn_len && (flow->protos.tls_quic_stun.tls_quic.subjectDN == NULL)) {
     flow->protos.tls_quic_stun.tls_quic.subjectDN = ndpi_strdup(rdnSeqBuf);
@@ -763,7 +771,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TL
   printf("[TLS] Processing block %u\n", packet->payload[0]);
 #endif
-  
+
   switch(packet->payload[0] /* block type */) {
   case 0x01: /* Client Hello */
   case 0x02: /* Server Hello */
@@ -893,7 +901,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_FATAL_ALERT);
       }
     }
-    
+
     if((len > 9)
        && (content_type != 0x17 /* Application Data */)
        && (!flow->l4.tcp.tls.certificate_processed)) {
@@ -1096,14 +1104,14 @@ static void tlsCheckUncommonALPN(struct ndpi_detection_module_struct *ndpi_struc
   char * comma_or_nul = alpn_start;
   do {
     int alpn_len;
-    
+
     comma_or_nul = strchr(comma_or_nul, ',');
 
     if(comma_or_nul == NULL)
       comma_or_nul = alpn_start + strlen(alpn_start);
 
     alpn_len = comma_or_nul - alpn_start;
-    
+
     if(!is_a_common_alpn(ndpi_struct, alpn_start, alpn_len)) {
 #ifdef DEBUG_TLS
       printf("TLS uncommon ALPN found: %.*s\n", (int)alpn_len, alpn_start);
@@ -1313,7 +1321,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	tot_extension_len = 0;
 
 #ifdef DEBUG_TLS
-      printf("TLS [server][extension_len: %u]\n", extension_len);
+      printf("TLS [server][tot_extension_len: %u]\n", tot_extension_len);
 #endif
       offset += 2;
 
