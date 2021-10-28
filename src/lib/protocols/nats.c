@@ -51,9 +51,14 @@ void ndpi_search_nats_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     for(i=0; commands[i] != NULL; i++) {
       char *match = ndpi_strnstr((const char *)packet->payload,
 				 commands[i],
-				 packet->payload_packet_len);
+				 ndpi_min(strlen(commands[i]), packet->payload_packet_len));
 
       if(!match) continue;
+
+      /* These commands are used by POP3 too. To avoid false positives, look for the other ones */
+      if((strcmp(commands[i], "+OK") == 0) || (strcmp(commands[i], "-ERR") == 0)) {
+        return;
+      }
 
       if(ndpi_strnstr((const char *)match, "\r\n",
 		      packet->payload_packet_len - ((size_t)match - (size_t)packet->payload)) != NULL) {
