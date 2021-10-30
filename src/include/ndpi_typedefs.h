@@ -1442,7 +1442,7 @@ typedef struct {
 typedef struct {
   u_int32_t network;
   u_int8_t cidr;
-  u_int8_t value;
+  u_int16_t value;
 } ndpi_network;
 
 typedef u_int32_t ndpi_init_prefs;

@@ -7,8 +7,8 @@ DNS	10	1059	5
 HTTP	19	2275	5
 TLS	15	1234	10
 Google	33	4778	7
-Amazon	2	132	1
 Sina(Weibo)	419	258077	16
+AmazonAWS	2	132	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -44,7 +44,7 @@ JA3 Host Stats:
 	27	TCP 192.168.1.105:34699 <-> 216.58.212.65:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.02 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	28	TCP 192.168.1.105:35154 <-> 216.58.210.206:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.05 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	TCP 192.168.1.105:37802 <-> 216.58.212.69:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	30	TCP 192.168.1.105:40440 <-> 54.225.163.210:443 [proto: 91.178/TLS.Amazon][Encrypted][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.14 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	30	TCP 192.168.1.105:40440 <-> 54.225.163.210:443 [proto: 91.265/TLS.AmazonAWS][Encrypted][cat: Cloud/13][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.14 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	TCP 192.168.1.105:58480 <-> 216.58.214.78:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	TCP 192.168.1.105:58481 <-> 216.58.214.78:443 [proto: 91.126/TLS.Google][Encrypted][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.05 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	UDP 192.168.1.105:11798 -> 192.168.1.1:53 [proto: 5.200/DNS.Sina(Weibo)][ClearText][cat: SocialNetwork/6][1 pkts/77 bytes -> 0 pkts/0 bytes][Goodput ratio: 45/0][< 1 sec][Host: account.weibo.com][::][PLAIN TEXT (account)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
