@@ -42,7 +42,9 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 
   NDPI_LOG_DBG(ndpi_struct, "search syslog\n");
 
-  if (packet->payload_packet_len > 20 && packet->payload_packet_len <= 1024 && packet->payload[0] == '<') {
+  if (packet->payload_packet_len > 20 && packet->payload[0] == '<') {
+    int j;
+
     NDPI_LOG_DBG2(ndpi_struct, "checked len>20 and <1024 and first symbol=<\n");
 
     for (i = 1; i <= 3; i++) {
@@ -55,7 +57,7 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 
     if (packet->payload[i++] != '>') {
       NDPI_LOG_DBG(ndpi_struct, "excluded, there is no > following the number\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SYSLOG);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     } else {
       NDPI_LOG_DBG2(ndpi_struct, "a > following the number\n");
@@ -68,51 +70,23 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
       NDPI_LOG_DBG2(ndpi_struct, "no blank following the >: do nothing\n");
     }
 
-    /* check for "last message repeated" */
-    if (i + sizeof("last message") - 1 <= packet->payload_packet_len &&
-	memcmp(packet->payload + i, "last message", sizeof("last message") - 1) == 0) {
-
-      NDPI_LOG_INFO(ndpi_struct, "found syslog by 'last message' string\n");
-
-      ndpi_int_syslog_add_connection(ndpi_struct, flow);
-
-      return;
-    } else if (i + sizeof("snort: ") - 1 <= packet->payload_packet_len &&
-	       memcmp(packet->payload + i, "snort: ", sizeof("snort: ") - 1) == 0) {
-
-      /* snort events */
-
-      NDPI_LOG_INFO(ndpi_struct, "found syslog by 'snort: ' string\n");
-
-      ndpi_int_syslog_add_connection(ndpi_struct, flow);
-
-      return;
+    /* Even if there are 2 RFCs (3164, 5424), syslog format after "<NUMBER>" is
+       not standard. The only common pattern seems to be that the entire
+       payload is made by printable characters */
+    /* TODO: check only the first N bytes to avoid touching the entire payload? */
+    for (j = 0; j < packet->payload_packet_len - i; j++) {
+      if (!(ndpi_isprint(packet->payload[i + j]) ||
+            ndpi_isspace(packet->payload[i + j]))) {
+        NDPI_LOG_DBG2(ndpi_struct, "no printable char 0x%x [i/j %d/%d]\n",
+                      packet->payload[i + j], i, j);
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        return;
+      }
     }
 
-    if (memcmp(&packet->payload[i], "Jan", 3) != 0
-	&& memcmp(&packet->payload[i], "Feb", 3) != 0
-	&& memcmp(&packet->payload[i], "Mar", 3) != 0
-	&& memcmp(&packet->payload[i], "Apr", 3) != 0
-	&& memcmp(&packet->payload[i], "May", 3) != 0
-	&& memcmp(&packet->payload[i], "Jun", 3) != 0
-	&& memcmp(&packet->payload[i], "Jul", 3) != 0
-	&& memcmp(&packet->payload[i], "Aug", 3) != 0
-	&& memcmp(&packet->payload[i], "Sep", 3) != 0
-	&& memcmp(&packet->payload[i], "Oct", 3) != 0
-	&& memcmp(&packet->payload[i], "Nov", 3) != 0 && memcmp(&packet->payload[i], "Dec", 3) != 0) {
-
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-
-      return;
-
-    } else {
-
-      NDPI_LOG_INFO(ndpi_struct, "found syslog\n");
-
-      ndpi_int_syslog_add_connection(ndpi_struct, flow);
-
-      return;
-    }
+    NDPI_LOG_INFO(ndpi_struct, "found syslog\n");
+    ndpi_int_syslog_add_connection(ndpi_struct, flow);
+    return;
   }
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }

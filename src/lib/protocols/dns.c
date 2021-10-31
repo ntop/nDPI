@@ -206,10 +206,11 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(*is_query) {
     /* DNS Request */
-    if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
+    if((dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS)
        //       && (dns_header->num_answers == 0)
        && (((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */)
 	   || ((dns_header->flags & 0xFCF0) == 0x00) /* Standard Query */
+	   || ((dns_header->flags & 0xFCFF) == 0x0800) /* Inverse query */
 	   || ((dns_header->num_answers == 0) && (dns_header->authority_rrs == 0)))) {
       /* This is a good query */
       while(x+2 < packet->payload_packet_len) {
