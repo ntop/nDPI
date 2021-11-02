@@ -1779,7 +1779,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 		if((s_offset+extension_len-2) <= total_len) {
-		  for(i=0; i<extension_len-2 && s_offset + i + 1 < total_len; i += 2) {
+		  for(i=0; i<(u_int32_t)extension_len-2 && s_offset + i + 1 < total_len; i += 2) {
 		    u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
 #ifdef DEBUG_TLS
@@ -1810,7 +1810,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("Client TLS [EllipticCurveFormat: len=%u]\n", extension_len);
 #endif
 		if((s_offset+extension_len-1) <= total_len) {
-		  for(i=0; i<extension_len-1 && s_offset+i < total_len; i++) {
+		  for(i=0; i<(u_int32_t)extension_len-1 && s_offset+i < total_len; i++) {
 		    u_int8_t s_group = packet->payload[s_offset+i];
 
 #ifdef DEBUG_TLS
