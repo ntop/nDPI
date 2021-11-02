@@ -39,7 +39,7 @@ extern int quic_len_buffer_still_required(uint8_t value);
 extern int is_version_with_var_int_transport_params(uint32_t version);
 
 // #define DEBUG_TLS_MEMORY       1
- #define DEBUG_TLS              1
+// #define DEBUG_TLS              1
 // #define DEBUG_TLS_BLOCKS       1
 // #define DEBUG_CERTIFICATE_HASH
 
