@@ -252,7 +252,6 @@ NDPIDetectionModuleStruct._fields_ = [
     ("ndpi_num_custom_protocols", c_uint),
     ("host_automa", NDPIAutoma),
     ("content_automa", NDPIAutoma),
-    ("subprotocol_automa", NDPIAutoma),
     ("bigrams_automa", NDPIAutoma),
     ("impossible_bigrams_automa", NDPIAutoma),
     ("custom_categories", CustomCategories),
