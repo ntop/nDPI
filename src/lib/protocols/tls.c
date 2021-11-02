@@ -39,7 +39,7 @@ extern int quic_len_buffer_still_required(uint8_t value);
 extern int is_version_with_var_int_transport_params(uint32_t version);
 
 // #define DEBUG_TLS_MEMORY       1
-// #define DEBUG_TLS              1
+ #define DEBUG_TLS              1
 // #define DEBUG_TLS_BLOCKS       1
 // #define DEBUG_CERTIFICATE_HASH
 
@@ -477,6 +477,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       /* Organization OID: 2.5.29.17 (subjectAltName) */
       u_int8_t matched_name = 0;
 
+      /* If the client hello was not observed or the requested name was missing, there is no need to trigger an alert */
+      if(flow->protos.tls_quic_stun.tls_quic.client_requested_server_name[0] == '\0')
+	matched_name = 1;
+	
 #ifdef DEBUG_TLS
       printf("******* [TLS] Found subjectAltName\n");
 #endif
