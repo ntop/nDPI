@@ -2685,6 +2685,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->ookla_cache)
       ndpi_lru_free_cache(ndpi_str->ookla_cache);
 
+    if(ndpi_str->bittorrent_cache)
+      ndpi_lru_free_cache(ndpi_str->bittorrent_cache);
+
     if(ndpi_str->stun_cache)
       ndpi_lru_free_cache(ndpi_str->stun_cache);
 

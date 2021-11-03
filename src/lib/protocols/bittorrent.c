@@ -82,6 +82,20 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
   }
 
   ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN);
+
+  if(packet->udp) {
+    if(ndpi_struct->bittorrent_cache == NULL)
+      ndpi_struct->bittorrent_cache = ndpi_lru_cache_init(1024);
+
+    if(ndpi_struct->bittorrent_cache && packet->iph && packet->udp) {
+      u_int32_t key = packet->iph->saddr + packet->udp->source;
+
+      ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key, NDPI_PROTOCOL_BITTORRENT);
+
+      key = packet->iph->daddr + packet->udp->dest;
+      ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key, NDPI_PROTOCOL_BITTORRENT);
+    }
+  }
 }
 
 static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module_struct
@@ -139,7 +153,6 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 					  || memcmp(packet->payload, "POST ", 5) == 0)) {
     const u_int8_t *ptr = &packet->payload[4];
     u_int16_t len = packet->payload_packet_len - 4;
-
 
     /* parse complete get packet here into line structure elements */
     ndpi_parse_packet_line_info(ndpi_struct, flow);
@@ -398,7 +411,7 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
       u_int16_t sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
 
       if(is_port(sport, dport, 3544) /* teredo */
-	 || is_port(sport, dport, 5246) || is_port(sport, dport, 5247)/* CAPWAP */) {
+	 || is_port(sport, dport, 5246) || is_port(sport, dport, 5247) /* CAPWAP */) {
       exclude_bt:
 	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
@@ -409,6 +422,24 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
 
+    if((flow->packet_counter == 0 /* Do the check once */) && ndpi_struct->bittorrent_cache) {
+      u_int32_t key = packet->udp ? (packet->iph->saddr + packet->udp->source) : (packet->iph->saddr + packet->tcp->source);
+	u_int16_t cached_proto;
+	u_int8_t found = 0;
+
+	if(ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key,
+			       &cached_proto, 0 /* Don't remove it as it can be used for other connections */))
+	  found = 1;
+	else {
+	  key = packet->udp ? (packet->iph->daddr + packet->udp->dest) : (packet->iph->daddr + packet->tcp->dest);
+
+	  found = ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key,
+				      &cached_proto, 0 /* Don't remove it as it can be used for other connections */);
+	}
+
+	if(found)
+	  goto bittorrent_found;
+      }
     if(packet->tcp != NULL) {
       ndpi_int_search_bittorrent_tcp(ndpi_struct, flow);
     } else if(packet->udp != NULL) {
@@ -487,14 +518,13 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	       ) {
 	    bittorrent_found:
 	      if(bt_proto != NULL && ((u_int8_t *)&bt_proto[27] - packet->payload +
-	         sizeof(flow->protos.bittorrent.hash)) < packet->payload_packet_len)
-	      {
+				      sizeof(flow->protos.bittorrent.hash)) < packet->payload_packet_len) {
 	        memcpy(flow->protos.bittorrent.hash, &bt_proto[27], sizeof(flow->protos.bittorrent.hash));
 	      }
 
 	      NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
 	      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0,
-				NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+						NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
 	      return;
 	    }
 	  }
