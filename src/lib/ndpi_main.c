@@ -5376,7 +5376,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
 
   if(flow->guessed_host_protocol_id >= NDPI_MAX_SUPPORTED_PROTOCOLS) {
     //u_int32_t num_calls;
-    NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
+    NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet = {0};
 
     /* This is a custom protocol and it has priority over everything else */
     ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
