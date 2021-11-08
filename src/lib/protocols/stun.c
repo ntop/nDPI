@@ -221,7 +221,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     printf("[STUN] Here we go\n");;
 #endif
 
-  if(ndpi_struct->stun_cache) {
+  if(ndpi_struct->stun_cache && packet->iph) { /* TODO: ipv6 */
     u_int16_t proto;
     u_int32_t key = get_stun_lru_key(packet, 0);
     int rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto,
@@ -471,10 +471,12 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
   printf("==>> NDPI_PROTOCOL_WHATSAPP_CALL\n");
 #endif
 
-  if(is_messenger_ip_address(ntohl(packet->iph->saddr)) || is_messenger_ip_address(ntohl(packet->iph->daddr)))      
-    flow->guessed_host_protocol_id = NDPI_PROTOCOL_MESSENGER;
-  else if(is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
-    flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+  if(packet->iph) { /* TODO: ipv6 */
+    if(is_messenger_ip_address(ntohl(packet->iph->saddr)) || is_messenger_ip_address(ntohl(packet->iph->daddr)))
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_MESSENGER;
+    else if(is_google_ip_address(ntohl(packet->iph->saddr)) || is_google_ip_address(ntohl(packet->iph->daddr)))
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+  }
   
   rc = (flow->stun.num_udp_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
 
@@ -543,7 +545,7 @@ void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   ndpi_set_bitmask_protocol_detection("STUN", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_STUN,
 				      ndpi_search_stun,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

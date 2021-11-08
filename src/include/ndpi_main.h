@@ -87,10 +87,6 @@ extern "C" {
   extern u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_struct,
 						struct ndpi_flow_struct *flow, u_int16_t counter);
 
-  extern void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-				       struct ndpi_flow_struct *flow,
-				       u_int16_t upper_detected_protocol,
-				       u_int16_t lower_detected_protocol);
   extern void ndpi_int_change_category(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow,
 				       ndpi_protocol_category_t protocol_category);

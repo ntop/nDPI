@@ -121,6 +121,8 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str, ndpi_p
 
 static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def, ndpi_default_ports_tree_node_t **root);
 static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet);
+static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol);
 
 /* ****************************************** */
 
@@ -4959,7 +4961,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       }
 
       *protocol_was_guessed = 1;
-      ndpi_int_change_protocol(ndpi_str, flow, guessed_host_protocol_id, guessed_protocol_id);
+      ndpi_set_detected_protocol(ndpi_str, flow, guessed_host_protocol_id, guessed_protocol_id);
     }
   }
 
@@ -6191,8 +6193,8 @@ void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_str
  * what it does is:
  * 1.update the flow protocol stack with the new protocol
  */
-void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-			      u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol) {
+static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol) {
   if((upper_detected_protocol == NDPI_PROTOCOL_UNKNOWN) && (lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN))
     upper_detected_protocol = lower_detected_protocol;
 

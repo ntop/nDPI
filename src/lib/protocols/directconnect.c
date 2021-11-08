@@ -166,7 +166,7 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	src->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_port));
-	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
       } else {
 	src->detected_directconnect_port = 0;
@@ -180,7 +180,7 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	src->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_ssl_port));
-	ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
 	return;
       } else {
 	src->detected_directconnect_ssl_port = 0;

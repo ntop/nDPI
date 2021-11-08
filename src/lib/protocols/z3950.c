@@ -128,7 +128,7 @@ void init_z3950_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
                                       ndpi_struct, detection_bitmask, *id,
                                       NDPI_PROTOCOL_Z3950,
                                       ndpi_search_z3950,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITH_PAYLOAD,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
 

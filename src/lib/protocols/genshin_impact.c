@@ -65,7 +65,7 @@ void init_genshin_impact_dissector(struct ndpi_detection_module_struct *ndpi_str
                                       ndpi_struct, detection_bitmask, *id,
                                       NDPI_PROTOCOL_GENSHIN_IMPACT,
                                       ndpi_search_genshin_impact,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
 

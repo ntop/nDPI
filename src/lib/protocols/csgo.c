@@ -134,7 +134,7 @@ void init_csgo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   ndpi_set_bitmask_protocol_detection("CSGO", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_CSGO,
 				      ndpi_search_csgo,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
