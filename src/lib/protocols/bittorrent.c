@@ -35,6 +35,7 @@
 #define NDPI_PROTOCOL_PLAIN_DETECTION 	 0
 #define NDPI_PROTOCOL_WEBSEED_DETECTION  2
 
+//#define CACHE_DEBUG 1
 
 struct ndpi_utp_hdr {
   u_int8_t h_version:4, h_type:4, next_extension;
@@ -94,6 +95,10 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 
       key = packet->iph->daddr + packet->udp->dest;
       ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key, NDPI_PROTOCOL_BITTORRENT);
+
+#ifdef CACHE_DEBUG
+      printf("[BitTorrent] *** ADDING ports %u / %u\n", ntohs(packet->udp->source), ntohs(packet->udp->dest));
+#endif
     }
   }
 }
@@ -427,6 +432,13 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	u_int16_t cached_proto;
 	u_int8_t found = 0;
 
+#ifdef CACHE_DEBUG
+	if(packet->udp)
+	  printf("[BitTorrent] *** SEARCHING ports %u / %u\n", ntohs(packet->udp->source), ntohs(packet->udp->dest));
+	else
+	  printf("[BitTorrent] *** SEARCHING ports %u / %u\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest));
+#endif
+	
 	if(ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key,
 			       &cached_proto, 0 /* Don't remove it as it can be used for other connections */))
 	  found = 1;
