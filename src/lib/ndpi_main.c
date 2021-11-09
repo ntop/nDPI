@@ -5884,27 +5884,6 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 
 	packet->http_num_headers++;
       } else
-
-      /* "Content-Type:" header line in HTTP. */
-      if(packet->line[packet->parsed_lines].len > 14 &&
-	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0 ) {
-	packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
-	packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
-
-	while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
-	  packet->content_line.len--, packet->content_line.ptr++;
-
-	packet->http_num_headers++;
-      } else 
-
-      /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
-      if((packet->content_line.len == 0) && (packet->line[packet->parsed_lines].len > 13) &&
-	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {
-	packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
-	packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
-	packet->http_num_headers++;
-      } else 
-
       /* "Accept:" header line in HTTP request. */
       if(packet->line[packet->parsed_lines].len > 8 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept: ", 8) == 0) {
@@ -6005,6 +5984,25 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	/* Just count. In the future, if needed, this if can be splited to parse these headers */
 	packet->http_num_headers++;
       } else 
+       /* "Content-Type:" header line in HTTP. */
+      if(packet->line[packet->parsed_lines].len > 14 &&
+	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0 ) {
+	packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
+	packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
+
+	while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
+	  packet->content_line.len--, packet->content_line.ptr++;
+
+	packet->http_num_headers++;
+      } else 
+
+      /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
+      if((packet->content_line.len == 0) && (packet->line[packet->parsed_lines].len > 13) &&
+	 (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {
+	packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
+	packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
+	packet->http_num_headers++;
+      } 
       
       if(packet->content_line.len > 0) {
 	/* application/json; charset=utf-8 */
