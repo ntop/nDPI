@@ -134,7 +134,6 @@ struct flow_metrics {
 
 struct ndpi_entropy {
   // Entropy fields
-  pkt_timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
   u_int16_t src2dst_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
   pkt_timeval src2dst_pkt_time[MAX_NUM_PKTS];               /*!< array of arrival times          */
   u_int16_t dst2src_pkt_len[MAX_NUM_PKTS];                     /*!< array of packet appdata lengths */
@@ -192,14 +191,15 @@ typedef struct ndpi_flow_info {
   ndpi_protocol detected_protocol;
 
   // Flow data analysis
+  pkt_timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
   struct ndpi_analyze_struct *iat_c_to_s, *iat_s_to_c, *iat_flow,
     *pktlen_c_to_s, *pktlen_s_to_c;
 
   char info[255];
   char flow_extra_info[16];
   char host_server_name[240];
-  char bittorent_hash[41];
-  char dhcp_fingerprint[48];
+  char *bittorent_hash;
+  char *dhcp_fingerprint;
   ndpi_risk risk;
   
   struct {
@@ -229,13 +229,13 @@ typedef struct ndpi_flow_info {
   } http;
 
   struct {
-    char username[32], password[32];
+    char *username, *password;
   } telnet;
 
   void *src_id, *dst_id;
 
-  struct ndpi_entropy entropy;
-  struct ndpi_entropy last_entropy;
+  struct ndpi_entropy *entropy;
+  struct ndpi_entropy *last_entropy;
 
   /* Payload lenght bins */
 #ifdef DIRECTION_BINS
