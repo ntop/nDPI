@@ -1136,8 +1136,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Thunder", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE,
-			  "FREE", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_OCSP,
+			  "OCSP", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PS_VUE,
@@ -2352,7 +2352,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->ndpi_num_custom_protocols = 0;
 
   ndpi_str->host_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
-  ndpi_str->content_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   ndpi_str->host_risk_mask_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   ndpi_str->common_alpns_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   load_common_alpns(ndpi_str);
@@ -2385,9 +2384,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   if(ndpi_str->tls_cert_subject_automa.ac_automa)
     ac_automata_feature(ndpi_str->tls_cert_subject_automa.ac_automa,AC_FEATURE_LC);
 
-  if(ndpi_str->content_automa.ac_automa)
-    ac_automata_feature(ndpi_str->content_automa.ac_automa,AC_FEATURE_LC);
-
   if(ndpi_str->host_risk_mask_automa.ac_automa)
     ac_automata_feature(ndpi_str->host_risk_mask_automa.ac_automa,AC_FEATURE_LC);
 
@@ -2407,9 +2403,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if(ndpi_str->tls_cert_subject_automa.ac_automa)
     ac_automata_name(ndpi_str->tls_cert_subject_automa.ac_automa,"tls_cert",AC_FEATURE_DEBUG);
-
-  if(ndpi_str->content_automa.ac_automa)
-    ac_automata_name(ndpi_str->content_automa.ac_automa,"content",AC_FEATURE_DEBUG);
 
   if(ndpi_str->host_risk_mask_automa.ac_automa)
     ac_automata_name(ndpi_str->host_risk_mask_automa.ac_automa,"content",AC_FEATURE_DEBUG);
@@ -2447,26 +2440,22 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
       break;
 
     case 1:
-      automa = &ndpi_str->content_automa;
-      break;
-
-    case 2:
       automa = &ndpi_str->tls_cert_subject_automa;
       break;
 
-    case 3:
+    case 2:
       automa = &ndpi_str->malicious_ja3_automa;
       break;
 
-    case 4:
+    case 3:
       automa = &ndpi_str->malicious_sha1_automa;
       break;
 
-    case 5:
+    case 4:
       automa = &ndpi_str->host_risk_mask_automa;
       break;
 
-    case 6:
+    case 5:
       automa = &ndpi_str->common_alpns_automa;
       break;
 
@@ -2714,9 +2703,6 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->host_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->host_automa.ac_automa,
 			  1 /* free patterns strings memory */);
-
-    if(ndpi_str->content_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->content_automa.ac_automa, 0);
 
     if(ndpi_str->risky_domain_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->risky_domain_automa.ac_automa,
@@ -6881,9 +6867,8 @@ int ndpi_match_prefix(const u_int8_t *payload,
 /* ****************************************************** */
 
 int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str, char *string_to_match,
-				  u_int string_to_match_len, ndpi_protocol_match_result *ret_match,
-				  u_int8_t is_host_match) {
-  ndpi_automa *automa = is_host_match ? &ndpi_str->host_automa : &ndpi_str->content_automa;
+				  u_int string_to_match_len, ndpi_protocol_match_result *ret_match) {
+  ndpi_automa *automa = &ndpi_str->host_automa;
   int rc;
 
   if((automa->ac_automa == NULL) || (string_to_match_len == 0))
@@ -6918,11 +6903,11 @@ static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_
 static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
 						      struct ndpi_flow_struct *flow, char *string_to_match,
 						      u_int string_to_match_len, u_int16_t master_protocol_id,
-						      ndpi_protocol_match_result *ret_match, u_int8_t is_host_match) {
+						      ndpi_protocol_match_result *ret_match) {
   int matching_protocol_id;
 
   matching_protocol_id =
-    ndpi_match_string_subprotocol(ndpi_str, string_to_match, string_to_match_len, ret_match, is_host_match);
+    ndpi_match_string_subprotocol(ndpi_str, string_to_match, string_to_match_len, ret_match);
 
   if(matching_protocol_id < 0)
     return NDPI_PROTOCOL_UNKNOWN;
@@ -6953,8 +6938,15 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   }
 
 #ifdef DEBUG
-  string_to_match[string_to_match_len] = '\0';
-  NDPI_LOG_DBG2(ndpi_str, "[NTOP] Unable to find a match for '%s'\n", string_to_match);
+  {
+    char m[256];
+    int len = ndpi_min(sizeof(m), string_to_match_len);
+
+    strncpy(m, string_to_match, len);
+    m[len] = '\0';
+
+    NDPI_LOG_DBG2(ndpi_str, "[NTOP] Unable to find a match for '%s'\n", m);
+  }
 #endif
 
   ret_match->protocol_id = NDPI_PROTOCOL_UNKNOWN, ret_match->protocol_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
@@ -6985,7 +6977,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   ndpi_protocol_category_t id;
 
   rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
-					    master_protocol_id, ret_match, 1);
+					    master_protocol_id, ret_match);
   id = ret_match->protocol_category;
 
   if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
@@ -7031,17 +7023,6 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
     return(1);
   } else
     return(0);
-}
-
-/* ****************************************************** */
-
-u_int16_t ndpi_match_content_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
-					 struct ndpi_flow_struct *flow,
-					 char *string_to_match, u_int string_to_match_len,
-					 ndpi_protocol_match_result *ret_match,
-					 u_int16_t master_protocol_id) {
-  return(ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
-					      master_protocol_id, ret_match, 0));
 }
 
 /* ****************************************************** */
@@ -7527,7 +7508,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if(flow && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
       return(0); /* Ignore DGA check for protocols already fully detected */
 
-    if(ndpi_match_string_subprotocol(ndpi_str, name, strlen(name), &ret_match, 1) > 0)
+    if(ndpi_match_string_subprotocol(ndpi_str, name, strlen(name), &ret_match) > 0)
       return(0); /* Ignore DGA for known domain names */
 
     if(isdigit(name[0])) {

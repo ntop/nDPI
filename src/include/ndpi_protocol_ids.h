@@ -91,7 +91,7 @@ typedef enum {
   NDPI_PROTOCOL_MONGODB               = 60, /* Leonn Paiva <leonn.paiva@gmail.com> */
   NDPI_PROTOCOL_QQLIVE                = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
-  NDPI_PROTOCOL_FREE                  = 63, /* FREE */
+  NDPI_PROTOCOL_OCSP                  = 63,
   NDPI_PROTOCOL_PS_VUE                = 64,
   NDPI_PROTOCOL_IRC                   = 65,
   NDPI_PROTOCOL_AYIYA                 = 66,

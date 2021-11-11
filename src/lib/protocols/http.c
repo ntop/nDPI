@@ -682,11 +682,13 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }    
     
     if(flow->http_detected && packet->content_line.ptr && *(char*)packet->content_line.ptr) {
-      ndpi_protocol_match_result ret_match;
-
-      ndpi_match_content_subprotocol(ndpi_struct, flow,
-				     (char*)packet->content_line.ptr, packet->content_line.len,
-				     &ret_match, NDPI_PROTOCOL_HTTP);
+      /* Matching on Content-Type.
+          OCSP:  application/ocsp-request, application/ocsp-response
+       */
+      if(strncmp((const char *)packet->content_line.ptr, "application/ocsp-", 17) == 0) {
+        NDPI_LOG_DBG2(ndpi_struct, "Found OCSP\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, NDPI_PROTOCOL_HTTP);
+      }
     }
   }
 
