@@ -38,12 +38,13 @@
 #define SMTP_BIT_HELO_EHLO	0x20
 #define SMTP_BIT_MAIL		0x40
 #define SMTP_BIT_RCPT		0x80
-#define SMTP_BIT_AUTH		0x100
+#define SMTP_BIT_AUTH_LOGIN	0x100
 #define SMTP_BIT_STARTTLS	0x200
 #define SMTP_BIT_DATA		0x400
 #define SMTP_BIT_NOOP		0x800
 #define SMTP_BIT_RSET		0x1000
 #define SMTP_BIT_TlRM		0x2000
+#define SMTP_BIT_AUTH_PLAIN	0x4000
 
 /* #define SMTP_DEBUG 1 */
 
@@ -62,6 +63,53 @@ static void ndpi_int_mail_smtp_add_connection(struct ndpi_detection_module_struc
 /* **************************************** */
 
 static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow);
+
+/* **************************************** */
+
+static void get_credentials_auth_plain(struct ndpi_detection_module_struct *ndpi_struct,
+				       struct ndpi_flow_struct *flow,
+				       const u_int8_t *line, u_int16_t line_len)
+{
+  u_int8_t buf[255];
+  u_char *out;
+  size_t i, out_len;
+  unsigned int user_len = 0;
+
+  /* AUTH PLAIN XXXXXX */
+  if(line_len <= 11)
+    return;
+
+  line += 11;
+  line_len -= 11;
+
+  ndpi_user_pwd_payload_copy(buf, sizeof(buf), 0, line, line_len);
+  out = ndpi_base64_decode(buf, strlen((char *)buf), &out_len);
+  if(!out)
+    return;
+  /* No guarantee that out is null terminated:
+     UTF8NUL authcid UTF8NUL passwd */
+  for(i = 1; i < out_len; i++) {
+    if(out[i] == '\0')
+      user_len = i - 1;
+  }
+  if(user_len > 0) {
+    user_len = ndpi_min(user_len, sizeof(flow->protos.ftp_imap_pop_smtp.username) - 1);
+
+    memcpy(flow->protos.ftp_imap_pop_smtp.username, out + 1, user_len);
+    flow->protos.ftp_imap_pop_smtp.username[user_len] = '\0';
+
+    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
+
+    if(1 + user_len + 1 < out_len) {
+      unsigned int pwd_len;
+
+      pwd_len = ndpi_min(out_len - (1 + user_len + 1), sizeof(flow->protos.ftp_imap_pop_smtp.password) - 1);
+      memcpy(flow->protos.ftp_imap_pop_smtp.password, out + 1 + user_len + 1, pwd_len);
+      flow->protos.ftp_imap_pop_smtp.password[pwd_len] = '\0';
+    }
+  }
+  ndpi_free(out);
+}
 
 /* **************************************** */
 
@@ -102,10 +150,14 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  len = ndpi_min(len, sizeof(flow->host_server_name)-1);
 		  strncpy((char*)flow->host_server_name, (char*)&packet->line[a].ptr[4], len);
 		  flow->host_server_name[len] = '\0';
-
-		  ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
-					       (char *)flow->host_server_name,
-					       strlen((const char *)flow->host_server_name));
+		  if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
+					          (char *)flow->host_server_name,
+					          strlen((const char *)flow->host_server_name))) {
+		    /* We set the protocols; we need to initialize extra dissection
+		       to search for credentials */
+		    NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname matched\n");
+		    smtpInitExtraPacketProcessing(flow);
+		  }
 		}
 	      }
 	    }
@@ -139,6 +191,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  && packet->line[a].ptr[4] == ' ') {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_MAIL;
 	  flow->protos.ftp_imap_pop_smtp.auth_found = 0;
+	  /* We shouldn't be here if there are credentials */
+	  flow->protos.ftp_imap_pop_smtp.auth_done = 1;
 	} else if((packet->line[a].ptr[0] == 'R' || packet->line[a].ptr[0] == 'r')
 		  && (packet->line[a].ptr[1] == 'C' || packet->line[a].ptr[1] == 'c')
 		  && (packet->line[a].ptr[2] == 'P' || packet->line[a].ptr[2] == 'p')
@@ -146,6 +200,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  && packet->line[a].ptr[4] == ' ') {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_RCPT;
 	  flow->protos.ftp_imap_pop_smtp.auth_found = 0;
+	  /* We shouldn't be here if there are credentials */
+	  flow->protos.ftp_imap_pop_smtp.auth_done = 1;
 	} else if((packet->line[a].ptr[0] == 'A' || packet->line[a].ptr[0] == 'a')
 		  && (packet->line[a].ptr[1] == 'U' || packet->line[a].ptr[1] == 'u')
 		  && (packet->line[a].ptr[2] == 'T' || packet->line[a].ptr[2] == 't')
@@ -154,16 +210,27 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef SMTP_DEBUG
 	  printf("%s() AUTH [%.*s]\n", __FUNCTION__, packet->line[a].len, packet->line[a].ptr);
 #endif
-
-	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH;
 	  flow->protos.ftp_imap_pop_smtp.auth_found = 1;
+	  if(packet->line[a].len >= 6) {
+            if(packet->line[a].ptr[5] == 'L' || packet->line[a].ptr[5] == 'l') {
+	      flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH_LOGIN;
+	      /* AUTH LOGIN: Username and pwd on the next messages */
+	    } else if(packet->line[a].ptr[5] == 'P' || packet->line[a].ptr[5] == 'p') {
+	      flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH_PLAIN;
+	      /* AUTH PLAIN: username and pwd here */
+	      get_credentials_auth_plain(ndpi_struct, flow,
+					 packet->line[a].ptr, packet->line[a].len);
+	      flow->protos.ftp_imap_pop_smtp.auth_done = 1;
+	    }
+	  }
 	} else {
 	  if(packet->line[a].ptr[3] != ' ') {
 #ifdef SMTP_DEBUG
 	    printf("%s() => [%.*s]\n", __FUNCTION__, packet->line[a].len, packet->line[a].ptr);
 #endif
 
-	    if(flow->protos.ftp_imap_pop_smtp.auth_found) {
+	    if(flow->protos.ftp_imap_pop_smtp.auth_found &&
+	       (flow->l4.tcp.smtp_command_bitmask & SMTP_BIT_AUTH_LOGIN)) {
 	      if(flow->protos.ftp_imap_pop_smtp.username[0] == '\0') {
 		/* Username */
 		u_int8_t buf[48];
@@ -214,6 +281,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 
 		ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
+
+		flow->protos.ftp_imap_pop_smtp.auth_done = 1;
 	      } else {
 		flow->host_server_name[0] = '\0';
 		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -234,6 +303,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	   && (packet->line[a].ptr[6] == 'L' || packet->line[a].ptr[6] == 'l')
 	   && (packet->line[a].ptr[7] == 'S' || packet->line[a].ptr[7] == 's')) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
+	  flow->protos.ftp_imap_pop_smtp.auth_tls = 1;
+	  flow->protos.ftp_imap_pop_smtp.auth_done = 1;
 	}
       }
 
@@ -274,8 +345,12 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	     bit_count, flow->protos.ftp_imap_pop_smtp.password);
 #endif
 
-      ndpi_int_mail_smtp_add_connection(ndpi_struct, flow);
-      smtpInitExtraPacketProcessing(flow);
+      /* Only if we don't have already set the protocol via hostname matching */
+      if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
+         flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+        ndpi_int_mail_smtp_add_connection(ndpi_struct, flow);
+        smtpInitExtraPacketProcessing(flow);
+      }
       return;
     }
 
@@ -324,7 +399,7 @@ static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
 #endif
 
   flow->check_extra_packets = 1;
-  /* At most 7 packets should almost always be enough */
+  /* At most 12 packets should almost always be enough */
   flow->max_extra_packets_to_check = 12;
   flow->extra_packets_func = ndpi_extra_search_mail_smtp_tcp;
 }

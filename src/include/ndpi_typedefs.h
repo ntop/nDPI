@@ -1340,8 +1340,8 @@ struct ndpi_flow_struct {
     } http;
 
     struct {
-      u_int8_t auth_found:1, auth_failed:1, auth_tls:1, _pad:5;
-      char username[16], password[16];
+      u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
+      char username[32], password[16];
     } ftp_imap_pop_smtp;
 
     struct {
