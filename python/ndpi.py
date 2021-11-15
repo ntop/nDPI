@@ -644,6 +644,13 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_CSGO */
   uint8_t csgo_strid[18],csgo_state,csgo_s2;
   uint32_t csgo_id2;
+
+  /* NDPI_PROTOCOL_RDP */
+  u_int8_t rdp_to_srv[3], rdp_from_srv[3], rdp_to_srv_pkts, rdp_from_srv_pkts;
+
+  /* NDPI_PROTOCOL_IMO */
+  uint8_t imo_last_one_byte_pkt, imo_last_byte;
+
 };
 
 struct ndpi_int_one_line_struct {
@@ -999,6 +1006,7 @@ struct ndpi_flow_struct {
     uint8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     uint16_t response_status_code; /* 200, 404, etc. */
     uint8_t detected_os[32]; /* Via HTTP/QUIC User-Agent */
+    uint8_t nat_ip[24];
 
   } http;
 
@@ -1011,6 +1019,18 @@ struct ndpi_flow_struct {
     char *pktbuf;
     uint16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
+
+  struct {
+    u_int8_t num_udp_pkts, num_binding_requests;
+    u_int16_t num_processed_pkts;
+  } stun;
+
+  /* TODO: something clever to save memory */
+  struct {
+      uint8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
+      char username[32], password[16];
+  } ftp_imap_pop_smtp;
+
   union {
     /* the only fields useful for nDPI and ntopng */
     struct {
@@ -1029,7 +1049,6 @@ struct ndpi_flow_struct {
     } kerberos;
 
     struct {
-      struct {
       char ssl_version_str[12];
       uint16_t ssl_version, server_names_len;
       char client_requested_server_name[64], *server_names,
@@ -1044,23 +1063,12 @@ struct ndpi_flow_struct {
         char *esni;
       } encrypted_sni;
       ndpi_cipher_weakness server_unsafe_cipher;
-      } ssl;
-
-      struct {
-      uint8_t num_udp_pkts, num_processed_pkts, num_binding_requests;
-      } stun;
-
-      /* We can have STUN over SSL/TLS thus they need to live together */
-    } stun_ssl;
+    } tls_quic;
 
     struct {
       char client_signature[48], server_signature[48];
       char hassh_client[33], hassh_server[33];
     } ssh;
-
-    struct {
-      uint8_t last_one_byte_pkt, last_byte;
-    } imo;
 
     struct {
       uint8_t username_detected:1, username_found:1,
@@ -1077,16 +1085,6 @@ struct ndpi_flow_struct {
     struct {
       char version[32];
     } ubntac2;
-
-    struct {
-      /* Via HTTP X-Forwarded-For */
-      uint8_t nat_ip[24];
-    } http;
-
-    struct {
-      uint8_t auth_found:1, auth_failed:1, auth_tls:1, _pad:5;
-      char username[16], password[16];
-    } ftp_imap_pop_smtp;
 
     struct {
       /* Bittorrent hash */

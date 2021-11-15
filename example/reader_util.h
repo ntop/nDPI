@@ -200,6 +200,7 @@ typedef struct ndpi_flow_info {
   char host_server_name[240];
   char *bittorent_hash;
   char *dhcp_fingerprint;
+  char *dhcp_class_ident;
   ndpi_risk risk;
   
   struct {

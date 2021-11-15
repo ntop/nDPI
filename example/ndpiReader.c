@@ -1539,6 +1539,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 					      flow->bittorent_hash);
   if(flow->dhcp_fingerprint) fprintf(out, "[DHCP Fingerprint: %s]",
 						flow->dhcp_fingerprint);
+  if(flow->dhcp_class_ident) fprintf(out, "[DHCP Class Ident: %s]",
+						flow->dhcp_class_ident);
 
   if(flow->has_human_readeable_strings) fprintf(out, "[PLAIN TEXT (%s)]",
 						flow->human_readeable_string_buffer);
