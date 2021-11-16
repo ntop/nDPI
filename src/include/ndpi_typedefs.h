@@ -502,37 +502,6 @@ typedef struct atomic {
   volatile int counter;
 } atomic_t;
 
-struct hash_ip4p_node {
-  struct hash_ip4p_node   *next,*prev;
-  time_t                  lchg;
-  u_int16_t               port,count:12,flag:4;
-  u_int32_t               ip;
-  // + 12 bytes for ipv6
-};
-
-struct hash_ip4p {
-  struct hash_ip4p_node   *top;
-  spinlock_t              lock;
-  size_t                  len;
-};
-
-struct hash_ip4p_table {
-  size_t                  size;
-  int			  ipv6;
-  spinlock_t              lock;
-  atomic_t                count;
-  struct hash_ip4p        tbl;
-};
-
-struct bt_announce {              // 192 bytes
-  u_int32_t		hash[5];
-  u_int32_t		ip[4];
-  u_int32_t		time;
-  u_int16_t		port;
-  u_int8_t		name_len,
-    name[192 - 4*10 - 2 - 1];     // 149 bytes
-};
-
 /* NDPI_PROTOCOL_TINC */
 #define TINC_CACHE_MAX_SIZE 10
 
@@ -1117,12 +1086,6 @@ struct ndpi_detection_module_struct {
   u_int32_t jabber_stun_timeout;
   u_int32_t jabber_file_transfer_timeout;
   u_int8_t ip_version_limit;
-  /* NDPI_PROTOCOL_BITTORRENT */
-  struct hash_ip4p_table *bt_ht, *bt6_ht;
-
-  /* BT_ANNOUNCE */
-  struct bt_announce *bt_ann;
-  int    bt_ann_len;
 
   /* NDPI_PROTOCOL_OOKLA */
   struct ndpi_lru_cache *ookla_cache;
@@ -1274,6 +1237,10 @@ struct ndpi_flow_struct {
     u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
     char username[32], password[16];
   } ftp_imap_pop_smtp;
+  
+  struct {
+    u_int8_t bt_check_performed;
+  } bittorrent;
 
   union {
     /* the only fields useful for nDPI and ntopng */
@@ -1296,8 +1263,7 @@ struct ndpi_flow_struct {
       char ssl_version_str[12];
       u_int16_t ssl_version, server_names_len;
       char client_requested_server_name[256]; /* SNI hostname length: RFC 4366 */
-      char
-	  *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
+      char *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       u_int32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];
       u_int16_t server_cipher;

@@ -85,7 +85,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
   ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN);
 
   if(ndpi_struct->bittorrent_cache == NULL)
-    ndpi_struct->bittorrent_cache = ndpi_lru_cache_init(1024);
+    ndpi_struct->bittorrent_cache = ndpi_lru_cache_init(8192);
 
   if(ndpi_struct->bittorrent_cache && packet->iph) {
     u_int32_t key1, key2;
@@ -431,11 +431,13 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
 
-    if((flow->packet_counter <= 1 /* Do the check once */) && ndpi_struct->bittorrent_cache) {
+    if((!flow->bittorrent.bt_check_performed /* Do the check once */) && ndpi_struct->bittorrent_cache) {
       u_int16_t cached_proto;
       u_int8_t found = 0;
       u_int32_t key1, key2;
 
+      flow->bittorrent.bt_check_performed = 1;
+      
       /* Check cached communications */
       if(packet->udp)
 	key1 = packet->iph->saddr + packet->udp->source, key2 = packet->iph->daddr + packet->udp->dest;
