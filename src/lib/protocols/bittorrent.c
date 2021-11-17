@@ -44,6 +44,10 @@ struct ndpi_utp_hdr {
   u_int16_t sequence_nr, ack_nr;
 };
 
+static inline u_int32_t bt_hash_funct(u_int32_t ip, u_int16_t port) {
+  return(ip + 3 * port);
+}
+
 static u_int8_t is_utpv1_pkt(const u_int8_t *payload, u_int payload_len) {
   struct ndpi_utp_hdr *h = (struct ndpi_utp_hdr*)payload;
 
@@ -85,16 +89,16 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
   ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN);
 
   if(ndpi_struct->bittorrent_cache == NULL)
-    ndpi_struct->bittorrent_cache = ndpi_lru_cache_init(8192);
+    ndpi_struct->bittorrent_cache = ndpi_lru_cache_init(32768);
 
   if(ndpi_struct->bittorrent_cache && packet->iph) {
     u_int32_t key1, key2;
 
     if(packet->udp)
-      key1 = packet->iph->saddr + packet->udp->source, key2 = packet->iph->daddr + packet->udp->dest;
+      key1 = bt_hash_funct(packet->iph->saddr, packet->udp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->udp->dest);
     else
-      key1 = packet->iph->saddr + packet->tcp->source, key2 = packet->iph->daddr + packet->tcp->dest;
-
+      key1 = bt_hash_funct(packet->iph->saddr, packet->tcp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->tcp->dest);
+    
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT);
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key2, NDPI_PROTOCOL_BITTORRENT);
 
@@ -440,9 +444,9 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
       
       /* Check cached communications */
       if(packet->udp)
-	key1 = packet->iph->saddr + packet->udp->source, key2 = packet->iph->daddr + packet->udp->dest;
+	key1 = bt_hash_funct(packet->iph->saddr, packet->udp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->udp->dest);
       else
-	key1 = packet->iph->saddr + packet->tcp->source, key2 = packet->iph->daddr + packet->tcp->dest;
+	key1 = bt_hash_funct(packet->iph->saddr, packet->tcp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->tcp->dest);
 
       found = ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)
 	|| ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0 /* Don't remove it as it can be used for other connections */);
