@@ -389,10 +389,6 @@ static void ndpi_int_search_bittorrent_tcp(struct ndpi_detection_module_struct *
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if(packet->payload_packet_len == 0) {
-    return;
-  }
-
   if(flow->bittorrent_stage == 0 && packet->payload_packet_len != 0) {
     /* exclude stage 0 detection from next run */
     flow->bittorrent_stage = 1;
@@ -408,6 +404,47 @@ static void ndpi_int_search_bittorrent_tcp(struct ndpi_detection_module_struct *
 
 static u_int8_t is_port(u_int16_t a, u_int16_t b, u_int16_t what) {
   return(((what == a) || (what == b)) ? 1 : 0);
+}
+
+static int search_into_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  if((!flow->bittorrent.bt_check_performed /* Do the check once */) && ndpi_struct->bittorrent_cache) {
+    u_int16_t cached_proto;
+    u_int8_t found = 0;
+    u_int32_t key1, key2;
+
+    flow->bittorrent.bt_check_performed = 1;
+
+    /* Check cached communications */
+    if(packet->udp)
+      key1 = bt_hash_funct(packet->iph->saddr, packet->udp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->udp->dest);
+    else
+      key1 = bt_hash_funct(packet->iph->saddr, packet->tcp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->tcp->dest);
+
+    found = ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)
+	|| ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0 /* Don't remove it as it can be used for other connections */);
+
+#ifdef CACHE_DEBUG
+    if(packet->udp)
+      printf("[BitTorrent] *** [UDP] SEARCHING ports %u / %u [%u][%u][found: %u][packet_counter: %u]\n",
+             ntohs(packet->udp->source), ntohs(packet->udp->dest), key1, key2, found, flow->packet_counter);
+    else
+      printf("[BitTorrent] *** [TCP] SEARCHING ports %u / %u [%u][%u][found: %u][packet_counter: %u]\n",
+             ntohs(packet->tcp->source), ntohs(packet->tcp->dest), key1, key2, found, flow->packet_counter);
+#endif
+
+    if(found) {
+      NDPI_LOG_INFO(ndpi_struct, "found BT: cache\n");
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0,
+					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+      return 1;
+
+    }
+  }
+
+  return 0;
 }
 
 void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -434,35 +471,6 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
-
-    if((!flow->bittorrent.bt_check_performed /* Do the check once */) && ndpi_struct->bittorrent_cache) {
-      u_int16_t cached_proto;
-      u_int8_t found = 0;
-      u_int32_t key1, key2;
-
-      flow->bittorrent.bt_check_performed = 1;
-      
-      /* Check cached communications */
-      if(packet->udp)
-	key1 = bt_hash_funct(packet->iph->saddr, packet->udp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->udp->dest);
-      else
-	key1 = bt_hash_funct(packet->iph->saddr, packet->tcp->source), key2 = bt_hash_funct(packet->iph->daddr, packet->tcp->dest);
-
-      found = ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)
-	|| ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0 /* Don't remove it as it can be used for other connections */);
-
-#ifdef CACHE_DEBUG
-      if(packet->udp)
-	printf("[BitTorrent] *** [UDP] SEARCHING ports %u / %u [%u][%u][found: %u][packet_counter: %u]\n",
-	       ntohs(packet->udp->source), ntohs(packet->udp->dest), key1, key2, found, flow->packet_counter);
-      else
-	printf("[BitTorrent] *** [TCP] SEARCHING ports %u / %u [%u][%u][found: %u][packet_counter: %u]\n",
-	       ntohs(packet->tcp->source), ntohs(packet->tcp->dest), key1, key2, found, flow->packet_counter);
-#endif
-
-	if(found)
-	  goto bittorrent_found;
-      }
 
     if(packet->tcp != NULL) {
       ndpi_int_search_bittorrent_tcp(ndpi_struct, flow);
@@ -556,12 +564,14 @@ void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct, st
 	return;
       }
 
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      if(!search_into_cache(ndpi_struct, flow))
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     }
   }
 
   if(flow->packet_counter > 8) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    if(!search_into_cache(ndpi_struct, flow))
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 }
@@ -572,7 +582,7 @@ void init_bittorrent_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("BitTorrent", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_BITTORRENT,
 				      ndpi_search_bittorrent,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
