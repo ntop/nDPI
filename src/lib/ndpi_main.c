@@ -7252,6 +7252,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     if(flow->extra_packets_func)
       return(1);
     break;
+
+  case NDPI_PROTOCOL_BITTORRENT:
+    if(flow->protos.bittorrent.hash[0] == '\0')
+      return(1);
+    break;
   }
 
   return(0);
