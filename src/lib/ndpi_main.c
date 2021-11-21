@@ -2377,8 +2377,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   ndpi_str->irc_timeout = NDPI_IRC_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
   ndpi_str->gnutella_timeout = NDPI_GNUTELLA_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
-  ndpi_str->thunder_timeout = NDPI_THUNDER_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
-  ndpi_str->zattoo_connection_timeout = NDPI_ZATTOO_CONNECTION_TIMEOUT * ndpi_str->ticks_per_second;
   ndpi_str->jabber_stun_timeout = NDPI_JABBER_STUN_TIMEOUT * ndpi_str->ticks_per_second;
   ndpi_str->jabber_file_transfer_timeout = NDPI_JABBER_FT_TIMEOUT * ndpi_str->ticks_per_second;
 
@@ -4322,6 +4320,12 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->http.user_agent)
       ndpi_free(flow->http.user_agent);
 
+    if(flow->http.nat_ip)
+      ndpi_free(flow->http.nat_ip);
+
+    if(flow->http.detected_os)
+      ndpi_free(flow->http.detected_os);
+
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 
@@ -4918,12 +4922,12 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
 				      struct ndpi_flow_struct *flow,
 				      /* Parameters below need to be in network byte order */
 				      u_int32_t saddr, u_int16_t sport, u_int32_t daddr, u_int16_t dport) {
-  if((!flow->bittorrent.bt_check_performed /* Do the check once */) && ndpi_struct->bittorrent_cache) {
+  if((!flow->bt_check_performed /* Do the check once */) && ndpi_struct->bittorrent_cache) {
     u_int16_t cached_proto;
     u_int8_t found = 0;
     u_int32_t key1, key2;
 
-    flow->bittorrent.bt_check_performed = 1;
+    flow->bt_check_performed = 1;
       
     /* Check cached communications */
     key1 = ndpi_bittorrent_hash_funct(saddr, sport), key2 = ndpi_bittorrent_hash_funct(daddr, dport);
@@ -7284,9 +7288,9 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   case NDPI_PROTOCOL_MAIL_POP:
   case NDPI_PROTOCOL_MAIL_IMAP:
   case NDPI_PROTOCOL_MAIL_SMTP:
-    if(flow->ftp_imap_pop_smtp.password[0] == '\0' &&
-       flow->ftp_imap_pop_smtp.auth_tls == 0 &&
-       flow->ftp_imap_pop_smtp.auth_done == 0)
+    if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0' &&
+       flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0 &&
+       flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0)
       return(1);
     break;
 

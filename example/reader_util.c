@@ -1078,7 +1078,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       flow->dhcp_fingerprint = ndpi_strdup(flow->ndpi_flow->protos.dhcp.fingerprint);
     if(flow->ndpi_flow->protos.dhcp.class_ident[0] != '\0')
       flow->dhcp_class_ident = ndpi_strdup(flow->ndpi_flow->protos.dhcp.class_ident);
-  } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_BITTORRENT)) {
+  } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_BITTORRENT) &&
+            !is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)) {
     u_int j;
 
     if(flow->ndpi_flow->protos.bittorrent.hash[0] != '\0') {
@@ -1116,11 +1117,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	  || /* IMAP */ is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_IMAP)
 	  || /* POP */  is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_POP)
 	  || /* SMTP */ is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_SMTP)) {
-    if(flow->ndpi_flow->ftp_imap_pop_smtp.username[0] != '\0')
+    if(flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.username[0] != '\0')
       snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s%s",
-	       flow->ndpi_flow->ftp_imap_pop_smtp.username,
-	       flow->ndpi_flow->ftp_imap_pop_smtp.password,
-	       flow->ndpi_flow->ftp_imap_pop_smtp.auth_failed ? "][Auth Failed" : "");
+	       flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.username,
+	       flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.password,
+	       flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.auth_failed ? "][Auth Failed" : "");
   }
   /* KERBEROS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_KERBEROS)) {
