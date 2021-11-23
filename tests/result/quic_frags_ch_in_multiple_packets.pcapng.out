@@ -1,6 +1,6 @@
-Guessed flow protos:	1
+Guessed flow protos:	0
 
-DPI Packets (UDP):	4	(4.00 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
 
 QUIC	4	3998	1
 
