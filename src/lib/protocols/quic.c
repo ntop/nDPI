@@ -1541,7 +1541,10 @@ static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_stru
 
   if (is_ch_reassembler_pending(flow)) {
     ndpi_search_quic(ndpi_struct, flow);
-    return is_ch_reassembler_pending(flow);
+    if(is_ch_reassembler_pending(flow))
+      return 1;
+    flow->extra_packets_func = NULL;
+    return 0;
   }
 
   /* RTP/RTCP stuff */
