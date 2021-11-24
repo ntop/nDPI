@@ -4916,7 +4916,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
   }
   else if((flow->protos.tls_quic.hello_processed == 1) &&
-          (flow->protos.tls_quic.client_requested_server_name[0] != '\0')) {
+          (flow->host_server_name[0] != '\0')) {
     *protocol_was_guessed = 1;
     ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
   } else if(enable_guess) {
@@ -5198,21 +5198,8 @@ void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_str, 
 
     if(flow->host_server_name[0] != '\0') {
       u_int32_t id;
-      int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->host_server_name,
-					  strlen((char *) flow->host_server_name), &id);
-
-      if(rc == 0) {
-	flow->category = ret->category = (ndpi_protocol_category_t) id;
-	return;
-      }
-    }
-
-    if(flow->protos.tls_quic.hello_processed == 1 &&
-       flow->protos.tls_quic.client_requested_server_name[0] != '\0') {
-      u_int32_t id;
-      int rc = ndpi_match_custom_category(ndpi_str, (char *) flow->protos.tls_quic.client_requested_server_name,
-					  strlen(flow->protos.tls_quic.client_requested_server_name), &id);
-
+      int rc = ndpi_match_custom_category(ndpi_str, flow->host_server_name,
+					  strlen(flow->host_server_name), &id);
       if(rc == 0) {
 	flow->category = ret->category = (ndpi_protocol_category_t) id;
 	return;
@@ -5389,7 +5376,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 					    struct ndpi_id_struct *src, struct ndpi_id_struct *dst) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
-  u_int32_t a, num_calls = 0;
+  u_int32_t num_calls = 0;
   ndpi_protocol ret = { flow->detected_protocol_stack[1], flow->detected_protocol_stack[0], flow->category };
 
   if(ndpi_str->ndpi_log_level >= NDPI_LOG_TRACE)
@@ -5466,23 +5453,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   }
 
   num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
-
-  a = flow->detected_protocol_stack[0];
-  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->detection_bitmask, a) == 0)
-    a = NDPI_PROTOCOL_UNKNOWN;
-
-  if(a != NDPI_PROTOCOL_UNKNOWN) {
-    unsigned int i;
-
-    for(i = 0; i < sizeof(flow->host_server_name); i++) {
-      if(flow->host_server_name[i] != '\0')
-	flow->host_server_name[i] = tolower(flow->host_server_name[i]);
-      else {
-	flow->host_server_name[i] = '\0';
-	break;
-      }
-    }
-  }
 
  ret_protocols:
   if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
@@ -7782,4 +7752,21 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 ndpi_risk_info* ndpi_risk2severity(ndpi_risk_enum risk) {
   return(&ndpi_known_risks[risk]);
+}
+
+/* ******************************************************************** */
+
+char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len)
+{
+  char *dst;
+  size_t len, i;
+
+  len = ndpi_min(value_len, sizeof(flow->host_server_name) - 1);
+  dst = flow->host_server_name;
+
+  for(i = 0; i < len; i++)
+    dst[i] = tolower(value[value_len - len + i]);
+  dst[i] = '\0';
+
+  return dst;
 }

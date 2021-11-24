@@ -159,17 +159,14 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
             strncpy((char*)flow->protos.dhcp.class_ident, name, j);
             flow->protos.dhcp.class_ident[j] = '\0';
           } else if(id == 12 /* Host Name */) {
-            char *name = (char*)&dhcp->options[i+2];
-            int j = 0;
-	    
+            u_int8_t *name = &dhcp->options[i+2];
+
 #ifdef DHCP_DEBUG
             NDPI_LOG_DBG2(ndpi_struct, "[DHCP] '%.*s'\n",name,len);
 	      //	    while(j < len) { printf( "%c", name[j]); j++; }; printf("\n");
 #endif
-            j = ndpi_min(len, sizeof(flow->host_server_name)-1);
-            strncpy((char*)flow->host_server_name, name, j);
-            flow->host_server_name[j] = '\0';
-          }
+            ndpi_hostname_sni_set(flow, name, len);
+	  }
 
           i += len + 2;
         }

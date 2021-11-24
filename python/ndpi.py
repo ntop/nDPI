@@ -986,8 +986,8 @@ struct ndpi_flow_struct {
   /* Place textual flow info here */
   char flow_extra_info[16];
 
-  /* HTTP host or DNS query */
-  uint8_t host_server_name[240];
+  char host_server_name[80];
+
   uint8_t initial_binary_bytes[8], initial_binary_bytes_len;
   uint8_t risk_checked;
   ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
@@ -1051,8 +1051,7 @@ struct ndpi_flow_struct {
     struct {
       char ssl_version_str[12];
       uint16_t ssl_version, server_names_len;
-      char client_requested_server_name[64], *server_names,
-      *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
+      char *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       uint32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];
       uint16_t server_cipher;

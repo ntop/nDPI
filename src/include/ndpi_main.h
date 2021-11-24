@@ -155,6 +155,9 @@ extern "C" {
   void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str);
   u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 			    const char *alpn_to_check, u_int alpn_to_check_len);    
+
+  char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
+
 #ifdef __cplusplus
 }
 #endif

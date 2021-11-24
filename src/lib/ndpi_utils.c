@@ -862,12 +862,12 @@ static const char* ndpi_get_flow_info_by_proto_id(struct ndpi_flow_struct const 
   {
     case NDPI_PROTOCOL_DNS:
     case NDPI_PROTOCOL_HTTP:
-        return (char const *)flow->host_server_name;
+        return flow->host_server_name;
     case NDPI_PROTOCOL_QUIC:
     case NDPI_PROTOCOL_TLS:
         if (flow->protos.tls_quic.hello_processed != 0)
         {
-          return flow->protos.tls_quic.client_requested_server_name;
+          return flow->host_server_name;
         }
         break;
   }
@@ -1150,7 +1150,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   switch(l7_protocol.master_protocol ? l7_protocol.master_protocol : l7_protocol.app_protocol) {
   case NDPI_PROTOCOL_DHCP:
     ndpi_serialize_start_of_block(serializer, "dhcp");
-    ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
+    ndpi_serialize_string_string(serializer, "hostname", flow->host_server_name);
     ndpi_serialize_string_string(serializer, "fingerprint", flow->protos.dhcp.fingerprint);
     ndpi_serialize_string_string(serializer, "class_ident", flow->protos.dhcp.class_ident);
     ndpi_serialize_end_of_block(serializer);
@@ -1179,7 +1179,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_DNS:
     ndpi_serialize_start_of_block(serializer, "dns");
     if(flow->host_server_name[0] != '\0')
-      ndpi_serialize_string_string(serializer, "query", (const char*)flow->host_server_name);
+      ndpi_serialize_string_string(serializer, "query", flow->host_server_name);
     ndpi_serialize_string_uint32(serializer, "num_queries", flow->protos.dns.num_queries);
     ndpi_serialize_string_uint32(serializer, "num_answers", flow->protos.dns.num_answers);
     ndpi_serialize_string_uint32(serializer, "reply_code",  flow->protos.dns.reply_code);
@@ -1200,7 +1200,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_MDNS:
     ndpi_serialize_start_of_block(serializer, "mdns");
-    ndpi_serialize_string_string(serializer, "answer", (const char*)flow->host_server_name);
+    ndpi_serialize_string_string(serializer, "answer", flow->host_server_name);
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -1228,7 +1228,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_HTTP:
     ndpi_serialize_start_of_block(serializer, "http");
     if(flow->host_server_name[0] != '\0')
-      ndpi_serialize_string_string(serializer, "hostname", (const char*)flow->host_server_name);
+      ndpi_serialize_string_string(serializer, "hostname", flow->host_server_name);
     if(flow->http.url != NULL){
       ndpi_serialize_string_string(serializer,   "url", flow->http.url);
       ndpi_serialize_string_uint32(serializer,   "code", flow->http.response_status_code);
@@ -1240,9 +1240,9 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_QUIC:
     ndpi_serialize_start_of_block(serializer, "quic");
-    if(flow->protos.tls_quic.client_requested_server_name[0] != '\0')
+    if(flow->host_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "client_requested_server_name",
-                                   flow->protos.tls_quic.client_requested_server_name);
+                                   flow->host_server_name);
     if(flow->protos.tls_quic.server_names)
       ndpi_serialize_string_string(serializer, "server_names", flow->protos.tls_quic.server_names);
     if(flow->http.user_agent)
@@ -1318,7 +1318,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_serialize_start_of_block(serializer, "tls");
 	ndpi_serialize_string_string(serializer, "version", version);
 	ndpi_serialize_string_string(serializer, "client_requested_server_name",
-				     flow->protos.tls_quic.client_requested_server_name);
+				     flow->host_server_name);
 	if(flow->protos.tls_quic.server_names)
 	  ndpi_serialize_string_string(serializer, "server_names", flow->protos.tls_quic.server_names);
 
@@ -2198,9 +2198,6 @@ char* ndpi_get_flow_name(struct ndpi_flow_struct *flow) {
 
   if(flow->host_server_name[0] != '\0')
     return((char*)flow->host_server_name);
-
-  if(flow->protos.tls_quic.client_requested_server_name[0] != '\0')
-    return(flow->protos.tls_quic.client_requested_server_name);
 
  no_flow_info:
   return((char*)"");
