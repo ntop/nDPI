@@ -330,6 +330,14 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   flow->max_extra_packets_to_check = 8;
   flow->extra_packets_func = ndpi_search_http_tcp_again;
   flow->http_detected = 1;
+
+  switch(flow->detected_protocol_stack[1]) {
+  case NDPI_PROTOCOL_HTTP_CONNECT:
+  case NDPI_PROTOCOL_HTTP_PROXY:
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP)
+      flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
+    break;
+  }
 }
 
 /* ************************************************************* */
@@ -549,10 +557,16 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	/* Check if we pass through a proxy (usually there is also the Via: ... header) */
 	if(strncmp((char*)packet->http_url_name.ptr, "http://", 7) != 0)
 	  strncpy(flow->http.url, (char*)packet->host_line.ptr, offset = packet->host_line.len);
-	
-	strncpy(&flow->http.url[offset], (char*)packet->http_url_name.ptr,
-		packet->http_url_name.len);
-	offset += packet->http_url_name.len;
+
+	if((packet->host_line.len == packet->http_url_name.len)
+	   && (strncmp((char*)packet->host_line.ptr,
+		       (char*)packet->http_url_name.ptr, packet->http_url_name.len) == 0))
+	  ;
+	else {
+	  strncpy(&flow->http.url[offset], (char*)packet->http_url_name.ptr,
+		  packet->http_url_name.len);
+	  offset += packet->http_url_name.len;
+	}
 	
 	flow->http.url[offset] = '\0';
       }
@@ -1078,7 +1092,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       if(filename_start == 8 && (strncasecmp((const char *)packet->payload, "CONNECT ", 8) == 0)) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP_CONNECT\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_CONNECT, flow->detected_protocol_stack[0]);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_CONNECT,
+				   (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN);
         check_content_type_and_change_protocol(ndpi_struct, flow);
       }
 
