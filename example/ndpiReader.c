@@ -1421,14 +1421,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if(flow->telnet.username)  fprintf(out, "[Username: %s]", flow->telnet.username);
   if(flow->telnet.password)  fprintf(out, "[Password: %s]", flow->telnet.password);
 
-  if((flow->detected_protocol.master_protocol != NDPI_PROTOCOL_TLS)
-     && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_TLS)
-     && (flow->detected_protocol.master_protocol != NDPI_PROTOCOL_QUIC)
-     && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_QUIC)
-     && (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_SSH)
-     && (flow->detected_protocol.master_protocol != NDPI_PROTOCOL_SSH)) {
-    if(flow->host_server_name[0] != '\0') fprintf(out, "[Host: %s]", flow->host_server_name);
-  }
+  if(flow->host_server_name[0] != '\0') fprintf(out, "[Hostname/SNI: %s]", flow->host_server_name);
 
   if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
   if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);
@@ -1489,15 +1482,6 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   }
   
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(flow->ndpi_flow, flow->ssh_tls.ssl_version, &known_tls));
-
-  if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
-     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_QUIC)
-     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_QUIC)
-     || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_SSH)
-     || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_SSH)) {
-    if(flow->host_server_name[0] != '\0') fprintf(out, "[Client: %s]", flow->host_server_name);
-  }
 
   if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 
