@@ -188,6 +188,14 @@ void ndpi_reset_serializer(ndpi_serializer *_serializer) {
 
 /* ********************************** */
 
+void ndpi_serializer_skip_header(ndpi_serializer *_serializer) {
+  ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
+  
+  serializer->status.flags |= NDPI_SERIALIZER_STATUS_HDR_DONE;
+}
+
+/* ********************************** */
+
 static int ndpi_init_serializer_buffer(ndpi_private_serializer_buffer *buffer, u_int32_t buffer_size) {
   buffer->initial_size = buffer->size = buffer_size;
   buffer->data = (u_int8_t *) calloc(buffer->size, sizeof(u_int8_t));
@@ -665,10 +673,10 @@ static inline void ndpi_serialize_csv_pre(ndpi_private_serializer *serializer) {
   } else if (serializer->status.buffer.size_used == 0) {
     /* nothing to do */
   } else {
-    u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-    serializer->status.buffer.size_used += snprintf((char *) 
-      &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, "%s",
-      serializer->csv_separator);
+    if(serializer->buffer.size > serializer->status.buffer.size_used)
+      serializer->buffer.data[serializer->status.buffer.size_used] = serializer->csv_separator[0];
+    
+    serializer->status.buffer.size_used++;
   }
 }
 

@@ -1081,6 +1081,12 @@ extern "C" {
   void ndpi_reset_serializer(ndpi_serializer *serializer);
 
   /**
+   * Hint to not create the header (used to avoid creaign the header when not used)
+   * @param serializer The serializer handle
+   */
+  void ndpi_serializer_skip_header(ndpi_serializer *serializer);
+
+  /**
    * Serialize a 32-bit unsigned int key and a 32-bit unsigned int value
    * @param serializer The serializer handle
    * @param key The field name or ID
