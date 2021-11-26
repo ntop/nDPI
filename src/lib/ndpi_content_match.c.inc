@@ -9276,6 +9276,13 @@ static ndpi_network host_protocol_list[] = {
   { 0x0D600000 /* 13.96.0.0 */, 13, NDPI_PROTOCOL_MICROSOFT },
   { 0x0D680000 /* 13.104.0.0 */, 14, NDPI_PROTOCOL_MICROSOFT },
 
+  /*
+    TODO
+
+    Salesforce
+    https://help.salesforce.com/s/articleView?id=000321501&type=1
+  */
+  
   /* End */
   { 0x0, 0, 0 }
 };
@@ -9358,9 +9365,10 @@ static ndpi_protocol_match host_match[] =
    { ".aws.",                                             "AmazonAWS",        NDPI_PROTOCOL_AMAZON_AWS, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".cloudfront.net",                                   "AmazonAWS",        NDPI_PROTOCOL_AMAZON_AWS, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".us-west-2.compute.amazonaws.com",                  "AmazonAWS",        NDPI_PROTOCOL_AMAZON_AWS, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { ".teamviewer.com",                                   "Teamviewer",           NDPI_PROTOCOL_TEAMVIEWER, NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".teamviewer.com",                                   "Teamviewer",       NDPI_PROTOCOL_TEAMVIEWER, NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".bloombergvault.com",                               "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".bloomberg.com",                                    "Bloomberg",        NDPI_PROTOCOL_BLOOMBERG, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".salesforce.com",                                   "Salesforce",       NDPI_PROTOCOL_SALESFORCE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".apple-dns.net",                            "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "origin-apple.com.akadns.net",               "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "e6858.dsce9.akamaiedge.net",                "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
