@@ -1105,8 +1105,8 @@ static int ndpi_serialize_uint32_binary(ndpi_serializer *_serializer,
     ndpi_serialize_csv_pre(serializer);
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
     serializer->status.buffer.size_used += snprintf((char *) 
-      &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%s", value);
+						    &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
+						    "%s", value);
   } else {
     ndpi_serialization_type kt;
     u_int8_t type = 0;

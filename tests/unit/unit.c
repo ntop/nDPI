@@ -55,7 +55,7 @@
 #include "ndpi_config.h"
 #include "ndpi_api.h"
 
-#ifdef HAVE_JSON_H
+#ifdef HAVE_LIBJSON_C
 #include "json.h" /* JSON-C */
 #endif
 
@@ -65,7 +65,7 @@ static int verbose = 0;
 /* *********************************************** */
 
 int serializerUnitTest() {
-#ifdef HAVE_JSON_H
+#ifdef HAVE_LIBJSON_C
   ndpi_serializer serializer, deserializer;
   int i, loop_id;
   ndpi_serialization_format fmt = {0};
