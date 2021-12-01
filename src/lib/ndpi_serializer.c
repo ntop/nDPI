@@ -47,6 +47,9 @@
 #define NDPI_U64_FORMAT "%llu"
 #endif
 
+#define OPTIMIZE_NUMERIC_KEYS      /* Convert numeric string keys into int keys */
+#define OPTIMIZE_CSV_SERIALIZATION /* Optimize serialization speed in case of CSV */
+
 /* ********************************** */
 
 u_int64_t ndpi_htonll(u_int64_t v) {
@@ -70,6 +73,7 @@ u_int64_t ndpi_ntohll(u_int64_t v) {
 
 /* ********************************** */
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
 static int ndpi_is_number(const char *str, u_int32_t str_len) {
   unsigned int i;
 
@@ -78,6 +82,7 @@ static int ndpi_is_number(const char *str, u_int32_t str_len) {
 
   return(1);
 }
+#endif
 
 /* ********************************** */
 
@@ -1190,8 +1195,10 @@ int ndpi_serialize_binary_int32(ndpi_serializer *_serializer,
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
   if(ndpi_is_number(key, klen))
     return(ndpi_serialize_uint32_int32(_serializer, atoi(key), value));
+#endif
 
   needed =
     sizeof(u_int8_t) /* type */ +
@@ -1268,8 +1275,10 @@ int ndpi_serialize_binary_int64(ndpi_serializer *_serializer,
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
   if(ndpi_is_number(key, klen))
     return(ndpi_serialize_uint32_int64(_serializer, atoi(key), value));
+#endif
 
   needed =
     sizeof(u_int8_t) /* type */ +
@@ -1339,6 +1348,7 @@ int ndpi_serialize_binary_uint32(ndpi_serializer *_serializer,
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
 
+#ifdef OPTIMIZE_CSV_SERIALIZATION
   if(serializer->fmt == ndpi_serialization_format_csv) {
     /* Key is ignored */
     u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
@@ -1366,18 +1376,20 @@ int ndpi_serialize_binary_uint32(ndpi_serializer *_serializer,
     serializer->status.buffer.size_used += needed;
     return(0);
   }
+#endif
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
   if(ndpi_is_number(key, klen))
     return(ndpi_serialize_uint32_uint32(_serializer, atoi(key), value));
+#endif
 
   needed =
     sizeof(u_int8_t) /* type */ +
     sizeof(u_int16_t) /* key len */ +
     klen /* key */ +
-    sizeof(u_int32_t);
-
-  if(serializer->fmt == ndpi_serialization_format_json)
-    needed += 16 + klen;
+    sizeof(u_int32_t) + /* value (as int) */
+    20 /* value (as string, in case of CSV) */ + 
+    16 /* extra overhead for JSON */;
 
   if(buff_diff < needed) {
     if(ndpi_extend_serializer_buffer(&serializer->buffer, needed - buff_diff) < 0)
@@ -1469,8 +1481,10 @@ int ndpi_serialize_binary_uint64(ndpi_serializer *_serializer,
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
   if(ndpi_is_number(key, klen))
     return(ndpi_serialize_uint32_uint64(_serializer, atoi(key), value));
+#endif
 
   needed =
     sizeof(u_int8_t) /* type */ +
@@ -1544,8 +1558,10 @@ int ndpi_serialize_binary_float(ndpi_serializer *_serializer,
   u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
   u_int32_t needed;
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
   if(ndpi_is_number(key, klen))
     return(ndpi_serialize_uint32_float(_serializer, atoi(key), value, format));
+#endif
 
   needed =
     sizeof(u_int8_t) /* type */ +
@@ -1637,25 +1653,31 @@ static int ndpi_serialize_binary_raw(ndpi_serializer *_serializer,
       serializer->status.buffer.size_used += ndpi_json_string_escape(key, klen,
         (char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff);
       buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-      serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, ":");
+      serializer->buffer.data[serializer->status.buffer.size_used] = ':';
+      serializer->status.buffer.size_used++;
       buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
     }
 
     if (escape)
       serializer->status.buffer.size_used += ndpi_json_string_escape(value, vlen,
         (char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff);
-    else
-      serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-        value, vlen);
+    else {
+      //serializer->status.buffer.size_used += snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, value, vlen);
+      memcpy(&serializer->buffer.data[serializer->status.buffer.size_used], value, vlen);
+      serializer->status.buffer.size_used += vlen;
+    }
 
     ndpi_serialize_json_post(_serializer);
   } else if(serializer->fmt == ndpi_serialization_format_csv) {
     if (ndpi_serializer_header_string(serializer, key, klen) < 0) return(-1);
     ndpi_serialize_csv_pre(serializer);
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-    serializer->status.buffer.size_used += snprintf((char *)
-      &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff,
-      "%s", value);
+
+    //serializer->status.buffer.size_used += snprintf((char *)
+    //  &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, "%s", value);
+    memcpy(&serializer->buffer.data[serializer->status.buffer.size_used], value, vlen);
+    serializer->status.buffer.size_used += vlen;
+
   } else {
     serializer->buffer.data[serializer->status.buffer.size_used++] = (ndpi_serialization_string << 4) | ndpi_serialization_string;
 
@@ -1677,8 +1699,10 @@ int ndpi_serialize_binary_binary(ndpi_serializer *_serializer,
 				 u_int16_t vlen) {
   const char *value = _value ? _value : "";
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
   if(ndpi_is_number(key, klen))
     return(ndpi_serialize_uint32_binary(_serializer, atoi(key), value, vlen));
+#endif
 
   return(ndpi_serialize_binary_raw(_serializer, key, klen, value, vlen, 1 /* escape */));
 }
@@ -1700,6 +1724,7 @@ int ndpi_serialize_string_string(ndpi_serializer *_serializer,
   const char *value = _value ? _value : "";
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
+#ifdef OPTIMIZE_CSV_SERIALIZATION
   if(serializer->fmt == ndpi_serialization_format_csv) {
     /* Key is ignored */
     u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
@@ -1723,7 +1748,8 @@ int ndpi_serialize_string_string(ndpi_serializer *_serializer,
     serializer->status.buffer.size_used += needed;
     return(0);
   } else
-    return(ndpi_serialize_binary_binary(_serializer, key, strlen(key), value, strlen(value)));
+#endif
+  return(ndpi_serialize_binary_binary(_serializer, key, strlen(key), value, strlen(value)));
 }
 
 /* ********************************** */
@@ -1746,8 +1772,10 @@ int ndpi_serialize_binary_boolean(ndpi_serializer *_serializer,
      serializer->fmt != ndpi_serialization_format_csv)
     return(-1);
 
+#ifdef OPTIMIZE_NUMERIC_KEYS
   if(ndpi_is_number(key, klen))
     return(ndpi_serialize_uint32_boolean(_serializer, atoi(key), value));
+#endif
 
   needed = klen + 16;
 
