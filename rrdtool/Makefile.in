@@ -1,7 +1,7 @@
 
 INC=-I ../src/include
 LIBDPI=../src/lib/libndpi.a
-LIB=$(LIBDPI) -lrrd -lm -lmaxminddb -lgcrypt
+LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@ @LDFLAGS@
 
 rrd_anomaly: rrd_anomaly.c Makefile $(LIBDPI)
 	$(CC) -g $(INC) rrd_anomaly.c -o rrd_anomaly $(LIB)
