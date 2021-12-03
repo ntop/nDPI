@@ -1226,7 +1226,7 @@ int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int64_t _value, doub
 
 #ifdef SES_DEBUG
   printf("[num_values: %u][[error: %.3f][forecast: %.3f][sqe: %.3f][sq: %.3f][confidence_band: %.3f]\n",
-	   ses->num_values, error, *forecast, ses->sum_square_error, sq, *confidence_band);
+	   ses->num_values, error, *forecast, ses->sum_square_error, sq_error, *confidence_band);
 #endif
 
   return(rc);
