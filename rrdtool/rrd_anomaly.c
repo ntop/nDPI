@@ -32,14 +32,16 @@
 /* *************************************************** */
 
 static void help() {
-  printf("Usage: rrd_anomaly [-a <alpha>][-s <start>][-e <end>] -f <filename>\n"
+  printf("Usage: rrd_anomaly [-a <alpha>][-e <end>][-q][-s <start>] -f <filename>\n"
 	 "-a             | Set alpha. Valid range >0 .. <1. Default %.2f\n"
-	 "-s <start>     | RRD start time. Default %s\n"
 	 "-e <end>       | RRD end time. Default %s\n"
-	 "-f <rrd path>  | Path of the RRD filename to analyze\n",
-	 DEFAULT_ALPHA, DEFAULT_START, DEFAULT_END);
+	 "-q             | Quick output (only anomalies are reported)\n"
+	 "-s <start>     | RRD start time. Default %s\n"
 
-  printf("\n\nExample: rrd_anomaly -s now-1d -e now -f hum.rrd\n");
+	 "-f <rrd path>  | Path of the RRD filename to analyze\n",
+	 DEFAULT_ALPHA, DEFAULT_END, DEFAULT_START);
+
+  printf("\n\nExample: rrd_anomaly -q -f hum.rrd\n");
   exit(0);
 }
 
@@ -50,7 +52,7 @@ int main(int argc, char *argv[]) {
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data, *p;
   char **names, *filename = NULL, *start_s, *end_s, *cf;
-  u_int i, j, t, first = 1;
+  u_int i, j, t, first = 1, quick_mode = 0;
   time_t start, end;
   struct ndpi_ses_struct ses;
   float alpha;
@@ -62,7 +64,7 @@ int main(int argc, char *argv[]) {
   end_s   = DEFAULT_END;
   cf      = "AVERAGE";
 
-  while((c = getopt(argc, argv, "s:e:a:f:")) != '?') {
+  while((c = getopt(argc, argv, "s:e:a:qf:")) != '?') {
     if(c == -1) break;
 
     switch(c) {
@@ -73,7 +75,11 @@ int main(int argc, char *argv[]) {
     case 'e':
       end_s = optarg;
       break;
-      
+
+    case 'q':
+      quick_mode = 1;
+      break;
+	
     case 'a':
       {
 	float f = atof(optarg);
@@ -135,19 +141,24 @@ int main(int argc, char *argv[]) {
 	is_anomaly = ((rc == 0) || ((value >= lower) && (value <= upper))) ? 0 : 1;
 
 	if(is_anomaly) {
-	  struct tm *t_info = localtime((const time_t*)&t);
-
-	  strftime(buf, sizeof(buf), "%d/%b/%Y %H:%M:%S", t_info);
-
-	  if(first) {
-	    first = 0; 
-	    printf("%s                       %s\t%s    %s           %s\t %s     [%s]\n",
-		   "When", "Value", "Prediction", "Lower", "Upper", "Out", "Band");		   
+	  if(quick_mode) {
+	    printf("%u\n", t);
+	  } else {
+	    const time_t _t = t;
+	    struct tm *t_info = localtime((const time_t*)&_t);
+	    
+	    strftime(buf, sizeof(buf), "%d/%b/%Y %H:%M:%S", t_info);
+	    
+	    if(first) {
+	      first = 0; 
+	      printf("%s                       %s\t%s    %s           %s\t %s     [%s]\n",
+		     "When", "Value", "Prediction", "Lower", "Upper", "Out", "Band");		   
+	    }
+	    
+	    printf("%s %12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n",
+		   buf, value/100., prediction/100., lower/100., upper/100., is_anomaly? "ANOMALY" : "OK",
+		   confidence_band/100.);
 	  }
-	  
-	  printf("%s %12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n",
-		 buf, value/100., prediction/100., lower/100., upper/100., is_anomaly? "ANOMALY" : "OK",
-		 confidence_band/100.);
 	}
       }
     }
