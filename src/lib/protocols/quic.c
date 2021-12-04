@@ -83,7 +83,8 @@ static int is_version_quic(uint32_t version)
   return version == V_1 ||
     ((version & 0xFFFFFF00) == 0xFF000000) /* IETF Drafts*/ ||
     ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */ ||
-    ((version & 0x0F0F0F0F) == 0x0a0a0a0a) /* Forcing Version Negotiation */;
+    ((version & 0x0F0F0F0F) == 0x0a0a0a0a) /* Forcing Version Negotiation */ ||
+    ((version & 0xFFFFFF00) == 0xFF020000) /* V2 IETF Drafts */;
 }
 static int is_version_valid(uint32_t version)
 {
@@ -112,6 +113,12 @@ static uint8_t get_u8_quic_ver(uint32_t version)
      only latest drafts... */
   if ((version & 0x0F0F0F0F) == 0x0a0a0a0a)
     return 29;
+
+  /* QUIC Version 2 */
+  /* For the time being use 100 + draft as a number for V2 */
+  if ((version >> 8) == 0xff0200)
+    return 100 + (uint8_t)version;
+
   return 0;
 }
 #ifdef HAVE_LIBGCRYPT
@@ -181,6 +188,15 @@ int is_version_with_ietf_long_header(uint32_t version)
     ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
     ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
 }
+#ifdef HAVE_LIBGCRYPT
+int is_version_with_v1_labels(uint32_t version)
+{
+  if(((version & 0xFFFFFF00) == 0x51303500)  /* Q05X */ ||
+     ((version & 0xFFFFFF00) == 0x54303500)) /* T05X */
+    return 1;
+  return is_quic_ver_less_than(version, 33);
+}
+#endif
 
 int quic_len(const uint8_t *buf, uint64_t *value)
 {
@@ -531,29 +547,34 @@ static void quic_ciphers_reset(quic_ciphers *ciphers)
  * and initialize cipher with the new key.
  */
 static int quic_hp_cipher_init(quic_hp_cipher *hp_cipher, int hash_algo,
-			       uint8_t key_length, uint8_t *secret)
+			       uint8_t key_length, uint8_t *secret,
+			       uint32_t version)
 {
   uint8_t hp_key[256/8]; /* Maximum key size is for AES256 cipher. */
   uint32_t hash_len = gcry_md_get_algo_dlen(hash_algo);
+  char *label = is_version_with_v1_labels(version) ? "quic hp" : "quicv2 hp";
 
-  if(!quic_hkdf_expand_label(hash_algo, secret, hash_len, "quic hp", hp_key, key_length)) {
+  if(!quic_hkdf_expand_label(hash_algo, secret, hash_len, label, hp_key, key_length)) {
     return 0;
   }
 
   return gcry_cipher_setkey(hp_cipher->hp_cipher, hp_key, key_length) == 0;
 }
 static int quic_pp_cipher_init(quic_pp_cipher *pp_cipher, int hash_algo,
-			       uint8_t key_length, uint8_t *secret)
+			       uint8_t key_length, uint8_t *secret,
+			       uint32_t version)
 {
   uint8_t write_key[256/8]; /* Maximum key size is for AES256 cipher. */
   uint32_t hash_len = gcry_md_get_algo_dlen(hash_algo);
+  char *key_label = is_version_with_v1_labels(version) ? "quic key" : "quicv2 key";
+  char *iv_label = is_version_with_v1_labels(version) ? "quic iv" : "quicv2 iv";
 
   if(key_length > sizeof(write_key)) {
     return 0;
   }
 
-  if(!quic_hkdf_expand_label(hash_algo, secret, hash_len, "quic key", write_key, key_length) ||
-     !quic_hkdf_expand_label(hash_algo, secret, hash_len, "quic iv", pp_cipher->pp_iv, sizeof(pp_cipher->pp_iv))) {
+  if(!quic_hkdf_expand_label(hash_algo, secret, hash_len, key_label, write_key, key_length) ||
+     !quic_hkdf_expand_label(hash_algo, secret, hash_len, iv_label, pp_cipher->pp_iv, sizeof(pp_cipher->pp_iv))) {
     return 0;
   }
 
@@ -579,7 +600,7 @@ static int quic_get_pn_cipher_algo(int cipher_algo, int *hp_cipher_mode)
  * If the optional base secret is given, then its length MUST match the hash
  * algorithm output.
  */
-static int quic_hp_cipher_prepare(quic_hp_cipher *hp_cipher, int hash_algo, int cipher_algo, uint8_t *secret)
+static int quic_hp_cipher_prepare(quic_hp_cipher *hp_cipher, int hash_algo, int cipher_algo, uint8_t *secret, u_int32_t version)
 {
 #if 0
   /* Clear previous state (if any). */
@@ -604,7 +625,7 @@ static int quic_hp_cipher_prepare(quic_hp_cipher *hp_cipher, int hash_algo, int 
 
   if(secret) {
     uint32_t cipher_keylen = (uint8_t)gcry_cipher_get_algo_keylen(cipher_algo);
-    if(!quic_hp_cipher_init(hp_cipher, hash_algo, cipher_keylen, secret)) {
+    if(!quic_hp_cipher_init(hp_cipher, hash_algo, cipher_keylen, secret, version)) {
       quic_hp_cipher_reset(hp_cipher);
 #ifdef DEBUG_CRYPT
       printf("Failed to derive key material for HP cipher\n");
@@ -615,7 +636,7 @@ static int quic_hp_cipher_prepare(quic_hp_cipher *hp_cipher, int hash_algo, int 
 
   return 1;
 }
-static int quic_pp_cipher_prepare(quic_pp_cipher *pp_cipher, int hash_algo, int cipher_algo, int cipher_mode, uint8_t *secret)
+static int quic_pp_cipher_prepare(quic_pp_cipher *pp_cipher, int hash_algo, int cipher_algo, int cipher_mode, uint8_t *secret, u_int32_t version)
 {
 #if 0
   /* Clear previous state (if any). */
@@ -632,7 +653,7 @@ static int quic_pp_cipher_prepare(quic_pp_cipher *pp_cipher, int hash_algo, int 
 
   if(secret) {
     uint32_t cipher_keylen = (uint8_t)gcry_cipher_get_algo_keylen(cipher_algo);
-    if(!quic_pp_cipher_init(pp_cipher, hash_algo, cipher_keylen, secret)) {
+    if(!quic_pp_cipher_init(pp_cipher, hash_algo, cipher_keylen, secret, version)) {
       quic_pp_cipher_reset(pp_cipher);
 #ifdef DEBUG_CRYPT
       printf("Failed to derive key material for PP cipher\n");
@@ -643,10 +664,10 @@ static int quic_pp_cipher_prepare(quic_pp_cipher *pp_cipher, int hash_algo, int 
 
   return 1;
 }
-static int quic_ciphers_prepare(quic_ciphers *ciphers, int hash_algo, int cipher_algo, int cipher_mode, uint8_t *secret)
+static int quic_ciphers_prepare(quic_ciphers *ciphers, int hash_algo, int cipher_algo, int cipher_mode, uint8_t *secret, u_int32_t version)
 {
-  return quic_hp_cipher_prepare(&ciphers->hp_cipher, hash_algo, cipher_algo, secret) &&
-         quic_pp_cipher_prepare(&ciphers->pp_cipher, hash_algo, cipher_algo, cipher_mode, secret);
+  return quic_hp_cipher_prepare(&ciphers->hp_cipher, hash_algo, cipher_algo, secret, version) &&
+         quic_pp_cipher_prepare(&ciphers->pp_cipher, hash_algo, cipher_algo, cipher_mode, secret, version);
 }
 /**
  * Given a header protection cipher, a buffer and the packet number offset,
@@ -864,6 +885,10 @@ static int quic_derive_initial_secrets(uint32_t version,
 						0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
 						0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
   };
+  static const uint8_t handshake_salt_v2_draft_00[20] = {
+						     0xa7, 0x07, 0xc2, 0x03, 0xa5, 0x9b, 0x47, 0x18, 0x4a, 0x1d,
+						     0x62, 0xca, 0x57, 0x04, 0x06, 0xea, 0x7a, 0xe3, 0xe5, 0xd3
+  };
   gcry_error_t err;
   uint8_t secret[HASH_SHA2_256_LENGTH];
 #ifdef DEBUG_CRYPT
@@ -894,9 +919,13 @@ static int quic_derive_initial_secrets(uint32_t version,
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_29,
 		       sizeof(handshake_salt_draft_29),
                        cid, cid_len, secret);
-  } else {
+  } else if (is_quic_ver_less_than(version, 33)) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_v1,
 		       sizeof(handshake_salt_v1),
+                       cid, cid_len, secret);
+  } else {
+    err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_v2_draft_00,
+		       sizeof(handshake_salt_v2_draft_00),
                        cid, cid_len, secret);
   }
   if(err) {
@@ -947,7 +976,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
      Initial packets are protected with AEAD_AES_128_GCM. */
   if(!quic_ciphers_prepare(&ciphers, GCRY_MD_SHA256,
                            GCRY_CIPHER_AES128, GCRY_CIPHER_MODE_GCM,
-                           client_secret)) {
+                           client_secret, version)) {
     NDPI_LOG_DBG(ndpi_struct, "Error quic_cipher_prepare\n");
     return NULL;
   }
