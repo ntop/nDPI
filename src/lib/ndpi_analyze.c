@@ -299,7 +299,7 @@ double ndpi_hll_count(struct ndpi_hll *hll) {
 /* ********************************************************************************* */
 /* ********************************************************************************* */
 
-int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int8_t num_bins) {
+int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int16_t num_bins) {
   b->num_bins = num_bins, b->family = f, b->is_empty = 1;
 
   switch(f) {
@@ -378,7 +378,7 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
 
 /* ********************************************************************************* */
 
-void ndpi_set_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
+void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t val) {
   if(slot_id >= b->num_bins) slot_id = 0;
 
   switch(b->family) {
@@ -396,7 +396,7 @@ void ndpi_set_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
 
 /* ********************************************************************************* */
 
-void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
+void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t val) {
   b->is_empty = 0;
 
   if(slot_id >= b->num_bins) slot_id = 0;
@@ -416,7 +416,7 @@ void ndpi_inc_bin(struct ndpi_bin *b, u_int8_t slot_id, u_int32_t val) {
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int8_t slot_id) {
+u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
   if(slot_id >= b->num_bins) slot_id = 0;
 
   switch(b->family) {
@@ -457,7 +457,7 @@ void ndpi_reset_bin(struct ndpi_bin *b) {
   Each bin slot is transformed in a % with respect to the value total
  */
 void ndpi_normalize_bin(struct ndpi_bin *b) {
-  u_int8_t i;
+  u_int16_t i;
   u_int32_t tot = 0;
 
   if(b->is_empty) return;
@@ -495,7 +495,7 @@ void ndpi_normalize_bin(struct ndpi_bin *b) {
 /* ********************************************************************************* */
 
 char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf, u_int out_buf_len) {
-  u_int8_t i;
+  u_int16_t i;
   u_int len = 0;
 
   if(!out_buf) return(out_buf); else out_buf[0] = '\0';
@@ -555,10 +555,14 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
    0 = alike
    ...
    the higher the more different
-*/
-float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t normalize_first) {
-  u_int8_t i;
 
+   if similarity_max_threshold != 0, we assume that bins arent similar
+*/
+float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2,
+			  u_int8_t normalize_first, float similarity_max_threshold) {
+  u_int16_t i;
+  float threshold = similarity_max_threshold*similarity_max_threshold;
+  
   if(
      // (b1->family != b2->family) ||
      (b1->num_bins != b2->num_bins))
@@ -594,7 +598,10 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2, u_int8_t nor
 
       if(a != b) sum += pow(diff, 2);
 
-      // printf("[a: %u][b: %u][sum: %u]\n", a, b, sum);
+      if(threshold && (sum > threshold))
+	return(-2); /* Sorry they are not similar */
+	 
+      // printf("%u/%u) [a: %u][b: %u][sum: %u]\n", i, b1->num_bins, a, b, sum);
     }
 
     /* The lower the more similar */
@@ -720,7 +727,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
 	if(centroids[j].is_empty) continue;
 
-	similarity = ndpi_bin_similarity(&bins[i], &centroids[j], 0);
+	similarity = ndpi_bin_similarity(&bins[i], &centroids[j], 0, 0);
 
 	if(j == cluster_ids[i])
 	  current_similarity = similarity;

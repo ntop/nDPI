@@ -1,5 +1,5 @@
 /*
- * ndpiReader.c
+ * rrd_anomaly.c
  *
  * Copyright (C) 2011-21 - ntop.org
  *
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   struct ndpi_ses_struct ses;
   float alpha;
   char c;
-  
+
   /* Defaults */
   alpha   = DEFAULT_ALPHA;
   start_s = DEFAULT_START;
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     case 's':
       start_s = optarg;
       break;
-      
+
     case 'e':
       end_s = optarg;
       break;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     case 'q':
       quick_mode = 1;
       break;
-	
+
     case 'a':
       {
 	float f = atof(optarg);
@@ -90,11 +90,11 @@ int main(int argc, char *argv[]) {
 	  printf("Discarding -a: valid range is >0 .. <1\n");
       }
       break;
-      
+
     case 'f':
       filename = optarg;
       break;
-      
+
     default:
       help();
       break;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
   if(filename == NULL)
     help();
-  
+
   ndpi_ses_init(&ses, alpha, 0.05);
 
   if((rrd_parsetime(start_s, &start_tv) != NULL)) {
@@ -124,8 +124,9 @@ int main(int argc, char *argv[]) {
   }
 
   p = data;
-  for(t=start+1, i=0; t<end; t+=step, i++) {    
-    for(j=0; j<ds_cnt; j++) {
+  for(t=start+1, i=0; t<end; t+=step, i++) {
+    j = 0; /* Consider only the first DS */
+    /* for(j=0; j<ds_cnt; j++) */ {
       rrd_value_t value = *p++;
 
       if(!isnan(value)) {
@@ -146,15 +147,15 @@ int main(int argc, char *argv[]) {
 	  } else {
 	    const time_t _t = t;
 	    struct tm *t_info = localtime((const time_t*)&_t);
-	    
+
 	    strftime(buf, sizeof(buf), "%d/%b/%Y %H:%M:%S", t_info);
-	    
+
 	    if(first) {
-	      first = 0; 
+	      first = 0;
 	      printf("%s                       %s\t%s    %s           %s\t %s     [%s]\n",
-		     "When", "Value", "Prediction", "Lower", "Upper", "Out", "Band");		   
+		     "When", "Value", "Prediction", "Lower", "Upper", "Out", "Band");
 	    }
-	    
+
 	    printf("%s %12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n",
 		   buf, value/100., prediction/100., lower/100., upper/100., is_anomaly? "ANOMALY" : "OK",
 		   confidence_band/100.);

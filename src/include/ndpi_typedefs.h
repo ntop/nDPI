@@ -1570,7 +1570,8 @@ enum ndpi_bin_family {
 };
 
 struct ndpi_bin {
-  u_int8_t num_bins, is_empty;
+  u_int8_t is_empty;
+  u_int16_t num_bins;
   enum ndpi_bin_family family;
 
   union {

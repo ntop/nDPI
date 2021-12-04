@@ -1,4 +1,5 @@
-This directory contains a tool that allows to identify anomalies in RRD files
+
+This directory contains a tool that allows to identify anomalies and similarities in RRD files
 
 
 Prerequisite

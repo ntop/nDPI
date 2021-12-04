@@ -266,7 +266,7 @@ u_int check_bin_doh_similarity(struct ndpi_bin *bin, float *similarity) {
   float lowest_similarity = 9999999999.0f;
 
   for(i=0; i<NUM_DOH_BINS; i++) {
-    *similarity = ndpi_bin_similarity(&doh_ndpi_bins[i], bin, 0);
+    *similarity = ndpi_bin_similarity(&doh_ndpi_bins[i], bin, 0, 0);
 
     if(*similarity <= doh_max_distance)
       return(1);
@@ -2827,7 +2827,7 @@ static void printFlowsStats() {
 
 	      print_bin(out, NULL, &bins[i]);
 	      printf("][similarity: %f]",
-		     (similarity = ndpi_bin_similarity(&centroids[j], &bins[i], 0)));
+		     (similarity = ndpi_bin_similarity(&centroids[j], &bins[i], 0, 0)));
 
 	      if(all_flows[i].flow->host_server_name[0] != '\0')
 		fprintf(out, "[%s]", all_flows[i].flow->host_server_name);
