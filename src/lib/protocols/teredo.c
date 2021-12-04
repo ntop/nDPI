@@ -36,7 +36,7 @@ void ndpi_search_teredo(struct ndpi_detection_module_struct *ndpi_struct, struct
      && ((ntohs(packet->udp->source) == 3544) || (ntohs(packet->udp->dest) == 3544))
      && (packet->payload_packet_len >= 40 /* IPv6 header */)) {
     NDPI_LOG_INFO(ndpi_struct,"found teredo\n");
-    ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEREDO, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEREDO, NDPI_PROTOCOL_UNKNOWN);
   }  else {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
@@ -48,6 +48,7 @@ void init_teredo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   ndpi_set_bitmask_protocol_detection("TEREDO", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TEREDO,
 				      ndpi_search_teredo,
+				      /* Teredo is inherently IPV4 only */
 				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);

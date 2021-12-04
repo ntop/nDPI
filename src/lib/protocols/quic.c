@@ -1342,7 +1342,7 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->protos.tls_quic.alpn &&
      strncmp(flow->protos.tls_quic.alpn, "doq", 3) == 0) {
     NDPI_LOG_DBG(ndpi_struct, "Found DOQ (ALPN: [%s])\n", flow->protos.tls_quic.alpn);
-    ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_QUIC);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_QUIC);
   }
 }
 static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1594,7 +1594,7 @@ static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_stru
       packet->payload[1] == 200 || /* RTCP, Sender Report */
       is_valid_rtp_payload_type(packet->payload[1] & 0x7F)) /* RTP */) {
     NDPI_LOG_DBG(ndpi_struct, "Found RTP/RTCP over QUIC\n");
-    ndpi_int_change_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SNAPCHAT_CALL, NDPI_PROTOCOL_QUIC);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SNAPCHAT_CALL, NDPI_PROTOCOL_QUIC);
   } else {
     /* Unexpected traffic pattern: we should investigate it... */
     NDPI_LOG_INFO(ndpi_struct, "To investigate...\n");
