@@ -1188,7 +1188,7 @@ static char* is_unsafe_cipher(ndpi_cipher_weakness c) {
 /* ********************************** */
 
 void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
-  u_int8_t i;
+  u_int16_t i;
   const char *sep = label ? "," : ";";
 
   ndpi_normalize_bin(b);

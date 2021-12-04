@@ -110,7 +110,7 @@ AC_CHECK_LIB([rrd], [rrd_fetch_r], [LIBRRD=-lrrd])
 
 if test "x$ac_cv_lib_rrd_rrd_fetch_r" = xyes; then :
    AC_DEFINE_UNQUOTED(HAVE_RRDTOOL, "1", [rrdtool is present])
-   EXTRA_TARGETS="rrdtool"
+   EXTRA_TARGETS="$EXTRA_TARGETS rrdtool"
 fi
 
 ADDITIONAL_LIBS="$LIBRRD $LIBM"

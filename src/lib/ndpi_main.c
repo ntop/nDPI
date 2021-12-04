@@ -3010,7 +3010,7 @@ int ndpi_add_host_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
 int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, u_int8_t do_add) {
   char *at, *proto, *elem;
   ndpi_proto_defaults_t *def;
-  u_int16_t subprotocol_id, i;
+  u_int subprotocol_id, i;
 
   at = strrchr(rule, '@');
   if(at == NULL) {
@@ -3061,7 +3061,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     }
   }
 
-  for(i = 0, def = NULL; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
+  for(i = 0, def = NULL; i < ndpi_str->ndpi_num_supported_protocols; i++) {
     if(ndpi_str->proto_defaults[i].protoName
        && strcasecmp(ndpi_str->proto_defaults[i].protoName, proto) == 0) {
       def = &ndpi_str->proto_defaults[i];
