@@ -75,3 +75,6 @@ stamp-h1
 /tests/dga/dga_evaluate
 /tests/unit/unit
 /tags
+/rrdtool/Makefile
+/rrdtool/rrd_anomaly
+/rrdtool/rrd_similarity
