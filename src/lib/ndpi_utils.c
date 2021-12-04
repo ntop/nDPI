@@ -1104,24 +1104,42 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
 /* ********************************** */
 
 void ndpi_serialize_risk(ndpi_serializer *serializer,
-			 struct ndpi_flow_struct *flow) {
-  if(flow->risk != 0) {
-    u_int32_t i;
+                         ndpi_risk_enum risk)
+{
+  u_int32_t i;
 
-    ndpi_serialize_start_of_block(serializer, "flow_risk");
+  ndpi_serialize_start_of_block(serializer, "flow_risk");
+  for(i = 0; i < NDPI_MAX_RISK; i++) {
+    ndpi_risk_enum r = (ndpi_risk_enum)i;
 
-    for(i = 0; i < NDPI_MAX_RISK; i++) {
-      ndpi_risk_enum r = (ndpi_risk_enum)i;
-
-      if(NDPI_ISSET_BIT(flow->risk, r))
-	ndpi_serialize_uint32_string(serializer, i, ndpi_risk2str(r));
-    }
-
-    ndpi_serialize_end_of_block(serializer);
+    if(NDPI_ISSET_BIT(risk, r))
+      ndpi_serialize_uint32_string(serializer, i, ndpi_risk2str(r));
   }
+
+  ndpi_serialize_end_of_block(serializer);
 }
 
-/* ********************************** */
+ /* ********************************** */
+
+void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
+                          ndpi_serializer *serializer,
+                          ndpi_risk_enum risk,
+                          ndpi_protocol l7_protocol)
+{
+  char buf[64];
+
+  ndpi_serialize_start_of_block(serializer, "ndpi");
+  ndpi_serialize_risk(serializer, risk);
+  ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
+  ndpi_protocol_breed_t breed =
+    ndpi_get_proto_breed(ndpi_struct,
+                         (l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN ? l7_protocol.app_protocol : l7_protocol.master_protocol));
+  ndpi_serialize_string_string(serializer, "breed", ndpi_get_proto_breed_name(ndpi_struct, breed));
+  if(l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
+  ndpi_serialize_end_of_block(serializer);
+}
+
 /* ********************************** */
 
 /* NOTE: serializer must have been already initialized */
@@ -1133,21 +1151,15 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(flow == NULL) return(-1);
 
-  ndpi_serialize_start_of_block(serializer, "ndpi");
-  ndpi_serialize_risk(serializer, flow);
-  if (l7_protocol.master_protocol == NDPI_PROTOCOL_IP_ICMP && flow->entropy > 0.0f) {
-    ndpi_serialize_string_float(serializer, "entropy", flow->entropy, "%.6f");
-  }
-  ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
-  ndpi_protocol_breed_t breed =
-      ndpi_get_proto_breed(ndpi_struct,
-                           (l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN ? l7_protocol.app_protocol : l7_protocol.master_protocol));
-  ndpi_serialize_string_string(serializer, "breed", ndpi_get_proto_breed_name(ndpi_struct, breed));
-  if(l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
-    ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
-  ndpi_serialize_end_of_block(serializer);
+  ndpi_serialize_proto(ndpi_struct, serializer, flow->risk, l7_protocol);
 
   switch(l7_protocol.master_protocol ? l7_protocol.master_protocol : l7_protocol.app_protocol) {
+  case NDPI_PROTOCOL_IP_ICMP:
+    if (flow->entropy > 0.0f) {
+      ndpi_serialize_string_float(serializer, "entropy", flow->entropy, "%.6f");
+    }
+    break;
+
   case NDPI_PROTOCOL_DHCP:
     ndpi_serialize_start_of_block(serializer, "dhcp");
     ndpi_serialize_string_string(serializer, "hostname", flow->host_server_name);
