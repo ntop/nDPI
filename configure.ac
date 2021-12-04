@@ -106,8 +106,14 @@ CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function $CFLAGS $JSONC_CFLAG
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
+AC_CHECK_LIB([rrd], [rrd_fetch_r], [LIBRRD=-lrrd])
 
-ADDITIONAL_LIBS="$LIBM"
+if test "x$ac_cv_lib_rrd_rrd_fetch_r" = xyes; then :
+   AC_DEFINE_UNQUOTED(HAVE_RRDTOOL, "1", [rrdtool is present])
+   EXTRA_TARGETS="rrdtool"
+fi
+
+ADDITIONAL_LIBS="$LIBRRD $LIBM"
 PCAP_HOME=$HOME/PF_RING/userland
 
 DPDK_TARGET=

@@ -26,19 +26,21 @@
 #include "ndpi_api.h"
 
 #define  DEFAULT_ALPHA   0.5
+#define  DEFAULT_RO      0.05
 #define  DEFAULT_START  "now-1d"
 #define  DEFAULT_END    "now"
 
 /* *************************************************** */
 
 static void help() {
-  printf("Usage: rrd_anomaly [-a <alpha>][-e <end>][-q][-s <start>] -f <filename>\n"
+  printf("Usage: rrd_anomaly [-v][-a <alpha>][-e <end>][-q][-s <start>] -f <filename>\n"
 	 "-a             | Set alpha. Valid range >0 .. <1. Default %.2f\n"
 	 "-e <end>       | RRD end time. Default %s\n"
 	 "-q             | Quick output (only anomalies are reported)\n"
 	 "-s <start>     | RRD start time. Default %s\n"
-
-	 "-f <rrd path>  | Path of the RRD filename to analyze\n",
+	 "-f <rrd path>  | Path of the RRD filename to analyze\n"
+	 "-v             | Verbose\n"
+	 ,
 	 DEFAULT_ALPHA, DEFAULT_END, DEFAULT_START);
 
   printf("\n\nExample: rrd_anomaly -q -f hum.rrd\n");
@@ -52,10 +54,10 @@ int main(int argc, char *argv[]) {
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data, *p;
   char **names, *filename = NULL, *start_s, *end_s, *cf;
-  u_int i, j, t, first = 1, quick_mode = 0;
+  u_int i, j, t, first = 1, quick_mode = 0, verbose = 0;
   time_t start, end;
   struct ndpi_ses_struct ses;
-  float alpha;
+  float alpha, ro;
   char c;
 
   /* Defaults */
@@ -63,8 +65,9 @@ int main(int argc, char *argv[]) {
   start_s = DEFAULT_START;
   end_s   = DEFAULT_END;
   cf      = "AVERAGE";
-
-  while((c = getopt(argc, argv, "s:e:a:qf:")) != '?') {
+  ro      = DEFAULT_RO;
+    
+  while((c = getopt(argc, argv, "s:e:a:qf:r:v")) != '?') {
     if(c == -1) break;
 
     switch(c) {
@@ -95,6 +98,16 @@ int main(int argc, char *argv[]) {
       filename = optarg;
       break;
 
+    case 'r':
+      ro = atof(optarg);
+      if((ro <= 0) || (ro >= 1))
+	ro = DEFAULT_RO;
+      break;
+
+    case 'v':
+      verbose = 1;
+      break;
+
     default:
       help();
       break;
@@ -104,7 +117,7 @@ int main(int argc, char *argv[]) {
   if(filename == NULL)
     help();
 
-  ndpi_ses_init(&ses, alpha, 0.05);
+  ndpi_ses_init(&ses, alpha, ro);
 
   if((rrd_parsetime(start_s, &start_tv) != NULL)) {
     printf("Unable to parse start time %s\n", start_s);
@@ -136,12 +149,12 @@ int main(int argc, char *argv[]) {
 	int rc;
 	u_int is_anomaly;
 
-	value *= 100;
+	value *= 100; /* trick to avoid dealing with floats */
 	rc = ndpi_ses_add_value(&ses, value, &prediction, &confidence_band);
 	lower = prediction - confidence_band, upper = prediction + confidence_band;
-	is_anomaly = ((rc == 0) || ((value >= lower) && (value <= upper))) ? 0 : 1;
-
-	if(is_anomaly) {
+	is_anomaly = ((rc == 0) || (confidence_band == 0) || ((value >= lower) && (value <= upper))) ? 0 : 1;
+	
+	if(verbose || is_anomaly) {
 	  if(quick_mode) {
 	    printf("%u\n", t);
 	  } else {
