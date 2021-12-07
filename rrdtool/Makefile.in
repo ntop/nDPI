@@ -15,3 +15,6 @@ rrd_similarity: rrd_similarity.c Makefile $(LIBDPI)
 
 clean:
 	/bin/rm -f *.o $(TOOLS) *~
+
+install:
+	@echo -n ""
