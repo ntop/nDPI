@@ -469,9 +469,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
     ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, j);
 
-    if (hostname_is_valid == 0) {
-      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
-    }
+    if (hostname_is_valid == 0)
+      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);    
 
     if(j > 0) {
       ndpi_protocol_match_result ret_match;

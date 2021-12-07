@@ -241,7 +241,7 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
   char *str;
   u_int len, j;
 
-  if (*rdnSeqBuf_offset >= rdnSeqBuf_len) {
+  if(*rdnSeqBuf_offset >= rdnSeqBuf_len) {
 #ifdef DEBUG_TLS
     printf("[TLS] %s() [buffer capacity reached][%u]\n",
            __FUNCTION__, rdnSeqBuf_len);
@@ -393,7 +393,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	if(rdn_len && (flow->protos.tls_quic.issuerDN == NULL)) {
 	  flow->protos.tls_quic.issuerDN = ndpi_strdup(rdnSeqBuf);
-	  if (ndpi_is_printable_string(rdnSeqBuf, rdn_len) == 0) {
+	  if(ndpi_is_printable_string(rdnSeqBuf, rdn_len) == 0) {
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
 	  }
 	}
@@ -463,7 +463,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      }
 	    }
 
-	    if (flow->protos.tls_quic.notBefore > TLS_LIMIT_DATE)
+	    if(flow->protos.tls_quic.notBefore > TLS_LIMIT_DATE)
 	      if((flow->protos.tls_quic.notAfter-flow->protos.tls_quic.notBefore) > TLS_THRESHOLD)
 		ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
 
@@ -499,7 +499,13 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	    i++;
 
 	    while(i < packet->payload_packet_len) {
-	      if(packet->payload[i] == 0x82) {
+	      u_int8_t general_name_type = packet->payload[i];
+	      
+	      if((general_name_type == 0x81)    /* rfc822Name */
+		 || (general_name_type == 0x82) /* dNSName    */
+		 || (general_name_type == 0x87) /* ipAddress  */
+		 )
+		{
 		if((i < (packet->payload_packet_len - 1))
 		   && ((i + packet->payload[i + 1] + 2) < packet->payload_packet_len)) {
 		  u_int8_t len = packet->payload[i + 1];
@@ -513,9 +519,24 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		     || ((i+len) > packet->payload_packet_len))
 		    break;
 
-		  strncpy(dNSName, (const char*)&packet->payload[i], len);
-		  dNSName[len] = '\0';
-
+		  if(general_name_type == 0x87) {
+		    if(len == 4 /* IPv4 */) {
+		      snprintf(dNSName, sizeof(dNSName), "%u.%u.%u.%u",
+			       packet->payload[i] & 0xFF,
+			       packet->payload[i+1] & 0xFF,
+			       packet->payload[i+2] & 0xFF,
+			       packet->payload[i+3] & 0xFF);
+		    } else {
+		      /* 
+			 TODO add IPv6 support when able to have 
+			 a pcap file for coding
+		      */
+		    }
+		  } else {
+		    strncpy(dNSName, (const char*)&packet->payload[i], len);
+		    dNSName[len] = '\0';
+		  }
+		  
 		  cleanupServerName(dNSName, len);
 
 #if DEBUG_TLS
@@ -523,9 +544,8 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 			 flow->host_server_name, len,
 			 packet->payload_packet_len-i-len);
 #endif
-		  if (ndpi_is_printable_string(dNSName, len) == 0) {
-		    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
-		  }
+		  if(ndpi_is_printable_string(dNSName, len) == 0)
+		    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);		  
 
 		  if(matched_name == 0) {
 #if DEBUG_TLS
@@ -536,13 +556,13 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 		    if(flow->host_server_name[0] == '\0') {
 		      matched_name = 1;	/* No SNI */
-		    } else if (dNSName[0] == '*') {
+		    } else if(dNSName[0] == '*') {
 		      char * label = strstr(flow->host_server_name, &dNSName[1]);
 
-		      if (label != NULL) {
+		      if(label != NULL) {
 		        char * first_dot = strchr(flow->host_server_name, '.');
 
-			if (first_dot == NULL || first_dot >= label) {
+			if(first_dot == NULL || first_dot >= label) {
                           matched_name = 1;
 			}
                       }
@@ -739,7 +759,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
       printf("[TLS] SHA-1: %s\n", sha1_str);
 #endif
 
-      if (ndpi_struct->malicious_sha1_automa.ac_automa != NULL) {
+      if(ndpi_struct->malicious_sha1_automa.ac_automa != NULL) {
         u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_sha1_automa.ac_automa, sha1_str);
 
         if(rc1 > 0)
@@ -801,7 +821,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
      * ndpi_int_tls_add_connection has been called */
     if(flow->protos.tls_quic.hello_processed) {
       ret = processCertificate(ndpi_struct, flow);
-      if (ret != 1) {
+      if(ret != 1) {
 #ifdef DEBUG_TLS
         printf("[TLS] Error processing certificate: %d\n", ret);
 #endif
@@ -1023,7 +1043,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
     printf("[TLS] DTLS block len: %d\n", block_len);
 #endif
-    if (block_len == 0 || (processed + block_len + 12 >= p_len)) {
+    if(block_len == 0 || (processed + block_len + 12 >= p_len)) {
 #ifdef DEBUG_TLS
       printf("[TLS] DTLS invalid block len %d (processed %d, p_len %d)\n",
              block_len, processed, p_len);
@@ -1033,7 +1053,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
     }
     /* We process only handshake msgs */
     if(block[0] == 0x16) {
-      if (processed + block_len + 13 > p_len) {
+      if(processed + block_len + 13 > p_len) {
 #ifdef DEBUG_TLS
         printf("[TLS] DTLS invalid len %d %d %d\n", processed, block_len, p_len);
 #endif
@@ -1041,7 +1061,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
         break;
      }
       /* TODO: handle (certificate) fragments */
-      if (block_len > 16) {
+      if(block_len > 16) {
         handshake_len = (block[14] << 16) + (block[15] << 8) + block[16];
         if((handshake_len + 12) != block_len) {
 #ifdef DEBUG_TLS
@@ -1165,7 +1185,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
-  if (extension_payload_offset + extension_len > packet->payload_packet_len)
+  if(extension_payload_offset + extension_len > packet->payload_packet_len)
   {
 #ifdef DEBUG_TLS
     printf("[TLS] extension length exceeds remaining packet length: %u > %u.\n",
@@ -1192,18 +1212,18 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
                                                   sizeof(allowed_non_iana_extensions[0]);
 
   /* see: https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml */
-  if (extension_id > 59 && extension_id != 65281)
+  if(extension_id > 59 && extension_id != 65281)
   {
     u_int8_t extension_found = 0;
     for (size_t i = 0; i < allowed_non_iana_extensions_size; ++i)
     {
-      if (allowed_non_iana_extensions[i] == extension_id)
+      if(allowed_non_iana_extensions[i] == extension_id)
       {
         extension_found = 1;
         break;
       }
     }
-    if (extension_found == 0)
+    if(extension_found == 0)
     {
 #ifdef DEBUG_TLS
       printf("[TLS] suspicious extension id: %u\n", extension_id);
@@ -1214,9 +1234,9 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   /* Check for DTLS-only extensions. */
-  if (is_dtls == 0)
+  if(is_dtls == 0)
   {
-    if (extension_id == 53 || extension_id == 54)
+    if(extension_id == 53 || extension_id == 54)
     {
 #ifdef DEBUG_TLS
       printf("[TLS] suspicious DTLS-only extension id: %u\n", extension_id);
@@ -1335,7 +1355,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	extension_id  = ntohs(*((u_int16_t*)&packet->payload[offset]));
 	extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+2]));
-	if (offset+4+extension_len > packet->payload_packet_len) {
+	if(offset+4+extension_len > packet->payload_packet_len) {
 	  break;
 	}
 
@@ -1371,7 +1391,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  s_offset += 2;
 	  tot_alpn_len += s_offset;
 
-	  if (tot_alpn_len > packet->payload_packet_len)
+	  if(tot_alpn_len > packet->payload_packet_len)
 	    return 0;
 
 	  while(s_offset < tot_alpn_len && s_offset < total_len) {
@@ -1409,7 +1429,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 	  printf("Server TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
-	  if (ndpi_is_printable_string(alpn_str, alpn_str_len) == 0)
+	  if(ndpi_is_printable_string(alpn_str, alpn_str_len) == 0)
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
 
 	  if(flow->protos.tls_quic.alpn == NULL)
@@ -1725,7 +1745,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: [%s]\n", sni);
 #endif
-		    if (ndpi_is_printable_string(sni, sni_len) == 0)
+		    if(ndpi_is_printable_string(sni, sni_len) == 0)
 		    {
 		       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
 		    }
@@ -1938,7 +1958,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		       duplicate_found);
 #endif
 
-		if (i > 0 && i >= tot_signature_algorithms_len) {
+		if(i > 0 && i >= tot_signature_algorithms_len) {
 		  ja3.client.signature_algorithms[i*2 - 1] = '\0';
 		} else {
 		  ja3.client.signature_algorithms[i*2] = '\0';
@@ -2067,7 +2087,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		/* Key Share Entry */
 		e_offset += 2; /* Group */
-		if (e_offset + 2 < packet->payload_packet_len) {
+		if(e_offset + 2 < packet->payload_packet_len) {
 		e_offset += ntohs(*((u_int16_t*)&packet->payload[e_offset])) + 2; /* Lenght */
 
 		if((e_offset+4) < packet->payload_packet_len) {
