@@ -295,6 +295,7 @@ typedef enum {
   NDPI_PROTOCOL_CASSANDRA             = 264, /* Lucas Santos <lfneiva.santos@gmail.com> */
   NDPI_PROTOCOL_AMAZON_AWS            = 265,
   NDPI_PROTOCOL_SALESFORCE            = 266,
+  NDPI_PROTOCOL_IRDMI                 = 267, /* Toni Uhlig <matzeton@googlemail.com> */
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

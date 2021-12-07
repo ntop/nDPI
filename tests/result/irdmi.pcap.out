@@ -1,0 +1,11 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	5	(1.00 pkts/flow)
+
+IRDMI	18	1404	5
+
+	1	UDP 192.168.2.100:64175 <-> 99.83.175.244:7999 [proto: 267/IRDMI][ClearText][cat: RemoteAccess/12][4 pkts/312 bytes <-> 4 pkts/312 bytes][Goodput ratio: 46/46][2850986.00 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 2160118/2160118 950328640/950328640 2252908080/2252908080 952425664/952425664][Pkt Len c2s/s2c min/avg/max/stddev: 78/78 78/78 78/78 0/0][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.2.100:49358 <-> 76.223.67.208:7999 [proto: 267/IRDMI][ClearText][cat: RemoteAccess/12][2 pkts/156 bytes <-> 2 pkts/156 bytes][Goodput ratio: 46/46][2954931.00 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.2.100:50776 <-> 75.2.116.77:7999 [proto: 267/IRDMI][ClearText][cat: RemoteAccess/12][1 pkts/78 bytes <-> 1 pkts/78 bytes][Goodput ratio: 46/46][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.2.100:56224 <-> 99.83.189.58:7999 [proto: 267/IRDMI][ClearText][cat: RemoteAccess/12][1 pkts/78 bytes <-> 1 pkts/78 bytes][Goodput ratio: 46/46][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 192.168.2.100:65112 <-> 75.2.125.166:7999 [proto: 267/IRDMI][ClearText][cat: RemoteAccess/12][1 pkts/78 bytes <-> 1 pkts/78 bytes][Goodput ratio: 46/46][0.04 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
