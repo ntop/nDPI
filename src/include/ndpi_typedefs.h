@@ -1164,10 +1164,14 @@ struct ndpi_flow_struct {
   u_int32_t next_tcp_seq_nr[2];
 
   /* Flow addresses (used mainly for LRU lookups in ndpi_detection_giveup())
-   * TODO: ipv6. Note that LRU is ipv4 only, for the time being */
-  u_int32_t saddr;
-  u_int32_t daddr;
+     and ports. All in *network* byte order
 
+     TODO
+     - IPv6. Note that LRU is ipv4 only, for the time being 
+   */
+  u_int32_t saddr, daddr;
+  u_int16_t sport, dport;
+  
   // -----------------------------------------
 
   u_int8_t max_extra_packets_to_check;
