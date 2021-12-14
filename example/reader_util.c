@@ -1065,6 +1065,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   if(!flow->ndpi_flow) return;
 
+  flow->confidence = flow->ndpi_flow->confidence;
+
   snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 

@@ -48,7 +48,7 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
 	
 	if(memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0) {
 	  NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN);
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	}
 	return;
       } else if(payload_len > 22) {
@@ -57,7 +57,7 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
 	if((memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0)
 	   || (ndpi_strnstr((const char *)packet->payload, "Citrix.TcpProxyService", payload_len) != NULL)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN);
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	}
 	return;	
       }

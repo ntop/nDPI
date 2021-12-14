@@ -30,7 +30,7 @@ static void ndpi_int_secondlife_add_connection(struct ndpi_detection_module_stru
 					       struct ndpi_flow_struct *flow/* , */
 					       /* ndpi_protocol_type_t protocol_type */)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SECONDLIFE, protocol_type);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SECONDLIFE, protocol_type, NDPI_CONFIDENCE_DPI);
 }
 
 void ndpi_search_secondlife(struct ndpi_detection_module_struct

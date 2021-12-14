@@ -36,7 +36,7 @@ void ndpi_search_vmware(struct ndpi_detection_module_struct *ndpi_struct, struct
        ((packet->payload[0] & 0xFF) == 0xA4)){
       
       NDPI_LOG_INFO(ndpi_struct, "found vmware\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VMWARE, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VMWARE, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

@@ -64,7 +64,7 @@ void ndpi_search_nats_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		      packet->payload_packet_len - ((size_t)match - (size_t)packet->payload)) != NULL) {
 	NDPI_LOG_INFO(ndpi_struct, "found NATS\n");
 
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NATS, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NATS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }

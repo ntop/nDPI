@@ -117,7 +117,7 @@ void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
         ndpi_check_valid_cassandra_opcode(get_u_int8_t(packet->payload, 4)) &&
         get_u_int32_t(packet->payload, 5) <= CASSANDRA_MAX_BODY_SIZE &&
         get_u_int32_t(packet->payload, 5) >= (uint32_t) (packet->payload_packet_len - CASSANDRA_HEADER_LEN)) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CASSANDRA, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CASSANDRA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

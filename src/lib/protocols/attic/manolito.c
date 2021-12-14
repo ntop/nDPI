@@ -35,7 +35,7 @@ static void ndpi_int_manolito_add_connection(struct
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MANOLITO);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MANOLITO, NDPI_CONFIDENCE_DPI);
 
 
   if (src != NULL) {

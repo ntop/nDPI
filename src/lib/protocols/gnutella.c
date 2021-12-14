@@ -30,14 +30,14 @@
 
 
 static void ndpi_int_gnutella_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					     struct ndpi_flow_struct *flow/* , */
-					     /* ndpi_protocol_type_t protocol_type */)
+					     struct ndpi_flow_struct *flow,
+					     ndpi_confidence_t confidence)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA, NDPI_PROTOCOL_UNKNOWN, confidence);
   NDPI_LOG_INFO(ndpi_struct, "found GNUTELLA\n");
 
   if (src != NULL) {
@@ -101,12 +101,12 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
   if (packet->tcp != NULL) {
     /* this case works asymmetrically */
     if (packet->payload_packet_len > 10 && memcmp(packet->payload, "GNUTELLA/", 9) == 0) {
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     /* this case works asymmetrically */
     if (packet->payload_packet_len > 17 && memcmp(packet->payload, "GNUTELLA CONNECT/", 17) == 0) {
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
 
@@ -120,7 +120,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	    || (packet->line[c].len > 7 && memcmp(packet->line[c].ptr, "X-Queue:", 8) == 0)
 	    || (packet->line[c].len > 36 && memcmp(packet->line[c].ptr,
 						   "Content-Type: application/x-gnutella-", 37) == 0)) {
-	  ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	  ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 	  return;
 	}
       }
@@ -131,7 +131,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	   && memcmp(packet->user_agent_line.ptr, "BearShare Lite ", 15) == 0)
 	  || (packet->accept_line.ptr != NULL && packet->accept_line.len > 24
 	      && memcmp(packet->accept_line.ptr, "application n/x-gnutella", 24) == 0)) {
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       }
 
     }
@@ -147,7 +147,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 
       if (c < (packet->payload_packet_len - 9) && memcmp(&packet->payload[c], "urn:sha1:", 9) == 0) {
 	NDPI_LOG_DBG2(ndpi_struct, "detected GET /get/ or GET /uri-res/\n");
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       }
 
     }
@@ -156,7 +156,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
      * it is searched in the upper paragraph. */
     if (packet->payload_packet_len > 30 && memcmp(packet->payload, "HEAD /gnutella/push-proxy?", 26) == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "detected HEAD /gnutella/push-proxy?\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     /* haven't found any trace with this pattern */
@@ -164,7 +164,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	&& memcmp(packet->payload, "\x50\x55\x53\x48\x20\x67\x75\x69\x64\x3a", 10) == 0) {
       NDPI_LOG_DBG2(ndpi_struct,
 	       "detected \x50\x55\x53\x48\x20\x67\x75\x69\x64\x3a\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     /* haven't found any trace with this pattern */
@@ -184,7 +184,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	      || (end - c > 13 && memcmp(&packet->payload[c], "\r\nX-Features:", 13) == 0)) {
 
 	    NDPI_LOG_DBG2(ndpi_struct, "FOXY :: GNUTELLA GET 2 DETECTED\n");
-	    ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	    ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 	    return;
 	  }
 
@@ -205,14 +205,14 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	get_u_int32_t(packet->payload, 4) == htonl(0x01000300) && get_u_int32_t(packet->payload, 8) == htonl(0x00002000) &&
 	get_u_int16_t(packet->payload, 12) == htons(0x0034)) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella len == 46\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     if (packet->payload_packet_len == 49 &&
 	memcmp(packet->payload, "\x80\x2f\x01\x03\x01\x00\x06\x00\x00\x00\x20\x00\x00\x34\x00\x00\xff\x4d\x6c",
 	       19) == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella len == 49\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     if (packet->payload_packet_len == 89 && memcmp(&packet->payload[43], "\x20\x4d\x6c", 3) == 0 &&
@@ -220,7 +220,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	memcmp(&packet->payload[76], "\x00\x02\x00\x34\x01\x00\x00\x05", 8) == 0) {
       NDPI_LOG_DBG2(ndpi_struct,
 	       "detected gnutella asymmetrically len == 388.\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     } else if (packet->payload_packet_len == 82) {
       if (get_u_int32_t(packet->payload, 0) == htonl(0x16030100)
@@ -229,7 +229,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  && get_u_int16_t(packet->payload, 76) == htons(0x0002)
 	  && get_u_int32_t(packet->payload, 78) == htonl(0x00340100)) {
 	NDPI_LOG_DBG2(ndpi_struct, "detected len == 82\n");
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }
@@ -238,7 +238,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 			packet->udp->source == src->detected_gnutella_udp_port2) &&
 	(packet->current_time_ms - src->gnutella_ts) < ndpi_struct->gnutella_timeout) {
       NDPI_LOG_DBG2(ndpi_struct, "port based detection\n\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
     }
     /* observations:
      * all the following patterns send out many packets which are the only ones of their flows,
@@ -251,7 +251,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	&& packet->payload[18] == 0x00 && packet->payload[19] == 0x00
 	&& packet->payload[20] == 0x00 && packet->payload[21] == 0x00 && packet->payload[22] == 0x00) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, len = 23\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 
       return;
     }
@@ -260,25 +260,25 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	&& packet->payload[28] == 0x83 && packet->payload[29] == 0x53
 	&& packet->payload[30] == 0x43 && packet->payload[31] == 0x50 && packet->payload[32] == 0x41) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, len = 35\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     if (packet->payload_packet_len == 32
 	&& (memcmp(&packet->payload[16], "\x31\x01\x00\x09\x00\x00\x00\x4c\x49\x4d\x45", 11) == 0)) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, len = 32\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     if (packet->payload_packet_len == 34 && (memcmp(&packet->payload[25], "SCP@", 4) == 0)
 	&& (memcmp(&packet->payload[30], "DNA@", 4) == 0)) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, len = 34\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     if ((packet->payload_packet_len == 73 || packet->payload_packet_len == 96)
 	&& memcmp(&packet->payload[32], "urn:sha1:", 9) == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, len = 73,96\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
 
@@ -297,7 +297,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  || (packet->payload_packet_len > 200 && packet->payload_packet_len < 300 && packet->payload[3] == 0x03)
 	  || (packet->payload_packet_len > 300 && (packet->payload[3] == 0x01 || packet->payload[3] == 0x03))) {
 	NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, GND\n");
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }
@@ -305,13 +305,13 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
     if ((packet->payload_packet_len == 32)
 	&& memcmp(&packet->payload[16], "\x31\x01\x00\x09\x00\x00\x00", 7) == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, len = 32 ii\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
     if ((packet->payload_packet_len == 23)
 	&& memcmp(&packet->payload[16], "\x00\x01\x00\x00\x00\x00\x00", 7) == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, len = 23 ii\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }
   }
@@ -336,7 +336,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  && flow->l4.tcp.gnutella_msg_id[2] == packet->payload[4]
 	  && NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_GNUTELLA)) {
 	NDPI_LOG_DBG2(ndpi_struct, "GNUTELLA DETECTED due to message ID match (NEONet protocol)\n");
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
 	return;
       }
     } else if (flow->l4.tcp.gnutella_stage == 2 - packet->packet_direction) {
@@ -346,7 +346,7 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
 	  && flow->l4.tcp.gnutella_msg_id[2] == packet->payload[4]
 	  && NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_GNUTELLA)) {
 	NDPI_LOG_DBG2(ndpi_struct, "GNUTELLA DETECTED due to message ID match (NEONet protocol)\n");
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
 	return;
       }
     }

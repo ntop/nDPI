@@ -53,6 +53,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 				  struct ndpi_flow_struct *flow,
 				  u_int proto, u_int app_proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  ndpi_confidence_t confidence = NDPI_CONFIDENCE_DPI;
 
   if(ndpi_struct->stun_cache == NULL)
     ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
@@ -71,6 +72,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
       printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key, cached_proto, proto, app_proto);
 #endif
       app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
+      confidence = NDPI_CONFIDENCE_DPI_CACHE;
     } else {
       u_int32_t key_rev = get_stun_lru_key(packet, 1);
 
@@ -80,6 +82,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 	printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key_rev, cached_proto, proto, app_proto);
 #endif
 	app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
+        confidence = NDPI_CONFIDENCE_DPI_CACHE;
       } else {
 	if(app_proto != NDPI_PROTOCOL_STUN) {
 	  /* No sense to add STUN, but only subprotocols */
@@ -101,7 +104,7 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
     }
   }
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, proto);
+  ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, proto, confidence);
 }
 
 typedef enum {

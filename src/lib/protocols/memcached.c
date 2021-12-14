@@ -96,7 +96,7 @@ static void ndpi_int_memcached_add_connection(struct ndpi_detection_module_struc
 {
   NDPI_LOG_INFO(ndpi_struct, "found memcached\n");
   ndpi_set_detected_protocol(ndpi_struct, flow,
-			     NDPI_PROTOCOL_MEMCACHED, NDPI_PROTOCOL_UNKNOWN);
+			     NDPI_PROTOCOL_MEMCACHED, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 void ndpi_search_memcached(

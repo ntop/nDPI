@@ -42,7 +42,7 @@ void ndpi_search_mpegts(struct ndpi_detection_module_struct *ndpi_struct, struct
 
     /* This looks MPEG TS */
     NDPI_LOG_INFO(ndpi_struct, "found MPEGTS\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MPEGTS, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MPEGTS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     return;
   }    
 

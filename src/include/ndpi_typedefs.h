@@ -847,6 +847,28 @@ typedef struct {
 } ndpi_port_range;
 
 typedef enum {
+  NDPI_CONFIDENCE_UNKNOWN = 0,		/* Unknown classification */
+  NDPI_CONFIDENCE_MATCH_BY_PORT,	/* Classification obtained looking only at the L4 ports */
+  NDPI_CONFIDENCE_MATCH_BY_IP,		/* Classification obtained looking only at the L3 addresses */
+  NDPI_CONFIDENCE_DPI_SRC_DST_ID,	/* Classification results based on ndpi_id_struct structures */
+  NDPI_CONFIDENCE_DPI_CACHE,		/* Classification results based on same LRU cache (i.e. correlation among sessions) */
+  NDPI_CONFIDENCE_DPI,			/* Deep packet inspection */
+
+  /*
+    IMPORTANT
+
+    Please keep in sync with
+
+    ndpi_confidence_get_name()
+
+    in ndpi_main.c
+  */
+
+  /* Last one */
+  NDPI_CONFIDENCE_MAX,
+} ndpi_confidence_t;
+
+typedef enum {
   NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
   NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn't provide risks, but could be malicious (e.g., Dropbox) */
   NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
@@ -1144,6 +1166,7 @@ struct ndpi_flow_struct {
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, fail_with_unknown:1,
     init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1, is_ipv6:1;
+  u_int8_t confidence; /* ndpi_confidence_t */
 
   /*
     if ndpi_struct->direction_detect_disable == 1
