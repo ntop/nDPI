@@ -239,7 +239,7 @@ static uint16_t gquic_get_u16(const uint8_t *buf, uint32_t version)
 {
   if(version >= V_Q039)
     return ntohs(*(uint16_t *)buf);
-  return (*(uint16_t *)buf);
+  return le16toh(*(uint16_t *)buf);
 }
 
 
