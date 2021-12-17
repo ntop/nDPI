@@ -131,7 +131,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     ndpi_struct->bittorrent_cache = ndpi_lru_cache_init(32768);
 
   if(ndpi_struct->bittorrent_cache && packet->iph) {
-    u_int32_t key1, key2;
+    u_int32_t key1, key2, i;
 
     if(packet->udp)
       key1 = ndpi_bittorrent_hash_funct(packet->iph->saddr, packet->udp->source), key2 = ndpi_bittorrent_hash_funct(packet->iph->daddr, packet->udp->dest);
@@ -141,6 +141,16 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT);
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key2, NDPI_PROTOCOL_BITTORRENT);
 
+    /* Also add +2 ports of the sender in order to catch additional sockets open by the same client */
+    for(i=0; i<2; i++) {
+      if(packet->udp)
+	key1 = ndpi_bittorrent_hash_funct(packet->iph->saddr, htons(ntohs(packet->udp->source)+1));
+      else
+	key1 = ndpi_bittorrent_hash_funct(packet->iph->saddr, htons(ntohs(packet->tcp->source)+1));
+
+      ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT);
+    }
+    
 #ifdef BITTORRENT_CACHE_DEBUG
     if(packet->udp)
       printf("[BitTorrent] [UDP] *** ADDED ports %u / %u [%u][%u]\n", ntohs(packet->udp->source), ntohs(packet->udp->dest), key1, key2);
