@@ -283,15 +283,21 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 /* **************************************** */
 
 static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				struct ndpi_flow_struct *flow) {
+				struct ndpi_flow_struct *flow,
+				int is_from_client) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
     /* Subprotocol not yet set */
 
     if(ndpi_struct->tls_cert_cache && packet->iph && packet->tcp) {
-      u_int32_t key = packet->iph->daddr + packet->tcp->dest;
+      u_int32_t key; /* Server ip/port */
       u_int16_t cached_proto;
+
+      if(is_from_client)
+        key = packet->iph->daddr + packet->tcp->dest;
+      else
+        key = packet->iph->saddr + packet->tcp->source;
 
       if(ndpi_lru_find_cache(ndpi_struct->tls_cert_cache, key,
 			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
@@ -640,7 +646,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	  ndpi_struct->tls_cert_cache = ndpi_lru_cache_init(1024);
 
 	if(ndpi_struct->tls_cert_cache && packet->iph) {
-	  u_int32_t key = packet->iph->daddr + packet->tcp->dest;
+	  u_int32_t key = packet->iph->saddr + packet->tcp->source; /* Server */
 
 	  ndpi_lru_add_to_cache(ndpi_struct->tls_cert_cache, key, proto_id);
 	}
@@ -813,7 +819,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
       flow->l4.tcp.tls.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
     }
 
-    checkTLSSubprotocol(ndpi_struct, flow);
+    checkTLSSubprotocol(ndpi_struct, flow, packet->payload[0] == 0x01);
     break;
 
   case 0x0b: /* Certificate */
