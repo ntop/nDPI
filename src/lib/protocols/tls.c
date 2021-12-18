@@ -516,6 +516,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		   && ((i + packet->payload[i + 1] + 2) < packet->payload_packet_len)) {
 		  u_int8_t len = packet->payload[i + 1];
 		  char dNSName[256];
+		  u_int16_t dNSName_len;
 
 		  i += 2;
 
@@ -532,25 +533,26 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 			       packet->payload[i+1] & 0xFF,
 			       packet->payload[i+2] & 0xFF,
 			       packet->payload[i+3] & 0xFF);
+		    } else if(len == 16 /* IPv6 */){
+		      inet_ntop(AF_INET6, &packet->payload[i], dNSName, sizeof(dNSName));
 		    } else {
-		      /* 
-			 TODO add IPv6 support when able to have 
-			 a pcap file for coding
-		      */
+		      /* Is that possibile? Better safe than sorry */
+		      dNSName[0] = '\0';
 		    }
 		  } else {
 		    strncpy(dNSName, (const char*)&packet->payload[i], len);
 		    dNSName[len] = '\0';
 		  }
 		  
-		  cleanupServerName(dNSName, len);
+		  dNSName_len = strlen(dNSName);
+		  cleanupServerName(dNSName, dNSName_len);
 
 #if DEBUG_TLS
 		  printf("[TLS] dNSName %s [%s][len: %u][leftover: %d]\n", dNSName,
 			 flow->host_server_name, len,
 			 packet->payload_packet_len-i-len);
 #endif
-		  if(ndpi_is_printable_string(dNSName, len) == 0)
+		  if(ndpi_is_printable_string(dNSName, dNSName_len) == 0)
 		    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);		  
 
 		  if(matched_name == 0) {
@@ -582,7 +584,6 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		    flow->protos.tls_quic.server_names = ndpi_strdup(dNSName),
 		      flow->protos.tls_quic.server_names_len = strlen(dNSName);
 		  else {
-		    u_int16_t dNSName_len = strlen(dNSName);
 		    u_int16_t newstr_len = flow->protos.tls_quic.server_names_len + dNSName_len + 1;
 		    char *newstr = (char*)ndpi_realloc(flow->protos.tls_quic.server_names,
 						       flow->protos.tls_quic.server_names_len+1, newstr_len+1);
@@ -598,7 +599,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		  }
 
 		  if(!flow->protos.tls_quic.subprotocol_detected)
-		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, dNSName, len))
+		    if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, dNSName, dNSName_len))
 		      flow->protos.tls_quic.subprotocol_detected = 1;
 
 		  i += len;
