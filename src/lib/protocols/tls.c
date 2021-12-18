@@ -2115,7 +2115,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			flow->protos.tls_quic.encrypted_sni.esni = (char*)ndpi_malloc(e_sni_len*2+1);
 
 			if(flow->protos.tls_quic.encrypted_sni.esni) {
-			  u_int16_t i, off;
+			  u_int16_t off;
+			  int i;
 
 			  for(i=e_offset, off=0; i<(e_offset+e_sni_len); i++) {
 			    int rc = sprintf(&flow->protos.tls_quic.encrypted_sni.esni[off], "%02X", packet->payload[i] & 0XFF);

@@ -24,6 +24,10 @@
 
 #include "ndpi_api.h"
 
+#define RADIUS_PORT 			1812
+#define RADIUS_PORT_ACC 		1813
+#define RADIUS_PORT_ACC_ALTERNATIVE 	18013
+
 
 struct radius_header {
   u_int8_t code;
@@ -37,7 +41,10 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if(packet->udp != NULL) {
+  if(packet->udp != NULL &&
+     (packet->udp->dest == htons(RADIUS_PORT) || packet->udp->source == htons(RADIUS_PORT) ||
+      packet->udp->dest == htons(RADIUS_PORT_ACC) || packet->udp->source == htons(RADIUS_PORT_ACC) ||
+      packet->udp->dest == htons(RADIUS_PORT_ACC_ALTERNATIVE) || packet->udp->source == htons(RADIUS_PORT_ACC_ALTERNATIVE))) {
     struct radius_header *h = (struct radius_header*)packet->payload;
     /* RFC2865: The minimum length is 20 and maximum length is 4096. */
     if((payload_len < 20) || (payload_len > 4096)) {

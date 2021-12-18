@@ -1022,6 +1022,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Skype_Teams", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GOOGLE,
+                          "Google", NDPI_PROTOCOL_CATEGORY_WEB,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYPE_CALL,
 			  "SkypeCall", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1426,6 +1430,18 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "GTP", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 2152, 2123, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GTP_C,
+			  "GTP_C", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GTP_U,
+			  "GTP_U", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GTP_PRIME,
+			  "GTP_PRIME", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WSD,
 			  "WSD", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -1458,7 +1474,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MESSENGER,
-			  "Messenger", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  "Messenger", NDPI_PROTOCOL_CATEGORY_CHAT,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LISP,
@@ -1749,6 +1765,14 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CASSANDRA,
 			  "Cassandra", NDPI_PROTOCOL_CATEGORY_DATABASE,
 			  ndpi_build_default_ports(ports_a, 9042, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FACEBOOK_VOIP,
+			  "FacebookVoip", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SIGNAL_VOIP,
+			  "SignalVoip", NDPI_PROTOCOL_CATEGORY_VOIP,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -2889,8 +2913,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 
 	  /* https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6 */
 	  if(((icmp6_type >= 5) && (icmp6_type <= 127))
-	     || (icmp6_type >= 156)
-	     || ((icmp6_code > 7) && (icmp6_type != 255)))
+	     || ((icmp6_code >= 156) && (icmp6_type != 255)))
 	    ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET);
 	}
       }
@@ -4955,7 +4978,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(flow->guessed_protocol_id == NDPI_PROTOCOL_STUN)
     goto check_stun_export;
   else if((flow->guessed_protocol_id == NDPI_PROTOCOL_HANGOUT_DUO) ||
-          (flow->guessed_protocol_id == NDPI_PROTOCOL_MESSENGER) ||
+          (flow->guessed_protocol_id == NDPI_PROTOCOL_FACEBOOK_VOIP) ||
+          (flow->guessed_protocol_id == NDPI_PROTOCOL_SIGNAL_VOIP) ||
           (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_CALL)) {
     *protocol_was_guessed = 1;
     ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
@@ -5039,7 +5063,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   if(ret.master_protocol == NDPI_PROTOCOL_STUN) {
     if(ret.app_protocol == NDPI_PROTOCOL_FACEBOOK)
-      ret.app_protocol = NDPI_PROTOCOL_MESSENGER;
+      ret.app_protocol = NDPI_PROTOCOL_FACEBOOK_VOIP;
     else if(ret.app_protocol == NDPI_PROTOCOL_GOOGLE) {
       /*
 	As Google has recently introduced Duo,
@@ -6913,6 +6937,11 @@ static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_
   case NDPI_PROTOCOL_WHATSAPP_FILES:
     if(new_proto == NDPI_PROTOCOL_WHATSAPP)
       return(1);
+    break;
+  case NDPI_PROTOCOL_FACEBOOK_VOIP:
+    if(new_proto == NDPI_PROTOCOL_FACEBOOK)
+      return(1);
+    break;
   }
 
   return(0);
@@ -7769,7 +7798,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       }
 
       if(num_bigram_checks
-	 && (num_dots > 0)
+	 /* We already checked num_dots > 0 */
 	 && ((num_found == 0) || ((num_digits > 5) && (num_words <= 3))
 	     || enough(num_found, num_impossible)
 	     || ((num_trigram_checked > 2)

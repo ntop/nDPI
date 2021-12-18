@@ -100,6 +100,11 @@ static bool ndpi_check_valid_cassandra_opcode(uint8_t opcode)
   return false;
 }
 
+static bool ndpi_check_valid_cassandra_flags(uint8_t flags)
+{
+  return (flags & 0xF0) == 0;
+}
+
 void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow)
 {
@@ -108,6 +113,7 @@ void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
   if (packet->tcp) {
     if (packet->payload_packet_len >= CASSANDRA_HEADER_LEN &&
         ndpi_check_valid_cassandra_version(get_u_int8_t(packet->payload, 0)) &&
+        ndpi_check_valid_cassandra_flags(get_u_int8_t(packet->payload, 1)) &&
         ndpi_check_valid_cassandra_opcode(get_u_int8_t(packet->payload, 4)) &&
         get_u_int32_t(packet->payload, 5) <= CASSANDRA_MAX_BODY_SIZE &&
         get_u_int32_t(packet->payload, 5) >= (uint32_t) (packet->payload_packet_len - CASSANDRA_HEADER_LEN)) {

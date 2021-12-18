@@ -153,6 +153,20 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
       ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
       return;
     }
+
+    if((memcmp(packet_payload, "REFER ", 6) == 0 || memcmp(packet_payload, "refer ", 6) == 0)
+       && (memcmp(&packet_payload[6], "SIP:", 4) == 0 || memcmp(&packet_payload[6], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip REFER\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    if((memcmp(packet_payload, "PRACK ", 6) == 0 || memcmp(packet_payload, "prack ", 6) == 0)
+       && (memcmp(&packet_payload[6], "SIP:", 4) == 0 || memcmp(&packet_payload[6], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip REFER\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
   }
 
   /* add bitmask for tcp only, some stupid udp programs

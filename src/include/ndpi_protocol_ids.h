@@ -295,6 +295,15 @@ typedef enum {
   NDPI_PROTOCOL_CASSANDRA             = 264, /* Lucas Santos <lfneiva.santos@gmail.com> */
   NDPI_PROTOCOL_AMAZON_AWS            = 265,
   NDPI_PROTOCOL_SALESFORCE            = 266,
+  NDPI_PROTOCOL_VIMEO                 = 267,
+  NDPI_PROTOCOL_FACEBOOK_VOIP         = 268,
+  NDPI_PROTOCOL_SIGNAL_VOIP           = 269,
+  NDPI_PROTOCOL_FUZE                  = 270,
+  NDPI_PROTOCOL_GTP_U                 = 271,
+  NDPI_PROTOCOL_GTP_C                 = 272,
+  NDPI_PROTOCOL_GTP_PRIME             = 273,
+  NDPI_PROTOCOL_ALIBABA               = 274,
+  NDPI_PROTOCOL_CRASHLYSTICS          = 275,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
