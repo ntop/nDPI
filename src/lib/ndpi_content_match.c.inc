@@ -1924,7 +1924,7 @@ static ndpi_network host_protocol_list[] = {
     https://torstatus.rueckgr.at/ip_list_all.php/Tor_ip_list_ALL.csv
     From 02.03.2021
 
-    Use utils/toripaddr2list.py to convert them
+    Use utils/ipaddr2list.py to convert them
   */
 
   { 0x021AF7B0 /* 2.26.247.176/32 */, 32, NDPI_PROTOCOL_TOR },

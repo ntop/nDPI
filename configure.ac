@@ -267,6 +267,15 @@ if test "${with_maxminddb+set}" = set; then :
   fi
 fi
 
+dnl> Curl
+dnl> AC_CHECK_LIB([curl], [curl_easy_perform])
+dnl> if test ${ac_cv_lib_curl_curl_easy_perform} = "no"; then
+dnl>    echo "Please install libcurl4-openssl-dev (http://curl.haxx.se/) in order to enable curl support"
+dnl> else
+dnl>   ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lcurl"
+dnl>   AC_DEFINE_UNQUOTED(HAVE_CURL, 1, [curl is present])
+dnl> fi
+
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/dga/Makefile rrdtool/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)

@@ -46,6 +46,7 @@
 #endif
 
 #include "ndpi_content_match.c.inc"
+#include "ndpi_azure_match.c.inc"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
 
@@ -1774,6 +1775,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "SignalVoip", NDPI_PROTOCOL_CATEGORY_VOIP,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MICROSOFT_AZURE,
+			  "Azure", NDPI_PROTOCOL_CATEGORY_CLOUD,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2352,9 +2357,12 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   }
 #endif
 
-  if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL)
+  if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list, prefs & ndpi_dont_load_tor_hosts);
-
+    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list,
+			 prefs & ndpi_dont_load_tor_hosts); /* Microsoft Azure */
+  }
+  
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
 
   NDPI_BITMASK_RESET(ndpi_str->detection_bitmask);
