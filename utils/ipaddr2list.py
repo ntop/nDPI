@@ -55,5 +55,6 @@ with open(sys.argv[1]) as fp:
             if(ipaddr != ""):
                 print(" { 0x"+socket.inet_aton(ipaddr).hex().upper()+" /* "+ipaddr+"/"+cidr+" */, "+cidr+", "+proto+" },")
 
-
+print(" /* End */")
+print(" { 0x0, 0, 0 }")
 print("};")
