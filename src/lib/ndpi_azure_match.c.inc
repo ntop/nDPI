@@ -39285,4 +39285,7 @@ static ndpi_network ndpi_protocol_microsoft_azure_protocol_list[] = {
  { 0xD5C7B460 /* 213.199.180.96/27 */, 27, NDPI_PROTOCOL_MICROSOFT_AZURE },
  { 0xD5C7B4C0 /* 213.199.180.192/27 */, 27, NDPI_PROTOCOL_MICROSOFT_AZURE },
  { 0xD5C7B700 /* 213.199.183.0/24 */, 24, NDPI_PROTOCOL_MICROSOFT_AZURE },
+
+ /* End */
+ { 0x0, 0, 0 }
 };
