@@ -4928,8 +4928,10 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
     /* Check cached communications */
     key1 = ndpi_bittorrent_hash_funct(saddr, sport), key2 = ndpi_bittorrent_hash_funct(daddr, dport);
 
-    found = ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)
-      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0 /* Don't remove it as it can be used for other connections */);
+    found =
+      ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, saddr+daddr, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)
+      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0     /* Don't remove it as it can be used for other connections */)
+      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */);
 
 #ifdef BITTORRENT_CACHE_DEBUG
     if(packet->udp)

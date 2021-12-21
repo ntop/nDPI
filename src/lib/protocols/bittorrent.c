@@ -141,6 +141,11 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT);
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key2, NDPI_PROTOCOL_BITTORRENT);
 
+    /* Now add hosts as twins */
+    ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache,
+			  packet->iph->saddr + packet->iph->daddr,
+			  NDPI_PROTOCOL_BITTORRENT);
+    
     /* Also add +2 ports of the sender in order to catch additional sockets open by the same client */
     for(i=0; i<2; i++) {
       if(packet->udp)
@@ -509,20 +514,6 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BITTORRENT) {
     /* check for tcp retransmission here */
-
-#ifdef EXCLUDE_BITTORRENT_QUICKLY
-    u_int16_t sport, dport;
-
-    if(packet->udp)
-      sport = packet->udp->source, dport = packet->udp->dest;
-    else
-      sport = packet->tcp->source, dport = packet->tcp->dest;
-
-    if(ndpi_search_into_bittorrent_cache(ndpi_struct, flow, packet->iph->saddr, sport, packet->iph->daddr, dport)) {     
-      ndpi_search_bittorrent_hash(ndpi_struct, flow, -1);
-      goto bittorrent_found;
-    }
-#endif
     
     if(packet->tcp != NULL) {
       ndpi_int_search_bittorrent_tcp(ndpi_struct, flow);
