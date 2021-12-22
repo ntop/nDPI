@@ -177,16 +177,16 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  if(user) {
 	    char *pwd;
 
-	    snprintf(flow->ftp_imap_pop_smtp.username,
-		     sizeof(flow->ftp_imap_pop_smtp.username),
+	    snprintf(flow->l4.tcp.ftp_imap_pop_smtp.username,
+		     sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username),
 		     "%s", user);
 
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
 
 	    pwd = strtok_r(NULL, " \"\r\n", &saveptr);
 	    if(pwd) {
-	      snprintf(flow->ftp_imap_pop_smtp.password,
-	               sizeof(flow->ftp_imap_pop_smtp.password),
+	      snprintf(flow->l4.tcp.ftp_imap_pop_smtp.password,
+		       sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password),
 	               "%s", pwd);
 	    }
 	  }
@@ -320,7 +320,7 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	 || (flow->l4.tcp.mail_imap_stage == 5)
 	 || (flow->l4.tcp.mail_imap_stage == 7)
         ) {
-	if((flow->ftp_imap_pop_smtp.username[0] != '\0')
+	if((flow->l4.tcp.ftp_imap_pop_smtp.username[0] != '\0')
 	   || (flow->l4.tcp.mail_imap_stage >= 7)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found MAIL_IMAP\n");
 	  ndpi_int_mail_imap_add_connection(ndpi_struct, flow);

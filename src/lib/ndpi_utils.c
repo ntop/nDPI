@@ -890,21 +890,24 @@ const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
 
 /* ********************************** */
 
-char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
+char* ndpi_ssl_version2str(char *buf, int buf_len,
                            u_int16_t version, u_int8_t *unknown_tls_version) {
 
   if(unknown_tls_version)
     *unknown_tls_version = 0;
 
+  if(buf == NULL || buf_len <= 1)
+    return NULL;
+
   switch(version) {
-  case 0x0300: return("SSLv3");
-  case 0x0301: return("TLSv1");
-  case 0x0302: return("TLSv1.1");
-  case 0x0303: return("TLSv1.2");
-  case 0x0304: return("TLSv1.3");
-  case 0XFB1A: return("TLSv1.3 (Fizz)"); /* https://engineering.fb.com/security/fizz/ */
-  case 0XFEFF: return("DTLSv1.0");
-  case 0XFEFD: return("DTLSv1.2");
+  case 0x0300: strncpy(buf, "SSLv3", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0x0301: strncpy(buf, "TLSv1", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0x0302: strncpy(buf, "TLSv1.1", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0x0303: strncpy(buf, "TLSv1.2", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0x0304: strncpy(buf, "TLSv1.3", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0XFB1A: strncpy(buf, "TLSv1.3 (Fizz)", buf_len); buf[buf_len - 1] = '\0'; return buf; /* https://engineering.fb.com/security/fizz/ */
+  case 0XFEFF: strncpy(buf, "DTLSv1.0", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0XFEFD: strncpy(buf, "DTLSv1.2", buf_len); buf[buf_len - 1] = '\0'; return buf;
   case 0x0A0A:
   case 0x1A1A:
   case 0x2A2A:
@@ -920,22 +923,21 @@ char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
   case 0xCACA:
   case 0xDADA:
   case 0xEAEA:
-  case 0xFAFA: return("GREASE");
+  case 0xFAFA: strncpy(buf, "GREASE", buf_len);  buf[buf_len - 1] = '\0'; return buf;
   }
 
-  if((version >= 0x7f00) && (version <= 0x7fff))
-    return("TLSv1.3 (draft)");
+  if((version >= 0x7f00) && (version <= 0x7fff)) {
+    strncpy(buf, "TLSv1.3 (draft)", buf_len);
+    buf[buf_len - 1] = '\0';
+    return buf;
+  }
 
   if(unknown_tls_version)
     *unknown_tls_version = 1;
 
-  if(flow != NULL) {
-    snprintf(flow->protos.tls_quic.ssl_version_str,
-	     sizeof(flow->protos.tls_quic.ssl_version_str), "TLS (%04X)", version);
+  snprintf(buf, buf_len, "TLS (%04X)", version);
 
-    return(flow->protos.tls_quic.ssl_version_str);
-  } else
-    return("");
+  return buf;
 }
 
 /* ***************************************************** */
@@ -1261,7 +1263,9 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
     if(flow->protos.tls_quic.ssl_version) {
       u_int8_t unknown_tls_version;
-      char *version = ndpi_ssl_version2str(flow, flow->protos.tls_quic.ssl_version, &unknown_tls_version);
+      char version[16];
+
+      ndpi_ssl_version2str(version, sizeof(version), flow->protos.tls_quic.ssl_version, &unknown_tls_version);
 
       if(!unknown_tls_version)
 	ndpi_serialize_string_string(serializer, "version", version);
@@ -1276,30 +1280,30 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_MAIL_IMAP:
     ndpi_serialize_start_of_block(serializer, "imap");
-    ndpi_serialize_string_string(serializer,  "user", flow->ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
 
   case NDPI_PROTOCOL_MAIL_POP:
     ndpi_serialize_start_of_block(serializer, "pop");
-    ndpi_serialize_string_string(serializer,  "user", flow->ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
 
   case NDPI_PROTOCOL_MAIL_SMTP:
     ndpi_serialize_start_of_block(serializer, "smtp");
-    ndpi_serialize_string_string(serializer,  "user", flow->ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
     ndpi_serialize_end_of_block(serializer);
     break;
 
   case NDPI_PROTOCOL_FTP_CONTROL:
     ndpi_serialize_start_of_block(serializer, "ftp");
-    ndpi_serialize_string_string(serializer,  "user", flow->ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->ftp_imap_pop_smtp.password);
-    ndpi_serialize_string_uint32(serializer,  "auth_failed", flow->ftp_imap_pop_smtp.auth_failed);
+    ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
+    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_uint32(serializer,  "auth_failed", flow->l4.tcp.ftp_imap_pop_smtp.auth_failed);
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -1319,7 +1323,9 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       struct tm a, b, *before = NULL, *after = NULL;
       u_int i, off;
       u_int8_t unknown_tls_version;
-      char *version = ndpi_ssl_version2str(flow, flow->protos.tls_quic.ssl_version, &unknown_tls_version);
+      char version[16];
+
+      ndpi_ssl_version2str(version, sizeof(version), flow->protos.tls_quic.ssl_version, &unknown_tls_version);
 
       if(flow->protos.tls_quic.notBefore)
         before = gmtime_r((const time_t *)&flow->protos.tls_quic.notBefore, &a);

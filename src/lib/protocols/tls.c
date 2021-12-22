@@ -2030,6 +2030,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t s_offset = offset+extension_offset;
 		u_int8_t version_len = packet->payload[s_offset];
 		char version_str[256];
+		char buf_ver_tmp[16];
 		size_t version_str_len = 0;
 		version_str[0] = 0;
 #ifdef DEBUG_TLS
@@ -2049,14 +2050,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 #ifdef DEBUG_TLS
 		    printf("Client TLS [TLS version: %s/0x%04X]\n",
-			   ndpi_ssl_version2str(flow, tls_version, &unknown_tls_version), tls_version);
+			   ndpi_ssl_version2str(buf_ver_tmp, sizeof(buf_ver_tmp), tls_version, &unknown_tls_version), tls_version);
 #endif
 
 		    if((version_str_len+8) < sizeof(version_str)) {
 		      int rc = snprintf(&version_str[version_str_len],
 					sizeof(version_str) - version_str_len, "%s%s",
 					(version_str_len > 0) ? "," : "",
-					ndpi_ssl_version2str(flow, tls_version, &unknown_tls_version));
+					ndpi_ssl_version2str(buf_ver_tmp, sizeof(buf_ver_tmp), tls_version, &unknown_tls_version));
 		      if(rc <= 0)
 			break;
 		      else

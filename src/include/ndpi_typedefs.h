@@ -489,7 +489,7 @@ struct ndpi_vxlanhdr {
 
 typedef struct message {
   u_int8_t *buffer;
-  u_int buffer_len, buffer_used, max_expected;
+  u_int buffer_len, buffer_used;
   u_int32_t next_seq[2]; /* Directions */
 } message_t;
 
@@ -557,12 +557,6 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_ts;
 
-  /* NDPI_PROTOCOL_THUNDER */
-  u_int32_t thunder_ts;
-
-  /* NDPI_PROTOCOL_ZATTOO */
-  u_int32_t zattoo_ts;
-
   /* NDPI_PROTOCOL_JABBER */
   u_int32_t jabber_stun_or_ft_ts;
 
@@ -593,6 +587,17 @@ struct ndpi_id_struct {
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
+
+  /* NDPI_PROTOCOL_MAIL_SMTP */
+  /* NDPI_PROTOCOL_MAIL_POP */
+  /* NDPI_PROTOCOL_MAIL_IMAP */
+  /* NDPI_PROTOCOL_MAIL_FTP */
+  /* TODO: something clever to save memory */
+  struct {
+    u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
+    char username[32], password[16];
+  } ftp_imap_pop_smtp;
+
   /* NDPI_PROTOCOL_MAIL_SMTP */
   u_int16_t smtp_command_bitmask;
 
@@ -604,7 +609,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_stage;
-  u_int8_t irc_port;
 
   /* NDPI_PROTOCOL_H323 */
   u_int8_t h323_valid_packets;
@@ -1078,11 +1082,7 @@ struct ndpi_detection_module_struct {
   u_int32_t irc_timeout;
   /* gnutella parameters */
   u_int32_t gnutella_timeout;
-  /* thunder parameters */
-  u_int32_t thunder_timeout;
   /* rstp */
-  u_int32_t orb_rstp_ts_timeout;
-  u_int32_t zattoo_connection_timeout;
   u_int32_t jabber_stun_timeout;
   u_int32_t jabber_file_transfer_timeout;
   u_int8_t ip_version_limit;
@@ -1219,12 +1219,11 @@ struct ndpi_flow_struct {
   */
   struct {
     ndpi_http_method method;
-    char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent;
-    u_int8_t num_request_headers, num_response_headers;
     u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     u_int16_t response_status_code; /* 200, 404, etc. */
-    u_char detected_os[32]; /* Via HTTP/QUIC User-Agent */
-    u_char nat_ip[24]; /* Via HTTP X-Forwarded-For */
+    char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent;
+    char *detected_os; /* Via HTTP/QUIC User-Agent */
+    char *nat_ip; /* Via HTTP X-Forwarded-For */
   } http;
 
   /*
@@ -1241,16 +1240,6 @@ struct ndpi_flow_struct {
     u_int8_t num_udp_pkts, num_binding_requests;
     u_int16_t num_processed_pkts;
   } stun;
-
-  /* TODO: something clever to save memory */
-  struct {
-    u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
-    char username[32], password[16];
-  } ftp_imap_pop_smtp;
-  
-  struct {
-    u_int8_t bt_check_performed;
-  } bittorrent;
 
   union {
     /* the only fields useful for nDPI and ntopng */
@@ -1270,8 +1259,6 @@ struct ndpi_flow_struct {
     } kerberos;
 
     struct {
-      char ssl_version_str[12];
-      u_int16_t ssl_version, server_names_len;
       char *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       u_int32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];
@@ -1286,6 +1273,8 @@ struct ndpi_flow_struct {
 #endif
 
       struct tls_heuristics browser_heuristics;
+
+      u_int16_t ssl_version, server_names_len;
 
       struct {
         u_int16_t cipher_suite;
@@ -1311,6 +1300,9 @@ struct ndpi_flow_struct {
       char version[32];
     } ubntac2;
 
+    /* In TLS.Bittorent flows there is no hash.
+       Nonetheless, we must pay attention to NOT write to /read from this field
+       with these flows */
     struct {
       /* Bittorrent hash */
       u_char hash[20];
@@ -1337,6 +1329,7 @@ struct ndpi_flow_struct {
   u_int16_t byte_counter[2];
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255
+  u_int8_t bt_check_performed : 1;
 
   /* NDPI_PROTOCOL_DIRECTCONNECT */
   u_int8_t directconnect_stage:2;	      // 0 - 1

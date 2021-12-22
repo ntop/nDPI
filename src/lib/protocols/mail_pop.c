@@ -77,8 +77,8 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
 	       && (packet->payload[1] == 'S' || packet->payload[1] == 's')
 	       && (packet->payload[2] == 'E' || packet->payload[2] == 'e')
 	       && (packet->payload[3] == 'R' || packet->payload[3] == 'r')) {
-      ndpi_user_pwd_payload_copy((u_int8_t*)flow->ftp_imap_pop_smtp.username,
-				 sizeof(flow->ftp_imap_pop_smtp.username), 5,
+      ndpi_user_pwd_payload_copy((u_int8_t*)flow->l4.tcp.ftp_imap_pop_smtp.username,
+				 sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username), 5,
 				 packet->payload, packet->payload_packet_len);
 
       ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
@@ -88,8 +88,8 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
 	      && (packet->payload[1] == 'A' || packet->payload[1] == 'a')
 	      && (packet->payload[2] == 'S' || packet->payload[2] == 's')
 	      && (packet->payload[3] == 'S' || packet->payload[3] == 's')) {
-      ndpi_user_pwd_payload_copy((u_int8_t*)flow->ftp_imap_pop_smtp.password,
-				 sizeof(flow->ftp_imap_pop_smtp.password), 5,
+      ndpi_user_pwd_payload_copy((u_int8_t*)flow->l4.tcp.ftp_imap_pop_smtp.password,
+				 sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password), 5,
 				 packet->payload, packet->payload_packet_len);
 
       ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
@@ -182,7 +182,7 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
       if(flow->l4.tcp.mail_pop_stage > 0) {
 	NDPI_LOG_INFO(ndpi_struct, "mail_pop identified\n");
 	
-	if((flow->ftp_imap_pop_smtp.password[0] != '\0')
+	if((flow->l4.tcp.ftp_imap_pop_smtp.password[0] != '\0')
 	   || (flow->l4.tcp.mail_pop_stage > 3)) {
 	  ndpi_int_mail_pop_add_connection(ndpi_struct, flow);
 	  popInitExtraPacketProcessing(flow);
@@ -222,7 +222,7 @@ int ndpi_extra_search_mail_pop_tcp(struct ndpi_detection_module_struct *ndpi_str
   
   ndpi_search_mail_pop_tcp(ndpi_struct, flow);
 
-  rc = (flow->ftp_imap_pop_smtp.password[0] == '\0') ? 1 : 0;
+  rc = (flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') ? 1 : 0;
   
 #ifdef POP_DEBUG
   printf("**** %s() [rc: %d]\n", __FUNCTION__, rc);

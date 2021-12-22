@@ -370,8 +370,9 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
   /* Good reference for future implementations:
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
-  snprintf((char*)flow->http.detected_os,
-	   sizeof(flow->http.detected_os), "%s", ua);
+  if(flow->http.detected_os == NULL) {
+    flow->http.detected_os = ndpi_strdup(ua);
+  }
 }
 
 /* ************************************************************* */
@@ -606,9 +607,14 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     if(strlen(flow->host_server_name) > 0) ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
 
     if(packet->forwarded_line.ptr) {
-      len = ndpi_min(packet->forwarded_line.len, sizeof(flow->http.nat_ip)-1);
-      strncpy((char*)flow->http.nat_ip, (char*)packet->forwarded_line.ptr, len);
-      flow->http.nat_ip[len] = '\0';
+      if(flow->http.nat_ip == NULL) {
+        len = packet->forwarded_line.len;
+        flow->http.nat_ip = ndpi_malloc(len + 1);
+        if(flow->http.nat_ip == NULL) {
+          strncpy(flow->http.nat_ip, (char*)packet->forwarded_line.ptr, len);
+          flow->http.nat_ip[len] = '\0';
+        }
+      }
     }
 
     ndpi_http_parse_subprotocol(ndpi_struct, flow);
@@ -1074,9 +1080,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       else
 	flow->http.request_version = 0;
 
-      /* Set the first found headers in request */
-      flow->http.num_request_headers = packet->http_num_headers;
-
       /* Check for Ookla */
       if((packet->referer_line.len > 0)
 	 && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
@@ -1155,9 +1158,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       ndpi_parse_packet_line_info(ndpi_struct, flow);
 
-      // Add more found HTTP request headers.
-      flow->http.num_request_headers+=packet->http_num_headers;
-
       if(packet->parsed_lines <= 1) {
         /* wait some packets in case request is split over more than 2 packets */
         if(flow->packet_counter < 5) {
@@ -1212,9 +1212,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     /* Parse packet line and we look for the subprotocols */
     ndpi_parse_packet_line_info(ndpi_struct, flow);
     check_content_type_and_change_protocol(ndpi_struct, flow);
-
-    if(packet->packet_direction == 1 /* server -> client */)
-      flow->http.num_response_headers += packet->http_num_headers; /* flow structs are initialized with zeros */
 
     if(packet->empty_line_position_set != 0 || flow->l4.tcp.http_empty_line_seen == 1) {
       NDPI_LOG_DBG2(ndpi_struct, "empty line. check_http_payload\n");

@@ -975,7 +975,7 @@ extern "C" {
   /* Return a flow info string (summarized). Does only work for DNS/HTTP/TLS/QUIC. */
   const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
                                  ndpi_protocol const * const l7_protocol);
-  char* ndpi_ssl_version2str(struct ndpi_flow_struct *flow,
+  char* ndpi_ssl_version2str(char *buf, int buf_len,
                              u_int16_t version, u_int8_t *unknown_tls_version);
   int ndpi_netbios_name_interpret(u_char *in, u_int in_len, u_char *out, u_int out_len);
   void ndpi_patchIPv6Address(char *str);

@@ -917,11 +917,12 @@ static void ndpi_process_packet(uint8_t * const args,
 	      flow_to_process->ndpi_flow->protos.tls_quic.hello_processed != 0)
             {
 	      uint8_t unknown_tls_version = 0;
+	      char buf_ver[16];
 	      printf("[%8llu, %d, %4d][TLS-CLIENT-HELLO] version: %s | sni: %s | alpn: %s\n",
 		     workflow->packets_captured,
 		     reader_thread->array_index,
 		     flow_to_process->flow_id,
-		     ndpi_ssl_version2str(flow_to_process->ndpi_flow,
+		     ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
 					  flow_to_process->ndpi_flow->protos.tls_quic.ssl_version,
 					  &unknown_tls_version),
 		     flow_to_process->ndpi_flow->host_server_name,
@@ -933,12 +934,13 @@ static void ndpi_process_packet(uint8_t * const args,
 	      flow_to_process->ndpi_flow->l4.tcp.tls.certificate_processed != 0)
             {
 	      uint8_t unknown_tls_version = 0;
+	      char buf_ver[16];
 	      printf("[%8llu, %d, %4d][TLS-SERVER-HELLO] version: %s | common-name(s): %.*s | "
 		     "issuer: %s | subject: %s\n",
 		     workflow->packets_captured,
 		     reader_thread->array_index,
 		     flow_to_process->flow_id,
-		     ndpi_ssl_version2str(flow_to_process->ndpi_flow,
+		     ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
 					  flow_to_process->ndpi_flow->protos.tls_quic.ssl_version,
 					  &unknown_tls_version),
 		     (flow_to_process->ndpi_flow->protos.tls_quic.server_names_len == 0 ?

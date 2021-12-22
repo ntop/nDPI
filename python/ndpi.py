@@ -452,12 +452,6 @@ struct ndpi_id_struct {
   /* NDPI_PROTOCOL_GNUTELLA */
   uint32_t gnutella_ts;
 
-  /* NDPI_PROTOCOL_THUNDER */
-  uint32_t thunder_ts;
-
-  /* NDPI_PROTOCOL_ZATTOO */
-  uint32_t zattoo_ts;
-
   /* NDPI_PROTOCOL_UNENCRYPTED_JABBER */
   uint32_t jabber_stun_or_ft_ts;
 
@@ -497,7 +491,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_IRC */
   uint8_t irc_stage;
-  uint8_t irc_port;
 
   /* NDPI_PROTOCOL_H323 */
   uint8_t h323_valid_packets;
@@ -912,11 +905,7 @@ struct ndpi_detection_module_struct {
   uint32_t irc_timeout;
   /* gnutella parameters */
   uint32_t gnutella_timeout;
-  /* thunder parameters */
-  uint32_t thunder_timeout;
   /* rstp */
-  uint32_t orb_rstp_ts_timeout;
-  uint32_t zattoo_connection_timeout;
   uint32_t jabber_stun_timeout;
   uint32_t jabber_file_transfer_timeout;
   uint8_t ip_version_limit;
@@ -1001,12 +990,11 @@ struct ndpi_flow_struct {
   */
   struct {
     ndpi_http_method method;
-    char *url, *content_type, *user_agent;
-    uint8_t num_request_headers, num_response_headers;
     uint8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
     uint16_t response_status_code; /* 200, 404, etc. */
-    uint8_t detected_os[32]; /* Via HTTP/QUIC User-Agent */
-    uint8_t nat_ip[24];
+    char *url, *content_type, *user_agent;
+    char *detected_os; /* Via HTTP/QUIC User-Agent */
+    char *nat_ip; /* Via HTTP X-Forwarded-For */
 
   } http;
 
@@ -1049,8 +1037,6 @@ struct ndpi_flow_struct {
     } kerberos;
 
     struct {
-      char ssl_version_str[12];
-      uint16_t ssl_version, server_names_len;
       char *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       uint32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];
@@ -1062,6 +1048,7 @@ struct ndpi_flow_struct {
         char *esni;
       } encrypted_sni;
       ndpi_cipher_weakness server_unsafe_cipher;
+      uint16_t ssl_version, server_names_len;
     } tls_quic;
 
     struct {
