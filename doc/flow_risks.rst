@@ -241,3 +241,9 @@ NDPI_INVALID_CHARACTERS
 The risk is set whenever a dissected protocol contains characters not allowed in that protocol field.
 For example a DNS hostname must only contain a subset of all printable characters or else this risk is set.
 Additionally, some TLS protocol fields are checked for printable characters as well.
+
+.. _Risk 040:
+
+NDPI_POSSIBLE_EXPLOIT
+=====================
+The risk is set whenever a a possible exploit (e.g. Log4J/Log4Shell) is detected.

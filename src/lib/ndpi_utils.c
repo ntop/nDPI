@@ -1833,6 +1833,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_INVALID_CHARACTERS:
     return("Text contains non-printable characters");
 
+  case NDPI_POSSIBLE_EXPLOIT:
+    return("Possible exploit detected");
+    break;
+    
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2168,6 +2172,15 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
   // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
   flow->risk |= v;
   ndpi_handle_risk_exceptions(ndpi_str, flow);
+}
+
+/* ******************************************************************** */
+
+int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
+		     struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
+  ndpi_risk v = 1ull << r;
+
+  return(((flow->risk & v) == v) ?  1 : 0);
 }
 
 /* ******************************************************************** */
