@@ -6534,6 +6534,16 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
       }
     }
 
+    if((flow != NULL)
+       && ndpi_search_into_bittorrent_cache(ndpi_str, flow,
+					    flow->saddr, flow->sport,
+					    flow->daddr, flow->dport)) {
+      /* This looks like BitTorrent */
+      ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
+      ret.category = ndpi_get_proto_category(ndpi_str, ret);
+      return(ret);
+    }
+
   check_guessed_skype:
     addr.s_addr = htonl(shost);
     if(ndpi_network_ptree_match(ndpi_str, &addr) == NDPI_PROTOCOL_SKYPE_TEAMS) {
