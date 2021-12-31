@@ -204,13 +204,13 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
   //Filtering by port. 
   //This check is NOT a 100% thing - these ports are mentioned in the documentation but the documentation also states they haven't been approved by IANA yet, and that the user is free to use different ports.
   //This is is PURELY for demo purposes and the rest of the check must be filled in later on!
-  if (packet->l4_protocol == IPPROTO_UDP){
+  if (flow->l4_proto == IPPROTO_UDP){
     if ((packet->udp->dest == ntohs(PORT_DEFAULT_CLIENT)) || (packet->udp->dest == ntohs(PORT_DEFAULT_SERVER)) || (packet->udp->dest == ntohs(PORT_DEFAULT_SD))) {
       ndpi_int_someip_add_connection(ndpi_struct, flow);
       return;
     }
   }
-  if (packet->l4_protocol == IPPROTO_TCP){
+  if (flow->l4_proto == IPPROTO_TCP){
     if ((packet->tcp->dest == ntohs(PORT_DEFAULT_CLIENT)) || (packet->tcp->dest == ntohs(PORT_DEFAULT_SERVER))) {
       ndpi_int_someip_add_connection(ndpi_struct, flow);
       return;

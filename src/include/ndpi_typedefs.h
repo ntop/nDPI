@@ -494,15 +494,6 @@ typedef struct message {
   u_int32_t next_seq[2]; /* Directions */
 } message_t;
 
-/* NDPI_PROTOCOL_BITTORRENT */
-typedef struct spinlock {
-  volatile int    val;
-} spinlock_t;
-
-typedef struct atomic {
-  volatile int counter;
-} atomic_t;
-
 /* NDPI_PROTOCOL_TINC */
 #define TINC_CACHE_MAX_SIZE 10
 
@@ -826,14 +817,10 @@ struct ndpi_packet_struct {
   u_int8_t http_num_headers; /* number of found (valid) header lines in HTTP request or response */
 
   u_int16_t l3_packet_len;
-  u_int16_t l4_packet_len;
   u_int16_t payload_packet_len;
-  u_int16_t actual_payload_len;
-  u_int16_t num_retried_bytes;
   u_int16_t parsed_lines;
   u_int16_t empty_line_position;
   u_int8_t tcp_retransmission;
-  u_int8_t l4_protocol;
 
   u_int8_t packet_lines_parsed_complete:1,
     packet_direction:1, empty_line_position_set:1, http_check_content:1, pad:4;
