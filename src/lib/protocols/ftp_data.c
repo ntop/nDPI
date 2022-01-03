@@ -1,7 +1,7 @@
 /*
  * ftp_data.c
  *
- * Copyright (C) 2016-21 - ntop.org
+ * Copyright (C) 2016-22 - ntop.org
  * 
  * The signature is based on the Libprotoident library.
  *

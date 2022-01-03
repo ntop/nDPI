@@ -1,7 +1,7 @@
 /*
  * ndpi_analyze.c
  *
- * Copyright (C) 2019-21 - ntop.org
+ * Copyright (C) 2019-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library.
