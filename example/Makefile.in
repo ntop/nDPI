@@ -57,7 +57,7 @@ install: ndpiReader$(SUFFIX)
 	[ -f ndpiReader.dpdk ] && cp ndpiReader.dpdk $(DESTDIR)$(PREFIX)/bin/ || true
 
 dpdk:
-	make -f Makefile.dpdk
+	$(MAKE) -f Makefile.dpdk
 
 check:
 	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include *.c

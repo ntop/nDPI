@@ -6,7 +6,7 @@ ndpi:
 	mkdir -p ./debian/ndpi-tmp ./debian/ndpi-dev-tmp
 	mkdir -p  ./debian/ndpi-tmp/usr/lib ./debian/ndpi-tmp/usr/bin 
 	mkdir -p ./debian/ndpi-dev-tmp/usr/lib ./debian/ndpi-dev-tmp/usr/include/ndpi ./debian/ndpi-dev-tmp/usr/lib/pkgconfig
-	cd ${NDPI_HOME}; ./autogen.sh; ./configure; make
+	cd ${NDPI_HOME}; ./autogen.sh; ./configure; $(MAKE)
 	cp $(NDPI_HOME)/src/lib/libndpi.so.@NDPI_VERS@ ./debian/ndpi-tmp/usr/lib/
 	cd ./debian/ndpi-tmp/usr/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so; cd -
 	cd ./debian/ndpi-tmp/usr/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so.@MAJOR_RELEASE@; cd -
@@ -33,11 +33,11 @@ ndpi:
 	@echo "-------------------------------"
 
 distclean:
-	-cd ${NDPI_HOME} && make distclean
+	-cd ${NDPI_HOME} && $(MAKE) distclean
 
 install:
-	cd ${NDPI_HOME}; make install DESTDIR="${NDPI_BUILD}/debian/tmp" AM_UPDATE_INFO_DIR=no
+	cd ${NDPI_HOME}; $(MAKE) install DESTDIR="${NDPI_BUILD}/debian/tmp" AM_UPDATE_INFO_DIR=no
 
 clean:
-	-cd ${NDPI_HOME} && make clean
+	-cd ${NDPI_HOME} && $(MAKE) clean
 	-rm -rf *~ *deb ./usr ./debian/ndpi ./debian/ndpi-dev ./debian/ndpi ./debian/ndpi-dev
