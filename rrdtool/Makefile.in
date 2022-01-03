@@ -1,4 +1,4 @@
-
+CC=@CC@
 INC=-I ../src/include
 LIBDPI=../src/lib/libndpi.a
 LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@ @LDFLAGS@
