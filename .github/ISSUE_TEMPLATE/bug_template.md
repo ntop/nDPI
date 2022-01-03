@@ -1,5 +1,5 @@
 ---
-name: Bug Report
+name: "🐞 Report a Bug"
 about: Create a report to help us improve nDPI
 title: ''
 labels: 'bug'
