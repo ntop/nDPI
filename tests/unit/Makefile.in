@@ -6,7 +6,8 @@ SRCHOME=../../src
 
 CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @JSONC_CFLAGS@ @PCAP_INC@ @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
-LDFLAGS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ -lpthread @LDFLAGS@
+LIBS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ -lpthread
+LDFLAGS=@LDFLAGS@
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=unit
 PREFIX?=@prefix@
@@ -23,10 +24,10 @@ EXECUTABLE_SOURCES := unit.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 
 unit: $(LIBNDPI) unit.o
-	$(CC) $(CFLAGS) unit.o -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) unit.o $(LIBS) -o $@
 
 %.o: %.c $(HEADERS) Makefile
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
 	/bin/rm -f *.o unit

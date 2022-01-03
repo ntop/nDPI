@@ -164,7 +164,7 @@ case "$host" in
         ;;
       esac
       CFLAGS="${CFLAGS}"
-      LDFLAGS="${LDFLAGS} -lws2_32"
+      LIBS="${LIBS} -lws2_32"
       BUILD_MINGW=1
       ;;
    *)
