@@ -633,7 +633,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       if(flow->http.nat_ip == NULL) {
         len = packet->forwarded_line.len;
         flow->http.nat_ip = ndpi_malloc(len + 1);
-        if(flow->http.nat_ip == NULL) {
+        if(flow->http.nat_ip != NULL) {
           strncpy(flow->http.nat_ip, (char*)packet->forwarded_line.ptr, len);
           flow->http.nat_ip[len] = '\0';
         }
