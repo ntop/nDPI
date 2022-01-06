@@ -4919,16 +4919,29 @@ u_int32_t ndpi_bittorrent_hash_funct(u_int32_t ip, u_int16_t port) {
 
 /* ********************************************************************************* */
 
+/* #define BITTORRENT_CACHE_DEBUG */
+
 int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow,
 				      /* Parameters below need to be in network byte order */
 				      u_int32_t saddr, u_int16_t sport, u_int32_t daddr, u_int16_t dport) {
-  if((!flow->bt_check_performed /* Do the check once */) && ndpi_struct->bittorrent_cache) {
+
+#ifdef BITTORRENT_CACHE_DEBUG
+  printf("[%s:%u] ndpi_search_into_bittorrent_cache(%08X, %u, %08X, %u) [bt_check_performed=%d]\n",
+	 __FILE__, __LINE__, saddr, sport, daddr, dport,
+	 flow ? flow->bt_check_performed : -1);
+#endif
+
+  if(flow && flow->bt_check_performed /* Do the check once */)
+    return(0);
+  
+  if(ndpi_struct->bittorrent_cache) {
     u_int16_t cached_proto;
     u_int8_t found = 0;
     u_int32_t key1, key2;
 
-    flow->bt_check_performed = 1;
+    if(flow)
+      flow->bt_check_performed = 1;
       
     /* Check cached communications */
     key1 = ndpi_bittorrent_hash_funct(saddr, sport), key2 = ndpi_bittorrent_hash_funct(daddr, dport);
@@ -4939,12 +4952,12 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
       || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */);
 
 #ifdef BITTORRENT_CACHE_DEBUG
-    if(packet->udp)
+    if(ndpi_struct->packet.udp)
       printf("[BitTorrent] *** [UDP] SEARCHING ports %u / %u [%u][%u][found: %u][packet_counter: %u]\n",
-	     ntohs(sport), ntohs(dport), key1, key2, found, flow->packet_counter);
+	     ntohs(sport), ntohs(dport), key1, key2, found, flow ? flow->packet_counter : 0);
     else
       printf("[BitTorrent] *** [TCP] SEARCHING ports %u / %u [%u][%u][found: %u][packet_counter: %u]\n",
-	     ntohs(sport), ntohs(dport), key1, key2, found, flow->packet_counter);
+	     ntohs(sport), ntohs(dport), key1, key2, found, flow ? flow->packet_counter : 0);
 #endif
 
     return(found);
@@ -6498,6 +6511,11 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
   ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
   u_int8_t user_defined_proto;
 
+#ifdef BITTORRENT_CACHE_DEBUG
+  printf("[%s:%u] ndpi_guess_undetected_protocol(%08X, %u, %08X, %u) [flow: %p]\n",
+	 __FILE__, __LINE__, shost, sport, dhost, dport, flow);
+#endif
+
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
     rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, proto, shost, dhost, sport, dport);
 
@@ -6512,6 +6530,10 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 	if(ret.app_protocol == ret.master_protocol)
 	  ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
 
+#ifdef BITTORRENT_CACHE_DEBUG
+	printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
+#endif
+	
 	ret.category = ndpi_get_proto_category(ndpi_str, ret);
 	return(ret);
       }
@@ -6528,19 +6550,27 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 	if(rc == NDPI_PROTOCOL_TLS)
 	  goto check_guessed_skype;
 	else {
+#ifdef BITTORRENT_CACHE_DEBUG
+	  printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
+#endif
+	  
 	  ret.category = ndpi_get_proto_category(ndpi_str, ret);
 	  return(ret);
 	}
       }
     }
 
-    if((flow != NULL)
-       && ndpi_search_into_bittorrent_cache(ndpi_str, flow,
-					    flow->saddr, flow->sport,
-					    flow->daddr, flow->dport)) {
+    if(ndpi_search_into_bittorrent_cache(ndpi_str, NULL /* flow */,
+					 htonl(shost), htons(sport),
+					 htonl(dhost), htons(dport))) {
       /* This looks like BitTorrent */
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
       ret.category = ndpi_get_proto_category(ndpi_str, ret);
+
+#ifdef BITTORRENT_CACHE_DEBUG
+      printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
+#endif
+      
       return(ret);
     }
 
@@ -6557,6 +6587,11 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
     ret.app_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
 
   ret.category = ndpi_get_proto_category(ndpi_str, ret);
+
+#ifdef BITTORRENT_CACHE_DEBUG
+  printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
+#endif
+  
   return(ret);
 }
 
