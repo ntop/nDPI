@@ -47,7 +47,7 @@ void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
       return;
   }
 
-  switch (packet->l4_protocol) {
+  switch (flow->l4_proto) {
   case NDPI_IPSEC_PROTOCOL_ESP:
   case NDPI_IPSEC_PROTOCOL_AH:
     set_protocol_and_bmask(NDPI_PROTOCOL_IP_IPSEC);

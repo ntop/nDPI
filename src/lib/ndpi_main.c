@@ -4377,7 +4377,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   const struct ndpi_iphdr *decaps_iph = NULL;
   u_int16_t l3len;
-  u_int16_t l4len;
+  u_int16_t l4len, l4_packet_len;
   const u_int8_t *l4ptr;
   u_int8_t l4protocol;
   u_int8_t l4_result;
@@ -4396,7 +4396,6 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
   /* reset payload_packet_len, will be set if ipv4 tcp or udp */
   packet->payload = NULL;
   packet->payload_packet_len = 0;
-  packet->l4_packet_len = 0;
   packet->l3_packet_len = packetlen;
 
   packet->tcp = NULL, packet->udp = NULL;
@@ -4441,17 +4440,15 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
     return(1);
   }
 
-  packet->l4_protocol = l4protocol;
-  packet->l4_packet_len = l4len;
+  l4_packet_len = l4len;
   flow->l4_proto = l4protocol;
 
   /* TCP / UDP detection */
-  if(l4protocol == IPPROTO_TCP && packet->l4_packet_len >= 20 /* min size of tcp */) {
+  if(l4protocol == IPPROTO_TCP && l4_packet_len >= 20 /* min size of tcp */) {
     /* tcp */
     packet->tcp = (struct ndpi_tcphdr *) l4ptr;
-    if(packet->l4_packet_len >= packet->tcp->doff * 4) {
-      packet->payload_packet_len = packet->l4_packet_len - packet->tcp->doff * 4;
-      packet->actual_payload_len = packet->payload_packet_len;
+    if(l4_packet_len >= packet->tcp->doff * 4) {
+      packet->payload_packet_len = l4_packet_len - packet->tcp->doff * 4;
       packet->payload = ((u_int8_t *) packet->tcp) + (packet->tcp->doff * 4);
 
       /* check for new tcp syn packets, here
@@ -4493,14 +4490,14 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
       /* tcp header not complete */
       packet->tcp = NULL;
     }
-  } else if(l4protocol == IPPROTO_UDP && packet->l4_packet_len >= 8 /* size of udp */) {
+  } else if(l4protocol == IPPROTO_UDP && l4_packet_len >= 8 /* size of udp */) {
     packet->udp = (struct ndpi_udphdr *) l4ptr;
-    packet->payload_packet_len = packet->l4_packet_len - 8;
+    packet->payload_packet_len = l4_packet_len - 8;
     packet->payload = ((u_int8_t *) packet->udp) + 8;
-  } else if((l4protocol == IPPROTO_ICMP && packet->l4_packet_len >= sizeof(struct ndpi_icmphdr))
-	    || (l4protocol == IPPROTO_ICMPV6 && packet->l4_packet_len >= sizeof(struct ndpi_icmp6hdr))) {
+  } else if((l4protocol == IPPROTO_ICMP && l4_packet_len >= sizeof(struct ndpi_icmphdr))
+	    || (l4protocol == IPPROTO_ICMPV6 && l4_packet_len >= sizeof(struct ndpi_icmp6hdr))) {
     packet->payload = ((u_int8_t *) l4ptr);
-    packet->payload_packet_len = packet->l4_packet_len;
+    packet->payload_packet_len = l4_packet_len;
   } else {
     packet->generic_l4_ptr = l4ptr;
   }
@@ -4550,8 +4547,6 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     if(tcph != NULL) {
-      /* reset retried bytes here before setting it */
-      packet->num_retried_bytes = 0;
 
       flow->sport = tcph->source, flow->dport = tcph->dest; /* (*#*) */
       
@@ -4601,23 +4596,11 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	  /* CHECK IF PARTIAL RETRY IS HAPPENING */
 	  if((flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq) <
 	      packet->payload_packet_len)) {
-	    /* num_retried_bytes actual_payload_len hold info about the partial retry
-	       analyzer which require this info can make use of this info
-	       Other analyzer can use packet->payload_packet_len */
-	    packet->num_retried_bytes =
-	      (u_int16_t)(flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq));
-	    packet->actual_payload_len = packet->payload_packet_len - packet->num_retried_bytes;
-
 	    if(flow->num_processed_pkts > 1) /* See also (***) above */
 	      flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
 	  }
 	}
-
-	/* normal path
-	   actual_payload_len is initialized to payload_packet_len during tcp header parsing itself.
-	   It will be changed only in case of retransmission */
 	else {
-	  packet->num_retried_bytes = 0;
 	  flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
 	}
       }
