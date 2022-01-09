@@ -919,6 +919,14 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_search_tls_tcp_memory(ndpi_struct, flow);
 
+  /* Valid TLS Content Types:
+     https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
+  if(!(flow->l4.tcp.tls.message.buffer[0] >= 20 &&
+       flow->l4.tcp.tls.message.buffer[0] <= 26)) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    something_went_wrong = 1;
+  }
+
   while(!something_went_wrong) {
     u_int16_t len, p_len;
     const u_int8_t *p;
