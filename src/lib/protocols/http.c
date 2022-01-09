@@ -421,25 +421,35 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow,
 				  char *ua) {
-  int log4j_exploit = -1;
+  u_int len;
   
-  if((!ua) || (ua[0] == '\0')) return;
+  if((!ua) || (ua[0] == '\0'))
+    return;
+  else
+    len = strlen(ua);   
 
-  if((strlen(ua) < 4)
-     || (!strncmp(ua, "test", 4))
-     || (!strncmp(ua, "<?", 2))
-     || strchr(ua, '{')
-     || strchr(ua, '}')
-     || (!(log4j_exploit = strncmp(ua, "jndi:ldap://", 12))) /* Log4J */
-     // || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
-     // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
-     ) {
+  if(
+     (!strncmp(ua, "<?", 2))
+	  || strchr(ua, '$')
+	  || strstr(ua, "://") // || (!strncmp(ua, "jndi:ldap://", 12)) /* Log4J */
+	  // || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
+	  // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
+	  ) {
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
-
-    if(log4j_exploit == 0) /* Log4J exploit */
-      ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+    
+    ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+  } else if(
+	    (len < 4)      /* Too short */
+	    || (len > 256) /* Too long  */
+	    || (!strncmp(ua, "test", 4))
+	    || strchr(ua, '{')
+	    || strchr(ua, '}')
+	    ) {
+    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
   }
 }
+
+/* ************************************************************* */
 
 int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,

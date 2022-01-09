@@ -225,7 +225,7 @@ typedef struct ndpi_flow_info {
   } ssh_tls;
 
   struct {
-    char url[256], request_content_type[64], content_type[64], user_agent[128];
+    char url[256], request_content_type[64], content_type[64], user_agent[256];
     u_int response_status_code;
   } http;
 
