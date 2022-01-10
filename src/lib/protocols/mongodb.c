@@ -26,6 +26,8 @@
 
 #include "ndpi_api.h"
 
+/* https://docs.mongodb.com/manual/reference/mongodb-wire-protocol/ */
+
 enum mongo_opcodes
   {
     OP_REPLY = 1,
@@ -67,6 +69,7 @@ static void ndpi_check_mongodb(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct mongo_message_header mongodb_hdr;
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  uint32_t responseFlags;
 
   if (packet->payload_packet_len <= sizeof(mongodb_hdr)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -87,7 +90,6 @@ static void ndpi_check_mongodb(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   switch(le32toh(mongodb_hdr.op_code)) {
-  case OP_REPLY:
   case OP_UPDATE:
   case OP_INSERT:
   case RESERVED:
@@ -98,6 +100,23 @@ static void ndpi_check_mongodb(struct ndpi_detection_module_struct *ndpi_struct,
   case OP_MSG:
     set_mongodb_detected(ndpi_struct, flow);
     break;
+  case OP_REPLY:
+    /* struct {
+         MsgHeader header;         // standard message header
+         int32     responseFlags;  // bit vector - see details below
+         int64     cursorID;       // cursor id if client needs to do get more's
+         int32     startingFrom;   // where in the cursor this reply is starting
+         int32     numberReturned; // number of documents in the reply
+         document* documents;      // documents
+       }
+    */
+    if(packet->payload_packet_len > sizeof(mongodb_hdr) + 20) {
+      responseFlags = le32toh(*(uint32_t *)(packet->payload + sizeof(mongodb_hdr)));
+      if((responseFlags & 0xFFFFFFF0) == 0)
+        set_mongodb_detected(ndpi_struct, flow);
+    }
+    break;
+
   default:
     NDPI_LOG_DBG(ndpi_struct, "Invalid MONGODB length");
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
