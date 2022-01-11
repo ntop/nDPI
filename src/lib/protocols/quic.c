@@ -985,8 +985,9 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   pn_offset = 1 + 4 + 1 + dest_conn_id_len + 1 + source_conn_id_len;
   pn_offset += quic_len(&packet->payload[pn_offset], &token_length);
   pn_offset += token_length;
-  /* Checks: quic_len reads 8 bytes, at most; quic_decrypt_header reads other 20 bytes */
-  if(pn_offset + 8 + (4 + 16) >= packet->payload_packet_len) {
+  /* Checks: quic_len reads 8 bytes, at most; quic_decrypt_header reads other 20 bytes.
+     Promote to uint64_t to avoid unsigned wrapping */
+  if((uint64_t)pn_offset + 8 + (4 + 16) >= (uint64_t)packet->payload_packet_len) {
     quic_ciphers_reset(&ciphers);
     return NULL;
   }
