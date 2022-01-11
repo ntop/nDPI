@@ -56,7 +56,6 @@
 #include <libgen.h>
 
 #include "reader_util.h"
-#include "intrusion_detection.h"
 
 #define ntohl64(x) ( ( (uint64_t)(ntohl( (uint32_t)((x << 32) >> 32) )) << 32) | ntohl( ((uint32_t)(x >> 32)) ) )
 #define htonl64(x) ntohl64(x)
@@ -84,7 +83,7 @@ static char* domain_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
 u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
-u_int8_t verbose = 0, enable_joy_stats = 0;
+u_int8_t verbose = 0, enable_flow_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 u_int8_t human_readeable_string_len = 5;
@@ -332,29 +331,6 @@ void ndpiCheckHostStringMatch(char *testChar) {
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
 
-#if 0
-static void reduceBDbits(uint32_t *bd, unsigned int len) {
-  int mask = 0;
-  int shift = 0;
-  unsigned int i = 0;
-
-  for(i = 0; i < len; i++)
-    mask = mask | bd[i];
-
-  mask = mask >> 8;
-  for(i = 0; i < 24 && mask; i++) {
-    mask = mask >> 1;
-    if (mask == 0) {
-      shift = i+1;
-      break;
-    }
-  }
-
-  for(i = 0; i < len; i++)
-    bd[i] = bd[i] >> shift;
-}
-#endif
-
 /**
  * @brief Get flow byte distribution mean and variance
  */
@@ -414,20 +390,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
     }
   }
 
-  if(enable_joy_stats) {
-#if 0
-    if(verbose > 1) {
-      reduceBDbits(tmp, 256);
-      array = tmp;
-
-      fprintf(out, " [byte_dist: ");
-      for(i = 0; i < 255; i++)
-	fprintf(out, "%u,", (unsigned char)array[i]);
-
-      fprintf(out, "%u]", (unsigned char)array[i]);
-    }
-#endif
-
+  if(enable_flow_stats) {
     /* Output the mean */
     if(num_bytes != 0) {
       double entropy = ndpi_flow_get_byte_count_entropy(array, num_bytes);
@@ -483,8 +446,7 @@ static void help(u_int long_help) {
 	 "  -d                        | Disable protocol guess and use only DPI\n"
 	 "  -e <len>                  | Min human readeable string match len. Default %u\n"
 	 "  -q                        | Quiet mode\n"
-	 "  -J                        | Display flow SPLT (sequence of packet length and time)\n"
-	 "                            | and BD (byte distribution). See https://github.com/cisco/joy\n"
+	 "  -F                        | Enable flow stats\n"
 	 "  -t                        | Dissect GTP/TZSP tunnels\n"
 	 "  -P <a>:<b>:<c>:<d>:<e>    | Enable payload analysis:\n"
 	 "                            | <a> = min pattern len to search\n"
@@ -575,6 +537,7 @@ static struct option longopts[] = {
   { "csv-dump", required_argument, NULL, 'C'},
   { "interface", required_argument, NULL, 'i'},
   { "filter", required_argument, NULL, 'f'},
+  { "flow-stats", required_argument, NULL, 'F'},
   { "cpu-bind", required_argument, NULL, 'g'},
   { "loops", required_argument, NULL, 'l'},
   { "num-threads", required_argument, NULL, 'n'},
@@ -589,7 +552,6 @@ static struct option longopts[] = {
   { "ndpi-log-level", required_argument, NULL, 'V'},
   { "dbg-proto", required_argument, NULL, 'u'},
   { "help", no_argument, NULL, 'h'},
-  { "joy", required_argument, NULL, 'J'},
   { "payload-analysis", required_argument, NULL, 'P'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
@@ -743,7 +705,6 @@ void printCSVHeader() {
   if(!csv_fp) return;
 
   fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,duration,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,server_name_sni,");
-  fprintf(csv_fp, "benign_score,dos_slow_score,dos_goldeneye_score,dos_hulk_score,ddos_score,hearthbleed_score,ftp_patator_score,ssh_patator_score,infiltration_score,");
   fprintf(csv_fp, "c_to_s_pkts,c_to_s_bytes,c_to_s_goodput_bytes,s_to_c_pkts,s_to_c_bytes,s_to_c_goodput_bytes,");
   fprintf(csv_fp, "data_ratio,str_data_ratio,c_to_s_goodput_ratio,s_to_c_goodput_ratio,");
 
@@ -777,7 +738,7 @@ void printCSVHeader() {
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info,plen_bins");
 
   /* Joy */
-  if(enable_joy_stats) {
+  if(enable_flow_stats) {
     fprintf(csv_fp, ",byte_dist_mean,byte_dist_std,entropy,total_entropy");
   }
 
@@ -822,7 +783,7 @@ static void parseOptions(int argc, char **argv) {
     case 'a':
       ndpi_generate_options(atoi(optarg));
       break;
-      
+
     case 'b':
       if((num_bin_clusters = atoi(optarg)) > 32)
 	num_bin_clusters = 32;
@@ -931,8 +892,8 @@ static void parseOptions(int argc, char **argv) {
       help(1);
       break;
 
-    case 'J':
-      enable_joy_stats = 1;
+    case 'F':
+      enable_flow_stats = 1;
       break;
 
     case 'P':
@@ -1073,7 +1034,7 @@ static void parseOptions(int argc, char **argv) {
   if(num_cores > 1 && bind_mask != NULL) {
     char *core_id = strtok(bind_mask, ":");
     thread_id = 0;
-    
+
     while(core_id != NULL && thread_id < num_threads) {
       core_affinity[thread_id++] = atoi(core_id) % num_cores;
       core_id = strtok(NULL, ":");
@@ -1224,39 +1185,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   char buf_ver[16];
   u_int i;
 
-  double dos_ge_score;
-  double dos_slow_score;
-  double dos_hulk_score;
-  double ddos_score;
-
-  double hearthbleed_score;
-
-  double ftp_patator_score;
-  double ssh_patator_score;
-
-  double inf_score;
-
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
     double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
-
-    /* PLEASE KEEP IN SYNC WITH printCSVHeader() */
-    dos_ge_score = Dos_goldeneye_score(flow);
-
-    dos_slow_score = Dos_slow_score(flow);
-    dos_hulk_score = Dos_hulk_score(flow);
-    ddos_score = Ddos_score(flow);
-
-    hearthbleed_score = Hearthbleed_score(flow);
-
-    ftp_patator_score = Ftp_patator_score(flow);
-    ssh_patator_score = Ssh_patator_score(flow);
-
-    inf_score = Infiltration_score(flow);
-
-    double benign_score = dos_ge_score < 1 && dos_slow_score < 1 && \
-    dos_hulk_score < 1 && ddos_score < 1 && hearthbleed_score < 1 && \
-    ftp_patator_score < 1 && ssh_patator_score < 1 && inf_score < 1 ? 1.1 : 0;
 
     fprintf(csv_fp, "%u,%u,%.3f,%.3f,%.3f,%s,%u,%s,%u,",
 	    flow->flow_id,
@@ -1275,11 +1206,6 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			       flow->detected_protocol, buf, sizeof(buf)),
 	    flow->host_server_name);
-
-    fprintf(csv_fp, "%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,%.4lf,", \
-	    benign_score, dos_slow_score, dos_ge_score, dos_hulk_score, \
-	    ddos_score, hearthbleed_score, ftp_patator_score,		\
-	    ssh_patator_score, inf_score);
 
     fprintf(csv_fp, "%u,%llu,%llu,", flow->src2dst_packets,
 	    (long long unsigned int) flow->src2dst_bytes, (long long unsigned int) flow->src2dst_goodput_bytes);
@@ -1347,7 +1273,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   }
 
   if((verbose != 1) && (verbose != 2)) {
-    if(csv_fp && enable_joy_stats) {
+    if(csv_fp && enable_flow_stats) {
       flowGetBDMeanandVariance(flow);
     }
 
@@ -1377,7 +1303,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if(enable_payload_analyzer) fprintf(out, "[flowId: %u]", flow->flow_id);
   }
 
-  if(enable_joy_stats) {
+  if(enable_flow_stats) {
     /* Print entropy values for monitored flows. */
     flowGetBDMeanandVariance(flow);
     fflush(out);
@@ -1400,7 +1326,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	  ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol) ? "Encrypted" : "ClearText");
 
   fprintf(out, "[Confidence: %s]", ndpi_confidence_get_name(flow->confidence));
-  
+
   if(flow->detected_protocol.category != 0)
     fprintf(out, "[cat: %s/%u]",
 	    ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
@@ -1483,7 +1409,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(out, "[Risk Score: %u]", ndpi_risk2score(flow->risk, &cli_score, &srv_score));
   }
-  
+
   if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(buf_ver, sizeof(buf_ver), flow->ssh_tls.ssl_version, &known_tls));
 
   if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
@@ -1523,7 +1449,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   if(flow->ssh_tls.browser_heuristics.is_firefox_tls) fprintf(out, "[Firefox]");
   if(flow->ssh_tls.browser_heuristics.is_chrome_tls)  fprintf(out, "[Chrome]");
 #endif
-  
+
   if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {
     char notBefore[32], notAfter[32];
     struct tm a, b;
@@ -3410,7 +3336,7 @@ static void ndpi_process_packet(u_char *args,
     u_int32_t *crc, delta = sizeof(struct ndpi_packet_trailer) + 4 /* ethernet trailer */;
     struct ndpi_packet_trailer *trailer;
     u_int16_t cli_score, srv_score;
-    
+
     memcpy(&h, header, sizeof(h));
 
     if(h.caplen > (sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4)) {
@@ -3770,12 +3696,12 @@ static void dgaUnitTest() {
     if(debug) printf("Checking non DGA %s\n", non_dga[i]);
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i], 1) == 0);
   }
-  
+
   for(i=0; dga[i] != NULL; i++) {
     if(debug) printf("Checking DGA %s\n", non_dga[i]);
     assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i], 1) == 1);
   }
-  
+
   ndpi_exit_detection_module(ndpi_str);
 }
 
@@ -4402,7 +4328,7 @@ void compressedBitmapUnitTest() {
   char *buf;
   ndpi_bitmap_iterator *it;
   u_int32_t value;
-  
+
   for(i=0; i<1000; i++) {
     u_int32_t v = rand();
 
@@ -4424,10 +4350,10 @@ void compressedBitmapUnitTest() {
   while(ndpi_bitmap_iterator_next(it, &value)) {
     if(trace) printf("%u ", value);
   }
-  
+
   if(trace) printf("\n");
   ndpi_bitmap_iterator_free(it);
-  
+
   ndpi_free(buf);
   ndpi_bitmap_free(b);
   ndpi_bitmap_free(b1);
@@ -4464,7 +4390,7 @@ int original_main(int argc, char **argv) {
       printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
       return(-1);
     }
-   
+
     if(!skip_unit_tests) {
 #ifndef DEBUG_TRACE
       /* Skip tests when debugging */
@@ -4498,7 +4424,7 @@ int original_main(int argc, char **argv) {
       compressedBitmapUnitTest();
 #endif
     }
-    
+
     gettimeofday(&startup_time, NULL);
     memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
@@ -4542,7 +4468,7 @@ int original_main(int argc, char **argv) {
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
     if(csv_fp)        fclose(csv_fp);
     ndpi_free(_debug_protocols);
-    
+
 #ifdef DEBUG_TRACE
     if(trace) fclose(trace);
 #endif
