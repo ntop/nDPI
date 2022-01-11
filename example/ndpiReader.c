@@ -737,7 +737,6 @@ void printCSVHeader() {
 #endif
   fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info,plen_bins");
 
-  /* Joy */
   if(enable_flow_stats) {
     fprintf(csv_fp, ",byte_dist_mean,byte_dist_std,entropy,total_entropy");
   }
