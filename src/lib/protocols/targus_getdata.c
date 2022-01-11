@@ -45,7 +45,7 @@ static void ndpi_check_targus_getdata(struct ndpi_detection_module_struct *ndpi_
                                 || (packet->udp->source == complex_link_port)))) {
 
       NDPI_LOG_INFO(ndpi_struct, "found targus getdata used for speedtest\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TARGUS_GETDATA, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TARGUS_GETDATA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

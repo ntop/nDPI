@@ -40,7 +40,7 @@ void ndpi_search_megaco(struct ndpi_detection_module_struct *ndpi_struct,
         packet->payload[5] == 'O' && packet->payload[6] == '/' &&
         packet->payload[7] == '1' && packet->payload[8] == ' ' && packet->payload[9] == '[')) {
       NDPI_LOG_INFO(ndpi_struct, "found MEGACO\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MEGACO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MEGACO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     } 
   }

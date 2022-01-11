@@ -1398,6 +1398,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
   fprintf(out, "[%s]",
 	  ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct, flow->detected_protocol) ? "Encrypted" : "ClearText");
+
+  fprintf(out, "[Confidence: %s]", ndpi_confidence_get_name(flow->confidence));
   
   if(flow->detected_protocol.category != 0)
     fprintf(out, "[cat: %s/%u]",
@@ -1624,6 +1626,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[proto]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[proto] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.protocol_flows[proto]++;
+    ndpi_thread_info[thread_id].workflow->stats.flow_confidence[flow->confidence]++;
   }
 }
 
@@ -2148,6 +2151,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	 sizeof(ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes));
   memset(ndpi_thread_info[thread_id].workflow->stats.protocol_flows, 0,
 	 sizeof(ndpi_thread_info[thread_id].workflow->stats.protocol_flows));
+  memset(ndpi_thread_info[thread_id].workflow->stats.flow_confidence, 0,
+	 sizeof(ndpi_thread_info[thread_id].workflow->stats.flow_confidence));
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
@@ -2970,6 +2975,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     cumulative_stats.dpi_packet_count[0] += ndpi_thread_info[thread_id].workflow->stats.dpi_packet_count[0];
     cumulative_stats.dpi_packet_count[1] += ndpi_thread_info[thread_id].workflow->stats.dpi_packet_count[1];
     cumulative_stats.dpi_packet_count[2] += ndpi_thread_info[thread_id].workflow->stats.dpi_packet_count[2];
+
+    for(i = 0; i < sizeof(cumulative_stats.flow_confidence)/sizeof(cumulative_stats.flow_confidence[0]); i++)
+      cumulative_stats.flow_confidence[i] += ndpi_thread_info[thread_id].workflow->stats.flow_confidence[i];
   }
 
   if(cumulative_stats.total_wire_bytes == 0)
@@ -3068,6 +3076,12 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
         printf("\tDPI Packets (other):   %-13llu (%.2f pkts/flow)\n",
                (long long unsigned int)cumulative_stats.dpi_packet_count[2],
                cumulative_stats.dpi_packet_count[2] / (float)cumulative_stats.flow_count[2]);
+
+      for(i = 0; i < sizeof(cumulative_stats.flow_confidence)/sizeof(cumulative_stats.flow_confidence[0]); i++) {
+        if(cumulative_stats.flow_confidence[i] != 0)
+          printf("\tConfidence %-17s: %-10llu (flows)\n", ndpi_confidence_get_name(i),
+                 (long long unsigned int)cumulative_stats.flow_confidence[i]);
+      }
   }
 
   if(results_file) {
@@ -3086,6 +3100,14 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
         fprintf(results_file, "DPI Packets (other):\t%llu\t(%.2f pkts/flow)\n",
                (long long unsigned int)cumulative_stats.dpi_packet_count[2],
                cumulative_stats.dpi_packet_count[2] / (float)cumulative_stats.flow_count[2]);
+
+      for(i = 0; i < sizeof(cumulative_stats.flow_confidence)/sizeof(cumulative_stats.flow_confidence[0]); i++) {
+        if(cumulative_stats.flow_confidence[i] != 0)
+	  fprintf(results_file, "Confidence %-17s: %llu (flows)\n",
+	          ndpi_confidence_get_name(i),
+                  (long long unsigned int)cumulative_stats.flow_confidence[i]);
+      }
+
       fprintf(results_file, "\n");
   }
 

@@ -126,7 +126,7 @@ void ndpi_search_starcraft(struct ndpi_detection_module_struct* ndpi_struct, str
       result = ndpi_check_starcraft_udp(ndpi_struct, flow);
       if (result == 1) {
 	NDPI_LOG_INFO(ndpi_struct, "Found Starcraft 2 [Game, UDP]\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STARCRAFT, NDPI_PROTOCOL_UNKNOWN);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STARCRAFT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }
@@ -134,7 +134,7 @@ void ndpi_search_starcraft(struct ndpi_detection_module_struct* ndpi_struct, str
       result = ndpi_check_starcraft_tcp(ndpi_struct, flow);
       if (result == 1) {
 	NDPI_LOG_INFO(ndpi_struct, "Found Starcraft 2 [Client, TCP]\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STARCRAFT, NDPI_PROTOCOL_UNKNOWN);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STARCRAFT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }

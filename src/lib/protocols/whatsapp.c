@@ -42,7 +42,7 @@ void ndpi_search_whatsapp(struct ndpi_detection_module_struct *ndpi_struct,
       flow->l4.tcp.wa_matched_so_far += match_len;
       if(flow->l4.tcp.wa_matched_so_far == sizeof(whatsapp_sequence)) {
 	NDPI_LOG_INFO(ndpi_struct, "found WhatsApp\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       }
       return;
     }

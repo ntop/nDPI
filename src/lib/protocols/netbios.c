@@ -108,9 +108,9 @@ static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct 
   }
 
   if(sub_protocol == NDPI_PROTOCOL_UNKNOWN)
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETBIOS, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETBIOS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   else
-    ndpi_set_detected_protocol(ndpi_struct, flow, sub_protocol, NDPI_PROTOCOL_NETBIOS);
+    ndpi_set_detected_protocol(ndpi_struct, flow, sub_protocol, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
 }
 
 /* ****************************************************************** */

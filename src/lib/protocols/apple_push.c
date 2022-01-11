@@ -44,7 +44,7 @@ static void ndpi_check_apple_push(struct ndpi_detection_module_struct *ndpi_stru
 	 || ((packet->tcp->source == apn_feedback_port) || (packet->tcp->dest == apn_feedback_port))
 	 ) {
 	NDPI_LOG_INFO(ndpi_struct, "found apple_push\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }

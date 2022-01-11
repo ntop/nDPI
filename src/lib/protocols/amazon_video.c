@@ -40,7 +40,7 @@ static void ndpi_check_amazon_video(struct ndpi_detection_module_struct *ndpi_st
 	packet->payload[2] == 0xFA &&
 	packet->payload[3] == 0xCE)) {
       NDPI_LOG_INFO(ndpi_struct, "found Amazon Video on TCP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     } else if((packet->udp != NULL) &&
 	      (packet->payload[0] == 0xDE &&
@@ -48,7 +48,7 @@ static void ndpi_check_amazon_video(struct ndpi_detection_module_struct *ndpi_st
 	       packet->payload[2] == 0xBE &&
 	       packet->payload[3] == 0xEF)) {
       NDPI_LOG_INFO(ndpi_struct, "found Amazon Video on UDP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

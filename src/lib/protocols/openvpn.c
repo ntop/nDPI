@@ -115,7 +115,7 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
 		 && ((opcode == 184) || (opcode == 88) || (opcode == 160) || (opcode == 168) || (opcode == 200)))
 	     )) {
 	NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }
@@ -148,7 +148,7 @@ void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct,
 	    
 	    if(memcmp(flow->ovpn_session_id, session_remote, 8) == 0) {
 	      NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
-	      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN);
+	      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	      return;
 	    } else {
 	      NDPI_LOG_DBG2(ndpi_struct,

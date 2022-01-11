@@ -212,7 +212,7 @@ static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
   flow->max_extra_packets_to_check = 12;
   flow->extra_packets_func = search_ssh_again;
   
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSH, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSH, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* ************************************************************************ */

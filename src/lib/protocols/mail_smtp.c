@@ -57,7 +57,7 @@ static void ndpi_int_mail_smtp_add_connection(struct ndpi_detection_module_struc
   flow->guessed_protocol_id = NDPI_PROTOCOL_MAIL_SMTP; /* Avoid SMTPS to be used s sub-protocol */
 
   ndpi_set_detected_protocol(ndpi_struct, flow,
-			     NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN);
+			     NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* **************************************** */

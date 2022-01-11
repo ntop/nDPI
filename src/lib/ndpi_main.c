@@ -124,7 +124,8 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str, ndpi_p
 static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def, ndpi_default_ports_tree_node_t **root);
 static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet);
 static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol);
+				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
+				     ndpi_confidence_t confidence);
 
 /* ****************************************** */
 
@@ -4980,7 +4981,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(ndpi_lru_find_cache(ndpi_str->mining_cache, flow->saddr + flow->daddr,
 			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
-      ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       return(ret);
     }
@@ -4993,12 +4994,12 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
           (flow->guessed_protocol_id == NDPI_PROTOCOL_SIGNAL_VOIP) ||
           (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_CALL)) {
     *protocol_was_guessed = 1;
-    ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI /* TODO */);
   }
   else if((flow->protos.tls_quic.hello_processed == 1) &&
           (flow->host_server_name[0] != '\0')) {
     *protocol_was_guessed = 1;
-    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI /* TODO */);
   } else if(enable_guess) {
     if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) && (flow->l4_proto == IPPROTO_TCP) &&
        flow->protos.tls_quic.hello_processed)
@@ -5021,9 +5022,18 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       flow->guessed_protocol_id = guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
     if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) || (guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
+      ndpi_confidence_t confidence;
+
+      if(guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	confidence = NDPI_CONFIDENCE_MATCH_BY_PORT;
+      if(guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+	confidence = NDPI_CONFIDENCE_MATCH_BY_IP;
+
       if((guessed_protocol_id == 0) && (flow->stun.num_binding_requests > 0) &&
-         (flow->stun.num_processed_pkts > 0))
+         (flow->stun.num_processed_pkts > 0)) {
 	guessed_protocol_id = NDPI_PROTOCOL_STUN;
+	confidence = NDPI_CONFIDENCE_DPI;
+      }
 
       if(flow->host_server_name[0] != '\0') {
         ndpi_protocol_match_result ret_match;
@@ -5039,7 +5049,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       }
 
       *protocol_was_guessed = 1;
-      ndpi_set_detected_protocol(ndpi_str, flow, guessed_host_protocol_id, guessed_protocol_id);
+      ndpi_set_detected_protocol(ndpi_str, flow, guessed_host_protocol_id, guessed_protocol_id, confidence);
     }
   }
 
@@ -5047,16 +5057,20 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
       *protocol_was_guessed = 1;
       flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
+      flow->confidence = NDPI_CONFIDENCE_MATCH_BY_PORT;
     }
 
     if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
       *protocol_was_guessed = 1;
       flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
+      flow->confidence = NDPI_CONFIDENCE_MATCH_BY_IP;
     }
 
-    if(flow->detected_protocol_stack[1] == flow->detected_protocol_stack[0]) {
+    if((flow->detected_protocol_stack[1] == flow->detected_protocol_stack[0]) &&
+       (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)) {
       *protocol_was_guessed = 1;
       flow->detected_protocol_stack[1] = flow->guessed_host_protocol_id;
+      flow->confidence = NDPI_CONFIDENCE_MATCH_BY_IP;
     }
   }
 
@@ -5066,7 +5080,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     /* if(flow->protos.stun.num_processed_pkts || flow->protos.stun.num_udp_pkts) */ {
       // if(/* (flow->protos.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
       *protocol_was_guessed = 1;
-      ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN);
+      ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN, NDPI_CONFIDENCE_DPI /* TODO */);
     }
   }
 
@@ -5396,6 +5410,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
 	ret->app_protocol = flow->guessed_protocol_id ? flow->guessed_protocol_id : flow->guessed_host_protocol_id;
 
       // if(ndpi_str->ndpi_num_custom_protocols != 0)
+      flow->confidence = NDPI_CONFIDENCE_MATCH_BY_PORT; /* TODO */
       ndpi_fill_protocol_category(ndpi_str, flow, ret);
       return(-1);
     }
@@ -6237,10 +6252,11 @@ u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int
 /* ********************************************************************************* */
 
 void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol) {
+				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
+				ndpi_confidence_t confidence) {
   struct ndpi_id_struct *src = flow->src, *dst = flow->dst;
 
-  ndpi_int_change_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol);
+  ndpi_int_change_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol, confidence);
 
   if(src != NULL) {
     NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, upper_detected_protocol);
@@ -6265,13 +6281,15 @@ u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi
 
 /* ********************************************************************************* */
 
-void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-				   u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol) {
+static void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+					  u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
+					  ndpi_confidence_t confidence) {
   if(!flow)
     return;
 
   flow->detected_protocol_stack[0] = upper_detected_protocol,
-    flow->detected_protocol_stack[1] = lower_detected_protocol;
+  flow->detected_protocol_stack[1] = lower_detected_protocol;
+  flow->confidence = confidence;
 }
 
 /* ********************************************************************************* */
@@ -6282,7 +6300,8 @@ void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_str
  * 1.update the flow protocol stack with the new protocol
  */
 static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol) {
+				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
+				     ndpi_confidence_t confidence) {
   if((upper_detected_protocol == NDPI_PROTOCOL_UNKNOWN) && (lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN))
     upper_detected_protocol = lower_detected_protocol;
 
@@ -6299,7 +6318,7 @@ static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_s
     }
   }
 
-  ndpi_int_change_flow_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol);
+  ndpi_int_change_flow_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol, confidence);
 }
 
 /* ********************************************************************************* */
@@ -6317,6 +6336,7 @@ void ndpi_int_reset_protocol(struct ndpi_flow_struct *flow) {
 
     for(a = 0; a < NDPI_PROTOCOL_SIZE; a++)
       flow->detected_protocol_stack[a] = NDPI_PROTOCOL_UNKNOWN;
+    flow->confidence = NDPI_CONFIDENCE_UNKNOWN;
   }
 }
 
@@ -6658,6 +6678,28 @@ void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_str,
 
   default:
     break;
+  }
+}
+
+/* ****************************************************** */
+
+const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
+{
+  switch(confidence) {
+  case NDPI_CONFIDENCE_UNKNOWN:
+    return "Unknown";
+  case NDPI_CONFIDENCE_MATCH_BY_PORT:
+    return "Match by port";
+  case NDPI_CONFIDENCE_MATCH_BY_IP:
+    return "Match by IP";
+  case NDPI_CONFIDENCE_DPI_SRC_DST_ID:
+    return "DPI (src/dst ids)";
+  case NDPI_CONFIDENCE_DPI_CACHE:
+    return "DPI (cache)";
+  case NDPI_CONFIDENCE_DPI:
+    return "DPI";
+  default:
+    return NULL;
   }
 }
 
@@ -7021,8 +7063,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
      (!ndpi_is_more_generic_protocol(flow->detected_protocol_stack[0], matching_protocol_id))) {
     /* Move the protocol on slot 0 down one position */
     flow->detected_protocol_stack[1] = master_protocol_id,
-      flow->detected_protocol_stack[0] = matching_protocol_id;
-
+    flow->detected_protocol_stack[0] = matching_protocol_id;
+    flow->confidence = NDPI_CONFIDENCE_DPI;
     if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
       flow->category = ret_match->protocol_category;
 
@@ -7110,7 +7152,7 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
 					 &ret_match, master_protocol);
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol);
+    ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol, NDPI_CONFIDENCE_DPI);
     ndpi_int_change_category(ndpi_struct, flow, ret_match.protocol_category);
     return(1);
   } else

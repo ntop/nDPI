@@ -61,7 +61,7 @@ void ndpi_search_ayiya(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
       if((epoch >= (now - fiveyears)) && (epoch <= (now+86400 /* 1 day */))) {
 	NDPI_LOG_INFO(ndpi_struct, "found AYIYA\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AYIYA, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AYIYA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       }
 
       return;

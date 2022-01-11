@@ -174,7 +174,7 @@ void ndpi_search_netflow(struct ndpi_detection_module_struct *ndpi_struct, struc
     if(((version == 1) && (when == 0))
        || ((when >= 946684800 /* 1/1/2000 */) && (when <= (u_int32_t)now))) {
       NDPI_LOG_INFO(ndpi_struct, "found netflow\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETFLOW, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETFLOW, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   } else

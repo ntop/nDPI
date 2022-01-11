@@ -582,6 +582,15 @@ extern "C" {
 				     ndpi_protocol_category_t category);
 
   /**
+   * Get classification confidence as string
+   *
+   * @par     confidence      = the confidence value
+   * @return  the string name of the confidence result
+   *
+   */
+  const char* ndpi_confidence_get_name(ndpi_confidence_t confidence);
+
+  /**
    * Set protocol category string
    *
    * @par     mod           = the detection module
