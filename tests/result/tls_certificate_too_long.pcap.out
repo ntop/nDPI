@@ -14,9 +14,9 @@ IGMP	2	92	2
 TLS	4	283	1
 Google	30	3310	5
 Apple	10	993	5
-Microsoft	123	47867	15
+Microsoft	121	47561	14
 Microsoft365	126	53776	2
-Azure	2	108	1
+Azure	4	414	2
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -43,7 +43,7 @@ JA3 Host Stats:
 	18	UDP 192.168.1.121:55567 <-> 8.8.8.8:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/78 bytes <-> 1 pkts/250 bytes][Goodput ratio: 46/83][0.07 sec][Hostname/SNI: wdcp.microsoft.com][::][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	UDP 192.168.1.121:58161 <-> 8.8.8.8:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/77 bytes <-> 1 pkts/244 bytes][Goodput ratio: 45/82][0.03 sec][Hostname/SNI: www.microsoft.com][2.22.33.235][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	UDP [fe80::1059:a858:f9e7:cf94]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][ClearText][Confidence: DPI][cat: Network/14][2 pkts/320 bytes -> 0 pkts/0 bytes][Goodput ratio: 61/0][1.02 sec][Hostname/SNI: _companion-link._tcp.local][_companion-link._tcp.local][PLAIN TEXT (companion)][Plen Bins: 0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	21	UDP 192.168.1.121:65492 <-> 8.8.8.8:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/115 bytes <-> 1 pkts/191 bytes][Goodput ratio: 63/78][0.07 sec][Hostname/SNI: wd-prod-cp-eu-north-2-fe.northeurope.cloudapp.azure.com][::][PLAIN TEXT (northeurope)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	21	UDP 192.168.1.121:65492 <-> 8.8.8.8:53 [proto: 5.276/DNS.Azure][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/115 bytes <-> 1 pkts/191 bytes][Goodput ratio: 63/78][0.07 sec][Hostname/SNI: wd-prod-cp-eu-north-2-fe.northeurope.cloudapp.azure.com][::][PLAIN TEXT (northeurope)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	TCP 192.168.1.121:53905 <-> 140.82.113.26:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/163 bytes][Goodput ratio: 0/19][0.11 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	23	UDP 192.168.1.121:53884 <-> 8.8.8.8:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/78 bytes <-> 1 pkts/203 bytes][Goodput ratio: 46/79][0.02 sec][Hostname/SNI: wdcp.microsoft.com][40.113.10.47][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	24	UDP 192.168.1.139:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][ClearText][Confidence: DPI][cat: Network/14][2 pkts/280 bytes -> 0 pkts/0 bytes][Goodput ratio: 70/0][1.02 sec][Hostname/SNI: _companion-link._tcp.local][_companion-link._tcp.local][PLAIN TEXT (companion)][Plen Bins: 0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

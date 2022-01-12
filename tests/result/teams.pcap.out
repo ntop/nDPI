@@ -20,10 +20,10 @@ Dropbox	18	11162	3
 Skype_Teams	44	21248	3
 Spotify	1	82	1
 Telegram	3	186	1
-Microsoft	403	283797	11
+Microsoft	401	283503	10
 Microsoft365	136	52120	6
 Teams	1916	1034899	34
-Azure	134	57390	5
+Azure	136	57684	6
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -96,7 +96,7 @@ JA3 Host Stats:
 	64	UDP 192.168.1.6:64046 <-> 192.168.1.1:53 [proto: 5.26/DNS.ntop][ClearText][Confidence: DPI][cat: Network/14][2 pkts/166 bytes <-> 1 pkts/136 bytes][Goodput ratio: 49/69][1.01 sec][Hostname/SNI: b._dns-sd._udp.ntop.org][::][PLAIN TEXT (postmaster)][Plen Bins: 0,66,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	65	UDP 192.168.1.6:63106 <-> 192.168.1.1:53 [proto: 5.250/DNS.Teams][ClearText][Confidence: DPI][cat: Collaborative/15][1 pkts/95 bytes <-> 1 pkts/203 bytes][Goodput ratio: 55/79][0.03 sec][Hostname/SNI: eu-prod.asyncgw.teams.microsoft.com][52.114.75.70][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	66	UDP 192.168.1.6:61245 <-> 192.168.1.1:53 [proto: 5.250/DNS.Teams][ClearText][Confidence: DPI][cat: Collaborative/15][1 pkts/87 bytes <-> 1 pkts/209 bytes][Goodput ratio: 51/80][0.05 sec][Hostname/SNI: euaz.tr.teams.microsoft.com][52.114.250.123][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	67	UDP 192.168.1.6:55765 <-> 192.168.1.1:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/109 bytes <-> 1 pkts/185 bytes][Goodput ratio: 61/77][0.01 sec][Hostname/SNI: b-tr-teams-euno-05.northeurope.cloudapp.azure.com][::][PLAIN TEXT (northeurope)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	67	UDP 192.168.1.6:55765 <-> 192.168.1.1:53 [proto: 5.276/DNS.Azure][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/109 bytes <-> 1 pkts/185 bytes][Goodput ratio: 61/77][0.01 sec][Hostname/SNI: b-tr-teams-euno-05.northeurope.cloudapp.azure.com][::][PLAIN TEXT (northeurope)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	68	UDP 192.168.1.6:59403 <-> 192.168.1.1:53 [proto: 5.219/DNS.Microsoft365][ClearText][Confidence: DPI][cat: Collaborative/15][1 pkts/80 bytes <-> 1 pkts/214 bytes][Goodput ratio: 47/80][0.01 sec][Hostname/SNI: substrate.office.com][13.107.18.11][PLAIN TEXT (substrate)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	69	UDP 192.168.1.6:49514 <-> 192.168.1.1:53 [proto: 5.250/DNS.Teams][ClearText][Confidence: DPI][cat: Collaborative/15][1 pkts/86 bytes <-> 1 pkts/204 bytes][Goodput ratio: 51/79][0.01 sec][Hostname/SNI: config.teams.microsoft.com][52.113.194.132][PLAIN TEXT (config)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	70	UDP 192.168.1.6:57530 <-> 192.168.1.1:53 [proto: 5/DNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/100 bytes <-> 1 pkts/181 bytes][Goodput ratio: 57/76][0.03 sec][Hostname/SNI: presence.services.sfb.trafficmanager.net][52.114.77.58][PLAIN TEXT (presence)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
