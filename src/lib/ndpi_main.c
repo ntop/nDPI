@@ -5038,8 +5038,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       if(flow->host_server_name[0] != '\0') {
         ndpi_protocol_match_result ret_match;
 
-        memset(&ret_match, 0, sizeof(ret_match));
-
         ndpi_match_host_subprotocol(ndpi_str, flow, (char *) flow->host_server_name,
 				    strlen((const char *) flow->host_server_name), &ret_match,
 				    NDPI_PROTOCOL_DNS);
@@ -7110,6 +7108,8 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   u_int16_t rc;
   ndpi_protocol_category_t id;
 
+  memset(ret_match, 0, sizeof(*ret_match));
+
   rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
 					    master_protocol_id, ret_match);
   id = ret_match->protocol_category;
@@ -7147,7 +7147,6 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
   else
     what = name, what_len = name_len;
 
-  memset(&ret_match, 0, sizeof(ret_match));
   subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len,
 					 &ret_match, master_protocol);
 

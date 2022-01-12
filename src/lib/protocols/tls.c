@@ -1718,6 +1718,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      checkExtensions(ndpi_struct, flow, is_dtls,
 			      extension_id, extension_len, offset + extension_offset);
 
+	      if(offset + 4 + extension_len > total_len) {
+#ifdef DEBUG_TLS
+	        printf("[TLS] extension length %u too long (%u, offset %u)\n",
+	               extension_len, total_len, offset);
+#endif
+	        break;
+	      }
+
 	      if((extension_id == 0) || (packet->payload[extn_off] != packet->payload[extn_off+1])) {
 		/* Skip GREASE */
 
@@ -1957,7 +1965,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("[SIGNATURE] [is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u][duplicate_found: %u]\n",
 		       flow->protos.tls_quic.browser_heuristics.is_firefox_tls,
 		       flow->protos.tls_quic.browser_heuristics.is_chrome_tls,
-		       flow->protos..tls_quic.browser_heuristics.is_safari_tls,
+		       flow->protos.tls_quic.browser_heuristics.is_safari_tls,
 		       duplicate_found);
 #endif
 
