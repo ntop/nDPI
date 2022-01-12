@@ -10324,7 +10324,7 @@ static const char *ndpi_en_impossible_bigrams[] = {
   "qg", "qh", "qj", "qk", "ql", "qm", "qn", "qo", "qp", "qr", "qs", "qt", "qv", "qw", "qx", "qy", "uu",
   "qz", "sx", "sz", "tq", "tx", "vb", "vc", "vd", "vf", "vg", "vh", "vj", "vm", "vn", /* "vp", Removed for vpbank.com */ "bw", /* "vk", "zr" Removed for kavkazr */
   "vq", /* "vt", gvt1.com, gvt2.com */ "vw", "vx", "vz", "wq", "wv", "wx", "wz", /* "xb", foxbusiness.com */
-  "xg", "xj", "xk", "xv", "xz", "xw", "yd", /*"yp", Removed for paypal */
+  "xg", "xj", "xk", "xv", "xz", "xw", /* "yd", Removed for anywayanyday.com */ /*"yp", Removed for paypal */
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zs", "zx", /* "wh", e.g. why */ "wk",
   "wb", "zk", "kp", "zk", "xy", "xx",
   NULL };
