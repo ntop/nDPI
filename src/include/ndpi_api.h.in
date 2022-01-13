@@ -726,6 +726,15 @@ extern "C" {
   int ndpi_add_host_risk_mask(struct ndpi_detection_module_struct *ndpi_mod, char *host, ndpi_risk mask);
 
   /**
+   * Add a trusted certificate issuer DN
+   *
+   * @par     ndpi_mod = the detection module
+   * @par     dn       = the issuer DN as it appears in the certificate (example "CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US")
+   * @return  0 if the rule is loaded correctly; < 0 in case an error is detected
+   */
+  int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_mod, char *dn);
+
+  /**
    * Read a file and load the categories
    *
    * @par     ndpi_mod = the detection module

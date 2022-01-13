@@ -1016,6 +1016,11 @@ typedef enum {
   ndpi_hangout_cache
 } ndpi_lru_cache_type;
 
+typedef struct ndpi_list_struct {
+  char *value;
+  struct ndpi_list_struct *next;
+} ndpi_list;
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -1077,6 +1082,8 @@ struct ndpi_detection_module_struct {
     host_risk_mask_automa, common_alpns_automa;  
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
 
+  ndpi_list *trusted_issuer_dn;
+  
   void *ip_risk_mask_ptree;
   
   struct {

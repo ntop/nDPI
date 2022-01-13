@@ -469,7 +469,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	    if(flow->protos.tls_quic.notBefore > TLS_LIMIT_DATE)
 	      if((flow->protos.tls_quic.notAfter-flow->protos.tls_quic.notBefore) > TLS_THRESHOLD)
-		ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months*/
+		ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months */
 
 	    if((time_sec < flow->protos.tls_quic.notBefore)
 	       || (time_sec > flow->protos.tls_quic.notAfter))
@@ -652,8 +652,24 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
   }
 
   if(flow->protos.tls_quic.subjectDN && flow->protos.tls_quic.issuerDN
-     && (!strcmp(flow->protos.tls_quic.subjectDN, flow->protos.tls_quic.issuerDN)))
+     && (!strcmp(flow->protos.tls_quic.subjectDN, flow->protos.tls_quic.issuerDN))) {
+    /* Last resort: we check if this is a trusted issuerDN */
+    ndpi_list *head = ndpi_struct->trusted_issuer_dn;
+
+    while(head != NULL) {
+#if DEBUG_TLS
+      printf("TLS] %s() issuerDN %s / %s\n", __FUNCTION__,
+	     flow->protos.tls_quic.issuerDN, head->value);
+#endif
+      
+      if(strcmp(flow->protos.tls_quic.issuerDN, head->value) == 0)
+	return; /* This is a trusted DN */
+      else
+	head = head->next;
+    }
+    
     ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SELFSIGNED_CERTIFICATE);
+  }
 
 #if DEBUG_TLS
   printf("[TLS] %s() SubjectDN [%s]\n", __FUNCTION__, rdnSeqBuf);

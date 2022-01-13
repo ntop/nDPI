@@ -54,3 +54,6 @@ ip:54.80.47.130@AmazonPrime
 host_risk_mask:".local"=0
 host_risk_mask:".msftconnecttest.com"=0
 
+
+# Custom certification autorities we trust
+trusted_issuer_dn:"CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US"

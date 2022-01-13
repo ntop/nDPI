@@ -2368,7 +2368,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list,
 			 prefs & ndpi_dont_load_tor_hosts); /* Microsoft Azure */
   }
-  
+
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
 
   NDPI_BITMASK_RESET(ndpi_str->detection_bitmask);
@@ -2397,6 +2397,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->malicious_ja3_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->malicious_sha1_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
+  ndpi_str->trusted_issuer_dn = NULL;
 
   if((sizeof(categories) / sizeof(char *)) != NDPI_PROTOCOL_NUM_CATEGORIES) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] invalid categories length: expected %u, got %u\n", NDPI_PROTOCOL_NUM_CATEGORIES,
@@ -2779,6 +2780,19 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->common_alpns_automa.ac_automa,
 			  1 /* free patterns strings memory */);
 
+    if(ndpi_str->trusted_issuer_dn) {
+      ndpi_list *head = ndpi_str->trusted_issuer_dn;
+
+      while(head != NULL) {
+	ndpi_list *next;
+
+	if(head->value) ndpi_free(head->value);
+	next = head->next;
+	ndpi_free(head);
+	head = next;
+      }
+    }
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/ndpi_exit_detection_module.c"
 #endif
@@ -3042,6 +3056,40 @@ int ndpi_add_host_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
+int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_str, char *dn) {
+  ndpi_list *head;
+
+  if(dn == NULL)
+    return(-1);
+  else
+    head = (ndpi_list*)ndpi_malloc(sizeof(ndpi_list));
+
+  if(head == NULL) return(-2);
+
+  if(dn[0] == '"') {
+    char buf[128], *quote;
+
+    snprintf(buf, sizeof(buf), "%s", &dn[1]);
+
+    if((quote = strchr(buf, '"')) != NULL)
+      quote[0] = '\0';
+
+    head->value = strdup(buf);
+  } else
+    head->value = strdup(dn);
+
+  if(head->value == NULL) {
+    ndpi_free(head);
+    return(-3);
+  }
+
+  head->next = ndpi_str->trusted_issuer_dn;
+  ndpi_str->trusted_issuer_dn = head;
+
+  return(0);
+}
+/* ******************************************************************** */
+
 int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, u_int8_t do_add) {
   char *at, *proto, *elem;
   ndpi_proto_defaults_t *def;
@@ -3060,13 +3108,15 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
       return(-1);
     }
 
+    if(!strcmp(rule_type, "trusted_issuer_dn"))
+      return(ndpi_add_trusted_issuer_dn(ndpi_str, strtok(NULL, ":")));
+
     key = strtok(NULL, "=");
-
     if(key) {
-      char *mask = strtok(NULL, "=");
+      char *value = strtok(NULL, "=");
 
-      if(mask) {
-	ndpi_risk risk_mask = (ndpi_risk)atoll(mask);
+      if(value) {
+	ndpi_risk risk_mask = (ndpi_risk)atoll(value);
 
 	if(!strcmp(rule_type, "ip_risk_mask")) {
 	  return(ndpi_add_ip_risk_mask(ndpi_str, key, risk_mask));
@@ -3449,7 +3499,7 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
 int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
   FILE *fd;
   char *buffer, *old_buffer;
-  int chunk_len = 512, buffer_len = chunk_len, old_buffer_len;
+  int chunk_len = 1024, buffer_len = chunk_len, old_buffer_len;
   int i, rc = -1;
 
   fd = fopen(path, "r");
@@ -4541,7 +4591,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     flow->is_ipv6 = (packet->iphv6 != NULL);
     if(flow->is_ipv6 == 0)
       flow->saddr = packet->iph->saddr, flow->daddr = packet->iph->daddr; /* See (*#*) */
-    
+
     flow->last_packet_time_ms = packet->current_time_ms;
 
     packet->packet_lines_parsed_complete = 0;
@@ -4554,7 +4604,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(tcph != NULL) {
 
       flow->sport = tcph->source, flow->dport = tcph->dest; /* (*#*) */
-      
+
       if(!ndpi_str->direction_detect_disable)
 	packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
@@ -4616,7 +4666,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       }
     } else if(udph != NULL) {
       flow->sport = udph->source, flow->dport = udph->dest; /* (*#*) */
-      
+
       if(!ndpi_str->direction_detect_disable)
 	packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
     }
@@ -4878,7 +4928,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   case NDPI_PROTOCOL_RDP:
     ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
     break;
-    
+
   case NDPI_PROTOCOL_ANYDESK:
     if(flow->l4_proto == IPPROTO_TCP) /* TCP only */
       ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
@@ -4922,7 +4972,7 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
 
   if(flow && flow->bt_check_performed /* Do the check once */)
     return(0);
-  
+
   if(ndpi_struct->bittorrent_cache) {
     u_int16_t cached_proto;
     u_int8_t found = 0;
@@ -4930,7 +4980,7 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
 
     if(flow)
       flow->bt_check_performed = 1;
-      
+
     /* Check cached communications */
     key1 = ndpi_bittorrent_hash_funct(saddr, sport), key2 = ndpi_bittorrent_hash_funct(daddr, dport);
 
@@ -5111,7 +5161,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
     }
   }
-  
+
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
     *protocol_was_guessed = 1;
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);
@@ -5908,7 +5958,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	  packet->server_line.len = packet->line[packet->parsed_lines].len - NDPI_STATICSTRING_LEN("Server:");
 	}
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "Host:" header line in HTTP request */
       if(packet->line[packet->parsed_lines].len > 6 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Host:", 5) == 0) {
@@ -5921,7 +5971,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	  packet->host_line.len = packet->line[packet->parsed_lines].len - 5;
 	}
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "X-Forwarded-For:" header line in HTTP request. Commonly used for HTTP proxies. */
       if(packet->line[packet->parsed_lines].len > 17 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "X-Forwarded-For:", 16) == 0) {
@@ -5934,7 +5984,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	  packet->forwarded_line.len = packet->line[packet->parsed_lines].len - 16;
 	}
 	packet->http_num_headers++;
-      } else 
+      } else
 
       /* "Authorization:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 15 &&
@@ -5960,63 +6010,63 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	packet->referer_line.ptr = &packet->line[packet->parsed_lines].ptr[9];
 	packet->referer_line.len = packet->line[packet->parsed_lines].len - 9;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "User-Agent:" header line in HTTP request. */
       if(packet->line[packet->parsed_lines].len > 12 &&
 	  strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "User-agent: ", 12) == 0) {
 	packet->user_agent_line.ptr = &packet->line[packet->parsed_lines].ptr[12];
 	packet->user_agent_line.len = packet->line[packet->parsed_lines].len - 12;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "Content-Encoding:" header line in HTTP response (and request?). */
       if(packet->line[packet->parsed_lines].len > 18 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Encoding: ", 18) == 0) {
 	packet->http_encoding.ptr = &packet->line[packet->parsed_lines].ptr[18];
 	packet->http_encoding.len = packet->line[packet->parsed_lines].len - 18;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "Transfer-Encoding:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 19 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Transfer-Encoding: ", 19) == 0) {
 	packet->http_transfer_encoding.ptr = &packet->line[packet->parsed_lines].ptr[19];
 	packet->http_transfer_encoding.len = packet->line[packet->parsed_lines].len - 19;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "Content-Length:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 16 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "content-length: ", 16) == 0) {
 	packet->http_contentlen.ptr = &packet->line[packet->parsed_lines].ptr[16];
 	packet->http_contentlen.len = packet->line[packet->parsed_lines].len - 16;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "Content-Disposition"*/
       if(packet->line[packet->parsed_lines].len > 21 &&
 	 ((strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Disposition: ", 21) == 0))) {
 	packet->content_disposition_line.ptr = &packet->line[packet->parsed_lines].ptr[21];
 	packet->content_disposition_line.len = packet->line[packet->parsed_lines].len - 21;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "Cookie:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 8 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Cookie: ", 8) == 0) {
 	packet->http_cookie.ptr = &packet->line[packet->parsed_lines].ptr[8];
 	packet->http_cookie.len = packet->line[packet->parsed_lines].len - 8;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "Origin:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 8 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Origin: ", 8) == 0) {
 	packet->http_origin.ptr = &packet->line[packet->parsed_lines].ptr[8];
 	packet->http_origin.len = packet->line[packet->parsed_lines].len - 8;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* "X-Session-Type:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 16 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "X-Session-Type: ", 16) == 0) {
 	packet->http_x_session_type.ptr = &packet->line[packet->parsed_lines].ptr[16];
 	packet->http_x_session_type.len = packet->line[packet->parsed_lines].len - 16;
 	packet->http_num_headers++;
-      } else 
+      } else
       /* Identification and counting of other HTTP headers.
        * We consider the most common headers, but there are many others,
        * which can be seen at references below:
@@ -6046,7 +6096,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 		      "Upgrade-Insecure-Requests: ", 27) == 0)) {
 	/* Just count. In the future, if needed, this if can be splited to parse these headers */
 	packet->http_num_headers++;
-      } else 
+      } else
        /* "Content-Type:" header line in HTTP. */
       if(packet->line[packet->parsed_lines].len > 14 &&
 	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0 ) {
@@ -6057,7 +6107,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	  packet->content_line.len--, packet->content_line.ptr++;
 
 	packet->http_num_headers++;
-      } else 
+      } else
 
       /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
       if((packet->content_line.len == 0) && (packet->line[packet->parsed_lines].len > 13) &&
@@ -6065,8 +6115,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
 	packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
 	packet->http_num_headers++;
-      } 
-      
+      }
+
       if(packet->content_line.len > 0) {
 	/* application/json; charset=utf-8 */
 	char separator[] = {';', '\r', '\0'};
@@ -6538,7 +6588,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 #ifdef BITTORRENT_CACHE_DEBUG
 	printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
 #endif
-	
+
 	ret.category = ndpi_get_proto_category(ndpi_str, ret);
 	return(ret);
       }
@@ -6558,7 +6608,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 #ifdef BITTORRENT_CACHE_DEBUG
 	  printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
 #endif
-	  
+
 	  ret.category = ndpi_get_proto_category(ndpi_str, ret);
 	  return(ret);
 	}
@@ -6575,7 +6625,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 #ifdef BITTORRENT_CACHE_DEBUG
       printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
 #endif
-      
+
       return(ret);
     }
 
@@ -6596,7 +6646,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 #ifdef BITTORRENT_CACHE_DEBUG
   printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
 #endif
-  
+
   return(ret);
 }
 
@@ -6897,7 +6947,7 @@ void ndpi_generate_options(u_int opt) {
     {
       for(i = 1 /* Skip no risk */; i < NDPI_MAX_RISK; i++) {
 	ndpi_risk_enum r = (ndpi_risk_enum)i;
-	
+
 	printf("            <Option%d value=\"%u\">%s</Option%d>\n",
 	       i, i, ndpi_risk2str(r), i);
       }
@@ -7580,7 +7630,7 @@ u_int8_t ndpi_ends_with(char *str, char *ends) {
   u_int8_t ends_len = strlen(ends);
   u_int8_t rc;
 
-  
+
   if(str_len < ends_len) return(0);
 
   rc = (strncmp(&str[str_len-ends_len], ends, ends_len) != 0) ? 0 : 1;
@@ -7631,7 +7681,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
     if(rc) {
       if(flow)
-	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);  	
+	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN);
     }
 
     return(rc);
@@ -7640,7 +7690,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     u_int8_t max_num_char_repetitions = 0, last_char = 0, num_char_repetitions = 0, num_dots = 0, num_trigram_dots = 0;
     u_int8_t max_domain_element_len = 0, curr_domain_element_len = 0, first_element_is_numeric = 1;
     ndpi_protocol_match_result ret_match;
-    
+
     if((!name)
        || (strchr(name, '_') != NULL)
        || (ndpi_ends_with(name, "in-addr.arpa"))
@@ -7665,7 +7715,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       if(strcmp(inet_ntoa(ip_addr), name) == 0)
 	return(0); /* Ignore numeric IPs */
     }
-    
+
     if(strncmp(name, "www.", 4) == 0)
       name = &name[4];
 

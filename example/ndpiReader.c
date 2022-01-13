@@ -3004,7 +3004,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
       for(i = 0; i < sizeof(cumulative_stats.flow_confidence)/sizeof(cumulative_stats.flow_confidence[0]); i++) {
         if(cumulative_stats.flow_confidence[i] != 0)
-          printf("\tConfidence %-17s: %-10llu (flows)\n", ndpi_confidence_get_name(i),
+          printf("\tConfidence: %-10s %-13llu (flows)\n", ndpi_confidence_get_name(i),
                  (long long unsigned int)cumulative_stats.flow_confidence[i]);
       }
   }
