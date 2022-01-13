@@ -3,7 +3,7 @@ INC=-I ../src/include
 LIBDPI=../src/lib/libndpi.a
 LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@ @LDFLAGS@
 
-TOOLS=rrd_anomaly rrd_similarity
+TOOLS=rrd_anomaly rrd_similarity rrd_mts_similarity
 
 all: $(TOOLS)
 
@@ -12,6 +12,9 @@ rrd_anomaly: rrd_anomaly.c Makefile $(LIBDPI)
 
 rrd_similarity: rrd_similarity.c Makefile $(LIBDPI)
 	$(CC) -g $(INC) rrd_similarity.c -o rrd_similarity $(LIB)
+
+rrd_mts_similarity: rrd_mts_similarity.c Makefile $(LIBDPI)
+	$(CC) -g $(INC) rrd_mts_similarity.c -o rrd_mts_similarity $(LIB)
 
 clean:
 	/bin/rm -f *.o $(TOOLS) *~
