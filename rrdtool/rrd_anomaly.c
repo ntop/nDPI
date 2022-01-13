@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <getopt.h>
-#include "rrd.h"
+#include <rrd.h>
 #include "ndpi_api.h"
 
 #define  DEFAULT_ALPHA   0.5

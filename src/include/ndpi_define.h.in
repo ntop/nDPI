@@ -27,8 +27,8 @@
   gcc -E -dM - < /dev/null |grep ENDIAN
 */
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#include <machine/endian.h>
+#if defined(__FreeBSD__) || defined(__NetBSD__)
+#include <sys/endian.h>
 #endif
 
 #ifdef __OpenBSD__
