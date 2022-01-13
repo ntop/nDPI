@@ -849,7 +849,11 @@ xmemchr(char *s, char i,int n)
       mask = c * DUPC;
 
       while (n >= LBLOCKSIZE) {
-        unsigned long int nc = DETECTNULL((*(unsigned long int *)s) ^ mask);
+#if __SIZEOF_LONG__ == 4
+        unsigned long int nc = DETECTNULL(le32toh(*(unsigned long int *)s) ^ mask);
+#else
+        unsigned long int nc = DETECTNULL(le64toh(*(unsigned long int *)s) ^ mask);
+#endif
         if(nc)
             return s + (bsf(nc) >> 3);
         s += LBLOCKSIZE;
