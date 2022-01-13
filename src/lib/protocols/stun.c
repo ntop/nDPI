@@ -42,9 +42,9 @@ struct stun_packet_header {
 
 u_int32_t get_stun_lru_key(struct ndpi_packet_struct *packet, u_int8_t rev) {
   if(rev)
-    return(packet->iph->daddr + packet->udp->dest);
+    return(ntohl(packet->iph->daddr) + ntohs(packet->udp->dest));
   else
-    return(packet->iph->saddr + packet->udp->source);
+    return(ntohl(packet->iph->saddr) + ntohs(packet->udp->source));
 }
 
 /* ************************************************************ */

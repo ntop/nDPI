@@ -44,7 +44,7 @@ struct mongo_message_header
   uint32_t message_length;
   uint32_t request_id;
   uint32_t response_to;
-  enum mongo_opcodes op_code;
+  uint32_t op_code; /* enum mongo_opcodes */
 };
 
 static void set_mongodb_detected(struct ndpi_detection_module_struct *ndpi_struct,
@@ -78,15 +78,15 @@ static void ndpi_check_mongodb(struct ndpi_detection_module_struct *ndpi_struct,
   /* All MongoDB numbers are in host byte order */
   // mongodb_hdr.message_length = ntohl(mongodb_hdr.message_length);
 
-  if((mongodb_hdr.message_length < 4)
-     || (mongodb_hdr.message_length > 1000000) /* Used to avoid false positives */
+  if((le32toh(mongodb_hdr.message_length) < 4)
+     || (le32toh(mongodb_hdr.message_length) > 1000000) /* Used to avoid false positives */
      ) {
     NDPI_LOG_DBG(ndpi_struct, "Invalid MONGODB length");
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
-  switch(mongodb_hdr.op_code) {
+  switch(le32toh(mongodb_hdr.op_code)) {
   case OP_REPLY:
   case OP_UPDATE:
   case OP_INSERT:

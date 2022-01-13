@@ -35,14 +35,16 @@ void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
   NDPI_LOG_DBG(ndpi_struct, "search MySQL\n");
 	
   if(packet->tcp) {
-    if(packet->payload_packet_len > 38	//min length
-       && get_u_int16_t(packet->payload, 0) == packet->payload_packet_len - 4	//first 3 bytes are length
-       && get_u_int8_t(packet->payload, 2) == 0x00	//3rd byte of packet length
-       && get_u_int8_t(packet->payload, 3) == 0x00	//packet sequence number is 0 for startup packet
-       && get_u_int8_t(packet->payload, 5) > 0x30	//server version > 0
-       && get_u_int8_t(packet->payload, 5) < 0x39	//server version < 9
-       && get_u_int8_t(packet->payload, 6) == 0x2e	//dot
-       ) {
+    if(packet->payload_packet_len > 38) { //min length
+      u_int32_t length = (packet->payload[2] << 16) + (packet->payload[1] << 8) + packet->payload[0];
+
+      if(length == (u_int32_t)packet->payload_packet_len - 4	//first 3 bytes are length
+         && get_u_int8_t(packet->payload, 2) == 0x00	//3rd byte of packet length
+         && get_u_int8_t(packet->payload, 3) == 0x00	//packet sequence number is 0 for startup packet
+         && get_u_int8_t(packet->payload, 5) > 0x30	//server version > 0
+         && get_u_int8_t(packet->payload, 5) < 0x39	//server version < 9
+         && get_u_int8_t(packet->payload, 6) == 0x2e	//dot
+        ) {
 #if 0
       /* Old code */
       u_int32_t a;
@@ -62,13 +64,14 @@ void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
 	}
       }
 #else
-      if(strncmp((const char*)&packet->payload[packet->payload_packet_len-22],
-		 "mysql_", 6) == 0) {
-	NDPI_LOG_INFO(ndpi_struct, "found MySQL\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL,  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	return;
-      }
+        if(strncmp((const char*)&packet->payload[packet->payload_packet_len-22],
+		   "mysql_", 6) == 0) {
+	  NDPI_LOG_INFO(ndpi_struct, "found MySQL\n");
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL,  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	  return;
+        }
 #endif
+      }
     }
   }
 
