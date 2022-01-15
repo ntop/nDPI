@@ -85,7 +85,7 @@ void analyze_rrd(rrd_file_stats *rrd, time_t start, time_t end) {
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data, *p;
   char **names;
-  u_int t, i, j, num_points;
+  u_int t, i, num_points;
   struct ndpi_analyze_struct *s;
 
   if(rrd_fetch_r(rrd->path, "AVERAGE", &start, &end, &step, &ds_cnt, &names, &data) != 0) {
@@ -122,7 +122,7 @@ void analyze_rrd(rrd_file_stats *rrd, time_t start, time_t end) {
 
 void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_file) {
   unsigned long  step = 0, ds_cnt = 0;
-  rrd_value_t *data, *p;
+  rrd_value_t *data;
   char **names;
   u_int t, i, j = 0, num_points;
   struct ndpi_analyze_struct *s;
@@ -237,7 +237,7 @@ void find_rrd_similarities(rrd_multifile_stats *rrdms, int *num_rrds, u_int num_
         }
       }
     }
-     printf("Found %u (%.3f %%) similar %s / %u zero alike %s [num_rrds: %u]\n",
+     printf("Found %u (%.3f %%) similar %s / %u zero alike %s [num_rrds: %d]\n",
 	 num_similar_rrds,
 	 (num_similar_rrds*100.)/(float)(num_rrds[k]*num_rrds[k]),
 	 filename[k],
@@ -286,7 +286,7 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
     }
   }
 
-  printf("Found %u (%.3f %%) similar Multivariates / %u zero alike Multivariates [num_mts: %u]\n",
+  printf("Found %u (%.3f %%) similar Multivariates / %u zero alike Multivariates [num_mts: %d]\n",
 	 num_similar_mts,
 	 (num_similar_mts*100.)/(float)(num_host*num_host),
 	 num_potentially_zero_equal,
