@@ -2099,7 +2099,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  if(flow->protos.tls_quic.tls_supported_versions == NULL)
 		    flow->protos.tls_quic.tls_supported_versions = ndpi_strdup(version_str);
 		}
-	      } else if(extension_id == 65486 /* encrypted server name */) {
+	      } else if(extension_id == 65486 /* encrypted server name */ &&
+	                offset+extension_offset+1 < total_len) {
 		/*
 		   - https://tools.ietf.org/html/draft-ietf-tls-esni-06
 		   - https://blog.cloudflare.com/encrypted-sni/
