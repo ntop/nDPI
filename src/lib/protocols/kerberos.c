@@ -260,7 +260,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		      printf("[AS-REQ][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n", sport, dport, cname_len, cname_str);
 #endif
 
-		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b)) {
+		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b) && num_cname == 1) {
 		        name_offset += cname_len + 2;
 		        if (name_offset < packet->payload_packet_len)
 		          cname_len = packet->payload[name_offset];
