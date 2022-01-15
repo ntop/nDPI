@@ -71,8 +71,10 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 #ifdef DEBUG_LRU
       printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key, cached_proto, proto, app_proto);
 #endif
-      app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
-      confidence = NDPI_CONFIDENCE_DPI_CACHE;
+      if(app_proto != cached_proto || proto != NDPI_PROTOCOL_STUN) {
+        app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
+        confidence = NDPI_CONFIDENCE_DPI_CACHE;
+      }
     } else {
       u_int32_t key_rev = get_stun_lru_key(packet, 1);
 
@@ -81,8 +83,10 @@ void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_stru
 #ifdef DEBUG_LRU
 	printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key_rev, cached_proto, proto, app_proto);
 #endif
-	app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
-        confidence = NDPI_CONFIDENCE_DPI_CACHE;
+	if(app_proto != cached_proto || proto != NDPI_PROTOCOL_STUN) {
+	  app_proto = cached_proto, proto = NDPI_PROTOCOL_STUN;
+	  confidence = NDPI_CONFIDENCE_DPI_CACHE;
+	}
       } else {
 	if(app_proto != NDPI_PROTOCOL_STUN) {
 	  /* No sense to add STUN, but only subprotocols */
