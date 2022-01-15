@@ -68,7 +68,7 @@ void init_targus_getdata_dissector(struct ndpi_detection_module_struct *ndpi_str
   ndpi_set_bitmask_protocol_detection("TARGUS_GETDATA", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TARGUS_GETDATA,
 				      ndpi_search_targus_getdata,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
