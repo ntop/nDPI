@@ -1870,7 +1870,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  printf("Client TLS Invalid len %u vs %u\n", s_offset+extension_len, total_len);
 #endif
 		}
-	      } else if(extension_id == 13 /* signature algorithms */) {
+	      } else if(extension_id == 13 /* signature algorithms */ &&
+	                offset+extension_offset+1 < total_len) {
 		int s_offset = offset+extension_offset, safari_signature_algorithms = 0, chrome_signature_algorithms = 0,
 		  duplicate_found = 0, last_signature = 0;
 		u_int16_t tot_signature_algorithms_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
