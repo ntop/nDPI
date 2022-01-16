@@ -80,12 +80,17 @@ void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, struct n
       NDPI_LOG_DBG(ndpi_struct, "maybe xbox\n");
       flow->l4.udp.xbox_stage++;
       return;
-    } else if ((dport == 3075 || dport == 3076 || dport == 3077 || dport == 3078) ||
+    }
+/* Disable this code. These checks are quite weak and these ports are not mentioned at
+   https://support.xbox.com/en-US/help/hardware-network/connect-network/network-ports-used-xbox-live */
+#if 0
+    else if ((dport == 3075 || dport == 3076 || dport == 3077 || dport == 3078) ||
           (sport == 3075 || sport == 3076 || sport == 3077 || sport == 3078)) {
 	ndpi_int_xbox_add_connection(ndpi_struct, flow);
 	NDPI_LOG_INFO(ndpi_struct, "found xbox udp port connection detected\n");
 	return;
     }
+#endif
 
     /* exclude here all non matched udp traffic, exclude here tcp only if http has been excluded, because xbox could use http */
     if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0) {
@@ -102,7 +107,7 @@ void init_xbox_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 				      NDPI_PROTOCOL_XBOX,
 				      ndpi_search_xbox,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
   *id += 1;

@@ -62,16 +62,12 @@ struct diameter_header_t
 
 
 // Check packet
-int is_diameter(struct ndpi_packet_struct *packet, int size_payload)
+int is_diameter(struct ndpi_packet_struct *packet)
 {
-  // check param
-  if(!packet || size_payload == 0) return -1;
+  struct diameter_header_t *diameter = (struct diameter_header_t *)packet->payload;
 
-  // cast to diameter header
-  struct diameter_header_t *diameter = (struct diameter_header_t *) packet;
-
-  // check if the packet is diameter
-  if(diameter->version == 0x01 &&
+  if(packet->payload_packet_len >= sizeof(struct diameter_header_t) &&
+     diameter->version == 0x01 &&
      (diameter->flags == DIAMETER_REQUEST ||
       diameter->flags == DIAMETER_PROXYABLE ||
       diameter->flags == DIAMETER_ERROR ||
@@ -83,10 +79,10 @@ int is_diameter(struct ndpi_packet_struct *packet, int size_payload)
 	com_code == CC || com_code == CE ||
 	com_code == DW || com_code == DP ||
 	com_code == RA || com_code == ST)
-       return 0; // OK
+       return 0;
   }
-  // wrong packet
-  return -2;
+
+  return -1;
 }
 
 
@@ -95,24 +91,16 @@ void ndpi_search_diameter(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  // Diameter is on TCP
   if(packet->tcp) {
-
-    /* Check if it's diameter */
-    int ret = is_diameter(packet, packet->payload_packet_len);
-    if(ret != 0) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-      return;
-    }
-    else {
+    int ret = is_diameter(packet);
+    if(ret == 0) {
       NDPI_LOG_INFO(ndpi_struct, "found Diameter\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIAMETER, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      return;
     }
   }
-  else { // UDP
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
@@ -121,7 +109,7 @@ void init_diameter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 {
   ndpi_set_bitmask_protocol_detection("Diameter", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_DIAMETER, ndpi_search_diameter,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
 
   *id += 1;
