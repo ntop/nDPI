@@ -65,9 +65,7 @@
 #define _NDPI_PATRICIA_TYPEDEF_H_
 
 /* pointer to usr data (ex. route flap info) */
-union ndpi_patricia_node_value_t {
-  void *user_data;
-  
+union ndpi_patricia_node_value_t { 
   /* User-defined values */
   union {
     struct {
@@ -75,6 +73,8 @@ union ndpi_patricia_node_value_t {
     } uv32;
     
     u_int64_t uv64;
+
+    void *user_data;
   } u;
 };
 
