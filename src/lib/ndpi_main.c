@@ -139,9 +139,23 @@ static inline uint8_t flow_is_proto(struct ndpi_flow_struct *flow, u_int16_t p) 
 
 /* ****************************************** */
 
+static u_int32_t ndpi_tot_allocated_memory;
+
+/* ****************************************** */
+
+u_int32_t ndpi_get_tot_allocated_memory() {
+  return(ndpi_tot_allocated_memory);
+}
+
+/* ****************************************** */
+
 void *ndpi_malloc(size_t size) {
+  ndpi_tot_allocated_memory += size;
   return(_ndpi_malloc ? _ndpi_malloc(size) : malloc(size));
 }
+
+/* ****************************************** */
+
 void *ndpi_flow_malloc(size_t size) {
   return(_ndpi_flow_malloc ? _ndpi_flow_malloc(size) : ndpi_malloc(size));
 }
@@ -152,9 +166,11 @@ void *ndpi_calloc(unsigned long count, size_t size) {
   size_t len = count * size;
   void *p = ndpi_malloc(len);
 
-  if(p)
+  if(p) {
     memset(p, 0, len);
-
+    ndpi_tot_allocated_memory += size;
+  }
+  
   return(p);
 }
 
