@@ -100,7 +100,7 @@ void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct, struct
       ndpi_parse_packet_line_info(ndpi_struct, flow);
 
       // test for unique character of the zattoo header
-      if(packet->parsed_lines == 4 && packet->host_line.ptr != NULL) {
+      if(packet->parsed_lines == 4 && packet->host_line.ptr != NULL && packet->iph) {
 	u_int32_t ip;
 	u_int16_t bytes_read = 0;
 
