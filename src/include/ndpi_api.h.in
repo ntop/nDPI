@@ -118,7 +118,7 @@ extern "C" {
   void   ndpi_free(void *ptr);
   void * ndpi_flow_malloc(size_t size);
   void   ndpi_flow_free(void *ptr);
-  u_int32_t ndpi_get_tot_allocated_memory();
+  u_int32_t ndpi_get_tot_allocated_memory(void);
   
   /**
    * Search the first occurrence of substring -find- in -s-

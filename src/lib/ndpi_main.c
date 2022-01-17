@@ -2509,7 +2509,7 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
   ndpi_risk mask = ((ndpi_risk)-1);
 
   for(i=0; risks_to_mask[i] != NDPI_NO_RISK; i++)
-    mask &= ~(1UL << risks_to_mask[i]);
+    mask &= ~(1ULL << risks_to_mask[i]);
 
   for(i=0; domains[i] != NULL; i++)
     ndpi_add_host_risk_mask(ndpi_str, (char*)domains[i], mask);
