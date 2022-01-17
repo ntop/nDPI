@@ -307,6 +307,7 @@ typedef enum {
   NDPI_PROTOCOL_MICROSOFT_AZURE       = 276,
   NDPI_PROTOCOL_ICLOUD_PRIVATE_RELAY  = 277,
   NDPI_PROTOCOL_ETHERNET_IP           = 278,
+  NDPI_PROTOCOL_BADOO                 = 279,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

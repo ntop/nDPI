@@ -10084,6 +10084,9 @@ static ndpi_protocol_match host_match[] =
    { "mask-h2.icloud.com",            "iCloudPrivateRelay", NDPI_PROTOCOL_ICLOUD_PRIVATE_RELAY, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "mask-api.icloud.com",           "iCloudPrivateRelay", NDPI_PROTOCOL_ICLOUD_PRIVATE_RELAY, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "badoo.com",                     "Badoo", NDPI_PROTOCOL_BADOO, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "badoocdn.com",                  "Badoo", NDPI_PROTOCOL_BADOO, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL }
   };
 
@@ -10230,7 +10233,6 @@ static ndpi_category_match category_match[] = {
    { ".nexage.com",                   CUSTOM_CATEGORY_ADVERTISEMENT },
    /* RadiumOne (formerly GWallet) is a digital advertising company */
    { ".gwallet.com",                  CUSTOM_CATEGORY_ADVERTISEMENT },
-
 
    { NULL, 0 }
 };
