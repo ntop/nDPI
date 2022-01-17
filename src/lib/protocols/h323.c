@@ -94,7 +94,7 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
       }
     /* H323  */
     if(sport == 1719 || dport == 1719) {
-      if((packet->payload_packet_len >= 5)
+      if((packet->payload_packet_len > 5)
 	 && (packet->payload[0] == 0x16)
 	 && (packet->payload[1] == 0x80)
 	 && (packet->payload[4] == 0x06)
