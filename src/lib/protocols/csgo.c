@@ -77,7 +77,8 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
       }
     }
 
-    if(flow->l4.udp.csgo_s2 < 3 && (w & 0xffff0000ul) == 0x0d1d0000) {
+    if(packet->payload_packet_len > 6 &&
+       flow->l4.udp.csgo_s2 < 3 && (w & 0xffff0000ul) == 0x0d1d0000) {
       uint32_t w2 = get_u_int32_t(packet->payload, 2);
       if(packet->payload_packet_len == 13) {
         if(!flow->l4.udp.csgo_s2) {
