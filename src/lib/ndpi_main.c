@@ -761,6 +761,8 @@ static void ndpi_xgrams_init(unsigned int *dst,size_t dn, const char **src,size_
   }
 }
 
+/* ******************************************************************** */
+
 static void init_string_based_protocols(struct ndpi_detection_module_struct *ndpi_str) {
   int i;
 
@@ -2481,9 +2483,45 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
 /* *********************************************** */
 
+/*
+  This function adds some exceptions for popular domain names
+  in order to avoid "false" positives and avoid polluting
+  results
+*/
+static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str) {
+  const char *domains[] = {
+    ".local",
+    ".msftconnecttest.com",
+    "amupdatedl.microsoft.com",
+    "update.microsoft.com.akadns.net",
+    ".windowsupdate.com",
+    "e5.sk",
+    "sophosxl.net",
+    NULL /* End */
+  };
+  const ndpi_risk risks_to_mask[] = {
+    NDPI_SUSPICIOUS_DGA_DOMAIN,
+    NDPI_BINARY_APPLICATION_TRANSFER,
+    NDPI_HTTP_NUMERIC_IP_HOST,
+    NDPI_NO_RISK /* End */
+  };
+  u_int i;
+  ndpi_risk mask = ((ndpi_risk)-1);
+
+  for(i=0; risks_to_mask[i] != NDPI_NO_RISK; i++)
+    mask &= ~(1UL << risks_to_mask[i]);
+
+  for(i=0; domains[i] != NULL; i++)
+    ndpi_add_host_risk_mask(ndpi_str, (char*)domains[i], mask);
+}
+
+/* *********************************************** */
+
 void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
+  ndpi_add_domain_risk_exceptions(ndpi_str);
+  
   if(ndpi_str->ac_automa_finalized) return;
 
   for(i = 0; i < 99; i++) {
