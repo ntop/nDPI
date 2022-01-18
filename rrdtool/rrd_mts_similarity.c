@@ -1,5 +1,5 @@
 /*
- * rrd_similarity.c
+ * rrd_mts_similarity.c
  *
  * Copyright (C) 2011-22 - ntop.org
  *
@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <getopt.h>
 #include <dirent.h>
@@ -58,22 +59,22 @@ u_int verbose = 0, similarity_threshold = 100, skip_zero = 0;
 /* *************************************************** */
 
 static void help() {
-  printf("Usage: rrd_similarity [-v][-a <alpha>][-e <end>][-q][-s <start>]\n"
-	 "                      -f <filename> -d <basedir> [-t <threshold>]\n"
+  printf("Usage: rrd_mts_similarity [-v][-a <alpha>][-e <end>][-q][-s <start>]\n"
+	 "                      -f <filename_1> <filename_2> ... <filename_n> -d <basedir> [-t <threshold>]\n"
 	 "-a             | Set alpha. Valid range >0 .. <1. Default %.2f\n"
 	 "-e <end>       | RRD end time. Default %s\n"
 	 "-q             | Quick output (only anomalies are reported)\n"
 	 "-s <start>     | RRD start time. Default %s\n"
 
 	 "-d <basedir>   | Base directory where RRD filename is searched\n"
-	 "-f <rrd path>  | Path of the RRD filename to analyze\n"
+	 "-f <rrd_path1> <rrd_path2> ...  | Path of the RRDs filename to analyze\n"
 	 "-t <threshold> | Similarity threshold. Default %u (0 == alike)\n"
 	 "-v             | Verbose\n"
 	 "-z             | Skip zero RRDs during comparison\n"
 	 ,
 	 DEFAULT_ALPHA, DEFAULT_END, DEFAULT_START, similarity_threshold);
 
-  printf("\n\nExample: rrd_similarity -q -f bytes.rrd -d /var/lib/ntopng/-1/snmpstats\n");
+  printf("\n\nExample: rrd_mts_similarity -q -f bytes.rrd score.rrd -d /var/lib/ntopng/-1/snmpstats\n");
 
   printf("\n\nGoal: find similar RRDs\n");
   exit(0);
@@ -85,7 +86,7 @@ void analyze_rrd(rrd_file_stats *rrd, time_t start, time_t end) {
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data, *p;
   char **names;
-  u_int t, i, num_points;
+  u_int t, i, j, num_points;
   struct ndpi_analyze_struct *s;
 
   if(rrd_fetch_r(rrd->path, "AVERAGE", &start, &end, &step, &ds_cnt, &names, &data) != 0) {
@@ -122,7 +123,7 @@ void analyze_rrd(rrd_file_stats *rrd, time_t start, time_t end) {
 
 void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_file) {
   unsigned long  step = 0, ds_cnt = 0;
-  rrd_value_t *data;
+  rrd_value_t *data, *p;
   char **names;
   u_int t, i, j = 0, num_points;
   struct ndpi_analyze_struct *s;
@@ -363,63 +364,57 @@ int main(int argc, char *argv[]) {
 
   filename = malloc(sizeof(char*)*MAX_NUM_FILE);
   for(i=0; i<MAX_NUM_FILE; i++)
+  {
     filename[i] = malloc(sizeof(char)*50);
-
-  while((c = getopt(argc, argv, "d:s:e:a:qf:t:vz")) != '?') {
-    if(c == -1) break;
-
-    switch(c) {
-    case 's':
-      start_s = optarg;
-      break;
-
-    case 'd':
-      basedir = optarg;
-      break;
-
-    case 'e':
-      end_s = optarg;
-      break;
-
-    case 'q':
-      quick_mode = 1;
-      break;
-
-    case 'v':
-      verbose = 1;
-      break;
-
-    case 'a':
-      {
-	float f = atof(optarg);
-
-	if((f > 0) && (f < 1))
-	  alpha = f;
-	else
-	  printf("Discarding -a: valid range is >0 .. <1\n");
-      }
-      break;
-
-    case 'f':
-      filename[n_file] = optarg;
-      n_file++;
-      break;
-
-    case 't':
-      similarity_threshold = atoi(optarg);
-      break;
-
-    case 'z':
-      skip_zero = 1;
-      break;
-
-    default:
-      help();
-      break;
-    }
+    filename[i] = NULL;
+  }
+  
+  for(i= 0; i<argc;i++)
+  { 
+    if(strstr(argv[i],"-s") != NULL && (i+1)<argc) 
+      start_s = argv[i+1]; 
+      
+    if(strstr(argv[i],"-d") != NULL && (i+1)<argc) 
+      basedir = argv[(i+1)]; 
+      
+    if(strstr(argv[i],"-e") != NULL && (i+1)<argc) 
+      end_s = argv[(i+1)]; 
+      
+    if(strstr(argv[i],"-q") != NULL) 
+      quick_mode = 1; 
+      
+    if(strstr(argv[i],"-v") != NULL) 
+      verbose = 1; 
+      
+    if(strstr(argv[i],"-a") != NULL && (i+1)<argc)
+    { 
+      float f = atof(argv[i]); 
+      
+      if((f > 0) && (f < 1)) 
+        alpha = f; 
+        
+      else 
+        printf("Discarding -a: valid range is >0 .. <1\n"); 
+    } 
+    
+    if(strstr(argv[i],"-t") != NULL && (i+1)<argc)
+     similarity_threshold = atoi(argv[i]);
+     
+    if(strstr(argv[i],"-z") != NULL)
+     skip_zero = 1;
+     
+    if(strstr(argv[i],"-f") != NULL)
+    { 
+      while((i+1)<argc && strstr(argv[i+1],".rrd")!= NULL )
+      { 
+        filename[n_file] = argv[i+1]; 
+        n_file++; 
+        i++; 
+      } 
+    } 
   }
 
-  if((filename == NULL) || (basedir == NULL))
+  if((filename[0] == NULL) || (basedir == NULL))
     help();
 
   if((rrd_parsetime(start_s, &start_tv) != NULL)) {
