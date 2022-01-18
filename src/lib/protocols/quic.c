@@ -1,7 +1,7 @@
 /*
  * quic.c
  *
- * Copyright (C) 2012-21 - ntop.org
+ * Copyright (C) 2012-22 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -985,8 +985,9 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   pn_offset = 1 + 4 + 1 + dest_conn_id_len + 1 + source_conn_id_len;
   pn_offset += quic_len(&packet->payload[pn_offset], &token_length);
   pn_offset += token_length;
-  /* Checks: quic_len reads 8 bytes, at most; quic_decrypt_header reads other 20 bytes */
-  if(pn_offset + 8 + (4 + 16) >= packet->payload_packet_len) {
+  /* Checks: quic_len reads 8 bytes, at most; quic_decrypt_header reads other 20 bytes.
+     Promote to uint64_t to avoid unsigned wrapping */
+  if((uint64_t)pn_offset + 8 + (4 + 16) >= (uint64_t)packet->payload_packet_len) {
     quic_ciphers_reset(&ciphers);
     return NULL;
   }
@@ -1342,7 +1343,7 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->protos.tls_quic.alpn &&
      strncmp(flow->protos.tls_quic.alpn, "doq", 3) == 0) {
     NDPI_LOG_DBG(ndpi_struct, "Found DOQ (ALPN: [%s])\n", flow->protos.tls_quic.alpn);
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_QUIC);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_QUIC, NDPI_CONFIDENCE_DPI);
   }
 }
 static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1594,7 +1595,7 @@ static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_stru
       packet->payload[1] == 200 || /* RTCP, Sender Report */
       is_valid_rtp_payload_type(packet->payload[1] & 0x7F)) /* RTP */) {
     NDPI_LOG_DBG(ndpi_struct, "Found RTP/RTCP over QUIC\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SNAPCHAT_CALL, NDPI_PROTOCOL_QUIC);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SNAPCHAT_CALL, NDPI_PROTOCOL_QUIC, NDPI_CONFIDENCE_DPI);
   } else {
     /* Unexpected traffic pattern: we should investigate it... */
     NDPI_LOG_INFO(ndpi_struct, "To investigate...\n");
@@ -1638,7 +1639,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
    */
 
   NDPI_LOG_INFO(ndpi_struct, "found QUIC\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
   /*
    * 3) Skip not supported versions

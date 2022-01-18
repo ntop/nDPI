@@ -2,7 +2,7 @@
  * tinc.c
  *
  * Copyright (C) 2017 - William Guglielmo <william@deselmo.com>
- * Copyright (C) 2017-21 - ntop.org
+ * Copyright (C) 2017-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -55,7 +55,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 	/* cache_free(ndpi_struct->tinc_cache); */
 
         NDPI_LOG_INFO(ndpi_struct, "found tinc udp connection\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
       }
     }
     
@@ -114,7 +114,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 
 	    cache_add(ndpi_struct->tinc_cache, &(flow->tinc_cache_entry), sizeof(flow->tinc_cache_entry));
 	    NDPI_LOG_INFO(ndpi_struct, "found tinc tcp connection\n");
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	  }
 	  return;
 	}
@@ -141,7 +141,7 @@ void init_tinc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   ndpi_set_bitmask_protocol_detection("TINC", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TINC,
 				      ndpi_search_tinc,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITHOUT_RETRANSMISSION, /* TODO: IPv6? */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

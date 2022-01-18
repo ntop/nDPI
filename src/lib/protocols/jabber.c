@@ -2,7 +2,7 @@
  * jabber.c
  *
  * Copyright (C) 2009-11 - ipoque GmbH
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -41,9 +41,9 @@ static struct jabber_string jabber_strings[] = {
 
 static void ndpi_int_jabber_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
-					   u_int32_t protocol)
+					   u_int32_t protocol, ndpi_confidence_t confidence)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN, confidence);
 }
 
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
@@ -56,7 +56,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   for(i=0; jabber_strings[i].string != NULL; i++) {
     if(ndpi_strnstr((const char*)&packet->payload[x], jabber_strings[i].string, left) != NULL) {    
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, jabber_strings[i].ndpi_protocol);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, jabber_strings[i].ndpi_protocol, NDPI_CONFIDENCE_DPI);
       return;
     }
   }  
@@ -97,7 +97,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 	NDPI_LOG_INFO(ndpi_struct, "found jabber file transfer\n");
 
 	ndpi_int_jabber_add_connection(ndpi_struct, flow,
-				       NDPI_PROTOCOL_JABBER);
+				       NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
       }
     }
     if (dst != NULL && dst->jabber_file_transfer_port[0] != 0) {
@@ -117,7 +117,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 	NDPI_LOG_INFO(ndpi_struct, "found jabber file transfer\n");
 
 	ndpi_int_jabber_add_connection(ndpi_struct, flow,
-				       NDPI_PROTOCOL_JABBER);
+				       NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
       }
     }
     return;
@@ -274,7 +274,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
        || ndpi_strnstr((const char *)&packet->payload[13], "xmlns:stream=\"http://etherx.jabber.org/streams\"", start)) {
   
       /* Protocol family */
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
 
       /* search for subprotocols */
       check_content_type_and_change_protocol(ndpi_struct, flow, 13);

@@ -1,7 +1,7 @@
 /*
  * amazon_video.c
  *
- * Copyright (C) 2018-21 - ntop.org
+ * Copyright (C) 2018-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -40,7 +40,7 @@ static void ndpi_check_amazon_video(struct ndpi_detection_module_struct *ndpi_st
 	packet->payload[2] == 0xFA &&
 	packet->payload[3] == 0xCE)) {
       NDPI_LOG_INFO(ndpi_struct, "found Amazon Video on TCP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     } else if((packet->udp != NULL) &&
 	      (packet->payload[0] == 0xDE &&
@@ -48,7 +48,7 @@ static void ndpi_check_amazon_video(struct ndpi_detection_module_struct *ndpi_st
 	       packet->payload[2] == 0xBE &&
 	       packet->payload[3] == 0xEF)) {
       NDPI_LOG_INFO(ndpi_struct, "found Amazon Video on UDP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMAZON_VIDEO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }
@@ -71,7 +71,7 @@ void init_amazon_video_dissector(struct ndpi_detection_module_struct *ndpi_struc
   ndpi_set_bitmask_protocol_detection("AMAZON_VIDEO", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_AMAZON_VIDEO,
 				      ndpi_search_amazon_video,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;

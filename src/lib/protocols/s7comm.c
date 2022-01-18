@@ -1,7 +1,7 @@
 /*
  * s7comm.c
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  * 
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -33,7 +33,7 @@ void ndpi_search_s7comm_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     
     if((packet->payload_packet_len >= 2) && (packet->payload[0]==0x03)&&(packet->payload[1]==0x00)&&((packet->tcp->dest == s7comm_port) || (packet->tcp->source == s7comm_port))) {
       NDPI_LOG_INFO(ndpi_struct, "found S7\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
       return;
       

@@ -1,7 +1,7 @@
 /*
  * kakaotalk_voice.c
  *
- * Copyright (C) 2015-21 - ntop.org
+ * Copyright (C) 2015-22 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -54,7 +54,7 @@ void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndpi_struc
       if(((ntohl(packet->iph->saddr) & 0xFFFF0000 /* 255.255.0.0 */) == 0x01C90000 /* 1.201.0.0/16 */)
 	 || ((ntohl(packet->iph->daddr) & 0xFFFF0000 /* 255.255.0.0 */) == 0x01C90000 /* 1.201.0.0/16 */)) {
 	NDPI_LOG_INFO(ndpi_struct, "found kakaotalk_voice\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KAKAOTALK_VOICE, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KAKAOTALK_VOICE, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     } 

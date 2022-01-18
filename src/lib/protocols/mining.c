@@ -1,7 +1,7 @@
 /*
  * mining.c [Bitcoin, Ethereum, ZCash, Monero]
  *
- * Copyright (C) 2018-21 - ntop.org
+ * Copyright (C) 2018-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -61,7 +61,7 @@ void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
       ;
     else {
       snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       if(packet->iph) /* TODO: ipv6 */
         cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
       return;
@@ -97,7 +97,7 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       
       if((*to_match == magic) || (*to_match == magic1)) {
 	snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	if(packet->iph) /* TODO: ipv6 */
 	  cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
 	return;
@@ -110,7 +110,7 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(isEthPort(ntohs(packet->tcp->dest)) /* Ethereum port */) {
 	snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	if(packet->iph) /* TODO: ipv6 */
 	  cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
 	return;
@@ -131,7 +131,7 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	{"worker": "", "jsonrpc": "2.0", "params": [], "id": 3, "method": "eth_getWork"}
       */
       snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       if(packet->iph) /* TODO: ipv6 */
         cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
       return;
@@ -155,7 +155,7 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	{"method":"submit","params":{"id":"479059546883218","job_id":"722134174127131","nonce":"98024001","result":"c9be9381a68d533c059d614d961e0534d7d8785dd5c339c2f9596eb95f320100"},"id":1}
       */
       snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ZCash/Monero");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       if(packet->iph) /* TODO: ipv6 */
         cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
       return;

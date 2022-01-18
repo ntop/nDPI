@@ -1,5 +1,5 @@
 CC=@CC@
-INC=-I ../src/include
+INC=-I ../src/include -I/usr/local/include
 LIBDPI=../src/lib/libndpi.a
 LDFLAGS=@LDFLAGS@
 LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@
@@ -16,6 +16,11 @@ rrd_similarity: rrd_similarity.c Makefile $(LIBDPI)
 
 clean:
 	/bin/rm -f *.o $(TOOLS) *~
+
+distclean: clean
+	/bin/rm -f Makefile
+
+distdir:
 
 install:
 	@echo -n ""

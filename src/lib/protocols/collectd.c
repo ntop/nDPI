@@ -1,7 +1,7 @@
 /*
  * collectd.c
  *
- * Copyright (C) 2014-21 - ntop.org
+ * Copyright (C) 2014-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -47,7 +47,7 @@ void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struct, stru
 
   if(len == packet->payload_packet_len) {
     NDPI_LOG_INFO(ndpi_struct, "found COLLECTD\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_COLLECTD, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_COLLECTD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   } else {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }

@@ -1,7 +1,7 @@
 /*
  * dns.c
  *
- * Copyright (C) 2012-21 - ntop.org
+ * Copyright (C) 2012-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -318,7 +318,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	/* We missed the request */
 	u_int16_t s_port = packet->udp ? ntohs(packet->udp->source) : ntohs(packet->tcp->source);
 
-	ndpi_set_detected_protocol(ndpi_struct, flow, checkPort(s_port), NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, checkPort(s_port), NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       }
     }
   }
@@ -498,7 +498,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
     if(is_query) {
       /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
-      ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
+      ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol, NDPI_CONFIDENCE_DPI);
 
       /* This is necessary to inform the core to call this dissector again */
       flow->check_extra_packets = 1;
@@ -525,7 +525,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	 matched a subprotocol
       **/
       NDPI_LOG_INFO(ndpi_struct, "found DNS\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol);
+      ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol, NDPI_CONFIDENCE_DPI);
     } else {
       if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
 	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS))

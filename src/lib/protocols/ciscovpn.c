@@ -1,7 +1,7 @@
 /*
  * ciscovpn.c
  *
- * Copyright (C) 2013-21 - ntop.org
+ * Copyright (C) 2013-22 - ntop.org
  * 
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -30,7 +30,7 @@
 
 static void ndpi_int_ciscovpn_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CISCOVPN, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CISCOVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* ****************************************************************** */
@@ -138,7 +138,7 @@ void init_ciscovpn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
   ndpi_set_bitmask_protocol_detection("CiscoVPN", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_CISCOVPN,
 				      ndpi_search_ciscovpn,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;

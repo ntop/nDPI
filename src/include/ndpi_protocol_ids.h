@@ -1,7 +1,7 @@
 /*
  * ndpi_protocol_ids.h
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -306,6 +306,8 @@ typedef enum {
   NDPI_PROTOCOL_CRASHLYSTICS          = 275,
   NDPI_PROTOCOL_MICROSOFT_AZURE       = 276,
   NDPI_PROTOCOL_ICLOUD_PRIVATE_RELAY  = 277,
+  NDPI_PROTOCOL_ETHERNET_IP           = 278,
+  NDPI_PROTOCOL_BADOO                 = 279,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

@@ -2,7 +2,7 @@
  * directconnect.c
  *
  * Copyright (C) 2009-11 - ipoque GmbH
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -82,7 +82,7 @@ static void ndpi_int_directconnect_add_connection(struct ndpi_detection_module_s
   struct ndpi_id_struct *src = flow->src;
   struct ndpi_id_struct *dst = flow->dst;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
   if(src != NULL) {
     src->directconnect_last_safe_access_time = packet->current_time_ms;
@@ -166,7 +166,7 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	src->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_port));
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
 	return;
       } else {
 	src->detected_directconnect_port = 0;
@@ -180,7 +180,7 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	   src->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	src->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(src->detected_directconnect_ssl_port));
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
 	return;
       } else {
 	src->detected_directconnect_ssl_port = 0;
@@ -198,7 +198,7 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	   dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	dst->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_INFO(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_port));
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
 	return;
       } else {
 	dst->detected_directconnect_port = 0;
@@ -212,7 +212,7 @@ static void ndpi_search_directconnect_tcp(struct ndpi_detection_module_struct *n
 	   dst->directconnect_last_safe_access_time) < ndpi_struct->directconnect_connection_ip_tick_timeout) {
 	dst->directconnect_last_safe_access_time = packet->current_time_ms;
 	NDPI_LOG_DBG(ndpi_struct, "found DC using port %d\n", ntohs(dst->detected_directconnect_ssl_port));
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
 	return;
       } else {
 	dst->detected_directconnect_ssl_port = 0;
@@ -324,7 +324,7 @@ static void ndpi_search_directconnect_udp(struct ndpi_detection_module_struct
 
       dst->directconnect_last_safe_access_time = packet->current_time_ms;
       NDPI_LOG_INFO(ndpi_struct, "found DC using udp port %d\n", ntohs(dst->detected_directconnect_udp_port));
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DIRECTCONNECT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
       return;
     } else {
       dst->detected_directconnect_udp_port = 0;
@@ -416,7 +416,7 @@ void ndpi_search_directconnect(struct ndpi_detection_module_struct
 			       ndpi_struct->directconnect_connection_ip_tick_timeout)) {
       dst->directconnect_last_safe_access_time = packet->current_time_ms;
     } else {
-      flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_UNKNOWN);
       NDPI_LOG_DBG2(ndpi_struct, "skipping as unknown due to timeout\n");
     }
     return;

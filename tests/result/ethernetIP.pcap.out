@@ -1,0 +1,11 @@
+Guessed flow protos:	4
+
+DPI Packets (TCP):	100	(25.00 pkts/flow)
+Confidence Match by port    : 4 (flows)
+
+EthernetIP	100	17384	4
+
+	1	TCP 141.81.0.10:50275 <-> 141.81.0.83:44818 [proto: 278/EthernetIP][ClearText][Confidence: Match by port][cat: Network/14][12 pkts/2716 bytes <-> 16 pkts/2580 bytes][Goodput ratio: 76/66][0.70 sec][bytes ratio: 0.026 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 72/38 231/232 96/75][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 226/161 1258/406 330/99][PLAIN TEXT (99999999359)][Plen Bins: 0,20,45,0,10,0,0,5,0,5,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 141.81.0.63:44818 <-> 141.81.0.10:52593 [proto: 278/EthernetIP][ClearText][Confidence: Match by port][cat: Network/14][16 pkts/2150 bytes <-> 13 pkts/2566 bytes][Goodput ratio: 58/73][0.78 sec][bytes ratio: -0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/1 30/60 190/197 55/74][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 134/197 406/528 92/158][PLAIN TEXT (99999999356)][Plen Bins: 0,15,43,0,5,0,10,5,0,0,5,5,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 141.81.0.10:52594 <-> 141.81.0.43:44818 [proto: 278/EthernetIP][ClearText][Confidence: Match by port][cat: Network/14][9 pkts/1978 bytes <-> 12 pkts/1784 bytes][Goodput ratio: 75/62][0.66 sec][bytes ratio: 0.052 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 61/33 196/185 73/56][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 220/149 528/406 163/113][PLAIN TEXT (rWKIm.)][Plen Bins: 0,14,35,0,7,0,14,0,0,7,0,7,7,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 141.81.0.10:62717 <-> 141.81.0.23:44818 [proto: 278/EthernetIP][ClearText][Confidence: Match by port][cat: Network/14][11 pkts/2132 bytes <-> 11 pkts/1478 bytes][Goodput ratio: 72/58][0.65 sec][bytes ratio: 0.181 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 52/48 202/242 68/82][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 194/134 528/406 156/96][PLAIN TEXT (DISABLE)][Plen Bins: 0,20,41,0,6,0,13,0,0,0,0,6,6,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

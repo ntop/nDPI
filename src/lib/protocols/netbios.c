@@ -1,7 +1,7 @@
 /*
  * netbios.c
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  * Copyright (C) 2009-11 - ipoque GmbH
  *
  * This file is part of nDPI, an open source deep packet inspection
@@ -108,9 +108,9 @@ static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct 
   }
 
   if(sub_protocol == NDPI_PROTOCOL_UNKNOWN)
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETBIOS, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETBIOS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   else
-    ndpi_set_detected_protocol(ndpi_struct, flow, sub_protocol, NDPI_PROTOCOL_NETBIOS);
+    ndpi_set_detected_protocol(ndpi_struct, flow, sub_protocol, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
 }
 
 /* ****************************************************************** */
@@ -418,7 +418,7 @@ void init_netbios_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   ndpi_set_bitmask_protocol_detection("NETBIOS", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_NETBIOS,
 				      ndpi_search_netbios,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

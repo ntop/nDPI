@@ -1,7 +1,7 @@
 /*
  * ookla.c
  *
- * Copyright (C) 2018-21 - ntop.org
+ * Copyright (C) 2018-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -54,7 +54,7 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
 	 && (packet->payload[0] == 0x48) /* HI\n */
 	 && (packet->payload[1] == 0x49)
 	 && (packet->payload[2] == 0x0A)) {	
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	
 	if(ndpi_struct->ookla_cache == NULL)
 	  ndpi_struct->ookla_cache = ndpi_lru_cache_init(1024);
@@ -84,7 +84,7 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
 	  
 	  if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, h, &dummy, 0 /* Don't remove it as it can be used for other connections */)) {
 	    NDPI_LOG_INFO(ndpi_struct, "found ookla tcp connection\n");
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
 #ifdef OOKLA_DEBUG
 	    printf("=>>>>> Found %u\n", h);
 #endif
@@ -117,7 +117,7 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
     
       if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, addr, &dummy, 0 /* Don't remove it as it can be used for other connections */)) {
 	NDPI_LOG_INFO(ndpi_struct, "found ookla tcp connection\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
 #ifdef OOKLA_DEBUG
 	printf("=>>>>> Found %u\n", addr);
 #endif

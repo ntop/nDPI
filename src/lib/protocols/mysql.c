@@ -2,7 +2,7 @@
  * mysql.c
  * 
  * Copyright (C) 2009-11 - ipoque GmbH
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -54,7 +54,7 @@ void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
 	     && get_u_int32_t(packet->payload, a + 27) == 0x0	 // filler bytes
 	     && get_u_int8_t(packet->payload, a + 31) == 0x0) {
 	    NDPI_LOG_INFO(ndpi_struct, "found MySQL\n");
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL, NDPI_PROTOCOL_UNKNOWN);
+	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	    return;
 	  }
 	  
@@ -65,7 +65,7 @@ void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_struct, str
       if(strncmp((const char*)&packet->payload[packet->payload_packet_len-22],
 		 "mysql_", 6) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found MySQL\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL,  NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL,  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
 #endif

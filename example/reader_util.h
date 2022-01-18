@@ -1,7 +1,7 @@
 /*
  * ndpi_util.h
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -189,6 +189,7 @@ typedef struct ndpi_flow_info {
 
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
+  ndpi_confidence_t confidence;
 
   // Flow data analysis
   pkt_timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;
@@ -225,7 +226,7 @@ typedef struct ndpi_flow_info {
   } ssh_tls;
 
   struct {
-    char url[256], request_content_type[64], content_type[64], user_agent[128];
+    char url[256], request_content_type[64], content_type[64], user_agent[256];
     u_int response_status_code;
   } http;
 
@@ -263,6 +264,7 @@ typedef struct ndpi_stats {
   u_int64_t packet_len[6];
   u_int16_t max_packet_len;
   u_int64_t dpi_packet_count[3];
+  u_int64_t flow_confidence[NDPI_CONFIDENCE_MAX];
 } ndpi_stats_t;
 
 

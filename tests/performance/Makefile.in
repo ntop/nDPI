@@ -1,0 +1,39 @@
+INC=-I ../../src/include/
+LIB=../../src/lib/libndpi.a @ADDITIONAL_LIBS@
+
+TOOLS=substringsearch patriciasearch
+TESTS=substring_test patricia_test
+
+
+all: $(TESTS)
+
+tools: $(TOOLS)
+
+
+substringsearch: substringsearch.c Makefile
+	$(CC) -O2 $(INC) substringsearch.c -o substringsearch $(LIB)
+
+substring_test: substringsearch top-1m.csv
+	./substringsearch
+
+#
+
+patriciasearch: patriciasearch.c Makefile
+	$(CC) -O2 $(INC) patriciasearch.c -o patriciasearch $(LIB)
+
+patricia_test: patriciasearch blacklist-ip.txt
+	./patriciasearch
+
+
+# Alexa Top 1 Million
+top-1m.csv:
+	wget http://s3.amazonaws.com/alexa-static/top-1m.csv.zip
+	unzip top-1m.csv.zip
+
+blacklist-ip.txt:
+	wget http://blacklists.ntop.org/blacklist-ip.txt
+
+clean:
+	/bin/rm -f *zip top-1m.csv blacklist-ip.txt
+
+

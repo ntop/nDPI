@@ -26,7 +26,7 @@
 static void ndpi_int_teamspeak_add_connection(struct ndpi_detection_module_struct
                                               *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEAMSPEAK, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEAMSPEAK, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -65,7 +65,7 @@ void init_teamspeak_dissector(struct ndpi_detection_module_struct *ndpi_struct, 
   ndpi_set_bitmask_protocol_detection("TeamSpeak", ndpi_struct, detection_bitmask, *id,
                                       NDPI_PROTOCOL_TEAMSPEAK,
                                       ndpi_search_teamspeak,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
 

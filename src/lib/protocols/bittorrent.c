@@ -2,7 +2,7 @@
  * bittorrent.c
  *
  * Copyright (C) 2009-11 - ipoque GmbH
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -116,7 +116,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
   if(check_hash)
     ndpi_search_bittorrent_hash(ndpi_struct, flow, bt_offset);
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
   
   if(flow->protos.bittorrent.hash[0] == '\0') {
     /* This is necessary to inform the core to call this dissector again */
@@ -481,7 +481,7 @@ static void ndpi_skip_bittorrent(struct ndpi_detection_module_struct *ndpi_struc
   else
     sport = packet->tcp->source, dport = packet->tcp->dest;
   
-  if(ndpi_search_into_bittorrent_cache(ndpi_struct, flow, packet->iph->saddr, sport, packet->iph->daddr, dport))
+  if(packet->iph && ndpi_search_into_bittorrent_cache(ndpi_struct, flow, packet->iph->saddr, sport, packet->iph->daddr, dport))
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0,
 				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
   else
@@ -625,7 +625,7 @@ void init_bittorrent_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("BitTorrent", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_BITTORRENT,
 				      ndpi_search_bittorrent,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;

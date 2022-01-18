@@ -1,7 +1,7 @@
 /*
  * radius.c
  *
- * Copyright (C) 2012-21 - ntop.org
+ * Copyright (C) 2012-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -56,7 +56,7 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
        && (h->code <= 13)
        && (ntohs(h->len) == payload_len)) {
       NDPI_LOG_INFO(ndpi_struct, "Found radius\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RADIUS, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RADIUS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
       return;
     }

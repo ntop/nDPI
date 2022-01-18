@@ -14,7 +14,7 @@ static void ndpi_int_rtcp_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTCP,
-			     NDPI_PROTOCOL_UNKNOWN);
+			     NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
@@ -76,7 +76,7 @@ void init_rtcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   ndpi_set_bitmask_protocol_detection("RTCP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_RTCP,
 				      ndpi_search_rtcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

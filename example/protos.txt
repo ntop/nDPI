@@ -51,6 +51,8 @@ ip:54.80.47.130@AmazonPrime
 # For Flows with a hostname (e.g. TLS) the risk is also put in AND with the host_risk_mask
 #ip_risk_mask:192.168.1.0/24=0
 #ip_risk_mask:10.196.157.228=0
-host_risk_mask:".local"=0
-host_risk_mask:".msftconnecttest.com"=0
+host_risk_mask:".home"=0
 
+
+# Custom certification autorities we trust
+trusted_issuer_dn:"CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US"

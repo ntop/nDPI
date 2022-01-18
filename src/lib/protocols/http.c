@@ -1,7 +1,7 @@
 /*
  * http.c
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -341,9 +341,9 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   // ndpi_int_reset_protocol(flow);
   ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id,
 			     (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) ?
-			     flow->detected_protocol_stack[1] : NDPI_PROTOCOL_HTTP
-			     );
-
+			     flow->detected_protocol_stack[1] : NDPI_PROTOCOL_HTTP,
+			     NDPI_CONFIDENCE_DPI);
+  
   /* This is necessary to inform the core to call this dissector again */
   flow->check_extra_packets = 1;
   flow->max_extra_packets_to_check = 8;
@@ -410,7 +410,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
          ((strstr(flow->http.url, ":8080/downloading?n=0.") != NULL)
           || (strstr(flow->http.url, ":8080/upload?n=0.") != NULL))) {
 	/* This looks like Ookla speedtest */
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
       }
     }
   }
@@ -421,25 +421,35 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow,
 				  char *ua) {
-  int log4j_exploit = -1;
+  u_int len;
   
-  if((!ua) || (ua[0] == '\0')) return;
+  if((!ua) || (ua[0] == '\0'))
+    return;
+  else
+    len = strlen(ua);   
 
-  if((strlen(ua) < 4)
-     || (!strncmp(ua, "test", 4))
-     || (!strncmp(ua, "<?", 2))
-     || strchr(ua, '{')
-     || strchr(ua, '}')
-     || (!(log4j_exploit = strncmp(ua, "jndi:ldap://", 12))) /* Log4J */
-     // || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
-     // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
-     ) {
+  if(
+     (!strncmp(ua, "<?", 2))
+	  || strchr(ua, '$')
+	  || strstr(ua, "://") // || (!strncmp(ua, "jndi:ldap://", 12)) /* Log4J */
+	  // || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
+	  // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
+	  ) {
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
-
-    if(log4j_exploit == 0) /* Log4J exploit */
-      ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+    
+    ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+  } else if(
+	    (len < 4)      /* Too short */
+	    || (len > 256) /* Too long  */
+	    || (!strncmp(ua, "test", 4))
+	    || strchr(ua, '{')
+	    || strchr(ua, '}')
+	    ) {
+    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
   }
 }
+
+/* ************************************************************* */
 
 int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
@@ -604,7 +614,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
     if(strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
       NDPI_CLR_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
     }
   }
@@ -633,7 +643,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       if(flow->http.nat_ip == NULL) {
         len = packet->forwarded_line.len;
         flow->http.nat_ip = ndpi_malloc(len + 1);
-        if(flow->http.nat_ip == NULL) {
+        if(flow->http.nat_ip != NULL) {
           strncpy(flow->http.nat_ip, (char*)packet->forwarded_line.ptr, len);
           flow->http.nat_ip[len] = '\0';
         }
@@ -749,7 +759,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
        */
       if(strncmp((const char *)packet->content_line.ptr, "application/ocsp-", 17) == 0) {
         NDPI_LOG_DBG2(ndpi_struct, "Found OCSP\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, NDPI_PROTOCOL_HTTP);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
       }
     }
   }
@@ -1113,14 +1123,15 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       if((packet->http_url_name.len > 7)
 	 && (!strncasecmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP_PROXY\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_PROXY, flow->detected_protocol_stack[0]);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_PROXY, flow->detected_protocol_stack[0], NDPI_CONFIDENCE_DPI);
         check_content_type_and_change_protocol(ndpi_struct, flow);
       }
 
       if(filename_start == 8 && (strncasecmp((const char *)packet->payload, "CONNECT ", 8) == 0)) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP_CONNECT\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_CONNECT,
-				   (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN);
+				   (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN,
+				   NDPI_CONFIDENCE_DPI);
         check_content_type_and_change_protocol(ndpi_struct, flow);
       }
 

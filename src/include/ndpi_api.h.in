@@ -118,7 +118,8 @@ extern "C" {
   void   ndpi_free(void *ptr);
   void * ndpi_flow_malloc(size_t size);
   void   ndpi_flow_free(void *ptr);
-
+  u_int32_t ndpi_get_tot_allocated_memory(void);
+  
   /**
    * Search the first occurrence of substring -find- in -s-
    * The search is limited to the first -slen- characters of the string
@@ -582,6 +583,15 @@ extern "C" {
 				     ndpi_protocol_category_t category);
 
   /**
+   * Get classification confidence as string
+   *
+   * @par     confidence      = the confidence value
+   * @return  the string name of the confidence result
+   *
+   */
+  const char* ndpi_confidence_get_name(ndpi_confidence_t confidence);
+
+  /**
    * Set protocol category string
    *
    * @par     mod           = the detection module
@@ -715,6 +725,15 @@ extern "C" {
    *          -1 else
    */
   int ndpi_add_host_risk_mask(struct ndpi_detection_module_struct *ndpi_mod, char *host, ndpi_risk mask);
+
+  /**
+   * Add a trusted certificate issuer DN
+   *
+   * @par     ndpi_mod = the detection module
+   * @par     dn       = the issuer DN as it appears in the certificate (example "CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US")
+   * @return  0 if the rule is loaded correctly; < 0 in case an error is detected
+   */
+  int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_mod, char *dn);
 
   /**
    * Read a file and load the categories

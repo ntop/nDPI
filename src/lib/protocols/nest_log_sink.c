@@ -2,7 +2,7 @@
  * nest_log_sink.c
  *
  * Copyright (C) 2009-11 - ipoque GmbH
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  * Copyright (C) 2018 - eGloo Incorporated
  *
  * This file is part of nDPI, an open source deep packet inspection
@@ -59,7 +59,7 @@ void ndpi_search_nest_log_sink(
 
     if (flow->l4.tcp.nest_log_sink_matches == NEST_LOG_SINK_MIN_MATCH) {
         NDPI_LOG_INFO(ndpi_struct, "found nest_log_sink\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NEST_LOG_SINK, NDPI_PROTOCOL_UNKNOWN);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NEST_LOG_SINK, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }
 }
 

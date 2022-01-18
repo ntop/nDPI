@@ -171,7 +171,12 @@ case "$host" in
       if test -f $PCAP_HOME/libpcap/libpcap.a; then :
          echo "Using libpcap from $PCAP_HOME"
          PCAP_INC="-I $PCAP_HOME/libpcap"
-         PCAP_LIB="$PCAP_HOME/libpcap/libpcap.a $PCAP_HOME/lib/libpfring.a $LIBNUMA `$PCAP_HOME/lib/pfring_config --libs`"
+	 PFRING_LIB=
+	 if test -f $PCAP_HOME/lib/libpfring.a; then :
+   	   PFRING_LIB=$PCAP_HOME/lib/libpfring.a
+	 fi
+	 
+         PCAP_LIB="$PCAP_HOME/libpcap/libpcap.a $PFRING_LIB $LIBNUMA `$PCAP_HOME/lib/pfring_config --libs`"
          AC_CHECK_LIB([rt], [clock_gettime],   [PCAP_LIB="$PCAP_LIB -lrt"])
          AC_CHECK_LIB([nl], [nl_handle_alloc], [PCAP_LIB="$PCAP_LIB -lnl"])
          # The dlopen() function is in libdl on GLIBC-based systems
@@ -277,7 +282,7 @@ dnl>   ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lcurl"
 dnl>   AC_DEFINE_UNQUOTED(HAVE_CURL, 1, [curl is present])
 dnl> fi
 
-AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/dga/Makefile rrdtool/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
+AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile python/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)

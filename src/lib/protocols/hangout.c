@@ -1,7 +1,7 @@
 /*
  * hangout.c
  *
- * Copyright (C) 2012-21 - ntop.org
+ * Copyright (C) 2012-22 - ntop.org
  *
  * This module is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -114,7 +114,7 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
       }
       
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO,
-				 NDPI_PROTOCOL_STUN);
+				 NDPI_PROTOCOL_STUN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }
@@ -129,7 +129,7 @@ void init_hangout_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   ndpi_set_bitmask_protocol_detection("GoogleHangout", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_HANGOUT_DUO,
 				      ndpi_search_hangout,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP, /* TODO: IPv6? */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

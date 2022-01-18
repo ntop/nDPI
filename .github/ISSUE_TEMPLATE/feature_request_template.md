@@ -1,5 +1,5 @@
 ---
-name: Feature request
+name: "💡 Suggest an Improvement or Feature"
 about: Suggest an idea or a feature for nDPI
 title: ''
 labels: 'enhancement'

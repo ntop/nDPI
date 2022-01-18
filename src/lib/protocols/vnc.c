@@ -1,7 +1,7 @@
 /*
  * vnc.c
  *
- * Copyright (C) 2016-21 - ntop.org
+ * Copyright (C) 2016-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -50,7 +50,7 @@ void ndpi_search_vnc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  ||
 	  ((memcmp(packet->payload, "RFB 004.", 7) == 0) && (packet->payload[11] == 0x0a)))) {	   
 	NDPI_LOG_INFO(ndpi_struct, "found vnc\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VNC, NDPI_PROTOCOL_UNKNOWN);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VNC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
 	return;
       }

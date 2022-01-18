@@ -50,7 +50,7 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
     if(flow->l4.udp.csgo_state == 1 && packet->payload_packet_len >= 42 && w == 0xfffffffful) {
       if(!memcmp(packet->payload + 24, flow->l4.udp.csgo_strid, 18)) {
         flow->l4.udp.csgo_state++;
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
         NDPI_LOG_INFO( ndpi_struct, "found csgo connect0x reply\n");
         return;
       }
@@ -58,13 +58,13 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
 
     if(packet->payload_packet_len == 8 && ( w == 0x3a180000 || w == 0x39180000) ) {
       NDPI_LOG_INFO( ndpi_struct, "found csgo udp 8b\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
 
     if(packet->payload_packet_len >= 36 && w == 0x56533031ul) {
       NDPI_LOG_INFO( ndpi_struct, "found csgo udp\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
 
@@ -72,7 +72,7 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
       uint32_t w2 = htonl(get_u_int32_t(packet->payload, 4));
       if(w2 == 0x70696e67) {
         NDPI_LOG_INFO( ndpi_struct, "found csgo udp ping\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
         return;
       }
     }
@@ -98,7 +98,7 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
       if(packet->payload_packet_len == 15) {
         if(flow->l4.udp.csgo_s2 == 1 && flow->l4.udp.csgo_id2 == w2) {
           NDPI_LOG_INFO( ndpi_struct, "found csgo udp 0d1d\n");
-          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
           return;
         }
       }
@@ -108,14 +108,14 @@ void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, struct n
     if(packet->payload_packet_len >= 140 && (w == 0x02124c6c || w == 0x02125c6c) &&
         !memcmp(&packet->payload[3], "lta\000mob\000tpc\000bhj\000bxd\000tae\000urg\000gkh\000", 32)) {
       NDPI_LOG_INFO( ndpi_struct, "found csgo dictionary udp\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
     
     if(packet->payload_packet_len >= 33 && packet->iph && packet->iph->daddr == 0xffffffff &&
         !memcmp(&packet->payload[17], "LanSearch", 9)) {
       NDPI_LOG_INFO( ndpi_struct, "found csgo LanSearch udp\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
 

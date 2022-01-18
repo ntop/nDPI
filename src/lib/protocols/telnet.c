@@ -1,7 +1,7 @@
 /*
  * telnet.c
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  * Copyright (C) 2009-11 - ipoque GmbH
  *
  * This file is part of nDPI, an open source deep packet inspection
@@ -118,7 +118,7 @@ static void ndpi_int_telnet_add_connection(struct ndpi_detection_module_struct
   flow->max_extra_packets_to_check = 64;
   flow->extra_packets_func = search_telnet_again;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELNET, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELNET, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* ************************************************************************ */

@@ -2,7 +2,7 @@
  * mpegts.c (MPEG Transport Stream)
  *          https://en.wikipedia.org/wiki/MPEG_transport_stream
  *
- * Copyright (C) 2015-21 - ntop.org
+ * Copyright (C) 2015-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -42,7 +42,7 @@ void ndpi_search_mpegts(struct ndpi_detection_module_struct *ndpi_struct, struct
 
     /* This looks MPEG TS */
     NDPI_LOG_INFO(ndpi_struct, "found MPEGTS\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MPEGTS, NDPI_PROTOCOL_UNKNOWN);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MPEGTS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     return;
   }    
 

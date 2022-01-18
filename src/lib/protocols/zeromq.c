@@ -1,7 +1,7 @@
 /*
  * zmq.c
  *
- * Copyright (C) 2016-21 - ntop.org
+ * Copyright (C) 2016-22 - ntop.org
  *
  * nDPI is free software: you can zmqtribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -24,7 +24,7 @@
 #include "ndpi_api.h"
 
 static void ndpi_int_zmq_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   NDPI_LOG_INFO(ndpi_struct, "found ZMQ\n");
 }
 

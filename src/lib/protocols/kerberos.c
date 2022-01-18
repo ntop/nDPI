@@ -1,7 +1,7 @@
 /*
  * kerberos.c
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  * Copyright (C) 2009-11 - ipoque GmbH
  *
  * This file is part of nDPI, an open source deep packet inspection
@@ -38,7 +38,7 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
 
 static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					     struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KERBEROS, NDPI_PROTOCOL_UNKNOWN);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KERBEROS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   NDPI_LOG_DBG(ndpi_struct, "trace KERBEROS\n");
 }
 
@@ -260,7 +260,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		      printf("[AS-REQ][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n", sport, dport, cname_len, cname_str);
 #endif
 
-		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b)) {
+		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b) && num_cname == 1) {
 		        name_offset += cname_len + 2;
 		        if (name_offset < packet->payload_packet_len)
 		          cname_len = packet->payload[name_offset];

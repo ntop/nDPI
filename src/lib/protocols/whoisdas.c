@@ -1,7 +1,7 @@
 /*
  * whoisdas.c
  *
- * Copyright (C) 2016-21 - ntop.org
+ * Copyright (C) 2016-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -38,7 +38,7 @@ void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_struct, str
        packet->payload[packet->payload_packet_len - 2] == '\r' &&
        packet->payload[packet->payload_packet_len - 1] == '\n') {
 	
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
       if((dport == 43) || (dport == 4343)) { /* Request */
         ndpi_hostname_sni_set(flow, &packet->payload[0], packet->payload_packet_len - 2); /* Skip \r\n */

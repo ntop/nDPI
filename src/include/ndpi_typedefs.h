@@ -1,7 +1,7 @@
 /*
  * ndpi_typedefs.h
  *
- * Copyright (C) 2011-21 - ntop.org
+ * Copyright (C) 2011-22 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -494,15 +494,6 @@ typedef struct message {
   u_int32_t next_seq[2]; /* Directions */
 } message_t;
 
-/* NDPI_PROTOCOL_BITTORRENT */
-typedef struct spinlock {
-  volatile int    val;
-} spinlock_t;
-
-typedef struct atomic {
-  volatile int counter;
-} atomic_t;
-
 /* NDPI_PROTOCOL_TINC */
 #define TINC_CACHE_MAX_SIZE 10
 
@@ -826,14 +817,10 @@ struct ndpi_packet_struct {
   u_int8_t http_num_headers; /* number of found (valid) header lines in HTTP request or response */
 
   u_int16_t l3_packet_len;
-  u_int16_t l4_packet_len;
   u_int16_t payload_packet_len;
-  u_int16_t actual_payload_len;
-  u_int16_t num_retried_bytes;
   u_int16_t parsed_lines;
   u_int16_t empty_line_position;
   u_int8_t tcp_retransmission;
-  u_int8_t l4_protocol;
 
   u_int8_t packet_lines_parsed_complete:1,
     packet_direction:1, empty_line_position_set:1, http_check_content:1, pad:4;
@@ -858,6 +845,28 @@ struct ndpi_subprotocol_conf_struct {
 typedef struct {
   u_int16_t port_low, port_high;
 } ndpi_port_range;
+
+typedef enum {
+  NDPI_CONFIDENCE_UNKNOWN = 0,		/* Unknown classification */
+  NDPI_CONFIDENCE_MATCH_BY_PORT,	/* Classification obtained looking only at the L4 ports */
+  NDPI_CONFIDENCE_MATCH_BY_IP,		/* Classification obtained looking only at the L3 addresses */
+  NDPI_CONFIDENCE_DPI_SRC_DST_ID,	/* Classification results based on ndpi_id_struct structures */
+  NDPI_CONFIDENCE_DPI_CACHE,		/* Classification results based on same LRU cache (i.e. correlation among sessions) */
+  NDPI_CONFIDENCE_DPI,			/* Deep packet inspection */
+
+  /*
+    IMPORTANT
+
+    Please keep in sync with
+
+    ndpi_confidence_get_name()
+
+    in ndpi_main.c
+  */
+
+  /* Last one */
+  NDPI_CONFIDENCE_MAX,
+} ndpi_confidence_t;
 
 typedef enum {
   NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
@@ -1007,6 +1016,11 @@ typedef enum {
   ndpi_hangout_cache
 } ndpi_lru_cache_type;
 
+typedef struct ndpi_list_struct {
+  char *value;
+  struct ndpi_list_struct *next;
+} ndpi_list;
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
@@ -1068,6 +1082,8 @@ struct ndpi_detection_module_struct {
     host_risk_mask_automa, common_alpns_automa;  
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
 
+  ndpi_list *trusted_issuer_dn;
+  
   void *ip_risk_mask_ptree;
   
   struct {
@@ -1157,6 +1173,7 @@ struct ndpi_flow_struct {
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, fail_with_unknown:1,
     init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1, is_ipv6:1;
+  u_int8_t confidence; /* ndpi_confidence_t */
 
   /*
     if ndpi_struct->direction_detect_disable == 1

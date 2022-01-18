@@ -1,7 +1,7 @@
 /*
  * lotus_notes.c
  *
- * Copyright (C) 2012-21 - ntop.org
+ * Copyright (C) 2012-22 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -47,7 +47,7 @@ static void ndpi_check_lotus_notes(struct ndpi_detection_module_struct *ndpi_str
       
       if(memcmp(&packet->payload[6], lotus_notes_header, sizeof(lotus_notes_header)) == 0) {
         NDPI_LOG_INFO(ndpi_struct, "found lotus_notes\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LOTUS_NOTES, NDPI_PROTOCOL_UNKNOWN);
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LOTUS_NOTES, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       }
       return;
     }
