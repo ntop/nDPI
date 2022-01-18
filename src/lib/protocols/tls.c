@@ -2145,11 +2145,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			    int rc = sprintf(&flow->protos.tls_quic.encrypted_sni.esni[off], "%02X", packet->payload[i] & 0XFF);
 
 			    if(rc <= 0) {
-			      flow->protos.tls_quic.encrypted_sni.esni[off] = '\0';
 			      break;
 			    } else
 			      off += rc;
 			  }
+			  flow->protos.tls_quic.encrypted_sni.esni[off] = '\0';
 			}
 		      }
 		    }

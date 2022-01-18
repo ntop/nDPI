@@ -1006,6 +1006,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info6(struct ndpi_workflow * workflo
                                                   pkt_timeval when) {
   struct ndpi_iphdr iph;
 
+  if(ipsize < 40)
+    return(NULL);
   memset(&iph, 0, sizeof(iph));
   iph.version = IPVERSION;
   iph.saddr = iph6->ip6_src.u6_addr.u6_addr32[2] + iph6->ip6_src.u6_addr.u6_addr32[3];
@@ -1729,7 +1731,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     /* Cisco PPP in HDLC-like framing - 50 */
   case DLT_PPP_SERIAL:
     chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
-    ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+    ip_offset = eth_offset + sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
     type = ntohs(chdlc->proto_code);
     break;
 
@@ -1738,10 +1740,10 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   case DLT_PPP:
     if(packet[0] == 0x0f || packet[0] == 0x8f) {
       chdlc = (struct ndpi_chdlc *) &packet[eth_offset];
-      ip_offset = sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
+      ip_offset = eth_offset + sizeof(struct ndpi_chdlc); /* CHDLC_OFF = 4 */
       type = ntohs(chdlc->proto_code);
     } else {
-      ip_offset = 2;
+      ip_offset = eth_offset + 2;
       type = ntohs(*((u_int16_t*)&packet[eth_offset]));
     }
     break;
@@ -1847,13 +1849,15 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   /* check ether type */
   switch(type) {
   case ETH_P_VLAN:
+    if(ip_offset+4 >= (int)header->caplen)
+      return(nproto);
     vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
     type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
     ip_offset += 4;
     vlan_packet = 1;
 
     // double tagging for 802.1Q
-    while((type == 0x8100) && (((bpf_u_int32)ip_offset) < header->caplen)) {
+    while((type == 0x8100) && (((bpf_u_int32)ip_offset+4) < header->caplen)) {
       vlan_id = ((packet[ip_offset] << 8) + packet[ip_offset+1]) & 0xFFF;
       type = (packet[ip_offset+2] << 8) + packet[ip_offset+3];
       ip_offset += 4;
