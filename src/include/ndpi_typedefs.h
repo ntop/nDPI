@@ -1173,7 +1173,7 @@ struct ndpi_flow_struct {
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, fail_with_unknown:1,
     init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1, is_ipv6:1;
-  u_int8_t confidence; /* ndpi_confidence_t */
+  ndpi_confidence_t confidence; /* ndpi_confidence_t */
 
   /*
     if ndpi_struct->direction_detect_disable == 1
