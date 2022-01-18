@@ -13,8 +13,6 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
   EXTRA_TARGETS=""
 ])
 
-GNU_PREFIX=""
-
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
@@ -36,11 +34,14 @@ dnl>  AC_PROG_CC(clang gcc)
   AC_PROG_CXX(clang++ g++)
   AC_PROG_CC_STDC(clang gcc)
 else
-dnl>  AC_PROG_CC
-  AM_PROG_CC_C_O
+  AC_PROG_CC
   AC_PROG_CXX
   AC_PROG_CC_STDC
 fi
+
+dnl> Can't iuse AM_PROG_AR because not all of our Makefiles are automake (yet?)
+AC_CHECK_TOOL(AR, ar, [false])
+
 AC_LANG_WERROR
 
 NDPI_MAJOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 1`
@@ -163,7 +164,7 @@ case "$host" in
         ;;
       esac
       CFLAGS="${CFLAGS}"
-      LDFLAGS="${LDFLAGS} -lws2_32"
+      LIBS="${LIBS} -lws2_32"
       BUILD_MINGW=1
       ;;
    *)
@@ -305,5 +306,4 @@ AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
 AC_SUBST(GCRYPT_ENABLED)
 AC_SUBST(PCRE_ENABLED)
-AC_SUBST(GNU_PREFIX)
 AC_OUTPUT
