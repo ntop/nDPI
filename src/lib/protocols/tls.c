@@ -2052,7 +2052,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		for(i=0; ja3.client.alpn[i] != '\0'; i++)
 		  if(ja3.client.alpn[i] == ',') ja3.client.alpn[i] = '-';
 
-	      } else if(extension_id == 43 /* supported versions */) {
+	      } else if(extension_id == 43 /* supported versions */ &&
+	                offset+extension_offset < total_len) {
 		u_int16_t s_offset = offset+extension_offset;
 		u_int8_t version_len = packet->payload[s_offset];
 		char version_str[256];
