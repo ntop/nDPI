@@ -568,7 +568,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		      if(label != NULL) {
 		        char * first_dot = strchr(flow->host_server_name, '.');
 
-			if(first_dot == NULL || first_dot >= label) {
+			if((first_dot == NULL) || (first_dot <= label)) {
                           matched_name = 1;
 			}
                       }
