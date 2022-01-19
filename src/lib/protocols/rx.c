@@ -72,6 +72,7 @@ struct ndpi_rx_header {
 #define PLUS_2             6
 #define MORE_1             9
 #define CLIENT_INIT_2     33
+#define PLUS_3            34
 
 
 
@@ -118,7 +119,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
      header->flags == PLUS_0 || header->flags == PLUS_1 ||
      header->flags == PLUS_2 || header->flags == REQ_ACK ||
      header->flags == MORE_1 || header->flags == CLIENT_INIT_1 ||
-     header->flags == CLIENT_INIT_2) {
+     header->flags == CLIENT_INIT_2 || header->flags == PLUS_3) {
 
     /* TYPE and FLAGS combo */
     switch(header->type)
@@ -132,7 +133,7 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
 	/* Fall-through */
       case RX_ACK:
 	if(header->flags == CLIENT_INIT_1 || header->flags == CLIENT_INIT_2 ||
-	   header->flags == EMPTY)
+	   header->flags == EMPTY || header->flags == PLUS_3)
 	  goto security;
 	/* Fall-through */
       case RX_CHALLENGE:
@@ -198,10 +199,6 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     flow->l4.udp.rx_conn_epoch = header->conn_epoch;
     flow->l4.udp.rx_conn_id = header->conn_id;
-    {
-      NDPI_LOG_INFO(ndpi_struct, "found RX\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-    }
   }
 }
 

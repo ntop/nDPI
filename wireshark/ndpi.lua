@@ -82,7 +82,7 @@ flow_risks[40] = ProtoField.bool("ndpi.flow_risk.possible_exploit", "Possible Ex
 flow_risks[41] = ProtoField.bool("ndpi.flow_risk.cert_about_to_expire", "TLS cert about to expire", num_bits_flow_risks, nil, bit(9), "nDPI Flow Risk: TLS certificate about to expire")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
-flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(8))
+flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(10))
 
 for _,v in pairs(flow_risks) do
   ndpi_fds[#ndpi_fds + 1] = v

@@ -5255,12 +5255,14 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 					 flow->daddr, flow->dport)) {
       /* This looks like BitTorrent */
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
+      flow->confidence = NDPI_CONFIDENCE_DPI_CACHE;
     } else if((flow->l4_proto == IPPROTO_UDP) /* Zoom/UDP used for video */
 	      && (((ntohs(flow->sport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->saddr))
 		  || ((ntohs(flow->dport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->daddr))
 		  )) {
       /* This looks like Zoom */
       ret.app_protocol = NDPI_PROTOCOL_ZOOM;
+      flow->confidence = NDPI_CONFIDENCE_DPI_CACHE;
     }
   }
 
