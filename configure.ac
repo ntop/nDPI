@@ -34,7 +34,7 @@ dnl>  AC_PROG_CC(clang gcc)
   AC_PROG_CXX(clang++ g++)
   AC_PROG_CC_STDC(clang gcc)
 else
-  AC_PROG_CC
+  AC_PROG_CC_C_O
   AC_PROG_CXX
   AC_PROG_CC_STDC
 fi
