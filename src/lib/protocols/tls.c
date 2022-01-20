@@ -1596,7 +1596,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  u_int16_t cipher_id = ntohs(*id);
 
 	  if(cipher_offset+i+1 < packet->payload_packet_len &&
-	     packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1] /* Skip Grease */) {
+	     ((packet->payload[cipher_offset+i] != packet->payload[cipher_offset+i+1]) ||
+		((packet->payload[cipher_offset+i] & 0xF) != 0xA)) /* Skip Grease */) {
 	    /*
 	      Skip GREASE [https://tools.ietf.org/id/draft-ietf-tls-grease-01.html]
 	      https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
@@ -1742,7 +1743,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	        break;
 	      }
 
-	      if((extension_id == 0) || (packet->payload[extn_off] != packet->payload[extn_off+1])) {
+	      if((extension_id == 0) || (packet->payload[extn_off] != packet->payload[extn_off+1]) ||
+		((packet->payload[extn_off] & 0xF) != 0xA)) {
 		/* Skip GREASE */
 
 		if(ja3.client.num_tls_extension < MAX_NUM_JA3)
@@ -1823,7 +1825,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("Client TLS [EllipticCurve: %u/0x%04X]\n", s_group, s_group);
 #endif
-		    if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])) {
+		    if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1]) 
+			|| ((packet->payload[s_offset+i] & 0xF) != 0xA)) {
 		      /* Skip GREASE */
 		      if(ja3.client.num_elliptic_curve < MAX_NUM_JA3)
 			ja3.client.elliptic_curve[ja3.client.num_elliptic_curve++] = s_group;
