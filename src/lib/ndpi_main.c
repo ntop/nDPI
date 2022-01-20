@@ -170,7 +170,7 @@ void *ndpi_calloc(unsigned long count, size_t size) {
     memset(p, 0, len);
     ndpi_tot_allocated_memory += size;
   }
-  
+
   return(p);
 }
 
@@ -2495,6 +2495,7 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
     "amupdatedl.microsoft.com",
     "update.microsoft.com.akadns.net",
     ".windowsupdate.com",
+    ".ras.microsoft.com",
     "e5.sk",
     "sophosxl.net",
     NULL /* End */
@@ -2503,6 +2504,7 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
     NDPI_SUSPICIOUS_DGA_DOMAIN,
     NDPI_BINARY_APPLICATION_TRANSFER,
     NDPI_HTTP_NUMERIC_IP_HOST,
+    NDPI_MALICIOUS_JA3,
     NDPI_NO_RISK /* End */
   };
   u_int i;
@@ -2521,7 +2523,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   u_int i;
 
   ndpi_add_domain_risk_exceptions(ndpi_str);
-  
+
   if(ndpi_str->ac_automa_finalized) return;
 
   for(i = 0; i < 99; i++) {
