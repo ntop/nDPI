@@ -1355,7 +1355,7 @@ int ndpi_serialize_binary_int64(ndpi_serializer *_serializer,
     } else {
       serializer->buffer.data[serializer->status.buffer.size_used++] = (ndpi_serialization_string << 4) | ndpi_serialization_int64;
       ndpi_serialize_single_string(serializer, key, klen);
-      ndpi_serialize_single_uint32(serializer, value);
+      ndpi_serialize_single_uint64(serializer, value);
     }
   }
 
