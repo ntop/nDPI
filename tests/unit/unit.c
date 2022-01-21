@@ -102,6 +102,7 @@ int serializerUnitTest() {
       assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
       assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);
       assert(ndpi_serialize_string_float(&serializer,  kbuf, (float)(i*i), "%f") != -1);
+      assert(ndpi_serialize_string_int64(&serializer,  kbuf, INT64_MAX) != -1);
       if ((i&0x3) == 0x3) ndpi_serialize_end_of_record(&serializer);
     }
 
@@ -164,6 +165,7 @@ int serializerUnitTest() {
           if (verbose) printf("EOR\n");
 	} else {
 	  u_int32_t k32, v32;
+          int64_t v64;
 	  ndpi_string ks, vs;
 	  float vf;
 
@@ -190,6 +192,11 @@ int serializerUnitTest() {
           case ndpi_serialization_uint32:
 	    assert(ndpi_deserialize_value_uint32(&deserializer, &v32) != -1);
 	    if(verbose) printf("%u\n", v32);
+	    break;
+
+          case ndpi_serialization_int64:
+	    assert(ndpi_deserialize_value_int64(&deserializer, &v64) != -1);
+	    if(verbose) printf("%" PRId64 "\n", v64);
 	    break;
 
           case ndpi_serialization_string:
