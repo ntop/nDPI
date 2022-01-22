@@ -86,7 +86,7 @@ void analyze_rrd(rrd_file_stats *rrd, time_t start, time_t end) {
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data, *p;
   char **names;
-  u_int t, i, j, num_points;
+  u_int t, i, num_points;
   struct ndpi_analyze_struct *s;
 
   if(rrd_fetch_r(rrd->path, "AVERAGE", &start, &end, &step, &ds_cnt, &names, &data) != 0) {
@@ -123,7 +123,7 @@ void analyze_rrd(rrd_file_stats *rrd, time_t start, time_t end) {
 
 void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_file) {
   unsigned long  step = 0, ds_cnt = 0;
-  rrd_value_t *data, *p;
+  rrd_value_t *data;
   char **names;
   u_int t, i, j = 0, num_points;
   struct ndpi_analyze_struct *s;
