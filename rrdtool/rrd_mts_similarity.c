@@ -238,13 +238,17 @@ void find_rrd_similarities(rrd_multifile_stats *rrdms, int *num_rrds, u_int num_
         }
       }
     }
-     printf("Found %u (%.3f %%) similar %s / %u zero alike %s [num_rrds: %d]\n",
-	 num_similar_rrds,
-	 (num_similar_rrds*100.)/(float)(num_rrds[k]*num_rrds[k]),
-	 filename[k],
-	 num_potentially_zero_equal,
-	 filename[k],
-	 num_rrds[k]);
+     if(num_rrds[k] != 0){
+	      printf("Found %u (%.3f %%) similar %s / %u zero alike %s [num_rrds: %d]\n",
+	   num_similar_rrds,
+	   (num_similar_rrds*100.)/(float)(num_rrds[k]*num_rrds[k]),
+	   filename[k],
+	   num_potentially_zero_equal,
+	   filename[k],
+	   num_rrds[k]);
+     }else{
+	     printf("%s: file not found",filename[k]); 
+     }
   }
 }
 
@@ -286,7 +290,7 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
       }
     }
   }
-
+ 
   printf("Found %u (%.3f %%) similar Multivariates / %u zero alike Multivariates [num_mts: %d]\n",
 	 num_similar_mts,
 	 (num_similar_mts*100.)/(float)(num_host*num_host),
