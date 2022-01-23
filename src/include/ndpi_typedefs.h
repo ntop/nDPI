@@ -1113,6 +1113,9 @@ struct ndpi_detection_module_struct {
   /* NDPI_PROTOCOL_BITTORRENT */
   struct ndpi_lru_cache *bittorrent_cache;
 
+  /* NDPI_PROTOCOL_ZOOM */
+  struct ndpi_lru_cache *zoom_cache;
+
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
 

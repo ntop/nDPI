@@ -62,7 +62,6 @@ void init_bgp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_bittorrent_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
 				      u_int32_t saddr, u_int16_t sport, u_int32_t daddr, u_int16_t dport);
-u_int32_t ndpi_bittorrent_hash_funct(u_int32_t ip, u_int16_t port);
 void init_lisp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_teredo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_ciscovpn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
@@ -219,5 +218,8 @@ void init_genshin_impact_dissector(struct ndpi_detection_module_struct *ndpi_str
 void init_z3950_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_avast_securedns_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_cassandra_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
+
+/* ndpi_main.c */
+extern u_int32_t ndpi_ip_port_hash_funct(u_int32_t ip, u_int16_t port);
 
 #endif /* __NDPI_PROTOCOLS_H__ */

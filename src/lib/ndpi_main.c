@@ -2772,6 +2772,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->bittorrent_cache)
       ndpi_lru_free_cache(ndpi_str->bittorrent_cache);
 
+    if(ndpi_str->zoom_cache)
+      ndpi_lru_free_cache(ndpi_str->zoom_cache);
+
     if(ndpi_str->stun_cache)
       ndpi_lru_free_cache(ndpi_str->stun_cache);
 
@@ -5007,7 +5010,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_bittorrent_hash_funct(u_int32_t ip, u_int16_t port) {
+u_int32_t ndpi_ip_port_hash_funct(u_int32_t ip, u_int16_t port) {
   return(ip + 3 * port);
 }
 
@@ -5038,7 +5041,7 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
       flow->bt_check_performed = 1;
 
     /* Check cached communications */
-    key1 = ndpi_bittorrent_hash_funct(saddr, sport), key2 = ndpi_bittorrent_hash_funct(daddr, dport);
+    key1 = ndpi_ip_port_hash_funct(saddr, sport), key2 = ndpi_ip_port_hash_funct(daddr, dport);
 
     found =
       ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, saddr+daddr, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)
@@ -5062,14 +5065,50 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
+/* #define ZOOM_CACHE_DEBUG */
+
+static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct,
+					    u_int32_t daddr /* Network byte order */) {
+  
+#ifdef ZOOM_CACHE_DEBUG
+  printf("[%s:%u] ndpi_search_into_zoom_cache(%08X, %u)\n",
+	 __FILE__, __LINE__, daddr, dport);
+#endif
+
+  if(ndpi_struct->zoom_cache) {
+    u_int16_t cached_proto;
+    u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, daddr, &cached_proto,
+					 0 /* Don't remove it as it can be used for other connections */);
+    
+#ifdef ZOOM_CACHE_DEBUG
+    printf("[Zoom] *** [TCP] SEARCHING host %u [found: %u]\n", daddr, found);
+#endif
+    
+    return(found);
+  }
+
+  return(0);
+}
+
+/* ********************************************************************************* */
+
+static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndpi_struct,
+					u_int32_t daddr /* Network byte order */) {
+  if(ndpi_struct->zoom_cache == NULL)
+    ndpi_struct->zoom_cache = ndpi_lru_cache_init(512);
+  
+  if(ndpi_struct->zoom_cache)
+    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, daddr, NDPI_PROTOCOL_ZOOM);
+}
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				    u_int8_t enable_guess, u_int8_t *protocol_was_guessed) {
   ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
   u_int16_t guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN, guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
-
-  /*
-   *** We can't access ndpi_str->packet from this function!! ***
-   */
+  
+  /* *** We can't access ndpi_str->packet from this function!! *** */
 
   *protocol_was_guessed = 0;
 
@@ -5215,6 +5254,12 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 					 flow->daddr, flow->dport)) {
       /* This looks like BitTorrent */
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
+    } else if((flow->l4_proto == IPPROTO_UDP) /* Zoom/UDP used for video */
+	      && (((ntohs(flow->sport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->saddr))
+		  || ((ntohs(flow->dport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->daddr))
+		  )) {
+      /* This looks like Zoom */
+      ret.app_protocol = NDPI_PROTOCOL_ZOOM;
     }
   }
 
@@ -5782,6 +5827,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   if(num_calls == 0)
     flow->fail_with_unknown = 1;
 
+  /* Zoom cache */
+  if((ret.app_protocol == NDPI_PROTOCOL_ZOOM)
+     && (flow->l4_proto == IPPROTO_TCP)
+     && (ndpi_str->packet.iph != NULL))
+    ndpi_add_connection_as_zoom(ndpi_str, ndpi_str->packet.iph->daddr);
+				
   return(ret);
 }
 
