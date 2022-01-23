@@ -254,7 +254,7 @@ void find_rrd_similarities(rrd_multifile_stats *rrdms, int *num_rrds, u_int num_
 
 /* *************************************************** */
 
-void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds, int n_file, int num_host) {
+void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds, int num_host) {
   u_int i, j, num_similar_mts = 0, num_potentially_zero_equal = 0;
 
   for(i=0; i<num_host; i++) {
@@ -460,7 +460,7 @@ int main(int argc, char *argv[]) {
 
   find_rrd_similarities(rrdms, num_rrds, num_tot_rrds, n_file, num_host, filename);
 
-  find_rrd_multi_similarities(rrdms, num_tot_rrds, n_file, num_host);
+  find_rrd_multi_similarities(rrdms, num_tot_rrds, num_host);
 
 #if 0
   if(verbose) {
