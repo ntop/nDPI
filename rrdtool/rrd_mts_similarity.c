@@ -125,7 +125,7 @@ void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_fil
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data;
   char **names;
-  u_int t, i, j = 0, num_points;
+  u_int t, i, j = 0, num_points,not_found = 0;
   struct ndpi_analyze_struct *s;
 
   /* Initializzation of mts_data */
@@ -146,6 +146,8 @@ void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_fil
       
       mts_data[j] = data;
       j++;
+    }else{
+      not_found++;
     }
   }
   
@@ -156,23 +158,22 @@ void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_fil
 
   ndpi_init_bin(&rrdms->mts_b, ndpi_bin_family32, num_points);
   
-  double value;
+  double value,acc;
 
   /* Step 1 - Compute average and stddev */
   for(t=start+1, j=0; t<end; t+=step, j++) {
   value = 0;
-  
+  acc = 0;
     /* For each Time Series we took the t-th point */
-    for(i=0; i<n_file; i++){
-      if(mts_data[i] != NULL)
-        value += (double)*mts_data[i]++;		//if it's not null, sum its value
-
-      if(isnan(value)) value += 0;  			//otherwise, sum 0
+    for(i=0; i<n_file-not_found; i++){
+     
+      value = (double)*mts_data[i]++;		
+      if(!isnan(value)) acc += value;  			
     }
     
     /* Multivariate Time Series takes the average of the values found */
-    ndpi_data_add_value(s, value/n_file);
-    ndpi_set_bin(&rrdms->mts_b, j, value/n_file);
+    ndpi_data_add_value(s, acc/(n_file-not_found));
+    ndpi_set_bin(&rrdms->mts_b, j, acc/(n_file-not_found));
   }
 
   /* Compute MTS's average and stddev */
