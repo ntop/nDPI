@@ -3,13 +3,14 @@ Guessed flow protos:	38
 DPI Packets (TCP):	112	(2.87 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Unknown          : 3 (flows)
-Confidence Match by port    : 29 (flows)
-Confidence Match by IP      : 1 (flows)
+Confidence Match by port    : 28 (flows)
+Confidence Match by IP      : 2 (flows)
 Confidence DPI              : 7 (flows)
 
 Unknown	3	655	3
-HTTP	117	27855	36
+HTTP	116	27378	35
 Cloudflare	1	854	1
+AmazonAWS	1	477	1
 
 	1	TCP 172.20.3.5:2601 <-> 172.20.3.13:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][9 pkts/6343 bytes <-> 4 pkts/409 bytes][Goodput ratio: 92/46][11.25 sec][bytes ratio: 0.879 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/104 67/128 469/152 164/24][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 705/102 1514/243 721/81][PLAIN TEXT (POST /servlets/mms HTTP/1.1)][Plen Bins: 16,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,0,0]
 	2	TCP 172.20.3.5:2606 <-> 172.20.3.13:80 [proto: 7/HTTP][ClearText][Confidence: DPI][cat: Web/5][8 pkts/2287 bytes <-> 5 pkts/2963 bytes][Goodput ratio: 80/91][11.18 sec][Hostname/SNI: 172.20.3.13][bytes ratio: -0.129 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 58/58 177/172 83/81][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 286/593 1514/1514 478/662][URL: 172.20.3.13/servlets/mms?message-id=189301][StatusCode: 0][Risk: ** HTTP Numeric IP Address **][Risk Score: 10][PLAIN TEXT (GET /servlets/mms)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,50,0,0]
@@ -24,7 +25,7 @@ Cloudflare	1	854	1
 	11	TCP 172.20.3.5:2607 <-> 172.20.3.13:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][4 pkts/657 bytes <-> 2 pkts/112 bytes][Goodput ratio: 64/0][0.21 sec][bytes ratio: 0.709 (Upload)][IAT c2s/s2c min/avg/max/stddev: 207/1 69/1 207/1 98/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 164/56 477/58 181/2][PLAIN TEXT (201.xml)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	12	TCP 172.20.3.5:2603 <-> 172.20.3.13:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][2 pkts/120 bytes <-> 4 pkts/363 bytes][Goodput ratio: 0/39][11.06 sec][bytes ratio: -0.503 (Download)][IAT c2s/s2c min/avg/max/stddev: 216/2 216/35 216/68 0/33][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 60/91 60/197 0/61][PLAIN TEXT (HTTP/1.1 200 OK)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	13	TCP 172.6.3.5:80 -> 172.20.3.13:53132 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/481 bytes -> 0 pkts/0 bytes][Goodput ratio: 89/0][< 1 sec][PLAIN TEXT (xml version)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	14	TCP 51.20.3.5:2605 -> 172.20.3.13:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/477 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][< 1 sec][PLAIN TEXT (201.xml)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	TCP 51.20.3.5:2605 -> 172.20.3.13:80 [proto: 7.265/HTTP.AmazonAWS][ClearText][Confidence: Match by IP][cat: Cloud/13][1 pkts/477 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][< 1 sec][PLAIN TEXT (201.xml)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	TCP 172.20.3.5:2605 <-> 172.20.3.13:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][4 pkts/240 bytes <-> 1 pkts/58 bytes][Goodput ratio: 0/0][11.06 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	TCP 172.20.3.5:2600 <-> 172.20.3.13:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][2 pkts/120 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	17	TCP 172.20.2.13:80 -> 172.20.3.5:2607 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/197 bytes -> 0 pkts/0 bytes][Goodput ratio: 10/0][< 1 sec][PLAIN TEXT (HTTP/1.1 200 OK)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

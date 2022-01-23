@@ -49,7 +49,7 @@ typedef enum {
   NDPI_PROTOCOL_DHCP                  = 18,
   NDPI_PROTOCOL_POSTGRES              = 19,
   NDPI_PROTOCOL_MYSQL                 = 20,
-  NDPI_PROTOCOL_HOTMAIL               = 21,
+  NDPI_PROTOCOL_MS_OUTLOOK            = 21, /* Hotmail / Microsoft Outlook / Exchange */
   NDPI_PROTOCOL_DIRECT_DOWNLOAD_LINK  = 22,
   NDPI_PROTOCOL_MAIL_POPS             = 23,
   NDPI_PROTOCOL_APPLEJUICE            = 24,

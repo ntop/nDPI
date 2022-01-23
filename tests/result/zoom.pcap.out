@@ -3,8 +3,8 @@ Guessed flow protos:	7
 DPI Packets (TCP):	135	(9.64 pkts/flow)
 DPI Packets (UDP):	25	(1.47 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
-Confidence Match by port    : 2 (flows)
-Confidence Match by IP      : 2 (flows)
+Confidence Match by port    : 1 (flows)
+Confidence Match by IP      : 3 (flows)
 Confidence DPI              : 29 (flows)
 
 DNS	2	205	1
@@ -15,11 +15,11 @@ DHCP	1	321	1
 ntop	20	4265	1
 IMAPS	2	226	1
 ICMP	3	210	2
-TLS	2	114	1
 Google	22	7791	2
 Spotify	1	86	1
 Zoom	635	354005	19
 GoogleServices	4	1060	1
+AmazonAWS	2	114	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -55,7 +55,7 @@ JA3 Host Stats:
 	27	UDP 192.168.1.117:62988 <-> 192.168.1.1:53 [proto: 5.189/DNS.Zoom][ClearText][Confidence: DPI][cat: Video/26][1 pkts/72 bytes <-> 1 pkts/88 bytes][Goodput ratio: 41/52][0.04 sec][Hostname/SNI: www3.zoom.us][52.202.62.236][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	28	UDP 192.168.1.117:64352 <-> 192.168.1.1:53 [proto: 5.189/DNS.Zoom][ClearText][Confidence: DPI][cat: Video/26][1 pkts/71 bytes <-> 1 pkts/87 bytes][Goodput ratio: 40/51][0.04 sec][Hostname/SNI: log.zoom.us][52.202.62.238][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	ICMP 192.168.1.117:0 -> 162.255.38.14:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][0.01 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	30	TCP 192.168.1.117:54798 <-> 13.225.84.182:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][1 pkts/54 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	30	TCP 192.168.1.117:54798 <-> 13.225.84.182:443 [proto: 91.265/TLS.AmazonAWS][Encrypted][Confidence: Match by IP][cat: Cloud/13][1 pkts/54 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	UDP 192.168.1.117:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Hostname/SNI: _spotify-connect._tcp.local][_spotify-connect._tcp.local][PLAIN TEXT (spotify)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 192.168.1.117:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][Encrypted][Confidence: DPI][cat: Music/25][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	ICMP 192.168.1.117:0 -> 192.168.1.1:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
