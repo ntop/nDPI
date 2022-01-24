@@ -353,7 +353,7 @@ int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, int *
 
 int main(int argc, char *argv[]) {
   rrd_time_value_t start_tv, end_tv;
-  char **filename, *start_s, *end_s, *dirname = NULL, *basedir = NULL;
+  char **filename = NULL, *start_s, *end_s, *dirname = NULL, *basedir = NULL;
   u_int first = 1, quick_mode = 0;
   float alpha;
   char c;
@@ -366,60 +366,68 @@ int main(int argc, char *argv[]) {
   alpha   = DEFAULT_ALPHA;
   start_s = DEFAULT_START;
   end_s   = DEFAULT_END;
-
-  filename = malloc(sizeof(char*)*MAX_NUM_FILE);
-  for(i=0; i<MAX_NUM_FILE; i++)
-  {
-    filename[i] = malloc(sizeof(char)*50);
-    filename[i] = NULL;
-  }
   
-  for(i= 0; i<argc;i++)
-  { 
-    if(strstr(argv[i],"-s") != NULL && (i+1)<argc) 
-      start_s = argv[i+1]; 
-      
-    if(strstr(argv[i],"-d") != NULL && (i+1)<argc) 
-      basedir = argv[(i+1)]; 
-      
-    if(strstr(argv[i],"-e") != NULL && (i+1)<argc) 
-      end_s = argv[(i+1)]; 
-      
-    if(strstr(argv[i],"-q") != NULL) 
-      quick_mode = 1; 
-      
-    if(strstr(argv[i],"-v") != NULL) 
-      verbose = 1; 
-      
-    if(strstr(argv[i],"-a") != NULL && (i+1)<argc)
-    { 
-      float f = atof(argv[i]); 
-      
-      if((f > 0) && (f < 1)) 
-        alpha = f; 
-        
-      else 
-        printf("Discarding -a: valid range is >0 .. <1\n"); 
-    } 
-    
-    if(strstr(argv[i],"-t") != NULL && (i+1)<argc)
-     similarity_threshold = atoi(argv[i]);
-     
-    if(strstr(argv[i],"-z") != NULL)
-     skip_zero = 1;
-     
-    if(strstr(argv[i],"-f") != NULL)
-    { 
-      while((i+1)<argc && strstr(argv[i+1],".rrd")!= NULL )
-      { 
-        filename[n_file] = argv[i+1]; 
-        n_file++; 
-        i++; 
-      } 
-    } 
+  while((c = getopt(argc, argv, "d:s:e:a:qf:t:vz")) != '?')
+  {
+    if(c == -1) break;
+
+    switch(c)
+    {
+      case 's':
+        start_s = optarg;
+      break;
+
+      case 'd':
+        basedir = optarg;
+      break;
+
+      case 'e':
+        end_s = optarg;
+      break;
+
+      case 'q':
+        quick_mode = 1;
+      break;
+
+      case 'v':
+        verbose = 1;
+      break;
+
+      case 'a':
+      {
+	float f = atof(optarg);
+
+	if((f > 0) && (f < 1))
+	  alpha = f;
+	else
+	  printf("Discarding -a: valid range is >0 .. <1\n");
+      }
+      break;
+
+      case 'f':
+       if(n_file == 0)
+    	 filename = malloc(sizeof(char*)*MAX_NUM_FILE);
+		    
+       filename[n_file] = strdup(optarg); 
+       n_file++; 
+     break;
+
+      case 't':
+        similarity_threshold = atoi(optarg);
+      break;
+
+      case 'z':
+        skip_zero = 1;
+      break;
+
+      default:
+        help();
+      break;
+    }
   }
 
-  if((filename[0] == NULL) || (basedir == NULL))
+
+  if((filename == NULL) || (basedir == NULL))
     help();
 
   if((rrd_parsetime(start_s, &start_tv) != NULL)) {
@@ -478,6 +486,10 @@ int main(int argc, char *argv[]) {
   }
 
   ndpi_free(rrdms);
-
+	
+  for(i=0; i<n_file; i++)
+    free(filename[i]);
+	
+  free(filename);
   return(0);
 }
