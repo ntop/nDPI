@@ -194,62 +194,33 @@ int circles_touch(int x1, int r1, int x2, int r2) {
 
 /* *************************************************** */
 
-void find_rrd_similarities(rrd_multifile_stats *rrdms, u_int num_tot_rrds, int n_file, int num_host, char **filename) {
-  u_int i, j, k, num_similar_rrds, num_potentially_zero_equal;
-
-  for(k=0; k<n_file; k++) {
-    num_similar_rrds = 0;
-    num_potentially_zero_equal = 0;
-  
-    for(i=0; i<num_host; i++) {
-      for(j=i+1; j<num_host; j++) {
-      /*
-	Average is the circle center, and stddev is the radius
-	if circles touch each other then there is a chance that
-	the two rrds are similar
-      */
-      if((rrdms[i].rfs[k].path != NULL) && (rrdms[j].rfs[k].path != NULL))
-      {
-        if((rrdms[i].rfs[k].average == 0) && (rrdms[i].rfs[k].average == rrdms[j].rfs[k].average)) {
-	  if(!skip_zero)
-	      printf("%s [%.1f/%.1f]  - %s [%.1f/%.1f] are alike\n",
-		     rrdms[i].rfs[k].path, rrdms[i].rfs[k].average, rrdms[i].rfs[k].stddev,
-		     rrdms[j].rfs[k].path, rrdms[j].rfs[k].average, rrdms[j].rfs[k].stddev);
-	  
-	  num_potentially_zero_equal++;
-        } else if(circles_touch(rrdms[i].rfs[k].average, rrdms[i].rfs[k].stddev, rrdms[j].rfs[k].average, rrdms[j].rfs[k].stddev)
-	  	) {
-	  float similarity = ndpi_bin_similarity(&rrdms[i].rfs[k].b, &rrdms[j].rfs[k].b, 0, similarity_threshold);
+void find_rrd_similarities(rrd_file_stats rrd1, rrd_file_stats rrd2) {
+     
+      if((rrd1.average == 0) && (rrd1.average == rrd2.average)) {
+        if(!skip_zero)
+	  printf("%s [%.1f/%.1f]  - %s [%.1f/%.1f] are alike\n",
+		 rrd1.path, rrd1.average, rrd1.stddev,
+		 rrd2.path, rrd2.average, rrd2.stddev);
+      } else if(circles_touch(rrd1.average, rrd1.stddev, rrd2.average, rrd2.stddev)) 
+        {
+	  float similarity = ndpi_bin_similarity(&rrd1.b, &rrd2.b, 0, similarity_threshold);
 
 	  if((similarity >= 0) && (similarity < similarity_threshold)) {
 	    if(verbose)
 	      printf("%s [%.1f/%.1f]  - %s [%.1f/%.1f] are %s [%.1f]\n",
-		   rrdms[i].rfs[k].path, rrdms[i].rfs[k].average, rrdms[i].rfs[k].stddev,
-		   rrdms[j].rfs[k].path, rrdms[j].rfs[k].average, rrdms[j].rfs[k].stddev,
+		   rrd1.path, rrd1.average, rrd1.stddev,
+		   rrd2.path, rrd2.average, rrd2.stddev,
 		   (similarity == 0) ? "alike" : "similar",
 		   similarity
 		   );
-
-	      num_similar_rrds++;
-	    }
-          }
-        }
-      }
     }
-    printf("Found %u (%.3f %%) similar %s / %u zero alike %s [num_rrds: %d]\n",
-      num_similar_rrds,
-      (num_similar_rrds*100.)/(float)(num_host*num_host),
-      filename[k],
-      num_potentially_zero_equal,
-      filename[k],
-      num_host);
   }
 }
 
 /* *************************************************** */
 
-void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds, int num_host) {
-  u_int i, j, num_similar_mts = 0, num_potentially_zero_equal = 0;
+void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds, int num_host, int n_file) {
+  u_int i, j, z, num_similar_mts = 0, num_potentially_zero_equal = 0;
 
   for(i=0; i<num_host; i++) {
     for(j=i+1; j<num_host; j++) {
@@ -278,7 +249,10 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
 		   (similarity == 0) ? "alike" : "similar",
 		   similarity
 		   );
-
+          /* If the two mts are similar we check the similarity of each of their files */
+	  for(z = 0; z < n_file; z++)
+            find_rrd_similarities(rrdms[i].rfs[z], rrdms[j].rfs[z]);
+		
 	  num_similar_mts++;
 	}
       }
@@ -464,9 +438,7 @@ int main(int argc, char *argv[]) {
     analyze_mts(&rrdms[i], start, end, n_file);
   }
 
-  find_rrd_similarities(rrdms, num_tot_rrds, n_file, num_host, filename);
-
-  find_rrd_multi_similarities(rrdms, num_tot_rrds, num_host);
+  find_rrd_multi_similarities(rrdms, num_tot_rrds, num_host, n_file);
 
 #if 0
   if(verbose) {
