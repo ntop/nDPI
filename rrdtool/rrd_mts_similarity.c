@@ -197,7 +197,7 @@ int circles_touch(int x1, int r1, int x2, int r2) {
 
 /* *************************************************** */
 
-void find_rrd_similarities(rrd_multifile_stats *rrdms, int *num_rrds, u_int num_tot_rrds, int n_file, int num_host, char **filename) {
+void find_rrd_similarities(rrd_multifile_stats *rrdms, u_int num_tot_rrds, int n_file, int num_host, char **filename) {
   u_int i, j, k, num_similar_rrds, num_potentially_zero_equal;
 
   for(k=0; k<n_file; k++) {
@@ -239,17 +239,13 @@ void find_rrd_similarities(rrd_multifile_stats *rrdms, int *num_rrds, u_int num_
         }
       }
     }
-     if(num_rrds[k] != 0){
-	      printf("Found %u (%.3f %%) similar %s / %u zero alike %s [num_rrds: %d]\n",
-	   num_similar_rrds,
-	   (num_similar_rrds*100.)/(float)(num_rrds[k]*num_rrds[k]),
-	   filename[k],
-	   num_potentially_zero_equal,
-	   filename[k],
-	   num_rrds[k]);
-     }else{
-	     printf("%s: file not found",filename[k]); 
-     }
+    printf("Found %u (%.3f %%) similar %s / %u zero alike %s [num_rrds: %d]\n",
+      num_similar_rrds,
+      (num_similar_rrds*100.)/(float)(num_host*num_host),
+      filename[k],
+      num_potentially_zero_equal,
+      filename[k],
+      num_host);
   }
 }
 
@@ -301,11 +297,11 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
 
 /* *************************************************** */
 
-int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, int *num_rrds, u_int *num_tot_rrds, int n_file, int *num_host) {
+int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, u_int *num_tot_rrds, int n_file, int *num_host) {
   struct dirent **namelist;
   int n = scandir(basedir, &namelist, 0, NULL);
   u_int i;
-  bool t = false;
+  bool t = true;
   char path[PATH_MAX];
   char* temp[n_file];
 
@@ -320,18 +316,12 @@ int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, int *
 
       if(stat(path, &s) == 0) {
 	if(S_ISDIR(s.st_mode))
-	 find_rrds(path, filename, rrdms, num_rrds, num_tot_rrds, n_file, num_host);
+	 find_rrds(path, filename, rrdms, num_tot_rrds, n_file, num_host);
 	else {
 	for(i=0; i<n_file; i++){
 	  if(strcmp(namelist[n]->d_name, filename[i]) == 0) {
-	    if(*num_tot_rrds < MAX_NUM_RRDS) {
+	    if(*num_tot_rrds < (MAX_NUM_RRDS-n_file)) {
 	     temp[i] = strdup(path);
-	      if(temp[i] != NULL)
-	        {
-	            t = true;
-	            (*num_tot_rrds)++;	//counter of all rrds
-	            (num_rrds[i])++;		//counter of each rrd
-	        }
 	      }
 	    }
 	  }
@@ -355,6 +345,7 @@ int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, int *
       rrdms[*num_host].rfs[i].path = temp[i];
 	  
     (*num_host)++;
+    (*num_tot_rrds) += n_file;
   }
 }
 
@@ -369,7 +360,7 @@ int main(int argc, char *argv[]) {
   time_t start, end;
   u_int num_tot_rrds = 0, i, j = 0;
   rrd_multifile_stats *rrdms;
-  int n_file = 0, num_host = 0, *num_rrds;
+  int n_file = 0, num_host = 0;
 
   /* Defaults */
   alpha   = DEFAULT_ALPHA;
@@ -461,15 +452,9 @@ int main(int argc, char *argv[]) {
            printf("Not enough memory !\n");
            return -1;
    }
-   
-  /* Initializzation of num_rrds */
-  num_rrds = malloc(sizeof(int)*n_file);
-  
-  for(i=0; i<n_file; i++)
-    num_rrds[i] = 0;
 
   /* Find all rrd's */
-  find_rrds(basedir, filename, rrdms, num_rrds, &num_tot_rrds, n_file, &num_host);
+  find_rrds(basedir, filename, rrdms, &num_tot_rrds, n_file, &num_host);
 
   /* Read RRD's data */
   for(i=0; i<num_host; i++)
@@ -482,7 +467,7 @@ int main(int argc, char *argv[]) {
     analyze_mts(&rrdms[i], start, end, n_file);
   }
 
-  find_rrd_similarities(rrdms, num_rrds, num_tot_rrds, n_file, num_host, filename);
+  find_rrd_similarities(rrdms, num_tot_rrds, n_file, num_host, filename);
 
   find_rrd_multi_similarities(rrdms, num_tot_rrds, num_host);
 
