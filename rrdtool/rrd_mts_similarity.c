@@ -125,7 +125,7 @@ void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_fil
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data;
   char **names;
-  u_int t, i, j = 0, num_points,not_found = 0;
+  u_int t, i, j = 0, num_points;
   struct ndpi_analyze_struct *s;
 
   /* Initializzation of mts_data */
@@ -146,8 +146,6 @@ void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_fil
       
       mts_data[j] = data;
       j++;
-    }else{
-      not_found++;
     }
   }
   
@@ -165,15 +163,14 @@ void analyze_mts(rrd_multifile_stats *rrdms, time_t start, time_t end, int n_fil
   value = 0;
   acc = 0;
     /* For each Time Series we took the t-th point */
-    for(i=0; i<n_file-not_found; i++){
-     
+    for(i=0; i<n_file; i++){
       value = (double)*mts_data[i]++;		
       if(!isnan(value)) acc += value;  			
     }
     
     /* Multivariate Time Series takes the average of the values found */
-    ndpi_data_add_value(s, acc/(n_file-not_found));
-    ndpi_set_bin(&rrdms->mts_b, j, acc/(n_file-not_found));
+    ndpi_data_add_value(s, acc/n_file);
+    ndpi_set_bin(&rrdms->mts_b, j, acc/n_file);
   }
 
   /* Compute MTS's average and stddev */
