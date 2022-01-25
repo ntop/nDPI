@@ -307,9 +307,10 @@ int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, int *
   u_int i;
   bool t = false;
   char path[PATH_MAX];
+  char* temp[n_file];
 
   if(n < 0)
-    return 0; /* End of the tree */
+    return; /* End of the tree */
 
   while(n--) {
     if(namelist[n]->d_name[0] != '.') {
@@ -319,13 +320,13 @@ int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, int *
 
       if(stat(path, &s) == 0) {
 	if(S_ISDIR(s.st_mode))
-	  *num_host += find_rrds(path, filename, rrdms, num_rrds, num_tot_rrds, n_file, num_host);
+	 find_rrds(path, filename, rrdms, num_rrds, num_tot_rrds, n_file, num_host);
 	else {
 	for(i=0; i<n_file; i++){
 	  if(strcmp(namelist[n]->d_name, filename[i]) == 0) {
 	    if(*num_tot_rrds < MAX_NUM_RRDS) {
-	      rrdms[*num_host].rfs[i].path = strdup(path);
-	      if(rrdms[*num_host].rfs[i].path != NULL)
+	     temp[i] = strdup(path);
+	      if(temp[i] != NULL)
 	        {
 	            t = true;
 	            (*num_tot_rrds)++;	//counter of all rrds
@@ -341,12 +342,20 @@ int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, int *
   }
   
   free(namelist);
+	
+  for(i=0; i<n_file; i++){
+    if(temp[i] == NULL)
+      t = false;
+  }
 
-  /* Report if I've found at least one of the files for a host */
+  /* If we have found all the requested files, we count the directory as a host */
   if(t)
-    return 1;
-  else
-    return 0;
+  {
+    for(i=0; i<n_file; i++)
+      rrdms[*num_host].rfs[i].path = temp[i];
+	  
+    (*num_host)++;
+  }
 }
 
 /* *************************************************** */
