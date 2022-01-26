@@ -1110,6 +1110,10 @@ void ndpi_serialize_risk(ndpi_serializer *serializer,
 {
   u_int32_t i;
 
+  if (risk == NDPI_NO_RISK) {
+    return;
+  }
+
   ndpi_serialize_start_of_block(serializer, "flow_risk");
   for(i = 0; i < NDPI_MAX_RISK; i++) {
     ndpi_risk_enum r = (ndpi_risk_enum)i;
