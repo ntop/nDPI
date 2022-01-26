@@ -268,7 +268,7 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
 
 /* *************************************************** */
 
-int find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, u_int *num_tot_rrds, int n_file, int *num_host) {
+void find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, u_int *num_tot_rrds, int n_file, int *num_host) {
   struct dirent **namelist;
   int n = scandir(basedir, &namelist, 0, NULL);
   u_int i;
