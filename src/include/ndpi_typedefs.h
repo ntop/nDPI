@@ -61,7 +61,6 @@ typedef enum {
   - nDPI/wireshark/ndpi.lua
   - ndpi_risk2str (in ndpi_utils.c)
   - doc/flow_risks.rst
-  - https://github.com/ntop/ntopng/blob/dev/scripts/lua/modules/flow_risk_utils.lua
   - ndpi_risk_enum (in python/ndpi.py)
   - ndpi_known_risks (ndpi_main.c)
 
@@ -116,7 +115,8 @@ typedef enum {
   NDPI_DNS_FRAGMENTED,
   NDPI_INVALID_CHARACTERS,
   NDPI_POSSIBLE_EXPLOIT, /* Log4J and other exploits */
-  
+  NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE,
+
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -1029,7 +1029,8 @@ struct ndpi_detection_module_struct {
   u_int32_t ticks_per_second;
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
-
+  u_int8_t tls_certificate_expire_in_x_days;
+  
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void *user_data;
 #endif

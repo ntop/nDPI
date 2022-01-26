@@ -246,4 +246,10 @@ Additionally, some TLS protocol fields are checked for printable characters as w
 
 NDPI_POSSIBLE_EXPLOIT
 =====================
-The risk is set whenever a a possible exploit (e.g. Log4J/Log4Shell) is detected.
+The risk is set whenever a possible exploit (e.g. Log4J/Log4Shell) is detected.
+
+.. _Risk 041:
+
+NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE
+===================================
+The risk is set whenever a TLS certificate is close to the expiration date.

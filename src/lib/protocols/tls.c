@@ -471,9 +471,11 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      if((flow->protos.tls_quic.notAfter-flow->protos.tls_quic.notBefore) > TLS_THRESHOLD)
 		ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERT_VALIDITY_TOO_LONG); /* Certificate validity longer than 13 months */
 
-	    if((time_sec < flow->protos.tls_quic.notBefore)
-	       || (time_sec > flow->protos.tls_quic.notAfter))
+	    if((time_sec < flow->protos.tls_quic.notBefore) || (time_sec > flow->protos.tls_quic.notAfter))
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_EXPIRED); /* Certificate expired */
+	    else if((time_sec > flow->protos.tls_quic.notBefore)
+		    && (time_sec > (flow->protos.tls_quic.notAfter - (ndpi_struct->tls_certificate_expire_in_x_days * 86400))))
+	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE); /* Certificate almost expired */
 	  }
 	}
       }
