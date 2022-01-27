@@ -145,13 +145,13 @@ static u_int32_t ndpi_tot_allocated_memory;
 /* ****************************************** */
 
 u_int32_t ndpi_get_tot_allocated_memory() {
-  return(ndpi_tot_allocated_memory);
+  return(__sync_fetch_and_add(&ndpi_tot_allocated_memory, 0));
 }
 
 /* ****************************************** */
 
 void *ndpi_malloc(size_t size) {
-  ndpi_tot_allocated_memory += size;
+  __sync_fetch_and_add(&ndpi_tot_allocated_memory, size);
   return(_ndpi_malloc ? _ndpi_malloc(size) : malloc(size));
 }
 
@@ -169,7 +169,7 @@ void *ndpi_calloc(unsigned long count, size_t size) {
 
   if(p) {
     memset(p, 0, len);
-    ndpi_tot_allocated_memory += size;
+    __sync_fetch_and_add(&ndpi_tot_allocated_memory, size);
   }
 
   return(p);

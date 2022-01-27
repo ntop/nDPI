@@ -92,9 +92,7 @@ struct nDPI_flow_info {
 struct nDPI_workflow {
   pcap_t * pcap_handle;
 
-  uint8_t error_or_eof:1;
-  uint8_t reserved_00:7;
-  uint8_t reserved_01[3];
+  uint8_t error_or_eof;
 
   unsigned long long int packets_captured;
   unsigned long long int packets_processed;
@@ -792,7 +790,7 @@ static void ndpi_process_packet(uint8_t * const args,
     workflow->cur_active_flows++;
     workflow->total_active_flows++;
     memcpy(flow_to_process, &flow, sizeof(*flow_to_process));
-    flow_to_process->flow_id = flow_id++;
+    flow_to_process->flow_id = __sync_fetch_and_add(&flow_id, 1);
 
     flow_to_process->ndpi_flow = (struct ndpi_flow_struct *)ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
     if (flow_to_process->ndpi_flow == NULL) {
@@ -994,7 +992,7 @@ static void run_pcap_loop(struct nDPI_reader_thread const * const reader_thread)
 
       fprintf(stderr, "Error while reading pcap file: '%s'\n",
 	      pcap_geterr(reader_thread->workflow->pcap_handle));
-      reader_thread->workflow->error_or_eof = 1;
+      __sync_fetch_and_add(&reader_thread->workflow->error_or_eof, 1);
     }
   }
 }
@@ -1015,14 +1013,14 @@ static void * processing_thread(void * const ndpi_thread_arg)
 
   printf("Starting Thread %d\n", reader_thread->array_index);
   run_pcap_loop(reader_thread);
-  reader_thread->workflow->error_or_eof = 1;
+  __sync_fetch_and_add(&reader_thread->workflow->error_or_eof, 1);
   return NULL;
 }
 
 static int processing_threads_error_or_eof(void)
 {
   for (int i = 0; i < reader_thread_count; ++i) {
-    if (reader_threads[i].workflow->error_or_eof == 0) {
+    if (__sync_fetch_and_add(&reader_threads[i].workflow->error_or_eof, 0) == 0) {
       return 0;
     }
   }
@@ -1129,8 +1127,8 @@ static void sighandler(int signum)
 {
   fprintf(stderr, "Received SIGNAL %d\n", signum);
 
-  if (main_thread_shutdown == 0) {
-    main_thread_shutdown = 1;
+  if (__sync_fetch_and_add(&main_thread_shutdown, 0) == 0) {
+    __sync_fetch_and_add(&main_thread_shutdown, 1);
   } else {
     fprintf(stderr, "Reader threads are already shutting down, please be patient.\n");
   }
@@ -1164,7 +1162,7 @@ int main(int argc, char ** argv)
 
   signal(SIGINT, sighandler);
   signal(SIGTERM, sighandler);
-  while (main_thread_shutdown == 0 && processing_threads_error_or_eof() == 0) {
+  while (__sync_fetch_and_add(&main_thread_shutdown, 0) == 0 && processing_threads_error_or_eof() == 0) {
     sleep(1);
   }
 
