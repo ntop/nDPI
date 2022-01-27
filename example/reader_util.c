@@ -2037,9 +2037,14 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	    if(iph->version == 6) {
 	      iph6 = (struct ndpi_ipv6hdr *)&packet[ip_offset];
 	      iph = NULL;
+              if(header->caplen < ip_offset + sizeof(struct ndpi_ipv6hdr))
+	        return(nproto);
 	    } else if(iph->version != IPVERSION) {
 	      // printf("WARNING: not good (packet_id=%u)!\n", (unsigned int)workflow->stats.raw_packet_count);
 	      goto v4_warning;
+	    } else {
+              if(header->caplen < ip_offset + sizeof(struct ndpi_iphdr))
+	        return(nproto);
 	    }
 	  }
 	}

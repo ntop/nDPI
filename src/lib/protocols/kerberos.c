@@ -230,7 +230,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    name_offset++;
 		  }
 
-		  if(name_offset < packet->payload_packet_len - 1 &&
+		  if(name_offset < packet->payload_packet_len - 3 &&
 		     packet->payload[name_offset+1] == 0x1b)
 		  {
 		    name_offset += 2;
