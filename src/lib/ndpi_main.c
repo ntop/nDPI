@@ -205,7 +205,7 @@ void *ndpi_realloc(void *ptr, size_t old_size, size_t new_size) {
     return(ret);
   else {
     if(ptr != NULL) {
-      memcpy(ret, ptr, old_size);
+      memcpy(ret, ptr, (old_size < new_size ? old_size : new_size));
       ndpi_free(ptr);
     }
     return(ret);
