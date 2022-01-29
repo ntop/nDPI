@@ -10,10 +10,11 @@ Confidence DPI              : 29 (flows)
 
 Unknown	13	5582	1
 MDNS	5	983	3
+NTP	8	720	4
 IGMP	2	92	2
 TLS	4	283	1
 Google	30	3310	5
-Apple	10	993	5
+Apple	2	273	1
 Microsoft	121	47561	14
 Microsoft365	126	53776	2
 Azure	4	414	2
@@ -50,10 +51,10 @@ JA3 Host Stats:
 	25	UDP 192.168.1.121:65213 <-> 8.8.8.8:53 [proto: 5.140/DNS.Apple][ClearText][Confidence: DPI][cat: Web/5][1 pkts/80 bytes <-> 1 pkts/193 bytes][Goodput ratio: 47/78][0.01 sec][Hostname/SNI: time-macos.apple.com][17.253.54.251][PLAIN TEXT (aaplimg)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	26	UDP 192.168.1.121:55578 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][ClearText][Confidence: DPI][cat: Web/5][1 pkts/86 bytes <-> 1 pkts/150 bytes][Goodput ratio: 51/72][0.01 sec][Hostname/SNI: e13678.dscb.akamaiedge.net][::][PLAIN TEXT (akamaiedge)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	27	UDP 192.168.1.121:54561 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][ClearText][Confidence: DPI][cat: Web/5][1 pkts/86 bytes <-> 1 pkts/102 bytes][Goodput ratio: 51/58][0.03 sec][Hostname/SNI: e13678.dscb.akamaiedge.net][2.22.33.235][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	28	UDP 192.168.1.121:49216 <-> 17.253.54.251:123 [proto: 9.140/NTP.Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	29	UDP 192.168.1.121:50288 <-> 17.253.54.251:123 [proto: 9.140/NTP.Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	30	UDP 192.168.1.121:56865 <-> 17.253.54.251:123 [proto: 9.140/NTP.Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	31	UDP 192.168.1.121:65099 <-> 17.253.54.251:123 [proto: 9.140/NTP.Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	28	UDP 192.168.1.121:49216 <-> 17.253.54.251:123 [proto: 9/NTP][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	29	UDP 192.168.1.121:50288 <-> 17.253.54.251:123 [proto: 9/NTP][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	30	UDP 192.168.1.121:56865 <-> 17.253.54.251:123 [proto: 9/NTP][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	31	UDP 192.168.1.121:65099 <-> 17.253.54.251:123 [proto: 9/NTP][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	TCP 192.168.1.121:52746 <-> 52.149.21.60:443 [proto: 91.276/TLS.Azure][Encrypted][Confidence: Match by IP][cat: Cloud/13][1 pkts/54 bytes <-> 1 pkts/54 bytes][Goodput ratio: 0/0][0.18 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	IGMP 192.168.1.139:0 -> 224.0.0.2:0 [proto: 82/IGMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/46 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	IGMP 192.168.1.139:0 -> 224.0.0.251:0 [proto: 82/IGMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/46 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

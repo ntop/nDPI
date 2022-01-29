@@ -9,6 +9,7 @@ Confidence DPI              : 56 (flows)
 
 DNS	4	390	2
 MDNS	2	174	2
+NTP	2	180	1
 SSDP	2	336	2
 DHCP	14	4772	2
 DataSaver	113	26168	13
@@ -16,7 +17,7 @@ TLS	1	90	1
 ICMPV6	7	578	4
 DHCPV6	2	228	1
 Dropbox	3	1656	1
-Google	189	59461	18
+Google	187	59281	17
 Apple	36	4740	5
 Spotify	3	258	1
 PlayStore	59	22749	4
@@ -65,7 +66,7 @@ JA3 Host Stats:
 	36	UDP 192.168.2.16:7660 <-> 192.168.2.1:53 [proto: 5.46/DNS.DataSaver][ClearText][Confidence: DPI][cat: Web/5][1 pkts/84 bytes <-> 1 pkts/100 bytes][Goodput ratio: 49/57][0.04 sec][Hostname/SNI: datasaver.googleapis.com][172.217.21.202][PLAIN TEXT (datasaver)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	37	UDP 192.168.2.16:18379 <-> 192.168.2.1:53 [proto: 5.46/DNS.DataSaver][ClearText][Confidence: DPI][cat: Web/5][1 pkts/84 bytes <-> 1 pkts/100 bytes][Goodput ratio: 49/57][0.00 sec][Hostname/SNI: datasaver.googleapis.com][172.217.21.202][PLAIN TEXT (datasaver)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	38	UDP 192.168.2.16:39760 <-> 192.168.2.1:53 [proto: 5.239/DNS.GoogleServices][ClearText][Confidence: DPI][cat: Web/5][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.04 sec][Hostname/SNI: android.googleapis.com][172.217.22.10][PLAIN TEXT (android)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	39	UDP 192.168.2.16:45863 <-> 216.239.35.8:123 [proto: 9.126/NTP.Google][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.04 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	39	UDP 192.168.2.16:45863 <-> 216.239.35.8:123 [proto: 9/NTP][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.04 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	40	ICMPV6 [::]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][ClearText][Confidence: DPI][cat: Network/14][2 pkts/180 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][0.22 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	41	ICMPV6 [fe80::4e6a:f6ff:fe9f:f627]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][ClearText][Confidence: DPI][cat: Network/14][2 pkts/180 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][0.09 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	42	UDP 192.168.2.16:10677 <-> 192.168.2.1:53 [proto: 5.46/DNS.DataSaver][ClearText][Confidence: DPI][cat: Web/5][1 pkts/79 bytes <-> 1 pkts/95 bytes][Goodput ratio: 46/55][0.00 sec][Hostname/SNI: proxy.googlezip.net][172.217.20.76][PLAIN TEXT (googlezip)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -5746,12 +5746,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
   }
 
-  if((ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) && (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) &&
-     (flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN)) {
-    ret.master_protocol = ret.app_protocol;
-    ret.app_protocol = flow->guessed_host_protocol_id;
-  }
-
   if((!flow->risk_checked)
      && ((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
      ) {

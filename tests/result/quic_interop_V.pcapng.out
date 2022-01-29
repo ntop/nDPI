@@ -4,10 +4,10 @@ DPI Packets (UDP):	63	(1.00 pkts/flow)
 DPI Packets (other):	14	(1.00 pkts/flow)
 Confidence DPI              : 77 (flows)
 
-ICMP	18	7129	7
+ICMP	21	7436	9
 ICMPV6	10	10642	5
 QUIC	179	185580	57
-Azure	39	39573	8
+Azure	36	39266	6
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -90,5 +90,5 @@ JA3 Host Stats:
 	73	ICMP 3.121.242.54:0 -> 192.168.1.128:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/590 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Risk: ** Suspicious Entropy **][Risk Score: 50][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	74	ICMP 18.189.84.245:0 -> 192.168.1.128:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/590 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Risk: ** Suspicious Entropy **][Risk Score: 50][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	75	ICMP 192.168.1.128:0 -> 140.227.52.92:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][3 pkts/267 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][0.17 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	76	ICMP 192.168.1.128:0 -> 40.112.191.60:0 [proto: 81.276/ICMP.Azure][ClearText][Confidence: DPI][cat: Network/14][2 pkts/194 bytes -> 0 pkts/0 bytes][Goodput ratio: 56/0][0.14 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	77	ICMP 192.168.1.128:0 -> 138.91.188.147:0 [proto: 81.276/ICMP.Azure][ClearText][Confidence: DPI][cat: Network/14][1 pkts/113 bytes -> 0 pkts/0 bytes][Goodput ratio: 62/0][< 1 sec][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	76	ICMP 192.168.1.128:0 -> 40.112.191.60:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][2 pkts/194 bytes -> 0 pkts/0 bytes][Goodput ratio: 56/0][0.14 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	77	ICMP 192.168.1.128:0 -> 138.91.188.147:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/113 bytes -> 0 pkts/0 bytes][Goodput ratio: 62/0][< 1 sec][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
