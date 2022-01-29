@@ -4956,7 +4956,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
       if(ndpi_str->msteams_cache)
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-			      flow->saddr,
+			      ntohl(flow->saddr),
 			      (flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
     }
     break;
@@ -4968,7 +4968,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
        && ndpi_str->msteams_cache) {
       u_int16_t when;
 
-      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, flow->saddr,
+      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, ntohl(flow->saddr),
 			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
 	u_int16_t tdiff = ((flow->last_packet_time_ms /1000) & 0xFFFF) - when;
 
@@ -4978,7 +4978,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
 	  /* Refresh cache */
 	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-				flow->saddr,
+				ntohl(flow->saddr),
 				(flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
 	}
       }

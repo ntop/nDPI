@@ -161,10 +161,10 @@ struct ndpi_entropy {
 typedef struct ndpi_flow_info {
   u_int32_t flow_id;
   u_int32_t hashval;
-  u_int32_t src_ip;
-  u_int32_t dst_ip;
-  u_int16_t src_port;
-  u_int16_t dst_port;
+  u_int32_t src_ip; /* network order */
+  u_int32_t dst_ip; /* network order */
+  u_int16_t src_port; /* network order */
+  u_int16_t dst_port; /* network order */
   u_int8_t detection_completed, protocol, bidirectional, check_extra_packets;
   u_int16_t vlan_id;
   ndpi_packet_tunnel tunnel_type;
