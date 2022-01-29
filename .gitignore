@@ -78,3 +78,4 @@ stamp-h1
 /rrdtool/Makefile
 /rrdtool/rrd_anomaly
 /rrdtool/rrd_similarity
+/tests/performance/Makefile

@@ -2267,6 +2267,9 @@ void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str) {
     "h3-fb-05", "h1q-fb",
     "doq-i00",
 
+    /* ApplePush */
+    "apns-security-v3", "apns-pack-v1",
+
     NULL /* end */
   };
   u_int i;

@@ -62,7 +62,7 @@ void ndpi_search_ldap(struct ndpi_detection_module_struct *ndpi_struct, struct n
 			}
 		}
 		// normal type
-		if (packet->payload[1] == 0x84 && packet->payload_packet_len >= 0x84 &&
+		if (packet->payload[1] == 0x84 &&
 			packet->payload[2] == 0x00 && packet->payload[3] == 0x00 && packet->payload[6] == 0x02) {
 
 			if (packet->payload[7] == 0x01 &&
@@ -79,6 +79,15 @@ void ndpi_search_ldap(struct ndpi_detection_module_struct *ndpi_struct, struct n
 				 packet->payload[10] == 0x64) && packet->payload[11] == 0x84) {
 
 				NDPI_LOG_INFO(ndpi_struct, "found ldap type 2\n");
+				ndpi_int_ldap_add_connection(ndpi_struct, flow);
+				return;
+			}
+
+			if (packet->payload[7] == 0x03 &&
+				(packet->payload[11] == 0x60 || packet->payload[11] == 0x61 || packet->payload[11] == 0x63 ||
+				 packet->payload[11] == 0x64 || packet->payload[11] == 0x65) && packet->payload[12] == 0x84) {
+
+				NDPI_LOG_INFO(ndpi_struct, "found ldap type 3\n");
 				ndpi_int_ldap_add_connection(ndpi_struct, flow);
 				return;
 			}

@@ -59,13 +59,34 @@ static void ndpi_int_mqtt_add_connection (struct ndpi_detection_module_struct *n
 	NDPI_LOG_INFO(ndpi_struct, "found Mqtt\n");
 }
 
+static int64_t get_var_int(const unsigned char *buf, int buf_len, u_int8_t *num_bytes)
+{
+	int i, multiplier = 1;
+	u_int32_t value = 0;
+	u_int8_t encodedByte;
+
+	*num_bytes= 0;
+	for (i = 0; i < 4; i++) {
+		if (i >= buf_len)
+			return -1;
+		(*num_bytes)++;
+		encodedByte = buf[i];
+		value += ((encodedByte & 127) * multiplier);
+		if ((encodedByte & 128) == 0)
+			break;
+		multiplier *= 128;
+	}
+	return value;
+}
+
 /**
  * Dissector function that searches Mqtt headers
  */
 void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 		struct ndpi_flow_struct *flow)
 {
-	u_int8_t rl,pt,flags;
+	u_int8_t pt,flags, rl_len;
+	int64_t rl;
 
 	NDPI_LOG_DBG(ndpi_struct, "search Mqtt\n");
 	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -89,15 +110,16 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 		return;
 	}
-	if (packet->payload_packet_len > 258) {
-		NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt .. maximum packet size exceeded!\n");
+	// we extract the remaining length
+	rl = get_var_int(&packet->payload[1], packet->payload_packet_len - 1, &rl_len);
+	if (rl < 0) {
+		NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt .. invalid length!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 		return;
 	}
-	// we extract the remaining length
-	rl = (u_int8_t) (packet->payload[1]);
-	if (packet->payload_packet_len != (rl + 2)) {
-		NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt .. packet size exceeded!\n");
+	NDPI_LOG_DBG(ndpi_struct, "Mqtt: msg_len %d\n", (unsigned long long)rl);
+	if (packet->payload_packet_len != rl + 1 + rl_len) {
+		NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt .. maximum packet size exceeded!\n");
 		NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 		return;
 	}
@@ -153,15 +175,9 @@ void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
 	NDPI_LOG_DBG2(ndpi_struct,"====>>>> Passed second stage of identification\n");
 	// third stage verification (payload)
 	if (pt == CONNECT) {
-		if (packet->payload_packet_len >= 8 && memcmp(&(packet->payload[4]),"MQTT",4) == 0) {
-			NDPI_LOG_DBG(ndpi_struct, "found Mqtt CONNECT\n");
-			ndpi_int_mqtt_add_connection(ndpi_struct,flow);
-			return;
-		} else {
-			NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt invalid CONNECT\n");
-			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-			return;
-		}
+		NDPI_LOG_DBG(ndpi_struct, "found Mqtt CONNECT\n");
+		ndpi_int_mqtt_add_connection(ndpi_struct,flow);
+		return;
 	}
 	if (pt == PUBLISH) {
 		// payload CAN be zero bytes length (section 3.3.3 of MQTT standard)

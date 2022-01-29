@@ -1,6 +1,6 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	5	(1.00 pkts/flow)
+DPI Packets (UDP):	10	(2.00 pkts/flow)
 Confidence DPI              : 5 (flows)
 
 RX	132	26475	5
