@@ -60,21 +60,21 @@ u_int verbose = 0, similarity_threshold = 100, skip_zero = 0;
 
 static void help() {
   printf("Usage: rrd_mts_similarity [-v][-a <alpha>][-e <end>][-q][-s <start>]\n"
-	 "                      -f <filename_1>+<filename_2>+...+<filename_n> -d <basedir> [-t <threshold>]\n"
+	 "                      -f <filename_1>,<filename_2>,...,<filename_n> -d <basedir> [-t <threshold>]\n"
 	 "-a             		| Set alpha. Valid range >0 .. <1. Default %.2f\n"
 	 "-e <end>       		| RRD end time. Default %s\n"
 	 "-q             		| Quick output (only anomalies are reported)\n"
 	 "-s <start>     		| RRD start time. Default %s\n"
 
 	 "-d <basedir>   		| Base directory where RRD filename is searched\n"
-	 "-f <rrd_path1>+<rrd_path2>...	| Path of the RRDs filename to analyze, they must be chained using '+' character\n"
+	 "-f <rrd_path1>,<rrd_path2>...	| Path of the RRDs filename to analyze, they must be chained using ',' character\n"
 	 "-t <threshold> 		| Similarity threshold. Default %u (0 == alike)\n"
 	 "-v             		| Verbose\n"
 	 "-z             		| Skip zero RRDs during comparison\n"
 	 ,
 	 DEFAULT_ALPHA, DEFAULT_END, DEFAULT_START, similarity_threshold);
 
-  printf("\n\nExample: rrd_mts_similarity -q -f bytes.rrd+score.rrd -d /var/lib/ntopng/-1/snmpstats\n");
+  printf("\n\nExample: rrd_mts_similarity -q -f bytes.rrd,score.rrd -d /var/lib/ntopng/-1/snmpstats\n");
 
   printf("\n\nGoal: find similar RRDs\n");
   exit(0);
@@ -379,13 +379,13 @@ int main(int argc, char *argv[]) {
        if(n_file == 0)
     	 filename = malloc(sizeof(char*)*MAX_NUM_FILE);
 		 
-       char* token = strtok(optarg, "+");
+       char* token = strtok(optarg, ",");
        while(token != NULL)
        {
          filename[n_file] = strdup(token); 
          n_file++;
 	       
-	 token = strtok(NULL, "+");
+	 token = strtok(NULL, ",");
        } 
        break;
 
