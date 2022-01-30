@@ -29,36 +29,9 @@
 
 #include "ndpi_api.h"
 
-#define NDPI_IRC_FIND_LESS(time_err,less) {int t1 = 0;	\
-    u_int32_t timestamp = time_err[0];			\
-    for(t1=0;t1 < NDPI_PROTOCOL_IRC_MAXPORT;t1++) {	\
-      if(timestamp > time_err[t1]) {			\
-	timestamp = time_err[t1];			\
-	less = t1;}}}
-
 static void ndpi_int_irc_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow, ndpi_confidence_t confidence)
 {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRC, NDPI_PROTOCOL_UNKNOWN, confidence);
-}
-
-	
-
-#if !defined(WIN32)
-static inline
-#elif defined(MINGW_GCC)
-__mingw_forceinline static
-#else
-__forceinline static
-#endif
-u_int8_t ndpi_is_duplicate(struct ndpi_id_struct *id_t, u_int16_t port)
-{
-  int index = 0;
-  while (index < id_t->irc_number_of_port) {
-    if (port == id_t->irc_port[index])
-      return 1;
-    index++;
-  }
-  return 0;
 }
 
 static u_int8_t ndpi_check_for_NOTICE_or_PRIVMSG(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -369,17 +342,9 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
-  int less;
   u_int16_t c = 0;
-  u_int16_t port = 0;
-  u_int16_t sport = 0;
-  u_int16_t dport = 0;
-  u_int16_t counter = 0;
   u_int16_t i = 0;
   u_int16_t j = 0;
-  u_int16_t k = 0;
   u_int16_t h;
   u_int16_t http_content_ptr_len = 0;
   u_int8_t space = 0;
@@ -389,53 +354,6 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     NDPI_LOG_DBG(ndpi_struct, "exclude irc, packet_counter > 70\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_IRC);
     return;
-  }
-
-  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_IRC) {
-    if (src != NULL && ((u_int32_t)
-			(packet->current_time_ms - src->irc_ts) < ndpi_struct->irc_timeout)) {
-      NDPI_LOG_DBG2(ndpi_struct, "irc : save src connection packet detected\n");
-      src->irc_ts = packet->current_time_ms;
-    } else if (dst != NULL && ((u_int32_t)
-			       (packet->current_time_ms - dst->irc_ts) < ndpi_struct->irc_timeout)) {
-      NDPI_LOG_DBG2(ndpi_struct, "irc : save dst connection packet detected\n");
-      dst->irc_ts = packet->current_time_ms;
-    }
-  }
-
-  if (((dst != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, NDPI_PROTOCOL_IRC)
-	&& ((u_int32_t)
-	    (packet->current_time_ms - dst->irc_ts)) <
-	ndpi_struct->irc_timeout)) || (src != NULL
-				       &&
-				       NDPI_COMPARE_PROTOCOL_TO_BITMASK
-				       (src->detected_protocol_bitmask, NDPI_PROTOCOL_IRC)
-				       && ((u_int32_t)
-					   (packet->current_time_ms - src->irc_ts)) < ndpi_struct->irc_timeout)) {
-    if (packet->tcp != NULL) {
-      sport = packet->tcp->source;
-      dport = packet->tcp->dest;
-    }
-    if (dst != NULL) {
-      for (counter = 0; counter < dst->irc_number_of_port; counter++) {
-	if (dst->irc_port[counter] == sport || dst->irc_port[counter] == dport) {
-	  dst->last_time_port_used[counter] = packet->current_time_ms;
-	  NDPI_LOG_INFO(ndpi_struct, "found IRC: dest port matched with the DCC port");
-	  ndpi_int_irc_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
-	  return;
-	}
-      }
-    }
-    if (src != NULL) {
-      for (counter = 0; counter < src->irc_number_of_port; counter++) {
-	if (src->irc_port[counter] == sport || src->irc_port[counter] == dport) {
-	  src->last_time_port_used[counter] = packet->current_time_ms;
-	  NDPI_LOG_INFO(ndpi_struct, "found  IRC: Source port matched with the DCC port");
-	  ndpi_int_irc_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
-	  return;
-	}
-      }
-    }
   }
 
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC &&
@@ -667,70 +585,6 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 		  if (space == 3) {
 		    j++;
 		    NDPI_LOG_DBG2(ndpi_struct, "read port.");
-		    if (src != NULL) {
-		      k = j;
-		      port =
-			ntohs_ndpi_bytestream_to_number
-			(&packet->line[i].ptr[j], packet->payload_packet_len - j, &j);
-		      NDPI_LOG_DBG2(ndpi_struct, "port %u.",
-				    port);
-		      j = k;
-		      // hier jetzt überlegen, wie die ports abgespeichert werden sollen
-		      if (src->irc_number_of_port < NDPI_PROTOCOL_IRC_MAXPORT)
-			NDPI_LOG_DBG2(ndpi_struct, "src->irc_number_of_port < NDPI_PROTOCOL_IRC_MAXPORT.");
-		      if (src->irc_number_of_port < NDPI_PROTOCOL_IRC_MAXPORT && port != 0) {
-			if (!ndpi_is_duplicate(src, port)) {
-			  src->irc_port[src->irc_number_of_port]
-			    = port;
-			  src->irc_number_of_port++;
-			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d jjeeeeeeeeeeeeeeeeeeeeeeeee",
-					ntohs(get_u_int16_t(src->irc_port, 0)));
-			}
-			src->irc_ts = packet->current_time_ms;
-		      } else if (port != 0 && src->irc_number_of_port == NDPI_PROTOCOL_IRC_MAXPORT) {
-			if (!ndpi_is_duplicate(src, port)) {
-			  less = 0;
-			  NDPI_IRC_FIND_LESS(src->last_time_port_used, less);
-			  src->irc_port[less] = port;
-			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d", ntohs(get_u_int16_t(src->irc_port, 0)));
-			}
-			src->irc_ts = packet->current_time_ms;
-		      }
-		      if (dst == NULL) {
-			break;
-		      }
-		    }
-		    if (dst != NULL) {
-		      port = ntohs_ndpi_bytestream_to_number
-			(&packet->line[i].ptr[j], packet->payload_packet_len - j, &j);
-		      NDPI_LOG_DBG2(ndpi_struct, "port %u.", port);
-		      // hier das gleiche wie oben.
-		      /* hier werden NDPI_PROTOCOL_IRC_MAXPORT ports pro irc flows mitgespeichert. könnte man denn nicht ein-
-		       * fach an die dst oder src einen flag setzten, dass dieser port für eine bestimmte
-		       * zeit ein irc-port bleibt?
-		       */
-		      if (dst->irc_number_of_port < NDPI_PROTOCOL_IRC_MAXPORT && port != 0) {
-			if (!ndpi_is_duplicate(dst, port)) {
-			  dst->irc_port[dst->irc_number_of_port]
-			    = port;
-			  dst->irc_number_of_port++;
-			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d", ntohs(get_u_int16_t(dst->irc_port, 0)));
-			  NDPI_LOG_DBG2(ndpi_struct, "juuuuuuuuuuuuuuuu");
-			}
-			dst->irc_ts = packet->current_time_ms;
-		      } else if (port != 0 && dst->irc_number_of_port == NDPI_PROTOCOL_IRC_MAXPORT) {
-			if (!ndpi_is_duplicate(dst, port)) {
-			  less = 0;
-			  NDPI_IRC_FIND_LESS(dst->last_time_port_used, less);
-			  dst->irc_port[less] = port;
-
-			  NDPI_LOG_DBG2(ndpi_struct, "found port=%d", ntohs(get_u_int16_t(dst->irc_port, 0)));
-			}
-			dst->irc_ts = packet->current_time_ms;
-		      }
-
-		      break;
-		    }
 		  }
 
 

@@ -85,8 +85,6 @@ struct nDPI_flow_info {
   struct ndpi_proto guessed_protocol;
 
   struct ndpi_flow_struct * ndpi_flow;
-  struct ndpi_id_struct * ndpi_src;
-  struct ndpi_id_struct * ndpi_dst;
 };
 
 struct nDPI_workflow {
@@ -190,8 +188,6 @@ static void ndpi_flow_info_freer(void * const node)
 {
   struct nDPI_flow_info * const flow = (struct nDPI_flow_info *)node;
 
-  ndpi_free(flow->ndpi_dst);
-  ndpi_free(flow->ndpi_src);
   ndpi_flow_free(flow->ndpi_flow);
   ndpi_free(flow);
 }
@@ -505,10 +501,6 @@ static void ndpi_process_packet(uint8_t * const args,
   void * tree_result;
   struct nDPI_flow_info * flow_to_process;
 
-  int direction_changed = 0;
-  struct ndpi_id_struct * ndpi_src;
-  struct ndpi_id_struct * ndpi_dst;
-
   const struct ndpi_ethhdr * ethernet;
   const struct ndpi_iphdr * ip;
   struct ndpi_ipv6hdr * ip6;
@@ -753,9 +745,6 @@ static void ndpi_process_packet(uint8_t * const args,
     flow.dst_port = orig_src_port;
 
     tree_result = ndpi_tfind(&flow, &workflow->ndpi_flows_active[hashed_index], ndpi_workflow_node_cmp);
-    if (tree_result != NULL) {
-      direction_changed = 1;
-    }
 
     flow.ip_tuple.u32.src[0] = orig_src_ip[0];
     flow.ip_tuple.u32.src[1] = orig_src_ip[1];
@@ -800,20 +789,6 @@ static void ndpi_process_packet(uint8_t * const args,
     }
     memset(flow_to_process->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
 
-    flow_to_process->ndpi_src = (struct ndpi_id_struct *)ndpi_calloc(1, SIZEOF_ID_STRUCT);
-    if (flow_to_process->ndpi_src == NULL) {
-      fprintf(stderr, "[%8llu, %d, %4u] Not enough memory for src id struct\n",
-	      workflow->packets_captured, reader_thread->array_index, flow_to_process->flow_id);
-      return;
-    }
-
-    flow_to_process->ndpi_dst = (struct ndpi_id_struct *)ndpi_calloc(1, SIZEOF_ID_STRUCT);
-    if (flow_to_process->ndpi_dst == NULL) {
-      fprintf(stderr, "[%8llu, %d, %4u] Not enough memory for dst id struct\n",
-	      workflow->packets_captured, reader_thread->array_index, flow_to_process->flow_id);
-      return;
-    }
-
     printf("[%8llu, %d, %4u] new %sflow\n", workflow->packets_captured, thread_index,
 	   flow_to_process->flow_id,
 	   (flow_to_process->is_midstream_flow != 0 ? "midstream-" : ""));
@@ -821,19 +796,8 @@ static void ndpi_process_packet(uint8_t * const args,
       /* Possible Leak, but should not happen as we'd abort earlier. */
       return;
     }
-
-    ndpi_src = flow_to_process->ndpi_src;
-    ndpi_dst = flow_to_process->ndpi_dst;
   } else {
     flow_to_process = *(struct nDPI_flow_info **)tree_result;
-
-    if (direction_changed != 0) {
-      ndpi_src = flow_to_process->ndpi_dst;
-      ndpi_dst = flow_to_process->ndpi_src;
-    } else {
-      ndpi_src = flow_to_process->ndpi_src;
-      ndpi_dst = flow_to_process->ndpi_dst;
-    }
   }
 
   flow_to_process->packets_processed++;
@@ -884,7 +848,7 @@ static void ndpi_process_packet(uint8_t * const args,
   flow_to_process->detected_l7_protocol =
     ndpi_detection_process_packet(workflow->ndpi_struct, flow_to_process->ndpi_flow,
 				  ip != NULL ? (uint8_t *)ip : (uint8_t *)ip6,
-				  ip_size, time_ms, ndpi_src, ndpi_dst);
+				  ip_size, time_ms);
 
   if (ndpi_is_protocol_detected(workflow->ndpi_struct,
 				flow_to_process->detected_l7_protocol) != 0 &&

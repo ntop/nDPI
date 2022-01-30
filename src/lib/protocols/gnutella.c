@@ -33,66 +33,17 @@ static void ndpi_int_gnutella_add_connection(struct ndpi_detection_module_struct
 					     struct ndpi_flow_struct *flow,
 					     ndpi_confidence_t confidence)
 {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
-
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA, NDPI_PROTOCOL_UNKNOWN, confidence);
   NDPI_LOG_INFO(ndpi_struct, "found GNUTELLA\n");
-
-  if (src != NULL) {
-    src->gnutella_ts = packet->current_time_ms;
-    if (packet->udp != NULL) {
-      if (!src->detected_gnutella_udp_port1) {
-	src->detected_gnutella_udp_port1 = (packet->udp->source);
-	NDPI_LOG_DBG2(ndpi_struct,
-		"GNUTELLA UDP PORT1 DETECTED as %u\n", src->detected_gnutella_udp_port1);
-
-      } else if ((ntohs(packet->udp->source) != src->detected_gnutella_udp_port1)
-		 && !src->detected_gnutella_udp_port2) {
-	src->detected_gnutella_udp_port2 = (packet->udp->source);
-	NDPI_LOG_DBG2(ndpi_struct,
-		"GNUTELLA UDP PORT2 DETECTED as %u\n", src->detected_gnutella_udp_port2);
-
-      }
-    }
-  }
-  if (dst != NULL) {
-    dst->gnutella_ts = packet->current_time_ms;
-  }
 }
 
 void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
   u_int16_t c;
 
   NDPI_LOG_DBG(ndpi_struct, "search GNUTELLA\n");
-
-  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_GNUTELLA) {
-    if (src != NULL && ((u_int32_t)
-			(packet->current_time_ms - src->gnutella_ts) < ndpi_struct->gnutella_timeout)) {
-      NDPI_LOG_DBG2(ndpi_struct, "save src connection packet detected\n");
-      src->gnutella_ts = packet->current_time_ms;
-    } else if (dst != NULL && ((u_int32_t)
-			       (packet->current_time_ms - dst->gnutella_ts) < ndpi_struct->gnutella_timeout)) {
-      NDPI_LOG_DBG2(ndpi_struct, "save dst connection packet detected\n");
-      dst->gnutella_ts = packet->current_time_ms;
-    }
-    if (src != NULL && (packet->current_time_ms - src->gnutella_ts) > ndpi_struct->gnutella_timeout) {
-      src->detected_gnutella_udp_port1 = 0;
-      src->detected_gnutella_udp_port2 = 0;
-    }
-    if (dst != NULL && (packet->current_time_ms - dst->gnutella_ts) > ndpi_struct->gnutella_timeout) {
-      dst->detected_gnutella_udp_port1 = 0;
-      dst->detected_gnutella_udp_port2 = 0;
-    }
-
-    return;
-  }
 
   /* skip packets without payload */
   if (packet->payload_packet_len < 2) {
@@ -234,12 +185,6 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
       }
     }
   } else if (packet->udp != NULL) {
-    if (src != NULL && (packet->udp->source == src->detected_gnutella_udp_port1 ||
-			packet->udp->source == src->detected_gnutella_udp_port2) &&
-	(packet->current_time_ms - src->gnutella_ts) < ndpi_struct->gnutella_timeout) {
-      NDPI_LOG_DBG2(ndpi_struct, "port based detection\n\n");
-      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
-    }
     /* observations:
      * all the following patterns send out many packets which are the only ones of their flows,
      * often on the very beginning of the traces, or flows with many packets in one direction only.
@@ -333,20 +278,18 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
       if (flow->packet_counter == 2 && (packet->payload_packet_len == 33 || packet->payload_packet_len == 22)
 	  && flow->l4.tcp.gnutella_msg_id[0] == packet->payload[0]
 	  && flow->l4.tcp.gnutella_msg_id[1] == packet->payload[2]
-	  && flow->l4.tcp.gnutella_msg_id[2] == packet->payload[4]
-	  && NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_GNUTELLA)) {
+	  && flow->l4.tcp.gnutella_msg_id[2] == packet->payload[4]) {
 	NDPI_LOG_DBG2(ndpi_struct, "GNUTELLA DETECTED due to message ID match (NEONet protocol)\n");
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 	return;
       }
     } else if (flow->l4.tcp.gnutella_stage == 2 - packet->packet_direction) {
       if (flow->packet_counter == 2 && (packet->payload_packet_len == 10 || packet->payload_packet_len == 75)
 	  && flow->l4.tcp.gnutella_msg_id[0] == packet->payload[0]
 	  && flow->l4.tcp.gnutella_msg_id[1] == packet->payload[2]
-	  && flow->l4.tcp.gnutella_msg_id[2] == packet->payload[4]
-	  && NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_GNUTELLA)) {
+	  && flow->l4.tcp.gnutella_msg_id[2] == packet->payload[4]) {
 	NDPI_LOG_DBG2(ndpi_struct, "GNUTELLA DETECTED due to message ID match (NEONet protocol)\n");
-	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_SRC_DST_ID);
+	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }

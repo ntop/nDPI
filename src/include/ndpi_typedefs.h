@@ -530,52 +530,6 @@ struct ndpi_lru_cache {
   struct ndpi_lru_cache_entry *entries;
 };
 
-struct ndpi_id_struct {
-  /**
-     detected_protocol_bitmask:
-     access this bitmask to find out whether an id has used skype or not
-     if a flag is set here, it will not be reset
-     to compare this, use:
-  **/
-  NDPI_PROTOCOL_BITMASK detected_protocol_bitmask;
-
-  /* NDPI_PROTOCOL_IRC_MAXPORT % 2 must be 0 */
-  /* NDPI_PROTOCOL_IRC */
-#define NDPI_PROTOCOL_IRC_MAXPORT 8
-  u_int16_t irc_port[NDPI_PROTOCOL_IRC_MAXPORT];
-  u_int32_t last_time_port_used[NDPI_PROTOCOL_IRC_MAXPORT];
-  u_int32_t irc_ts;
-
-  /* NDPI_PROTOCOL_GNUTELLA */
-  u_int32_t gnutella_ts;
-
-  /* NDPI_PROTOCOL_JABBER */
-  u_int32_t jabber_stun_or_ft_ts;
-
-  /* NDPI_PROTOCOL_DIRECTCONNECT */
-  u_int32_t directconnect_last_safe_access_time;
-
-  /* NDPI_PROTOCOL_DIRECTCONNECT */
-  u_int16_t detected_directconnect_port;
-  u_int16_t detected_directconnect_udp_port;
-  u_int16_t detected_directconnect_ssl_port;
-
-  /* NDPI_PROTOCOL_JABBER */
-#define JABBER_MAX_STUN_PORTS 6
-  u_int16_t jabber_voice_stun_port[JABBER_MAX_STUN_PORTS];
-  u_int16_t jabber_file_transfer_port[2];
-
-  /* NDPI_PROTOCOL_GNUTELLA */
-  u_int16_t detected_gnutella_udp_port1;
-  u_int16_t detected_gnutella_udp_port2;
-
-  /* NDPI_PROTOCOL_IRC */
-  u_int8_t irc_number_of_port;
-
-  /* NDPI_PROTOCOL_JABBER */
-  u_int8_t jabber_voice_stun_used_ports;
-};
-
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
@@ -850,7 +804,6 @@ typedef enum {
   NDPI_CONFIDENCE_UNKNOWN = 0,		/* Unknown classification */
   NDPI_CONFIDENCE_MATCH_BY_PORT,	/* Classification obtained looking only at the L4 ports */
   NDPI_CONFIDENCE_MATCH_BY_IP,		/* Classification obtained looking only at the L3 addresses */
-  NDPI_CONFIDENCE_DPI_SRC_DST_ID,	/* Classification results based on ndpi_id_struct structures */
   NDPI_CONFIDENCE_DPI_CACHE,		/* Classification results based on same LRU cache (i.e. correlation among sessions) */
   NDPI_CONFIDENCE_DPI,			/* Deep packet inspection */
 
@@ -1399,9 +1352,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;
   struct tinc_cache_entry tinc_cache_entry;
-
-  struct ndpi_id_struct *src;
-  struct ndpi_id_struct *dst;
 };
 
 #define NDPI_PROTOCOL_DEFAULT_LEVEL	0

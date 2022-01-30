@@ -246,12 +246,6 @@ u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void) {
 
 /* *********************************************************************************** */
 
-u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void) {
-  return(sizeof(struct ndpi_id_struct));
-}
-
-/* *********************************************************************************** */
-
 u_int32_t ndpi_detection_get_sizeof_ndpi_flow_tcp_struct(void) {
   return(sizeof(struct ndpi_flow_tcp_struct));
 }
@@ -5279,16 +5273,13 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
 void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 			       const unsigned char *packet_data, const unsigned short packetlen,
-			       const u_int64_t current_time_ms, struct ndpi_id_struct *src, struct ndpi_id_struct *dst) {
+			       const u_int64_t current_time_ms) {
   if(flow == NULL)
     return;
 
   /* set up the packet headers for the extra packet function to use if it wants */
   if(ndpi_init_packet(ndpi_str, flow, current_time_ms, packet_data, packetlen) != 0)
     return;
-
-  /* detect traffic for tcp or udp only */
-  flow->src = src, flow->dst = dst;
 
   ndpi_connection_tracking(ndpi_str, flow);
 
@@ -5633,8 +5624,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
 
 ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct *ndpi_str,
 					    struct ndpi_flow_struct *flow, const unsigned char *packet_data,
-					    const unsigned short packetlen, const u_int64_t current_time_ms,
-					    struct ndpi_id_struct *src, struct ndpi_id_struct *dst) {
+					    const unsigned short packetlen, const u_int64_t current_time_ms) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
   u_int32_t num_calls = 0;
@@ -5664,7 +5654,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret.app_protocol = flow->detected_protocol_stack[0];
 
   if(flow->check_extra_packets) {
-    ndpi_process_extra_packet(ndpi_str, flow, packet_data, packetlen, current_time_ms, src, dst);
+    ndpi_process_extra_packet(ndpi_str, flow, packet_data, packetlen, current_time_ms);
     /* Update in case of new match */
     ret.master_protocol = flow->detected_protocol_stack[1],
       ret.app_protocol = flow->detected_protocol_stack[0],
@@ -5678,9 +5668,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   if(ndpi_init_packet(ndpi_str, flow, current_time_ms, packet_data, packetlen) != 0)
     return ret;
-
-  /* detect traffic for tcp or udp only */
-  flow->src = src, flow->dst = dst;
 
   ndpi_connection_tracking(ndpi_str, flow);
 
@@ -6419,23 +6406,7 @@ u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int
 void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 				ndpi_confidence_t confidence) {
-  struct ndpi_id_struct *src = flow->src, *dst = flow->dst;
-
   ndpi_int_change_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol, confidence);
-
-  if(src != NULL) {
-    NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, upper_detected_protocol);
-
-    if(lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN)
-      NDPI_ADD_PROTOCOL_TO_BITMASK(src->detected_protocol_bitmask, lower_detected_protocol);
-  }
-
-  if(dst != NULL) {
-    NDPI_ADD_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, upper_detected_protocol);
-
-    if(lower_detected_protocol != NDPI_PROTOCOL_UNKNOWN)
-      NDPI_ADD_PROTOCOL_TO_BITMASK(dst->detected_protocol_bitmask, lower_detected_protocol);
-  }
 }
 
 /* ********************************************************************************* */
@@ -6857,8 +6828,6 @@ const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
     return "Match by port";
   case NDPI_CONFIDENCE_MATCH_BY_IP:
     return "Match by IP";
-  case NDPI_CONFIDENCE_DPI_SRC_DST_ID:
-    return "DPI (src/dst ids)";
   case NDPI_CONFIDENCE_DPI_CACHE:
     return "DPI (cache)";
   case NDPI_CONFIDENCE_DPI:

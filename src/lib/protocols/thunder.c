@@ -135,11 +135,9 @@ void ndpi_int_search_thunder_http(struct ndpi_detection_module_struct
 				  *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
 
   if (packet->payload_packet_len > 5
-      && memcmp(packet->payload, "GET /", 5) == 0 && NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_THUNDER)) {
+      && memcmp(packet->payload, "GET /", 5) == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "HTTP packet detected\n");
     ndpi_parse_packet_line_info(ndpi_struct, flow);
 

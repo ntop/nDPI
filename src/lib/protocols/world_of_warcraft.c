@@ -56,9 +56,6 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  struct ndpi_id_struct *src = flow->src;
-  struct ndpi_id_struct *dst = flow->dst;
-
   NDPI_LOG_DBG(ndpi_struct, "search World of Warcraft\n");
 
   if (packet->tcp != NULL) {
@@ -108,14 +105,11 @@ void ndpi_search_worldofwarcraft(struct ndpi_detection_module_struct
       return;
     }
 
-    if (NDPI_SRC_OR_DST_HAS_PROTOCOL(src, dst, NDPI_PROTOCOL_WORLDOFWARCRAFT) != 0) {
-      if (packet->tcp->source == htons(3724)
-	  && packet->payload_packet_len == 8 && get_u_int32_t(packet->payload, 0) == htonl(0x0006ec01)) {
-	ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow);
-	NDPI_LOG_INFO(ndpi_struct, "World of Warcraft: connection detected\n");
-	return;
-      }
-
+    if (packet->tcp->source == htons(3724)
+	&& packet->payload_packet_len == 8 && get_u_int32_t(packet->payload, 0) == htonl(0x0006ec01)) {
+      ndpi_int_worldofwarcraft_add_connection(ndpi_struct, flow);
+      NDPI_LOG_INFO(ndpi_struct, "World of Warcraft: connection detected\n");
+      return;
     }
 
     /* for some well known WoW ports
