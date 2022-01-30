@@ -36,7 +36,6 @@ extern "C" {
   */
 #define NDPI_API_VERSION                      @NDPI_API_VERSION@
 
-#define SIZEOF_ID_STRUCT                      ( sizeof(struct ndpi_id_struct)   )
 #define SIZEOF_FLOW_STRUCT                    ( sizeof(struct ndpi_flow_struct) )
 
 #define NDPI_DETECTION_ONLY_IPV4              ( 1 << 0 )
@@ -73,15 +72,6 @@ extern "C" {
    *
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void);
-
-
-  /**
-   * Get the size of the id struct
-   *
-   * @return the size of the id struct
-   *
-   */
-  u_int32_t ndpi_detection_get_sizeof_ndpi_id_struct(void);
 
 
   /**
@@ -303,8 +293,6 @@ extern "C" {
    * @par    packet         = unsigned char pointer to the Layer 3 (IP header)
    * @par    packetlen      = the length of the packet
    * @par    packet_time_ms = the current timestamp for the packet (expressed in msec)
-   * @par    src            = pointer to the source subscriber state machine
-   * @par    dst            = pointer to the destination subscriber state machine
    * @return void
    *
    */
@@ -312,9 +300,7 @@ extern "C" {
 				 struct ndpi_flow_struct *flow,
 				 const unsigned char *packet,
 				 const unsigned short packetlen,
-				 const u_int64_t packet_time_ms,
-				 struct ndpi_id_struct *src,
-				 struct ndpi_id_struct *dst);
+				 const u_int64_t packet_time_ms);
 
   /**
    * Processes one packet and returns the ID of the detected protocol.
@@ -325,8 +311,6 @@ extern "C" {
    * @par    packet         = unsigned char pointer to the Layer 3 (IP header)
    * @par    packetlen      = the length of the packet
    * @par    packet_time_ms = the current timestamp for the packet (expressed in msec)
-   * @par    src            = pointer to the source subscriber state machine
-   * @par    dst            = pointer to the destination subscriber state machine
    * @return the detected ID of the protocol
    *
    */
@@ -334,9 +318,7 @@ extern "C" {
 					      struct ndpi_flow_struct *flow,
 					      const unsigned char *packet,
 					      const unsigned short packetlen,
-					      const u_int64_t packet_time_ms,
-					      struct ndpi_id_struct *src,
-					      struct ndpi_id_struct *dst);
+					      const u_int64_t packet_time_ms);
   /**
    * Get the main protocol of the passed flows for the detected module
    *

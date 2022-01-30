@@ -60,10 +60,6 @@ void ndpi_search_icecast_tcp(struct ndpi_detection_module_struct *ndpi_struct, s
     }
   }
 
-  if(NDPI_FLOW_PROTOCOL_EXCLUDED(ndpi_struct, flow, NDPI_PROTOCOL_HTTP)) {
-    goto icecast_exclude;
-  }
-
   if(flow == NULL) return;
     
   if((packet->packet_direction == flow->setup_packet_direction)
@@ -89,7 +85,6 @@ void ndpi_search_icecast_tcp(struct ndpi_detection_module_struct *ndpi_struct, s
     }
   }
 
- icecast_exclude:
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
