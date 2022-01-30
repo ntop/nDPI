@@ -11,6 +11,7 @@ Confidence DPI              : 200 (flows)
 Unknown	718	73876	35
 DNS	2	267	1
 MDNS	8	1736	2
+NTP	2	180	1
 SSDP	101	38156	6
 SkypeCall	152	10704	144
 ICMP	8	656	1
@@ -18,9 +19,10 @@ IGMP	5	258	4
 TLS	131	16587	9
 Dropbox	38	17948	5
 Skype_Teams	1796	451121	80
-Apple	17	2225	3
+Apple	3	168	1
 AppleiCloud	88	20520	2
 Spotify	5	430	1
+ApplePush	12	1877	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -43,7 +45,7 @@ JA3 Host Stats:
 	14	UDP 192.168.1.92:17500 -> 255.255.255.255:17500 [proto: 121/Dropbox][ClearText][Confidence: DPI][cat: Cloud/13][5 pkts/2720 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][120.15 sec][PLAIN TEXT ( 3375359593)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	TCP 192.168.1.34:50133 <-> 149.13.32.15:13392 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][9 pkts/1968 bytes <-> 7 pkts/632 bytes][Goodput ratio: 69/26][0.29 sec][bytes ratio: 0.514 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/39 52/53 24/23][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 219/90 1418/199 424/45][Plen Bins: 71,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0]
 	16	TCP 192.168.1.34:50090 <-> 23.206.33.166:443 [proto: 91.125/TLS.Skype_Teams][Encrypted][Confidence: DPI][cat: VoIP/10][12 pkts/2140 bytes <-> 3 pkts/200 bytes][Goodput ratio: 62/0][20.12 sec][Hostname/SNI: apps.skype.com][bytes ratio: 0.829 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 1686/0 6249/0 2227/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 178/67 233/74 77/6][Risk: ** Obsolete TLS Version (1.1 or older) **][Risk Score: 100][TLSv1][JA3C: 3d49c0a7161d6636fcb6973f14e05046][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	17	TCP 17.143.160.22:5223 <-> 192.168.1.34:49447 [proto: 238.140/ApplePush.Apple][Encrypted][Confidence: DPI][cat: Cloud/13][6 pkts/1211 bytes <-> 6 pkts/666 bytes][Goodput ratio: 67/40][66.95 sec][bytes ratio: 0.290 (Upload)][IAT c2s/s2c min/avg/max/stddev: 228/1 16680/16680 43974/44201 18099/18357][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 202/111 471/156 151/45][Plen Bins: 0,0,50,0,0,0,33,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	TCP 17.143.160.22:5223 <-> 192.168.1.34:49447 [proto: 238/ApplePush][Encrypted][Confidence: DPI][cat: Cloud/13][6 pkts/1211 bytes <-> 6 pkts/666 bytes][Goodput ratio: 67/40][66.95 sec][bytes ratio: 0.290 (Upload)][IAT c2s/s2c min/avg/max/stddev: 228/1 16680/16680 43974/44201 18099/18357][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 202/111 471/156 151/45][Plen Bins: 0,0,50,0,0,0,33,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	18	TCP 192.168.1.34:50091 <-> 157.55.235.146:443 [proto: 91.125/TLS.Skype_Teams][Encrypted][Confidence: Match by IP][cat: VoIP/10][13 pkts/1554 bytes <-> 3 pkts/200 bytes][Goodput ratio: 44/0][29.28 sec][bytes ratio: 0.772 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/73 2360/73 8785/73 2806/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 120/67 138/74 27/6][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	TCP 192.168.1.34:50039 <-> 213.199.179.175:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][13 pkts/1392 bytes <-> 3 pkts/200 bytes][Goodput ratio: 37/0][25.19 sec][bytes ratio: 0.749 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/66 2028/66 7535/66 2316/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 107/67 138/74 21/6][Plen Bins: 0,90,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	TCP 192.168.1.34:50101 <-> 157.55.235.176:443 [proto: 91.125/TLS.Skype_Teams][Encrypted][Confidence: Match by IP][cat: VoIP/10][12 pkts/1305 bytes <-> 3 pkts/285 bytes][Goodput ratio: 39/28][17.34 sec][bytes ratio: 0.642 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/77 1416/77 5596/77 1926/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 109/95 138/145 31/36][Plen Bins: 0,77,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -134,7 +136,7 @@ JA3 Host Stats:
 	105	UDP 192.168.1.34:13021 -> 176.26.55.167:63773 [proto: 125.38/Skype_Teams.SkypeCall][Encrypted][Confidence: DPI][cat: VoIP/10][5 pkts/300 bytes -> 0 pkts/0 bytes][Goodput ratio: 30/0][20.13 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	106	UDP 192.168.1.34:58681 <-> 192.168.1.1:53 [proto: 5/DNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/101 bytes <-> 1 pkts/166 bytes][Goodput ratio: 58/74][0.07 sec][Hostname/SNI: db3msgr5011709.gateway.messenger.live.com][::][PLAIN TEXT (MSGR5011709)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	107	UDP 192.168.1.34:62454 <-> 192.168.1.1:53 [proto: 5.143/DNS.AppleiCloud][ClearText][Confidence: DPI][cat: Web/5][1 pkts/101 bytes <-> 1 pkts/133 bytes][Goodput ratio: 58/68][0.05 sec][Hostname/SNI: p05-keyvalueservice.icloud.com.akadns.net][17.172.100.36][PLAIN TEXT (valueservice)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	108	UDP 192.168.1.34:123 <-> 17.253.48.245:123 [proto: 9.140/NTP.Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.05 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	108	UDP 192.168.1.34:123 <-> 17.253.48.245:123 [proto: 9/NTP][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.05 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	109	UDP 192.168.1.34:51879 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][ClearText][Confidence: DPI][cat: VoIP/10][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.05 sec][Hostname/SNI: e4593.g.akamaiedge.net][23.206.33.166][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	110	UDP 192.168.1.34:63321 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][ClearText][Confidence: DPI][cat: VoIP/10][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.05 sec][Hostname/SNI: e4593.g.akamaiedge.net][23.206.33.166][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	111	UDP 192.168.1.34:64085 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][ClearText][Confidence: DPI][cat: VoIP/10][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.06 sec][Hostname/SNI: e7768.b.akamaiedge.net][23.223.73.34][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

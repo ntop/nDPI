@@ -11,6 +11,7 @@ Unknown	24	6428	14
 DNS	5	638	2
 HTTP	945	530967	19
 MDNS	1	82	1
+NTP	1	90	1
 NetBIOS	26	2392	6
 SSDP	143	36951	13
 SMBv1	5	1197	2
@@ -20,7 +21,6 @@ TLS	105	21914	7
 DHCPV6	10	980	3
 Facebook	19	6840	2
 Google	12	991	4
-Apple	1	90	1
 LLMNR	91	6931	48
 
 JA3 Host Stats: 
@@ -136,7 +136,7 @@ JA3 Host Stats:
 	106	UDP 192.168.5.45:59789 -> 192.168.255.255:137 [proto: 10/NetBIOS][ClearText][Confidence: DPI][cat: System/18][1 pkts/92 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][< 1 sec][Hostname/SNI: sanji-lifebook-][PLAIN TEXT ( FDEBEOEKEJ)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	107	UDP [fe80::e034:7be:d8f9:6197]:57143 -> [ff02::1:3]:5355 [proto: 154/LLMNR][ClearText][Confidence: DPI][cat: Network/14][1 pkts/91 bytes -> 0 pkts/0 bytes][Goodput ratio: 32/0][< 1 sec][Hostname/SNI: charming-pc][PLAIN TEXT (charming)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	108	UDP [fe80::e034:7be:d8f9:6197]:62756 -> [ff02::1:3]:5355 [proto: 154/LLMNR][ClearText][Confidence: DPI][cat: Network/14][1 pkts/91 bytes -> 0 pkts/0 bytes][Goodput ratio: 32/0][< 1 sec][Hostname/SNI: charming-pc][PLAIN TEXT (charming)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	109	UDP 192.168.5.16:123 -> 17.253.26.125:123 [proto: 9.140/NTP.Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	109	UDP 192.168.5.16:123 -> 17.253.26.125:123 [proto: 9/NTP][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	110	UDP 192.168.5.64:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/82 bytes -> 0 pkts/0 bytes][Goodput ratio: 48/0][< 1 sec][Hostname/SNI: _googlecast._tcp.local][_googlecast._tcp.local][PLAIN TEXT (googlecast)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	111	UDP 192.168.5.50:49766 -> 224.0.0.252:5355 [proto: 154/LLMNR][ClearText][Confidence: DPI][cat: Network/14][1 pkts/71 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: charming-pc][PLAIN TEXT (charming)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	112	UDP 192.168.5.50:50030 -> 224.0.0.252:5355 [proto: 154/LLMNR][ClearText][Confidence: DPI][cat: Network/14][1 pkts/71 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: charming-pc][PLAIN TEXT (charming)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -21,9 +21,9 @@ ICMPV6	18	2964	2
 Slack	29	4979	2
 Google	2	132	1
 AJP	5	390	1
-Apple	7	656	2
+Apple	2	297	1
 CiscoVPN	2474	896875	3
-ApplePush	6	966	3
+ApplePush	11	1325	4
 AmazonAWS	36	3540	3
 
 JA3 Host Stats: 
@@ -62,7 +62,7 @@ JA3 Host Stats:
 	29	UDP 10.0.0.227:59582 <-> 75.75.75.75:53 [proto: 5.238/DNS.ApplePush][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/92 bytes <-> 1 pkts/323 bytes][Goodput ratio: 54/87][0.02 sec][Hostname/SNI: 1-courier.sandbox.push.apple.com][17.188.138.71][PLAIN TEXT (courier)][Plen Bins: 0,50,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	30	TCP 10.0.0.227:56871 <-> 8.37.103.196:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][1 pkts/66 bytes <-> 5 pkts/330 bytes][Goodput ratio: 0/0][20.32 sec][bytes ratio: -0.667 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66/66 66/66 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	TCP 10.0.0.227:56916 -> 10.0.0.151:8009 [proto: 139/AJP][ClearText][Confidence: Match by port][cat: Web/5][5 pkts/390 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][5.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	32	TCP 10.0.0.227:56886 <-> 17.57.144.116:5223 [proto: 238.140/ApplePush.Apple][Encrypted][Confidence: DPI][cat: Cloud/13][3 pkts/174 bytes <-> 2 pkts/185 bytes][Goodput ratio: 0/28][0.02 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	32	TCP 10.0.0.227:56886 <-> 17.57.144.116:5223 [proto: 238/ApplePush][Encrypted][Confidence: DPI][cat: Cloud/13][3 pkts/174 bytes <-> 2 pkts/185 bytes][Goodput ratio: 0/28][0.02 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	UDP 10.0.0.151:1900 -> 10.0.0.227:61328 [proto: 12/SSDP][ClearText][Confidence: DPI][cat: System/18][1 pkts/353 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][< 1 sec][PLAIN TEXT (HTTP/1.1 200 OK)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	TCP 10.0.0.227:56910 <-> 35.201.124.9:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/170 bytes <-> 2 pkts/164 bytes][Goodput ratio: 22/19][0.05 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	35	UDP 10.0.0.227:62427 <-> 75.75.75.75:53 [proto: 5/DNS][ClearText][Confidence: DPI][cat: ConnCheck/30][1 pkts/84 bytes <-> 1 pkts/242 bytes][Goodput ratio: 49/82][0.02 sec][Hostname/SNI: detectportal.firefox.com][184.25.56.82][PLAIN TEXT (detectportal)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
