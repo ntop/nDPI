@@ -1,21 +1,12 @@
 
-#ifndef __KERNEL__
 #include <stdint.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-#else
-#include <asm/byteorder.h>
-#include <linux/kernel.h>
-#include <linux/types.h>
-#include <linux/string.h>
-#include <linux/slab.h>
-#endif
 
-#include "ndpi_config.h"
-
-#if !defined(HAVE_LIBGCRYPT) || defined(__KERNEL__)
 #include "ndpi_api.h"
+
+#if !defined(HAVE_LIBGCRYPT)
 
 /****************************/
 #define MBEDTLS_GCM_C
