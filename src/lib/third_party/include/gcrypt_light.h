@@ -2,6 +2,8 @@
 #ifndef GCRY_LIGHT_H
 #define GCRY_LIGHT_H
 
+#define LIBGCRYPT_INTERNAL
+
 #define HMAC_SHA256_DIGEST_SIZE 32  /* Same as SHA-256's output size. */
 #define SHA256_DIGEST_SIZE 32
 #define GCRY_MD_BUFF_SIZE 256

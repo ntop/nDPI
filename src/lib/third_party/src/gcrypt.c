@@ -8,6 +8,44 @@
 
 #if !defined(HAVE_LIBGCRYPT)
 
+#ifdef _MSC_VER
+
+  #include <stdlib.h>
+  #define bswap_64(x) _byteswap_uint64(x)
+
+#elif defined(__APPLE__)
+
+  // Mac OS X / Darwin features
+  #include <libkern/OSByteOrder.h>
+  #define bswap_64(x) OSSwapInt64(x)
+
+#elif defined(__sun) || defined(sun)
+
+  #include <sys/byteorder.h>
+  #define bswap_64(x) BSWAP_64(x)
+
+#elif defined(__FreeBSD__)
+
+  #include <sys/endian.h>
+  #define bswap_64(x) bswap64(x)
+
+#elif defined(__OpenBSD__)
+
+  #include <sys/types.h>
+  #define bswap_64(x) swap64(x)
+
+#elif defined(__NetBSD__)
+
+  #include <sys/types.h>
+  #include <machine/bswap.h>
+  #if defined(__BSWAP_RENAME) && !defined(__bswap_32)
+  #define bswap_64(x) bswap64(x)
+  #endif
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+  #define bswap_64(x) ((uint64_t)htonl((x) >> 32) | ((uint64_t)htonl((x) & 0xfffffffful) << 32))
+  #warning use MINGW
+#endif
+
 /****************************/
 #define MBEDTLS_GCM_C
 #define MBEDTLS_CIPHER_C
@@ -15,19 +53,8 @@
 #undef MBEDTLS_SELF_TEST
 /****************************/
 
-#if !defined(BYTE_ORDER)
-#error BYTE_ORDER not defined
-#endif
 
-#if !defined(__LITTLE_ENDIAN) && !defined(__BIG_ENDIAN)
-#error __LITTLE_ENDIAN and __BIG_ENDIAN not defined
-#endif
-
-#if BYTE_ORDER != __LITTLE_ENDIAN && BYTE_ORDER != __BIG_ENDIAN
-#error unknown endian
-#endif
-
-#if BYTE_ORDER == __LITTLE_ENDIAN
+#if defined(__LITTLE_ENDIAN__) || defined(_LITTLE_ENDIAN)
 
 #define GET_UINT32_LE(n,b,i)  (n) = *(uint32_t *) (&(b)[(i)]);
 #define PUT_UINT32_LE(n,b,i)  *(uint32_t *) (&(b)[(i)]) = (n);
@@ -36,7 +63,7 @@
 #define PUT_UINT32_BE(n,b,i)  *(uint32_t *) (&(b)[(i)]) = htonl(n);
 #define PUT_UINT64_BE(n,b,i)  *(uint64_t *) (&(b)[(i)]) = bswap_64(n);
 
-#else 
+#elif defined(__BIG_ENDIAN__) || defined(__BIG_ENDIAN) 
 
 #define GET_UINT32_LE(n,b,i)  (n) = htonl(*(uint32_t *) (&(b)[(i)]));
 #define PUT_UINT32_LE(n,b,i)  *(uint32_t *) (&(b)[(i)]) = htonl(n);
@@ -45,6 +72,8 @@
 #define PUT_UINT32_BE(n,b,i)  *(uint32_t *) (&(b)[(i)]) = (n);
 #define PUT_UINT64_BE(n,b,i)  *(uint64_t *) (&(b)[(i)]) = (n);
 
+#else
+#error "__BYTE_ORDER MUST BE DEFINED !"
 #endif
 
 

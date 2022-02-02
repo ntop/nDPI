@@ -246,12 +246,12 @@ static uint16_t gquic_get_u16(const uint8_t *buf, uint32_t version)
 }
 
 
-#ifdef HAVE_LIBGCRYPT
+#if defined(HAVE_LIBGCRYPT)
 
 #ifdef DEBUG_CRYPT
 char *__gcry_err(gpg_error_t err, char *buf, size_t buflen)
 {
-#ifdef HAVE_LIBGPG_ERROR
+#if defined(HAVE_LIBGPG_ERROR) && !defined(LIBGCRYPT_INTERNAL)
   gpg_strerror_r(err, buf, buflen);
   /* I am not sure if the string will be always null-terminated...
      Better safe than sorry */

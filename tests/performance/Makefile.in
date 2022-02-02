@@ -1,4 +1,4 @@
-INC=-I ../../src/include/
+INC=-I ../../src/include/ -I ../../src/lib/third_party/include/
 LIB=../../src/lib/libndpi.a @ADDITIONAL_LIBS@
 
 TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu
@@ -10,10 +10,10 @@ all: $(TESTS)
 tools: $(TOOLS)
 
 gcrypt-int: gcrypt.c Makefile
-        $(CC) -O2  $(INC) gcrypt.c -o $@
+	$(CC) -O2  $(INC) gcrypt.c -o $@
 
 gcrypt-gnu: gcrypt.c Makefile
-        $(CC) -O2 $(INC) -DHAVE_LIBGCRYPT gcrypt.c -o $@ -lgcrypt
+	$(CC) -O2 $(INC) -DHAVE_LIBGCRYPT gcrypt.c -o $@ -lgcrypt
 
 substringsearch: substringsearch.c Makefile
 	$(CC) -O2 $(INC) substringsearch.c -o substringsearch $(LIB)
