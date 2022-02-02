@@ -10,6 +10,39 @@ on:
   release:
     types: [created]
 jobs:
+  coverage:
+    name: Coverage (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
+          sudo apt-get install rrdtool librrd-dev
+          sudo apt-get install libgcrypt20-dev libpcre3-dev libmaxminddb-dev lcov
+      - name: Configure
+        run: env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-debug-messages --enable-code-coverage --with-pcre --with-maxminddb
+      - name: Build
+        run: make all
+      - name: Test
+        run: |
+          ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
+      - name: Generate Coverage Report
+        run: |
+          mkdir -p coverage_report/ndpi_coverage_report
+          lcov --directory . --capture --output-file lcov.info
+          genhtml -o coverage_report/ndpi_coverage_report lcov.info
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ndpi-coverage-report
+          path: coverage_report
+          retention-days: 7
+
   test:
     name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
     runs-on: ${{ matrix.os }}

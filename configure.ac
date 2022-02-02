@@ -15,12 +15,19 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
 
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
+AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
+
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
   CFLAGS="${CFLAGS} -g3 -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
   LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak"
+])
+
+AS_IF([test "x$enable_code_coverage" = "xyes"],[
+  CFLAGS="${CFLAGS} -fprofile-arcs -ftest-coverage"
+  LDFLAGS="${LDFLAGS} --coverage"
 ])
 
 LT_INIT
