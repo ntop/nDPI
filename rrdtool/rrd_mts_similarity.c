@@ -49,6 +49,7 @@ typedef struct {
 } rrd_file_stats;
 
 typedef struct {
+  char *path;
   float mts_average, mts_stddev;
   struct ndpi_bin mts_b;
   rrd_file_stats rfs[MAX_NUM_FILE];
@@ -232,9 +233,9 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
 
       if((rrdms[i].mts_average == 0) && (rrdms[i].mts_average == rrdms[j].mts_average)) {
 	if(!skip_zero)
-	    printf("Host: %d [%.1f/%.1f]  - Host: %d [%.1f/%.1f] are alike\n",
-		   i, rrdms[i].mts_average, rrdms[i].mts_stddev,
-		   j, rrdms[j].mts_average, rrdms[j].mts_stddev);
+	    printf("Host: %s [%.1f/%.1f]  - Host: %s [%.1f/%.1f] are alike\n",
+		   rrdms[i].path, rrdms[i].mts_average, rrdms[i].mts_stddev,
+		   rrdms[j].path, rrdms[j].mts_average, rrdms[j].mts_stddev);
 	  
 	num_potentially_zero_equal++;
       } else if(circles_touch(rrdms[i].mts_average, rrdms[i].mts_stddev, rrdms[j].mts_average, rrdms[j].mts_stddev)
@@ -243,9 +244,9 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
 
 	if((similarity >= 0) && (similarity < similarity_threshold)) {
 	  if(verbose)
-	    printf("Host: %d [%.1f/%.1f]  - Host: %d [%.1f/%.1f] are %s [%.1f]\n",
-		   i, rrdms[i].mts_average, rrdms[i].mts_stddev,
-		   j, rrdms[j].mts_average, rrdms[j].mts_stddev,
+	    printf("Host: %s [%.1f/%.1f]  - Host: %s [%.1f/%.1f] are %s [%.1f]\n",
+		   rrdms[i].path, rrdms[i].mts_average, rrdms[i].mts_stddev,
+		   rrdms[j].path, rrdms[j].mts_average, rrdms[j].mts_stddev,
 		   (similarity == 0) ? "alike" : "similar",
 		   similarity
 		   );
@@ -268,7 +269,7 @@ void find_rrd_multi_similarities(rrd_multifile_stats rrdms[], u_int num_tot_rrds
 
 /* *************************************************** */
 
-void find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, u_int *num_tot_rrds, int n_file, int *num_host) {
+void find_rrds(char *basedir, char *filename[], rrd_multifile_stats **rrdms, u_int *num_tot_rrds, int n_file, int *num_host) {
   struct dirent **namelist;
   int n = scandir(basedir, &namelist, 0, NULL);
   u_int i;
@@ -313,7 +314,12 @@ void find_rrds(char *basedir, char *filename[], rrd_multifile_stats *rrdms, u_in
   if(t)
   {
     for(i=0; i<n_file; i++)
-      rrdms[*num_host].rfs[i].path = temp[i];
+      (*rrdms)[*num_host].rfs[i].path = strdup(temp[i]);
+	  
+    (*rrdms)[*num_host].path = strdup(basedir);
+	  
+    for(i=0; i<n_file; i++)
+      free(temp[i]);
 	  
     (*num_host)++;
     (*num_tot_rrds) += n_file;
@@ -425,7 +431,7 @@ int main(int argc, char *argv[]) {
    }
 
   /* Find all rrd's */
-  find_rrds(basedir, filename, rrdms, &num_tot_rrds, n_file, &num_host);
+  find_rrds(basedir, filename, &rrdms, &num_tot_rrds, n_file, &num_host);
 
   /* Read RRD's data */
   for(i=0; i<num_host; i++)
