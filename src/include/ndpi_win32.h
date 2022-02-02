@@ -82,4 +82,7 @@ typedef unsigned       __int64 u_int64_t;
 
 #define sleep(a /* sec */)              Sleep(1000*a /* ms */)
 
+/* https://stackoverflow.com/questions/7993050/multiplatform-atomic-increment */
+#define __sync_fetch_and_add(a,b)       InterlockedExchangeAdd ((a), b)
+
 #endif /* __NDPI_WIN32_H__ */
