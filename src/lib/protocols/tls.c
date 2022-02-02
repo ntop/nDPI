@@ -273,6 +273,8 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 		      "%s%s=%s", (*rdnSeqBuf_offset > 0) ? ", " : "",
 		      label, buffer);
 
+    if(rc > 0 && ((u_int)rc > rdnSeqBuf_len-(*rdnSeqBuf_offset)))
+      return -1; /* Truncated; not enough buffer */
     if(rc > 0)
       (*rdnSeqBuf_offset) += rc;
   }
@@ -329,7 +331,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 #endif
 
   /* Check after handshake protocol header (5 bytes) and message header (4 bytes) */
-  for(i = p_offset; i < certificate_len; i++) {
+  for(i = p_offset; i < certificate_len - 2; i++) {
     /*
       See https://www.ibm.com/support/knowledgecenter/SSFKSJ_7.5.0/com.ibm.mq.sec.doc/q009860_.htm
       for X.509 certificate labels
