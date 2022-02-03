@@ -246,7 +246,7 @@ Additionally, some TLS protocol fields are checked for printable characters as w
 
 NDPI_POSSIBLE_EXPLOIT
 =====================
-The risk is set whenever a possible exploit (e.g. Log4J/Log4Shell) is detected.
+The risk is set whenever a possible exploit (e.g. `Log4J/Log4Shell <https://en.wikipedia.org/wiki/Log4Shell>`) is detected.
 
 .. _Risk 041:
 
@@ -258,4 +258,4 @@ The risk is set whenever a TLS certificate is close to the expiration date.
 
 NDPI_PUNYCODE_IDN
 ===================================
-The risk is set whenever a domain name is specified in IDN format
+The risk is set whenever a domain name is specified in IDN format as they are sometimes used in `IDN homograph attacks <https://https://en.wikipedia.org/wiki/IDN_homograph_attack>`.
