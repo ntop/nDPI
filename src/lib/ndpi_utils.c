@@ -1844,6 +1844,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE:
     return("TLS Certificate About To Expire");
     break;
+
+  case NDPI_PUNYCODE_IDN:
+    return("IDN Domain Name");
+    break;
     
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);

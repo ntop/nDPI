@@ -253,3 +253,9 @@ The risk is set whenever a possible exploit (e.g. Log4J/Log4Shell) is detected.
 NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE
 ===================================
 The risk is set whenever a TLS certificate is close to the expiration date.
+
+.. _Risk 042:
+
+NDPI_PUNYCODE_IDN
+===================================
+The risk is set whenever a domain name is specified in IDN format

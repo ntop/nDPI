@@ -110,6 +110,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_INVALID_CHARACTERS,                    NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE },
   { NDPI_POSSIBLE_EXPLOIT,                      NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE },
   { NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE,       NDPI_RISK_MEDIUM, CLIENT_LOW_RISK_PERCENTAGE  },
+  { NDPI_PUNYCODE_IDN,                          NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
@@ -7246,11 +7247,13 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 
   memset(ret_match, 0, sizeof(*ret_match));
 
-  rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow, string_to_match, string_to_match_len,
+  rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow,
+					    string_to_match, string_to_match_len,
 					    master_protocol_id, ret_match);
   id = ret_match->protocol_category;
 
-  if(ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &id) != -1) {
+  if(ndpi_get_custom_category_match(ndpi_str, string_to_match,
+				    string_to_match_len, &id) != -1) {
     /* if(id != -1) */ {
       flow->category = ret_match->protocol_category = id;
       rc = master_protocol_id;
@@ -7266,6 +7269,10 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
       ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN);
   }
 
+  /* Add punycode check */
+  if(ndpi_strnstr(string_to_match, "xn--", string_to_match_len))
+    ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN);
+		  
   return(rc);
 }
 

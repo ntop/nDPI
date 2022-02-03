@@ -116,6 +116,7 @@ typedef enum {
   NDPI_INVALID_CHARACTERS,
   NDPI_POSSIBLE_EXPLOIT, /* Log4J and other exploits */
   NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE,
+  NDPI_PUNYCODE_IDN, /* https://en.wikipedia.org/wiki/Punycode */
 
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
