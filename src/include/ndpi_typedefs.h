@@ -518,7 +518,9 @@ typedef enum {
 	      NDPI_HTTP_METHOD_PUT,
 	      NDPI_HTTP_METHOD_DELETE,
 	      NDPI_HTTP_METHOD_TRACE,
-	      NDPI_HTTP_METHOD_CONNECT
+	      NDPI_HTTP_METHOD_CONNECT,
+	      NDPI_HTTP_METHOD_RPC_IN_DATA,
+	      NDPI_HTTP_METHOD_RPC_OUT_DATA,
 } ndpi_http_method;
 
 struct ndpi_lru_cache_entry {

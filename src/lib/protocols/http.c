@@ -196,7 +196,7 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
 	  Java downloads Java: Log4J:
 	  https://corelight.com/blog/detecting-log4j-exploits-via-zeek-when-java-downloads-java
 	*/
-	
+
 	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
       }
     }
@@ -343,7 +343,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 			     (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) ?
 			     flow->detected_protocol_stack[1] : NDPI_PROTOCOL_HTTP,
 			     NDPI_CONFIDENCE_DPI);
-  
+
   /* This is necessary to inform the core to call this dissector again */
   flow->check_extra_packets = 1;
   flow->max_extra_packets_to_check = 8;
@@ -390,7 +390,7 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
    * https://github.com/ua-parser/uap-core/blob/master/regexes.yaml */
 
   if(flow->http.detected_os == NULL)
-    flow->http.detected_os = ndpi_strdup(ua);  
+    flow->http.detected_os = ndpi_strdup(ua);
 }
 
 /* ************************************************************* */
@@ -422,11 +422,11 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
 				  struct ndpi_flow_struct *flow,
 				  char *ua) {
   u_int len;
-  
+
   if((!ua) || (ua[0] == '\0'))
     return;
   else
-    len = strlen(ua);   
+    len = strlen(ua);
 
   if(
      (!strncmp(ua, "<?", 2))
@@ -436,7 +436,7 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
 	  // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
 	  ) {
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
-    
+
     ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
   } else if(
 	    (len < 4)      /* Too short */
@@ -610,6 +610,12 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     flow->http.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
 					     (u_int16_t)packet->http_method.len);
+
+    if((flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA)
+       || (flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA)) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RPC, flow->detected_protocol_stack[0], NDPI_CONFIDENCE_DPI);
+      check_content_type_and_change_protocol(ndpi_struct, flow);
+    }    
   }
 
   if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
@@ -718,7 +724,13 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(packet->authorization_line.ptr != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "Authorization line found %.*s\n",
 		  packet->authorization_line.len, packet->authorization_line.ptr);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
+
+    if(ndpi_strncasestr((const char*)packet->authorization_line.ptr,
+			"Basic", packet->authorization_line.len)
+       || ndpi_strncasestr((const char*)packet->authorization_line.ptr,
+			   "Digest", packet->authorization_line.len)) {
+      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
+    }
   }
 
   if(packet->content_line.ptr != NULL && packet->content_line.len != 0) {
@@ -807,7 +819,9 @@ static struct l_string {
 		    STATIC_STRING_L("DELETE "),
 		    STATIC_STRING_L("CONNECT "),
 		    STATIC_STRING_L("PROPFIND "),
-		    STATIC_STRING_L("REPORT ") };
+		    STATIC_STRING_L("REPORT "),
+		    STATIC_STRING_L("RPC_IN_DATA "), STATIC_STRING_L("RPC_OUT_DATA ")
+};
 static const char *http_fs = "CDGHOPR";
 
 static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -1089,7 +1103,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       packet->http_method.ptr = packet->line[0].ptr;
       packet->http_method.len = filename_start - 1;
-
+      
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
       flow->l4.tcp.http_stage = packet->packet_direction + 1; // packet_direction 0: stage 1, packet_direction 1: stage 2
       return;

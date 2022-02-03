@@ -1930,16 +1930,18 @@ u_int16_t ndpi_risk2score(ndpi_risk risk,
 
 const char* ndpi_http_method2str(ndpi_http_method m) {
   switch(m) {
-  case NDPI_HTTP_METHOD_UNKNOWN: break;
-  case NDPI_HTTP_METHOD_OPTIONS: return("OPTIONS");
-  case NDPI_HTTP_METHOD_GET:     return("GET");
-  case NDPI_HTTP_METHOD_HEAD:    return("HEAD");
-  case NDPI_HTTP_METHOD_PATCH:   return("PATCH");
-  case NDPI_HTTP_METHOD_POST:    return("POST");
-  case NDPI_HTTP_METHOD_PUT:     return("PUT");
-  case NDPI_HTTP_METHOD_DELETE:  return("DELETE");
-  case NDPI_HTTP_METHOD_TRACE:   return("TRACE");
-  case NDPI_HTTP_METHOD_CONNECT: return("CONNECT");
+  case NDPI_HTTP_METHOD_UNKNOWN:      break;
+  case NDPI_HTTP_METHOD_OPTIONS:      return("OPTIONS");
+  case NDPI_HTTP_METHOD_GET:          return("GET");
+  case NDPI_HTTP_METHOD_HEAD:         return("HEAD");
+  case NDPI_HTTP_METHOD_PATCH:        return("PATCH");
+  case NDPI_HTTP_METHOD_POST:         return("POST");
+  case NDPI_HTTP_METHOD_PUT:          return("PUT");
+  case NDPI_HTTP_METHOD_DELETE:       return("DELETE");
+  case NDPI_HTTP_METHOD_TRACE:        return("TRACE");
+  case NDPI_HTTP_METHOD_CONNECT:      return("CONNECT");
+  case NDPI_HTTP_METHOD_RPC_IN_DATA:  return("RPC_IN_DATA");
+  case NDPI_HTTP_METHOD_RPC_OUT_DATA: return("RPC_OUT_DATA");
   }
 
   return("Unknown HTTP method");
@@ -1967,8 +1969,16 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
   case 'D':  return(NDPI_HTTP_METHOD_DELETE);
   case 'T':  return(NDPI_HTTP_METHOD_TRACE);
   case 'C':  return(NDPI_HTTP_METHOD_CONNECT);
+  case 'R':
+    if(method_len >= 11) {
+      if(strncmp(method, "RPC_IN_DATA", 11) == 0)
+	return(NDPI_HTTP_METHOD_RPC_IN_DATA);
+      else if(strncmp(method, "RPC_OUT_DATA", 11) == 0)
+	return(NDPI_HTTP_METHOD_RPC_OUT_DATA);
+    }
+    break;
   }
-
+  
   return(NDPI_HTTP_METHOD_UNKNOWN);
 }
 
