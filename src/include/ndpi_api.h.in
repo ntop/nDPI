@@ -1155,7 +1155,7 @@ extern "C" {
   int ndpi_serialize_uint32_string(ndpi_serializer *serializer, u_int32_t key, const char *value);
 
   /**
-   * Serialize a 32-bit unsigned int key and a boolean value
+   * Serialize a 32-bit unsigned int key and a boolean value (JSON/CSV only, not supported by TLV)
    * @param serializer The serializer handle
    * @param key The field name or ID
    * @param value The field value
