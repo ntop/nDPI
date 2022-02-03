@@ -233,6 +233,9 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
     /* DNS Reply */
     flow->protos.dns.reply_code = dns_header->flags & 0x0F;
 
+    if(flow->protos.dns.reply_code != 0)
+      ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED);
+    
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
        && ((((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
 	    || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))

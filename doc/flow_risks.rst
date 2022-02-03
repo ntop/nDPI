@@ -259,3 +259,11 @@ The risk is set whenever a TLS certificate is close to the expiration date.
 NDPI_PUNYCODE_IDN
 ===================================
 The risk is set whenever a domain name is specified in IDN format as they are sometimes used in `IDN homograph attacks <https://en.wikipedia.org/wiki/IDN_homograph_attack>`_.
+
+.. _Risk 043:
+
+NDPI_ERROR_CODE_DETECTED
+===================================
+The risk is set whenever an error code is detected in the underlying protocol (e.g. HTTP and DNS).
+
+

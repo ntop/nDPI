@@ -999,9 +999,12 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  buf[3] = '\0';
 
 	  flow->http.response_status_code = atoi(buf);
+	  
 	  /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
 	  if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
 	    flow->http.response_status_code = 0; /* Out of range */
+	  else if(flow->http.response_status_code >= 400)
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED);
 	}
 
 	ndpi_parse_packet_line_info(ndpi_struct, flow);

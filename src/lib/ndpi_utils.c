@@ -1848,7 +1848,11 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_PUNYCODE_IDN:
     return("IDN Domain Name");
     break;
-    
+
+  case NDPI_ERROR_CODE_DETECTED:
+    return("Error Code Detected");
+    break;
+      
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
