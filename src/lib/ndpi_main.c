@@ -6096,6 +6096,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 
 	while((packet->authorization_line.len > 0) && (packet->authorization_line.ptr[0] == ' '))
 	  packet->authorization_line.len--, packet->authorization_line.ptr++;
+	if(packet->authorization_line.len == 0)
+	  packet->authorization_line.ptr = NULL;
 
 	packet->http_num_headers++;
       } else
@@ -6207,6 +6209,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 
 	while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
 	  packet->content_line.len--, packet->content_line.ptr++;
+	if(packet->content_line.len == 0)
+	  packet->content_line.ptr = NULL;;
 
 	packet->http_num_headers++;
       } else
