@@ -138,7 +138,7 @@ void ht_insert(HashTable* table, char* key){
     	}
  	for (int i=0; i<table->size;i++)
  		if(table->items[i]!=NULL)
-    			if(table->items[i]->value)
+    			if(min<table->items[i]->value)
     				min = table->items[i]->value;
 }
 
