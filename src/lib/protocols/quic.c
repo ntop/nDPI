@@ -1610,17 +1610,33 @@ static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struc
 {
   /* For the time being we need extra processing in two cases only:
      1) to detect Snapchat calls, i.e. RTP/RTCP multiplxed with QUIC.
-     We noticed that Snapchat uses Q046, without any SNI.
+        Two cases:
+        a) [old] Q046, without any SNI
+        b) v1 with SNI *.addlive.io
      2) to reassemble CH fragments on multiple UDP packets.
      These two cases are mutually exclusive
   */
 
-  if((version == V_Q046 &&
-      flow->host_server_name[0] == '\0') ||
-     is_ch_reassembler_pending(flow)) {
-    NDPI_LOG_DBG2(ndpi_struct, "We have further work to do\n");
+  if(version == V_Q046 && flow->host_server_name[0] == '\0') {
+    NDPI_LOG_DBG2(ndpi_struct, "We have further work to do (old snapchat call?)\n");
     return 1;
   }
+
+  if(version == V_1 &&
+     flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SNAPCHAT) {
+    size_t sni_len = strlen(flow->host_server_name);
+    if(sni_len > 11 &&
+       strcmp(flow->host_server_name + sni_len - 11, ".addlive.io") == 0) {
+      NDPI_LOG_DBG2(ndpi_struct, "We have further work to do (new snapchat call?)\n");
+      return 1;
+    }
+  }
+
+  if(is_ch_reassembler_pending(flow)) {
+    NDPI_LOG_DBG2(ndpi_struct, "We have further work to do (reasm)\n");
+    return 1;
+  }
+
   return 0;
 }
 
