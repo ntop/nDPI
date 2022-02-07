@@ -119,6 +119,26 @@ static u_int16_t checkPort(u_int16_t port) {
 
 /* *********************************************** */
 
+static int isMDNSMulticastAddress(struct ndpi_packet_struct * const packet)
+{
+  return (packet->iph && ntohl(packet->iph->daddr) == 0xE00000FB /* multicast: 224.0.0.251 */) ||
+         (packet->iphv6 && ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) == 0xFF020000 &&
+                           ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[1]) == 0x00000000 &&
+                           ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[2]) == 0x00000000 &&
+                           ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[3]) == 0x000000FB /* multicast: FF02::FB */);
+}
+
+static int isLLMNRMulticastAddress(struct ndpi_packet_struct *const packet)
+{
+  return (packet->iph && ntohl(packet->iph->daddr) == 0xE00000FC /* multicast: 224.0.0.252 */) ||
+         (packet->iphv6 && ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) == 0xFF020000 &&
+                           ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[1]) == 0x00000000 &&
+                           ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[2]) == 0x00000000 &&
+                           ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[3]) == 0x00010003 /* multicast: FF02::1:3 */);
+}
+
+/* *********************************************** */
+
 static u_int16_t checkDNSSubprotocol(u_int16_t sport, u_int16_t dport) {
   u_int16_t rc = checkPort(sport);
 
@@ -351,6 +371,19 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     s_port = ntohs(packet->udp->source);
     d_port = ntohs(packet->udp->dest);
     payload_offset = 0;
+
+    /* For MDNS/LLMNR: If the packet is not a response, dest addr needs to be multicast. */
+    if ((d_port == MDNS_PORT && isMDNSMulticastAddress(packet) == 0) ||
+        (d_port == LLMNR_PORT && isLLMNRMulticastAddress(packet) == 0))
+    {
+      if (packet->payload_packet_len > 5 &&
+          ntohs(get_u_int16_t(packet->payload, 2)) != 0 &&
+          ntohs(get_u_int16_t(packet->payload, 4)) != 0)
+      {
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        return;
+      }
+    }
   } else if(packet->tcp != NULL) /* pkt size > 512 bytes */ {
     s_port = ntohs(packet->tcp->source);
     d_port = ntohs(packet->tcp->dest);
