@@ -6490,6 +6490,27 @@ u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi
 
 /* ********************************************************************************* */
 
+u_int16_t ndpi_get_flow_appprotocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+  return(flow->detected_protocol_stack[0]);
+}
+
+/* ********************************************************************************* */
+
+ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow)
+{
+  return(flow->category);
+}
+
+void ndpi_get_flow_ndpi_proto(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                struct ndpi_proto * ndpi_proto)
+{
+  ndpi_proto->master_protocol = ndpi_get_flow_masterprotocol(ndpi_str, flow);
+  ndpi_proto->app_protocol = ndpi_get_flow_appprotocol(ndpi_str, flow);
+  ndpi_proto->category = ndpi_get_flow_category(ndpi_str, flow);
+}
+
+/* ********************************************************************************* */
+
 static void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 					  u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 					  ndpi_confidence_t confidence) {

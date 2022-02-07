@@ -332,6 +332,40 @@ extern "C" {
 					 struct ndpi_flow_struct *flow);
 
   /**
+   * Get the app protocol of the passed flows for the detected module
+   *
+   *
+   * @par    ndpi_struct  = the detection module
+   * @par    flow         = the flow given for the detection module
+   * @return the ID of the app protocol detected
+   *
+   */
+  u_int16_t ndpi_get_flow_appprotocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow);
+
+  /**
+   * Get the category of the passed flows for the detected module
+   *
+   *
+   * @par    ndpi_struct  = the detection module
+   * @par    flow         = the flow given for the detection module
+   * @return the ID of the category
+   *
+   */
+  ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow);
+
+  /**
+   * Get the ndpi protocol data of the passed flows for the detected module
+   *
+   *
+   * @par    ndpi_struct  = the detection module
+   * @par    flow         = the flow given for the detection module
+   * @par    ndpi_proto   = the output struct where to store the requested information
+   *
+   */
+  void ndpi_get_flow_ndpi_proto(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                    struct ndpi_proto * ndpi_proto);
+
+  /**
    * API call that is called internally by ndpi_detection_process_packet or by apps
    * that want to avoid calling ndpi_detection_process_packet as they have already
    * parsed the packet and thus want to avoid this.
@@ -1402,6 +1436,14 @@ extern "C" {
   int ndpi_serialize_start_of_block(ndpi_serializer *serializer, const char *key);
 
   /**
+   * Serialize the start of a block with a numeric key
+   * @param serializer The serializer handle
+   * @param key The numeric key as 32-bit unsigned integer.
+   * @return 0 on success, a negative number otherwise
+   */
+  int ndpi_serialize_start_of_block_uint32(ndpi_serializer *serializer, u_int32_t key);
+
+  /**
    * Serialize the end of a block
    * @param serializer The serializer handle
    * @param key The field name or ID
@@ -1563,8 +1605,12 @@ extern "C" {
   u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
 				     ndpi_protocol proto);
   void ndpi_serialize_risk(ndpi_serializer *serializer, ndpi_risk risk);
+  void ndpi_serialize_risk_score(ndpi_serializer *serializer, ndpi_risk_enum risk);
+  void ndpi_serialize_confidence(ndpi_serializer *serializer, ndpi_confidence_t confidence);
   void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
-                            ndpi_serializer *serializer, ndpi_risk_enum risk,
+                            ndpi_serializer *serializer,
+                            ndpi_risk_enum risk,
+                            ndpi_confidence_t confidence,
                             ndpi_protocol l7_protocol);
   const char* ndpi_risk2str(ndpi_risk_enum risk);
   const char* ndpi_severity2str(ndpi_risk_severity s);

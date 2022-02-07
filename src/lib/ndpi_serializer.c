@@ -1983,6 +1983,21 @@ int ndpi_serialize_start_of_block(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
+/* Serialize start of nested block with a numeric key */
+int ndpi_serialize_start_of_block_uint32(ndpi_serializer *_serializer, u_int32_t key) {
+  char buf[11];
+  int written = snprintf(buf, sizeof(buf), "%u", key);
+
+  if (written <= 0 || written == sizeof(buf))
+  {
+    return(-1);
+  }
+
+  return(ndpi_serialize_start_of_block_binary(_serializer, buf, written));
+}
+
+/* ********************************** */
+
 /* Serialize end of nested block (JSON only)*/
 int ndpi_serialize_end_of_block(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
