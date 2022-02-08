@@ -28,16 +28,33 @@
 
 #include "ndpi_api.h"
 
-#define HSRP_PORT 1985
+#define HSRP_PORT	1985
+#define HSRP_PORT_V6	2029
 
 void ndpi_search_hsrp(struct ndpi_detection_module_struct *ndpi_struct,
 		      struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int16_t port_to_match;
 
   NDPI_LOG_DBG(ndpi_struct, "search HSRP\n");
 
-  if(packet->iph && packet->udp && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)) {
-    u_int16_t port_to_match = htons(HSRP_PORT);
+  if(packet->iphv6) {
+    port_to_match = htons(HSRP_PORT_V6);
+
+    if((packet->udp->source == port_to_match) && (packet->udp->dest == port_to_match)
+       && (packet->payload_packet_len >= 42)
+       && (packet->payload[2] == 0x02) /* Version 2 */
+       && (packet->payload[5] == 0x06) /* IPv6 */
+       && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) == 0xFF020000)
+       && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[1]) == 0x00000000)
+       && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[2]) == 0x00000000)
+       && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[3]) == 0x00000066)) { /* multicast: ff02::66 */;
+      NDPI_LOG_INFO(ndpi_struct, "found HSRP\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HSRP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      return;
+    }
+  } else if(packet->iph) {
+    port_to_match = htons(HSRP_PORT);
 
     if((packet->udp->source == port_to_match) && (packet->udp->dest == port_to_match)) {
       u_int8_t found = 0;
