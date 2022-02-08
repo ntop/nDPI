@@ -1270,6 +1270,17 @@ extern "C" {
   int ndpi_serialize_string_string(ndpi_serializer *serializer, const char *key, const char *value);
 
   /**
+   * Serialize a string key and a string value
+   * @param serializer The serializer handle
+   * @param key The field name or ID
+   * @param value The field value
+   * @param value_len The field value length
+   * @return 0 on success, a negative number otherwise
+   */
+  int ndpi_serialize_string_string_len(ndpi_serializer *serializer, const char *key,
+				       const char *value, u_int16_t value_len);
+
+  /**
    * Serialize a string key and an unterminated string value
    * @param serializer The serializer handle
    * @param key The field name or ID

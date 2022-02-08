@@ -680,10 +680,10 @@ static inline void ndpi_serialize_csv_pre(ndpi_private_serializer *serializer) {
   } else if (serializer->status.buffer.size_used == 0) {
     /* nothing to do */
   } else {
-    if(serializer->buffer.size > serializer->status.buffer.size_used)
+    if(serializer->buffer.size > serializer->status.buffer.size_used) {
       serializer->buffer.data[serializer->status.buffer.size_used] = serializer->csv_separator[0];
-
-    serializer->status.buffer.size_used++;
+      serializer->status.buffer.size_used++;
+    }
   }
 }
 
@@ -1745,16 +1745,16 @@ int ndpi_serialize_string_binary(ndpi_serializer *_serializer,
 /* ********************************** */
 
 /* Key is a string, value is a string (strlen is used to compute the len) */
-int ndpi_serialize_string_string(ndpi_serializer *_serializer,
-				 const char *key, const char *_value) {
-  const char *value = _value ? _value : "";
+int ndpi_serialize_string_string_len(ndpi_serializer *_serializer,
+				     const char *key,
+				     const char *value, u_int16_t value_len) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
 #ifdef OPTIMIZE_CSV_SERIALIZATION
   if(serializer->fmt == ndpi_serialization_format_csv) {
     /* Key is ignored */
     u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-    u_int16_t needed = strlen(_value) + 1 /* CVS separator */;
+    u_int16_t needed = value_len + 1 /* CVS separator */;
 
     if(buff_diff < needed) {
       if(ndpi_extend_serializer_buffer(&serializer->buffer, needed - buff_diff) < 0)
@@ -1770,19 +1770,30 @@ int ndpi_serialize_string_string(ndpi_serializer *_serializer,
 
     ndpi_serialize_csv_pre(serializer);
     needed--;
-    memcpy(&serializer->buffer.data[serializer->status.buffer.size_used], _value, needed);
+    memcpy(&serializer->buffer.data[serializer->status.buffer.size_used], value, needed);
     serializer->status.buffer.size_used += needed;
     return(0);
   } else
 #endif
-  return(ndpi_serialize_binary_binary(_serializer, key, strlen(key), value, strlen(value)));
+  return(ndpi_serialize_binary_binary(_serializer, key, strlen(key),
+				      value, value_len));
+}
+
+/* ********************************** */
+
+/* Key is a string, value is a string (strlen is used to compute the len) */
+int ndpi_serialize_string_string(ndpi_serializer *_serializer,
+				 const char *key, const char *_value) {
+  const char *value = _value ? _value : "";
+  
+  return(ndpi_serialize_string_string_len(_serializer, key, value, strlen(value)));
 }
 
 /* ********************************** */
 
 /* Key is a string, value is a raw json value (it can be a number, an escaped/quoted string, an array, ..) */
 int ndpi_serialize_string_raw(ndpi_serializer *_serializer,
-				 const char *key, const char *_value, u_int16_t vlen) {
+			      const char *key, const char *_value, u_int16_t vlen) {
   return(ndpi_serialize_binary_raw(_serializer, key, strlen(key), _value, vlen, 0 /* do not escape */));
 }
 
