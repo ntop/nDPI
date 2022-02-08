@@ -48,7 +48,9 @@ void ndpi_search_ayiya(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
   if(packet->udp && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)) {
     /* Ayiya is udp based, port 5072 */
-    if ((packet->udp->source == htons(5072) || packet->udp->dest == htons(5072))
+    u_int16_t port_to_match = htons(5072);
+    
+    if ((packet->udp->source == port_to_match || packet->udp->dest == port_to_match)
 	/* check for ayiya new packet */
 	&& (packet->payload_packet_len > 44)
 	) {

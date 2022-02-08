@@ -310,6 +310,7 @@ typedef enum {
   NDPI_PROTOCOL_BADOO                 = 279,
   NDPI_PROTOCOL_ACCUWEATHER           = 280,
   NDPI_PROTOCOL_GOOGLE_CLASSROOM      = 281,
+  NDPI_PROTOCOL_HSRP                  = 282,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

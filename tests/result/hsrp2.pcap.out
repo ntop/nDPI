@@ -1,0 +1,9 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+
+HSRP	2	188	2
+
+	1	UDP 10.52.220.125:1985 -> 224.0.0.102:1985 [proto: 282/HSRP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/94 bytes -> 0 pkts/0 bytes][Goodput ratio: 55/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.52.253.125:1985 -> 224.0.0.102:1985 [proto: 282/HSRP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/94 bytes -> 0 pkts/0 bytes][Goodput ratio: 55/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
