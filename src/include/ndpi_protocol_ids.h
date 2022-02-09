@@ -92,7 +92,7 @@ typedef enum {
   NDPI_PROTOCOL_QQLIVE                = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_OCSP                  = 63,
-  NDPI_PROTOCOL_FREE_64               = 64, /* FREE */
+  NDPI_PROTOCOL_VXLAN                 = 64, /* Dmytrii Vitman <dmytriiv@interfacemasters.com> */
   NDPI_PROTOCOL_IRC                   = 65,
   NDPI_PROTOCOL_AYIYA                 = 66,
   NDPI_PROTOCOL_JABBER                = 67,
