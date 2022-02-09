@@ -47,6 +47,16 @@
 
 #include "ndpi_content_match.c.inc"
 #include "ndpi_azure_match.c.inc"
+#include "ndpi_tor_match.c.inc"
+#include "ndpi_whatsapp_match.c.inc"
+#include "ndpi_amazon_aws_match.c.inc"
+#include "ndpi_ethereum_match.c.inc"
+#include "ndpi_zoom_match.c.inc"
+#include "ndpi_cloudflare_match.c.inc"
+#include "ndpi_ms_office365_match.c.inc"
+#include "ndpi_ms_onedrive_match.c.inc"
+#include "ndpi_ms_outlook_match.c.inc"
+#include "ndpi_ms_skype_teams_match.c.inc"
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
 
@@ -2112,16 +2122,12 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 /* ******************************************* */
 
 static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
-				 void *ptree, ndpi_network host_list[],
-                                 u_int8_t skip_tor_hosts) {
+				 void *ptree, ndpi_network host_list[]) {
   int i;
 
   for(i = 0; host_list[i].network != 0x0; i++) {
     struct in_addr pin;
     ndpi_patricia_node_t *node;
-
-    if(skip_tor_hosts && (host_list[i].value == NDPI_PROTOCOL_TOR))
-      continue;
 
     pin.s_addr = htonl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL) {
@@ -2383,9 +2389,27 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 #endif
 
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list, prefs & ndpi_dont_load_tor_hosts);
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list,
-			 prefs & ndpi_dont_load_tor_hosts); /* Microsoft Azure */
+    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
+    if(!(prefs & ndpi_dont_load_tor_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tor_protocol_list);
+    if(!(prefs & ndpi_dont_load_azure_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list);
+    if(!(prefs & ndpi_dont_load_whatsapp_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_whatsapp_protocol_list);
+    if(!(prefs & ndpi_dont_load_amazon_aws_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);
+    if(!(prefs & ndpi_dont_load_ethereum_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mining_protocol_list);
+    if(!(prefs & ndpi_dont_load_zoom_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_zoom_protocol_list);
+    if(!(prefs & ndpi_dont_load_cloudflare_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cloudflare_protocol_list);
+    if(!(prefs & ndpi_dont_load_microsoft_list)) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_365_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_one_drive_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_outlook_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_skype_teams_protocol_list);
+    }
   }
 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
