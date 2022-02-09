@@ -11,7 +11,7 @@ ORIGIN="https://scontent.fmxp6-1.fna.fbcdn.net/v/t39.8562-6/218944277_7946532178
 
 echo "(1) Downloading file..."
 http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
-if [ $http_response != "200" ]; then
+if [ "$http_response" != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
     return
 fi
