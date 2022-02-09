@@ -11,7 +11,7 @@ ORIGIN="https://assets.zoom.us/docs/ipranges/Zoom.txt"
 
 echo "(1) Downloading file..."
 http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
-if [ $http_response != "200" ]; then
+if [ "$http_response" != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
     return
 fi
