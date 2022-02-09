@@ -71,8 +71,10 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  /* No need to do ntohl() with 0xFFFFFFFF */
-  if(packet->iph && (packet->iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */)) {
+  if(packet->iph
+     && ((packet->iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */)
+	 || ((ntohl(packet->iph->daddr) & 0xFFFFFF00) == 0xE0000000 /* multicast */)
+	 )) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
