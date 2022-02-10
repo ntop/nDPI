@@ -872,6 +872,7 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_SHOPPING,
   NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,
   NDPI_PROTOCOL_CATEGORY_FILE_SHARING,
+
   /*
     The category below is used by sites who are used
     to test connectivity
@@ -882,6 +883,7 @@ typedef enum {
     The category below is used for vocal assistance services.
   */
   NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT,
+  NDPI_PROTOCOL_CATEGORY_CYBERSECURITY,
   
   /* Some custom categories */
   CUSTOM_CATEGORY_MINING           = 99,

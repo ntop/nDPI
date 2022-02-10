@@ -46,6 +46,7 @@
 #endif
 
 #include "ndpi_content_match.c.inc"
+#include "ndpi_dga_match.c.inc"
 #include "ndpi_azure_match.c.inc"
 #include "ndpi_tor_match.c.inc"
 #include "ndpi_whatsapp_match.c.inc"
@@ -57,6 +58,8 @@
 #include "ndpi_ms_onedrive_match.c.inc"
 #include "ndpi_ms_outlook_match.c.inc"
 #include "ndpi_ms_skype_teams_match.c.inc"
+
+/* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
 
