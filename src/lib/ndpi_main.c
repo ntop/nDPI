@@ -34,6 +34,9 @@
 
 #ifdef HAVE_LIBGCRYPT
 #include <gcrypt.h>
+#else
+#include <gcrypt_light.h>
+#define HAVE_LIBGCRYPT 1
 #endif
 
 #include <time.h>
