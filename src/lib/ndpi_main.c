@@ -2261,7 +2261,7 @@ static const char *categories[] = {
   "ConnCheck",
   "IoT-Scada",
   "VirtAssistant",
-  "",
+  "Cybersecurity",
   "",
   "",
   "",
