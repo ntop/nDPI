@@ -42,9 +42,7 @@ void ndpi_search_hsrp(struct ndpi_detection_module_struct *ndpi_struct,
     port_to_match = htons(HSRP_PORT_V6);
 
     if((packet->udp->source == port_to_match) && (packet->udp->dest == port_to_match)
-       && (packet->payload_packet_len >= 42)
-       && (packet->payload[2] == 0x02) /* Version 2 */
-       && (packet->payload[5] == 0x06) /* IPv6 */
+       && (packet->payload[0] <= 0x04) /* Message type */
        && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) == 0xFF020000)
        && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[1]) == 0x00000000)
        && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[2]) == 0x00000000)
