@@ -1106,7 +1106,7 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
 /* ********************************** */
 
 void ndpi_serialize_risk(ndpi_serializer *serializer,
-                         ndpi_risk_enum risk)
+                         ndpi_risk risk)
 {
   u_int32_t i;
 
