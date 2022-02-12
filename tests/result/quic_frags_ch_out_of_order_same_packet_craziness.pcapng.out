@@ -3,10 +3,11 @@ Guessed flow protos:	113
 DPI Packets (UDP):	179	(1.58 pkts/flow)
 Confidence DPI              : 113 (flows)
 
-Google	6	8352	2
-QUIC	130	180960	100
+Google	7	9744	3
+QUIC	126	175392	96
 GoogleServices	4	5568	1
 Azure	39	54288	10
+GoogleCloud	3	4176	3
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -49,7 +50,7 @@ JA3 Host Stats:
 	31	UDP 159.117.176.124:51856 -> 16.205.123.234:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	32	UDP 168.144.64.5:49153 -> 153.98.28.78:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	33	UDP 168.144.64.5:49217 -> 185.186.183.185:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
-	34	UDP 168.144.64.5:49324 -> 35.194.157.47:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	34	UDP 168.144.64.5:49324 -> 35.194.157.47:443 [proto: 188.284/QUIC.GoogleCloud][Encrypted][Confidence: DPI][cat: Cloud/13][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	35	UDP 168.144.64.5:49860 -> 113.250.137.243:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	36	UDP 168.144.64.5:49926 -> 103.179.40.184:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	37	UDP 168.144.64.5:50023 -> 76.231.104.92:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][PLAIN TEXT (TJdZNR)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
@@ -72,7 +73,7 @@ JA3 Host Stats:
 	54	UDP 168.144.64.5:54449 -> 102.194.207.179:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	55	UDP 168.144.64.5:55066 -> 128.248.24.1:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	56	UDP 168.144.64.5:55479 -> 113.250.137.243:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
-	57	UDP 168.144.64.5:55561 -> 35.194.157.47:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	57	UDP 168.144.64.5:55561 -> 35.194.157.47:443 [proto: 188.284/QUIC.GoogleCloud][Encrypted][Confidence: DPI][cat: Cloud/13][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	58	UDP 168.144.64.5:55572 -> 117.148.117.30:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	59	UDP 168.144.64.5:55637 -> 169.81.163.225:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	60	UDP 168.144.64.5:55844 -> 112.1.105.138:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
@@ -105,10 +106,10 @@ JA3 Host Stats:
 	87	UDP 168.144.64.5:60934 -> 128.248.24.1:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	88	UDP 168.144.64.5:60936 -> 9.65.169.252:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	89	UDP 168.144.64.5:60949 -> 185.186.183.185:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
-	90	UDP 168.144.64.5:61209 -> 35.194.157.47:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	90	UDP 168.144.64.5:61209 -> 35.194.157.47:443 [proto: 188.284/QUIC.GoogleCloud][Encrypted][Confidence: DPI][cat: Cloud/13][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	91	UDP 168.144.64.5:61341 -> 16.232.218.117:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	92	UDP 168.144.64.5:61886 -> 65.33.51.74:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
-	93	UDP 168.144.64.5:62047 -> 136.125.67.96:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	93	UDP 168.144.64.5:62047 -> 136.125.67.96:443 [proto: 188.126/QUIC.Google][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	94	UDP 168.144.64.5:62652 -> 158.146.215.30:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	95	UDP 168.144.64.5:62818 -> 113.250.137.243:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	96	UDP 168.144.64.5:63136 -> 9.65.169.252:443 [proto: 188/QUIC][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]

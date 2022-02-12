@@ -4,8 +4,8 @@ DPI Packets (TCP):	174	(7.91 pkts/flow)
 DPI Packets (UDP):	90	(2.43 pkts/flow)
 DPI Packets (other):	10	(1.00 pkts/flow)
 Confidence Unknown          : 2 (flows)
-Confidence Match by port    : 6 (flows)
-Confidence Match by IP      : 4 (flows)
+Confidence Match by port    : 5 (flows)
+Confidence Match by IP      : 5 (flows)
 Confidence DPI              : 57 (flows)
 
 Unknown	19	1054	2
@@ -16,7 +16,7 @@ NetBIOS	15	1542	1
 SSDP	15	5625	9
 ICMP	2	126	2
 IGMP	8	378	6
-TLS	255	78703	7
+TLS	251	78369	6
 ICMPV6	18	2964	2
 Slack	29	4979	2
 Google	2	132	1
@@ -25,6 +25,7 @@ Apple	2	297	1
 CiscoVPN	2474	896875	3
 ApplePush	11	1325	4
 AmazonAWS	36	3540	3
+GoogleCloud	4	334	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -64,7 +65,7 @@ JA3 Host Stats:
 	31	TCP 10.0.0.227:56916 -> 10.0.0.151:8009 [proto: 139/AJP][ClearText][Confidence: Match by port][cat: Web/5][5 pkts/390 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][5.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	TCP 10.0.0.227:56886 <-> 17.57.144.116:5223 [proto: 238/ApplePush][Encrypted][Confidence: DPI][cat: Cloud/13][3 pkts/174 bytes <-> 2 pkts/185 bytes][Goodput ratio: 0/28][0.02 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	UDP 10.0.0.151:1900 -> 10.0.0.227:61328 [proto: 12/SSDP][ClearText][Confidence: DPI][cat: System/18][1 pkts/353 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][< 1 sec][PLAIN TEXT (HTTP/1.1 200 OK)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	34	TCP 10.0.0.227:56910 <-> 35.201.124.9:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/170 bytes <-> 2 pkts/164 bytes][Goodput ratio: 22/19][0.05 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	34	TCP 10.0.0.227:56910 <-> 35.201.124.9:443 [proto: 91.284/TLS.GoogleCloud][Encrypted][Confidence: Match by IP][cat: Cloud/13][2 pkts/170 bytes <-> 2 pkts/164 bytes][Goodput ratio: 22/19][0.05 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	35	UDP 10.0.0.227:62427 <-> 75.75.75.75:53 [proto: 5/DNS][ClearText][Confidence: DPI][cat: ConnCheck/30][1 pkts/84 bytes <-> 1 pkts/242 bytes][Goodput ratio: 49/82][0.02 sec][Hostname/SNI: detectportal.firefox.com][184.25.56.82][PLAIN TEXT (detectportal)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	36	UDP 10.0.0.227:58074 <-> 75.75.75.75:53 [proto: 5/DNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/75 bytes <-> 1 pkts/230 bytes][Goodput ratio: 43/81][0.01 sec][Hostname/SNI: www.outlook.com][40.97.222.34][PLAIN TEXT (outlook)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	37	UDP 10.0.0.227:60341 <-> 75.75.75.75:53 [proto: 5.140/DNS.Apple][ClearText][Confidence: DPI][cat: Web/5][1 pkts/73 bytes <-> 1 pkts/224 bytes][Goodput ratio: 42/81][0.01 sec][Hostname/SNI: www.apple.com][184.27.115.161][PLAIN TEXT (edgekey)][Plen Bins: 50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

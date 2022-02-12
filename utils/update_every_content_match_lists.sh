@@ -10,3 +10,5 @@ cd "$(dirname "${0}")"
 ./tor_ip_addresses_download.sh
 ./whatsapp_ip_addresses_download.sh
 ./zoom_ip_addresses_download.sh
+./google_cloud_ip_addresses_download.sh
+./google_ip_addresses_download.sh
