@@ -7572,6 +7572,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_KERBEROS:
+  case NDPI_PROTOCOL_SNMP:
     if(flow->extra_packets_func)
       return(1);
     break;
