@@ -2519,13 +2519,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str) {
   const char *domains[] = {
     ".local",
-    ".msftconnecttest.com",
-    "amupdatedl.microsoft.com",
-    "update.microsoft.com.akadns.net",
-    ".windowsupdate.com",
-    ".ras.microsoft.com",
-    "e5.sk",
-    "sophosxl.net",
     NULL /* End */
   };
   const ndpi_risk risks_to_mask[] = {
@@ -2543,6 +2536,19 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
 
   for(i=0; domains[i] != NULL; i++)
     ndpi_add_host_risk_mask(ndpi_str, (char*)domains[i], mask);
+  
+  for(i=0; host_match[i].string_to_match != NULL; i++) {
+    switch(host_match[i].protocol_category) {
+    case NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK:
+    case NDPI_PROTOCOL_CATEGORY_CYBERSECURITY:
+      ndpi_add_host_risk_mask(ndpi_str, (char*)host_match[i].string_to_match, mask); 
+      break;
+
+    default:
+      /* Nothing to do */
+      break;
+    }
+  }
 }
 
 /* *********************************************** */
