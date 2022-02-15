@@ -1895,11 +1895,15 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_ERROR_CODE_DETECTED:
     return("Error Code Detected");
     break;
-      
+
   case NDPI_HTTP_CRAWLER_BOT:
     return("Crawler/Bot Detected");
     break;
-      
+
+  case NDPI_ANONYMOUS_SUBSCRIBER:
+    return("Anonymous Subscriber");
+    break;
+
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
