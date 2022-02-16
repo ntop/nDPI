@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 struct ndpi_workflow_prefs *prefs = NULL;
+struct ndpi_workflow *workflow = NULL;
 
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
@@ -55,9 +56,22 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
     prefs->decode_tunnels = 1;
     prefs->num_roots = 16;
-    prefs->max_ndpi_flows = 1024;
+    prefs->max_ndpi_flows = 1024 * 1024;
     prefs->quiet_mode = 0;
+
+    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */);
+    // enable all protocols
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
+    memset(workflow->stats.protocol_counter, 0,
+	   sizeof(workflow->stats.protocol_counter));
+    memset(workflow->stats.protocol_counter_bytes, 0,
+	   sizeof(workflow->stats.protocol_counter_bytes));
+    memset(workflow->stats.protocol_flows, 0,
+	   sizeof(workflow->stats.protocol_flows));
+    ndpi_finalize_initialization(workflow->ndpi_struct);
   }
+
   bufferToFile(pcap_path, Data, Size);
 
   pkts = pcap_open_offline(pcap_path, errbuf);
@@ -74,37 +88,25 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     free(pcap_path);
     return 0;
   }
-  struct ndpi_workflow * workflow = ndpi_workflow_init(prefs, pkts);
-  // enable all protocols
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
-  memset(workflow->stats.protocol_counter, 0,
-	 sizeof(workflow->stats.protocol_counter));
-  memset(workflow->stats.protocol_counter_bytes, 0,
-	 sizeof(workflow->stats.protocol_counter_bytes));
-  memset(workflow->stats.protocol_flows, 0,
-	 sizeof(workflow->stats.protocol_flows));
-  ndpi_finalize_initialization(workflow->ndpi_struct);
+
+  workflow->pcap_handle = pkts;
 
   header = NULL;
   r = pcap_next_ex(pkts, &header, &pkt);
   while (r > 0) {
-    if(header->caplen >= 42 /* ARP+ size */) {
-      /* allocate an exact size buffer to check overflows */
-      uint8_t *packet_checked = malloc(header->caplen);
+    /* allocate an exact size buffer to check overflows */
+    uint8_t *packet_checked = malloc(header->caplen);
 
-      if(packet_checked) {
-	ndpi_risk flow_risk;
-	
-	memcpy(packet_checked, pkt, header->caplen);
-	ndpi_workflow_process_packet(workflow, header, packet_checked, &flow_risk, NULL);
-	free(packet_checked);
-      }
+    if(packet_checked) {
+      ndpi_risk flow_risk;
+
+      memcpy(packet_checked, pkt, header->caplen);
+      ndpi_workflow_process_packet(workflow, header, packet_checked, &flow_risk, NULL);
+      free(packet_checked);
     }
 
     r = pcap_next_ex(pkts, &header, &pkt);
   }
-  ndpi_workflow_free(workflow);
   pcap_close(pkts);
 
   remove(pcap_path);
