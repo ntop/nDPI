@@ -422,30 +422,52 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
 				  struct ndpi_flow_struct *flow,
 				  char *ua) {
   u_int len;
-
+  char *double_slash;
+  
   if((!ua) || (ua[0] == '\0'))
     return;
   else
     len = strlen(ua);
 
-  if(
-     (!strncmp(ua, "<?", 2))
-	  || strchr(ua, '$')
-	  || strstr(ua, "://") // || (!strncmp(ua, "jndi:ldap://", 12)) /* Log4J */
-	  // || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
-	  // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
-	  ) {
+  if((!strncmp(ua, "<?", 2))
+     || strchr(ua, '$')
+     // || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
+     // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
+     )
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
 
+  if((double_slash = strstr(ua, "://")) != NULL) {
+    if(double_slash != ua) /* We're not at the beginning of the user agent */{
+      if((double_slash[-1] != 'p') /* http:// */
+	 && (double_slash[-1] != 's') /* https:// */)
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+    }
+  }
+  
+  /* no else */
+  if(!strncmp(ua, "jndi:ldap://", 12)) /* Log4J */ {
     ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
   } else if(
-	    (len < 4)      /* Too short */
-	    || (len > 256) /* Too long  */
-	    || (!strncmp(ua, "test", 4))
-	    || strchr(ua, '{')
-	    || strchr(ua, '}')
-	    ) {
+	  (len < 4)      /* Too short */
+	  || (len > 256) /* Too long  */
+	  || (!strncmp(ua, "test", 4))
+	  || strchr(ua, '{')
+	  || strchr(ua, '}')
+	  ) {
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+  }
+
+  /*
+    Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)
+    Amazon-Route53-Health-Check-Service (ref 68784dad-be98-49e4-a63c-9fbbe2816d7c; report http://amzn.to/1vsZADi)
+    Anonymous Crawler/1.0 (Webcrawler developed with StormCrawler; http://example.com/; webcrawler@example.com)
+   */
+  if((strstr(ua, "+http") != NULL)
+     || (strstr(ua, " http") != NULL)
+     || strcasestr(ua, "Crawler")
+     || strcasestr(ua, "Bot") /* bot/robot */
+     ) {
+    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT);
   }
 }
 

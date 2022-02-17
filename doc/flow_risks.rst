@@ -266,4 +266,10 @@ NDPI_ERROR_CODE_DETECTED
 ===================================
 The risk is set whenever an error code is detected in the underlying protocol (e.g. HTTP and DNS).
 
+.. _Risk 044:
+
+NDPI_HTTP_CRAWLER_BOT
+===================================
+The risk is set whenever a crawler/bot/robot has been detected
+
 

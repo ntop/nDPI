@@ -735,7 +735,7 @@ void printCSVHeader() {
 #if 0
   fprintf(csv_fp, "tls_issuerDN,tls_subjectDN,");
 #endif
-  fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info,plen_bins");
+  fprintf(csv_fp, "ssh_client_hassh,ssh_server_hassh,flow_info,plen_bins,http_user_agent");
 
   if(enable_flow_stats) {
     fprintf(csv_fp, ",byte_dist_mean,byte_dist_std,entropy,total_entropy");
@@ -1230,9 +1230,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     /* TCP flags */
    fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->cwr_count, flow->ece_count, flow->urg_count, flow->ack_count, flow->psh_count, flow->rst_count, flow->syn_count, flow->fin_count);
 
-   fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->src2dst_cwr_count, flow->src2dst_ece_count, flow->src2dst_urg_count, flow->src2dst_ack_count, flow->src2dst_psh_count, flow->src2dst_rst_count, flow->src2dst_syn_count, flow->src2dst_fin_count);
+   fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->src2dst_cwr_count, flow->src2dst_ece_count, flow->src2dst_urg_count, flow->src2dst_ack_count,
+	   flow->src2dst_psh_count, flow->src2dst_rst_count, flow->src2dst_syn_count, flow->src2dst_fin_count);
 
-   fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->dst2src_cwr_count, flow->ece_count, flow->urg_count, flow->ack_count, flow->psh_count, flow->rst_count, flow->syn_count, flow->fin_count);
+   fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->dst2src_cwr_count, flow->ece_count, flow->urg_count, flow->ack_count,
+	   flow->psh_count, flow->rst_count, flow->syn_count, flow->fin_count);
 
    /* TCP window */
    fprintf(csv_fp, "%u,%u,", flow->c_to_s_init_win, flow->s_to_c_init_win);
@@ -1269,6 +1271,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 #ifndef DIRECTION_BINS
     print_bin(csv_fp, NULL, &flow->payload_len_bin);
 #endif
+
+    fprintf(csv_fp, ",%s", flow->http.user_agent);
   }
 
   if((verbose != 1) && (verbose != 2)) {

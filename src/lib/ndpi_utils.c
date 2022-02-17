@@ -1852,6 +1852,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Error Code Detected");
     break;
       
+  case NDPI_HTTP_CRAWLER_BOT:
+    return("Crawler/Bot Detected");
+    break;
+      
   default:
     snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
