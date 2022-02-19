@@ -4210,6 +4210,9 @@ void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *n
   /* Cassandra */
   init_cassandra_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* EthernetIP */
+  init_ethernet_ip_dissector(ndpi_str, &a, detection_bitmask);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
