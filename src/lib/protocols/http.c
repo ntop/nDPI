@@ -464,8 +464,8 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
    */
   if((strstr(ua, "+http") != NULL)
      || (strstr(ua, " http") != NULL)
-     || strcasestr(ua, "Crawler")
-     || strcasestr(ua, "Bot") /* bot/robot */
+     || ndpi_strncasestr(ua, "Crawler", strlen(ua))
+     || ndpi_strncasestr(ua, "Bot", strlen(ua)) /* bot/robot */
      ) {
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT);
   }
