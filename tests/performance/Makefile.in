@@ -1,7 +1,7 @@
-INC=-I ../../src/include/
+INC=-I ../../src/include/ -I ../../src/lib/third_party/include/
 LIB=../../src/lib/libndpi.a @ADDITIONAL_LIBS@
 
-TOOLS=substringsearch patriciasearch
+TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu
 TESTS=substring_test patricia_test
 
 
@@ -9,9 +9,14 @@ all: $(TESTS)
 
 tools: $(TOOLS)
 
+gcrypt-int: gcrypt.c Makefile
+	$(CC) $(INC) @CFLAGS@ gcrypt.c -o $@
+
+gcrypt-gnu: gcrypt.c Makefile
+	$(CC) $(INC) @CFLAGS@ -DHAVE_LIBGCRYPT gcrypt.c -o $@ -lgcrypt
 
 substringsearch: substringsearch.c Makefile
-	$(CC) -O2 $(INC) substringsearch.c -o substringsearch $(LIB)
+	$(CC) $(INC) @CFLAGS@ substringsearch.c -o substringsearch $(LIB)
 
 substring_test: substringsearch top-1m.csv
 	./substringsearch
@@ -19,7 +24,7 @@ substring_test: substringsearch top-1m.csv
 #
 
 patriciasearch: patriciasearch.c Makefile
-	$(CC) -O2 $(INC) patriciasearch.c -o patriciasearch $(LIB)
+	$(CC) $(INC) @CFLAGS@ patriciasearch.c -o patriciasearch $(LIB)
 
 patricia_test: patriciasearch blacklist-ip.txt
 	./patriciasearch
