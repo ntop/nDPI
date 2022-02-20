@@ -14,10 +14,11 @@ NTP	8	720	4
 Outlook	126	53776	2
 IGMP	2	92	2
 TLS	4	283	1
-Google	30	3310	5
+Google	26	2980	4
 Apple	2	273	1
 Microsoft	121	47561	14
 Azure	4	414	2
+GoogleCloud	4	330	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -40,7 +41,7 @@ JA3 Host Stats:
 	14	UDP 192.168.1.121:51998 <-> 8.8.8.8:53 [proto: 5.126/DNS.Google][ClearText][Confidence: DPI][cat: Web/5][3 pkts/255 bytes <-> 3 pkts/449 bytes][Goodput ratio: 50/72][1.02 sec][Hostname/SNI: 235.33.22.2.in-addr.arpa][::][bytes ratio: -0.276 (Download)][IAT c2s/s2c min/avg/max/stddev: 999/996 500/498 999/996 500/498][Pkt Len c2s/s2c min/avg/max/stddev: 84/131 85/150 86/171 1/16][PLAIN TEXT (deploy)][Plen Bins: 0,51,16,16,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	UDP 192.168.1.121:5353 -> 192.168.1.139:5353 [proto: 8/MDNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/383 bytes -> 0 pkts/0 bytes][Goodput ratio: 89/0][< 1 sec][Hostname/SNI: _companion-link._tcp.local][_companion-link._tcp.local][PLAIN TEXT (companion)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	UDP 192.168.1.121:51364 <-> 8.8.8.8:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/77 bytes <-> 1 pkts/289 bytes][Goodput ratio: 45/85][0.01 sec][Hostname/SNI: www.microsoft.com][::][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	17	TCP 130.211.33.145:443 <-> 192.168.1.121:53432 [proto: 91.126/TLS.Google][Encrypted][Confidence: Match by IP][cat: Web/5][2 pkts/163 bytes <-> 2 pkts/167 bytes][Goodput ratio: 19/21][0.01 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	TCP 130.211.33.145:443 <-> 192.168.1.121:53432 [proto: 91.284/TLS.GoogleCloud][Encrypted][Confidence: Match by IP][cat: Cloud/13][2 pkts/163 bytes <-> 2 pkts/167 bytes][Goodput ratio: 19/21][0.01 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	18	UDP 192.168.1.121:55567 <-> 8.8.8.8:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/78 bytes <-> 1 pkts/250 bytes][Goodput ratio: 46/83][0.07 sec][Hostname/SNI: wdcp.microsoft.com][::][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	UDP 192.168.1.121:58161 <-> 8.8.8.8:53 [proto: 5.212/DNS.Microsoft][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/77 bytes <-> 1 pkts/244 bytes][Goodput ratio: 45/82][0.03 sec][Hostname/SNI: www.microsoft.com][2.22.33.235][PLAIN TEXT (microsoft)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	UDP [fe80::1059:a858:f9e7:cf94]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][ClearText][Confidence: DPI][cat: Network/14][2 pkts/320 bytes -> 0 pkts/0 bytes][Goodput ratio: 61/0][1.02 sec][Hostname/SNI: _companion-link._tcp.local][_companion-link._tcp.local][PLAIN TEXT (companion)][Plen Bins: 0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

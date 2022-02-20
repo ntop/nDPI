@@ -1400,6 +1400,8 @@ typedef enum
     ndpi_dont_load_zoom_list       = (1 << 7),
     ndpi_dont_load_cloudflare_list = (1 << 8),
     ndpi_dont_load_microsoft_list  = (1 << 9),
+    ndpi_dont_load_google_list     = (1 << 10),
+    ndpi_dont_load_google_cloud_list = (1 << 11),
   } ndpi_prefs;
 
 typedef struct {

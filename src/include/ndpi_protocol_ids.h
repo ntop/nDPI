@@ -312,6 +312,7 @@ typedef enum {
   NDPI_PROTOCOL_GOOGLE_CLASSROOM      = 281,
   NDPI_PROTOCOL_HSRP                  = 282,
   NDPI_PROTOCOL_CYBERSECURITY         = 283, /* Cybersecurity companies */
+  NDPI_PROTOCOL_GOOGLE_CLOUD          = 284,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
