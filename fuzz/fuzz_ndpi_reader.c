@@ -47,6 +47,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   char errbuf[PCAP_ERRBUF_SIZE];
   NDPI_PROTOCOL_BITMASK all;
   char * pcap_path = tempnam("/tmp", "fuzz-ndpi-reader");
+  u_int i;
 
   if (prefs == NULL) {
     prefs = calloc(sizeof(struct ndpi_workflow_prefs), 1);
@@ -59,7 +60,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     prefs->max_ndpi_flows = 1024 * 1024;
     prefs->quiet_mode = 0;
 
-    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */);
+    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0);
     // enable all protocols
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
@@ -90,6 +91,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   }
 
   workflow->pcap_handle = pkts;
+  /* Init flow tree */
+  workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
 
   header = NULL;
   r = pcap_next_ex(pkts, &header, &pkt);
@@ -108,6 +111,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     r = pcap_next_ex(pkts, &header, &pkt);
   }
   pcap_close(pkts);
+
+  /* Free flow trees */
+  for(i = 0; i < workflow->prefs.num_roots; i++)
+    ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
+  ndpi_free(workflow->ndpi_flows_root);
 
   remove(pcap_path);
   free(pcap_path);

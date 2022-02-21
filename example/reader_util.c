@@ -391,7 +391,7 @@ extern char *_debug_protocols;
 static int _debug_protocols_ok = 0;
 
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
-					 pcap_t * pcap_handle) {
+					 pcap_t * pcap_handle, int do_init_flows_root) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
 
@@ -427,7 +427,8 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   if(_debug_protocols_ok)
     ndpi_set_debug_bitmask(module, debug_bitmask);
 
-  workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
+  if(do_init_flows_root)
+    workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
 
   return workflow;
 }
