@@ -2062,7 +2062,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   prefs.ignore_vlanid = ignore_vlanid;
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
-  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle);
+  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1);
 
   /* Preferences */
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
