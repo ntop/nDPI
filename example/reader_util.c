@@ -1719,14 +1719,14 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 #ifdef DLT_IPV4
   case DLT_IPV4:
     type = ETH_P_IP;
-    ip_offset = 0;
+    ip_offset = eth_offset;
     break;
 #endif
 
 #ifdef DLT_IPV6
   case DLT_IPV6:
     type = ETH_P_IPV6;
-    ip_offset = 0;
+    ip_offset = eth_offset;
     break;
 #endif
 
@@ -1785,7 +1785,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	 (FCF_TO_DS(fc) == 0x0 && FCF_FROM_DS(fc)))
 	wifi_len = 26; /* + 4 byte fcs */
     } else   /* no data frames */
-      break;
+      return(nproto);
 
     /* Check ether_type from LLC */
     if(header->caplen < (eth_offset + wifi_len + radio_len + sizeof(struct ndpi_llc_header_snap)))
@@ -1799,7 +1799,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     break;
 
   case DLT_RAW:
-    ip_offset = eth_offset = 0;
+    ip_offset = eth_offset;
     break;
 
   default:
