@@ -4615,7 +4615,10 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
   flow->l4_proto = l4protocol;
 
   /* TCP / UDP detection */
-  if(l4protocol == IPPROTO_TCP && l4_packet_len >= 20 /* min size of tcp */) {
+  if(l4protocol == IPPROTO_TCP) {
+    if(l4_packet_len < 20 /* min size of tcp */)
+      return(1);
+
     /* tcp */
     packet->tcp = (struct ndpi_tcphdr *) l4ptr;
     if(l4_packet_len >= packet->tcp->doff * 4) {
@@ -4659,14 +4662,18 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
       }
     } else {
       /* tcp header not complete */
-      packet->tcp = NULL;
+      return(1);
     }
-  } else if(l4protocol == IPPROTO_UDP && l4_packet_len >= 8 /* size of udp */) {
+  } else if(l4protocol == IPPROTO_UDP) {
+    if(l4_packet_len < 8 /* size of udp */)
+      return(1);
     packet->udp = (struct ndpi_udphdr *) l4ptr;
     packet->payload_packet_len = l4_packet_len - 8;
     packet->payload = ((u_int8_t *) packet->udp) + 8;
-  } else if((l4protocol == IPPROTO_ICMP && l4_packet_len >= sizeof(struct ndpi_icmphdr))
-	    || (l4protocol == IPPROTO_ICMPV6 && l4_packet_len >= sizeof(struct ndpi_icmp6hdr))) {
+  } else if((l4protocol == IPPROTO_ICMP) || (l4protocol == IPPROTO_ICMPV6)) {
+    if((l4protocol == IPPROTO_ICMP && l4_packet_len < sizeof(struct ndpi_icmphdr)) ||
+       (l4protocol == IPPROTO_ICMPV6 && l4_packet_len < sizeof(struct ndpi_icmp6hdr)))
+      return(1);
     packet->payload = ((u_int8_t *) l4ptr);
     packet->payload_packet_len = l4_packet_len;
   } else {
