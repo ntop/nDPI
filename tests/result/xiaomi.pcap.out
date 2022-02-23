@@ -1,0 +1,11 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	7	(1.75 pkts/flow)
+Confidence DPI              : 4 (flows)
+
+Xiaomi	18	5123	4
+
+	1	TCP 115.164.74.232:5222 <-> 192.168.247.13:38018 [proto: 287/Xiaomi][Encrypted][Confidence: DPI][cat: Web/5][4 pkts/456 bytes <-> 3 pkts/1283 bytes][Goodput ratio: 40/85][149.32 sec][Hostname/SNI: 47.241.35.73][bytes ratio: -0.476 (Download)][IAT c2s/s2c min/avg/max/stddev: 143/153 49772/74586 149015/149020 70175/74434][Pkt Len c2s/s2c min/avg/max/stddev: 74/78 114/428 172/980 41/395][User-Agent: M2010J19SG][PLAIN TEXT (xiaomi.com)][Plen Bins: 34,0,16,16,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 97.39.119.172:5222 <-> 192.168.93.59:51488 [proto: 287/Xiaomi][Encrypted][Confidence: DPI][cat: Web/5][3 pkts/377 bytes <-> 2 pkts/1249 bytes][Goodput ratio: 45/89][0.25 sec][Hostname/SNI: 47.241.59.87][User-Agent: M2101K7BG][PLAIN TEXT (xiaomi.com)][Plen Bins: 0,0,25,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 115.164.74.232:5222 <-> 192.168.244.219:45904 [proto: 287/Xiaomi][Encrypted][Confidence: DPI][cat: Web/5][3 pkts/378 bytes <-> 2 pkts/1244 bytes][Goodput ratio: 45/89][0.26 sec][Hostname/SNI: 47.241.35.73][User-Agent: Redmi Note 9S][PLAIN TEXT (xiaomi.com)][Plen Bins: 0,0,25,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 47.241.7.88:5222 -> 10.52.151.160:39180 [VLAN: 208][proto: 287/Xiaomi][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/136 bytes -> 0 pkts/0 bytes][Goodput ratio: 48/0][< 1 sec][PLAIN TEXT (xiaomi.com)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

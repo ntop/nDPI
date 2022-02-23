@@ -1,0 +1,9 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	8	(4.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+
+Xiaomi	30	5748	2
+
+	1	TCP 192.168.2.100:45106 <-> 18.193.233.122:5222 [proto: 287/Xiaomi][Encrypted][Confidence: DPI][cat: Web/5][8 pkts/2061 bytes <-> 7 pkts/1063 bytes][Goodput ratio: 74/56][359.14 sec][Hostname/SNI: fr-app-chat-global-xiaomi-net2-2117517874.eu-central-1.elb.amazonaws.com][bytes ratio: 0.319 (Upload)][IAT c2s/s2c min/avg/max/stddev: 7/1 59816/100 358553/211 133599/79][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 258/152 1014/488 311/142][User-Agent: Redmi Note 8T][PLAIN TEXT (xiaomi.com)][Plen Bins: 14,0,14,14,0,0,14,0,0,0,14,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.2.100:37708 <-> 3.127.176.74:5222 [proto: 287/Xiaomi][Encrypted][Confidence: DPI][cat: Web/5][8 pkts/1983 bytes <-> 7 pkts/641 bytes][Goodput ratio: 73/27][455.15 sec][Hostname/SNI: fr-app-chat-global-xiaomi-net1-1667981913.eu-central-1.elb.amazonaws.com][bytes ratio: 0.511 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/0 75808/90740 453408/453409 168869/181335][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 248/92 999/171 303/39][User-Agent: Redmi Note 9 Pro][PLAIN TEXT (xiaomi.com)][Plen Bins: 16,0,16,16,0,0,0,16,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
