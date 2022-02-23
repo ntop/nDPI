@@ -3181,9 +3181,9 @@ int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_str, ch
     if((quote = strchr(buf, '"')) != NULL)
       quote[0] = '\0';
 
-    head->value = strdup(buf);
+    head->value = ndpi_strdup(buf);
   } else
-    head->value = strdup(dn);
+    head->value = ndpi_strdup(dn);
 
   if(head->value == NULL) {
     ndpi_free(head);
