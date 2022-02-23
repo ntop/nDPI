@@ -424,7 +424,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	
 	return;
       } else if(kerberos_len == expected_len) {
-	if(packet->payload_packet_len > 128) {
+	if(packet->payload_packet_len > 64) {
 	  u_int16_t koffset, i;
 
 	  for(i=8; i<16; i++)
@@ -444,6 +444,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  if(((packet->payload[koffset] == 0x0A)
 	      || (packet->payload[koffset] == 0x0C)
+	      || (packet->payload[koffset] == 0x1E)
 	      || (packet->payload[koffset] == 0x0D)
 	      || (packet->payload[koffset] == 0x0E))) {
 	    u_int16_t koffsetp, body_offset = 0, pad_len;
@@ -678,6 +679,12 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	                   "[TGS-REP][s/dport: %u/%u][Kerberos Hostname,Domain,Username][%s,%s,%s]\n",
 	                   sport, dport, flow->protos.kerberos.hostname, flow->protos.kerberos.domain,
 	                   flow->protos.kerberos.username);
+	      flow->extra_packets_func = NULL;
+	    } else if(msg_type == 0x1e) /* Error */ {
+#ifdef KERBEROS_DEBUG
+	      printf("[Kerberos] Processing KRB-Error\n");
+#endif
+	      /* Nothing specific to do; stop dissecting this flow */
 	      flow->extra_packets_func = NULL;
 	    }
 
