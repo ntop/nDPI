@@ -34,7 +34,11 @@
 #define GCM_VALIDATE( cond ) \
     MBEDTLS_INTERNAL_VALIDATE( cond )
 
+#ifdef _WIN32
+#define LBLOCKSIZE 4 
+#else
 #define LBLOCKSIZE __SIZEOF_LONG__ 
+#endif
 
 static void xorbytes( unsigned char *dst, const unsigned char *src, int n) {
     while(n > LBLOCKSIZE) {
