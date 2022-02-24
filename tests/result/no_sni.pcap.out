@@ -2,7 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (TCP):	51	(6.38 pkts/flow)
 Confidence DPI              : 8 (flows)
-Num dissector calls: 106 (13.25 diss/flow)
+Num dissector calls: 29 (3.62 diss/flow)
 
 DoH_DoT	268	31882	1
 Cloudflare	917	562254	7

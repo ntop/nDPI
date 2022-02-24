@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	12	(4.00 pkts/flow)
 DPI Packets (UDP):	3	(1.00 pkts/flow)
 Confidence DPI              : 6 (flows)
-Num dissector calls: 553 (92.17 diss/flow)
+Num dissector calls: 526 (87.67 diss/flow)
 
 GenshinImpact	90	18405	6
 

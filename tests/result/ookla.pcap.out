@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	16	(8.00 pkts/flow)
 Confidence DPI (cache)      : 1 (flows)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 138 (69.00 diss/flow)
+Num dissector calls: 118 (59.00 diss/flow)
 
 Ookla	5086	4689745	2
 

@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	12	(4.00 pkts/flow)
 Confidence DPI              : 3 (flows)
-Num dissector calls: 264 (88.00 diss/flow)
+Num dissector calls: 234 (78.00 diss/flow)
 
 Corba	22	3681	3
 

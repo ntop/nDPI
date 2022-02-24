@@ -3,7 +3,7 @@ Guessed flow protos:	639
 DPI Packets (TCP):	3972	(6.01 pkts/flow)
 Confidence Match by port    : 639 (flows)
 Confidence DPI              : 22 (flows)
-Num dissector calls: 17276 (26.14 diss/flow)
+Num dissector calls: 4236 (6.41 diss/flow)
 
 HTTP	9374	4721148	661
 

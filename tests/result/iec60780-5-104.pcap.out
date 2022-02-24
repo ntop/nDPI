@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	24	(4.00 pkts/flow)
 Confidence DPI              : 6 (flows)
-Num dissector calls: 90 (15.00 diss/flow)
+Num dissector calls: 24 (4.00 diss/flow)
 
 IEC60870	147	9033	6
 

@@ -5,7 +5,7 @@ DPI Packets (UDP):	52	(1.68 pkts/flow)
 DPI Packets (other):	4	(1.00 pkts/flow)
 Confidence Match by IP      : 3 (flows)
 Confidence DPI              : 60 (flows)
-Num dissector calls: 600 (9.52 diss/flow)
+Num dissector calls: 348 (5.52 diss/flow)
 
 DNS	4	390	2
 MDNS	2	174	2

@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	7	(1.75 pkts/flow)
 DPI Packets (UDP):	12	(1.00 pkts/flow)
 Confidence DPI              : 16 (flows)
-Num dissector calls: 361 (22.56 diss/flow)
+Num dissector calls: 351 (21.94 diss/flow)
 
 COAP	19	1614	8
 Dropbox	800	80676	4

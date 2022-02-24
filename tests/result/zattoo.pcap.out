@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	10	(5.00 pkts/flow)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 43 (21.50 diss/flow)
+Num dissector calls: 21 (10.50 diss/flow)
 
 Zattoo	32	13467	2
 

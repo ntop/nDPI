@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	48	(8.00 pkts/flow)
 Confidence DPI              : 6 (flows)
-Num dissector calls: 281 (46.83 diss/flow)
+Num dissector calls: 216 (36.00 diss/flow)
 
 SMTP	626	438465	1
 HTTP	1601	1581542	3

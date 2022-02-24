@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	18	(6.00 pkts/flow)
 Confidence DPI              : 3 (flows)
-Num dissector calls: 45 (15.00 diss/flow)
+Num dissector calls: 12 (4.00 diss/flow)
 
 Google	22	2879	1
 Snapchat	34	7320	2

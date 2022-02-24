@@ -6,7 +6,7 @@ Confidence Unknown          : 14 (flows)
 Confidence Match by port    : 5 (flows)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 177 (flows)
-Num dissector calls: 5061 (25.69 diss/flow)
+Num dissector calls: 4718 (23.95 diss/flow)
 
 Unknown	24	6428	14
 DNS	2	378	1

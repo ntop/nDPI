@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	36	(7.20 pkts/flow)
 Confidence DPI              : 5 (flows)
-Num dissector calls: 217 (43.40 diss/flow)
+Num dissector calls: 150 (30.00 diss/flow)
 
 WorldOfWarcraft	95	10688	5
 

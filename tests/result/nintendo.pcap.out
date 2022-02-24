@@ -5,7 +5,7 @@ DPI Packets (UDP):	35	(2.33 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence Match by IP      : 6 (flows)
 Confidence DPI              : 15 (flows)
-Num dissector calls: 1295 (61.67 diss/flow)
+Num dissector calls: 1265 (60.24 diss/flow)
 
 ICMP	30	2100	2
 Nintendo	890	320242	12

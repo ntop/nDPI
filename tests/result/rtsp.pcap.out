@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	87	(12.43 pkts/flow)
 Confidence DPI              : 7 (flows)
-Num dissector calls: 256 (36.57 diss/flow)
+Num dissector calls: 82 (11.71 diss/flow)
 
 RTSP	568	100872	7
 

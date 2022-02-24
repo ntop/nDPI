@@ -97,7 +97,7 @@ void init_warcraft3_dissector(struct ndpi_detection_module_struct *ndpi_struct, 
   ndpi_set_bitmask_protocol_detection("Warcraft3", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_WARCRAFT3,
 				      ndpi_search_warcraft3,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

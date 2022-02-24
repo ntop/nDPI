@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	11	(11.00 pkts/flow)
 DPI Packets (UDP):	12	(1.00 pkts/flow)
 Confidence DPI              : 13 (flows)
-Num dissector calls: 31 (2.38 diss/flow)
+Num dissector calls: 17 (1.31 diss/flow)
 
 Kerberos	39	37272	13
 

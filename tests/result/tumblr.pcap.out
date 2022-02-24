@@ -3,7 +3,7 @@ Guessed flow protos:	32
 DPI Packets (TCP):	237	(5.04 pkts/flow)
 Confidence Match by port    : 28 (flows)
 Confidence DPI              : 19 (flows)
-Num dissector calls: 323 (6.87 diss/flow)
+Num dissector calls: 19 (0.40 diss/flow)
 
 Yahoo	31	9933	1
 Tumblr	1733	1208864	2

@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	10	(2.50 pkts/flow)
 Confidence DPI              : 4 (flows)
-Num dissector calls: 88 (22.00 diss/flow)
+Num dissector calls: 69 (17.25 diss/flow)
 
 AmazonAWS	9	2693	3
 MpegDash	4	1976	1

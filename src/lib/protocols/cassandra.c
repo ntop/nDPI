@@ -142,7 +142,7 @@ void init_cassandra_dissector(struct ndpi_detection_module_struct *ndpi_struct,
                                       *id,
                                       NDPI_PROTOCOL_CASSANDRA,
                                       ndpi_search_cassandra,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
 

@@ -4,7 +4,7 @@ DPI Packets (TCP):	43	(5.38 pkts/flow)
 DPI Packets (UDP):	3	(1.00 pkts/flow)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 10 (flows)
-Num dissector calls: 155 (14.09 diss/flow)
+Num dissector calls: 73 (6.64 diss/flow)
 
 SMBv1	1	252	1
 TLS	2028	1601908	4

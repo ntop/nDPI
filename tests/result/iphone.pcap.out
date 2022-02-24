@@ -5,7 +5,7 @@ DPI Packets (UDP):	55	(1.77 pkts/flow)
 DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence DPI              : 50 (flows)
-Num dissector calls: 562 (11.02 diss/flow)
+Num dissector calls: 397 (7.78 diss/flow)
 
 Unknown	2	120	1
 MDNS	17	7012	5

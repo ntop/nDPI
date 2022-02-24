@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	47	(11.75 pkts/flow)
 Confidence DPI (cache)      : 3 (flows)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 60 (15.00 diss/flow)
+Num dissector calls: 16 (4.00 diss/flow)
 
 DNScrypt	111	44676	4
 

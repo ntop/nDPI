@@ -4,7 +4,7 @@ DPI Packets (TCP):	8	(4.00 pkts/flow)
 DPI Packets (other):	6	(3.00 pkts/flow)
 Confidence Unknown          : 2 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 30 (7.50 diss/flow)
+Num dissector calls: 8 (2.00 diss/flow)
 
 Unknown	6	2200	2
 AJP	26	4446	2

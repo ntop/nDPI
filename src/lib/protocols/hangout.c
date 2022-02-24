@@ -129,7 +129,7 @@ void init_hangout_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   ndpi_set_bitmask_protocol_detection("GoogleHangout", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_HANGOUT_DUO,
 				      ndpi_search_hangout,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP, /* TODO: IPv6? */
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION, /* TODO: IPv6? */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

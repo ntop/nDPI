@@ -3,7 +3,7 @@ Guessed flow protos:	16
 DPI Packets (TCP):	224	(6.05 pkts/flow)
 Confidence Match by port    : 16 (flows)
 Confidence DPI              : 21 (flows)
-Num dissector calls: 333 (9.00 diss/flow)
+Num dissector calls: 21 (0.57 diss/flow)
 
 TLS	979	1924858	20
 Facebook	242	237988	2

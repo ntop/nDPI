@@ -165,11 +165,6 @@ static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if(payload_len == 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
-  
   /* Check if we so far detected the protocol in the request or not. */
   if(flow->edonkey_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "EDONKEY stage 0: \n");
@@ -218,7 +213,7 @@ void init_edonkey_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   ndpi_set_bitmask_protocol_detection("eDonkey", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_EDONKEY,
 				      ndpi_search_edonkey,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
