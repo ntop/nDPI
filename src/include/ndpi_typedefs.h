@@ -981,10 +981,8 @@ typedef struct ndpi_list_struct {
 
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
-  NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
 
   u_int32_t current_ts;
-  u_int32_t ticks_per_second;
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;
@@ -1025,8 +1023,6 @@ struct ndpi_detection_module_struct {
   /* misc parameters */
   u_int32_t tcp_max_retransmission_window_size;
 
-  u_int32_t directconnect_connection_ip_tick_timeout;
-
   /* subprotocol registration handler */
   struct ndpi_subprotocol_conf_struct subprotocol_conf[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
 
@@ -1054,13 +1050,6 @@ struct ndpi_detection_module_struct {
   /* IP-based protocol detection */
   void *protocols_ptree;
 
-  /* irc parameters */
-  u_int32_t irc_timeout;
-  /* gnutella parameters */
-  u_int32_t gnutella_timeout;
-  /* rstp */
-  u_int32_t jabber_stun_timeout;
-  u_int32_t jabber_file_transfer_timeout;
   u_int8_t ip_version_limit;
 
   /* NDPI_PROTOCOL_OOKLA */
