@@ -1439,7 +1439,9 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
   }
 
-  return(ndpi_dpi2json(ndpi_struct, flow, l7_protocol, serializer));
+  int res = ndpi_dpi2json(ndpi_struct, flow, l7_protocol, serializer);
+  ndpi_term_serializer(serializer);
+  return res;
 }
 
 /* ********************************** */
