@@ -1,6 +1,6 @@
 #/bin/sh
 
-cd "$(dirname "${0}")"
+cd "$(dirname "${0}")" || return
 
 ./aws_ip_addresses_download.sh
 ./azure_ip_addresses_download.sh
@@ -12,3 +12,5 @@ cd "$(dirname "${0}")"
 ./zoom_ip_addresses_download.sh
 ./google_cloud_ip_addresses_download.sh
 ./google_ip_addresses_download.sh
+
+./asn_update.sh
