@@ -1391,7 +1391,6 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************** */
 
-/* NOTE: serializer is initialized by the function */
 int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   struct ndpi_flow_struct *flow,
 		   u_int8_t ip_version,
@@ -1399,11 +1398,11 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   u_int32_t src_v4, u_int32_t dst_v4,
 		   struct ndpi_in6_addr *src_v6, struct ndpi_in6_addr *dst_v6,
 		   u_int16_t src_port, u_int16_t dst_port,
-		   ndpi_protocol l7_protocol,
-		   ndpi_serializer *serializer) {
+		   ndpi_protocol l7_protocol) {
   char src_name[32], dst_name[32];
 
-  if(ndpi_init_serializer(serializer, ndpi_serialization_format_json) == -1)
+  ndpi_serializer serializer;
+  if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == -1)
     return(-1);
 
   if(ip_version == 4) {
@@ -1416,31 +1415,31 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_patchIPv6Address(src_name), ndpi_patchIPv6Address(dst_name);
   }
 
-  ndpi_serialize_string_string(serializer, "src_ip", src_name);
-  ndpi_serialize_string_string(serializer, "dest_ip", dst_name);
-  if(src_port) ndpi_serialize_string_uint32(serializer, "src_port", src_port);
-  if(dst_port) ndpi_serialize_string_uint32(serializer, "dst_port", dst_port);
+  ndpi_serialize_string_string(&serializer, "src_ip", src_name);
+  ndpi_serialize_string_string(&serializer, "dest_ip", dst_name);
+  if(src_port) ndpi_serialize_string_uint32(&serializer, "src_port", src_port);
+  if(dst_port) ndpi_serialize_string_uint32(&serializer, "dst_port", dst_port);
 
   switch(l4_protocol) {
   case IPPROTO_TCP:
-    ndpi_serialize_string_string(serializer, "proto", "TCP");
+    ndpi_serialize_string_string(&serializer, "proto", "TCP");
     break;
 
   case IPPROTO_UDP:
-    ndpi_serialize_string_string(serializer, "proto", "UDP");
+    ndpi_serialize_string_string(&serializer, "proto", "UDP");
     break;
 
   case IPPROTO_ICMP:
-    ndpi_serialize_string_string(serializer, "proto", "ICMP");
+    ndpi_serialize_string_string(&serializer, "proto", "ICMP");
     break;
 
   default:
-    ndpi_serialize_string_uint32(serializer, "proto", l4_protocol);
+    ndpi_serialize_string_uint32(&serializer, "proto", l4_protocol);
     break;
   }
 
-  int res = ndpi_dpi2json(ndpi_struct, flow, l7_protocol, serializer);
-  ndpi_term_serializer(serializer);
+  int res = ndpi_dpi2json(ndpi_struct, flow, l7_protocol, &serializer);
+  ndpi_term_serializer(&serializer);
   return res;
 }
 
