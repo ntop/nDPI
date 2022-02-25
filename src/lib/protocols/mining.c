@@ -87,7 +87,8 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Check connection over TCP */
   if(packet->tcp && (packet->payload_packet_len > 10)) {
-    if(packet->tcp->source == htons(8333)) {
+    if(packet->tcp->source == htons(8333) ||
+       packet->tcp->dest == htons(8333)) {
       /*
 	Bitcoin
 	
