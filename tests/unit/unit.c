@@ -54,6 +54,7 @@
 
 #include "ndpi_config.h"
 #include "ndpi_api.h"
+#include "ndpi_define.h"
 
 #ifdef HAVE_LIBJSON_C
 #include "json.h" /* JSON-C */
@@ -138,12 +139,12 @@ int serializerUnitTest() {
 
     } else if (fmt == ndpi_serialization_format_csv) {
       if(verbose) {
-	u_int32_t buffer_len = 0;
-	char *buffer;
 
+	buffer_len = 0;
 	buffer = ndpi_serializer_get_header(&serializer, &buffer_len);
 	printf("%s\n", buffer);
 
+	buffer_len = 0;
 	buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
 	printf("%s\n", buffer);
       }
@@ -228,8 +229,96 @@ int serializerUnitTest() {
     ndpi_term_serializer(&serializer);
   }
 
-  printf("%s                      OK\n", __FUNCTION__);
+  printf("%30s                      OK\n", __FUNCTION__);
 #endif
+  return 0;
+}
+
+/* *********************************************** */
+
+int serializeProtoUnitTest(void)
+{
+#ifdef HAVE_LIBJSON_C
+  ndpi_serializer serializer;
+  int loop_id;
+  ndpi_serialization_format fmt = {0};
+  u_int32_t buffer_len;
+  char * buffer;
+
+  for(loop_id=0; loop_id<3; loop_id++) {
+    switch(loop_id) {
+    case 0:
+      if (verbose) printf("--- TLV test ---\n");
+      fmt = ndpi_serialization_format_tlv;
+      break;
+
+    case 1:
+      if (verbose) printf("--- JSON test ---\n");
+      fmt = ndpi_serialization_format_json;
+      break;
+
+    case 2:
+      if (verbose) printf("--- CSV test ---\n");
+      fmt = ndpi_serialization_format_csv;
+      break;
+    }
+    assert(ndpi_init_serializer(&serializer, fmt) != -1);
+
+    ndpi_protocol ndpi_proto = { .master_protocol = NDPI_PROTOCOL_TLS,
+                                 .app_protocol = NDPI_PROTOCOL_FACEBOOK,
+                                 .category = NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK };
+    ndpi_risk risks = 0;
+    NDPI_SET_BIT(risks, NDPI_MALFORMED_PACKET);
+    NDPI_SET_BIT(risks, NDPI_TLS_WEAK_CIPHER);
+    NDPI_SET_BIT(risks, NDPI_TLS_OBSOLETE_VERSION);
+    NDPI_SET_BIT(risks, NDPI_TLS_SELFSIGNED_CERTIFICATE);
+    ndpi_serialize_proto(ndpi_info_mod, &serializer, risks, NDPI_CONFIDENCE_DPI, ndpi_proto);
+
+    if (fmt == ndpi_serialization_format_json)
+    {
+      buffer_len = 0;
+      buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+      char const * const expected_json_str = "{\"ndpi\": {\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Certificate\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS Version (1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"4\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"breed\":\"Fun\",\"category\":\"SocialNetwork\"}}";
+
+      if (strncmp(buffer, expected_json_str, buffer_len) != 0)
+      {
+        printf("%s: ERROR: expected JSON str: \"%s\"\n", __FUNCTION__, expected_json_str);
+        printf("%s: ERROR: got JSON str: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+        return -1;
+      }
+
+      if(verbose)
+        printf("%s\n", buffer);
+
+      /* Decoding JSON to validate syntax */
+      enum json_tokener_error jerr = json_tokener_success;
+      json_object * const j = json_tokener_parse_verbose(buffer, &jerr);
+      if (j == NULL) {
+        printf("%s: ERROR (json validation failed)\n", __FUNCTION__);
+        return -1;
+      } else {
+        /* Validation ok */
+        json_object_put(j);
+      }
+    } else if (fmt == ndpi_serialization_format_csv)
+    {
+      if(verbose) {
+        buffer_len = 0;
+        buffer = ndpi_serializer_get_header(&serializer, &buffer_len);
+        printf("%s\n", buffer);
+
+        buffer_len = 0;
+        buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+        printf("%s\n", buffer);
+      }
+    }
+
+    ndpi_term_serializer(&serializer);
+  }
+
+  printf("%30s                      OK\n", __FUNCTION__);
+#endif
+
   return 0;
 }
 
@@ -262,6 +351,7 @@ int main(int argc, char **argv) {
     
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
+  if (serializeProtoUnitTest() != 0) return -1;
 
   return 0;
 }
