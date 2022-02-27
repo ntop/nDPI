@@ -2047,6 +2047,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	      tag_len = 1, stop = 1;
 	      break;
 	    default:
+	      if(offset + 1 >= header->caplen)
+	        return(nproto); /* Invalid packet */
 	      tag_len = packet[offset+1];
 	      break;
 	    }
