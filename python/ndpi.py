@@ -849,11 +849,8 @@ typedef struct ndpi_proto {
 
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
-  NDPI_PROTOCOL_BITMASK generic_http_packet_bitmask;
 
   uint32_t current_ts;
-
-  uint32_t ticks_per_second;
 
   uint16_t num_tls_blocks_to_follow;
 
@@ -881,8 +878,6 @@ struct ndpi_detection_module_struct {
   /* misc parameters */
   uint32_t tcp_max_retransmission_window_size;
 
-  uint32_t directconnect_connection_ip_tick_timeout;
-
   /* subprotocol registration handler */
   struct ndpi_subprotocol_conf_struct subprotocol_conf[250];
 
@@ -903,20 +898,7 @@ struct ndpi_detection_module_struct {
   /* IP-based protocol detection */
   void *protocols_ptree;
 
-  /* irc parameters */
-  uint32_t irc_timeout;
-  /* gnutella parameters */
-  uint32_t gnutella_timeout;
-  /* rstp */
-  uint32_t jabber_stun_timeout;
-  uint32_t jabber_file_transfer_timeout;
   uint8_t ip_version_limit;
-  /* NDPI_PROTOCOL_BITTORRENT */
-  struct hash_ip4p_table *bt_ht;
-  struct hash_ip4p_table *bt6_ht;
-  /* BT_ANNOUNCE */
-  struct bt_announce *bt_ann;
-  int    bt_ann_len;
 
   /* NDPI_PROTOCOL_OOKLA */
   struct ndpi_lru_cache *ookla_cache;

@@ -167,17 +167,6 @@
 #define MAX_PACKET_COUNTER                                   65000
 #define MAX_DEFAULT_PORTS                                        5
 
-#define NDPI_DIRECTCONNECT_CONNECTION_IP_TICK_TIMEOUT          600
-#define NDPI_IRC_CONNECTION_TIMEOUT                            120
-#define NDPI_GNUTELLA_CONNECTION_TIMEOUT                        60
-#define NDPI_BATTLEFIELD_CONNECTION_TIMEOUT                     60
-#define NDPI_THUNDER_CONNECTION_TIMEOUT                         30
-#define NDPI_TVANTS_CONNECTION_TIMEOUT                           5
-#define NDPI_ZATTOO_CONNECTION_TIMEOUT                         120
-#define NDPI_ZATTOO_FLASH_TIMEOUT                                5
-#define NDPI_JABBER_STUN_TIMEOUT                                30
-#define NDPI_JABBER_FT_TIMEOUT				         5
-
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
  #define NDPI_LOG(proto, m, log_level, args...)		                                 \
   {								                         \
