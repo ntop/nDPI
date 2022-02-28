@@ -2958,7 +2958,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	struct tm result;
 
 	if(live_capture) traffic_duration = processing_time_usec;
-	else traffic_duration = (pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - (pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
+	else traffic_duration = ((u_int64_t)pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - ((u_int64_t)pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
 
 	printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
 	if(traffic_duration != 0) {
@@ -3377,8 +3377,8 @@ static void ndpi_process_packet(u_char *args,
     u_int64_t processing_time_usec, setup_time_usec;
 
     gettimeofday(&end, NULL);
-    processing_time_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
-    setup_time_usec = begin.tv_sec*1000000 + begin.tv_usec - (startup_time.tv_sec*1000000 + startup_time.tv_usec);
+    processing_time_usec = (u_int64_t)end.tv_sec*1000000 + end.tv_usec - ((u_int64_t)begin.tv_sec*1000000 + begin.tv_usec);
+    setup_time_usec = (u_int64_t)begin.tv_sec*1000000 + begin.tv_usec - ((u_int64_t)startup_time.tv_sec*1000000 + startup_time.tv_usec);
 
     printResults(processing_time_usec, setup_time_usec);
 
@@ -3558,8 +3558,8 @@ void test_lib() {
 #endif
 
   gettimeofday(&end, NULL);
-  processing_time_usec = end.tv_sec*1000000 + end.tv_usec - (begin.tv_sec*1000000 + begin.tv_usec);
-  setup_time_usec = begin.tv_sec*1000000 + begin.tv_usec - (startup_time.tv_sec*1000000 + startup_time.tv_usec);
+  processing_time_usec = (u_int64_t)end.tv_sec*1000000 + end.tv_usec - ((u_int64_t)begin.tv_sec*1000000 + begin.tv_usec);
+  setup_time_usec = (u_int64_t)begin.tv_sec*1000000 + begin.tv_usec - ((u_int64_t)startup_time.tv_sec*1000000 + startup_time.tv_usec);
 
   /* Printing cumulative results */
   printResults(processing_time_usec, setup_time_usec);

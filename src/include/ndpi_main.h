@@ -25,6 +25,10 @@
 #define __NDPI_MAIN_H__
 
 #include "ndpi_includes.h"
+#ifdef NDPI_LIB_COMPILATION
+/* for macros NDPI_LOG_* in ndpi_define.h */
+#include "ndpi_config.h"
+#endif
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 #include "ndpi_typedefs.h"
