@@ -16,6 +16,7 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
+AC_ARG_WITH(libgcrypt,  AS_HELP_STRING([--with-libgcrypt], [Build with libgcritp (if prsent) instead of the enclosed gcryt light]))
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
@@ -237,6 +238,7 @@ AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
+AS_IF([test "${with_libgcrypt+set}" = set],[
 dnl> GCRYPT
 GCRYPT_ENABLED=1
 AC_ARG_ENABLE([gcrypt],
@@ -256,6 +258,7 @@ AS_IF([test ${GCRYPT_ENABLED} -eq 1], [
       GCRYPT_ENABLED=0
     fi
   fi
+])
 ])
 
 dnl> PCRE
