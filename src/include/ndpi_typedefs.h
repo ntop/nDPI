@@ -117,7 +117,8 @@ typedef enum {
   NDPI_PUNYCODE_IDN, /* https://en.wikipedia.org/wiki/Punycode */
   NDPI_ERROR_CODE_DETECTED,
   NDPI_HTTP_CRAWLER_BOT,
-  
+  NDPI_ANONYMOUS_SUBSCRIBER,
+
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -1040,6 +1041,7 @@ struct ndpi_detection_module_struct {
   ndpi_list *trusted_issuer_dn;
   
   void *ip_risk_mask_ptree;
+  void *ip_risk_ptree;
   
   struct {
     ndpi_automa hostnames, hostnames_shadow;
@@ -1175,7 +1177,7 @@ struct ndpi_flow_struct {
   char host_server_name[80];
 
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
-  u_int8_t risk_checked:1, ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, _notused:5;
+  u_int8_t risk_checked:1, ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:4;
   ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
   ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
 
@@ -1392,6 +1394,8 @@ typedef enum
     ndpi_dont_load_google_list     = (1 << 10),
     ndpi_dont_load_google_cloud_list = (1 << 11),
     ndpi_dont_load_asn_lists       = (1 << 12),
+    ndpi_dont_load_icloud_private_relay_list  = (1 << 13),
+    ndpi_dont_init_risk_ptree      = (1 << 14),
   } ndpi_prefs;
 
 typedef struct {

@@ -336,6 +336,7 @@ typedef enum {
   NDPI_PUNYCODE_IDN,
   NDPI_ERROR_CODE_DETECTED,
   NDPI_HTTP_CRAWLER_BOT,
+  NDPI_ANONYMOUS_SUBSCRIBER,
 
   /* Leave this as last member */
   NDPI_MAX_RISK

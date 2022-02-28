@@ -63,6 +63,7 @@
 #include "ndpi_ms_skype_teams_match.c.inc"
 #include "ndpi_google_match.c.inc"
 #include "ndpi_google_cloud_match.c.inc"
+#include "ndpi_icloud_private_relay_match.c.inc"
 #include "ndpi_asn_telegram.c.inc"
 #include "ndpi_asn_apple.c.inc"
 #include "ndpi_asn_twitter.c.inc"
@@ -138,6 +139,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_PUNYCODE_IDN,                          NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
   { NDPI_ERROR_CODE_DETECTED,                   NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
   { NDPI_HTTP_CRAWLER_BOT,                      NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
+  { NDPI_ANONYMOUS_SUBSCRIBER,                  NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
   
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
@@ -2051,6 +2053,23 @@ u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndp
 
 /* ******************************************* */
 
+ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
+					     struct in_addr *pin /* network byte order */) {
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
+
+  /* Make sure all in network byte order otherwise compares wont work */
+  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_ptree, &prefix);
+
+  if(node)
+    return((ndpi_risk_enum)node->value.u.uv32.user_value);
+
+  return(NDPI_NO_RISK);
+}
+
+/* ******************************************* */
+
 #if 0
 static u_int8_t tor_ptree_match(struct ndpi_detection_module_struct *ndpi_str, struct in_addr *pin) {
   return((ndpi_network_ptree_match(ndpi_str, pin) == NDPI_PROTOCOL_TOR) ? 1 : 0);
@@ -2151,6 +2170,10 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 
     pin.s_addr = htonl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL) {
+      /* Two main cases:
+         1) ip -> protocol: uv32.user_value = protocol; uv32.additional_user_value = 0;
+         2) ip -> risk: uv32.user_value = risk; uv32.additional_user_value = 0;
+      */
       node->value.u.uv32.user_value = host_list[i].value, node->value.u.uv32.additional_user_value = 0;
     }
   }
@@ -2446,6 +2469,14 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   }
 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
+
+  if(!(prefs & ndpi_dont_init_risk_ptree)) {
+    if((ndpi_str->ip_risk_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
+      if(!(prefs & ndpi_dont_load_icloud_private_relay_list)) {
+        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protocol_list);
+      }
+    }
+  }
 
   NDPI_BITMASK_RESET(ndpi_str->detection_bitmask);
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
@@ -2849,6 +2880,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->ip_risk_mask_ptree)
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree, free_ptree_data);
+
+    if(ndpi_str->ip_risk_ptree)
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree, free_ptree_data);
 
     if(ndpi_str->udpRoot != NULL)
       ndpi_tdestroy(ndpi_str->udpRoot, ndpi_free);
@@ -5891,6 +5925,27 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     }
 
     flow->risk_checked = 1;
+  }
+  if(!flow->tree_risk_checked) {
+    if(ndpi_str->ip_risk_ptree) {
+      /* TODO: ipv6 */
+      if(packet->iph &&
+         ndpi_is_public_ipv4(ntohl(packet->iph->saddr)) &&
+         ndpi_is_public_ipv4(ntohl(packet->iph->daddr))) {
+        struct in_addr addr;
+        ndpi_risk_enum net_risk;
+
+        addr.s_addr = packet->iph->saddr;
+        net_risk = ndpi_network_risk_ptree_match(ndpi_str, &addr);
+        if(net_risk == NDPI_NO_RISK) {
+          addr.s_addr = packet->iph->daddr;
+          net_risk = ndpi_network_risk_ptree_match(ndpi_str, &addr);
+        }
+        if(net_risk != NDPI_NO_RISK)
+          ndpi_set_risk(ndpi_str, flow, net_risk);
+      }
+    }
+    flow->tree_risk_checked = 1;
   }
 
   ndpi_reconcile_protocols(ndpi_str, flow, &ret);

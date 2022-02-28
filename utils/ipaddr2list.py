@@ -3,6 +3,8 @@
 import sys
 import socket, struct
 
+# This scripts is mainly used to create "ip -> protocols" lists.
+# However it is also used to create "ip -> risk" lists
 proto = "NDPI_PROTOCOL_XYX"
 if len (sys.argv) < 2 :
     print("Usage: ipaddr2list.py <file> <protocol>")
