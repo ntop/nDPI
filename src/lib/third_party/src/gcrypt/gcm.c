@@ -216,10 +216,10 @@ int mbedtls_gcm_setkey( mbedtls_gcm_context *ctx,
  */
 static const uint64_t last4[16] =
 {
-    0x0000UL << 48, 0x1c20UL << 48, 0x3840UL << 48, 0x2460UL << 48,
-    0x7080UL << 48, 0x6ca0UL << 48, 0x48c0UL << 48, 0x54e0UL << 48,
-    0xe100UL << 48, 0xfd20UL << 48, 0xd940UL << 48, 0xc560UL << 48,
-    0x9180UL << 48, 0x8da0UL << 48, 0xa9c0UL << 48, 0xb5e0UL << 48
+    0x0000ULL << 48, 0x1c20ULL << 48, 0x3840ULL << 48, 0x2460ULL << 48,
+    0x7080ULL << 48, 0x6ca0ULL << 48, 0x48c0ULL << 48, 0x54e0ULL << 48,
+    0xe100ULL << 48, 0xfd20ULL << 48, 0xd940ULL << 48, 0xc560ULL << 48,
+    0x9180ULL << 48, 0x8da0ULL << 48, 0xa9c0ULL << 48, 0xb5e0ULL << 48
 };
 
 /*
