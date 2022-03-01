@@ -2295,6 +2295,33 @@ float ndpi_entropy(u_int8_t const * const buf, size_t len) {
   return entropy;
 }
 
+/* ******************************************************************** */
+
+u_int16_t ndpi_calculate_icmp4_checksum(u_int8_t const * const buf, size_t len) {
+  u_int16_t const * sbuf = (u_int16_t *)buf;
+  u_int32_t checksum = 0;
+
+  /*
+   * The first two bytes of the icmp header are required.
+   * The next two bytes is the checksum, which we want to ignore.
+   */
+  checksum += *sbuf++; len -= 2; /* icmp->type, icmp->code */
+  sbuf++; len -= 2; /* icmp->checksum */
+
+  for (; len > 1; len -= 2) {
+    checksum += *sbuf++;
+  }
+
+  if (len == 1) {
+    checksum += *(u_int8_t *)sbuf;
+  }
+
+  checksum = (checksum >> 16) + (checksum & 0xFFFF);
+  checksum += (checksum >> 16);
+
+  return ~checksum;
+}
+
 /* ******************************************* */
 
 char* ndpi_get_flow_name(struct ndpi_flow_struct *flow) {

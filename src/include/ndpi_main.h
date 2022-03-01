@@ -151,6 +151,7 @@ extern "C" {
   int ndpi_is_printable_string(char * const str, size_t len);
 #define NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(entropy) (entropy > 7.0f)
   float ndpi_entropy(u_int8_t const * const buf, size_t len);
+  u_int16_t ndpi_calculate_icmp4_checksum(u_int8_t const * const buf, size_t len);
   void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str);
   u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 			    const char *alpn_to_check, u_int alpn_to_check_len);    
