@@ -51,7 +51,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11"]
         arch: ["x86_64"]
-        gcrypt: ["--disable-gcrypt", ""]
+        gcrypt: ["--with-libgcrypt", ""]
         compiler: ["default-cc"]
         pcre: [""]
         maxminddb: [""]
@@ -151,7 +151,7 @@ jobs:
           sudo apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe python3-pip
           sudo apt-get install rrdtool librrd-dev
       - name: Install Ubuntu Prerequisites (libgcrypt)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.gcrypt, '--disable-gcrypt')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.gcrypt, '--with-libgcrypt')
         run: |
           sudo apt-get install libgcrypt20-dev
       - name: Install Ubuntu Prerequisites (libpcre)
@@ -177,7 +177,7 @@ jobs:
           brew install coreutils
           brew install rrdtool
       - name: Install MacOS Prerequisites (libgcrypt)
-        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.gcrypt, '--disable-gcrypt')
+        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.gcrypt, '--with-libgcrypt')
         run: |
           brew install libgcrypt
       - name: Install MacOS Prerequisites (libpcre)

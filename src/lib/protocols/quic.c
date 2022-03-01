@@ -29,7 +29,6 @@
 #ifdef HAVE_LIBGCRYPT
 #include <gcrypt.h>
 #else
-#define HAVE_LIBGCRYPT 1
 #include <gcrypt_light.h>
 #endif
 
@@ -124,13 +123,11 @@ static uint8_t get_u8_quic_ver(uint32_t version)
 
   return 0;
 }
-#ifdef HAVE_LIBGCRYPT
 static int is_quic_ver_less_than(uint32_t version, uint8_t max_version)
 {
   uint8_t u8_ver = get_u8_quic_ver(version);
   return u8_ver && u8_ver <= max_version;
 }
-#endif
 static int is_quic_ver_greater_than(uint32_t version, uint8_t min_version)
 {
   return get_u8_quic_ver(version) >= min_version;
@@ -191,7 +188,6 @@ int is_version_with_ietf_long_header(uint32_t version)
     ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
     ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
 }
-#ifdef HAVE_LIBGCRYPT
 int is_version_with_v1_labels(uint32_t version)
 {
   if(((version & 0xFFFFFF00) == 0x51303500)  /* Q05X */ ||
@@ -199,7 +195,6 @@ int is_version_with_v1_labels(uint32_t version)
     return 1;
   return is_quic_ver_less_than(version, 33);
 }
-#endif
 
 int quic_len(const uint8_t *buf, uint64_t *value)
 {
@@ -246,21 +241,14 @@ static uint16_t gquic_get_u16(const uint8_t *buf, uint32_t version)
 }
 
 
-#if defined(HAVE_LIBGCRYPT)
-
 #ifdef DEBUG_CRYPT
 char *__gcry_err(gpg_error_t err, char *buf, size_t buflen)
 {
-#if defined(HAVE_LIBGPG_ERROR) || defined(LIBGCRYPT_INTERNAL)
   gpg_strerror_r(err, buf, buflen);
   /* I am not sure if the string will be always null-terminated...
      Better safe than sorry */
   if(buflen > 0)
     buf[buflen - 1] = '\0';
-#else
-  if(buflen > 0)
-    buf[0] = '\0';
-#endif
   return buf;
 }
 #endif /* DEBUG_CRYPT */
@@ -1036,8 +1024,6 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   return NULL;
 }
 
-#endif /* HAVE_LIBGCRYPT */
-
 
 static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
                         uint64_t frag_len, uint64_t frag_offset,
@@ -1271,9 +1257,7 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t *clear_payload;
   u_int8_t dest_conn_id_len;
-#ifdef HAVE_LIBGCRYPT
   u_int8_t source_conn_id_len;
-#endif
 
   if(is_gquic_ver_less_than(version, 43)) {
     clear_payload = (uint8_t *)&packet->payload[26];
@@ -1300,16 +1284,12 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
 		   version, dest_conn_id_len);
       return NULL;
     }
-#ifdef HAVE_LIBGCRYPT
     source_conn_id_len = packet->payload[6 + dest_conn_id_len];
     const u_int8_t *dest_conn_id = &packet->payload[6];
     clear_payload = decrypt_initial_packet(ndpi_struct, flow,
 					   dest_conn_id, dest_conn_id_len,
 					   source_conn_id_len, version,
 					   clear_payload_len);
-#else
-    clear_payload = NULL;
-#endif
   }
 
   return clear_payload;
