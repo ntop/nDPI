@@ -16,7 +16,7 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
-AC_ARG_WITH(libgcrypt,  AS_HELP_STRING([--with-libgcrypt], [Build with libgcritp (if prsent) instead of the enclosed gcryt light]))
+AC_ARG_WITH(libgcrypt,  AS_HELP_STRING([--with-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
