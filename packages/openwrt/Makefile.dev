@@ -27,8 +27,8 @@ PKG_BUILD_PARALLEL:=1
 include $(INCLUDE_DIR)/uclibc++.mk
 include $(INCLUDE_DIR)/package.mk
 
-ifeq ($(CONFIG_LIBNDPI_GCRYPT),)
-CONFIGURE_ARGS += --disable-gcrypt
+ifneq ($(CONFIG_LIBNDPI_GCRYPT),)
+CONFIGURE_ARGS += --with-local-libgcrypt
 endif
 
 define Package/libndpi
@@ -46,11 +46,12 @@ endef
 
 define Package/libndpi/config
 config LIBNDPI_GCRYPT
-	bool "GCrypt support"
+	bool "Use external libgcrypt"
 	depends on PACKAGE_libndpi
 	default n
 	help
-	  This option enables QUIC client hello decryption.
+	  This option enables QUIC client hello decryption through
+	  an external libgcrypt instead of a lightweight builtin version.
 	  Disabled by default.
 endef
 

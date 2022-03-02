@@ -16,7 +16,7 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
-AC_ARG_WITH(libgcrypt,  AS_HELP_STRING([--with-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
+AC_ARG_WITH(local-libgcrypt,  AS_HELP_STRING([--with-local-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
@@ -238,27 +238,20 @@ AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
-AS_IF([test "${with_libgcrypt+set}" = set],[
-dnl> GCRYPT
-GCRYPT_ENABLED=1
-AC_ARG_ENABLE([gcrypt],
-  [AS_HELP_STRING([--disable-gcrypt], [Avoid compiling with libgcrypt/libgpg-error, even if they are present. QUIC sub-classification may be missing])],
-  [GCRYPT_ENABLED=0],
-  [AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)])
-AS_IF([test ${GCRYPT_ENABLED} -eq 1], [
+dnl> libgcrypt (external)
+USE_HOST_LIBGCRYPT=0
+AS_IF([test "${with_local_libgcrypt+set}" = set],[
+  USE_HOST_LIBGCRYPT=1
+  AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
   if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes; then :
     ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt"
   else
     $as_unset ac_cv_lib_gcrypt_gcry_cipher_checktag
-    AC_CHECK_LIB(gpg-error, gpg_strerror_r)
-    AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
-    if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes -a "x$ac_cv_lib_gpg_error_gpg_strerror_r" = xyes; then :
-      ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
-    else
-      GCRYPT_ENABLED=0
-    fi
+    AC_CHECK_LIB(gpg-error, gpg_strerror_r, [], AC_MSG_ERROR([libgpg-error required (because of --with-local-libgcrypt) but not found or too old.]))
+    AC_CHECK_LIB(gcrypt, gcry_cipher_checktag, [], AC_MSG_ERROR([libgcrypt required (because of --with-local-libgcrypt) but not found or too old.]))
+    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
   fi
-])
+  AC_DEFINE_UNQUOTED(USE_HOST_LIBGCRYPT, 1, [Use locally installed libgcrypt instead of builtin gcrypt-light])
 ])
 
 dnl> PCRE
@@ -314,6 +307,6 @@ AC_SUBST(BUILD_MINGW_X64)
 AC_SUBST(BUILD_FUZZTARGETS)
 AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
-AC_SUBST(GCRYPT_ENABLED)
+AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE_ENABLED)
 AC_OUTPUT
