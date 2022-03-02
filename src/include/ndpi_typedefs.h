@@ -638,9 +638,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_packet_id;
 
-  /* NDPI_PROTOCOL_CITRIX */
-  u_int8_t citrix_packet_id;
-
   /* NDPI_PROTOCOL_LOTUS_NOTES */
   u_int8_t lotus_notes_packet_id;
 

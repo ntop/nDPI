@@ -35,40 +35,26 @@ static void ndpi_check_citrix(struct ndpi_detection_module_struct *ndpi_struct, 
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if(packet->tcp != NULL) {
-    flow->l4.tcp.citrix_packet_id++;
-    
-    if((flow->l4.tcp.citrix_packet_id == 3)
-       /* We have seen the 3-way handshake */
-       && flow->l4.tcp.seen_syn
-       && flow->l4.tcp.seen_syn_ack
-       && flow->l4.tcp.seen_ack) {
-      if(payload_len == 6) {
-	char citrix_header[] = { 0x07, 0x07, 0x49, 0x43, 0x41, 0x00 };
-	
-	if(memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0) {
-	  NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	}
-	return;
-      } else if(payload_len > 22) {
-	char citrix_header[] = { 0x1a, 0x43, 0x47, 0x50, 0x2f, 0x30, 0x31 };
-	
-	if((memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0)
-	   || (ndpi_strnstr((const char *)packet->payload, "Citrix.TcpProxyService", payload_len) != NULL)) {
-	  NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	}
-	return;	
-      }
-      
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    } else if(flow->l4.tcp.citrix_packet_id > 3) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  if(payload_len == 6) {
+    char citrix_header[] = { 0x7F, 0x7F, 0x49, 0x43, 0x41, 0x00 };
+
+    if(memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0) {
+      NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      return;
     }
-    
-    return;
+  } else if(payload_len > 22) {
+    char citrix_header[] = { 0x1a, 0x43, 0x47, 0x50, 0x2f, 0x30, 0x31 };
+
+    if((memcmp(packet->payload, citrix_header, sizeof(citrix_header)) == 0)
+       || (ndpi_strnstr((const char *)packet->payload, "Citrix.TcpProxyService", payload_len) != NULL)) {
+      NDPI_LOG_INFO(ndpi_struct, "found citrix\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CITRIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      return;
+    }
   }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void ndpi_search_citrix(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

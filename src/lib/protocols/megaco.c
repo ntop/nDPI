@@ -34,7 +34,8 @@ void ndpi_search_megaco(struct ndpi_detection_module_struct *ndpi_struct,
   
   if(packet->udp != NULL) {
     if((packet->payload_packet_len > 4 && packet->payload[0] == '!' && packet->payload[1] == '/' &&
-        packet->payload[2] == '1' && packet->payload[3] == ' ' && packet->payload[4] == '[')
+        packet->payload[2] == '1' && packet->payload[3] == ' ' &&
+        (packet->payload[4] == '[' || packet->payload[4] == '<'))
        || (packet->payload_packet_len > 9 && packet->payload[0] == 'M' && packet->payload[1] == 'E' &&
         packet->payload[2] == 'G' && packet->payload[3] == 'A' && packet->payload[4] == 'C' &&
         packet->payload[5] == 'O' && packet->payload[6] == '/' &&

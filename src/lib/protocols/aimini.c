@@ -227,8 +227,10 @@ void ndpi_search_aimini(struct ndpi_detection_module_struct *ndpi_struct, struct
 		{
 			if ((LINE_STARTS(packet->http_url_name, "/download/") == 1 ||
 			     LINE_STARTS(packet->http_url_name, "/player/") == 1 ||
+			     LINE_STARTS(packet->http_url_name, "/webcounter/") == 1 ||
 			     LINE_STARTS(packet->http_url_name, "/play/") == 1 ||
-                 LINE_STARTS(packet->http_url_name, "/member/") == 1) &&
+			     LINE_STARTS(packet->http_url_name, "/search/") == 1 ||
+		             LINE_STARTS(packet->http_url_name, "/member/") == 1) &&
 			    (LINE_ENDS(packet->host_line, ".aimini.net") == 1 ||
                  LINE_ENDS(packet->host_line, ".aimini.com") == 1))
 			{
