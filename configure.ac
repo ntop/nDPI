@@ -17,6 +17,7 @@ AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with suppor
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
 AC_ARG_WITH(local-libgcrypt,  AS_HELP_STRING([--with-local-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
+AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
@@ -26,7 +27,7 @@ AS_IF([test "${with_sanitizer+set}" = set],[
   LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak"
 ])
 
-AS_IF([test "x$enable_code_coverage" = "xyes"],[
+AS_IF([test "x${enable_code_coverage}" = "xyes"],[
   CFLAGS="${CFLAGS} -fprofile-arcs -ftest-coverage"
   LDFLAGS="${LDFLAGS} --coverage"
 ])
@@ -109,6 +110,11 @@ if ! test "${with_only_libndpi+set}" = set; then :
         EXTRA_TARGETS=""
     ])
 fi
+
+HANDLE_TLS_SIGS="//"
+AS_IF([test "x${enable_tls_sigs}" = "xyes"],[
+  HANDLE_TLS_SIGS=""
+])
 
 LIBS="$LIBS $JSONC_LIBS"
 CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function $CFLAGS $JSONC_CFLAGS"
@@ -309,4 +315,5 @@ AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
 AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE_ENABLED)
+AC_SUBST(HANDLE_TLS_SIGS)
 AC_OUTPUT
