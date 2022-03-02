@@ -848,6 +848,13 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
     ndpi_str->skip_tls_blocks_until_change_cipher = 1;
     break;
 
+  case ndpi_pref_max_packets_to_process:
+    if (value > 0xFFFF) {
+      return(-1);
+    }
+    ndpi_str->max_packets_to_process = value;
+    break;
+
   default:
     return(-1);
   }
@@ -2477,6 +2484,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       }
     }
   }
+
+  ndpi_str->max_packets_to_process = NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT;
 
   NDPI_BITMASK_RESET(ndpi_str->detection_bitmask);
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
@@ -5756,10 +5765,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     return(ret);
   }
 
-  flow->num_processed_pkts++;
-
-  if(flow->num_processed_pkts > NDPI_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT)
+  if(ndpi_str->max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->max_packets_to_process)
     return(ret); /* Avoid spending too much time with this flow */
+
+  flow->num_processed_pkts++;
 
   /* Init default */
   ret.master_protocol = flow->detected_protocol_stack[1],
