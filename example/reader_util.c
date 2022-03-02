@@ -1837,6 +1837,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
   case ETH_P_MPLS_UNI:
   case ETH_P_MPLS_MULTI:
+    if(ip_offset+4 >= (int)header->caplen)
+      return(nproto);
     mpls.u32 = *((uint32_t *) &packet[ip_offset]);
     mpls.u32 = ntohl(mpls.u32);
     workflow->stats.mpls_count++;
