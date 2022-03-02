@@ -45,25 +45,25 @@ TLS/QUIC only: this risk is triggered when a `self-signed certificate <https://e
 
 NDPI_TLS_OBSOLETE_VERSION
 =========================
-Risk 0triggered when TLS version is older than 1.1.
+Risk triggered when TLS version is older than 1.1.
 
 .. _Risk 008:
 
 NDPI_TLS_WEAK_CIPHER
 ====================
-Risk 0triggered when an unsafe TLS cipher is used. See `this page <https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites>`_ for a list of insecure ciphers.
+Risk triggered when an unsafe TLS cipher is used. See `this page <https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites>`_ for a list of insecure ciphers.
 
 .. _Risk 009:
 
 NDPI_TLS_CERTIFICATE_EXPIRED
 ============================
-Risk 0triggered when a TLS certificate is expired, i.e. the current date falls outside of the certificate validity dates.
+Risk triggered when a TLS certificate is expired, i.e. the current date falls outside of the certificate validity dates.
 
 .. _Risk 010:
 
 NDPI_TLS_CERTIFICATE_MISMATCH
 =============================
-Risk 0triggered when a TLS certificate does not match the hostname we're accessing. Example you do http://www.aaa.com and the TLS certificate returned is for www.bbb.com.
+Risk triggered when a TLS certificate does not match the hostname we're accessing. Example you do http://www.aaa.com and the TLS certificate returned is for www.bbb.com.
 
 .. _Risk 011:
 
