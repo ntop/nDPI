@@ -32,11 +32,10 @@
 #include "ahocorasick.h"
 #include "libcache.h"
 
-#ifdef HAVE_LIBGCRYPT
+#ifdef USE_HOST_LIBGCRYPT
 #include <gcrypt.h>
 #else
 #include <gcrypt_light.h>
-#define HAVE_LIBGCRYPT 1
 #endif
 
 #include <time.h>
@@ -2420,7 +2419,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   if(prefs & ndpi_enable_ja3_plus)
     ndpi_str->enable_ja3_plus = 1;
 
-#ifdef HAVE_LIBGCRYPT
   if(!(prefs & ndpi_dont_init_libgcrypt)) {
     if(!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
       const char *gcrypt_ver = gcry_check_version(NULL);
@@ -2436,7 +2434,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   } else {
     NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
   }
-#endif
 
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
@@ -7554,10 +7551,7 @@ u_int16_t ndpi_get_api_version() {
 }
 
 const char *ndpi_get_gcrypt_version(void) {
-#ifdef HAVE_LIBGCRYPT
   return gcry_check_version(NULL);
-#endif
-  return NULL;
 }
 
 ndpi_proto_defaults_t *ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_str) {

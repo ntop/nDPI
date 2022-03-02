@@ -25,6 +25,12 @@ NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so
 NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE).@NDPI_VERSION_SHORT@
 NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
+USE_HOST_LIBGCRYPT   = @USE_HOST_LIBGCRYPT@
+
+ifneq ($(USE_HOST_LIBGCRYPT),0)
+TMP_OBJS := $(OBJECTS)
+OBJECTS   = $(filter-out third_party/src/gcrypt_light.o,$(TMP_OBJS))
+endif
 
 ifneq ($(OS),Windows_NT)
 OS := $(shell uname)
