@@ -248,15 +248,9 @@ dnl> libgcrypt (external)
 USE_HOST_LIBGCRYPT=0
 AS_IF([test "${with_local_libgcrypt+set}" = set],[
   USE_HOST_LIBGCRYPT=1
-  AC_CHECK_LIB(gcrypt, gcry_cipher_checktag)
-  if test "x$ac_cv_lib_gcrypt_gcry_cipher_checktag" = xyes; then :
-    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt"
-  else
-    $as_unset ac_cv_lib_gcrypt_gcry_cipher_checktag
-    AC_CHECK_LIB(gpg-error, gpg_strerror_r, [], AC_MSG_ERROR([libgpg-error required (because of --with-local-libgcrypt) but not found or too old.]))
-    AC_CHECK_LIB(gcrypt, gcry_cipher_checktag, [], AC_MSG_ERROR([libgcrypt required (because of --with-local-libgcrypt) but not found or too old.]))
-    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
-  fi
+  AC_CHECK_LIB(gpg-error, gpg_strerror_r, [], AC_MSG_ERROR([libgpg-error required (because of --with-local-libgcrypt) but not found or too old.]))
+  AC_CHECK_LIB(gcrypt, gcry_cipher_checktag, [], AC_MSG_ERROR([libgcrypt required (because of --with-local-libgcrypt) but not found or too old.]))
+  ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lgcrypt -lgpg-error"
   AC_DEFINE_UNQUOTED(USE_HOST_LIBGCRYPT, 1, [Use locally installed libgcrypt instead of builtin gcrypt-light])
 ])
 
