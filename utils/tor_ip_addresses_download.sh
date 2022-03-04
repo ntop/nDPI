@@ -11,11 +11,11 @@ LIST=/tmp/tor.list
 ORIGIN="https://check.torproject.org/torbulkexitlist"
 
 
-echo "(1) Downloading file..."
+echo "(1) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
 if [ $http_response != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
-    return
+    return 1
 fi
 
 echo "(2) Processing IP addresses..."
@@ -23,6 +23,4 @@ echo "(2) Processing IP addresses..."
 rm -f $LIST
 
 echo "(3) TOR IPs are available in $DEST"
-
-
-
+return 0

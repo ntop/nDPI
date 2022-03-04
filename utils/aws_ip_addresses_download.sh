@@ -12,7 +12,7 @@ echo "(1) Downloading file..."
 http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
 if [ $http_response != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
-    return
+    return 1
 fi
 
 echo "(2) Processing IP addresses..."
@@ -21,3 +21,4 @@ jq -r '.prefixes | .[].ip_prefix' $TMP > $LIST # TODO: ipv6
 rm -f $TMP $LIST
 
 echo "(3) Amazon AWS IPs are available in $DEST"
+return 0

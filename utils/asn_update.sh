@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function processing_list() {
 	local LIST_MERGED="/tmp/list_m"
 
