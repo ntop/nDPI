@@ -94,9 +94,9 @@
 
 #elif defined(__BIG_ENDIAN__) || defined(__BIG_ENDIAN) 
 
-#define MBEDTLS_GET_UINT32_LE(b,i)    htonl(*(uint32_t *) (&(b)[(i)]))
+#define MBEDTLS_GET_UINT32_LE(b,i)    bswap_32(*(uint32_t *) (&(b)[(i)]))
 #define MBEDTLS_GET_UINT32_BE(b,i)   (*(uint32_t *) (&(b)[(i)]))
-#define MBEDTLS_PUT_UINT32_LE(n,b,i)  *(uint32_t *) (&(b)[(i)]) = htonl(n);
+#define MBEDTLS_PUT_UINT32_LE(n,b,i)  *(uint32_t *) (&(b)[(i)]) = bswap_32(n);
 #define MBEDTLS_PUT_UINT64_BE(n,b,i)  *(uint64_t *) (&(b)[(i)]) = (n);
 
 #else
