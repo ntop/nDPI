@@ -42,24 +42,6 @@ static int aes_setkey_enc_wrap( void *ctx, const unsigned char *key,
     return mbedtls_aes_setkey_enc( (mbedtls_aes_context *) ctx, key, key_bitlen );
 }
 
-static void * aes_ctx_alloc( void )
-{
-    mbedtls_aes_context *aes = mbedtls_calloc( 1, sizeof( mbedtls_aes_context ) );
-
-    if( aes == NULL )
-        return( NULL );
-
-    mbedtls_aes_init( aes );
-
-    return( aes );
-}
-
-static void aes_ctx_free( void *ctx )
-{
-    mbedtls_aes_free( (mbedtls_aes_context *) ctx );
-    mbedtls_free( ctx );
-}
-
 static void aes_ctx_zero( void *ctx )
 {
     mbedtls_aes_init( (mbedtls_aes_context *) ctx );

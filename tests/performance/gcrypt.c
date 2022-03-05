@@ -145,6 +145,7 @@ do {
 static void single_encryption2(void) {
     gcry_cipher_hd_t handle2;
     uint8_t de2_out[sizeof de2_src];
+    gcry_error_t err;
 
 do {
     err = gcry_cipher_open (&handle2, GCRY_CIPHER_AES128, GCRY_CIPHER_MODE_GCM,0);
