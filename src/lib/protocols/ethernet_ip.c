@@ -44,7 +44,7 @@ void ndpi_search_ethernet_ip(struct ndpi_detection_module_struct *ndpi_struct,
       u_int16_t eth_ip_port = ntohs(44818);
 
       if((packet->tcp->source == eth_ip_port) || (packet->tcp->dest == eth_ip_port)) {
-	u_int16_t len = *((u_int16_t*)&packet->payload[2]); /* Little endian */
+	u_int16_t len = le16toh(*((u_int16_t *)&packet->payload[2])); /* Little endian */
 	
 	if((len+24) == packet->payload_packet_len) {	
 	  NDPI_LOG_INFO(ndpi_struct, "found ethernet_ip\n");
