@@ -12,7 +12,7 @@ LINK_ORIGIN="https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519
 
 echo "(1) Downloading file... ${LINK_ORIGIN}"
 http_response=$(curl -s -o ${LINK_TMP} -w "%{http_code}" ${LINK_ORIGIN})
-if [ $http_response != "200" ]; then
+if [ "${http_response}" != "200" ]; then
     echo "Error $http_response: you probably need to update the link origin url!"
     return
 fi
@@ -26,7 +26,7 @@ fi
 
 echo "(2) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
-if [ $http_response != "200" ]; then
+if [ "${http_response}" != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
     return
 fi
