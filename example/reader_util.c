@@ -544,6 +544,13 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow) {
   ndpi_free(workflow);
 }
 
+static inline int cmp_n32(uint32_t a,uint32_t b) {
+	return a == b ? 0 : ntohl(a) < ntohl(b) ? -1:1;
+}
+static inline int cmp_n16(uint16_t a,uint16_t b) {
+	return a == b ? 0 : ntohs(a) < ntohs(b) ? -1:1;
+}
+
 /* ***************************************************** */
 
 int ndpi_workflow_node_cmp(const void *a, const void *b) {
@@ -557,29 +564,13 @@ int ndpi_workflow_node_cmp(const void *a, const void *b) {
   if(fa->vlan_id   < fb->vlan_id   ) return(-1); else { if(fa->vlan_id    > fb->vlan_id   ) return(1); }
   if(fa->protocol  < fb->protocol  ) return(-1); else { if(fa->protocol   > fb->protocol  ) return(1); }
 
-  if(
-     (
-      (fa->src_ip      == fb->src_ip  )
-      && (fa->src_port == fb->src_port)
-      && (fa->dst_ip   == fb->dst_ip  )
-      && (fa->dst_port == fb->dst_port)
-      )
-     ||
-     (
-      (fa->src_ip      == fb->dst_ip  )
-      && (fa->src_port == fb->dst_port)
-      && (fa->dst_ip   == fb->src_ip  )
-      && (fa->dst_port == fb->src_port)
-      )
-     )
-    return(0);
+  int r;
+  r = cmp_n32(fa->src_ip, fb->src_ip); if(r) return r;
+  r = cmp_n16(fa->src_port, fb->src_port) ; if(r) return r;
+  r = cmp_n32(fa->dst_ip, fb->dst_ip); if(r) return r;
+  r = cmp_n16(fa->dst_port, fb->dst_port);
 
-  if(fa->src_ip   < fb->src_ip  ) return(-1); else { if(fa->src_ip   > fb->src_ip  ) return(1); }
-  if(fa->src_port < fb->src_port) return(-1); else { if(fa->src_port > fb->src_port) return(1); }
-  if(fa->dst_ip   < fb->dst_ip  ) return(-1); else { if(fa->dst_ip   > fb->dst_ip  ) return(1); }
-  if(fa->dst_port < fb->dst_port) return(-1); else { if(fa->dst_port > fb->dst_port) return(1); }
-
-  return(0); /* notreached */
+  return(r);
 }
 
 /* ***************************************************** */
@@ -789,11 +780,17 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   flow.protocol = iph->protocol, flow.vlan_id = vlan_id;
   flow.src_ip = iph->saddr, flow.dst_ip = iph->daddr;
   flow.src_port = htons(*sport), flow.dst_port = htons(*dport);
-  flow.hashval = hashval = flow.protocol + flow.src_ip + flow.dst_ip + flow.src_port + flow.dst_port;
+  flow.hashval = hashval = flow.protocol + ntohl(flow.src_ip) + ntohl(flow.dst_ip) 
+	  + ntohs(flow.src_port) + ntohs(flow.dst_port);
 
 #if 0
-  printf("hashval=%u [%u][%u][%u:%u][%u:%u]\n", hashval, flow.protocol, flow.vlan_id,
-	 flow.src_ip, flow.src_port, ntohs(flow.dst_ip), ntohs(flow.dst_port));
+  {
+  char ip1[48],ip2[48];
+       inet_ntop(AF_INET, &flow.src_ip, ip1, sizeof(ip1));
+       inet_ntop(AF_INET, &flow.dst_ip, ip2, sizeof(ip2));
+  printf("hashval=%u [%u][%u][%s:%u][%s:%u]\n", hashval, flow.protocol, flow.vlan_id,
+        ip1, ntohs(flow.src_port),  ip2, ntohs(flow.dst_port));
+  }
 #endif
 
   idx = hashval % workflow->prefs.num_roots;
@@ -905,24 +902,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     struct ndpi_flow_info *rflow = *(struct ndpi_flow_info**)ret;
 
     if(is_changed) {
-      if(rflow->src_ip == iph->saddr
-	 && rflow->dst_ip == iph->daddr
-	 && rflow->src_port == htons(*sport)
-	 && rflow->dst_port == htons(*dport)
-	 )
-	*src_to_dst_direction = 0, rflow->bidirectional = 1;
-      else
-	*src_to_dst_direction = 1;
+	*src_to_dst_direction = 0, rflow->bidirectional |= 1;
     }
     else {
-      if(rflow->src_ip == iph->saddr
-	 && rflow->dst_ip == iph->daddr
-	 && rflow->src_port == htons(*sport)
-	 && rflow->dst_port == htons(*dport)
-	 )
 	*src_to_dst_direction = 1;
-      else
-	*src_to_dst_direction = 0, rflow->bidirectional = 1;
     }
     if(enable_flow_stats) {
       if(src_to_dst_direction) {

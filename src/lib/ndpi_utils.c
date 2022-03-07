@@ -2300,24 +2300,26 @@ float ndpi_entropy(u_int8_t const * const buf, size_t len) {
 }
 
 /* ******************************************************************** */
+static inline uint16_t get_n16bit(uint8_t const * cbuf) {
+  uint16_t r = ((uint16_t)cbuf[0]) | (((uint16_t)cbuf[1]) << 8);
+  return r;
+}
 
-u_int16_t ndpi_calculate_icmp4_checksum(u_int8_t const * const buf, size_t len) {
-  u_int16_t const * sbuf = (u_int16_t *)buf;
+u_int16_t ndpi_calculate_icmp4_checksum(const u_int8_t * buf, size_t len) {
   u_int32_t checksum = 0;
 
   /*
    * The first two bytes of the icmp header are required.
    * The next two bytes is the checksum, which we want to ignore.
    */
-  checksum += *sbuf++; len -= 2; /* icmp->type, icmp->code */
-  sbuf++; len -= 2; /* icmp->checksum */
 
   for (; len > 1; len -= 2) {
-    checksum += *sbuf++;
+    checksum += get_n16bit(buf);
+    buf += 2;
   }
 
   if (len == 1) {
-    checksum += *(u_int8_t *)sbuf;
+    checksum += *buf;
   }
 
   checksum = (checksum >> 16) + (checksum & 0xFFFF);

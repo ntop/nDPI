@@ -3064,9 +3064,8 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	      ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_ENTROPY);
 	    }
 
-	    struct ndpi_icmphdr * const icmphdr = (struct ndpi_icmphdr *)packet->payload;
 	    u_int16_t chksm = ndpi_calculate_icmp4_checksum(packet->payload, packet->payload_packet_len);
-	    if (icmphdr->checksum != chksm) {
+	    if (chksm) {
 	      ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET);
 	    }
 	  }
