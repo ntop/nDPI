@@ -59,7 +59,7 @@ TargusDataspeed	2	116	2
 DNP3	2	116	2
 iSCSI	2	116	2
 
-	1	TCP 172.16.0.8:36050 -> 64.13.134.52:22 [proto: 92/SSH][Encrypted][Confidence: Match by port][cat: RemoteAccess/12][5 pkts/298 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][21.68 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 172.16.0.8:36050 <-> 64.13.134.52:22 [proto: 92/SSH][Encrypted][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.68 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 172.16.0.8:36050 <-> 64.13.134.52:53 [proto: 5/DNS][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.09 sec][::][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 172.16.0.8:36050 <-> 64.13.134.52:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.27 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	TCP 172.16.0.8:36050 <-> 64.13.134.52:25 [proto: 3/SMTP][ClearText][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.06 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

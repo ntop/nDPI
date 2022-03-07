@@ -18,8 +18,8 @@ Instagram	3062	2617399	22
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
-	1	 192.168.2.17             	 2      
-	2	 192.168.0.103            	 1      
+	1	 192.168.0.103            	 1      
+	2	 192.168.2.17             	 2      
 
 
 	1	TCP 192.168.2.17:49355 <-> 31.13.86.52:443 [proto: 91.211/TLS.Instagram][Encrypted][Confidence: DPI][cat: SocialNetwork/6][456 pkts/33086 bytes <-> 910 pkts/1277296 bytes][Goodput ratio: 9/95][14.29 sec][Hostname/SNI: scontent-mxp1-1.cdninstagram.com][ALPN: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.3 (Fizz)][bytes ratio: -0.950 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 38/1 10107/274 547/12][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 73/1404 657/1454 57/231][Risk: ** Possibly Malicious JA3 Fingerprint **][Risk Score: 50][TLSv1.3 (Fizz)][JA3C: 7a29c223fb122ec64d10f0a159e07996][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,98,0,0,0,0]
