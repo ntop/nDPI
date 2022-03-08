@@ -177,13 +177,25 @@ jobs:
           msystem: MINGW64
           update: true
           install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre
-      - name: Setup Windows prerequisites (with libgcrypt)
+      - name: Setup Windows prerequisites (libgcrypt)
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libgcrypt
+        run: |
+          msys2 -c 'git clone --branch libgpg-error-1.42 https://github.com/gpg/libgpg-error'
+          cd libgpg-error
+          msys2 -c './autogen.sh'
+          msys2 -c './configure -enable-maintainer-mode --enable-static --enable-shared --with-pic --disable-doc --disable-nls'
+          msys2 -c 'make'
+          msys2 -c 'make install'
+          msys2 -c 'cd ..'
+          msys2 -c 'rm -rf libgpg-error/'
+          msys2 -c 'git clone --branch libgcrypt-1.8.8 https://github.com/gpg/libgcrypt'
+          cd libgcrypt
+          msys2 -c './autogen.sh'
+          msys2 -c './configure -enable-maintainer-mode --enable-static --enable-shared --with-pic --disable-doc'
+          msys2 -c 'make'
+          msys2 -c 'make install'
+          msys2 -c 'cd ..'
+          msys2 -c 'rm -rf libgcrypt/'
       - name: Installing MacOS prerequisites
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64')
         run: |
