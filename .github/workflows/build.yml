@@ -170,7 +170,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang')
         run: |
           sudo apt-get install ${{ matrix.compiler }}
-      - name: Set up MSYS2
+      - name: Setup Windows prerequisites
         if: startsWith(matrix.os, 'windows')
         uses: msys2/setup-msys2@v2
         with:
@@ -212,27 +212,27 @@ jobs:
         run: |
           env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Build nDPI
-        if: startsWith(matrix.arch, 'x86_64')
+        if: startsWith(matrix.arch, 'x86_64') & !startsWith(matrix.os, 'windows')
         run: |
           make all
           make -C example ndpiSimpleIntegration
           make -C rrdtool
           make -C python
       - name: Install nDPI
-        if: startsWith(matrix.arch, 'x86_64')
+        if: startsWith(matrix.arch, 'x86_64') & !startsWith(matrix.os, 'windows')
         run: |
           make install DESTDIR=$(realpath _install)
           ls -alhHR _install
       - name: Test nDPI [DIFF]
-        if: startsWith(matrix.arch, 'x86_64')
+        if: startsWith(matrix.arch, 'x86_64') & !startsWith(matrix.os, 'windows')
         run: |
           ./tests/do.sh
       - name: Test nDPI [UNIT]
-        if: startsWith(matrix.arch, 'x86_64')
+        if: startsWith(matrix.arch, 'x86_64') & !startsWith(matrix.os, 'windows')
         run: |
           ./tests/do-unit.sh
       - name: Test nDPI [DGA]
-        if: startsWith(matrix.arch, 'x86_64')
+        if: startsWith(matrix.arch, 'x86_64') & !startsWith(matrix.os, 'windows')
         run: |
           ./tests/do-dga.sh
       - name: Generate tarball
