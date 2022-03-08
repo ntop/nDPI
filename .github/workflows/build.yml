@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: true # Debugging purposes, switch to true when all issues on big endian is solved
       matrix:
-        os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11"]
+        os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["default-cc"]
@@ -147,7 +147,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install gcc-mingw-w64 libc6-dev
+          sudo apt-get install libc6-dev
           sudo apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe python3-pip
           sudo apt-get install rrdtool librrd-dev
       - name: Install Ubuntu Prerequisites (libgcrypt)
@@ -170,6 +170,13 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang')
         run: |
           sudo apt-get install ${{ matrix.compiler }}
+      - name: Set up MSYS2
+        if: startsWith(matrix.os, 'windows')
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git
       - name: Installing MacOS prerequisites
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64')
         run: |
@@ -238,10 +245,6 @@ jobs:
           pip3 install --user sphinxcontrib.swaggerdoc
           make -C doc text
           make -C doc html
-      - name: Configure nDPI [Mingw-w64] (runs only on ubuntu jobs)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
-        run: |
-          make distclean && ./autogen.sh --enable-option-checking=fatal --host=x86_64-w64-mingw32 ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Build nDPI [Mingw-w64] (runs only on ubuntu jobs)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
         run: |
