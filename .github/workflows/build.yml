@@ -47,7 +47,7 @@ jobs:
     name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true # Debugging purposes, switch to true when all issues on big endian is solved
+      fail-fast: false # Debugging purposes, switch to true when all issues on Windows is solved
       matrix:
         os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11", "windows-latest"]
         arch: ["x86_64"]
@@ -176,7 +176,14 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git
+          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre
+      - name: Setup Windows prerequisites (with libgcrypt)
+        if: startsWith(matrix.os, 'windows') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libgcrypt
       - name: Installing MacOS prerequisites
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64')
         run: |
@@ -202,7 +209,22 @@ jobs:
       - name: Configure nDPI on MacOS
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
         run: |
-          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
+          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }}
+      - name: Configure nDPI on Windows
+        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc') && !startsWith(matrix.gcrypt, '--with-local-libgcrypt')
+        run: |
+          msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs'
+      - name: Configure nDPI on Windows (with libgcrypt)
+        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
+        run: |
+          msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --with-local-libgcrypt'
+      - name: Build nDPI on Windows
+        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
+        run: |
+          msys2 -c 'make all'
+          msys2 -c 'make -C example ndpiSimpleIntegration'
+          msys2 -c 'make -C rrdtool'
+          msys2 -c 'make -C python'
       - name: Configure nDPI with specified GCC version on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'gcc')
         run: |
