@@ -221,7 +221,7 @@ jobs:
       - name: Configure nDPI on MacOS
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
         run: |
-          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }}
+          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Configure nDPI on Windows
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
         run: |
@@ -254,6 +254,10 @@ jobs:
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
           ./tests/do.sh
+      - name: Test nDPI [DIFF] (windows)
+        if: startsWith(matrix.arch, 'x86_64') && startsWith(matrix.os, 'windows')
+        run: |
+          msys2 -c './tests/do.sh'
       - name: Test nDPI [UNIT]
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
