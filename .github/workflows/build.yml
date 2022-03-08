@@ -211,16 +211,13 @@ jobs:
         run: |
           env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }}
       - name: Configure nDPI on Windows
-        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc') && !startsWith(matrix.gcrypt, '--with-local-libgcrypt')
+        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
         run: |
           msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs ${{ matrix.gcrypt }}'
       - name: Build nDPI on Windows
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
         run: |
           msys2 -c 'make all'
-          msys2 -c 'make -C example ndpiSimpleIntegration'
-          msys2 -c 'make -C rrdtool'
-          msys2 -c 'make -C python'
       - name: Configure nDPI with specified GCC version on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'gcc')
         run: |
