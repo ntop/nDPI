@@ -47,7 +47,7 @@ jobs:
     name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false # Debugging purposes, switch to true when all issues on big endian is solved
+      fail-fast: true # Debugging purposes, switch to true when all issues on big endian is solved
       matrix:
         os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11"]
         arch: ["x86_64"]
