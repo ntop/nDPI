@@ -254,10 +254,6 @@ jobs:
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
           ./tests/do.sh
-      - name: Test nDPI [DIFF] (windows)
-        if: startsWith(matrix.arch, 'x86_64') && startsWith(matrix.os, 'windows')
-        run: |
-          msys2 -c './tests/do.sh'
       - name: Test nDPI [UNIT]
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |

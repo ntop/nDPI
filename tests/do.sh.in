@@ -66,20 +66,20 @@ check_results() {
 	    fi
 
 	if [ -f result/$f.out ]; then
-	    CMD="$READER -q -t -i pcap/$f -w reader.out -v 2"
+	    CMD="$READER -q -t -i pcap/$f -w /tmp/reader.out -v 2"
 	    $CMD
-	    NUM_DIFF=`diff result/$f.out reader.out | wc -l`
+	    NUM_DIFF=`diff result/$f.out /tmp/reader.out | wc -l`
 
 	    if [ $NUM_DIFF -eq 0 ]; then
 		printf "%-48s\tOK\n" "$f"
 	    else
 		printf "%-48s\tERROR\n" "$f"
 		echo "$CMD [old vs new]"
-		diff result/$f.out reader.out
+		diff result/$f.out /tmp/reader.out
 		RC=1
 	    fi
 
-	    /bin/rm reader.out
+	    /bin/rm /tmp/reader.out
 	fi
     done
 }
