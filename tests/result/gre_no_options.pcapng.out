@@ -1,0 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (other):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+GRE	2	276	1
+
+	1	47 203.0.113.1:0 <-> 192.0.2.2:0 [proto: 80/GRE][ClearText][Confidence: DPI][cat: Network/14][1 pkts/138 bytes <-> 1 pkts/138 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

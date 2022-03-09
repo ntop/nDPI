@@ -1,0 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (other):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+OSPF	2	200	1
+
+	1	89 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 85/OSPF][ClearText][Confidence: DPI][cat: Network/14][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

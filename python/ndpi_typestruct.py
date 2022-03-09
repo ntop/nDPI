@@ -352,7 +352,6 @@ class NDPIFlowTcpStruct(Structure):
         ('mail_imap_stage', c_uint32, 3),
         ('mail_imap_starttls', c_uint32, 2),
         ('skype_packet_id', c_uint8),
-        ('citrix_packet_id', c_uint8),
         ('lotus_notes_packet_id', c_uint8),
         ('teamviewer_stage', c_uint8),
         ('prev_zmq_pkt_len', c_uint8),

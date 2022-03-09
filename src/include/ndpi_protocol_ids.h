@@ -89,7 +89,7 @@ typedef enum {
   NDPI_PROTOCOL_DISCORD               = 58,
   NDPI_PROTOCOL_TVUPLAYER             = 59,
   NDPI_PROTOCOL_MONGODB               = 60,
-  NDPI_PROTOCOL_QQLIVE                = 61,
+  NDPI_PROTOCOL_FREE_61               = 61, /* FREE */
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_OCSP                  = 63,
   NDPI_PROTOCOL_VXLAN                 = 64,
@@ -183,7 +183,7 @@ typedef enum {
   NDPI_PROTOCOL_GTP                   = 152,
   NDPI_PROTOCOL_WSD                   = 153,
   NDPI_PROTOCOL_LLMNR                 = 154,
-  NDPI_PROTOCOL_REMOTE_SCAN           = 155,
+  NDPI_PROTOCOL_FREE_155              = 155, /* FREE */
   NDPI_PROTOCOL_SPOTIFY               = 156,
   NDPI_PROTOCOL_MESSENGER             = 157,
   NDPI_PROTOCOL_H323                  = 158,
@@ -199,7 +199,7 @@ typedef enum {
   NDPI_PROTOCOL_CORBA                 = 168,
   NDPI_PROTOCOL_UBUNTUONE             = 169,
   NDPI_PROTOCOL_WHOIS_DAS             = 170,
-  NDPI_PROTOCOL_COLLECTD              = 171,
+  NDPI_PROTOCOL_FREE_171              = 171, /* FREE */
   NDPI_PROTOCOL_SOCKS                 = 172,
   NDPI_PROTOCOL_NINTENDO              = 173,
   NDPI_PROTOCOL_RTMP                  = 174,

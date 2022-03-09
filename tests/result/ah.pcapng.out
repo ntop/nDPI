@@ -1,0 +1,11 @@
+Guessed flow protos:	1
+
+DPI Packets (UDP):	4	(4.00 pkts/flow)
+DPI Packets (other):	1	(1.00 pkts/flow)
+Confidence Match by port    : 1 (flows)
+Confidence DPI              : 1 (flows)
+
+IPsec	6	1768	2
+
+	1	UDP 10.2.3.2:500 <-> 10.3.4.4:500 [proto: 79/IPsec][Encrypted][Confidence: Match by port][cat: VPN/2][2 pkts/770 bytes <-> 2 pkts/722 bytes][Goodput ratio: 89/88][0.02 sec][PLAIN TEXT (DELETE)][Plen Bins: 0,0,0,0,0,0,0,0,25,0,25,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	51 10.2.3.2:0 <-> 10.3.4.4:0 [proto: 79/IPsec][Encrypted][Confidence: DPI][cat: VPN/2][1 pkts/138 bytes <-> 1 pkts/138 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

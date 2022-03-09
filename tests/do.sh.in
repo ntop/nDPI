@@ -19,7 +19,7 @@ GCRYPT_PCAPS="gquic.pcap quic-23.pcap quic-24.pcap quic-27.pcap quic-28.pcap qui
 READER="$VALGRIND ../example/ndpiReader -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv"
 
 RC=0
-PCAPS=`cd pcap; /bin/ls *.pcap *.pcapng`
+PCAPS=`cd pcap; /bin/ls *.pcap *.pcapng *.cap`
 
 if [ ! -x "../example/ndpiReader" ]; then
   echo "$0: Missing $(realpath ../example/ndpiReader)"

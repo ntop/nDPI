@@ -1,0 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+Jabber	13	901	1
+
+	1	TCP 192.168.58.1:53460 <-> 192.168.58.153:5222 [proto: 67/Jabber][ClearText][Confidence: DPI][cat: Web/5][7 pkts/565 bytes <-> 6 pkts/336 bytes][Goodput ratio: 28/0][0.07 sec][bytes ratio: 0.254 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/14 13/7 48/14 18/7][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 81/56 173/66 38/4][PLAIN TEXT (xml version)][Plen Bins: 66,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -1580,6 +1580,7 @@ int ndpi_is_datalink_supported(int datalink_type) {
   case DLT_LINUX_SLL:
   case DLT_IEEE802_11_RADIO:
   case DLT_RAW:
+  case DLT_PPI:
     return 1;
   default:
     return 0;
@@ -1624,8 +1625,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   ndpi_packet_tunnel tunnel_type = ndpi_no_tunnel;
 
   /* lengths and offsets */
-  u_int32_t eth_offset = 0;
-  u_int16_t radio_len;
+  u_int32_t eth_offset = 0, dlt;
+  u_int16_t radio_len, header_length;
   u_int16_t fc;
   u_int16_t type = 0;
   int wifi_len = 0;
@@ -1786,6 +1787,15 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   case DLT_RAW:
     ip_offset = eth_offset;
     break;
+
+  case DLT_PPI:
+    header_length = le16toh(*(u_int16_t *)&packet[eth_offset + 2]);
+    dlt = le32toh(*(u_int32_t *)&packet[eth_offset + 4]);
+    if(dlt != DLT_EN10MB) /* Handle only standard ethernet, for the time being */
+      return(nproto);
+    datalink_type = DLT_EN10MB;
+    eth_offset += header_length;
+    goto datalink_check;
 
   default:
     /*
