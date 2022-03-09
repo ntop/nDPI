@@ -97,9 +97,10 @@ static uint8_t get_u8_quic_ver(uint32_t version)
   /* IETF Draft versions */
   if((version >> 8) == 0xff0000)
     return (uint8_t)version;
-  /* QUIC (final?) constants for v1 are defined in draft-33 */
+  /* QUIC (final?) constants for v1 are defined in draft-33, but latest
+     draft version is -34 */
   if (version == 0x00000001) {
-    return 33;
+    return 34;
   }
 
   if (version == V_MVFST_22)
@@ -195,7 +196,7 @@ int is_version_with_v1_labels(uint32_t version)
   if(((version & 0xFFFFFF00) == 0x51303500)  /* Q05X */ ||
      ((version & 0xFFFFFF00) == 0x54303500)) /* T05X */
     return 1;
-  return is_quic_ver_less_than(version, 33);
+  return is_quic_ver_less_than(version, 34);
 }
 
 int quic_len(const uint8_t *buf, uint64_t *value)
@@ -912,7 +913,7 @@ static int quic_derive_initial_secrets(uint32_t version,
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_draft_29,
 		       sizeof(handshake_salt_draft_29),
                        cid, cid_len, secret);
-  } else if (is_quic_ver_less_than(version, 33)) {
+  } else if (is_quic_ver_less_than(version, 34)) {
     err = hkdf_extract(GCRY_MD_SHA256, handshake_salt_v1,
 		       sizeof(handshake_salt_v1),
                        cid, cid_len, secret);
