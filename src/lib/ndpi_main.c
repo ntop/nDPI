@@ -4619,7 +4619,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
   packet->current_time_ms = current_time_ms;
 
-  packet->iph = (struct ndpi_iphdr *)packet_data;
+  packet->iph = (const struct ndpi_iphdr *)packet_data;
 
   /* reset payload_packet_len, will be set if ipv4 tcp or udp */
   packet->payload = NULL;

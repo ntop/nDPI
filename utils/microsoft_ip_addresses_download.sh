@@ -12,11 +12,11 @@ LIST=/tmp/ms.list
 ORIGIN="https://endpoints.office.com/endpoints/worldwide?clientrequestid=b10c5ed1-bad1-445f-b386-b919946339a7"
 
 
-echo "(1) Downloading file..."
+echo "(1) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
 if [ $http_response != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
-    return
+    return 1
 fi
 
 echo "(2) Processing IP addresses..."
@@ -45,6 +45,4 @@ jq -r '.[] | select(.serviceArea=="Common") | .ips[]?' < $TMP | grep -v ':' | so
 rm -f $TMP $LIST
 
 echo "(3) Microsoft IPs are available in $DEST_OUTLOOK, $DEST_SKYPE_MSTEAMS, $DEST_ONEDRIVE, $DEST_OFFICE365"
-
-
-
+return 0

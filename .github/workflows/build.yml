@@ -43,6 +43,29 @@ jobs:
           path: coverage_report
           retention-days: 7
 
+  test-scripts:
+    name: Test Utils (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-netaddr git
+      - name: Run Scripts
+        run: |
+          echo 'Running ./utils/bitcoinnodes.sh'
+          ./utils/bitcoinnodes.sh >/dev/null
+          echo 'Running ./utils/get_routes_by_asn.sh AS714'
+          ./utils/get_routes_by_asn.sh AS714 >/dev/null
+          echo 'Running ./utils/update_every_lists.sh'
+          ./utils/update_every_lists.sh
+          echo 'Checking for changes in the git tree..'
+          git update-index --refresh || echo "::warning file=utils/update_every_lists.sh::Please re-run utils/update_every_lists.sh and commit any changes."
+          git diff-index --quiet HEAD -- || true
+
   test:
     name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
     runs-on: ${{ matrix.os }}

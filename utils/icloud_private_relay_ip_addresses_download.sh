@@ -9,11 +9,11 @@ LIST_MERGED=/tmp/icloud.list_m
 ORIGIN="https://mask-api.icloud.com/egress-ip-ranges.csv"
 
 
-echo "(1) Downloading file..."
+echo "(1) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o "$TMP" -w "%{http_code}" ${ORIGIN})
 if [ "$http_response" != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
-    return
+    return 1
 fi
 
 echo "(2) Processing IP addresses..."
@@ -25,6 +25,4 @@ cut -d ',' -f 1 $TMP | grep -v ':' > $LIST
 rm -f $TMP $LIST $LIST_MERGED
 
 echo "(3) iCloud Private Relay IPs are available in $DEST"
-
-
-
+return 0
