@@ -3314,7 +3314,7 @@ static void ndpi_process_packet(u_char *args,
 		     ndpi_workflow_node_cmp);
 
 	/* free the memory associated to idle flow in "idle_flows" - (see struct reader thread)*/
-	ndpi_free_flow_info_half(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
+	ndpi_flow_info_free_data(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
 	ndpi_free(ndpi_thread_info[thread_id].idle_flows[ndpi_thread_info[thread_id].num_idle_flows]);
       }
 
