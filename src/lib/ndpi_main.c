@@ -4896,7 +4896,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
       if ((flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
           (ndpi_str->proto_defaults[flow->guessed_protocol_id].func != NULL) &&
           (is_tcp_without_payload == 0 ||
-           ((ndpi_str->callback_buffer[flow->guessed_protocol_id].ndpi_selection_bitmask &
+           ((ndpi_str->callback_buffer[proto_index].ndpi_selection_bitmask &
 	     NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD) == 0)))
 	{
 	  ndpi_str->proto_defaults[flow->guessed_protocol_id].func(ndpi_str, flow);
