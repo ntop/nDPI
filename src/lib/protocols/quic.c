@@ -1046,14 +1046,11 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
       return -1; /* Memory error */
     flow->l4.udp.quic_reasm_buf_len = 0;
   }
-  if(flow->l4.udp.quic_reasm_buf_len != frag_offset)
-    return -2; /* Out-of-order, retransmission, overlapping */
   if(frag_offset + frag_len > max_quic_reasm_buffer_len)
     return -3; /* Buffer too small */
 
-  memcpy(&flow->l4.udp.quic_reasm_buf[flow->l4.udp.quic_reasm_buf_len],
-	 frag, frag_len);
-  flow->l4.udp.quic_reasm_buf_len += frag_len;
+  memcpy(&flow->l4.udp.quic_reasm_buf[frag_offset], frag, frag_len);
+  flow->l4.udp.quic_reasm_buf_len = (frag_offset + frag_len > flow->l4.udp.quic_reasm_buf_len) ? frag_offset + frag_len : flow->l4.udp.quic_reasm_buf_len;
 
   *buf = flow->l4.udp.quic_reasm_buf;
   *buf_len = flow->l4.udp.quic_reasm_buf_len;
@@ -1105,7 +1102,7 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
     }
     NDPI_LOG_DBG2(ndpi_struct, "CH not yet completed\n");
   } else {
-    NDPI_LOG_DBG(ndpi_struct, "Reassembler error: %d\n", rc);
+    NDPI_LOG_DBG2("Reassembler error: %d\n", rc);
   }
   return NULL;
 }
