@@ -1102,7 +1102,7 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
     }
     NDPI_LOG_DBG2(ndpi_struct, "CH not yet completed\n");
   } else {
-    NDPI_LOG_DBG2("Reassembler error: %d\n", rc);
+    NDPI_LOG_DBG(ndpi_struct, "Reassembler error: %d\n", rc);
   }
   return NULL;
 }
