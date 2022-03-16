@@ -1033,11 +1033,9 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
 {
   const uint64_t max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... */
   const uint64_t last_pos = frag_offset + frag_len;
-  /* TODO: at the moment, this function is only a little more than a stub.
-     We should reassemble the fragments, but nDPI lacks any proper generic
-     reassembler code. So, to keep the code simple here, try reassembling
-     the simplest case: only in-order fragments using a fixed-size buffer (i.e. no
-     retransmissions, no out-of-order, no overlapping...)
+  /* 
+     Working: in-order and out-of order, non overlapping, fragments
+     Not supported: retransmissions and (partial) overlapping
   */
 
   if(!flow->l4.udp.quic_reasm_buf) {
@@ -1062,9 +1060,9 @@ static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len, uint64_t last_p
 {
   uint32_t msg_len;
 
-  if(buf_len >= 4) {
+  if(buf_len >= 4 && last_pos == buf_len) {
     msg_len = (buf[1] << 16) + (buf[2] << 8) + buf[3];
-    if (last_pos == buf_len &&  4 + msg_len == buf_len) {
+    if (4 + msg_len == buf_len) {
       return 1;
     }
   }
