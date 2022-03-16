@@ -991,20 +991,17 @@ struct ndpi_detection_module_struct {
   void *user_data;
 #endif
   char custom_category_labels[NUM_CUSTOM_CATEGORIES][CUSTOM_CATEGORY_LABEL_LEN];
+
   /* callback function buffer */
-  struct ndpi_call_function_struct callback_buffer[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
+  struct ndpi_call_function_struct *callback_buffer;
+  struct ndpi_call_function_struct *callback_buffer_tcp_no_payload;
+  struct ndpi_call_function_struct *callback_buffer_tcp_payload;
+  struct ndpi_call_function_struct *callback_buffer_udp;
+  struct ndpi_call_function_struct *callback_buffer_non_tcp_udp;
   u_int32_t callback_buffer_size;
-
-  struct ndpi_call_function_struct callback_buffer_tcp_no_payload[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size_tcp_no_payload;
-
-  struct ndpi_call_function_struct callback_buffer_tcp_payload[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size_tcp_payload;
-
-  struct ndpi_call_function_struct callback_buffer_udp[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size_udp;
-
-  struct ndpi_call_function_struct callback_buffer_non_tcp_udp[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
   u_int32_t callback_buffer_size_non_tcp_udp;
 
   ndpi_default_ports_tree_node_t *tcpRoot, *udpRoot;
