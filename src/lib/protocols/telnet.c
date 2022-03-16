@@ -99,7 +99,19 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   for(i=0; i<packet->payload_packet_len; i++) {
     if(packet->packet_direction == 0) /* client -> server */ {
       if(flow->protos.telnet.character_id < (sizeof(flow->protos.telnet.username)-1))
-	flow->protos.telnet.username[flow->protos.telnet.character_id++] = packet->payload[i];
+      {
+        if (i>=packet->payload_packet_len-2 &&
+            (packet->payload[i] == '\r' || packet->payload[i] == '\n'))
+        {
+          continue;
+        }
+        else if (ndpi_isprint(packet->payload[i]) == 0)
+        {
+          flow->protos.telnet.username[flow->protos.telnet.character_id++] = '?';
+        } else {
+          flow->protos.telnet.username[flow->protos.telnet.character_id++] = packet->payload[i];
+        }
+      }
     }
   }
 

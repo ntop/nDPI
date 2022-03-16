@@ -629,11 +629,11 @@ static AC_ERROR_t dump_node_common(AC_AUTOMATA_t * thiz,
         char lbuf[512];
         int nl = 0,j;
 
-        nl = snprintf(lbuf,sizeof(lbuf),"'%.100s' N:%d{",rstr,n->matched_patterns->num);
+        nl = ndpi_snprintf(lbuf,sizeof(lbuf),"'%.100s' N:%d{",rstr,n->matched_patterns->num);
         for (j=0; j<n->matched_patterns->num; j++) {
             AC_PATTERN_t *sid = &n->matched_patterns->patterns[j];
-            if(j) nl += snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,", ");
-            nl += snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,"%d %c%.100s%c",
+            if(j) nl += ndpi_snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,", ");
+            nl += ndpi_snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,"%d %c%.100s%c",
                             sid->rep.number & 0x3fff,
                             sid->rep.number & 0x8000 ? '^':' ',
                             sid->astring,

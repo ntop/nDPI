@@ -34,7 +34,7 @@
 #define GCM_VALIDATE( cond ) \
     MBEDTLS_INTERNAL_VALIDATE( cond )
 
-#ifdef _WIN32
+#ifdef WIN32
 #define LBLOCKSIZE 4 
 #else
 #define LBLOCKSIZE __SIZEOF_LONG__ 
@@ -295,7 +295,7 @@ int mbedtls_gcm_starts( mbedtls_gcm_context *ctx,
     if( iv_len == 0)
         return( MBEDTLS_ERR_GCM_BAD_INPUT );
 #if __SIZE_WIDTH__ == 64
-    if( iv_len >= (1UL << 32 ))
+    if( iv_len >= (1ULL << 32 ))
         return( MBEDTLS_ERR_GCM_BAD_INPUT );
 #endif
 

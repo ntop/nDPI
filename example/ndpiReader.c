@@ -26,11 +26,18 @@
 #endif
 #include <sched.h>
 #endif
+
+#include "ndpi_api.h"
+#include "../src/lib/third_party/include/uthash.h"
+#include "../src/lib/third_party/include/ahocorasick.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
+#include <windows.h>
+#include <ws2tcpip.h>
 #include <process.h>
 #include <io.h>
 #define getopt getopt____
@@ -45,12 +52,10 @@
 #include <search.h>
 #include <pcap.h>
 #include <signal.h>
+#include <time.h>
 #include <pthread.h>
 #include <assert.h>
 #include <math.h>
-#include "ndpi_api.h"
-#include "../src/lib/third_party/include/uthash.h"
-#include "../src/lib/third_party/include/ahocorasick.h"
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -667,7 +672,7 @@ void extcap_config() {
 
   for(i=0; i<(int) ndpi_num_supported_protocols; i++) {
     protos[i].id = i;
-    snprintf(protos[i].name, sizeof(protos[i].name), "%s", proto_defaults[i].protoName);
+    ndpi_snprintf(protos[i].name, sizeof(protos[i].name), "%s", proto_defaults[i].protoName);
   }
 
   qsort(protos, ndpi_num_supported_protocols, sizeof(struct ndpi_proto_sorter), cmpProto);
@@ -1099,7 +1104,7 @@ static char* ipProto2Name(u_int16_t proto_id) {
     break;
   }
 
-  snprintf(proto, sizeof(proto), "%u", proto_id);
+  ndpi_snprintf(proto, sizeof(proto), "%u", proto_id);
   return(proto);
 }
 
@@ -1533,7 +1538,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->detected_protocol.master_protocol) {
       char tmp[256];
 
-      snprintf(tmp, sizeof(tmp), "%s.%s",
+      ndpi_snprintf(tmp, sizeof(tmp), "%s.%s",
 	       ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				   flow->detected_protocol.master_protocol),
 	       ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
@@ -2155,9 +2160,9 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 
     memset(buf, 0, sizeof(buf));
     strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime,&result));
-    vsnprintf(buf, sizeof(buf)-1, format, va_ap);
+    ndpi_snprintf(buf, sizeof(buf)-1, format, va_ap);
 
-    snprintf(out_buf, sizeof(out_buf), "%s %s%s", theDate, extra_msg, buf);
+    ndpi_snprintf(out_buf, sizeof(out_buf), "%s %s%s", theDate, extra_msg, buf);
     printf("%s", out_buf);
     fflush(stdout);
   }
@@ -2248,21 +2253,21 @@ char* formatTraffic(float numBits, int bits, char *buf) {
     unit = 'B';
 
   if(numBits < 1024) {
-    snprintf(buf, 32, "%lu %c", (unsigned long)numBits, unit);
+    ndpi_snprintf(buf, 32, "%lu %c", (unsigned long)numBits, unit);
   } else if(numBits < (1024*1024)) {
-    snprintf(buf, 32, "%.2f K%c", (float)(numBits)/1024, unit);
+    ndpi_snprintf(buf, 32, "%.2f K%c", (float)(numBits)/1024, unit);
   } else {
     float tmpMBits = ((float)numBits)/(1024*1024);
 
     if(tmpMBits < 1024) {
-      snprintf(buf, 32, "%.2f M%c", tmpMBits, unit);
+      ndpi_snprintf(buf, 32, "%.2f M%c", tmpMBits, unit);
     } else {
       tmpMBits /= 1024;
 
       if(tmpMBits < 1024) {
-        snprintf(buf, 32, "%.2f G%c", tmpMBits, unit);
+        ndpi_snprintf(buf, 32, "%.2f G%c", tmpMBits, unit);
       } else {
-        snprintf(buf, 32, "%.2f T%c", (float)(tmpMBits)/1024, unit);
+        ndpi_snprintf(buf, 32, "%.2f T%c", (float)(tmpMBits)/1024, unit);
       }
     }
   }
@@ -2278,12 +2283,12 @@ char* formatTraffic(float numBits, int bits, char *buf) {
 char* formatPackets(float numPkts, char *buf) {
 
   if(numPkts < 1000) {
-    snprintf(buf, 32, "%.2f", numPkts);
+    ndpi_snprintf(buf, 32, "%.2f", numPkts);
   } else if(numPkts < (1000*1000)) {
-    snprintf(buf, 32, "%.2f K", numPkts/1000);
+    ndpi_snprintf(buf, 32, "%.2f K", numPkts/1000);
   } else {
     numPkts /= (1000*1000);
-    snprintf(buf, 32, "%.2f M", numPkts);
+    ndpi_snprintf(buf, 32, "%.2f M", numPkts);
   }
 
   return(buf);
@@ -2360,18 +2365,18 @@ char* formatBytes(u_int32_t howMuch, char *buf, u_int buf_len) {
   char unit = 'B';
 
   if(howMuch < 1024) {
-    snprintf(buf, buf_len, "%lu %c", (unsigned long)howMuch, unit);
+    ndpi_snprintf(buf, buf_len, "%lu %c", (unsigned long)howMuch, unit);
   } else if(howMuch < (1024*1024)) {
-    snprintf(buf, buf_len, "%.2f K%c", (float)(howMuch)/1024, unit);
+    ndpi_snprintf(buf, buf_len, "%.2f K%c", (float)(howMuch)/1024, unit);
   } else {
     float tmpGB = ((float)howMuch)/(1024*1024);
 
     if(tmpGB < 1024) {
-      snprintf(buf, buf_len, "%.2f M%c", tmpGB, unit);
+      ndpi_snprintf(buf, buf_len, "%.2f M%c", tmpGB, unit);
     } else {
       tmpGB /= 1024;
 
-      snprintf(buf, buf_len, "%.2f G%c", tmpGB, unit);
+      ndpi_snprintf(buf, buf_len, "%.2f G%c", tmpGB, unit);
     }
   }
 
@@ -3946,7 +3951,7 @@ void * processing_thread(void *_thread_id) {
     }
   } else
 #endif
-    if((!json_flag) && (!quiet_mode)) {
+    if((!quiet_mode)) {
 #ifdef WIN64
       printf("Running thread %lld...\n", thread_id);
 #else
@@ -4017,11 +4022,6 @@ void test_lib() {
   long long int thread_id;
 #else
   long thread_id;
-#endif
-
-#ifdef HAVE_LIBJSON_C
-  json_init();
-  if(stats_flag)  json_open_stats_file();
 #endif
 
 #ifdef DEBUG_TRACE
@@ -4370,57 +4370,57 @@ void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
 
     while(i < p_size && port_array[i] != INIT_VAL) {
       if(i+1 == p_size || port_array[i+1] == INIT_VAL)
-	snprintf(&filter[l], sizeof(filter)-l, "%d", port_array[i]);
+        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%d", port_array[i]);
       else
-	snprintf(&filter[l], sizeof(filter)-l, "%d or ", port_array[i]);
+        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%d or ", port_array[i]);
 
       i++;
     }
 
-    l += snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
 
 
   if(src_host_array[0] != NULL) {
     if(port_array[0] != INIT_VAL)
-      l += snprintf(&filter[l], sizeof(filter)-l, " and not (src ");
+      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, " and not (src ");
     else
-      l += snprintf(&filter[l], sizeof(filter)-l, "not (src ");
+      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "not (src ");
 
     i = 0;
 
     while(i < sh_size && src_host_array[i] != NULL) {
       if(i+1 == sh_size || src_host_array[i+1] == NULL)
-	l += snprintf(&filter[l], sizeof(filter)-l, "%s", src_host_array[i]);
+	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", src_host_array[i]);
       else
-	l += snprintf(&filter[l], sizeof(filter)-l, "%s or ", src_host_array[i]);
+	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s or ", src_host_array[i]);
 
       i++;
     }
 
-    l += snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
 
   if(dst_host_array[0] != NULL) {
     if(port_array[0] != INIT_VAL || src_host_array[0] != NULL)
-      l += snprintf(&filter[l], sizeof(filter)-l, " and not (dst ");
+      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, " and not (dst ");
     else
-      l += snprintf(&filter[l], sizeof(filter)-l, "not (dst ");
+      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "not (dst ");
 
     i=0;
 
     while(i < dh_size && dst_host_array[i] != NULL) {
       if(i+1 == dh_size || dst_host_array[i+1] == NULL)
-	l += snprintf(&filter[l], sizeof(filter)-l, "%s", dst_host_array[i]);
+	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", dst_host_array[i]);
       else
-	l += snprintf(&filter[l], sizeof(filter)-l, "%s or ", dst_host_array[i]);
+	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s or ", dst_host_array[i]);
 
       i++;
     }
 
-    l +=  snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    l +=  ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
 
@@ -4455,15 +4455,15 @@ void bpf_filter_host_peak_filter(json_object **jObj_bpfFilter,
       l = strlen(filter);
 
       if(i+1 == h_size || host_array[i+1] == NULL)
-	snprintf(&filter[l], sizeof(filter)-l, "%s", host_array[i]);
+        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", host_array[i]);
       else
-	snprintf(&filter[l], sizeof(filter)-l, "%s or ", host_array[i]);
+        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s or ", host_array[i]);
 
       i++;
     }
 
     l = strlen(filter);
-    snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
+    ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
     produced = 1;
   }
 
@@ -4879,7 +4879,7 @@ static void produceBpfFilter(char *filePath) {
   }
 
 
-  snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
+  ndpi_snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
 
   if((fp = fopen(_filterFilePath,"w")) == NULL) {
     printf("Error creating .json file %s\n", _filterFilePath);

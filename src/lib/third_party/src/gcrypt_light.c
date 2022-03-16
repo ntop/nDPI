@@ -1,6 +1,6 @@
 
 #include <stdint.h>
-#ifndef _WIN32
+#ifndef WIN32
 #include <unistd.h>
 #endif
 #include <string.h>

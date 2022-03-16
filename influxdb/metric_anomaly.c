@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
   if((database == NULL) || (query == NULL))
     help();
 
-  snprintf(cmd, sizeof(cmd), "influx -database '%s' -precision s -execute '%s'", database, query);
+  ndpi_snprintf(cmd, sizeof(cmd), "influx -database '%s' -precision s -execute '%s'", database, query);
 
   if(verbose) printf("%s\n", cmd);
 

@@ -1,8 +1,6 @@
 #ifndef WIN32
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#else
-#include <windows.h>
 #endif
 #include <errno.h>
 #include <ndpi_api.h>
@@ -15,6 +13,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 //#define VERBOSE 1
 #define MAX_FLOW_ROOTS_PER_THREAD 2048
@@ -90,7 +92,7 @@ struct nDPI_flow_info {
 struct nDPI_workflow {
   pcap_t * pcap_handle;
 
-  uint8_t error_or_eof;
+  volatile long int error_or_eof;
 
   unsigned long long int packets_captured;
   unsigned long long int packets_processed;
@@ -121,8 +123,8 @@ struct nDPI_reader_thread {
 
 static struct nDPI_reader_thread reader_threads[MAX_READER_THREADS] = {};
 static int reader_thread_count = MAX_READER_THREADS;
-static int main_thread_shutdown = 0;
-static uint32_t flow_id = 0;
+static volatile long int main_thread_shutdown = 0;
+static volatile long int flow_id = 0;
 
 static void free_workflow(struct nDPI_workflow ** const workflow);
 
@@ -300,7 +302,7 @@ static void print_packet_info(struct nDPI_reader_thread const * const reader_thr
   char buf[256];
   int used = 0, ret;
 
-  ret = snprintf(buf, sizeof(buf), "[%8llu, %d, %4u] %4u bytes: ",
+  ret = ndpi_snprintf(buf, sizeof(buf), "[%8llu, %d, %4u] %4u bytes: ",
 		 workflow->packets_captured, reader_thread->array_index,
 		 flow->flow_id, header->caplen);
   if (ret > 0) {
@@ -308,9 +310,9 @@ static void print_packet_info(struct nDPI_reader_thread const * const reader_thr
   }
 
   if (ip_tuple_to_string(flow, src_addr_str, sizeof(src_addr_str), dst_addr_str, sizeof(dst_addr_str)) != 0) {
-    ret = snprintf(buf + used, sizeof(buf) - used, "IP[%s -> %s]", src_addr_str, dst_addr_str);
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, "IP[%s -> %s]", src_addr_str, dst_addr_str);
   } else {
-    ret = snprintf(buf + used, sizeof(buf) - used, "IP[ERROR]");
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, "IP[ERROR]");
   }
   if (ret > 0) {
     used += ret;
@@ -318,24 +320,24 @@ static void print_packet_info(struct nDPI_reader_thread const * const reader_thr
 
   switch (flow->l4_protocol) {
   case IPPROTO_UDP:
-    ret = snprintf(buf + used, sizeof(buf) - used, " -> UDP[%u -> %u, %u bytes]",
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, " -> UDP[%u -> %u, %u bytes]",
 		   flow->src_port, flow->dst_port, l4_data_len);
     break;
   case IPPROTO_TCP:
-    ret = snprintf(buf + used, sizeof(buf) - used, " -> TCP[%u -> %u, %u bytes]",
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, " -> TCP[%u -> %u, %u bytes]",
 		   flow->src_port, flow->dst_port, l4_data_len);
     break;
   case IPPROTO_ICMP:
-    ret = snprintf(buf + used, sizeof(buf) - used, " -> ICMP");
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, " -> ICMP");
     break;
   case IPPROTO_ICMPV6:
-    ret = snprintf(buf + used, sizeof(buf) - used, " -> ICMP6");
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, " -> ICMP6");
     break;
   case IPPROTO_HOPOPTS:
-    ret = snprintf(buf + used, sizeof(buf) - used, " -> ICMP6 Hop-By-Hop");
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, " -> ICMP6 Hop-By-Hop");
     break;
   default:
-    ret = snprintf(buf + used, sizeof(buf) - used, " -> Unknown[0x%X]", flow->l4_protocol);
+    ret = ndpi_snprintf(buf + used, sizeof(buf) - used, " -> Unknown[0x%X]", flow->l4_protocol);
     break;
   }
   if (ret > 0) {

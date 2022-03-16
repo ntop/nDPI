@@ -47,16 +47,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#define _WS2TCPIP_H_ /* Avoid compilation problems */
-
 #define	IPVERSION	4 /* on *nix it is defined in netinet/ip.h */ 
 
 #ifndef MIN
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
-#endif
-
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
 #endif
 
 #if defined(__MINGW32__) || defined(__MINGW64__)

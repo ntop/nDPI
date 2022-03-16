@@ -1,36 +1,33 @@
 CC=@CC@
 CXX=@CXX@
-BUILD_MINGW=@BUILD_MINGW@
+EXE_SUFFIX=@EXE_SUFFIX@
 
 SRCHOME=../../src
 
-CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @JSONC_CFLAGS@ @PCAP_INC@ @CFLAGS@
+ifneq ($(OS),Windows_NT)
+CFLAGS+=-fPIC -DPIC
+endif
+CFLAGS+=-g -I$(SRCHOME)/include @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
-LIBS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ -lpthread
+LIBS=$(LIBNDPI) @LIBS@ @ADDITIONAL_LIBS@ -lpthread
 LDFLAGS=@LDFLAGS@
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=dga_evaluate
 PREFIX?=@prefix@
 
-ifneq ($(BUILD_MINGW),)
-all:
-	@echo 'DGA test disabled due to mingw build.'
-
-else
-
-all: dga_evaluate
+all: dga_evaluate$(EXE_SUFFIX)
 
 EXECUTABLE_SOURCES := dga_evaluate.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 
-dga_evaluate: $(LIBNDPI) dga_evaluate.o
+dga_evaluate$(EXE_SUFFIX): $(LIBNDPI) dga_evaluate.o
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) dga_evaluate.o $(LIBS) -o $@
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
-	/bin/rm -f *.o dga_evaluate
+	/bin/rm -f *.o dga_evaluate$(EXE_SUFFIX)
 	/bin/rm -f .*.o.cmd .*.o.d
 	/bin/rm -rf build
 
@@ -42,5 +39,3 @@ distdir:
 
 distclean: clean
 	/bin/rm -f Makefile
-
-endif

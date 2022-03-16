@@ -180,7 +180,7 @@ void find_rrds(char *basedir, char *filename, rrd_file_stats *rrds, u_int *num_r
       char path[PATH_MAX];
       struct stat s;
 
-      snprintf(path, sizeof(path), "%s/%s", basedir, namelist[n]->d_name);
+      ndpi_snprintf(path, sizeof(path), "%s/%s", basedir, namelist[n]->d_name);
 
       if(stat(path, &s) == 0) {
 	if(S_ISDIR(s.st_mode))

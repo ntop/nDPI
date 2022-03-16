@@ -32,4 +32,9 @@ extern u_int8_t ndpi_ends_with(char *str, char *ends);
               ((ch) >= '[' && (ch) <= '`') ||   \
               ((ch) >= '{' && (ch) <= '~'))
 
+#ifndef NDPI_CFFI_PREPROCESSING
+int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args);
+int ndpi_snprintf(char * str, size_t size, char const * format, ...);
+#endif
+
 #endif
