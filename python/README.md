@@ -61,7 +61,7 @@ optional arguments:
 Example with a Skype capture file
 
 ``` bash
-python ndpi_example.py -u ../tests/pcap/skype.pcap
+python3 ndpi_example.py -u ../tests/pcap/skype.pcap
 ```
 
 ## Related projects

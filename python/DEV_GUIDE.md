@@ -12,6 +12,11 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
 
 [**NDPI_APIS**][py_ndpi_api] must be updated with the this new API your want to add.
 
+## Regenerate bindings
+
+``` bash
+python3 setup.py install
+```
 
 ## That's it!
 
