@@ -62,6 +62,7 @@ jobs:
         run: |
           env CC=gcc CFLAGS='-Werror' ./autogen.sh
           make
+          sudo make install
       - name: Generate Python bindings
         run: |
           cd python

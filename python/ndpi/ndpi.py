@@ -47,7 +47,7 @@ class NDPI(object):
 
     def process_packet(self, flow, packet, packet_time_ms):
         p = lib.ndpi_detection_process_packet(self._detection_module,
-                                              flow._C,
+                                              flow.C,
                                               packet,
                                               len(packet),
                                               int(packet_time_ms))
@@ -58,7 +58,7 @@ class NDPI(object):
 
     def giveup(self, flow, enable_guess=True):
         p = lib.ndpi_detection_giveup(self._detection_module,
-                                      flow._C,
+                                      flow.C,
                                       enable_guess,
                                       ffi.new("uint8_t*", 0))
         return ndpi_protocol(C=p,
@@ -82,20 +82,20 @@ class NDPI(object):
 
 
 class NDPIFlow(object):
-    __slots__ = ("_C")
+    __slots__ = "C"
 
     @property
     def confidence(self):
-        confidence = self._C.confidence
+        confidence = self.C.confidence
         return ndpi_confidence(id=confidence,
                                name=ffi.string(lib.ndpi_confidence_get_name(confidence)).decode('utf-8',
                                                                                                 errors='ignore'))
 
     def __init__(self):
-        self._C = lib.ndpi_py_initialize_flow()
+        self.C = lib.ndpi_py_initialize_flow()
 
     def __del__(self):
-        if self._C != ffi.NULL:
-            lib.ndpi_flow_free(self._C)
-            self._C = ffi.NULL
+        if self.C != ffi.NULL:
+            lib.ndpi_flow_free(self.C)
+            self.C = ffi.NULL
 

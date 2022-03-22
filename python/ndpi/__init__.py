@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------------------------------------------------
 """
 
-from .ndpi import NDPI, NDPIFlow
+from .ndpi import *
 
 
 __author__ = """Zied Aouini"""

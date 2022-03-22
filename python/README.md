@@ -15,6 +15,7 @@ cd nDPI
 ./autogen.sh
 ./configure
 make
+sudo make install
 ```
 
 ### Install ndpi package
