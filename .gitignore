@@ -61,7 +61,6 @@ stamp-h1
 /fuzz/fuzz_ndpi_reader_with_main
 /fuzz/fuzz_process_packet
 /fuzz/fuzz_process_packet_with_main
-/python/Makefile
 /tests/dga/Makefile
 /tests/do.sh
 /tests/unit/Makefile

@@ -43,6 +43,33 @@ jobs:
           path: coverage_report
           retention-days: 7
 
+  python-bindings:
+    name: Python Bindings (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
+      - name: Build nDPI library
+        run: |
+          env CC=gcc CFLAGS='-Werror' ./autogen.sh
+          make
+      - name: Generate Python bindings
+        run: |
+          cd python
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+          python3 setup.py install
+          cd ..
+      - name: Test Python Bindings
+        run: |
+          cd python
+          python3 tests.py
+
   test-scripts:
     name: Test Utils (ubuntu-latest)
     runs-on: ubuntu-latest
@@ -267,7 +294,6 @@ jobs:
           make all
           make -C example ndpiSimpleIntegration
           make -C rrdtool
-          make -C python
       - name: Install nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
@@ -320,7 +346,6 @@ jobs:
             make all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&
-            make -C python &&
             ./tests/do.sh &&
             ./tests/do-unit.sh
             "
@@ -345,7 +370,6 @@ jobs:
             make all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&
-            make -C python &&
             ./tests/do.sh &&
             ./tests/do-unit.sh
             "
@@ -370,7 +394,6 @@ jobs:
             make all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&
-            make -C python &&
             ./tests/do.sh &&
             ./tests/do-unit.sh
             "
