@@ -18,7 +18,7 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
 Now this API can be called and used on python side
 
 ``` python
-from ndpi import, lib, ffi
+from ndpi import lib, ffi
 
 des = ffi.new("struct ndpi_des_struct *")
 alpha = 0.9
