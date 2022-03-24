@@ -717,6 +717,7 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_QUIC */
   u_int8_t *quic_reasm_buf;
   u_int32_t quic_reasm_buf_len;
+  u_int32_t quic_reasm_buf_last_pos;
 
   /* NDPI_PROTOCOL_CSGO */
   u_int8_t csgo_strid[18],csgo_state,csgo_s2;

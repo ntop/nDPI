@@ -1008,12 +1008,10 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
                         const u_int8_t **buf, u_int64_t *buf_len)
 {
   const uint64_t max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... */
-
-  /* TODO: at the moment, this function is only a little more than a stub.
-     We should reassemble the fragments, but nDPI lacks any proper generic
-     reassembler code. So, to keep the code simple here, try reassembling
-     the simplest case: only in-order fragments using a fixed-size buffer (i.e. no
-     retransmissions, no out-of-order, no overlapping...)
+  const uint64_t last_pos = frag_offset + frag_len;
+  /* 
+     Working: in-order and out-of order, non overlapping, fragments
+     Not supported: retransmissions and (partial) overlapping
   */
 
   if(!flow->l4.udp.quic_reasm_buf) {
@@ -1021,25 +1019,24 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
     if(!flow->l4.udp.quic_reasm_buf)
       return -1; /* Memory error */
     flow->l4.udp.quic_reasm_buf_len = 0;
+    flow->l4.udp.quic_reasm_buf_last_pos = 0;
   }
-  if(flow->l4.udp.quic_reasm_buf_len != frag_offset)
-    return -2; /* Out-of-order, retransmission, overlapping */
-  if(frag_offset + frag_len > max_quic_reasm_buffer_len)
+  if(last_pos > max_quic_reasm_buffer_len)
     return -3; /* Buffer too small */
 
-  memcpy(&flow->l4.udp.quic_reasm_buf[flow->l4.udp.quic_reasm_buf_len],
-	 frag, frag_len);
+  memcpy(&flow->l4.udp.quic_reasm_buf[frag_offset], frag, frag_len);
   flow->l4.udp.quic_reasm_buf_len += frag_len;
+  flow->l4.udp.quic_reasm_buf_last_pos = last_pos > flow->l4.udp.quic_reasm_buf_last_pos ? last_pos : flow->l4.udp.quic_reasm_buf_last_pos;
 
   *buf = flow->l4.udp.quic_reasm_buf;
   *buf_len = flow->l4.udp.quic_reasm_buf_len;
   return 0;
 }
-static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len)
+static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len, uint64_t last_pos)
 {
   uint32_t msg_len;
 
-  if(buf_len >= 4) {
+  if(buf_len >= 4 && last_pos == buf_len) {
     msg_len = (buf[1] << 16) + (buf[2] << 8) + buf[3];
     if (4 + msg_len == buf_len) {
       return 1;
@@ -1051,7 +1048,7 @@ static int is_ch_reassembler_pending(struct ndpi_flow_struct *flow)
 {
   return flow->l4.udp.quic_reasm_buf != NULL &&
          !is_ch_complete(flow->l4.udp.quic_reasm_buf,
-			 flow->l4.udp.quic_reasm_buf_len);
+			 flow->l4.udp.quic_reasm_buf_len, flow->l4.udp.quic_reasm_buf_last_pos);
 }
 static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 						  struct ndpi_flow_struct *flow,
@@ -1066,7 +1063,7 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
 
   /* Fast path: no need of reassembler stuff */
   if(frag_offset == 0 &&
-     is_ch_complete(frag, frag_len)) {
+     is_ch_complete(frag, frag_len, frag_len)) {
     NDPI_LOG_DBG2(ndpi_struct, "Complete CH (fast path)\n");
     *crypto_data_len = frag_len;
     return frag;
@@ -1075,7 +1072,7 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
   rc = __reassemble(flow, frag, frag_len, frag_offset,
                     &crypto_data, crypto_data_len);
   if(rc == 0) {
-    if(is_ch_complete(crypto_data, *crypto_data_len)) {
+    if(is_ch_complete(crypto_data, *crypto_data_len, flow->l4.udp.quic_reasm_buf_last_pos)) {
       NDPI_LOG_DBG2(ndpi_struct, "Reassembler completed!\n");
       return crypto_data;
     }
