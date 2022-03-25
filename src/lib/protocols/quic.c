@@ -83,7 +83,7 @@ static int is_version_quic(uint32_t version)
     ((version & 0xFFFFFF00) == 0xFF000000) /* IETF Drafts*/ ||
     ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */ ||
     ((version & 0x0F0F0F0F) == 0x0a0a0a0a) /* Forcing Version Negotiation */ ||
-    ((version & 0xFFFFFF00) == 0xFF020000) /* V2 IETF Drafts */;
+    (version == 0x709A50C4);               /* V2 IETF Drafts */
 }
 static int is_version_valid(uint32_t version)
 {
@@ -115,9 +115,9 @@ static uint8_t get_u8_quic_ver(uint32_t version)
     return 29;
 
   /* QUIC Version 2 */
-  /* For the time being use 100 + draft as a number for V2 */
-  if ((version >> 8) == 0xff0200)
-    return 100 + (uint8_t)version;
+  /* For the time being use 100 as a number for V2 and let see how v2 drafts evolve */
+  if (version == 0x709A50C4)
+    return 100;
 
   return 0;
 }
@@ -188,12 +188,16 @@ int is_version_with_ietf_long_header(uint32_t version)
     ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
     ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
 }
-int is_version_with_v1_labels(uint32_t version)
+static int is_version_with_v1_labels(uint32_t version)
 {
   if(((version & 0xFFFFFF00) == 0x51303500)  /* Q05X */ ||
      ((version & 0xFFFFFF00) == 0x54303500)) /* T05X */
     return 1;
   return is_quic_ver_less_than(version, 34);
+}
+static int is_version_quic_v2(uint32_t version)
+{
+  return version == 0x709A50C4;
 }
 
 int quic_len(const uint8_t *buf, uint64_t *value)
@@ -1430,8 +1434,14 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Q46 invalid flag 0x%x\n", first_byte);
     return 0;
   }
-  if((is_version_quic(*version) || (*version == V_Q046) || (*version == V_Q050)) &&
+  if(((is_version_quic(*version) && !is_version_quic_v2(*version)) ||
+      (*version == V_Q046) || (*version == V_Q050)) &&
      (pub_bit3 != 0 || pub_bit4 != 0)) {
+    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not Initial Packet\n", *version);
+    return 0;
+  }
+  if(is_version_quic_v2(*version) &&
+     (pub_bit3 != 0 || pub_bit4 != 1)) {
     NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not Initial Packet\n", *version);
     return 0;
   }
