@@ -47,7 +47,7 @@ struct ndpi_flow_struct * ndpi_py_initialize_flow(void) {
 
 
 NDPI_APIS = """
-u_int16_t ndpi_get_api_version(void);
+u_int64_t ndpi_get_api_version(void);
 char* ndpi_revision(void);
 struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs);
 void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct);

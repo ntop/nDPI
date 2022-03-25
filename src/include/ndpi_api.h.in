@@ -999,7 +999,7 @@ extern "C" {
   void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
   void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str,
 			       ndpi_debug_function_ptr ndpi_debug_printf);
-  u_int16_t ndpi_get_api_version(void);
+  u_int64_t ndpi_get_api_version(void);
   const char *ndpi_get_gcrypt_version(void);
 
   /* https://github.com/corelight/community-id-spec */

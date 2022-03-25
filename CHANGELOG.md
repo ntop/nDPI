@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Misc
+ - NDPI_API_VERSION now 64-bit.
+
 #### nDPI 4.2 (Feb 2022)
 
 ## New Features

@@ -73,21 +73,17 @@ if test -d ".git" || test -f ".git" ; then :
      #
      GIT_NUM=`git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
      GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
-
-     A=`git log src/include/ndpi_typedefs.h|wc -l`
-     B=`git log src/include/ndpi_protocol_ids.h|wc -l`
-     C=`git log src/include/ndpi_api.h.in|wc -l`
-     NDPI_API_VERSION=$((A+B+C))
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
      GIT_DATE=`date -u -r CHANGELOG.md`
-     if test -z "$SOURCE_DATE_EPOCH" ; then :
-         SOURCE_DATE_EPOCH=`date +%s`
-     fi
-     NDPI_API_VERSION=`echo $SOURCE_DATE_EPOCH | cut -c7-10`
 fi
 
-NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
+NDPI_API_VERSION=0x$( cat \
+    src/include/ndpi_typedefs.h \
+    src/include/ndpi_protocol_ids.h \
+    src/include/ndpi_api.h.in \
+    | md5sum | cut -c1-16 \
+)
 
 echo "Setting API version to $NDPI_API_VERSION"
 
