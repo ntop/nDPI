@@ -36,8 +36,8 @@ static void cacheMiningHostTwins(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ************************************************************************** */
 
-void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
-			    struct ndpi_flow_struct *flow) {
+static void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t source = ntohs(packet->udp->source);
   u_int16_t dest = ntohs(packet->udp->dest);
@@ -49,8 +49,7 @@ void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_struct,
      Ethereum P2P Discovery Protocol
      https://github.com/ConsenSys/ethereum-dissectors/blob/master/packet-ethereum-disc.c
   */
-  if(packet->udp
-     && (packet->payload_packet_len > 98)
+  if((packet->payload_packet_len > 98)
      && (packet->payload_packet_len < 1280)
      && ((source == 30303) || (dest == 30303))
      && (packet->payload[97] <= 0x04 /* NODES */)
@@ -79,14 +78,14 @@ static u_int8_t isEthPort(u_int16_t dport) {
 
 /* ************************************************************************** */
 
-void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-			    struct ndpi_flow_struct *flow) {
+static void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search MINING TCP\n");
 
   /* Check connection over TCP */
-  if(packet->tcp && (packet->payload_packet_len > 10)) {
+  if(packet->payload_packet_len > 10) {
     if(packet->tcp->source == htons(8333) ||
        packet->tcp->dest == htons(8333)) {
       /*
@@ -168,24 +167,25 @@ void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ************************************************************************** */
 
+void ndpi_search_mining(struct ndpi_detection_module_struct *ndpi_struct,
+			struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  if(packet->tcp)
+    return ndpi_search_mining_tcp(ndpi_struct, flow);
+  return ndpi_search_mining_udp(ndpi_struct, flow);
+}
+
+
+/* ************************************************************************** */
+
 void init_mining_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 			   u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("Mining", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_MINING,
-				      ndpi_search_mining_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
-
-  /* ************ */
-  
-  ndpi_set_bitmask_protocol_detection("Mining", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_MINING,
-				      ndpi_search_mining_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      ndpi_search_mining,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
