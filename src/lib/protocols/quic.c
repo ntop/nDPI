@@ -1042,11 +1042,10 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
 
   if(!flow->l4.udp.quic_reasm_buf) {
     flow->l4.udp.quic_reasm_buf = (uint8_t *)ndpi_malloc(max_quic_reasm_buffer_len);
-    flow->l4.udp.quic_reasm_buf_bitmap = (uint8_t *)ndpi_malloc(quic_reasm_buffer_bitmap_len);
+    flow->l4.udp.quic_reasm_buf_bitmap = (uint8_t *)ndpi_calloc(quic_reasm_buffer_bitmap_len, sizeof(uint8_t));
     if(!flow->l4.udp.quic_reasm_buf || !flow->l4.udp.quic_reasm_buf_bitmap)
       return -1; /* Memory error */
     flow->l4.udp.quic_reasm_buf_last_pos = 0;
-    memset(flow->l4.udp.quic_reasm_buf_bitmap, 0, quic_reasm_buffer_bitmap_len);
   }
   if(last_pos > max_quic_reasm_buffer_len)
     return -3; /* Buffer too small */
