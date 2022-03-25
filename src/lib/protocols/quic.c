@@ -1002,41 +1002,68 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   return NULL;
 }
 
+static void update_reasm_buf_bitmap(u_int8_t *buffer_bitmap,
+                                const u_int32_t buffer_bitmap_size,
+                                const u_int32_t recv_pos,
+                                const u_int32_t recv_len)
+{
+  if (!recv_len || !buffer_bitmap_size || recv_pos + recv_len > buffer_bitmap_size * 8)
+    return;
+  const u_int32_t start_byte = recv_pos / 8;
+  const u_int32_t end_byte = (recv_pos + recv_len - 1) / 8;
+  const u_int32_t start_bit = recv_pos % 8;
+  const u_int32_t end_bit = (start_bit + recv_len - 1) % 8;
+  if (start_byte == end_byte)
+    buffer_bitmap[start_byte] |= (((1U << recv_len) - 1U) << start_bit); // fill from bit 'start_bit' until bit 'end_bit', both inclusive
+  else{
+    for (u_int32_t i = start_byte + 1; i <= end_byte - 1; i++)
+      buffer_bitmap[i] = 0xff; // completely received byte
+    buffer_bitmap[start_byte] |= ~((1U << start_bit) - 1U); // fill from bit 'start_bit' until bit 7, both inclusive
+    buffer_bitmap[end_byte] |= (1U << end_bit + 1U) - 1U; // fill from bit 0 until bit 'end_bit', both inclusive
+  }
+}
+
+static int is_reasm_buf_complete(const u_int8_t *buffer_bitmap,
+                                 const u_int32_t buffer_len)
+{
+  for (u_int32_t i = 0; i < buffer_len / 8; i++)
+    if (buffer_bitmap[i] != 0xff)
+      return 0;
+  return 1;
+}
 
 static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
                         uint64_t frag_len, uint64_t frag_offset,
                         const u_int8_t **buf, u_int64_t *buf_len)
 {
-  const uint64_t max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... */
+  const uint64_t max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... Must be multiple of 8*/
+  const uint64_t quic_reasm_buffer_bitmap_len = max_quic_reasm_buffer_len / 8;
   const uint64_t last_pos = frag_offset + frag_len;
-  /* 
-     Working: in-order and out-of order, non overlapping, fragments
-     Not supported: retransmissions and (partial) overlapping
-  */
 
   if(!flow->l4.udp.quic_reasm_buf) {
     flow->l4.udp.quic_reasm_buf = (uint8_t *)ndpi_malloc(max_quic_reasm_buffer_len);
-    if(!flow->l4.udp.quic_reasm_buf)
+    flow->l4.udp.quic_reasm_buf_bitmap = (uint8_t *)ndpi_malloc(quic_reasm_buffer_bitmap_len);
+    if(!flow->l4.udp.quic_reasm_buf || !flow->l4.udp.quic_reasm_buf_bitmap)
       return -1; /* Memory error */
-    flow->l4.udp.quic_reasm_buf_len = 0;
     flow->l4.udp.quic_reasm_buf_last_pos = 0;
+    memset(flow->l4.udp.quic_reasm_buf_bitmap, 0, quic_reasm_buffer_bitmap_len);
   }
   if(last_pos > max_quic_reasm_buffer_len)
     return -3; /* Buffer too small */
 
   memcpy(&flow->l4.udp.quic_reasm_buf[frag_offset], frag, frag_len);
-  flow->l4.udp.quic_reasm_buf_len += frag_len;
   flow->l4.udp.quic_reasm_buf_last_pos = last_pos > flow->l4.udp.quic_reasm_buf_last_pos ? last_pos : flow->l4.udp.quic_reasm_buf_last_pos;
+  update_reasm_buf_bitmap(flow->l4.udp.quic_reasm_buf_bitmap, quic_reasm_buffer_bitmap_len, frag_offset, frag_len); 
 
   *buf = flow->l4.udp.quic_reasm_buf;
-  *buf_len = flow->l4.udp.quic_reasm_buf_len;
+  *buf_len = flow->l4.udp.quic_reasm_buf_last_pos;
   return 0;
 }
-static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len, uint64_t last_pos)
+static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len)
 {
   uint32_t msg_len;
 
-  if(buf_len >= 4 && last_pos == buf_len) {
+  if(buf_len >= 4) {
     msg_len = (buf[1] << 16) + (buf[2] << 8) + buf[3];
     if (4 + msg_len == buf_len) {
       return 1;
@@ -1047,8 +1074,8 @@ static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len, uint64_t last_p
 static int is_ch_reassembler_pending(struct ndpi_flow_struct *flow)
 {
   return flow->l4.udp.quic_reasm_buf != NULL &&
-         !is_ch_complete(flow->l4.udp.quic_reasm_buf,
-			 flow->l4.udp.quic_reasm_buf_len, flow->l4.udp.quic_reasm_buf_last_pos);
+         !(is_ch_complete(flow->l4.udp.quic_reasm_buf, flow->l4.udp.quic_reasm_buf_last_pos)
+            && is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, flow->l4.udp.quic_reasm_buf_last_pos));
 }
 static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 						  struct ndpi_flow_struct *flow,
@@ -1063,7 +1090,7 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
 
   /* Fast path: no need of reassembler stuff */
   if(frag_offset == 0 &&
-     is_ch_complete(frag, frag_len, frag_len)) {
+     is_ch_complete(frag, frag_len)) {
     NDPI_LOG_DBG2(ndpi_struct, "Complete CH (fast path)\n");
     *crypto_data_len = frag_len;
     return frag;
@@ -1072,7 +1099,8 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
   rc = __reassemble(flow, frag, frag_len, frag_offset,
                     &crypto_data, crypto_data_len);
   if(rc == 0) {
-    if(is_ch_complete(crypto_data, *crypto_data_len, flow->l4.udp.quic_reasm_buf_last_pos)) {
+    if(is_ch_complete(crypto_data, *crypto_data_len) &&
+      is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, *crypto_data_len)) {
       NDPI_LOG_DBG2(ndpi_struct, "Reassembler completed!\n");
       return crypto_data;
     }
