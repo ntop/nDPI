@@ -1019,7 +1019,7 @@ static void update_reasm_buf_bitmap(u_int8_t *buffer_bitmap,
     for (u_int32_t i = start_byte + 1; i <= end_byte - 1; i++)
       buffer_bitmap[i] = 0xff; // completely received byte
     buffer_bitmap[start_byte] |= ~((1U << start_bit) - 1U); // fill from bit 'start_bit' until bit 7, both inclusive
-    buffer_bitmap[end_byte] |= (1U << end_bit + 1U) - 1U; // fill from bit 0 until bit 'end_bit', both inclusive
+    buffer_bitmap[end_byte] |= (1U << (end_bit + 1U)) - 1U; // fill from bit 0 until bit 'end_bit', both inclusive
   }
 }
 
