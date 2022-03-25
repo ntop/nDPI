@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <inttypes.h>
 
 //#define VERBOSE 1
 #define MAX_FLOW_ROOTS_PER_THREAD 2048
@@ -1108,7 +1109,7 @@ int main(int argc, char ** argv)
   printf("usage: %s [PCAP-FILE-OR-INTERFACE]\n"
 	 "----------------------------------\n"
 	 "nDPI version: %s\n"
-	 " API version: %u\n"
+	 " API version: %" PRIu64 "\n"
 	 "libgcrypt...: %s\n"
 	 "----------------------------------\n",
 	 argv[0],

@@ -12,8 +12,8 @@ RANLIB = @RANLIB@
 # Installation directories
 #
 prefix     = @prefix@
-libdir     = ${prefix}/lib
-includedir = ${prefix}/include/ndpi
+libdir     = @libdir@
+includedir = @includedir@/ndpi
 CFLAGS     += -fPIC -DPIC -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @CFLAGS@ @CUSTOM_NDPI@
 LDFLAGS    = @LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@
