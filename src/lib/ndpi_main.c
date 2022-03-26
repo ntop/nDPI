@@ -8101,8 +8101,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       tmp[j] = '\0';
       len = j;
 
+      u_int max_num_consecutive_digits_first_word = 0, num_word = 0;
+      
       for(word = strtok_r(tmp, ".", &tok_tmp); ; word = strtok_r(NULL, ".", &tok_tmp)) {
-	if(!word) break;
+	u_int num_consecutive_digits = 0;
+	
+	if(!word) break; else num_word++;
 
 	num_words++;
 
@@ -8114,7 +8118,16 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	trigram_char_skip = 0;
 
 	for(i = 0; word[i+1] != '\0'; i++) {
-	  switch(word[i]) {
+	  if(isdigit(word[i]))
+	    num_consecutive_digits++;
+	  else {
+	    if((num_word == 1) && (num_consecutive_digits > max_num_consecutive_digits_first_word))
+	      max_num_consecutive_digits_first_word = num_consecutive_digits;
+	    
+	    num_consecutive_digits = 0;
+	  }
+	  
+	  switch(word[i]) {	    
 	  case '-':
 	    num_dash++;
 	    /*
@@ -8133,7 +8146,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	  case '.':
 	    continue;
-	    break;
+	    break;	 	    
 	  }
 	  num_bigram_checks++;
 
@@ -8180,8 +8193,14 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	    }
 	  }
 	} /* for */
-      } /* for */
 
+	if((num_word == 1) && (num_consecutive_digits > max_num_consecutive_digits_first_word))
+	  max_num_consecutive_digits_first_word = num_consecutive_digits;
+      } /* for */
+      
+      if(ndpi_verbose_dga_detection)
+	printf("[NDPI] max_num_consecutive_digits_first_word=%u\n", max_num_consecutive_digits_first_word);	
+      
       if(ndpi_verbose_dga_detection)
 	printf("[%s][num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u][num_trigram_vowels: %u][num_trigram_found: %u/%u][vowels: %u][rc: %u]\n",
 	       name, num_found, num_impossible, num_digits, num_bigram_checks, num_vowels, len, num_trigram_vowels,
@@ -8210,6 +8229,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	rc = 1;
 
       if(num_dash > 2)
+	rc = 0;
+
+      /* Skip names whose first word item has at least 3 consecutive digits */
+      if(max_num_consecutive_digits_first_word > 2)
 	rc = 0;
 
       if(ndpi_verbose_dga_detection) {
