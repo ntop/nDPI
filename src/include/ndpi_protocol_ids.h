@@ -89,7 +89,7 @@ typedef enum {
   NDPI_PROTOCOL_DISCORD               = 58,
   NDPI_PROTOCOL_TVUPLAYER             = 59,
   NDPI_PROTOCOL_MONGODB               = 60,
-  NDPI_PROTOCOL_FREE_61               = 61, /* FREE */
+  NDPI_PROTOCOL_PLURALSIGHT           = 61,
   NDPI_PROTOCOL_THUNDER               = 62,
   NDPI_PROTOCOL_OCSP                  = 63,
   NDPI_PROTOCOL_VXLAN                 = 64,
