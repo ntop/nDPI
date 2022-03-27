@@ -6,7 +6,7 @@ cd "$(dirname "${0}")"
 # Important notes: BASE values must be integers examples and represents percentage (e.g. 79%, 98%).
 BASE_ACCURACY=69
 BASE_PRECISION=89
-BASE_RECALL=41
+BASE_RECALL=40
 # ----------------------------------------------------------------------------------------------------------------------
 
 DGA_EVALUATE="./dga/dga_evaluate"
