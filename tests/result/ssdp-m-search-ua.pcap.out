@@ -1,0 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+SSDP	4	864	1
+
+	1	UDP 192.168.242.50:56446 -> 239.255.255.250:1900 [proto: 12/SSDP][ClearText][Confidence: DPI][cat: System/18][4 pkts/864 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][3.00 sec][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

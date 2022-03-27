@@ -29,9 +29,30 @@
 #include "ndpi_api.h"
 
 
+static void ssdp_parse_lines(struct ndpi_detection_module_struct
+					 *ndpi_struct, struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  ndpi_parse_packet_line_info(ndpi_struct, flow);
+
+  /* Save user-agent for device discovery if available */
+  if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
+    if(flow->http.user_agent == NULL) {
+      flow->http.user_agent = ndpi_malloc(packet->user_agent_line.len + 1);
+      if(flow->http.user_agent) {
+        memcpy(flow->http.user_agent,
+          (char*)packet->user_agent_line.ptr, packet->user_agent_line.len);
+        flow->http.user_agent[packet->user_agent_line.len] = '\0';
+      }
+    }
+  }
+}
+
 static void ndpi_int_ssdp_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
+  ssdp_parse_lines(ndpi_struct, flow);
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
