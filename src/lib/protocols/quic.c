@@ -1041,7 +1041,7 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
   const uint64_t last_pos = frag_offset + frag_len;
 
   if(!flow->l4.udp.quic_reasm_buf) {
-    flow->l4.udp.quic_reasm_buf = (uint8_t *)ndpi_calloc(max_quic_reasm_buffer_len, sizeof(uint8_t));
+    flow->l4.udp.quic_reasm_buf = (uint8_t *)ndpi_malloc(max_quic_reasm_buffer_len);
     flow->l4.udp.quic_reasm_buf_bitmap = (uint8_t *)ndpi_calloc(quic_reasm_buffer_bitmap_len, sizeof(uint8_t));
     if(!flow->l4.udp.quic_reasm_buf || !flow->l4.udp.quic_reasm_buf_bitmap)
       return -1; /* Memory error */
