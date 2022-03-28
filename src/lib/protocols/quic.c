@@ -1073,8 +1073,8 @@ static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len)
 static int is_ch_reassembler_pending(struct ndpi_flow_struct *flow)
 {
   return flow->l4.udp.quic_reasm_buf != NULL &&
-         !(is_ch_complete(flow->l4.udp.quic_reasm_buf, flow->l4.udp.quic_reasm_buf_last_pos)
-            && is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, flow->l4.udp.quic_reasm_buf_last_pos));
+         !(is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, flow->l4.udp.quic_reasm_buf_last_pos)
+            && is_ch_complete(flow->l4.udp.quic_reasm_buf, flow->l4.udp.quic_reasm_buf_last_pos));
 }
 static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 						  struct ndpi_flow_struct *flow,
@@ -1098,8 +1098,8 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
   rc = __reassemble(flow, frag, frag_len, frag_offset,
                     &crypto_data, crypto_data_len);
   if(rc == 0) {
-    if(is_ch_complete(crypto_data, *crypto_data_len) &&
-      is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, *crypto_data_len)) {
+    if(is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, *crypto_data_len) &&
+      is_ch_complete(crypto_data, *crypto_data_len)) {
       NDPI_LOG_DBG2(ndpi_struct, "Reassembler completed!\n");
       return crypto_data;
     }
