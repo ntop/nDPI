@@ -1026,9 +1026,16 @@ static void update_reasm_buf_bitmap(u_int8_t *buffer_bitmap,
 static int is_reasm_buf_complete(const u_int8_t *buffer_bitmap,
                                  const u_int32_t buffer_len)
 {
-  for(u_int32_t i = 0; i < buffer_len / 8; i++)
+  const u_int32_t complete_bytes = buffer_len / 8;
+  const u_int32_t remaining_bits = buffer_len % 8;
+
+  for(u_int32_t i = 0; i < complete_bytes; i++)
     if (buffer_bitmap[i] != 0xff)
       return 0;
+
+  if (remaining_bits && buffer_bitmap[complete_bytes] != (1U << (remaining_bits)) - 1) 
+    return 0;
+    
   return 1;
 }
 
