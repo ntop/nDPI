@@ -64,7 +64,7 @@ AC_DEFINE_UNQUOTED(NDPI_PATCH_LEVEL,   "${NDPI_PATCH}", [nDPI patch level])
 
 # .git as directory in a cloned repo
 # .git as file in submodule based integration
-if test -d ".git" || test -f ".git" ; then :
+if test -d ".git" || test -f ".git" -a -d `cat .git | cut -d' ' -f2`; then :
      GIT_TAG=`git log -1 --format=%h`
      GIT_DATE=`git log -1 --format=%cd`
      #
