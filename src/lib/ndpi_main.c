@@ -2589,6 +2589,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str) {
   const char *domains[] = {
     ".local",
+    ".work",
+    /* DGA's are used for caching */
+    "akamaihd.net",
     NULL /* End */
   };
   const ndpi_risk risks_to_mask[] = {
@@ -8198,7 +8201,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	num_words++;
 
-	if(strlen(word) < 3) continue;
+	if(num_words > 2)
+	  break; /* Stop after the 2nd word of the domain name */
+	
+	if(strlen(word) < 5) continue;
 
 	if(ndpi_verbose_dga_detection)
 	  printf("-> word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
@@ -8236,6 +8242,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	    continue;
 	    break;	 	    
 	  }
+	  
 	  num_bigram_checks++;
 
 	  if(ndpi_verbose_dga_detection)

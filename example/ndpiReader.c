@@ -3652,6 +3652,7 @@ static void dgaUnitTest() {
 
   const char *non_dga[] = {
     "100x100design.com",
+    "vcsa.vmware.com",
     "mz.gov.pl",
     "zoomam104zc.zoom.us",
     "5CI_DOMBIN",
