@@ -61,7 +61,7 @@ static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct
   case 14:
   case 253:
   case 11:
-  case 33:
+    /* case 33: */ /* SRV */
   case 10:
   case 38:
   case 30:
