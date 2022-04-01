@@ -4157,6 +4157,7 @@ static void dgaUnitTest() {
   };
 
   const char *non_dga[] = {
+    "cdcvps.cloudapps.cisco.com",
     "100x100design.com",
     "vcsa.vmware.com",
     "mz.gov.pl",

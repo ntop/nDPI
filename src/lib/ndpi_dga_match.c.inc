@@ -102,7 +102,7 @@ NULL
 /* ******************************************************************** */
 
 static const char *ndpi_en_impossible_bigrams[] = {
-  "bk", "bq", "bx", "cb", "cf", "cg", "cj", "cp", "cv", "cw", "cx", "dx", "fk", "fq", "fv", "fx", /* "ee", removed it can be found in 'meeting' */
+  "bk", "bq", "bx", "cb", "cf", "cg", "cj", "cp", /* "cv", */ "cw", "cx", "dx", "fk", "fq", "fv", "fx", /* "ee", removed it can be found in 'meeting' */
   "fz", "gq", "gv", "gx", "hh", "hk", "hv", "hx", "hz", "iy", "jb", /* "jc", jcrew.com */ "jd", "jf", "jg", "jh", "jk",
   "jl", "jm", "jn", "jp", "jq", /* "jr",*/  /* "js", */ "jt", "jv", "jw", "jx", "jy", "jz", /* "kg", */ "kq", "kv", "kx",
   "kz", "lq", "lx", /* "mg" tamgrt.com , */ "mj", /* "mq", mqtt */  "mx", "mz", "pq", "pv", "px", "qb", "qc", "qd", "qe", "qf", "ii",

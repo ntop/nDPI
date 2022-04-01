@@ -48,7 +48,7 @@
 #endif
 
 #include "ndpi_content_match.c.inc"
-#include "inc_generated/ndpi_dga_match.c.inc"
+#include "ndpi_dga_match.c.inc"
 #include "inc_generated/ndpi_azure_match.c.inc"
 #include "inc_generated/ndpi_tor_match.c.inc"
 #include "inc_generated/ndpi_whatsapp_match.c.inc"
