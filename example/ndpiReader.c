@@ -1486,15 +1486,15 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       struct tm *before = gmtime_r(&flow->ssh_tls.notBefore, &a);
       struct tm *after  = gmtime_r(&flow->ssh_tls.notAfter, &b);
 
-      strftime(notBefore, sizeof(notBefore), "%F %T", before);
-      strftime(notAfter, sizeof(notAfter), "%F %T", after);
+      strftime(notBefore, sizeof(notBefore), "%Y-%m-%d %H:%M:%S", before);
+      strftime(notAfter, sizeof(notAfter), "%Y-%m-%d %H:%M:%S", after);
 
       fprintf(out, "[Validity: %s - %s]", notBefore, notAfter);
     }
 
     if(flow->ssh_tls.server_cipher != '\0') fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher));
-    if(flow->bittorent_hash != '\0') fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
-    if(flow->dhcp_fingerprint != '\0') fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
+    if(flow->bittorent_hash != NULL) fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
+    if(flow->dhcp_fingerprint != NULL) fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
     if(flow->dhcp_class_ident) fprintf(out, "[DHCP Class Ident: %s]",
 				       flow->dhcp_class_ident);
 
@@ -3349,7 +3349,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	}
 #ifdef WIN32
 	/* localtime() on Windows is thread-safe */
-	struct tm * tm_ptr = localtime(&pcap_start.tv_sec);
+	time_t tv_sec = pcap_start.tv_sec;
+	struct tm * tm_ptr = localtime(&tv_sec);
 	result = *tm_ptr;
 #else
 	localtime_r(&pcap_start.tv_sec, &result);
@@ -3358,7 +3359,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	printf("\tAnalysis begin:        %s\n", when);
 #ifdef WIN32
 	/* localtime() on Windows is thread-safe */
-	tm_ptr = localtime(&pcap_end.tv_sec);
+	tv_sec = pcap_end.tv_sec;
+	tm_ptr = localtime(&tv_sec);
 	result = *tm_ptr;
 #else
 	localtime_r(&pcap_end.tv_sec, &result);
@@ -3546,8 +3548,18 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     json_object *jObj_stats = json_object_new_object();
     char timestamp[64];
     int count;
+    struct tm result;
 
-    strftime(timestamp, sizeof(timestamp), "%FT%TZ", localtime(&pcap_start.tv_sec));
+#ifdef WIN32
+    /* localtime() on Windows is thread-safe */
+    time_t tv_sec = pcap_start.tv_sec;
+    struct tm * tm_ptr = localtime(&tv_sec);
+    result = *tm_ptr;
+#else
+    localtime_r(&pcap_start.tv_sec, &result);
+#endif
+
+    strftime(timestamp, sizeof(timestamp), "%d/%b/%Y %H:%M:%S", &result);
     json_object_object_add(jObj_stats, "time", json_object_new_string(timestamp));
 
     saveScannerStats(&jObj_stats, &scannerHosts);
@@ -3911,7 +3923,11 @@ static void runPcapLoop(u_int16_t thread_id) {
  * @brief Process a running thread
  */
 void * processing_thread(void *_thread_id) {
-  long thread_id = (long) _thread_id;
+#ifdef WIN64
+  long long int thread_id = (long long int)_thread_id;
+#else
+  long int thread_id = (long int)_thread_id;
+#endif
 #ifndef USE_DPDK
   char pcap_error_buffer[PCAP_ERRBUF_SIZE];
 #endif
@@ -3930,7 +3946,13 @@ void * processing_thread(void *_thread_id) {
     }
   } else
 #endif
-    if((!json_flag) && (!quiet_mode)) printf("Running thread %ld...\n", thread_id);
+    if((!json_flag) && (!quiet_mode)) {
+#ifdef WIN64
+      printf("Running thread %lld...\n", thread_id);
+#else
+      printf("Running thread %ld...\n", thread_id);
+#endif
+    }
 
 #ifdef USE_DPDK
   while(dpdk_run_capture) {
@@ -3991,7 +4013,11 @@ void * processing_thread(void *_thread_id) {
  */
 void test_lib() {
   u_int64_t processing_time_usec, setup_time_usec;
+#ifdef WIN64
+  long long int thread_id;
+#else
   long thread_id;
+#endif
 
 #ifdef HAVE_LIBJSON_C
   json_init();
@@ -4023,7 +4049,11 @@ void test_lib() {
     status = pthread_create(&ndpi_thread_info[thread_id].pthread, NULL, processing_thread, (void *) thread_id);
     /* check pthreade_create return value */
     if(status != 0) {
+#ifdef WIN64
+      fprintf(stderr, "error on create %lld thread\n", thread_id);
+#else
       fprintf(stderr, "error on create %ld thread\n", thread_id);
+#endif
       exit(-1);
     }
   }
@@ -4032,11 +4062,19 @@ void test_lib() {
     status = pthread_join(ndpi_thread_info[thread_id].pthread, &thd_res);
     /* check pthreade_join return value */
     if(status != 0) {
+#ifdef WIN64
+      fprintf(stderr, "error on join %lld thread\n", thread_id);
+#else
       fprintf(stderr, "error on join %ld thread\n", thread_id);
+#endif
       exit(-1);
     }
     if(thd_res != NULL) {
+#ifdef WIN64
+      fprintf(stderr, "error on returned value of %lld joined thread\n", thread_id);
+#else
       fprintf(stderr, "error on returned value of %ld joined thread\n", thread_id);
+#endif
       exit(-1);
     }
   }
@@ -4734,6 +4772,7 @@ void getDestinationHosts(struct json_object *jObj_stat, int duration,
 /* *********************************************** */
 
 #ifdef HAVE_LIBJSON_C
+#ifndef WIN32
 static void produceBpfFilter(char *filePath) {
   json_object *jObj; /* entire json object from file */
   json_object *jObj_duration;
@@ -4861,6 +4900,7 @@ static void produceBpfFilter(char *filePath) {
 
   json_object_put(jObj); /* free memory */
 }
+#endif
 #endif
 
 
