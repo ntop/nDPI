@@ -107,16 +107,13 @@ static void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_str
     if((packet->payload_packet_len > 300)
        && (packet->payload_packet_len < 600)
        && (packet->payload[2] == 0x04)) {
-
       if(isEthPort(ntohs(packet->tcp->dest)) /* Ethereum port */) {
 	snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	if(packet->iph) /* TODO: ipv6 */
 	  cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
 	return;
-      } else
-	flow->guessed_protocol_id = NDPI_PROTOCOL_MINING;
-      
+      } 
     } else if(ndpi_strnstr((const char *)packet->payload, "{", packet->payload_packet_len)
 	 && (
 	   ndpi_strnstr((const char *)packet->payload, "\"eth1.0\"", packet->payload_packet_len)
