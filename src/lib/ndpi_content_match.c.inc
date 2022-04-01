@@ -887,6 +887,10 @@ static ndpi_network host_protocol_list[] = {
     https://help.salesforce.com/s/articleView?id=000321501&type=1
   */
 
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_content_match_host_protocol_list.c.inc"
+#endif
+
   /* End */
   { 0x0, 0, 0 }
 };
@@ -1760,6 +1764,10 @@ static ndpi_protocol_match host_match[] =
    { "pluralsight.imgix.net",                                               "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "zn6qzq6caaucudesr-pluralsight.siteintercept.qualtrics.com",           "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ip-video-course-exercise-files-us-west-2.s3.us-west-2.amazonaws.com", "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
+#endif
 
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL }
   };
