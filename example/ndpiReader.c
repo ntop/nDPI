@@ -4521,7 +4521,7 @@ float getAverage(struct json_object *jObj_stat, char *field) {
   int j = 0;
 
   if((r = strcmp(field, "top.scanner.stats")) == 0) {
-    for(j=0; j<json_object_array_length(jObj_stat); j++) {
+    for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
       field_stat = json_object_array_get_idx(jObj_stat, j);
       json_object *jObj_tot_flows_number;
 
@@ -4534,7 +4534,7 @@ float getAverage(struct json_object *jObj_stat, char *field) {
       sum += tot_flows_number;
     }
   } else if((r = strcmp(field, "top.src.pkts.stats")) == 0) {
-    for(j=0; j<json_object_array_length(jObj_stat); j++) {
+    for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
       field_stat = json_object_array_get_idx(jObj_stat, j);
       json_object *jObj_packets_number;
 
@@ -4567,7 +4567,7 @@ float getStdDeviation(struct json_object *jObj_stat, float average, char *field)
   int r;
 
   if((r = strcmp(field, "top.scanner.stats")) == 0) {
-    for(; j<json_object_array_length(jObj_stat); j++) {
+    for(; j<(int)json_object_array_length(jObj_stat); j++) {
       field_stat = json_object_array_get_idx(jObj_stat, j);
       json_object *jObj_tot_flows_number;
 
@@ -4592,7 +4592,7 @@ float getStdDeviation(struct json_object *jObj_stat, float average, char *field)
 void getSourcePorts(struct json_object *jObj_stat, int srcPortArray[], int size, float threshold) {
   int j;
 
-  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
     json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
     json_object *jObj_packets_number;
     json_object *jObj_flows_percent;
@@ -4641,7 +4641,7 @@ void getSourcePorts(struct json_object *jObj_stat, int srcPortArray[], int size,
 void getReceiverHosts(struct json_object *jObj_stat, const char *dstHostArray[16], int size) {
   int j;
 
-  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
     json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
     json_object *jObj_host_address;
     json_object *jObj_pkts_percent;
@@ -4675,7 +4675,7 @@ void getScannerHosts(struct json_object *jObj_stat, int duration,
                      float threshold) {
   int j;
 
-  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
     json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
     json_object *jObj_host_address;
     json_object *jObj_tot_flows_number;
@@ -4710,7 +4710,7 @@ void getDestinationHosts(struct json_object *jObj_stat, int duration,
                          const char *dstHostArray[16], int size) {
   int j;
 
-  for(j=0; j<json_object_array_length(jObj_stat); j++) {
+  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
     json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
     json_object *jObj_host_address;
     json_object *jObj_flows_percent;
