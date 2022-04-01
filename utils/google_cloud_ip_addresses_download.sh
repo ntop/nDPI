@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")" || return
 
-DEST=../src/lib/ndpi_google_cloud_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_google_cloud_match.c.inc
 TMP=/tmp/google_c.json
 LIST=/tmp/google_c.list
 ORIGIN="https://www.gstatic.com/ipranges/cloud.json"

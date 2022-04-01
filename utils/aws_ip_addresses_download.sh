@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-DEST=../src/lib/ndpi_amazon_aws_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_amazon_aws_match.c.inc
 TMP=/tmp/aws.json
 LIST=/tmp/aws.list
 ORIGIN=https://ip-ranges.amazonaws.com/ip-ranges.json
