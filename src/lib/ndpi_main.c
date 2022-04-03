@@ -1775,7 +1775,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TARGUS_GETDATA,
 			  "TargusDataspeed", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 5001, 5201, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 5001, 5201, 0, 0, 0) /* UDP */);
+			  ndpi_build_default_ports(ports_b, 5001, 5201, 0, 0, 0) /* UDP */); /* Missing dissector: port based only */
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AMAZON_VIDEO,
 			  "AmazonVideo", NDPI_PROTOCOL_CATEGORY_CLOUD,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -4363,9 +4363,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Amazon_Video */
   init_amazon_video_dissector(ndpi_str, &a, detection_bitmask);
-
-  /* Targus Getdata */
-  init_targus_getdata_dissector(ndpi_str, &a, detection_bitmask);
 
   /* S7 comm */
   init_s7comm_dissector(ndpi_str, &a, detection_bitmask);
