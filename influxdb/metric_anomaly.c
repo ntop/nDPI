@@ -30,12 +30,13 @@
 /* *************************************************** */
 
 static void help() {
-  printf("Usage: metric_anomaly [-Q][-v][-a <alpha>][-q] -d <database> -q <query>\n"
+  printf("Usage: metric_anomaly [-Q][-v][-z][-a <alpha>][-q] -d <database> -q <query>\n"
 	 "-a             | Set alpha. Valid range >0 .. <1. Default %.2f\n"
 	 "-Q             | Quick output (only anomalies are reported)\n"
 	 "-d <database>  | InfluxDB database name\n"
 	 "-q <query>     | InfluxQL query\n"
 	 "-v             | Verbose\n"
+	 "-z             | Bottom metric value set to zero\n"
 	 ,
 	 DEFAULT_ALPHA);
 
@@ -53,12 +54,13 @@ int main(int argc, char *argv[]) {
   float alpha, ro;
   char c;
   FILE *fd;
+  bool go_below_zero = true;
   
   /* Defaults */
   alpha   = DEFAULT_ALPHA;
   ro      = DEFAULT_RO;
   
-  while((c = getopt(argc, argv, "a:Qd:q:v")) != '?') {
+  while((c = getopt(argc, argv, "a:Qd:q:vz")) != '?') {
     if(c == -1) break;
 
     switch(c) {
@@ -89,6 +91,10 @@ int main(int argc, char *argv[]) {
       verbose = 1;
       break;
 
+    case 'z':
+      go_below_zero = false;
+      break;
+
     default:
       help();
       break;
@@ -115,7 +121,7 @@ int main(int argc, char *argv[]) {
     double prediction, confidence_band;
     double lower, upper;
     int rc;
-    u_int is_anomaly;
+    bool is_anomaly;
 
     if(sscanf(buf, "%u %f", &epoch, &value) != 2)
       continue;
@@ -125,7 +131,10 @@ int main(int argc, char *argv[]) {
     value *= 100; /* trick to avoid dealing with floats */
     rc = ndpi_ses_add_value(&ses, value, &prediction, &confidence_band);
     lower = prediction - confidence_band, upper = prediction + confidence_band;
-    is_anomaly = ((rc == 0) || (confidence_band == 0) || ((value >= lower) && (value <= upper))) ? 0 : 1;
+
+    if(!go_below_zero) lower = ndpi_max(lower, 0), upper = ndpi_max(upper, 0);
+    
+    is_anomaly = ((rc == 0) || (confidence_band == 0) || ((value >= lower) && (value <= upper))) ? false : true;
     
     if(verbose || is_anomaly) {
       const time_t _t = epoch;
@@ -144,9 +153,9 @@ int main(int argc, char *argv[]) {
 		 "When", "Value", "Prediction", "Lower", "Upper", "Out", "Band");
 	}
 	
-	printf("%s %12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f]\n",
+	printf("%s %12.3f\t%.3f\t%12.3f\t%12.3f\t %s [%.3f][rc: %d]\n",
 	       buf, value/100., prediction/100., lower/100., upper/100., is_anomaly? "ANOMALY" : "OK",
-	       confidence_band/100.);
+	       confidence_band/100., rc);
       }
     }    
   }
