@@ -41,50 +41,20 @@ static int krb_decode_asn1_length(struct ndpi_detection_module_struct *ndpi_stru
                                   size_t * const kasn1_offset)
 {
   struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-  unsigned char length_octet;
   int length;
+  u_int16_t value_len;
 
-  length_octet = packet->payload[*kasn1_offset];
+  length = ndpi_asn1_ber_decode_length(&packet->payload[*kasn1_offset],
+				       packet->payload_packet_len - *kasn1_offset,
+				       &value_len);
 
-  if (length_octet == 0xFF)
-  {
-    /* Malformed Packet */
-    return -1;
-  }
-
-  if ((length_octet & 0x80) == 0)
-  {
-    /* Definite, short */
-    length = length_octet & 0x7F;
-    (*kasn1_offset)++;
-  } else {
-    /* Definite, long or indefinite (not support by this implementation) */
-    if ((length_octet & 0x7F) == 0)
-    {
-      /* indefinite, unsupported */
-      return -1;
-    }
-
-    length_octet &= 0x7F;
-    if (length_octet > 4 /* We support only 4 additional length octets. */ ||
-        packet->payload_packet_len <= *kasn1_offset + length_octet + 1)
-    {
-      return -1;
-    }
-
-    int i = 1;
-    length = 0;
-    for (; i <= length_octet; ++i)
-    {
-      length |= (unsigned int)packet->payload[*kasn1_offset + i] << (length_octet - i) * 8;
-    }
-    *kasn1_offset += i;
-  }
-
-  if (packet->payload_packet_len < *kasn1_offset + length)
+  if (length == -1 ||
+      packet->payload_packet_len < *kasn1_offset + value_len + length)
   {
     return -1;
   }
+
+  *kasn1_offset += value_len;
 
   return length;
 }
