@@ -39,7 +39,6 @@ static void ndpi_int_spotify_add_connection(struct ndpi_detection_module_struct 
 static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
   if(packet->udp != NULL) {
@@ -63,56 +62,6 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
        packet->payload[8] == 0x50 ) {
       NDPI_LOG_INFO(ndpi_struct, "found spotify tcp dissector\n");
       ndpi_int_spotify_add_connection(ndpi_struct, flow, 0);
-    }
-
-
-    if(packet->iph /* IPv4 Only: we need to support packet->iphv6 at some point */) {
-      /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */ {
-	/*
-	Spotify
-
-	78.31.8.0 - 78.31.15.255 (78.31.8.0/22)
-	AS29017
-
-	193.235.232.0 - 193.235.235.255 (193.235.232.0/22)
-	AS29017
-
-      194.132.196.0 - 194.132.199.255 (194.132.198.147/22)
-      AS43650
-
-      194.132.176.0 - 194.132.179.255  (194.132.176.0/22)
-      AS43650
-
-      194.132.162.0 - 194.132.163.255   (194.132.162.0/24)
-      AS43650
-      */
-
-	//printf("%08X - %08X\n", ntohl(packet->iph->saddr), ntohl(packet->iph->daddr));
-
-    unsigned long src_addr = ntohl(packet->iph->saddr);
-    unsigned long dst_addr = ntohl(packet->iph->daddr);
-    unsigned long src_addr_masked_22 = src_addr & 0xFFFFFC00; // */22
-    unsigned long dst_addr_masked_22 = dst_addr & 0xFFFFFC00; // */22
-    unsigned long src_addr_masked_24 = src_addr & 0xFFFFFF00; // */24
-    unsigned long dst_addr_masked_24 = dst_addr & 0xFFFFFF00; // */24
-
-	if(   src_addr_masked_22 == 0x4E1F0800 /* 78.31.8.0 */
-	   || dst_addr_masked_22 == 0x4E1F0800 /* 78.31.8.0 */
-	   /* **** */
-	   || src_addr_masked_22 == 0xC1EBE800 /* 193.235.232.0 */
-	   || dst_addr_masked_22 == 0xC1EBE800 /* 193.235.232.0 */
-       /* **** */
-       || src_addr_masked_22 == 0xC284C400 /* 194.132.196.0 */
-       || dst_addr_masked_22 == 0xC284C400 /* 194.132.196.0 */
-       /* **** */
-       || src_addr_masked_24 == 0xC284A200 /* 194.132.162.0 */
-       || dst_addr_masked_24 == 0xC284A200 /* 194.132.162.0 */
-	   ) {
-        NDPI_LOG_INFO(ndpi_struct, "found spotify via ip range\n");
-	ndpi_int_spotify_add_connection(ndpi_struct, flow, 0);
-	  return;
-	}
-      }
     }
   }
 
