@@ -5398,6 +5398,24 @@ void compressedBitmapUnitTest() {
 
 /* *********************************************** */
 
+void zscoreUnitTest() {
+  u_int32_t values[] = { 1, 3, 3, 4, 5, 2, 6, 7, 30, 16 };
+  u_int32_t i;
+  u_int32_t num_outliers, num = sizeof(values) / sizeof(u_int32_t);
+  bool outliers[num], do_trace = false;
+
+  num_outliers = ndpi_find_outliers(values, outliers, num);
+
+  if(do_trace) {
+    printf("outliers: %u\n", num_outliers);
+    
+    for(i=0; i<num; i++)
+      printf("%u %s\n", values[i], outliers[i] ? "OUTLIER" : "OK");
+  }
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -5441,6 +5459,7 @@ int original_main(int argc, char **argv) {
       exit(0);
 #endif
 
+      zscoreUnitTest();
       sesUnitTest();
       desUnitTest();
 
