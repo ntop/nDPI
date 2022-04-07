@@ -96,6 +96,7 @@ AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
 if ! test "${with_only_libndpi+set}" = set; then :
     dnl> used by json-c for unit tests
+    PKG_CHECK_MODULES([JSONC], [json-c], [JSONC_LIBS="${pkg_cv_JSONC_LIBS}" JSONC_CFLAGS="${pkg_cv_JSONC_CFLAGS}"])
     AC_CHECK_LIB([json-c], [json_object_put], [], [
         AC_MSG_WARN([JSON-C not available. Disabled unit test.])
         JSONC_LIBS=""
