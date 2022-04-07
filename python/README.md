@@ -22,8 +22,9 @@ sudo make install
 
 ``` bash
 cd python
+python3 -m pip install --upgrade pip
 python3 -m install -r dev_requirements.txt
-python3 setup.py install
+python3 -m pip install .
 ```
 
 ## Usage
