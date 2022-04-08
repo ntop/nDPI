@@ -90,11 +90,11 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 	u_int16_t i = 3;
 	u_int8_t numbers_left = 4;
 	while(numbers_left) {
-	  while(packet_payload[i] >= '0' && packet_payload[i] <= '9') {
+	  while(i < payload_len && packet_payload[i] >= '0' && packet_payload[i] <= '9') {
 	    i++;
 	  }
 
-	  if(packet_payload[i++] == ' ') {
+	  if(i < payload_len && packet_payload[i++] == ' ') {
 	    numbers_left--;
 	  }
 	  else break;
@@ -102,12 +102,13 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
           
 	if(numbers_left) break;
           
-	while((packet_payload[i] >= '0' && packet_payload[i] <= '9') ||
-	      (packet_payload[i] >= 'A' && packet_payload[i] <= 'Z')) {
+	while(i < payload_len &&
+	      ((packet_payload[i] >= '0' && packet_payload[i] <= '9') ||
+	       (packet_payload[i] >= 'A' && packet_payload[i] <= 'Z'))) {
 	  i++;
 	}
           
-	if(packet_payload[i] == '\n') {
+	if(i < payload_len && packet_payload[i] == '\n') {
 	  if(++flow->tinc_state > 3) {
 	    if(ndpi_struct->tinc_cache == NULL)
 	      ndpi_struct->tinc_cache = cache_new(TINC_CACHE_MAX_SIZE);              
