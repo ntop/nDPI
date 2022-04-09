@@ -54,7 +54,14 @@ static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_
     }
 
     if (detected) {
+      ndpi_protocol proto;
+
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      /* In "extra_eval" data path, if we change the classification, we need to update the category, too */
+      proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+      proto.app_protocol = NDPI_PROTOCOL_SKYPE_TEAMS;
+      proto.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
+      ndpi_fill_protocol_category(ndpi_struct, flow, &proto);
       flow->extra_packets_func = NULL;
 
       /* Stop checking extra packets */
