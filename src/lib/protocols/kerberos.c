@@ -76,7 +76,7 @@ static int krb_decode_asn1_length(struct ndpi_detection_module_struct *ndpi_stru
     length = 0;
     for (; i <= length_octet; ++i)
     {
-      length |= packet->payload[*kasn1_offset + i] << (length_octet - i) * 8;
+      length |= (unsigned int)packet->payload[*kasn1_offset + i] << (length_octet - i) * 8;
     }
     *kasn1_offset += i;
   }
@@ -262,7 +262,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
   }
 
   length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, &text);
-  if (length < 0)
+  if (length < 3)
   {
     return -1;
   }
@@ -302,7 +302,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
   }
 
   length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, &text);
-  if (length < 0)
+  if (length < 3)
   {
     return -1;
   }
