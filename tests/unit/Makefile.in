@@ -1,10 +1,14 @@
 CC=@CC@
 CXX=@CXX@
 BUILD_MINGW=@BUILD_MINGW@
+EXE_SUFFIX=@EXE_SUFFIX@
 
 SRCHOME=../../src
 
-CFLAGS=-g -fPIC -DPIC -I$(SRCHOME)/include @JSONC_CFLAGS@ @PCAP_INC@ @CFLAGS@
+ifneq ($(OS),Windows_NT)
+CFLAGS+=-fPIC -DPIC
+endif
+CFLAGS+=-g -I$(SRCHOME)/include @JSONC_CFLAGS@ @PCAP_INC@ @CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LIBS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ -lpthread
 LDFLAGS=@LDFLAGS@
@@ -13,24 +17,41 @@ OBJS=unit
 PREFIX?=@prefix@
 
 ifneq ($(BUILD_MINGW),)
-all:
-	@echo 'Unit tests disabled due to mingw build.'
 
+ifeq ($(DISABLE_NPCAP),0)
+CFLAGS+=-I@srcdir@/../windows/WpdPack/Include -I@srcdir@/../windows/WpdPack/Include/pcap
 else
+CFLAGS+=-DDISABLE_NPCAP
+endif
 
-all: unit
+ifeq ($(DISABLE_NPCAP),0)
+
+ifneq ($(BUILD_MINGW_X64),)
+LIBS+=@srcdir@/../windows/WpdPack/Lib/x64/wpcap.lib
+else
+LIBS+=@srcdir@/../windows/WpdPack/Lib/wpcap.lib
+endif
+
+endif
+
+LIBS+=-Wl,-Bstatic -lpthread -Wl,-Bdynamic
+else
+LIBS+=-pthread
+endif
+
+all: unit$(EXE_SUFFIX)
 
 EXECUTABLE_SOURCES := unit.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 
-unit: $(LIBNDPI) unit.o
+unit$(EXE_SUFFIX): $(LIBNDPI) unit.o
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) unit.o $(LIBS) -o $@
 
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
-	/bin/rm -f *.o unit
+	/bin/rm -f *.o unit$(EXE_SUFFIX)
 	/bin/rm -f .*.o.cmd .*.o.d
 	/bin/rm -rf build
 
@@ -42,5 +63,3 @@ distdir:
 
 distclean: clean
 	/bin/rm -f Makefile
-
-endif

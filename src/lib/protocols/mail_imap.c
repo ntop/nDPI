@@ -178,7 +178,7 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  if(user) {
 	    char *pwd;
 
-	    snprintf(flow->l4.tcp.ftp_imap_pop_smtp.username,
+	    ndpi_snprintf(flow->l4.tcp.ftp_imap_pop_smtp.username,
 		     sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username),
 		     "%s", user);
 
@@ -186,7 +186,7 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    pwd = strtok_r(NULL, " \"\r\n", &saveptr);
 	    if(pwd) {
-	      snprintf(flow->l4.tcp.ftp_imap_pop_smtp.password,
+	      ndpi_snprintf(flow->l4.tcp.ftp_imap_pop_smtp.password,
 		       sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password),
 	               "%s", pwd);
 	    }

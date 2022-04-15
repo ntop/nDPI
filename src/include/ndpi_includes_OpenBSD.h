@@ -24,10 +24,6 @@
 #ifndef __NDPI_INCLUDES_OPENBSD_H__
 #define __NDPI_INCLUDES_OPENBSD_H__
 
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif /* IPPROTO_SCTP */
-
 #include <net/bpf.h>
 
 typedef struct bpf_timeval pkt_timeval;

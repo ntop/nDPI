@@ -200,17 +200,21 @@ static int krb_decode_asn1_blocks_skip(struct ndpi_detection_module_struct *ndpi
   return length;
 }
 
-static void strncpy_lower(char * const dst, size_t dst_siz,
-                          char const * const src, size_t src_siz)
+static void krb_strncpy_lower(char * const dst, size_t dst_siz,
+                              char const * const src, size_t src_siz)
 {
    int dst_len = ndpi_min(src_siz, dst_siz - 1);
 
-   strncpy(dst, src, dst_len);
    dst[dst_len] = '\0';
 
    for(int i = 0; i < dst_len; ++i)
    {
-     dst[i] = tolower(dst[i]);
+     if (ndpi_isprint(src[i]) == 0)
+     {
+       dst[i] = '?';
+     } else {
+       dst[i] = tolower(src[i]);
+     }
    }
 }
 
@@ -272,8 +276,8 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
   length -= 2;
   if (flow->protos.kerberos.domain[0] == '\0')
   {
-    strncpy_lower(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain),
-                  text, length);
+    krb_strncpy_lower(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain),
+                      text, length);
   }
 
   length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, NULL);
@@ -312,11 +316,11 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
   length -= 2;
   if (flow->protos.kerberos.hostname[0] == '\0' && text[length - 1] != '$')
   {
-    strncpy_lower(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname),
-                  text, length);
+    krb_strncpy_lower(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname),
+                      text, length);
   } else if (flow->protos.kerberos.username[0] == '\0') {
-    strncpy_lower(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username),
-                  text, length - 1);
+    krb_strncpy_lower(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username),
+                      text, length - 1);
   }
 
   return 0;
@@ -532,15 +536,9 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 			cname_str[0] = '\0'; // required, because cname_len
 
 		    while(++num_cname <= 2) {
-		      if(cname_len > sizeof(cname_str)-1)
-		        cname_len = sizeof(cname_str)-1;
-
 		      if (name_offset + cname_len + 1 >= packet->payload_packet_len)
 		        cname_len = 0;
-		      else
-		        strncpy(cname_str, (char*)&packet->payload[name_offset+1], cname_len);
-		      cname_str[cname_len] = '\0';
-		      for(i=0; i<cname_len; i++) cname_str[i] = tolower(cname_str[i]);
+		      krb_strncpy_lower(cname_str, sizeof(cname_str), (char*)&packet->payload[name_offset+1], cname_len);
 
 #ifdef KERBEROS_DEBUG
 		      printf("[AS-REQ][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n", sport, dport, cname_len, cname_str);
@@ -562,9 +560,9 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		       && (cname_len < sizeof(cname_str))
 		       && (cname_str[cname_len-1] == '$')) {
 		      cname_str[cname_len-1] = '\0';
-		      snprintf(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname), "%s", cname_str);
+		      ndpi_snprintf(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname), "%s", cname_str);
 		    } else
-		      snprintf(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username), "%s", cname_str);
+		      ndpi_snprintf(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username), "%s", cname_str);
 
 		    for(i=0; (i < 14) && (realm_offset <  packet->payload_packet_len); i++) {
 		      if(packet->payload[realm_offset] != 0x1b)
@@ -584,19 +582,13 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		      if((realm_offset+realm_len) < packet->payload_packet_len) {
 			char realm_str[48];
 
-			if(realm_len > sizeof(realm_str)-1)
-			  realm_len = sizeof(realm_str)-1;
-
 			realm_offset += 1;
-
-			strncpy(realm_str, (char*)&packet->payload[realm_offset], realm_len);
-			realm_str[realm_len] = '\0';
-			for(i=0; i<realm_len; i++) realm_str[i] = tolower(realm_str[i]);
+			krb_strncpy_lower(realm_str, sizeof(realm_str), (char*)&packet->payload[realm_offset], realm_len);
 
 #ifdef KERBEROS_DEBUG
 			printf("[AS-REQ][Kerberos Realm][len: %u][%s]\n", realm_len, realm_str);
 #endif
-			snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
+		        ndpi_snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
 		      }
 		    }
 		  }
@@ -639,19 +631,13 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		  if((realm_len+name_offset) < packet->payload_packet_len) {
 		    char realm_str[48];
 
-		    if(realm_len > sizeof(realm_str)-1)
-		      realm_len = sizeof(realm_str)-1;
-
 		    name_offset += 1;
-
-		    strncpy(realm_str, (char*)&packet->payload[name_offset], realm_len);
-		    realm_str[realm_len] = '\0';
-		    for(i=0; i<realm_len; i++) realm_str[i] = tolower(realm_str[i]);
+		    krb_strncpy_lower(realm_str, sizeof(realm_str), (char*)&packet->payload[name_offset], realm_len);
 
 #ifdef KERBEROS_DEBUG
 		    printf("[TGS-REQ][s/dport: %u/%u][Kerberos Realm][len: %u][%s]\n", sport, dport, realm_len, realm_str);
 #endif
-		    snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
+		    ndpi_snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
 
 		    /* If necessary we can decode sname */
 		    if(flow->kerberos_buf.pktbuf) {

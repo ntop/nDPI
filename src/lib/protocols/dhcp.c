@@ -142,7 +142,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
             u_int idx, offset = 0;
 	    
             for(idx = 0; idx < len && offset < sizeof(flow->protos.dhcp.fingerprint) - 2; idx++) {
-              int rc = snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
+              int rc = ndpi_snprintf((char*)&flow->protos.dhcp.fingerprint[offset],
 				sizeof(flow->protos.dhcp.fingerprint) - offset,
 				"%s%u", (idx > 0) ? "," : "",
 				(unsigned int)dhcp->options[i+2+idx] & 0xFF);

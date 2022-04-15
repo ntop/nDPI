@@ -204,7 +204,7 @@ static int ndpi_community_id_finalize_and_compute_hash(u_int8_t *comm_buf, u_int
   switch(l4_proto) {
   case IPPROTO_ICMP:
   case IPPROTO_ICMPV6:
-  case IPPROTO_SCTP:
+  case NDPI_SCTP_PROTOCOL_TYPE:
   case IPPROTO_UDP:
   case IPPROTO_TCP:
     off += ndpi_community_id_buf_copy(&comm_buf[off], &src_port, sizeof(src_port));
@@ -285,7 +285,7 @@ int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip,
     src_port = icmp_type;
     dst_port = ndpi_community_id_icmp_type_to_code_v4(icmp_type, icmp_code, &icmp_one_way);
     break;
-  case IPPROTO_SCTP:
+  case NDPI_SCTP_PROTOCOL_TYPE:
   case IPPROTO_UDP:
   case IPPROTO_TCP:
     /* src/dst port ok */
@@ -344,7 +344,7 @@ int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struc
     src_port = icmp_type;
     dst_port = ndpi_community_id_icmp_type_to_code_v6(icmp_type, icmp_code, &icmp_one_way);
     break;
-  case IPPROTO_SCTP:
+  case NDPI_SCTP_PROTOCOL_TYPE:
   case IPPROTO_UDP:
   case IPPROTO_TCP:
     /* src/dst port ok */

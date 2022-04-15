@@ -516,7 +516,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
   switch(b->family) {
   case ndpi_bin_family8:
     for(i=0; i<b->num_bins; i++) {
-      int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
+      int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
 
       if(rc < 0) break;
       len += rc;
@@ -525,7 +525,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
 
   case ndpi_bin_family16:
     for(i=0; i<b->num_bins; i++) {
-      int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
+      int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
 
       if(rc < 0) break;
       len += rc;
@@ -534,7 +534,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
 
   case ndpi_bin_family32:
     for(i=0; i<b->num_bins; i++) {
-      int rc = snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
+      int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
 
       if(rc < 0) break;
       len += rc;

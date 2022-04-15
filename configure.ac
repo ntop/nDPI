@@ -7,7 +7,7 @@ AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 AC_PREFIX_DEFAULT(/usr)
 
-EXTRA_TARGETS="example tests tests/unit tests/dga"
+EXTRA_TARGETS="example tests tests/dga"
 AC_ARG_WITH(only-libndpi,  AS_HELP_STRING([--with-only-libndpi], [Build only libndpi (no examples, tests etc)]))
 AS_IF([test "${with_only_libndpi+set}" = set],[
   EXTRA_TARGETS=""
@@ -18,6 +18,7 @@ AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz t
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
 AC_ARG_WITH(local-libgcrypt,  AS_HELP_STRING([--with-local-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
 AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
+AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable linkage against the wpcap/npcap import library in windows/WpdPack/Lib.]))
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
@@ -31,6 +32,8 @@ AS_IF([test "x${enable_code_coverage}" = "xyes"],[
   CFLAGS="${CFLAGS} -fprofile-arcs -ftest-coverage"
   LDFLAGS="${LDFLAGS} --coverage"
 ])
+
+AS_IF([test "${enable_npcap+set}" = set],[DISABLE_NPCAP=1],[DISABLE_NPCAP=0])
 
 LT_INIT
 LT_LIB_M
@@ -96,12 +99,12 @@ AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
 if ! test "${with_only_libndpi+set}" = set; then :
     dnl> used by json-c for unit tests
-    PKG_CHECK_MODULES([JSONC], [json-c], [JSONC_LIBS="${pkg_cv_JSONC_LIBS}" JSONC_CFLAGS="${pkg_cv_JSONC_CFLAGS}"])
-    AC_CHECK_LIB([json-c], [json_object_put], [], [
+    PKG_CHECK_MODULES([JSONC], [json-c], [JSONC_LIBS="${pkg_cv_JSONC_LIBS}" JSONC_CFLAGS="${pkg_cv_JSONC_CFLAGS}"],
+                      [AC_MSG_WARN([JSON-C not available. Disabled unit test.])])
+    AC_CHECK_LIB([json-c], [json_object_put], [EXTRA_TARGETS="$EXTRA_TARGETS tests/unit"], [
         AC_MSG_WARN([JSON-C not available. Disabled unit test.])
         JSONC_LIBS=""
         JSONC_CFLAGS=""
-        EXTRA_TARGETS="example tests tests/dga"
     ])
     AX_PTHREAD([],[
         AC_MSG_WARN([POSIX Threads not available. Building library only.])
@@ -117,7 +120,7 @@ AS_IF([test "x${enable_tls_sigs}" = "xyes"],[
 ])
 
 LIBS="$LIBS $JSONC_LIBS"
-CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function $CFLAGS $JSONC_CFLAGS"
+CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member $CFLAGS $JSONC_CFLAGS"
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
@@ -170,16 +173,22 @@ case "$host" in
       case "$host" in
         x86_64-*)
           BUILD_MINGW_X64=1
+          LDFLAGS="${LDFLAGS} -L/mingw64/lib"
         ;;
         i686-*)
+          LDFLAGS="${LDFLAGS} -L/mingw32/lib"
         ;;
         *)
           AC_MSG_ERROR([Unsupported MingW cross compiler.])
         ;;
       esac
-      CFLAGS="${CFLAGS}"
+      CFLAGS="-D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS ${CFLAGS}"
       LIBS="${LIBS} -lws2_32"
       BUILD_MINGW=1
+      EXE_SUFFIX=".exe"
+      AS_IF([test "${enable_npcap+set}" != set && test "${with_only_libndpi+set}" != set],,
+            [PKG_CHECK_MODULES([PCAP], [libpcap], [PCAP_LIB="" PCAP_INC="${pkg_cv_PCAP_CFLAGS}"])
+             AC_CHECK_LIB([pcap], [pcap_open_live],, [AC_MSG_ERROR([Missing msys2/mingw libpcap library. Install it with `pacman -S mingw-w64-x86_64-libpcap' (msys2).])])])
       ;;
    *)
       if test -f $PCAP_HOME/libpcap/libpcap.a; then :
@@ -204,6 +213,8 @@ case "$host" in
             AC_MSG_ERROR([Missing libpcap(-dev) library required to compile the example application.])
          fi
       fi
+      EXE_SUFFIX=""
+      AS_IF([test "${enable_npcap+set}" = set],AC_MSG_ERROR([--disable-npcap does only work with msys2/mingw CCs]))
       ;;
 esac
 
@@ -310,4 +321,6 @@ AC_SUBST(JSONC_LIBS)
 AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE_ENABLED)
 AC_SUBST(HANDLE_TLS_SIGS)
+AC_SUBST(DISABLE_NPCAP)
+AC_SUBST(EXE_SUFFIX)
 AC_OUTPUT

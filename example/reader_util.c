@@ -25,15 +25,21 @@
 #include "ndpi_config.h"
 #endif
 
+#include "ndpi_api.h"
+
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
 
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
+#include <windows.h>
+#include <ws2tcpip.h>
 #include <process.h>
 #include <io.h>
+#ifndef DISABLE_NPCAP
 #include <ip6_misc.h>
+#endif
 #else
 #include <unistd.h>
 #include <netinet/in.h>
@@ -854,8 +860,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
 	inet_ntop(AF_INET, &newflow->dst_ip, newflow->dst_name, sizeof(newflow->dst_name));
       } else {
-	inet_ntop(AF_INET6, &iph6->ip6_src, newflow->src_name, sizeof(newflow->src_name));
-	inet_ntop(AF_INET6, &iph6->ip6_dst, newflow->dst_name, sizeof(newflow->dst_name));
+	struct in6_addr addr = *(struct in6_addr *)&iph6->ip6_src;
+	inet_ntop(AF_INET6, &addr, newflow->src_name, sizeof(newflow->src_name));
+	addr = *(struct in6_addr *)&iph6->ip6_dst;
+	inet_ntop(AF_INET6, &addr, newflow->dst_name, sizeof(newflow->dst_name));
 	/* For consistency across platforms replace :0: with :: */
 	ndpi_patchIPv6Address(newflow->src_name), ndpi_patchIPv6Address(newflow->dst_name);
       }
@@ -1023,10 +1031,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   flow->confidence = flow->ndpi_flow->confidence;
 
-  snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
+  ndpi_snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);
 
-  snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s",
+  ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s",
 	   flow->ndpi_flow->flow_extra_info);
 
   flow->risk = flow->ndpi_flow->risk;
@@ -1064,11 +1072,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {
-    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->host_server_name);
+    ndpi_snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->host_server_name);
   }
   /* UBNTAC2 */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_UBNTAC2)) {
-    snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
+    ndpi_snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->protos.ubntac2.version);
   }
   /* FTP */
   else if((is_ndpi_proto(flow, NDPI_PROTOCOL_FTP_CONTROL))
@@ -1076,7 +1084,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	  || /* POP */  is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_POP)
 	  || /* SMTP */ is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_SMTP)) {
     if(flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.username[0] != '\0')
-      snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s%s",
+      ndpi_snprintf(flow->info, sizeof(flow->info), "User: %s][Pwd: %s%s",
 	       flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.username,
 	       flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.password,
 	       flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.auth_failed ? "][Auth Failed" : "");
@@ -1085,13 +1093,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_KERBEROS)) {
     if((flow->ndpi_flow->protos.kerberos.hostname[0] != '\0')
        || (flow->ndpi_flow->protos.kerberos.username[0] != '\0')) {
-      snprintf(flow->info, sizeof(flow->info), "%s%s%s%s",
+      ndpi_snprintf(flow->info, sizeof(flow->info), "%s%s%s%s",
 	       flow->ndpi_flow->protos.kerberos.domain /* = realm */,
 	       flow->ndpi_flow->protos.kerberos.domain[0] != '\0' ? "\\" : "",
 	       flow->ndpi_flow->protos.kerberos.hostname,
 	       flow->ndpi_flow->protos.kerberos.username);
     } else if(flow->ndpi_flow->protos.kerberos.domain[0] != '\0')
-      snprintf(flow->info, sizeof(flow->info), "%s",
+      ndpi_snprintf(flow->info, sizeof(flow->info), "%s",
 	       flow->ndpi_flow->protos.kerberos.domain);
 
 #if 0
@@ -1107,28 +1115,28 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   else if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP)
 	  || is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP)) {
     if(flow->ndpi_flow->http.url != NULL) {
-      snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
+      ndpi_snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
       flow->http.response_status_code = flow->ndpi_flow->http.response_status_code;
-      snprintf(flow->http.content_type, sizeof(flow->http.content_type), "%s", flow->ndpi_flow->http.content_type ? flow->ndpi_flow->http.content_type : "");
-      snprintf(flow->http.request_content_type, sizeof(flow->http.request_content_type), "%s", flow->ndpi_flow->http.request_content_type ? flow->ndpi_flow->http.request_content_type : "");
-      snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
+      ndpi_snprintf(flow->http.content_type, sizeof(flow->http.content_type), "%s", flow->ndpi_flow->http.content_type ? flow->ndpi_flow->http.content_type : "");
+      ndpi_snprintf(flow->http.request_content_type, sizeof(flow->http.request_content_type), "%s", flow->ndpi_flow->http.request_content_type ? flow->ndpi_flow->http.request_content_type : "");
+      ndpi_snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
     }
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SSDP)) {
-    snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
+    ndpi_snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TELNET)) {
     if(flow->ndpi_flow->protos.telnet.username[0] != '\0')
       flow->telnet.username = ndpi_strdup(flow->ndpi_flow->protos.telnet.username);
     if(flow->ndpi_flow->protos.telnet.password[0] != '\0')
       flow->telnet.password = ndpi_strdup(flow->ndpi_flow->protos.telnet.password);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)) {
-    snprintf(flow->host_server_name,
+    ndpi_snprintf(flow->host_server_name,
 	     sizeof(flow->host_server_name), "%s",
 	     flow->ndpi_flow->protos.ssh.client_signature);
-    snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
+    ndpi_snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
 	     flow->ndpi_flow->protos.ssh.server_signature);
-    snprintf(flow->ssh_tls.client_hassh, sizeof(flow->ssh_tls.client_hassh), "%s",
+    ndpi_snprintf(flow->ssh_tls.client_hassh, sizeof(flow->ssh_tls.client_hassh), "%s",
 	     flow->ndpi_flow->protos.ssh.hassh_client);
-    snprintf(flow->ssh_tls.server_hassh, sizeof(flow->ssh_tls.server_hassh), "%s",
+    ndpi_snprintf(flow->ssh_tls.server_hassh, sizeof(flow->ssh_tls.server_hassh), "%s",
 	     flow->ndpi_flow->protos.ssh.hassh_server);
   }
   /* TLS */
@@ -1139,16 +1147,16 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	  ) {
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.tls_quic.ssl_version;
 
-    snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
+    ndpi_snprintf(flow->http.user_agent, sizeof(flow->http.user_agent), "%s", flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : "");
 
     if(flow->ndpi_flow->protos.tls_quic.server_names_len > 0 && flow->ndpi_flow->protos.tls_quic.server_names)
       flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.server_names);
 
     flow->ssh_tls.notBefore = flow->ndpi_flow->protos.tls_quic.notBefore;
     flow->ssh_tls.notAfter = flow->ndpi_flow->protos.tls_quic.notAfter;
-    snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
+    ndpi_snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja3_client);
-    snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
+    ndpi_snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja3_server);
     flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.tls_quic.server_unsafe_cipher;
     flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.tls_quic.server_cipher;
@@ -1188,20 +1196,20 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       correct_csv_data_field(flow->ndpi_flow->protos.tls_quic.tls_supported_versions);
 
       if(csv_fp)
-	snprintf(flow->info, sizeof(flow->info), "%s",
+       ndpi_snprintf(flow->info, sizeof(flow->info), "%s",
 		 flow->ndpi_flow->protos.tls_quic.alpn);
       else
-	snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
+       ndpi_snprintf(flow->info, sizeof(flow->info), "ALPN: %s][TLS Supported Versions: %s",
 		 flow->ndpi_flow->protos.tls_quic.alpn,
 		 flow->ndpi_flow->protos.tls_quic.tls_supported_versions);
     } else if(flow->ndpi_flow->protos.tls_quic.alpn) {
       correct_csv_data_field(flow->ndpi_flow->protos.tls_quic.alpn);
 
       if(csv_fp)
-	snprintf(flow->info, sizeof(flow->info), "%s,",
+       ndpi_snprintf(flow->info, sizeof(flow->info), "%s,",
 		 flow->ndpi_flow->protos.tls_quic.alpn);
       else
-	snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
+       ndpi_snprintf(flow->info, sizeof(flow->info), "ALPN: %s",
 		 flow->ndpi_flow->protos.tls_quic.alpn);
     }
 
@@ -1892,9 +1900,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     iph6 = NULL;
 
     if(iph->protocol == IPPROTO_IPV6
-#ifdef IPPROTO_IPIP
-       || iph->protocol == IPPROTO_IPIP
-#endif
+       || iph->protocol == NDPI_IPIP_PROTOCOL_TYPE
        ) {
       ip_offset += ip_len;
       if(ip_len > 0)
@@ -1933,9 +1939,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     }
 
     if(proto == IPPROTO_IPV6
-#ifdef IPPROTO_IPIP
-       || proto == IPPROTO_IPIP
-#endif
+       || proto == NDPI_IPIP_PROTOCOL_TYPE
        ) {
       if(l4ptr > packet) { /* Better safe than sorry */
         ip_offset = (l4ptr - packet);

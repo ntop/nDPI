@@ -29,8 +29,8 @@
 #include <winsock2.h>
 #include <process.h>
 #include <io.h>
-#define getopt getopt____
 #else
+#include <getopt.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -39,7 +39,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
 #include <string.h>
 #include <stdarg.h>
 #include <search.h>
@@ -96,8 +95,8 @@ int serializerUnitTest() {
 
     for(i=0; i<16; i++) {
       char kbuf[32], vbuf[32];
-      snprintf(kbuf, sizeof(kbuf), "Key %d", i);
-      snprintf(vbuf, sizeof(vbuf), "Value %d", i);
+      ndpi_snprintf(kbuf, sizeof(kbuf), "Key %d", i);
+      ndpi_snprintf(vbuf, sizeof(vbuf), "Value %d", i);
       assert(ndpi_serialize_uint32_uint32(&serializer, i, i*i) != -1);
       assert(ndpi_serialize_uint32_string(&serializer, i, "Data") != -1);
       assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
@@ -112,8 +111,8 @@ int serializerUnitTest() {
 
       for(i=0; i<4; i++) {
 	char kbuf[32], vbuf[32];
-	snprintf(kbuf, sizeof(kbuf), "Ignored");
-	snprintf(vbuf, sizeof(vbuf), "Item %d", i);
+	ndpi_snprintf(kbuf, sizeof(kbuf), "Ignored");
+	ndpi_snprintf(vbuf, sizeof(vbuf), "Item %d", i);
 	assert(ndpi_serialize_uint32_uint32(&serializer, i, i*i) != -1);
 	assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
 	assert(ndpi_serialize_string_float(&serializer,  kbuf, (float)(i*i), "%f") != -1);
@@ -325,7 +324,9 @@ int serializeProtoUnitTest(void)
 /* *********************************************** */
 
 int main(int argc, char **argv) {
+#ifndef WIN32
   int c;
+#endif
   
   if (ndpi_get_api_version() != NDPI_API_VERSION) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
@@ -337,6 +338,11 @@ int main(int argc, char **argv) {
   if (ndpi_info_mod == NULL)
     return -1;
 
+/*
+ * If we want argument parsing on Windows,
+ * we need to re-implement it as Windows has no such function.
+ */
+#ifndef WIN32
   while((c = getopt(argc, argv, "vh")) != -1) {
     switch(c) {
     case 'v':
@@ -348,6 +354,9 @@ int main(int argc, char **argv) {
       return(0);
     }
   }
+#else
+  verbose = 0;
+#endif
     
   /* Tests */
   if (serializerUnitTest() != 0) return -1;

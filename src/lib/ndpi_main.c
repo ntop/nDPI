@@ -173,7 +173,7 @@ static inline uint8_t flow_is_proto(struct ndpi_flow_struct *flow, u_int16_t p) 
 
 /* ****************************************** */
 
-static u_int32_t ndpi_tot_allocated_memory;
+static volatile long int ndpi_tot_allocated_memory;
 
 /* ****************************************** */
 
@@ -2258,7 +2258,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
      !NDPI_ISSET(&ndpi_str->debug_bitmask, proto))
     return;
   va_start(args, format);
-  vsnprintf(str, sizeof(str) - 1, format, args);
+  ndpi_vsnprintf(str, sizeof(str) - 1, format, args);
   va_end(args);
 
   if(ndpi_str != NULL) {
@@ -2576,7 +2576,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   }
 
   for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
-    snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
+    ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 	     (unsigned int) (i + 1));
 
   return(ndpi_str);
@@ -3250,7 +3250,7 @@ int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_str, ch
   if(dn[0] == '"') {
     char buf[128], *quote;
 
-    snprintf(buf, sizeof(buf), "%s", &dn[1]);
+    ndpi_snprintf(buf, sizeof(buf), "%s", &dn[1]);
 
     if((quote = strchr(buf, '"')) != NULL)
       quote[0] = '\0';
@@ -3281,7 +3281,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     /* This looks like a mask rule or an invalid rule */
     char _rule[256], *rule_type, *key;
 
-    snprintf(_rule, sizeof(_rule), "%s", rule);
+    ndpi_snprintf(_rule, sizeof(_rule), "%s", rule);
     rule_type = strtok(rule, ":");
 
     if(!rule_type) {
@@ -6854,13 +6854,15 @@ char *ndpi_get_ip_string(const ndpi_ip_addr_t *ip, char *buf, u_int buf_len) {
   const u_int8_t *a = (const u_int8_t *) &ip->ipv4;
 
   if(ndpi_is_ipv6(ip)) {
-    if(inet_ntop(AF_INET6, &ip->ipv6.u6_addr, buf, buf_len) == NULL)
+    struct in6_addr addr = *(struct in6_addr *)&ip->ipv6.u6_addr;
+
+    if(inet_ntop(AF_INET6, &addr, buf, buf_len) == NULL)
       buf[0] = '\0';
 
     return(buf);
   }
 
-  snprintf(buf, buf_len, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
+  ndpi_snprintf(buf, buf_len, "%u.%u.%u.%u", a[0], a[1], a[2], a[3]);
 
   return(buf);
 }
@@ -7010,11 +7012,11 @@ char *ndpi_protocol2id(struct ndpi_detection_module_struct *ndpi_str,
 		       ndpi_protocol proto, char *buf, u_int buf_len) {
   if((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) && (proto.master_protocol != proto.app_protocol)) {
     if(proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
-      snprintf(buf, buf_len, "%u.%u", proto.master_protocol, proto.app_protocol);
+      ndpi_snprintf(buf, buf_len, "%u.%u", proto.master_protocol, proto.app_protocol);
     else
-      snprintf(buf, buf_len, "%u", proto.master_protocol);
+      ndpi_snprintf(buf, buf_len, "%u", proto.master_protocol);
   } else
-    snprintf(buf, buf_len, "%u", proto.app_protocol);
+    ndpi_snprintf(buf, buf_len, "%u", proto.app_protocol);
 
   return(buf);
 }
@@ -7025,12 +7027,12 @@ char *ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_str,
 			 ndpi_protocol proto, char *buf, u_int buf_len) {
   if((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) && (proto.master_protocol != proto.app_protocol)) {
     if(proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
-      snprintf(buf, buf_len, "%s.%s", ndpi_get_proto_name(ndpi_str, proto.master_protocol),
+      ndpi_snprintf(buf, buf_len, "%s.%s", ndpi_get_proto_name(ndpi_str, proto.master_protocol),
 	       ndpi_get_proto_name(ndpi_str, proto.app_protocol));
     else
-      snprintf(buf, buf_len, "%s", ndpi_get_proto_name(ndpi_str, proto.master_protocol));
+      ndpi_snprintf(buf, buf_len, "%s", ndpi_get_proto_name(ndpi_str, proto.master_protocol));
   } else
-    snprintf(buf, buf_len, "%s", ndpi_get_proto_name(ndpi_str, proto.app_protocol));
+    ndpi_snprintf(buf, buf_len, "%s", ndpi_get_proto_name(ndpi_str, proto.app_protocol));
 
   return(buf);
 }
@@ -7063,23 +7065,23 @@ void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_str,
 
   switch(category) {
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
-    snprintf(ndpi_str->custom_category_labels[0], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    ndpi_snprintf(ndpi_str->custom_category_labels[0], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
     break;
 
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
-    snprintf(ndpi_str->custom_category_labels[1], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    ndpi_snprintf(ndpi_str->custom_category_labels[1], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
     break;
 
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_3:
-    snprintf(ndpi_str->custom_category_labels[2], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    ndpi_snprintf(ndpi_str->custom_category_labels[2], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
     break;
 
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
-    snprintf(ndpi_str->custom_category_labels[3], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    ndpi_snprintf(ndpi_str->custom_category_labels[3], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
     break;
 
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
-    snprintf(ndpi_str->custom_category_labels[4], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
+    ndpi_snprintf(ndpi_str->custom_category_labels[4], CUSTOM_CATEGORY_LABEL_LEN, "%s", name);
     break;
 
   default:
@@ -7115,9 +7117,9 @@ const char *ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_str
     static char b[24];
 
     if(!ndpi_str)
-      snprintf(b, sizeof(b), "NULL nDPI");
+      ndpi_snprintf(b, sizeof(b), "NULL nDPI");
     else
-      snprintf(b, sizeof(b), "Invalid category %d", (int) category);
+      ndpi_snprintf(b, sizeof(b), "Invalid category %d", (int) category);
     return(b);
   }
 
@@ -8064,7 +8066,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if(ndpi_match_string_subprotocol(ndpi_str, name, strlen(name), &ret_match) > 0)
       return(0); /* Ignore DGA for known domain names */
 
-    if(isdigit(name[0])) {
+    if(isdigit((int)name[0])) {
       struct in_addr ip_addr;
 
       ip_addr.s_addr = inet_addr(name);
@@ -8087,7 +8089,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       char tmp[128], *word, *tok_tmp;
       u_int i, j, max_tmp_len = sizeof(tmp)-1;
 
-      len = snprintf(tmp, max_tmp_len, "%s", name);
+      len = ndpi_snprintf(tmp, max_tmp_len, "%s", name);
       if(len < 0) {
 
 	if(ndpi_verbose_dga_detection)
@@ -8103,7 +8105,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	if(tmp[j] == '.') {
 	  num_dots++;
 	} else if(num_dots == 0) {
-	  if(!isdigit(tmp[j]))
+	  if(!isdigit((int)tmp[j]))
 	    first_element_is_numeric = 0;
 	}
 
@@ -8116,10 +8118,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	} else
 	  num_char_repetitions = 1, last_char = tmp[j];
 
-	if(isdigit(tmp[j])) {
+	if(isdigit((int)tmp[j])) {
 	  num_digits++;
 
-	  if(((j+2)<(u_int)len) && isdigit(tmp[j+1]) && (tmp[j+2] == '.')) {
+	  if(((j+2)<(u_int)len) && isdigit((int)tmp[j+1]) && (tmp[j+2] == '.')) {
 	    /* Check if there are too many digits */
 	    if(num_digits < 4)
 	      return(0); /* Double digits */
@@ -8218,7 +8220,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	trigram_char_skip = 0;
 
 	for(i = 0; word[i+1] != '\0'; i++) {
-	  if(isdigit(word[i]))
+	  if(isdigit((int)word[i]))
 	    num_consecutive_digits++;
 	  else {
 	    if((num_word == 1) && (num_consecutive_digits > max_num_consecutive_digits_first_word))

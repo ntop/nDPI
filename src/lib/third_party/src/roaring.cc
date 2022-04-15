@@ -300,7 +300,7 @@ static inline uint32_t croaring_detect_supported_architectures() {
 extern "C" {  // portability definitions are in global scope, not a namespace
 #endif
 
-#if defined(_MSC_VER) && !defined(__clang__) && !defined(_WIN64) && !defined(ROARING_ACK_32BIT)
+#if defined(_MSC_VER) && !defined(__clang__) && !defined(WIN64) && !defined(ROARING_ACK_32BIT)
 #pragma message( \
     "You appear to be attempting a 32-bit build under Visual Studio. We recommend a 64-bit build instead.")
 #endif
@@ -373,7 +373,7 @@ extern "C" {  // portability definitions are in global scope, not a namespace
 /* result might be undefined when input_num is zero */
 static inline int __builtin_ctzll(unsigned long long input_num) {
     unsigned long index;
-#ifdef _WIN64  // highly recommended!!!
+#ifdef WIN64  // highly recommended!!!
     _BitScanForward64(&index, input_num);
 #else  // if we must support 32-bit Windows
     if ((uint32_t)input_num != 0) {
@@ -389,7 +389,7 @@ static inline int __builtin_ctzll(unsigned long long input_num) {
 /* result might be undefined when input_num is zero */
 static inline int __builtin_clzll(unsigned long long input_num) {
     unsigned long index;
-#ifdef _WIN64  // highly recommended!!!
+#ifdef WIN64  // highly recommended!!!
     _BitScanReverse64(&index, input_num);
 #else  // if we must support 32-bit Windows
     if (input_num > 0xFFFFFFFF) {
@@ -479,14 +479,14 @@ static inline int hammingbackup(uint64_t x) {
 }
 
 static inline int hamming(uint64_t x) {
-#if defined(_WIN64) && defined(_MSC_VER) && !defined(__clang__)
+#if defined(WIN64) && defined(_MSC_VER) && !defined(__clang__)
 #ifdef _M_ARM64
   return hammingbackup(x);
   // (int) _CountOneBits64(x); is unavailable
 #else  // _M_ARM64
   return (int) __popcnt64(x);
 #endif // _M_ARM64
-#elif defined(_WIN32) && defined(_MSC_VER) && !defined(__clang__)
+#elif defined(WIN32) && defined(_MSC_VER) && !defined(__clang__)
 #ifdef _M_ARM
   return hammingbackup(x);
   // _CountOneBits is unavailable
