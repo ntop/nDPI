@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-DEST=../src/lib/ndpi_azure_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_azure_match.c.inc
 LINK_TMP=/tmp/azure_link.txt
 TMP=/tmp/azure.json
 LIST=/tmp/azure.list

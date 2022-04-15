@@ -36,6 +36,292 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
 				      struct ndpi_flow_struct *flow);
 
 
+/* Reference: https://en.wikipedia.org/wiki/X.690#Length_octets */
+static int krb_decode_asn1_length(struct ndpi_detection_module_struct *ndpi_struct,
+                                  size_t * const kasn1_offset)
+{
+  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
+  unsigned char length_octet;
+  int length;
+
+  length_octet = packet->payload[*kasn1_offset];
+
+  if (length_octet == 0xFF)
+  {
+    /* Malformed Packet */
+    return -1;
+  }
+
+  if ((length_octet & 0x80) == 0)
+  {
+    /* Definite, short */
+    length = length_octet & 0x7F;
+    (*kasn1_offset)++;
+  } else {
+    /* Definite, long or indefinite (not support by this implementation) */
+    if ((length_octet & 0x7F) == 0)
+    {
+      /* indefinite, unsupported */
+      return -1;
+    }
+
+    length_octet &= 0x7F;
+    if (length_octet > 4 /* We support only 4 additional length octets. */ ||
+        packet->payload_packet_len <= *kasn1_offset + length_octet + 1)
+    {
+      return -1;
+    }
+
+    int i = 1;
+    length = 0;
+    for (; i <= length_octet; ++i)
+    {
+      length |= (unsigned int)packet->payload[*kasn1_offset + i] << (length_octet - i) * 8;
+    }
+    *kasn1_offset += i;
+  }
+
+  if (packet->payload_packet_len < *kasn1_offset + length)
+  {
+    return -1;
+  }
+
+  return length;
+}
+
+/* Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets */
+static int krb_decode_asn1_sequence_type(struct ndpi_detection_module_struct *ndpi_struct,
+                                         size_t * const kasn1_offset)
+{
+  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
+
+  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
+      packet->payload[*kasn1_offset] != 0x30 /* Universal Constructed Tag Type: Sequence */)
+  {
+    return -1;
+  }
+
+  (*kasn1_offset)++;
+
+  return krb_decode_asn1_length(ndpi_struct, kasn1_offset);
+}
+
+/* Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets */
+static int krb_decode_asn1_string_type(struct ndpi_detection_module_struct *ndpi_struct,
+                                       size_t * const kasn1_offset,
+                                       char const ** const out)
+{
+  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
+  int length;
+
+  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
+      (packet->payload[*kasn1_offset] != 0xA3 /* Context-specific Constructed Tag Type: Bit String */ &&
+       packet->payload[*kasn1_offset] != 0xA4 /* Context-specific Constructed Tag Type: Octect String */ &&
+       packet->payload[*kasn1_offset] != 0x30 /* Sequence Of */))
+  {
+    return -1;
+  }
+
+  (*kasn1_offset)++;
+
+  length = krb_decode_asn1_length(ndpi_struct, kasn1_offset);
+  if (length <= 0)
+  {
+    return -1;
+  }
+
+  if (out != NULL)
+  {
+    *out = (char *)&packet->payload[*kasn1_offset];
+  }
+
+  return length;
+}
+
+/* Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets */
+static int krb_decode_asn1_int_type(struct ndpi_detection_module_struct *ndpi_struct,
+                                    size_t * const kasn1_offset,
+                                    int * const out)
+{
+  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
+  int length;
+
+  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
+      packet->payload[*kasn1_offset] != 0x02)
+  {
+    return -1;
+  }
+
+  (*kasn1_offset)++;
+
+  length = krb_decode_asn1_length(ndpi_struct, kasn1_offset);
+  if (length <= 0 || length > 4)
+  {
+    return -1;
+  }
+
+  if (out != NULL)
+  {
+    int i = 0;
+    *out = 0;
+    for (; i < length; ++i)
+    {
+      *out |= packet->payload[*kasn1_offset + i] << (length - i - 1) * 8;
+    }
+    *kasn1_offset += i;
+  }
+
+  return length;
+}
+
+/* Tags in which we are not interested. */
+static int krb_decode_asn1_blocks_skip(struct ndpi_detection_module_struct *ndpi_struct,
+                                       size_t * const kasn1_offset)
+{
+  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
+  int length;
+
+  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
+      (packet->payload[*kasn1_offset] != 0xA0 /* Constructed Context-specific NULL */ &&
+       packet->payload[*kasn1_offset] != 0xA1 /* Constructed Context-specific BOOLEAN */ &&
+       packet->payload[*kasn1_offset] != 0xA2 /* Constructed Context-specific INTEGER */))
+  {
+    return -1;
+  }
+
+  (*kasn1_offset)++;
+
+  length = krb_decode_asn1_length(ndpi_struct, kasn1_offset);
+  if (length < 0)
+  {
+    return -1;
+  }
+
+  return length;
+}
+
+static void strncpy_lower(char * const dst, size_t dst_siz,
+                          char const * const src, size_t src_siz)
+{
+   int dst_len = ndpi_min(src_siz, dst_siz - 1);
+
+   strncpy(dst, src, dst_len);
+   dst[dst_len] = '\0';
+
+   for(int i = 0; i < dst_len; ++i)
+   {
+     dst[i] = tolower(dst[i]);
+   }
+}
+
+/* Reference: https://datatracker.ietf.org/doc/html/rfc4120 */
+static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
+                     struct ndpi_flow_struct * const flow,
+                     size_t payload_offset)
+{
+  size_t kasn1_offset = payload_offset;
+  int length, krb_version, msg_type;
+  char const * text;
+
+  length = krb_decode_asn1_sequence_type(ndpi_struct, &kasn1_offset);
+  if (length < 0)
+  {
+    return -1;
+  }
+
+  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
+  if (length < 0)
+  {
+    return -1;
+  }
+
+  length = krb_decode_asn1_int_type(ndpi_struct, &kasn1_offset, &krb_version); /* pvno */
+  if (length != 1 || krb_version != 5)
+  {
+    return -1;
+  }
+
+  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
+  if (length < 0)
+  {
+    return -1;
+  }
+
+  length = krb_decode_asn1_int_type(ndpi_struct, &kasn1_offset, &msg_type); /* msg-type */
+  if (length != 1 || msg_type != 0x0d /* TGS-REP */)
+  {
+    return -1;
+  }
+
+  krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
+
+  length = krb_decode_asn1_sequence_type(ndpi_struct, &kasn1_offset); /* Optional PADATA */
+  if (length > 0)
+  {
+    kasn1_offset += length;
+  }
+
+  length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, &text);
+  if (length < 3)
+  {
+    return -1;
+  }
+
+  kasn1_offset += length;
+  text += 2;
+  length -= 2;
+  if (flow->protos.kerberos.domain[0] == '\0')
+  {
+    strncpy_lower(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain),
+                  text, length);
+  }
+
+  length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, NULL);
+  if (length < 0)
+  {
+    return -1;
+  }
+
+  length = krb_decode_asn1_sequence_type(ndpi_struct, &kasn1_offset);
+  if (length < 0)
+  {
+    return -1;
+  }
+
+  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
+  if (length < 0)
+  {
+    return -1;
+  }
+  kasn1_offset += length;
+
+  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
+  if (length < 0)
+  {
+    return -1;
+  }
+
+  length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, &text);
+  if (length < 3)
+  {
+    return -1;
+  }
+
+  kasn1_offset += length;
+  text += 2;
+  length -= 2;
+  if (flow->protos.kerberos.hostname[0] == '\0' && text[length - 1] != '$')
+  {
+    strncpy_lower(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname),
+                  text, length);
+  } else if (flow->protos.kerberos.username[0] == '\0') {
+    strncpy_lower(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username),
+                  text, length - 1);
+  }
+
+  return 0;
+}
+
 static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					     struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KERBEROS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
@@ -395,48 +681,18 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 	      return;
 	    } else if(msg_type == 0x0d) /* TGS-REP */ {
-	      u_int16_t pad_data_len, cname_offset;
-	      
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Processing TGS-REP\n");
-#endif
+	      NDPI_LOG_DBG(ndpi_struct, "[Kerberos] Processing TGS-REP\n");
 
-	      koffsetp = koffset + 4;
-	      pad_data_len = packet->payload[koffsetp];
-	      /* Skip realm already filled in request */
-	      cname_offset = pad_data_len + koffsetp + 15;
-
-	      if(cname_offset < packet->payload_packet_len) {
-		u_int8_t cname_len = packet->payload[cname_offset];
-
-		if((cname_offset+cname_offset) < packet->payload_packet_len) {
-		  char cname_str[48];
-		  
-		  if(cname_len > sizeof(cname_str)-1)
-		    cname_len = sizeof(cname_str)-1;
-
-		  strncpy(cname_str, (char*)&packet->payload[cname_offset+1], cname_len);
-		  cname_str[cname_len] = '\0';
-		  for(i=0; i<cname_len; i++) cname_str[i] = tolower(cname_str[i]);
-
-#ifdef KERBEROS_DEBUG
-		  printf("[TGS-REP][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n",
-			 sport, dport, cname_len, cname_str);
-#endif
-
-		  if(cname_len && cname_str[cname_len-1] == '$') {
-		    cname_str[cname_len-1] = '\0';
-		    snprintf(flow->protos.kerberos.hostname, sizeof(flow->protos.kerberos.hostname), "%s", cname_str);
-		  } else {
-		    snprintf(flow->protos.kerberos.username, sizeof(flow->protos.kerberos.username), "%s", cname_str);
-		  }
-
-#ifdef KERBEROS_DEBUG
-		  printf("[TGS-REP] Found everything. disabling extra func\n");
-#endif
-	          flow->extra_packets_func = NULL;
-		}
+	      if (krb_parse(ndpi_struct, flow, 8) != 0)
+	      {
+	        NDPI_LOG_ERR(ndpi_struct, "[TGS-REP] Invalid packet received\n");
+	        return;
 	      }
+	      NDPI_LOG_DBG(ndpi_struct,
+	                   "[TGS-REP][s/dport: %u/%u][Kerberos Hostname,Domain,Username][%s,%s,%s]\n",
+	                   sport, dport, flow->protos.kerberos.hostname, flow->protos.kerberos.domain,
+	                   flow->protos.kerberos.username);
+	      flow->extra_packets_func = NULL;
 	    }
 
 	    return;

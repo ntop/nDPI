@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")" || return
 
-DEST=../src/lib/ndpi_icloud_private_relay_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_icloud_private_relay_match.c.inc
 TMP=/tmp/icloud.csv
 LIST=/tmp/icloud.list
 LIST_MERGED=/tmp/icloud.list_m

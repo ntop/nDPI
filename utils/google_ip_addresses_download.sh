@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "${0}")" || return
 
-DEST=../src/lib/ndpi_google_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_google_match.c.inc
 LIST=/tmp/google.list
 
 echo "(1) Downloading file..."

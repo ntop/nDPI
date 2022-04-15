@@ -49,27 +49,27 @@
 
 #include "ndpi_content_match.c.inc"
 #include "ndpi_dga_match.c.inc"
-#include "ndpi_azure_match.c.inc"
-#include "ndpi_tor_match.c.inc"
-#include "ndpi_whatsapp_match.c.inc"
-#include "ndpi_amazon_aws_match.c.inc"
-#include "ndpi_ethereum_match.c.inc"
-#include "ndpi_zoom_match.c.inc"
-#include "ndpi_cloudflare_match.c.inc"
-#include "ndpi_ms_office365_match.c.inc"
-#include "ndpi_ms_onedrive_match.c.inc"
-#include "ndpi_ms_outlook_match.c.inc"
-#include "ndpi_ms_skype_teams_match.c.inc"
-#include "ndpi_google_match.c.inc"
-#include "ndpi_google_cloud_match.c.inc"
-#include "ndpi_icloud_private_relay_match.c.inc"
-#include "ndpi_asn_telegram.c.inc"
-#include "ndpi_asn_apple.c.inc"
-#include "ndpi_asn_twitter.c.inc"
-#include "ndpi_asn_netflix.c.inc"
-#include "ndpi_asn_webex.c.inc"
-#include "ndpi_asn_teamviewer.c.inc"
-#include "ndpi_asn_facebook.c.inc"
+#include "inc_generated/ndpi_azure_match.c.inc"
+#include "inc_generated/ndpi_tor_match.c.inc"
+#include "inc_generated/ndpi_whatsapp_match.c.inc"
+#include "inc_generated/ndpi_amazon_aws_match.c.inc"
+#include "inc_generated/ndpi_ethereum_match.c.inc"
+#include "inc_generated/ndpi_zoom_match.c.inc"
+#include "inc_generated/ndpi_cloudflare_match.c.inc"
+#include "inc_generated/ndpi_ms_office365_match.c.inc"
+#include "inc_generated/ndpi_ms_onedrive_match.c.inc"
+#include "inc_generated/ndpi_ms_outlook_match.c.inc"
+#include "inc_generated/ndpi_ms_skype_teams_match.c.inc"
+#include "inc_generated/ndpi_google_match.c.inc"
+#include "inc_generated/ndpi_google_cloud_match.c.inc"
+#include "inc_generated/ndpi_icloud_private_relay_match.c.inc"
+#include "inc_generated/ndpi_asn_telegram.c.inc"
+#include "inc_generated/ndpi_asn_apple.c.inc"
+#include "inc_generated/ndpi_asn_twitter.c.inc"
+#include "inc_generated/ndpi_asn_netflix.c.inc"
+#include "inc_generated/ndpi_asn_webex.c.inc"
+#include "inc_generated/ndpi_asn_teamviewer.c.inc"
+#include "inc_generated/ndpi_asn_facebook.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -2513,6 +2513,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   if((sizeof(categories) / sizeof(char *)) != NDPI_PROTOCOL_NUM_CATEGORIES) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] invalid categories length: expected %u, got %u\n", NDPI_PROTOCOL_NUM_CATEGORIES,
 		 (unsigned int) (sizeof(categories) / sizeof(char *)));
+    ndpi_free(ndpi_str);
     return(NULL);
   }
 
@@ -2562,6 +2563,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating Patricia trees\n");
+    ndpi_free(ndpi_str);
     return(NULL);
   }
 
@@ -2569,6 +2571,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if(ndpi_callback_init(ndpi_str)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating callbacks\n");
+    ndpi_free(ndpi_str);
     return NULL;
   }
 
@@ -2589,6 +2592,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str) {
   const char *domains[] = {
     ".local",
+    ".work",
+    /* DGA's are used for caching */
+    "akamaihd.net",
     NULL /* End */
   };
   const ndpi_risk risks_to_mask[] = {
@@ -4672,8 +4678,11 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     }
 
     if(flow->l4_proto == IPPROTO_UDP) {
-      if(flow->l4.udp.quic_reasm_buf)
-	ndpi_free(flow->l4.udp.quic_reasm_buf);
+      if(flow->l4.udp.quic_reasm_buf){
+        ndpi_free(flow->l4.udp.quic_reasm_buf);
+        if(flow->l4.udp.quic_reasm_buf_bitmap)
+          ndpi_free(flow->l4.udp.quic_reasm_buf_bitmap);
+      }
     }
   }
 }
@@ -8198,7 +8207,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	num_words++;
 
-	if(strlen(word) < 3) continue;
+	if(num_words > 2)
+	  break; /* Stop after the 2nd word of the domain name */
+	
+	if(strlen(word) < 5) continue;
 
 	if(ndpi_verbose_dga_detection)
 	  printf("-> word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
@@ -8236,6 +8248,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	    continue;
 	    break;	 	    
 	  }
+	  
 	  num_bigram_checks++;
 
 	  if(ndpi_verbose_dga_detection)

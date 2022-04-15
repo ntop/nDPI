@@ -64,7 +64,7 @@ AC_DEFINE_UNQUOTED(NDPI_PATCH_LEVEL,   "${NDPI_PATCH}", [nDPI patch level])
 
 # .git as directory in a cloned repo
 # .git as file in submodule based integration
-if test -d ".git" || test -f ".git" ; then :
+if test -d ".git" || test -f ".git" -a -d `cat .git | cut -d' ' -f2`; then :
      GIT_TAG=`git log -1 --format=%h`
      GIT_DATE=`git log -1 --format=%cd`
      #
@@ -285,7 +285,7 @@ dnl>   ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lcurl"
 dnl>   AC_DEFINE_UNQUOTED(HAVE_CURL, 1, [curl is present])
 dnl> fi
 
-AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile fuzz/Makefile src/include/ndpi_api.h])
+AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile fuzz/Makefile src/include/ndpi_api.h])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)

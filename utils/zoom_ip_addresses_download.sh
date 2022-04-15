@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-DEST=../src/lib/ndpi_zoom_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_zoom_match.c.inc
 LIST=/tmp/zoom.list
 # https://support.zoom.us/hc/en-us/articles/201362683-Zoom-network-firewall-or-proxy-server-settings
 # There are few lists in this page, partially overlapping. Pick the generic one

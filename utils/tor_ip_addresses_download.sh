@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-DEST=../src/lib/ndpi_tor_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_tor_match.c.inc
 LIST=/tmp/tor.list
 # There are at least two lists:
 #  * https://torstatus.rueckgr.at/ip_list_all.php/Tor_ip_list_ALL.csv

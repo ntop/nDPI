@@ -102,12 +102,12 @@ NULL
 /* ******************************************************************** */
 
 static const char *ndpi_en_impossible_bigrams[] = {
-  "bk", "bq", "bx", "cb", "cf", "cg", "cj", "cp", "cv", "cw", "cx", "dx", "fk", "fq", "fv", "fx", /* "ee", removed it can be found in 'meeting' */
+  "bk", "bq", "bx", "cb", "cf", "cg", "cj", "cp", /* "cv", */ "cw", "cx", "dx", "fk", "fq", "fv", "fx", /* "ee", removed it can be found in 'meeting' */
   "fz", "gq", "gv", "gx", "hh", "hk", "hv", "hx", "hz", "iy", "jb", /* "jc", jcrew.com */ "jd", "jf", "jg", "jh", "jk",
   "jl", "jm", "jn", "jp", "jq", /* "jr",*/  /* "js", */ "jt", "jv", "jw", "jx", "jy", "jz", /* "kg", */ "kq", "kv", "kx",
   "kz", "lq", "lx", /* "mg" tamgrt.com , */ "mj", /* "mq", mqtt */  "mx", "mz", "pq", "pv", "px", "qb", "qc", "qd", "qe", "qf", "ii",
   "qg", "qh", "qj", "qk", "ql", "qm", "qn", "qo", "qp", "qr", "qs", "qt", "qv", "qw", "qx", "qy", "uu",
-  "qz", "sx", "sz", "tq", "tx", "vb", "vc", "vd", "vf", "vg", "vh", "vj", "vm", "vn", /* "vp", Removed for vpbank.com */ "bw", /* "vk", "zr" Removed for kavkazr */
+  "qz", "sx", "sz", "tq", "tx", "vb", "vc", "vd", "vf", "vg", "vh", "vj", /* "vm" Used in VMs */ "vn", /* "vp", Removed for vpbank.com */ "bw", /* "vk", "zr" Removed for kavkazr */
   "vq", /* "vt", gvt1.com, gvt2.com */ "vw", "vx", "vz", "wq", "wv", "wx", "wz", /* "xb", foxbusiness.com */
   "xg", "xj", "xk", "xv", "xz", "xw", /* "yd", Removed for anywayanyday.com */ /*"yp", Removed for paypal */
   "yj", "yq", "yv", "yz", "yw", "zb", "zc", "zg", "zh", "zj", "zn", "zq", "zs", "zx", /* "wh", e.g. why */ "wk",

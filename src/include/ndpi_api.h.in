@@ -1558,6 +1558,7 @@ extern "C" {
   float ndpi_data_entropy(struct ndpi_analyze_struct *s);
   float ndpi_data_variance(struct ndpi_analyze_struct *s);
   float ndpi_data_stddev(struct ndpi_analyze_struct *s);
+  float ndpi_data_mean(struct ndpi_analyze_struct *s);
   u_int32_t ndpi_data_last(struct ndpi_analyze_struct *s);
   u_int32_t ndpi_data_min(struct ndpi_analyze_struct *s);
   u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s);
@@ -1650,6 +1651,20 @@ extern "C" {
   int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 			u_int8_t num_clusters, u_int16_t *cluster_ids,
 			struct ndpi_bin *centroids);
+
+  /* ******************************* */
+
+  /*
+   * Finds outliers using Z-score  
+   * Z-Score = (Value - Mean) / StdDev
+   *
+   * @par    values      = pointer to the individual values to be analyzed [in]
+   * @par    outliers    = pointer to a list of outliers identified        [out]
+   * @par    num_values  = lenght of values and outliers that MUST have the same lenght [in]
+   *
+   * @return The number of outliers found
+  */
+  u_int ndpi_find_outliers(u_int32_t *values, bool *outliers, u_int32_t num_values);
 
   /* ******************************* */
 

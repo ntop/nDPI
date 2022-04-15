@@ -2,10 +2,10 @@
 
 cd "$(dirname "${0}")"
 
-DEST_OUTLOOK=../src/lib/ndpi_ms_outlook_match.c.inc
-DEST_SKYPE_MSTEAMS=../src/lib/ndpi_ms_skype_teams_match.c.inc
-DEST_ONEDRIVE=../src/lib/ndpi_ms_onedrive_match.c.inc
-DEST_OFFICE365=../src/lib/ndpi_ms_office365_match.c.inc
+DEST_OUTLOOK=../src/lib/inc_generated/ndpi_ms_outlook_match.c.inc
+DEST_SKYPE_MSTEAMS=../src/lib/inc_generated/ndpi_ms_skype_teams_match.c.inc
+DEST_ONEDRIVE=../src/lib/inc_generated/ndpi_ms_onedrive_match.c.inc
+DEST_OFFICE365=../src/lib/inc_generated/ndpi_ms_office365_match.c.inc
 TMP=/tmp/ms.json
 LIST=/tmp/ms.list
 # https://docs.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide

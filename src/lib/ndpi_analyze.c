@@ -161,6 +161,16 @@ float ndpi_data_stddev(struct ndpi_analyze_struct *s) {
 
 /* ********************************************************************************* */
 
+/* 
+   Compute the mean on all values 
+   NOTE: In statistics, there is no difference between the mean and average
+*/
+float ndpi_data_mean(struct ndpi_analyze_struct *s) {
+  return(ndpi_data_average(s));
+}
+
+/* ********************************************************************************* */
+
 /* Compute the average only on the sliding window */
 float ndpi_data_window_average(struct ndpi_analyze_struct *s) {
   if(s->num_values_array_len) {
@@ -1425,3 +1435,35 @@ void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, fl
 
   *ret_alpha = best_alpha, *ret_beta = best_beta;
 }
+
+/* *********************************************************** */
+
+/* Z-Score = (Value - Mean) / StdDev */
+u_int ndpi_find_outliers(u_int32_t *values, bool *outliers, u_int32_t num_values) {
+  u_int i, ret = 0;
+  float mean, stddev, low_threshold = -2.5, high_threshold = 2.5;
+  struct ndpi_analyze_struct a;
+  
+  ndpi_init_data_analysis(&a, 3 /* this is the window so we do not need to store values and 3 is enough */);
+
+  /* Add values */
+  for(i=0; i<num_values; i++) 
+    ndpi_data_add_value(&a, values[i]);
+
+  mean    = ndpi_data_mean(&a);
+  stddev  = ndpi_data_stddev(&a);
+  
+  /* Process values */
+  for(i=0; i<num_values; i++) {
+    float z_score = (((float)values[i]) - mean) / stddev;
+    bool is_outlier = ((z_score < low_threshold) || (z_score > high_threshold)) ? true : false;
+
+    if(is_outlier) ret++;
+    outliers[i] = is_outlier;
+  }
+  
+  ndpi_free_data_analysis(&a, 0);
+
+  return(ret);
+}
+

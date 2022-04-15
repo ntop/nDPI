@@ -1,0 +1,23 @@
+CC=@CC@
+INC=-I ../src/include -I/usr/local/include
+LIBDPI=../src/lib/libndpi.a
+LDFLAGS=@LDFLAGS@
+LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@
+
+TOOLS=metric_anomaly
+
+all: $(TOOLS)
+
+metric_anomaly: metric_anomaly.c Makefile $(LIBDPI)
+	$(CC) $(CPPFLAGS) -g $(INC) $(LDFLAGS) metric_anomaly.c -o metric_anomaly $(LIB)
+
+clean:
+	/bin/rm -f *.o $(TOOLS) *~
+
+distclean: clean
+	/bin/rm -f Makefile
+
+distdir:
+
+install:
+	@echo -n ""

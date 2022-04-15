@@ -172,6 +172,7 @@ typedef u_int32_t ndpi_ndpi_mask;
 
 /* NDPI_PROTO_BITMASK_STRUCT */
 #ifdef NDPI_CFFI_PREPROCESSING
+#undef NDPI_NUM_FDS_BITS
 #define NDPI_NUM_FDS_BITS     16
 #endif
 
@@ -206,6 +207,8 @@ typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol, void *module_struct
 /* PLEASE DO NOT REMOVE OR CHANGE THE ORDER OF WHAT IS DELIMITED BY CFFI.NDPI_PACKED_STRUCTURES FLAG AS IT IS USED FOR
    PYTHON BINDINGS AUTO GENERATION */
 #ifdef NDPI_CFFI_PREPROCESSING
+#undef PACK_ON
+#undef PACK_OFF
 #define PACK_ON
 #define PACK_OFF
 #endif
@@ -716,7 +719,7 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_QUIC */
   u_int8_t *quic_reasm_buf;
-  u_int32_t quic_reasm_buf_len;
+  u_int8_t *quic_reasm_buf_bitmap;
   u_int32_t quic_reasm_buf_last_pos;
 
   /* NDPI_PROTOCOL_CSGO */

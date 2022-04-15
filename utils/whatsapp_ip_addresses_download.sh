@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-DEST=../src/lib/ndpi_whatsapp_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_whatsapp_match.c.inc
 TMP=/tmp/wa.zip
 LIST=/tmp/wa.list
 # https://developers.facebook.com/docs/whatsapp/guides/network-requirements/

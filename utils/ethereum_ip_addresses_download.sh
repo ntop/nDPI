@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-DEST=../src/lib/ndpi_ethereum_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_ethereum_match.c.inc
 TMP=/tmp/ethereum
 LIST=/tmp/ethereum.list
 ORIGIN="https://raw.githubusercontent.com/ethereum/go-ethereum/master/params/bootnodes.go"

@@ -887,6 +887,10 @@ static ndpi_network host_protocol_list[] = {
     https://help.salesforce.com/s/articleView?id=000321501&type=1
   */
 
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_content_match_host_protocol_list.c.inc"
+#endif
+
   /* End */
   { 0x0, 0, 0 }
 };
@@ -1236,17 +1240,18 @@ static ndpi_protocol_match host_match[] =
    { ".tuenti.com",                              "Tuenti",           NDPI_PROTOCOL_TUENTI, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { ".twttr.com",                                "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "twitter.",                                   "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "twimg.com",                                    "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN , NDPI_PROTOCOL_DEFAULT_LEVEL},
+   { "twitter.",                                  "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "twimg.com",                                 "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN , NDPI_PROTOCOL_DEFAULT_LEVEL},
+   { "t.co",                                      "Twitter",          NDPI_PROTOCOL_TWITTER, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN , NDPI_PROTOCOL_DEFAULT_LEVEL},
 
    { ".viber.com",                                "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { ".cdn.viber.com",                                      "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { ".viber.it",                                           "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".cdn.viber.com",                            "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".viber.it",                                 "Viber",            NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "wikipedia.",                               "Wikipedia",        NDPI_PROTOCOL_WIKIPEDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "wikimedia.",                               "Wikipedia",        NDPI_PROTOCOL_WIKIPEDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "mediawiki.",                               "Wikipedia",        NDPI_PROTOCOL_WIKIPEDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "wikimediafoundation.",           "Wikipedia",        NDPI_PROTOCOL_WIKIPEDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "wikimediafoundation.",                     "Wikipedia",        NDPI_PROTOCOL_WIKIPEDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "mmg-fna.whatsapp.net",            "WhatsAppFiles",    NDPI_PROTOCOL_WHATSAPP_FILES, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".fna.whatsapp.net",               "WhatsAppFiles",    NDPI_PROTOCOL_WHATSAPP_FILES, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1257,8 +1262,8 @@ static ndpi_protocol_match host_match[] =
    { "v.whatsapp.net",                  "WhatsApp",         NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "mmg.whatsapp.net",                "WhatsApp",         NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
-   { ".yahoo.",                                   "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { ".yimg.com",                                  "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".yahoo.",                                  "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".yimg.com",                                "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "yahooapis.",                               "Yahoo",            NDPI_PROTOCOL_YAHOO, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "upload.youtube.com",                "YouTubeUpload",    NDPI_PROTOCOL_YOUTUBE_UPLOAD, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1273,7 +1278,7 @@ static ndpi_protocol_match host_match[] =
    { ".youtube-ui.l.google.com",          "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".youtubeeducation.com",             "YouTube",          NDPI_PROTOCOL_YOUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
-   { ".vevo.com",                                  "Vevo",             NDPI_PROTOCOL_VEVO,    NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".vevo.com",                               "Vevo",             NDPI_PROTOCOL_VEVO,    NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { ".spotify.com",                            "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".scdn.co",                                "Spotify",          NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1746,6 +1751,8 @@ static ndpi_protocol_match host_match[] =
    { "spameatingmonkey.net",             "Cybersec", NDPI_PROTOCOL_CYBERSECURITY, NDPI_PROTOCOL_CATEGORY_CYBERSECURITY, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "senderscore.com",                  "Cybersec", NDPI_PROTOCOL_CYBERSECURITY, NDPI_PROTOCOL_CATEGORY_CYBERSECURITY, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ixhash.net",                       "Cybersec", NDPI_PROTOCOL_CYBERSECURITY, NDPI_PROTOCOL_CATEGORY_CYBERSECURITY, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "esvarbl.com",                      "Cybersec", NDPI_PROTOCOL_CYBERSECURITY, NDPI_PROTOCOL_CATEGORY_CYBERSECURITY, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".dnsbl.", /* www.dnsbl.info */     "Cybersec", NDPI_PROTOCOL_CYBERSECURITY, NDPI_PROTOCOL_CATEGORY_CYBERSECURITY, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "iqiyi.com",                        "PPStream", NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "iqiyipic.com",                     "PPStream", NDPI_PROTOCOL_PPSTREAM, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1759,6 +1766,10 @@ static ndpi_protocol_match host_match[] =
    { "pluralsight.imgix.net",                                               "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "zn6qzq6caaucudesr-pluralsight.siteintercept.qualtrics.com",           "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ip-video-course-exercise-files-us-west-2.s3.us-west-2.amazonaws.com", "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
+#endif
 
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL }
   };

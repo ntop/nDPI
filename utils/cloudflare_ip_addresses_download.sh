@@ -2,7 +2,7 @@
 
 cd "$(dirname "${0}")"
 
-DEST=../src/lib/ndpi_cloudflare_match.c.inc
+DEST=../src/lib/inc_generated/ndpi_cloudflare_match.c.inc
 LIST=/tmp/cloudflare.list
 # TODO: ipv6 list from https://www.cloudflare.com/ips-v6
 ORIGIN="https://www.cloudflare.com/ips-v4"
