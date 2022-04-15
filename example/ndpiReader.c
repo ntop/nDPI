@@ -3223,6 +3223,9 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
   /* Trying to open the interface */
   if((pcap_handle = pcap_open_live((char*)pcap_file, snaplen,
 				   promisc, 500, pcap_error_buffer)) == NULL) {
+    char errmsg[256];
+   snprintf(errmsg, 256, "Can't not open interface %s", pcap_file);
+   perror(errmsg);
     capture_for = capture_until = 0;
 
     live_capture = 0;
