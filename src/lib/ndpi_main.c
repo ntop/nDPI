@@ -8318,7 +8318,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
       if(num_bigram_checks
 	 /* We already checked num_dots > 0 */
-	 && ((num_found == 0) || ((num_digits > 5) && (num_words <= 3))
+	 && ((num_found == 0) || ((num_digits > 5) && (num_words <= 3) && (num_impossible > 0))
 	     || enough(num_found, num_impossible)
 	     || ((num_trigram_checked > 2)
 		 && ((num_trigram_found < (num_trigram_checked/2))
