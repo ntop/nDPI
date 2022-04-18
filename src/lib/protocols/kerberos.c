@@ -166,7 +166,7 @@ static int krb_decode_asn1_int_type(struct ndpi_detection_module_struct *ndpi_st
     *out = 0;
     for (; i < length; ++i)
     {
-      *out |= packet->payload[*kasn1_offset + i] << (length - i - 1) * 8;
+      *out |= (unsigned int)packet->payload[*kasn1_offset + i] << (length - i - 1) * 8;
     }
     *kasn1_offset += i;
   }
