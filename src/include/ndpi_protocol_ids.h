@@ -183,7 +183,7 @@ typedef enum {
   NDPI_PROTOCOL_GTP                   = 152,
   NDPI_PROTOCOL_WSD                   = 153,
   NDPI_PROTOCOL_LLMNR                 = 154,
-  NDPI_PROTOCOL_FREE_155              = 155, /* FREE */
+  NDPI_PROTOCOL_TOCA_BOCA             = 155,
   NDPI_PROTOCOL_SPOTIFY               = 156,
   NDPI_PROTOCOL_MESSENGER             = 157,
   NDPI_PROTOCOL_H323                  = 158,
