@@ -139,7 +139,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_ERROR_CODE_DETECTED,                   NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
   { NDPI_HTTP_CRAWLER_BOT,                      NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
   { NDPI_ANONYMOUS_SUBSCRIBER,                  NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
-  
+
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
 };
@@ -1847,7 +1847,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "GoogleCloud", NDPI_PROTOCOL_CATEGORY_CLOUD,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WZRY,
+			  "WZRY", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
 #endif
@@ -2612,12 +2615,12 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
 
   for(i=0; domains[i] != NULL; i++)
     ndpi_add_host_risk_mask(ndpi_str, (char*)domains[i], mask);
-  
+
   for(i=0; host_match[i].string_to_match != NULL; i++) {
     switch(host_match[i].protocol_category) {
     case NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK:
     case NDPI_PROTOCOL_CATEGORY_CYBERSECURITY:
-      ndpi_add_host_risk_mask(ndpi_str, (char*)host_match[i].string_to_match, mask); 
+      ndpi_add_host_risk_mask(ndpi_str, (char*)host_match[i].string_to_match, mask);
       break;
 
     default:
@@ -3801,7 +3804,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
 /* ******************************************************************** */
 
 static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
-  
+
   NDPI_PROTOCOL_BITMASK detection_bitmask_local;
   NDPI_PROTOCOL_BITMASK *detection_bitmask = &detection_bitmask_local;
   struct ndpi_call_function_struct *all_cb = NULL;
@@ -4307,6 +4310,7 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* WSD */
   init_wsd_dissector(ndpi_str, &a, detection_bitmask);
+  init_wzry_dissector(ndpi_str, &a, detection_bitmask);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
@@ -4361,8 +4365,8 @@ static inline int ndpi_proto_cb_tcp_nopayload(const struct ndpi_detection_module
     return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
 	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
 	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
-              NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0 
-	   && (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask & 
+              NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0
+	   && (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
 	       NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD) == 0;
 }
 
@@ -4377,9 +4381,9 @@ static inline int ndpi_proto_cb_other(const struct ndpi_detection_module_struct 
     return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
 	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
 	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
-	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)) == 0 
+	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)) == 0
 	   ||
-             (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask & 
+             (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
 	       NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC) != 0;
 }
 
@@ -5288,7 +5292,7 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
 
 static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct,
 					    u_int32_t daddr /* Network byte order */) {
-  
+
 #ifdef ZOOM_CACHE_DEBUG
   printf("[%s:%u] ndpi_search_into_zoom_cache(%08X, %u)\n",
 	 __FILE__, __LINE__, daddr, dport);
@@ -5298,11 +5302,11 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
     u_int16_t cached_proto;
     u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, daddr, &cached_proto,
 					 0 /* Don't remove it as it can be used for other connections */);
-    
+
 #ifdef ZOOM_CACHE_DEBUG
     printf("[Zoom] *** [TCP] SEARCHING host %u [found: %u]\n", daddr, found);
 #endif
-    
+
     return(found);
   }
 
@@ -5315,7 +5319,7 @@ static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndp
 					u_int32_t daddr /* Network byte order */) {
   if(ndpi_struct->zoom_cache == NULL)
     ndpi_struct->zoom_cache = ndpi_lru_cache_init(512);
-  
+
   if(ndpi_struct->zoom_cache)
     ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, daddr, NDPI_PROTOCOL_ZOOM);
 }
@@ -5326,7 +5330,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 				    u_int8_t enable_guess, u_int8_t *protocol_was_guessed) {
   ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
   u_int16_t guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN, guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
-  
+
   /* *** We can't access ndpi_str->packet from this function!! *** */
 
   *protocol_was_guessed = 0;
@@ -5965,7 +5969,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       ret.app_protocol = flow->guessed_host_protocol_id;
     }
 #endif
-    
+
   if((!flow->risk_checked)
      && ((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
      ) {
@@ -6070,7 +6074,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
      && (flow->l4_proto == IPPROTO_TCP)
      && (ndpi_str->packet.iph != NULL))
     ndpi_add_connection_as_zoom(ndpi_str, ndpi_str->packet.iph->daddr);
-				
+
   return(ret);
 }
 
@@ -7541,7 +7545,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   /* Add punycode check */
   if(ndpi_strnstr(string_to_match, "xn--", string_to_match_len))
     ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN);
-		  
+
   return(rc);
 }
 
@@ -8199,17 +8203,17 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       len = j;
 
       u_int max_num_consecutive_digits_first_word = 0, num_word = 0;
-      
+
       for(word = strtok_r(tmp, ".", &tok_tmp); ; word = strtok_r(NULL, ".", &tok_tmp)) {
 	u_int num_consecutive_digits = 0;
-	
+
 	if(!word) break; else num_word++;
 
 	num_words++;
 
 	if(num_words > 2)
 	  break; /* Stop after the 2nd word of the domain name */
-	
+
 	if(strlen(word) < 5) continue;
 
 	if(ndpi_verbose_dga_detection)
@@ -8223,11 +8227,11 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	  else {
 	    if((num_word == 1) && (num_consecutive_digits > max_num_consecutive_digits_first_word))
 	      max_num_consecutive_digits_first_word = num_consecutive_digits;
-	    
+
 	    num_consecutive_digits = 0;
 	  }
-	  
-	  switch(word[i]) {	    
+
+	  switch(word[i]) {
 	  case '-':
 	    num_dash++;
 	    /*
@@ -8246,9 +8250,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	  case '.':
 	    continue;
-	    break;	 	    
+	    break;
 	  }
-	  
+
 	  num_bigram_checks++;
 
 	  if(ndpi_verbose_dga_detection)
@@ -8298,10 +8302,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	if((num_word == 1) && (num_consecutive_digits > max_num_consecutive_digits_first_word))
 	  max_num_consecutive_digits_first_word = num_consecutive_digits;
       } /* for */
-      
+
       if(ndpi_verbose_dga_detection)
-	printf("[NDPI] max_num_consecutive_digits_first_word=%u\n", max_num_consecutive_digits_first_word);	
-      
+	printf("[NDPI] max_num_consecutive_digits_first_word=%u\n", max_num_consecutive_digits_first_word);
+
       if(ndpi_verbose_dga_detection)
 	printf("[%s][num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u][num_trigram_vowels: %u][num_trigram_found: %u/%u][vowels: %u][rc: %u]\n",
 	       name, num_found, num_impossible, num_digits, num_bigram_checks, num_vowels, len, num_trigram_vowels,
