@@ -21,10 +21,7 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
 #include "ndpi_config.h"
-#endif
-
 #include "ndpi_api.h"
 
 #include <stdlib.h>
