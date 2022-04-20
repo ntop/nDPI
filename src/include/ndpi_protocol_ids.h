@@ -199,7 +199,7 @@ typedef enum {
   NDPI_PROTOCOL_CORBA                 = 168,
   NDPI_PROTOCOL_UBUNTUONE             = 169,
   NDPI_PROTOCOL_WHOIS_DAS             = 170,
-  NDPI_PROTOCOL_FREE_171              = 171, /* FREE */
+  NDPI_PROTOCOL_SD_RTN                = 171, /* Agora SD-RTN: https://www.agora.io/en */
   NDPI_PROTOCOL_SOCKS                 = 172,
   NDPI_PROTOCOL_NINTENDO              = 173,
   NDPI_PROTOCOL_RTMP                  = 174,
