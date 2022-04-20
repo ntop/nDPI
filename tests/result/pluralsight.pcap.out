@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	33	(5.50 pkts/flow)
 Confidence DPI              : 6 (flows)
+Num dissector calls: 78 (13.00 diss/flow)
 
 Pluralsight	44	29652	6
 

@@ -2,6 +2,7 @@ Guessed flow protos:	3
 
 DPI Packets (TCP):	3	(1.00 pkts/flow)
 Confidence DPI              : 3 (flows)
+Num dissector calls: 3 (1.00 diss/flow)
 
 Cloudflare	3	2310	3
 

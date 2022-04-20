@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	3	(3.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 25 (25.00 diss/flow)
 
 SOAP	13	2935	1
 

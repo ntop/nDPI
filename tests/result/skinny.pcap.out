@@ -4,6 +4,7 @@ DPI Packets (TCP):	3	(1.00 pkts/flow)
 DPI Packets (UDP):	5	(1.00 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence DPI              : 9 (flows)
+Num dissector calls: 19 (2.11 diss/flow)
 
 ICMP	2	140	1
 RTP	2871	614394	5

@@ -3,6 +3,7 @@ Guessed flow protos:	0
 DPI Packets (UDP):	63	(1.00 pkts/flow)
 DPI Packets (other):	14	(1.00 pkts/flow)
 Confidence DPI              : 77 (flows)
+Num dissector calls: 2767 (35.94 diss/flow)
 
 ICMP	21	7436	9
 ICMPV6	10	10642	5

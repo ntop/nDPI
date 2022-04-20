@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	4	(4.00 pkts/flow)
 Confidence DPI (cache)      : 1 (flows)
+Num dissector calls: 81 (81.00 diss/flow)
 
 BitTorrent	86	41489	1
 

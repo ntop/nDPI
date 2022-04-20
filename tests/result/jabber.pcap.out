@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	6	(6.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 142 (142.00 diss/flow)
 
 Jabber	13	901	1
 

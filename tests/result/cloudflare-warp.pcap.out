@@ -4,6 +4,7 @@ DPI Packets (TCP):	42	(5.25 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence Match by IP      : 3 (flows)
 Confidence DPI              : 4 (flows)
+Num dissector calls: 328 (41.00 diss/flow)
 
 Unknown	11	890	1
 Google	8	476	3

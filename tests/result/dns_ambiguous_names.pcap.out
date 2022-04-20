@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	20	(2.00 pkts/flow)
 Confidence DPI              : 10 (flows)
+Num dissector calls: 10 (1.00 diss/flow)
 
 QQ	2	212	1
 Google	2	208	1

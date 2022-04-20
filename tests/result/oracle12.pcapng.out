@@ -2,6 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (TCP):	20	(20.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
+Num dissector calls: 314 (314.00 diss/flow)
 
 Oracle	20	2518	1
 

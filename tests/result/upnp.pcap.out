@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	2	(1.00 pkts/flow)
 Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
 
 WSD	14	9912	2
 

@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	6	(6.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 8 (8.00 diss/flow)
 
 Cachefly	6	6163	1
 

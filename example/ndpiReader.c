@@ -1398,6 +1398,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 				    flow->detected_protocol) ? "Encrypted" : "ClearText");
 
     fprintf(out, "[Confidence: %s]", ndpi_confidence_get_name(flow->confidence));
+    /* If someone wants to have the num_dissector_calls variable per flow, he can print it here.
+       Disabled by default to avoid too many diffs in the unit tests...
+    */
+#if 0
+    fprintf(out, "[Num calls: %d]", flow->num_dissector_calls);
+#endif
 
     if(flow->detected_protocol.category != 0)
       fprintf(out, "[cat: %s/%u]",
@@ -1977,6 +1983,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[proto] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.protocol_flows[proto]++;
     ndpi_thread_info[thread_id].workflow->stats.flow_confidence[flow->confidence]++;
+    ndpi_thread_info[thread_id].workflow->stats.num_dissector_calls += flow->num_dissector_calls;
   }
 }
 
@@ -3482,6 +3489,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
     for(i = 0; i < sizeof(cumulative_stats.flow_confidence)/sizeof(cumulative_stats.flow_confidence[0]); i++)
       cumulative_stats.flow_confidence[i] += ndpi_thread_info[thread_id].workflow->stats.flow_confidence[i];
+
+    cumulative_stats.num_dissector_calls += ndpi_thread_info[thread_id].workflow->stats.num_dissector_calls;
   }
 
   if(cumulative_stats.total_wire_bytes == 0)
@@ -3589,6 +3598,11 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	  printf("\tConfidence: %-10s %-13llu (flows)\n", ndpi_confidence_get_name(i),
 		 (long long unsigned int)cumulative_stats.flow_confidence[i]);
       }
+
+      if(cumulative_stats.ndpi_flow_count)
+	printf("\tNum dissector calls:   %-13llu (%.2f diss/flow)\n",
+	       (long long unsigned int)cumulative_stats.num_dissector_calls,
+	       cumulative_stats.num_dissector_calls / (float)cumulative_stats.ndpi_flow_count);
     }
 
     if(results_file) {
@@ -3614,6 +3628,11 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 		  ndpi_confidence_get_name(i),
 		  (long long unsigned int)cumulative_stats.flow_confidence[i]);
       }
+
+      if(cumulative_stats.ndpi_flow_count)
+	fprintf(results_file, "Num dissector calls: %llu (%.2f diss/flow)\n",
+	        (long long unsigned int)cumulative_stats.num_dissector_calls,
+	        cumulative_stats.num_dissector_calls / (float)cumulative_stats.ndpi_flow_count);
 
       fprintf(results_file, "\n");
   }
