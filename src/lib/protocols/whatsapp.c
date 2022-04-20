@@ -23,8 +23,53 @@
 
 #include "ndpi_api.h"
 
+static void ndpi_whatsapp_dissect_extra(struct ndpi_flow_struct * const flow,
+                                        u_int8_t const * const payload,
+                                        u_int32_t payload_len)
+{
+  size_t offset = 18;
+
+  while (offset + 1 < payload_len)
+  {
+    u_int8_t op = payload[offset];
+    u_int8_t len = payload[offset + 1];
+
+    offset += 2;
+    if (offset + len >= payload_len)
+    {
+      break;
+    }
+
+    switch (op)
+    {
+      case 0x28:
+      case 0x08:
+        break;
+
+      case 0x12:
+        flow->http.user_agent = ndpi_malloc(len + 1);
+        if (flow->http.user_agent != NULL)
+        {
+          memcpy(flow->http.user_agent, &payload[offset], len);
+          flow->http.user_agent[len] = '\0';
+        }
+        offset += len;
+        break;
+
+      case 0x3a:
+        ndpi_hostname_sni_set(flow, &payload[offset], len);
+        break;
+
+      default:
+        offset += len;
+        break;
+    }
+  }
+}
+
 void ndpi_search_whatsapp(struct ndpi_detection_module_struct *ndpi_struct,
-			  struct ndpi_flow_struct *flow) {
+                          struct ndpi_flow_struct *flow)
+{
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   static u_int8_t whatsapp_sequence[] = {
     0x45, 0x44, 0x0, 0x01, 0x0, 0x0, 0x02, 0x08,
@@ -35,6 +80,25 @@ void ndpi_search_whatsapp(struct ndpi_detection_module_struct *ndpi_struct,
   };
 
   NDPI_LOG_DBG(ndpi_struct, "search WhatsApp\n");
+
+  if (packet->payload_packet_len == 4 && ntohl(get_u_int32_t(packet->payload, 0)) == 0x45440001)
+  {
+    NDPI_LOG_INFO(ndpi_struct, "found WhatsApp preface\n");
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    return;
+  }
+
+  if (packet->payload_packet_len >= 32 &&
+      ntohs(get_u_int16_t(packet->payload, 0)) == 0xc2fe &&
+      packet->payload[3] == 0x05 &&
+      ntohl(get_u_int32_t(packet->payload, 8)) == 0x00020016 &&
+      packet->payload[16] == 0x08)
+  {
+    NDPI_LOG_INFO(ndpi_struct, "found WhatsApp (additional info available)\n");
+    ndpi_whatsapp_dissect_extra(flow, packet->payload, packet->payload_packet_len);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    return;
+  }
 
   /* This is a very old sequence (2015?) but we still have it in our unit tests.
      Try to detect it, without too much effort... */
