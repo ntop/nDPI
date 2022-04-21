@@ -185,6 +185,20 @@ void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, stru
       }
     }
   } else if (packet->udp != NULL) {
+    /* Check for Mojito-DHT encapsulated gnutella (gtk-gnutella). */
+    if (packet->payload_packet_len >= 28 &&
+        ntohl(get_u_int32_t(packet->payload, 24)) == 0x47544b47 /* GTKG */)
+    {
+        u_int32_t gnutella_payload_len = le32toh(get_u_int32_t(packet->payload, 19));
+
+        if (gnutella_payload_len == (u_int32_t)packet->payload_packet_len - 23)
+        {
+            NDPI_LOG_DBG2(ndpi_struct, "detected mojito-dht/gnutella udp\n");
+            ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
+            return;
+        }
+    }
+
     /* observations:
      * all the following patterns send out many packets which are the only ones of their flows,
      * often on the very beginning of the traces, or flows with many packets in one direction only.
