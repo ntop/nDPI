@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd "$(dirname "${0}")" || return
+cd "$(dirname "${0}")" || exit 1
 
 DEST=../src/lib/inc_generated/ndpi_google_cloud_match.c.inc
 TMP=/tmp/google_c.json
@@ -12,7 +12,7 @@ echo "(1) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
 if [ "$http_response" != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
-    return 1
+    exit 1
 fi
 
 echo "(2) Processing IP addresses..."
@@ -21,4 +21,4 @@ jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP > $LIST # TODO: i
 rm -f $TMP $LIST
 
 echo "(3) Google Cloud IPs are available in $DEST"
-return 0
+exit 0
