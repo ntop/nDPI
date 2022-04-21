@@ -441,7 +441,7 @@ static void help(u_int long_help) {
          "-i <file|device> "
 #endif
          "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
-         "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-D][-e <len>][-t][-v <level>]\n"
+         "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-H][-D][-e <len>][-t][-v <level>]\n"
          "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
          "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>][-z]\n"
          "          [-a <mode>]\n\n"
@@ -484,6 +484,7 @@ static void help(u_int long_help) {
          "  -w <path>                 | Write test output on the specified file. This is useful for\n"
          "                            | testing purposes in order to compare results across runs\n"
          "  -h                        | This help\n"
+         "  -H                        | This help plus some information about supported protocols/risks\n"
          "  -v <1|2|3>                | Verbose 'unknown protocol' packet print.\n"
          "                            | 1 = verbose\n"
          "                            | 2 = very verbose\n"
@@ -573,6 +574,7 @@ static struct option longopts[] = {
   { "ndpi-log-level", required_argument, NULL, 'V'},
   { "dbg-proto", required_argument, NULL, 'u'},
   { "help", no_argument, NULL, 'h'},
+  { "long-help", no_argument, NULL, 'H'},
   { "json", required_argument, NULL, 'k'},
   { "payload-analysis", required_argument, NULL, 'P'},
   { "result-path", required_argument, NULL, 'w'},
@@ -794,7 +796,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "a:b:e:c:C:dDf:g:i:Ij:k:S:hp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "a:b:e:c:C:dDf:g:i:Ij:k:S:hHp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -910,6 +912,10 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'h':
+      help(0);
+      break;
+
+    case 'H':
       help(1);
       break;
 
