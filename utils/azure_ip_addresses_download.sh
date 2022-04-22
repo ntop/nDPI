@@ -14,21 +14,21 @@ echo "(1) Downloading file... ${LINK_ORIGIN}"
 http_response=$(curl -s -o ${LINK_TMP} -w "%{http_code}" ${LINK_ORIGIN})
 if [ "${http_response}" != "200" ]; then
     echo "Error $http_response: you probably need to update the link origin url!"
-    return 1
+    exit 1
 fi
 
 ORIGIN="$(grep -E 'ServiceTags_Public_[[:digit:]]+.json' ${LINK_TMP} | grep -o -E 'href=\"[^"]+' | sed 's/href="//' | uniq)"
 rm -f ${LINK_TMP}
 if [ -z "${ORIGIN}" ]; then
     echo "Error ${LINK_ORIGIN} does not contain the url format!"
-    return 1
+    exit 1
 fi
 
 echo "(2) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
 if [ "${http_response}" != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
-    return 1
+    exit 1
 fi
 
 echo "(3) Processing IP addresses..."
@@ -38,4 +38,4 @@ tr -d '\r' < $TMP | grep / | tr -d '"' | tr -d " " | tr -d "," | grep -v : > $LI
 rm -f $TMP $LIST
 
 echo "(4) Microsoft Azure IPs are available in $DEST"
-return 0
+exit 0

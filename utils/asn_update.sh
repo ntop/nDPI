@@ -22,7 +22,7 @@ function create_list() {
 	rm -f $LIST
 }
 
-cd "$(dirname "${0}")" || return
+cd "$(dirname "${0}")" || exit 1
 
 echo "(1) Downloading Apple routes..."
 DEST="../src/lib/inc_generated/ndpi_asn_apple.c.inc"

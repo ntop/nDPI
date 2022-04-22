@@ -2,7 +2,7 @@
 
 set -e
 
-cd "$(dirname "${0}")" || return
+cd "$(dirname "${0}")" || exit 1
 
 DEST=../src/lib/inc_generated/ndpi_google_match.c.inc
 LIST=/tmp/google.list
@@ -17,4 +17,4 @@ python3 google.py > $LIST
 #rm -f $TMP $LIST
 
 echo "(3) Google IPs are available in $DEST"
-return 0
+exit 0
