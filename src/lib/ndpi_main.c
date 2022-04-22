@@ -3301,7 +3301,8 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
   char *at, *proto, *elem;
   ndpi_proto_defaults_t *def;
   u_int subprotocol_id, i;
-
+  int id;
+  
   at = strrchr(rule, '@');
   if(at == NULL) {
     /* This looks like a mask rule or an invalid rule */
@@ -3353,15 +3354,12 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     }
   }
 
-  for(i = 0, def = NULL; i < ndpi_str->ndpi_num_supported_protocols; i++) {
-    if(ndpi_str->proto_defaults[i].protoName
-       && strcasecmp(ndpi_str->proto_defaults[i].protoName, proto) == 0) {
-      def = &ndpi_str->proto_defaults[i];
-      subprotocol_id = i;
-      break;
-    }
-  }
-
+  if((id = ndpi_get_protocol_id(ndpi_str, proto)) != -1) {
+    subprotocol_id = (u_int)id;
+    def = &ndpi_str->proto_defaults[subprotocol_id];
+  } else
+    def = NULL;
+  
   if(def == NULL) {
     if(!do_add) {
       /* We need to remove a rule */
