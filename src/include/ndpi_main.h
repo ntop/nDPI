@@ -161,6 +161,7 @@ extern "C" {
 			    const char *alpn_to_check, u_int alpn_to_check_len);    
 
   char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
+  char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
 
 #ifdef __cplusplus
 }

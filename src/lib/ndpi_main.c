@@ -8421,3 +8421,22 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value
 
   return dst;
 }
+
+/* ******************************************************************** */
+
+char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len)
+{
+  if (flow->http.user_agent != NULL)
+  {
+    return NULL;
+  }
+
+  flow->http.user_agent = ndpi_malloc(value_len + 1);
+  if (flow->http.user_agent != NULL)
+  {
+    memcpy(flow->http.user_agent, value, value_len);
+    flow->http.user_agent[value_len] = '\0';
+  }
+
+  return flow->http.user_agent;
+}

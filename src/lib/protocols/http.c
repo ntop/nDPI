@@ -535,14 +535,11 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  if(flow->http.user_agent == NULL) {
-    flow->http.user_agent = ndpi_malloc(ua_ptr_len + 1);
-    if(flow->http.user_agent) {
-      memcpy(flow->http.user_agent, (char*)ua_ptr, ua_ptr_len);
-      flow->http.user_agent[ua_ptr_len] = '\0';
-
-      ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent);
-    }
+  if (ndpi_user_agent_set(flow, ua_ptr, ua_ptr_len) != NULL)
+  {
+    ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent);
+  } else {
+    NDPI_LOG_DBG2(ndpi_struct, "Could not set HTTP user agent\n");
   }
 
   NDPI_LOG_DBG2(ndpi_struct, "User Agent Type line found %.*s\n",
