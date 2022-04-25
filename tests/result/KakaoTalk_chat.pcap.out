@@ -4,8 +4,8 @@ DPI Packets (TCP):	174	(9.16 pkts/flow)
 DPI Packets (UDP):	36	(2.00 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 4 (flows)
-Confidence Match by IP      : 5 (flows)
-Confidence DPI              : 29 (flows)
+Confidence Match by IP      : 3 (flows)
+Confidence DPI              : 31 (flows)
 
 DNS	2	217	1
 HTTP	1	56	1
@@ -54,9 +54,9 @@ JA3 Host Stats:
 	30	UDP 10.24.82.188:24596 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][ClearText][Confidence: DPI][cat: SocialNetwork/6][1 pkts/78 bytes <-> 1 pkts/118 bytes][Goodput ratio: 43/62][0.05 sec][Hostname/SNI: api.facebook.com][31.13.68.84][PLAIN TEXT (facebook)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	UDP 10.24.82.188:38448 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][ClearText][Confidence: DPI][cat: Chat/9][1 pkts/76 bytes <-> 1 pkts/114 bytes][Goodput ratio: 42/61][0.08 sec][Hostname/SNI: auth.kakao.com][210.103.240.15][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 10.24.82.188:58810 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][ClearText][Confidence: DPI][cat: Chat/9][1 pkts/76 bytes <-> 1 pkts/114 bytes][Goodput ratio: 42/61][0.03 sec][Hostname/SNI: item.kakao.com][210.103.240.15][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	33	TCP 10.24.82.188:58927 -> 54.255.253.199:5223 [proto: 91.265/TLS.AmazonAWS][Encrypted][Confidence: Match by IP][cat: Cloud/13][2 pkts/181 bytes -> 0 pkts/0 bytes][Goodput ratio: 25/0][41.33 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	33	TCP 10.24.82.188:58927 -> 54.255.253.199:5223 [proto: 91.265/TLS.AmazonAWS][Encrypted][Confidence: DPI][cat: Cloud/13][2 pkts/181 bytes -> 0 pkts/0 bytes][Goodput ratio: 25/0][41.33 sec][Risk: ** Known Protocol on Non Standard Port **][Risk Score: 50][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	UDP 10.24.82.188:43077 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][ClearText][Confidence: DPI][cat: Chat/9][1 pkts/81 bytes <-> 1 pkts/97 bytes][Goodput ratio: 45/54][0.04 sec][Hostname/SNI: dn-l.talk.kakao.com][110.76.141.86][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	35	TCP 10.24.82.188:34686 -> 173.194.72.188:5228 [proto: 91.126/TLS.Google][Encrypted][Confidence: Match by IP][cat: Web/5][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 58/0][< 1 sec][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	35	TCP 10.24.82.188:34686 -> 173.194.72.188:5228 [proto: 91.126/TLS.Google][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 58/0][< 1 sec][Risk: ** Known Protocol on Non Standard Port **][Risk Score: 50][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	36	ICMP 10.24.82.188:0 -> 10.188.191.1:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/147 bytes -> 0 pkts/0 bytes][Goodput ratio: 70/0][< 1 sec][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	37	TCP 10.24.82.188:49217 -> 216.58.220.174:443 [proto: 91.126/TLS.Google][Encrypted][Confidence: Match by IP][cat: Web/5][1 pkts/83 bytes -> 0 pkts/0 bytes][Goodput ratio: 32/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	38	TCP 120.28.26.242:80 -> 10.24.82.188:34503 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/56 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

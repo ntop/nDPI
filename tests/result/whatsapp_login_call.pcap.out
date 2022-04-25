@@ -1,20 +1,21 @@
-Guessed flow protos:	24
+Guessed flow protos:	23
 
-DPI Packets (TCP):	182	(6.74 pkts/flow)
+DPI Packets (TCP):	169	(6.26 pkts/flow)
 DPI Packets (UDP):	35	(1.21 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 5 (flows)
-Confidence Match by IP      : 17 (flows)
-Confidence DPI              : 35 (flows)
+Confidence Match by IP      : 16 (flows)
+Confidence DPI              : 36 (flows)
 
 HTTP	11	726	3
 MDNS	8	952	4
 DHCP	10	3420	1
 WhatsAppCall	803	102942	20
+IMAPS	17	1998	1
 ICMP	10	700	1
 TLS	8	589	2
 Dropbox	4	2176	1
-Apple	105	22176	19
+Apple	88	20178	18
 WhatsApp	182	25154	2
 Spotify	3	258	1
 AppleStore	85	28087	2
@@ -36,7 +37,7 @@ JA3 Host Stats:
 	9	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][ClearText][Confidence: DPI][cat: Network/14][10 pkts/3420 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][59.94 sec][Hostname/SNI: lucas-imac][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1255/0 6660/0 9061/0 2880/0][Pkt Len c2s/s2c min/avg/max/stddev: 342/0 342/0 342/0 0/0][DHCP Fingerprint: 1,3,6,15,119,95,252,44,46][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	10	UDP 192.168.2.4:52794 <-> 31.13.84.48:3478 [proto: 78.45/STUN.WhatsAppCall][ClearText][Confidence: DPI][cat: VoIP/10][9 pkts/1842 bytes <-> 11 pkts/1151 bytes][Goodput ratio: 79/60][14.33 sec][bytes ratio: 0.231 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 1923/792 6986/6468 2906/2008][Pkt Len c2s/s2c min/avg/max/stddev: 68/64 205/105 331/128 82/23][Plen Bins: 15,10,40,15,0,0,10,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	11	UDP 192.168.2.1:17500 -> 192.168.2.255:17500 [proto: 121/Dropbox][ClearText][Confidence: DPI][cat: Cloud/13][4 pkts/2176 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][90.14 sec][PLAIN TEXT ( 3375359593)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	12	TCP 192.168.2.4:49199 <-> 17.172.100.70:993 [proto: 51.140/IMAPS.Apple][Encrypted][Confidence: Match by IP][cat: Web/5][9 pkts/1130 bytes <-> 8 pkts/868 bytes][Goodput ratio: 47/39][0.94 sec][bytes ratio: 0.131 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 9/53 105/100 275/162 108/47][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 126/108 236/151 68/42][Plen Bins: 0,0,50,25,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	TCP 192.168.2.4:49199 <-> 17.172.100.70:993 [proto: 51/IMAPS][Encrypted][Confidence: DPI][cat: Email/3][9 pkts/1130 bytes <-> 8 pkts/868 bytes][Goodput ratio: 47/39][0.94 sec][bytes ratio: 0.131 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 9/53 105/100 275/162 108/47][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 126/108 236/151 68/42][Plen Bins: 0,0,50,25,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	13	UDP 192.168.2.4:51518 -> 1.194.90.191:60312 [proto: 78.45/STUN.WhatsAppCall][ClearText][Confidence: DPI][cat: VoIP/10][15 pkts/1290 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][8.85 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 614/0 632/0 667/0 13/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86/0 86/0 0/0][Risk: ** Known Protocol on Non Standard Port **][Risk Score: 50][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	14	UDP 192.168.2.4:52794 -> 1.194.90.191:51727 [proto: 78.45/STUN.WhatsAppCall][ClearText][Confidence: DPI][cat: VoIP/10][12 pkts/1032 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][6.95 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 625/0 631/0 644/0 6/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86/0 86/0 0/0][Risk: ** Known Protocol on Non Standard Port **][Risk Score: 50][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	ICMP 192.168.2.4:0 -> 91.253.176.65:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][10 pkts/700 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][43.15 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/0 4795/0 42598/0 13366/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/0 70/0 70/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

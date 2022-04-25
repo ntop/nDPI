@@ -1,0 +1,8 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+Facebook	6	789	1
+
+	1	TCP 179.60.195.173:443 <-> 192.168.2.100:60636 [proto: 91.119/TLS.Facebook][Encrypted][Confidence: DPI][cat: SocialNetwork/6][3 pkts/627 bytes <-> 3 pkts/162 bytes][Goodput ratio: 68/0][0.22 sec][bytes ratio: 0.589 (Upload)][IAT c2s/s2c min/avg/max/stddev: 11/0 56/0 101/0 45/0][Pkt Len c2s/s2c min/avg/max/stddev: 201/54 209/54 225/54 11/0][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
