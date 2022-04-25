@@ -52,10 +52,9 @@ static void xiaomi_dissect_metadata(struct ndpi_detection_module_struct *ndpi_st
 
     switch(op) {
       case 0x12:
-        flow->http.user_agent = ndpi_malloc(len + 1);
-        if(flow->http.user_agent != NULL) {
-          memcpy(flow->http.user_agent, &payload[offset], len);
-          flow->http.user_agent[len] = '\0';
+        if (ndpi_user_agent_set(flow, &payload[offset], len) == NULL)
+        {
+            NDPI_LOG_DBG2(ndpi_struct, "Could not set Xiaomi user agent\n");
         }
         break;
 

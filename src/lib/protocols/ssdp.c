@@ -38,13 +38,9 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
 
   /* Save user-agent for device discovery if available */
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
-    if(flow->http.user_agent == NULL) {
-      flow->http.user_agent = ndpi_malloc(packet->user_agent_line.len + 1);
-      if(flow->http.user_agent) {
-        memcpy(flow->http.user_agent,
-          (char*)packet->user_agent_line.ptr, packet->user_agent_line.len);
-        flow->http.user_agent[packet->user_agent_line.len] = '\0';
-      }
+    if (ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len) == NULL)
+    {
+      NDPI_LOG_DBG2(ndpi_struct, "Could not set SSDP user agent\n");
     }
   }
 }
