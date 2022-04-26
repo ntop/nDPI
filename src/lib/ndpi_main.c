@@ -3458,7 +3458,8 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
  *  - host and category are separated by a single TAB
  *  - empty lines or lines starting with # are ignored
  */
-int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
+int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
+			      const char *path, void *user_data) {
   char buffer[512], *line, *name, *category, *saveptr;
   FILE *fd;
   int len, num = 0;
@@ -3488,7 +3489,9 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, con
       category = strtok_r(NULL, "\t", &saveptr);
 
       if(category) {
-	int rc = ndpi_load_category(ndpi_str, name, (ndpi_protocol_category_t) atoi(category));
+	int rc = ndpi_load_category(ndpi_str, name,
+				    (ndpi_protocol_category_t) atoi(category),
+				    user_data);
 
 	if(rc >= 0)
 	  num++;
@@ -5368,7 +5371,7 @@ static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndp
 
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				    u_int8_t enable_guess, u_int8_t *protocol_was_guessed) {
-  ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
+  ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
   u_int16_t guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN, guessed_host_protocol_id = NDPI_PROTOCOL_UNKNOWN;
   
   /* *** We can't access ndpi_str->packet from this function!! *** */
@@ -5563,8 +5566,10 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str, st
 
 /* ********************************************************************************* */
 
-int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str, const char *ip_address_and_mask,
-			  ndpi_protocol_category_t category) {
+int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
+			  const char *ip_address_and_mask,
+			  ndpi_protocol_category_t category,
+			  void *user_data) {
   ndpi_patricia_node_t *node;
   struct in_addr pin;
   int bits = 32;
@@ -5589,15 +5594,17 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str, const c
 
   if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow, AF_INET, &pin, bits)) != NULL) {
     node->value.u.uv32.user_value = (u_int16_t)category, node->value.u.uv32.additional_user_value = 0;
+    node->custom_user_data = user_data;
   }
 
+  
   return(0);
 }
 
-
 /* ********************************************************************************* */
 
-int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, const char *name_to_add,
+int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
+				const char *name_to_add,
 				ndpi_protocol_category_t category) {
 
   if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL)
@@ -5606,7 +5613,8 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, c
   if(name_to_add == NULL)
     return(-1);
 
-  return ndpi_string_to_automa(ndpi_str,(AC_AUTOMATA_t *)ndpi_str->custom_categories.hostnames_shadow.ac_automa,
+  return ndpi_string_to_automa(ndpi_str,
+			       (AC_AUTOMATA_t *)ndpi_str->custom_categories.hostnames_shadow.ac_automa,
 			       name_to_add,category,category, 0, 0, 1); /* at_end */
 }
 
@@ -5614,14 +5622,20 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str, c
 
 /* Loads an IP or name category */
 int ndpi_load_category(struct ndpi_detection_module_struct *ndpi_struct, const char *ip_or_name,
-		       ndpi_protocol_category_t category) {
+		       ndpi_protocol_category_t category, void *user_data) {
   int rv;
 
   /* Try to load as IP address first */
-  rv = ndpi_load_ip_category(ndpi_struct, ip_or_name, category);
+  rv = ndpi_load_ip_category(ndpi_struct, ip_or_name, category, user_data);
 
   if(rv < 0) {
-    /* IP load failed, load as hostname */
+    /* 
+       IP load failed, load as hostname 
+
+       NOTE: 
+       we cannot add user_data here as with Aho-Corasick this
+       information would not be used
+    */
     rv = ndpi_load_hostname_category(ndpi_struct, ip_or_name, category);
   }
 
@@ -5632,10 +5646,12 @@ int ndpi_load_category(struct ndpi_detection_module_struct *ndpi_struct, const c
 
 int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str) {
   int i;
-
+  static char *built_in = "built-in";
+  
   /* First add the nDPI known categories matches */
   for(i = 0; category_match[i].string_to_match != NULL; i++)
-    ndpi_load_category(ndpi_str, category_match[i].string_to_match, category_match[i].protocol_category);
+    ndpi_load_category(ndpi_str, category_match[i].string_to_match,
+		       category_match[i].protocol_category, built_in);
 
   /* Free */
   ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
@@ -5667,8 +5683,33 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ********************************************************************************* */
 
-int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str, u_int32_t saddr, u_int32_t daddr,
+/* NOTE u_int32_t is represented in network byte order */
+void* ndpi_find_ipv4_category_userdata(struct ndpi_detection_module_struct *ndpi_str,
+				       u_int32_t saddr) {
+  ndpi_patricia_node_t *node;
+  
+  if(saddr == 0)
+    node = NULL;
+  else {
+    ndpi_prefix_t prefix;
+    
+    ndpi_fill_prefix_v4(&prefix, (struct in_addr *) &saddr, 32,
+			((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+    node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
+  }
+
+  return(node ? node->custom_user_data : NULL);
+}
+
+/* ********************************************************************************* */
+
+/* NOTE u_int32_t is represented in network byte order */
+int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
+				   u_int32_t saddr, u_int32_t daddr,
 				   ndpi_protocol *ret) {
+
+  ret->custom_category_userdata = NULL;
+  
   if(ndpi_str->custom_categories.categories_loaded) {
     ndpi_prefix_t prefix;
     ndpi_patricia_node_t *node;
@@ -5692,7 +5733,7 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
 
     if(node) {
       ret->category = (ndpi_protocol_category_t) node->value.u.uv32.user_value;
-
+      ret->custom_category_userdata = node->custom_user_data;
       return(1);
     }
   }
@@ -5896,7 +5937,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
   u_int32_t num_calls = 0;
-  ndpi_protocol ret = { flow->detected_protocol_stack[1], flow->detected_protocol_stack[0], flow->category };
+  ndpi_protocol ret = { flow->detected_protocol_stack[1], flow->detected_protocol_stack[0], flow->category, NULL };
 
   if(ndpi_str->ndpi_log_level >= NDPI_LOG_TRACE)
     NDPI_LOG(flow ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN, ndpi_str, NDPI_LOG_TRACE,
@@ -6721,8 +6762,10 @@ ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_str
   return(flow->category);
 }
 
+/* ********************************************************************************* */
+
 void ndpi_get_flow_ndpi_proto(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-                struct ndpi_proto * ndpi_proto)
+			      struct ndpi_proto * ndpi_proto)
 {
   ndpi_proto->master_protocol = ndpi_get_flow_masterprotocol(ndpi_str, flow);
   ndpi_proto->app_protocol = ndpi_get_flow_appprotocol(ndpi_str, flow);
@@ -6963,7 +7006,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 					     u_int32_t dhost /* host byte order */, u_int16_t dport) {
   u_int32_t rc;
   struct in_addr addr;
-  ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED};
+  ndpi_protocol ret = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
   u_int8_t user_defined_proto;
 
 #ifdef BITTORRENT_CACHE_DEBUG

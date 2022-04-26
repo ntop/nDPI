@@ -109,7 +109,7 @@ extern "C" {
   void * ndpi_flow_malloc(size_t size);
   void   ndpi_flow_free(void *ptr);
   u_int32_t ndpi_get_tot_allocated_memory(void);
-  
+
   /**
    * Search the first occurrence of substring -find- in -s-
    * The search is limited to the first -slen- characters of the string
@@ -756,10 +756,11 @@ extern "C" {
    *
    * @par     ndpi_mod = the detection module
    * @par     path     = the path of the file
+   * @par     user_data = pointer to some user data value
    * @return  0 if the file is loaded correctly;
    *          -1 else
    */
-  int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path);
+  int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path, void *user_data);
 
   /**
    * Read a file and load the list of risky domains
@@ -922,12 +923,16 @@ extern "C" {
   int ndpi_match_string(void *_automa, char *string_to_match);
 
   int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_struct,
-			    const char *ip_address_and_mask, ndpi_protocol_category_t category);
+			    const char *ip_address_and_mask, ndpi_protocol_category_t category,
+			    void *user_data);
   int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_struct,
 				  const char *name_to_add, ndpi_protocol_category_t category);
   int ndpi_load_category(struct ndpi_detection_module_struct *ndpi_struct,
-			 const char *ip_or_name, ndpi_protocol_category_t category);
+			 const char *ip_or_name, ndpi_protocol_category_t category,
+			 void *user_data);
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
+  void* ndpi_find_ipv4_category_userdata(struct ndpi_detection_module_struct *ndpi_str,
+					 u_int32_t saddr);
   int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				     u_int32_t saddr,
 				     u_int32_t daddr,
@@ -986,12 +991,12 @@ extern "C" {
    *
    * @par    ndpi_struct  = the struct created for the protocol detection
    * @par    days         = the number of days threshold for emitting the alert
-   *                        
+   *
    */
   void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
 				     u_int8_t days);
 
-  
+
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
@@ -1090,7 +1095,7 @@ extern "C" {
   u_int64_t ndpi_ntohll(u_int64_t v);
   u_int8_t ndpi_is_valid_protoId(u_int16_t protoId);
   u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str, ndpi_protocol proto);
-  
+
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			  struct ndpi_flow_struct *flow,
@@ -1589,13 +1594,13 @@ extern "C" {
   int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance);
   int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int64_t _value, double *forecast, double *confidence_band);
   void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha);
-  
+
   /* ******************************* */
 
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
   int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int64_t _value, double *forecast, double *confidence_band);
   void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, float *ret_beta);
-  
+
   /* ******************************* */
 
   int   ndpi_jitter_init(struct ndpi_jitter_struct *hw, u_int16_t num_periods);
@@ -1662,7 +1667,7 @@ extern "C" {
   /* ******************************* */
 
   /*
-   * Finds outliers using Z-score  
+   * Finds outliers using Z-score
    * Z-Score = (Value - Mean) / StdDev
    *
    * @par    values      = pointer to the individual values to be analyzed [in]
@@ -1698,7 +1703,7 @@ extern "C" {
   /* ******************************* */
 
   char* ndpi_get_flow_name(struct ndpi_flow_struct *flow);
-  
+
   /* ******************************* */
 
   ndpi_bitmap* ndpi_bitmap_alloc(void);
@@ -1714,13 +1719,13 @@ extern "C" {
 
   void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or);
-  
+
   ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b);
   void ndpi_bitmap_iterator_free(ndpi_bitmap* b);
   bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, uint32_t *value);
 
   /* ******************************* */
-  
+
 #ifdef __cplusplus
 }
 #endif

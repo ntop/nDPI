@@ -73,7 +73,7 @@ union ndpi_patricia_node_value_t {
     } uv32;
     
     u_int64_t uv64;
-
+    
     void *user_data;
   } u;
 };
@@ -95,6 +95,7 @@ typedef struct _ndpi_patricia_node_t {
   struct _ndpi_patricia_node_t *l, *r;	/* left and right children */
   struct _ndpi_patricia_node_t *parent;/* may be used */
   void *data;			/* pointer to data */
+  void *custom_user_data;       /* pointer to custom userdata */
   union ndpi_patricia_node_value_t value;
 } ndpi_patricia_node_t;
 
