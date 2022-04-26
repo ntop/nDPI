@@ -1541,6 +1541,13 @@ extern "C" {
   int ndpi_deserialize_clone_item(ndpi_deserializer *deserializer, ndpi_serializer *serializer);
   int ndpi_deserialize_clone_all(ndpi_deserializer *deserializer, ndpi_serializer *serializer);
 
+  /*
+   * Escape a string to be suitable for a JSON value, adding double quotes, and terminating the string with a null byte.
+   * It is recommended to provide a destination buffer (dst) which is as large as double the source buffer (src) at least.
+   * Upon successful return, these functions return the number of characters printed (excluding the null byte used to terminate the string).
+   */
+  int ndpi_json_string_escape(const char *src, int src_len, char *dst, int dst_max_len);
+
   /* Data analysis */
   struct ndpi_analyze_struct* ndpi_alloc_data_analysis(u_int16_t _max_series_len);
   void ndpi_init_data_analysis(struct ndpi_analyze_struct *s, u_int16_t _max_series_len);

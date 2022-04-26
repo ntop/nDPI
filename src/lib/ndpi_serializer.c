@@ -87,7 +87,7 @@ static int ndpi_is_number(const char *str, u_int32_t str_len) {
  * It is recommended to provide a destination buffer (dst) which is as large as double the source buffer (src) at least.
  * Upon successful return, these functions return the number of characters printed (excluding the null byte used to terminate the string).
  */
-static int ndpi_json_string_escape(const char *src, int src_len, char *dst, int dst_max_len) {
+int ndpi_json_string_escape(const char *src, int src_len, char *dst, int dst_max_len) {
   char c = 0;
   int i, j = 0;
 
