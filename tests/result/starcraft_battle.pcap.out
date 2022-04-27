@@ -4,8 +4,8 @@ DPI Packets (TCP):	182	(4.79 pkts/flow)
 DPI Packets (UDP):	36	(2.77 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 16 (flows)
-Confidence Match by IP      : 6 (flows)
-Confidence DPI              : 30 (flows)
+Confidence Match by IP      : 5 (flows)
+Confidence DPI              : 31 (flows)
 
 DNS	26	2848	7
 HTTP	450	294880	19
@@ -55,7 +55,7 @@ Starcraft	236	51494	6
 	36	TCP 192.168.1.100:3490 <-> 2.228.46.104:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes][Goodput ratio: 0/32][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	37	TCP 192.168.1.100:3491 <-> 2.228.46.104:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes][Goodput ratio: 0/32][0.04 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	38	TCP 192.168.1.100:3492 <-> 2.228.46.104:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/167 bytes][Goodput ratio: 0/32][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	39	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91.203/TLS.Github][Encrypted][Confidence: Match by IP][cat: Collaborative/15][2 pkts/145 bytes <-> 1 pkts/89 bytes][Goodput ratio: 21/39][0.13 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	39	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91.203/TLS.Github][Encrypted][Confidence: DPI][cat: Collaborative/15][2 pkts/145 bytes <-> 1 pkts/89 bytes][Goodput ratio: 21/39][0.13 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	40	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/120 bytes][Goodput ratio: 0/0][0.12 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	41	UDP 192.168.1.100:58844 <-> 192.168.1.254:53 [proto: 5/DNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/86 bytes <-> 1 pkts/124 bytes][Goodput ratio: 51/66][0.05 sec][Hostname/SNI: 40.186.239.80.in-addr.arpa][::][PLAIN TEXT (attens)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	42	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91.126/TLS.Google][Encrypted][Confidence: Match by IP][cat: Web/5][2 pkts/108 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
