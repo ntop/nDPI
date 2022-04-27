@@ -1773,70 +1773,70 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("RCE Injection");
 
   case NDPI_BINARY_APPLICATION_TRANSFER:
-    return("Binary Application Transfer");
+    return("Binary App Transfer");
 
   case NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT:
-    return("Known Protocol on Non Standard Port");
+    return("Known Proto on Non Std Port");
 
   case NDPI_TLS_SELFSIGNED_CERTIFICATE:
-    return("Self-signed Certificate");
+    return("Self-signed Cert");
 
   case NDPI_TLS_OBSOLETE_VERSION:
-    return("Obsolete TLS Version (1.1 or older)");
+    return("Obsolete TLS (v1.1 or older)");
 
   case NDPI_TLS_WEAK_CIPHER:
     return("Weak TLS Cipher");
 
   case NDPI_TLS_CERTIFICATE_EXPIRED:
-    return("TLS Expired Certificate");
+    return("TLS Cert Expire");
 
   case NDPI_TLS_CERTIFICATE_MISMATCH:
-    return("TLS Certificate Mismatch");
+    return("TLS Cert Mismatch");
 
   case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
-    return("HTTP Suspicious User-Agent");
+    return("HTTP Susp User-Agent");
 
   case NDPI_HTTP_NUMERIC_IP_HOST:
     return("HTTP Numeric IP Address");
 
   case NDPI_HTTP_SUSPICIOUS_URL:
-    return("HTTP Suspicious URL");
+    return("HTTP Susp URL");
 
   case NDPI_HTTP_SUSPICIOUS_HEADER:
-    return("HTTP Suspicious Header");
+    return("HTTP Susp Header");
 
   case NDPI_TLS_NOT_CARRYING_HTTPS:
     return("TLS (probably) Not Carrying HTTPS");
 
   case NDPI_SUSPICIOUS_DGA_DOMAIN:
-    return("Suspicious DGA Domain name");
+    return("Susp DGA Domain name");
 
   case NDPI_MALFORMED_PACKET:
     return("Malformed Packet");
 
   case NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER:
-    return("SSH Obsolete Client Version/Cipher");
+    return("SSH Obsolete Cli Vers/Cipher");
 
   case NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER:
-    return("SSH Obsolete Server Version/Cipher");
+    return("SSH Obsolete Ser Vers/Cipher");
 
   case NDPI_SMB_INSECURE_VERSION:
-    return("SMB Insecure Version");
+    return("SMB Insecure Vers");
 
   case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
-    return("TLS Suspicious ESNI Usage");
+    return("TLS Susp ESNI Usage");
 
   case NDPI_UNSAFE_PROTOCOL:
     return("Unsafe Protocol");
 
   case NDPI_DNS_SUSPICIOUS_TRAFFIC:
-    return("Suspicious DNS Traffic"); /* Exfiltration ? */
+    return("Susp DNS Traffic"); /* Exfiltration ? */
 
   case NDPI_TLS_MISSING_SNI:
-    return("Missing SNI TLS Extension");
+    return("Missing SNI TLS Extn");
 
   case NDPI_HTTP_SUSPICIOUS_CONTENT:
-    return("HTTP Suspicious Content");
+    return("HTTP Susp Content");
 
   case NDPI_RISKY_ASN:
     return("Risky ASN");
@@ -1845,47 +1845,47 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Risky Domain Name");
 
   case NDPI_MALICIOUS_JA3:
-    return("Possibly Malicious JA3 Fingerprint");
+    return("Malicious JA3 Fingerp.");
 
   case NDPI_MALICIOUS_SHA1_CERTIFICATE:
-    return("Possibly Malicious SSL Cert. SHA1 Fingerprint");
+    return("Malicious SSL Cert/SHA1 Fingerp.");
 
   case NDPI_DESKTOP_OR_FILE_SHARING_SESSION:
-    return("Desktop/File Sharing Session");
+    return("Desktop/File Sharing");
 
   case NDPI_TLS_UNCOMMON_ALPN:
     return("Uncommon TLS ALPN");
 
   case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
-    return("TLS Certificate Validity Too Long");
+    return("TLS Cert Validity Too Long");
 
   case NDPI_TLS_SUSPICIOUS_EXTENSION:
-    return("TLS Suspicious Extension");
+    return("TLS Susp Extension");
 
   case NDPI_TLS_FATAL_ALERT:
     return("TLS Fatal Alert");
 
   case NDPI_SUSPICIOUS_ENTROPY:
-    return("Suspicious Entropy");
-      
+    return("Susp Entropy");
+
   case NDPI_CLEAR_TEXT_CREDENTIALS:
     return("Clear-Text Credentials");
-    
+
   case NDPI_DNS_LARGE_PACKET:
-    return("DNS Packet Larger Than 512 bytes");
-    
+    return("Large DNS Packet (512+ bytes)");
+
   case NDPI_DNS_FRAGMENTED:
     return("Fragmented DNS Message");
 
   case NDPI_INVALID_CHARACTERS:
-    return("Text Contains Non-Printable Characters");
+    return("Text With Non-Printable Chars");
 
   case NDPI_POSSIBLE_EXPLOIT:
-    return("Possible Exploit Detected");
+    return("Possible Exploit");
     break;
-    
+
   case NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE:
-    return("TLS Certificate About To Expire");
+    return("TLS Cert About To Expire");
     break;
 
   case NDPI_PUNYCODE_IDN:
@@ -1893,11 +1893,11 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     break;
 
   case NDPI_ERROR_CODE_DETECTED:
-    return("Error Code Detected");
+    return("Error Code");
     break;
 
   case NDPI_HTTP_CRAWLER_BOT:
-    return("Crawler/Bot Detected");
+    return("Crawler/Bot");
     break;
 
   case NDPI_ANONYMOUS_SUBSCRIBER:
@@ -2033,7 +2033,7 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
     }
     break;
   }
-  
+
   return(NDPI_HTTP_METHOD_UNKNOWN);
 }
 
@@ -2198,9 +2198,9 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
   host = ndpi_get_flow_name(flow);
 
   if((!flow->host_risk_mask_evaluated) && (!flow->ip_risk_mask_evaluated)) {
-    flow->risk_mask = (u_int64_t)-1; /* No mask */    
+    flow->risk_mask = (u_int64_t)-1; /* No mask */
   }
-  
+
   if(!flow->host_risk_mask_evaluated) {
     if(host && (host[0] != '\0')) {
       /* Check host exception */
@@ -2389,25 +2389,25 @@ void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str) {
 u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 			  const char *alpn_to_check, u_int alpn_to_check_len) {
   ndpi_automa *automa = &ndpi_str->common_alpns_automa;
-  
+
   if(automa->ac_automa) {
     AC_TEXT_t ac_input_text;
     AC_REP_t match;
-    
+
     ac_input_text.astring = (char*)alpn_to_check, ac_input_text.length = alpn_to_check_len;
     ac_input_text.option = 0;
-    
+
     if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0)
       return(1);
   }
-  
+
   return(0);
 }
 
 /* ******************************************* */
 
 u_int8_t ndpi_is_valid_protoId(u_int16_t protoId) {
-  return((protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS) ? 0 : 1);  
+  return((protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS) ? 0 : 1);
 }
 
 /* ******************************************* */
