@@ -68,21 +68,6 @@ void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, stru
     ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
     return;
   }
-#if 0
-  /* Code disabled as it is too generic and it can lead to false positives */
-  else if(((tsport == 443 || tdport == 443) ||
-	   (tsport == 80 || tdport == 80)) &&
-          (packet->payload_packet_len >= 5) &&
-          ((packet->payload[0] == 0x17 /* TLS Application Data */ &&
-	    packet->payload[1] == 0x03 && packet->payload[2] == 0x03 && /* TLS 1.2 */
-	    packet->payload[3] == 0x00 && packet->payload[4] == 0x3A /* Length */)))
-    {
-      /* TLS signature of Cisco AnyConnect 0X170303003A */
-      NDPI_LOG_INFO(ndpi_struct, "found CISCO Anyconnect VPN\n");
-      ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
-      return;
-    }
-#endif
   else if(((tsport == 8009 || tdport == 8009) ||
 	   (tsport == 8008 || tdport == 8008)) &&
           (packet->payload_packet_len >= 5) &&
