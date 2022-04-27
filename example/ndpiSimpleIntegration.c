@@ -1,3 +1,22 @@
+/*
+ *
+ * Copyright (C) 2011-22 - ntop.org
+ *
+ * nDPI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * nDPI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef WIN32
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -132,7 +151,10 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
 {
   char pcap_error_buffer[PCAP_ERRBUF_SIZE];
   struct nDPI_workflow * workflow = (struct nDPI_workflow *)ndpi_calloc(1, sizeof(*workflow));
-
+  const char *bpfFilter = "ip or ip6";
+  static struct bpf_program bpf_code;
+  static struct bpf_program *bpf_cfilter = NULL;
+  
   if (workflow == NULL) {
     return NULL;
   }
@@ -154,6 +176,17 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
     free_workflow(&workflow);
     return NULL;
   }
+
+  if(pcap_compile(workflow->pcap_handle, &bpf_code, bpfFilter, 1, 0xFFFFFF00) < 0) {
+    printf("pcap_compile error: '%s'\n", pcap_geterr(workflow->pcap_handle));
+    exit(-1);
+  }
+
+  bpf_cfilter = &bpf_code;
+
+  if(pcap_setfilter(workflow->pcap_handle, bpf_cfilter) < 0) {
+    printf("pcap_setfilter error: '%s'\n", pcap_geterr(workflow->pcap_handle));
+  }  
 
   ndpi_init_prefs init_prefs = ndpi_no_prefs;
   workflow->ndpi_struct = ndpi_init_detection_module(init_prefs);
@@ -1104,9 +1137,10 @@ static void sighandler(int signum)
 int main(int argc, char ** argv)
 {
   if (argc == 0) {
+    printf("usage: ndpiSimpleIntegration Mdevice name>\n");
     return 1;
   }
-
+  
   printf("usage: %s [PCAP-FILE-OR-INTERFACE]\n"
 	 "----------------------------------\n"
 	 "nDPI version: %s\n"
