@@ -2,8 +2,9 @@ Guessed flow protos:	1
 
 DPI Packets (UDP):	60	(2.86 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
+Confidence DPI (partial)    : 1 (flows)
 Confidence DPI (cache)      : 2 (flows)
-Confidence DPI              : 21 (flows)
+Confidence DPI              : 20 (flows)
 
 ICMP	53	5186	2
 GoogleHangoutDuo	40	2720	4
@@ -32,4 +33,4 @@ SignalVoip	193	23756	11
 	20	UDP 192.168.12.169:39518 -> 35.158.183.167:443 [proto: 78.269/STUN.SignalVoip][ClearText][Confidence: DPI][cat: VoIP/10][10 pkts/660 bytes -> 0 pkts/0 bytes][Goodput ratio: 36/0][3.82 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 64/0 424/0 1928/0 598/0][Pkt Len c2s/s2c min/avg/max/stddev: 62/0 66/0 70/0 4/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 3478][PLAIN TEXT (BJKHNYBG4)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	21	UDP 192.168.12.169:47204 -> 35.158.183.167:443 [proto: 78.265/STUN.AmazonAWS][ClearText][Confidence: DPI][cat: Cloud/13][10 pkts/660 bytes -> 0 pkts/0 bytes][Goodput ratio: 36/0][3.82 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 63/0 424/0 1928/0 597/0][Pkt Len c2s/s2c min/avg/max/stddev: 62/0 66/0 70/0 4/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 3478][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	UDP 192.168.12.169:39518 <-> 172.253.121.127:19302 [proto: 78.269/STUN.SignalVoip][ClearText][Confidence: DPI][cat: VoIP/10][2 pkts/124 bytes <-> 2 pkts/148 bytes][Goodput ratio: 32/43][0.62 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	23	UDP 192.168.12.169:47204 <-> 172.253.121.127:19302 [proto: 78.201/STUN.GoogleHangoutDuo][ClearText][Confidence: DPI][cat: VoIP/10][2 pkts/124 bytes <-> 2 pkts/148 bytes][Goodput ratio: 32/43][0.63 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	23	UDP 192.168.12.169:47204 <-> 172.253.121.127:19302 [proto: 78.201/STUN.GoogleHangoutDuo][ClearText][Confidence: DPI (partial)][cat: VoIP/10][2 pkts/124 bytes <-> 2 pkts/148 bytes][Goodput ratio: 32/43][0.63 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
