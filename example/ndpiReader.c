@@ -59,9 +59,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <libgen.h>
-#ifdef HAVE_LIBJSON_C
-#include <json.h>
-#endif
+#include <errno.h>
 
 #include "reader_util.h"
 
@@ -84,28 +82,19 @@ static char *_customCategoryFilePath= NULL; /**< Custom categories file path  */
 static char *_maliciousJA3Path      = NULL; /**< Malicious JA3 signatures */
 static char *_maliciousSHA1Path     = NULL; /**< Malicious SSL certificate SHA1 fingerprints */
 static char *_riskyDomainFilePath   = NULL; /**< Risky domain files */
-#ifdef HAVE_LIBJSON_C
-static char *_statsFilePath         = NULL; /**< Top stats file path */
-static char *_jsonFilePath          = NULL; /**< JSON file path  */
-static FILE *stats_fp               = NULL; /**< for Top Stats JSON file */
-static json_object *jArray_known_flows = NULL, *jArray_unknown_flows = NULL;
-static json_object *jArray_topStats = NULL;
-#endif
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
-FILE *csv_fp                 = NULL; /**< for CSV export */
+static FILE *csv_fp                 = NULL; /**< for CSV export */
+static FILE *serialization_fp       = NULL; /**< for TLV,CSV,JSON export */
+static ndpi_serialization_format serialization_format = ndpi_serialization_format_unknown;
 static char* domain_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
 u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
-u_int8_t json_flag = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 static u_int8_t stats_flag = 0;
-#ifdef HAVE_LIBJSON_C
-static u_int8_t file_first_time = 1;
-#endif
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
@@ -456,7 +445,9 @@ static void help(u_int long_help) {
          "  -n <num threads>          | Number of threads. Default: number of interfaces in -i.\n"
          "                            | Ignored with pcap files.\n"
          "  -b <num bin clusters>     | Number of bin clusters\n"
-         "  -k <file.json>            | Specify a file to write the content of packets in .json format\n"
+         "  -k <file>                 | Specify a file to write serialized detection results\n"
+         "  -K <format>               | Specify the serialization format for `-k'\n"
+         "                            | Valid formats are tlv, csv or json (default)\n"
 #ifdef linux
          "  -g <id:id...>             | Thread affinity mask (one core id per thread)\n"
 #endif
@@ -575,7 +566,8 @@ static struct option longopts[] = {
   { "dbg-proto", required_argument, NULL, 'u'},
   { "help", no_argument, NULL, 'h'},
   { "long-help", no_argument, NULL, 'H'},
-  { "json", required_argument, NULL, 'k'},
+  { "serialization-outfile", required_argument, NULL, 'k'},
+  { "serialization-format", required_argument, NULL, 'K'},
   { "payload-analysis", required_argument, NULL, 'P'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
@@ -796,7 +788,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "a:b:e:c:C:dDf:g:i:Ij:k:S:hHp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "a:b:e:c:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -875,8 +867,12 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'C':
+      errno = 0;
       if((csv_fp = fopen(optarg, "w")) == NULL)
-        printf("Unable to write on CSV file %s\n", optarg);
+      {
+        printf("Unable to write on CSV file %s: %s\n", optarg, strerror(errno));
+        exit(1);
+      }
       break;
 
     case 'r':
@@ -951,19 +947,35 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'k':
-#ifndef HAVE_LIBJSON_C
-      printf("WARNING: this copy of ndpiReader has been compiled without json-c: JSON export disabled\n");
-#else
-      _jsonFilePath = optarg;
-      json_flag = 1;
-#endif
+      errno = 0;
+      if((serialization_fp = fopen(optarg, "w")) == NULL)
+      {
+        printf("Unable to write on serialization file %s: %s\n", optarg, strerror(errno));
+        exit(1);
+      }
+      break;
+
+    case 'K':
+      if (strcasecmp(optarg, "tlv") == 0 && strlen(optarg) == 3)
+      {
+        serialization_format = ndpi_serialization_format_tlv;
+      } else if (strcasecmp(optarg, "csv") == 0 && strlen(optarg) == 3)
+      {
+        serialization_format = ndpi_serialization_format_csv;
+      } else if (strcasecmp(optarg, "json") == 0 && strlen(optarg) == 4)
+      {
+        serialization_format = ndpi_serialization_format_json;
+      } else {
+        printf("Unknown serialization format. Valid values are: tlv,csv,json\n");
+        exit(1);
+      }
       break;
 
     case 'w':
       results_path = ndpi_strdup(optarg);
       if((results_file = fopen(results_path, "w")) == NULL) {
         printf("Unable to write in file %s: quitting\n", results_path);
-        return;
+        exit(1);
       }
       break;
 
@@ -1030,6 +1042,13 @@ static void parseOptions(int argc, char **argv) {
       help(0);
       break;
     }
+  }
+
+  if ((serialization_fp == NULL && serialization_format != ndpi_serialization_format_unknown) ||
+      (serialization_fp != NULL && serialization_format == ndpi_serialization_format_unknown))
+  {
+    printf("Serializing detection results to a file requires command line arguments -k AND -K\n");
+    exit(1);
   }
 
   if(extcap_exit)
@@ -1270,8 +1289,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->src2dst_cwr_count, flow->src2dst_ece_count, flow->src2dst_urg_count, flow->src2dst_ack_count,
 	    flow->src2dst_psh_count, flow->src2dst_rst_count, flow->src2dst_syn_count, flow->src2dst_fin_count);
 
-    fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->dst2src_cwr_count, flow->ece_count, flow->urg_count, flow->ack_count,
-	    flow->psh_count, flow->rst_count, flow->syn_count, flow->fin_count);
+    fprintf(csv_fp, "%d,%d,%d,%d,%d,%d,%d,%d,", flow->dst2src_cwr_count, flow->dst2src_ece_count, flow->dst2src_urg_count, flow->dst2src_ack_count,
+	    flow->dst2src_psh_count, flow->dst2src_rst_count, flow->dst2src_syn_count, flow->dst2src_fin_count);
 
     /* TCP window */
     fprintf(csv_fp, "%u,%u,", flow->c_to_s_init_win, flow->s_to_c_init_win);
@@ -1322,7 +1341,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     }
   }
 
-  if(csv_fp || !json_flag || (verbose > 1)) {
+  if(csv_fp || (verbose > 1)) {
 #if 1
     fprintf(out, "\t%u", id);
 #else
@@ -1392,7 +1411,55 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->host_server_name[0] != '\0') fprintf(out, "[Hostname/SNI: %s]", flow->host_server_name);
 
-    if(flow->info[0] != '\0') fprintf(out, "[%s]", flow->info);
+    switch (flow->info_type)
+    {
+      case INFO_INVALID:
+        break;
+
+      case INFO_GENERIC:
+        if (flow->info[0] != '\0')
+        {
+          fprintf(out, "[%s]", flow->info);
+        }
+        break;
+
+      case INFO_KERBEROS:
+        if (flow->kerberos.domain[0] != '\0' ||
+            flow->kerberos.hostname[0] != '\0' ||
+            flow->kerberos.username[0] != '\0')
+        {
+          fprintf(out, "[%s%s%s%s]",
+                  flow->kerberos.domain,
+                  (flow->kerberos.hostname[0] != '\0' ||
+                   flow->kerberos.username[0] != '\0' ? "\\" : ""),
+                  flow->kerberos.hostname,
+                  flow->kerberos.username);
+        }
+        break;
+
+      case INFO_FTP_IMAP_POP_SMTP:
+        if (flow->ftp_imap_pop_smtp.username[0] != '\0')
+        {
+          fprintf(out, "[User: %s][Pwd: %s]",
+                  flow->ftp_imap_pop_smtp.username,
+                  flow->ftp_imap_pop_smtp.password);
+          if (flow->ftp_imap_pop_smtp.auth_failed != 0)
+          {
+            fprintf(out, "[%s]", "Auth Failed");
+          }
+        }
+        break;
+
+      case INFO_TLS_QUIC_ALPN_VERSION:
+        fprintf(out, "[ALPN: %s][TLS Supported Versions: %s]",
+                flow->tls_quic.alpn, flow->tls_quic.tls_supported_versions);
+        break;
+
+      case INFO_TLS_QUIC_ALPN_ONLY:
+        fprintf(out, "[ALPN: %s]", flow->tls_quic.alpn);
+        break;
+    }
+
     if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);
 
     if((flow->src2dst_packets+flow->dst2src_packets) > 5) {
@@ -1521,68 +1588,306 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(out, "\n");
   }
+}
 
-#ifdef HAVE_LIBJSON_C
-  if(json_flag) {
-    json_object *jObj;
+static void printFlowSerialized(u_int16_t thread_id,
+                                struct ndpi_flow_info *flow)
+{
+  char *json_str = NULL;
+  u_int32_t json_str_len = 0;
+  ndpi_serializer * const serializer = &ndpi_thread_info[thread_id].workflow->ndpi_serializer;
+  //float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
+  double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
+  u_int8_t known_tls;
+  char buf[64];
+  float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
 
-    jObj = json_object_new_object();
+  ndpi_reset_serializer(serializer);
 
-    json_object_object_add(jObj,"protocol",json_object_new_string(ipProto2Name(flow->protocol)));
-    json_object_object_add(jObj,"host_a.name",json_object_new_string(flow->src_name));
-    json_object_object_add(jObj,"host_a.port",json_object_new_int(ntohs(flow->src_port)));
-    json_object_object_add(jObj,"host_b.name",json_object_new_string(flow->dst_name));
-    json_object_object_add(jObj,"host_b.port",json_object_new_int(ntohs(flow->dst_port)));
+  ndpi_serialize_string_uint32(serializer, "flow_id", flow->flow_id);
+  ndpi_serialize_string_uint32(serializer, "l4_protocol", flow->protocol);
+  ndpi_serialize_string_float(serializer, "first_seen_ms", f, "%.3f");
+  ndpi_serialize_string_float(serializer, "last_seen_ms", l, "%.3f");
+  ndpi_serialize_string_float(serializer, "duration_ms", (l-f)/1000.0, "%.3f");
+  ndpi_serialize_string_string(serializer, "src_name", flow->src_name);
+  ndpi_serialize_string_string(serializer, "dst_name", flow->dst_name);
+  ndpi_serialize_string_uint32(serializer, "src_port", flow->src_port);
+  ndpi_serialize_string_uint32(serializer, "dst_port", flow->dst_port);
+  ndpi_serialize_string_uint32(serializer, "ip_version", flow->ip_version);
+  ndpi_serialize_string_uint32(serializer, "vlan_id", flow->vlan_id);
+  ndpi_serialize_string_uint32(serializer, "bidirectional", flow->bidirectional);
+  ndpi_serialize_string_uint32(serializer, "encrypted",
+                               ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                                       flow->detected_protocol));
+  ndpi_serialize_string_string(serializer, "confidence",
+                               ndpi_confidence_get_name(flow->confidence));
+  ndpi_serialize_string_uint32(serializer, "category_id",
+                               flow->detected_protocol.category);
+  ndpi_serialize_string_string(
+    serializer, "category_name",
+    ndpi_category_get_name(
+      ndpi_thread_info[thread_id].workflow->ndpi_struct,
+      flow->detected_protocol.category
+    )
+  );
 
-    if(flow->detected_protocol.master_protocol)
-      json_object_object_add(jObj,"detected.master_protocol",
-			     json_object_new_int(flow->detected_protocol.master_protocol));
+  ndpi_serialize_string_string(serializer, "l7_protocol_id",
+                               ndpi_protocol2id(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                               flow->detected_protocol, buf, sizeof(buf)));
+  ndpi_serialize_string_string(serializer, "l7_protocol_name",
+                               ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                               flow->detected_protocol, buf, sizeof(buf)));
+  ndpi_serialize_start_of_list(serializer, "risks");
+  if (flow->risk != NDPI_NO_RISK)
+  {
+    for (u_int32_t i = 0; i < NDPI_MAX_RISK; ++i)
+    {
+      if (NDPI_ISSET_BIT(flow->risk, i) != 0)
+      {
+        ndpi_serialize_string_string(serializer, "str", ndpi_risk2str(i));
+      }
+    }
+  }
+  ndpi_serialize_end_of_list(serializer);
+  {
+    u_int16_t cli_score, srv_score;
+    ndpi_serialize_string_uint32(serializer, "risks_score",
+                                 ndpi_risk2score(flow->risk, &cli_score, &srv_score));
+  }
+  ndpi_serialize_string_string(serializer, "host_server_name",
+                               flow->host_server_name);
 
-    json_object_object_add(jObj,"detected.app_protocol",
-			   json_object_new_int(flow->detected_protocol.app_protocol));
+  /* XFER Packets/Bytes */
+  ndpi_serialize_start_of_block(serializer, "xfer");
+  ndpi_serialize_string_float(serializer, "data_ratio", data_ratio, "%.3f");
+  ndpi_serialize_string_string(serializer, "data_ratio_str", ndpi_data_ratio2str(data_ratio));
+  ndpi_serialize_string_uint32(serializer, "src2dst_packets", flow->src2dst_packets);
+  ndpi_serialize_string_uint64(serializer, "src2dst_bytes",
+                               (u_int64_t)flow->src2dst_bytes);
+  ndpi_serialize_string_uint64(serializer, "src2dst_goodput_bytes",
+                               (u_int64_t)flow->src2dst_goodput_bytes);
+  ndpi_serialize_string_uint32(serializer, "dst2src_packets", flow->dst2src_packets);
+  ndpi_serialize_string_uint64(serializer, "dst2src_bytes",
+                               (u_int64_t)flow->dst2src_bytes);
+  ndpi_serialize_string_uint64(serializer, "dst2src_goodput_bytes",
+                               (u_int64_t)flow->dst2src_goodput_bytes);
+  ndpi_serialize_end_of_block(serializer);
 
-    if(flow->detected_protocol.master_protocol) {
-      char tmp[256];
+  /* IAT (Inter Arrival Time) */
+  ndpi_serialize_start_of_block(serializer, "iat");
+  ndpi_serialize_string_uint32(serializer, "flow_min", ndpi_data_min(flow->iat_flow));
+  ndpi_serialize_string_float(serializer, "flow_avg",
+                              ndpi_data_average(flow->iat_flow), "%.1f");
+  ndpi_serialize_string_uint32(serializer, "flow_max", ndpi_data_max(flow->iat_flow));
+  ndpi_serialize_string_float(serializer, "flow_stddev",
+                              ndpi_data_stddev(flow->iat_flow), "%.1f");
 
-      ndpi_snprintf(tmp, sizeof(tmp), "%s.%s",
-	       ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				   flow->detected_protocol.master_protocol),
-	       ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				   flow->detected_protocol.app_protocol));
+  ndpi_serialize_string_uint32(serializer, "c_to_s_min",
+                               ndpi_data_min(flow->iat_c_to_s));
+  ndpi_serialize_string_float(serializer, "c_to_s_avg",
+                              ndpi_data_average(flow->iat_c_to_s), "%.1f");
+  ndpi_serialize_string_uint32(serializer, "c_to_s_max",
+                               ndpi_data_max(flow->iat_c_to_s));
+  ndpi_serialize_string_float(serializer, "c_to_s_stddev",
+                              ndpi_data_stddev(flow->iat_c_to_s), "%.1f");
 
-      json_object_object_add(jObj,"detected.protocol.name",
-			     json_object_new_string(tmp));
-    } else
-      json_object_object_add(jObj,"detected.protocol.name",
-			     json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-									flow->detected_protocol.app_protocol)));
+  ndpi_serialize_string_uint32(serializer, "s_to_c_min",
+                               ndpi_data_min(flow->iat_s_to_c));
+  ndpi_serialize_string_float(serializer, "s_to_c_avg",
+                              ndpi_data_average(flow->iat_s_to_c), "%.1f");
+  ndpi_serialize_string_uint32(serializer, "s_to_c_max",
+                               ndpi_data_max(flow->iat_s_to_c));
+  ndpi_serialize_string_float(serializer, "s_to_c_stddev",
+                              ndpi_data_stddev(flow->iat_s_to_c), "%.1f");
+  ndpi_serialize_end_of_block(serializer);
 
-    json_object_object_add(jObj,"packets",json_object_new_int(flow->src2dst_packets + flow->dst2src_packets));
-    json_object_object_add(jObj,"bytes",json_object_new_int(flow->src2dst_bytes + flow->dst2src_bytes));
+  /* Packet Length */
+  ndpi_serialize_start_of_block(serializer, "pktlen");
+  ndpi_serialize_string_uint32(serializer, "c_to_s_min",
+                               ndpi_data_min(flow->pktlen_c_to_s));
+  ndpi_serialize_string_float(serializer, "c_to_s_avg",
+                              ndpi_data_average(flow->pktlen_c_to_s), "%.1f");
+  ndpi_serialize_string_uint32(serializer, "c_to_s_max",
+                               ndpi_data_max(flow->pktlen_c_to_s));
+  ndpi_serialize_string_float(serializer, "c_to_s_stddev",
+                              ndpi_data_stddev(flow->pktlen_c_to_s), "%.1f");
 
-    if(flow->host_server_name[0] != '\0')
-      json_object_object_add(jObj,"host.server.name",json_object_new_string(flow->host_server_name));
+  ndpi_serialize_string_uint32(serializer, "s_to_c_min",
+                               ndpi_data_min(flow->pktlen_s_to_c));
+  ndpi_serialize_string_float(serializer, "s_to_c_avg",
+                              ndpi_data_average(flow->pktlen_s_to_c), "%.1f");
+  ndpi_serialize_string_uint32(serializer, "s_to_c_max",
+                               ndpi_data_max(flow->pktlen_s_to_c));
+  ndpi_serialize_string_float(serializer, "s_to_c_stddev",
+                              ndpi_data_stddev(flow->pktlen_s_to_c), "%.1f");
+  ndpi_serialize_end_of_block(serializer);
 
-    if((flow->ssh_tls.client_hassh[0] != '\0') || (flow->ssh_tls.server_info[0] != '\0')) {
-      json_object *sjObj = json_object_new_object();
+  /* TCP flags */
+  ndpi_serialize_start_of_block(serializer, "tcp_flags");
+  ndpi_serialize_string_int32(serializer, "cwr_count", flow->cwr_count);
+  ndpi_serialize_string_int32(serializer, "ece_count", flow->ece_count);
+  ndpi_serialize_string_int32(serializer, "urg_count", flow->urg_count);
+  ndpi_serialize_string_int32(serializer, "ack_count", flow->ack_count);
+  ndpi_serialize_string_int32(serializer, "psh_count", flow->psh_count);
+  ndpi_serialize_string_int32(serializer, "rst_count", flow->rst_count);
+  ndpi_serialize_string_int32(serializer, "syn_count", flow->syn_count);
+  ndpi_serialize_string_int32(serializer, "fin_count", flow->fin_count);
 
-      if(flow->ssh_tls.ja3_server[0] != '\0')
-	json_object_object_add(jObj,"ja3s",json_object_new_string(flow->ssh_tls.ja3_server));
-      if(flow->ssh_tls.client_hassh[0] != '\0')
-	json_object_object_add(sjObj, "client", json_object_new_string(flow->ssh_tls.client_hassh));
+  ndpi_serialize_string_int32(serializer, "src2dst_cwr_count", flow->src2dst_cwr_count);
+  ndpi_serialize_string_int32(serializer, "src2dst_ece_count", flow->src2dst_ece_count);
+  ndpi_serialize_string_int32(serializer, "src2dst_urg_count", flow->src2dst_urg_count);
+  ndpi_serialize_string_int32(serializer, "src2dst_ack_count", flow->src2dst_ack_count);
+  ndpi_serialize_string_int32(serializer, "src2dst_psh_count", flow->src2dst_psh_count);
+  ndpi_serialize_string_int32(serializer, "src2dst_rst_count", flow->src2dst_rst_count);
+  ndpi_serialize_string_int32(serializer, "src2dst_syn_count", flow->src2dst_syn_count);
+  ndpi_serialize_string_int32(serializer, "src2dst_fin_count", flow->src2dst_fin_count);
 
-      if(flow->ssh_tls.server_info[0] != '\0')
-	json_object_object_add(sjObj, "server", json_object_new_string(flow->ssh_tls.server_info));
+  ndpi_serialize_string_int32(serializer, "dst2src_cwr_count", flow->dst2src_cwr_count);
+  ndpi_serialize_string_int32(serializer, "dst2src_ece_count", flow->dst2src_ece_count);
+  ndpi_serialize_string_int32(serializer, "dst2src_urg_count", flow->dst2src_urg_count);
+  ndpi_serialize_string_int32(serializer, "dst2src_ack_count", flow->dst2src_ack_count);
+  ndpi_serialize_string_int32(serializer, "dst2src_psh_count", flow->dst2src_psh_count);
+  ndpi_serialize_string_int32(serializer, "dst2src_rst_count", flow->dst2src_rst_count);
+  ndpi_serialize_string_int32(serializer, "dst2src_syn_count", flow->dst2src_syn_count);
+  ndpi_serialize_string_int32(serializer, "dst2src_fin_count", flow->dst2src_fin_count);
+  ndpi_serialize_end_of_block(serializer);
 
-      json_object_object_add(jObj, "ssh_tls", sjObj);
+  /* TCP window */
+  ndpi_serialize_string_uint32(serializer, "c_to_s_init_win", flow->c_to_s_init_win);
+  ndpi_serialize_string_uint32(serializer, "s_to_c_init_win", flow->s_to_c_init_win);
+
+  /* Protocol specific serialization */
+  ndpi_serialize_start_of_block(serializer, "l7_protocol_data");
+  if (flow->ssh_tls.server_info[0] != '\0')
+  {
+    ndpi_serialize_string_string(serializer, "server_info", flow->ssh_tls.server_info);
+  }
+
+  if (flow->ssh_tls.server_names != NULL)
+  {
+    ndpi_serialize_string_string(serializer, "server_names", flow->ssh_tls.server_names);
+  }
+
+  if (flow->ssh_tls.ssl_version != 0)
+  {
+    ndpi_ssl_version2str(buf, sizeof(buf), flow->ssh_tls.ssl_version, &known_tls);
+    ndpi_serialize_string_string(serializer, "version", buf);
+  }
+
+  if (flow->ssh_tls.ja3_client[0] != '\0')
+  {
+    ndpi_serialize_string_string(serializer, "ja3_client", flow->ssh_tls.ja3_client);
+  }
+
+  if (flow->ssh_tls.ja3_server[0] != '\0')
+  {
+    ndpi_serialize_string_string(serializer, "ja3_server", flow->ssh_tls.ja3_server);
+  }
+
+  if (flow->ssh_tls.tls_issuerDN != NULL)
+  {
+    ndpi_serialize_string_string(serializer, "issuerDN", flow->ssh_tls.tls_issuerDN);
+  }
+
+  if (flow->ssh_tls.tls_subjectDN != NULL)
+  {
+    ndpi_serialize_string_string(serializer, "subjectDN", flow->ssh_tls.tls_subjectDN);
+  }
+
+  if (flow->ssh_tls.client_hassh[0] != '\0')
+  {
+    ndpi_serialize_string_string(serializer, "client_hassh", flow->ssh_tls.client_hassh);
+  }
+
+  if (flow->ssh_tls.server_hassh[0] != '\0')
+  {
+    ndpi_serialize_string_string(serializer, "server_hassh", flow->ssh_tls.server_hassh);
+  }
+
+  if (flow->http.user_agent[0] != '\0')
+  {
+    ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
+  }
+
+  if (flow->http.url[0] != '\0')
+  {
+    ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
+    if (risk != NDPI_NO_RISK)
+    {
+      NDPI_SET_BIT(flow->risk, risk);
     }
 
-    if(json_flag == 1)
-      json_object_array_add(jArray_known_flows,jObj);
-    else if(json_flag == 2)
-      json_object_array_add(jArray_unknown_flows,jObj);
+    ndpi_serialize_string_string(serializer, "url", flow->http.url);
+    ndpi_serialize_string_uint32(serializer, "code", flow->http.response_status_code);
+    if (flow->http.request_content_type[0] != '\0')
+    {
+      ndpi_serialize_string_string(serializer, "req_content_type",
+                                   flow->http.request_content_type);
+    }
+
+    if (flow->http.content_type[0] != '\0')
+    {
+      ndpi_serialize_string_string(serializer, "content_type",
+                                   flow->http.content_type);
+    }
   }
-#endif
+
+  switch (flow->info_type)
+  {
+    case INFO_INVALID:
+      break;
+
+    case INFO_GENERIC:
+      if (flow->info[0] != '\0')
+      {
+        ndpi_serialize_string_string(serializer, "info", flow->info);
+      }
+      break;
+
+    case INFO_KERBEROS:
+      if (flow->kerberos.domain[0] != '\0' ||
+          flow->kerberos.hostname[0] != '\0' ||
+          flow->kerberos.username[0] != '\0')
+      {
+        ndpi_serialize_string_string(serializer, "domain",
+                                     flow->kerberos.domain);
+        ndpi_serialize_string_string(serializer, "hostname",
+                                     flow->kerberos.hostname);
+        ndpi_serialize_string_string(serializer, "username",
+                                     flow->kerberos.username);
+      }
+      break;
+
+    case INFO_FTP_IMAP_POP_SMTP:
+      ndpi_serialize_string_string(serializer, "username",
+                                   flow->ftp_imap_pop_smtp.username);
+      ndpi_serialize_string_string(serializer, "password",
+                                   flow->ftp_imap_pop_smtp.password);
+      ndpi_serialize_string_uint32(serializer, "auth_failed",
+                                   flow->ftp_imap_pop_smtp.auth_failed);
+      break;
+
+    case INFO_TLS_QUIC_ALPN_VERSION:
+      ndpi_serialize_string_string(serializer, "alpn", flow->tls_quic.alpn);
+      ndpi_serialize_string_string(serializer, "supported_versions",
+                                   flow->tls_quic.tls_supported_versions);
+      break;
+
+    case INFO_TLS_QUIC_ALPN_ONLY:
+      ndpi_serialize_string_string(serializer, "alpn", flow->tls_quic.alpn);
+      break;
+  }
+
+  ndpi_serialize_end_of_block(serializer);
+
+  json_str = ndpi_serializer_get_buffer(serializer, &json_str_len);
+  if (json_str == NULL || json_str_len == 0)
+  {
+    printf("ERROR: nDPI serialization failed\n");
+    exit(-1);
+  }
+
+  fprintf(serialization_fp, "%.*s\n", (int)json_str_len, json_str);
 }
 
 /* ********************************** */
@@ -1646,7 +1951,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
       if(enable_protocol_guess) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
 
-    process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow, csv_fp);
+    process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
 
     proto = flow->detected_protocol.app_protocol ? flow->detected_protocol.app_protocol : flow->detected_protocol.master_protocol;
 
@@ -1991,42 +2296,6 @@ static void updateReceivers(struct receiver **rcvrs, u_int32_t dst_addr,
 
 /* *********************************************** */
 
-#ifdef HAVE_LIBJSON_C
-static void saveReceiverStats(json_object **jObj_group,
-                              struct receiver **receivers,
-                              u_int64_t total_pkt_count) {
-
-  json_object *jArray_stats  = json_object_new_array();
-  struct receiver *r, *tmp;
-  int i = 0;
-
-  HASH_ITER(hh, *receivers, r, tmp) {
-    json_object *jObj_stat = json_object_new_object();
-    char addr_name[48];
-
-    if(r->version == IPVERSION)
-      inet_ntop(AF_INET, &(r->addr), addr_name, sizeof(addr_name));
-    else
-      inet_ntop(AF_INET6, &(r->addr),  addr_name, sizeof(addr_name));
-
-
-    json_object_object_add(jObj_stat,"ip.address",json_object_new_string(addr_name));
-    json_object_object_add(jObj_stat,"packets.number", json_object_new_int(r->num_pkts));
-    json_object_object_add(jObj_stat,"packets.percent",json_object_new_double(((double)r->num_pkts) / total_pkt_count));
-
-    json_object_array_add(jArray_stats, jObj_stat);
-
-    i++;
-    if(i >= 10) break;
-  }
-
-  json_object_object_add(*jObj_group, "top.receiver.stats", jArray_stats);
-}
-#endif
-
-
-/* *********************************************** */
-
 static void deleteScanners(struct single_flow_info *scanners) {
   struct single_flow_info *s, *tmp;
   struct port_flow_info *p, *tmp2;
@@ -2194,7 +2463,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   prefs.ignore_vlanid = ignore_vlanid;
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
-  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1);
+  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
+                                                            serialization_format);
 
   /* Preferences */
   ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
@@ -2251,6 +2521,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
  */
 static void terminateDetection(u_int16_t thread_id) {
   ndpi_workflow_free(ndpi_thread_info[thread_id].workflow);
+  ndpi_thread_info[thread_id].workflow = NULL;
 }
 
 /* *********************************************** */
@@ -2311,68 +2582,6 @@ char* formatPackets(float numPkts, char *buf) {
 /* *********************************************** */
 
 /**
- * @brief JSON function init
- */
-#ifdef HAVE_LIBJSON_C
-static void json_init() {
-  jArray_known_flows = json_object_new_array();
-  jArray_unknown_flows = json_object_new_array();
-  jArray_topStats = json_object_new_array();
-}
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-/**
- * @brief JSON destroy function
- */
-static void json_destroy() {
-  if(jArray_known_flows) {
-    json_object_put(jArray_known_flows);
-    jArray_known_flows = NULL;
-  }
-
-  if(jArray_unknown_flows) {
-    json_object_put(jArray_unknown_flows);
-    jArray_unknown_flows = NULL;
-  }
-
-  if(jArray_topStats) {
-    json_object_put(jArray_topStats);
-    jArray_topStats = NULL;
-  }
-}
-#endif
-
-/* *********************************************** */
-
-static void json_open_stats_file() {
-  if((file_first_time && ((stats_fp = fopen(_statsFilePath,"w")) == NULL))
-     ||
-     (!file_first_time && (stats_fp = fopen(_statsFilePath,"a")) == NULL)) {
-    printf("Error creating/opening file %s\n", _statsFilePath);
-    stats_flag = 0;
-  }
-  else file_first_time = 0;
-}
-
-/* *********************************************** */
-
-static void json_close_stats_file() {
-  json_object *jObjFinal = json_object_new_object();
-
-  json_object_object_add(jObjFinal,"duration.in.seconds",
-                         json_object_new_int(pcap_analysis_duration));
-  json_object_object_add(jObjFinal,"statistics", jArray_topStats);
-  fprintf(stats_fp,"%s\n",json_object_to_json_string(jObjFinal));
-  fclose(stats_fp);
-  json_object_put(jObjFinal);
-}
-#endif
-
-/* *********************************************** */
-
-/**
  * @brief Bytes stats format
  */
 char* formatBytes(u_int32_t howMuch, char *buf, u_int buf_len) {
@@ -2411,26 +2620,6 @@ static int port_stats_sort(void *_a, void *_b) {
 
 /* *********************************************** */
 
-#ifdef HAVE_LIBJSON_C
-static int scanners_sort(void *_a, void *_b) {
-  struct single_flow_info *a = (struct single_flow_info *)_a;
-  struct single_flow_info *b = (struct single_flow_info *)_b;
-
-  return(b->tot_flows - a->tot_flows);
-}
-
-/* *********************************************** */
-
-static int scanners_port_sort(void *_a, void *_b) {
-  struct port_flow_info *a = (struct port_flow_info *)_a;
-  struct port_flow_info *b = (struct port_flow_info *)_b;
-
-  return(b->num_flows - a->num_flows);
-}
-
-#endif
-/* *********************************************** */
-
 static int info_pair_cmp (const void *_a, const void *_b)
 {
   struct info_pair *a = (struct info_pair *)_a;
@@ -2438,171 +2627,6 @@ static int info_pair_cmp (const void *_a, const void *_b)
 
   return b->count - a->count;
 }
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-static int top_stats_sort(void *_a, void *_b) {
-  struct port_stats *a = (struct port_stats*)_a;
-  struct port_stats *b = (struct port_stats*)_b;
-
-  return(b->num_addr - a->num_addr);
-}
-
-/* *********************************************** */
-
-/**
- * @brief Get port based top statistics
- */
-static int getTopStats(struct port_stats *stats) {
-  struct port_stats *sp, *tmp;
-  struct info_pair inf;
-  u_int64_t total_ip_addrs = 0;
-
-  HASH_ITER(hh, stats, sp, tmp) {
-    qsort(sp->top_ip_addrs, MAX_NUM_IP_ADDRESS, sizeof(struct info_pair), info_pair_cmp);
-    inf = sp->top_ip_addrs[0];
-
-    if(((inf.count * 100.0)/sp->cumulative_addr) > AGGRESSIVE_PERCENT) {
-      sp->hasTopHost = 1;
-      sp->top_host = inf.addr;
-      sp->version = inf.version;
-      strncpy(sp->proto, inf.proto, sizeof(sp->proto));
-    } else
-      sp->hasTopHost = 0;
-
-    total_ip_addrs += sp->num_addr;
-  }
-
-  return total_ip_addrs;
-}
-
-/* *********************************************** */
-
-static void saveScannerStats(json_object **jObj_group, struct single_flow_info **scanners) {
-  struct single_flow_info *s, *tmp;
-  struct port_flow_info *p, *tmp2;
-  char addr_name[48];
-  int i = 0, j = 0;
-
-  json_object *jArray_stats  = json_object_new_array();
-
-  HASH_SORT(*scanners, scanners_sort); // FIX
-
-  HASH_ITER(hh, *scanners, s, tmp) {
-    json_object *jObj_stat = json_object_new_object();
-    json_object *jArray_ports = json_object_new_array();
-
-    if(s->version == IPVERSION)
-      inet_ntop(AF_INET, &(s->saddr), addr_name, sizeof(addr_name));
-    else
-      inet_ntop(AF_INET6, &(s->saddr),  addr_name, sizeof(addr_name));
-
-    json_object_object_add(jObj_stat,"ip.address",json_object_new_string(addr_name));
-    json_object_object_add(jObj_stat,"total.flows.number",json_object_new_int(s->tot_flows));
-
-    HASH_SORT(s->ports, scanners_port_sort);
-
-    HASH_ITER(hh, s->ports, p, tmp2) {
-      json_object *jObj_port = json_object_new_object();
-
-      json_object_object_add(jObj_port,"port",json_object_new_int(p->port));
-      json_object_object_add(jObj_port,"flows.number",json_object_new_int(p->num_flows));
-
-      json_object_array_add(jArray_ports, jObj_port);
-
-      j++;
-      if(j >= 10) break;
-    }
-
-    json_object_object_add(jObj_stat,"top.dst.ports",jArray_ports);
-    json_object_array_add(jArray_stats, jObj_stat);
-
-    j = 0;
-    i++;
-    if(i >= 10) break;
-  }
-
-  json_object_object_add(*jObj_group, "top.scanner.stats", jArray_stats);
-}
-
-#endif
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-/*
- * @brief Save Top Stats in json format
- */
-static void saveTopStats(json_object **jObj_group,
-                         struct port_stats **stats,
-                         u_int8_t direction,
-                         u_int64_t total_flow_count,
-                         u_int64_t total_ip_addr) {
-  struct port_stats *s, *tmp;
-  char addr_name[48];
-  int i = 0;
-
-  json_object *jArray_stats  = json_object_new_array();
-
-
-  HASH_ITER(hh, *stats, s, tmp) {
-
-    if((s->hasTopHost)) {
-      json_object *jObj_stat = json_object_new_object();
-
-      json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
-      json_object_object_add(jObj_stat,"packets.number",json_object_new_int(s->num_pkts));
-      json_object_object_add(jObj_stat,"flows.number",json_object_new_int(s->num_flows));
-      json_object_object_add(jObj_stat,"flows.percent",json_object_new_double((s->num_flows*100.0)/total_flow_count));
-      if(s->num_pkts) json_object_object_add(jObj_stat,"flows/packets",
-                                             json_object_new_double(((double)s->num_flows)/s->num_pkts));
-      else json_object_object_add(jObj_stat,"flows.num_packets",json_object_new_double(0.0));
-
-      if(s->version == IPVERSION) {
-        inet_ntop(AF_INET, &(s->top_host), addr_name, sizeof(addr_name));
-      } else {
-        inet_ntop(AF_INET6, &(s->top_host),  addr_name, sizeof(addr_name));
-      }
-
-      json_object_object_add(jObj_stat,"aggressive.host",json_object_new_string(addr_name));
-      json_object_object_add(jObj_stat,"host.app.protocol",json_object_new_string(s->proto));
-
-      json_object_array_add(jArray_stats, jObj_stat);
-      i++;
-
-      if(i >= 10) break;
-    }
-  }
-
-  json_object_object_add(*jObj_group, (direction == DIR_SRC) ?
-                         "top.src.pkts.stats" : "top.dst.pkts.stats", jArray_stats);
-
-  jArray_stats  = json_object_new_array();
-  i=0;
-
-  /*sort top stats by ip addr count*/
-  HASH_SORT(*stats, top_stats_sort);
-
-
-  HASH_ITER(hh, *stats, s, tmp) {
-    json_object *jObj_stat = json_object_new_object();
-
-    json_object_object_add(jObj_stat,"port",json_object_new_int(s->port));
-    json_object_object_add(jObj_stat,"host.number",json_object_new_int64(s->num_addr));
-    json_object_object_add(jObj_stat,"host.percent",json_object_new_double((s->num_addr*100.0)/total_ip_addr));
-    json_object_object_add(jObj_stat,"flows.number",json_object_new_int(s->num_flows));
-
-    json_object_array_add(jArray_stats,jObj_stat);
-    i++;
-
-    if(i >= 10) break;
-  }
-
-  json_object_object_add(*jObj_group, (direction == DIR_SRC) ?
-                         "top.src.host.stats" : "top.dst.host.stats", jArray_stats);
-}
-#endif
 
 /* *********************************************** */
 
@@ -2719,7 +2743,7 @@ static void printFlowsStats() {
     unsigned int num_ja3_client;
     unsigned int num_ja3_server;
 
-    if(!json_flag) fprintf(out, "\n");
+    fprintf(out, "\n");
 
     num_flows = 0;
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
@@ -3197,14 +3221,8 @@ static void printFlowsStats() {
 
     for(thread_id = 0; thread_id < num_threads; thread_id++) {
       if(ndpi_thread_info[thread_id].workflow->stats.protocol_counter[0 /* 0 = Unknown */] > 0) {
-        if(!json_flag) {
-
-          fprintf(out, "\n\nUndetected flows:%s\n",
-                  undetected_flows_deleted ? " (expired flows are not listed below)" : "");
-        }
-
-        if(json_flag)
-          json_flag = 2;
+        fprintf(out, "\n\nUndetected flows:%s\n",
+                undetected_flows_deleted ? " (expired flows are not listed below)" : "");
         break;
       }
     }
@@ -3236,6 +3254,30 @@ static void printFlowsStats() {
       printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
   }
 
+  if (serialization_fp != NULL &&
+      serialization_format != ndpi_serialization_format_unknown)
+  {
+    unsigned int i;
+
+    num_flows = 0;
+    for (thread_id = 0; thread_id < num_threads; thread_id++) {
+      for (i = 0; i < NUM_ROOTS; i++)
+      {
+        ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
+                   node_print_known_proto_walker, &thread_id);
+        ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
+                   node_proto_guess_walker, &thread_id);
+        ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
+                   node_print_unknown_proto_walker, &thread_id);
+      }
+    }
+
+    for(i=0; i<num_flows; i++)
+    {
+      printFlowSerialized(all_flows[i].thread_id, all_flows[i].flow);
+    }
+  }
+
   ndpi_free(all_flows);
 }
 
@@ -3249,11 +3291,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   u_int32_t avg_pkt_size = 0;
   int thread_id;
   char buf[32];
-#ifdef HAVE_LIBJSON_C
-  FILE *json_fp = NULL;
-  u_int8_t dont_close_json_fp = 0;
-  json_object *jObj_main = NULL, *jObj_trafficStats, *jArray_detProto = NULL, *jObj;
-#endif
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
 
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
@@ -3309,51 +3346,51 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   if(cumulative_stats.total_wire_bytes == 0)
     goto free_stats;
 
-  if(!json_flag) {
-    if(!quiet_mode) {
-      printf("\nnDPI Memory statistics:\n");
-      printf("\tnDPI Memory (once):      %-13s\n", formatBytes(ndpi_get_ndpi_detection_module_size(), buf, sizeof(buf)));
-      printf("\tFlow Memory (per flow):  %-13s\n", formatBytes( ndpi_detection_get_sizeof_ndpi_flow_struct(), buf, sizeof(buf)));
-      printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
-      printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
-      printf("\tSetup Time:              %lu msec\n", (unsigned long)(setup_time_usec/1000));
-      printf("\tPacket Processing Time:  %lu msec\n", (unsigned long)(processing_time_usec/1000));
+  if(!quiet_mode) {
+    printf("\nnDPI Memory statistics:\n");
+    printf("\tnDPI Memory (once):      %-13s\n", formatBytes(ndpi_get_ndpi_detection_module_size(), buf, sizeof(buf)));
+    printf("\tFlow Memory (per flow):  %-13s\n", formatBytes( ndpi_detection_get_sizeof_ndpi_flow_struct(), buf, sizeof(buf)));
+    printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
+    printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
+    printf("\tSetup Time:              %lu msec\n", (unsigned long)(setup_time_usec/1000));
+    printf("\tPacket Processing Time:  %lu msec\n", (unsigned long)(processing_time_usec/1000));
 
-      printf("\nTraffic statistics:\n");
-      printf("\tEthernet bytes:        %-13llu (includes ethernet CRC/IFC/trailer)\n",
-	     (long long unsigned int)cumulative_stats.total_wire_bytes);
-      printf("\tDiscarded bytes:       %-13llu\n",
-	     (long long unsigned int)cumulative_stats.total_discarded_bytes);
-      printf("\tIP packets:            %-13llu of %llu packets total\n",
-	     (long long unsigned int)cumulative_stats.ip_packet_count,
-	     (long long unsigned int)cumulative_stats.raw_packet_count);
-      /* In order to prevent Floating point exception in case of no traffic*/
-      if(cumulative_stats.total_ip_bytes && cumulative_stats.raw_packet_count)
-	avg_pkt_size = (unsigned int)(cumulative_stats.total_ip_bytes/cumulative_stats.raw_packet_count);
-      printf("\tIP bytes:              %-13llu (avg pkt size %u bytes)\n",
-	     (long long unsigned int)cumulative_stats.total_ip_bytes,avg_pkt_size);
-      printf("\tUnique flows:          %-13u\n", cumulative_stats.ndpi_flow_count);
+    printf("\nTraffic statistics:\n");
+    printf("\tEthernet bytes:        %-13llu (includes ethernet CRC/IFC/trailer)\n",
+           (long long unsigned int)cumulative_stats.total_wire_bytes);
+    printf("\tDiscarded bytes:       %-13llu\n",
+           (long long unsigned int)cumulative_stats.total_discarded_bytes);
+    printf("\tIP packets:            %-13llu of %llu packets total\n",
+           (long long unsigned int)cumulative_stats.ip_packet_count,
+           (long long unsigned int)cumulative_stats.raw_packet_count);
+    /* In order to prevent Floating point exception in case of no traffic*/
+    if(cumulative_stats.total_ip_bytes && cumulative_stats.raw_packet_count)
+    {
+      avg_pkt_size = (unsigned int)(cumulative_stats.total_ip_bytes/cumulative_stats.raw_packet_count);
+    }
+    printf("\tIP bytes:              %-13llu (avg pkt size %u bytes)\n",
+           (long long unsigned int)cumulative_stats.total_ip_bytes,avg_pkt_size);
+    printf("\tUnique flows:          %-13u\n", cumulative_stats.ndpi_flow_count);
+    printf("\tTCP Packets:           %-13lu\n", (unsigned long)cumulative_stats.tcp_count);
+    printf("\tUDP Packets:           %-13lu\n", (unsigned long)cumulative_stats.udp_count);
+    printf("\tVLAN Packets:          %-13lu\n", (unsigned long)cumulative_stats.vlan_count);
+    printf("\tMPLS Packets:          %-13lu\n", (unsigned long)cumulative_stats.mpls_count);
+    printf("\tPPPoE Packets:         %-13lu\n", (unsigned long)cumulative_stats.pppoe_count);
+    printf("\tFragmented Packets:    %-13lu\n", (unsigned long)cumulative_stats.fragmented_count);
+    printf("\tMax Packet size:       %-13u\n",   cumulative_stats.max_packet_len);
+    printf("\tPacket Len < 64:       %-13lu\n", (unsigned long)cumulative_stats.packet_len[0]);
+    printf("\tPacket Len 64-128:     %-13lu\n", (unsigned long)cumulative_stats.packet_len[1]);
+    printf("\tPacket Len 128-256:    %-13lu\n", (unsigned long)cumulative_stats.packet_len[2]);
+    printf("\tPacket Len 256-1024:   %-13lu\n", (unsigned long)cumulative_stats.packet_len[3]);
+    printf("\tPacket Len 1024-1500:  %-13lu\n", (unsigned long)cumulative_stats.packet_len[4]);
+    printf("\tPacket Len > 1500:     %-13lu\n", (unsigned long)cumulative_stats.packet_len[5]);
 
-      printf("\tTCP Packets:           %-13lu\n", (unsigned long)cumulative_stats.tcp_count);
-      printf("\tUDP Packets:           %-13lu\n", (unsigned long)cumulative_stats.udp_count);
-      printf("\tVLAN Packets:          %-13lu\n", (unsigned long)cumulative_stats.vlan_count);
-      printf("\tMPLS Packets:          %-13lu\n", (unsigned long)cumulative_stats.mpls_count);
-      printf("\tPPPoE Packets:         %-13lu\n", (unsigned long)cumulative_stats.pppoe_count);
-      printf("\tFragmented Packets:    %-13lu\n", (unsigned long)cumulative_stats.fragmented_count);
-      printf("\tMax Packet size:       %-13u\n",   cumulative_stats.max_packet_len);
-      printf("\tPacket Len < 64:       %-13lu\n", (unsigned long)cumulative_stats.packet_len[0]);
-      printf("\tPacket Len 64-128:     %-13lu\n", (unsigned long)cumulative_stats.packet_len[1]);
-      printf("\tPacket Len 128-256:    %-13lu\n", (unsigned long)cumulative_stats.packet_len[2]);
-      printf("\tPacket Len 256-1024:   %-13lu\n", (unsigned long)cumulative_stats.packet_len[3]);
-      printf("\tPacket Len 1024-1500:  %-13lu\n", (unsigned long)cumulative_stats.packet_len[4]);
-      printf("\tPacket Len > 1500:     %-13lu\n", (unsigned long)cumulative_stats.packet_len[5]);
-
-      if(processing_time_usec > 0) {
-	char buf[32], buf1[32], when[64];
-	float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)processing_time_usec;
-	float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)processing_time_usec;
-	float traffic_duration;
-	struct tm result;
+	if(processing_time_usec > 0) {
+	  char buf[32], buf1[32], when[64];
+	  float t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)processing_time_usec;
+	  float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)processing_time_usec;
+	  float traffic_duration;
+	  struct tm result;
 
 	if(live_capture) traffic_duration = processing_time_usec;
 	else traffic_duration = ((u_int64_t)pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - ((u_int64_t)pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
@@ -3438,51 +3475,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       }
 
       fprintf(results_file, "\n");
-    }
   }
 
-  if(json_flag) {
-#ifdef HAVE_LIBJSON_C
-    if(!strcmp(_jsonFilePath, "-"))
-      json_fp = stderr, dont_close_json_fp = 1;
-    else if((json_fp = fopen(_jsonFilePath,"w")) == NULL) {
-      printf("Error creating .json file %s\n", _jsonFilePath);
-      json_flag = 0;
-    }
-
-    if(json_flag) {
-      jObj_main = json_object_new_object();
-      jObj_trafficStats = json_object_new_object();
-      jArray_detProto = json_object_new_array();
-
-      json_object_object_add(jObj_trafficStats,"ethernet.bytes",json_object_new_int64(cumulative_stats.total_wire_bytes));
-      json_object_object_add(jObj_trafficStats,"discarded.bytes",json_object_new_int64(cumulative_stats.total_discarded_bytes));
-      json_object_object_add(jObj_trafficStats,"ip.packets",json_object_new_int64(cumulative_stats.ip_packet_count));
-      json_object_object_add(jObj_trafficStats,"total.packets",json_object_new_int64(cumulative_stats.raw_packet_count));
-      json_object_object_add(jObj_trafficStats,"ip.bytes",json_object_new_int64(cumulative_stats.total_ip_bytes));
-      json_object_object_add(jObj_trafficStats,"avg.pkt.size",json_object_new_int(cumulative_stats.total_ip_bytes/cumulative_stats.raw_packet_count));
-      json_object_object_add(jObj_trafficStats,"unique.flows",json_object_new_int(cumulative_stats.ndpi_flow_count));
-      json_object_object_add(jObj_trafficStats,"tcp.pkts",json_object_new_int64(cumulative_stats.tcp_count));
-      json_object_object_add(jObj_trafficStats,"udp.pkts",json_object_new_int64(cumulative_stats.udp_count));
-      json_object_object_add(jObj_trafficStats,"vlan.pkts",json_object_new_int64(cumulative_stats.vlan_count));
-      json_object_object_add(jObj_trafficStats,"mpls.pkts",json_object_new_int64(cumulative_stats.mpls_count));
-      json_object_object_add(jObj_trafficStats,"pppoe.pkts",json_object_new_int64(cumulative_stats.pppoe_count));
-      json_object_object_add(jObj_trafficStats,"fragmented.pkts",json_object_new_int64(cumulative_stats.fragmented_count));
-      json_object_object_add(jObj_trafficStats,"max.pkt.size",json_object_new_int(cumulative_stats.max_packet_len));
-      json_object_object_add(jObj_trafficStats,"pkt.len_min64",json_object_new_int64(cumulative_stats.packet_len[0]));
-      json_object_object_add(jObj_trafficStats,"pkt.len_64_128",json_object_new_int64(cumulative_stats.packet_len[1]));
-      json_object_object_add(jObj_trafficStats,"pkt.len_128_256",json_object_new_int64(cumulative_stats.packet_len[2]));
-      json_object_object_add(jObj_trafficStats,"pkt.len_256_1024",json_object_new_int64(cumulative_stats.packet_len[3]));
-      json_object_object_add(jObj_trafficStats,"pkt.len_1024_1500",json_object_new_int64(cumulative_stats.packet_len[4]));
-      json_object_object_add(jObj_trafficStats,"pkt.len_grt1500",json_object_new_int64(cumulative_stats.packet_len[5]));
-      json_object_object_add(jObj_trafficStats,"guessed.flow.protos",json_object_new_int(cumulative_stats.guessed_flow_protocols));
-
-      json_object_object_add(jObj_main,"traffic.statistics",jObj_trafficStats);
-    }
-#endif
-  }
-
-  if((!json_flag) && (!quiet_mode)) printf("\n\nDetected protocols:\n");
+  if(!quiet_mode) printf("\n\nDetected protocols:\n");
   for(i = 0; i <= ndpi_get_num_supported_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {
     ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].workflow->ndpi_struct, i);
 
@@ -3496,32 +3491,18 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 		(long long unsigned int)cumulative_stats.protocol_counter_bytes[i],
 		cumulative_stats.protocol_flows[i]);
 
-      if((!json_flag) && (!quiet_mode)) {
+      if(!quiet_mode) {
 	printf("\t%-20s packets: %-13llu bytes: %-13llu "
 	       "flows: %-13u\n",
 	       ndpi_get_proto_name(ndpi_thread_info[0].workflow->ndpi_struct, i),
 	       (long long unsigned int)cumulative_stats.protocol_counter[i],
 	       (long long unsigned int)cumulative_stats.protocol_counter_bytes[i],
 	       cumulative_stats.protocol_flows[i]);
-      } else {
-#ifdef HAVE_LIBJSON_C
-	if(json_fp) {
-	  jObj = json_object_new_object();
-
-	  json_object_object_add(jObj,"name",json_object_new_string(ndpi_get_proto_name(ndpi_thread_info[0].workflow->ndpi_struct, i)));
-	  json_object_object_add(jObj,"breed",json_object_new_string(ndpi_get_proto_breed_name(ndpi_thread_info[0].workflow->ndpi_struct, breed)));
-	  json_object_object_add(jObj,"packets",json_object_new_int64(cumulative_stats.protocol_counter[i]));
-	  json_object_object_add(jObj,"bytes",json_object_new_int64(cumulative_stats.protocol_counter_bytes[i]));
-	  json_object_object_add(jObj,"flows",json_object_new_int(cumulative_stats.protocol_flows[i]));
-
-	  json_object_array_add(jArray_detProto,jObj);
-	}
-#endif
       }
     }
   }
 
-  if((!json_flag) && (!quiet_mode)) {
+  if(!quiet_mode) {
     printf("\n\nProtocol statistics:\n");
 
     for(i=0; i < NUM_BREEDS; i++) {
@@ -3536,19 +3517,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   printRiskStats();
   printFlowsStats();
 
-  if(json_flag) {
-#ifdef HAVE_LIBJSON_C
-    json_object_object_add(jObj_main,"detected.protos",jArray_detProto);
-    json_object_object_add(jObj_main,"known.flows",jArray_known_flows);
-
-    if(json_object_array_length(jArray_unknown_flows) != 0)
-      json_object_object_add(jObj_main,"unknown.flows",jArray_unknown_flows);
-
-    fprintf(json_fp,"%s\n",json_object_to_json_string(jObj_main));
-    if(!dont_close_json_fp) fclose(json_fp);
-#endif
-  }
-
   if(stats_flag || verbose == 3) {
     HASH_SORT(srcStats, port_stats_sort);
     HASH_SORT(dstStats, port_stats_sort);
@@ -3560,49 +3528,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
     printf("\nDestination Ports Stats:\n");
     printPortStats(dstStats);
-  }
-
-  if(stats_flag) {
-#ifdef HAVE_LIBJSON_C
-    json_object *jObj_stats = json_object_new_object();
-    char timestamp[64];
-    int count;
-    struct tm result;
-
-#ifdef WIN32
-    /* localtime() on Windows is thread-safe */
-    time_t tv_sec = pcap_start.tv_sec;
-    struct tm * tm_ptr = localtime(&tv_sec);
-    result = *tm_ptr;
-#else
-    localtime_r(&pcap_start.tv_sec, &result);
-#endif
-
-    strftime(timestamp, sizeof(timestamp), "%d/%b/%Y %H:%M:%S", &result);
-    json_object_object_add(jObj_stats, "time", json_object_new_string(timestamp));
-
-    saveScannerStats(&jObj_stats, &scannerHosts);
-
-    if((count = HASH_COUNT(topReceivers)) == 0) {
-      HASH_SORT(receivers, receivers_sort);
-      saveReceiverStats(&jObj_stats, &receivers, cumulative_stats.ip_packet_count);
-    }
-    else{
-      HASH_SORT(topReceivers, receivers_sort);
-      saveReceiverStats(&jObj_stats, &topReceivers, cumulative_stats.ip_packet_count);
-    }
-
-    u_int64_t total_src_addr = getTopStats(srcStats);
-    u_int64_t total_dst_addr = getTopStats(dstStats);
-
-    saveTopStats(&jObj_stats, &srcStats, DIR_SRC,
-		 cumulative_stats.ndpi_flow_count, total_src_addr);
-
-    saveTopStats(&jObj_stats, &dstStats, DIR_DST,
-		 cumulative_stats.ndpi_flow_count, total_dst_addr);
-
-    json_object_array_add(jArray_topStats, jObj_stats);
-#endif
   }
 
  free_stats:
@@ -3756,17 +3681,17 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
 	printf("ERROR: could not open %s: %s\n", filename, pcap_error_buffer);
 	exit(-1);
       } else {
-	if((!json_flag) && (!quiet_mode))
+	if(!quiet_mode)
 	  printf("Reading packets from playlist %s...\n", pcap_file);
       }
     } else {
-      if((!json_flag) && (!quiet_mode))
+      if(!quiet_mode)
 	printf("Reading packets from pcap file %s...\n", pcap_file);
     }
   } else {
     live_capture = 1;
 
-    if((!json_flag) && (!quiet_mode)) {
+    if(!quiet_mode) {
 #ifdef USE_DPDK
       printf("Capturing from DPDK (port 0)...\n");
 #else
@@ -3779,7 +3704,7 @@ static pcap_t * openPcapFileOrDevice(u_int16_t thread_id, const u_char * pcap_fi
 #endif /* !DPDK */
 
   if(capture_for > 0) {
-    if((!json_flag) && (!quiet_mode))
+    if(!quiet_mode)
       printf("Capturing traffic up to %u seconds\n", (unsigned int)capture_for);
 
 #ifndef WIN32
@@ -3808,7 +3733,7 @@ static void ndpi_process_packet(u_char *args,
     return ;
   }
   memcpy(packet_checked, packet, header->caplen);
-  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, &flow_risk, csv_fp);
+  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, &flow_risk);
 
   if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
   pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
@@ -3961,7 +3886,7 @@ void * processing_thread(void *_thread_id) {
     if(pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset) != 0)
       fprintf(stderr, "Error while binding thread %ld to core %d\n", thread_id, core_affinity[thread_id]);
     else {
-      if((!json_flag) && (!quiet_mode)) printf("Running thread %ld on core %d...\n", thread_id, core_affinity[thread_id]);
+      if(!quiet_mode) printf("Running thread %ld on core %d...\n", thread_id, core_affinity[thread_id]);
     }
   } else
 #endif
@@ -4104,22 +4029,12 @@ void test_lib() {
   /* Printing cumulative results */
   printResults(processing_time_usec, setup_time_usec);
 
-  if(stats_flag) {
-#ifdef HAVE_LIBJSON_C
-    json_close_stats_file();
-#endif
-  }
-
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
     if(ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)
       pcap_close(ndpi_thread_info[thread_id].workflow->pcap_handle);
 
     terminateDetection(thread_id);
   }
-
-#ifdef HAVE_LIBJSON_C
-  json_destroy();
-#endif
 }
 
 /* *********************************************** */
@@ -4362,134 +4277,6 @@ void analyzeUnitTest() {
 /* *********************************************** */
 
 /**
- * @brief Produce bpf filter to filter ports and hosts
- * in order to remove a peak in terms of number of packets
- * sent by source hosts.
- */
-#ifdef HAVE_LIBJSON_C
-void bpf_filter_pkt_peak_filter(json_object **jObj_bpfFilter,
-				int port_array[], int p_size,
-				const char *src_host_array[16],
-				int sh_size,
-				const char *dst_host_array[16],
-				int dh_size) {
-  char filter[2048] = { '\0' };
-  int produced = 0;
-  int i = 0, l = 0;
-
-  if(port_array[0] != INIT_VAL) {
-    strcpy(filter, "not (src port ");
-
-    l = strlen(filter);
-
-    while(i < p_size && port_array[i] != INIT_VAL) {
-      if(i+1 == p_size || port_array[i+1] == INIT_VAL)
-        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%d", port_array[i]);
-      else
-        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%d or ", port_array[i]);
-
-      i++;
-    }
-
-    l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
-    produced = 1;
-  }
-
-
-  if(src_host_array[0] != NULL) {
-    if(port_array[0] != INIT_VAL)
-      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, " and not (src ");
-    else
-      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "not (src ");
-
-    i = 0;
-
-    while(i < sh_size && src_host_array[i] != NULL) {
-      if(i+1 == sh_size || src_host_array[i+1] == NULL)
-	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", src_host_array[i]);
-      else
-	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s or ", src_host_array[i]);
-
-      i++;
-    }
-
-    l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
-    produced = 1;
-  }
-
-  if(dst_host_array[0] != NULL) {
-    if(port_array[0] != INIT_VAL || src_host_array[0] != NULL)
-      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, " and not (dst ");
-    else
-      l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "not (dst ");
-
-    i=0;
-
-    while(i < dh_size && dst_host_array[i] != NULL) {
-      if(i+1 == dh_size || dst_host_array[i+1] == NULL)
-	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", dst_host_array[i]);
-      else
-	l += ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s or ", dst_host_array[i]);
-
-      i++;
-    }
-
-    l +=  ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
-    produced = 1;
-  }
-
-  if(produced)
-    json_object_object_add(*jObj_bpfFilter, "pkt.peak.filter", json_object_new_string(filter));
-  else
-    json_object_object_add(*jObj_bpfFilter, "pkt.peak.filter", json_object_new_string(""));
-}
-#endif
-
-/* *********************************************** */
-/**
- * @brief Produce bpf filter to filter ports and hosts
- * in order to remove a peak in terms of number of source
- * addresses.
- */
-#ifdef HAVE_LIBJSON_C
-void bpf_filter_host_peak_filter(json_object **jObj_bpfFilter,
-				 const char *host_array[16],
-				 int h_size) {
-  char filter[2048];
-  int produced = 0;
-  int i = 0;
-
-
-  if(host_array[0] != NULL) {
-    int l;
-
-    strcpy(filter, "not (dst ");
-
-    while(i < h_size && host_array[i] != NULL) {
-      l = strlen(filter);
-
-      if(i+1 == h_size || host_array[i+1] == NULL)
-        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", host_array[i]);
-      else
-        ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s or ", host_array[i]);
-
-      i++;
-    }
-
-    l = strlen(filter);
-    ndpi_snprintf(&filter[l], sizeof(filter)-l, "%s", ")");
-    produced = 1;
-  }
-
-  if(produced)
-    json_object_object_add(*jObj_bpfFilter, "host.peak.filter", json_object_new_string(filter));
-  else
-    json_object_object_add(*jObj_bpfFilter, "host.peak.filter", json_object_new_string(""));
-}
-#endif
-
-/* *********************************************** */
-/**
  * @brief Initialize port array
  */
 
@@ -4552,372 +4339,6 @@ void bpf_filter_port_array_add(int filter_array[], int size, int port) {
   exit(-1);
 }
 
-
-/* *********************************************** */
-#ifdef HAVE_LIBJSON_C
-/*
- * @brief returns average value for a given field
- */
-float getAverage(struct json_object *jObj_stat, char *field) {
-  json_object *field_stat;
-  json_bool res;
-  float sum = 0;
-  int r;
-  int j = 0;
-
-  if((r = strcmp(field, "top.scanner.stats")) == 0) {
-    for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
-      field_stat = json_object_array_get_idx(jObj_stat, j);
-      json_object *jObj_tot_flows_number;
-
-      if((res = json_object_object_get_ex(field_stat, "total.flows.number", &jObj_tot_flows_number)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      u_int32_t tot_flows_number = json_object_get_int(jObj_tot_flows_number);
-
-      sum += tot_flows_number;
-    }
-  } else if((r = strcmp(field, "top.src.pkts.stats")) == 0) {
-    for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
-      field_stat = json_object_array_get_idx(jObj_stat, j);
-      json_object *jObj_packets_number;
-
-      if((res = json_object_object_get_ex(field_stat, "packets.number", &jObj_packets_number)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"packets.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      u_int32_t packets_number = json_object_get_int(jObj_packets_number);
-
-      sum += packets_number;
-    }
-  }
-
-  if(j == 0) return 0.0;
-
-  return sum/j;
-}
-#endif
-/* *********************************************** */
-#ifdef HAVE_LIBJSON_C
-/*
- * @brief returns standard deviation for a given
- * field and it's average value.
- */
-float getStdDeviation(struct json_object *jObj_stat, float average, char *field) {
-  json_object *field_stat;
-  json_bool res;
-  float sum = 0;
-  int j = 0;
-  int r;
-
-  if((r = strcmp(field, "top.scanner.stats")) == 0) {
-    for(; j<(int)json_object_array_length(jObj_stat); j++) {
-      field_stat = json_object_array_get_idx(jObj_stat, j);
-      json_object *jObj_tot_flows_number;
-
-      if((res = json_object_object_get_ex(field_stat, "total.flows.number", &jObj_tot_flows_number)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      u_int32_t tot_flows_number = json_object_get_int(jObj_tot_flows_number);
-
-      sum += pow((tot_flows_number - average), 2);
-    }
-  }
-
-  return sqrt(sum/(float)j);
-}
-
-#endif
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-void getSourcePorts(struct json_object *jObj_stat, int srcPortArray[], int size, float threshold) {
-  int j;
-
-  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
-    json_object *src_pkts_stat = json_object_array_get_idx(jObj_stat, j);
-    json_object *jObj_packets_number;
-    json_object *jObj_flows_percent;
-    json_object *jObj_flows_packets;
-    json_object *jObj_port;
-    json_bool res;
-
-    if((res = json_object_object_get_ex(src_pkts_stat, "packets.number", &jObj_packets_number)) == 0) {
-      fprintf(stderr, "ERROR: can't get \"packets.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    u_int32_t packets_number = json_object_get_int(jObj_packets_number);
-
-    if((res = json_object_object_get_ex(src_pkts_stat, "flows.percent", &jObj_flows_percent)) == 0) {
-      fprintf(stderr, "ERROR: can't get \"flows.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    double flows_percent = json_object_get_double(jObj_flows_percent);
-
-
-    if((res = json_object_object_get_ex(src_pkts_stat, "flows/packets", &jObj_flows_packets)) == 0) {
-      fprintf(stderr, "ERROR: can't get \"flows/packets\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    double flows_packets = json_object_get_double(jObj_flows_packets);
-
-
-    if((flows_packets > FLOWS_PACKETS_THRESHOLD)
-       && (flows_percent >= FLOWS_PERCENT_THRESHOLD)
-       && packets_number >= threshold) {
-      if((res = json_object_object_get_ex(src_pkts_stat, "port", &jObj_port)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"port\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      int port = json_object_get_int(jObj_port);
-
-      bpf_filter_port_array_add(srcPortArray, size, port);
-    }
-  }
-}
-#endif
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-void getReceiverHosts(struct json_object *jObj_stat, const char *dstHostArray[16], int size) {
-  int j;
-
-  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
-    json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
-    json_object *jObj_host_address;
-    json_object *jObj_pkts_percent;
-    json_bool res;
-
-    if((res = json_object_object_get_ex(scanner_stat, "packets.percent", &jObj_pkts_percent)) == 0) {
-      fprintf(stderr, "ERROR: can't get \"packets.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    double pkts_percent = json_object_get_double(jObj_pkts_percent);
-
-
-    if(pkts_percent > PKTS_PERCENT_THRESHOLD) {
-      if((res = json_object_object_get_ex(scanner_stat, "ip.address", &jObj_host_address)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"ip.address, use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      const char *host_address = json_object_get_string(jObj_host_address);
-
-      bpf_filter_host_array_add(dstHostArray, size, host_address);
-    }
-  }
-}
-#endif
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-void getScannerHosts(struct json_object *jObj_stat, int duration,
-		     const char *srcHostArray[48], int size,
-		     float threshold) {
-  int j;
-
-  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
-    json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
-    json_object *jObj_host_address;
-    json_object *jObj_tot_flows_number;
-    json_bool res;
-
-
-    if((res = json_object_object_get_ex(scanner_stat, "total.flows.number", &jObj_tot_flows_number)) == 0) {
-      fprintf(stderr, "ERROR: can't get \"total.flows.number\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    u_int32_t tot_flows_number = json_object_get_int(jObj_tot_flows_number);
-
-
-    if(((tot_flows_number/(float)duration) > FLOWS_THRESHOLD) && tot_flows_number > threshold) {
-      if((res = json_object_object_get_ex(scanner_stat, "ip.address", &jObj_host_address)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"ip.address\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      const char *host_address = json_object_get_string(jObj_host_address);
-
-      bpf_filter_host_array_add(srcHostArray, size, host_address);
-
-    }
-  }
-}
-#endif
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-void getDestinationHosts(struct json_object *jObj_stat, int duration,
-			 const char *dstHostArray[16], int size) {
-  int j;
-
-  for(j=0; j<(int)json_object_array_length(jObj_stat); j++) {
-    json_object *scanner_stat = json_object_array_get_idx(jObj_stat, j);
-    json_object *jObj_host_address;
-    json_object *jObj_flows_percent;
-    json_bool res;
-
-
-    if((res = json_object_object_get_ex(scanner_stat, "flows.percent", &jObj_flows_percent)) == 0) {
-      fprintf(stderr, "ERROR: can't get \"flows.percent\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    double flows_percent = json_object_get_double(jObj_flows_percent);
-
-
-    if(flows_percent > FLOWS_PERCENT_THRESHOLD_2) {
-      if((res = json_object_object_get_ex(scanner_stat, "aggressive.host", &jObj_host_address)) == 0) {
-	fprintf(stderr, "ERROR: can't get \"aggressive.host\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-	exit(-1);
-      }
-      const char *host_address = json_object_get_string(jObj_host_address);
-
-      bpf_filter_host_array_add(dstHostArray, size, host_address);
-
-    }
-  }
-}
-#endif
-
-/* *********************************************** */
-
-#ifdef HAVE_LIBJSON_C
-#ifndef WIN32
-static void produceBpfFilter(char *filePath) {
-  json_object *jObj; /* entire json object from file */
-  json_object *jObj_duration;
-  json_object *jObj_statistics; /* json array */
-  json_bool res;
-  int filterSrcPorts[PORT_ARRAY_SIZE];
-  const char *filterSrcHosts[48];
-  const char *filterDstHosts[48];
-  const char *filterPktDstHosts[48];
-  struct stat statbuf;
-  FILE *fp = NULL;
-  char _filterFilePath[1024];
-  json_object *jObj_bpfFilter;
-  void *fmap;
-  int fsock;
-  float average;
-  float deviation;
-  int duration;
-  int typeCheck;
-  int array_len;
-  int i;
-
-  if((fsock = open(filePath, O_RDONLY)) == -1) {
-    fprintf(stderr,"error opening file %s\n", filePath);
-    exit(-1);
-  }
-
-  if(fstat(fsock, &statbuf) == -1) {
-    fprintf(stderr,"error getting file stat\n");
-    exit(-1);
-  }
-
-  if((fmap = mmap(NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fsock, 0)) == MAP_FAILED) {
-    fprintf(stderr,"error mmap is failed\n");
-    exit(-1);
-  }
-
-  if((jObj = json_tokener_parse(fmap)) == NULL) {
-    fprintf(stderr,"ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
-    exit(-1);
-  }
-
-
-  if((res = json_object_object_get_ex(jObj, "duration.in.seconds", &jObj_duration)) == 0) {
-    fprintf(stderr,"ERROR: can't get \"duration.in.seconds\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-    exit(-1);
-  }
-  duration = json_object_get_int(jObj_duration);
-
-
-  if((res = json_object_object_get_ex(jObj, "statistics", &jObj_statistics)) == 0) {
-    fprintf(stderr,"ERROR: can't get \"statistics\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-    exit(-1);
-  }
-
-  if((typeCheck = json_object_is_type(jObj_statistics, json_type_array)) == 0) {
-    fprintf(stderr,"ERROR: invalid json file. Use -x flag only with .json files generated by ndpiReader -b flag.\n");
-    exit(-1);
-  }
-  array_len = json_object_array_length(jObj_statistics);
-
-
-  bpf_filter_port_array_init(filterSrcPorts, PORT_ARRAY_SIZE);
-  bpf_filter_host_array_init(filterSrcHosts, HOST_ARRAY_SIZE);
-  bpf_filter_host_array_init(filterDstHosts, HOST_ARRAY_SIZE);
-  bpf_filter_host_array_init(filterPktDstHosts, HOST_ARRAY_SIZE/2);
-
-  for(i=0; i<array_len; i++) {
-    json_object *stats = json_object_array_get_idx(jObj_statistics, i);
-    json_object *val;
-
-    if((res = json_object_object_get_ex(stats, "top.scanner.stats", &val)) == 0) {
-      fprintf(stderr,"ERROR: can't get \"top.scanner.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-
-    if((average = getAverage(val, "top.scanner.stats")) != 0) {
-      deviation = getStdDeviation(val, average, "top.scanner.stats");
-      getScannerHosts(val, duration, filterSrcHosts, HOST_ARRAY_SIZE, average+deviation);
-    }
-
-
-    if((res = json_object_object_get_ex(stats, "top.receiver.stats", &val)) == 0) {
-      fprintf(stderr,"ERROR: can't get \"top.receiver.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    getReceiverHosts(val, filterPktDstHosts, HOST_ARRAY_SIZE/2);
-
-
-    if((res = json_object_object_get_ex(stats, "top.src.pkts.stats", &val)) == 0) {
-      fprintf(stderr,"ERROR: can't get \"top.src.pkts.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-
-    if((average = getAverage(val, "top.src.pkts.stats")) != 0)
-      getSourcePorts(val, filterSrcPorts, PORT_ARRAY_SIZE, average);
-
-
-    if((res = json_object_object_get_ex(stats, "top.dst.pkts.stats", &val)) == 0) {
-      fprintf(stderr,"ERROR: can't get \"top.dst.pkts.stats\", use -x flag only with .json files generated by ndpiReader -b flag.\n");
-      exit(-1);
-    }
-    getDestinationHosts(val, duration, filterDstHosts, HOST_ARRAY_SIZE);
-  }
-
-
-  ndpi_snprintf(_filterFilePath, sizeof(_filterFilePath), "%s.bpf", filePath);
-
-  if((fp = fopen(_filterFilePath,"w")) == NULL) {
-    printf("Error creating .json file %s\n", _filterFilePath);
-    exit(-1);
-  }
-
-  jObj_bpfFilter = json_object_new_object();
-
-  bpf_filter_pkt_peak_filter(&jObj_bpfFilter, filterSrcPorts, PORT_ARRAY_SIZE,
-			     filterSrcHosts, HOST_ARRAY_SIZE, filterPktDstHosts, HOST_ARRAY_SIZE/2);
-
-  bpf_filter_host_peak_filter(&jObj_bpfFilter, filterDstHosts, HOST_ARRAY_SIZE);
-
-  fprintf(fp,"%s\n",json_object_to_json_string(jObj_bpfFilter));
-  fclose(fp);
-
-  printf("created: %s\n", _filterFilePath);
-
-  json_object_put(jObj); /* free memory */
-}
-#endif
-#endif
-
-
 /* *********************************************** */
 
 void analysisUnitTest() {
@@ -4936,16 +4357,6 @@ void analysisUnitTest() {
   }
 
   ndpi_free_data_analysis(s, 1);
-}
-
-/* *********************************************** */
-
-void rulesUnitTest() {
-#ifdef HAVE_JSON_H
-#ifdef DEBUG_RULES
-  ndpi_parse_rules(ndpi_info_mod, "../rules/sample_rules.txt");
-#endif
-#endif
 }
 
 /* *********************************************** */
@@ -5490,7 +4901,6 @@ int original_main(int argc, char **argv) {
       analyzeUnitTest();
       ndpi_self_check_host_match();
       analysisUnitTest();
-      rulesUnitTest();
       compressedBitmapUnitTest();
 #endif
     }
@@ -5511,7 +4921,7 @@ int original_main(int argc, char **argv) {
       exit(0);
     }
 
-    if((!json_flag) && (!quiet_mode)) {
+    if(!quiet_mode) {
       printf("\n-----------------------------------------------------------\n"
 	     "* NOTE: This is demo app to show *some* nDPI features.\n"
 	     "* In this demo we have implemented only some basic features\n"

@@ -90,6 +90,7 @@ extern int dpdk_port_deinit(int port);
 #define MAX_TABLE_SIZE_1         4096
 #define MAX_TABLE_SIZE_2         8192
 #define INIT_VAL                   -1
+#define SERIALIZATION_BUFSIZ     (8192 * 2)
 
 
 // inner hash table (ja3 -> security state)
@@ -157,12 +158,23 @@ struct ndpi_entropy {
   float score;
 };
 
+enum info_type {
+    INFO_INVALID = 0,
+    INFO_GENERIC,
+    INFO_KERBEROS,
+    INFO_FTP_IMAP_POP_SMTP,
+    INFO_TLS_QUIC_ALPN_VERSION,
+    INFO_TLS_QUIC_ALPN_ONLY,
+};
+
 // flow tracking
 typedef struct ndpi_flow_info {
   u_int32_t flow_id;
   u_int32_t hashval;
   u_int32_t src_ip; /* network order */
   u_int32_t dst_ip; /* network order */
+  struct ndpi_in6_addr src_ip6; /* network order */
+  struct ndpi_in6_addr dst_ip6; /* network order */
   u_int16_t src_port; /* network order */
   u_int16_t dst_port; /* network order */
   u_int8_t detection_completed, protocol, bidirectional, check_extra_packets;
@@ -196,7 +208,25 @@ typedef struct ndpi_flow_info {
   struct ndpi_analyze_struct *iat_c_to_s, *iat_s_to_c, *iat_flow,
     *pktlen_c_to_s, *pktlen_s_to_c;
 
-  char info[255];
+  enum info_type info_type;
+  union {
+    char info[256];
+    struct {
+      char alpn[128];
+      char tls_supported_versions[128];
+    } tls_quic;
+    struct {
+      unsigned char auth_failed;
+      char username[127];
+      char password[128];
+    } ftp_imap_pop_smtp;
+    struct {
+      char domain[85];
+      char hostname[85];
+      char username[86];
+    } kerberos;
+  };
+
   char flow_extra_info[16];
   char host_server_name[80]; /* Hostname/SNI */
   char *bittorent_hash;
@@ -302,11 +332,14 @@ typedef struct ndpi_workflow {
   void **ndpi_flows_root;
   struct ndpi_detection_module_struct *ndpi_struct;
   u_int32_t num_allocated_flows;
+
+  /* CSV,TLV,JSON serialization interface */
+  ndpi_serializer ndpi_serializer;
 } ndpi_workflow_t;
 
 
 /* TODO: remove wrappers parameters and use ndpi global, when their initialization will be fixed... */
-struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle, int do_init_flows_root);
+struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle, int do_init_flows_root, ndpi_serialization_format serialization_format);
 
 
 /* workflow main free function */
@@ -324,8 +357,7 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
 					       const u_char *packet,
-					       ndpi_risk *flow_risk,
-					       FILE * csv_fp);
+					       ndpi_risk *flow_risk);
 
 int ndpi_is_datalink_supported(int datalink_type);
 
@@ -345,7 +377,7 @@ static inline void ndpi_workflow_set_flow_giveup_callback(struct ndpi_workflow *
 
 /* compare two nodes in workflow */
 int ndpi_workflow_node_cmp(const void *a, const void *b);
-void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow, FILE * csv_fp);
+void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow);
 u_int32_t ethernet_crc32(const void* data, size_t n_bytes);
 void ndpi_flow_info_free_data(struct ndpi_flow_info *flow);
 void ndpi_flow_info_freer(void *node);

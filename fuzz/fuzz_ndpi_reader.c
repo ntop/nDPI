@@ -60,7 +60,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     prefs->max_ndpi_flows = 1024 * 1024;
     prefs->quiet_mode = 0;
 
-    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0);
+    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json);
     // enable all protocols
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
@@ -79,6 +79,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   if (pkts == NULL) {
     remove(pcap_path);
     free(pcap_path);
+    ndpi_term_serializer(&workflow->ndpi_serializer);
     return 0;
   }
   if (ndpi_is_datalink_supported(pcap_datalink(pkts)) == 0)
@@ -87,6 +88,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     pcap_close(pkts);
     remove(pcap_path);
     free(pcap_path);
+    ndpi_term_serializer(&workflow->ndpi_serializer);
     return 0;
   }
 
@@ -104,7 +106,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
       ndpi_risk flow_risk;
 
       memcpy(packet_checked, pkt, header->caplen);
-      ndpi_workflow_process_packet(workflow, header, packet_checked, &flow_risk, NULL);
+      ndpi_workflow_process_packet(workflow, header, packet_checked, &flow_risk);
       free(packet_checked);
     }
 

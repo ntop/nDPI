@@ -55,9 +55,7 @@
 #include "ndpi_api.h"
 #include "ndpi_define.h"
 
-#ifdef HAVE_LIBJSON_C
 #include "json.h" /* JSON-C */
-#endif
 
 static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 static int verbose = 0;
@@ -65,7 +63,6 @@ static int verbose = 0;
 /* *********************************************** */
 
 int serializerUnitTest() {
-#ifdef HAVE_LIBJSON_C
   ndpi_serializer serializer, deserializer;
   int i, loop_id;
   ndpi_serialization_format fmt = {0};
@@ -229,7 +226,6 @@ int serializerUnitTest() {
   }
 
   printf("%30s                      OK\n", __FUNCTION__);
-#endif
   return 0;
 }
 
@@ -237,7 +233,6 @@ int serializerUnitTest() {
 
 int serializeProtoUnitTest(void)
 {
-#ifdef HAVE_LIBJSON_C
   ndpi_serializer serializer;
   int loop_id;
   ndpi_serialization_format fmt = {0};
@@ -277,7 +272,7 @@ int serializeProtoUnitTest(void)
     {
       buffer_len = 0;
       buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
-      char const * const expected_json_str = "{\"ndpi\": {\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Certificate\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS Version (1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"4\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"breed\":\"Fun\",\"category\":\"SocialNetwork\"}}";
+      char const * const expected_json_str = "{\"ndpi\": {\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Cert\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS (v1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"4\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"breed\":\"Fun\",\"category\":\"SocialNetwork\"}}";
 
       if (strncmp(buffer, expected_json_str, buffer_len) != 0)
       {
@@ -316,7 +311,6 @@ int serializeProtoUnitTest(void)
   }
 
   printf("%30s                      OK\n", __FUNCTION__);
-#endif
 
   return 0;
 }
