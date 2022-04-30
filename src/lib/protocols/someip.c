@@ -98,7 +98,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
   const struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   
   if (packet->payload_packet_len < 16) {
-    NDPI_LOG(NDPI_PROTOCOL_SOMEIP, ndpi_struct, NDPI_LOG_DEBUG,
+    NDPI_LOG_DBG(ndpi_struct,
 	     "Excluding SOME/IP .. mandatory header not found (not enough data for all fields)\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
     return;

@@ -180,7 +180,7 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 
   /* add bitmask for tcp only, some stupid udp programs
    * send a very few (< 10 ) packets before invite (mostly a 0x0a0x0d, but just search the first 3 payload_packets here */
-  if(packet->udp != NULL && flow->packet_counter < 20) {
+  if(packet->udp != NULL && flow->packet_counter < 10) {
     NDPI_LOG_DBG2(ndpi_struct, "need next packet\n");
     return;
   }

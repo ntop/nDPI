@@ -57,13 +57,12 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
        && (ntohs(h->len) == payload_len)) {
       NDPI_LOG_INFO(ndpi_struct, "Found radius\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RADIUS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-
       return;
     }
-    
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
   }
+  if(flow->packet_counter > 3)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  return;
 }
 
 static void ndpi_search_radius(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

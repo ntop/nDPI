@@ -32,6 +32,8 @@ static void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, s
   if(packet->udp != NULL) {
     if(packet->payload_packet_len < sizeof(uint32_t)) {
       NDPI_LOG_DBG2(ndpi_struct, "Short csgo packet\n");
+      if(flow->packet_counter > 5)
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
 

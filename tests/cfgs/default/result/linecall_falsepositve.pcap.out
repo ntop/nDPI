@@ -1,8 +1,8 @@
 Guessed flow protos:	1
 
-DPI Packets (UDP):	25	(25.00 pkts/flow)
+DPI Packets (UDP):	13	(13.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
-Num dissector calls: 301 (301.00 diss/flow)
+Num dissector calls: 199 (199.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -25,4 +25,4 @@ Unknown	42	16442	1
 
 
 Undetected flows:
-	1	UDP 10.13.129.30:56295 <-> 10.10.214.6:5093 [VLAN: 265][proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 25][21 pkts/5987 bytes <-> 21 pkts/10455 bytes][Goodput ratio: 82/90][150.38 sec][bytes ratio: -0.272 (Download)][IAT c2s/s2c min/avg/max/stddev: 14/13 7519/7518 120047/120047 29055/29055][Pkt Len c2s/s2c min/avg/max/stddev: 191/298 285/498 473/732 130/147][PLAIN TEXT (L@AERgX)][Plen Bins: 0,0,0,0,33,0,0,16,0,0,0,0,0,16,0,0,28,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.13.129.30:56295 <-> 10.10.214.6:5093 [VLAN: 265][proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 13][21 pkts/5987 bytes <-> 21 pkts/10455 bytes][Goodput ratio: 82/90][150.38 sec][bytes ratio: -0.272 (Download)][IAT c2s/s2c min/avg/max/stddev: 14/13 7519/7518 120047/120047 29055/29055][Pkt Len c2s/s2c min/avg/max/stddev: 191/298 285/498 473/732 130/147][PLAIN TEXT (L@AERgX)][Plen Bins: 0,0,0,0,33,0,0,16,0,0,0,0,0,16,0,0,28,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
