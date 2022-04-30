@@ -34,49 +34,50 @@
 #endif
 
 #if defined(MBEDTLS_HAVE_X86_64)
+#if defined(linux) || defined(__linux__)
+#include <cpuid.h>
+#endif
+
+#if defined(WIN32) || defined(WIN64)
+#include <intrin.h>
+#endif
 
 /*
  * AES-NI support detection routine
  */
 int mbedtls_aesni_has_support( unsigned int what )
 {
-#if !(defined(linux) || defined(__linux__))
-    static int done = 0;
-    static unsigned int c = 0;
-#endif
-    
 #if defined(__has_feature)
 #  if __has_feature(memory_sanitizer)
-        return 0;
+     return 0;
 #  endif
 #endif
 
 #if defined(linux) || defined(__linux__)
-	FILE *p;
-	int ch;
-	
-	p = popen("sort -u /proc/crypto | grep aesni_intel | wc -l","r");
-	if(p == NULL)
-	  return(0);
-	
-	ch=fgetc(p);
-	pclose(p);
-	
-	/* printf("*** %d / %c\n", ch, ch);  */
-	
-	return(ch == '1' ? 1 : 0);
-#else
-    if( ! done )
-    {
-        asm( "movl  $1, %%eax   \n\t"
-             "cpuid             \n\t"
-             : "=c" (c)
-             :
-             : "eax", "ebx", "edx" );
-        done = 1;
-    }
+  unsigned int eax, ebx, ecx, edx;
 
-    return( ( (volatile unsigned int)c & what ) != 0 );
+  if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) == 0)
+  {
+    return 0;
+  }
+
+  return ( (ecx & what) != 0 );
+#elif defined(WIN32) || defined(WIN64)
+  int cpuInfo[4];
+
+  __cpuid(cpuInfo, 1);
+
+  return ( (cpuInfo[2] & what) != 0 );
+#else
+  volatile unsigned int c = 0;
+
+  asm( "movl  $1, %%eax   \n\t"
+       "cpuid             \n\t"
+       : "=c" (c)
+       :
+       : "eax", "ebx", "edx" );
+
+  return( ( c & what ) != 0 );
 #endif
 }
 
