@@ -1300,6 +1300,12 @@ struct ndpi_flow_struct {
       char fingerprint[48];
       char class_ident[48];
     } dhcp;
+
+    struct {
+      u_int8_t version;   /* 0 = SNMPv1, 1 = SNMPv2c, 3 = SNMPv3 */
+      u_int8_t primitive; /* GET, SET... */
+      u_int8_t error_status;
+    } snmp;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/

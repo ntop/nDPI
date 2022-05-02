@@ -856,34 +856,30 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 /* ********************************** */
 
 static const char* ndpi_get_flow_info_by_proto_id(struct ndpi_flow_struct const * const flow,
-                                                  u_int16_t proto_id)
-{
-  switch (proto_id)
-  {
-    case NDPI_PROTOCOL_DNS:
-    case NDPI_PROTOCOL_HTTP:
-        return flow->host_server_name;
-    case NDPI_PROTOCOL_QUIC:
-    case NDPI_PROTOCOL_TLS:
-        if (flow->protos.tls_quic.hello_processed != 0)
-        {
-          return flow->host_server_name;
-        }
-        break;
+                                                  u_int16_t proto_id) {
+  switch (proto_id) {
+  case NDPI_PROTOCOL_DNS:
+  case NDPI_PROTOCOL_HTTP:
+    return flow->host_server_name;
+    
+  case NDPI_PROTOCOL_QUIC:
+  case NDPI_PROTOCOL_TLS:
+    if (flow->protos.tls_quic.hello_processed != 0)
+      return flow->host_server_name;        
+    break;
   }
-
+  
   return NULL;
 }
 
+/* ********************************** */
+
 const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
-                               ndpi_protocol const * const l7_protocol)
-{
+                               ndpi_protocol const * const l7_protocol) {
   char const * const app_protocol_info = ndpi_get_flow_info_by_proto_id(flow, l7_protocol->app_protocol);
 
-  if (app_protocol_info != NULL)
-  {
-    return app_protocol_info;
-  }
+  if (app_protocol_info != NULL)  
+    return app_protocol_info;  
 
   return ndpi_get_flow_info_by_proto_id(flow, l7_protocol->master_protocol);
 }
@@ -1788,7 +1784,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Weak TLS Cipher");
 
   case NDPI_TLS_CERTIFICATE_EXPIRED:
-    return("TLS Cert Expire");
+    return("TLS Cert Expired");
 
   case NDPI_TLS_CERTIFICATE_MISMATCH:
     return("TLS Cert Mismatch");
@@ -2436,6 +2432,23 @@ void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str
 
 /* ******************************************* */
 
+u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow) {
+  switch(flow->detected_protocol_stack[0] /* app_protocol */) {
+  case NDPI_PROTOCOL_DNS:
+    return(flow->protos.dns.reply_code);
+
+  case NDPI_PROTOCOL_HTTP:
+    return(flow->http.response_status_code);
+ 
+  case NDPI_PROTOCOL_SNMP:
+    return(flow->protos.snmp.error_status);
+ }
+
+  return(0);
+}
+
+/* ******************************************* */
+
 int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args)
 {
 #ifdef WIN32
@@ -2457,6 +2470,8 @@ int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args
 #endif
 }
 
+/* ******************************************* */
+
 int ndpi_snprintf(char * str, size_t size, char const * format, ...)
 {
   va_list va_args;
@@ -2466,3 +2481,4 @@ int ndpi_snprintf(char * str, size_t size, char const * format, ...)
   va_end(va_args);
   return ret;
 }
+

@@ -99,6 +99,15 @@ extern "C" {
 			      u_int match_len, u_int32_t *num);
 
   /**
+   * Return the protocol error code of a given flow
+   *
+   * @par    flow    = the flow to analyze
+   * @return the error code or 0 otherwise
+   *                        
+   */
+  u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow);
+  
+  /**
    * nDPI personal allocation and free functions
    **/
   void * ndpi_malloc(size_t size);

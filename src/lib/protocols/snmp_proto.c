@@ -97,11 +97,13 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
 
     len = get_int(&packet->payload[1], packet->payload_packet_len - 1, &len_length);
 
+    flow->protos.snmp.version = packet->payload[1 + len_length + 2];
+    
     if(len > 2 &&
        1 + len_length + len == packet->payload_packet_len &&
-       (packet->payload[1 + len_length + 2] == 0 /* SNMPv1 */ ||
-        packet->payload[1 + len_length + 2] == 1 /* SNMPv2c */ ||
-        packet->payload[1 + len_length + 2] == 3 /* SNMPv3 */)) {
+       ((flow->protos.snmp.version == 0 /* SNMPv1 */) ||
+        (flow->protos.snmp.version == 1 /* SNMPv2c */) ||
+        (flow->protos.snmp.version == 3 /* SNMPv3 */))) {
 
       if(flow->extra_packets_func == NULL) {
         ndpi_int_snmp_add_connection(ndpi_struct, flow);
@@ -125,6 +127,8 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
         if(snmp_primitive_offset < packet->payload_packet_len) {
           u_int8_t snmp_primitive = packet->payload[snmp_primitive_offset] & 0xF;
 
+	  flow->protos.snmp.primitive = snmp_primitive;
+	  
           if(snmp_primitive == 2 /* Get Response */ &&
              snmp_primitive_offset + 1 < packet->payload_packet_len) {
             offset = snmp_primitive_offset + 1;
@@ -145,6 +149,8 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
 
                 flow->extra_packets_func = NULL; /* We're good now */
 
+		flow->protos.snmp.error_status = error_status;
+		
                 if(error_status != 0)
                   ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED);
               }
@@ -152,6 +158,7 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
           }
         }
       }
+
       return;
     }
   }
