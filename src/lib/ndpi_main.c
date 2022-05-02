@@ -7408,13 +7408,33 @@ const char *ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_str
 
 /* ****************************************************** */
 
+static int category_depends_on_master(int proto)
+{
+  switch(proto) {
+  case NDPI_PROTOCOL_MAIL_POP:
+  case NDPI_PROTOCOL_MAIL_SMTP:
+  case NDPI_PROTOCOL_MAIL_IMAP:
+  case NDPI_PROTOCOL_MAIL_POPS:
+  case NDPI_PROTOCOL_MAIL_SMTPS:
+  case NDPI_PROTOCOL_MAIL_IMAPS:
+	  return 1;
+  }
+  return 0;
+}
+
+/* ****************************************************** */
+
 ndpi_protocol_category_t ndpi_get_proto_category(struct ndpi_detection_module_struct *ndpi_str,
 						 ndpi_protocol proto) {
   if(proto.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
     return(proto.category);
 
-  /* simple rule: sub protocol first, master after */
-  else if((proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) ||
+  /* Simple rule: sub protocol first, master after, with some exceptions (i.e. mail) */
+
+  if(category_depends_on_master(proto.master_protocol)) {
+    if(ndpi_is_valid_protoId(proto.master_protocol))
+      return(ndpi_str->proto_defaults[proto.master_protocol].protoCategory);
+  } else if((proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) ||
 	  (ndpi_str->proto_defaults[proto.app_protocol].protoCategory != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)) {
     if(ndpi_is_valid_protoId(proto.app_protocol))
       return(ndpi_str->proto_defaults[proto.app_protocol].protoCategory);
@@ -7735,7 +7755,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
     flow->detected_protocol_stack[1] = master_protocol_id,
     flow->detected_protocol_stack[0] = matching_protocol_id;
     flow->confidence = NDPI_CONFIDENCE_DPI;
-    if(flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    if(!category_depends_on_master(master_protocol_id) &&
+       flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
       flow->category = ret_match->protocol_category;
 
     return(flow->detected_protocol_stack[0]);
@@ -7838,7 +7859,8 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
     ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol, NDPI_CONFIDENCE_DPI);
-    ndpi_int_change_category(ndpi_struct, flow, ret_match.protocol_category);
+    if(!category_depends_on_master(master_protocol))
+      ndpi_int_change_category(ndpi_struct, flow, ret_match.protocol_category);
     return(1);
   } else
     return(0);
