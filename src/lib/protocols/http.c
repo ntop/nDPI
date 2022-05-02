@@ -420,19 +420,44 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 
 static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 				  struct ndpi_flow_struct *flow,
-				  char *ua) {
-  u_int len;
+				  char const *ua, size_t ua_len) {
   char *double_slash;
   
   if((!ua) || (ua[0] == '\0'))
     return;
-  else
-    len = strlen(ua);
+
+  if (ua_len > 12)
+  {
+    size_t i, upper_case_count = 0;
+
+    for (i = 0; i < ua_len; ++i)
+    {
+      /*
+       * We assume at least one non alpha char.
+       * e.g. ' ', '-' or ';' ...
+       */
+      if (isalpha(ua[i]) == 0)
+      {
+        break;
+      }
+      if (isupper(ua[i]) != 0)
+      {
+        upper_case_count++;
+      }
+    }
+
+    if (i == ua_len)
+    {
+      float upper_case_ratio = (float)upper_case_count / (float)ua_len;
+      if (upper_case_ratio >= 0.2f)
+      {
+        ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+      }
+    }
+  }
 
   if((!strncmp(ua, "<?", 2))
      || strchr(ua, '$')
-     // || ndpi_check_dga_name(ndpi_struct, NULL, ua, 0)
-     // || ndpi_match_bigram(ndpi_struct, &ndpi_struct->impossible_bigrams_automa, ua)
      )
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
 
@@ -448,8 +473,8 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
   if(!strncmp(ua, "jndi:ldap://", 12)) /* Log4J */ {
     ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
   } else if(
-	  (len < 4)      /* Too short */
-	  || (len > 256) /* Too long  */
+	  (ua_len < 4)      /* Too short */
+	  || (ua_len > 256) /* Too long  */
 	  || (!strncmp(ua, "test", 4))
 	  || strchr(ua, '{')
 	  || strchr(ua, '}')
@@ -464,8 +489,8 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
    */
   if((strstr(ua, "+http") != NULL)
      || (strstr(ua, " http") != NULL)
-     || ndpi_strncasestr(ua, "Crawler", strlen(ua))
-     || ndpi_strncasestr(ua, "Bot", strlen(ua)) /* bot/robot */
+     || ndpi_strncasestr(ua, "Crawler", ua_len)
+     || ndpi_strncasestr(ua, "Bot", ua_len) /* bot/robot */
      ) {
     ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT);
   }
@@ -537,7 +562,7 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (ndpi_user_agent_set(flow, ua_ptr, ua_ptr_len) != NULL)
   {
-    ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent);
+    ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent, ua_ptr_len);
   } else {
     NDPI_LOG_DBG2(ndpi_struct, "Could not set HTTP user agent\n");
   }
