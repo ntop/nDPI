@@ -2,7 +2,7 @@ CC=@CC@
 INC=-I ../src/include -I/usr/local/include
 LIBDPI=../src/lib/libndpi.a
 LDFLAGS=@LDFLAGS@
-LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@
+LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@ @LIBRRD@
 
 TOOLS=rrd_anomaly rrd_similarity
 
