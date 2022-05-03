@@ -1602,7 +1602,12 @@ static ndpi_protocol_match host_match[] =
    { "pluralsight2.imgix.net",                                              "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "pluralsight.imgix.net",                                               "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "zn6qzq6caaucudesr-pluralsight.siteintercept.qualtrics.com",           "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "znejw6fzxpoc4z2sj-pluralsight.siteintercept.qualtrics.com",           "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ip-video-course-exercise-files-us-west-2.s3.us-west-2.amazonaws.com", "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pluralsight.demdex.net",                                              "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pluralsight.sc.omtrdc.net",                                           "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pluralsight.hb.omtrdc.net",                                           "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pluralsight.tt.omtrdc.net",                                           "Pluralsight", NDPI_PROTOCOL_PLURALSIGHT, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "xiaomi.com",                       "Xiaomi", NDPI_PROTOCOL_XIAOMI, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "xiaomi.net",                       "Xiaomi", NDPI_PROTOCOL_XIAOMI, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
