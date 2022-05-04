@@ -158,7 +158,8 @@ static ndpi_risk_info ndpi_known_risks[] = {
 /* ****************************************** */
 
 /* Forward */
-static void addDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
+static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
+			   ndpi_port_range *range, ndpi_proto_defaults_t *def,
 			   u_int8_t customUserProto, ndpi_default_ports_tree_node_t **root,
                            const char *_func, int _line);
 
@@ -498,11 +499,11 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
 
   for(j = 0; j < MAX_DEFAULT_PORTS; j++) {
     if(udpDefPorts[j].port_low != 0)
-      addDefaultPort(&udpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->udpRoot,
+      addDefaultPort(ndpi_str, &udpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->udpRoot,
 		     __FUNCTION__, __LINE__);
 
     if(tcpDefPorts[j].port_low != 0)
-      addDefaultPort(&tcpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->tcpRoot,
+      addDefaultPort(ndpi_str, &tcpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->tcpRoot,
 		     __FUNCTION__, __LINE__);
 
     /* No port range, just the lower port */
@@ -538,7 +539,8 @@ void ndpi_default_ports_tree_node_t_walker(const void *node, const ndpi_VISIT wh
 
 /* ******************************************************************** */
 
-static void addDefaultPort(ndpi_port_range *range,
+static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
+                           ndpi_port_range *range,
                            ndpi_proto_defaults_t *def,
 			   u_int8_t customUserProto,
 			   ndpi_default_ports_tree_node_t **root,
@@ -3431,7 +3433,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
 	range.port_low = range.port_high = atoi(&elem[4]);
 
       if(do_add)
-	addDefaultPort(&range, def, 1 /* Custom user proto */,
+	addDefaultPort(ndpi_str, &range, def, 1 /* Custom user proto */,
 		       is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot, __FUNCTION__, __LINE__);
       else
 	removeDefaultPort(&range, def, is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot);
