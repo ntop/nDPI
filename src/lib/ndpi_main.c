@@ -6096,10 +6096,11 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	} /* for */
 
 	if(!found) {
-	  ndpi_default_ports_tree_node_t *ret = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
+	  ndpi_default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
 									     sport, dport);
 
-	  if(ret == NULL)
+	if((r == NULL)
+	   || ((r->proto->protoId != ret.app_protocol) && (r->proto->protoId != ret.master_protocol)))	  
 	    ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
 	}
       }
@@ -6125,10 +6126,11 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       }
 
       if(!found) {
-	ndpi_default_ports_tree_node_t *ret = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
+	ndpi_default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
 									   sport, dport);
 	
-	if(ret == NULL)
+	if((r == NULL)
+	   || ((r->proto->protoId != ret.app_protocol) && (r->proto->protoId != ret.master_protocol)))	  
 	  ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
       }
     }
