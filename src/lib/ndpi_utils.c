@@ -1790,22 +1790,22 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("TLS Cert Mismatch");
 
   case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
-    return("HTTP Susp User-Agent");
+    return("HTTP Suspicious User-Agent");
 
   case NDPI_HTTP_NUMERIC_IP_HOST:
     return("HTTP Numeric IP Address");
 
   case NDPI_HTTP_SUSPICIOUS_URL:
-    return("HTTP Susp URL");
+    return("HTTP Suspicious URL");
 
   case NDPI_HTTP_SUSPICIOUS_HEADER:
-    return("HTTP Susp Header");
+    return("HTTP Suspicious Header");
 
   case NDPI_TLS_NOT_CARRYING_HTTPS:
     return("TLS (probably) Not Carrying HTTPS");
 
   case NDPI_SUSPICIOUS_DGA_DOMAIN:
-    return("Susp DGA Domain name");
+    return("Suspicious DGA Domain name");
 
   case NDPI_MALFORMED_PACKET:
     return("Malformed Packet");
@@ -1820,19 +1820,19 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("SMB Insecure Vers");
 
   case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
-    return("TLS Susp ESNI Usage");
+    return("TLS Suspicious ESNI Usage");
 
   case NDPI_UNSAFE_PROTOCOL:
     return("Unsafe Protocol");
 
   case NDPI_DNS_SUSPICIOUS_TRAFFIC:
-    return("Susp DNS Traffic"); /* Exfiltration ? */
+    return("Suspicious DNS Traffic"); /* Exfiltration ? */
 
   case NDPI_TLS_MISSING_SNI:
     return("Missing SNI TLS Extn");
 
   case NDPI_HTTP_SUSPICIOUS_CONTENT:
-    return("HTTP Susp Content");
+    return("HTTP Suspicious Content");
 
   case NDPI_RISKY_ASN:
     return("Risky ASN");
@@ -1856,13 +1856,13 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("TLS Cert Validity Too Long");
 
   case NDPI_TLS_SUSPICIOUS_EXTENSION:
-    return("TLS Susp Extension");
+    return("TLS Suspicious Extn");
 
   case NDPI_TLS_FATAL_ALERT:
     return("TLS Fatal Alert");
 
   case NDPI_SUSPICIOUS_ENTROPY:
-    return("Susp Entropy");
+    return("Suspicious Entropy");
 
   case NDPI_CLEAR_TEXT_CREDENTIALS:
     return("Clear-Text Credentials");
