@@ -76,7 +76,7 @@ check_results() {
 	      NUM_DIFF=`diff result/$f.out /tmp/reader.out | wc -l`
 	    else
 	      printf "%-48s\tERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n" "$f"
-	      RC=1
+	      RC=$(( RC + 1 ))
 	      continue
 	    fi
 
@@ -86,7 +86,7 @@ check_results() {
 		  printf "%-48s\tERROR\n" "$f"
 		  echo "$CMD [old vs new]"
 		  diff result/$f.out /tmp/reader.out
-		  RC=1
+		  RC=$(( RC + 1 ))
 	    fi
 
 	    /bin/rm -f /tmp/reader.out
@@ -99,5 +99,7 @@ if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
 fi
 build_results
 check_results $*
+
+test ${RC} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
 
 exit $RC

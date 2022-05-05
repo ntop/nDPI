@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd "$(dirname "${0}")"
+cd "$(dirname "${0}")" || exit 1
 
 DEST=../src/lib/inc_generated/ndpi_zoom_match.c.inc
 LIST=/tmp/zoom.list
