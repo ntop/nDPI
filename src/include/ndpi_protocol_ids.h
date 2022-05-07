@@ -316,6 +316,8 @@ typedef enum {
   NDPI_PROTOCOL_TENCENT               = 285,
   NDPI_PROTOCOL_RAKNET                = 286,
   NDPI_PROTOCOL_XIAOMI                = 287,
+  NDPI_PROTOCOL_EDGECAST              = 288,
+  NDPI_PROTOCOL_CACHEFLY              = 289,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

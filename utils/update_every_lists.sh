@@ -8,6 +8,8 @@ RETVAL=0
 RETVAL=$(( RETVAL + $? ))
 ./azure_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
+./cachefly_ip_addresses_download.sh
+RETVAL=$(( RETVAL + $? ))
 ./cloudflare_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
 ./ethereum_ip_addresses_download.sh
@@ -30,5 +32,5 @@ RETVAL=$(( RETVAL + $? ))
 ./asn_update.sh
 RETVAL=$(( RETVAL + $? ))
 
-test ${RETVAL} -ne 0 && printf '%s: %s\n' "${0}" "${RETVAL} scripts failed"
+test ${RETVAL} -ne 0 && printf '%s: %s\n' "${0}" "${RETVAL} script(s) failed"
 exit ${RETVAL}

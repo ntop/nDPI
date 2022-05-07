@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 cd "$(dirname "${0}")" || exit 1
 
 DEST=../src/lib/inc_generated/ndpi_google_cloud_match.c.inc

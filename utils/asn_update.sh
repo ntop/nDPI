@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -e
+FAILED_ASN=0
+TOTAL_ASN=0
 
 function processing_list() {
 	local LIST_MERGED="/tmp/list_m"
@@ -15,7 +16,11 @@ function create_list() {
 	LIST=/tmp/list
 
 	for i in "${@:3}"; do
-		./get_routes_by_asn.sh "$i" >> $LIST
+		TOTAL_ASN=$(( TOTAL_ASN + 1 ))
+		if ! ./get_routes_by_asn.sh "$i" >> $LIST; then
+			echo "Could not fetch route for ${i} (${1})"
+			FAILED_ASN=$(( FAILED_ASN + 1 ))
+		fi
 	done
 
 	processing_list "$LIST" "$1" "$2"
@@ -113,3 +118,15 @@ echo "(1) Downloading Citrix routes..." #Citrix or a more generic LogMeIn stuff?
 DEST=../src/lib/inc_generated/ndpi_asn_citrix.c.inc
 create_list NDPI_PROTOCOL_CITRIX $DEST "AS395424" "AS21866" "AS213380" "AS20104" "AS16815"
 echo "(3) Citrix IPs are available in $DEST"
+
+echo "(1) Downloading Edgecast routes..."
+DEST=../src/lib/inc_generated/ndpi_asn_edgecast.c.inc
+create_list NDPI_PROTOCOL_EDGECAST $DEST "AS15133"
+echo "(3) Edgecast IPs are available in $DEST"
+
+if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
+	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
+	exit 1
+else
+	exit 0
+fi

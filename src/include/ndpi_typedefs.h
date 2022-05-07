@@ -1419,6 +1419,7 @@ typedef enum
     ndpi_dont_load_asn_lists       = (1 << 12),
     ndpi_dont_load_icloud_private_relay_list  = (1 << 13),
     ndpi_dont_init_risk_ptree      = (1 << 14),
+    ndpi_dont_load_cachefly_list   = (1 << 15),
   } ndpi_prefs;
 
 typedef struct {

@@ -55,6 +55,7 @@
 #include "inc_generated/ndpi_amazon_aws_match.c.inc"
 #include "inc_generated/ndpi_ethereum_match.c.inc"
 #include "inc_generated/ndpi_zoom_match.c.inc"
+#include "inc_generated/ndpi_cachefly_match.c.inc"
 #include "inc_generated/ndpi_cloudflare_match.c.inc"
 #include "inc_generated/ndpi_ms_office365_match.c.inc"
 #include "inc_generated/ndpi_ms_onedrive_match.c.inc"
@@ -81,6 +82,7 @@
 #include "inc_generated/ndpi_asn_steam.c.inc"
 #include "inc_generated/ndpi_asn_bloomberg.c.inc"
 #include "inc_generated/ndpi_asn_citrix.c.inc"
+#include "inc_generated/ndpi_asn_edgecast.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -1877,6 +1879,14 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "Xiaomi", NDPI_PROTOCOL_CATEGORY_WEB,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_EDGECAST,
+                          "Edgecast", NDPI_PROTOCOL_CATEGORY_CLOUD,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CACHEFLY,
+                          "Cachefly", NDPI_PROTOCOL_CATEGORY_CLOUD,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2472,6 +2482,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
+    if(!(prefs & ndpi_dont_load_cachefly_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cachefly_protocol_list);
     if(!(prefs & ndpi_dont_load_tor_list))
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tor_protocol_list);
     if(!(prefs & ndpi_dont_load_azure_list))
@@ -2515,6 +2527,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_steam_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_bloomberg_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_citrix_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_edgecast_protocol_list);
     }
   }
 

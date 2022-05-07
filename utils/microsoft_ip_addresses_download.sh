@@ -1,6 +1,8 @@
 #!/bin/sh
 
-cd "$(dirname "${0}")"
+set -e
+
+cd "$(dirname "${0}")" || exit 1
 
 DEST_OUTLOOK=../src/lib/inc_generated/ndpi_ms_outlook_match.c.inc
 DEST_SKYPE_MSTEAMS=../src/lib/inc_generated/ndpi_ms_skype_teams_match.c.inc
