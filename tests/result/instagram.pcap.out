@@ -4,9 +4,9 @@ DPI Packets (TCP):	499	(16.63 pkts/flow)
 DPI Packets (UDP):	10	(1.43 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
-Confidence Match by port    : 7 (flows)
+Confidence Match by port    : 6 (flows)
 Confidence Match by IP      : 1 (flows)
-Confidence DPI              : 29 (flows)
+Confidence DPI              : 30 (flows)
 
 Unknown	1	66	1
 HTTP	116	91784	6
@@ -55,7 +55,7 @@ JA3 Host Stats:
 	31	UDP 192.168.0.103:33603 <-> 8.8.8.8:53 [proto: 5.211/DNS.Instagram][ClearText][Confidence: DPI][cat: SocialNetwork/6][1 pkts/89 bytes <-> 1 pkts/209 bytes][Goodput ratio: 52/80][0.05 sec][Hostname/SNI: igcdn-photos-a-a.akamaihd.net][82.85.26.154][PLAIN TEXT (photos)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	TCP 192.168.0.103:38817 <-> 46.33.70.160:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][2 pkts/132 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.02 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	TCP 192.168.0.103:57966 <-> 82.85.26.185:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][2 pkts/132 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	34	TCP 192.168.0.103:58690 -> 46.33.70.159:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/169 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	34	TCP 192.168.0.103:58690 -> 46.33.70.159:443 [proto: 91/TLS][Encrypted][Confidence: DPI][cat: Web/5][2 pkts/169 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	35	UDP 192.168.0.106:17500 -> 192.168.0.255:17500 [proto: 121/Dropbox][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/145 bytes -> 0 pkts/0 bytes][Goodput ratio: 71/0][< 1 sec][PLAIN TEXT ( 413767116)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	36	TCP 46.33.70.150:80 <-> 192.168.0.103:40855 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	37	UDP 192.168.0.103:27124 -> 8.8.8.8:53 [proto: 5.211/DNS.Instagram][ClearText][Confidence: DPI][cat: SocialNetwork/6][1 pkts/85 bytes -> 0 pkts/0 bytes][Goodput ratio: 50/0][< 1 sec][Hostname/SNI: photos-b.ak.instagram.com][::][PLAIN TEXT (photos)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -3,8 +3,8 @@ Guessed flow protos:	12
 DPI Packets (TCP):	86	(5.73 pkts/flow)
 DPI Packets (UDP):	6	(1.20 pkts/flow)
 Confidence Match by port    : 4 (flows)
-Confidence Match by IP      : 6 (flows)
-Confidence DPI              : 10 (flows)
+Confidence Match by IP      : 5 (flows)
+Confidence DPI              : 11 (flows)
 
 HTTP	5	280	1
 QQ	15	1727	1
@@ -38,7 +38,7 @@ JA3 Host Stats:
 	14	UDP 10.24.82.188:25223 <-> 10.188.1.1:53 [proto: 5.119/DNS.Facebook][ClearText][Confidence: DPI][cat: SocialNetwork/6][1 pkts/79 bytes <-> 1 pkts/118 bytes][Goodput ratio: 44/62][0.20 sec][Hostname/SNI: mqtt.facebook.com][173.252.97.2][PLAIN TEXT (facebook)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	TCP 10.24.82.188:34686 -> 173.194.72.188:5228 [proto: 91.126/TLS.Google][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 58/0][< 1 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	TCP 173.252.88.128:443 -> 10.24.82.188:59912 [proto: 91.119/TLS.Facebook][Encrypted][Confidence: Match by IP][cat: SocialNetwork/6][2 pkts/124 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	17	TCP 10.24.82.188:49217 -> 216.58.220.174:443 [proto: 91.126/TLS.Google][Encrypted][Confidence: Match by IP][cat: Web/5][1 pkts/83 bytes -> 0 pkts/0 bytes][Goodput ratio: 32/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	TCP 10.24.82.188:49217 -> 216.58.220.174:443 [proto: 91.126/TLS.Google][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/83 bytes -> 0 pkts/0 bytes][Goodput ratio: 32/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	18	TCP 173.194.117.229:443 -> 10.24.82.188:38380 [proto: 91.126/TLS.Google][Encrypted][Confidence: Match by IP][cat: Web/5][1 pkts/56 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	TCP 173.252.122.1:443 -> 10.24.82.188:52123 [proto: 91.119/TLS.Facebook][Encrypted][Confidence: Match by IP][cat: SocialNetwork/6][1 pkts/56 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	TCP 216.58.220.161:443 -> 10.24.82.188:56697 [proto: 91.126/TLS.Google][Encrypted][Confidence: Match by IP][cat: Web/5][1 pkts/56 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
