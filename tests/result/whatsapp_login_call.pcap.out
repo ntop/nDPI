@@ -3,9 +3,9 @@ Guessed flow protos:	23
 DPI Packets (TCP):	167	(6.19 pkts/flow)
 DPI Packets (UDP):	35	(1.21 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
-Confidence Match by port    : 5 (flows)
+Confidence Match by port    : 4 (flows)
 Confidence Match by IP      : 16 (flows)
-Confidence DPI              : 36 (flows)
+Confidence DPI              : 37 (flows)
 
 HTTP	11	726	3
 MDNS	8	952	4
@@ -55,7 +55,7 @@ JA3 Host Stats:
 	27	UDP 192.168.2.4:52794 <-> 31.13.93.48:3478 [proto: 78.45/STUN.WhatsAppCall][ClearText][Confidence: DPI][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes][Goodput ratio: 75/51][14.33 sec][Plen Bins: 0,40,0,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	28	UDP 192.168.2.4:52794 <-> 173.252.114.1:3478 [proto: 78.45/STUN.WhatsAppCall][ClearText][Confidence: DPI][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes][Goodput ratio: 75/51][14.33 sec][Plen Bins: 0,40,0,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	UDP 192.168.2.4:52794 <-> 179.60.192.48:3478 [proto: 78.45/STUN.WhatsAppCall][ClearText][Confidence: DPI][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes][Goodput ratio: 75/51][14.33 sec][Plen Bins: 0,40,0,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	30	TCP 192.168.2.4:49172 <-> 23.50.148.228:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][3 pkts/174 bytes <-> 2 pkts/217 bytes][Goodput ratio: 0/39][0.03 sec][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	30	TCP 192.168.2.4:49172 <-> 23.50.148.228:443 [proto: 91/TLS][Encrypted][Confidence: DPI][cat: Web/5][3 pkts/174 bytes <-> 2 pkts/217 bytes][Goodput ratio: 0/39][0.03 sec][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	TCP 192.168.2.4:49192 <-> 93.186.135.8:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][3 pkts/198 bytes <-> 2 pkts/132 bytes][Goodput ratio: 0/0][0.20 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 192.168.2.4:51897 <-> 192.168.2.1:53 [proto: 5.140/DNS.Apple][ClearText][Confidence: DPI][cat: Web/5][1 pkts/79 bytes <-> 1 pkts/251 bytes][Goodput ratio: 46/83][0.07 sec][Hostname/SNI: query.ess.apple.com][17.178.104.12][PLAIN TEXT (akadns)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	UDP 192.168.2.4:52190 <-> 192.168.2.1:53 [proto: 5.142/DNS.WhatsApp][ClearText][Confidence: DPI][cat: Chat/9][1 pkts/76 bytes <-> 1 pkts/204 bytes][Goodput ratio: 44/79][0.03 sec][Hostname/SNI: e13.whatsapp.net][158.85.233.52][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

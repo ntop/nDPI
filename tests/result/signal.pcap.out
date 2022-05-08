@@ -3,8 +3,7 @@ Guessed flow protos:	3
 DPI Packets (TCP):	110	(7.33 pkts/flow)
 DPI Packets (UDP):	5	(1.67 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
-Confidence Match by port    : 1 (flows)
-Confidence DPI              : 18 (flows)
+Confidence DPI              : 19 (flows)
 
 DNS	2	186	1
 DHCP	4	1368	1
@@ -34,7 +33,7 @@ JA3 Host Stats:
 	13	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][ClearText][Confidence: DPI][cat: Network/14][4 pkts/1368 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][15.76 sec][Hostname/SNI: lucas-imac][DHCP Fingerprint: 1,121,3,6,15,119,252,95,44,46][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	14	TCP 23.57.24.16:443 <-> 192.168.2.17:57016 [proto: 91/TLS][Encrypted][Confidence: DPI][cat: Web/5][6 pkts/408 bytes <-> 6 pkts/471 bytes][Goodput ratio: 12/13][0.65 sec][bytes ratio: -0.072 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 7/16 158/4 347/16 157/7][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 68/78 90/105 16/15][Plen Bins: 75,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	TCP 192.168.2.17:56996 <-> 17.248.146.144:443 [proto: 91.140/TLS.Apple][Encrypted][Confidence: DPI][cat: Web/5][4 pkts/341 bytes <-> 4 pkts/264 bytes][Goodput ratio: 23/0][0.03 sec][bytes ratio: 0.127 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 25/0 8/0 25/0 12/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 85/66 112/66 20/0][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	16	TCP 192.168.2.17:57017 <-> 2.18.232.118:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][5 pkts/317 bytes <-> 3 pkts/221 bytes][Goodput ratio: 7/10][0.03 sec][bytes ratio: 0.178 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/0 24/0 10/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 63/74 89/89 14/11][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	16	TCP 192.168.2.17:57017 <-> 2.18.232.118:443 [proto: 91/TLS][Encrypted][Confidence: DPI][cat: Web/5][5 pkts/317 bytes <-> 3 pkts/221 bytes][Goodput ratio: 7/10][0.03 sec][bytes ratio: 0.178 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/0 24/0 10/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 63/74 89/89 14/11][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	17	UDP 192.168.2.17:56263 <-> 192.168.2.1:53 [proto: 5.39/DNS.Signal][ClearText][Confidence: DPI][cat: Chat/9][1 pkts/97 bytes <-> 1 pkts/193 bytes][Goodput ratio: 56/78][0.03 sec][Hostname/SNI: textsecure-service.whispersystems.org][54.175.47.110][PLAIN TEXT (textsecure)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	18	UDP 192.168.2.17:60793 <-> 192.168.2.1:53 [proto: 5/DNS][ClearText][Confidence: DPI][cat: Network/14][1 pkts/85 bytes <-> 1 pkts/101 bytes][Goodput ratio: 50/58][0.04 sec][Hostname/SNI: e673.dsce9.akamaiedge.net][23.57.24.16][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	ICMP 192.168.2.17:0 -> 192.168.2.1:0 [proto: 81/ICMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
