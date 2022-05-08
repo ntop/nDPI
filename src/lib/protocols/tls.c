@@ -987,8 +987,9 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	if(block_len < 16384 /* Max TLS block size */)
 	  ndpi_looks_like_tls(ndpi_struct, flow);
 
-    if (packet->payload[1] == 0x03 && packet->payload[2] <= 4 &&
-        block_len == (u_int32_t)packet->payload_packet_len - 5)
+    if (flow->l4.tcp.tls.message.buffer[1] == 0x03 &&
+        flow->l4.tcp.tls.message.buffer[2] <= 0x04 &&
+        block_len == (u_int32_t)flow->l4.tcp.tls.message.buffer_used - 5)
     {
       ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
     }
