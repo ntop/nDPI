@@ -1,0 +1,8 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+Softether	4	1392	1
+
+	1	TCP 192.168.2.100:37504 <-> 130.158.75.45:80 [proto: 7.290/HTTP.Softether][ClearText][Confidence: DPI][cat: VPN/2][3 pkts/1318 bytes <-> 1 pkts/74 bytes][Goodput ratio: 84/0][0.26 sec][Hostname/SNI: x0.x0.dev.open.servers.ddns.softether-network.net][URL: x0.x0.dev.open.servers.ddns.softether-network.net/ddns/ddns.aspx?v=9291257684825389030][StatusCode: 0][Req Content-Type: application/x-www-form-urlencoded][User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0][PLAIN TEXT (POST /ddns/ddns.asp)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0]
