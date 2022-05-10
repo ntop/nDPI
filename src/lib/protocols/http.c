@@ -413,6 +413,12 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
       }
     }
+
+    if (flow->http.url != NULL &&
+        strstr(flow->http.url, "micloud.xiaomi.net") != NULL)
+    {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XIAOMI, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+    }
   }
 }
 
