@@ -25,12 +25,47 @@
 #include "ndpi_api.h"
 
 
+static void viber_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+                                 struct ndpi_flow_struct *flow)
+{
+  NDPI_LOG_INFO(ndpi_struct, "found Viber\n");
+  ndpi_set_detected_protocol(ndpi_struct, flow,
+                             NDPI_PROTOCOL_VIBER,
+                             NDPI_PROTOCOL_UNKNOWN,
+                             NDPI_CONFIDENCE_DPI);
+}
+
 void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   
-  NDPI_LOG_DBG(ndpi_struct, "search for VIBER\n");
-  
+  NDPI_LOG_DBG(ndpi_struct, "search for Viber\n");
+
+  if (packet->tcp != NULL)
+  {
+    NDPI_LOG_DBG2(ndpi_struct, "searching Viber over tcp\n");
+
+    if (packet->payload_packet_len >= 11 &&
+        le16toh(get_u_int16_t(packet->payload, 0)) == packet->payload_packet_len)
+    {
+      if (ntohs(get_u_int16_t(packet->payload, 6)) == 0xfcff &&
+          packet->payload[9] == 0x80)
+      {
+        viber_add_connection(ndpi_struct, flow);
+        return;
+      }
+      if (ntohs(get_u_int16_t(packet->payload, 4)) == 0x0380 &&
+          packet->payload[10] == 0x0a)
+      {
+        viber_add_connection(ndpi_struct, flow);
+        return;
+      }
+    }
+
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+
   if((packet->udp != NULL) && (packet->payload_packet_len > 5)) {
     NDPI_LOG_DBG2(ndpi_struct, "calculating dport over udp\n");
 
@@ -39,23 +74,24 @@ void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, struct 
        || (packet->payload[2] == 0x01 && packet->payload[3] == 0x00 && packet->payload[4] == 0x05 && packet->payload[5] == 0x00)
        || (packet->payload_packet_len == 34 && packet->payload[2] == 0x19 && packet->payload[3] == 0x00)
        || (packet->payload_packet_len == 34 && packet->payload[2] == 0x1b && packet->payload[3] == 0x00)
-       ) {
-      NDPI_LOG_DBG(ndpi_struct, "found VIBER\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VIBER, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+       )
+    {
+      viber_add_connection(ndpi_struct, flow);
       return;
-    } 
-  }
+    }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
 }
 
 
 void init_viber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
 {
-  ndpi_set_bitmask_protocol_detection("VIBER", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Viber", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_VIBER,
 				      ndpi_search_viber,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
