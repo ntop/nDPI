@@ -67,7 +67,7 @@ AC_DEFINE_UNQUOTED(NDPI_PATCH_LEVEL,   "${NDPI_PATCH}", [nDPI patch level])
 
 # .git as directory in a cloned repo
 # .git as file in submodule based integration
-if test -d ".git" || test -f ".git" -a -d `cat .git | cut -d' ' -f2`; then :
+if test -d ".git" || test -r ".git"; then
      GIT_TAG=`git log -1 --format=%h`
      GIT_DATE=`git log -1 --format=%cd`
      #
@@ -87,10 +87,8 @@ else
      if test -z "$SOURCE_DATE_EPOCH" ; then :
          SOURCE_DATE_EPOCH=`date +%s`
      fi
-     NDPI_API_VERSION=`echo $SOURCE_DATE_EPOCH | cut -c7-10`
+     NDPI_API_VERSION=$((SOURCE_DATE_EPOCH % 65536))
 fi
-
-NDPI_API_VERSION=`echo $NDPI_API_VERSION | sed 's/^0*//'`
 
 echo "Setting API version to $NDPI_API_VERSION"
 
