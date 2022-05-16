@@ -1,0 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+MGCP	12	1672	1
+
+	1	UDP 10.10.228.72:2427 <-> 10.10.244.2:2427 [proto: 94/MGCP][ClearText][Confidence: DPI][cat: VoIP/10][6 pkts/1254 bytes <-> 6 pkts/418 bytes][Goodput ratio: 79/40][6.26 sec][bytes ratio: 0.500 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 884/884 3523/3523 1524/1523][Pkt Len c2s/s2c min/avg/max/stddev: 60/57 209/70 846/104 285/19][PLAIN TEXT (RSIP 262662134 )][Plen Bins: 41,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
