@@ -361,20 +361,6 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 
 /* ************************************************************* */
 
-static void rtsp_parse_packet_acceptline(struct ndpi_detection_module_struct
-					 *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
-  if((packet->accept_line.len >= 28)
-     && (memcmp(packet->accept_line.ptr, "application/x-rtsp-tunnelled", 28) == 0)) {
-    NDPI_LOG_INFO(ndpi_struct, "found RTSP accept line\n");
-    ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTSP, NDPI_PROTOCOL_CATEGORY_MEDIA);
-  }
-}
-
-/* ************************************************************* */
-
 static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow, char *ua) {
   if(    !strcmp(ua, "Windows NT 5.0"))  ua = "Windows 2000";
@@ -764,10 +750,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   if(packet->accept_line.ptr != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "Accept line found %.*s\n",
 		  packet->accept_line.len, packet->accept_line.ptr);
-    if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask,
-					NDPI_PROTOCOL_RTSP) != 0) {
-      rtsp_parse_packet_acceptline(ndpi_struct, flow);
-    }
   }
 
   /* check for authorization line */

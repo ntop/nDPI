@@ -50,7 +50,9 @@ void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct
   }
 
   if (packet->parsed_lines > 0 &&
-      LINE_ENDS(packet->line[0], "RTSP/1.0") != 0)
+      (LINE_ENDS(packet->line[0], "RTSP/1.0") != 0 ||
+       LINE_ENDS(packet->accept_line, "application/x-rtsp-tunnelled") != 0 ||
+       LINE_ENDS(packet->content_line, "application/x-rtsp-tunnelled") != 0))
   {
     ndpi_int_rtsp_add_connection(ndpi_struct, flow);
     return;
