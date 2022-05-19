@@ -1371,6 +1371,13 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;
   struct tinc_cache_entry tinc_cache_entry;
+
+  /* 
+     Leave this field below at the end
+     The field below can be used by third
+     party dissectors for storing private data
+   */
+  u_int8_t priv_data[16];
 };
 
 #define NDPI_PROTOCOL_DEFAULT_LEVEL	0
