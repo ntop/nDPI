@@ -2277,6 +2277,7 @@ int ndpi_is_valid_hostname(char * const str, size_t len) {
   for (size_t i = 0; i < len; ++i) {
     if((str[i] == '.')
        || (str[i] == '-')
+       || (str[i] == '_')
        || (str[i] == ':')
        )
       continue; /* Used in hostnames */    
