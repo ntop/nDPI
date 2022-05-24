@@ -1389,6 +1389,14 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_check_dga_name(ndpi_struct, flow,
                           flow->host_server_name, 1);
 
+      if(ndpi_is_valid_hostname(flow->host_server_name,
+				strlen(flow->host_server_name)) == 0) {
+	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+	
+	/* This looks like an attack */
+	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+      }
+      
       sni_found = 1;
       if (ua_found)
         return;
