@@ -679,8 +679,18 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len);
     flow->extra_packets_func = NULL; /* We're good now */
 
-    if(strlen(flow->host_server_name) > 0) ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
-
+    if(strlen(flow->host_server_name) > 0) {
+      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
+      
+      if(ndpi_is_valid_hostname(flow->host_server_name,
+				strlen(flow->host_server_name)) == 0) {
+	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+	
+	/* This looks like an attack */
+	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+      }
+    }
+    
     if(packet->forwarded_line.ptr) {
       if(flow->http.nat_ip == NULL) {
         len = packet->forwarded_line.len;

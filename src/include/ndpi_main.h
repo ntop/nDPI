@@ -153,6 +153,7 @@ extern "C" {
   int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
 		      struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_is_printable_string(char * const str, size_t len);
+  int ndpi_is_valid_hostname(char * const str, size_t len);
 #define NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(entropy) (entropy > 7.0f)
   float ndpi_entropy(u_int8_t const * const buf, size_t len);
   u_int16_t ndpi_calculate_icmp4_checksum(u_int8_t const * const buf, size_t len);

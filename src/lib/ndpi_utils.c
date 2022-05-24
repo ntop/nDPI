@@ -864,7 +864,7 @@ static const char* ndpi_get_flow_info_by_proto_id(struct ndpi_flow_struct const 
     
   case NDPI_PROTOCOL_QUIC:
   case NDPI_PROTOCOL_TLS:
-    if (flow->protos.tls_quic.hello_processed != 0)
+    if(flow->protos.tls_quic.hello_processed != 0)
       return flow->host_server_name;        
     break;
   }
@@ -878,7 +878,7 @@ const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
                                ndpi_protocol const * const l7_protocol) {
   char const * const app_protocol_info = ndpi_get_flow_info_by_proto_id(flow, l7_protocol->app_protocol);
 
-  if (app_protocol_info != NULL)  
+  if(app_protocol_info != NULL)  
     return app_protocol_info;  
 
   return ndpi_get_flow_info_by_proto_id(flow, l7_protocol->master_protocol);
@@ -1105,7 +1105,7 @@ void ndpi_serialize_risk(ndpi_serializer *serializer,
                          ndpi_risk risk) {
   u_int32_t i;
 
-  if (risk == 0) {
+  if(risk == 0) {
     return;
   }
 
@@ -1115,7 +1115,7 @@ void ndpi_serialize_risk(ndpi_serializer *serializer,
 
     if(NDPI_ISSET_BIT(risk, r)) {
       ndpi_risk_info const * const risk_info = ndpi_risk2severity(r);
-      if (risk_info == NULL)
+      if(risk_info == NULL)
         continue;
 
       ndpi_serialize_start_of_block_uint32(serializer, i);
@@ -1136,7 +1136,7 @@ void ndpi_serialize_risk_score(ndpi_serializer *serializer,
 {
   u_int16_t rs, rs_client = 0, rs_server = 0;
 
-  if (risk == NDPI_NO_RISK) {
+  if(risk == NDPI_NO_RISK) {
     return;
   }
 
@@ -1153,7 +1153,7 @@ void ndpi_serialize_risk_score(ndpi_serializer *serializer,
 void ndpi_serialize_confidence(ndpi_serializer *serializer,
                                ndpi_confidence_t confidence)
 {
-  if (confidence == NDPI_CONFIDENCE_UNKNOWN) {
+  if(confidence == NDPI_CONFIDENCE_UNKNOWN) {
     return;
   }
 
@@ -1200,7 +1200,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   switch(l7_protocol.master_protocol ? l7_protocol.master_protocol : l7_protocol.app_protocol) {
   case NDPI_PROTOCOL_IP_ICMP:
-    if (flow->entropy > 0.0f) {
+    if(flow->entropy > 0.0f) {
       ndpi_serialize_string_float(serializer, "entropy", flow->entropy, "%.6f");
     }
     break;
@@ -2262,13 +2262,33 @@ int ndpi_is_printable_string(char * const str, size_t len) {
   int retval = 1;
 
   for (size_t i = 0; i < len; ++i) {
-    if (ndpi_isprint(str[i]) == 0) {
+    if(ndpi_isprint(str[i]) == 0) {
       str[i] = '?';
       retval = 0;
     }
   }
 
   return retval;
+}
+
+/* ******************************************************************** */
+
+int ndpi_is_valid_hostname(char * const str, size_t len) {
+  for (size_t i = 0; i < len; ++i) {
+    if((str[i] == '.')
+       || (str[i] == '-')
+       || (str[i] == ':')
+       )
+      continue; /* Used in hostnames */    
+    else if((ndpi_isprint(str[i]) == 0)       
+	    || ndpi_isspace(str[i])
+	    || ndpi_ispunct(str[i])
+	    ) {
+      return(0);
+    }
+  }
+  
+  return(1);
 }
 
 /* ******************************************************************** */
@@ -2284,7 +2304,7 @@ float ndpi_entropy(u_int8_t const * const buf, size_t len) {
   }
 
   for (size_t i = 0; i < sizeof(byte_counters) / sizeof(byte_counters[0]); ++i) {
-    if (byte_counters[i] == 0) {
+    if(byte_counters[i] == 0) {
       continue;
     }
 
@@ -2314,7 +2334,7 @@ u_int16_t ndpi_calculate_icmp4_checksum(const u_int8_t * buf, size_t len) {
     buf += 2;
   }
 
-  if (len == 1) {
+  if(len == 1) {
     checksum += *buf;
   }
 
@@ -2452,15 +2472,13 @@ u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow) {
 int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args)
 {
 #ifdef WIN32
-  if (str == NULL || size == 0 || format == NULL)
-  {
+  if((str == NULL) || (size == 0) || (format == NULL)) {
     return -1;
   }
 
   int ret = vsnprintf_s(str, size, _TRUNCATE, format, va_args);
 
-  if (ret < 0)
-  {
+  if(ret < 0) {
     return size;
   } else {
     return ret;
@@ -2472,8 +2490,7 @@ int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args
 
 /* ******************************************* */
 
-int ndpi_snprintf(char * str, size_t size, char const * format, ...)
-{
+int ndpi_snprintf(char * str, size_t size, char const * format, ...) {
   va_list va_args;
 
   va_start(va_args, format);

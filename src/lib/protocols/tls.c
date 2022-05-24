@@ -239,7 +239,7 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 			      const char *label) {
   u_int8_t str_len = packet->payload[offset+4], is_printable = 1;
   char *str;
-  u_int len, j;
+  u_int len;
 
   if(*rdnSeqBuf_offset >= rdnSeqBuf_len) {
 #ifdef DEBUG_TLS
@@ -260,12 +260,7 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
   buffer[len] = '\0';
 
   // check string is printable
-  for(j = 0; j < len; j++) {
-    if(!ndpi_isprint(buffer[j])) {
-      is_printable = 0;
-      break;
-    }
-  }
+  is_printable = ndpi_is_printable_string(buffer, len);
 
   if(is_printable) {
     int rc = ndpi_snprintf(&rdnSeqBuf[*rdnSeqBuf_offset],
@@ -488,7 +483,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       /* If the client hello was not observed or the requested name was missing, there is no need to trigger an alert */
       if(flow->host_server_name[0] == '\0')
 	matched_name = 1;
-	
+
 #ifdef DEBUG_TLS
       printf("******* [TLS] Found subjectAltName\n");
 #endif
@@ -497,7 +492,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
       /* skip the first type, 0x04 == BIT STRING, and jump to it's length */
       if(packet->payload[i] == 0x04) i++; else i += 4; /* 4 bytes, with the last byte set to 04 */
-      
+
       if(i < packet->payload_packet_len) {
 	i += (packet->payload[i] & 0x80) ? (packet->payload[i] & 0x7F) : 0; /* skip BIT STRING length */
 	if(i < packet->payload_packet_len) {
@@ -508,7 +503,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	    while(i < packet->payload_packet_len) {
 	      u_int8_t general_name_type = packet->payload[i];
-	      
+
 	      if((general_name_type == 0x81)    /* rfc822Name */
 		 || (general_name_type == 0x82) /* dNSName    */
 		 || (general_name_type == 0x87) /* ipAddress  */
@@ -546,7 +541,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		    strncpy(dNSName, (const char*)&packet->payload[i], len);
 		    dNSName[len] = '\0';
 		  }
-		  
+
 		  dNSName_len = strlen(dNSName);
 		  cleanupServerName(dNSName, dNSName_len);
 
@@ -555,8 +550,17 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 			 flow->host_server_name, len,
 			 packet->payload_packet_len-i-len);
 #endif
-		  if(ndpi_is_printable_string(dNSName, dNSName_len) == 0)
-		    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);		  
+
+		  /*
+		     We cannot use ndpi_is_valid_hostname() as we can have wildcards
+		     here that will create false positives
+		  */
+		  if(ndpi_is_printable_string(dNSName, dNSName_len) == 0) {
+		    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+
+		    /* This looks like an attack */
+		    ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+		  }
 
 		  if(matched_name == 0) {
 #if DEBUG_TLS
@@ -666,13 +670,13 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       printf("TLS] %s() issuerDN %s / %s\n", __FUNCTION__,
 	     flow->protos.tls_quic.issuerDN, head->value);
 #endif
-      
+
       if(strcmp(flow->protos.tls_quic.issuerDN, head->value) == 0)
 	return; /* This is a trusted DN */
       else
 	head = head->next;
     }
-    
+
     ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SELFSIGNED_CERTIFICATE);
   }
 
@@ -1794,11 +1798,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: [%s]\n", sni);
 #endif
-		    if(ndpi_is_printable_string(sni, sni_len) == 0)
-		    {
-		       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+		    if(ndpi_is_valid_hostname(sni, sni_len) == 0) {
+		      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+		      
+		      /* This looks like an attack */
+		      ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
 		    }
-
+		    
 		    if(!is_quic) {
 		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, sni, sni_len))
 		        flow->protos.tls_quic.subprotocol_detected = 1;
@@ -1845,7 +1851,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("Client TLS [EllipticCurve: %u/0x%04X]\n", s_group, s_group);
 #endif
-		    if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1]) 
+		    if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])
 			|| ((packet->payload[s_offset+i] & 0xF) != 0xA)) {
 		      /* Skip GREASE */
 		      if(ja3.client.num_elliptic_curve < MAX_NUM_JA3)
