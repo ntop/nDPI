@@ -18,6 +18,8 @@ distclean: clean
 	/bin/rm -f Makefile
 
 distdir:
+	find . -type f -name '*.c' \
+		-o -name '*.txt' | xargs -I'{}' cp '{}' '$(distdir)/{}'
 
 install:
 	@echo -n ""

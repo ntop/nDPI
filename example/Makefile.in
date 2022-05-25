@@ -83,8 +83,12 @@ clean:
 	/bin/rm -rf build
 
 distdir:
-	cp categories.txt mining_hosts.txt protos.txt README.DPDK '$(distdir)/'
-	find . -maxdepth 1 -type f -name '*.c' -o -name '*.h' -o -name '*.py' | xargs -I'{}' cp '{}' '$(distdir)/{}'
+	cp README.DPDK '$(distdir)/'
+	find . -maxdepth 1 -type f -name '*.c' \
+		-o -name '*.h' \
+		-o -name '*.py' \
+		-o -name '*.txt' \
+		-o -name '*.csv' | xargs -I'{}' cp '{}' '$(distdir)/{}'
 
 distclean: clean
 	/bin/rm -f Makefile.dpdk
