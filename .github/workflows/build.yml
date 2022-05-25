@@ -280,7 +280,7 @@ jobs:
       - name: Configure nDPI on Windows
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
         run: |
-          msys2 -c 'env CFLAGS="-Werror" ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap ${{ matrix.gcrypt }}'
+          msys2 -c 'env CFLAGS=\"-Werror -Wuse-after-free=1\" ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap ${{ matrix.gcrypt }}'
       - name: Build nDPI on Windows
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
         run: |
