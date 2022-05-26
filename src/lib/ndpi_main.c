@@ -986,6 +986,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			      NDPI_PROTOCOL_MAPLESTORY, NDPI_PROTOCOL_ZATTOO, NDPI_PROTOCOL_WORLDOFWARCRAFT,
 			      NDPI_PROTOCOL_THUNDER, NDPI_PROTOCOL_IRC,
 			      NDPI_PROTOCOL_IPP,
+			      NDPI_PROTOCOL_MPEGDASH,
 			      NDPI_PROTOCOL_RTSP,
 			      NDPI_PROTOCOL_MATCHED_BY_CONTENT,
 			      NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS); /* NDPI_PROTOCOL_HTTP can have (content-matched) subprotocols */
@@ -1890,6 +1891,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SOFTETHER,
                           "Softether", NDPI_PROTOCOL_CATEGORY_VPN,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MPEGDASH,
+                          "MpegDash", NDPI_PROTOCOL_CATEGORY_MEDIA,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
@@ -4378,6 +4383,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Xiaomi */
   init_xiaomi_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* MpegDash */
+  init_mpegdash_dissector(ndpi_str, &a, detection_bitmask);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
@@ -5037,6 +5045,47 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ************************************************ */
 
+static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * const ndpi_str,
+                                         struct ndpi_flow_struct * const flow,
+                                         NDPI_SELECTION_BITMASK_PROTOCOL_SIZE const ndpi_selection_packet,
+                                         NDPI_PROTOCOL_BITMASK detection_bitmask,
+                                         u_int16_t detected_protocol)
+{
+  u_int32_t num_calls = 0;
+
+  if (detected_protocol == NDPI_PROTOCOL_UNKNOWN)
+  {
+    return num_calls;
+  }
+
+  for (u_int32_t a = 0; a < ndpi_str->proto_defaults[detected_protocol].subprotocol_count; a++)
+  {
+    u_int16_t subproto_id = ndpi_str->proto_defaults[detected_protocol].subprotocols[a];
+    if (subproto_id == (uint16_t)NDPI_PROTOCOL_MATCHED_BY_CONTENT ||
+        subproto_id == flow->detected_protocol_stack[0] ||
+        subproto_id == flow->detected_protocol_stack[1])
+    {
+      continue;
+    }
+
+    u_int16_t subproto_index = ndpi_str->proto_defaults[subproto_id].protoIdx;
+    if ((ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
+         ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask &&
+        NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
+                             ndpi_str->callback_buffer[subproto_index].excluded_protocol_bitmask) == 0 &&
+        NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[subproto_index].detection_bitmask,
+                             detection_bitmask) != 0)
+    {
+      ndpi_str->callback_buffer[subproto_index].func(ndpi_str, flow);
+      num_calls++;
+    }
+  }
+
+  return num_calls;
+}
+
+/* ************************************************ */
+
 static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct * const ndpi_str,
 					   struct ndpi_flow_struct * const flow,
 					   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE const ndpi_selection_packet,
@@ -5094,33 +5143,10 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
       }
     }
 
-  /* Check for subprotocols. */
-  for (a = 0; a < ndpi_str->proto_defaults[flow->detected_protocol_stack[0]].subprotocol_count; a++)
-    {
-      u_int16_t subproto_id = ndpi_str->proto_defaults[flow->detected_protocol_stack[0]].subprotocols[a];
-      if (subproto_id == (uint16_t)NDPI_PROTOCOL_MATCHED_BY_CONTENT)
-	{
-	  continue;
-	}
-
-      u_int16_t subproto_index = ndpi_str->proto_defaults[subproto_id].protoIdx;
-      if ((func != ndpi_str->proto_defaults[subproto_id].func) &&
-          (ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
-	  ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask &&
-          NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
-                               ndpi_str->callback_buffer[subproto_index].excluded_protocol_bitmask) == 0 &&
-          NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[subproto_index].detection_bitmask,
-                               detection_bitmask) != 0)
-	{
-	  ndpi_str->callback_buffer[subproto_index].func(ndpi_str, flow);
-	  num_calls++;
-	}
-
-      if (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
-	{
-	  break; /* Stop after the first detected subprotocol. */
-	}
-    }
+  num_calls += check_ndpi_subprotocols(ndpi_str, flow, ndpi_selection_packet, detection_bitmask,
+                                       flow->detected_protocol_stack[0]);
+  num_calls += check_ndpi_subprotocols(ndpi_str, flow, ndpi_selection_packet, detection_bitmask,
+                                       flow->detected_protocol_stack[1]);
 
   return num_calls;
 }

@@ -1,0 +1,10 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	6	(2.00 pkts/flow)
+Confidence DPI              : 3 (flows)
+
+AmazonAWS	9	2693	3
+
+	1	TCP 54.161.101.85:80 <-> 192.168.2.105:59144 [proto: 291.265/MpegDash.AmazonAWS][ClearText][Confidence: DPI][cat: Media/1][2 pkts/1649 bytes <-> 2 pkts/323 bytes][Goodput ratio: 92/59][0.01 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (OHTTP/1.1 200 OK)][Plen Bins: 0,0,33,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0]
+	2	TCP 192.168.2.105:59142 <-> 54.161.101.85:80 [proto: 291.265/MpegDash.AmazonAWS][ClearText][Confidence: DPI][cat: Cloud/13][3 pkts/390 bytes <-> 1 pkts/74 bytes][Goodput ratio: 47/0][0.10 sec][Hostname/SNI: livesim.dashif.org][User-Agent: VLC/3.0.16 LibVLC/3.0.16][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (IGET /livesim/sts)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 192.168.2.105:59146 -> 54.161.101.85:80 [proto: 291.265/MpegDash.AmazonAWS][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/257 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Hostname/SNI: livesim.dashif.org][User-Agent: VLC/3.0.16 LibVLC/3.0.16][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (GET /livesim/sts)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
