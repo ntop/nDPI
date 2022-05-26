@@ -1104,8 +1104,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "Google", NDPI_PROTOCOL_CATEGORY_WEB,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYPE_CALL,
-			  "SkypeCall", NDPI_PROTOCOL_CATEGORY_VOIP,
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYPE_TEAMS_CALL,
+			  "Skype_TeamsCall", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TIKTOK,
@@ -5250,7 +5250,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     break;
 
   case NDPI_PROTOCOL_SKYPE_TEAMS:
-  case NDPI_PROTOCOL_SKYPE_CALL:
+  case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
     if(flow->is_ipv6 == 0
        && flow->l4_proto == IPPROTO_UDP
        && ndpi_str->msteams_cache) {
