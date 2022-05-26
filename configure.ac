@@ -39,16 +39,16 @@ LT_INIT
 LT_LIB_M
 PKG_PROG_PKG_CONFIG
 
+AC_PROG_CC
+
 SYSTEM=`uname -s`
 if test $SYSTEM = "Darwin"; then
 dnl>  AC_PROG_CC(clang gcc)
   AM_PROG_CC_C_O(clang gcc)
   AC_PROG_CXX(clang++ g++)
-  AC_PROG_CC
 else
   AC_PROG_CC_C_O
   AC_PROG_CXX
-  AC_PROG_CC
 fi
 
 dnl> Can't iuse AM_PROG_AR because not all of our Makefiles are automake (yet?)
