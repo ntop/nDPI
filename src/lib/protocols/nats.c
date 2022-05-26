@@ -28,13 +28,12 @@ static const char* commands[] =
    "INFO {",
    "CONNECT {",
    "PUB ",
-   "SUB",
+   "SUB ",
    "UNSUB ",
    "MSG ",
    "PING",
    "PONG",
-   "+OK",
-   "-ERR",
+
    NULL
   };
 
@@ -49,19 +48,14 @@ void ndpi_search_nats_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     int i;
 
     for(i=0; commands[i] != NULL; i++) {
-      char *match = ndpi_strnstr((const char *)packet->payload,
-				 commands[i],
-				 ndpi_min(strlen(commands[i]), packet->payload_packet_len));
+      int len = ndpi_min(strlen(commands[i]), packet->payload_packet_len);
+      int rc = strncmp((const char *)packet->payload, commands[i], len);
+      
+      if(rc != 0) continue;
 
-      if(!match) continue;
-
-      /* These commands are used by POP3 too. To avoid false positives, look for the other ones */
-      if((strcmp(commands[i], "+OK") == 0) || (strcmp(commands[i], "-ERR") == 0)) {
-        return;
-      }
-
-      if(ndpi_strnstr((const char *)match, "\r\n",
-		      packet->payload_packet_len - ((size_t)match - (size_t)packet->payload)) != NULL) {
+      if(ndpi_strnstr((const char *)packet->payload,
+		      "\r\n",
+		      packet->payload_packet_len) != NULL) {
 	NDPI_LOG_INFO(ndpi_struct, "found NATS\n");
 
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NATS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
