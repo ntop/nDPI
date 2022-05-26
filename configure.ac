@@ -1,4 +1,4 @@
-AC_INIT([libndpi], [4.3.0])
+AC_INIT([libndpi],[4.3.0])
 
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_MACRO_DIR([m4])
@@ -44,11 +44,11 @@ if test $SYSTEM = "Darwin"; then
 dnl>  AC_PROG_CC(clang gcc)
   AM_PROG_CC_C_O(clang gcc)
   AC_PROG_CXX(clang++ g++)
-  AC_PROG_CC_STDC(clang gcc)
+  AC_PROG_CC
 else
   AC_PROG_CC_C_O
   AC_PROG_CXX
-  AC_PROG_CC_STDC
+  AC_PROG_CC
 fi
 
 dnl> Can't iuse AM_PROG_AR because not all of our Makefiles are automake (yet?)
@@ -281,7 +281,7 @@ dnl> GeoIP
 AC_ARG_WITH(maxminddb,          [  --with-maxminddb        Enable nDPI build with libmaxminddb])
 if test "${with_maxminddb+set}" = set; then :
   AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
-  AC_HAVE_HEADERS(maxminddb.h)
+  AC_CHECK_HEADERS([maxminddb.h])
   if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" && test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
     ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lmaxminddb"
     AC_DEFINE_UNQUOTED(HAVE_MAXMINDDB, 1, [MaxMind DB support])
