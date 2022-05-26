@@ -72,10 +72,15 @@ clean:
 	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo libndpi.so*
 
 distdir:
-	cp ndpi_content_match.c.inc '$(distdir)/'
 	find . -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
-	find ../include -type f -name '*.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
-	find . -type f -name '*.c' -o -name '*.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
+	find ../include -type f -name '*.h' \
+		-a '!' -name 'ndpi_api.h' \
+		-a '!' -name 'ndpi_config.h' \
+		-a '!' -name 'ndpi_define.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
+	find . -type f -name '*.c' \
+		-o -name '*.cc' \
+		-o -name '*.c.inc' \
+		-o -name '*.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
 
 distclean: clean
 	/bin/rm -f Makefile

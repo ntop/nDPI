@@ -329,10 +329,11 @@ jobs:
         if: startsWith(matrix.arch, 'x86_64') && startsWith(matrix.os, 'windows')
         run: |
           msys2 -c './tests/do-dga.sh'
-      - name: Generate tarball
+      - name: Generate/Verify tarball
         if: startsWith(matrix.os, 'ubuntu-latest') && startsWith(matrix.arch, 'x86_64')
         run: |
           make dist
+          ./utils/verify_dist_tarball.sh
       - name: Generate documentation
         if: startsWith(matrix.os, 'ubuntu-latest') && startsWith(matrix.arch, 'x86_64')
         run: |
