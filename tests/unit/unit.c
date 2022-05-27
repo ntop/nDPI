@@ -317,6 +317,76 @@ int serializeProtoUnitTest(void)
 
 /* *********************************************** */
 
+static int reassmbleUnitTest()
+{
+  u_int8_t const * org_payload = NULL;
+  u_int16_t org_payload_len;
+  char const * const packets[] = { "There", " ", "is", " ", "some", " ", "payload", " ", "on", " ", "the", " ", "wire!" };
+  struct ndpi_packet_struct packet = {};
+  struct ndpi_reasm reasm = {};
+  size_t i, j;
+
+  assert(ndpi_reassemble_in_progress(&reasm) == 0);
+  assert(ndpi_reassemble_is_complete(&reasm) != 0);
+  for (i = 0; i < NDPI_ARRAY_LENGTH(packets); ++i)
+  {
+    ndpi_reassemble_set_buffer_len(&reasm, reasm.buf_req + strlen(packets[i]));
+    assert(ndpi_reassemble_is_complete(&reasm) == 0);
+    assert(ndpi_reassemble_in_progress(&reasm) != 0);
+
+    packet.payload = (u_int8_t const *)packets[i];
+    packet.payload_packet_len = strlen(packets[i]);
+
+    assert(ndpi_reassemble_payload(&reasm, &packet) == 0);
+  }
+  assert(ndpi_reassemble_in_progress(&reasm) == 0);
+  assert(ndpi_reassemble_is_complete(&reasm) != 0);
+
+  ndpi_reassemble_swap_payload(&packet, &reasm, &org_payload, &org_payload_len);
+
+  j = 0;
+  for (i = 0; i < NDPI_ARRAY_LENGTH(packets); ++i)
+  {
+    assert(strncmp((char *)&packet.payload[j], packets[i], strlen(packets[i])) == 0);
+    j += strlen(packets[i]);
+  }
+  assert(j == packet.payload_packet_len);
+
+  ndpi_reassemble_swap_payload(&packet, &reasm, &org_payload, &org_payload_len);
+
+  free(reasm.buf);
+  free(reasm.buf_bitmap);
+  memset(&reasm, 0, sizeof(reasm));
+
+  assert(ndpi_reassemble_in_progress(&reasm) == 0);
+  assert(ndpi_reassemble_is_complete(&reasm) != 0);
+  j = 0;
+  for (i = 0; i < NDPI_ARRAY_LENGTH(packets); ++i)
+  {
+    j += strlen(packets[i]);
+  }
+  ndpi_reassemble_set_buffer_len(&reasm, j);
+  assert(ndpi_reassemble_is_complete(&reasm) == 0);
+  for (i = NDPI_ARRAY_LENGTH(packets); i > 0; --i)
+  {
+    assert(ndpi_reassemble_is_complete(&reasm) == 0);
+    assert(ndpi_reassemble_in_progress(&reasm) != 0);
+
+    j -= strlen(packets[i - 1]);
+    assert(ndpi_reassemble(&reasm, (u_int8_t const *)packets[i - 1], strlen(packets[i - 1]), j) == 0);
+  }
+
+  free(reasm.buf);
+  free(reasm.buf_bitmap);
+  memset(&reasm, 0, sizeof(reasm));
+
+  printf("%30s                      OK\n", __FUNCTION__);
+
+  return 0;
+}
+
+/* *********************************************** */
+
 int main(int argc, char **argv) {
 #ifndef WIN32
   int c;
@@ -355,6 +425,7 @@ int main(int argc, char **argv) {
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
+  if (reassmbleUnitTest() != 0) return -1;
 
   return 0;
 }

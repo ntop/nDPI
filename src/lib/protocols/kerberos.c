@@ -322,30 +322,27 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef KERBEROS_DEBUG
   printf("\n[Kerberos] Process packet [len: %u]\n", packet->payload_packet_len);
 #endif
-    
-  if(flow->kerberos_buf.pktbuf != NULL) {
-    u_int missing = flow->kerberos_buf.pktbuf_maxlen - flow->kerberos_buf.pktbuf_currlen;
 
-    if(packet->payload_packet_len <= missing) {
-      memcpy(&flow->kerberos_buf.pktbuf[flow->kerberos_buf.pktbuf_currlen], packet->payload, packet->payload_packet_len);
-      flow->kerberos_buf.pktbuf_currlen += packet->payload_packet_len;
-
-      if(flow->kerberos_buf.pktbuf_currlen == flow->kerberos_buf.pktbuf_maxlen) {
-	original_packet_payload = packet->payload;
-	original_payload_packet_len = packet->payload_packet_len;
-	packet->payload = (u_int8_t *)flow->kerberos_buf.pktbuf;
-	packet->payload_packet_len = flow->kerberos_buf.pktbuf_currlen;
+  if (ndpi_reassemble_in_progress(&flow->reassemble) != 0)
+  {
+    if (ndpi_reassemble_payload(&flow->reassemble, packet) != 0)
+    {
+      return;
+    }
+    if (ndpi_reassemble_is_complete(&flow->reassemble) != 0)
+    {
+      ndpi_reassemble_swap_payload(packet, &flow->reassemble, &original_packet_payload,
+                                   &original_payload_packet_len);
 #ifdef KERBEROS_DEBUG
-	printf("[Kerberos] Packet is now full: processing\n");
+      printf("[Kerberos] Packet is now full: processing\n");
 #endif
-      } else {
+    } else {
 #ifdef KERBEROS_DEBUG
-	printf("[Kerberos] Missing %u bytes: skipping\n",
-	       flow->kerberos_buf.pktbuf_maxlen - flow->kerberos_buf.pktbuf_currlen);
+        printf("[Kerberos] Missing %u bytes: skipping\n",
+               flow->reassemble.buf_len - flow->reassemble.buf_last_pos);
 #endif
 
-	return;
-      }
+        return;
     }
   }
 
@@ -356,44 +353,30 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
     if(packet->tcp) {
       kerberos_len = ntohl(get_u_int32_t(packet->payload, 0)),
-	expected_len = packet->payload_packet_len - 4;
+      expected_len = packet->payload_packet_len - 4;
       base_offset = 4;
-    } else
+    } else {
       base_offset = 0, kerberos_len = expected_len = packet->payload_packet_len;
+    }
 
 #ifdef KERBEROS_DEBUG
     printf("[Kerberos] [Kerberos len: %u][expected_len: %u]\n", kerberos_len, expected_len);
 #endif
 
-    if(kerberos_len < 12000) {
+    if (kerberos_len < 12000 && packet->tcp != NULL &&
+        kerberos_len > expected_len) {
       /*
-	Kerberos packets might be too long for a TCP packet
-	so it could be split across two packets. Instead of
-	rebuilding the stream we use a heuristic approach
-      */
-      if(kerberos_len > expected_len) {
-	if(packet->tcp) {
-	  if(flow->kerberos_buf.pktbuf == NULL) {
-	    flow->kerberos_buf.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
-
-	    if(flow->kerberos_buf.pktbuf != NULL) {
-	      flow->kerberos_buf.pktbuf_maxlen = kerberos_len+4;	      
+       * Kerberos packets might be too long for a TCP packet
+       * so it could be split across two packets. Instead of
+       * rebuilding the stream we use a heuristic approach
+       */
+      ndpi_reassemble_set_buffer_len(&flow->reassemble, kerberos_len + 4);
+      ndpi_reassemble_payload(&flow->reassemble, packet);
 #ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Allocated %u bytes\n", flow->kerberos_buf.pktbuf_maxlen);
-#endif	      
-	    }
-	  }
-	  
-	  if(flow->kerberos_buf.pktbuf != NULL) {
-	    if(packet->payload_packet_len <= flow->kerberos_buf.pktbuf_maxlen) {
-	      memcpy(flow->kerberos_buf.pktbuf, packet->payload, packet->payload_packet_len);
-	      flow->kerberos_buf.pktbuf_currlen = packet->payload_packet_len;
-	    }
-	  }
-	}
-	
-	return;
-      } else if(kerberos_len == expected_len) {
+      printf("[Kerberos] Allocated %u bytes\n", flow->reassemble.buf_len);
+#endif
+      return;
+    } else if(kerberos_len == expected_len) {
 	if(packet->payload_packet_len > 64) {
 	  u_int16_t koffset, i;
 
@@ -611,12 +594,10 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 		    ndpi_snprintf(flow->protos.kerberos.domain, sizeof(flow->protos.kerberos.domain), "%s", realm_str);
 
 		    /* If necessary we can decode sname */
-		    if(flow->kerberos_buf.pktbuf) {
-			    ndpi_free(flow->kerberos_buf.pktbuf);
-			    packet->payload = original_packet_payload;
-			    packet->payload_packet_len = original_payload_packet_len;
+		    if(ndpi_reassemble_in_progress(&flow->reassemble) != 0) {
+                ndpi_reassemble_swap_payload(packet, &flow->reassemble, &original_packet_payload,
+                                             &original_payload_packet_len);
 		    }
-		    flow->kerberos_buf.pktbuf = NULL;
 		  }
 		}
 	      }
@@ -629,14 +610,13 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	        flow->extra_packets_func = ndpi_search_kerberos_extra;
 	      }
 
-	      if(flow->kerberos_buf.pktbuf != NULL) {
-		ndpi_free(flow->kerberos_buf.pktbuf);
-		packet->payload = original_packet_payload;
-		packet->payload_packet_len = original_payload_packet_len;
-		flow->kerberos_buf.pktbuf = NULL;
-	      }
-
-	      return;
+          if (ndpi_reassemble_in_progress(&flow->reassemble) != 0)
+          {
+            ndpi_reassemble_swap_payload(packet, &flow->reassemble, &original_packet_payload,
+                                         &original_payload_packet_len);
+            // XXX: Free reassemble data?
+           }
+           return;
 	    } else if(msg_type == 0x0d) /* TGS-REP */ {
 	      NDPI_LOG_DBG(ndpi_struct, "[Kerberos] Processing TGS-REP\n");
 
@@ -659,9 +639,8 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	    }
 
 	    return;
-	  }
-	}
       }
+	}
     } else {
 #ifdef KERBEROS_DEBUG
       printf("[Kerberos][s/dport: %u/%u] Skipping packet: too long [kerberos_len: %u]\n",
@@ -679,17 +658,9 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
 #ifdef KERBEROS_DEBUG
   printf("[Kerberos] Extra function\n");
 #endif
-
-  /* Unfortunately, generic "extra function" code doesn't honour protocol bitmask */
-  /* TODO: handle that in ndpi_main.c for all the protocols */
-  if(packet->payload_packet_len == 0 ||
-     packet->tcp_retransmission)
-    return 1;
 
   /* Possibly dissect the reply */
   ndpi_search_kerberos(ndpi_struct, flow);

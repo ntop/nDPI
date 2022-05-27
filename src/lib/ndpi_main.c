@@ -4895,9 +4895,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->http.detected_os)
       ndpi_free(flow->http.detected_os);
 
-    if(flow->kerberos_buf.pktbuf)
-      ndpi_free(flow->kerberos_buf.pktbuf);
-
     if(flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
        flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
@@ -4930,12 +4927,13 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 	ndpi_free(flow->l4.tcp.tls.message[1].buffer);
     }
 
-    if(flow->l4_proto == IPPROTO_UDP) {
-      if(flow->l4.udp.quic_reasm_buf){
-        ndpi_free(flow->l4.udp.quic_reasm_buf);
-        if(flow->l4.udp.quic_reasm_buf_bitmap)
-          ndpi_free(flow->l4.udp.quic_reasm_buf_bitmap);
-      }
+    if (flow->reassemble.buf != NULL)
+    {
+      ndpi_free(flow->reassemble.buf);
+    }
+    if (flow->reassemble.buf_bitmap != NULL)
+    {
+      ndpi_free(flow->reassemble.buf_bitmap);
     }
   }
 }

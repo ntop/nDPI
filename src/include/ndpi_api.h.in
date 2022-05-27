@@ -1823,6 +1823,21 @@ extern "C" {
 				char *out, u_int out_len,
 				u_int8_t use_json);
 
+  /* ******************************* */
+
+  void ndpi_reassemble_set_buffer_len(struct ndpi_reasm * const reasm,
+                                      u_int64_t buffer_len);
+  int ndpi_reassemble(struct ndpi_reasm * const reasm, uint8_t const * const frag,
+                      uint64_t frag_len, uint64_t frag_offset);
+  int ndpi_reassemble_payload(struct ndpi_reasm * const reasm,
+                              struct ndpi_packet_struct * packet);
+  void ndpi_reassemble_swap_payload(struct ndpi_packet_struct * packet,
+                                    struct ndpi_reasm const * reasm,
+                                    u_int8_t const ** const original_payload,
+                                    u_int16_t * original_payload_packet_len);
+  int ndpi_reassemble_in_progress(struct ndpi_reasm * const reasm);
+  int ndpi_reassemble_is_complete(struct ndpi_reasm * const reasm);
+
 #ifdef __cplusplus
 }
 #endif

@@ -647,6 +647,14 @@ struct ndpi_lru_cache {
   struct ndpi_lru_cache_entry *entries;
 };
 
+struct ndpi_reasm {
+  u_int8_t *buf;
+  u_int8_t *buf_bitmap;
+  u_int32_t buf_last_pos;
+  u_int32_t buf_req;
+  u_int32_t buf_len;
+};
+
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
@@ -807,11 +815,6 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_WIREGUARD */
   u_int8_t wireguard_stage;
   u_int32_t wireguard_peer_index[2];
-
-  /* NDPI_PROTOCOL_QUIC */
-  u_int8_t *quic_reasm_buf;
-  u_int8_t *quic_reasm_buf_bitmap;
-  u_int32_t quic_reasm_buf_last_pos;
 
   /* NDPI_PROTOCOL_CSGO */
   u_int8_t csgo_strid[18],csgo_state,csgo_s2;
@@ -1293,6 +1296,8 @@ struct ndpi_flow_struct {
     struct ndpi_flow_udp_struct udp;
   } l4;
 
+  struct ndpi_reasm reassemble;
+
   /* Some protocols calculate the entropy. */
   float entropy;
 
@@ -1329,16 +1334,6 @@ struct ndpi_flow_struct {
     char *detected_os; /* Via HTTP/QUIC User-Agent */
     char *nat_ip; /* Via HTTP X-Forwarded-For */
   } http;
-
-  /*
-     Put outside of the union to avoid issues in case the protocol
-     is remapped to somethign pther than Kerberos due to a faulty
-     dissector
-  */
-  struct {
-    char *pktbuf;
-    u_int16_t pktbuf_maxlen, pktbuf_currlen;
-  } kerberos_buf;
 
   struct {
     u_int8_t num_udp_pkts, num_binding_requests;
