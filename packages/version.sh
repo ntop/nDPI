@@ -1,8 +1,8 @@
 #!/bin/bash
 
 SCRIPTPATH="$(cd "$(dirname "$0")"; pwd -P)"
-RELEASE="$(cd ${SCRIPTPATH}; cat ../configure.ac|grep C_INIT|cut -c 21-|rev|cut -c 3-|rev)"
-MAJOR_RELEASE="$(cd ${SCRIPTPATH}; cat ../configure.ac|grep C_INIT|cut -c 21-|rev|cut -c 3-|rev|cut -d. -f1)"
+RELEASE="$(cd ${SCRIPTPATH}; cat ../configure.ac|grep C_INIT|cut -c 20-|rev|cut -c 3-|rev)"
+MAJOR_RELEASE="$(cd ${SCRIPTPATH}; cat ../configure.ac|grep C_INIT|cut -c 20-|rev|cut -c 3-|rev|cut -d. -f1)"
 REVISION="$(cd ${SCRIPTPATH}; git rev-list --all |wc -l | tr -d '[[:space:]]')"
 
 get_release() {
