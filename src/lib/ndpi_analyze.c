@@ -323,6 +323,11 @@ int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int16_t num_bins
     if((b->u.bins32 = (u_int32_t*)ndpi_calloc(num_bins, sizeof(u_int32_t))) == NULL)
       return(-1);
     break;
+
+  case ndpi_bin_family64:
+    if((b->u.bins64 = (u_int64_t*)ndpi_calloc(num_bins, sizeof(u_int64_t))) == NULL)
+      return(-1);
+    break;
   }
 
   return(0);
@@ -340,6 +345,9 @@ void ndpi_free_bin(struct ndpi_bin *b) {
     break;
   case ndpi_bin_family32:
     ndpi_free(b->u.bins32);
+    break;
+  case ndpi_bin_family64:
+    ndpi_free(b->u.bins64);
     break;
   }
 }
@@ -377,6 +385,14 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
     } else
       memcpy(out->u.bins32, b->u.bins32, out->num_bins*sizeof(u_int32_t));
     break;
+
+  case ndpi_bin_family64:
+    if((out->u.bins64 = (u_int64_t*)ndpi_calloc(out->num_bins, sizeof(u_int64_t))) == NULL) {
+      ndpi_free(out);
+      return(NULL);
+    } else
+      memcpy(out->u.bins64, b->u.bins64, out->num_bins*sizeof(u_int64_t));
+    break;
   }
 
   return(out);
@@ -384,7 +400,7 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
 
 /* ********************************************************************************* */
 
-void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t val) {
+void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
   if(slot_id >= b->num_bins) slot_id = 0;
 
   switch(b->family) {
@@ -397,12 +413,15 @@ void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t val) {
   case ndpi_bin_family32:
     b->u.bins32[slot_id] = (u_int32_t)val;
     break;
+  case ndpi_bin_family64:
+    b->u.bins64[slot_id] = (u_int64_t)val;
+    break;
   }
 }
 
 /* ********************************************************************************* */
 
-void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t val) {
+void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
   b->is_empty = 0;
 
   if(slot_id >= b->num_bins) slot_id = 0;
@@ -417,12 +436,15 @@ void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t val) {
   case ndpi_bin_family32:
     b->u.bins32[slot_id] += (u_int32_t)val;
     break;
+  case ndpi_bin_family64:
+    b->u.bins64[slot_id] += (u_int64_t)val;
+    break;
   }
 }
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
+u_int64_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
   if(slot_id >= b->num_bins) slot_id = 0;
 
   switch(b->family) {
@@ -434,6 +456,9 @@ u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
     break;
   case ndpi_bin_family32:
     return(b->u.bins32[slot_id]);
+    break;
+  case ndpi_bin_family64:
+    return(b->u.bins64[slot_id]);
     break;
   }
 
@@ -454,6 +479,9 @@ void ndpi_reset_bin(struct ndpi_bin *b) {
     break;
   case ndpi_bin_family32:
     memset(b->u.bins32, 0, sizeof(u_int32_t)*b->num_bins);
+    break;
+  case ndpi_bin_family64:
+    memset(b->u.bins64, 0, sizeof(u_int64_t)*b->num_bins);
     break;
   }
 }
@@ -495,6 +523,15 @@ void ndpi_normalize_bin(struct ndpi_bin *b) {
 	b->u.bins32[i] = (b->u.bins32[i]*100) / tot;
     }
     break;
+
+  case ndpi_bin_family64:
+    for(i=0; i<b->num_bins; i++) tot += b->u.bins64[i];
+
+    if(tot > 0) {
+      for(i=0; i<b->num_bins; i++)
+	b->u.bins64[i] = (b->u.bins64[i]*100) / tot;
+    }
+    break;
   }
 }
 
@@ -531,6 +568,15 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
   case ndpi_bin_family32:
     for(i=0; i<b->num_bins; i++) {
       int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
+
+      if(rc < 0) break;
+      len += rc;
+    }
+    break;
+
+  case ndpi_bin_family64:
+    for(i=0; i<b->num_bins; i++) {
+      int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%llu", (i > 0) ? "," : "", (unsigned long long)b->u.bins64[i]);
 
       if(rc < 0) break;
       len += rc;

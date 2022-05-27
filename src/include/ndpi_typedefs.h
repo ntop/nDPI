@@ -1602,7 +1602,8 @@ struct ndpi_hll {
 enum ndpi_bin_family {
    ndpi_bin_family8,
    ndpi_bin_family16,
-   ndpi_bin_family32
+   ndpi_bin_family32,
+   ndpi_bin_family64,
 };
 
 struct ndpi_bin {
@@ -1614,6 +1615,7 @@ struct ndpi_bin {
     u_int8_t  *bins8; /* num_bins bins */
     u_int16_t *bins16; /* num_bins bins */
     u_int32_t *bins32; /* num_bins bins */
+    u_int64_t *bins64; /* num_bins bins */
   } u;
 };
 
