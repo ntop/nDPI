@@ -165,12 +165,14 @@ void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x10: /* Connection Request Accepted */
     case 0x13: /* New Incoming Connection */
       {
+	size_t i;
+
         ip_addr_offset = 4 + raknet_dissect_ip(packet, 0);
         if (op == 0x10)
         {
           ip_addr_offset += 2; // System Index
         }
-        for (size_t i = 0; i < 10; ++i)
+        for (i = 0; i < 10; ++i)
         {
           ip_addr_offset += 3 + raknet_dissect_ip(packet, ip_addr_offset);
         }

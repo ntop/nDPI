@@ -66,8 +66,8 @@ void ndpi_search_tftp(struct ndpi_detection_module_struct
 
         {
           char const * const possible_modes[] = { "netascii", "octet", "mail" };
-          uint8_t mode_found = 0;
-          for (uint8_t mode_idx = 0; mode_idx < sizeof(possible_modes) / sizeof(possible_modes[0]); ++mode_idx)
+          uint8_t mode_found = 0, mode_idx;
+          for(mode_idx = 0; mode_idx < sizeof(possible_modes) / sizeof(possible_modes[0]); ++mode_idx)
           {
             size_t const mode_len = strlen(possible_modes[mode_idx]);
 

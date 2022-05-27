@@ -350,6 +350,7 @@ static gcry_error_t hkdf_expand(int hashalgo, const uint8_t *prk, uint32_t prk_l
   gcry_md_hd_t h;
   gcry_error_t err;
   const unsigned int hash_len = gcry_md_get_algo_dlen(hashalgo);
+  uint32_t offset;
 
   /* Some sanity checks */
   if(!(out_len > 0 && out_len <= 255 * hash_len) ||
@@ -362,7 +363,7 @@ static gcry_error_t hkdf_expand(int hashalgo, const uint8_t *prk, uint32_t prk_l
     return err;
   }
 
-  for(uint32_t offset = 0; offset < out_len; offset += hash_len) {
+  for(offset = 0; offset < out_len; offset += hash_len) {
     gcry_md_reset(h);
     gcry_md_setkey(h, prk, prk_len); /* Set PRK */
     if(offset > 0) {
@@ -654,7 +655,7 @@ static int quic_ciphers_prepare(struct ndpi_detection_module_struct *ndpi_struct
 				quic_ciphers *ciphers, int hash_algo, int cipher_algo, int cipher_mode, uint8_t *secret, u_int32_t version)
 {
   return quic_hp_cipher_prepare(ndpi_struct, &ciphers->hp_cipher, hash_algo, cipher_algo, secret, version) &&
-         quic_pp_cipher_prepare(ndpi_struct, &ciphers->pp_cipher, hash_algo, cipher_algo, cipher_mode, secret, version);
+    quic_pp_cipher_prepare(ndpi_struct, &ciphers->pp_cipher, hash_algo, cipher_algo, cipher_mode, secret, version);
 }
 /**
  * Given a header protection cipher, a buffer and the packet number offset,
@@ -712,8 +713,8 @@ static int quic_decrypt_header(const uint8_t *packet_payload,
 
   uint8_t pkn_bytes[4];
   memcpy(pkn_bytes, packet_payload + pn_offset, pkn_len);
-  uint32_t pkt_pkn = 0;
-  for(uint32_t i = 0; i < pkn_len; i++) {
+  uint32_t pkt_pkn = 0, i;
+  for(i = 0; i < pkn_len; i++) {
     pkt_pkn |= (uint32_t)(pkn_bytes[i] ^ mask[1 + i]) << (8 * (pkn_len - 1 - i));
   }
   *first_byte = packet0;
@@ -739,7 +740,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
   uint8_t nonce[TLS13_AEAD_NONCE_LENGTH];
   uint8_t *buffer;
   uint8_t atag[16];
-  uint32_t buffer_length;
+  uint32_t buffer_length, i;
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   char buferr[128];
 #endif
@@ -748,7 +749,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
      !(pp_cipher->pp_cipher != NULL) ||
      !(pkn_len < header_length) ||
      !(1 <= pkn_len && pkn_len <= 4)) {
-      NDPI_LOG_DBG(ndpi_struct, "Failed sanity checks\n");
+    NDPI_LOG_DBG(ndpi_struct, "Failed sanity checks\n");
     return;
   }
   /* Copy header, but replace encrypted first byte and PKN by plaintext. */
@@ -756,7 +757,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
   if(!header)
     return;
   header[0] = first_byte;
-  for(uint32_t i = 0; i < pkn_len; i++) {
+  for( i = 0; i < pkn_len; i++) {
     header[header_length - 1 - i] = (uint8_t)(packet_number >> (8 * i));
   }
 
@@ -835,36 +836,36 @@ static int quic_derive_initial_secrets(struct ndpi_detection_module_struct *ndpi
    * Hash for handshake packets is SHA-256 (output size 32).
    */
   static const uint8_t handshake_salt_draft_22[20] = {
-						      0x7f, 0xbc, 0xdb, 0x0e, 0x7c, 0x66, 0xbb, 0xe9, 0x19, 0x3a,
-						      0x96, 0xcd, 0x21, 0x51, 0x9e, 0xbd, 0x7a, 0x02, 0x64, 0x4a
+    0x7f, 0xbc, 0xdb, 0x0e, 0x7c, 0x66, 0xbb, 0xe9, 0x19, 0x3a,
+    0x96, 0xcd, 0x21, 0x51, 0x9e, 0xbd, 0x7a, 0x02, 0x64, 0x4a
   };
   static const uint8_t handshake_salt_draft_23[20] = {
-						      0xc3, 0xee, 0xf7, 0x12, 0xc7, 0x2e, 0xbb, 0x5a, 0x11, 0xa7,
-						      0xd2, 0x43, 0x2b, 0xb4, 0x63, 0x65, 0xbe, 0xf9, 0xf5, 0x02,
+    0xc3, 0xee, 0xf7, 0x12, 0xc7, 0x2e, 0xbb, 0x5a, 0x11, 0xa7,
+    0xd2, 0x43, 0x2b, 0xb4, 0x63, 0x65, 0xbe, 0xf9, 0xf5, 0x02,
   };
   static const uint8_t handshake_salt_draft_29[20] = {
-						      0xaf, 0xbf, 0xec, 0x28, 0x99, 0x93, 0xd2, 0x4c, 0x9e, 0x97,
-						      0x86, 0xf1, 0x9c, 0x61, 0x11, 0xe0, 0x43, 0x90, 0xa8, 0x99
+    0xaf, 0xbf, 0xec, 0x28, 0x99, 0x93, 0xd2, 0x4c, 0x9e, 0x97,
+    0x86, 0xf1, 0x9c, 0x61, 0x11, 0xe0, 0x43, 0x90, 0xa8, 0x99
   };
   static const uint8_t hanshake_salt_draft_q50[20] = {
-						      0x50, 0x45, 0x74, 0xEF, 0xD0, 0x66, 0xFE, 0x2F, 0x9D, 0x94,
-						      0x5C, 0xFC, 0xDB, 0xD3, 0xA7, 0xF0, 0xD3, 0xB5, 0x6B, 0x45
+    0x50, 0x45, 0x74, 0xEF, 0xD0, 0x66, 0xFE, 0x2F, 0x9D, 0x94,
+    0x5C, 0xFC, 0xDB, 0xD3, 0xA7, 0xF0, 0xD3, 0xB5, 0x6B, 0x45
   };
   static const uint8_t hanshake_salt_draft_t50[20] = {
-						      0x7f, 0xf5, 0x79, 0xe5, 0xac, 0xd0, 0x72, 0x91, 0x55, 0x80,
-						      0x30, 0x4c, 0x43, 0xa2, 0x36, 0x7c, 0x60, 0x48, 0x83, 0x10
+    0x7f, 0xf5, 0x79, 0xe5, 0xac, 0xd0, 0x72, 0x91, 0x55, 0x80,
+    0x30, 0x4c, 0x43, 0xa2, 0x36, 0x7c, 0x60, 0x48, 0x83, 0x10
   };
   static const uint8_t hanshake_salt_draft_t51[20] = {
-						      0x7a, 0x4e, 0xde, 0xf4, 0xe7, 0xcc, 0xee, 0x5f, 0xa4, 0x50,
-						      0x6c, 0x19, 0x12, 0x4f, 0xc8, 0xcc, 0xda, 0x6e, 0x03, 0x3d
+    0x7a, 0x4e, 0xde, 0xf4, 0xe7, 0xcc, 0xee, 0x5f, 0xa4, 0x50,
+    0x6c, 0x19, 0x12, 0x4f, 0xc8, 0xcc, 0xda, 0x6e, 0x03, 0x3d
   };
   static const uint8_t handshake_salt_v1[20] = {
-						0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
-						0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
+    0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
+    0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
   };
   static const uint8_t handshake_salt_v2_draft_00[20] = {
-						     0xa7, 0x07, 0xc2, 0x03, 0xa5, 0x9b, 0x47, 0x18, 0x4a, 0x1d,
-						     0x62, 0xca, 0x57, 0x04, 0x06, 0xea, 0x7a, 0xe3, 0xe5, 0xd3
+    0xa7, 0x07, 0xc2, 0x03, 0xa5, 0x9b, 0x47, 0x18, 0x4a, 0x1d,
+    0x62, 0xca, 0x57, 0x04, 0x06, 0xea, 0x7a, 0xe3, 0xe5, 0xd3
   };
   gcry_error_t err;
   uint8_t secret[HASH_SHA2_256_LENGTH];
@@ -1007,9 +1008,9 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
 }
 
 static void update_reasm_buf_bitmap(u_int8_t *buffer_bitmap,
-                                const u_int32_t buffer_bitmap_size,
-                                const u_int32_t recv_pos,
-                                const u_int32_t recv_len)
+				    const u_int32_t buffer_bitmap_size,
+				    const u_int32_t recv_pos,
+				    const u_int32_t recv_len)
 {
   if (!recv_len || !buffer_bitmap_size || recv_pos + recv_len > buffer_bitmap_size * 8)
     return;
@@ -1020,7 +1021,9 @@ static void update_reasm_buf_bitmap(u_int8_t *buffer_bitmap,
   if (start_byte == end_byte)
     buffer_bitmap[start_byte] |= (((1U << recv_len) - 1U) << start_bit); // fill from bit 'start_bit' until bit 'end_bit', both inclusive
   else{
-    for (u_int32_t i = start_byte + 1; i <= end_byte - 1; i++)
+    u_int32_t i;
+
+    for (i = start_byte + 1; i <= end_byte - 1; i++)
       buffer_bitmap[i] = 0xff; // completely received byte
     buffer_bitmap[start_byte] |= ~((1U << start_bit) - 1U); // fill from bit 'start_bit' until bit 7, both inclusive
     buffer_bitmap[end_byte] |= (1U << (end_bit + 1U)) - 1U; // fill from bit 0 until bit 'end_bit', both inclusive
@@ -1032,8 +1035,9 @@ static int is_reasm_buf_complete(const u_int8_t *buffer_bitmap,
 {
   const u_int32_t complete_bytes = buffer_len / 8;
   const u_int32_t remaining_bits = buffer_len % 8;
+  u_int32_t i;
 
-  for(u_int32_t i = 0; i < complete_bytes; i++)
+  for(i = 0; i < complete_bytes; i++)
     if (buffer_bitmap[i] != 0xff)
       return 0;
 
@@ -1084,8 +1088,8 @@ static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len)
 static int is_ch_reassembler_pending(struct ndpi_flow_struct *flow)
 {
   return flow->l4.udp.quic_reasm_buf != NULL &&
-         !(is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, flow->l4.udp.quic_reasm_buf_last_pos)
-            && is_ch_complete(flow->l4.udp.quic_reasm_buf, flow->l4.udp.quic_reasm_buf_last_pos));
+    !(is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, flow->l4.udp.quic_reasm_buf_last_pos)
+      && is_ch_complete(flow->l4.udp.quic_reasm_buf, flow->l4.udp.quic_reasm_buf_last_pos));
 }
 static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 						  struct ndpi_flow_struct *flow,
@@ -1110,7 +1114,7 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
                     &crypto_data, crypto_data_len);
   if(rc == 0) {
     if(is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, *crypto_data_len) &&
-      is_ch_complete(crypto_data, *crypto_data_len)) {
+       is_ch_complete(crypto_data, *crypto_data_len)) {
       NDPI_LOG_DBG2(ndpi_struct, "Reassembler completed!\n");
       return crypto_data;
     }
@@ -1493,10 +1497,10 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
      of traffic with the QUIC bit greased i.e. having a server token.
      Accordind to https://tools.ietf.org/html/draft-thomson-quic-bit-grease-00#section-3.1
      "A client MAY also clear the QUIC Bit in Initial packets that are sent
-      to establish a new connection.  A client can only clear the QUIC Bit
-      if the packet includes a token provided by the server in a NEW_TOKEN
-      frame on a connection where the server also included the
-      grease_quic_bit transport parameter." */
+     to establish a new connection.  A client can only clear the QUIC Bit
+     if the packet includes a token provided by the server in a NEW_TOKEN
+     frame on a connection where the server also included the
+     grease_quic_bit transport parameter." */
   if((*version & 0x0F0F0F0F) == 0x0a0a0a0a &&
      !(pub_bit1 == 1 && pub_bit2 == 1)) {
     NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x with first byte 0x%x\n", *version, first_byte);
@@ -1510,7 +1514,7 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
     if (dest_conn_id_len > QUIC_MAX_CID_LENGTH ||
         source_conn_id_len > QUIC_MAX_CID_LENGTH) {
       NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x invalid CIDs length %u %u",
-		     *version, dest_conn_id_len, source_conn_id_len);
+		    *version, dest_conn_id_len, source_conn_id_len);
       return 0;
     }
   }
@@ -1523,14 +1527,14 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
 /* ***************************************************************** */
 
 static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struct,
-								 struct ndpi_flow_struct *flow, u_int32_t version)
+				 struct ndpi_flow_struct *flow, u_int32_t version)
 {
   /* For the time being we need extra processing in two cases only:
      1) to detect Snapchat calls, i.e. RTP/RTCP multiplxed with QUIC.
-        We noticed that Snapchat uses Q046, without any SNI.
+     We noticed that Snapchat uses Q046, without any SNI.
      2) to reassemble CH fragments on multiple UDP packets.
      These two cases are mutually exclusive
-   */
+  */
 
   if((version == V_Q046 &&
       flow->host_server_name[0] == '\0') ||
@@ -1557,8 +1561,8 @@ static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_stru
   /* We are elaborating a packet following the initial CHLO/ClientHello.
      Two cases:
      1) Mutiplexing QUIC with RTP/RTCP. It should be quite generic, but
-        for the time being, we known only NDPI_PROTOCOL_SNAPCHAT_CALL having
-	such behaviour
+     for the time being, we known only NDPI_PROTOCOL_SNAPCHAT_CALL having
+     such behaviour
      2) CH reasssembling is going on */
   /* TODO: could we unify ndpi_search_quic() and ndpi_search_quic_extra() somehow? */
 
