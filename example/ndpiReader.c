@@ -364,7 +364,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
   if (!flow->bidirectional) {
     array = last_entropy->src2dst_byte_count;
     num_bytes = last_entropy->src2dst_l4_bytes;
-    for (i=0; i<256; i++) {
+    for(i=0; i<256; i++) {
       tmp[i] = last_entropy->src2dst_byte_count[i];
     }
 
@@ -378,7 +378,7 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
       }
     }
   } else {
-    for (i=0; i<256; i++) {
+    for(i=0; i<256; i++) {
       tmp[i] = last_entropy->src2dst_byte_count[i] + last_entropy->dst2src_byte_count[i];
     }
     array = tmp;
@@ -1640,7 +1640,9 @@ static void printFlowSerialized(u_int16_t thread_id,
   ndpi_serialize_start_of_list(serializer, "risks");
   if (flow->risk != NDPI_NO_RISK)
   {
-    for (u_int32_t i = 0; i < NDPI_MAX_RISK; ++i)
+    u_int32_t i;
+
+    for(i = 0; i < NDPI_MAX_RISK; ++i)
     {
       if (NDPI_ISSET_BIT(flow->risk, i) != 0)
       {
@@ -3260,9 +3262,8 @@ static void printFlowsStats() {
     unsigned int i;
 
     num_flows = 0;
-    for (thread_id = 0; thread_id < num_threads; thread_id++) {
-      for (i = 0; i < NUM_ROOTS; i++)
-      {
+    for(thread_id = 0; thread_id < num_threads; thread_id++) {
+      for(i = 0; i < NUM_ROOTS; i++) {
         ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
                    node_print_known_proto_walker, &thread_id);
         ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],

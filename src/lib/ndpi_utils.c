@@ -2260,8 +2260,9 @@ int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 int ndpi_is_printable_string(char * const str, size_t len) {
   int retval = 1;
+  size_t i;
 
-  for (size_t i = 0; i < len; ++i) {
+  for(i = 0; i < len; ++i) {
     if(ndpi_isprint(str[i]) == 0) {
       str[i] = '?';
       retval = 0;
@@ -2274,7 +2275,9 @@ int ndpi_is_printable_string(char * const str, size_t len) {
 /* ******************************************************************** */
 
 int ndpi_is_valid_hostname(char * const str, size_t len) {
-  for (size_t i = 0; i < len; ++i) {
+  size_t i;
+
+  for(i = 0; i < len; ++i) {
     if((str[i] == '.')
        || (str[i] == '-')
        || (str[i] == '_')
@@ -2297,14 +2300,15 @@ int ndpi_is_valid_hostname(char * const str, size_t len) {
 float ndpi_entropy(u_int8_t const * const buf, size_t len) {
   float entropy = 0.0f;
   u_int32_t byte_counters[256];
+  size_t i;
 
   memset(byte_counters, 0, sizeof(byte_counters));
 
-  for (size_t i = 0; i < len; ++i) {
+  for(i = 0; i < len; ++i) {
     byte_counters[buf[i]]++;
   }
 
-  for (size_t i = 0; i < sizeof(byte_counters) / sizeof(byte_counters[0]); ++i) {
+  for(i = 0; i < sizeof(byte_counters) / sizeof(byte_counters[0]); ++i) {
     if(byte_counters[i] == 0) {
       continue;
     }
@@ -2330,7 +2334,7 @@ u_int16_t ndpi_calculate_icmp4_checksum(const u_int8_t * buf, size_t len) {
    * The next two bytes is the checksum, which we want to ignore.
    */
 
-  for (; len > 1; len -= 2) {
+  for(; len > 1; len -= 2) {
     checksum += get_n16bit(buf);
     buf += 2;
   }
