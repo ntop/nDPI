@@ -127,8 +127,6 @@ extern "C" {
 
   extern u_int8_t ndpi_is_proto(ndpi_protocol proto, u_int16_t p);
 
-  extern u_int16_t ndpi_get_lower_proto(ndpi_protocol p);
-
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
 					     const char **file, const char **func, u_int32_t * line);

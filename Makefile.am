@@ -12,13 +12,13 @@ EXTRA_DIST = README.md README.nDPI README.fuzzer.md CHANGELOG.md CONTRIBUTING.md
 	autogen.sh wireshark windows utils packages \
 	influxdb/Makefile.in influxdb/metric_anomaly.c influxdb/README.txt \
 	rrdtool/Makefile.in rrdtool/README.txt rrdtool/rrd_anomaly.c rrdtool/rrd_similarity.c \
-	doc/api.rst doc/conf.py doc/flow_risks.rst doc/guide/nDPI_QuickStartGuide.pages \
+	doc/requirements.txt doc/conf.py doc/flow_risks.rst doc/guide/nDPI_QuickStartGuide.pages \
 		doc/guide/nDPI_QuickStartGuide.pdf doc/img/logo.png doc/index.rst \
 		doc/Makefile doc/what_is_ndpi.rst \
 	python/DEV_GUIDE.md python/dev_requirements.txt python/ndpi_example.py python/ndpi/__init__.py \
 		python/ndpi/ndpi_build.py python/ndpi/ndpi.py python/README.md \
 		python/requirements.txt python/setup.py python/tests.py \
-	sonar-project.properties .github .lgtm/cpp-queries/packet-payload-integer-arithmetic.ql lgtm.yml
+	sonar-project.properties .github .ci-ignore .lgtm/cpp-queries/packet-payload-integer-arithmetic.ql lgtm.yml
 
 
 changelog:

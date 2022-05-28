@@ -22,8 +22,8 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 .PHONY: help
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
-	@echo "  release    to make standalone HTML files for ntop documentation release"
-	@echo "  html       to make standalone HTML files"
+	@echo "  release    to make standalone Doxygen/HTML files for ntop documentation release"
+	@echo "  html       to make standalone Doxygen/HTML files"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 	@echo "  pickle     to make pickle files"
@@ -50,12 +50,15 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)/*
-	cd doxygen; make clean
+	rm -rf $(BUILDDIR)/* api doxygen
 
 .PHONY: html
 html:
-	cd doxygen; make
+	@test -r Doxyfile.cfg || { \
+		echo 'Doxyfile.cfg does not exist; Please run $(realpath ..)/autogen.sh or $(realpath ..)/configure first.'; \
+		false; \
+	}
+	doxygen Doxyfile.cfg
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
