@@ -748,11 +748,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
   }
 
-#if 0
-  if(flow->http_detected)
-    ndpi_http_parse_subprotocol(ndpi_struct, flow);
-#endif
-
   if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
     flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
 
@@ -1295,12 +1290,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
       check_content_type_and_change_protocol(ndpi_struct, flow);
       return;
-    }
-
-    /* If we already detected the HTTP request, we can add the connection and then check for the sub-protocol */
-    if(flow->http_detected) {
-      NDPI_LOG_INFO(ndpi_struct, "found HTTP\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
     }
 
     /* Parse packet line and we look for the subprotocols */
