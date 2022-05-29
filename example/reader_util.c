@@ -541,6 +541,8 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
 #else
   ndpi_free_bin(&flow->payload_len_bin);
 #endif
+
+  if(flow->risk_str) ndpi_free(flow->risk_str);
 }
 
 /* ***************************************************** */
@@ -1036,11 +1038,17 @@ u_int8_t plen2slot(u_int16_t plen) {
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
   u_int i, is_quic = 0;
-
+  char out[128], *s;
+  
   if(!flow->ndpi_flow) return;
 
   flow->info_type = INFO_INVALID;
 
+  s = ndpi_get_flow_risk_info(flow->ndpi_flow, out, sizeof(out));
+
+  if(s != NULL)
+    flow->risk_str = ndpi_strdup(s);
+  
   flow->confidence = flow->ndpi_flow->confidence;
 
   ndpi_snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",

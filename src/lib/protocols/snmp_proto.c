@@ -151,8 +151,12 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
 
 		flow->protos.snmp.error_status = error_status;
 		
-                if(error_status != 0)
-                  ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED);
+                if(error_status != 0) {
+		  char str[64];
+
+		  snprintf(str, sizeof(str), "SNMP Error %d", error_status);
+                  ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
+		}
               }
             }
           }

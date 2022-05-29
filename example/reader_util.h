@@ -198,6 +198,7 @@ typedef struct ndpi_flow_info {
   u_int32_t src2dst_packets, dst2src_packets;
   u_int32_t has_human_readeable_strings;
   char human_readeable_string_buffer[32];
+  char *risk_str;
 
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;

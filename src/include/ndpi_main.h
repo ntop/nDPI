@@ -147,7 +147,8 @@ extern "C" {
 					 const u_int8_t ** l4ptr, u_int16_t * l4len,
 					 u_int8_t * nxt_hdr);
   void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
-		     struct ndpi_flow_struct *flow, ndpi_risk_enum r);
+		     struct ndpi_flow_struct *flow, ndpi_risk_enum r,
+		     char *risk_message);
   int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
 		      struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_is_printable_string(char * const str, size_t len);

@@ -1286,7 +1286,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "http");
     if(flow->host_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "hostname", flow->host_server_name);
-    if(flow->http.url != NULL){
+    if(flow->http.url != NULL) {
       ndpi_serialize_string_string(serializer,   "url", flow->http.url);
       ndpi_serialize_string_uint32(serializer,   "code", flow->http.response_status_code);
       ndpi_serialize_string_string(serializer,   "content_type", flow->http.content_type);
@@ -2239,12 +2239,27 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
 /* ******************************************************************** */
 
 void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
-		   struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
-  ndpi_risk v = 1ull << r;
+		   struct ndpi_flow_struct *flow, ndpi_risk_enum r,
+		   char *risk_message) {
+  /* Check if the risk is not yet set */
+  if(!ndpi_isset_risk(ndpi_str, flow, r)) {
+    ndpi_risk v = 1ull << r;
+    
+    // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
+    flow->risk |= v;
+    
+    ndpi_handle_risk_exceptions(ndpi_str, flow);
 
-  // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
-  flow->risk |= v;
-  ndpi_handle_risk_exceptions(ndpi_str, flow);
+    if(risk_message != NULL) {
+      if(flow->num_risk_infos < MAX_NUM_RISK_INFOS) {
+	char *s = ndpi_strdup(risk_message);
+
+	if(s != NULL) {
+	  flow->risk_infos[flow->num_risk_infos++] = s;
+	}
+      }
+    }
+  }
 }
 
 /* ******************************************************************** */
@@ -2501,6 +2516,32 @@ int ndpi_snprintf(char * str, size_t size, char const * format, ...) {
   va_start(va_args, format);
   int ret = ndpi_vsnprintf(str, size, format, va_args);
   va_end(va_args);
+
   return ret;
 }
 
+/* ******************************************* */
+
+char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
+			      char *out, u_int out_len) {
+  if(out == NULL)
+    return(NULL);
+  else
+    out[0] = '\0';
+
+  if(flow->num_risk_infos) {
+    u_int i, offset = 0;
+    for(i=0; i<flow->num_risk_infos; i++) {
+      int rc = snprintf(&out[offset], out_len-offset, "%s%s",
+			(i == 0) ? "" : " / ",
+			flow->risk_infos[i]);
+
+      if(rc <= 0)
+	break;
+      else
+	offset += rc;
+    }
+  }
+
+  return(out[0] == '\0' ? NULL : out);
+}

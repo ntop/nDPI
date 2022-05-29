@@ -52,14 +52,15 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 /* *********************************************** */
 
 static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_struct *ndpi_struct,
-						 struct ndpi_flow_struct *flow) {
+						 struct ndpi_flow_struct *flow,
+						 char *msg) {
   /*
     Check known exceptions
   */
   if(ndpi_ends_with((char*)flow->host_server_name, ".windowsupdate.com"))
     ;
   else
-    ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER, msg);
  }
 
   /* *********************************************** */
@@ -67,29 +68,30 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
 static void ndpi_analyze_content_signature(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow) {
   u_int8_t set_risk = 0;
+  const char *msg = NULL;
 
   if((flow->initial_binary_bytes_len >= 2) && (flow->initial_binary_bytes[0] == 0x4D) && (flow->initial_binary_bytes[1] == 0x5A))
-   set_risk = 1; /* Win executable */
+    set_risk = 1, msg = "Found Windows Exe"; /* Win executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0x7F) && (flow->initial_binary_bytes[1] == 'E')
 	  && (flow->initial_binary_bytes[2] == 'L') && (flow->initial_binary_bytes[3] == 'F'))
-   set_risk = 1; /* Linux executable */
+    set_risk = 1, msg = "Found Linux Exe"; /* Linux executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0xCF) && (flow->initial_binary_bytes[1] == 0xFA)
 	  && (flow->initial_binary_bytes[2] == 0xED) && (flow->initial_binary_bytes[3] == 0xFE))
-   set_risk = 1; /* Linux executable */
+    set_risk = 1, msg = "Found Linux Exe"; /* Linux executable */
   else if((flow->initial_binary_bytes_len >= 3)
 	  && (flow->initial_binary_bytes[0] == '#')
 	  && (flow->initial_binary_bytes[1] == '!')
 	  && (flow->initial_binary_bytes[2] == '/'))
-   set_risk = 1; /* Unix script (e.g. #!/bin/sh) */
+    set_risk = 1, msg = "Found Unix Script"; /* Unix script (e.g. #!/bin/sh) */
   else if(flow->initial_binary_bytes_len >= 8) {
     u_int8_t exec_pattern[] = { 0x64, 0x65, 0x78, 0x0A, 0x30, 0x33, 0x35, 0x00 };
 
     if(memcmp(flow->initial_binary_bytes, exec_pattern, 8) == 0)
-     set_risk = 1; /* Dalvik Executable (Android) */
+      set_risk = 1, msg = "Found Android Exe"; /* Dalvik Executable (Android) */
   }
 
   if(set_risk)
-    ndpi_set_binary_application_transfer(ndpi_struct, flow);
+    ndpi_set_binary_application_transfer(ndpi_struct, flow, (char*)msg);
 }
 
 /* *********************************************** */
@@ -148,8 +150,13 @@ static void ndpi_http_check_human_redeable_content(struct ndpi_detection_module_
 	 && (content[2] == 0x08)
 	 && (content[3] == 0x00)) {
 	/* Looks like compressed data */
-      } else
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT);
+      } else {
+	char str[32];
+
+	snprintf(str, sizeof(str), "Susp content %02X%02X%02X%02X",
+		 content[0], content[1], content[2], content[3]);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT, str);
+      }
     }
   }
 }
@@ -197,7 +204,7 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
 	  https://corelight.com/blog/detecting-log4j-exploits-via-zeek-when-java-downloads-java
 	*/
 
-	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious Log4J");
       }
     }
 
@@ -258,8 +265,11 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 	    for(i = 0; cmp_mimes[i] != NULL; i++) {
 	      if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
+		char str[64];
+
+		snprintf(str, sizeof(str), "Found mime exe %s", cmp_mimes[i]);
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-		ndpi_set_binary_application_transfer(ndpi_struct, flow);
+		ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
 		NDPI_LOG_INFO(ndpi_struct, "Found executable HTTP transfer");
 		return(flow->category);
 	      }
@@ -287,8 +297,11 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	      /* Use memcmp in case content-disposition contains binary data */
 	      if(memcmp(&packet->content_disposition_line.ptr[attachment_len],
 			binary_file_ext[i], ATTACHMENT_LEN) == 0) {
+		char str[64];
+
+		snprintf(str, sizeof(str), "Found file extn %s", binary_file_ext[i]);
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-		ndpi_set_binary_application_transfer(ndpi_struct, flow);
+		ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
 		NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
 		return(flow->category);
 	      }
@@ -414,7 +427,7 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
 				  struct ndpi_flow_struct *flow,
 				  char const *ua, size_t ua_len) {
   char *double_slash;
-  
+
   if((!ua) || (ua[0] == '\0'))
     return;
 
@@ -438,32 +451,42 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
       }
     }
 
-    if (i == ua_len)
-    {
+    if (i == ua_len) {
       float upper_case_ratio = (float)upper_case_count / (float)ua_len;
-      if (upper_case_ratio >= 0.2f)
-      {
-        ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+
+      if (upper_case_ratio >= 0.2f) {
+	char str[64];
+
+	snprintf(str, sizeof(str), "UA %s", ua);
+        ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
       }
     }
   }
 
   if((!strncmp(ua, "<?", 2))
      || strchr(ua, '$')
-     )
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+     ) {
+    char str[64];
+
+    snprintf(str, sizeof(str), "UA %s", ua);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+  }
 
   if((double_slash = strstr(ua, "://")) != NULL) {
     if(double_slash != ua) /* We're not at the beginning of the user agent */{
       if((double_slash[-1] != 'p') /* http:// */
-	 && (double_slash[-1] != 's') /* https:// */)
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+	 && (double_slash[-1] != 's') /* https:// */) {
+	char str[64];
+
+	snprintf(str, sizeof(str), "UA %s", ua);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+      }
     }
   }
-  
+
   /* no else */
   if(!strncmp(ua, "jndi:ldap://", 12)) /* Log4J */ {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious Log4J");
   } else if(
 	  (ua_len < 4)      /* Too short */
 	  || (ua_len > 256) /* Too long  */
@@ -471,7 +494,7 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
 	  || strchr(ua, '{')
 	  || strchr(ua, '}')
 	  ) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, "Suspicious Log4J");
   }
 
   /*
@@ -484,7 +507,11 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
      || ndpi_strncasestr(ua, "Crawler", ua_len)
      || ndpi_strncasestr(ua, "Bot", ua_len) /* bot/robot */
      ) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT);
+    char str[64];
+
+    snprintf(str, sizeof(str), "UA %s", ua);
+
+    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT, str);
   }
 }
 
@@ -579,8 +606,12 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
     double_dot[0] = '\0';
 
   ip_addr.s_addr = inet_addr(buf);
-  if(strcmp(inet_ntoa(ip_addr), buf) == 0)
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_NUMERIC_IP_HOST);
+  if(strcmp(inet_ntoa(ip_addr), buf) == 0) {
+    char str[64];
+
+    snprintf(str, sizeof(str), "Found host %s", buf);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_NUMERIC_IP_HOST, str);
+  }
 }
 
 /* ************************************************************* */
@@ -651,7 +682,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
        || (flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA)) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RPC, flow->detected_protocol_stack[0], NDPI_CONFIDENCE_DPI);
       check_content_type_and_change_protocol(ndpi_struct, flow);
-    }    
+    }
   }
 
   if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
@@ -681,16 +712,19 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     if(strlen(flow->host_server_name) > 0) {
       ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
-      
+
       if(ndpi_is_valid_hostname(flow->host_server_name,
 				strlen(flow->host_server_name)) == 0) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
-	
+	char str[64];
+
+	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+
 	/* This looks like an attack */
-	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, NULL);
       }
     }
-    
+
     if(packet->forwarded_line.ptr) {
       if(flow->http.nat_ip == NULL) {
         len = packet->forwarded_line.len;
@@ -766,7 +800,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 			"Basic", packet->authorization_line.len)
        || ndpi_strncasestr((const char*)packet->authorization_line.ptr,
 			   "Digest", packet->authorization_line.len)) {
-      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS,
+		    "Found credentials in HTTP Auth Line");
     }
   }
 
@@ -942,55 +977,82 @@ static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_str
     switch(packet->line[i].ptr[0]){
     case 'A':
       if(is_a_suspicious_header(suspicious_http_header_keys_A, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'C':
       if(is_a_suspicious_header(suspicious_http_header_keys_C, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'M':
       if(is_a_suspicious_header(suspicious_http_header_keys_M, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'O':
       if(is_a_suspicious_header(suspicious_http_header_keys_O, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'R':
       if(is_a_suspicious_header(suspicious_http_header_keys_R, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'S':
       if(is_a_suspicious_header(suspicious_http_header_keys_S, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'T':
       if(is_a_suspicious_header(suspicious_http_header_keys_T, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'U':
       if(is_a_suspicious_header(suspicious_http_header_keys_U, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
       break;
     case 'X':
       if(is_a_suspicious_header(suspicious_http_header_keys_X, packet->line[i])) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found %s", packet->line[i].ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
 	return;
       }
 
@@ -998,6 +1060,7 @@ static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_str
     }
   }
 }
+
 /*************************************************************************************************/
 
 static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1036,25 +1099,28 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  buf[3] = '\0';
 
 	  flow->http.response_status_code = atoi(buf);
-	  
+
 	  /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
 	  if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
 	    flow->http.response_status_code = 0; /* Out of range */
 	  else if(flow->http.response_status_code >= 400) {
+	    char ec[48];
+	    
 	    if(flow->http.url != NULL) {
 	      /* Let's check for Wordpress */
 	      char *slash = strchr(flow->http.url, '/');
-	      
+
 	      if(
 		 ((flow->http.method == NDPI_HTTP_METHOD_POST) && (strncmp(slash, "/wp-admin/", 10) == 0))
-		 || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))		 
+		 || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))
 		 ) {
 		/* Example of popular exploits https://www.wordfence.com/blog/2022/05/millions-of-attacks-target-tatsu-builder-plugin/ */
-		ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);	       
+		ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Possible Wordpress Exploit");
 	      }
 	    }
-	    
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED);
+
+	    snprintf(ec, sizeof(ec), "HTTP Error Code %u", flow->http.response_status_code);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, ec);
 	  }
 	}
 
@@ -1158,7 +1224,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       packet->http_method.ptr = packet->line[0].ptr;
       packet->http_method.len = filename_start - 1;
-      
+
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
       flow->l4.tcp.http_stage = packet->packet_direction + 1; // packet_direction 0: stage 1, packet_direction 1: stage 2
       return;
@@ -1341,7 +1407,7 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow) {
   if(!flow) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, (char*)"Unknown HTTP Method");
     return(NDPI_HTTP_METHOD_UNKNOWN);
   } else
     return(flow->http.method);

@@ -169,6 +169,7 @@ typedef struct node_t {
 /* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
 
+#define MAX_NUM_RISK_INFOS    8
 
 /* NDPI_PROTO_BITMASK_STRUCT */
 #ifdef NDPI_CFFI_PREPROCESSING
@@ -1197,7 +1198,9 @@ struct ndpi_flow_struct {
   u_int8_t risk_checked:1, ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:4;
   ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
   ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
-
+  char *risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
+  u_int8_t num_risk_infos;
+  
   /*
     This structure below will not not stay inside the protos
     structure below as HTTP is used by many subprotocols

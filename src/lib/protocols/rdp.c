@@ -52,7 +52,7 @@ void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
       NDPI_LOG_INFO(ndpi_struct, "found RDP\n");
     rdp_found:
       ndpi_int_rdp_add_connection(ndpi_struct, flow);
-      ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION); /* Remote assistance */
+      ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found RDP"); /* Remote assistance */
       return;
     }
 

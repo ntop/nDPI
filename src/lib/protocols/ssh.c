@@ -128,7 +128,7 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
 
   char *rem;
   char *cipher;
-  u_int8_t found_obsolete_cipher = 0;
+  u_int found_obsolete_cipher = 0;
   char *cipher_copy;
   /*
     List of obsolete ciphers can be found at
@@ -161,7 +161,7 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
     
     for(i = 0; obsolete_ciphers[i]; i++) {
       if(strcmp(cipher, obsolete_ciphers[i]) == 0) {
-        found_obsolete_cipher = 1;
+        found_obsolete_cipher = i;
 #ifdef SSH_DEBUG
 	printf("[SSH] [SSH obsolete %s cipher][%s]\n",
 	       is_client_signature ? "client" : "server",
@@ -175,8 +175,12 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(found_obsolete_cipher) {
+    char str[64];
+
+    snprintf(str, sizeof(str), "Found cipher %s", obsolete_ciphers[found_obsolete_cipher]);
     ndpi_set_risk(ndpi_struct, flow,
-		  (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER));
+		  (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER),
+		  str);
   }
 
   ndpi_free(cipher_copy);
