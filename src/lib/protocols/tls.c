@@ -2200,10 +2200,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  } else {
 		    u_int16_t seq_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 		    s_offset += 2;
-	            final_offset = MIN(total_len, s_offset + seq_len);
+	            final_offset = ndpi_min(total_len, s_offset + seq_len);
 		  }
 		} else {
-	          final_offset = MIN(total_len, s_offset + extension_len);
+	          final_offset = ndpi_min(total_len, s_offset + extension_len);
 		}
 
 		while(s_offset < final_offset) {

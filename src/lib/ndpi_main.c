@@ -4664,7 +4664,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 
   /* 0: fragmented; 1: not fragmented */
   if(iph != NULL && ndpi_iph_is_valid_and_not_fragmented(iph, l3_len)) {
-    u_int16_t len = ntohs(iph->tot_len);
+    u_int16_t len = ndpi_min(ntohs(iph->tot_len), l3_len);
     u_int16_t hlen = (iph->ihl * 4);
 
     l4ptr = (((const u_int8_t *) iph) + iph->ihl * 4);

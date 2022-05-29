@@ -375,7 +375,7 @@ static gcry_error_t hkdf_expand(int hashalgo, const uint8_t *prk, uint32_t prk_l
     gcry_md_write(h, &c, sizeof(c));                    /* constant 0x01..N */
 
     memcpy(lastoutput, gcry_md_read(h, hashalgo), hash_len);
-    memcpy(out + offset, lastoutput, MIN(hash_len, out_len - offset));
+    memcpy(out + offset, lastoutput, ndpi_min(hash_len, out_len - offset));
   }
 
   gcry_md_close(h);
