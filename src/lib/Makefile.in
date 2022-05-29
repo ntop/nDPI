@@ -85,6 +85,9 @@ distdir:
 distclean: clean
 	/bin/rm -f Makefile
 
+check:
+	true # nothing to do here
+
 cppcheck:
 	cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I ../include *.c protocols/*.c
 

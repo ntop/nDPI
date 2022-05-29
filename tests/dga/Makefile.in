@@ -36,6 +36,8 @@ install:
 
 distdir:
 
-
 distclean: clean
 	/bin/rm -f Makefile
+
+check:
+	true # nothing to do here, done by invoking tests/do-dga.sh

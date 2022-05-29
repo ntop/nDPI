@@ -74,6 +74,9 @@ dpdk:
 	$(MAKE) -f Makefile.dpdk
 
 check:
+	true # nothing to do here
+
+cppcheck:
 	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include *.c
 
 clean:
