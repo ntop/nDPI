@@ -1395,7 +1395,7 @@ static void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(ndpi_is_valid_hostname(flow->host_server_name,
 				strlen(flow->host_server_name)) == 0) {
-	char str[64];
+	char str[128];
 
 	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
 	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);

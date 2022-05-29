@@ -1047,7 +1047,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   s = ndpi_get_flow_risk_info(flow->ndpi_flow, out, sizeof(out));
 
   if(s != NULL)
-    flow->risk_str = ndpi_strdup(s);
+    flow->risk_str = ndpi_strdup(out);
   
   flow->confidence = flow->ndpi_flow->confidence;
 

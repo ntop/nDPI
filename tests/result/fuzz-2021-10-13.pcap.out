@@ -10,4 +10,4 @@ JA3 Host Stats:
 	1	 3400:3a30:3035:2f75:706c:6f32:643f:6c3d 	 1      
 
 
-	1	TCP [3400:3a30:3035:2f75:706c:6f32:643f:6c3d]:44288 -> [302e::3d00::8001]:0 [proto: 91/TLS][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/197 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Known Proto on Non Std Port **** Obsolete TLS (v1.1 or older) **** TLS Suspicious Extn **][Risk Score: 250][TLS (0030)][JA3C: a5e5938747ae3199abb5d3fcd94f9e8d][PLAIN TEXT (005/uplo2)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP [3400:3a30:3035:2f75:706c:6f32:643f:6c3d]:44288 -> [302e::3d00::8001]:0 [proto: 91/TLS][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/197 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Known Proto on Non Std Port **** Obsolete TLS (v1.1 or older) **** TLS Suspicious Extn **][Risk Score: 250][Risk Info: 0030][TLS (0030)][JA3C: a5e5938747ae3199abb5d3fcd94f9e8d][PLAIN TEXT (005/uplo2)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

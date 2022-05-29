@@ -2524,24 +2524,25 @@ int ndpi_snprintf(char * str, size_t size, char const * format, ...) {
 
 char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 			      char *out, u_int out_len) {
-  if(out == NULL)
+  u_int i, offset = 0;
+  
+  if((out == NULL) || (flow->num_risk_infos == 0))
     return(NULL);
-  else
-    out[0] = '\0';
+  
+  out[0] = '\0';
 
-  if(flow->num_risk_infos) {
-    u_int i, offset = 0;
-    for(i=0; i<flow->num_risk_infos; i++) {
-      int rc = snprintf(&out[offset], out_len-offset, "%s%s",
-			(i == 0) ? "" : " / ",
-			flow->risk_infos[i]);
+  for(i=0; i<flow->num_risk_infos; i++) {
+    int rc = snprintf(&out[offset], out_len-offset, "%s%s",
+		      (i == 0) ? "" : " / ",
+		      flow->risk_infos[i]);
 
-      if(rc <= 0)
-	break;
-      else
-	offset += rc;
-    }
+    if(rc <= 0)
+      break;
+    else
+      offset += rc;
   }
+
+  out[offset] = '\0';
 
   return(out[0] == '\0' ? NULL : out);
 }
