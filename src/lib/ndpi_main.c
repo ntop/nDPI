@@ -5056,14 +5056,14 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
                                          NDPI_PROTOCOL_BITMASK detection_bitmask,
                                          u_int16_t detected_protocol)
 {
-  u_int32_t num_calls = 0;
+  u_int32_t num_calls = 0, a;
 
   if (detected_protocol == NDPI_PROTOCOL_UNKNOWN)
   {
     return num_calls;
   }
 
-  for (u_int32_t a = 0; a < ndpi_str->proto_defaults[detected_protocol].subprotocol_count; a++)
+  for (a = 0; a < ndpi_str->proto_defaults[detected_protocol].subprotocol_count; a++)
   {
     u_int16_t subproto_id = ndpi_str->proto_defaults[detected_protocol].subprotocols[a];
     if (subproto_id == (uint16_t)NDPI_PROTOCOL_MATCHED_BY_CONTENT ||

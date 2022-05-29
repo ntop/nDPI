@@ -59,6 +59,8 @@ void ndpi_search_mpegdash_http(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->parsed_lines > 0)
   {
+    size_t i;
+
     if (LINE_ENDS(packet->line[0], "RTSP/1.0") != 0 ||
         LINE_ENDS(packet->line[0], ".mp4 HTTP/1.1") != 0 ||
         LINE_ENDS(packet->line[0], ".m4s HTTP/1.1") != 0)
@@ -67,7 +69,7 @@ void ndpi_search_mpegdash_http(struct ndpi_detection_module_struct *ndpi_struct,
       return;
     }
 
-    for (size_t i = 0; i < packet->parsed_lines && packet->line[i].len > 0; ++i)
+    for (i = 0; i < packet->parsed_lines && packet->line[i].len > 0; ++i)
     {
       if ((LINE_STARTS(packet->line[i], "Content-Type:") != 0 &&
            LINE_ENDS(packet->line[i], "video/mp4") != 0) ||
