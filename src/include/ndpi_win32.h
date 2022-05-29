@@ -49,10 +49,6 @@
 
 #define	IPVERSION	4 /* on *nix it is defined in netinet/ip.h */ 
 
-#ifndef MIN
-#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
-#endif
-
 #if defined(__MINGW32__) || defined(__MINGW64__)
 #undef gettimeofday
 #define gettimeofday mingw_gettimeofday
