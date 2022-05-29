@@ -2529,9 +2529,9 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
   if((out == NULL) || (flow->num_risk_infos == 0))
     return(NULL);
   
-  out[0] = '\0';
+  out[0] = '\0', out_len--;
 
-  for(i=0; i<flow->num_risk_infos; i++) {
+  for(i=0; (i<flow->num_risk_infos) && (out_len > offset); i++) {
     int rc = snprintf(&out[offset], out_len-offset, "%s%s",
 		      (i == 0) ? "" : " / ",
 		      flow->risk_infos[i]);
@@ -2542,6 +2542,8 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
       offset += rc;
   }
 
+  if(offset > out_len) offset = out_len;
+  
   out[offset] = '\0';
 
   return(out[0] == '\0' ? NULL : out);
