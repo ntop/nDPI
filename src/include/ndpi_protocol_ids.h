@@ -320,6 +320,7 @@ typedef enum {
   NDPI_PROTOCOL_CACHEFLY              = 289,
   NDPI_PROTOCOL_SOFTETHER             = 290,
   NDPI_PROTOCOL_MPEGDASH              = 291,
+  NDPI_PROTOCOL_DAZN                  = 292,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
