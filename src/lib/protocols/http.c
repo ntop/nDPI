@@ -1040,8 +1040,22 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
 	  if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
 	    flow->http.response_status_code = 0; /* Out of range */
-	  else if(flow->http.response_status_code >= 400)
+	  else if(flow->http.response_status_code >= 400) {
+	    if(flow->http.url != NULL) {
+	      /* Let's check for Wordpress */
+	      char *slash = strchr(flow->http.url, '/');
+	      
+	      if(
+		 ((flow->http.method == NDPI_HTTP_METHOD_POST) && (strncmp(slash, "/wp-admin/", 10) == 0))
+		 || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))		 
+		 ) {
+		/* Example of popular exploits https://www.wordfence.com/blog/2022/05/millions-of-attacks-target-tatsu-builder-plugin/ */
+		ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);	       
+	      }
+	    }
+	    
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED);
+	  }
 	}
 
 	ndpi_parse_packet_line_info(ndpi_struct, flow);
