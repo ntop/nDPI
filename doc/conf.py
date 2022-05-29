@@ -21,7 +21,8 @@ sys.path.append( "breathe/" )
 # ones.
 extensions = [
     'sphinx.ext.intersphinx',
-    'breathe'
+    'breathe',
+    'exhale'
 ]
 
 # Workaround for platforms where swaggerdoc is not available
@@ -30,6 +31,18 @@ if not os.environ.get("PYTHON_SKIP_SWAGGERDOC"):
 
 breathe_projects = { "apidoc" : "doxygen/xml/" }
 breathe_default_project = "apidoc"
+
+exhale_args = {
+    "containmentFolder":     "./api",
+    "rootFileName":          "library_root.rst",
+    "rootFileTitle":         "Library API",
+    "doxygenStripFromPath":  ".",
+    "createTreeView":        True,
+    # "treeViewIsBootstrap": True,
+}
+
+primary_domain = 'c'
+highlight_language = 'c'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -139,7 +152,7 @@ html_logo = "img/logo.png"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -288,4 +301,4 @@ texinfo_documents = [
 intersphinx_mapping = {'https://docs.python.org/': None}
 
 def setup(app):
-    app.add_stylesheet('css/ntop.css')
+    app.add_css_file('css/ntop.css')
