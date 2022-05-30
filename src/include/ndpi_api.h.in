@@ -1736,7 +1736,8 @@ extern "C" {
   /* ******************************* */
 
   char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
-				char *out, u_int out_len);
+				char *out, u_int out_len,
+				u_int8_t use_json);
 
 #ifdef __cplusplus
 }

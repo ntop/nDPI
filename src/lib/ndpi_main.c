@@ -4716,7 +4716,7 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       u_int i;
 
       for(i=0; i<flow->num_risk_infos; i++)      
-	ndpi_free(flow->risk_infos[i]);
+	ndpi_free(flow->risk_infos[i].info);
     }
     
     if(flow->http.url)

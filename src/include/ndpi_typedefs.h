@@ -1136,6 +1136,10 @@ struct tls_heuristics {
   u_int8_t is_safari_tls:1, is_firefox_tls:1, is_chrome_tls:1, notused:5;
 };
 
+struct ndpi_risk_info {
+  ndpi_risk_enum id;
+  char *info;  
+};
 
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
@@ -1198,7 +1202,7 @@ struct ndpi_flow_struct {
   u_int8_t risk_checked:1, ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:4;
   ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
   ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
-  char *risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
+  struct ndpi_risk_info risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
   u_int8_t num_risk_infos;
   
   /*

@@ -209,8 +209,8 @@ static int ndpi_init_serializer_buffer(ndpi_private_serializer_buffer *buffer, u
 /* ********************************** */
 
 int ndpi_init_serializer_ll(ndpi_serializer *_serializer,
-			 ndpi_serialization_format fmt,
-			 u_int32_t buffer_size) {
+			    ndpi_serialization_format fmt,
+			    u_int32_t buffer_size) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
   memset(serializer, 0, sizeof(ndpi_private_serializer));

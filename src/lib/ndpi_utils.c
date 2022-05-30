@@ -1132,8 +1132,7 @@ void ndpi_serialize_risk(ndpi_serializer *serializer,
 /* ********************************** */
 
 void ndpi_serialize_risk_score(ndpi_serializer *serializer,
-                               ndpi_risk_enum risk)
-{
+                               ndpi_risk_enum risk) {
   u_int16_t rs, rs_client = 0, rs_server = 0;
 
   if(risk == NDPI_NO_RISK) {
@@ -2255,7 +2254,9 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 	char *s = ndpi_strdup(risk_message);
 
 	if(s != NULL) {
-	  flow->risk_infos[flow->num_risk_infos++] = s;
+	  flow->risk_infos[flow->num_risk_infos].id = r;
+	  flow->risk_infos[flow->num_risk_infos].info = s;
+	  flow->num_risk_infos++;
 	}
       }
     }
@@ -2523,28 +2524,56 @@ int ndpi_snprintf(char * str, size_t size, char const * format, ...) {
 /* ******************************************* */
 
 char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
-			      char *out, u_int out_len) {
+			      char *out, u_int out_len,
+			      u_int8_t use_json) {
   u_int i, offset = 0;
   
   if((out == NULL) || (flow->num_risk_infos == 0))
     return(NULL);
+
+  if(use_json) {
+    ndpi_serializer serializer;
+    u_int32_t buffer_len;
+    char *buffer;
+    
+    if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == -1)
+      return(NULL);
+
+    for(i=0; i<flow->num_risk_infos; i++)
+      ndpi_serialize_uint32_string(&serializer,
+				   flow->risk_infos[i].id, 
+				   flow->risk_infos[i].info);  
+    
+    buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+
+    if(buffer && (buffer_len > 0)) {
+      u_int l = ndpi_min(out_len-1, buffer_len);
+
+      strncpy(out, buffer, l);
+      out[l] = '\0';
+    }
+    
+    ndpi_term_serializer(&serializer);
+
+    return(out);
+  } else {
+    out[0] = '\0', out_len--;
+    
+    for(i=0; (i<flow->num_risk_infos) && (out_len > offset); i++) {
+      int rc = snprintf(&out[offset], out_len-offset, "%s%s",
+			(i == 0) ? "" : " / ",
+			flow->risk_infos[i].info);
+      
+      if(rc <= 0)
+	break;
+      else
+	offset += rc;
+    }
+    
+    if(offset > out_len) offset = out_len;
+    
+    out[offset] = '\0';
   
-  out[0] = '\0', out_len--;
-
-  for(i=0; (i<flow->num_risk_infos) && (out_len > offset); i++) {
-    int rc = snprintf(&out[offset], out_len-offset, "%s%s",
-		      (i == 0) ? "" : " / ",
-		      flow->risk_infos[i]);
-
-    if(rc <= 0)
-      break;
-    else
-      offset += rc;
+    return(out[0] == '\0' ? NULL : out);
   }
-
-  if(offset > out_len) offset = out_len;
-  
-  out[offset] = '\0';
-
-  return(out[0] == '\0' ? NULL : out);
 }
