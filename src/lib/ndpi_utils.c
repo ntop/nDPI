@@ -2528,7 +2528,9 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 			      u_int8_t use_json) {
   u_int i, offset = 0;
   
-  if((out == NULL) || (flow->num_risk_infos == 0))
+  if((out == NULL)
+     || (flow == NULL)
+     || (flow->num_risk_infos == 0))
     return(NULL);
 
   if(use_json) {
