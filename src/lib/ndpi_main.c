@@ -6145,7 +6145,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 	/*
 	  Before triggering the alert we need to make some extra checks
 	  - the protocol found is not running on the port we have found
-	    (i.e. two or more protools share the same default port)
+	  (i.e. two or more protools share the same default port)
 	*/
 	u_int8_t found = 0, i;
 
@@ -6158,11 +6158,30 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
 	if(!found) {
 	  ndpi_default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
-									     sport, dport);
+									   sport, dport);
 
-	if((r == NULL)
-	   || ((r->proto->protoId != ret.app_protocol) && (r->proto->protoId != ret.master_protocol)))	  
-	  ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT, NULL);
+	  if((r == NULL)
+	     || ((r->proto->protoId != ret.app_protocol) && (r->proto->protoId != ret.master_protocol))) {
+	    if(default_ports[0] != 0) {
+		char str[64];
+		u_int8_t i, offset;
+
+		offset = snprintf(str, sizeof(str), "Expected on port ");
+	    
+		for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
+		  int rc = snprintf(&str[offset], sizeof(str)-offset, "%s%u",
+				    (i > 0) ? "," : "", default_ports[i]);
+
+		  if(rc > 0)
+		    offset += rc;
+		  else
+		    break;
+		}
+
+		str[offset] = '\0';
+		ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT, str);
+	    }
+	  }
 	}
       }
     } else if((!ndpi_is_ntop_protocol(&ret)) && default_ports && (default_ports[0] != 0)) {
