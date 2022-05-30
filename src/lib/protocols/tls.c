@@ -483,10 +483,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      time_t theTime;
 
 	      theTime = flow->protos.tls_quic.notBefore;
-	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &result));
+	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
 
 	      theTime = flow->protos.tls_quic.notAfter;
-	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &result));
+	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
 	      	      
 	      snprintf(str, sizeof(str), "%s - %s", b, e);
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_EXPIRED, str); /* Certificate expired */
@@ -497,10 +497,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      time_t theTime;
 
 	      theTime = flow->protos.tls_quic.notBefore;
-	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &result));
+	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
 
 	      theTime = flow->protos.tls_quic.notAfter;
-	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &result));
+	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
 
 	      snprintf(str, sizeof(str), "%s - %s", b, e);
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE, str); /* Certificate almost expired */
