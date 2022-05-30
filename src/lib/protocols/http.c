@@ -1110,10 +1110,10 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	      /* Let's check for Wordpress */
 	      char *slash = strchr(flow->http.url, '/');
 
-	      if(
-		 ((flow->http.method == NDPI_HTTP_METHOD_POST) && (strncmp(slash, "/wp-admin/", 10) == 0))
-		 || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))
-		 ) {
+	      if(slash != NULL &&
+		 (((flow->http.method == NDPI_HTTP_METHOD_POST) && (strncmp(slash, "/wp-admin/", 10) == 0))
+		 || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))		 
+		 )) {
 		/* Example of popular exploits https://www.wordfence.com/blog/2022/05/millions-of-attacks-target-tatsu-builder-plugin/ */
 		ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Possible Wordpress Exploit");
 	      }

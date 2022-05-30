@@ -31,8 +31,15 @@
 static void ndpi_int_mpegdash_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                              struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id,
-                             NDPI_PROTOCOL_MPEGDASH, NDPI_CONFIDENCE_DPI);
+  if (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN ||
+      flow->guessed_host_protocol_id == NDPI_PROTOCOL_HTTP)
+  {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MPEGDASH, NDPI_PROTOCOL_HTTP,
+                               NDPI_CONFIDENCE_DPI);
+  } else {
+    ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_MPEGDASH,
+                               NDPI_CONFIDENCE_DPI);
+  }
 }
 
 void ndpi_search_mpegdash_http(struct ndpi_detection_module_struct *ndpi_struct,
