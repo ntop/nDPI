@@ -15,6 +15,10 @@ elif [ "${NDPI_TESTS_VALGRIND}" = "1" ]; then
    CMD_PREFIX="valgrind -q --leak-check=full"
 fi
 
+CMD_DIFF="$(which diff)"
+CMD_WDIFF="$(which wdiff)"
+CMD_COLORDIFF="$(which colordiff)"
+
 EXE_SUFFIX=@EXE_SUFFIX@
 PCRE_ENABLED=@PCRE_ENABLED@
 PCRE_PCAPS="WebattackRCE.pcap"
@@ -73,7 +77,7 @@ check_results() {
 	    $CMD
 	    CMD_RET=$?
 	    if [ $CMD_RET -eq 0 ]; then
-	      NUM_DIFF=`diff result/$f.out /tmp/reader.out | wc -l`
+	      NUM_DIFF=`${CMD_DIFF} result/$f.out /tmp/reader.out | wc -l`
 	    else
 	      printf "%-48s\tERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n" "$f"
 	      RC=$(( RC + 1 ))
@@ -85,7 +89,10 @@ check_results() {
 		else
 		  printf "%-48s\tERROR\n" "$f"
 		  echo "$CMD [old vs new]"
-		  diff result/$f.out /tmp/reader.out
+		  ${CMD_DIFF} result/$f.out /tmp/reader.out
+		  if [ ! -z "${CMD_COLORDIFF}" -a ! -z "${CMD_WDIFF}" ]; then
+		    ${CMD_WDIFF} -n -3 result/$f.out /tmp/reader.out | ${CMD_COLORDIFF}
+		  fi
 		  RC=$(( RC + 1 ))
 	    fi
 
