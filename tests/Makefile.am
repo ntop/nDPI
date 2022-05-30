@@ -1,4 +1,8 @@
-TESTS = do.sh
+TESTS = do.sh do-dga.sh
+
+if BUILD_UNITTESTS
+TESTS += do-unit.sh
+endif
 
 EXTRA_DIST = pcap result performance \
 	unit/unit.c unit/Makefile.in \

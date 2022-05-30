@@ -26,3 +26,6 @@ distdir:
 
 install:
 	@echo -n ""
+
+check:
+	true # nothing to do here

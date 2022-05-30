@@ -102,7 +102,10 @@ if ! test "${with_only_libndpi+set}" = set; then :
         JSONC_LIBS="${pkg_cv_JSONC_LIBS}"
         JSONC_CFLAGS="${pkg_cv_JSONC_CFLAGS}"
     ], [AC_MSG_WARN([JSON-C not available. Disabled unit test.])])
-    AC_CHECK_LIB([json-c], [json_object_put], [EXTRA_TARGETS="$EXTRA_TARGETS tests/unit"], [
+    AC_CHECK_LIB([json-c], [json_object_put], [
+        EXTRA_TARGETS="$EXTRA_TARGETS tests/unit"
+        build_unittests=yes
+    ],[
         AC_MSG_WARN([JSON-C not available. Disabled unit test.])
         JSONC_LIBS=""
         JSONC_CFLAGS=""
@@ -114,6 +117,7 @@ if ! test "${with_only_libndpi+set}" = set; then :
         EXTRA_TARGETS=""
     ])
 fi
+AM_CONDITIONAL([BUILD_UNITTESTS], [test "x$build_unittests" = "xyes"])
 
 HANDLE_TLS_SIGS="//"
 AS_IF([test "x${enable_tls_sigs}" = "xyes"],[

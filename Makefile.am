@@ -21,5 +21,12 @@ EXTRA_DIST = README.md README.nDPI README.fuzzer.md CHANGELOG.md CONTRIBUTING.md
 	sonar-project.properties .github .ci-ignore .lgtm/cpp-queries/packet-payload-integer-arithmetic.ql lgtm.yml
 
 
+.PHONY: doc doc-view
+doc:
+	make -C doc html
+
+doc-view:
+	python3 -m http.server --bind 127.0.0.1 --directory doc/_build/html 8080
+
 changelog:
 	git log --since={`curl -s https://github.com/ntop/ndpi/releases | grep datetime | head -n1 | egrep -o "[0-9]+\-[0-9]+\-[0-9]+"`} --name-only --pretty=format:" - %s" | grep  "^ " > CHANGELOG.latest
