@@ -448,7 +448,7 @@ static inline void roaring_bitmap_aligned_free(void *memblock) {
 #elif defined(__MINGW32__) || defined(__MINGW64__)
     __mingw_aligned_free(memblock);
 #else
-    free(memblock);
+    ndpi_free(memblock);
 #endif
 }
 
@@ -7137,7 +7137,7 @@ static bool realloc_array(roaring_array_t *ra, int32_t new_capacity) {
     // https://github.com/RoaringBitmap/CRoaring/issues/256
 
     if ( new_capacity == 0 ) {
-      free(ra->containers);
+      ndpi_free(ra->containers);
       ra->containers = NULL;
       ra->keys = NULL;
       ra->typecodes = NULL;
@@ -7146,7 +7146,7 @@ static bool realloc_array(roaring_array_t *ra, int32_t new_capacity) {
     }
     const size_t memoryneeded = new_capacity * (
                 sizeof(uint16_t) + sizeof(container_t *) + sizeof(uint8_t));
-    void *bigalloc = malloc(memoryneeded);
+    void *bigalloc = ndpi_malloc(memoryneeded);
     if (!bigalloc) return false;
     void *oldbigalloc = ra->containers;
     container_t **newcontainers = (container_t **)bigalloc;
@@ -7163,7 +7163,7 @@ static bool realloc_array(roaring_array_t *ra, int32_t new_capacity) {
     ra->keys = newkeys;
     ra->typecodes = newtypecodes;
     ra->allocation_size = new_capacity;
-    free(oldbigalloc);
+    ndpi_free(oldbigalloc);
     return true;
 }
 
@@ -7174,7 +7174,7 @@ static bool ra_init_with_capacity(roaring_array_t *new_ra, uint32_t cap) {
     if (cap > INT32_MAX) { return false; }
 
     if(cap > 0) {
-      void *bigalloc = malloc(cap *
+      void *bigalloc = ndpi_malloc(cap *
                 (sizeof(uint16_t) + sizeof(container_t *) + sizeof(uint8_t)));
       if( bigalloc == NULL ) return false;
       new_ra->containers = (container_t **)bigalloc;
@@ -7263,7 +7263,7 @@ static void ra_reset(roaring_array_t *ra) {
 }
 
 static void ra_clear_without_containers(roaring_array_t *ra) {
-    free(ra->containers);    // keys and typecodes are allocated with containers
+    ndpi_free(ra->containers);    // keys and typecodes are allocated with containers
     ra->size = 0;
     ra->allocation_size = 0;
     ra->containers = NULL;
@@ -7576,7 +7576,7 @@ static bool ra_range_uint32_array(const roaring_array_t *ra, size_t offset, size
                 //first_skip = t_limit - (ctr + t_limit - offset);
                 first_skip = offset - ctr;
                 first = true;
-                t_ans = (uint32_t *)malloc(sizeof(*t_ans) * (first_skip + limit));
+                t_ans = (uint32_t *)ndpi_malloc(sizeof(*t_ans) * (first_skip + limit));
                 if(t_ans == NULL) {
                   return false;
                 }
@@ -7584,15 +7584,15 @@ static bool ra_range_uint32_array(const roaring_array_t *ra, size_t offset, size
                 cur_len = first_skip + limit;
             }
             if (dtr + t_limit > cur_len){
-                uint32_t * append_ans = (uint32_t *)malloc(sizeof(*append_ans) * (cur_len + t_limit));
+                uint32_t * append_ans = (uint32_t *)ndpi_malloc(sizeof(*append_ans) * (cur_len + t_limit));
                 if(append_ans == NULL) {
-                  if(t_ans != NULL) free(t_ans);
+                  if(t_ans != NULL) ndpi_free(t_ans);
                   return false;
                 }
                 memset(append_ans, 0, sizeof(*append_ans) * (cur_len + t_limit));
                 cur_len = cur_len + t_limit;
                 memcpy(append_ans, t_ans, dtr * sizeof(uint32_t));
-                free(t_ans);
+                ndpi_free(t_ans);
                 t_ans = append_ans;
             }
             switch (ra->typecodes[i]) {
@@ -7622,7 +7622,7 @@ static bool ra_range_uint32_array(const roaring_array_t *ra, size_t offset, size
     }
     if(t_ans != NULL) {
       memcpy(ans, t_ans+first_skip, limit * sizeof(uint32_t));
-      free(t_ans);
+      ndpi_free(t_ans);
     }
     return true;
 }
@@ -7667,7 +7667,7 @@ static size_t ra_portable_serialize(const roaring_array_t *ra, char *buf) {
         memcpy(buf, &cookie, sizeof(cookie));
         buf += sizeof(cookie);
         uint32_t s = (ra->size + 7) / 8;
-        uint8_t *bitmapOfRunContainers = (uint8_t *)calloc(s, 1);
+        uint8_t *bitmapOfRunContainers = (uint8_t *)ndpi_calloc(s, 1);
         assert(bitmapOfRunContainers != NULL);  // todo: handle
         int32_t i; for (i = 0; i < ra->size; ++i) {
             if (get_container_type(ra->containers[i], ra->typecodes[i]) ==
@@ -7677,7 +7677,7 @@ static size_t ra_portable_serialize(const roaring_array_t *ra, char *buf) {
         }
         memcpy(buf, bitmapOfRunContainers, s);
         buf += s;
-        free(bitmapOfRunContainers);
+        ndpi_free(bitmapOfRunContainers);
         if (ra->size < NO_OFFSET_THRESHOLD) {
             startOffset = 4 + 4 * ra->size + s;
         } else {
@@ -8020,7 +8020,7 @@ static void pq_add(roaring_pq_t *pq, roaring_pq_element_t *t) {
 }
 
 static void pq_free(roaring_pq_t *pq) {
-    free(pq);
+    ndpi_free(pq);
 }
 
 static void percolate_down(roaring_pq_t *pq, uint32_t i) {
@@ -8048,7 +8048,7 @@ static void percolate_down(roaring_pq_t *pq, uint32_t i) {
 
 static roaring_pq_t *create_pq(const roaring_bitmap_t **arr, uint32_t length) {
     size_t alloc_size = sizeof(roaring_pq_t) + sizeof(roaring_pq_element_t) * length;
-    roaring_pq_t *answer = (roaring_pq_t *)malloc(alloc_size);
+    roaring_pq_t *answer = (roaring_pq_t *)ndpi_malloc(alloc_size);
     answer->elements = (roaring_pq_element_t *)(answer + 1);
     answer->size = length;
     uint32_t i; for (i = 0; i < length; i++) {
@@ -8167,8 +8167,8 @@ static roaring_bitmap_t *lazy_or_from_lazy_inputs(roaring_bitmap_t *x1,
     }
     ra_clear_without_containers(&x1->high_low_container);
     ra_clear_without_containers(&x2->high_low_container);
-    free(x1);
-    free(x2);
+    ndpi_free(x1);
+    ndpi_free(x2);
     return answer;
 }
 
@@ -8299,13 +8299,13 @@ static inline container_t *containerptr_roaring_bitmap_add(
 
 static roaring_bitmap_t *roaring_bitmap_create_with_capacity(uint32_t cap) {
     roaring_bitmap_t *ans =
-        (roaring_bitmap_t *)malloc(sizeof(roaring_bitmap_t));
+        (roaring_bitmap_t *)ndpi_malloc(sizeof(roaring_bitmap_t));
     if (!ans) {
         return NULL;
     }
     bool is_ok = ra_init_with_capacity(&ans->high_low_container, cap);
     if (!is_ok) {
-        free(ans);
+        ndpi_free(ans);
         return NULL;
     }
     return ans;
@@ -8608,14 +8608,14 @@ static void roaring_bitmap_statistics(const roaring_bitmap_t *r,
 
 static roaring_bitmap_t *roaring_bitmap_copy(const roaring_bitmap_t *r) {
     roaring_bitmap_t *ans =
-        (roaring_bitmap_t *)malloc(sizeof(roaring_bitmap_t));
+        (roaring_bitmap_t *)ndpi_malloc(sizeof(roaring_bitmap_t));
     if (!ans) {
         return NULL;
     }
     if (!ra_init_with_capacity(  // allocation of list of containers can fail
                 &ans->high_low_container, r->high_low_container.size)
     ){
-        free(ans);
+        ndpi_free(ans);
         return NULL;
     }
     if (!ra_overwrite(  // memory allocation of individual containers may fail
@@ -8639,7 +8639,7 @@ static void roaring_bitmap_free(const roaring_bitmap_t *r) {
     if (!is_frozen(r)) {
       ra_clear((roaring_array_t*)&r->high_low_container);
     }
-    free((roaring_bitmap_t*)r);
+    ndpi_free((roaring_bitmap_t*)r);
 }
 
 static void roaring_bitmap_clear(roaring_bitmap_t *r) {
@@ -9609,7 +9609,7 @@ static size_t roaring_bitmap_portable_size_in_bytes(const roaring_bitmap_t *r) {
 
 static roaring_bitmap_t *roaring_bitmap_portable_deserialize_safe(const char *buf, size_t maxbytes) {
     roaring_bitmap_t *ans =
-        (roaring_bitmap_t *)malloc(sizeof(roaring_bitmap_t));
+        (roaring_bitmap_t *)ndpi_malloc(sizeof(roaring_bitmap_t));
     if (ans == NULL) {
         return NULL;
     }
@@ -9618,7 +9618,7 @@ static roaring_bitmap_t *roaring_bitmap_portable_deserialize_safe(const char *bu
     if(is_ok) assert(bytesread <= maxbytes);
     roaring_bitmap_set_copy_on_write(ans, false);
     if (!is_ok) {
-        free(ans);
+        ndpi_free(ans);
         return NULL;
     }
     return ans;
@@ -9844,7 +9844,7 @@ static void roaring_init_iterator_last(const roaring_bitmap_t *r,
 
 static roaring_uint32_iterator_t *roaring_create_iterator(const roaring_bitmap_t *r) {
     roaring_uint32_iterator_t *newit =
-        (roaring_uint32_iterator_t *)malloc(sizeof(roaring_uint32_iterator_t));
+        (roaring_uint32_iterator_t *)ndpi_malloc(sizeof(roaring_uint32_iterator_t));
     if (newit == NULL) return NULL;
     roaring_init_iterator(r, newit);
     return newit;
@@ -9853,7 +9853,7 @@ static roaring_uint32_iterator_t *roaring_create_iterator(const roaring_bitmap_t
 static roaring_uint32_iterator_t *roaring_copy_uint32_iterator(
     const roaring_uint32_iterator_t *it) {
     roaring_uint32_iterator_t *newit =
-        (roaring_uint32_iterator_t *)malloc(sizeof(roaring_uint32_iterator_t));
+        (roaring_uint32_iterator_t *)ndpi_malloc(sizeof(roaring_uint32_iterator_t));
     memcpy(newit, it, sizeof(roaring_uint32_iterator_t));
     return newit;
 }
@@ -10099,7 +10099,7 @@ static uint32_t roaring_read_uint32_iterator(roaring_uint32_iterator_t *it, uint
 
 
 
-static void roaring_free_uint32_iterator(roaring_uint32_iterator_t *it) { free(it); }
+static void roaring_free_uint32_iterator(roaring_uint32_iterator_t *it) { ndpi_free(it); }
 
 /****
 * end of roaring_uint32_iterator_t
@@ -11197,7 +11197,7 @@ roaring_bitmap_frozen_view(const char *buf, size_t length) {
     alloc_size += num_run_containers * sizeof(run_container_t);
     alloc_size += num_array_containers * sizeof(array_container_t);
 
-    char *arena = (char *)malloc(alloc_size);
+    char *arena = (char *)ndpi_malloc(alloc_size);
     if (arena == NULL) {
         return NULL;
     }
@@ -11244,7 +11244,7 @@ roaring_bitmap_frozen_view(const char *buf, size_t length) {
                 break;
             }
             default:
-                free(arena);
+                ndpi_free(arena);
                 return NULL;
         }
     }
@@ -13242,16 +13242,16 @@ extern inline bool array_container_full(const array_container_t *array);
 static array_container_t *array_container_create_given_capacity(int32_t size) {
     array_container_t *container;
 
-    if ((container = (array_container_t *)malloc(sizeof(array_container_t))) ==
+    if ((container = (array_container_t *)ndpi_malloc(sizeof(array_container_t))) ==
         NULL) {
         return NULL;
     }
 
     if( size <= 0 ) { // we don't want to rely on malloc(0)
         container->array = NULL;
-    } else if ((container->array = (uint16_t *)malloc(sizeof(uint16_t) * size)) ==
+    } else if ((container->array = (uint16_t *)ndpi_malloc(sizeof(uint16_t) * size)) ==
         NULL) {
-        free(container);
+        ndpi_free(container);
         return NULL;
     }
 
@@ -13293,16 +13293,17 @@ static array_container_t *array_container_clone(const array_container_t *src) {
 
 static int array_container_shrink_to_fit(array_container_t *src) {
     if (src->cardinality == src->capacity) return 0;  // nothing to do
+    int old_capacity = src->capacity;
     int savings = src->capacity - src->cardinality;
     src->capacity = src->cardinality;
     if( src->capacity == 0) { // we do not want to rely on realloc for zero allocs
-      free(src->array);
+      ndpi_free(src->array);
       src->array = NULL;
     } else {
       uint16_t *oldarray = src->array;
       src->array =
-        (uint16_t *)realloc(oldarray, src->capacity * sizeof(uint16_t));
-      if (src->array == NULL) free(oldarray);  // should never happen?
+        (uint16_t *)ndpi_realloc(oldarray, old_capacity * sizeof(uint16_t), src->capacity * sizeof(uint16_t));
+      if (src->array == NULL) ndpi_free(oldarray);  // should never happen?
     }
     return savings;
 }
@@ -13310,10 +13311,10 @@ static int array_container_shrink_to_fit(array_container_t *src) {
 /* Free memory. */
 static void array_container_free(array_container_t *arr) {
     if(arr->array != NULL) {// Jon Strabala reports that some tools complain otherwise
-      free(arr->array);
+      ndpi_free(arr->array);
       arr->array = NULL; // pedantic
     }
-    free(arr);
+    ndpi_free(arr);
 }
 
 static inline int32_t grow_capacity(int32_t capacity) {
@@ -13332,20 +13333,21 @@ static void array_container_grow(array_container_t *container, int32_t min,
 
     int32_t max = (min <= DEFAULT_MAX_SIZE ? DEFAULT_MAX_SIZE : 65536);
     int32_t new_capacity = clamp(grow_capacity(container->capacity), min, max);
+    int32_t old_capacity = container->capacity;
 
     container->capacity = new_capacity;
     uint16_t *array = container->array;
 
     if (preserve) {
         container->array =
-            (uint16_t *)realloc(array, new_capacity * sizeof(uint16_t));
-        if (container->array == NULL) free(array);
+            (uint16_t *)ndpi_realloc(array, old_capacity * sizeof(uint16_t), new_capacity * sizeof(uint16_t));
+        if (container->array == NULL) ndpi_free(array);
     } else {
         // Jon Strabala reports that some tools complain otherwise
         if (array != NULL) {
-          free(array);
+          ndpi_free(array);
         }
-        container->array = (uint16_t *)malloc(new_capacity * sizeof(uint16_t));
+        container->array = (uint16_t *)ndpi_malloc(new_capacity * sizeof(uint16_t));
     }
 
     //  handle the case where realloc fails
@@ -14387,13 +14389,13 @@ static bool run_container_add(run_container_t *run, uint16_t pos) {
 static run_container_t *run_container_create_given_capacity(int32_t size) {
     run_container_t *run;
     /* Allocate the run container itself. */
-    if ((run = (run_container_t *)malloc(sizeof(run_container_t))) == NULL) {
+    if ((run = (run_container_t *)ndpi_malloc(sizeof(run_container_t))) == NULL) {
         return NULL;
     }
     if (size <= 0 ) { // we don't want to rely on malloc(0)
         run->runs = NULL;
-    } else if ((run->runs = (rle16_t *)malloc(sizeof(rle16_t) * size)) == NULL) {
-        free(run);
+    } else if ((run->runs = (rle16_t *)ndpi_malloc(sizeof(rle16_t) * size)) == NULL) {
+        ndpi_free(run);
         return NULL;
     }
     run->capacity = size;
@@ -14404,10 +14406,11 @@ static run_container_t *run_container_create_given_capacity(int32_t size) {
 static int run_container_shrink_to_fit(run_container_t *src) {
     if (src->n_runs == src->capacity) return 0;  // nothing to do
     int savings = src->capacity - src->n_runs;
+    int old_capacity = src->capacity;
     src->capacity = src->n_runs;
     rle16_t *oldruns = src->runs;
-    src->runs = (rle16_t *)realloc(oldruns, src->capacity * sizeof(rle16_t));
-    if (src->runs == NULL) free(oldruns);  // should never happen?
+    src->runs = (rle16_t *)ndpi_realloc(oldruns, old_capacity * sizeof(rle16_t), src->capacity * sizeof(rle16_t));
+    if (src->runs == NULL) ndpi_free(oldruns);  // should never happen?
     return savings;
 }
 /* Create a new run container. Return NULL in case of failure. */
@@ -14427,10 +14430,10 @@ static run_container_t *run_container_clone(const run_container_t *src) {
 /* Free memory. */
 static void run_container_free(run_container_t *run) {
     if(run->runs != NULL) {// Jon Strabala reports that some tools complain otherwise
-      free(run->runs);
+      ndpi_free(run->runs);
       run->runs = NULL;  // pedantic
     }
-    free(run);
+    ndpi_free(run);
 }
 
 static void run_container_grow(run_container_t *run, int32_t min, bool copy) {
@@ -14440,20 +14443,21 @@ static void run_container_grow(run_container_t *run, int32_t min, bool copy) {
             : run->capacity < 64 ? run->capacity * 2
                                  : run->capacity < 1024 ? run->capacity * 3 / 2
                                                         : run->capacity * 5 / 4;
+    int32_t old_capacity = run->capacity;
     if (newCapacity < min) newCapacity = min;
     run->capacity = newCapacity;
     assert(run->capacity >= min);
     if (copy) {
         rle16_t *oldruns = run->runs;
         run->runs =
-            (rle16_t *)realloc(oldruns, run->capacity * sizeof(rle16_t));
-        if (run->runs == NULL) free(oldruns);
+            (rle16_t *)ndpi_realloc(oldruns, old_capacity * sizeof(rle16_t), run->capacity * sizeof(rle16_t));
+        if (run->runs == NULL) ndpi_free(oldruns);
     } else {
         // Jon Strabala reports that some tools complain otherwise
         if (run->runs != NULL) {
-          free(run->runs);
+          ndpi_free(run->runs);
         }
-        run->runs = (rle16_t *)malloc(run->capacity * sizeof(rle16_t));
+        run->runs = (rle16_t *)ndpi_malloc(run->capacity * sizeof(rle16_t));
     }
     // handle the case where realloc fails
     if (run->runs == NULL) {
@@ -15300,7 +15304,7 @@ static container_t *get_copy_of_container(
         }
         assert(*typecode != SHARED_CONTAINER_TYPE);
 
-        if ((shared_container = (shared_container_t *)malloc(
+        if ((shared_container = (shared_container_t *)ndpi_malloc(
                  sizeof(shared_container_t))) == NULL) {
             return NULL;
         }
@@ -15354,7 +15358,7 @@ static container_t *shared_container_extract_copy(
     if (sc->counter == 0) {
         answer = sc->container;
         sc->container = NULL;  // paranoid
-        free(sc);
+        ndpi_free(sc);
     } else {
         answer = container_clone(sc->container, *typecode);
     }
@@ -15369,7 +15373,7 @@ static void shared_container_free(shared_container_t *container) {
         assert(container->typecode != SHARED_CONTAINER_TYPE);
         container_free(container->container, container->typecode);
         container->container = NULL;  // paranoid
-        free(container);
+        ndpi_free(container);
     }
 }
 
@@ -16432,7 +16436,7 @@ static void bitset_container_set_all(bitset_container_t *bitset) {
 /* Create a new bitset. Return NULL in case of failure. */
 static bitset_container_t *bitset_container_create(void) {
     bitset_container_t *bitset =
-        (bitset_container_t *)malloc(sizeof(bitset_container_t));
+        (bitset_container_t *)ndpi_malloc(sizeof(bitset_container_t));
 
     if (!bitset) {
         return NULL;
@@ -16441,7 +16445,7 @@ static bitset_container_t *bitset_container_create(void) {
     bitset->words = (uint64_t *)roaring_bitmap_aligned_malloc(
         32, sizeof(uint64_t) * BITSET_CONTAINER_SIZE_IN_WORDS);
     if (!bitset->words) {
-        free(bitset);
+        ndpi_free(bitset);
         return NULL;
     }
     bitset_container_clear(bitset);
@@ -16490,13 +16494,13 @@ static void bitset_container_free(bitset_container_t *bitset) {
       roaring_bitmap_aligned_free(bitset->words);
       bitset->words = NULL; // pedantic
     }
-    free(bitset);
+    ndpi_free(bitset);
 }
 
 /* duplicate container. */
 static bitset_container_t *bitset_container_clone(const bitset_container_t *src) {
     bitset_container_t *bitset =
-        (bitset_container_t *)malloc(sizeof(bitset_container_t));
+        (bitset_container_t *)ndpi_malloc(sizeof(bitset_container_t));
 
     if (!bitset) {
         return NULL;
@@ -16505,7 +16509,7 @@ static bitset_container_t *bitset_container_clone(const bitset_container_t *src)
     bitset->words = (uint64_t *)roaring_bitmap_aligned_malloc(
         32, sizeof(uint64_t) * BITSET_CONTAINER_SIZE_IN_WORDS);
     if (!bitset->words) {
-        free(bitset);
+        ndpi_free(bitset);
         return NULL;
     }
     bitset->cardinality = src->cardinality;

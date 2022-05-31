@@ -91,7 +91,7 @@ check_results() {
 		  echo "$CMD [old vs new]"
 		  ${CMD_DIFF} result/$f.out /tmp/reader.out
 		  if [ ! -z "${CMD_COLORDIFF}" -a ! -z "${CMD_WDIFF}" ]; then
-		    ${CMD_WDIFF} -n -3 result/$f.out /tmp/reader.out | ${CMD_COLORDIFF}
+		    ${CMD_WDIFF} -n -3 result/$f.out /tmp/reader.out | sort | uniq | ${CMD_COLORDIFF}
 		  fi
 		  RC=$(( RC + 1 ))
 	    fi
