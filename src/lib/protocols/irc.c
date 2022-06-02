@@ -517,7 +517,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     for (i = 0; i < packet->parsed_lines; i++) {
       if (packet->line[i].len > 6 && memcmp(packet->line[i].ptr, "NOTICE ", 7) == 0) {
 	NDPI_LOG_DBG2(ndpi_struct, "NOTICE");
-	for (j = 7; j < packet->line[i].len - 8; j++) {
+	for (j = 7; j < packet->line[i].len - 9; j++) {
 	  if (packet->line[i].ptr[j] == ':') {
 	    if (memcmp(&packet->line[i].ptr[j + 1], "DCC SEND ", 9) == 0
 		|| memcmp(&packet->line[i].ptr[j + 1], "DCC CHAT ", 9) == 0) {
