@@ -68,7 +68,7 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
       NDPI_LOG_DBG2(ndpi_struct, "no blank following the >: do nothing\n");
     }
 
-    while (i < packet->payload_packet_len)
+    while (i < packet->payload_packet_len - 1)
     {
         if (ndpi_isalnum(packet->payload[i]) == 0)
         {
@@ -86,8 +86,7 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 
     if (packet->payload[i] == ':')
     {
-        i++;
-        if (i >= packet->payload_packet_len ||
+        if (++i >= packet->payload_packet_len ||
             packet->payload[i] != ' ')
         {
             NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
