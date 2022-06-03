@@ -1,6 +1,6 @@
-Guessed flow protos:	10
+Guessed flow protos:	8
 
-DPI Packets (TCP):	147	(7.00 pkts/flow)
+DPI Packets (TCP):	75	(3.57 pkts/flow)
 Confidence DPI              : 21 (flows)
 
 HTTP	133	96179	11

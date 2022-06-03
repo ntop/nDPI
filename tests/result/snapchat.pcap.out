@@ -1,6 +1,6 @@
-Guessed flow protos:	3
+Guessed flow protos:	0
 
-DPI Packets (TCP):	56	(18.67 pkts/flow)
+DPI Packets (TCP):	18	(6.00 pkts/flow)
 Confidence DPI              : 3 (flows)
 
 Google	22	2879	1

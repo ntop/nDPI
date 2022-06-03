@@ -1,6 +1,6 @@
-Guessed flow protos:	1
+Guessed flow protos:	0
 
-DPI Packets (TCP):	28	(14.00 pkts/flow)
+DPI Packets (TCP):	21	(10.50 pkts/flow)
 Confidence DPI              : 2 (flows)
 
 AnyDesk	6963	2795460	2
