@@ -38,13 +38,11 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
 			*ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int8_t i;
+  u_int16_t i;
 
   NDPI_LOG_DBG(ndpi_struct, "search syslog\n");
 
   if (packet->payload_packet_len > 20 && packet->payload[0] == '<') {
-    int j;
-
     NDPI_LOG_DBG2(ndpi_struct, "checked len>20 and <1024 and first symbol=<\n");
 
     for (i = 1; i <= 3; i++) {
@@ -70,18 +68,31 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
       NDPI_LOG_DBG2(ndpi_struct, "no blank following the >: do nothing\n");
     }
 
-    /* Even if there are 2 RFCs (3164, 5424), syslog format after "<NUMBER>" is
-       not standard. The only common pattern seems to be that the entire
-       payload is made by printable characters */
-    /* TODO: check only the first N bytes to avoid touching the entire payload? */
-    for (j = 0; j < packet->payload_packet_len - i; j++) {
-      if (!(ndpi_isprint(packet->payload[i + j]) ||
-            ndpi_isspace(packet->payload[i + j]))) {
-        NDPI_LOG_DBG2(ndpi_struct, "no printable char 0x%x [i/j %d/%d]\n",
-                      packet->payload[i + j], i, j);
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        return;
-      }
+    while (i < packet->payload_packet_len)
+    {
+        if (ndpi_isalnum(packet->payload[i]) == 0)
+        {
+            if (packet->payload[i] == ' ' || packet->payload[i] == ':' ||
+                packet->payload[i] == '=')
+            {
+                break;
+            }
+            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            return;
+        }
+
+        i++;
+    }
+
+    if (packet->payload[i] == ':')
+    {
+        i++;
+        if (i >= packet->payload_packet_len ||
+            packet->payload[i] != ' ')
+        {
+            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            return;
+        }
     }
 
     NDPI_LOG_INFO(ndpi_struct, "found syslog\n");

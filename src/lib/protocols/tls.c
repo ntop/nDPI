@@ -260,7 +260,7 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
   buffer[len] = '\0';
 
   // check string is printable
-  is_printable = ndpi_is_printable_string(buffer, len);
+  is_printable = ndpi_normalize_printable_string(buffer, len);
 
   if(is_printable) {
     int rc = ndpi_snprintf(&rdnSeqBuf[*rdnSeqBuf_offset],
@@ -394,7 +394,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 
 	if(rdn_len && (flow->protos.tls_quic.issuerDN == NULL)) {
 	  flow->protos.tls_quic.issuerDN = ndpi_strdup(rdnSeqBuf);
-	  if(ndpi_is_printable_string(rdnSeqBuf, rdn_len) == 0) {
+	  if(ndpi_normalize_printable_string(rdnSeqBuf, rdn_len) == 0) {
 	    char str[64];
 
 	    snprintf(str, sizeof(str), "Invalid issuerDN %s", flow->protos.tls_quic.issuerDN);
@@ -587,7 +587,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 		      We cannot use ndpi_is_valid_hostname() as we can have wildcards
 		      here that will create false positives
 		    */
-		    if(ndpi_is_printable_string(dNSName, dNSName_len) == 0) {
+		    if(ndpi_normalize_printable_string(dNSName, dNSName_len) == 0) {
 		      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, dNSName);
 
 		      /* This looks like an attack */
@@ -1531,7 +1531,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 	  printf("Server TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
-	  if(ndpi_is_printable_string(alpn_str, alpn_str_len) == 0)
+	  if(ndpi_normalize_printable_string(alpn_str, alpn_str_len) == 0)
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, alpn_str);
 
 	  if(flow->protos.tls_quic.alpn == NULL)

@@ -25,6 +25,7 @@ extern u_int8_t ndpi_ends_with(char *str, char *ends);
 
 #define ndpi_isalpha(ch) (((ch) >= 'a' && (ch) <= 'z') || ((ch) >= 'A' && (ch) <= 'Z'))
 #define ndpi_isdigit(ch) ((ch) >= '0' && (ch) <= '9')
+#define ndpi_isalnum(ch) (ndpi_isalpha(ch) != 0 || ndpi_isdigit(ch) != 0)
 #define ndpi_isspace(ch) (((ch) >= '\t' && (ch) <= '\r') || ((ch) == ' '))
 #define ndpi_isprint(ch) ((ch) >= 0x20 && (ch) <= 0x7e)
 #define ndpi_ispunct(ch) (((ch) >= '!' && (ch) <= '/') ||   \

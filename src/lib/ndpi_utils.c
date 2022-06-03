@@ -755,8 +755,8 @@ static int _ndpi_is_valid_char(char c) {
   if(ispunct(c) && (!ndpi_is_other_char(c)))
     return(0);
   else
-    return(isdigit(c)
-	   || isalpha(c)
+    return(ndpi_isdigit(c)
+	   || ndpi_isalpha(c)
 	   || ndpi_is_other_char(c));
 }
 static char ndpi_is_valid_char_tbl[256],ndpi_is_valid_char_tbl_init=0;
@@ -2274,7 +2274,22 @@ int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
-int ndpi_is_printable_string(char * const str, size_t len) {
+int ndpi_is_printable_buffer(uint8_t const * const buf, size_t len) {
+  int retval = 1;
+  size_t i;
+
+  for(i = 0; i < len; ++i) {
+    if(ndpi_isprint(buf[i]) == 0) {
+      retval = 0;
+    }
+  }
+
+  return retval;
+}
+
+/* ******************************************************************** */
+
+int ndpi_normalize_printable_string(char * const str, size_t len) {
   int retval = 1;
   size_t i;
 
