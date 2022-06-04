@@ -73,7 +73,8 @@ void ndpi_search_syslog(struct ndpi_detection_module_struct
         if (ndpi_isalnum(packet->payload[i]) == 0)
         {
             if (packet->payload[i] == ' ' || packet->payload[i] == ':' ||
-                packet->payload[i] == '=')
+                packet->payload[i] == '=' || packet->payload[i] == '[' ||
+                packet->payload[i] == '-')
             {
                 break;
             }
