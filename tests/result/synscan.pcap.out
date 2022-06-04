@@ -15,7 +15,6 @@ HTTP	9	530	5
 NetBIOS	2	116	2
 NFS	2	116	2
 BGP	4	232	4
-Syslog	2	116	2
 PostgreSQL	2	116	2
 MySQL	2	116	2
 POPS	2	116	2
@@ -57,6 +56,7 @@ Starcraft	2	116	2
 Git	2	116	2
 TargusDataspeed	2	116	2
 DNP3	2	116	2
+RSH	2	116	2
 iSCSI	2	116	2
 
 	1	TCP 172.16.0.8:36050 <-> 64.13.134.52:22 [proto: 92/SSH][Encrypted][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.68 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -79,7 +79,7 @@ iSCSI	2	116	2
 	18	TCP 172.16.0.8:36050 -> 64.13.134.52:445 [proto: 41/SMBv23][ClearText][Confidence: Match by port][cat: System/18][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	TCP 172.16.0.8:36050 -> 64.13.134.52:465 [proto: 29/SMTPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	TCP 172.16.0.8:36050 -> 64.13.134.52:500 [proto: 79/IPsec][Encrypted][Confidence: Match by port][cat: VPN/2][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	21	TCP 172.16.0.8:36050 -> 64.13.134.52:514 [proto: 17/Syslog][ClearText][Confidence: Match by port][cat: System/18][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	21	TCP 172.16.0.8:36050 -> 64.13.134.52:514 [proto: 294/RSH][ClearText][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unsafe Protocol **][Risk Score: 10][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	TCP 172.16.0.8:36050 -> 64.13.134.52:548 [proto: 97/AFP][ClearText][Confidence: Match by port][cat: DataTransfer/4][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	23	TCP 172.16.0.8:36050 -> 64.13.134.52:554 [proto: 50/RTSP][ClearText][Confidence: Match by port][cat: Media/1][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	24	TCP 172.16.0.8:36050 -> 64.13.134.52:587 [proto: 29/SMTPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -104,7 +104,7 @@ iSCSI	2	116	2
 	43	TCP 172.16.0.8:36050 -> 64.13.134.52:2605 [proto: 13/BGP][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	44	TCP 172.16.0.8:36050 -> 64.13.134.52:3000 [proto: 26/ntop][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	45	TCP 172.16.0.8:36050 -> 64.13.134.52:3128 [proto: 131/HTTP_Proxy][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	46	TCP 172.16.0.8:36050 -> 64.13.134.52:3260 [proto: 294/iSCSI][ClearText][Confidence: Match by port][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	46	TCP 172.16.0.8:36050 -> 64.13.134.52:3260 [proto: 295/iSCSI][ClearText][Confidence: Match by port][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	47	TCP 172.16.0.8:36050 -> 64.13.134.52:3306 [proto: 20/MySQL][ClearText][Confidence: Match by port][cat: Database/11][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	48	TCP 172.16.0.8:36050 -> 64.13.134.52:3389 [proto: 88/RDP][ClearText][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	49	TCP 172.16.0.8:36050 -> 64.13.134.52:4343 [proto: 170/Whois-DAS][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -140,7 +140,7 @@ iSCSI	2	116	2
 	79	TCP 172.16.0.8:36051 -> 64.13.134.52:445 [proto: 41/SMBv23][ClearText][Confidence: Match by port][cat: System/18][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	80	TCP 172.16.0.8:36051 -> 64.13.134.52:465 [proto: 29/SMTPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	81	TCP 172.16.0.8:36051 -> 64.13.134.52:500 [proto: 79/IPsec][Encrypted][Confidence: Match by port][cat: VPN/2][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	82	TCP 172.16.0.8:36051 -> 64.13.134.52:514 [proto: 17/Syslog][ClearText][Confidence: Match by port][cat: System/18][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	82	TCP 172.16.0.8:36051 -> 64.13.134.52:514 [proto: 294/RSH][ClearText][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unsafe Protocol **][Risk Score: 10][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	83	TCP 172.16.0.8:36051 -> 64.13.134.52:548 [proto: 97/AFP][ClearText][Confidence: Match by port][cat: DataTransfer/4][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	84	TCP 172.16.0.8:36051 -> 64.13.134.52:554 [proto: 50/RTSP][ClearText][Confidence: Match by port][cat: Media/1][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	85	TCP 172.16.0.8:36051 -> 64.13.134.52:587 [proto: 29/SMTPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -165,7 +165,7 @@ iSCSI	2	116	2
 	104	TCP 172.16.0.8:36051 -> 64.13.134.52:2605 [proto: 13/BGP][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	105	TCP 172.16.0.8:36051 -> 64.13.134.52:3000 [proto: 26/ntop][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	106	TCP 172.16.0.8:36051 -> 64.13.134.52:3128 [proto: 131/HTTP_Proxy][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	107	TCP 172.16.0.8:36051 -> 64.13.134.52:3260 [proto: 294/iSCSI][ClearText][Confidence: Match by port][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	107	TCP 172.16.0.8:36051 -> 64.13.134.52:3260 [proto: 295/iSCSI][ClearText][Confidence: Match by port][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	108	TCP 172.16.0.8:36051 -> 64.13.134.52:3306 [proto: 20/MySQL][ClearText][Confidence: Match by port][cat: Database/11][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	109	TCP 172.16.0.8:36051 -> 64.13.134.52:3389 [proto: 88/RDP][ClearText][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	110	TCP 172.16.0.8:36051 -> 64.13.134.52:4343 [proto: 170/Whois-DAS][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
