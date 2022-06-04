@@ -322,6 +322,7 @@ typedef enum {
   NDPI_PROTOCOL_MPEGDASH              = 291,
   NDPI_PROTOCOL_DAZN                  = 292,
   NDPI_PROTOCOL_GOTO                  = 293, /* GoTo products, mainly GoToMeeting */
+  NDPI_PROTOCOL_RSH                   = 294,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

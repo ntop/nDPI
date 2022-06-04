@@ -1,0 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+RSH	6	3335	1
+
+	1	TCP 172.31.78.129:9039 -> 172.29.43.201:514 [proto: 294/RSH][ClearText][Confidence: DPI][cat: RemoteAccess/12][6 pkts/3335 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][0.08 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 11/0 16/0 26/0 6/0][Pkt Len c2s/s2c min/avg/max/stddev: 292/0 556/0 844/0 212/0][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (52.926451)][Plen Bins: 0,0,0,0,0,0,0,34,0,0,0,0,0,16,0,0,0,0,16,0,0,16,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

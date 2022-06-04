@@ -297,6 +297,8 @@
 #define NDPI_IPIP_PROTOCOL_TYPE    0x04
 #define NDPI_ICMPV6_PROTOCOL_TYPE  0x3a
 
+#define NDPI_ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
+
 /* the get_uXX will return raw network packet bytes !! */
 #define get_u_int8_t(X,O)   (*(u_int8_t  *)((&(((u_int8_t *)X)[O]))))
 #define get_u_int16_t(X,O)  (*(u_int16_t *)((&(((u_int8_t *)X)[O]))))
@@ -314,7 +316,6 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 
 /* new definitions to get little endian from network bytes */
 #define get_ul8(X,O) get_u_int8_t(X,O)
-
 
 #if defined(__LITTLE_ENDIAN__) || defined(_LITTLE_ENDIAN)
 #define get_l16(X,O)  get_u_int16_t(X,O)
