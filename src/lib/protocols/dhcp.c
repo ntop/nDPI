@@ -25,14 +25,15 @@
 #include "ndpi_api.h"
 
 /* freeradius/src/lib/dhcp.c */
-#define DHCP_CHADDR_LEN	16
+#define DHCP_CHADDR_LEN	6
 #define DHCP_SNAME_LEN	64
 #define DHCP_FILE_LEN	128
 #define DHCP_VEND_LEN	308
 #define DHCP_OPTION_MAGIC_NUMBER 	0x63825363
+#define DHCP_MAGIC_LEN             4
 
-
-typedef struct {
+PACK_ON
+struct dhcp_packet {
   uint8_t	msgType;
   uint8_t	htype;
   uint8_t	hlen;
@@ -45,21 +46,32 @@ typedef struct {
   uint32_t	siaddr;/* 20 */
   uint32_t	giaddr;/* 24 */
   uint8_t	chaddr[DHCP_CHADDR_LEN]; /* 28 */
+  uint8_t	pad[10]; /* 34 */
   uint8_t	sname[DHCP_SNAME_LEN]; /* 44 */
   uint8_t	file[DHCP_FILE_LEN]; /* 108 */
-  uint32_t	magic; /* 236 */
+  uint8_t	magic[DHCP_MAGIC_LEN]; /* 236 */
   uint8_t	options[DHCP_VEND_LEN];
-} dhcp_packet_t;
+} PACK_OFF;
 
 
-static void ndpi_int_dhcp_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DHCP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+static void ndpi_int_dhcp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+					 struct ndpi_flow_struct *flow) {
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DHCP,
+			     NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
+static int is_dhcp_magic(uint8_t *magic) {
+  if((magic[0] == 0x63)
+     && (magic[1] == 0x82)
+     && (magic[2] == 0x53)
+     && (magic[3] == 0x63))
+    return(1);
+  else
+    return(0);
+}
 
-void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
+			  struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t msg_type = 0;
 
@@ -69,16 +81,16 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 
   /* check standard DHCP 0.0.0.0:68 -> 255.255.255.255:67 */
   if(packet->udp) {
-    dhcp_packet_t *dhcp = (dhcp_packet_t*)packet->payload;
-
-    if((packet->payload_packet_len >= 244 /* 244 is the offset of options[0] in dhcp_packet_t */)
+    struct dhcp_packet *dhcp = (struct dhcp_packet*)packet->payload;
+    
+    if((packet->payload_packet_len >= 244 /* 244 is the offset of options[0] in struct dhcp_packet */)
        && (packet->udp->source == htons(67) || packet->udp->source == htons(68))
        && (packet->udp->dest == htons(67) || packet->udp->dest == htons(68))
-       && (dhcp->magic == htonl(DHCP_OPTION_MAGIC_NUMBER))) {
+       && is_dhcp_magic(dhcp->magic)) {	   
       u_int i = 0, foundValidMsgType = 0;
 
-      u_int dhcp_options_size = ndpi_min(DHCP_VEND_LEN /* maximum size of options in dhcp_packet_t */,
-					 packet->payload_packet_len - 244);
+      u_int dhcp_options_size = ndpi_min(DHCP_VEND_LEN /* maximum size of options in struct dhcp_packet */,
+					 packet->payload_packet_len - 240);
 
 
       /* Parse options in two steps (since we need first the message type and
@@ -96,6 +108,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
 				  dhcp_options_size - (i+2) /* 1 for the type and 1 for the value */);
           if(len == 0)
             break;
+	  
           if(id == 53 /* DHCP Message Type */) {
             msg_type = dhcp->options[i+2];
 
@@ -104,6 +117,7 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct, stru
               break;
             }
           }
+	  
           i += len + 2;
         }
       }
