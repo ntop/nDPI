@@ -90,7 +90,11 @@ else
      NDPI_API_VERSION=$((SOURCE_DATE_EPOCH % 65536))
 fi
 
-echo "Setting API version to $NDPI_API_VERSION"
+AS_IF([test "x${NDPI_API_VERSION}" = "x"],[
+  AC_MSG_WARN([Could not get NDPI_API_VERSION, defaulting to 0.])
+  NDPI_API_VERSION=0
+])
+echo "Setting API version to ${NDPI_API_VERSION}"
 
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
