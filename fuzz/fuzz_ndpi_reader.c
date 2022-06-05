@@ -57,7 +57,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
     prefs->decode_tunnels = 1;
     prefs->num_roots = 16;
-    prefs->max_ndpi_flows = 1024 * 1024;
+    prefs->max_ndpi_flows = 16 * 1024 * 1024;
     prefs->quiet_mode = 0;
 
     workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json);

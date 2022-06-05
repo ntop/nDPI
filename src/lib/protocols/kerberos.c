@@ -671,7 +671,7 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 
 	      if (krb_parse(ndpi_struct, flow, 8) != 0)
 	      {
-	        NDPI_LOG_ERR(ndpi_struct, "[TGS-REP] Invalid packet received\n");
+	        NDPI_LOG_DBG(ndpi_struct, "[TGS-REP] Invalid packet received\n");
 	        return;
 	      }
 	      NDPI_LOG_DBG(ndpi_struct,
