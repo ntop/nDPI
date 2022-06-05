@@ -186,8 +186,8 @@ void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
         }
       }
     }
-  }
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  } else
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
