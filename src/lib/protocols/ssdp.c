@@ -37,10 +37,18 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
   ndpi_parse_packet_line_info(ndpi_struct, flow);
 
   /* Save user-agent for device discovery if available */
-  if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
+  if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len > 0) {
     if (ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len) == NULL)
     {
       NDPI_LOG_DBG2(ndpi_struct, "Could not set SSDP user agent\n");
+    }
+  }
+
+  /* Save host which provides a service if available */
+  if (packet->host_line.ptr != NULL && packet->host_line.len > 0) {
+    if (ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len) == NULL)
+    {
+      NDPI_LOG_DBG2(ndpi_struct, "Could not set SSDP host\n");
     }
   }
 }
