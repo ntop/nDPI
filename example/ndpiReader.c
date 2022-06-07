@@ -146,6 +146,14 @@ typedef struct node_a {
   struct node_a *left, *right;
 }addr_node;
 
+// struct to add more statitcs in function printFlowStats
+typedef struct hash_stats{
+  char* domain_name;  
+  int occurency;       /* how many time domain name occury in the flow */
+  UT_hash_handle hh;   /* hashtable to collect the stats */
+}hash_stats;
+
+
 struct port_stats {
   u_int32_t port; /* we'll use this field as the key */
   u_int32_t num_pkts, num_bytes;
@@ -476,10 +484,11 @@ static void help(u_int long_help) {
          "                            | testing purposes in order to compare results across runs\n"
          "  -h                        | This help\n"
          "  -H                        | This help plus some information about supported protocols/risks\n"
-         "  -v <1|2|3>                | Verbose 'unknown protocol' packet print.\n"
+         "  -v <1|2|3|4>              | Verbose 'unknown protocol' packet print.\n"
          "                            | 1 = verbose\n"
          "                            | 2 = very verbose\n"
          "                            | 3 = port stats\n"
+	   "                            | 4 = hash stats\n"
          "  -V <1-4>                  | nDPI logging level\n"
          "                            | 1 - trace, 2 - debug, 3 - full debug\n"
          "                            | >3 - full debug + log enabled for all protocols (i.e. '-u all')\n"
@@ -2720,6 +2729,16 @@ static void printRiskStats() {
 
 /* *********************************************** */
 
+/*function to use in HASH_SORT function in verbose == 4 */
+static int hash_stats_sort(void *_a, void *_b){
+	struct hash_stats *a = (struct hash_stats*)_a;
+	struct hash_stats *b = (struct hash_stats*)_b;
+	
+	return (b->occurency - a->occurency);
+}
+
+/* *********************************************** */
+
 static void printFlowsStats() {
   int thread_id;
   u_int32_t total_flows = 0;
@@ -3073,6 +3092,118 @@ static void printFlowsStats() {
         }
       }
     }
+
+    if (verbose == 4){
+		//how long the table could be
+		unsigned int len_table_max = 1000;
+	      	//number of element to delete when the table is full
+		int toDelete = 10;
+		unsigned int size_table;
+		struct hash_stats *hostsHashT = NULL;
+		struct hash_stats *host_iter = NULL;
+		struct hash_stats *tmp4 = NULL;
+		struct hash_stats *tmp5 = NULL;
+		struct hash_stats *tmp6 = NULL;
+		struct hash_stats *tmp7 = NULL;
+		int len_max = 0;    
+		      
+	      	for (i = 0; i<num_flows; i++){
+			
+		if(all_flows[i].flow->host_server_name[0] != '\0'){
+		
+			int len = strlen(all_flows[i].flow->host_server_name);
+			if(len > len_max)
+				len_max = len;
+				
+			struct hash_stats *hostFound;
+			HASH_FIND_STR(hostsHashT, all_flows[i].flow->host_server_name, hostFound);
+
+			if(hostFound == NULL){
+				struct hash_stats *newHost = (struct hash_stats*)malloc(sizeof(hash_stats));
+			      	newHost->domain_name = all_flows[i].flow->host_server_name;
+				newHost->occurency = 1;
+				    
+				if ((size_table = HASH_COUNT(hostsHashT)==len_table_max)){
+				  int i=0;
+				  while (i<=toDelete){
+					
+				    HASH_ITER(hh, hostsHashT, host_iter, tmp4){
+				      HASH_DEL(hostsHashT,host_iter);
+				      free(host_iter);
+				      i++;		
+				    }	
+				  }
+				      	
+				}			
+				HASH_ADD_KEYPTR(hh, hostsHashT, newHost->domain_name, strlen(newHost->domain_name), newHost);
+			}	
+			else
+			  hostFound->occurency++;
+			
+			
+		}
+		
+		if(all_flows[i].flow->ssh_tls.server_info[0] != '\0'){
+		
+			int len = strlen(all_flows[i].flow->host_server_name);
+			if(len > len_max)
+				len_max = len;
+				
+			struct hash_stats *hostFound;
+		  	HASH_FIND_STR(hostsHashT, all_flows[i].flow->ssh_tls.server_info, hostFound);
+
+		  	if(hostFound == NULL){
+		    		struct hash_stats *newHost = (struct hash_stats*)malloc(sizeof(hash_stats));
+	      	    		newHost->domain_name = all_flows[i].flow->ssh_tls.server_info;
+		    		newHost->occurency = 1;
+	    
+	    			if ((size_table = HASH_COUNT(hostsHashT)==len_table_max)){
+				  int i=0;
+				  while (i<toDelete){
+		
+				    HASH_ITER(hh, hostsHashT, host_iter, tmp5){
+			 	     HASH_DEL(hostsHashT,host_iter);
+			  	    free(host_iter);
+			   	   i++;		
+			 	   }
+				  }	
+	      			
+	      	
+	    			}
+				HASH_ADD_KEYPTR(hh, hostsHashT, newHost->domain_name, strlen(newHost->domain_name), newHost);
+			}
+			else
+			  hostFound->occurency++;
+			
+			
+		}	
+		
+		//sort the table by the occurency
+		HASH_SORT(hostsHashT, hash_stats_sort);
+	}
+
+      
+	
+      	//print the element of the hash table
+   	int j;
+   	int diff;
+	HASH_ITER(hh, hostsHashT, host_iter, tmp6){
+		
+		printf("%s", host_iter->domain_name);
+		//to print the occurency in aligned column	    	
+		diff = len_max-strlen(host_iter->domain_name);
+	    	for (j = 0; j <= diff+5;j++)
+	    		printf (" ");
+	    	printf("%d\n",host_iter->occurency);
+	}
+
+	//freeing the hash table
+	HASH_ITER(hh, hostsHashT, host_iter, tmp7){
+	   HASH_DEL(hostsHashT, host_iter);
+	   free(host_iter);
+	}
+	    
+  }
 
     /* Print all flows stats */
 
