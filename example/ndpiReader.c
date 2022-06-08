@@ -3164,7 +3164,7 @@ static void printFlowsStats() {
 		
 				    HASH_ITER(hh, hostsHashT, host_iter, tmp5){
 			 	     HASH_DEL(hostsHashT,host_iter);
-			  	    free(host_iter);
+			  	    ndpi_free(host_iter);
 			   	   i++;		
 			 	   }
 				  }	
