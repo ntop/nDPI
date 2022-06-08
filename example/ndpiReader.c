@@ -3154,7 +3154,7 @@ static void printFlowsStats() {
 		  	HASH_FIND_STR(hostsHashT, all_flows[i].flow->ssh_tls.server_info, hostFound);
 
 		  	if(hostFound == NULL){
-		    		struct hash_stats *newHost = (struct hash_stats*)malloc(sizeof(hash_stats));
+		    		struct hash_stats *newHost = (struct hash_stats*)ndpi_malloc(sizeof(hash_stats));
 	      	    		newHost->domain_name = all_flows[i].flow->ssh_tls.server_info;
 		    		newHost->occurency = 1;
 	    
