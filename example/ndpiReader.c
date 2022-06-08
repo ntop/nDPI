@@ -3190,7 +3190,7 @@ static void printFlowsStats() {
    	int diff;
 	HASH_ITER(hh, hostsHashT, host_iter, tmp6){
 		
-		printf("%s", host_iter->domain_name);
+		printf("\t%s", host_iter->domain_name);
 		//to print the occurency in aligned column	    	
 		diff = len_max-strlen(host_iter->domain_name);
 	    	for (j = 0; j <= diff+5;j++)
