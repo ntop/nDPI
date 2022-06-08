@@ -1294,6 +1294,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "EGP", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_PGM,
+			  "PGM", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_SCTP,
 			  "SCTP", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -3128,6 +3132,9 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
     case NDPI_GRE_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_GRE);
       break;
+    case NDPI_PGM_PROTOCOL_TYPE:
+      return(NDPI_PROTOCOL_IP_PGM);
+      break;
     case NDPI_ICMP_PROTOCOL_TYPE:
       if(flow) {
         flow->entropy = 0.0f;
@@ -4941,7 +4948,6 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 }
 
 /* ************************************************ */
-
 
 void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 			      struct ndpi_flow_struct *flow) {

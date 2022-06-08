@@ -296,6 +296,7 @@
 #define NDPI_SCTP_PROTOCOL_TYPE	   132
 #define NDPI_IPIP_PROTOCOL_TYPE    0x04
 #define NDPI_ICMPV6_PROTOCOL_TYPE  0x3a
+#define NDPI_PGM_PROTOCOL_TYPE     0x71
 
 #define NDPI_ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
 

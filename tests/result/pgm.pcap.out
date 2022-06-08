@@ -1,0 +1,8 @@
+Guessed flow protos:	0
+
+DPI Packets (other):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+
+PGM	1000	196302	1
+
+	1	113 10.244.64.154:0 -> 235.0.1.47:0 [proto: 296/PGM][ClearText][Confidence: DPI][cat: Network/14][1000 pkts/196302 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][78.91 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 78/0 1479/0 169/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/0 196/0 1344/0 201/0][PLAIN TEXT (PORTFOLIO)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
