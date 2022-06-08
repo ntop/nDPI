@@ -3158,7 +3158,7 @@ static void printFlowsStats() {
 	      	    		newHost->domain_name = all_flows[i].flow->ssh_tls.server_info;
 		    		newHost->occurency = 1;
 	    
-	    			if ((size_table = HASH_COUNT(hostsHashT)==len_table_max)){
+	    			if ((size_table = HASH_COUNT(hostsHashT)) == len_table_max) {
 				  int i=0;
 				  while (i<toDelete){
 		
