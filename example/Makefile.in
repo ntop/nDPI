@@ -13,9 +13,8 @@ CFLAGS+=-g -I$(SRCHOME)/include @PCAP_INC@ @CFLAGS@
 LDFLAGS=@LDFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LIBS=$(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@
-HEADERS=intrusion_detection.h reader_util.h $(SRCHOME)/include/ndpi_api.h \
+HEADERS=reader_util.h $(SRCHOME)/include/ndpi_api.h \
         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
-OBJS=ndpiReader.o reader_util.o intrusion_detection.o
 PREFIX?=@prefix@
 
 ifneq ($(BUILD_MINGW),)
