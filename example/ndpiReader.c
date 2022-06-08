@@ -3197,6 +3197,7 @@ static void printFlowsStats() {
 	    		printf (" ");
 	    	printf("%d\n",host_iter->occurency);
 	}
+	printf("%s", "\n\n");
 
 	//freeing the hash table
 	HASH_ITER(hh, hostsHashT, host_iter, tmp7){
