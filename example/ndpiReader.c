@@ -3191,7 +3191,7 @@ static void printFlowsStats() {
 		
 		printf("\t%s", host_iter->domain_name);
 		//to print the occurency in aligned column	    	
-		diff = len_max-strlen(host_iter->domain_name);
+		int diff = len_max-strlen(host_iter->domain_name);
 	    	for (j = 0; j <= diff+5;j++)
 	    		printf (" ");
 	    	printf("%d\n",host_iter->occurency);
