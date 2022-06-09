@@ -3123,7 +3123,7 @@ static void printFlowsStats() {
 				newHost->occurency = 1;
 				    
 				size_t size_table;
-				if ((size_table = HASH_COUNT(hostsHashT)) == len_table_max) {
+				if (HASH_COUNT(hostsHashT) == len_table_max) {
 				  int i=0;
 				  while (i<=toDelete){
 					
