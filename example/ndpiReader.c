@@ -3098,7 +3098,6 @@ static void printFlowsStats() {
 		unsigned int len_table_max = 1000;
 	      	//number of element to delete when the table is full
 		int toDelete = 10;
-		unsigned int size_table;
 		struct hash_stats *hostsHashT = NULL;
 		struct hash_stats *host_iter = NULL;
 		struct hash_stats *tmp4 = NULL;
