@@ -3187,7 +3187,6 @@ static void printFlowsStats() {
 	
       	//print the element of the hash table
    	int j;
-   	int diff;
 	HASH_ITER(hh, hostsHashT, host_iter, tmp6){
 		
 		printf("\t%s", host_iter->domain_name);
