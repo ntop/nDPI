@@ -15,6 +15,7 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
 
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
+AC_ARG_ENABLE(gprof, AS_HELP_STRING([--enable-gprof], [Enable CPU/HEAP profiling with gperftools]),[enable_gprof=$enableval],[enable_gprof=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
 AC_ARG_WITH(local-libgcrypt,  AS_HELP_STRING([--with-local-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
 AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
@@ -26,7 +27,7 @@ AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 AS_IF([test "${with_sanitizer+set}" = set],[
   CFLAGS="${CFLAGS} -g3 -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
   LDFLAGS="${LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak"
-])
+],[CFLAGS="${CFLAGS} -g"])
 
 AS_IF([test "x${enable_code_coverage}" = "xyes"],[
   CFLAGS="${CFLAGS} -fprofile-arcs -ftest-coverage"
@@ -128,8 +129,7 @@ AS_IF([test "x${enable_tls_sigs}" = "xyes"],[
   HANDLE_TLS_SIGS=""
 ])
 
-LIBS="$LIBS $JSONC_LIBS"
-CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member $CFLAGS $JSONC_CFLAGS"
+CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member ${CFLAGS}"
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
@@ -262,6 +262,17 @@ return 0;
 ])
 AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
+AS_IF([test "x$enable_gprof" = "xyes"], [
+    PKG_CHECK_MODULES([PROFILER], [libprofiler],,[
+        AC_MSG_ERROR([libprofiler not available. Required for profiling support.])
+    ])
+    PKG_CHECK_MODULES([TCMALLOC], [libtcmalloc],,[
+        AC_MSG_ERROR([libtcmalloc not available. Required for profiling support.])
+    ])
+    GPROF_LIBS="${pkg_cv_PROFILER_LIBS} ${pkg_cv_TCMALLOC_LIBS}"
+    GPROF_CFLAGS="${pkg_cv_PROFILER_CFLAGS} ${pkg_cv_TCMALLOC_CFLAGS}"
+])
+
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
 
 dnl> libgcrypt (external)
@@ -328,6 +339,8 @@ AC_SUBST(BUILD_MINGW_X64)
 AC_SUBST(BUILD_FUZZTARGETS)
 AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
+AC_SUBST(GPROF_CFLAGS)
+AC_SUBST(GPROF_LIBS)
 AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE_ENABLED)
 AC_SUBST(HANDLE_TLS_SIGS)

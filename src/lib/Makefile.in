@@ -17,9 +17,9 @@ includedir = ${prefix}/include/ndpi
 ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
-CFLAGS     += -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @CFLAGS@ @CUSTOM_NDPI@
+CFLAGS     += -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@
 LDFLAGS    = @LDFLAGS@
-LIBS       = @ADDITIONAL_LIBS@ @LIBS@
+LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
 OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) $(patsubst ./%.c, ./%.o, $(wildcard ./*.c))
 HEADERS   = $(wildcard ../include/*.h)
