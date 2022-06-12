@@ -2,7 +2,7 @@ CC=@CC@
 INC=-I ../src/include -I/usr/local/include
 LIBDPI=../src/lib/libndpi.a
 LDFLAGS=@LDFLAGS@
-LIB=$(LIBDPI) -lrrd -lm @LIBS@ @ADDITIONAL_LIBS@
+LIB=$(LIBDPI) -lm @ADDITIONAL_LIBS@ @LIBS@
 
 TOOLS=metric_anomaly
 

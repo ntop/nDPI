@@ -1,5 +1,5 @@
 INC=-I ../../src/include/ -I ../../src/lib/third_party/include/
-LIB=../../src/lib/libndpi.a @ADDITIONAL_LIBS@
+LIB=../../src/lib/libndpi.a @ADDITIONAL_LIBS@ @LIBS@
 
 TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu
 TESTS=substring_test patricia_test
