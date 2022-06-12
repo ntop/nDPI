@@ -3111,8 +3111,7 @@ static void printFlowsStats() {
 		if(all_flows[i].flow->host_server_name[0] != '\0'){
 		
 			int len = strlen(all_flows[i].flow->host_server_name);
-			if(len > len_max)
-				len_max = len;
+			len_max = ndpi_max(len,len_max);
 				
 			struct hash_stats *hostFound;
 			HASH_FIND_STR(hostsHashT, all_flows[i].flow->host_server_name, hostFound);
@@ -3146,8 +3145,7 @@ static void printFlowsStats() {
 		if(all_flows[i].flow->ssh_tls.server_info[0] != '\0'){
 		
 			int len = strlen(all_flows[i].flow->host_server_name);
-			if(len > len_max)
-				len_max = len;
+			len_max = ndpi_max(len,len_max);
 				
 			struct hash_stats *hostFound;
 		  	HASH_FIND_STR(hostsHashT, all_flows[i].flow->ssh_tls.server_info, hostFound);
