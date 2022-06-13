@@ -139,6 +139,14 @@ extern "C" {
   int ndpi_handle_ipv6_extension_headers(u_int16_t l3len,
 					 const u_int8_t ** l4ptr, u_int16_t * l4len,
 					 u_int8_t * nxt_hdr);
+  
+  void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
+			       u_int8_t is_cleartext, u_int8_t is_app_protocol,
+			       ndpi_protocol_breed_t breed,
+			       u_int16_t protoId, char *protoName,
+			       ndpi_protocol_category_t protoCategory,
+			       ndpi_port_range *tcpDefPorts,
+			       ndpi_port_range *udpDefPorts);    
   void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 		     struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		     char *risk_message);
