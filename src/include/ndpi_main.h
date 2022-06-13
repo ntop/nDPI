@@ -99,13 +99,6 @@ extern "C" {
   extern void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_mod,
 				      int protoId, ...);
 
-  extern void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod,
-				      u_int8_t is_cleartext,
-				      ndpi_protocol_breed_t protoBreed, u_int16_t protoId, char *protoName,
-				      ndpi_protocol_category_t protoCategory,
-				      ndpi_port_range *tcpDefPorts,
-				      ndpi_port_range *udpDefPorts);
-
   extern void ndpi_int_reset_protocol(struct ndpi_flow_struct *flow);
 
   extern int ndpi_packet_src_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip);

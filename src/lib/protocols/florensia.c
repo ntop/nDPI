@@ -36,83 +36,83 @@ static void ndpi_florensia_add_connection(struct ndpi_detection_module_struct *n
 
 void ndpi_search_florensia(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
-	NDPI_LOG_DBG(ndpi_struct, "search florensia\n");
+  NDPI_LOG_DBG(ndpi_struct, "search florensia\n");
 
-	if (packet->tcp != NULL) {
-		if (packet->payload_packet_len == 5 && get_l16(packet->payload, 0) == packet->payload_packet_len
-			&& packet->payload[2] == 0x65 && packet->payload[4] == 0xff) {
-			if (flow->florensia_stage == 1) {
-				NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
-				ndpi_florensia_add_connection(ndpi_struct, flow);
-				return;
-			}
-			NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
-			flow->florensia_stage = 1;
-			return;
-		}
-		if (packet->payload_packet_len > 8 && get_l16(packet->payload, 0) == packet->payload_packet_len
-			&& get_u_int16_t(packet->payload, 2) == htons(0x0201) && get_u_int32_t(packet->payload, 4) == htonl(0xFFFFFFFF)) {
-			NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
-			flow->florensia_stage = 1;
-			return;
-		}
-		if (packet->payload_packet_len == 406 && get_l16(packet->payload, 0) == packet->payload_packet_len
-			&& packet->payload[2] == 0x63) {
-			NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
-			flow->florensia_stage = 1;
-			return;
-		}
-		if (packet->payload_packet_len == 12 && get_l16(packet->payload, 0) == packet->payload_packet_len
-			&& get_u_int16_t(packet->payload, 2) == htons(0x0301)) {
-			if (flow->florensia_stage == 1) {
-				NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
-				ndpi_florensia_add_connection(ndpi_struct, flow);
-				return;
-			}
-			NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
-			flow->florensia_stage = 1;
-			return;
-		}
+  if (packet->tcp != NULL) {
+    if (packet->payload_packet_len == 5 && get_l16(packet->payload, 0) == packet->payload_packet_len
+	&& packet->payload[2] == 0x65 && packet->payload[4] == 0xff) {
+      if (flow->florensia_stage == 1) {
+	NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
+	ndpi_florensia_add_connection(ndpi_struct, flow);
+	return;
+      }
+      NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
+      flow->florensia_stage = 1;
+      return;
+    }
+    if (packet->payload_packet_len > 8 && get_l16(packet->payload, 0) == packet->payload_packet_len
+	&& get_u_int16_t(packet->payload, 2) == htons(0x0201) && get_u_int32_t(packet->payload, 4) == htonl(0xFFFFFFFF)) {
+      NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
+      flow->florensia_stage = 1;
+      return;
+    }
+    if (packet->payload_packet_len == 406 && get_l16(packet->payload, 0) == packet->payload_packet_len
+	&& packet->payload[2] == 0x63) {
+      NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
+      flow->florensia_stage = 1;
+      return;
+    }
+    if (packet->payload_packet_len == 12 && get_l16(packet->payload, 0) == packet->payload_packet_len
+	&& get_u_int16_t(packet->payload, 2) == htons(0x0301)) {
+      if (flow->florensia_stage == 1) {
+	NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
+	ndpi_florensia_add_connection(ndpi_struct, flow);
+	return;
+      }
+      NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
+      flow->florensia_stage = 1;
+      return;
+    }
 
-		if (flow->florensia_stage == 1) {
-			if (packet->payload_packet_len == 8 && get_l16(packet->payload, 0) == packet->payload_packet_len
-				&& get_u_int16_t(packet->payload, 2) == htons(0x0302) && get_u_int32_t(packet->payload, 4) == htonl(0xFFFFFFFF)) {
-				NDPI_LOG_INFO(ndpi_struct, "found florensia asymmetrically\n");
-				ndpi_florensia_add_connection(ndpi_struct, flow);
-				return;
-			}
-			if (packet->payload_packet_len == 24 && get_l16(packet->payload, 0) == packet->payload_packet_len
-				&& get_u_int16_t(packet->payload, 2) == htons(0x0202)
-				&& get_u_int32_t(packet->payload, packet->payload_packet_len - 4) == htonl(0xFFFFFFFF)) {
-				NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
-				ndpi_florensia_add_connection(ndpi_struct, flow);
-				return;
-			}
-			if (flow->packet_counter < 10 && get_l16(packet->payload, 0) == packet->payload_packet_len) {
-				NDPI_LOG_DBG2(ndpi_struct, "maybe florensia\n");
-				return;
-			}
-		}
-	}
+    if (flow->florensia_stage == 1) {
+      if (packet->payload_packet_len == 8 && get_l16(packet->payload, 0) == packet->payload_packet_len
+	  && get_u_int16_t(packet->payload, 2) == htons(0x0302) && get_u_int32_t(packet->payload, 4) == htonl(0xFFFFFFFF)) {
+	NDPI_LOG_INFO(ndpi_struct, "found florensia asymmetrically\n");
+	ndpi_florensia_add_connection(ndpi_struct, flow);
+	return;
+      }
+      if (packet->payload_packet_len == 24 && get_l16(packet->payload, 0) == packet->payload_packet_len
+	  && get_u_int16_t(packet->payload, 2) == htons(0x0202)
+	  && get_u_int32_t(packet->payload, packet->payload_packet_len - 4) == htonl(0xFFFFFFFF)) {
+	NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
+	ndpi_florensia_add_connection(ndpi_struct, flow);
+	return;
+      }
+      if (flow->packet_counter < 10 && get_l16(packet->payload, 0) == packet->payload_packet_len) {
+	NDPI_LOG_DBG2(ndpi_struct, "maybe florensia\n");
+	return;
+      }
+    }
+  }
 
-	if (packet->udp != NULL) {
-		if (flow->florensia_stage == 0 && packet->payload_packet_len == 6
-			&& get_u_int16_t(packet->payload, 0) == ntohs(0x0503) && get_u_int32_t(packet->payload, 2) == htonl(0xFFFF0000)) {
-			NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
-			flow->florensia_stage = 1;
-			return;
-		}
-		if (flow->florensia_stage == 1 && packet->payload_packet_len == 8
-			&& get_u_int16_t(packet->payload, 0) == ntohs(0x0500) && get_u_int16_t(packet->payload, 4) == htons(0x4191)) {
-			NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
-			ndpi_florensia_add_connection(ndpi_struct, flow);
-			return;
-		}
-	}
+  if (packet->udp != NULL) {
+    if (flow->florensia_stage == 0 && packet->payload_packet_len == 6
+	&& get_u_int16_t(packet->payload, 0) == ntohs(0x0503) && get_u_int32_t(packet->payload, 2) == htonl(0xFFFF0000)) {
+      NDPI_LOG_DBG2(ndpi_struct, "maybe florensia -> stage is set to 1\n");
+      flow->florensia_stage = 1;
+      return;
+    }
+    if (flow->florensia_stage == 1 && packet->payload_packet_len == 8
+	&& get_u_int16_t(packet->payload, 0) == ntohs(0x0500) && get_u_int16_t(packet->payload, 4) == htons(0x4191)) {
+      NDPI_LOG_INFO(ndpi_struct, "found florensia\n");
+      ndpi_florensia_add_connection(ndpi_struct, flow);
+      return;
+    }
+  }
 
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

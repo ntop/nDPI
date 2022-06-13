@@ -78,7 +78,7 @@ void ndpi_search_warcraft3(struct ndpi_detection_module_struct
 
     if (l == packet->payload_packet_len) {
       NDPI_LOG_DBG2(ndpi_struct, "maybe WARCRAFT3 flow->packet_counter = %u \n",
-	       flow->packet_counter);
+		    flow->packet_counter);
       if (flow->packet_counter > 2) {
 	NDPI_LOG_INFO(ndpi_struct, "found WARCRAFT3\n");
 	ndpi_int_warcraft3_add_connection(ndpi_struct, flow);

@@ -27,12 +27,12 @@
 #include "ndpi_api.h"
 
 enum websocket_opcode
-{
+  {
     /*
-    * CONTINUATION_FRAME is not relevant for the detection and leads to many false positives  
-    CONTINUATION_FRAME = 0x00,
-    FIN_CONTINUATION_FRAME = 0x80,
-     */
+     * CONTINUATION_FRAME is not relevant for the detection and leads to many false positives  
+     CONTINUATION_FRAME = 0x00,
+     FIN_CONTINUATION_FRAME = 0x80,
+    */
     TEXT_FRAME = 0x01,
     FIN_TEXT_FRAME = 0x81,
     BINARY_FRAME = 0x02,
@@ -43,17 +43,17 @@ enum websocket_opcode
     FIN_PING_FRAME = 0x89,
     PONG_FRAME = 0x0A,
     FIN_PONG_FRAME = 0x8A
-};
+  };
 
 static void set_websocket_detected(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-    /* If no custom protocol has been detected */
-    if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
+  /* If no custom protocol has been detected */
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     {
-        ndpi_search_tcp_or_udp(ndpi_struct, flow);
+      ndpi_search_tcp_or_udp(ndpi_struct, flow);
 
-        ndpi_int_reset_protocol(flow);
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET, flow->guessed_host_protocol_id, NDPI_CONFIDENCE_DPI);
+      ndpi_int_reset_protocol(flow);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET, flow->guessed_host_protocol_id, NDPI_CONFIDENCE_DPI);
     }
 }
 
@@ -61,59 +61,59 @@ static void set_websocket_detected(struct ndpi_detection_module_struct *ndpi_str
 
 static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-    struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-    if (packet->payload_packet_len < sizeof(u_int16_t))
+  if (packet->payload_packet_len < sizeof(u_int16_t))
     {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        return;
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
     }
 
-    u_int8_t websocket_payload_length = packet->payload[1] & 0x7F;
-    u_int8_t websocket_masked = packet->payload[1] & 0x80;
+  u_int8_t websocket_payload_length = packet->payload[1] & 0x7F;
+  u_int8_t websocket_masked = packet->payload[1] & 0x80;
 
-    uint8_t hdr_size = (websocket_masked == 1) ? 6 : 2;
+  uint8_t hdr_size = (websocket_masked == 1) ? 6 : 2;
 
-    if (packet->payload_packet_len != hdr_size + websocket_payload_length)
+  if (packet->payload_packet_len != hdr_size + websocket_payload_length)
     {
-        NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        return;
+      NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
     }
 
-    if (packet->payload[0] == TEXT_FRAME ||  packet->payload[0] == FIN_TEXT_FRAME || 
-        packet->payload[0] == BINARY_FRAME || packet->payload[0] == FIN_BINARY_FRAME || 
-        packet->payload[0] == CONNECTION_CLOSE_FRAME || packet->payload[0] == FIN_CONNECTION_CLOSE_FRAME || 
-        packet->payload[0] == PING_FRAME || packet->payload[0] == FIN_PING_FRAME || 
-        packet->payload[0] == PONG_FRAME || packet->payload[0] == FIN_PONG_FRAME) {
+  if (packet->payload[0] == TEXT_FRAME ||  packet->payload[0] == FIN_TEXT_FRAME || 
+      packet->payload[0] == BINARY_FRAME || packet->payload[0] == FIN_BINARY_FRAME || 
+      packet->payload[0] == CONNECTION_CLOSE_FRAME || packet->payload[0] == FIN_CONNECTION_CLOSE_FRAME || 
+      packet->payload[0] == PING_FRAME || packet->payload[0] == FIN_PING_FRAME || 
+      packet->payload[0] == PONG_FRAME || packet->payload[0] == FIN_PONG_FRAME) {
 
-        set_websocket_detected(ndpi_struct, flow);
+    set_websocket_detected(ndpi_struct, flow);
 
-    } else {
-        NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        return;
-    }
+  } else {
+    NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
 }
 
 void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-    // Break after 6 packets.
-    if (flow->packet_counter > 10)
+  // Break after 6 packets.
+  if (flow->packet_counter > 10)
     {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        return;
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
     }
 
-    if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
     {
-        return;
+      return;
     }
 
-    NDPI_LOG_DBG(ndpi_struct, "search WEBSOCKET\n");
-    ndpi_check_websocket(ndpi_struct, flow);
+  NDPI_LOG_DBG(ndpi_struct, "search WEBSOCKET\n");
+  ndpi_check_websocket(ndpi_struct, flow);
 
-    return;
+  return;
 }
 
 /* ********************************* */
@@ -121,9 +121,9 @@ void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_struct, str
 void init_websocket_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
                               NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-    ndpi_set_bitmask_protocol_detection("WEBSOCKET", ndpi_struct, detection_bitmask, *id, NDPI_PROTOCOL_WEBSOCKET,
-                                        ndpi_search_websocket, NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
-                                        SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
+  ndpi_set_bitmask_protocol_detection("WEBSOCKET", ndpi_struct, detection_bitmask, *id, NDPI_PROTOCOL_WEBSOCKET,
+				      ndpi_search_websocket, NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+				      SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
 
-    *id += 1;
+  *id += 1;
 }

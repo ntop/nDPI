@@ -516,7 +516,8 @@ static void help(u_int long_help) {
 
     ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
     printf("\n\nnDPI supported protocols:\n");
-    printf("%3s %-22s %-8s %-12s %s\n", "Id", "Protocol", "Layer_4", "Breed", "Category");
+    printf("%3s %-22s %-10s %-8s %-12s %s\n",
+	   "Id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category");
     num_threads = 1;
 
     NDPI_BITMASK_SET_ALL(all);
