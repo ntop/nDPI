@@ -310,12 +310,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  rsp_type = get16(&x, packet->payload);
 	  rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
 
-	  if(rsp_ttl < 300) {
-	    char buf[64];
-
-	    snprintf(buf, sizeof(buf), "Low DNS Record TTL %d", rsp_ttl);
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, buf);
-	  }
+	  if(rsp_ttl == 0)
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "DNS Record with zero TTL");	  
 
 #ifdef DNS_DEBUG
 	  printf("[DNS] TTL = %u\n", rsp_ttl);
