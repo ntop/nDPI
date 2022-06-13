@@ -94,7 +94,7 @@ static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct
   case 106:
   case 107:
   case 259:
-    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, NULL);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "Obsolete DNS record type");
     break;
   }
 }
@@ -283,6 +283,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(dns_header->num_answers > 0) {
 	u_int16_t rsp_type;
+	u_int32_t rsp_ttl;
 	u_int16_t num;
 
 	for(num = 0; num < dns_header->num_answers; num++) {
@@ -303,8 +304,17 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  }
 
 	  rsp_type = get16(&x, packet->payload);
+	  rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+
+	  if(rsp_ttl < 300) {
+	    char buf[64];
+
+	    snprintf(buf, sizeof(buf), "Low DNS Record TTL %d", rsp_ttl);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, buf);
+	  }
 
 #ifdef DNS_DEBUG
+	  printf("[DNS] TTL = %u\n", rsp_ttl);
 	  printf("[DNS] [response] response_type=%d\n", rsp_type);
 #endif
 
