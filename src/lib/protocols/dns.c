@@ -258,6 +258,10 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
       snprintf(str, sizeof(str), "DNS Error Code %d", flow->protos.dns.reply_code);
       ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
+    } else {
+      if(ndpi_isset_risk(ndpi_struct, flow, NDPI_SUSPICIOUS_DGA_DOMAIN)) {
+	ndpi_set_risk(ndpi_struct, flow, NDPI_RISKY_DOMAIN, "DGA Name Query with no Error Code");	
+      }
     }
     
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
