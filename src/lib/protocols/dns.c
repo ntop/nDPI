@@ -303,7 +303,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  } else
 	    x += data_len;
 
-	  if((x+2) >= packet->payload_packet_len) {
+	  if((x+8) >= packet->payload_packet_len) {
 	    break;
 	  }
 
