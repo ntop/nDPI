@@ -3100,10 +3100,7 @@ static void printFlowsStats() {
 		int toDelete = 10;
 		struct hash_stats *hostsHashT = NULL;
 		struct hash_stats *host_iter = NULL;
-		struct hash_stats *tmp4 = NULL;
-		struct hash_stats *tmp5 = NULL;
-		struct hash_stats *tmp6 = NULL;
-		struct hash_stats *tmp7 = NULL;
+		struct hash_stats *tmp = NULL;
 		int len_max = 0;    
 		      
 	      	for (i = 0; i<num_flows; i++){
@@ -3124,7 +3121,7 @@ static void printFlowsStats() {
 				  int i=0;
 				  while (i<=toDelete){
 					
-				    HASH_ITER(hh, hostsHashT, host_iter, tmp4){
+				    HASH_ITER(hh, hostsHashT, host_iter, tmp){
 				      HASH_DEL(hostsHashT,host_iter);
 				      free(host_iter);
 				      i++;		
@@ -3157,7 +3154,7 @@ static void printFlowsStats() {
 				  int i=0;
 				  while (i<toDelete){
 		
-				    HASH_ITER(hh, hostsHashT, host_iter, tmp5){
+				    HASH_ITER(hh, hostsHashT, host_iter, tmp){
 			 	     HASH_DEL(hostsHashT,host_iter);
 			  	    ndpi_free(host_iter);
 			   	   i++;		
@@ -3182,7 +3179,7 @@ static void printFlowsStats() {
 	
       	//print the element of the hash table
    	int j;
-	HASH_ITER(hh, hostsHashT, host_iter, tmp6){
+	HASH_ITER(hh, hostsHashT, host_iter, tmp){
 		
 		printf("\t%s", host_iter->domain_name);
 		//to print the occurency in aligned column	    	
@@ -3194,7 +3191,7 @@ static void printFlowsStats() {
 	printf("%s", "\n\n");
 
 	//freeing the hash table
-	HASH_ITER(hh, hostsHashT, host_iter, tmp7){
+	HASH_ITER(hh, hostsHashT, host_iter, tmp){
 	   HASH_DEL(hostsHashT, host_iter);
 	   ndpi_free(host_iter);
 	}
