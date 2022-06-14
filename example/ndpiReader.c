@@ -2729,8 +2729,18 @@ static void printRiskStats() {
 
 /* *********************************************** */
 
-/*function to use in HASH_SORT function in verbose == 4 */
-static int hash_stats_sort(void *_a, void *_b){
+/*function to use in HASH_SORT function in verbose == 4 to order in creasing order to delete host with the leatest occurency*/
+static int hash_stats_sort_to_order(void *_a, void *_b){
+	struct hash_stats *a = (struct hash_stats*)_a;
+	struct hash_stats *b = (struct hash_stats*)_b;
+	
+	return (a->occurency - b->occurency);
+}
+
+/* *********************************************** */
+
+/*function to use in HASH_SORT function in verbose == 4 to print in decreasing order*/
+static int hash_stats_sort_to_print(void *_a, void *_b){
 	struct hash_stats *a = (struct hash_stats*)_a;
 	struct hash_stats *b = (struct hash_stats*)_b;
 	
@@ -3171,13 +3181,14 @@ static void printFlowsStats() {
 			
 		}	
 		
-		//sort the table by the occurency
-		HASH_SORT(hostsHashT, hash_stats_sort);
+		//sort the table by the least occurency
+		HASH_SORT(hostsHashT, hash_stats_sort_to_order);
 	}
 
-      
-	
-      	//print the element of the hash table
+	//sort the table in decreasing order to print
+      	HASH_SORT(hostsHashT, hash_stats_sort_to_print);
+      	
+	//print the element of the hash table
    	int j;
 	HASH_ITER(hh, hostsHashT, host_iter, tmp){
 		
