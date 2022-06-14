@@ -187,7 +187,7 @@ typedef struct ac_node
   struct edge    *outgoing;           /* Array of outgoing edges */
 
   struct ac_node *failure_node;       /* The failure node of this node */
-  AC_ALPHABET_t  *a_ptr;
+  unsigned char  *a_ptr;
 } AC_NODE_t;
 
 struct edge {
