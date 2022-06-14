@@ -1157,10 +1157,12 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	     flow->ndpi_flow->protos.ssh.hassh_server);
   }
   /* TLS */
-  else if((is_ndpi_proto(flow, NDPI_PROTOCOL_TLS))
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)
+          || is_ndpi_proto(flow, NDPI_PROTOCOL_DTLS)
+          || is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS)
+          || is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS)
+          || is_ndpi_proto(flow, NDPI_PROTOCOL_MAIL_POPS)
 	  || ((is_quic = is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)))
-	  || (flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-	  || (flow->ndpi_flow->protos.tls_quic.ja3_client[0] != '\0')
 	  ) {
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.tls_quic.ssl_version;
 
