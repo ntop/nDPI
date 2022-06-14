@@ -1276,7 +1276,7 @@ struct ndpi_flow_struct {
         char *esni;
       } encrypted_sni;
       ndpi_cipher_weakness server_unsafe_cipher;
-    } tls_quic;
+    } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS */
 
     struct {
       char client_signature[48], server_signature[48];
