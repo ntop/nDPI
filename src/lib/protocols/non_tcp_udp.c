@@ -89,6 +89,10 @@ void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
     set_protocol_and_bmask(NDPI_PROTOCOL_IP_ICMPV6);
     break;
 
+  case NDPI_PIM_PROTOCOL_TYPE:
+    set_protocol_and_bmask(NDPI_PROTOCOL_IP_PIM);
+    break;
+
   case 112:
     set_protocol_and_bmask(NDPI_PROTOCOL_IP_VRRP);
     break;
@@ -176,6 +180,14 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 
   ndpi_set_bitmask_protocol_detection("IP_ICMPV6", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_IP_ICMPV6,
+				      ndpi_search_in_non_tcp_udp,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
+				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+				      ADD_TO_DETECTION_BITMASK);
+  *id += 1;
+
+  ndpi_set_bitmask_protocol_detection("IP_PIM", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_IP_PIM,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
