@@ -1915,6 +1915,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "RSH", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
                           ndpi_build_default_ports(ports_a, 514, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_PIM,
+			  "IP_PIM", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -3143,6 +3147,9 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       break;
     case NDPI_PGM_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_PGM);
+      break;
+    case NDPI_PIM_PROTOCOL_TYPE:
+      return(NDPI_PROTOCOL_IP_PIM);
       break;
     case NDPI_ICMP_PROTOCOL_TYPE:
       if(flow) {
