@@ -107,7 +107,7 @@ typedef enum {
   NDPI_PROTOCOL_WORLDOFWARCRAFT       = 76,
   NDPI_PROTOCOL_TELNET                = 77,
   NDPI_PROTOCOL_STUN                  = 78,
-  NDPI_PROTOCOL_IP_IPSEC              = 79,
+  NDPI_PROTOCOL_IPSEC                 = 79,
   NDPI_PROTOCOL_IP_GRE                = 80,
   NDPI_PROTOCOL_IP_ICMP               = 81,
   NDPI_PROTOCOL_IP_IGMP               = 82,

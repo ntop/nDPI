@@ -50,7 +50,7 @@ void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
   switch (flow->l4_proto) {
   case NDPI_IPSEC_PROTOCOL_ESP:
   case NDPI_IPSEC_PROTOCOL_AH:
-    set_protocol_and_bmask(NDPI_PROTOCOL_IP_IPSEC);
+    set_protocol_and_bmask(NDPI_PROTOCOL_IPSEC);
     break;
 
   case NDPI_GRE_PROTOCOL_TYPE:
@@ -106,8 +106,8 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
   /* always add non tcp/udp if one protocol is compiled in */
   NDPI_SAVE_AS_BITMASK(ndpi_struct->callback_buffer[*id].detection_bitmask, NDPI_PROTOCOL_UNKNOWN);
 
-  ndpi_set_bitmask_protocol_detection("IP_IPSEC", ndpi_struct, detection_bitmask, *id,
-				      NDPI_PROTOCOL_IP_IPSEC,
+  ndpi_set_bitmask_protocol_detection("IPSec", ndpi_struct, detection_bitmask, *id,
+				      NDPI_PROTOCOL_IPSEC,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
