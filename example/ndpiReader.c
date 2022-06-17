@@ -4553,20 +4553,24 @@ void rsiUnitTest() {
 /* *********************************************** */
 
 void hashUnitTest() {
-  ndpi_str_hash *h = ndpi_hash_alloc(16384);
-  char* dict[] = { "hello", "world", NULL };
+  ndpi_str_hash *h;
+  char * const dict[] = { "hello", "world", NULL };
   int i;
 
-  assert(h);
+  assert(ndpi_hash_init(&h) == 0);
+  assert(h == NULL);
 
   for(i=0; dict[i] != NULL; i++) {
-    u_int8_t l = strlen(dict[i]), v;
+    u_int8_t l = strlen(dict[i]);
+    int * v;
 
-    assert(ndpi_hash_add_entry(h, dict[i], l, i) == 0);
-    assert(ndpi_hash_find_entry(h, dict[i], l, &v) == 0);
+    assert(ndpi_hash_add_entry(&h, dict[i], l, &i) == 0);
+    assert(ndpi_hash_find_entry(h, dict[i], l, (void **)&v) == 0);
+    assert(v == (void *)&i && *v == i);
   }
 
-  ndpi_hash_free(h);
+  ndpi_hash_free(&h, NULL);
+  assert(h == NULL);
 }
 
 /* *********************************************** */

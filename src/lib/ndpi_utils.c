@@ -51,6 +51,7 @@
 #include "third_party/include/libinjection.h"
 #include "third_party/include/libinjection_sqli.h"
 #include "third_party/include/libinjection_xss.h"
+#include "third_party/include/uthash.h"
 #include "third_party/include/rce_injection.h"
 
 #define NDPI_CONST_GENERIC_PROTOCOL_NAME  "GenericProtocol"
@@ -66,6 +67,20 @@ struct pcre_struct {
   pcre *compiled;
   pcre_extra *optimized;
 };
+#endif
+
+/*
+ * Please keep this strcture in sync with
+ * `struct ndpi_str_hash` in src/include/ndpi_typedefs.h
+ */
+typedef struct ndpi_str_hash_private {
+  unsigned int hash;
+  void *value;
+  UT_hash_handle hh;
+} ndpi_str_hash_private;
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+_Static_assert(sizeof(struct ndpi_str_hash) == sizeof(struct ndpi_str_hash_private) - sizeof(UT_hash_handle),
+               "Please keep `struct ndpi_str_hash` and `struct ndpi_str_hash_private` syncd.");
 #endif
 
 /* ****************************************** */
@@ -2063,106 +2078,79 @@ u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long) {
 
 /* ******************************************************************** */
 
-ndpi_str_hash* ndpi_hash_alloc(u_int32_t max_num_entries) {
-  ndpi_str_hash *h = (ndpi_str_hash*)ndpi_malloc(sizeof(ndpi_str_hash));
-
-  if(!h) return(NULL);
-  if(max_num_entries < 1024) max_num_entries = 1024;
-  if(max_num_entries > 10000000) max_num_entries = 10000000;
-
-  h->max_num_entries = max_num_entries, h->num_buckets = max_num_entries/2;
-  h->buckets = (struct ndpi_str_hash_info**)ndpi_calloc(sizeof(struct ndpi_str_hash_info*), h->num_buckets);
-
-  if(h->buckets == NULL) {
-    ndpi_free(h);
-    return(NULL);
-  } else
-    return(h);
-}
-
-/* ******************************************************************** */
-
-void ndpi_hash_free(ndpi_str_hash *h) {
-  u_int32_t i;
-
-  for(i=0; i<h->num_buckets; i++) {
-    struct ndpi_str_hash_info *head = h->buckets[i];
-
-    while(head != NULL) {
-      struct ndpi_str_hash_info *next = head->next;
-
-      ndpi_free(head->key);
-      ndpi_free(head);
-      head = next;
-    }
+int ndpi_hash_init(ndpi_str_hash **h)
+{
+  if (h == NULL)
+  {
+    return 1;
   }
 
-  ndpi_free(h->buckets);
-  ndpi_free(h);
+  *h = NULL;
+  return 0;
 }
 
 /* ******************************************************************** */
 
-static u_int32_t _ndpi_hash_function(ndpi_str_hash *h, char *key, u_int8_t key_len) {
-  u_int32_t hv = 0;
-  u_int8_t i;
+void ndpi_hash_free(ndpi_str_hash **h, void (*cleanup_func)(ndpi_str_hash *h))
+{
+  struct ndpi_str_hash_private *h_priv;
+  struct ndpi_str_hash_private *current, *tmp;
 
-  for(i=0; i<key_len; i++)
-    hv += key[i]*(i+1);
+  if (h == NULL)
+  {
+    return;
+  }
+  h_priv = *(struct ndpi_str_hash_private **)h;
 
-  return(hv % h->num_buckets);
-}
-
-/* ******************************************************************** */
-
-static int _ndpi_hash_find_entry(ndpi_str_hash *h, u_int32_t hashval, char *key, u_int key_len, u_int8_t *value) {
-  struct ndpi_str_hash_info *head = h->buckets[hashval];
-
-  while(head != NULL) {
-    if((head->key_len == key_len) && (memcmp(head->key, key, key_len) == 0)) {
-      *value = head->value;
-      return(0); /* Found */
+  HASH_ITER(hh, h_priv, current, tmp) {
+    HASH_DEL(h_priv, current);
+    if (cleanup_func != NULL)
+    {
+      cleanup_func((ndpi_str_hash *)current);
     }
-
-    head = head-> next;
+    free(current);
   }
 
-  return(-1); /* Not found */
+  *h = NULL;
 }
 
 /* ******************************************************************** */
 
-int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int8_t *value) {
-  u_int32_t hv = _ndpi_hash_function(h, key, key_len);
+int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, void **value)
+{
+  struct ndpi_str_hash_private *h_priv = (struct ndpi_str_hash_private *)h;
+  struct ndpi_str_hash_private *found;
+  unsigned int hash_value;
 
-  return(_ndpi_hash_find_entry(h, hv, key, key_len, value));
+  HASH_VALUE(key, key_len, hash_value);
+  HASH_FIND_INT(h_priv, &hash_value, found);
+  if (found != NULL)
+  {
+    *value = found->value;
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 /* ******************************************************************** */
 
-int ndpi_hash_add_entry(ndpi_str_hash *h, char *key, u_int8_t key_len, u_int8_t value) {
-  u_int32_t hv = _ndpi_hash_function(h, key, key_len);
-  u_int8_t ret_value;
-  int rc = _ndpi_hash_find_entry(h, hv, key, key_len, &ret_value);
+int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, void *value)
+{
+  struct ndpi_str_hash_private **h_priv = (struct ndpi_str_hash_private **)h;
+  struct ndpi_str_hash_private *new = ndpi_calloc(1, sizeof(*new));
+  unsigned int hash_value;
 
-  if(rc == -1) {
-    /* Not found */
-    struct ndpi_str_hash_info *e = (struct ndpi_str_hash_info*)ndpi_malloc(sizeof(struct ndpi_str_hash_info));
+  if (new == NULL)
+  {
+    return 1;
+  }
 
-    if(e == NULL)
-      return(-2);
-
-    if((e->key = (char*)ndpi_malloc(key_len)) == NULL)
-      return(-3);
-
-    memcpy(e->key, key, key_len);
-    e->key_len = key_len, e->value = value;
-    e->next = h->buckets[hv];
-    h->buckets[hv] = e;
-
-    return(0);
-  } else
-    return(0);
+  HASH_VALUE(key, key_len, hash_value);
+  new->hash = hash_value;
+  new->value = value;
+  HASH_ADD_INT(*h_priv, hash, new);
+  return 0;
 }
 
 /* ********************************************************************************* */
