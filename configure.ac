@@ -277,6 +277,7 @@ return 0;
 ])
 AM_CONDITIONAL([HAS_FUZZLDFLAGS], [test "x$has_sanitizefuzzer" = "xyes"])
 
+GPROF_ENABLED=0
 AS_IF([test "x$enable_gprof" = "xyes"], [
     PKG_CHECK_MODULES([PROFILER], [libprofiler],,[
         AC_MSG_ERROR([libprofiler not available. Required for profiling support.])
@@ -284,6 +285,7 @@ AS_IF([test "x$enable_gprof" = "xyes"], [
     PKG_CHECK_MODULES([TCMALLOC], [libtcmalloc],,[
         AC_MSG_ERROR([libtcmalloc not available. Required for profiling support.])
     ])
+    GPROF_ENABLED=1
     GPROF_LIBS="${pkg_cv_PROFILER_LIBS} ${pkg_cv_TCMALLOC_LIBS}"
     GPROF_CFLAGS="${pkg_cv_PROFILER_CFLAGS} ${pkg_cv_TCMALLOC_CFLAGS}"
 ])
@@ -356,6 +358,7 @@ AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)
 AC_SUBST(GPROF_CFLAGS)
 AC_SUBST(GPROF_LIBS)
+AC_SUBST(GPROF_ENABLED)
 AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE_ENABLED)
 AC_SUBST(HANDLE_TLS_SIGS)

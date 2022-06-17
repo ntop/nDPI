@@ -91,7 +91,7 @@ jobs:
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison doxygen
       - name: Configure nDPI library
         run: |
-          ./autogen.sh --with-only-libndpi
+          ./autogen.sh --with-only-libndpi --enable-option-checking=fatal
       - name: Generate Documentation
         run: |
           pip install --upgrade pip
@@ -104,6 +104,31 @@ jobs:
           name: ndpi-documentation
           path: doc/_build/ndpi-documentation-upload
           retention-days: 7
+
+  performance:
+    name: Performance (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libpcap-dev
+          sudo apt-get install golang-1.16-go libgoogle-perftools-dev
+          env GO111MODULE=on go install github.com/google/pprof@latest
+          sudo ln -s ${HOME}/go/bin/pprof /usr/bin/pprof
+          pprof -h
+      - name: Configure nDPI library
+        run: |
+          ./autogen.sh --enable-gprof --enable-option-checking=fatal ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
+      - name: Build nDPI library
+        run: |
+          make
+      - name: Performance Profiling
+        run: |
+          env LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libprofiler.so ./tests/do.sh
 
   test-scripts:
     name: Test Utils (ubuntu-latest)
