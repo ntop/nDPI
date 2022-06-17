@@ -1140,7 +1140,16 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       ndpi_snprintf(flow->http.content_type, sizeof(flow->http.content_type), "%s", flow->ndpi_flow->http.content_type ? flow->ndpi_flow->http.content_type : "");
       ndpi_snprintf(flow->http.request_content_type, sizeof(flow->http.request_content_type), "%s", flow->ndpi_flow->http.request_content_type ? flow->ndpi_flow->http.request_content_type : "");
     }
-  } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TELNET)) {
+  }
+  /* COLLECTD */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_COLLECTD)) {
+    flow->info_type = INFO_GENERIC;
+    if(flow->ndpi_flow->protos.collectd.client_username[0] != '\0')
+      ndpi_snprintf(flow->info, sizeof(flow->info), "Username: %s",
+                    flow->ndpi_flow->protos.collectd.client_username);
+  }
+  /* TELNET */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TELNET)) {
     if(flow->ndpi_flow->protos.telnet.username[0] != '\0')
       flow->telnet.username = ndpi_strdup(flow->ndpi_flow->protos.telnet.username);
     if(flow->ndpi_flow->protos.telnet.password[0] != '\0')
