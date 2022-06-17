@@ -1608,18 +1608,11 @@ struct ndpi_bin {
 
 /* **************************************** */
 
-struct ndpi_str_hash_info {
-  char *key;         /* Key   */
-  u_int8_t key_len;
-  u_int8_t value;    /* Value */
-  struct ndpi_str_hash_info *next;
-};
-
-typedef struct {
-  u_int32_t num_buckets, max_num_entries;
-  struct ndpi_str_hash_info **buckets;
+typedef struct ndpi_str_hash {
+  unsigned int hash;
+  void *value;
+  u_int8_t private_data[0];
 } ndpi_str_hash;
-
 
 /* **************************************** */
 
