@@ -20,6 +20,7 @@ CMD_WDIFF="$(which wdiff)"
 CMD_COLORDIFF="$(which colordiff)"
 
 EXE_SUFFIX=@EXE_SUFFIX@
+GPROF_ENABLED=@GPROF_ENABLED@
 PCRE_ENABLED=@PCRE_ENABLED@
 PCRE_PCAPS="WebattackRCE.pcap"
 GCRYPT_PCAPS="gquic.pcap quic-23.pcap quic-24.pcap quic-27.pcap quic-28.pcap quic-29.pcap quic-mvfst-22.pcap quic-mvfst-27.pcapng quic-mvfst-exp.pcap quic_q50.pcap quic_t50.pcap quic_t51.pcap quic_0RTT.pcap quic_interop_V.pcapng quic-33.pcapng doq.pcapng doq_adguard.pcapng dlt_ppp.pcap os_detected.pcapng quic_frags_ch_out_of_order_same_packet_craziness.pcapng quic_frags_ch_in_multiple_packets.pcapng quic-v2-00.pcapng"
@@ -32,6 +33,12 @@ if [ ! -x "../example/ndpiReader${EXE_SUFFIX}" ]; then
   echo "$0: Missing $(realpath ../example/ndpiReader${EXE_SUFFIX})"
   echo "$0: Run ./configure and make first"
   exit 1
+fi
+
+if [ ${GPROF_ENABLED} -eq 1 ]; then
+  GPROF="$(which pprof)"
+else
+  GPROF=false
 fi
 
 fuzzy_testing() {
@@ -74,7 +81,7 @@ check_results() {
 
 	if [ -f result/$f.out ]; then
 	    CMD="$READER -q -K JSON -k /dev/null -t -i pcap/$f -w /tmp/reader.out -v 2"
-	    $CMD
+	    CPUPROFILE=result/$f.cprof HEAPPROFILE=result/$f $CMD
 	    CMD_RET=$?
 	    if [ $CMD_RET -eq 0 ]; then
 	      NUM_DIFF=`${CMD_DIFF} result/$f.out /tmp/reader.out | wc -l`
@@ -99,6 +106,11 @@ check_results() {
 	    /bin/rm -f /tmp/reader.out
 	fi
     done
+
+    if [ ${GPROF_ENABLED} -eq 1 ]; then
+      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || RC=$(( RC + 1 ))
+      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || RC=$(( RC + 1 ))
+    fi
 }
 
 if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
