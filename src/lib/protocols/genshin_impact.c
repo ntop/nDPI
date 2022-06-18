@@ -39,14 +39,28 @@ static void ndpi_search_genshin_impact(struct ndpi_detection_module_struct *ndpi
 
   NDPI_LOG_DBG(ndpi_struct, "search genshin-impact\n");
 
-  if (packet->udp != NULL)
+  if (packet->tcp != NULL && packet->payload_packet_len >= 18)
+  {
+    u_int32_t pdu_len = ntohl(get_u_int32_t(packet->payload, 1));
+
+    if (packet->payload[0] == 0x01 && pdu_len == packet->payload_packet_len &&
+        (packet->payload[5] == 0x01 || packet->payload[5] == 0x07) &&
+        ntohs(get_u_int16_t(packet->payload, 16)) == 0x4da6)
+    {
+      NDPI_LOG_INFO(ndpi_struct, "found genshin-impact (TCP)\n");
+      ndpi_int_genshin_impact_add_connection(ndpi_struct, flow);
+      return;
+    }
+  }
+  else if (packet->udp != NULL)
   {
     if (flow->packet_counter == 1 && packet->payload_packet_len >= 20 &&
-        ntohl(*(u_int32_t*)&packet->payload[0]) == 0x000000FF &&
-        ntohl(*(u_int32_t*)&packet->payload[4]) == 0x00000000 &&
-        ntohl(*(u_int32_t*)&packet->payload[12]) == 0x499602D2 &&
-        ntohl(*(u_int32_t*)&packet->payload[16]) == 0xFFFFFFFF)
+        ntohl(get_u_int32_t(packet->payload, 0)) == 0x000000FF &&
+        ntohl(get_u_int32_t(packet->payload, 4)) == 0x00000000 &&
+        ntohl(get_u_int32_t(packet->payload, 12)) == 0x499602D2 &&
+        ntohl(get_u_int32_t(packet->payload, 16)) == 0xFFFFFFFF)
     {
+      NDPI_LOG_INFO(ndpi_struct, "found genshin-impact (UDP)\n");
       ndpi_int_genshin_impact_add_connection(ndpi_struct, flow);
       return;
     }
@@ -65,7 +79,7 @@ void init_genshin_impact_dissector(struct ndpi_detection_module_struct *ndpi_str
                                       ndpi_struct, detection_bitmask, *id,
                                       NDPI_PROTOCOL_GENSHIN_IMPACT,
                                       ndpi_search_genshin_impact,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
 
