@@ -117,7 +117,10 @@ typedef enum {
   NDPI_ERROR_CODE_DETECTED,
   NDPI_HTTP_CRAWLER_BOT,
   NDPI_ANONYMOUS_SUBSCRIBER,
-
+  NDPI_UNIDIRECTIONAL_TRAFFIC, /* NOTE: as nDPI can detect a protocol with one packet, make sure
+				  your app will clear this risk if future packets (not sent to nDPI)
+				  are received in the opposite direction */
+  
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;

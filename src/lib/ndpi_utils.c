@@ -1914,6 +1914,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Anonymous Subscriber");
     break;
 
+  case NDPI_UNIDIRECTIONAL_TRAFFIC:
+    return("Unidirectional Traffic");
+    break;
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

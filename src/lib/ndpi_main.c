@@ -153,6 +153,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_ERROR_CODE_DETECTED,                   NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
   { NDPI_HTTP_CRAWLER_BOT,                      NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE  },
   { NDPI_ANONYMOUS_SUBSCRIBER,                  NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE },
+  { NDPI_UNIDIRECTIONAL_TRAFFIC,                NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE }
@@ -4975,6 +4976,29 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ************************************************ */
 
+static u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_packet_struct *packet) {
+
+  if(packet->iph) {
+    /* IPv4 */
+    u_int32_t daddr = ntohl(packet->iph->daddr);
+
+    if(((daddr & 0xE0000000) == 0xE0000000 /* multicast */)
+       || ((daddr & 0x000000FF) == 0x000000FF /* last byte is 0xFF, not super correct, but a good approximation */)
+       || ((daddr & 0x000000FF) == 0x00000000 /* last byte is 0x00, not super correct, but a good approximation */)
+       || (daddr == 0xFFFFFFFF))
+      return(1);
+  } else if(packet->iphv6) {
+    /* IPv6 */
+    
+    if((ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) & 0xFF000000) == 0xFF000000)
+      return(1);
+  }
+
+  return(0);
+}
+
+/* ************************************************ */
+
 void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 			      struct ndpi_flow_struct *flow) {
   if(!flow) {
@@ -5014,7 +5038,6 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     if(tcph != NULL) {
-
       flow->sport = tcph->source, flow->dport = tcph->dest; /* (*#*) */
 
       if(!ndpi_str->direction_detect_disable)
@@ -5092,6 +5115,18 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       flow->packet_direction_counter[packet->packet_direction]++;
     }
 
+    if(ndpi_is_multi_or_broadcast(packet))
+      ; /* multicast or broadcast */
+    else {
+      if(flow->packet_direction_counter[0] == 0)
+	ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No client to server traffic"); /* Should never happen */
+      else if(flow->packet_direction_counter[1] == 0)
+	ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No server to client traffic");
+      else {
+	flow->risk &= ~(1UL << NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
+      }
+    }
+    
     if(flow->byte_counter[packet->packet_direction] + packet->payload_packet_len >
        flow->byte_counter[packet->packet_direction]) {
       flow->byte_counter[packet->packet_direction] += packet->payload_packet_len;
