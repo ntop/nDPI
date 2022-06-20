@@ -5123,7 +5123,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       else if(flow->packet_direction_counter[1] == 0)
 	ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No server to client traffic");
       else {
-	flow->risk &= ~(1UL << NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
+	flow->risk &= ~(1ULL << NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
       }
     }
     
