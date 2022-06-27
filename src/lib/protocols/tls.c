@@ -1426,7 +1426,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       if((flow->protos.tls_quic.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.server.cipher[0])) == 1) {
 	char str[64];
 
-	snprintf(str, sizeof(str), "Cipher %08X", ja3.server.cipher[0]);
+	snprintf(str, sizeof(str), "Cipher %s", ndpi_cipher2str(ja3.server.cipher[0]));
 	ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_WEAK_CIPHER, str);
       }
       
@@ -1648,9 +1648,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
       flow->protos.tls_quic.ssl_version = ja3.client.tls_handshake_version = tls_version;
       if(flow->protos.tls_quic.ssl_version < 0x0303) /* < TLSv1.2 */ {
-	char str[32];
-
-	snprintf(str, sizeof(str), "%04X", flow->protos.tls_quic.ssl_version);
+	char str[32], buf[32];
+	u_int8_t unknown_tls_version;
+	
+	snprintf(str, sizeof(str), "%s", ndpi_ssl_version2str(buf, sizeof(buf),
+							      flow->protos.tls_quic.ssl_version,
+							      &unknown_tls_version));
 	ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_OBSOLETE_VERSION, str);
       }
       
@@ -1851,11 +1854,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("[TLS] Extensions: found server name\n");
 #endif
 		if((offset+extension_offset+4) < packet->payload_packet_len) {
-
 		  len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
 
 		  if((offset+extension_offset+5+len) <= packet->payload_packet_len) {
-
 		    char *sni = ndpi_hostname_sni_set(flow, &packet->payload[offset+extension_offset+5], len);
 		    int sni_len = strlen(sni);
 #ifdef DEBUG_TLS

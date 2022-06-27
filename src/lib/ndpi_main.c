@@ -1042,7 +1042,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SYSLOG,
 			  "Syslog", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
-			  ndpi_build_default_ports(ports_a, 601, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 514, 601, 6514, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 514, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DHCP,
 			  "DHCP", NDPI_PROTOCOL_CATEGORY_NETWORK,
@@ -1912,9 +1912,13 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "MpegDash", NDPI_PROTOCOL_CATEGORY_MEDIA,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  /* 
+     Note: removed RSH port 514 as TCP/514 is often used for syslog and RSH is as such on;y
+     if both source and destination ports are 514. So we removed the default for RSH and used with syslog
+  */
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_RSH,
                           "RSH", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
-                          ndpi_build_default_ports(ports_a, 514, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IP_PIM,
                           "IP_PIM", NDPI_PROTOCOL_CATEGORY_NETWORK,
