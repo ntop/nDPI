@@ -178,6 +178,13 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
           - compiler: "default-cc"
+            os: ubuntu-latest
+            arch: "x86_64"
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-thread-sanitizer"
+          - compiler: "default-cc"
             os: ubuntu-18.04
             arch: "x86_64"
             gcrypt: ""
