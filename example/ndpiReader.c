@@ -1624,8 +1624,8 @@ static void printFlowSerialized(u_int16_t thread_id,
   ndpi_serialize_string_float(serializer, "duration_ms", (l-f)/1000.0, "%.3f");
   ndpi_serialize_string_string(serializer, "src_name", flow->src_name);
   ndpi_serialize_string_string(serializer, "dst_name", flow->dst_name);
-  ndpi_serialize_string_uint32(serializer, "src_port", flow->src_port);
-  ndpi_serialize_string_uint32(serializer, "dst_port", flow->dst_port);
+  ndpi_serialize_string_uint32(serializer, "src_port", ntohs(flow->src_port));
+  ndpi_serialize_string_uint32(serializer, "dst_port", ntohs(flow->dst_port));
   ndpi_serialize_string_uint32(serializer, "ip_version", flow->ip_version);
   ndpi_serialize_string_uint32(serializer, "vlan_id", flow->vlan_id);
   ndpi_serialize_string_uint32(serializer, "bidirectional", flow->bidirectional);
@@ -3405,8 +3405,6 @@ static void printFlowsStats() {
       for(i = 0; i < NUM_ROOTS; i++) {
         ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
                    node_print_known_proto_walker, &thread_id);
-        ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
-                   node_proto_guess_walker, &thread_id);
         ndpi_twalk(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i],
                    node_print_unknown_proto_walker, &thread_id);
       }

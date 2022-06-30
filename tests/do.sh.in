@@ -45,7 +45,7 @@ build_results() {
 	#echo $f
 	# create result files if not present
 	if [ ! -f result/$f.out ]; then
-	    CMD="$READER -q -t -i pcap/$f -w result/$f.out -v 2"
+	    CMD="$READER -q -K JSON -k /dev/null -t -i pcap/$f -w result/$f.out -v 2"
 	    $CMD
 	fi
     done
@@ -73,7 +73,7 @@ check_results() {
 	    fi
 
 	if [ -f result/$f.out ]; then
-	    CMD="$READER -q -t -i pcap/$f -w /tmp/reader.out -v 2"
+	    CMD="$READER -q -K JSON -k /dev/null -t -i pcap/$f -w /tmp/reader.out -v 2"
 	    $CMD
 	    CMD_RET=$?
 	    if [ $CMD_RET -eq 0 ]; then
