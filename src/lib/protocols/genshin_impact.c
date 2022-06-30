@@ -75,7 +75,7 @@ static void ndpi_search_genshin_impact(struct ndpi_detection_module_struct *ndpi
 void init_genshin_impact_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
                                    NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
-  ndpi_set_bitmask_protocol_detection("Genshin Impact",
+  ndpi_set_bitmask_protocol_detection("GenshinImpact",
                                       ndpi_struct, detection_bitmask, *id,
                                       NDPI_PROTOCOL_GENSHIN_IMPACT,
                                       ndpi_search_genshin_impact,
