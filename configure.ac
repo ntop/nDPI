@@ -286,7 +286,7 @@ AS_IF([test "x$enable_gprof" = "xyes"], [
         AC_MSG_ERROR([libtcmalloc not available. Required for profiling support.])
     ])
     GPROF_ENABLED=1
-    GPROF_LIBS="${pkg_cv_PROFILER_LIBS} ${pkg_cv_TCMALLOC_LIBS}"
+    GPROF_LIBS="-ltcmalloc_and_profiler"
     GPROF_CFLAGS="${pkg_cv_PROFILER_CFLAGS} ${pkg_cv_TCMALLOC_CFLAGS}"
 ])
 

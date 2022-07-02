@@ -108,8 +108,10 @@ check_results() {
     done
 
     if [ ${GPROF_ENABLED} -eq 1 ]; then
-      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || RC=$(( RC + 1 ))
-      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || RC=$(( RC + 1 ))
+      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -png -output ./result/cpu_profile.png -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      ${GPROF} -png -output ./result/heap_profile.png -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
     fi
 }
 
