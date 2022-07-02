@@ -8,7 +8,7 @@ Confidence DPI              : 2 (flows)
 Unknown	1872	108584	1868
 FTP_CONTROL	2	116	2
 POP3	2	116	2
-SMTP	2	118	1
+SMTP	4	234	3
 IMAP	2	116	2
 DNS	5	298	1
 HTTP	9	530	5
@@ -21,7 +21,7 @@ MySQL	2	116	2
 POPS	2	116	2
 ntop	2	116	2
 VMware	2	116	2
-SMTPS	4	232	4
+SMTPS	2	116	2
 SMBv23	2	116	2
 Mining	2	116	2
 RTSP	2	116	2
@@ -82,7 +82,7 @@ iSCSI	2	116	2
 	21	TCP 172.16.0.8:36050 -> 64.13.134.52:514 [proto: 17/Syslog][ClearText][Confidence: Match by port][cat: System/18][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	TCP 172.16.0.8:36050 -> 64.13.134.52:548 [proto: 97/AFP][ClearText][Confidence: Match by port][cat: DataTransfer/4][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	23	TCP 172.16.0.8:36050 -> 64.13.134.52:554 [proto: 50/RTSP][ClearText][Confidence: Match by port][cat: Media/1][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	24	TCP 172.16.0.8:36050 -> 64.13.134.52:587 [proto: 29/SMTPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	24	TCP 172.16.0.8:36050 -> 64.13.134.52:587 [proto: 3/SMTP][ClearText][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	25	TCP 172.16.0.8:36050 -> 64.13.134.52:873 [proto: 166/RSYNC][ClearText][Confidence: Match by port][cat: DataTransfer/4][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	26	TCP 172.16.0.8:36050 -> 64.13.134.52:903 [proto: 28/VMware][ClearText][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	27	TCP 172.16.0.8:36050 -> 64.13.134.52:993 [proto: 51/IMAPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -143,7 +143,7 @@ iSCSI	2	116	2
 	82	TCP 172.16.0.8:36051 -> 64.13.134.52:514 [proto: 17/Syslog][ClearText][Confidence: Match by port][cat: System/18][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	83	TCP 172.16.0.8:36051 -> 64.13.134.52:548 [proto: 97/AFP][ClearText][Confidence: Match by port][cat: DataTransfer/4][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	84	TCP 172.16.0.8:36051 -> 64.13.134.52:554 [proto: 50/RTSP][ClearText][Confidence: Match by port][cat: Media/1][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	85	TCP 172.16.0.8:36051 -> 64.13.134.52:587 [proto: 29/SMTPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	85	TCP 172.16.0.8:36051 -> 64.13.134.52:587 [proto: 3/SMTP][ClearText][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	86	TCP 172.16.0.8:36051 -> 64.13.134.52:873 [proto: 166/RSYNC][ClearText][Confidence: Match by port][cat: DataTransfer/4][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	87	TCP 172.16.0.8:36051 -> 64.13.134.52:903 [proto: 28/VMware][ClearText][Confidence: Match by port][cat: RemoteAccess/12][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	88	TCP 172.16.0.8:36051 -> 64.13.134.52:993 [proto: 51/IMAPS][Encrypted][Confidence: Match by port][cat: Email/3][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

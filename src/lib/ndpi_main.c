@@ -958,11 +958,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MAIL_SMTP,
 			  "SMTP", NDPI_PROTOCOL_CATEGORY_MAIL,
-			  ndpi_build_default_ports(ports_a, 25, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 25, 587, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MAIL_SMTPS,
 			  "SMTPS", NDPI_PROTOCOL_CATEGORY_MAIL,
-			  ndpi_build_default_ports(ports_a, 465, 587, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 465, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MAIL_IMAP,
 			  "IMAP", NDPI_PROTOCOL_CATEGORY_MAIL,
