@@ -1118,6 +1118,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->ftp_imap_pop_smtp.auth_failed =
       flow->ndpi_flow->l4.tcp.ftp_imap_pop_smtp.auth_failed;
   }
+  /* TFTP */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TFTP)) {
+    flow->info_type = INFO_GENERIC;
+    if(flow->ndpi_flow->protos.tftp.filename[0] != '\0')
+      ndpi_snprintf(flow->info, sizeof(flow->info), "Filename: %s",
+                    flow->ndpi_flow->protos.tftp.filename);
+  }
   /* KERBEROS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_KERBEROS)) {
     flow->info_type = INFO_KERBEROS;

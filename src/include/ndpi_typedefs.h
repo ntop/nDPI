@@ -1287,6 +1287,10 @@ struct ndpi_flow_struct {
     } ssh;
 
     struct {
+      char filename[128];
+    } tftp;
+
+    struct {
       u_int8_t username_detected:1, username_found:1,
 	password_detected:1, password_found:1,
 	_pad:4;
