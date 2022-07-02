@@ -116,19 +116,27 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libpcap-dev
-          sudo apt-get install golang-1.16-go libgoogle-perftools-dev
+          sudo apt-get install golang-1.16-go libgoogle-perftools-dev graphviz
           env GO111MODULE=on go install github.com/google/pprof@latest
           sudo ln -s ${HOME}/go/bin/pprof /usr/bin/pprof
           pprof -h
       - name: Configure nDPI library
         run: |
-          ./autogen.sh --enable-gprof --enable-option-checking=fatal ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
+          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre --with-maxminddb --enable-tls-sigs
       - name: Build nDPI library
         run: |
           make
       - name: Performance Profiling
         run: |
-          env LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libprofiler.so ./tests/do.sh
+          ./tests/do.sh
+          mkdir ndpi-performance-upload
+          mv -v tests/result/cpu_profile.png ndpi-performance-upload/cpu_profile.png
+          mv -v tests/result/heap_profile.png ndpi-performance-upload/heap_profile.png
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ndpi-performance
+          path: ndpi-performance-upload
+          retention-days: 7
 
   test-scripts:
     name: Test Utils (ubuntu-latest)
