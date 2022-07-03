@@ -84,6 +84,10 @@ void ndpi_search_usenet_tcp(struct ndpi_detection_module_struct
 			NDPI_LOG_INFO(ndpi_struct, "found usenet\n");
 			ndpi_int_usenet_add_connection(ndpi_struct, flow);
 			return;
+		}  else if (packet->payload_packet_len == 6 && (memcmp(packet->payload, "HELP\r\n", 6) == 0)) {
+			NDPI_LOG_INFO(ndpi_struct, "found usenet\n");
+			ndpi_int_usenet_add_connection(ndpi_struct, flow);
+			return;
 		}
 	}
 
