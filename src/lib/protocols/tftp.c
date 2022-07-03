@@ -67,9 +67,11 @@ void ndpi_search_tftp(struct ndpi_detection_module_struct
         {
           char const * const possible_modes[] = { "netascii", "octet", "mail" };
           uint8_t mode_found = 0, mode_idx;
-          for(mode_idx = 0; mode_idx < sizeof(possible_modes) / sizeof(possible_modes[0]); ++mode_idx)
+          size_t mode_len;
+
+          for(mode_idx = 0; mode_idx < NDPI_ARRAY_LENGTH(possible_modes); ++mode_idx)
           {
-            size_t const mode_len = strlen(possible_modes[mode_idx]);
+            mode_len = strlen(possible_modes[mode_idx]);
 
             if (packet->payload_packet_len < mode_len + 1 /* mode is a nul terminated string */)
             {
@@ -87,6 +89,17 @@ void ndpi_search_tftp(struct ndpi_detection_module_struct
           {
             NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
             return;
+          }
+
+          /* Dissect RRQ/WWQ filename. */
+          size_t filename_len = packet->payload_packet_len - 2 /* Opcode */ - mode_len - 1 /* NUL */;
+
+          if (filename_len == 0 || packet->payload[2] == '\0' || ndpi_is_printable_buffer(&packet->payload[2], filename_len - 1) == 0)
+          {
+            ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid TFTP RR/WR header: Source/Destination file missing");
+          } else {
+            memcpy(flow->protos.tftp.filename, &packet->payload[2], ndpi_min(filename_len, sizeof(flow->protos.tftp.filename) - 1));
+            flow->protos.tftp.filename[filename_len] = '\0';
           }
 
           /* We have seen enough and do not need any more TFTP packets. */
