@@ -329,6 +329,8 @@ typedef enum {
   NDPI_PROTOCOL_COLLECTD              = 298,
   NDPI_PROTOCOL_TUNNELBEAR            = 299,
   NDPI_PROTOCOL_CLOUDFLARE_WARP       = 300,
+  NDPI_PROTOCOL_I3D                   = 301, /* i3d.net: Game Hosting service */
+  NDPI_PROTOCOL_RIOTGAMES             = 302,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
