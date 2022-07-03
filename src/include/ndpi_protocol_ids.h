@@ -332,6 +332,7 @@ typedef enum {
   NDPI_PROTOCOL_I3D                   = 301, /* i3d.net: Game Hosting service */
   NDPI_PROTOCOL_RIOTGAMES             = 302,
   NDPI_PROTOCOL_PSIPHON               = 303,
+  NDPI_PROTOCOL_ULTRASURF             = 304,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
