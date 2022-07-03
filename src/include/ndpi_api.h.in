@@ -1661,9 +1661,9 @@ extern "C" {
   int  ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int16_t num_bins);
   void ndpi_free_bin(struct ndpi_bin *b);
   struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b);
-  void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t val);
-  void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int32_t value);
-  u_int32_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id);
+  void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val);
+  void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t value);
+  u_int64_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id);
   void ndpi_reset_bin(struct ndpi_bin *b);
   void ndpi_normalize_bin(struct ndpi_bin *b);
   char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf, u_int out_buf_len);

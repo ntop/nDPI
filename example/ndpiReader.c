@@ -1232,6 +1232,9 @@ void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
     case ndpi_bin_family32:
       fprintf(fout, "%s%u", (i > 0) ? sep : "", b->u.bins32[i]);
       break;
+    case ndpi_bin_family64:
+      fprintf(fout, "%s%llu", (i > 0) ? sep : "", (unsigned long long)b->u.bins64[i]);
+      break;
     }
   }
 
