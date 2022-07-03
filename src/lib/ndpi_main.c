@@ -5652,6 +5652,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	we need to distinguish between it and hangout
 	thing that should be handled by the STUN dissector
       */
+      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN, NDPI_CONFIDENCE_DPI /* TODO */);
       ret.app_protocol = NDPI_PROTOCOL_HANGOUT_DUO;
     }
   }
@@ -5663,15 +5664,15 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 					 flow->saddr, flow->sport,
 					 flow->daddr, flow->dport)) {
       /* This looks like BitTorrent */
+      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
-      flow->confidence = NDPI_CONFIDENCE_DPI_CACHE;
     } else if((flow->l4_proto == IPPROTO_UDP) /* Zoom/UDP used for video */
 	      && (((ntohs(flow->sport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->saddr))
 		  || ((ntohs(flow->dport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->daddr))
 		  )) {
       /* This looks like Zoom */
+      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
       ret.app_protocol = NDPI_PROTOCOL_ZOOM;
-      flow->confidence = NDPI_CONFIDENCE_DPI_CACHE;
     }
   }
 
