@@ -1108,9 +1108,10 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
     u_int32_t block_len;
     const u_int8_t *block = (const u_int8_t *)&p[processed];
 
-    if((block[0] != 0x16 && block[0] != 0x14) || /* Handshake, change-cipher-spec */
-       (block[1] != 0xfe) || /* We ignore old DTLS versions */
-       ((block[2] != 0xff) && (block[2] != 0xfd))) {
+    if((block[0] != 0x16 && block[0] != 0x14 && block[0] != 0x17) || /* Handshake, change-cipher-spec, Application-Data */
+       !((block[1] == 0xfe && block[2] == 0xff) ||
+         (block[1] == 0xfe && block[2] == 0xfd) ||
+         (block[1] == 0x01 && block[2] == 0x00))) {
 #ifdef DEBUG_TLS
       printf("[TLS] DTLS invalid block 0x%x or old version 0x%x-0x%x-0x%x\n",
              block[0], block[1], block[2], block[3]);
@@ -1154,13 +1155,22 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
         packet->payload_packet_len = block_len;
         processTLSBlock(ndpi_struct, flow);
       }
-    } else {
+    } else if(block[0] == 0x14) {
       /* Change-cipher-spec: any subsequent block might be encrypted */
 #ifdef DEBUG_TLS
       printf("[TLS] Change-cipher-spec\n");
 #endif
       change_cipher_found = 1;
       processed += block_len + 13;
+      break;
+    } else {
+#ifdef DEBUG_TLS
+      printf("[TLS] Appllication Data\n");
+#endif
+      processed += block_len + 13;
+      /* DTLS mid session: no need to further inspect the flow */
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DTLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      flow->l4.tcp.tls.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
     }
 
