@@ -2644,23 +2644,23 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 */
 u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 					 u_int num_params,
-					 ndpi_risk_params **params) {
+					 ndpi_risk_params params[]) {
   u_int i;
 
-  for(i=0; (i<num_params) && (params[i] != NULL); i++) {
-    switch(params[i]->id) {
+  for(i=0; i<num_params; i++) {
+    switch(params[i].id) {
     case NDPI_PARAM_HOSTNAME:
-      if(ndpi_check_hostname_risk_exception(ndpi_str, NULL, (char*)params[i]->value))
+      if(ndpi_check_hostname_risk_exception(ndpi_str, NULL, (char*)params[i].value))
 	return(1);
       break;
       
     case NDPI_PARAM_ISSUER_DN:
-      if(ndpi_check_issuerdn_risk_exception(ndpi_str, (char*)params[i]->value))
+      if(ndpi_check_issuerdn_risk_exception(ndpi_str, (char*)params[i].value))
 	return(1);
       break;
 
     case NDPI_PARAM_HOST_IPV4:
-      if(ndpi_check_ipv4_exception(ndpi_str, NULL, *((u_int32_t*)params[i]->value)))
+      if(ndpi_check_ipv4_exception(ndpi_str, NULL, *((u_int32_t*)params[i].value)))
 	return(1);
       break;
 
@@ -2670,7 +2670,7 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
 
     default:
       printf("nDPI [%s:%u] Ignored risk parameter id %u\n",
-	     __FILE__, __LINE__, params[i]->id);
+	     __FILE__, __LINE__, params[i].id);
       break;
     }
   }

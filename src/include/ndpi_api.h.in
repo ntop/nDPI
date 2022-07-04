@@ -1642,9 +1642,9 @@ extern "C" {
 
   u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
 					      char *issuerDN);    
-  u_int8_t ndpi_check_flow_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
-					  u_int num_params,
-					  ndpi_risk_params **params);
+  u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
+					   u_int num_params,
+					   ndpi_risk_params params[]);
   
   /* ******************************* */
 
