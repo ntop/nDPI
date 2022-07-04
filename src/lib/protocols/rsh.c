@@ -88,12 +88,12 @@ void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
       }
 
       {
+	char str[64];
         char const * dissected_info[] = { (char const *)packet->payload,
                                           NULL, NULL };
         size_t i;
 
-        for (i = 1; i < NDPI_ARRAY_LENGTH(dissected_info); ++i)
-        {
+        for (i = 1; i < NDPI_ARRAY_LENGTH(dissected_info); ++i) {
           dissected_info[i] = memchr(dissected_info[i - 1], '\0',
                                      packet->payload_packet_len -
                                      (dissected_info[i - 1] - dissected_info[0]));
@@ -132,13 +132,12 @@ void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
                          (unsigned long)packet->payload_packet_len -
                          (unsigned long)(dissected_info[2] - dissected_info[0])));
 
-        char str[64];
+	
         if (snprintf(str, NDPI_ARRAY_LENGTH(str), "User '%s' executing '%s'",
                      flow->protos.rsh.server_username,
                      flow->protos.rsh.command) < 0)
-        {
           str[0] = '\0';
-        }
+        
         ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, str);
       }
       return;

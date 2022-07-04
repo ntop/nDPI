@@ -90,10 +90,16 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(packet->payload[0] == '\r') {
+    char buf[64];
+    
     flow->protos.telnet.username_detected = 1;
-    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found username");
     flow->protos.telnet.username[flow->protos.telnet.character_id] = '\0';
     flow->protos.telnet.character_id = 0;
+
+    snprintf(buf, sizeof(buf), "Found Telnet username (%s)",
+	     flow->protos.telnet.username);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+
     return(1);
   }
 

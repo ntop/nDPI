@@ -93,12 +93,16 @@ static void get_credentials_auth_plain(struct ndpi_detection_module_struct *ndpi
       user_len = i - 1;
   }
   if(user_len > 0) {
+    char buf[64];
+    
     user_len = ndpi_min(user_len, sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username) - 1);
 
     memcpy(flow->l4.tcp.ftp_imap_pop_smtp.username, out + 1, user_len);
     flow->l4.tcp.ftp_imap_pop_smtp.username[user_len] = '\0';
 
-    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found username");
+    snprintf(buf, sizeof(buf), "Found username (%s)",
+	     flow->l4.tcp.ftp_imap_pop_smtp.username);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
 
     if(1 + user_len + 1 < out_len) {
       unsigned int pwd_len;
@@ -235,7 +239,8 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int8_t buf[48];
 		u_char *out;
 		size_t out_len;
-
+		char msg[64];
+		  
 		ndpi_user_pwd_payload_copy(buf, sizeof(buf), 0,
 					   packet->line[a].ptr, packet->line[a].len);
 
@@ -254,7 +259,9 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  ndpi_free(out);
 		}
 		
-		ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found username");
+		snprintf(msg, sizeof(msg), "Found SMTP username (%s)",
+			 flow->l4.tcp.ftp_imap_pop_smtp.username);
+		ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
 	      } else if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') {
 		/* Password */
 		u_int8_t buf[48];

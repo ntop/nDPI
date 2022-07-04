@@ -176,13 +176,15 @@ void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  user = strtok_r(str, " \"\r\n", &saveptr);
 	  if(user) {
-	    char *pwd;
+	    char *pwd, buf[64];
 
 	    ndpi_snprintf(flow->l4.tcp.ftp_imap_pop_smtp.username,
 		     sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username),
 		     "%s", user);
 
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found IMAP Username");
+	    snprintf(buf, sizeof(buf), "Found IMAP username (%s)",
+		     flow->l4.tcp.ftp_imap_pop_smtp.username);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
 
 	    pwd = strtok_r(NULL, " \"\r\n", &saveptr);
 	    if(pwd) {

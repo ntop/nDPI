@@ -77,11 +77,16 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
 	       && (packet->payload[1] == 'S' || packet->payload[1] == 's')
 	       && (packet->payload[2] == 'E' || packet->payload[2] == 'e')
 	       && (packet->payload[3] == 'R' || packet->payload[3] == 'r')) {
+      char buf[64];
+	
       ndpi_user_pwd_payload_copy((u_int8_t*)flow->l4.tcp.ftp_imap_pop_smtp.username,
 				 sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username), 5,
 				 packet->payload, packet->payload_packet_len);
 
-      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found username");
+      snprintf(buf, sizeof(buf), "Found username (%s)",
+	       flow->l4.tcp.ftp_imap_pop_smtp.username);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+      
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_USER;
       return 1;
     } else if((packet->payload[0] == 'P' || packet->payload[0] == 'p')
