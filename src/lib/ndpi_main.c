@@ -5551,7 +5551,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(ndpi_lru_find_cache(ndpi_str->mining_cache, flow->saddr + flow->daddr,
 			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
-      ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
+      ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       ndpi_fill_protocol_category(ndpi_str, flow, &ret);
       return(ret);
@@ -5565,12 +5565,12 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
           (flow->guessed_protocol_id == NDPI_PROTOCOL_SIGNAL_VOIP) ||
           (flow->guessed_protocol_id == NDPI_PROTOCOL_WHATSAPP_CALL)) {
     *protocol_was_guessed = 1;
-    ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI /* TODO */);
+    ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_protocol_id, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL);
   }
   else if((flow->protos.tls_quic.hello_processed == 1) &&
           (flow->host_server_name[0] != '\0')) {
     *protocol_was_guessed = 1;
-    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI /* TODO */);
+    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL);
   } else if(enable_guess) {
     if((flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN) && (flow->l4_proto == IPPROTO_TCP) &&
        flow->protos.tls_quic.hello_processed)
@@ -5603,7 +5603,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       if((guessed_protocol_id == 0) && (flow->stun.num_binding_requests > 0) &&
          (flow->stun.num_processed_pkts > 0)) {
 	guessed_protocol_id = NDPI_PROTOCOL_STUN;
-	confidence = NDPI_CONFIDENCE_DPI;
+	confidence = NDPI_CONFIDENCE_DPI_PARTIAL;
       }
 
       if(flow->host_server_name[0] != '\0') {
@@ -5649,7 +5649,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     /* if(flow->protos.stun.num_processed_pkts || flow->protos.stun.num_udp_pkts) */ {
       // if(/* (flow->protos.stun.num_processed_pkts >= NDPI_MIN_NUM_STUN_DETECTION) */
       *protocol_was_guessed = 1;
-      ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN, NDPI_CONFIDENCE_DPI /* TODO */);
+      ndpi_set_detected_protocol(ndpi_str, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_STUN, NDPI_CONFIDENCE_DPI_PARTIAL);
     }
   }
 
@@ -5664,7 +5664,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	we need to distinguish between it and hangout
 	thing that should be handled by the STUN dissector
       */
-      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN, NDPI_CONFIDENCE_DPI /* TODO */);
+      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_STUN, NDPI_CONFIDENCE_DPI_PARTIAL);
       ret.app_protocol = NDPI_PROTOCOL_HANGOUT_DUO;
     }
   }
@@ -5676,14 +5676,14 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 					 flow->saddr, flow->sport,
 					 flow->daddr, flow->dport)) {
       /* This looks like BitTorrent */
-      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
+      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
     } else if((flow->l4_proto == IPPROTO_UDP) /* Zoom/UDP used for video */
 	      && (((ntohs(flow->sport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->saddr))
 		  || ((ntohs(flow->dport) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->daddr))
 		  )) {
       /* This looks like Zoom */
-      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
+      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.app_protocol = NDPI_PROTOCOL_ZOOM;
     }
   }
@@ -7375,6 +7375,10 @@ const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
     return "Match by port";
   case NDPI_CONFIDENCE_MATCH_BY_IP:
     return "Match by IP";
+  case NDPI_CONFIDENCE_DPI_PARTIAL:
+    return "DPI (partial)";
+  case NDPI_CONFIDENCE_DPI_PARTIAL_CACHE:
+    return "DPI (partial cache)";
   case NDPI_CONFIDENCE_DPI_CACHE:
     return "DPI (cache)";
   case NDPI_CONFIDENCE_DPI:
