@@ -823,10 +823,10 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
       printf("[TLS] SHA-1: %s\n", sha1_str);
 #endif
 
-      if(ndpi_struct->malicious_sha1_automa.ac_automa != NULL) {
-        u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_sha1_automa.ac_automa, sha1_str);
+      if(ndpi_struct->malicious_sha1_hashmap != NULL) {
+        u_int16_t rc1 = ndpi_hash_find_entry(ndpi_struct->malicious_sha1_hashmap, sha1_str, sha1_siz * 2, NULL);
 
-        if(rc1 > 0)
+        if(rc1 == 0)
           ndpi_set_risk(ndpi_struct, flow, NDPI_MALICIOUS_SHA1_CERTIFICATE, sha1_str);
       }
 
@@ -2392,12 +2392,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      printf("[JA3] Client: %s \n", flow->protos.tls_quic.ja3_client);
 #endif
 
-	      if(ndpi_struct->malicious_ja3_automa.ac_automa != NULL) {
-		u_int16_t rc1 = ndpi_match_string(ndpi_struct->malicious_ja3_automa.ac_automa,
-						  flow->protos.tls_quic.ja3_client);
+	      if(ndpi_struct->malicious_ja3_hashmap != NULL) {
+	        u_int16_t rc1 = ndpi_hash_find_entry(ndpi_struct->malicious_ja3_hashmap,
+	                                             flow->protos.tls_quic.ja3_client,
+	                                             NDPI_ARRAY_LENGTH(flow->protos.tls_quic.ja3_client) - 1,
+	                                             NULL);
 
-		if(rc1 > 0)
-		  ndpi_set_risk(ndpi_struct, flow, NDPI_MALICIOUS_JA3, flow->protos.tls_quic.ja3_client);
+	      if(rc1 == 0)
+	        ndpi_set_risk(ndpi_struct, flow, NDPI_MALICIOUS_JA3, flow->protos.tls_quic.ja3_client);
 	      }
 	    }
 

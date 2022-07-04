@@ -969,6 +969,12 @@ typedef struct _ndpi_automa {
   void *ac_automa; /* Real type is AC_AUTOMATA_t */
 } ndpi_automa;
 
+typedef struct ndpi_str_hash {
+  unsigned int hash;
+  void *value;
+  u_int8_t private_data[0];
+} ndpi_str_hash;
+
 typedef struct ndpi_proto {
   /*
     Note
@@ -1058,8 +1064,8 @@ struct ndpi_detection_module_struct {
   /* HTTP/DNS/HTTPS/QUIC host matching */
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
     risky_domain_automa, tls_cert_subject_automa,
-    malicious_ja3_automa, malicious_sha1_automa,
-    host_risk_mask_automa, common_alpns_automa;  
+    host_risk_mask_automa, common_alpns_automa;
+  ndpi_str_hash *malicious_ja3_hashmap, *malicious_sha1_hashmap;
   /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
 
   ndpi_list *trusted_issuer_dn;
@@ -1618,14 +1624,6 @@ struct ndpi_bin {
     u_int64_t *bins64; /* num_bins bins */
   } u;
 };
-
-/* **************************************** */
-
-typedef struct ndpi_str_hash {
-  unsigned int hash;
-  void *value;
-  u_int8_t private_data[0];
-} ndpi_str_hash;
 
 /* **************************************** */
 

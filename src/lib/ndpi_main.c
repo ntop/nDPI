@@ -2609,8 +2609,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->common_alpns_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   load_common_alpns(ndpi_str);
   ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(NULL);
-  ndpi_str->malicious_ja3_automa.ac_automa = NULL; /* Initialized on demand */
-  ndpi_str->malicious_sha1_automa.ac_automa = NULL; /* Initialized on demand */
+  ndpi_str->malicious_ja3_hashmap = NULL; /* Initialized on demand */
+  ndpi_str->malicious_sha1_hashmap = NULL; /* Initialized on demand */
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->trusted_issuer_dn = NULL;
 
@@ -2740,42 +2740,19 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
   if(ndpi_str->ac_automa_finalized) return;
 
-  for(i = 0; i < 99; i++) {
-    ndpi_automa *automa;
+  ndpi_automa * const automa[] = { &ndpi_str->host_automa,
+                                   &ndpi_str->tls_cert_subject_automa,
+                                   &ndpi_str->host_risk_mask_automa,
+                                   &ndpi_str->common_alpns_automa };
 
-    switch(i) {
-    case 0:
-      automa = &ndpi_str->host_automa;
-      break;
+  for(i = 0; i < NDPI_ARRAY_LENGTH(automa); ++i) {
+    ndpi_automa *a = automa[i];
 
-    case 1:
-      automa = &ndpi_str->tls_cert_subject_automa;
-      break;
-
-    case 2:
-      automa = &ndpi_str->malicious_ja3_automa;
-      break;
-
-    case 3:
-      automa = &ndpi_str->malicious_sha1_automa;
-      break;
-
-    case 4:
-      automa = &ndpi_str->host_risk_mask_automa;
-      break;
-
-    case 5:
-      automa = &ndpi_str->common_alpns_automa;
-      break;
-
-    default:
-      ndpi_str->ac_automa_finalized = 1;
-      return;
-    }
-
-    if(automa && automa->ac_automa)
-      ac_automata_finalize((AC_AUTOMATA_t *) automa->ac_automa);
+    if(a && a->ac_automa)
+      ac_automata_finalize((AC_AUTOMATA_t *) a->ac_automa);
   }
+
+  ndpi_str->ac_automa_finalized = 1;
 }
 
 /* *********************************************** */
@@ -3024,13 +3001,11 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->tls_cert_subject_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->tls_cert_subject_automa.ac_automa, 0);
 
-    if(ndpi_str->malicious_ja3_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_ja3_automa.ac_automa,
-                          1 /* free patterns strings memory */);
+    if(ndpi_str->malicious_ja3_hashmap != NULL)
+      ndpi_hash_free(&ndpi_str->malicious_ja3_hashmap, NULL);
 
-    if(ndpi_str->malicious_sha1_automa.ac_automa != NULL)
-      ac_automata_release((AC_AUTOMATA_t *) ndpi_str->malicious_sha1_automa.ac_automa,
-			  1 /* free patterns strings memory */);
+    if(ndpi_str->malicious_sha1_hashmap != NULL)
+      ndpi_hash_free(&ndpi_str->malicious_sha1_hashmap, NULL);
 
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
@@ -3656,14 +3631,12 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
  *
  */
 int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
-  char buffer[128], *line, *str;
+  char buffer[128], *line;
   FILE *fd;
   int len, num = 0;
 
-  if(ndpi_str->malicious_ja3_automa.ac_automa == NULL)
-    ndpi_str->malicious_ja3_automa.ac_automa = ac_automata_init(NULL);
-  if(ndpi_str->malicious_ja3_automa.ac_automa)
-    ac_automata_name(ndpi_str->malicious_ja3_automa.ac_automa,"ja3",0);
+  if(ndpi_str->malicious_ja3_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_ja3_hashmap) != 0)
+    return(-1);
 
   fd = fopen(path, "r");
 
@@ -3690,13 +3663,14 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
     if((comma = strchr(line, ',')) != NULL)
       comma[0] = '\0';
 
-    str = ndpi_strdup(line);
-    if (str == NULL) {
-      NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
-      return -1;
-    };
+    len = strlen(line);
 
-    if(ndpi_add_string_to_automa(ndpi_str->malicious_ja3_automa.ac_automa, str) >= 0)
+    if(len != 32 /* size of MD5 hash */) {
+      NDPI_LOG_ERR(ndpi_str, "Not a JA3 md5 hash: [%s]\n", line);
+      continue;
+    }
+
+    if(ndpi_hash_add_entry(&ndpi_str->malicious_ja3_hashmap, line, len, NULL) == 0)
       num++;
   }
 
@@ -3718,15 +3692,13 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
 int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str, const char *path)
 {
   char buffer[128];
-  char *first_comma, *second_comma, *str;
+  char *first_comma, *second_comma;
   FILE *fd;
   size_t i, len;
   int num = 0;
 
-  if (ndpi_str->malicious_sha1_automa.ac_automa == NULL)
-    ndpi_str->malicious_sha1_automa.ac_automa = ac_automata_init(NULL);
-  if(ndpi_str->malicious_sha1_automa.ac_automa)
-    ac_automata_name(ndpi_str->malicious_sha1_automa.ac_automa,"sha1",0);
+  if (ndpi_str->malicious_sha1_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_sha1_hashmap) != 0)
+    return(-1);
 
   fd = fopen(path, "r");
 
@@ -3752,20 +3724,16 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
       second_comma = &buffer[len - 1];
     }
 
-    if ((second_comma - first_comma) != 40)
-      continue;
     second_comma[0] = '\0';
+    if ((second_comma - first_comma) != 40) {
+      NDPI_LOG_ERR(ndpi_str, "Not a SSL certificate sha1 hash: [%s]\n", first_comma);
+      continue;
+    }
 
     for (i = 0; i < 40; ++i)
       first_comma[i] = toupper(first_comma[i]);
 
-    str = ndpi_strdup(first_comma);
-    if (str == NULL) {
-      NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
-      return -1;
-    };
-
-    if (ndpi_add_string_to_automa(ndpi_str->malicious_sha1_automa.ac_automa, str) >= 0)
+    if(ndpi_hash_add_entry(&ndpi_str->malicious_sha1_hashmap, first_comma, second_comma - first_comma, NULL) == 0)
       num++;
   }
 
