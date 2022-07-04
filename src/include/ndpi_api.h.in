@@ -1640,6 +1640,12 @@ extern "C" {
   u_int16_t ndpi_risk2score(ndpi_risk risk,
 			    u_int16_t *client_score, u_int16_t *server_score);
 
+  u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
+					      char *issuerDN);    
+  u_int8_t ndpi_check_flow_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
+					  u_int num_params,
+					  ndpi_risk_params **params);
+  
   /* ******************************* */
 
   /* HyperLogLog cardinality estimator */

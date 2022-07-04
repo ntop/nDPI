@@ -699,23 +699,12 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
   if(flow->protos.tls_quic.subjectDN && flow->protos.tls_quic.issuerDN
      && (!strcmp(flow->protos.tls_quic.subjectDN, flow->protos.tls_quic.issuerDN))) {
     /* Last resort: we check if this is a trusted issuerDN */
-    ndpi_list *head = ndpi_struct->trusted_issuer_dn;
-
-    while(head != NULL) {
-#if DEBUG_TLS
-      printf("TLS] %s() issuerDN %s / %s\n", __FUNCTION__,
-	     flow->protos.tls_quic.issuerDN, head->value);
-#endif
-
-      if(strcmp(flow->protos.tls_quic.issuerDN, head->value) == 0)
-	return; /* This is a trusted DN */
-      else
-	head = head->next;
-    }
-
+    if(ndpi_check_issuerdn_risk_exception(ndpi_struct, flow->protos.tls_quic.issuerDN))
+      return; /* This is a trusted DN */
+    
     ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SELFSIGNED_CERTIFICATE, flow->protos.tls_quic.subjectDN);
   }
-
+  
 #if DEBUG_TLS
   printf("[TLS] %s() SubjectDN [%s]\n", __FUNCTION__, rdnSeqBuf);
 #endif
