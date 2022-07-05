@@ -855,7 +855,10 @@ int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   case 0x02: /* Server Hello */
     processClientServerHello(ndpi_struct, flow, 0);
     flow->protos.tls_quic.hello_processed = 1;
-    ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
+
+    ndpi_int_tls_add_connection(ndpi_struct, flow,
+				/* Check if this is a SMTP connection with STARTTLS or TLS */
+				(flow->l4.tcp.smtp_command_bitmask & SMTP_BIT_STARTTLS) ? NDPI_PROTOCOL_MAIL_SMTPS : NDPI_PROTOCOL_TLS);
 
 #ifdef DEBUG_TLS
     printf("*** TLS [version: %02X][%s Hello]\n",
@@ -1243,7 +1246,8 @@ static void tlsCheckUncommonALPN(struct ndpi_detection_module_struct *ndpi_struc
 static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow, u_int32_t protocol) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
+  u_int16_t upper_detected_protocol;
+    
 #if DEBUG_TLS
   printf("[TLS] %s()\n", __FUNCTION__);
 #endif
@@ -1258,12 +1262,17 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
     return;
   }
 
-  if(protocol != NDPI_PROTOCOL_TLS)
-    ;
-  else
+  if(protocol != NDPI_PROTOCOL_TLS) {
+    if(flow->l4.tcp.smtp_command_bitmask & SMTP_BIT_STARTTLS)
+      upper_detected_protocol = flow->detected_protocol_stack[0];
+    else
+      upper_detected_protocol = protocol;
+  } else {
     protocol = ndpi_tls_refine_master_protocol(ndpi_struct, flow, protocol);
-
-  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, protocol, NDPI_CONFIDENCE_DPI);
+    upper_detected_protocol = protocol;
+  }
+  
+  ndpi_set_detected_protocol(ndpi_struct, flow, upper_detected_protocol, protocol, NDPI_CONFIDENCE_DPI);
 
   tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
