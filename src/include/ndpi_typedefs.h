@@ -1370,9 +1370,13 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_REDIS */
   u_int8_t redis_s2d_first_char, redis_d2s_first_char;
 
+  /* Only packets with L5 data (ie no TCP SYN, pure ACKs, ...) */
   u_int16_t packet_counter;		      // can be 0 - 65000
   u_int16_t packet_direction_counter[2];
-  u_int16_t byte_counter[2];
+
+  /* Every packets */
+  u_int16_t packet_direction_complete_counter[2];      // can be 0 - 65000
+
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255
   u_int8_t bt_check_performed : 1;

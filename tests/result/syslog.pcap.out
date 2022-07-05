@@ -32,4 +32,4 @@ Syslog	93	20321	21
 
 
 Undetected flows:
-	1	TCP 169.46.82.162:52173 -> 10.186.117.194:49948 [VLAN: 1906][proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 169.46.82.162:52173 -> 10.186.117.194:49948 [VLAN: 1906][proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
