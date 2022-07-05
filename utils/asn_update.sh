@@ -129,6 +129,11 @@ DEST=../src/lib/inc_generated/ndpi_asn_goto.c.inc
 create_list NDPI_PROTOCOL_GOTO $DEST "AS395424" "AS21866" "AS213380" "AS20104" "AS16815"
 echo "(3) LogMeIn/GoTo IPs are available in $DEST"
 
+echo "(1) Downloading RiotGames..."
+DEST=../src/lib/inc_generated/ndpi_asn_riotgames.c.inc
+create_list NDPI_PROTOCOL_RIOTGAMES $DEST "AS6507"
+echo "(3) RiotGames IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
