@@ -57,6 +57,14 @@ void ndpi_search_riotgames(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
+  if (packet->payload_packet_len == 53 &&
+      ntohl(get_u_int32_t(packet->payload, packet->payload_packet_len - 4)) == 0xea23460c &&
+      ntohl(get_u_int32_t(packet->payload, packet->payload_packet_len - 8)) == 0x3cb11f2d)
+  {
+    ndpi_int_riotgames_add_connection(ndpi_struct, flow);
+    return;
+  }
+
   /*
    * Please add new patterns for games made by RiotGames here
    */
