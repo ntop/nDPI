@@ -30,6 +30,22 @@
 #include "ndpi_api.h"
 
 
+#define SMTP_BIT_220		0x01
+#define SMTP_BIT_250		0x02
+#define SMTP_BIT_235		0x04
+#define SMTP_BIT_334		0x08
+#define SMTP_BIT_354		0x10
+#define SMTP_BIT_HELO_EHLO	0x20
+#define SMTP_BIT_MAIL		0x40
+#define SMTP_BIT_RCPT		0x80
+#define SMTP_BIT_AUTH_LOGIN	0x100
+#define SMTP_BIT_STARTTLS	0x200
+#define SMTP_BIT_DATA		0x400
+#define SMTP_BIT_NOOP		0x800
+#define SMTP_BIT_RSET		0x1000
+#define SMTP_BIT_TlRM		0x2000
+#define SMTP_BIT_AUTH_PLAIN	0x4000
+
 /* #define SMTP_DEBUG 1 */
 
 extern int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
