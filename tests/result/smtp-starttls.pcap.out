@@ -1,8 +1,13 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	9	(9.00 pkts/flow)
+DPI Packets (TCP):	11	(11.00 pkts/flow)
 Confidence DPI              : 1 (flows)
 
 Google	36	8403	1
 
-	1	TCP 10.0.0.1:57406 <-> 173.194.68.26:25 [proto: 3.126/SMTP.Google][ClearText][Confidence: DPI][cat: Email/3][17 pkts/2514 bytes <-> 19 pkts/5889 bytes][Goodput ratio: 55/79][0.48 sec][Hostname/SNI: mx.google.com][bytes ratio: -0.402 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 30/24 156/103 42/26][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 148/310 752/1484 168/444][PLAIN TEXT (x.google.com ESMTP s4)][Plen Bins: 23,18,13,9,4,4,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0]
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.0.0.1                 	 1      
+
+
+	1	TCP 10.0.0.1:57406 <-> 173.194.68.26:25 [proto: 91.126/TLS.Google][Encrypted][Confidence: DPI][cat: Email/3][17 pkts/2514 bytes <-> 19 pkts/5889 bytes][Goodput ratio: 55/79][0.48 sec][Hostname/SNI: mx.google.com][bytes ratio: -0.402 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 30/24 156/103 42/26][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 148/310 752/1484 168/444][Risk: ** Obsolete TLS (v1.1 or older) **][Risk Score: 100][Risk Info: No client to server traffic / TLSv1][TLSv1][JA3C: fab507fe132c544e8a0eb7c394affeae][Plen Bins: 23,18,13,9,4,4,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0]

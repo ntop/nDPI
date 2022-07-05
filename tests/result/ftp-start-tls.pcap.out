@@ -1,6 +1,6 @@
-Guessed flow protos:	0
+Guessed flow protos:	1
 
-DPI Packets (TCP):	10	(10.00 pkts/flow)
+DPI Packets (TCP):	51	(51.00 pkts/flow)
 Confidence DPI              : 1 (flows)
 
 FTP_CONTROL	51	7510	1

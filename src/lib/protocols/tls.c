@@ -28,6 +28,8 @@
 #include "ndpi_encryption.h"
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
+extern int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
+                           struct ndpi_flow_struct *flow);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow, uint32_t quic_version);
 extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
@@ -839,8 +841,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
-static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
-			   struct ndpi_flow_struct *flow) {
+int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
+                    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int ret;
 
