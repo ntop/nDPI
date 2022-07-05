@@ -2303,6 +2303,33 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
+void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
+		     struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
+  if(ndpi_isset_risk(ndpi_str, flow, r)) {
+    u_int8_t i, j;
+    ndpi_risk v = 1ull << r;
+
+    flow->risk &= ~v;
+
+    for(i = 0; i < flow->num_risk_infos; i++) {
+      if(flow->risk_infos[i].id == r) {
+        flow->risk_infos[i].id = 0;
+        if(flow->risk_infos[i].info) {
+          ndpi_free(flow->risk_infos[i].info);
+          flow->risk_infos[i].info = NULL;
+        }
+        for(j = i + 1; j < flow->num_risk_infos; j++) {
+          flow->risk_infos[j - 1].id = flow->risk_infos[j].id;
+          flow->risk_infos[j - 1].info = flow->risk_infos[j].info;
+        }
+        flow->num_risk_infos--;
+      }
+    }
+  }
+}
+
+/* ******************************************************************** */
+
 int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
 		     struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
   ndpi_risk v = 1ull << r;

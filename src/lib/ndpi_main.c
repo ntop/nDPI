@@ -161,6 +161,9 @@ static ndpi_risk_info ndpi_known_risks[] = {
 
 /* ****************************************** */
 
+extern void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
+			    struct ndpi_flow_struct *flow, ndpi_risk_enum r);
+
 /* Forward */
 static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
 			   ndpi_port_range *range, ndpi_proto_defaults_t *def,
@@ -5099,27 +5102,25 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(flow->packet_counter < MAX_PACKET_COUNTER && packet->payload_packet_len) {
       flow->packet_counter++;
     }
-
     if(flow->packet_direction_counter[packet->packet_direction] < MAX_PACKET_COUNTER &&
        packet->payload_packet_len) {
       flow->packet_direction_counter[packet->packet_direction]++;
     }
 
+    if(flow->packet_direction_complete_counter[packet->packet_direction] < MAX_PACKET_COUNTER) {
+      flow->packet_direction_complete_counter[packet->packet_direction]++;
+    }
+
     if(ndpi_is_multi_or_broadcast(packet))
       ; /* multicast or broadcast */
     else {
-      if(flow->packet_direction_counter[0] == 0)
+      if(flow->packet_direction_complete_counter[0] == 0)
 	ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No client to server traffic"); /* Should never happen */
-      else if(flow->packet_direction_counter[1] == 0)
+      else if(flow->packet_direction_complete_counter[1] == 0)
 	ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No server to client traffic");
       else {
-	flow->risk &= ~(1ULL << NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
+	ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
       }
-    }
-    
-    if(flow->byte_counter[packet->packet_direction] + packet->payload_packet_len >
-       flow->byte_counter[packet->packet_direction]) {
-      flow->byte_counter[packet->packet_direction] += packet->payload_packet_len;
     }
   }
 }
