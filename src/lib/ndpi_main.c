@@ -5339,6 +5339,13 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
 
   switch(ret->app_protocol) {
+  case NDPI_PROTOCOL_MAIL_IMAPS:
+  case NDPI_PROTOCOL_MAIL_SMTPS:
+  case NDPI_PROTOCOL_MAIL_POPS:
+    /* ALPN not necessary for secure email */
+    NDPI_CLR_BIT(flow->risk, NDPI_TLS_NOT_CARRYING_HTTPS);
+    break;
+    
     /*
       Skype for a host doing MS Teams means MS Teams
       (MS Teams uses Skype as transport protocol for voice/video)
