@@ -393,6 +393,13 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
     if (rc == 0 && memcmp(packet->payload, "220", 3) != 0)
     {
       flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
+      if (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) {
+        ndpi_set_detected_protocol(ndpi_struct, flow,
+                                   NDPI_PROTOCOL_MAIL_SMTPS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      } else {
+        ndpi_set_detected_protocol(ndpi_struct, flow,
+                                   flow->guessed_host_protocol_id, NDPI_PROTOCOL_MAIL_SMTPS, NDPI_CONFIDENCE_DPI);
+      }
     }
   } else {
     ndpi_search_mail_smtp_tcp(ndpi_struct, flow);

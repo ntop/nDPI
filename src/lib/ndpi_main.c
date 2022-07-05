@@ -8042,9 +8042,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
   case NDPI_PROTOCOL_DTLS:
-    if(flow->l4.tcp.tls.certificate_processed ||
-       (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 &&
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 1)) return(0);
+    if(flow->l4.tcp.tls.certificate_processed) return(0);
 
     if(flow->l4.tcp.tls.num_tls_blocks <= ndpi_str->num_tls_blocks_to_follow) {
       // printf("*** %u/%u\n", flow->l4.tcp.tls.num_tls_blocks, ndpi_str->num_tls_blocks_to_follow);
@@ -8064,6 +8062,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_FTP_CONTROL:
+    if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0' &&
+       flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0 &&
+       flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0)
+      return(1);
+    break;
   case NDPI_PROTOCOL_MAIL_POP:
   case NDPI_PROTOCOL_MAIL_IMAP:
   case NDPI_PROTOCOL_MAIL_SMTP:
