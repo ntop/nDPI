@@ -5339,13 +5339,6 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
 
   switch(ret->app_protocol) {
-  case NDPI_PROTOCOL_MAIL_IMAPS:
-  case NDPI_PROTOCOL_MAIL_SMTPS:
-  case NDPI_PROTOCOL_MAIL_POPS:
-    /* ALPN not necessary for secure email */
-    NDPI_CLR_BIT(flow->risk, NDPI_TLS_NOT_CARRYING_HTTPS);
-    break;
-    
     /*
       Skype for a host doing MS Teams means MS Teams
       (MS Teams uses Skype as transport protocol for voice/video)
@@ -8042,9 +8035,7 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
   case NDPI_PROTOCOL_DTLS:
-    if(flow->l4.tcp.tls.certificate_processed ||
-       (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 &&
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 1)) return(0);
+    if(flow->l4.tcp.tls.certificate_processed) return(0);
 
     if(flow->l4.tcp.tls.num_tls_blocks <= ndpi_str->num_tls_blocks_to_follow) {
       // printf("*** %u/%u\n", flow->l4.tcp.tls.num_tls_blocks, ndpi_str->num_tls_blocks_to_follow);
@@ -8064,6 +8055,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_FTP_CONTROL:
+    if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0' &&
+       flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0 &&
+       flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0)
+      return(1);
+    break;
   case NDPI_PROTOCOL_MAIL_POP:
   case NDPI_PROTOCOL_MAIL_IMAP:
   case NDPI_PROTOCOL_MAIL_SMTP:
