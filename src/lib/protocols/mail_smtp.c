@@ -315,6 +315,27 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
+      if(packet->line[a].len >= 14) {
+        if((packet->line[a].ptr[0] == 'X' || packet->line[a].ptr[0] == 'x')
+            && (packet->line[a].ptr[1] == '-' || packet->line[a].ptr[1] == '-')
+            && (packet->line[a].ptr[2] == 'A' || packet->line[a].ptr[2] == 'a')
+            && (packet->line[a].ptr[3] == 'N' || packet->line[a].ptr[3] == 'n')
+            && (packet->line[a].ptr[4] == 'O' || packet->line[a].ptr[4] == 'o')
+            && (packet->line[a].ptr[5] == 'N' || packet->line[a].ptr[5] == 'n')
+            && (packet->line[a].ptr[6] == 'Y' || packet->line[a].ptr[6] == 'y')
+            && (packet->line[a].ptr[7] == 'M' || packet->line[a].ptr[6] == 'm')
+            && (packet->line[a].ptr[8] == 'O' || packet->line[a].ptr[6] == 'o')
+            && (packet->line[a].ptr[9] == 'U' || packet->line[a].ptr[6] == 'u')
+            && (packet->line[a].ptr[10] == 'S' || packet->line[a].ptr[6] == 's')
+            && (packet->line[a].ptr[11] == 'T' || packet->line[a].ptr[6] == 't')
+            && (packet->line[a].ptr[12] == 'L' || packet->line[a].ptr[6] == 'l')
+            && (packet->line[a].ptr[13] == 'S' || packet->line[a].ptr[7] == 's')) {
+          flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
+          flow->l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
+          flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 0;
+        }
+      }
+
       if(packet->line[a].len >= 4) {
 	if((packet->line[a].ptr[0] == 'D' || packet->line[a].ptr[0] == 'd')
 	   && (packet->line[a].ptr[1] == 'A' || packet->line[a].ptr[1] == 'a')
