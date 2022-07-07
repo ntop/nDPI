@@ -1,6 +1,6 @@
 Guessed flow protos:	2
 
-DPI Packets (TCP):	117	(16.71 pkts/flow)
+DPI Packets (TCP):	42	(6.00 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by IP      : 2 (flows)
 Confidence DPI              : 6 (flows)

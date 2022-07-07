@@ -1,6 +1,6 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	421	(60.14 pkts/flow)
+DPI Packets (TCP):	46	(6.57 pkts/flow)
 Confidence DPI              : 7 (flows)
 
 TLS	6019	5570309	7

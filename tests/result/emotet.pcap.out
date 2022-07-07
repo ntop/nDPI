@@ -1,6 +1,6 @@
-Guessed flow protos:	1
+Guessed flow protos:	0
 
-DPI Packets (TCP):	121	(20.17 pkts/flow)
+DPI Packets (TCP):	48	(8.00 pkts/flow)
 Confidence DPI              : 6 (flows)
 
 SMTP	626	438465	1

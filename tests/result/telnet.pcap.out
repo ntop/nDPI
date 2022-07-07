@@ -1,6 +1,6 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	81	(81.00 pkts/flow)
+DPI Packets (TCP):	33	(33.00 pkts/flow)
 Confidence DPI              : 1 (flows)
 
 Telnet	87	7418	1

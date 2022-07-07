@@ -6097,8 +6097,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     return(ret);
   }
 
-  if(ndpi_str->max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->max_packets_to_process)
+  if(ndpi_str->max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->max_packets_to_process) {
+    flow->extra_packets_func = NULL; /* To allow ndpi_extra_dissection_possible() to fail */
     return(ret); /* Avoid spending too much time with this flow */
+  }
 
   flow->num_processed_pkts++;
 
@@ -8043,6 +8045,9 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 	 proto);
 #endif
 
+  if(!flow->extra_packets_func)
+    return(0);
+
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
   case NDPI_PROTOCOL_DTLS:
@@ -8091,19 +8096,10 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_SKYPE_TEAMS:
-    if(flow->extra_packets_func)
-      return(1);
-    break;
-
   case NDPI_PROTOCOL_QUIC:
-    if(flow->extra_packets_func)
-      return(1);
-    break;
-
   case NDPI_PROTOCOL_KERBEROS:
   case NDPI_PROTOCOL_SNMP:
-    if(flow->extra_packets_func)
-      return(1);
+    return(1);
     break;
 
   case NDPI_PROTOCOL_BITTORRENT:

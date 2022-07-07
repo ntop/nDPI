@@ -1,7 +1,7 @@
-Guessed flow protos:	125
+Guessed flow protos:	97
 
-DPI Packets (TCP):	1771	(18.26 pkts/flow)
-DPI Packets (UDP):	366	(1.92 pkts/flow)
+DPI Packets (TCP):	1691	(17.43 pkts/flow)
+DPI Packets (UDP):	337	(1.76 pkts/flow)
 DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 61 (flows)
 Confidence Match by port    : 27 (flows)

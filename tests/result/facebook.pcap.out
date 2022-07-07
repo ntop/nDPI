@@ -1,6 +1,6 @@
-Guessed flow protos:	1
+Guessed flow protos:	0
 
-DPI Packets (TCP):	51	(25.50 pkts/flow)
+DPI Packets (TCP):	16	(8.00 pkts/flow)
 Confidence DPI              : 2 (flows)
 
 Facebook	60	30511	2
