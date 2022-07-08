@@ -36,7 +36,14 @@ if [ ! -x "../example/ndpiReader${EXE_SUFFIX}" ]; then
 fi
 
 if [ ${GPROF_ENABLED} -eq 1 ]; then
-  GPROF="$(which pprof)"
+  GPROF="${GPROF:-$(which pprof)}"
+  if [ ! -x "${GPROF}" ]; then
+    echo "$0: ${GPROF} not found or not executable"
+    exit 1
+  fi
+  echo "$0: Using pprof executable ${GPROF}"
+  echo "$0: Please make sure that you use google-pprof and not gperftools"
+  echo "$0: See https://github.com/google/pprof"
 else
   GPROF=false
 fi
@@ -81,7 +88,7 @@ check_results() {
 
 	if [ -f result/$f.out ]; then
 	    CMD="$READER -q -K JSON -k /dev/null -t -i pcap/$f -w /tmp/reader.$$.out -v 2"
-	    CPUPROFILE=result/$f.cprof HEAPPROFILE=result/$f $CMD
+	    CPUPROFILE=./result/$f.cprof HEAPPROFILE=./result/$f $CMD
 	    CMD_RET=$?
 	    if [ $CMD_RET -eq 0 ]; then
 	      NUM_DIFF=`${CMD_DIFF} result/$f.out /tmp/reader.$$.out | wc -l`
@@ -108,10 +115,11 @@ check_results() {
     done
 
     if [ ${GPROF_ENABLED} -eq 1 ]; then
-      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -png -output ./result/cpu_profile.png -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -top -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
-      ${GPROF} -png -output ./result/heap_profile.png -nodecount 100 -nodefraction 0 -show '^(ndpi|.*_ndpi)' ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      GPROF_ARGS='-nodecount 100 -nodefraction 0 -symbolize=fastlocal'
+      ${GPROF} -top ${GPROF_ARGS} ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -png -output ./result/cpu_profile.png ${GPROF_ARGS} ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -top ${GPROF_ARGS} -sample_index=alloc_space  ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      ${GPROF} -png -output ./result/heap_profile.png ${GPROF_ARGS} -sample_index=alloc_space ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
     fi
 }
 
