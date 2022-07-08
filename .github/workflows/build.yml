@@ -227,6 +227,13 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-thread-sanitizer"
+          - compiler: "clang-12"
+            os: ubuntu-latest
+            arch: "x86_64"
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-memory-sanitizer"
           - compiler: "cc"
             os: ubuntu-18.04
             arch: "x86_64"
@@ -391,7 +398,8 @@ jobs:
         run: |
           ./tests/do.sh
       - name: Test nDPI [UNIT]
-        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
+        #Some issues with masan + json-c. Disable the test as workaround
+        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.msan, '--with-memory-sanitizer')
         run: |
           ./tests/do-unit.sh
       - name: Test nDPI [DGA]

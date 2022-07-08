@@ -15,6 +15,7 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
 
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_WITH(thread-sanitizer, AS_HELP_STRING([--with-thread-sanitizer], [Build with support for thread sanitizer]))
+AC_ARG_WITH(memory-sanitizer, AS_HELP_STRING([--with-memory-sanitizer], [Build with support for memory sanitizer]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AC_ARG_ENABLE(gprof, AS_HELP_STRING([--enable-gprof], [Enable CPU/HEAP profiling with gperftools]),[enable_gprof=$enableval],[enable_gprof=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
@@ -28,14 +29,20 @@ AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
 AS_IF([test "${with_sanitizer+set}" = set -a "${with_thread_sanitizer+set}" = set],[
   AC_MSG_ERROR([Configure options `--with-sanitizer' and `--with_thread_sanitizer' can not used at the same time.])
 ])
-AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set],[
+AS_IF([test "${with_sanitizer+set}" = set -a "${with_memory_sanitizer+set}" = set],[
+  AC_MSG_ERROR([Configure options `--with-sanitizer' and `--with_memory_sanitizer' can not used at the same time.])
+])
+AS_IF([test "${with_thread_sanitizer+set}" = set -a "${with_memory_sanitizer+set}" = set],[
+  AC_MSG_ERROR([Configure options `--with_thread_sanitizer' and `--with_memory_sanitizer' can not used at the same time.])
+])
+AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set -o "${with_memory_sanitizer+set}" = set],[
   NDPI_CFLAGS="${NDPI_CFLAGS} -O0 -g3"
 ],[
   NDPI_CFLAGS="${NDPI_CFLAGS} -O2"
 ])
-AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set],[
+AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set -o "${with_memory_sanitizer+set}" = set],[
   AS_IF([test "x$enable_gprof" = "xyes"], [
-    AC_MSG_ERROR([Configure options `--with-sanitizer' / `--with_thread_sanitizer' can not used together with `--enable-gprof'.])
+    AC_MSG_ERROR([Configure options `--with-sanitizer' / `--with_thread_sanitizer' / `--with_memory_sanitizer' can not used together with `--enable-gprof'.])
   ])
 ])
 
@@ -47,6 +54,11 @@ AS_IF([test "${with_sanitizer+set}" = set],[
 AS_IF([test "${with_thread_sanitizer+set}" = set],[
   NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=thread -fno-omit-frame-pointer"
   NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=thread"
+])
+
+AS_IF([test "${with_memory_sanitizer+set}" = set],[
+  NDPI_CFLAGS="${CFLAGS} -fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer"
+  NDPI_LDFLAGS="${LDFLAGS} -fsanitize=memory"
 ])
 
 AS_IF([test "x${enable_code_coverage}" = "xyes"],[
