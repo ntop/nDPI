@@ -2704,3 +2704,39 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
   
   return(0);
 }
+
+/* ******************************************* */
+
+int ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len)
+{
+  unsigned int value, i;
+
+  if(payload_len <= 0)
+    return -1;
+
+  /* Malformed */
+  if(payload[0] == 0xFF)
+    return -1;
+
+  /* Definite, short */
+  if(payload[0] <= 0x80) {
+    *value_len = 1;
+    return payload[0];
+  }
+  /* Indefinite, unsupported */
+  if((payload[0] & 0x7F) == 0)
+    return -1;
+
+  *value_len = payload[0] & 0x7F;
+  /* We support only 4 additional length octets */
+  if(*value_len > 4 ||
+     payload_len <= *value_len + 1)
+    return -1;
+
+  value = 0;
+  for (i = 1; i <= *value_len; i++) {
+    value |= (unsigned int)payload[i] << ((*value_len) - i) * 8;
+  }
+  (*value_len) += 1;
+  return value;
+}
