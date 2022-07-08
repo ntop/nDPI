@@ -98,7 +98,8 @@ void ndpi_search_tftp(struct ndpi_detection_module_struct
           {
             ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid TFTP RR/WR header: Source/Destination file missing");
           } else {
-            memcpy(flow->protos.tftp.filename, &packet->payload[2], ndpi_min(filename_len, sizeof(flow->protos.tftp.filename) - 1));
+            filename_len = ndpi_min(filename_len, sizeof(flow->protos.tftp.filename) - 1);
+            memcpy(flow->protos.tftp.filename, &packet->payload[2], filename_len);
             flow->protos.tftp.filename[filename_len] = '\0';
           }
 
