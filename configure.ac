@@ -33,6 +33,11 @@ AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = se
 ],[
   CFLAGS="${CFLAGS} -g"
 ])
+AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set],[
+  AS_IF([test "x$enable_gprof" = "xyes"], [
+    AC_MSG_ERROR([Configure options `--with-sanitizer' / `--with_thread_sanitizer' can not used together with `--enable-gprof'.])
+  ])
+])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
   CFLAGS="${CFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
@@ -287,7 +292,7 @@ AS_IF([test "x$enable_gprof" = "xyes"], [
     ])
     GPROF_ENABLED=1
     GPROF_LIBS="-ltcmalloc_and_profiler"
-    GPROF_CFLAGS="${pkg_cv_PROFILER_CFLAGS} ${pkg_cv_TCMALLOC_CFLAGS}"
+    GPROF_CFLAGS="-g3 -fvisibility=default -fno-omit-frame-pointer ${pkg_cv_PROFILER_CFLAGS} ${pkg_cv_TCMALLOC_CFLAGS}"
 ])
 
 AC_CHECK_LIB(pthread, pthread_setaffinity_np, AC_DEFINE_UNQUOTED(HAVE_PTHREAD_SETAFFINITY_NP, 1, [libc has pthread_setaffinity_np]))
