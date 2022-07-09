@@ -109,14 +109,16 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
     }
 
     if((memcmp(packet_payload, "ACK ", 4) == 0 || memcmp(packet_payload, "ack ", 4) == 0)
-       && (memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0)) {
+       && ((memcmp(&packet_payload[4], "SIP:", 4) == 0 || memcmp(&packet_payload[4], "sip:", 4) == 0) ||
+           (memcmp(&packet_payload[4], "TEL:", 4) == 0 || memcmp(&packet_payload[4], "tel:", 4) == 0))) {
       NDPI_LOG_INFO(ndpi_struct, "found sip ACK\n");
       ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
       return;
     }
 
     if((memcmp(packet_payload, "CANCEL ", 7) == 0 || memcmp(packet_payload, "cancel ", 7) == 0)
-       && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
+       && ((memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0) ||
+           (memcmp(&packet_payload[7], "TEL:", 4) == 0 || memcmp(&packet_payload[7], "tel:", 4) == 0))) {
       NDPI_LOG_INFO(ndpi_struct, "found sip CANCEL\n");
       ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
       return;
@@ -147,8 +149,8 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
     /* Courtesy of Miguel Quesada <mquesadab@gmail.com> */
     if((memcmp(packet_payload, "OPTIONS ", 8) == 0
 	|| memcmp(packet_payload, "options ", 8) == 0)
-       && (memcmp(&packet_payload[8], "SIP:", 4) == 0
-	   || memcmp(&packet_payload[8], "sip:", 4) == 0)) {
+       && ((memcmp(&packet_payload[8], "SIP:", 4) == 0 || memcmp(&packet_payload[8], "sip:", 4) == 0) ||
+           (memcmp(&packet_payload[8], "TEL:", 4) == 0 || memcmp(&packet_payload[8], "tel:", 4) == 0))) {
       NDPI_LOG_INFO(ndpi_struct, "found sip OPTIONS\n");
       ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
       return;
@@ -163,7 +165,14 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 
     if((memcmp(packet_payload, "PRACK ", 6) == 0 || memcmp(packet_payload, "prack ", 6) == 0)
        && (memcmp(&packet_payload[6], "SIP:", 4) == 0 || memcmp(&packet_payload[6], "sip:", 4) == 0)) {
-      NDPI_LOG_INFO(ndpi_struct, "found sip REFER\n");
+      NDPI_LOG_INFO(ndpi_struct, "found sip PRACK\n");
+      ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
+      return;
+    }
+
+    if((memcmp(packet_payload, "INFO ", 5) == 0 || memcmp(packet_payload, "info ", 5) == 0)
+       && (memcmp(&packet_payload[5], "SIP:", 4) == 0 || memcmp(&packet_payload[5], "sip:", 4) == 0)) {
+      NDPI_LOG_INFO(ndpi_struct, "found sip INFO\n");
       ndpi_int_sip_add_connection(ndpi_struct, flow, 0);
       return;
     }
@@ -194,13 +203,9 @@ void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 {
   NDPI_LOG_DBG(ndpi_struct, "search sip\n");
 
-  if(flow->packet_counter > 5)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  else {
-    /* skip marked packets */
-    if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {
-      ndpi_search_sip_handshake(ndpi_struct, flow);
-    }
+  /* skip marked packets */
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SIP) {
+    ndpi_search_sip_handshake(ndpi_struct, flow);
   }
 }
 
