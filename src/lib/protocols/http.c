@@ -848,6 +848,20 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
   }
 
+  if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0 &&
+     flow->http.url) {
+    /* WindowsUpdate over some kind of CDN */
+    if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP &&
+       (strstr(flow->http.url, "delivery.mp.microsoft.com/") ||
+        strstr(flow->http.url, "download.windowsupdate.com/")) &&
+       ndpi_strnstr((const char *)packet->user_agent_line.ptr, "Microsoft-Delivery-Optimization/",
+                    packet->user_agent_line.len) &&
+       ndpi_isset_risk(ndpi_struct, flow, NDPI_HTTP_NUMERIC_IP_HOST)) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+    }
+  }
+
   if(ndpi_get_http_method(ndpi_struct, flow) != NDPI_HTTP_METHOD_UNKNOWN) {
     ndpi_int_http_add_connection(ndpi_struct, flow, flow->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
   }
