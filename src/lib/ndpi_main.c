@@ -5187,7 +5187,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 {
   void *func = NULL;
   u_int8_t is_tcp_without_payload = (callback_buffer == ndpi_str->callback_buffer_tcp_no_payload);
-  u_int32_t num_calls = (is_tcp_without_payload != 0 ? 1 : 0);
+  u_int32_t num_calls = 0;
   u_int16_t proto_index = ndpi_str->proto_defaults[flow->guessed_protocol_id].protoIdx;
   u_int16_t proto_id = ndpi_str->proto_defaults[flow->guessed_protocol_id].protoId;
   NDPI_PROTOCOL_BITMASK detection_bitmask;
@@ -6045,14 +6045,12 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
   }
 
   if(flow->guessed_host_protocol_id >= NDPI_MAX_SUPPORTED_PROTOCOLS) {
-    //u_int32_t num_calls;
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet = {0};
 
     /* This is a custom protocol and it has priority over everything else */
     ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
 
-    //num_calls =
-    ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
+    flow->num_dissector_calls += ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
 
     //if(ndpi_str->ndpi_num_custom_protocols != 0)
     ndpi_fill_protocol_category(ndpi_str, flow, ret);
@@ -6311,10 +6309,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     flow->tree_risk_checked = 1;
   }
 
-  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
-
-  if(num_calls == 0)
+  /* It is common to not trigger any dissectors for pure TCP ACK packets */
+  if(num_calls == 0 && packet->payload_packet_len != 0)
     flow->fail_with_unknown = 1;
+  flow->num_dissector_calls += num_calls;
+
+  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
 
   /* Zoom cache */
   if((ret.app_protocol == NDPI_PROTOCOL_ZOOM)

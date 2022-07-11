@@ -3,6 +3,7 @@ Guessed flow protos:	1
 DPI Packets (UDP):	12	(1.20 pkts/flow)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 9 (flows)
+Num dissector calls: 208 (20.80 diss/flow)
 
 GMail	413	254874	1
 YouTube	85	76193	5

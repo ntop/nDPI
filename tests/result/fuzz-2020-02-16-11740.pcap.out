@@ -5,6 +5,7 @@ DPI Packets (other):	7	(1.00 pkts/flow)
 Confidence Unknown          : 19 (flows)
 Confidence Match by port    : 3 (flows)
 Confidence DPI              : 55 (flows)
+Num dissector calls: 1645 (21.36 diss/flow)
 
 Unknown	19	6603	19
 VRRP	1	725	1

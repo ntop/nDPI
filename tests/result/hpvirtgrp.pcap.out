@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	37	(4.11 pkts/flow)
 Confidence DPI              : 9 (flows)
+Num dissector calls: 1143 (127.00 diss/flow)
 
 HP_VIRTGRP	135	12739	9
 

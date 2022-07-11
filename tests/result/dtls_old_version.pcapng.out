@@ -2,6 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (UDP):	7	(7.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 3 (3.00 diss/flow)
 
 DTLS	7	994	1
 

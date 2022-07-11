@@ -3,6 +3,7 @@ Guessed flow protos:	1
 DPI Packets (UDP):	6	(1.20 pkts/flow)
 DPI Packets (other):	4	(1.00 pkts/flow)
 Confidence DPI              : 9 (flows)
+Num dissector calls: 9 (1.00 diss/flow)
 
 DNS	2	166	1
 DHCP	5	2090	1

@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	5	(5.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 13 (13.00 diss/flow)
 
 Discord	7	3708	1
 

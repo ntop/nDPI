@@ -4,6 +4,7 @@ DPI Packets (TCP):	92	(7.67 pkts/flow)
 DPI Packets (UDP):	8	(1.00 pkts/flow)
 Confidence Match by IP      : 2 (flows)
 Confidence DPI              : 18 (flows)
+Num dissector calls: 222 (11.10 diss/flow)
 
 Google	29	3320	5
 OCS	863	57552	7

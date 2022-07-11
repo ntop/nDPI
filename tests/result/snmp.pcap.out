@@ -2,6 +2,7 @@ Guessed flow protos:	2
 
 DPI Packets (UDP):	24	(1.41 pkts/flow)
 Confidence DPI              : 17 (flows)
+Num dissector calls: 17 (1.00 diss/flow)
 
 SNMP	72	14435	17
 

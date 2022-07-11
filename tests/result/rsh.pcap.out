@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	12	(6.00 pkts/flow)
 Confidence DPI              : 2 (flows)
+Num dissector calls: 332 (166.00 diss/flow)
 
 RSH	24	1721	2
 

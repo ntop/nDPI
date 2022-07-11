@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	12	(6.00 pkts/flow)
 Confidence DPI              : 2 (flows)
+Num dissector calls: 278 (139.00 diss/flow)
 
 PostgreSQL	39	4709	2
 

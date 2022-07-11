@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 140 (140.00 diss/flow)
 
 WireGuard	2399	734182	1
 

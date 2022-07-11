@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 72 (72.00 diss/flow)
 
 SOMEIP	9	12850	1
 

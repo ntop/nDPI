@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
+Num dissector calls: 18 (18.00 diss/flow)
 
 Citrix	100	11332	1
 

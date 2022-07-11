@@ -4,6 +4,7 @@ DPI Packets (TCP):	2	(2.00 pkts/flow)
 DPI Packets (UDP):	14	(1.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 14 (flows)
+Num dissector calls: 137 (9.13 diss/flow)
 
 NetBIOS	258	24196	13
 SMBv1	2	486	2

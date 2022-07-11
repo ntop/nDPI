@@ -3,6 +3,7 @@ Guessed flow protos:	0
 DPI Packets (UDP):	1	(1.00 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
 
 IPSec	6	1856	2
 

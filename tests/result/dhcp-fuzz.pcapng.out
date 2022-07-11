@@ -2,6 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
+Num dissector calls: 99 (99.00 diss/flow)
 
 DHCP	1	342	1
 

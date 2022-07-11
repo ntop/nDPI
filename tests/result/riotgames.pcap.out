@@ -2,6 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	9	(1.00 pkts/flow)
 Confidence DPI              : 9 (flows)
+Num dissector calls: 891 (99.00 diss/flow)
 
 RiotGames	44	3953	9
 

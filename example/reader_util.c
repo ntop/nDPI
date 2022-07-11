@@ -1050,6 +1050,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->risk_str = ndpi_strdup(s);  
   
   flow->confidence = flow->ndpi_flow->confidence;
+  flow->num_dissector_calls = flow->ndpi_flow->num_dissector_calls;
 
   ndpi_snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 	   flow->ndpi_flow->host_server_name);

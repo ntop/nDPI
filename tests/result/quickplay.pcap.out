@@ -2,6 +2,7 @@ Guessed flow protos:	8
 
 DPI Packets (TCP):	75	(3.57 pkts/flow)
 Confidence DPI              : 21 (flows)
+Num dissector calls: 273 (13.00 diss/flow)
 
 HTTP	133	96179	11
 QQ	12	4781	5
