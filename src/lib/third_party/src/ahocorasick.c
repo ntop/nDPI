@@ -434,6 +434,8 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
   AC_NODE_t *next;
   AC_ALPHABET_t *apos;
 
+  thiz->stats.n_search++;
+
   if(thiz->automata_open)
     /* you must call ac_automata_locate_failure() first */
     return -1;
@@ -493,15 +495,20 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
                       match->position = position;
                       match->match_num = curr->matched_patterns->num;
                       match->patterns = curr->matched_patterns->patterns;
-                      if (thiz->match_handler(match, txt, param))
+                      if (thiz->match_handler(match, txt, param)) {
+                          thiz->stats.n_found++;
                           return 1;
+		      }
                   }
               } /* match->match_map */
           }
       }
   }
-  if(thiz->match_handler)
+  if(thiz->match_handler) {
+    if(match->match_counter > 0)
+      thiz->stats.n_found++;
     return match->match_counter > 0 ? 1:0;
+  }
 
   for(i = 0; i < 4; i++)
       if(txt->match.matched[i]) {
@@ -516,6 +523,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
                           pattern->rep.number);
             }
 #endif
+            thiz->stats.n_found++;
             return 1;
       }
   return 0;
@@ -1235,6 +1243,17 @@ static inline void node_sort_edges (AC_NODE_t * thiz)
         break;
       swap_func(e, r, c);
     }
+  }
+}
+
+void ac_automata_get_stats(AC_AUTOMATA_t * thiz, struct ac_stats *stats)
+{
+  if (thiz) {
+    stats->n_search = thiz->stats.n_search;
+    stats->n_found = thiz->stats.n_found;
+  } else {
+    stats->n_search = 0;
+    stats->n_found = 0;
   }
 }
 

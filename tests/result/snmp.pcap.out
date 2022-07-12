@@ -3,6 +3,21 @@ Guessed flow protos:	2
 DPI Packets (UDP):	24	(1.41 pkts/flow)
 Confidence DPI              : 17 (flows)
 Num dissector calls: 17 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   26/0 (search/found)
+Patricia risk:        30/0 (search/found)
+Patricia protocols:   68/8 (search/found)
 
 SNMP	72	14435	17
 

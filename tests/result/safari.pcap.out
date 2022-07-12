@@ -3,6 +3,21 @@ Guessed flow protos:	0
 DPI Packets (TCP):	46	(6.57 pkts/flow)
 Confidence DPI              : 7 (flows)
 Num dissector calls: 7 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+Automa host:          16/0 (search/found)
+Automa domain:        9/0 (search/found)
+Automa tls cert:      2/0 (search/found)
+Automa risk mask:     5/0 (search/found)
+Automa common alpns:  14/14 (search/found)
+Patricia risk mask:   14/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   28/0 (search/found)
 
 TLS	6019	5570309	7
 
