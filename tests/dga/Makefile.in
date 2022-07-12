@@ -7,10 +7,10 @@ SRCHOME=../../src
 ifneq ($(OS),Windows_NT)
 CFLAGS+=-fPIC -DPIC
 endif
-CFLAGS+=-g -I$(SRCHOME)/include @CFLAGS@
+CFLAGS+=-g -I$(SRCHOME)/include @NDPI_CFLAGS@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LIBS=$(LIBNDPI) @ADDITIONAL_LIBS@ -lpthread @LIBS@
-LDFLAGS=@LDFLAGS@
+LDFLAGS+=@NDPI_LDFLAGS@
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=dga_evaluate
 PREFIX?=@prefix@

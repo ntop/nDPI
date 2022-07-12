@@ -8,10 +8,10 @@ SRCHOME=../../src
 ifneq ($(OS),Windows_NT)
 CFLAGS+=-fPIC -DPIC
 endif
-CFLAGS+=-g -I$(SRCHOME)/include @JSONC_CFLAGS@ @PCAP_INC@ @CFLAGS@
+CFLAGS+=-g -I$(SRCHOME)/include @NDPI_CFLAGS@ @JSONC_CFLAGS@ @PCAP_INC@
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ @LIBS@
-LDFLAGS=@LDFLAGS@
+LDFLAGS+=@NDPI_LDFLAGS@
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 OBJS=unit
 PREFIX?=@prefix@

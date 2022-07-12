@@ -13,6 +13,8 @@ jobs:
   coverage:
     name: Coverage (ubuntu-latest)
     runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror
     steps:
       - uses: actions/checkout@v2
         with:
@@ -25,7 +27,7 @@ jobs:
           sudo apt-get install libpcre3-dev libmaxminddb-dev lcov
           sudo apt-get install wdiff colordiff
       - name: Configure
-        run: env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre --with-maxminddb --enable-tls-sigs
+        run: ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre --with-maxminddb --enable-tls-sigs
       - name: Build
         run: make all
       - name: Test
@@ -45,6 +47,8 @@ jobs:
   python-bindings:
     name: Python Bindings (ubuntu-latest)
     runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror
     steps:
       - uses: actions/checkout@v2
         with:
@@ -59,7 +63,7 @@ jobs:
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
       - name: Build nDPI library
         run: |
-          env CC=gcc CFLAGS='-Werror' ./autogen.sh
+          ./autogen.sh
           make
           sudo make install
       - name: Generate Python bindings
@@ -108,6 +112,9 @@ jobs:
   performance:
     name: Performance (ubuntu-latest)
     runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+      CFLAGS: -Werror
     steps:
       - uses: actions/checkout@v2
         with:
@@ -117,7 +124,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libpcap-dev
           sudo apt-get install golang-1.16-go libgoogle-perftools-dev graphviz
-          env GO111MODULE=on go install github.com/google/pprof@latest
+          go install github.com/google/pprof@latest
           sudo ln -s ${HOME}/go/bin/pprof /usr/bin/pprof
           pprof -h
       - name: Configure nDPI library
@@ -164,13 +171,16 @@ jobs:
   test:
     name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
     runs-on: ${{ matrix.os }}
+    env:
+      CC: ${{ matrix.compiler }}
+      CFLAGS: -Werror
     strategy:
       fail-fast: true
       matrix:
         os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
-        compiler: ["default-cc"]
+        compiler: ["cc"]
         pcre: [""]
         maxminddb: [""]
         msan: [""]
@@ -203,56 +213,56 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: ubuntu-latest
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: ubuntu-latest
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-thread-sanitizer"
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: ubuntu-18.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: macOS-latest
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: macos-11
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: ubuntu-latest
             arch: "arm64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on arm64
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: ubuntu-latest
             arch: "armhf"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler: "default-cc"
+          - compiler: "cc"
             os: ubuntu-latest
             arch: "s390x"
             gcrypt: ""
@@ -321,6 +331,9 @@ jobs:
           msys2 -c 'make install'
           msys2 -c 'cd ..'
           msys2 -c 'rm -rf libgcrypt/'
+        env:
+          CC:
+          CFLAGS:
       - name: Installing MacOS prerequisites
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64')
         run: |
@@ -338,30 +351,30 @@ jobs:
         run: |
           brew install libmaxminddb
       - name: Configure nDPI on Ubuntu
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
-          env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
+          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Configure nDPI on MacOS
-        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
+        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
-          env CC=clang CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
+          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Configure nDPI on Windows
-        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
+        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
-          msys2 -c 'env CFLAGS=\"-Werror\" ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap ${{ matrix.gcrypt }}'
+          msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap ${{ matrix.gcrypt }}'
       - name: Build nDPI on Windows
-        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'default-cc')
+        if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
           msys2 -c 'make all'
           msys2 -c 'ldd ./example/ndpiReader.exe'
       - name: Configure nDPI with specified GCC version on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'gcc')
         run: |
-          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
+          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Configure nDPI with specified CLANG on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang')
         run: |
-          env CC=${{ matrix.compiler }} CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
+          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Build nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
@@ -406,8 +419,10 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
         run: |
           make distclean
-          env CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32
+          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32
           make all
+        env:
+          CC:
       - name: Display qemu specified architecture (arm64 - little endian)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'arm64')
         uses: docker://multiarch/ubuntu-core:arm64-bionic

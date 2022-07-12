@@ -1,7 +1,8 @@
 CC=@CC@
 INC=-I ../src/include -I/usr/local/include
 LIBDPI=../src/lib/libndpi.a
-LDFLAGS=@LDFLAGS@
+CFLAGS+=@NDPI_CFLAGS@
+LDFLAGS+=@NDPI_LDFLAGS@
 LIB=$(LIBDPI) -lm @ADDITIONAL_LIBS@ @LIBRRD@ @LIBS@
 
 TOOLS=rrd_anomaly rrd_similarity
@@ -9,10 +10,10 @@ TOOLS=rrd_anomaly rrd_similarity
 all: $(TOOLS)
 
 rrd_anomaly: rrd_anomaly.c Makefile $(LIBDPI)
-	$(CC) $(CPPFLAGS) -g $(INC) $(LDFLAGS) rrd_anomaly.c -o rrd_anomaly $(LIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -g $(INC) $(LDFLAGS) rrd_anomaly.c -o rrd_anomaly $(LIB)
 
 rrd_similarity: rrd_similarity.c Makefile $(LIBDPI)
-	$(CC) $(CPPFLAGS) -g $(INC) $(LDFLAGS) rrd_similarity.c -o rrd_similarity $(LIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -g $(INC) $(LDFLAGS) rrd_similarity.c -o rrd_similarity $(LIB)
 
 clean:
 	/bin/rm -f *.o $(TOOLS) *~

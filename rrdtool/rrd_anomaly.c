@@ -54,11 +54,11 @@ int main(int argc, char *argv[]) {
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data, *p;
   char **names, *filename = NULL, *start_s, *end_s, *cf;
-  u_int i, j, t, first = 1, quick_mode = 0, verbose = 0;
-  time_t start, end;
+  u_int i, first = 1, quick_mode = 0, verbose = 0;
+  time_t t, start, end;
   struct ndpi_ses_struct ses;
   float alpha, ro;
-  char c;
+  int c;
 
   /* Defaults */
   alpha   = DEFAULT_ALPHA;
@@ -138,8 +138,6 @@ int main(int argc, char *argv[]) {
 
   p = data;
   for(t=start+1, i=0; t<end; t+=step, i++) {
-    j = 0; /* Consider only the first DS */
-    /* for(j=0; j<ds_cnt; j++) */ {
       rrd_value_t value = *p++;
 
       if(!isnan(value)) {
@@ -156,7 +154,7 @@ int main(int argc, char *argv[]) {
 	
 	if(verbose || is_anomaly) {
 	  if(quick_mode) {
-	    printf("%u\n", t);
+	    printf("%ld\n", t);
 	  } else {
 	    const time_t _t = t;
 	    struct tm *t_info = localtime((const time_t*)&_t);
@@ -175,7 +173,6 @@ int main(int argc, char *argv[]) {
 	  }
 	}
       }
-    }
   }
 
   rrd_freemem(data);

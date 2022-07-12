@@ -50,7 +50,7 @@ u_int verbose = 0, similarity_threshold = 100, skip_zero = 0;
 /* *************************************************** */
 
 static void help() {
-  printf("Usage: rrd_similarity [-v][-a <alpha>][-e <end>][-q][-s <start>]\n"
+  printf("Usage: rrd_similarity [-v][-e <end>][-q][-s <start>]\n"
 	 "                      -f <filename> -d <basedir> [-t <threshold>]\n"
 	 "-a             | Set alpha. Valid range >0 .. <1. Default %.2f\n"
 	 "-e <end>       | RRD end time. Default %s\n"
@@ -77,7 +77,8 @@ void analyze_rrd(rrd_file_stats *rrd, time_t start, time_t end) {
   unsigned long  step = 0, ds_cnt = 0;
   rrd_value_t *data, *p;
   char **names;
-  u_int t, i, j, num_points;
+  time_t t;
+  u_int i, num_points;
   struct ndpi_analyze_struct *s;
 
   if(rrd_fetch_r(rrd->path, "AVERAGE", &start, &end, &step, &ds_cnt, &names, &data) != 0) {
@@ -205,16 +206,13 @@ void find_rrds(char *basedir, char *filename, rrd_file_stats *rrds, u_int *num_r
 
 int main(int argc, char *argv[]) {
   rrd_time_value_t start_tv, end_tv;
-  char *filename = NULL, *start_s, *end_s, *dirname = NULL, *basedir = NULL;
-  u_int first = 1, quick_mode = 0;
-  float alpha;
-  char c;
+  char *filename = NULL, *start_s, *end_s, *basedir = NULL;
+  int c;
   time_t start, end;
   u_int num_rrds = 0, i;
   rrd_file_stats *rrds;
 
   /* Defaults */
-  alpha   = DEFAULT_ALPHA;
   start_s = DEFAULT_START;
   end_s   = DEFAULT_END;
 
@@ -235,23 +233,8 @@ int main(int argc, char *argv[]) {
       end_s = optarg;
       break;
 
-    case 'q':
-      quick_mode = 1;
-      break;
-
     case 'v':
       verbose = 1;
-      break;
-
-    case 'a':
-      {
-	float f = atof(optarg);
-
-	if((f > 0) && (f < 1))
-	  alpha = f;
-	else
-	  printf("Discarding -a: valid range is >0 .. <1\n");
-      }
       break;
 
     case 'f':
