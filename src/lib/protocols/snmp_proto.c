@@ -69,7 +69,7 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->payload_packet_len > 16 && packet->payload[0] == 0x30) {
     u_int16_t len_length = 0, offset;
-    int len;
+    int64_t len;
 
     len = ndpi_asn1_ber_decode_length(&packet->payload[1], packet->payload_packet_len - 1, &len_length);
 

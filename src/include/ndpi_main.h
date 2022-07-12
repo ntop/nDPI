@@ -165,7 +165,7 @@ extern "C" {
   char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
   char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
 
-  int ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len);
+  int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len);
 
 #ifdef __cplusplus
 }

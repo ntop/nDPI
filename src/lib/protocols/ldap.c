@@ -38,7 +38,7 @@ static void ndpi_int_ldap_add_connection(struct ndpi_detection_module_struct *nd
 void ndpi_search_ldap(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  int length;
+  int64_t length;
   u_int16_t length_len = 0, msg_id_len;
   u_int8_t op;
 	

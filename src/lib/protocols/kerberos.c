@@ -41,7 +41,7 @@ static int krb_decode_asn1_length(struct ndpi_detection_module_struct *ndpi_stru
                                   size_t * const kasn1_offset)
 {
   struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-  int length;
+  int64_t length;
   u_int16_t value_len;
 
   length = ndpi_asn1_ber_decode_length(&packet->payload[*kasn1_offset],
