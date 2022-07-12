@@ -99,10 +99,16 @@ typedef struct _ndpi_patricia_node_t {
   union ndpi_patricia_node_value_t value;
 } ndpi_patricia_node_t;
 
+struct ndpi_patricia_tree_stats {
+  u_int64_t n_search;
+  u_int64_t n_found;
+};
+
 typedef struct _ndpi_patricia_tree_t {
   ndpi_patricia_node_t 	*head;
   u_int16_t		maxbits;	/* for IP, 32 bit addresses */
   int num_active_node;		/* for debug purpose */
+  struct ndpi_patricia_tree_stats stats;
 } ndpi_patricia_tree_t;
 
 #endif /* _NDPI_PATRICIA_TYPEDEF_H_ */
