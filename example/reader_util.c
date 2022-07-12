@@ -1543,6 +1543,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
   }
 
   if(!flow->detection_completed) {
+    struct ndpi_flow_input_info input_info;
+
     u_int enough_packets =
       (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_udp_dissected_pkts))
        || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_tcp_dissected_pkts))) ? 1 : 0;
@@ -1558,9 +1560,13 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     else
       workflow->stats.dpi_packet_count[2]++;
 
+    memset(&input_info, '\0', sizeof(input_info)); /* To be sure to set to "unknown" any fields */
+    /* Set here any information (easily) available; in this trivial example we don't have any */
+    input_info.in_pkt_dir = NDPI_IN_PKT_DIR_UNKNOWN;
+    input_info.seen_flow_beginning = NDPI_FLOW_BEGINNING_UNKNOWN;
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
-							    ipsize, time_ms);
+							    ipsize, time_ms, &input_info);
 
     enough_packets |= ndpi_flow->fail_with_unknown;
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {

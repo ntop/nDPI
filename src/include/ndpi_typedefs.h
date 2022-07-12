@@ -528,6 +528,31 @@ struct ndpi_vxlanhdr {
 } PACK_OFF;
 
 /* ************************************************************ */
+
+/**
+ * The application might inform the library about client/server direction
+ */
+#define NDPI_IN_PKT_DIR_UNKNOWN		0	/**< The application doesn't provide this kind of information */
+#define NDPI_IN_PKT_DIR_C_TO_S		1	/**< Current packet is from client to server */
+#define NDPI_IN_PKT_DIR_S_TO_C		2	/**< Current packet is from server to client */
+
+/**
+ * The application might choose to not pass TCP handshake packets to the library
+ * (for performance reasons), but it might want to inform the library itlsef that these
+ * packets have been captured/seen anyway (to avoid losing classifiation capabilities).
+ */
+#define NDPI_FLOW_BEGINNING_UNKNOWN	0	/**< The application doesn't provide this kind of information */
+#define NDPI_FLOW_BEGINNING_SEEN	1	/**< The application informs the library that the TCP handshake has been seen (even if its packets might not have been passed to the library) */
+#define NDPI_FLOW_BEGINNING_NOT_SEEN	2	/**< The application informs the library that the TCP handshake has not been seen */
+
+/**
+ * Optional information about flow management (per packet)
+ */
+struct ndpi_flow_input_info {
+  unsigned char in_pkt_dir;
+  unsigned char seen_flow_beginning;
+};
+
 /* ******************* ********************* ****************** */
 /* ************************************************************ */
 
@@ -1150,6 +1175,7 @@ struct ndpi_detection_module_struct {
 
   /* Current packet */
   struct ndpi_packet_struct packet;
+  const struct ndpi_flow_input_info *input_info;
 };
 
 #endif /* NDPI_LIB_COMPILATION */
@@ -1182,7 +1208,7 @@ struct ndpi_flow_struct {
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_host_protocol_id, guessed_category, guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, host_already_guessed:1, fail_with_unknown:1,
-    init_finished:1, setup_packet_direction:1, packet_direction:1, check_extra_packets:1, is_ipv6:1;
+    init_finished:1, client_packet_direction:1, packet_direction:1, check_extra_packets:1, is_ipv6:1;
   u_int16_t num_dissector_calls;
   ndpi_confidence_t confidence; /* ndpi_confidence_t */
 
@@ -1192,14 +1218,15 @@ struct ndpi_flow_struct {
   */
   u_int32_t next_tcp_seq_nr[2];
 
-  /* Flow addresses (used mainly for LRU lookups in ndpi_detection_giveup())
-     and ports. All in *network* byte order
-
-     TODO
-     - IPv6. Note that LRU is ipv4 only, for the time being 
+  /* Flow addresses (useful for LRU lookups in ndpi_detection_giveup())
+     and ports. All in *network* byte order.
+     Client and server.
    */
-  u_int32_t saddr, daddr;
-  u_int16_t sport, dport;
+  union {
+    u_int32_t v4;
+    u_int8_t v6[16];
+  } c_address, s_address;	/* For some unknown reasons, x86_64-w64-mingw32-gcc doesn't like the name "s_addr" */
+  u_int16_t c_port, s_port;
   
   // -----------------------------------------
 

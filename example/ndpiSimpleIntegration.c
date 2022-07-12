@@ -884,7 +884,7 @@ static void ndpi_process_packet(uint8_t * const args,
   flow_to_process->detected_l7_protocol =
     ndpi_detection_process_packet(workflow->ndpi_struct, flow_to_process->ndpi_flow,
 				  ip != NULL ? (uint8_t *)ip : (uint8_t *)ip6,
-				  ip_size, time_ms);
+				  ip_size, time_ms, NULL);
 
   if (ndpi_is_protocol_detected(workflow->ndpi_struct,
 				flow_to_process->detected_l7_protocol) != 0 &&

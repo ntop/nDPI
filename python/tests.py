@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------------------------------------------------
 """
 
-from ndpi import NDPI, NDPIFlow
+from ndpi import NDPI, NDPIFlow, ffi
 import time
 
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     try:
         nDPI = NDPI()
         ndpi_flow = NDPIFlow()
-        nDPI.process_packet(ndpi_flow, b'', time.time())
+        nDPI.process_packet(ndpi_flow, b'', time.time(), ffi.NULL)
         nDPI.giveup(ndpi_flow)
         print("nDPI Python bindings: OK")
     except Exception:

@@ -7,7 +7,7 @@ Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 6 (flows)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 30 (flows)
-Num dissector calls: 2069 (54.45 diss/flow)
+Num dissector calls: 2042 (53.74 diss/flow)
 
 Unknown	1	66	1
 HTTP	116	91784	6

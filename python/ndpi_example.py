@@ -14,7 +14,7 @@ If not, see <http://www.gnu.org/licenses/>.
 """
 
 from collections import namedtuple
-from ndpi import NDPI, NDPIFlow
+from ndpi import NDPI, NDPIFlow, ffi
 import argparse
 import socket
 import dpkt
@@ -131,7 +131,7 @@ if __name__ == "__main__":
                 key = ppkt_to_flow_key(ppkt)
                 try:  # Try a Flow update
                     flow = flow_cache[key]
-                    flow.detected_protocol = nDPI.process_packet(flow.ndpi_flow, ppkt.ip_bytes, time_ms)
+                    flow.detected_protocol = nDPI.process_packet(flow.ndpi_flow, ppkt.ip_bytes, time_ms, ffi.NULL)
                     flow.pkts += 1
                     flow.bytes += len(packet)
                 except KeyError:  # New Flow
@@ -139,7 +139,7 @@ if __name__ == "__main__":
                     flow.index = flow_count
                     flow_count += 1
                     flow.ndpi_flow = NDPIFlow()  # We create an nDPIFlow object per Flow
-                    flow.detected_protocol = nDPI.process_packet(flow.ndpi_flow, ppkt.ip_bytes, time_ms)
+                    flow.detected_protocol = nDPI.process_packet(flow.ndpi_flow, ppkt.ip_bytes, time_ms, ffi.NULL)
                     flow.pkts += 1
                     flow.bytes += len(packet)
                     flow_cache[key] = flow
