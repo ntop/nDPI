@@ -65,20 +65,56 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int16_t const max_packets = 4;
+  size_t i;
+  static uint8_t const valid_patterns[] = { 0x25, 0x26, 0x30 };
 
   NDPI_LOG_DBG(ndpi_struct, "search JABBER\n");
 
-  if (flow->packet_counter > 5) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
-  
-  if (packet->tcp != 0 && packet->payload_packet_len == 0) {
-    return;
+  if (packet->payload_packet_len >= 3 &&
+      packet->payload[1] == 0x00 && packet->payload[2] == packet->payload_packet_len)
+  {
+    /* Old style Jabber/XMPP SSL. */
+    if (flow->packet_counter > max_packets - 1)
+    {
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+    }
+    for (i = 0; i < NDPI_ARRAY_LENGTH(valid_patterns); ++i)
+    {
+      if (packet->payload[0] == valid_patterns[i])
+      {
+        return;
+      }
+    }
   }
 
   /* search for jabber here */
   /* this part is working asymmetrically */
+  if (packet->payload_packet_len >= NDPI_STATICSTRING_LEN("<presence ") &&
+      memcmp(packet->payload, "<presence ", NDPI_STATICSTRING_LEN("<presence ")) == 0 &&
+      ndpi_strnstr((const char *)&packet->payload[0],
+                   "xmlns='http://jabber.org/protocol/caps'", packet->payload_packet_len) != NULL)
+  {
+    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+    return;
+  }
+
+  if (packet->payload_packet_len >= NDPI_STATICSTRING_LEN("<iq type='") &&
+      memcmp(packet->payload, "<iq type='", NDPI_STATICSTRING_LEN("<iq type='")) == 0 &&
+      ndpi_strnstr((const char *)&packet->payload[0],
+                   "xmlns='http://jabber.org/protocol/commands'", packet->payload_packet_len) != NULL)
+  {
+    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+    return;
+  }
+
+  if (packet->payload_packet_len == NDPI_STATICSTRING_LEN("</stream:stream>") &&
+      memcmp(packet->payload, "</stream:stream>", NDPI_STATICSTRING_LEN("</stream:stream>")) == 0)
+  {
+    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+    return;
+  }
+
   if ((packet->payload_packet_len > 13 && memcmp(packet->payload, "<?xml version=", 14) == 0)
       || (packet->payload_packet_len >= NDPI_STATICSTRING_LEN("<stream:stream ")
 	  && memcmp(packet->payload, "<stream:stream ", NDPI_STATICSTRING_LEN("<stream:stream ")) == 0)) {
@@ -95,16 +131,11 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
       return;
     }
   }
-  
-  if (flow->packet_counter < 3) {
-    NDPI_LOG_DBG2(ndpi_struct, "packet_counter: %u\n", flow->packet_counter);
+
+  if (flow->packet_counter > max_packets) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
-
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-
-  ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TRUPHONE,
-			__FILE__,__FUNCTION__,__LINE__);
 }
 
 
@@ -113,7 +144,7 @@ void init_jabber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   ndpi_set_bitmask_protocol_detection("Jabber", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_JABBER,
 				      ndpi_search_jabber_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

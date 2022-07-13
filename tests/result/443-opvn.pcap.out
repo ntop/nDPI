@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	6	(6.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 139 (139.00 diss/flow)
+Num dissector calls: 135 (135.00 diss/flow)
 
 OpenVPN	46	11573	1
 
