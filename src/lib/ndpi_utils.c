@@ -1202,9 +1202,13 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
       {
         ndpi_serialize_string_string(serializer, "subjectDN", flow->protos.tls_quic.subjectDN);
       }
-      if(flow->protos.tls_quic.alpn)
+      if(flow->protos.tls_quic.advertised_alpns)
       {
-        ndpi_serialize_string_string(serializer, "alpn", flow->protos.tls_quic.alpn);
+        ndpi_serialize_string_string(serializer, "advertised_alpns", flow->protos.tls_quic.advertised_alpns);
+      }
+      if(flow->protos.tls_quic.negotiated_alpn)
+      {
+        ndpi_serialize_string_string(serializer, "negotiated_alpn", flow->protos.tls_quic.negotiated_alpn);
       }
       if(flow->protos.tls_quic.tls_supported_versions)
       {
@@ -2559,8 +2563,8 @@ void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str) {
 
     /* QUIC ALPNs */
     "h3-T051", "h3-T050",
-    "h3-32", "h3-30", "h3-29", "h3-28", "h3-27", "h3-24", "h3-22",
-    "hq-30", "hq-29", "hq-28", "hq-27",
+    "h3-34", "h3-33", "h3-32", "h3-31", "h3-30", "h3-29", "h3-28", "h3-27", "h3-24", "h3-22",
+    "hq-34", "hq-33", "hq-32", "hq-31", "hq-30", "hq-29", "hq-28", "hq-27", "hq-interop",
     "h3-fb-05", "h1q-fb",
     "doq-i00",
 

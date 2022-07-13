@@ -1404,7 +1404,7 @@ struct ndpi_flow_struct {
     } softether;
 
     struct {
-      char *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
+      char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       u_int32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];
       u_int16_t server_cipher;
@@ -1578,11 +1578,11 @@ struct ndpi_flow_struct {
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 200,
-               "Size of the struct member protocols increased to more than 200 bytes, "
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 208,
+               "Size of the struct member protocols increased to more than 208 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 920,
-               "Size of the flow struct increased to more than 920 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 928,
+               "Size of the flow struct increased to more than 928 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

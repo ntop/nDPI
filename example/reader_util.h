@@ -165,8 +165,6 @@ enum info_type {
     INFO_SOFTETHER,
     INFO_TIVOCONNECT,
     INFO_FTP_IMAP_POP_SMTP,
-    INFO_TLS_QUIC_ALPN_VERSION,
-    INFO_TLS_QUIC_ALPN_ONLY,
     INFO_NATPMP,
 };
 
@@ -217,10 +215,6 @@ typedef struct ndpi_flow_info {
   union {
     char info[256];
     struct {
-      char alpn[128];
-      char tls_supported_versions[128];
-    } tls_quic;
-    struct {
       unsigned char auth_failed;
       char username[127];
       char password[128];
@@ -263,7 +257,7 @@ typedef struct ndpi_flow_info {
     u_int16_t ssl_version;
     char server_info[64],
       client_hassh[33], server_hassh[33], *server_names,
-      *tls_alpn, *tls_supported_versions,
+      *advertised_alpns, *negotiated_alpn, *tls_supported_versions,
       *tls_issuerDN, *tls_subjectDN,
       ja3_client[33], ja3_server[33],
       sha1_cert_fingerprint[20];

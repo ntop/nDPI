@@ -480,9 +480,14 @@ static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     flow->ssh_tls.server_names = NULL;
   }
 
-  if(flow->ssh_tls.tls_alpn) {
-    ndpi_free(flow->ssh_tls.tls_alpn);
-    flow->ssh_tls.tls_alpn = NULL;
+  if(flow->ssh_tls.advertised_alpns) {
+    ndpi_free(flow->ssh_tls.advertised_alpns);
+    flow->ssh_tls.advertised_alpns = NULL;
+  }
+
+  if(flow->ssh_tls.negotiated_alpn) {
+    ndpi_free(flow->ssh_tls.negotiated_alpn);
+    flow->ssh_tls.negotiated_alpn = NULL;
   }
 
   if(flow->ssh_tls.tls_supported_versions) {
@@ -1248,11 +1253,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     flow->ssh_tls.browser_heuristics = flow->ndpi_flow->protos.tls_quic.browser_heuristics;
 
-    if(flow->ndpi_flow->protos.tls_quic.alpn) {
-      if((flow->ssh_tls.tls_alpn = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.alpn)) != NULL)
-	correct_csv_data_field(flow->ssh_tls.tls_alpn);
-    }
-
     if(flow->ndpi_flow->protos.tls_quic.issuerDN)
       flow->ssh_tls.tls_issuerDN = strdup(flow->ndpi_flow->protos.tls_quic.issuerDN);
 
@@ -1264,28 +1264,19 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       flow->ssh_tls.encrypted_sni.cipher_suite = flow->ndpi_flow->protos.tls_quic.encrypted_sni.cipher_suite;
     }
 
-    if(flow->ssh_tls.tls_supported_versions) {
+    if(flow->ndpi_flow->protos.tls_quic.tls_supported_versions) {
       if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.tls_supported_versions)) != NULL)
 	correct_csv_data_field(flow->ssh_tls.tls_supported_versions);
     }
 
-    if(flow->ndpi_flow->protos.tls_quic.alpn
-       && flow->ndpi_flow->protos.tls_quic.tls_supported_versions) {
-      correct_csv_data_field(flow->ndpi_flow->protos.tls_quic.alpn);
-      correct_csv_data_field(flow->ndpi_flow->protos.tls_quic.tls_supported_versions);
+    if(flow->ndpi_flow->protos.tls_quic.advertised_alpns) {
+      if((flow->ssh_tls.advertised_alpns = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.advertised_alpns)) != NULL)
+	correct_csv_data_field(flow->ssh_tls.advertised_alpns);
+    }
 
-      flow->info_type = INFO_TLS_QUIC_ALPN_VERSION;
-      ndpi_snprintf(flow->tls_quic.alpn, sizeof(flow->tls_quic.alpn), "%s",
-                    flow->ndpi_flow->protos.tls_quic.alpn);
-      ndpi_snprintf(flow->tls_quic.tls_supported_versions,
-                    sizeof(flow->tls_quic.tls_supported_versions),
-                    "%s", flow->ndpi_flow->protos.tls_quic.tls_supported_versions);
-    } else if(flow->ndpi_flow->protos.tls_quic.alpn) {
-      correct_csv_data_field(flow->ndpi_flow->protos.tls_quic.alpn);
-
-      flow->info_type = INFO_TLS_QUIC_ALPN_ONLY;
-      ndpi_snprintf(flow->tls_quic.alpn, sizeof(flow->tls_quic.alpn), "%s",
-                    flow->ndpi_flow->protos.tls_quic.alpn);
+    if(flow->ndpi_flow->protos.tls_quic.negotiated_alpn) {
+      if((flow->ssh_tls.negotiated_alpn = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.negotiated_alpn)) != NULL)
+	correct_csv_data_field(flow->ssh_tls.negotiated_alpn);
     }
 
     if(enable_doh_dot_detection) {
