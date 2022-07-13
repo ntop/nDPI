@@ -1,7 +1,8 @@
 CC=@CC@
 INC=-I ../src/include -I/usr/local/include
 LIBDPI=../src/lib/libndpi.a
-LDFLAGS=@LDFLAGS@
+CFLAGS+=@NDPI_CFLAGS@
+LDFLAGS+=@NDPI_LDFLAGS@
 LIB=$(LIBDPI) -lm @ADDITIONAL_LIBS@ @LIBS@
 
 TOOLS=metric_anomaly
@@ -9,7 +10,7 @@ TOOLS=metric_anomaly
 all: $(TOOLS)
 
 metric_anomaly: metric_anomaly.c Makefile $(LIBDPI)
-	$(CC) $(CPPFLAGS) -g $(INC) $(LDFLAGS) metric_anomaly.c -o metric_anomaly $(LIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -g $(INC) $(LDFLAGS) metric_anomaly.c -o metric_anomaly $(LIB)
 
 clean:
 	/bin/rm -f *.o $(TOOLS) *~
