@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	10	(5.00 pkts/flow)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 286 (143.00 diss/flow)
+Num dissector calls: 280 (140.00 diss/flow)
 
 VNC	4551	329158	2
 
