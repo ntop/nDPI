@@ -31,7 +31,7 @@ AS_IF([test "${with_sanitizer+set}" = set -a "${with_thread_sanitizer+set}" = se
 AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set],[
   CFLAGS="${CFLAGS} -O0 -g3"
 ],[
-  CFLAGS="${CFLAGS} -g"
+  CFLAGS="${CFLAGS} -O2"
 ])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
