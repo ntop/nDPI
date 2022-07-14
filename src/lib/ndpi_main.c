@@ -4813,8 +4813,10 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     }
 
     if(flow->l4_proto == IPPROTO_TCP) {
-      if(flow->l4.tcp.tls.message.buffer)
-	ndpi_free(flow->l4.tcp.tls.message.buffer);
+      if(flow->l4.tcp.tls.message[0].buffer)
+	ndpi_free(flow->l4.tcp.tls.message[0].buffer);
+      if(flow->l4.tcp.tls.message[1].buffer)
+	ndpi_free(flow->l4.tcp.tls.message[1].buffer);
     }
 
     if(flow->l4_proto == IPPROTO_UDP) {

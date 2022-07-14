@@ -550,7 +550,7 @@ typedef union
 typedef struct message {
   u_int8_t *buffer;
   u_int buffer_len, buffer_used;
-  u_int32_t next_seq[2]; /* Directions */
+  u_int32_t next_seq;
 } message_t;
 
 /* NDPI_PROTOCOL_TINC */
@@ -643,7 +643,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t telnet_stage:2;			// 0 - 2
 
   struct {
-    message_t message;
+    message_t message[2]; /* Directions */
 
     /* NDPI_PROTOCOL_TLS */
     u_int8_t certificate_processed:1, fingerprint_set:1, _pad:6;

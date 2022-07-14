@@ -141,7 +141,7 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
 void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  message_t *message = &flow->l4.tcp.tls.message;
+  message_t *message = &flow->l4.tcp.tls.message[packet->packet_direction];
   u_int avail_bytes;
 
   /* TCP */
@@ -185,8 +185,8 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
   if(packet->payload_packet_len > 0 && avail_bytes >= packet->payload_packet_len) {
     u_int8_t ok = 0;
 
-    if(message->next_seq[packet->packet_direction] != 0) {
-      if(ntohl(packet->tcp->seq) == message->next_seq[packet->packet_direction])
+    if(message->next_seq != 0) {
+      if(ntohl(packet->tcp->seq) == message->next_seq)
 	ok = 1;
     } else
       ok = 1;
@@ -204,7 +204,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 	     ntohl(packet->tcp->seq)+packet->payload_packet_len);
 #endif
 
-      message->next_seq[packet->packet_direction] = ntohl(packet->tcp->seq)+packet->payload_packet_len;
+      message->next_seq = ntohl(packet->tcp->seq)+packet->payload_packet_len;
     } else {
 #ifdef DEBUG_TLS_MEMORY
       printf("[TLS Mem] Skipping packet [%u bytes][direction: %u][tcp_seq: %u][expected next: %u]\n",
@@ -920,7 +920,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     return(1); /* Keep working */
 
   ndpi_search_tls_tcp_memory(ndpi_struct, flow);
-  message = &flow->l4.tcp.tls.message;
+  message = &flow->l4.tcp.tls.message[packet->packet_direction];
 
   /* Valid TLS Content Types:
      https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
