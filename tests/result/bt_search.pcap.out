@@ -1,9 +1,9 @@
 Guessed flow protos:	1
 
 DPI Packets (UDP):	2	(2.00 pkts/flow)
-Confidence DPI (cache)      : 1 (flows)
+Confidence DPI              : 1 (flows)
 Num dissector calls: 1 (1.00 diss/flow)
 
 BitTorrent	2	322	1
 
-	1	UDP 192.168.0.102:6771 -> 239.192.152.143:6771 [proto: 37/BitTorrent][ClearText][Confidence: DPI (cache)][cat: Download/7][2 pkts/322 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][300.03 sec][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.0.102:6771 -> 239.192.152.143:6771 [proto: 37/BitTorrent][ClearText][Confidence: DPI][cat: Download/7][2 pkts/322 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][300.03 sec][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
