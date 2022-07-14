@@ -2182,16 +2182,18 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
 /* Check isuerDN exception */
 u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
 					    char *issuerDN) {
-  ndpi_list *head = ndpi_str->trusted_issuer_dn;
-
+  if(issuerDN != NULL) {
+    ndpi_list *head = ndpi_str->trusted_issuer_dn;
+    
     while(head != NULL) {
       if(strcmp(issuerDN, head->value) == 0)
 	return(1); /* This is a trusted DN */
       else
 	head = head->next;
+    }
   }
   
-    return(0 /* no exception */);
+  return(0 /* no exception */);
 }
 
 /* ********************************************************************************* */
@@ -2200,23 +2202,27 @@ u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct 
 static u_int8_t ndpi_check_hostname_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
 						   struct ndpi_flow_struct *flow,
 						   char *hostname) {
-  ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
-  u_int8_t ret = 0;
-  
-  if(automa->ac_automa) {
-    AC_TEXT_t ac_input_text;
-    AC_REP_t match;
+  if(hostname == NULL)
+    return(0);
+  else {
+    ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
+    u_int8_t ret = 0;
     
-    ac_input_text.astring = hostname, ac_input_text.length = strlen(hostname);
-    ac_input_text.option = 0;
-    
-    if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0) {
-      if(flow) flow->risk_mask &= match.number64;
-      ret = 1;
+    if(automa->ac_automa) {
+      AC_TEXT_t ac_input_text;
+      AC_REP_t match;
+      
+      ac_input_text.astring = hostname, ac_input_text.length = strlen(hostname);
+      ac_input_text.option = 0;
+      
+      if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0) {
+	if(flow) flow->risk_mask &= match.number64;
+	ret = 1;
+      }
     }
+    
+    return(ret);
   }
-  
-  return(ret);
 }
 
 /* ********************************************************************************* */
@@ -2236,7 +2242,7 @@ static u_int8_t ndpi_check_ipv4_exception(struct ndpi_detection_module_struct *n
   return((r != (u_int64_t)-1) ? 1 : 0);
 }
 
-  /* ********************************************************************************* */
+/* ********************************************************************************* */
 
 static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 					struct ndpi_flow_struct *flow) {
