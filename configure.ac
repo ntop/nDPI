@@ -31,7 +31,7 @@ AS_IF([test "${with_sanitizer+set}" = set -a "${with_thread_sanitizer+set}" = se
 AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set],[
   NDPI_CFLAGS="${NDPI_CFLAGS} -O0 -g3"
 ],[
-  NDPI_CFLAGS="${NDPI_CFLAGS} -g"
+  NDPI_CFLAGS="${NDPI_CFLAGS} -O2"
 ])
 AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set],[
   AS_IF([test "x$enable_gprof" = "xyes"], [
