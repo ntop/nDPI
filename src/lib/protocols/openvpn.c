@@ -52,8 +52,9 @@
 #define P_SHA1_HMAC_SIZE 20
 #define P_HMAC_128 16                            // (RSA-)MD5, (RSA-)MD4, ..others
 #define P_HMAC_160 20                            // (RSA-|DSA-)SHA(1), ..others, SHA1 is openvpn default
+#define P_HMAC_NONE 0                            // No HMAC
 #define P_HARD_RESET_PACKET_ID_OFFSET(hmac_size) (9 + hmac_size)
-#define P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size)  (P_HARD_RESET_PACKET_ID_OFFSET(hmac_size) + 8)
+#define P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size)  (P_HARD_RESET_PACKET_ID_OFFSET(hmac_size) + 8 * (!!(hmac_size)))
 #define P_HARD_RESET_CLIENT_MAX_COUNT  5
 
 static 
@@ -64,18 +65,48 @@ u_int32_t get_packet_id(const u_int8_t * payload, u_int8_t hms) {
   return(ntohl(*(u_int32_t*)(payload + P_HARD_RESET_PACKET_ID_OFFSET(hms))));
 }
 
+/* From wireshark */
+/* We check the leading 4 byte of a suspected hmac for 0x00 bytes,
+   if more than 1 byte out of the 4 provided contains 0x00, the
+   hmac is considered not valid, which suggests that no tls auth is used.
+   unfortunatly there is no other way to detect tls auth on the fly */
+static int check_for_valid_hmac(u_int32_t hmac)
+{
+  int c = 0;
+
+  if((hmac & 0x000000FF) == 0x00000000)
+    c++;
+  if((hmac & 0x0000FF00) == 0x00000000)
+    c++;
+  if ((hmac & 0x00FF0000) == 0x00000000)
+    c++;
+  if ((hmac & 0xFF000000) == 0x00000000)
+    c++;
+  if (c > 1)
+    return 0;
+  return 1;
+}
+
 static 
 #ifndef WIN32
 inline
 #endif
-int8_t check_pkid_and_detect_hmac_size(const u_int8_t * payload) {
+int8_t check_pkid_and_detect_hmac_size(const u_int8_t *payload, int payload_len) {
   // try to guess
-  if(get_packet_id(payload, P_HMAC_160) == 1)
+  if((payload_len >= P_HARD_RESET_PACKET_ID_OFFSET(P_HMAC_160) + 4) &&
+     get_packet_id(payload, P_HMAC_160) == 1)
     return P_HMAC_160;
   
-  if(get_packet_id(payload, P_HMAC_128) == 1)    
+  if((payload_len >= P_HARD_RESET_PACKET_ID_OFFSET(P_HMAC_128) + 4) &&
+     get_packet_id(payload, P_HMAC_128) == 1)
     return P_HMAC_128;
-  
+
+  /* Heuristic from Wireshark, to detect no-HMAC flows (i.e. tls-crypt) */
+  if(payload_len >= 14 &&
+     !(payload[9] > 0 &&
+       check_for_valid_hmac(ntohl(*(u_int32_t*)(payload + 9)))))
+    return P_HMAC_NONE;
+
   return(-1);
 }
 
@@ -90,21 +121,19 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
   int8_t failed = 0;
   /* No u_ */int16_t ovpn_payload_len = packet->payload_packet_len;
   
-  if(ovpn_payload_len >= 40) {
+  if(ovpn_payload_len >= 14 + 2 * (packet->tcp != NULL)) {
     // skip openvpn TCP transport packet size
     if(packet->tcp != NULL)
       ovpn_payload += 2, ovpn_payload_len -= 2;;
 
     opcode = ovpn_payload[0] & P_OPCODE_MASK;
 
+    NDPI_LOG_DBG2(ndpi_struct, "[packet_id: %u][opcode: %u][HMAC size: %d][len: %u]\n",
+		  flow->num_processed_pkts,
+		  opcode, check_pkid_and_detect_hmac_size(ovpn_payload, ovpn_payload_len),
+		  ovpn_payload_len);
+
     if(packet->udp) {
-#ifdef DEBUG
-      printf("[packet_id: %u][opcode: %u][Packet ID: %d][%u <-> %u][len: %u]\n",
-	     flow->num_processed_pkts,
-	     opcode, check_pkid_and_detect_hmac_size(ovpn_payload),
-	     htons(packet->udp->source), htons(packet->udp->dest), ovpn_payload_len);	   
-#endif
-      
       if(
 	 (flow->num_processed_pkts == 1)
 	 && (
@@ -122,7 +151,7 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
     
     if(flow->ovpn_counter < P_HARD_RESET_CLIENT_MAX_COUNT && (opcode == P_CONTROL_HARD_RESET_CLIENT_V1 ||
 							      opcode == P_CONTROL_HARD_RESET_CLIENT_V2)) {
-      if(check_pkid_and_detect_hmac_size(ovpn_payload) > 0) {
+      if(check_pkid_and_detect_hmac_size(ovpn_payload, ovpn_payload_len) >= 0) {
         memcpy(flow->ovpn_session_id, ovpn_payload+1, 8);
 
         NDPI_LOG_DBG2(ndpi_struct,
@@ -133,9 +162,10 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
     } else if(flow->ovpn_counter >= 1 && flow->ovpn_counter <= P_HARD_RESET_CLIENT_MAX_COUNT &&
 	      (opcode == P_CONTROL_HARD_RESET_SERVER_V1 || opcode == P_CONTROL_HARD_RESET_SERVER_V2)) {
 
-      hmac_size = check_pkid_and_detect_hmac_size(ovpn_payload);
+      hmac_size = check_pkid_and_detect_hmac_size(ovpn_payload, ovpn_payload_len);
 
-      if(hmac_size > 0) {
+      if(hmac_size >= 0 &&
+	 P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size) < ovpn_payload_len) {
 	u_int16_t offset = P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size);
 	  
         alen = ovpn_payload[offset];

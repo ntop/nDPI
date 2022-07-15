@@ -1,0 +1,25 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 107 (107.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        2/0 (search/found)
+Patricia protocols:   2/1 (search/found)
+
+OpenVPN	944	303931	1
+
+	1	UDP 3.111.166.78:51146 <-> 85.134.13.165:1194 [proto: 159/OpenVPN][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][cat: VPN/2][594 pkts/138399 bytes <-> 350 pkts/165532 bytes][Goodput ratio: 82/91][73.25 sec][bytes ratio: -0.089 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 101/181 5093/5107 502/713][Pkt Len c2s/s2c min/avg/max/stddev: 60/64 233/473 1490/1487 273/526][PLAIN TEXT (New York1)][Plen Bins: 18,1,1,72,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]

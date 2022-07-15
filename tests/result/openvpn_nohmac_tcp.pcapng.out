@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	6	(6.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 143 (143.00 diss/flow)
+Num dissector calls: 117 (117.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -11,8 +11,8 @@ LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
-Automa host:          1/0 (search/found)
-Automa domain:        1/0 (search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
@@ -20,6 +20,6 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 
-FastCGI	102	72243	1
+OpenVPN	195	27581	1
 
-	1	TCP 10.0.0.9:38254 <-> 10.0.0.11:9000 [proto: 310/FastCGI][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][48 pkts/4271 bytes <-> 54 pkts/67972 bytes][Goodput ratio: 26/95][3.42 sec][Hostname/SNI: api.openstreetmap.org][bytes ratio: -0.882 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 38/81 1257/2019 204/358][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 89/1259 1121/1514 151/523][User-Agent: dummy_agent   dummy_agent][PLAIN TEXT (SCRIPT)][Plen Bins: 7,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,85,0,0]
+	1	TCP 10.181.235.122:39772 <-> 10.251.71.30:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VPN/2][100 pkts/13594 bytes <-> 95 pkts/13987 bytes][Goodput ratio: 51/55][32.02 sec][bytes ratio: -0.014 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 245/317 3842/9253 675/1172][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 136/147 472/542 78/90][PLAIN TEXT (121031022835Z)][Plen Bins: 35,13,1,39,1,0,0,8,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
