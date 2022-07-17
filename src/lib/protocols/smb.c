@@ -63,8 +63,8 @@ void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
     }
   }
 
-  ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, __FILE__, __FUNCTION__, __LINE__);
-  ndpi_exclude_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23, __FILE__, __FUNCTION__, __LINE__);
+  NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1);
+  NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23);
 }
 
 

@@ -5,7 +5,7 @@ DPI Packets (UDP):	201	(4.57 pkts/flow)
 Confidence Unknown          : 34 (flows)
 Confidence Match by port    : 2 (flows)
 Confidence DPI              : 71 (flows)
-Num dissector calls: 6427 (60.07 diss/flow)
+Num dissector calls: 6270 (58.60 diss/flow)
 
 Unknown	990	378832	34
 HTTP	377	402676	46

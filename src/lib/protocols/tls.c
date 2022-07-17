@@ -1187,7 +1187,9 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload_packet_len = p_len; /* Restore */
 
   if(no_dtls || change_cipher_found) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
+    flow->check_extra_packets = 0;
+    flow->extra_packets_func = NULL;
     return(0); /* That's all */
   } else {
     return(1); /* Keep working */

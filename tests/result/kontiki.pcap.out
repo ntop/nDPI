@@ -4,7 +4,7 @@ DPI Packets (UDP):	6	(1.50 pkts/flow)
 DPI Packets (other):	4	(1.00 pkts/flow)
 Confidence Unknown          : 2 (flows)
 Confidence DPI              : 6 (flows)
-Num dissector calls: 308 (38.50 diss/flow)
+Num dissector calls: 306 (38.25 diss/flow)
 
 Unknown	4	1696	2
 Kontiki	3278	3852324	2
