@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	256	(1.04 pkts/flow)
 Confidence DPI              : 245 (flows)
-Num dissector calls: 21885 (89.33 diss/flow)
+Num dissector calls: 21874 (89.28 diss/flow)
 
 DNScrypt	488	309562	245
 

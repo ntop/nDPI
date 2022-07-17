@@ -5,7 +5,7 @@ DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence DPI (partial)    : 1 (flows)
 Confidence DPI (cache)      : 2 (flows)
 Confidence DPI              : 20 (flows)
-Num dissector calls: 1846 (80.26 diss/flow)
+Num dissector calls: 1818 (79.04 diss/flow)
 
 ICMP	53	5186	2
 GoogleHangoutDuo	40	2720	4
