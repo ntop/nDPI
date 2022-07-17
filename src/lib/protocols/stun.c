@@ -49,9 +49,9 @@ u_int32_t get_stun_lru_key(struct ndpi_packet_struct *packet, u_int8_t rev) {
 
 /* ************************************************************ */
 
-void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-				  struct ndpi_flow_struct *flow,
-				  u_int proto, u_int app_proto) {
+static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+					 struct ndpi_flow_struct *flow,
+					 u_int proto, u_int app_proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   ndpi_confidence_t confidence = NDPI_CONFIDENCE_DPI;
 
@@ -531,6 +531,12 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
 			 packet->payload_packet_len) == NDPI_IS_STUN) {
   udp_stun_match:
+
+    if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_GOOGLE)
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_HANGOUT_DUO;
+    else if(flow->guessed_host_protocol_id == NDPI_PROTOCOL_FACEBOOK)
+      flow->guessed_host_protocol_id = NDPI_PROTOCOL_FACEBOOK_VOIP;
+
     if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
       flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
@@ -538,7 +544,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
       flow->guessed_host_protocol_id = flow->guessed_protocol_id;
       flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
     }
-    
+
     ndpi_int_stun_add_connection(ndpi_struct, flow,
 				 flow->guessed_protocol_id,
 				 flow->guessed_host_protocol_id);
