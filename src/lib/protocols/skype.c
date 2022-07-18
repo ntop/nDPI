@@ -27,55 +27,8 @@ static int is_port(u_int16_t a, u_int16_t b, u_int16_t c) {
   return(((a == c) || (b == c)) ? 1 : 0);
 }
 
-static int ndpi_check_skype_udp_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
-  int i;
-  const uint8_t id_flags_iv_crc_len = 11;
-  const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
-  const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
-
-  if (flow->packet_counter > 2)
-  {
-    /*
-     * Process only one packet after the initial packet received.
-     * This is required to prevent fals-positives with other protocols e.g. dnscrypt.
-     */
-    return 0;
-  }
-
-  if ((payload_len >= id_flags_iv_crc_len) && (packet->payload[2] == 0x02 /* Payload flag */ )) {
-    u_int8_t detected = 1;
-
-    /* Check if both packets have the same CRC */
-    for (i = 0; i < crc_len && detected; i++) {
-      if (packet->payload[crc_offset + i] != flow->l4.udp.skype_crc[i])
-        detected = 0;
-    }
-
-    if (detected) {
-      ndpi_protocol proto;
-
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      /* In "extra_eval" data path, if we change the classification, we need to update the category, too */
-      proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
-      proto.app_protocol = NDPI_PROTOCOL_SKYPE_TEAMS;
-      proto.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-      ndpi_fill_protocol_category(ndpi_struct, flow, &proto);
-      flow->extra_packets_func = NULL;
-
-      /* Stop checking extra packets */
-      return 0;
-    }
-  }
-
-  /* Check more packets */
-  return 1;
-}
-
 static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
   /* No need to do ntohl() with 0xFFFFFFFF */
@@ -90,11 +43,9 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
   if(flow->host_server_name[0] != '\0')
     return;
   
-  // UDP check
   if(packet->udp != NULL) {    
-    flow->l4.udp.skype_packet_id++;
 
-    if(flow->l4.udp.skype_packet_id < 5) {
+    if(flow->packet_counter < 5) {
       u_int16_t sport = ntohs(packet->udp->source);
       u_int16_t dport = ntohs(packet->udp->dest);
 
@@ -117,8 +68,10 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	    && (packet->payload[2] == 0x02))) {
 
 	  if(is_port(sport, dport, 8801)) {
+	    NDPI_LOG_INFO(ndpi_struct, "found ZOOM (in SKYPE_TEAMS code)\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	  } else if (payload_len >= 16 && packet->payload[0] != 0x01) /* Avoid invalid Cisco HSRP detection / RADIUS */ {
+	    NDPI_LOG_INFO(ndpi_struct, "found SKYPE_TEAMS\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS_CALL, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_CONFIDENCE_DPI);
 	  }
 	}
@@ -128,22 +81,23 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
           const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
           const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
 
-          if ((payload_len >= id_flags_iv_crc_len)
-	      && (packet->payload[2] == 0x02 /* Payload flag */ )
-	      && (payload_len >= (crc_offset+crc_len))
-	      && (!flow->extra_packets_func)) {
-            flow->check_extra_packets = 1;
-            flow->max_extra_packets_to_check = 5;
-            flow->extra_packets_func = ndpi_check_skype_udp_again;
-
-            memcpy(flow->l4.udp.skype_crc, &packet->payload[crc_offset], crc_len);
+          /* Look for two pkts with the same crc */
+          if((payload_len >= id_flags_iv_crc_len) &&
+             (packet->payload[2] == 0x02 /* Payload flag */ )) {
+            if(flow->packet_counter == 1) {
+              memcpy(flow->l4.udp.skype_crc, &packet->payload[crc_offset], crc_len);
+            } else {
+              if(memcmp(flow->l4.udp.skype_crc, &packet->payload[crc_offset], crc_len) == 0) {
+                NDPI_LOG_INFO(ndpi_struct, "found SKYPE_TEAMS\n");
+                ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+                return;
+              }
+            }
+            /* No idea if the two pkts need to be consecutive; in doubt wait for some more pkts */
             return;
           }
         }
-
       }
-      
-      // return;
     }
     
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
