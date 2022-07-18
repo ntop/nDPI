@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	29	(9.67 pkts/flow)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 520 (173.33 diss/flow)
+Num dissector calls: 511 (170.33 diss/flow)
 
 SOCKS	46	8383	3
 

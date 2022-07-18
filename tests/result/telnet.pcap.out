@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	33	(33.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 163 (163.00 diss/flow)
+Num dissector calls: 161 (161.00 diss/flow)
 
 Telnet	87	7418	1
 

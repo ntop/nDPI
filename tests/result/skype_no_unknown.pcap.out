@@ -6,7 +6,7 @@ DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 45 (flows)
 Confidence Match by port    : 22 (flows)
 Confidence DPI              : 200 (flows)
-Num dissector calls: 26274 (98.40 diss/flow)
+Num dissector calls: 25957 (97.22 diss/flow)
 
 Unknown	850	152468	45
 DNS	2	267	1
