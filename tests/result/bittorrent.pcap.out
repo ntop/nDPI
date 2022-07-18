@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	24	(1.00 pkts/flow)
 Confidence DPI              : 24 (flows)
-Num dissector calls: 2114 (88.08 diss/flow)
+Num dissector calls: 2092 (87.17 diss/flow)
 
 BitTorrent	299	305728	24
 

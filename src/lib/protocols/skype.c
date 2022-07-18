@@ -148,39 +148,6 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
     
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
-    // TCP check
-  } else if((packet->tcp != NULL)
-	    /* As the TCP skype heuristic is weak, we need to make sure no other protocols overlap */
-	    && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-	    && (flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)) {
-    flow->l4.tcp.skype_packet_id++;
-
-    if(flow->l4.tcp.skype_packet_id < 3) {
-      ; /* Too early */
-    } else if((flow->l4.tcp.skype_packet_id == 3)
-	      /* We have seen the 3-way handshake */
-	      && flow->l4.tcp.seen_syn
-	      && flow->l4.tcp.seen_syn_ack
-	      && flow->l4.tcp.seen_ack) {
-      /* Disabled this logic as it's too weak and leads to false positives */
-#if 0
-      if((payload_len == 8) || (payload_len == 3) || (payload_len == 17)) {
-	// printf("[SKYPE] payload_len=%u\n", payload_len);
-	/* printf("[SKYPE] %u/%u\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest)); */
-	
-	NDPI_LOG_INFO(ndpi_struct, "found skype\n");
-	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS_CALL, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_CONFIDENCE_DPI);
-      } else {
-	// printf("NO [SKYPE] payload_len=%u\n", payload_len);
-      }
-
-      /* printf("[SKYPE] [id: %u][len: %d]\n", flow->l4.tcp.skype_packet_id, payload_len);  */
-#endif
-    } else {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    }
-
-    return;
   }
 }
 
@@ -199,7 +166,7 @@ void init_skype_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
   ndpi_set_bitmask_protocol_detection("Skype_Teams", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_SKYPE_TEAMS,
 				      ndpi_search_skype,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
