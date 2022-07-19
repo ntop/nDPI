@@ -1562,6 +1562,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time_ms);
 
+    enough_packets |= ndpi_flow->fail_with_unknown;
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
 	 && ndpi_extra_dissection_possible(workflow->ndpi_struct, ndpi_flow))
