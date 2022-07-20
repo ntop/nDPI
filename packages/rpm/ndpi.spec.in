@@ -86,7 +86,7 @@ rm -fr $RPM_BUILD_ROOT
 /usr/share/ndpi/ndpiCustomCategory.txt
 /usr/share/ndpi/ndpiProtos.txt
 /etc/ld.so.conf.d/ndpi.conf
-%{libdir}/pkgconfig/libndpi.pc
+/usr/lib64/pkgconfig/libndpi.pc
 
 %preun
 
