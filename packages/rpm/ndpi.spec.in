@@ -8,9 +8,10 @@ URL: http://www.ntop.org/products/deep-packet-inspection/ndpi/
 Source: ndpi-%{version}.tgz
 Packager: Luca Deri <deri@ntop.org>
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
+%{?el9:Requires: glibc >= 2.3.4 numactl coreutils @GEOIP_DEP@ }
 %{?el8:Requires: glibc >= 2.3.4 numactl coreutils @GEOIP_DEP@ }
 %{?el7:Requires: glibc >= 2.3.4 numactl coreutils @GEOIP_DEP@ }
-%{?el6:Requires: glibc >= 2.3.4 numactl coreutils @GEOIP_DEP@ }
+
 AutoReqProv: no
 
 %define debug_package %{nil}
@@ -48,9 +49,9 @@ you will need to install %{name}-dev.
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 
 %define includedir    /usr/include/ndpi
-%{?el6:%define libdir /usr/lib}
 %{?el7:%define libdir /usr/lib}
 %{?el8:%define libdir /usr/lib64}
+%{?el9:%define libdir /usr/lib64}
 %define bindir        /usr/bin
 
 %install
@@ -86,7 +87,7 @@ rm -fr $RPM_BUILD_ROOT
 /usr/share/ndpi/ndpiCustomCategory.txt
 /usr/share/ndpi/ndpiProtos.txt
 /etc/ld.so.conf.d/ndpi.conf
-/usr/lib64/pkgconfig/libndpi.pc
+%{libdir}/pkgconfig/libndpi.pc
 
 %preun
 
