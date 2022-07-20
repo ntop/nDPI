@@ -29,12 +29,6 @@
 
 #include "ndpi_api.h"
 
-#define NDPI_PROTOCOL_UNSAFE_DETECTION 	 0
-#define NDPI_PROTOCOL_SAFE_DETECTION 	 1
-
-#define NDPI_PROTOCOL_PLAIN_DETECTION 	 0
-#define NDPI_PROTOCOL_WEBSEED_DETECTION  2
-
 #define BITTORRENT_PROTO_STRING          "BitTorrent protocol"
 
 // #define BITTORRENT_CACHE_DEBUG 1
@@ -109,14 +103,13 @@ static void ndpi_search_bittorrent_hash(struct ndpi_detection_module_struct *ndp
 static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struct *ndpi_struct,
 					      struct ndpi_flow_struct *flow,
 					      int bt_offset, int check_hash,
-					      const u_int8_t save_detection,
-					      const u_int8_t encrypted_connection) {
+					      ndpi_confidence_t confidence) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(check_hash)
     ndpi_search_bittorrent_hash(ndpi_struct, flow, bt_offset);
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN, confidence);
   
   if(flow->protos.bittorrent.hash[0] == '\0') {
     /* This is necessary to inform the core to call this dissector again */
@@ -182,8 +175,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
   if(flow->packet_counter == 2 && packet->payload_packet_len > 20) {
     if(memcmp(&packet->payload[0], BITTORRENT_PROTO_STRING, 19) == 0) {
       NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
-      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, 19, 1,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, 19, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
   }
@@ -193,8 +185,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     if(packet->payload[0] == 0x13) {
       if(memcmp(&packet->payload[1], BITTORRENT_PROTO_STRING, 19) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
-	ndpi_add_connection_as_bittorrent(ndpi_struct, flow, 20, 1,
-					  NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+	ndpi_add_connection_as_bittorrent(ndpi_struct, flow, 20, 1, NDPI_CONFIDENCE_DPI);
 	return 1;
       }
     }
@@ -202,8 +193,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 
   if(packet->payload_packet_len > 23 && memcmp(packet->payload, "GET /webseed?info_hash=", 23) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found BT: plain webseed\n");
-    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION);
+    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
     return 1;
   }
   /* seen Azureus as server for webseed, possibly other servers existing, to implement */
@@ -212,8 +202,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
   if(packet->payload_packet_len > 60
      && memcmp(packet->payload, "GET /data?fid=", 14) == 0 && memcmp(&packet->payload[54], "&size=", 6) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found BT: plain Bitcomet persistent seed\n");
-    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION);
+    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
     return 1;
   }
 
@@ -231,8 +220,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 	   || (packet->user_agent_line.len >= 10 && memcmp(packet->user_agent_line.ptr, "BitTorrent", 10) == 0)
 	   || (packet->user_agent_line.len >= 11 && memcmp(packet->user_agent_line.ptr, "BTWebClient", 11) == 0))) {
       NDPI_LOG_INFO(ndpi_struct, "found BT: Azureus /Bittorrent user agent\n");
-      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION);
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
 
@@ -241,8 +229,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
        && (packet->parsed_lines > 8 && packet->line[8].ptr != 0
 	   && packet->line[8].len >= 9 && memcmp(packet->line[8].ptr, "X-Queue: ", 9) == 0)) {
       NDPI_LOG_INFO(ndpi_struct, "found BT: Shareaza detected\n");
-      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION);
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
 
@@ -275,8 +262,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
        && packet->line[8].len > 22 && memcmp(packet->line[8].ptr, "Cache-Control: no-cache", 23) == 0) {
 
       NDPI_LOG_INFO(ndpi_struct, "found BT: Bitcomet LTS\n");
-      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
 
@@ -300,8 +286,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
        && packet->line[6].len > 21 && memcmp(packet->line[6].ptr, "Connection: Keep-Alive", 22) == 0) {
 
       NDPI_LOG_INFO(ndpi_struct, "found BT: FlashGet\n");
-      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
 
@@ -321,8 +306,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
        && packet->line[5].len > 21 && memcmp(packet->line[5].ptr, "Connection: Keep-Alive", 22) == 0) {
 
       NDPI_LOG_INFO(ndpi_struct, "found BT: FlashGet\n");
-      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					NDPI_PROTOCOL_UNSAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
 
@@ -388,8 +372,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     }
 
     NDPI_LOG_INFO(ndpi_struct, "found BT: tracker info hash parsed\n");
-    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
     return 1;
   }
 
@@ -416,8 +399,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     if((memcmp(&packet->payload[0], pattern_20_bytes, 20) == 0)
        && (memcmp(&packet->payload[52], pattern_12_bytes, 12) == 0)) {
       NDPI_LOG_INFO(ndpi_struct, "found BT: Warez - Plain\n");
-      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+      ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
   }
@@ -430,8 +412,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
       if(packet->host_line.ptr != NULL
 	 && packet->host_line.len >= 9 && memcmp(packet->host_line.ptr, "ip2p.com:", 9) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found BT: Warez - Plain Host: ip2p.com: pattern\n");
-	ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					  NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_WEBSEED_DETECTION);
+	ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
 	return 1;
       }
     }
@@ -482,8 +463,7 @@ static void ndpi_skip_bittorrent(struct ndpi_detection_module_struct *ndpi_struc
     sport = packet->tcp->source, dport = packet->tcp->dest;
   
   if(packet->iph && ndpi_search_into_bittorrent_cache(ndpi_struct, flow, packet->iph->saddr, sport, packet->iph->daddr, dport))
-    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0,
-				      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0, NDPI_CONFIDENCE_DPI_CACHE);
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
@@ -539,8 +519,7 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	   (strncmp((const char*)packet->payload, bt_search, strlen(bt_search)) == 0)
 	   || (strncmp((const char*)packet->payload, bt_search1, strlen(bt_search1)) == 0)
 	   ) {
-	  ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1,
-					    NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+	  ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
 	  return;
 	} else {
 	  /* Check if this is protocol v0 */
@@ -599,8 +578,7 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	    }
 
 	    NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
-	    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0,
-					      NDPI_PROTOCOL_SAFE_DETECTION, NDPI_PROTOCOL_PLAIN_DETECTION);
+	    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0, NDPI_CONFIDENCE_DPI);
 	    return;
 	  }
 	}
