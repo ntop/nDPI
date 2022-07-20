@@ -5778,8 +5778,10 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str, st
 
   /* call the extra packet function (which may add more data/info to flow) */
   if(flow->extra_packets_func) {
-    if((flow->extra_packets_func(ndpi_str, flow)) == 0)
+    if((flow->extra_packets_func(ndpi_str, flow)) == 0) {
       flow->check_extra_packets = 0;
+      flow->extra_packets_func = NULL; /* Enough packets detected */
+    }
 
     if(++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)
       flow->extra_packets_func = NULL; /* Enough packets detected */
@@ -8116,61 +8118,22 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
   case NDPI_PROTOCOL_DTLS:
-    if(flow->l4.tcp.tls.certificate_processed) return(0);
-
-    if(flow->l4.tcp.tls.num_tls_blocks <= ndpi_str->num_tls_blocks_to_follow) {
-      // printf("*** %u/%u\n", flow->l4.tcp.tls.num_tls_blocks, ndpi_str->num_tls_blocks_to_follow);
-      return(1);
-    }
-    break;
-
   case NDPI_PROTOCOL_HTTP:
   case NDPI_PROTOCOL_HTTP_PROXY:
   case NDPI_PROTOCOL_HTTP_CONNECT:
-    if((flow->host_server_name[0] == '\0') || (flow->http.response_status_code == 0))
-      return(1);
-    break;
-
   case NDPI_PROTOCOL_DNS:
   case NDPI_PROTOCOL_MDNS:
-    if(flow->protos.dns.num_answers == 0)
-      return(1);
-    break;
-
   case NDPI_PROTOCOL_FTP_CONTROL:
-    if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0' &&
-       flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0 &&
-       flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0)
-      return(1);
-    break;
   case NDPI_PROTOCOL_MAIL_POP:
   case NDPI_PROTOCOL_MAIL_IMAP:
   case NDPI_PROTOCOL_MAIL_SMTP:
-    if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0' &&
-       (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 ||
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0))
-      return(1);
-    break;
-
   case NDPI_PROTOCOL_SSH:
-    if((flow->protos.ssh.hassh_client[0] == '\0') || (flow->protos.ssh.hassh_server[0] == '\0'))
-      return(1);
-    break;
-
   case NDPI_PROTOCOL_TELNET:
-    if(!flow->protos.telnet.password_detected)
-      return(1);
-    break;
-
   case NDPI_PROTOCOL_SKYPE_TEAMS:
   case NDPI_PROTOCOL_QUIC:
   case NDPI_PROTOCOL_KERBEROS:
   case NDPI_PROTOCOL_SNMP:
-    return(1);
-    break;
-
   case NDPI_PROTOCOL_BITTORRENT:
-    if(flow->protos.bittorrent.hash[0] == '\0')
       return(1);
     break;
   }

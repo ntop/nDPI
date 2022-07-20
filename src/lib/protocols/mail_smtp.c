@@ -440,7 +440,9 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
     }
   } else {
     ndpi_search_mail_smtp_tcp(ndpi_struct, flow);
-    rc = (flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') ? 1 : 0;
+    rc = ((flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') &&
+          (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 ||
+           flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0)) ? 1 : 0;
   }
 
 #ifdef SMTP_DEBUG
