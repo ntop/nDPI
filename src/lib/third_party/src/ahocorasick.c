@@ -348,7 +348,7 @@ static AC_ERROR_t ac_finalize_node(AC_AUTOMATA_t * thiz,AC_NODE_t * n, int idx, 
         }
     }
     if(!n->a_ptr && n->outgoing && !n->one) {
-        n->a_ptr = edge_get_alpha(n->outgoing);
+        n->a_ptr = (unsigned char *)edge_get_alpha(n->outgoing);
     }
     return ACERR_SUCCESS;
 }
@@ -838,15 +838,12 @@ static inline size_t bsf(uint64_t bits)
 }
 #endif
 
-static inline char *
-xmemchr(char *s, char i,int n)
+static inline unsigned char *
+xmemchr(unsigned char *s, unsigned char c,int n)
 {
-  unsigned char c = (unsigned char)i;
-
   while(n > 0) {
     if (n >= LBLOCKSIZE && !UNALIGNED (s)) {
-      unsigned long int mask;
-      mask = c * DUPC;
+      unsigned long int mask = c * DUPC;
 
       while (n >= LBLOCKSIZE) {
 #if __SIZEOF_LONG__ == 4
@@ -877,13 +874,13 @@ xmemchr(char *s, char i,int n)
  ******************************************************************************/
 static AC_NODE_t * node_find_next(AC_NODE_t * thiz, AC_ALPHABET_t alpha)
 {
-  AC_ALPHABET_t  *alphas, *fc;
+  unsigned char *alphas, *fc;
 
   if(thiz->one) return alpha == thiz->one_alpha ? (AC_NODE_t *)thiz->outgoing:NULL;
   if(!thiz->outgoing) return NULL;
 
-  alphas = edge_get_alpha(thiz->outgoing);
-  fc = xmemchr((char *)alphas,(char)alpha,thiz->outgoing->degree);
+  alphas = (unsigned char *)edge_get_alpha(thiz->outgoing);
+  fc = xmemchr(alphas,(unsigned char)alpha,thiz->outgoing->degree);
   return fc ? thiz->outgoing->next[fc-alphas] : NULL;
 }
 
@@ -904,10 +901,10 @@ static inline AC_NODE_t *node_findbs_next (AC_NODE_t * thiz, uint8_t alpha)
         return NULL;
 
   if(thiz->range)
-        return thiz->outgoing->next[(uint8_t)alpha - (uint8_t)thiz->one_alpha];
+        return thiz->outgoing->next[alpha - (uint8_t)thiz->one_alpha];
 
   return thiz->outgoing->next[
-      xmemchr((char *)thiz->a_ptr,(char)alpha,thiz->outgoing->degree) - thiz->a_ptr];
+      xmemchr(thiz->a_ptr,alpha,thiz->outgoing->degree) - thiz->a_ptr];
 }
 
 static AC_NODE_t *node_findbs_next_ac (AC_NODE_t * thiz, uint8_t alpha,int icase) {
@@ -1098,7 +1095,7 @@ static int node_register_outgoing
  * Comparison function for qsort. see man qsort.
  ******************************************************************************/
 static int node_edge_compare (struct edge * e, int a, int b) {
-    AC_ALPHABET_t *c = edge_get_alpha(e);
+    unsigned char *c = (unsigned char *)edge_get_alpha(e);
     return c[a] >= c[b] ? 1:0;
 }
 
