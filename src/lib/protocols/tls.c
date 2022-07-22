@@ -141,73 +141,74 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
 void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  message_t *message = &flow->l4.tcp.tls.message[packet->packet_direction];
   u_int avail_bytes;
 
   /* TCP */
 #ifdef DEBUG_TLS_MEMORY
   printf("[TLS Mem] Handling TCP/TLS flow [payload_len: %u][buffer_len: %u][direction: %u]\n",
 	 packet->payload_packet_len,
-	 flow->l4.tcp.tls.message.buffer_len,
+	 message->buffer_len,
 	 packet->packet_direction);
 #endif
 
-  if(flow->l4.tcp.tls.message.buffer == NULL) {
+  if(message->buffer == NULL) {
     /* Allocate buffer */
-    flow->l4.tcp.tls.message.buffer_len = 2048, flow->l4.tcp.tls.message.buffer_used = 0;
-    flow->l4.tcp.tls.message.buffer = (u_int8_t*)ndpi_malloc(flow->l4.tcp.tls.message.buffer_len);
+    message->buffer_len = 2048, message->buffer_used = 0;
+    message->buffer = (u_int8_t*)ndpi_malloc(message->buffer_len);
 
-    if(flow->l4.tcp.tls.message.buffer == NULL)
+    if(message->buffer == NULL)
       return;
 
 #ifdef DEBUG_TLS_MEMORY
-    printf("[TLS Mem] Allocating %u buffer\n", flow->l4.tcp.tls.message.buffer_len);
+    printf("[TLS Mem] Allocating %u buffer\n", message->buffer_len);
 #endif
   }
 
-  avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
+  avail_bytes = message->buffer_len - message->buffer_used;
 
   if(avail_bytes < packet->payload_packet_len) {
-    u_int new_len = flow->l4.tcp.tls.message.buffer_len + packet->payload_packet_len - avail_bytes + 1;
-    void *newbuf  = ndpi_realloc(flow->l4.tcp.tls.message.buffer,
-				 flow->l4.tcp.tls.message.buffer_len, new_len);
+    u_int new_len = message->buffer_len + packet->payload_packet_len - avail_bytes + 1;
+    void *newbuf  = ndpi_realloc(message->buffer,
+				 message->buffer_len, new_len);
     if(!newbuf) return;
 
 #ifdef DEBUG_TLS_MEMORY
-    printf("[TLS Mem] Enlarging %u -> %u buffer\n", flow->l4.tcp.tls.message.buffer_len, new_len);
+    printf("[TLS Mem] Enlarging %u -> %u buffer\n", message->buffer_len, new_len);
 #endif
 
-    flow->l4.tcp.tls.message.buffer = (u_int8_t*)newbuf;
-    flow->l4.tcp.tls.message.buffer_len = new_len;
-    avail_bytes = flow->l4.tcp.tls.message.buffer_len - flow->l4.tcp.tls.message.buffer_used;
+    message->buffer = (u_int8_t*)newbuf;
+    message->buffer_len = new_len;
+    avail_bytes = message->buffer_len - message->buffer_used;
   }
 
   if(packet->payload_packet_len > 0 && avail_bytes >= packet->payload_packet_len) {
     u_int8_t ok = 0;
 
-    if(flow->l4.tcp.tls.message.next_seq[packet->packet_direction] != 0) {
-      if(ntohl(packet->tcp->seq) == flow->l4.tcp.tls.message.next_seq[packet->packet_direction])
+    if(message->next_seq != 0) {
+      if(ntohl(packet->tcp->seq) == message->next_seq)
 	ok = 1;
     } else
       ok = 1;
 
     if(ok) {
-      memcpy(&flow->l4.tcp.tls.message.buffer[flow->l4.tcp.tls.message.buffer_used],
+      memcpy(&message->buffer[message->buffer_used],
 	     packet->payload, packet->payload_packet_len);
 
-      flow->l4.tcp.tls.message.buffer_used += packet->payload_packet_len;
+      message->buffer_used += packet->payload_packet_len;
 #ifdef DEBUG_TLS_MEMORY
       printf("[TLS Mem] Copied data to buffer [%u/%u bytes][direction: %u][tcp_seq: %u][next: %u]\n",
-	     flow->l4.tcp.tls.message.buffer_used, flow->l4.tcp.tls.message.buffer_len,
+	     message->buffer_used, message->buffer_len,
 	     packet->packet_direction,
 	     ntohl(packet->tcp->seq),
 	     ntohl(packet->tcp->seq)+packet->payload_packet_len);
 #endif
 
-      flow->l4.tcp.tls.message.next_seq[packet->packet_direction] = ntohl(packet->tcp->seq)+packet->payload_packet_len;
+      message->next_seq = ntohl(packet->tcp->seq)+packet->payload_packet_len;
     } else {
 #ifdef DEBUG_TLS_MEMORY
       printf("[TLS Mem] Skipping packet [%u bytes][direction: %u][tcp_seq: %u][expected next: %u]\n",
-	     flow->l4.tcp.tls.message.buffer_len,
+	     message->buffer_len,
 	     packet->packet_direction,
 	     ntohl(packet->tcp->seq),
 	     ntohl(packet->tcp->seq)+packet->payload_packet_len);
@@ -908,6 +909,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t something_went_wrong = 0;
+  message_t *message;
 
 #ifdef DEBUG_TLS_MEMORY
   printf("[TLS Mem] ndpi_search_tls_tcp() Processing new packet [payload_packet_len: %u]\n",
@@ -918,11 +920,12 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     return(1); /* Keep working */
 
   ndpi_search_tls_tcp_memory(ndpi_struct, flow);
+  message = &flow->l4.tcp.tls.message[packet->packet_direction];
 
   /* Valid TLS Content Types:
      https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
-  if(!(flow->l4.tcp.tls.message.buffer[0] >= 20 &&
-       flow->l4.tcp.tls.message.buffer[0] <= 26)) {
+  if(!(message->buffer[0] >= 20 &&
+       message->buffer[0] <= 26)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     something_went_wrong = 1;
   }
@@ -932,20 +935,20 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     const u_int8_t *p;
     u_int8_t content_type;
 
-    if(flow->l4.tcp.tls.message.buffer_used < 5)
+    if(message->buffer_used < 5)
       return(1); /* Keep working */
 
-    len = (flow->l4.tcp.tls.message.buffer[3] << 8) + flow->l4.tcp.tls.message.buffer[4] + 5;
+    len = (message->buffer[3] << 8) + message->buffer[4] + 5;
 
-    if(len > flow->l4.tcp.tls.message.buffer_used) {
+    if(len > message->buffer_used) {
 #ifdef DEBUG_TLS_MEMORY
       printf("[TLS Mem] Not enough TLS data [%u < %u][%02X %02X %02X %02X %02X]\n",
-	     len, flow->l4.tcp.tls.message.buffer_used,
-	     flow->l4.tcp.tls.message.buffer[0],
-	     flow->l4.tcp.tls.message.buffer[1],
-	     flow->l4.tcp.tls.message.buffer[2],
-	     flow->l4.tcp.tls.message.buffer[3],
-	     flow->l4.tcp.tls.message.buffer[4]);
+	     len, message->buffer_used,
+	     message->buffer[0],
+	     message->buffer[1],
+	     message->buffer[2],
+	     message->buffer[3],
+	     message->buffer[4]);
 #endif
       break;
     }
@@ -959,7 +962,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     printf("[TLS Mem] Processing %u bytes message\n", len);
 #endif
 
-    content_type = flow->l4.tcp.tls.message.buffer[0];
+    content_type = message->buffer[0];
 
     /* Overwriting packet payload */
     p = packet->payload;
@@ -981,16 +984,16 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
       if(len >= 7) {
-	u_int8_t alert_level = flow->l4.tcp.tls.message.buffer[5];
+	u_int8_t alert_level = message->buffer[5];
 
 	if(alert_level == 2 /* Warning (1), Fatal (2) */)
 	  ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_FATAL_ALERT, NULL);
       }
 
-      u_int16_t const alert_len = ntohs(*(u_int16_t const *)&flow->l4.tcp.tls.message.buffer[3]);
-      if (flow->l4.tcp.tls.message.buffer[1] == 0x03 &&
-          flow->l4.tcp.tls.message.buffer[2] <= 0x04 &&
-          alert_len == (u_int32_t)flow->l4.tcp.tls.message.buffer_used - 5)
+      u_int16_t const alert_len = ntohs(*(u_int16_t const *)&message->buffer[3]);
+      if (message->buffer[1] == 0x03 &&
+          message->buffer[2] <= 0x04 &&
+          alert_len == (u_int32_t)message->buffer_used - 5)
 	{
 	  ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
 	}
@@ -1003,7 +1006,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       u_int16_t processed = 5;
 
       while((processed+4) <= len) {
-	const u_int8_t *block = (const u_int8_t *)&flow->l4.tcp.tls.message.buffer[processed];
+	const u_int8_t *block = (const u_int8_t *)&message->buffer[processed];
 	u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
 	if(/* (block_len == 0) || */ /* Note blocks can have zero lenght */
@@ -1013,7 +1016,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
 
 	packet->payload = block;
-	packet->payload_packet_len = ndpi_min(block_len+4, flow->l4.tcp.tls.message.buffer_used);
+	packet->payload_packet_len = ndpi_min(block_len+4, message->buffer_used);
 
 	if((processed+packet->payload_packet_len) > len) {
 	  something_went_wrong = 1;
@@ -1028,15 +1031,15 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     } else if(len > 5 /* Minimum block size */) {
       /* Process element as a whole */
       if(content_type == 0x17 /* Application Data */) {
-	u_int32_t block_len   = (flow->l4.tcp.tls.message.buffer[3] << 8) + (flow->l4.tcp.tls.message.buffer[4]);
+	u_int32_t block_len   = (message->buffer[3] << 8) + (message->buffer[4]);
 
 	/* Let's do a quick check to make sure this really looks like TLS */
 	if(block_len < 16384 /* Max TLS block size */)
 	  ndpi_looks_like_tls(ndpi_struct, flow);
 
-	if (flow->l4.tcp.tls.message.buffer[1] == 0x03 &&
-	    flow->l4.tcp.tls.message.buffer[2] <= 0x04 &&
-	    block_len == (u_int32_t)flow->l4.tcp.tls.message.buffer_used - 5)
+	if (message->buffer[1] == 0x03 &&
+	    message->buffer[2] <= 0x04 &&
+	    block_len == (u_int32_t)message->buffer_used - 5)
 	  {
 	    ndpi_int_tls_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TLS);
 	  }
@@ -1056,17 +1059,15 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     packet->payload = p;
     packet->payload_packet_len = p_len; /* Restore */
-    flow->l4.tcp.tls.message.buffer_used -= len;
+    message->buffer_used -= len;
 
-    if(flow->l4.tcp.tls.message.buffer_used > 0)
-      memmove(flow->l4.tcp.tls.message.buffer,
-	      &flow->l4.tcp.tls.message.buffer[len],
-	      flow->l4.tcp.tls.message.buffer_used);
+    if(message->buffer_used > 0)
+      memmove(message->buffer, &message->buffer[len], message->buffer_used);
     else
       break;
 
 #ifdef DEBUG_TLS_MEMORY
-    printf("[TLS Mem] Left memory buffer %u bytes\n", flow->l4.tcp.tls.message.buffer_used);
+    printf("[TLS Mem] Left memory buffer %u bytes\n", message->buffer_used);
 #endif
   }
 
