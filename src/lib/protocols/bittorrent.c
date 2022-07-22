@@ -142,9 +142,9 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     /* Also add +2 ports of the sender in order to catch additional sockets open by the same client */
     for(i=0; i<2; i++) {
       if(packet->udp)
-	key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, htons(ntohs(packet->udp->source)+1));
+	key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, htons(ntohs(packet->udp->source)+1+i));
       else
-	key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, htons(ntohs(packet->tcp->source)+1));
+	key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, htons(ntohs(packet->tcp->source)+1+i));
 
       ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT);
     }
