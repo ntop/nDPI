@@ -73,9 +73,11 @@ struct pcre_struct {
  * Please keep this strcture in sync with
  * `struct ndpi_str_hash` in src/include/ndpi_typedefs.h
  */
+
 typedef struct ndpi_str_hash_private {
   unsigned int hash;
   void *value;
+  u_int8_t private_data[1];
   UT_hash_handle hh;
 } ndpi_str_hash_private;
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L

@@ -998,7 +998,7 @@ typedef struct _ndpi_automa {
 typedef struct ndpi_str_hash {
   unsigned int hash;
   void *value;
-  u_int8_t private_data[0];
+  u_int8_t private_data[1]; /* Avoid error C2466  */
 } ndpi_str_hash;
 
 typedef struct ndpi_proto {
