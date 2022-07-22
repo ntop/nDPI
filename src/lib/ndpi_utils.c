@@ -77,7 +77,7 @@ struct pcre_struct {
 typedef struct ndpi_str_hash_private {
   unsigned int hash;
   void *value;
-  u_int8_t private_data[1];
+  // u_int8_t private_data[1]; /* Avoid error C2466 and do not initiate private data with 0  */
   UT_hash_handle hh;
 } ndpi_str_hash_private;
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
