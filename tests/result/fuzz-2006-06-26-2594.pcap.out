@@ -6,7 +6,7 @@ DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 30 (flows)
 Confidence Match by port    : 28 (flows)
 Confidence DPI              : 193 (flows)
-Num dissector calls: 5287 (21.06 diss/flow)
+Num dissector calls: 5303 (21.13 diss/flow)
 
 Unknown	30	3356	30
 FTP_CONTROL	36	2569	12
