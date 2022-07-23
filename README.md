@@ -82,6 +82,11 @@ You can use nDPI to selectively block selected Internet traffic by embedding it 
 
 - Deri, Luca, et al. [nDPI: Open-source high-speed deep packet inspection](http://luca.ntop.org/nDPI.pdf) 2014 International Wireless Communications and Mobile Computing Conference (IWCMC). IEEE, 2014.
 
+### Videos and Presentations
+
+- [Using nDPI for Monitoring and Security](https://archive.fosdem.org/2021/schedule/event/nemondpi/)
+- [Network Traffic Classification for Cybersecurity and Monitoring](https://fosdem.org/2022/schedule/event/using_ndpi_to_efficiently_classify_network_traffic/)
+
 ### nDPI-Related Projects
 
 - [nfstream](https://github.com/aouinizied/nfstream)
