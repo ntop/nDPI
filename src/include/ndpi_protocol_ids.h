@@ -334,6 +334,7 @@ typedef enum {
   NDPI_PROTOCOL_PSIPHON               = 303,
   NDPI_PROTOCOL_ULTRASURF             = 304,
   NDPI_PROTOCOL_THREEMA               = 305,
+  NDPI_PROTOCOL_ALICLOUD              = 306,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

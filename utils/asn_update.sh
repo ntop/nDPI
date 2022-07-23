@@ -139,6 +139,11 @@ DEST=../src/lib/inc_generated/ndpi_asn_threema.c.inc
 create_list NDPI_PROTOCOL_THREEMA $DEST "AS29691"
 echo "(3) Threema IPs are available in $DEST"
 
+echo "(1) Downloading AliBaba..."
+DEST=../src/lib/inc_generated/ndpi_asn_alibaba.c.inc
+create_list NDPI_PROTOCOL_ALIBABA $DEST "AS134963"
+echo "(3) AliBaba IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
