@@ -302,6 +302,7 @@ extern "C" {
    * @par    packet         = unsigned char pointer to the Layer 3 (IP header)
    * @par    packetlen      = the length of the packet
    * @par    packet_time_ms = the current timestamp for the packet (expressed in msec)
+   * @par    input_info     = (optional) flow information provided by the (external) flow manager
    * @return void
    *
    */
@@ -309,7 +310,8 @@ extern "C" {
 				 struct ndpi_flow_struct *flow,
 				 const unsigned char *packet,
 				 const unsigned short packetlen,
-				 const u_int64_t packet_time_ms);
+				 const u_int64_t packet_time_ms,
+				 const struct ndpi_flow_input_info *input_info);
 
   /**
    * Processes one packet and returns the ID of the detected protocol.
@@ -320,6 +322,7 @@ extern "C" {
    * @par    packet         = unsigned char pointer to the Layer 3 (IP header)
    * @par    packetlen      = the length of the packet
    * @par    packet_time_ms = the current timestamp for the packet (expressed in msec)
+   * @par    input_info     = (optional) flow information provided by the (external) flow manager
    * @return the detected ID of the protocol
    *
    */
@@ -327,7 +330,8 @@ extern "C" {
 					      struct ndpi_flow_struct *flow,
 					      const unsigned char *packet,
 					      const unsigned short packetlen,
-					      const u_int64_t packet_time_ms);
+					      const u_int64_t packet_time_ms,
+					      const struct ndpi_flow_input_info *input_info);
   /**
    * Get the main protocol of the passed flows for the detected module
    *

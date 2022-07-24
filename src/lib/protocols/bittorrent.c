@@ -126,34 +126,25 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
   if(ndpi_struct->bittorrent_cache && packet->iph) {
     u_int32_t key1, key2, i;
 
-    if(packet->udp)
-      key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, packet->udp->source), key2 = ndpi_ip_port_hash_funct(packet->iph->daddr, packet->udp->dest);
-    else
-      key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, packet->tcp->source), key2 = ndpi_ip_port_hash_funct(packet->iph->daddr, packet->tcp->dest);
+    key1 = ndpi_ip_port_hash_funct(flow->c_address.v4, flow->c_port), key2 = ndpi_ip_port_hash_funct(flow->s_address.v4, flow->s_port);
     
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT);
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key2, NDPI_PROTOCOL_BITTORRENT);
 
     /* Now add hosts as twins */
     ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache,
-			  packet->iph->saddr + packet->iph->daddr,
+			  flow->c_address.v4 + flow->s_address.v4,
 			  NDPI_PROTOCOL_BITTORRENT);
     
     /* Also add +2 ports of the sender in order to catch additional sockets open by the same client */
     for(i=0; i<2; i++) {
-      if(packet->udp)
-	key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, htons(ntohs(packet->udp->source)+1+i));
-      else
-	key1 = ndpi_ip_port_hash_funct(packet->iph->saddr, htons(ntohs(packet->tcp->source)+1+i));
+      key1 = ndpi_ip_port_hash_funct(flow->c_address.v4, htons(ntohs(flow->c_port)+1+i));
 
       ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT);
     }
     
 #ifdef BITTORRENT_CACHE_DEBUG
-    if(packet->udp)
-      printf("[BitTorrent] [UDP] *** ADDED ports %u / %u [%u][%u]\n", ntohs(packet->udp->source), ntohs(packet->udp->dest), key1, key2);
-    else
-      printf("[BitTorrent] [TCP] *** ADDED ports %u / %u [%u][%u]\n", ntohs(packet->tcp->source), ntohs(packet->tcp->dest), key1, key2);
+    printf("[BitTorrent] [%s] *** ADDED ports %u / %u [%u][%u]\n", flow->l4_proto == IPPROTO_TCP ? "TCP" : "UDP", ntohs(flow->c_port), ntohs(flow->s_port), key1, key2);
 #endif
   }
 }
@@ -455,14 +446,7 @@ static u_int8_t is_port(u_int16_t a, u_int16_t b, u_int16_t what) {
 static void ndpi_skip_bittorrent(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 struct ndpi_packet_struct *packet) {
-  u_int16_t sport, dport;
-
-  if(packet->udp)
-    sport = packet->udp->source, dport = packet->udp->dest;
-  else
-    sport = packet->tcp->source, dport = packet->tcp->dest;
-  
-  if(packet->iph && ndpi_search_into_bittorrent_cache(ndpi_struct, flow, packet->iph->saddr, sport, packet->iph->daddr, dport))
+  if(packet->iph && ndpi_search_into_bittorrent_cache(ndpi_struct, flow, flow->c_address.v4, flow->c_port, flow->s_address.v4, flow->s_port))
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0, NDPI_CONFIDENCE_DPI_CACHE);
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

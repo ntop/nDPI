@@ -37,11 +37,8 @@ static void ndpi_check_lotus_notes(struct ndpi_detection_module_struct *ndpi_str
 
   flow->l4.tcp.lotus_notes_packet_id++;
   
-  if((flow->l4.tcp.lotus_notes_packet_id == 1)
-     /* We have seen the 3-way handshake */
-     && flow->l4.tcp.seen_syn
-     && flow->l4.tcp.seen_syn_ack
-     && flow->l4.tcp.seen_ack) {
+  if((flow->l4.tcp.lotus_notes_packet_id == 1) &&
+     ndpi_seen_flow_beginning(flow)) {
     if(payload_len > 16) {
       char lotus_notes_header[] = { 0x00, 0x00, 0x02, 0x00, 0x00, 0x40, 0x02, 0x0F };
       

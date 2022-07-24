@@ -232,7 +232,7 @@ static void ndpi_check_ftp_data(struct ndpi_detection_module_struct *ndpi_struct
     Make sure we see the beginning of the connection as otherwise we might have
     false positive results
   */
-  if(flow->l4.tcp.seen_syn) {
+  if(ndpi_seen_flow_beginning(flow)) {
     if((packet->payload_packet_len > 0)
        && (ndpi_match_file_header(ndpi_struct, flow)
 	   || ndpi_match_ftp_data_directory(ndpi_struct, flow) 

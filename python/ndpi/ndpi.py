@@ -45,12 +45,13 @@ class NDPI(object):
     def revision(self):
         return ffi.string(lib.ndpi_revision()).decode('utf-8', errors='ignore')
 
-    def process_packet(self, flow, packet, packet_time_ms):
+    def process_packet(self, flow, packet, packet_time_ms, input_info):
         p = lib.ndpi_detection_process_packet(self._detection_module,
                                               flow.C,
                                               packet,
                                               len(packet),
-                                              int(packet_time_ms))
+                                              int(packet_time_ms),
+                                              input_info)
         return ndpi_protocol(C=p,
                              master_protocol=p.master_protocol,
                              app_protocol=p.app_protocol,

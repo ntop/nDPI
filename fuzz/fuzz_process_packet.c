@@ -26,7 +26,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   struct ndpi_flow_struct *ndpi_flow = ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
   memset(ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
   ndpi_protocol detected_protocol =
-    ndpi_detection_process_packet(ndpi_info_mod, ndpi_flow, Data, Size, 0);
+    ndpi_detection_process_packet(ndpi_info_mod, ndpi_flow, Data, Size, 0, NULL);
   ndpi_protocol guessed_protocol =
     ndpi_detection_giveup(ndpi_info_mod, ndpi_flow, 1, &protocol_was_guessed);
 
