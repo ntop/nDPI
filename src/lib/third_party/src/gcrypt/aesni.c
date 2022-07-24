@@ -25,7 +25,10 @@
 
 #if defined(__has_feature)
 #if __has_feature(memory_sanitizer)
-#warning "MBEDTLS_AESNI_C is known to cause spurious error reports with some memory sanitizers as they do not understand the assembly code."
+/* Using "#pragma message" instead of "#warning" to allow compilation with -Werror.
+   This pragma directive should be supported from every compilers supporting also memory sanitizer
+*/
+#pragma message "MBEDTLS_AESNI_C is known to cause spurious error reports with some memory sanitizers as they do not understand the assembly code."
 #endif
 #endif
 
