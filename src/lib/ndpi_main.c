@@ -374,7 +374,8 @@ ndpi_port_range *ndpi_build_default_ports(ndpi_port_range *ports, u_int16_t port
 
 /* ********************************************************************************** */
 
-void ndpi_set_proto_breed(struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId, ndpi_protocol_breed_t breed) {
+void ndpi_set_proto_breed(struct ndpi_detection_module_struct *ndpi_str,
+			  u_int16_t protoId, ndpi_protocol_breed_t breed) {
   if(!ndpi_is_valid_protoId(protoId))
     return;
   else
@@ -439,13 +440,13 @@ void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_str, 
 {
   va_list ap;
   int current_arg = protoId;
-
+  size_t i = 0;
+  
   va_start(ap, protoId);
-  while (current_arg != NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS)
-    {
-      ndpi_str->proto_defaults[protoId].subprotocol_count++;
-      current_arg = va_arg(ap, int);
-    }
+  while (current_arg != NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS) {
+    ndpi_str->proto_defaults[protoId].subprotocol_count++;
+    current_arg = va_arg(ap, int);
+  }
   va_end(ap);
 
   ndpi_str->proto_defaults[protoId].subprotocols = NULL;
@@ -453,22 +454,23 @@ void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_str, 
   /* The last protocol is not a subprotocol. */
   ndpi_str->proto_defaults[protoId].subprotocol_count--;
   /* No subprotocol was set before NDPI_NO_MORE_SUBPROTOCOLS. */
-  if (ndpi_str->proto_defaults[protoId].subprotocol_count == 0)
-    {
+  if(ndpi_str->proto_defaults[protoId].subprotocol_count == 0) {
       return;
     }
 
   ndpi_str->proto_defaults[protoId].subprotocols =
     ndpi_malloc(sizeof(protoId) * ndpi_str->proto_defaults[protoId].subprotocol_count);
 
-  size_t i = 0;
   va_start(ap, protoId);
   current_arg = va_arg(ap, int);
-  while (current_arg != NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS)
-    {
+  
+  while (current_arg != NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS) {
+    if(ndpi_str->proto_defaults[protoId].subprotocols != NULL) {
       ndpi_str->proto_defaults[protoId].subprotocols[i++] = current_arg;
       current_arg = va_arg(ap, int);
     }
+  }
+  
   va_end(ap);
 }
 
@@ -890,7 +892,7 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
     break;
 
   case ndpi_pref_max_packets_to_process:
-    if (value > 0xFFFF) {
+    if(value > 0xFFFF) {
       return(-1);
     }
     ndpi_str->max_packets_to_process = value;
@@ -3056,9 +3058,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     int i;
 
     for (i = 0; i < (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS); i++) {
-      if (ndpi_str->proto_defaults[i].protoName)
+      if(ndpi_str->proto_defaults[i].protoName)
         ndpi_free(ndpi_str->proto_defaults[i].protoName);
-      if (ndpi_str->proto_defaults[i].subprotocols != NULL)
+      if(ndpi_str->proto_defaults[i].subprotocols != NULL)
         ndpi_free(ndpi_str->proto_defaults[i].subprotocols);
     }
 
@@ -3266,11 +3268,11 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	     || (icmp_code > 15))
 	    ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, NULL);
 
-	  if (packet->payload_packet_len > sizeof(struct ndpi_icmphdr)) {
+	  if(packet->payload_packet_len > sizeof(struct ndpi_icmphdr)) {
 	    flow->entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
 	                                 packet->payload_packet_len - sizeof(struct ndpi_icmphdr));
 
-	    if (NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) != 0) {
+	    if(NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) != 0) {
 	      char str[32];
 
 		snprintf(str, sizeof(str), "Entropy %.2f", flow->entropy);
@@ -3278,7 +3280,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	    }
 
 	    u_int16_t chksm = ndpi_calculate_icmp4_checksum(packet->payload, packet->payload_packet_len);
-	    if (chksm) {
+	    if(chksm) {
 	      ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, NULL);
 	    }
 	  }
@@ -3804,12 +3806,12 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
   size_t i, len;
   int num = 0;
 
-  if (ndpi_str->malicious_sha1_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_sha1_hashmap) != 0)
+  if(ndpi_str->malicious_sha1_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_sha1_hashmap) != 0)
     return(-1);
 
   fd = fopen(path, "r");
 
-  if (fd == NULL) {
+  if(fd == NULL) {
     NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
     return -1;
   }
@@ -3817,14 +3819,14 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
   while (fgets(buffer, sizeof(buffer), fd) != NULL) {
     len = strlen(buffer);
 
-    if (len <= 1 || buffer[0] == '#')
+    if(len <= 1 || buffer[0] == '#')
       continue;
 
     first_comma = strchr(buffer, ',');
-    if (first_comma != NULL) {
+    if(first_comma != NULL) {
       first_comma++;
       second_comma = strchr(first_comma, ',');
-      if (second_comma == NULL)
+      if(second_comma == NULL)
         second_comma = &buffer[len - 1];
     } else {
       first_comma = &buffer[0];
@@ -3832,7 +3834,7 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     second_comma[0] = '\0';
-    if ((second_comma - first_comma) != 40) {
+    if((second_comma - first_comma) != 40) {
       NDPI_LOG_ERR(ndpi_str, "Not a SSL certificate sha1 hash: [%s]\n", first_comma);
       continue;
     }
@@ -4704,7 +4706,7 @@ int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
 	return(1);
       }
 
-      if (l3len < 5) {
+      if(l3len < 5) {
         return 1;
       }
       l3len -= 5;
@@ -4712,7 +4714,7 @@ int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
       *nxt_hdr = (*l4ptr)[0];
       frag_offset = ntohs(*(u_int16_t *)((*l4ptr) + 2)) >> 3;
       // Handle ipv6 fragments as the ipv4 ones: keep the first fragment, drop the others
-      if (frag_offset != 0)
+      if(frag_offset != 0)
           return(1);
       *l4len -= 8;
       (*l4ptr) += 8;
@@ -4729,7 +4731,7 @@ int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
     ehdr_len *= 8;
     ehdr_len += 8;
 
-    if (ehdr_len > l3len) {
+    if(ehdr_len > l3len) {
       return 1;
     }
     l3len -= ehdr_len;
@@ -5318,7 +5320,7 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
 {
   u_int32_t num_calls = 0, a;
 
-  if (detected_protocol == NDPI_PROTOCOL_UNKNOWN)
+  if(detected_protocol == NDPI_PROTOCOL_UNKNOWN)
   {
     return num_calls;
   }
@@ -5326,7 +5328,7 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
   for (a = 0; a < ndpi_str->proto_defaults[detected_protocol].subprotocol_count; a++)
   {
     u_int16_t subproto_id = ndpi_str->proto_defaults[detected_protocol].subprotocols[a];
-    if (subproto_id == (uint16_t)NDPI_PROTOCOL_MATCHED_BY_CONTENT ||
+    if(subproto_id == (uint16_t)NDPI_PROTOCOL_MATCHED_BY_CONTENT ||
         subproto_id == flow->detected_protocol_stack[0] ||
         subproto_id == flow->detected_protocol_stack[1])
     {
@@ -5334,7 +5336,7 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
     }
 
     u_int16_t subproto_index = ndpi_str->proto_defaults[subproto_id].protoIdx;
-    if ((ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
+    if((ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
          ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask &&
         NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
                              ndpi_str->callback_buffer[subproto_index].excluded_protocol_bitmask) == 0 &&
@@ -5367,14 +5369,14 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 
   NDPI_SAVE_AS_BITMASK(detection_bitmask, flow->detected_protocol_stack[0]);
 
-  if ((proto_id != NDPI_PROTOCOL_UNKNOWN) &&
+  if((proto_id != NDPI_PROTOCOL_UNKNOWN) &&
       NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
 			   ndpi_str->callback_buffer[proto_index].excluded_protocol_bitmask) == 0 &&
       NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[proto_index].detection_bitmask, detection_bitmask) != 0 &&
       (ndpi_str->callback_buffer[proto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
       ndpi_str->callback_buffer[proto_index].ndpi_selection_bitmask)
     {
-      if ((flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
+      if((flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
           (ndpi_str->proto_defaults[flow->guessed_protocol_id].func != NULL) &&
           (is_tcp_without_payload == 0 ||
            ((ndpi_str->callback_buffer[proto_index].ndpi_selection_bitmask &
@@ -5386,10 +5388,10 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 	}
     }
 
-  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     {
       for (a = 0; a < callback_buffer_size; a++) {
-        if ((func != callback_buffer[a].func) &&
+        if((func != callback_buffer[a].func) &&
             (callback_buffer[a].ndpi_selection_bitmask & ndpi_selection_packet) ==
 	    callback_buffer[a].ndpi_selection_bitmask &&
             NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
@@ -5400,7 +5402,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 	    callback_buffer[a].func(ndpi_str, flow);
 	    num_calls++;
 
-	    if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+	    if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
 	      {
 		break; /* Stop after the first detected protocol. */
 	      }
@@ -5444,7 +5446,7 @@ static u_int32_t check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *n
 					  struct ndpi_flow_struct *flow,
 					  NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet)
 {
-  if (ndpi_str->packet.payload_packet_len != 0) {
+  if(ndpi_str->packet.payload_packet_len != 0) {
     return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				     ndpi_str->callback_buffer_tcp_payload,
 				     ndpi_str->callback_buffer_size_tcp_payload, 0);
@@ -8819,8 +8821,8 @@ ndpi_risk_info* ndpi_risk2severity(ndpi_risk_enum risk) {
 
 /* ******************************************************************** */
 
-char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len)
-{
+char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
+			    const u_int8_t *value, size_t value_len) {
   char *dst;
   size_t len, i;
 
@@ -8836,16 +8838,14 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value
 
 /* ******************************************************************** */
 
-char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len)
-{
-  if (flow->http.user_agent != NULL)
-  {
+char *ndpi_user_agent_set(struct ndpi_flow_struct *flow,
+			  const u_int8_t *value, size_t value_len) {
+  if(flow->http.user_agent != NULL) {
     return NULL;
   }
 
   flow->http.user_agent = ndpi_malloc(value_len + 1);
-  if (flow->http.user_agent != NULL)
-  {
+  if(flow->http.user_agent != NULL) {
     memcpy(flow->http.user_agent, value, value_len);
     flow->http.user_agent[value_len] = '\0';
   }
