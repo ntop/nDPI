@@ -1299,6 +1299,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case NDPI_PROTOCOL_HTTP:
+  case NDPI_PROTOCOL_HTTP_CONNECT:
+  case NDPI_PROTOCOL_HTTP_PROXY:
     ndpi_serialize_start_of_block(serializer, "http");
     if(flow->host_server_name[0] != '\0')
       ndpi_serialize_string_string(serializer, "hostname", flow->host_server_name);

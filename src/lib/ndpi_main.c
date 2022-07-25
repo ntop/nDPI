@@ -8114,6 +8114,8 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
     break;
 
   case NDPI_PROTOCOL_HTTP:
+  case NDPI_PROTOCOL_HTTP_PROXY:
+  case NDPI_PROTOCOL_HTTP_CONNECT:
     if((flow->host_server_name[0] == '\0') || (flow->http.response_status_code == 0))
       return(1);
     break;

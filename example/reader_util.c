@@ -1140,8 +1140,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
                   "%s", flow->ndpi_flow->protos.kerberos.username);
   }
   /* HTTP */
-  else if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_HTTP)
-	  || is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP)) {
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP)
+	  || is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP_PROXY)
+	  || is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP_CONNECT)) {
     if(flow->ndpi_flow->http.url != NULL) {
       ndpi_snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
       flow->http.response_status_code = flow->ndpi_flow->http.response_status_code;

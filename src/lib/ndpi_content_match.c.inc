@@ -1747,7 +1747,6 @@ static ndpi_category_match category_match[] = {
    { "icq.com",                          NDPI_PROTOCOL_CATEGORY_CHAT },
    { "quickplay.com",                    NDPI_PROTOCOL_CATEGORY_STREAMING },
    { ".71.am",                           NDPI_PROTOCOL_CATEGORY_STREAMING },
-   { ".1kxun.",                          NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "tcad.wedolook.com",                NDPI_PROTOCOL_CATEGORY_STREAMING },
    { ".rapidvideo.com",                  NDPI_PROTOCOL_CATEGORY_STREAMING },
    { ".playercdn.net",                   NDPI_PROTOCOL_CATEGORY_STREAMING },

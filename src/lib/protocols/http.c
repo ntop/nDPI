@@ -335,6 +335,8 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 					 struct ndpi_flow_struct *flow,
 					 u_int16_t http_protocol,
 					 ndpi_protocol_category_t category) {
+  u_int16_t master_protocol;
+
 #ifdef HTTP_DEBUG
   printf("=> %s()\n", __FUNCTION__);
 #endif
@@ -347,14 +349,22 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 
   /* If no custom protocol has been detected */
   if((flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-     || ((http_protocol != NDPI_PROTOCOL_HTTP) && (http_protocol != NDPI_PROTOCOL_HTTP_CONNECT))
+     || ((http_protocol != NDPI_PROTOCOL_HTTP) &&
+         (http_protocol != NDPI_PROTOCOL_HTTP_CONNECT) &&
+         (http_protocol != NDPI_PROTOCOL_HTTP_PROXY))
      )
     flow->guessed_host_protocol_id = http_protocol;
 
   // ndpi_int_reset_protocol(flow);
+  master_protocol = NDPI_PROTOCOL_HTTP;
+  if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
+    master_protocol = flow->detected_protocol_stack[1];
+  else if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_CONNECT ||
+          flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_PROXY)
+    master_protocol = flow->detected_protocol_stack[0];
+
   ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id,
-			     (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) ?
-			     flow->detected_protocol_stack[1] : NDPI_PROTOCOL_HTTP,
+			     master_protocol,
 			     NDPI_CONFIDENCE_DPI);
 
   /* This is necessary to inform the core to call this dissector again */
@@ -366,8 +376,10 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   switch(flow->detected_protocol_stack[1]) {
   case NDPI_PROTOCOL_HTTP_CONNECT:
   case NDPI_PROTOCOL_HTTP_PROXY:
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP)
-      flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP) {
+      flow->detected_protocol_stack[0] = flow->detected_protocol_stack[1];
+      flow->detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
+    }
     break;
   }
 }
@@ -402,7 +414,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     if(double_col) double_col[0] = '\0';
 
     if(ndpi_match_hostname_protocol(ndpi_struct, flow,
-				    flow->detected_protocol_stack[1],
+				    flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN ? flow->detected_protocol_stack[1] : NDPI_PROTOCOL_HTTP,
 				    flow->host_server_name,
 				    strlen(flow->host_server_name)) == 0) {
       if(flow->http.url &&
@@ -773,7 +785,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
       if((flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP)
-	 && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP_CONNECT)) {
+	 && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP_CONNECT)
+	 && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP_PROXY)) {
 	NDPI_LOG_INFO(ndpi_struct, "found HTTP/%s\n",
 		      ndpi_get_proto_name(ndpi_struct, flow->detected_protocol_stack[0]));
 	ndpi_int_http_add_connection(ndpi_struct, flow, flow->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
@@ -1272,16 +1285,20 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       if((packet->http_url_name.len > 7)
 	 && (!strncasecmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP_PROXY\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_PROXY, flow->detected_protocol_stack[0], NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_HTTP_PROXY, NDPI_CONFIDENCE_DPI);
         check_content_type_and_change_protocol(ndpi_struct, flow);
+	flow->http_detected = 1;
+	flow->l4.tcp.http_stage = packet->packet_direction + 1; // packet_direction 0: stage 1, packet_direction 1: stage 2
+	return;
       }
 
       if(filename_start == 8 && (strncasecmp((const char *)packet->payload, "CONNECT ", 8) == 0)) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP_CONNECT\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HTTP_CONNECT,
-				   (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP) ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN,
-				   NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_HTTP_CONNECT, NDPI_CONFIDENCE_DPI);
         check_content_type_and_change_protocol(ndpi_struct, flow);
+	flow->http_detected = 1;
+	flow->l4.tcp.http_stage = packet->packet_direction + 1; // packet_direction 0: stage 1, packet_direction 1: stage 2
+	return;
       }
 
       NDPI_LOG_DBG2(ndpi_struct,
