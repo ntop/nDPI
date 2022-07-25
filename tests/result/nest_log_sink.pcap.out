@@ -4,7 +4,7 @@ DPI Packets (TCP):	128	(9.85 pkts/flow)
 DPI Packets (UDP):	2	(2.00 pkts/flow)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 13 (flows)
-Num dissector calls: 2103 (150.21 diss/flow)
+Num dissector calls: 2115 (151.07 diss/flow)
 
 DNS	15	1612	1
 NestLogSink	676	112058	12

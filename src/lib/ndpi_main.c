@@ -87,6 +87,7 @@
 #include "inc_generated/ndpi_asn_riotgames.c.inc"
 #include "inc_generated/ndpi_asn_threema.c.inc"
 #include "inc_generated/ndpi_asn_alibaba.c.inc"
+#include "inc_generated/ndpi_asn_avast.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -1954,6 +1955,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "AliCloud", NDPI_PROTOCOL_CATEGORY_CLOUD,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_AVAST,
+                          "AVAST", NDPI_PROTOCOL_CATEGORY_NETWORK,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2612,6 +2617,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_riotgames_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_threema_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_alibaba_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_avast_protocol_list);
     }
   }
 
@@ -4455,6 +4461,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* AliCloud */
   init_alicloud_dissector(ndpi_str, &a, detection_bitmask);
+
+  /* AVAST */
+  init_avast_dissector(ndpi_str, &a, detection_bitmask);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
