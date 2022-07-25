@@ -1,5 +1,5 @@
 /*
- * avast.c
+ * avast_securedns.c
  *
  * Copyright (C) 2012-22 - ntop.org
  *
@@ -44,7 +44,7 @@ static void ndpi_search_avast_securedns(struct ndpi_detection_module_struct *ndp
     return;
   }
 
-  if (strncasecmp((char *)&packet->payload[15], "securedns", strlen("securedns")) == 0)
+  if (strncasecmp((char *)&packet->payload[15], "securedns", NDPI_STATICSTRING_LEN("securedns")) == 0)
   {
     ndpi_int_avast_securedns_add_connection(ndpi_struct, flow);
     return;
