@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	40	(4.00 pkts/flow)
 Confidence DPI              : 10 (flows)
-Num dissector calls: 1250 (125.00 diss/flow)
+Num dissector calls: 1220 (122.00 diss/flow)
 
 AVAST	142	9433	10
 

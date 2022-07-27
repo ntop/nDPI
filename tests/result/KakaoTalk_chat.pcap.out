@@ -6,7 +6,7 @@ DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 4 (flows)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 33 (flows)
-Num dissector calls: 671 (17.66 diss/flow)
+Num dissector calls: 617 (16.24 diss/flow)
 
 DNS	2	217	1
 HTTP	1	56	1

@@ -556,11 +556,6 @@ struct ndpi_flow_input_info {
 /* ******************* ********************* ****************** */
 /* ************************************************************ */
 
-PACK_ON struct tinc_cache_entry {
-  u_int32_t src_address;
-  u_int32_t dst_address;
-  u_int16_t dst_port;
-} PACK_OFF;
 //CFFI.NDPI_PACKED_STRUCTURES
 #endif // NDPI_CFFI_PREPROCESSING_EXCLUDE_PACKED
 
@@ -1458,7 +1453,6 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;
-  struct tinc_cache_entry tinc_cache_entry;
 
   /* 
      Leave this field below at the end

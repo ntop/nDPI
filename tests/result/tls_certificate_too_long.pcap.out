@@ -6,7 +6,7 @@ DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 33 (flows)
-Num dissector calls: 626 (17.89 diss/flow)
+Num dissector calls: 593 (16.94 diss/flow)
 
 Unknown	13	5582	1
 MDNS	5	983	3
