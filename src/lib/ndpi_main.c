@@ -6383,8 +6383,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     flow->tree_risk_checked = 1;
   }
 
-  /* It is common to not trigger any dissectors for pure TCP ACK packets */
-  if(num_calls == 0 && packet->payload_packet_len != 0)
+  /* It is common to don't trigger any dissectors for pure TCP ACKs
+     and for for retransmissions */
+  if(num_calls == 0 &&
+     (packet->tcp_retransmission == 0 && packet->payload_packet_len != 0))
     flow->fail_with_unknown = 1;
   flow->num_dissector_calls += num_calls;
 

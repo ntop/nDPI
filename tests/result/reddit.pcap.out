@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	445	(7.42 pkts/flow)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 59 (flows)
-Num dissector calls: 659 (10.98 diss/flow)
+Num dissector calls: 59 (0.98 diss/flow)
 
 TLS	508	331149	13
 Twitter	863	686585	3

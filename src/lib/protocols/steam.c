@@ -304,7 +304,7 @@ void init_steam_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("Steam", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_STEAM,
 				      ndpi_search_steam,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

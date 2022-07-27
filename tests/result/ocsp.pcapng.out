@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	60	(6.00 pkts/flow)
 Confidence DPI              : 10 (flows)
-Num dissector calls: 290 (29.00 diss/flow)
+Num dissector calls: 180 (18.00 diss/flow)
 
 HTTP	23	10871	1
 OCSP	321	62776	9

@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	8	(8.00 pkts/flow)
 DPI Packets (UDP):	4	(2.00 pkts/flow)
 Confidence DPI              : 3 (flows)
-Num dissector calls: 31 (10.33 diss/flow)
+Num dissector calls: 20 (6.67 diss/flow)
 
 DNS	2	162	1
 Spotify	2	197	1

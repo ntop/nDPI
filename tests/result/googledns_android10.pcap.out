@@ -4,7 +4,7 @@ DPI Packets (TCP):	42	(6.00 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by IP      : 2 (flows)
 Confidence DPI              : 6 (flows)
-Num dissector calls: 122 (15.25 diss/flow)
+Num dissector calls: 39 (4.88 diss/flow)
 
 ICMP	4	392	1
 Google	8	504	2

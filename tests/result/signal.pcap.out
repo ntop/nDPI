@@ -4,7 +4,7 @@ DPI Packets (TCP):	97	(6.47 pkts/flow)
 DPI Packets (UDP):	5	(1.67 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence DPI              : 19 (flows)
-Num dissector calls: 187 (9.84 diss/flow)
+Num dissector calls: 55 (2.89 diss/flow)
 
 DNS	2	186	1
 DHCP	4	1368	1

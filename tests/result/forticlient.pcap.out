@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	35	(7.00 pkts/flow)
 Confidence DPI (cache)      : 4 (flows)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 85 (17.00 diss/flow)
+Num dissector calls: 30 (6.00 diss/flow)
 
 FortiClient	2000	430931	5
 

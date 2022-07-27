@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	21	(10.50 pkts/flow)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 20 (10.00 diss/flow)
+Num dissector calls: 9 (4.50 diss/flow)
 
 AnyDesk	6963	2795460	2
 

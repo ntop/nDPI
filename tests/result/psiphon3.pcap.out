@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	12	(12.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 19 (19.00 diss/flow)
+Num dissector calls: 5 (5.00 diss/flow)
 
 Psiphon	62	11818	1
 

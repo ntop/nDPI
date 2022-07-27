@@ -268,7 +268,7 @@ void init_mqtt_dissector (struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_set_bitmask_protocol_detection ("MQTT", ndpi_struct, detection_bitmask, *id,
 			NDPI_PROTOCOL_MQTT,
 			ndpi_search_mqtt,
-			NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+			NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 			SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
 	*id +=1;
 }

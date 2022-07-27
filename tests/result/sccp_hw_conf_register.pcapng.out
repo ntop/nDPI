@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 15 (15.00 diss/flow)
+Num dissector calls: 4 (4.00 diss/flow)
 
 CiscoSkinny	17	1522	1
 

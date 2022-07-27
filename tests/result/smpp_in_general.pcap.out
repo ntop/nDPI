@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 101 (101.00 diss/flow)
+Num dissector calls: 92 (92.00 diss/flow)
 
 SMPP	17	1144	1
 

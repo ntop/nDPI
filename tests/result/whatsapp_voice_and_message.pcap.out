@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	20	(4.00 pkts/flow)
 DPI Packets (UDP):	8	(1.00 pkts/flow)
 Confidence DPI              : 13 (flows)
-Num dissector calls: 548 (42.15 diss/flow)
+Num dissector calls: 503 (38.69 diss/flow)
 
 WhatsAppCall	44	5916	8
 WhatsApp	217	22139	5

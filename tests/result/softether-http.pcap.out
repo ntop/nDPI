@@ -2,7 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 29 (29.00 diss/flow)
+Num dissector calls: 18 (18.00 diss/flow)
 
 Softether	4	1392	1
 

@@ -63,7 +63,7 @@ void init_ultrasurf_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("UltraSurf", ndpi_struct, detection_bitmask, *id,
     NDPI_PROTOCOL_ULTRASURF,
     ndpi_search_ultrasurf,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD,
+    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
     SAVE_DETECTION_BITMASK_AS_UNKNOWN,
     ADD_TO_DETECTION_BITMASK
   );

@@ -4,7 +4,7 @@ DPI Packets (TCP):	27	(5.40 pkts/flow)
 DPI Packets (UDP):	4	(2.00 pkts/flow)
 DPI Packets (other):	3	(1.00 pkts/flow)
 Confidence DPI              : 10 (flows)
-Num dissector calls: 58 (5.80 diss/flow)
+Num dissector calls: 28 (2.80 diss/flow)
 
 HTTP	10	1792	1
 IMAPS	4	516	2

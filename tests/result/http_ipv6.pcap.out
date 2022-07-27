@@ -5,7 +5,7 @@ DPI Packets (UDP):	4	(2.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 6 (flows)
 Confidence DPI              : 8 (flows)
-Num dissector calls: 232 (15.47 diss/flow)
+Num dissector calls: 130 (8.67 diss/flow)
 
 Unknown	3	502	1
 ntop	80	36401	4

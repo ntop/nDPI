@@ -217,7 +217,7 @@ void init_sopcast_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   ndpi_set_bitmask_protocol_detection("Sopcast", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_SOPCAST,
 				      ndpi_search_sopcast,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
