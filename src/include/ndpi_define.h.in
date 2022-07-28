@@ -390,9 +390,9 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 #define htole32(x) (x)
 #define be32toh(x) ntohl(x)
 #define le32toh(x) (x)
-#define htobe64(x) htonll(x)
+#define htobe64(x) ndpi_htonll(x)
 #define htole64(x) (x)
-#define be64toh(x) ntohll(x)
+#define be64toh(x) ndpi_ntohll(x)
 #define le64toh(x) (x)
 
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__

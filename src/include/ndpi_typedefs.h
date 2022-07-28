@@ -1362,6 +1362,13 @@ struct ndpi_flow_struct {
     } kerberos;
 
     struct {
+      char ip[16];
+      char port[6];
+      char hostname[48];
+      char fqdn[48];
+    } softether;
+
+    struct {
       char *server_names, *alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       u_int32_t notBefore, notAfter;
       char ja3_client[33], ja3_server[33];

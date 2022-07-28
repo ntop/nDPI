@@ -4534,6 +4534,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* AVAST */
   init_avast_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* Softether */
+  init_softether_dissector(ndpi_str, &a, detection_bitmask);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
@@ -8251,6 +8254,9 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   case NDPI_PROTOCOL_BITTORRENT:
       return(1);
     break;
+
+  case NDPI_PROTOCOL_SOFTETHER:
+    return(1);
   }
 
   return(0);

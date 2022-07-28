@@ -1080,6 +1080,18 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       flow->bittorent_hash[j] = '\0';
     }
   }
+  /* SOFTETHER */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SOFTETHER) && !is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP)) {
+    flow->info_type = INFO_SOFTETHER;
+    ndpi_snprintf(flow->softether.ip, sizeof(flow->softether.ip), "%s",
+                  flow->ndpi_flow->protos.softether.ip);
+    ndpi_snprintf(flow->softether.port, sizeof(flow->softether.port), "%s",
+                  flow->ndpi_flow->protos.softether.port);
+    ndpi_snprintf(flow->softether.hostname, sizeof(flow->softether.hostname), "%s",
+                  flow->ndpi_flow->protos.softether.hostname);
+    ndpi_snprintf(flow->softether.fqdn, sizeof(flow->softether.fqdn), "%s",
+                  flow->ndpi_flow->protos.softether.fqdn);
+  }
   /* DNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DNS)) {
     if(flow->ndpi_flow->protos.dns.rsp_type == 0x1)
