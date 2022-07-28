@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	80	(10.00 pkts/flow)
 Confidence DPI              : 8 (flows)
-Num dissector calls: 64 (8.00 diss/flow)
+Num dissector calls: 8 (1.00 diss/flow)
 
 DNP3	543	38754	8
 

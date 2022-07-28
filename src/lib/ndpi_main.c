@@ -5280,10 +5280,10 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 					   struct ndpi_flow_struct * const flow,
 					   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE const ndpi_selection_packet,
 					   struct ndpi_call_function_struct const * const callback_buffer,
-					   uint32_t callback_buffer_size)
+					   uint32_t callback_buffer_size,
+					   int is_tcp_without_payload)
 {
   void *func = NULL;
-  u_int8_t is_tcp_without_payload = (callback_buffer == ndpi_str->callback_buffer_tcp_no_payload);
   u_int32_t num_calls = 0;
   u_int16_t proto_index = ndpi_str->proto_defaults[flow->guessed_protocol_id].protoIdx;
   u_int16_t proto_id = ndpi_str->proto_defaults[flow->guessed_protocol_id].protoId;
@@ -5349,7 +5349,7 @@ u_int32_t check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_s
 {
   return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				   ndpi_str->callback_buffer_non_tcp_udp,
-				   ndpi_str->callback_buffer_size_non_tcp_udp);
+				   ndpi_str->callback_buffer_size_non_tcp_udp, 0);
 }
 
 /* ************************************************ */
@@ -5360,7 +5360,7 @@ static u_int32_t check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *n
 {
   return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				   ndpi_str->callback_buffer_udp,
-				   ndpi_str->callback_buffer_size_udp);
+				   ndpi_str->callback_buffer_size_udp, 0);
 }
 
 /* ************************************************ */
@@ -5372,12 +5372,12 @@ static u_int32_t check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *n
   if (ndpi_str->packet.payload_packet_len != 0) {
     return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				     ndpi_str->callback_buffer_tcp_payload,
-				     ndpi_str->callback_buffer_size_tcp_payload);
+				     ndpi_str->callback_buffer_size_tcp_payload, 0);
   } else {
     /* no payload */
     return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				     ndpi_str->callback_buffer_tcp_no_payload,
-				     ndpi_str->callback_buffer_size_tcp_no_payload);
+				     ndpi_str->callback_buffer_size_tcp_no_payload, 1);
   }
 }
 

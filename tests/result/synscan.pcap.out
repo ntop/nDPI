@@ -3,7 +3,7 @@ Guessed flow protos:	1992
 DPI Packets (TCP):	2011	(1.01 pkts/flow)
 Confidence Unknown          : 1868 (flows)
 Confidence Match by port    : 126 (flows)
-Num dissector calls: 2003 (1.00 diss/flow)
+Num dissector calls: 0 (0.00 diss/flow)
 
 Unknown	1872	108584	1868
 FTP_CONTROL	2	116	2

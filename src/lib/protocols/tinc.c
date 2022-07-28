@@ -25,6 +25,11 @@
 #include "ndpi_api.h"
 #include "libcache.h"
 
+PACK_ON struct tinc_cache_entry {
+  u_int32_t src_address;
+  u_int32_t dst_address;
+  u_int16_t dst_port;
+} PACK_OFF;
 
 static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -62,14 +67,6 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   } else if(packet->tcp != NULL) {
-    if(payload_len == 0) {
-      if(packet->tcp->syn == 1 && packet->tcp->ack == 0) {
-        flow->tinc_cache_entry.src_address = packet->iph->saddr;
-        flow->tinc_cache_entry.dst_address = packet->iph->daddr;
-        flow->tinc_cache_entry.dst_port = packet->tcp->dest;
-      }
-      return;
-    }
 
     switch(flow->tinc_state) {
     case 0:
@@ -110,10 +107,16 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
           
 	if(i < payload_len && packet_payload[i] == '\n') {
 	  if(++flow->tinc_state > 3) {
+	    struct tinc_cache_entry tinc_cache_entry = {
+	      .src_address = flow->c_address.v4,
+	      .dst_address = flow->s_address.v4,
+	      .dst_port = flow->s_port,
+	    };
+
 	    if(ndpi_struct->tinc_cache == NULL)
 	      ndpi_struct->tinc_cache = cache_new(TINC_CACHE_MAX_SIZE);              
 
-	    cache_add(ndpi_struct->tinc_cache, &(flow->tinc_cache_entry), sizeof(flow->tinc_cache_entry));
+	    cache_add(ndpi_struct->tinc_cache, &tinc_cache_entry, sizeof(tinc_cache_entry));
 	    NDPI_LOG_INFO(ndpi_struct, "found tinc tcp connection\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	  }
@@ -142,7 +145,7 @@ void init_tinc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   ndpi_set_bitmask_protocol_detection("TINC", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_TINC,
 				      ndpi_search_tinc,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITHOUT_RETRANSMISSION, /* TODO: IPv6? */
+				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION, /* TODO: IPv6? */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
