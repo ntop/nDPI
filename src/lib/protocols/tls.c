@@ -28,8 +28,6 @@
 #include "ndpi_encryption.h"
 
 extern char *strptime(const char *s, const char *format, struct tm *tm);
-extern int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
-                           struct ndpi_flow_struct *flow);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow, uint32_t quic_version);
 extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
@@ -221,7 +219,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 	     message->buffer_len,
 	     packet->packet_direction,
 	     ntohl(packet->tcp->seq),
-	     ntohl(packet->tcp->seq)+packet->payload_packet_len);
+	     message->next_seq);
 #endif
     }
   }
@@ -852,8 +850,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
-int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
-                    struct ndpi_flow_struct *flow) {
+static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
+                           struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int ret;
 
@@ -924,8 +922,17 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	 packet->payload_packet_len);
 #endif
 
-  if(packet->payload_packet_len == 0)
-    return(1); /* Keep working */
+  /* This function is also called by "extra dissection" data path. Unfortunately,
+     generic "extra function" code doesn't honour protocol bitmask.
+     TODO: handle that in ndpi_main.c for all the protocols */
+  if(packet->payload_packet_len == 0 ||
+     packet->tcp_retransmission) {
+#ifdef DEBUG_TLS_MEMORY
+    printf("[TLS Mem] Ack or retransmission %d/%d. Skip\n",
+           packet->payload_packet_len, packet->tcp_retransmission);
+#endif
+    return 1; /* Keep working */
+  }
 
   ndpi_search_tls_tcp_memory(ndpi_struct, flow);
   message = &flow->l4.tcp.tls.message[packet->packet_direction];
@@ -1220,6 +1227,26 @@ static void tlsInitExtraPacketProcessing(struct ndpi_detection_module_struct *nd
   /* At most 12 packets should almost always be enough to find the server certificate if it's there */
   flow->max_extra_packets_to_check = 12 + (ndpi_struct->num_tls_blocks_to_follow*4);
   flow->extra_packets_func = (packet->udp != NULL) ? ndpi_search_tls_udp : ndpi_search_tls_tcp;
+}
+
+/* **************************************** */
+
+void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow)
+{
+#ifdef DEBUG_TLS
+  printf("Switching to TLS extra dissection\n");
+#endif
+
+  /* Reset reassemblers */
+  if(flow->l4.tcp.tls.message[0].buffer)
+    ndpi_free(flow->l4.tcp.tls.message[0].buffer);
+  memset(&flow->l4.tcp.tls.message[0], '\0', sizeof(flow->l4.tcp.tls.message[0]));
+  if(flow->l4.tcp.tls.message[1].buffer)
+    ndpi_free(flow->l4.tcp.tls.message[1].buffer);
+  memset(&flow->l4.tcp.tls.message[1], '\0', sizeof(flow->l4.tcp.tls.message[1]));
+
+  tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
 
 /* **************************************** */

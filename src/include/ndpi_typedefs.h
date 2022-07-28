@@ -1208,6 +1208,11 @@ struct ndpi_detection_module_struct {
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
+  int opportunistic_tls_smtp_enabled;
+  int opportunistic_tls_imap_enabled;
+  int opportunistic_tls_pop_enabled;
+  int opportunistic_tls_ftp_enabled;
+
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
   u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
@@ -1395,7 +1400,7 @@ struct ndpi_flow_struct {
         char *esni;
       } encrypted_sni;
       ndpi_cipher_weakness server_unsafe_cipher;
-    } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS */
+    } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
     struct {
       char client_signature[48], server_signature[48];

@@ -1974,6 +1974,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "FastCGI", NDPI_PROTOCOL_CATEGORY_NETWORK,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_FTPS,
+			  "FTPS", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2758,6 +2762,11 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_free(ndpi_str);
     return(NULL);
   }
+
+  ndpi_str->opportunistic_tls_smtp_enabled = 1;
+  ndpi_str->opportunistic_tls_imap_enabled = 1;
+  ndpi_str->opportunistic_tls_pop_enabled = 1;
+  ndpi_str->opportunistic_tls_ftp_enabled = 1;
 
   ndpi_init_protocol_defaults(ndpi_str);
 
@@ -4924,7 +4933,8 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_POPS) ||
-       flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS)) {
+       flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS) ||
+       flow_is_proto(flow, NDPI_PROTOCOL_FTPS)) {
       if(flow->protos.tls_quic.server_names)
 	ndpi_free(flow->protos.tls_quic.server_names);
 
@@ -5193,8 +5203,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
         }
       }
 
-      if((flow->next_tcp_seq_nr[0] == 0 && flow->next_tcp_seq_nr[1] == 0) ||
-	 (flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0)) {
+      if(flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0 ||
+	 (tcph->syn && flow->packet_counter == 0)) {
 	/* initialize tcp sequence counters */
 	/* the ack flag needs to be set to get valid sequence numbers from the other
 	 * direction. Usually it will catch the second packet syn+ack but it works
@@ -5202,6 +5212,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	 *
 	 * if the syn flag is set add one to the sequence number,
 	 * otherwise use the payload length.
+	 *
+	 * If we receive multiple syn-ack (before any real data), keep the last one
 	 */
 	if(tcph->ack != 0) {
 	  flow->next_tcp_seq_nr[packet->packet_direction] =
@@ -6246,9 +6258,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   u_int32_t num_calls = 0;
   ndpi_protocol ret = { flow->detected_protocol_stack[1], flow->detected_protocol_stack[0], flow->category, NULL };
 
-  if(ndpi_str->ndpi_log_level >= NDPI_LOG_TRACE)
-    NDPI_LOG(flow ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN, ndpi_str, NDPI_LOG_TRACE,
-	     "START packet processing\n");
+  NDPI_LOG_DBG(ndpi_str, "[%d/%d] START packet processing\n",
+               flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
 
   if(flow == NULL)
     return(ret);
@@ -8888,4 +8899,52 @@ int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow)
       flow->l4.tcp.seen_ack == 0))
     return 0;
   return 1;
+}
+
+/* ******************************************************************** */
+
+int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
+			       u_int16_t proto, int value)
+{
+  if(!ndpi_struct || (value != 0 && value != 1))
+    return -1;
+
+  switch(proto) {
+  case NDPI_PROTOCOL_MAIL_SMTP:
+    ndpi_struct->opportunistic_tls_smtp_enabled = value;
+    return 0;
+  case NDPI_PROTOCOL_MAIL_IMAP:
+    ndpi_struct->opportunistic_tls_imap_enabled = value;
+    return 0;
+  case NDPI_PROTOCOL_MAIL_POP:
+    ndpi_struct->opportunistic_tls_pop_enabled = value;
+    return 0;
+  case NDPI_PROTOCOL_FTP_CONTROL:
+    ndpi_struct->opportunistic_tls_ftp_enabled = value;
+    return 0;
+  default:
+    return -1;
+  }
+}
+
+/* ******************************************************************** */
+
+int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
+			       u_int16_t proto)
+{
+  if(!ndpi_struct)
+    return -1;
+
+  switch(proto) {
+  case NDPI_PROTOCOL_MAIL_SMTP:
+    return ndpi_struct->opportunistic_tls_smtp_enabled;
+  case NDPI_PROTOCOL_MAIL_IMAP:
+    return ndpi_struct->opportunistic_tls_imap_enabled;
+  case NDPI_PROTOCOL_MAIL_POP:
+    return ndpi_struct->opportunistic_tls_pop_enabled;
+  case NDPI_PROTOCOL_FTP_CONTROL:
+    return ndpi_struct->opportunistic_tls_ftp_enabled;
+  default:
+    return -1;
+  }
 }

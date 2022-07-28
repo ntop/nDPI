@@ -43,12 +43,16 @@
 #define POP_BIT_STLS		0x0400
 
 
+extern void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
+					   struct ndpi_flow_struct *flow);
+
 static void ndpi_int_mail_pop_add_connection(struct ndpi_detection_module_struct
-					     *ndpi_struct, struct ndpi_flow_struct *flow) {
+					     *ndpi_struct, struct ndpi_flow_struct *flow,
+					     u_int16_t protocol) {
 
   NDPI_LOG_INFO(ndpi_struct, "mail_pop identified\n");
   flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN; /* Avoid POP3S to be used s sub-protocol */
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_POP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* **************************************** */
@@ -142,6 +146,7 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
 	       && (packet->payload[2] == 'L' || packet->payload[2] == 'l')
 	       && (packet->payload[3] == 'S' || packet->payload[3] == 's')) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_STLS;
+      flow->l4.tcp.mail_imap_starttls = 1;
       return 1;
     }
   }
@@ -168,6 +173,19 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
 	      && (packet->payload[3] == 'R' || packet->payload[3] == 'r')))) {
     // +OK or -ERR seen
     flow->l4.tcp.mail_pop_stage += 1;
+    if(packet->payload[0] == '+' && flow->l4.tcp.mail_imap_starttls == 1) {
+      NDPI_LOG_DBG2(ndpi_struct, "starttls detected\n");
+      ndpi_int_mail_pop_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_POPS);
+      if(ndpi_struct->opportunistic_tls_pop_enabled) {
+        NDPI_LOG_DBG(ndpi_struct, "Switching to [%d/%d]\n",
+		     flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+	/* We are done (in POP dissector): delegating TLS... */
+	switch_extra_dissection_to_tls(ndpi_struct, flow);
+	return;
+      }
+    }
+    if(packet->payload[0] == '-' && flow->l4.tcp.mail_imap_starttls == 1)
+      flow->l4.tcp.mail_imap_starttls = 0;
   } else if(!ndpi_int_mail_pop_check_for_client_commands(ndpi_struct, flow)) {
     goto maybe_split_pop;
   }
@@ -189,7 +207,7 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
 	
 	if((flow->l4.tcp.ftp_imap_pop_smtp.password[0] != '\0')
 	   || (flow->l4.tcp.mail_pop_stage > 3)) {
-	  ndpi_int_mail_pop_add_connection(ndpi_struct, flow);
+	  ndpi_int_mail_pop_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_POP);
 	  if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0')
 	    popInitExtraPacketProcessing(flow);
 	}

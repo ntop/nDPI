@@ -48,8 +48,8 @@
 
 /* #define SMTP_DEBUG 1 */
 
-extern int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
-                           struct ndpi_flow_struct *flow);
+extern void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
+					   struct ndpi_flow_struct *flow);
 
 static void ndpi_int_mail_smtp_add_connection(struct ndpi_detection_module_struct
 					      *ndpi_struct, struct ndpi_flow_struct *flow) {
@@ -153,6 +153,7 @@ void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 		  len = i-4;
 		  /* Copy result for nDPI apps */
 		  ndpi_hostname_sni_set(flow, &packet->line[a].ptr[4], len);
+		  NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname [%s]\n", flow->host_server_name);
 
 		  if (ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
 						   flow->host_server_name,
@@ -406,38 +407,40 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-  int rc = 0;
+  int rc;
 
-  if (flow->l4.tcp.smtp_command_bitmask & SMTP_BIT_STARTTLS &&
-      packet->payload_packet_len > 5)
-  {
-    uint8_t const * const block = &packet->payload[5];
-    uint8_t const * const p = &packet->payload[0];
-    uint16_t const block_len = packet->payload_packet_len - 5;
-    uint16_t const l = packet->payload_packet_len;
+  if(flow->l4.tcp.smtp_command_bitmask & SMTP_BIT_STARTTLS) {
 
-    packet->payload = block;
-    packet->payload_packet_len = block_len;
+    /* RFC 3207:
+       "After the client gives the STARTTLS command, the server responds with
+        one of the following reply codes:
+         220 Ready to start TLS
+         501 Syntax error (no parameters allowed)
+         454 TLS not available due to temporary reason"
+    */
 
-    if (processTLSBlock(ndpi_struct, flow) != 0) {
+    if(ndpi_struct->opportunistic_tls_smtp_enabled &&
+       packet->payload_packet_len > 3 && memcmp(packet->payload, "220", 3) == 0) {
       rc = 1;
-    }
-
-    packet->payload = p;
-    packet->payload_packet_len = l;
-
-    /* STARTTLS may be followed by a 220 - Service ready */
-    if (rc == 0 && memcmp(packet->payload, "220", 3) != 0)
-    {
-      flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
-      if (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN) {
-        ndpi_set_detected_protocol(ndpi_struct, flow,
-                                   NDPI_PROTOCOL_MAIL_SMTPS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      /* Switch classification to SMTPS, keeping the hostname sub-classification (if any) */
+      if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
+	 flow->detected_protocol_stack[0] != NDPI_PROTOCOL_MAIL_SMTP) {
+	ndpi_set_detected_protocol(ndpi_struct, flow,
+                                   flow->detected_protocol_stack[0], NDPI_PROTOCOL_MAIL_SMTPS, NDPI_CONFIDENCE_DPI);
+	/* Now it is safe to write to `flow->protos.tls_quic` union */
+	flow->protos.tls_quic.subprotocol_detected = 1;
       } else {
         ndpi_set_detected_protocol(ndpi_struct, flow,
-                                   flow->guessed_host_protocol_id, NDPI_PROTOCOL_MAIL_SMTPS, NDPI_CONFIDENCE_DPI);
+                                   NDPI_PROTOCOL_MAIL_SMTPS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       }
+      NDPI_LOG_DBG(ndpi_struct, "Switching to [%d/%d]\n",
+                   flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+      /* We are done (in SMTP dissector): delegating TLS... */
+      switch_extra_dissection_to_tls(ndpi_struct, flow);
+    } else {
+      rc = 0; /* Something went wrong. Stop extra dissection */
     }
+
   } else {
     ndpi_search_mail_smtp_tcp(ndpi_struct, flow);
     rc = ((flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') &&

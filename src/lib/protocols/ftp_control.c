@@ -29,6 +29,9 @@
 
 // #define FTP_DEBUG
 
+extern void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
+					   struct ndpi_flow_struct *flow);
+
 /* *************************************************************** */
 
 static void ndpi_int_ftp_control_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
@@ -643,10 +646,21 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
 
 	if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0' &&
 	   flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0 &&
-	   flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0) /* TODO: any values on dissecting TLS handshake? */
+	   flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0) {
 	  flow->ftp_control_stage = 0;
-	else
+	} else if (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 &&
+		   ndpi_struct->opportunistic_tls_ftp_enabled) {
+	  flow->host_server_name[0] = '\0'; /* Remove any data set by other dissectors (eg. SMTP) */
+	  /* Switch classification to FTPS */
+	  ndpi_set_detected_protocol(ndpi_struct, flow,
+				     NDPI_PROTOCOL_FTPS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	  NDPI_LOG_DBG(ndpi_struct, "Switching to [%d/%d]\n",
+		       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+	  /* We are done (in FTP dissector): delegating TLS... */
+	  switch_extra_dissection_to_tls(ndpi_struct, flow);
+	} else {
 	  ndpi_int_ftp_control_add_connection(ndpi_struct, flow);
+	}
       } else {
 	NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to FTP_CONTROL, "
 		      "resetting the stage to 0\n");
