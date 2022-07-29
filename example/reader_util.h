@@ -298,6 +298,10 @@ typedef struct ndpi_stats {
   u_int64_t dpi_packet_count[3];
   u_int64_t flow_confidence[NDPI_CONFIDENCE_MAX];
   u_int64_t num_dissector_calls;
+
+  struct ndpi_lru_cache_stats lru_stats[NDPI_LRUCACHE_MAX];
+  struct ndpi_automa_stats automa_stats[NDPI_AUTOMA_MAX];
+  struct ndpi_patricia_tree_stats patricia_stats[NDPI_PTREE_MAX];
 } ndpi_stats_t;
 
 
