@@ -3,6 +3,21 @@ Guessed flow protos:	0
 DPI Packets (UDP):	256	(1.04 pkts/flow)
 Confidence DPI              : 245 (flows)
 Num dissector calls: 21874 (89.28 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   490/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   1458/18 (search/found)
 
 DNScrypt	488	309562	245
 

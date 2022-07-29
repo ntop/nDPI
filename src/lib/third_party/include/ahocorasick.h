@@ -212,6 +212,11 @@ struct ac_path {
   unsigned short int idx,l;
 };
 
+struct ac_stats {
+  uint64_t n_search;
+  uint64_t n_found;
+};
+
 typedef struct
 {
   /* The root of the Aho-Corasick trie */
@@ -236,6 +241,7 @@ typedef struct
   int add_to_range; /* for convert to range */
   int n_oc,n_range,n_find; /* statistics */
   char name[32]; /* if debug != 0 */
+  struct ac_stats stats;
 } AC_AUTOMATA_t;
 
 typedef AC_ERROR_t (*NODE_CALLBACK_f)(AC_AUTOMATA_t *, AC_NODE_t *,int idx, void *);
@@ -266,4 +272,5 @@ void            ac_automata_enable_debug (int debug);
 /* See man open_memstream() for get result as string */
 void            ac_automata_dump     (AC_AUTOMATA_t * thiz, FILE *);
 #endif
+void            ac_automata_get_stats(AC_AUTOMATA_t * thiz, struct ac_stats *stats);
 #endif

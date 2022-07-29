@@ -3,6 +3,21 @@ Guessed flow protos:	797
 DPI Packets (TCP):	797	(1.00 pkts/flow)
 Confidence DPI              : 797 (flows)
 Num dissector calls: 11955 (15.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+Automa host:          1554/0 (search/found)
+Automa domain:        777/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     777/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   1594/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   3188/0 (search/found)
 
 HTTP	797	191003	797
 
