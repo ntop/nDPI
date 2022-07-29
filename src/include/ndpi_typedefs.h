@@ -595,55 +595,13 @@ typedef enum {
 	      NDPI_HTTP_METHOD_RPC_OUT_DATA,
 } ndpi_http_method;
 
-typedef enum {
-  NDPI_PTREE_RISK_MASK = 0,
-  NDPI_PTREE_RISK,
-  NDPI_PTREE_PROTOCOLS,
-
-  NDPI_PTREE_MAX	/* Last one! */
-} ptree_type;
-
-typedef enum {
-  NDPI_AUTOMA_HOST = 0,
-  NDPI_AUTOMA_DOMAIN,
-  NDPI_AUTOMA_TLS_CERT,
-  NDPI_AUTOMA_RISK_MASK,
-  NDPI_AUTOMA_COMMON_ALPNS,
-
-  NDPI_AUTOMA_MAX	/* Last one! */
-} automa_type;
-
-struct ndpi_automa_stats {
-  u_int64_t n_search;
-  u_int64_t n_found;
-};
-
-typedef enum {
-  NDPI_LRUCACHE_OOKLA = 0,
-  NDPI_LRUCACHE_BITTORRENT,
-  NDPI_LRUCACHE_ZOOM,
-  NDPI_LRUCACHE_STUN,
-  NDPI_LRUCACHE_TLS_CERT,
-  NDPI_LRUCACHE_MINING,
-  NDPI_LRUCACHE_MSTEAMS,
-
-  NDPI_LRUCACHE_MAX	/* Last one! */
-} lru_cache_type;
-
 struct ndpi_lru_cache_entry {
   u_int32_t key; /* Store the whole key to avoid ambiguities */
   u_int32_t is_full:1, value:16, pad:15;
 };
 
-struct ndpi_lru_cache_stats {
-  u_int64_t n_insert;
-  u_int64_t n_search;
-  u_int64_t n_found;
-};
-
 struct ndpi_lru_cache {
   u_int32_t num_entries;
-  struct ndpi_lru_cache_stats stats;
   struct ndpi_lru_cache_entry *entries;
 };
 
@@ -1055,7 +1013,6 @@ typedef struct ndpi_default_ports_tree_node {
 
 typedef struct _ndpi_automa {
   void *ac_automa; /* Real type is AC_AUTOMATA_t */
-  struct ndpi_automa_stats stats;
 } ndpi_automa;
 
 typedef struct ndpi_str_hash {
@@ -1154,27 +1111,22 @@ struct ndpi_detection_module_struct {
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
     risky_domain_automa, tls_cert_subject_automa,
     host_risk_mask_automa, common_alpns_automa;
-  /* IMPORTANT: please, whenever you add a new automa:
-       * update ndpi_finalize_initialization()
-       * update automa_type above
-  */
-
   ndpi_str_hash *malicious_ja3_hashmap, *malicious_sha1_hashmap;
+  /* IMPORTANT: please update ndpi_finalize_initialization() whenever you add a new automa */
 
   ndpi_list *trusted_issuer_dn;
   
   void *ip_risk_mask_ptree;
   void *ip_risk_ptree;
-  /* IP-based protocol detection */
-  void *protocols_ptree;
   
-  /* *** If you add a new Patricia tree, please update ptree_type above! *** */
-
   struct {
     ndpi_automa hostnames, hostnames_shadow;
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
     u_int8_t categories_loaded;
   } custom_categories;
+
+  /* IP-based protocol detection */
+  void *protocols_ptree;
 
   u_int8_t ip_version_limit;
 
@@ -1201,8 +1153,6 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_cache;
-
-  /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 

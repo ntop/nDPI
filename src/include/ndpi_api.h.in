@@ -926,28 +926,6 @@ extern "C" {
   void ndpi_finalize_automa(void *_automa);
 
   /**
-   * Get the automa statistics
-   *
-   * @par     The automata initialized with ndpi_init_automa();
-   *
-   */
-
-  void ndpi_automa_get_stats(void *_automa, struct ndpi_automa_stats *stats);
-
-  /**
-   * Get the statistics of one of the automas used internally by the library
-   *
-   * @par     ndpi_mod = the detection module
-   * @par     automa_type = of which automa we want the stats
-   * @par     stats = buffer where to save the stats
-   * @return  0 in case of no error, or -1 if an error occurred.
-   *
-   */
-
-  int ndpi_get_automa_stats(struct ndpi_detection_module_struct *ndpi_struct,
-			    automa_type automa_type,
-			    struct ndpi_automa_stats *stats);
-  /**
    * Add a string to match to an automata
    *
    * @par     The automata initialized with ndpi_init_automa();
@@ -1004,11 +982,6 @@ extern "C" {
   u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
 			       u_int16_t *value, u_int8_t clean_key_when_found);
   void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value);
-  void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats);
-
-  int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
-			       lru_cache_type cache_type,
-			       struct ndpi_lru_cache_stats *stats);
 
   /**
    * Find a protocol id associated with a string automata
@@ -1123,11 +1096,6 @@ extern "C" {
   ndpi_prefix_t *ndpi_patricia_get_node_prefix(ndpi_patricia_node_t *node);
   u_int16_t ndpi_patricia_get_node_bits(ndpi_patricia_node_t *node);
   u_int16_t ndpi_patricia_get_maxbits(ndpi_patricia_tree_t *tree);
-  void ndpi_patricia_get_stats(ndpi_patricia_tree_t *tree, struct ndpi_patricia_tree_stats *stats);
-
-  int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
-                              ptree_type ptree_type,
-                              struct ndpi_patricia_tree_stats *stats);
 
   /* ptree (trie) API - a wrapper on top of Patricia that seamlessly handle IPv4 and IPv6 */
   ndpi_ptree_t* ndpi_ptree_create(void);
