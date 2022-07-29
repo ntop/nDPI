@@ -629,6 +629,9 @@ static void dump_node_header(AC_NODE_t * n, struct aho_dump_info *ai) {
 static AC_ERROR_t dump_node_common(AC_AUTOMATA_t * thiz,
         AC_NODE_t * n, int idx, void *data) {
     struct aho_dump_info *ai = (struct aho_dump_info *)data;
+
+    if(!ai) return ACERR_ERROR;
+
     char *rstr = ai->bufstr;
 
     if(idx) return ACERR_SUCCESS;
