@@ -8236,6 +8236,9 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
   switch(proto) {
   case NDPI_PROTOCOL_TLS:
   case NDPI_PROTOCOL_DTLS:
+  case NDPI_PROTOCOL_MAIL_POPS:
+  case NDPI_PROTOCOL_MAIL_IMAPS:
+  case NDPI_PROTOCOL_MAIL_SMTPS:
   case NDPI_PROTOCOL_HTTP:
   case NDPI_PROTOCOL_HTTP_PROXY:
   case NDPI_PROTOCOL_HTTP_CONNECT:
