@@ -2289,7 +2289,7 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 		   struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		   char *risk_message) {
   /* Check if the risk is not yet set */
-  if(!ndpi_isset_risk(ndpi_str, flow, r)) {
+  if(flow && !ndpi_isset_risk(ndpi_str, flow, r)) {
     ndpi_risk v = 1ull << r;
     
     // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
