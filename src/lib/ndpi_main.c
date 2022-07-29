@@ -2039,38 +2039,6 @@ u_int16_t ndpi_patricia_get_maxbits(ndpi_patricia_tree_t *tree) {
 
 /* ******************************************************************** */
 
-void ndpi_patricia_get_stats(ndpi_patricia_tree_t *tree, struct ndpi_patricia_tree_stats *stats) {
-  if(tree) {
-    stats->n_search = tree->stats.n_search;
-    stats->n_found = tree->stats.n_found;
-  } else {
-    stats->n_search = 0;
-    stats->n_found = 0;
-  }
-}
-
-/* ******************************************************************** */
-
-int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
-                          ptree_type ptree_type,
-                          struct ndpi_patricia_tree_stats *stats) {
-  switch(ptree_type) {
-  case NDPI_PTREE_RISK_MASK:
-    ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->ip_risk_mask_ptree, stats);
-    return 0;
-  case NDPI_PTREE_RISK:
-    ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->ip_risk_ptree, stats);
-    return 0;
-  case NDPI_PTREE_PROTOCOLS:
-    ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->protocols_ptree, stats);
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-/* ****************************************************** */
-
 int ndpi_fill_prefix_v4(ndpi_prefix_t *p, const struct in_addr *a, int b, int mb) {
   if(b < 0 || b > mb)
     return(-1);
@@ -2869,43 +2837,6 @@ void ndpi_free_automa(void *_automa) {
 
 void ndpi_finalize_automa(void *_automa) {
   ac_automata_finalize((AC_AUTOMATA_t *) _automa);
-}
-
-/* ****************************************************** */
-
-void ndpi_automa_get_stats(void *_automa, struct ndpi_automa_stats *stats) {
-  struct ac_stats ac_stats;
-
-  ac_automata_get_stats((AC_AUTOMATA_t *) _automa, &ac_stats);
-  stats->n_search = ac_stats.n_search;
-  stats->n_found = ac_stats.n_found;
-}
-
-/* ****************************************************** */
-
-int ndpi_get_automa_stats(struct ndpi_detection_module_struct *ndpi_struct,
-			  automa_type automa_type,
-			  struct ndpi_automa_stats *stats)
-{
-  switch(automa_type) {
-  case NDPI_AUTOMA_HOST:
-    ndpi_automa_get_stats(ndpi_struct->host_automa.ac_automa, stats);
-    return 0;
-  case NDPI_AUTOMA_DOMAIN:
-    ndpi_automa_get_stats(ndpi_struct->risky_domain_automa.ac_automa, stats);
-    return 0;
-  case NDPI_AUTOMA_TLS_CERT:
-    ndpi_automa_get_stats(ndpi_struct->tls_cert_subject_automa.ac_automa, stats);
-    return 0;
-  case NDPI_AUTOMA_RISK_MASK:
-    ndpi_automa_get_stats(ndpi_struct->host_risk_mask_automa.ac_automa, stats);
-    return 0;
-  case NDPI_AUTOMA_COMMON_ALPNS:
-    ndpi_automa_get_stats(ndpi_struct->common_alpns_automa.ac_automa, stats);
-    return 0;
-  default:
-    return -1;
-  }
 }
 
 /* ****************************************************** */
@@ -8122,7 +8053,7 @@ void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){
 
 /* LRU cache */
 struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries) {
-  struct ndpi_lru_cache *c = (struct ndpi_lru_cache *) ndpi_calloc(1, sizeof(struct ndpi_lru_cache));
+  struct ndpi_lru_cache *c = (struct ndpi_lru_cache *) ndpi_malloc(sizeof(struct ndpi_lru_cache));
 
   if(!c)
     return(NULL);
@@ -8147,12 +8078,10 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
 			     u_int16_t *value, u_int8_t clean_key_when_found) {
   u_int32_t slot = key % c->num_entries;
 
-  c->stats.n_search++;
   if(c->entries[slot].is_full && c->entries[slot].key == key) {
     *value = c->entries[slot].value;
     if(clean_key_when_found)
       c->entries[slot].is_full = 0;
-    c->stats.n_found++;
     return(1);
   } else
     return(0);
@@ -8161,51 +8090,7 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
 void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value) {
   u_int32_t slot = key % c->num_entries;
 
-  c->stats.n_insert++;
   c->entries[slot].is_full = 1, c->entries[slot].key = key, c->entries[slot].value = value;
-}
-
-void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats) {
-  if(c) {
-    stats->n_insert = c->stats.n_insert;
-    stats->n_search = c->stats.n_search;
-    stats->n_found = c->stats.n_found;
-  } else {
-    stats->n_insert = 0;
-    stats->n_search = 0;
-    stats->n_found = 0;
-  }
-}
-
-int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
-			     lru_cache_type cache_type,
-			     struct ndpi_lru_cache_stats *stats)
-{
-  switch(cache_type) {
-  case NDPI_LRUCACHE_OOKLA:
-    ndpi_lru_get_stats(ndpi_struct->ookla_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_BITTORRENT:
-    ndpi_lru_get_stats(ndpi_struct->bittorrent_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_ZOOM:
-    ndpi_lru_get_stats(ndpi_struct->zoom_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_STUN:
-    ndpi_lru_get_stats(ndpi_struct->stun_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_TLS_CERT:
-    ndpi_lru_get_stats(ndpi_struct->tls_cert_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_MINING:
-    ndpi_lru_get_stats(ndpi_struct->mining_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_MSTEAMS:
-    ndpi_lru_get_stats(ndpi_struct->msteams_cache, stats);
-    return 0;
-  default:
-    return -1;
-  }
 }
 
 /* ******************************************************************** */
