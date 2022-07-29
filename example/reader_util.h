@@ -162,6 +162,7 @@ enum info_type {
     INFO_INVALID = 0,
     INFO_GENERIC,
     INFO_KERBEROS,
+    INFO_SOFTETHER,
     INFO_FTP_IMAP_POP_SMTP,
     INFO_TLS_QUIC_ALPN_VERSION,
     INFO_TLS_QUIC_ALPN_ONLY,
@@ -227,6 +228,12 @@ typedef struct ndpi_flow_info {
       char hostname[85];
       char username[86];
     } kerberos;
+    struct {
+      char ip[16];
+      char port[6];
+      char hostname[48];
+      char fqdn[48];
+    } softether;
   };
 
   char flow_extra_info[16];

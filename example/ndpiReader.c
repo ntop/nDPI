@@ -1462,6 +1462,25 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
         }
         break;
 
+      case INFO_SOFTETHER:
+        if (flow->softether.ip[0] != '\0')
+        {
+          fprintf(out, "[Client IP: %s]", flow->softether.ip);
+        }
+        if (flow->softether.port[0] != '\0')
+        {
+          fprintf(out, "[Client Port: %s]", flow->softether.port);
+        }
+        if (flow->softether.hostname[0] != '\0')
+        {
+          fprintf(out, "[Hostname: %s]", flow->softether.hostname);
+        }
+        if (flow->softether.fqdn[0] != '\0')
+        {
+          fprintf(out, "[FQDN: %s]", flow->softether.fqdn);
+        }
+        break;
+
       case INFO_FTP_IMAP_POP_SMTP:
         if (flow->ftp_imap_pop_smtp.username[0] != '\0')
         {
@@ -1886,6 +1905,13 @@ static void printFlowSerialized(u_int16_t thread_id,
         ndpi_serialize_string_string(serializer, "username",
                                      flow->kerberos.username);
       }
+      break;
+
+    case INFO_SOFTETHER:
+      ndpi_serialize_string_string(serializer, "client_ip", flow->softether.ip);
+      ndpi_serialize_string_string(serializer, "client_port", flow->softether.port);
+      ndpi_serialize_string_string(serializer, "hostname", flow->softether.hostname);
+      ndpi_serialize_string_string(serializer, "fqdn", flow->softether.fqdn);
       break;
 
     case INFO_FTP_IMAP_POP_SMTP:
