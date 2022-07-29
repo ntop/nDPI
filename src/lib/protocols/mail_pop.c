@@ -46,6 +46,7 @@
 static void ndpi_int_mail_pop_add_connection(struct ndpi_detection_module_struct
 					     *ndpi_struct, struct ndpi_flow_struct *flow) {
 
+  NDPI_LOG_INFO(ndpi_struct, "mail_pop identified\n");
   flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN; /* Avoid POP3S to be used s sub-protocol */
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_POP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
@@ -185,12 +186,12 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
 
     if((bit_count + flow->l4.tcp.mail_pop_stage) >= 3) {
       if(flow->l4.tcp.mail_pop_stage > 0) {
-	NDPI_LOG_INFO(ndpi_struct, "mail_pop identified\n");
 	
 	if((flow->l4.tcp.ftp_imap_pop_smtp.password[0] != '\0')
 	   || (flow->l4.tcp.mail_pop_stage > 3)) {
 	  ndpi_int_mail_pop_add_connection(ndpi_struct, flow);
-	  popInitExtraPacketProcessing(flow);
+	  if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0')
+	    popInitExtraPacketProcessing(flow);
 	}
       }
       

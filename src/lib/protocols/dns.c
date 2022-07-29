@@ -370,6 +370,9 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
   /* possibly dissect the DNS reply */
   ndpi_search_dns(ndpi_struct, flow);
 
+  if(flow->protos.dns.num_answers != 0)
+    return(0);
+
   /* Possibly more processing */
   return(1);
 }

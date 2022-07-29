@@ -936,7 +936,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     u_int8_t content_type;
 
     if(message->buffer_used < 5)
-      return(1); /* Keep working */
+      break;
 
     len = (message->buffer[3] << 8) + message->buffer[4] + 5;
 
@@ -1074,6 +1074,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   if(something_went_wrong
      || ((ndpi_struct->num_tls_blocks_to_follow > 0)
 	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
+     || ((ndpi_struct->num_tls_blocks_to_follow == 0)
+	 && (flow->l4.tcp.tls.certificate_processed == 1))
      ) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
@@ -1187,7 +1189,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = p;
   packet->payload_packet_len = p_len; /* Restore */
 
-  if(no_dtls || change_cipher_found) {
+  if(no_dtls || change_cipher_found || flow->l4.tcp.tls.certificate_processed) {
     NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
     flow->check_extra_packets = 0;
     flow->extra_packets_func = NULL;
