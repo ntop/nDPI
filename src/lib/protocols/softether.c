@@ -255,7 +255,7 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
     payload_len -= value_siz;
   }
 
-  if (payload_len != 0)
+  if (payload_len != 0 || tuple_count != 0)
   {
     return 1;
   }
