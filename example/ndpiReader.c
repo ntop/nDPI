@@ -1588,15 +1588,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[ESNI Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.encrypted_sni.cipher_suite));
     }
 
-    if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-       || (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)) {
-      if(flow->ssh_tls.sha1_cert_fingerprint_set) {
-	fprintf(out, "[Certificate SHA-1: ");
-	for(i=0; i<20; i++)
-	  fprintf(out, "%s%02X", (i > 0) ? ":" : "",
-		  flow->ssh_tls.sha1_cert_fingerprint[i] & 0xFF);
-	fprintf(out, "]");
-      }
+    if(flow->ssh_tls.sha1_cert_fingerprint_set) {
+      fprintf(out, "[Certificate SHA-1: ");
+      for(i=0; i<20; i++)
+        fprintf(out, "%s%02X", (i > 0) ? ":" : "",
+                flow->ssh_tls.sha1_cert_fingerprint[i] & 0xFF);
+      fprintf(out, "]");
     }
 
 #ifdef HEURISTICS_CODE

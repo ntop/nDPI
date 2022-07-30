@@ -1,6 +1,6 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	3	(3.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
 Num dissector calls: 3 (3.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
