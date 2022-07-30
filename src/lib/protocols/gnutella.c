@@ -33,8 +33,9 @@ static void ndpi_int_gnutella_add_connection(struct ndpi_detection_module_struct
 					     struct ndpi_flow_struct *flow,
 					     ndpi_confidence_t confidence)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA, NDPI_PROTOCOL_UNKNOWN, confidence);
   NDPI_LOG_INFO(ndpi_struct, "found GNUTELLA\n");
+  ndpi_set_detected_protocol_keeping_master(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA,
+					    confidence);
 }
 
 void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

@@ -344,9 +344,6 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
   if(flow->extra_packets_func && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN))
      return; /* Nothing new to add */
 
-  /* This is HTTP and it is not a sub protocol (e.g. skype or dropbox) */
-  ndpi_search_tcp_or_udp(ndpi_struct, flow);
-
   /* If no custom protocol has been detected */
   if((flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
      || ((http_protocol != NDPI_PROTOCOL_HTTP) &&
@@ -363,9 +360,14 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
           flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_PROXY)
     master_protocol = flow->detected_protocol_stack[0];
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id,
-			     master_protocol,
-			     NDPI_CONFIDENCE_DPI);
+  /* Update the classification only if we don't already have master + app;
+     for example don't change the protocols if we have already detected a
+     sub-protocol via the (content-matched) subprotocols logic (i.e.
+     MPEGDASH, SOAP, ....) */
+  if(flow->detected_protocol_stack[1] == 0)
+    ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id,
+			       master_protocol,
+			       NDPI_CONFIDENCE_DPI);
 
   /* This is necessary to inform the core to call this dissector again */
   flow->check_extra_packets = 1;
