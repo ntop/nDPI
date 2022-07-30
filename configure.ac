@@ -57,8 +57,8 @@ AS_IF([test "${with_thread_sanitizer+set}" = set],[
 ])
 
 AS_IF([test "${with_memory_sanitizer+set}" = set],[
-  NDPI_CFLAGS="${CFLAGS} -fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer"
-  NDPI_LDFLAGS="${LDFLAGS} -fsanitize=memory"
+  NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer"
+  NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=memory"
 ])
 
 AS_IF([test "x${enable_code_coverage}" = "xyes"],[

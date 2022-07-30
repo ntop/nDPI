@@ -654,7 +654,7 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
   /* NDPI_PROTOCOL_MAIL_IMAP */
-  /* NDPI_PROTOCOL_MAIL_FTP */
+  /* NDPI_PROTOCOL_FTP_CONTROL */
   /* TODO: something clever to save memory */
   struct {
     u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;

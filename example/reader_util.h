@@ -236,6 +236,8 @@ typedef struct ndpi_flow_info {
     } softether;
   };
 
+  ndpi_serializer ndpi_flow_serializer;
+
   char flow_extra_info[16];
   char host_server_name[80]; /* Hostname/SNI */
   char *bittorent_hash;
@@ -348,7 +350,7 @@ typedef struct ndpi_workflow {
   u_int32_t num_allocated_flows;
 
   /* CSV,TLV,JSON serialization interface */
-  ndpi_serializer ndpi_serializer;
+  ndpi_serialization_format ndpi_serialization_format;
 } ndpi_workflow_t;
 
 

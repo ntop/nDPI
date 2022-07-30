@@ -66,8 +66,6 @@ typedef uint           u_int32_t;
 typedef uint           u_int;
 typedef unsigned       __int64 u_int64_t;
 
-#define gmtime_r(a, b)                  memcpy(b, gmtime(a), sizeof(struct tm))
-
 #define timegm                          _mkgmtime
 
 #define sleep(a /* sec */)              Sleep(1000*a /* ms */)

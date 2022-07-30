@@ -1060,11 +1060,14 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
-  if ((serialization_fp == NULL && serialization_format != ndpi_serialization_format_unknown) ||
-      (serialization_fp != NULL && serialization_format == ndpi_serialization_format_unknown))
+  if (serialization_fp == NULL && serialization_format != ndpi_serialization_format_unknown)
   {
-    printf("Serializing detection results to a file requires command line arguments -k AND -K\n");
+    printf("Serializing detection results to a file requires command line arguments `-k'\n");
     exit(1);
+  }
+  if (serialization_fp != NULL && serialization_format == ndpi_serialization_format_unknown)
+  {
+    serialization_format = ndpi_serialization_format_json;
   }
 
   if(extcap_exit)
@@ -1584,8 +1587,10 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_tls.tls_subjectDN) fprintf(out, "[Subject: %s]", flow->ssh_tls.tls_subjectDN);
 
     if(flow->ssh_tls.encrypted_sni.esni) {
+      char unknown_cipher[8];
       fprintf(out, "[ESNI: %s]", flow->ssh_tls.encrypted_sni.esni);
-      fprintf(out, "[ESNI Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.encrypted_sni.cipher_suite));
+      fprintf(out, "[ESNI Cipher: %s]",
+              ndpi_cipher2str(flow->ssh_tls.encrypted_sni.cipher_suite, unknown_cipher));
     }
 
     if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
@@ -1608,8 +1613,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_tls.notBefore && flow->ssh_tls.notAfter) {
       char notBefore[32], notAfter[32];
       struct tm a, b;
-      struct tm *before = gmtime_r(&flow->ssh_tls.notBefore, &a);
-      struct tm *after  = gmtime_r(&flow->ssh_tls.notAfter, &b);
+      struct tm *before = ndpi_gmtime_r(&flow->ssh_tls.notBefore, &a);
+      struct tm *after  = ndpi_gmtime_r(&flow->ssh_tls.notAfter, &b);
 
       strftime(notBefore, sizeof(notBefore), "%Y-%m-%d %H:%M:%S", before);
       strftime(notAfter, sizeof(notAfter), "%Y-%m-%d %H:%M:%S", after);
@@ -1617,7 +1622,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[Validity: %s - %s]", notBefore, notAfter);
     }
 
-    if(flow->ssh_tls.server_cipher != '\0') fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher));
+    char unknown_cipher[8];
+    if(flow->ssh_tls.server_cipher != '\0')
+    {
+      fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher, unknown_cipher));
+    }
     if(flow->bittorent_hash != NULL) fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint != NULL) fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
     if(flow->dhcp_class_ident) fprintf(out, "[DHCP Class Ident: %s]",
@@ -1642,69 +1651,17 @@ static void printFlowSerialized(u_int16_t thread_id,
 {
   char *json_str = NULL;
   u_int32_t json_str_len = 0;
-  ndpi_serializer * const serializer = &ndpi_thread_info[thread_id].workflow->ndpi_serializer;
+  ndpi_serializer * const serializer = &flow->ndpi_flow_serializer;
   //float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
   double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
-  u_int8_t known_tls;
-  char buf[64];
   float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
 
-  ndpi_reset_serializer(serializer);
-
   ndpi_serialize_string_uint32(serializer, "flow_id", flow->flow_id);
-  ndpi_serialize_string_uint32(serializer, "l4_protocol", flow->protocol);
   ndpi_serialize_string_float(serializer, "first_seen_ms", f, "%.3f");
   ndpi_serialize_string_float(serializer, "last_seen_ms", l, "%.3f");
   ndpi_serialize_string_float(serializer, "duration_ms", (l-f)/1000.0, "%.3f");
-  ndpi_serialize_string_string(serializer, "src_name", flow->src_name);
-  ndpi_serialize_string_string(serializer, "dst_name", flow->dst_name);
-  ndpi_serialize_string_uint32(serializer, "src_port", ntohs(flow->src_port));
-  ndpi_serialize_string_uint32(serializer, "dst_port", ntohs(flow->dst_port));
-  ndpi_serialize_string_uint32(serializer, "ip_version", flow->ip_version);
   ndpi_serialize_string_uint32(serializer, "vlan_id", flow->vlan_id);
   ndpi_serialize_string_uint32(serializer, "bidirectional", flow->bidirectional);
-  ndpi_serialize_string_uint32(serializer, "encrypted",
-                               ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                                       flow->detected_protocol));
-  ndpi_serialize_string_string(serializer, "confidence",
-                               ndpi_confidence_get_name(flow->confidence));
-  ndpi_serialize_string_uint32(serializer, "category_id",
-                               flow->detected_protocol.category);
-  ndpi_serialize_string_string(
-    serializer, "category_name",
-    ndpi_category_get_name(
-      ndpi_thread_info[thread_id].workflow->ndpi_struct,
-      flow->detected_protocol.category
-    )
-  );
-
-  ndpi_serialize_string_string(serializer, "l7_protocol_id",
-                               ndpi_protocol2id(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                               flow->detected_protocol, buf, sizeof(buf)));
-  ndpi_serialize_string_string(serializer, "l7_protocol_name",
-                               ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                               flow->detected_protocol, buf, sizeof(buf)));
-  ndpi_serialize_start_of_list(serializer, "risks");
-  if (flow->risk != NDPI_NO_RISK)
-  {
-    u_int32_t i;
-
-    for(i = 0; i < NDPI_MAX_RISK; ++i)
-    {
-      if (NDPI_ISSET_BIT(flow->risk, i) != 0)
-      {
-        ndpi_serialize_string_string(serializer, "str", ndpi_risk2str(i));
-      }
-    }
-  }
-  ndpi_serialize_end_of_list(serializer);
-  {
-    u_int16_t cli_score, srv_score;
-    ndpi_serialize_string_uint32(serializer, "risks_score",
-                                 ndpi_risk2score(flow->risk, &cli_score, &srv_score));
-  }
-  ndpi_serialize_string_string(serializer, "host_server_name",
-                               flow->host_server_name);
 
   /* XFER Packets/Bytes */
   ndpi_serialize_start_of_block(serializer, "xfer");
@@ -1804,137 +1761,6 @@ static void printFlowSerialized(u_int16_t thread_id,
   /* TCP window */
   ndpi_serialize_string_uint32(serializer, "c_to_s_init_win", flow->c_to_s_init_win);
   ndpi_serialize_string_uint32(serializer, "s_to_c_init_win", flow->s_to_c_init_win);
-
-  /* Protocol specific serialization */
-  ndpi_serialize_start_of_block(serializer, "l7_protocol_data");
-  if (flow->ssh_tls.server_info[0] != '\0')
-  {
-    ndpi_serialize_string_string(serializer, "server_info", flow->ssh_tls.server_info);
-  }
-
-  if (flow->ssh_tls.server_names != NULL)
-  {
-    ndpi_serialize_string_string(serializer, "server_names", flow->ssh_tls.server_names);
-  }
-
-  if (flow->ssh_tls.ssl_version != 0)
-  {
-    ndpi_ssl_version2str(buf, sizeof(buf), flow->ssh_tls.ssl_version, &known_tls);
-    ndpi_serialize_string_string(serializer, "version", buf);
-  }
-
-  if (flow->ssh_tls.ja3_client[0] != '\0')
-  {
-    ndpi_serialize_string_string(serializer, "ja3_client", flow->ssh_tls.ja3_client);
-  }
-
-  if (flow->ssh_tls.ja3_server[0] != '\0')
-  {
-    ndpi_serialize_string_string(serializer, "ja3_server", flow->ssh_tls.ja3_server);
-  }
-
-  if (flow->ssh_tls.tls_issuerDN != NULL)
-  {
-    ndpi_serialize_string_string(serializer, "issuerDN", flow->ssh_tls.tls_issuerDN);
-  }
-
-  if (flow->ssh_tls.tls_subjectDN != NULL)
-  {
-    ndpi_serialize_string_string(serializer, "subjectDN", flow->ssh_tls.tls_subjectDN);
-  }
-
-  if (flow->ssh_tls.client_hassh[0] != '\0')
-  {
-    ndpi_serialize_string_string(serializer, "client_hassh", flow->ssh_tls.client_hassh);
-  }
-
-  if (flow->ssh_tls.server_hassh[0] != '\0')
-  {
-    ndpi_serialize_string_string(serializer, "server_hassh", flow->ssh_tls.server_hassh);
-  }
-
-  if (flow->http.user_agent[0] != '\0')
-  {
-    ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
-  }
-
-  if (flow->http.url[0] != '\0')
-  {
-    ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
-    if (risk != NDPI_NO_RISK)
-    {
-      NDPI_SET_BIT(flow->risk, risk);
-    }
-
-    ndpi_serialize_string_string(serializer, "url", flow->http.url);
-    ndpi_serialize_string_uint32(serializer, "code", flow->http.response_status_code);
-    if (flow->http.request_content_type[0] != '\0')
-    {
-      ndpi_serialize_string_string(serializer, "req_content_type",
-                                   flow->http.request_content_type);
-    }
-
-    if (flow->http.content_type[0] != '\0')
-    {
-      ndpi_serialize_string_string(serializer, "content_type",
-                                   flow->http.content_type);
-    }
-  }
-
-  switch (flow->info_type)
-  {
-    case INFO_INVALID:
-      break;
-
-    case INFO_GENERIC:
-      if (flow->info[0] != '\0')
-      {
-        ndpi_serialize_string_string(serializer, "info", flow->info);
-      }
-      break;
-
-    case INFO_KERBEROS:
-      if (flow->kerberos.domain[0] != '\0' ||
-          flow->kerberos.hostname[0] != '\0' ||
-          flow->kerberos.username[0] != '\0')
-      {
-        ndpi_serialize_string_string(serializer, "domain",
-                                     flow->kerberos.domain);
-        ndpi_serialize_string_string(serializer, "hostname",
-                                     flow->kerberos.hostname);
-        ndpi_serialize_string_string(serializer, "username",
-                                     flow->kerberos.username);
-      }
-      break;
-
-    case INFO_SOFTETHER:
-      ndpi_serialize_string_string(serializer, "client_ip", flow->softether.ip);
-      ndpi_serialize_string_string(serializer, "client_port", flow->softether.port);
-      ndpi_serialize_string_string(serializer, "hostname", flow->softether.hostname);
-      ndpi_serialize_string_string(serializer, "fqdn", flow->softether.fqdn);
-      break;
-
-    case INFO_FTP_IMAP_POP_SMTP:
-      ndpi_serialize_string_string(serializer, "username",
-                                   flow->ftp_imap_pop_smtp.username);
-      ndpi_serialize_string_string(serializer, "password",
-                                   flow->ftp_imap_pop_smtp.password);
-      ndpi_serialize_string_uint32(serializer, "auth_failed",
-                                   flow->ftp_imap_pop_smtp.auth_failed);
-      break;
-
-    case INFO_TLS_QUIC_ALPN_VERSION:
-      ndpi_serialize_string_string(serializer, "alpn", flow->tls_quic.alpn);
-      ndpi_serialize_string_string(serializer, "supported_versions",
-                                   flow->tls_quic.tls_supported_versions);
-      break;
-
-    case INFO_TLS_QUIC_ALPN_ONLY:
-      ndpi_serialize_string_string(serializer, "alpn", flow->tls_quic.alpn);
-      break;
-  }
-
-  ndpi_serialize_end_of_block(serializer);
 
   json_str = ndpi_serializer_get_buffer(serializer, &json_str_len);
   if (json_str == NULL || json_str_len == 0)

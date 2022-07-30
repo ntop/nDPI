@@ -1056,7 +1056,7 @@ extern "C" {
   u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_struct,
 					  struct ndpi_flow_struct *flow);
   u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
-  const char* ndpi_cipher2str(u_int32_t cipher);
+  const char* ndpi_cipher2str(u_int32_t cipher, char unknown_cipher[8]);
   const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);

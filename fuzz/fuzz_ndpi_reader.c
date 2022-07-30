@@ -79,7 +79,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   if (pkts == NULL) {
     remove(pcap_path);
     free(pcap_path);
-    ndpi_term_serializer(&workflow->ndpi_serializer);
     return 0;
   }
   if (ndpi_is_datalink_supported(pcap_datalink(pkts)) == 0)
@@ -88,7 +87,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     pcap_close(pkts);
     remove(pcap_path);
     free(pcap_path);
-    ndpi_term_serializer(&workflow->ndpi_serializer);
     return 0;
   }
 

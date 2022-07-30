@@ -486,10 +486,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      time_t theTime;
 
 	      theTime = flow->protos.tls_quic.notBefore;
-	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
+	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", ndpi_gmtime_r(&theTime, &result));
 
 	      theTime = flow->protos.tls_quic.notAfter;
-	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
+	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", ndpi_gmtime_r(&theTime, &result));
 	      	      
 	      snprintf(str, sizeof(str), "%s - %s", b, e);
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_EXPIRED, str); /* Certificate expired */
@@ -500,10 +500,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	      time_t theTime;
 
 	      theTime = flow->protos.tls_quic.notBefore;
-	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
+	      strftime(b, sizeof(b), "%d/%b/%Y %H:%M:%S", ndpi_gmtime_r(&theTime, &result));
 
 	      theTime = flow->protos.tls_quic.notAfter;
-	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", gmtime_r(&theTime, &result));
+	      strftime(e, sizeof(e), "%d/%b/%Y %H:%M:%S", ndpi_gmtime_r(&theTime, &result));
 
 	      snprintf(str, sizeof(str), "%s - %s", b, e);
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE, str); /* Certificate almost expired */
@@ -1438,8 +1438,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       ja3.server.num_cipher = 1, ja3.server.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
       if((flow->protos.tls_quic.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja3.server.cipher[0])) == 1) {
 	char str[64];
+	char unknown_cipher[8];
 
-	snprintf(str, sizeof(str), "Cipher %s", ndpi_cipher2str(ja3.server.cipher[0]));
+	snprintf(str, sizeof(str), "Cipher %s", ndpi_cipher2str(ja3.server.cipher[0], unknown_cipher));
 	ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_WEAK_CIPHER, str);
       }
       
