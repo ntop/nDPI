@@ -709,6 +709,7 @@ struct ndpi_flow_tcp_struct {
 
     /* NDPI_PROTOCOL_TLS */
     u_int8_t certificate_processed:1, fingerprint_set:1, _pad:6;
+    u_int8_t app_data_seen[2];
     u_int8_t num_tls_blocks;
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;

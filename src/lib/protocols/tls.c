@@ -1052,6 +1052,12 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	    ndpi_int_tls_add_connection(ndpi_struct, flow);
 	  }
 
+	/* If we have seen Application Data blocks in both directions, it means
+	   we are after the handshake. Stop extra processing */
+	flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
+	if(flow->l4.tcp.tls.app_data_seen[!packet->packet_direction] == 1)
+	  flow->l4.tcp.tls.certificate_processed = 1;
+
 	if(flow->l4.tcp.tls.certificate_processed) {
 	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
 	    flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
