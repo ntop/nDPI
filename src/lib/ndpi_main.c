@@ -4537,6 +4537,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Softether */
   init_softether_dissector(ndpi_str, &a, detection_bitmask);
 
+  /* Activision */
+  init_activision_dissector(ndpi_str, &a, detection_bitmask);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
