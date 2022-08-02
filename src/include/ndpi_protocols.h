@@ -236,6 +236,7 @@ void init_alicloud_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 void init_avast_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_softether_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 void init_activision_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
+void init_discord_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask);
 
 /* ndpi_main.c */
 extern u_int32_t ndpi_ip_port_hash_funct(u_int32_t ip, u_int16_t port);

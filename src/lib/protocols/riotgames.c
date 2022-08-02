@@ -42,13 +42,6 @@ void ndpi_search_riotgames(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "searching RiotGames\n");
 
-  if (packet->payload_packet_len == 8 &&
-      ntohl(get_u_int32_t(packet->payload, 0)) == 0x1337cafe)
-  {
-    ndpi_int_riotgames_add_connection(ndpi_struct, flow);
-    return;
-  }
-
   if (packet->payload_packet_len > 8 &&
       ntohl(get_u_int32_t(packet->payload, packet->payload_packet_len - 8)) == 0xaaaaaaaa &&
       ntohl(get_u_int32_t(packet->payload, packet->payload_packet_len - 4)) == 0xbbbbbbbb)
