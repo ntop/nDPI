@@ -2670,8 +2670,8 @@ int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args
 
 /* ******************************************* */
 
-struct tm *ndpi_gmtime_r(const time_t *restrict timep,
-                         struct tm *restrict result)
+struct tm *ndpi_gmtime_r(const time_t *timep,
+                         struct tm *result)
 {
 #ifdef WIN32
   gmtime_s(result, timep);
