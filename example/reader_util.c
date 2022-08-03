@@ -1085,6 +1085,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->softether.fqdn, sizeof(flow->softether.fqdn), "%s",
                   flow->ndpi_flow->protos.softether.fqdn);
   }
+  /* DISCORD */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DISCORD) && !is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) &&
+          flow->ndpi_flow->protos.discord.client_ip[0] != '\0') {
+    flow->info_type = INFO_GENERIC;
+    ndpi_snprintf(flow->info, sizeof(flow->info), "Client IP: %s",
+                  flow->ndpi_flow->protos.discord.client_ip);
+  }
   /* DNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DNS)) {
     if(flow->ndpi_flow->protos.dns.rsp_type == 0x1)

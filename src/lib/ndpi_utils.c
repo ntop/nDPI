@@ -1499,6 +1499,14 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
+  case NDPI_PROTOCOL_DISCORD:
+    if (l7_protocol.master_protocol != NDPI_PROTOCOL_TLS) {
+      ndpi_serialize_start_of_block(serializer, "discord");
+      ndpi_serialize_string_string(serializer, "client_ip", flow->protos.discord.client_ip);
+      ndpi_serialize_end_of_block(serializer);
+    }
+    break;
+
   case NDPI_PROTOCOL_SSH:
     ndpi_serialize_start_of_block(serializer, "ssh");
     ndpi_serialize_string_string(serializer,  "client_signature", flow->protos.ssh.client_signature);
