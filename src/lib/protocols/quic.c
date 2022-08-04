@@ -1696,7 +1696,6 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
    * 7) We need to process other packets than (the first) ClientHello/CHLO?
    */
   if(eval_extra_processing(ndpi_struct, flow, version)) {
-    flow->check_extra_packets = 1;
     flow->max_extra_packets_to_check = 24; /* TODO */
     flow->extra_packets_func = ndpi_search_quic_extra;
   } else if(!crypto_data) {

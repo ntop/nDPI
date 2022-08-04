@@ -113,9 +113,6 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 					    confidence);
   
   if(flow->protos.bittorrent.hash[0] == '\0') {
-    /* This is necessary to inform the core to call this dissector again */
-    flow->check_extra_packets = 1;
-    
     /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
     flow->max_extra_packets_to_check = 3;
     flow->extra_packets_func = search_bittorrent_again;

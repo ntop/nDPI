@@ -1094,7 +1094,6 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
 #endif
-    flow->check_extra_packets = 0;
     flow->extra_packets_func = NULL;
     return(0); /* That's all */
   } else
@@ -1205,7 +1204,6 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(no_dtls || change_cipher_found || flow->l4.tcp.tls.certificate_processed) {
     NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
-    flow->check_extra_packets = 0;
     flow->extra_packets_func = NULL;
     return(0); /* That's all */
   } else {
@@ -1218,8 +1216,6 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 static void tlsInitExtraPacketProcessing(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
-  flow->check_extra_packets = 1;
 
   /* At most 12 packets should almost always be enough to find the server certificate if it's there */
   flow->max_extra_packets_to_check = 12 + (ndpi_struct->num_tls_blocks_to_follow*4);
@@ -1277,7 +1273,7 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
 
   if((flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) ||
      (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)) {
-    if(!flow->check_extra_packets)
+    if(!flow->extra_packets_func)
       tlsInitExtraPacketProcessing(ndpi_struct, flow);
     return;
   }

@@ -553,12 +553,12 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol, NDPI_CONFIDENCE_DPI);
 
-      /* This is necessary to inform the core to call this dissector again */
-      flow->check_extra_packets = 1;
-
-      /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
-      flow->max_extra_packets_to_check = 5;
-      flow->extra_packets_func = search_dns_again;
+      /* We have never triggered extra-dissection for LLMNR. Keep the old behaviour */
+      if(ret.master_protocol != NDPI_PROTOCOL_LLMNR) {
+        /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
+        flow->max_extra_packets_to_check = 5;
+        flow->extra_packets_func = search_dns_again;
+      }
       return; /* The response will set the verdict */
     }
 
