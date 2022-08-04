@@ -98,7 +98,7 @@ static size_t dissect_softether_type(enum softether_value_type t,
 
       v->value.ptr.raw = payload + 4;
       u_int32_t siz = ntohl(get_u_int32_t(payload, 0));
-      if(payload_len < siz + 3)
+      if(siz == 0 || payload_len < siz + 3)
 	return 0;
 
       if(t == VALUE_DATA)
@@ -263,9 +263,6 @@ static int dissect_softether_ip_port(struct ndpi_flow_struct *flow,
   if(ip_port_separator == NULL)    
     return 1;    
 
-  if(ip_port_separator < (char const *)packet->payload + NDPI_STATICSTRING_LEN("IP="))    
-    return 1;    
-
   ip_len = ndpi_min(sizeof(flow->protos.softether.ip) - 1,
                     ip_port_separator - (char const *)packet->payload -
                     NDPI_STATICSTRING_LEN("IP="));
@@ -275,16 +272,14 @@ static int dissect_softether_ip_port(struct ndpi_flow_struct *flow,
           ip_len);
   flow->protos.softether.ip[ip_len] = '\0';
 
-  if(ip_port_separator < (char const *)packet->payload +
-     NDPI_STATICSTRING_LEN("IP=") + NDPI_STATICSTRING_LEN(",PORT="))
-    return 1;    
+  if (packet->payload_packet_len < (ip_port_separator - (char const *)packet->payload) +
+                                   NDPI_STATICSTRING_LEN(",PORT="))
+    return 1;
 
   port_len = ndpi_min(sizeof(flow->protos.softether.port) - 1,
-                      ip_port_separator - (char const *)packet->payload -
-                      NDPI_STATICSTRING_LEN("IP=") - NDPI_STATICSTRING_LEN(",PORT="));
-
-  strncpy(flow->protos.softether.port,
-	  ip_port_separator + NDPI_STATICSTRING_LEN(",PORT="),
+                      packet->payload_packet_len - (ip_port_separator - (char const *)packet->payload) -
+                      NDPI_STATICSTRING_LEN(",PORT="));
+  strncpy(flow->protos.softether.port, ip_port_separator + NDPI_STATICSTRING_LEN(",PORT="),
           port_len);
   
   flow->protos.softether.port[port_len] = '\0';
