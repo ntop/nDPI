@@ -378,7 +378,7 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 #endif /* __APPLE__ */
 
 
-#if defined(__MINGW32__)
+#if defined(_WINDOWS_)
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 
