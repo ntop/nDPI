@@ -693,7 +693,7 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
   ndpi_search_kerberos(ndpi_struct, flow);
 
   /* Possibly more processing */
-  return 1;
+  return flow->extra_packets_func != NULL;
 }
 
 void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct,

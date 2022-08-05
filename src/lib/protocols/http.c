@@ -720,7 +720,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     /* Copy result for nDPI apps */
     ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len);
-    flow->extra_packets_func = NULL; /* We're good now */
 
     if(strlen(flow->host_server_name) > 0) {
       ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
