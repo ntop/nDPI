@@ -29,7 +29,7 @@ RC=0
 PCAPS=`cd pcap; /bin/ls *.pcap *.pcapng *.cap`
 
 if [ ! -x "../example/ndpiReader${EXE_SUFFIX}" ]; then
-  echo "$0: Missing $(realpath ../example/ndpiReader${EXE_SUFFIX})"
+  echo "$0: Missing ../example/ndpiReader${EXE_SUFFIX}"
   echo "$0: Run ./configure and make first"
   exit 1
 fi
