@@ -568,7 +568,6 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef KERBEROS_DEBUG
 	      printf("[Kerberos] Setting extra func from AS-REQ\n");
 #endif
-	      flow->check_extra_packets = 1;
 	      flow->max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
 	      flow->extra_packets_func = ndpi_search_kerberos_extra;
 	    } else if(msg_type == 0x0e) /* AS-REQ */ {
@@ -624,7 +623,6 @@ void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 	      printf("[Kerberos] Setting extra func from TGS-REQ\n");
 #endif
 	      if(!packet->udp) {
-	        flow->check_extra_packets = 1;
 	        flow->max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
 	        flow->extra_packets_func = ndpi_search_kerberos_extra;
 	      }

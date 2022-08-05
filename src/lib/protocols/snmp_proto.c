@@ -90,8 +90,6 @@ void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
 	 (offset + 2 < packet->payload_packet_len)) {
 
         if(flow->extra_packets_func == NULL) {
-          /* This is necessary to inform the core to call this dissector again */
-          flow->check_extra_packets = 1;
           flow->max_extra_packets_to_check = 8;
           flow->extra_packets_func = ndpi_search_snmp_again;
         }

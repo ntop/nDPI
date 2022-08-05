@@ -244,7 +244,6 @@ static void popInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
   printf("**** %s()\n", __FUNCTION__);
 #endif
   
-  flow->check_extra_packets = 1;
   /* At most 7 packets should almost always be enough */
   flow->max_extra_packets_to_check = 7;
   flow->extra_packets_func = ndpi_extra_search_mail_pop_tcp;
