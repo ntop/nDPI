@@ -7063,6 +7063,22 @@ u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int
 
 /* ********************************************************************************* */
 
+void ndpi_set_detected_protocol_keeping_master(struct ndpi_detection_module_struct *ndpi_str,
+					       struct ndpi_flow_struct *flow,
+					       u_int16_t detected_protocol,
+					       ndpi_confidence_t confidence) {
+  u_int16_t master;
+
+  master = flow->detected_protocol_stack[1] ? flow->detected_protocol_stack[1] : flow->detected_protocol_stack[0];
+
+  if (master != NDPI_PROTOCOL_UNKNOWN)
+    ndpi_set_detected_protocol(ndpi_str, flow, detected_protocol, master, confidence);
+  else
+    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN, detected_protocol, confidence);
+}
+
+/* ********************************************************************************* */
+
 void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 				ndpi_confidence_t confidence) {

@@ -1,4 +1,4 @@
-Guessed flow protos:	24
+Guessed flow protos:	25
 
 DPI Packets (TCP):	415	(4.23 pkts/flow)
 DPI Packets (UDP):	120	(1.21 pkts/flow)
@@ -39,8 +39,9 @@ Facebook	19	6840	2
 Google	33	54701	5
 LLMNR	91	6931	48
 GoogleServices	17	30330	1
-AmazonAWS	265	845607	20
+AmazonAWS	264	845308	19
 Tencent	1	571	1
+MpegDash	1	299	1
 1kxun	1209	3841345	48
 
 JA3 Host Stats: 
@@ -166,7 +167,7 @@ JA3 Host Stats:
 	116	TCP 192.168.115.8:49596 <-> 203.66.182.87:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][4 pkts/220 bytes <-> 2 pkts/132 bytes][Goodput ratio: 2/0][45.01 sec][bytes ratio: 0.250 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/45002 14999/45002 44996/45002 21211/0][Pkt Len c2s/s2c min/avg/max/stddev: 55/66 55/66 55/66 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	117	UDP 192.168.5.9:68 -> 255.255.255.255:67 [proto: 18/DHCP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/342 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][< 1 sec][Hostname/SNI: joanna-pc][DHCP Fingerprint: 1,15,3,6,44,46,47,31,33,121,249,43,252][DHCP Class Ident: MSFT 5.0][PLAIN TEXT (Joanna)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	118	UDP 192.168.5.41:68 -> 255.255.255.255:67 [proto: 18/DHCP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/342 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][< 1 sec][Hostname/SNI: kevin-pc][DHCP Fingerprint: 1,15,3,6,44,46,47,31,33,121,249,43,252][DHCP Class Ident: MSFT 5.0][PLAIN TEXT (MSFT 5.07)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	119	TCP 192.168.2.126:35666 -> 18.66.2.90:80 [proto: 291.265/MpegDash.AmazonAWS][ClearText][Confidence: DPI][cat: Cloud/13][1 pkts/299 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][< 1 sec][Hostname/SNI: cdn.liftoff.io][User-Agent: Dalvik/2.1.0 (Linux; U; Android 11; sdk_gphone_x86 Build/RSR1.201013.001)][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (GET /customers/45)][Plen Bins: 0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	119	TCP 192.168.2.126:35666 -> 18.66.2.90:80 [proto: 7.291/HTTP.MpegDash][ClearText][Confidence: DPI][cat: Media/1][1 pkts/299 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][< 1 sec][Hostname/SNI: cdn.liftoff.io][URL: cdn.liftoff.io/customers/45d4b09eba/videos/mobile/fd5692dd53042b199e03.mp4][StatusCode: 0][User-Agent: Dalvik/2.1.0 (Linux; U; Android 11; sdk_gphone_x86 Build/RSR1.201013.001)][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (GET /customers/45)][Plen Bins: 0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	120	UDP 192.168.115.8:60724 <-> 8.8.8.8:53 [proto: 5.295/DNS.1kxun][ClearText][Confidence: DPI][cat: Streaming/17][2 pkts/146 bytes <-> 1 pkts/137 bytes][Goodput ratio: 42/69][0.05 sec][Hostname/SNI: pic.1kxun.com][106.187.35.246][Plen Bins: 66,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	121	UDP 192.168.0.104:137 -> 192.168.255.255:137 [proto: 10/NetBIOS][ClearText][Confidence: DPI][cat: System/18][3 pkts/276 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][1.54 sec][Hostname/SNI: sc.arrancar.org][PLAIN TEXT ( FDEDCOEBFC)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	122	UDP 192.168.115.8:51024 <-> 8.8.8.8:53 [proto: 5.295/DNS.1kxun][ClearText][Confidence: DPI][cat: Streaming/17][2 pkts/160 bytes <-> 1 pkts/112 bytes][Goodput ratio: 47/62][0.02 sec][Hostname/SNI: jp.kankan.1kxun.mobi][106.185.35.110][PLAIN TEXT (kankan)][Plen Bins: 0,66,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
