@@ -523,6 +523,11 @@ static void help(u_int long_help) {
 #endif
 
   if(long_help) {
+    printf("\n\nSize of nDPI Flow structure: %u\n"
+           "Sizeof of nDPI Flow protocol union: %zu\n",
+           ndpi_detection_get_sizeof_ndpi_flow_struct(),
+           sizeof(((struct ndpi_flow_struct *)0)->protos));
+
     NDPI_PROTOCOL_BITMASK all;
 
     ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
@@ -1481,6 +1486,25 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
         if (flow->softether.fqdn[0] != '\0')
         {
           fprintf(out, "[FQDN: %s]", flow->softether.fqdn);
+        }
+        break;
+
+      case INFO_TIVOCONNECT:
+        if (flow->tivoconnect.identity_uuid[0] != '\0')
+        {
+          fprintf(out, "[UUID: %s]", flow->tivoconnect.identity_uuid);
+        }
+        if (flow->tivoconnect.machine[0] != '\0')
+        {
+          fprintf(out, "[Machine: %s]", flow->tivoconnect.machine);
+        }
+        if (flow->tivoconnect.platform[0] != '\0')
+        {
+          fprintf(out, "[Platform: %s]", flow->tivoconnect.platform);
+        }
+        if (flow->tivoconnect.services[0] != '\0')
+        {
+          fprintf(out, "[Services: %s]", flow->tivoconnect.services);
         }
         break;
 

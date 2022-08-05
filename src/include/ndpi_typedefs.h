@@ -1447,6 +1447,13 @@ struct ndpi_flow_struct {
       u_int8_t primitive; /* GET, SET... */
       u_int8_t error_status;
     } snmp;
+
+    struct {
+      char identity_uuid[36];
+      char machine[48];
+      char platform[32];
+      char services[48];
+    } tivoconnect;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/
@@ -1523,6 +1530,17 @@ struct ndpi_flow_struct {
    */
   u_int8_t priv_data[16];
 };
+
+#if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 200,
+               "Size of the struct member protocols increased to more than 200 bytes, "
+               "please check if this change is necessary.");
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 904,
+               "Size of the flow struct increased to more than 904 bytes, "
+               "please check if this change is necessary.");
+#endif
+#endif
 
 #define NDPI_PROTOCOL_DEFAULT_LEVEL	0
 

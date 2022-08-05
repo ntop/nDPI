@@ -388,6 +388,10 @@ jobs:
           make all
           make -C example ndpiSimpleIntegration
           make -C rrdtool
+      - name: Print nDPI long help
+        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
+        run: |
+         ./example/ndpiReader -H
       - name: Install nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
