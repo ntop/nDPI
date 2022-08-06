@@ -54,7 +54,7 @@ static int search_bittorrent_again(struct ndpi_detection_module_struct *ndpi_str
   ndpi_search_bittorrent_hash(ndpi_struct, flow, -1);
   
   /* Possibly more processing */
-  return(1);
+  return flow->extra_packets_func != NULL;
 }
 
 /* *********************************************** */
