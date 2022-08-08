@@ -62,6 +62,7 @@ static int verbose = 0;
 
 /* *********************************************** */
 
+#define FLT_MAX 3.402823466e+38F
 int serializerUnitTest() {
   ndpi_serializer serializer, deserializer;
   int i, loop_id;
@@ -99,6 +100,7 @@ int serializerUnitTest() {
       assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
       assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);
       assert(ndpi_serialize_string_float(&serializer,  kbuf, (float)(i*i), "%f") != -1);
+      assert(ndpi_serialize_string_double(&serializer, kbuf, ((double)(FLT_MAX))*2, "%lf") != -1);
       assert(ndpi_serialize_string_int64(&serializer,  kbuf, INT64_MAX) != -1);
       if ((i&0x3) == 0x3) ndpi_serialize_end_of_record(&serializer);
     }
@@ -126,7 +128,8 @@ int serializerUnitTest() {
       jerr = json_tokener_success;
       j = json_tokener_parse_verbose(buffer, &jerr);
       if (j == NULL) {
-        printf("%s: ERROR (json validation failed)\n", __FUNCTION__);
+        printf("%s: ERROR (json validation failed: `%s')\n",
+               __FUNCTION__, json_tokener_error_desc(jerr));
         return -1;
       } else {
         /* Validation ok */
@@ -165,6 +168,7 @@ int serializerUnitTest() {
           int64_t v64;
 	  ndpi_string ks, vs;
 	  float vf;
+	  double vd;
 
 	  switch(kt) {
           case ndpi_serialization_uint32:
@@ -209,6 +213,11 @@ int serializerUnitTest() {
           case ndpi_serialization_float:
 	    assert(ndpi_deserialize_value_float(&deserializer, &vf) != -1);
 	    if(verbose) printf("%f\n", vf);
+	    break;
+
+          case ndpi_serialization_double:
+	    assert(ndpi_deserialize_value_double(&deserializer, &vd) != -1);
+	    if(verbose) printf("%lf\n", vd);
 	    break;
 
           default:
@@ -267,12 +276,15 @@ int serializeProtoUnitTest(void)
     NDPI_SET_BIT(risks, NDPI_TLS_OBSOLETE_VERSION);
     NDPI_SET_BIT(risks, NDPI_TLS_SELFSIGNED_CERTIFICATE);
     ndpi_serialize_proto(ndpi_info_mod, &serializer, risks, NDPI_CONFIDENCE_DPI, ndpi_proto);
+    assert(ndpi_serialize_string_float(&serializer,  "float", FLT_MAX, "%f") != -1);
+    assert(ndpi_serialize_string_double(&serializer,  "double", ((double)(FLT_MAX))*2, "%lf") != -1);
 
     if (fmt == ndpi_serialization_format_json)
     {
       buffer_len = 0;
       buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
-      char const * const expected_json_str = "{\"ndpi\": {\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Cert\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS (v1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"6\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"proto_id\":\"91.119\",\"encrypted\":1,\"breed\":\"Fun\",\"category_id\":6,\"category\":\"SocialNetwork\"}}";
+#ifndef WIN32
+      char const * const expected_json_str = "{\"ndpi\": {\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Cert\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS (v1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"6\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"proto_id\":\"91.119\",\"encrypted\":1,\"breed\":\"Fun\",\"category_id\":6,\"category\":\"SocialNetwork\"},\"float\":340282346638528859811704183484516925440.000000,\"double\":680564693277057719623408366969033850880.000000}";
 
       if (strncmp(buffer, expected_json_str, buffer_len) != 0)
       {
@@ -280,6 +292,7 @@ int serializeProtoUnitTest(void)
         printf("%s: ERROR: got JSON str: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
         return -1;
       }
+#endif
 
       if(verbose)
         printf("%s\n", buffer);
@@ -288,7 +301,8 @@ int serializeProtoUnitTest(void)
       enum json_tokener_error jerr = json_tokener_success;
       json_object * const j = json_tokener_parse_verbose(buffer, &jerr);
       if (j == NULL) {
-        printf("%s: ERROR (json validation failed)\n", __FUNCTION__);
+        printf("%s: ERROR (json validation failed: `%s')\n",
+               __FUNCTION__, json_tokener_error_desc(jerr));
         return -1;
       } else {
         /* Validation ok */
@@ -296,14 +310,28 @@ int serializeProtoUnitTest(void)
       }
     } else if (fmt == ndpi_serialization_format_csv)
     {
-      if(verbose) {
-        buffer_len = 0;
-        buffer = ndpi_serializer_get_header(&serializer, &buffer_len);
+      char const * const expected_csv_hdr_str = "risk,severity,total,client,server,risk,severity,total,client,server,risk,severity,total,client,server,risk,severity,total,client,server,6,proto,proto_id,encrypted,breed,category_id,category,float,double";
+      buffer_len = 0;
+      buffer = ndpi_serializer_get_header(&serializer, &buffer_len);
+      assert(buffer != NULL && buffer_len != 0);
+      if (verbose)
         printf("%s\n", buffer);
+      if (strncmp(buffer, expected_csv_hdr_str, buffer_len) != 0)
+      {
+        printf("%s: ERROR: expected CSV str: \"%s\"\n", __FUNCTION__, expected_csv_hdr_str);
+        printf("%s: ERROR: got CSV str: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+      }
 
-        buffer_len = 0;
-        buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
-        printf("%s\n", buffer);
+      char const * const expected_csv_buf_str = "Self-signed Cert,High,500,450,50,Obsolete TLS (v1.1 or older),High,510,455,55,Weak TLS Cipher,High,250,225,25,Malformed Packet,Low,260,130,130,DPI,TLS.Facebook,91.119,1,Fun,6,SocialNetwork,340282346638528859811704183484516925440.000000,680564693277057719623408366969033850880.000000";
+      buffer_len = 0;
+      buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+      assert(buffer != NULL && buffer_len != 0);
+      if (verbose)
+          printf("%s\n", buffer);
+      if (strncmp(buffer, expected_csv_buf_str, buffer_len) != 0)
+      {
+        printf("%s: ERROR: expected CSV str: \"%s\"\n", __FUNCTION__, expected_csv_buf_str);
+        printf("%s: ERROR: got CSV str: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
       }
     }
 

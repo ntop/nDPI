@@ -1654,9 +1654,9 @@ static void printFlowSerialized(u_int16_t thread_id,
   float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
 
   ndpi_serialize_string_uint32(serializer, "flow_id", flow->flow_id);
-  ndpi_serialize_string_float(serializer, "first_seen_ms", f, "%.3f");
-  ndpi_serialize_string_float(serializer, "last_seen_ms", l, "%.3f");
-  ndpi_serialize_string_float(serializer, "duration_ms", (l-f)/1000.0, "%.3f");
+  ndpi_serialize_string_double(serializer, "first_seen", f / 1000., "%.3f");
+  ndpi_serialize_string_double(serializer, "last_seen", l / 1000., "%.3f");
+  ndpi_serialize_string_double(serializer, "duration", (l-f)/1000.0, "%.3f");
   ndpi_serialize_string_uint32(serializer, "vlan_id", flow->vlan_id);
   ndpi_serialize_string_uint32(serializer, "bidirectional", flow->bidirectional);
 
