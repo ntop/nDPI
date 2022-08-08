@@ -163,6 +163,7 @@ enum info_type {
     INFO_GENERIC,
     INFO_KERBEROS,
     INFO_SOFTETHER,
+    INFO_TIVOCONNECT,
     INFO_FTP_IMAP_POP_SMTP,
     INFO_TLS_QUIC_ALPN_VERSION,
     INFO_TLS_QUIC_ALPN_ONLY,
@@ -234,6 +235,12 @@ typedef struct ndpi_flow_info {
       char hostname[48];
       char fqdn[48];
     } softether;
+    struct {
+      char identity_uuid[36];
+      char machine[48];
+      char platform[32];
+      char services[48];
+    } tivoconnect;
   };
 
   ndpi_serializer ndpi_flow_serializer;

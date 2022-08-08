@@ -1073,6 +1073,18 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       flow->bittorent_hash[j] = '\0';
     }
   }
+  /* TIVOCONNECT */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TIVOCONNECT)) {
+    flow->info_type = INFO_TIVOCONNECT;
+    ndpi_snprintf(flow->tivoconnect.identity_uuid, sizeof(flow->tivoconnect.identity_uuid),
+                  "%s", flow->ndpi_flow->protos.tivoconnect.identity_uuid);
+    ndpi_snprintf(flow->tivoconnect.machine, sizeof(flow->tivoconnect.machine),
+                  "%s", flow->ndpi_flow->protos.tivoconnect.machine);
+    ndpi_snprintf(flow->tivoconnect.platform, sizeof(flow->tivoconnect.platform),
+                  "%s", flow->ndpi_flow->protos.tivoconnect.platform);
+    ndpi_snprintf(flow->tivoconnect.services, sizeof(flow->tivoconnect.services),
+                  "%s", flow->ndpi_flow->protos.tivoconnect.services);
+  }
   /* SOFTETHER */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SOFTETHER) && !is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP)) {
     flow->info_type = INFO_SOFTETHER;
