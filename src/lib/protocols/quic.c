@@ -1442,10 +1442,7 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t pub_bit1, pub_bit2, pub_bit3, pub_bit4, pub_bit5, pub_bit7, pub_bit8;
   u_int8_t dest_conn_id_len, source_conn_id_len;
 
-  /* According to draft-ietf-quic-transport-29: "Clients MUST ensure that UDP
-     datagrams containing Initial packets have UDP payloads of at least 1200
-     bytes". Similar limit exists for previous versions */
-  if(packet->payload_packet_len < 1200) {
+  if(packet->payload_packet_len < 14) {
     return 0;
   }
 
@@ -1485,8 +1482,8 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
   }
   if(((is_version_quic(*version) && !is_version_quic_v2(*version)) ||
       (*version == V_Q046) || (*version == V_Q050)) &&
-     (pub_bit3 != 0 || pub_bit4 != 0)) {
-    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not Initial Packet\n", *version);
+     (pub_bit3 != 0)) {
+    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not Initial Packet or 0-RTT\n", *version);
     return 0;
   }
   if(is_version_quic_v2(*version) &&
