@@ -97,7 +97,7 @@ static size_t dissect_softether_type(enum softether_value_type t,
 
       v->value.ptr.raw = payload + 4;
       u_int32_t siz = ntohl(get_u_int32_t(payload, 0));
-      if(siz == 0 || payload_len < siz + 3)
+      if(siz == 0 || (u_int64_t)payload_len < (u_int64_t)siz + 3)
 	return 0;
 
       if(t == VALUE_DATA)
