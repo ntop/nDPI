@@ -49,8 +49,7 @@ void ndpi_search_discord(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if (packet->payload_packet_len == 74 &&
-      ntohs(get_u_int16_t(packet->payload, 6)) == 0xace3)
+  if (packet->payload_packet_len == 74)
   {
     if (flow->packet_counter == 1 &&
         ntohl(get_u_int32_t(packet->payload, 0)) == 0x00010046)
