@@ -30,7 +30,7 @@ static void ndpi_int_alicloud_add_connection(struct ndpi_detection_module_struct
 {
   NDPI_LOG_INFO(ndpi_struct, "found alicloud\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, NDPI_PROTOCOL_ALICLOUD,
+  ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_protocol_id_by_ip, NDPI_PROTOCOL_ALICLOUD,
                              NDPI_CONFIDENCE_DPI);
 }
 
