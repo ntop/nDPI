@@ -335,22 +335,20 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 					 struct ndpi_flow_struct *flow,
 					 u_int16_t http_protocol,
 					 ndpi_protocol_category_t category) {
-  u_int16_t master_protocol;
+  u_int16_t master_protocol, app_protocol;
 
 #ifdef HTTP_DEBUG
   printf("=> %s()\n", __FUNCTION__);
 #endif
 
-  if(flow->extra_packets_func && (flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN))
-     return; /* Nothing new to add */
-
+  app_protocol = flow->guessed_protocol_id_by_ip;
   /* If no custom protocol has been detected */
-  if((flow->guessed_host_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+  if((app_protocol == NDPI_PROTOCOL_UNKNOWN)
      || ((http_protocol != NDPI_PROTOCOL_HTTP) &&
          (http_protocol != NDPI_PROTOCOL_HTTP_CONNECT) &&
          (http_protocol != NDPI_PROTOCOL_HTTP_PROXY))
      )
-    flow->guessed_host_protocol_id = http_protocol;
+    app_protocol = http_protocol;
 
   // ndpi_int_reset_protocol(flow);
   master_protocol = NDPI_PROTOCOL_HTTP;
@@ -365,7 +363,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
      sub-protocol via the (content-matched) subprotocols logic (i.e.
      MPEGDASH, SOAP, ....) */
   if(flow->detected_protocol_stack[1] == 0)
-    ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id,
+    ndpi_set_detected_protocol(ndpi_struct, flow, app_protocol,
 			       master_protocol,
 			       NDPI_CONFIDENCE_DPI);
 
@@ -408,27 +406,36 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
+  u_int16_t master_protocol;
+
   if((flow->l4.tcp.http_stage == 0) || (flow->http.url && flow->http_detected)) {
     char *double_col = strchr((char*)flow->host_server_name, ':');
 
     if(double_col) double_col[0] = '\0';
 
+    master_protocol = NDPI_PROTOCOL_HTTP;
+    if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
+      master_protocol = flow->detected_protocol_stack[1];
+    else if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_CONNECT ||
+            flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_PROXY)
+      master_protocol = flow->detected_protocol_stack[0];
+
     if(ndpi_match_hostname_protocol(ndpi_struct, flow,
-				    flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN ? flow->detected_protocol_stack[1] : NDPI_PROTOCOL_HTTP,
+				    master_protocol,
 				    flow->host_server_name,
 				    strlen(flow->host_server_name)) == 0) {
       if(flow->http.url &&
          ((strstr(flow->http.url, ":8080/downloading?n=0.") != NULL)
           || (strstr(flow->http.url, ":8080/upload?n=0.") != NULL))) {
 	/* This looks like Ookla speedtest */
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
       }
     }
 
     if (flow->http.url != NULL &&
         strstr(flow->http.url, "micloud.xiaomi.net") != NULL)
     {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XIAOMI, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XIAOMI, master_protocol, NDPI_CONFIDENCE_DPI);
     }
   }
 }

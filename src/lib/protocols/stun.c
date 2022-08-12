@@ -424,7 +424,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 
-  app_proto = flow->guessed_host_protocol_id;
+  app_proto = flow->guessed_protocol_id_by_ip;
 
   if(packet->tcp) {
     /* STUN may be encapsulated in TCP packets */

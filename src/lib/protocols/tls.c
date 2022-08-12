@@ -2491,7 +2491,7 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
 #ifdef DEBUG_TLS
   printf("==>> %s() %u [len: %u][version: %u]\n",
 	 __FUNCTION__,
-	 flow->guessed_host_protocol_id,
+	 flow->guessed_protocol_id_by_ip,
 	 packet->payload_packet_len,
 	 flow->protos.tls_quic.ssl_version);
 #endif
