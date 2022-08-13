@@ -12,8 +12,8 @@ RANLIB = @RANLIB@
 # Installation directories
 #
 prefix     = @prefix@
-libdir     = ${prefix}/lib
-includedir = ${prefix}/include/ndpi
+libdir     = @libdir@
+includedir = @includedir@/ndpi
 ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
