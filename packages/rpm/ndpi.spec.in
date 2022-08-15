@@ -63,8 +63,9 @@ mkdir -p $RPM_BUILD_ROOT%{includedir}
 mkdir -p $RPM_BUILD_ROOT%{libdir}
 mkdir -p $RPM_BUILD_ROOT%{bindir}
 cd $HOME/nDPI; make DESTDIR=$RPM_BUILD_ROOT install;
-rm $RPM_BUILD_ROOT/usr/lib/libndpi.so
-rm $RPM_BUILD_ROOT/usr/lib/libndpi.so.?
+rm -f $RPM_BUILD_ROOT/usr/lib/libndpi.so
+rm -f $RPM_BUILD_ROOT/usr/lib/libndpi.so.?
+rm -rf $RPM_BUILD_ROOT/lib
 cd $RPM_BUILD_ROOT/usr/lib/; ln -s libndpi.so.@PACKAGE_VERSION@ libndpi.so.@MAJOR_RELEASE@; cd -
 cd $RPM_BUILD_ROOT/usr/lib/; ln -s libndpi.so.@PACKAGE_VERSION@ libndpi.so; cd -
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
@@ -82,7 +83,7 @@ rm -fr $RPM_BUILD_ROOT
 
 /usr/lib/libndpi.so
 /usr/lib/libndpi.so.@MAJOR_RELEASE@
-/usr/lib/libndpi.so.@PACKAGE_VERSION@
+#/usr/lib/libndpi.so.@PACKAGE_VERSION@
 /usr/bin/ndpiReader
 /usr/share/ndpi/ndpiCustomCategory.txt
 /usr/share/ndpi/ndpiProtos.txt
@@ -95,7 +96,7 @@ rm -fr $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 
 %{includedir}
-/usr/lib/libndpi.a
+#/usr/lib/libndpi.a
 
 %changelog
 * Mon Nov 19 2018 Alfredo Cardigliano <cardigliano@ntop.org> 2.5
