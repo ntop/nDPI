@@ -290,12 +290,13 @@ void ndpi_hll_reset(struct ndpi_hll *hll) {
   hll_reset(hll);
 }
 
-void ndpi_hll_add(struct ndpi_hll *hll, const char *data, size_t data_len) {
-  hll_add(hll, (const void *)data, data_len);
+int ndpi_hll_add(struct ndpi_hll *hll, const char *data, size_t data_len) {
+  return(hll_add(hll, (const void *)data, data_len));
 }
 
-void ndpi_hll_add_number(struct ndpi_hll *hll, u_int32_t value) {
-  hll_add(hll, (const void *)&value, sizeof(value));
+/* 1 = rank changed, 0 = no changes in rank */
+int ndpi_hll_add_number(struct ndpi_hll *hll, u_int32_t value) {
+  return(hll_add(hll, (const void *)&value, sizeof(value)));
 }
 
 double ndpi_hll_count(struct ndpi_hll *hll) {

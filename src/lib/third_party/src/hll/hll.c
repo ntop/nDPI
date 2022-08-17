@@ -97,20 +97,26 @@ void hll_reset(struct ndpi_hll *hll) {
     memset(hll->registers, 0, hll->size);
 }
 
-static __inline void _hll_add_hash(struct ndpi_hll *hll, u_int32_t hash) {
+/* Return: 0 = nothing changed, 1 = ranking changed */
+static __inline int _hll_add_hash(struct ndpi_hll *hll, u_int32_t hash) {
   if(hll->registers) {
     u_int32_t index = hash >> (32 - hll->bits);   /* Use the first 'hll->bits' bits as bucket index */
     u_int8_t rank   = _hll_rank(hash, hll->bits); /* Count the number of leading 0 */
     
-    if(rank > hll->registers[index])
-      hll->registers[index] = rank; /* Store the largest number of lesding zeros for the bucket */    
+    if(rank > hll->registers[index]) {
+      hll->registers[index] = rank; /* Store the largest number of lesding zeros for the bucket */
+      return(1);
+    }
   }
+  
+  return(0);
 }
 
-void hll_add(struct ndpi_hll *hll, const void *buf, size_t size) {
+/* Return: 0 = nothing changed, 1 = ranking changed */
+int hll_add(struct ndpi_hll *hll, const void *buf, size_t size) {
   u_int32_t hash = MurmurHash3_x86_32((const char *)buf, (u_int32_t)size, 0x5f61767a);
 
-  _hll_add_hash(hll, hash);
+  return(_hll_add_hash(hll, hash));
 }
 
 double hll_count(const struct ndpi_hll *hll) {
