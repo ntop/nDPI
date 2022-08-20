@@ -885,6 +885,16 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       } else
 	memset(newflow->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
 
+    if (workflow->ndpi_serialization_format != ndpi_serialization_format_unknown)
+    {
+      if (ndpi_init_serializer(&newflow->ndpi_flow_serializer,
+                               workflow->ndpi_serialization_format) != 0)
+      {
+        LOG(NDPI_LOG_ERROR, "ndpi serializer init failed\n");
+        exit(-1);
+      }
+    }
+
       ndpi_tsearch(newflow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp); /* Add */
       workflow->stats.ndpi_flow_count++;
       if(*proto == IPPROTO_TCP)
@@ -1285,6 +1295,23 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
                 sizeof(flow->http.user_agent),
                 "%s", (flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : ""));
 
+  if (workflow->ndpi_serialization_format != ndpi_serialization_format_unknown)
+  {
+    if (ndpi_flow2json(workflow->ndpi_struct, flow->ndpi_flow,
+                       flow->ip_version, flow->protocol,
+                       flow->src_ip, flow->dst_ip,
+                       &flow->src_ip6, &flow->dst_ip6,
+                       flow->src_port, flow->dst_port,
+                       flow->detected_protocol,
+                       &flow->ndpi_flow_serializer) != 0)
+    {
+      LOG(NDPI_LOG_ERROR, "flow2json failed\n");
+      exit(-1);
+    }
+    ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "detection_completed", flow->detection_completed);
+    ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "check_extra_packets", flow->check_extra_packets);
+  }
+
   if(flow->detection_completed && (!flow->check_extra_packets)) {
     if(is_ndpi_proto(flow, NDPI_PROTOCOL_UNKNOWN)) {
       if(workflow->__flow_giveup_callback != NULL)
@@ -1294,26 +1321,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
     }
 
-    if (workflow->ndpi_serialization_format != ndpi_serialization_format_unknown)
-    {
-      if (ndpi_init_serializer(&flow->ndpi_flow_serializer,
-                               workflow->ndpi_serialization_format) != 0)
-      {
-        LOG(NDPI_LOG_ERROR, "ndpi serializer init failed\n");
-        exit(-1);
-      }
-      if (ndpi_flow2json(workflow->ndpi_struct, flow->ndpi_flow,
-                         flow->ip_version, flow->protocol,
-                         flow->src_ip, flow->dst_ip,
-                         &flow->src_ip6, &flow->dst_ip6,
-                         flow->src_port, flow->dst_port,
-                         flow->detected_protocol,
-                         &flow->ndpi_flow_serializer) != 0)
-      {
-        LOG(NDPI_LOG_ERROR, "flow2json failed\n");
-        exit(-1);
-      }
-    }
     ndpi_free_flow_info_half(flow);
   }
 }
