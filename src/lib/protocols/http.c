@@ -855,7 +855,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       /* Matching on Content-Type.
           OCSP:  application/ocsp-request, application/ocsp-response
        */
-      if(strncmp((const char *)packet->content_line.ptr, "application/ocsp-", 17) == 0) {
+      if(packet->content_line.len > 17 &&
+         strncmp((const char *)packet->content_line.ptr, "application/ocsp-", 17) == 0) {
         NDPI_LOG_DBG2(ndpi_struct, "Found OCSP\n");
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
       }

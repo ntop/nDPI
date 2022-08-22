@@ -90,7 +90,8 @@ void ndpi_search_florensia(struct ndpi_detection_module_struct *ndpi_struct, str
 	ndpi_florensia_add_connection(ndpi_struct, flow);
 	return;
       }
-      if (flow->packet_counter < 10 && get_l16(packet->payload, 0) == packet->payload_packet_len) {
+      if (flow->packet_counter < 10 && packet->payload_packet_len >=2 &&
+	  get_l16(packet->payload, 0) == packet->payload_packet_len) {
 	NDPI_LOG_DBG2(ndpi_struct, "maybe florensia\n");
 	return;
       }
