@@ -1,8 +1,8 @@
-Guessed flow protos:	1
+Guessed flow protos:	0
 
-DPI Packets (TCP):	33	(33.00 pkts/flow)
-Confidence Match by port    : 1 (flows)
-Num dissector calls: 338 (338.00 diss/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 124 (124.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -19,6 +19,6 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   6/0 (search/found)
 
-TLS	71	9386	1
+Kismet	35	4871	1
 
-	1	TCP 10.30.29.3:63357 <-> 178.237.24.249:443 [proto: 91/TLS][Encrypted][Confidence: Match by port][cat: Web/5][38 pkts/3580 bytes <-> 33 pkts/5806 bytes][Goodput ratio: 42/68][72.45 sec][bytes ratio: -0.237 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2392/2607 58175/58215 10382/11142][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 94/176 369/1414 75/257][Plen Bins: 7,58,5,5,0,0,5,2,2,7,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0]
+	1	TCP 127.0.0.1:34065 <-> 127.0.0.1:2501 [proto: 309/Kismet][ClearText][Confidence: DPI][cat: Network/14][18 pkts/2029 bytes <-> 17 pkts/2842 bytes][Goodput ratio: 51/67][14.61 sec][bytes ratio: -0.167 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 399/399 857/870 1099/1099 407/366][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 113/167 1099/253 239/52][PLAIN TEXT (KISMET)][Plen Bins: 6,0,6,0,75,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

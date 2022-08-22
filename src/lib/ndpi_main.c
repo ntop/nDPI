@@ -1966,6 +1966,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "TiVoConnect", NDPI_PROTOCOL_CATEGORY_NETWORK,
                           ndpi_build_default_ports(ports_a, 2190, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 2190, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_KISMET,
+                          "Kismet", NDPI_PROTOCOL_CATEGORY_NETWORK,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -4553,6 +4557,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* TiVoConnect */
   init_tivoconnect_dissector(ndpi_str, &a, detection_bitmask);
+
+  /* Kismet */
+  init_kismet_dissector(ndpi_str, &a, detection_bitmask);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
