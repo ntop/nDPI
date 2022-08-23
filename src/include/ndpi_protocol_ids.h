@@ -338,6 +338,7 @@ typedef enum {
   NDPI_PROTOCOL_AVAST                 = 307,
   NDPI_PROTOCOL_TIVOCONNECT           = 308,
   NDPI_PROTOCOL_KISMET                = 309,
+  NDPI_PROTOCOL_FASTCGI               = 310,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
