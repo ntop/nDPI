@@ -1476,12 +1476,12 @@ static int may_be_0rtt(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Check that CIDs lengths are valid */
   dest_conn_id_len = packet->payload[5];
-  if(packet->payload_packet_len < 5 + 1 + dest_conn_id_len) {
+  if(packet->payload_packet_len <= 5 + 1 + dest_conn_id_len) {
     NDPI_LOG_DBG2(ndpi_struct, "Dcid too short\n");
     return 0;
   }
   source_conn_id_len = packet->payload[5 + 1 + dest_conn_id_len];
-  if(packet->payload_packet_len < 5 + 1 + dest_conn_id_len + 1 + source_conn_id_len) {
+  if(packet->payload_packet_len <= 5 + 1 + dest_conn_id_len + 1 + source_conn_id_len) {
     NDPI_LOG_DBG2(ndpi_struct, "Scid too short\n");
     return 0;
   }
