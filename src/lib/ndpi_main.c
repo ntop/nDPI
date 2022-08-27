@@ -4110,8 +4110,8 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* IAX */
   init_iax_dissector(ndpi_str, &a, detection_bitmask);
 
-  /* MGPC */
-  init_mgpc_dissector(ndpi_str, &a, detection_bitmask);
+  /* Media Gateway Control Protocol */
+  init_mgcp_dissector(ndpi_str, &a, detection_bitmask);
 
   /* ZATTOO */
   init_zattoo_dissector(ndpi_str, &a, detection_bitmask);
