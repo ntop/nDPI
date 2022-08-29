@@ -56,6 +56,35 @@ int mbedtls_aesni_has_support( unsigned int what )
 #if defined(linux) || defined(__linux__)
   unsigned int eax, ebx, ecx, edx;
 
+  if(what == MBEDTLS_AESNI_AES) {
+    /*
+      NOTE
+
+      This code is necessary as __get_cpuid() is not reliable
+      Example with Intel(R) Celeron(R) CPU N2930 (that has NO AES-NI)
+      the code based on __get_cpuid() reports that AES-NI is present
+      and thus nDPI crashes on such platform.
+     */
+    FILE *fd = fopen("/proc/cpuinfo", "r");
+
+    if(fd != NULL) {
+      char *line = NULL;
+      size_t len = 0;
+      int found = 0;
+
+      while(getline(&line, &len, fd) != -1) {
+	if(strstr(line, "aes")) {
+	  /* printf("FOUND %s", line); */
+	  found = 1;
+	  break;
+	}
+      }
+
+      fclose(fd);
+      return(found);
+    }
+  }
+
   if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) == 0)
   {
     return 0;
