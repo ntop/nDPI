@@ -76,13 +76,14 @@ int mbedtls_aesni_has_support( unsigned int what )
       int found = 0;
 
       while(getline(&line, &len, fd) != -1) {
-	if(strstr(line, "aes")) {
-	  /* printf("FOUND %s", line); */
-	  found = 1;
-	  break;
-	}
+        if(strstr(line, "aes")) {
+          /* printf("FOUND %s", line); */
+          found = 1;
+          break;
+        }
       }
 
+      free(line);
       fclose(fd);
       return(found);
     }
