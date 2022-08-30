@@ -30,6 +30,7 @@
 static void ndpi_int_mgcp_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
+  NDPI_LOG_INFO(ndpi_struct, "found MGCP\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MGCP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -39,7 +40,9 @@ void ndpi_search_mgcp(struct ndpi_detection_module_struct *ndpi_struct, struct n
   
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  u_int16_t pos = 5;
+  char const * endpoint;
+  char const * endpoint_hostname;
+  char const * mgcp;
 
   NDPI_LOG_DBG(ndpi_struct, "search MGCP\n");
 
@@ -61,23 +64,41 @@ void ndpi_search_mgcp(struct ndpi_detection_module_struct *ndpi_struct, struct n
         memcmp(packet->payload, "RSIP ", 5) != 0)
   	  break;
 
-    // now search for string "MGCP " in the rest of the message
-    while ((pos + 4) < packet->payload_packet_len) {
-      if (memcmp(&packet->payload[pos], "MGCP ", 5) == 0) {
-        NDPI_LOG_INFO(ndpi_struct, "found MGCP\n");
-        ndpi_int_mgcp_add_connection(ndpi_struct, flow);
-        return;
-      }
-      pos++;
+    endpoint = ndpi_strnstr((char const *)packet->payload + 5, " ", packet->payload_packet_len - 5);
+    if (endpoint == NULL)
+    {
+      break;
     }
+    endpoint++;
 
+    mgcp = ndpi_strnstr(endpoint, " ", packet->payload_packet_len - ((u_int8_t const *)endpoint - packet->payload));
+    if (mgcp == NULL)
+    {
+      break;
+    }
+    mgcp++;
+
+    if (strncmp(mgcp, "MGCP ", ndpi_min(5, packet->payload_packet_len - ((u_int8_t const *)mgcp - packet->payload))) == 0)
+    {
+      ndpi_int_mgcp_add_connection(ndpi_struct, flow);
+
+      endpoint_hostname = ndpi_strnstr(endpoint, "@", packet->payload_packet_len - ((u_int8_t const *)endpoint - packet->payload));
+      if (endpoint_hostname == NULL || endpoint_hostname >= mgcp)
+      {
+        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint, (mgcp - endpoint) - 1);
+      } else {
+        endpoint_hostname++;
+        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint_hostname, (mgcp - endpoint_hostname) - 1);
+      }
+      return;
+    }
   } while(0);
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
-void init_mgpc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_mgcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
 {
   ndpi_set_bitmask_protocol_detection("MGCP", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_MGCP,
