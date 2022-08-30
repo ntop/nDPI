@@ -59,10 +59,10 @@ int mbedtls_aesni_has_support( unsigned int what )
 #if defined(linux) || defined(__linux__)
   unsigned int eax, ebx, ecx, edx;
 
-  if(what == MBEDTLS_AESNI_AES) {
+  {
     /*
       NOTE
-
+      
       This code is necessary as __get_cpuid() is not reliable
       Example with Intel(R) Celeron(R) CPU N2930 (that has NO AES-NI)
       the code based on __get_cpuid() reports that AES-NI is present
