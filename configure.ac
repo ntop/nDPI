@@ -203,10 +203,6 @@ if test -d ../nDPI-custom; then :
    AC_MSG_RESULT([Compiling with custom nDPI protocols])
 fi
 
-if test -d ../ndpi-pro; then :
-   with_maxminddb=1
-fi
-
 case "$host" in
    *-*-mingw32*|*-*-msys)
       PCAP_INC=""
