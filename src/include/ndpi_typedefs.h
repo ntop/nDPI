@@ -1611,7 +1611,7 @@ typedef enum {
  * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API
  * - always add new enum at the end of the list (to avoid breaking backward compatibility) */
 typedef enum {
-  ndpi_serialization_double         =  0,
+  ndpi_serialization_unknown        =  0,
   ndpi_serialization_end_of_record  =  1,
   ndpi_serialization_uint8          =  2,
   ndpi_serialization_uint16         =  3,
@@ -1629,7 +1629,7 @@ typedef enum {
   ndpi_serialization_end_of_list    = 15,
   /* Do not add new types!
    * Exceeding 16 types requires reworking the TLV encoding due to key type limit (4 bit) */
-  ndpi_serialization_unknown
+  ndpi_serialization_double         =  16 /* FIXX this is currently unusable */
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
