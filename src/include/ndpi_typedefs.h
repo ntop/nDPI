@@ -1608,25 +1608,28 @@ typedef enum {
 
 /* Note:
  * - up to 16 types (TLV encoding: "4 bit key type" << 4 | "4 bit value type")
- * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API */
+ * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API
+ * - always add new enum at the end of the list (to avoid breaking backward compatibility) */
 typedef enum {
-  ndpi_serialization_unknown = 0,
-  ndpi_serialization_end_of_record,
-  ndpi_serialization_uint8,
-  ndpi_serialization_uint16,
-  ndpi_serialization_uint32,
-  ndpi_serialization_uint64,
-  ndpi_serialization_int8,
-  ndpi_serialization_int16,
-  ndpi_serialization_int32,
-  ndpi_serialization_int64,
-  ndpi_serialization_float,
-  ndpi_serialization_double,
-  ndpi_serialization_string,
-  ndpi_serialization_start_of_block,
-  ndpi_serialization_end_of_block,
-  ndpi_serialization_start_of_list,
-  ndpi_serialization_end_of_list
+  ndpi_serialization_double         =  0,
+  ndpi_serialization_end_of_record  =  1,
+  ndpi_serialization_uint8          =  2,
+  ndpi_serialization_uint16         =  3,
+  ndpi_serialization_uint32         =  4,
+  ndpi_serialization_uint64         =  5,
+  ndpi_serialization_int8           =  6,
+  ndpi_serialization_int16          =  7,
+  ndpi_serialization_int32          =  8,
+  ndpi_serialization_int64          =  9,
+  ndpi_serialization_float          = 10,
+  ndpi_serialization_string         = 11,
+  ndpi_serialization_start_of_block = 12,
+  ndpi_serialization_end_of_block   = 13,
+  ndpi_serialization_start_of_list  = 14,
+  ndpi_serialization_end_of_list    = 15,
+  /* Do not add new types!
+   * Exceeding 16 types requires reworking the TLV encoding due to key type limit (4 bit) */
+  ndpi_serialization_unknown
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
