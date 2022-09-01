@@ -1135,9 +1135,9 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t _value, double 
 
     error                 = value - *forecast;
     sq_error              =  error * error;
-    hw->sum_square_error += sq_error, hw->prev_error.sum_square_error += sq_error;;
-    observations = (hw->num_values < MAX_SQUARE_ERROR_ITERATIONS) ? hw->num_values : ((hw->num_values % MAX_SQUARE_ERROR_ITERATIONS) + MAX_SQUARE_ERROR_ITERATIONS);
-    sq = sqrt(hw->sum_square_error / (observations - hw->params.num_season_periods));
+    hw->sum_square_error += sq_error, hw->prev_error.sum_square_error += sq_error;
+    observations = (hw->num_values < MAX_SQUARE_ERROR_ITERATIONS) ? hw->num_values : ((hw->num_values % MAX_SQUARE_ERROR_ITERATIONS) + MAX_SQUARE_ERROR_ITERATIONS + 1);
+    sq = sqrt(hw->sum_square_error / observations);
     *confidence_band      = hw->params.ro * sq;
 
 #ifdef HW_DEBUG
