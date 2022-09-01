@@ -1629,7 +1629,7 @@ typedef enum {
   ndpi_serialization_end_of_list    = 15,
   /* Do not add new types!
    * Exceeding 16 types requires reworking the TLV encoding due to key type limit (4 bit) */
-  ndpi_serialization_double         =  16 /* FIXX this is currently unusable */
+  ndpi_serialization_double         = 16 /* FIXX this is currently unusable */
 } ndpi_serialization_type;
 
 #define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024

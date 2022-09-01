@@ -100,7 +100,8 @@ int serializerUnitTest() {
       assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
       assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);
       assert(ndpi_serialize_string_float(&serializer,  kbuf, (float)(i*i), "%f") != -1);
-      assert(ndpi_serialize_string_double(&serializer, kbuf, ((double)(FLT_MAX))*2, "%lf") != -1);
+      if (fmt != ndpi_serialization_format_tlv)
+        assert(ndpi_serialize_string_double(&serializer, kbuf, ((double)(FLT_MAX))*2, "%lf") != -1);
       assert(ndpi_serialize_string_int64(&serializer,  kbuf, INT64_MAX) != -1);
       if ((i&0x3) == 0x3) ndpi_serialize_end_of_record(&serializer);
     }
@@ -185,7 +186,7 @@ int serializerUnitTest() {
             }
 	    break;
           default:
-            printf("%s: ERROR (unsupported TLV key type %u)\n", __FUNCTION__, kt);
+            printf("%s: ERROR Unsupported TLV key type %u (value type %u)\n", __FUNCTION__, kt, et);
 	    return -1;
 	  }
 
@@ -222,7 +223,7 @@ int serializerUnitTest() {
 
           default:
 	    if (verbose) printf("\n");
-            printf("%s: ERROR (unsupported type %u detected)\n", __FUNCTION__, et);
+            printf("%s: ERROR Unsupported TLV value type %u (key type %u)\n", __FUNCTION__, et, kt);
 	    return -1;
 	  }
 	}
@@ -277,7 +278,8 @@ int serializeProtoUnitTest(void)
     NDPI_SET_BIT(risks, NDPI_TLS_SELFSIGNED_CERTIFICATE);
     ndpi_serialize_proto(ndpi_info_mod, &serializer, risks, NDPI_CONFIDENCE_DPI, ndpi_proto);
     assert(ndpi_serialize_string_float(&serializer,  "float", FLT_MAX, "%f") != -1);
-    assert(ndpi_serialize_string_double(&serializer,  "double", ((double)(FLT_MAX))*2, "%lf") != -1);
+    if (fmt != ndpi_serialization_format_tlv)
+      assert(ndpi_serialize_string_double(&serializer,  "double", ((double)(FLT_MAX))*2, "%lf") != -1);
 
     if (fmt == ndpi_serialization_format_json)
     {

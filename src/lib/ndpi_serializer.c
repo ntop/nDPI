@@ -1650,6 +1650,7 @@ int ndpi_serialize_binary_float(ndpi_serializer *_serializer,
 
 /* ********************************** */
 
+/* JSON/CSV only (TLV not yet supported due to a type field limit) */
 int ndpi_serialize_binary_double(ndpi_serializer *_serializer,
                     const char *key,
                     u_int16_t klen,
@@ -1694,10 +1695,14 @@ int ndpi_serialize_binary_double(ndpi_serializer *_serializer,
     buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
     serializer->status.buffer.size_used += ndpi_snprintf((char *) &serializer->buffer.data[serializer->status.buffer.size_used], buff_diff, format, value);
   } else {
+#if 1
+    fprintf(stderr, "TLV serializer does not support double\n");
+#else
     serializer->buffer.data[serializer->status.buffer.size_used++] = (ndpi_serialization_string << 4) | ndpi_serialization_double;
 
     ndpi_serialize_single_string(serializer, key, klen);
     ndpi_serialize_single_double(serializer, value);
+#endif
   }
 
   serializer->status.flags |= NDPI_SERIALIZER_STATUS_NOT_EMPTY;
