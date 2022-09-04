@@ -85,8 +85,8 @@ unsigned int ndpi_timer_eq(const pkt_timeval *a, const pkt_timeval *b);
 unsigned int ndpi_timer_lt(const pkt_timeval *a, const pkt_timeval *b);
 void ndpi_timer_sub(const pkt_timeval *a, const pkt_timeval *b, pkt_timeval *result);
 void ndpi_timer_clear(pkt_timeval *a);
-unsigned int ndpi_timeval_to_milliseconds(pkt_timeval ts);
-unsigned int ndpi_timeval_to_microseconds(pkt_timeval ts);
+u_int64_t ndpi_timeval_to_milliseconds(pkt_timeval ts);
+u_int64_t ndpi_timeval_to_microseconds(pkt_timeval ts);
 void ndpi_log_timestamp(char *log_ts, uint32_t log_ts_len);
 
 #endif /* NDPI_CLASSIFY_H */

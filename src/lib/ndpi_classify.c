@@ -657,24 +657,24 @@ ndpi_timer_clear(pkt_timeval *a)
 /**
  * \brief Calculate the milliseconds representation of a timeval.
  * \param ts Timeval
- * \return unsigned int - Milliseconds
+ * \return unsigned int (64bit) - Milliseconds
  */
-unsigned int
+u_int64_t
 ndpi_timeval_to_milliseconds(pkt_timeval ts)
 {
-  unsigned int result = ts.tv_usec / 1000 + ts.tv_sec * 1000;
+  u_int64_t result = ts.tv_usec / 1000 + ts.tv_sec * 1000;
   return result;
 }
 
 /**
  * \brief Calculate the microseconds representation of a timeval.
  * \param ts Timeval
- * \return unsigned int - Milliseconds
+ * \return unsigned int (64bit) - Microseconds
  */
-unsigned int
+u_int64_t
 ndpi_timeval_to_microseconds(pkt_timeval ts)
 {
-  unsigned int result = ts.tv_usec + ts.tv_sec * 1000 * 1000;
+  u_int64_t result = ts.tv_usec + ts.tv_sec * 1000 * 1000;
   return result;
 }
 
