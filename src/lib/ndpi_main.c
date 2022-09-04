@@ -5523,11 +5523,11 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
     /* guess host protocol; server first */
     addr.s_addr = flow->s_address.v4;
-    ret = ndpi_network_port_ptree_match(ndpi_str, &addr, ntohs(flow->s_port));
+    ret = ndpi_network_port_ptree_match(ndpi_str, &addr, flow->s_port);
 
     if(ret == NDPI_PROTOCOL_UNKNOWN) {
       addr.s_addr = flow->c_address.v4;
-      ret = ndpi_network_port_ptree_match(ndpi_str, &addr, ntohs(flow->c_port));
+      ret = ndpi_network_port_ptree_match(ndpi_str, &addr, flow->c_port);
     }
   }
 
