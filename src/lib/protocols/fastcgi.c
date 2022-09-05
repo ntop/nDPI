@@ -143,7 +143,7 @@ static int fcgi_parse_params(struct ndpi_flow_struct * const flow,
 
   if (flow->http.url == NULL && packet->http_url_name.len > 0)
   {
-    flow->http.url = malloc(packet->http_url_name.len + 1);
+    flow->http.url = ndpi_malloc(packet->http_url_name.len + 1);
     if (flow->http.url != NULL)
     {
       strncpy(flow->http.url, (char const *)packet->http_url_name.ptr, packet->http_url_name.len);
