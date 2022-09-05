@@ -722,8 +722,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len);
 
     if(strlen(flow->host_server_name) > 0) {
-      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1);
-
       if(ndpi_is_valid_hostname(flow->host_server_name,
 				strlen(flow->host_server_name)) == 0) {
 	char str[128];
@@ -748,6 +746,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
 
     ndpi_http_parse_subprotocol(ndpi_struct, flow);
+
+    if(strlen(flow->host_server_name) > 0) {
+      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0);
+    }
 
     /**
        check result of host subprotocol detection
