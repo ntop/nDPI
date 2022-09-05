@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
   while(fgets(buffer, sizeof(buffer), fd) != NULL) {
     char *hostname = strtok(buffer, "\n");
     
-    if(ndpi_check_dga_name(ndpi_str, NULL, hostname, 1)) {
+    if(ndpi_check_dga_name(ndpi_str, NULL, hostname, 1, 1)) {
       if(verbose)
 	printf("%10s\t%s\n", "[DGA]", hostname);
 	       

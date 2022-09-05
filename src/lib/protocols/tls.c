@@ -1923,7 +1923,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    }
 
 		    if(ndpi_check_dga_name(ndpi_struct, flow,
-					   sni, 1)) {
+					   sni, 1, 0)) {
 #ifdef DEBUG_TLS
 		      printf("[TLS] SNI: (DGA) [%s]\n", sni);
 #endif
