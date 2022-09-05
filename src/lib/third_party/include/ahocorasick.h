@@ -174,8 +174,8 @@ struct edge;
 typedef struct ac_node
 {
   int id;                              /* Node ID : set after finalize(), only for ac_automata_dump */
-  AC_ALPHABET_t  one_alpha,
-		 one:1,                /* one_char: yes/no */
+  AC_ALPHABET_t  one_alpha;
+  unsigned char  one:1,                /* one_char: yes/no */
 		 range:1,              /* range symbols start from one_alpha */
 		 root:1,               /* is root node */
 	  	 final:1,	       /* 0: no ; 1: yes, it is a final node */

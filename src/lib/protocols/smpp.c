@@ -67,7 +67,9 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
       // check if multiple PDUs included
       u_int32_t total_pdu_l = pdu_l;
       u_int32_t tmp_pdu_l = 0;
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
       u_int16_t pdu_c = 1;
+#endif
       // loop PDUs (check if lengths are valid)
       while(total_pdu_l < ((uint32_t)packet->payload_packet_len-4)) {
 	// get next PDU length
@@ -76,8 +78,10 @@ void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
 	if(tmp_pdu_l == 0 ||  ndpi_check_overflow(tmp_pdu_l, total_pdu_l) ) return;
 	// inc total PDU length
 	total_pdu_l += ntohl(get_u_int32_t(packet->payload, total_pdu_l));
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 	// inc total PDU count
 	++pdu_c;
+#endif
       }
         
       NDPI_LOG_DBG2(ndpi_struct, 
