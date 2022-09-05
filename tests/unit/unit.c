@@ -286,12 +286,12 @@ int serializeProtoUnitTest(void)
       buffer_len = 0;
       buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
 #ifndef WIN32
-      char const * const expected_json_str = "{\"ndpi\": {\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Cert\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS (v1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"6\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"proto_id\":\"91.119\",\"encrypted\":1,\"breed\":\"Fun\",\"category_id\":6,\"category\":\"SocialNetwork\"},\"float\":340282346638528859811704183484516925440.000000,\"double\":680564693277057719623408366969033850880.000000}";
+      char const * const expected_json_str = "{\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Cert\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS (v1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"6\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"proto_id\":\"91.119\",\"encrypted\":1,\"breed\":\"Fun\",\"category_id\":6,\"category\":\"SocialNetwork\",\"float\":340282346638528859811704183484516925440.000000,\"double\":680564693277057719623408366969033850880.000000}";
 
       if (strncmp(buffer, expected_json_str, buffer_len) != 0)
       {
         printf("%s: ERROR: expected JSON str: \"%s\"\n", __FUNCTION__, expected_json_str);
-        printf("%s: ERROR: got JSON str: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+        printf("%s: ERROR: got JSON str.....: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
         return -1;
       }
 #endif
@@ -321,7 +321,7 @@ int serializeProtoUnitTest(void)
       if (strncmp(buffer, expected_csv_hdr_str, buffer_len) != 0)
       {
         printf("%s: ERROR: expected CSV str: \"%s\"\n", __FUNCTION__, expected_csv_hdr_str);
-        printf("%s: ERROR: got CSV str: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+        printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
       }
 
       char const * const expected_csv_buf_str = "Self-signed Cert,High,500,450,50,Obsolete TLS (v1.1 or older),High,510,455,55,Weak TLS Cipher,High,250,225,25,Malformed Packet,Low,260,130,130,DPI,TLS.Facebook,91.119,1,Fun,6,SocialNetwork,340282346638528859811704183484516925440.000000,680564693277057719623408366969033850880.000000";
@@ -333,7 +333,7 @@ int serializeProtoUnitTest(void)
       if (strncmp(buffer, expected_csv_buf_str, buffer_len) != 0)
       {
         printf("%s: ERROR: expected CSV str: \"%s\"\n", __FUNCTION__, expected_csv_buf_str);
-        printf("%s: ERROR: got CSV str: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+        printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
       }
     }
 
