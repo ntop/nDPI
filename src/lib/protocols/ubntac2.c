@@ -65,8 +65,8 @@ void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  
 	  version[j] = '\0';
 
-	  len = ndpi_min(sizeof(flow->protos.ubntac2.version)-1, j);
-	  strncpy(flow->protos.ubntac2.version, (const char *)version, len);
+	  len = ndpi_min(sizeof(flow->protos.ubntac2.version) - 1, j);
+	  memcpy(flow->protos.ubntac2.version, (const char *)version, len);
 	  flow->protos.ubntac2.version[len] = '\0';
 	}
 	
