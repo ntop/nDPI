@@ -1198,7 +1198,6 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
 {
   char buf[64];
 
-  ndpi_serialize_start_of_block(serializer, "ndpi");
   ndpi_serialize_risk(serializer, risk);
   ndpi_serialize_confidence(serializer, confidence);
   ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
@@ -1213,7 +1212,6 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_uint32(serializer, "category_id", l7_protocol.category);
     ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
   }
-  ndpi_serialize_end_of_block(serializer);
 }
 
 /* ********************************** */
@@ -1314,6 +1312,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(flow == NULL) return(-1);
 
+  ndpi_serialize_start_of_block(serializer, "ndpi");
   ndpi_serialize_proto(ndpi_struct, serializer, flow->risk, flow->confidence, l7_protocol);
 
   host_server_name = ndpi_get_flow_info(flow, &l7_protocol);
@@ -1521,6 +1520,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_tls2json(serializer, flow);
     break;
   } /* switch */
+
+  ndpi_serialize_end_of_block(serializer); // "ndpi"
 
   return(0);
 }
