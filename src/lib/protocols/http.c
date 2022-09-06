@@ -762,8 +762,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       if(ndpi_struct->proto_defaults[flow->guessed_protocol_id].subprotocol_count == 0) {
 	if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
 	   flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-	  flow->detected_protocol_stack[0] = flow->guessed_host_protocol_id;
-	  flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
+	  ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_host_protocol_id, flow->guessed_protocol_id, NDPI_CONFIDENCE_DPI);
         }
       }
     }
