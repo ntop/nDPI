@@ -1349,7 +1349,7 @@ struct ndpi_flow_struct {
   } kerberos_buf;
 
   struct {
-    u_int8_t num_udp_pkts, num_binding_requests;
+    u_int8_t num_pkts, num_binding_requests;
     u_int16_t num_processed_pkts;
   } stun;
 
