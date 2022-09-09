@@ -1405,7 +1405,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_STUN:
     ndpi_serialize_start_of_block(serializer, "stun");
-    ndpi_serialize_string_uint32(serializer, "num_udp_pkts", flow->stun.num_udp_pkts);
+    ndpi_serialize_string_uint32(serializer, "num_pkts", flow->stun.num_pkts);
     ndpi_serialize_string_uint32(serializer, "num_binding_requests",
                                  flow->stun.num_binding_requests);
     ndpi_serialize_string_uint32(serializer, "num_processed_pkts",
