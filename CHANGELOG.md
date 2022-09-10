@@ -1,5 +1,88 @@
 # CHANGELOG
 
+#### nDPI 4.4 (July 2022)
+
+## New Features
+ - Add risk information that describes why a specific risk was triggered also providing metadata
+ - Added API call ndpi_check_flow_risk_exceptions() for handling risk exceptions
+ - Split protocols in: network (e.g. TLS) and application protocols (e.g. Google)
+ - Extended confidence level with two new values (NDPI_CONFIDENCE_DPI_PARTIAL and NDPI_CONFIDENCE_DPI_PARTIAL_CACHE)
+ - Added ndpi_get_flow_error_code() API call
+
+## New Supported Protocols and Services
+ - Add protocol detection for:
+   - UltraSurf
+   - i3D
+   - RiotGames
+   - TSAN
+   - TunnelBear VPN
+   - collectd
+   - PIM (Protocol Indipendent Multicast)
+   - Pragmatic General Multicast (PGM)
+   - RSH
+   - GoTo products (mainly GoToMeeting)
+   - Dazn
+   - MPEG-DASH
+   - Agora Software Defined Real-time Network (SD-RTN)
+   - Toca Boca
+   - VXLAN
+   - MDNS/LLMNR
+
+## Improvements
+ - Improve protocol detection for:
+   - SMTP/SMTPS now supports STARTTLS
+   - OCSP
+   - TargusDataspeed
+   - Usenet
+   - DTLS (added support for old versions)
+   - TFTP
+   - SOAP via HTTP
+   - GenshinImpact
+   - IPSec/ISAKMP
+   - DNS
+   - syslog
+   - DHCP (various bug fixes and improvements)
+   - NATS
+   - Viber
+   - Xiaomi
+   - Raknet
+   - gnutella
+   - Kerberos
+   - QUIC (Added support for v2drft 01)
+   - SSDP
+   - SNMP
+ - Improved DGA detection
+ - Improved AES-NI check
+ - Add flow risk:
+   - NDPI_PUNYCODE_IDN
+   - NDPI_ERROR_CODE_DETECTED
+   - NDPI_HTTP_CRAWLER_BOT
+   - NDPI_ANONYMOUS_SUBSCRIBER
+   - NDPI_UNIDIRECTIONAL_TRAFFIC
+
+## Changes
+ - Added support for 64 bit bins
+ - Added Cloudflare WARP detection patterns
+ - Renamed Z39.50 -> Z3950
+ - Replaced nDPI's internal hashmap with uthash
+ - Reimplemented 1kxun application protoco
+ - Renamed SkypeCall to Skype_TeamsCall
+ - Updated Python Bindings
+ - Unless --with-libgcrypt is used, nDPI now uses its internal gcrypt implementation
+
+## Fixes
+ - Fixes for some protocol classification families
+ - Fixed default protocol ports for email protocols
+ - Various memory and overflow fixes
+ - Disabled various risks for specific protocols (e.g. disable missing ALPN for CiscoVPN)
+ - Fix TZSP decapsulation
+
+## Misc
+ - Update ASN/IPs lists
+ - Improved code profiling
+ - Use Doxygen to generate the API documentation
+ - Added Edgecast and Cachefly CDNs.
+
 #### nDPI 4.2 (Feb 2022)
 
 ## New Features
