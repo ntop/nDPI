@@ -19,7 +19,7 @@ Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   56/0 (search/found)
 Patricia risk:        6/0 (search/found)
-Patricia protocols:   112/0 (search/found)
+Patricia protocols:   56/0 (search/found)
 
 Unknown	1	78	1
 Syslog	93	20321	21

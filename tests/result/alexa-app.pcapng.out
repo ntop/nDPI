@@ -21,7 +21,7 @@ Automa risk mask:     82/0 (search/found)
 Automa common alpns:  48/48 (search/found)
 Patricia risk mask:   356/0 (search/found)
 Patricia risk:        2/0 (search/found)
-Patricia protocols:   476/244 (search/found)
+Patricia protocols:   238/122 (search/found)
 
 DNS	4	400	2
 DHCP	3	1056	2

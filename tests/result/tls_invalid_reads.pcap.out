@@ -18,7 +18,7 @@ Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   6/0 (search/found)
 Patricia risk:        2/0 (search/found)
-Patricia protocols:   8/4 (search/found)
+Patricia protocols:   4/2 (search/found)
 
 TLS	7	1827	1
 Crashlytics	3	560	1

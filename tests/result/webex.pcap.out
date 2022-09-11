@@ -20,7 +20,7 @@ Automa risk mask:     5/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   132/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   156/108 (search/found)
+Patricia protocols:   78/54 (search/found)
 
 HTTP	22	3182	2
 TLS	106	11841	8

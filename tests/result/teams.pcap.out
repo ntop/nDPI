@@ -22,7 +22,7 @@ Automa risk mask:     21/0 (search/found)
 Automa common alpns:  12/12 (search/found)
 Patricia risk mask:   156/0 (search/found)
 Patricia risk:        2/0 (search/found)
-Patricia protocols:   246/95 (search/found)
+Patricia protocols:   125/48 (search/found)
 
 Unknown	4	456	1
 DNS	10	1357	5
