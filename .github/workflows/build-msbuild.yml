@@ -1,0 +1,34 @@
+name: MSBuild
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+jobs:
+  test:
+    name: MSBuild
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build solution for release
+        run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Release
+
+      - name: Build solution for debug
+        run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: x64
+          retention-days: 14
