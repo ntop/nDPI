@@ -342,14 +342,14 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang')
         run: |
           sudo apt-get install ${{ matrix.compiler }}
-      - name: Install Windows prerequisites
+      - name: Install Windows msys2 prerequisites
         if: startsWith(matrix.os, 'windows')
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           update: true
           install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap
-      - name: Setup Windows prerequisites (libgcrypt)
+      - name: Setup Windows msys2 prerequisites (libgcrypt)
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
         run: |
           msys2 -c 'git clone --branch libgpg-error-1.42 https://github.com/gpg/libgpg-error'
@@ -395,11 +395,11 @@ jobs:
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
           ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
-      - name: Configure nDPI on Windows
+      - name: Configure nDPI on Windows msys2
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
           msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap ${{ matrix.gcrypt }}'
-      - name: Build nDPI on Windows
+      - name: Build nDPI on Windows msys2
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
           msys2 -c 'make all'
