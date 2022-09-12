@@ -177,7 +177,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: ["ubuntu-latest", "ubuntu-18.04", "macOS-latest", "macos-11", "windows-latest"]
+        os: ["ubuntu-latest", "ubuntu-22.04", "macOS-latest", "macos-12", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["cc"]
@@ -192,7 +192,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler: "gcc-10"
+          - compiler: "gcc-11"
             os: ubuntu-latest
             arch: "x86_64"
             gcrypt: ""
@@ -206,8 +206,8 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-          - compiler: "clang-12"
-            os: ubuntu-latest
+          - compiler: "clang-14"
+            os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
@@ -227,15 +227,15 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-thread-sanitizer"
-          - compiler: "clang-12"
-            os: ubuntu-latest
+          - compiler: "clang-14"
+            os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-memory-sanitizer"
           - compiler: "cc"
-            os: ubuntu-18.04
+            os: ubuntu-latest
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
@@ -249,7 +249,7 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
           - compiler: "cc"
-            os: macos-11
+            os: macos-12
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
