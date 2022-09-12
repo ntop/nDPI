@@ -17,7 +17,7 @@ Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   4/3 (search/found)
+Patricia protocols:   3/2 (search/found)
 
 Google	15	5178	1
 QUIC	2	2588	1

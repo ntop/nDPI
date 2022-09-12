@@ -20,7 +20,7 @@ Automa risk mask:     2/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   42/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   84/24 (search/found)
+Patricia protocols:   52/14 (search/found)
 
 ICMP	30	2100	2
 Nintendo	890	320242	12

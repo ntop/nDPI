@@ -19,7 +19,7 @@ Automa risk mask:     6/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   18/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   38/2 (search/found)
+Patricia protocols:   19/1 (search/found)
 
 SMBv1	1	252	1
 TLS	2028	1601908	4

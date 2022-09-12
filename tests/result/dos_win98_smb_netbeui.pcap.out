@@ -18,7 +18,7 @@ Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   4/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   16/0 (search/found)
+Patricia protocols:   8/0 (search/found)
 
 NetBIOS	46	5060	2
 SMBv1	15	3447	1

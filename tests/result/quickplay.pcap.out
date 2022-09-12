@@ -17,7 +17,7 @@ Automa risk mask:     5/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   42/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   70/14 (search/found)
+Patricia protocols:   35/7 (search/found)
 
 HTTP	133	96179	11
 QQ	12	4781	5

@@ -17,7 +17,7 @@ Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   26/0 (search/found)
 Patricia risk:        30/0 (search/found)
-Patricia protocols:   68/8 (search/found)
+Patricia protocols:   34/4 (search/found)
 
 SNMP	72	14435	17
 

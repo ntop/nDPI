@@ -6193,42 +6193,15 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
     }
 
     if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-      if(packet->iph) {
-	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-	  u_int8_t protocol_was_guessed;
+      if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+        u_int8_t protocol_was_guessed;
 
-	  /* ret->master_protocol = flow->guessed_protocol_id , ret->app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
-	  *ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
-	}
-
-	// if(ndpi_str->ndpi_num_custom_protocols != 0)
-	ndpi_fill_protocol_category(ndpi_str, flow, ret);
-	return(-1);
+        /* ret->master_protocol = flow->guessed_protocol_id , ret->app_protocol = flow->guessed_host_protocol_id; /\* ****** *\/ */
+        *ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
       }
-    } else {
-      /* guess host protocol */
-      if(packet->iph) {
-	flow->guessed_host_protocol_id = ndpi_guess_host_protocol_id(ndpi_str, flow);
 
-	/*
-	  We could implement a shortcut here skipping dissectors for
-	  protocols we have identified by other means such as with the IP
-
-	  However we do NOT stop here and skip invoking the dissectors
-	  because we want to dissect the flow (e.g. dissect the TLS)
-	  and extract metadata.
-	*/
-#if SKIP_INVOKING_THE_DISSECTORS
-	if(flow->guessed_host_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-	  /*
-	    We have identified a protocol using the IP address so
-	    it is not worth to dissect the traffic as we already have
-	    the solution
-	  */
-	  ret->master_protocol = flow->guessed_protocol_id, ret->app_protocol = flow->guessed_host_protocol_id;
-	}
-#endif
-      }
+      ndpi_fill_protocol_category(ndpi_str, flow, ret);
+      return(-1);
     }
   }
 
