@@ -20,7 +20,7 @@
 
 #include "ndpi_config.h"
 
-#ifdef linux
+#ifdef __linux__
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -105,7 +105,7 @@ static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
 static u_int8_t num_threads = 1;
 static struct timeval startup_time, begin, end;
-#ifdef linux
+#ifdef __linux__
 static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
 static struct timeval pcap_start = { 0, 0}, pcap_end = { 0, 0 };
@@ -457,7 +457,7 @@ static void help(u_int long_help) {
          "  -k <file>                 | Specify a file to write serialized detection results\n"
          "  -K <format>               | Specify the serialization format for `-k'\n"
          "                            | Valid formats are tlv, csv or json (default)\n"
-#ifdef linux
+#ifdef __linux__
          "  -g <id:id...>             | Thread affinity mask (one core id per thread)\n"
 #endif
          "  -a <mode>                 | Generates option values for GUIs\n"
@@ -788,7 +788,7 @@ static void parseOptions(int argc, char **argv) {
 #ifndef USE_DPDK
   char *__pcap_file = NULL;
   int thread_id, do_capture = 0;
-#ifdef linux
+#ifdef __linux__
   char *bind_mask = NULL;
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
@@ -864,7 +864,7 @@ static void parseOptions(int argc, char **argv) {
       break;
 
 #ifndef USE_DPDK
-#ifdef linux
+#ifdef __linux__
     case 'g':
       bind_mask = optarg;
       break;
@@ -1105,7 +1105,7 @@ static void parseOptions(int argc, char **argv) {
     }
   }
 
-#ifdef linux
+#ifdef __linux__
 #ifndef USE_DPDK
   for(thread_id = 0; thread_id < num_threads; thread_id++)
     core_affinity[thread_id] = -1;
@@ -4041,7 +4041,7 @@ void * processing_thread(void *_thread_id) {
   char pcap_error_buffer[PCAP_ERRBUF_SIZE];
 #endif
 
-#if defined(linux) && defined(HAVE_PTHREAD_SETAFFINITY_NP)
+#if defined(__linux__) && defined(HAVE_PTHREAD_SETAFFINITY_NP)
   if(core_affinity[thread_id] >= 0) {
     cpu_set_t cpuset;
 
