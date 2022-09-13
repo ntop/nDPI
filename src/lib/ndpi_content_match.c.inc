@@ -716,6 +716,8 @@ static ndpi_network host_protocol_list[] = {
   { 0x3353EED0 /* 51.83.238.208/29 */, 29, NDPI_PROTOCOL_ANYDESK },
   { 0x3353EED8 /* 51.83.238.216/30 */, 30, NDPI_PROTOCOL_ANYDESK },
   { 0x3353EEDC /* 51.83.238.220/31 */, 31, NDPI_PROTOCOL_ANYDESK },
+  /* From support.anydesk.com/knowledge/firewall */
+  { 0xEFFF6612 /* 239.255.102.18/32 */, 32, NDPI_PROTOCOL_ANYDESK },
 
   /*
    * Edgecast CDN
@@ -1713,6 +1715,7 @@ static ndpi_protocol_match host_match[] =
 
 static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "CN=AnyDesk Client",               NDPI_PROTOCOL_ANYDESK     },
+  { "O=philandro Software GmbH",       NDPI_PROTOCOL_ANYDESK     },
   { "O=Kakao",                         NDPI_PROTOCOL_KAKAOTALK   },
   { "O=ntop.org",                      NDPI_PROTOCOL_NTOP        },
   { "O=Netflix",                       NDPI_PROTOCOL_NETFLIX     },
